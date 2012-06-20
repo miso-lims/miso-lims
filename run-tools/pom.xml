@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2010. The Genome Analysis Centre, Norwich, UK
+  ~ MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+  ~
+  ~ **********************************************************************
+  ~
+  ~ This file is part of MISO.
+  ~
+  ~ MISO is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ MISO is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+  ~
+  ~ **********************************************************************
+  -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <parent>
+    <artifactId>miso</artifactId>
+    <groupId>uk.ac.bbsrc.tgac.miso</groupId>
+    <version>0.1.6RC</version>
+  </parent>
+
+  <groupId>${parent.groupId}</groupId>
+  <version>${parent.version}</version>
+  <artifactId>run-tools</artifactId>
+
+  <packaging>jar</packaging>
+  <name>MISO Run Tools</name>
+  <modelVersion>4.0.0</modelVersion>
+  <url>http://maven.apache.org</url>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <repositories>
+    <repository>
+      <id>hasbanana-repo</id>
+      <url>http://www.hasbanana.com/maven/repo</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+
+  <dependencies>
+    <dependency>
+        <groupId>${parent.groupId}</groupId>
+        <artifactId>core</artifactId>
+        <version>${parent.version}</version>
+    </dependency>
+
+    <dependency>
+        <groupId>org.springframework.integration</groupId>
+        <artifactId>spring-integration-core</artifactId>
+        <version>${spring-integration-version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework.integration</groupId>
+        <artifactId>spring-integration-http</artifactId>
+        <version>${spring-integration-version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework.integration</groupId>
+        <artifactId>spring-integration-xml</artifactId>
+        <version>${spring-integration-version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework.integration</groupId>
+        <artifactId>spring-integration-file</artifactId>
+        <version>${spring-integration-version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework.integration</groupId>
+        <artifactId>spring-integration-ip</artifactId>
+        <version>${spring-integration-version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework.integration</groupId>
+        <artifactId>spring-integration-event</artifactId>
+        <version>${spring-integration-version}</version>
+    </dependency>
+  </dependencies>
+
+  <properties>
+    <spring-integration-version>2.0.3.RELEASE</spring-integration-version>
+  </properties>
+</project>

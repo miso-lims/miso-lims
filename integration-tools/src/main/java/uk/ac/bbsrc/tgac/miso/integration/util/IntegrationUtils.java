@@ -1,0 +1,159 @@
+/*
+ * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
+ * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * *********************************************************************
+ *
+ * This file is part of MISO.
+ *
+ * MISO is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MISO is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * *********************************************************************
+ */
+
+package uk.ac.bbsrc.tgac.miso.integration.util;
+
+import org.apache.commons.codec.binary.Base64InputStream;
+import org.apache.commons.codec.binary.Base64OutputStream;
+
+import java.io.*;
+import java.net.*;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
+
+/**
+ * uk.ac.bbsrc.tgac.miso.integration.util
+ * <p/>
+ * Info
+ *
+ * @author Rob Davey
+ * @date 04/11/11
+ * @since 0.1.3
+ */
+public class IntegrationUtils {
+  /**
+   * Sets up the socket connection to a given host
+   *
+   * @param host of type String
+   * @param port of type int
+   * @return Socket
+   * @throws IntegrationException when the socket couldn't be created
+   */
+  public static Socket prepareSocket(String host, int port) throws IntegrationException {
+    try {
+      return new Socket(host, port);
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+      throw new IntegrationException(e.getMessage());
+    }
+  }
+
+  /**
+   * Sends a String message to a given host socket
+   *
+   * @param socket of type Socket
+   * @param query of type String
+   * @return String
+   * @throws IntegrationException when the socket couldn't be created
+   */
+  public static String sendMessage(Socket socket, String query) throws IntegrationException {
+    BufferedWriter wr = null;
+    BufferedReader rd = null;
+    try {
+      wr = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF8"));
+
+      // Send data
+      wr.write(query+"\r\n");
+      wr.flush();
+
+      // Get response
+      rd = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+      String line;
+      StringBuilder sb = new StringBuilder();
+      while ((line = rd.readLine()) != null) {
+        sb.append(line);
+      }
+      wr.close();
+      rd.close();
+
+      String dirty = sb.toString();
+      StringBuilder response = new StringBuilder();
+      int codePoint;
+      int i=0;
+      while(i<dirty.length()) {
+          codePoint = dirty.codePointAt(i);
+          if ((codePoint == 0x9) ||
+              (codePoint == 0xA) ||
+              (codePoint == 0xD) ||
+              ((codePoint >= 0x20) && (codePoint <= 0xD7FF)) ||
+              ((codePoint >= 0xE000) && (codePoint <= 0xFFFD)) ||
+              ((codePoint >= 0x10000) && (codePoint <= 0x10FFFF))) {
+              response.append(Character.toChars(codePoint));
+          }
+          i+= Character.charCount(codePoint);
+      }
+
+      return response.toString().replace("\\\n", "").replace("\\\t", "");
+    }
+    catch (UnknownHostException e) {
+      System.err.println("Cannot resolve host: " + socket.getInetAddress());
+      throw new IntegrationException(e.getMessage());
+    }
+    catch (IOException e) {
+      System.err.println("Couldn't get I/O for the connection to: " + socket.getInetAddress());
+      throw new IntegrationException(e.getMessage());
+    }
+    finally {
+      try {
+        if (wr != null) {
+          wr.close();
+        }
+        if (rd != null) {
+          rd.close();
+        }
+      } catch (Throwable t) {
+        t.printStackTrace();
+      }
+    }
+  }
+
+  public static byte[] compress(byte[] content) {
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    Base64OutputStream b64os = new Base64OutputStream(baos);
+    try {
+      GZIPOutputStream gzip = new GZIPOutputStream(b64os);
+      gzip.write(content);
+      gzip.close();
+    } catch(IOException e) {
+      throw new RuntimeException(e);
+    }
+    //System.out.printf("Compression ratio %f\n", (1.0f * content.length/baos.size()));
+    return baos.toByteArray();
+  }
+
+  public static byte[] decompress(byte[] contentBytes) {
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    try{
+      GZIPInputStream bis = new GZIPInputStream(new Base64InputStream(new ByteArrayInputStream(contentBytes)));
+      byte[] buffer = new byte[1024*4];
+      int n = 0;
+      while (-1 != (n = bis.read(buffer))) {
+        out.write(buffer, 0, n);
+      }
+    } catch(IOException e) {
+        throw new RuntimeException(e);
+    }
+    return out.toByteArray();
+  }
+}

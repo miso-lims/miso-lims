@@ -1,0 +1,1195 @@
+<%--
+  ~ Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
+  ~ MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+  ~ **********************************************************************
+  ~
+  ~ This file is part of MISO.
+  ~
+  ~ MISO is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ MISO is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+  ~
+  ~ **********************************************************************
+  --%>
+
+<%--
+  Created by IntelliJ IDEA.
+  User: davey
+  Date: 15-Feb-2010
+  Time: 15:09:06
+
+--%>
+<%@ include file="../header.jsp" %>
+<script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.breadcrumbs.popup.js'/>"></script>
+<script src="<c:url value='/scripts/datatables_utils.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
+
+<div id="maincontent">
+<div id="contentcolumn">
+<c:if test="${empty library.libraryId}">
+<script src="<c:url value='/scripts/jquery/datatables/jquery.dataTables.min.js'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.mini.js'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.datepicker.js'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.checkbox.js'/>" type="text/javascript"></script>
+<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/datatable.css'/>" type="text/css">
+
+<div id="tabs">
+<ul>
+    <li><a href="#tab-1"><span>Single</span></a></li>
+    <li><a href="#tab-2"><span>Bulk</span></a></li>
+</ul>
+
+<div id="tab-1">
+</c:if>
+
+<form:form method="POST" commandName="library" autocomplete="off" onsubmit="return validate_library(this);">
+<h1>
+    <c:choose>
+        <c:when test="${not empty library.libraryId}">Edit</c:when>
+        <c:otherwise>Create</c:otherwise>
+    </c:choose> Library
+    <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
+</h1>
+<div class="breadcrumbs">
+    <ul>
+        <li>
+            <a href='<c:url value="/"/>'>Home</a>
+        </li>
+        <li>
+            <div class="breadcrumbsbubbleInfo">
+                <div class="trigger">
+                    <a href='<c:url value="/miso/project/${library.sample.project.projectId}"/>'>${library.sample.project.name}</a>
+                </div>
+                <div class="breadcrumbspopup">
+                        ${library.sample.project.alias}
+                </div>
+            </div>
+        </li>
+        <li>
+            <div class="breadcrumbsbubbleInfo">
+                <div class="trigger">
+                    <a href='<c:url value="/miso/sample/${library.sample.sampleId}"/>'>${library.sample.name}</a>
+                </div>
+                <div class="breadcrumbspopup">
+                        ${library.sample.alias}
+                </div>
+            </div>
+        </li>
+    </ul>
+</div>
+<div class="sectionDivider" onclick="toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
+    <div id="note_arrowclick" class="toggleLeft"></div>
+</div>
+<div id="notediv" class="note" style="display:none;">A Library is the first step in constructing sequenceable
+    material from an initial Sample. A Library is then diluted down to a Dilution, and put in a Pool.
+</div>
+<h2>Library Information</h2>
+
+<div class="barcodes">
+    <div class="barcodeArea ui-corner-all">
+        <c:choose>
+            <c:when test="${empty library.locationBarcode}">
+                <span style="float: left; font-size: 24px; font-weight: bold; color:#BBBBBB">Location</span><form:input
+                    path="locationBarcode" size="8"/>
+            </c:when>
+            <c:otherwise>
+                <span style="float: left; font-size: 24px; font-weight: bold; color:#BBBBBB">Location</span>
+                <ul class="barcode-ddm">
+                    <li><a
+                            onmouseover="mopen('locationBarcodeMenu')"
+                            onmouseout="mclosetime()"><span style="float:right; margin-top:6px;" class="ui-icon ui-icon-triangle-1-s"></span><span id="locationBarcode" style="float:right; margin-top:6px; padding-bottom: 11px;">${sample.locationBarcode}</span></a>
+
+                        <div id="locationBarcodeMenu"
+                             onmouseover="mcancelclosetime()"
+                             onmouseout="mclosetime()">
+                            <a href="javascript:void(0);" onclick="showLibraryLocationChangeDialog(${library.libraryId});">Change location</a>
+                        </div>
+                    </li>
+                </ul>
+                <div id="changeLibraryLocationDialog" title="Change Library Location"></div>
+            </c:otherwise>
+        </c:choose>
+    </div>
+    <div class="barcodeArea ui-corner-all">
+      <span style="float: left; font-size: 24px; font-weight: bold; color:#BBBBBB">ID</span>
+        <c:if test="${not empty library.identificationBarcode}">
+          <ul class="barcode-ddm">
+              <li><a
+                      onmouseover="mopen('idBarcodeMenu')"
+                      onmouseout="mclosetime()"><span style="float:right; margin-top:6px;" class="ui-icon ui-icon-triangle-1-s"></span><span id="idBarcode" style="float:right"></span></a>
+
+                  <div id="idBarcodeMenu"
+                       onmouseover="mcancelclosetime()"
+                       onmouseout="mclosetime()">
+                      <a href="javascript:void(0);" onclick="printLibraryBarcodes(${library.libraryId});">Print</a>
+                  </div>
+              </li>
+          </ul>
+          <%-- <div style="clear:both"></div> --%>
+            <script type="text/javascript">
+                jQuery(document).ready(function() {
+                    Fluxion.doAjax(
+                            'libraryControllerHelperService',
+                            'getLibraryBarcode',
+                    {'libraryId':${library.libraryId},
+                        'url':ajaxurl
+                    },
+                    {'doOnSuccess':function(json) {
+                        jQuery('#idBarcode').html("<img style='border:0;' src='<c:url value='/temp/'/>" + json.img + "'/>");
+                    }
+                    });
+                });
+            </script>
+        </c:if>
+    </div>
+    <div id="printServiceSelectDialog" title="Select a Printer"></div>
+</div>
+
+<table class="in">
+<tr>
+    <td class="h">Library ID:</td>
+    <td>
+        <c:choose>
+            <c:when test="${not empty library.libraryId}">${library.libraryId}</c:when>
+            <c:otherwise><i>Unsaved</i></c:otherwise>
+        </c:choose>
+    </td>
+</tr>
+<tr>
+    <td>Name:</td>
+    <td>
+        <c:choose>
+            <c:when test="${not empty library.libraryId}">${library.name}</c:when>
+            <c:otherwise><i>Unsaved</i></c:otherwise>
+        </c:choose>
+    </td>
+</tr>
+<tr>
+    <td>Parent Sample:</td>
+    <td>
+        <c:choose>
+            <c:when test='${empty library.sample}'>
+                <i>Unassigned</i>
+            </c:when>
+            <c:otherwise>
+                <a href='<c:url value="/miso/sample/${library.sample.sampleId}"/>'>${library.sample.name}</a>
+            </c:otherwise>
+        </c:choose>
+    </td>
+</tr>
+<tr>
+    <td class="h">Alias:</td>
+    <td>
+        <c:choose>
+            <c:when test="${not empty autogeneratedLibraryAlias}">
+                <form:input path="alias" value="${autogeneratedLibraryAlias}" class="validateable"/>
+            </c:when>
+            <c:otherwise>
+                <form:input path="alias" class="validateable"/>
+            </c:otherwise>
+        </c:choose>
+
+        <span id="aliascounter" class="counter"></span>
+    </td>
+        <%-- <td><a href="void(0);" onclick="popup('help/libraryAlias.html');">Help</a></td> --%>
+</tr>
+<tr>
+    <td>Description:</td>
+    <td><form:input path="description" class="validateable"/><span id="descriptioncounter" class="counter"></span></td>
+        <%-- <td><a href="void(0);" onclick="popup('help/libraryDescription.html');">Help</a></td> --%>
+</tr>
+<tr>
+    <td class="h">Creation date:</td>
+    <td><fmt:formatDate value="${library.creationDate}"/></td>
+</tr>
+<c:if test="${not empty library.accession}">
+    <tr>
+        <td class="h">Accession:</td>
+        <td><a href="http://www.ebi.ac.uk/ena/data/view/${library.accession}">${library.accession}</a>
+        </td>
+            <%-- <td><a href="void(0);" onclick="popup('help/libraryAccession.html');">Help</a></td> --%>
+    </tr>
+</c:if>
+<tr>
+    <td>Paired:</td>
+    <td>
+        <c:choose>
+            <c:when test="${empty library.libraryId}">
+                <form:checkbox path="paired" checked="checked"/>
+            </c:when>
+            <c:otherwise>
+                <form:checkbox path="paired"/>
+            </c:otherwise>
+        </c:choose>
+    </td>
+</tr>
+<tr>
+  <%--
+  <td>Platform - Library Type:</td>
+  <td>
+      <form:select id="platformNames" path="platformName" items="${platformNames}"
+                   onchange="changePlatformName(this);"/>
+      <form:select id="libraryTypes" path="libraryType"/>
+  </td>
+  <c:if test="${empty library.libraryId}">
+    <script type="text/javascript">
+        jQuery(document).ready(function() {
+            changePlatformName(jQuery("#platformNames"));
+        });
+    </script>
+  </c:if>
+  --%>
+    <c:choose>
+        <c:when test="${empty library.libraryId or empty library.libraryType}">
+            <td>Platform - Library Type:</td>
+            <td>
+                <form:select id="platformNames" path="platformName" items="${platformNames}"
+                             onchange="changePlatformName(this);"/>
+                <form:select id="libraryTypes" path="libraryType"/>
+            </td>
+            <script type="text/javascript">
+                jQuery(document).ready(function() {
+                    changePlatformName(jQuery("#platformNames"));
+                });
+            </script>
+        </c:when>
+        <c:otherwise>
+            <td>Platform - Library Type</td>
+            <td>${library.platformName} - ${library.libraryType.description}</td>
+        </c:otherwise>
+    </c:choose>
+</tr>
+<tr>
+  <%--
+  <td>Library Selection Type:</td>
+  <td><form:select id="librarySelectionTypes" path="librarySelectionType" items="${librarySelectionTypes}"
+                   itemLabel="name" itemValue="librarySelectionTypeId"/>
+  </td>
+  --%>
+    <c:choose>
+        <c:when test="${empty library.libraryId or empty library.librarySelectionType}">
+            <td>Library Selection Type:</td>
+            <td>
+                <form:select id="librarySelectionTypes" path="librarySelectionType" items="${librarySelectionTypes}"
+                             itemLabel="name" itemValue="librarySelectionTypeId"/>
+            </td>
+        </c:when>
+        <c:otherwise>
+            <td>Library Selection Type:</td>
+            <td>${library.librarySelectionType.name}</td>
+        </c:otherwise>
+    </c:choose>
+</tr>
+<tr>
+  <%--
+  <td>Library Strategy Type:</td>
+  <td>
+      <form:select id="libraryStrategyTypes" path="libraryStrategyType" items="${libraryStrategyTypes}"
+                   itemLabel="name" itemValue="libraryStrategyTypeId"/>
+  </td>
+  --%>
+
+    <c:choose>
+        <c:when test="${empty library.libraryId or empty library.libraryStrategyType}">
+            <td>Library Strategy Type:</td>
+            <td>
+                <form:select id="libraryStrategyTypes" path="libraryStrategyType" items="${libraryStrategyTypes}"
+                             itemLabel="name" itemValue="libraryStrategyTypeId"/>
+            </td>
+        </c:when>
+        <c:otherwise>
+            <td>Library Strategy Type:</td>
+            <td>${library.libraryStrategyType.name}</td>
+        </c:otherwise>
+    </c:choose>
+
+</tr>
+<tr>
+  <%--
+  <td>Tag Barcode:</td>
+  <td>
+      <form:select id="tagBarcodes" path="tagBarcode">
+        <form:option value="" label="No Barcode"/>
+        <form:options items="${availableTagBarcodes}" itemLabel="name" itemValue="tagBarcodeId" />
+      </form:select>
+  </td>
+  --%>
+
+    <c:choose>
+        <c:when test="${empty library.libraryId or empty library.tagBarcode}">
+            <td>Tag Barcode:</td>
+            <td>
+                <form:select id="tagBarcodes" path="tagBarcode">
+                  <form:option value="" label="No Barcode"/>
+                  <form:options items="${availableTagBarcodes}" itemLabel="name" itemValue="tagBarcodeId" />
+                </form:select>
+            </td>
+        </c:when>
+        <c:otherwise>
+            <td>Tag Barcode:</td>
+            <td>
+                <form:select id="tagBarcodes" path="tagBarcode">
+                  <form:option value="" label="No Barcode"/>
+                  <form:options items="${availableTagBarcodes}" itemLabel="name" itemValue="tagBarcodeId" />
+                </form:select>
+            </td>
+        </c:otherwise>
+    </c:choose>
+</tr>
+<tr bgcolor="yellow">
+    <td>QC Passed:</td>
+    <td>
+        <form:checkbox path="qcPassed"/>
+    </td>
+</tr>
+<c:choose>
+    <c:when test="${!empty library.sample and library.securityProfile.profileId eq library.sample.project.securityProfile.profileId}">
+        <tr>
+            <td>Permissions</td>
+            <td><i>Inherited from sample </i><a
+                    href='<c:url value="/miso/sample/${library.sample.sampleId}"/>'>${library.sample.name}</a>
+                <input type="hidden" value="${library.sample.securityProfile.profileId}"
+                       name="securityProfile" id="securityProfile"/>
+            </td>
+        </tr>
+        </table>
+    </c:when>
+    <c:otherwise>
+        </table>
+        <%@ include file="permissions.jsp" %>
+    </c:otherwise>
+</c:choose>
+
+<c:if test="${not empty library.libraryId}">
+    <div class="sectionDivider" onclick="toggleLeftInfo(jQuery('#notes_arrowclick'), 'notes');">Notes
+        <div id="notes_arrowclick" class="toggleLeftDown"></div>
+    </div>
+    <div id="notes">
+      <h1>Notes</h1>
+        <ul class="sddm">
+            <li><a
+                    onmouseover="mopen('notesmenu')"
+                    onmouseout="mclosetime()">Options <span style="float:right"
+                                                            class="ui-icon ui-icon-triangle-1-s"></span></a>
+
+                <div id="notesmenu"
+                     onmouseover="mcancelclosetime()"
+                     onmouseout="mclosetime()">
+                    <a onclick="showLibraryNoteDialog(${library.libraryId});" href="javascript:void(0);" class="add">Add
+                        Note</a>
+                </div>
+            </li>
+        </ul>
+        <%-- <div style="clear:both"></div> --%>
+        <c:if test="${fn:length(library.notes) > 0}">
+        <div class="note" style="clear:both">
+        <c:forEach items="${library.notes}" var="note" varStatus="n">
+            <div class="exppreview" id="library-notes-${n.count}">
+                <b>${note.creationDate}</b>: ${note.text}
+            <span class="float-right"
+                  style="font-weight:bold; color:#C0C0C0;">${note.owner.loginName}</span>
+            </div>
+        </c:forEach>
+        </div>
+        </c:if>
+        <div id="addLibraryNoteDialog" title="Create new Note"></div>
+    </div>
+</c:if>
+</form:form>
+<br/>
+<c:if test="${not empty library.libraryId}">
+<h1>
+    <div id="qcsTotalCount">
+    </div>
+</h1>
+<%--
+<a href='javascript:void(0);' class="add"
+   onclick="insertLibraryQCRow(${library.libraryId}
+    <sec:authorize access="hasRole('ROLE_ADMIN')">, true</sec:authorize>
+   ); return false;">Add Library QC</a><br/>
+--%>
+<ul class="sddm">
+    <li><a
+            onmouseover="mopen('qcmenu')"
+            onmouseout="mclosetime()">Options <span style="float:right"
+                                                    class="ui-icon ui-icon-triangle-1-s"></span></a>
+
+        <div id="qcmenu"
+             onmouseover="mcancelclosetime()"
+             onmouseout="mclosetime()">
+            <a href='javascript:void(0);' class="add"
+               onclick="insertLibraryQCRow(${library.libraryId}); return false;">Add Library QC</a>
+        </div>
+    </li>
+</ul>
+<span style="clear:both">
+  <div id="addLibraryQC"></div>
+  <form id='addQcForm'>
+      <table class="list" id="libraryQcTable">
+          <thead>
+          <tr>
+                  <%--
+                  <sec:authorize access="hasRole('ROLE_ADMIN')">
+                      <th class="fit">ID</th>
+                  </sec:authorize>
+                  --%>
+              <th>QCed By</th>
+              <th>QC Date</th>
+              <th>Method</th>
+              <th>Results</th>
+              <th>Insert Size</th>
+                  <c:if test="${(library.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
+                                  or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+                      <th align="center">Edit</th>
+                  </c:if>
+          </tr>
+          </thead>
+          <tbody>
+          <c:if test="${not empty library.libraryQCs}">
+              <c:forEach items="${library.libraryQCs}" var="qc">
+                  <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
+                          <%--
+                          <sec:authorize access="hasRole('ROLE_ADMIN')">
+                              <td class="fit">${qc.qcId}</td>
+                          </sec:authorize>
+                          --%>
+                      <td>${qc.qcCreator}</td>
+                      <td><fmt:formatDate value="${qc.qcDate}"/></td>
+                      <td>${qc.qcType.name}</td>
+                      <td id="result${qc.qcId}">${qc.results} ${qc.qcType.units}</td>
+                      <td id="insert${qc.qcId}">${qc.insertSize} bp</td>
+                          <c:if test="${(library.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
+                                          or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+                              <td id="edit${qc.qcId}" align="center"><a href="javascript:void(0);" onclick="changeLibraryQCRow('${qc.qcId}','${library.libraryId}')">
+                                  <span class="ui-icon ui-icon-pencil"></span></a></td>
+                          </c:if>
+                  </tr>
+              </c:forEach>
+          </c:if>
+          </tbody>
+      </table>
+      <input type='hidden' id='qcLibraryId' name='libraryId' value='${library.libraryId}'/>
+  </form>
+</span>
+
+<%--
+<h2 class="hrule">Upload LibraryQC File</h2>
+<table class="in">
+    <tr>
+        <td width="30%">
+            <form method='post'
+                  id='ajax_upload_form'
+                  action="<c:url value="/miso/upload/libraryqc"/>"
+                  enctype="multipart/form-data"
+                  target="target_upload"
+                  onsubmit="fileUploadProgress('ajax_upload_form', 'statusdiv', pageReload);">
+                <input type="hidden" name="libraryId" value="${library.libraryId}"/><br/>
+                <input type="file" name="file"/><br/>
+                <button type="submit" class="br-button ui-state-default ui-corner-all">Upload</button>
+            </form>
+            <iframe id='target_upload' name='target_upload' src='' style='display: none'></iframe>
+            <div id="statusdiv"></div>
+        </td>
+    </tr>
+</table>
+
+<ul>
+    <c:forEach items="${qcFiles}" var="file">
+        <li><a href="<c:url value='/miso/download/library/${library.libraryId}/qc/${file.key}'/>">${file.value}</a></li>
+    </c:forEach>
+</ul>
+--%>
+
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        jQuery("#libraryQcTable").tablesorter({
+            headers: {
+            }
+        });
+    });
+    jQuery(document).ready(function() {
+        writeTotalNo();
+    });
+    function writeTotalNo() {
+        jQuery('#qcsTotalCount').html(jQuery('#libraryQcTable>tbody>tr:visible').length.toString() + " QCs");
+        jQuery('#ldsTotalCount').html(jQuery('#libraryDilutionTable>tbody>tr:visible').length.toString() + " Library Dilutions");
+    }
+</script>
+
+<h1>
+    <div id="ldsTotalCount">
+    </div>
+</h1>
+<ul class="sddm">
+    <li><a
+            onmouseover="mopen('ldmenu')"
+            onmouseout="mclosetime()">Options <span style="float:right"
+                                                    class="ui-icon ui-icon-triangle-1-s"></span></a>
+
+        <div id="ldmenu"
+             onmouseover="mcancelclosetime()"
+             onmouseout="mclosetime()">
+            <a href='javascript:void(0);' class="add"
+               onclick="insertLibraryDilutionRow(${library.libraryId}); return false;">Add Library Dilution</a>
+            <c:if test="${not empty library.libraryDilutions}">
+              <a href='<c:url value="/miso/poolwizard/new/${library.sample.project.projectId}"/>'>Create Pools</a>
+            </c:if>
+        </div>
+    </li>
+</ul>
+<span style="clear:both">
+  <div id="addLibraryDilution"></div>
+  <form id='addDilutionForm'>
+      <table class="list" id="libraryDilutionTable">
+          <thead>
+          <tr>
+              <th>LD Name</th>
+              <th>Done By</th>
+              <th>Date</th>
+              <th>Results (${libraryDilutionUnits})</th>
+              <th>ID Barcode</th>
+              <%-- <th>Location Barcode</th> --%>
+              <c:if test="${(dil.dilutionCreator eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
+                              or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+                  <th align="center">Edit</th>
+              </c:if>
+          </tr>
+          </thead>
+          <tbody>
+          <c:if test="${not empty library.libraryDilutions}">
+              <c:forEach items="${library.libraryDilutions}" var="dil">
+                  <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
+                          <%--
+                          <sec:authorize access="hasRole('ROLE_ADMIN')">
+                              <td class="fit">${dil.dilutionId}</td>
+                          </sec:authorize>
+                          --%>
+                      <td>${dil.name}</td>
+                      <td>${dil.dilutionCreator}</td>
+                      <td><fmt:formatDate value="${dil.creationDate}"/></td>
+                      <td id="results${dil.dilutionId}">${dil.concentration} ${libraryDilutionUnits}</td>
+                      <td class="fit">
+                          <c:if test="${not empty dil.identificationBarcode}">
+                          <div class="barcodes">
+                            <div class="barcodeArea ui-corner-all">
+                              <ul class="barcode-ddm">
+                                  <li><a
+                                          onmouseover="mopen('dil${dil.dilutionId}IdBarcodeMenu')"
+                                          onmouseout="mclosetime()"><span style="float:right; margin-top:6px;" class="ui-icon ui-icon-triangle-1-s"></span><span id="dil${dil.dilutionId}IdBarcode" style="float:right"></span></a>
+
+                                      <div id="dil${dil.dilutionId}IdBarcodeMenu"
+                                           onmouseover="mcancelclosetime()"
+                                           onmouseout="mclosetime()">
+                                          <a href="javascript:void(0);" onclick="printDilutionBarcode(${dil.dilutionId}, '${library.platformName}');">Print</a>
+                                      </div>
+                                  </li>
+                              </ul>
+
+                              <script type="text/javascript">
+                                  jQuery(document).ready(function() {
+                                      Fluxion.doAjax(
+                                              'libraryControllerHelperService',
+                                              'getLibraryDilutionBarcode',
+                                      {'dilutionId':${dil.dilutionId},
+                                          'url':ajaxurl
+                                      },
+                                      {'doOnSuccess':function(json) {
+                                          jQuery('#dil${dil.dilutionId}IdBarcode').html("<img style='border:0;' src='<c:url value='/temp/'/>" + json.img + "'/><br/>");
+                                      }
+                                      });
+                                  });
+                              </script>
+                            </div>
+                          </div>
+
+                          </c:if>
+                      </td>
+                      <c:if test="${(sample.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
+                                      or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+                          <td id="edit${dil.dilutionId}" align="center"><a href="javascript:void(0);"
+                                                                    onclick="changeLibraryDilutionRow('${dil.dilutionId}','${library.libraryId}')">
+                              <span class="ui-icon ui-icon-pencil"></span></a></td>
+                      </c:if>
+                      <%-- <td>${dil.locationBarcode}</td> --%>
+                      <c:choose>
+                          <c:when test="${library.platformName ne 'Illumina'}">
+                              <td><a href="javascript:void(0);" onclick="insertEmPcrRow(${dil.dilutionId});">Add emPCR</a>
+                              </td>
+                          </c:when>
+                          <c:otherwise>
+                              <td>
+                                <%--
+                                <a href="<c:url value='/miso/pool/${fn:toLowerCase(library.platformName)}/new/dilution/${dil.dilutionId}'/>">Construct
+                                      new Pool using this dilution...</a></td>
+                                      --%>
+                                <a href="<c:url value="/miso/poolwizard/new/${library.sample.project.projectId}"/>">Construct
+                                      new Pool using this dilution...</a>
+                              </td>
+                          </c:otherwise>
+                      </c:choose>
+                  </tr>
+              </c:forEach>
+          </c:if>
+          </tbody>
+      </table>
+      <input type='hidden' id='dilLibraryId' name='libraryId' value='${library.libraryId}'/>
+  </form>
+</span>
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        jQuery("#libraryDilutionTable").tablesorter({
+            headers: {
+            }
+        });
+    });
+</script>
+<br/>
+
+<c:if test="${library.platformName ne 'Illumina'}">
+    <h1>emPCR</h1>
+
+    <div id="addEmPcr"></div>
+    <form id='addEmPcrForm'>
+        <table class="list" id="emPcrTable">
+            <thead>
+            <tr>
+                    <%--
+                    <sec:authorize access="hasRole('ROLE_ADMIN')">
+                        <th class="fit">ID</th>
+                    </sec:authorize>
+                    --%>
+                <th>Library Dilution ID</th>
+                <th>PCRed By</th>
+                <th>PCR Date</th>
+                <th>Results (${emPCRUnits})</th>
+                    <%-- <th>Add emPCR Dilution</th> --%>
+            </tr>
+            </thead>
+            <tbody>
+            <c:if test="${not empty emPCRs}">
+                <c:forEach items="${emPCRs}" var="empcr">
+                    <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
+                            <%--
+                            <sec:authorize access="hasRole('ROLE_ADMIN')">
+                                <td class="fit">${empcr.pcrId}</td>
+                            </sec:authorize>
+                            --%>
+                        <td>${empcr.libraryDilution.dilutionId}</td>
+                        <td>${empcr.pcrCreator}</td>
+                        <td><fmt:formatDate value="${empcr.creationDate}"/></td>
+                        <td>${empcr.concentration} ${emPCRUnits}</td>
+                        <td><a href="javascript:void(0);" onclick="insertEmPcrDilutionRow(${empcr.pcrId});">Add emPCR
+                            Dilution</a>
+                        </td>
+                    </tr>
+                </c:forEach>
+            </c:if>
+            </tbody>
+        </table>
+            <%-- <input type='hidden' id='dilutionId' name='dilutionId' value='${empcr.libraryDilution.dilutionId}'/> --%>
+    </form>
+    <script type="text/javascript">
+        jQuery(document).ready(function() {
+            jQuery("#emPcrTable").tablesorter({
+                headers: {
+                }
+            });
+        });
+    </script>
+
+    <h1>emPCR Dilutions</h1>
+
+    <div id="addEmPcrDilution"></div>
+    <form id='addEmPcrDilutionForm'>
+        <table class="list" id="emPcrDilutionTable">
+            <thead>
+            <tr>
+                    <%--
+                    <sec:authorize access="hasRole('ROLE_ADMIN')">
+                        <th class="fit">ID</th>
+                    </sec:authorize>
+                    --%>
+                <th>emPCR ID</th>
+                <th>Done By</th>
+                <th>Date</th>
+                    <%--<th>Location Barcode</th>--%>
+                <th>Results (${emPCRDilutionUnits})</th>
+                <th>Construct Pool</th>
+            </tr>
+            </thead>
+            <tbody>
+            <c:if test="${not empty emPcrDilutions}">
+                <c:forEach items="${emPcrDilutions}" var="dil">
+                    <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
+                            <%--
+                            <sec:authorize access="hasRole('ROLE_ADMIN')">
+                                <td class="fit">${dil.dilutionId}</td>
+                            </sec:authorize>
+                            --%>
+                        <td>${dil.emPCR.pcrId}</td>
+                        <td>${dil.dilutionCreator}</td>
+                        <td><fmt:formatDate value="${dil.creationDate}"/></td>
+                            <%--<td>${dil.locationBarcode}</td>--%>
+                        <td>${dil.concentration} ${emPCRDilutionUnits}</td>
+                        <td>
+                          <%--
+                            <a href="<c:url value='/miso/pool/${fn:toLowerCase(library.platformName)}/new/dilution/${dil.dilutionId}'/>">Construct
+                                new Pool using this dilution...</a></td>
+                                --%>
+                            <a href="<c:url value="/miso/poolwizard/new/${library.sample.project.projectId}"/>">Construct
+                                  new Pool using this dilution...</a>
+                    </tr>
+                </c:forEach>
+            </c:if>
+            </tbody>
+        </table>
+            <%-- <input type='hidden' id='emPcrId' name='emPcrId' value='${empcr.pcrId}'/> --%>
+    </form>
+    <script type="text/javascript">
+        jQuery(document).ready(function() {
+            jQuery("#emPcrDilutionTable").tablesorter({
+                headers: {
+                }
+            });
+        });
+    </script>
+    <br/>
+</c:if>
+</c:if>
+
+<c:if test="${empty library.libraryId}">
+</div>
+<div id="tab-2" align="center">
+    <div class="breadcrumbs">
+        <ul>
+            <li>
+                <a href="/">Home</a>
+            </li>
+            <li>
+                <div class="breadcrumbsbubbleInfo">
+                    <div class="trigger">
+                        <a href='<c:url value="/miso/project/${library.sample.project.projectId}"/>'>${library.sample.project.name}</a>
+                    </div>
+                    <div class="breadcrumbspopup">
+                            ${library.sample.project.alias}
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="breadcrumbsbubbleInfo">
+                    <div class="trigger">
+                        <a href='<c:url value="/miso/sample/${library.sample.sampleId}"/>'>${library.sample.name}</a>
+                    </div>
+                    <div class="breadcrumbspopup">
+                            ${library.sample.alias}
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <h1>Create Libraries
+        <button id="bulkLibSaveButton" onClick="submitBulkLibraries();" class="fg-button ui-state-default ui-corner-all">Save</button>
+    </h1>
+    <br/>
+
+    This system will create <b>ONE</b> library for each of the selected samples below:
+    <br/>
+    <table id="cinput" class="display">
+        <thead>
+        <tr>
+            <th>Select <span sel="none" header="select" class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
+                             onclick="toggleSelectAll('#cinput', this);"></span></th>
+            <th>Sample</th>
+            <th>Description <span header="description" class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
+                                  onclick="fillDown('#cinput', this);"></span></th>
+            <th>Paired <span header="paired" class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
+                             onclick="fillDown('#cinput', this);"></span></th>
+            <th>Platform <span header="platform" class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
+                               onclick="fillDown('#cinput', this);"></span></th>
+            <th>Type <span header="libraryType" class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
+                           onclick="fillDown('#cinput', this);"></span></th>
+            <th>Selection <span header="selectionType" class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
+                                onclick="fillDown('#cinput', this);"></span></th>
+            <th>Strategy <span header="strategyType" class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
+                               onclick="fillDown('#cinput', this);"></span></th>
+            <th>Tag Barcode <span header="tagBarcode" class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
+                               onclick="fillDown('#cinput', this);"></span></th>
+            <th>Location Barcode <span header="locationBarcode" class="ui-icon ui-icon-arrowstop-1-s"
+                                       style="float:right" onclick="fillDown('#cinput', this);"></span></th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <div id="pager"></div>
+</div>
+</div>
+
+<script type="text/javascript">
+var headers = ['rowsel',
+    'parentSample',
+    'description',
+    'paired',
+    'platform',
+    'libraryType',
+    'selectionType',
+    'strategyType',
+    'tagBarcode',
+    'locationBarcode'];
+
+jQuery(document).ready(function() {
+    var oTable = jQuery('#cinput').dataTable({
+        "aoColumnDefs": [
+            {
+                "bUseRendered": false,
+                "aTargets": [ 0 ]
+            }
+        ],
+        "bPaginate": false,
+        "bInfo": false,
+        "bJQueryUI": true,
+        "bAutoWidth": true,
+        "bSort": false,
+        "bFilter": false,
+        "sDom": '<<"toolbar">f>r<t>ip>'
+    });
+
+<%--
+  <c:forEach items="${library.sample.project.samples}" var="s" varStatus="n">
+      fnClickAddRow([
+          "",
+          "${s.alias}",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          ""
+      ]);
+  </c:forEach>
+--%>
+  var sampleArray = new Array();
+  var sampleDescArray = new Array();
+<c:forEach items="${projectSamples}" var="s" varStatus="n">
+  sampleArray.push("${s.alias}");
+  sampleDescArray.push("${s.description}");
+</c:forEach>
+
+    jQuery.each(sampleArray, function(index, value) {
+        fnClickAddRow(
+                [ "",
+                    value,
+                    sampleDescArray[index],
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""]
+                );
+    });
+
+    jQuery('#cinput .rowSelect').click(function() {
+        if (jQuery(this).parent().hasClass('row_selected')) {
+            jQuery(this).parent().removeClass('row_selected');
+        }
+        else {
+            jQuery(this).parent().addClass('row_selected');
+        }
+    });
+
+    setEditables(oTable);
+
+    jQuery("#tabs").tabs();
+    jQuery("#tabs").removeClass('ui-widget').removeClass('ui-widget-content');
+});
+
+function fnClickAddRow(rowdata) {
+    var table = jQuery('#cinput').dataTable();
+    var a = [];
+    if (rowdata && rowdata.length > 0) {
+        a = table.fnAddData(rowdata);
+    }
+    else {
+        a = table.fnAddData(
+                [ "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    ""]
+                );
+    }
+
+    var nTr = table.fnSettings().aoData[a[0]].nTr;
+
+    jQuery(nTr.cells[0]).addClass("rowSelect");
+
+    for (var i = 2; i < headers.length; i++) {
+        jQuery(nTr.cells[i]).attr("name", headers[i]);
+        if (headers[i] === "platform") {
+            jQuery(nTr.cells[i]).addClass("platform");
+        }
+        else if (headers[i] === "libraryType") {
+            jQuery(nTr.cells[i]).addClass("libraryType");
+        }
+        else if (headers[i] === "selectionType") {
+            jQuery(nTr.cells[i]).addClass("selectionType");
+        }
+        else if (headers[i] === "strategyType") {
+            jQuery(nTr.cells[i]).addClass("strategyType");
+        }
+        else if (headers[i] === "tagBarcode") {
+            jQuery(nTr.cells[i]).addClass("tagBarcode");
+        }
+        else if (headers[i] === "paired") {
+            jQuery(nTr.cells[i]).addClass("passedCheck");
+        }
+        else {
+            jQuery(nTr.cells[i]).addClass("defaultEditable");
+        }
+    }
+}
+
+function setEditables(datatable) {
+    jQuery('#cinput .defaultEditable').editable(function(value, settings) {
+        return value;
+    },
+    {
+        callback: function(sValue, y) {
+            var aPos = datatable.fnGetPosition(this);
+            datatable.fnUpdate(sValue, aPos[0], aPos[1]);
+        },
+        submitdata: function (value, settings) {
+            return {
+                "row_id": this.parentNode.getAttribute('id'),
+                "column": datatable.fnGetPosition(this)[2]
+            };
+        },
+        onblur: 'submit',
+        placeholder : '',
+        height: '14px'
+    });
+
+    jQuery("#cinput .platform").editable(function(value, settings) {
+        return value;
+    },
+    {
+        data : '{${platformNamesString}}',
+        type : 'select',
+        onblur: 'submit',
+        placeholder : '',
+        style : 'inherit',
+        callback: function(sValue, y) {
+            var aPos = datatable.fnGetPosition(this);
+            datatable.fnUpdate(sValue, aPos[0], aPos[1]);
+        },
+        submitdata : function(value, settings) {
+            return {
+                "row_id": this.parentNode.getAttribute('id'),
+                "column": datatable.fnGetPosition(this)[2]
+            };
+        }
+    });
+
+    jQuery("#cinput .libraryType").editable(function(value, settings) {
+        return value;
+    },
+    {
+        loadurl : '../../rest/library/librarytypes',
+        loaddata : function (value, settings) {
+          collapseInputs('#cinput');
+          var row = datatable.fnGetPosition(this)[0];
+          var platform = datatable.fnGetData(row, 4);
+          if (!isNullCheck(platform)) {
+            return {'platform':platform};
+          }
+          else {
+            alert("Please select a platform in this row");
+            return {'platform':''};
+          }
+        },
+        type : 'select',
+        onblur: 'submit',
+        placeholder : '',
+        style : 'inherit',
+        callback: function(sValue, y) {
+            var aPos = datatable.fnGetPosition(this);
+            datatable.fnUpdate(sValue, aPos[0], aPos[1]);
+        },
+        submitdata : function(value, settings) {
+            return {
+                "row_id": this.parentNode.getAttribute('id'),
+                "column": datatable.fnGetPosition(this)[2]
+            };
+        }
+    });
+
+    jQuery("#cinput .selectionType").editable(function(value, settings) {
+        return value;
+    },
+    {
+        data : '{${librarySelectionTypesString}}',
+        type : 'select',
+        onblur: 'submit',
+        placeholder : '',
+        style : 'inherit',
+        callback: function(sValue, y) {
+            var aPos = datatable.fnGetPosition(this);
+            datatable.fnUpdate(sValue, aPos[0], aPos[1]);
+        },
+        submitdata : function(value, settings) {
+            return {
+                "row_id": this.parentNode.getAttribute('id'),
+                "column": datatable.fnGetPosition(this)[2]
+            };
+        }
+    });
+
+    jQuery("#cinput .strategyType").editable(function(value, settings) {
+        return value;
+    },
+    {
+        data : '{${libraryStrategyTypesString}}',
+        type : 'select',
+        onblur: 'submit',
+        placeholder : '',
+        style : 'inherit',
+        callback: function(sValue, y) {
+            var aPos = datatable.fnGetPosition(this);
+            datatable.fnUpdate(sValue, aPos[0], aPos[1]);
+        },
+        submitdata : function(value, settings) {
+            return {
+                "row_id": this.parentNode.getAttribute('id'),
+                "column": datatable.fnGetPosition(this)[2]
+            };
+        }
+    });
+
+    jQuery("#cinput .tagBarcode").editable(function(value, settings) {
+        return value;
+    },
+    {
+        loadurl : '../../rest/library/tagbarcodes',
+        loaddata : function (value, settings) {
+          collapseInputs('#cinput');
+          var row = datatable.fnGetPosition(this)[0];
+          var platform = datatable.fnGetData(row, 4);
+          if (!isNullCheck(platform)) {
+            return {'platform':platform};
+          }
+          else {
+            alert("Please select a platform in this row");
+            return {'platform':''};
+          }
+        },
+        type : 'select',
+        onblur: 'submit',
+        placeholder : '',
+        style : 'inherit',
+        callback: function(sValue, y) {
+            var aPos = datatable.fnGetPosition(this);
+            datatable.fnUpdate(sValue, aPos[0], aPos[1]);
+        },
+        submitdata : function(value, settings) {
+            return {
+                "row_id": this.parentNode.getAttribute('id'),
+                "column": datatable.fnGetPosition(this)[2]
+            };
+        }
+    });
+
+    jQuery("#cinput .passedCheck").editable(function(value, settings) {
+        return value;
+    },
+    {
+        type : 'checkbox',
+        onblur: 'submit',
+        placeholder : '',
+        style : 'inherit',
+        callback: function(sValue, y) {
+            var aPos = datatable.fnGetPosition(this);
+            datatable.fnUpdate(sValue, aPos[0], aPos[1]);
+        },
+        submitdata : function(value, settings) {
+            return {
+                "row_id": this.parentNode.getAttribute('id'),
+                "column": datatable.fnGetPosition(this)[2]
+            };
+        }
+    });
+}
+
+function submitBulkLibraries() {
+    jQuery('#bulkLibSaveButton').attr('disabled', 'disabled');
+    jQuery('#bulkLibSaveButton').html("Processing...");
+
+    collapseInputs('#cinput');
+
+    var table = jQuery('#cinput').dataTable();
+    var nodes = fnGetSelected(table);
+    var ok = true;
+    var arr = [];
+    for (var i = 0; i < nodes.length; i++) {
+        var obj = {};
+        for (var j = 1; j < (nodes[i].cells.length); j++) {
+            obj[headers[j]] = jQuery(nodes[i].cells[j]).text();
+        }
+
+        if (isNullCheck(obj["description"]) ||
+            isNullCheck(obj["platform"]) ||
+            isNullCheck(obj["libraryType"])||
+            isNullCheck(obj["selectionType"])||
+            isNullCheck(obj["strategyType"])) {
+            ok = false;
+            jQuery(nodes[i]).css('background', '#EE9966');
+        }
+        else {
+            jQuery(nodes[i]).css('background', '#CCFF99');
+            arr.push(JSON.stringify(obj));
+        }
+    }
+
+    if (ok) {
+        Fluxion.doAjax(
+                'libraryControllerHelperService',
+                'bulkSaveLibraries',
+        {'projectId':${library.sample.project.projectId},
+            'libraries':"[" + arr.join(',') + "]",
+            'url':ajaxurl
+        },
+        {'doOnSuccess':function(json) {
+            window.location.href = '<c:url value='/miso/project/${library.sample.project.projectId}'/>';
+        }
+        });
+    }
+    else {
+        alert("Red data rows do not have one or more of the following: description, platform, library type, selection type or strategy type!");
+    }
+    jQuery('#bulkLibSaveButton').removeAttr('disabled');
+    jQuery('#bulkLibSaveButton').html("Save");
+}
+</script>
+</c:if>
+</div>
+</div>
+
+<%@ include file="adminsub.jsp" %>
+
+<%@ include file="../footer.jsp" %>

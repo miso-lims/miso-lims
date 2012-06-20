@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
+  ~ MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+  ~ **********************************************************************
+  ~
+  ~ This file is part of MISO.
+  ~
+  ~ MISO is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ MISO is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+  ~
+  ~ **********************************************************************
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:jee="http://www.springframework.org/schema/jee"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.0.xsd"
+       default-autowire="byName">
+
+  <bean id="jspViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+    <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+  </bean>
+
+  <bean id="dataObjectFactory" name="dataObjectFactory" class="uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory"/>
+
+  <bean id="protocolManager" class="com.eaglegenomics.simlims.core.manager.LocalProtocolManager"/>
+
+  <bean id="requestManager" class="uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager">
+    <constructor-arg index="0">
+      <bean class="org.springframework.security.core.context.SecurityContextHolder" factory-method="getContextHolderStrategy"/>
+    </constructor-arg>
+    <constructor-arg index="1" ref="securityManager"/>
+  </bean>
+
+  <bean id="misoFormsService" name="misoFormsService" class="uk.ac.bbsrc.tgac.miso.webapp.service.forms.MisoFormsService"/>
+
+  <bean name="multipartUploadListener" class="net.sourceforge.fluxion.ajax.beans.util.FileUploadListener"/>
+
+  <bean id="multipartResolver" class="uk.ac.bbsrc.tgac.miso.spring.ajax.multipart.AjaxMultipartResolver">
+    <property name="maxUploadSize" value="1000000"/>
+    <property name="fileUploadListener" ref="multipartUploadListener"/>
+  </bean>
+
+  <bean id="fileUploadController" class="uk.ac.bbsrc.tgac.miso.webapp.controller.UploadController">
+    <property name="filesManager" ref="misoFileManager"/>
+  </bean>
+
+  <bean id="fileDownloadController" class="uk.ac.bbsrc.tgac.miso.webapp.controller.DownloadController">
+    <property name="filesManager" ref="misoFileManager"/>
+  </bean>
+
+  <bean id="misoFileManager" class="uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager">
+    <property name="fileStorageDirectory" value="${miso.fileStorageDirectory}"/>
+  </bean>
+
+  <bean id="submissionManager" class="uk.ac.bbsrc.tgac.miso.core.manager.ERASubmissionManager">
+    <property name="accountName" value="${submission.accountName}"/>
+    <property name="dropBox" value="${submission.dropBox}"/>
+    <property name="authKey" value="${submission.authKey}"/>
+    <property name="submissionEndPoint" value="${submission.submissionEndPoint}"/>
+    <property name="proxyHost" value="${submission.proxyHost}"/>
+    <property name="submissionStoragePath" value="${miso.submissionStorageDirectory}"/>
+  </bean>
+
+  <bean name="statsInterfaceTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+    <property name="dataSource" ref="statsDataSource"/>
+    <property name="nativeJdbcExtractor" ref="statsNativeJdbcExtractor"/>
+  </bean>
+
+  <bean name="runStatsManager" class="uk.ac.bbsrc.tgac.miso.runstats.client.manager.RunStatsManager">
+    <constructor-arg index="0" ref="statsInterfaceTemplate"/>
+  </bean>
+
+  <bean name="statsNativeJdbcExtractor"
+        class="org.springframework.jdbc.support.nativejdbc.CommonsDbcpNativeJdbcExtractor"/>
+
+  <bean id="statsTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+    <property name="dataSource" ref="statsDataSource"/>
+  </bean>
+
+  <jee:jndi-lookup id="statsDataSource"
+                   jndi-name="/jdbc/STATSDB"
+                   resource-ref="true"/>
+</beans>

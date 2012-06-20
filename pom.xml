@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2010. The Genome Analysis Centre, Norwich, UK
+  ~ MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+  ~
+  ~ **********************************************************************
+  ~
+  ~ This file is part of MISO.
+  ~
+  ~ MISO is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ MISO is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+  ~
+  ~ **********************************************************************
+  -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>uk.ac.bbsrc.tgac.miso</groupId>
+  <artifactId>miso</artifactId>
+  <packaging>pom</packaging>
+  <version>0.1.6RC</version>
+  <name>MISO Framework</name>
+  <url>http://www.tgac.bbsrc.ac.uk/software/miso</url>
+
+  <!-- Reporting/Documentation output -->
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.7</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>2.2</version>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <!-- <report>dependencies</report> -->
+              <report>project-team</report>
+              <report>mailing-list</report>
+              <report>cim</report>
+              <report>issue-tracking</report>
+              <report>license</report>
+              <report>scm</report>
+              <report>index</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>2.1</version>
+        <configuration>
+          <preparationGoals>clean verify install</preparationGoals>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
+
+  <!-- Licensing -->
+  <licenses>
+    <license>
+      <name>GNU Lesser General Public License</name>
+      <url>http://www.gnu.org/copyleft/lesser.html</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <!-- Mailing Lists -->
+  <!--
+    <mailingLists>
+      <mailingList>
+        <name>fluxion-users</name>
+        <subscribe>
+          https://lists.sourceforge.net/mailman/listinfo/fluxion-users
+        </subscribe>
+        <unsubscribe>
+          https://lists.sourceforge.net/mailman/listinfo/fluxion-users
+        </unsubscribe>
+        <post>fluxion-users@lists.sourceforge.net</post>
+      </mailingList>
+      <mailingList>
+        <name>fluxion-devel</name>
+        <subscribe>
+          https://lists.sourceforge.net/mailman/listinfo/fluxion-devel
+        </subscribe>
+        <unsubscribe>
+          https://lists.sourceforge.net/mailman/listinfo/fluxion-devel
+        </unsubscribe>
+        <post>fluxion-devel@lists.sourceforge.net</post>
+      </mailingList>
+    </mailingLists>
+  -->
+  <!-- Bug Tracker -->
+  <issueManagement>
+    <system>sourceforge</system>
+    <url>https://sourceforge.net/tracker/?group_id=226286</url>
+  </issueManagement>
+
+  <!-- Developer Listing -->
+  <developers>
+    <developer>
+      <id>davey</id>
+      <name>Rob Davey</name>
+      <email>robert.davey@tgac.ac.uk</email>
+      <organization>TGAC</organization>
+      <organizationUrl>http://www.tgac.ac.uk/bioinformatics/sequence-informatics/core-bioinformatics/</organizationUrl>
+      <roles>
+        <role>administrator</role>
+        <role>Developer</role>
+      </roles>
+      <timezone>0</timezone>
+      <properties/>
+    </developer>
+
+    <developer>
+      <id>bianx</id>
+      <name>Xingdong Bian</name>
+      <email>xingdong.bian@tgac.ac.uk</email>
+      <organization>TGAC</organization>
+      <organizationUrl>http://www.tgac.ac.uk/bioinformatics/sequence-informatics/core-bioinformatics/</organizationUrl>
+      <roles>
+        <role>administrator</role>
+        <role>Developer</role>
+      </roles>
+      <timezone>0</timezone>
+      <properties/>
+    </developer>
+
+    <developer>
+      <id>thankia</id>
+      <name>Anil Thanki</name>
+      <email>anil.thanki@tgac.ac.uk</email>
+      <organization>TGAC</organization>
+      <organizationUrl>http://www.tgac.ac.uk/bioinformatics/sequence-informatics/core-bioinformatics/</organizationUrl>
+      <roles>
+        <role>administrator</role>
+        <role>Developer</role>
+      </roles>
+      <timezone>0</timezone>
+      <properties/>
+    </developer>
+  </developers>
+
+  <!-- SVN connection -->
+  <scm>
+    <connection>
+      scm:svn:https://repos.tgac.bbsrc.ac.uk/subversion/lims/simlims/branches/lims-0.1.6-rc
+    </connection>
+    <developerConnection>
+      scm:svn:https://repos.tgac.bbsrc.ac.uk/subversion/lims/simlims/branches/lims-0.1.6-rc
+    </developerConnection>
+    <url>
+      https://repos.tgac.bbsrc.ac.uk/subversion/lims/simlims/branches/lims-0.1.6-rc
+    </url>
+  </scm>
+
+  <!-- Maven repository deploy -->
+  <distributionManagement>
+    <downloadUrl>https://repos.tgac.bbsrc.ac.uk/maven/repo</downloadUrl>
+    <repository>
+      <id>tgac-repo</id>
+      <name>TGAC repository</name>
+      <url>scp://repos.tgac.bbsrc.ac.uk/var/www/html/maven/repo</url>
+    </repository>
+    <snapshotRepository>
+      <id>tgac-repo</id>
+      <name>TGAC repository</name>
+      <url>scp://repos.tgac.bbsrc.ac.uk/var/www/html/maven/repo</url>
+    </snapshotRepository>
+    <site>
+      <id>miso-site</id>
+      <url>scp://repos.tgac.bbsrc.ac.uk/var/www/html/miso</url>
+    </site>
+  </distributionManagement>
+
+  <!-- Maven repository download -->
+  <repositories>
+    <repository>
+      <id>hasbanana-repo</id>
+      <name>hasbanana Maven Repository</name>
+      <url>http://www.hasbanana.com/maven/repo</url>
+    </repository>
+
+    <repository>
+      <id>tgac-repo</id>
+      <name>TGAC Maven Repository</name>
+      <url>https://repos.tgac.bbsrc.ac.uk/maven/repo</url>
+      <releases>
+        <updatePolicy>always</updatePolicy>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+      </snapshots>
+    </repository>
+
+    <!--
+    <repository>
+      <id>apache-snapshots</id>
+      <name>apache snapshots repository</name>
+      <url>http://repository.apache.org/snapshots</url>
+      <snapshots>
+        <enabled>true</enabled>
+        <updatePolicy>never</updatePolicy>
+      </snapshots>
+    </repository>
+    -->
+
+    <repository>
+      <id>spring-snapshot</id>
+      <name>Spring Portfolio Milestone Repository</name>
+      <url>http://maven.springframework.org/snapshot</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+
+    <repository>
+      <id>Atlassian Maven Repository</id>
+      <url>https://maven.atlassian.com/public</url>
+    </repository>
+
+    <repository>
+      <id>spring-maven-release</id>
+      <name>Springframework Maven Repository</name>
+      <url>http://maven.springframework.org/release</url>
+    </repository>
+    <repository>
+      <id>spring-maven-milestone</id>
+      <name>Springframework Maven Repository</name>
+      <url>http://maven.springframework.org/milestone</url>
+    </repository>
+    <repository>
+      <id>springsource-milestone</id>
+      <url>http://repository.springsource.com/maven/bundles/milestone</url>
+    </repository>
+    <repository>
+      <id>springsource-external</id>
+      <url>http://repository.springsource.com/maven/bundles/external</url>
+    </repository>
+    <repository>
+      <id>springsource-snapshot</id>
+      <url>http://repository.springsource.com/maven/bundles/snapshot</url>
+    </repository>
+  </repositories>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>tgac-repo</id>
+      <name>TGAC Maven Repository</name>
+      <url>https://repos.tgac.bbsrc.ac.uk/maven/repo</url>
+      <!--
+      <releases>
+          <updatePolicy>never</updatePolicy>
+      </releases>
+      <snapshots>
+          <updatePolicy>never</updatePolicy>
+      </snapshots>
+      -->
+    </pluginRepository>
+
+    <pluginRepository>
+      <id>apache-snapshots</id>
+      <name>apache snapshots repository</name>
+      <url>http://repository.apache.org/snapshots</url>
+      <snapshots>
+        <updatePolicy>never</updatePolicy>
+      </snapshots>
+    </pluginRepository>
+
+    <pluginRepository>
+      <id>Atlassian Maven Repository</id>
+      <url>https://maven.atlassian.com/public</url>
+    </pluginRepository>
+
+  </pluginRepositories>
+
+  <!-- Required Build Plugins -->
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.5</version>
+        <configuration>
+          <includes>
+            <include>**/*Suite.java</include>
+          </includes>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>com.atlassian.maven.plugins</groupId>
+        <artifactId>maven-clover2-plugin</artifactId>
+        <version>3.1.2</version>
+        <configuration>
+          <licenseLocation>clover.license</licenseLocation>
+        </configuration>
+      </plugin>
+    </plugins>
+
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>2.1.1</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
+  </build>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.5</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.6.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>1.6.0</version>
+    </dependency>
+  </dependencies>
+
+  <modules>
+    <module>integration-tools</module>
+
+    <module>core</module>
+    <module>run-tools</module>
+
+    <module>spring</module>
+    <module>miso-web</module>
+  </modules>
+
+  <profiles>
+    <profile>
+      <id>external</id>
+      <modules>
+        <module>sqlstore</module>
+
+        <module>runstats-client</module>
+
+        <module>analysis-server</module>
+        <module>notification-consumer-services</module>
+        <module>notification-server</module>
+
+        <module>demo-notification-client</module>
+        <module>demo-task</module>
+      </modules>
+      <activation>
+        <property>
+          <name>release</name>
+          <value>external</value>
+        </property>
+      </activation>
+    </profile>
+  </profiles>
+
+  <properties>
+    <simlims-version>0.0.4-SNAPSHOT</simlims-version>
+    <spring-version>3.0.5.RELEASE</spring-version>
+  </properties>
+
+</project>

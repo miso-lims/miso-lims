@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
+  ~ MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+  ~ **********************************************************************
+  ~
+  ~ This file is part of MISO.
+  ~
+  ~ MISO is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ MISO is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+  ~
+  ~ **********************************************************************
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:integration="http://www.springframework.org/schema/integration"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.springframework.org/schema/tx spring-tx-2.5.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd">
+
+  <bean id="applicationContextProvider" name="applicationContextProvider" class="uk.ac.bbsrc.tgac.miso.integration.context.ApplicationContextProvider"/>
+
+  <integration:annotation-config/>
+  <tx:annotation-driven/>
+
+  <integration:channel id="wireTapChannel"/>
+  <integration:channel id="splitterChannel"/>
+
+  <!-- UTILS -->
+  <bean id="illuminaTransformer" class="uk.ac.bbsrc.tgac.miso.notification.service.IlluminaTransformer"/>
+  <bean id="solidTransformer" class="uk.ac.bbsrc.tgac.miso.notification.service.SolidTransformer"/>
+  <bean id="ls454Transformer" class="uk.ac.bbsrc.tgac.miso.notification.service.LS454Transformer"/>
+  <bean id="pacbioTransformer" class="uk.ac.bbsrc.tgac.miso.notification.service.PacBioTransformer"/>
+
+  <bean id="statusFilter" class="org.springframework.integration.file.filters.CompositeFileListFilter">
+    <constructor-arg>
+      <list>
+        <bean class="org.springframework.integration.file.filters.AcceptAllFileListFilter"/>
+      </list>
+    </constructor-arg>
+  </bean>
+
+  <!-- ILLUMINA STATUS -->
+  <integration:channel id="illuminaStatusFileInputChannel"/>
+  <integration:channel id="illuminaStatusTransformerChannel"/>
+  <integration:channel id="illuminaStatusChannel"/>
+  <integration:channel id="illuminaMessageSignerChannel"/>
+
+  <bean id="illuminaStatusRecursiveScanner" class="uk.ac.bbsrc.tgac.miso.tools.run.RunFolderScanner">
+    <constructor-arg index="0">
+      <util:constant static-field="uk.ac.bbsrc.tgac.miso.tools.run.RunFolderConstants.ILLUMINA_FOLDER_REGEX"/>
+    </constructor-arg>
+  </bean>
+
+  <integration:transformer id="illuminaStatusTransformer"
+                           ref="illuminaTransformer" method="transform"
+                           input-channel="illuminaStatusFileInputChannel"
+                           output-channel="illuminaMessageSignerChannel">
+  </integration:transformer>
+
+  <!-- SOLID STATUS -->
+  <integration:channel id="solidStatusFileInputChannel"/>
+  <integration:channel id="solidStatusWebServiceChannel"/>
+  <integration:channel id="solidStatusTransformerChannel"/>
+  <integration:channel id="solidStatusChannel"/>
+  <integration:channel id="solidMessageSignerChannel"/>
+
+  <bean id="solidStatusRecursiveScanner" class="uk.ac.bbsrc.tgac.miso.tools.run.RunFolderScanner">
+    <constructor-arg index="0">
+      <util:constant static-field="uk.ac.bbsrc.tgac.miso.tools.run.RunFolderConstants.SOLID_FOLDER_REGEX"/>
+    </constructor-arg>
+  </bean>
+
+  <integration:transformer id="solidStatusTransformer"
+                           ref="solidTransformer" method="transform"
+                           input-channel="solidStatusFileInputChannel"
+                           output-channel="solidMessageSignerChannel">
+  </integration:transformer>
+
+  <!-- 454 STATUS -->
+  <integration:channel id="ls454StatusFileInputChannel"/>
+  <integration:channel id="ls454StatusTransformerChannel"/>
+  <integration:channel id="ls454StatusChannel"/>
+  <integration:channel id="ls454MessageSignerChannel"/>
+
+  <bean id="ls454StatusRecursiveScanner" class="uk.ac.bbsrc.tgac.miso.tools.run.RunFolderScanner">
+    <constructor-arg index="0">
+      <util:constant static-field="uk.ac.bbsrc.tgac.miso.tools.run.RunFolderConstants.LS454_FOLDER_REGEX"/>
+    </constructor-arg>
+  </bean>
+
+  <integration:transformer id="ls454StatusTransformer" ref="ls454Transformer"
+                           input-channel="ls454StatusFileInputChannel"
+                           output-channel="ls454MessageSignerChannel"
+                           method="transform">
+  </integration:transformer>
+
+  <!-- PACBIO STATUS -->
+  <bean id="pacbioStatusFilter" class="org.springframework.integration.file.filters.CompositeFileListFilter">
+    <constructor-arg>
+      <list>
+        <bean class="org.springframework.integration.file.filters.AcceptOnceFileListFilter"/>
+      </list>
+    </constructor-arg>
+  </bean>
+
+  <integration:channel id="pacbioStatusFileInputChannel"/>
+  <integration:channel id="pacbioStatusTransformerChannel"/>
+  <integration:channel id="pacbioStatusChannel"/>
+  <integration:channel id="pacbioMessageSignerChannel"/>
+
+  <bean id="pacbioStatusRecursiveScanner" class="uk.ac.bbsrc.tgac.miso.tools.run.RunFolderScanner">
+    <constructor-arg index="0">
+      <util:constant static-field="uk.ac.bbsrc.tgac.miso.tools.run.RunFolderConstants.PACBIO_FOLDER_REGEX"/>
+    </constructor-arg>
+  </bean>
+
+  <integration:transformer id="pacbioStatusTransformer"
+                           ref="pacbioTransformer" method="transform"
+                           input-channel="pacbioStatusFileInputChannel"
+                           output-channel="splitterChannel">
+  </integration:transformer>
+
+  <!-- SPRING BATCH SETUP -->
+  <!--
+  <integration:channel id="illuminaStatusBatchChannel"/>
+
+  <jdbc:embedded-database id="dataSource" type="H2">
+      <jdbc:script location="classpath:/org/springframework/batch/core/schema-h2.sql"/>
+  </jdbc:embedded-database>
+
+  <batch:job-repository id="jobRepository"/>
+
+  <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+      <constructor-arg ref="dataSource"/>
+  </bean>
+
+  <bean id="batchTaskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+      <property name="corePoolSize" value="5"/>
+      <property name="threadGroup" value="nThreads"/>
+  </bean>
+
+  <bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry"/>
+  <bean class="org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor">
+      <property name="jobRegistry" ref="jobRegistry"/>
+  </bean>
+
+  <bean id="jobLauncher" class="uk.ac.bbsrc.tgac.miso.notification.core.batch.NotificationJobLauncher">
+      <property name="jobRepository" ref="jobRepository"/>
+      <property name="taskExecutor" ref="batchTaskExecutor"/>
+  </bean>
+
+  <bean id="launchHandler" class="uk.ac.bbsrc.tgac.miso.notification.core.batch.JobLaunchingHandler">
+      <constructor-arg ref="jobRegistry"/>
+      <constructor-arg ref="jobLauncher"/>
+  </bean>
+
+  <bean id="jobLoader" class="org.springframework.batch.core.configuration.support.DefaultJobLoader">
+      <property name="jobRegistry" ref="jobRegistry"/>
+  </bean>
+  -->
+</beans>

@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
+  ~ MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+  ~ **********************************************************************
+  ~
+  ~ This file is part of MISO.
+  ~
+  ~ MISO is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ MISO is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+  ~
+  ~ **********************************************************************
+  -->
+
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="ehcache.xsd" updateCheck="true" monitoring="autodetect" dynamicConfig="true">
+    <diskStore path="java.io.tmpdir"/>
+    <defaultCache
+            maxElementsInMemory="10000"
+            eternal="false"
+            timeToIdleSeconds="120"
+            timeToLiveSeconds="120"
+            overflowToDisk="true"
+            diskPersistent="false"
+            diskExpiryThreadIntervalSeconds="120"
+            memoryStoreEvictionPolicy="LRU">
+    </defaultCache>
+
+    <cache name="limsCache" maxElementsInMemory="100000" eternal="false" overflowToDisk="false">
+        <cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+                     retryAttempts="0" retryAttemptDelaySeconds="0"/>
+    </cache>
+
+    <cache name="alertCache" maxElementsInMemory="1000000" eternal="true" overflowToDisk="false" statistics="true">
+                <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+                     retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+    </cache>
+
+    <cache name="chamberCache" maxElementsInMemory="10000" eternal="true" overflowToDisk="false" statistics="true">
+                <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+                     retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+    </cache>
+
+    <cache name="containerCache" maxElementsInMemory="10000" eternal="true" overflowToDisk="false" statistics="true">
+                <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+                     retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+    </cache>
+
+    <cache name="libraryDilutionCache" maxElementsInMemory="1000000" eternal="true" overflowToDisk="false" statistics="true">
+                <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+                     retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+    </cache>
+
+    <cache name="emPCRDilutionCache" maxElementsInMemory="1000000" eternal="true" overflowToDisk="false" statistics="true">
+                <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+                     retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+    </cache>
+
+    <cache name="empcrCache" maxElementsInMemory="100000" eternal="true" overflowToDisk="false" statistics="true">
+                <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+                     retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+    </cache>
+
+    <cache name="experimentCache" maxElementsInMemory="1000000" eternal="true" overflowToDisk="false" statistics="true">
+                <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+                     retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+    </cache>
+
+    <cache name="laneCache" maxElementsInMemory="10000" eternal="true" overflowToDisk="false" statistics="true">
+                <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+                     retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+    </cache>
+
+    <cache name="libraryCache" maxElementsInMemory="1000000" eternal="true" overflowToDisk="false" statistics="true">
+                <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+                     retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+    </cache>
+
+    <cache name="partitionCache" maxElementsInMemory="1000000" eternal="true" overflowToDisk="false" statistics="true">
+                <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+                     retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+    </cache>
+
+    <cache name="plateCache" maxElementsInMemory="100000" eternal="true" overflowToDisk="false" statistics="true">
+                <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+                     retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+    </cache>
+
+    <cache name="poolCache" maxElementsInMemory="100000" eternal="true" overflowToDisk="false" statistics="true">
+                <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+                     retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+    </cache>
+
+    <cache name="projectCache" maxElementsInMemory="10000" eternal="true" overflowToDisk="false" statistics="true">
+                <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+                     retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+    </cache>
+
+    <cache name="projectOverviewCache" maxElementsInMemory="10000" eternal="true" overflowToDisk="false" statistics="true">
+                <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+                     retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+    </cache>
+
+    <cache name="runCache" maxElementsInMemory="1000000" eternal="true" overflowToDisk="false" statistics="true">
+                <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+                     retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+    </cache>
+
+    <cache name="sampleCache" maxElementsInMemory="1000000" eternal="true" overflowToDisk="false" statistics="true">
+                <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+                     retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+    </cache>
+
+    <cache name="securityProfileCache" maxElementsInMemory="1000000" eternal="true" overflowToDisk="false" statistics="true"/>
+
+    <cache name="studyCache" maxElementsInMemory="10000" eternal="true" overflowToDisk="false" statistics="true">
+                <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+                     retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+
+    </cache>
+
+    <cache name="userCache" maxElementsInMemory="100000" eternal="true" overflowToDisk="false" statistics="true"/>
+
+<!-- LIST CACHES -->
+    <cache name="containerListCache"
+           maxElementsInMemory="1"
+           eternal="true"
+           overflowToDisk="false" statistics="true"/>
+
+    <cache name="experimentListCache"
+           maxElementsInMemory="1"
+           eternal="true"
+           overflowToDisk="false"
+           diskPersistent="false" statistics="true"/>
+
+    <cache name="libraryListCache"
+           maxElementsInMemory="1"
+           eternal="true"
+           overflowToDisk="false" statistics="true"/>
+
+    <cache name="partitionListCache"
+           maxElementsInMemory="1"
+           eternal="true"
+           overflowToDisk="false" statistics="true"/>
+
+    <cache name="projectListCache"
+           maxElementsInMemory="1"
+           eternal="true"
+           overflowToDisk="false" statistics="true"/>
+
+    <cache name="runListCache"
+           maxElementsInMemory="1"
+           eternal="true"
+           overflowToDisk="false" statistics="true"/>
+
+    <cache name="sampleListCache"
+           maxElementsInMemory="1"
+           eternal="true"
+           overflowToDisk="false" statistics="true"/>
+
+    <cache name="studyListCache"
+           maxElementsInMemory="1"
+           eternal="true"
+           overflowToDisk="false" statistics="true"/>
+
+</ehcache>

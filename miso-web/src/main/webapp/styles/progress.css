@@ -1,0 +1,137 @@
+/*
+ * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
+ * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * *********************************************************************
+ *
+ * This file is part of MISO.
+ *
+ * MISO is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MISO is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * *********************************************************************
+ */
+
+/*------------------------------------*\
+  PROGRESS
+\*------------------------------------*/
+#progress {
+  list-style:none;
+  float:left;
+  margin-bottom:20px;
+  margin-left:-40px;
+  counter-reset:step;
+  /*
+  background:#7b8d77;
+  -moz-border-radius:5px;
+  -webkit-border-radius:5px;
+  border-radius:5px;
+  */
+}
+
+#progress li{
+  float:left;
+  font-size:0.75em;
+  font-style:italic;
+}
+
+#progress div {
+  display:block;
+  text-decoration:none;
+  padding:10px 20px 10px 26px;
+  background:#E5E9E4;
+  text-shadow:1px 1px 1px rgba(0,0,0,0.25);
+  position:relative;
+  /*
+  color:#fff;
+  -moz-border-radius:5px 0 0 5px;
+  -webkit-border-radius:5px 0 0 5px;
+  border-radius:5px 0 0 5px;
+  */
+}
+
+#progress div.left {
+  -moz-border-radius:5px 0 0 5px;
+  -webkit-border-radius:5px 0 0 5px;
+  border-radius:5px 0 0 5px;
+}
+
+#progress div.right {
+  -moz-border-radius:0 5px 5px 0;
+  -webkit-border-radius:0 5px 5px 0;
+  border-radius:0 5px 5px 0;
+}
+
+#progress span {
+  font-size:1.333em;
+  font-weight:bold;
+  display:block;
+  font-style:normal;
+  padding-left:5px;
+}
+
+#progress strong{
+  font-weight:normal
+}
+#progress a:hover{
+  text-decoration:none;
+}
+#progress a:hover span {
+  text-decoration:underline;
+}
+
+#progress li div:before {
+  counter-increment:step;
+  content:counter(step);
+  text-align:center;
+  font-weight:bold;
+  position:absolute;
+  top:50%;
+  left:5px;
+  margin-top:-8px;
+  padding:2px 6px;
+  background:rgba(0,0,0,0.25);
+
+  -moz-border-radius:20px;
+  -webkit-border-radius:20px;
+  border-radius:20px;
+}
+
+#progress li div.left-progress-done {
+  background: url("images/splitter.gif") right center no-repeat #66aa00;
+}
+
+#progress li div.mid-progress-done{
+  background: url("images/splitter-mid.gif") right center no-repeat #66aa00;
+}
+
+/*
+.sample-qc-step div,
+.lib-prep-step div,
+.lib-qc-step div,
+.pools-step div {
+  background:url("images/splitter.gif") right center no-repeat #66aa00;
+}
+*/
+
+/*
+#go-page .go-step a{
+  background:#a49d4d;
+}
+
+#progress .pools-step div {
+  background:#a49d4d;
+  -moz-border-radius:5px;
+  -webkit-border-radius:5px;
+  border-radius:5px;
+}
+*/

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
+  ~ MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+  ~ **********************************************************************
+  ~
+  ~ This file is part of MISO.
+  ~
+  ~ MISO is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ MISO is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+  ~
+  ~ **********************************************************************
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd"
+       default-autowire="byName">
+
+    <!-- <context:load-time-weaver aspectj-weaving="on" weaver-class="org.springframework.instrument.classloading.ReflectiveLoadTimeWeaver"/> -->
+    <bean class="net.sourceforge.fluxion.ajax.controller.AjaxController">
+        <property name="invalidSessionUrl" value="/login.jsp"/>
+    </bean>
+
+    <bean id="plateControllerHelperService"
+          class="uk.ac.bbsrc.tgac.miso.spring.ajax.PlateControllerHelperService">
+    </bean>
+
+    <bean id="poolControllerHelperService"
+          class="uk.ac.bbsrc.tgac.miso.spring.ajax.PoolControllerHelperService">
+    </bean>
+
+    <bean id="printerControllerHelperService"
+          class="uk.ac.bbsrc.tgac.miso.spring.ajax.PrinterControllerHelperService">
+    </bean>  
+
+    <bean id="projectControllerHelperService"
+          class="uk.ac.bbsrc.tgac.miso.spring.ajax.ProjectControllerHelperService">
+        <property name="issueTrackerManager" ref="issueTrackerManager"/>
+    </bean>
+
+    <bean id="statsControllerHelperService"
+          class="uk.ac.bbsrc.tgac.miso.spring.ajax.StatsControllerHelperService">
+    </bean>
+
+    <bean id="studyControllerHelperService"
+          class="uk.ac.bbsrc.tgac.miso.spring.ajax.StudyControllerHelperService">
+    </bean>
+
+    <bean id="sampleControllerHelperService"
+          class="uk.ac.bbsrc.tgac.miso.spring.ajax.SampleControllerHelperService">
+    </bean>
+
+    <bean id="submissionControllerHelperService"
+          class="uk.ac.bbsrc.tgac.miso.spring.ajax.SubmissionControllerHelperService">
+    </bean>
+
+    <bean id="runControllerHelperService"
+          class="uk.ac.bbsrc.tgac.miso.spring.ajax.RunControllerHelperService">
+    </bean>
+
+    <bean id="containerControllerHelperService"
+          class="uk.ac.bbsrc.tgac.miso.spring.ajax.ContainerControllerHelperService">
+    </bean>
+
+    <bean id="libraryControllerHelperService"
+          class="uk.ac.bbsrc.tgac.miso.spring.ajax.LibraryControllerHelperService">
+    </bean>
+
+    <bean id="experimentPreview"
+          class="uk.ac.bbsrc.tgac.miso.spring.ajax.ExperimentPreview">
+    </bean>
+
+    <bean id="projectPreview"
+          class="uk.ac.bbsrc.tgac.miso.spring.ajax.ProjectPreview">
+    </bean>
+
+    <bean id="dashboard"
+          class="uk.ac.bbsrc.tgac.miso.spring.ajax.DashboardHelperService">
+    </bean>
+
+    <bean id="poolSearchService"
+          class="uk.ac.bbsrc.tgac.miso.spring.ajax.PoolSearchService">
+    </bean>
+
+    <bean id="experimentSearchService"
+          class="uk.ac.bbsrc.tgac.miso.spring.ajax.ExperimentSearchService">
+    </bean>
+
+    <bean id="cacheHelperService"
+          class="uk.ac.bbsrc.tgac.miso.spring.ajax.CacheHelperService">
+    </bean>
+
+    <bean id="loggedActionService"
+          class="uk.ac.bbsrc.tgac.miso.spring.ajax.logging.LoggedActionService">
+    </bean>
+
+    <bean id="sequencerReferenceControllerHelperService"
+          class="uk.ac.bbsrc.tgac.miso.spring.ajax.SequencerReferenceControllerHelperService">
+    </bean>
+
+    <bean id="reportingControllerHelperService"
+          class="uk.ac.bbsrc.tgac.miso.spring.ajax.ReportingControllerHelperService">
+    </bean>
+
+    <bean id="flexReportingControllerHelperService"
+          class="uk.ac.bbsrc.tgac.miso.spring.ajax.FlexReportingControllerHelperService">
+    </bean>
+
+    <bean id="experimentControllerHelperService"
+          class="uk.ac.bbsrc.tgac.miso.spring.ajax.ExperimentControllerHelperService">
+    </bean>
+
+    <bean id="experimentWizardControllerHelperService"
+          class="uk.ac.bbsrc.tgac.miso.spring.ajax.ExperimentWizardControllerHelperService">
+    </bean>
+
+    <bean id="poolWizardControllerHelperService"
+          class="uk.ac.bbsrc.tgac.miso.spring.ajax.PoolWizardControllerHelperService">
+    </bean>
+
+    <bean id="taskControllerHelperService"
+          class="uk.ac.bbsrc.tgac.miso.spring.ajax.TaskControllerHelperService">
+    </bean>
+
+    <bean id="externalSectionControllerHelperService"
+          class="uk.ac.bbsrc.tgac.miso.spring.ajax.ExternalSectionControllerHelperService">
+    </bean>
+    
+</beans>
+

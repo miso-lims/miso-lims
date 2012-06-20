@@ -1,0 +1,636 @@
+/*
+ * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
+ * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+ * *********************************************************************
+ *
+ * This file is part of MISO.
+ *
+ * MISO is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MISO is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * *********************************************************************
+ */
+
+package uk.ac.bbsrc.tgac.miso.core.manager;
+
+//import com.sun.xml.internal.bind.v2.schemagen.xmlschema.Element;
+import net.sf.json.JSONArray;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+//import sun.jdbc.odbc.ee.PoolWorker;
+import uk.ac.bbsrc.tgac.miso.core.data.*;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.*;
+import uk.ac.bbsrc.tgac.miso.core.service.submission.*;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
+import uk.ac.bbsrc.tgac.miso.core.exception.SubmissionException;
+import uk.ac.bbsrc.tgac.miso.core.factory.submission.ERASubmissionFactory;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+import java.io.*;
+import java.net.URL;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+/**
+ * Manager class that holds state for a submission connection to the EBI SRA submission service, and facilitates the submission process
+ *
+ * @author Rob Davey
+ * @since 0.0.2
+ */
+public class ERASubmissionManager implements SubmissionManager<Set<Submittable<Document>>, URL, Document> {
+
+  @Autowired
+  private RequestManager requestManager;
+
+  public void setRequestManager(RequestManager requestManager) {
+  this.requestManager = requestManager;
+  }
+
+  @Autowired
+  private FilesManager misoFileManager;  
+
+  public void setMisoFileManager(FilesManager misoFileManager) {
+    this.misoFileManager = misoFileManager;
+  }
+
+  /** Field log  */
+  protected static final Logger log = LoggerFactory.getLogger(ERASubmissionManager.class);
+
+  private String accountName;
+  private String dropBox;
+  private String authKey;
+  private String proxyHost;
+  private String proxyUser;
+  private String proxyPass;
+  private URL submissionEndPoint;
+  private String submissionStoragePath;
+  private Map<Long,UploadReport> uploadReports = new HashMap<Long,UploadReport>();
+  /**
+   * Sets the accountName of this ERASubmissionManager object.
+   *
+   * @param accountName accountName.
+   */
+  public void setAccountName(String accountName) {
+    this.accountName = accountName;
+  }
+
+  /**
+   * Sets the dropBox of this ERASubmissionManager object.
+   *
+   * @param dropBox dropBox.
+   */
+  public void setDropBox(String dropBox) {
+    this.dropBox = dropBox;
+  }
+
+  /**
+   * Sets the authKey of this ERASubmissionManager object.
+   *
+   * @param authKey authKey.
+   */
+  public void setAuthKey(String authKey) {
+    this.authKey = authKey;
+  }
+
+  /**
+   * Sets the proxyHost of this ERASubmissionManager object if a proxy needs to be traversed
+   *
+   * @param proxyHost proxyHost.
+   */
+  public void setProxyHost(String proxyHost) {
+    this.proxyHost = proxyHost;
+  }
+
+  /**
+   * Sets the proxyUser of this ERASubmissionManager object if a proxy needs to be traversed
+   *
+   * @param proxyUser proxyUser.
+   */
+  public void setProxyUser(String proxyUser) {
+    this.proxyUser = proxyUser;
+  }
+
+  /**
+   * Sets the proxyPass of this ERASubmissionManager object if a proxy needs to be traversed
+   *
+   * @param proxyPass proxyPass.
+   */
+  public void setProxyPass(String proxyPass) {
+    this.proxyPass = proxyPass;
+  }
+
+  /**
+   * Sets the submissionEndPoint of this ERASubmissionManager object.
+   *
+   * @param submissionEndPoint submissionEndPoint.
+   */
+  public void setSubmissionEndPoint(URL submissionEndPoint) {
+    this.submissionEndPoint = submissionEndPoint;
+  }
+
+  /**
+   * Returns the submissionEndPoint of this ERASubmissionManager object.
+   *
+   * @return URL submissionEndPoint.
+   */
+  public URL getSubmissionEndPoint() {
+    return this.submissionEndPoint;
+  }
+
+  /**
+   * Sets the submissionStoragePath of this ERASubmissionManager object.
+   *
+   * @param submissionStoragePath submissionStoragePath.
+   */
+  public void setSubmissionStoragePath(String submissionStoragePath) {
+    this.submissionStoragePath = submissionStoragePath;
+   }
+
+  /**
+   * Returns the submissionStoragePath of this ERASubmissionManager object.
+   *
+   * @return String submissionStoragePath.
+   */
+  public String getSubmissionStoragePath() {
+        return submissionStoragePath;
+  }
+
+  @Override
+  public String generateSubmissionMetadata(Submission submission) throws SubmissionException {
+    File subPath = new File(misoFileManager.getFileStorageDirectory()+"/submission/"+submission.getName());
+    //File subPath = null;
+    StringBuilder sb = new StringBuilder();
+    try {
+       //subPath = misoFileManager.storeFile(submission.getClass(),submission.getName());
+      DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+
+      if (LimsUtils.checkDirectory(subPath, true)) {
+        Map<String, List<Submittable<Document>>> map = new HashMap<String, List<Submittable<Document>>>();
+        map.put("study", new ArrayList<Submittable<Document>>());
+        map.put("sample", new ArrayList<Submittable<Document>>());
+        map.put("experiment", new ArrayList<Submittable<Document>>());
+        map.put("run", new ArrayList<Submittable<Document>>());
+
+        Set<Submittable<Document>> subs = submission.getSubmissionElements();
+        for (Submittable<Document> sub : subs) {
+
+          if (sub instanceof Study) {
+            map.get("study").add(sub);
+          }
+          else if (sub instanceof Sample) {
+            map.get("sample").add(sub);
+          }
+          else if (sub instanceof Experiment) {
+            map.get("experiment").add(sub);
+          }
+          else if (sub instanceof SequencerPoolPartition) {
+            map.get("run").add(sub);
+          }
+        }
+
+        for (String key : map.keySet()) {
+          List<Submittable<Document>> submittables = map.get(key);
+          Document submissionDocument = docBuilder.newDocument();
+          ERASubmissionFactory.generateSubmissionXML(submissionDocument, submittables, key);
+
+          //generate xml files on disk
+          SubmissionUtils.transform(submissionDocument,
+                                    new File(subPath,
+                                             File.separator+
+                                             submission.getName()+
+                                             "_"+
+                                             key+
+                                             ".xml"));
+          sb.append(SubmissionUtils.transform(submissionDocument, true));
+        }
+
+        Document submissionDocument = docBuilder.newDocument();
+        ERASubmissionFactory.generateParentSubmissionXML(submissionDocument, submission);
+        SubmissionUtils.transform(submissionDocument,
+                                  new File(subPath,
+                                           File.separator+
+                                           submission.getName()+
+                                           "_submission.xml"),
+                                  true);
+
+        sb.append(SubmissionUtils.transform(submissionDocument, true));
+      }
+    }
+    catch (ParserConfigurationException e) {
+      throw new SubmissionException(e.getMessage());
+    }
+    catch (TransformerException e) {
+      throw new SubmissionException(e.getMessage());
+    }
+    catch (IOException e) {
+      throw new SubmissionException("Cannot write to submission storage directory: " + subPath + ". Please check this directory exists and is writable.");
+    }
+
+    return sb.toString();
+  }
+
+  /**
+   * Submits the given set of Submittables to the ERA submission service endpoint
+   *
+   * @param submissionData of type Set<Submittable<Document>>
+   * @return Document
+   * @throws SubmissionException when an error occurred with the submission process
+   */
+  public Document submit(Set<Submittable<Document>> submissionData) throws SubmissionException {
+    try {
+
+      DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+
+      if (submissionEndPoint == null) {
+        throw new SubmissionException("No submission endpoint configured. Please check the Spring miso-config.xml file.");
+      }
+
+      if (submissionData == null || submissionData.size() == 0) {
+        throw new SubmissionException("No submission data set.");
+      }
+
+      if (accountName == null || dropBox == null || authKey == null) {
+        throw new SubmissionException("An accountName, dropBox and authKey must be supplied!");
+      }
+
+      String curl = "curl -k ";
+
+      StringBuilder sb = new StringBuilder();
+      sb.append(curl);
+
+      if (proxyHost != null && !proxyHost.equals("")) {
+        sb.append("-x ").append(proxyHost);
+
+        if (proxyUser != null && !proxyUser.equals("")) {
+          sb.append("-U ").append(proxyUser);
+
+          if (proxyPass != null && !proxyPass.equals("")) {
+            sb.append(":").append(proxyPass);
+          }
+        }
+      }
+
+      //submit via REST to endpoint
+      try {
+
+        Map<String, List<Submittable<Document>>> map = new HashMap<String, List<Submittable<Document>>>();
+        map.put("study", new ArrayList<Submittable<Document>>());
+        map.put("sample", new ArrayList<Submittable<Document>>());
+        map.put("experiment", new ArrayList<Submittable<Document>>());
+        map.put("run", new ArrayList<Submittable<Document>>());
+
+        Document submissionXml = docBuilder.newDocument();
+        String subName = null;
+
+        for (Submittable<Document> s : submissionData) {
+          if (s instanceof Submission) {
+            //s.buildSubmission();
+            ERASubmissionFactory.generateParentSubmissionXML(submissionXml, (Submission) s);
+            subName = ((Submission) s).getName();
+          }
+          else if (s instanceof Study) {
+            map.get("study").add(s);
+          }
+          else if (s instanceof Sample) {
+            map.get("sample").add(s);
+          }
+          else if (s instanceof Experiment) {
+            map.get("experiment").add(s);
+          }
+          else if (s instanceof SequencerPoolPartition) {
+            map.get("run").add(s);
+          }
+        }
+
+        if (submissionXml != null && subName != null) {
+
+          String url = getSubmissionEndPoint() + "?auth=ERA%20" + dropBox + "%20" + authKey;
+
+          HttpClient httpclient = getEvilTrustingTrustManager(new DefaultHttpClient());
+
+              HttpPost httppost = new HttpPost(url);
+
+          MultipartEntity reqEntity = new MultipartEntity();
+
+          String submissionXmlFileName = subName + File.separator + subName + "_submission.xml";
+
+          File subtmp = new File(submissionStoragePath + submissionXmlFileName);
+
+          SubmissionUtils.transform(submissionXml, subtmp, true);
+
+          reqEntity.addPart("SUBMISSION", new FileBody(subtmp));
+
+          for (String key : map.keySet()) {
+
+            List<Submittable<Document>> submittables = map.get(key);
+
+            String submittableXmlFileName = subName
+                                            + File.separator
+                                            + subName
+                                            + "_"
+                                            + key.toLowerCase()
+                                            + ".xml";
+
+            File elementTmp = new File(submissionStoragePath + submittableXmlFileName);
+
+            Document submissionDocument = docBuilder.newDocument();
+
+            ERASubmissionFactory.generateSubmissionXML(submissionDocument, submittables, key);
+            SubmissionUtils.transform(submissionDocument, elementTmp, true);
+            reqEntity.addPart(key.toUpperCase(), new FileBody(elementTmp));
+          }
+
+          httppost.setEntity(reqEntity);
+          HttpResponse response = httpclient.execute(httppost);
+
+          if (response.getStatusLine().getStatusCode() == 200) {
+            HttpEntity resEntity = response.getEntity();
+            try {
+
+              Document submissionReport = docBuilder.newDocument();
+
+              SubmissionUtils.transform(resEntity.getContent(), submissionReport);
+              DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+              File savedReport = new File(submissionStoragePath
+                                          + subName
+                                          + File.separator
+                                          + "report_"
+                                          + df.format(new Date())
+                                          + ".xml");
+              SubmissionUtils.transform(submissionReport, savedReport);
+              return submissionReport;
+            }
+            catch (IOException e) {
+              e.printStackTrace();
+            }
+            catch (TransformerException e) {
+              e.printStackTrace();
+            }
+          }
+          else {
+
+            throw new SubmissionException("Response from submission endpoint (" + url + ") was not OK (200). Was: " + response.getStatusLine().getStatusCode());
+          }
+        }
+        else {
+          throw new SubmissionException("Could not find a Submission in the supplied set of Submittables");
+        }
+      }
+      catch (IOException e) {
+        e.printStackTrace();
+      }
+      catch (TransformerException e) {
+        e.printStackTrace();
+      }
+    }
+    catch (ParserConfigurationException e) {
+      e.printStackTrace();
+    }
+    return null;
+  }
+
+  public Map<String, Object> parseResponse(Document report) {
+    Map<String, Object> responseMap = new HashMap<String, Object>();
+    NodeList errors = report.getElementsByTagName("ERROR");
+    NodeList infos = report.getElementsByTagName("INFO");
+
+    ArrayList<String> errorList = new ArrayList<String>();
+    if (errors.getLength() > 0) {
+      for (int i = 0; i < errors.getLength(); i++) {
+        errorList.add(errors.item(i).getTextContent());
+      }
+      responseMap.put("errors", JSONArray.fromObject(errorList));
+    }
+
+    ArrayList<String> infoList = new ArrayList<String>();
+    if (infos.getLength() > 0) {
+      for (int i = 0; i < infos.getLength(); i++) {
+        infoList.add(infos.item(i).getTextContent());
+      }
+      responseMap.put("infos", JSONArray.fromObject(infoList));
+    }
+    return responseMap;
+  }
+
+  public String submitSequenceData(Submission s){
+
+      Set<File> dataFiles = new HashSet<File>();
+      FilePathGenerator FPG = new TGACIlluminaFilepathGenerator();
+      //FilePathGenerator FPG = new FakeFilepathGenerator();
+
+      for(Object o: s.getSubmissionElements()){
+          if(o instanceof SequencerPoolPartition){
+            SequencerPoolPartition l = (SequencerPoolPartition) o;
+           //  if( l.getPool()!=null){
+//            Collection<LibraryDilution> ld=l.getPool().getDilutions();
+//              LibraryDilution libd=ld.iterator().next();
+            try{
+            dataFiles = FPG.generateFilePaths(l);
+
+            }catch(SubmissionException submissionException){submissionException.printStackTrace();}
+
+          }
+      }
+
+
+      if(dataFiles.size()>0){
+      TransferMethod t = new FTPTransferMethod();
+      EndPoint end = new ERAEndpoint();
+      end.setDestination("localhost");
+      //end.setDestination(submissionEndPoint.toExternalForm());
+
+      try{
+
+          UploadReport report=t.uploadSequenceData(dataFiles, end);
+          uploadReports.put(s.getSubmissionId(),report);
+
+          return("attempting to upload files...");
+      }
+      catch (Exception e){e.printStackTrace();
+      return ("there was an error");
+      }
+      }
+      else return("No datafiles were found to upload");
+
+  }
+
+    @Override
+    public UploadReport getUploadProgress(Long submissionId) {
+
+        try{
+
+        return uploadReports.get(submissionId);
+        }
+        catch(Exception e){e.printStackTrace(); return null;}
+
+    }
+
+    public void setTransferMethod(TransferMethod transferMethod){
+
+  }
+   /*
+    public FTPUploadReport getUploadReport(Submission submission){
+         return uploadReports.get(submission);
+    }
+    */
+
+  public String prettifySubmissionMetadata(Submission submission) throws SubmissionException {
+
+
+      StringBuilder sb = new StringBuilder();
+    try {
+      Collection<File> files = misoFileManager.getFiles(Submission.class, submission.getName());
+
+      InputStream in = null;
+      for (File f : files) {
+
+        if (f.getName().contains("submission")) {
+
+          in = ERASubmissionManager.class.getResourceAsStream("/submission/xsl/eraSubmission.xsl");
+          if (in != null) {
+            String xsl = LimsUtils.inputStreamToString(in);
+            sb.append(SubmissionUtils.xslTransform(SubmissionUtils.transform(f, true), xsl));
+          }
+        }
+      }
+
+      for (File f : files) {
+        if (f.getName().contains("study")) {
+
+
+          in = ERASubmissionManager.class.getResourceAsStream("/submission/xsl/eraStudy.xsl");
+          if (in != null) {
+            String xsl = LimsUtils.inputStreamToString(in);
+            sb.append(SubmissionUtils.xslTransform(SubmissionUtils.transform(f, true), xsl));
+          }
+        }
+      }
+
+      for (File f : files) {
+        if (f.getName().contains("sample")) {
+          in = ERASubmissionManager.class.getResourceAsStream("/submission/xsl/eraSample.xsl");
+          if (in != null) {
+            String xsl = LimsUtils.inputStreamToString(in);
+            sb.append(SubmissionUtils.xslTransform(SubmissionUtils.transform(f, true), xsl));
+          }
+        }
+      }
+
+      for (File f : files) {
+        if (f.getName().contains("experiment")) {
+          in = ERASubmissionManager.class.getResourceAsStream("/submission/xsl/eraExperiment.xsl");
+          if (in != null) {
+            String xsl = LimsUtils.inputStreamToString(in);
+            sb.append(SubmissionUtils.xslTransform(SubmissionUtils.transform(f, true), xsl));
+          }
+        }
+      }
+
+      for (File f : files) {
+        if (f.getName().contains("run")) {
+          in = ERASubmissionManager.class.getResourceAsStream("/submission/xsl/eraRun.xsl");
+          if (in != null) {
+            String xsl = LimsUtils.inputStreamToString(in);
+            sb.append(SubmissionUtils.xslTransform(SubmissionUtils.transform(f, true), xsl));
+          }
+        }
+      }
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+    }
+    catch (TransformerException e) {
+      e.printStackTrace();
+    }
+
+    return sb.toString();
+  }
+
+  /**
+   * Builds a "trusting" trust manager. This is totally horrible and basically ignores everything that SSL stands for.
+   * This allows connection to self-signed certificate hosts, bypassing the normal validation exceptions that occur.
+   * <p/>
+   * Use at your own risk - again, this is horrible!
+   */
+  public DefaultHttpClient getEvilTrustingTrustManager(DefaultHttpClient httpClient) {
+    try {
+      // First create a trust manager that won't care about any SSL self-cert problems - eurgh!
+      X509TrustManager trustManager = new X509TrustManager() {
+        public void checkClientTrusted(X509Certificate[] chain, String authType)
+                throws CertificateException {
+          log.warn("BYPASSING CLIENT TRUSTED CHECK!");
+        }
+
+        public void checkServerTrusted(X509Certificate[] chain, String authType)
+                throws CertificateException {
+          log.warn("BYPASSING SERVER TRUSTED CHECK!");
+        }
+
+        public X509Certificate[] getAcceptedIssuers() {
+          log.warn("BYPASSING CERTIFICATE ISSUER CHECKS!");
+          return null;
+        }
+      };
+
+      // Now put the trust manager into an SSLContext
+      SSLContext sslcontext = SSLContext.getInstance("TLS");
+      sslcontext.init(null, new TrustManager[]{trustManager}, null);
+      SSLSocketFactory sf = new SSLSocketFactory(sslcontext);
+      sf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+
+      // If you want a thread safe client, use the ThreadSafeConManager, but
+      // otherwise just grab the one from the current client, and get hold of its
+      // schema registry. THIS IS THE KEY THING.
+      ClientConnectionManager ccm = httpClient.getConnectionManager();
+      SchemeRegistry schemeRegistry = ccm.getSchemeRegistry();
+
+      // Register our new socket factory with the typical SSL port and the
+      // correct protocol name.
+      schemeRegistry.register(new Scheme("https", sf, 443));
+
+      // Finally, apply the ClientConnectionManager to the Http Client
+      // or, as in this example, create a new one.
+      return new DefaultHttpClient(ccm, httpClient.getParams());
+    }
+    catch (Throwable t) {
+      log.warn("Something nasty happened with the EvilTrustingTrustManager. Warranty is null and void!");
+      t.printStackTrace();
+      return null;
+    }
+  }
+}
+

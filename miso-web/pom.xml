@@ -1,0 +1,510 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2010. The Genome Analysis Centre, Norwich, UK
+  ~ MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+  ~
+  ~ **********************************************************************
+  ~
+  ~ This file is part of MISO.
+  ~
+  ~ MISO is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ MISO is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+  ~
+  ~ **********************************************************************
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <parent>
+    <artifactId>miso</artifactId>
+    <groupId>uk.ac.bbsrc.tgac.miso</groupId>
+    <version>0.1.6RC</version>
+  </parent>
+
+  <groupId>${parent.groupId}</groupId>
+  <version>${parent.version}</version>
+  <artifactId>miso-web</artifactId>
+
+  <packaging>war</packaging>
+  <name>MISO MVC</name>
+  <modelVersion>4.0.0</modelVersion>
+
+  <build>
+    <finalName>ROOT</finalName>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpack-fluxion-ajax-js</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>net.sourceforge.fluxion.ajax</groupId>
+                  <artifactId>fluxion-ajax-js</artifactId>
+                  <version>1.0-alpha-10</version>
+                  <type>jar</type>
+                  <overWrite>true</overWrite>
+                </artifactItem>
+              </artifactItems>
+              <excludes>META-INF</excludes>
+              <outputDirectory>target/ROOT/scripts/fluxion-ajax/</outputDirectory>
+              <overWriteReleases>true</overWriteReleases>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>sql</id>
+      <activation>
+        <property>
+          <name>database</name>
+          <value>sql</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-war-plugin</artifactId>
+            <configuration>
+              <webResources>
+                <resource>
+                  <directory>src/main/resources/sql</directory>
+                  <targetPath>WEB-INF</targetPath>
+                  <filtering>true</filtering>
+                  <includes>
+                    <include>db-config.xml</include>
+                  </includes>
+                </resource>
+              </webResources>
+            </configuration>
+          </plugin>
+        </plugins>
+
+        <resources>
+          <resource>
+            <directory>src/main/resources</directory>
+            <filtering>true</filtering>
+            <excludes>
+              <exclude>db4o/*</exclude>
+            </excludes>
+          </resource>
+        </resources>
+      </build>
+
+      <dependencies>
+        <dependency>
+          <groupId>${parent.groupId}</groupId>
+          <artifactId>sqlstore</artifactId>
+          <version>${parent.version}</version>
+        </dependency>
+      </dependencies>
+
+      <properties>
+        <spring-version>3.0.5.RELEASE</spring-version>
+      </properties>
+
+    </profile>
+
+    <profile>
+      <id>db4o</id>
+      <activation>
+        <property>
+          <name>database</name>
+          <value>db4o</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-war-plugin</artifactId>
+            <configuration>
+              <webResources>
+                <resource>
+                  <directory>src/main/resources/db4o</directory>
+                  <targetPath>WEB-INF</targetPath>
+                  <filtering>true</filtering>
+                  <includes>
+                    <include>db-config.xml</include>
+                  </includes>
+                </resource>
+              </webResources>
+            </configuration>
+          </plugin>
+        </plugins>
+
+        <resources>
+          <resource>
+            <directory>src/main/resources</directory>
+            <filtering>true</filtering>
+            <excludes>
+              <exclude>sql/*</exclude>
+            </excludes>
+          </resource>
+        </resources>
+      </build>
+
+      <dependencies>
+        <dependency>
+          <groupId>${parent.groupId}</groupId>
+          <artifactId>db4ostore</artifactId>
+          <version>${parent.version}</version>
+        </dependency>
+      </dependencies>
+
+      <properties>
+        <spring-version>3.0.5.RELEASE</spring-version>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>internal</id>
+      <activation>
+        <property>
+          <name>release</name>
+          <value>internal</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-war-plugin</artifactId>
+            <configuration>
+              <webResources>
+                <resource>
+                  <directory>src/main/resources/internal</directory>
+                  <targetPath>WEB-INF</targetPath>
+                  <filtering>true</filtering>
+                  <includes>
+                    <include>miso.properties</include>
+                  </includes>
+                </resource>
+                <resource>
+                  <directory>src/main/resources/sql</directory>
+                  <targetPath>WEB-INF</targetPath>
+                  <filtering>true</filtering>
+                  <includes>
+                    <include>db-config.xml</include>
+                  </includes>
+                </resource>
+              </webResources>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>external</id>
+      <activation>
+        <property>
+          <name>release</name>
+          <value>external</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-war-plugin</artifactId>
+            <configuration>
+              <webResources>
+                <resource>
+                  <directory>src/main/resources/external</directory>
+                  <targetPath>WEB-INF</targetPath>
+                  <filtering>true</filtering>
+                  <includes>
+                    <include>miso.properties</include>
+                    <include>db-config.xml</include>
+                  </includes>
+                </resource>
+              </webResources>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+  </profiles>
+
+  <repositories>
+    <repository>
+      <id>hasbanana-repo</id>
+      <name>hasBanana Repository</name>
+      <url>http://www.hasbanana.com/maven/repo</url>
+    </repository>
+
+    <repository>
+      <id>sonatype-sourceforge-snapshots</id>
+      <name>Sonatype SF Repository</name>
+      <url>http://oss.sonatype.org/content/repositories/sourceforge-snapshots/</url>
+    </repository>
+
+    <repository>
+      <id>Atlassian Maven Repository</id>
+      <url>https://maven.atlassian.com/public</url>
+    </repository>
+
+    <repository>
+      <id>Java.Net Maven Repository</id>
+      <url>http://download.java.net/maven/2</url>
+    </repository>
+  </repositories>
+
+  <dependencies>
+    <dependency>
+      <groupId>${parent.groupId}</groupId>
+      <artifactId>spring</artifactId>
+      <version>${parent.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>${parent.groupId}</groupId>
+      <artifactId>integration-tools</artifactId>
+      <version>${parent.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>${parent.groupId}</groupId>
+      <artifactId>run-tools</artifactId>
+      <version>${parent.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>${parent.groupId}</groupId>
+      <artifactId>notification-consumer-services</artifactId>
+      <version>${parent.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.eaglegenomics.simlims</groupId>
+      <artifactId>simlims-hibernatestore</artifactId>
+      <version>${simlims-version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-webmvc</artifactId>
+      <version>${spring-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-taglibs</artifactId>
+      <version>${spring-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-web</artifactId>
+      <version>${spring-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-core</artifactId>
+      <version>${spring-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+      <version>${spring-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>jstl</artifactId>
+      <version>${jstl-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-core</artifactId>
+      <version>${spring-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-config</artifactId>
+      <version>${spring-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-tx</artifactId>
+      <version>${spring-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.integration</groupId>
+      <artifactId>spring-integration-core</artifactId>
+      <version>${spring-integration-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.integration</groupId>
+      <artifactId>spring-integration-http</artifactId>
+      <version>${spring-integration-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.integration</groupId>
+      <artifactId>spring-integration-xml</artifactId>
+      <version>${spring-integration-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.integration</groupId>
+      <artifactId>spring-integration-ip</artifactId>
+      <version>${spring-integration-version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.sf.ehcache</groupId>
+      <artifactId>ehcache</artifactId>
+      <type>pom</type>
+      <version>2.5.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.sf.ehcache</groupId>
+      <artifactId>ehcache-core</artifactId>
+      <version>2.5.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>javassist</groupId>
+      <artifactId>javassist</artifactId>
+      <version>${javassist-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>${log4j-version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jdom</groupId>
+      <artifactId>jdom</artifactId>
+      <version>${jdom-version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-ldap</artifactId>
+      <version>${spring-version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.security.oauth</groupId>
+      <artifactId>spring-security-oauth</artifactId>
+      <version>1.0.0.M3</version>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-codec</groupId>
+          <artifactId>commons-codec</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>net.sourceforge.fluxion.ajax</groupId>
+      <artifactId>fluxion-ajax-3</artifactId>
+      <version>1.0-alpha-4</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.sourceforge.fluxion.ajax.beans</groupId>
+      <artifactId>fluxion-ajax-beans</artifactId>
+      <version>1.0-alpha-3</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.sf.json-lib</groupId>
+      <artifactId>json-lib</artifactId>
+      <version>2.4</version>
+      <classifier>jdk15</classifier>
+    </dependency>
+
+    <!--
+      <dependency>
+        <groupId>oauth.signpost</groupId>
+        <artifactId>signpost-core</artifactId>
+        <version>1.2</version>
+        <exclusions>
+            <exclusion>
+                <groupId>commons-codec</groupId>
+                <artifactId>commons-codec</artifactId>
+            </exclusion>
+        </exclusions>
+      </dependency>
+
+    <dependency>
+        <groupId>com.atlassian.jira</groupId>
+        <artifactId>jira-rest-java-client</artifactId>
+        <version>0.1.1</version>
+        <exclusions>
+            <exclusion>
+                <groupId>org.codehaus.jackson</groupId>
+                <artifactId>jackson-core-asl</artifactId>
+            </exclusion>
+        </exclusions>
+    </dependency>
+    -->
+
+    <dependency>
+      <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
+      <artifactId>oauth-signature</artifactId>
+      <version>1.5</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
+      <artifactId>oauth-client</artifactId>
+      <version>1.5</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.sun.jersey.contribs</groupId>
+      <artifactId>jersey-apache-client</artifactId>
+      <version>1.5</version>
+    </dependency>
+    <!--
+    <dependency>
+      <groupId>org.atmosphere</groupId>
+      <artifactId>atmosphere-jquery</artifactId>
+      <version>0.8.2</version>
+    </dependency>
+    -->
+  </dependencies>
+  <properties>
+    <jdom-version>1.1</jdom-version>
+    <jstl-version>1.2</jstl-version>
+    <javassist-version>3.8.0.GA</javassist-version>
+    <log4j-version>1.2.16</log4j-version>
+    <slf4j-log4j-version>1.6.0</slf4j-log4j-version>
+    <jetty-version>6.1.7</jetty-version>
+    <spring-version>3.0.5.RELEASE</spring-version>
+    <spring-integration-version>2.0.3.RELEASE</spring-integration-version>
+    <mysql-version>5.1.10</mysql-version>
+  </properties>
+</project>
