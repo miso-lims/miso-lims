@@ -248,6 +248,14 @@
                     <include>db-config.xml</include>
                   </includes>
                 </resource>
+                <resource>
+                  <directory>src/main/resources/sql</directory>
+                  <targetPath>WEB-INF</targetPath>
+                  <filtering>true</filtering>
+                  <includes>
+                    <include>db-config.xml</include>
+                  </includes>
+                </resource>
               </webResources>
             </configuration>
           </plugin>
