@@ -81,31 +81,6 @@
     </license>
   </licenses>
 
-  <!-- Mailing Lists -->
-  <!--
-    <mailingLists>
-      <mailingList>
-        <name>fluxion-users</name>
-        <subscribe>
-          https://lists.sourceforge.net/mailman/listinfo/fluxion-users
-        </subscribe>
-        <unsubscribe>
-          https://lists.sourceforge.net/mailman/listinfo/fluxion-users
-        </unsubscribe>
-        <post>fluxion-users@lists.sourceforge.net</post>
-      </mailingList>
-      <mailingList>
-        <name>fluxion-devel</name>
-        <subscribe>
-          https://lists.sourceforge.net/mailman/listinfo/fluxion-devel
-        </subscribe>
-        <unsubscribe>
-          https://lists.sourceforge.net/mailman/listinfo/fluxion-devel
-        </unsubscribe>
-        <post>fluxion-devel@lists.sourceforge.net</post>
-      </mailingList>
-    </mailingLists>
-  -->
   <!-- Bug Tracker -->
   <issueManagement>
     <system>sourceforge</system>
@@ -160,13 +135,13 @@
   <!-- SVN connection -->
   <scm>
     <connection>
-      scm:svn:https://repos.tgac.bbsrc.ac.uk/subversion/lims/simlims/branches/lims-0.1.6-rc
+      scm:git:https://www.github.com/TGAC/miso-lims
     </connection>
     <developerConnection>
-      scm:svn:https://repos.tgac.bbsrc.ac.uk/subversion/lims/simlims/branches/lims-0.1.6-rc
+      scm:git:ssh://www.github.com/TGAC/miso-lims
     </developerConnection>
     <url>
-      https://repos.tgac.bbsrc.ac.uk/subversion/lims/simlims/branches/lims-0.1.6-rc
+      https://www.github.com/TGAC/miso-lims
     </url>
   </scm>
 
