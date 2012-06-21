@@ -73,23 +73,5 @@
     <property name="submissionStoragePath" value="${miso.submissionStorageDirectory}"/>
   </bean>
 
-  <bean name="statsInterfaceTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
-    <property name="dataSource" ref="statsDataSource"/>
-    <property name="nativeJdbcExtractor" ref="statsNativeJdbcExtractor"/>
-  </bean>
-
-  <bean name="runStatsManager" class="uk.ac.bbsrc.tgac.miso.runstats.client.manager.RunStatsManager">
-    <constructor-arg index="0" ref="statsInterfaceTemplate"/>
-  </bean>
-
-  <bean name="statsNativeJdbcExtractor"
-        class="org.springframework.jdbc.support.nativejdbc.CommonsDbcpNativeJdbcExtractor"/>
-
-  <bean id="statsTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-    <property name="dataSource" ref="statsDataSource"/>
-  </bean>
-
-  <jee:jndi-lookup id="statsDataSource"
-                   jndi-name="/jdbc/STATSDB"
-                   resource-ref="true"/>
+  <bean name="issueTrackerManager" class="uk.ac.bbsrc.tgac.miso.core.manager.DummyIssueTrackerManager"/>
 </beans>

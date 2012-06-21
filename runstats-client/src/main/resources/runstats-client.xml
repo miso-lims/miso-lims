@@ -23,16 +23,11 @@
   -->
 
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:jee="http://www.springframework.org/schema/jee"
        xmlns:integration="http://www.springframework.org/schema/integration"
-       xmlns:integration-http="http://www.springframework.org/schema/integration/http"
-       xmlns:integration-xml="http://www.springframework.org/schema/integration/xml"
-       xmlns:ip="http://www.springframework.org/schema/integration/ip"
-       xmlns:task="http://www.springframework.org/schema/task"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-                        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
-                        http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.0.xsd http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd http://www.springframework.org/schema/integration/http http://www.springframework.org/schema/integration/http/spring-integration-http.xsd http://www.springframework.org/schema/integration/ip http://www.springframework.org/schema/integration/ip/spring-integration-ip-2.0.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.0.xsd"
+                        http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.0.xsd http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd"
        default-autowire="byName">
 
   <integration:annotation-config/>
@@ -57,74 +52,4 @@
   <jee:jndi-lookup id="statsDataSource"
                    jndi-name="/jdbc/STATSDB"
                    resource-ref="true"/>
-
-  <!-- OLD STUFF -->
-  <!--
-
-  <bean name="statsJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
-    <property name="dataSource" ref="statsDataSource"/>
-  </bean>
-
-  <bean id="statsDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-    <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
-    <property name="url" value="jdbc:mysql://localhost:3306/run_metrics"/>
-    <property name="username" value="tgaclims"/>
-    <property name="password" value="tgaclims"/>
-  </bean>
-
-  <bean id="sqlRunstatsDAO" class="uk.ac.bbsrc.tgac.miso.runstats.client.sql.SQLRunstatsDAO">
-    <property name="jdbcTemplate" ref="statsJdbcTemplate"/>
-  </bean>
-
-  <bean name="runStatsStore" class="org.springframework.aop.framework.ProxyFactoryBean">
-    <property name="proxyInterfaces">
-      <value>uk.ac.bbsrc.tgac.miso.runstats.client.RunstatsStore</value>
-    </property>
-    <property name="interceptorNames">
-      <list>
-        <value>sqlRunstatsDAO</value>
-      </list>
-    </property>
-  </bean>
-
-  <bean id="statsHandler" class="uk.ac.bbsrc.tgac.miso.runstats.client.handler.RunStatsHandler">
-    <property name="runStatsManager">
-      <bean class="uk.ac.bbsrc.tgac.miso.runstats.client.manager.RunStatsManager"/>
-    </property>
-  </bean>
-
-  <integration:channel id="statisticsChannel"/>
-
-  <bean id="byteSerializer" class="org.springframework.integration.ip.tcp.serializer.ByteArrayRawSerializer">
-    <property name="maxMessageSize" value="10000000"/>
-  </bean>
-
-  <bean id="byteDeserializer" class="org.springframework.integration.ip.tcp.serializer.ByteArrayRawSerializer">
-    <property name="maxMessageSize" value="10000000"/>
-  </bean>
-
-  <bean id="defaultSerializer" class="org.springframework.core.serializer.DefaultSerializer"/>
-  <bean id="defaultDeserializer" class="org.springframework.core.serializer.DefaultDeserializer"/>
-
-  <task:executor id="exec" pool-size="10"/>
-
-  <ip:tcp-connection-factory id="tcpserver"
-                             type="server"
-                             port="57476"
-                             single-use="true"
-                             so-timeout="30000"
-                             using-nio="true"
-                             serializer="defaultSerializer"
-                             deserializer="defaultDeserializer"
-                             task-executor="exec"/>
-
-  <ip:tcp-inbound-channel-adapter id="inboundServer"
-                                  channel="statisticsChannel"
-                                  connection-factory="tcpserver"/>
-
-  <integration:service-activator id="statsService"
-                                 input-channel="statisticsChannel"
-                                 ref="statsHandler"
-                                 method="persist"/>
-  -->
 </beans>

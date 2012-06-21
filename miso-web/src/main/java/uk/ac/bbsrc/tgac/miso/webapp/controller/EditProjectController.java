@@ -78,9 +78,6 @@ public class EditProjectController {
   private FilesManager filesManager;
 
   @Autowired
-  private IssueTrackerManager issueTrackerManager;
-
-  @Autowired
   private DataObjectFactory dataObjectFactory;
 
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
@@ -97,14 +94,6 @@ public class EditProjectController {
 
   public void setFilesManager(FilesManager filesManager) {
     this.filesManager = filesManager;
-  }
-
-  public IssueTrackerManager getIssueTrackerManager() {
-    return issueTrackerManager;
-  }
-
-  public void setIssueTrackerManager(IssueTrackerManager issueTrackerManager) {
-    this.issueTrackerManager = issueTrackerManager;
   }
 
   @Autowired

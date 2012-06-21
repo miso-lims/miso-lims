@@ -32,7 +32,7 @@
     <bean id="propertyConfigurer" class="uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter">
         <property name="locations">
             <list>
-                <value>classpath:internal/miso.properties</value>
+                <value>classpath:miso.properties</value>
             </list>
         </property>
     </bean>

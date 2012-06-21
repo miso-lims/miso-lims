@@ -193,55 +193,65 @@ public class ProjectControllerHelperService {
   }
 
   public JSONObject previewIssues(HttpSession session, JSONObject json) {
-    List<JSONObject> issueList = new ArrayList<JSONObject>();
-    List<String> errorList = new ArrayList<String>();
-    JSONArray issues = JSONArray.fromObject(json.getString("issues"));
-    for (JSONObject issueKey : (Iterable<JSONObject>) issues) {
-      JSONObject issue = null;
-      try {
-        issue = issueTrackerManager.getIssue(issueKey.getString("key"));
-        if (issue != null) {
-          issueList.add(issue);
+    if (issueTrackerManager != null) {
+      List<JSONObject> issueList = new ArrayList<JSONObject>();
+      List<String> errorList = new ArrayList<String>();
+      JSONArray issues = JSONArray.fromObject(json.getString("issues"));
+      for (JSONObject issueKey : (Iterable<JSONObject>) issues) {
+        JSONObject issue = null;
+        try {
+          issue = issueTrackerManager.getIssue(issueKey.getString("key"));
+          if (issue != null) {
+            issueList.add(issue);
+          }
+          else {
+            errorList.add(issueKey.getString("key"));
+          }
         }
-        else {
+        catch (IOException e) {
+          e.printStackTrace();
           errorList.add(issueKey.getString("key"));
         }
       }
-      catch (IOException e) {
-        e.printStackTrace();
-        errorList.add(issueKey.getString("key"));
-      }
-    }
 
-    JSONObject j = new JSONObject();
-    j.put("validIssues", JSONArray.fromObject(issueList));
-    j.put("invalidIssues", JSONArray.fromObject(errorList));
-    return j;
+      JSONObject j = new JSONObject();
+      j.put("validIssues", JSONArray.fromObject(issueList));
+      j.put("invalidIssues", JSONArray.fromObject(errorList));
+      return j;
+    }
+    else {
+      return JSONUtils.SimpleJSONError("No issue tracker manager available.");
+    }
   }
 
   public JSONObject getIssues(HttpSession session, JSONObject json) {
-    Long projectId = json.getLong("projectId");
-    try {
-      Project project = requestManager.getProjectById(projectId);
-      JSONObject j = new JSONObject();
-      if (project != null) {
-        List<JSONObject> issueList = new ArrayList<JSONObject>();
+    if (issueTrackerManager != null) {
+      Long projectId = json.getLong("projectId");
+      try {
+        Project project = requestManager.getProjectById(projectId);
+        JSONObject j = new JSONObject();
+        if (project != null) {
+          List<JSONObject> issueList = new ArrayList<JSONObject>();
 
-        if (project.getIssueKeys() != null) {
-          for (String issueKey : project.getIssueKeys()) {
-            JSONObject issue = issueTrackerManager.getIssue(issueKey);
-            if (issue != null) {
-              issueList.add(issue);
+          if (project.getIssueKeys() != null) {
+            for (String issueKey : project.getIssueKeys()) {
+              JSONObject issue = issueTrackerManager.getIssue(issueKey);
+              if (issue != null) {
+                issueList.add(issue);
+              }
             }
+            j.put("issues", JSONArray.fromObject(issueList));
           }
-          j.put("issues", JSONArray.fromObject(issueList));
         }
+        return j;
       }
-      return j;
+      catch (IOException e) {
+        e.printStackTrace();
+        return JSONUtils.SimpleJSONError(e.getMessage());
+      }
     }
-    catch (IOException e) {
-      e.printStackTrace();
-      return JSONUtils.SimpleJSONError(e.getMessage());
+    else {
+      return JSONUtils.SimpleJSONError("No issue tracker manager available.");
     }
   }
 

@@ -203,7 +203,7 @@
               <webResources>
                 <resource>
                   <directory>src/main/resources/internal</directory>
-                  <targetPath>WEB-INF</targetPath>
+                  <targetPath>WEB-INF/classes</targetPath>
                   <filtering>true</filtering>
                   <includes>
                     <include>miso.properties</include>
@@ -221,6 +221,16 @@
             </configuration>
           </plugin>
         </plugins>
+        <resources>
+          <resource>
+            <directory>src/main/resources</directory>
+            <filtering>true</filtering>
+            <excludes>
+              <exclude>external/*</exclude>
+              <exclude>db4o/*</exclude>
+            </excludes>
+          </resource>
+        </resources>
       </build>
     </profile>
 
@@ -241,11 +251,10 @@
               <webResources>
                 <resource>
                   <directory>src/main/resources/external</directory>
-                  <targetPath>WEB-INF</targetPath>
+                  <targetPath>WEB-INF/classes</targetPath>
                   <filtering>true</filtering>
                   <includes>
                     <include>miso.properties</include>
-                    <include>db-config.xml</include>
                   </includes>
                 </resource>
                 <resource>
@@ -260,6 +269,16 @@
             </configuration>
           </plugin>
         </plugins>
+        <resources>
+          <resource>
+            <directory>src/main/resources</directory>
+            <filtering>true</filtering>
+            <excludes>
+              <exclude>internal/*</exclude>
+              <exclude>db4o/*</exclude>
+            </excludes>
+          </resource>
+        </resources>
       </build>
     </profile>
 

@@ -27,6 +27,11 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jdbc.support.nativejdbc.CommonsDbcpNativeJdbcExtractor;
+import org.springframework.jndi.JndiObjectFactoryBean;
+import org.springframework.jndi.JndiTemplate;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.context.support.XmlWebApplicationContext;
@@ -44,12 +49,15 @@ import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
+import uk.ac.bbsrc.tgac.miso.runstats.client.manager.RunStatsManager;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
+import javax.naming.NamingException;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import javax.sql.DataSource;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -180,6 +188,39 @@ public class MisoAppListener implements ServletContextListener {
           e.printStackTrace();
         }
       }
+    }
+
+    if ("true".equals(misoProperties.get("miso.statsdb.enabled"))) {
+      try {
+        JndiObjectFactoryBean jndiBean = new JndiObjectFactoryBean();
+        jndiBean.setLookupOnStartup(true);
+        jndiBean.setResourceRef(true);
+        jndiBean.setJndiName("jdbc/STATSDB");
+        jndiBean.setExpectedType(javax.sql.DataSource.class);
+        jndiBean.afterPropertiesSet();
+
+        DataSource datasource = (DataSource)jndiBean.getObject();
+
+        JdbcTemplate template = new JdbcTemplate();
+        template.setDataSource(datasource);
+        template.setNativeJdbcExtractor(new CommonsDbcpNativeJdbcExtractor());
+        context.getBeanFactory().registerSingleton("statsInterfaceTemplate", template);
+
+        DataSourceTransactionManager transactionManager = new DataSourceTransactionManager();
+        transactionManager.setDataSource(datasource);
+        context.getBeanFactory().registerSingleton("statsTransactionManager", transactionManager);
+
+        RunStatsManager rsm = new RunStatsManager(template);
+        context.getBeanFactory().registerSingleton("runStatsManager", rsm);
+      }
+      catch (NamingException e) {
+        e.printStackTrace();
+      }
+    }
+    else {
+      JdbcTemplate template = new JdbcTemplate();
+      RunStatsManager rsm = new RunStatsManager(template);
+      context.getBeanFactory().registerSingleton("runStatsManager", rsm);
     }
   }
 

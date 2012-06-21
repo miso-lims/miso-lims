@@ -1,6 +1,6 @@
 MISO: An open source LIMS for small-to-large scale sequencing centres
 ---------------------------------------------------------------------
-Copyright (c) 2010. The Genome Analysis Centre, Norwich, UK
+Copyright (c) 2010-2012. The Genome Analysis Centre, Norwich, UK
 MISO project contacts: Robert Davey (robert.davey@bbsrc.ac.uk), Mario Caccamo (mario.caccamo@bbsrc.ac.uk)
 
 ~ **********************************************************************
@@ -20,7 +20,7 @@ MISO project contacts: Robert Davey (robert.davey@bbsrc.ac.uk), Mario Caccamo (m
 ~
 ~ **********************************************************************
 
-VERSION 0.1.5 (Boron)
+VERSION 0.1.6-RC (Carbon)
 
 1) INSTALLING
 -------------
@@ -30,8 +30,8 @@ VERSION 0.1.5 (Boron)
 You will need to install MySQL v5 or greater. You will then need the two latest MISO database dumps. These are available
 from our repository here:
 
-https://repos.tgac.bbsrc.ac.uk/miso/lims-schema-20120124.sql
-https://repos.tgac.bbsrc.ac.uk/miso/lims_type_data_20120124.sql
+https://repos.tgac.bbsrc.ac.uk/miso/lims-schema-20120621.sql
+https://repos.tgac.bbsrc.ac.uk/miso/miso_type_data_20120620.sql
 
 Log in to your local MySQL install, and create a database called 'lims':
 
@@ -51,8 +51,8 @@ GRANT ALL ON `lims`.* TO 'tgaclims'@'your.tomcat.install.server' IDENTIFIED BY '
 
 Then populate the database with the two dumps by running the following commands at a shell prompt:
 
-mysql -u tgaclims -p -D lims < lims-schema-20120124.sql
-mysql -u tgaclims -p -D lims < lims_type_data_20120124.sql
+mysql -u tgaclims -p -D lims < lims-schema-20120621.sql
+mysql -u tgaclims -p -D lims < miso_type_data_20120620.sql
 
 1.2 ) Setting up the MISO web application
 
@@ -102,6 +102,15 @@ and populate it with the following information:
      <Resource name="file/CONAN_PROPERTIES" type="java.util.File"
                 factory="uk.ac.ebi.fgpt.naming.factory.FileFactory"
                  path="../webapps/ROOT/WEB-INF/conan.properties"/>
+
+     <!-- uncomment if using the Stats DB -->
+     <!--
+     <Resource name="jdbc/STATSDB" type="javax.sql.DataSource"
+      driverClassName="com.mysql.jdbc.Driver" initialSize="32" maxIdle="32" maxActive="100" maxWait="-1"
+      url="jdbc:mysql://your_stats_db_server:3306/run_statistics?zeroDateTimeBehavior=convertToNull"
+      username="statsuser"
+      password="statspass"/>
+      -->
 </Context>
 
 If the <tomcat-install>/conf/Catalina/localhost directory doesn't exist (usually due to a fresh Tomcat install), either create 
@@ -127,7 +136,6 @@ https://repos.tgac.bbsrc.ac.uk/miso/jndi-file-factory-1.0.jar
 
 And copy them to <tomcat-install>/lib/
 
-
 2.2 ) Setting up miso.properties file
 
 The main miso.properties file is located in the <tomcat-install>/lib/classes/ directory.
@@ -152,6 +160,7 @@ https://repos.tgac.bbsrc.ac.uk/miso/miso_userspace_properties.tar.gz
 
 Unpack this file to your MISO storage directory, which is /storage/miso by default. You should see 3 files:
 
+issuetracker.properties - settings for an issue tracking system, such as JIRA or RT.
 mail.properties - email settings so that MISO can send emails to users.
 security.properties - properties to set the security environment (see 2.4 below).
 submission.properties - properties to set the submission environment (see 2.5 below).
