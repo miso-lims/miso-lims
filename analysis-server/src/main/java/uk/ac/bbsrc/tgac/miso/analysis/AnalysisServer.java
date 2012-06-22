@@ -28,12 +28,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import uk.ac.bbsrc.tgac.miso.analysis.manager.AnalysisRequestManager;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.Properties;
-
 /**
  * uk.ac.bbsrc.tgac.miso.analysis
  * <p/>
@@ -49,7 +43,7 @@ public class AnalysisServer {
   public static void main(String[] args) {
     log.info("Starting Analysis Server...");
 
-    ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("/tgac-analysis.xml");
+    ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("/analysis-server.xml");
 
     AnalysisRequestManager manager = (AnalysisRequestManager) context.getBean("analysisManager");
     log.info("READY: " + manager.getConanTaskService().getTasks().toString());

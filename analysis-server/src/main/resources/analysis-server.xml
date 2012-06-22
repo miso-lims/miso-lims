@@ -55,28 +55,10 @@
 
   <bean id="conanDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
     <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
-    <!--
-    <property name="url" value="jdbc:mysql://n74967.nbi.bbsrc.ac.uk:3306/conan"/>
-    <property name="username" value="conan"/>
-    <property name="password" value="conan"/>
-    -->
     <property name="url" value="${analysis.db.url}"/>
     <property name="username" value="${analysis.db.username}"/>
     <property name="password" value="${analysis.db.password}"/>
   </bean>
-
-  <!--
-  <jee:jndi-lookup id="conanDataSource"
-                   jndi-name="java:comp/env/jdbc/CONAN">
-    <jee:environment>
-      type=javax.sql.DataSource
-      driverClassName=com.mysql.jdbc.Driver
-      url=jdbc:mysql://n74967:3306/conan
-      username=conan
-      password=conan
-    </jee:environment>
-  </jee:jndi-lookup>
-  -->
 
   <!-- Conan Pipeline DAO, used in several places to fetch loaded pipelines -->
   <bean name="conanPipelineDAO" class="uk.ac.ebi.fgpt.conan.dao.XMLLoadingPipelineDAO">
@@ -128,9 +110,9 @@
         init-method="init"
         destroy-method="destroy">
     <!-- number of allowed parallel processes -->
-    <constructor-arg name="numberOfParallelJobs" value="30"/>
+    <constructor-arg name="numberOfParallelJobs" value="${analysis.submission.parallelJobLimit}"/>
     <!-- time in seconds to hold jobs before running -->
-    <constructor-arg name="coolingOffPeriod" value="120"/>
+    <constructor-arg name="coolingOffPeriod" value="${analysis.submission.coolingOffPeriod}"/>
     <property name="taskService" ref="taskService"/>
   </bean>
 
