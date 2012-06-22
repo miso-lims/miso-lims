@@ -227,17 +227,23 @@
 
   <pluginRepositories>
     <pluginRepository>
-      <id>miso-repo</id>
-      <name>MISO Plugin Repository</name>
-      <url>https://repos.tgac.bbsrc.ac.uk/maven/miso</url>
-      <!--
+      <id>miso-releases</id>
+      <name>MISO repository</name>
+      <url>https://repos.tgac.bbsrc.ac.uk/maven/miso/releases</url>
       <releases>
-          <updatePolicy>never</updatePolicy>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
       </releases>
+    </pluginRepository>
+
+    <pluginRepository>
+      <id>miso-snapshots</id>
+      <name>MISO snapshot repository</name>
+      <url>https://repos.tgac.bbsrc.ac.uk/maven/miso/snapshots</url>
       <snapshots>
-          <updatePolicy>never</updatePolicy>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
       </snapshots>
-      -->
     </pluginRepository>
 
     <pluginRepository>
@@ -265,16 +271,6 @@
         <configuration>
           <source>1.6</source>
           <target>1.6</target>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.5</version>
-        <configuration>
-          <includes>
-            <include>**/*Suite.java</include>
-          </includes>
         </configuration>
       </plugin>
 

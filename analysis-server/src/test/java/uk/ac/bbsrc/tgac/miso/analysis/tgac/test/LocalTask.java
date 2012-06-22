@@ -53,7 +53,15 @@ import java.util.Map;
 public class LocalTask extends TestCase {
   protected final Logger log = LoggerFactory.getLogger(getClass());
 
-  File testFile = new File("/tmp/sequence.txt");
+  private static File testFile = null;
+  static {
+    try {
+      testFile = File.createTempFile("sequence", ".txt");
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
 
   @Test
   public void testGzip() {
