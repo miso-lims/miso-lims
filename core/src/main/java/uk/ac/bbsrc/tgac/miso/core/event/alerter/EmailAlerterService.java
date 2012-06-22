@@ -29,6 +29,8 @@ import uk.ac.bbsrc.tgac.miso.core.event.Alert;
 import uk.ac.bbsrc.tgac.miso.core.event.AlerterService;
 import uk.ac.bbsrc.tgac.miso.core.util.EmailUtils;
 
+import java.util.Properties;
+
 /**
  * uk.ac.bbsrc.tgac.miso.core.event.service
  * <p/>
@@ -41,10 +43,20 @@ import uk.ac.bbsrc.tgac.miso.core.util.EmailUtils;
 public class EmailAlerterService implements AlerterService {
   protected static final Logger log = LoggerFactory.getLogger(EmailAlerterService.class);
 
+  private Properties mailProps = new Properties();
+
+  public void setMailProps(Properties mailProps) {
+    this.mailProps = mailProps;
+  }
+
   @Override
   public void raiseAlert(Alert a) {
+    String from = mailProps.getProperty("mail.miso.from");
+    if (from == null || "".equals(from)) {
+      from = "miso@your.miso.server";
+    }
+
     String to = a.getAlertUser().getEmail();
-    String from = "miso@tgac.ac.uk";
     String subject = "MISO ALERT: " + a.getAlertTitle();
     String text = "Hello " +
                   a.getAlertUser().getFullName() +
@@ -52,6 +64,6 @@ public class EmailAlerterService implements AlerterService {
                   a.getAlertTitle() + " ("+a.getAlertDate()+")" +
                   "\n\n" +
                   a.getAlertText();
-    EmailUtils.send(to, from, subject, text);
+    EmailUtils.send(to, from, subject, text, mailProps);
   }
 }

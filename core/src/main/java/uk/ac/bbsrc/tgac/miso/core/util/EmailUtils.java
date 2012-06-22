@@ -48,16 +48,10 @@ public class EmailUtils {
    * @param from of type String
    * @param subject of type String
    * @param text of type String
+   * @param mailProps of type Properties
    */
-  public static void send(String to, String from, String subject, String text) {
-    Properties props = new Properties();
-    props.put("mail.smtp.host", "mail.nbi.ac.uk");
-    props.put("mail.from", "tgac.lims@bbsrc.ac.uk");
-    props.put("mail.smtp.port", "25");
-    props.put("mail.user", "tgaclims");
-    props.put("mail.password", "TG4Cl1m5");
-
-    Session mailSession = Session.getDefaultInstance(props);
+  public static void send(String to, String from, String subject, String text, Properties mailProps) {
+    Session mailSession = Session.getDefaultInstance(mailProps);
     Message simpleMessage = new MimeMessage(mailSession);
 
     InternetAddress fromAddress = null;

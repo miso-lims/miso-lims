@@ -41,7 +41,11 @@
     <property name="alertStore" ref="sqlAlertDAO"/>
   </bean>
 
-  <bean name="emailAlerterService" class="uk.ac.bbsrc.tgac.miso.core.event.alerter.EmailAlerterService"/>
+  <bean name="emailAlerterService" class="uk.ac.bbsrc.tgac.miso.core.event.alerter.EmailAlerterService">
+    <property name="mailProps">
+      <bean factory-bean="propertyConfigurer" factory-method="getPropertiesAsProperties"/>
+    </property>
+  </bean>
 
 <!-- RUNS -->
   <bean id="runAlertAspectBean" class="uk.ac.bbsrc.tgac.miso.core.event.impl.RunAlertAspect">

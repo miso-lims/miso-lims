@@ -27,6 +27,7 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.support.nativejdbc.CommonsDbcpNativeJdbcExtractor;
@@ -169,6 +170,7 @@ public class MisoAppListener implements ServletContextListener {
                 m.invoke(manager, misoProperties.get(key));
               }
             }
+            ((DefaultListableBeanFactory)context.getBeanFactory()).removeBeanDefinition("issueTrackerManager");
             context.getBeanFactory().registerSingleton("issueTrackerManager", manager);
           }
           else {

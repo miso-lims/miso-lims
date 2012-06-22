@@ -106,6 +106,12 @@ public class MisoPropertyExporter extends PropertyPlaceholderConfigurer {
     return Collections.unmodifiableMap(resolvedProperties);
   }
 
+  public Properties getPropertiesAsProperties() {
+    Properties props = new Properties();
+    props.putAll(Collections.unmodifiableMap(resolvedProperties));
+    return props;
+  }
+
   protected class PropertiesFilenameFilter implements FilenameFilter {
     @Override
     public boolean accept(File dir, String name) {

@@ -29,6 +29,8 @@ import uk.ac.bbsrc.tgac.miso.core.event.Alert;
 import uk.ac.bbsrc.tgac.miso.core.event.AlerterService;
 import uk.ac.bbsrc.tgac.miso.core.util.EmailUtils;
 
+import java.util.Properties;
+
 /**
  * uk.ac.bbsrc.tgac.miso.core.test
  * <p/>
@@ -45,12 +47,11 @@ public class MockEmailAlerterService implements AlerterService {
   public void raiseAlert(Alert a) {
     log.info("Emailing alert -> " + a.toString());
 
-    String to = "robert.davey@tgac.ac.uk";
-    //String to = "tgac.jira@tgac.ac.uk";
-    String from = "runstats@tgac";
+    String to = "someone@somewhere";
+    String from = "runstats@miso";
     String subject = "Test runstats delivery";
     String text = "Hello,\n\nMISO would like to tell you about something:\n\n"+a.toString();
 
-    EmailUtils.send(to, from, subject, text);
+    EmailUtils.send(to, from, subject, text, new Properties());
   }
 }
