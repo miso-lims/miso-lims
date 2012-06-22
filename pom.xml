@@ -353,7 +353,7 @@
 
   <properties>
     <simlims-version>0.0.4-SNAPSHOT</simlims-version>
-    <spring-version>3.0.5.RELEASE</spring-version>
+    <spring-version>3.0.7.RELEASE</spring-version>
   </properties>
 
 </project>

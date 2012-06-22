@@ -129,7 +129,7 @@
       </dependencies>
 
       <properties>
-        <spring-version>3.0.5.RELEASE</spring-version>
+        <spring-version>3.0.7.RELEASE</spring-version>
       </properties>
 
     </profile>
@@ -182,7 +182,7 @@
       </dependencies>
 
       <properties>
-        <spring-version>3.0.5.RELEASE</spring-version>
+        <spring-version>3.0.7.RELEASE</spring-version>
       </properties>
     </profile>
 
@@ -530,8 +530,8 @@
     <log4j-version>1.2.16</log4j-version>
     <slf4j-log4j-version>1.6.0</slf4j-log4j-version>
     <jetty-version>6.1.7</jetty-version>
-    <spring-version>3.0.5.RELEASE</spring-version>
-    <spring-integration-version>2.0.3.RELEASE</spring-integration-version>
+    <spring-version>3.0.7.RELEASE</spring-version>
+    <spring-integration-version>2.1.0.RELEASE</spring-integration-version>
     <mysql-version>5.1.10</mysql-version>
   </properties>
 </project>

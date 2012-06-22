@@ -77,7 +77,7 @@
   </dependencies>
 
   <properties>
-    <spring-version>3.0.5.RELEASE</spring-version>
+    <spring-version>3.0.7.RELEASE</spring-version>
     <junit-version>4.5</junit-version>
     <commons-logging-version>1.1</commons-logging-version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

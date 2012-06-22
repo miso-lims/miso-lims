@@ -168,7 +168,7 @@
     </dependency>
   </dependencies>
   <properties>
-    <spring-version>3.0.5.RELEASE</spring-version>
+    <spring-version>3.0.7.RELEASE</spring-version>
     <spring-integration-version>2.1.0.RELEASE</spring-integration-version>
   </properties>
 </project>

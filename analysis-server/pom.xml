@@ -154,8 +154,8 @@
   </repositories>
 
   <properties>
-    <spring-version>3.0.5.RELEASE</spring-version>
-    <spring-integration-version>2.0.3.RELEASE</spring-integration-version>
+    <spring-version>3.0.7.RELEASE</spring-version>
+    <spring-integration-version>2.1.0.RELEASE</spring-integration-version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 </project>

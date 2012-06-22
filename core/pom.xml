@@ -243,7 +243,7 @@
     <javax-persistence-version>1.0</javax-persistence-version>
     <junit-version>4.5</junit-version>
     <commons-logging-version>1.1</commons-logging-version>
-    <spring-version>3.0.5.RELEASE</spring-version>
-    <spring-integration-version>2.0.3.RELEASE</spring-integration-version>
+    <spring-version>3.0.7.RELEASE</spring-version>
+    <spring-integration-version>2.1.0.RELEASE</spring-integration-version>
   </properties>
 </project>
