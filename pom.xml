@@ -32,7 +32,7 @@
   <packaging>pom</packaging>
   <version>0.1.6RC</version>
   <name>MISO Framework</name>
-  <url>http://www.tgac.bbsrc.ac.uk/software/miso</url>
+  <url>http://www.tgac.ac.uk/miso</url>
 
   <!-- Reporting/Documentation output -->
   <reporting>
@@ -147,21 +147,16 @@
 
   <!-- Maven repository deploy -->
   <distributionManagement>
-    <downloadUrl>https://repos.tgac.bbsrc.ac.uk/maven/repo</downloadUrl>
     <repository>
-      <id>tgac-repo</id>
-      <name>TGAC repository</name>
-      <url>scp://repos.tgac.bbsrc.ac.uk/var/www/html/maven/repo</url>
+      <id>miso-releases</id>
+      <name>MISO repository</name>
+      <url>scp://repos.tgac.bbsrc.ac.uk/var/www/html/maven/miso/releases</url>
     </repository>
     <snapshotRepository>
-      <id>tgac-repo</id>
-      <name>TGAC repository</name>
-      <url>scp://repos.tgac.bbsrc.ac.uk/var/www/html/maven/repo</url>
+      <id>miso-snapshots</id>
+      <name>MISO snapshot repository</name>
+      <url>scp://repos.tgac.bbsrc.ac.uk/var/www/html/maven/miso/snapshots</url>
     </snapshotRepository>
-    <site>
-      <id>miso-site</id>
-      <url>scp://repos.tgac.bbsrc.ac.uk/var/www/html/miso</url>
-    </site>
   </distributionManagement>
 
   <!-- Maven repository download -->
@@ -173,29 +168,24 @@
     </repository>
 
     <repository>
-      <id>tgac-repo</id>
-      <name>TGAC Maven Repository</name>
-      <url>https://repos.tgac.bbsrc.ac.uk/maven/repo</url>
+      <id>miso-releases</id>
+      <name>MISO repository</name>
+      <url>https://repos.tgac.bbsrc.ac.uk/maven/miso/releases</url>
       <releases>
+        <enabled>true</enabled>
         <updatePolicy>always</updatePolicy>
       </releases>
+    </repository>
+
+    <repository>
+      <id>miso-snapshots</id>
+      <name>MISO snapshot repository</name>
+      <url>https://repos.tgac.bbsrc.ac.uk/maven/miso/snapshots</url>
       <snapshots>
         <enabled>true</enabled>
         <updatePolicy>always</updatePolicy>
       </snapshots>
     </repository>
-
-    <!--
-    <repository>
-      <id>apache-snapshots</id>
-      <name>apache snapshots repository</name>
-      <url>http://repository.apache.org/snapshots</url>
-      <snapshots>
-        <enabled>true</enabled>
-        <updatePolicy>never</updatePolicy>
-      </snapshots>
-    </repository>
-    -->
 
     <repository>
       <id>spring-snapshot</id>
@@ -237,9 +227,9 @@
 
   <pluginRepositories>
     <pluginRepository>
-      <id>tgac-repo</id>
-      <name>TGAC Maven Repository</name>
-      <url>https://repos.tgac.bbsrc.ac.uk/maven/repo</url>
+      <id>miso-repo</id>
+      <name>MISO Plugin Repository</name>
+      <url>https://repos.tgac.bbsrc.ac.uk/maven/miso</url>
       <!--
       <releases>
           <updatePolicy>never</updatePolicy>
