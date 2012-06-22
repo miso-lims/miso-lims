@@ -55,6 +55,9 @@ public class LsfGzipProcess extends AbstractTgacLsfProcess {
   public LsfGzipProcess() {
     setQueueName("lsf_testing");
 
+    // set this to your own bsub path!
+    setBsubPath("/path/to/bsub");
+
     fileParameter = new PathCreatingPathParameter("file");
     compressionParameter = new FlagParameter("compression");
 
