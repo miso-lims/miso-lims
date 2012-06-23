@@ -287,7 +287,7 @@
   <repositories>
     <repository>
       <id>hasbanana-repo</id>
-      <name>hasBanana Repository</name>
+      <name>hasbanana Maven Repository</name>
       <url>http://www.hasbanana.com/maven/repo</url>
     </repository>
 
@@ -457,6 +457,12 @@
       <groupId>net.sourceforge.fluxion.ajax</groupId>
       <artifactId>fluxion-ajax-3</artifactId>
       <version>1.0-alpha-4</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.sourceforge.fluxion.ajax</groupId>
+      <artifactId>fluxion-ajax-js</artifactId>
+      <version>1.0-alpha-10</version>
     </dependency>
 
     <dependency>
