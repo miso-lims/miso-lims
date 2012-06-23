@@ -27,8 +27,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.ac.bbsrc.tgac.miso.core.event.Alert;
 import uk.ac.bbsrc.tgac.miso.core.event.AlerterService;
+import uk.ac.bbsrc.tgac.miso.core.exception.AlertingException;
 import uk.ac.bbsrc.tgac.miso.core.util.EmailUtils;
 
+import javax.mail.MessagingException;
 import java.util.Properties;
 
 /**
@@ -44,7 +46,7 @@ public class MockEmailAlerterService implements AlerterService {
   protected static final Logger log = LoggerFactory.getLogger(MockEmailAlerterService.class);
 
   @Override
-  public void raiseAlert(Alert a) {
+  public void raiseAlert(Alert a) throws AlertingException {
     log.info("Emailing alert -> " + a.toString());
 
     String to = "someone@somewhere";
@@ -52,6 +54,12 @@ public class MockEmailAlerterService implements AlerterService {
     String subject = "Test runstats delivery";
     String text = "Hello,\n\nMISO would like to tell you about something:\n\n"+a.toString();
 
-    EmailUtils.send(to, from, subject, text, new Properties());
+
+    try {
+      EmailUtils.send(to, from, subject, text, new Properties());
+    } catch (MessagingException e) {
+      log.error("Cannot send email to alert recipients:" + e.getMessage());
+      throw new AlertingException("Cannot send email to alert recipients", e);
+    }
   }
 }

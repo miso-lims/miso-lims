@@ -36,6 +36,7 @@ import uk.ac.bbsrc.tgac.miso.core.event.Event;
 import uk.ac.bbsrc.tgac.miso.core.event.ResponderService;
 import uk.ac.bbsrc.tgac.miso.core.event.model.RunEvent;
 import uk.ac.bbsrc.tgac.miso.core.event.model.StatusChangedEvent;
+import uk.ac.bbsrc.tgac.miso.core.exception.AlertingException;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -87,7 +88,13 @@ public class MockStatusChangedResponderService implements ResponderService {
     a.setAlertText(a.getAlertText() + " ("+event.getEventMessage()+")");
 
     for (AlerterService as : alerterServices) {
-      as.raiseAlert(a);
+      try {
+        as.raiseAlert(a);
+      }
+      catch (AlertingException e) {
+        log.error("Cannot raise user-level alert:" + e.getMessage());
+        e.printStackTrace();
+      }
     }
   }
 }

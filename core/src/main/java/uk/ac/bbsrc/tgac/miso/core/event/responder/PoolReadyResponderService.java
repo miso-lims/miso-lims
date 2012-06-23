@@ -35,6 +35,7 @@ import uk.ac.bbsrc.tgac.miso.core.event.impl.AbstractResponderService;
 import uk.ac.bbsrc.tgac.miso.core.event.impl.DefaultAlert;
 import uk.ac.bbsrc.tgac.miso.core.event.model.PoolEvent;
 import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
+import uk.ac.bbsrc.tgac.miso.core.exception.AlertingException;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -90,7 +91,13 @@ public class PoolReadyResponderService extends AbstractResponderService {
         a.setAlertText("The following Pool is ready to run: "+p.getName()+" ("+event.getEventMessage()+"). Please view Pool " +p.getPoolId() + " in MISO for more information");
 
         for (AlerterService as : alerterServices) {
-          as.raiseAlert(a);
+          try {
+            as.raiseAlert(a);
+          }
+          catch (AlertingException e) {
+            log.error("Cannot raise user-level alert:" + e.getMessage());
+            e.printStackTrace();
+          }
         }
       }
 

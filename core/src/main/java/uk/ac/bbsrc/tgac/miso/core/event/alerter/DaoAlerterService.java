@@ -30,6 +30,7 @@ import uk.ac.bbsrc.tgac.miso.core.event.Alert;
 import uk.ac.bbsrc.tgac.miso.core.event.AlerterService;
 import uk.ac.bbsrc.tgac.miso.core.event.impl.DefaultAlert;
 import uk.ac.bbsrc.tgac.miso.core.event.impl.SystemAlert;
+import uk.ac.bbsrc.tgac.miso.core.exception.AlertingException;
 import uk.ac.bbsrc.tgac.miso.core.store.AlertStore;
 
 import java.io.IOException;
@@ -54,7 +55,7 @@ public class DaoAlerterService implements AlerterService {
   }
 
   @Override
-  public void raiseAlert(Alert a) {
+  public void raiseAlert(Alert a) throws AlertingException {
     try {
       if (alertStore != null) {
         alertStore.save(a);
@@ -64,8 +65,8 @@ public class DaoAlerterService implements AlerterService {
       }
     }
     catch (IOException e) {
-      log.error(e.getMessage());
-      e.printStackTrace();
+      log.error("Cannot save alert to DAO: "+e.getMessage());
+      throw new AlertingException("Cannot save alert to DAO", e);
     }
   }
 }

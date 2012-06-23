@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.core.event;
 
+import uk.ac.bbsrc.tgac.miso.core.exception.AlertingException;
+
 /**
  * uk.ac.bbsrc.tgac.miso.core.event
  * <p/>
@@ -33,5 +35,5 @@ package uk.ac.bbsrc.tgac.miso.core.event;
  * @since 0.1.2
  */
 public interface AlerterService {
-  public void raiseAlert(Alert a);
+  public void raiseAlert(Alert a) throws AlertingException;
 }

@@ -31,6 +31,7 @@ import uk.ac.bbsrc.tgac.miso.core.event.*;
 import uk.ac.bbsrc.tgac.miso.core.event.impl.DefaultAlert;
 import uk.ac.bbsrc.tgac.miso.core.event.model.ProjectOverviewEvent;
 import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
+import uk.ac.bbsrc.tgac.miso.core.exception.AlertingException;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -86,7 +87,13 @@ public class PoolConstructionCompleteResponderService implements ResponderServic
         a.setAlertText("The following Project's Pools have been prepared and are ready to run: "+po.getProject().getAlias()+" ("+event.getEventMessage()+"). Please view Project " +po.getProject().getProjectId() + " in MISO for more information");
 
         for (AlerterService as : alerterServices) {
-          as.raiseAlert(a);
+          try {
+            as.raiseAlert(a);
+          }
+          catch (AlertingException e) {
+            log.error("Cannot raise user-level alert:" + e.getMessage());
+            e.printStackTrace();
+          }
         }
       }
     }

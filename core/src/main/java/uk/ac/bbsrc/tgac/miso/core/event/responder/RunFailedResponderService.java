@@ -34,6 +34,7 @@ import uk.ac.bbsrc.tgac.miso.core.event.impl.DefaultAlert;
 import uk.ac.bbsrc.tgac.miso.core.event.model.RunEvent;
 import uk.ac.bbsrc.tgac.miso.core.event.type.AlertLevel;
 import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
+import uk.ac.bbsrc.tgac.miso.core.exception.AlertingException;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -88,7 +89,13 @@ public class RunFailedResponderService extends AbstractResponderService {
         a.setAlertText("The following Run has been set to FAILED: "+r.getAlias()+" ("+event.getEventMessage()+"). Please view Run " +r.getRunId()+ " in MISO for more information");
 
         for (AlerterService as : alerterServices) {
-          as.raiseAlert(a);
+          try {
+            as.raiseAlert(a);
+          }
+          catch (AlertingException e) {
+            log.error("Cannot raise user-level alert:" + e.getMessage());
+            e.printStackTrace();
+          }
         }
       }
 

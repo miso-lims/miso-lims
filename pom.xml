@@ -168,6 +168,20 @@
     </repository>
 
     <repository>
+      <id>tgac-legacy</id>
+      <name>TGAC legacy repository</name>
+      <url>https://repos.tgac.bbsrc.ac.uk/maven/repo</url>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+      </snapshots>
+    </repository>
+
+    <repository>
       <id>miso-releases</id>
       <name>MISO repository</name>
       <url>https://repos.tgac.bbsrc.ac.uk/maven/miso/releases</url>

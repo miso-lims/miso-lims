@@ -27,8 +27,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.ac.bbsrc.tgac.miso.core.event.Alert;
 import uk.ac.bbsrc.tgac.miso.core.event.AlerterService;
+import uk.ac.bbsrc.tgac.miso.core.exception.AlertingException;
 import uk.ac.bbsrc.tgac.miso.core.util.EmailUtils;
 
+import javax.mail.MessagingException;
 import java.util.Properties;
 
 /**
@@ -50,7 +52,7 @@ public class EmailAlerterService implements AlerterService {
   }
 
   @Override
-  public void raiseAlert(Alert a) {
+  public void raiseAlert(Alert a) throws AlertingException {
     String from = mailProps.getProperty("mail.miso.from");
     if (from == null || "".equals(from)) {
       from = "miso@your.miso.server";
@@ -64,6 +66,11 @@ public class EmailAlerterService implements AlerterService {
                   a.getAlertTitle() + " ("+a.getAlertDate()+")" +
                   "\n\n" +
                   a.getAlertText();
-    EmailUtils.send(to, from, subject, text, mailProps);
+    try {
+      EmailUtils.send(to, from, subject, text, mailProps);
+    } catch (MessagingException e) {
+      log.error("Cannot send email to alert recipients:" + e.getMessage());
+      throw new AlertingException("Cannot send email to alert recipients", e);
+    }
   }
 }

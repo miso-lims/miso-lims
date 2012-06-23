@@ -32,6 +32,7 @@ import uk.ac.bbsrc.tgac.miso.core.event.AlerterService;
 import uk.ac.bbsrc.tgac.miso.core.event.Event;
 import uk.ac.bbsrc.tgac.miso.core.event.ResponderService;
 import uk.ac.bbsrc.tgac.miso.core.event.alerter.DaoAlerterService;
+import uk.ac.bbsrc.tgac.miso.core.exception.AlertingException;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -86,7 +87,12 @@ public abstract class AbstractResponderService implements ResponderService {
     for (AlerterService as : alerterServices) {
       if (serviceList.contains(as.getClass())) {
         log.debug("Raising system alert via " + as.getClass());
-        as.raiseAlert(a);
+        try {
+          as.raiseAlert(a);
+        } catch (AlertingException e) {
+          log.error("Cannot raise system alert:" + e.getMessage());
+          e.printStackTrace();
+        }
       }
     }
   }
@@ -101,7 +107,13 @@ public abstract class AbstractResponderService implements ResponderService {
       a.setAlertText("The object " + o.toString() + " produced an event " + event.getEventType() + ":: " + event.getEventMessage());
 
       for (AlerterService as : alerterServices) {
-        as.raiseAlert(a);
+        try {
+          as.raiseAlert(a);
+        }
+        catch (AlertingException e) {
+          log.error("Cannot raise user-level alert:" + e.getMessage());
+          e.printStackTrace();
+        }
       }
     }
 

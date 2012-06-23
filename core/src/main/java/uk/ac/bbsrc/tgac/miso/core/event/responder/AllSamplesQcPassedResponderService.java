@@ -35,6 +35,7 @@ import uk.ac.bbsrc.tgac.miso.core.event.impl.DefaultAlert;
 import uk.ac.bbsrc.tgac.miso.core.event.model.ProjectOverviewEvent;
 import uk.ac.bbsrc.tgac.miso.core.event.model.RunEvent;
 import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
+import uk.ac.bbsrc.tgac.miso.core.exception.AlertingException;
 
 import javax.swing.event.HyperlinkEvent;
 import java.util.HashSet;
@@ -91,7 +92,13 @@ public class AllSamplesQcPassedResponderService extends AbstractResponderService
         a.setAlertText("The following Project's Samples have been QC'ed successfully: "+po.getProject().getAlias()+" ("+event.getEventMessage()+"). Please view Project " +po.getProject().getProjectId() + " in MISO for more information");
 
         for (AlerterService as : alerterServices) {
-          as.raiseAlert(a);
+          try {
+            as.raiseAlert(a);
+          }
+          catch (AlertingException e) {
+            log.error("Cannot raise user-level alert:" + e.getMessage());
+            e.printStackTrace();
+          }
         }
       }
 

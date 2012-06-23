@@ -21,28 +21,26 @@
  * *********************************************************************
  */
 
-package uk.ac.bbsrc.tgac.miso.core.test;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import uk.ac.bbsrc.tgac.miso.core.event.Alert;
-import uk.ac.bbsrc.tgac.miso.core.event.AlerterService;
-import uk.ac.bbsrc.tgac.miso.core.exception.AlertingException;
+package uk.ac.bbsrc.tgac.miso.core.exception;
 
 /**
- * uk.ac.bbsrc.tgac.miso.core.test
+ * uk.ac.bbsrc.tgac.miso.core.exception
  * <p/>
  * Info
  *
  * @author Rob Davey
- * @date 29/09/11
- * @since 0.1.2
+ * @date 23-Jun-2012
+ * @since 0.1.6RC
  */
-public class MockLogAlerterService implements AlerterService {
-  protected static final Logger log = LoggerFactory.getLogger(MockLogAlerterService.class);
+public class AlertingException extends Exception {
+  public AlertingException(String s) {
+    super(s);
+  }
 
-  @Override
-  public void raiseAlert(Alert a) throws AlertingException {
-    log.info("Raising alert -> " + a.toString());
+  public AlertingException(String s, Throwable cause) {
+    super(s);
+    if (cause != null) {
+        initCause(cause);
+    }
   }
 }

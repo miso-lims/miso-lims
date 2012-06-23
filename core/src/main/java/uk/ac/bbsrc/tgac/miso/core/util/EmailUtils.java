@@ -27,7 +27,6 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Transport;
-import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.util.Properties;
@@ -50,30 +49,18 @@ public class EmailUtils {
    * @param text of type String
    * @param mailProps of type Properties
    */
-  public static void send(String to, String from, String subject, String text, Properties mailProps) {
+  public static void send(String to, String from, String subject, String text, Properties mailProps) throws MessagingException {
     Session mailSession = Session.getDefaultInstance(mailProps);
     Message simpleMessage = new MimeMessage(mailSession);
 
-    InternetAddress fromAddress = null;
-    InternetAddress toAddress = null;
-    try {
-      fromAddress = new InternetAddress(from);
-      toAddress = new InternetAddress(to);
-    }
-    catch (AddressException e) {
-      e.printStackTrace();
-    }
+    InternetAddress fromAddress = new InternetAddress(from);
+    InternetAddress toAddress = new InternetAddress(to);
 
-    try {
-      simpleMessage.setFrom(fromAddress);
-      simpleMessage.setRecipient(Message.RecipientType.TO, toAddress);
-      simpleMessage.setSubject(subject);
-      simpleMessage.setText(text);
+    simpleMessage.setFrom(fromAddress);
+    simpleMessage.setRecipient(Message.RecipientType.TO, toAddress);
+    simpleMessage.setSubject(subject);
+    simpleMessage.setText(text);
 
-      Transport.send(simpleMessage);
-    }
-    catch (MessagingException e) {
-      e.printStackTrace();
-    }
+    Transport.send(simpleMessage);
   }
 }
