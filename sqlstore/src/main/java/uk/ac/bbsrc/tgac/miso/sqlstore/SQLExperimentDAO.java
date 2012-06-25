@@ -242,13 +242,18 @@ public class SQLExperimentDAO implements ExperimentStore {
 
   private void purgeListCache(Experiment experiment, boolean replace) {
     Cache cache = cacheManager.getCache("experimentListCache");
-    Object cachekey = cache.getKeys().get(0);
-    List<Experiment> c = (List<Experiment>)cache.get(cachekey).getValue();
-    if (c.remove(experiment)) {
-      if (replace) {
-        c.add(experiment);
-        cache.put(new Element(cachekey, c));
+    if (cache.getKeys().size() > 0) {
+      Object cachekey = cache.getKeys().get(0);
+      List<Experiment> c = (List<Experiment>)cache.get(cachekey).getValue();
+      if (c.remove(experiment)) {
+        if (replace) {
+          c.add(experiment);
+        }
       }
+      else {
+        c.add(experiment);
+      }
+      cache.put(new Element(cachekey, c));
     }
   }
 

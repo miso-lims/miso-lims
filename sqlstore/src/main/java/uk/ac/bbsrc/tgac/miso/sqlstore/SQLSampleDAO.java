@@ -203,13 +203,18 @@ public class SQLSampleDAO implements SampleStore {
 
   private void purgeListCache(Sample s, boolean replace) {
     Cache cache = cacheManager.getCache("sampleListCache");
-    Object cachekey = cache.getKeys().get(0);
-    List<Sample> c = (List<Sample>)cache.get(cachekey).getValue();
-    if (c.remove(s)) {
-      if (replace) {
-        c.add(s);
-        cache.put(new Element(cachekey, c));
+    if (cache.getKeys().size() > 0) {
+      Object cachekey = cache.getKeys().get(0);
+      List<Sample> c = (List<Sample>)cache.get(cachekey).getValue();
+      if (c.remove(s)) {
+        if (replace) {
+          c.add(s);
+        }
       }
+      else {
+        c.add(s);
+      }
+      cache.put(new Element(cachekey, c));
     }
   }
 

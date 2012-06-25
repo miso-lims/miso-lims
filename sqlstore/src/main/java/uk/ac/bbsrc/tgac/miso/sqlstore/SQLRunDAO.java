@@ -31,6 +31,7 @@ import com.googlecode.ehcache.annotations.Cacheable;
 import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
 import com.googlecode.ehcache.annotations.TriggersRemove;
+import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import org.slf4j.Logger;
@@ -265,13 +266,19 @@ public class SQLRunDAO implements RunStore {
   }
 
   private void purgeListCache(Run run, boolean replace) {
-    Object cachekey = cacheManager.getCache("runListCache").getKeys().get(0);
-    List<Run> cachedruns = (List<Run>)cacheManager.getCache("runListCache").get(cachekey).getValue();
-    if (cachedruns.remove(run)) {
-      if (replace) {
-        cachedruns.add(run);
-        cacheManager.getCache("runListCache").put(new Element(cachekey, cachedruns));
+    Cache cache = cacheManager.getCache("runListCache");
+    if (cache.getKeys().size() > 0) {
+      Object cachekey = cache.getKeys().get(0);
+      List<Run> cachedruns = (List<Run>)cache.get(cachekey).getValue();
+      if (cachedruns.remove(run)) {
+        if (replace) {
+          cachedruns.add(run);
+        }
       }
+      else {
+        cachedruns.add(run);
+      }
+      cache.put(new Element(cachekey, cachedruns));
     }
   }
 

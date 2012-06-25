@@ -27,7 +27,9 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.support.nativejdbc.CommonsDbcpNativeJdbcExtractor;
@@ -49,6 +51,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
+import uk.ac.bbsrc.tgac.miso.core.store.RunQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
 import uk.ac.bbsrc.tgac.miso.runstats.client.manager.RunStatsManager;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
@@ -129,6 +132,7 @@ public class MisoAppListener implements ServletContextListener {
       MisoRequestManager rm = new MisoRequestManager();
       rm.setProjectStore((ProjectStore)context.getBean("projectStore"));
       rm.setRunStore((RunStore)context.getBean("runStore"));
+      rm.setRunQcStore((RunQcStore) context.getBean("runQcStore"));
       rm.setPoolStore((PoolStore)context.getBean("poolStore"));
 
       SecurityManager sm = (com.eaglegenomics.simlims.core.manager.SecurityManager)context.getBean("securityManager");

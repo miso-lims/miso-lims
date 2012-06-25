@@ -254,13 +254,18 @@ public class SQLProjectDAO implements ProjectStore {
 
   private void purgeListCache(Project p, boolean replace) {
     Cache cache = cacheManager.getCache("projectListCache");
-    Object cachekey = cache.getKeys().get(0);
-    List<Project> c = (List<Project>)cache.get(cachekey).getValue();
-    if (c.remove(p)) {
-      if (replace) {
-        c.add(p);
-        cache.put(new Element(cachekey, c));
+    if (cache.getKeys().size() > 0) {
+      Object cachekey = cache.getKeys().get(0);
+      List<Project> c = (List<Project>)cache.get(cachekey).getValue();
+      if (c.remove(p)) {
+        if (replace) {
+          c.add(p);
+        }
       }
+      else {
+        c.add(p);
+      }
+      cache.put(new Element(cachekey, c));
     }
   }
 

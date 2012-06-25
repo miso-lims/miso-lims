@@ -237,13 +237,18 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
 
   private void purgeListCache(SequencerPartitionContainer<SequencerPoolPartition> s, boolean replace) {
     Cache cache = cacheManager.getCache("containerListCache");
-    Object cachekey = cache.getKeys().get(0);
-    List<SequencerPartitionContainer<SequencerPoolPartition>> c = (List<SequencerPartitionContainer<SequencerPoolPartition>>)cache.get(cachekey).getValue();
-    if (c.remove(s)) {
-      if (replace) {
-        c.add(s);
-        cache.put(new Element(cachekey, c));
+    if (cache.getKeys().size() > 0) {
+      Object cachekey = cache.getKeys().get(0);
+      List<SequencerPartitionContainer<SequencerPoolPartition>> c = (List<SequencerPartitionContainer<SequencerPoolPartition>>)cache.get(cachekey).getValue();
+      if (c.remove(s)) {
+        if (replace) {
+          c.add(s);
+        }
       }
+      else {
+        c.add(s);
+      }
+      cache.put(new Element(cachekey, c));
     }
   }
 

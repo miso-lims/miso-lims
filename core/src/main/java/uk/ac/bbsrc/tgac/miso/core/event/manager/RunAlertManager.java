@@ -98,6 +98,14 @@ public class RunAlertManager {
       Collection<Run> persistedRuns = misoRequestManager.listAllRuns();
       int count = 1;
       for (Run r : persistedRuns) {
+        for (RunQC qc : misoRequestManager.listAllRunQCsByRunId(r.getRunId())) {
+          try {
+            r.addQc(qc);
+          }
+          catch (MalformedRunQcException e) {
+            log.warn("Cannot add RunQC to Run " + r.getRunId());
+          }
+        }
         log.debug("Cloning run " +count+ " of " + persistedRuns.size() + " ("+r.getRunId()+")");
         cloneAndAddRun(r);
         count++;

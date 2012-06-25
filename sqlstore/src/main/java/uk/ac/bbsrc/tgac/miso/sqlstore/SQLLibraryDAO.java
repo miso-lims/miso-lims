@@ -263,13 +263,18 @@ public class SQLLibraryDAO implements LibraryStore {
 
   private void purgeListCache(Library l, boolean replace) {
     Cache cache = cacheManager.getCache("libraryListCache");
-    Object cachekey = cache.getKeys().get(0);
-    List<Library> c = (List<Library>)cache.get(cachekey).getValue();
-    if (c.remove(l)) {
-      if (replace) {
-        c.add(l);
-        cache.put(new Element(cachekey, c));
+    if (cache.getKeys().size() > 0) {
+      Object cachekey = cache.getKeys().get(0);
+      List<Library> c = (List<Library>)cache.get(cachekey).getValue();
+      if (c.remove(l)) {
+        if (replace) {
+          c.add(l);
+        }
       }
+      else {
+        c.add(l);
+      }
+      cache.put(new Element(cachekey, c));
     }
   }
 

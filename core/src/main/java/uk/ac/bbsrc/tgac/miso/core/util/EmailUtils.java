@@ -48,6 +48,7 @@ public class EmailUtils {
    * @param subject of type String
    * @param text of type String
    * @param mailProps of type Properties
+   * @throws javax.mail.MessagingException
    */
   public static void send(String to, String from, String subject, String text, Properties mailProps) throws MessagingException {
     Session mailSession = Session.getDefaultInstance(mailProps);
