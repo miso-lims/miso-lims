@@ -181,7 +181,7 @@ public class DefaultNotifier {
           DirectChannel signChannel = (DirectChannel)channelResolver.resolveChannelName(platformType+"MessageSignerChannel");
           signChannel.setBeanFactory(context.getBeanFactory());
 
-          DirectChannel splitterChannel = (DirectChannel)channelResolver.resolveChannelName("splitterChannel");
+          DirectChannel splitterChannel = (DirectChannel)channelResolver.resolveChannelName(platformType+"splitterChannel");
           splitterChannel.setBeanFactory(context.getBeanFactory());
 
           if (props.containsKey(platformType + ".http.statusEndpointURIs")) {

@@ -36,13 +36,19 @@
   <tx:annotation-driven/>
 
   <integration:channel id="wireTapChannel"/>
-  <integration:channel id="splitterChannel"/>
 
   <!-- UTILS -->
   <bean id="illuminaTransformer" class="uk.ac.bbsrc.tgac.miso.notification.service.IlluminaTransformer"/>
+  <integration:channel id="illuminaSplitterChannel"/>
+
   <bean id="solidTransformer" class="uk.ac.bbsrc.tgac.miso.notification.service.SolidTransformer"/>
+  <integration:channel id="solidSplitterChannel"/>
+
   <bean id="ls454Transformer" class="uk.ac.bbsrc.tgac.miso.notification.service.LS454Transformer"/>
+  <integration:channel id="ls454SplitterChannel"/>
+
   <bean id="pacbioTransformer" class="uk.ac.bbsrc.tgac.miso.notification.service.PacBioTransformer"/>
+  <integration:channel id="pacbioSplitterChannel"/>
 
   <bean id="statusFilter" class="org.springframework.integration.file.filters.CompositeFileListFilter">
     <constructor-arg>
@@ -127,10 +133,10 @@
     </constructor-arg>
   </bean>
 
-  <integration:transformer id="pacbioStatusTransformer"
-                           ref="pacbioTransformer" method="transform"
+  <integration:transformer id="pacbioStatusTransformer" ref="pacbioTransformer"
                            input-channel="pacbioStatusFileInputChannel"
-                           output-channel="splitterChannel">
+                           output-channel="pacbioSplitterChannel"
+                           method="transform">
   </integration:transformer>
 
   <!-- SPRING BATCH SETUP -->

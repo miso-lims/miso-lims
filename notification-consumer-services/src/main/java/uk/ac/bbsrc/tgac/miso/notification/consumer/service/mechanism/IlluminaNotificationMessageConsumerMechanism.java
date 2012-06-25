@@ -193,10 +193,12 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
 
             if (r.getStatus() != null && run.has("status")) {
               r.getStatus().setXml(run.getString("status"));
+              r.getStatus().setHealth(ht);
             }
             else {
               if (run.has("status")) {
                 is.setXml(run.getString("status"));
+                is.setHealth(ht);
                 r.setStatus(is);
               }
             }
