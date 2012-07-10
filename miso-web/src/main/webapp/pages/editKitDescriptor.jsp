@@ -20,10 +20,13 @@
   ~
   ~ **********************************************************************
   --%>
- <%@ include file="../header.jsp" %>
+<%@ include file="../header.jsp" %>
 <div id="maincontent">
 <div id="contentcolumn">
 <form:form method="POST" commandName="kitDescriptor" autocomplete="off" >
+
+  <sessionConversation:insertSessionConversationId attributeName="kitDescriptor"/>
+
     <h1><c:choose><c:when
             test="${not empty kitDescriptor.kitDescriptorId}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose>
         Kit Descriptor

@@ -28,14 +28,12 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
-import org.codehaus.jackson.map.util.JSONPObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
@@ -133,10 +131,10 @@ public class FlexReportingControllerHelperService {
   }
 
   public JSONObject searchProjectsByCreationDateandString(HttpSession session, JSONObject json) {
-    String searchStr = (String) json.get("str");
-    String from = (String) json.get("from");
-    String to = (String) json.get("to");
-    String progress = (String) json.get("progress");
+    String searchStr = json.getString("str");
+    String from = json.getString("from");
+    String to = json.getString("to");
+    String progress = json.getString("progress");
     JSONArray jsonArray = new JSONArray();
     JSONObject jsonObject = new JSONObject();
     try {
@@ -161,8 +159,7 @@ public class FlexReportingControllerHelperService {
               Date endDate = df.parse(to);
               Date creationDate = project.getCreationDate();
 
-              if (creationDate.getTime() >= startDate.getTime() &&
-                  creationDate.getTime() <= endDate.getTime()) {
+              if (creationDate.after(startDate) && creationDate.before(endDate)) {
                 jsonArray.add(projectRowBuilder(project));
               }
             }
@@ -280,11 +277,11 @@ public class FlexReportingControllerHelperService {
   }
 
   public JSONObject searchSamplesByCreationDateandString(HttpSession session, JSONObject json) {
-    String searchStr = (String) json.get("str");
-    String from = (String) json.get("from");
-    String to = (String) json.get("to");
-    String type = (String) json.get("type");
-    String qc = (String) json.get("qc");
+    String searchStr = json.getString("str");
+    String from = json.getString("from");
+    String to = json.getString("to");
+    String type = json.getString("type");
+    String qc = json.getString("qc");
     JSONArray jsonArray = new JSONArray();
     JSONObject jsonObject = new JSONObject();
     try {
@@ -312,8 +309,7 @@ public class FlexReportingControllerHelperService {
               Date endDate = df.parse(to);
               Date receivedDate = sample.getReceivedDate();
 
-              if (receivedDate.getTime() >= startDate.getTime() &&
-                  receivedDate.getTime() <= endDate.getTime()) {
+              if (receivedDate.after(startDate) && receivedDate.before(endDate)) {
                 jsonArray.add(sampleFormRowBuilder(sample));
               }
             }
@@ -467,16 +463,14 @@ public class FlexReportingControllerHelperService {
   }
 
   public JSONObject searchLibrariesByCreationDateandString(HttpSession session, JSONObject json) {
-    String searchStr = (String) json.get("str");
-    String from = (String) json.get("from");
-    String to = (String) json.get("to");
-    String platform = (String) json.get("platform");
-    String qc = (String) json.get("qc");
+    String searchStr = json.getString("str");
+    String from = json.getString("from");
+    String to = json.getString("to");
+    String platform = json.getString("platform");
+    String qc = json.getString("qc");
     JSONObject jsonObject = new JSONObject();
     JSONArray jsonArray = new JSONArray();
     try {
-      StringBuilder b = new StringBuilder();
-
       Collection<Library> libraries = null;
       if (searchStr != null && !searchStr.equals("")) {
         libraries = requestManager.listAllLibrariesBySearch(searchStr);
@@ -497,9 +491,7 @@ public class FlexReportingControllerHelperService {
             Date startDate = df.parse(from);
             Date endDate = df.parse(to);
             Date receivedDate = library.getCreationDate();
-
-            if (receivedDate.getTime() >= startDate.getTime() &&
-                receivedDate.getTime() <= endDate.getTime()) {
+            if (receivedDate.after(startDate) && receivedDate.before(endDate)) {
               jsonArray.add(libraryFormRowBuilder(library));
             }
           }
@@ -525,7 +517,6 @@ public class FlexReportingControllerHelperService {
 
       Map<String, Integer> typeMap = new HashMap<String, Integer>();
       Map<String, Integer> platformMap = new HashMap<String, Integer>();
-      Map<String, Integer> qcMap = new HashMap<String, Integer>();
       JSONArray overviewRelationArray = new JSONArray();
       JSONArray graphArray = new JSONArray();
       JSONArray qcGraphArray = new JSONArray();
@@ -656,14 +647,12 @@ public class FlexReportingControllerHelperService {
   public JSONObject searchRunsByCreationDateandString(HttpSession session, JSONObject json) {
     JSONObject jsonObject = new JSONObject();
     JSONArray jsonArray = new JSONArray();
-    String searchStr = (String) json.get("str");
-    String from = (String) json.get("from");
-    String to = (String) json.get("to");
-    String platform = (String) json.get("platform");
-    String status = (String) json.get("status");
+    String searchStr = json.getString("str");
+    String from = json.getString("from");
+    String to = json.getString("to");
+    String platform = json.getString("platform");
+    String status = json.getString("status");
     try {
-      StringBuilder b = new StringBuilder();
-
       Collection<Run> runs = null;
       if (searchStr != null && !searchStr.equals("")) {
         runs = requestManager.listAllRunsBySearch(searchStr);
@@ -683,11 +672,9 @@ public class FlexReportingControllerHelperService {
               DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
               Date startDate = df.parse(from);
               Date endDate = df.parse(to);
-              DateFormat dfdb = new SimpleDateFormat("yyyy-MM-dd");
-              Date receivedDate = dfdb.parse(run.getStatus().getCompletionDate().toString());
+              Date receivedDate = run.getStatus().getCompletionDate();
 
-              if (receivedDate.getTime() >= startDate.getTime() &&
-                  receivedDate.getTime() <= endDate.getTime()) {
+              if (receivedDate.after(startDate) && receivedDate.before(endDate)) {
                 jsonArray.add(runFormRowBuilder(run));
               }
             }

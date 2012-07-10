@@ -30,6 +30,9 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+
+<%@taglib prefix="sessionConversation" uri="/WEB-INF/tld/sessionConversation.tld" %>
+
 <%--
   ~ Copyright (c) 2010. The Genome Analysis Centre, Norwich, UK
   ~ MISO project contacts: Robert Davey, Mario Caccamo @ TGAC

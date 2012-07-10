@@ -32,6 +32,7 @@
 <link rel="stylesheet" href="<c:url value='/styles/progress.css'/>" type="text/css">
 
 <form:form method="POST" commandName="project" autocomplete="off" onsubmit="return validate_project(this);">
+<sessionConversation:insertSessionConversationId attributeName="project"/>
 <h1><c:choose><c:when
         test="${not empty project.projectId}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose>
   Project

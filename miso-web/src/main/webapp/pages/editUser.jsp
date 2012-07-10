@@ -26,6 +26,7 @@
 <div id="maincontent">
     <div id="contentcolumn">
         <form:form method="POST" commandName="user" autocomplete="off">
+          <sessionConversation:insertSessionConversationId attributeName="user"/>
             <h1><c:choose><c:when
                     test="${not empty user.userId}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose>
                 User

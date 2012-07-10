@@ -29,6 +29,7 @@
 
 --%>
 <%@ include file="../header.jsp" %>
+
 <script type="text/javascript" src="<c:url value='/scripts/run_ajax.js?ts=${timestamp.time}'/>"></script>
 <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.breadcrumbs.popup.js'/>"></script>
 
@@ -36,6 +37,9 @@
 <div id="contentcolumn">
 <form:form method="POST" commandName="experiment" autocomplete="off"
            onsubmit="return validate_experiment(this);">
+
+<sessionConversation:insertSessionConversationId attributeName="experiment"/>
+
 <h1>
     <c:choose>
         <c:when test="${not empty experiment.experimentId}">Edit</c:when>

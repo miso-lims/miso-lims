@@ -35,6 +35,7 @@
 <div id="maincontent">
     <div id="contentcolumn">
         <form:form method="POST" commandName="study" autocomplete="off" onsubmit="return validate_study(this);">
+          <sessionConversation:insertSessionConversationId attributeName="study"/>
             <h1>
                 <c:choose>
                     <c:when test="${not empty study.studyId}">Edit</c:when>

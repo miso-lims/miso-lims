@@ -50,6 +50,7 @@
 </c:if>
 
 <form:form method="POST" commandName="sample" autocomplete="off" onsubmit="return validate_sample(this);">
+<sessionConversation:insertSessionConversationId attributeName="sample"/>
 <h1>
     <c:choose>
         <c:when test="${not empty sample.sampleId}">Edit</c:when>

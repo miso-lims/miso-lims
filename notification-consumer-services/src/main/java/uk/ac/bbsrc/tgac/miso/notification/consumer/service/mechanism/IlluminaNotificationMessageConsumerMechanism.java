@@ -69,6 +69,7 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
   private final String runDirRegex = "[\\d]+_([A-z0-9])+_([\\d])+_([A-z0-9_\\-])*";
   private final Pattern p = Pattern.compile(runDirRegex);
   private final DateFormat logDateFormat = new SimpleDateFormat("MM'/'dd'/'yyyy','HH:mm:ss");
+  private final DateFormat anotherLogDateFormat = new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH:mm:ss");
   private final DateFormat illuminaRunFolderDateFormat = new SimpleDateFormat("yyMMdd");
 
   @Override
@@ -192,8 +193,8 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
             r.setPlatformType(PlatformType.ILLUMINA);
 
             if (r.getStatus() != null && run.has("status")) {
-              r.getStatus().setXml(run.getString("status"));
               r.getStatus().setHealth(ht);
+              r.getStatus().setXml(run.getString("status"));
             }
             else {
               if (run.has("status")) {
@@ -228,28 +229,34 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
                 }
               }
               catch (ParseException e) {
-                log.error(e.getMessage());
+                log.error(runName + ": "+ e.getMessage());
                 e.printStackTrace();
               }
             }
 
             if (run.has("completionDate")) {
-              try {
-                if (run.get("completionDate") != null && !run.getString("completionDate").equals("null") && !"".equals(run.getString("completionDate"))) {
-                  log.debug("Updating completion date:" + run.getString("completionDate"));
+              if (run.get("completionDate") != null && !run.getString("completionDate").equals("null") && !"".equals(run.getString("completionDate"))) {
+                log.debug("Updating completion date:" + run.getString("completionDate"));
+                try {
                   r.getStatus().setCompletionDate(logDateFormat.parse(run.getString("completionDate")));
                 }
-                else {
-                  if (!r.getStatus().getHealth().equals(HealthType.Completed) &&
-                      !r.getStatus().getHealth().equals(HealthType.Failed) &&
-                      !r.getStatus().getHealth().equals(HealthType.Stopped)) {
-                    r.getStatus().setCompletionDate(null);
+                catch (ParseException e) {
+                  log.error(runName + ": "+ e.getMessage());
+                  try {
+                    r.getStatus().setCompletionDate(anotherLogDateFormat.parse(run.getString("completionDate")));
+                  }
+                  catch (ParseException e1) {
+                    log.error(runName + ": "+ e1.getMessage());
+                    e1.printStackTrace();
                   }
                 }
               }
-              catch (ParseException e) {
-                log.error(e.getMessage());
-                e.printStackTrace();
+              else {
+                if (!r.getStatus().getHealth().equals(HealthType.Completed) &&
+                    !r.getStatus().getHealth().equals(HealthType.Failed) &&
+                    !r.getStatus().getHealth().equals(HealthType.Stopped)) {
+                  r.getStatus().setCompletionDate(null);
+                }
               }
             }
 

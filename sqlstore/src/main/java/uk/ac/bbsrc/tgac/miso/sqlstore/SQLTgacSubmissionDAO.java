@@ -75,7 +75,7 @@ public class SQLTgacSubmissionDAO implements Store<SubmissionImpl> {
           "WHERE submissionId=:submissionId";
 
   public static final String SUBMISSION_ELEMENTS_DELETE =
-          "DELETE sexp, ssam, sstu, ssch, ssla FROM Submission s " +
+          "DELETE sexp, ssam, sstu, ssla FROM Submission s " +
           "LEFT JOIN Submission_Experiment AS sexp ON s.submissionId = sexp.submission_submissionId " +
           "LEFT JOIN Submission_Sample AS ssam ON s.submissionId = ssam.submission_submissionId " +
           "LEFT JOIN Submission_Study AS sstu ON s.submissionId = sstu.submission_submissionId " +
@@ -171,6 +171,7 @@ public class SQLTgacSubmissionDAO implements Store<SubmissionImpl> {
         String tableName = "Submission_";
         String priKey = null;
         Long priValue = null;
+        boolean process = true;
 
         if (s instanceof Sample) {
           tableName += "Sample";
@@ -192,6 +193,7 @@ public class SQLTgacSubmissionDAO implements Store<SubmissionImpl> {
           tableName += "Partition_Dilution";
           priKey = "partitions_partitionId";
           priValue = l.getId();
+          process = false;
 
           if (l.getPool() != null) {
             Collection<Experiment> exps = l.getPool().getExperiments();
@@ -240,21 +242,23 @@ public class SQLTgacSubmissionDAO implements Store<SubmissionImpl> {
           }
         }
 
-        if (priKey != null && priValue != null) {
-          SimpleJdbcInsert pInsert = new SimpleJdbcInsert(template)
-                  .withTableName(tableName);
-          try {
-            MapSqlParameterSource poParams = new MapSqlParameterSource();
-            poParams.addValue("submission_submissionId", submission.getSubmissionId())
-                    .addValue(priKey, priValue);
-            pInsert.execute(poParams);
+        if (process) {
+          if (priKey != null && priValue != null) {
+            SimpleJdbcInsert pInsert = new SimpleJdbcInsert(template)
+                    .withTableName(tableName);
+            try {
+              MapSqlParameterSource poParams = new MapSqlParameterSource();
+              poParams.addValue("submission_submissionId", submission.getSubmissionId())
+                      .addValue(priKey, priValue);
+              pInsert.execute(poParams);
+            }
+            catch (DuplicateKeyException dke) {
+              log.warn("This "+tableName+" combination already exists - not inserting: " + dke.getMessage());
+            }
           }
-          catch (DuplicateKeyException dke) {
-            log.warn("This "+tableName+" combination already exists - not inserting: " + dke.getMessage());
+          else {
+            throw new IOException("Null parameter key/value detected. Cannot insert.");
           }
-        }
-        else {
-          throw new IOException("Null parameter key/value detected. Cannot insert.");
         }
       }
     }

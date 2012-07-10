@@ -51,6 +51,7 @@
 </c:if>
 
 <form:form method="POST" commandName="library" autocomplete="off" onsubmit="return validate_library(this);">
+<sessionConversation:insertSessionConversationId attributeName="library"/>
 <h1>
     <c:choose>
         <c:when test="${not empty library.libraryId}">Edit</c:when>

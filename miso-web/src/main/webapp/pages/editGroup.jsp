@@ -27,6 +27,9 @@
 <div id="maincontent">
     <div id="contentcolumn">
         <form:form method="POST" commandName="group" autocomplete="off">
+
+          <sessionConversation:insertSessionConversationId attributeName="group"/>
+
             <h1><c:choose><c:when
                     test="${not empty group.groupId}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose>
                 Group

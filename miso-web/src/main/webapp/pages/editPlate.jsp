@@ -34,6 +34,7 @@
 <div id="maincontent">
 <div id="contentcolumn">
 <form:form method="POST" commandName="plate" autocomplete="off" onsubmit="return validate_plate(this);">
+  <sessionConversation:insertSessionConversationId attributeName="plate"/>
 <h1>
     <c:choose>
         <c:when test="${not empty plate.plateId}">Edit</c:when>

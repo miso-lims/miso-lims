@@ -25,6 +25,7 @@
 <div id="maincontent">
     <div id="contentcolumn">
         <form:form method="POST" commandName="sequencerReference" autocomplete="off">
+          <sessionConversation:insertSessionConversationId attributeName="sequencerReference"/>
             <h1>
                 Edit Sequencer Reference
                 <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>

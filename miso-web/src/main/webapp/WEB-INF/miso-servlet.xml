@@ -51,8 +51,13 @@
                <bean class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter"/>
             </list>
         </property>
+        <property name="sessionAttributeStore" ref="sessionConversationAttributeStore"/>
     </bean>
 
     <bean name="inputDataXmlView" class="uk.ac.bbsrc.tgac.miso.webapp.controller.InputDataXmlView"/>
+
+    <bean id="sessionConversationAttributeStore" class="uk.ac.bbsrc.tgac.miso.webapp.util.SessionConversationAttributeStore">
+      <property name="numConversationsToKeep" value="100"/>
+    </bean>
 
 </beans>

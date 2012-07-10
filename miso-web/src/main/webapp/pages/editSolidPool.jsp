@@ -33,6 +33,7 @@
 <div id="maincontent">
     <div id="contentcolumn">
         <form:form method="POST" commandName="pool" autocomplete="off" onsubmit="return validate_pool(this);">
+          <sessionConversation:insertSessionConversationId attributeName="pool"/>
             <h1><c:choose><c:when
                     test="${not empty pool.poolId}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose>
                 Solid Pool
