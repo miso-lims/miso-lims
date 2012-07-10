@@ -71,13 +71,14 @@ public class ContainerControllerHelperService {
   public JSONObject changePlatformType(HttpSession session, JSONObject json) {
     String newContainerType = json.getString("platformtype");
     PlatformType pt = PlatformType.get(newContainerType);
+    String cId = json.getString("container_cId");
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
 
       Map<String, Object> responseMap = new HashMap<String, Object>();
       if (pt != null) {
         SequencerPartitionContainer<SequencerPoolPartition> lf = dataObjectFactory.getSequencerPartitionContainer(pt, user);
-        session.setAttribute("container", lf);
+        session.setAttribute("container_"+cId, lf);
 
         StringBuilder srb = new StringBuilder();
         srb.append("<select name='sequencer' id='sequencerReference' onchange='populateContainerOptions(this);'>");
@@ -181,7 +182,8 @@ public class ContainerControllerHelperService {
         b.append("</table>");
         b.append("</div>");
 
-        SequencerPartitionContainer<SequencerPoolPartition> lf = (SequencerPartitionContainer<SequencerPoolPartition>)session.getAttribute("container");
+        SequencerPartitionContainer<SequencerPoolPartition> lf =
+                (SequencerPartitionContainer<SequencerPoolPartition>)session.getAttribute("container_"+json.getString("container_cId"));
         lf.setPartitionLimit(1);
         lf.initEmptyPartitions();
       }
@@ -202,7 +204,8 @@ public class ContainerControllerHelperService {
         b.append("</table>");
         b.append("</div>");
 
-        SequencerPartitionContainer<SequencerPoolPartition> lf = (SequencerPartitionContainer<SequencerPoolPartition>)session.getAttribute("container");
+        SequencerPartitionContainer<SequencerPoolPartition> lf =
+                (SequencerPartitionContainer<SequencerPoolPartition>)session.getAttribute("container_"+json.getString("container_cId"));
         lf.setPartitionLimit(8);
         lf.initEmptyPartitions();
       }
@@ -264,10 +267,11 @@ public class ContainerControllerHelperService {
         b.append("<tr><td>6 </td><td width='90%'><div id='p_div_0-5' class='barcodeEntryDiv'><ul class='runPartitionDroppable' bind='partitions[5].pool' partition='5' ondblclick='populatePartition(this);'></ul></div></td></tr>");
         b.append("</table>");
 
-        SequencerPartitionContainer<SequencerPoolPartition> lf = (SequencerPartitionContainer<SequencerPoolPartition>)session.getAttribute("container");
+        SequencerPartitionContainer<SequencerPoolPartition> lf =
+                (SequencerPartitionContainer<SequencerPoolPartition>)session.getAttribute("container_"+json.getString("container_cId"));
         lf.setPartitionLimit(6);
         lf.initEmptyPartitions();
-        session.setAttribute("container", lf);
+        session.setAttribute("container_"+json.getString("container_cId"), lf);
       }
       else {
         b.append("<input id='chamber1' name='container0Select' onchange='changeContainerSolidChamber(this, 0);' type='radio' value='1'/>1 ");
@@ -341,10 +345,11 @@ public class ContainerControllerHelperService {
     b.append("<th>Chamber No.</th>");
     b.append("<th>Pool</th>");
 
-    SequencerPartitionContainer<SequencerPoolPartition> lf = (SequencerPartitionContainer<SequencerPoolPartition>)session.getAttribute("container");
+    SequencerPartitionContainer<SequencerPoolPartition> lf =
+            (SequencerPartitionContainer<SequencerPoolPartition>)session.getAttribute("container_"+json.getString("container_cId"));
     lf.setPartitionLimit(numChambers);
     lf.initEmptyPartitions();
-    session.setAttribute("container", lf);
+    session.setAttribute("container_"+json.getString("container_cId"), lf);
 
     for (int i = 0; i < numChambers; i++) {
       b.append("<tr><td>" + (i + 1) + "</td>");
@@ -365,10 +370,11 @@ public class ContainerControllerHelperService {
     b.append("<th>Chamber No.</th>");
     b.append("<th>Pool</th>");
 
-    SequencerPartitionContainer<SequencerPoolPartition> lf = (SequencerPartitionContainer<SequencerPoolPartition>)session.getAttribute("container");
+    SequencerPartitionContainer<SequencerPoolPartition> lf =
+            (SequencerPartitionContainer<SequencerPoolPartition>)session.getAttribute("container_"+json.getString("container_cId"));
     lf.setPartitionLimit(numChambers);
     lf.initEmptyPartitions();
-    session.setAttribute("container", lf);
+    session.setAttribute("container_"+json.getString("container_cId"), lf);
 
     for (int i = 0; i < numChambers; i++) {
       b.append("<tr><td>" + (i + 1) + "</td>");
@@ -389,10 +395,11 @@ public class ContainerControllerHelperService {
     b.append("<th>Chamber No.</th>");
     b.append("<th>Pool</th>");
 
-    SequencerPartitionContainer<SequencerPoolPartition> lf = (SequencerPartitionContainer<SequencerPoolPartition>)session.getAttribute("container");
+    SequencerPartitionContainer<SequencerPoolPartition> lf =
+            (SequencerPartitionContainer<SequencerPoolPartition>)session.getAttribute("container_"+json.getString("container_cId"));
     lf.setPartitionLimit(numChambers);
     lf.initEmptyPartitions();
-    session.setAttribute("container", lf);
+    session.setAttribute("container_"+json.getString("container_cId"), lf);
 
     for (int i = 0; i < numChambers; i++) {
       b.append("<tr><td>"+(i+1)+"</td>");
@@ -409,7 +416,8 @@ public class ContainerControllerHelperService {
 
     try {
       Pool p = requestManager.getPoolByBarcode(barcode);
-      SequencerPartitionContainer<SequencerPoolPartition> lf = (SequencerPartitionContainer<SequencerPoolPartition>)session.getAttribute("container");
+      SequencerPartitionContainer<SequencerPoolPartition> lf =
+              (SequencerPartitionContainer<SequencerPoolPartition>)session.getAttribute("container_"+json.getString("container_cId"));
       if (lf.getPlatformType().equals(p.getPlatformType())) {
         return JSONUtils.JSONObjectResponse("html", poolHtml(p, partition));
       }

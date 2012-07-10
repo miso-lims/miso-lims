@@ -132,7 +132,7 @@ function changePlatformType(form, runId) {
   Fluxion.doAjax(
     'runControllerHelperService',
     'changePlatformType',
-    {'platformtype':form.value, 'runId':runId, 'url':ajaxurl},
+    {'platformtype':form.value, 'run_cId':jQuery('input[name=run_cId]').val(), 'runId':runId, 'url':ajaxurl},
     {'doOnSuccess':
       function(json) {
         jQuery('#sequencerReferenceSelect').html(json.sequencers);
@@ -147,7 +147,7 @@ function populateRunOptions(form, runId) {
     Fluxion.doAjax(
       'runControllerHelperService',
       'populateRunOptions',
-      {'sequencerReference':form.value, 'runId':runId, 'url':ajaxurl},
+      {'sequencerReference':form.value, 'run_cId':jQuery('input[name=run_cId]').val(), 'runId':runId, 'url':ajaxurl},
       {'doOnSuccess':
         function(json) {
           jQuery('#runPartitions').html(json.partitions);
@@ -295,7 +295,7 @@ function changeContainer(numContainers, platform, seqrefId) {
   Fluxion.doAjax(
           'runControllerHelperService',
           'changeContainer',
-          {'platform':platform, 'numContainers':numContainers, 'sequencerReferenceId':seqrefId, 'url':ajaxurl},
+          {'platform':platform, 'run_cId':jQuery('input[name=run_cId]').val(), 'numContainers':numContainers, 'sequencerReferenceId':seqrefId, 'url':ajaxurl},
           {'updateElement':'containerdiv'});
 }
 
@@ -609,7 +609,7 @@ function getPool(t, containerNum) {
   Fluxion.doAjax(
     'runControllerHelperService',
     'getPoolByBarcode',
-    {'platform':platform, 'container':containerNum, 'partition':pNum, 'barcode':a.val(),'url':ajaxurl},
+    {'platform':platform, 'run_cId':jQuery('input[name=run_cId]').val(), 'container':containerNum, 'partition':pNum, 'barcode':a.val(),'url':ajaxurl},
     {'doOnSuccess':function(json) {
       if (json.err) {
         jQuery("#msg" + pNum).html(json.err);
@@ -627,7 +627,7 @@ function confirmPoolRemove(t) {
 }
 
 function lookupContainer(t, containerNum) {
-  var barcode = jQuery('#sequencerPartitionContainers' + containerNum + '\\.identificationBarcode').val();
+  var barcode = jQuery('#sequencerPartitionContainers\\[' + containerNum + '\\]\\.identificationBarcode').val();
   if (!isNullCheck(barcode)) {
     Fluxion.doAjax(
       'runControllerHelperService',

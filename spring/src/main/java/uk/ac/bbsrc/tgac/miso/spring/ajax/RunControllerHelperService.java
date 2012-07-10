@@ -86,7 +86,8 @@ public class RunControllerHelperService {
   }
 
   public JSONObject changePlatformType(HttpSession session, JSONObject json) {
-    Run run = (Run) session.getAttribute("run");
+    String cId = json.getString("run_cId");
+    Run run = (Run) session.getAttribute("run_"+cId);
 
     String newRuntype = json.getString("platformtype");
 
@@ -112,7 +113,7 @@ public class RunControllerHelperService {
             run = storedRun;
           }
 
-          session.setAttribute("run", run);
+          session.setAttribute("run_"+cId, run);
           responseMap.put("partitions", getPlatformRunOptions(run));
           StringBuilder srb = new StringBuilder();
           srb.append("<select name='sequencer' id='sequencerReference' onchange='populateRunOptions(this);'>");
@@ -158,6 +159,7 @@ public class RunControllerHelperService {
 
   public JSONObject populateRunOptions(HttpSession session, JSONObject json) {
     Long sequencerReferenceId = json.getLong("sequencerReference");
+    String cId = json.getString("run_cId");
     try {
       SequencerReference sr = requestManager.getSequencerReferenceById(sequencerReferenceId);
       PlatformType pt = sr.getPlatform().getPlatformType();
@@ -166,7 +168,8 @@ public class RunControllerHelperService {
 
       Run run = dataObjectFactory.getRunOfType(pt, user);
       run.setSequencerReference(sr);
-      session.setAttribute("run", run);
+
+      session.setAttribute("run_"+cId, run);
       responseMap.put("partitions", getPlatformRunOptions(run));
 
       return JSONUtils.JSONObjectResponse(responseMap);
@@ -277,7 +280,7 @@ public class RunControllerHelperService {
 
   public JSONObject changeIlluminaContainer(HttpSession session, JSONObject json) {
     StringBuilder b = new StringBuilder();
-    IlluminaRun run = (IlluminaRun)session.getAttribute("run");
+    IlluminaRun run = (IlluminaRun)session.getAttribute("run_"+json.getString("run_cId"));
     if ("Illumina MiSeq".equals(run.getSequencerReference().getPlatform().getInstrumentModel())) {
       b.append("<h2>Container 1</h2>");
       b.append("<table class='in'>");
@@ -333,7 +336,7 @@ public class RunControllerHelperService {
   public JSONObject changeLS454Container(HttpSession session, JSONObject json) {
     StringBuilder b = new StringBuilder();
     int numContainers = json.getInt("numContainers");
-    LS454Run run = (LS454Run)session.getAttribute("run");
+    LS454Run run = (LS454Run)session.getAttribute("run_"+json.getString("run_cId"));
     run.getSequencerPartitionContainers().clear();
 
     for (int i = 0; i < numContainers; i++) {
@@ -367,7 +370,7 @@ public class RunControllerHelperService {
     b.append("<th>Chamber No.</th>");
     b.append("<th>Pool</th>");
 
-    LS454Run run = (LS454Run)session.getAttribute("run");
+    LS454Run run = (LS454Run)session.getAttribute("run_"+json.getString("run_cId"));
     SequencerPartitionContainer f = run.getSequencerPartitionContainers().get(container);
     f.setPartitionLimit(numChambers);
     f.initEmptyPartitions();
@@ -385,7 +388,7 @@ public class RunControllerHelperService {
   public JSONObject changeSolidContainer(HttpSession session, JSONObject json) {
     int numContainers = json.getInt("numContainers");
     StringBuilder b = new StringBuilder();
-    SolidRun run = (SolidRun)session.getAttribute("run");
+    SolidRun run = (SolidRun)session.getAttribute("run_"+json.getString("run_cId"));
     run.getSequencerPartitionContainers().clear();
     
     for (int i = 0; i < numContainers; i++) {
@@ -428,7 +431,7 @@ public class RunControllerHelperService {
     int numChambers = json.getInt("numChambers");
     int container = json.getInt("container");
 
-    SolidRun run = (SolidRun)session.getAttribute("run");
+    SolidRun run = (SolidRun)session.getAttribute("run_"+json.getString("run_cId"));
     SequencerPartitionContainer f = run.getSequencerPartitionContainers().get(container);
     f.setPartitionLimit(numChambers);
     f.initEmptyPartitions();
@@ -449,7 +452,7 @@ public class RunControllerHelperService {
   public JSONObject changePacBioContainer(HttpSession session, JSONObject json) {
     int numContainers = json.getInt("numContainers");
     StringBuilder b = new StringBuilder();
-    PacBioRun run = (PacBioRun)session.getAttribute("run");
+    PacBioRun run = (PacBioRun)session.getAttribute("run_"+json.getString("run_cId"));
     run.getSequencerPartitionContainers().clear();
 
     for (int i = 0; i < numContainers; i++) {
@@ -483,7 +486,7 @@ public class RunControllerHelperService {
     int numChambers = json.getInt("numChambers");
     int container = json.getInt("container");
 
-    PacBioRun run = (PacBioRun)session.getAttribute("run");
+    PacBioRun run = (PacBioRun)session.getAttribute("run_"+json.getString("run_cId"));
     SequencerPartitionContainer f = run.getSequencerPartitionContainers().get(container);
     f.setPartitionLimit(numChambers);
     f.initEmptyPartitions();
@@ -1101,7 +1104,7 @@ public class RunControllerHelperService {
 
     try {
       Pool<? extends Poolable> p = requestManager.getPoolByBarcode(barcode);
-      RunImpl r = (RunImpl) session.getAttribute("run");
+      RunImpl r = (RunImpl) session.getAttribute("run_"+json.getString("run_cId"));
       List<SequencerPartitionContainer> fs = new ArrayList<SequencerPartitionContainer>(r.getSequencerPartitionContainers());
       if (!fs.isEmpty()) {
         SequencerPartitionContainer f = fs.get(container);

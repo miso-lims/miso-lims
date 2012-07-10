@@ -229,7 +229,7 @@ public class LimsBindingInitializer implements WebBindingInitializer {
       }
     });
 
-    binder.registerCustomEditor(Pool.class, "containers.partitions.pool", new PropertyEditorSupport() {
+    binder.registerCustomEditor(Pool.class, "sequencerPartitionContainers.partitions.pool", new PropertyEditorSupport() {
       @Override
       public void setAsText(String element) throws IllegalArgumentException {
         setValue(resolvePool(element));
@@ -356,7 +356,7 @@ public class LimsBindingInitializer implements WebBindingInitializer {
       }
     });
 
-    binder.registerCustomEditor(List.class, "containers", new CustomCollectionEditor(List.class) {
+    binder.registerCustomEditor(List.class, "sequencerPartitionContainers", new CustomCollectionEditor(List.class) {
       @Override
       protected Object convertElement(Object element) {
         return resolveSequencerPartitionContainer(element);

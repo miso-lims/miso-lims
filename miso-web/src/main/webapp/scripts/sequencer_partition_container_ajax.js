@@ -37,7 +37,7 @@ function changeContainerPlatformType(form) {
   Fluxion.doAjax(
           'containerControllerHelperService',
           'changePlatformType',
-          {'platformtype':form.value, 'url':ajaxurl},
+          {'platformtype':form.value, 'container_cId':jQuery('input[name=container_cId]').val(), 'url':ajaxurl},
           {'doOnSuccess':
                   function(json) {
                     jQuery('#sequencerReferenceSelect').html(json.sequencers);
@@ -65,7 +65,7 @@ function changeContainer(numContainers, platform, seqrefId) {
   Fluxion.doAjax(
           'containerControllerHelperService',
           'changeContainer',
-          {'platform':platform, 'numContainers':numContainers, 'sequencerReferenceId':seqrefId, 'url':ajaxurl},
+          {'platform':platform, 'container_cId':jQuery('input[name=container_cId]').val(), 'numContainers':numContainers, 'sequencerReferenceId':seqrefId, 'url':ajaxurl},
           {'updateElement':'containerdiv'});
 }
 
@@ -119,7 +119,7 @@ function getPool(t) {
   Fluxion.doAjax(
     'containerControllerHelperService',
     'getPoolByBarcode',
-    {'platform':platform, 'partition':pNum, 'barcode':a.val(),'url':ajaxurl},
+    {'platform':platform, 'container_cId':jQuery('input[name=container_cId]').val(), 'partition':pNum, 'barcode':a.val(),'url':ajaxurl},
     {'doOnSuccess':function(json) {
       if (json.err) {
         jQuery("#msg"+pNum).html(json.err);
