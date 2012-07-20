@@ -631,8 +631,7 @@
                                 <a href="<c:url value='/miso/pool/${fn:toLowerCase(library.platformName)}/new/dilution/${dil.dilutionId}'/>">Construct
                                       new Pool using this dilution...</a></td>
                                       --%>
-                                <a href="<c:url value="/miso/poolwizard/new/${library.sample.project.projectId}"/>">Construct
-                                      new Pool using this dilution...</a>
+                                <a href="<c:url value="/miso/poolwizard/new/${library.sample.project.projectId}"/>">Construct New Pool</a>
                               </td>
                           </c:otherwise>
                       </c:choose>
@@ -745,8 +744,7 @@
                             <a href="<c:url value='/miso/pool/${fn:toLowerCase(library.platformName)}/new/dilution/${dil.dilutionId}'/>">Construct
                                 new Pool using this dilution...</a></td>
                                 --%>
-                            <a href="<c:url value="/miso/poolwizard/new/${library.sample.project.projectId}"/>">Construct
-                                  new Pool using this dilution...</a>
+                            <a href="<c:url value="/miso/poolwizard/new/${library.sample.project.projectId}"/>">Construct New Pool</a>
                     </tr>
                 </c:forEach>
             </c:if>

@@ -621,7 +621,7 @@ public class LibraryControllerHelperService {
             sb.append("<td><a href='javascript:void(0);' onclick='insertEmPcrRow("+dil.getDilutionId()+");'>Add emPCR</a></td>");
           }
           else {
-            sb.append("<td><a href='/miso/pool/"+library.getPlatformName().toLowerCase()+"/new/'>Construct New Pool</a></td>");
+            sb.append("<td><a href='/miso/poolwizard/new/"+library.getSample().getProject().getProjectId()+"'>Construct New Pool</a></td>");
           }
 
           sb.append("</tr>");
@@ -804,7 +804,7 @@ public class LibraryControllerHelperService {
           }
           sb.append("</td>");
 
-          sb.append("<td><a href='/miso/pool/"+pcr.getLibraryDilution().getLibrary().getPlatformName().toLowerCase()+"/new/'>Construct New Pool</a></td>");
+          sb.append("<td><a href='/miso/poolwizard/new/"+pcr.getLibraryDilution().getLibrary().getSample().getProject().getProjectId()+"'>Construct New Pool</a></td>");
           sb.append("</tr>");
         }
         return JSONUtils.SimpleJSONResponse(sb.toString());

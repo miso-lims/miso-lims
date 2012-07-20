@@ -38,8 +38,7 @@
             <h1><c:choose><c:when
                     test="${not empty pool.poolId}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose>
                 LS454 Pool
-                <button type="submit" class="fg-button ui-state-default ui-corner-all" onclick="processLists()">Save
-                </button>
+                <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
             </h1>
             <div class="sectionDivider" onclick="toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
                 <div id="note_arrowclick" class="toggleLeft"></div>
@@ -240,21 +239,6 @@
 
 <script type="text/javascript">
     addMaxDatePicker("creationDate", 0);
-
-    var processLists = function() {
-        // remove available li inputs
-        jQuery('#list_1').find('li').find('input').each(function() {
-            var jQueryitem = jQuery(this);
-            jQueryitem.remove();
-        });
-
-        //add selected li inputs
-        jQuery('#list_2').find('li').each(function() {
-            var jQueryitem = jQuery(this);
-            jQueryitem.html(jQueryitem.attr('dilName') + "<input type='hidden' id='dilutions" + jQueryitem.attr('dilId') + "' value='" + jQueryitem.attr('dilId') + "' name='dilutions" + jQueryitem.attr('dilId') + "'/></li>");
-        });
-    }
-
 </script>
 
 <%@ include file="adminsub.jsp" %>

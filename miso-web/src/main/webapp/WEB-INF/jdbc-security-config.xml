@@ -87,8 +87,8 @@
   <bean id="sessionRegistry" class="org.springframework.security.core.session.SessionRegistryImpl"/>
 
   <bean id="sas" class="org.springframework.security.web.authentication.session.ConcurrentSessionControlStrategy">
-    <property name="maximumSessions" value="1"/>
-    <property name="exceptionIfMaximumExceeded" value="true"/>
+    <property name="maximumSessions" value="-1"/>
+    <property name="exceptionIfMaximumExceeded" value="false"/>
     <constructor-arg name="sessionRegistry" ref="sessionRegistry"/>
   </bean>
 

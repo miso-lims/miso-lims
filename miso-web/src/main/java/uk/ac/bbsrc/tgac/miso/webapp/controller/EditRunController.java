@@ -80,7 +80,6 @@ public class EditRunController {
   @Autowired
   private JdbcTemplate interfaceTemplate;
 
-  @Autowired
   private RunStatsManager runStatsManager;
 
   public void setInterfaceTemplate(JdbcTemplate interfaceTemplate) {
@@ -263,7 +262,9 @@ public class EditRunController {
           model.put("availablePools", populateAvailablePools(run.getPlatformType(), user));
           model.put("multiplexed", isMultiplexed(runId));
           try {
-            model.put("statsAvailable", runStatsManager.hasStatsForRun(run));
+            if (runStatsManager != null) {
+              model.put("statsAvailable", runStatsManager.hasStatsForRun(run));
+            }
             model.put("operationsQcPassed", hasOperationsQcPassed(runId));
             model.put("informaticsQcPassed", hasInformaticsQcPassed(runId));
           }

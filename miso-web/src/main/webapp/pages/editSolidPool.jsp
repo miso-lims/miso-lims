@@ -37,8 +37,7 @@
             <h1><c:choose><c:when
                     test="${not empty pool.poolId}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose>
                 Solid Pool
-                <button type="submit" class="fg-button ui-state-default ui-corner-all" onclick="processLists()">Save
-                </button>
+                <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
             </h1>
             <div class="sectionDivider" onclick="toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
                 <div id="note_arrowclick" class="toggleLeft"></div>
@@ -122,64 +121,6 @@
                     <td class="h">Ready To Run</td>
                     <td><form:checkbox path="readyToRun"/></td>
                 </tr>              
-              <%--
-                <tr>
-                    <td>
-                        Available Dilutions:<br/>
-                        <a href="javascript:void(0);"
-                           onclick="return jQuery.dds.selectAll('list_1');">All</a>
-                        / <a href="javascript:void(0);"
-                             onclick="return jQuery.dds.selectNone('list_1');">None</a>
-                    </td>
-                    <td>
-                        <div class="dd">
-                            <ul id="list_1" dds="0" class="ui-droppable">
-                                <c:forEach items="${availableDilutions}" var="dil">
-                                    <li id="dil_${dil.dilutionId}" dilId="${dil.dilutionId}" dilName="${dil.name}" dds="1"
-                                        style="cursor: pointer;"
-                                        class="ui-draggable">${dil.name}
-
-                                        <div class="toggleRight"
-                                             onclick="toggleRightInfo(this, 'dildiv_${dil.dilutionId}');"></div>
-                                        <div id="dildiv_${dil.dilutionId}" style="display:none;">
-                                                ${dil.library.name} (${dil.library.identificationBarcode})<br/>
-                                        </div>                                         
-                                    </li>
-                                </c:forEach>
-                            </ul>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td> Selected Dilutions:<br/>
-                        <a href="javascript:void(0);"
-                           onclick="return jQuery.dds.selectAll('list_2');">All</a>
-                        / <a href="javascript:void(0);"
-                             onclick="return jQuery.dds.selectNone('list_2');">None</a>
-                    </td>
-                    <td>
-                        <div class="dd">
-                            <ul id="list_2" dds="0" class="ui-droppable">
-                                <c:forEach items="${pool.dilutions}" var="dil">
-                                    <li id="dil_${dil.dilutionId}" dilId="${dil.dilutionId}" dilName="${dil.name}" dds="1"
-                                        style="cursor: pointer;"
-                                        class="ui-draggable">${dil.name}
-                                        <input type="hidden" id="dilutions${dil.dilutionId}" value="${dil.dilutionId}"
-                                               name="dilutions"/>
-
-                                        <div class="toggleRight"
-                                             onclick="toggleRightInfo(this, 'dildiv_${dil.dilutionId}');"></div>
-                                        <div id="dildiv_${dil.dilutionId}" style="display:none;">
-                                                ${dil.library.name} (${dil.library.identificationBarcode})<br/>
-                                        </div>
-                                    </li>
-                                </c:forEach>
-                                <input type="hidden" value="on" name="_dilutions"/>
-                            </ul>
-                        </div>
-                    </td>
-                </tr>
-                --%>
             </table>
             <%@ include file="permissions.jsp" %>
             <br/>
@@ -297,21 +238,6 @@
 
 <script type="text/javascript">
     addMaxDatePicker("creationDate", 0);
-
-    var processLists = function() {
-        // remove available li inputs
-        jQuery('#list_1').find('li').find('input').each(function() {
-            var jQueryitem = jQuery(this);
-            jQueryitem.remove();
-        });
-
-        //add selected li inputs
-        jQuery('#list_2').find('li').each(function() {
-            var jQueryitem = jQuery(this);
-            jQueryitem.html(jQueryitem.attr('dilName') + "<input type='hidden' id='dilutions" + jQueryitem.attr('dilId') + "' value='" + jQueryitem.attr('dilId') + "' name='dilutions" + jQueryitem.attr('dilId') + "'/></li>");
-        });
-    }
-
 </script>
 
 <%@ include file="adminsub.jsp" %>

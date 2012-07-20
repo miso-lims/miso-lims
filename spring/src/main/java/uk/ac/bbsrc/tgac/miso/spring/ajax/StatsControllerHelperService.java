@@ -53,7 +53,7 @@ public class StatsControllerHelperService {
   private SecurityManager securityManager;
   @Autowired
   private RequestManager requestManager;
-  @Autowired
+
   private RunStatsManager runStatsManager;
 
   public void setSecurityManager(SecurityManager securityManager) {
@@ -69,35 +69,45 @@ public class StatsControllerHelperService {
   }
 
   public JSONObject getRunStats(HttpSession session, JSONObject json) {
-    Long runId = json.getLong("runId");
-    try {
-      Run run = requestManager.getRunById(runId);
-      return runStatsManager.getSummaryStatsForRun(run);
+    if (runStatsManager != null) {
+      Long runId = json.getLong("runId");
+      try {
+        Run run = requestManager.getRunById(runId);
+        return runStatsManager.getSummaryStatsForRun(run);
+      }
+      catch (IOException e) {
+        e.printStackTrace();
+        return JSONUtils.SimpleJSONError("Cannot retrieve run: " + e.getMessage());
+      }
+      catch (RunStatsException e) {
+        e.printStackTrace();
+        return JSONUtils.SimpleJSONError("Cannot get stats for run: " + e.getMessage());
+      }
     }
-    catch (IOException e) {
-      e.printStackTrace();
-      return JSONUtils.SimpleJSONError("Cannot retrieve run: " + e.getMessage());
-    }
-    catch (RunStatsException e) {
-      e.printStackTrace();
-      return JSONUtils.SimpleJSONError("Cannot get stats for run: " + e.getMessage());
+    else {
+      return JSONUtils.SimpleJSONError("Run stats manager is not set. No stats available.");
     }
   }
 
   public JSONObject getPartitionStats(HttpSession session, JSONObject json) {
-    Long runId = json.getLong("runId");
-    Integer partitionNumber = json.getInt("partitionNumber");
-    try {
-      Run run = requestManager.getRunById(runId);
-      return runStatsManager.getSummaryStatsForLane(run, partitionNumber);
+    if (runStatsManager != null) {
+      Long runId = json.getLong("runId");
+      Integer partitionNumber = json.getInt("partitionNumber");
+      try {
+        Run run = requestManager.getRunById(runId);
+        return runStatsManager.getSummaryStatsForLane(run, partitionNumber);
+      }
+      catch (IOException e) {
+        e.printStackTrace();
+        return JSONUtils.SimpleJSONError("Cannot retrieve run: " + e.getMessage());
+      }
+      catch (RunStatsException e) {
+        e.printStackTrace();
+        return JSONUtils.SimpleJSONError("Cannot get stats for lane: " + e.getMessage());
+      }
     }
-    catch (IOException e) {
-      e.printStackTrace();
-      return JSONUtils.SimpleJSONError("Cannot retrieve run: " + e.getMessage());
-    }
-    catch (RunStatsException e) {
-      e.printStackTrace();
-      return JSONUtils.SimpleJSONError("Cannot get stats for lane: " + e.getMessage());
+    else {
+      return JSONUtils.SimpleJSONError("Run stats manager is not set. No stats available.");
     }
   }
 }

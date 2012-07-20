@@ -54,6 +54,8 @@ import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.core.store.RunQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
 import uk.ac.bbsrc.tgac.miso.runstats.client.manager.RunStatsManager;
+import uk.ac.bbsrc.tgac.miso.spring.ajax.StatsControllerHelperService;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.EditRunController;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
@@ -220,13 +222,9 @@ public class MisoAppListener implements ServletContextListener {
         context.getBeanFactory().registerSingleton("runStatsManager", rsm);
       }
       catch (NamingException e) {
+        log.error("Cannot initiate statsdb connection: " + e.getMessage());
         e.printStackTrace();
       }
-    }
-    else {
-      JdbcTemplate template = new JdbcTemplate();
-      RunStatsManager rsm = new RunStatsManager(template);
-      context.getBeanFactory().registerSingleton("runStatsManager", rsm);
     }
   }
 
