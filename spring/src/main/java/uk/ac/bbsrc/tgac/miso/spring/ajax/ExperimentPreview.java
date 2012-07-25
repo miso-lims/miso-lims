@@ -30,6 +30,7 @@ import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -74,11 +75,13 @@ public class ExperimentPreview {
 
       StringBuilder sb = new StringBuilder();
       if (e.getPool() != null) {
+        for (Dilution dil : e.getPool().getDilutions()) {
+          Sample s = dil.getLibrary().getSample();
+          sb.append("<li><a href='/miso/sample/").append(s.getSampleId()).append("'>").append(s.getName()).append("</a></li>");
+        }
+
+        /*
         if (e.getPlatform().getPlatformType().equals(PlatformType.ILLUMINA)) {
-          for (Object dil : e.getPool().getDilutions()) {
-            Sample s = ((LibraryDilution) dil).getLibrary().getSample();
-            sb.append("<li><a href='/miso/sample/").append(s.getSampleId()).append("'>").append(s.getName()).append("</a></li>");
-          }
         }
         else {
           for (Object dil : e.getPool().getDilutions()) {
@@ -86,6 +89,7 @@ public class ExperimentPreview {
             sb.append("<li><a href='/miso/sample/").append(s.getSampleId()).append("'>").append(s.getName()).append("</a></li>");
           }
         }
+        */
       }
 
       StringBuilder b = new StringBuilder();

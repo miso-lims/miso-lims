@@ -233,21 +233,6 @@
     </td>
 </tr>
 <tr>
-  <%--
-  <td>Platform - Library Type:</td>
-  <td>
-      <form:select id="platformNames" path="platformName" items="${platformNames}"
-                   onchange="changePlatformName(this);"/>
-      <form:select id="libraryTypes" path="libraryType"/>
-  </td>
-  <c:if test="${empty library.libraryId}">
-    <script type="text/javascript">
-        jQuery(document).ready(function() {
-            changePlatformName(jQuery("#platformNames"));
-        });
-    </script>
-  </c:if>
-  --%>
     <c:choose>
         <c:when test="${empty library.libraryId or empty library.libraryType}">
             <td>Platform - Library Type:</td>
@@ -269,12 +254,6 @@
     </c:choose>
 </tr>
 <tr>
-  <%--
-  <td>Library Selection Type:</td>
-  <td><form:select id="librarySelectionTypes" path="librarySelectionType" items="${librarySelectionTypes}"
-                   itemLabel="name" itemValue="librarySelectionTypeId"/>
-  </td>
-  --%>
     <c:choose>
         <c:when test="${empty library.libraryId or empty library.librarySelectionType}">
             <td>Library Selection Type:</td>
@@ -290,14 +269,6 @@
     </c:choose>
 </tr>
 <tr>
-  <%--
-  <td>Library Strategy Type:</td>
-  <td>
-      <form:select id="libraryStrategyTypes" path="libraryStrategyType" items="${libraryStrategyTypes}"
-                   itemLabel="name" itemValue="libraryStrategyTypeId"/>
-  </td>
-  --%>
-
     <c:choose>
         <c:when test="${empty library.libraryId or empty library.libraryStrategyType}">
             <td>Library Strategy Type:</td>
@@ -314,16 +285,6 @@
 
 </tr>
 <tr>
-  <%--
-  <td>Tag Barcode:</td>
-  <td>
-      <form:select id="tagBarcodes" path="tagBarcode">
-        <form:option value="" label="No Barcode"/>
-        <form:options items="${availableTagBarcodes}" itemLabel="name" itemValue="tagBarcodeId" />
-      </form:select>
-  </td>
-  --%>
-
     <c:choose>
         <c:when test="${empty library.libraryId or empty library.tagBarcode}">
             <td>Tag Barcode:</td>
@@ -389,7 +350,6 @@
                 </div>
             </li>
         </ul>
-        <%-- <div style="clear:both"></div> --%>
         <c:if test="${fn:length(library.notes) > 0}">
         <div class="note" style="clear:both">
         <c:forEach items="${library.notes}" var="note" varStatus="n">
@@ -411,12 +371,6 @@
     <div id="qcsTotalCount">
     </div>
 </h1>
-<%--
-<a href='javascript:void(0);' class="add"
-   onclick="insertLibraryQCRow(${library.libraryId}
-    <sec:authorize access="hasRole('ROLE_ADMIN')">, true</sec:authorize>
-   ); return false;">Add Library QC</a><br/>
---%>
 <ul class="sddm">
     <li><a
             onmouseover="mopen('qcmenu')"
@@ -694,7 +648,6 @@
             </c:if>
             </tbody>
         </table>
-            <%-- <input type='hidden' id='dilutionId' name='dilutionId' value='${empcr.libraryDilution.dilutionId}'/> --%>
     </form>
     <script type="text/javascript">
         jQuery(document).ready(function() {
@@ -740,11 +693,7 @@
                             <%--<td>${dil.locationBarcode}</td>--%>
                         <td>${dil.concentration} ${emPCRDilutionUnits}</td>
                         <td>
-                          <%--
-                            <a href="<c:url value='/miso/pool/${fn:toLowerCase(library.platformName)}/new/dilution/${dil.dilutionId}'/>">Construct
-                                new Pool using this dilution...</a></td>
-                                --%>
-                            <a href="<c:url value="/miso/poolwizard/new/${library.sample.project.projectId}"/>">Construct New Pool</a>
+                        <a href="<c:url value="/miso/poolwizard/new/${library.sample.project.projectId}"/>">Construct New Pool</a>
                     </tr>
                 </c:forEach>
             </c:if>

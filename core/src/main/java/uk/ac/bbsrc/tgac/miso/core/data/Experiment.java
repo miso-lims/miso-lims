@@ -203,7 +203,7 @@ public interface Experiment extends SecurableByProfile, Submittable<Document>, C
    *
    * @return Pool pool.
    */
-  public Pool getPool();
+  public Pool<? extends Poolable> getPool();
 
   /**
    * Sets the kits of this Experiment object.

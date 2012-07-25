@@ -135,11 +135,11 @@ public class DashboardHelperService {
   }
 
   public JSONObject searchProject(HttpSession session, JSONObject json) {
-    String searchStr = (String) json.get("str");
+    String searchStr = json.getString("str");
     try {
-      List<Project> projects = new ArrayList<Project>();
+      List<Project> projects;
       StringBuilder b = new StringBuilder();
-      if (searchStr != null && !searchStr.equals("")) {
+      if (!"".equals(searchStr)) {
         projects = new ArrayList<Project>(requestManager.listAllProjectsBySearch(searchStr));
       }
       else {
@@ -168,11 +168,11 @@ public class DashboardHelperService {
   }
 
   public JSONObject searchStudy(HttpSession session, JSONObject json) {
-    String searchStr = (String) json.get("str");
+    String searchStr = json.getString("str");
     try {
-      List<Study> studies = new ArrayList<Study>();
+      List<Study> studies;
       StringBuilder b = new StringBuilder();
-      if (searchStr != null && !searchStr.equals("")) {
+      if (!"".equals(searchStr)) {
         studies = new ArrayList<Study>(requestManager.listAllStudiesBySearch(searchStr));
       }
       else {
@@ -200,11 +200,11 @@ public class DashboardHelperService {
   }
 
   public JSONObject searchExperiment(HttpSession session, JSONObject json) {
-    String searchStr = (String) json.get("str");
+    String searchStr = json.getString("str");
     try {
-      List<Experiment> experiments = new ArrayList<Experiment>();
+      List<Experiment> experiments;
       StringBuilder b = new StringBuilder();
-      if (searchStr != null && !searchStr.equals("")) {
+      if (!"".equals(searchStr)) {
         experiments = new ArrayList<Experiment>(requestManager.listAllExperimentsBySearch(searchStr));
       }
       else {
@@ -232,11 +232,11 @@ public class DashboardHelperService {
   }
 
   public JSONObject searchRun(HttpSession session, JSONObject json) {
-    String searchStr = (String) json.get("str");
+    String searchStr = json.getString("str");
     try {
-      List<Run> runs = new ArrayList<Run>();
+      List<Run> runs;
       StringBuilder b = new StringBuilder();
-      if (searchStr != null && !searchStr.equals("")) {
+      if (!"".equals(searchStr)) {
         runs = new ArrayList<Run>(requestManager.listAllRunsBySearch(searchStr));
       }
       else {
@@ -264,11 +264,11 @@ public class DashboardHelperService {
   }
 
   public JSONObject searchLibrary(HttpSession session, JSONObject json) {
-    String searchStr = (String) json.get("str");
+    String searchStr = json.getString("str");
     try {
-      List<Library> libraries = new ArrayList<Library>();
+      List<Library> libraries;
       StringBuilder b = new StringBuilder();
-      if (searchStr != null && !searchStr.equals("")) {
+      if (!"".equals(searchStr)) {
         libraries = new ArrayList<Library>(requestManager.listAllLibrariesBySearch(searchStr));
       }
       else {
@@ -296,11 +296,11 @@ public class DashboardHelperService {
   }
 
   public JSONObject searchSample(HttpSession session, JSONObject json) {
-    String searchStr = (String) json.get("str");
+    String searchStr = json.getString("str");
     try {
-      List<Sample> samples = new ArrayList<Sample>();
+      List<Sample> samples;
       StringBuilder b = new StringBuilder();
-      if (searchStr != null && !searchStr.equals("")) {
+      if (!"".equals(searchStr)) {
         samples = new ArrayList<Sample>(requestManager.listAllSamplesBySearch(searchStr));
       }
       else {

@@ -160,7 +160,7 @@ public abstract class AbstractDilution implements Dilution, Comparable {
       return false;
     if (obj == this)
       return true;
-    if (!(obj instanceof TagBarcode))
+    if (!(obj instanceof Dilution))
       return false;
     Dilution them = (Dilution) obj;
     // If not saved, then compare resolved actual objects. Otherwise
