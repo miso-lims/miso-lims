@@ -37,7 +37,8 @@
             <h1><c:choose><c:when
                     test="${not empty pool.poolId}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose>
                 Solid Pool
-                <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
+                <button type="submit" class="fg-button ui-state-default ui-corner-all">Save
+                </button>
             </h1>
             <div class="sectionDivider" onclick="toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
                 <div id="note_arrowclick" class="toggleLeft"></div>
@@ -172,13 +173,19 @@
                     <c:choose>
                       <c:when test="${fn:length(pool.dilutions) > 1}">
                         <c:choose>
-                          <c:when test="${not empty dil.library.tagBarcode}">
-                            <b>Barcode:</b> ${dil.library.tagBarcode.sequence} (${dil.library.tagBarcode.name})
-                            </span>
-                            <span class="counter">
-                              <img src="<c:url value='/styles/images/status/green.png'/>" border='0'>
-                            </span>
-                          </c:when>
+                            <c:when test="${not empty dil.library.tagBarcodes}">
+                              <b>Barcodes:</b></br>
+                              <c:forEach items="${dil.library.tagBarcodes}" varStatus="status" var="barcodemap">
+                                ${status.count}: ${barcodemap.value.name} (${barcodemap.value.sequence})
+                                <c:if test="${status.count lt fn:length(dil.library.tagBarcodes)}">
+                                <br/>
+                                </c:if>
+                              </c:forEach>
+                              </span>
+                              <span class="counter">
+                                <img src="<c:url value='/styles/images/status/green.png'/>" border='0'>
+                              </span>
+                            </c:when>
                           <c:otherwise>
                             <b>Barcode:</b> <a href="<c:url value="/miso/library/${dil.library.libraryId}"/>">Choose tag barcode</a>
                             </span>
@@ -205,8 +212,9 @@
             <tr>
                 <td width="30%" style="vertical-align:top">
                     <label for="ldiBarcodes"><b>Search dilution:</b></label><br/>
-                    <input type="text" id='dilinput' name="ldiInput" value="" onKeyup="timedFunc(poolSearchEmPcrDilution(this,'SOLID'),200);"/>
-                    <div id='libdilresult'></div>
+                    <%-- <input type="text" id='dilinput' name="ldiInput" value="" onKeyup="timedFunc(poolSearchEmPcrDilution(this,'SOLID'),200);"/> --%>
+                    <input type="text" id='searchDilution' name="searchDilution"/>
+                    <div id='searchDilutionResult'></div>
                 </td>
                 <td width="30%" style="vertical-align:top">
                     <label for="ldiBarcodes"><b>Select dilutions by barcode(s):</b></label><br/>
@@ -238,6 +246,7 @@
 
 <script type="text/javascript">
     addMaxDatePicker("creationDate", 0);
+    typewatchFunc(jQuery('#searchDilution'), function(){poolSearchEmPcrDilution(jQuery('#searchDilution'), 'SOLID')}, 300, 2);
 </script>
 
 <%@ include file="adminsub.jsp" %>

@@ -430,22 +430,24 @@ public class PoolControllerHelperService {
       if (searchStr.length() > 1) {
         String str = searchStr.toLowerCase();
         StringBuilder b = new StringBuilder();
-        List<LibraryDilution> dilutions = new ArrayList<LibraryDilution>(requestManager.listAllLibraryDilutionsByPlatform(PlatformType.valueOf(platformType)));
+        List<LibraryDilution> dilutions = new ArrayList<LibraryDilution>(requestManager.listAllLibraryDilutionsBySearch(searchStr, PlatformType.valueOf(platformType)));
         int numMatches = 0;
         for (LibraryDilution d : dilutions) {
+          /*
           String dilName = d.getName() == null ? null : d.getName();
           if (dilName != null &&
               (dilName.toLowerCase().equals(str) || dilName.toLowerCase().contains(str)) ||
               (d.getLibrary().getAlias().toLowerCase().contains(str) || d.getLibrary().getName().toLowerCase().contains(str)) ||
               (d.getLibrary().getSample().getAlias().toLowerCase().contains(str) || d.getLibrary().getSample().getName().toLowerCase().contains(str))) {
+          */
             b.append("<div onmouseover=\"this.className='autocompleteboxhighlight'\" onmouseout=\"this.className='autocompletebox'\" class=\"autocompletebox\"" +
-                     " onclick=\"poolSearchSelectLibraryDilution('" + d.getDilutionId() + "', '" + d.getName() + "')\">" +
-                     "<b>Dilution: " + dilName + "</b><br/>" +
+                     " onclick=\"poolSearchSelectDilution('" + d.getDilutionId() + "', '" + d.getName() + "')\">" +
+                     "<b>Dilution: " + d.getName() + "</b><br/>" +
                      "<b>Library: " + d.getLibrary().getAlias() + "</b><br/>" +
                      "<b>Sample: " + d.getLibrary().getSample().getAlias() + "</b><br/>" +
                      "</div>");
             numMatches++;
-          }
+          //}
         }
         if (numMatches == 0) {
           return JSONUtils.JSONObjectResponse("html", "No matches");
@@ -471,22 +473,24 @@ public class PoolControllerHelperService {
       if (searchStr.length() > 1) {
         String str = searchStr.toLowerCase();
         StringBuilder b = new StringBuilder();
-        List<emPCRDilution> dilutions = new ArrayList<emPCRDilution>(requestManager.listAllEmPcrDilutionsByPlatform(PlatformType.valueOf(platformType)));
+        List<emPCRDilution> dilutions = new ArrayList<emPCRDilution>(requestManager.listAllEmPcrDilutionsBySearch(searchStr, PlatformType.valueOf(platformType)));
         int numMatches = 0;
         for (emPCRDilution d : dilutions) {
+          /*
           String dilName = d.getName() == null ? null : d.getName();
           if (dilName != null &&
               (dilName.toLowerCase().equals(str) || dilName.toLowerCase().contains(str)) ||
               (d.getLibrary().getAlias().toLowerCase().contains(str) || d.getLibrary().getName().toLowerCase().contains(str)) ||
               (d.getLibrary().getSample().getAlias().toLowerCase().contains(str) || d.getLibrary().getSample().getName().toLowerCase().contains(str))) {
+          */
             b.append("<div onmouseover=\"this.className='autocompleteboxhighlight'\" onmouseout=\"this.className='autocompletebox'\" class=\"autocompletebox\"" +
-                     " onclick=\"poolSearchSelectEmPcrDilution('" + d.getDilutionId() + "', '" + d.getName() + "')\">" +
-                     "<b>Dilution: " + dilName + "</b><br/>" +
+                     " onclick=\"poolSearchSelectDilution('" + d.getDilutionId() + "', '" + d.getName() + "')\">" +
+                     "<b>Dilution: " + d.getName() + "</b><br/>" +
                      "<b>Library: " + d.getLibrary().getAlias() + "</b><br/>" +
                      "<b>Sample: " + d.getLibrary().getSample().getAlias() + "</b><br/>" +
                      "</div>");
             numMatches++;
-          }
+          //}
         }
         if (numMatches == 0) {
           return JSONUtils.JSONObjectResponse("html", "No matches");

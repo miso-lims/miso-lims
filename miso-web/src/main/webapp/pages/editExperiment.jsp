@@ -169,80 +169,6 @@
     <li><a href="#tab-2"><span>Consumables</span></a></li>
 </ul>
 <div id="tab-1">
-        <%--<c:choose>--%>
-        <%--<c:when test="${empty experiment.pool and empty availablePools}">--%>
-        <%--No ${experiment.platform.platformType.key} pools available. Would you like to--%>
-        <%--<c:choose>--%>
-        <%--<c:when test="${not empty experiment}">--%>
-        <%--<a href='<c:url value="/miso/pool/${fn:toLowerCase(experiment.platform.platformType.key)}/new/${experiment.experimentId}"/>'>create--%>
-        <%--one</a>?--%>
-        <%--</c:when>--%>
-        <%--<c:otherwise>--%>
-        <%--<a href='<c:url value="/miso/pool/${fn:toLowerCase(experiment.platform.platformType.key)}/new"/>'>create--%>
-        <%--one</a>?--%>
-        <%--</c:otherwise>--%>
-        <%--</c:choose>--%>
-        <%--</c:when>--%>
-        <%--<c:otherwise>--%>
-        <%--<table class="in">--%>
-        <%--<tr>--%>
-        <%--<td>Available Pools:<br/></td>--%>
-        <%--<td>--%>
-        <%--<div class="draggable_box">--%>
-        <%--<ul id="list_1" class="poolList elementListDroppable">--%>
-        <%--<c:forEach items="${availablePools}" var="pool">--%>
-        <%--<li id="pool_${pool.poolId}" poolId="${pool.poolId}" poolName="${pool.name}"--%>
-        <%--style="cursor: pointer;"--%>
-        <%--class="draggable">${pool.name}--%>
-        <%--<input type="hidden" id="poolId${pool.poolId}" value="${pool.poolId}"/>--%>
-
-        <%--<div class="toggleRight"--%>
-        <%--onclick="toggleRightInfo(this, 'pooldiv_${pool.poolId}');"></div>--%>
-        <%--<div id="pooldiv_${pool.poolId}" style="display:none;">--%>
-        <%--<c:forEach items="${pool.dilutions}" var="dil">--%>
-        <%--${dil.name} (${dil.identificationBarcode})<br/>--%>
-        <%--</c:forEach>--%>
-        <%--</div>--%>
-        <%--</li>--%>
-        <%--</c:forEach>--%>
-        <%--</ul>--%>
-        <%--</div>--%>
-        <%--</td>--%>
-        <%--</tr>--%>
-        <%--<tr>--%>
-        <%--<td>Selected Pool:<br/></td>--%>
-        <%--<td>--%>
-        <%--<div class="singledropbox">--%>
-        <%--<ul id="list_2" class="droppable" bind="pool">--%>
-        <%--<c:if test="${not empty experiment.pool}">--%>
-        <%--<li id="pool_${experiment.pool.poolId}" poolId="${experiment.pool.poolId}"--%>
-        <%--poolName="${experiment.pool.name}"--%>
-        <%--style="cursor: pointer;"--%>
-        <%--class="draggable">${experiment.pool.name}--%>
-
-        <%--<input type="hidden" id="pool${experiment.pool.poolId}"--%>
-        <%--value="${experiment.pool.poolId}"--%>
-        <%--name="pool"/>--%>
-
-        <%--<div class="toggleRight"--%>
-        <%--onclick="toggleRightInfo(this, 'pooldiv_${experiment.pool.poolId}');"></div>--%>
-        <%--<div id="pooldiv_${experiment.pool.poolId}" style="display:none;">--%>
-        <%--<c:forEach items="${experiment.pool.dilutions}" var="dil">--%>
-        <%--${dil.name} (${dil.identificationBarcode})<br/>--%>
-        <%--</c:forEach>--%>
-        <%--</div>--%>
-        <%--</li>--%>
-        <%--</c:if>--%>
-
-        <%--</ul>--%>
-        <%--<input type="hidden" value="on" name="_pool"/>--%>
-        <%--</div>--%>
-        <%--</td>--%>
-        <%--</tr>--%>
-        <%--</table>--%>
-        <%--</c:otherwise>--%>
-        <%--</c:choose>--%>
-
       <c:choose>
         <c:when test="${empty experiment.pool}">
           <c:choose>
@@ -455,21 +381,6 @@
 
 <script type="text/javascript">
     addMaxDatePicker("creationDate", 0);
-
-    var processLists = function() {
-        // remove available li inputs
-        jQuery('#list_1').find('li').find('input').each(function() {
-            var jQueryitem = jQuery(this);
-            jQueryitem.remove();
-        });
-
-        //add selected li inputs
-        jQuery('#list_2').find('li').each(function() {
-            var jQueryitem = jQuery(this);
-            var h = jQueryitem.attr('poolName') + "<input type='hidden' id='pool" + jQueryitem.attr('poolId') + "' value='" + jQueryitem.attr('poolId') + "' name='pool'/>";
-            jQueryitem.html(h);
-        });
-    }
 
     jQuery(function() {
         jQuery("#poolList").sortable({

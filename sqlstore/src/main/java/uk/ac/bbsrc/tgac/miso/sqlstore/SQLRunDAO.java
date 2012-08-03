@@ -267,18 +267,20 @@ public class SQLRunDAO implements RunStore {
 
   private void purgeListCache(Run run, boolean replace) {
     Cache cache = cacheManager.getCache("runListCache");
-    if (cache.getKeys().size() > 0) {
+    if (cache != null && cache.getKeys().size() > 0) {
       Object cachekey = cache.getKeys().get(0);
-      List<Run> cachedruns = (List<Run>)cache.get(cachekey).getValue();
-      if (cachedruns.remove(run)) {
-        if (replace) {
+      if (cachekey != null) {
+        List<Run> cachedruns = (List<Run>)cache.get(cachekey).getValue();
+        if (cachedruns.remove(run)) {
+          if (replace) {
+            cachedruns.add(run);
+          }
+        }
+        else {
           cachedruns.add(run);
         }
+        cache.put(new Element(cachekey, cachedruns));
       }
-      else {
-        cachedruns.add(run);
-      }
-      cache.put(new Element(cachekey, cachedruns));
     }
   }
 

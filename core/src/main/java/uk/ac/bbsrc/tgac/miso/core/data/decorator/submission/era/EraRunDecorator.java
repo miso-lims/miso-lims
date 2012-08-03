@@ -29,9 +29,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.decorator.AbstractSubmittableDecorator;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
+import uk.ac.bbsrc.tgac.miso.core.service.submission.FilePathGenerator;
+import uk.ac.bbsrc.tgac.miso.core.service.submission.TGACIlluminaFilepathGenerator;
 import uk.ac.bbsrc.tgac.miso.core.util.TgacSubmissionConstants;
 
 import java.text.DateFormat;
@@ -98,21 +98,30 @@ public class EraRunDecorator extends AbstractSubmittableDecorator<Document> {
         //dataBlock.setAttribute("region", "0"); // tile number
 
         Element files = submission.createElementNS(null, "FILES");
-          Collection<? extends Dilution> dilutions = pool.getDilutions();
-          for(Dilution libraryDilution : dilutions){
-              String fileName=libraryDilution.getLibrary().getName()+"_"+
-                      libraryDilution.getLibrary().getTagBarcode().getSequence()+
-                      "_L00"+p.getPartitionNumber()+"*.fastq.gz";
-              Element file = submission.createElementNS(null,"FILE");
-              file.setAttribute("filename", fileName);
-              file.setAttribute("filetype", "fastq");
-              //file.setAttribute("checksum_method", "MD5");
-              //file.setAttribute("checksum", "not implemented yet");
-              Element readLabel = submission.createElementNS(null, "READ_LABEL");
-              file.appendChild(readLabel);
-              files.appendChild(file);
-          }
+        Collection<? extends Dilution> dilutions = pool.getDilutions();
+        FilePathGenerator fpg = new TGACIlluminaFilepathGenerator();
+        for(Dilution libraryDilution : dilutions){
 
+            //replace with FPG call?
+           // String fileName=libraryDilution.getLibrary().getName()+"_"+
+           //         libraryDilution.getLibrary().getTagBarcode().getSequence()+
+           //         "_L00"+p.getPartitionNumber()+"*.fastq.gz";
+
+          try{
+            String fileName = fpg.generateFilePath(p,libraryDilution).getName();
+            Element file = submission.createElementNS(null,"FILE");
+            file.setAttribute("filename", fileName);
+            file.setAttribute("filetype", "fastq");
+            //file.setAttribute("checksum_method", "MD5");
+            //file.setAttribute("checksum", "not implemented yet");
+            Element readLabel = submission.createElementNS(null, "READ_LABEL");
+            file.appendChild(readLabel);
+            files.appendChild(file);
+          }
+          catch (Exception e) {
+            e.printStackTrace();
+          }
+        }
         dataBlock.appendChild(files);
 
         run.appendChild(dataBlock);

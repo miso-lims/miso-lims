@@ -40,9 +40,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Transient;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
+import java.util.*;
 
 /**
  * Skeleton implementation of a Library
@@ -65,6 +63,8 @@ public abstract class AbstractLibrary implements Library {
   private String identificationBarcode;
   private String locationBarcode;
   private TagBarcode tagBarcode;
+
+  private HashMap<Integer, TagBarcode> tagBarcodes = new HashMap<Integer, TagBarcode>();
 
   private Boolean paired;
 
@@ -154,12 +154,22 @@ public abstract class AbstractLibrary implements Library {
     return getAlias();
   }
 
+  @Deprecated
   public TagBarcode getTagBarcode() {
     return tagBarcode;
   }
 
+  @Deprecated
   public void setTagBarcode(TagBarcode tagBarcode) {
     this.tagBarcode = tagBarcode;
+  }
+
+  public HashMap<Integer, TagBarcode> getTagBarcodes() {
+    return tagBarcodes;
+  }
+
+  public void setTagBarcodes(HashMap<Integer, TagBarcode> tagBarcodes) {
+    this.tagBarcodes = tagBarcodes;
   }
 
   public Boolean getPaired() {
@@ -186,12 +196,7 @@ public abstract class AbstractLibrary implements Library {
 
   public void addDilution(LibraryDilution libraryDilution) throws MalformedDilutionException {
     this.libraryDilutions.add(libraryDilution);
-//    try {
-      libraryDilution.setLibrary(this);
-//    }
-//    catch (MalformedLibraryException e) {
-//      e.printStackTrace();
-//    }
+    libraryDilution.setLibrary(this);
   }
 
   public Collection<LibraryDilution> getLibraryDilutions() {

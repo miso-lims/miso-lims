@@ -133,11 +133,16 @@ public class SQLSecurityProfileDAO implements Store<SecurityProfile> {
       MapSqlParameterSource delparams = new MapSqlParameterSource();
       delparams.addValue("profileId", securityProfile.getProfileId());
       NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-      //log.info("Deleting SecurityProfile " + securityProfile.getProfileId());
       namedTemplate.update(PROFILE_USERS_GROUPS_DELETE, delparams);
 
-      params.addValue("profileId", securityProfile.getProfileId());
-      insert.execute(params);
+      List<SecurityProfile> results = template.query(PROFILE_SELECT_BY_ID, new Object[]{securityProfile.getProfileId()}, new SecurityProfileMapper());
+      if (results.size() > 0) {
+        log.error("SecurityProfile deletion failed!");
+      }
+      else {
+        params.addValue("profileId", securityProfile.getProfileId());
+        insert.execute(params);
+      }
     }
     else {
       insert.usingGeneratedKeyColumns("profileId");

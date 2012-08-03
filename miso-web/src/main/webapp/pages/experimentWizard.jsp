@@ -74,21 +74,6 @@
 <script type="text/javascript">
     addMaxDatePicker("creationDate", 0);
 
-    var processLists = function() {
-        // remove available li inputs
-        jQuery('#list_1').find('li').find('input').each(function() {
-            var jQueryitem = jQuery(this);
-            jQueryitem.remove();
-        });
-
-        //add selected li inputs
-        jQuery('#list_2').find('li').each(function() {
-            var jQueryitem = jQuery(this);
-            var h = jQueryitem.attr('poolName') + "<input type='hidden' id='pool" + jQueryitem.attr('poolId') + "' value='" + jQueryitem.attr('poolId') + "' name='pool'/>";
-            jQueryitem.html(h);
-        });
-    };
-
     jQuery(function() {
         jQuery("#poolList").sortable({
             revert: true

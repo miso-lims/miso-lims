@@ -35,9 +35,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedDilutionException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryQcException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
+import uk.ac.bbsrc.tgac.miso.core.service.tagbarcode.TagBarcodeStrategy;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A Library is the first step in constructing sequenceable material from an initial {@link Sample}.
@@ -246,10 +249,25 @@ public interface Library extends SecurableByProfile, Comparable, Barcodable, Loc
   public void setLibraryStrategyType(LibraryStrategyType libraryStrategyType);
 
   /**
+   * Returns the position-indexed map of TagBarcodes for this Library object.
+   *
+   * @return Map<Integer, TagBarcode> tagBarcodes
+   */
+  public HashMap<Integer, TagBarcode> getTagBarcodes();
+
+  /**
+   * Sets the position-indexed map of TagBarcodes for this Library object.
+   *
+   * @param tagBarcodes Map<Integer, TagBarcode>.
+   */
+  public void setTagBarcodes(HashMap<Integer, TagBarcode> tagBarcodes);
+
+  /**
    * Returns the TagBarcode of this Library object, if this Library is multiplexed
    *
    * @return TagBarcode tagBarcode.
    */
+  @Deprecated
   public TagBarcode getTagBarcode();
 
   /**
@@ -257,6 +275,7 @@ public interface Library extends SecurableByProfile, Comparable, Barcodable, Loc
    *
    * @param tagBarcode TagBarcode.
    */
+  @Deprecated
   public void setTagBarcode(TagBarcode tagBarcode);
 
   /**

@@ -86,4 +86,16 @@ public interface TagBarcode extends Comparable {
    * @param platformType
    */
   public void setPlatformType(PlatformType platformType);
+
+  /**
+   * Returns the strategy name to which this TagBarcode belongs.
+   * @return String strategyName
+   */
+  public String getStrategyName();
+
+  /**
+   * Sets the strategy name to which this TagBarcode belongs.
+   * @param strategyName String
+   */
+  public void setStrategyName(String strategyName);
 }

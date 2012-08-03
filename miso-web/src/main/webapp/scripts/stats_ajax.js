@@ -69,12 +69,16 @@ Stats.getPartitionStats = function(runId, partitionNumber) {
                   }
                 }
                 text += "</tbody></table>";
-                jQuery.colorbox({width:"90%",html:text});
+                jQuery("#statstable").html(text);
+                jQuery.colorbox({width:"90%",height:"100%",html:jQuery("#graphpanel").html()});
+//                        jQuery.colorbox({width:"90%",html:text});
               }
             },
             'doOnError':
             function(json) {
-              jQuery.colorbox({width:"90%",html:json.error});
+              jQuery("#statstable").html(text);
+              jQuery.colorbox({width:"90%",height:"100%",html:jQuery("#graphpanel").html()});
+//              jQuery.colorbox({width:"90%",html:json.error});
             }
           }
   );

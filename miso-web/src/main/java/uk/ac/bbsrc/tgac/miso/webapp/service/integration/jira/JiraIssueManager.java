@@ -58,27 +58,16 @@ public class JiraIssueManager implements IssueTrackerManager {
   private String oAuthConsumerSecret;
   private String oAuthSignatureMethod;
   
-  public String baseTrackerUrl;
   private String httpBasicAuthUsername;
   private String httpBasicAuthPassword;
 
+  public String baseTrackerUrl;
   private final String restApiUrl = "/rest/api/";
   public String jiraRestApiVersion = "2.0.alpha1";
 
   public final String jiraIssueSuffix = restApiUrl+jiraRestApiVersion+"/issue/";
 
   public Client client;
-
-  /*
-  public OAuthRestTemplate jiraRestTemplate;
-  public RestTemplate getJiraRestTemplate() {
-    return jiraRestTemplate;
-  }
-
-  public void setJiraRestTemplate(RestTemplate jiraRestTemplate) {
-    this.jiraRestTemplate = jiraRestTemplate;
-  }
-  */
 
   public void setOAuthConsumerKey(String oAuthConsumerKey) {
     this.oAuthConsumerKey = oAuthConsumerKey;

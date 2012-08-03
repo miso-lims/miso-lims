@@ -30,7 +30,7 @@
 --%>
 <%@ include file="../header.jsp" %>
 
-
+<script src="<c:url value='/scripts/statsdb.js'/>" type="text/javascript"></script>
 <script type="text/javascript" src="<c:url value='/scripts/run_ajax.js?ts=${timestamp.time}'/>"></script>
 <script type="text/javascript" src="<c:url value='/scripts/run_validation.js?ts=${timestamp.time}'/>"></script>
 <script type="text/javascript" src="<c:url value='/scripts/stats_ajax.js?ts=${timestamp.time}'/>"></script>
@@ -51,6 +51,17 @@
     </c:choose> Run
     <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
 </h1>
+<div style='display:none'>
+    <div id="graphpanel">
+        <div id="statresultgraph">
+            <div id="statstable"></div>
+            <div><h2>Quality Profile</h2></div>
+            <div id="statschart"></div>
+            <div id="statschartmessage"></div>
+        </div>
+    </div>
+</div>
+
 <div class="sectionDivider" onclick="toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
     <div id="note_arrowclick" class="toggleLeft"></div>
 </div>
@@ -539,8 +550,8 @@
                                     </c:choose>
                                 </td>
                                 <c:if test="${statsAvailable}">
-                                    <td><img src="<c:url value='/styles/images/chart-bar-icon.png'/>" border="0"
-                                             onclick="Stats.getPartitionStats(${run.runId}, ${partition.partitionNumber});">
+                                    <td><img id = "charttrigger"  src="<c:url value='/styles/images/chart-bar-icon.png'/>" border="0"
+                                             onclick="Stats.getPartitionStats(${run.runId}, ${partition.partitionNumber}); checkstats(${run.runId}, ${partition.partitionNumber}); ">
                                     </td>
                                 </c:if>
                             </tr>
@@ -596,6 +607,8 @@
 </div>
 
 <script type="text/javascript">
+    jQuery("#charttrigger").colorbox({width:"90%", inline:true, href:"#graphpanel"});
+
     jQuery(document).ready(function() {
         jQuery('#alias').simplyCountable({
                                              counter: '#aliascounter',
@@ -610,8 +623,6 @@
                                                    maxCount: ${maxLengths['description']},
                                                    countDirection: 'down'
                                                });
-
-
         <c:choose>
         <c:when test="${not empty run.platformType}">
         poolSearch("", '${run.platformType.key}');
@@ -625,6 +636,24 @@
         Stats.getRunStats(${run.runId});
         </c:if>
     });
+
+    function checkstats(runId, lane) {
+     jQuery('#statschart').html('');
+        Fluxion.doAjax(
+                'statsControllerHelperService',
+                'getSummaryRunstatsDiagram',
+                {'runId':runId, 'lane':lane, 'url':ajaxurl},
+                {'doOnSuccess':
+                        function(json) {
+                            readStats(json);
+                        }
+                }
+        );
+    }
+
+    function readStats(json){
+        readStatsdb(json);
+    }
 </script>
 
 <br/>

@@ -627,6 +627,16 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
+  public Collection<TagBarcode> listAllTagBarcodesByStrategyName(String strategyName) throws IOException {
+    if (libraryStore != null) {
+      return libraryStore.listTagBarcodesByStrategyName(strategyName);
+    }
+    else {
+      throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
   public Collection<LibraryDilution> listAllLibraryDilutions() throws IOException {
     if (dilutionStore != null) {
       return dilutionStore.listAllLibraryDilutions();
@@ -660,6 +670,16 @@ public class MisoRequestManager implements RequestManager {
   public Collection<LibraryDilution> listAllLibraryDilutionsByProjectId(long projectId) throws IOException {
     if (dilutionStore != null) {
       return dilutionStore.listAllLibraryDilutionsByProjectId(projectId);
+    }
+    else {
+      throw new IOException("No dilutionStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public Collection<LibraryDilution> listAllLibraryDilutionsBySearch(String query, PlatformType platformType) throws IOException {
+    if (dilutionStore != null) {
+      return dilutionStore.listAllLibraryDilutionsBySearch(query, platformType);
     }
     else {
       throw new IOException("No dilutionStore available. Check that it has been declared in the Spring config.");
@@ -750,6 +770,16 @@ public class MisoRequestManager implements RequestManager {
   public Collection<emPCRDilution> listAllEmPcrDilutionsByProjectId(long projectId) throws IOException {
     if (dilutionStore != null) {
       return dilutionStore.listAllEmPcrDilutionsByProjectId(projectId);
+    }
+    else {
+      throw new IOException("No dilutionStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public Collection<emPCRDilution> listAllEmPcrDilutionsBySearch(String query, PlatformType platformType) throws IOException {
+    if (dilutionStore != null) {
+      return dilutionStore.listAllEmPcrDilutionsBySearch(query, platformType);
     }
     else {
       throw new IOException("No dilutionStore available. Check that it has been declared in the Spring config.");

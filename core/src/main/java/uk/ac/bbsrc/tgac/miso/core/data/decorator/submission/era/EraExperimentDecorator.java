@@ -25,14 +25,13 @@ package uk.ac.bbsrc.tgac.miso.core.data.decorator.submission.era;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.Submittable;
+import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.decorator.AbstractSubmittableDecorator;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.TgacSubmissionConstants;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Decorates an Experiment so that an ERA Experiment submission XML document can be built from it
@@ -66,6 +65,9 @@ public class EraExperimentDecorator extends AbstractSubmittableDecorator<Documen
       Element studyRef = submission.createElementNS(null, "STUDY_REF");
       studyRef.setAttribute("refname", e.getStudy().getAlias());
       studyRef.setAttribute("refcenter", TgacSubmissionConstants.CENTRE_NAME.getKey());
+      if (e.getStudy().getAccession() != null && !"".equals(e.getStudy().getAccession())) {
+        studyRef.setAttribute("accession", e.getStudy().getAccession());
+      }
       experiment.appendChild(studyRef);
 
       Element design = submission.createElementNS(null, "DESIGN");
@@ -86,70 +88,39 @@ public class EraExperimentDecorator extends AbstractSubmittableDecorator<Documen
           Element pool = submission.createElementNS(null, "POOL");
           sampleDescriptor.appendChild(pool);
 
-          if (e.getPlatform().getPlatformType().equals(PlatformType.ILLUMINA)) {
-            for (Object dil : e.getPool().getDilutions()) {
-              LibraryDilution d = (LibraryDilution) dil;
-              relevantLibrary = d.getLibrary();
-              Element member = submission.createElementNS(null, "MEMBER");
-              member.setAttribute("member_name", d.getName());
-              member.setAttribute("refname", relevantLibrary.getSample().getAlias());
-              pool.appendChild(member);
-              Element readLabel = submission.createElementNS(null, "READ_LABEL");
-              member.appendChild(readLabel);
+          for (Dilution dil : e.getPool().getDilutions()) {
+            relevantLibrary = dil.getLibrary();
+            Element member = submission.createElementNS(null, "MEMBER");
+            member.setAttribute("member_name", dil.getName());
+            member.setAttribute("refname", relevantLibrary.getSample().getAlias());
+            if (relevantLibrary.getSample().getAccession() != null && !"".equals(relevantLibrary.getSample().getAccession())) {
+              sampleDescriptor.setAttribute("accession", relevantLibrary.getSample().getAccession());
             }
-          }
-          else if (e.getPlatform().getPlatformType().equals(PlatformType.LS454)) {
-            for (Object dil : e.getPool().getDilutions()) {
-              emPCRDilution d = (emPCRDilution) dil;
-              relevantLibrary = d.getEmPCR().getLibraryDilution().getLibrary();
-              Element member = submission.createElementNS(null, "MEMBER");
-              member.setAttribute("member_name", d.getName());
-              member.setAttribute("refname", relevantLibrary.getSample().getAlias());
-              pool.appendChild(member);
-              Element readLabel = submission.createElementNS(null, "READ_LABEL");
-              member.appendChild(readLabel);
-            }
-          }
-          else if (e.getPlatform().getPlatformType().equals(PlatformType.SOLID)) {
-            for (Object dil : e.getPool().getDilutions()) {
-              emPCRDilution d = (emPCRDilution) dil;
-              relevantLibrary = d.getEmPCR().getLibraryDilution().getLibrary();
-              Element member = submission.createElementNS(null, "MEMBER");
-              member.setAttribute("member_name", d.getName());
-              member.setAttribute("refname", relevantLibrary.getSample().getAlias());
-              pool.appendChild(member);
-              Element readLabel = submission.createElementNS(null, "READ_LABEL");
-              member.appendChild(readLabel);
-            }
-          }
-          else {
+            pool.appendChild(member);
 
+            Element readLabel = submission.createElementNS(null, "READ_LABEL");
+            if (!relevantLibrary.getTagBarcodes().isEmpty()) {
+              StringBuilder tsb = new StringBuilder();
+              StringBuilder vsb = new StringBuilder();
+              for (TagBarcode tb : relevantLibrary.getTagBarcodes().values()) {
+                tsb.append(tb.getSequence());
+                vsb.append(tb.getName());
+              }
+              readLabel.setAttribute("read_group_tag", tsb.toString());
+              readLabel.setTextContent(vsb.toString());
+            }
+            member.appendChild(readLabel);
           }
         }
         else {
-          if (e.getPlatform().getPlatformType().equals(PlatformType.ILLUMINA)) {
-            for (Object dil : e.getPool().getDilutions()) {
-              LibraryDilution d = (LibraryDilution) dil;
-              relevantLibrary = d.getLibrary();
-              sampleDescriptor.setAttribute("refname", relevantLibrary.getSample().getAlias());
-            }
-          }
-          else if (e.getPlatform().getPlatformType().equals(PlatformType.LS454)) {
-            for (Object dil : e.getPool().getDilutions()) {
-              emPCRDilution d = (emPCRDilution) dil;
-              relevantLibrary = d.getEmPCR().getLibraryDilution().getLibrary();
-              sampleDescriptor.setAttribute("refname", relevantLibrary.getSample().getAlias());
-            }
-          }
-          else if (e.getPlatform().getPlatformType().equals(PlatformType.SOLID)) {
-            for (Object dil : e.getPool().getDilutions()) {
-              emPCRDilution d = (emPCRDilution) dil;
-              relevantLibrary = d.getEmPCR().getLibraryDilution().getLibrary();
-              sampleDescriptor.setAttribute("refname", relevantLibrary.getSample().getAlias());
+          for (Dilution dil : e.getPool().getDilutions()) {
+            relevantLibrary = dil.getLibrary();
+            sampleDescriptor.setAttribute("refname", relevantLibrary.getSample().getAlias());
+            if (relevantLibrary.getSample().getAccession() != null && !"".equals(relevantLibrary.getSample().getAccession())) {
+              sampleDescriptor.setAttribute("accession", relevantLibrary.getSample().getAccession());
             }
           }
         }
-
       }
 
       design.appendChild(sampleDescriptor);
@@ -157,7 +128,12 @@ public class EraExperimentDecorator extends AbstractSubmittableDecorator<Documen
       Element libraryDescriptor = submission.createElementNS(null, "LIBRARY_DESCRIPTOR");
       Element libraryName = submission.createElementNS(null, "LIBRARY_NAME");
       if (relevantLibrary != null) {
-        libraryName.setTextContent(relevantLibrary.getAlias());
+        if (e.getPool().getAlias() != null && !"".equals(e.getPool().getAlias())) {
+          libraryName.setTextContent(e.getPool().getAlias());
+        }
+        else {
+          libraryName.setTextContent(e.getPool().getName());
+        }
       }
       libraryDescriptor.appendChild(libraryName);
 
@@ -176,7 +152,6 @@ public class EraExperimentDecorator extends AbstractSubmittableDecorator<Documen
       Element librarySelection = submission.createElementNS(null, "LIBRARY_SELECTION");
       if (relevantLibrary != null) {
         librarySelection.setTextContent(relevantLibrary.getLibrarySelectionType().getName());
-        //librarySelection.setTextContent("unspecified");
       }
       libraryDescriptor.appendChild(librarySelection);
 
@@ -185,7 +160,17 @@ public class EraExperimentDecorator extends AbstractSubmittableDecorator<Documen
       if (relevantLibrary != null) {
         if (relevantLibrary.getPaired()) {
           layout = submission.createElementNS(null, "PAIRED");
-          layout.setAttribute("NOMINAL_LENGTH", "0");
+          if (!relevantLibrary.getLibraryQCs().isEmpty()) {
+            List<LibraryQC> qcs = new ArrayList<LibraryQC>(relevantLibrary.getLibraryQCs());
+            int insert = 0;
+            for (LibraryQC qc : qcs) {
+              insert += qc.getInsertSize();
+            }
+            layout.setAttribute("NOMINAL_LENGTH", String.valueOf(insert/qcs.size()));
+          }
+          else {
+            layout.setAttribute("NOMINAL_LENGTH", "0");
+          }
         }
         else {
           layout = submission.createElementNS(null, "SINGLE");
@@ -212,7 +197,10 @@ public class EraExperimentDecorator extends AbstractSubmittableDecorator<Documen
       libraryDescriptor.appendChild(poolingStrategy);
 
       design.appendChild(libraryDescriptor);
+
        // commenting out spot_descriptor to see what happens...
+      // SPOT DESCRIPTOR WAS MADE OPTIONAL IN 1.3
+      /*
       Element spotDescriptor = submission.createElementNS(null, "SPOT_DESCRIPTOR");
       Element spotDecodeSpec = submission.createElementNS(null, "SPOT_DECODE_SPEC");
 
@@ -429,7 +417,7 @@ public class EraExperimentDecorator extends AbstractSubmittableDecorator<Documen
 
 
       design.appendChild(spotDescriptor);
-
+      */
       if (e.getPlatform() != null) {
         Element platform = submission.createElementNS(null, "PLATFORM");
 
@@ -572,23 +560,14 @@ public class EraExperimentDecorator extends AbstractSubmittableDecorator<Documen
 */
       experiment.appendChild(processing);
 
-      /*
-      if (submission.getElementsByTagName("EXPERIMENT_SET").item(0) != null) {
+      if(submission.getElementsByTagName("EXPERIMENT_SET").item(0) != null) {
         submission.getElementsByTagName("EXPERIMENT_SET").item(0).appendChild(experiment);
       }
       else {
-        submission.appendChild(experiment);
+        Element expSet = submission.createElementNS(null, "EXPERIMENT_SET");
+        submission.appendChild(expSet);
+        expSet.appendChild(experiment);
       }
-      */
-        if(submission.getElementsByTagName("EXPERIMENT_SET").item(0)!=null){
-           submission.getElementsByTagName("EXPERIMENT_SET").item(0).appendChild(experiment);
-
-        }
-        else{
-            Element expSet = submission.createElementNS(null, "EXPERIMENT_SET");
-            submission.appendChild(expSet);
-            expSet.appendChild(experiment);
-        }
     }
   }
 }

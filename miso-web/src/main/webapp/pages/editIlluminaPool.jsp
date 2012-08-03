@@ -38,7 +38,8 @@
             <h1><c:choose><c:when
                     test="${not empty pool.poolId}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose>
                 Illumina Pool
-                <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
+                <button type="submit" class="fg-button ui-state-default ui-corner-all">Save
+                </button>
             </h1>
             <div class="sectionDivider" onclick="toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
                 <div id="note_arrowclick" class="toggleLeft"></div>
@@ -173,8 +174,14 @@
                       <c:choose>
                         <c:when test="${fn:length(pool.dilutions) > 1}">
                           <c:choose>
-                            <c:when test="${not empty dil.library.tagBarcode}">
-                              <b>Barcode:</b> ${dil.library.tagBarcode.sequence} (${dil.library.tagBarcode.name})
+                            <c:when test="${not empty dil.library.tagBarcodes}">
+                              <b>Barcodes:</b></br>
+                              <c:forEach items="${dil.library.tagBarcodes}" varStatus="status" var="barcodemap">
+                                ${status.count}: ${barcodemap.value.name} (${barcodemap.value.sequence})
+                                <c:if test="${status.count lt fn:length(dil.library.tagBarcodes)}">
+                                <br/>
+                                </c:if>
+                              </c:forEach>
                               </span>
                               <span class="counter">
                                 <img src="<c:url value='/styles/images/status/green.png'/>" border='0'>
@@ -207,9 +214,10 @@
         <table class="in">
             <tr>
                 <td width="30%" style="vertical-align:top">
-                    <label for="ldiInput"><b>Search dilution:</b></label><br/>
-                    <input type="text" id='ldiInput' name="ldiInput" value="" onKeyup="timedFunc(poolSearchLibraryDilution(this, 'ILLUMINA'),200);"/>
-                    <div id='libdilresult'></div>
+                    <label for="searchDilution"><b>Search dilution:</b></label><br/>
+                    <%-- <input type="text" id='ldiInput' name="ldiInput" value="" onKeyup="timedFunc(poolSearchLibraryDilution(this, 'ILLUMINA'),200);"/> --%>
+                    <input type="text" id='searchDilution' name="searchDilution"/>
+                    <div id='searchDilutionResult'></div>
                 </td>
                 <td width="30%" style="vertical-align:top">
                     <label for="ldiBarcodes"><b>Select dilutions by barcode(s):</b></label><br/>
@@ -240,23 +248,8 @@
 </div>
 
 <script type="text/javascript">
-    addMaxDatePicker("creationDate", 0);
-
-    var updateDroppables = function(j) {
-        jQuery("#list_2").droppable({
-            accept: '.ui-draggable',
-            activeClass: 'ui-state-hover',
-            hoverClass: 'ui-state-active',
-            tolerance: 'pointer',
-            drop: function(event, ui) {
-                if (jQuery(this).children().length == 0) {
-                    jQuery(ui.draggable).find('input').attr("name", jQuery(this).attr("bind"));
-                    jQuery(ui.draggable).appendTo(jQuery(this));
-                }
-            }
-        });
-    }
-
+  addMaxDatePicker("creationDate", 0);
+  typewatchFunc(jQuery('#searchDilution'), function(){poolSearchLibraryDilution(jQuery('#searchDilution'), 'ILLUMINA')}, 300, 2);
 </script>
 
 <%@ include file="adminsub.jsp" %>

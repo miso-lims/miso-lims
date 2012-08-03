@@ -447,7 +447,6 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
   }
 
   public String submitSequenceData(Submission s){
-
       Set<File> dataFiles = new HashSet<File>();
       FilePathGenerator FPG = new TGACIlluminaFilepathGenerator();
       //FilePathGenerator FPG = new FakeFilepathGenerator();
@@ -460,7 +459,6 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
 //              LibraryDilution libd=ld.iterator().next();
             try{
             dataFiles = FPG.generateFilePaths(l);
-
             }catch(SubmissionException submissionException){submissionException.printStackTrace();}
 
           }

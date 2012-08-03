@@ -282,30 +282,57 @@
             <td>${library.libraryStrategyType.name}</td>
         </c:otherwise>
     </c:choose>
-
 </tr>
 <tr>
-    <c:choose>
-        <c:when test="${empty library.libraryId or empty library.tagBarcode}">
-            <td>Tag Barcode:</td>
-            <td>
-                <form:select id="tagBarcodes" path="tagBarcode">
-                  <form:option value="" label="No Barcode"/>
-                  <form:options items="${availableTagBarcodes}" itemLabel="name" itemValue="tagBarcodeId" />
-                </form:select>
-            </td>
-        </c:when>
-        <c:otherwise>
-            <td>Tag Barcode:</td>
-            <td>
-                <form:select id="tagBarcodes" path="tagBarcode">
-                  <form:option value="" label="No Barcode"/>
-                  <form:options items="${availableTagBarcodes}" itemLabel="name" itemValue="tagBarcodeId" />
-                </form:select>
-            </td>
-        </c:otherwise>
-    </c:choose>
+  <c:choose>
+    <c:when test="${empty library.libraryId}">
+      <td>Barcoding Strategy:</td>
+      <td>
+        <select name='tagBarcodeStrategies' id='tagBarcodeStrategies' onchange='populateAvailableBarcodesForStrategy(this);'>
+          <option value="">Please select a platform...</option>
+        </select>
+      </td>
+    </c:when>
+    <c:otherwise>
+      <td>Barcoding Strategy:</td>
+      <td>
+        <c:choose>
+          <c:when test="${empty library.tagBarcodes}">
+            <select id="tagBarcodeStrategies" id='tagBarcodeStrategies' onchange="populateAvailableBarcodesForStrategy(this);">
+              <option selected="selected" value="">No barcoding</option>
+              <c:forEach items="${availableTagBarcodeStrategies}" var="tagBarcodeStrategy">
+                <option value="${tagBarcodeStrategy.name}">${tagBarcodeStrategy.name}</option>
+              </c:forEach>
+            </select>
+          </c:when>
+          <c:otherwise>
+            ${selectedTagBarcodeStrategy}
+          </c:otherwise>
+        </c:choose>
+      </td>
+    </c:otherwise>
+  </c:choose>
 </tr>
+
+<tr>
+  <c:choose>
+    <c:when test="${empty library.libraryId or empty library.tagBarcodes}">
+      <td>Barcodes:</td>
+      <td id="tagBarcodesDiv">
+      </td>
+    </c:when>
+    <c:otherwise>
+      <td>Barcodes:</td>
+      <td>
+        <c:forEach items="${availableTagBarcodeStrategyBarcodes}" var="barcodemap">
+          <form:select path="tagBarcodes['${barcodemap.key}']" items="${barcodemap.value}"
+                             itemLabel="name" itemValue="tagBarcodeId"/>
+        </c:forEach>
+      </td>
+    </c:otherwise>
+  </c:choose>
+</tr>
+
 <tr bgcolor="yellow">
     <td>QC Passed:</td>
     <td>
@@ -693,7 +720,8 @@
                             <%--<td>${dil.locationBarcode}</td>--%>
                         <td>${dil.concentration} ${emPCRDilutionUnits}</td>
                         <td>
-                        <a href="<c:url value="/miso/poolwizard/new/${library.sample.project.projectId}"/>">Construct New Pool</a>
+                          <a href="<c:url value="/miso/poolwizard/new/${library.sample.project.projectId}"/>">Construct New Pool</a>
+                        </td>
                     </tr>
                 </c:forEach>
             </c:if>
@@ -768,8 +796,10 @@
                                 onclick="fillDown('#cinput', this);"></span></th>
             <th>Strategy <span header="strategyType" class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
                                onclick="fillDown('#cinput', this);"></span></th>
-            <th>Tag Barcode <span header="tagBarcode" class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
-                               onclick="fillDown('#cinput', this);"></span></th>
+            <th>Barcode Kit<span header="barcodeStrategy" class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
+                               onclick="fillDownTagBarcodeStrategySelects('#cinput', this);"></span></th>
+            <th>Tag Barcodes<span header="tagBarcodes" class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
+                               onclick="fillDownTagBarcodeSelects('#cinput', this);"></span></th>
             <th>Location Barcode <span header="locationBarcode" class="ui-icon ui-icon-arrowstop-1-s"
                                        style="float:right" onclick="fillDown('#cinput', this);"></span></th>
         </tr>
@@ -790,42 +820,27 @@ var headers = ['rowsel',
     'libraryType',
     'selectionType',
     'strategyType',
-    'tagBarcode',
+    'barcodeStrategy',
+    'tagBarcodes',
     'locationBarcode'];
 
 jQuery(document).ready(function() {
-    var oTable = jQuery('#cinput').dataTable({
-        "aoColumnDefs": [
-            {
-                "bUseRendered": false,
-                "aTargets": [ 0 ]
-            }
-        ],
-        "bPaginate": false,
-        "bInfo": false,
-        "bJQueryUI": true,
-        "bAutoWidth": true,
-        "bSort": false,
-        "bFilter": false,
-        "sDom": '<<"toolbar">f>r<t>ip>'
-    });
+  var oTable = jQuery('#cinput').dataTable({
+    "aoColumnDefs": [
+      {
+        "bUseRendered": false,
+        "aTargets": [ 0 ]
+      }
+    ],
+    "bPaginate": false,
+    "bInfo": false,
+    "bJQueryUI": true,
+    "bAutoWidth": true,
+    "bSort": false,
+    "bFilter": false,
+    "sDom": '<<"toolbar">f>r<t>ip>'
+  });
 
-<%--
-  <c:forEach items="${library.sample.project.samples}" var="s" varStatus="n">
-      fnClickAddRow([
-          "",
-          "${s.alias}",
-          "",
-          "",
-          "",
-          "",
-          "",
-          "",
-          "",
-          ""
-      ]);
-  </c:forEach>
---%>
   var sampleArray = new Array();
   var sampleDescArray = new Array();
 <c:forEach items="${projectSamples}" var="s" varStatus="n">
@@ -838,6 +853,7 @@ jQuery(document).ready(function() {
                 [ "",
                     value,
                     sampleDescArray[index],
+                    "",
                     "",
                     "",
                     "",
@@ -880,6 +896,7 @@ function fnClickAddRow(rowdata) {
                     "",
                     "",
                     "",
+                    "",
                     ""]
                 );
     }
@@ -902,8 +919,11 @@ function fnClickAddRow(rowdata) {
         else if (headers[i] === "strategyType") {
             jQuery(nTr.cells[i]).addClass("strategyType");
         }
-        else if (headers[i] === "tagBarcode") {
-            jQuery(nTr.cells[i]).addClass("tagBarcode");
+        else if (headers[i] === "barcodeStrategy") {
+            jQuery(nTr.cells[i]).addClass("barcodeStrategy");
+        }
+        else if (headers[i] === "tagBarcodes") {
+            jQuery(nTr.cells[i]).addClass("tagBarcodes");
         }
         else if (headers[i] === "paired") {
             jQuery(nTr.cells[i]).addClass("passedCheck");
@@ -1030,11 +1050,11 @@ function setEditables(datatable) {
         }
     });
 
-    jQuery("#cinput .tagBarcode").editable(function(value, settings) {
+    jQuery("#cinput .barcodeStrategy").editable(function(value, settings) {
         return value;
     },
     {
-        loadurl : '../../rest/library/tagbarcodes',
+        loadurl : '../../rest/library/barcodeStrategies',
         loaddata : function (value, settings) {
           collapseInputs('#cinput');
           var row = datatable.fnGetPosition(this)[0];
@@ -1052,8 +1072,62 @@ function setEditables(datatable) {
         placeholder : '',
         style : 'inherit',
         callback: function(sValue, y) {
-            var aPos = datatable.fnGetPosition(this);
-            datatable.fnUpdate(sValue, aPos[0], aPos[1]);
+          var aPos = datatable.fnGetPosition(this);
+          datatable.fnUpdate(sValue, aPos[0], aPos[1]);
+
+          var cell = datatable.fnGetPosition(this)[2];
+          var nTr = datatable.fnSettings().aoData[aPos[0]].nTr;
+
+          Fluxion.doAjax(
+                  'libraryControllerHelperService',
+                  'getBarcodesPositions',
+          {'strategy':sValue,
+           'url':ajaxurl
+          },
+          {'doOnSuccess':function(json) {
+            jQuery(nTr.cells[cell+1]).html("");
+            for (var i = 0; i < json.numApplicableBarcodes; i++) {
+              jQuery(nTr.cells[cell+1]).append("<span class='tagBarcodeSelectDiv' position='"+(i+1)+"' id='tagbarcodes"+(i+1)+"'>- <i>Select...</i></span>");
+              if (json.numApplicableBarcodes > 1 && i == 0) {
+                jQuery(nTr.cells[cell+1]).append("|");
+              }
+            }
+
+            //bind editable to selects
+            jQuery("#cinput .tagBarcodeSelectDiv").editable(function(value, settings) {
+                return value;
+            },
+            {
+                loadurl : '../../rest/library/barcodesForPosition',
+                loaddata : function (value, settings) {
+                  var ret = {};
+                  ret["position"] = jQuery(this).attr("position");
+                  if (!isNullCheck(sValue)) {
+                    ret['barcodeStrategy'] = sValue;
+                  }
+                  else {
+                    ret['barcodeStrategy'] = '';
+                  }
+
+                  return ret;
+                },
+                type : 'select',
+                onblur: 'submit',
+                placeholder : '',
+                style : 'inherit',
+//                callback: function(tValue, z) {
+//                    var tPos = datatable.fnGetPosition(this);
+//                    datatable.fnUpdate(tValue, tPos[0], tPos[1]);
+//                },
+                submitdata : function(tvalue, tsettings) {
+                    return {
+                        "row_id": this.parentNode.getAttribute('id'),
+                        "column": datatable.fnGetPosition(this)[2]
+                    };
+                }
+            });
+          }
+          });
         },
         submitdata : function(value, settings) {
             return {

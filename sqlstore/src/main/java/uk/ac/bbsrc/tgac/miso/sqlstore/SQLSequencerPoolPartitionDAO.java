@@ -106,11 +106,11 @@ public class SQLSequencerPoolPartitionDAO implements PartitionStore {
           "INNER JOIN Run_SequencerPartitionContainer rf ON fa.containerId = rf.containers_containerId " +
           "LEFT JOIN Run ra ON rf.Run_runId = ra.runId " +
           "WHERE p.projectId=?";
-
+           //just changed this bit to see if it fixes the missing partition problem...
   public static final String PARTITIONS_BY_RELATED_SUBMISSION =
           "SELECT l.partitionId, l.partitionNumber, l.pool_poolId, l.securityProfile_profileId " +
-          "FROM Partition l, Submission_Partition sl " +
-          "WHERE l.partitionId=sl.partitions_partitionId " +
+          "FROM Partition l, Submission_Partition_Dilution sl " +
+          "WHERE l.partitionId=sl.partition_partitionId " +
           "AND sl.submission_submissionId=?";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLSequencerPoolPartitionDAO.class);

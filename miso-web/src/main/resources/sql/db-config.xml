@@ -277,10 +277,7 @@
 
   <bean id="sqlSubmissionDAO"
         class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLTgacSubmissionDAO">
-    <!--
-    <property name="chamberDAO" ref="sqlChamberDAO"/>
-    <property name="laneDAO" ref="sqlLaneDAO"/>
-    -->
+    <property name="dilutionDAO" ref="sqlDilutionDAO"/>
     <property name="experimentDAO" ref="sqlExperimentDAO"/>
     <property name="partitionDAO" ref="sqlPartitionDAO"/>
     <property name="sampleDAO" ref="sqlSampleDAO"/>

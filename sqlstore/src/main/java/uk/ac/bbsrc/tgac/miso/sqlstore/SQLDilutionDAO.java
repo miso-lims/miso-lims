@@ -135,6 +135,12 @@ public class SQLDilutionDAO implements DilutionStore {
   public static final String LIBRARY_DILUTION_DELETE =
           "DELETE FROM LibraryDilution WHERE dilutionId=:dilutionId";
 
+  public static String LIBRARY_DILUTION_SELECT_BY_SEARCH =
+          "SELECT ld.dilutionId, ld.name, ld.concentration, ld.library_libraryId, ld.identificationBarcode, ld.creationDate, ld.dilutionUserName, ld.securityProfile_profileId " +
+          "FROM LibraryDilution ld " +
+          //"WHERE l.platformName = :platformName " +
+          "WHERE ld.name LIKE :search OR ld.identificationBarcode LIKE :search";
+
   public static String EMPCR_DILUTION_SELECT =
           "SELECT dilutionId, name, concentration, emPCR_pcrId, identificationBarcode, creationDate, dilutionUserName, securityProfile_profileId " +
           "FROM emPCRDilution";
@@ -199,6 +205,14 @@ public class SQLDilutionDAO implements DilutionStore {
   public static final String EMPCR_DILUTION_DELETE =
           "DELETE FROM emPCRDilution WHERE dilutionId=:dilutionId";  
 
+  public static final String EMPCR_DILUTION_SELECT_BY_SEARCH =
+          "SELECT ed.dilutionId, ed.name, ed.concentration, ed.emPCR_pcrId, ed.identificationBarcode, ed.creationDate, ed.dilutionUserName, ed.securityProfile_profileId, e.dilution_dilutionId " +
+          "FROM emPCRDilution ed, emPCR e, LibraryDilution ld " +
+          "WHERE ed.emPCR_pcrId = e.pcrId " +
+          "AND ld.dilutionId = e.dilution_dilutionId " +
+          //"AND l.platformName = :platformName " +
+          "AND (ed.name LIKE :search OR ld.name LIKE :search OR ed.identificationBarcode LIKE :search)";
+
   protected static final Logger log = LoggerFactory.getLogger(SQLDilutionDAO.class);
 
   private JdbcTemplate template;
@@ -247,6 +261,15 @@ public class SQLDilutionDAO implements DilutionStore {
 
   public void setCascadeType(CascadeType cascadeType) {
     this.cascadeType = cascadeType;
+  }
+
+  public Collection<LibraryDilution> listAllLibraryDilutionsBySearch(String query, PlatformType platformType) {
+    String squery = "%" + query + "%";
+    MapSqlParameterSource params = new MapSqlParameterSource();
+    params.addValue("search", squery);
+          //.addValue("platformName", platformType.getKey());
+    NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+    return namedTemplate.query(LIBRARY_DILUTION_SELECT_BY_SEARCH, params, new LazyLibraryDilutionMapper());
   }
 
   public List<LibraryDilution> listByLibraryId(long libraryId) throws IOException {
@@ -316,6 +339,16 @@ public class SQLDilutionDAO implements DilutionStore {
     else {
       return Collections.emptyList();
     }
+  }
+
+  public Collection<emPCRDilution> listAllEmPcrDilutionsBySearch(String query, PlatformType platformType) {
+    String squery = "%" + query + "%";
+    MapSqlParameterSource params = new MapSqlParameterSource();
+    params.addValue("search", squery);
+          //.addValue("platformName", platformType.getKey());
+
+    NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+    return namedTemplate.query(EMPCR_DILUTION_SELECT_BY_SEARCH, params, new LazyEmPCRDilutionMapper());
   }
 
   public Collection<emPCRDilution> listAllEmPcrDilutions() throws IOException {

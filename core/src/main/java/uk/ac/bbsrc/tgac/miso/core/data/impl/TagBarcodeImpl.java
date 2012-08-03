@@ -51,6 +51,7 @@ public class TagBarcodeImpl implements TagBarcode {
   private String name;
   private String sequence;
   private PlatformType platformType;
+  private String strategyName;
 
   @Override
   public Long getTagBarcodeId() {
@@ -92,6 +93,16 @@ public class TagBarcodeImpl implements TagBarcode {
     this.platformType = platformType;
   }
 
+  @Override
+  public String getStrategyName() {
+    return strategyName;
+  }
+
+  @Override
+  public void setStrategyName(String strategyName) {
+    this.strategyName = strategyName;
+  }
+
   /**
    * Equivalency is based on getProjectId() if set, otherwise on name,
    * description and creation date.
@@ -111,7 +122,8 @@ public class TagBarcodeImpl implements TagBarcode {
         || them.getTagBarcodeId() == UNSAVED_ID) {
       return getName().equals(them.getName()) &&
              getSequence().equals(them.getSequence()) &&
-             getPlatformType().equals(them.getPlatformType());
+             getPlatformType().equals(them.getPlatformType()) &&
+             getStrategyName().equals(them.getStrategyName());
     }
     else {
       return getTagBarcodeId().longValue() == them.getTagBarcodeId().longValue();
@@ -128,6 +140,7 @@ public class TagBarcodeImpl implements TagBarcode {
       if (getName() != null) hashcode = 37 * hashcode + getName().hashCode();
       if (getSequence() != null) hashcode = 37 * hashcode + getSequence().hashCode();
       if (getPlatformType() != null) hashcode = 37 * hashcode + getPlatformType().hashCode();
+      if (getStrategyName() != null) hashcode = 37 * hashcode + getStrategyName().hashCode();
       return hashcode;
     }
   }

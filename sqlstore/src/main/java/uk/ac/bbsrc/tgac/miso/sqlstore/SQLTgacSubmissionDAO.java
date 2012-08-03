@@ -34,10 +34,10 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubmissionImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.store.*;
-import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
@@ -46,10 +46,7 @@ import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore
@@ -79,12 +76,19 @@ public class SQLTgacSubmissionDAO implements Store<SubmissionImpl> {
           "LEFT JOIN Submission_Experiment AS sexp ON s.submissionId = sexp.submission_submissionId " +
           "LEFT JOIN Submission_Sample AS ssam ON s.submissionId = ssam.submission_submissionId " +
           "LEFT JOIN Submission_Study AS sstu ON s.submissionId = sstu.submission_submissionId " +
-          "LEFT JOIN Submission_Partition AS ssla ON s.submissionId = ssla.submission_submissionId " +
+          "LEFT JOIN Submission_Partition_Dilution AS ssla ON s.submissionId = ssla.submission_submissionId " +
           "WHERE s.submissionId=:submissionId";
+
+  public static final String SUBMISSION_DILUTION_SELECT =
+          "SELECT dilution_dilutionId " +
+          "FROM Submission_Partition_Dilution " +
+          //"WHERE submission_submissionId = :submissionId AND partition_partitionId = :partitionId";
+          "WHERE submission_submissionId = ? AND partition_partitionId = ?";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLTgacSubmissionDAO.class);
 
   private JdbcTemplate template;
+  private DilutionStore dilutionDAO;
   private ExperimentStore experimentDAO;
   private PartitionStore partitionDAO;
   private RunStore runDAO;
@@ -96,6 +100,10 @@ public class SQLTgacSubmissionDAO implements Store<SubmissionImpl> {
 
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
+  }
+
+  public void setDilutionDAO(DilutionStore dilutionDAO) {
+    this.dilutionDAO = dilutionDAO;
   }
 
   public void setExperimentDAO(ExperimentStore experimentDAO) {
@@ -143,7 +151,7 @@ public class SQLTgacSubmissionDAO implements Store<SubmissionImpl> {
 
     //if a submission already exists then delete all the old rows first, and repopulate.
     //easier than trying to work out which rows need to be updated and which don't
-    if(submission.getSubmissionId() != Submission.UNSAVED_ID) {
+    if (submission.getSubmissionId() != Submission.UNSAVED_ID) {
       MapSqlParameterSource delparams = new MapSqlParameterSource();
       delparams.addValue("submissionId", submission.getSubmissionId());
       NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
@@ -176,20 +184,20 @@ public class SQLTgacSubmissionDAO implements Store<SubmissionImpl> {
         if (s instanceof Sample) {
           tableName += "Sample";
           priKey = "samples_sampleId";
-          priValue = ((Sample)s).getSampleId();
+          priValue = ((Sample) s).getSampleId();
         }
         else if (s instanceof Study) {
           tableName += "Study";
           priKey = "studies_studyId";
-          priValue = ((Study)s).getStudyId();
+          priValue = ((Study) s).getStudyId();
         }
         else if (s instanceof Experiment) {
           tableName += "Experiment";
           priKey = "experiments_experimentId";
-          priValue = ((Experiment)s).getExperimentId();
+          priValue = ((Experiment) s).getExperimentId();
         }
         else if (s instanceof SequencerPoolPartition) {
-          SequencerPoolPartition l = (SequencerPoolPartition)s;
+          SequencerPoolPartition l = (SequencerPoolPartition) s;
           tableName += "Partition_Dilution";
           priKey = "partitions_partitionId";
           priValue = l.getId();
@@ -199,7 +207,7 @@ public class SQLTgacSubmissionDAO implements Store<SubmissionImpl> {
             Collection<Experiment> exps = l.getPool().getExperiments();
             for (Experiment experiment : exps) {
               SimpleJdbcInsert pInsert = new SimpleJdbcInsert(template)
-                  .withTableName("Submission_Experiment");
+                      .withTableName("Submission_Experiment");
               try {
                 MapSqlParameterSource poParams = new MapSqlParameterSource();
                 poParams.addValue("submission_submissionId", submission.getSubmissionId())
@@ -212,7 +220,7 @@ public class SQLTgacSubmissionDAO implements Store<SubmissionImpl> {
 
               Study study = experiment.getStudy();
               SimpleJdbcInsert sInsert = new SimpleJdbcInsert(template)
-                  .withTableName("Submission_Study");
+                      .withTableName("Submission_Study");
               try {
                 MapSqlParameterSource poParams = new MapSqlParameterSource();
                 poParams.addValue("submission_submissionId", submission.getSubmissionId())
@@ -228,7 +236,7 @@ public class SQLTgacSubmissionDAO implements Store<SubmissionImpl> {
             for (Dilution dil : dils) {
               Sample sample = dil.getLibrary().getSample();
               SimpleJdbcInsert sInsert = new SimpleJdbcInsert(template)
-                  .withTableName("Submission_Sample");
+                      .withTableName("Submission_Sample");
               try {
                 MapSqlParameterSource poParams = new MapSqlParameterSource();
                 poParams.addValue("submission_submissionId", submission.getSubmissionId())
@@ -237,6 +245,21 @@ public class SQLTgacSubmissionDAO implements Store<SubmissionImpl> {
               }
               catch (DuplicateKeyException dke) {
                 log.warn("This Submission_Sample combination already exists - not inserting: " + dke.getMessage());
+              }
+
+              //Adds Submission_Partition_Dilution info to DB table.
+
+              sInsert = new SimpleJdbcInsert(template).withTableName("Submission_Partition_Dilution");
+              try {
+                MapSqlParameterSource poParams = new MapSqlParameterSource();
+                poParams.addValue("submission_submissionId", submission.getSubmissionId())
+                        .addValue("partition_partitionId", l.getId())
+                        .addValue("dilution_dilutionId", dil.getDilutionId());
+                sInsert.execute(poParams);
+
+              }
+              catch (DuplicateKeyException dke) {
+                log.warn("This Submission_Partition_Dilution combination already exists - not inserting: " + dke.getMessage());
               }
             }
           }
@@ -253,7 +276,7 @@ public class SQLTgacSubmissionDAO implements Store<SubmissionImpl> {
               pInsert.execute(poParams);
             }
             catch (DuplicateKeyException dke) {
-              log.warn("This "+tableName+" combination already exists - not inserting: " + dke.getMessage());
+              log.warn("This " + tableName + " combination already exists - not inserting: " + dke.getMessage());
             }
           }
           else {
@@ -263,7 +286,7 @@ public class SQLTgacSubmissionDAO implements Store<SubmissionImpl> {
       }
     }
     else {
-      throw new IOException("No defined Submittable elements available");  
+      throw new IOException("No defined Submittable elements available");
     }
 
     return submission.getSubmissionId();
@@ -279,9 +302,10 @@ public class SQLTgacSubmissionDAO implements Store<SubmissionImpl> {
     return template.query(SUBMISSION_SELECT, new TgacSubmissionMapper());
   }
 
+  //sets the values of the new Submission object based on those in the SubmissionMapper
   public class TgacSubmissionMapper implements RowMapper<SubmissionImpl> {
     public SubmissionImpl mapRow(ResultSet rs, int rowNum) throws SQLException {
-      SubmissionImpl t = (SubmissionImpl)dataObjectFactory.getSubmission();
+      SubmissionImpl t = (SubmissionImpl) dataObjectFactory.getSubmission();
       t.setSubmissionId(rs.getLong("submissionId"));
       t.setAccession(rs.getString("accession"));
       t.setAlias(rs.getString("alias"));
@@ -309,13 +333,42 @@ public class SQLTgacSubmissionDAO implements Store<SubmissionImpl> {
           t.addSubmissionElement(experiment);
           log.debug(t.getName() + ": added " + experiment.getName());
         }
-
+        //not sure what this bit's for- re-using flowcells? If so, shouldn't it choose the last run in the list, not the first?
+        //gets all the partitions for this submission from the Submission_Partition_Dilution table
         for (SequencerPoolPartition partition : partitionDAO.listBySubmissionId(rs.getLong("submissionId"))) {
+          //for each partition, lists all the runs on the flowcell/container
+          SequencerPoolPartition newPartition = new PartitionImpl();
+          newPartition.setId(partition.getId());
+          newPartition.setSequencerPartitionContainer(partition.getSequencerPartitionContainer());
+          newPartition.setPartitionNumber(partition.getPartitionNumber());
+
+          Pool<Dilution> newPool = new PoolImpl<Dilution>();
+          Pool<? extends Poolable> oldPool = partition.getPool();
+          newPool.setExperiments(oldPool.getExperiments());
+
           List<Run> runs = new ArrayList<Run>(runDAO.listBySequencerPartitionContainerId(partition.getSequencerPartitionContainer().getContainerId()));
+          //if there is 1 run for the flowcell/container, sets the run for that container to the first on on the list
           if (runs.size() == 1) {
             partition.getSequencerPartitionContainer().setRun(runs.get(0));
           }
-          t.addSubmissionElement(partition);
+
+          List<Long> dilutionIdList = template.queryForList(SUBMISSION_DILUTION_SELECT, Long.class, new Object[]{rs.getLong("submissionId"), partition.getId()});
+
+          log.debug("dilutionIdList for partition " + partition.getId() + "from DB table:" + dilutionIdList.toString());
+          for (Long id : dilutionIdList) {
+            Dilution dil = dilutionDAO.getDilutionByIdAndPlatform(id, partition.getPool().getPlatformType());
+            try {
+              newPool.addPoolableElement(dil);
+            }
+            catch (Exception e) {
+              e.printStackTrace();
+            }
+          }
+          //adds the new pool to the partition
+          newPartition.setPool(newPool);
+          //adds the partition to the submission
+          log.debug("submission " + t.getSubmissionId() + " new partition " + newPartition.getId() + " contains dilutions " + newPartition.getPool().getDilutions().toString());
+          t.addSubmissionElement(newPartition);
         }
       }
       catch (IOException ie) {

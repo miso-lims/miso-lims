@@ -110,4 +110,30 @@ public class StatsControllerHelperService {
       return JSONUtils.SimpleJSONError("Run stats manager is not set. No stats available.");
     }
   }
+
+
+  public JSONObject getSummaryRunstatsDiagram(HttpSession session, JSONObject json) {
+    Long runId = json.getLong("runId");
+    Integer lane = json.getInt("lane");
+    StringBuilder b = new StringBuilder();
+    try {
+      Run run = requestManager.getRunById(runId);
+//        log.info("<<<<<<<<<<<<"+runstatsManager.hasStatsForRun(run));
+//        if(runstatsManager.hasStatsForRun(run)){
+      JSONObject resultJson = runStatsManager.getPerPositionBaseSequenceQualityForLane(run, lane);
+      log.info(">>>>>>>>>>>" + resultJson);
+      return resultJson;
+//        }
+
+//        return JSONUtils.JSONObjectResponse("summary", "nothing");
+    }
+    catch (IOException e) {
+      log.debug("Failed", e);
+      return JSONUtils.SimpleJSONError("Failed");
+    }
+    catch (RunStatsException e) {
+      log.debug("Failed", e);
+      return JSONUtils.SimpleJSONError("Failed");
+    }
+  }
 }

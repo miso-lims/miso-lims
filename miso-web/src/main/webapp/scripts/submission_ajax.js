@@ -21,6 +21,22 @@
  * *********************************************************************
  */
 
+
+function saveSubmission(submissionId, JSON) {
+//alert("saveSubmission called! For: "+submissionId+ JSONArray.toString());
+
+    Fluxion.doAjax(
+        'submissionControllerHelperService',
+        'saveSubmission',
+        {'submissionId':submissionId, 'url':ajaxurl, 'form':JSON},
+        {'doOnSuccess':function(json) {
+        alert("Submission Saved!")}
+        }
+
+    )
+
+}
+
 function previewSubmissionMetadata(submissionId) {
     Fluxion.doAjax(
             'submissionControllerHelperService',
@@ -34,8 +50,7 @@ function previewSubmissionMetadata(submissionId) {
         //doc = doc.replace("<","&lt");
         //doc = doc.replace(">","&gt");
         win.document.write(json.metadata);
-
-        win.document.close();        
+        win.document.close();
       }
     });
 }

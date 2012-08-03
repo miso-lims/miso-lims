@@ -572,7 +572,7 @@
           <th>Library Description</th>
           <th>Library Type</th>
           <th>Library Platform</th>
-          <th>Tag Barcode</th>
+          <th>Tag Barcodes</th>
           <th>Insert Size</th>
           <th>QC Passed</th>
           <th class="fit">Edit</th>
@@ -590,7 +590,14 @@
             <td>${library.description}</td>
             <td>${library.libraryType.description}</td>
             <td>${library.platformName}</td>
-            <td><c:if test="${not empty library.tagBarcode}">${library.tagBarcode.name} (${library.tagBarcode.sequence})</c:if></td>
+            <td><c:if test="${not empty library.tagBarcodes}">
+              <c:forEach items="${library.tagBarcodes}" varStatus="status" var="barcodemap">
+                ${status.count}: ${barcodemap.value.name} (${barcodemap.value.sequence})
+                <c:if test="${status.count lt fn:length(library.tagBarcodes)}">
+                <br/>
+                </c:if>
+              </c:forEach>
+            </c:if></td>
             <td><c:forEach var="qc" items="${library.libraryQCs}" end="0">${qc.insertSize}</c:forEach></td>
             <td>${library.qcPassed}</td>
             <td class="misoicon"

@@ -1535,3 +1535,58 @@ table.overviewSummary td.smallbox {
 table.overviewSummary td.partitionOccupied {
     background-color: #ccff99 !important;
 }
+
+/*statsdb*/
+.box { font: 10px sans-serif; }
+.box { stroke-width: 0.5px;  }
+.box .center { stroke-dasharray: 3 3; }
+.box .outlier { stroke: #ccc; fill: none; }
+
+.whisker {
+ stroke: black; stroke-width: 0.5px;
+}
+
+
+.basebox:hover {
+  fill: lightgray;
+    opacity: 0.5;
+
+}
+
+.label{
+font: 10px sans-serif;
+}
+
+.path {
+stroke: red; stroke-width: 2px;
+fill: transparent;
+}
+
+.scoreboxgreen {
+fill: green;
+opacity: 0.3;
+}
+
+.scoreboxyellow {
+fill: yellow;
+opacity: 0.3;
+}
+
+.scoreboxred {
+fill: red;
+opacity: 0.3;
+}
+
+#statschartmessage{
+    position: absolute;
+    background: white;
+    border: 2px solid #000000;
+    padding: 5px;
+    text-align: left;
+}
+
+#statsresultgraph{
+    text-align: center;
+}
+
+/*statsdb ends*/

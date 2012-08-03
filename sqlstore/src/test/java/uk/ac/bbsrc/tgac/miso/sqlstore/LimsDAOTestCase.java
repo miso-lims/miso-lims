@@ -136,7 +136,7 @@ public abstract class LimsDAOTestCase {
                   "Study_Experiment",
                   "Submission",
                   "Submission_Experiment",
-                  "Submission_Partition",
+                  "Submission_Partition_Dilution",
                   "Submission_Sample",
                   "Submission_Study",
                   "TagBarcodes",
@@ -666,6 +666,7 @@ public abstract class LimsDAOTestCase {
     submissionDAO.setSampleDAO(sampleDAO);
     submissionDAO.setStudyDAO(studyDAO);
     submissionDAO.setDataObjectFactory(dataObjectFactory);
+    submissionDAO.setDilutionDAO(dilutionDAO);
 
     statusDAO.setJdbcTemplate(template);
     statusDAO.setDataObjectFactory(dataObjectFactory);
@@ -1231,9 +1232,9 @@ public abstract class LimsDAOTestCase {
                  "creationDate DATE NOT NULL," +
                  "submittedDate DATE DEFAULT NULL," +
                  "verified BIT NOT NULL," +
-                 "description VARCHAR(255) NOT NULL," +
-                 "name VARCHAR(255) NOT NULL," +
-                 "title VARCHAR(255) NOT NULL," +
+                 "description VARCHAR(255)," +
+                 "name VARCHAR(255)," +
+                 "title VARCHAR(255)," +
                  "accession VARCHAR(50) DEFAULT NULL," +
                  "alias VARCHAR(30) DEFAULT NULL," +
                  "completed BIT NOT NULL," +
@@ -1247,9 +1248,11 @@ public abstract class LimsDAOTestCase {
                  ");");
 
     runStatement(conn,
-                 "CREATE TABLE Submission_Partition (" +
+                 "CREATE TABLE Submission_Partition_Dilution (" +
                  "submission_submissionId BIGINT NOT NULL," +
-                 "partitions_partitionId BIGINT NOT NULL" +
+                 "partition_partitionId BIGINT NOT NULL," +
+                 "dilution_dilutionId BIGINT NOT NULL," +
+                 "PRIMARY KEY (submission_submissionId,partition_partitionId,dilution_dilutionId)" +
                  ");");
 
     runStatement(conn,
@@ -1270,6 +1273,7 @@ public abstract class LimsDAOTestCase {
                  "name VARCHAR(10) NOT NULL," +
                  "sequence VARCHAR(20) NOT NULL," +
                  "platformName VARCHAR(20) NOT NULL," +
+                 "strategyName VARCHAR(100) NOT NULL," +
                  "PRIMARY KEY  (tagId)" +
                  ");");
 

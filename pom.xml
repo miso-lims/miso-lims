@@ -30,7 +30,7 @@
   <groupId>uk.ac.bbsrc.tgac.miso</groupId>
   <artifactId>miso</artifactId>
   <packaging>pom</packaging>
-  <version>0.1.6RC</version>
+  <version>0.1.7-SNAPSHOT</version>
   <name>MISO Framework</name>
   <url>http://www.tgac.ac.uk/miso</url>
 
@@ -289,6 +289,16 @@
       </plugin>
 
       <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.5</version>
+        <configuration>
+          <includes>
+            <include>**/*Suite.java</include>
+          </includes>
+        </configuration>
+      </plugin>
+
+      <plugin>
         <groupId>com.atlassian.maven.plugins</groupId>
         <artifactId>maven-clover2-plugin</artifactId>
         <version>3.1.2</version>
@@ -339,6 +349,8 @@
 
     <module>spring</module>
     <module>miso-web</module>
+
+    <module>tagbarcode-strategies</module>
   </modules>
 
   <profiles>

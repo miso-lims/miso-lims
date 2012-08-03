@@ -301,8 +301,6 @@ public class EditRunController {
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, run, securityManager.listAllUsers()));
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, run, securityManager.listAllGroups()));
 
-      //log.info("Run partitions: " + LimsUtils.join(((RunImpl)run).getSequencerPartitionContainers().get(0).getPartitions(), ","));
-
       Map<Long, String> runMap = new HashMap<Long, String>();
       if (run.getWatchers().contains(user)) {
         runMap.put(run.getRunId(), user.getLoginName());

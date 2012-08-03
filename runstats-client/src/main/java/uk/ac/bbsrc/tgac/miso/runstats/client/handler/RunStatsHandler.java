@@ -54,5 +54,4 @@ public class RunStatsHandler {
   public void persist() {
 
   }
-
 }

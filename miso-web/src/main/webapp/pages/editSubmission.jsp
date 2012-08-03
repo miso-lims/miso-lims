@@ -42,7 +42,12 @@
                     <c:when test="${not empty submission.submissionId}">Edit</c:when>
                     <c:otherwise>Create</c:otherwise>
                 </c:choose> Submission
-                <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
+                <c:if test="${not empty submission.submissionId}">
+                <input type="button" value="Save" class="fg-button ui-state-default ui-corner-all" onclick="saveSubmission(${submission.submissionId},jQuery(form).serializeArray())"/>
+                </c:if>
+                <c:if test="${empty submission.submissionId}">
+                <input type="button" value="Save" class="fg-button ui-state-default ui-corner-all" onclick="saveSubmission(-1,jQuery(form).serializeArray())"/>
+                </c:if>
             </h1>
             <div class="sectionDivider" onclick="toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
                 <div id="note_arrowclick" class="toggleLeft"></div>
@@ -161,10 +166,10 @@
                 <c:forEach items="${projects}" var="project">
                     <li id="project${project.projectId}" class="jstree-closed">
                         <c:if test="${not empty submission.submissionId}">
-                            <p id="projectTitle${project.projectId}" onclick="populateSubmissionProject(${project.projectId},${submission.submissionId});"><strong>${project.name}</strong> : ${project.description}</p>
+                            <p style="cursor: pointer" id="projectTitle${project.projectId}" onclick="populateSubmissionProject(${project.projectId},${submission.submissionId});"><strong>${project.name}</strong> : ${project.description}</p>
                         </c:if>
                         <c:if test="${empty submission.submissionId}">
-                            <p id="projectTitle${project.projectId}" onclick="populateSubmissionProject(${project.projectId});"><strong>${project.name}</strong> : ${project.description}</p>
+                            <p style="cursor: pointer" id="projectTitle${project.projectId}" onclick="populateSubmissionProject(${project.projectId});"><strong>${project.name}</strong> : ${project.description}</p>
                         </c:if>
                         <ul id="projectSubmission${project.projectId}">
 

@@ -66,7 +66,6 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
 
   private User getCurrentUser() throws IOException {
     Authentication auth = securityContextHolderStrategy.getContext().getAuthentication();
-    //log.info(auth.toString());
     User user = securityManager.getUserByLoginName(securityContextHolderStrategy.getContext().getAuthentication().getName());
     if (user == null && auth.isAuthenticated()) {
       user = new UserImpl();
@@ -891,6 +890,18 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
+  public Collection<LibraryDilution> listAllLibraryDilutionsBySearch(String query, PlatformType platformType) throws IOException {
+    User user = getCurrentUser();
+    Collection<LibraryDilution> accessibles = new HashSet<LibraryDilution>();
+    for (LibraryDilution dilution : super.listAllLibraryDilutionsBySearch(query, platformType)) {
+      if (dilution.userCanRead(user)) {
+        accessibles.add(dilution);
+      }
+    }
+    return accessibles;
+  }
+
+  @Override
   public Collection<emPCRDilution> listAllEmPcrDilutions() throws IOException {
     User user = getCurrentUser();
     Collection<emPCRDilution> accessibles = new HashSet<emPCRDilution>();
@@ -919,6 +930,18 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
     User user = getCurrentUser();
     Collection<emPCRDilution> accessibles = new HashSet<emPCRDilution>();
     for (emPCRDilution dilution : super.listAllEmPcrDilutionsByPlatform(platformType)) {
+      if (dilution.userCanRead(user)) {
+        accessibles.add(dilution);
+      }
+    }
+    return accessibles;
+  }
+
+  @Override
+  public Collection<emPCRDilution> listAllEmPcrDilutionsBySearch(String query, PlatformType platformType) throws IOException {
+    User user = getCurrentUser();
+    Collection<emPCRDilution> accessibles = new HashSet<emPCRDilution>();
+    for (emPCRDilution dilution : super.listAllEmPcrDilutionsBySearch(query, platformType)) {
       if (dilution.userCanRead(user)) {
         accessibles.add(dilution);
       }

@@ -33,10 +33,7 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.propertyeditors.CustomBooleanEditor;
-import org.springframework.beans.propertyeditors.CustomCollectionEditor;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
-import org.springframework.beans.propertyeditors.CustomNumberEditor;
+import org.springframework.beans.propertyeditors.*;
 import org.springframework.util.NumberUtils;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.support.WebBindingInitializer;
@@ -61,7 +58,7 @@ import java.util.*;
 /**
  * Class that binds all the MISO model datatypes to the Spring form path types
  */
-public class LimsBindingInitializer implements WebBindingInitializer {
+public class LimsBindingInitializer extends org.springframework.web.bind.support.ConfigurableWebBindingInitializer implements WebBindingInitializer {
   protected static final Logger log = LoggerFactory.getLogger(LimsBindingInitializer.class);
 
   @Autowired
@@ -458,9 +455,11 @@ public class LimsBindingInitializer implements WebBindingInitializer {
       }
     });
 
-    binder.registerCustomEditor(Set.class, "tagBarcodes", new CustomCollectionEditor(Set.class) {
+    binder.registerCustomEditor(HashMap.class, "tagBarcodes", new CustomMapEditor(HashMap.class) {
+
+
       @Override
-      protected Object convertElement(Object element) {
+      protected Object convertValue(Object element) {
         return resolveTagBarcode(element);
       }
     });

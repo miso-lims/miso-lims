@@ -28,7 +28,7 @@
   <parent>
     <artifactId>miso</artifactId>
     <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-    <version>0.1.6RC</version>
+    <version>0.1.7-SNAPSHOT</version>
   </parent>
 
   <groupId>${parent.groupId}</groupId>
@@ -330,6 +330,12 @@
     <dependency>
       <groupId>${parent.groupId}</groupId>
       <artifactId>notification-consumer-services</artifactId>
+      <version>${parent.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>${parent.groupId}</groupId>
+      <artifactId>tagbarcode-strategies</artifactId>
       <version>${parent.version}</version>
     </dependency>
 

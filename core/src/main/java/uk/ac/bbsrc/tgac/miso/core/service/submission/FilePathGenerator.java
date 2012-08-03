@@ -23,8 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.core.service.submission;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.exception.SubmissionException;
 
 import java.io.File;
@@ -43,7 +43,7 @@ public interface FilePathGenerator {
    //* @param dataFiles set of datafiles
    * @return Object response
    */
-  public File generateFilePath(SequencerPoolPartition partition, LibraryDilution libraryDilution) throws SubmissionException;
+  public File generateFilePath(SequencerPoolPartition partition, Dilution libraryDilution) throws SubmissionException;
 
   public Set<File> generateFilePaths(SequencerPoolPartition partition) throws SubmissionException;
 }

@@ -86,6 +86,16 @@ public interface DilutionStore extends Store<Dilution>, Remover<Dilution> {
   Collection<LibraryDilution> listAllLibraryDilutionsByProjectId(long projectId) throws IOException;
 
   /**
+   * List all LibraryDilutions that match a given search string
+   *
+   * @param query of type String
+   * @param platformType of type PlatformType
+   * @return Collection<LibraryDilution>
+   * @throws IOException when
+   */
+  Collection<LibraryDilution> listAllLibraryDilutionsBySearch(String query, PlatformType platformType) throws IOException;
+
+  /**
    * List all emPCRDilutions prepared for a given PlatformType
    *
    * @param platformType of type PlatformType
@@ -102,6 +112,16 @@ public interface DilutionStore extends Store<Dilution>, Remover<Dilution> {
    * @throws IOException when
    */
   Collection<emPCRDilution> listAllEmPcrDilutionsByProjectId(long projectId) throws IOException;
+
+  /**
+   * List all emPCRDilutions that match a given search string
+   *
+   * @param query of type String
+   * @param platformType of type PlatformType
+   * @return Collection<emPCRDilution>
+   * @throws IOException when
+   */
+  Collection<emPCRDilution> listAllEmPcrDilutionsBySearch(String query, PlatformType platformType) throws IOException;
 
   /**
    * List all emPCRDilutions prepared for a given PlatformType within a given Project

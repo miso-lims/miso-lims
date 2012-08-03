@@ -27,6 +27,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import uk.ac.bbsrc.tgac.miso.runstats.client.RunstatsStore;
 
 import java.io.IOException;
+import java.lang.Deprecated;
 import java.util.Collection;
 
 /**
@@ -38,6 +39,7 @@ import java.util.Collection;
  * @date 27/10/11
  * @since 0.1.2
  */
+@Deprecated
 public class SQLRunstatsDAO implements RunstatsStore {
   private JdbcTemplate template;
 

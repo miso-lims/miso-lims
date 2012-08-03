@@ -198,15 +198,20 @@ public interface RequestManager {
   public Collection<LibraryStrategyType> listAllLibraryStrategyTypes() throws IOException;
   public Collection<TagBarcode> listAllTagBarcodes() throws IOException;
   public Collection<TagBarcode> listAllTagBarcodesByPlatform(String platformType) throws IOException;
+  public Collection<TagBarcode> listAllTagBarcodesByStrategyName(String platformType) throws IOException;
 
   public Collection<LibraryDilution> listAllLibraryDilutions() throws IOException;
   public Collection<LibraryDilution> listAllLibraryDilutionsByLibraryId(long libraryId) throws IOException;
   public Collection<LibraryDilution> listAllLibraryDilutionsByPlatform(PlatformType platformType) throws IOException;
   public Collection<LibraryDilution> listAllLibraryDilutionsByProjectId(long projectId) throws IOException;
+  public Collection<LibraryDilution> listAllLibraryDilutionsBySearch(String query, PlatformType platformType) throws IOException;
+
   public Collection<emPCRDilution> listAllEmPcrDilutions() throws IOException;
   public Collection<emPCRDilution> listAllEmPcrDilutionsByEmPcrId(long pcrId) throws IOException;
   public Collection<emPCRDilution> listAllEmPcrDilutionsByPlatform(PlatformType platformType) throws IOException;
   public Collection<emPCRDilution> listAllEmPcrDilutionsByProjectId(long projectId) throws IOException;
+  public Collection<emPCRDilution> listAllEmPcrDilutionsBySearch(String query, PlatformType platformType) throws IOException;
+
   public Collection<? extends Dilution> listAllDilutionsByProjectAndPlatform(long projectId, PlatformType platformType) throws IOException;
   public Collection<? extends Dilution> listAllDilutionsByPlatform(PlatformType platformType) throws IOException;
   public Collection<? extends Dilution> listAllDilutionsByPoolAndPlatform(long poolId, PlatformType platformType) throws IOException;

@@ -23,12 +23,15 @@
 
 package uk.ac.bbsrc.tgac.miso.core.service.submission;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by IntelliJ IDEA.
@@ -38,21 +41,22 @@ import java.util.Set;
  * To change this template use File | Settings | File Templates.
  */
 public class FakeFilepathGenerator implements FilePathGenerator{
-    //returns a HashSet containing 3 files on the local drive.
-    @Override
-    public File generateFilePath(SequencerPoolPartition partition, LibraryDilution libraryDilution) {
-        File datafile = new File("/storage/miso/datafiles/datafile1.dat");
-        return datafile;
-    }
+  protected static final Logger log = LoggerFactory.getLogger(FakeFilepathGenerator.class);
 
-    @Override
-    public Set<File> generateFilePaths(SequencerPoolPartition partition) {
+  //returns a HashSet containing 3 files on the local drive.
+  @Override
+  public File generateFilePath(SequencerPoolPartition partition, Dilution libraryDilution) {
+    File datafile = new File("/storage/miso/datafiles/datafile1.dat");
+    return datafile;
+  }
 
-        Set<File> dataFiles = new HashSet<File>();
-        for(int i=1;i<=3;i++){
-            File datafile = new File("/storage/miso/datafiles/datafile"+i+".dat");
-            dataFiles.add(datafile);
-        }
-        return dataFiles;
+  @Override
+  public Set<File> generateFilePaths(SequencerPoolPartition partition) {
+    Set<File> dataFiles = new HashSet<File>();
+    for(int i=1;i<=3;i++){
+      File datafile = new File("/storage/miso/datafiles/datafile"+i+".dat");
+      dataFiles.add(datafile);
     }
+    return dataFiles;
+  }
 }

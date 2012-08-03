@@ -24,22 +24,16 @@
 package uk.ac.bbsrc.tgac.miso.webapp.context;
 
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
-import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.support.nativejdbc.CommonsDbcpNativeJdbcExtractor;
 import org.springframework.jndi.JndiObjectFactoryBean;
-import org.springframework.jndi.JndiTemplate;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.context.support.XmlWebApplicationContext;
-import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
-import uk.ac.bbsrc.tgac.miso.core.data.PrintableBarcode;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.PoolAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.ProjectAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.RunAlertManager;
@@ -49,13 +43,13 @@ import uk.ac.bbsrc.tgac.miso.core.manager.MisoRequestManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.PrintManager;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
+import uk.ac.bbsrc.tgac.miso.core.service.tagbarcode.TagBarcodeStrategy;
+import uk.ac.bbsrc.tgac.miso.core.service.tagbarcode.TagBarcodeStrategyResolverService;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.core.store.RunQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
 import uk.ac.bbsrc.tgac.miso.runstats.client.manager.RunStatsManager;
-import uk.ac.bbsrc.tgac.miso.spring.ajax.StatsControllerHelperService;
-import uk.ac.bbsrc.tgac.miso.webapp.controller.EditRunController;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
@@ -126,6 +120,13 @@ public class MisoAppListener implements ServletContextListener {
     catch (Exception e) {
       log.error("Could not list print services. This does not bode well for printing.", e);
       e.printStackTrace();
+    }
+
+    //set up Tag Barcode strategies
+    TagBarcodeStrategyResolverService tagBarcodeService = (TagBarcodeStrategyResolverService)context.getBean("tagBarcodeStrategyResolverService");
+    Collection<TagBarcodeStrategy> tbss = tagBarcodeService.getTagBarcodeStrategies();
+    for (TagBarcodeStrategy tbs : tbss) {
+      log.info("Got Tag Barcode Index service: " + tbs.getName());
     }
 
     //set up alerting

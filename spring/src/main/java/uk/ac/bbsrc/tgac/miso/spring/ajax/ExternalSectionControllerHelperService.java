@@ -229,15 +229,25 @@ public class ExternalSectionControllerHelperService {
                   "            </thead>\n" +
                   "            <tbody>");
         for (Sample sample : samples) {
+          Boolean passed = sample.getQcPassed();
+          String passStr;
+          if (passed == null) {
+            passStr = "Unknown";
+          }
+          else if (passed) {
+            passStr = passed.toString();
+            sampleQCPassed++;
+          }
+          else {
+            passStr = passed.toString();
+          }
+
           sb.append("<tr>\n" +
                     "                    <td><b>" + sample.getName() + "</b></td>\n" +
                     "                    <td>" + sample.getAlias() + "</td>\n" +
                     "                    <td>" + sample.getSampleType() + "</td>\n" +
-                    "                    <td>" + sample.getQcPassed().toString() + "</td>\n" +
+                    "                    <td>" + passStr + "</td>\n" +
                     "                </tr>");
-          if (sample.getQcPassed()) {
-            sampleQCPassed++;
-          }
         }
         sb.append("</tbody></table>");
         sb.append("Sample QC Passed: " + sampleQCPassed + " out of " + samples.size() + ".<br/><br/>");
@@ -261,15 +271,24 @@ public class ExternalSectionControllerHelperService {
                   "            </thead>\n" +
                   "            <tbody>");
         for (Library library : libraries) {
+          Boolean passed = library.getQcPassed();
+          String passStr;
+          if (passed == null) {
+            passStr = "Unknown";
+          }
+          else if (passed) {
+            passStr = passed.toString();
+            libraryQCPassed++;
+          }
+          else {
+            passStr = passed.toString();
+          }
           sb.append("<tr>\n" +
                     "                    <td><b>" + library.getName() + "</b></td>\n" +
                     "                    <td>" + library.getAlias() + "</td>\n" +
                     "                    <td>" + library.getLibraryType() + "</td>\n" +
-                    "                    <td>" + library.getQcPassed().toString() + "</td>\n" +
+                    "                    <td>" + passStr + "</td>\n" +
                     "                </tr>");
-          if (library.getQcPassed()) {
-            libraryQCPassed++;
-          }
         }
         sb.append("</tbody>\n" +
                   "        </table>");
@@ -279,7 +298,6 @@ public class ExternalSectionControllerHelperService {
       else {
         sb.append("<b>Library:</b> None.<br/><br/>");
       }
-
 
       Collection<Run> runs = requestManager.listAllRunsByProjectId(projectId);
       if (runs.size() > 0) {

@@ -287,7 +287,7 @@ public class EditSolidPoolController {
   }
 
   @RequestMapping(method = RequestMethod.POST)
-  public String processSubmit(@ModelAttribute("pool") SolidPool pool,
+  public String processSubmit(@ModelAttribute("pool") Pool pool,
                               ModelMap model,
                               SessionStatus session) throws IOException, MalformedLibraryException {
     try {

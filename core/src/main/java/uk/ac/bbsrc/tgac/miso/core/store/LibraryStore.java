@@ -24,7 +24,6 @@
 package uk.ac.bbsrc.tgac.miso.core.store;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
@@ -196,6 +195,14 @@ public interface LibraryStore extends Store<Library>, Remover<Library> {
    * @throws IOException when
    */
   Collection<TagBarcode> listTagBarcodesByPlatform(String platformName) throws IOException;
+
+  /**
+   * List all TagBarcodes in a given strategy
+   *
+   * @return Collection<TagBarcode>
+   * @throws IOException when
+   */
+  Collection<TagBarcode> listTagBarcodesByStrategyName(String strategyName) throws IOException;
 
   /**
    * List all libraries related to a given LibraryDilution given a LibraryDilution ID

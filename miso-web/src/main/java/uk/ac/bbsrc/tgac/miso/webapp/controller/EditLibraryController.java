@@ -29,6 +29,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.service.tagbarcode.TagBarcodeStrategy;
+import uk.ac.bbsrc.tgac.miso.core.service.tagbarcode.TagBarcodeStrategyResolverService;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
@@ -82,6 +85,9 @@ public class EditLibraryController {
   @Autowired
   private JdbcTemplate interfaceTemplate;
 
+  @Autowired
+  private TagBarcodeStrategyResolverService tagBarcodeStrategyResolverService;
+
   public void setInterfaceTemplate(JdbcTemplate interfaceTemplate) {
     this.interfaceTemplate = interfaceTemplate;
   }
@@ -96,6 +102,10 @@ public class EditLibraryController {
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
+  }
+
+  public void setTagBarcodeStrategyResolverService(TagBarcodeStrategyResolverService tagBarcodeStrategyResolverService) {
+    this.tagBarcodeStrategyResolverService = tagBarcodeStrategyResolverService;
   }
 
   public Collection<LibraryType> populateLibraryTypes() throws IOException {
@@ -170,13 +180,12 @@ public class EditLibraryController {
     return LimsUtils.join(types, ",");
   }
 
-  public Collection<TagBarcode> populateAvailableTagBarcodes(Library l) throws IOException {
-    /*
-    List<TagBarcode> barcodes = new ArrayList<TagBarcode>();
-    for (TagBarcode t : requestManager.listAllTagBarcodesByPlatform(l.getPlatformName())) {
+  public Collection<TagBarcodeStrategy> populateAvailableTagBarcodeStrategies(Library l) throws IOException {
+    List<TagBarcodeStrategy> strategies = new ArrayList<TagBarcodeStrategy>(tagBarcodeStrategyResolverService.getTagBarcodeStrategiesByPlatform(PlatformType.get(l.getPlatformName())));
+    return strategies;
+  }
 
-    }
-    */
+  public Collection<TagBarcode> populateAvailableTagBarcodes(Library l) throws IOException {
     List<TagBarcode> barcodes = new ArrayList<TagBarcode>(requestManager.listAllTagBarcodesByPlatform(l.getPlatformName()));
     Collections.sort(barcodes);
     return barcodes;
@@ -259,16 +268,20 @@ public class EditLibraryController {
       if (!library.userCanRead(user)) {
         throw new SecurityException("Permission denied.");
       }
-//      if (library.getPlatformName() == null || library.getPlatformName().equals("")) {
-//        library.setPlatformName("Unspecified");
-//      }
 
       model.put("formObj", library);
       model.put("library", library);
       Collection<emPCR> pcrs = populateEmPcrs(user, library);
       model.put("emPCRs", pcrs);
       model.put("emPcrDilutions", populateEmPcrDilutions(user, pcrs));
-      model.put("availableTagBarcodes", populateAvailableTagBarcodes(library));
+
+      if (library.getTagBarcodes() != null && !library.getTagBarcodes().isEmpty() && library.getTagBarcodes().get(1) != null) {
+        model.put("selectedTagBarcodeStrategy", library.getTagBarcodes().get(1).getStrategyName());
+        model.put("availableTagBarcodeStrategyBarcodes", tagBarcodeStrategyResolverService.getTagBarcodeStrategy(library.getTagBarcodes().get(1).getStrategyName()).getApplicableBarcodes());
+      }
+
+      model.put("availableTagBarcodeStrategies", populateAvailableTagBarcodeStrategies(library));
+
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, library, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, library, securityManager.listAllUsers()));
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, library, securityManager.listAllGroups()));
@@ -297,15 +310,16 @@ public class EditLibraryController {
       else {
         library = requestManager.getLibraryById(libraryId);
         model.put("title", "Library " + libraryId);
+        if (library.getTagBarcodes() != null && !library.getTagBarcodes().isEmpty() && library.getTagBarcodes().get(1) != null) {
+          model.put("selectedTagBarcodeStrategy", library.getTagBarcodes().get(1).getStrategyName());
+          model.put("availableTagBarcodeStrategyBarcodes", tagBarcodeStrategyResolverService.getTagBarcodeStrategy(
+                  library.getTagBarcodes().get(1).getStrategyName()).getApplicableBarcodes());
+        }
       }
 
       if (!library.userCanRead(user)) {
         throw new SecurityException("Permission denied.");
       }
-
-//      if (library.getPlatformName() == null || library.getPlatformName().equals("")) {
-//        library.setPlatformName("Unspecified");
-//      }
 
       if (sampleId != null) {
         Sample sample = requestManager.getSampleById(sampleId);
@@ -340,7 +354,7 @@ public class EditLibraryController {
       Collection<emPCR> pcrs = populateEmPcrs(user, library);
       model.put("emPCRs", pcrs);
       model.put("emPcrDilutions", populateEmPcrDilutions(user, pcrs));
-//      model.put("availableTagBarcodes", populateAvailableTagBarcodes(library));
+      model.put("availableTagBarcodeStrategies", populateAvailableTagBarcodeStrategies(library));
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, library, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, library, securityManager.listAllUsers()));
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, library, securityManager.listAllGroups()));

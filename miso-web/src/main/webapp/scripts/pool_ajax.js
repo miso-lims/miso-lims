@@ -50,18 +50,18 @@ function poolSearchSelectExperiment(experimentId, experimentName) {
 
 function poolSearchLibraryDilution(input, platform) {
   Fluxion.doAjax(
-          'poolControllerHelperService',
-          'poolSearchLibraryDilution',
-          {'str':jQuery(input).val(), 'platform':platform, 'id':input.id, 'url':ajaxurl},
-          {'doOnSuccess': function(json) {
-            jQuery('#libdilresult').css('visibility', 'visible');
-            jQuery('#libdilresult').html(json.html);
-          }
-          }
+    'poolControllerHelperService',
+    'poolSearchLibraryDilution',
+    {'str':jQuery(input).val(), 'platform':platform, 'id':input.id, 'url':ajaxurl},
+    {'doOnSuccess': function(json) {
+      jQuery('#searchDilutionResult').css('visibility', 'visible');
+      jQuery('#searchDilutionResult').html(json.html);
+    }
+    }
   );
 }
 
-function poolSearchSelectLibraryDilution(dilutionId, dilutionName) {
+function poolSearchSelectDilution(dilutionId, dilutionName) {
   if (jQuery("#dilutions" + dilutionId).length > 0) {
     alert("Dilution " + dilutionName + " is already part of this pool.");
   }
@@ -72,19 +72,19 @@ function poolSearchSelectLibraryDilution(dilutionId, dilutionName) {
     div += "<span onclick='confirmRemove(jQuery(this).parent());' class='float-right ui-icon ui-icon-circle-close'></span></div>";
     jQuery('#dillist').append(div);
   }
-  jQuery('#libdilresult').css('visibility', 'hidden');
+  jQuery('#searchDilutionResult').css('visibility', 'hidden');
 }
 
 function poolSearchEmPcrDilution(input, platform) {
   Fluxion.doAjax(
-          'poolControllerHelperService',
-          'poolSearchEmPcrDilution',
-          {'str':jQuery(input).val(), 'platform':platform, 'id':input.id, 'url':ajaxurl},
-          {'doOnSuccess': function(json) {
-            jQuery('#libdilresult').css('visibility', 'visible');
-            jQuery('#libdilresult').html(json.html);
-          }
-          }
+    'poolControllerHelperService',
+    'poolSearchEmPcrDilution',
+    {'str':jQuery(input).val(), 'platform':platform, 'id':input.id, 'url':ajaxurl},
+    {'doOnSuccess': function(json) {
+      jQuery('#searchDilutionResult').css('visibility', 'visible');
+      jQuery('#searchDilutionResult').html(json.html);
+    }
+    }
   );
 }
 
@@ -99,7 +99,7 @@ function poolSearchSelectEmPcrDilution(dilutionId, dilutionName) {
     div += "<span onclick='confirmRemove(jQuery(this).parent());' class='float-right ui-icon ui-icon-circle-close'></span></div>";
     jQuery('#dillist').append(div);
   }
-  jQuery('#libdilresult').css('visibility', 'hidden');
+  jQuery('#searchDilutionResult').css('visibility', 'hidden');
 }
 
 function selectLibraryDilutionsByBarcodes(codes) {

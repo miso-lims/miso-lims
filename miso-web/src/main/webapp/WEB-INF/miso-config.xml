@@ -74,4 +74,8 @@
   </bean>
 
   <bean name="issueTrackerManager" class="uk.ac.bbsrc.tgac.miso.core.manager.DummyIssueTrackerManager"/>
+
+  <bean name="tagBarcodeStrategyResolverService" class="uk.ac.bbsrc.tgac.miso.core.service.tagbarcode.TagBarcodeStrategyResolverService">
+    <property name="requestManager" ref="requestManager"/>
+  </bean>
 </beans>

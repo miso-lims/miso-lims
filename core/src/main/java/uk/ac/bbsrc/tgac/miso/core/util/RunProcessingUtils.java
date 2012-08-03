@@ -25,6 +25,9 @@ package uk.ac.bbsrc.tgac.miso.core.util;
 
 import uk.ac.bbsrc.tgac.miso.core.data.*;
 
+import java.util.Map;
+import java.util.TreeMap;
+
 /**
  * uk.ac.bbsrc.tgac.miso.core.util
  * <p/>
@@ -73,8 +76,13 @@ public class RunProcessingUtils {
                   .append(ld.getLibrary().getName()).append(",")
                   .append(ld.getLibrary().getSample().getAlias().replaceAll("\\s", "")).append(",");
 
-          if (ld.getLibrary().getTagBarcode() != null && p.getDilutions().size() > 1) {
-            sb.append(ld.getLibrary().getTagBarcode().getSequence()).append(",");
+          if (ld.getLibrary().getTagBarcodes() != null && !ld.getLibrary().getTagBarcodes().isEmpty() && p.getDilutions().size() > 1) {
+            Map<Integer, TagBarcode> barcodes = new TreeMap<Integer, TagBarcode>(ld.getLibrary().getTagBarcodes());
+            for (Integer key : barcodes.keySet()) {
+              TagBarcode t = barcodes.get(key);
+              sb.append(t.getSequence());
+            }
+            sb.append(",");
           }
           else {
             sb.append(",");

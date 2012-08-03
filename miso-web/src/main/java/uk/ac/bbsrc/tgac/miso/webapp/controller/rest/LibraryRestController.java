@@ -31,7 +31,10 @@ import org.springframework.web.bind.annotation.*;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.core.service.tagbarcode.TagBarcodeStrategy;
+import uk.ac.bbsrc.tgac.miso.core.service.tagbarcode.TagBarcodeStrategyResolverService;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 import java.io.IOException;
@@ -62,6 +65,13 @@ public class LibraryRestController {
     this.requestManager = requestManager;
   }
 
+  @Autowired
+  private TagBarcodeStrategyResolverService tagBarcodeStrategyResolverService;
+
+  public void setTagBarcodeStrategyResolverService(TagBarcodeStrategyResolverService tagBarcodeStrategyResolverService) {
+    this.tagBarcodeStrategyResolverService = tagBarcodeStrategyResolverService;
+  }
+
   public Collection<LibraryType> populateLibraryTypes() throws IOException {
     List<LibraryType> types = new ArrayList<LibraryType>(requestManager.listAllLibraryTypes());
     Collections.sort(types);
@@ -90,19 +100,39 @@ public class LibraryRestController {
     }
   }
 
-  @RequestMapping(value = "tagbarcodes", method = RequestMethod.GET)
+  @RequestMapping(value = "barcodeStrategies", method = RequestMethod.GET)
   public
   @ResponseBody
-  String jsonRestTagBarcodes(@RequestParam("platform") String platform) throws IOException {
+  String jsonRestBarcodeStrategies(@RequestParam("platform") String platform) throws IOException {
     if (platform != null && !"".equals(platform)) {
-      List<TagBarcode> tagBarcodes = new ArrayList<TagBarcode>(requestManager.listAllTagBarcodesByPlatform(platform));
-      Collections.sort(tagBarcodes);
-      List<String> names = new ArrayList<String>();
-      names.add("\"\"" + ":" + "\"No Barcode\"");
-      for (TagBarcode tb : tagBarcodes) {
-        names.add("\"" + tb.getTagBarcodeId() + "\"" + ":" + "\"" + tb.getName() + " ("+tb.getSequence()+")\"");
+      List<String> types = new ArrayList<String>();
+      for (TagBarcodeStrategy t : tagBarcodeStrategyResolverService.getTagBarcodeStrategiesByPlatform(PlatformType.get(platform))) {
+        types.add("\"" + t.getName() + "\"" + ":" + "\"" + t.getName() + "\"");
       }
-      return "{"+LimsUtils.join(names, ",")+"}";
+      return "{"+ LimsUtils.join(types, ",")+"}";
+    }
+    else {
+      return "{}";
+    }
+  }
+
+  @RequestMapping(value = "barcodesForPosition", method = RequestMethod.GET)
+  public
+  @ResponseBody
+  String jsonRestTagBarcodes(@RequestParam("barcodeStrategy") String barcodeStrategy, @RequestParam("position") String position) throws IOException {
+    if (barcodeStrategy != null && !"".equals(barcodeStrategy)) {
+      TagBarcodeStrategy tbs = tagBarcodeStrategyResolverService.getTagBarcodeStrategy(barcodeStrategy);
+      if (tbs != null) {
+        List<TagBarcode> tagBarcodes = new ArrayList<TagBarcode>(tbs.getApplicableBarcodesForPosition(Integer.parseInt(position)));
+        List<String> names = new ArrayList<String>();
+        for (TagBarcode tb : tagBarcodes) {
+          names.add("\"" + tb.getTagBarcodeId() + "\"" + ":" + "\"" + tb.getName() + " ("+tb.getSequence()+")\"");
+        }
+        return "{"+LimsUtils.join(names, ",")+"}";
+      }
+      else {
+        return "{}";
+      }
     }
     else {
       return "{}";

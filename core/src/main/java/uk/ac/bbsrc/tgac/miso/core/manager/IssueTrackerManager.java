@@ -27,9 +27,6 @@ import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.spi.Spi;
 
 import java.io.IOException;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.manager
