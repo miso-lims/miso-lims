@@ -329,6 +329,12 @@
 
     <dependency>
       <groupId>${parent.groupId}</groupId>
+      <artifactId>runstats-client</artifactId>
+      <version>${parent.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>${parent.groupId}</groupId>
       <artifactId>notification-consumer-services</artifactId>
       <version>${parent.version}</version>
     </dependency>
