@@ -1363,6 +1363,16 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
+  public int[] saveRuns(Collection<Run> runs) throws IOException {
+    if (runStore != null) {
+      return runStore.saveAll(runs);
+    }
+    else {
+      throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
   public long saveRunQC(RunQC runQC) throws IOException {
     if (runQcStore != null) {
       return runQcStore.save(runQC);

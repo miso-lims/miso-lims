@@ -100,6 +100,22 @@ public class CacheHelperService {
     return JSONUtils.JSONObjectResponse("html", jQueryDialogFactory.okDialog("Cache Administration", "Caches flushed successfully!"));
   }
 
+  public JSONObject flushCache(HttpSession session, JSONObject json) {
+    if (json.has("cache") && !"".equals(json.getString("cache"))) {
+      String cacheName = json.getString("cache");
+      Cache cache = cacheManager.getCache(cacheName);
+      if (cache != null) {
+        cache.removeAll();
+        log.info("Cache '"+cacheName+"' flushed!");
+      }
+      else {
+        return JSONUtils.SimpleJSONError("No such cache: " + cacheName);
+      }
+      return JSONUtils.JSONObjectResponse("html", jQueryDialogFactory.okDialog("Cache Administration", "Cache '"+cacheName+"' flushed successfully!"));
+    }
+    return JSONUtils.SimpleJSONError("No cache specified to flush");
+  }
+
   public JSONObject viewCacheStats(HttpSession session, JSONObject json) {
     Map<String, Object> response = new HashMap<String, Object>();
     List<String> cacheNames = Arrays.asList(cacheManager.getCacheNames());

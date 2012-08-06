@@ -91,7 +91,7 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
 
   private Map<String, Run> processRunJSON(HealthType ht, JSONArray runs, RequestManager requestManager) {
     Map<String, Run> updatedRuns = new HashMap<String, Run>();
-
+    List<Run> runsToSave = new ArrayList<Run>();
     StringBuilder sb = new StringBuilder();
 
     for (JSONObject run : (Iterable<JSONObject>) runs) {
@@ -154,36 +154,36 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
               r.setSequencerReference(sr);
             }
 
-            if (r.getSequencerReference() != null) {
-              log.debug("Setting sequencer reference: " + sr.getName());
-            }
-            else {
+            if (r.getSequencerReference() == null) {
               log.error("Cannot save " + is.getRunName() + ": no sequencer reference available.");
             }
+            else {
+              log.debug("Setting sequencer reference: " + sr.getName());
 
-            if (run.has("startDate")) {
-              try {
-                if (run.get("startDate") != null && !run.getString("startDate").equals("null") && !"".equals(run.getString("startDate"))) {
-                  log.debug("Updating start date:" + run.getString("startDate"));
-                  r.getStatus().setStartDate(illuminaRunFolderDateFormat.parse(run.getString("startDate")));
+              if (run.has("startDate")) {
+                try {
+                  if (run.get("startDate") != null && !run.getString("startDate").equals("null") && !"".equals(run.getString("startDate"))) {
+                    log.debug("Updating start date:" + run.getString("startDate"));
+                    r.getStatus().setStartDate(illuminaRunFolderDateFormat.parse(run.getString("startDate")));
+                  }
+                }
+                catch (ParseException e) {
+                  log.error(e.getMessage());
+                  e.printStackTrace();
                 }
               }
-              catch (ParseException e) {
-                log.error(e.getMessage());
-                e.printStackTrace();
-              }
-            }
 
-            if (run.has("completionDate")) {
-              try {
-                if (run.get("completionDate") != null && !run.getString("completionDate").equals("null") && !"".equals(run.getString("completionDate"))) {
-                  log.debug("Updating completion date:" + run.getString("completionDate"));
-                  r.getStatus().setCompletionDate(logDateFormat.parse(run.getString("completionDate")));
+              if (run.has("completionDate")) {
+                try {
+                  if (run.get("completionDate") != null && !run.getString("completionDate").equals("null") && !"".equals(run.getString("completionDate"))) {
+                    log.debug("Updating completion date:" + run.getString("completionDate"));
+                    r.getStatus().setCompletionDate(logDateFormat.parse(run.getString("completionDate")));
+                  }
                 }
-              }
-              catch (ParseException e) {
-                log.error(e.getMessage());
-                e.printStackTrace();
+                catch (ParseException e) {
+                  log.error(e.getMessage());
+                  e.printStackTrace();
+                }
               }
             }
           }
@@ -269,68 +269,69 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
             }
           }
 
-          Collection<SequencerPartitionContainer<SequencerPoolPartition>> fs = ((IlluminaRun) r).getSequencerPartitionContainers();
-          if (fs.isEmpty()) {
-            if (run.has("containerId") && !"".equals(run.getString("containerId"))) {
-              Collection<SequencerPartitionContainer<SequencerPoolPartition>> pfs = requestManager.listSequencerPartitionContainersByBarcode(run.getString("containerId"));
-              if (!pfs.isEmpty()) {
-                if (pfs.size() == 1) {
-                  SequencerPartitionContainer<SequencerPoolPartition> lf = new ArrayList<SequencerPartitionContainer<SequencerPoolPartition>>(pfs).get(0);
-                  if (lf.getSecurityProfile() != null && r.getSecurityProfile() == null) {
-                    r.setSecurityProfile(lf.getSecurityProfile());
+          if (r.getSequencerReference() != null) {
+            Collection<SequencerPartitionContainer<SequencerPoolPartition>> fs = ((IlluminaRun) r).getSequencerPartitionContainers();
+            if (fs.isEmpty()) {
+              if (run.has("containerId") && !"".equals(run.getString("containerId"))) {
+                Collection<SequencerPartitionContainer<SequencerPoolPartition>> pfs = requestManager.listSequencerPartitionContainersByBarcode(run.getString("containerId"));
+                if (!pfs.isEmpty()) {
+                  if (pfs.size() == 1) {
+                    SequencerPartitionContainer<SequencerPoolPartition> lf = new ArrayList<SequencerPartitionContainer<SequencerPoolPartition>>(pfs).get(0);
+                    if (lf.getSecurityProfile() != null && r.getSecurityProfile() == null) {
+                      r.setSecurityProfile(lf.getSecurityProfile());
+                    }
+                    if (lf.getPlatformType() == null && r.getPlatformType() != null) {
+                      lf.setPlatformType(r.getPlatformType());
+                    }
+                    ((RunImpl)r).addSequencerPartitionContainer(lf);
                   }
-                  if (lf.getPlatformType() == null && r.getPlatformType() != null) {
-                    lf.setPlatformType(r.getPlatformType());
+                  else {
+                    //more than one flowcell hit to this barcode
+                    log.warn(r.getAlias() + ":: More than one partition container has this barcode. Cannot automatically link to a pre-existing barcode.");
                   }
-                  ((RunImpl)r).addSequencerPartitionContainer(lf);
                 }
                 else {
-                  //more than one flowcell hit to this barcode
-                  log.warn(r.getAlias() + ":: More than one partition container has this barcode. Cannot automatically link to a pre-existing barcode.");
+                  SequencerPartitionContainer<SequencerPoolPartition> f = new SequencerPartitionContainerImpl();
+                  f.setSecurityProfile(r.getSecurityProfile());
+                  if (f.getPlatformType() == null && r.getPlatformType() != null) {
+                    f.setPlatformType(r.getPlatformType());
+                  }
+
+                  if (r.getSequencerReference().getPlatform().getInstrumentModel().contains("MiSeq")) {
+                    f.setPartitionLimit(1);
+                  }
+                  f.initEmptyPartitions();
+                  f.setIdentificationBarcode(run.getString("containerId"));
+                  ((RunImpl)r).addSequencerPartitionContainer(f);
                 }
               }
-              else {
-                SequencerPartitionContainer<SequencerPoolPartition> f = new SequencerPartitionContainerImpl();
-                f.setSecurityProfile(r.getSecurityProfile());
-                if (f.getPlatformType() == null && r.getPlatformType() != null) {
-                  f.setPlatformType(r.getPlatformType());
-                }
+            }
+            else {
+              SequencerPartitionContainer<SequencerPoolPartition> f = fs.iterator().next();
+              f.setSecurityProfile(r.getSecurityProfile());
+              if (f.getPlatformType() == null && r.getPlatformType() != null) {
+                f.setPlatformType(r.getPlatformType());
+              }
 
+              if (f.getPartitions().isEmpty()) {
+                log.info("No partitions found for run " + r.getName() + " (container "+f.getContainerId()+")");
                 if (r.getSequencerReference().getPlatform().getInstrumentModel().contains("MiSeq")) {
                   f.setPartitionLimit(1);
                 }
                 f.initEmptyPartitions();
-                f.setIdentificationBarcode(run.getString("containerId"));
-                ((RunImpl)r).addSequencerPartitionContainer(f);
+              }
+
+              if (f.getIdentificationBarcode() == null || "".equals(f.getIdentificationBarcode())) {
+                if (run.has("containerId") && !"".equals(run.getString("containerId"))) {
+                  f.setIdentificationBarcode(run.getString("containerId"));
+                  requestManager.saveSequencerPartitionContainer(f);
+                }
               }
             }
+
+            updatedRuns.put(r.getAlias(), r);
+            runsToSave.add(r);
           }
-          else {
-            SequencerPartitionContainer<SequencerPoolPartition> f = fs.iterator().next();
-            f.setSecurityProfile(r.getSecurityProfile());
-            if (f.getPlatformType() == null && r.getPlatformType() != null) {
-              f.setPlatformType(r.getPlatformType());
-            }
-
-            if (f.getPartitions().isEmpty()) {
-              log.info("No partitions found for run " + r.getName() + " (container "+f.getContainerId()+")");
-              if (r.getSequencerReference().getPlatform().getInstrumentModel().contains("MiSeq")) {
-                f.setPartitionLimit(1);
-              }
-              f.initEmptyPartitions();
-            }
-
-            if (f.getIdentificationBarcode() == null || "".equals(f.getIdentificationBarcode())) {
-              if (run.has("containerId") && !"".equals(run.getString("containerId"))) {
-                f.setIdentificationBarcode(run.getString("containerId"));
-                requestManager.saveSequencerPartitionContainer(f);
-              }
-            }
-          }
-
-          long runId = requestManager.saveRun(r);
-          r.setRunId(runId);
-          updatedRuns.put(r.getAlias(), r);
         }
         else {
           log.warn("\\_ Run not saved. Saving status: " + is.getRunName());
@@ -338,12 +339,19 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
         }
       }
       catch(IOException ioe) {
-        log.error(ioe.getMessage());
+        log.error("Couldn't process run:" + ioe.getMessage());
         ioe.printStackTrace();
       }
-      sb.append("...done\n");
     }
-    log.info(sb.toString());
+    try {
+      int[] saved = requestManager.saveRuns(runsToSave);
+      log.info("Batch saved " + saved.length + " / "+ runs.size() + " runs");
+    }
+    catch (IOException e) {
+      log.error("Couldn't save run batch: " + e.getMessage());
+      e.printStackTrace();
+    }
+
     return updatedRuns;
   }
 }

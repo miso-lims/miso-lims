@@ -68,14 +68,13 @@ public class EraSampleDecorator extends AbstractSubmittableDecorator<Document> {
     Element sampleTaxonIdentifier = submission.createElementNS(null, "TAXON_ID");
     if (sample.getTaxonIdentifier() != null && !sample.getTaxonIdentifier().equals(""))
     {
-    sampleTaxonIdentifier.setTextContent(sample.getTaxonIdentifier());
+      sampleTaxonIdentifier.setTextContent(sample.getTaxonIdentifier());
     }
     else
     {
-        sampleTaxonIdentifier.setTextContent("000001");
+      sampleTaxonIdentifier.setTextContent("000001");
     }
     sampleName.appendChild(sampleTaxonIdentifier);
-
 
     s.appendChild(sampleName);
 

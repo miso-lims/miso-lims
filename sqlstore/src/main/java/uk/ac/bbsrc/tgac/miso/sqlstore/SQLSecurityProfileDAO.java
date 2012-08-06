@@ -207,8 +207,7 @@ public class SQLSecurityProfileDAO implements Store<SecurityProfile> {
 
   //@Cacheable(cacheName="securityProfileCache", keyGeneratorName="limsHashKeyGenerator")
   public Collection<SecurityProfile> listAll() throws IOException {
-    List results = template.query(PROFILES_SELECT, new SecurityProfileMapper());
-    return (List<SecurityProfile>) results;
+    return template.query(PROFILES_SELECT, new SecurityProfileMapper());
   }
 
   @Cacheable(cacheName="securityProfileCache",

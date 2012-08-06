@@ -47,6 +47,8 @@ public interface RequestManager {
   public long saveProjectOverview(ProjectOverview overview) throws IOException;
   public long saveProjectOverviewNote(ProjectOverview overview, Note note) throws IOException;
   public long saveRun(Run run) throws IOException;
+  public int[] saveRuns(Collection<Run> runs) throws IOException;
+
   public long saveRunQC(RunQC runQC) throws IOException;
   public long saveRunNote(Run run, Note note) throws IOException;
   public long saveSample(Sample sample) throws IOException;

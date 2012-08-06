@@ -26,11 +26,11 @@ package uk.ac.bbsrc.tgac.miso.sqlstore;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.store.SecurityStore;
 import com.googlecode.ehcache.annotations.Cacheable;
 import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
 import com.googlecode.ehcache.annotations.TriggersRemove;
+import com.googlecode.ehcache.annotations.key.HashCodeCacheKeyGenerator;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
@@ -42,6 +42,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,10 +57,7 @@ import javax.persistence.CascadeType;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore
@@ -265,6 +263,31 @@ public class SQLRunDAO implements RunStore {
     this.cascadeType = cascadeType;
   }
 
+  private void purgeCaches(Collection<Run> runs) {
+    Cache listCache = cacheManager.getCache("runListCache");
+    if (listCache != null && listCache.getKeys().size() > 0) {
+      Object cachekey = listCache.getKeys().get(0);
+      if (cachekey != null) {
+        List<Run> cachedruns = (List<Run>)listCache.get(cachekey).getValue();
+        for (Run run : runs) {
+          cachedruns.remove(run);
+          cachedruns.add(run);
+        }
+        listCache.put(new Element(cachekey, cachedruns));
+      }
+    }
+
+    Cache cache = cacheManager.getCache("runCache");
+    if (cache != null) {
+      HashCodeCacheKeyGenerator keygen = new HashCodeCacheKeyGenerator();
+      for (Run run : runs) {
+        Long cachekey = keygen.generateKey(run);
+        cache.remove(cachekey);
+        cache.put(new Element(cachekey, run));
+      }
+    }
+  }
+
   private void purgeListCache(Run run, boolean replace) {
     Cache cache = cacheManager.getCache("runListCache");
     if (cache != null && cache.getKeys().size() > 0) {
@@ -396,6 +419,114 @@ public class SQLRunDAO implements RunStore {
     }
 
     return run.getRunId();
+  }
+
+  public int[] saveAll(Collection<Run> runs) throws IOException {
+    NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+    List<SqlParameterSource> batch = new ArrayList<SqlParameterSource>();
+    for (Run run : runs) {
+      Long statusId = null;
+      if (run.getStatus() != null) {
+        Status s = run.getStatus();
+        statusId = s.getStatusId();
+        //if no status has ever been saved to the database for this run
+        //we want to create one, cascading or not
+        if (statusId == null || (this.cascadeType != null && this.cascadeType.equals(CascadeType.PERSIST))) {
+          if (s.getRunName() == null) {
+            s.setRunName(run.getAlias());
+          }
+
+          if (s.getInstrumentName() == null && run.getSequencerReference() != null) {
+            s.setInstrumentName(run.getSequencerReference().getName());
+          }
+        }
+
+        try {
+          statusDAO.save(s);
+        }
+        catch (IOException e) {
+          log.warn("Couldn't save status for run: " + run.getName()+". This isn't fatal, but probably should be investigated!");
+          e.printStackTrace();
+        }
+        run.setStatus(s);
+      }
+
+      try {
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("accession", run.getAccession())
+                .addValue("alias", run.getAlias())
+                .addValue("description", run.getDescription())
+                .addValue("platformRunId", run.getPlatformRunId())
+                .addValue("pairedEnd", run.getPairedEnd())
+                .addValue("cycles", run.getCycles())
+                .addValue("filePath", run.getFilePath())
+                .addValue("platformType", run.getPlatformType().getKey())
+                .addValue("securityProfile_profileId", run.getSecurityProfile().getProfileId())
+                .addValue("status_statusId", run.getStatus().getStatusId())
+                .addValue("sequencerReference_sequencerReferenceId", run.getSequencerReference().getId());
+
+        if (run.getRunId() == AbstractRun.UNSAVED_ID) {
+          long i = DbUtils.getAutoIncrement(template, "Run");
+          String name = "RUN" + i;
+          run.setRunId(i);
+          run.setName(name);
+        }
+
+        params.addValue("runId", run.getRunId())
+              .addValue("name", run.getName());
+
+        if (this.cascadeType != null) {
+          if (this.cascadeType.equals(CascadeType.PERSIST)) {
+            for (SequencerPartitionContainer<SequencerPoolPartition> l : ((RunImpl)run).getSequencerPartitionContainers()) {
+              l.setSecurityProfile(run.getSecurityProfile());
+              if (l.getPlatformType() == null) {
+                l.setPlatformType(run.getPlatformType());
+              }
+              long containerId = sequencerPartitionContainerDAO.save(l);
+
+              SimpleJdbcInsert fInsert = new SimpleJdbcInsert(template).withTableName("Run_SequencerPartitionContainer");
+              MapSqlParameterSource fcParams = new MapSqlParameterSource();
+              fcParams.addValue("Run_runId", run.getRunId())
+                      .addValue("containers_containerId", containerId);
+
+              try {
+                fInsert.execute(fcParams);
+              }
+              catch(DuplicateKeyException dke) {
+                log.warn("This Run/SequencerPartitionContainer combination already exists - not inserting: " + dke.getMessage());
+              }
+            }
+          }
+
+          if (!run.getNotes().isEmpty()) {
+            for (Note n : run.getNotes()) {
+              noteDAO.saveRunNote(run, n);
+            }
+          }
+
+          //if this is saved by a user, and not automatically saved by the notification system
+          User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+          watcherDAO.removeWatchedEntityByUser(run, user);
+
+          for (User u : run.getWatchers()) {
+            watcherDAO.saveWatchedEntityUser(run, u);
+          }
+        }
+
+        batch.add(params);
+      }
+      catch (IOException e) {
+        log.error("Cannot batch save run: " + run.getName());
+        e.printStackTrace();
+      }
+    }
+
+    int[] rows = namedTemplate.batchUpdate(RUN_UPDATE, batch.toArray(new SqlParameterSource[runs.size()]));
+
+    //flush caches
+    purgeCaches(runs);
+
+    return rows;
   }
 
   @Override

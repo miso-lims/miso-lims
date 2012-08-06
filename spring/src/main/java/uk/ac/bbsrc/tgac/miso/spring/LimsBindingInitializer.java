@@ -787,7 +787,6 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 //      else {
         id = NumberUtils.parseNumber((String) element, Long.class).longValue();
 //      }
-
     }
     try {
       return id != null ? requestManager.getExperimentById(id) : null;

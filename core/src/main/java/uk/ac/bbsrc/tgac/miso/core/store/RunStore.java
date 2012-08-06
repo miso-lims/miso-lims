@@ -138,4 +138,6 @@ public interface RunStore extends Store<Run>, Cascadable, Remover<Run> {
    * @throws IOException when
    */
   List<Run> listByStatus(String health) throws IOException;
+
+  int[] saveAll(Collection<Run> runs) throws IOException;
 }

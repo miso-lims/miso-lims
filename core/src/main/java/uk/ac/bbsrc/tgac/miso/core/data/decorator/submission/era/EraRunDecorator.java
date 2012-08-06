@@ -100,7 +100,7 @@ public class EraRunDecorator extends AbstractSubmittableDecorator<Document> {
         Element files = submission.createElementNS(null, "FILES");
         Collection<? extends Dilution> dilutions = pool.getDilutions();
         FilePathGenerator fpg = new TGACIlluminaFilepathGenerator();
-        for(Dilution libraryDilution : dilutions){
+        for(Dilution libraryDilution : dilutions) {
 
             //replace with FPG call?
            // String fileName=libraryDilution.getLibrary().getName()+"_"+

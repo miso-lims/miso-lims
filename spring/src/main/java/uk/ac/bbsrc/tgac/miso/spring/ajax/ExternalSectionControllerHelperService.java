@@ -241,7 +241,6 @@ public class ExternalSectionControllerHelperService {
           else {
             passStr = passed.toString();
           }
-
           sb.append("<tr>\n" +
                     "                    <td><b>" + sample.getName() + "</b></td>\n" +
                     "                    <td>" + sample.getAlias() + "</td>\n" +

@@ -91,6 +91,7 @@ public class LS454NotificationMessageConsumerMechanism implements NotificationMe
 
   private Map<String, Run> processRunJSON(HealthType ht, JSONArray runs, RequestManager requestManager) {
     Map<String, Run> updatedRuns = new HashMap<String, Run>();
+    List<Run> runsToSave = new ArrayList<Run>();
 
     DateFormat gsLogDateFormat = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy");
     DateFormat startDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
@@ -163,8 +164,7 @@ public class LS454NotificationMessageConsumerMechanism implements NotificationMe
 
                 if (sr != null) {
                   r.setSequencerReference(sr);
-                  long runId = requestManager.saveRun(r);
-                  r.setRunId(runId);
+                  runsToSave.add(r);
                 }
                 else {
                   log.error("\\_ Cannot save " + is.getRunName() + ": no sequencer reference available.");
@@ -222,98 +222,91 @@ public class LS454NotificationMessageConsumerMechanism implements NotificationMe
                 }
               }
 
-              if (run.has("runparams")) {
-                try {
-                  Document paramsDoc = SubmissionUtils.emptyDocument();
-                  SubmissionUtils.transform(new StringReader(run.getString("runparams")), paramsDoc);
+              if (r.getSequencerReference() != null) {
+                if (run.has("runparams")) {
+                  try {
+                    Document paramsDoc = SubmissionUtils.emptyDocument();
+                    SubmissionUtils.transform(new StringReader(run.getString("runparams")), paramsDoc);
 
-                  Element runInfo = (Element)paramsDoc.getElementsByTagName("run").item(0);
-                  String runDesc = runInfo.getElementsByTagName("shortName").item(0).getTextContent();
-                  r.setDescription(runDesc);
+                    Element runInfo = (Element)paramsDoc.getElementsByTagName("run").item(0);
+                    String runDesc = runInfo.getElementsByTagName("shortName").item(0).getTextContent();
+                    r.setDescription(runDesc);
 
-                  String cycles = runInfo.getElementsByTagName("numCycles").item(0).getTextContent();
-                  r.setCycles(Integer.parseInt(cycles));
+                    String cycles = runInfo.getElementsByTagName("numCycles").item(0).getTextContent();
+                    r.setCycles(Integer.parseInt(cycles));
 
-                  String startDateStr = runInfo.getElementsByTagName("date").item(0).getTextContent();
-                  Date startDate = startDateFormat.parse(startDateStr);
-                  if (!startDate.equals(r.getStatus().getStartDate())) {
-                    r.getStatus().setStartDate(startDate);
-                    requestManager.saveStatus(r.getStatus());
-                  }
+                    String startDateStr = runInfo.getElementsByTagName("date").item(0).getTextContent();
+                    Date startDate = startDateFormat.parse(startDateStr);
+                    if (!startDate.equals(r.getStatus().getStartDate())) {
+                      r.getStatus().setStartDate(startDate);
+                      requestManager.saveStatus(r.getStatus());
+                    }
 
-                  List<SequencerPartitionContainer<SequencerPoolPartition>> fs = ((LS454Run)r).getSequencerPartitionContainers();
+                    List<SequencerPartitionContainer<SequencerPoolPartition>> fs = ((LS454Run)r).getSequencerPartitionContainers();
 
-                  Element ptp = (Element)paramsDoc.getElementsByTagName("ptp").item(0);
-                  String ptpId = ptp.getElementsByTagName("id").item(0).getTextContent();
+                    Element ptp = (Element)paramsDoc.getElementsByTagName("ptp").item(0);
+                    String ptpId = ptp.getElementsByTagName("id").item(0).getTextContent();
 
-                  if (fs.isEmpty()) {
-                    if (ptp.getElementsByTagName("padLayout").getLength() > 0 && ptp.getElementsByTagName("padLayout").item(0) != null) {
-                      int numPartitions = Integer.parseInt(ptp.getElementsByTagName("padLayout").item(0).getTextContent().split("_")[0]);
-                      /*
-                      ChamberFlowcell f = new ChamberFlowcell();
-                      f.initEmptyChambers(numPartitions);
-                      f.setIdentificationBarcode(ptpId);
-                      f.setPaired(r.getPairedEnd());
-                      log.debug("\\_ Created new flowcell with "+f.getPartitions().size()+" partitions");
-                      ((RunImpl)r).addFlowcell(f);
-                      */
-                      SequencerPartitionContainer f = new SequencerPartitionContainerImpl();
+                    if (fs.isEmpty()) {
+                      if (ptp.getElementsByTagName("padLayout").getLength() > 0 && ptp.getElementsByTagName("padLayout").item(0) != null) {
+                        int numPartitions = Integer.parseInt(ptp.getElementsByTagName("padLayout").item(0).getTextContent().split("_")[0]);
+                        SequencerPartitionContainer f = new SequencerPartitionContainerImpl();
+                        if (f.getPlatformType() == null && r.getPlatformType() != null) {
+                          f.setPlatformType(r.getPlatformType());
+                        }
+                        f.setPartitionLimit(numPartitions);
+                        f.initEmptyPartitions();
+                        f.setIdentificationBarcode(ptpId);
+
+                        log.debug("\\_ Created new SequencerPartitionContainer with "+f.getPartitions().size()+" partitions");
+                        ((RunImpl)r).addSequencerPartitionContainer(f);
+                      }
+                    }
+                    else {
+                      SequencerPartitionContainer f = fs.iterator().next();
+                      log.debug("\\_ Got SequencerPartitionContainer " + f.getContainerId());
                       if (f.getPlatformType() == null && r.getPlatformType() != null) {
                         f.setPlatformType(r.getPlatformType());
                       }
-                      f.setPartitionLimit(numPartitions);
-                      f.initEmptyPartitions();
-                      f.setIdentificationBarcode(ptpId);
+                      if (f.getIdentificationBarcode() == null || "".equals(f.getIdentificationBarcode())) {
+                        f.setIdentificationBarcode(ptpId);
+                        long flowId = requestManager.saveSequencerPartitionContainer(f);
+                        f.setContainerId(flowId);
+                      }
+                    }
+                  }
+                  catch (ParserConfigurationException e) {
+                    log.error(e.getMessage());
+                    e.printStackTrace();
+                  }
+                  catch (TransformerException e) {
+                    log.error(e.getMessage());
+                    e.printStackTrace();
+                  }
+                  catch (ParseException e) {
+                    log.error(e.getMessage());
+                    e.printStackTrace();
+                  }
+                }
+                else {
+                  try {
+                    String startDateStr = m.group(1);
+                    DateFormat df = new SimpleDateFormat("yyyy'_'MM'_'dd'_'HH'_'mm'_'ss");
+                    Date startDate = df.parse(startDateStr);
+                    if (!startDate.equals(r.getStatus().getStartDate())) {
+                      r.getStatus().setStartDate(startDate);
+                      requestManager.saveStatus(r.getStatus());
+                    }
+                  }
+                  catch (ParseException e) {
+                    log.error(e.getMessage());
+                    e.printStackTrace();
+                  }
+                }
 
-                      log.debug("\\_ Created new SequencerPartitionContainer with "+f.getPartitions().size()+" partitions");
-                      ((RunImpl)r).addSequencerPartitionContainer(f);
-                    }
-                  }
-                  else {
-                    SequencerPartitionContainer f = fs.iterator().next();
-                    log.debug("\\_ Got SequencerPartitionContainer " + f.getContainerId());
-                    if (f.getPlatformType() == null && r.getPlatformType() != null) {
-                      f.setPlatformType(r.getPlatformType());
-                    }
-                    if (f.getIdentificationBarcode() == null || "".equals(f.getIdentificationBarcode())) {
-                      f.setIdentificationBarcode(ptpId);
-                      long flowId = requestManager.saveSequencerPartitionContainer(f);
-                      f.setContainerId(flowId);
-                    }
-                  }
-                }
-                catch (ParserConfigurationException e) {
-                  log.error(e.getMessage());
-                  e.printStackTrace();
-                }
-                catch (TransformerException e) {
-                  log.error(e.getMessage());
-                  e.printStackTrace();
-                }
-                catch (ParseException e) {
-                  log.error(e.getMessage());
-                  e.printStackTrace();
-                }
+                updatedRuns.put(r.getAlias(), r);
+                runsToSave.add(r);
               }
-              else {
-                try {
-                  String startDateStr = m.group(1);
-                  DateFormat df = new SimpleDateFormat("yyyy'_'MM'_'dd'_'HH'_'mm'_'ss");
-                  Date startDate = df.parse(startDateStr);
-                  if (!startDate.equals(r.getStatus().getStartDate())) {
-                    r.getStatus().setStartDate(startDate);
-                    requestManager.saveStatus(r.getStatus());
-                  }
-                }
-                catch (ParseException e) {
-                  log.error(e.getMessage());
-                  e.printStackTrace();
-                }
-              }
-
-              long runId = requestManager.saveRun(r);
-              r.setRunId(runId);
-              updatedRuns.put(r.getAlias(), r);
             }
           }
           catch (IOException e) {
@@ -322,9 +315,17 @@ public class LS454NotificationMessageConsumerMechanism implements NotificationMe
           }
         }
       }
-      sb.append("...done.\n");
     }
-    log.info(sb.toString());
+
+    try {
+      int[] saved = requestManager.saveRuns(runsToSave);
+      log.info("Batch saved " + saved.length + " / "+ runs.size() + " runs");
+    }
+    catch (IOException e) {
+      log.error("Couldn't save run batch: " + e.getMessage());
+      e.printStackTrace();
+    }
+
     return updatedRuns;
   }
 }

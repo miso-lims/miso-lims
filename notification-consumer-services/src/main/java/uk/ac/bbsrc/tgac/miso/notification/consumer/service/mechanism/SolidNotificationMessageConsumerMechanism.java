@@ -85,6 +85,7 @@ public class SolidNotificationMessageConsumerMechanism implements NotificationMe
 
   private Map<String, Run> processRunJSON(HealthType ht, JSONArray runs, RequestManager requestManager) {
     Map<String, Run> updatedRuns = new HashMap<String, Run>();
+    List<Run> runsToSave = new ArrayList<Run>();
     //2011-01-25 15:37:27.093
     DateFormat logDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
     DateFormat simpleLogDateFormat = new SimpleDateFormat("yyyyMMdd");
@@ -141,37 +142,39 @@ public class SolidNotificationMessageConsumerMechanism implements NotificationMe
                 r.setSequencerReference(sr);
               }
 
-              if (run.has("startDate")) {
-                try {
-                  log.debug("Updating start date:" + run.getString("startDate"));
+              if (r.getSequencerReference() != null) {
+                if (run.has("startDate")) {
+                  try {
+                    log.debug("Updating start date:" + run.getString("startDate"));
 
-                  Matcher m2 = simpleDateRegex.matcher(run.getString("startDate"));
-                  if (m2.matches()) {
-                    r.getStatus().setStartDate(simpleLogDateFormat.parse(run.getString("startDate")));
+                    Matcher m2 = simpleDateRegex.matcher(run.getString("startDate"));
+                    if (m2.matches()) {
+                      r.getStatus().setStartDate(simpleLogDateFormat.parse(run.getString("startDate")));
+                    }
+                    else {
+                      r.getStatus().setStartDate(logDateFormat.parse(run.getString("startDate")));
+                    }
                   }
-                  else {
-                    r.getStatus().setStartDate(logDateFormat.parse(run.getString("startDate")));
+                  catch (ParseException e) {
+                    log.error(e.getMessage());
+                    e.printStackTrace();
                   }
                 }
-                catch (ParseException e) {
-                  log.error(e.getMessage());
-                  e.printStackTrace();
-                }
-              }
 
-              if (run.has("completionDate")) {
-                try {
-                  if (run.get("completionDate") != null && !run.getString("completionDate").equals("null")) {
-                    log.debug("Updating completion date:" + run.getString("completionDate"));
-                    r.getStatus().setCompletionDate(logDateFormat.parse(run.getString("completionDate")));
+                if (run.has("completionDate")) {
+                  try {
+                    if (run.get("completionDate") != null && !run.getString("completionDate").equals("null")) {
+                      log.debug("Updating completion date:" + run.getString("completionDate"));
+                      r.getStatus().setCompletionDate(logDateFormat.parse(run.getString("completionDate")));
+                    }
+                    else {
+                      r.getStatus().setCompletionDate(null);
+                    }
                   }
-                  else {
-                    r.getStatus().setCompletionDate(null);
+                  catch (ParseException e) {
+                    log.error(e.getMessage());
+                    e.printStackTrace();
                   }
-                }
-                catch (ParseException e) {
-                  log.error(e.getMessage());
-                  e.printStackTrace();
                 }
               }
             }
@@ -197,109 +200,111 @@ public class SolidNotificationMessageConsumerMechanism implements NotificationMe
                   r.setSequencerReference(sr);
                 }
               }
+              if (r.getSequencerReference() != null) {
+                if (run.has("startDate")) {
+                  try {
+                    log.debug("Updating start date:" + run.getString("startDate"));
 
-              if (run.has("startDate")) {
-                try {
-                  log.debug("Updating start date:" + run.getString("startDate"));
-
-                  Matcher m2 = simpleDateRegex.matcher(run.getString("startDate"));
-                  if (m2.matches()) {
-                    r.getStatus().setStartDate(simpleLogDateFormat.parse(run.getString("startDate")));
+                    Matcher m2 = simpleDateRegex.matcher(run.getString("startDate"));
+                    if (m2.matches()) {
+                      r.getStatus().setStartDate(simpleLogDateFormat.parse(run.getString("startDate")));
+                    }
+                    else {
+                      r.getStatus().setStartDate(logDateFormat.parse(run.getString("startDate")));
+                    }
                   }
-                  else {
-                    r.getStatus().setStartDate(logDateFormat.parse(run.getString("startDate")));
-                  }
-                }
-                catch (ParseException e) {
-                  log.error(e.getMessage());
-                  e.printStackTrace();
-                }
-              }
-
-              if (run.has("completionDate")) {
-                try {
-                  if (run.get("completionDate") != null && !run.getString("completionDate").equals("null")) {
-                    log.debug("Updating completion date:" + run.getString("completionDate"));
-                    r.getStatus().setCompletionDate(logDateFormat.parse(run.getString("completionDate")));
-                  }
-                  else {
-                    r.getStatus().setCompletionDate(null);
+                  catch (ParseException e) {
+                    log.error(e.getMessage());
+                    e.printStackTrace();
                   }
                 }
-                catch (ParseException e) {
-                  log.error(e.getMessage());
-                  e.printStackTrace();
-                }
-              }
 
-              //update path if changed
-              if (run.has("fullPath") && !"".equals(run.getString("fullPath")) && r.getFilePath() != null && !"".equals(r.getFilePath())) {
-                if (!run.getString("fullPath").equals(r.getFilePath())) {
-                  log.debug("Updating run file path:" + r.getFilePath() + " -> " + run.getString("fullPath"));
-                  r.setFilePath(run.getString("fullPath"));
+                if (run.has("completionDate")) {
+                  try {
+                    if (run.get("completionDate") != null && !run.getString("completionDate").equals("null")) {
+                      log.debug("Updating completion date:" + run.getString("completionDate"));
+                      r.getStatus().setCompletionDate(logDateFormat.parse(run.getString("completionDate")));
+                    }
+                    else {
+                      r.getStatus().setCompletionDate(null);
+                    }
+                  }
+                  catch (ParseException e) {
+                    log.error(e.getMessage());
+                    e.printStackTrace();
+                  }
                 }
-              }
 
-              // update status if run isn't completed or failed
-              if (!r.getStatus().getHealth().equals(HealthType.Completed) && !r.getStatus().getHealth().equals(HealthType.Failed)) {
-                log.debug("Saving previously saved status: " + is.getRunName() + " (" + r.getStatus().getHealth().getKey() + " -> " + is.getHealth().getKey() + ")");
-                r.setStatus(is);
+                //update path if changed
+                if (run.has("fullPath") && !"".equals(run.getString("fullPath")) && r.getFilePath() != null && !"".equals(r.getFilePath())) {
+                  if (!run.getString("fullPath").equals(r.getFilePath())) {
+                    log.debug("Updating run file path:" + r.getFilePath() + " -> " + run.getString("fullPath"));
+                    r.setFilePath(run.getString("fullPath"));
+                  }
+                }
+
+                // update status if run isn't completed or failed
+                if (!r.getStatus().getHealth().equals(HealthType.Completed) && !r.getStatus().getHealth().equals(HealthType.Failed)) {
+                  log.debug("Saving previously saved status: " + is.getRunName() + " (" + r.getStatus().getHealth().getKey() + " -> " + is.getHealth().getKey() + ")");
+                  r.setStatus(is);
+                }
               }
             }
 
-            List<SequencerPartitionContainer<SequencerPoolPartition>> fs = ((SolidRun)r).getSequencerPartitionContainers();
-            if (fs.isEmpty()) {
-              if (run.has("containerId") && !"".equals(run.getString("containerId"))) {
-                Collection<SequencerPartitionContainer<SequencerPoolPartition>> pfs = requestManager.listSequencerPartitionContainersByBarcode(run.getString("containerId"));
-                if (!pfs.isEmpty()) {
-                  if (pfs.size() == 1) {
-                    SequencerPartitionContainer lf = new ArrayList<SequencerPartitionContainer<SequencerPoolPartition>>(pfs).get(0);
-                    if (lf.getSecurityProfile() != null && r.getSecurityProfile() == null) {
-                      r.setSecurityProfile(lf.getSecurityProfile());
+            if (r.getSequencerReference() != null) {
+              List<SequencerPartitionContainer<SequencerPoolPartition>> fs = ((SolidRun)r).getSequencerPartitionContainers();
+              if (fs.isEmpty()) {
+                if (run.has("containerId") && !"".equals(run.getString("containerId"))) {
+                  Collection<SequencerPartitionContainer<SequencerPoolPartition>> pfs = requestManager.listSequencerPartitionContainersByBarcode(run.getString("containerId"));
+                  if (!pfs.isEmpty()) {
+                    if (pfs.size() == 1) {
+                      SequencerPartitionContainer lf = new ArrayList<SequencerPartitionContainer<SequencerPoolPartition>>(pfs).get(0);
+                      if (lf.getSecurityProfile() != null && r.getSecurityProfile() == null) {
+                        r.setSecurityProfile(lf.getSecurityProfile());
+                      }
+                      if (lf.getPlatformType() == null && r.getPlatformType() != null) {
+                        lf.setPlatformType(r.getPlatformType());
+                      }
+                      ((RunImpl)r).addSequencerPartitionContainer(lf);
                     }
-                    if (lf.getPlatformType() == null && r.getPlatformType() != null) {
-                      lf.setPlatformType(r.getPlatformType());
+                  }
+                  else {
+                    log.debug("No containers linked to run " + r.getRunId() + ": creating...");
+                    SequencerPartitionContainer f = new SequencerPartitionContainerImpl();
+                    f.setSecurityProfile(r.getSecurityProfile());
+                    f.initEmptyPartitions();
+                    f.setIdentificationBarcode(run.getString("containerNum"));
+                    if (f.getPlatformType() == null && r.getPlatformType() != null) {
+                      f.setPlatformType(r.getPlatformType());
                     }
-                    ((RunImpl)r).addSequencerPartitionContainer(lf);
+                    //f.setPaired(r.getPairedEnd());
+                    ((RunImpl)r).addSequencerPartitionContainer(f);
                   }
                 }
-                else {
-                  log.debug("No containers linked to run " + r.getRunId() + ": creating...");
-                  SequencerPartitionContainer f = new SequencerPartitionContainerImpl();
+              }
+              else {
+                SequencerPartitionContainer f = fs.iterator().next();
+                log.debug("Got container " + f.getContainerId());
+
+                if (f.getSecurityProfile() == null) {
                   f.setSecurityProfile(r.getSecurityProfile());
-                  f.initEmptyPartitions();
-                  f.setIdentificationBarcode(run.getString("containerNum"));
-                  if (f.getPlatformType() == null && r.getPlatformType() != null) {
-                    f.setPlatformType(r.getPlatformType());
-                  }
-                  //f.setPaired(r.getPairedEnd());
-                  ((RunImpl)r).addSequencerPartitionContainer(f);
                 }
+
+                if (f.getPlatformType() == null && r.getPlatformType() != null) {
+                  f.setPlatformType(r.getPlatformType());
+                }
+
+                if (run.has("containerId") && !"".equals(run.getString("containerId"))) {
+                  f.setIdentificationBarcode(run.getString("containerId"));
+                }
+
+                long flowId = requestManager.saveSequencerPartitionContainer(f);
+                f.setContainerId(flowId);
               }
+
+              updatedRuns.put(r.getAlias(), r);
+              runsToSave.add(r);
             }
-            else {
-              SequencerPartitionContainer f = fs.iterator().next();
-              log.debug("Got container " + f.getContainerId());
-
-              if (f.getSecurityProfile() == null) {
-                f.setSecurityProfile(r.getSecurityProfile());
-              }
-
-              if (f.getPlatformType() == null && r.getPlatformType() != null) {
-                f.setPlatformType(r.getPlatformType());
-              }
-
-              if (run.has("containerId") && !"".equals(run.getString("containerId"))) {
-                f.setIdentificationBarcode(run.getString("containerId"));
-              }
-
-              long flowId = requestManager.saveSequencerPartitionContainer(f);
-              f.setContainerId(flowId);
-            }
-
-            long runId = requestManager.saveRun(r);
-            r.setRunId(runId);
-            updatedRuns.put(r.getAlias(), r);
           }
         }
         catch (IOException e) {
@@ -307,9 +312,17 @@ public class SolidNotificationMessageConsumerMechanism implements NotificationMe
           e.printStackTrace();
         }
       }
-      sb.append("...done.\n");
     }
-    log.info(sb.toString());
+
+    try {
+      int[] saved = requestManager.saveRuns(runsToSave);
+      log.info("Batch saved " + saved.length + " / "+ runs.size() + " runs");
+    }
+    catch (IOException e) {
+      log.error("Couldn't save run batch: " + e.getMessage());
+      e.printStackTrace();
+    }
+
     return updatedRuns;
   }
 }
