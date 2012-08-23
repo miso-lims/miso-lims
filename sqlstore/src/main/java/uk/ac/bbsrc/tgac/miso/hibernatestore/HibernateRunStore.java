@@ -76,4 +76,9 @@ public class HibernateRunStore  extends HibernateDaoSupport implements Store<Run
             */
     return null;
   }
+
+  @Override
+  public int count() throws IOException {
+    return 0;
+  }
 }

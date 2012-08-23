@@ -67,21 +67,23 @@ import java.util.List;
  * @since 0.1.6
  */
 public class SQLSequencerPartitionContainerDAO implements SequencerPartitionContainerStore {
+  private static final String TABLE_NAME = "SequencerPartitionContainer";
+
   private static final String SEQUENCER_PARTITION_CONTAINER_SELECT =
-          "SELECT containerId, platformType, identificationBarcode, locationBarcode, validationBarcode, securityProfile_profileId FROM SequencerPartitionContainer";
+          "SELECT containerId, platformType, identificationBarcode, locationBarcode, validationBarcode, securityProfile_profileId FROM " + TABLE_NAME;
 
   private static final String SEQUENCER_PARTITION_CONTAINER_SELECT_BY_ID =
           SEQUENCER_PARTITION_CONTAINER_SELECT + " WHERE containerId=?";
 
   private static final String SEQUENCER_PARTITION_CONTAINER_SELECT_BY_PARTITION_ID  =
           "SELECT s.containerId, s.platformType, s.identificationBarcode, s.locationBarcode, s.validationBarcode, s.securityProfile_profileId " +
-          "FROM SequencerPartitionContainer s, SequencerPartitionContainer_Partition sp " +
+          "FROM "+TABLE_NAME+" s, SequencerPartitionContainer_Partition sp " +
           "WHERE s.containerId=sp.container_containerId " +
           "AND sp.partitions_partitionId=?";
 
   private static final String SEQUENCER_PARTITION_CONTAINER_SELECT_BY_RELATED_RUN =
           "SELECT DISTINCT f.containerId, f.platformType, f.identificationBarcode, f.locationBarcode, f.validationBarcode, f.securityProfile_profileId " +
-          "FROM SequencerPartitionContainer f, Run_SequencerPartitionContainer rf " +
+          "FROM "+TABLE_NAME+" f, Run_SequencerPartitionContainer rf " +
           "WHERE f.containerId=rf.containers_containerId " +
           "AND rf.run_runId=?";
 
@@ -98,7 +100,7 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
           "AND containers_containerId=:containers_containerId";
 
   public static final String SEQUENCER_PARTITION_CONTAINER_UPDATE =
-          "UPDATE SequencerPartitionContainer " +
+          "UPDATE "+TABLE_NAME+" " +
           "SET platformType=:platformType, identificationBarcode=:identificationBarcode, locationBarcode=:locationBarcode, validationBarcode=:validationBarcode, securityProfile_profileId:=securityProfile_profileId " +
           "WHERE containerId=:containerId";
 
@@ -196,6 +198,11 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
   }
 
   @Override
+  public int count() throws IOException {
+    return template.queryForInt("SELECT count(*) FROM "+TABLE_NAME);
+  }
+
+  @Override
   public List<SequencerPartitionContainer<SequencerPoolPartition>> listSequencerPartitionContainersByBarcode(String barcode) throws IOException {
     List<SequencerPartitionContainer<SequencerPoolPartition>> lp =  template.query(SEQUENCER_PARTITION_CONTAINER_SELECT_BY_IDENTIFICATION_BARCODE, new Object[]{barcode}, new LazySequencerPartitionContainerMapper<SequencerPartitionContainer<SequencerPoolPartition>>());
     for (SequencerPartitionContainer<SequencerPoolPartition> f : lp) {
@@ -267,7 +274,7 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
                           }
                   )
   )
-  public long save(SequencerPartitionContainer<SequencerPoolPartition> sequencerPartitionContainer) throws IOException {
+  public synchronized long save(SequencerPartitionContainer<SequencerPoolPartition> sequencerPartitionContainer) throws IOException {
     Long securityProfileId = sequencerPartitionContainer.getSecurityProfile().getProfileId();
     if (securityProfileId == null || (this.cascadeType != null)) { // && this.cascadeType.equals(CascadeType.PERSIST))) {
       securityProfileId = securityProfileDAO.save(sequencerPartitionContainer.getSecurityProfile());
@@ -286,7 +293,7 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
 
     if (sequencerPartitionContainer.getContainerId() == AbstractSequencerPartitionContainer.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-              .withTableName("SequencerPartitionContainer")
+              .withTableName(TABLE_NAME)
               .usingGeneratedKeyColumns("containerId");
       Number newId = insert.executeAndReturnKey(params);
       sequencerPartitionContainer.setContainerId(newId.longValue());
@@ -297,18 +304,22 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
       namedTemplate.update(SEQUENCER_PARTITION_CONTAINER_UPDATE, params);
     }
 
-    MapSqlParameterSource delparams = new MapSqlParameterSource();
-    delparams.addValue("container_containerId", sequencerPartitionContainer.getContainerId());
-    NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-    namedTemplate.update(SEQUENCER_PARTITION_CONTAINER_PARTITION_DELETE_BY_SEQUENCER_PARTITION_CONTAINER_ID, delparams);
+    //MapSqlParameterSource delparams = new MapSqlParameterSource();
+    //delparams.addValue("container_containerId", sequencerPartitionContainer.getContainerId());
+    //NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+    //namedTemplate.update(SEQUENCER_PARTITION_CONTAINER_PARTITION_DELETE_BY_SEQUENCER_PARTITION_CONTAINER_ID, delparams);
 
     if (sequencerPartitionContainer.getPartitions() != null && !sequencerPartitionContainer.getPartitions().isEmpty()) {
+      //log.info(sequencerPartitionContainer.getName()+":: Saving " + sequencerPartitionContainer.getPartitions().size() + " partitions...");
+
       SimpleJdbcInsert eInsert = new SimpleJdbcInsert(template)
               .withTableName("SequencerPartitionContainer_Partition");
 
       for (SequencerPoolPartition l : sequencerPartitionContainer.getPartitions()) {
         l.setSecurityProfile(sequencerPartitionContainer.getSecurityProfile());
         long partitionId = partitionDAO.save(l);
+
+        //log.info(sequencerPartitionContainer.getName()+":: Saved partition " + l.getPartitionNumber() + " ("+partitionId+")");
 
         MapSqlParameterSource flParams = new MapSqlParameterSource();
         flParams.addValue("container_containerId", sequencerPartitionContainer.getContainerId())
@@ -317,7 +328,7 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
           eInsert.execute(flParams);
         }
         catch (DuplicateKeyException dke) {
-          log.warn("This Container/Partition combination already exists - not inserting: " + dke.getMessage());
+          log.debug("This Container/Partition combination already exists - not inserting: " + dke.getMessage());
         }
       }
     }

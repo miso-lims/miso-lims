@@ -62,9 +62,11 @@ import java.util.Queue;
  * @since 0.0.3
  */
 public class SQLPrintJobDAO implements PrintJobStore {
+  private static final String TABLE_NAME = "PrintJob";
+
   public static final String PRINT_JOB_SELECT =
           "SELECT jobId, printServiceName, printDate, jobCreator_userId, printedElements, status " +
-          "FROM PrintJob";
+          "FROM "+TABLE_NAME;
 
   public static final String PRINT_JOB_SELECT_BY_ID =
           PRINT_JOB_SELECT + " WHERE jobId = ?";
@@ -76,7 +78,7 @@ public class SQLPrintJobDAO implements PrintJobStore {
           PRINT_JOB_SELECT + " WHERE jobCreator_userId = ?";  
 
   public static final String PRINT_JOB_UPDATE =
-          "UPDATE PrintJob " +
+          "UPDATE "+TABLE_NAME+" " +
           "SET printServiceName=:printServiceName, printDate=:printDate, jobCreator_userId=:jobCreator_userId, printedElements=:printedElements, status=:status " +
           "WHERE jobId=:jobId";  
 
@@ -130,7 +132,7 @@ public class SQLPrintJobDAO implements PrintJobStore {
 
     if (printJob.getJobId() == AbstractPrintJob.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-              .withTableName("PrintJob")
+              .withTableName(TABLE_NAME)
               .usingGeneratedKeyColumns("jobId");
       Number newId = insert.executeAndReturnKey(params);
       printJob.setJobId(newId.longValue());
@@ -151,6 +153,11 @@ public class SQLPrintJobDAO implements PrintJobStore {
 
   public Collection<PrintJob> listAll() throws IOException {
     return template.query(PRINT_JOB_SELECT, new PrintJobMapper());
+  }
+
+  @Override
+  public int count() throws IOException {
+    return template.queryForInt("SELECT count(*) FROM "+TABLE_NAME);
   }
 
   public List<PrintJob> listByUser(User user) throws IOException {

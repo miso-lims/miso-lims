@@ -49,15 +49,17 @@ import java.util.List;
  * @since 0.0.2
  */
 public class SQLPlatformDAO implements PlatformStore {
+  private static final String TABLE_NAME = "Platform";
+
   public static final String PLATFORMS_SELECT =
           "SELECT platformId, name, instrumentModel, description, numContainers " +
-          "FROM Platform";
+          "FROM "+TABLE_NAME;
 
   public static final String PLATFORM_NAMES_SELECT_DISTINCT =
-          "SELECT DISTINCT name FROM Platform";
+          "SELECT DISTINCT name FROM "+TABLE_NAME;
 
   public static final String PLATFORM_UPDATE =
-          "UPDATE Platform " +
+          "UPDATE "+TABLE_NAME+" " +
           "SET name=:name, instrumentModel=:instrumentModel, description=:description, numContainers=:numContainers " +
           "WHERE platformId=:platformId";
 
@@ -97,7 +99,7 @@ public class SQLPlatformDAO implements PlatformStore {
 
     if (platform.getPlatformId() == null) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-              .withTableName("Platform")
+              .withTableName(TABLE_NAME)
               .usingGeneratedKeyColumns("platformId");
       Number newId = insert.executeAndReturnKey(params);
       platform.setPlatformId(newId.longValue());
@@ -113,6 +115,11 @@ public class SQLPlatformDAO implements PlatformStore {
 
   public List<Platform> listAll() {
     return template.query(PLATFORMS_SELECT, new PlatformMapper());
+  }
+
+  @Override
+  public int count() throws IOException {
+    return template.queryForInt("SELECT count(*) FROM "+TABLE_NAME);
   }
 
   public List<String> listDistinctPlatformNames() {

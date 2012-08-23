@@ -76,7 +76,7 @@ public class SequencerPartitionContainerImpl extends AbstractSequencerPartitionC
   }
 
   @Override
-  public SequencerPoolPartition getPartitionAt(int partitionNumber) {
+  public SequencerPoolPartition getPartitionAt(int partitionNumber) throws IndexOutOfBoundsException {
     return partitions.get(partitionNumber-1);
   }
 

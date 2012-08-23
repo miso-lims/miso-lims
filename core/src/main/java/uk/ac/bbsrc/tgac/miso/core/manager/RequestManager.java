@@ -84,10 +84,11 @@ public interface RequestManager {
   public SequencerPartitionContainer<SequencerPoolPartition> getSequencerPartitionContainerById(long containerId) throws IOException;
 
   public Experiment getExperimentById(long experimentId) throws IOException;
-  public Pool getPoolById(long poolId) throws IOException;
-  public Pool getPoolByBarcode(String barcode) throws IOException;
-  public Pool getIlluminaPoolByBarcode(String barcode) throws IOException;
-  public Pool getIlluminaPoolById(long poolId) throws IOException;
+  public Pool<? extends Poolable> getPoolById(long poolId) throws IOException;
+  public Pool<? extends Poolable> getPoolByBarcode(String barcode) throws IOException;
+  public Pool<? extends Poolable> getPoolByBarcode(String barcode, PlatformType platformType) throws IOException;
+  public Pool<? extends Poolable> getIlluminaPoolByBarcode(String barcode) throws IOException;
+  public Pool<? extends Poolable> getIlluminaPoolById(long poolId) throws IOException;
   public Library getLibraryById(long libraryId) throws IOException;
   public Library getLibraryByBarcode(String barcode) throws IOException;
   public Library getLibraryByAlias(String alias) throws IOException;
@@ -105,8 +106,8 @@ public interface RequestManager {
   public emPCR getEmPcrById(long pcrId) throws IOException;
   public emPCRDilution getEmPcrDilutionById(long dilutionId) throws IOException;
   public emPCRDilution getEmPcrDilutionByBarcode(String barcode) throws IOException;
-  public Pool getLS454PoolById(long poolId) throws IOException;
-  public Pool getLS454PoolByBarcode(String barcode) throws IOException;
+  public Pool<? extends Poolable> getLS454PoolById(long poolId) throws IOException;
+  public Pool<? extends Poolable> getLS454PoolByBarcode(String barcode) throws IOException;
   public Note getNoteById(long noteId) throws IOException;
   public Platform getPlatformById(long platformId) throws IOException;
   public Project getProjectById(long projectId) throws IOException;
@@ -117,8 +118,8 @@ public interface RequestManager {
   public Sample getSampleById(long sampleId) throws IOException;
   public Sample getSampleByBarcode(String barcode) throws IOException;
   public SampleQC getSampleQCById(long sampleQcId) throws IOException;
-  public Pool getSolidPoolById(long poolId) throws IOException;
-  public Pool getSolidPoolByBarcode(String barcode) throws IOException;
+  public Pool<? extends Poolable> getSolidPoolById(long poolId) throws IOException;
+  public Pool<? extends Poolable> getSolidPoolByBarcode(String barcode) throws IOException;
   public Status getStatusById(long statusId) throws IOException;
   public Status getStatusByRunName(String runName) throws IOException;
   public Study getStudyById(long studyId) throws IOException;

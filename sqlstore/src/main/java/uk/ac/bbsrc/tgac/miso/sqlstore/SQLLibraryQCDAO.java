@@ -65,10 +65,11 @@ import java.util.List;
  * @since 0.0.2
  */
 public class SQLLibraryQCDAO implements LibraryQcStore {
+  private static final String TABLE_NAME = "LibraryQC";
 
   public static final String LIBRARY_QC =
           "SELECT qcId, library_libraryId, qcUserName, qcDate, qcMethod, results, insertSize " +
-          "FROM LibraryQC";
+          "FROM "+TABLE_NAME;
 
   public static final String LIBRARY_QC_SELECT_BY_ID =
          LIBRARY_QC + " WHERE qcId=?";
@@ -78,8 +79,8 @@ public class SQLLibraryQCDAO implements LibraryQcStore {
           "ORDER BY qcDate ASC";
 
   public static final String LIBRARY_QC_UPDATE =
-          "UPDATE LibraryQC " +
-          "SET library_libraryId=:library_libraryId, qcUserName=:qcUserName, qcDate=:qcDate, qcMethod=:qcMethod, results=:results, insertSize=:insertSize " +
+          "UPDATE "+TABLE_NAME+
+          " SET library_libraryId=:library_libraryId, qcUserName=:qcUserName, qcDate=:qcDate, qcMethod=:qcMethod, results=:results, insertSize=:insertSize " +
           "WHERE qcId=:qcId";
 
   public static final String LIBRARY_QC_TYPE_SELECT =
@@ -93,7 +94,7 @@ public class SQLLibraryQCDAO implements LibraryQcStore {
           LIBRARY_QC_TYPE_SELECT + " AND name = ?";
 
   public static final String LIBRARY_QC_DELETE =
-         "DELETE FROM LibraryQC WHERE qcId=:qcId";
+         "DELETE FROM "+TABLE_NAME+" WHERE qcId=:qcId";
 
   private JdbcTemplate template;
   private LibraryStore libraryDAO;
@@ -142,7 +143,7 @@ public class SQLLibraryQCDAO implements LibraryQcStore {
 
     if (libraryQC.getQcId() == AbstractLibraryQC.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-                              .withTableName("LibraryQC")
+                              .withTableName(TABLE_NAME)
                               .usingGeneratedKeyColumns("qcId");
       Number newId = insert.executeAndReturnKey(params);
       libraryQC.setQcId(newId.longValue());
@@ -193,6 +194,11 @@ public class SQLLibraryQCDAO implements LibraryQcStore {
 
   public Collection<LibraryQC> listAll() throws IOException {
     return template.query(LIBRARY_QC, new LazyLibraryQcMapper());
+  }
+
+  @Override
+  public int count() throws IOException {
+    return template.queryForInt("SELECT count(*) FROM "+TABLE_NAME);
   }
 
   public boolean remove(LibraryQC qc) throws IOException {

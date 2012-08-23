@@ -60,9 +60,11 @@ import java.util.List;
  * @since 0.1.6
  */
 public class SQLPrintServiceDAO implements PrintServiceStore {
+  private static final String TABLE_NAME = "PrintService";
+
   public static final String PRINT_SERVICE_SELECT =
           "SELECT serviceId, serviceName, contextName, contextFields, enabled, printServiceFor " +
-          "FROM PrintService";
+          "FROM "+TABLE_NAME;
 
   public static final String PRINT_SERVICE_SELECT_BY_SERVICE_ID =
           PRINT_SERVICE_SELECT + " WHERE serviceId = ?";
@@ -77,7 +79,7 @@ public class SQLPrintServiceDAO implements PrintServiceStore {
           PRINT_SERVICE_SELECT + " WHERE printServiceFor = ?";
 
   public static final String PRINT_SERVICE_UPDATE =
-          "UPDATE PrintService " +
+          "UPDATE "+TABLE_NAME+" " +
           "SET contextName=:contextName, contextFields=:contextFields, enabled=:enabled, printServiceFor=:printServiceFor " +
           "WHERE serviceName=:serviceName";
 
@@ -128,7 +130,7 @@ public class SQLPrintServiceDAO implements PrintServiceStore {
 
     if (printService.getServiceId() == -1) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-              .withTableName("PrintService")
+              .withTableName(TABLE_NAME)
               .usingGeneratedKeyColumns("serviceId");
       Number newId = insert.executeAndReturnKey(params);
       printService.setServiceId(newId.longValue());
@@ -155,6 +157,11 @@ public class SQLPrintServiceDAO implements PrintServiceStore {
 
   public Collection<MisoPrintService> listAll() throws IOException {
     return template.query(PRINT_SERVICE_SELECT, new MisoPrintServiceMapper());
+  }
+
+  @Override
+  public int count() throws IOException {
+    return template.queryForInt("SELECT count(*) FROM "+TABLE_NAME);
   }
 
   @Override

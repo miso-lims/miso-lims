@@ -68,4 +68,9 @@ public class HibernateExperimentStore extends HibernateDaoSupport implements Sto
             */
     return null;
   }
+
+  @Override
+  public int count() throws IOException {
+    return 0;
+  }
 }

@@ -68,4 +68,9 @@ public class HibernateSampleStore extends HibernateDaoSupport implements Store<S
             */
     return null;
   }
+
+  @Override
+  public int count() throws IOException {
+    return 0;
+  }
 }

@@ -59,10 +59,11 @@ import java.util.*;
  * @since 0.0.2
  */
 public class SQLExperimentDAO implements ExperimentStore {
+  private static final String TABLE_NAME="Experiment";
 
   public static final String EXPERIMENTS_SELECT =
           "SELECT experimentId, name, description, alias, accession, title, platform_platformId, securityProfile_profileId, study_studyId " +
-          "FROM Experiment";
+          "FROM "+TABLE_NAME;
 
   public static final String EXPERIMENT_SELECT_BY_ID =
           EXPERIMENTS_SELECT + " " + "WHERE experimentId = ?";
@@ -74,22 +75,22 @@ public class SQLExperimentDAO implements ExperimentStore {
           "description LIKE ? ";
 
   public static final String EXPERIMENT_UPDATE =
-          "UPDATE Experiment " +
-          "SET name=:name, description=:description, alias=:alias, accession=:accession, title=:title, platform_platformId=:platform_platformId, securityProfile_profileId=:securityProfile_profileId " +
+          "UPDATE " +TABLE_NAME+
+          " SET name=:name, description=:description, alias=:alias, accession=:accession, title=:title, platform_platformId=:platform_platformId, securityProfile_profileId=:securityProfile_profileId " +
           "WHERE experimentId=:experimentId";  
 
   public static final String EXPERIMENT_DELETE =
-          "DELETE FROM Experiment WHERE experimentId=:experimentId";  
+          "DELETE FROM "+TABLE_NAME+" WHERE experimentId=:experimentId";
 
   public static final String PROFILE_SELECT_BY_EXPERIMENT_ID =
           "SELECT sp.profileId, sp.allowAllInternal, sp.owner_userId " +
-          "FROM Experiment e, SecurityProfile sp " +
+          "FROM "+TABLE_NAME+" e, SecurityProfile sp " +
           "WHERE sp.profileId = e.SecurityProfile_profileId " +
           "AND e.experimentId=?";
 
   public static final String EXPERIMENTS_BY_RELATED_STUDY =
           "SELECT e.experimentId, e.name, e.description, e.alias, e.accession, e.title, e.platform_platformId, e.securityProfile_profileId, e.study_studyId " +
-          "FROM Experiment e, Study s " +
+          "FROM "+TABLE_NAME+" e, Study s " +
           "WHERE e.study_studyId=s.studyId " +
           "AND s.studyId=?";
 
@@ -101,37 +102,37 @@ public class SQLExperimentDAO implements ExperimentStore {
 */
   public static final String EXPERIMENTS_BY_RELATED_POOL =
           "SELECT e.experimentId, e.name, e.description, e.alias, e.accession, e.title, e.platform_platformId, e.securityProfile_profileId, e.study_studyId, pe.experiments_experimentId " +
-          "FROM Experiment e, Pool_Experiment pe " +
+          "FROM "+TABLE_NAME+" e, Pool_Experiment pe " +
           "WHERE pe.experiments_experimentId=e.experimentId " +
           "AND pe.pool_poolId=?";
 
   public static final String EXPERIMENTS_BY_RELATED_RUN =
           "SELECT e.experimentId, e.name, e.description, e.alias, e.accession, e.title, e.platform_platformId, e.securityProfile_profileId, e.study_studyId, er.runs_runId " +
-          "FROM Experiment e, Experiment_Run er " +
+          "FROM "+TABLE_NAME+" e, Experiment_Run er " +
           "WHERE er.Experiment_experimentId=e.experimentId " +
           "AND er.runs_runId=?";
 
   public static final String EXPERIMENT_BY_RELATED_LANE =
           "SELECT e.experimentId, e.name, e.description, e.alias, e.accession, e.title, e.platform_platformId, e.securityProfile_profileId, e.study_studyId, er.runs_runId " +
-          "FROM Experiment e, Lane l " +
+          "FROM "+TABLE_NAME+" e, Lane l " +
           "WHERE e.experimentId=l.experiment_experimentId " +
           "AND l.laneId=?";  
 
   public static final String EXPERIMENT_BY_RELATED_CHAMBER =
           "SELECT e.experimentId, e.name, e.description, e.alias, e.accession, e.title, e.platform_platformId, e.securityProfile_profileId, e.study_studyId, er.runs_runId " +
-          "FROM Experiment e, Partition c " +
+          "FROM "+TABLE_NAME+" e, Partition c " +
           "WHERE e.experimentId=c.experiment_experimentId " +
           "AND c.chamberId=?";
 
   public static final String EXPERIMENT_BY_RELATED_PARTITION =
           "SELECT e.experimentId, e.name, e.description, e.alias, e.accession, e.title, e.platform_platformId, e.securityProfile_profileId, e.study_studyId, er.runs_runId " +
-          "FROM Experiment e, Partition l " +
+          "FROM "+TABLE_NAME+" e, Partition l " +
           "WHERE e.experimentId=l.experiment_experimentId " +
           "AND l.partitionId=?";
 
   public static final String EXPERIMENTS_BY_RELATED_SUBMISSION =
           "SELECT e.experimentId, e.name, e.description, e.alias, e.accession, e.title, e.platform_platformId, e.securityProfile_profileId, e.study_studyId " +
-          "FROM Experiment e, Submission_Experiment se " +
+          "FROM "+TABLE_NAME+" e, Submission_Experiment se " +
           "WHERE e.experimentId=se.experiments_experimentId " +
           "AND se.submission_submissionId=?";  
 
@@ -294,9 +295,9 @@ public class SQLExperimentDAO implements ExperimentStore {
 
     if (experiment.getExperimentId() == AbstractExperiment.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-                            .withTableName("Experiment")
+                            .withTableName(TABLE_NAME)
                             .usingGeneratedKeyColumns("experimentId");
-      String name = Experiment.PREFIX + DbUtils.getAutoIncrement(template, "Experiment");
+      String name = Experiment.PREFIX + DbUtils.getAutoIncrement(template, TABLE_NAME);
       params.addValue("name", name);
       Number newId = insert.executeAndReturnKey(params);
       experiment.setExperimentId(newId.longValue());
@@ -380,6 +381,11 @@ public class SQLExperimentDAO implements ExperimentStore {
   )
   public List<Experiment> listAll() {
     return template.query(EXPERIMENTS_SELECT, new LazyExperimentMapper());
+  }
+
+  @Override
+  public int count() throws IOException {
+    return template.queryForInt("SELECT count(*) FROM "+TABLE_NAME);
   }
 
   public List<Experiment> listBySearch(String query) {

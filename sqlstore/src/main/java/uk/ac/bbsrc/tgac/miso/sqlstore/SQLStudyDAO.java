@@ -68,9 +68,11 @@ import java.util.List;
  * @since 0.0.2
  */
 public class SQLStudyDAO implements StudyStore {
+  private static final String TABLE_NAME = "Study";
+
   public static final String STUDIES_SELECT =
           "SELECT studyId, name, description, alias, accession, securityProfile_profileId, project_projectId, studyType " +
-          "FROM Study";
+          "FROM "+TABLE_NAME;
 
   public static final String STUDY_SELECT_BY_ID =
           STUDIES_SELECT + " " + "WHERE studyId = ?";
@@ -82,34 +84,34 @@ public class SQLStudyDAO implements StudyStore {
           "description LIKE ? ";
 
   public static final String STUDY_UPDATE =
-          "UPDATE Study " +
+          "UPDATE "+TABLE_NAME+" " +
           "SET name=:name, description=:description, alias=:alias, accession=:accession, securityProfile_profileId=:securityProfile_profileId, project_projectId=:project_projectId, studyType=:studyType " +
           "WHERE studyId=:studyId";
 
   public static final String STUDY_DELETE =
-          "DELETE FROM Study WHERE studyId=:studyId";  
+          "DELETE FROM "+TABLE_NAME+" WHERE studyId=:studyId";
 
   public static final String STUDY_SELECT_BY_EXPERIMENT_ID =
           "SELECT s.studyId, s.name, s.description, s.alias, s.accession, s.securityProfile_profileId, s.project_projectId, s.studyType " +
-          "FROM Study s, Experiment e " +
+          "FROM "+TABLE_NAME+" s, Experiment e " +
           "WHERE s.studyId=e.study_studyId " +
           "AND e.experimentId=?";
 
   public static final String STUDY_SELECT_BY_STUDY_TYPE =
           "SELECT s.studyId, s.name, s.description, s.alias, s.accession, s.securityProfile_profileId, s.project_projectId, s.studyType " +
-          "FROM Study s, StudyType t " +
+          "FROM "+TABLE_NAME+" s, StudyType t " +
           "WHERE s.studyType=t.name " +
           "AND t.name=?";  
 
   public static final String STUDIES_BY_RELATED_PROJECT =
           "SELECT s.studyId, s.name, s.description, s.alias, s.accession, s.securityProfile_profileId, s.project_projectId, s.studyType " +
-          "FROM Study s, Project_Study ps " +
+          "FROM "+TABLE_NAME+" s, Project_Study ps " +
           "WHERE s.studyId=ps.studies_studyId " +
           "AND ps.Project_projectId=?";
 
   public static final String STUDIES_BY_RELATED_SUBMISSION = 
           "SELECT s.studyId, s.name, s.description, s.alias, s.accession, s.securityProfile_profileId, s.project_projectId, s.studyType " +
-          "FROM Study s, Submission_Study ss " +
+          "FROM "+TABLE_NAME+" s, Submission_Study ss " +
           "WHERE s.studyId=ss.studies_studyId " +
           "AND ss.submission_submissionId=?";
 
@@ -214,9 +216,9 @@ public class SQLStudyDAO implements StudyStore {
 
     if (study.getStudyId() == AbstractStudy.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-                            .withTableName("Study")
+                            .withTableName(TABLE_NAME)
                             .usingGeneratedKeyColumns("studyId");
-      String name = "STU"+ DbUtils.getAutoIncrement(template, "Study");
+      String name = "STU"+ DbUtils.getAutoIncrement(template, TABLE_NAME);
       params.addValue("name", name);
       Number newId = insert.executeAndReturnKey(params);
       study.setStudyId(newId.longValue());
@@ -273,6 +275,11 @@ public class SQLStudyDAO implements StudyStore {
   )
   public List<Study> listAll() {
     return template.query(STUDIES_SELECT, new LazyStudyMapper());
+  }
+
+  @Override
+  public int count() throws IOException {
+    return template.queryForInt("SELECT count(*) FROM "+TABLE_NAME);
   }
 
   public List<Study> listBySearch(String query) {

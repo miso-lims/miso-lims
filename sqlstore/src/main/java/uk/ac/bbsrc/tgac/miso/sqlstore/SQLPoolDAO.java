@@ -68,9 +68,11 @@ import java.util.*;
  * @since 0.0.2
  */
 public class SQLPoolDAO implements PoolStore {
-  private static String POOL_SELECT =
+  private static final String TABLE_NAME = "Pool";
+
+  private static final String POOL_SELECT =
           "SELECT poolId, concentration, identificationBarcode, name, alias, creationDate, securityProfile_profileId, platformType, ready " +
-          "FROM Pool";
+          "FROM "+TABLE_NAME;
 
   public static final String POOL_SELECT_BY_POOL_ID =
           POOL_SELECT + " WHERE poolId=?";
@@ -91,12 +93,12 @@ public class SQLPoolDAO implements PoolStore {
           POOL_SELECT_BY_PLATFORM_AND_SEARCH + " AND ready=1";
 
   public static final String POOL_UPDATE =
-          "UPDATE Pool " +
+          "UPDATE "+TABLE_NAME+" " +
           "SET alias=:alias, concentration=:concentration, identificationBarcode=:identificationBarcode, creationDate=:creationDate, securityProfile_profileId=:securityProfile_profileId, platformType=:platformType, ready=:ready " +
           "WHERE poolId=:poolId";
 
   public static final String POOL_DELETE =
-          "DELETE FROM Pool WHERE poolId=:poolId";
+          "DELETE FROM "+TABLE_NAME+" WHERE poolId=:poolId";
 
   public static final String POOL_EXPERIMENT_DELETE_BY_POOL_ID =
           "DELETE FROM Pool_Experiment " +
@@ -115,7 +117,7 @@ public class SQLPoolDAO implements PoolStore {
           "LEFT JOIN Pool_LibraryDilution pld ON pld.dilutions_dilutionId = ld.dilutionId " +
           "LEFT JOIN Pool_emPCRDilution ple ON ple.dilutions_dilutionId = ed.dilutionId " +
 
-          "INNER JOIN Pool pool ON pool.poolId = pld.pool_poolId " +
+          "INNER JOIN "+TABLE_NAME+" pool ON pool.poolId = pld.pool_poolId " +
           "OR pool.poolId = ple.pool_poolId " +
           "WHERE p.projectId=?";
 
@@ -130,7 +132,7 @@ public class SQLPoolDAO implements PoolStore {
           "LEFT JOIN Pool_LibraryDilution pld ON pld.dilutions_dilutionId = ld.dilutionId " +
           "LEFT JOIN Pool_emPCRDilution ple ON ple.dilutions_dilutionId = ed.dilutionId " +
 
-          "INNER JOIN Pool pool ON pool.poolId = pld.pool_poolId " +
+          "INNER JOIN "+TABLE_NAME+" pool ON pool.poolId = pld.pool_poolId " +
           "OR pool.poolId = ple.pool_poolId " +
           "WHERE li.libraryId=?";
 
@@ -156,21 +158,21 @@ public class SQLPoolDAO implements PoolStore {
 
   public static final String ILLUMINA_POOL_BY_RELATED_LANE =
           "SELECT l.laneId, ip.poolId, ip.concentration, ip.identificationBarcode, ip.name, ip.alias, ip.creationDate, ip.securityProfile_profileId, ip.platformType, ip.ready " +
-          "FROM Lane l, Pool ip " +
+          "FROM Lane l, "+TABLE_NAME+" ip " +
           "WHERE l.poolId=ip.poolId " +
           "AND ip.platformType='Illumina' " +
           "AND l.laneId=?";
 
   public static final String ILLUMINA_POOLS_BY_RELATED_LIBRARY_DILUTION =
           "SELECT ip.poolId, ip.concentration, ip.identificationBarcode, ip.name, ip.alias, ip.creationDate, ip.securityProfile_profileId, ip.platformType, ip.ready " +
-          "FROM Pool ip, Pool_LibraryDilution p " +
+          "FROM "+TABLE_NAME+" ip, Pool_LibraryDilution p " +
           "WHERE ip.poolId=p.pool_poolId " +
           "AND ip.platformType='Illumina' " +
           "AND p.dilutions_dilutionId=?";
 
   public static final String ILLUMINA_POOL_SELECT_BY_EXPERIMENT_ID =
           "SELECT ip.poolId, ip.concentration, ip.identificationBarcode, ip.name, ip.alias, ip.creationDate, ip.securityProfile_profileId, ip.platformType, ip.ready " +
-          "FROM Pool ip, Pool_Experiment pe " +
+          "FROM "+TABLE_NAME+" ip, Pool_Experiment pe " +
           "WHERE ip.poolId=pe.pool_poolId " +
           "AND ip.platformType='Illumina' " +
           "AND pe.experiments_experimentId=?";
@@ -190,21 +192,21 @@ public class SQLPoolDAO implements PoolStore {
 
   public static final String LS454_POOL_BY_RELATED_CHAMBER =
           "SELECT c.chamberId, ip.poolId, ip.concentration, ip.identificationBarcode, ip.name, ip.alias, ip.creationDate, ip.securityProfile_profileId, ip.platformType, ip.ready " +
-          "FROM Chamber c, Pool ip " +
+          "FROM Chamber c, "+TABLE_NAME+" ip " +
           "WHERE c.poolId=ip.poolId " +
           "AND ip.platformType='LS454' " +
           "AND c.chamberId=?";
 
   public static final String LS454_POOLS_BY_RELATED_EMPCR_DILUTION =
           "SELECT ip.poolId, ip.concentration, ip.identificationBarcode, ip.name, ip.alias, ip.creationDate, ip.securityProfile_profileId, ip.platformType, ip.ready " +
-          "FROM Pool ip, Pool_emPCRDilution p " +
+          "FROM "+TABLE_NAME+" ip, Pool_emPCRDilution p " +
           "WHERE ip.poolId=ip.pool_poolId " +
           "AND ip.platformType='LS454' " +
           "AND p.dilutions_dilutionId=?";
 
   public static final String LS454_POOL_SELECT_BY_EXPERIMENT_ID =
           "SELECT ip.poolId, ip.concentration, ip.identificationBarcode, ip.name, ip.alias, ip.creationDate, ip.securityProfile_profileId, ip.platformType, ip.ready " +
-          "FROM Pool ip, Pool_Experiment pe " +
+          "FROM "+TABLE_NAME+" ip, Pool_Experiment pe " +
           "WHERE ip.poolId=pe.pool_poolId " +
           "AND ip.platformType='LS454' " +
           "AND pe.experiments_experimentId=?";
@@ -230,21 +232,21 @@ public class SQLPoolDAO implements PoolStore {
 
   public static final String SOLID_POOL_BY_RELATED_CHAMBER =
           "SELECT c.chamberId, ip.poolId, ip.concentration, ip.identificationBarcode, ip.name, ip.alias, ip.creationDate, ip.securityProfile_profileId, ip.platformType, ip.ready " +
-          "FROM Chamber c, Pool ip " +
+          "FROM Chamber c, "+TABLE_NAME+" ip " +
           "WHERE c.poolId=ip.poolId " +
           "AND ip.platformType='Solid' " +
           "AND c.chamberId=?";
 
   public static final String SOLID_POOLS_BY_RELATED_EMPCR_DILUTION =
           "SELECT ip.poolId, ip.concentration, ip.identificationBarcode, ip.name, ip.alias, ip.creationDate, ip.securityProfile_profileId, ip.platformType, ip.ready " +
-          "FROM Pool ip, Pool_emPCRDilution p " +
+          "FROM "+TABLE_NAME+" ip, Pool_emPCRDilution p " +
           "WHERE ip.poolId=ip.pool_poolId " +
           "AND ip.platformType='Solid' " +
           "AND p.dilutions_dilutionId=?";
 
   public static final String SOLID_POOL_SELECT_BY_EXPERIMENT_ID =
           "SELECT ip.poolId, ip.concentration, ip.identificationBarcode, ip.name, ip.alias, ip.creationDate, ip.securityProfile_profileId, ip.platformType, ip.ready " +
-          "FROM Pool ip, Pool_Experiment pe " +
+          "FROM "+TABLE_NAME+" ip, Pool_Experiment pe " +
           "WHERE ip.poolId=pe.pool_poolId " +
           "AND ip.platformType='Solid' " +
           "AND pe.experiments_experimentId=?";
@@ -412,9 +414,9 @@ public class SQLPoolDAO implements PoolStore {
 
     if (pool.getPoolId() == AbstractPool.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-              .withTableName("Pool")
+              .withTableName(TABLE_NAME)
               .usingGeneratedKeyColumns("poolId");
-      String name = IlluminaPool.PREFIX + DbUtils.getAutoIncrement(template, "Pool");
+      String name = IlluminaPool.PREFIX + DbUtils.getAutoIncrement(template, TABLE_NAME);
       params.addValue("name", name);
       params.addValue("identificationBarcode", name + "::" + PlatformType.ILLUMINA.getKey());
       Number newId = insert.executeAndReturnKey(params);
@@ -543,9 +545,9 @@ public class SQLPoolDAO implements PoolStore {
 
     if (pool.getPoolId() == AbstractPool.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-              .withTableName("Pool")
+              .withTableName(TABLE_NAME)
               .usingGeneratedKeyColumns("poolId");
-      String name = LS454Pool.PREFIX + DbUtils.getAutoIncrement(template, "Pool");
+      String name = LS454Pool.PREFIX + DbUtils.getAutoIncrement(template, TABLE_NAME);
       params.addValue("name", name);
       params.addValue("identificationBarcode", name + "::" + PlatformType.LS454.getKey());
       Number newId = insert.executeAndReturnKey(params);
@@ -670,9 +672,9 @@ public class SQLPoolDAO implements PoolStore {
 
     if (pool.getPoolId() == AbstractPool.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-              .withTableName("Pool")
+              .withTableName(TABLE_NAME)
               .usingGeneratedKeyColumns("poolId");
-      String name = SolidPool.PREFIX + DbUtils.getAutoIncrement(template, "Pool");
+      String name = SolidPool.PREFIX + DbUtils.getAutoIncrement(template, TABLE_NAME);
       params.addValue("name", name);
       params.addValue("identificationBarcode", name + "::" + PlatformType.SOLID.getKey());
       Number newId = insert.executeAndReturnKey(params);
@@ -787,9 +789,9 @@ public class SQLPoolDAO implements PoolStore {
 
     if (pool.getPoolId() == AbstractPool.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-              .withTableName("Pool")
+              .withTableName(TABLE_NAME)
               .usingGeneratedKeyColumns("poolId");
-      String name = emPCRPool.PREFIX + DbUtils.getAutoIncrement(template, "Pool");
+      String name = emPCRPool.PREFIX + DbUtils.getAutoIncrement(template, TABLE_NAME);
       params.addValue("name", name);
       params.addValue("identificationBarcode", name + "::" + pool.getPlatformType().getKey());
       Number newId = insert.executeAndReturnKey(params);
@@ -894,9 +896,9 @@ public class SQLPoolDAO implements PoolStore {
 
     if (pool.getPoolId() == AbstractPool.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-              .withTableName("Pool")
+              .withTableName(TABLE_NAME)
               .usingGeneratedKeyColumns("poolId");
-      String name = AbstractPool.lookupPrefix(pool.getPlatformType())+ DbUtils.getAutoIncrement(template, "Pool");
+      String name = AbstractPool.lookupPrefix(pool.getPlatformType())+ DbUtils.getAutoIncrement(template, TABLE_NAME);
       params.addValue("name", name);
       params.addValue("identificationBarcode", name + "::" + pool.getPlatformType().getKey());
       Number newId = insert.executeAndReturnKey(params);
@@ -920,14 +922,13 @@ public class SQLPoolDAO implements PoolStore {
     if (pool.getDilutions() != null && !pool.getDilutions().isEmpty()) {
       String type = pool.getDilutions().iterator().next().getClass().getSimpleName();
 
-      log.info("Inserting into Pool_"+type);
       SimpleJdbcInsert eInsert = new SimpleJdbcInsert(template).withTableName("Pool_"+type);
       String lc = type.substring(0,1).toLowerCase() + type.substring(1);
 
       Cache dc = cacheManager.getCache(lc+"Cache");
 
       for (Dilution d : pool.getDilutions()) {
-        log.info("Linking "+d.getName() + " to " + pool.getName());
+        log.debug("Linking "+d.getName() + " to " + pool.getName());
         MapSqlParameterSource esParams = new MapSqlParameterSource();
         esParams.addValue("dilutions_dilutionId", d.getDilutionId())
                 .addValue("pool_poolId", pool.getPoolId());
@@ -983,6 +984,12 @@ public class SQLPoolDAO implements PoolStore {
     return pool.getPoolId();
   }
 
+  @Override
+  public Pool<? extends Poolable> getPoolByBarcode(String barcode, PlatformType platformType) throws IOException {
+    List<Pool<? extends Poolable>> pools = listAllByPlatformAndSearch(platformType, barcode);
+    return pools.size() == 1 ? pools.get(0) : null;
+  }
+
   public Collection<Pool<? extends Poolable>> listByLibraryId(long libraryId) throws IOException {
     return template.query(POOL_SELECT_BY_RELATED_LIBRARY, new Object[]{libraryId}, new PoolMapper());
   }
@@ -1006,8 +1013,19 @@ public class SQLPoolDAO implements PoolStore {
     return e;
   }
 
+  public Pool lazyGet(long poolId) throws IOException {
+    List eResults = template.query(POOL_SELECT_BY_POOL_ID, new Object[]{poolId}, new LazyPoolMapper());
+    Pool e = eResults.size() > 0 ? (Pool) eResults.get(0) : null;
+    return e;
+  }
+
   public Collection<Pool<? extends Poolable>> listAll() throws IOException {
     return template.query(POOL_SELECT, new PoolMapper());
+  }
+
+  @Override
+  public int count() throws IOException {
+    return template.queryForInt("SELECT count(*) FROM "+TABLE_NAME);
   }
 
   public List<Pool<? extends Poolable>> listAllByPlatform(PlatformType platformType) throws IOException {
@@ -1113,6 +1131,49 @@ public class SQLPoolDAO implements PoolStore {
         p.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
 
         p.setExperiments(experimentDAO.listByPoolId(rs.getLong("poolId")));
+
+        p.setWatchers(new HashSet<User>(watcherDAO.getWatchersByEntityName(p.getWatchableIdentifier())));
+        if (p.getSecurityProfile() != null &&
+            p.getSecurityProfile().getOwner() != null) {
+          p.addWatcher(p.getSecurityProfile().getOwner());
+        }
+        for (User u : watcherDAO.getWatchersByWatcherGroup("PoolWatchers")) {
+          p.addWatcher(u);
+        }
+      }
+      catch (IOException e1) {
+        log.error("Cannot map from database to Pool: ", e1);
+        e1.printStackTrace();
+      }
+      return p;
+    }
+  }
+
+  public class LazyPoolMapper implements RowMapper<Pool<? extends Poolable>> {
+    public Pool<? extends Poolable> mapRow(ResultSet rs, int rowNum) throws SQLException {
+      Pool p = null;
+      try {
+        p = dataObjectFactory.getPool();
+        PlatformType pt = PlatformType.get(rs.getString("platformType"));
+        p.setPlatformType(pt);
+
+        if (pt != null) {
+          List<? extends Dilution> dilutions = new ArrayList<Dilution>(dilutionDAO.listAllDilutionsByPoolAndPlatform(rs.getLong("poolId"), pt));
+          Collections.sort(dilutions);
+          p.setPoolableElements(dilutions);
+        }
+
+        p.setPoolId(rs.getLong("poolId"));
+        p.setName(rs.getString("name"));
+        p.setAlias(rs.getString("alias"));
+        p.setCreationDate(rs.getDate("creationDate"));
+        p.setConcentration(rs.getDouble("concentration"));
+        p.setIdentificationBarcode(rs.getString("identificationBarcode"));
+        p.setReadyToRun(rs.getBoolean("ready"));
+
+        p.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
+
+        //p.setExperiments(experimentDAO.listByPoolId(rs.getLong("poolId")));
 
         p.setWatchers(new HashSet<User>(watcherDAO.getWatchersByEntityName(p.getWatchableIdentifier())));
         if (p.getSecurityProfile() != null &&

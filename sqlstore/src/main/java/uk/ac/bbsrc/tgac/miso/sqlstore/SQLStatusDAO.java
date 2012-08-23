@@ -56,12 +56,14 @@ import java.util.List;
  * @since 0.0.2
  */
 public class SQLStatusDAO implements StatusStore {
+  private static final String TABLE_NAME = "Status";
+
   public static final String STATUSES_SELECT =
           "SELECT statusId, health, startDate, completionDate, runName, instrumentName, xml, lastUpdated " +
-          "FROM Status";
+          "FROM "+TABLE_NAME;
 
   public static final String STATUS_UPDATE =
-          "UPDATE Status " +
+          "UPDATE "+TABLE_NAME+" " +
           "SET health=:health, startDate=:startDate, completionDate=:completionDate, runName=:runName, instrumentName=:instrumentName, xml=:xml " +
           "WHERE statusId=:statusId";
 
@@ -128,7 +130,7 @@ public class SQLStatusDAO implements StatusStore {
       Status savedStatus = getByRunName(status.getRunName());
       if (savedStatus == null) {
         SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-                .withTableName("Status")
+                .withTableName(TABLE_NAME)
                 .usingGeneratedKeyColumns("statusId");
 
         if (status.getHealth().equals(HealthType.Running) && status.getStartDate() == null) {
@@ -159,6 +161,11 @@ public class SQLStatusDAO implements StatusStore {
   public List<Status> listAll() {
     List results = template.query(STATUSES_SELECT, new StatusMapper());
     return results;
+  }
+
+  @Override
+  public int count() throws IOException {
+    return template.queryForInt("SELECT count(*) FROM "+TABLE_NAME);
   }
 
   public List<Status> listAllBySequencerName(String sequencerName) {

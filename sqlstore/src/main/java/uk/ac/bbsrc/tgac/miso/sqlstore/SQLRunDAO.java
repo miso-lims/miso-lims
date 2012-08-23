@@ -34,6 +34,7 @@ import com.googlecode.ehcache.annotations.key.HashCodeCacheKeyGenerator;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
+import net.sf.ehcache.constructs.blocking.BlockingCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,9 +69,11 @@ import java.util.*;
  * @since 0.0.2
  */
 public class SQLRunDAO implements RunStore {
+  private static final String TABLE_NAME = "Run";
+
   public static final String RUNS_SELECT =
           "SELECT runId, name, alias, description, accession, platformRunId, pairedEnd, cycles, filePath, securityProfile_profileId, platformType, status_statusId, sequencerReference_sequencerReferenceId " +
-          "FROM Run";
+          "FROM "+TABLE_NAME;
 
   public static final String RUN_SELECT_BY_ID =
           RUNS_SELECT + " WHERE runId = ?";
@@ -85,20 +88,20 @@ public class SQLRunDAO implements RunStore {
           "description LIKE ? ";
 
   public static final String RUN_UPDATE =
-          "UPDATE Run " +
+          "UPDATE "+TABLE_NAME+" " +
           "SET name=:name, alias=:alias, description=:description, accession=:accession, platformRunId=:platformRunId, " +
           "pairedEnd=:pairedEnd, cycles=:cycles, filePath=:filePath, securityProfile_profileId=:securityProfile_profileId, " +
           "platformType=:platformType, status_statusId=:status_statusId, sequencerReference_sequencerReferenceId=:sequencerReference_sequencerReferenceId " +
           "WHERE runId=:runId";
 
   public static final String RUN_DELETE =
-          "DELETE FROM Run WHERE runId=:rundId";
+          "DELETE FROM "+TABLE_NAME+" WHERE runId=:rundId";
 
   @Deprecated
   public static final String RUNS_SELECT_BY_RELATED_EXPERIMENT =
           "SELECT r.runId, r.name, r.alias, r.description, r.accession, r.platformRunId, r.pairedEnd, r.cycles, r.filePath, " +
           "r.securityProfile_profileId, r.platformType, r.status_statusId, r.sequencerReference_sequencerReferenceId " +
-          "FROM Run r " +
+          "FROM "+TABLE_NAME+" r " +
 
           "INNER JOIN Run_SequencerPartitionContainer rf ON r.runId = rf.Run_runId" +
           "LEFT JOIN SequencerPartitionContainer f ON f.containerId = rf.containers_containerId " +
@@ -109,13 +112,13 @@ public class SQLRunDAO implements RunStore {
 
   public static final String RUNS_SELECT_BY_PLATFORM_ID =
           "SELECT r.name, r.alias, r.description, r.accession, r.platformRunId, r.pairedEnd, r.cycles, r.filePath, r.securityProfile_profileId, r.platformType, r.status_statusId, r.sequencerReference_sequencerReferenceId " +
-          "FROM Run r, Platform p " +
+          "FROM "+TABLE_NAME+" r, Platform p " +
           "WHERE r.platform_platformId=p.platformId " +
           "AND r.platform_platformId=?";
 
   public static final String RUNS_SELECT_BY_STATUS_HEALTH =
           "SELECT r.name, r.alias, r.description, r.accession, r.platformRunId, r.pairedEnd, r.cycles, r.filePath, r.securityProfile_profileId, r.platformType, r.status_statusId, r.sequencerReference_sequencerReferenceId " +
-          "FROM Run r, Status s " +
+          "FROM "+TABLE_NAME+" r, Status s " +
           "WHERE r.status_statusId=s.statusId " +
           "AND s.health=?";
 
@@ -132,7 +135,7 @@ public class SQLRunDAO implements RunStore {
           "LEFT JOIN SequencerPartitionContainer fa ON fc.container_containerId = fa.containerId " +
 
           "INNER JOIN Run_SequencerPartitionContainer rf ON fa.containerId = rf.containers_containerId " +
-          "LEFT JOIN Run ra ON rf.Run_runId = ra.runId " +
+          "LEFT JOIN "+TABLE_NAME+" ra ON rf.Run_runId = ra.runId " +
           "WHERE p.projectId=?";
 
   public static String RUNS_SELECT_BY_POOL_ID =
@@ -144,39 +147,39 @@ public class SQLRunDAO implements RunStore {
           "LEFT JOIN SequencerPartitionContainer fa ON fc.container_containerId = fa.containerId " +
 
           "INNER JOIN Run_SequencerPartitionContainer rf ON fa.containerId = rf.containers_containerId " +
-          "LEFT JOIN Run ra ON rf.Run_runId = ra.runId " +
+          "LEFT JOIN "+TABLE_NAME+" ra ON rf.Run_runId = ra.runId " +
           "WHERE pool.poolId=?";
 
   public static String RUNS_SELECT_BY_FLOWCELL_ID =
           "SELECT ra.* " +
           "FROM Flowcell f " +
           "INNER JOIN Run_Flowcell rf ON flowcell.flowcellId = rf.flowcells_flowcellId " +
-          "LEFT JOIN Run ra ON rf.Run_runId = ra.runId " +
+          "LEFT JOIN "+TABLE_NAME+" ra ON rf.Run_runId = ra.runId " +
           "WHERE flowcell.flowcellId=?";
 
   public static String RUNS_SELECT_BY_SEQUENCER_PARTITION_CONTAINER_ID =
           "SELECT ra.* " +
           "FROM SequencerPartitionContainer container " +
           "INNER JOIN Run_SequencerPartitionContainer rf ON container.containerId = rf.containers_containerId " +
-          "LEFT JOIN Run ra ON rf.Run_runId = ra.runId " +
+          "LEFT JOIN "+TABLE_NAME+" ra ON rf.Run_runId = ra.runId " +
           "WHERE container.containerId=?";
 
   public static String LATEST_RUN_STARTED_SELECT_BY_SEQUENCER_PARTITION_CONTAINER_ID =
           "SELECT max(s.startDate), r.runId, r.name, r.alias, r.description, r.accession, r.platformRunId, r.pairedEnd, r.cycles, r.filePath, r.securityProfile_profileId, r.platformType, r.status_statusId, r.sequencerReference_sequencerReferenceId " +
           "FROM SequencerPartitionContainer container " +
           "INNER JOIN Run_SequencerPartitionContainer rf ON container.containerId = rf.containers_containerId " +
-          "LEFT JOIN Run r ON rf.Run_runId = r.runId " +
+          "LEFT JOIN "+TABLE_NAME+" r ON rf.Run_runId = r.runId " +
           "INNER JOIN Status s ON r.status_statusId=s.statusId " +
           "WHERE container.containerId=?";
 
   public static String LATEST_RUN_ID_SELECT_BY_SEQUENCER_PARTITION_CONTAINER_ID =
           "SELECT runId, name, alias, description, accession, platformRunId, pairedEnd, cycles, filePath, securityProfile_profileId, platformType, status_statusId, sequencerReference_sequencerReferenceId " +
-          "FROM Run " +
+          "FROM "+TABLE_NAME+" " +
           "INNER JOIN ( " +
           "    SELECT MAX(r.runId) as maxrun " +
           "    FROM SequencerPartitionContainer container " +
           "    INNER JOIN Run_SequencerPartitionContainer rf ON container.containerId = rf.containers_containerId " +
-          "    LEFT JOIN Run r ON rf.Run_runId = r.runId " +
+          "    LEFT JOIN "+TABLE_NAME+" r ON rf.Run_runId = r.runId " +
           "    WHERE container.containerId=? GROUP BY r.alias " +
           ") grouprun ON runId = maxrun";
 
@@ -264,21 +267,25 @@ public class SQLRunDAO implements RunStore {
   }
 
   private void purgeCaches(Collection<Run> runs) {
-    Cache listCache = cacheManager.getCache("runListCache");
-    if (listCache != null && listCache.getKeys().size() > 0) {
-      Object cachekey = listCache.getKeys().get(0);
-      if (cachekey != null) {
-        List<Run> cachedruns = (List<Run>)listCache.get(cachekey).getValue();
-        for (Run run : runs) {
-          cachedruns.remove(run);
-          cachedruns.add(run);
+    Cache lcache = cacheManager.getCache("runListCache");
+    if (lcache != null) {
+      BlockingCache listCache = new BlockingCache(lcache);
+      if (listCache.getKeys().size() > 0) {
+        Object cachekey = listCache.getKeys().get(0);
+        if (cachekey != null) {
+          List<Run> cachedruns = (List<Run>)listCache.get(cachekey).getValue();
+          for (Run run : runs) {
+            cachedruns.remove(run);
+            cachedruns.add(run);
+          }
+          listCache.put(new Element(cachekey, cachedruns));
         }
-        listCache.put(new Element(cachekey, cachedruns));
       }
     }
 
-    Cache cache = cacheManager.getCache("runCache");
-    if (cache != null) {
+    Cache rcache = cacheManager.getCache("runCache");
+    if (rcache != null) {
+      BlockingCache cache = new BlockingCache(rcache);
       HashCodeCacheKeyGenerator keygen = new HashCodeCacheKeyGenerator();
       for (Run run : runs) {
         Long cachekey = keygen.generateKey(run);
@@ -289,20 +296,23 @@ public class SQLRunDAO implements RunStore {
   }
 
   private void purgeListCache(Run run, boolean replace) {
-    Cache cache = cacheManager.getCache("runListCache");
-    if (cache != null && cache.getKeys().size() > 0) {
-      Object cachekey = cache.getKeys().get(0);
-      if (cachekey != null) {
-        List<Run> cachedruns = (List<Run>)cache.get(cachekey).getValue();
-        if (cachedruns.remove(run)) {
-          if (replace) {
+    Cache rcache = cacheManager.getCache("runListCache");
+    if (rcache != null) {
+      BlockingCache cache = new BlockingCache(rcache);
+      if (cache.getKeys().size() > 0) {
+        Object cachekey = cache.getKeys().get(0);
+        if (cachekey != null) {
+          List<Run> cachedruns = (List<Run>)cache.get(cachekey).getValue();
+          if (cachedruns.remove(run)) {
+            if (replace) {
+              cachedruns.add(run);
+            }
+          }
+          else {
             cachedruns.add(run);
           }
+          cache.put(new Element(cachekey, cachedruns));
         }
-        else {
-          cachedruns.add(run);
-        }
-        cache.put(new Element(cachekey, cachedruns));
       }
     }
   }
@@ -362,9 +372,9 @@ public class SQLRunDAO implements RunStore {
 
     if (run.getRunId() == AbstractRun.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-              .withTableName("Run")
+              .withTableName(TABLE_NAME)
               .usingGeneratedKeyColumns("runId");
-      String name = "RUN" + DbUtils.getAutoIncrement(template, "Run");
+      String name = "RUN" + DbUtils.getAutoIncrement(template, TABLE_NAME);
       params.addValue("name", name);
       Number newId = insert.executeAndReturnKey(params);
       run.setRunId(newId.longValue());
@@ -421,9 +431,12 @@ public class SQLRunDAO implements RunStore {
     return run.getRunId();
   }
 
-  public int[] saveAll(Collection<Run> runs) throws IOException {
+  public synchronized int[] saveAll(Collection<Run> runs) throws IOException {
+    log.debug(">>> Entering saveAll with " + runs.size() + " runs");
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
     List<SqlParameterSource> batch = new ArrayList<SqlParameterSource>();
+    long autoIncrement = DbUtils.getAutoIncrement(template, TABLE_NAME);
+
     for (Run run : runs) {
       Long statusId = null;
       if (run.getStatus() != null) {
@@ -466,14 +479,26 @@ public class SQLRunDAO implements RunStore {
                 .addValue("sequencerReference_sequencerReferenceId", run.getSequencerReference().getId());
 
         if (run.getRunId() == AbstractRun.UNSAVED_ID) {
-          long i = DbUtils.getAutoIncrement(template, "Run");
-          String name = "RUN" + i;
-          run.setRunId(i);
+          SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
+                  .withTableName(TABLE_NAME)
+                  .usingGeneratedKeyColumns("runId");
+          String name = "RUN" + autoIncrement;
+          params.addValue("name", name);
+          Number newId = insert.executeAndReturnKey(params);
+          run.setRunId(newId.longValue());
           run.setName(name);
-        }
 
-        params.addValue("runId", run.getRunId())
-              .addValue("name", run.getName());
+          autoIncrement = newId.longValue() + 1;
+
+          log.debug(run.getName() + ":: Inserted as ID " + run.getRunId());
+        }
+        else {
+          params.addValue("runId", run.getRunId())
+                .addValue("name", run.getName());
+
+          log.debug(run.getName() + ":: Updating as ID " + run.getRunId());
+          batch.add(params);
+        }
 
         if (this.cascadeType != null) {
           if (this.cascadeType.equals(CascadeType.PERSIST)) {
@@ -493,7 +518,7 @@ public class SQLRunDAO implements RunStore {
                 fInsert.execute(fcParams);
               }
               catch(DuplicateKeyException dke) {
-                log.warn("This Run/SequencerPartitionContainer combination already exists - not inserting: " + dke.getMessage());
+                log.debug("This Run/SequencerPartitionContainer combination already exists - not inserting: " + dke.getMessage());
               }
             }
           }
@@ -512,8 +537,6 @@ public class SQLRunDAO implements RunStore {
             watcherDAO.saveWatchedEntityUser(run, u);
           }
         }
-
-        batch.add(params);
       }
       catch (IOException e) {
         log.error("Cannot batch save run: " + run.getName());
@@ -521,11 +544,12 @@ public class SQLRunDAO implements RunStore {
       }
     }
 
-    int[] rows = namedTemplate.batchUpdate(RUN_UPDATE, batch.toArray(new SqlParameterSource[runs.size()]));
+    int[] rows = namedTemplate.batchUpdate(RUN_UPDATE, batch.toArray(new SqlParameterSource[batch.size()]));
 
     //flush caches
     purgeCaches(runs);
 
+    log.debug("<<< Exiting saveAll");
     return rows;
   }
 
@@ -533,6 +557,11 @@ public class SQLRunDAO implements RunStore {
   @Cacheable(cacheName="runListCache")
   public List<Run> listAll() {
     return template.query(RUNS_SELECT, new LazyRunMapper());
+  }
+
+  @Override
+  public int count() throws IOException {
+    return template.queryForInt("SELECT count(*) FROM "+TABLE_NAME);
   }
 
   @Override

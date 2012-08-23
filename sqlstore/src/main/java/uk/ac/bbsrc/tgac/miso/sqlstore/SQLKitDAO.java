@@ -61,9 +61,11 @@ import java.util.Map;
  * @since 0.0.2
  */
 public class SQLKitDAO implements KitStore {
+  private static final String TABLE_NAME = "Kit";
+
   public static final String KITS_SELECT =
           "SELECT kitId, identificationBarcode, locationBarcode, lotNumber, kitDate, kitDescriptorId " +
-          "FROM Kit";
+          "FROM "+TABLE_NAME;
 
   public static final String KIT_SELECT_BY_ID =
           KITS_SELECT + " WHERE kitId = ?";
@@ -76,30 +78,30 @@ public class SQLKitDAO implements KitStore {
 
   public static final String KITS_SELECT_BY_TYPE =
           "SELECT k.kitId, k.identificationBarcode, k.locationBarcode, k.lotNumber, k.kitDate, k.kitDescriptorId, ek.experiments_experimentId " +
-          "FROM Kit k, Experiment_Kit ek " +
+          "FROM "+TABLE_NAME+" k, Experiment_Kit ek " +
           "WHERE ek.kits_kitId=k.kitId " +
           "AND ek.experiments_experimentId=?";
 
   public static final String KITS_SELECT_BY_MANUFACTURER =
           "SELECT k.kitId, k.identificationBarcode, k.locationBarcode, k.lotNumber, k.kitDate, k.kitDescriptorId, ek.experiments_experimentId " +
-          "FROM Kit k, Experiment_Kit ek " +
+          "FROM "+TABLE_NAME+" k, Experiment_Kit ek " +
           "WHERE ek.kits_kitId=k.kitId " +
           "AND ek.experiments_experimentId=?";
 
   public static final String KITS_SELECT_BY_RELATED_EXPERIMENT =
           "SELECT k.kitId, k.identificationBarcode, k.locationBarcode, k.lotNumber, k.kitDate, k.kitDescriptorId, ek.experiments_experimentId " +
-          "FROM Kit k, Experiment_Kit ek " +
+          "FROM "+TABLE_NAME+" k, Experiment_Kit ek " +
           "WHERE ek.kits_kitId=k.kitId " +
           "AND ek.experiments_experimentId=?";
 
   public static final String KITS_SELECT_BY_RELATED_LIBRARY =
           "SELECT k.kitId, k.identificationBarcode, k.locationBarcode, k.lotNumber, k.kitDate, k.kitDescriptorId, ek.experiments_experimentId " +
-          "FROM Kit k, Library_Kit lk " +
+          "FROM "+TABLE_NAME+" k, Library_Kit lk " +
           "WHERE lk.kits_kitId=k.kitId " +
           "AND lk.libraries_libraryId=?";
 
   public static final String KIT_UPDATE =
-          "UPDATE Kit " +
+          "UPDATE "+TABLE_NAME+" " +
           "SET identificationBarcode=:identificationBarcode, locationBarcode=:locationBarcode, lotNumber=:lotNumber, kitDate=:kitDate, kitDescriptorId=:kitDescriptorId " +
           "WHERE kitId=:kitId";
 
@@ -171,6 +173,11 @@ public class SQLKitDAO implements KitStore {
     return template.query(KITS_SELECT, new KitMapper());
   }
 
+  @Override
+  public int count() throws IOException {
+    return template.queryForInt("SELECT count(*) FROM "+TABLE_NAME);
+  }
+
   public List<Kit> listByExperiment(long experimentId) throws IOException {
     return template.query(KITS_SELECT_BY_RELATED_EXPERIMENT, new Object[]{experimentId}, new KitMapper());
   }
@@ -197,7 +204,7 @@ public class SQLKitDAO implements KitStore {
 
     if (kit.getKitId() == AbstractKit.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-                            .withTableName("Kit")
+                            .withTableName(TABLE_NAME)
                             .usingGeneratedKeyColumns("kitId");
       Number newId = insert.executeAndReturnKey(params);
       kit.setKitId(newId.longValue());

@@ -63,10 +63,11 @@ import java.util.List;
  * @since 0.0.2
  */
 public class SQLEmPCRDAO implements EmPCRStore {
+  private static final String TABLE_NAME="emPCR";
 
   public static String EMPCR_SELECT =
           "SELECT pcrId, concentration, pcrUserName, creationDate, name, dilution_dilutionId, securityProfile_profileId " +
-          "FROM emPCR";
+          "FROM " + TABLE_NAME;
 
   public static final String EMPCR_SELECT_BY_PCR_ID =
           EMPCR_SELECT + " WHERE pcrId=?";
@@ -79,16 +80,16 @@ public class SQLEmPCRDAO implements EmPCRStore {
           "INNER JOIN Sample sa ON sa.project_projectId = p.projectId " +
           "INNER JOIN Library li ON li.sample_sampleId = sa.sampleId " +
           "INNER JOIN LibraryDilution ld ON ld.library_libraryId = li.libraryId " +
-          "INNER JOIN emPCR e ON e.dilution_dilutionId = ld.dilutionId " +
+          "INNER JOIN "+TABLE_NAME+" e ON e.dilution_dilutionId = ld.dilutionId " +
           "WHERE p.projectId=?";  
 
   public static final String EMPCR_UPDATE =
-          "UPDATE emPCR " +
-          "SET concentration=:concentration, pcrUserName=:pcrUserName, creationDate=:creationDate, name=:name, dilution_dilutionId=:dilution_dilutionId, securityProfile_profileId=:securityProfile_profileId " +
+          "UPDATE " + TABLE_NAME +
+          " SET concentration=:concentration, pcrUserName=:pcrUserName, creationDate=:creationDate, name=:name, dilution_dilutionId=:dilution_dilutionId, securityProfile_profileId=:securityProfile_profileId " +
           "WHERE pcrId=:pcrId";
 
   public static final String EMPCR_DELETE =
-          "DELETE FROM emPCR WHERE pcrId=:pcrId";
+          "DELETE FROM "+TABLE_NAME+" WHERE pcrId=:pcrId";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLEmPCRDAO.class);
 
@@ -160,9 +161,9 @@ public class SQLEmPCRDAO implements EmPCRStore {
 
     if (pcr.getPcrId() == emPCR.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-                              .withTableName("emPCR")
+                              .withTableName(TABLE_NAME)
                               .usingGeneratedKeyColumns("pcrId");
-      String name = "EMP"+ DbUtils.getAutoIncrement(template, "emPCR");
+      String name = "EMP"+ DbUtils.getAutoIncrement(template, TABLE_NAME);
       params.addValue("name", name);
       Number newId = insert.executeAndReturnKey(params);
       pcr.setPcrId(newId.longValue());
@@ -218,6 +219,11 @@ public class SQLEmPCRDAO implements EmPCRStore {
 
   public Collection<emPCR> listAll() throws IOException {
     return template.query(EMPCR_SELECT, new LazyEmPCRMapper());
+  }
+
+  @Override
+  public int count() throws IOException {
+    return template.queryForInt("SELECT count(*) FROM "+TABLE_NAME);
   }
 
   public Collection<emPCR> listAllByDilutionId(long dilutionId) throws IOException {

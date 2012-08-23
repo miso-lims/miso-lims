@@ -1914,7 +1914,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Pool getPoolById(long poolId) throws IOException {
+  public Pool<? extends Poolable> getPoolById(long poolId) throws IOException {
     if (poolStore != null) {
       return poolStore.getPoolById(poolId);
     }
@@ -1924,7 +1924,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Pool getIlluminaPoolById(long poolId) throws IOException {
+  public Pool<? extends Poolable> getIlluminaPoolById(long poolId) throws IOException {
     if (poolStore != null) {
       return poolStore.getIlluminaPoolById(poolId);
     }
@@ -1934,21 +1934,32 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Pool getPoolByBarcode(String barcode) throws IOException {
-    if (getIlluminaPoolByBarcode(barcode) != null) {
-      return getIlluminaPoolByBarcode(barcode);
+  public Pool<? extends Poolable> getPoolByBarcode(String barcode, PlatformType platformType) throws IOException {
+    if (poolStore != null) {
+      return poolStore.getPoolByBarcode(barcode, platformType);
     }
-    if (getLS454PoolByBarcode(barcode) != null) {
-      return getLS454PoolByBarcode(barcode);
+    else {
+      throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
     }
-    if (getSolidPoolByBarcode(barcode) != null) {
-      return getSolidPoolByBarcode(barcode);
+  }
+
+  @Override
+  public Pool<? extends Poolable> getPoolByBarcode(String barcode) throws IOException {
+    String[] s = barcode.split("::");
+    if (s.length > 1) {
+      String platformKey = s[1];
+      if (platformKey != null && !"".equals(platformKey)) {
+        PlatformType pt = PlatformType.get(platformKey);
+        if (pt != null) {
+          return getPoolByBarcode(barcode, pt);
+        }
+      }
     }
     return null;
   }
 
   @Override
-  public Pool getIlluminaPoolByBarcode(String barcode) throws IOException {
+  public Pool<? extends Poolable> getIlluminaPoolByBarcode(String barcode) throws IOException {
     if (poolStore != null) {
       return poolStore.getIlluminaPoolByBarcode(barcode);
     }
@@ -1958,7 +1969,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Pool getLS454PoolById(long poolId) throws IOException {
+  public Pool<? extends Poolable> getLS454PoolById(long poolId) throws IOException {
     if (poolStore != null) {
       return poolStore.get454PoolById(poolId);
     }
@@ -1968,7 +1979,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Pool getLS454PoolByBarcode(String barcode) throws IOException {
+  public Pool<? extends Poolable> getLS454PoolByBarcode(String barcode) throws IOException {
     if (poolStore != null) {
       return poolStore.get454PoolByBarcode(barcode);
     }
@@ -1978,7 +1989,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Pool getSolidPoolById(long poolId) throws IOException {
+  public Pool<? extends Poolable> getSolidPoolById(long poolId) throws IOException {
     if (poolStore != null) {
       return poolStore.getSolidPoolById(poolId);
     }
@@ -1988,7 +1999,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Pool getSolidPoolByBarcode(String barcode) throws IOException {
+  public Pool<? extends Poolable> getSolidPoolByBarcode(String barcode) throws IOException {
     if (poolStore != null) {
       return poolStore.getSolidPoolByBarcode(barcode);
     }

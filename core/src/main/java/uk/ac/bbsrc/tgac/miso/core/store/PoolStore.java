@@ -49,7 +49,7 @@ public interface PoolStore extends Store<Pool<? extends Poolable>>, Remover<Pool
    * @return Pool
    * @throws IOException when
    */
-  Pool getPoolById(long poolId) throws IOException;  
+  Pool<? extends Poolable> getPoolById(long poolId) throws IOException;
 
   /**
    * Save a Pool
@@ -59,6 +59,16 @@ public interface PoolStore extends Store<Pool<? extends Poolable>>, Remover<Pool
    * @throws IOException when
    */
   long save(Pool<? extends Poolable> pool) throws IOException;
+
+  /**
+   * Get a Pool given a barcode and its platform
+   *
+   * @param barcode of type String
+   * @param platformType of type PlatformType
+   * @return Pool
+   * @throws IOException when
+   */
+  Pool<? extends Poolable> getPoolByBarcode(String barcode, PlatformType platformType) throws IOException;
 
   /**
    * List all Pools that are related to a given {@link uk.ac.bbsrc.tgac.miso.core.data.Library} by means of that
@@ -77,7 +87,7 @@ public interface PoolStore extends Store<Pool<? extends Poolable>>, Remover<Pool
    * @return IlluminaPool
    * @throws IOException when
    */
-  Pool getIlluminaPoolByBarcode(String barcode) throws IOException;
+  Pool<? extends Poolable> getIlluminaPoolByBarcode(String barcode) throws IOException;
 
   /**
    * Get an IlluminaPool given an IlluminaPool ID
@@ -86,7 +96,7 @@ public interface PoolStore extends Store<Pool<? extends Poolable>>, Remover<Pool
    * @return IlluminaPool
    * @throws IOException when
    */
-  Pool getIlluminaPoolById(long poolId) throws IOException;
+  Pool<? extends Poolable> getIlluminaPoolById(long poolId) throws IOException;
 
   /**
    * List all Pools that are related to a given {@link uk.ac.bbsrc.tgac.miso.core.data.Project}
@@ -167,7 +177,7 @@ public interface PoolStore extends Store<Pool<? extends Poolable>>, Remover<Pool
    * @return LS454Pool
    * @throws IOException when
    */
-  Pool get454PoolByBarcode(String barcode) throws IOException;
+  Pool<? extends Poolable> get454PoolByBarcode(String barcode) throws IOException;
 
   /**
    * Get a LS454Pool given a LS454Pool ID
@@ -176,7 +186,7 @@ public interface PoolStore extends Store<Pool<? extends Poolable>>, Remover<Pool
    * @return LS454Pool
    * @throws IOException when
    */
-  Pool get454PoolById(long poolId) throws IOException;
+  Pool<? extends Poolable> get454PoolById(long poolId) throws IOException;
 
   /**
    * List all LS454Pools
@@ -210,7 +220,7 @@ public interface PoolStore extends Store<Pool<? extends Poolable>>, Remover<Pool
    * @return SolidPool
    * @throws IOException when
    */
-  Pool getSolidPoolByBarcode(String barcode) throws IOException;
+  Pool<? extends Poolable> getSolidPoolByBarcode(String barcode) throws IOException;
 
   /**
    * Get a SolidPool given a SolidPool ID
@@ -219,7 +229,7 @@ public interface PoolStore extends Store<Pool<? extends Poolable>>, Remover<Pool
    * @return SolidPool
    * @throws IOException when
    */
-  Pool getSolidPoolById(long poolId) throws IOException;
+  Pool<? extends Poolable> getSolidPoolById(long poolId) throws IOException;
 
   /**
    * List all SolidPools
@@ -251,5 +261,5 @@ public interface PoolStore extends Store<Pool<? extends Poolable>>, Remover<Pool
    * @return Pool
    * @throws IOException when
    */
-  Pool getPoolByExperiment(Experiment e) throws IOException;
+  Pool<? extends Poolable> getPoolByExperiment(Experiment e) throws IOException;
 }

@@ -57,22 +57,23 @@ import java.util.*;
  * @since 0.0.2
  */
 public class SQLTgacSubmissionDAO implements Store<SubmissionImpl> {
+  private static final String TABLE_NAME = "Submission";
 
   public static final String SUBMISSION_SELECT =
           "SELECT submissionId, creationDate, submittedDate, name, alias, title, description, accession, verified, completed " +
-          "FROM Submission";
+          "FROM "+TABLE_NAME;
 
   public static final String SUBMISSION_SELECT_BY_ID =
           SUBMISSION_SELECT + " WHERE submissionId = ?";
 
   public static final String SUBMISSION_UPDATE =
-          "UPDATE Submission " +
+          "UPDATE "+TABLE_NAME+" " +
           "SET creationDate=:creationDate, submittedDate=:submittedDate, name=:name, alias=:alias, title=:title, " +
           "description=:description, accession=:accession, verified=:verified, completed=:completed " +
           "WHERE submissionId=:submissionId";
 
   public static final String SUBMISSION_ELEMENTS_DELETE =
-          "DELETE sexp, ssam, sstu, ssla FROM Submission s " +
+          "DELETE sexp, ssam, sstu, ssla FROM "+TABLE_NAME+" s " +
           "LEFT JOIN Submission_Experiment AS sexp ON s.submissionId = sexp.submission_submissionId " +
           "LEFT JOIN Submission_Sample AS ssam ON s.submissionId = ssam.submission_submissionId " +
           "LEFT JOIN Submission_Study AS sstu ON s.submissionId = sstu.submission_submissionId " +
@@ -165,7 +166,7 @@ public class SQLTgacSubmissionDAO implements Store<SubmissionImpl> {
     }
     else {
       insert.usingGeneratedKeyColumns("submissionId");
-      String name = "SUB" + DbUtils.getAutoIncrement(template, "Submission");
+      String name = "SUB" + DbUtils.getAutoIncrement(template, TABLE_NAME);
       params.addValue("creationDate", new Date());
       params.addValue("name", name);
       Number newId = insert.executeAndReturnKey(params);
@@ -300,6 +301,11 @@ public class SQLTgacSubmissionDAO implements Store<SubmissionImpl> {
 
   public Collection<SubmissionImpl> listAll() throws IOException {
     return template.query(SUBMISSION_SELECT, new TgacSubmissionMapper());
+  }
+
+  @Override
+  public int count() throws IOException {
+    return template.queryForInt("SELECT count(*) FROM "+TABLE_NAME);
   }
 
   //sets the values of the new Submission object based on those in the SubmissionMapper

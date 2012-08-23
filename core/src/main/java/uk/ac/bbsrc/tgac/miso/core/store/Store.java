@@ -58,4 +58,12 @@ public interface Store<T> {
    * @throws IOException when the objects cannot be retrieved
    */
   public Collection<T> listAll() throws IOException;
+
+  /**
+   * Count all persisted objects
+   *
+   * @return number of persisted objects
+   * @throws IOException when the count of objects cannot be retrieved
+   */
+  public int count() throws IOException;
 }

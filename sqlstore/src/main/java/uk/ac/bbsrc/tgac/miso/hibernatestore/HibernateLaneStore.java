@@ -67,4 +67,9 @@ public class HibernateLaneStore  extends HibernateDaoSupport implements Store<La
             */
     return null;
   }
+
+  @Override
+  public int count() throws IOException {
+    return 0;
+  }
 }

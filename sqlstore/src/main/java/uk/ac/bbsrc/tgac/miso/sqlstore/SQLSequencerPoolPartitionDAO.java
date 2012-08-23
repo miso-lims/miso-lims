@@ -64,28 +64,30 @@ import java.util.List;
  * @since 0.1.6
  */
 public class SQLSequencerPoolPartitionDAO implements PartitionStore {
+  private static final String TABLE_NAME = "Partition";
+
   public static final String PARTITIONS_SELECT =
           "SELECT partitionId, partitionNumber, pool_poolId, securityProfile_profileId " +
-          "FROM Partition";
+          "FROM "+TABLE_NAME;
 
   public static final String PARTITION_SELECT_BY_ID =
           PARTITIONS_SELECT + " " + "WHERE partitionId = ?";
 
   public static final String PARTITION_UPDATE =
-          "UPDATE Partition " +
+          "UPDATE "+TABLE_NAME+" " +
           "SET partitionNumber=:partitionNumber, pool_poolId=:pool_poolId, securityProfile_profileId=:securityProfile_profileId " +
           "WHERE partitionId=:partitionId";
 
   public static final String PARTITIONS_BY_RELATED_RUN =
           "SELECT l.partitionId, l.partitionNumber, l.pool_poolId, l.securityProfile_profileId " +
-          "FROM Partition l, Run_SequencerPartitionContainer rf, Run r " +
+          "FROM "+TABLE_NAME+" l, Run_SequencerPartitionContainer rf, Run r " +
           "WHERE l.container_containerId=rf.containers_containerId " +
           "AND rf.Run_runId=r.runId " +
           "AND r.runId=?";
 
   public static final String PARTITIONS_BY_RELATED_SEQUENCER_PARTITION_CONTAINER =
           "SELECT l.partitionId, l.partitionNumber, l.pool_poolId, l.securityProfile_profileId " +
-          "FROM Partition l " +
+          "FROM "+TABLE_NAME+" l " +
           "INNER JOIN SequencerPartitionContainer_Partition fl ON l.partitionId = fl.partitions_partitionId " +
           "AND fl.container_containerId=?";
 
@@ -94,12 +96,12 @@ public class SQLSequencerPoolPartitionDAO implements PartitionStore {
 
   public static String PARTITIONS_BY_RELATED_PROJECT =
           "SELECT l.* " +
-          "FROM Project p, Partition l " +
+          "FROM Project p, "+TABLE_NAME+" l " +
           "INNER JOIN Study st ON st.project_projectId = p.projectId " +
           "LEFT JOIN Experiment ex ON st.studyId = ex.study_studyId " +
           "INNER JOIN Pool_Experiment pex ON ex.experimentId = pex.experiments_experimentId " +
           "LEFT JOIN Pool pool ON pool.poolId = pex.pool_poolId " +
-          "LEFT JOIN Partition l ON pool.poolId = l.pool_poolId " +
+          "LEFT JOIN "+TABLE_NAME+" l ON pool.poolId = l.pool_poolId " +
           "LEFT JOIN SequencerPartitionContainer_Partition fl ON l.partitionId = fl.partitions_partitionId " +
           "LEFT JOIN SequencerPartitionContainer fa ON fl.container_containerId = fa.containerId " +
 
@@ -109,7 +111,7 @@ public class SQLSequencerPoolPartitionDAO implements PartitionStore {
            //just changed this bit to see if it fixes the missing partition problem...
   public static final String PARTITIONS_BY_RELATED_SUBMISSION =
           "SELECT l.partitionId, l.partitionNumber, l.pool_poolId, l.securityProfile_profileId " +
-          "FROM Partition l, Submission_Partition_Dilution sl " +
+          "FROM "+TABLE_NAME+" l, Submission_Partition_Dilution sl " +
           "WHERE l.partitionId=sl.partition_partitionId " +
           "AND sl.submission_submissionId=?";
 
@@ -220,7 +222,7 @@ public class SQLSequencerPoolPartitionDAO implements PartitionStore {
     
     if (partition.getId() == AbstractPartition.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-        .withTableName("Partition")
+        .withTableName(TABLE_NAME)
         .usingGeneratedKeyColumns("partitionId");
       Number newId = insert.executeAndReturnKey(params);
       partition.setId(newId.longValue());
@@ -250,6 +252,11 @@ public class SQLSequencerPoolPartitionDAO implements PartitionStore {
   )
   public List<SequencerPoolPartition> listAll() throws IOException {
     return template.query(PARTITIONS_SELECT, new LazyPartitionMapper());
+  }
+
+  @Override
+  public int count() throws IOException {
+    return template.queryForInt("SELECT count(*) FROM "+TABLE_NAME);
   }
 
   @Cacheable(cacheName="partitionCache",

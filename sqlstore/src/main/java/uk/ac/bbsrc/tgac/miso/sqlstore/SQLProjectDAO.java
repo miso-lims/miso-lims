@@ -63,9 +63,11 @@ import java.util.*;
  * @since 0.0.2
  */
 public class SQLProjectDAO implements ProjectStore {
+  private static final String TABLE_NAME = "Project";
+
   public static final String PROJECTS_SELECT =
           "SELECT projectId, name, alias, description, creationDate, securityProfile_profileId, progress, lastUpdated " +
-          "FROM Project";
+          "FROM "+TABLE_NAME;
 
   public static final String PROJECT_SELECT_BY_ID =
           PROJECTS_SELECT + " WHERE projectId = ?";
@@ -77,16 +79,16 @@ public class SQLProjectDAO implements ProjectStore {
           "description LIKE ? ";
 
   public static final String PROJECT_UPDATE =
-          "UPDATE Project " +
+          "UPDATE "+TABLE_NAME+" " +
           "SET name=:name, alias=:alias, description=:description, creationDate=:creationDate, securityProfile_profileId=:securityProfile_profileId, progress=:progress " +
           "WHERE projectId=:projectId";
 
   public static final String PROJECT_DELETE =
-          "DELETE FROM Project WHERE projectId=:projectId";
+          "DELETE FROM "+TABLE_NAME+" WHERE projectId=:projectId";
 
   public static final String PROJECT_SELECT_BY_STUDY_ID =
           "SELECT p.projectId, p.name, p.alias, p.description, p.creationDate, p.securityProfile_profileId, p.progress " +
-          "FROM Project p, Study s " +
+          "FROM "+TABLE_NAME+" p, Study s " +
           "WHERE p.projectId=s.project_projectId " +
           "AND s.studyId=?";
 
@@ -138,7 +140,7 @@ public class SQLProjectDAO implements ProjectStore {
 
   public static String SAMPLES_BY_PROJECT_ID =
           "SELECT sa.* " +
-          "FROM Project p " +
+          "FROM "+TABLE_NAME+" p " +
           "LEFT JOIN Study st ON st.project_projectId = p.projectId " +
           "LEFT JOIN Experiment ex ON st.studyId = ex.study_studyId " +
           "INNER JOIN Experiment_Sample exsa ON ex.experimentId = exsa.experiment_experimentId " +
@@ -158,7 +160,7 @@ public class SQLProjectDAO implements ProjectStore {
           "r.platformType, " +
           "pl.platformId " +
           "pl.instrumentModel " +
-          "FROM Project p " +
+          "FROM "+TABLE_NAME+" p " +
           "LEFT JOIN Study st ON st.project_projectId = p.projectId " +
           "LEFT JOIN Experiment ex ON st.studyId = ex.study_studyId " +
           "INNER JOIN Experiment_Sample exsa ON ex.experimentId = exsa.experiment_experimentId " +
@@ -302,9 +304,9 @@ public class SQLProjectDAO implements ProjectStore {
 
     if (project.getProjectId() == AbstractProject.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-              .withTableName("Project")
+              .withTableName(TABLE_NAME)
               .usingGeneratedKeyColumns("projectId");
-      String name = "PRO" + DbUtils.getAutoIncrement(template, "Project");
+      String name = "PRO" + DbUtils.getAutoIncrement(template, TABLE_NAME);
       params.addValue("name", name);
       Number newId = insert.executeAndReturnKey(params);
       project.setProjectId(newId.longValue());
@@ -431,6 +433,11 @@ public class SQLProjectDAO implements ProjectStore {
   )
   public List<Project> listAll() {
     return template.query(PROJECTS_SELECT, new LazyProjectMapper());
+  }
+
+  @Override
+  public int count() throws IOException {
+    return template.queryForInt("SELECT count(*) FROM "+TABLE_NAME);
   }
 
   @Transactional(readOnly = false, rollbackFor = IOException.class)

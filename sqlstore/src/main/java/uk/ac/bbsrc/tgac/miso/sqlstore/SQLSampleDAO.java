@@ -67,10 +67,12 @@ import java.util.List;
  * @since 0.0.2
  */
 public class SQLSampleDAO implements SampleStore {
-    public static final String SAMPLES_SELECT =
-          "SELECT sampleId, name, description, scientificName, taxonIdentifier, taxonIdentifier, alias, accession, securityProfile_profileId, identificationBarcode, locationBarcode, " +
-          "sampleType, receivedDate, qcPassed, project_projectId " +
-          "FROM Sample";
+  private static final String TABLE_NAME = "Sample";
+
+  public static final String SAMPLES_SELECT =
+        "SELECT sampleId, name, description, scientificName, taxonIdentifier, taxonIdentifier, alias, accession, securityProfile_profileId, identificationBarcode, locationBarcode, " +
+        "sampleType, receivedDate, qcPassed, project_projectId " +
+        "FROM "+TABLE_NAME;
 
   public static final String SAMPLE_SELECT_BY_ID =
           SAMPLES_SELECT + " " + "WHERE sampleId = ?";
@@ -89,14 +91,14 @@ public class SQLSampleDAO implements SampleStore {
           "scientificName LIKE ?";
 
   public static final String SAMPLE_UPDATE =
-          "UPDATE Sample " +
+          "UPDATE "+TABLE_NAME+" " +
           "SET name=:name, description=:description, scientificName=:scientificName, taxonIdentifier=:taxonIdentifier, alias=:alias, accession=:accession, securityProfile_profileId=:securityProfile_profileId, " +
           "identificationBarcode=:identificationBarcode, locationBarcode=:locationBarcode, sampleType=:sampleType, receivedDate=:receivedDate, " +
           "qcPassed=:qcPassed, project_projectId=:project_projectId " +
           "WHERE sampleId=:sampleId";    
 
   public static final String SAMPLE_DELETE =
-          "DELETE FROM Sample WHERE sampleId=:sampleId";  
+          "DELETE FROM "+TABLE_NAME+" WHERE sampleId=:sampleId";
 
   public static String SAMPLES_SELECT_BY_PROJECT_ID =
 /*          "SELECT sa.* " +
@@ -111,14 +113,14 @@ public class SQLSampleDAO implements SampleStore {
   public static final String SAMPLES_SELECT_BY_EXPERIMENT_ID =
           "SELECT s.sampleId, s.name, s.description, s.scientificName, s.taxonIdentifier, s.alias, s.accession, s.securityProfile_profileId, s.identificationBarcode, s.locationBarcode, " +
           "s.sampleType, s.receivedDate, s.qcPassed, s.project_projectId " +
-          "FROM Sample s, Experiment_Sample es " +
+          "FROM "+TABLE_NAME+" s, Experiment_Sample es " +
           "WHERE es.samples_sampleId=s.sampleId " +
           "AND es.Experiment_experimentId=?";
 
   public static final String SAMPLE_SELECT_BY_LIBRARY_ID =
           "SELECT s.sampleId, s.name, s.description, s.scientificName, s.taxonIdentifier, s.alias, s.accession, s.securityProfile_profileId, s.identificationBarcode, s.locationBarcode, " +
           "s.sampleType, s.receivedDate, s.qcPassed, s.project_projectId " +
-          "FROM Sample s, Library l " +
+          "FROM "+TABLE_NAME+" s, Library l " +
           "WHERE s.sampleId=l.sample_sampleId " +
           "AND l.libraryId=?";
 
@@ -129,7 +131,7 @@ public class SQLSampleDAO implements SampleStore {
   public static final String SAMPLES_BY_RELATED_SUBMISSION =
           "SELECT s.sampleId, s.name, s.description, s.scientificName, s.taxonIdentifier, s.alias, s.accession, s.securityProfile_profileId, s.identificationBarcode, s.locationBarcode, " +
           "s.sampleType, s.receivedDate, s.qcPassed, project_projectId " +
-          "FROM Sample s, Submission_Sample ss " +
+          "FROM "+TABLE_NAME+" s, Submission_Sample ss " +
           "WHERE s.sampleId=ss.samples_sampleId " +
           "AND ss.submission_submissionId=?";
 
@@ -293,9 +295,9 @@ public class SQLSampleDAO implements SampleStore {
       }
       else {
         SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-                                .withTableName("Sample")
+                                .withTableName(TABLE_NAME)
                                 .usingGeneratedKeyColumns("sampleId");
-        String name = "SAM"+ DbUtils.getAutoIncrement(template, "Sample");
+        String name = "SAM"+ DbUtils.getAutoIncrement(template, TABLE_NAME);
         String barcode = name + "::" + sample.getAlias();
         params.addValue("name", name);
         params.addValue("identificationBarcode", barcode);
@@ -354,6 +356,11 @@ public class SQLSampleDAO implements SampleStore {
   )
   public List<Sample> listAll() {
     return template.query(SAMPLES_SELECT, new LazySampleMapper());
+  }
+
+  @Override
+  public int count() throws IOException {
+    return template.queryForInt("SELECT count(*) FROM "+TABLE_NAME);
   }
 
   public List<Sample> listBySearch(String query) {

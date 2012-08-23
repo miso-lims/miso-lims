@@ -71,11 +71,12 @@ import java.util.*;
  * @since 0.0.2
  */
 public class SQLLibraryDAO implements LibraryStore {
+  private static String TABLE_NAME = "Library";
 
   public static final String LIBRARIES_SELECT =
           "SELECT libraryId, name, description, alias, accession, securityProfile_profileId, sample_sampleId, identificationBarcode, " +
           "locationBarcode, paired, libraryType, librarySelectionType, libraryStrategyType, platformName, concentration, creationDate, qcPassed " +
-          "FROM Library";
+          "FROM "+TABLE_NAME;
 
   public static final String LIBRARY_SELECT_BY_ID =
           LIBRARIES_SELECT + " " + "WHERE libraryId = ?";
@@ -93,20 +94,20 @@ public class SQLLibraryDAO implements LibraryStore {
           LIBRARIES_SELECT + " " + "WHERE identificationBarcode = ?";
 
   public static final String LIBRARY_UPDATE =
-          "UPDATE Library " +
-          "SET name=:name, description=:description, alias=:alias, accession=:accession, securityProfile_profileId=:securityProfile_profileId, " +
+          "UPDATE " + TABLE_NAME +
+          " SET name=:name, description=:description, alias=:alias, accession=:accession, securityProfile_profileId=:securityProfile_profileId, " +
           "sample_sampleId=:sample_sampleId, identificationBarcode=:identificationBarcode,  locationBarcode=:locationBarcode, " +
           "paired=:paired, libraryType=:libraryType, librarySelectionType=:librarySelectionType, libraryStrategyType=:libraryStrategyType, "+
           "platformName=:platformName, concentration=:concentration, creationDate=:creationDate, qcPassed=:qcPassed " +
           "WHERE libraryId=:libraryId";
 
   public static final String LIBRARY_DELETE =
-          "DELETE FROM Library WHERE libraryId=:libraryId";
+          "DELETE FROM "+TABLE_NAME+" WHERE libraryId=:libraryId";
 
   public static final String LIBRARIES_SELECT_BY_SAMPLE_ID =
           "SELECT l.libraryId, l.name, l.description, l.alias, l.accession, l.securityProfile_profileId, l.sample_sampleId, l.identificationBarcode, l.locationBarcode, " +
           "l.paired, l.libraryType, l.librarySelectionType, l.libraryStrategyType, l.platformName, l.concentration, l.creationDate, l.qcPassed " +
-          "FROM Library l, Sample s " +
+          "FROM "+TABLE_NAME+" l, Sample s " +
           "WHERE l.sample_sampleId=s.sampleId " +
           "AND s.sampleId=?";
 
@@ -121,7 +122,7 @@ public class SQLLibraryDAO implements LibraryStore {
           "WHERE p.projectId=?";*/
           "SELECT li.* FROM Project p " +
           "INNER JOIN Sample sa ON sa.project_projectId = p.projectId " +
-          "INNER JOIN Library li ON li.sample_sampleId = sa.sampleId " +
+          "INNER JOIN "+TABLE_NAME+" li ON li.sample_sampleId = sa.sampleId " +
           "WHERE p.projectId=?";
 
   public static final String LIBRARY_TYPES_SELECT =
@@ -168,7 +169,7 @@ public class SQLLibraryDAO implements LibraryStore {
   public static final String LIBRARIES_BY_RELATED_DILUTION_ID =
           "SELECT p.library_libraryId, l.libraryId, l.name, l.description, l.alias, l.accession, l.securityProfile_profileId, l.sample_sampleId, l.identificationBarcode, l.locationBarcode, " +
           "l.paired, l.libraryType, l.librarySelectionType, l.libraryStrategyType, l.platformName, l.concentration, l.creationDate, l.qcPassed " +
-          "FROM Library l, LibraryDilution p " +
+          "FROM "+TABLE_NAME+" l, LibraryDilution p " +
           "WHERE l.libraryId=p.library_libraryId " +
           "AND p.dilutionId=?";
 
@@ -321,9 +322,9 @@ public class SQLLibraryDAO implements LibraryStore {
 
     if (library.getLibraryId() == AbstractLibrary.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-              .withTableName("Library")
+              .withTableName(TABLE_NAME)
               .usingGeneratedKeyColumns("libraryId");
-      String name = Library.PREFIX + DbUtils.getAutoIncrement(template, "Library");
+      String name = Library.PREFIX + DbUtils.getAutoIncrement(template, TABLE_NAME);
       params.addValue("name", name);
       params.addValue("identificationBarcode", name + "::" + library.getAlias());
       Number newId = insert.executeAndReturnKey(params);
@@ -461,6 +462,11 @@ public class SQLLibraryDAO implements LibraryStore {
   )
   public List<Library> listAll() throws IOException {
     return template.query(LIBRARIES_SELECT, new LazyLibraryMapper());
+  }
+
+  @Override
+  public int count() throws IOException {
+    return template.queryForInt("SELECT count(*) FROM "+TABLE_NAME);
   }
 
   public List<Library> listBySearch(String query) {

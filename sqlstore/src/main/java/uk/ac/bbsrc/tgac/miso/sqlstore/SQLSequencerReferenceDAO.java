@@ -54,10 +54,11 @@ import java.util.List;
  * @since 0.0.2
  */
 public class SQLSequencerReferenceDAO implements SequencerReferenceStore {
+  private static final String TABLE_NAME = "SequencerReference";
 
   private static final String SEQUENCER_REFERENCE_SELECT=
           "SELECT referenceId, name, ipAddress, platformId, available " +
-          "FROM SequencerReference";
+          "FROM "+TABLE_NAME;
 
   private static final String SEQUENCER_REFERENCE_SELECT_BY_ID =
           SEQUENCER_REFERENCE_SELECT + " WHERE referenceId = ?";
@@ -67,7 +68,7 @@ public class SQLSequencerReferenceDAO implements SequencerReferenceStore {
 
   private static final String SEQUENCER_REFERENCE_SELECT_BY_PLATFORM =
           "SELECT sr.referenceId, sr.name, sr.ipAddress, sr.platformId, sr.available, p.platformId, p.name " +
-          "FROM SequencerReference sr, Platform p " +
+          "FROM "+TABLE_NAME+" sr, Platform p " +
           "WHERE sr.platformId=p.platformId " +
           "AND p.name=?";
 
@@ -75,12 +76,12 @@ public class SQLSequencerReferenceDAO implements SequencerReferenceStore {
           "";
 
   private static final String SEQUENCER_REFERENCE_UPDATE =
-          "UPDATE SequencerReference " +
+          "UPDATE "+TABLE_NAME+" " +
           "SET name=:name, ipAddress=:ipAddress, platformId=:platformId, available=:available " +
           "WHERE referenceId=:referenceId";
 
   private static final String SEQUENCER_REFERENCE_DELETE =
-          "DELETE FROM SequencerReference WHERE referenceId=:referenceId";
+          "DELETE FROM "+TABLE_NAME+" WHERE referenceId=:referenceId";
 
   private JdbcTemplate template;
   private PlatformStore platformDAO;
@@ -122,7 +123,7 @@ public class SQLSequencerReferenceDAO implements SequencerReferenceStore {
 
     if (sequencerReference.getId() == AbstractSequencerReference.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-                            .withTableName("SequencerReference")
+                            .withTableName(TABLE_NAME)
                             .usingGeneratedKeyColumns("referenceId");
 
       Number newId = insert.executeAndReturnKey(params);
@@ -163,6 +164,11 @@ public class SQLSequencerReferenceDAO implements SequencerReferenceStore {
 */
   public Collection<SequencerReference> listAll() throws IOException {
     return template.query(SEQUENCER_REFERENCE_SELECT, new SequencerReferenceMapper());
+  }
+
+  @Override
+  public int count() throws IOException {
+    return template.queryForInt("SELECT count(*) FROM "+TABLE_NAME);
   }
 
   public Collection<SequencerReference> listByPlatformType(PlatformType platformType) throws IOException {

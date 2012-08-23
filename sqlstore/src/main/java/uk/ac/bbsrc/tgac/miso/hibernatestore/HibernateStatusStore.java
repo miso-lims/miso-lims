@@ -75,4 +75,9 @@ public class HibernateStatusStore  extends HibernateDaoSupport implements Store<
             */
     return null;
   }
+
+  @Override
+  public int count() throws IOException {
+    return 0;
+  }
 }

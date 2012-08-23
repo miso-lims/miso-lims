@@ -71,7 +71,6 @@ import java.util.List;
  * @since 0.0.2
  */
 public class SQLDilutionDAO implements DilutionStore {
-
   public static String DILUTION_SELECT_BY_ID_AND_LIBRARY_PLATFORM =
           "SELECT DISTINCT * " +
           "FROM Library l " +
@@ -576,6 +575,13 @@ public class SQLDilutionDAO implements DilutionStore {
       dilutions.addAll(listAllDilutionsByPlatform(platformType));
     }
     return dilutions;
+  }
+
+  @Override
+  public int count() throws IOException {
+    int ld = template.queryForInt("SELECT count(*) FROM LibraryDilution");
+    int ed = template.queryForInt("SELECT count(*) FROM emPCRDilution");
+    return ld + ed;
   }
 
   public boolean remove(Dilution dilution) throws IOException {

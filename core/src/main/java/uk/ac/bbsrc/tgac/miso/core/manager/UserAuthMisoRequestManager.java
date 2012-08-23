@@ -353,29 +353,36 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
-  public Pool getPoolById(long poolId) throws IOException {
-    Pool o = super.getPoolById(poolId);
+  public Pool<? extends Poolable> getPoolById(long poolId) throws IOException {
+    Pool<? extends Poolable> o = super.getPoolById(poolId);
     if (readCheck(o)) return o;
     else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Pool " + poolId);
   }
 
   @Override
-  public Pool getPoolByBarcode(String barcode) throws IOException {
-    Pool o = super.getPoolByBarcode(barcode);
+  public Pool<? extends Poolable> getPoolByBarcode(String barcode, PlatformType platformType) throws IOException {
+    Pool<? extends Poolable> o = super.getPoolByBarcode(barcode, platformType);
     if (readCheck(o)) return o;
     else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Pool " + o.getPoolId());
   }
 
   @Override
-  public Pool getIlluminaPoolByBarcode(String barcode) throws IOException {
-    Pool o = super.getIlluminaPoolByBarcode(barcode);
+  public Pool<? extends Poolable> getPoolByBarcode(String barcode) throws IOException {
+    Pool<? extends Poolable> o = super.getPoolByBarcode(barcode);
     if (readCheck(o)) return o;
     else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Pool " + o.getPoolId());
   }
 
   @Override
-  public Pool getIlluminaPoolById(long poolId) throws IOException {
-    Pool o = super.getIlluminaPoolById(poolId);
+  public Pool<? extends Poolable> getIlluminaPoolByBarcode(String barcode) throws IOException {
+    Pool<? extends Poolable> o = super.getIlluminaPoolByBarcode(barcode);
+    if (readCheck(o)) return o;
+    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Pool " + o.getPoolId());
+  }
+
+  @Override
+  public Pool<? extends Poolable> getIlluminaPoolById(long poolId) throws IOException {
+    Pool<? extends Poolable> o = super.getIlluminaPoolById(poolId);
     if (readCheck(o)) return o;
     else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Pool " + o.getPoolId());
   }
@@ -451,15 +458,15 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
-  public Pool getLS454PoolById(long poolId) throws IOException {
-    Pool o = super.getLS454PoolById(poolId);
+  public Pool<? extends Poolable> getLS454PoolById(long poolId) throws IOException {
+    Pool<? extends Poolable> o = super.getLS454PoolById(poolId);
     if (readCheck(o)) return o;
     else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read LS454Pool " + poolId);
   }
 
   @Override
-  public Pool getLS454PoolByBarcode(String barcode) throws IOException {
-    Pool o = super.getLS454PoolByBarcode(barcode);
+  public Pool<? extends Poolable> getLS454PoolByBarcode(String barcode) throws IOException {
+    Pool<? extends Poolable> o = super.getLS454PoolByBarcode(barcode);
     if (readCheck(o)) return o;
     else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read LS454Pool " + o.getPoolId());
   }
@@ -529,15 +536,15 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
-  public Pool getSolidPoolById(long poolId) throws IOException {
-    Pool o = super.getSolidPoolById(poolId);
+  public Pool<? extends Poolable> getSolidPoolById(long poolId) throws IOException {
+    Pool<? extends Poolable> o = super.getSolidPoolById(poolId);
     if (readCheck(o)) return o;
     else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read SolidPool " + poolId);
   }
 
   @Override
-  public Pool getSolidPoolByBarcode(String barcode) throws IOException {
-    Pool o = super.getSolidPoolByBarcode(barcode);
+  public Pool<? extends Poolable> getSolidPoolByBarcode(String barcode) throws IOException {
+    Pool<? extends Poolable> o = super.getSolidPoolByBarcode(barcode);
     if (readCheck(o)) return o;
     else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read SolidPool " + o.getPoolId());
   }
@@ -605,10 +612,21 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   public Collection<Run> listAllRuns() throws IOException {
     User user = getCurrentUser();
     Collection<Run> accessibles = new HashSet<Run>();
-    for (Run run : super.listAllRuns()) {
-      if (run.userCanRead(user)) {
-        accessibles.add(run);
+    Collection<Run> runs = super.listAllRuns();
+    if (runs != null) {
+      for (Run run : super.listAllRuns()) {
+        if (run != null) {
+          if (run.userCanRead(user)) {
+            accessibles.add(run);
+          }
+        }
+        else {
+          log.error("WTF. Seems to be a null run in the cached list");
+        }
       }
+    }
+    else {
+      log.error("WTF. Run list coming from cache is null");
     }
     return accessibles;
   }

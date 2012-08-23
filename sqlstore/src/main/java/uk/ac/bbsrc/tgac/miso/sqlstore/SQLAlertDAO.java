@@ -62,20 +62,22 @@ import java.util.List;
  * @since 0.1.2
  */
 public class SQLAlertDAO implements AlertStore {
+  private static final String TABLE_NAME = "Alert";
+
   private static final String ALERTS_SELECT =
           "SELECT alertId, title, text, userId, date, isRead, level " +
-          "FROM Alert";
+          "FROM " + TABLE_NAME;
 
   private static final String ALERT_SELECT_BY_ID =
           ALERTS_SELECT + " " + "WHERE alertId = ?";
 
   private static final String ALERT_UPDATE =
-          "UPDATE Alert " +
-          "SET title=:title, text=:text, userId=:userId, date=:date, isRead=:isRead, level=:level " +
+          "UPDATE " + TABLE_NAME +
+          " SET title=:title, text=:text, userId=:userId, date=:date, isRead=:isRead, level=:level " +
           "WHERE alertId=:alertId";
 
   private static final String ALERT_DELETE =
-          "DELETE FROM Alert WHERE alertId=:alertId";
+          "DELETE FROM "+TABLE_NAME+" WHERE alertId=:alertId";
 
   private static final String ALERTS_BY_USER =
           ALERTS_SELECT + " WHERE userId = ?";
@@ -159,7 +161,7 @@ public class SQLAlertDAO implements AlertStore {
 
     if (alert.getAlertId() == DefaultAlert.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-                            .withTableName("Alert")
+                            .withTableName(TABLE_NAME)
                             .usingGeneratedKeyColumns("alertId");
       Number newId = insert.executeAndReturnKey(params);
       alert.setAlertId(newId.longValue());
@@ -192,6 +194,11 @@ public class SQLAlertDAO implements AlertStore {
   @Override
   public Collection<Alert> listAll() throws IOException {
     return template.query(ALERTS_SELECT, new AlertMapper());
+  }
+
+  @Override
+  public int count() throws IOException {
+    return template.queryForInt("SELECT count(*) FROM "+TABLE_NAME);
   }
 
   @Override

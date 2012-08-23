@@ -60,10 +60,11 @@ import java.util.List;
  * @since 0.0.2
  */
 public class SQLSampleQCDAO implements SampleQcStore {
+  private static final String TABLE_NAME = "SampleQC";
 
   public static final String SAMPLE_QC =
           "SELECT qcId, sample_sampleId, qcUserName, qcDate, qcMethod, results " +
-          "FROM SampleQC";
+          "FROM "+TABLE_NAME;
 
   public static final String SAMPLE_QC_SELECT_BY_ID =
          SAMPLE_QC + " WHERE qcId=?";
@@ -73,7 +74,7 @@ public class SQLSampleQCDAO implements SampleQcStore {
           "ORDER BY qcDate ASC";
   
   public static final String SAMPLE_QC_UPDATE =
-          "UPDATE SampleQC " +
+          "UPDATE "+TABLE_NAME+" " +
           "SET sample_sampleId=:sample_sampleId, qcUserName=:qcUserName, qcDate=:qcDate, qcMethod=:qcMethod, results=:results " +
           "WHERE qcId=:qcId";
 
@@ -88,7 +89,7 @@ public class SQLSampleQCDAO implements SampleQcStore {
           SAMPLE_QC_TYPE_SELECT + " AND name = ?";
 
   public static final String SAMPLE_QC_DELETE =
-          "DELETE FROM SampleQC WHERE qcId=:qcId";
+          "DELETE FROM "+TABLE_NAME+" WHERE qcId=:qcId";
 
   private JdbcTemplate template;
   private SampleStore sampleDAO;
@@ -135,7 +136,7 @@ public class SQLSampleQCDAO implements SampleQcStore {
 
     if (sampleQC.getQcId() == AbstractSampleQC.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-                              .withTableName("SampleQC")
+                              .withTableName(TABLE_NAME)
                               .usingGeneratedKeyColumns("qcId");
       Number newId = insert.executeAndReturnKey(params);
       sampleQC.setQcId(newId.longValue());
@@ -186,6 +187,11 @@ public class SQLSampleQCDAO implements SampleQcStore {
 
   public Collection<SampleQC> listAll() throws IOException {
     return template.query(SAMPLE_QC, new LazySampleQcMapper());
+  }
+
+  @Override
+  public int count() throws IOException {
+    return template.queryForInt("SELECT count(*) FROM "+TABLE_NAME);
   }
 
   public boolean remove(SampleQC qc) throws IOException {

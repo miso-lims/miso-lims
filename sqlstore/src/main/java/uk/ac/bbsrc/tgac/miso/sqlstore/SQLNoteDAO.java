@@ -57,41 +57,42 @@ import java.util.List;
  * @since 0.0.2
  */
 public class SQLNoteDAO implements NoteStore {
+  private static final String TABLE_NAME="Note";
 
   public static final String NOTES_SELECT =
           "SELECT noteId, creationDate, internalOnly, text, owner_userId " +
-          "FROM Note";
+          "FROM "+TABLE_NAME;
 
   public static final String NOTE_SELECT_BY_ID =
           NOTES_SELECT + " " + "WHERE noteId = ?";
 
   public static final String NOTES_BY_RELATED_PROJECT_OVERVIEW =
           "SELECT n.noteId, n.creationDate, n.internalOnly, n.text, n.owner_userId " +
-          "FROM Note n, ProjectOverview_Note pon " +
+          "FROM "+TABLE_NAME+" n, ProjectOverview_Note pon " +
           "WHERE n.noteId=pon.notes_noteId " +
           "AND pon.overview_overviewId=?";
 
   public static final String NOTES_BY_RELATED_SAMPLE =
           "SELECT n.noteId, n.creationDate, n.internalOnly, n.text, n.owner_userId " +
-          "FROM Note n, Sample_Note sn " +
+          "FROM "+TABLE_NAME+" n, Sample_Note sn " +
           "WHERE n.noteId=sn.notes_noteId " +
           "AND sn.sample_sampleId=?";
 
   public static final String NOTES_BY_RELATED_LIBRARY =
           "SELECT n.noteId, n.creationDate, n.internalOnly, n.text, n.owner_userId " +
-          "FROM Note n, Library_Note ln " +
+          "FROM "+TABLE_NAME+" n, Library_Note ln " +
           "WHERE n.noteId=ln.notes_noteId " +
           "AND ln.library_libraryId=?";  
 
   public static final String NOTES_BY_RELATED_KIT =
           "SELECT n.noteId, n.creationDate, n.internalOnly, n.text, n.owner_userId " +
-          "FROM Note n, Kit_Note kn " +
+          "FROM "+TABLE_NAME+" n, Kit_Note kn " +
           "WHERE n.noteId=kn.notes_noteId " +
           "AND kn.kit_kitId=?";
 
   public static final String NOTES_BY_RELATED_RUN =
           "SELECT n.noteId, n.creationDate, n.internalOnly, n.text, n.owner_userId " +
-          "FROM Note n, Run_Note rn " +
+          "FROM "+TABLE_NAME+" n, Run_Note rn " +
           "WHERE n.noteId=rn.notes_noteId " +
           "AND rn.run_runId=?";
 
@@ -125,12 +126,18 @@ public class SQLNoteDAO implements NoteStore {
     MapSqlParameterSource params = new MapSqlParameterSource();
     params.addValue("creationDate", note.getCreationDate())
             .addValue("internalOnly", note.isInternalOnly())
-            .addValue("text", newNoteText)
-            .addValue("owner_userId", note.getOwner().getUserId());
+            .addValue("text", newNoteText);
+
+    if (note.getOwner() == null) {
+      log.warn("Note has no owner - check parent permissions.");
+    }
+    else {
+      params.addValue("owner_userId", note.getOwner().getUserId());
+    }
 
     if (note.getNoteId() == Note.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-              .withTableName("Note")
+              .withTableName(TABLE_NAME)
               .usingGeneratedKeyColumns("noteId");
       Number newId = insert.executeAndReturnKey(params);
       note.setNoteId(newId.longValue());
@@ -235,6 +242,11 @@ public class SQLNoteDAO implements NoteStore {
 
   public Collection<Note> listAll() throws IOException {
     return template.query(NOTES_SELECT, new NoteMapper());
+  }
+
+  @Override
+  public int count() throws IOException {
+    return template.queryForInt("SELECT count(*) FROM "+TABLE_NAME);
   }
 
   public List<Note> listByProjectOverview(Long overviewId) throws IOException {

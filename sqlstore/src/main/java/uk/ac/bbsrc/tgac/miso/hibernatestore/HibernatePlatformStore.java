@@ -67,4 +67,9 @@ public class HibernatePlatformStore  extends HibernateDaoSupport implements Stor
             */
     return null;
   }
+
+  @Override
+  public int count() throws IOException {
+    return 0;
+  }
 }

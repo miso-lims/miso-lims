@@ -24,7 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
 import com.eaglegenomics.simlims.core.manager.LocalSecurityManager;
-import org.dbunit.IDatabaseTester;
+import org.dbunit.DatabaseTestCase;
 import org.dbunit.JdbcDatabaseTester;
 import org.dbunit.database.DatabaseConfig;
 import org.dbunit.database.DatabaseConnection;
@@ -34,11 +34,9 @@ import org.dbunit.dataset.IDataSet;
 import org.dbunit.ext.hsqldb.HsqldbDataTypeFactory;
 import org.dbunit.ext.mysql.MySqlDataTypeFactory;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.SingleConnectionDataSource;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.support.lob.DefaultLobHandler;
 import org.springframework.jdbc.support.lob.LobHandler;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
@@ -66,9 +64,8 @@ import java.util.Properties;
  * @author Rob Davey
  * @since 0.0.2
  */
-public abstract class LimsDAOTestCase {
-  private static IDatabaseTester dbTester;
-  private static QueryDataSet dataSet;
+public abstract class LimsDAOTestCase extends DatabaseTestCase {
+  private QueryDataSet dataSet;
 
   private static final String DRIVER = "org.hsqldb.jdbcDriver";
   private static final String URL = "jdbc:hsqldb:mem:miso";
@@ -415,58 +412,38 @@ public abstract class LimsDAOTestCase {
     return sequencerPartitionContainerDAO;
   }
 
-  @BeforeClass
-  public static void setUpDataset() throws Exception {
-    System.out.print("Initial setup...");
-    InputStream in = LimsDAOTestCase.class.getClassLoader().getResourceAsStream("test.db.properties");
-    Properties props = new Properties();
-    props.load(in);
-    System.out.print("properties loaded...");
-
-    Connection jdbcConnection = DriverManager.getConnection(props.getProperty("db.url"), props.getProperty("db.username"), props.getProperty("db.password"));
-    IDatabaseConnection connection = new DatabaseConnection(jdbcConnection);
-    DatabaseConfig config = connection.getConfig();
-    config.setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, new MySqlDataTypeFactory());
-    System.out.print("mysql connection set...");
-
-    dataSet = new QueryDataSet(connection);
-    for (String table : tables) {
-      dataSet.addTable(table);
-    }
-    System.out.print("tables selected...");
-
-    dbTester = new JdbcDatabaseTester(DRIVER, URL, USER, PASSWORD);
-    DatabaseConfig memConfig = dbTester.getConnection().getConfig();
-    memConfig.setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, new HsqldbDataTypeFactory());
-    dbTester.setDataSet(dataSet);
-    System.out.println("dbTester setup...done!");
-    createDatabase();
-
-    dbTester.onSetup();
-  }
-
-  @AfterClass
-  public static void tearDownDataSet() throws Exception {
-    System.out.println("Final teardown...");
-    Connection conn = getTesterConnection().getConnection();
-    runStatement(conn, "SHUTDOWN");
-    conn.close();
-
-    dbTester.onTearDown();
-  }
-
+  @Override
   protected IDataSet getDataSet() throws Exception {
+    if (dataSet == null) {
+      System.out.print("Getting dataset...");
+      InputStream in = LimsDAOTestCase.class.getClassLoader().getResourceAsStream("test.db.properties");
+      Properties props = new Properties();
+      props.load(in);
+      System.out.print("properties loaded...");
+
+      Connection jdbcConnection = DriverManager.getConnection(props.getProperty("db.url"), props.getProperty("db.username"), props.getProperty("db.password"));
+      IDatabaseConnection connection = new DatabaseConnection(jdbcConnection);
+      DatabaseConfig config = connection.getConfig();
+      config.setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, new MySqlDataTypeFactory());
+      System.out.print("mysql connection set...");
+
+      dataSet = new QueryDataSet(connection);
+      for (String table : tables) {
+        dataSet.addTable(table);
+      }
+      System.out.print("dataset ready.\n");
+    }
     return dataSet;
   }
 
-  private static IDatabaseConnection getTesterConnection() throws Exception {
-    return dbTester.getConnection();
-  }
-
-  protected static void runStatement(Connection conn, String sql) throws SQLException {
-    Statement st = conn.createStatement();
-    st.executeUpdate(sql);
-    st.close();
+  @Override
+  protected IDatabaseConnection getConnection() throws Exception {
+    JdbcDatabaseTester dbTester = new JdbcDatabaseTester(DRIVER, URL, USER, PASSWORD);
+    dbTester.setDataSet(getDataSet());
+    IDatabaseConnection connection = dbTester.getConnection();
+    DatabaseConfig memConfig = connection.getConfig();
+    memConfig.setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, new HsqldbDataTypeFactory());
+    return connection;
   }
 
   /**
@@ -480,7 +457,13 @@ public abstract class LimsDAOTestCase {
    */
   @Before
   public void setUp() throws Exception {
-    datasource = new SingleConnectionDataSource(getTesterConnection().getConnection(), false);
+    System.out.println(">>>>>>>>>>>>>> SETUP");
+
+    InputStream in = LimsDAOTestCase.class.getClassLoader().getResourceAsStream("test.db.properties");
+    Properties props = new Properties();
+    props.load(in);
+
+    datasource = new DriverManagerDataSource(props.getProperty("db.url"), props.getProperty("db.username"), props.getProperty("db.password"));
 
     DataObjectFactory dataObjectFactory = new TgacDataObjectFactory();
     LobHandler lh = new DefaultLobHandler();
@@ -677,13 +660,13 @@ public abstract class LimsDAOTestCase {
 
   @After
   public void tearDown() throws Exception {
+    System.out.println("<<<<<<<<<<<<<<<< TEARDOWN");
     datasource = null;
   }
 
-  private static void createDatabase() throws Exception {
+  private static void createDatabase(Connection conn) throws Exception {
     // get a database connection that will create the DB in memory
-    Connection conn = getTesterConnection().getConnection();
-    System.out.print("Creating test database tables...");
+    System.out.println("Creating test database tables...");
 
     runStatement(conn,
                  "CREATE TABLE Alert (" +
@@ -1339,5 +1322,11 @@ public abstract class LimsDAOTestCase {
 
     System.out.println("...done!");
     conn.close();
+  }
+
+  protected static void runStatement(Connection conn, String sql) throws SQLException {
+    Statement st = conn.createStatement();
+    st.executeUpdate(sql);
+    st.close();
   }
 }

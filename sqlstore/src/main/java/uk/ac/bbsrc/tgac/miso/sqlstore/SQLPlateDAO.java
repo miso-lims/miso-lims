@@ -65,9 +65,11 @@ import java.util.List;
  * @since 0.1.1
  */
 public class SQLPlateDAO implements PlateStore {
+  private static final String TABLE_NAME = "Plate";
+
   public static final String PLATE_SELECT =
           "SELECT plateId, name, description, creationDate, plateMaterialType, identificationBarcode, locationBarcode, size, tagBarcodeId, securityProfile_profileId " +
-          "FROM Plate";
+          "FROM "+TABLE_NAME;
 
   public static final String PLATE_SELECT_BY_ID =
           PLATE_SELECT + " WHERE plateId = ?";
@@ -76,12 +78,12 @@ public class SQLPlateDAO implements PlateStore {
           PLATE_SELECT + " WHERE identificationBarcode = ?";
 
   public static final String PLATE_UPDATE =
-          "UPDATE Plate " +
+          "UPDATE "+TABLE_NAME+" " +
           "SET plateId=:plateId, name=:name, description=:description, creationDate=:creationDate, plateMaterialType=:plateMaterialType, identificationBarcode=:identificationBarcode, locationBarcode=:locationBarcode, size=:size, tagBarcodeId=:tagBarcodeId, securityProfile_profileId=:securityProfile_profileId " +
           "WHERE plateId=:plateId";
 
   public static final String PLATE_DELETE =
-          "DELETE FROM Plate WHERE plateId=:plateId";
+          "DELETE FROM "+TABLE_NAME+" WHERE plateId=:plateId";
 
   public static final String PLATE_BARCODES_SELECT =
           "SELECT plateBarcodeId, name, sequence, materialType " +
@@ -173,6 +175,11 @@ public class SQLPlateDAO implements PlateStore {
   }
 
   @Override
+  public int count() throws IOException {
+    return template.queryForInt("SELECT count(*) FROM "+TABLE_NAME);
+  }
+
+  @Override
   @Transactional(readOnly = false, rollbackFor = Exception.class)
   @TriggersRemove(
     cacheName="plateCache",
@@ -202,9 +209,9 @@ public class SQLPlateDAO implements PlateStore {
 
     if (plate.getPlateId() == AbstractPlate.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-                            .withTableName("Plate")
+                            .withTableName(TABLE_NAME)
                             .usingGeneratedKeyColumns("plateId");
-      String name = "PLA"+ DbUtils.getAutoIncrement(template, "Plate");
+      String name = "PLA"+ DbUtils.getAutoIncrement(template, TABLE_NAME);
       params.addValue("name", name);
       params.addValue("identificationBarcode", name + "::" + plate.getTagBarcode());
       Number newId = insert.executeAndReturnKey(params);

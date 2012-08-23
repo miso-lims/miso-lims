@@ -87,13 +87,15 @@ public class LimsUtils {
    * @param s of type Collection
    * @param delimiter of type String
    * @return String
+   * @throws IllegalArgumentException
    */
-  public static String join(Collection s, String delimiter) {
+  public static String join(Collection s, String delimiter) throws IllegalArgumentException {
+    if (s == null) { throw new IllegalArgumentException("Collection to join must not be null"); }
     StringBuffer buffer = new StringBuffer();
     Iterator iter = s.iterator();
     while (iter.hasNext()) {
       buffer.append(iter.next());
-      if (iter.hasNext()) {
+      if (iter.hasNext() && delimiter != null) {
         buffer.append(delimiter);
       }
     }

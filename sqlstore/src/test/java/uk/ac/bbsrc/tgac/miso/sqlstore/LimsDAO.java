@@ -28,6 +28,14 @@ import junit.framework.TestCase;
 import org.junit.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.ac.bbsrc.tgac.miso.core.data.*;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCR;
+import uk.ac.bbsrc.tgac.miso.core.store.Store;
+
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.*;
 
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore
@@ -41,41 +49,8 @@ import org.slf4j.LoggerFactory;
 public class LimsDAO extends LimsDAOTestCase {
   protected static final Logger log = LoggerFactory.getLogger(LimsDAO.class);
 
-  //@Test
-  public void testListAllObjects() {
-    try {
-      TestCase.assertNotNull(getDilutionDAO().listAll());
-      TestCase.assertNotNull(getEmPCRDAO().listAll());
-      TestCase.assertNotNull(getExperimentDAO().listAll());
-      TestCase.assertNotNull(getSequencerPartitionContainerDAO().listAll());
-      TestCase.assertNotNull(getKitDAO().listAll());
-      TestCase.assertNotNull(getPartitionDAO().listAll());
-      TestCase.assertNotNull(getLibraryDAO().listAll());
-      TestCase.assertNotNull(getLibraryQcDAO().listAll());
-      TestCase.assertNotNull(getNoteDAO().listAll());
-      TestCase.assertNotNull(getPlatformDAO().listAll());
-      TestCase.assertNotNull(getPoolDAO().listAll());
-      TestCase.assertNotNull(getProjectDAO().listAll());
-      TestCase.assertNotNull(getRunDAO().listAll());
-      TestCase.assertNotNull(getRunQcDAO().listAll());
-      TestCase.assertNotNull(getSampleDAO().listAll());
-      TestCase.assertNotNull(getSampleQcDAO().listAll());
-      TestCase.assertNotNull(getSequencerReferenceDAO().listAll());
-      TestCase.assertNotNull(getSecurityDAO().listAllUsers());
-      TestCase.assertNotNull(getSecurityDAO().listAllGroups());
-      TestCase.assertNotNull(getSecurityProfileDAO().listAll());
-      TestCase.assertNotNull(getStatusDAO().listAll());
-      TestCase.assertNotNull(getStudyDAO().listAll());
-      TestCase.assertNotNull(getSubmissionDAO().listAll());
-    }
-    catch (Exception e) {
-      e.printStackTrace();
-      TestCase.fail();
-    }
-  }
-
   @Test
-  public void testGetAllUsers() {
+  public void testUsers() {
     try {
       int expected = getDataSet().getTable("User").getRowCount();
       int actual = getSecurityDAO().listAllUsers().size();
@@ -88,26 +63,63 @@ public class LimsDAO extends LimsDAOTestCase {
     }
   }
 
+  private <T> Collection<T> random(Store<T> s, int rows, int sampleSize) {
+    if (rows > 0) {
+      Set<T> ret = new HashSet<T>();
+      Random r = new Random();
+      for (int i = 0; i < sampleSize; i++) {
+        try {
+          int rand = r.nextInt(rows);
+          if (rand != 0) {
+            T t;
+            try {
+              Method lazy = s.getClass().getDeclaredMethod("lazyGet", Long.TYPE);
+              t = (T)lazy.invoke(s, new Long(rand));
+            }
+            catch (NoSuchMethodException e) {
+              System.out.println("WARN:: Unable to lazily get object. Using full get.");
+              t = s.get(Integer.valueOf(rand).longValue());
+            }
+            catch (InvocationTargetException e) {
+              System.out.println("WARN:: Unable to lazily get object. Using full get.");
+              t = s.get(Integer.valueOf(rand).longValue());
+            }
+            catch (IllegalAccessException e) {
+              System.out.println("WARN:: Unable to lazily get object. Using full get.");
+              t = s.get(Integer.valueOf(rand).longValue());
+            }
+
+            if (t != null) {
+              ret.add(t);
+            }
+          }
+        }
+        catch (IOException e) {
+          System.out.println("ERROR:: could not get random object from store");
+        }
+      }
+      return ret;
+    }
+    else {
+      return Collections.emptySet();
+    }
+  }
+
   @Test
-  public void testGetAllDilutions() {
+  public void testDilutions() {
     try {
-      int emExpected = getDataSet().getTable("emPCRDilution").getRowCount();
+      int ec = getDataSet().getTable("emPCRDilution").getRowCount();
+      int lc = getDataSet().getTable("LibraryDilution").getRowCount();
 
-      //int ls454Actual = getDilutionDAO().listAllDilutionsByPlatform(PlatformType.LS454).size();
-      //int solidActual = getDilutionDAO().listAllDilutionsByPlatform(PlatformType.Solid).size();
-      //assertEquals("Wrong number of emPCRDilutions", emExpected, (ls454Actual+solidActual));
-      //System.out.println("Expected number of emPCR (Solid+454) dilutions: " + emExpected + ", actual: " + (ls454Actual+solidActual));
+      int expected = ec + lc;
+      int actual = getDilutionDAO().count();
+      TestCase.assertEquals("Wrong number of dilutions", expected, actual);
+      System.out.println("Expected number of dilutions: " + expected + ", actual: " + actual);
 
-      int emPcrActual = getDilutionDAO().listAllEmPcrDilutions().size();
-      TestCase.assertEquals("Wrong number of emPCRDilutions", emExpected, emPcrActual);
-      System.out.println("Expected number of emPCR (Solid+454) dilutions: " + emExpected + ", actual: " + emPcrActual);
-
-      int libExpected = getDataSet().getTable("LibraryDilution").getRowCount();
-      //int libActual = getDilutionDAO().listAllDilutionsByPlatform(PlatformType.Illumina).size();
-      int libActual = getDilutionDAO().listAllLibraryDilutions().size();
-      TestCase.assertEquals("Wrong number of LibraryDilutions", libExpected, libActual);
-      System.out.println(
-              "Expected number of Library (Illumina) dilutions: " + libExpected + ", actual: " + libActual);
+//      for (Dilution d : random(getDilutionDAO(), actual, 5)) {
+//        TestCase.assertNotNull(d);
+//        TestCase.assertNotNull(d.getDilutionId());
+//      }
     }
     catch (Exception e) {
       e.printStackTrace();
@@ -116,19 +128,24 @@ public class LimsDAO extends LimsDAOTestCase {
   }
 
   @Test
-  public void testGetAllEmPCRs() {
+  public void testEmPCRs() {
     try {
       // get row count of experiments in the dataset
       int expected = getDataSet().getTable("emPCR").getRowCount();
 
       // get number of experiments from the DAO
-      int actual = getEmPCRDAO().listAll().size();
+      int actual = getEmPCRDAO().count();
 
       // test data contains 2 experiments, check size of returned list
       TestCase.assertEquals("Wrong number of emPCRs", expected, actual);
 
       System.out.println(
               "Expected number of emPCRs: " + expected + ", actual: " + actual);
+
+      for (emPCR d : random(getEmPCRDAO(), actual, 5)) {
+        TestCase.assertNotNull(d);
+        TestCase.assertNotNull(d.getPcrId());
+      }
     }
     catch (Exception e) {
       e.printStackTrace();
@@ -137,19 +154,24 @@ public class LimsDAO extends LimsDAOTestCase {
   }
 
   @Test
-  public void testGetAllExperiments() {
+  public void testExperiments() {
     try {
       // get row count of experiments in the dataset
       int expected = getDataSet().getTable("Experiment").getRowCount();
 
       // get number of experiments from the DAO
-      int actual = getExperimentDAO().listAll().size();
+      int actual = getExperimentDAO().count();
 
       // test data contains 2 experiments, check size of returned list
       TestCase.assertEquals("Wrong number of experiments", expected, actual);
 
       System.out.println(
               "Expected number of experiments: " + expected + ", actual: " + actual);
+
+      for (Experiment d : random(getExperimentDAO(), actual, 5)) {
+        TestCase.assertNotNull(d);
+        TestCase.assertNotNull(d.getExperimentId());
+      }
     }
     catch (Exception e) {
       e.printStackTrace();
@@ -158,19 +180,24 @@ public class LimsDAO extends LimsDAOTestCase {
   }
 
   @Test
-  public void testGetAllSequencerPartitionContainers() {
+  public void testSequencerPartitionContainers() {
     try {
       // get row count of experiments in the dataset
       int expected = getDataSet().getTable("SequencerPartitionContainer").getRowCount();
 
       // get number of experiments from the DAO
-      int actual = getSequencerPartitionContainerDAO().listAll().size();
+      int actual = getSequencerPartitionContainerDAO().count();
 
       // test data contains 2 experiments, check size of returned list
       TestCase.assertEquals("Wrong number of containers", expected, actual);
 
       System.out.println(
               "Expected number of containers: " + expected + ", actual: " + actual);
+
+      for (SequencerPartitionContainer d : random(getSequencerPartitionContainerDAO(), actual, 5)) {
+        TestCase.assertNotNull(d);
+        TestCase.assertNotNull(d.getContainerId());
+      }
     }
     catch (Exception e) {
       e.printStackTrace();
@@ -179,19 +206,24 @@ public class LimsDAO extends LimsDAOTestCase {
   }
 
   @Test
-  public void testGetAllKits() {
+  public void testKits() {
     try {
       // get row count of experiments in the dataset
       int expected = getDataSet().getTable("Kit").getRowCount();
 
       // get number of experiments from the DAO
-      int actual = getKitDAO().listAll().size();
+      int actual = getKitDAO().count();
 
       // test data contains 2 experiments, check size of returned list
       TestCase.assertEquals("Wrong number of kits", expected, actual);
 
       System.out.println(
               "Expected number of kits: " + expected + ", actual: " + actual);
+
+      for (Kit d : random(getKitDAO(), actual, 5)) {
+        TestCase.assertNotNull(d);
+        TestCase.assertNotNull(d.getKitId());
+      }
     }
     catch (Exception e) {
       e.printStackTrace();
@@ -200,19 +232,24 @@ public class LimsDAO extends LimsDAOTestCase {
   }
 
   @Test
-  public void testGetAllPartitions() {
+  public void testPartitions() {
     try {
       // get row count of experiments in the dataset
       int expected = getDataSet().getTable("Partition").getRowCount();
 
       // get number of experiments from the DAO
-      int actual = getPartitionDAO().listAll().size();
+      int actual = getPartitionDAO().count();
 
       // test data contains 2 experiments, check size of returned list
       TestCase.assertEquals("Wrong number of partitions", expected, actual);
 
       System.out.println(
               "Expected number of partitions: " + expected + ", actual: " + actual);
+
+      for (Partition d : random(getPartitionDAO(), actual, 5)) {
+        TestCase.assertNotNull(d);
+        TestCase.assertNotNull(d.getId());
+      }
     }
     catch (Exception e) {
       e.printStackTrace();
@@ -221,19 +258,24 @@ public class LimsDAO extends LimsDAOTestCase {
   }
 
   @Test
-  public void testGetAllLibraries() {
+  public void testLibraries() {
     try {
       // get row count of experiments in the dataset
       int expected = getDataSet().getTable("Library").getRowCount();
 
       // get number of experiments from the DAO
-      int actual = getLibraryDAO().listAll().size();
+      int actual = getLibraryDAO().count();
 
       // test data contains 2 experiments, check size of returned list
       TestCase.assertEquals("Wrong number of Library", expected, actual);
 
       System.out.println(
               "Expected number of Library: " + expected + ", actual: " + actual);
+
+      for (Library d : random(getLibraryDAO(), actual, 5)) {
+        TestCase.assertNotNull(d);
+        TestCase.assertNotNull(d.getLibraryId());
+      }
     }
     catch (Exception e) {
       e.printStackTrace();
@@ -242,19 +284,24 @@ public class LimsDAO extends LimsDAOTestCase {
   }
 
   @Test
-  public void testGetAllLibraryQCs() {
+  public void testLibraryQCs() {
     try {
       // get row count of experiments in the dataset
       int expected = getDataSet().getTable("LibraryQC").getRowCount();
 
       // get number of experiments from the DAO
-      int actual = getLibraryQcDAO().listAll().size();
+      int actual = getLibraryQcDAO().count();
 
       // test data contains 2 experiments, check size of returned list
       TestCase.assertEquals("Wrong number of LibraryQC", expected, actual);
 
       System.out.println(
               "Expected number of LibraryQC: " + expected + ", actual: " + actual);
+
+      for (LibraryQC d : random(getLibraryQcDAO(), actual, 5)) {
+        TestCase.assertNotNull(d);
+        TestCase.assertNotNull(d.getQcId());
+      }
     }
     catch (Exception e) {
       e.printStackTrace();
@@ -263,17 +310,22 @@ public class LimsDAO extends LimsDAOTestCase {
   }
 
   @Test
-  public void testGetAllPlatforms() {
+  public void testPlatforms() {
     try {
       // get row count of experiments in the dataset
       int expected = getDataSet().getTable("Platform").getRowCount();
 
       // get number of experiments from the DAO
-      int actual = getPlatformDAO().listAll().size();
+      int actual = getPlatformDAO().count();
 
       // test data contains 2 experiments, check size of returned list
       TestCase.assertEquals("Wrong number of Platform", expected, actual);
       System.out.println("Expected number of Platform: " + expected + ", actual: " + actual);
+
+      for (Platform d : random(getPlatformDAO(), actual, 5)) {
+        TestCase.assertNotNull(d);
+        TestCase.assertNotNull(d.getPlatformId());
+      }
     }
     catch (Exception e) {
       e.printStackTrace();
@@ -282,14 +334,19 @@ public class LimsDAO extends LimsDAOTestCase {
   }
 
   @Test
-  public void testGetAllPools() {
+  public void testPools() {
     try {
       int expected = getDataSet().getTable("Pool").getRowCount();
 
-      int actual = getPoolDAO().listAll().size();
+      int actual = getPoolDAO().count();
 
       TestCase.assertEquals("Wrong number of Pools", expected, actual);
-      System.out.println("Expected number of Pools: " + expected + ", actual: " + actual);      
+      System.out.println("Expected number of Pools: " + expected + ", actual: " + actual);
+
+      for (Pool d : random(getPoolDAO(), actual, 5)) {
+        TestCase.assertNotNull(d);
+        TestCase.assertNotNull(d.getPoolId());
+      }
     }
     catch (Exception e) {
       e.printStackTrace();
@@ -298,19 +355,24 @@ public class LimsDAO extends LimsDAOTestCase {
   }
 
   @Test
-  public void testGetAllProjects() {
+  public void testProjects() {
     try {
       // get row count of experiments in the dataset
       int expected = getDataSet().getTable("Project").getRowCount();
 
       // get number of experiments from the DAO
-      int actual = getProjectDAO().listAll().size();
+      int actual = getProjectDAO().count();
 
       // test data contains 2 experiments, check size of returned list
       TestCase.assertEquals("Wrong number of Project", expected, actual);
 
       System.out.println(
               "Expected number of Project: " + expected + ", actual: " + actual);
+
+      for (Project d : random(getProjectDAO(), actual, 5)) {
+        TestCase.assertNotNull(d);
+        TestCase.assertNotNull(d.getProjectId());
+      }
     }
     catch (Exception e) {
       e.printStackTrace();
@@ -319,19 +381,24 @@ public class LimsDAO extends LimsDAOTestCase {
   }
 
   @Test
-  public void testGetAllRuns() {
+  public void testRuns() {
     try {
       // get row count of experiments in the dataset
       int expected = getDataSet().getTable("Run").getRowCount();
 
       // get number of experiments from the DAO
-      int actual = getRunDAO().listAll().size();
+      int actual = getRunDAO().count();
 
       // test data contains 2 experiments, check size of returned list
       TestCase.assertEquals("Wrong number of Run", expected, actual);
 
       System.out.println(
               "Expected number of Run: " + expected + ", actual: " + actual);
+
+      for (Run d : random(getRunDAO(), actual, 5)) {
+        TestCase.assertNotNull(d);
+        TestCase.assertNotNull(d.getRunId());
+      }
     }
     catch (Exception e) {
       e.printStackTrace();
@@ -340,19 +407,24 @@ public class LimsDAO extends LimsDAOTestCase {
   }
 
   @Test
-  public void testGetAllRunQCs() {
+  public void testRunQCs() {
     try {
       // get row count of experiments in the dataset
       int expected = getDataSet().getTable("RunQC").getRowCount();
 
       // get number of experiments from the DAO
-      int actual = getRunQcDAO().listAll().size();
+      int actual = getRunQcDAO().count();
 
       // test data contains 2 experiments, check size of returned list
       TestCase.assertEquals("Wrong number of RunQC", expected, actual);
 
       System.out.println(
               "Expected number of RunQC: " + expected + ", actual: " + actual);
+
+      for (RunQC d : random(getRunQcDAO(), actual, 1)) {
+        TestCase.assertNotNull(d);
+        TestCase.assertNotNull(d.getQcId());
+      }
     }
     catch (Exception e) {
       e.printStackTrace();
@@ -361,19 +433,24 @@ public class LimsDAO extends LimsDAOTestCase {
   }
 
   @Test
-  public void testGetAllSamples() {
+  public void testSamples() {
     try {
       // get row count of experiments in the dataset
       int expected = getDataSet().getTable("Sample").getRowCount();
 
       // get number of experiments from the DAO
-      int actual = getSampleDAO().listAll().size();
+      int actual = getSampleDAO().count();
 
       // test data contains 2 experiments, check size of returned list
       TestCase.assertEquals("Wrong number of Sample", expected, actual);
 
       System.out.println(
               "Expected number of Sample: " + expected + ", actual: " + actual);
+
+      for (Sample d : random(getSampleDAO(), actual, 5)) {
+        TestCase.assertNotNull(d);
+        TestCase.assertNotNull(d.getSampleId());
+      }
     }
     catch (Exception e) {
       e.printStackTrace();
@@ -382,19 +459,24 @@ public class LimsDAO extends LimsDAOTestCase {
   }
 
   @Test
-  public void testGetAllSampleQCs() {
+  public void testSampleQCs() {
     try {
       // get row count of experiments in the dataset
       int expected = getDataSet().getTable("SampleQC").getRowCount();
 
       // get number of experiments from the DAO
-      int actual = getSampleQcDAO().listAll().size();
+      int actual = getSampleQcDAO().count();
 
       // test data contains 2 experiments, check size of returned list
       TestCase.assertEquals("Wrong number of SampleQC", expected, actual);
 
       System.out.println(
               "Expected number of SampleQC: " + expected + ", actual: " + actual);
+
+      for (SampleQC d : random(getSampleQcDAO(), actual, 5)) {
+        TestCase.assertNotNull(d);
+        TestCase.assertNotNull(d.getQcId());
+      }
     }
     catch (Exception e) {
       e.printStackTrace();
@@ -403,19 +485,24 @@ public class LimsDAO extends LimsDAOTestCase {
   }
 
   @Test
-  public void testGetAllSequencerReferences() {
+  public void testSequencerReferences() {
     try {
       // get row count of experiments in the dataset
       int expected = getDataSet().getTable("SequencerReference").getRowCount();
 
       // get number of experiments from the DAO
-      int actual = getSequencerReferenceDAO().listAll().size();
+      int actual = getSequencerReferenceDAO().count();
 
       // test data contains 2 experiments, check size of returned list
       TestCase.assertEquals("Wrong number of SequencerReference", expected, actual);
 
       System.out.println(
               "Expected number of SequencerReference: " + expected + ", actual: " + actual);
+
+      for (SequencerReference d : random(getSequencerReferenceDAO(), actual, 5)) {
+        TestCase.assertNotNull(d);
+        TestCase.assertNotNull(d.getId());
+      }
     }
     catch (Exception e) {
       e.printStackTrace();
@@ -424,19 +511,24 @@ public class LimsDAO extends LimsDAOTestCase {
   }
 
   @Test
-  public void testGetAllStatus() {
+  public void testStatus() {
     try {
       // get row count of experiments in the dataset
       int expected = getDataSet().getTable("Status").getRowCount();
 
       // get number of experiments from the DAO
-      int actual = getStatusDAO().listAll().size();
+      int actual = getStatusDAO().count();
 
       // test data contains 2 experiments, check size of returned list
       TestCase.assertEquals("Wrong number of Status", expected, actual);
 
       System.out.println(
               "Expected number of Status: " + expected + ", actual: " + actual);
+
+      for (Status d : random(getStatusDAO(), actual, 5)) {
+        TestCase.assertNotNull(d);
+        TestCase.assertNotNull(d.getStatusId());
+      }
     }
     catch (Exception e) {
       e.printStackTrace();
@@ -445,19 +537,24 @@ public class LimsDAO extends LimsDAOTestCase {
   }
 
   @Test
-  public void testGetAllStudies() {
+  public void testStudies() {
     try {
       // get row count of experiments in the dataset
       int expected = getDataSet().getTable("Study").getRowCount();
 
       // get number of experiments from the DAO
-      int actual = getStudyDAO().listAll().size();
+      int actual = getStudyDAO().count();
 
       // test data contains 2 experiments, check size of returned list
       TestCase.assertEquals("Wrong number of Study", expected, actual);
 
       System.out.println(
               "Expected number of Study: " + expected + ", actual: " + actual);
+
+      for (Study d : random(getStudyDAO(), actual, 5)) {
+        TestCase.assertNotNull(d);
+        TestCase.assertNotNull(d.getStudyId());
+      }
     }
     catch (Exception e) {
       e.printStackTrace();
@@ -466,19 +563,24 @@ public class LimsDAO extends LimsDAOTestCase {
   }
 
   @Test
-  public void testGetAllSubmissions() {
+  public void testSubmissions() {
     try {
       // get row count of experiments in the dataset
       int expected = getDataSet().getTable("Submission").getRowCount();
 
       // get number of experiments from the DAO
-      int actual = getSubmissionDAO().listAll().size();
+      int actual = getSubmissionDAO().count();
 
       // test data contains 2 experiments, check size of returned list
       TestCase.assertEquals("Wrong number of submissions", expected, actual);
 
       System.out.println(
               "Expected number of submissions: " + expected + ", actual: " + actual);
+
+      for (Submission d : random(getSubmissionDAO(), actual, 5)) {
+        TestCase.assertNotNull(d);
+        TestCase.assertNotNull(d.getSubmissionId());
+      }
     }
     catch (Exception e) {
       e.printStackTrace();

@@ -60,10 +60,11 @@ import java.util.*;
  * @since 0.0.3
  */
 public class SQLRunQCDAO implements RunQcStore {
+  private static final String TABLE_NAME = "RunQC";
 
   public static final String RUN_QC =
           "SELECT qcId, run_runId, qcUserName, qcDate, qcMethod, information, doNotProcess " +
-          "FROM RunQC";
+          "FROM "+TABLE_NAME;
 
   public static final String RUN_QC_SELECT_BY_ID =
          RUN_QC + " WHERE qcId=?";
@@ -73,12 +74,12 @@ public class SQLRunQCDAO implements RunQcStore {
           "ORDER BY qcDate ASC";
   
   public static final String RUN_QC_UPDATE =
-          "UPDATE RunQC " +
+          "UPDATE "+TABLE_NAME+" " +
           "SET run_runId=:run_runId, qcUserName=:qcUserName, qcDate=:qcDate, qcMethod=:qcMethod, information=:information, doNotProcess=:doNotProcess " +
           "WHERE qcId=:qcId";
 
   public static final String RUN_QC_DELETE =
-          "DELETE FROM RunQC WHERE qcId=:qcId";
+          "DELETE FROM "+TABLE_NAME+" WHERE qcId=:qcId";
 
   public static final String RUN_QC_TYPE_SELECT =
           "SELECT qcTypeId, name, description, qcTarget, units " +
@@ -146,7 +147,7 @@ public class SQLRunQCDAO implements RunQcStore {
 
     if (runQC.getQcId() == AbstractQC.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-                              .withTableName("RunQC")
+                              .withTableName(TABLE_NAME)
                               .usingGeneratedKeyColumns("qcId");
       Number newId = insert.executeAndReturnKey(params);
       runQC.setQcId(newId.longValue());
@@ -215,6 +216,11 @@ public class SQLRunQCDAO implements RunQcStore {
     return template.query(RUN_QC, new LazyRunQcMapper());
   }
 
+  @Override
+  public int count() throws IOException {
+    return template.queryForInt("SELECT count(*) FROM "+TABLE_NAME);
+  }
+
   public Collection<Partition> listPartitionSelectionsByRunQcId(long runQcId) throws IOException {
     return template.query(PARTITIONS_BY_RUN_QC, new Object[]{runQcId}, new PartitionMapper());
   }
@@ -254,7 +260,6 @@ public class SQLRunQCDAO implements RunQcStore {
     public Partition mapRow(ResultSet rs, int rowNum) throws SQLException {
       try {
         SequencerPartitionContainer<SequencerPoolPartition> f = sequencerPartitionContainerDAO.lazyGet(rs.getLong("containers_containerId"));
-        int count = 1;
         for (Partition p : f.getPartitions()) {
           if (rs.getLong("partitionNumber") == p.getPartitionNumber()) {
             p.setSequencerPartitionContainer(f);

@@ -57,16 +57,17 @@ import java.util.*;
  * @since 0.0.2
  */
 public class SQLSecurityProfileDAO implements Store<SecurityProfile> {
+  private static final String TABLE_NAME = "SecurityProfile";
 
   public static final String PROFILES_SELECT =
           "SELECT profileId, allowAllInternal, owner_userId " +
-          "FROM SecurityProfile";
+          "FROM "+TABLE_NAME;
 
   public static final String PROFILE_SELECT_BY_ID =
           PROFILES_SELECT + " WHERE profileId = ?";
 
   public static final String PROFILE_USERS_GROUPS_DELETE =
-          "DELETE sp, spru, spwu, sprg, spwg FROM SecurityProfile sp " +
+          "DELETE sp, spru, spwu, sprg, spwg FROM "+TABLE_NAME+" sp " +
           "LEFT JOIN SecurityProfile_ReadUser AS spru ON sp.profileId = spru.SecurityProfile_profileId " +
           "LEFT JOIN SecurityProfile_WriteUser AS spwu ON sp.profileId = spwu.SecurityProfile_profileId " +
           "LEFT JOIN SecurityProfile_ReadGroup AS sprg ON sp.profileId = sprg.SecurityProfile_profileId " +
@@ -75,7 +76,7 @@ public class SQLSecurityProfileDAO implements Store<SecurityProfile> {
 
   public static final String USERS_GROUPS_SELECT_BY_PROFILE_ID =
           "SELECT sp.profileId, spru.readUser_userId, spwu.writeUser_userId, sprg.readGroup_groupId, spwg.writeGroup_groupId " +
-          "FROM SecurityProfile sp " +
+          "FROM "+TABLE_NAME+" sp " +
           "LEFT JOIN SecurityProfile_ReadUser spru ON sp.profileId = spru.SecurityProfile_profileId " +
           "LEFT JOIN SecurityProfile_WriteUser spwu ON sp.profileId = spwu.SecurityProfile_profileId " +
           "LEFT JOIN SecurityProfile_ReadGroup sprg ON sp.profileId = sprg.SecurityProfile_profileId " +
@@ -119,7 +120,7 @@ public class SQLSecurityProfileDAO implements Store<SecurityProfile> {
   )
   public long save(SecurityProfile securityProfile) throws IOException {
     SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-            .withTableName("SecurityProfile");
+            .withTableName(TABLE_NAME);
     MapSqlParameterSource params = new MapSqlParameterSource();
     params.addValue("allowAllInternal", securityProfile.isAllowAllInternal());
 
@@ -208,6 +209,11 @@ public class SQLSecurityProfileDAO implements Store<SecurityProfile> {
   //@Cacheable(cacheName="securityProfileCache", keyGeneratorName="limsHashKeyGenerator")
   public Collection<SecurityProfile> listAll() throws IOException {
     return template.query(PROFILES_SELECT, new SecurityProfileMapper());
+  }
+
+  @Override
+  public int count() throws IOException {
+    return template.queryForInt("SELECT count(*) FROM "+TABLE_NAME);
   }
 
   @Cacheable(cacheName="securityProfileCache",

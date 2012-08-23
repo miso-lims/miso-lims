@@ -148,7 +148,7 @@ public class SQLWatcherDAO implements WatcherStore {
         log.debug("DAO insert of " + user.getUserId() + " on " + watchable.getWatchableIdentifier());
       }
       catch(DuplicateKeyException dke) {
-        log.warn("This Watcher combination already exists - not inserting: " + dke.getMessage());
+        log.debug("This Watcher combination already exists - not inserting: " + dke.getMessage());
       }
     }
   }
