@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.integration.Message;
 import org.springframework.util.Assert;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaRun;
@@ -270,7 +271,7 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
           }
 
           if (r.getSequencerReference() != null) {
-            Collection<SequencerPartitionContainer<SequencerPoolPartition>> fs = ((IlluminaRun) r).getSequencerPartitionContainers();
+            Collection<SequencerPartitionContainer<SequencerPoolPartition>> fs = ((RunImpl)r).getSequencerPartitionContainers();
             if (fs.isEmpty()) {
               if (run.has("containerId") && !"".equals(run.getString("containerId"))) {
                 Collection<SequencerPartitionContainer<SequencerPoolPartition>> pfs = requestManager.listSequencerPartitionContainersByBarcode(run.getString("containerId"));
@@ -282,6 +283,9 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
                     }
                     if (lf.getPlatformType() == null && r.getPlatformType() != null) {
                       lf.setPlatformType(r.getPlatformType());
+                    }
+                    else {
+                      lf.setPlatformType(PlatformType.ILLUMINA);
                     }
                     ((RunImpl)r).addSequencerPartitionContainer(lf);
                   }
@@ -296,7 +300,9 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
                   if (f.getPlatformType() == null && r.getPlatformType() != null) {
                     f.setPlatformType(r.getPlatformType());
                   }
-
+                  else {
+                    f.setPlatformType(PlatformType.ILLUMINA);
+                  }
                   if (r.getSequencerReference().getPlatform().getInstrumentModel().contains("MiSeq")) {
                     f.setPartitionLimit(1);
                   }
@@ -312,19 +318,64 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
               if (f.getPlatformType() == null && r.getPlatformType() != null) {
                 f.setPlatformType(r.getPlatformType());
               }
+              else {
+                f.setPlatformType(PlatformType.ILLUMINA);
+              }
 
               if (f.getPartitions().isEmpty()) {
-                log.info("No partitions found for run " + r.getName() + " (container "+f.getContainerId()+")");
+                //log.info("No partitions found for run " + r.getName() + " (container "+f.getContainerId()+")");
                 if (r.getSequencerReference().getPlatform().getInstrumentModel().contains("MiSeq")) {
                   f.setPartitionLimit(1);
                 }
                 f.initEmptyPartitions();
               }
+              else {
+                //log.info("Got "+f.getPartitions().size()+" partitions for run " + r.getName() + " (container "+f.getContainerId()+")");
+                if (r.getSequencerReference().getPlatform().getInstrumentModel().contains("MiSeq")) {
+                  if (f.getPartitions().size() != 1) {
+                    log.warn(f.getName()+":: WARNING - number of partitions found ("+f.getPartitions().size()+") doesn't match usual number of MiSeq partitions (1)");
+                  }
+                }
+                else {
+                  if (f.getPartitions().size() != 8) {
+                    log.warn(f.getName()+":: WARNING - number of partitions found ("+f.getPartitions().size()+") doesn't match usual number of GA/HiSeq partitions (8)");
+                    log.warn("Attempting fix...");
+                    Map<Integer, Partition> parts = new HashMap<Integer, Partition>();
+                    Partition notNullPart = f.getPartitions().get(0);
+                    long notNullPartID = notNullPart.getId();
+                    int notNullPartNum = notNullPart.getPartitionNumber();
+
+                    for (int i = 1; i < 9; i++) {
+                      parts.put(i, null);
+                    }
+
+                    for (Partition p : f.getPartitions()) {
+                      parts.put(p.getPartitionNumber(), p);
+                    }
+
+                    for (Integer num : parts.keySet()) {
+                      if (parts.get(num) == null) {
+                        long newId = (notNullPartID-notNullPartNum)+num;
+                        log.info("Inserting partition at "+num+" with ID "+ newId);
+                        SequencerPoolPartition p = new PartitionImpl();
+                        p.setSequencerPartitionContainer(f);
+                        p.setId(newId);
+                        p.setPartitionNumber(num);
+                        p.setSecurityProfile(f.getSecurityProfile());
+                        ((SequencerPartitionContainerImpl)f).addPartition(p);
+                      }
+                    }
+
+                    log.info(f.getName()+":: partitions now ("+f.getPartitions().size()+")");
+                  }
+                }
+              }
 
               if (f.getIdentificationBarcode() == null || "".equals(f.getIdentificationBarcode())) {
                 if (run.has("containerId") && !"".equals(run.getString("containerId"))) {
+                  //log.info("Updating container barcode for container "+f.getContainerId()+" (" + r.getName() + ")");
                   f.setIdentificationBarcode(run.getString("containerId"));
-                  requestManager.saveSequencerPartitionContainer(f);
+                  //requestManager.saveSequencerPartitionContainer(f);
                 }
               }
             }
@@ -344,8 +395,11 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
       }
     }
     try {
-      int[] saved = requestManager.saveRuns(runsToSave);
-      log.info("Batch saved " + saved.length + " / "+ runs.size() + " runs");
+      if (runsToSave.size() > 0) {
+        log.info("Saving " + runsToSave.size() + " runs");
+        int[] saved = requestManager.saveRuns(runsToSave);
+        log.info("Batch saved " + saved.length + " / "+ runs.size() + " runs");
+      }
     }
     catch (IOException e) {
       log.error("Couldn't save run batch: " + e.getMessage());

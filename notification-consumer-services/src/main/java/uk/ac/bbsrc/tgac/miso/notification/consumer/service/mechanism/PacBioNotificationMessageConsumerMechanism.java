@@ -260,6 +260,9 @@ public class PacBioNotificationMessageConsumerMechanism implements NotificationM
                         if (lf.getPlatformType() == null && r.getPlatformType() != null) {
                           lf.setPlatformType(r.getPlatformType());
                         }
+                        else {
+                          lf.setPlatformType(PlatformType.PACBIO);
+                        }
                         ((RunImpl)r).addSequencerPartitionContainer(lf);
                       }
                       else {
@@ -278,6 +281,9 @@ public class PacBioNotificationMessageConsumerMechanism implements NotificationM
                         }
                         if (f.getPlatformType() == null && r.getPlatformType() != null) {
                           f.setPlatformType(r.getPlatformType());
+                        }
+                        else {
+                          f.setPlatformType(PlatformType.PACBIO);
                         }
                         f.setRun(r);
                         log.info("\\_ Created new container with "+f.getPartitions().size()+" partitions");
@@ -306,6 +312,9 @@ public class PacBioNotificationMessageConsumerMechanism implements NotificationM
                   f.setSecurityProfile(r.getSecurityProfile());
                   if (f.getPlatformType() == null && r.getPlatformType() != null) {
                     f.setPlatformType(r.getPlatformType());
+                  }
+                  else {
+                    f.setPlatformType(PlatformType.PACBIO);
                   }
                   if (f.getIdentificationBarcode() == null || "".equals(f.getIdentificationBarcode())) {
                     if (run.has("plateId") && !"".equals(run.getString("plateId"))) {
@@ -336,8 +345,10 @@ public class PacBioNotificationMessageConsumerMechanism implements NotificationM
     }
 
     try {
-      int[] saved = requestManager.saveRuns(runsToSave);
-      log.info("Batch saved " + saved.length + " / "+ runs.size() + " runs");
+      if (runsToSave.size() > 0) {
+        int[] saved = requestManager.saveRuns(runsToSave);
+        log.info("Batch saved " + saved.length + " / "+ runs.size() + " runs");
+      }
     }
     catch (IOException e) {
       log.error("Couldn't save run batch: " + e.getMessage());

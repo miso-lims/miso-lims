@@ -254,6 +254,9 @@ public class LS454NotificationMessageConsumerMechanism implements NotificationMe
                         if (f.getPlatformType() == null && r.getPlatformType() != null) {
                           f.setPlatformType(r.getPlatformType());
                         }
+                        else {
+                          f.setPlatformType(PlatformType.LS454);
+                        }
                         f.setPartitionLimit(numPartitions);
                         f.initEmptyPartitions();
                         f.setIdentificationBarcode(ptpId);
@@ -267,6 +270,9 @@ public class LS454NotificationMessageConsumerMechanism implements NotificationMe
                       log.debug("\\_ Got SequencerPartitionContainer " + f.getContainerId());
                       if (f.getPlatformType() == null && r.getPlatformType() != null) {
                         f.setPlatformType(r.getPlatformType());
+                      }
+                      else {
+                        f.setPlatformType(PlatformType.LS454);
                       }
                       if (f.getIdentificationBarcode() == null || "".equals(f.getIdentificationBarcode())) {
                         f.setIdentificationBarcode(ptpId);
@@ -318,8 +324,10 @@ public class LS454NotificationMessageConsumerMechanism implements NotificationMe
     }
 
     try {
-      int[] saved = requestManager.saveRuns(runsToSave);
-      log.info("Batch saved " + saved.length + " / "+ runs.size() + " runs");
+      if (runsToSave.size() > 0) {
+        int[] saved = requestManager.saveRuns(runsToSave);
+        log.info("Batch saved " + saved.length + " / "+ runs.size() + " runs");
+      }
     }
     catch (IOException e) {
       log.error("Couldn't save run batch: " + e.getMessage());

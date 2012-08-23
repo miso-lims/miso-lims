@@ -265,6 +265,9 @@ public class SolidNotificationMessageConsumerMechanism implements NotificationMe
                       if (lf.getPlatformType() == null && r.getPlatformType() != null) {
                         lf.setPlatformType(r.getPlatformType());
                       }
+                      else {
+                        lf.setPlatformType(PlatformType.SOLID);
+                      }
                       ((RunImpl)r).addSequencerPartitionContainer(lf);
                     }
                   }
@@ -276,6 +279,9 @@ public class SolidNotificationMessageConsumerMechanism implements NotificationMe
                     f.setIdentificationBarcode(run.getString("containerNum"));
                     if (f.getPlatformType() == null && r.getPlatformType() != null) {
                       f.setPlatformType(r.getPlatformType());
+                    }
+                    else {
+                      f.setPlatformType(PlatformType.SOLID);
                     }
                     //f.setPaired(r.getPairedEnd());
                     ((RunImpl)r).addSequencerPartitionContainer(f);
@@ -292,6 +298,9 @@ public class SolidNotificationMessageConsumerMechanism implements NotificationMe
 
                 if (f.getPlatformType() == null && r.getPlatformType() != null) {
                   f.setPlatformType(r.getPlatformType());
+                }
+                else {
+                  f.setPlatformType(PlatformType.SOLID);
                 }
 
                 if (run.has("containerId") && !"".equals(run.getString("containerId"))) {
@@ -315,8 +324,10 @@ public class SolidNotificationMessageConsumerMechanism implements NotificationMe
     }
 
     try {
-      int[] saved = requestManager.saveRuns(runsToSave);
-      log.info("Batch saved " + saved.length + " / "+ runs.size() + " runs");
+      if (runsToSave.size() > 0) {
+        int[] saved = requestManager.saveRuns(runsToSave);
+        log.info("Batch saved " + saved.length + " / "+ runs.size() + " runs");
+      }
     }
     catch (IOException e) {
       log.error("Couldn't save run batch: " + e.getMessage());
