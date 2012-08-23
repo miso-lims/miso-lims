@@ -251,7 +251,7 @@ function changeLS454Chamber(t, container) {
   Fluxion.doAjax(
           'runControllerHelperService',
           'changeChamber',
-          {'platform':'LS454', 'numChambers':jQuery(t).val(), 'container':container, 'url':ajaxurl},
+          {'platform':'LS454', 'run_cId':jQuery('input[name=run_cId]').val(), 'numChambers':jQuery(t).val(), 'container':container, 'url':ajaxurl},
           {'updateElement':'containerdiv' + container});
 }
 
@@ -269,7 +269,7 @@ function changeSolidChamber(t, container) {
   Fluxion.doAjax(
           'runControllerHelperService',
           'changeChamber',
-          {'platform':'Solid', 'numChambers':t.value, 'container':container, 'url':ajaxurl},
+          {'platform':'Solid', 'run_cId':jQuery('input[name=run_cId]').val(), 'numChambers':t.value, 'container':container, 'url':ajaxurl},
           {'updateElement':'containerdiv' + container});
 }
 
@@ -278,7 +278,7 @@ function changePacBioChamber(t, container) {
   Fluxion.doAjax(
           'runControllerHelperService',
           'changeChamber',
-          {'platform':'PacBio', 'numChambers':t.value, 'container':container, 'url':ajaxurl},
+          {'platform':'PacBio', 'run_cId':jQuery('input[name=run_cId]').val(), 'numChambers':t.value, 'container':container, 'url':ajaxurl},
           {'updateElement':'containerdiv' + container});
 }
 

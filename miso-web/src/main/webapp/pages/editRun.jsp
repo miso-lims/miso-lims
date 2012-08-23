@@ -40,7 +40,7 @@
     <c:otherwise><div id="maincontent"></c:otherwise>
 </c:choose>
 <div id="contentcolumn">
-<form:form method="POST" commandName="run" autocomplete="off" onsubmit="return validate_run(this);">
+<form:form method="POST" modelAttribute="run" autocomplete="off" onsubmit="return validate_run(this);">
 
 <sessionConversation:insertSessionConversationId attributeName="run"/>
 
@@ -565,7 +565,7 @@
         </c:forEach>
     </c:otherwise>
 </c:choose>
-<input type="hidden" value="on" name="_sequencerPartitionContainers"/>
+<form:hidden path="sequencerPartitionContainers"/>
 </div>
 </td>
 <td width="50%" valign="top">

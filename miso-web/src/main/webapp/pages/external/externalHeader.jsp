@@ -171,7 +171,7 @@
 <div id="navtabs">
     <sec:authorize access="isAuthenticated()">
     <script type="text/javascript">
-        //checkUser('<sec:authentication property="principal.username"/>');
+        <%-- checkUser('<sec:authentication property="principal.username"/>'); --%>
     </script>
     <ul>
         </sec:authorize>
@@ -179,7 +179,6 @@
         <sec:authorize access="isAuthenticated()">
             <li><a href="<c:url value="/miso/external"/>"><span>Home</span></a></li>
         </sec:authorize>
-
 
         <sec:authorize access="isAuthenticated()">
     </ul>

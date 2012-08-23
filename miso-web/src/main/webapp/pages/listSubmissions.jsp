@@ -39,7 +39,7 @@
         <form id="filter-form">Filter: <input name="filter" id="filter" value="" maxlength="30" size="30" type="text">
         </form>
         <br/>
-        <a href="<c:url value="/miso/admin/submission/new"/>" class="add">Create Submission</a>
+        <a href="<c:url value="/miso/submission/new"/>" class="add">Create Submission</a>
         <table class="list" id="table">
             <thead>
             <tr>
@@ -84,7 +84,7 @@
                             ${submission.completed}
                     </td>
                     <td class="misoicon"
-                        onclick="window.location.href='<c:url value="/miso/admin/submission/${submission.submissionId}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
+                        onclick="window.location.href='<c:url value="/miso/submission/${submission.submissionId}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
                 </tr>
             </c:forEach>
             </tbody>

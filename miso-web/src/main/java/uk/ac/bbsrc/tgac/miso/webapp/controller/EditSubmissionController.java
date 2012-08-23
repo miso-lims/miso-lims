@@ -53,7 +53,7 @@ import java.io.IOException;
 import java.util.*;
 
 @Controller
-@RequestMapping("/admin/submission")
+@RequestMapping("/submission")
 @SessionAttributes("submission")
 public class EditSubmissionController {
   protected static final Logger log = LoggerFactory.getLogger(EditSubmissionController.class);
@@ -107,7 +107,7 @@ public class EditSubmissionController {
 
   @ModelAttribute("projects")
   public Collection<Project> populateProjects() throws IOException {
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    //User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     List<Project> projects = new ArrayList<Project>(requestManager.listAllProjects());
     /*
     for (Project p : projects) {
@@ -224,7 +224,7 @@ public class EditSubmissionController {
       requestManager.saveSubmission(submission);
       session.setComplete();
       model.clear();
-      return "redirect:/miso/admin/submission/"+submission.getSubmissionId();
+      return "redirect:/miso/submission/"+submission.getSubmissionId();
     }
     catch (IOException ex) {
       if (log.isDebugEnabled()) {

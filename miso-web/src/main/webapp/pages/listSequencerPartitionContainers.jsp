@@ -37,6 +37,7 @@
     <table class="list" id="table">
       <thead>
       <tr>
+        <th>Name</th>
         <th>ID Barcode</th>
         <th>Platform</th>
         <th>Last Associated Run</th>
@@ -48,6 +49,7 @@
       <tbody>
       <c:forEach items="${containers}" var="container" varStatus="fCount">
         <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
+          <td>${container.name}</td>
           <td>${container.identificationBarcode}</td>
           <td>${container.platformType.key}</td>
           <td>

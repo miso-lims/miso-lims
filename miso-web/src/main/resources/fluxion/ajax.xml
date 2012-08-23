@@ -44,7 +44,7 @@
 
     <bean id="printerControllerHelperService"
           class="uk.ac.bbsrc.tgac.miso.spring.ajax.PrinterControllerHelperService">
-    </bean>  
+    </bean>
 
     <bean id="projectControllerHelperService"
           class="uk.ac.bbsrc.tgac.miso.spring.ajax.ProjectControllerHelperService">
@@ -138,6 +138,6 @@
     <bean id="externalSectionControllerHelperService"
           class="uk.ac.bbsrc.tgac.miso.spring.ajax.ExternalSectionControllerHelperService">
     </bean>
-    
+
 </beans>
 

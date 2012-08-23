@@ -60,7 +60,7 @@ public class ListSubmissionsController {
     this.requestManager = requestManager;
   }
 
-  @RequestMapping("/admin/submissions")
+  @RequestMapping("/submissions")
   public ModelAndView listSubmissions() throws IOException {
     try {
       return new ModelAndView("/pages/listSubmissions.jsp", "submissions", requestManager.listAllSubmissions());

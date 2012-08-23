@@ -65,4 +65,9 @@ public class SQLRunstatsDAO implements RunstatsStore {
   public Collection listAll() throws IOException {
     return null;
   }
+
+  @Override
+  public int count() throws IOException {
+    return 0;
+  }
 }
