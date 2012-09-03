@@ -55,11 +55,11 @@ function toggleSelectAll(tableselector, span) {
   var s = jQuery(span);
   var sel = s.attr("sel");
   if (sel == "none") {
-    tableObj.find('tr').each(function() { jQuery(this).addClass('row_selected') });
+    tableObj.find('tbody tr').each(function() { jQuery(this).addClass('row_selected') });
     s.attr("sel", "all");
   }
   else {
-    tableObj.find('tr').each(function() { jQuery(this).removeClass('row_selected') });
+    tableObj.find('tbody tr').each(function() { jQuery(this).removeClass('row_selected') });
     s.attr("sel", "none");
   }
 }

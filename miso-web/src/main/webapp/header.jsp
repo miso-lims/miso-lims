@@ -185,7 +185,7 @@
     </sec:authorize>
 
     <sec:authorize access="isAuthenticated()">
-      <li><a href="<c:url value="/miso/help"/>"><span>Help</span></a></li>
+      <li><a href="<c:url value="http://www.tgac.ac.uk/misofiles/MISO-01.6.RC-User_Manual.pdf"/>"><span>Help</span></a></li>
     </sec:authorize>
 
     <sec:authorize access="isAuthenticated()">

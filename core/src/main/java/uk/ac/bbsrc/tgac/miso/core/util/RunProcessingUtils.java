@@ -78,9 +78,14 @@ public class RunProcessingUtils {
 
           if (ld.getLibrary().getTagBarcodes() != null && !ld.getLibrary().getTagBarcodes().isEmpty() && p.getDilutions().size() > 1) {
             Map<Integer, TagBarcode> barcodes = new TreeMap<Integer, TagBarcode>(ld.getLibrary().getTagBarcodes());
+            int bcount = 1;
             for (Integer key : barcodes.keySet()) {
               TagBarcode t = barcodes.get(key);
               sb.append(t.getSequence());
+              if (bcount < barcodes.keySet().size() && barcodes.keySet().size() > 1) {
+                sb.append("-");
+              }
+              bcount++;
             }
             sb.append(",");
           }

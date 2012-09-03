@@ -118,14 +118,8 @@ public class StatsControllerHelperService {
     StringBuilder b = new StringBuilder();
     try {
       Run run = requestManager.getRunById(runId);
-//        log.info("<<<<<<<<<<<<"+runstatsManager.hasStatsForRun(run));
-//        if(runstatsManager.hasStatsForRun(run)){
       JSONObject resultJson = runStatsManager.getPerPositionBaseSequenceQualityForLane(run, lane);
-      log.info(">>>>>>>>>>>" + resultJson);
       return resultJson;
-//        }
-
-//        return JSONUtils.JSONObjectResponse("summary", "nothing");
     }
     catch (IOException e) {
       log.debug("Failed", e);
