@@ -23,13 +23,15 @@
 
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
-import net.sf.json.JSONArray;
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
@@ -51,7 +53,8 @@ import java.util.Collection;
 @Ajaxified
 public class SequencerReferenceControllerHelperService {
   protected static final Logger log = LoggerFactory.getLogger(SubmissionControllerHelperService.class);
-
+  @Autowired
+  private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
   @Autowired
   private RequestManager requestManager;
 
@@ -125,7 +128,34 @@ public class SequencerReferenceControllerHelperService {
     return JSONUtils.SimpleJSONError("Failed to add server");
   }
 
+  public JSONObject deleteSequencerReference(HttpSession session, JSONObject json) {
+    try {
+      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+      if (user.isAdmin()) {
+        if (json.has("refId")) {
+          Long refId = json.getLong("refId");
+          requestManager.deleteSequencerReference(requestManager.getSequencerReferenceById(refId));
+          return JSONUtils.SimpleJSONResponse("Sequencer Reference deleted");
+        }
+        else {
+          return JSONUtils.SimpleJSONError("No Sequencer Reference specified to delete.");
+        }
+      }
+      else {
+        return JSONUtils.SimpleJSONError("Only admins can delete objects.");
+      }
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+      return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
+    }
+  }
+
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
+  }
+
+  public void setSecurityManager(SecurityManager securityManager) {
+    this.securityManager = securityManager;
   }
 }

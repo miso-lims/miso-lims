@@ -33,7 +33,7 @@
 <%@ include file="../header.jsp" %>
 
 <div id="maincontent">
-<div id="contentcolumn">
+  <div id="contentcolumn">
 
     <c:if test="${not empty clusterStatus}">
       <h1>${referenceName} Cluster Status</h1>
@@ -41,166 +41,179 @@
     </c:if>
 
     <c:if test="${not empty stats}">
-        <h1>${referenceName} Runs</h1>
-        <form id="filter-form">Filter: <input name="filter" id="filter" value="" maxlength="30" size="30" type="text">
-        </form>
-        <br/>
+      <h1>${referenceName} Runs</h1>
 
-        <table class="list" id="runStatusTable">
-            <thead>
-                <tr>
-                <th>Run Name</th>
-                <th>Instrument Name</th>
-                <th>Health</th>
-                <th>Start Date</th>
-                <th>Last Updated</th>
-                <th class="fit">View Stats</th>
-                </tr>
-            </thead>
-            <tbody>
-            <c:forEach items="${stats}" var="stat">
-                <tr>
-                <td>${stat.runName}</td>
-                <td>${stat.instrumentName}</td>
-                <td>${stat.health.key}</td>
-                <td>${stat.startDate}</td>
-                <td><fmt:formatDate value="${stat.lastUpdated}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
-                <td class="misoicon" onclick="window.location.href='<c:url value="/miso/stats/${fn:toLowerCase(platformtype)}/${referenceId}/${stat.runName}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
-                </tr>
-           </c:forEach>
-            </tbody>
-        </table>
+      <form id="filter-form">Filter: <input name="filter" id="filter" value="" maxlength="30" size="30" type="text">
+      </form>
+      <br/>
 
-        <script type="text/javascript">
-            jQuery(document).ready(function() {
-                jQuery("#runStatusTable").tablesorter({
-                    headers: { }
-                });
-            });
+      <table class="list" id="runStatusTable">
+        <thead>
+        <tr>
+          <th>Run Name</th>
+          <th>Instrument Name</th>
+          <th>Health</th>
+          <th>Start Date</th>
+          <th>Last Updated</th>
+          <th class="fit">View Stats</th>
+        </tr>
+        </thead>
+        <tbody>
+        <c:forEach items="${stats}" var="stat">
+          <tr>
+            <td>${stat.runName}</td>
+            <td>${stat.instrumentName}</td>
+            <td>${stat.health.key}</td>
+            <td>${stat.startDate}</td>
+            <td><fmt:formatDate value="${stat.lastUpdated}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
+            <td class="misoicon"
+                onclick="window.location.href='<c:url value="/miso/stats/${fn:toLowerCase(platformtype)}/${referenceId}/${stat.runName}"/>'">
+              <span class="ui-icon ui-icon-pencil"/></td>
+          </tr>
+        </c:forEach>
+        </tbody>
+      </table>
 
-            jQuery(function() {
-                var theTable = jQuery("#runStatusTable");
+      <script type="text/javascript">
+        jQuery(document).ready(function() {
+          jQuery("#runStatusTable").tablesorter({
+                                                  headers: { }
+                                                });
+        });
 
-                jQuery("#filter").keyup(function() {
-                    jQuery.uiTableFilter(theTable, this.value);
-                });
+        jQuery(function() {
+          var theTable = jQuery("#runStatusTable");
 
-                jQuery('#filter-form').submit(function() {
+          jQuery("#filter").keyup(function() {
+            jQuery.uiTableFilter(theTable, this.value);
+          });
+
+          jQuery('#filter-form').submit(
+                  function() {
                     theTable.find("tbody > tr:visible > td:eq(1)").mousedown();
                     return false;
-                }).focus(); //Give focus to input field
-            });
-        </script>
+                  }).focus(); //Give focus to input field
+        });
+      </script>
     </c:if>
 
     <c:if test="${not empty incompleteRuns}">
-        <h1>${referenceName} Incomplete Runs</h1>
-        <c:forEach items="${incompleteRuns}" var="incomp">
-            <a href="<c:url value="/miso/stats/${fn:toLowerCase(platformtype)}/${referenceId}/${incomp}"/>">${incomp}</a><br/>
-        </c:forEach>
-        <br/>
+      <h1>${referenceName} Incomplete Runs</h1>
+      <c:forEach items="${incompleteRuns}" var="incomp">
+        <a href="<c:url value="/miso/stats/${fn:toLowerCase(platformtype)}/${referenceId}/${incomp}"/>">${incomp}</a><br/>
+      </c:forEach>
+      <br/>
     </c:if>
 
-  <c:choose>
-    <c:when test="${not empty runStatus}">
+    <c:choose>
+      <c:when test="${not empty runStatus}">
         <h1>${runName}</h1>
 
         <table class="list" id="runStatusTable">
-            <thead>
-                <tr>
-                <th>Run Name</th>
-                <th>Health</th>
-                <th>Start Date</th>
-                <th>Last Updated</th>
-                <th class="fit">View Run</th>
-                </tr>
-            </thead>
-            <tbody>
-            <tr>
+          <thead>
+          <tr>
+            <th>Run Name</th>
+            <th>Health</th>
+            <th>Start Date</th>
+            <th>Last Updated</th>
+            <th class="fit">View Run</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
             <td>${runStatus.runName}</td>
             <td>${runStatus.health.key}</td>
             <td>${runStatus.startDate}</td>
             <td><fmt:formatDate value="${runStatus.lastUpdated}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
-            <td class="misoicon" onclick="window.location.href='<c:url value="/miso/run/${runId}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
-            </tr>
+            <td class="misoicon" onclick="window.location.href='<c:url value="/miso/run/${runId}"/>'"><span
+                    class="ui-icon ui-icon-pencil"/></td>
+          </tr>
 
-            </tbody>
+          </tbody>
         </table>
 
         <c:if test="${not empty runStatus.xml}">
-            ${statusXml}
+          ${statusXml}
         </c:if>
 
-    </c:when>
-    <c:otherwise>
+      </c:when>
+      <c:otherwise>
         <c:if test="${empty referenceId}">
-            <h1>${platformtype} Sequencer References</h1>
-            <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-              <a href='javascript:void(0);' class="add" onclick="insertSequencerReferenceRow(); return false;">Add Sequencer Reference</a><br/>
-            </c:if>
+          <h1>${platformtype} Sequencer References</h1>
+          <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+            <a href='javascript:void(0);' class="add" onclick="insertSequencerReferenceRow(); return false;">Add
+              Sequencer Reference</a><br/>
+          </c:if>
 
-            <div id="addSequencerReference"></div>
-            <form id='addReferenceForm'>
-                <table class="list" id="sequencerReferenceTable">
-                    <thead>
-                    <tr>
-                        <th class="fit">ID</th>
-                        <th>Name</th>
-                        <th>Platform</th>
-                        <th>Hostname</th>
-                        <th>Available</th>
-                        <th>View Stats</th>
-                        <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-                            <th class="fit">Edit</th>
-                        </c:if>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <c:if test="${not empty sequencerReferences}">
-                        <c:forEach items="${sequencerReferences}" var="ref">
-                            <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-                                <td class="fit">${ref.id}</td>
-                                <td>${ref.name}</td>
-                                <td>${ref.platform.nameAndModel}</td>
-                                <td>${ref.FQDN}</td>
-                                <c:choose>
-                                    <c:when test="${ref.available}">
-                                        <td style="background-color:green"></td>
-                                        <c:choose>
-                                            <c:when test="${ref.platform.platformType.key eq 'Illumina'}">
-                                                <td><a href="<c:url value="/miso/stats/illumina/${ref.id}"/>">View</a></td>
-                                            </c:when>
-                                            <c:when test="${ref.platform.platformType.key eq 'LS454'}">
-                                                <td><a href="<c:url value="/miso/stats/ls454/${ref.id}"/>">View</a></td>
-                                            </c:when>
-                                            <c:when test="${ref.platform.platformType.key eq 'Solid'}">
-                                                <td><a href="<c:url value="/miso/stats/solid/${ref.id}"/>">View</a> (<a href="http://${ref.FQDN}${path}">SETS</a>)</td>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <td><a href="http://${ref.FQDN}${path}">View</a></td>
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <td style="background-color:red"></td>
-                                        <td><i>Unavailable</i></td>
-                                    </c:otherwise>
-                                </c:choose>
-                                <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-                                    <td class="misoicon" onclick="window.location.href='<c:url value="/miso/stats/sequencer/${ref.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
-                                </c:if>
-                            </tr>
-                        </c:forEach>
+          <div id="addSequencerReference"></div>
+          <form id='addReferenceForm'>
+            <table class="list" id="sequencerReferenceTable">
+              <thead>
+              <tr>
+                <th class="fit">ID</th>
+                <th>Name</th>
+                <th>Platform</th>
+                <th>Hostname</th>
+                <th>Available</th>
+                <th>View Stats</th>
+                <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+                  <th class="fit">Edit</th>
+                  <th class="fit">DELETE</th>
+                </c:if>
+              </tr>
+              </thead>
+              <tbody>
+              <c:if test="${not empty sequencerReferences}">
+                <c:forEach items="${sequencerReferences}" var="ref">
+                  <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
+                    <td class="fit">${ref.id}</td>
+                    <td>${ref.name}</td>
+                    <td>${ref.platform.nameAndModel}</td>
+                    <td>${ref.FQDN}</td>
+                    <c:choose>
+                      <c:when test="${ref.available}">
+                        <td style="background-color:green"></td>
+                        <c:choose>
+                          <c:when test="${ref.platform.platformType.key eq 'Illumina'}">
+                            <td><a href="<c:url value="/miso/stats/illumina/${ref.id}"/>">View</a></td>
+                          </c:when>
+                          <c:when test="${ref.platform.platformType.key eq 'LS454'}">
+                            <td><a href="<c:url value="/miso/stats/ls454/${ref.id}"/>">View</a></td>
+                          </c:when>
+                          <c:when test="${ref.platform.platformType.key eq 'Solid'}">
+                            <td><a href="<c:url value="/miso/stats/solid/${ref.id}"/>">View</a> (<a
+                                    href="http://${ref.FQDN}${path}">SETS</a>)
+                            </td>
+                          </c:when>
+                          <c:otherwise>
+                            <td><a href="http://${ref.FQDN}${path}">View</a></td>
+                          </c:otherwise>
+                        </c:choose>
+                      </c:when>
+                      <c:otherwise>
+                        <td style="background-color:red"></td>
+                        <td><i>Unavailable</i></td>
+                      </c:otherwise>
+                    </c:choose>
+                    <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+                      <td class="misoicon"
+                          onclick="window.location.href='<c:url value="/miso/stats/sequencer/${ref.id}"/>'"><span
+                              class="ui-icon ui-icon-pencil"/></td>
+                      <td class="misoicon" onclick="deleteSequencerReference(${ref.id}, pageReload);"><span
+                              class="ui-icon ui-icon-trash"/></td>
                     </c:if>
-                    </tbody>
-                </table>
-            </form>
-       </c:if>
-    </c:otherwise>
-</c:choose>
+                  </tr>
+                </c:forEach>
+              </c:if>
+              </tbody>
+            </table>
+          </form>
+        </c:if>
+      </c:otherwise>
+    </c:choose>
 
 
-</div>
+  </div>
 </div>
 
 <%@ include file="adminsub.jsp" %>

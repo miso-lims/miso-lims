@@ -90,3 +90,16 @@ function addSequencerReference(form) {
     {'doOnSuccess':pageReload}
   );
 }
+
+function deleteSequencerReference(refId, successfunc) {
+  if (confirm("Are you sure you really want to delete sequencer reference "+refId+"? This operation is permanent!")) {
+    Fluxion.doAjax(
+      'sequencerReferenceControllerHelperService',
+      'deleteSequencerReference',
+      {'refId':refId, 'url':ajaxurl},
+      {'doOnSuccess':function(json) {
+        successfunc();
+      }
+    });
+  }
+}
