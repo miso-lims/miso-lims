@@ -299,6 +299,7 @@ public class RunControllerHelperService {
       b.append("</div>");
 
       SequencerPartitionContainer<SequencerPoolPartition> f = dataObjectFactory.getSequencerPartitionContainer();
+      f.setPartitionLimit(1);
       f.initEmptyPartitions();
       run.addSequencerPartitionContainer(f);
     }
@@ -334,7 +335,6 @@ public class RunControllerHelperService {
         run.addSequencerPartitionContainer(f);
       }
     }
-
     return JSONUtils.SimpleJSONResponse(b.toString());
   }
 
@@ -364,7 +364,6 @@ public class RunControllerHelperService {
       SequencerPartitionContainer<SequencerPoolPartition> f = dataObjectFactory.getSequencerPartitionContainer();
       run.addSequencerPartitionContainer(f);
     }
-
     return JSONUtils.SimpleJSONResponse(b.toString());
   }
 
@@ -430,7 +429,6 @@ public class RunControllerHelperService {
       SequencerPartitionContainer<SequencerPoolPartition> f = dataObjectFactory.getSequencerPartitionContainer();
       run.addSequencerPartitionContainer(f);
     }
-
     return JSONUtils.SimpleJSONResponse(b.toString());
   }
 
@@ -453,7 +451,6 @@ public class RunControllerHelperService {
       b.append("</tr>");
     }
     b.append("</table>");
-
     return JSONUtils.SimpleJSONResponse(b.toString());
   }
 
@@ -487,7 +484,6 @@ public class RunControllerHelperService {
       SequencerPartitionContainer<SequencerPoolPartition> f = dataObjectFactory.getSequencerPartitionContainer();
       run.addSequencerPartitionContainer(f);
     }
-
     return JSONUtils.SimpleJSONResponse(b.toString());
   }
 
@@ -1111,9 +1107,27 @@ public class RunControllerHelperService {
     int container = json.getInt("container");
     int partition = json.getInt("partition");
 
+    RunImpl r = (RunImpl) session.getAttribute("run_"+json.getString("run_cId"));
+
     try {
-      Pool<? extends Poolable> p = requestManager.getPoolByBarcode(barcode);
-      RunImpl r = (RunImpl) session.getAttribute("run_"+json.getString("run_cId"));
+      Pool<? extends Poolable> p = null;
+      if (json.has("platform") && !"".equals(json.getString("platform"))) {
+        PlatformType pt = PlatformType.get(json.getString("platform"));
+        if (pt != null) {
+          p = requestManager.getPoolByBarcode(barcode, pt);
+        }
+        else {
+          p = requestManager.getPoolByBarcode(barcode);
+        }
+      }
+      else {
+        if (r.getPlatformType() != null) {
+          p = requestManager.getPoolByBarcode(barcode, r.getPlatformType());
+        }
+        else {
+          p = requestManager.getPoolByBarcode(barcode);
+        }
+      }
       List<SequencerPartitionContainer> fs = new ArrayList<SequencerPartitionContainer>(r.getSequencerPartitionContainers());
       if (!fs.isEmpty()) {
         SequencerPartitionContainer f = fs.get(container);

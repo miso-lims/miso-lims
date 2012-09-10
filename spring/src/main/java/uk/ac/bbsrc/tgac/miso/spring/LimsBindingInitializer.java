@@ -107,7 +107,6 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
    * @param req of type WebRequest
    */
   public void initBinder(WebDataBinder binder, WebRequest req) {
-
     binder.registerCustomEditor(Long.class, new CustomNumberEditor(Long.class, false));
 
     binder.registerCustomEditor(Boolean.class, new CustomBooleanEditor(CustomBooleanEditor.VALUE_TRUE, CustomBooleanEditor.VALUE_FALSE, true));

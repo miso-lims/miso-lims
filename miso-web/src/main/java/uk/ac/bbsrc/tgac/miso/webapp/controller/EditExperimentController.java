@@ -99,41 +99,16 @@ public class EditExperimentController {
 
   public Collection<? extends Pool> populateAvailablePools(User user, Experiment experiment) throws IOException {
     if (experiment.getPlatform() != null) {
-      if (experiment.getPlatform().getPlatformType().equals(PlatformType.ILLUMINA)) {
-        ArrayList<Pool> pools = new ArrayList<Pool>();
-        for (Pool p : requestManager.listAllIlluminaPools()) {
-          if (experiment.getPool() == null || !experiment.getPool().equals(p)) {
-            pools.add(p);
-          }
-          Collections.sort(pools);
+      List<Pool> pools = new ArrayList<Pool>();
+      for (Pool p : requestManager.listAllPoolsByPlatform(experiment.getPlatform().getPlatformType())) {
+        if (experiment.getPool() == null || !experiment.getPool().equals(p)) {
+          pools.add(p);
         }
-        return pools;
+        Collections.sort(pools);
       }
-      else if (experiment.getPlatform().getPlatformType().equals(PlatformType.LS454)) {
-        ArrayList<Pool> pools = new ArrayList<Pool>();
-        for (Pool p : requestManager.listAll454Pools()) {
-          if (experiment.getPool() == null || !experiment.getPool().equals(p)) {
-            pools.add(p);
-          }
-          Collections.sort(pools);
-        }
-        return pools;
-      }
-      else if (experiment.getPlatform().getPlatformType().equals(PlatformType.SOLID)) {
-        ArrayList<Pool> pools = new ArrayList<Pool>();
-        for (Pool p : requestManager.listAllSolidPools()) {
-          if (experiment.getPool() == null || !experiment.getPool().equals(p)) {
-            pools.add(p);
-          }
-          Collections.sort(pools);
-        }
-        return pools;
-      }
-      else {
-        return Collections.emptyList();
-      }
+      return pools;
     }
-    return requestManager.listAllPools();
+    return Collections.emptyList();
   }
 
   @RequestMapping(value = "/new/{studyId}", method = RequestMethod.GET)

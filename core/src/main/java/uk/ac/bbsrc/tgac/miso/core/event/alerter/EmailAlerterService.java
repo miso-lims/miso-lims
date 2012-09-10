@@ -53,7 +53,7 @@ public class EmailAlerterService implements AlerterService {
 
   @Override
   public void raiseAlert(Alert a) throws AlertingException {
-    String from = mailProps.getProperty("mail.miso.from");
+    String from = mailProps.getProperty("mail.from");
     if (from == null || "".equals(from)) {
       from = "miso@your.miso.server";
     }

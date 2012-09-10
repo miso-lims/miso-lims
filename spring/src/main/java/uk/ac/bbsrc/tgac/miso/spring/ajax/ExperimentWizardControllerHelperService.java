@@ -213,10 +213,8 @@ public class ExperimentWizardControllerHelperService {
   }
 
   public String populatePlatform() {
-
     StringBuilder a = new StringBuilder();
     try {
-
       for (Platform platform : requestManager.listAllPlatforms()) {
         a.append("<option value=\"" + platform.getPlatformId() + "\">" + platform.getNameAndModel() + "</option>");
       }

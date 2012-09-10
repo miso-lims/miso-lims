@@ -62,6 +62,7 @@ import java.util.List;
  * @since 0.0.2
  */
 @Ajaxified
+@Deprecated
 public class ReportingControllerHelperService {
   protected static final Logger log = LoggerFactory.getLogger(ReportingControllerHelperService.class);
 
@@ -552,5 +553,4 @@ public class ReportingControllerHelperService {
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
   }
-
 }
