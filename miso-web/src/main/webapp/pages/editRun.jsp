@@ -565,7 +565,7 @@
         </c:forEach>
     </c:otherwise>
 </c:choose>
-<form:hidden path="sequencerPartitionContainers"/>
+<%-- <form:hidden path="sequencerPartitionContainers"/> --%>
 </div>
 </td>
 <td width="50%" valign="top">
