@@ -70,10 +70,10 @@
     </constructor-arg>
   </bean>
 
-  <integration:transformer id="illuminaStatusTransformer"
-                           ref="illuminaTransformer" method="transform"
+  <integration:transformer id="illuminaStatusTransformer" ref="illuminaTransformer"
                            input-channel="illuminaStatusFileInputChannel"
-                           output-channel="illuminaMessageSignerChannel">
+                           output-channel="illuminaSplitterChannel"
+                           method="transform">
   </integration:transformer>
 
   <!-- SOLID STATUS -->
