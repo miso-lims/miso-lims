@@ -88,6 +88,11 @@ public class DefaultNotifier {
 
       for (String platformType : PlatformType.getKeys()) {
         platformType = platformType.toLowerCase();
+
+        if (props.containsKey(platformType + ".splitterBatchSize")) {
+          notificationUtils.setSplitterBatchSize(Integer.parseInt(props.getProperty(platformType + ".splitterBatchSize")));
+        }
+
         if (props.containsKey(platformType + ".dataPaths")) {
           log.debug("Resolving " + platformType + ".dataPaths ...");
           String dataPaths = props.getProperty(platformType + ".dataPaths");

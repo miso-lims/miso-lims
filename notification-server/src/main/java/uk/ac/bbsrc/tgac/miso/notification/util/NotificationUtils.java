@@ -46,6 +46,12 @@ import java.util.*;
 public class NotificationUtils {
   protected static final Logger log = LoggerFactory.getLogger(NotificationUtils.class);
 
+  private int splitterBatchSize = 5;
+
+  public void setSplitterBatchSize(int splitterBatchSize) {
+    this.splitterBatchSize = splitterBatchSize;
+  }
+
   public static <T> Message<T> buildSimpleMultipartMessage(T payload) {
     Message<T> message = MessageBuilder.withPayload(payload).setHeader("Content-Type", "multipart/form-data").build();
     return message;
@@ -63,19 +69,36 @@ public class NotificationUtils {
   public Set<Map<String, String>> splitMessage(Message<Map<String, String>> message) {
     Set<Map<String, String>> outset = new HashSet<Map<String, String>>();
     Map<String, String> payload = message.getPayload();
+    //key is run status
     for (String key : payload.keySet()) {
       //each map value is a JSONArray string
       JSONArray a = JSONArray.fromObject(payload.get(key));
-      for (JSONObject o : (Iterable<JSONObject>)a) {
+      List<JSONObject> all = a.subList(0, a.size());
+      //for (JSONObject o : (Iterable<JSONObject>)a) {
+      for (List<JSONObject> chunk : NotificationUtils.chunkList(all, splitterBatchSize)) {
         Map<String, String> runMap = new HashMap<String, String>();
         JSONArray aa = new JSONArray();
-        aa.add(o);
+        for (JSONObject o : chunk) {
+          aa.add(o);
+        }
         runMap.put(key, aa.toString());
         outset.add(runMap);
       }
     }
-    log.info("Split a single message payload into a " + outset.size() + " sized set...");
+    log.info("Split a single message payload into " + outset.size() + "-mer chunked set...");
     return outset;
+  }
+
+  // chops a list into non-view sublists of length L
+  public static <T> List<List<T>> chunkList(List<T> list, final int L) {
+    List<List<T>> parts = new ArrayList<List<T>>();
+    final int N = list.size();
+    for (int i = 0; i < N; i += L) {
+      parts.add(new ArrayList<T>(
+        list.subList(i, Math.min(N, i + L)))
+      );
+    }
+    return parts;
   }
 
   public Map<String, Object> signMessageHeaders(Message<?> message) {
