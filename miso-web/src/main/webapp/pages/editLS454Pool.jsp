@@ -41,7 +41,7 @@
                 <button type="submit" class="fg-button ui-state-default ui-corner-all">Save
                 </button>
             </h1>
-            <div class="sectionDivider" onclick="toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
+            <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
                 <div id="note_arrowclick" class="toggleLeft"></div>
             </div>
             <div id="notediv" class="note" style="display:none;">A Pool contains <b>one or more</b> Dilutions that are
@@ -61,7 +61,7 @@
                             <div id="idBarcodeMenu"
                                  onmouseover="mcancelclosetime()"
                                  onmouseout="mclosetime()">
-                                <a href="javascript:void(0);" onclick="printPoolBarcodes(${pool.poolId});">Print</a>
+                                <a href="javascript:void(0);" onclick="Pool.barcode.printPoolBarcodes(${pool.poolId});">Print</a>
                             </div>
                         </li>
                     </ul>
@@ -140,7 +140,7 @@
                     <b>Description:</b> ${exp.description}<br/>
                     <b>Project:</b> <a href="<c:url value="/miso/project/${exp.study.project.projectId}"/>">${exp.study.project.alias} (${exp.study.project.name})</a><br/>
                     </span>
-                    <span onclick='confirmRemove(jQuery(this).parent());' class='float-right ui-icon ui-icon-circle-close'></span>
+                    <span onclick='Utils.ui.confirmRemove(jQuery(this).parent());' class='float-right ui-icon ui-icon-circle-close'></span>
                   </div>
                 </c:forEach>
               </c:if>
@@ -152,7 +152,7 @@
             <tr>
               <td width="30%" style="vertical-align:top">
                 <label for="selectExpts"><b>Search experiments:</b></label><br/>
-                <input type="text" id='selectExpts' name="selectExpts" value="" onKeyup="timedFunc(poolSearchExperiments(this, 'LS454'),200);"/>
+                <input type="text" id='selectExpts' name="selectExpts" value="" onKeyup="Utils.timer.timedFunc(Pool.search.poolSearchExperiments(this, 'LS454'),200);"/>
                 <div id='exptresult'></div>
               </td>
             </tr>
@@ -200,7 +200,7 @@
                         </span>
                     </c:otherwise>
                   </c:choose>
-                  <span onclick='confirmRemove(jQuery(this).parent());' class='float-right ui-icon ui-icon-circle-close'></span>
+                  <span onclick='Utils.ui.confirmRemove(jQuery(this).parent());' class='float-right ui-icon ui-icon-circle-close'></span>
                   </div>
               </c:forEach>
               <input type="hidden" value="on" name="_dilutions"/>
@@ -213,7 +213,7 @@
             <tr>
                 <td width="30%" style="vertical-align:top">
                     <label for="ldiBarcodes"><b>Search dilution:</b></label><br/>
-                    <%-- <input type="text" id='dilinput' name="ldiInput" value="" onKeyup="timedFunc(poolSearchEmPcrDilution(this,'LS454'),200);"/> --%>
+                    <%-- <input type="text" id='dilinput' name="ldiInput" value="" onKeyup="Utils.timer.timedFunc(poolSearchEmPcrDilution(this,'LS454'),200);"/> --%>
                     <input type="text" id='searchDilution' name="searchDilution"/>
                     <div id='searchDilutionResult'></div>
                 </td>
@@ -221,7 +221,7 @@
                     <label for="ldiBarcodes"><b>Select dilutions by barcode(s):</b></label><br/>
                     <textarea id="ldiBarcodes" name="ldiBarcodes" rows="6" cols="40"></textarea><br/>
                     <button type="button" class="br-button ui-state-default ui-corner-all"
-                            onclick="select454EmPCRDilutionsByBarcodes(jQuery('#ldiBarcodes').val());">Select
+                            onclick="Pool.ui.select454EmPCRDilutionsByBarcodes(jQuery('#ldiBarcodes').val());">Select
                     </button>
                     <div id="dilimportlist"></div>
                 </td>
@@ -232,7 +232,7 @@
                           action="<c:url value="/miso/upload/empcrdilution-to-pool"/>"
                           enctype="multipart/form-data"
                           target="target_upload"
-                          onsubmit="ls454EmPcrDilutionFileUploadProgress();">
+                          onsubmit="Pool.ui.ls454EmPcrDilutionFileUploadProgress();">
                         <input type="file" name="file"/><br/>
                         <button type="submit" class="br-button ui-state-default ui-corner-all">Upload</button>
                     </form>
@@ -246,8 +246,8 @@
 </div>
 
 <script type="text/javascript">
-  addMaxDatePicker("creationDate", 0);
-  typewatchFunc(jQuery('#searchDilution'), function(){poolSearchEmPcrDilution(jQuery('#searchDilution'), 'LS454')}, 300, 2);
+  Utils.ui.addMaxDatePicker("creationDate", 0);
+  Utils.timer.typewatchFunc(jQuery('#searchDilution'), function(){Pool.search.poolSearchEmPcrDilution(jQuery('#searchDilution'), 'LS454')}, 300, 2);
 </script>
 
 <%@ include file="adminsub.jsp" %>

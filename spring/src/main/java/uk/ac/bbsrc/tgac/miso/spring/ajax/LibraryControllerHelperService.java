@@ -48,6 +48,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleQcException;
+import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoPrintException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeFactory;
@@ -56,6 +57,7 @@ import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.PrintManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
 import uk.ac.bbsrc.tgac.miso.core.service.tagbarcode.TagBarcodeStrategy;
@@ -98,6 +100,34 @@ public class LibraryControllerHelperService {
   private PrintManager<MisoPrintService, Queue<?>> printManager;
   @Autowired
   private TagBarcodeStrategyResolverService tagBarcodeStrategyResolverService;
+  @Autowired
+  private MisoNamingScheme<Sample> sampleNamingScheme;
+  @Autowired
+  private MisoNamingScheme<Library> libraryNamingScheme;
+
+  public JSONObject validateLibraryAlias(HttpSession session, JSONObject json) {
+    if (json.has("alias")) {
+      String alias = json.getString("alias");
+      try {
+        if (libraryNamingScheme.validateField("alias", alias)) {
+          log.info("Library alias OK!");
+          return JSONUtils.SimpleJSONResponse("OK");
+        }
+        else {
+          log.error("Library alias not valid: " + alias);
+          return JSONUtils.SimpleJSONError("The following Library alias doesn't conform to the chosen naming scheme ("+libraryNamingScheme.getValidationRegex("alias")+") or already exists: " + json.getString("alias"));
+        }
+      }
+      catch (MisoNamingException e) {
+        log.error("Cannot validate Library alias " + json.getString("alias") + ": " + e.getMessage());
+        e.printStackTrace();
+        return JSONUtils.SimpleJSONError("Cannot validate Library alias " + json.getString("alias") + ": " + e.getMessage());
+      }
+    }
+    else {
+      return JSONUtils.SimpleJSONError("No alias specified");
+    }
+  }
 
   public JSONObject addLibraryNote(HttpSession session, JSONObject json) {
     Long libraryId = json.getLong("libraryId");
@@ -336,8 +366,6 @@ public class LibraryControllerHelperService {
     if (json.has("libraries")) {
       try {
         Project p = requestManager.getProjectById(json.getLong("projectId"));
-
-        //objectify the stringified JSONArray
         JSONArray a = JSONArray.fromObject(json.get("libraries"));
         Set<Library> saveSet = new HashSet<Library>();
 
@@ -347,19 +375,21 @@ public class LibraryControllerHelperService {
             Sample sample = null;
             String libAlias = null;
             String sampleAlias = j.getString("parentSample");
-            String regex = "([A-z0-9]+)_S([A-z0-9]+)_(.*)";
-            Pattern pat = Pattern.compile(regex);
 
             for (Sample s : p.getSamples()) {
               if (s.getAlias().equals(sampleAlias)) {
                 sp = s.getSecurityProfile();
                 sample = s;
-                
-                Matcher mat = pat.matcher(s.getAlias());
-                if (mat.matches()) {
+
+                if (sampleNamingScheme.validateField("alias", s.getAlias())) {
+                  Pattern pat = Pattern.compile(sampleNamingScheme.getValidationRegex("alias"));
+                  Matcher mat = pat.matcher(s.getAlias());
                   //convert the sample alias automatically to a library alias
                   int numLibs = requestManager.listAllLibrariesBySampleId(s.getSampleId()).size();
-                  libAlias = mat.group(1) + "_" + "L" + mat.group(2) + "-"+(numLibs+1)+"_" + mat.group(3);
+                  String la = mat.group(1) + "_" + "L" + mat.group(2) + "-"+(numLibs+1)+"_" + mat.group(3);
+                  if (libraryNamingScheme.validateField("alias", la)) {
+                    libAlias = la;
+                  }
                 }
               }
             }
@@ -414,7 +444,7 @@ public class LibraryControllerHelperService {
               saveSet.add(library);
             }
             else {
-              throw new IOException("Could not process a selected Sample to generate Libraries. Please check that all selected samples' aliases conform to the <PI initials>_S<Sample Number>_<Species> naming convention.");
+              throw new IOException("Could not process a selected Sample to generate Libraries. Please check that all selected samples' aliases conform to the chosen naming convention ("+sampleNamingScheme.getValidationRegex("alias")+")");
             }
           }
           catch (IOException e) {
@@ -682,7 +712,7 @@ public class LibraryControllerHelperService {
           sb.append("</td>");
 
           if (!library.getPlatformName().equals("Illumina")) {
-            sb.append("<td><a href='javascript:void(0);' onclick='insertEmPcrRow("+dil.getDilutionId()+");'>Add emPCR</a></td>");
+            sb.append("<td><a href='javascript:void(0);' onclick='Library.empcr.insertEmPcrRow("+dil.getDilutionId()+");'>Add emPCR</a></td>");
           }
           else {
             //sb.append("<td><a href='/miso/poolwizard/new/"+library.getPlatformName().toLowerCase()+"/new/'>Construct New Pool</a></td>");
@@ -747,7 +777,7 @@ public class LibraryControllerHelperService {
       Long dilutionId = Long.parseLong(json.getString("dilutionId"));
       LibraryDilution dilution = requestManager.getLibraryDilutionById(dilutionId);
       response.put("results", "<input type='text' id='" + dilutionId + "' value='" + dilution.getConcentration() + "'/>");
-      response.put("edit", "<a href='javascript:void(0);' onclick='editLibraryDilution(\"" + dilutionId + "\");'>Save</a>");
+      response.put("edit", "<a href='javascript:void(0);' onclick='Library.dilution.editLibraryDilution(\"" + dilutionId + "\");'>Save</a>");
       return response;
     }
     catch (Exception e) {
@@ -803,7 +833,7 @@ public class LibraryControllerHelperService {
           sb.append("<td>"+p.getPcrCreator()+"</td>");
           sb.append("<td>"+p.getCreationDate()+"</td>");
           sb.append("<td>"+p.getConcentration()+" "+ p.getUnits()+"</td>");
-          sb.append("<td><a href='javascript:void(0);' onclick='insertEmPcrDilutionRow("+p.getPcrId()+");'>Add emPCR Dilution</a></td>");
+          sb.append("<td><a href='javascript:void(0);' onclick='Library.empcr.insertEmPcrDilutionRow("+p.getPcrId()+");'>Add emPCR Dilution</a></td>");
           sb.append("</tr>");
         }
         return JSONUtils.SimpleJSONResponse(sb.toString());
@@ -974,7 +1004,7 @@ public class LibraryControllerHelperService {
 
       response.put("results", "<input type='text' id='results" + qcId + "' value='" + libraryQc.getResults() + "'/>");
       response.put("insertSize", "<input type='text' id='insertSize" + qcId + "' value='" + libraryQc.getInsertSize() + "'/>");
-      response.put("edit", "<a href='javascript:void(0);' onclick='editLibraryQC(\"" + qcId + "\",\"" + libraryId + "\");'>Save</a>");
+      response.put("edit", "<a href='javascript:void(0);' onclick='Library.qc.editLibraryQC(\"" + qcId + "\",\"" + libraryId + "\");'>Save</a>");
       return response;
     }
     catch (Exception e) {
@@ -1120,5 +1150,9 @@ public class LibraryControllerHelperService {
 
   public void setTagBarcodeStrategyResolverService(TagBarcodeStrategyResolverService tagBarcodeStrategyResolverService) {
     this.tagBarcodeStrategyResolverService = tagBarcodeStrategyResolverService;
+  }
+
+  public void setSampleNamingScheme(MisoNamingScheme<Sample> sampleNamingScheme) {
+    this.sampleNamingScheme = sampleNamingScheme;
   }
 }

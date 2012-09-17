@@ -32,7 +32,7 @@ package uk.ac.bbsrc.tgac.miso.core.data;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface Barcodable {
+public interface Barcodable extends Nameable {
    /**
    * Returns the name of this Barcodable object.
    *

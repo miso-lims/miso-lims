@@ -120,7 +120,7 @@
 
             jQuery(document).ready(function() {
                 jQuery('#table').find('tr').each(function() {
-                  if (jQuery(this.cells[2]).html() === "Completed" && isNullCheck(jQuery(this.cells[4]).html())) {
+                  if (jQuery(this.cells[2]).html() === "Completed" && Utils.validation.isNullCheck(jQuery(this.cells[4]).html())) {
                     jQuery(this.cells[4]).addClass("error");
                   }
                 });

@@ -21,409 +21,394 @@
  * *********************************************************************
  */
 
-function poolSearchExperiments(input, platform) {
-  Fluxion.doAjax(
-          'poolControllerHelperService',
-          'poolSearchExperiments',
-          {'str':jQuery(input).val(), 'platform':platform, 'id':input.id, 'url':ajaxurl},
-          {'doOnSuccess': function(json) {
-            jQuery('#exptresult').css('visibility', 'visible');
-            jQuery('#exptresult').html(json.html);
-          }
-          }
-  );
-}
-
-function poolSearchSelectExperiment(experimentId, experimentName) {
-  if (jQuery("#experiments" + experimentId).length > 0) {
-    alert("Experiment " + experimentName + " is already associated with this pool.");
-  }
-  else {
-    var div = "<div onMouseOver='this.className=\"dashboardhighlight\"' onMouseOut='this.className=\"dashboard\"' class='dashboard'>";
-    div += "<span class='float-left'><input type='hidden' id='experiment" + experimentId + "' value='" + experimentId + "' name='experiments'/>";
-    div += "<b>Experiment: " + experimentName + "</b></span>";
-    div += "<span onclick='confirmRemove(jQuery(this).parent());' class='float-right ui-icon ui-icon-circle-close'></span></div>";
-    jQuery('#exptlist').append(div);
-  }
-  jQuery('#exptresult').css('visibility', 'hidden');
-}
-
-function poolSearchLibraryDilution(input, platform) {
-  Fluxion.doAjax(
-    'poolControllerHelperService',
-    'poolSearchLibraryDilution',
-    {'str':jQuery(input).val(), 'platform':platform, 'id':input.id, 'url':ajaxurl},
-    {'doOnSuccess': function(json) {
-      jQuery('#searchDilutionResult').css('visibility', 'visible');
-      jQuery('#searchDilutionResult').html(json.html);
-    }
-    }
-  );
-}
-
-function poolSearchSelectDilution(dilutionId, dilutionName) {
-  if (jQuery("#dilutions" + dilutionId).length > 0) {
-    alert("Dilution " + dilutionName + " is already part of this pool.");
-  }
-  else {
-    var div = "<div onMouseOver='this.className=\"dashboardhighlight\"' onMouseOut='this.className=\"dashboard\"' class='dashboard'>";
-    div += "<span class='float-left'><input type='hidden' id='dilutions" + dilutionId + "' value='" + dilutionName + "' name='dilutions'/>";
-    div += "<b>Dilution: " + dilutionName + "</b></span>";
-    div += "<span onclick='confirmRemove(jQuery(this).parent());' class='float-right ui-icon ui-icon-circle-close'></span></div>";
-    jQuery('#dillist').append(div);
-  }
-  jQuery('#searchDilutionResult').css('visibility', 'hidden');
-}
-
-function poolSearchEmPcrDilution(input, platform) {
-  Fluxion.doAjax(
-    'poolControllerHelperService',
-    'poolSearchEmPcrDilution',
-    {'str':jQuery(input).val(), 'platform':platform, 'id':input.id, 'url':ajaxurl},
-    {'doOnSuccess': function(json) {
-      jQuery('#searchDilutionResult').css('visibility', 'visible');
-      jQuery('#searchDilutionResult').html(json.html);
-    }
-    }
-  );
-}
-
-function poolSearchSelectEmPcrDilution(dilutionId, dilutionName) {
-  if (jQuery("#dilutions" + dilutionId).length > 0) {
-    alert("Dilution " + dilutionName + " is already part of this pool.");
-  }
-  else {
-    var div = "<div onMouseOver='this.className=\"dashboardhighlight\"' onMouseOut='this.className=\"dashboard\"' class='dashboard'>";
-    div += "<span class='float-left'><input type='hidden' id='dilutions" + dilutionId + "' value='" + dilutionName + "' name='dilutions'/>";
-    div += "<b>Dilution: " + dilutionName + "</b></span>";
-    div += "<span onclick='confirmRemove(jQuery(this).parent());' class='float-right ui-icon ui-icon-circle-close'></span></div>";
-    jQuery('#dillist').append(div);
-  }
-  jQuery('#searchDilutionResult').css('visibility', 'hidden');
-}
-
-function selectLibraryDilutionsByBarcodes(codes) {
-  if (codes === "") {
-    alert("Please input at least one barcode...");
-  }
-  else {
-    Fluxion.doAjax(
-            'poolControllerHelperService',
-            'selectLibraryDilutionsByBarcodeList',
-            {
-              'barcodes':codes,
-              'url':ajaxurl
-            },
-            {'updateElement':'dilimportlist'}
-    );
-  }
-}
-
-function select454EmPCRDilutionsByBarcodes(codes) {
-  if (codes === "") {
-    alert("Please input at least one barcode...");
-  }
-  else {
-    Fluxion.doAjax(
-            'poolControllerHelperService',
-            'select454EmPCRDilutionsByBarcodeList',
-            {
-              'barcodes':codes,
-              'url':ajaxurl
-            },
-            {'updateElement':'dilimportlist'}
-    );
-  }
-}
-
-function selectSolidEmPCRDilutionsByBarcodes(codes) {
-  if (codes === "") {
-    alert("Please input at least one barcode...");
-  }
-  else {
-    Fluxion.doAjax(
-            'poolControllerHelperService',
-            'selectSolidEmPCRDilutionsByBarcodeList',
-            {
-              'barcodes':codes,
-              'url':ajaxurl
-            },
-            {'updateElement':'dilimportlist'}
-    );
-  }
-}
-
-function libraryDilutionFileUploadProgress() {
-  Fluxion.doAjaxUpload(
-          'ajax_upload_form',
-          'fileUploadProgressBean',
-          'checkUploadStatus',
-          {'url':ajaxurl},
-          {'statusElement':'statusdiv', 'progressElement':'trash', 'doOnSuccess':libraryDilutionFileUploadSuccessFunc},
-          {'':''}
-  );
-}
-
-var libraryDilutionFileUploadSuccessFunc = function(json) {
-  Fluxion.doAjax(
-          'poolControllerHelperService',
-          'selectLibraryDilutionsByBarcodeFile',
-          {'url':ajaxurl},
-          {'updateElement':'dilimportfile'}
-  );
-};
-
-function ls454EmPcrDilutionFileUploadProgress() {
-  Fluxion.doAjaxUpload(
-          'ajax_upload_form',
-          'fileUploadProgressBean',
-          'checkUploadStatus',
-          {'url':ajaxurl},
-          {'statusElement':'statusdiv', 'progressElement':'trash', 'doOnSuccess':ls454EmPcrDilutionFileUploadSuccessFunc},
-          {'':''}
-  );
-}
-
-var ls454EmPcrDilutionFileUploadSuccessFunc = function(json) {
-  Fluxion.doAjax(
-          'poolControllerHelperService',
-          'select454EmPCRDilutionsByBarcodeFile',
-          {'url':ajaxurl},
-          {'updateElement':'dilimportfile'}
-  );
-};
-
-function solidEmPcrDilutionFileUploadProgress() {
-  Fluxion.doAjaxUpload(
-          'ajax_upload_form',
-          'fileUploadProgressBean',
-          'checkUploadStatus',
-          {'url':ajaxurl},
-          {'statusElement':'statusdiv', 'progressElement':'trash', 'doOnSuccess':solidEmPcrDilutionFileUploadSuccessFunc},
-          {'':''}
-  );
-}
-
-var solidEmPcrDilutionFileUploadSuccessFunc = function(json) {
-  Fluxion.doAjax(
-          'poolControllerHelperService',
-          'selectSolidEmPCRDilutionsByBarcodeFile',
-          {'url':ajaxurl},
-          {'updateElement':'dilimportfile'}
-  );
-};
-
-function printPoolBarcodes() {
-  var pools = [];
-  for (var i = 0; i < arguments.length; i++) {
-    pools[i] = {'poolId':arguments[i]};
-  }
-  Fluxion.doAjax(
-          'poolControllerHelperService',
-          'printPoolBarcodes',
-          {
-            'pools':pools,
-            'url':ajaxurl
-          },
-          {
-            'doOnSuccess':function (json) {
-              alert(json.response);
-            }
-          }
-  );
-}
-
-function selectPoolBarcodesToPrint(tableId) {
-  if (!jQuery(tableId).hasClass("display")) {
-    jQuery(tableId).addClass("display");
-
-    jQuery(tableId).find('tr:first th:eq(3)').remove();
-    jQuery(tableId).find("tr").each(function() {
-      jQuery(this).removeAttr("onmouseover").removeAttr("onmouseout");
-      jQuery(this).find("td:eq(3)").remove();
-    });
-
-    var headers = ['rowsel',
-                   'name',
-                   'creationDate',
-                   'info'];
-
-    var oTable = jQuery(tableId).dataTable({
-                                             "aoColumnDefs": [
-                                               {
-                                                 "bUseRendered": false,
-                                                 "aTargets": [ 0 ]
-                                               }
-                                             ],
-                                             "bPaginate": false,
-                                             "bInfo": false,
-                                             "bJQueryUI": true,
-                                             "bAutoWidth": true,
-                                             "bSort": false,
-                                             "bFilter": false,
-                                             "sDom": '<<"toolbar">f>r<t>ip>'
-                                           });
-
-    jQuery(tableId).find("tr:first").prepend("<th>Select</th>");
-    jQuery(tableId).find("tr:gt(0)").prepend("<td class='rowSelect'></td>");
-
-    jQuery(tableId).find('.rowSelect').click(function() {
-      if (jQuery(this).parent().hasClass('row_selected')) {
-        jQuery(this).parent().removeClass('row_selected');
-      }
-      else {
-        jQuery(this).parent().addClass('row_selected');
-      }
-    });
-
-    jQuery("div.toolbar").html("<button onclick=\"printSelectedPoolBarcodes('" + tableId + "');\" class=\"fg-button ui-state-default ui-corner-all\">Print Selected</button>");
-    jQuery("div.toolbar").append("<button onclick=\"pageReload();\" class=\"fg-button ui-state-default ui-corner-all\">Cancel</button>");
-    jQuery("div.toolbar").removeClass("toolbar");
-  }
-}
-
-function printSelectedPoolBarcodes(tableId) {
-  var pools = [];
-  var table = jQuery(tableId).dataTable();
-  var nodes = fnGetSelected(table);
-  for (var i = 0; i < nodes.length; i++) {
-    pools[i] = {'poolId':jQuery(nodes[i]).attr("poolId")};
-  }
-
-  Fluxion.doAjax(
-          'printerControllerHelperService',
-          'listAvailableServices',
-          {
-            'serviceClass':'uk.ac.bbsrc.tgac.miso.core.data.Pool',
-            'url':ajaxurl
-          },
-          {
-            'doOnSuccess':function (json) {
-              jQuery('#printServiceSelectDialog')
-                      .html("<form>" +
-                            "<fieldset class='dialog'>" +
-                            "<select name='serviceSelect' id='serviceSelect' class='ui-widget-content ui-corner-all'>" +
-                            json.services +
-                            "</select></fieldset></form>");
-
-              jQuery(function() {
-                jQuery('#printServiceSelectDialog').dialog({
-                                                             autoOpen: false,
-                                                             width: 400,
-                                                             modal: true,
-                                                             resizable: false,
-                                                             buttons: {
-                                                               "Print": function() {
-                                                                 Fluxion.doAjax(
-                                                                         'poolControllerHelperService',
-                                                                         'printPoolBarcodes',
-                                                                         {
-                                                                           'serviceName':jQuery('#serviceSelect').val(),
-                                                                           'pools':pools,
-                                                                           'url':ajaxurl
-                                                                         },
-                                                                         {
-                                                                           'doOnSuccess':function (json) {
-                                                                             alert(json.response);
-                                                                           }
-                                                                         }
-                                                                 );
-                                                                 jQuery(this).dialog('close');
-                                                               },
-                                                               "Cancel": function() {
-                                                                 jQuery(this).dialog('close');
-                                                               }
-                                                             }
-                                                           });
-              });
-              jQuery('#printServiceSelectDialog').dialog('open');
-            },
-            'doOnError':function (json) {
-              alert(json.error);
-            }
-          }
-  );
-
-  /*
-   Fluxion.doAjax(
-   'poolControllerHelperService',
-   'printPoolBarcodes',
-   {
-   'pools':pools,
-   'url':ajaxurl
-   },
-   {
-   'doOnSuccess':function (json) {
-   alert(json.response);
-   }
-   }
-   );
-   */
-}
-
-function filterRunPoolList(input) {
-  var func = function(input) {
-    var filter = jQuery(input).val();
-    if (filter) {
-      jQuery('#poolList').find("li").each(function() {
-        var li = jQuery(this);
-        var hide = false;
-
-        if (li.not("[pName*=" + filter + "]")) {
-          hide = true;
+var Pool = Pool || {
+  deletePool : function(poolId, successfunc) {
+    if (confirm("Are you sure you really want to delete pool " + poolId + "? This operation is permanent!")) {
+      Fluxion.doAjax(
+        'poolControllerHelperService',
+        'deletePool',
+        {'poolId':poolId, 'url':ajaxurl},
+        {'doOnSuccess':function(json) {
+          successfunc();
         }
+        }
+      );
+    }
+  }
+};
 
-        li.find(".poolListProjectAlias").each(function () {
-          if (jQuery(this).not("[alias*=" + filter + "]")) {
+Pool.ui = {
+  selectLibraryDilutionsByBarcodes : function(codes) {
+    if (codes === "") {
+      alert("Please input at least one barcode...");
+    }
+    else {
+      Fluxion.doAjax(
+        'poolControllerHelperService',
+        'selectLibraryDilutionsByBarcodeList',
+        {
+          'barcodes':codes,
+          'url':ajaxurl
+        },
+        {'updateElement':'dilimportlist'}
+      );
+    }
+  },
+
+  select454EmPCRDilutionsByBarcodes : function(codes) {
+    if (codes === "") {
+      alert("Please input at least one barcode...");
+    }
+    else {
+      Fluxion.doAjax(
+        'poolControllerHelperService',
+        'select454EmPCRDilutionsByBarcodeList',
+        {
+          'barcodes':codes,
+          'url':ajaxurl
+        },
+        {'updateElement':'dilimportlist'}
+      );
+    }
+  },
+
+  selectSolidEmPCRDilutionsByBarcodes : function(codes) {
+    if (codes === "") {
+      alert("Please input at least one barcode...");
+    }
+    else {
+      Fluxion.doAjax(
+        'poolControllerHelperService',
+        'selectSolidEmPCRDilutionsByBarcodeList',
+        {
+          'barcodes':codes,
+          'url':ajaxurl
+        },
+        {'updateElement':'dilimportlist'}
+      );
+    }
+  },
+
+  libraryDilutionFileUploadProgress : function() {
+    var self = this;
+    Fluxion.doAjaxUpload(
+      'ajax_upload_form',
+      'fileUploadProgressBean',
+      'checkUploadStatus',
+      {'url':ajaxurl},
+      {'statusElement':'statusdiv', 'progressElement':'trash', 'doOnSuccess':self.libraryDilutionFileUploadSuccessFunc},
+      {'':''}
+    );
+  },
+
+  libraryDilutionFileUploadSuccessFunc : function(json) {
+    Fluxion.doAjax(
+      'poolControllerHelperService',
+      'selectLibraryDilutionsByBarcodeFile',
+      {'url':ajaxurl},
+      {'updateElement':'dilimportfile'}
+    );
+  },
+
+  ls454EmPcrDilutionFileUploadProgress : function() {
+    var self = this;
+    Fluxion.doAjaxUpload(
+      'ajax_upload_form',
+      'fileUploadProgressBean',
+      'checkUploadStatus',
+      {'url':ajaxurl},
+      {'statusElement':'statusdiv', 'progressElement':'trash', 'doOnSuccess':self.ls454EmPcrDilutionFileUploadSuccessFunc},
+      {'':''}
+    );
+  },
+
+  ls454EmPcrDilutionFileUploadSuccessFunc : function(json) {
+    Fluxion.doAjax(
+      'poolControllerHelperService',
+      'select454EmPCRDilutionsByBarcodeFile',
+      {'url':ajaxurl},
+      {'updateElement':'dilimportfile'}
+    );
+  },
+
+  solidEmPcrDilutionFileUploadProgress : function() {
+    var self = this;
+    Fluxion.doAjaxUpload(
+      'ajax_upload_form',
+      'fileUploadProgressBean',
+      'checkUploadStatus',
+      {'url':ajaxurl},
+      {'statusElement':'statusdiv', 'progressElement':'trash', 'doOnSuccess':self.solidEmPcrDilutionFileUploadSuccessFunc},
+      {'':''}
+    );
+  },
+
+  solidEmPcrDilutionFileUploadSuccessFunc : function(json) {
+    Fluxion.doAjax(
+      'poolControllerHelperService',
+      'selectSolidEmPCRDilutionsByBarcodeFile',
+      {'url':ajaxurl},
+      {'updateElement':'dilimportfile'}
+    );
+  },
+
+  //TODO - DEPRECATED
+  filterRunPoolList : function(input) {
+    var func = function(input) {
+      var filter = jQuery(input).val();
+      if (filter) {
+        jQuery('#poolList').find("li").each(function() {
+          var li = jQuery(this);
+          var hide = false;
+
+          if (li.not("[pName*=" + filter + "]")) {
             hide = true;
           }
-        });
 
-        if (hide) {
-          li.hide();
+          li.find(".poolListProjectAlias").each(function () {
+            if (jQuery(this).not("[alias*=" + filter + "]")) {
+              hide = true;
+            }
+          });
+
+          if (hide) {
+            li.hide();
+          }
+          else {
+            li.show();
+          }
+        });
+      }
+      else {
+        jQuery('#poolList').find("li").show();
+      }
+    };
+
+    Utils.timer.timedFunc(func(input), 200);
+  },
+
+  listPoolAverageInsertSizes : function() {
+    jQuery('.averageInsertSize').html("<img src='../styles/images/ajax-loader.gif'/>");
+    Fluxion.doAjax(
+      'poolControllerHelperService',
+      'listPoolAverageInsertSizes',
+      {
+        'url':ajaxurl
+      },
+      {
+        'doOnSuccess': function(json) {
+          jQuery.each(json, function(i, val) {
+            jQuery('#average' + i).html(val)
+          });
+        }
+      }
+    );
+  }
+};
+
+Pool.search = {
+  poolSearchExperiments : function(input, platform) {
+    Fluxion.doAjax(
+      'poolControllerHelperService',
+      'poolSearchExperiments',
+      {'str':jQuery(input).val(), 'platform':platform, 'id':input.id, 'url':ajaxurl},
+      {'doOnSuccess': function(json) {
+        jQuery('#exptresult').css('visibility', 'visible');
+        jQuery('#exptresult').html(json.html);
+      }
+      }
+    );
+  },
+
+  poolSearchSelectExperiment : function(experimentId, experimentName) {
+    if (jQuery("#experiments" + experimentId).length > 0) {
+      alert("Experiment " + experimentName + " is already associated with this pool.");
+    }
+    else {
+      var div = "<div onMouseOver='this.className=\"dashboardhighlight\"' onMouseOut='this.className=\"dashboard\"' class='dashboard'>";
+      div += "<span class='float-left'><input type='hidden' id='experiment" + experimentId + "' value='" + experimentId + "' name='experiments'/>";
+      div += "<b>Experiment: " + experimentName + "</b></span>";
+      div += "<span onclick='Utils.ui.confirmRemove(jQuery(this).parent());' class='float-right ui-icon ui-icon-circle-close'></span></div>";
+      jQuery('#exptlist').append(div);
+    }
+    jQuery('#exptresult').css('visibility', 'hidden');
+  },
+
+  poolSearchLibraryDilution : function(input, platform) {
+    Fluxion.doAjax(
+      'poolControllerHelperService',
+      'poolSearchLibraryDilution',
+      {'str':jQuery(input).val(), 'platform':platform, 'id':input.id, 'url':ajaxurl},
+      {'doOnSuccess': function(json) {
+        jQuery('#searchDilutionResult').css('visibility', 'visible');
+        jQuery('#searchDilutionResult').html(json.html);
+      }
+      }
+    );
+  },
+
+  poolSearchSelectDilution : function(dilutionId, dilutionName) {
+    if (jQuery("#dilutions" + dilutionId).length > 0) {
+      alert("Dilution " + dilutionName + " is already part of this pool.");
+    }
+    else {
+      var div = "<div onMouseOver='this.className=\"dashboardhighlight\"' onMouseOut='this.className=\"dashboard\"' class='dashboard'>";
+      div += "<span class='float-left'><input type='hidden' id='dilutions" + dilutionId + "' value='" + dilutionName + "' name='dilutions'/>";
+      div += "<b>Dilution: " + dilutionName + "</b></span>";
+      div += "<span onclick='Utils.ui.confirmRemove(jQuery(this).parent());' class='float-right ui-icon ui-icon-circle-close'></span></div>";
+      jQuery('#dillist').append(div);
+    }
+    jQuery('#searchDilutionResult').css('visibility', 'hidden');
+  },
+
+  poolSearchEmPcrDilution : function(input, platform) {
+    Fluxion.doAjax(
+      'poolControllerHelperService',
+      'poolSearchEmPcrDilution',
+      {'str':jQuery(input).val(), 'platform':platform, 'id':input.id, 'url':ajaxurl},
+      {'doOnSuccess': function(json) {
+        jQuery('#searchDilutionResult').css('visibility', 'visible');
+        jQuery('#searchDilutionResult').html(json.html);
+      }
+      }
+    );
+  }
+};
+
+Pool.barcode = {
+  printPoolBarcodes : function() {
+    var pools = [];
+    for (var i = 0; i < arguments.length; i++) {
+      pools[i] = {'poolId':arguments[i]};
+    }
+    Fluxion.doAjax(
+      'poolControllerHelperService',
+      'printPoolBarcodes',
+      {
+        'pools':pools,
+        'url':ajaxurl
+      },
+      {
+        'doOnSuccess':function (json) {
+          alert(json.response);
+        }
+      }
+    );
+  },
+
+  selectPoolBarcodesToPrint : function(tableId) {
+    if (!jQuery(tableId).hasClass("display")) {
+      jQuery(tableId).addClass("display");
+
+      jQuery(tableId).find('tr:first th:eq(3)').remove();
+      jQuery(tableId).find("tr").each(function() {
+        jQuery(this).removeAttr("onmouseover").removeAttr("onmouseout");
+        jQuery(this).find("td:eq(3)").remove();
+      });
+
+      var headers = ['rowsel',
+                     'name',
+                     'creationDate',
+                     'info'];
+
+      var oTable = jQuery(tableId).dataTable({
+        "aoColumnDefs": [
+          {
+            "bUseRendered": false,
+            "aTargets": [ 0 ]
+          }
+        ],
+        "bPaginate": false,
+        "bInfo": false,
+        "bJQueryUI": true,
+        "bAutoWidth": true,
+        "bSort": false,
+        "bFilter": false,
+        "sDom": '<<"toolbar">f>r<t>ip>'
+      });
+
+      jQuery(tableId).find("tr:first").prepend("<th>Select</th>");
+      jQuery(tableId).find("tr:gt(0)").prepend("<td class='rowSelect'></td>");
+
+      jQuery(tableId).find('.rowSelect').click(function() {
+        if (jQuery(this).parent().hasClass('row_selected')) {
+          jQuery(this).parent().removeClass('row_selected');
         }
         else {
-          li.show();
+          jQuery(this).parent().addClass('row_selected');
         }
       });
 
-      //jQuery('#poolList').find("li[pName*=" + filter + "]").show();
+      jQuery("div.toolbar").html("<button onclick=\"Pool.barcode.printSelectedPoolBarcodes('" + tableId + "');\" class=\"fg-button ui-state-default ui-corner-all\">Print Selected</button>");
+      jQuery("div.toolbar").append("<button onclick=\"Utils.page.pageReload();\" class=\"fg-button ui-state-default ui-corner-all\">Cancel</button>");
+      jQuery("div.toolbar").removeClass("toolbar");
     }
-    else {
-      jQuery('#poolList').find("li").show();
+  },
+
+  printSelectedPoolBarcodes : function(tableId) {
+    var pools = [];
+    var table = jQuery(tableId).dataTable();
+    var nodes = DatatableUtils.fnGetSelected(table);
+    for (var i = 0; i < nodes.length; i++) {
+      pools[i] = {'poolId':jQuery(nodes[i]).attr("poolId")};
     }
-  };
 
-  timedFunc(func(input), 200);
-}
-
-
-function listPoolAverageInsertSizes() {
-  jQuery('.averageInsertSize').html("<img src='../styles/images/ajax-loader.gif'/>");
-  Fluxion.doAjax(
-          'poolControllerHelperService',
-          'listPoolAverageInsertSizes',
-          {
-            'url':ajaxurl
-          },
-          {
-            'doOnSuccess': function(json) {
-              jQuery.each(json, function(i, val) {
-                jQuery('#average' + i).html(val)
-              });
-            }
-          });
-}
-
-function deletePool(poolId, successfunc) {
-  if (confirm("Are you sure you really want to delete pool " + poolId + "? This operation is permanent!")) {
     Fluxion.doAjax(
-            'poolControllerHelperService',
-            'deletePool',
-            {'poolId':poolId, 'url':ajaxurl},
-            {'doOnSuccess':function(json) {
-              successfunc();
-            }
+      'printerControllerHelperService',
+      'listAvailableServices',
+      {
+        'serviceClass':'uk.ac.bbsrc.tgac.miso.core.data.Pool',
+        'url':ajaxurl
+      },
+      {
+        'doOnSuccess':function (json) {
+          jQuery('#printServiceSelectDialog')
+            .html("<form>" +
+              "<fieldset class='dialog'>" +
+              "<select name='serviceSelect' id='serviceSelect' class='ui-widget-content ui-corner-all'>" +
+              json.services +
+              "</select></fieldset></form>");
+
+          jQuery(function() {
+            jQuery('#printServiceSelectDialog').dialog({
+              autoOpen: false,
+              width: 400,
+              modal: true,
+              resizable: false,
+              buttons: {
+              "Print": function() {
+                Fluxion.doAjax(
+                  'poolControllerHelperService',
+                  'printPoolBarcodes',
+                  {
+                    'serviceName':jQuery('#serviceSelect').val(),
+                    'pools':pools,
+                    'url':ajaxurl
+                  },
+                  {'doOnSuccess':function (json) {
+                      alert(json.response);
+                    }
+                  }
+                );
+                jQuery(this).dialog('close');
+              },
+              "Cancel": function() {
+                jQuery(this).dialog('close');
+              }
+              }
             });
+          });
+          jQuery('#printServiceSelectDialog').dialog('open');
+        },
+        'doOnError':function (json) {
+          alert(json.error);
+        }
+      }
+    );
   }
-}
+};
+
+
+
+
+

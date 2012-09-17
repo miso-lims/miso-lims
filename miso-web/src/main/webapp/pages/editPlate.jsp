@@ -64,7 +64,7 @@
                         <div id="locationBarcodeMenu"
                              onmouseover="mcancelclosetime()"
                              onmouseout="mclosetime()">
-                            <a href="javascript:void(0);" onclick="showPlateLocationChangeDialog(${plate.plateId});">Change
+                            <a href="javascript:void(0);" onclick="Plate.barcode.showPlateLocationChangeDialog(${plate.plateId});">Change
                                 location</a>
                         </div>
                     </li>
@@ -86,7 +86,7 @@
                     <div id="idBarcodeMenu"
                          onmouseover="mcancelclosetime()"
                          onmouseout="mclosetime()">
-                        <a href="javascript:void(0);" onclick="printPlateBarcodes(${plate.plateId});">Print</a>
+                        <a href="javascript:void(0);" onclick="Plate.barcode.printPlateBarcodes(${plate.plateId});">Print</a>
                     </div>
                 </li>
             </ul>
@@ -137,7 +137,7 @@
             <td>
                 <form:input path="creationDate" id="creationdatepicker"/>
                 <script type="text/javascript">
-                    addDatePicker("creationdatepicker");
+                    Utils.ui.addDatePicker("creationdatepicker");
                 </script>
             </td>
         </tr>
@@ -152,7 +152,7 @@
                 <c:when test="${empty plate.plateId or empty plate.plateMaterialType}">
                     <td>Plate Material Type:</td>
                     <td>
-                        <form:radiobuttons id="plateMaterialType" path="plateMaterialType" onchange="getPlateBarcodesByMaterialType(this);"/>
+                        <form:radiobuttons id="plateMaterialType" path="plateMaterialType" onchange="Plate.tagbarcode.getPlateBarcodesByMaterialType(this);"/>
                     </td>
                 </c:when>
                 <c:otherwise>

@@ -21,58 +21,61 @@
  * *********************************************************************
  */
 
-function search(inp, throbber) {
-  var t = jQuery(inp);
-  var id = t.attr('id');
-  jQuery('#' + id + 'result').html('<img src=\"/styles/images/ajax-loader.gif\"/>');
-  Fluxion.doAjax(
-    'dashboard',
-    id,
-    {'str':t.val(), 'url':ajaxurl},
-    {
-      "doOnSuccess":
-            function(json) {
-              if (throbber) {
-                jQuery('#' + id + 'result').html("");
-              }
-
-              if (json.html && json.html !== "") {
-                jQuery('#' + id + 'result').html(json.html);
-              }
-              else {
-                jQuery('#' + id + 'result').html("No matches");
-              }
+var Search = Search || {
+  dashboardSearch : function(inp, throbber) {
+    var t = jQuery(inp);
+    var id = t.attr('id');
+    jQuery('#' + id + 'result').html("<img src='/styles/images/ajax-loader.gif'/>");
+    Fluxion.doAjax(
+      'dashboard',
+      id,
+      {'str':t.val(), 'url':ajaxurl},
+      {
+        "doOnSuccess":
+          function(json) {
+            if (throbber) {
+              jQuery('#' + id + 'result').html("");
             }
-    });
-  return true;
-}
 
-function loadAll() {
-  search(jQuery('#searchProject'), true);
-  search(jQuery('#searchStudy'), true);
-  search(jQuery('#searchExperiment'), true);
-  search(jQuery('#searchRun'), true);
-  search(jQuery('#searchLibrary'), true);
-  search(jQuery('#searchSample'), true);
-}
+            if (!Utils.validation.isNullCheck(json.html)) {
+              jQuery('#' + id + 'result').html(json.html);
+            }
+            else {
+              jQuery('#' + id + 'result').html("No matches");
+            }
+          }
+      });
+    return true;
+  },
 
-function insertResult(id, v) {
-  var i = $(id);
-  i.value = v;
-  $(id + 'result').style.visibility = 'hidden';
-}
+  loadAll : function() {
+    var self = this;
+    self.dashboardSearch(jQuery('#searchProject'), true);
+    self.dashboardSearch(jQuery('#searchStudy'), true);
+    self.dashboardSearch(jQuery('#searchExperiment'), true);
+    self.dashboardSearch(jQuery('#searchRun'), true);
+    self.dashboardSearch(jQuery('#searchLibrary'), true);
+    self.dashboardSearch(jQuery('#searchSample'), true);
+  },
 
-function filterListOnAttribute(input, attr, list) {
-  var func = function(input, attr, list) {
-    var filter = jQuery(input).val();
-    if (filter) {
-      jQuery('#' + list).find("li").not("[" + attr + "*=" + filter + "]").hide();
-      jQuery('#' + list).find("li[" + attr + "*=" + filter + "]").show();
-    }
-    else {
-      jQuery('#' + list).find("li").show();
-    }
-  };
+  insertResult : function(id, v) {
+    var i = $(id);
+    i.value = v;
+    $(id + 'result').style.visibility = 'hidden';
+  },
 
-  timedFunc(func(input, attr, list), 200);
-}
+  filterListOnAttribute : function(input, attr, list) {
+    var func = function(input, attr, list) {
+      var filter = jQuery(input).val();
+      if (filter) {
+        jQuery('#' + list).find("li").not("[" + attr + "*=" + filter + "]").hide();
+        jQuery('#' + list).find("li[" + attr + "*=" + filter + "]").show();
+      }
+      else {
+        jQuery('#' + list).find("li").show();
+      }
+    };
+
+    Utils.timer.timedFunc(func(input, attr, list), 200);
+  }
+};

@@ -62,7 +62,7 @@ public class ContainerControllerHelperService {
     StringBuilder b = new StringBuilder();
     List<String> platformTypes = PlatformType.getKeys();
     for (String p : platformTypes) {
-      b.append("<input type='radio' name='platformTypes' id='platformTypes" + p + "' value='" + p + "' onchange='changeContainerPlatformType(this);'/>");
+      b.append("<input type='radio' name='platformTypes' id='platformTypes" + p + "' value='" + p + "' onchange='Container.ui.changeContainerPlatformType(this);'/>");
       b.append("<label for='platformTypes" + p + "'>" + p + "</label>");
     }
     return JSONUtils.JSONObjectResponse("html", b.toString());
@@ -81,7 +81,7 @@ public class ContainerControllerHelperService {
         session.setAttribute("container_"+cId, lf);
 
         StringBuilder srb = new StringBuilder();
-        srb.append("<select name='sequencer' id='sequencerReference' onchange='populateContainerOptions(this);'>");
+        srb.append("<select name='sequencer' id='sequencerReference' onchange='Container.ui.populateContainerOptions(this);'>");
         srb.append("<option value='0' selected='selected'>Please select...</option>");
         for (SequencerReference sr : requestManager.listSequencerReferencesByPlatformType(pt)) {
           srb.append("<option value='" + sr.getId() + "'>" + sr.getName() + " (" + sr.getPlatform().getInstrumentModel() + ")</option>");
@@ -120,7 +120,7 @@ public class ContainerControllerHelperService {
     b.append("<span id='containerspan'>Containers: ");
     PlatformType pt = sr.getPlatform().getPlatformType();
     for (int i = 0; i < sr.getPlatform().getNumContainers(); i++) {
-      b.append("<input id='container" + (i + 1) + "' name='containerselect' onchange='changeContainer("+sr.getPlatform().getNumContainers()+", \"" + pt.getKey() + "\", " + sr.getId() + ");' type='radio' value='" + (i + 1) + "'/>" + (i + 1));
+      b.append("<input id='container" + (i + 1) + "' name='containerselect' onchange='Container.ui.changeContainer("+sr.getPlatform().getNumContainers()+", \"" + pt.getKey() + "\", " + sr.getId() + ");' type='radio' value='" + (i + 1) + "'/>" + (i + 1));
     }
     b.append("</span><br/>");
     b.append("<div id='containerdiv' class='note ui-corner-all'> </div>");
@@ -162,7 +162,7 @@ public class ContainerControllerHelperService {
     StringBuilder b = new StringBuilder();
     b.append("<h2>Container</h2>");
     b.append("<table class='in'>");
-    b.append("<tr><td>ID:</td><td><button onclick='lookupContainer(this);' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'><input type='text' id='identificationBarcode' name='identificationBarcode'/><input type='hidden' value='on' name='_identificationBarcode'></div></td></tr>");
+    b.append("<tr><td>ID:</td><td><button onclick='Container.lookupContainer(this);' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'><input type='text' id='identificationBarcode' name='identificationBarcode'/><input type='hidden' value='on' name='_identificationBarcode'></div></td></tr>");
     b.append("<tr><td>Location:</td><td><input type='text' id='locationBarcode' name='locationBarcode'/><input type='hidden' value='on' name='_locationBarcode'></td></tr>");
     b.append("<tr><td>Validation:</td><td><input type='text' id='validationBarcode' name='validationBarcode'/><input type='hidden' value='on' name='_validationBarcode'></td></tr>");
     b.append("<tr><td>Paired:</td><td><input type='checkbox' id='paired' name='paired' value='false'/><input type='hidden' value='on' name='_paired'></td></tr>");
@@ -178,7 +178,7 @@ public class ContainerControllerHelperService {
         b.append("<th>Lane No.</th>");
         b.append("<th>Pool</th>");
 
-        b.append("<tr><td>1 </td><td width='90%'><div id='p_div-0'><ul class='runPartitionDroppable' bind='partitions[0].pool' partition='0' ondblclick='populatePartition(this);'></ul></div></td></tr>");
+        b.append("<tr><td>1 </td><td width='90%'><div id='p_div-0'><ul class='runPartitionDroppable' bind='partitions[0].pool' partition='0' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
         b.append("</table>");
         b.append("</div>");
 
@@ -193,14 +193,14 @@ public class ContainerControllerHelperService {
         b.append("<th>Lane No.</th>");
         b.append("<th>Pool</th>");
 
-        b.append("<tr><td>1 </td><td width='90%'><div id='p_div-0'><ul class='runPartitionDroppable' bind='partitions[0].pool' partition='0' ondblclick='populatePartition(this);'></ul></div></td></tr>");
-        b.append("<tr><td>2 </td><td width='90%'><div id='p_div-1'><ul class='runPartitionDroppable' bind='partitions[1].pool' partition='1' ondblclick='populatePartition(this);'></ul></div></td></tr>");
-        b.append("<tr><td>3 </td><td width='90%'><div id='p_div-2'><ul class='runPartitionDroppable' bind='partitions[2].pool' partition='2' ondblclick='populatePartition(this);'></ul></div></td></tr>");
-        b.append("<tr><td>4 </td><td width='90%'><div id='p_div-3'><ul class='runPartitionDroppable' bind='partitions[3].pool' partition='3' ondblclick='populatePartition(this);'></ul></div></td></tr>");
-        b.append("<tr><td>5 </td><td width='90%'><div id='p_div-4'><ul class='runPartitionDroppable' bind='partitions[4].pool' partition='4' ondblclick='populatePartition(this);'></ul></div></td></tr>");
-        b.append("<tr><td>6 </td><td width='90%'><div id='p_div-5'><ul class='runPartitionDroppable' bind='partitions[5].pool' partition='5' ondblclick='populatePartition(this);'></ul></div></td></tr>");
-        b.append("<tr><td>7 </td><td width='90%'><div id='p_div-6'><ul class='runPartitionDroppable' bind='partitions[6].pool' partition='6' ondblclick='populatePartition(this);'></ul></div></td></tr>");
-        b.append("<tr><td>8 </td><td width='90%'><div id='p_div-7'><ul class='runPartitionDroppable' bind='partitions[7].pool' partition='7' ondblclick='populatePartition(this);'></ul></div></td></tr>");
+        b.append("<tr><td>1 </td><td width='90%'><div id='p_div-0'><ul class='runPartitionDroppable' bind='partitions[0].pool' partition='0' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
+        b.append("<tr><td>2 </td><td width='90%'><div id='p_div-1'><ul class='runPartitionDroppable' bind='partitions[1].pool' partition='1' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
+        b.append("<tr><td>3 </td><td width='90%'><div id='p_div-2'><ul class='runPartitionDroppable' bind='partitions[2].pool' partition='2' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
+        b.append("<tr><td>4 </td><td width='90%'><div id='p_div-3'><ul class='runPartitionDroppable' bind='partitions[3].pool' partition='3' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
+        b.append("<tr><td>5 </td><td width='90%'><div id='p_div-4'><ul class='runPartitionDroppable' bind='partitions[4].pool' partition='4' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
+        b.append("<tr><td>6 </td><td width='90%'><div id='p_div-5'><ul class='runPartitionDroppable' bind='partitions[5].pool' partition='5' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
+        b.append("<tr><td>7 </td><td width='90%'><div id='p_div-6'><ul class='runPartitionDroppable' bind='partitions[6].pool' partition='6' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
+        b.append("<tr><td>8 </td><td width='90%'><div id='p_div-7'><ul class='runPartitionDroppable' bind='partitions[7].pool' partition='7' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
         b.append("</table>");
         b.append("</div>");
 
@@ -223,18 +223,18 @@ public class ContainerControllerHelperService {
     StringBuilder b = new StringBuilder();
     b.append("<h2>Container</h2>");
     b.append("<table class='in'>");
-    b.append("<tr><td>ID:</td><td><input type='text' id='identificationBarcode' name='identificationBarcode'/><input type='hidden' value='on' name='_identificationBarcode'><button onclick='lookupContainer(this);' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button></td></tr>");
+    b.append("<tr><td>ID:</td><td><input type='text' id='identificationBarcode' name='identificationBarcode'/><input type='hidden' value='on' name='_identificationBarcode'><button onclick='Container.lookupContainer(this);' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button></td></tr>");
     b.append("<tr><td>Location:</td><td><input type='text' id='locationBarcode' name='locationBarcode'/><input type='hidden' value='on' name='_locationBarcode'></td></tr>");
     b.append("<tr><td>Validation:</td><td><input type='text' id='validationBarcode' name='validationBarcode'/><input type='hidden' value='on' name='_validationBarcode'></td></tr>");
     b.append("<tr><td>Paired:</td><td><input type='checkbox' id='paired' name='paired'/><input type='hidden' value='on' name='_paired'></td></tr>");
     b.append("</table>");
     b.append("<div id='partitionErrorDiv'> </div>");
     b.append("<div id='partitionDiv'>");
-    b.append("<input id='chamber1' name='container0Select' onchange='changeContainerLS454Chamber(this, 0);' type='radio' value='1'/>1 ");
-    b.append("<input id='chamber2' name='container0Select' onchange='changeContainerLS454Chamber(this, 0);' type='radio' value='2'/>2 ");
-    b.append("<input id='chamber4' name='container0Select' onchange='changeContainerLS454Chamber(this, 0);' type='radio' value='4'/>4 ");
-    b.append("<input id='chamber8' name='container0Select' onchange='changeContainerLS454Chamber(this, 0);' type='radio' value='8'/>8 ");
-    b.append("<input id='chamber16' name='container0Select' onchange='changeContainerLS454Chamber(this, 0);' type='radio' value='16'/>16<br/>");
+    b.append("<input id='chamber1' name='container0Select' onchange='Container.ui.changeContainerLS454Chamber(this, 0);' type='radio' value='1'/>1 ");
+    b.append("<input id='chamber2' name='container0Select' onchange='Container.ui.changeContainerLS454Chamber(this, 0);' type='radio' value='2'/>2 ");
+    b.append("<input id='chamber4' name='container0Select' onchange='Container.ui.changeContainerLS454Chamber(this, 0);' type='radio' value='4'/>4 ");
+    b.append("<input id='chamber8' name='container0Select' onchange='Container.ui.changeContainerLS454Chamber(this, 0);' type='radio' value='8'/>8 ");
+    b.append("<input id='chamber16' name='container0Select' onchange='Container.ui.changeContainerLS454Chamber(this, 0);' type='radio' value='16'/>16<br/>");
     b.append("<div id='containerdiv0'> </div>");
     b.append("</div>");
     return JSONUtils.SimpleJSONResponse(b.toString());
@@ -247,7 +247,7 @@ public class ContainerControllerHelperService {
       SequencerReference sr = requestManager.getSequencerReferenceById(seqRefId);
       b.append("<h2>Container</h2>");
       b.append("<table class='in'>");
-      b.append("<tr><td>ID:</td><td><button onclick='lookupContainer(this);' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'><input type='text' id='identificationBarcode' name='identificationBarcode'/><input type='hidden' value='on' name='_identificationBarcode'></div></td></tr>");
+      b.append("<tr><td>ID:</td><td><button onclick='Container.lookupContainer(this);' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'><input type='text' id='identificationBarcode' name='identificationBarcode'/><input type='hidden' value='on' name='_identificationBarcode'></div></td></tr>");
       b.append("<tr><td>Location:</td><td><input type='text' id='locationBarcode' name='locationBarcode'/><input type='hidden' value='on' name='_locationBarcode'></td></tr>");
       b.append("<tr><td>Validation:</td><td><input type='text' id='validationBarcode' name='validationBarcode'/><input type='hidden' value='on' name='_validationBarcode'></td></tr>");
       b.append("<tr><td>Paired:</td><td><input type='checkbox' id='paired' name='paired'/><input type='hidden' value='on' name='_paired'></td></tr>");
@@ -259,12 +259,12 @@ public class ContainerControllerHelperService {
         b.append("<th>Chamber No.</th>");
         b.append("<th>Pool</th>");
 
-        b.append("<tr><td>1 </td><td width='90%'><div id='p_div_0-0' class='barcodeEntryDiv'><ul class='runPartitionDroppable' bind='partitions[0].pool' partition='0' ondblclick='populatePartition(this);'></ul></div></td></tr>");
-        b.append("<tr><td>2 </td><td width='90%'><div id='p_div_0-1' class='barcodeEntryDiv'><ul class='runPartitionDroppable' bind='partitions[1].pool' partition='1' ondblclick='populatePartition(this);'></ul></div></td></tr>");
-        b.append("<tr><td>3 </td><td width='90%'><div id='p_div_0-2' class='barcodeEntryDiv'><ul class='runPartitionDroppable' bind='partitions[2].pool' partition='2' ondblclick='populatePartition(this);'></ul></div></td></tr>");
-        b.append("<tr><td>4 </td><td width='90%'><div id='p_div_0-3' class='barcodeEntryDiv'><ul class='runPartitionDroppable' bind='partitions[3].pool' partition='3' ondblclick='populatePartition(this);'></ul></div></td></tr>");
-        b.append("<tr><td>5 </td><td width='90%'><div id='p_div_0-4' class='barcodeEntryDiv'><ul class='runPartitionDroppable' bind='partitions[4].pool' partition='4' ondblclick='populatePartition(this);'></ul></div></td></tr>");
-        b.append("<tr><td>6 </td><td width='90%'><div id='p_div_0-5' class='barcodeEntryDiv'><ul class='runPartitionDroppable' bind='partitions[5].pool' partition='5' ondblclick='populatePartition(this);'></ul></div></td></tr>");
+        b.append("<tr><td>1 </td><td width='90%'><div id='p_div_0-0' class='barcodeEntryDiv'><ul class='runPartitionDroppable' bind='partitions[0].pool' partition='0' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
+        b.append("<tr><td>2 </td><td width='90%'><div id='p_div_0-1' class='barcodeEntryDiv'><ul class='runPartitionDroppable' bind='partitions[1].pool' partition='1' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
+        b.append("<tr><td>3 </td><td width='90%'><div id='p_div_0-2' class='barcodeEntryDiv'><ul class='runPartitionDroppable' bind='partitions[2].pool' partition='2' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
+        b.append("<tr><td>4 </td><td width='90%'><div id='p_div_0-3' class='barcodeEntryDiv'><ul class='runPartitionDroppable' bind='partitions[3].pool' partition='3' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
+        b.append("<tr><td>5 </td><td width='90%'><div id='p_div_0-4' class='barcodeEntryDiv'><ul class='runPartitionDroppable' bind='partitions[4].pool' partition='4' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
+        b.append("<tr><td>6 </td><td width='90%'><div id='p_div_0-5' class='barcodeEntryDiv'><ul class='runPartitionDroppable' bind='partitions[5].pool' partition='5' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
         b.append("</table>");
 
         SequencerPartitionContainer<SequencerPoolPartition> lf =
@@ -274,10 +274,10 @@ public class ContainerControllerHelperService {
         session.setAttribute("container_"+json.getString("container_cId"), lf);
       }
       else {
-        b.append("<input id='chamber1' name='container0Select' onchange='changeContainerSolidChamber(this, 0);' type='radio' value='1'/>1 ");
-        b.append("<input id='chamber4' name='container0Select' onchange='changeContainerSolidChamber(this, 0);' type='radio' value='4'/>4 ");
-        b.append("<input id='chamber8' name='container0Select' onchange='changeContainerSolidChamber(this, 0);' type='radio' value='8'/>8 ");
-        b.append("<input id='chamber16' name='container0Select' onchange='changeContainerSolidChamber(this, 0);' type='radio' value='16'/>16<br/>");
+        b.append("<input id='chamber1' name='container0Select' onchange='Container.ui.changeContainerSolidChamber(this, 0);' type='radio' value='1'/>1 ");
+        b.append("<input id='chamber4' name='container0Select' onchange='Container.ui.changeContainerSolidChamber(this, 0);' type='radio' value='4'/>4 ");
+        b.append("<input id='chamber8' name='container0Select' onchange='Container.ui.changeContainerSolidChamber(this, 0);' type='radio' value='8'/>8 ");
+        b.append("<input id='chamber16' name='container0Select' onchange='Container.ui.changeContainerSolidChamber(this, 0);' type='radio' value='16'/>16<br/>");
       }
       b.append("<div id='containerdiv0'> </div>");
       b.append("</div>");
@@ -293,21 +293,21 @@ public class ContainerControllerHelperService {
     StringBuilder b = new StringBuilder();
     b.append("<h2>Container</h2>");
     b.append("<table class='in'>");
-    b.append("<tr><td>ID:</td><td><input type='text' id='identificationBarcode' name='identificationBarcode'/><input type='hidden' value='on' name='_identificationBarcode'><button onclick='lookupContainer(this);' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button></td></tr>");
+    b.append("<tr><td>ID:</td><td><input type='text' id='identificationBarcode' name='identificationBarcode'/><input type='hidden' value='on' name='_identificationBarcode'><button onclick='Container.lookupContainer(this);' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button></td></tr>");
     b.append("<tr><td>Location:</td><td><input type='text' id='locationBarcode' name='locationBarcode'/><input type='hidden' value='on' name='_locationBarcode'></td></tr>");
     b.append("<tr><td>Validation:</td><td><input type='text' id='validationBarcode' name='validationBarcode'/><input type='hidden' value='on' name='_validationBarcode'></td></tr>");
     b.append("<tr><td>Paired:</td><td><input type='checkbox' id='paired' name='paired'/><input type='hidden' value='on' name='_paired'></td></tr>");
     b.append("</table>");
     b.append("<div id='partitionErrorDiv'> </div>");
     b.append("<div id='partitionDiv'>");
-    b.append("<input id='chamber1' name='container0Select' onchange='changeContainerPacBioChamber(this, 0);' type='radio' value='1'/>1 ");
-    b.append("<input id='chamber2' name='container0Select' onchange='changeContainerPacBioChamber(this, 0);' type='radio' value='2'/>2 ");
-    b.append("<input id='chamber3' name='container0Select' onchange='changeContainerPacBioChamber(this, 0);' type='radio' value='3'/>3 ");
-    b.append("<input id='chamber4' name='container0Select' onchange='changeContainerPacBioChamber(this, 0);' type='radio' value='4'/>4 ");
-    b.append("<input id='chamber5' name='container0Select' onchange='changeContainerPacBioChamber(this, 0);' type='radio' value='5'/>5 ");
-    b.append("<input id='chamber6' name='container0Select' onchange='changeContainerPacBioChamber(this, 0);' type='radio' value='6'/>6 ");
-    b.append("<input id='chamber7' name='container0Select' onchange='changeContainerPacBioChamber(this, 0);' type='radio' value='7'/>7 ");
-    b.append("<input id='chamber8' name='container0Select' onchange='changeContainerPacBioChamber(this, 0);' type='radio' value='8'/>8<br/>");
+    b.append("<input id='chamber1' name='container0Select' onchange='Container.ui.changeContainerPacBioChamber(this, 0);' type='radio' value='1'/>1 ");
+    b.append("<input id='chamber2' name='container0Select' onchange='Container.ui.changeContainerPacBioChamber(this, 0);' type='radio' value='2'/>2 ");
+    b.append("<input id='chamber3' name='container0Select' onchange='Container.ui.changeContainerPacBioChamber(this, 0);' type='radio' value='3'/>3 ");
+    b.append("<input id='chamber4' name='container0Select' onchange='Container.ui.changeContainerPacBioChamber(this, 0);' type='radio' value='4'/>4 ");
+    b.append("<input id='chamber5' name='container0Select' onchange='Container.ui.changeContainerPacBioChamber(this, 0);' type='radio' value='5'/>5 ");
+    b.append("<input id='chamber6' name='container0Select' onchange='Container.ui.changeContainerPacBioChamber(this, 0);' type='radio' value='6'/>6 ");
+    b.append("<input id='chamber7' name='container0Select' onchange='Container.ui.changeContainerPacBioChamber(this, 0);' type='radio' value='7'/>7 ");
+    b.append("<input id='chamber8' name='container0Select' onchange='Container.ui.changeContainerPacBioChamber(this, 0);' type='radio' value='8'/>8<br/>");
 
     b.append("<div id='containerdiv0'> </div>");
     b.append("</div>");
@@ -353,7 +353,7 @@ public class ContainerControllerHelperService {
 
     for (int i = 0; i < numChambers; i++) {
       b.append("<tr><td>" + (i + 1) + "</td>");
-      b.append("<td width='90%'><div id='p_div_" + container + "-" + i + "' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='partitions[" + i + "].pool' partition='" + i + "' ondblclick='populatePartition(this);'>");
+      b.append("<td width='90%'><div id='p_div_" + container + "-" + i + "' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='partitions[" + i + "].pool' partition='" + i + "' ondblclick='Container.partition.populatePartition(this);'>");
       b.append("</ul></div></td>");
       b.append("</tr>");
     }
@@ -378,7 +378,7 @@ public class ContainerControllerHelperService {
 
     for (int i = 0; i < numChambers; i++) {
       b.append("<tr><td>" + (i + 1) + "</td>");
-      b.append("<td width='90%'><div id='p_div_" + container + "-" + i + "' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='partitions[" + i + "].pool' partition='" + i + "' ondblclick='populatePartition(this);'>");
+      b.append("<td width='90%'><div id='p_div_" + container + "-" + i + "' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='partitions[" + i + "].pool' partition='" + i + "' ondblclick='Container.partition.populatePartition(this);'>");
       b.append("</ul></div></td>");
       b.append("</tr>");
     }
@@ -403,7 +403,7 @@ public class ContainerControllerHelperService {
 
     for (int i = 0; i < numChambers; i++) {
       b.append("<tr><td>"+(i+1)+"</td>");
-      b.append("<td width='90%'><div id='p_div_" + container + "-" + i + "' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='partitions[" + i + "].pool' partition='" + i + "' ondblclick='populatePartition(this);'>");
+      b.append("<td width='90%'><div id='p_div_" + container + "-" + i + "' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='partitions[" + i + "].pool' partition='" + i + "' ondblclick='Container.partition.populatePartition(this);'>");
       b.append("</tr>");
     }
     b.append("</table>");
@@ -469,13 +469,13 @@ public class ContainerControllerHelperService {
           }
         }
         b.append("</select>");
-        b.append("<input id='studySelectButton-"+partition+"_"+p.getPoolId()+"' type='button' onclick=\"selectContainerStudy('" + partition + "', " + p.getPoolId() + ");\" class=\"ui-state-default ui-corner-all\" value='Select Study'/>");
+        b.append("<input id='studySelectButton-"+partition+"_"+p.getPoolId()+"' type='button' onclick=\"Container.partition.selectContainerStudy('" + partition + "', " + p.getPoolId() + ");\" class=\"ui-state-default ui-corner-all\" value='Select Study'/>");
         b.append("</div></div>");
       }
 
       b.append("<input type='hidden' name='partitions[" + partition + "].pool' id='pId" + p.getPoolId() + "' value='" + p.getPoolId() + "'/></div>");
       b.append("<div style='position: absolute; bottom: 0; right: 0; font-size: 24px; font-weight: bold; color:#BBBBBB'>" + p.getPlatformType().getKey() + "</div>");
-      b.append("<span style='position: absolute; top: 0; right: 0;' onclick='confirmPoolRemove(this);' class='float-right ui-icon ui-icon-circle-close'></span>");
+      b.append("<span style='position: absolute; top: 0; right: 0;' onclick='Container.pool.confirmPoolRemove(this);' class='float-right ui-icon ui-icon-circle-close'></span>");
       b.append("</div>");
     }
     catch (IOException e) {
@@ -576,7 +576,7 @@ public class ContainerControllerHelperService {
                 confirm.put(p.getPartitionNumber(), "Empty");
 
                 sb.append("<div id='p_div_" + (p.getPartitionNumber() - 1) + "' class='elementListDroppableDiv'>");
-                sb.append("<ul class='runPartitionDroppable' bind='partitions[" + (p.getPartitionNumber() - 1) + "].pool' partition='" + (p.getPartitionNumber() - 1) + "' ondblclick='populatePartition(this);'></ul>");
+                sb.append("<ul class='runPartitionDroppable' bind='partitions[" + (p.getPartitionNumber() - 1) + "].pool' partition='" + (p.getPartitionNumber() - 1) + "' ondblclick='Container.partition.populatePartition(this);'></ul>");
                 sb.append("</div>");
               }
               sb.append("</td>");

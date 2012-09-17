@@ -32,7 +32,7 @@
         Kit Descriptor
         <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
     </h1>
-    <div class="sectionDivider" onclick="toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
+    <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
         <div id="note_arrowclick" class="toggleLeft"></div>
     </div>
     <div id="notediv" class="note" style="display:none;">Kit Descriptor contains information about Consumable

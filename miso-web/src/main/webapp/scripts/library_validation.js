@@ -22,12 +22,24 @@
  */
 
 function validate_library(form) {
+  Fluxion.doAjax(
+    'libraryControllerHelperService',
+    'validateLibraryAlias',
+  {'alias':jQuery('#alias').val(), 'url':ajaxurl},
+  {
+    'doOnSuccess': function(json) { if (json.html === "OK") { process_validate_library(form); }},
+    'doOnError':function(json) { alert(json.error); }
+  }
+  );
+}
+
+function process_validate_library(form) {
   var ok = true;
   var error = "Please correct the following error(s):\n\n";
 
   if (jQuery(':text.validateable').length > 0) {
     jQuery(':text.validateable').each(function() {
-      var result = validate_input_field(this,'Library',ok);
+      var result = Utils.validation.validate_input_field(this,'Library',ok);
       ok = result.okstatus;
       error += result.errormsg;
     })
@@ -35,6 +47,9 @@ function validate_library(form) {
 
   if (!ok) {
     alert(error);
+  }
+  else {
+    form.submit();
   }
 
   return ok;

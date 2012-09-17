@@ -74,7 +74,7 @@
         </tbody>
     </table>
 
-    <div class="sectionDivider" onclick="toggleLeftInfo(jQuery('#ipu_arrowclick'), 'ipudiv');"  style="font: bold 80% Helvetica;">Used pools
+    <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#ipu_arrowclick'), 'ipudiv');"  style="font: bold 80% Helvetica;">Used pools
         <div id="ipu_arrowclick" class="toggleLeft"></div>
     </div>
     <div id="ipudiv" class="simplebox ui-corner-all" style="display:none;">
@@ -159,7 +159,7 @@
         </tbody>
     </table>
 
-    <div class="sectionDivider" onclick="toggleLeftInfo(jQuery('#lpu_arrowclick'), 'lpudiv');" style="font: bold 80% Helvetica;">Used pools
+    <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#lpu_arrowclick'), 'lpudiv');" style="font: bold 80% Helvetica;">Used pools
         <div id="lpu_arrowclick" class="toggleLeft"></div>
     </div>
     <div id="lpudiv" class="simplebox ui-corner-all" style="display:none;">
@@ -244,7 +244,7 @@
         </tbody>
     </table>
 
-    <div class="sectionDivider" onclick="toggleLeftInfo(jQuery('#spu_arrowclick'), 'spudiv');" style="font: bold 80% Helvetica;">Used pools
+    <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#spu_arrowclick'), 'spudiv');" style="font: bold 80% Helvetica;">Used pools
         <div id="spu_arrowclick" class="toggleLeft"></div>
     </div>
     <div id="spudiv" class="simplebox ui-corner-all" style="display:none;">

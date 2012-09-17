@@ -79,13 +79,6 @@ public interface Library extends SecurableByProfile, Comparable, Barcodable, Loc
   public void setLibraryId(Long libraryId);
 
   /**
-   * Returns the name of this Library object.
-   *
-   * @return String name.
-   */
-  public String getName();
-
-  /**
    * Sets the name of this Library object.
    *
    * @param name name.

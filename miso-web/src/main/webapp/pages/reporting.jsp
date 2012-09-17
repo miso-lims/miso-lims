@@ -23,36 +23,6 @@
 
 <%@ include file="../header.jsp" %>
 
-
-<%--   Old Reporting Form
-<form:form method="POST" autocomplete="off">
-<h1>Reports</h1>
-
-<div class="sectionDivider" onclick="toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
-    <div id="note_arrowclick" class="toggleLeft"></div>
-</div>
-<div id="notediv" class="note" style="display:none;">Reports can be generated using the selection criteria
-    below, or by selecting a previously saved reporting query file.
-</div>
-<a href="javascript:void(0);" onclick='processQueryParameters()'>Process Query Parameters</a>
-<h2>Select parameters</h2>
-
-<div id="tablelist" class="checklist">
-    <c:forEach items="${tables}" var="table">
-        <input type="checkbox" id="table_${table}" value="${table}"
-               onclick="toggleAddTableToQuerySet(this);"/>${table}<br/>
-    </c:forEach>
-</div>
-
-<div id="querydiv" class="note">
-    <h2>Selected query parameters</h2>
-
-</div>
-
-<br/>
-
-<h2>Select a previously saved query</h2>
-</form:form>    --%>
 <h1>
   <div id="title">Reports</div>
 </h1>
@@ -73,25 +43,9 @@
 
 
 <script type="text/javascript">
-  checked = false;
-  // check/uncheck all
-  function checkAll(field) {
-    if (checked == false) {
-      checked = true
-    }
-    else {
-      checked = false
-    }
-
-    for (i = 0; i < field.length; i++)
-      field[i].checked = checked;
-  }
-  //shift check
-
   jQuery(document).ready(function() {
-    prepareTable();
+    Reports.ui.prepareTable();
   });
-
 </script>
 
 <%@ include file="../footer.jsp" %>

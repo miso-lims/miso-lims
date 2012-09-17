@@ -50,14 +50,16 @@
 <div id="tab-1">
 </c:if>
 
-<form:form method="POST" commandName="library" autocomplete="off" onsubmit="return validate_library(this);">
+<form:form method="POST" commandName="library" autocomplete="off" acceptCharset="utf-8">
 <sessionConversation:insertSessionConversationId attributeName="library"/>
 <h1>
     <c:choose>
         <c:when test="${not empty library.libraryId}">Edit</c:when>
         <c:otherwise>Create</c:otherwise>
     </c:choose> Library
-    <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
+    <button type="button" class="fg-button ui-state-default ui-corner-all"
+            onclick="return validate_library(this.form);">Save
+    </button>
 </h1>
 <div class="breadcrumbs">
     <ul>
@@ -86,7 +88,7 @@
         </li>
     </ul>
 </div>
-<div class="sectionDivider" onclick="toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
+<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
     <div id="note_arrowclick" class="toggleLeft"></div>
 </div>
 <div id="notediv" class="note" style="display:none;">A Library is the first step in constructing sequenceable
@@ -111,7 +113,7 @@
                         <div id="locationBarcodeMenu"
                              onmouseover="mcancelclosetime()"
                              onmouseout="mclosetime()">
-                            <a href="javascript:void(0);" onclick="showLibraryLocationChangeDialog(${library.libraryId});">Change location</a>
+                            <a href="javascript:void(0);" onclick="Library.barcode.showLibraryLocationChangeDialog(${library.libraryId});">Change location</a>
                         </div>
                     </li>
                 </ul>
@@ -130,7 +132,7 @@
                   <div id="idBarcodeMenu"
                        onmouseover="mcancelclosetime()"
                        onmouseout="mclosetime()">
-                      <a href="javascript:void(0);" onclick="printLibraryBarcodes(${library.libraryId});">Print</a>
+                      <a href="javascript:void(0);" onclick="Library.barcode.printLibraryBarcodes(${library.libraryId});">Print</a>
                   </div>
               </li>
           </ul>
@@ -238,12 +240,12 @@
             <td>Platform - Library Type:</td>
             <td>
                 <form:select id="platformNames" path="platformName" items="${platformNames}"
-                             onchange="changePlatformName(this);"/>
+                             onchange="Library.ui.changePlatformName(this);"/>
                 <form:select id="libraryTypes" path="libraryType"/>
             </td>
             <script type="text/javascript">
                 jQuery(document).ready(function() {
-                    changePlatformName(jQuery("#platformNames"));
+                    Library.ui.changePlatformName(jQuery("#platformNames"));
                 });
             </script>
         </c:when>
@@ -288,7 +290,7 @@
     <c:when test="${empty library.libraryId}">
       <td>Barcoding Strategy:</td>
       <td>
-        <select name='tagBarcodeStrategies' id='tagBarcodeStrategies' onchange='populateAvailableBarcodesForStrategy(this);'>
+        <select name='tagBarcodeStrategies' id='tagBarcodeStrategies' onchange='Library.tagbarcode.populateAvailableBarcodesForStrategy(this);'>
           <option value="">Please select a platform...</option>
         </select>
       </td>
@@ -298,7 +300,7 @@
       <td>
         <c:choose>
           <c:when test="${empty library.tagBarcodes}">
-            <select id="tagBarcodeStrategies" id='tagBarcodeStrategies' onchange="populateAvailableBarcodesForStrategy(this);">
+            <select id="tagBarcodeStrategies" id='tagBarcodeStrategies' onchange="Library.tagbarcode.populateAvailableBarcodesForStrategy(this);">
               <option selected="selected" value="">No barcoding</option>
               <c:forEach items="${availableTagBarcodeStrategies}" var="tagBarcodeStrategy">
                 <option value="${tagBarcodeStrategy.name}">${tagBarcodeStrategy.name}</option>
@@ -358,7 +360,7 @@
 </c:choose>
 
 <c:if test="${not empty library.libraryId}">
-    <div class="sectionDivider" onclick="toggleLeftInfo(jQuery('#notes_arrowclick'), 'notes');">Notes
+    <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#notes_arrowclick'), 'notes');">Notes
         <div id="notes_arrowclick" class="toggleLeftDown"></div>
     </div>
     <div id="notes">
@@ -372,7 +374,7 @@
                 <div id="notesmenu"
                      onmouseover="mcancelclosetime()"
                      onmouseout="mclosetime()">
-                    <a onclick="showLibraryNoteDialog(${library.libraryId});" href="javascript:void(0);" class="add">Add
+                    <a onclick="Library.ui.showLibraryNoteDialog(${library.libraryId});" href="javascript:void(0);" class="add">Add
                         Note</a>
                 </div>
             </li>
@@ -408,7 +410,7 @@
              onmouseover="mcancelclosetime()"
              onmouseout="mclosetime()">
             <a href='javascript:void(0);' class="add"
-               onclick="insertLibraryQCRow(${library.libraryId}); return false;">Add Library QC</a>
+               onclick="Library.qc.insertLibraryQCRow(${library.libraryId}); return false;">Add Library QC</a>
         </div>
     </li>
 </ul>
@@ -450,7 +452,7 @@
                       <td id="insert${qc.qcId}">${qc.insertSize} bp</td>
                           <c:if test="${(library.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                                           or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-                              <td id="edit${qc.qcId}" align="center"><a href="javascript:void(0);" onclick="changeLibraryQCRow('${qc.qcId}','${library.libraryId}')">
+                              <td id="edit${qc.qcId}" align="center"><a href="javascript:void(0);" onclick="Library.qc.changeLibraryQCRow('${qc.qcId}','${library.libraryId}')">
                                   <span class="ui-icon ui-icon-pencil"></span></a></td>
                           </c:if>
                   </tr>
@@ -472,7 +474,7 @@
                   action="<c:url value="/miso/upload/libraryqc"/>"
                   enctype="multipart/form-data"
                   target="target_upload"
-                  onsubmit="fileUploadProgress('ajax_upload_form', 'statusdiv', pageReload);">
+                  onsubmit="Utils.fileUpload.fileUploadProgress('ajax_upload_form', 'statusdiv', Utils.page.pageReload);">
                 <input type="hidden" name="libraryId" value="${library.libraryId}"/><br/>
                 <input type="file" name="file"/><br/>
                 <button type="submit" class="br-button ui-state-default ui-corner-all">Upload</button>
@@ -520,7 +522,7 @@
              onmouseover="mcancelclosetime()"
              onmouseout="mclosetime()">
             <a href='javascript:void(0);' class="add"
-               onclick="insertLibraryDilutionRow(${library.libraryId}); return false;">Add Library Dilution</a>
+               onclick="Library.dilution.insertLibraryDilutionRow(${library.libraryId}); return false;">Add Library Dilution</a>
             <c:if test="${not empty library.libraryDilutions}">
               <a href='<c:url value="/miso/poolwizard/new/${library.sample.project.projectId}"/>'>Create Pools</a>
             </c:if>
@@ -570,7 +572,7 @@
                                       <div id="dil${dil.dilutionId}IdBarcodeMenu"
                                            onmouseover="mcancelclosetime()"
                                            onmouseout="mclosetime()">
-                                          <a href="javascript:void(0);" onclick="printDilutionBarcode(${dil.dilutionId}, '${library.platformName}');">Print</a>
+                                          <a href="javascript:void(0);" onclick="Library.barcode.printDilutionBarcode(${dil.dilutionId}, '${library.platformName}');">Print</a>
                                       </div>
                                   </li>
                               </ul>
@@ -597,13 +599,13 @@
                       <c:if test="${(sample.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                                       or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
                           <td id="edit${dil.dilutionId}" align="center"><a href="javascript:void(0);"
-                                                                    onclick="changeLibraryDilutionRow('${dil.dilutionId}','${library.libraryId}')">
+                                                                    onclick="Library.dilution.changeLibraryDilutionRow('${dil.dilutionId}','${library.libraryId}')">
                               <span class="ui-icon ui-icon-pencil"></span></a></td>
                       </c:if>
                       <%-- <td>${dil.locationBarcode}</td> --%>
                       <c:choose>
                           <c:when test="${library.platformName ne 'Illumina'}">
-                              <td><a href="javascript:void(0);" onclick="insertEmPcrRow(${dil.dilutionId});">Add emPCR</a>
+                              <td><a href="javascript:void(0);" onclick="Library.empcr.insertEmPcrRow(${dil.dilutionId});">Add emPCR</a>
                               </td>
                           </c:when>
                           <c:otherwise>
@@ -667,7 +669,7 @@
                         <td>${empcr.pcrCreator}</td>
                         <td><fmt:formatDate value="${empcr.creationDate}"/></td>
                         <td>${empcr.concentration} ${emPCRUnits}</td>
-                        <td><a href="javascript:void(0);" onclick="insertEmPcrDilutionRow(${empcr.pcrId});">Add emPCR
+                        <td><a href="javascript:void(0);" onclick="Library.empcr.insertEmPcrDilutionRow(${empcr.pcrId});">Add emPCR
                             Dilution</a>
                         </td>
                     </tr>
@@ -782,26 +784,26 @@
         <thead>
         <tr>
             <th>Select <span sel="none" header="select" class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
-                             onclick="toggleSelectAll('#cinput', this);"></span></th>
+                             onclick="DatatableUtils.toggleSelectAll('#cinput', this);"></span></th>
             <th>Sample</th>
             <th>Description <span header="description" class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
-                                  onclick="fillDown('#cinput', this);"></span></th>
+                                  onclick="DatatableUtils.fillDown('#cinput', this);"></span></th>
             <th>Paired <span header="paired" class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
-                             onclick="fillDown('#cinput', this);"></span></th>
+                             onclick="DatatableUtils.fillDown('#cinput', this);"></span></th>
             <th>Platform <span header="platform" class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
-                               onclick="fillDown('#cinput', this);"></span></th>
+                               onclick="DatatableUtils.fillDown('#cinput', this);"></span></th>
             <th>Type <span header="libraryType" class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
-                           onclick="fillDown('#cinput', this);"></span></th>
+                           onclick="DatatableUtils.fillDown('#cinput', this);"></span></th>
             <th>Selection <span header="selectionType" class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
-                                onclick="fillDown('#cinput', this);"></span></th>
+                                onclick="DatatableUtils.fillDown('#cinput', this);"></span></th>
             <th>Strategy <span header="strategyType" class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
-                               onclick="fillDown('#cinput', this);"></span></th>
+                               onclick="DatatableUtils.fillDown('#cinput', this);"></span></th>
             <th>Barcode Kit<span header="barcodeStrategy" class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
-                               onclick="fillDownTagBarcodeStrategySelects('#cinput', this);"></span></th>
+                               onclick="Library.ui.fillDownTagBarcodeStrategySelects('#cinput', this);"></span></th>
             <th>Tag Barcodes<span header="tagBarcodes" class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
-                               onclick="fillDownTagBarcodeSelects('#cinput', this);"></span></th>
+                               onclick="Library.ui.fillDownTagBarcodeSelects('#cinput', this);"></span></th>
             <th>Location Barcode <span header="locationBarcode" class="ui-icon ui-icon-arrowstop-1-s"
-                                       style="float:right" onclick="fillDown('#cinput', this);"></span></th>
+                                       style="float:right" onclick="DatatableUtils.fillDown('#cinput', this);"></span></th>
         </tr>
         </thead>
         <tbody>
@@ -981,10 +983,10 @@ function setEditables(datatable) {
     {
         loadurl : '../../rest/library/librarytypes',
         loaddata : function (value, settings) {
-          collapseInputs('#cinput');
+          DatatableUtils.collapseInputs('#cinput');
           var row = datatable.fnGetPosition(this)[0];
           var platform = datatable.fnGetData(row, 4);
-          if (!isNullCheck(platform)) {
+          if (!Utils.validation.isNullCheck(platform)) {
             return {'platform':platform};
           }
           else {
@@ -1056,10 +1058,10 @@ function setEditables(datatable) {
     {
         loadurl : '../../rest/library/barcodeStrategies',
         loaddata : function (value, settings) {
-          collapseInputs('#cinput');
+          DatatableUtils.collapseInputs('#cinput');
           var row = datatable.fnGetPosition(this)[0];
           var platform = datatable.fnGetData(row, 4);
-          if (!isNullCheck(platform)) {
+          if (!Utils.validation.isNullCheck(platform)) {
             return {'platform':platform};
           }
           else {
@@ -1102,7 +1104,7 @@ function setEditables(datatable) {
                 loaddata : function (value, settings) {
                   var ret = {};
                   ret["position"] = jQuery(this).attr("position");
-                  if (!isNullCheck(sValue)) {
+                  if (!Utils.validation.isNullCheck(sValue)) {
                     ret['barcodeStrategy'] = sValue;
                   }
                   else {
@@ -1162,10 +1164,10 @@ function submitBulkLibraries() {
     jQuery('#bulkLibSaveButton').attr('disabled', 'disabled');
     jQuery('#bulkLibSaveButton').html("Processing...");
 
-    collapseInputs('#cinput');
+    DatatableUtils.collapseInputs('#cinput');
 
     var table = jQuery('#cinput').dataTable();
-    var nodes = fnGetSelected(table);
+    var nodes = DatatableUtils.fnGetSelected(table);
     var ok = true;
     var arr = [];
     for (var i = 0; i < nodes.length; i++) {
@@ -1174,11 +1176,11 @@ function submitBulkLibraries() {
             obj[headers[j]] = jQuery(nodes[i].cells[j]).text();
         }
 
-        if (isNullCheck(obj["description"]) ||
-            isNullCheck(obj["platform"]) ||
-            isNullCheck(obj["libraryType"])||
-            isNullCheck(obj["selectionType"])||
-            isNullCheck(obj["strategyType"])) {
+        if (Utils.validation.isNullCheck(obj["description"]) ||
+            Utils.validation.isNullCheck(obj["platform"]) ||
+            Utils.validation.isNullCheck(obj["libraryType"])||
+            Utils.validation.isNullCheck(obj["selectionType"])||
+            Utils.validation.isNullCheck(obj["strategyType"])) {
             ok = false;
             jQuery(nodes[i]).css('background', '#EE9966');
         }

@@ -25,14 +25,14 @@ function validate_container(form) {
   var ok = true;
   var error = "Please correct the following error(s):\n\n";
 
-  if (isNullCheck(jQuery('#identificationBarcode').val())) {
+  if (Utils.validation.isNullCheck(jQuery('#identificationBarcode').val())) {
     ok = false;
     error += "You have not entered an ID barcode for the Container.\n";
   }
 
   if (jQuery(':text.validateable').length > 0) {
     jQuery(':text.validateable').each(function() {
-      var result = validate_input_field(this, 'Container', ok);
+      var result = Utils.validation.validate_input_field(this, 'Container', ok);
       ok = result.okstatus;
       error += result.errormsg;
     })

@@ -99,8 +99,8 @@ public class PoolControllerHelperService {
       }
     }
     sb.append("</div>");
-    sb.append("<a onclick='checkAll(\"importdilslist\"); return false;' href='javascript:void(0);'>All</a> " +
-              "/ <a onclick='uncheckAll(\"importdilslist\"); return false;' href='javascript:void(0);'>None</a>");
+    sb.append("<a onclick='Utils.ui.checkAll(\"importdilslist\"); return false;' href='javascript:void(0);'>All</a> " +
+              "/ <a onclick='Utils.ui.uncheckAll(\"importdilslist\"); return false;' href='javascript:void(0);'>None</a>");
     sb.append("<br/><button type='submit' class='br-button ui-state-default ui-corner-all'>Use</button>");
     return sb.toString();
   }
@@ -118,8 +118,8 @@ public class PoolControllerHelperService {
       }
     }
     sb.append("</div>");
-    sb.append("<a onclick='checkAll(\"importdilslist\"); return false;' href='javascript:void(0);'>All</a> " +
-              "/ <a onclick='uncheckAll(\"importdilslist\"); return false;' href='javascript:void(0);'>None</a>");
+    sb.append("<a onclick='Utils.ui.checkAll(\"importdilslist\"); return false;' href='javascript:void(0);'>All</a> " +
+              "/ <a onclick='Utils.ui.uncheckAll(\"importdilslist\"); return false;' href='javascript:void(0);'>None</a>");
     sb.append("<br/><button type='submit' class='br-button ui-state-default ui-corner-all'>Use</button>");
     return sb.toString();
   }
@@ -397,7 +397,7 @@ public class PoolControllerHelperService {
                 (e.getStudy().getAlias().toLowerCase().contains(str) || e.getStudy().getName().toLowerCase().contains(str)) ||
                 (e.getStudy().getProject().getAlias().toLowerCase().contains(str) || e.getStudy().getProject().getName().toLowerCase().contains(str))) {
               b.append("<div onmouseover=\"this.className='autocompleteboxhighlight'\" onmouseout=\"this.className='autocompletebox'\" class=\"autocompletebox\"" +
-                       " onclick=\"poolSearchSelectExperiment('" + e.getExperimentId() + "', '" + e.getName() + "')\">" +
+                       " onclick=\"Pool.search.poolSearchSelectExperiment('" + e.getExperimentId() + "', '" + e.getName() + "')\">" +
                        "<b>Experiment:</b> " + expName + "<br/>" +
                        "<b>Description:</b> " + e.getDescription() + "<br/>" +
                        "<b>Project:</b> " + e.getStudy().getProject().getAlias() + "<br/>" +
@@ -441,7 +441,7 @@ public class PoolControllerHelperService {
               (d.getLibrary().getSample().getAlias().toLowerCase().contains(str) || d.getLibrary().getSample().getName().toLowerCase().contains(str))) {
           */
             b.append("<div onmouseover=\"this.className='autocompleteboxhighlight'\" onmouseout=\"this.className='autocompletebox'\" class=\"autocompletebox\"" +
-                     " onclick=\"poolSearchSelectDilution('" + d.getDilutionId() + "', '" + d.getName() + "')\">" +
+                     " onclick=\"Pool.search.poolSearchSelectDilution('" + d.getDilutionId() + "', '" + d.getName() + "')\">" +
                      "<b>Dilution: " + d.getName() + "</b><br/>" +
                      "<b>Library: " + d.getLibrary().getAlias() + "</b><br/>" +
                      "<b>Sample: " + d.getLibrary().getSample().getAlias() + "</b><br/>" +
@@ -484,7 +484,7 @@ public class PoolControllerHelperService {
               (d.getLibrary().getSample().getAlias().toLowerCase().contains(str) || d.getLibrary().getSample().getName().toLowerCase().contains(str))) {
           */
             b.append("<div onmouseover=\"this.className='autocompleteboxhighlight'\" onmouseout=\"this.className='autocompletebox'\" class=\"autocompletebox\"" +
-                     " onclick=\"poolSearchSelectDilution('" + d.getDilutionId() + "', '" + d.getName() + "')\">" +
+                     " onclick=\"Pool.search.poolSearchSelectDilution('" + d.getDilutionId() + "', '" + d.getName() + "')\">" +
                      "<b>Dilution: " + d.getName() + "</b><br/>" +
                      "<b>Library: " + d.getLibrary().getAlias() + "</b><br/>" +
                      "<b>Sample: " + d.getLibrary().getSample().getAlias() + "</b><br/>" +
@@ -538,7 +538,7 @@ public class PoolControllerHelperService {
             }
           }
           sb.append("</select>");
-          sb.append("<input id='studySelectButton-"+partition+"_"+p.getPoolId()+"' type='button' onclick=\"selectStudy('" + partition + "', " + p.getPoolId() + "," + project.getProjectId() + ");\" class=\"ui-state-default ui-corner-all\" value='Select Study'/>");
+          sb.append("<input id='studySelectButton-"+partition+"_"+p.getPoolId()+"' type='button' onclick=\"Run.container.selectStudy('" + partition + "', " + p.getPoolId() + "," + project.getProjectId() + ");\" class=\"ui-state-default ui-corner-all\" value='Select Study'/>");
           sb.append("</div><br/>");
         }
         sb.append("</div>");

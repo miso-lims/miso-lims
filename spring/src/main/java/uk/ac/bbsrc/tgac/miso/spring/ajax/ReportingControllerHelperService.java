@@ -157,7 +157,7 @@ public class ReportingControllerHelperService {
 
 
       if (json.has("reportType") && !json.get("reportType").equals("")) {
-        b.append("<input type=\"text\" onkeyup=\"timedFunc(reportSearch(this), 300);\" size=\"20\" id=\"search" + json.get("reportType") + "\" name=\"search" + json.get("reportType") + "\"/>");
+        b.append("<input type=\"text\" onkeyup=\"Utils.timer.timedFunc(reportSearch(this), 300);\" size=\"20\" id=\"search" + json.get("reportType") + "\" name=\"search" + json.get("reportType") + "\"/>");
         b.append("<form id=\"reportform\" name=\"reportform\" method=\"POST\" >");
         b.append("<button type=\"button\" id=\"generateReportButton\" class=\"fg-button ui-state-default ui-corner-all\"  onclick=\"generateReport('reportform');\">Generate Report</button><br/>");
         b.append("<input type=\"hidden\" name=\"reportType\" value=\"" + json.get("reportType") + "\"/>");
@@ -168,7 +168,7 @@ public class ReportingControllerHelperService {
           b.append("<table class=\"list\" id=\"table\">");
           b.append("<thead>\n" +
                    "    <tr>\n" +
-                   "        <th><input class=\"chkbox\" type=\"checkbox\" onclick=\"checkAll(document.reportform.ids)\"/> All</th>\n" +
+                   "        <th><input class=\"chkbox\" type=\"checkbox\" onclick=\"Utils.ui.checkAll(document.reportform.ids)\"/> All</th>\n" +
                    "        <th>Project Name</th>\n" +
                    "        <th>Project Alias</th>\n" +
                    "        <th>Project Description</th>\n" +
@@ -185,7 +185,7 @@ public class ReportingControllerHelperService {
           b.append("<table class=\"list\" id=\"table\">");
           b.append("<thead>\n" +
                    "    <tr>\n" +
-                   "        <th><input class=\"chkbox\" type=\"checkbox\" onClick=\"checkAll(document.reportform.ids)\"/> All</th>\n" +
+                   "        <th><input class=\"chkbox\" type=\"checkbox\" onClick=\"Utils.ui.checkAll(document.reportform.ids)\"/> All</th>\n" +
                    "        <th>Sample Name</th>\n" +
                    "        <th>Sample Alias</th>\n" +
                    "        <th>Sample Description</th>\n" +
@@ -202,7 +202,7 @@ public class ReportingControllerHelperService {
           b.append("<table class=\"list\" id=\"table\">");
           b.append("<thead>\n" +
                    "    <tr>\n" +
-                   "        <th><input class=\"chkbox\" type=\"checkbox\" onClick=\"checkAll(document.reportform.ids)\"/> All</th>\n" +
+                   "        <th><input class=\"chkbox\" type=\"checkbox\" onClick=\"Utils.ui.checkAll(document.reportform.ids)\"/> All</th>\n" +
                    "        <th>Run Name</th>\n" +
                    "        <th>Run Alias</th>\n" +
                   // "        <th>Run Description</th>\n" +

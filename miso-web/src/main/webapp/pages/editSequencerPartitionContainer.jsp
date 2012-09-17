@@ -96,10 +96,10 @@
                      onmouseover="mcancelclosetime()"
                      onmouseout="mclosetime()">
                   <a href="javascript:void(0);"
-                     onclick="generateCasava17DemultiplexCSV(${container.containerId});">Demultiplex
+                     onclick="Container.generateCasava17DemultiplexCSV(${container.containerId});">Demultiplex
                     CSV (pre-1.8)</a>
                   <a href="javascript:void(0);"
-                     onclick="generateCasava18DemultiplexCSV(${container.containerId});">Demultiplex
+                     onclick="Container.generateCasava18DemultiplexCSV(${container.containerId});">Demultiplex
                     CSV (1.8+)</a>
                 </div>
               </li>
@@ -112,7 +112,7 @@
                 <c:when test="${empty container.identificationBarcode}">
                   <td>ID Barcode:</td>
                   <td>
-                    <button onclick="lookupContainer(this);" type="button" class="right-button ui-state-default ui-corner-all">Lookup</button>
+                    <button onclick="Container.lookupContainer(this);" type="button" class="right-button ui-state-default ui-corner-all">Lookup</button>
                     <div style="overflow: hidden">
                       <form:input path="identificationBarcode"/>
                     </div>
@@ -223,7 +223,7 @@
                       <c:otherwise>
                         <div id="p_div_${partitionCount.index}"
                              class="elementListDroppableDiv">
-                          <ul class='runPartitionDroppable' bind='partitions[${partitionCount.index}].pool' partition='${partitionCount.index}' ondblclick='populatePartition(this);'/></ul>
+                          <ul class='runPartitionDroppable' bind='partitions[${partitionCount.index}].pool' partition='${partitionCount.index}' ondblclick='Container.partition.populatePartition(this);'/></ul>
                         </div>
                       </c:otherwise>
                     </c:choose>
@@ -246,7 +246,7 @@
 <script type="text/javascript">
   <c:if test="${empty container.containerId or empty container.platformType}">
     jQuery(document).ready(function() {
-      populatePlatformTypes();
+      Container.ui.populatePlatformTypes();
     });
   </c:if>
 </script>

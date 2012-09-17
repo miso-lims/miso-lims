@@ -23,7 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
-import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -32,24 +31,17 @@ import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaPool;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ls454.LS454Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.solid.SolidPool;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  * Created by IntelliJ IDEA.
@@ -180,7 +172,7 @@ public class ExperimentWizardControllerHelperService {
     String newidstr = json.get("newid").toString();
     Long newId = Long.parseLong(newidstr);
     String html =
-            "            <div id=\"new" + (newId + 1) + "\"><a href=\"#\" class=\"add\" onclick=\"addExperimentForm(" + (newId + 1) + ");\">Add a new experiment</a>\n" +
+            "            <div id=\"new" + (newId + 1) + "\"><a href=\"#\" class=\"add\" onclick=\"Experiment.ui.addExperimentForm(" + (newId + 1) + ");\">Add a new experiment</a>\n" +
             "                   </div><br/>" +
             "<div class=\"experimentwizard ui-corner-all\" id=\"exp" + newId + "\">" +
             "<table class=\"in\">\n" +
@@ -188,7 +180,7 @@ public class ExperimentWizardControllerHelperService {
             "                    <input type=\"hidden\" class=\"expids\" name=\"expids\" value=\"" + newId + "\"/>" +
             "                    <td class=\"h\">Title:</td>\n" +
             "                    <td><input type=\"text\" id=\"title" + newId + "\" class=\"needcheck\" name=\"title" + newId + "\"/>" +
-            "<span onclick=\"confirmRemoveExperiment(" + newId + ");\" class=\"float-right ui-icon ui-icon-circle-close\" style=\"cursor:pointer;\"></span>\n" +
+            "<span onclick=\"Experiment.ui.confirmRemoveExperiment(" + newId + ");\" class=\"float-right ui-icon ui-icon-circle-close\" style=\"cursor:pointer;\"></span>\n" +
             "                </td></tr>\n" +
             "                <tr>\n" +
             "                    <td class=\"h\">Alias:</td>\n" +
@@ -200,13 +192,16 @@ public class ExperimentWizardControllerHelperService {
             "                </tr>\n" +
             "                <tr>\n" +
             "                    <td>Platform:</td>\n" +
-            "                    <td><select name=\"platform" + newId + "\" onchange=\"loadPoolsbyPlatform(this, " + newId + ");\">\n" +
+            "                    <td><select name=\"platform" + newId + "\" onchange=\"Experiment.pool.loadPoolsByPlatform(this, " + newId + ");\">\n" +
             populatePlatform() +
             "                    </select>\n" +
             "                    </td>\n" +
             "                </tr>\n" +
             "            </table>\n" +
-            "<div id=\"pools" + newId + "\"></div>" +
+            "          <div class=\"note\">\n" +
+            "            <h2>Selected pool:</h2>\n" +
+            "            <div id=\"selPool"+ newId +"\" class=\"elementList ui-corner-all\"></div></div>"+
+            "<div id=\"poolList" + newId + "\" class='elementList' style='height:120px; overflow:auto'></div>" +
             "            </div>\n";
 
     return JSONUtils.JSONObjectResponse("html", html);
@@ -225,171 +220,45 @@ public class ExperimentWizardControllerHelperService {
     return a.toString();
   }
 
-  public JSONObject loadPoolsbyPlatform(HttpSession session, JSONObject json) {
+  public JSONObject loadPoolsByPlatform(HttpSession session, JSONObject json) {
     StringBuilder a = new StringBuilder();
     try {
-      String newidstr = json.get("newid").toString();
-      Long newId = Long.parseLong(newidstr);
-      String platformidstr = json.get("platformId").toString();
-      Long platformId = Long.parseLong(platformidstr);
-      Platform platform = requestManager.getPlatformById(platformId);
-      a.append("<table class=\"in\">" +
-               "<tr>" +
-               "<td class=\"h\">Pool:</td>" + "<td><input type=\"text\" id='" + newId + "' name=\"pool" + newId + "\" value=\"\" onKeyup=\"timedFunc(poolSearchType(this,'" + platform.getPlatformType().getKey() + "'),200);\"/>" +
-               "<div id='poolresult" + newId + "'></div></td></tr></table>");
-    }
-    catch (IOException e) {
-      log.debug("Failed", e);
-    }
-
-    return JSONUtils.JSONObjectResponse("html", a.toString());
-  }
-
-  public JSONObject editloadPoolsbyPlatform(HttpSession session, JSONObject json) {
-    StringBuilder a = new StringBuilder();
-    try {
-      String platformidstr = json.get("platformId").toString();
-      Long platformId = Long.parseLong(platformidstr);
-      Platform platform = requestManager.getPlatformById(platformId);
-      a.append("<table class=\"in\">" +
-               "<tr>" +
-               "<td class=\"h\">Pool:</td>" + "<td><input type=\"text\" id='poolinput' name=\"pool\" value=\"\" onKeyup=\"timedFunc(editpoolSearchType(this,'" + platform.getPlatformType().getKey() + "'),200);\"/>" +
-               "<div id='poolresult'></div></td></tr></table>");
-    }
-    catch (IOException e) {
-      log.debug("Failed", e);
-    }
-
-    return JSONUtils.JSONObjectResponse("html", a.toString());
-  }
-
-  public JSONObject poolSearchType(HttpSession session, JSONObject json) {
-    StringBuffer sb = new StringBuffer();
-    String searchStr = (String) json.get("str");
-    String resultId = (String) json.get("id");
-    String platformType = (String) json.get("type");
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      if (searchStr.length() > 1) {
-        String str = searchStr.toLowerCase();
-        StringBuilder b = new StringBuilder();
-
-        Collection<Pool<? extends Poolable>> pools = requestManager.listAllPoolsByPlatform(PlatformType.valueOf(platformType));
-        /*
-        List<? extends Pool> pools = new ArrayList<Pool>();
-        if (platformType.equals("Illumina")) {
-          pools = requestManager.listAllIlluminaPools();
-        }
-        else if (platformType.equals("LS454")) {
-          pools = requestManager.listAll454Pools();
-        }
-        else if (platformType.equals("Solid")) {
-          pools = requestManager.listAllSolidPools();
-        }
-        */
-        int numMatches = 0;
-        for (Pool p : pools) {
-          String poolName = p.getName() == null ? null : p.getName();
-          String poolBarcode = p.getIdentificationBarcode() == null ? null : p.getIdentificationBarcode();
-          StringBuilder ds = new StringBuilder();
-          if (p.getDilutions().size() == 0) {
-            ds.append("none");
-          }
-          else {
-            for (Dilution dl : (List<Dilution>) p.getDilutions()) {
-              ds.append(dl.getName() + " ");
+      if (json.has("platformId") && !"".equals(json.getString("platformId"))) {
+        Long platformId = json.getLong("platformId");
+        Platform platform = requestManager.getPlatformById(platformId);
+        if (platform != null) {
+          PlatformType pt = platform.getPlatformType();
+          List<Pool<? extends Poolable>> pools = new ArrayList<Pool<? extends Poolable>>(requestManager.listAllPoolsByPlatform(pt));
+          //Collections.sort(pools, Collections.<Pool<? extends Poolable>>reverseOrder());
+          Collections.sort(pools);
+          for (Pool p : pools) {
+            a.append("<div bind='"+p.getPoolId()+"' onMouseOver='this.className=\"dashboardhighlight\"' onMouseOut='this.className=\"dashboard\"' class='dashboard' style='position:relative' ");
+            if (json.has("newid") && !"".equals(json.getString("newid"))) {
+              a.append("ondblclick='Experiment.pool.experimentSelectPool(this,"+json.getString("newid")+");'");
             }
+            else {
+              a.append("ondblclick='Experiment.pool.experimentSelectPool(this);'");
+            }
+            a.append(">");
+            a.append("<span style='float:left'>");
+            a.append("<b>"+p.getName()+"</b> <i>"+p.getDilutions().size()+" dilution(s)</i>");
+            a.append("</span>");
+            a.append("<span class='pType' style='float: right; font-size: 24px; font-weight: bold; color:#BBBBBB'>"+p.getPlatformType().getKey()+"</span>");
+            a.append("</div>");
           }
-          long poolId = p.getPoolId();
-
-          if ((poolBarcode != null && (poolBarcode.toLowerCase().equals(str) || poolBarcode.toLowerCase().contains(str)))
-              || (poolName != null && (poolName.toLowerCase().equals(str) || poolName.toLowerCase().contains(str)))) {
-            b.append("<div onmouseover=\"this.className='autocompleteboxhighlight'\" onmouseout=\"this.className='autocompletebox'\" class=\"autocompletebox\"" +
-                     " onclick=\"insertPoolResult(&#39;" + resultId + "&#39;,&#39;" + poolBarcode + "&#39;)\">" +
-                     "<b>Pool: " + poolName + "(" + poolBarcode + ")</b><br/>" +
-                     "Dilutions: " + ds.toString() +
-                     "</div>");
-            numMatches++;
-          }
-        }
-        if (numMatches == 0) {
-          return JSONUtils.JSONObjectResponse("html", "No matches");
+          return JSONUtils.JSONObjectResponse("html", a.toString());
         }
         else {
-          return JSONUtils.JSONObjectResponse("html", "<div class=\"autocomplete\"><ul>" + b.toString() + "</ul></div>");
+          return JSONUtils.SimpleJSONError("Failed to load pools: no such platform");
         }
       }
       else {
-        return JSONUtils.JSONObjectResponse("html", "Need a longer search pattern ...");
+        return JSONUtils.SimpleJSONError("Failed to load pools: no platform specified");
       }
     }
     catch (IOException e) {
       log.debug("Failed", e);
-      return JSONUtils.SimpleJSONError("Failed");
-    }
-  }
-
-  public JSONObject editpoolSearchType(HttpSession session, JSONObject json) {
-    StringBuffer sb = new StringBuffer();
-    String searchStr = (String) json.get("str");
-    String resultId = "poolinput";
-    String platformType = (String) json.get("type");
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      if (searchStr.length() > 1) {
-        String str = searchStr.toLowerCase();
-        StringBuilder b = new StringBuilder();
-        Collection<Pool<? extends Poolable>> pools = requestManager.listAllPoolsByPlatform(PlatformType.valueOf(platformType));
-/*
-        if (platformType.equals("Illumina")) {
-          pools = requestManager.listAllIlluminaPools();
-        }
-        else if (platformType.equals("LS454")) {
-          pools = requestManager.listAll454Pools();
-        }
-        else if (platformType.equals("Solid")) {
-          pools = requestManager.listAllSolidPools();
-        }
-*/
-        int numMatches = 0;
-        for (Pool p : pools) {
-          String poolName = p.getName() == null ? null : p.getName();
-          String poolBarcode = p.getIdentificationBarcode() == null ? null : p.getIdentificationBarcode();
-          StringBuilder ds = new StringBuilder();
-          if (p.getDilutions().size() == 0) {
-            ds.append("none");
-          }
-          else {
-            for (Dilution dl : (List<Dilution>) p.getDilutions()) {
-              ds.append(dl.getName() + " ");
-            }
-          }
-          long poolId = p.getPoolId();
-
-          if ((poolBarcode != null && (poolBarcode.toLowerCase().equals(str) || poolBarcode.toLowerCase().contains(str)))
-              || (poolName != null && (poolName.toLowerCase().equals(str) || poolName.toLowerCase().contains(str)))) {
-            b.append("<div onmouseover=\"this.className='autocompleteboxhighlight'\" onmouseout=\"this.className='autocompletebox'\" class=\"autocompletebox\"" +
-                     " onclick=\"editinsertPoolResult(&#39;" + poolId + "&#39,&#39;" + poolBarcode + "&#39;)\">" +
-                     "<b>Pool: " + poolName + "(" + poolBarcode + ")</b><br/>" +
-                     "Dilutions: " + ds.toString() +
-                     "</div>");
-            numMatches++;
-          }
-        }
-        if (numMatches == 0) {
-          return JSONUtils.JSONObjectResponse("html", "No matches");
-        }
-        else {
-          return JSONUtils.JSONObjectResponse("html", "<div class=\"autocomplete\"><ul>" + b.toString() + "</ul></div>");
-        }
-      }
-      else {
-        return JSONUtils.JSONObjectResponse("html", "Need a longer search pattern ...");
-      }
-    }
-    catch (IOException e) {
-      log.debug("Failed", e);
-      return JSONUtils.SimpleJSONError("Failed");
+      return JSONUtils.SimpleJSONError("Failed to load pools: " + e.getMessage());
     }
   }
 

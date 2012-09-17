@@ -41,7 +41,7 @@ function validate_run(form) {
 
   if (jQuery(':text.validateable').length > 0) {
     jQuery(':text.validateable').each(function() {
-      var result = validate_input_field(this, 'Run', ok);
+      var result = Utils.validation.validate_input_field(this, 'Run', ok);
       ok = result.okstatus;
       error += result.errormsg;
     })
@@ -63,12 +63,12 @@ function validate_run(form) {
 
 function checkForCompletionDate() {
   var statusVal = jQuery('input[name=status\\.health]:checked').val();
-  if (!isNullCheck(statusVal)) {
+  if (!Utils.validation.isNullCheck(statusVal)) {
     if (statusVal === "Failed" || statusVal === "Stopped") {
       alert("You are manually setting a run to Stopped or Failed. Please remember to enter a Completion Date!");
       if (jQuery("#completionDate input").length == 0) {
         jQuery("#completionDate").html("<input type='text' name='status.completionDate' id='status.completionDate' value='" + jQuery('#completionDate').html() + "'>");
-        addDatePicker("status\\.completionDate");
+        Utils.ui.addDatePicker("status\\.completionDate");
       }
     }
     else {

@@ -100,7 +100,7 @@ public class PoolSearchService {
 
   private String poolHtml(Pool p) {
     StringBuilder b = new StringBuilder();
-    b.append("<div style='position:relative' onMouseOver='this.className=\"dashboardhighlight\"' onMouseOut='this.className=\"dashboard\"' class='dashboard' ondblclick='insertPoolNextAvailable(this);'>");
+    b.append("<div style='position:relative' onMouseOver='this.className=\"dashboardhighlight\"' onMouseOut='this.className=\"dashboard\"' class='dashboard' ondblclick='Run.container.insertPoolNextAvailable(this);'>");
     b.append("<div style=\"float:left\"><b>" + p.getName() + " (" + p.getCreationDate() + ")</b><br/>");
 
     Collection<Dilution> ds = p.getDilutions();

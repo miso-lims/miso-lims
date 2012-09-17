@@ -60,7 +60,7 @@
                     </li>
                 </ul>
             </div>
-            <div class="sectionDivider" onclick="toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
+            <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
                 <div id="note_arrowclick" class="toggleLeft"></div>
             </div>
             <div id="notediv" class="note" style="display:none;">A Study contains more fine-grained information about

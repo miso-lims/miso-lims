@@ -35,11 +35,8 @@
 
 <div id="maincontent">
 <div id="contentcolumn">
-<form:form method="POST" commandName="experiment" autocomplete="off"
-           onsubmit="return validate_experiment(this);">
-
+<form:form method="POST" commandName="experiment" autocomplete="off" onsubmit="return validate_experiment(this);">
 <sessionConversation:insertSessionConversationId attributeName="experiment"/>
-
 <h1>
     <c:choose>
         <c:when test="${not empty experiment.experimentId}">Edit</c:when>
@@ -74,7 +71,7 @@
         </li>
     </ul>
 </div>
-<div class="sectionDivider" onclick="toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
+<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
     <div id="note_arrowclick" class="toggleLeft"></div>
 </div>
 <div id="notediv" class="note" style="display:none;">An experiment contains design information about the
@@ -136,7 +133,7 @@
             <td>
                 <form:select id="platforms" path="platform" items="${platforms}" itemLabel="nameAndModel"
                              itemValue="platformId"
-                             onchange="editloadPoolsbyPlatform(this);"/>
+                             onchange="Experiment.pool.loadPoolsByPlatform(this);"/>
             </td>
         </c:when>
         <c:otherwise>
@@ -172,41 +169,34 @@
       <c:choose>
         <c:when test="${empty experiment.pool}">
           <c:choose>
-            <c:when test="${empty availablePools}">
+            <c:when test="${not empty experiment.platform and empty availablePools}">
               No ${experiment.platform.platformType.key} pools available. Would you like to
-              <c:choose>
-                  <c:when test="${not empty experiment}">
-                      <a href='<c:url value="/miso/pool/${fn:toLowerCase(experiment.platform.platformType.key)}/new/${experiment.experimentId}"/>'>create
-                          pool</a>?
-                  </c:when>
-                  <c:otherwise>
-                      <a href='<c:url value="/miso/pool/${fn:toLowerCase(experiment.platform.platformType.key)}/new"/>'>create
-                          pool</a>?
-                  </c:otherwise>
-              </c:choose>
+              <a href='<c:url value="/miso/pool/${fn:toLowerCase(experiment.platform.platformType.key)}/new/${experiment.experimentId}"/>'>
+              create a pool</a>?
             </c:when>
             <c:otherwise>
               <div class="note">
               <h2>Selected pool:</h2>
               <div id="selPool" class="elementList ui-corner-all"></div>
               </div>
-              Please select a Pool below to be associated with this Experiment
               <c:choose>
-                   <c:when test="${empty experiment.experimentId or empty experiment.platform}">
-                  <%--<c:when test="${not empty experiment}">--%>
-                     <%--<a href='<c:url value="/miso/pool/${fn:toLowerCase(experiment.platform.platformType.key)}/new"/>'> create a new pool</a>?--%>
-                  </c:when>
-                  <c:otherwise>
-                     , <b>OR</b> <a href='<c:url value="/miso/pool/${fn:toLowerCase(experiment.platform.platformType.key)}/new/${experiment.experimentId}"/>'> create a new pool</a>?
-                  </c:otherwise>
+                <c:when test="${empty availablePools}">
+                  Please select a platform to begin pool selection...
+                </c:when>
+                <c:otherwise>
+                  Please select a Pool below to be associated with this Experiment
+                  <c:if test="${not empty experiment.experimentId or not empty experiment.platform}">
+                    <b>OR</b> <a href='<c:url value="/miso/pool/${fn:toLowerCase(experiment.platform.platformType.key)}/new/${experiment.experimentId}"/>'> create a new pool</a>?
+                  </c:if>
+                </c:otherwise>
               </c:choose>
               <div id='poolList' class="elementList ui-corner-all" style="height:500px">
                 <c:forEach items="${availablePools}" var="p">
-                    <div bind="${p.poolId}" onMouseOver="this.className='dashboardhighlight'" onMouseOut="this.className='dashboard'" class="dashboard" ondblclick="experimentSelectPool(this);">
+                    <div bind="${p.poolId}" onMouseOver="this.className='dashboardhighlight'" onMouseOut="this.className='dashboard'" class="dashboard" ondblclick="Experiment.pool.experimentSelectPool(this);">
                       <span style="float:left">
                       <b>${p.name}</b> (${fn:length(p.dilutions)} dilutions)
                       </span>
-                      <span style='float: right; font-size: 24px; font-weight: bold; color:#BBBBBB'>${p.platformType.key}</span>
+                      <span class='pType' style='float: right; font-size: 24px; font-weight: bold; color:#BBBBBB'>${p.platformType.key}</span>
                     </div>
                 </c:forEach>
               </div>
@@ -228,7 +218,7 @@
                   </c:forEach>
                 </i>
                 </span>
-                <span onclick='confirmRemove(jQuery(this).parent());' class='float-right ui-icon ui-icon-circle-close'></span>
+                <span onclick='Utils.ui.confirmRemove(jQuery(this).parent());' class='float-right ui-icon ui-icon-circle-close'></span>
               </div>
               <input type="hidden" value="on" name="_pool"/>
             </div>
@@ -380,7 +370,7 @@
 </div>
 
 <script type="text/javascript">
-    addMaxDatePicker("creationDate", 0);
+    Utils.ui.addMaxDatePicker("creationDate", 0);
 
     jQuery(function() {
         jQuery("#poolList").sortable({
@@ -392,8 +382,6 @@
             scroll: false
         });
         jQuery("ul, li").disableSelection();
-
-        updateDroppables("#list_2");
 
         jQuery(".elementListDroppable").droppable({
             accept: '.draggable',

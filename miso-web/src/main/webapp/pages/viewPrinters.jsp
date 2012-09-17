@@ -34,84 +34,65 @@
 
 <div id="maincontent">
   <div id="contentcolumn">
-    <h1>Printers</h1>
-    <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-      <a href='javascript:void(0);' class="add" onclick="getPrinterFormEntities(); return false;">Add Printer
-        Service</a><br/>
+    <c:if test="${not empty barcodePrinters}">
+      <h1>Printers</h1>
+      <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+        <a href='javascript:void(0);' class="add" onclick="Print.ui.getPrinterFormEntities(); return false;">Add Printer
+          Service</a><br/>
+      </c:if>
+
+        <form id='addPrinterForm'>
+          <table class="list" id="printerTable">
+            <thead>
+            <tr>
+              <th>Printer Service</th>
+              <th>Host</th>
+              <th>Type</th>
+              <th>Recent Print Jobs</th>
+              <th>Enabled</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            <c:forEach items="${barcodePrinters}" var="service">
+              <tr>
+                <td>${service.name}</td>
+                <td>${service.printContext.host}</td>
+                <td>${service.printContext.name}</td>
+                <td>
+                  <a href='<c:url value="/miso/admin/configuration/printers/barcode/${service.name}"/>'>View</a>
+                </td>
+
+                <td>
+                  <c:choose>
+                    <c:when test="${service.enabled}">
+                      <span class="miso-button ui-state-default ui-corner-all ui-icon ui-icon-check"
+                            onclick="Print.service.disablePrintService('${service.name}');">Disable</span>
+                    </c:when>
+                    <c:otherwise>
+                      <span class="miso-button ui-state-default ui-corner-all ui-icon ui-icon-closethick"
+                            onclick="Print.service.enablePrintService('${service.name}');">Enable</span>
+                    </c:otherwise>
+                  </c:choose>
+                </td>
+              </tr>
+            </c:forEach>
+
+            </tbody>
+          </table>
+        </form>
     </c:if>
 
-      <form id='addPrinterForm'>
-        <table class="list" id="printerTable">
-          <thead>
-          <tr>
-            <th>Printer Service</th>
-            <th>Host</th>
-            <th>Type</th>
-            <th>Recent Print Jobs</th>
-            <th>Enabled</th>
-          </tr>
-          </thead>
-          <tbody>
-      <c:if test="${not empty barcodePrinters}">
-          <c:forEach items="${barcodePrinters}" var="service">
-            <tr>
-              <td>${service.name}</td>
-              <td>${service.printContext.host}</td>
-              <td>${service.printContext.name}</td>
-              <td>
-                <a href='<c:url value="/miso/admin/configuration/printers/barcode/${service.name}"/>'>View</a>
-              </td>
-
-              <td>
-                <c:choose>
-                  <c:when test="${service.enabled}">
-                    <span class="miso-button ui-state-default ui-corner-all ui-icon ui-icon-check"
-                          onclick="disablePrintService('${service.name}');">Disable</span>
-                  </c:when>
-                  <c:otherwise>
-                    <span class="miso-button ui-state-default ui-corner-all ui-icon ui-icon-closethick"
-                          onclick="enablePrintService('${service.name}');">Enable</span>
-                  </c:otherwise>
-                </c:choose>
-              </td>
-            </tr>
-          </c:forEach>
-      </c:if>
-          </tbody>
-        </table>
-      </form>
-
-      <script type="text/javascript">
-        jQuery('.miso-button').hover(
-                function() {
-                  jQuery(this).addClass('ui-state-hover');
-                },
-                function() {
-                  jQuery(this).removeClass('ui-state-hover');
-                }
-        );
-        <%--
-        jQuery(document).ready(function() {
-            jQuery("#printerTable").tablesorter({
-                headers: { }
-            });
-        });
-
-        jQuery(function() {
-            var theTable = jQuery("#printerTable");
-
-            jQuery("#filter").keyup(function() {
-                jQuery.uiTableFilter(theTable, this.value);
-            });
-
-            jQuery('#filter-form').submit(function() {
-                theTable.find("tbody > tr:visible > td:eq(1)").mousedown();
-                return false;
-            }).focus(); //Give focus to input field
-        });
-        --%>
-      </script>
-
+    <script type="text/javascript">
+      jQuery('.miso-button').hover(
+        function() {
+          jQuery(this).addClass('ui-state-hover');
+        },
+        function() {
+          jQuery(this).removeClass('ui-state-hover');
+        }
+      );
+    </script>
 
     <c:if test="${not empty barcodePrinter}">
       <h1>Printer ${barcodePrinter.name}</h1>
@@ -144,15 +125,15 @@
       <script type="text/javascript">
         jQuery(document).ready(function() {
           jQuery("#printerTable").tablesorter({
-                                                headers: {
-                                                  3: {
-                                                    sorter: false
-                                                  },
-                                                  4: {
-                                                    sorter: false
-                                                  }
-                                                }
-                                              });
+            headers: {
+              3: {
+                sorter: false
+              },
+              4: {
+                sorter: false
+              }
+            }
+          });
         });
       </script>
     </c:if>
@@ -183,7 +164,7 @@
               </c:forEach>
               </td>
               <td><span class="miso-button ui-state-default ui-corner-all ui-icon ui-icon-print"
-                        onclick="reprintJob(${job.jobId});">Reprint</span></td>
+                        onclick="Print.service.reprintJob(${job.jobId});">Reprint</span></td>
             </tr>
           </c:forEach>
           </tbody>
@@ -192,15 +173,15 @@
         <script type="text/javascript">
           jQuery(document).ready(function() {
             jQuery("#printerTable").tablesorter({
-                                                  headers: {
-                                                    4: {
-                                                      sorter: false
-                                                    },
-                                                    5: {
-                                                      sorter: false
-                                                    }
-                                                  }
-                                                });
+              headers: {
+                4: {
+                  sorter: false
+                },
+                5: {
+                  sorter: false
+                }
+              }
+            });
           });
         </script>
       </c:when>

@@ -59,7 +59,7 @@
            onmouseover="mcancelclosetime()"
            onmouseout="mclosetime()">
         <a href='<c:url value="/miso/pool/illumina/new"/>'>Add Illumina Pool</a>
-        <a href='javascript:void(0);' onclick="selectPoolBarcodesToPrint('#illumina'); return false;">Print Barcodes
+        <a href='javascript:void(0);' onclick="Pool.barcode.selectPoolBarcodesToPrint('#illumina'); return false;">Print Barcodes
           ...</a>
       </div>
     </li>
@@ -144,7 +144,7 @@
            onmouseover="mcancelclosetime()"
            onmouseout="mclosetime()">
         <a href='<c:url value="/miso/pool/ls454/new"/>'>Add LS454 Pool</a>
-        <a href='javascript:void(0);' onclick="selectPoolBarcodesToPrint('#ls454'); return false;">Print Barcodes
+        <a href='javascript:void(0);' onclick="Pool.barcode.selectPoolBarcodesToPrint('#ls454'); return false;">Print Barcodes
           ...</a>
       </div>
     </li>
@@ -229,7 +229,7 @@
            onmouseover="mcancelclosetime()"
            onmouseout="mclosetime()">
         <a href='<c:url value="/miso/pool/solid/new"/>'>Add Solid Pool</a>
-        <a href='javascript:void(0);' onclick="selectPoolBarcodesToPrint('#solid'); return false;">Print Barcodes
+        <a href='javascript:void(0);' onclick="Pool.barcode.selectPoolBarcodesToPrint('#solid'); return false;">Print Barcodes
           ...</a>
       </div>
     </li>
@@ -280,56 +280,53 @@
     </tbody>
   </table>
   <script type="text/javascript">
-
-//    var poolIds = new Array();
-
     jQuery(document).ready(function() {
       jQuery("#tabs").tabs();
-      listPoolAverageInsertSizes();
+      Pool.ui.listPoolAverageInsertSizes();
 
       writeTotalNo();
 
       jQuery("#illumina").tablesorter({
-                                        headers: {
-                                          3: {
-                                            sorter: false
-                                          },
-                                          4: {
-                                            sorter: false
-                                          },
-                                          5: {
-                                            sorter: false
-                                          }
-                                        }
-                                      });
+        headers: {
+          3: {
+            sorter: false
+          },
+          4: {
+            sorter: false
+          },
+          5: {
+            sorter: false
+          }
+        }
+      });
 
       jQuery("#ls454").tablesorter({
-                                     headers: {
-                                       3: {
-                                         sorter: false
-                                       },
-                                       4: {
-                                         sorter: false
-                                       },
-                                       5: {
-                                         sorter: false
-                                       }
-                                     }
-                                   });
+        headers: {
+          3: {
+           sorter: false
+          },
+          4: {
+           sorter: false
+          },
+          5: {
+           sorter: false
+          }
+        }
+      });
 
       jQuery("#solid").tablesorter({
-                                     headers: {
-                                       3: {
-                                         sorter: false
-                                       },
-                                       4: {
-                                         sorter: false
-                                       },
-                                       5: {
-                                         sorter: false
-                                       }
-                                     }
-                                   });
+        headers: {
+          3: {
+            sorter: false
+          },
+          4: {
+            sorter: false
+          },
+          5: {
+            sorter: false
+          }
+        }
+      });
     });
 
     jQuery(function() {
@@ -341,10 +338,10 @@
       });
 
       jQuery('#filter-form3').submit(
-              function() {
-                theTable.find("tbody > tr:visible > td:eq(1)").mousedown();
-                return false;
-              }).focus(); //Give focus to input field
+        function() {
+          theTable.find("tbody > tr:visible > td:eq(1)").mousedown();
+          return false;
+        }).focus(); //Give focus to input field
     });
 
     function writeTotalNo() {
@@ -352,7 +349,6 @@
       jQuery('#ls454totalCount').html(jQuery('#ls454>tbody>tr:visible').length.toString() + " LS454 Pools");
       jQuery('#solidtotalCount').html(jQuery('#solid>tbody>tr:visible').length.toString() + " Solid Pools");
     }
-
   </script>
 </div>
 

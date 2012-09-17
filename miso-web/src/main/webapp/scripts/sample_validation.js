@@ -22,17 +22,29 @@
  */
 
 function validate_sample(form) {
+  Fluxion.doAjax(
+    'sampleControllerHelperService',
+    'validateSampleAlias',
+  {'alias':jQuery('#alias').val(), 'url':ajaxurl},
+  {
+    'doOnSuccess': function(json) { if (json.html === "OK") { process_validate_sample(form); }},
+    'doOnError':function(json) { alert(json.error); }
+  }
+  );
+}
+
+function process_validate_sample(form) {
   var ok = true;
   var error = "Please correct the following error(s):\n\n";
 
-  if (!jQuery('#alias').val().match(/[A-z0-9]+_S[0-9]+_[\s\S]*/)) {
-    ok = false;
-    error += "Sample alias " + jQuery('#alias').val() + " doesn't conform to the <PI initials>_S<Sample Number>_<Species> naming convention.\n";
-  }
+//  if (!jQuery('#alias').val().match(/[A-z0-9]+_S[0-9]+_[\s\S]*/)) {
+//    ok = false;
+//    error += "Sample alias " + jQuery('#alias').val() + " doesn't conform to the <PI initials>_S<Sample Number>_<Species> naming convention.\n";
+//  }
 
   if (jQuery(':text.validateable').length > 0) {
     jQuery(':text.validateable').each(function() {
-      var result = validate_input_field(this, 'Sample', ok);
+      var result = Utils.validation.validate_input_field(this, 'Sample', ok);
       ok = result.okstatus;
       error += result.errormsg;
     })
@@ -40,6 +52,9 @@ function validate_sample(form) {
 
   if (!ok) {
     alert(error);
+  }
+  else {
+    form.submit();
   }
 
   return ok;
@@ -50,7 +65,7 @@ function validate_library_qcs(json) {
   for (var i = 0; i < json.length; i++) {
     if (!json[i].results.match(/[0-9\.]+/) ||
         !json[i].insertSize.match(/[0-9]+/) ||
-        isNullCheck(json[i].qcDate)) ok = false;
+        Utils.validation.isNullCheck(json[i].qcDate)) ok = false;
   }
   return ok;
 }
@@ -59,7 +74,7 @@ function validate_library_dilutions(json) {
   var ok = true;
   for (var i = 0; i < json.length; i++) {
     if (!json[i].results.match(/[0-9\.]+/) ||
-        isNullCheck(json[i].dilutionDate)) ok = false;
+        Utils.validation.isNullCheck(json[i].dilutionDate)) ok = false;
   }
   return ok;
 }

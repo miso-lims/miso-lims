@@ -185,6 +185,7 @@ public interface RequestManager {
   public Collection<Sample> listAllSamplesBySearch(String query) throws IOException;
   public Collection<Sample> listAllSamplesByProjectId(long projectId) throws IOException;
   public Collection<Sample> listAllSamplesByExperimentId(long experimentId) throws IOException;
+  public Collection<Sample> listSamplesByAlias(String alias) throws IOException;
 
   public Collection<String> listAllSampleTypes() throws IOException;
   public Collection<SampleQC> listAllSampleQCsBySampleId(long sampleId) throws IOException;

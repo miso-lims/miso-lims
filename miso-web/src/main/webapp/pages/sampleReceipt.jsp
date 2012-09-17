@@ -42,7 +42,7 @@
     <h1>
       Receive Samples
       <button type="submit" class="fg-button ui-state-default ui-corner-all"
-              onclick="setSampleReceiveDate('#sample_pan');">
+              onclick="Sample.ui.setSampleReceiveDate('#sample_pan');">
         Save
       </button>
     </h1>
@@ -50,7 +50,7 @@
     <form id="samples" commandName="sample" autocomplete="off" onsubmit="">
       <div>
         Barcode:<input type="text"
-                       onkeyup="timedFunc(receiveSample(this), 400);"
+                       onkeyup="Utils.timer.timedFunc(Sample.ui.receiveSample(this), 400);"
                        size="40"
                        id="searchSampleByBarcode"
                        name="searchSampleByBarcode">

@@ -366,7 +366,7 @@ public class DashboardHelperService {
         b.append(a.getAlertDate() + " <b>" + a.getAlertTitle() + "</b><br/>");
         b.append(a.getAlertText() + "<br/>");
         if (!a.getAlertRead()) {
-          b.append("<span onclick='confirmAlertRead(this);' class='float-right ui-icon ui-icon-circle-close'></span>");
+          b.append("<span onclick='Utils.alert.confirmAlertRead(this);' class='float-right ui-icon ui-icon-circle-close'></span>");
         }
         b.append("</div>");
       }

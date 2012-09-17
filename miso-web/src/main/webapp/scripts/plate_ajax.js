@@ -21,80 +21,84 @@
  * *********************************************************************
  */
 
-function printPlateBarcodes() {
-  var plates = [];
-  for (var i = 0; i < arguments.length; i++) {
-    plates[i] = {'plateId':plates[i]};
-  }
+var Plate = Plate || {};
 
-  Fluxion.doAjax(
-    'printerControllerHelperService',
-    'listAvailableServices',
-    {
-      'serviceClass':'uk.ac.bbsrc.tgac.miso.core.data.Plate',
-      'url':ajaxurl
-    },
-    {
-      'doOnSuccess':function (json) {
-        jQuery('#printServiceSelectDialog')
-                .html("<form>" +
-                      "<fieldset class='dialog'>" +
-                      "<select name='serviceSelect' id='serviceSelect' class='ui-widget-content ui-corner-all'>" +
-                      json.services +
-                      "</select></fieldset></form>");
-
-        jQuery(function() {
-          jQuery('#printServiceSelectDialog').dialog({
-            autoOpen: false,
-            width: 400,
-            modal: true,
-            resizable: false,
-            buttons: {
-              "Print": function() {
-                Fluxion.doAjax(
-                  'plateControllerHelperService',
-                  'printPlateBarcodes',
-                  {
-                    'serviceName':jQuery('#serviceSelect').val(),
-                    'plates':plates,
-                    'url':ajaxurl
-                  },
-                  {
-                    'doOnSuccess':function (json) {
-                      alert(json.response);
-                    }
-                  }
-                );
-                jQuery(this).dialog('close');
-              },
-              "Cancel": function() {
-                jQuery(this).dialog('close');
-              }
-            }
-          });
-        });
-        jQuery('#printServiceSelectDialog').dialog('open');
-      },
-      'doOnError':function (json) { alert(json.error); }
+Plate.barcode = {
+  printPlateBarcodes : function() {
+    var plates = [];
+    for (var i = 0; i < arguments.length; i++) {
+      plates[i] = {'plateId':plates[i]};
     }
-  );
 
-  /*
-  Fluxion.doAjax(
-        'plateControllerHelperService',
-        'printPlateBarcodes',
-   {
-        'plates':plates,
+    Fluxion.doAjax(
+      'printerControllerHelperService',
+      'listAvailableServices',
+      {
+        'serviceClass':'uk.ac.bbsrc.tgac.miso.core.data.Plate',
         'url':ajaxurl
-    },
-    {
-        'doOnSuccess':function (json) { alert(json.response); }
-    }
-  );
-  */
-}
+      },
+      {
+        'doOnSuccess':function (json) {
+          jQuery('#printServiceSelectDialog')
+                  .html("<form>" +
+                        "<fieldset class='dialog'>" +
+                        "<select name='serviceSelect' id='serviceSelect' class='ui-widget-content ui-corner-all'>" +
+                        json.services +
+                        "</select></fieldset></form>");
 
-function showPlateLocationChangeDialog(plateId) {
+          jQuery(function() {
+            jQuery('#printServiceSelectDialog').dialog({
+              autoOpen: false,
+              width: 400,
+              modal: true,
+              resizable: false,
+              buttons: {
+                "Print": function() {
+                  Fluxion.doAjax(
+                    'plateControllerHelperService',
+                    'printPlateBarcodes',
+                    {
+                      'serviceName':jQuery('#serviceSelect').val(),
+                      'plates':plates,
+                      'url':ajaxurl
+                    },
+                    {
+                      'doOnSuccess':function (json) {
+                        alert(json.response);
+                      }
+                    }
+                  );
+                  jQuery(this).dialog('close');
+                },
+                "Cancel": function() {
+                  jQuery(this).dialog('close');
+                }
+              }
+            });
+          });
+          jQuery('#printServiceSelectDialog').dialog('open');
+        },
+        'doOnError':function (json) { alert(json.error); }
+      }
+    );
+
+    /*
+    Fluxion.doAjax(
+          'plateControllerHelperService',
+          'printPlateBarcodes',
+     {
+          'plates':plates,
+          'url':ajaxurl
+      },
+      {
+          'doOnSuccess':function (json) { alert(json.response); }
+      }
+    );
+    */
+  },
+
+  showPlateLocationChangeDialog : function(plateId) {
+    var self = this;
     jQuery('#changePlateLocationDialog')
             .html("<form>" +
                   "<fieldset class='dialog'>" +
@@ -110,7 +114,7 @@ function showPlateLocationChangeDialog(plateId) {
             resizable: false,
             buttons: {
                 "Save": function() {
-                    changePlateLocation(plateId, jQuery('#locationBarcode').val());
+                    self.changePlateLocation(plateId, jQuery('#locationBarcode').val());
                     jQuery(this).dialog('close');
                 },
                 "Cancel": function() {
@@ -120,32 +124,35 @@ function showPlateLocationChangeDialog(plateId) {
         });
     });
     jQuery('#changePlateLocationDialog').dialog('open');
-}
+  },
 
-var changePlateLocation = function(plateId, barcode) {
-  Fluxion.doAjax(
-    'plateControllerHelperService',
-    'changePlateLocation',
-    {
-      'plateId':plateId,
-      'locationBarcode':barcode,
-      'url':ajaxurl
-    },
-    {
-      'doOnSuccess':pageReload
-    }
-  );
+  changePlateLocation : function(plateId, barcode) {
+    Fluxion.doAjax(
+      'plateControllerHelperService',
+      'changePlateLocation',
+      {
+        'plateId':plateId,
+        'locationBarcode':barcode,
+        'url':ajaxurl
+      },
+      {
+        'doOnSuccess':Utils.page.pageReload
+      }
+    );
+  }
 };
 
-function getPlateBarcodesByMaterialType(form) {
-  Fluxion.doAjax(
-    'plateControllerHelperService',
-    'getPlateBarcodesByMaterialType',
-    {'materialType':form.value, 'url':ajaxurl},
-    {'doOnSuccess':
-      function(json) {
-        jQuery('#plateBarcodeSelect').html(json.plateBarcodes);
+Plate.tagbarcode = {
+  getPlateBarcodesByMaterialType : function(form) {
+    Fluxion.doAjax(
+      'plateControllerHelperService',
+      'getPlateBarcodesByMaterialType',
+      {'materialType':form.value, 'url':ajaxurl},
+      {'doOnSuccess':
+        function(json) {
+          jQuery('#plateBarcodeSelect').html(json.plateBarcodes);
+        }
       }
-    }
-  );
-}
+    );
+  }
+};

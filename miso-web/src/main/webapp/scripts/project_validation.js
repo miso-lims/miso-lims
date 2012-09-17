@@ -34,7 +34,7 @@ function validate_project(form) {
 
   if (jQuery(':text.validateable').length > 0) {
     jQuery(':text.validateable').each(function() {
-      var result = validate_input_field(this,'Project', ok);
+      var result = Utils.validation.validate_input_field(this,'Project', ok);
       ok = result.okstatus;
       error += result.errormsg;
     })
@@ -42,6 +42,9 @@ function validate_project(form) {
 
   if (!ok) {
     alert(error);
+  }
+  else {
+    form.submit();
   }
 
   return ok;

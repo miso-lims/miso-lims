@@ -62,7 +62,7 @@
     </div>
 </div>
 
-<div class="sectionDivider" onclick="toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
+<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
     <div id="note_arrowclick" class="toggleLeft"></div>
 </div>
 <div id="notediv" class="note" style="display:none;">A Run contains the sequencing results from sequencing Experiments.
@@ -81,10 +81,10 @@
              onmouseout="mclosetime()">
             <c:choose>
                 <c:when test="${not empty runMap[run.runId]}">
-                    <a href='javascript:void(0);' onclick="unwatchRun(${run.runId});">Stop watching</a>
+                    <a href='javascript:void(0);' onclick="Run.alert.unwatchRun(${run.runId});">Stop watching</a>
                 </c:when>
                 <c:otherwise>
-                    <a href='javascript:void(0);' onclick="watchRun(${run.runId});">Watch</a>
+                    <a href='javascript:void(0);' onclick="Run.alert.watchRun(${run.runId});">Watch</a>
                 </c:otherwise>
             </c:choose>
         </div>
@@ -117,10 +117,10 @@
                     <c:choose>
                         <c:when test="${not empty run.status and run.status.health.key ne 'Unknown'}"><form:radiobuttons
                                 id="platformTypes" path="platformType" items="${platformTypes}"
-                                onchange="changePlatformType(this, '${run.runId}');"
+                                onchange="Run.ui.changePlatformType(this, '${run.runId}');"
                                 disabled="disabled"/></c:when>
                         <c:otherwise><form:radiobuttons id="platformTypes" path="platformType" items="${platformTypes}"
-                                                        onchange="changePlatformType(this, '${run.runId}');"/></c:otherwise>
+                                                        onchange="Run.ui.changePlatformType(this, '${run.runId}');"/></c:otherwise>
 
                     </c:choose>
                 </td>
@@ -159,7 +159,7 @@
     </tr>
     <tr>
         <td class="h">Alias:</td>
-        <td><form:input path="alias" class="validateable"/><span id="aliascounter" class="counter"></span><%--<a href="javascript:void(0);" onclick="retrieveRunInformation(jQuery('#alias').val());">Retrieve run information</a> --%>
+        <td><form:input path="alias" class="validateable"/><span id="aliascounter" class="counter"></span>
         </td>
             <%--<td><a href="void(0);" onclick="popup('help/runAlias.html');">Help</a></td>--%>
     </tr>
@@ -215,7 +215,7 @@
                         <c:when test="${(run.status.health.key eq 'Completed' and empty run.status.completionDate) or run.status.health.key eq 'Failed' or run.status.health.key eq 'Stopped'}">
                             <td><form:input path="status.completionDate"/></td>
                             <script type="text/javascript">
-                                addDatePicker("status\\.completionDate");
+                                Utils.ui.addDatePicker("status\\.completionDate");
                             </script>
                         </c:when>
                         <c:otherwise>
@@ -240,7 +240,7 @@
 <%@ include file="permissions.jsp" %>
 <c:if test="${not empty run.runId}">
     <c:if test="${statsAvailable}">
-        <div class="sectionDivider" onclick="toggleLeftInfo(jQuery('#stats_arrowclick'), 'stats');">Statistics
+        <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#stats_arrowclick'), 'stats');">Statistics
             <div id="stats_arrowclick" class="toggleLeftDown"></div>
         </div>
         <div id="stats">
@@ -250,7 +250,7 @@
         </div>
     </c:if>
 
-    <div class="sectionDivider" onclick="toggleLeftInfo(jQuery('#notes_arrowclick'), 'notes');">Notes
+    <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#notes_arrowclick'), 'notes');">Notes
         <div id="notes_arrowclick" class="toggleLeftDown"></div>
     </div>
     <div id="notes">
@@ -264,7 +264,7 @@
                 <div id="notesmenu"
                      onmouseover="mcancelclosetime()"
                      onmouseout="mclosetime()">
-                    <a onclick="showRunNoteDialog(${run.runId});" href="javascript:void(0);" class="add">Add
+                    <a onclick="Run.ui.showRunNoteDialog(${run.runId});" href="javascript:void(0);" class="add">Add
                         Note</a>
                 </div>
             </li>
@@ -298,7 +298,7 @@
                  onmouseout="mclosetime()">
 
                 <a href='javascript:void(0);' class="add"
-                   onclick="generateRunQCRow(${run.runId}); return false;">Add Run QC</a>
+                   onclick="Run.qc.generateRunQCRow(${run.runId}); return false;">Add Run QC</a>
 
                 <c:if test="${operationsQcPassed}">
                     <a href='<c:url value="/miso/analysis/new/run/${run.runId}"/>' class="add">Initiate Analysis</a>
@@ -374,14 +374,14 @@
                            end="${run.sequencerReference.platform.numContainers}" step="1"
                            varStatus="platformContainer">
                     <input id='container${platformContainerCount}select' name='containerselect'
-                           onchange="changeContainer(this.value, '${run.platformType.key}', ${run.sequencerReference.id});"
+                           onchange="Run.container.changeContainer(this.value, '${run.platformType.key}', ${run.sequencerReference.id});"
                            type='radio'
                            value='${platformContainerCount}'/>${platformContainerCount}
                 </c:forEach>
             </c:when>
             <c:otherwise>
                 <input id='container1select' name='containerselect'
-                       onchange="changeContainer(this.value, '${run.platformType.key}', ${run.sequencerReference.id});"
+                       onchange="Run.container.changeContainer(this.value, '${run.platformType.key}', ${run.sequencerReference.id});"
                        type='radio' value='1'/>1
             </c:otherwise>
         </c:choose>
@@ -405,10 +405,10 @@
                                  onmouseout="mclosetime()">
                                 <c:if test="${run.platformType.key eq 'Illumina'}">
                                     <a href="javascript:void(0);"
-                                       onclick="generateCasava17DemultiplexCSV(${run.runId}, ${container.containerId});">Demultiplex
+                                       onclick="Run.container.generateCasava17DemultiplexCSV(${run.runId}, ${container.containerId});">Demultiplex
                                         CSV (pre-1.8)</a>
                                     <a href="javascript:void(0);"
-                                       onclick="generateCasava18DemultiplexCSV(${run.runId}, ${container.containerId});">Demultiplex
+                                       onclick="Run.container.generateCasava18DemultiplexCSV(${run.runId}, ${container.containerId});">Demultiplex
                                         CSV (1.8+)</a>
                                 </c:if>
                             </div>
@@ -422,7 +422,7 @@
                             <c:when test="${empty container.identificationBarcode}">
                                 <td>ID:</td>
                                 <td>
-                                    <button onclick='lookupContainer(this, ${containerCount.index});'
+                                    <button onclick='Run.container.lookupContainer(this, ${containerCount.index});'
                                             type='button' class='right-button ui-state-default ui-corner-all'>
                                         Lookup
                                     </button>
@@ -439,7 +439,7 @@
                                     <c:if test="${(container.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                                                     or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
                                         <a href="javascript:void(0);"
-                                           onclick="editContainerIdBarcode(jQuery('#idBarcode'), ${containerCount.index})">
+                                           onclick="Run.ui.editContainerIdBarcode(jQuery('#idBarcode'), ${containerCount.index})">
                                             <span class="fg-button ui-icon ui-icon-pencil"></span>
                                         </a>
                                     </c:if>
@@ -461,7 +461,7 @@
                                     <c:if test="${(container.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                                                     or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
                                         <a href="javascript:void(0);"
-                                           onclick="editContainerLocationBarcode(jQuery('#locationBarcode'), ${containerCount.index})">
+                                           onclick="Run.ui.editContainerLocationBarcode(jQuery('#locationBarcode'), ${containerCount.index})">
                                             <span class="fg-button ui-icon ui-icon-pencil"></span>
                                         </a>
                                     </c:if>
@@ -544,7 +544,7 @@
                                                 <div class="runPartitionDroppable"
                                                      bind="sequencerPartitionContainers[${containerCount.index}].partitions[${partitionCount.index}].pool"
                                                      partition="${containerCount.index}_${partitionCount.index}"
-                                                     ondblclick='populatePartition(this, ${containerCount.index}, ${partitionCount.index});'></div>
+                                                     ondblclick='Run.container.populatePartition(this, ${containerCount.index}, ${partitionCount.index});'></div>
                                             </div>
                                         </c:otherwise>
                                     </c:choose>
@@ -573,27 +573,27 @@
     <c:choose>
         <c:when test="${not empty run.platformType}">
             <input id="showOnlyReady" type="checkbox" checked="true"
-                   onclick="toggleReadyToRunCheck(this, '${run.platformType.key}');"/>Only Ready to Run pools?
+                   onclick="Run.pool.toggleReadyToRunCheck(this, '${run.platformType.key}');"/>Only Ready to Run pools?
             <div align="right" style="margin-top: -23px; margin-bottom:3px">Filter: <input type="text"
                 <%--onkeyup="poolSearch(this, true, '${run.platformType.key}');"--%>
                                                                                            size="8" id="searchPools"
                                                                                            name="searchPools"/></div>
             <script type="text/javascript">
-                typewatchFunc(jQuery('#searchPools'), function() {
-                    poolSearch(jQuery('#searchPools').val(), '${run.platformType.key}');
+                Utils.timer.typewatchFunc(jQuery('#searchPools'), function() {
+                    Run.pool.poolSearch(jQuery('#searchPools').val(), '${run.platformType.key}');
                 }, 300, 2);
             </script>
         </c:when>
         <c:otherwise>
             <input id="showOnlyReady" type="checkbox" checked="true"
-                   onclick="toggleReadyToRunCheck(this, jQuery('input[name=platformType]:checked').val());"/>Only Ready to Run pools?
+                   onclick="Run.pool.toggleReadyToRunCheck(this, jQuery('input[name=platformType]:checked').val());"/>Only Ready to Run pools?
             <div align="right" style="margin-top: -23px; margin-bottom:3px">Filter: <input type="text"
                 <%--onkeyup="poolSearch(this, true, jQuery('input[name=platformType]:checked').val());"--%>
                                                                                            size="8" id="searchPools"
                                                                                            name="searchPools"/></div>
             <script type="text/javascript">
-                typewatchFunc(jQuery('#searchPools'), function() {
-                    poolSearch(jQuery('#searchPools').val(), jQuery('input[name=platformType]:checked').val());
+                Utils.timer.typewatchFunc(jQuery('#searchPools'), function() {
+                    Run.pool.poolSearch(jQuery('#searchPools').val(), jQuery('input[name=platformType]:checked').val());
                 }, 300, 2);
             </script>
         </c:otherwise>
@@ -625,10 +625,10 @@
                                                });
         <c:choose>
         <c:when test="${not empty run.platformType}">
-        poolSearch("", '${run.platformType.key}');
+        Run.pool.poolSearch("", '${run.platformType.key}');
         </c:when>
         <c:otherwise>
-        poolSearch("", jQuery('input[name=platformType]:checked').val());
+        Run.pool.poolSearch("", jQuery('input[name=platformType]:checked').val());
         </c:otherwise>
         </c:choose>
 

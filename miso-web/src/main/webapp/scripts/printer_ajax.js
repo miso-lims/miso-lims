@@ -21,150 +21,158 @@
  * *********************************************************************
  */
 
-function getPrinterFormEntities() {
-  Fluxion.doAjax(
-          'printerControllerHelperService',
-          'getPrinterFormEntities',
-          {'url':ajaxurl},
-          {'doOnSuccess':processPrinterServiceRow}
-          );
-}
+var Print = Print || {};
 
-function processPrinterServiceRow(json) {
-  jQuery('#printerTable tr:first th:eq(4)').remove();
-  jQuery('#printerTable tr:first th:eq(3)').remove();
+Print.ui = {
+  getPrinterFormEntities : function() {
+    var self = this;
+    Fluxion.doAjax(
+      'printerControllerHelperService',
+      'getPrinterFormEntities',
+      {'url':ajaxurl},
+      {'doOnSuccess':self.processPrinterServiceRow}
+    );
+  },
 
-  jQuery('#printerTable').find("tr").each(function() {
-    jQuery(this).find("td:eq(4)").remove();
-    jQuery(this).find("td:eq(3)").remove();
-  });
+  processPrinterServiceRow : function(json) {
+    jQuery('#printerTable tr:first th:eq(4)').remove();
+    jQuery('#printerTable tr:first th:eq(3)').remove();
 
-  jQuery('#printerTable tr:first').append("<th>Printable Entity</th><th>Available</th><th></th>");
+    jQuery('#printerTable').find("tr").each(function() {
+      jQuery(this).find("td:eq(4)").remove();
+      jQuery(this).find("td:eq(3)").remove();
+    });
 
-  $('printerTable').insertRow(1);
+    jQuery('#printerTable tr:first').append("<th>Printable Entity</th><th>Available</th><th></th>");
 
-  var column1 = $('printerTable').rows[1].insertCell(-1);
-  column1.innerHTML = "<input id='serviceName' name='serviceName' type='text'/>";
-  var column2 = $('printerTable').rows[1].insertCell(-1);
-  column2.innerHTML = "<i>Set in context fields</i>";
-  var column3 = $('printerTable').rows[1].insertCell(-1);
-  column3.innerHTML = "<select id='contexts' name='context' onchange='getContextFieldsForContext(this)'>" +json.contexts+ "</select><br/><div id='contextFields' name='contextFields'/>";
-  var column4 = $('printerTable').rows[1].insertCell(-1);
-  column4.innerHTML = "<select id='barcodables' name='printServiceFor'>" +json.barcodables+ "</select>";
-  var column5 = $('printerTable').rows[1].insertCell(-1);
-  column5.innerHTML = "<div id='available'></div>";
-  var column6 = $('printerTable').rows[1].insertCell(-1);
-  column6.id = "addTd";
-  column6.innerHTML = "Add";
-}
+    $('printerTable').insertRow(1);
 
-function getContextFieldsForContext(contextSelect) {
-  var context = jQuery(contextSelect).val();
-  Fluxion.doAjax(
-          'printerControllerHelperService',
-          'getContextFields',
-  {'contextName':context, 'url':ajaxurl},
-  {'doOnSuccess':processContextChange}
-  );
-}
+    var column1 = $('printerTable').rows[1].insertCell(-1);
+    column1.innerHTML = "<input id='serviceName' name='serviceName' type='text'/>";
+    var column2 = $('printerTable').rows[1].insertCell(-1);
+    column2.innerHTML = "<i>Set in context fields</i>";
+    var column3 = $('printerTable').rows[1].insertCell(-1);
+    column3.innerHTML = "<select id='contexts' name='context' onchange='Print.ui.getContextFieldsForContext(this)'>" +json.contexts+ "</select><br/><div id='contextFields' name='contextFields'/>";
+    var column4 = $('printerTable').rows[1].insertCell(-1);
+    column4.innerHTML = "<select id='barcodables' name='printServiceFor'>" +json.barcodables+ "</select>";
+    var column5 = $('printerTable').rows[1].insertCell(-1);
+    column5.innerHTML = "<div id='available'></div>";
+    var column6 = $('printerTable').rows[1].insertCell(-1);
+    column6.id = "addTd";
+    column6.innerHTML = "Add";
+  },
 
-var processContextChange = function(json) {
-  jQuery('#contextFields').html("Context fields:<br/>");
-  var fields = json.contextFields;
-  for (var key in fields) {
-    if (fields.hasOwnProperty(key)) {
-      jQuery('#contextFields').append(key +": <input id='contextField-"+key+"' field='"+key+"' type='text' value='"+fields[key]+"'/><br/>");
+  getContextFieldsForContext : function(contextSelect) {
+    var self = this;
+    var context = jQuery(contextSelect).val();
+    Fluxion.doAjax(
+            'printerControllerHelperService',
+            'getContextFields',
+    {'contextName':context, 'url':ajaxurl},
+    {'doOnSuccess':self.processContextChange}
+    );
+  },
+
+  processContextChange : function(json) {
+    jQuery('#contextFields').html("Context fields:<br/>");
+    var fields = json.contextFields;
+    for (var key in fields) {
+      if (fields.hasOwnProperty(key)) {
+        jQuery('#contextFields').append(key +": <input id='contextField-"+key+"' field='"+key+"' type='text' value='"+fields[key]+"'/><br/>");
+      }
     }
+    jQuery('#contextField-host').keyup(function() { Print.service.validatePrinter(this) });
   }
-  jQuery('#contextField-host').keyup(function() { validatePrinter(this) });
 };
 
-function validatePrinter(t) {
-  $('available').innerHTML="<div align='center'><img src='../../styles/images/ajax-loader.gif'/></div>";
+Print.service = {
+  validatePrinter : function(t) {
+    $('available').innerHTML="<div align='center'><img src='../../styles/images/ajax-loader.gif'/></div>";
 
-  if (t.value != t.lastValue) {
-    if (t.timer) clearTimeout(t.timer);
+    if (t.value != t.lastValue) {
+      if (t.timer) clearTimeout(t.timer);
 
-    t.timer = setTimeout(function () {
-      Fluxion.doAjax(
-        'printerControllerHelperService',
-        'checkPrinterAvailability',
-        {'host':t.value, 'url':ajaxurl},
-        {"doOnSuccess": function(json) {
-          $('available').innerHTML = json.html;
-          if (json.html == "OK") {
-            $('available').setAttribute("style", "background-color:green");
-            $('addTd').innerHTML = "<a href='javascript:void(0);' onclick='addPrinterService(\"addPrinterForm\");'/>Add</a>";
+      t.timer = setTimeout(function () {
+        Fluxion.doAjax(
+          'printerControllerHelperService',
+          'checkPrinterAvailability',
+          {'host':t.value, 'url':ajaxurl},
+          {"doOnSuccess": function(json) {
+            $('available').innerHTML = json.html;
+            if (json.html == "OK") {
+              $('available').setAttribute("style", "background-color:green");
+              $('addTd').innerHTML = "<a href='javascript:void(0);' onclick='Print.service.addPrinterService(\"addPrinterForm\");'/>Add</a>";
+            }
+            else {
+              $('available').setAttribute("style", "background-color:red");
+            }
           }
-          else {
-            $('available').setAttribute("style", "background-color:red");
-          }
-        }
-      });
-    }, 200);
-    t.lastValue = t.value;
-  }
-}
+        });
+      }, 200);
+      t.lastValue = t.value;
+    }
+  },
 
-function addPrinterService(form) {
-  var f = $(form);
-  var cf = {};
-  jQuery('input[id*="contextField-"]').each(function(e) {
-    var field = jQuery(this).attr("field");
-    cf[field] = jQuery(this).val();
-  });
+  addPrinterService : function(form) {
+    var f = $(form);
+    var cf = {};
+    jQuery('input[id*="contextField-"]').each(function(e) {
+      var field = jQuery(this).attr("field");
+      cf[field] = jQuery(this).val();
+    });
 
-  Fluxion.doAjax(
+    Fluxion.doAjax(
+      'printerControllerHelperService',
+      'addPrintService',
+      {
+        'serviceName':f.serviceName.value,
+        'contextName':f.context.value,
+        'contextFields':cf,
+        'serviceFor':f.printServiceFor.value,
+        'url':ajaxurl},
+      {'doOnSuccess':Utils.page.pageReload,
+       'doOnError':function(json) {
+         alert(json.error);
+       }
+      }
+    );
+  },
+
+  disablePrintService : function(printerName) {
+    Fluxion.doAjax(
     'printerControllerHelperService',
-    'addPrintService',
+    'disablePrintService',
     {
-      'serviceName':f.serviceName.value,
-      'contextName':f.context.value,
-      'contextFields':cf,
-      'serviceFor':f.printServiceFor.value,
+      'printerName':printerName,
       'url':ajaxurl},
-    {'doOnSuccess':pageReload,
-     'doOnError':function(json) {
-       alert(json.error);
-     }
-    }
-  );
-}
+    {
+      'doOnSuccess':Utils.page.pageReload
+    });
+  },
 
-function disablePrintService(printerName) {
-  Fluxion.doAjax(
-  'printerControllerHelperService',
-  'disablePrintService',
-  {
-    'printerName':printerName,
-    'url':ajaxurl},
-  {
-    'doOnSuccess':pageReload
-  });
-}
+  enablePrintService : function(printerName) {
+    Fluxion.doAjax(
+    'printerControllerHelperService',
+    'enablePrintService',
+    {
+      'printerName':printerName,
+      'url':ajaxurl},
+    {
+      'doOnSuccess':Utils.page.pageReload
+    });
+  },
 
-function enablePrintService(printerName) {
-  Fluxion.doAjax(
-  'printerControllerHelperService',
-  'enablePrintService',
-  {
-    'printerName':printerName,
-    'url':ajaxurl},
-  {
-    'doOnSuccess':pageReload
-  });
-}
-
-function reprintJob(jobId) {
-  Fluxion.doAjax(
-  'printerControllerHelperService',
-  'reprintJob',
-  {
-    'jobId':jobId,
-    'url':ajaxurl},
-  {
-    'doOnSuccess': function(json) {
-      alert(json.response);
-    }
-  });
-}
+  reprintJob : function(jobId) {
+    Fluxion.doAjax(
+    'printerControllerHelperService',
+    'reprintJob',
+    {
+      'jobId':jobId,
+      'url':ajaxurl},
+    {
+      'doOnSuccess': function(json) {
+        alert(json.response);
+      }
+    });
+  }
+};

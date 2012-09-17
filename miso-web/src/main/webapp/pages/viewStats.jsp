@@ -141,7 +141,7 @@
         <c:if test="${empty referenceId}">
           <h1>${platformtype} Sequencer References</h1>
           <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-            <a href='javascript:void(0);' class="add" onclick="insertSequencerReferenceRow(); return false;">Add
+            <a href='javascript:void(0);' class="add" onclick="Sequencer.ui.insertSequencerReferenceRow(); return false;">Add
               Sequencer Reference</a><br/>
           </c:if>
 
@@ -199,7 +199,7 @@
                       <td class="misoicon"
                           onclick="window.location.href='<c:url value="/miso/stats/sequencer/${ref.id}"/>'"><span
                               class="ui-icon ui-icon-pencil"/></td>
-                      <td class="misoicon" onclick="deleteSequencerReference(${ref.id}, pageReload);"><span
+                      <td class="misoicon" onclick="Sequencer.ui.deleteSequencerReference(${ref.id}, pageReload);"><span
                               class="ui-icon ui-icon-trash"/></td>
                     </c:if>
                   </tr>

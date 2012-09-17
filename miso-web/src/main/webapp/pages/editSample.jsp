@@ -49,14 +49,16 @@
 <div id="tab-1">
 </c:if>
 
-<form:form method="POST" commandName="sample" autocomplete="off" onsubmit="return validate_sample(this);">
+<form:form method="POST" commandName="sample" autocomplete="off" acceptCharset="utf-8">
 <sessionConversation:insertSessionConversationId attributeName="sample"/>
 <h1>
     <c:choose>
         <c:when test="${not empty sample.sampleId}">Edit</c:when>
         <c:otherwise>Create</c:otherwise>
     </c:choose> Sample
-    <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
+    <button type="button" class="fg-button ui-state-default ui-corner-all"
+            onclick="return validate_sample(this.form);">Save
+    </button>
 </h1>
 
 <c:if test="${not empty sample.project}">
@@ -78,7 +80,7 @@
         </ul>
     </div>
 </c:if>
-<div class="sectionDivider" onclick="toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
+<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
     <div id="note_arrowclick" class="toggleLeft"></div>
 </div>
 <div id="notediv" class="note" style="display:none;">A Sample contains information about the material upon which the
@@ -107,7 +109,7 @@
                         <div id="locationBarcodeMenu"
                              onmouseover="mcancelclosetime()"
                              onmouseout="mclosetime()">
-                            <a href="javascript:void(0);" onclick="showSampleLocationChangeDialog(${sample.sampleId});">Change
+                            <a href="javascript:void(0);" onclick="Sample.ui.showSampleLocationChangeDialog(${sample.sampleId});">Change
                                 location</a>
                         </div>
                     </li>
@@ -129,7 +131,7 @@
                     <div id="idBarcodeMenu"
                          onmouseover="mcancelclosetime()"
                          onmouseout="mclosetime()">
-                        <a href="javascript:void(0);" onclick="printSampleBarcodes(${sample.sampleId});">Print</a>
+                        <a href="javascript:void(0);" onclick="Sample.barcode.printSampleBarcodes(${sample.sampleId});">Print</a>
                     </div>
                 </li>
             </ul>
@@ -169,7 +171,7 @@
                     <td>
                         <div id="projectlist" class="checklist">
                             <form:checkboxes items="${accessibleProjects}" path="project" itemValue="projectId"
-                                             itemLabel="name" onclick="uncheckOthers('project', this);"/>
+                                             itemLabel="name" onclick="Utils.ui.uncheckOthers('project', this);"/>
                         </div>
                     </td>
                 </c:when>
@@ -205,7 +207,7 @@
             <td>
                 <form:input path="receivedDate" id="receiveddatepicker"/>
                 <script type="text/javascript">
-                    addDatePicker("receiveddatepicker");
+                    Utils.ui.addDatePicker("receiveddatepicker");
                 </script>
             </td>
         </tr>
@@ -213,7 +215,7 @@
             <td class="h">Scientific Name:</td>
             <td><form:input path="scientificName"/>
               <c:if test="${sessionScope.taxonLookupEnabled}">
-                <script>typewatchFunc(jQuery('#scientificName'), validate_ncbi_taxon, 1000, 2);</script></td>
+                <script>Utils.timer.typewatchFunc(jQuery('#scientificName'), validate_ncbi_taxon, 1000, 2);</script></td>
               </c:if>
                 <%--<td><a href="void(0);" onclick="popup('help/sampleScientificName.html');">Help</a></td>--%>
         </tr>
@@ -255,7 +257,7 @@
     </c:otherwise>
     </c:choose>
     <c:if test="${not empty sample.sampleId}">
-        <div class="sectionDivider" onclick="toggleLeftInfo(jQuery('#notes_arrowclick'), 'notes');">Notes
+        <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#notes_arrowclick'), 'notes');">Notes
             <div id="notes_arrowclick" class="toggleLeftDown"></div>
         </div>
         <div id="notes">
@@ -269,7 +271,7 @@
                     <div id="notesmenu"
                          onmouseover="mcancelclosetime()"
                          onmouseout="mclosetime()">
-                        <a onclick="showSampleNoteDialog(${sample.sampleId});" href="javascript:void(0);" class="add">Add
+                        <a onclick="Sample.ui.showSampleNoteDialog(${sample.sampleId});" href="javascript:void(0);" class="add">Add
                             Note</a>
                     </div>
                 </li>
@@ -292,6 +294,7 @@
     </c:if>
 </div>
 </form:form>
+
 <c:if test="${not empty sample.sampleId}">
     <a name="sampleqc"></a>
 
@@ -308,7 +311,7 @@
                  onmouseover="mcancelclosetime()"
                  onmouseout="mclosetime()">
                 <a href='javascript:void(0);' class="add"
-                   onclick="generateSampleQCRow(${sample.sampleId}); return false;">Add Sample QC</a>
+                   onclick="Sample.qc.generateSampleQCRow(${sample.sampleId}); return false;">Add Sample QC</a>
             </div>
         </li>
     </ul>
@@ -349,7 +352,7 @@
                           <c:if test="${(sample.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                                           or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
                               <td id="edit${qc.qcId}" align="center"><a href="javascript:void(0);"
-                                                                        onclick="changeSampleQCRow('${qc.qcId}','${sample.sampleId}')">
+                                                                        onclick="Sample.qc.changeSampleQCRow('${qc.qcId}','${sample.sampleId}')">
                                   <span class="ui-icon ui-icon-pencil"></span></a></td>
                           </c:if>
                       </tr>
@@ -381,7 +384,7 @@
                           action="<c:url value="/miso/upload/sampleqc"/>"
                           enctype="multipart/form-data"
                           target="target_upload"
-                          onsubmit="fileUploadProgress('ajax_upload_form', 'statusdiv', pageReload);">
+                          onsubmit="Utils.fileUpload.fileUploadProgress('ajax_upload_form', 'statusdiv', Utils.page.pageReload);">
                         <input type="hidden" name="sampleId" value="${sample.sampleId}"/><br/>
                         <input type="file" name="file"/><br/>
                         <button type="submit" class="br-button ui-state-default ui-corner-all">Upload</button>
@@ -492,7 +495,7 @@
     <br/>
     <br/>
 
-    <div class="sectionDivider" onclick="toggleLeftInfo(jQuery('#options_arrowclick'), 'optionsdiv');">Table Options
+    <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#options_arrowclick'), 'optionsdiv');">Table Options
         <div id="options_arrowclick" class="toggleLeft"></div>
     </div>
     <div id="optionsdiv" class="note" style="display:none;">
@@ -560,10 +563,10 @@ function bulkCopySample() {
             obj[sampleheaders[j]] = jQuery(nodes[numrows - 1].cells[j]).text();
         }
 
-        if (isNullCheck(obj.alias) ||
-            isNullCheck(obj.description) ||
-            isNullCheck(obj.scientificName) ||
-            isNullCheck(obj.sampleType)) {
+        if (Utils.validation.isNullCheck(obj.alias) ||
+            Utils.validation.isNullCheck(obj.description) ||
+            Utils.validation.isNullCheck(obj.scientificName) ||
+            Utils.validation.isNullCheck(obj.sampleType)) {
             ok = false;
             jQuery(nodes[numrows - 1]).css('background', '#EE9966');
         }
@@ -631,7 +634,7 @@ function fnClickAddRow(rowdata) {
 }
 
 function copyRow(row) {
-    collapseInputs('#cinput');
+    DatatableUtils.collapseInputs('#cinput');
 
     var table = jQuery('#cinput').dataTable();
     var numrows = table.fnGetNodes().length;
@@ -646,17 +649,6 @@ function copyRow(row) {
         }
     }
     fnClickAddRow(rowToCopy);
-}
-
-function fnGetSelected(oTableLocal) {
-    var aReturn = new Array();
-    var aTrs = oTableLocal.fnGetNodes();
-    for (var i = 0; i < aTrs.length; i++) {
-        if (jQuery(aTrs[i]).hasClass('row_selected')) {
-            aReturn.push(aTrs[i]);
-        }
-    }
-    return aReturn;
 }
 
 function setEditables(datatable) {
@@ -745,15 +737,11 @@ function setEditables(datatable) {
     });
 }
 
-var isNullCheck = function(value) {
-    return (value === "" || value === " " || value === "undefined" || value === "&nbsp;" || value === undefined);
-};
-
 function submitBulkSamples() {
     jQuery('#bulkSampleButton').attr('disabled', 'disabled');
     jQuery('#bulkSampleButton').html("Processing...");
 
-    collapseInputs('#cinput');
+    DatatableUtils.collapseInputs('#cinput');
 
     var table = jQuery('#cinput').dataTable();
     var nodes = table.fnGetNodes();
@@ -765,10 +753,10 @@ function submitBulkSamples() {
             obj[sampleheaders[j]] = jQuery(nodes[i].cells[j]).text();
         }
 
-        if (isNullCheck(obj.alias) ||
-            isNullCheck(obj.description) ||
-            isNullCheck(obj.scientificName) ||
-            isNullCheck(obj.sampleType)) {
+        if (Utils.validation.isNullCheck(obj.alias) ||
+            Utils.validation.isNullCheck(obj.description) ||
+            Utils.validation.isNullCheck(obj.scientificName) ||
+            Utils.validation.isNullCheck(obj.sampleType)) {
             ok = false;
             jQuery(nodes[i]).css('background', '#EE9966');
         }
@@ -862,9 +850,9 @@ function bulkLibraryQcTable() {
     });
 
     //headers
-    jQuery("#library_table tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='toggleSelectAll(\"#library_table\", this);'></span></th>");
-    jQuery("#library_table tr:first").append("<th>QC Date <span header='qcDate' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='fillDown(\"#library_table\", this);'></span></th>");
-    jQuery("#library_table tr:first").append("<th>QC Method <span header='qcType' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='fillDown(\"#library_table\", this);'></span></th>");
+    jQuery("#library_table tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"#library_table\", this);'></span></th>");
+    jQuery("#library_table tr:first").append("<th>QC Date <span header='qcDate' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\"#library_table\", this);'></span></th>");
+    jQuery("#library_table tr:first").append("<th>QC Method <span header='qcType' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\"#library_table\", this);'></span></th>");
     jQuery("#library_table tr:first").append("<th>Insert Size</th>");
     jQuery("#library_table tr:first").append("<th>Results</th>");
 
@@ -905,7 +893,7 @@ function bulkLibraryQcTable() {
     });
 
     jQuery("div.toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
-    jQuery("div.toolbar").html("<button id=\"bulkLibraryQcButton\" onclick=\"saveBulkLibraryQc();\" class=\"fg-button ui-state-default ui-corner-all\"><span class=\"add\">Save QCs</span></button>");
+    jQuery("div.toolbar").html("<button id=\"bulkLibraryQcButton\" onclick=\"Sample.qc.saveBulkLibraryQc();\" class=\"fg-button ui-state-default ui-corner-all\"><span class=\"add\">Save QCs</span></button>");
 
     jQuery('#library_table .defaultEditable').editable(function(value, settings) {
          return value;
@@ -1017,8 +1005,8 @@ function bulkLibraryDilutionTable() {
         });
 
         //headers
-        jQuery("#library_table tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='toggleSelectAll(\"#library_table\", this);'></span></th>");
-        jQuery("#library_table tr:first").append("<th>Dilution Date <span header='qcDate' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='fillDown(\"#library_table\", this);'></span></th>");
+        jQuery("#library_table tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"#library_table\", this);'></span></th>");
+        jQuery("#library_table tr:first").append("<th>Dilution Date <span header='qcDate' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\"#library_table\", this);'></span></th>");
         jQuery("#library_table tr:first").append("<th>Results</th>");
 
         //columns
@@ -1056,7 +1044,7 @@ function bulkLibraryDilutionTable() {
         });
 
         jQuery("div.toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
-        jQuery("div.toolbar").html("<button id=\"bulkLibraryDilutionButton\" onclick=\"saveBulkLibraryDilutions();\" class=\"fg-button ui-state-default ui-corner-all\"><span class=\"add\">Save Dilutions</span></button>");
+        jQuery("div.toolbar").html("<button id=\"bulkLibraryDilutionButton\" onclick=\"Sample.library.saveBulkLibraryDilutions();\" class=\"fg-button ui-state-default ui-corner-all\"><span class=\"add\">Save Dilutions</span></button>");
 
         jQuery('#library_table .defaultEditable').editable(function(value, settings) {
              return value;

@@ -43,13 +43,13 @@
                     <c:otherwise>Create</c:otherwise>
                 </c:choose> Submission
                 <c:if test="${not empty submission.submissionId}">
-                <input type="button" value="Save" class="fg-button ui-state-default ui-corner-all" onclick="saveSubmission(${submission.submissionId},jQuery(form).serializeArray())"/>
+                <input type="button" value="Save" class="fg-button ui-state-default ui-corner-all" onclick="Submission.saveSubmission(${submission.submissionId},jQuery(form).serializeArray())"/>
                 </c:if>
                 <c:if test="${empty submission.submissionId}">
-                <input type="button" value="Save" class="fg-button ui-state-default ui-corner-all" onclick="saveSubmission(-1,jQuery(form).serializeArray())"/>
+                <input type="button" value="Save" class="fg-button ui-state-default ui-corner-all" onclick="Submission.saveSubmission(-1,jQuery(form).serializeArray())"/>
                 </c:if>
             </h1>
-            <div class="sectionDivider" onclick="toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
+            <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
                 <div id="note_arrowclick" class="toggleLeft"></div>
             </div>
             <div id="notediv" class="note" style="display:none;">Submission help
@@ -107,10 +107,10 @@
             </table>
 
             <c:if test="${not empty submission.submissionId}">
-                <span style="float:right"><a href="javascript:void(0);" onclick="previewSubmissionMetadata(${submission.submissionId});">Preview Raw Submission Metadata</a></span><br/>
-                <span style="float:right"><a href="javascript:void(0);" onclick="validateSubmissionMetadata(${submission.submissionId});">Validate Submission Metadata</a></span><br/>
-                <span style="float:right"><a href="javascript:void(0);" onclick="submitSubmissionMetadata(${submission.submissionId});">Submit Submission Metadata</a></span><br/>
-                <span style="float:right"><a href="javascript:void(0);" onclick="submitSequenceData(${submission.submissionId});">Submit Sequence Data</a></span>
+                <span style="float:right"><a href="javascript:void(0);" onclick="Submission.ui.previewSubmissionMetadata(${submission.submissionId});">Preview Raw Submission Metadata</a></span><br/>
+                <span style="float:right"><a href="javascript:void(0);" onclick="Submission.validateSubmissionMetadata(${submission.submissionId});">Validate Submission Metadata</a></span><br/>
+                <span style="float:right"><a href="javascript:void(0);" onclick="Submission.submitSubmissionMetadata(${submission.submissionId});">Submit Submission Metadata</a></span><br/>
+                <span style="float:right"><a href="javascript:void(0);" onclick="Submission.submitSequenceData(${submission.submissionId});">Submit Sequence Data</a></span>
                  <div id="submissionreport"></div>
 
                 <c:if test="${not empty prettyMetadata}">
@@ -166,10 +166,10 @@
                 <c:forEach items="${projects}" var="project">
                     <li id="project${project.projectId}" class="jstree-closed">
                         <c:if test="${not empty submission.submissionId}">
-                            <p style="cursor: pointer" id="projectTitle${project.projectId}" onclick="populateSubmissionProject(${project.projectId},${submission.submissionId});"><strong>${project.name}</strong> : ${project.description}</p>
+                            <p style="cursor: pointer" id="projectTitle${project.projectId}" onclick="Submission.ui.populateSubmissionProject(${project.projectId},${submission.submissionId});"><strong>${project.name}</strong> : ${project.description}</p>
                         </c:if>
                         <c:if test="${empty submission.submissionId}">
-                            <p style="cursor: pointer" id="projectTitle${project.projectId}" onclick="populateSubmissionProject(${project.projectId});"><strong>${project.name}</strong> : ${project.description}</p>
+                            <p style="cursor: pointer" id="projectTitle${project.projectId}" onclick="Submission.ui.populateSubmissionProject(${project.projectId});"><strong>${project.name}</strong> : ${project.description}</p>
                         </c:if>
                         <ul id="projectSubmission${project.projectId}">
 
@@ -284,7 +284,7 @@
     });
     */
     <c:if test="${not empty submission.submissionId}">
-      openSubmissionProjectNodes(${submission.submissionId});
+      Submission.ui.openSubmissionProjectNodes(${submission.submissionId});
     </c:if>
 	});
 </script>

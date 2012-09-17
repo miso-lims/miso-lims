@@ -20,8 +20,9 @@
  *
  * *********************************************************************
  */
-function toggleAddTableToQuerySet(tableInput) {
 
+/*
+function toggleAddTableToQuerySet(tableInput) {
   if (tableInput.checked) {
     Fluxion.doAjax(
             'reportingControllerHelperService',
@@ -90,39 +91,6 @@ function processQueryParameters() {
           );
 }
 
-var lastChecked = null;
-function prepareTable() {
-
-  jQuery('.chkbox').click(function(event) {
-    if (!lastChecked) {
-      lastChecked = this;
-      return;
-    }
-
-    if (event.shiftKey) {
-      var start = jQuery('.chkbox').index(this);
-      var end = jQuery('.chkbox').index(lastChecked);
-
-      for (i = Math.min(start, end); i <= Math.max(start, end); i++) {
-        jQuery('.chkbox')[i].checked = lastChecked.checked;
-      }
-    }
-
-    lastChecked = this;
-  });
-  var theTable = jQuery("#table");
-
-  jQuery("#filter").keyup(function() {
-    jQuery.uiTableFilter(theTable, this.value);
-  });
-
-  jQuery('#filter-form').submit(function() {
-    theTable.find("tbody > tr:visible > td:eq(1)").mousedown();
-    return false;
-  }).focus(); //Give focus to input field
-
-}
-
 function changeReportType(form) {
   Fluxion.doAjax(
           'reportingControllerHelperService',
@@ -171,13 +139,11 @@ function reportSearch(inp, throbber) {
 }
 
 function reportloadAll(type) {
-  timedFunc(reportSearch(jQuery('#search' + type), true), 200);
+  Utils.timer.timedFunc(reportSearch(jQuery('#search' + type), true), 200);
 }
 
 function generateReport(form) {
-  disableButton('generateReportButton');
-  //jQuery('#generateReportButton').attr('disabled', 'disabled');
-  //Query('#generateReportButton').html("Processing...");
+  Utils.ui.disableButton('generateReportButton');
 
   Fluxion.doAjax(
           'reportingControllerHelperService',
@@ -204,3 +170,4 @@ function writeConsole(content) {
           );
   top.consoleRef.document.close();
 }
+*/

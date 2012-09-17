@@ -104,25 +104,21 @@
 </table>
 <script type="text/javascript">
 var fun, state = "tree";
-//var projectIds = new Array();
 
 jQuery(document).ready(function() {
-    writeTotalNo();
-    jQuery("#traftrigger").colorbox({width:"90%", inline:true, href:"#trafpanel"});
-    <%--<c:forEach items="${projects}" var="project">--%>
-    <%--projectIds.push(${project.projectId});--%>
-    <%--</c:forEach>--%>
-    listProjectTrafficLight();
-    jQuery("#table").tablesorter({
-                                     headers: {
-                                         4: {
-                                             sorter: false
-                                         },
-                                         5: {
-                                             sorter: false
-                                         }
-                                     }
-                                 });
+  writeTotalNo();
+  jQuery("#traftrigger").colorbox({width:"90%", inline:true, href:"#trafpanel"});
+  Project.ui.listProjectTrafficLight();
+  jQuery("#table").tablesorter({
+    headers: {
+      4: {
+        sorter: false
+      },
+      5: {
+        sorter: false
+      }
+    }
+  });
 });
 
 

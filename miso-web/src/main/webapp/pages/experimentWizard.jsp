@@ -30,130 +30,117 @@
 <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.breadcrumbs.popup.js'/>"></script>
 
 <div id="maincontent">
-    <div id="contentcolumn">
-        <div id="result">
-            <form id="experimentWizardForm" method="POST" autocomplete="off">
-                <h1>
-                    Create Experiment Wizard
-                    <button type="button" class="fg-button ui-state-default ui-corner-all"
-                            onclick="checkform('experimentWizardForm');">Save
-                    </button>
-                </h1>
-                <div class="sectionDivider" onclick="toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
-                    <div id="note_arrowclick" class="toggleLeft"></div>
-                </div>
-                <div id="notediv" class="note" style="display:none;">An experiment contains design information about the
-                    sequencing experiment. Experiments are associated with Runs which contain the actual sequencing
-                    results.
-                    A Pool is attached to an Experiment which is then assigned to an instrument partition
-                    (lane/chamber).
-                </div>
-                <h2>Study Information</h2>
-                <table class="in">
-                    <input type="hidden" name="projectId" value="${projectId}"/>
-                    <tr>
-                        <td>Study Type:</td>
-                        <td>
-                            <select name="studyType">
-                                ${studyTypes}
-                            </select>
-                        </td>
-                    </tr>
-                </table>
-                <br/>
-                <hr/>
-
-                <div id="new1">
-                </div>
-
-            </form>
+  <div id="contentcolumn">
+    <div id="result">
+      <form id="experimentWizardForm" method="POST" autocomplete="off">
+        <h1>
+          Create Experiment Wizard
+          <button type="button" class="fg-button ui-state-default ui-corner-all"
+                  onclick="checkform('experimentWizardForm');">Save
+          </button>
+        </h1>
+        <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
+          <div id="note_arrowclick" class="toggleLeft"></div>
         </div>
+        <div id="notediv" class="note" style="display:none;">An experiment contains design information about the
+          sequencing experiment. Experiments are associated with Runs which contain the actual sequencing
+          results.
+          A Pool is attached to an Experiment which is then assigned to an instrument partition
+          (lane/chamber).
+        </div>
+        <h2>Study Information</h2>
+        <table class="in">
+          <input type="hidden" name="projectId" value="${projectId}"/>
+          <tr>
+            <td>Study Type:</td>
+            <td>
+              <select name="studyType">
+                ${studyTypes}
+              </select>
+            </td>
+          </tr>
+        </table>
+        <br/>
+        <hr/>
+
+      </form>
     </div>
+  </div>
 </div>
 
 <script type="text/javascript">
-    addMaxDatePicker("creationDate", 0);
+  Utils.ui.addMaxDatePicker("creationDate", 0);
 
-    jQuery(function() {
-        jQuery("#poolList").sortable({
-            revert: true
-        });
-        jQuery(".draggable").draggable({
-            connectToSortable: '#poolList',
-            revert: true,
-            scroll: false
-        });
-        jQuery("ul, li").disableSelection();
+  jQuery(function() {
+    jQuery("#poolList").sortable({
+       revert: true
+     });
+    jQuery(".draggable").draggable({
+       connectToSortable: '#poolList',
+       revert: true,
+       scroll: false
+     });
+    jQuery("ul, li").disableSelection();
 
-        updateDroppables("#list_2");
-
-        jQuery(".elementListDroppable").droppable({
-            accept: '.draggable',
-            activeClass: 'ui-state-hover',
-            hoverClass: 'ui-state-active',
-            tolerance: 'pointer',
-            drop: function(event, ui) {
-                jQuery(ui.draggable).find('input').attr("name", "");
-                jQuery(ui.draggable).appendTo(jQuery(this));
-            }
-        });
-
+    jQuery(".elementListDroppable").droppable({
+      accept: '.draggable',
+      activeClass: 'ui-state-hover',
+      hoverClass: 'ui-state-active',
+      tolerance: 'pointer',
+      drop: function(event, ui) {
+        jQuery(ui.draggable).find('input').attr("name", "");
+        jQuery(ui.draggable).appendTo(jQuery(this));
+      }
     });
+  });
 
-    jQuery(document).ready(function() {
-        addExperimentForm('1');
+  jQuery(document).ready(function() {
+    Experiment.ui.addExperimentForm('1');
 
-        jQuery("#tabs").tabs();
+    jQuery("#tabs").tabs();
 
-        jQuery('#title').simplyCountable({
-            counter: '#titlecounter',
-            countType: 'characters',
-            maxCount: ${maxLengths['title']},
-            countDirection: 'down'
-        });
+    jQuery('#title').simplyCountable({
+       counter: '#titlecounter',
+       countType: 'characters',
+       maxCount: ${maxLengths['title']},
+       countDirection: 'down'
+     });
 
-        jQuery('#alias').simplyCountable({
-            counter: '#aliascounter',
-            countType: 'characters',
-            maxCount: ${maxLengths['alias']},
-            countDirection: 'down'
-        });
+    jQuery('#alias').simplyCountable({
+       counter: '#aliascounter',
+       countType: 'characters',
+       maxCount: ${maxLengths['alias']},
+       countDirection: 'down'
+     });
 
-        jQuery('#description').simplyCountable({
-            counter: '#descriptioncounter',
-            countType: 'characters',
-            maxCount: ${maxLengths['description']},
-            countDirection: 'down'
-        });
+    jQuery('#description').simplyCountable({
+       counter: '#descriptioncounter',
+       countType: 'characters',
+       maxCount: ${maxLengths['description']},
+       countDirection: 'down'
+     });
+  });
+
+  function checkform(form) {
+    var bool = true;
+    jQuery('.needcheck').each(function() {
+      if (jQuery(this).val() == '') {
+        bool = false;
+      }
     });
-
-    function checkform(form) {
-        var bool = true;
-        jQuery('.needcheck').each(function() {
-            if (jQuery(this).val() == '') {
-                bool = false;
-            }
-        });
-        if (bool) {
-            var idarray = [];
-            jQuery('.expids').each(function() {
-            if (jQuery(this).val() == '') {
-                bool = false;
-            }
-        });
-            wizardAddExperiment(form);
+    if (bool) {
+      var idarray = [];
+      jQuery('.expids').each(function() {
+        if (jQuery(this).val() == '') {
+          bool = false;
         }
-        else {
-            alert("Title, Alias and Description cannot be empty");
-        }
+      });
+      Experiment.ui.wizardAddExperiment(form);
     }
-
-    function confirmRemoveExperiment(id) {
-        if (confirm("Are you sure you wish to remove this Experiment?")) {
-            var obj = jQuery('#exp' + id);
-            obj.remove();
-        }
+    else {
+      alert("Title, Alias and Description cannot be empty");
     }
+  }
 
 </script>
 

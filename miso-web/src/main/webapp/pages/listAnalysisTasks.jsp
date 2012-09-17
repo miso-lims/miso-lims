@@ -166,10 +166,10 @@ jQuery(document).ready(function() {
   jQuery("#tabs").tabs();
   jQuery("#tabs").removeClass('ui-widget').removeClass('ui-widget-content');
 
-  populateRunningTasks();
-  populatePendingTasks();
-  populateCompletedTasks();
-  populatePipelines();
+  Tasks.ui.populateRunningTasks();
+  Tasks.ui.populatePendingTasks();
+  Tasks.ui.populateCompletedTasks();
+  Tasks.ui.populatePipelines();
 });
 </script>
 <%@ include file="../footer.jsp" %>

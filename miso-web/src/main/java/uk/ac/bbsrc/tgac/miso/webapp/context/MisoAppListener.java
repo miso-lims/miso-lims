@@ -37,10 +37,13 @@ import org.springframework.web.context.support.XmlWebApplicationContext;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.PoolAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.ProjectAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.RunAlertManager;
+import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.issuetracker.IssueTrackerFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoRequestManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.PrintManager;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoEntityNamingSchemeResolverService;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
 import uk.ac.bbsrc.tgac.miso.core.service.tagbarcode.TagBarcodeStrategy;
@@ -49,6 +52,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.core.store.RunQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.runstats.client.manager.RunStatsManager;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
@@ -103,6 +107,34 @@ public class MisoAppListener implements ServletContextListener {
 
     //set headless property so JFreeChart doesn't try to use the X rendering system to generate images
     System.setProperty("java.awt.headless", "true");
+
+    //set up naming schemes
+    MisoEntityNamingSchemeResolverService entityNamingSchemeResolverService = (MisoEntityNamingSchemeResolverService)context.getBean("entityNamingSchemeResolverService");
+    Collection<MisoNamingScheme<?>> mnss = entityNamingSchemeResolverService.getNamingSchemes();
+    for (MisoNamingScheme<?> mns : mnss) {
+      log.info("Got naming scheme: " + mns.getSchemeName());
+      String classname = mns.namingSchemeFor().getSimpleName().toLowerCase();
+
+      if (misoProperties.containsKey("miso.naming.scheme."+classname) && misoProperties.get("miso.naming.scheme."+classname).equals(mns.getSchemeName())) {
+        log.info("Replacing default "+classname+"NamingScheme with " + mns.getSchemeName());
+        ((DefaultListableBeanFactory)context.getBeanFactory()).removeBeanDefinition(classname+"NamingScheme");
+        context.getBeanFactory().registerSingleton(classname+"NamingScheme", mns);
+      }
+
+      for (String key : misoProperties.keySet()) {
+        if (key.startsWith("miso.naming.validation."+classname)) {
+          String prop = key.substring(key.lastIndexOf(".")+1);
+
+          try {
+            mns.setValidationRegex(prop, misoProperties.get("miso.naming.validation."+classname+"."+prop));
+          }
+          catch (MisoNamingException e) {
+            log.error("Cannot set new validation regex for field '"+prop+"'. Reverting to default: " + e);
+            e.printStackTrace();
+          }
+        }
+      }
+    }
 
     //set up printers
     PrintManager printManager = (PrintManager)context.getBean("printManager");
@@ -172,7 +204,7 @@ public class MisoAppListener implements ServletContextListener {
             for (String key : misoProperties.keySet()) {
               if (key.startsWith("miso.issuetracker."+trackerType)) {
                 String prop = key.substring(key.lastIndexOf(".")+1);
-                String methodName = "set"+prop.substring(0,1).toUpperCase() + prop.substring(1);
+                String methodName = "set"+ LimsUtils.capitalise(prop); //prop.substring(0,1).toUpperCase() + prop.substring(1);
                 Method m = manager.getClass().getDeclaredMethod(methodName, String.class);
                 m.invoke(manager, misoProperties.get(key));
               }

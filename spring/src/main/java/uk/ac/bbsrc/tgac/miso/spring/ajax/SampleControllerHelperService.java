@@ -43,8 +43,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
+import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoPrintException;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
@@ -65,8 +67,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
@@ -91,73 +91,96 @@ public class SampleControllerHelperService {
   private BarcodeFactory barcodeFactory;
   @Autowired
   private PrintManager<MisoPrintService, Queue<?>> printManager;
+  @Autowired
+  private MisoNamingScheme<Sample> sampleNamingScheme;
+
+  public JSONObject validateSampleAlias(HttpSession session, JSONObject json) {
+    if (json.has("alias")) {
+      String alias = json.getString("alias");
+      try {
+        if (sampleNamingScheme.validateField("alias", alias)) {
+          log.info("Sample alias OK!");
+          return JSONUtils.SimpleJSONResponse("OK");
+        }
+        else {
+          log.error("Sample alias not valid: " + alias);
+          return JSONUtils.SimpleJSONError("The following sample alias doesn't conform to the chosen naming scheme ("+sampleNamingScheme.getValidationRegex("alias")+") or already exists: " + json.getString("alias"));
+        }
+      }
+      catch (MisoNamingException e) {
+        log.error("Cannot validate sample alias " + json.getString("alias") + ": " + e.getMessage());
+        e.printStackTrace();
+        return JSONUtils.SimpleJSONError("Cannot validate sample alias " + json.getString("alias") + ": " + e.getMessage());
+      }
+    }
+    else {
+      return JSONUtils.SimpleJSONError("No alias specified");
+    }
+  }
 
   public JSONObject bulkSaveSamples(HttpSession session, JSONObject json) {
     if (json.has("samples")) {
       try {
         Project p = requestManager.getProjectById(json.getLong("projectId"));
         SecurityProfile sp = p.getSecurityProfile();
-
-        //objectify the stringified JSONArray
         JSONArray a = JSONArray.fromObject(json.get("samples"));
         Set<Sample> saveSet = new HashSet<Sample>();
-
-        String regex = "([A-z0-9]+)_S([A-z0-9]+)_(.*)";
-        Pattern pat = Pattern.compile(regex);
 
         for (JSONObject j : (Iterable<JSONObject>) a) {
           try {
             String alias = j.getString("alias");
-            Matcher mat = pat.matcher(alias);
-            if (!mat.matches()) {
-              throw new IOException("Sample alias '" + alias + "' doesn't conform to the <PI initials>_S<Sample Number>_<Species> naming convention.");
-            }
-            String descr = j.getString("description");
-            String scientificName = j.getString("scientificName");
-            DateFormat df = new SimpleDateFormat("dd/mm/yyyy");
-            String type = j.getString("sampleType");
-            //String idBarcode = j.getString("identificationBarcode");
-            String locationBarcode = j.getString("locationBarcode");
 
-            Sample news = new SampleImpl();
-            news.setProject(p);
-            news.setAlias(alias);
-            news.setDescription(descr);
-            news.setScientificName(scientificName);
-            news.setSecurityProfile(sp);
-            news.setSampleType(type);
-            //samples should stay as "Unknown" after bulk save
-            //news.setQcPassed();
-            //news.setIdentificationBarcode(idBarcode);
-            news.setLocationBarcode(locationBarcode);
+            if (sampleNamingScheme.validateField("alias", alias)) {
+              String descr = j.getString("description");
+              String scientificName = j.getString("scientificName");
+              DateFormat df = new SimpleDateFormat("dd/mm/yyyy");
+              String type = j.getString("sampleType");
+              String locationBarcode = j.getString("locationBarcode");
 
-            if (j.has("receivedDate") && !"".equals(j.getString("receivedDate"))) {
-              Date date = df.parse(j.getString("receivedDate"));
-              news.setReceivedDate(date);
-            }
-
-            if (!j.getString("note").equals("")) {
-              Note note = new Note();
-              note.setOwner(sp.getOwner());
-              note.setText(j.getString("note"));
-              note.setInternalOnly(true);
+              Sample news = new SampleImpl();
+              news.setProject(p);
+              news.setAlias(alias);
+              news.setDescription(descr);
+              news.setScientificName(scientificName);
+              news.setSecurityProfile(sp);
+              news.setSampleType(type);
+              news.setLocationBarcode(locationBarcode);
 
               if (j.has("receivedDate") && !"".equals(j.getString("receivedDate"))) {
                 Date date = df.parse(j.getString("receivedDate"));
-                note.setCreationDate(date);
-              }
-              else {
-                note.setCreationDate(new Date());
+                news.setReceivedDate(date);
               }
 
-              news.setNotes(Arrays.asList(note));
+              if (!j.getString("note").equals("")) {
+                Note note = new Note();
+                note.setOwner(sp.getOwner());
+                note.setText(j.getString("note"));
+                note.setInternalOnly(true);
+
+                if (j.has("receivedDate") && !"".equals(j.getString("receivedDate"))) {
+                  Date date = df.parse(j.getString("receivedDate"));
+                  note.setCreationDate(date);
+                }
+                else {
+                  note.setCreationDate(new Date());
+                }
+
+                news.setNotes(Arrays.asList(note));
+              }
+
+              saveSet.add(news);
             }
-
-            saveSet.add(news);
+            else {
+              return JSONUtils.SimpleJSONError("The following sample alias doesn't conform to the chosen naming scheme ("+sampleNamingScheme.getValidationRegex("alias")+") or already exists: " + j.getString("alias"));
+            }
           }
           catch (ParseException e) {
             e.printStackTrace();
             return JSONUtils.SimpleJSONError("Cannot parse date for sample " + j.getString("alias"));
+          }
+          catch (MisoNamingException e) {
+            e.printStackTrace();
+            return JSONUtils.SimpleJSONError("Cannot validate sample alias " + j.getString("alias") + ": " + e.getMessage());
           }
         }
 
@@ -320,7 +343,7 @@ public class SampleControllerHelperService {
       Long qcId = Long.parseLong(json.getString("qcId"));
       SampleQC sampleQc = requestManager.getSampleQCById(qcId);
       response.put("results", "<input type='text' id='" + qcId + "' value='" + sampleQc.getResults() + "'/>");
-      response.put("edit", "<a href='javascript:void(0);' onclick='editSampleQC(\"" + qcId + "\");'>Save</a>");
+      response.put("edit", "<a href='javascript:void(0);' onclick='Sample.qc.editSampleQC(\"" + qcId + "\");'>Save</a>");
       return response;
     }
     catch (Exception e) {
@@ -626,5 +649,9 @@ public class SampleControllerHelperService {
 
   public void setPrintManager(PrintManager<MisoPrintService, Queue<?>> printManager) {
     this.printManager = printManager;
+  }
+
+  public void setSampleNamingScheme(MisoNamingScheme<Sample> sampleNamingScheme) {
+    this.sampleNamingScheme = sampleNamingScheme;
   }
 }

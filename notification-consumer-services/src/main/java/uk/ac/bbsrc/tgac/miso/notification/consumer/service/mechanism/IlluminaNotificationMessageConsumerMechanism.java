@@ -67,7 +67,7 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
     this.attemptRunPopulation = attemptRunPopulation;
   }
 
-  private final String runDirRegex = "[\\d]+_([A-z0-9])+_([\\d])+_([A-z0-9_\\-])*";
+  private final String runDirRegex = "[\\d]+_([A-z0-9])+_([\\d])+_([A-z0-9_-])*";
   private final Pattern p = Pattern.compile(runDirRegex);
   private final DateFormat logDateFormat = new SimpleDateFormat("MM'/'dd'/'yyyy','HH:mm:ss");
   private final DateFormat anotherLogDateFormat = new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH:mm:ss");
@@ -396,7 +396,6 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
     }
     try {
       if (runsToSave.size() > 0) {
-        log.info("Saving " + runsToSave.size() + " runs");
         int[] saved = requestManager.saveRuns(runsToSave);
         log.info("Batch saved " + saved.length + " / "+ runs.size() + " runs");
       }

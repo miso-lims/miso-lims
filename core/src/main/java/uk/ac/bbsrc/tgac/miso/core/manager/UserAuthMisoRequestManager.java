@@ -800,6 +800,18 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
+  public Collection<Sample> listSamplesByAlias(String alias) throws IOException {
+    User user = getCurrentUser();
+    Collection<Sample> accessibles = new HashSet<Sample>();
+    for (Sample sample : super.listSamplesByAlias(alias)) {
+      if (sample.userCanRead(user)) {
+        accessibles.add(sample);
+      }
+    }
+    return accessibles;
+  }
+
+  @Override
   public Collection<SampleQC> listAllSampleQCsBySampleId(long sampleId) throws IOException {
     User user = getCurrentUser();
     Collection<SampleQC> accessibles = new HashSet<SampleQC>();

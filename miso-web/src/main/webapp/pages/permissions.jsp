@@ -21,7 +21,7 @@
   ~ **********************************************************************
   --%>
 
-<div class="sectionDivider" onclick="toggleLeftInfo(jQuery('#permissions_arrowclick'), 'permissions');">Permissions<div id="permissions_arrowclick" class="toggleLeft"></div></div>
+<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#permissions_arrowclick'), 'permissions');">Permissions<div id="permissions_arrowclick" class="toggleLeft"></div></div>
 <div id="permissions" class="note" style="display:none">
     <h2>Permissions</h2>    
     <table class="in">
@@ -61,9 +61,9 @@
             <tr>
                 <td class="h">Users (read):<br/>
                     <a href="javascript:void(0);"
-                       onclick="checkAll('securityProfile.readUsers'); return false;">All</a>
+                       onclick="Utils.ui.checkAll('securityProfile.readUsers'); return false;">All</a>
                     / <a href="javascript:void(0);"
-                         onclick="uncheckAll('securityProfile.readUsers'); return false;">None</a></td>
+                         onclick="Utils.ui.uncheckAll('securityProfile.readUsers'); return false;">None</a></td>
                 <td>
                     <div id="readUsers" class="checklist">
                         <form:checkboxes items="${accessibleUsers}" path="securityProfile.readUsers"
@@ -75,9 +75,9 @@
             <tr>
                 <td class="h">Users (write):<br/>
                     <a href="javascript:void(0);"
-                       onclick="checkAll('securityProfile.writeUsers'); return false;">All</a>
+                       onclick="Utils.ui.checkAll('securityProfile.writeUsers'); return false;">All</a>
                     / <a href="javascript:void(0);"
-                         onclick="uncheckAll('securityProfile.writeUsers'); return false;">None</a>
+                         onclick="Utils.ui.uncheckAll('securityProfile.writeUsers'); return false;">None</a>
                 </td>
                 <td>
                     <div id="writeUsers" class="checklist">
@@ -90,9 +90,9 @@
             <tr>
                 <td class="h">Groups (read):<br/>
                     <a href="javascript:void(0);"
-                       onclick="checkAll('securityProfile.readGroups'); return false;">All</a>
+                       onclick="Utils.ui.checkAll('securityProfile.readGroups'); return false;">All</a>
                     / <a href="javascript:void(0);"
-                         onclick="uncheckAll('securityProfile.readGroups'); return false;">None</a>
+                         onclick="Utils.ui.uncheckAll('securityProfile.readGroups'); return false;">None</a>
                 </td>
                 <td>
                     <div id="readGroups" class="checklist">
@@ -105,9 +105,9 @@
             <tr>
                 <td class="h">Groups (write):<br/>
                     <a href="javascript:void(0);"
-                       onclick="checkAll('securityProfile.writeGroups'); return false;">All</a>
+                       onclick="Utils.ui.checkAll('securityProfile.writeGroups'); return false;">All</a>
                     / <a href="javascript:void(0);"
-                         onclick="uncheckAll('securityProfile.writeGroups'); return false;">None</a>
+                         onclick="Utils.ui.uncheckAll('securityProfile.writeGroups'); return false;">None</a>
                 </td>
                 <td>
                     <div id="writeGroups" class="checklist">

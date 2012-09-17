@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.core.store;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -34,7 +35,7 @@ import java.util.Collection;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface SampleStore extends Store<Sample>, Cascadable, Remover<Sample> {
+public interface SampleStore extends Store<Sample>, Cascadable, Remover<Sample>, NamingSchemeAware<Sample> {
   /**
    * Retrieve a Sample from an underlying data store given a Sample ID
    * <p/>
@@ -86,7 +87,16 @@ public interface SampleStore extends Store<Sample>, Cascadable, Remover<Sample> 
   Collection<Sample> listByExperimentId(long experimentId) throws IOException;
 
   /**
-   * List all Samples that are part of a Submission given a Submission ID 
+   * List all Samples by a given alias
+   *
+   * @param alias of type String
+   * @return Collection<Sample>
+   * @throws IOException when
+   */
+  Collection<Sample> listByAlias(String alias) throws IOException;
+
+  /**
+   * List all Samples that are part of a Submission given a Submission ID
    *
    * @param submissionId of type long
    * @return Collection<Sample>

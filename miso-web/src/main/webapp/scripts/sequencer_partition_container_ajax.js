@@ -21,175 +21,180 @@
  * *********************************************************************
  */
 
-function populatePlatformTypes() {
-  Fluxion.doAjax(
-    'containerControllerHelperService',
-    'getPlatformTypes',
-  {'url':ajaxurl},
-  {
-    'doOnSuccess': function(json) {
-      jQuery('#platformTypesDiv').html(json.html);
+var Container = Container || {
+  lookupContainer : function(t) {
+    var self = this;
+    var barcode = jQuery("input", jQuery(t).parent()).val();
+    if (!Utils.validation.isNullCheck(barcode)) {
+      Fluxion.doAjax(
+        'containerControllerHelperService',
+        'lookupContainer',
+        {'barcode':barcode,'url':ajaxurl},
+        {'doOnSuccess':self.processLookup}
+      );
     }
-  });
-}
+  },
 
-function changeContainerPlatformType(form) {
-  Fluxion.doAjax(
-          'containerControllerHelperService',
-          'changePlatformType',
-          {'platformtype':form.value, 'container_cId':jQuery('input[name=container_cId]').val(), 'url':ajaxurl},
-          {'doOnSuccess':
-                  function(json) {
-                    jQuery('#sequencerReferenceSelect').html(json.sequencers);
-                  }
-          }
-          );
-}
+  processLookup : function(json) {
+    if (json.err) {
+      jQuery('#partitionErrorDiv').html(json.err);
+    }
+    else {
+      if (json.verify) {
+        var dialogStr = "Container Properties\n\n";
+        for (var key in json.verify) {
+          dialogStr += "Partition "+ key + ": " + json.verify[key] + "\n";
+        }
 
-function populateContainerOptions(form) {
-  if (form.value != 0) {
-    Fluxion.doAjax(
-            'containerControllerHelperService',
-            'populateContainerOptions',
-            {'sequencerReference':form.value, 'url':ajaxurl},
-            {'doOnSuccess':
-                    function(json) {
-                      jQuery('#containerPartitions').html(json.partitions);
-                    }
-            }
-            );
-  }
-}
-
-function changeContainer(numContainers, platform, seqrefId) {
-  Fluxion.doAjax(
-          'containerControllerHelperService',
-          'changeContainer',
-          {'platform':platform, 'container_cId':jQuery('input[name=container_cId]').val(), 'numContainers':numContainers, 'sequencerReferenceId':seqrefId, 'url':ajaxurl},
-          {'updateElement':'containerdiv'});
-}
-
-function changeContainerLS454Chamber(t, container) {
-  Fluxion.doAjax(
-          'containerControllerHelperService',
-          'changeChamber',
-          {'platform':'LS454', 'numChambers':jQuery(t).val(), 'container':container, 'url':ajaxurl},
-          {'updateElement':'containerdiv'+container});
-}
-
-function changeContainerSolidChamber(t, container) {
-  Fluxion.doAjax(
-          'containerControllerHelperService',
-          'changeChamber',
-          {'platform':'Solid', 'numChambers':jQuery(t).val(), 'container':container, 'url':ajaxurl},
-          {'updateElement':'containerdiv'+container});
-}
-
-function changeContainerPacBioChamber(t, container) {
-  Fluxion.doAjax(
-          'containerControllerHelperService',
-          'changeChamber',
-          {'platform':'PacBio', 'numChambers':jQuery(t).val(), 'container':container, 'url':ajaxurl},
-          {'updateElement':'containerdiv'+container});
-}
-
-function populatePartition(t) {
-  var a = jQuery(t);
-  var partitionNum = a.attr("partition");
-  if (partitionNum > 0) {
-    var ul = jQuery("ul[partition='"+(partitionNum-1)+"']");
-    if (ul.length > 0) {
-      if (!isNullCheck(ul.html()) && ul.find("div").length > 0) {
-        a.html("<input type='text' id='poolBarcode"+partitionNum+"' name='poolBarcode"+partitionNum+"' partition='"+partitionNum+"' onkeyup='timedFunc(getPool(this), 300);'/><br/><span id='msg"+partitionNum+"'/>");
-      }
-      else {
-        alert("Please enter a pool for partition " + (partitionNum));
+        if (confirm("Import this container?\n\n"+dialogStr)) {
+          jQuery('#partitionErrorDiv').html("");
+          jQuery('#partitionDiv').html(json.html);
+        }
       }
     }
   }
-  else {
-    a.html("<input type='text' id='poolBarcode"+partitionNum+"' name='poolBarcode"+partitionNum+"' partition='"+partitionNum+"' onkeyup='timedFunc(getPool(this), 300);'/><br/><span id='msg"+partitionNum+"'/>");
-  }
-}
+};
 
-function getPool(t) {
-  var a = jQuery(t);
-  var platform = jQuery("input[name='platformTypes']:checked").val();
-  var pNum = a.attr("partition");
-  Fluxion.doAjax(
-    'containerControllerHelperService',
-    'getPoolByBarcode',
-    {'platform':platform, 'container_cId':jQuery('input[name=container_cId]').val(), 'partition':pNum, 'barcode':a.val(),'url':ajaxurl},
-    {'doOnSuccess':function(json) {
-      if (json.err) {
-        jQuery("#msg"+pNum).html(json.err);
-      }
-      else {
-        a.parent().html(json.html);
-      }
-    }});
-}
-
-function selectContainerStudy(partition, poolId) {
-  disableButton('studySelectButton-'+partition+'_'+poolId);
-  //jQuery('#studySelectButton-'+partition+'_'+poolId).attr('disabled', 'disabled');
-  //jQuery('#studySelectButton-'+partition+'_'+poolId).val("Processing...");
-
-  var studyId = jQuery("select[name='poolStudies"+partition+"'] :selected").val();
-
-  Fluxion.doAjax(
-    'containerControllerHelperService',
-    'selectStudyForPool',
-    {'poolId':poolId, 'studyId':studyId, 'sequencerReferenceId':jQuery('#sequencerReference').val(), 'url':ajaxurl},
-    {'doOnSuccess':
-      function(json) {
-        var div = jQuery("#studySelectDiv"+partition).parent();
-        jQuery("#studySelectDiv"+partition).remove();
-        div.append(json.html);
-      },
-      'doOnError':
-      function(json) {
-        reenableButton('studySelectButton-'+partition+'_'+poolId, "Select Study");
-        //jQuery('#studySelectButton-'+partition+'_'+poolId).removeAttr('disabled');
-        //jQuery('#studySelectButton-'+partition+'_'+poolId).val("Select Study");
-      }
-    }
-  );
-}
-
-function confirmPoolRemove(t) {
-  if (confirm("Remove this pool?")) {
-    jQuery(t).parent().remove();
-  }
-}
-
-function lookupContainer(t) {
-  var barcode = jQuery("input", jQuery(t).parent()).val();
-  if (!isNullCheck(barcode)) {
+Container.ui = {
+  populatePlatformTypes : function() {
     Fluxion.doAjax(
       'containerControllerHelperService',
-      'lookupContainer',
-      {'barcode':barcode,'url':ajaxurl},
-      {'doOnSuccess':processLookup}
-    );
-  }
-}
-
-var processLookup = function(json) {
-  if (json.err) {
-    jQuery('#partitionErrorDiv').html(json.err);
-  }
-  else {
-    if (json.verify) {
-      var dialogStr = "Container Properties\n\n";
-      for (var key in json.verify) {
-        dialogStr += "Partition "+ key + ": " + json.verify[key] + "\n";
+      'getPlatformTypes',
+    {'url':ajaxurl},
+    {
+      'doOnSuccess': function(json) {
+        jQuery('#platformTypesDiv').html(json.html);
       }
+    });
+  },
 
-      if (confirm("Import this container?\n\n"+dialogStr)) {
-        jQuery('#partitionErrorDiv').html("");
-        jQuery('#partitionDiv').html(json.html);
+  changeContainerPlatformType : function(form) {
+    Fluxion.doAjax(
+      'containerControllerHelperService',
+      'changePlatformType',
+      {'platformtype':form.value, 'container_cId':jQuery('input[name=container_cId]').val(), 'url':ajaxurl},
+      {'doOnSuccess':
+        function(json) {
+          jQuery('#sequencerReferenceSelect').html(json.sequencers);
+        }
+      }
+    );
+  },
+
+  populateContainerOptions : function(form) {
+    if (form.value != 0) {
+      Fluxion.doAjax(
+        'containerControllerHelperService',
+        'populateContainerOptions',
+        {'sequencerReference':form.value, 'url':ajaxurl},
+        {'doOnSuccess':
+          function(json) {
+            jQuery('#containerPartitions').html(json.partitions);
+          }
+        }
+      );
+    }
+  },
+
+  changeContainer : function(numContainers, platform, seqrefId) {
+    Fluxion.doAjax(
+      'containerControllerHelperService',
+      'changeContainer',
+      {'platform':platform, 'container_cId':jQuery('input[name=container_cId]').val(), 'numContainers':numContainers, 'sequencerReferenceId':seqrefId, 'url':ajaxurl},
+      {'updateElement':'containerdiv'});
+  },
+
+  changeContainerLS454Chamber : function(t, container) {
+    Fluxion.doAjax(
+      'containerControllerHelperService',
+      'changeChamber',
+      {'platform':'LS454', 'numChambers':jQuery(t).val(), 'container':container, 'url':ajaxurl},
+      {'updateElement':'containerdiv'+container});
+  },
+
+  changeContainerSolidChamber : function(t, container) {
+    Fluxion.doAjax(
+      'containerControllerHelperService',
+      'changeChamber',
+      {'platform':'Solid', 'numChambers':jQuery(t).val(), 'container':container, 'url':ajaxurl},
+      {'updateElement':'containerdiv'+container});
+  },
+
+  changeContainerPacBioChamber : function(t, container) {
+    Fluxion.doAjax(
+      'containerControllerHelperService',
+      'changeChamber',
+      {'platform':'PacBio', 'numChambers':jQuery(t).val(), 'container':container, 'url':ajaxurl},
+      {'updateElement':'containerdiv'+container});
+  },
+
+  confirmPoolRemove : function(t) {
+    if (confirm("Remove this pool?")) {
+      jQuery(t).parent().remove();
+    }
+  }
+};
+
+Container.partition = {
+  populatePartition : function(t) {
+    var a = jQuery(t);
+    var partitionNum = a.attr("partition");
+    if (partitionNum > 0) {
+      var ul = jQuery("ul[partition='"+(partitionNum-1)+"']");
+      if (ul.length > 0) {
+        if (!Utils.validation.isNullCheck(ul.html()) && ul.find("div").length > 0) {
+          a.html("<input type='text' id='poolBarcode"+partitionNum+"' name='poolBarcode"+partitionNum+"' partition='"+partitionNum+"' onkeyup='Utils.timer.timedFunc(Container.pool.getPool(this), 300);'/><br/><span id='msg"+partitionNum+"'/>");
+        }
+        else {
+          alert("Please enter a pool for partition " + (partitionNum));
+        }
       }
     }
+    else {
+      a.html("<input type='text' id='poolBarcode"+partitionNum+"' name='poolBarcode"+partitionNum+"' partition='"+partitionNum+"' onkeyup='Utils.timer.timedFunc(Container.pool.getPool(this), 300);'/><br/><span id='msg"+partitionNum+"'/>");
+    }
+  },
+
+  selectContainerStudy : function(partition, poolId) {
+    Utils.ui.disableButton('studySelectButton-'+partition+'_'+poolId);
+    var studyId = jQuery("select[name='poolStudies"+partition+"'] :selected").val();
+
+    Fluxion.doAjax(
+      'containerControllerHelperService',
+      'selectStudyForPool',
+      {'poolId':poolId, 'studyId':studyId, 'sequencerReferenceId':jQuery('#sequencerReference').val(), 'url':ajaxurl},
+      {'doOnSuccess':
+        function(json) {
+          var div = jQuery("#studySelectDiv"+partition).parent();
+          jQuery("#studySelectDiv"+partition).remove();
+          div.append(json.html);
+        },
+        'doOnError':
+        function(json) {
+          Utils.ui.reenableButton('studySelectButton-'+partition+'_'+poolId, "Select Study");
+        }
+      }
+    );
+  }
+};
+
+Container.pool = {
+  getPool : function(t) {
+    var a = jQuery(t);
+    var platform = jQuery("input[name='platformTypes']:checked").val();
+    var pNum = a.attr("partition");
+    Fluxion.doAjax(
+      'containerControllerHelperService',
+      'getPoolByBarcode',
+      {'platform':platform, 'container_cId':jQuery('input[name=container_cId]').val(), 'partition':pNum, 'barcode':a.val(),'url':ajaxurl},
+      {'doOnSuccess':function(json) {
+        if (json.err) {
+          jQuery("#msg"+pNum).html(json.err);
+        }
+        else {
+          a.parent().html(json.html);
+        }}
+      }
+    );
   }
 };

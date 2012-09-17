@@ -127,7 +127,7 @@
               <thead>
               <tr>
                 <th>Select <span sel="none" header="select" class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
-                                 onclick="toggleSelectAll('#dlTable', this);"></span>
+                                 onclick="DatatableUtils.toggleSelectAll('#dlTable', this);"></span>
                 </th>
                 <th>Dilution ID</th>
                 <th>Dilution Name</th>
@@ -209,7 +209,7 @@
       jQuery('#createPoolButton').html("Processing...");
 
       var table = jQuery('#dlTable').dataTable();
-      var nodes = fnGetSelected(table);
+      var nodes = DatatableUtils.fnGetSelected(table);
       var arr = [];
       for (var i = 0; i < nodes.length; i++) {
         var obj = {};
@@ -246,17 +246,6 @@
       }
       });
     }
-  }
-
-  function fnGetSelected(datatable) {
-    var aReturn = new Array();
-    var aTrs = datatable.fnGetNodes();
-    for (var i = 0; i < aTrs.length; i++) {
-      if (jQuery(aTrs[i]).hasClass('row_selected')) {
-        aReturn.push(aTrs[i]);
-      }
-    }
-    return aReturn;
   }
 
   jQuery(document).ready(function() {

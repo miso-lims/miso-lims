@@ -21,602 +21,681 @@
  * *********************************************************************
  */
 
-function changePlatformName(input) {
-  var platform = jQuery(input).val();
-  Fluxion.doAjax(
-          'libraryControllerHelperService',
-          'changePlatformName',
-  {'platform':platform, 'url':ajaxurl},
-  {'doOnSuccess':processPlatformChange}
-  );
-}
-
-var processPlatformChange = function(json) {
-  jQuery('#libraryTypes').html(json.libraryTypes);
-  //jQuery('#tagBarcodes').html(json.tagBarcodes);
-  jQuery('#tagBarcodeStrategies').html(json.tagBarcodeStrategies);
+var Library = Library || {
+  deleteLibrary : function(libraryId, successfunc) {
+    if (confirm("Are you sure you really want to delete LIB"+libraryId+"? This operation is permanent!")) {
+      Fluxion.doAjax(
+        'libraryControllerHelperService',
+        'deleteLibrary',
+        {'libraryId':libraryId, 'url':ajaxurl},
+        {'doOnSuccess':function(json) {
+          successfunc();
+        }
+      });
+    }
+  }
 };
 
-function populateAvailableBarcodesForStrategy(input) {
-  var strategy = jQuery(input).val();
-  if (!isNullCheck(strategy)) {
-    Fluxion.doAjax(
-            'libraryControllerHelperService',
-            'getTagBarcodesForStrategy',
-    {'strategy':strategy, 'url':ajaxurl},
-    {'doOnSuccess':processTagBarcodeStrategyChange}
-    );
-  }
-}
-
-var processTagBarcodeStrategyChange = function(json) {
-  jQuery('#tagBarcodesDiv').html(json.tagBarcodes);
-}
-
-function insertLibraryQCRow(libraryId, includeId) {
-  if (!jQuery('#libraryQcTable').attr("qcInProgress")) {
-    jQuery('#libraryQcTable').attr("qcInProgress", "true");
-
-    $('libraryQcTable').insertRow(1);
-    //QCId  QCed By  	QC Date  	Method  	Results
-
-    if (includeId) {
-      var column1=$('libraryQcTable').rows[1].insertCell(-1);
-      column1.innerHTML="<input type='hidden' id='libraryId' name='libraryId' value='"+libraryId+"'/>";
+Library.tagbarcode = {
+  populateAvailableBarcodesForStrategy : function(input) {
+    var self = this;
+    var strategy = jQuery(input).val();
+    if (!Utils.validation.isNullCheck(strategy)) {
+      Fluxion.doAjax(
+              'libraryControllerHelperService',
+              'getTagBarcodesForStrategy',
+      {'strategy':strategy, 'url':ajaxurl},
+      {'doOnSuccess':self.processTagBarcodeStrategyChange}
+      );
     }
-    var column2=$('libraryQcTable').rows[1].insertCell(-1);
-    column2.innerHTML="<input id='libraryQcUser' name='libraryQcUser' type='hidden' value='"+$('currentUser').innerHTML+"'/>"+$('currentUser').innerHTML;
-    var column3=$('libraryQcTable').rows[1].insertCell(-1);
-    column3.innerHTML="<input id='libraryQcDate' name='libraryQcDate' type='text'/>";
-    var column4=$('libraryQcTable').rows[1].insertCell(-1);
-    column4.innerHTML="<select id='libraryQcType' name='libraryQcType' onchange='changeLibraryQcUnits(this);'/>";
-    var column5=$('libraryQcTable').rows[1].insertCell(-1);
-    column5.innerHTML="<input id='libraryQcResults' name='libraryQcResults' type='text'/><span id='units'/>";
-    var column6=$('libraryQcTable').rows[1].insertCell(-1);
-    column6.innerHTML="<input id='libraryQcInsertSize' name='libraryQcInsertSize' type='text'/> bp";
-    var column7=$('libraryQcTable').rows[1].insertCell(-1);
-    column7.innerHTML="<a href='javascript:void(0);' onclick='addLibraryQC(\"addQcForm\");'/>Add</a>";
+  },
 
-    addMaxDatePicker("libraryQcDate", 0);
+  processTagBarcodeStrategyChange : function(json) {
+    jQuery('#tagBarcodesDiv').html(json.tagBarcodes);
+  }
+};
 
-    Fluxion.doAjax(
-            'libraryControllerHelperService',
-            'getLibraryQcTypes',
-    {'url':ajaxurl},
-    {'doOnSuccess':function(json) {
-        jQuery('#libraryQcType').html(json.types);
-        jQuery('#units').html(jQuery('#libraryQcType option:first').attr("units"));
+Library.qc = {
+  insertLibraryQCRow : function(libraryId, includeId) {
+    if (!jQuery('#libraryQcTable').attr("qcInProgress")) {
+      jQuery('#libraryQcTable').attr("qcInProgress", "true");
+
+      $('libraryQcTable').insertRow(1);
+      //QCId  QCed By  	QC Date  	Method  	Results
+
+      if (includeId) {
+        var column1=$('libraryQcTable').rows[1].insertCell(-1);
+        column1.innerHTML="<input type='hidden' id='libraryId' name='libraryId' value='"+libraryId+"'/>";
       }
+      var column2=$('libraryQcTable').rows[1].insertCell(-1);
+      column2.innerHTML="<input id='libraryQcUser' name='libraryQcUser' type='hidden' value='"+$('currentUser').innerHTML+"'/>"+$('currentUser').innerHTML;
+      var column3=$('libraryQcTable').rows[1].insertCell(-1);
+      column3.innerHTML="<input id='libraryQcDate' name='libraryQcDate' type='text'/>";
+      var column4=$('libraryQcTable').rows[1].insertCell(-1);
+      column4.innerHTML="<select id='libraryQcType' name='libraryQcType' onchange='Library.qc.changeLibraryQcUnits(this);'/>";
+      var column5=$('libraryQcTable').rows[1].insertCell(-1);
+      column5.innerHTML="<input id='libraryQcResults' name='libraryQcResults' type='text'/><span id='units'/>";
+      var column6=$('libraryQcTable').rows[1].insertCell(-1);
+      column6.innerHTML="<input id='libraryQcInsertSize' name='libraryQcInsertSize' type='text'/> bp";
+      var column7=$('libraryQcTable').rows[1].insertCell(-1);
+      column7.innerHTML="<a href='javascript:void(0);' onclick='Library.qc.addLibraryQC(\"addQcForm\");'/>Add</a>";
+
+      Utils.ui.addMaxDatePicker("libraryQcDate", 0);
+
+      Fluxion.doAjax(
+              'libraryControllerHelperService',
+              'getLibraryQcTypes',
+      {'url':ajaxurl},
+      {'doOnSuccess':function(json) {
+          jQuery('#libraryQcType').html(json.types);
+          jQuery('#units').html(jQuery('#libraryQcType option:first').attr("units"));
+        }
+      }
+      );
     }
-    );
-  }
-  else {
-    alert("Cannot add another QC when one is already in progress.")
-  }
-}
+    else {
+      alert("Cannot add another QC when one is already in progress.")
+    }
+  },
 
-function changeLibraryQcUnits(input) {
-  jQuery('#units').html(jQuery('#libraryQcType').find(":selected").attr("units"));
-}
+  changeLibraryQcUnits : function(input) {
+    jQuery('#units').html(jQuery('#libraryQcType').find(":selected").attr("units"));
+  },
 
-function addLibraryQC(form) {
+  addLibraryQC : function(form) {
     var f = $(form);
     var tindex = f.libraryQcType.selectedIndex;
     Fluxion.doAjax(
-            'libraryControllerHelperService',
-            'addLibraryQC',
-    {
+      'libraryControllerHelperService',
+      'addLibraryQC',
+      {
         'libraryId':f.libraryId.value,
         'qcCreator':f.libraryQcUser.value,
         'qcDate':f.libraryQcDate.value,
         'qcType':f.libraryQcType.options[tindex].value,
         'results':f.libraryQcResults.value,
         'insertSize':f.libraryQcInsertSize.value,
-        'url':ajaxurl},
-    {'updateElement':'libraryQcTable',
+        'url':ajaxurl
+      },
+      {'updateElement':'libraryQcTable',
+       'doOnSuccess':function(json) {
+        jQuery('#libraryQcTable').removeAttr("qcInProgress");
+      }
+    });
+  },
+
+  changeLibraryQCRow : function(qcId, libraryId) {
+    Fluxion.doAjax(
+      'libraryControllerHelperService',
+      'changeLibraryQCRow',
+      {
+        'libraryId':libraryId,
+        'qcId':qcId,
+        'url':ajaxurl
+      },
+      {'doOnSuccess':function(json) {
+        jQuery('#result' + qcId).html(json.results);
+        jQuery('#insert' + qcId).html(json.insertSize);
+        jQuery('#edit' + qcId).html(json.edit);
+      }
+    });
+  },
+
+  editLibraryQC : function(qcId, libraryId) {
+    Fluxion.doAjax(
+      'libraryControllerHelperService',
+      'editLibraryQC',
+      {
+        'libraryId':libraryId,
+        'qcId':qcId,
+        'result':jQuery('#results' + qcId).val(),
+        'insertSize':jQuery('#insertSize' + qcId).val(),
+        'url':ajaxurl
+      },
+      {'doOnSuccess':Utils.page.pageReload
+      }
+    );
+  }
+};
+
+Library.dilution = {
+  insertLibraryDilutionRow : function(libraryId) {
+    if (!jQuery('#libraryDilutionTable').attr("dilutionInProgress")) {
+      jQuery('#libraryDilutionTable').attr("dilutionInProgress", "true");
+
+      $('libraryDilutionTable').insertRow(1);
+      //dilutionId    Done By   Dilution Date Barcode Results
+
+    //
+      //var column1=$('libraryDilutionTable').rows[1].insertCell(-1);
+      //column1.innerHTML="<input type='hidden' id='libraryId' name='libraryId' value='"+libraryId+"'/>";
+      var column1=$('libraryDilutionTable').rows[1].insertCell(-1);
+      column1.innerHTML="<input id='name' name='name' type='hidden' value='Unsaved '/>Unsaved";
+      var column2=$('libraryDilutionTable').rows[1].insertCell(-1);
+      column2.innerHTML="<input id='libraryDilutionCreator' name='libraryDilutionCreator' type='hidden' value='"+$('currentUser').innerHTML+"'/>"+$('currentUser').innerHTML;
+      var column3=$('libraryDilutionTable').rows[1].insertCell(-1);
+      column3.innerHTML="<input id='libraryDilutionDate' name='libraryDilutionDate' type='text'/>";
+      //var column5=$('libraryDilutionTable').rows[1].insertCell(-1);
+      //column5.innerHTML="<input id='libraryDilutionBarcode' name='libraryDilutionBarcode' type='text'/>";
+      var column6=$('libraryDilutionTable').rows[1].insertCell(-1);
+      column6.innerHTML="<input id='libraryDilutionResults' name='libraryDilutionResults' type='text'/>";
+      var column7=$('libraryDilutionTable').rows[1].insertCell(-1);
+      column7.innerHTML="<i>Generated on save</i>";
+      var column8=$('libraryDilutionTable').rows[1].insertCell(-1);
+      column8.innerHTML="<a href='javascript:void(0);' onclick='Library.dilution.addLibraryDilution(\"addDilutionForm\");'/>Add</a>";
+
+      Utils.ui.addMaxDatePicker("libraryDilutionDate", 0);
+    }
+    else {
+      alert("Cannot add another dilution when one is already in progress.")
+    }
+  },
+
+  addLibraryDilution : function(form) {
+    var f = $(form);
+    Fluxion.doAjax(
+      'libraryControllerHelperService',
+      'addLibraryDilution',
+    {
+      'libraryId':f.libraryId.value,
+      'dilutionCreator':f.libraryDilutionCreator.value,
+      'dilutionDate':f.libraryDilutionDate.value,
+      //'locationBarcode':f.libraryDilutionBarcode.value,
+      'results':f.libraryDilutionResults.value,
+      'url':ajaxurl},
+    {'updateElement':'libraryDilutionTable',
      'doOnSuccess':function(json) {
-       jQuery('#libraryQcTable').removeAttr("qcInProgress");
-     }    
+       jQuery('#libraryDilutionTable').removeAttr("dilutionInProgress");
+     }
     }
     );
-}
+  },
 
-function changeLibraryQCRow(qcId, libraryId) {
-  Fluxion.doAjax(
-    'libraryControllerHelperService',
-    'changeLibraryQCRow',
-    {
-      'libraryId':libraryId,
-      'qcId':qcId,
-      'url':ajaxurl
-    },
-    {'doOnSuccess':function(json) {
-      jQuery('#result' + qcId).html(json.results);
-      jQuery('#insert' + qcId).html(json.insertSize);
-      jQuery('#edit' + qcId).html(json.edit);
-    }
-    }
-  );
-}
-
-function editLibraryQC(qcId, libraryId) {
-  Fluxion.doAjax(
-    'libraryControllerHelperService',
-    'editLibraryQC',
-    {
-      'libraryId':libraryId,
-      'qcId':qcId,
-      'result':jQuery('#results' + qcId).val(),
-      'insertSize':jQuery('#insertSize' + qcId).val(),
-      'url':ajaxurl
-    },
-    {'doOnSuccess':pageReload
-    }
-  );
-}
-
-function insertLibraryDilutionRow(libraryId) {
-  if (!jQuery('#libraryDilutionTable').attr("dilutionInProgress")) {
-    jQuery('#libraryDilutionTable').attr("dilutionInProgress", "true");
-
-    $('libraryDilutionTable').insertRow(1);
-    //dilutionId    Done By   Dilution Date Barcode Results
-
-  //
-    //var column1=$('libraryDilutionTable').rows[1].insertCell(-1);
-    //column1.innerHTML="<input type='hidden' id='libraryId' name='libraryId' value='"+libraryId+"'/>";
-    var column1=$('libraryDilutionTable').rows[1].insertCell(-1);
-    column1.innerHTML="<input id='name' name='name' type='hidden' value='Unsaved '/>Unsaved";
-    var column2=$('libraryDilutionTable').rows[1].insertCell(-1);
-    column2.innerHTML="<input id='libraryDilutionCreator' name='libraryDilutionCreator' type='hidden' value='"+$('currentUser').innerHTML+"'/>"+$('currentUser').innerHTML;
-    var column3=$('libraryDilutionTable').rows[1].insertCell(-1);
-    column3.innerHTML="<input id='libraryDilutionDate' name='libraryDilutionDate' type='text'/>";
-    //var column5=$('libraryDilutionTable').rows[1].insertCell(-1);
-    //column5.innerHTML="<input id='libraryDilutionBarcode' name='libraryDilutionBarcode' type='text'/>";
-    var column6=$('libraryDilutionTable').rows[1].insertCell(-1);
-    column6.innerHTML="<input id='libraryDilutionResults' name='libraryDilutionResults' type='text'/>";
-    var column7=$('libraryDilutionTable').rows[1].insertCell(-1);
-    column7.innerHTML="<i>Generated on save</i>";
-    var column8=$('libraryDilutionTable').rows[1].insertCell(-1);
-    column8.innerHTML="<a href='javascript:void(0);' onclick='addLibraryDilution(\"addDilutionForm\");'/>Add</a>";
-
-    addMaxDatePicker("libraryDilutionDate", 0);
-  }
-  else {
-    alert("Cannot add another dilution when one is already in progress.")
-  }
-}
-
-function addLibraryDilution(form) {
-  var f = $(form);
-  Fluxion.doAjax(
-    'libraryControllerHelperService',
-    'addLibraryDilution',
-  {
-    'libraryId':f.libraryId.value,
-    'dilutionCreator':f.libraryDilutionCreator.value,
-    'dilutionDate':f.libraryDilutionDate.value,
-    //'locationBarcode':f.libraryDilutionBarcode.value,
-    'results':f.libraryDilutionResults.value,
-    'url':ajaxurl},
-  {'updateElement':'libraryDilutionTable',
-   'doOnSuccess':function(json) {
-     jQuery('#libraryDilutionTable').removeAttr("dilutionInProgress");
-   }
-  }
-  );
-}
-
-function changeLibraryDilutionRow(dilutionId) {
+  changeLibraryDilutionRow : function(dilutionId) {
     Fluxion.doAjax(
-            'libraryControllerHelperService',
-            'changeLibraryDilutionRow',
-            {
-              'dilutionId':dilutionId,
-              'url':ajaxurl
-            },
-            {'doOnSuccess':function(json) {
-              jQuery('#results' + dilutionId).html(json.results);
-              jQuery('#edit' + dilutionId).html(json.edit);
-            }
-            }
+      'libraryControllerHelperService',
+      'changeLibraryDilutionRow',
+      {
+        'dilutionId':dilutionId,
+        'url':ajaxurl
+      },
+      {'doOnSuccess':function(json) {
+          jQuery('#results' + dilutionId).html(json.results);
+          jQuery('#edit' + dilutionId).html(json.edit);
+        }
+      }
     );
-}
+  },
 
-function editLibraryDilution(dilutionId) {
-  Fluxion.doAjax(
-          'libraryControllerHelperService',
-          'editLibraryDilution',
-          {
-            'dilutionId':dilutionId,
-            'result':jQuery('#' + dilutionId).val(),
-            'url':ajaxurl
+  editLibraryDilution : function(dilutionId) {
+    Fluxion.doAjax(
+      'libraryControllerHelperService',
+      'editLibraryDilution',
+      {
+        'dilutionId':dilutionId,
+        'result':jQuery('#' + dilutionId).val(),
+        'url':ajaxurl
+      },
+      {'doOnSuccess':Utils.page.pageReload
+      }
+    );
+  },
+
+  deleteLibraryDilution : function(libraryDilutionId, successfunc) {
+    if (confirm("Are you sure you really want to delete LDI"+libraryDilutionId+"? This operation is permanent!")) {
+      Fluxion.doAjax(
+        'libraryControllerHelperService',
+        'deleteLibraryDilution',
+        {'libraryDilutionId':libraryDilutionId, 'url':ajaxurl},
+        {'doOnSuccess':function(json) {
+          successfunc();
+        }
+      });
+    }
+  }
+};
+
+Library.empcr = {
+  insertEmPcrRow : function(dilutionId) {
+    if (!jQuery('#emPcrTable').attr("pcrInProgress")) {
+      jQuery('#emPcrTable').attr("pcrInProgress", "true");
+
+      $('emPcrTable').insertRow(1);
+
+      //var column1=$('emPcrTable').rows[1].insertCell(-1);
+      //column1.innerHTML="<input type='hidden' id='dilutionId' name='dilutionId' value='"+dilutionId+"'/>";
+      var column2=$('emPcrTable').rows[1].insertCell(-1);
+      column2.innerHTML=""+dilutionId+" <input type='hidden' id='dilutionId' name='dilutionId' value='"+dilutionId+"'/>";
+      var column3=$('emPcrTable').rows[1].insertCell(-1);
+      column3.innerHTML="<input id='emPcrCreator' name='emPcrCreator' type='hidden' value='"+$('currentUser').innerHTML+"'/>"+$('currentUser').innerHTML;
+      var column4=$('emPcrTable').rows[1].insertCell(-1);
+      column4.innerHTML="<input id='emPcrDate' name='emPcrDate' type='text'/>";
+      var column5=$('emPcrTable').rows[1].insertCell(-1);
+      column5.innerHTML="<input id='emPcrResults' name='emPcrResults' type='text'/>";
+      var column6=$('emPcrTable').rows[1].insertCell(-1);
+      column6.innerHTML="<a href='javascript:void(0);' onclick='Library.empcr.addEmPcr(\"addEmPcrForm\");'/>Add</a>";
+
+      Utils.ui.addMaxDatePicker("emPcrDate", 0);
+    }
+    else {
+      alert("Cannot add another emPCR when one is already in progress.")
+    }
+  },
+
+  addEmPcr : function(form) {
+    var f = $(form);
+    Fluxion.doAjax(
+      'libraryControllerHelperService',
+      'addEmPcr',
+    {
+      'dilutionId':f.dilutionId.value,
+      'pcrCreator':f.emPcrCreator.value,
+      'pcrDate':f.emPcrDate.value,
+      'results':f.emPcrResults.value,
+      'url':ajaxurl},
+    {'updateElement':'emPcrTable',
+     'doOnSuccess':function(json) {
+       jQuery('#emPcrTable').removeAttr("pcrInProgress");
+     }
+    }
+    );
+  },
+
+  insertEmPcrDilutionRow : function(emPcrId) {
+    if (!jQuery('#emPcrDilutionTable').attr("dilutionInProgress")) {
+      jQuery('#emPcrDilutionTable').attr("dilutionInProgress", "true");
+
+      $('emPcrDilutionTable').insertRow(1);
+
+      //var column1=$('emPcrDilutionTable').rows[1].insertCell(-1);
+      //column1.innerHTML="<input type='hidden' id='emPcrId' name='emPcrId' value='"+emPcrId+"'/>";
+      var column2=$('emPcrDilutionTable').rows[1].insertCell(-1);
+      column2.innerHTML=""+emPcrId+" <input type='hidden' id='emPcrId' name='emPcrId' value='"+emPcrId+"'/>";
+      var column3=$('emPcrDilutionTable').rows[1].insertCell(-1);
+      column3.innerHTML="<input id='emPcrDilutionCreator' name='emPcrDilutionCreator' type='hidden' value='"+$('currentUser').innerHTML+"'/>"+$('currentUser').innerHTML;
+      var column4=$('emPcrDilutionTable').rows[1].insertCell(-1);
+      column4.innerHTML="<input id='emPcrDilutionDate' name='emPcrDilutionDate' type='text'/>";
+      //var column5=$('emPcrDilutionTable').rows[1].insertCell(-1);
+      //column5.innerHTML="<input id='emPcrDilutionBarcode' name='emPcrDilutionBarcode' type='text'/>";
+      var column6=$('emPcrDilutionTable').rows[1].insertCell(-1);
+      column6.innerHTML="<input id='emPcrDilutionResults' name='emPcrDilutionResults' type='text'/>";
+      var column7=$('emPcrDilutionTable').rows[1].insertCell(-1);
+      column7.innerHTML="<a href='javascript:void(0);' onclick='Library.empcr.addEmPcrDilution(\"addEmPcrDilutionForm\");'/>Add</a>";
+
+      Utils.ui.addMaxDatePicker("emPcrDilutionDate", 0);
+    }
+    else {
+      alert("Cannot add another dilution when one is already in progress.")
+    }
+  },
+
+  addEmPcrDilution : function(form) {
+    var f = $(form);
+    Fluxion.doAjax(
+      'libraryControllerHelperService',
+      'addEmPcrDilution',
+    {
+      'pcrId':f.emPcrId.value,
+      'pcrDilutionCreator':f.emPcrDilutionCreator.value,
+      'pcrDilutionDate':f.emPcrDilutionDate.value,
+      //'pcrDilutionBarcode':f.emPcrDilutionBarcode.value,
+      'results':f.emPcrDilutionResults.value,
+      'url':ajaxurl},
+    {'updateElement':'emPcrDilutionTable',
+     'doOnSuccess':function(json) {
+       jQuery('#emPcrDilutionTable').removeAttr("dilutionInProgress");
+     }
+    }
+    );
+  },
+
+  deleteEmPCR : function(empcrId, successfunc) {
+    if (confirm("Are you sure you really want to delete EmPCR "+empcrId+"? This operation is permanent!")) {
+      Fluxion.doAjax(
+        'libraryControllerHelperService',
+        'deleteEmPCR',
+        {'empcrId':empcrId, 'url':ajaxurl},
+        {'doOnSuccess':function(json) {
+          successfunc();
+        }
+      });
+    }
+  },
+
+  deleteEmPCRDilution : function(empcrDilutionId, successfunc) {
+    if (confirm("Are you sure you really want to delete EmPCRDilution"+empcrDilutionId+"? This operation is permanent!")) {
+      Fluxion.doAjax(
+        'libraryControllerHelperService',
+        'deleteEmPCRDilution',
+        {'empcrDilutionId':empcrDilutionId, 'url':ajaxurl},
+        {'doOnSuccess':function(json) {
+          successfunc();
+        }
+      });
+    }
+  }
+};
+
+Library.barcode = {
+  printLibraryBarcodes : function() {
+    var libraries = [];
+    for (var i = 0; i < arguments.length; i++) {
+      libraries[i] = {'libraryId':arguments[i]};
+    }
+
+    Fluxion.doAjax(
+      'printerControllerHelperService',
+      'listAvailableServices',
+      {
+        'serviceClass':'uk.ac.bbsrc.tgac.miso.core.data.Library',
+        'url':ajaxurl
+      },
+      {
+        'doOnSuccess':function (json) {
+          jQuery('#printServiceSelectDialog')
+                  .html("<form>" +
+                        "<fieldset class='dialog'>" +
+                        "<select name='serviceSelect' id='serviceSelect' class='ui-widget-content ui-corner-all'>" +
+                        json.services +
+                        "</select></fieldset></form>");
+
+          jQuery(function() {
+            jQuery('#printServiceSelectDialog').dialog({
+              autoOpen: false,
+              width: 400,
+              modal: true,
+              resizable: false,
+              buttons: {
+                "Print": function() {
+                  Fluxion.doAjax(
+                    'libraryControllerHelperService',
+                    'printLibraryBarcodes',
+                    {
+                      'serviceName':jQuery('#serviceSelect').val(),
+                      'libraries':libraries,
+                      'url':ajaxurl
+                    },
+                    {
+                      'doOnSuccess':function (json) {
+                        alert(json.response);
+                      }
+                    }
+                  );
+                  jQuery(this).dialog('close');
+                },
+                "Cancel": function() {
+                  jQuery(this).dialog('close');
+                }
+              }
+            });
+          });
+          jQuery('#printServiceSelectDialog').dialog('open');
+        },
+        'doOnError':function (json) { alert(json.error); }
+      }
+    );
+  },
+
+  printDilutionBarcode : function(dilutionId, platform) {
+    var dilutions = [];
+    dilutions[0] = {'dilutionId':dilutionId};
+
+    Fluxion.doAjax(
+      'printerControllerHelperService',
+      'listAvailableServices',
+      {
+        'serviceClass':'uk.ac.bbsrc.tgac.miso.core.data.Dilution',
+        'url':ajaxurl
+      },
+      {
+        'doOnSuccess':function (json) {
+          jQuery('#printServiceSelectDialog')
+                  .html("<form>" +
+                        "<fieldset class='dialog'>" +
+                        "<select name='serviceSelect' id='serviceSelect' class='ui-widget-content ui-corner-all'>" +
+                        json.services +
+                        "</select></fieldset></form>");
+
+          jQuery(function() {
+            jQuery('#printServiceSelectDialog').dialog({
+              autoOpen: false,
+              width: 400,
+              modal: true,
+              resizable: false,
+              buttons: {
+                "Print": function() {
+                  Fluxion.doAjax(
+                    'libraryControllerHelperService',
+                    'printLibraryDilutionBarcodes',
+                    {
+                      'serviceName':jQuery('#serviceSelect').val(),
+                      'dilutions':dilutions,
+                      'platform':platform,
+                      'url':ajaxurl
+                    },
+                    {
+                      'doOnSuccess':function (json) {
+                        alert(json.response);
+                      }
+                    }
+                  );
+                  jQuery(this).dialog('close');
+                },
+                "Cancel": function() {
+                  jQuery(this).dialog('close');
+                }
+              }
+            });
+          });
+          jQuery('#printServiceSelectDialog').dialog('open');
+        },
+        'doOnError':function (json) { alert(json.error); }
+      }
+    );
+  },
+
+  showLibraryLocationChangeDialog : function(libraryId) {
+    var self = this;
+    jQuery('#changeLibraryLocationDialog')
+            .html("<form>" +
+                  "<fieldset class='dialog'>" +
+                  "<label for='notetext'>New Location:</label>" +
+                  "<input type='text' name='locationBarcodeInput' id='locationBarcodeInput' class='text ui-widget-content ui-corner-all'/>" +
+                  "</fieldset></form>");
+
+    jQuery(function() {
+      jQuery('#changeLibraryLocationDialog').dialog({
+        autoOpen: false,
+        width: 400,
+        modal: true,
+        resizable: false,
+        buttons: {
+          "Save": function() {
+            self.changeLibraryLocation(libraryId, jQuery('#locationBarcodeInput').val());
+            jQuery(this).dialog('close');
           },
-          {'doOnSuccess':pageReload
+          "Cancel": function() {
+            jQuery(this).dialog('close');
           }
-  );
-}
-
-function insertEmPcrRow(dilutionId) {
-  if (!jQuery('#emPcrTable').attr("pcrInProgress")) {
-    jQuery('#emPcrTable').attr("pcrInProgress", "true");
-
-    $('emPcrTable').insertRow(1);
-
-    //var column1=$('emPcrTable').rows[1].insertCell(-1);
-    //column1.innerHTML="<input type='hidden' id='dilutionId' name='dilutionId' value='"+dilutionId+"'/>";
-    var column2=$('emPcrTable').rows[1].insertCell(-1);
-    column2.innerHTML=""+dilutionId+" <input type='hidden' id='dilutionId' name='dilutionId' value='"+dilutionId+"'/>";  
-    var column3=$('emPcrTable').rows[1].insertCell(-1);
-    column3.innerHTML="<input id='emPcrCreator' name='emPcrCreator' type='hidden' value='"+$('currentUser').innerHTML+"'/>"+$('currentUser').innerHTML;
-    var column4=$('emPcrTable').rows[1].insertCell(-1);
-    column4.innerHTML="<input id='emPcrDate' name='emPcrDate' type='text'/>";
-    var column5=$('emPcrTable').rows[1].insertCell(-1);
-    column5.innerHTML="<input id='emPcrResults' name='emPcrResults' type='text'/>";
-    var column6=$('emPcrTable').rows[1].insertCell(-1);
-    column6.innerHTML="<a href='javascript:void(0);' onclick='addEmPcr(\"addEmPcrForm\");'/>Add</a>";
-
-    addMaxDatePicker("emPcrDate", 0);
-  }
-  else {
-    alert("Cannot add another emPCR when one is already in progress.")
-  }
-}
-
-function addEmPcr(form) {
-  var f = $(form);
-  Fluxion.doAjax(
-    'libraryControllerHelperService',
-    'addEmPcr',
-  {
-    'dilutionId':f.dilutionId.value,
-    'pcrCreator':f.emPcrCreator.value,
-    'pcrDate':f.emPcrDate.value,
-    'results':f.emPcrResults.value,
-    'url':ajaxurl},
-  {'updateElement':'emPcrTable',
-   'doOnSuccess':function(json) {
-     jQuery('#emPcrTable').removeAttr("pcrInProgress");
-   }
-  }
-  );
-}
-
-function insertEmPcrDilutionRow(emPcrId) {
-  if (!jQuery('#emPcrDilutionTable').attr("dilutionInProgress")) {
-    jQuery('#emPcrDilutionTable').attr("dilutionInProgress", "true");
-
-    $('emPcrDilutionTable').insertRow(1);
-
-    //var column1=$('emPcrDilutionTable').rows[1].insertCell(-1);
-    //column1.innerHTML="<input type='hidden' id='emPcrId' name='emPcrId' value='"+emPcrId+"'/>";
-    var column2=$('emPcrDilutionTable').rows[1].insertCell(-1);
-    column2.innerHTML=""+emPcrId+" <input type='hidden' id='emPcrId' name='emPcrId' value='"+emPcrId+"'/>";
-    var column3=$('emPcrDilutionTable').rows[1].insertCell(-1);
-    column3.innerHTML="<input id='emPcrDilutionCreator' name='emPcrDilutionCreator' type='hidden' value='"+$('currentUser').innerHTML+"'/>"+$('currentUser').innerHTML;
-    var column4=$('emPcrDilutionTable').rows[1].insertCell(-1);
-    column4.innerHTML="<input id='emPcrDilutionDate' name='emPcrDilutionDate' type='text'/>";
-    //var column5=$('emPcrDilutionTable').rows[1].insertCell(-1);
-    //column5.innerHTML="<input id='emPcrDilutionBarcode' name='emPcrDilutionBarcode' type='text'/>";
-    var column6=$('emPcrDilutionTable').rows[1].insertCell(-1);
-    column6.innerHTML="<input id='emPcrDilutionResults' name='emPcrDilutionResults' type='text'/>";
-    var column7=$('emPcrDilutionTable').rows[1].insertCell(-1);
-    column7.innerHTML="<a href='javascript:void(0);' onclick='addEmPcrDilution(\"addEmPcrDilutionForm\");'/>Add</a>";
-
-    addMaxDatePicker("emPcrDilutionDate", 0);
-  }
-  else {
-    alert("Cannot add another dilution when one is already in progress.")
-  }
-}
-
-function addEmPcrDilution(form) {
-  var f = $(form);
-  Fluxion.doAjax(
-    'libraryControllerHelperService',
-    'addEmPcrDilution',
-  {
-    'pcrId':f.emPcrId.value,
-    'pcrDilutionCreator':f.emPcrDilutionCreator.value,
-    'pcrDilutionDate':f.emPcrDilutionDate.value,
-    //'pcrDilutionBarcode':f.emPcrDilutionBarcode.value,
-    'results':f.emPcrDilutionResults.value,
-    'url':ajaxurl},
-  {'updateElement':'emPcrDilutionTable',
-   'doOnSuccess':function(json) {
-     jQuery('#emPcrDilutionTable').removeAttr("dilutionInProgress");
-   }
-  }
-  );
-}
-
-function printLibraryBarcodes() {
-  var libraries = [];
-  for (var i = 0; i < arguments.length; i++) {
-    libraries[i] = {'libraryId':arguments[i]};
-  }
-
-  Fluxion.doAjax(
-    'printerControllerHelperService',
-    'listAvailableServices',
-    {
-      'serviceClass':'uk.ac.bbsrc.tgac.miso.core.data.Library',
-      'url':ajaxurl
-    },
-    {
-      'doOnSuccess':function (json) {
-        jQuery('#printServiceSelectDialog')
-                .html("<form>" +
-                      "<fieldset class='dialog'>" +
-                      "<select name='serviceSelect' id='serviceSelect' class='ui-widget-content ui-corner-all'>" +
-                      json.services +
-                      "</select></fieldset></form>");
-
-        jQuery(function() {
-          jQuery('#printServiceSelectDialog').dialog({
-            autoOpen: false,
-            width: 400,
-            modal: true,
-            resizable: false,
-            buttons: {
-              "Print": function() {
-                Fluxion.doAjax(
-                  'libraryControllerHelperService',
-                  'printLibraryBarcodes',
-                  {
-                    'serviceName':jQuery('#serviceSelect').val(),
-                    'libraries':libraries,
-                    'url':ajaxurl
-                  },
-                  {
-                    'doOnSuccess':function (json) {
-                      alert(json.response);
-                    }
-                  }
-                );
-                jQuery(this).dialog('close');
-              },
-              "Cancel": function() {
-                jQuery(this).dialog('close');
-              }
-            }
-          });
-        });
-        jQuery('#printServiceSelectDialog').dialog('open');
-      },
-      'doOnError':function (json) { alert(json.error); }
-    }
-  );
-}
-
-function printDilutionBarcode(dilutionId, platform) {
-  var dilutions = [];
-  dilutions[0] = {'dilutionId':dilutionId};
-
-  Fluxion.doAjax(
-    'printerControllerHelperService',
-    'listAvailableServices',
-    {
-      'serviceClass':'uk.ac.bbsrc.tgac.miso.core.data.Dilution',
-      'url':ajaxurl
-    },
-    {
-      'doOnSuccess':function (json) {
-        jQuery('#printServiceSelectDialog')
-                .html("<form>" +
-                      "<fieldset class='dialog'>" +
-                      "<select name='serviceSelect' id='serviceSelect' class='ui-widget-content ui-corner-all'>" +
-                      json.services +
-                      "</select></fieldset></form>");
-
-        jQuery(function() {
-          jQuery('#printServiceSelectDialog').dialog({
-            autoOpen: false,
-            width: 400,
-            modal: true,
-            resizable: false,
-            buttons: {
-              "Print": function() {
-                Fluxion.doAjax(
-                  'libraryControllerHelperService',
-                  'printLibraryDilutionBarcodes',
-                  {
-                    'serviceName':jQuery('#serviceSelect').val(),
-                    'dilutions':dilutions,
-                    'platform':platform,
-                    'url':ajaxurl
-                  },
-                  {
-                    'doOnSuccess':function (json) {
-                      alert(json.response);
-                    }
-                  }
-                );
-                jQuery(this).dialog('close');
-              },
-              "Cancel": function() {
-                jQuery(this).dialog('close');
-              }
-            }
-          });
-        });
-        jQuery('#printServiceSelectDialog').dialog('open');
-      },
-      'doOnError':function (json) { alert(json.error); }
-    }
-  );
-}
-
-function showLibraryNoteDialog(libraryId) {
-  jQuery('#addLibraryNoteDialog')
-          .html("<form>" +
-                "<fieldset class='dialog'>" +
-                "<label for='internalOnly'>Internal Only?</label>" +
-                "<input type='checkbox' checked='checked' name='internalOnly' id='internalOnly' class='text ui-widget-content ui-corner-all' />" +
-                "<br/>" +
-                "<label for='notetext'>Text</label>" +
-                "<input type='text' name='notetext' id='notetext' class='text ui-widget-content ui-corner-all' />" +
-                "</fieldset></form>");
-
-  jQuery(function() {
-    jQuery('#addLibraryNoteDialog').dialog({
-      autoOpen: false,
-      width: 400,
-      modal: true,
-      resizable: false,
-      buttons: {
-        "Add Note": function() {
-          addLibraryNote(libraryId, jQuery('#internalOnly').val(), jQuery('#notetext').val());
-          jQuery(this).dialog('close');
-        },
-        "Cancel": function() {
-          jQuery(this).dialog('close');
         }
-      }
+      });
     });
-  });
-  jQuery('#addLibraryNoteDialog').dialog('open');
-}
+    jQuery('#changeLibraryLocationDialog').dialog('open');
+  },
 
-var addLibraryNote = function(libraryId, internalOnly, text) {
-  Fluxion.doAjax(
-    'libraryControllerHelperService',
-    'addLibraryNote',
-    {'libraryId':libraryId, 'internalOnly':internalOnly, 'text':text, 'url':ajaxurl},
-    {'doOnSuccess':pageReload}
-  );
+  changeLibraryLocation : function(libraryId, barcode) {
+    Fluxion.doAjax(
+      'libraryControllerHelperService',
+      'changeLibraryLocation',
+      {'libraryId':libraryId, 'locationBarcode':barcode, 'url':ajaxurl},
+      {'doOnSuccess':Utils.page.pageReload}
+    );
+  }
 };
 
-function showLibraryLocationChangeDialog(libraryId) {
-  jQuery('#changeLibraryLocationDialog')
-          .html("<form>" +
-                "<fieldset class='dialog'>" +
-                "<label for='notetext'>New Location:</label>" +
-                "<input type='text' name='locationBarcodeInput' id='locationBarcodeInput' class='text ui-widget-content ui-corner-all'/>" +
-                "</fieldset></form>");
-
-  jQuery(function() {
-    jQuery('#changeLibraryLocationDialog').dialog({
-      autoOpen: false,
-      width: 400,
-      modal: true,
-      resizable: false,
-      buttons: {
-        "Save": function() {
-          changeLibraryLocation(libraryId, jQuery('#locationBarcodeInput').val());
-          jQuery(this).dialog('close');
-        },
-        "Cancel": function() {
-          jQuery(this).dialog('close');
-        }
-      }
-    });
-  });
-  jQuery('#changeLibraryLocationDialog').dialog('open');
-}
-
-var changeLibraryLocation = function(libraryId, barcode) {
-  Fluxion.doAjax(
-    'libraryControllerHelperService',
-    'changeLibraryLocation',
-    {'libraryId':libraryId, 'locationBarcode':barcode, 'url':ajaxurl},
-    {'doOnSuccess':pageReload}
-  );
-};
-
-function deleteLibrary(libraryId, successfunc) {
-  if (confirm("Are you sure you really want to delete LIB"+libraryId+"? This operation is permanent!")) {
-    Fluxion.doAjax(
-      'libraryControllerHelperService',
-      'deleteLibrary',
-      {'libraryId':libraryId, 'url':ajaxurl},
-      {'doOnSuccess':function(json) {
-        successfunc();
-      }
-    });
-  }
-}
-
-function deleteLibraryDilution(libraryDilutionId, successfunc) {
-  if (confirm("Are you sure you really want to delete LDI"+libraryDilutionId+"? This operation is permanent!")) {
-    Fluxion.doAjax(
-      'libraryControllerHelperService',
-      'deleteLibraryDilution',
-      {'libraryDilutionId':libraryDilutionId, 'url':ajaxurl},
-      {'doOnSuccess':function(json) {
-        successfunc();
-      }
-    });
-  }
-}
-
-function deleteEmPCR(empcrId, successfunc) {
-  if (confirm("Are you sure you really want to delete EmPCR "+empcrId+"? This operation is permanent!")) {
-    Fluxion.doAjax(
-      'libraryControllerHelperService',
-      'deleteEmPCR',
-      {'empcrId':empcrId, 'url':ajaxurl},
-      {'doOnSuccess':function(json) {
-        successfunc();
-      }
-    });
-  }
-}
-
-function deleteEmPCRDilution(empcrDilutionId, successfunc) {
-  if (confirm("Are you sure you really want to delete EmPCRDilution"+empcrDilutionId+"? This operation is permanent!")) {
-    Fluxion.doAjax(
-      'libraryControllerHelperService',
-      'deleteEmPCRDilution',
-      {'empcrDilutionId':empcrDilutionId, 'url':ajaxurl},
-      {'doOnSuccess':function(json) {
-        successfunc();
-      }
-    });
-  }
-}
-
-function fillDownTagBarcodeStrategySelects(tableselector, th) {
-  collapseInputs(tableselector);
-  var tableObj = jQuery(tableselector);
-  var table = tableObj.dataTable();
-  var header = jQuery(th);
-  var headerName = header.attr("header");
-  var firstSelectedRow = tableObj.find(".row_selected").first();
-  if (firstSelectedRow.length > 0) {
-    var td = firstSelectedRow.find("td[name=" + headerName + "]");
-    var tdtext = td.html();
-
-    var col = firstSelectedRow.children().index(td);
-
-    var frId = 0;
-    var aTrs = table.fnGetNodes();
-    for (var i = 0; i < aTrs.length; i++) {
-      if (jQuery(aTrs[i]).hasClass('row_selected')) {
-        frId = i;
-        break;
-      }
-    }
-
-    tableObj.find("tr:gt(" + frId + ")").each(function () {
-      table.fnUpdate(tdtext, table.fnGetPosition(this), col);
-    });
-
+Library.ui = {
+  changePlatformName : function(input) {
+    var self = this;
+    var platform = jQuery(input).val();
     Fluxion.doAjax(
             'libraryControllerHelperService',
-            'getBarcodesPositions',
-    {'strategy':tdtext,
-     'url':ajaxurl
-    },
-    {'doOnSuccess':function(json) {
+            'changePlatformName',
+    {'platform':platform, 'url':ajaxurl},
+    {'doOnSuccess':self.processPlatformChange}
+    );
+  },
+
+  processPlatformChange : function(json) {
+    jQuery('#libraryTypes').html(json.libraryTypes);
+    jQuery('#tagBarcodeStrategies').html(json.tagBarcodeStrategies);
+  },
+
+  fillDownTagBarcodeStrategySelects : function(tableselector, th) {
+    DatatableUtils.collapseInputs(tableselector);
+    var tableObj = jQuery(tableselector);
+    var table = tableObj.dataTable();
+    var header = jQuery(th);
+    var headerName = header.attr("header");
+    var firstSelectedRow = tableObj.find(".row_selected").first();
+    if (firstSelectedRow.length > 0) {
+      var td = firstSelectedRow.find("td[name=" + headerName + "]");
+      var tdtext = td.html();
+
+      var col = firstSelectedRow.children().index(td);
+
+      var frId = 0;
+      var aTrs = table.fnGetNodes();
+      for (var i = 0; i < aTrs.length; i++) {
+        if (jQuery(aTrs[i]).hasClass('row_selected')) {
+          frId = i;
+          break;
+        }
+      }
+
       tableObj.find("tr:gt(" + frId + ")").each(function () {
-        var c = this.cells[col+1];
-        jQuery(c).html("");
-        for (var i = 0; i < json.numApplicableBarcodes; i++) {
-          jQuery(c).append("<span class='tagBarcodeSelectDiv' position='"+(i+1)+"' id='tagbarcodes"+(i+1)+"'>- <i>Select...</i></span>");
-          //jQuery(c).append("<td class='smallbox'><span class='tagBarcodeSelectDiv' position='"+(i+1)+"' id='tagbarcodes"+(i+1)+"'>X</span></td>");
-          if (json.numApplicableBarcodes > 1 && i == 0) {
-            jQuery(c).append("|");
+        table.fnUpdate(tdtext, table.fnGetPosition(this), col);
+      });
+
+      Fluxion.doAjax(
+              'libraryControllerHelperService',
+              'getBarcodesPositions',
+      {'strategy':tdtext,
+       'url':ajaxurl
+      },
+      {'doOnSuccess':function(json) {
+        tableObj.find("tr:gt(" + frId + ")").each(function () {
+          var c = this.cells[col+1];
+          jQuery(c).html("");
+          for (var i = 0; i < json.numApplicableBarcodes; i++) {
+            jQuery(c).append("<span class='tagBarcodeSelectDiv' position='"+(i+1)+"' id='tagbarcodes"+(i+1)+"'>- <i>Select...</i></span>");
+            //jQuery(c).append("<td class='smallbox'><span class='tagBarcodeSelectDiv' position='"+(i+1)+"' id='tagbarcodes"+(i+1)+"'>X</span></td>");
+            if (json.numApplicableBarcodes > 1 && i == 0) {
+              jQuery(c).append("|");
+            }
+          }
+
+          //bind editable to selects
+          jQuery("#cinput .tagBarcodeSelectDiv").editable(function(value, settings) {
+              return value;
+          },
+          {
+              loadurl : '../../rest/library/barcodesForPosition',
+              loaddata : function (value, settings) {
+                var ret = {};
+                ret["position"] = jQuery(this).attr("position");
+                if (!Utils.validation.isNullCheck(tdtext)) {
+                  ret['barcodeStrategy'] = tdtext;
+                }
+                else {
+                  ret['barcodeStrategy'] = '';
+                }
+
+                return ret;
+              },
+              type : 'select',
+              onblur: 'submit',
+              placeholder : '',
+              style : 'inherit',
+      //                callback: function(tValue, z) {
+      //                    var tPos = datatable.fnGetPosition(this);
+      //                    datatable.fnUpdate(tValue, tPos[0], tPos[1]);
+      //                },
+              submitdata : function(tvalue, tsettings) {
+                  return {
+                      "row_id": this.parentNode.getAttribute('id'),
+                      "column": table.fnGetPosition(this)[2]
+                  };
+              }
+          });
+        });
+      }
+      });
+    }
+    else {
+      alert("Please select a row to use as the Fill Down template by clicking in the Select column for that row.");
+    }
+  },
+
+  fillDownTagBarcodeSelects : function(tableselector, th) {
+    DatatableUtils.collapseInputs(tableselector);
+    var tableObj = jQuery(tableselector);
+    var table = tableObj.dataTable();
+    var header = jQuery(th);
+    var headerName = header.attr("header");
+    var firstSelectedRow = tableObj.find(".row_selected").first();
+    if (firstSelectedRow.length > 0) {
+      var td = firstSelectedRow.find("td[name=" + headerName + "]");
+      var tdtext = td.html();
+
+      var col = firstSelectedRow.children().index(td);
+
+      var frId = 0;
+      var aTrs = table.fnGetNodes();
+      for (var i = 0; i < aTrs.length; i++) {
+        if (jQuery(aTrs[i]).hasClass('row_selected')) {
+          frId = i;
+          break;
+        }
+      }
+
+      var firstSelText = jQuery(aTrs[frId].cells[col-1]).text();
+
+      tableObj.find("tr:gt(" + frId + ")").each(function () {
+        var strat = this.cells[col-1];
+        var stratText = jQuery(strat).text();
+        var cell = jQuery(this.cells[col]);
+
+        if (stratText.trim()) {
+          //no select means empty or already filled
+          if (firstSelText.indexOf("Select") == 0) {
+            //same strategy, just copy the cell
+            if (firstSelText === stratText) {
+              cell.html(tdtext);
+            }
+            else {
+              Fluxion.doAjax(
+                      'libraryControllerHelperService',
+                      'getBarcodesPositions',
+              {'strategy':stratText,
+               'url':ajaxurl
+              },
+              {'doOnSuccess':function(json) {
+                cell.html("");
+                for (var i = 0; i < json.numApplicableBarcodes; i++) {
+                  cell.append("<span class='tagBarcodeSelectDiv' position='"+(i+1)+"' id='tagbarcodes"+(i+1)+"'>- <i>Select...</i></span>");
+                  if (json.numApplicableBarcodes > 1 && i == 0) {
+                    cell.append("|");
+                  }
+                }
+              }
+              });
+            }
+          }
+          else {
+            //just copy select
+            if (firstSelText === stratText) {
+              cell.html(tdtext);
+            }
           }
         }
 
@@ -629,8 +708,8 @@ function fillDownTagBarcodeStrategySelects(tableselector, th) {
             loaddata : function (value, settings) {
               var ret = {};
               ret["position"] = jQuery(this).attr("position");
-              if (!isNullCheck(tdtext)) {
-                ret['barcodeStrategy'] = tdtext;
+              if (!Utils.validation.isNullCheck(stratText)) {
+                ret['barcodeStrategy'] = stratText;
               }
               else {
                 ret['barcodeStrategy'] = '';
@@ -655,109 +734,46 @@ function fillDownTagBarcodeStrategySelects(tableselector, th) {
         });
       });
     }
-    });
-  }
-  else {
-    alert("Please select a row to use as the Fill Down template by clicking in the Select column for that row.");
-  }
-}
+  },
 
-function fillDownTagBarcodeSelects(tableselector, th) {
-  collapseInputs(tableselector);
-  var tableObj = jQuery(tableselector);
-  var table = tableObj.dataTable();
-  var header = jQuery(th);
-  var headerName = header.attr("header");
-  var firstSelectedRow = tableObj.find(".row_selected").first();
-  if (firstSelectedRow.length > 0) {
-    var td = firstSelectedRow.find("td[name=" + headerName + "]");
-    var tdtext = td.html();
+  showLibraryNoteDialog : function(libraryId) {
+    var self = this;
+    jQuery('#addLibraryNoteDialog')
+            .html("<form>" +
+                  "<fieldset class='dialog'>" +
+                  "<label for='internalOnly'>Internal Only?</label>" +
+                  "<input type='checkbox' checked='checked' name='internalOnly' id='internalOnly' class='text ui-widget-content ui-corner-all' />" +
+                  "<br/>" +
+                  "<label for='notetext'>Text</label>" +
+                  "<input type='text' name='notetext' id='notetext' class='text ui-widget-content ui-corner-all' />" +
+                  "</fieldset></form>");
 
-    var col = firstSelectedRow.children().index(td);
-
-    var frId = 0;
-    var aTrs = table.fnGetNodes();
-    for (var i = 0; i < aTrs.length; i++) {
-      if (jQuery(aTrs[i]).hasClass('row_selected')) {
-        frId = i;
-        break;
-      }
-    }
-
-    var firstSelText = jQuery(aTrs[frId].cells[col-1]).text();
-
-    tableObj.find("tr:gt(" + frId + ")").each(function () {
-      var strat = this.cells[col-1];
-      var stratText = jQuery(strat).text();
-      var cell = jQuery(this.cells[col]);
-
-      if (stratText.trim()) {
-        //no select means empty or already filled
-        if (firstSelText.indexOf("Select") == 0) {
-          //same strategy, just copy the cell
-          if (firstSelText === stratText) {
-            cell.html(tdtext);
-          }
-          else {
-            Fluxion.doAjax(
-                    'libraryControllerHelperService',
-                    'getBarcodesPositions',
-            {'strategy':stratText,
-             'url':ajaxurl
-            },
-            {'doOnSuccess':function(json) {
-              cell.html("");
-              for (var i = 0; i < json.numApplicableBarcodes; i++) {
-                cell.append("<span class='tagBarcodeSelectDiv' position='"+(i+1)+"' id='tagbarcodes"+(i+1)+"'>- <i>Select...</i></span>");
-                if (json.numApplicableBarcodes > 1 && i == 0) {
-                  cell.append("|");
-                }
-              }
-            }
-            });
-          }
-        }
-        else {
-          //just copy select
-          if (firstSelText === stratText) {
-            cell.html(tdtext);
-          }
-        }
-      }
-
-      //bind editable to selects
-      jQuery("#cinput .tagBarcodeSelectDiv").editable(function(value, settings) {
-          return value;
-      },
-      {
-          loadurl : '../../rest/library/barcodesForPosition',
-          loaddata : function (value, settings) {
-            var ret = {};
-            ret["position"] = jQuery(this).attr("position");
-            if (!isNullCheck(stratText)) {
-              ret['barcodeStrategy'] = stratText;
-            }
-            else {
-              ret['barcodeStrategy'] = '';
-            }
-
-            return ret;
+    jQuery(function() {
+      jQuery('#addLibraryNoteDialog').dialog({
+        autoOpen: false,
+        width: 400,
+        modal: true,
+        resizable: false,
+        buttons: {
+          "Add Note": function() {
+            self.addLibraryNote(libraryId, jQuery('#internalOnly').val(), jQuery('#notetext').val());
+            jQuery(this).dialog('close');
           },
-          type : 'select',
-          onblur: 'submit',
-          placeholder : '',
-          style : 'inherit',
-  //                callback: function(tValue, z) {
-  //                    var tPos = datatable.fnGetPosition(this);
-  //                    datatable.fnUpdate(tValue, tPos[0], tPos[1]);
-  //                },
-          submitdata : function(tvalue, tsettings) {
-              return {
-                  "row_id": this.parentNode.getAttribute('id'),
-                  "column": table.fnGetPosition(this)[2]
-              };
+          "Cancel": function() {
+            jQuery(this).dialog('close');
           }
+        }
       });
     });
+    jQuery('#addLibraryNoteDialog').dialog('open');
+  },
+
+  addLibraryNote : function(libraryId, internalOnly, text) {
+    Fluxion.doAjax(
+      'libraryControllerHelperService',
+      'addLibraryNote',
+      {'libraryId':libraryId, 'internalOnly':internalOnly, 'text':text, 'url':ajaxurl},
+      {'doOnSuccess':Utils.page.pageReload}
+    );
   }
-}
+};

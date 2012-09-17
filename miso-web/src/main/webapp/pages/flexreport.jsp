@@ -58,12 +58,12 @@
                 <td>
                     <input id="from" name="from" type="text" value=""/>
                     <script type="text/javascript">
-                        addDatePicker("from");
+                        Utils.ui.addDatePicker("from");
                     </script>
                     To :
                     <input id="to" name="to" type="text" value=""/>
                     <script type="text/javascript">
-                        addDatePicker("to");
+                        Utils.ui.addDatePicker("to");
                     </script>
                 </td>
             </tr>
@@ -75,15 +75,15 @@
             </tr>
             <button class="fg-button ui-state-default ui-corner-all"
                     id="generateProjectsFlexReportButton"
-                    onclick="generateProjectsFlexReport();">
+                    onclick="Reports.generateProjectsFlexReport();">
                 Generate Report
             </button>
             <button class="fg-button ui-state-default ui-corner-all" id="resetProjectsFlexReportButton"
-                    onclick="initProjects();">
+                    onclick="Reports.ui.initProjects();">
                 Reset
             </button>
             <button class="fg-button ui-state-default ui-corner-all" id="searchProjects"
-                    onclick="searchProjects();">
+                    onclick="Reports.search.searchProjects();">
                 Search
             </button>
         </table>
@@ -130,12 +130,12 @@
                 <td>
                     <input id="samplefrom" name="from" type="text" value=""/>
                     <script type="text/javascript">
-                        addDatePicker("samplefrom");
+                        Utils.ui.addDatePicker("samplefrom");
                     </script>
                     To :
                     <input id="sampleto" name="to" type="text" value=""/>
                     <script type="text/javascript">
-                        addDatePicker("sampleto");
+                        Utils.ui.addDatePicker("sampleto");
                     </script>
                 </td>
             </tr>
@@ -157,15 +157,15 @@
             </tr>
             <button class="fg-button ui-state-default ui-corner-all"
                     id="generateSamplesFlexReportButton"
-                    onclick="generateSamplesFlexReport();">
+                    onclick="Reports.generateSamplesFlexReport();">
                 Generate Report
             </button>
             <button class="fg-button ui-state-default ui-corner-all" id="resetSamplesFlexReportButton"
-                    onclick="initSamples();">
+                    onclick="Reports.ui.initSamples();">
                 Reset
             </button>
             <button class="fg-button ui-state-default ui-corner-all" id="searchSamples"
-                    onclick="searchSamples();">
+                    onclick="Reports.search.searchSamples();">
                 Search
             </button>
         </table>
@@ -210,12 +210,12 @@
                 <td>
                     <input id="libraryfrom" name="from" type="text" value=""/>
                     <script type="text/javascript">
-                        addDatePicker("libraryfrom");
+                        Utils.ui.addDatePicker("libraryfrom");
                     </script>
                     To :
                     <input id="libraryto" name="to" type="text" value=""/>
                     <script type="text/javascript">
-                        addDatePicker("libraryto");
+                        Utils.ui.addDatePicker("libraryto");
                     </script>
                 </td>
             </tr>
@@ -237,15 +237,15 @@
             </tr>
             <button class="fg-button ui-state-default ui-corner-all"
                     id="generateLibrariesFlexReportButton"
-                    onclick="generateLibrariesFlexReport();">
+                    onclick="Reports.generateLibrariesFlexReport();">
                 Generate Report
             </button>
             <button class="fg-button ui-state-default ui-corner-all" id="resetLibrariesFlexReportButton"
-                    onclick="initLibraries();">
+                    onclick="Reports.ui.initLibraries();">
                 Reset
             </button>
             <button class="fg-button ui-state-default ui-corner-all" id="searchLibraries"
-                    onclick="searchLibraries();">
+                    onclick="Reports.search.searchLibraries();">
                 Search
             </button>
         </table>
@@ -288,12 +288,12 @@
                 <td>
                     <input id="runfrom" name="from" type="text" value=""/>
                     <script type="text/javascript">
-                        addDatePicker("runfrom");
+                        Utils.ui.addDatePicker("runfrom");
                     </script>
                     To :
                     <input id="runto" name="to" type="text" value=""/>
                     <script type="text/javascript">
-                        addDatePicker("runto");
+                        Utils.ui.addDatePicker("runto");
                     </script>
                 </td>
             </tr>
@@ -311,15 +311,15 @@
             </tr>
 
             <button class="fg-button ui-state-default ui-corner-all" id="generateRunsFlexReportButton"
-                    onclick="generateRunsFlexReport()">
+                    onclick="Reports.generateRunsFlexReport()">
                 Generate Report
             </button>
             <button class="fg-button ui-state-default ui-corner-all" id="resetRunsFlexReportButton"
-                    onclick="initRuns();">
+                    onclick="Reports.ui.initRuns();">
                 Reset
             </button>
             <button class="fg-button ui-state-default ui-corner-all" id="searchRuns"
-                    onclick="searchRuns();">
+                    onclick="Reports.search.searchRuns();">
                 Search
             </button>
         </table>
@@ -369,7 +369,7 @@
             <tr valign="top">
                 <td colspan=2>
                     <b> Show me: </b> &nbsp;
-                    <select id='datepicking' name='datepicking' onchange='updateCalendar();'>
+                    <select id='datepicking' name='datepicking' onchange='Reports.ui.updateCalendar();'>
                         <option value=cyear selected=""> Current Year</option>
                         <option value=lweek> Last week</option>
                         <option value=lmonth> Last Month</option>
@@ -394,14 +394,14 @@
                             Update Calendar
                         </button>
 
-                        <button id="Reset" onclick="resetCalendar()">Reset Calendar</button>
+                        <button id="Reset" onclick="Reports.ui.resetCalendar()">Reset Calendar</button>
                     </div>
                 </td>
 
             </tr>
 
         </table>
-         <div class="sectionDivider" onclick="toggleLeftInfo(jQuery('#legendlist_arrowclick'), 'legendlist');">Colour Schema
+         <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#legendlist_arrowclick'), 'legendlist');">Colour Schema
             <div id="legendlist_arrowclick" class="toggleLeft"></div>
         </div>
         <div id="legendlist" style="display:none;"></div>
@@ -416,16 +416,16 @@
 </div>
 
 <script type="text/javascript">
-    jQuery("#tabs").tabs();
+  jQuery("#tabs").tabs();
 
-    jQuery(document).ready(function() {
-        prepareTable();
-        initProjects();
-        initSamples();
-        initLibraries();
-        initRuns();
-        getSequencersList();
-    });
+  jQuery(document).ready(function() {
+    Reports.ui.prepareTable();
+    Reports.ui.initProjects();
+    Reports.ui.initSamples();
+    Reports.ui.initLibraries();
+    Reports.ui.initRuns();
+    Reports.ui.getSequencersList();
+  });
 </script>
 
 

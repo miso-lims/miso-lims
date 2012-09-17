@@ -96,7 +96,7 @@
           <div class="portlet-header">My Alerts</div>
           <div class="portlet-content">
             <input id="showReadAlerts" type="checkbox" onclick="toggleShowReadAlerts();"/>Show Read Alerts
-            <a href="javascript:void(0)" style="float:right;" onclick="confirmAllAlertsRead();">Mark All Alerts as Read</a>
+            <a href="javascript:void(0)" style="float:right;" onclick="Utils.alert.confirmAllAlertsRead();">Mark All Alerts as Read</a>
             <div id="alertList" class="elementList" style="max-height: 380px"><i style="color: gray">No unread alerts</i></div>
           </div>
         </div>
@@ -305,7 +305,7 @@
             'dashboard',
             'getAlerts',
     {'showReadAlerts':jQuery('input[id=showReadAlerts]').is(':checked'), 'url':ajaxurl},
-    {'doOnSuccess':processAlerts}
+    {'doOnSuccess':Utils.alert.processAlerts}
     );
   }
 
@@ -314,7 +314,7 @@
             'dashboard',
             'getSystemAlerts',
     {'url':ajaxurl},
-    {'doOnSuccess':processSystemAlerts}
+    {'doOnSuccess':Utils.alert.processSystemAlerts}
     );
   }
 </script>

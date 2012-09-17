@@ -21,85 +21,90 @@
  * *********************************************************************
  */
 
-function insertSequencerReferenceRow() {
-  Fluxion.doAjax(
-          'sequencerReferenceControllerHelperService',
-          'listPlatforms',
-          {'url':ajaxurl},
-          {'doOnSuccess':processSequencerReferenceRow}
-          );
-}
+var Sequencer = Sequencer || {};
 
-function processSequencerReferenceRow(json) {
-  $('sequencerReferenceTable').insertRow(1);
-
-  var column1 = $('sequencerReferenceTable').rows[1].insertCell(-1);
-  column1.innerHTML = "<i>Unsaved</i>";
-  var column2 = $('sequencerReferenceTable').rows[1].insertCell(-1);
-  column2.innerHTML = "<input id='sequencername' name='sequencername' type='text'/>";
-  var column3 = $('sequencerReferenceTable').rows[1].insertCell(-1);
-//  column3.innerHTML = "<input id='platform' name='platform' type='text'/>";
-  column3.innerHTML = "<select id='platforms' name='platform'>" +json.platforms+ "</select>";
-  var column4 = $('sequencerReferenceTable').rows[1].insertCell(-1);
-  column4.innerHTML = "<input id='server' name='server' type='text' onkeyup='validateServer(this)'/>";
-  var column5 = $('sequencerReferenceTable').rows[1].insertCell(-1);
-  column5.innerHTML = "<div id='available'></div>";
-  var column6 = $('sequencerReferenceTable').rows[1].insertCell(-1);
-  column6.id = "addTd";
-  column6.innerHTML = "Add";
-}
-
-function validateServer(t) {
-
-  $('available').innerHTML="<div align='center'><img src='../../styles/images/ajax-loader.gif'/></div>";
-
-  if (t.value != t.lastValue) {
-    if (t.timer) clearTimeout(t.timer);
-
-    t.timer = setTimeout(function () {
-      Fluxion.doAjax(
-        'sequencerReferenceControllerHelperService',
-        'checkServerAvailability',
-        {'server':t.value, 'url':ajaxurl},
-        {"doOnSuccess": function(json) {
-          $('available').innerHTML = json.html;
-          if (json.html == "OK") {
-            $('available').setAttribute("style", "background-color:green");
-            $('addTd').innerHTML = "<a href='javascript:void(0);' onclick='addSequencerReference(\"addReferenceForm\");'/>Add</a>";
-          }
-          else {
-            $('available').setAttribute("style", "background-color:red");
-          }
-        }
-      });
-    }, 200);
-    t.lastValue = t.value;
-  }
-}
-
-function addSequencerReference(form) {
-  var f = $(form);
-  Fluxion.doAjax(
-    'sequencerReferenceControllerHelperService',
-    'addSequencerReference',
-    {
-      'name':f.sequencername.value,
-      'platform':f.platform.value,
-      'server':f.server.value,
-      'url':ajaxurl},
-    {'doOnSuccess':pageReload}
-  );
-}
-
-function deleteSequencerReference(refId, successfunc) {
-  if (confirm("Are you sure you really want to delete sequencer reference "+refId+"? This operation is permanent!")) {
+Sequencer.ui = {
+  insertSequencerReferenceRow : function() {
+    var self = this;
     Fluxion.doAjax(
       'sequencerReferenceControllerHelperService',
-      'deleteSequencerReference',
-      {'refId':refId, 'url':ajaxurl},
-      {'doOnSuccess':function(json) {
-        successfunc();
-      }
-    });
+      'listPlatforms',
+      {'url':ajaxurl},
+      {'doOnSuccess':self.processSequencerReferenceRow}
+    );
+  },
+
+  processSequencerReferenceRow : function(json) {
+    $('sequencerReferenceTable').insertRow(1);
+
+    var column1 = $('sequencerReferenceTable').rows[1].insertCell(-1);
+    column1.innerHTML = "<i>Unsaved</i>";
+    var column2 = $('sequencerReferenceTable').rows[1].insertCell(-1);
+    column2.innerHTML = "<input id='sequencername' name='sequencername' type='text'/>";
+    var column3 = $('sequencerReferenceTable').rows[1].insertCell(-1);
+  //  column3.innerHTML = "<input id='platform' name='platform' type='text'/>";
+    column3.innerHTML = "<select id='platforms' name='platform'>" +json.platforms+ "</select>";
+    var column4 = $('sequencerReferenceTable').rows[1].insertCell(-1);
+    column4.innerHTML = "<input id='server' name='server' type='text' onkeyup='Sequencer.ui.validateServer(this)'/>";
+    var column5 = $('sequencerReferenceTable').rows[1].insertCell(-1);
+    column5.innerHTML = "<div id='available'></div>";
+    var column6 = $('sequencerReferenceTable').rows[1].insertCell(-1);
+    column6.id = "addTd";
+    column6.innerHTML = "Add";
+  },
+
+  validateServer : function(t) {
+    $('available').innerHTML="<div align='center'><img src='../../styles/images/ajax-loader.gif'/></div>";
+
+    if (t.value != t.lastValue) {
+      if (t.timer) clearTimeout(t.timer);
+
+      t.timer = setTimeout(function () {
+        Fluxion.doAjax(
+          'sequencerReferenceControllerHelperService',
+          'checkServerAvailability',
+          {'server':t.value, 'url':ajaxurl},
+          {"doOnSuccess": function(json) {
+            $('available').innerHTML = json.html;
+            if (json.html == "OK") {
+              $('available').setAttribute("style", "background-color:green");
+              $('addTd').innerHTML = "<a href='javascript:void(0);' onclick='Sequencer.ui.addSequencerReference(\"addReferenceForm\");'/>Add</a>";
+            }
+            else {
+              $('available').setAttribute("style", "background-color:red");
+            }
+          }
+        });
+      }, 200);
+      t.lastValue = t.value;
+    }
+  },
+
+  addSequencerReference : function(form) {
+    var f = $(form);
+    Fluxion.doAjax(
+      'sequencerReferenceControllerHelperService',
+      'addSequencerReference',
+      {
+        'name':f.sequencername.value,
+        'platform':f.platform.value,
+        'server':f.server.value,
+        'url':ajaxurl},
+      {'doOnSuccess':Utils.page.pageReload}
+    );
+  },
+
+  deleteSequencerReference : function(refId, successfunc) {
+    if (confirm("Are you sure you really want to delete sequencer reference "+refId+"? This operation is permanent!")) {
+      Fluxion.doAjax(
+        'sequencerReferenceControllerHelperService',
+        'deleteSequencerReference',
+        {'refId':refId, 'url':ajaxurl},
+        {'doOnSuccess':function(json) {
+            successfunc();
+          }
+        }
+      );
+    }
   }
-}
+};

@@ -78,4 +78,11 @@
   <bean name="tagBarcodeStrategyResolverService" class="uk.ac.bbsrc.tgac.miso.core.service.tagbarcode.TagBarcodeStrategyResolverService">
     <property name="requestManager" ref="requestManager"/>
   </bean>
+
+  <bean id="entityNamingSchemeResolverService" name="entityNamingSchemeResolverService" class="uk.ac.bbsrc.tgac.miso.core.service.naming.MisoEntityNamingSchemeResolverService"/>
+
+  <bean id="entityNameNamingScheme" name="entityNameNamingScheme" class="uk.ac.bbsrc.tgac.miso.core.service.naming.DefaultEntityNamingScheme"/>
+  <bean id="sampleNamingScheme" name="sampleNamingScheme" class="uk.ac.bbsrc.tgac.miso.core.service.naming.DefaultSampleNamingScheme"/>
+  <bean id="libraryNamingScheme" name="libraryNamingScheme" class="uk.ac.bbsrc.tgac.miso.core.service.naming.DefaultLibraryNamingScheme"/>
+
 </beans>

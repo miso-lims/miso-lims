@@ -94,13 +94,13 @@
         </td>
 </table>
 <script type="text/javascript">
-    loadAll();
-    typewatchFunc(jQuery('#searchProject'), function(){search(jQuery('#searchProject'))}, 300, 2);
-    typewatchFunc(jQuery('#searchRun'), function(){search(jQuery('#searchRun'))}, 300, 2);
-    typewatchFunc(jQuery('#searchStudy'), function(){search(jQuery('#searchStudy'))}, 300, 2);
-    typewatchFunc(jQuery('#searchSample'), function(){search(jQuery('#searchSample'))}, 300, 2);
-    typewatchFunc(jQuery('#searchExperiment'), function(){search(jQuery('#searchExperiment'))}, 300, 2);
-    typewatchFunc(jQuery('#searchLibrary'), function(){search(jQuery('#searchLibrary'))}, 300, 2);
+    Search.loadAll();
+    Utils.timer.typewatchFunc(jQuery('#searchProject'), function(){Search.dashboardSearch(jQuery('#searchProject'))}, 300, 2);
+    Utils.timer.typewatchFunc(jQuery('#searchRun'), function(){Search.dashboardSearch(jQuery('#searchRun'))}, 300, 2);
+    Utils.timer.typewatchFunc(jQuery('#searchStudy'), function(){Search.dashboardSearch(jQuery('#searchStudy'))}, 300, 2);
+    Utils.timer.typewatchFunc(jQuery('#searchSample'), function(){Search.dashboardSearch(jQuery('#searchSample'))}, 300, 2);
+    Utils.timer.typewatchFunc(jQuery('#searchExperiment'), function(){Search.dashboardSearch(jQuery('#searchExperiment'))}, 300, 2);
+    Utils.timer.typewatchFunc(jQuery('#searchLibrary'), function(){Search.dashboardSearch(jQuery('#searchLibrary'))}, 300, 2);
 </script>
 
 <%@ include file="../footer.jsp" %>

@@ -21,15 +21,17 @@
  * *********************************************************************
  */
 
-function deleteStudy(studyId, successfunc) {
-  if (confirm("Are you sure you really want to delete STU"+studyId+"? This operation is permanent!")) {
-    Fluxion.doAjax(
-      'studyControllerHelperService',
-      'deleteStudy',
-      {'studyId':studyId, 'url':ajaxurl},
-      {'doOnSuccess':function(json) {
-        successfunc();
-      }
-    });
+var Study = Study || {
+  deleteStudy : function(studyId, successfunc) {
+    if (confirm("Are you sure you really want to delete STU"+studyId+"? This operation is permanent!")) {
+      Fluxion.doAjax(
+        'studyControllerHelperService',
+        'deleteStudy',
+        {'studyId':studyId, 'url':ajaxurl},
+        {'doOnSuccess':function(json) {
+          successfunc();
+        }
+      });
+    }
   }
-}
+};

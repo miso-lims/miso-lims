@@ -31,14 +31,16 @@
 <link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/datatable.css'/>" type="text/css">
 <link rel="stylesheet" href="<c:url value='/styles/progress.css'/>" type="text/css">
 
-<form:form method="POST" commandName="project" autocomplete="off" onsubmit="return validate_project(this);">
+<form:form method="POST" commandName="project" autocomplete="off">
 <sessionConversation:insertSessionConversationId attributeName="project"/>
 <h1><c:choose><c:when
         test="${not empty project.projectId}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose>
   Project
-  <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
+    <button type="button" class="fg-button ui-state-default ui-corner-all"
+            onclick="return validate_project(this.form);">Save
+    </button>
 </h1>
-<div class="sectionDivider" onclick="toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
+<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
   <div id="note_arrowclick" class="toggleLeft"></div>
 </div>
 <div id="notediv" class="note" style="display:none;">A Project contains information about a set of Studies that may
@@ -52,7 +54,7 @@
     <div id="pro${project.projectId}traf"></div>
     <script type="text/javascript">
       jQuery(document).ready(function() {
-        editProjectTrafficLight(${project.projectId});
+        Project.ui.editProjectTrafficLight(${project.projectId});
 
         jQuery("#trafdiv").colorbox({width:"90%", inline:true, href:"#trafpanel"});
       });
@@ -123,7 +125,7 @@
 
 <div id="projectoverviews">
   <c:if test="${not empty project.projectId}">
-    <a class="add" href="javascript:void(0);" onclick="showProjectOverviewDialog(${project.projectId});">Add
+    <a class="add" href="javascript:void(0);" onclick="Project.overview.showProjectOverviewDialog(${project.projectId});">Add
       Overview</a><br/>
   </c:if>
   <c:choose>
@@ -141,10 +143,10 @@
                  onmouseout="mclosetime()">
               <c:choose>
                 <c:when test="${not empty overviewMap[overview.overviewId]}">
-                  <a href='javascript:void(0);' onclick="unwatchOverview(${overview.overviewId});">Stop watching</a>
+                  <a href='javascript:void(0);' onclick="Project.alert.unwatchOverview(${overview.overviewId});">Stop watching</a>
                 </c:when>
                 <c:otherwise>
-                  <a href='javascript:void(0);' onclick="watchOverview(${overview.overviewId});">Watch</a>
+                  <a href='javascript:void(0);' onclick="Project.alert.watchOverview(${overview.overviewId});">Watch</a>
                 </c:otherwise>
               </c:choose>
             </div>
@@ -172,13 +174,13 @@
                 <c:choose>
                   <c:when test="${overview.locked}">
                     <td style="text-align:center;"><a href="javascript:void(0);"
-                                                      onclick="unlockProjectOverview(${overview.overviewId})"><img
+                                                      onclick="Project.overview.unlockProjectOverview(${overview.overviewId})"><img
                             style="border:0;" alt="Unlock" title="Unlock this overview"
                             src="<c:url value='/styles/images/lock_closed.png'/>"/></a></td>
                   </c:when>
                   <c:otherwise>
                     <td style="text-align:center;"><a href="javascript:void(0);"
-                                                      onclick="lockProjectOverview(${overview.overviewId})"><img
+                                                      onclick="Project.overview.lockProjectOverview(${overview.overviewId})"><img
                             style="border:0;" alt="Lock" title="Lock this overview"
                             src="<c:url value='/styles/images/lock_open.png'/>"/></a></td>
                   </c:otherwise>
@@ -192,7 +194,7 @@
                                       or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN'))}">
                     <form:input path="overviews['${ov.count-1}'].startDate" id="startdatepicker"/>
                     <script type="text/javascript">
-                      addDatePicker("startdatepicker");
+                      Utils.ui.addDatePicker("startdatepicker");
                     </script>
                   </c:when>
                   <c:otherwise>
@@ -206,7 +208,7 @@
                                       or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN'))}">
                     <form:input path="overviews['${ov.count-1}'].endDate" id="enddatepicker"/>
                     <script type="text/javascript">
-                      addDatePicker("enddatepicker");
+                      Utils.ui.addDatePicker("enddatepicker");
                     </script>
                   </c:when>
                   <c:otherwise>
@@ -234,7 +236,7 @@
               </td>
               <td>
                 <c:if test="${not overview.locked}">
-                  <a onclick="showProjectOverviewNoteDialog(${overview.overviewId});"
+                  <a onclick="Project.overview.showProjectOverviewNoteDialog(${overview.overviewId});"
                      href="javascript:void(0);" class="add">Add Note</a><br/>
                 </c:if>
                 <c:forEach items="${overview.notes}" var="note" varStatus="n">
@@ -356,7 +358,7 @@
   </c:choose>
 </div>
 
-<div class="sectionDivider" onclick="toggleLeftInfo(jQuery('#issues_arrowclick'), 'issuesdiv');">Tracked Issues
+<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#issues_arrowclick'), 'issuesdiv');">Tracked Issues
   <div id="issues_arrowclick" class="toggleLeft"></div>
 </div>
 <div id="issuesdiv" class="note" style="display:none;">
@@ -364,7 +366,7 @@
     <c:when test="${not empty project.projectId}">
       To link issues to this project please enter your issue keys here, separated by a single comma, e.g. FOO-1,FOO-2,FOO-3:<br/>
       <input type="text" id="previewKeys" name="previewKeys"/>
-      <button type="button" class="br-button ui-state-default ui-corner-all" onclick="previewIssueKeys();">Preview
+      <button type="button" class="br-button ui-state-default ui-corner-all" onclick="Project.issues.previewIssueKeys();">Preview
         Issues
       </button>
       <br/>
@@ -373,7 +375,7 @@
       To import a project from an issue tracker, please enter an Issue Key to form the basis of this project.
       Enter a SINGLE key, e.g. FOO-1, and click Import to link this project to an external issue.<br/>
       <input type="text" id="previewKey" name="previewKey"/>
-      <button type="button" class="br-button ui-state-default ui-corner-all" onclick="importProjectFromIssue();">
+      <button type="button" class="br-button ui-state-default ui-corner-all" onclick="Project.issues.importProjectFromIssue();">
         Import
       </button>
     </c:otherwise>
@@ -400,7 +402,7 @@
 <c:choose>
 <c:when test="${not empty project.projectId}">
 <div id="simplebox">
-  <div class="sectionDivider" onclick="toggleLeftInfo(jQuery('#upload_arrowclick'), 'uploaddiv');">Project Files
+  <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#upload_arrowclick'), 'uploaddiv');">Project Files
     <div id="upload_arrowclick" class="toggleLeft"></div>
   </div>
   <div id="uploaddiv" class="simplebox" style="display:none;">
@@ -412,7 +414,7 @@
                 action="<c:url value="/miso/upload/project"/>"
                 enctype="multipart/form-data"
                 target="target_upload"
-                onsubmit="fileUploadProgress('ajax_upload_form', 'statusdiv', processingOverlay);">
+                onsubmit="Utils.fileUpload.fileUploadProgress('ajax_upload_form', 'statusdiv', Utils.fileUpload.processingOverlay);">
             <input type="hidden" name="projectId" value="${project.projectId}"/>
             <input type="file" name="file"/>
             <button type="submit" class="br-button ui-state-default ui-corner-all">Upload</button>
@@ -440,7 +442,7 @@
 <br/>
 
 <div class="sectionDivider"
-     onclick="toggleLeftInfo(jQuery('#samples_arrowclick'), 'samplesdiv');">${fn:length(project.samples)} Samples
+     onclick="Utils.ui.toggleLeftInfo(jQuery('#samples_arrowclick'), 'samplesdiv');">${fn:length(project.samples)} Samples
   <div id="samples_arrowclick" class="toggleLeft"></div>
 </div>
 <div id="samplesdiv" style="display:none;">
@@ -459,10 +461,10 @@
           <a href='javascript:void(0);' onclick='bulkSampleQcTable();'>QC Samples</a>
           <a href='<c:url value="/miso/library/new/${project.samples[0].sampleId}#tab-2"/>'>Add
             Libraries</a>
-          <a href="javascript:void(0);" onclick="selectSampleBarcodesToPrint('#sample_table');">Print Barcodes ...</a>
+          <a href="javascript:void(0);" onclick="Project.barcode.selectSampleBarcodesToPrint('#sample_table');">Print Barcodes ...</a>
           <a href="javascript:void(0);" onclick="generateSampleDeliveryForm(${project.projectId});">Get
             Delivery Form</a>
-          <a href="javascript:void(0);" onclick="uploadSampleDeliveryForm(${project.projectId});">Import
+          <a href="javascript:void(0);" onclick="Project.ui.uploadSampleDeliveryForm(${project.projectId});">Import
             Delivery Form</a>
           <a href='<c:url value="/miso/sample/receipt"/>'>Receive Samples</a>
         </c:if>
@@ -480,12 +482,12 @@
                     action="<c:url value="/miso/upload/project/sample-delivery-form"/>"
                     enctype="multipart/form-data"
                     target="deliveryform_target_upload"
-                    onsubmit="fileUploadProgress('deliveryform_upload_form', 'deliveryform_statusdiv', deliveryFormUploadSuccess);">
+                    onsubmit="Utils.fileUpload.fileUploadProgress('deliveryform_upload_form', 'deliveryform_statusdiv', Project.ui.deliveryFormUploadSuccess);">
                 <input type="hidden" name="projectId" value="${project.projectId}"/>
                 <input type="file" name="file"/>
                 <button type="submit" class="br-button ui-state-default ui-corner-all">Upload</button>
                 <button type="button" class="br-button ui-state-default ui-corner-all"
-                        onclick="cancelSampleDeliveryFormUpload();">Cancel
+                        onclick="Project.ui.cancelSampleDeliveryFormUpload();">Cancel
                 </button>
               </form>
               <iframe id='deliveryform_target_upload' name='deliveryform_target_upload' src=''
@@ -524,7 +526,7 @@
             <td class="misoicon"
                 onclick="window.location.href='<c:url value="/miso/sample/${sample.sampleId}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
             <sec:authorize access="hasRole('ROLE_ADMIN')">
-              <td class="misoicon" onclick="deleteSample(${sample.sampleId}, pageReload);"><span class="ui-icon ui-icon-trash"/></td>
+              <td class="misoicon" onclick="Sample.deleteSample(${sample.sampleId}, Utils.page.pageReload);"><span class="ui-icon ui-icon-trash"/></td>
             </sec:authorize>
           </tr>
         </c:forEach>
@@ -534,7 +536,7 @@
 </div>
 
 <div class="sectionDivider"
-     onclick="toggleLeftInfo(jQuery('#libraries_arrowclick'), 'librariesdiv');">${fn:length(projectLibraries)} Libraries
+     onclick="Utils.ui.toggleLeftInfo(jQuery('#libraries_arrowclick'), 'librariesdiv');">${fn:length(projectLibraries)} Libraries
   <div id="libraries_arrowclick" class="toggleLeft"></div>
 </div>
 <div id="librariesdiv" style="display:none;">
@@ -558,7 +560,7 @@
           <a href='javascript:void(0);' onclick='bulkLibraryQcTable();' class="add">QC these
             Libraries</a>
           <a href='javascript:void(0);' onclick='bulkLibraryDilutionTable();' class="add">Add Library Dilutions</a>
-          <a href="javascript:void(0);" onclick="selectLibraryBarcodesToPrint('#library_table');">Print Barcodes ...</a>
+          <a href="javascript:void(0);" onclick="Project.barcode.selectLibraryBarcodesToPrint('#library_table');">Print Barcodes ...</a>
         </c:if>
       </div>
     </li>
@@ -603,30 +605,17 @@
             <td class="misoicon"
                 onclick="window.location.href='<c:url value="/miso/library/${library.libraryId}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
             <sec:authorize access="hasRole('ROLE_ADMIN')">
-              <td class="misoicon" onclick="deleteLibrary(${library.libraryId}, pageReload);"><span class="ui-icon ui-icon-trash"/></td>
+              <td class="misoicon" onclick="Library.deleteLibrary(${library.libraryId}, Utils.page.pageReload);"><span class="ui-icon ui-icon-trash"/></td>
             </sec:authorize>
           </tr>
         </c:forEach>
         </tbody>
       </table>
     </span>
-  <script type="text/javascript">
-    <%--
-    jQuery(document).ready(function() {
-        jQuery("#library_table").tablesorter({
-            headers: {
-                4: {
-                    sorter: false
-                }
-            }
-        });
-    });
-    --%>
-  </script>
 </div>
 
 <div class="sectionDivider"
-     onclick="toggleLeftInfo(jQuery('#librarydils_arrowclick'), 'librarydilsdiv');">${fn:length(projectLibraryDilutions)}
+     onclick="Utils.ui.toggleLeftInfo(jQuery('#librarydils_arrowclick'), 'librarydilsdiv');">${fn:length(projectLibraryDilutions)}
   Library Dilutions
   <div id="librarydils_arrowclick" class="toggleLeft"></div>
 </div>
@@ -646,7 +635,7 @@
           <c:if test="${existsAnyEmPcrLibrary}">
             <a href='javascript:void(0);' onclick='bulkEmPcrTable();' class="add">Add EmPCRs</a>
           </c:if>
-          <a href="javascript:void(0);" onclick="selectLibraryDilutionBarcodesToPrint('#librarydils_table');">Print Barcodes ...</a>
+          <a href="javascript:void(0);" onclick="Project.barcode.selectLibraryDilutionBarcodesToPrint('#librarydils_table');">Print Barcodes ...</a>
           <a href='<c:url value="/miso/poolwizard/new/${project.projectId}"/>'>Create Pools</a>
         </c:if>
       </div>
@@ -681,7 +670,7 @@
             <td class="misoicon"
                 onclick="window.location.href='<c:url value="/miso/library/${dil.library.libraryId}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
             <sec:authorize access="hasRole('ROLE_ADMIN')">
-              <td class="misoicon" onclick="deleteLibraryDilution(${dil.dilutionId}, pageReload);"><span class="ui-icon ui-icon-trash"/></td>
+              <td class="misoicon" onclick="Library.dilution.deleteLibraryDilution(${dil.dilutionId}, Utils.page.pageReload);"><span class="ui-icon ui-icon-trash"/></td>
             </sec:authorize>
           </tr>
         </c:forEach>
@@ -691,7 +680,7 @@
 </div>
 
 <div class="sectionDivider"
-     onclick="toggleLeftInfo(jQuery('#pools_arrowclick'), 'poolsdiv');">${fn:length(projectPools)}
+     onclick="Utils.ui.toggleLeftInfo(jQuery('#pools_arrowclick'), 'poolsdiv');">${fn:length(projectPools)}
   Pools
   <div id="pools_arrowclick" class="toggleLeft"></div>
 </div>
@@ -709,9 +698,9 @@
            onmouseout="mclosetime()">
         <c:if test="${not empty projectPools}">
           <c:if test="${existsAnyEmPcrLibrary}">
-            <a href='javascript:void(0);' onclick="addPoolEmPCR('#pools_table');" class="add">Add Pool EmPCR</a>
+            <a href='javascript:void(0);' onclick="Project.ui.addPoolEmPCR('#pools_table');" class="add">Add Pool EmPCR</a>
           </c:if>
-          <a href="javascript:void(0);" onclick="selectPoolBarcodesToPrint('#pools_table');">Print Barcodes ...</a>
+          <a href="javascript:void(0);" onclick="Pool.barcode.selectPoolBarcodesToPrint('#pools_table');">Print Barcodes ...</a>
         </c:if>
       </div>
     </li>
@@ -743,7 +732,7 @@
             <td class="misoicon"
                 onclick="window.location.href='<c:url value="/miso/pool/${fn:toLowerCase(pool.platformType.key)}/${pool.poolId}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
             <sec:authorize access="hasRole('ROLE_ADMIN')">
-              <td class="misoicon" onclick="deletePool(${pool.poolId}, pageReload);"><span class="ui-icon ui-icon-trash"/></td>
+              <td class="misoicon" onclick="Pool.deletePool(${pool.poolId}, Utils.page.pageReload);"><span class="ui-icon ui-icon-trash"/></td>
             </sec:authorize>
           </tr>
         </c:forEach>
@@ -757,7 +746,7 @@
    At the moment you can create emPCRs and EmPcrDilutions for Illumina libraries!
 --%>
 <div class="sectionDivider"
-     onclick="toggleLeftInfo(jQuery('#empcrs_arrowclick'), 'empcrsdiv');">${fn:length(projectEmPcrs)} EmPCRs
+     onclick="Utils.ui.toggleLeftInfo(jQuery('#empcrs_arrowclick'), 'empcrsdiv');">${fn:length(projectEmPcrs)} EmPCRs
   <div id="empcrs_arrowclick" class="toggleLeft"></div>
 </div>
 <div id="empcrsdiv" style="display:none;">
@@ -805,7 +794,7 @@
             <td class="misoicon"
                 onclick="window.location.href='<c:url value="/miso/library/${pcr.libraryDilution.library.libraryId}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
             <sec:authorize access="hasRole('ROLE_ADMIN')">
-              <td class="misoicon" onclick="deleteEmPCR(${pcr.pcrId}, pageReload);"><span class="ui-icon ui-icon-trash"/></td>
+              <td class="misoicon" onclick="Library.empcr.deleteEmPCR(${pcr.pcrId}, Utils.page.pageReload);"><span class="ui-icon ui-icon-trash"/></td>
             </sec:authorize>
           </tr>
         </c:forEach>
@@ -826,7 +815,7 @@
 </div>
 
 <div class="sectionDivider"
-     onclick="toggleLeftInfo(jQuery('#empcrdils_arrowclick'), 'empcrdilsdiv');">${fn:length(projectEmPcrDilutions)}
+     onclick="Utils.ui.toggleLeftInfo(jQuery('#empcrdils_arrowclick'), 'empcrdilsdiv');">${fn:length(projectEmPcrDilutions)}
   EmPCR Dilutions
   <div id="empcrdils_arrowclick" class="toggleLeft"></div>
 </div>
@@ -873,7 +862,7 @@
             <td class="misoicon"
                 onclick="window.location.href='<c:url value="/miso/library/${dil.library.libraryId}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
             <sec:authorize access="hasRole('ROLE_ADMIN')">
-              <td class="misoicon" onclick="deleteEmPCRDilution(${dil.dilutionId}, pageReload);"><span class="ui-icon ui-icon-trash"/></td>
+              <td class="misoicon" onclick="Library.empcr.deleteEmPCRDilution(${dil.dilutionId}, Utils.page.pageReload);"><span class="ui-icon ui-icon-trash"/></td>
             </sec:authorize>
           </tr>
         </c:forEach>
@@ -894,7 +883,7 @@
 </div>
 
 <div class="sectionDivider"
-     onclick="toggleLeftInfo(jQuery('#studies_arrowclick'), 'studiesdiv');">${fn:length(project.studies)} Studies
+     onclick="Utils.ui.toggleLeftInfo(jQuery('#studies_arrowclick'), 'studiesdiv');">${fn:length(project.studies)} Studies
   <div id="studies_arrowclick" class="toggleLeft"></div>
 </div>
 <div id="studiesdiv" style="display:none;">
@@ -934,7 +923,7 @@
             <td class="misoicon"
                 onclick="window.location.href='<c:url value="/miso/study/${study.studyId}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
             <sec:authorize access="hasRole('ROLE_ADMIN')">
-              <td class="misoicon" onclick="deleteStudy(${study.studyId}, pageReload);"><span class="ui-icon ui-icon-trash"/></td>
+              <td class="misoicon" onclick="Study.deleteStudy(${study.studyId}, Utils.page.pageReload);"><span class="ui-icon ui-icon-trash"/></td>
             </sec:authorize>
           </tr>
         </c:forEach>
@@ -943,7 +932,7 @@
     </span>
 </div>
 
-<div class="sectionDivider" onclick="toggleLeftInfo(jQuery('#runs_arrowclick'), 'runsdiv');">${fn:length(projectRuns)}
+<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#runs_arrowclick'), 'runsdiv');">${fn:length(projectRuns)}
   Runs
   <div id="runs_arrowclick" class="toggleLeft"></div>
 </div>
@@ -994,7 +983,7 @@
         </td>
         <td class="misoicon" onclick="window.location.href='<c:url value="/miso/run/${run.runId}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
         <sec:authorize access="hasRole('ROLE_ADMIN')">
-          <td class="misoicon" onclick="deleteRun(${run.runId}, pageReload);"><span class="ui-icon ui-icon-trash"/></td>
+          <td class="misoicon" onclick="Run.deleteRun(${run.runId}, Utils.page.pageReload);"><span class="ui-icon ui-icon-trash"/></td>
         </sec:authorize>
       </tr>
     </c:forEach>
@@ -1029,7 +1018,7 @@ jQuery(document).ready(function() {
                            });
 
   <c:if test="${not empty project.projectId}">
-    getProjectIssues(${project.projectId});
+    Project.issues.getProjectIssues(${project.projectId});
   </c:if>
 });
 
@@ -1065,10 +1054,10 @@ function bulkSampleQcTable() {
     });
 
     //headers
-    jQuery("#sample_table tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='toggleSelectAll(\"#sample_table\", this);'></span></th>");
-    jQuery('#sample_table tr:first th:eq(6)').html("QC Passed <span header='qcPassed' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='fillDown(\"#sample_table\", this);'></span>");
-    jQuery("#sample_table tr:first").append("<th>QC Date <span header='qcDate' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='fillDown(\"#sample_table\", this);'></span></th>");
-    jQuery("#sample_table tr:first").append("<th>QC Method <span header='qcType' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='fillDown(\"#sample_table\", this);'></span></th>");
+    jQuery("#sample_table tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"#sample_table\", this);'></span></th>");
+    jQuery('#sample_table tr:first th:eq(6)').html("QC Passed <span header='qcPassed' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\"#sample_table\", this);'></span>");
+    jQuery("#sample_table tr:first").append("<th>QC Date <span header='qcDate' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\"#sample_table\", this);'></span></th>");
+    jQuery("#sample_table tr:first").append("<th>QC Method <span header='qcType' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\"#sample_table\", this);'></span></th>");
     jQuery("#sample_table tr:first").append("<th>Results</th>");
 
     //columns
@@ -1107,8 +1096,8 @@ function bulkSampleQcTable() {
     });
 
     //jQuery("div.toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
-    jQuery("div.toolbar").html("<button id=\"bulkSampleQcButton\" onclick=\"saveBulkSampleQc();\" class=\"fg-button ui-state-default ui-corner-all\">Save QCs</button>");
-    jQuery("div.toolbar").append("<button onclick=\"pageReload();\" class=\"fg-button ui-state-default ui-corner-all\">Cancel</button>");
+    jQuery("div.toolbar").html("<button id=\"bulkSampleQcButton\" onclick=\"Project.ui.saveBulkSampleQc();\" class=\"fg-button ui-state-default ui-corner-all\">Save QCs</button>");
+    jQuery("div.toolbar").append("<button onclick=\"Utils.page.pageReload();\" class=\"fg-button ui-state-default ui-corner-all\">Cancel</button>");
     jQuery("div.toolbar").removeClass("toolbar");
 
     jQuery('#sample_table .defaultEditable').editable(
@@ -1227,7 +1216,7 @@ function generateSampleDeliveryForm(projectId) {
     });
 
     //headers
-    jQuery("#sample_table tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='toggleSelectAll(\"#sample_table\", this);'></span></th>");
+    jQuery("#sample_table tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"#sample_table\", this);'></span></th>");
     jQuery("#sample_table tr:gt(0)").prepend("<td class='rowSelect'></td>");
 
     var datatable = jQuery('#sample_table')
@@ -1260,7 +1249,7 @@ function generateSampleDeliveryForm(projectId) {
         jQuery(this).parent().addClass('row_selected');
     });
 
-    jQuery("div.toolbar").html("<button onclick=\"processSampleDeliveryForm(${project.projectId});\" class=\"fg-button ui-state-default ui-corner-all\">Generate Form</button>");
+    jQuery("div.toolbar").html("<button onclick=\"Project.ui.processSampleDeliveryForm(${project.projectId});\" class=\"fg-button ui-state-default ui-corner-all\">Generate Form</button>");
   }
 }
 </c:if>
@@ -1300,10 +1289,10 @@ function bulkLibraryQcTable() {
     });
 
     //headers
-    jQuery("#library_table tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='toggleSelectAll(\"#library_table\", this);'></span></th>");
-    jQuery('#library_table tr:first th:eq(7)').html("QC Passed <span header='qcPassed' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='fillDown(\"#library_table\", this);'></span>");
-    jQuery("#library_table tr:first").append("<th>QC Date <span header='qcDate' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='fillDown(\"#library_table\", this);'></span></th>");
-    jQuery("#library_table tr:first").append("<th>QC Method <span header='qcType' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='fillDown(\"#library_table\", this);'></span></th>");
+    jQuery("#library_table tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"#library_table\", this);'></span></th>");
+    jQuery('#library_table tr:first th:eq(7)').html("QC Passed <span header='qcPassed' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\"#library_table\", this);'></span>");
+    jQuery("#library_table tr:first").append("<th>QC Date <span header='qcDate' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\"#library_table\", this);'></span></th>");
+    jQuery("#library_table tr:first").append("<th>QC Method <span header='qcType' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\"#library_table\", this);'></span></th>");
     <%--jQuery("#library_table tr:first").append("<th>Insert Size</th>");--%>
     jQuery("#library_table tr:first").append("<th>Concentration</th>");
 
@@ -1359,8 +1348,8 @@ function bulkLibraryQcTable() {
     });
 
     //jQuery("div.toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
-    jQuery("div.toolbar").html("<button id=\"bulkLibraryQcButton\" onclick=\"saveBulkLibraryQc();\" class=\"fg-button ui-state-default ui-corner-all\">Save QCs</button>");
-    jQuery("div.toolbar").append("<button onclick=\"pageReload();\" class=\"fg-button ui-state-default ui-corner-all\">Cancel</button>");
+    jQuery("div.toolbar").html("<button id=\"bulkLibraryQcButton\" onclick=\"Sample.qc.saveBulkLibraryQc();\" class=\"fg-button ui-state-default ui-corner-all\">Save QCs</button>");
+    jQuery("div.toolbar").append("<button onclick=\"Utils.page.pageReload();\" class=\"fg-button ui-state-default ui-corner-all\">Cancel</button>");
     jQuery("div.toolbar").removeClass("toolbar");
 
     jQuery('#library_table .defaultEditable')
@@ -1486,9 +1475,9 @@ function bulkLibraryDilutionTable() {
     });
 
     //headers
-    jQuery("#library_table tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='toggleSelectAll(\"#library_table\", this);'></span></th>");
-    jQuery("#library_table tr:first").append("<th>Dilution Date <span header='dilutionDate' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='fillDown(\"#library_table\", this);'></span></th>");
-    jQuery("#library_table tr:first").append("<th>Concentration <span header='qcType' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='fillDown(\"#library_table\", this);'></span></th>");
+    jQuery("#library_table tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"#library_table\", this);'></span></th>");
+    jQuery("#library_table tr:first").append("<th>Dilution Date <span header='dilutionDate' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\"#library_table\", this);'></span></th>");
+    jQuery("#library_table tr:first").append("<th>Concentration <span header='qcType' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\"#library_table\", this);'></span></th>");
 
     //columns
     jQuery("#library_table tr:gt(0)").prepend("<td class='rowSelect'></td>");
@@ -1537,8 +1526,8 @@ function bulkLibraryDilutionTable() {
         jQuery(this).parent().addClass('row_selected');
     });
 
-    jQuery("div.toolbar").html("<button id=\"bulkLibraryDilutionButton\" onclick=\"saveBulkLibraryDilutions();\" class=\"fg-button ui-state-default ui-corner-all\">Save Dilutions</button>");
-    jQuery("div.toolbar").append("<button onclick=\"pageReload();\" class=\"fg-button ui-state-default ui-corner-all\">Cancel</button>");
+    jQuery("div.toolbar").html("<button id=\"bulkLibraryDilutionButton\" onclick=\"Sample.library.saveBulkLibraryDilutions();\" class=\"fg-button ui-state-default ui-corner-all\">Save Dilutions</button>");
+    jQuery("div.toolbar").append("<button onclick=\"Utils.page.pageReload();\" class=\"fg-button ui-state-default ui-corner-all\">Cancel</button>");
     jQuery("div.toolbar").removeClass("toolbar");
 
     jQuery('#library_table .defaultEditable')
@@ -1613,8 +1602,8 @@ function bulkEmPcrTable() {
     });
 
     //headers
-    jQuery("#librarydils_table tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='toggleSelectAll(\"#librarydils_table\", this);'></span></th>");
-    jQuery("#librarydils_table tr:first").append("<th>PCR Date <span header='pcrDate' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='fillDown(\"#librarydils_table\", this);'></span></th>");
+    jQuery("#librarydils_table tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"#librarydils_table\", this);'></span></th>");
+    jQuery("#librarydils_table tr:first").append("<th>PCR Date <span header='pcrDate' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\"#librarydils_table\", this);'></span></th>");
     jQuery("#librarydils_table tr:first").append("<th>Concentration</th>");
 
     //columns
@@ -1667,8 +1656,8 @@ function bulkEmPcrTable() {
         jQuery(this).parent().addClass('row_selected');
     });
 
-    jQuery("div.toolbar").html("<button id=\"bulkEmPcrButton\" onclick=\"saveBulkEmPcrs();\" class=\"fg-button ui-state-default ui-corner-all\">Save EmPCRs</button>");
-    jQuery("div.toolbar").append("<button onclick=\"pageReload();\" class=\"fg-button ui-state-default ui-corner-all\">Cancel</button>");
+    jQuery("div.toolbar").html("<button id=\"bulkEmPcrButton\" onclick=\"Project.ui.saveBulkEmPcrs();\" class=\"fg-button ui-state-default ui-corner-all\">Save EmPCRs</button>");
+    jQuery("div.toolbar").append("<button onclick=\"Utils.page.pageReload();\" class=\"fg-button ui-state-default ui-corner-all\">Cancel</button>");
     jQuery("div.toolbar").removeClass("toolbar");
 
     jQuery('#librarydils_table .defaultEditable')
@@ -1743,9 +1732,9 @@ function bulkEmPcrDilutionTable() {
     });
 
     //headers
-    jQuery("#empcrs_table tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='toggleSelectAll(\"#empcrs_table\", this);'></span></th>");
-    jQuery("#empcrs_table tr:first").append("<th>Dilution Date <span header='pcrDilutionDate' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='fillDown(\"#empcrs_table\", this);'></span></th>");
-    jQuery("#empcrs_table tr:first").append("<th>Concentration <span header='qcType' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='fillDown(\"#empcrs_table\", this);'></span></th>");
+    jQuery("#empcrs_table tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"#empcrs_table\", this);'></span></th>");
+    jQuery("#empcrs_table tr:first").append("<th>Dilution Date <span header='pcrDilutionDate' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\"#empcrs_table\", this);'></span></th>");
+    jQuery("#empcrs_table tr:first").append("<th>Concentration</th>");
 
     //columns
     jQuery("#empcrs_table tr:gt(0)").prepend("<td class='rowSelect'></td>");
@@ -1792,8 +1781,8 @@ function bulkEmPcrDilutionTable() {
         jQuery(this).parent().addClass('row_selected');
     });
 
-    jQuery("div.toolbar").html("<button id=\"bulkEmPcrDilutionButton\" onclick=\"saveBulkEmPcrDilutions();\" class=\"fg-button ui-state-default ui-corner-all\">Save Dilutions</button>");
-    jQuery("div.toolbar").append("<button onclick=\"pageReload();\" class=\"fg-button ui-state-default ui-corner-all\">Cancel</button>");
+    jQuery("div.toolbar").html("<button id=\"bulkEmPcrDilutionButton\" onclick=\"Project.ui.saveBulkEmPcrDilutions();\" class=\"fg-button ui-state-default ui-corner-all\">Save Dilutions</button>");
+    jQuery("div.toolbar").append("<button onclick=\"Utils.page.pageReload();\" class=\"fg-button ui-state-default ui-corner-all\">Cancel</button>");
     jQuery("div.toolbar").removeClass("toolbar");
 
     jQuery('#empcrs_table .defaultEditable')

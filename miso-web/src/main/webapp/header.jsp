@@ -68,7 +68,6 @@
   <jsp:useBean id="timestamp" class="java.util.Date" scope="request"/>
 
   <link rel="stylesheet" href="<c:url value='/styles/style.css?ts=${timestamp.time}'/>" type="text/css">
-  <link rel="stylesheet" href="<c:url value='/styles/simpletree.css'/>" type="text/css">
   <title>MISO LIMS <c:if test="${not empty title}">- ${title}</c:if></title>
   <script type="text/javascript" src="<c:url value='/scripts/scriptaculous/prototype.js'/>"></script>
   <script type="text/javascript" src="<c:url value='/scripts/fluxion-ajax/fluxion-ajax.js?ts=${timestamp.time}'/>"></script>

@@ -27,7 +27,7 @@ function validate_study(form) {
 
   if (jQuery(':text.validateable').length > 0) {
     jQuery(':text.validateable').each(function() {
-      var result = validate_input_field(this, 'Study', ok);
+      var result = Utils.validation.validate_input_field(this, 'Study', ok);
       ok = result.okstatus;
       error += result.errormsg;
     })

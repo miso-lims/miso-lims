@@ -25,7 +25,6 @@ package uk.ac.bbsrc.tgac.miso.sqlstore;
 
 import com.eaglegenomics.simlims.core.Note;
 import com.googlecode.ehcache.annotations.*;
-import com.googlecode.ehcache.annotations.key.HashCodeCacheKeyGenerator;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
@@ -42,6 +41,8 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.transaction.annotation.Transactional;
+import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.*;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
@@ -150,6 +151,19 @@ public class SQLSampleDAO implements SampleStore {
   private CascadeType cascadeType;
 
   @Autowired
+  private MisoNamingScheme<Sample> sampleNamingScheme;
+
+  @Override
+  public MisoNamingScheme<Sample> getNamingScheme() {
+    return sampleNamingScheme;
+  }
+
+  @Override
+  public void setNamingScheme(MisoNamingScheme<Sample> sampleNamingScheme) {
+    this.sampleNamingScheme = sampleNamingScheme;
+  }
+
+  @Autowired
   private CacheManager cacheManager;
 
   public void setCacheManager(CacheManager cacheManager) {
@@ -227,30 +241,41 @@ public class SQLSampleDAO implements SampleStore {
   //TODO finish this
   public int[] batchSave(final Collection<Sample> samples) throws IOException {
     List<SqlParameterSource> batch = new ArrayList<SqlParameterSource>();
-    for (Sample sample : samples) {
-      Long securityProfileId = sample.getSecurityProfile().getProfileId();
-      if (this.cascadeType != null){// && this.cascadeType.equals(CascadeType.PERSIST) || this.cascadeType.equals(CascadeType.REMOVE)) {
-        securityProfileId = securityProfileDAO.save(sample.getSecurityProfile());
-      }
+    try {
+      for (Sample sample : samples) {
+        Long securityProfileId = sample.getSecurityProfile().getProfileId();
+        if (this.cascadeType != null){// && this.cascadeType.equals(CascadeType.PERSIST) || this.cascadeType.equals(CascadeType.REMOVE)) {
+          securityProfileId = securityProfileDAO.save(sample.getSecurityProfile());
+        }
 
-      MapSqlParameterSource params = new MapSqlParameterSource();
-      params.addValue("alias", sample.getAlias())
-            .addValue("accession", sample.getAccession())
-            .addValue("description", sample.getDescription())
-            .addValue("scientificName", sample.getScientificName())
-            .addValue("taxonIdentifier", sample.getTaxonIdentifier())
-            //.addValue("identificationBarcode", sample.getIdentificationBarcode())
-            .addValue("locationBarcode", sample.getLocationBarcode())
-            .addValue("sampleType", sample.getSampleType())
-            .addValue("receivedDate", sample.getReceivedDate())
-            .addValue("qcPassed", sample.getQcPassed().toString())
-            .addValue("project_projectId", sample.getProject().getProjectId())
-            .addValue("securityProfile_profileId", securityProfileId);
-      batch.add(params);
-      purgeCache(sample);
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("alias", sample.getAlias())
+              .addValue("accession", sample.getAccession())
+              .addValue("description", sample.getDescription())
+              .addValue("scientificName", sample.getScientificName())
+              .addValue("taxonIdentifier", sample.getTaxonIdentifier())
+              //.addValue("identificationBarcode", sample.getIdentificationBarcode())
+              .addValue("locationBarcode", sample.getLocationBarcode())
+              .addValue("sampleType", sample.getSampleType())
+              .addValue("receivedDate", sample.getReceivedDate())
+              .addValue("qcPassed", sample.getQcPassed().toString())
+              .addValue("project_projectId", sample.getProject().getProjectId())
+              .addValue("securityProfile_profileId", securityProfileId);
+
+        if (sampleNamingScheme.validateField("name", sample.getName()) && sampleNamingScheme.validateField("alias", sample.getAlias())) {
+          batch.add(params);
+          purgeCache(sample);
+        }
+        else {
+          throw new IOException("Cannot save sample - invalid field:" + sample.toString());
+        }
+      }
+      SimpleJdbcTemplate sTemplate = new SimpleJdbcTemplate(template);
+      return sTemplate.batchUpdate(SAMPLE_UPDATE, batch.toArray(new SqlParameterSource[samples.size()]));
     }
-    SimpleJdbcTemplate sTemplate = new SimpleJdbcTemplate(template);
-    return sTemplate.batchUpdate(SAMPLE_UPDATE, batch.toArray(new SqlParameterSource[samples.size()]));
+    catch (MisoNamingException e) {
+      throw new IOException("Cannot save sample - issue with naming scheme", e);
+    }
   }
 
   @Transactional(readOnly = false, rollbackFor = IOException.class)
@@ -290,34 +315,62 @@ public class SQLSampleDAO implements SampleStore {
     }
 
     if (sample.getSampleId() == AbstractSample.UNSAVED_ID) {
-      if (getByAlias(sample.getAlias()) != null) {
+      if (!listByAlias(sample.getAlias()).isEmpty()) {
         throw new IOException("NEW: A sample with this alias already exists in the database");
       }
       else {
         SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
                                 .withTableName(TABLE_NAME)
                                 .usingGeneratedKeyColumns("sampleId");
-        String name = "SAM"+ DbUtils.getAutoIncrement(template, TABLE_NAME);
-        String barcode = name + "::" + sample.getAlias();
-        params.addValue("name", name);
-        params.addValue("identificationBarcode", barcode);
+        try {
+          sample.setSampleId(DbUtils.getAutoIncrement(template, TABLE_NAME));
 
-        Number newId = insert.executeAndReturnKey(params);
-        sample.setSampleId(newId.longValue());
-        sample.setName(name);
+          String name = sampleNamingScheme.generateNameFor("name", sample);
+          if (sampleNamingScheme.validateField("name", sample.getName()) && sampleNamingScheme.validateField("alias", sample.getAlias())) {
+            String barcode = name + "::" + sample.getAlias();
+            params.addValue("name", name);
+
+            params.addValue("identificationBarcode", barcode);
+
+            Number newId = insert.executeAndReturnKey(params);
+            if (newId != sample.getSampleId()) {
+              log.error("Expected Sample ID doesn't match returned value from database insert: rolling back...");
+              new NamedParameterJdbcTemplate(template).update(SAMPLE_DELETE, new MapSqlParameterSource().addValue("sampleId", sample.getSampleId()));
+              throw new IOException("Something bad happened. Expected Sample ID doesn't match returned value from DB insert");
+            }
+            //sample.setSampleId(newId.longValue());
+            sample.setName(name);
+          }
+          else {
+            throw new IOException("Cannot save sample - invalid field:" + sample.toString());
+          }
+        }
+        catch (MisoNamingException e) {
+          throw new IOException("Cannot save sample - issue with naming scheme", e);
+        }
       }
     }
     else {
-      Sample exist = getByAlias(sample.getAlias());
-      if (exist != null && exist.getSampleId().longValue() != sample.getSampleId().longValue()) {
+      List<Sample> as = new ArrayList<Sample>(listByAlias(sample.getAlias()));
+      if (!as.isEmpty() && as.get(0) != null && as.get(0).getSampleId().longValue() != sample.getSampleId().longValue()) {
         throw new IOException("UPD: A sample with this alias already exists in the database");
       }
       else {
-        params.addValue("sampleId", sample.getSampleId())
-              .addValue("name", sample.getName())
-              .addValue("identificationBarcode", sample.getName() + "::" + sample.getAlias());
-        NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-        namedTemplate.update(SAMPLE_UPDATE, params);
+        try {
+          if (sampleNamingScheme.validateField("name", sample.getName()) && sampleNamingScheme.validateField("alias", sample.getAlias())) {
+            params.addValue("sampleId", sample.getSampleId())
+                  .addValue("name", sample.getName())
+                  .addValue("identificationBarcode", sample.getName() + "::" + sample.getAlias());
+            NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+            namedTemplate.update(SAMPLE_UPDATE, params);
+          }
+          else {
+            throw new IOException("Cannot save sample - invalid field:" + sample.toString());
+          }
+        }
+        catch (MisoNamingException e) {
+          throw new IOException("Cannot save sample - issue with naming scheme", e);
+        }
       }
     }
 
@@ -422,12 +475,6 @@ public class SQLSampleDAO implements SampleStore {
     return e;
   }
 
-  public Sample getByAlias(String alias) throws IOException {
-    List eResults = template.query(SAMPLE_SELECT_BY_ALIAS, new Object[]{alias}, new LazySampleMapper());
-    Sample e = eResults.size() > 0 ? (Sample) eResults.get(0) : null;
-    return e;
-  }
-
   public Sample getByBarcode(String barcode) throws IOException {
     List eResults = template.query(SAMPLE_SELECT_BY_IDENTIFICATION_BARCODE, new Object[]{barcode}, new LazySampleMapper());
     Sample e = eResults.size() > 0 ? (Sample) eResults.get(0) : null;
@@ -442,6 +489,10 @@ public class SQLSampleDAO implements SampleStore {
 
   public List<Sample> listByExperimentId(long experimentId) throws IOException {
     return template.query(SAMPLES_SELECT_BY_EXPERIMENT_ID, new Object[]{experimentId}, new LazySampleMapper());
+  }
+
+  public Collection<Sample> listByAlias(String alias) throws IOException {
+    return template.query(SAMPLE_SELECT_BY_ALIAS, new Object[]{alias}, new LazySampleMapper());
   }
 
   public List<String> listAllSampleTypes() throws IOException {

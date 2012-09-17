@@ -70,7 +70,7 @@ public class ExperimentSearchService {
           long experimentId = exp.getExperimentId();
 
           if (experimentName != null && (experimentName.equals(str) || experimentName.contains(str))) {
-            b.append("<li onclick=\"insertResult(&#39;" + resultId + "&#39;,&#39;" + experimentId + "&#39;)\">" + exp.getName() + "(" + exp.getAlias() + ")</li>");
+            b.append("<li onclick=\"Search.insertResult(&#39;" + resultId + "&#39;,&#39;" + experimentId + "&#39;)\">" + exp.getName() + "(" + exp.getAlias() + ")</li>");
             numMatches++;
           }
         }

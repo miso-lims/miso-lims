@@ -35,7 +35,6 @@ import net.sf.ehcache.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -47,7 +46,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.service.tagbarcode.TagBarcodeStrategyResolverService;
+import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.*;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
@@ -214,6 +214,19 @@ public class SQLLibraryDAO implements LibraryStore {
   private CascadeType cascadeType;
 
   @Autowired
+  private MisoNamingScheme<Library> libraryNamingScheme;
+
+  @Override
+  public MisoNamingScheme<Library> getNamingScheme() {
+    return libraryNamingScheme;
+  }
+
+  @Override
+  public void setNamingScheme(MisoNamingScheme<Library> libraryNamingScheme) {
+    this.libraryNamingScheme = libraryNamingScheme;
+  }
+
+  @Autowired
   private CacheManager cacheManager;
 
   @Autowired
@@ -324,19 +337,57 @@ public class SQLLibraryDAO implements LibraryStore {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
               .withTableName(TABLE_NAME)
               .usingGeneratedKeyColumns("libraryId");
+      /*
       String name = Library.PREFIX + DbUtils.getAutoIncrement(template, TABLE_NAME);
       params.addValue("name", name);
       params.addValue("identificationBarcode", name + "::" + library.getAlias());
       Number newId = insert.executeAndReturnKey(params);
       library.setLibraryId(newId.longValue());
       library.setName(name);
+      */
+
+      try {
+        library.setLibraryId(DbUtils.getAutoIncrement(template, TABLE_NAME));
+
+        String name = libraryNamingScheme.generateNameFor("name", library);
+        if (libraryNamingScheme.validateField("name", library.getName()) && libraryNamingScheme.validateField("alias", library.getAlias())) {
+          String barcode = name + "::" + library.getAlias();
+          params.addValue("name", name);
+
+          params.addValue("identificationBarcode", barcode);
+
+          Number newId = insert.executeAndReturnKey(params);
+          if (newId != library.getLibraryId()) {
+            log.error("Expected library ID doesn't match returned value from database insert: rolling back...");
+            new NamedParameterJdbcTemplate(template).update(LIBRARY_DELETE, new MapSqlParameterSource().addValue("libraryId", library.getLibraryId()));
+            throw new IOException("Something bad happened. Expected library ID doesn't match returned value from DB insert");
+          }
+          library.setName(name);
+        }
+        else {
+          throw new IOException("Cannot save library - invalid field:" + library.toString());
+        }
+      }
+      catch (MisoNamingException e) {
+        throw new IOException("Cannot save library - issue with naming scheme", e);
+      }
     }
     else {
-      params.addValue("libraryId", library.getLibraryId())
-            .addValue("name", library.getName())
-            .addValue("identificationBarcode", library.getName() + "::" + library.getAlias());
-      NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-      namedTemplate.update(LIBRARY_UPDATE, params);
+      try {
+        if (libraryNamingScheme.validateField("name", library.getName()) && libraryNamingScheme.validateField("alias", library.getAlias())) {
+          params.addValue("libraryId", library.getLibraryId())
+                .addValue("name", library.getName())
+                .addValue("identificationBarcode", library.getName() + "::" + library.getAlias());
+          NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+          namedTemplate.update(LIBRARY_UPDATE, params);
+        }
+        else {
+          throw new IOException("Cannot save library - invalid field:" + library.toString());
+        }
+      }
+      catch (MisoNamingException e) {
+        throw new IOException("Cannot save library - issue with naming scheme", e);
+      }
     }
 
     MapSqlParameterSource libparams = new MapSqlParameterSource();
