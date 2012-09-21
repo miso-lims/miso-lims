@@ -128,21 +128,21 @@ public class SQLSampleQCDAO implements SampleQcStore {
   @Transactional(readOnly = false, rollbackFor = IOException.class)
   public long save(SampleQC sampleQC) throws IOException {
     MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("sample_sampleId", sampleQC.getSample().getSampleId())
+    params.addValue("sample_sampleId", sampleQC.getSample().getId())
             .addValue("qcUserName", sampleQC.getQcCreator())
             .addValue("qcDate", sampleQC.getQcDate())
             .addValue("qcMethod", sampleQC.getQcType().getQcTypeId())
             .addValue("results", sampleQC.getResults());
 
-    if (sampleQC.getQcId() == AbstractSampleQC.UNSAVED_ID) {
+    if (sampleQC.getId() == AbstractSampleQC.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
                               .withTableName(TABLE_NAME)
                               .usingGeneratedKeyColumns("qcId");
       Number newId = insert.executeAndReturnKey(params);
-      sampleQC.setQcId(newId.longValue());
+      sampleQC.setId(newId.longValue());
     }
     else {
-      params.addValue("qcId", sampleQC.getQcId());
+      params.addValue("qcId", sampleQC.getId());
       NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
       namedTemplate.update(SAMPLE_QC_UPDATE, params);
     }
@@ -155,18 +155,18 @@ public class SQLSampleQCDAO implements SampleQcStore {
       else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (s != null) {
           Cache pc = cacheManager.getCache("sampleCache");
-          pc.remove(DbUtils.hashCodeCacheKeyFor(s.getSampleId()));
+          pc.remove(DbUtils.hashCodeCacheKeyFor(s.getId()));
         }
       }
       else if (this.cascadeType.equals(CascadeType.ALL)) {
         if (s!=null) {
           sampleDAO.save(s);
           Cache pc = cacheManager.getCache("sampleCache");
-          pc.remove(DbUtils.hashCodeCacheKeyFor(s.getSampleId()));
+          pc.remove(DbUtils.hashCodeCacheKeyFor(s.getId()));
         }
       }
     }
-    return sampleQC.getQcId();
+    return sampleQC.getId();
   }
 
   public SampleQC get(long qcId) throws IOException {
@@ -198,7 +198,7 @@ public class SQLSampleQCDAO implements SampleQcStore {
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
     if (qc.isDeletable() &&
            (namedTemplate.update(SAMPLE_QC_DELETE,
-                                 new MapSqlParameterSource().addValue("qcId", qc.getQcId())) == 1)) {
+                                 new MapSqlParameterSource().addValue("qcId", qc.getId())) == 1)) {
       Sample s = qc.getSample();
       if (this.cascadeType.equals(CascadeType.PERSIST)) {
         if (s!=null) sampleDAO.save(s);
@@ -206,7 +206,7 @@ public class SQLSampleQCDAO implements SampleQcStore {
       else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (s != null) {
           Cache pc = cacheManager.getCache("sampleCache");
-          pc.remove(DbUtils.hashCodeCacheKeyFor(s.getSampleId()));
+          pc.remove(DbUtils.hashCodeCacheKeyFor(s.getId()));
         }
       }
       return true;
@@ -217,7 +217,7 @@ public class SQLSampleQCDAO implements SampleQcStore {
   public class LazySampleQcMapper implements RowMapper<SampleQC> {
     public SampleQC mapRow(ResultSet rs, int rowNum) throws SQLException {
       SampleQC s = dataObjectFactory.getSampleQC();
-      s.setQcId(rs.getLong("qcId"));
+      s.setId(rs.getLong("qcId"));
       s.setQcCreator(rs.getString("qcUserName"));
       s.setQcDate(rs.getDate("qcDate"));
       s.setResults(rs.getDouble("results"));
@@ -236,7 +236,7 @@ public class SQLSampleQCDAO implements SampleQcStore {
   public class SampleQcMapper implements RowMapper<SampleQC> {
     public SampleQC mapRow(ResultSet rs, int rowNum) throws SQLException {
       SampleQC s = dataObjectFactory.getSampleQC();
-      s.setQcId(rs.getLong("qcId"));
+      s.setId(rs.getLong("qcId"));
       s.setQcCreator(rs.getString("qcUserName"));
       s.setQcDate(rs.getDate("qcDate"));
       s.setResults(rs.getDouble("results"));

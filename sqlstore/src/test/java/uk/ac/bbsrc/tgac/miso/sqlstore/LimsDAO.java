@@ -144,7 +144,7 @@ public class LimsDAO extends LimsDAOTestCase {
 
       for (emPCR d : random(getEmPCRDAO(), actual, 5)) {
         TestCase.assertNotNull(d);
-        TestCase.assertNotNull(d.getPcrId());
+        TestCase.assertNotNull(d.getId());
       }
     }
     catch (Exception e) {
@@ -170,7 +170,7 @@ public class LimsDAO extends LimsDAOTestCase {
 
       for (Experiment d : random(getExperimentDAO(), actual, 5)) {
         TestCase.assertNotNull(d);
-        TestCase.assertNotNull(d.getExperimentId());
+        TestCase.assertNotNull(d.getId());
       }
     }
     catch (Exception e) {
@@ -196,7 +196,7 @@ public class LimsDAO extends LimsDAOTestCase {
 
       for (SequencerPartitionContainer d : random(getSequencerPartitionContainerDAO(), actual, 5)) {
         TestCase.assertNotNull(d);
-        TestCase.assertNotNull(d.getContainerId());
+        TestCase.assertNotNull(d.getId());
       }
     }
     catch (Exception e) {
@@ -222,7 +222,7 @@ public class LimsDAO extends LimsDAOTestCase {
 
       for (Kit d : random(getKitDAO(), actual, 5)) {
         TestCase.assertNotNull(d);
-        TestCase.assertNotNull(d.getKitId());
+        TestCase.assertNotNull(d.getId());
       }
     }
     catch (Exception e) {
@@ -274,7 +274,7 @@ public class LimsDAO extends LimsDAOTestCase {
 
       for (Library d : random(getLibraryDAO(), actual, 5)) {
         TestCase.assertNotNull(d);
-        TestCase.assertNotNull(d.getLibraryId());
+        TestCase.assertNotNull(d.getId());
       }
     }
     catch (Exception e) {
@@ -300,7 +300,7 @@ public class LimsDAO extends LimsDAOTestCase {
 
       for (LibraryQC d : random(getLibraryQcDAO(), actual, 5)) {
         TestCase.assertNotNull(d);
-        TestCase.assertNotNull(d.getQcId());
+        TestCase.assertNotNull(d.getId());
       }
     }
     catch (Exception e) {
@@ -345,7 +345,7 @@ public class LimsDAO extends LimsDAOTestCase {
 
       for (Pool d : random(getPoolDAO(), actual, 5)) {
         TestCase.assertNotNull(d);
-        TestCase.assertNotNull(d.getPoolId());
+        TestCase.assertNotNull(d.getId());
       }
     }
     catch (Exception e) {
@@ -397,7 +397,7 @@ public class LimsDAO extends LimsDAOTestCase {
 
       for (Run d : random(getRunDAO(), actual, 5)) {
         TestCase.assertNotNull(d);
-        TestCase.assertNotNull(d.getRunId());
+        TestCase.assertNotNull(d.getId());
       }
     }
     catch (Exception e) {
@@ -423,7 +423,7 @@ public class LimsDAO extends LimsDAOTestCase {
 
       for (RunQC d : random(getRunQcDAO(), actual, 1)) {
         TestCase.assertNotNull(d);
-        TestCase.assertNotNull(d.getQcId());
+        TestCase.assertNotNull(d.getId());
       }
     }
     catch (Exception e) {
@@ -449,7 +449,7 @@ public class LimsDAO extends LimsDAOTestCase {
 
       for (Sample d : random(getSampleDAO(), actual, 5)) {
         TestCase.assertNotNull(d);
-        TestCase.assertNotNull(d.getSampleId());
+        TestCase.assertNotNull(d.getId());
       }
     }
     catch (Exception e) {
@@ -475,7 +475,7 @@ public class LimsDAO extends LimsDAOTestCase {
 
       for (SampleQC d : random(getSampleQcDAO(), actual, 5)) {
         TestCase.assertNotNull(d);
-        TestCase.assertNotNull(d.getQcId());
+        TestCase.assertNotNull(d.getId());
       }
     }
     catch (Exception e) {
@@ -553,7 +553,7 @@ public class LimsDAO extends LimsDAOTestCase {
 
       for (Study d : random(getStudyDAO(), actual, 5)) {
         TestCase.assertNotNull(d);
-        TestCase.assertNotNull(d.getStudyId());
+        TestCase.assertNotNull(d.getId());
       }
     }
     catch (Exception e) {
@@ -579,7 +579,7 @@ public class LimsDAO extends LimsDAOTestCase {
 
       for (Submission d : random(getSubmissionDAO(), actual, 5)) {
         TestCase.assertNotNull(d);
-        TestCase.assertNotNull(d.getSubmissionId());
+        TestCase.assertNotNull(d.getId());
       }
     }
     catch (Exception e) {

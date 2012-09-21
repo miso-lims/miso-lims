@@ -105,7 +105,7 @@ public class EditIlluminaPoolController {
       for (Experiment e : requestManager.listAllExperiments()) {
         if (e.getPlatform().getPlatformType().equals(p.getPlatformType())) {
           if (experimentId != null) {
-            if (!e.getExperimentId().equals(experimentId)) {
+            if (e.getId() != experimentId) {
               es.add(e);
             }
           }
@@ -287,7 +287,7 @@ public class EditIlluminaPoolController {
     }
 
     requestManager.savePool(p);
-    return "redirect:/miso/pool/illumina/" + p.getPoolId();
+    return "redirect:/miso/pool/illumina/" + p.getId();
   }
 
   @RequestMapping(method = RequestMethod.POST)
@@ -302,7 +302,7 @@ public class EditIlluminaPoolController {
       requestManager.savePool(pool);
       session.setComplete();
       model.clear();
-      return "redirect:/miso/pool/illumina/" + pool.getPoolId();
+      return "redirect:/miso/pool/illumina/" + pool.getId();
     }
     catch (IOException ex) {
       if (log.isDebugEnabled()) {

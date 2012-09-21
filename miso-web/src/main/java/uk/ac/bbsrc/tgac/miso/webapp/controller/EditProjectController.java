@@ -162,7 +162,7 @@ public class EditProjectController {
       for (Run r : runs) {
         RunImpl ri = (RunImpl) r;
         ri.setSequencerPartitionContainers(new ArrayList<SequencerPartitionContainer<SequencerPoolPartition>>(
-                requestManager.listSequencerPartitionContainersByRunId(r.getRunId())));
+                requestManager.listSequencerPartitionContainersByRunId(r.getId())));
       }
       return runs;
     }
@@ -176,7 +176,7 @@ public class EditProjectController {
     try {
       Collections.sort(libraries, new AliasComparator(Library.class));
       for (Library l : libraries) {
-        for (LibraryQC qc : requestManager.listAllLibraryQCsByLibraryId(l.getLibraryId())) {
+        for (LibraryQC qc : requestManager.listAllLibraryQCsByLibraryId(l.getId())) {
           try {
             l.addQc(qc);
           }
@@ -196,7 +196,7 @@ public class EditProjectController {
   public Collection<LibraryDilution> populateProjectLibraryDilutions(Collection<Library> projectLibraries) throws IOException {
     List<LibraryDilution> dilutions = new ArrayList<LibraryDilution>();
     for (Library l : projectLibraries) {
-      dilutions.addAll(requestManager.listAllLibraryDilutionsByLibraryId(l.getLibraryId()));
+      dilutions.addAll(requestManager.listAllLibraryDilutionsByLibraryId(l.getId()));
     }
     Collections.sort(dilutions);
     return dilutions;
@@ -243,7 +243,7 @@ public class EditProjectController {
   public Collection<emPCRDilution> populateProjectEmPcrDilutions(Collection<emPCR> projectEmPCRs) throws IOException {
     List<emPCRDilution> dilutions = new ArrayList<emPCRDilution>();
     for (emPCR e : projectEmPCRs) {
-      dilutions.addAll(requestManager.listAllEmPcrDilutionsByEmPcrId(e.getPcrId()));
+      dilutions.addAll(requestManager.listAllEmPcrDilutionsByEmPcrId(e.getId()));
     }
     Collections.sort(dilutions);
     return dilutions;
@@ -281,7 +281,7 @@ public class EditProjectController {
       }
 
       for (Study study : studies) {
-        Collection<Experiment> experiments = requestManager.listAllExperimentsByStudyId(study.getStudyId());
+        Collection<Experiment> experiments = requestManager.listAllExperimentsByStudyId(study.getId());
         if (experiments.size() == 0) {
           studiesJSON.put(study.getName(), "2");
         }
@@ -295,7 +295,7 @@ public class EditProjectController {
       }
 
       for (Sample sample : samples) {
-        Collection<Library> libraries = requestManager.listAllLibrariesBySampleId(sample.getSampleId());
+        Collection<Library> libraries = requestManager.listAllLibrariesBySampleId(sample.getId());
         if (libraries.size() == 0) {
           if (sample.getQcPassed()) {
             samplesJSON.put(sample.getName(), "1");
@@ -307,7 +307,7 @@ public class EditProjectController {
         else {
           JSONObject librariesJSON = new JSONObject();
           for (Library library : libraries) {
-            Collection<LibraryDilution> lds = requestManager.listAllLibraryDilutionsByLibraryId(library.getLibraryId());
+            Collection<LibraryDilution> lds = requestManager.listAllLibraryDilutionsByLibraryId(library.getId());
             if (lds.size() > 0) {
               JSONObject dilutionsJSON = new JSONObject();
               for (LibraryDilution ld : lds) {

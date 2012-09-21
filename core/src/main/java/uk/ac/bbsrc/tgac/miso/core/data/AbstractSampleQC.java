@@ -67,22 +67,22 @@ public abstract class AbstractSampleQC extends AbstractQC implements SampleQC {
     SampleQC them = (SampleQC) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
-    if (this.getQcId() == AbstractSampleQC.UNSAVED_ID
-        || them.getQcId() == AbstractSampleQC.UNSAVED_ID) {
+    if (this.getId() == AbstractSampleQC.UNSAVED_ID
+        || them.getId() == AbstractSampleQC.UNSAVED_ID) {
       return this.getQcCreator().equals(them.getQcCreator())
              && this.getQcDate().equals(them.getQcDate())
              && this.getQcType().equals(them.getQcType())
              && this.getResults().equals(them.getResults());
     }
     else {
-      return this.getQcId().longValue() == them.getQcId().longValue();
+      return this.getId() == them.getId();
     }
   }
 
   @Override
   public int hashCode() {
-    if (getQcId() != AbstractSampleQC.UNSAVED_ID) {
-      return getQcId().intValue();
+    if (getId() != AbstractSampleQC.UNSAVED_ID) {
+      return (int)getId();
     }
     else {
       int hashcode = getQcCreator().hashCode();
@@ -91,9 +91,5 @@ public abstract class AbstractSampleQC extends AbstractQC implements SampleQC {
       hashcode = 37 * hashcode + getResults().hashCode();
       return hashcode;
     }
-  }
-
-  public int compareTo(Object o) {
-    return this.equals(o) ? 0 : 1;
   }
 }

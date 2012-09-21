@@ -58,7 +58,7 @@
                     <td>${library.sample.name}</td>
                     <td>${library.qcPassed}</td>
                     <td class="misoicon"
-                        onclick="window.location.href='<c:url value="/miso/library/${library.libraryId}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
+                        onclick="window.location.href='<c:url value="/miso/library/${library.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
                 </tr>
             </c:forEach>
             </tbody>

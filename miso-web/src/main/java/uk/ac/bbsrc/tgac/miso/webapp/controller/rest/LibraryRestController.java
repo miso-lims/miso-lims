@@ -126,7 +126,7 @@ public class LibraryRestController {
         List<TagBarcode> tagBarcodes = new ArrayList<TagBarcode>(tbs.getApplicableBarcodesForPosition(Integer.parseInt(position)));
         List<String> names = new ArrayList<String>();
         for (TagBarcode tb : tagBarcodes) {
-          names.add("\"" + tb.getTagBarcodeId() + "\"" + ":" + "\"" + tb.getName() + " ("+tb.getSequence()+")\"");
+          names.add("\"" + tb.getId() + "\"" + ":" + "\"" + tb.getName() + " ("+tb.getSequence()+")\"");
         }
         return "{"+LimsUtils.join(names, ",")+"}";
       }

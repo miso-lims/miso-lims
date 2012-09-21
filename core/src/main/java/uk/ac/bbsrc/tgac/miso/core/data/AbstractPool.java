@@ -43,7 +43,7 @@ import java.util.*;
  * @since 0.0.2
  */
 public abstract class AbstractPool<P extends Poolable> implements Pool<P> {
-  public static final Long UNSAVED_ID = null;
+  public static final Long UNSAVED_ID = 0L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -67,12 +67,23 @@ public abstract class AbstractPool<P extends Poolable> implements Pool<P> {
   private Set<MisoListener> listeners = new HashSet<MisoListener>();
   private Set<User> watchers = new HashSet<User>();
 
+  @Deprecated
   public Long getPoolId() {
     return this.poolId;
   }
 
+  @Deprecated
   public void setPoolId(Long poolId) {
     this.poolId = poolId;
+  }
+
+  @Override
+  public long getId() {
+    return poolId;
+  }
+
+  public void setId(long id) {
+    this.poolId = id;
   }
 
   @Override
@@ -133,10 +144,15 @@ public abstract class AbstractPool<P extends Poolable> implements Pool<P> {
    */
   @Override
   public void setDilutions(Collection<P> dilutions) {
-    for (P p : dilutions) {
-      if (p instanceof Dilution) {
-        setPoolableElements(dilutions);
+    if (dilutions != null) {
+      for (P p : dilutions) {
+        if (p instanceof Dilution) {
+          setPoolableElements(dilutions);
+        }
       }
+    }
+    else {
+      setPoolableElements(dilutions);
     }
   }
 
@@ -248,7 +264,7 @@ public abstract class AbstractPool<P extends Poolable> implements Pool<P> {
   }
 
   protected void firePoolReadyEvent() {
-    if (this.getPoolId() != null) {
+    if (this.getId() != 0L) {
       //PoolEvent pe = new PoolEvent(this, MisoEventType.POOL_READY, "Pool "+getName()+" ("+getAlias()+") ready to run");
       PoolEvent pe = new PoolEvent(this, MisoEventType.POOL_READY, "Pool "+getName()+" ready to run");
       for (MisoListener listener : getListeners()) {
@@ -303,7 +319,7 @@ public abstract class AbstractPool<P extends Poolable> implements Pool<P> {
   }
 
   public boolean isDeletable() {
-    return getPoolId() != AbstractPool.UNSAVED_ID &&
+    return getId() != AbstractPool.UNSAVED_ID &&
            getPoolableElements().isEmpty();
   }
 
@@ -318,20 +334,20 @@ public abstract class AbstractPool<P extends Poolable> implements Pool<P> {
     Pool them = (Pool) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
-    if (getPoolId() == AbstractPool.UNSAVED_ID
-        || them.getPoolId() == AbstractPool.UNSAVED_ID) {
+    if (getId() == AbstractPool.UNSAVED_ID
+        || them.getId() == AbstractPool.UNSAVED_ID) {
       return getPlatformType().equals(them.getPlatformType())
              && getCreationDate().equals(them.getCreationDate());
     }
     else {
-      return getPoolId().longValue() == them.getPoolId().longValue();
+      return getId() == them.getId();
     }
   }
 
   @Override
   public int hashCode() {
-    if (getPoolId() != AbstractPool.UNSAVED_ID) {
-      return getPoolId().intValue();
+    if (getId() != AbstractPool.UNSAVED_ID) {
+      return (int)getId();
     }
     else {
       final int PRIME = 37;
@@ -347,15 +363,15 @@ public abstract class AbstractPool<P extends Poolable> implements Pool<P> {
   @Override
   public int compareTo(Object o) {
     Pool t = (Pool)o;
-    if (getPoolId() < t.getPoolId()) return -1;
-    if (getPoolId() > t.getPoolId()) return 1;
+    if (getId() < t.getId()) return -1;
+    if (getId() > t.getId()) return 1;
     return 0;
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append(getPoolId());
+    sb.append(getId());
     sb.append(" : ");
     sb.append(getName());
     if (!getPoolableElements().isEmpty()) {

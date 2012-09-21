@@ -75,6 +75,9 @@ public class SQLSampleDAO implements SampleStore {
         "sampleType, receivedDate, qcPassed, project_projectId " +
         "FROM "+TABLE_NAME;
 
+  public static final String SAMPLES_SELECT_LIMIT =
+          SAMPLES_SELECT + " ORDER BY sampleId DESC LIMIT ?";
+
   public static final String SAMPLE_SELECT_BY_ID =
           SAMPLES_SELECT + " " + "WHERE sampleId = ?";
 
@@ -153,14 +156,25 @@ public class SQLSampleDAO implements SampleStore {
   @Autowired
   private MisoNamingScheme<Sample> sampleNamingScheme;
 
-  @Override
-  public MisoNamingScheme<Sample> getNamingScheme() {
+  public MisoNamingScheme<Sample> getSampleNamingScheme() {
     return sampleNamingScheme;
   }
 
-  @Override
-  public void setNamingScheme(MisoNamingScheme<Sample> sampleNamingScheme) {
+  public void setSampleNamingScheme(MisoNamingScheme<Sample> sampleNamingScheme) {
     this.sampleNamingScheme = sampleNamingScheme;
+  }
+
+  @Autowired
+  private MisoNamingScheme<Sample> namingScheme;
+
+  @Override
+  public MisoNamingScheme<Sample> getNamingScheme() {
+    return namingScheme;
+  }
+
+  @Override
+  public void setNamingScheme(MisoNamingScheme<Sample> namingScheme) {
+    this.namingScheme = namingScheme;
   }
 
   @Autowired
@@ -314,7 +328,7 @@ public class SQLSampleDAO implements SampleStore {
       params.addValue("qcPassed", sample.getQcPassed());
     }
 
-    if (sample.getSampleId() == AbstractSample.UNSAVED_ID) {
+    if (sample.getId() == AbstractSample.UNSAVED_ID) {
       if (!listByAlias(sample.getAlias()).isEmpty()) {
         throw new IOException("NEW: A sample with this alias already exists in the database");
       }
@@ -323,9 +337,11 @@ public class SQLSampleDAO implements SampleStore {
                                 .withTableName(TABLE_NAME)
                                 .usingGeneratedKeyColumns("sampleId");
         try {
-          sample.setSampleId(DbUtils.getAutoIncrement(template, TABLE_NAME));
+          sample.setId(DbUtils.getAutoIncrement(template, TABLE_NAME));
 
           String name = sampleNamingScheme.generateNameFor("name", sample);
+          sample.setName(name);
+
           if (sampleNamingScheme.validateField("name", sample.getName()) && sampleNamingScheme.validateField("alias", sample.getAlias())) {
             String barcode = name + "::" + sample.getAlias();
             params.addValue("name", name);
@@ -333,13 +349,11 @@ public class SQLSampleDAO implements SampleStore {
             params.addValue("identificationBarcode", barcode);
 
             Number newId = insert.executeAndReturnKey(params);
-            if (newId != sample.getSampleId()) {
+            if (newId.longValue() != sample.getId()) {
               log.error("Expected Sample ID doesn't match returned value from database insert: rolling back...");
-              new NamedParameterJdbcTemplate(template).update(SAMPLE_DELETE, new MapSqlParameterSource().addValue("sampleId", sample.getSampleId()));
+              new NamedParameterJdbcTemplate(template).update(SAMPLE_DELETE, new MapSqlParameterSource().addValue("sampleId", sample.getId()));
               throw new IOException("Something bad happened. Expected Sample ID doesn't match returned value from DB insert");
             }
-            //sample.setSampleId(newId.longValue());
-            sample.setName(name);
           }
           else {
             throw new IOException("Cannot save sample - invalid field:" + sample.toString());
@@ -352,20 +366,20 @@ public class SQLSampleDAO implements SampleStore {
     }
     else {
       List<Sample> as = new ArrayList<Sample>(listByAlias(sample.getAlias()));
-      if (!as.isEmpty() && as.get(0) != null && as.get(0).getSampleId().longValue() != sample.getSampleId().longValue()) {
+      if (!as.isEmpty() && as.get(0) != null && as.get(0).getId() != sample.getId()) {
         throw new IOException("UPD: A sample with this alias already exists in the database");
       }
       else {
         try {
           if (sampleNamingScheme.validateField("name", sample.getName()) && sampleNamingScheme.validateField("alias", sample.getAlias())) {
-            params.addValue("sampleId", sample.getSampleId())
+            params.addValue("sampleId", sample.getId())
                   .addValue("name", sample.getName())
                   .addValue("identificationBarcode", sample.getName() + "::" + sample.getAlias());
             NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
             namedTemplate.update(SAMPLE_UPDATE, params);
           }
           else {
-            throw new IOException("Cannot save sample - invalid field:" + sample.toString());
+            throw new IOException("Cannot save sample - invalid field value: " + sample.toString());
           }
         }
         catch (MisoNamingException e) {
@@ -395,7 +409,7 @@ public class SQLSampleDAO implements SampleStore {
       }
     }
 
-    return sample.getSampleId();
+    return sample.getId();
   }
 
   @Cacheable(cacheName="sampleListCache",
@@ -409,6 +423,10 @@ public class SQLSampleDAO implements SampleStore {
   )
   public List<Sample> listAll() {
     return template.query(SAMPLES_SELECT, new LazySampleMapper());
+  }
+
+  public List<Sample> listAllWithLimit(long limit) throws IOException {
+    return template.query(SAMPLES_SELECT_LIMIT, new Object[]{limit}, new LazySampleMapper());
   }
 
   @Override
@@ -436,7 +454,7 @@ public class SQLSampleDAO implements SampleStore {
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
     if (sample.isDeletable() &&
            (namedTemplate.update(SAMPLE_DELETE,
-                                 new MapSqlParameterSource().addValue("sampleId", sample.getSampleId())) == 1)) {
+                                 new MapSqlParameterSource().addValue("sampleId", sample.getId())) == 1)) {
       Project p = sample.getProject();
       if (this.cascadeType.equals(CascadeType.PERSIST)) {
         if (p!=null) projectDAO.save(p);
@@ -506,7 +524,7 @@ public class SQLSampleDAO implements SampleStore {
   public class LazySampleMapper implements RowMapper<Sample> {
     public Sample mapRow(ResultSet rs, int rowNum) throws SQLException {
       Sample s = dataObjectFactory.getSample();
-      s.setSampleId(rs.getLong("sampleId"));
+      s.setId(rs.getLong("sampleId"));
       s.setName(rs.getString("name"));
       s.setAlias(rs.getString("alias"));
       s.setAccession(rs.getString("accession"));
@@ -540,7 +558,7 @@ public class SQLSampleDAO implements SampleStore {
   public class SampleMapper implements RowMapper<Sample> {
     public Sample mapRow(ResultSet rs, int rowNum) throws SQLException {
       Sample s = dataObjectFactory.getSample();
-      s.setSampleId(rs.getLong("sampleId"));
+      s.setId(rs.getLong("sampleId"));
       s.setName(rs.getString("name"));
       s.setAlias(rs.getString("alias"));
       s.setAccession(rs.getString("accession"));

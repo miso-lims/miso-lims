@@ -267,7 +267,7 @@ public class LS454NotificationMessageConsumerMechanism implements NotificationMe
                     }
                     else {
                       SequencerPartitionContainer f = fs.iterator().next();
-                      log.debug("\\_ Got SequencerPartitionContainer " + f.getContainerId());
+                      log.debug("\\_ Got SequencerPartitionContainer " + f.getId());
                       if (f.getPlatformType() == null && r.getPlatformType() != null) {
                         f.setPlatformType(r.getPlatformType());
                       }
@@ -277,7 +277,7 @@ public class LS454NotificationMessageConsumerMechanism implements NotificationMe
                       if (f.getIdentificationBarcode() == null || "".equals(f.getIdentificationBarcode())) {
                         f.setIdentificationBarcode(ptpId);
                         long flowId = requestManager.saveSequencerPartitionContainer(f);
-                        f.setContainerId(flowId);
+                        f.setId(flowId);
                       }
                     }
                   }

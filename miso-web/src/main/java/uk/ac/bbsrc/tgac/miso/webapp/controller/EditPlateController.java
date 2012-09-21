@@ -97,7 +97,7 @@ public class EditPlateController {
     Collections.sort(tagBarcodes);
     List<String> names = new ArrayList<String>();
     for (TagBarcode tb : tagBarcodes) {
-      names.add("\"" + tb.getName() + " ("+tb.getSequence()+")\"" + ":" + "\"" + tb.getTagBarcodeId() + "\"");
+      names.add("\"" + tb.getName() + " ("+tb.getSequence()+")\"" + ":" + "\"" + tb.getId() + "\"");
     }
     return LimsUtils.join(names, ",");
   }
@@ -167,7 +167,7 @@ public class EditPlateController {
       requestManager.savePlate(plate);
       session.setComplete();
       model.clear();
-      return "redirect:/miso/plate/"+plate.getPlateId();
+      return "redirect:/miso/plate/"+plate.getId();
     }
     catch (IOException ex) {
       if (log.isDebugEnabled()) {

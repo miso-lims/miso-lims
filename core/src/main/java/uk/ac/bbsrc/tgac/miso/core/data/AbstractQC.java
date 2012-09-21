@@ -38,7 +38,7 @@ import java.util.Date;
  * @since 0.0.3
  */
 public abstract class AbstractQC implements QC {
-  public static final Long UNSAVED_ID = null;
+  public static final Long UNSAVED_ID = 0L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -48,12 +48,23 @@ public abstract class AbstractQC implements QC {
   private QcType qcType;
   private Date qcDate = new Date();
 
+  @Deprecated
   public Long getQcId() {
     return qcId;
   }
 
+  @Deprecated
   public void setQcId(Long qcId) {
     this.qcId = qcId;
+  }
+
+  @Override
+  public long getId() {
+    return qcId;
+  }
+
+  public void setId(long id) {
+    this.qcId = id;
   }
 
   public String getQcCreator() {
@@ -81,7 +92,7 @@ public abstract class AbstractQC implements QC {
   }
 
   public boolean isDeletable() {
-    return getQcId() != AbstractQC.UNSAVED_ID;
+    return getId() != AbstractQC.UNSAVED_ID;
   }
 
   /**
@@ -98,21 +109,21 @@ public abstract class AbstractQC implements QC {
     QC them = (QC) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
-    if (this.getQcId() == AbstractQC.UNSAVED_ID
-        || them.getQcId() == AbstractQC.UNSAVED_ID) {
+    if (this.getId() == AbstractQC.UNSAVED_ID
+        || them.getId() == AbstractQC.UNSAVED_ID) {
       return this.getQcCreator().equals(them.getQcCreator())
              && this.getQcDate().equals(them.getQcDate())
              && this.getQcType().equals(them.getQcType());
     }
     else {
-      return this.getQcId().longValue() == them.getQcId().longValue();
+      return this.getId() == them.getId();
     }
   }
 
   @Override
   public int hashCode() {
-    if (getQcId() != AbstractQC.UNSAVED_ID) {
-      return getQcId().intValue();
+    if (getId() != AbstractQC.UNSAVED_ID) {
+      return (int)getId();
     }
     else {
       final int PRIME = 37;
@@ -127,8 +138,8 @@ public abstract class AbstractQC implements QC {
   @Override
   public int compareTo(Object o) {
     QC t = (QC)o;
-    if (getQcId() < t.getQcId()) return -1;
-    if (getQcId() > t.getQcId()) return 1;
+    if (getId() < t.getId()) return -1;
+    if (getId() > t.getId()) return 1;
     return 0;
   }
 }

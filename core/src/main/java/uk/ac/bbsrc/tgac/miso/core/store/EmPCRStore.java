@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.core.store;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCR;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -34,7 +35,7 @@ import java.util.Collection;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface EmPCRStore extends Store<emPCR>, Remover<emPCR> {
+public interface EmPCRStore extends Store<emPCR>, Remover<emPCR>, NamingSchemeAware<emPCR> {
   /**
    * Retrieve an EmPCR from an underlying data store given an EmPCR ID
    * <p/>

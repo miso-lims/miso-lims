@@ -16,4 +16,11 @@ public interface Nameable {
    * @return String name.
    */
   public String getName();
+
+   /**
+   * Returns the unique ID of this Nameable object.
+   *
+   * @return long id.
+   */
+  public long getId();
 }

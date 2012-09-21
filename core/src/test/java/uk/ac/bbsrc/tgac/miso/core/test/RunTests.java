@@ -62,7 +62,7 @@ public class RunTests {
   @Test
   public void testIlluminaRun() {
     IlluminaRun r = (IlluminaRun)dataObjectFactory.getRunOfType(PlatformType.ILLUMINA);
-    r.setRunId(-1L);
+    r.setId(-1L);
 
     log.info("Registering listeners");
 

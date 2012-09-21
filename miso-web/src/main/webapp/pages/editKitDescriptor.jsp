@@ -28,7 +28,7 @@
   <sessionConversation:insertSessionConversationId attributeName="kitDescriptor"/>
 
     <h1><c:choose><c:when
-            test="${not empty kitDescriptor.kitDescriptorId}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose>
+            test="${kitDescriptor.kitDescriptorId != 0}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose>
         Kit Descriptor
         <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
     </h1>
@@ -43,7 +43,7 @@
             <td class="h">ID:</td>
             <td>
                 <c:choose>
-                    <c:when test="${not empty kitDescriptor.kitDescriptorId}">${kitDescriptor.kitDescriptorId}</c:when>
+                    <c:when test="${kitDescriptor.kitDescriptorId != 0}">${kitDescriptor.kitDescriptorId}</c:when>
                     <c:otherwise><i>Unsaved</i></c:otherwise>
                 </c:choose>
             </td>
@@ -70,7 +70,7 @@
         </tr>
         <tr>
         <c:choose>
-            <c:when test="${empty kitDescriptor.kitDescriptorId or empty kitDescriptor.kitType}">
+            <c:when test="${kitDescriptor.kitDescriptorId == 0 or empty kitDescriptor.kitType}">
                 <td>Kit Type:</td>
                 <td>
                     <form:select id="kitTypes" path="kitType" items="${kitTypes}"/>
@@ -84,7 +84,7 @@
         </tr>
         <tr>
         <c:choose>
-            <c:when test="${empty kitDescriptor.kitDescriptorId or empty kitDescriptor.platformType}">
+            <c:when test="${kitDescriptor.kitDescriptorId == 0 or empty kitDescriptor.platformType}">
                 <td>Platform Type:</td>
                 <td>
                     <form:select id="platformTypes" path="platformType" items="${platformTypes}"/>

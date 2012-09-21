@@ -143,11 +143,11 @@ public class DashboardHelperService {
         projects = new ArrayList<Project>(requestManager.listAllProjectsBySearch(searchStr));
       }
       else {
-        projects = new ArrayList<Project>(requestManager.listAllProjects());
+        projects = new ArrayList<Project>(requestManager.listAllProjectsWithLimit(50));
       }
 
       if (projects.size() > 0) {
-        Collections.sort(projects);
+//        Collections.sort(projects);
         for (Project p : projects) {
           b.append("<a class=\"dashboardresult\" href=\"/miso/project/" + p.getProjectId() + "\"><div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
           b.append("Name: <b>" + p.getName() + "</b><br/>");
@@ -176,13 +176,13 @@ public class DashboardHelperService {
         studies = new ArrayList<Study>(requestManager.listAllStudiesBySearch(searchStr));
       }
       else {
-        studies = new ArrayList<Study>(requestManager.listAllStudies());
+        studies = new ArrayList<Study>(requestManager.listAllStudiesWithLimit(50));
       }
 
       if (studies.size() > 0) {
-        Collections.sort(studies);
+//        Collections.sort(studies);
         for (Study s : studies) {
-          b.append("<a class=\"dashboardresult\" href=\"/miso/study/" + s.getStudyId() + "\"><div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
+          b.append("<a class=\"dashboardresult\" href=\"/miso/study/" + s.getId() + "\"><div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
           b.append("Name: <b>" + s.getName() + "</b><br/>");
           b.append("Alias: <b>" + s.getAlias() + "</b><br/>");
           b.append("</div></a>");
@@ -208,13 +208,13 @@ public class DashboardHelperService {
         experiments = new ArrayList<Experiment>(requestManager.listAllExperimentsBySearch(searchStr));
       }
       else {
-        experiments = new ArrayList<Experiment>(requestManager.listAllExperiments());
+        experiments = new ArrayList<Experiment>(requestManager.listAllExperimentsWithLimit(50));
       }
 
       if (experiments.size() > 0) {
-        Collections.sort(experiments);
+//        Collections.sort(experiments);
         for (Experiment e : experiments) {
-          b.append("<a class=\"dashboardresult\" href=\"/miso/experiment/" + e.getExperimentId() + "\"><div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
+          b.append("<a class=\"dashboardresult\" href=\"/miso/experiment/" + e.getId() + "\"><div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
           b.append("Name: <b>" + e.getName() + "</b><br/>");
           b.append("Alias: <b>" + e.getAlias() + "</b><br/>");
           b.append("</div></a>");
@@ -240,13 +240,13 @@ public class DashboardHelperService {
         runs = new ArrayList<Run>(requestManager.listAllRunsBySearch(searchStr));
       }
       else {
-        runs = new ArrayList<Run>(requestManager.listAllRuns());
+        runs = new ArrayList<Run>(requestManager.listAllRunsWithLimit(50));
       }
 
       if (runs.size() > 0) {
-        Collections.sort(runs);
+//        Collections.sort(runs);
         for (Run r : runs) {
-          b.append("<a class=\"dashboardresult\" href=\"/miso/run/" + r.getRunId() + "\"><div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
+          b.append("<a class=\"dashboardresult\" href=\"/miso/run/" + r.getId() + "\"><div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
           b.append("Name: <b>" + r.getName() + "</b><br/>");
           b.append("Alias: <b>" + r.getAlias() + "</b><br/>");
           b.append("</div></a>");
@@ -272,13 +272,13 @@ public class DashboardHelperService {
         libraries = new ArrayList<Library>(requestManager.listAllLibrariesBySearch(searchStr));
       }
       else {
-        libraries = new ArrayList<Library>(requestManager.listAllLibraries());
+        libraries = new ArrayList<Library>(requestManager.listAllLibrariesWithLimit(50));
       }
 
       if (libraries.size() > 0) {
-        Collections.sort(libraries);
+//        Collections.sort(libraries);
         for (Library l : libraries) {
-          b.append("<a class=\"dashboardresult\" href=\"/miso/library/" + l.getLibraryId() + "\"><div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
+          b.append("<a class=\"dashboardresult\" href=\"/miso/library/" + l.getId() + "\"><div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
           b.append("Name: <b>" + l.getName() + "</b><br/>");
           b.append("Alias: <b>" + l.getAlias() + "</b><br/>");
           b.append("</div></a>");
@@ -304,13 +304,13 @@ public class DashboardHelperService {
         samples = new ArrayList<Sample>(requestManager.listAllSamplesBySearch(searchStr));
       }
       else {
-        samples = new ArrayList<Sample>(requestManager.listAllSamples());
+        samples = new ArrayList<Sample>(requestManager.listAllSamplesWithLimit(50));
       }
 
       if (samples.size() > 0) {
-        Collections.sort(samples);
+//        Collections.sort(samples);
         for (Sample s : samples) {
-          b.append("<a class=\"dashboardresult\" href=\"/miso/sample/" + s.getSampleId() + "\"><div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
+          b.append("<a class=\"dashboardresult\" href=\"/miso/sample/" + s.getId() + "\"><div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
           b.append("Name: <b>" + s.getName() + "</b><br/>");
           b.append("Alias: <b>" + s.getAlias() + "</b><br/>");
           b.append("</div></a>");

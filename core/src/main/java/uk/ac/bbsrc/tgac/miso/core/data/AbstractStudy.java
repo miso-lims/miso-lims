@@ -43,7 +43,7 @@ import java.util.HashSet;
 @Entity
 @Table(name = "`Study`")
 public abstract class AbstractStudy implements Study {
-  public static final Long UNSAVED_ID = null;
+  public static final Long UNSAVED_ID = 0L;
 
   private static final long serialVersionUID = 1L;
 
@@ -82,12 +82,23 @@ public abstract class AbstractStudy implements Study {
     this.project = project;
   }
 
+  @Deprecated
   public Long getStudyId() {
     return studyId;
   }
 
+  @Deprecated
   public void setStudyId(Long studyId) {
     this.studyId = studyId;
+  }
+
+  @Override
+  public long getId() {
+    return studyId;
+  }
+
+  public void setId(long id) {
+    this.studyId = id;
   }
 
   public String getAccession() {
@@ -149,7 +160,7 @@ public abstract class AbstractStudy implements Study {
   }
 
   public boolean isDeletable() {
-    return getStudyId() != AbstractStudy.UNSAVED_ID &&
+    return getId() != AbstractStudy.UNSAVED_ID &&
            getExperiments().isEmpty();    
   }
 
@@ -190,8 +201,8 @@ public abstract class AbstractStudy implements Study {
     Study them = (Study) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
-    if (getStudyId() == AbstractStudy.UNSAVED_ID
-        || them.getStudyId() == AbstractStudy.UNSAVED_ID) {
+    if (getId() == AbstractStudy.UNSAVED_ID
+        || them.getId() == AbstractStudy.UNSAVED_ID) {
       if (getName() != null && them.getName() != null) {
         return getName().equals(them.getName());
       }
@@ -200,14 +211,14 @@ public abstract class AbstractStudy implements Study {
       }
     }
     else {
-      return this.getStudyId().longValue() == them.getStudyId().longValue();
+      return this.getId() == them.getId();
     }
   }
 
   @Override
   public int hashCode() {
-    if (this.getStudyId() != AbstractStudy.UNSAVED_ID) {
-      return this.getStudyId().intValue();
+    if (this.getId() != AbstractStudy.UNSAVED_ID) {
+      return (int)getId();
     }
     else {
       final int PRIME = 37;
@@ -222,8 +233,8 @@ public abstract class AbstractStudy implements Study {
   @Override
   public int compareTo(Object o) {
     Study t = (Study)o;
-    if (getStudyId() < t.getStudyId()) return -1;
-    if (getStudyId() > t.getStudyId()) return 1;
+    if (getId() < t.getId()) return -1;
+    if (getId() > t.getId()) return 1;
     return 0;
   }
 }

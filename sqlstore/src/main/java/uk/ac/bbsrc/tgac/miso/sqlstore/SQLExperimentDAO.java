@@ -40,6 +40,8 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.transaction.annotation.Transactional;
+import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.*;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
@@ -64,6 +66,9 @@ public class SQLExperimentDAO implements ExperimentStore {
   public static final String EXPERIMENTS_SELECT =
           "SELECT experimentId, name, description, alias, accession, title, platform_platformId, securityProfile_profileId, study_studyId " +
           "FROM "+TABLE_NAME;
+
+  public static final String EXPERIMENTS_SELECT_LIMIT =
+          EXPERIMENTS_SELECT + " ORDER BY experimentId DESC LIMIT ?";
 
   public static final String EXPERIMENT_SELECT_BY_ID =
           EXPERIMENTS_SELECT + " " + "WHERE experimentId = ?";
@@ -152,6 +157,19 @@ public class SQLExperimentDAO implements ExperimentStore {
   private KitStore kitDAO;
   private Store<SecurityProfile> securityProfileDAO;
   private CascadeType cascadeType;
+
+  @Autowired
+  private MisoNamingScheme<Experiment> namingScheme;
+
+  @Override
+  public MisoNamingScheme<Experiment> getNamingScheme() {
+    return namingScheme;
+  }
+
+  @Override
+  public void setNamingScheme(MisoNamingScheme<Experiment> namingScheme) {
+    this.namingScheme = namingScheme;
+  }
 
   @Autowired
   private CacheManager cacheManager;
@@ -291,28 +309,69 @@ public class SQLExperimentDAO implements ExperimentStore {
             .addValue("title", experiment.getTitle())
             .addValue("platform_platformId", experiment.getPlatform().getPlatformId())
             .addValue("securityProfile_profileId", securityProfileId)
-            .addValue("study_studyId", experiment.getStudy().getStudyId());
+            .addValue("study_studyId", experiment.getStudy().getId());
 
-    if (experiment.getExperimentId() == AbstractExperiment.UNSAVED_ID) {
+    if (experiment.getId() == AbstractExperiment.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
                             .withTableName(TABLE_NAME)
                             .usingGeneratedKeyColumns("experimentId");
+      try {
+        experiment.setId(DbUtils.getAutoIncrement(template, TABLE_NAME));
+
+        String name = namingScheme.generateNameFor("name", experiment);
+        experiment.setName(name);
+
+        if (namingScheme.validateField("name", experiment.getName())) {
+          params.addValue("name", name);
+
+          Number newId = insert.executeAndReturnKey(params);
+          if (newId.longValue() != experiment.getId()) {
+            log.error("Expected Experiment ID doesn't match returned value from database insert: rolling back...");
+            new NamedParameterJdbcTemplate(template).update(EXPERIMENT_DELETE, new MapSqlParameterSource().addValue("experimentId", experiment.getId()));
+            throw new IOException("Something bad happened. Expected Experiment ID doesn't match returned value from DB insert");
+          }
+        }
+        else {
+          throw new IOException("Cannot save Experiment - invalid field:" + experiment.toString());
+        }
+      }
+      catch (MisoNamingException e) {
+        throw new IOException("Cannot save Experiment - issue with naming scheme", e);
+      }
+      /*
       String name = Experiment.PREFIX + DbUtils.getAutoIncrement(template, TABLE_NAME);
       params.addValue("name", name);
       Number newId = insert.executeAndReturnKey(params);
       experiment.setExperimentId(newId.longValue());
       experiment.setName(name);
+      */
     }
     else {
+      try {
+        if (namingScheme.validateField("name", experiment.getName())) {
+          params.addValue("experimentId", experiment.getId())
+                .addValue("name", experiment.getName());
+          NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+          namedTemplate.update(EXPERIMENT_UPDATE, params);
+        }
+        else {
+          throw new IOException("Cannot save Experiment - invalid field:" + experiment.toString());
+        }
+      }
+      catch (MisoNamingException e) {
+        throw new IOException("Cannot save Experiment - issue with naming scheme", e);
+      }
+      /*
       params.addValue("experimentId", experiment.getExperimentId())
               .addValue("name", experiment.getName());
       NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
       namedTemplate.update(EXPERIMENT_UPDATE, params);
+      */
     }
 
     if (this.cascadeType != null) {
       MapSqlParameterSource eParams = new MapSqlParameterSource();
-      eParams.addValue("experiments_experimentId", experiment.getExperimentId());
+      eParams.addValue("experiments_experimentId", experiment.getId());
       NamedParameterJdbcTemplate eNamedTemplate = new NamedParameterJdbcTemplate(template);
       eNamedTemplate.update(POOL_EXPERIMENT_DELETE_BY_EXPERIMENT_ID, eParams);
 
@@ -321,8 +380,8 @@ public class SQLExperimentDAO implements ExperimentStore {
                 .withTableName("Pool_Experiment");
 
         MapSqlParameterSource esParams = new MapSqlParameterSource();
-        esParams.addValue("experiments_experimentId", experiment.getExperimentId())
-                .addValue("pool_poolId", experiment.getPool().getPoolId());
+        esParams.addValue("experiments_experimentId", experiment.getId())
+                .addValue("pool_poolId", experiment.getPool().getId());
         eInsert.execute(esParams);
 
         if (this.cascadeType.equals(CascadeType.PERSIST)) {
@@ -330,7 +389,7 @@ public class SQLExperimentDAO implements ExperimentStore {
         }
         else if (this.cascadeType.equals(CascadeType.REMOVE)) {
           Cache pc = cacheManager.getCache("poolCache");
-          pc.remove(DbUtils.hashCodeCacheKeyFor(experiment.getPool().getPoolId()));
+          pc.remove(DbUtils.hashCodeCacheKeyFor(experiment.getPool().getId()));
         }
       }
 
@@ -341,7 +400,7 @@ public class SQLExperimentDAO implements ExperimentStore {
       else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (s != null) {
           Cache pc = cacheManager.getCache("studyCache");
-          pc.remove(DbUtils.hashCodeCacheKeyFor(s.getStudyId()));
+          pc.remove(DbUtils.hashCodeCacheKeyFor(s.getId()));
         }
       }
 
@@ -353,8 +412,8 @@ public class SQLExperimentDAO implements ExperimentStore {
                                 .withTableName("Experiment_Kit");
 
           MapSqlParameterSource kParams = new MapSqlParameterSource();
-          kParams.addValue("experiments_experimentId", experiment.getExperimentId())
-                  .addValue("kits_kidId", k.getKitId());
+          kParams.addValue("experiments_experimentId", experiment.getId())
+                  .addValue("kits_kidId", k.getId());
           try {
             kInsert.execute(kParams);
           }
@@ -367,7 +426,7 @@ public class SQLExperimentDAO implements ExperimentStore {
       purgeListCache(experiment);
     }
 
-    return experiment.getExperimentId();
+    return experiment.getId();
   }
 
   @Cacheable(cacheName="experimentListCache",
@@ -381,6 +440,10 @@ public class SQLExperimentDAO implements ExperimentStore {
   )
   public List<Experiment> listAll() {
     return template.query(EXPERIMENTS_SELECT, new LazyExperimentMapper());
+  }
+
+  public List<Experiment> listAllWithLimit(long limit) throws IOException {
+    return template.query(EXPERIMENTS_SELECT_LIMIT, new Object[]{limit}, new LazyExperimentMapper());
   }
 
   @Override
@@ -459,7 +522,7 @@ public class SQLExperimentDAO implements ExperimentStore {
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
     if (experiment.isDeletable() &&
            (namedTemplate.update(EXPERIMENT_DELETE,
-                            new MapSqlParameterSource().addValue("experimentId", experiment.getExperimentId())) == 1)) {
+                            new MapSqlParameterSource().addValue("experimentId", experiment.getId())) == 1)) {
       Study s = experiment.getStudy();
       if (this.cascadeType.equals(CascadeType.PERSIST)) {
         if (s!=null) studyDAO.save(s);
@@ -470,11 +533,11 @@ public class SQLExperimentDAO implements ExperimentStore {
       else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (s != null) {
           Cache sc = cacheManager.getCache("studyCache");
-          sc.remove(DbUtils.hashCodeCacheKeyFor(s.getStudyId()));
+          sc.remove(DbUtils.hashCodeCacheKeyFor(s.getId()));
 
           if (experiment.getPool() != null) {
             Cache pc = cacheManager.getCache("poolCache");
-            pc.remove(DbUtils.hashCodeCacheKeyFor(experiment.getPool().getPoolId()));
+            pc.remove(DbUtils.hashCodeCacheKeyFor(experiment.getPool().getId()));
           }
         }
         purgeListCache(experiment, false);
@@ -487,7 +550,7 @@ public class SQLExperimentDAO implements ExperimentStore {
   public class LazyExperimentMapper implements RowMapper<Experiment> {
     public Experiment mapRow(ResultSet rs, int rowNum) throws SQLException {
       Experiment e = dataObjectFactory.getExperiment();
-      e.setExperimentId(rs.getLong("experimentId"));
+      e.setId(rs.getLong("experimentId"));
       e.setName(rs.getString("name"));
       e.setAlias(rs.getString("alias"));
       e.setAccession(rs.getString("accession"));
@@ -511,7 +574,7 @@ public class SQLExperimentDAO implements ExperimentStore {
   public class ExperimentMapper implements RowMapper<Experiment> {
     public Experiment mapRow(ResultSet rs, int rowNum) throws SQLException {
       Experiment e = dataObjectFactory.getExperiment();
-      e.setExperimentId(rs.getLong("experimentId"));
+      e.setId(rs.getLong("experimentId"));
       e.setName(rs.getString("name"));
       e.setAlias(rs.getString("alias"));
       e.setAccession(rs.getString("accession"));

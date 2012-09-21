@@ -288,7 +288,7 @@ public class PacBioNotificationMessageConsumerMechanism implements NotificationM
                         f.setRun(r);
                         log.info("\\_ Created new container with "+f.getPartitions().size()+" partitions");
                         long flowId = requestManager.saveSequencerPartitionContainer(f);
-                        f.setContainerId(flowId);
+                        f.setId(flowId);
                         ((RunImpl)r).addSequencerPartitionContainer(f);
                         //TODO match up samples to libraries and pools?
                         /*

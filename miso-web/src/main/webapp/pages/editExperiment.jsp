@@ -39,7 +39,7 @@
 <sessionConversation:insertSessionConversationId attributeName="experiment"/>
 <h1>
     <c:choose>
-        <c:when test="${not empty experiment.experimentId}">Edit</c:when>
+        <c:when test="${experiment.id != 0}">Edit</c:when>
         <c:otherwise>Create</c:otherwise>
     </c:choose> Experiment
     <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
@@ -52,7 +52,7 @@
         <li>
             <div class="breadcrumbsbubbleInfo">
                 <div class="trigger">
-                    <a href='<c:url value="/miso/project/${experiment.study.project.projectId}"/>'>${experiment.study.project.name}</a>
+                    <a href='<c:url value="/miso/project/${experiment.study.project.id}"/>'>${experiment.study.project.name}</a>
                 </div>
                 <div class="breadcrumbspopup">
                         ${experiment.study.project.alias}
@@ -62,7 +62,7 @@
         <li>
             <div class="breadcrumbsbubbleInfo">
                 <div class="trigger">
-                    <a href='<c:url value="/miso/study/${experiment.study.studyId}"/>'>${experiment.study.name}</a>
+                    <a href='<c:url value="/miso/study/${experiment.study.id}"/>'>${experiment.study.name}</a>
                 </div>
                 <div class="breadcrumbspopup">
                         ${experiment.study.alias}
@@ -84,20 +84,20 @@
     <td class="h">Experiment ID:</td>
     <td>
         <c:choose>
-            <c:when test="${not empty experiment.experimentId}">${experiment.experimentId}</c:when>
+            <c:when test="${experiment.id != 0}">${experiment.id}</c:when>
             <c:otherwise><i>Unsaved</i></c:otherwise>
         </c:choose>
     </td>
 </tr>
 <tr>
     <td class="h">Study ID:</td>
-    <td>${experiment.study.studyId}</td>
+    <td>${experiment.study.id}</td>
 </tr>
 <tr>
     <td class="h">Name:</td>
     <td>
         <c:choose>
-            <c:when test="${not empty experiment.experimentId}">${experiment.name}</c:when>
+            <c:when test="${experiment.id != 0}">${experiment.name}</c:when>
             <c:otherwise><i>Unsaved</i></c:otherwise>
         </c:choose>
     </td>
@@ -128,7 +128,7 @@
 </c:if>
 <tr>
     <c:choose>
-        <c:when test="${empty experiment.experimentId or empty experiment.platform}">
+        <c:when test="${experiment.id == 0 or empty experiment.platform}">
             <td>Platform:</td>
             <td>
                 <form:select id="platforms" path="platform" items="${platforms}" itemLabel="nameAndModel"
@@ -147,7 +147,7 @@
         <tr>
             <td>Permissions</td>
             <td><i>Inherited from study </i><a
-                    href='<c:url value="/miso/study/${experiment.study.studyId}"/>'>${experiment.study.name}</a>
+                    href='<c:url value="/miso/study/${experiment.study.id}"/>'>${experiment.study.name}</a>
                 <input type="hidden" value="${experiment.study.securityProfile.profileId}"
                        name="securityProfile" id="securityProfile"/>
             </td>
@@ -171,7 +171,7 @@
           <c:choose>
             <c:when test="${not empty experiment.platform and empty availablePools}">
               No ${experiment.platform.platformType.key} pools available. Would you like to
-              <a href='<c:url value="/miso/pool/${fn:toLowerCase(experiment.platform.platformType.key)}/new/${experiment.experimentId}"/>'>
+              <a href='<c:url value="/miso/pool/${fn:toLowerCase(experiment.platform.platformType.key)}/new/${experiment.id}"/>'>
               create a pool</a>?
             </c:when>
             <c:otherwise>
@@ -185,14 +185,14 @@
                 </c:when>
                 <c:otherwise>
                   Please select a Pool below to be associated with this Experiment
-                  <c:if test="${not empty experiment.experimentId or not empty experiment.platform}">
-                    <b>OR</b> <a href='<c:url value="/miso/pool/${fn:toLowerCase(experiment.platform.platformType.key)}/new/${experiment.experimentId}"/>'> create a new pool</a>?
+                  <c:if test="${experiment.id != 0 or not empty experiment.platform}">
+                    <b>OR</b> <a href='<c:url value="/miso/pool/${fn:toLowerCase(experiment.platform.platformType.key)}/new/${experiment.id}"/>'> create a new pool</a>?
                   </c:if>
                 </c:otherwise>
               </c:choose>
               <div id='poolList' class="elementList ui-corner-all" style="height:500px">
                 <c:forEach items="${availablePools}" var="p">
-                    <div bind="${p.poolId}" onMouseOver="this.className='dashboardhighlight'" onMouseOut="this.className='dashboard'" class="dashboard" ondblclick="Experiment.pool.experimentSelectPool(this);">
+                    <div bind="${p.id}" onMouseOver="this.className='dashboardhighlight'" onMouseOut="this.className='dashboard'" class="dashboard" ondblclick="Experiment.pool.experimentSelectPool(this);">
                       <span style="float:left">
                       <b>${p.name}</b> (${fn:length(p.dilutions)} dilutions)
                       </span>
@@ -209,8 +209,8 @@
             <div id="selPool" class="elementList ui-corner-all">
               <div onMouseOver="this.className='dashboardhighlight'" onMouseOut="this.className='dashboard'" class="dashboard">
                 <span class='float-left'>
-                <input type="hidden" id="pool${experiment.pool.poolId}" value="${experiment.pool.poolId}" name="pool"/>
-                <b>Pool:</b> <a href='<c:url value="/miso/pool/${fn:toLowerCase(experiment.platform.platformType.key)}/${experiment.pool.poolId}"/>'>${experiment.pool.name}</a><br/>
+                <input type="hidden" id="pool${experiment.pool.id}" value="${experiment.pool.id}" name="pool"/>
+                <b>Pool:</b> <a href='<c:url value="/miso/pool/${fn:toLowerCase(experiment.platform.platformType.key)}/${experiment.pool.id}"/>'>${experiment.pool.name}</a><br/>
                 <b>Dilutions:</b><br/>
                 <i>
                   <c:forEach items="${experiment.pool.dilutions}" var="dil">
@@ -235,7 +235,7 @@
     <h2>Library Kit</h2>
 
     <a href='javascript:void(0);' class="add"
-       onclick="showLibraryKitDialog(${experiment.experimentId},
+       onclick="Experiment.kit.showLibraryKitDialog(${experiment.id},
                <c:choose>
                 <c:when test="${fn:length(experiment.pool.dilutions) > 1}">
                     true
@@ -275,7 +275,7 @@
         <c:when test="${experiment.platform.platformType.key ne 'Illumina'}">
             <h2>EmPCR Kit</h2>
             <a href='javascript:void(0);' class="add"
-               onclick="showEmPcrKitDialog(${experiment.experimentId}); return false;">Add EmPCR Kit</a><br/>
+               onclick="Experiment.kit.showEmPcrKitDialog(${experiment.id}); return false;">Add EmPCR Kit</a><br/>
 
             <form id='addEmPcrKitForm'>
                 <table class="list" id="emPcrKitTable">
@@ -305,7 +305,7 @@
         <c:otherwise>
             <h2>Clustering Kit</h2>
             <a href='javascript:void(0);' class="add"
-               onclick="showClusteringKitDialog(${experiment.experimentId}); return false;">Add Clustering Kit</a><br/>
+               onclick="Experiment.kit.showClusteringKitDialog(${experiment.id}); return false;">Add Clustering Kit</a><br/>
 
             <form id='addClusteringKitForm'>
                 <table class="list" id="clusteringKitTable">
@@ -336,7 +336,7 @@
 
     <h2>Sequencing Kit</h2>
     <a href='javascript:void(0);' class="add"
-       onclick="showSequencingKitDialog(${experiment.experimentId}); return false;">Add Sequencing Kit</a><br/>
+       onclick="Experiment.kit.showSequencingKitDialog(${experiment.id}); return false;">Add Sequencing Kit</a><br/>
 
     <form id='addSequencingKitForm'>
         <table class="list" id="sequencingKitTable">

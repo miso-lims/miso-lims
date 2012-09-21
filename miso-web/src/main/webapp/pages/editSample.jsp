@@ -39,7 +39,7 @@
 
 <div id="maincontent">
 <div id="contentcolumn">
-<c:if test="${empty sample.sampleId and not empty sample.project}">
+<c:if test="${sample.id == 0 and not empty sample.project}">
 <div id="tabs">
 <ul>
     <li><a href="#tab-1"><span>Single</span></a></li>
@@ -53,7 +53,7 @@
 <sessionConversation:insertSessionConversationId attributeName="sample"/>
 <h1>
     <c:choose>
-        <c:when test="${not empty sample.sampleId}">Edit</c:when>
+        <c:when test="${sample.id != 0}">Edit</c:when>
         <c:otherwise>Create</c:otherwise>
     </c:choose> Sample
     <button type="button" class="fg-button ui-state-default ui-corner-all"
@@ -70,7 +70,7 @@
             <li>
                 <div class="breadcrumbsbubbleInfo">
                     <div class="trigger">
-                        <a href='<c:url value="/miso/project/${sample.project.projectId}"/>'>${sample.project.name}</a>
+                        <a href='<c:url value="/miso/project/${sample.project.id}"/>'>${sample.project.name}</a>
                     </div>
                     <div class="breadcrumbspopup">
                             ${sample.project.alias}
@@ -109,7 +109,7 @@
                         <div id="locationBarcodeMenu"
                              onmouseover="mcancelclosetime()"
                              onmouseout="mclosetime()">
-                            <a href="javascript:void(0);" onclick="Sample.ui.showSampleLocationChangeDialog(${sample.sampleId});">Change
+                            <a href="javascript:void(0);" onclick="Sample.ui.showSampleLocationChangeDialog(${sample.id});">Change
                                 location</a>
                         </div>
                     </li>
@@ -131,7 +131,7 @@
                     <div id="idBarcodeMenu"
                          onmouseover="mcancelclosetime()"
                          onmouseout="mclosetime()">
-                        <a href="javascript:void(0);" onclick="Sample.barcode.printSampleBarcodes(${sample.sampleId});">Print</a>
+                        <a href="javascript:void(0);" onclick="Sample.barcode.printSampleBarcodes(${sample.id});">Print</a>
                     </div>
                 </li>
             </ul>
@@ -140,7 +140,7 @@
                     Fluxion.doAjax(
                             'sampleControllerHelperService',
                             'getSampleBarcode',
-                            {'sampleId':${sample.sampleId},
+                            {'sampleId':${sample.id},
                                 'url':ajaxurl
                             },
                             {'doOnSuccess':function(json) {
@@ -159,7 +159,7 @@
             <td class="h">Sample ID:</td>
             <td>
                 <c:choose>
-                    <c:when test="${not empty sample.sampleId}">${sample.sampleId}</c:when>
+                    <c:when test="${sample.id != 0}">${sample.id}</c:when>
                     <c:otherwise><i>Unsaved</i></c:otherwise>
                 </c:choose>
             </td>
@@ -170,15 +170,15 @@
                 <c:when test="${empty sample.project}">
                     <td>
                         <div id="projectlist" class="checklist">
-                            <form:checkboxes items="${accessibleProjects}" path="project" itemValue="projectId"
+                            <form:checkboxes items="${accessibleProjects}" path="project" itemValue="id"
                                              itemLabel="name" onclick="Utils.ui.uncheckOthers('project', this);"/>
                         </div>
                     </td>
                 </c:when>
                 <c:otherwise>
                     <td>
-                        <input type="hidden" value="${sample.project.projectId}" name="project" id="project"/>
-                        <a href='<c:url value="/miso/project/${sample.project.projectId}"/>'>${sample.project.name}</a>
+                        <input type="hidden" value="${sample.project.id}" name="project" id="project"/>
+                        <a href='<c:url value="/miso/project/${sample.project.id}"/>'>${sample.project.name}</a>
                     </td>
                 </c:otherwise>
             </c:choose>
@@ -187,7 +187,7 @@
             <td>Name:</td>
             <td>
                 <c:choose>
-                    <c:when test="${not empty sample.sampleId}">${sample.name}</c:when>
+                    <c:when test="${sample.id != 0}">${sample.name}</c:when>
                     <c:otherwise><i>Unsaved</i></c:otherwise>
                 </c:choose>
             </td>
@@ -244,7 +244,7 @@
         <tr>
             <td>Permissions</td>
             <td><i>Inherited from project </i><a
-                    href='<c:url value="/miso/project/${sample.project.projectId}"/>'>${sample.project.name}</a>
+                    href='<c:url value="/miso/project/${sample.project.id}"/>'>${sample.project.name}</a>
                 <input type="hidden" value="${sample.project.securityProfile.profileId}"
                        name="securityProfile" id="securityProfile"/>
             </td>
@@ -256,7 +256,7 @@
         <%@ include file="permissions.jsp" %>
     </c:otherwise>
     </c:choose>
-    <c:if test="${not empty sample.sampleId}">
+    <c:if test="${sample.id != 0}">
         <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#notes_arrowclick'), 'notes');">Notes
             <div id="notes_arrowclick" class="toggleLeftDown"></div>
         </div>
@@ -271,7 +271,7 @@
                     <div id="notesmenu"
                          onmouseover="mcancelclosetime()"
                          onmouseout="mclosetime()">
-                        <a onclick="Sample.ui.showSampleNoteDialog(${sample.sampleId});" href="javascript:void(0);" class="add">Add
+                        <a onclick="Sample.ui.showSampleNoteDialog(${sample.id});" href="javascript:void(0);" class="add">Add
                             Note</a>
                     </div>
                 </li>
@@ -295,7 +295,7 @@
 </div>
 </form:form>
 
-<c:if test="${not empty sample.sampleId}">
+<c:if test="${sample.id != 0}">
     <a name="sampleqc"></a>
 
     <h1>
@@ -311,7 +311,7 @@
                  onmouseover="mcancelclosetime()"
                  onmouseout="mclosetime()">
                 <a href='javascript:void(0);' class="add"
-                   onclick="Sample.qc.generateSampleQCRow(${sample.sampleId}); return false;">Add Sample QC</a>
+                   onclick="Sample.qc.generateSampleQCRow(${sample.id}); return false;">Add Sample QC</a>
             </div>
         </li>
     </ul>
@@ -348,11 +348,11 @@
                           <td>${qc.qcCreator}</td>
                           <td><fmt:formatDate value="${qc.qcDate}"/></td>
                           <td>${qc.qcType.name}</td>
-                          <td id="results${qc.qcId}">${qc.results} ${qc.qcType.units}</td>
+                          <td id="results${qc.id}">${qc.results} ${qc.qcType.units}</td>
                           <c:if test="${(sample.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                                           or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-                              <td id="edit${qc.qcId}" align="center"><a href="javascript:void(0);"
-                                                                        onclick="Sample.qc.changeSampleQCRow('${qc.qcId}','${sample.sampleId}')">
+                              <td id="edit${qc.id}" align="center"><a href="javascript:void(0);"
+                                                                        onclick="Sample.qc.changeSampleQCRow('${qc.id}','${sample.id}')">
                                   <span class="ui-icon ui-icon-pencil"></span></a></td>
                           </c:if>
                       </tr>
@@ -360,7 +360,7 @@
               </c:if>
               </tbody>
           </table>
-          <input type='hidden' id='sampleId' name='sampleId' value='${sample.sampleId}'/>
+          <input type='hidden' id='sampleId' name='id' value='${sample.id}'/>
       </form>
     </span>
     <script type="text/javascript">
@@ -417,7 +417,7 @@
             <div id="librarymenu"
                  onmouseover="mcancelclosetime()"
                  onmouseout="mclosetime()">
-                <a href='<c:url value="/miso/library/new/${sample.sampleId}"/>' class="add">Add Library</a><br/>
+                <a href='<c:url value="/miso/library/new/${sample.id}"/>' class="add">Add Library</a><br/>
 
                 <c:if test="${not empty sample.libraries}">
                     <a href='javascript:void(0);' onclick='bulkLibraryQcTable();' class="add">Bulk QC these
@@ -447,7 +447,7 @@
                   <td> ${library.libraryType.description} </td>
                   <td>${library.qcPassed}</td>
                   <td class="misoicon"
-                      onclick="window.location.href='<c:url value="/miso/library/${library.libraryId}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
+                      onclick="window.location.href='<c:url value="/miso/library/${library.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
               </tr>
           </c:forEach>
           </tbody>
@@ -467,7 +467,7 @@
     <br/>
 </c:if>
 
-<c:if test="${empty sample.sampleId and not empty sample.project}">
+<c:if test="${sample.id == 0 and not empty sample.project}">
 </div>
 <div id="tab-2" align="center">
     <div class="breadcrumbs">
@@ -478,7 +478,7 @@
             <li>
                 <div class="breadcrumbsbubbleInfo">
                     <div class="trigger">
-                        <a href='<c:url value="/miso/project/${sample.project.projectId}"/>'>${sample.project.name}</a>
+                        <a href='<c:url value="/miso/project/${sample.project.id}"/>'>${sample.project.name}</a>
                     </div>
                     <div class="breadcrumbspopup">
                             ${sample.project.alias}
@@ -770,7 +770,7 @@ function submitBulkSamples() {
       Fluxion.doAjax(
         'sampleControllerHelperService',
         'bulkSaveSamples',
-        {'projectId':${sample.project.projectId},
+        {'projectId':${sample.project.id},
           'samples':"[" + arr.join(',') + "]",
           'url':ajaxurl
         },
@@ -790,7 +790,7 @@ function submitBulkSamples() {
               alert("Samples saved, but those highlighted in red did not have valid taxon information. Any submissions made from these samples may not be valid!");
             }
             else {
-              window.location.href = '<c:url value='/miso/project/${sample.project.projectId}'/>';
+              window.location.href = '<c:url value='/miso/project/${sample.project.id}'/>';
             }
           }
           else {

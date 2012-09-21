@@ -30,6 +30,8 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.DilutionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.EmPCRStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
@@ -99,6 +101,19 @@ public class SQLEmPCRDAO implements EmPCRStore {
   private Store<SecurityProfile> securityProfileDAO;
 
   @Autowired
+  private MisoNamingScheme<emPCR> namingScheme;
+
+  @Override
+  public MisoNamingScheme<emPCR> getNamingScheme() {
+    return namingScheme;
+  }
+
+  @Override
+  public void setNamingScheme(MisoNamingScheme<emPCR> namingScheme) {
+    this.namingScheme = namingScheme;
+  }
+
+  @Autowired
   private CacheManager cacheManager;
 
   public void setCacheManager(CacheManager cacheManager) {
@@ -156,24 +171,65 @@ public class SQLEmPCRDAO implements EmPCRStore {
     params.addValue("concentration", pcr.getConcentration())
           .addValue("creationDate", pcr.getCreationDate())
           .addValue("pcrUserName", pcr.getPcrCreator())
-          .addValue("dilution_dilutionId", pcr.getLibraryDilution().getDilutionId())
+          .addValue("dilution_dilutionId", pcr.getLibraryDilution().getId())
           .addValue("securityProfile_profileId", securityProfileId);
 
-    if (pcr.getPcrId() == emPCR.UNSAVED_ID) {
+    if (pcr.getId() == emPCR.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
                               .withTableName(TABLE_NAME)
                               .usingGeneratedKeyColumns("pcrId");
+      try {
+        pcr.setId(DbUtils.getAutoIncrement(template, TABLE_NAME));
+
+        String name = namingScheme.generateNameFor("name", pcr);
+        pcr.setName(name);
+
+        if (namingScheme.validateField("name", pcr.getName())) {
+          params.addValue("name", name);
+
+          Number newId = insert.executeAndReturnKey(params);
+          if (newId.longValue() != pcr.getId()) {
+            log.error("Expected emPCR ID doesn't match returned value from database insert: rolling back...");
+            new NamedParameterJdbcTemplate(template).update(EMPCR_DELETE, new MapSqlParameterSource().addValue("pcrId", pcr.getId()));
+            throw new IOException("Something bad happened. Expected emPCR ID doesn't match returned value from DB insert");
+          }
+        }
+        else {
+          throw new IOException("Cannot save emPCR - invalid field:" + pcr.toString());
+        }
+      }
+      catch (MisoNamingException e) {
+        throw new IOException("Cannot save emPCR - issue with naming scheme", e);
+      }
+      /*
       String name = "EMP"+ DbUtils.getAutoIncrement(template, TABLE_NAME);
       params.addValue("name", name);
       Number newId = insert.executeAndReturnKey(params);
       pcr.setPcrId(newId.longValue());
       pcr.setName(name);
+      */
     }
     else {
+      try {
+        if (namingScheme.validateField("name", pcr.getName())) {
+          params.addValue("pcrId", pcr.getId())
+                .addValue("name", pcr.getName());
+          NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+          namedTemplate.update(EMPCR_UPDATE, params);
+        }
+        else {
+          throw new IOException("Cannot save emPCR - invalid field:" + pcr.toString());
+        }
+      }
+      catch (MisoNamingException e) {
+        throw new IOException("Cannot save emPCR - issue with naming scheme", e);
+      }
+      /*
       params.addValue("pcrId", pcr.getPcrId())
               .addValue("name", pcr.getName());
       NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
       namedTemplate.update(EMPCR_UPDATE, params);
+      */
     }
 
     if (this.cascadeType != null) {
@@ -184,12 +240,12 @@ public class SQLEmPCRDAO implements EmPCRStore {
       else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (ld != null) {
           Cache pc = cacheManager.getCache("libraryDilutionCache");
-          pc.remove(DbUtils.hashCodeCacheKeyFor(ld.getDilutionId()));
+          pc.remove(DbUtils.hashCodeCacheKeyFor(ld.getId()));
         }
       }
     }
 
-    return pcr.getPcrId();
+    return pcr.getId();
   }
 
   @Cacheable(cacheName="empcrCache",
@@ -245,7 +301,7 @@ public class SQLEmPCRDAO implements EmPCRStore {
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
     if (e.isDeletable() &&
            (namedTemplate.update(EMPCR_DELETE,
-                            new MapSqlParameterSource().addValue("pcrId", e.getPcrId())) == 1)) {
+                            new MapSqlParameterSource().addValue("pcrId", e.getId())) == 1)) {
       LibraryDilution ld = e.getLibraryDilution();
       if (this.cascadeType.equals(CascadeType.PERSIST)) {
         if (ld != null) dilutionDAO.save(ld);
@@ -253,7 +309,7 @@ public class SQLEmPCRDAO implements EmPCRStore {
       else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (ld != null) {
           Cache pc = cacheManager.getCache("emPCRDilutionCache");
-          pc.remove(DbUtils.hashCodeCacheKeyFor(ld.getDilutionId()));
+          pc.remove(DbUtils.hashCodeCacheKeyFor(ld.getId()));
         }
       }
       return true;
@@ -264,7 +320,7 @@ public class SQLEmPCRDAO implements EmPCRStore {
   public class EmPCRMapper implements RowMapper<emPCR> {
     public emPCR mapRow(ResultSet rs, int rowNum) throws SQLException {
       emPCR pcr = dataObjectFactory.getEmPCR();
-      pcr.setPcrId(rs.getLong("pcrId"));
+      pcr.setId(rs.getLong("pcrId"));
       pcr.setConcentration(rs.getDouble("concentration"));
       pcr.setName(rs.getString("name"));
       pcr.setCreationDate(rs.getDate("creationDate"));
@@ -285,7 +341,7 @@ public class SQLEmPCRDAO implements EmPCRStore {
   public class LazyEmPCRMapper implements RowMapper<emPCR> {
     public emPCR mapRow(ResultSet rs, int rowNum) throws SQLException {
       emPCR pcr = dataObjectFactory.getEmPCR();
-      pcr.setPcrId(rs.getLong("pcrId"));
+      pcr.setId(rs.getLong("pcrId"));
       pcr.setConcentration(rs.getDouble("concentration"));
       pcr.setName(rs.getString("name"));
       pcr.setCreationDate(rs.getDate("creationDate"));

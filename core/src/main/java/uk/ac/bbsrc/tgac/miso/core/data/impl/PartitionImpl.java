@@ -65,7 +65,7 @@ public class PartitionImpl extends AbstractPartition implements SequencerPoolPar
     sb.append(getPartitionNumber());
     if (getPool() != null) {
       sb.append(" : ");
-      sb.append(getPool().getPoolId());
+      sb.append(getPool().getId());
     }
     return sb.toString();
   }

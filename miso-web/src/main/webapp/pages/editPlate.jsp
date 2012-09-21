@@ -37,7 +37,7 @@
   <sessionConversation:insertSessionConversationId attributeName="plate"/>
 <h1>
     <c:choose>
-        <c:when test="${not empty plate.plateId}">Edit</c:when>
+        <c:when test="${plate.id != 0}">Edit</c:when>
         <c:otherwise>Create</c:otherwise>
     </c:choose> Plate
     <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
@@ -64,7 +64,7 @@
                         <div id="locationBarcodeMenu"
                              onmouseover="mcancelclosetime()"
                              onmouseout="mclosetime()">
-                            <a href="javascript:void(0);" onclick="Plate.barcode.showPlateLocationChangeDialog(${plate.plateId});">Change
+                            <a href="javascript:void(0);" onclick="Plate.barcode.showPlateLocationChangeDialog(${plate.id});">Change
                                 location</a>
                         </div>
                     </li>
@@ -86,7 +86,7 @@
                     <div id="idBarcodeMenu"
                          onmouseover="mcancelclosetime()"
                          onmouseout="mclosetime()">
-                        <a href="javascript:void(0);" onclick="Plate.barcode.printPlateBarcodes(${plate.plateId});">Print</a>
+                        <a href="javascript:void(0);" onclick="Plate.barcode.printPlateBarcodes(${plate.id});">Print</a>
                     </div>
                 </li>
             </ul>
@@ -95,7 +95,7 @@
                     Fluxion.doAjax(
                             'plateControllerHelperService',
                             'getPlateBarcode',
-                            {'plateId':${plate.plateId},
+                            {'plateId':${plate.id},
                                 'url':ajaxurl
                             },
                             {'doOnSuccess':function(json) {
@@ -114,7 +114,7 @@
             <td class="h">Plate ID:</td>
             <td>
                 <c:choose>
-                    <c:when test="${not empty plate.plateId}">${plate.plateId}</c:when>
+                    <c:when test="${plate.id != 0}">${plate.id}</c:when>
                     <c:otherwise><i>Unsaved</i></c:otherwise>
                 </c:choose>
             </td>
@@ -123,7 +123,7 @@
             <td>Name:</td>
             <td>
                 <c:choose>
-                    <c:when test="${not empty plate.plateId}">${plate.name}</c:when>
+                    <c:when test="${plate.id != 0}">${plate.name}</c:when>
                     <c:otherwise><i>Unsaved</i></c:otherwise>
                 </c:choose>
             </td>
@@ -149,7 +149,7 @@
         </tr>
         <tr>
             <c:choose>
-                <c:when test="${empty plate.plateId or empty plate.plateMaterialType}">
+                <c:when test="${plate.id == 0 or empty plate.plateMaterialType}">
                     <td>Plate Material Type:</td>
                     <td>
                         <form:radiobuttons id="plateMaterialType" path="plateMaterialType" onchange="Plate.tagbarcode.getPlateBarcodesByMaterialType(this);"/>

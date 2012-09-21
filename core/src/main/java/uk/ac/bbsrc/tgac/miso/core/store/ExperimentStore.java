@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.core.store;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -34,7 +35,7 @@ import java.util.Collection;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface ExperimentStore extends Store<Experiment>, Cascadable, Remover<Experiment> {
+public interface ExperimentStore extends Store<Experiment>, Cascadable, Remover<Experiment>, NamingSchemeAware<Experiment> {
   /**
    * Retrieve an Experiment from an underlying data store given an Experiment ID
    * <p/>
@@ -100,4 +101,12 @@ public interface ExperimentStore extends Store<Experiment>, Cascadable, Remover<
    * @throws IOException when
    */
   Collection<Experiment> listByPoolId(long poolId) throws IOException;
+
+  /**
+   * List all persisted objects
+   *
+   * @return Collection<Experiment>
+   * @throws IOException when the objects cannot be retrieved
+   */
+  Collection<Experiment> listAllWithLimit(long limit) throws IOException;
 }

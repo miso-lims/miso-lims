@@ -36,7 +36,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = "`Platform`")
 public abstract class AbstractPlatform implements Platform {
-  public static final Long UNSAVED_ID = null;
+  public static final Long UNSAVED_ID = 0L;
 
   private PlatformType platformType;
   private String description;

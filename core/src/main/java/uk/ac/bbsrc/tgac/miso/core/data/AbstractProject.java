@@ -53,7 +53,7 @@ public abstract class AbstractProject implements Project {
    * Use this ID to indicate that a project has not yet been saved, and
    * therefore does not yet have a unique ID.
    */
-  public static final Long UNSAVED_ID = null;
+  public static final Long UNSAVED_ID = 0L;
 
   private Date creationDate = new Date();
   private String description = "";
@@ -97,6 +97,16 @@ public abstract class AbstractProject implements Project {
     return alias;
   }
 
+  @Override
+  public long getId() {
+    return projectId;
+  }
+
+  public void setId(long id) {
+    this.projectId = id;
+  }
+
+  @Deprecated
   public Long getProjectId() {
     return projectId;
   }
@@ -142,6 +152,7 @@ public abstract class AbstractProject implements Project {
     this.alias = alias;
   }
 
+  @Deprecated
   public void setProjectId(Long projectId) {
     this.projectId = projectId;
   }
@@ -201,7 +212,7 @@ public abstract class AbstractProject implements Project {
   }
 
   public boolean isDeletable() {
-    return getProjectId() != AbstractProject.UNSAVED_ID &&
+    return getId() != AbstractProject.UNSAVED_ID &&
            getSamples().isEmpty() &&
            getStudies().isEmpty();
   }
@@ -315,7 +326,7 @@ public abstract class AbstractProject implements Project {
       return false;
     AbstractProject them = (AbstractProject) obj;
 
-    if (getProjectId() == AbstractProject.UNSAVED_ID || them.getProjectId() == AbstractProject.UNSAVED_ID) {
+    if (getId() == AbstractProject.UNSAVED_ID || them.getId() == AbstractProject.UNSAVED_ID) {
       if (getName() != null && them.getName() != null) {
         return getName().equals(them.getName());
       }
@@ -324,14 +335,14 @@ public abstract class AbstractProject implements Project {
       }
     }
     else {
-      return this.getProjectId().longValue() == them.getProjectId().longValue();
+      return this.getId() == them.getId();
     }
   }
 
   @Override
   public int hashCode() {
-    if (getProjectId() != null && !getProjectId().equals(AbstractProject.UNSAVED_ID)) {
-      return getProjectId().intValue();
+    if (getId() != 0L && getId() != AbstractProject.UNSAVED_ID) {
+      return (int)getId();
     }
     else {
       final int PRIME = 37;
@@ -345,9 +356,9 @@ public abstract class AbstractProject implements Project {
   @Override
   public int compareTo(Object o) {
     Project s = (Project)o;
-    if (getProjectId() != null && s.getProjectId() != null) {
-      if (getProjectId() < s.getProjectId()) return -1;
-      if (getProjectId() > s.getProjectId()) return 1;
+    if (getId() != 0L && s.getId() != 0L) {
+      if (getId() < s.getId()) return -1;
+      if (getId() > s.getId()) return 1;
     }
     else if (getAlias() != null && s.getAlias() != null) {
       return getAlias().compareTo(s.getAlias());
@@ -361,7 +372,7 @@ public abstract class AbstractProject implements Project {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append(getProjectId());
+    sb.append(getId());
     sb.append(" : ");
     sb.append(getCreationDate());
     sb.append(" : ");

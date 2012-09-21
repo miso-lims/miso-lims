@@ -50,7 +50,7 @@ import javax.xml.parsers.ParserConfigurationException;
 @JsonIgnoreProperties({"securityProfile","flowcell"})
 @Deprecated
 public class Lane extends PartitionImpl {
-  public static final Long UNSAVED_ID = null;
+  public static final Long UNSAVED_ID = 0L;
   
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)

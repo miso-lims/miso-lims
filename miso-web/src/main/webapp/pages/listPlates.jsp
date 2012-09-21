@@ -54,7 +54,7 @@
                     <td>${plate.plateMaterialType}</td>
                     <td>${plate.tagBarcode.sequence}</td>
                     <td class="misoicon"
-                        onclick="window.location.href='<c:url value="/miso/plate/${plate.plateId}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
+                        onclick="window.location.href='<c:url value="/miso/plate/${plate.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
                 </tr>
             </c:forEach>
             </tbody>

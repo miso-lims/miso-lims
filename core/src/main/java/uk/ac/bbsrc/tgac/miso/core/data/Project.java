@@ -55,7 +55,8 @@ public interface Project extends com.eaglegenomics.simlims.core.Project,
                                  Submittable<Document>,
                                  Reportable,
                                  Deletable,
-                                 Watchable {
+                                 Watchable,
+                                 Nameable {
   /** Field PREFIX  */
   public static final String PREFIX = "PRO";
 

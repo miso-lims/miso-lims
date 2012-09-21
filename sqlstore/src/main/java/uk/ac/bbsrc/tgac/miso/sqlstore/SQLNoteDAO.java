@@ -169,7 +169,7 @@ public class SQLNoteDAO implements NoteStore {
             .withTableName("Kit_Note");
 
     MapSqlParameterSource poParams = new MapSqlParameterSource();
-    poParams.addValue("kit_kitId", kit.getKitId())
+    poParams.addValue("kit_kitId", kit.getId())
             .addValue("notes_noteId", noteId);
     try {
       pInsert.execute(poParams);
@@ -186,7 +186,7 @@ public class SQLNoteDAO implements NoteStore {
             .withTableName("Sample_Note");
 
     MapSqlParameterSource poParams = new MapSqlParameterSource();
-    poParams.addValue("sample_sampleId", sample.getSampleId())
+    poParams.addValue("sample_sampleId", sample.getId())
             .addValue("notes_noteId", noteId);
 
     try {
@@ -204,7 +204,7 @@ public class SQLNoteDAO implements NoteStore {
             .withTableName("Library_Note");
 
     MapSqlParameterSource poParams = new MapSqlParameterSource();
-    poParams.addValue("library_libraryId", library.getLibraryId())
+    poParams.addValue("library_libraryId", library.getId())
             .addValue("notes_noteId", noteId);
 
     try {
@@ -222,7 +222,7 @@ public class SQLNoteDAO implements NoteStore {
             .withTableName("Run_Note");
 
     MapSqlParameterSource poParams = new MapSqlParameterSource();
-    poParams.addValue("run_runId", run.getRunId())
+    poParams.addValue("run_runId", run.getId())
             .addValue("notes_noteId", noteId);
 
     try {

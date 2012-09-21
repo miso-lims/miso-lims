@@ -57,7 +57,7 @@
                     <td>${sample.sampleType}</td>
                     <td>${sample.qcPassed}</td>
                     <td class="misoicon"
-                        onclick="window.location.href='<c:url value="/miso/sample/${sample.sampleId}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
+                        onclick="window.location.href='<c:url value="/miso/sample/${sample.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
                 </tr>
             </c:forEach>
             </tbody>

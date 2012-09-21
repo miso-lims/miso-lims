@@ -397,7 +397,7 @@ public class PoolControllerHelperService {
                 (e.getStudy().getAlias().toLowerCase().contains(str) || e.getStudy().getName().toLowerCase().contains(str)) ||
                 (e.getStudy().getProject().getAlias().toLowerCase().contains(str) || e.getStudy().getProject().getName().toLowerCase().contains(str))) {
               b.append("<div onmouseover=\"this.className='autocompleteboxhighlight'\" onmouseout=\"this.className='autocompletebox'\" class=\"autocompletebox\"" +
-                       " onclick=\"Pool.search.poolSearchSelectExperiment('" + e.getExperimentId() + "', '" + e.getName() + "')\">" +
+                       " onclick=\"Pool.search.poolSearchSelectExperiment('" + e.getId() + "', '" + e.getName() + "')\">" +
                        "<b>Experiment:</b> " + expName + "<br/>" +
                        "<b>Description:</b> " + e.getDescription() + "<br/>" +
                        "<b>Project:</b> " + e.getStudy().getProject().getAlias() + "<br/>" +
@@ -441,7 +441,7 @@ public class PoolControllerHelperService {
               (d.getLibrary().getSample().getAlias().toLowerCase().contains(str) || d.getLibrary().getSample().getName().toLowerCase().contains(str))) {
           */
             b.append("<div onmouseover=\"this.className='autocompleteboxhighlight'\" onmouseout=\"this.className='autocompletebox'\" class=\"autocompletebox\"" +
-                     " onclick=\"Pool.search.poolSearchSelectDilution('" + d.getDilutionId() + "', '" + d.getName() + "')\">" +
+                     " onclick=\"Pool.search.poolSearchSelectDilution('" + d.getId() + "', '" + d.getName() + "')\">" +
                      "<b>Dilution: " + d.getName() + "</b><br/>" +
                      "<b>Library: " + d.getLibrary().getAlias() + "</b><br/>" +
                      "<b>Sample: " + d.getLibrary().getSample().getAlias() + "</b><br/>" +
@@ -484,7 +484,7 @@ public class PoolControllerHelperService {
               (d.getLibrary().getSample().getAlias().toLowerCase().contains(str) || d.getLibrary().getSample().getName().toLowerCase().contains(str))) {
           */
             b.append("<div onmouseover=\"this.className='autocompleteboxhighlight'\" onmouseout=\"this.className='autocompletebox'\" class=\"autocompletebox\"" +
-                     " onclick=\"Pool.search.poolSearchSelectDilution('" + d.getDilutionId() + "', '" + d.getName() + "')\">" +
+                     " onclick=\"Pool.search.poolSearchSelectDilution('" + d.getId() + "', '" + d.getName() + "')\">" +
                      "<b>Dilution: " + d.getName() + "</b><br/>" +
                      "<b>Library: " + d.getLibrary().getAlias() + "</b><br/>" +
                      "<b>Sample: " + d.getLibrary().getSample().getAlias() + "</b><br/>" +
@@ -534,11 +534,11 @@ public class PoolControllerHelperService {
           }
           else {
             for (Study s : studies) {
-              sb.append("<option value='" + s.getStudyId() + "'>" + s.getAlias() + " (" + s.getName() + " - " + s.getStudyType() + ")</option>");
+              sb.append("<option value='" + s.getId() + "'>" + s.getAlias() + " (" + s.getName() + " - " + s.getStudyType() + ")</option>");
             }
           }
           sb.append("</select>");
-          sb.append("<input id='studySelectButton-"+partition+"_"+p.getPoolId()+"' type='button' onclick=\"Run.container.selectStudy('" + partition + "', " + p.getPoolId() + "," + project.getProjectId() + ");\" class=\"ui-state-default ui-corner-all\" value='Select Study'/>");
+          sb.append("<input id='studySelectButton-"+partition+"_"+p.getId()+"' type='button' onclick=\"Run.container.selectStudy('" + partition + "', " + p.getId() + "," + project.getProjectId() + ");\" class=\"ui-state-default ui-corner-all\" value='Select Study'/>");
           sb.append("</div><br/>");
         }
         sb.append("</div>");
@@ -612,7 +612,7 @@ public class PoolControllerHelperService {
           int sum = 0;
           int count = 0;
           for (Dilution ld : dls) {
-            List<LibraryQC> libraryQCs = new ArrayList<LibraryQC>(requestManager.listAllLibraryQCsByLibraryId(ld.getLibrary().getLibraryId()));
+            List<LibraryQC> libraryQCs = new ArrayList<LibraryQC>(requestManager.listAllLibraryQCsByLibraryId(ld.getLibrary().getId()));
             if (libraryQCs.size() > 0) {
               //List<LibraryQC> libraryQCsList = new ArrayList<LibraryQC>(libraryQCs);
               //Collections.sort(libraryQCsList);
@@ -628,7 +628,7 @@ public class PoolControllerHelperService {
         else {
           b.append("No QC");
         }
-        j.put(pool.getPoolId(), b.toString());
+        j.put(pool.getId(), b.toString());
       }
       return j;
     }

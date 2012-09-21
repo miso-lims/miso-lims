@@ -53,7 +53,7 @@ import java.util.*;
 @JsonWriteNullProperties(false)
 @JsonIgnoreProperties({"project","samples","libraries","runs","qcPassedSamples"})
 public class ProjectOverview implements Watchable {
-  public static final Long UNSAVED_ID = null;
+  public static final Long UNSAVED_ID = 0L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -79,7 +79,6 @@ public class ProjectOverview implements Watchable {
   private Set<MisoListener> listeners = new HashSet<MisoListener>();
   private Set<User> watchers = new HashSet<User>();
   private Date lastUpdated;
-
 
   public Long getOverviewId() {
     return overviewId;

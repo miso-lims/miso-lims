@@ -38,7 +38,7 @@ import java.net.InetAddress;
 public abstract class AbstractSequencerReference implements SequencerReference {
   protected static final Logger log = LoggerFactory.getLogger(AbstractSequencerReference.class);
 
-  public static final Long UNSAVED_ID = null;
+  public static final Long UNSAVED_ID = 0L;
 
   private Long id = AbstractSequencerReference.UNSAVED_ID; 
   private String name;
@@ -46,18 +46,22 @@ public abstract class AbstractSequencerReference implements SequencerReference {
   private Boolean available;
   private InetAddress ip;
 
+  @Override
   public void setId(Long id) {
     this.id = id;
   }
 
-  public Long getId() {
+  @Override
+  public long getId() {
     return this.id;
   }
 
+  @Override
   public void setName(String name) {
     this.name = name;
   }
 
+  @Override
   public String getName() {
     return this.name;
   }

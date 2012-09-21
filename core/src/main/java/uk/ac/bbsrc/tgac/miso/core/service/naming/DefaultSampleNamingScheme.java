@@ -68,8 +68,8 @@ public class DefaultSampleNamingScheme implements RequestManagerAwareNamingSchem
       if (validationMap.keySet().contains(fieldName)) {
         Method m = fieldCheck(fieldName);
         if (m != null) {
-          log.info("Generating name for '"+fieldName+"' :: " + DefaultMisoEntityPrefix.get(Sample.class.getSimpleName()).name() + s.getSampleId());
-          return DefaultMisoEntityPrefix.get(Sample.class.getSimpleName()).name() + s.getSampleId();
+          log.info("Generating name for '"+fieldName+"' :: " + DefaultMisoEntityPrefix.get(Sample.class.getSimpleName()).name() + s.getId());
+          return DefaultMisoEntityPrefix.get(Sample.class.getSimpleName()).name() + s.getId();
         }
         else {
           throw new MisoNamingException("No such nameable field.");

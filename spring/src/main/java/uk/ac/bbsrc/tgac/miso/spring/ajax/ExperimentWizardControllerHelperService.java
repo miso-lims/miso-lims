@@ -120,7 +120,7 @@ public class ExperimentWizardControllerHelperService {
       s.setStudyType(studyType);
       requestManager.saveStudy(s);
 
-      studyId = s.getStudyId().toString();
+      studyId = String.valueOf(s.getId());
 
       for (Long i : ids) {
         String title = null;
@@ -232,7 +232,7 @@ public class ExperimentWizardControllerHelperService {
           //Collections.sort(pools, Collections.<Pool<? extends Poolable>>reverseOrder());
           Collections.sort(pools);
           for (Pool p : pools) {
-            a.append("<div bind='"+p.getPoolId()+"' onMouseOver='this.className=\"dashboardhighlight\"' onMouseOut='this.className=\"dashboard\"' class='dashboard' style='position:relative' ");
+            a.append("<div bind='"+p.getId()+"' onMouseOver='this.className=\"dashboardhighlight\"' onMouseOut='this.className=\"dashboard\"' class='dashboard' style='position:relative' ");
             if (json.has("newid") && !"".equals(json.getString("newid"))) {
               a.append("ondblclick='Experiment.pool.experimentSelectPool(this,"+json.getString("newid")+");'");
             }

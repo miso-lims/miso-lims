@@ -375,7 +375,7 @@ Run.container = {
           dialogStr += "Partition " + key + ": " + json.verify[key] + "\n";
         }
 
-        if (confirm("Import this container?\n\n" + dialogStr)) {
+        if (confirm("Found container '"+json.barcode+"'. Import this container?\n\n" + dialogStr)) {
           jQuery('#partitionErrorDiv').html("");
           jQuery('#partitionDiv').html(json.html);
         }

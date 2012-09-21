@@ -36,7 +36,7 @@ import javax.persistence.Id;
  * @since 0.0.2
  */
 public class QcType implements Comparable {
-  public static final Long UNSAVED_ID = null;
+  public static final Long UNSAVED_ID = 0L;
 
   /** Field libraryTypeId  */
   @Id

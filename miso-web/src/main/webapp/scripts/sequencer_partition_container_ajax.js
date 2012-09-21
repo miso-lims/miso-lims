@@ -46,7 +46,7 @@ var Container = Container || {
           dialogStr += "Partition "+ key + ": " + json.verify[key] + "\n";
         }
 
-        if (confirm("Import this container?\n\n"+dialogStr)) {
+        if (confirm("Found container '"+json.barcode+"'. Import this container?\n\n"+dialogStr)) {
           jQuery('#partitionErrorDiv').html("");
           jQuery('#partitionDiv').html(json.html);
         }
@@ -56,6 +56,17 @@ var Container = Container || {
 };
 
 Container.ui = {
+  editContainerIdBarcode : function(span) {
+    var s = jQuery(span);
+    s.html("<input type='text' id='identificationBarcode' name='identificationBarcode' value='" + s.html() + "'/>" +
+           "<button onclick='Container.lookupContainer(this);' type='button' class='fg-button ui-state-default ui-corner-all'>Lookup</button>");
+  },
+
+  editContainerLocationBarcode : function(span, fc) {
+    var s = jQuery(span);
+    s.html("<input type='text' id='locationBarcode' name='locationBarcode' value='" + s.html() + "'/>");
+  },
+
   populatePlatformTypes : function() {
     Fluxion.doAjax(
       'containerControllerHelperService',
@@ -108,7 +119,7 @@ Container.ui = {
     Fluxion.doAjax(
       'containerControllerHelperService',
       'changeChamber',
-      {'platform':'LS454', 'numChambers':jQuery(t).val(), 'container':container, 'url':ajaxurl},
+      {'platform':'LS454', 'container_cId':jQuery('input[name=container_cId]').val(), 'numChambers':jQuery(t).val(), 'container':container, 'url':ajaxurl},
       {'updateElement':'containerdiv'+container});
   },
 
@@ -116,7 +127,7 @@ Container.ui = {
     Fluxion.doAjax(
       'containerControllerHelperService',
       'changeChamber',
-      {'platform':'Solid', 'numChambers':jQuery(t).val(), 'container':container, 'url':ajaxurl},
+      {'platform':'Solid', 'container_cId':jQuery('input[name=container_cId]').val(), 'numChambers':jQuery(t).val(), 'container':container, 'url':ajaxurl},
       {'updateElement':'containerdiv'+container});
   },
 
@@ -124,7 +135,7 @@ Container.ui = {
     Fluxion.doAjax(
       'containerControllerHelperService',
       'changeChamber',
-      {'platform':'PacBio', 'numChambers':jQuery(t).val(), 'container':container, 'url':ajaxurl},
+      {'platform':'PacBio', 'container_cId':jQuery('input[name=container_cId]').val(), 'numChambers':jQuery(t).val(), 'container':container, 'url':ajaxurl},
       {'updateElement':'containerdiv'+container});
   },
 

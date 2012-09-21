@@ -82,7 +82,7 @@ public class SubmissionControllerHelperService {
           //calls up the existing submission with this ID
           Submission oldSubmission = requestManager.getSubmissionById(Long.parseLong(json.getString("submissionId")));
           //sets the details of the new one to match the old.
-          newSubmission.setSubmissionId(oldSubmission.getSubmissionId());
+          newSubmission.setId(oldSubmission.getId());
           newSubmission.setAccession(oldSubmission.getAccession());
           //newSubmission.setAlias(oldSubmission.getAlias());
           newSubmission.setCreationDate(oldSubmission.getCreationDate());
@@ -128,7 +128,7 @@ public class SubmissionControllerHelperService {
             }
 
             for (SequencerPoolPartition nextPartition : newPartitions) {
-              if (nextPartition.getId().equals(partitionId)) {
+              if (nextPartition.getId() == partitionId) {
                 Dilution dilution = requestManager.getDilutionByIdAndPlatform(dilutionId, nextPartition.getPool().getPlatformType());
                 Pool pool = nextPartition.getPool();
                 pool.addPoolableElement(dilution);
@@ -142,7 +142,7 @@ public class SubmissionControllerHelperService {
         }
         //the submission is saved
         requestManager.saveSubmission(newSubmission);
-        return JSONUtils.SimpleJSONResponse("Submission " + newSubmission.getSubmissionId() + " saved!");
+        return JSONUtils.SimpleJSONResponse("Submission " + newSubmission.getId() + " saved!");
       }
     }
     catch (Exception e) {
@@ -362,7 +362,7 @@ public class SubmissionControllerHelperService {
         Collection<Study> studies = requestManager.listAllStudiesByProjectId(p.getProjectId());
         p.setStudies(studies);
         for (Study s : studies) {
-          Collection<Experiment> experiments = requestManager.listAllExperimentsByStudyId(s.getStudyId());
+          Collection<Experiment> experiments = requestManager.listAllExperimentsByStudyId(s.getId());
           s.setExperiments(experiments);
         }
         //gets the runs for the project
@@ -374,14 +374,14 @@ public class SubmissionControllerHelperService {
           sb.append("<ul id='runList" + projectId + "'>");
           for (Run r : runs) {
             sb.append("<li>");
-            sb.append("<a href='/miso/run/" + r.getRunId() + "'><b>" + r.getName() + "</b> : " + r.getAlias() + "</a>");
+            sb.append("<a href='/miso/run/" + r.getId() + "'><b>" + r.getName() + "</b> : " + r.getAlias() + "</a>");
             sb.append("<ul>");
 
             //creates HTML list of partition containers for each run
-            Collection<SequencerPartitionContainer<SequencerPoolPartition>> partitionContainers = requestManager.listSequencerPartitionContainersByRunId(r.getRunId());
+            Collection<SequencerPartitionContainer<SequencerPoolPartition>> partitionContainers = requestManager.listSequencerPartitionContainersByRunId(r.getId());
             for (SequencerPartitionContainer<SequencerPoolPartition> partitionContainer : partitionContainers) {
               sb.append("<li>");
-              sb.append("<b>" + partitionContainer.getIdentificationBarcode() + "</b> : " + partitionContainer.getContainerId());
+              sb.append("<b>" + partitionContainer.getIdentificationBarcode() + "</b> : " + partitionContainer.getId());
               sb.append("<ul>");
 
               //creates HTML list of partitions for each partition container
@@ -402,7 +402,7 @@ public class SubmissionControllerHelperService {
 
                   if (partitionInvolved) {
                     //If the partition was involved in the project, it is listed
-                    sb.append("<li><input type='checkbox' id='" + r.getRunId() + "_" + partitionContainer.getContainerId() + "_" + part.getPartitionNumber() + "' name='partition' " +
+                    sb.append("<li><input type='checkbox' id='" + r.getId() + "_" + partitionContainer.getId() + "_" + part.getPartitionNumber() + "' name='partition' " +
                               "itemLabel='" + part.getPartitionNumber() + "' itemValue='PAR" + part.getId() + "' value='PAR" + part.getId() + "'");
 
                     if (sub != null) {
@@ -428,7 +428,7 @@ public class SubmissionControllerHelperService {
                     //this is failing- it's ticking all the dilutions, regardless of whether they're in the submission. I reckon it's checking the wrong Partition somehow.
                     //Better method might be to create a list of dilutions in each submission partition, and check each dilution in the menu list against it.
                     for (Dilution d : libraryDilutions) {
-                      sb.append("<li><input type='checkbox'  name='DIL_" + d.getDilutionId() + "' id='DIL" + d.getDilutionId() + "_PAR" + part.getId() + "' value='PAR_" + part.getId() + "' ");
+                      sb.append("<li><input type='checkbox'  name='DIL_" + d.getId() + "' id='DIL" + d.getId() + "_PAR" + part.getId() + "' value='PAR_" + part.getId() + "' ");
 
                       if (sub != null && sub.getSubmissionElements().contains(part)) {
                         //checks dilution checkboxes if dilution is in the submission
@@ -437,7 +437,7 @@ public class SubmissionControllerHelperService {
                             SequencerPoolPartition subPart = (SequencerPoolPartition) o;
                             //this is causing problems- it's returning dilutions from the original partition!
                             for (Dilution bla : subPart.getPool().getDilutions()) {
-                              if (bla.getDilutionId().equals(d.getDilutionId())) {
+                              if (bla.getId() == d.getId()) {
                                 sb.append(" checked='checked' ");
                               }
                             }

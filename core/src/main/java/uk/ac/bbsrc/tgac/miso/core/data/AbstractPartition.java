@@ -36,7 +36,7 @@ import javax.persistence.*;
  * @since 0.0.2
  */
 public abstract class AbstractPartition implements Partition {
-  public static final Long UNSAVED_ID = null;
+  public static final Long UNSAVED_ID = 0L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -56,11 +56,11 @@ public abstract class AbstractPartition implements Partition {
     this.sequencerPartitionContainer = sequencerPartitionContainer;
   }
 
-  public void setId(Long id) {
+  public void setId(long id) {
     this.id = id;
   }
 
-  public Long getId() {
+  public long getId() {
     return id;
   }
 
@@ -115,14 +115,14 @@ public abstract class AbstractPartition implements Partition {
              && getSequencerPartitionContainer().equals(them.getSequencerPartitionContainer());
     }
     else {
-      return this.getId().longValue() == them.getId().longValue();
+      return this.getId() == them.getId();
     }
   }
 
   @Override
   public int hashCode() {
     if (getId() != AbstractPartition.UNSAVED_ID) {
-      return getId().intValue();
+      return (int)getId();
     }
     else {
       final int PRIME = 37;
@@ -136,7 +136,7 @@ public abstract class AbstractPartition implements Partition {
   @Override
   public int compareTo(Object o) {
     Partition t = (Partition)o;
-    if (getId() != null && t.getId() != null) {
+    if (getId() != 0L && t.getId() != 0L) {
       if (getId() < t.getId()) return -1;
       if (getId() > t.getId()) return 1;
     }

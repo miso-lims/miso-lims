@@ -47,7 +47,7 @@ import java.util.*;
  * @since 0.0.2
  */
 public abstract class AbstractLibrary implements Library {
-  public static final Long UNSAVED_ID = null;
+  public static final Long UNSAVED_ID = 0L;
   public static final String UNITS = "nM";
 
   @Id
@@ -84,12 +84,23 @@ public abstract class AbstractLibrary implements Library {
 
   private Date lastUpdated;
 
+  @Deprecated
   public Long getLibraryId() {
     return libraryId;
   }
 
+  @Deprecated
   public void setLibraryId(Long libraryId) {
     this.libraryId = libraryId;
+  }
+
+  @Override
+  public long getId() {
+    return libraryId;
+  }
+
+  public void setId(long id) {
+    this.libraryId = id;
   }
 
   public String getName() {
@@ -282,7 +293,7 @@ public abstract class AbstractLibrary implements Library {
   }
 
   public boolean isDeletable() {
-    return getLibraryId() != AbstractLibrary.UNSAVED_ID &&
+    return getId() != AbstractLibrary.UNSAVED_ID &&
            getLibraryDilutions().isEmpty() &&
            getLibraryQCs().isEmpty();    
   }
@@ -322,8 +333,8 @@ public abstract class AbstractLibrary implements Library {
     Library them = (Library) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
-    if (getLibraryId() == AbstractLibrary.UNSAVED_ID
-        || them.getLibraryId() == AbstractLibrary.UNSAVED_ID) {
+    if (getId() == AbstractLibrary.UNSAVED_ID
+        || them.getId() == AbstractLibrary.UNSAVED_ID) {
       if (getName() != null && them.getName() != null) {
         return getName().equals(them.getName());
       }
@@ -332,14 +343,14 @@ public abstract class AbstractLibrary implements Library {
       }
     }
     else {
-      return getLibraryId().longValue() == them.getLibraryId().longValue();
+      return getId() == them.getId();
     }
   }
 
   @Override
   public int hashCode() {
-    if (getLibraryId() != AbstractLibrary.UNSAVED_ID) {
-      return getLibraryId().intValue();
+    if (AbstractLibrary.UNSAVED_ID != getId()) {
+      return (int)getId();
     }
     else {
       final int PRIME = 37;
@@ -355,9 +366,9 @@ public abstract class AbstractLibrary implements Library {
   @Override
   public int compareTo(Object o) {
     Library l = (Library)o;
-    if (getLibraryId() != null && l.getLibraryId() != null) {
-      if (getLibraryId() < l.getLibraryId()) return -1;
-      if (getLibraryId() > l.getLibraryId()) return 1;
+    if (getId() != 0L && l.getId() != 0L) {
+      if (getId() < l.getId()) return -1;
+      if (getId() > l.getId()) return 1;
     }
     else if (getName() != null && l.getName() != null) {
       return getName().compareTo(l.getName());

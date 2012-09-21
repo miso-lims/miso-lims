@@ -68,7 +68,7 @@ Sequencer.ui = {
             $('available').innerHTML = json.html;
             if (json.html == "OK") {
               $('available').setAttribute("style", "background-color:green");
-              $('addTd').innerHTML = "<a href='javascript:void(0);' onclick='Sequencer.ui.addSequencerReference(\"addReferenceForm\");'/>Add</a>";
+              $('addTd').innerHTML = "<a href='javascript:void(0);' onclick='Sequencer.ui.addSequencerReference();'/>Add</a>";
             }
             else {
               $('available').setAttribute("style", "background-color:red");
@@ -80,15 +80,15 @@ Sequencer.ui = {
     }
   },
 
-  addSequencerReference : function(form) {
-    var f = $(form);
+  addSequencerReference : function() {
+    var f = Utils.mappifyForm("addReferenceForm");
     Fluxion.doAjax(
       'sequencerReferenceControllerHelperService',
       'addSequencerReference',
       {
-        'name':f.sequencername.value,
-        'platform':f.platform.value,
-        'server':f.server.value,
+        'name':f.sequencername,
+        'platform':f.platform,
+        'server':f.server,
         'url':ajaxurl},
       {'doOnSuccess':Utils.page.pageReload}
     );

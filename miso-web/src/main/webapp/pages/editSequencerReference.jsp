@@ -61,7 +61,7 @@
                     <td class="h">Sequencer Reference ID:</td>
                     <td>
                         <c:choose>
-                            <c:when test="${not empty sequencerReference.id}">${sequencerReference.id}</c:when>
+                            <c:when test="${sequencerReference.id != 0}">${sequencerReference.id}</c:when>
                             <c:otherwise><i>Unsaved</i></c:otherwise>
                         </c:choose>
                     </td>

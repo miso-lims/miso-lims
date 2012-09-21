@@ -45,7 +45,7 @@
   </c:if>
 
   <div id="pipelines" style="padding-top:6px">
-    Pipeline: <select name='pipeline' id='pipeline' onchange='Tasks.ui.selectPipeline(this<c:if test="${not empty run}">, ${run.runId}</c:if>);'>
+    Pipeline: <select name='pipeline' id='pipeline' onchange='Tasks.ui.selectPipeline(this<c:if test="${not empty run}">, ${run.id}</c:if>);'>
       <option value='' selected='selected'>Choose a pipeline...</option>
       <c:forEach items="${pipelines}" var="p" varStatus="n">
         <option value='${p}'>${p}</option>

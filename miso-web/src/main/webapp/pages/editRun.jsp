@@ -46,7 +46,7 @@
 
 <h1>
     <c:choose>
-        <c:when test="${not empty run.runId}">Edit</c:when>
+        <c:when test="${run.id != 0}">Edit</c:when>
         <c:otherwise>Create</c:otherwise>
     </c:choose> Run
     <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
@@ -80,11 +80,11 @@
              onmouseover="mcancelclosetime()"
              onmouseout="mclosetime()">
             <c:choose>
-                <c:when test="${not empty runMap[run.runId]}">
-                    <a href='javascript:void(0);' onclick="Run.alert.unwatchRun(${run.runId});">Stop watching</a>
+                <c:when test="${not empty runMap[run.id]}">
+                    <a href='javascript:void(0);' onclick="Run.alert.unwatchRun(${run.id});">Stop watching</a>
                 </c:when>
                 <c:otherwise>
-                    <a href='javascript:void(0);' onclick="Run.alert.watchRun(${run.runId});">Watch</a>
+                    <a href='javascript:void(0);' onclick="Run.alert.watchRun(${run.id});">Watch</a>
                 </c:otherwise>
             </c:choose>
         </div>
@@ -95,8 +95,8 @@
         <td class="h">Run ID:</td>
         <td>
             <c:choose>
-                <c:when test="${not empty run.runId}"><input type='hidden' id='runId' name='runId'
-                                                             value='${run.runId}'/>${run.runId}</c:when>
+                <c:when test="${run.id != 0}"><input type='hidden' id='runId' name='id'
+                                                             value='${run.id}'/>${run.id}</c:when>
                 <c:otherwise><i>Unsaved</i></c:otherwise>
             </c:choose>
         </td>
@@ -111,16 +111,16 @@
     </c:if>
     <tr>
         <c:choose>
-            <c:when test="${empty run.runId}">
+            <c:when test="${run.id == 0}">
                 <td>Platform:</td>
                 <td>
                     <c:choose>
                         <c:when test="${not empty run.status and run.status.health.key ne 'Unknown'}"><form:radiobuttons
                                 id="platformTypes" path="platformType" items="${platformTypes}"
-                                onchange="Run.ui.changePlatformType(this, '${run.runId}');"
+                                onchange="Run.ui.changePlatformType(this, '${run.id}');"
                                 disabled="disabled"/></c:when>
                         <c:otherwise><form:radiobuttons id="platformTypes" path="platformType" items="${platformTypes}"
-                                                        onchange="Run.ui.changePlatformType(this, '${run.runId}');"/></c:otherwise>
+                                                        onchange="Run.ui.changePlatformType(this, '${run.id}');"/></c:otherwise>
 
                     </c:choose>
                 </td>
@@ -134,7 +134,7 @@
 
     <tr>
         <c:choose>
-            <c:when test="${empty run.runId}">
+            <c:when test="${run.id == 0}">
                 <td>Sequencer:</td>
                 <td id="sequencerReferenceSelect">
                     <i>Please choose a platform above...</i>
@@ -151,7 +151,7 @@
         <td>Name:</td>
         <td>
             <c:choose>
-                <c:when test="${not empty run.runId}">${run.name}</c:when>
+                <c:when test="${run.id != 0}">${run.name}</c:when>
                 <c:otherwise><i>Unsaved</i></c:otherwise>
             </c:choose>
         </td>
@@ -238,7 +238,7 @@
 
 </table>
 <%@ include file="permissions.jsp" %>
-<c:if test="${not empty run.runId}">
+<c:if test="${run.id != 0}">
     <c:if test="${statsAvailable}">
         <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#stats_arrowclick'), 'stats');">Statistics
             <div id="stats_arrowclick" class="toggleLeftDown"></div>
@@ -264,7 +264,7 @@
                 <div id="notesmenu"
                      onmouseover="mcancelclosetime()"
                      onmouseout="mclosetime()">
-                    <a onclick="Run.ui.showRunNoteDialog(${run.runId});" href="javascript:void(0);" class="add">Add
+                    <a onclick="Run.ui.showRunNoteDialog(${run.id});" href="javascript:void(0);" class="add">Add
                         Note</a>
                 </div>
             </li>
@@ -298,10 +298,10 @@
                  onmouseout="mclosetime()">
 
                 <a href='javascript:void(0);' class="add"
-                   onclick="Run.qc.generateRunQCRow(${run.runId}); return false;">Add Run QC</a>
+                   onclick="Run.qc.generateRunQCRow(${run.id}); return false;">Add Run QC</a>
 
                 <c:if test="${operationsQcPassed}">
-                    <a href='<c:url value="/miso/analysis/new/run/${run.runId}"/>' class="add">Initiate Analysis</a>
+                    <a href='<c:url value="/miso/analysis/new/run/${run.id}"/>' class="add">Initiate Analysis</a>
                 </c:if>
             </div>
         </li>
@@ -334,7 +334,7 @@
                                       <c:if test="${not empty qc.partitionSelections and fn:length(qc.partitionSelections) > 0}">
                                           <c:forEach items="${qc.partitionSelections}" var="selection">
                                               <c:if test="${selection.partitionNumber eq partition.partitionNumber}">
-                                                  <td id="${qc.qcId}_${run.runId}_${container.containerId}_${partition.partitionNumber}"
+                                                  <td id="${qc.id}_${run.id}_${container.id}_${partition.partitionNumber}"
                                                       class="smallbox partitionOccupied">${partition.partitionNumber}</td>
                                               </c:if>
                                           </c:forEach>
@@ -405,10 +405,10 @@
                                  onmouseout="mclosetime()">
                                 <c:if test="${run.platformType.key eq 'Illumina'}">
                                     <a href="javascript:void(0);"
-                                       onclick="Run.container.generateCasava17DemultiplexCSV(${run.runId}, ${container.containerId});">Demultiplex
+                                       onclick="Run.container.generateCasava17DemultiplexCSV(${run.id}, ${container.id});">Demultiplex
                                         CSV (pre-1.8)</a>
                                     <a href="javascript:void(0);"
-                                       onclick="Run.container.generateCasava18DemultiplexCSV(${run.runId}, ${container.containerId});">Demultiplex
+                                       onclick="Run.container.generateCasava18DemultiplexCSV(${run.id}, ${container.id});">Demultiplex
                                         CSV (1.8+)</a>
                                 </c:if>
                             </div>
@@ -514,7 +514,7 @@
                                     <c:choose>
                                         <c:when test="${not empty partition.pool}">
                                             <div class="dashboard">
-                                                <a href='<c:url value="/miso/pool/${fn:toLowerCase(run.platformType.key)}/${partition.pool.poolId}"/>'>
+                                                <a href='<c:url value="/miso/pool/${fn:toLowerCase(run.platformType.key)}/${partition.pool.id}"/>'>
                                                         ${partition.pool.name}
                                                     (${partition.pool.creationDate})
                                                 </a><br/>
@@ -529,7 +529,7 @@
                                                                 <input type="hidden"
                                                                        name="sequencerPartitionContainers[${containerCount.index}].partitions[${partitionCount.index}].pool"
                                                                        id="pId${partitionCount.index}"
-                                                                       value="${partition.pool.poolId}"/>
+                                                                       value="${partition.pool.id}"/>
                                                             </c:when>
                                                             <c:otherwise>
                                                                 <i>No experiment linked to this pool</i>
@@ -551,14 +551,14 @@
                                 </td>
                                 <c:if test="${statsAvailable}">
                                     <td><img id = "charttrigger"  src="<c:url value='/styles/images/chart-bar-icon.png'/>" border="0"
-                                             onclick="Stats.getPartitionStats(${run.runId}, ${partition.partitionNumber}); checkstats(${run.runId}, ${partition.partitionNumber}); ">
+                                             onclick="Stats.getPartitionStats(${run.id}, ${partition.partitionNumber}); checkstats(${run.id}, ${partition.partitionNumber}); ">
                                     </td>
                                 </c:if>
                             </tr>
                         </c:forEach>
                     </table>
                 </div>
-                <input type="hidden" value="${container.containerId}"
+                <input type="hidden" value="${container.id}"
                        id="sequencerPartitionContainers${containerCount.count-1}"
                        name="sequencerPartitionContainers"/>
             </div>
@@ -633,7 +633,7 @@
         </c:choose>
 
         <c:if test="${statsAvailable}">
-        Stats.getRunStats(${run.runId});
+        Stats.getRunStats(${run.id});
         </c:if>
     });
 

@@ -53,7 +53,7 @@ import java.util.*;
 @Entity
 @Table(name = "`Run`")
 public abstract class AbstractRun implements Run {
-  public static final Long UNSAVED_ID = null;
+  public static final Long UNSAVED_ID = 0L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -92,12 +92,23 @@ public abstract class AbstractRun implements Run {
   private Set<MisoListener> listeners = new HashSet<MisoListener>();
   private Set<User> watchers = new HashSet<User>();
 
+  @Deprecated
   public Long getRunId() {
     return runId;
   }
 
+  @Deprecated
   public void setRunId(Long runId) {
     this.runId = runId;
+  }
+
+  @Override
+  public long getId() {
+    return runId;
+  }
+
+  public void setId(long id) {
+    this.runId = id;
   }
 
   public SequencerReference getSequencerReference() {
@@ -292,7 +303,7 @@ public abstract class AbstractRun implements Run {
   }
 
   protected void fireRunStartedEvent() {
-    if (this.getRunId() != null) {
+    if (this.getId() != 0L) {
       RunEvent re = new RunEvent(this, MisoEventType.RUN_STARTED, "Run started");
       for (MisoListener listener : getListeners()) {
         listener.stateChanged(re);
@@ -301,7 +312,7 @@ public abstract class AbstractRun implements Run {
   }
 
   protected void fireRunCompletedEvent() {
-    if (this.getRunId() != null) {
+    if (this.getId() != 0L) {
       RunEvent re = new RunEvent(this, MisoEventType.RUN_COMPLETED, "Run completed");
       for (MisoListener listener : getListeners()) {
         listener.stateChanged(re);
@@ -310,7 +321,7 @@ public abstract class AbstractRun implements Run {
   }
 
   protected void fireRunFailedEvent() {
-    if (this.getRunId() != null) {
+    if (this.getId() != 0L) {
       RunEvent re = new RunEvent(this, MisoEventType.RUN_FAILED, "Run failed");
       for (MisoListener listener : getListeners()) {
         listener.stateChanged(re);
@@ -319,7 +330,7 @@ public abstract class AbstractRun implements Run {
   }
 
   protected void fireStatusChangedEvent() {
-    if (this.getRunId() != null) {
+    if (this.getId() != 0L) {
       StatusChangedEvent<Run> event = new StatusChangedEvent<Run>(this, getStatus());
       for (MisoListener listener : getListeners()) {
         listener.stateChanged(event);
@@ -328,7 +339,7 @@ public abstract class AbstractRun implements Run {
   }
 
   protected void fireRunQcAddedEvent() {
-    if (this.getRunId() != null) {
+    if (this.getId() != 0L) {
       RunEvent re = new RunEvent(this, MisoEventType.RUN_QC_ADDED, "Run QC added");
       for (MisoListener listener : getListeners()) {
         listener.stateChanged(re);
@@ -362,7 +373,7 @@ public abstract class AbstractRun implements Run {
   }
 
   public boolean isDeletable() {
-    return getRunId() != AbstractQC.UNSAVED_ID;
+    return getId() != AbstractQC.UNSAVED_ID;
   }
 
   /**
@@ -379,19 +390,19 @@ public abstract class AbstractRun implements Run {
     Run them = (Run) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
-    if (getRunId() == AbstractRun.UNSAVED_ID
-        || them.getRunId() == AbstractRun.UNSAVED_ID) {
+    if (getId() == AbstractRun.UNSAVED_ID
+        || them.getId() == AbstractRun.UNSAVED_ID) {
       return getAlias().equals(them.getAlias()); //&& this.getDescription().equals(them.getDescription());
     }
     else {
-      return getRunId().longValue() == them.getRunId().longValue();
+      return getId() == them.getId();
     }
   }
 
   @Override
   public int hashCode() {
-    if (getRunId() != AbstractRun.UNSAVED_ID) {
-      return getRunId().intValue();
+    if (getId() != AbstractRun.UNSAVED_ID) {
+      return (int)getId();
     }
     else {
       final int PRIME = 37;
@@ -406,8 +417,8 @@ public abstract class AbstractRun implements Run {
   @Override
   public int compareTo(Object o) {
     Run t = (Run)o;
-    if (getRunId() < t.getRunId()) return -1;
-    if (getRunId() > t.getRunId()) return 1;
+    if (getId() < t.getId()) return -1;
+    if (getId() > t.getId()) return 1;
     return 0;
   }
 

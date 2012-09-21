@@ -138,22 +138,22 @@ public class SQLRunQCDAO implements RunQcStore {
   @Transactional(readOnly = false, rollbackFor = IOException.class)
   public long save(RunQC runQC) throws IOException {
     MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("run_runId", runQC.getRun().getRunId())
+    params.addValue("run_runId", runQC.getRun().getId())
             .addValue("qcUserName", runQC.getQcCreator())
             .addValue("qcDate", runQC.getQcDate())
             .addValue("qcMethod", runQC.getQcType().getQcTypeId())
             .addValue("information", runQC.getInformation())
             .addValue("doNotProcess", runQC.getDoNotProcess());
 
-    if (runQC.getQcId() == AbstractQC.UNSAVED_ID) {
+    if (runQC.getId() == AbstractQC.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
                               .withTableName(TABLE_NAME)
                               .usingGeneratedKeyColumns("qcId");
       Number newId = insert.executeAndReturnKey(params);
-      runQC.setQcId(newId.longValue());
+      runQC.setId(newId.longValue());
     }
     else {
-      params.addValue("qcId", runQC.getQcId());
+      params.addValue("qcId", runQC.getId());
       NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
       namedTemplate.update(RUN_QC_UPDATE, params);
     }
@@ -163,8 +163,8 @@ public class SQLRunQCDAO implements RunQcStore {
               .withTableName("RunQC_Partition");
 
       MapSqlParameterSource poParams = new MapSqlParameterSource();
-      poParams.addValue("runQc_runQcId", runQC.getQcId())
-              .addValue("containers_containerId", p.getSequencerPartitionContainer().getContainerId())
+      poParams.addValue("runQc_runQcId", runQC.getId())
+              .addValue("containers_containerId", p.getSequencerPartitionContainer().getId())
               .addValue("partitionNumber", p.getPartitionNumber());
       try {
         pInsert.execute(poParams);
@@ -182,18 +182,18 @@ public class SQLRunQCDAO implements RunQcStore {
       else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (r != null) {
           Cache pc = cacheManager.getCache("runCache");
-          pc.remove(DbUtils.hashCodeCacheKeyFor(r.getRunId()));
+          pc.remove(DbUtils.hashCodeCacheKeyFor(r.getId()));
         }
       }
       else if (this.cascadeType.equals(CascadeType.ALL)) {
         if (r != null) {
           runDAO.save(r);
           Cache pc = cacheManager.getCache("runCache");
-          pc.remove(DbUtils.hashCodeCacheKeyFor(r.getRunId()));
+          pc.remove(DbUtils.hashCodeCacheKeyFor(r.getId()));
         }
       }
     }
-    return runQC.getQcId();
+    return runQC.getId();
   }
 
   public RunQC get(long qcId) throws IOException {
@@ -240,7 +240,7 @@ public class SQLRunQCDAO implements RunQcStore {
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
     if (qc.isDeletable() &&
            (namedTemplate.update(RUN_QC_DELETE,
-                                 new MapSqlParameterSource().addValue("qcId", qc.getQcId())) == 1)) {
+                                 new MapSqlParameterSource().addValue("qcId", qc.getId())) == 1)) {
       Run r = qc.getRun();
       if (this.cascadeType.equals(CascadeType.PERSIST)) {
         if (r!=null) runDAO.save(r);
@@ -248,7 +248,7 @@ public class SQLRunQCDAO implements RunQcStore {
       else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (r != null) {
           Cache pc = cacheManager.getCache("runCache");
-          pc.remove(DbUtils.hashCodeCacheKeyFor(r.getRunId()));
+          pc.remove(DbUtils.hashCodeCacheKeyFor(r.getId()));
         }
       }
       return true;
@@ -277,7 +277,7 @@ public class SQLRunQCDAO implements RunQcStore {
   public class LazyRunQcMapper implements RowMapper<RunQC> {
     public RunQC mapRow(ResultSet rs, int rowNum) throws SQLException {
       RunQC s = dataObjectFactory.getRunQC();
-      s.setQcId(rs.getLong("qcId"));
+      s.setId(rs.getLong("qcId"));
       s.setQcCreator(rs.getString("qcUserName"));
       s.setQcDate(rs.getDate("qcDate"));
       s.setInformation(rs.getString("information"));
@@ -298,7 +298,7 @@ public class SQLRunQCDAO implements RunQcStore {
   public class RunQcMapper implements RowMapper<RunQC> {
     public RunQC mapRow(ResultSet rs, int rowNum) throws SQLException {
       RunQC s = dataObjectFactory.getRunQC();
-      s.setQcId(rs.getLong("qcId"));
+      s.setId(rs.getLong("qcId"));
       s.setQcCreator(rs.getString("qcUserName"));
       s.setQcDate(rs.getDate("qcDate"));
       s.setInformation(rs.getString("information"));

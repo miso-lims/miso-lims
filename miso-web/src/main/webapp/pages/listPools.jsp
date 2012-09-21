@@ -81,7 +81,7 @@
     </thead>
     <tbody>
     <c:forEach items="${illuminaPools}" var="ipool">
-      <tr poolId="${ipool.poolId}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
+      <tr poolId="${ipool.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
         <td>${ipool.name}</td>
         <td>${ipool.alias}</td>
         <td>${ipool.creationDate}</td>
@@ -101,10 +101,10 @@
         </td>
 
         <td>
-          <div id="average${ipool.poolId}" class="averageInsertSize"></div>
+          <div id="average${ipool.id}" class="averageInsertSize"></div>
         </td>
         <td class="misoicon"
-            onclick="window.location.href='<c:url value="/miso/pool/illumina/${ipool.poolId}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
+            onclick="window.location.href='<c:url value="/miso/pool/illumina/${ipool.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
       </tr>
 
     </c:forEach>
@@ -166,7 +166,7 @@
     </thead>
     <tbody>
     <c:forEach items="${ls454Pools}" var="lpool">
-      <tr poolId="${lpool.poolId}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
+      <tr poolId="${lpool.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
         <td>${lpool.name}</td>
         <td>${lpool.alias}</td>
         <td>${lpool.creationDate}</td>
@@ -185,10 +185,10 @@
           </c:if>
         </td>
         <td>
-          <div id="average${lpool.poolId}" class="averageInsertSize"></div>
+          <div id="average${lpool.id}" class="averageInsertSize"></div>
         </td>
         <td class="misoicon"
-            onclick="window.location.href='<c:url value="/miso/pool/ls454/${lpool.poolId}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
+            onclick="window.location.href='<c:url value="/miso/pool/ls454/${lpool.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
       </tr>
 
     </c:forEach>
@@ -251,7 +251,7 @@
     </thead>
     <tbody>
     <c:forEach items="${solidPools}" var="spool">
-      <tr poolId="${spool.poolId}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
+      <tr poolId="${spool.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
         <td>${spool.name}</td>
         <td>${spool.alias}</td>
         <td>${spool.creationDate}</td>
@@ -270,10 +270,10 @@
           </c:if>
         </td>
         <td>
-          <div id="average${spool.poolId}" class="averageInsertSize"></div>
+          <div id="average${spool.id}" class="averageInsertSize"></div>
         </td>
         <td class="misoicon"
-            onclick="window.location.href='<c:url value="/miso/pool/solid/${spool.poolId}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
+            onclick="window.location.href='<c:url value="/miso/pool/solid/${spool.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
       </tr>
 
     </c:forEach>

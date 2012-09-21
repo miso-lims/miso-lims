@@ -94,9 +94,9 @@
             <td>${project.description}</td>
             <td>${project.progress}</td>
             <td align="center" valign="center">
-                <div id="pro${project.projectId}overview" class="overviewstat"></div>
+                <div id="pro${project.id}overview" class="overviewstat"></div>
             </td>
-            <td class="misoicon" onclick="window.location.href='<c:url value="/miso/project/${project.projectId}"/>'">
+            <td class="misoicon" onclick="window.location.href='<c:url value="/miso/project/${project.id}"/>'">
                 <span class="ui-icon ui-icon-pencil"/></td>
         </tr>
     </c:forEach>

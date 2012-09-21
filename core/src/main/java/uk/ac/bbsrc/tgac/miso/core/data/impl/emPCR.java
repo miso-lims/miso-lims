@@ -26,6 +26,7 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
+import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
@@ -44,8 +45,8 @@ import java.util.HashSet;
  * @author Rob Davey
  * @since 0.0.2
  */
-public class emPCR implements SecurableByProfile, Comparable, Deletable {
-  public static final Long UNSAVED_ID = null;
+public class emPCR implements SecurableByProfile, Comparable, Deletable, Nameable {
+  public static final Long UNSAVED_ID = 0L;
 
   public static final String UNITS = "beads/&#181;l";
 
@@ -80,12 +81,23 @@ public class emPCR implements SecurableByProfile, Comparable, Deletable {
     setSecurityProfile(new SecurityProfile(user));
   }
 
+  @Deprecated
   public Long getPcrId() {
-    return this.pcrId;
+    return pcrId;
   }
 
+  @Deprecated
   public void setPcrId(Long pcrId) {
     this.pcrId = pcrId;
+  }
+
+  @Override
+  public long getId() {
+    return pcrId;
+  }
+
+  public void setId(long id) {
+    this.pcrId = id;
   }
 
   public Double getConcentration() {
@@ -187,7 +199,7 @@ public class emPCR implements SecurableByProfile, Comparable, Deletable {
   }
 
   public boolean isDeletable() {
-    return getPcrId() != emPCR.UNSAVED_ID;
+    return getId() != emPCR.UNSAVED_ID;
   }
 
   /**
@@ -205,20 +217,20 @@ public class emPCR implements SecurableByProfile, Comparable, Deletable {
     emPCR them = (emPCR) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
-    if (getPcrId() == emPCR.UNSAVED_ID
-        || them.getPcrId() == emPCR.UNSAVED_ID) {
+    if (getId() == emPCR.UNSAVED_ID
+        || them.getId() == emPCR.UNSAVED_ID) {
       return getName().equals(them.getName()) &&
              getConcentration().equals(them.getConcentration());
     }
     else {
-      return getPcrId() == them.getPcrId();
+      return getId() == them.getId();
     }
   }
 
   @Override
   public int hashCode() {
-    if (getPcrId() != emPCR.UNSAVED_ID) {
-      return getPcrId().intValue();
+    if (getId() != emPCR.UNSAVED_ID) {
+      return (int)getId();
     }
     else {
       int hashcode = -1;
@@ -231,8 +243,8 @@ public class emPCR implements SecurableByProfile, Comparable, Deletable {
   @Override
   public int compareTo(Object o) {
     emPCR t = (emPCR)o;
-    if (getPcrId() < t.getPcrId()) return -1;
-    if (getPcrId() > t.getPcrId()) return 1;
+    if (getId() < t.getId()) return -1;
+    if (getId() > t.getId()) return 1;
     return 0;
   }
 }

@@ -37,7 +37,7 @@ import java.util.HashSet;
  * @since 0.0.2
  */
 public abstract class AbstractKit implements Kit {
-  public static final Long UNSAVED_ID = null;
+  public static final Long UNSAVED_ID = 0L;
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long kitId = AbstractKit.UNSAVED_ID;
@@ -51,12 +51,23 @@ public abstract class AbstractKit implements Kit {
   private Date kitDate;
   private KitDescriptor kitDescriptor;
 
+  @Deprecated
   public Long getKitId() {
     return kitId;
   }
 
+  @Deprecated
   public void setKitId(Long kitId) {
     this.kitId = kitId;
+  }
+
+  @Override
+  public long getId() {
+    return kitId;
+  }
+
+  public void setId(long id) {
+    this.kitId = id;
   }
 
   public String getLotNumber() {
@@ -111,6 +122,7 @@ public abstract class AbstractKit implements Kit {
     this.locationBarcode = locationBarcode;
   }
 
+  @Override
   public String getName() {
     return getKitDescriptor().getName();
   }
@@ -122,15 +134,15 @@ public abstract class AbstractKit implements Kit {
   @Override
   public int compareTo(Object o) {
     Kit t = (Kit)o;
-    if (getKitId() < t.getKitId()) return -1;
-    if (getKitId() > t.getKitId()) return 1;
+    if (getId() < t.getId()) return -1;
+    if (getId() > t.getId()) return 1;
     return 0;
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append(getKitId());
+    sb.append(getId());
     sb.append(" : ");
     sb.append(getLotNumber());
     sb.append(" : ");

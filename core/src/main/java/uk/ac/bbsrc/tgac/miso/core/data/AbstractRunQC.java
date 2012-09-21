@@ -93,21 +93,21 @@ public abstract class AbstractRunQC extends AbstractQC implements RunQC {
     RunQC them = (RunQC) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
-    if (this.getQcId() == AbstractRunQC.UNSAVED_ID
-        || them.getQcId() == AbstractRunQC.UNSAVED_ID) {
+    if (this.getId() == AbstractRunQC.UNSAVED_ID
+        || them.getId() == AbstractRunQC.UNSAVED_ID) {
       return this.getQcCreator().equals(them.getQcCreator())
              && this.getQcDate().equals(them.getQcDate())
              && this.getQcType().equals(them.getQcType());
     }
     else {
-      return this.getQcId().longValue() == them.getQcId().longValue();
+      return this.getId() == them.getId();
     }
   }
 
   @Override
   public int hashCode() {
-    if (getQcId() != AbstractRunQC.UNSAVED_ID) {
-      return getQcId().intValue();
+    if (getId() != AbstractRunQC.UNSAVED_ID) {
+      return (int)getId();
     }
     else {
       final int PRIME = 37;
@@ -117,9 +117,5 @@ public abstract class AbstractRunQC extends AbstractQC implements RunQC {
       if (getQcType() != null) hashcode = PRIME * hashcode + getQcType().hashCode();
       return hashcode;
     }
-  }
-
-  public int compareTo(Object o) {
-    return this.equals(o) ? 0 : 1;
   }
 }

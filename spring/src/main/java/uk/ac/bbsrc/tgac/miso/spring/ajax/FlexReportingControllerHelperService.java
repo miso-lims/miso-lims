@@ -267,8 +267,8 @@ public class FlexReportingControllerHelperService {
     if (sample.getQcPassed() != null) {
       qc = sample.getQcPassed().toString();
     }
-    return "['<input class=\"chkboxsamples\" id=\"" + sample.getSampleId() +
-           "\" type=\"checkbox\" name=\"sampleIds\" value=\"" + sample.getSampleId() + "\" id=\"" + sample.getSampleId() + "\"/>','"
+    return "['<input class=\"chkboxsamples\" id=\"" + sample.getId() +
+           "\" type=\"checkbox\" name=\"sampleIds\" value=\"" + sample.getId() + "\" id=\"" + sample.getId() + "\"/>','"
            + sample.getName() + "','"
            + sample.getAlias() + "','"
            + sample.getDescription() + "','"
@@ -452,8 +452,8 @@ public class FlexReportingControllerHelperService {
   }
 
   public String libraryFormRowBuilder(Library library) {
-    return "['<input class=\"chkboxlibraries\" id=\"" + library.getLibraryId() +
-           "\" type=\"checkbox\" name=\"libraryIds\" value=\"" + library.getLibraryId() + "\" id=\"" + library.getLibraryId() + "\"/>','"
+    return "['<input class=\"chkboxlibraries\" id=\"" + library.getId() +
+           "\" type=\"checkbox\" name=\"libraryIds\" value=\"" + library.getId() + "\" id=\"" + library.getId() + "\"/>','"
            + library.getName() + "','"
            + library.getAlias() + "','"
            + library.getDescription() + "','"
@@ -637,7 +637,7 @@ public class FlexReportingControllerHelperService {
   }
 
   public String runFormRowBuilder(Run run) {
-    return "['<input class=\"chkboxruns\" id=\"" + run.getRunId() + "\" type=\"checkbox\" name=\"runIds\" value=\"" + run.getRunId() + "\" id=\"" + run.getRunId() + "\"/>','"
+    return "['<input class=\"chkboxruns\" id=\"" + run.getId() + "\" type=\"checkbox\" name=\"runIds\" value=\"" + run.getId() + "\" id=\"" + run.getId() + "\"/>','"
            + run.getName() + "','"
            + run.getAlias() + "','"
            + run.getStatus().getHealth().getKey() + "','"
@@ -803,7 +803,7 @@ public class FlexReportingControllerHelperService {
         JSONArray substudiesArray = new JSONArray();
         substudyJSON.put("name", study.getName());
         substudyJSON.put("description", study.getAlias());
-        Collection<Experiment> experiments = requestManager.listAllExperimentsByStudyId(study.getStudyId());
+        Collection<Experiment> experiments = requestManager.listAllExperimentsByStudyId(study.getId());
         if (experiments.size() > 0) {
           JSONObject experimentJSON = new JSONObject();
           JSONArray experimentsArray = new JSONArray();
@@ -832,7 +832,7 @@ public class FlexReportingControllerHelperService {
       sampleJSON.put("name", "Samples");
       sampleJSON.put("description", "");
       for (Sample sample : samples) {
-        Collection<Library> libraries = requestManager.listAllLibrariesBySampleId(sample.getSampleId());
+        Collection<Library> libraries = requestManager.listAllLibrariesBySampleId(sample.getId());
         if (libraries.size() == 0) {
           if (sample.getQcPassed()) {
             samplesArray.add(JSONObject.fromObject("{'name': '" + sample.getName() + "','description':'" + sample.getAlias() + "','color': '1'}"));

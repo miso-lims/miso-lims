@@ -43,11 +43,14 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.PartitionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
+import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 import javax.persistence.CascadeType;
 import java.io.IOException;
@@ -71,6 +74,9 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
 
   private static final String SEQUENCER_PARTITION_CONTAINER_SELECT =
           "SELECT containerId, platformType, identificationBarcode, locationBarcode, validationBarcode, securityProfile_profileId FROM " + TABLE_NAME;
+
+  public static final String SEQUENCER_PARTITION_CONTAINER_DELETE =
+          "DELETE FROM "+TABLE_NAME+" WHERE containerId=:containerId";
 
   private static final String SEQUENCER_PARTITION_CONTAINER_SELECT_BY_ID =
           SEQUENCER_PARTITION_CONTAINER_SELECT + " WHERE containerId=?";
@@ -111,6 +117,19 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
   private Store<SecurityProfile> securityProfileDAO;
   private JdbcTemplate template;
   private CascadeType cascadeType;
+
+  @Autowired
+  private MisoNamingScheme<SequencerPartitionContainer<SequencerPoolPartition>> namingScheme;
+
+  @Override
+  public MisoNamingScheme<SequencerPartitionContainer<SequencerPoolPartition>> getNamingScheme() {
+    return namingScheme;
+  }
+
+  @Override
+  public void setNamingScheme(MisoNamingScheme<SequencerPartitionContainer<SequencerPoolPartition>> namingScheme) {
+    this.namingScheme = namingScheme;
+  }
 
   @Autowired
   private CacheManager cacheManager;
@@ -234,7 +253,7 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
   }
 
   private void fillInRun(SequencerPartitionContainer<SequencerPoolPartition> container) throws IOException {
-    container.setRun(runDAO.getLatestRunIdRunBySequencerPartitionContainerId(container.getContainerId()));
+    container.setRun(runDAO.getLatestRunIdRunBySequencerPartitionContainerId(container.getId()));
   }
 
   private void fillInRun(SequencerPartitionContainer<SequencerPoolPartition> container, long runId) throws IOException {
@@ -291,17 +310,58 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
       params.addValue("platformType", sequencerPartitionContainer.getPlatformType().getKey());
     }
 
-    if (sequencerPartitionContainer.getContainerId() == AbstractSequencerPartitionContainer.UNSAVED_ID) {
+    if (sequencerPartitionContainer.getId() == AbstractSequencerPartitionContainer.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
               .withTableName(TABLE_NAME)
               .usingGeneratedKeyColumns("containerId");
+      try {
+        sequencerPartitionContainer.setId(DbUtils.getAutoIncrement(template, TABLE_NAME));
+
+        String name = namingScheme.generateNameFor("name", sequencerPartitionContainer);
+        sequencerPartitionContainer.setName(name);
+
+        if (namingScheme.validateField("name", sequencerPartitionContainer.getName())) {
+          params.addValue("name", name);
+
+          Number newId = insert.executeAndReturnKey(params);
+          if (newId.longValue() != sequencerPartitionContainer.getId()) {
+            log.error("Expected SequencerPartitionContainer ID doesn't match returned value from database insert: rolling back...");
+            new NamedParameterJdbcTemplate(template).update(SEQUENCER_PARTITION_CONTAINER_DELETE, new MapSqlParameterSource().addValue("containerId", sequencerPartitionContainer.getId()));
+            throw new IOException("Something bad happened. Expected SequencerPartitionContainer ID doesn't match returned value from DB insert");
+          }
+        }
+        else {
+          throw new IOException("Cannot save SequencerPartitionContainer - invalid field:" + sequencerPartitionContainer.toString());
+        }
+      }
+      catch (MisoNamingException e) {
+        throw new IOException("Cannot save SequencerPartitionContainer - issue with naming scheme", e);
+      }
+      /*
       Number newId = insert.executeAndReturnKey(params);
       sequencerPartitionContainer.setContainerId(newId.longValue());
+      */
     }
     else {
+      try {
+        if (namingScheme.validateField("name", sequencerPartitionContainer.getName())) {
+          params.addValue("containerId", sequencerPartitionContainer.getId())
+                .addValue("name", sequencerPartitionContainer.getName());
+          NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+          namedTemplate.update(SEQUENCER_PARTITION_CONTAINER_UPDATE, params);
+        }
+        else {
+          throw new IOException("Cannot save SequencerPartitionContainer - invalid field:" + sequencerPartitionContainer.toString());
+        }
+      }
+      catch (MisoNamingException e) {
+        throw new IOException("Cannot save SequencerPartitionContainer - issue with naming scheme", e);
+      }
+      /*
       params.addValue("containerId", sequencerPartitionContainer.getContainerId());
       NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
       namedTemplate.update(SEQUENCER_PARTITION_CONTAINER_UPDATE, params);
+      */
     }
 
     //MapSqlParameterSource delparams = new MapSqlParameterSource();
@@ -322,7 +382,7 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
         //log.info(sequencerPartitionContainer.getName()+":: Saved partition " + l.getPartitionNumber() + " ("+partitionId+")");
 
         MapSqlParameterSource flParams = new MapSqlParameterSource();
-        flParams.addValue("container_containerId", sequencerPartitionContainer.getContainerId())
+        flParams.addValue("container_containerId", sequencerPartitionContainer.getId())
                 .addValue("partitions_partitionId", partitionId);
         try {
           eInsert.execute(flParams);
@@ -337,7 +397,7 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
       purgeListCache(sequencerPartitionContainer);
     }
 
-    return sequencerPartitionContainer.getContainerId();
+    return sequencerPartitionContainer.getId();
   }
 
   public class LazySequencerPartitionContainerMapper<T extends SequencerPartitionContainer<SequencerPoolPartition>> implements RowMapper<T> {
@@ -345,7 +405,7 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
       SequencerPartitionContainer<SequencerPoolPartition> s = null;
       try {
         s = dataObjectFactory.getSequencerPartitionContainer();
-        s.setContainerId(rs.getLong("containerId"));
+        s.setId(rs.getLong("containerId"));
         List<SequencerPoolPartition> partitions = new ArrayList<SequencerPoolPartition>(partitionDAO.listBySequencerPartitionContainerId(rs.getLong("containerId")));
         for (SequencerPoolPartition part : partitions) {
           part.setSequencerPartitionContainer(s);
@@ -376,7 +436,7 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
       SequencerPartitionContainer<SequencerPoolPartition> s = null;
       try {
         s = dataObjectFactory.getSequencerPartitionContainer();
-        s.setContainerId(rs.getLong("containerId"));
+        s.setId(rs.getLong("containerId"));
         Collection<SequencerPoolPartition> partitions = partitionDAO.listBySequencerPartitionContainerId(rs.getLong("containerId"));
         s.setPartitions(new ArrayList<SequencerPoolPartition>(partitions));
 

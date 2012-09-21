@@ -54,7 +54,7 @@ public class UserImpl implements User, Serializable, Comparable {
    * Use this ID to indicate that a user has not yet been saved, and therefore
    * does not yet have a unique ID.
    */
-  public static final Long UNSAVED_ID = null;
+  public static final Long UNSAVED_ID = 0L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)

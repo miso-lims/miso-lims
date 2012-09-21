@@ -55,7 +55,7 @@
             <c:forEach items="${submissions}" var="submission">
                 <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
                     <td class="fit">
-                            ${submission.submissionId}
+                            ${submission.id}
                     </td>
                     <td class="fit">
                             ${submission.creationDate}
@@ -84,7 +84,7 @@
                             ${submission.completed}
                     </td>
                     <td class="misoicon"
-                        onclick="window.location.href='<c:url value="/miso/submission/${submission.submissionId}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
+                        onclick="window.location.href='<c:url value="/miso/submission/${submission.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
                 </tr>
             </c:forEach>
             </tbody>

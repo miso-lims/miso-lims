@@ -78,7 +78,7 @@ Library.qc = {
       var column6=$('libraryQcTable').rows[1].insertCell(-1);
       column6.innerHTML="<input id='libraryQcInsertSize' name='libraryQcInsertSize' type='text'/> bp";
       var column7=$('libraryQcTable').rows[1].insertCell(-1);
-      column7.innerHTML="<a href='javascript:void(0);' onclick='Library.qc.addLibraryQC(\"addQcForm\");'/>Add</a>";
+      column7.innerHTML="<a href='javascript:void(0);' onclick='Library.qc.addLibraryQC();'/>Add</a>";
 
       Utils.ui.addMaxDatePicker("libraryQcDate", 0);
 
@@ -102,19 +102,18 @@ Library.qc = {
     jQuery('#units').html(jQuery('#libraryQcType').find(":selected").attr("units"));
   },
 
-  addLibraryQC : function(form) {
-    var f = $(form);
-    var tindex = f.libraryQcType.selectedIndex;
+  addLibraryQC : function() {
+    var f = Utils.mappifyForm("addQcForm");
     Fluxion.doAjax(
       'libraryControllerHelperService',
       'addLibraryQC',
       {
-        'libraryId':f.libraryId.value,
-        'qcCreator':f.libraryQcUser.value,
-        'qcDate':f.libraryQcDate.value,
-        'qcType':f.libraryQcType.options[tindex].value,
-        'results':f.libraryQcResults.value,
-        'insertSize':f.libraryQcInsertSize.value,
+        'libraryId':f.id,
+        'qcCreator':f.libraryQcUser,
+        'qcDate':f.libraryQcDate,
+        'qcType':f.libraryQcType,
+        'results':f.libraryQcResults,
+        'insertSize':f.libraryQcInsertSize,
         'url':ajaxurl
       },
       {'updateElement':'libraryQcTable',
@@ -182,7 +181,7 @@ Library.dilution = {
       var column7=$('libraryDilutionTable').rows[1].insertCell(-1);
       column7.innerHTML="<i>Generated on save</i>";
       var column8=$('libraryDilutionTable').rows[1].insertCell(-1);
-      column8.innerHTML="<a href='javascript:void(0);' onclick='Library.dilution.addLibraryDilution(\"addDilutionForm\");'/>Add</a>";
+      column8.innerHTML="<a href='javascript:void(0);' onclick='Library.dilution.addLibraryDilution();'/>Add</a>";
 
       Utils.ui.addMaxDatePicker("libraryDilutionDate", 0);
     }
@@ -191,17 +190,17 @@ Library.dilution = {
     }
   },
 
-  addLibraryDilution : function(form) {
-    var f = $(form);
+  addLibraryDilution : function() {
+    var f = Utils.mappifyForm("addDilutionForm");
     Fluxion.doAjax(
       'libraryControllerHelperService',
       'addLibraryDilution',
     {
-      'libraryId':f.libraryId.value,
-      'dilutionCreator':f.libraryDilutionCreator.value,
-      'dilutionDate':f.libraryDilutionDate.value,
+      'libraryId':f.id,
+      'dilutionCreator':f.libraryDilutionCreator,
+      'dilutionDate':f.libraryDilutionDate,
       //'locationBarcode':f.libraryDilutionBarcode.value,
-      'results':f.libraryDilutionResults.value,
+      'results':f.libraryDilutionResults,
       'url':ajaxurl},
     {'updateElement':'libraryDilutionTable',
      'doOnSuccess':function(json) {
@@ -273,7 +272,7 @@ Library.empcr = {
       var column5=$('emPcrTable').rows[1].insertCell(-1);
       column5.innerHTML="<input id='emPcrResults' name='emPcrResults' type='text'/>";
       var column6=$('emPcrTable').rows[1].insertCell(-1);
-      column6.innerHTML="<a href='javascript:void(0);' onclick='Library.empcr.addEmPcr(\"addEmPcrForm\");'/>Add</a>";
+      column6.innerHTML="<a href='javascript:void(0);' onclick='Library.empcr.addEmPcr();'/>Add</a>";
 
       Utils.ui.addMaxDatePicker("emPcrDate", 0);
     }
@@ -282,16 +281,16 @@ Library.empcr = {
     }
   },
 
-  addEmPcr : function(form) {
-    var f = $(form);
+  addEmPcr : function() {
+    var f = Utils.mappifyForm("addEmPcrForm");
     Fluxion.doAjax(
       'libraryControllerHelperService',
       'addEmPcr',
     {
-      'dilutionId':f.dilutionId.value,
-      'pcrCreator':f.emPcrCreator.value,
-      'pcrDate':f.emPcrDate.value,
-      'results':f.emPcrResults.value,
+      'dilutionId':f.dilutionId,
+      'pcrCreator':f.emPcrCreator,
+      'pcrDate':f.emPcrDate,
+      'results':f.emPcrResults,
       'url':ajaxurl},
     {'updateElement':'emPcrTable',
      'doOnSuccess':function(json) {
@@ -320,7 +319,7 @@ Library.empcr = {
       var column6=$('emPcrDilutionTable').rows[1].insertCell(-1);
       column6.innerHTML="<input id='emPcrDilutionResults' name='emPcrDilutionResults' type='text'/>";
       var column7=$('emPcrDilutionTable').rows[1].insertCell(-1);
-      column7.innerHTML="<a href='javascript:void(0);' onclick='Library.empcr.addEmPcrDilution(\"addEmPcrDilutionForm\");'/>Add</a>";
+      column7.innerHTML="<a href='javascript:void(0);' onclick='Library.empcr.addEmPcrDilution();'/>Add</a>";
 
       Utils.ui.addMaxDatePicker("emPcrDilutionDate", 0);
     }
@@ -330,16 +329,16 @@ Library.empcr = {
   },
 
   addEmPcrDilution : function(form) {
-    var f = $(form);
+    var f = Utils.mappifyForm("addEmPcrDilutionForm");
     Fluxion.doAjax(
       'libraryControllerHelperService',
       'addEmPcrDilution',
     {
-      'pcrId':f.emPcrId.value,
-      'pcrDilutionCreator':f.emPcrDilutionCreator.value,
-      'pcrDilutionDate':f.emPcrDilutionDate.value,
+      'pcrId':f.emPcrId,
+      'pcrDilutionCreator':f.emPcrDilutionCreator,
+      'pcrDilutionDate':f.emPcrDilutionDate,
       //'pcrDilutionBarcode':f.emPcrDilutionBarcode.value,
-      'results':f.emPcrDilutionResults.value,
+      'results':f.emPcrDilutionResults,
       'url':ajaxurl},
     {'updateElement':'emPcrDilutionTable',
      'doOnSuccess':function(json) {

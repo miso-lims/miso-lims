@@ -68,7 +68,7 @@
                 <td>${ipool.identificationBarcode}</td>
                 <td>${ipool.creationDate}</td>
                 <td class="misoicon"
-                    onclick="window.location.href='<c:url value="/miso/pool/illumina/${ipool.poolId}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
+                    onclick="window.location.href='<c:url value="/miso/pool/illumina/${ipool.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
             </tr>
         </c:forEach>
         </tbody>
@@ -96,7 +96,7 @@
                   <td>${ipool.identificationBarcode}</td>
                   <td>${ipool.creationDate}</td>
                   <td class="misoicon"
-                      onclick="window.location.href='<c:url value="/miso/pool/illumina/${ipool.poolId}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
+                      onclick="window.location.href='<c:url value="/miso/pool/illumina/${ipool.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
               </tr>
           </c:forEach>
           </tbody>
@@ -153,7 +153,7 @@
                 <td>${lpool.identificationBarcode}</td>
                 <td>${lpool.creationDate}</td>
                 <td class="misoicon"
-                    onclick="window.location.href='<c:url value="/miso/pool/ls454/${lpool.poolId}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
+                    onclick="window.location.href='<c:url value="/miso/pool/ls454/${lpool.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
             </tr>
         </c:forEach>
         </tbody>
@@ -176,12 +176,12 @@
           <tbody>
           <c:forEach items="${ls454PoolsUsed}" var="lpool">
               <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-                  <td>${lpool.poolId}</td>
+                  <td>${lpool.id}</td>
                   <td>${lpool.alias}</td>
                   <td>${lpool.identificationBarcode}</td>
                   <td>${lpool.creationDate}</td>
                   <td class="misoicon"
-                      onclick="window.location.href='<c:url value="/miso/pool/ls454/${lpool.poolId}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
+                      onclick="window.location.href='<c:url value="/miso/pool/ls454/${lpool.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
               </tr>
           </c:forEach>
           </tbody>
@@ -232,12 +232,12 @@
         <tbody>
         <c:forEach items="${solidPools}" var="spool">
             <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-                <td>${spool.poolId}</td>
+                <td>${spool.id}</td>
                 <td>${spool.alias}</td>
                 <td>${spool.identificationBarcode}</td>
                 <td>${spool.creationDate}</td>
                 <td class="misoicon"
-                    onclick="window.location.href='<c:url value="/miso/pool/solid/${spool.poolId}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
+                    onclick="window.location.href='<c:url value="/miso/pool/solid/${spool.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
             </tr>
 
         </c:forEach>
@@ -261,12 +261,12 @@
           <tbody>
           <c:forEach items="${solidPoolsUsed}" var="spool">
               <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-                  <td>${spool.poolId}</td>
+                  <td>${spool.id}</td>
                   <td>${spool.alias}</td>
                   <td>${spool.identificationBarcode}</td>
                   <td>${spool.creationDate}</td>
                   <td class="misoicon"
-                      onclick="window.location.href='<c:url value="/miso/pool/solid/${spool.poolId}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
+                      onclick="window.location.href='<c:url value="/miso/pool/solid/${spool.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
               </tr>
           </c:forEach>
           </tbody>

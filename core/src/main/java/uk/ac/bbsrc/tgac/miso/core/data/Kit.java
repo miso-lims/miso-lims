@@ -46,6 +46,7 @@ public interface Kit extends Comparable, Barcodable, Locatable {
    *
    * @return Long kitId.
    */
+  @Deprecated
   Long getKitId();
 
   /**
@@ -54,7 +55,10 @@ public interface Kit extends Comparable, Barcodable, Locatable {
    * @param kitId the id of this Kit object.
    *
    */
+  @Deprecated
   void setKitId(Long kitId);
+
+  public void setId(long id);
 
   /**
    * Returns the lotNumber of this Kit object.

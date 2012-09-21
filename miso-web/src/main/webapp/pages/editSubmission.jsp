@@ -39,13 +39,13 @@
           <sessionConversation:insertSessionConversationId attributeName="submission"/>
             <h1>
                 <c:choose>
-                    <c:when test="${not empty submission.submissionId}">Edit</c:when>
+                    <c:when test="${submission.id != 0}">Edit</c:when>
                     <c:otherwise>Create</c:otherwise>
                 </c:choose> Submission
-                <c:if test="${not empty submission.submissionId}">
-                <input type="button" value="Save" class="fg-button ui-state-default ui-corner-all" onclick="Submission.saveSubmission(${submission.submissionId},jQuery(form).serializeArray())"/>
+                <c:if test="${submission.id != 0}">
+                <input type="button" value="Save" class="fg-button ui-state-default ui-corner-all" onclick="Submission.saveSubmission(${submission.id},jQuery(form).serializeArray())"/>
                 </c:if>
-                <c:if test="${empty submission.submissionId}">
+                <c:if test="${submission.id == 0}">
                 <input type="button" value="Save" class="fg-button ui-state-default ui-corner-all" onclick="Submission.saveSubmission(-1,jQuery(form).serializeArray())"/>
                 </c:if>
             </h1>
@@ -60,7 +60,7 @@
                     <td class="h">Submission ID:</td>
                     <td>
                         <c:choose>
-                            <c:when test="${not empty submission.submissionId}">${submission.submissionId}</c:when>
+                            <c:when test="${submission.id != 0}">${submission.id}</c:when>
                             <c:otherwise><i>Unsaved</i></c:otherwise>
                         </c:choose>
                     </td>
@@ -69,7 +69,7 @@
                     <td class="h">Name:</td>
                     <td>
                         <c:choose>
-                            <c:when test="${not empty submission.submissionId}">${submission.name}</c:when>
+                            <c:when test="${submission.id != 0}">${submission.name}</c:when>
                             <c:otherwise><i>Unsaved</i></c:otherwise>
                         </c:choose>
                     </td>
@@ -106,11 +106,11 @@
                 </tr>
             </table>
 
-            <c:if test="${not empty submission.submissionId}">
-                <span style="float:right"><a href="javascript:void(0);" onclick="Submission.ui.previewSubmissionMetadata(${submission.submissionId});">Preview Raw Submission Metadata</a></span><br/>
-                <span style="float:right"><a href="javascript:void(0);" onclick="Submission.validateSubmissionMetadata(${submission.submissionId});">Validate Submission Metadata</a></span><br/>
-                <span style="float:right"><a href="javascript:void(0);" onclick="Submission.submitSubmissionMetadata(${submission.submissionId});">Submit Submission Metadata</a></span><br/>
-                <span style="float:right"><a href="javascript:void(0);" onclick="Submission.submitSequenceData(${submission.submissionId});">Submit Sequence Data</a></span>
+            <c:if test="${submission.id != 0}">
+                <span style="float:right"><a href="javascript:void(0);" onclick="Submission.ui.previewSubmissionMetadata(${submission.id});">Preview Raw Submission Metadata</a></span><br/>
+                <span style="float:right"><a href="javascript:void(0);" onclick="Submission.validateSubmissionMetadata(${submission.id});">Validate Submission Metadata</a></span><br/>
+                <span style="float:right"><a href="javascript:void(0);" onclick="Submission.submitSubmissionMetadata(${submission.id});">Submit Submission Metadata</a></span><br/>
+                <span style="float:right"><a href="javascript:void(0);" onclick="Submission.submitSequenceData(${submission.id});">Submit Sequence Data</a></span>
                  <div id="submissionreport"></div>
 
                 <c:if test="${not empty prettyMetadata}">
@@ -164,19 +164,19 @@
                         </c:choose>
                         --%>
                 <c:forEach items="${projects}" var="project">
-                    <li id="project${project.projectId}" class="jstree-closed">
-                        <c:if test="${not empty submission.submissionId}">
-                            <p style="cursor: pointer" id="projectTitle${project.projectId}" onclick="Submission.ui.populateSubmissionProject(${project.projectId},${submission.submissionId});"><strong>${project.name}</strong> : ${project.description}</p>
+                    <li id="project${project.id}" class="jstree-closed">
+                        <c:if test="${submission.id != 0}">
+                            <p style="cursor: pointer" id="projectTitle${project.id}" onclick="Submission.ui.populateSubmissionProject(${project.id},${submission.id});"><strong>${project.name}</strong> : ${project.description}</p>
                         </c:if>
-                        <c:if test="${empty submission.submissionId}">
-                            <p style="cursor: pointer" id="projectTitle${project.projectId}" onclick="Submission.ui.populateSubmissionProject(${project.projectId});"><strong>${project.name}</strong> : ${project.description}</p>
+                        <c:if test="${submission.id == 0}">
+                            <p style="cursor: pointer" id="projectTitle${project.id}" onclick="Submission.ui.populateSubmissionProject(${project.id});"><strong>${project.name}</strong> : ${project.description}</p>
                         </c:if>
-                        <ul id="projectSubmission${project.projectId}">
+                        <ul id="projectSubmission${project.id}">
 
                         <c:forEach items="${project.studies}" var="study">
-                            <li><form:checkbox id="study${study.studyId}_${project.projectId}" path="submissionElements" itemLabel="${study.name}"
+                            <li><form:checkbox id="study${study.id}_${project.id}" path="submissionElements" itemLabel="${study.name}"
                                                itemValue="${study.name}" value="${study.name}"/>
-                                <a href="<c:url value='/miso/study/${study.studyId}'/>"><b>${study.name}</b> : ${study.description}</a>
+                                <a href="<c:url value='/miso/study/${study.id}'/>"><b>${study.name}</b> : ${study.description}</a>
                               <%--
                                 <ul>
                                     <c:forEach items="${study.experiments}" var="experiment">
@@ -283,8 +283,8 @@
       "plugins" : [ "themes", "html_data" ]
     });
     */
-    <c:if test="${not empty submission.submissionId}">
-      Submission.ui.openSubmissionProjectNodes(${submission.submissionId});
+    <c:if test="${submission.id != 0}">
+      Submission.ui.openSubmissionProjectNodes(${submission.id});
     </c:if>
 	});
 </script>

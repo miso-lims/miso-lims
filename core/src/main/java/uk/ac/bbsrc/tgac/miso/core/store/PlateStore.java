@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.core.store;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Plate;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
 
 import java.io.IOException;
 
@@ -34,7 +35,7 @@ import java.io.IOException;
  * @date 12-Sep-2011
  * @since 0.1.1
  */
-public interface PlateStore extends Store<Plate>, Cascadable, Remover<Plate> {
+public interface PlateStore extends Store<Plate>, Cascadable, Remover<Plate>, NamingSchemeAware<Plate> {
   /**
    * Retrieve a Plate from an underlying data store given a Plate ID
    * <p/>

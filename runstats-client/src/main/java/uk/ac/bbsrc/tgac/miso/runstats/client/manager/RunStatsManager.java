@@ -170,7 +170,7 @@ public class RunStatsManager {
           partitions.add(part.getPartitionNumber() - 1, partition);
         }
         f.put("partitions", partitions);
-        containers.put(container.getContainerId(), f);
+        containers.put(container.getId(), f);
       }
       report.put("containers", containers);
     }

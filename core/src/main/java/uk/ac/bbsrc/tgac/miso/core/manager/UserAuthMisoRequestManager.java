@@ -363,28 +363,28 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   public Pool<? extends Poolable> getPoolByBarcode(String barcode, PlatformType platformType) throws IOException {
     Pool<? extends Poolable> o = super.getPoolByBarcode(barcode, platformType);
     if (readCheck(o)) return o;
-    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Pool " + o.getPoolId());
+    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Pool " + o.getId());
   }
 
   @Override
   public Pool<? extends Poolable> getPoolByBarcode(String barcode) throws IOException {
     Pool<? extends Poolable> o = super.getPoolByBarcode(barcode);
     if (readCheck(o)) return o;
-    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Pool " + o.getPoolId());
+    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Pool " + o.getId());
   }
 
   @Override
   public Pool<? extends Poolable> getIlluminaPoolByBarcode(String barcode) throws IOException {
     Pool<? extends Poolable> o = super.getIlluminaPoolByBarcode(barcode);
     if (readCheck(o)) return o;
-    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Pool " + o.getPoolId());
+    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Pool " + o.getId());
   }
 
   @Override
   public Pool<? extends Poolable> getIlluminaPoolById(long poolId) throws IOException {
     Pool<? extends Poolable> o = super.getIlluminaPoolById(poolId);
     if (readCheck(o)) return o;
-    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Pool " + o.getPoolId());
+    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Pool " + o.getId());
   }
 
   @Override
@@ -398,14 +398,14 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   public Library getLibraryByBarcode(String barcode) throws IOException {
     Library o = super.getLibraryByBarcode(barcode);
     if (readCheck(o)) return o;
-    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Library " + o.getLibraryId());
+    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Library " + o.getId());
   }
 
   @Override
   public Library getLibraryByAlias(String alias) throws IOException {
     Library o = super.getLibraryByAlias(alias);
     if (readCheck(o)) return o;
-    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Library " + o.getLibraryId());
+    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Library " + o.getId());
   }
 
   @Override
@@ -419,14 +419,14 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   public LibraryDilution getLibraryDilutionByBarcode(String barcode) throws IOException {
     LibraryDilution o = super.getLibraryDilutionByBarcode(barcode);
     if (readCheck(o)) return o;
-    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read LibraryDilution " + o.getDilutionId());
+    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read LibraryDilution " + o.getId());
   }
 
   @Override
   public LibraryQC getLibraryQCById(long qcId) throws IOException {
     LibraryQC o = super.getLibraryQCById(qcId);
     if (readCheck(o.getLibrary())) return o;
-    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read parent Library " + o.getLibrary().getLibraryId() + " for LibraryQC " + qcId);
+    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read parent Library " + o.getLibrary().getId() + " for LibraryQC " + qcId);
   }
 
   @Override
@@ -447,7 +447,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   public emPCRDilution getEmPcrDilutionByBarcode(String barcode) throws IOException {
     emPCRDilution o = super.getEmPcrDilutionByBarcode(barcode);
     if (readCheck(o)) return o;
-    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read emPCRDilution " + o.getDilutionId());
+    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read emPCRDilution " + o.getId());
   }
 
   @Override
@@ -468,7 +468,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   public Pool<? extends Poolable> getLS454PoolByBarcode(String barcode) throws IOException {
     Pool<? extends Poolable> o = super.getLS454PoolByBarcode(barcode);
     if (readCheck(o)) return o;
-    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read LS454Pool " + o.getPoolId());
+    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read LS454Pool " + o.getId());
   }
 
   @Override
@@ -504,14 +504,14 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   public Run getRunByAlias(String alias) throws IOException {
     Run o = super.getRunByAlias(alias);
     if (readCheck(o)) return o;
-    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Run " + o.getRunId());
+    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Run " + o.getId());
   }
 
   @Override
   public RunQC getRunQCById(long runQcId) throws IOException {
     RunQC o = super.getRunQCById(runQcId);
     if (readCheck(o.getRun())) return o;
-    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read parent Run " + o.getRun().getRunId() + " for RunQC " + runQcId);
+    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read parent Run " + o.getRun().getId() + " for RunQC " + runQcId);
   }
 
   @Override
@@ -525,14 +525,14 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   public Sample getSampleByBarcode(String barcode) throws IOException {
     Sample o = super.getSampleByBarcode(barcode);
     if (readCheck(o)) return o;
-    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Sample " + o.getSampleId());
+    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Sample " + o.getId());
   }
 
   @Override
   public SampleQC getSampleQCById(long sampleQcId) throws IOException {
     SampleQC o = super.getSampleQCById(sampleQcId);
     if (readCheck(o.getSample())) return o;
-    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read parent Run " + o.getSample().getSampleId() + " for SampleQC " + sampleQcId);
+    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read parent Run " + o.getSample().getId() + " for SampleQC " + sampleQcId);
   }
 
   @Override
@@ -546,14 +546,14 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   public Pool<? extends Poolable> getSolidPoolByBarcode(String barcode) throws IOException {
     Pool<? extends Poolable> o = super.getSolidPoolByBarcode(barcode);
     if (readCheck(o)) return o;
-    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read SolidPool " + o.getPoolId());
+    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read SolidPool " + o.getId());
   }
 
   @Override
   public Status getStatusByRunName(String runName) throws IOException {
     Run o = super.getRunByAlias(runName);
     if (readCheck(o)) return super.getStatusByRunName(runName);
-    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read parent Run " + o.getRunId() + " for Status");
+    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read parent Run " + o.getId() + " for Status");
   }
 
   @Override
@@ -577,6 +577,18 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
     User user = getCurrentUser();
     Collection<Project> accessibles = new HashSet<Project>();
     for (Project project : super.listAllProjects()) {
+      if (project.userCanRead(user)) {
+        accessibles.add(project);
+      }
+    }
+    return accessibles;
+  }
+
+  @Override
+  public Collection<Project> listAllProjectsWithLimit(long limit) throws IOException {
+    User user = getCurrentUser();
+    Collection<Project> accessibles = new HashSet<Project>();
+    for (Project project : super.listAllProjectsWithLimit(limit)) {
       if (project.userCanRead(user)) {
         accessibles.add(project);
       }
@@ -615,6 +627,29 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
     Collection<Run> runs = super.listAllRuns();
     if (runs != null) {
       for (Run run : super.listAllRuns()) {
+        if (run != null) {
+          if (run.userCanRead(user)) {
+            accessibles.add(run);
+          }
+        }
+        else {
+          log.error("WTF. Seems to be a null run in the cached list");
+        }
+      }
+    }
+    else {
+      log.error("WTF. Run list coming from cache is null");
+    }
+    return accessibles;
+  }
+
+  @Override
+  public Collection<Run> listAllRunsWithLimit(long limit) throws IOException {
+    User user = getCurrentUser();
+    Collection<Run> accessibles = new HashSet<Run>();
+    Collection<Run> runs = super.listAllRunsWithLimit(limit);
+    if (runs != null) {
+      for (Run run : super.listAllRunsWithLimit(limit)) {
         if (run != null) {
           if (run.userCanRead(user)) {
             accessibles.add(run);
@@ -764,6 +799,18 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
+  public Collection<Sample> listAllSamplesWithLimit(long limit) throws IOException {
+    User user = getCurrentUser();
+    Collection<Sample> accessibles = new HashSet<Sample>();
+    for (Sample sample : super.listAllSamplesWithLimit(limit)) {
+      if (sample.userCanRead(user)) {
+        accessibles.add(sample);
+      }
+    }
+    return accessibles;
+  }
+
+  @Override
   public Collection<Sample> listAllSamplesBySearch(String query) throws IOException {
     User user = getCurrentUser();
     Collection<Sample> accessibles = new HashSet<Sample>();
@@ -828,6 +875,18 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
     User user = getCurrentUser();
     Collection<Library> accessibles = new HashSet<Library>();
     for (Library library : super.listAllLibraries()) {
+      if (library.userCanRead(user)) {
+        accessibles.add(library);
+      }
+    }
+    return accessibles;
+  }
+
+  @Override
+  public Collection<Library> listAllLibrariesWithLimit(long limit) throws IOException {
+    User user = getCurrentUser();
+    Collection<Library> accessibles = new HashSet<Library>();
+    for (Library library : super.listAllLibrariesWithLimit(limit)) {
       if (library.userCanRead(user)) {
         accessibles.add(library);
       }
@@ -1196,6 +1255,18 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
+  public Collection<Experiment> listAllExperimentsWithLimit(long limit) throws IOException {
+    User user = getCurrentUser();
+    Collection<Experiment> accessibles = new HashSet<Experiment>();
+    for (Experiment experiment : super.listAllExperimentsWithLimit(limit)) {
+      if (experiment.userCanRead(user)) {
+        accessibles.add(experiment);
+      }
+    }
+    return accessibles;
+  }
+
+  @Override
   public Collection<Experiment> listAllExperimentsBySearch(String query) throws IOException {
     User user = getCurrentUser();
     Collection<Experiment> accessibles = new HashSet<Experiment>();
@@ -1224,6 +1295,18 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
     User user = getCurrentUser();
     Collection<Study> accessibles = new HashSet<Study>();
     for (Study study : super.listAllStudies()) {
+      if (study.userCanRead(user)) {
+        accessibles.add(study);
+      }
+    }
+    return accessibles;
+  }
+
+  @Override
+  public Collection<Study> listAllStudiesWithLimit(long limit) throws IOException {
+    User user = getCurrentUser();
+    Collection<Study> accessibles = new HashSet<Study>();
+    for (Study study : super.listAllStudiesWithLimit(limit)) {
       if (study.userCanRead(user)) {
         accessibles.add(study);
       }

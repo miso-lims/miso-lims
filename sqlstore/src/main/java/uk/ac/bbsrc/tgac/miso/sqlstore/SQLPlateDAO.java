@@ -32,7 +32,6 @@ import net.sf.ehcache.CacheManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -42,7 +41,9 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPlate;
 import uk.ac.bbsrc.tgac.miso.core.data.Plate;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlateMaterialType;
+import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PlateStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
@@ -106,6 +107,19 @@ public class SQLPlateDAO implements PlateStore {
   private CascadeType cascadeType;
   private LibraryStore libraryDAO;
   private Store<SecurityProfile> securityProfileDAO;
+
+  @Autowired
+  private MisoNamingScheme<Plate> namingScheme;
+
+  @Override
+  public MisoNamingScheme<Plate> getNamingScheme() {
+    return namingScheme;
+  }
+
+  @Override
+  public void setNamingScheme(MisoNamingScheme<Plate> namingScheme) {
+    this.namingScheme = namingScheme;
+  }
 
   @Autowired
   private CacheManager cacheManager;
@@ -204,26 +218,71 @@ public class SQLPlateDAO implements PlateStore {
           .addValue("plateMaterialType", plate.getPlateMaterialType().getKey())
           .addValue("locationBarcode", plate.getLocationBarcode())
           .addValue("size", plate.getSize())
-          .addValue("tagBarcodeId", plate.getTagBarcode().getTagBarcodeId())
+          .addValue("tagBarcodeId", plate.getTagBarcode().getId())
           .addValue("securityProfile_profileId", securityProfileId);
 
-    if (plate.getPlateId() == AbstractPlate.UNSAVED_ID) {
+    if (plate.getId() == AbstractPlate.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
                             .withTableName(TABLE_NAME)
                             .usingGeneratedKeyColumns("plateId");
+      try {
+        plate.setId(DbUtils.getAutoIncrement(template, TABLE_NAME));
+
+        String name = namingScheme.generateNameFor("name", plate);
+        plate.setName(name);
+
+        if (namingScheme.validateField("name", plate.getName())) {
+          String barcode = name + "::" + plate.getTagBarcode();
+          params.addValue("name", name);
+
+          params.addValue("identificationBarcode", barcode);
+
+          Number newId = insert.executeAndReturnKey(params);
+          if (newId.longValue() != plate.getId()) {
+            log.error("Expected Plate ID doesn't match returned value from database insert: rolling back...");
+            new NamedParameterJdbcTemplate(template).update(PLATE_DELETE, new MapSqlParameterSource().addValue("plateId", plate.getId()));
+            throw new IOException("Something bad happened. Expected Plate ID doesn't match returned value from DB insert");
+          }
+        }
+        else {
+          throw new IOException("Cannot save Plate - invalid field:" + plate.toString());
+        }
+      }
+      catch (MisoNamingException e) {
+        throw new IOException("Cannot save Plate - issue with naming scheme", e);
+      }
+      /*
       String name = "PLA"+ DbUtils.getAutoIncrement(template, TABLE_NAME);
       params.addValue("name", name);
       params.addValue("identificationBarcode", name + "::" + plate.getTagBarcode());
       Number newId = insert.executeAndReturnKey(params);
       plate.setPlateId(newId.longValue());
       plate.setName(name);
+      */
     }
     else {
+      try {
+        if (namingScheme.validateField("name", plate.getName())) {
+          params.addValue("plateId", plate.getId())
+                .addValue("name", plate.getName())
+                .addValue("identificationBarcode", plate.getName() + "::" + plate.getTagBarcode());
+          NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+          namedTemplate.update(PLATE_UPDATE, params);
+        }
+        else {
+          throw new IOException("Cannot save Plate - invalid field:" + plate.toString());
+        }
+      }
+      catch (MisoNamingException e) {
+        throw new IOException("Cannot save Plate - issue with naming scheme", e);
+      }
+      /*
       params.addValue("plateId", plate.getPlateId());
       params.addValue("name", plate.getName());
       params.addValue("identificationBarcode", plate.getName() + "::" + plate.getTagBarcode());
       NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
       namedTemplate.update(PLATE_UPDATE, params);
+      */
     }
 
     if (this.cascadeType != null && this.cascadeType.equals(CascadeType.PERSIST)) {
@@ -247,7 +306,7 @@ public class SQLPlateDAO implements PlateStore {
       }
     }    
 
-    return plate.getPlateId();
+    return plate.getId();
   }
 
   @Override
@@ -265,7 +324,7 @@ public class SQLPlateDAO implements PlateStore {
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
     return plate.isDeletable() &&
            (namedTemplate.update(PLATE_DELETE,
-                                 new MapSqlParameterSource().addValue("plateId", plate.getPlateId())) == 1);
+                                 new MapSqlParameterSource().addValue("plateId", plate.getId())) == 1);
   }
 
   public class LazyPlateMapper implements RowMapper<Plate> {
@@ -273,7 +332,7 @@ public class SQLPlateDAO implements PlateStore {
       int plateSize = rs.getInt("size");
 
       Plate plate = dataObjectFactory.getPlateOfSize(plateSize);
-      plate.setPlateId(rs.getLong("plateId"));
+      plate.setId(rs.getLong("plateId"));
       plate.setName(rs.getString("name"));
       plate.setCreationDate(rs.getDate("creationDate"));
       plate.setDescription(rs.getString("description"));
@@ -299,7 +358,7 @@ public class SQLPlateDAO implements PlateStore {
       int plateSize = rs.getInt("size");
       
       Plate plate = dataObjectFactory.getPlateOfSize(plateSize);
-      plate.setPlateId(rs.getLong("plateId"));
+      plate.setId(rs.getLong("plateId"));
       plate.setName(rs.getString("name"));
       plate.setCreationDate(rs.getDate("creationDate"));
       plate.setDescription(rs.getString("description"));

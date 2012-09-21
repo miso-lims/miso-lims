@@ -34,7 +34,7 @@
 
 <div id="maincontent">
 <div id="contentcolumn">
-<c:if test="${empty library.libraryId}">
+<c:if test="${library.id == 0}">
 <script src="<c:url value='/scripts/jquery/datatables/jquery.dataTables.min.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.mini.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.datepicker.js'/>" type="text/javascript"></script>
@@ -54,7 +54,7 @@
 <sessionConversation:insertSessionConversationId attributeName="library"/>
 <h1>
     <c:choose>
-        <c:when test="${not empty library.libraryId}">Edit</c:when>
+        <c:when test="${library.id != 0}">Edit</c:when>
         <c:otherwise>Create</c:otherwise>
     </c:choose> Library
     <button type="button" class="fg-button ui-state-default ui-corner-all"
@@ -69,7 +69,7 @@
         <li>
             <div class="breadcrumbsbubbleInfo">
                 <div class="trigger">
-                    <a href='<c:url value="/miso/project/${library.sample.project.projectId}"/>'>${library.sample.project.name}</a>
+                    <a href='<c:url value="/miso/project/${library.sample.project.id}"/>'>${library.sample.project.name}</a>
                 </div>
                 <div class="breadcrumbspopup">
                         ${library.sample.project.alias}
@@ -79,7 +79,7 @@
         <li>
             <div class="breadcrumbsbubbleInfo">
                 <div class="trigger">
-                    <a href='<c:url value="/miso/sample/${library.sample.sampleId}"/>'>${library.sample.name}</a>
+                    <a href='<c:url value="/miso/sample/${library.sample.id}"/>'>${library.sample.name}</a>
                 </div>
                 <div class="breadcrumbspopup">
                         ${library.sample.alias}
@@ -113,7 +113,7 @@
                         <div id="locationBarcodeMenu"
                              onmouseover="mcancelclosetime()"
                              onmouseout="mclosetime()">
-                            <a href="javascript:void(0);" onclick="Library.barcode.showLibraryLocationChangeDialog(${library.libraryId});">Change location</a>
+                            <a href="javascript:void(0);" onclick="Library.barcode.showLibraryLocationChangeDialog(${library.id});">Change location</a>
                         </div>
                     </li>
                 </ul>
@@ -132,7 +132,7 @@
                   <div id="idBarcodeMenu"
                        onmouseover="mcancelclosetime()"
                        onmouseout="mclosetime()">
-                      <a href="javascript:void(0);" onclick="Library.barcode.printLibraryBarcodes(${library.libraryId});">Print</a>
+                      <a href="javascript:void(0);" onclick="Library.barcode.printLibraryBarcodes(${library.id});">Print</a>
                   </div>
               </li>
           </ul>
@@ -142,7 +142,7 @@
                     Fluxion.doAjax(
                             'libraryControllerHelperService',
                             'getLibraryBarcode',
-                    {'libraryId':${library.libraryId},
+                    {'libraryId':${library.id},
                         'url':ajaxurl
                     },
                     {'doOnSuccess':function(json) {
@@ -161,7 +161,7 @@
     <td class="h">Library ID:</td>
     <td>
         <c:choose>
-            <c:when test="${not empty library.libraryId}">${library.libraryId}</c:when>
+            <c:when test="${library.id != 0}">${library.id}</c:when>
             <c:otherwise><i>Unsaved</i></c:otherwise>
         </c:choose>
     </td>
@@ -170,7 +170,7 @@
     <td>Name:</td>
     <td>
         <c:choose>
-            <c:when test="${not empty library.libraryId}">${library.name}</c:when>
+            <c:when test="${library.id != 0}">${library.name}</c:when>
             <c:otherwise><i>Unsaved</i></c:otherwise>
         </c:choose>
     </td>
@@ -183,7 +183,7 @@
                 <i>Unassigned</i>
             </c:when>
             <c:otherwise>
-                <a href='<c:url value="/miso/sample/${library.sample.sampleId}"/>'>${library.sample.name}</a>
+                <a href='<c:url value="/miso/sample/${library.sample.id}"/>'>${library.sample.name}</a>
             </c:otherwise>
         </c:choose>
     </td>
@@ -225,7 +225,7 @@
     <td>Paired:</td>
     <td>
         <c:choose>
-            <c:when test="${empty library.libraryId}">
+            <c:when test="${library.id != 0}">
                 <form:checkbox path="paired" checked="checked"/>
             </c:when>
             <c:otherwise>
@@ -236,7 +236,7 @@
 </tr>
 <tr>
     <c:choose>
-        <c:when test="${empty library.libraryId or empty library.libraryType}">
+        <c:when test="${library.id ==0 or empty library.libraryType}">
             <td>Platform - Library Type:</td>
             <td>
                 <form:select id="platformNames" path="platformName" items="${platformNames}"
@@ -257,7 +257,7 @@
 </tr>
 <tr>
     <c:choose>
-        <c:when test="${empty library.libraryId or empty library.librarySelectionType}">
+        <c:when test="${library.id == 0 or empty library.librarySelectionType}">
             <td>Library Selection Type:</td>
             <td>
                 <form:select id="librarySelectionTypes" path="librarySelectionType" items="${librarySelectionTypes}"
@@ -272,7 +272,7 @@
 </tr>
 <tr>
     <c:choose>
-        <c:when test="${empty library.libraryId or empty library.libraryStrategyType}">
+        <c:when test="${library.id == 0 or empty library.libraryStrategyType}">
             <td>Library Strategy Type:</td>
             <td>
                 <form:select id="libraryStrategyTypes" path="libraryStrategyType" items="${libraryStrategyTypes}"
@@ -287,7 +287,7 @@
 </tr>
 <tr>
   <c:choose>
-    <c:when test="${empty library.libraryId}">
+    <c:when test="${library.id == 0}">
       <td>Barcoding Strategy:</td>
       <td>
         <select name='tagBarcodeStrategies' id='tagBarcodeStrategies' onchange='Library.tagbarcode.populateAvailableBarcodesForStrategy(this);'>
@@ -318,7 +318,7 @@
 
 <tr>
   <c:choose>
-    <c:when test="${empty library.libraryId or empty library.tagBarcodes}">
+    <c:when test="${library.id == 0 or empty library.tagBarcodes}">
       <td>Barcodes:</td>
       <td id="tagBarcodesDiv">
       </td>
@@ -328,7 +328,7 @@
       <td>
         <c:forEach items="${availableTagBarcodeStrategyBarcodes}" var="barcodemap">
           <form:select path="tagBarcodes['${barcodemap.key}']" items="${barcodemap.value}"
-                             itemLabel="name" itemValue="tagBarcodeId"/>
+                             itemLabel="name" itemValue="id"/>
         </c:forEach>
       </td>
     </c:otherwise>
@@ -346,7 +346,7 @@
         <tr>
             <td>Permissions</td>
             <td><i>Inherited from sample </i><a
-                    href='<c:url value="/miso/sample/${library.sample.sampleId}"/>'>${library.sample.name}</a>
+                    href='<c:url value="/miso/sample/${library.sample.id}"/>'>${library.sample.name}</a>
                 <input type="hidden" value="${library.sample.securityProfile.profileId}"
                        name="securityProfile" id="securityProfile"/>
             </td>
@@ -359,7 +359,7 @@
     </c:otherwise>
 </c:choose>
 
-<c:if test="${not empty library.libraryId}">
+<c:if test="${library.id != 0}">
     <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#notes_arrowclick'), 'notes');">Notes
         <div id="notes_arrowclick" class="toggleLeftDown"></div>
     </div>
@@ -374,7 +374,7 @@
                 <div id="notesmenu"
                      onmouseover="mcancelclosetime()"
                      onmouseout="mclosetime()">
-                    <a onclick="Library.ui.showLibraryNoteDialog(${library.libraryId});" href="javascript:void(0);" class="add">Add
+                    <a onclick="Library.ui.showLibraryNoteDialog(${library.id});" href="javascript:void(0);" class="add">Add
                         Note</a>
                 </div>
             </li>
@@ -395,7 +395,7 @@
 </c:if>
 </form:form>
 <br/>
-<c:if test="${not empty library.libraryId}">
+<c:if test="${library.id != 0}">
 <h1>
     <div id="qcsTotalCount">
     </div>
@@ -410,7 +410,7 @@
              onmouseover="mcancelclosetime()"
              onmouseout="mclosetime()">
             <a href='javascript:void(0);' class="add"
-               onclick="Library.qc.insertLibraryQCRow(${library.libraryId}); return false;">Add Library QC</a>
+               onclick="Library.qc.insertLibraryQCRow(${library.id}); return false;">Add Library QC</a>
         </div>
     </li>
 </ul>
@@ -448,11 +448,11 @@
                       <td>${qc.qcCreator}</td>
                       <td><fmt:formatDate value="${qc.qcDate}"/></td>
                       <td>${qc.qcType.name}</td>
-                      <td id="result${qc.qcId}">${qc.results} ${qc.qcType.units}</td>
-                      <td id="insert${qc.qcId}">${qc.insertSize} bp</td>
+                      <td id="result${qc.id}">${qc.results} ${qc.qcType.units}</td>
+                      <td id="insert${qc.id}">${qc.insertSize} bp</td>
                           <c:if test="${(library.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                                           or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-                              <td id="edit${qc.qcId}" align="center"><a href="javascript:void(0);" onclick="Library.qc.changeLibraryQCRow('${qc.qcId}','${library.libraryId}')">
+                              <td id="edit${qc.id}" align="center"><a href="javascript:void(0);" onclick="Library.qc.changeLibraryQCRow('${qc.id}','${library.id}')">
                                   <span class="ui-icon ui-icon-pencil"></span></a></td>
                           </c:if>
                   </tr>
@@ -460,7 +460,7 @@
           </c:if>
           </tbody>
       </table>
-      <input type='hidden' id='qcLibraryId' name='libraryId' value='${library.libraryId}'/>
+      <input type='hidden' id='qcLibraryId' name='id' value='${library.id}'/>
   </form>
 </span>
 
@@ -522,9 +522,9 @@
              onmouseover="mcancelclosetime()"
              onmouseout="mclosetime()">
             <a href='javascript:void(0);' class="add"
-               onclick="Library.dilution.insertLibraryDilutionRow(${library.libraryId}); return false;">Add Library Dilution</a>
+               onclick="Library.dilution.insertLibraryDilutionRow(${library.id}); return false;">Add Library Dilution</a>
             <c:if test="${not empty library.libraryDilutions}">
-              <a href='<c:url value="/miso/poolwizard/new/${library.sample.project.projectId}"/>'>Create Pools</a>
+              <a href='<c:url value="/miso/poolwizard/new/${library.sample.project.id}"/>'>Create Pools</a>
             </c:if>
         </div>
     </li>
@@ -559,20 +559,20 @@
                       <td>${dil.name}</td>
                       <td>${dil.dilutionCreator}</td>
                       <td><fmt:formatDate value="${dil.creationDate}"/></td>
-                      <td id="results${dil.dilutionId}">${dil.concentration} ${libraryDilutionUnits}</td>
+                      <td id="results${dil.id}">${dil.concentration} ${libraryDilutionUnits}</td>
                       <td class="fit">
                           <c:if test="${not empty dil.identificationBarcode}">
                           <div class="barcodes">
                             <div class="barcodeArea ui-corner-all">
                               <ul class="barcode-ddm">
                                   <li><a
-                                          onmouseover="mopen('dil${dil.dilutionId}IdBarcodeMenu')"
-                                          onmouseout="mclosetime()"><span style="float:right; margin-top:6px;" class="ui-icon ui-icon-triangle-1-s"></span><span id="dil${dil.dilutionId}IdBarcode" style="float:right"></span></a>
+                                          onmouseover="mopen('dil${dil.id}IdBarcodeMenu')"
+                                          onmouseout="mclosetime()"><span style="float:right; margin-top:6px;" class="ui-icon ui-icon-triangle-1-s"></span><span id="dil${dil.id}IdBarcode" style="float:right"></span></a>
 
-                                      <div id="dil${dil.dilutionId}IdBarcodeMenu"
+                                      <div id="dil${dil.id}IdBarcodeMenu"
                                            onmouseover="mcancelclosetime()"
                                            onmouseout="mclosetime()">
-                                          <a href="javascript:void(0);" onclick="Library.barcode.printDilutionBarcode(${dil.dilutionId}, '${library.platformName}');">Print</a>
+                                          <a href="javascript:void(0);" onclick="Library.barcode.printDilutionBarcode(${dil.id}, '${library.platformName}');">Print</a>
                                       </div>
                                   </li>
                               </ul>
@@ -582,11 +582,11 @@
                                       Fluxion.doAjax(
                                               'libraryControllerHelperService',
                                               'getLibraryDilutionBarcode',
-                                      {'dilutionId':${dil.dilutionId},
+                                      {'dilutionId':${dil.id},
                                           'url':ajaxurl
                                       },
                                       {'doOnSuccess':function(json) {
-                                          jQuery('#dil${dil.dilutionId}IdBarcode').html("<img style='border:0;' src='<c:url value='/temp/'/>" + json.img + "'/><br/>");
+                                          jQuery('#dil${dil.id}IdBarcode').html("<img style='border:0;' src='<c:url value='/temp/'/>" + json.img + "'/><br/>");
                                       }
                                       });
                                   });
@@ -598,14 +598,14 @@
                       </td>
                       <c:if test="${(sample.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                                       or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-                          <td id="edit${dil.dilutionId}" align="center"><a href="javascript:void(0);"
-                                                                    onclick="Library.dilution.changeLibraryDilutionRow('${dil.dilutionId}','${library.libraryId}')">
+                          <td id="edit${dil.id}" align="center"><a href="javascript:void(0);"
+                                                                    onclick="Library.dilution.changeLibraryDilutionRow('${dil.id}','${library.id}')">
                               <span class="ui-icon ui-icon-pencil"></span></a></td>
                       </c:if>
                       <%-- <td>${dil.locationBarcode}</td> --%>
                       <c:choose>
                           <c:when test="${library.platformName ne 'Illumina'}">
-                              <td><a href="javascript:void(0);" onclick="Library.empcr.insertEmPcrRow(${dil.dilutionId});">Add emPCR</a>
+                              <td><a href="javascript:void(0);" onclick="Library.empcr.insertEmPcrRow(${dil.id});">Add emPCR</a>
                               </td>
                           </c:when>
                           <c:otherwise>
@@ -614,7 +614,7 @@
                                 <a href="<c:url value='/miso/pool/${fn:toLowerCase(library.platformName)}/new/dilution/${dil.dilutionId}'/>">Construct
                                       new Pool using this dilution...</a></td>
                                       --%>
-                                <a href="<c:url value="/miso/poolwizard/new/${library.sample.project.projectId}"/>">Construct New Pool</a>
+                                <a href="<c:url value="/miso/poolwizard/new/${library.sample.project.id}"/>">Construct New Pool</a>
                               </td>
                           </c:otherwise>
                       </c:choose>
@@ -623,7 +623,7 @@
           </c:if>
           </tbody>
       </table>
-      <input type='hidden' id='dilLibraryId' name='libraryId' value='${library.libraryId}'/>
+      <input type='hidden' id='dilLibraryId' name='id' value='${library.id}'/>
   </form>
 </span>
 <script type="text/javascript">
@@ -665,11 +665,11 @@
                                 <td class="fit">${empcr.pcrId}</td>
                             </sec:authorize>
                             --%>
-                        <td>${empcr.libraryDilution.dilutionId}</td>
+                        <td>${empcr.libraryDilution.id}</td>
                         <td>${empcr.pcrCreator}</td>
                         <td><fmt:formatDate value="${empcr.creationDate}"/></td>
                         <td>${empcr.concentration} ${emPCRUnits}</td>
-                        <td><a href="javascript:void(0);" onclick="Library.empcr.insertEmPcrDilutionRow(${empcr.pcrId});">Add emPCR
+                        <td><a href="javascript:void(0);" onclick="Library.empcr.insertEmPcrDilutionRow(${empcr.id});">Add emPCR
                             Dilution</a>
                         </td>
                     </tr>
@@ -716,13 +716,13 @@
                                 <td class="fit">${dil.dilutionId}</td>
                             </sec:authorize>
                             --%>
-                        <td>${dil.emPCR.pcrId}</td>
+                        <td>${dil.emPCR.id}</td>
                         <td>${dil.dilutionCreator}</td>
                         <td><fmt:formatDate value="${dil.creationDate}"/></td>
                             <%--<td>${dil.locationBarcode}</td>--%>
                         <td>${dil.concentration} ${emPCRDilutionUnits}</td>
                         <td>
-                          <a href="<c:url value="/miso/poolwizard/new/${library.sample.project.projectId}"/>">Construct New Pool</a>
+                          <a href="<c:url value="/miso/poolwizard/new/${library.sample.project.id}"/>">Construct New Pool</a>
                         </td>
                     </tr>
                 </c:forEach>
@@ -743,7 +743,7 @@
 </c:if>
 </c:if>
 
-<c:if test="${empty library.libraryId}">
+<c:if test="${library.id == 0}">
 </div>
 <div id="tab-2" align="center">
     <div class="breadcrumbs">
@@ -754,7 +754,7 @@
             <li>
                 <div class="breadcrumbsbubbleInfo">
                     <div class="trigger">
-                        <a href='<c:url value="/miso/project/${library.sample.project.projectId}"/>'>${library.sample.project.name}</a>
+                        <a href='<c:url value="/miso/project/${library.sample.project.id}"/>'>${library.sample.project.name}</a>
                     </div>
                     <div class="breadcrumbspopup">
                             ${library.sample.project.alias}
@@ -764,7 +764,7 @@
             <li>
                 <div class="breadcrumbsbubbleInfo">
                     <div class="trigger">
-                        <a href='<c:url value="/miso/sample/${library.sample.sampleId}"/>'>${library.sample.name}</a>
+                        <a href='<c:url value="/miso/sample/${library.sample.id}"/>'>${library.sample.name}</a>
                     </div>
                     <div class="breadcrumbspopup">
                             ${library.sample.alias}
@@ -1194,12 +1194,12 @@ function submitBulkLibraries() {
         Fluxion.doAjax(
                 'libraryControllerHelperService',
                 'bulkSaveLibraries',
-        {'projectId':${library.sample.project.projectId},
+        {'projectId':${library.sample.project.id},
             'libraries':"[" + arr.join(',') + "]",
             'url':ajaxurl
         },
         {'doOnSuccess':function(json) {
-            window.location.href = '<c:url value='/miso/project/${library.sample.project.projectId}'/>';
+            window.location.href = '<c:url value='/miso/project/${library.sample.project.id}'/>';
         }
         });
     }

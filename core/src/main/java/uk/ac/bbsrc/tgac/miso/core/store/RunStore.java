@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.core.store;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -35,7 +36,7 @@ import java.util.List;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface RunStore extends Store<Run>, Cascadable, Remover<Run> {
+public interface RunStore extends Store<Run>, Cascadable, Remover<Run>, NamingSchemeAware<Run> {
   /**
    * Retrieve a Run from an underlying data store given a Run ID
    * <p/>
@@ -138,6 +139,14 @@ public interface RunStore extends Store<Run>, Cascadable, Remover<Run> {
    * @throws IOException when
    */
   List<Run> listByStatus(String health) throws IOException;
+
+  /**
+   * List all persisted objects
+   *
+   * @return Collection<Run>
+   * @throws IOException when the objects cannot be retrieved
+   */
+  Collection<Run> listAllWithLimit(long limit) throws IOException;
 
   int[] saveAll(Collection<Run> runs) throws IOException;
 }

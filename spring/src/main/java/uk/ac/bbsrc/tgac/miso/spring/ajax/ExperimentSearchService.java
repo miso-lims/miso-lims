@@ -67,7 +67,7 @@ public class ExperimentSearchService {
         int numMatches = 0;
         for (Experiment exp : requestManager.listAllExperiments()) {
           String experimentName = exp.getName() == null ? null : exp.getName().toLowerCase();
-          long experimentId = exp.getExperimentId();
+          long experimentId = exp.getId();
 
           if (experimentName != null && (experimentName.equals(str) || experimentName.contains(str))) {
             b.append("<li onclick=\"Search.insertResult(&#39;" + resultId + "&#39;,&#39;" + experimentId + "&#39;)\">" + exp.getName() + "(" + exp.getAlias() + ")</li>");

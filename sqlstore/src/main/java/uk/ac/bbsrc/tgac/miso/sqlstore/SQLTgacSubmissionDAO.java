@@ -37,6 +37,9 @@ import org.w3c.dom.Document;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubmissionImpl;
+import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
 import uk.ac.bbsrc.tgac.miso.core.store.*;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
@@ -56,12 +59,15 @@ import java.util.*;
  * @author Rob Davey
  * @since 0.0.2
  */
-public class SQLTgacSubmissionDAO implements Store<SubmissionImpl> {
+public class SQLTgacSubmissionDAO implements Store<Submission>, NamingSchemeAware<Submission> {
   private static final String TABLE_NAME = "Submission";
 
   public static final String SUBMISSION_SELECT =
           "SELECT submissionId, creationDate, submittedDate, name, alias, title, description, accession, verified, completed " +
           "FROM "+TABLE_NAME;
+
+  public static final String SUBMISSION_DELETE =
+          "DELETE FROM "+TABLE_NAME+" WHERE submissionId=:submissionId";
 
   public static final String SUBMISSION_SELECT_BY_ID =
           SUBMISSION_SELECT + " WHERE submissionId = ?";
@@ -95,6 +101,19 @@ public class SQLTgacSubmissionDAO implements Store<SubmissionImpl> {
   private RunStore runDAO;
   private StudyStore studyDAO;
   private SampleStore sampleDAO;
+
+  @Autowired
+  private MisoNamingScheme<Submission> namingScheme;
+
+  @Override
+  public MisoNamingScheme<Submission> getNamingScheme() {
+    return namingScheme;
+  }
+
+  @Override
+  public void setNamingScheme(MisoNamingScheme<Submission> namingScheme) {
+    this.namingScheme = namingScheme;
+  }
 
   @Autowired
   private DataObjectFactory dataObjectFactory;
@@ -136,7 +155,7 @@ public class SQLTgacSubmissionDAO implements Store<SubmissionImpl> {
   }
 
   @Transactional(readOnly = false, rollbackFor = IOException.class)
-  public long save(SubmissionImpl submission) throws IOException {
+  public long save(Submission submission) throws IOException {
     SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
             .withTableName("Submission");
 
@@ -152,26 +171,65 @@ public class SQLTgacSubmissionDAO implements Store<SubmissionImpl> {
 
     //if a submission already exists then delete all the old rows first, and repopulate.
     //easier than trying to work out which rows need to be updated and which don't
-    if (submission.getSubmissionId() != Submission.UNSAVED_ID) {
-      MapSqlParameterSource delparams = new MapSqlParameterSource();
-      delparams.addValue("submissionId", submission.getSubmissionId());
-      NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-      log.debug("Deleting Submission elements for " + submission.getSubmissionId());
-      namedTemplate.update(SUBMISSION_ELEMENTS_DELETE, delparams);
+    if (submission.getId() != Submission.UNSAVED_ID) {
+      try {
+        if (namingScheme.validateField("name", submission.getName())) {
+          MapSqlParameterSource delparams = new MapSqlParameterSource();
+          delparams.addValue("submissionId", submission.getId());
+          NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+          log.debug("Deleting Submission elements for " + submission.getId());
+          namedTemplate.update(SUBMISSION_ELEMENTS_DELETE, delparams);
 
+          params.addValue("submissionId", submission.getId())
+                .addValue("name", submission.getName());
+          namedTemplate.update(SUBMISSION_UPDATE, params);
+        }
+        else {
+          throw new IOException("Cannot save Submission - invalid field:" + submission.toString());
+        }
+      }
+      catch (MisoNamingException e) {
+        throw new IOException("Cannot save Submission - issue with naming scheme", e);
+      }
+      /*
       params.addValue("submissionId", submission.getSubmissionId())
               .addValue("name", submission.getName());
-
       namedTemplate.update(SUBMISSION_UPDATE, params);
+      */
     }
     else {
       insert.usingGeneratedKeyColumns("submissionId");
+      try {
+        submission.setId(DbUtils.getAutoIncrement(template, TABLE_NAME));
+
+        String name = namingScheme.generateNameFor("name", submission);
+        submission.setName(name);
+
+        if (namingScheme.validateField("name", submission.getName())) {
+          params.addValue("name", name);
+
+          Number newId = insert.executeAndReturnKey(params);
+          if (newId.longValue() != submission.getId()) {
+            log.error("Expected Submission ID doesn't match returned value from database insert: rolling back...");
+            new NamedParameterJdbcTemplate(template).update(SUBMISSION_DELETE, new MapSqlParameterSource().addValue("submissionId", submission.getId()));
+            throw new IOException("Something bad happened. Expected Submission ID doesn't match returned value from DB insert");
+          }
+        }
+        else {
+          throw new IOException("Cannot save Submission - invalid field:" + submission.toString());
+        }
+      }
+      catch (MisoNamingException e) {
+        throw new IOException("Cannot save Submission - issue with naming scheme", e);
+      }
+      /*
       String name = "SUB" + DbUtils.getAutoIncrement(template, TABLE_NAME);
       params.addValue("creationDate", new Date());
       params.addValue("name", name);
       Number newId = insert.executeAndReturnKey(params);
       submission.setSubmissionId(newId.longValue());
       submission.setName(name);
+      */
     }
 
     if (submission.getSubmissionElements() != null) {
@@ -185,17 +243,17 @@ public class SQLTgacSubmissionDAO implements Store<SubmissionImpl> {
         if (s instanceof Sample) {
           tableName += "Sample";
           priKey = "samples_sampleId";
-          priValue = ((Sample) s).getSampleId();
+          priValue = ((Sample) s).getId();
         }
         else if (s instanceof Study) {
           tableName += "Study";
           priKey = "studies_studyId";
-          priValue = ((Study) s).getStudyId();
+          priValue = ((Study) s).getId();
         }
         else if (s instanceof Experiment) {
           tableName += "Experiment";
           priKey = "experiments_experimentId";
-          priValue = ((Experiment) s).getExperimentId();
+          priValue = ((Experiment) s).getId();
         }
         else if (s instanceof SequencerPoolPartition) {
           SequencerPoolPartition l = (SequencerPoolPartition) s;
@@ -211,8 +269,8 @@ public class SQLTgacSubmissionDAO implements Store<SubmissionImpl> {
                       .withTableName("Submission_Experiment");
               try {
                 MapSqlParameterSource poParams = new MapSqlParameterSource();
-                poParams.addValue("submission_submissionId", submission.getSubmissionId())
-                        .addValue("experiments_experimentId", experiment.getExperimentId());
+                poParams.addValue("submission_submissionId", submission.getId())
+                        .addValue("experiments_experimentId", experiment.getId());
                 pInsert.execute(poParams);
               }
               catch (DuplicateKeyException dke) {
@@ -224,8 +282,8 @@ public class SQLTgacSubmissionDAO implements Store<SubmissionImpl> {
                       .withTableName("Submission_Study");
               try {
                 MapSqlParameterSource poParams = new MapSqlParameterSource();
-                poParams.addValue("submission_submissionId", submission.getSubmissionId())
-                        .addValue("studies_studyId", study.getStudyId());
+                poParams.addValue("submission_submissionId", submission.getId())
+                        .addValue("studies_studyId", study.getId());
                 sInsert.execute(poParams);
               }
               catch (DuplicateKeyException dke) {
@@ -240,8 +298,8 @@ public class SQLTgacSubmissionDAO implements Store<SubmissionImpl> {
                       .withTableName("Submission_Sample");
               try {
                 MapSqlParameterSource poParams = new MapSqlParameterSource();
-                poParams.addValue("submission_submissionId", submission.getSubmissionId())
-                        .addValue("samples_sampleId", sample.getSampleId());
+                poParams.addValue("submission_submissionId", submission.getId())
+                        .addValue("samples_sampleId", sample.getId());
                 sInsert.execute(poParams);
               }
               catch (DuplicateKeyException dke) {
@@ -253,9 +311,9 @@ public class SQLTgacSubmissionDAO implements Store<SubmissionImpl> {
               sInsert = new SimpleJdbcInsert(template).withTableName("Submission_Partition_Dilution");
               try {
                 MapSqlParameterSource poParams = new MapSqlParameterSource();
-                poParams.addValue("submission_submissionId", submission.getSubmissionId())
+                poParams.addValue("submission_submissionId", submission.getId())
                         .addValue("partition_partitionId", l.getId())
-                        .addValue("dilution_dilutionId", dil.getDilutionId());
+                        .addValue("dilution_dilutionId", dil.getId());
                 sInsert.execute(poParams);
 
               }
@@ -272,7 +330,7 @@ public class SQLTgacSubmissionDAO implements Store<SubmissionImpl> {
                     .withTableName(tableName);
             try {
               MapSqlParameterSource poParams = new MapSqlParameterSource();
-              poParams.addValue("submission_submissionId", submission.getSubmissionId())
+              poParams.addValue("submission_submissionId", submission.getId())
                       .addValue(priKey, priValue);
               pInsert.execute(poParams);
             }
@@ -290,7 +348,7 @@ public class SQLTgacSubmissionDAO implements Store<SubmissionImpl> {
       throw new IOException("No defined Submittable elements available");
     }
 
-    return submission.getSubmissionId();
+    return submission.getId();
   }
 
   public SubmissionImpl get(long id) throws IOException {
@@ -299,7 +357,7 @@ public class SQLTgacSubmissionDAO implements Store<SubmissionImpl> {
     return e;
   }
 
-  public Collection<SubmissionImpl> listAll() throws IOException {
+  public Collection<Submission> listAll() throws IOException {
     return template.query(SUBMISSION_SELECT, new TgacSubmissionMapper());
   }
 
@@ -309,10 +367,10 @@ public class SQLTgacSubmissionDAO implements Store<SubmissionImpl> {
   }
 
   //sets the values of the new Submission object based on those in the SubmissionMapper
-  public class TgacSubmissionMapper implements RowMapper<SubmissionImpl> {
+  public class TgacSubmissionMapper implements RowMapper<Submission> {
     public SubmissionImpl mapRow(ResultSet rs, int rowNum) throws SQLException {
       SubmissionImpl t = (SubmissionImpl) dataObjectFactory.getSubmission();
-      t.setSubmissionId(rs.getLong("submissionId"));
+      t.setId(rs.getLong("submissionId"));
       t.setAccession(rs.getString("accession"));
       t.setAlias(rs.getString("alias"));
       t.setCreationDate(rs.getDate("creationDate"));
@@ -352,7 +410,7 @@ public class SQLTgacSubmissionDAO implements Store<SubmissionImpl> {
           Pool<? extends Poolable> oldPool = partition.getPool();
           newPool.setExperiments(oldPool.getExperiments());
 
-          List<Run> runs = new ArrayList<Run>(runDAO.listBySequencerPartitionContainerId(partition.getSequencerPartitionContainer().getContainerId()));
+          List<Run> runs = new ArrayList<Run>(runDAO.listBySequencerPartitionContainerId(partition.getSequencerPartitionContainer().getId()));
           //if there is 1 run for the flowcell/container, sets the run for that container to the first on on the list
           if (runs.size() == 1) {
             partition.getSequencerPartitionContainer().setRun(runs.get(0));
@@ -373,7 +431,7 @@ public class SQLTgacSubmissionDAO implements Store<SubmissionImpl> {
           //adds the new pool to the partition
           newPartition.setPool(newPool);
           //adds the partition to the submission
-          log.debug("submission " + t.getSubmissionId() + " new partition " + newPartition.getId() + " contains dilutions " + newPartition.getPool().getDilutions().toString());
+          log.debug("submission " + t.getId() + " new partition " + newPartition.getId() + " contains dilutions " + newPartition.getPool().getDilutions().toString());
           t.addSubmissionElement(newPartition);
         }
       }

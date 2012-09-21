@@ -272,7 +272,7 @@ public class SolidNotificationMessageConsumerMechanism implements NotificationMe
                     }
                   }
                   else {
-                    log.debug("No containers linked to run " + r.getRunId() + ": creating...");
+                    log.debug("No containers linked to run " + r.getId() + ": creating...");
                     SequencerPartitionContainer f = new SequencerPartitionContainerImpl();
                     f.setSecurityProfile(r.getSecurityProfile());
                     f.initEmptyPartitions();
@@ -290,7 +290,7 @@ public class SolidNotificationMessageConsumerMechanism implements NotificationMe
               }
               else {
                 SequencerPartitionContainer f = fs.iterator().next();
-                log.debug("Got container " + f.getContainerId());
+                log.debug("Got container " + f.getId());
 
                 if (f.getSecurityProfile() == null) {
                   f.setSecurityProfile(r.getSecurityProfile());
@@ -308,7 +308,7 @@ public class SolidNotificationMessageConsumerMechanism implements NotificationMe
                 }
 
                 long flowId = requestManager.saveSequencerPartitionContainer(f);
-                f.setContainerId(flowId);
+                f.setId(flowId);
               }
 
               updatedRuns.put(r.getAlias(), r);

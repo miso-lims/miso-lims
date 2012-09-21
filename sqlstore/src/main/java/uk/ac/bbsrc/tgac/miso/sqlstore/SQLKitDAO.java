@@ -202,15 +202,15 @@ public class SQLKitDAO implements KitStore {
             .addValue("kitDate", kit.getKitDate())
             .addValue("kitDescriptorId", kit.getKitDescriptor().getKitDescriptorId());
 
-    if (kit.getKitId() == AbstractKit.UNSAVED_ID) {
+    if (kit.getId() == AbstractKit.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
                             .withTableName(TABLE_NAME)
                             .usingGeneratedKeyColumns("kitId");
       Number newId = insert.executeAndReturnKey(params);
-      kit.setKitId(newId.longValue());
+      kit.setId(newId.longValue());
     }
     else {
-      params.addValue("kitId", kit.getKitId());
+      params.addValue("kitId", kit.getId());
       NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
       namedTemplate.update(KIT_UPDATE, params);
     }
@@ -222,7 +222,7 @@ public class SQLKitDAO implements KitStore {
         }
       }
     }
-    return kit.getKitId();
+    return kit.getId();
   }
 
   public class LazyKitMapper implements RowMapper<Kit> {
@@ -252,7 +252,7 @@ public class SQLKitDAO implements KitStore {
           throw new SQLException("Unsupported KitType: "+kitType.getKey());
         }
 
-        kit.setKitId(rs.getLong("kitId"));
+        kit.setId(rs.getLong("kitId"));
         kit.setIdentificationBarcode(rs.getString("identificationBarcode"));
         kit.setLocationBarcode(rs.getString("locationBarcode"));
         kit.setLotNumber(rs.getString("lotNumber"));
@@ -294,7 +294,7 @@ public class SQLKitDAO implements KitStore {
           throw new SQLException("Unsupported KitType: "+kitType.getKey());
         }
 
-        kit.setKitId(rs.getLong("kitId"));
+        kit.setId(rs.getLong("kitId"));
         kit.setIdentificationBarcode(rs.getString("identificationBarcode"));
         kit.setLocationBarcode(rs.getString("locationBarcode"));
         kit.setLotNumber(rs.getString("lotNumber"));

@@ -56,10 +56,10 @@
   ~
   ~ **********************************************************************
   --%>
-
+<%@ page pageEncoding="UTF-8" contentType="text/html; charset=UTF-8" %>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-gb">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
@@ -169,7 +169,9 @@
     <%--</sec:authorize>--%>
 
     <sec:authorize access="isAuthenticated()">
-      <li><a id="myAccountLink" href="<c:url value="/miso/myAccount"/>"><span id="myAccountSpan">My Account</span></a></li>
+      <li>
+        <a id="myAccountLink" href="<c:url value="/miso/myAccount"/>"><span id="myAccountSpan">My Account</span></a>
+      </li>
     </sec:authorize>
     <sec:authorize access="isAuthenticated()">
       <li><a href="<c:url value="/miso/projects"/>"><span>My Projects</span></a></li>
@@ -184,7 +186,9 @@
     </sec:authorize>
 
     <sec:authorize access="isAuthenticated()">
-      <li><a href="<c:url value="http://www.tgac.ac.uk/misofiles/MISO-01.6.RC-User_Manual.pdf"/>"><span>Help</span></a></li>
+      <li>
+        <a href="<c:url value="http://www.tgac.ac.uk/misofiles/MISO-01.6.RC-User_Manual.pdf"/>"><span>Help</span></a>
+      </li>
     </sec:authorize>
 
     <sec:authorize access="isAuthenticated()">
@@ -211,21 +215,26 @@
     jQuery(function() {
       //all hover and click logic for buttons
       jQuery(".fg-button:not(.ui-state-disabled)")
-              .hover(
-              function() {
-                jQuery(this).addClass("ui-state-hover");
-              },
-              function() {
-                jQuery(this).removeClass("ui-state-hover");
-              })
+        .hover(
+        function() {
+          jQuery(this).addClass("ui-state-hover");
+        },
+        function() {
+          jQuery(this).removeClass("ui-state-hover");
+        }
+      )
     });
 
-    checkAlerts();
+    Utils.alert.checkAlerts();
 
     jQuery(document).ready(function() {
       jQuery('.misoicon').hover(
-        function() { jQuery(this).addClass('misoicon-hover'); },
-        function() { jQuery(this).removeClass('misoicon-hover'); }
+        function() {
+          jQuery(this).addClass('misoicon-hover');
+        },
+        function() {
+          jQuery(this).removeClass('misoicon-hover');
+        }
       );
     });
   </script>

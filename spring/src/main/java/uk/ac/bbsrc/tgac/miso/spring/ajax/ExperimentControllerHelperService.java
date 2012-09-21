@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
@@ -40,6 +41,8 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -177,7 +180,10 @@ public class ExperimentControllerHelperService {
         
         KitDescriptor kitDescriptor = requestManager.getKitDescriptorByPartNumber(partNumber);
         if (kitDescriptor != null) {
-          return JSONUtils.JSONObjectResponse("{'id':'"+kitDescriptor.getKitDescriptorId()+"', 'name':'"+kitDescriptor.getName()+"'}");  
+          Map<String, Object> m = new HashMap<String, Object>();
+          m.put("id", kitDescriptor.getKitDescriptorId());
+          m.put("name", kitDescriptor.getName());
+          return JSONUtils.JSONObjectResponse(m);
         }
       }
     }
@@ -197,33 +203,43 @@ public class ExperimentControllerHelperService {
         Experiment e = requestManager.getExperimentById(new Long(experimentId));
 
         Collection<KitDescriptor> kits = requestManager.listKitDescriptorsByType(KitType.LIBRARY);
-        StringBuilder sb = new StringBuilder();
-        sb.append("'libraryKitDescriptors':[");
+        StringBuilder lkits = new StringBuilder();
+        lkits.append("[");
         int count = 0;
         for (KitDescriptor k : kits) {
           if (e.getPlatform().getPlatformType().equals(k.getPlatformType())) {
-            sb.append("{'name':'"+k.getName()+"', 'id':'"+k.getKitDescriptorId()+"', 'partNumber':'"+k.getPartNumber()+"'}");
-            if (count < kits.size()) sb.append(",");
+            lkits.append("{'name':'"+k.getName()+"', 'id':'"+k.getKitDescriptorId()+"', 'partNumber':'"+k.getPartNumber()+"'}");
+            if (count < kits.size()) lkits.append(",");
             count++;
           }
         }
-        sb.append("]");
+        lkits.append("]");
 
+        StringBuilder mkits = null;
         if (multiplexed.equals("true")) {
-          Collection<KitDescriptor> mkits = requestManager.listKitDescriptorsByType(KitType.MULTIPLEXING);
-          sb.append(",'multiplexKitDescriptors':[");
+          mkits = new StringBuilder();
+          Collection<KitDescriptor> mkitds = requestManager.listKitDescriptorsByType(KitType.MULTIPLEXING);
+          mkits.append("[");
           count = 0;
-          for (KitDescriptor k : mkits) {
+          for (KitDescriptor k : mkitds) {
             if (e.getPlatform().getPlatformType().equals(k.getPlatformType())) {
-              sb.append("{'name':'"+k.getName()+"', 'id':'"+k.getKitDescriptorId()+"', 'partNumber':'"+k.getPartNumber()+"'}");
-              if (count < mkits.size()) sb.append(",");
+              mkits.append("{'name':'"+k.getName()+"', 'id':'"+k.getKitDescriptorId()+"', 'partNumber':'"+k.getPartNumber()+"'}");
+              if (count < mkitds.size()) mkits.append(",");
               count++;
             }
           }
-          sb.append("]");
+          mkits.append("]");
         }
 
-        return JSONUtils.JSONObjectResponse("{'experimentId':'"+experimentId+"', 'multiplexed':'"+multiplexed+"', "+sb.toString()+"}");
+        //return JSONUtils.JSONObjectResponse("{'experimentId':'"+experimentId+"', 'multiplexed':'"+multiplexed+"', "+sb.toString()+"}");
+        Map<String, Object> m = new HashMap<String, Object>();
+        m.put("experimentId", experimentId);
+        m.put("multiplexed", multiplexed);
+        m.put("libraryKitDescriptors", JSONArray.fromObject(lkits.toString()));
+        if (mkits != null) {
+          m.put("multiplexKitDescriptors", JSONArray.fromObject(mkits.toString()));
+        }
+        return JSONUtils.JSONObjectResponse(m);
       }
     }
     catch (Exception e) {
@@ -272,7 +288,7 @@ public class ExperimentControllerHelperService {
         
         Collection<KitDescriptor> kits = requestManager.listKitDescriptorsByType(KitType.EMPCR);
         StringBuilder sb = new StringBuilder();
-        sb.append("'emPcrKitDescriptors':[");
+        sb.append("[");
         int count = 0;
         for (KitDescriptor k : kits) {
           if (e.getPlatform().getPlatformType().equals(k.getPlatformType())) {
@@ -283,7 +299,11 @@ public class ExperimentControllerHelperService {
         }
         sb.append("]");
 
-        return JSONUtils.JSONObjectResponse("{'experimentId':'"+experimentId+"', "+sb.toString()+"}");
+        //return JSONUtils.JSONObjectResponse("{'experimentId':'"+experimentId+"', "+sb.toString()+"}");
+        Map<String, Object> m = new HashMap<String, Object>();
+        m.put("experimentId", experimentId);
+        m.put("emPcrKitDescriptors", JSONArray.fromObject(sb.toString()));
+        return JSONUtils.JSONObjectResponse(m);
       }
     }
     catch (Exception e) {
@@ -332,7 +352,7 @@ public class ExperimentControllerHelperService {
         
         Collection<KitDescriptor> kits = requestManager.listKitDescriptorsByType(KitType.CLUSTERING);
         StringBuilder sb = new StringBuilder();
-        sb.append("'clusteringKitDescriptors':[");
+        sb.append("[");
         int count = 0;
         for (KitDescriptor k : kits) {
           if (e.getPlatform().getPlatformType().equals(k.getPlatformType())) {
@@ -343,7 +363,11 @@ public class ExperimentControllerHelperService {
         }
         sb.append("]");
 
-        return JSONUtils.JSONObjectResponse("{'experimentId':'"+experimentId+"', "+sb.toString()+"}");
+        //return JSONUtils.JSONObjectResponse("{'experimentId':'"+experimentId+"', "+sb.toString()+"}");
+        Map<String, Object> m = new HashMap<String, Object>();
+        m.put("experimentId", experimentId);
+        m.put("clusteringKitDescriptors", JSONArray.fromObject(sb.toString()));
+        return JSONUtils.JSONObjectResponse(m);
       }
     }
     catch (Exception e) {
@@ -392,7 +416,7 @@ public class ExperimentControllerHelperService {
         
         Collection<KitDescriptor> kits = requestManager.listKitDescriptorsByType(KitType.SEQUENCING);
         StringBuilder sb = new StringBuilder();
-        sb.append("'sequencingKitDescriptors':[");
+        sb.append("[");
         int count = 0;
         for (KitDescriptor k : kits) {
           if (e.getPlatform().getPlatformType().equals(k.getPlatformType())) {
@@ -403,7 +427,11 @@ public class ExperimentControllerHelperService {
         }
         sb.append("]");
 
-        return JSONUtils.JSONObjectResponse("{'experimentId':'"+experimentId+"', "+sb.toString()+"}");
+        //return JSONUtils.JSONObjectResponse("{'experimentId':'"+experimentId+"', "+sb.toString()+"}");
+        Map<String, Object> m = new HashMap<String, Object>();
+        m.put("experimentId", experimentId);
+        m.put("sequencingKitDescriptors", JSONArray.fromObject(sb.toString()));
+        return JSONUtils.JSONObjectResponse(m);
       }
     }
     catch (Exception e) {

@@ -42,7 +42,9 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
+import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.*;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
@@ -68,6 +70,9 @@ public class SQLProjectDAO implements ProjectStore {
   public static final String PROJECTS_SELECT =
           "SELECT projectId, name, alias, description, creationDate, securityProfile_profileId, progress, lastUpdated " +
           "FROM "+TABLE_NAME;
+
+  public static final String PROJECTS_SELECT_LIMIT =
+          PROJECTS_SELECT + " ORDER BY projectId DESC LIMIT ?";
 
   public static final String PROJECT_SELECT_BY_ID =
           PROJECTS_SELECT + " WHERE projectId = ?";
@@ -190,6 +195,19 @@ public class SQLProjectDAO implements ProjectStore {
   private WatcherStore watcherDAO;
 
   @Autowired
+  private MisoNamingScheme<Project> namingScheme;
+
+  @Override
+  public MisoNamingScheme<Project> getNamingScheme() {
+    return namingScheme;
+  }
+
+  @Override
+  public void setNamingScheme(MisoNamingScheme<Project> namingScheme) {
+    this.namingScheme = namingScheme;
+  }
+
+  @Autowired
   private CacheManager cacheManager;
 
   public void setCacheManager(CacheManager cacheManager) {
@@ -306,17 +324,58 @@ public class SQLProjectDAO implements ProjectStore {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
               .withTableName(TABLE_NAME)
               .usingGeneratedKeyColumns("projectId");
+      try {
+        project.setProjectId(DbUtils.getAutoIncrement(template, TABLE_NAME));
+
+        String name = namingScheme.generateNameFor("name", project);
+        project.setName(name);
+
+        if (namingScheme.validateField("name", project.getName())) {
+          params.addValue("name", name);
+
+          Number newId = insert.executeAndReturnKey(params);
+          if (newId != project.getProjectId()) {
+            log.error("Expected Project ID doesn't match returned value from database insert: rolling back...");
+            new NamedParameterJdbcTemplate(template).update(PROJECT_DELETE, new MapSqlParameterSource().addValue("projectId", project.getProjectId()));
+            throw new IOException("Something bad happened. Expected Project ID doesn't match returned value from DB insert");
+          }
+        }
+        else {
+          throw new IOException("Cannot save Project - invalid field:" + project.toString());
+        }
+      }
+      catch (MisoNamingException e) {
+        throw new IOException("Cannot save Project - issue with naming scheme", e);
+      }
+      /*
       String name = "PRO" + DbUtils.getAutoIncrement(template, TABLE_NAME);
       params.addValue("name", name);
       Number newId = insert.executeAndReturnKey(params);
       project.setProjectId(newId.longValue());
       project.setName(name);
+      */
     }
     else {
+      try {
+        if (namingScheme.validateField("name", project.getName())) {
+          params.addValue("projectId", project.getProjectId())
+                .addValue("name", project.getName());
+          NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+          namedTemplate.update(PROJECT_UPDATE, params);
+        }
+        else {
+          throw new IOException("Cannot save Project - invalid field:" + project.toString());
+        }
+      }
+      catch (MisoNamingException e) {
+        throw new IOException("Cannot save Project - issue with naming scheme", e);
+      }
+      /*
       params.addValue("projectId", project.getProjectId());
       params.addValue("name", project.getName());
       NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
       namedTemplate.update(PROJECT_UPDATE, params);
+      */
     }
 
     if (this.cascadeType != null) {
@@ -433,6 +492,10 @@ public class SQLProjectDAO implements ProjectStore {
   )
   public List<Project> listAll() {
     return template.query(PROJECTS_SELECT, new LazyProjectMapper());
+  }
+
+  public List<Project> listAllWithLimit(long limit) throws IOException {
+    return template.query(PROJECTS_SELECT_LIMIT, new Object[]{limit}, new LazyProjectMapper());
   }
 
   @Override

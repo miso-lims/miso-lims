@@ -92,7 +92,7 @@ public class PoolAlertManager {
 
     Pool clone = cloner.deepClone(pool);
     ((PoolImpl)clone).addListener(getPoolListener());
-    pools.put(clone.getPoolId(), clone);
+    pools.put(clone.getId(), clone);
     return clone;
   }
 
@@ -119,7 +119,7 @@ public class PoolAlertManager {
 
   private void update(Pool p) throws IOException {
     if (enabled) {
-      Pool clone = pools.get(p.getPoolId());
+      Pool clone = pools.get(p.getId());
       if (clone == null) {
         log.info("New pool - adding all PoolWatchers and cloning!");
         clone = cloneAndAdd(p);
@@ -139,7 +139,7 @@ public class PoolAlertManager {
         }
       }
       else {
-        log.info("Updating Pool " + clone.getPoolId() + " ...");
+        log.info("Updating Pool " + clone.getId() + " ...");
 
         //find any watchable setters on the clone and call the respective getter from the clone parent
         //i.e. clone.setFoo(parent.getFoo()); where @WatchableSetter Class.setFoo(T t);
@@ -165,14 +165,14 @@ public class PoolAlertManager {
         //TODO the above will get rid of this necessity to call each method explicitly
         clone.setReadyToRun(p.getReadyToRun());
       }
-      pools.put(p.getPoolId(), clone);
+      pools.put(p.getId(), clone);
     }
   }
 
   public void addWatcher(Pool pool, Long userId) throws IOException {
     User user = securityManager.getUserById(userId);
     if (user != null) {
-      Pool clone = pools.get(pool.getPoolId());
+      Pool clone = pools.get(pool.getId());
       if (clone == null) {
         clone = cloneAndAdd(pool);
       }
@@ -183,7 +183,7 @@ public class PoolAlertManager {
   public void removeWatcher(Pool pool, Long userId) throws IOException {
     User user = securityManager.getUserById(userId);
     if (user != null && pool.getWatchers().contains(user)) {
-      Pool clone = pools.get(pool.getPoolId());
+      Pool clone = pools.get(pool.getId());
       if (clone == null) {
         clone = cloneAndAdd(pool);
       }

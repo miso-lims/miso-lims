@@ -42,7 +42,7 @@ import java.util.Date;
  * @since 0.1.2
  */
 public class DefaultAlert implements Alert {
-  public static final Long UNSAVED_ID = null;
+  public static final Long UNSAVED_ID = 0L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)

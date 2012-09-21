@@ -385,7 +385,7 @@ public class LibraryControllerHelperService {
                   Pattern pat = Pattern.compile(sampleNamingScheme.getValidationRegex("alias"));
                   Matcher mat = pat.matcher(s.getAlias());
                   //convert the sample alias automatically to a library alias
-                  int numLibs = requestManager.listAllLibrariesBySampleId(s.getSampleId()).size();
+                  int numLibs = requestManager.listAllLibrariesBySampleId(s.getId()).size();
                   String la = mat.group(1) + "_" + "L" + mat.group(2) + "-"+(numLibs+1)+"_" + mat.group(3);
                   if (libraryNamingScheme.validateField("alias", la)) {
                     libAlias = la;
@@ -510,7 +510,7 @@ public class LibraryControllerHelperService {
     }
     catch (IOException e) {
       e.printStackTrace();
-      log.debug("Failed to retrieve library types given platform type: ", e);
+      log.error("Failed to retrieve library types given platform type: ", e);
       return JSONUtils.SimpleJSONError("Failed to retrieve library types given platform type: " + e.getMessage());      
     }
     return JSONUtils.SimpleJSONError("Cannot resolve LibraryType from selected Platform");
@@ -531,7 +531,7 @@ public class LibraryControllerHelperService {
           Collections.sort(bs);
           for (TagBarcode tb : bs) {
             //option
-            tagsb.append("<option value='" + tb.getTagBarcodeId() + "'>"+tb.getName()+"</option>");
+            tagsb.append("<option value='" + tb.getId() + "'>"+tb.getName()+"</option>");
           }
           tagsb.append("</select><br/>");
           tagsb.append("<input type='hidden' value='on' name='_tagBarcodes[\""+i+"\"]'/>");
@@ -605,7 +605,7 @@ public class LibraryControllerHelperService {
       }
     }
     catch (Exception e) {
-      log.debug("Failed to add Library QC to this Library: ", e);
+      log.error("Failed to add Library QC to this Library: ", e);
       return JSONUtils.SimpleJSONError("Failed to add Library QC to this Library: " + e.getMessage());
     }
     return JSONUtils.SimpleJSONError("Cannot add LibraryQC");
@@ -712,7 +712,7 @@ public class LibraryControllerHelperService {
           sb.append("</td>");
 
           if (!library.getPlatformName().equals("Illumina")) {
-            sb.append("<td><a href='javascript:void(0);' onclick='Library.empcr.insertEmPcrRow("+dil.getDilutionId()+");'>Add emPCR</a></td>");
+            sb.append("<td><a href='javascript:void(0);' onclick='Library.empcr.insertEmPcrRow("+dil.getId()+");'>Add emPCR</a></td>");
           }
           else {
             //sb.append("<td><a href='/miso/poolwizard/new/"+library.getPlatformName().toLowerCase()+"/new/'>Construct New Pool</a></td>");
@@ -725,7 +725,7 @@ public class LibraryControllerHelperService {
       }
     }
     catch (Exception e) {
-      log.debug("Failed to add Library Dilution to this Library: ", e);
+      log.error("Failed to add Library Dilution to this Library: ", e);
       return JSONUtils.SimpleJSONError("Failed to add Library Dilution to this Library: " + e.getMessage());
     }
     return JSONUtils.SimpleJSONError("Cannot add LibraryDilution");
@@ -829,22 +829,22 @@ public class LibraryControllerHelperService {
         sb.append("</tr>");
         for (emPCR p : requestManager.listAllEmPCRsByDilutionId(dilutionId)) {
           sb.append("<tr>");
-          sb.append("<td>"+p.getPcrId()+"</td>");
+          sb.append("<td>"+p.getId()+"</td>");
           sb.append("<td>"+p.getPcrCreator()+"</td>");
           sb.append("<td>"+p.getCreationDate()+"</td>");
           sb.append("<td>"+p.getConcentration()+" "+ p.getUnits()+"</td>");
-          sb.append("<td><a href='javascript:void(0);' onclick='Library.empcr.insertEmPcrDilutionRow("+p.getPcrId()+");'>Add emPCR Dilution</a></td>");
+          sb.append("<td><a href='javascript:void(0);' onclick='Library.empcr.insertEmPcrDilutionRow("+p.getId()+");'>Add emPCR Dilution</a></td>");
           sb.append("</tr>");
         }
         return JSONUtils.SimpleJSONResponse(sb.toString());
       }
       else {
-        log.debug("Failed to add emPCR to this LibraryDilution: No parent Dilution ID found");
+        log.error("Failed to add emPCR to this LibraryDilution: No parent Dilution ID found");
         return JSONUtils.SimpleJSONError("Failed to add emPCR to this LibraryDilution: No parent Dilution ID found");        
       }
     }
     catch (Exception e) {
-      log.debug("Failed to add emPCR to this LibraryDilution: ", e);
+      log.error("Failed to add emPCR to this LibraryDilution: ", e);
       return JSONUtils.SimpleJSONError("Failed to add emPCR to this LibraryDilution: " + e.getMessage());
     }
   }
@@ -877,7 +877,7 @@ public class LibraryControllerHelperService {
         File temploc = new File(session.getServletContext().getRealPath("/")+"temp/");
         for (emPCRDilution dil : requestManager.listAllEmPcrDilutionsByEmPcrId(pcrId)) {
           sb.append("<tr>");
-          sb.append("<td>"+dil.getDilutionId()+"</td>");
+          sb.append("<td>"+dil.getId()+"</td>");
           sb.append("<td>"+dil.getDilutionCreator()+"</td>");
           sb.append("<td>"+dil.getCreationDate()+"</td>");
           sb.append("<td>"+dil.getConcentration()+" "+ dil.getUnits()+"</td>");
@@ -907,7 +907,7 @@ public class LibraryControllerHelperService {
       }
     }
     catch (Exception e) {
-      log.debug("Failed to add EmPCRDilution to this EmPCR: ", e);
+      log.error("Failed to add EmPCRDilution to this EmPCR: ", e);
       return JSONUtils.SimpleJSONError("Failed to add EmPCRDilution to this EmPCR: " + e.getMessage());
     }
     return JSONUtils.SimpleJSONError("Cannot add EmPCRDilution");
@@ -1154,5 +1154,9 @@ public class LibraryControllerHelperService {
 
   public void setSampleNamingScheme(MisoNamingScheme<Sample> sampleNamingScheme) {
     this.sampleNamingScheme = sampleNamingScheme;
+  }
+
+  public void setLibraryNamingScheme(MisoNamingScheme<Library> libraryNamingScheme) {
+    this.libraryNamingScheme = libraryNamingScheme;
   }
 }

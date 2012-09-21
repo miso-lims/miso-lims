@@ -118,8 +118,8 @@ public class EditRunController {
 
   public Boolean isMultiplexed(@PathVariable Long runId) throws IOException {
     Run run = requestManager.getRunById(runId);
-    if (run != null && run.getRunId() != AbstractRun.UNSAVED_ID) {
-      for (SequencerPartitionContainer<SequencerPoolPartition> f : requestManager.listSequencerPartitionContainersByRunId(run.getRunId())) {
+    if (run != null && run.getId() != AbstractRun.UNSAVED_ID) {
+      for (SequencerPartitionContainer<SequencerPoolPartition> f : requestManager.listSequencerPartitionContainersByRunId(run.getId())) {
         for (SequencerPoolPartition p : f.getPartitions()) {
           if (p.getPool() != null && p.getPool().getDilutions().size() > 1) {
             return true;
@@ -132,7 +132,7 @@ public class EditRunController {
 
   public Boolean hasOperationsQcPassed(@PathVariable Long runId) throws IOException {
     Run run = requestManager.getRunById(runId);
-    if (run != null && run.getRunId() != AbstractRun.UNSAVED_ID) {
+    if (run != null && run.getId() != AbstractRun.UNSAVED_ID) {
       for (RunQC qc : run.getRunQCs()) {
         if ("SeqOps QC".equals(qc.getQcType().getName()) && !qc.getDoNotProcess()) {
           return true;
@@ -144,7 +144,7 @@ public class EditRunController {
 
   public Boolean hasInformaticsQcPassed(@PathVariable Long runId) throws IOException {
     Run run = requestManager.getRunById(runId);
-    if (run != null && run.getRunId() != AbstractRun.UNSAVED_ID) {
+    if (run != null && run.getId() != AbstractRun.UNSAVED_ID) {
       for (RunQC qc : run.getRunQCs()) {
         if ("SeqInfo QC".equals(qc.getQcType().getName()) && !qc.getDoNotProcess()) {
           return true;
@@ -297,7 +297,7 @@ public class EditRunController {
 
       Map<Long, String> runMap = new HashMap<Long, String>();
       if (run.getWatchers().contains(user)) {
-        runMap.put(run.getRunId(), user.getLoginName());
+        runMap.put(run.getId(), user.getLoginName());
       }
       model.put("overviewMap", runMap);
 
@@ -322,7 +322,7 @@ public class EditRunController {
       requestManager.saveRun(run);
       session.setComplete();
       model.clear();
-      return "redirect:/miso/run/" + run.getRunId();
+      return "redirect:/miso/run/" + run.getId();
     }
     catch (IOException ex) {
       if (log.isDebugEnabled()) {

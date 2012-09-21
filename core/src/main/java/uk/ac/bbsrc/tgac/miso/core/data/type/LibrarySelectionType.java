@@ -38,7 +38,7 @@ import javax.persistence.Id;
  */
 public class LibrarySelectionType implements Comparable {
   /** Field UNSAVED_ID  */
-  public static final Long UNSAVED_ID = null;
+  public static final Long UNSAVED_ID = 0L;
 
   /** Field librarySelectionTypeId  */
   @Id

@@ -68,7 +68,7 @@ public class MockRunResponderService implements ResponderService {
     if (event instanceof RunEvent) {
       RunEvent re = (RunEvent)event;
       Run r = re.getEventObject();
-      log.info("Checking responder for run " + r.getRunId());
+      log.info("Checking responder for run " + r.getId());
       if (r.getStatus() != null) {
         Status s = r.getStatus();
         if (s.getHealth().equals(HealthType.Failed) || s.getHealth().equals(HealthType.Completed)) {

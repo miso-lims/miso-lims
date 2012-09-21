@@ -105,7 +105,7 @@ public class RunControllerHelperService {
           log.info("STORED: " + newRuntype + " :: " + storedPlatformType);
           if (!newRuntype.equals(storedPlatformType)) {
             run = dataObjectFactory.getRunOfType(newPt, user);
-            run.setRunId(storedRun.getRunId());
+            run.setId(storedRun.getId());
           }
           else {
             run = storedRun;
@@ -525,7 +525,7 @@ public class RunControllerHelperService {
         for (SequencerPartitionContainer<SequencerPoolPartition> f : ((RunImpl) r).getSequencerPartitionContainers()) {
           sb.append("<table class='containerSummary'><tr>");
           for (Partition p : f.getPartitions()) {
-            sb.append("<td onclick='Run.qc.toggleProcessPartition(this);' runId='"+r.getRunId()+"' containerId='"+f.getContainerId()+"' partitionNumber='"+p.getPartitionNumber()+"' id='"+r.getRunId()+"_"+f.getContainerId()+"_"+p.getPartitionNumber()+"' class='smallbox'>"+p.getPartitionNumber()+"</td>");
+            sb.append("<td onclick='Run.qc.toggleProcessPartition(this);' runId='"+r.getId()+"' containerId='"+f.getId()+"' partitionNumber='"+p.getPartitionNumber()+"' id='"+r.getId()+"_"+f.getId()+"_"+p.getPartitionNumber()+"' class='smallbox'>"+p.getPartitionNumber()+"</td>");
           }
           sb.append("</tr></table>");
         }
@@ -598,11 +598,11 @@ public class RunControllerHelperService {
           for (SequencerPartitionContainer<SequencerPoolPartition> f : ((RunImpl) run).getSequencerPartitionContainers()) {
             sb.append("<table class='containerSummary'><tr>");
             for (Partition p : f.getPartitions()) {
-              if (processSelections.contains(run.getRunId()+"_"+f.getContainerId()+"_"+p.getPartitionNumber())) {
-                sb.append("<td runId='"+run.getRunId()+"' containerId='"+f.getContainerId()+"' partitionId='"+p.getId()+"' id='"+qc.getQcId()+"_"+run.getRunId()+"_"+f.getContainerId()+"_"+p.getPartitionNumber()+"' class='smallbox partitionOccupied'>"+p.getPartitionNumber()+"</td>");
+              if (processSelections.contains(run.getId()+"_"+f.getId()+"_"+p.getPartitionNumber())) {
+                sb.append("<td runId='"+run.getId()+"' containerId='"+f.getId()+"' partitionId='"+p.getId()+"' id='"+qc.getId()+"_"+run.getId()+"_"+f.getId()+"_"+p.getPartitionNumber()+"' class='smallbox partitionOccupied'>"+p.getPartitionNumber()+"</td>");
               }
               else {
-                sb.append("<td runId='"+run.getRunId()+"' containerId='"+f.getContainerId()+"' partitionId='"+p.getId()+"' id='"+qc.getQcId()+"_"+run.getRunId()+"_"+f.getContainerId()+"_"+p.getPartitionNumber()+"' class='smallbox'>"+p.getPartitionNumber()+"</td>");
+                sb.append("<td runId='"+run.getId()+"' containerId='"+f.getId()+"' partitionId='"+p.getId()+"' id='"+qc.getId()+"_"+run.getId()+"_"+f.getId()+"_"+p.getPartitionNumber()+"' class='smallbox'>"+p.getPartitionNumber()+"</td>");
               }
             }
             sb.append("</tr></table>");
@@ -930,7 +930,7 @@ public class RunControllerHelperService {
                     sb.append(e.getStudy().getProject().getAlias() + " (" + e.getName() + ": " + p.getPool().getDilutions().size() + " dilutions)<br/>");
                   }
                   sb.append("</i>");
-                  sb.append("<input type='hidden' name='sequencerPartitionContainers["+containerNum+"].partitions[" + (p.getPartitionNumber() - 1) + "].pool' id='pId" + (p.getPartitionNumber() - 1) + "' value='"+p.getPool().getPoolId()+"'/>");
+                  sb.append("<input type='hidden' name='sequencerPartitionContainers["+containerNum+"].partitions[" + (p.getPartitionNumber() - 1) + "].pool' id='pId" + (p.getPartitionNumber() - 1) + "' value='"+p.getPool().getId()+"'/>");
                 }
                 else {
                   sb.append("<i>No experiment linked to this pool</i>");
@@ -952,6 +952,7 @@ public class RunControllerHelperService {
             sb.append("</table>");
             Map<String, Object> responseMap = new HashMap<String, Object>();
             responseMap.put("html", sb.toString());
+            responseMap.put("barcode", f.getIdentificationBarcode());
             responseMap.put("verify", confirm);
             return JSONUtils.JSONObjectResponse(responseMap);
           }
@@ -1132,16 +1133,16 @@ public class RunControllerHelperService {
           }
           else {
             for (Study s : studies) {
-              b.append("<option value='" + s.getStudyId() + "'>" + s.getAlias() + " (" + s.getName() + " - " + s.getStudyType() + ")</option>");
+              b.append("<option value='" + s.getId() + "'>" + s.getAlias() + " (" + s.getName() + " - " + s.getStudyType() + ")</option>");
             }
           }
           b.append("</select>");
-          b.append("<input type='button' onclick=\"Run.container.selectStudy('" + partition + "', " + p.getPoolId() + ","+project.getProjectId()+");\" class=\"ui-state-default ui-corner-all\" value='Select Study'/>");
+          b.append("<input type='button' onclick=\"Run.container.selectStudy('" + partition + "', " + p.getId() + ","+project.getProjectId()+");\" class=\"ui-state-default ui-corner-all\" value='Select Study'/>");
           b.append("</div><br/>");
         }
       }
       b.append("</div>");
-      b.append("<input type='hidden' name='sequencerPartitionContainers["+container+"].partitions[" + partition + "].pool' id='pId" + p.getPoolId() + "' value='" + p.getPoolId() + "'/></div>");
+      b.append("<input type='hidden' name='sequencerPartitionContainers["+container+"].partitions[" + partition + "].pool' id='pId" + p.getId() + "' value='" + p.getId() + "'/></div>");
       b.append("<div style='position: absolute; bottom: 0; right: 0; font-size: 24px; font-weight: bold; color:#BBBBBB'>" + p.getPlatformType().getKey() + "</div>");
       b.append("<span style='position: absolute; top: 0; right: 0;' onclick='Run.pool.confirmPoolRemove(this);' class='float-right ui-icon ui-icon-circle-close'></span>");
       b.append("</div>");

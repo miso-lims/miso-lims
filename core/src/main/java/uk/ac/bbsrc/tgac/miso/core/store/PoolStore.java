@@ -30,6 +30,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaPool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ls454.LS454Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.solid.SolidPool;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -41,7 +42,7 @@ import java.util.List;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface PoolStore extends Store<Pool<? extends Poolable>>, Remover<Pool> {
+public interface PoolStore extends Store<Pool<? extends Poolable>>, Remover<Pool>, NamingSchemeAware<Pool> {
   /**
    * Get a Pool given a Pool ID
    *

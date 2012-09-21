@@ -78,7 +78,7 @@
                     <td>${experiment.description}</td>
                     <td>${experiment.platform.platformType.key} - ${experiment.platform.instrumentModel}</td>
                     <td class="misoicon"
-                        onclick="window.location.href='<c:url value="/miso/experiment/${experiment.experimentId}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
+                        onclick="window.location.href='<c:url value="/miso/experiment/${experiment.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
                 </tr>
             </c:forEach>
             </tbody>

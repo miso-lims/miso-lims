@@ -34,6 +34,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRPool;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.*;
 import com.googlecode.ehcache.annotations.Cacheable;
 import com.googlecode.ehcache.annotations.TriggersRemove;
@@ -275,8 +277,20 @@ public class SQLPoolDAO implements PoolStore {
   private ExperimentStore experimentDAO;
   private Store<SecurityProfile> securityProfileDAO;
   private WatcherStore watcherDAO;
-
   private CascadeType cascadeType;
+
+  @Autowired
+  private MisoNamingScheme<Pool> namingScheme;
+
+  @Override
+  public MisoNamingScheme<Pool> getNamingScheme() {
+    return namingScheme;
+  }
+
+  @Override
+  public void setNamingScheme(MisoNamingScheme<Pool> namingScheme) {
+    this.namingScheme = namingScheme;
+  }
 
   @Autowired
   private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
@@ -334,17 +348,17 @@ public class SQLPoolDAO implements PoolStore {
   public Pool getPoolByExperiment(Experiment e) {
     if (e.getPlatform() != null) {
       if (e.getPlatform().getPlatformType().equals(PlatformType.ILLUMINA)) {
-        List eResults = template.query(ILLUMINA_POOL_SELECT_BY_EXPERIMENT_ID, new Object[]{e.getExperimentId()}, new PoolMapper());
+        List eResults = template.query(ILLUMINA_POOL_SELECT_BY_EXPERIMENT_ID, new Object[]{e.getId()}, new PoolMapper());
         Pool p = eResults.size() > 0 ? (Pool) eResults.get(0) : null;
         return p;
       }
       else if (e.getPlatform().getPlatformType().equals(PlatformType.LS454)) {
-        List eResults = template.query(LS454_POOL_SELECT_BY_EXPERIMENT_ID, new Object[]{e.getExperimentId()}, new PoolMapper());
+        List eResults = template.query(LS454_POOL_SELECT_BY_EXPERIMENT_ID, new Object[]{e.getId()}, new PoolMapper());
         Pool p = eResults.size() > 0 ? (Pool) eResults.get(0) : null;
         return p;
       }
       else if (e.getPlatform().getPlatformType().equals(PlatformType.SOLID)) {
-        List eResults = template.query(SOLID_POOL_SELECT_BY_EXPERIMENT_ID, new Object[]{e.getExperimentId()}, new PoolMapper());
+        List eResults = template.query(SOLID_POOL_SELECT_BY_EXPERIMENT_ID, new Object[]{e.getId()}, new PoolMapper());
         Pool p = eResults.size() > 0 ? (Pool) eResults.get(0) : null;
         return p;
       }
@@ -395,6 +409,7 @@ public class SQLPoolDAO implements PoolStore {
     return template.query(ILLUMINA_POOL_SELECT_BY_READY, new PoolMapper());
   }
 
+  @Deprecated
   public long saveIlluminaPool(IlluminaPool pool) throws IOException {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
 
@@ -412,7 +427,7 @@ public class SQLPoolDAO implements PoolStore {
             .addValue("platformType", PlatformType.ILLUMINA.getKey())
             .addValue("ready", pool.getReadyToRun());
 
-    if (pool.getPoolId() == AbstractPool.UNSAVED_ID) {
+    if (pool.getId() == AbstractPool.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
               .withTableName(TABLE_NAME)
               .usingGeneratedKeyColumns("poolId");
@@ -420,11 +435,11 @@ public class SQLPoolDAO implements PoolStore {
       params.addValue("name", name);
       params.addValue("identificationBarcode", name + "::" + PlatformType.ILLUMINA.getKey());
       Number newId = insert.executeAndReturnKey(params);
-      pool.setPoolId(newId.longValue());
+      pool.setId(newId.longValue());
       pool.setName(name);
     }
     else {
-      params.addValue("poolId", pool.getPoolId())
+      params.addValue("poolId", pool.getId())
               .addValue("name", pool.getName())
               .addValue("identificationBarcode", pool.getName() + "::" + PlatformType.ILLUMINA.getKey());
       NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
@@ -432,7 +447,7 @@ public class SQLPoolDAO implements PoolStore {
     }
 
     MapSqlParameterSource delparams = new MapSqlParameterSource();
-    delparams.addValue("pool_poolId", pool.getPoolId());
+    delparams.addValue("pool_poolId", pool.getId());
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
     namedTemplate.update(LIBRARY_DILUTION_POOL_DELETE_BY_POOL_ID, delparams);
 
@@ -444,8 +459,8 @@ public class SQLPoolDAO implements PoolStore {
 
       for (Dilution d : pool.getDilutions()) {
         MapSqlParameterSource esParams = new MapSqlParameterSource();
-        esParams.addValue("dilutions_dilutionId", d.getDilutionId())
-                .addValue("pool_poolId", pool.getPoolId());
+        esParams.addValue("dilutions_dilutionId", d.getId())
+                .addValue("pool_poolId", pool.getId());
 
         eInsert.execute(esParams);
 
@@ -454,14 +469,14 @@ public class SQLPoolDAO implements PoolStore {
             dilutionDAO.save(d);
           }
           else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-            dc.remove(DbUtils.hashCodeCacheKeyFor(d.getDilutionId()));
+            dc.remove(DbUtils.hashCodeCacheKeyFor(d.getId()));
           }
         }
       }
     }
 
     MapSqlParameterSource poolparams = new MapSqlParameterSource();
-    poolparams.addValue("pool_poolId", pool.getPoolId());
+    poolparams.addValue("pool_poolId", pool.getId());
     NamedParameterJdbcTemplate poolNamedTemplate = new NamedParameterJdbcTemplate(template);
     poolNamedTemplate.update(POOL_EXPERIMENT_DELETE_BY_POOL_ID, poolparams);
 
@@ -473,8 +488,8 @@ public class SQLPoolDAO implements PoolStore {
 
       for (Experiment e : pool.getExperiments()) {
         MapSqlParameterSource esParams = new MapSqlParameterSource();
-        esParams.addValue("experiments_experimentId", e.getExperimentId())
-                .addValue("pool_poolId", pool.getPoolId());
+        esParams.addValue("experiments_experimentId", e.getId())
+                .addValue("pool_poolId", pool.getId());
 
         eInsert.execute(esParams);
 
@@ -483,7 +498,7 @@ public class SQLPoolDAO implements PoolStore {
             experimentDAO.save(e);
           }
           else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-            ec.remove(DbUtils.hashCodeCacheKeyFor(e.getExperimentId()));
+            ec.remove(DbUtils.hashCodeCacheKeyFor(e.getId()));
           }
         }
       }
@@ -495,7 +510,7 @@ public class SQLPoolDAO implements PoolStore {
       watcherDAO.saveWatchedEntityUser(pool, u);
     }
 
-    return pool.getPoolId();
+    return pool.getId();
   }
 
   public Pool get454PoolByBarcode(String barcode) throws IOException {
@@ -527,6 +542,7 @@ public class SQLPoolDAO implements PoolStore {
     return template.query(LS454_POOL_SELECT_BY_READY, new PoolMapper());
   }
 
+  @Deprecated
   public long save454Pool(LS454Pool pool) throws IOException {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
 
@@ -543,7 +559,7 @@ public class SQLPoolDAO implements PoolStore {
             .addValue("platformType", PlatformType.LS454.getKey())
             .addValue("ready", pool.getReadyToRun());
 
-    if (pool.getPoolId() == AbstractPool.UNSAVED_ID) {
+    if (pool.getId() == AbstractPool.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
               .withTableName(TABLE_NAME)
               .usingGeneratedKeyColumns("poolId");
@@ -551,11 +567,11 @@ public class SQLPoolDAO implements PoolStore {
       params.addValue("name", name);
       params.addValue("identificationBarcode", name + "::" + PlatformType.LS454.getKey());
       Number newId = insert.executeAndReturnKey(params);
-      pool.setPoolId(newId.longValue());
+      pool.setId(newId.longValue());
       pool.setName(name);
     }
     else {
-      params.addValue("poolId", pool.getPoolId())
+      params.addValue("poolId", pool.getId())
               .addValue("name", pool.getName())
               .addValue("identificationBarcode", pool.getName() + "::" + PlatformType.LS454.getKey());
       NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
@@ -563,7 +579,7 @@ public class SQLPoolDAO implements PoolStore {
     }
 
     MapSqlParameterSource delparams = new MapSqlParameterSource();
-    delparams.addValue("pool_poolId", pool.getPoolId());
+    delparams.addValue("pool_poolId", pool.getId());
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
     namedTemplate.update(EMPCR_DILUTION_POOL_DELETE_BY_POOL_ID, delparams);
 
@@ -573,8 +589,8 @@ public class SQLPoolDAO implements PoolStore {
       Cache dc = cacheManager.getCache("emPCRDilutionCache");
       for (Dilution d : pool.getDilutions()) {
         MapSqlParameterSource esParams = new MapSqlParameterSource();
-        esParams.addValue("dilutions_dilutionId", d.getDilutionId())
-                .addValue("pool_poolId", pool.getPoolId());
+        esParams.addValue("dilutions_dilutionId", d.getId())
+                .addValue("pool_poolId", pool.getId());
 
         eInsert.execute(esParams);
 
@@ -583,14 +599,14 @@ public class SQLPoolDAO implements PoolStore {
             dilutionDAO.save(d);
           }
           else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-            dc.remove(DbUtils.hashCodeCacheKeyFor(d.getDilutionId()));
+            dc.remove(DbUtils.hashCodeCacheKeyFor(d.getId()));
           }
         }
       }
     }
 
     MapSqlParameterSource poolparams = new MapSqlParameterSource();
-    poolparams.addValue("pool_poolId", pool.getPoolId());
+    poolparams.addValue("pool_poolId", pool.getId());
     NamedParameterJdbcTemplate poolNamedTemplate = new NamedParameterJdbcTemplate(template);
     poolNamedTemplate.update(POOL_EXPERIMENT_DELETE_BY_POOL_ID, poolparams);
 
@@ -600,8 +616,8 @@ public class SQLPoolDAO implements PoolStore {
       Cache ec = cacheManager.getCache("experimentCache");
       for (Experiment e : pool.getExperiments()) {
         MapSqlParameterSource esParams = new MapSqlParameterSource();
-        esParams.addValue("experiments_experimentId", e.getExperimentId())
-                .addValue("pool_poolId", pool.getPoolId());
+        esParams.addValue("experiments_experimentId", e.getId())
+                .addValue("pool_poolId", pool.getId());
 
         eInsert.execute(esParams);
 
@@ -610,7 +626,7 @@ public class SQLPoolDAO implements PoolStore {
             experimentDAO.save(e);
           }
           else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-            ec.remove(DbUtils.hashCodeCacheKeyFor(e.getExperimentId()));
+            ec.remove(DbUtils.hashCodeCacheKeyFor(e.getId()));
           }
         }
       }
@@ -622,7 +638,7 @@ public class SQLPoolDAO implements PoolStore {
       watcherDAO.saveWatchedEntityUser(pool, u);
     }
 
-    return pool.getPoolId();
+    return pool.getId();
   }
 
   public Pool getSolidPoolByBarcode(String barcode) throws IOException {
@@ -654,6 +670,7 @@ public class SQLPoolDAO implements PoolStore {
     return template.query(SOLID_POOL_SELECT_BY_READY, new PoolMapper());
   }
 
+  @Deprecated
   public long saveSolidPool(SolidPool pool) throws IOException {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
 
@@ -670,7 +687,7 @@ public class SQLPoolDAO implements PoolStore {
             .addValue("platformType", PlatformType.SOLID.getKey())
             .addValue("ready", pool.getReadyToRun());
 
-    if (pool.getPoolId() == AbstractPool.UNSAVED_ID) {
+    if (pool.getId() == AbstractPool.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
               .withTableName(TABLE_NAME)
               .usingGeneratedKeyColumns("poolId");
@@ -678,11 +695,11 @@ public class SQLPoolDAO implements PoolStore {
       params.addValue("name", name);
       params.addValue("identificationBarcode", name + "::" + PlatformType.SOLID.getKey());
       Number newId = insert.executeAndReturnKey(params);
-      pool.setPoolId(newId.longValue());
+      pool.setId(newId.longValue());
       pool.setName(name);
     }
     else {
-      params.addValue("poolId", pool.getPoolId())
+      params.addValue("poolId", pool.getId())
               .addValue("name", pool.getName())
               .addValue("identificationBarcode", pool.getName() + "::" + PlatformType.SOLID.getKey());
       NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
@@ -690,7 +707,7 @@ public class SQLPoolDAO implements PoolStore {
     }
 
     MapSqlParameterSource delparams = new MapSqlParameterSource();
-    delparams.addValue("pool_poolId", pool.getPoolId());
+    delparams.addValue("pool_poolId", pool.getId());
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
     namedTemplate.update(EMPCR_DILUTION_POOL_DELETE_BY_POOL_ID, delparams);
 
@@ -700,8 +717,8 @@ public class SQLPoolDAO implements PoolStore {
       Cache dc = cacheManager.getCache("emPCRDilutionCache");
       for (Dilution d : pool.getDilutions()) {
         MapSqlParameterSource esParams = new MapSqlParameterSource();
-        esParams.addValue("dilutions_dilutionId", d.getDilutionId())
-                .addValue("pool_poolId", pool.getPoolId());
+        esParams.addValue("dilutions_dilutionId", d.getId())
+                .addValue("pool_poolId", pool.getId());
 
         eInsert.execute(esParams);
 
@@ -710,14 +727,14 @@ public class SQLPoolDAO implements PoolStore {
             dilutionDAO.save(d);
           }
           else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-            dc.remove(DbUtils.hashCodeCacheKeyFor(d.getDilutionId()));
+            dc.remove(DbUtils.hashCodeCacheKeyFor(d.getId()));
           }
         }
       }
     }
 
     MapSqlParameterSource poolparams = new MapSqlParameterSource();
-    poolparams.addValue("pool_poolId", pool.getPoolId());
+    poolparams.addValue("pool_poolId", pool.getId());
     NamedParameterJdbcTemplate poolNamedTemplate = new NamedParameterJdbcTemplate(template);
     poolNamedTemplate.update(POOL_EXPERIMENT_DELETE_BY_POOL_ID, poolparams);
 
@@ -727,8 +744,8 @@ public class SQLPoolDAO implements PoolStore {
       Cache ec = cacheManager.getCache("experimentCache");
       for (Experiment e : pool.getExperiments()) {
         MapSqlParameterSource esParams = new MapSqlParameterSource();
-        esParams.addValue("experiments_experimentId", e.getExperimentId())
-                .addValue("pool_poolId", pool.getPoolId());
+        esParams.addValue("experiments_experimentId", e.getId())
+                .addValue("pool_poolId", pool.getId());
 
         eInsert.execute(esParams);
 
@@ -737,7 +754,7 @@ public class SQLPoolDAO implements PoolStore {
             experimentDAO.save(e);
           }
           else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-            ec.remove(DbUtils.hashCodeCacheKeyFor(e.getExperimentId()));
+            ec.remove(DbUtils.hashCodeCacheKeyFor(e.getId()));
           }
         }
       }
@@ -749,7 +766,7 @@ public class SQLPoolDAO implements PoolStore {
       watcherDAO.saveWatchedEntityUser(pool, u);
     }
 
-    return pool.getPoolId();
+    return pool.getId();
   }
 
   @Cacheable(cacheName = "poolCache",
@@ -771,6 +788,7 @@ public class SQLPoolDAO implements PoolStore {
     return template.query(EMPCR_POOL_SELECT, new EmPCRPoolMapper());
   }
 
+  @Deprecated
   public long saveEmPCRPool(emPCRPool pool) throws IOException {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
 
@@ -787,7 +805,7 @@ public class SQLPoolDAO implements PoolStore {
             .addValue("platformType", pool.getPlatformType().getKey())
             .addValue("ready", pool.getReadyToRun());
 
-    if (pool.getPoolId() == AbstractPool.UNSAVED_ID) {
+    if (pool.getId() == AbstractPool.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
               .withTableName(TABLE_NAME)
               .usingGeneratedKeyColumns("poolId");
@@ -795,11 +813,11 @@ public class SQLPoolDAO implements PoolStore {
       params.addValue("name", name);
       params.addValue("identificationBarcode", name + "::" + pool.getPlatformType().getKey());
       Number newId = insert.executeAndReturnKey(params);
-      pool.setPoolId(newId.longValue());
+      pool.setId(newId.longValue());
       pool.setName(name);
     }
     else {
-      params.addValue("poolId", pool.getPoolId())
+      params.addValue("poolId", pool.getId())
               .addValue("name", pool.getName())
               .addValue("identificationBarcode", pool.getName() + "::" + pool.getPlatformType().getKey());
       NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
@@ -807,7 +825,7 @@ public class SQLPoolDAO implements PoolStore {
     }
 
     MapSqlParameterSource delparams = new MapSqlParameterSource();
-    delparams.addValue("pool_poolId", pool.getPoolId());
+    delparams.addValue("pool_poolId", pool.getId());
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
     namedTemplate.update(LIBRARY_DILUTION_POOL_DELETE_BY_POOL_ID, delparams);
 
@@ -817,8 +835,8 @@ public class SQLPoolDAO implements PoolStore {
       Cache dc = cacheManager.getCache("libraryDilutionCache");
       for (Dilution d : pool.getDilutions()) {
         MapSqlParameterSource esParams = new MapSqlParameterSource();
-        esParams.addValue("dilutions_dilutionId", d.getDilutionId())
-                .addValue("pool_poolId", pool.getPoolId());
+        esParams.addValue("dilutions_dilutionId", d.getId())
+                .addValue("pool_poolId", pool.getId());
 
         eInsert.execute(esParams);
 
@@ -827,14 +845,14 @@ public class SQLPoolDAO implements PoolStore {
             dilutionDAO.save(d);
           }
           else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-            dc.remove(DbUtils.hashCodeCacheKeyFor(d.getDilutionId()));
+            dc.remove(DbUtils.hashCodeCacheKeyFor(d.getId()));
           }
         }
       }
     }
 
     MapSqlParameterSource poolparams = new MapSqlParameterSource();
-    poolparams.addValue("pool_poolId", pool.getPoolId());
+    poolparams.addValue("pool_poolId", pool.getId());
     NamedParameterJdbcTemplate poolNamedTemplate = new NamedParameterJdbcTemplate(template);
     poolNamedTemplate.update(POOL_EXPERIMENT_DELETE_BY_POOL_ID, poolparams);
 
@@ -844,8 +862,8 @@ public class SQLPoolDAO implements PoolStore {
       Cache ec = cacheManager.getCache("experimentCache");
       for (Experiment e : pool.getExperiments()) {
         MapSqlParameterSource esParams = new MapSqlParameterSource();
-        esParams.addValue("experiments_experimentId", e.getExperimentId())
-                .addValue("pool_poolId", pool.getPoolId());
+        esParams.addValue("experiments_experimentId", e.getId())
+                .addValue("pool_poolId", pool.getId());
 
         eInsert.execute(esParams);
 
@@ -854,7 +872,7 @@ public class SQLPoolDAO implements PoolStore {
             experimentDAO.save(e);
           }
           else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-            ec.remove(DbUtils.hashCodeCacheKeyFor(e.getExperimentId()));
+            ec.remove(DbUtils.hashCodeCacheKeyFor(e.getId()));
           }
         }
       }
@@ -866,7 +884,7 @@ public class SQLPoolDAO implements PoolStore {
       watcherDAO.saveWatchedEntityUser(pool, u);
     }
 
-    return pool.getPoolId();
+    return pool.getId();
   }
 
   @Transactional(readOnly = false, rollbackFor = Exception.class)
@@ -894,27 +912,72 @@ public class SQLPoolDAO implements PoolStore {
             .addValue("platformType", pool.getPlatformType().getKey())
             .addValue("ready", pool.getReadyToRun());
 
-    if (pool.getPoolId() == AbstractPool.UNSAVED_ID) {
+    if (pool.getId() == AbstractPool.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
               .withTableName(TABLE_NAME)
               .usingGeneratedKeyColumns("poolId");
+      try {
+        pool.setId(DbUtils.getAutoIncrement(template, TABLE_NAME));
+
+        String name = namingScheme.generateNameFor("name", pool);
+        pool.setName(name);
+
+        if (namingScheme.validateField("name", pool.getName())) {
+          String barcode = name + "::" + pool.getPlatformType().getKey();
+          params.addValue("name", name);
+
+          params.addValue("identificationBarcode", barcode);
+
+          Number newId = insert.executeAndReturnKey(params);
+          if (newId.longValue() != pool.getId()) {
+            log.error("Expected Pool ID doesn't match returned value from database insert: rolling back...");
+            new NamedParameterJdbcTemplate(template).update(POOL_DELETE, new MapSqlParameterSource().addValue("poolId", pool.getId()));
+            throw new IOException("Something bad happened. Expected Pool ID doesn't match returned value from DB insert");
+          }
+        }
+        else {
+          throw new IOException("Cannot save Pool - invalid field:" + pool.toString());
+        }
+      }
+      catch (MisoNamingException e) {
+        throw new IOException("Cannot save Pool - issue with naming scheme", e);
+      }
+      /*
       String name = AbstractPool.lookupPrefix(pool.getPlatformType())+ DbUtils.getAutoIncrement(template, TABLE_NAME);
       params.addValue("name", name);
       params.addValue("identificationBarcode", name + "::" + pool.getPlatformType().getKey());
       Number newId = insert.executeAndReturnKey(params);
       pool.setPoolId(newId.longValue());
       pool.setName(name);
+      */
     }
     else {
+      try {
+        if (namingScheme.validateField("name", pool.getName())) {
+          params.addValue("poolId", pool.getId())
+                .addValue("name", pool.getName())
+                .addValue("identificationBarcode", pool.getName() + "::" + pool.getPlatformType().getKey());
+          NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+          namedTemplate.update(POOL_UPDATE, params);
+        }
+        else {
+          throw new IOException("Cannot save Pool - invalid field:" + pool.toString());
+        }
+      }
+      catch (MisoNamingException e) {
+        throw new IOException("Cannot save Pool - issue with naming scheme", e);
+      }
+      /*
       params.addValue("poolId", pool.getPoolId())
               .addValue("name", pool.getName())
               .addValue("identificationBarcode", pool.getName() + "::" + pool.getPlatformType().getKey());
       NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
       namedTemplate.update(POOL_UPDATE, params);
+      */
     }
 
     MapSqlParameterSource delparams = new MapSqlParameterSource();
-    delparams.addValue("pool_poolId", pool.getPoolId());
+    delparams.addValue("pool_poolId", pool.getId());
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
     namedTemplate.update(LIBRARY_DILUTION_POOL_DELETE_BY_POOL_ID, delparams);
     namedTemplate.update(EMPCR_DILUTION_POOL_DELETE_BY_POOL_ID, delparams);
@@ -930,8 +993,8 @@ public class SQLPoolDAO implements PoolStore {
       for (Dilution d : pool.getDilutions()) {
         log.debug("Linking "+d.getName() + " to " + pool.getName());
         MapSqlParameterSource esParams = new MapSqlParameterSource();
-        esParams.addValue("dilutions_dilutionId", d.getDilutionId())
-                .addValue("pool_poolId", pool.getPoolId());
+        esParams.addValue("dilutions_dilutionId", d.getId())
+                .addValue("pool_poolId", pool.getId());
 
         eInsert.execute(esParams);
 
@@ -940,14 +1003,14 @@ public class SQLPoolDAO implements PoolStore {
             dilutionDAO.save(d);
           }
           else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-            dc.remove(DbUtils.hashCodeCacheKeyFor(d.getDilutionId()));
+            dc.remove(DbUtils.hashCodeCacheKeyFor(d.getId()));
           }
         }
       }
     }
 
     MapSqlParameterSource poolparams = new MapSqlParameterSource();
-    poolparams.addValue("pool_poolId", pool.getPoolId());
+    poolparams.addValue("pool_poolId", pool.getId());
     NamedParameterJdbcTemplate poolNamedTemplate = new NamedParameterJdbcTemplate(template);
     poolNamedTemplate.update(POOL_EXPERIMENT_DELETE_BY_POOL_ID, poolparams);
 
@@ -959,8 +1022,8 @@ public class SQLPoolDAO implements PoolStore {
 
       for (Experiment e : pool.getExperiments()) {
         MapSqlParameterSource esParams = new MapSqlParameterSource();
-        esParams.addValue("experiments_experimentId", e.getExperimentId())
-                .addValue("pool_poolId", pool.getPoolId());
+        esParams.addValue("experiments_experimentId", e.getId())
+                .addValue("pool_poolId", pool.getId());
 
         eInsert.execute(esParams);
 
@@ -969,7 +1032,7 @@ public class SQLPoolDAO implements PoolStore {
             experimentDAO.save(e);
           }
           else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-            ec.remove(DbUtils.hashCodeCacheKeyFor(e.getExperimentId()));
+            ec.remove(DbUtils.hashCodeCacheKeyFor(e.getId()));
           }
         }
       }
@@ -981,7 +1044,7 @@ public class SQLPoolDAO implements PoolStore {
       watcherDAO.saveWatchedEntityUser(pool, u);
     }
 
-    return pool.getPoolId();
+    return pool.getId();
   }
 
   @Override
@@ -1058,8 +1121,8 @@ public class SQLPoolDAO implements PoolStore {
   )
   public boolean remove(Pool pool) throws IOException {
     MapSqlParameterSource poolparams = new MapSqlParameterSource();
-    poolparams.addValue("pool_poolId", pool.getPoolId());
-    poolparams.addValue("poolId", pool.getPoolId());
+    poolparams.addValue("pool_poolId", pool.getId());
+    poolparams.addValue("poolId", pool.getId());
     NamedParameterJdbcTemplate poolNamedTemplate = new NamedParameterJdbcTemplate(template);
 
     boolean ok = true;
@@ -1081,7 +1144,7 @@ public class SQLPoolDAO implements PoolStore {
             dilutionDAO.save(d);
           }
           else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-            if (dc != null) dc.remove(DbUtils.hashCodeCacheKeyFor(d.getDilutionId()));
+            if (dc != null) dc.remove(DbUtils.hashCodeCacheKeyFor(d.getId()));
           }
         }
       }
@@ -1096,7 +1159,7 @@ public class SQLPoolDAO implements PoolStore {
               experimentDAO.save(e);
             }
             else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-              ec.remove(DbUtils.hashCodeCacheKeyFor(e.getExperimentId()));
+              ec.remove(DbUtils.hashCodeCacheKeyFor(e.getId()));
             }
           }
         }
@@ -1120,7 +1183,7 @@ public class SQLPoolDAO implements PoolStore {
           p.setPoolableElements(dilutions);
         }
 
-        p.setPoolId(rs.getLong("poolId"));
+        p.setId(rs.getLong("poolId"));
         p.setName(rs.getString("name"));
         p.setAlias(rs.getString("alias"));
         p.setCreationDate(rs.getDate("creationDate"));
@@ -1163,7 +1226,7 @@ public class SQLPoolDAO implements PoolStore {
           p.setPoolableElements(dilutions);
         }
 
-        p.setPoolId(rs.getLong("poolId"));
+        p.setId(rs.getLong("poolId"));
         p.setName(rs.getString("name"));
         p.setAlias(rs.getString("alias"));
         p.setCreationDate(rs.getDate("creationDate"));
@@ -1195,7 +1258,7 @@ public class SQLPoolDAO implements PoolStore {
   public class IlluminaPoolMapper implements RowMapper<IlluminaPool> {
     public IlluminaPool mapRow(ResultSet rs, int rowNum) throws SQLException {
       IlluminaPool illuminaPool = dataObjectFactory.getIlluminaPool();
-      illuminaPool.setPoolId(rs.getLong("poolId"));
+      illuminaPool.setId(rs.getLong("poolId"));
       illuminaPool.setName(rs.getString("name"));
       illuminaPool.setAlias(rs.getString("alias"));
       illuminaPool.setCreationDate(rs.getDate("creationDate"));
@@ -1233,7 +1296,7 @@ public class SQLPoolDAO implements PoolStore {
   public class LS454PoolMapper implements RowMapper<LS454Pool> {
     public LS454Pool mapRow(ResultSet rs, int rowNum) throws SQLException {
       LS454Pool ls454Pool = dataObjectFactory.getLS454Pool();
-      ls454Pool.setPoolId(rs.getLong("poolId"));
+      ls454Pool.setId(rs.getLong("poolId"));
       ls454Pool.setName(rs.getString("name"));
       ls454Pool.setAlias(rs.getString("alias"));
       ls454Pool.setCreationDate(rs.getDate("creationDate"));
@@ -1271,7 +1334,7 @@ public class SQLPoolDAO implements PoolStore {
   public class SolidPoolMapper implements RowMapper<SolidPool> {
     public SolidPool mapRow(ResultSet rs, int rowNum) throws SQLException {
       SolidPool solidPool = dataObjectFactory.getSolidPool();
-      solidPool.setPoolId(rs.getLong("poolId"));
+      solidPool.setId(rs.getLong("poolId"));
       solidPool.setName(rs.getString("name"));
       solidPool.setAlias(rs.getString("alias"));
       solidPool.setCreationDate(rs.getDate("creationDate"));
@@ -1312,7 +1375,7 @@ public class SQLPoolDAO implements PoolStore {
       PlatformType platformType = PlatformType.get(rs.getString("platformType"));
       if (platformType != null) {
         emPCRPool pool = dataObjectFactory.getEmPCRPool(platformType);
-        pool.setPoolId(rs.getLong("poolId"));
+        pool.setId(rs.getLong("poolId"));
         pool.setName(rs.getString("name"));
         pool.setAlias(rs.getString("alias"));
         pool.setCreationDate(rs.getDate("creationDate"));

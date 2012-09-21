@@ -208,7 +208,7 @@ public class EditStudyController {
       requestManager.saveStudy(study);
       session.setComplete();
       model.clear();
-      return "redirect:/miso/study/"+study.getStudyId();
+      return "redirect:/miso/study/"+study.getId();
     }
     catch (IOException ex) {
       if (log.isDebugEnabled()) {

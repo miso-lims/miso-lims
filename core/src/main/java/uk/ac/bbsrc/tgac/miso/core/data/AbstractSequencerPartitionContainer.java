@@ -38,7 +38,7 @@ import java.util.List;
  * @since 0.1.6
  */
 public abstract class AbstractSequencerPartitionContainer<T extends Partition> implements SequencerPartitionContainer<T> {
-  public static final Long UNSAVED_ID = null;
+  public static final Long UNSAVED_ID = 0L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -47,7 +47,7 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
   private String identificationBarcode;
   private String locationBarcode;
   private Boolean paired = false;
-
+  private String name;
   private Run run = null;
 
   @OneToOne(cascade = CascadeType.ALL)
@@ -55,12 +55,23 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
   private PlatformType platformType;
   private String validationBarcode;
 
+  @Deprecated
   public Long getContainerId() {
     return containerId;
   }
 
+  @Deprecated
   public void setContainerId(Long containerId) {
     this.containerId = containerId;
+  }
+
+  @Override
+  public long getId() {
+    return containerId;
+  }
+
+  public void setId(long id) {
+    this.containerId = id;
   }
 
   public String getIdentificationBarcode() {
@@ -80,7 +91,11 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
   }
 
   public String getName() {
-    return "SPC"+getContainerId();
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
   }
 
   public String getLabelText() {
@@ -165,19 +180,19 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
       return false;
     SequencerPartitionContainer them = (SequencerPartitionContainer) obj;
     // If not saved, then compare resolved actual objects. Otherwise just compare IDs.
-    if (getContainerId() == AbstractSequencerPartitionContainer.UNSAVED_ID
-        || them.getContainerId() == AbstractSequencerPartitionContainer.UNSAVED_ID) {
+    if (getId() == AbstractSequencerPartitionContainer.UNSAVED_ID
+        || them.getId() == AbstractSequencerPartitionContainer.UNSAVED_ID) {
       return getIdentificationBarcode().equals(them.getIdentificationBarcode());
     }
     else {
-      return getContainerId().longValue() == them.getContainerId().longValue();
+      return getId() == them.getId();
     }
   }
 
   @Override
   public int hashCode() {
-    if (getContainerId() != AbstractSequencerPartitionContainer.UNSAVED_ID) {
-      return getContainerId().intValue();
+    if (getId() != AbstractSequencerPartitionContainer.UNSAVED_ID) {
+      return (int)getId();
     }
     else {
       int hashcode = -1;
@@ -189,7 +204,7 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append(getContainerId());
+    sb.append(getId());
     sb.append(" : ");
     sb.append(getIdentificationBarcode());
     sb.append(" : ");
@@ -200,10 +215,8 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
   @Override
   public int compareTo(Object o) {
     SequencerPartitionContainer t = (SequencerPartitionContainer)o;
-    if (getContainerId() != null) {
-      if (getContainerId() < t.getContainerId()) return -1;
-      if (getContainerId() > t.getContainerId()) return 1;
-    }
+    if (getId() < t.getId()) return -1;
+    if (getId() > t.getId()) return 1;
     return 0;
   }
 }

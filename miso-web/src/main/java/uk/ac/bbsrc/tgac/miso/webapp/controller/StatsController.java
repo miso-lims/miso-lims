@@ -181,7 +181,7 @@ public class StatsController {
         if (status != null) {
           model.put("referenceName", sr.getName());
           model.put("referenceId", sr.getId());
-          model.put("runId", requestManager.getRunByAlias(runName).getRunId());
+          model.put("runId", requestManager.getRunByAlias(runName).getId());
           model.put("runName", runName);
           model.put("runStatus", status);
         }
@@ -246,7 +246,7 @@ public class StatsController {
         if (status != null) {
           model.put("referenceName", sr.getName());
           model.put("referenceId", sr.getId());
-          model.put("runId", requestManager.getRunByAlias(runName).getRunId());
+          model.put("runId", requestManager.getRunByAlias(runName).getId());
           model.put("runName", runName);
           model.put("runStatus", status);
 
@@ -331,7 +331,7 @@ public class StatsController {
         if (status != null) {
           model.put("referenceName", sr.getName());
           model.put("referenceId", sr.getId());
-          model.put("runId", requestManager.getRunByAlias(runName).getRunId());
+          model.put("runId", requestManager.getRunByAlias(runName).getId());
           model.put("runName", runName);
           model.put("runStatus", status);
 
@@ -401,7 +401,7 @@ public class StatsController {
         if (status != null) {
           model.put("referenceName", sr.getName());
           model.put("referenceId", sr.getId());
-          model.put("runId", requestManager.getRunByAlias(runName).getRunId());
+          model.put("runId", requestManager.getRunByAlias(runName).getId());
           model.put("runName", runName);
           model.put("runStatus", status);
 

@@ -86,7 +86,7 @@ public class PoolAlertAspect {
 
   public void update(Pool pool) {
     try {
-      poolAlertManager.update(pool.getPoolId());
+      poolAlertManager.update(pool.getId());
     }
     catch (IOException e) {
       e.printStackTrace();

@@ -41,7 +41,7 @@ import java.util.Collection;
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC)
 @JsonWriteNullProperties(false)
 @JsonIgnoreProperties({"securityProfile"})
-public interface Study extends SecurableByProfile, Submittable<Document>, Comparable, Deletable {
+public interface Study extends SecurableByProfile, Submittable<Document>, Comparable, Deletable, Nameable {
 
   /** Field PREFIX  */
   public static final String PREFIX = "STU";
@@ -51,6 +51,7 @@ public interface Study extends SecurableByProfile, Submittable<Document>, Compar
    *
    * @return Long studyId.
    */
+  @Deprecated
   public Long getStudyId();
 
   /**
@@ -58,7 +59,10 @@ public interface Study extends SecurableByProfile, Submittable<Document>, Compar
    *
    * @param studyId studyId.
    */
+  @Deprecated
   public void setStudyId(Long studyId);
+
+  public void setId(long id);
 
   /**
    * Returns the project of this Study object.
@@ -87,13 +91,6 @@ public interface Study extends SecurableByProfile, Submittable<Document>, Compar
    * @param accession accession.
    */
   public void setAccession(String accession);
-
-  /**
-   * Returns the name of this Study object.
-   *
-   * @return String name.
-   */
-  public String getName();
 
   /**
    * Sets the name of this Study object.

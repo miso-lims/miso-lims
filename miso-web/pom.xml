@@ -202,12 +202,15 @@
             <configuration>
               <webResources>
                 <resource>
-                  <directory>src/main/resources/internal</directory>
+                  <directory>src/main/resources</directory>
                   <targetPath>WEB-INF/classes</targetPath>
                   <filtering>true</filtering>
-                  <includes>
-                    <include>miso.properties</include>
-                  </includes>
+                  <excludes>
+                    <exclude>sql/*</exclude>
+                    <exclude>internal/*</exclude>
+                    <exclude>external/*</exclude>
+                    <exclude>db4o/*</exclude>
+                  </excludes>
                 </resource>
                 <resource>
                   <directory>src/main/resources/sql</directory>
@@ -223,11 +226,29 @@
         </plugins>
         <resources>
           <resource>
+            <directory>src/main/resources/internal</directory>
+            <filtering>true</filtering>
+            <includes>
+              <include>miso.properties</include>
+            </includes>
+            <excludes>
+              <exclude>../external/*</exclude>
+              <exclude>../db4o/*</exclude>
+            </excludes>
+          </resource>
+          <resource>
             <directory>src/main/resources</directory>
             <filtering>true</filtering>
+            <includes>
+              <include>conan/</include>
+              <include>fluxion/</include>
+              <include>status/</include>
+            </includes>
             <excludes>
-              <exclude>external/*</exclude>
-              <exclude>db4o/*</exclude>
+              <exclude>../sql/*</exclude>
+              <exclude>../internal/*</exclude>
+              <exclude>../external/*</exclude>
+              <exclude>../db4o/*</exclude>
             </excludes>
           </resource>
         </resources>
@@ -250,12 +271,15 @@
             <configuration>
               <webResources>
                 <resource>
-                  <directory>src/main/resources/external</directory>
+                  <directory>src/main/resources</directory>
                   <targetPath>WEB-INF/classes</targetPath>
                   <filtering>true</filtering>
-                  <includes>
-                    <include>miso.properties</include>
-                  </includes>
+                  <excludes>
+                    <exclude>sql/*</exclude>
+                    <exclude>internal/*</exclude>
+                    <exclude>external/*</exclude>
+                    <exclude>db4o/*</exclude>
+                  </excludes>
                 </resource>
                 <resource>
                   <directory>src/main/resources/sql</directory>
@@ -271,11 +295,29 @@
         </plugins>
         <resources>
           <resource>
+            <directory>src/main/resources/external</directory>
+            <filtering>true</filtering>
+            <includes>
+              <include>miso.properties</include>
+            </includes>
+            <excludes>
+              <exclude>../internal/*</exclude>
+              <exclude>../db4o/*</exclude>
+            </excludes>
+          </resource>
+          <resource>
             <directory>src/main/resources</directory>
             <filtering>true</filtering>
+            <includes>
+              <include>conan/</include>
+              <include>fluxion/</include>
+              <include>status/</include>
+            </includes>
             <excludes>
-              <exclude>internal/*</exclude>
-              <exclude>db4o/*</exclude>
+              <exclude>../sql/*</exclude>
+              <exclude>../internal/*</exclude>
+              <exclude>../external/*</exclude>
+              <exclude>../db4o/*</exclude>
             </excludes>
           </resource>
         </resources>
@@ -287,7 +329,7 @@
   <repositories>
     <repository>
       <id>hasbanana-repo</id>
-      <name>hasbanana Maven Repository</name>
+      <name>hasBanana Repository</name>
       <url>http://www.hasbanana.com/maven/repo</url>
     </repository>
 

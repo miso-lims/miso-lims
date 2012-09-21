@@ -27,6 +27,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -38,7 +39,7 @@ import java.util.List;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface DilutionStore extends Store<Dilution>, Remover<Dilution> {
+public interface DilutionStore extends Store<Dilution>, Remover<Dilution>, NamingSchemeAware<Dilution> {
   /**
    * List all LibraryDilutions by a given parent library ID
    *

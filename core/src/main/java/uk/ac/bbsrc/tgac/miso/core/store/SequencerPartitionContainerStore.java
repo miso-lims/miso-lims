@@ -27,6 +27,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -38,7 +39,7 @@ import java.util.List;
  * @author Rob Davey
  * @since 0.1.6
  */
-public interface SequencerPartitionContainerStore extends Store<SequencerPartitionContainer<SequencerPoolPartition>> {
+public interface SequencerPartitionContainerStore extends Store<SequencerPartitionContainer<SequencerPoolPartition>>, NamingSchemeAware<SequencerPartitionContainer<SequencerPoolPartition>> {
   /**
    * Retrieve a SequencerPartitionContainer from an underlying data store given a SequencerPartitionContainer ID
    * <p/>

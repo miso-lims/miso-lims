@@ -58,6 +58,7 @@ public interface Pool<P extends Poolable> extends SecurableByProfile, Comparable
    *
    * @return Long poolId.
    */
+  @Deprecated
   public Long getPoolId();
 
   /**
@@ -66,14 +67,15 @@ public interface Pool<P extends Poolable> extends SecurableByProfile, Comparable
    * @param poolId poolId.
    *
    */
+  @Deprecated
   public void setPoolId(Long poolId);
 
   /**
-   * Returns the name of this Pool object.
+   * Sets the ID of this Pool object.
    *
-   * @return String name.
+   * @param ID long.
    */
-  public String getName();
+  public void setId(long id);
 
   /**
    * Sets the name of this Pool object.

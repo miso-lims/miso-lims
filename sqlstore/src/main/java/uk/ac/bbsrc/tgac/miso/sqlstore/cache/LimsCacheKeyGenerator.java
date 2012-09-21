@@ -63,22 +63,22 @@ public class LimsCacheKeyGenerator extends AbstractCacheKeyGenerator<Long> {
         code = ((Partition)a).getId();
       }
       if (a instanceof Project) {
-        code = ((Project)a).getProjectId();
+        code = ((Project)a).getId();
       }
       else if (a instanceof Experiment) {
-        code = ((Experiment)a).getExperimentId();
+        code = ((Experiment)a).getId();
       }
       else if (a instanceof Study) {
-        code = ((Study)a).getStudyId();
+        code = ((Study)a).getId();
       }      
       else if (a instanceof IlluminaPool) {
-        code = ((IlluminaPool)a).getPoolId();
+        code = ((IlluminaPool)a).getId();
       }
       else if (a instanceof LS454Pool) {
-        code = ((LS454Pool)a).getPoolId();
+        code = ((LS454Pool)a).getId();
       }
       else if (a instanceof SolidPool) {
-        code = ((SolidPool)a).getPoolId();
+        code = ((SolidPool)a).getId();
       }
     }
     return code;

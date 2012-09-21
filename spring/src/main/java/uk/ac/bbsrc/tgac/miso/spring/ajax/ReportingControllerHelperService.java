@@ -312,7 +312,7 @@ public class ReportingControllerHelperService {
             if (sampleName != null && (sampleName.equals(str) || sampleName.contains(str)
                                        || sampleAlias.equals(str) || sampleAlias.contains(str)
                                        || sampleDesc.equals(str) || sampleDesc.contains(str))) {
-              b.append("<tr><td><input type=\"checkbox\" class=\"chkbox\" name=\"ids\" value=\"" + sample.getSampleId() + "\" id=\"" + sample.getSampleId() + "\"/></td>");
+              b.append("<tr><td><input type=\"checkbox\" class=\"chkbox\" name=\"ids\" value=\"" + sample.getId() + "\" id=\"" + sample.getId() + "\"/></td>");
               b.append("<td>" + sample.getName());
               b.append("</td>");
               b.append("<td> " + sample.getAlias());
@@ -338,7 +338,7 @@ public class ReportingControllerHelperService {
       else {
         StringBuilder b = new StringBuilder();
         for (Sample sample : requestManager.listAllSamples()) {
-          b.append("<tr><td><input type=\"checkbox\" class=\"chkbox\" name=\"ids\" value=\"" + sample.getSampleId() + "\" id=\"" + sample.getSampleId() + "\"/></td>");
+          b.append("<tr><td><input type=\"checkbox\" class=\"chkbox\" name=\"ids\" value=\"" + sample.getId() + "\" id=\"" + sample.getId() + "\"/></td>");
           b.append("<td>" + sample.getName());
           b.append("</td>");
           b.append("<td> " + sample.getAlias());
@@ -380,7 +380,7 @@ public class ReportingControllerHelperService {
             if (runName != null && (runName.equals(str) || runName.contains(str)
                                     || runAlias.equals(str) || runAlias.contains(str)
                                     || runDesc.equals(str) || runDesc.contains(str))) {
-              b.append("<tr><td><input type=\"checkbox\" class=\"chkbox\" name=\"ids\" value=\"" + run.getRunId() + "\" id=\"" + run.getRunId() + "\"/></td>");
+              b.append("<tr><td><input type=\"checkbox\" class=\"chkbox\" name=\"ids\" value=\"" + run.getId() + "\" id=\"" + run.getId() + "\"/></td>");
               b.append("<td>" + run.getName());
               b.append("</td>");
               b.append("<td> " + run.getAlias());
@@ -406,7 +406,7 @@ public class ReportingControllerHelperService {
       else {
         StringBuilder b = new StringBuilder();
         for (Run run : requestManager.listAllRuns()) {
-          b.append("<tr><td><input type=\"checkbox\" class=\"chkbox\" name=\"ids\" value=\"" + run.getRunId() + "\" id=\"" + run.getRunId() + "\"/></td>");
+          b.append("<tr><td><input type=\"checkbox\" class=\"chkbox\" name=\"ids\" value=\"" + run.getId() + "\" id=\"" + run.getId() + "\"/></td>");
           b.append("<td>" + run.getName());
           b.append("</td>");
           b.append("<td> " + run.getAlias());

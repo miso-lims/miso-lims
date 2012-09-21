@@ -39,7 +39,7 @@ import java.util.*;
  * @since 0.1.1
  */
 public abstract class AbstractPlate<T extends LinkedList<S>, S> implements Plate<T, S> {
-  public static final Long UNSAVED_ID = null;
+  public static final Long UNSAVED_ID = 0L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -60,13 +60,24 @@ public abstract class AbstractPlate<T extends LinkedList<S>, S> implements Plate
   private Date lastUpdated;
 
   @Override
+  @Deprecated
   public Long getPlateId() {
     return plateId;
   }
 
   @Override
+  @Deprecated
   public void setPlateId(Long plateId) {
     this.plateId = plateId;
+  }
+
+  @Override
+  public long getId() {
+    return plateId;
+  }
+
+  public void setId(long id) {
+    this.plateId = id;
   }
 
   @Override
@@ -167,7 +178,7 @@ public abstract class AbstractPlate<T extends LinkedList<S>, S> implements Plate
 
   @Override
   public boolean isDeletable() {
-    return getPlateId() != AbstractPlate.UNSAVED_ID &&
+    return getId() != AbstractPlate.UNSAVED_ID &&
            getElements().isEmpty();
   }
   
@@ -207,20 +218,20 @@ public abstract class AbstractPlate<T extends LinkedList<S>, S> implements Plate
     AbstractPlate them = (AbstractPlate) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
-    if (getPlateId() == AbstractPlate.UNSAVED_ID
-        || them.getPlateId() == AbstractPlate.UNSAVED_ID) {
+    if (getId() == AbstractPlate.UNSAVED_ID
+        || them.getId() == AbstractPlate.UNSAVED_ID) {
       return getName().equals(them.getName()) &&
              getPlateMaterialType().equals(them.getPlateMaterialType());
     }
     else {
-      return this.getPlateId().longValue() == them.getPlateId().longValue();
+      return this.getId() == them.getId();
     }
   }
 
   @Override
   public int hashCode() {
-    if (getPlateId() != AbstractPlate.UNSAVED_ID) {
-      return getPlateId().intValue();
+    if (getId() != AbstractPlate.UNSAVED_ID) {
+      return (int)getId();
     }
     else {
       final int PRIME = 37;
@@ -234,9 +245,9 @@ public abstract class AbstractPlate<T extends LinkedList<S>, S> implements Plate
   @Override
   public int compareTo(Object o) {
     Plate t = (Plate)o;
-    if (getPlateId() != null && t.getPlateId() != null) {
-      if (getPlateId() < t.getPlateId()) return -1;
-      if (getPlateId() > t.getPlateId()) return 1;
+    if (getId() != 0L && t.getId() != 0L) {
+      if (getId() < t.getId()) return -1;
+      if (getId() > t.getId()) return 1;
     }
     else if (getName() != null && t.getName() != null) {
       return getName().compareTo(t.getName());
@@ -247,7 +258,7 @@ public abstract class AbstractPlate<T extends LinkedList<S>, S> implements Plate
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append(getPlateId());
+    sb.append(getId());
     sb.append(" : ");
     sb.append(getName());
     sb.append(" : ");

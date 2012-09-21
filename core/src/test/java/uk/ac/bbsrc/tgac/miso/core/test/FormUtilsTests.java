@@ -110,7 +110,7 @@ public class FormUtilsTests {
 
     for (int i = 1; i < 6; i++) {
       Sample s = dataObjectFactory.getSample();
-      s.setSampleId(new Long(i));
+      s.setId(i);
       s.setName("SAM"+i);
       s.setAlias("MI_S"+i+"_TestSample");
       s.setScientificName("F.bar");

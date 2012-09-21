@@ -225,4 +225,12 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
    * @throws IOException when
    */
   Library lazyGet(long libraryId) throws IOException;
+
+  /**
+   * List all persisted objects
+   *
+   * @return Collection<Library>
+   * @throws IOException when the objects cannot be retrieved
+   */
+  Collection<Library> listAllWithLimit(long limit) throws IOException;
 }

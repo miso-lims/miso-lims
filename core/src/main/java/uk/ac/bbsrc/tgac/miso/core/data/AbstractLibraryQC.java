@@ -76,22 +76,22 @@ public abstract class AbstractLibraryQC extends AbstractQC implements LibraryQC 
     LibraryQC them = (LibraryQC) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
-    if (this.getQcId() == AbstractLibraryQC.UNSAVED_ID
-        || them.getQcId() == AbstractLibraryQC.UNSAVED_ID) {
+    if (this.getId() == AbstractLibraryQC.UNSAVED_ID
+        || them.getId() == AbstractLibraryQC.UNSAVED_ID) {
       return this.getQcCreator().equals(them.getQcCreator())
              && this.getQcDate().equals(them.getQcDate())
              && this.getQcType().equals(them.getQcType())
              && this.getResults().equals(them.getResults());
     }
     else {
-      return this.getQcId().longValue() == them.getQcId().longValue();
+      return this.getId() == them.getId();
     }
   }
 
   @Override
   public int hashCode() {
-    if (getQcId() != AbstractLibraryQC.UNSAVED_ID) {
-      return getQcId().intValue();
+    if (getId() != AbstractLibraryQC.UNSAVED_ID) {
+      return (int)getId();
     }
     else {
       int hashcode = getQcCreator().hashCode();

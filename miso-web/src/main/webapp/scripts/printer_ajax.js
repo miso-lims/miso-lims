@@ -101,7 +101,7 @@ Print.service = {
             $('available').innerHTML = json.html;
             if (json.html == "OK") {
               $('available').setAttribute("style", "background-color:green");
-              $('addTd').innerHTML = "<a href='javascript:void(0);' onclick='Print.service.addPrinterService(\"addPrinterForm\");'/>Add</a>";
+              $('addTd').innerHTML = "<a href='javascript:void(0);' onclick='Print.service.addPrinterService();'/>Add</a>";
             }
             else {
               $('available').setAttribute("style", "background-color:red");
@@ -113,8 +113,8 @@ Print.service = {
     }
   },
 
-  addPrinterService : function(form) {
-    var f = $(form);
+  addPrinterService : function() {
+    var f = Utils.mappifyForm("addPrinterForm");
     var cf = {};
     jQuery('input[id*="contextField-"]').each(function(e) {
       var field = jQuery(this).attr("field");
@@ -125,10 +125,10 @@ Print.service = {
       'printerControllerHelperService',
       'addPrintService',
       {
-        'serviceName':f.serviceName.value,
-        'contextName':f.context.value,
+        'serviceName':f.serviceName,
+        'contextName':f.context,
         'contextFields':cf,
-        'serviceFor':f.printServiceFor.value,
+        'serviceFor':f.printServiceFor,
         'url':ajaxurl},
       {'doOnSuccess':Utils.page.pageReload,
        'doOnError':function(json) {

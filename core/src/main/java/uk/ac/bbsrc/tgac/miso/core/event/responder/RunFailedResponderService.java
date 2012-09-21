@@ -86,7 +86,7 @@ public class RunFailedResponderService extends AbstractResponderService {
         Alert a = new DefaultAlert(user);
         a.setAlertLevel(AlertLevel.CRITICAL);
         a.setAlertTitle("Run Failed: " + r.getAlias());
-        a.setAlertText("The following Run has been set to FAILED: "+r.getAlias()+" ("+event.getEventMessage()+"). Please view Run " +r.getRunId()+ " in MISO for more information");
+        a.setAlertText("The following Run has been set to FAILED: "+r.getAlias()+" ("+event.getEventMessage()+"). Please view Run " +r.getId()+ " in MISO for more information");
 
         for (AlerterService as : alerterServices) {
           try {

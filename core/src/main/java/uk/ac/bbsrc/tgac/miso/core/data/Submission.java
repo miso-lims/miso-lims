@@ -42,13 +42,17 @@ import java.util.*;
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC)
 @JsonWriteNullProperties(false)
 @JsonIgnoreProperties({"securityProfile"})
-public interface Submission<I, O, R> extends Submittable<O>, SecurableByProfile {
+public interface Submission<I, O, R> extends Submittable<O>, SecurableByProfile, Nameable {
 
-  public static final Long UNSAVED_ID = null;
+  public static final Long UNSAVED_ID = 0L;
 
+  @Deprecated
   public Long getSubmissionId();
+  @Deprecated
   public void setSubmissionId(Long submissionId);
-  public String getName();
+
+  public void setId(long id);
+
   public void setName(String name);
   public String getAlias();
   public void setAlias(String alias);

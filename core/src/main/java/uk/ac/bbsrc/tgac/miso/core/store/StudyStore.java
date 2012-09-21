@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.core.store;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -34,7 +35,7 @@ import java.util.Collection;
  * @author Rob Davey
  * @since version
  */
-public interface StudyStore extends Store<Study>, Cascadable, Remover<Study> {
+public interface StudyStore extends Store<Study>, Cascadable, Remover<Study>, NamingSchemeAware<Study> {
   /**
    * Retrieve a Study from an underlying data store given a Study ID
    * <p/>
@@ -90,4 +91,12 @@ public interface StudyStore extends Store<Study>, Cascadable, Remover<Study> {
    * @throws IOException when
    */
   Collection<String> listAllStudyTypes() throws IOException;
+
+  /**
+   * List all persisted objects
+   *
+   * @return Collection<Study>
+   * @throws IOException when the objects cannot be retrieved
+   */
+  Collection<Study> listAllWithLimit(long limit) throws IOException;
 }

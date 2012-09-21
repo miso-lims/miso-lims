@@ -87,8 +87,8 @@ public class PoolReadyResponderService extends AbstractResponderService {
 
         Alert a = new DefaultAlert(user);
         //TODO change to p.getAlias() when added
-        a.setAlertTitle("Pool " + p.getName() + "(" + p.getPoolId() + ")");
-        a.setAlertText("The following Pool is ready to run: "+p.getName()+" ("+event.getEventMessage()+"). Please view Pool " +p.getPoolId() + " in MISO for more information");
+        a.setAlertTitle("Pool " + p.getName() + "(" + p.getId() + ")");
+        a.setAlertText("The following Pool is ready to run: "+p.getName()+" ("+event.getEventMessage()+"). Please view Pool " +p.getId() + " in MISO for more information");
 
         for (AlerterService as : alerterServices) {
           try {

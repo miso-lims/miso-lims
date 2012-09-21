@@ -41,7 +41,7 @@ import java.util.Date;
 @Entity
 @Table(name = "`Status`")
 public class StatusImpl implements Status {
-  public static final Long UNSAVED_ID = null;
+  public static final Long UNSAVED_ID = 0L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)

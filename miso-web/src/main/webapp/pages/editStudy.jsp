@@ -38,7 +38,7 @@
           <sessionConversation:insertSessionConversationId attributeName="study"/>
             <h1>
                 <c:choose>
-                    <c:when test="${not empty study.studyId}">Edit</c:when>
+                    <c:when test="${study.id != 0}">Edit</c:when>
                     <c:otherwise>Create</c:otherwise>
                 </c:choose> Study
                 <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
@@ -51,7 +51,7 @@
                     <li>
                         <div class="breadcrumbsbubbleInfo">
                             <div class="trigger">
-                                <a href='<c:url value="/miso/project/${study.project.projectId}"/>'>${study.project.name}</a>
+                                <a href='<c:url value="/miso/project/${study.project.id}"/>'>${study.project.name}</a>
                             </div>
                             <div class="breadcrumbspopup">
                                     ${study.project.alias}
@@ -72,7 +72,7 @@
                 <td class="h">Study ID:</td>
                 <td>
                     <c:choose>
-                        <c:when test="${not empty study.studyId}">${study.studyId}</c:when>
+                        <c:when test="${study.id != 0}">${study.id}</c:when>
                         <c:otherwise><i>Unsaved</i></c:otherwise>
                     </c:choose>
                 </td>
@@ -80,15 +80,15 @@
             <tr>
                 <td class="h">Project ID:</td>
                 <td>
-                    <input type="hidden" value="${study.project.projectId}" name="project" id="project"/>
-                    <a href='<c:url value="/miso/project/${study.project.projectId}"/>'>${study.project.name}</a>
+                    <input type="hidden" value="${study.project.id}" name="project" id="project"/>
+                    <a href='<c:url value="/miso/project/${study.project.id}"/>'>${study.project.name}</a>
                 </td>
             </tr>
             <tr>
                 <td>Name:</td>
                 <td>
                     <c:choose>
-                        <c:when test="${not empty study.studyId}">${study.name}</c:when>
+                        <c:when test="${study.id != 0}">${study.name}</c:when>
                         <c:otherwise><i>Unsaved</i></c:otherwise>
                     </c:choose>
                 </td>
@@ -121,7 +121,7 @@
                     <tr>
                         <td>Permissions</td>
                         <td><i>Inherited from project </i><a
-                                href='<c:url value="/miso/project/${project.projectId}"/>'>${project.name}</a>
+                                href='<c:url value="/miso/project/${project.id}"/>'>${project.name}</a>
                             <input type="hidden" value="${project.securityProfile.profileId}"
                                    name="securityProfile" id="securityProfile"/>
                         </td>
@@ -136,7 +136,7 @@
             <br/>
 
             <c:choose>
-                <c:when test="${not empty study.studyId}">
+                <c:when test="${study.id != 0}">
                     <h1>
                         <div id="totalCount">
                         </div>
@@ -150,7 +150,7 @@
                             <div id="expmenu"
                                  onmouseover="mcancelclosetime()"
                                  onmouseout="mclosetime()">
-                                <a href='<c:url value="/miso/experiment/new/${study.studyId}"/>' class="add">Add new
+                                <a href='<c:url value="/miso/experiment/new/${study.id}"/>' class="add">Add new
                                     Experiment</a>
                             </div>
                         </li>
@@ -188,7 +188,7 @@
                                   <td>${experiment.platform.platformType.key}
                                       - ${experiment.platform.instrumentModel}</td>
                                   <td class="misoicon"
-                                      onclick="window.location.href='<c:url value="/miso/experiment/${experiment.experimentId}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
+                                      onclick="window.location.href='<c:url value="/miso/experiment/${experiment.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
                               </tr>
                           </c:forEach>
                           </tbody>

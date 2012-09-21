@@ -40,7 +40,7 @@ import java.util.Set;
  * @since 0.0.2
  */
 public abstract class AbstractDilution implements Dilution, Comparable {
-  public static final Long UNSAVED_ID = null;
+  public static final Long UNSAVED_ID = 0L;
 
   @OneToOne(cascade = CascadeType.ALL)
   private SecurityProfile securityProfile;
@@ -54,12 +54,23 @@ public abstract class AbstractDilution implements Dilution, Comparable {
   private String identificationBarcode;
   private String dilutionUserName;
 
+  @Deprecated
   public Long getDilutionId() {
     return this.dilutionId;
   }
 
+  @Deprecated
   public void setDilutionId(Long dilutionId) {
     this.dilutionId = dilutionId;
+  }
+
+  @Override
+  public long getId() {
+    return dilutionId;
+  }
+
+  public void setId(long id) {
+    this.dilutionId = id;
   }
 
   public String getName() {
@@ -134,13 +145,13 @@ public abstract class AbstractDilution implements Dilution, Comparable {
   }
 
   public boolean isDeletable() {
-    return getDilutionId() != AbstractDilution.UNSAVED_ID;
+    return getId() != AbstractDilution.UNSAVED_ID;
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append(getDilutionId());
+    sb.append(getId());
     sb.append(" : ");
     sb.append(getName());
     sb.append(" : ");
@@ -165,21 +176,21 @@ public abstract class AbstractDilution implements Dilution, Comparable {
     Dilution them = (Dilution) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
-    if (getDilutionId() == AbstractDilution.UNSAVED_ID
-        || them.getDilutionId() == AbstractDilution.UNSAVED_ID) {
+    if (getId() == AbstractDilution.UNSAVED_ID
+        || them.getId() == AbstractDilution.UNSAVED_ID) {
       return getName().equals(them.getName()) &&
              getDilutionCreator().equals(them.getDilutionCreator()) &&
              getConcentration().equals(them.getConcentration());
     }
     else {
-      return getDilutionId().longValue() == them.getDilutionId().longValue();
+      return getId() == them.getId();
     }
   }
 
   @Override
   public int hashCode() {
-    if (getDilutionId() != AbstractDilution.UNSAVED_ID) {
-      return getDilutionId().intValue();
+    if (getId() != AbstractDilution.UNSAVED_ID) {
+      return (int)getId();
     }
     else {
       final int PRIME = 37;
@@ -194,8 +205,8 @@ public abstract class AbstractDilution implements Dilution, Comparable {
   @Override
   public int compareTo(Object o) {
     Dilution t = (Dilution)o;
-    if (getDilutionId() < t.getDilutionId()) return -1;
-    if (getDilutionId() > t.getDilutionId()) return 1;
+    if (getId() < t.getId()) return -1;
+    if (getId() > t.getId()) return 1;
     return 0;
   }
 }

@@ -68,8 +68,8 @@ public class DefaultLibraryNamingScheme implements RequestManagerAwareNamingSche
       if (validationMap.keySet().contains(fieldName)) {
         Method m = fieldCheck(fieldName);
         if (m != null) {
-          log.info("Generating name for '"+fieldName+"' :: " + DefaultMisoEntityPrefix.get(Library.class.getSimpleName()).name() + l.getLibraryId());
-          return DefaultMisoEntityPrefix.get(Library.class.getSimpleName()).name() + l.getLibraryId();
+          log.info("Generating name for '"+fieldName+"' :: " + DefaultMisoEntityPrefix.get(Library.class.getSimpleName()).name() + l.getId());
+          return DefaultMisoEntityPrefix.get(Library.class.getSimpleName()).name() + l.getId();
         }
         else {
           throw new MisoNamingException("No such nameable field.");

@@ -97,7 +97,7 @@ public class ListPoolsController {
       List<Pool> ipools = new ArrayList<Pool>();
       List<Pool> ipoolsUsed = new ArrayList<Pool>();
       for (Pool p: requestManager.listReadyIlluminaPools()) {
-        if (requestManager.listRunsByPoolId(p.getPoolId()).isEmpty()) {
+        if (requestManager.listRunsByPoolId(p.getId()).isEmpty()) {
           ipools.add(p);
         }
         else {
@@ -108,7 +108,7 @@ public class ListPoolsController {
       List<Pool> lpools = new ArrayList<Pool>();
       List<Pool> lpoolsUsed = new ArrayList<Pool>();
       for (Pool p: requestManager.listReady454Pools()) {
-        if (requestManager.listRunsByPoolId(p.getPoolId()).isEmpty()) {
+        if (requestManager.listRunsByPoolId(p.getId()).isEmpty()) {
           lpools.add(p);
         }
         else {
@@ -119,7 +119,7 @@ public class ListPoolsController {
       List<Pool> spools = new ArrayList<Pool>();
       List<Pool> spoolsUsed = new ArrayList<Pool>();
       for (Pool p: requestManager.listReadySolidPools()) {
-        if (requestManager.listRunsByPoolId(p.getPoolId()).isEmpty()) {
+        if (requestManager.listRunsByPoolId(p.getId()).isEmpty()) {
           spools.add(p);
         }
         else {

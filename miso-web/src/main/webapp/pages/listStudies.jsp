@@ -55,7 +55,7 @@
                     <td>${study.alias}</td>
                     <td>${study.description}</td>
                     <td class="misoicon"
-                        onclick="window.location.href='<c:url value="/miso/study/${study.studyId}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
+                        onclick="window.location.href='<c:url value="/miso/study/${study.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
                 </tr>
             </c:forEach>
             </tbody>

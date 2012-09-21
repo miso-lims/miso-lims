@@ -49,6 +49,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.*;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
@@ -75,6 +77,9 @@ public class SQLRunDAO implements RunStore {
           "SELECT runId, name, alias, description, accession, platformRunId, pairedEnd, cycles, filePath, securityProfile_profileId, platformType, status_statusId, sequencerReference_sequencerReferenceId " +
           "FROM "+TABLE_NAME;
 
+  public static final String RUNS_SELECT_LIMIT =
+          RUNS_SELECT + " ORDER BY runId DESC LIMIT ?";
+
   public static final String RUN_SELECT_BY_ID =
           RUNS_SELECT + " WHERE runId = ?";
 
@@ -95,7 +100,7 @@ public class SQLRunDAO implements RunStore {
           "WHERE runId=:runId";
 
   public static final String RUN_DELETE =
-          "DELETE FROM "+TABLE_NAME+" WHERE runId=:rundId";
+          "DELETE FROM "+TABLE_NAME+" WHERE runId=:runId";
 
   @Deprecated
   public static final String RUNS_SELECT_BY_RELATED_EXPERIMENT =
@@ -194,6 +199,19 @@ public class SQLRunDAO implements RunStore {
   private NoteStore noteDAO;
   private WatcherStore watcherDAO;
   private CascadeType cascadeType;
+
+  @Autowired
+  private MisoNamingScheme<Run> namingScheme;
+
+  @Override
+  public MisoNamingScheme<Run> getNamingScheme() {
+    return namingScheme;
+  }
+
+  @Override
+  public void setNamingScheme(MisoNamingScheme<Run> namingScheme) {
+    this.namingScheme = namingScheme;
+  }
 
   @Autowired
   private CacheManager cacheManager;
@@ -370,22 +388,62 @@ public class SQLRunDAO implements RunStore {
             .addValue("status_statusId", statusId)
             .addValue("sequencerReference_sequencerReferenceId", run.getSequencerReference().getId());
 
-    if (run.getRunId() == AbstractRun.UNSAVED_ID) {
+    if (run.getId() == AbstractRun.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
               .withTableName(TABLE_NAME)
               .usingGeneratedKeyColumns("runId");
+      try {
+        run.setId(DbUtils.getAutoIncrement(template, TABLE_NAME));
+
+        String name = namingScheme.generateNameFor("name", run);
+        run.setName(name);
+
+        if (namingScheme.validateField("name", run.getName())) {
+          params.addValue("name", name);
+
+          Number newId = insert.executeAndReturnKey(params);
+          if (newId.longValue() != run.getId()) {
+            log.error("Expected Run ID doesn't match returned value from database insert: rolling back...");
+            new NamedParameterJdbcTemplate(template).update(RUN_DELETE, new MapSqlParameterSource().addValue("runId", run.getId()));
+            throw new IOException("Something bad happened. Expected Run ID doesn't match returned value from DB insert");
+          }
+        }
+        else {
+          throw new IOException("Cannot save Run - invalid field:" + run.toString());
+        }
+      }
+      catch (MisoNamingException e) {
+        throw new IOException("Cannot save Run - issue with naming scheme", e);
+      }
+      /*
       String name = "RUN" + DbUtils.getAutoIncrement(template, TABLE_NAME);
       params.addValue("name", name);
       Number newId = insert.executeAndReturnKey(params);
       run.setRunId(newId.longValue());
       run.setName(name);
+      */
     }
     else {
+      try {
+        if (namingScheme.validateField("name", run.getName())) {
+          params.addValue("runId", run.getId())
+                .addValue("name", run.getName());
+          NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+          namedTemplate.update(RUN_UPDATE, params);
+        }
+        else {
+          throw new IOException("Cannot save Run - invalid field:" + run.toString());
+        }
+      }
+      catch (MisoNamingException e) {
+        throw new IOException("Cannot save Run - issue with naming scheme", e);
+      }
+      /*
       params.addValue("runId", run.getRunId())
             .addValue("name", run.getName());
-
       NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
       namedTemplate.update(RUN_UPDATE, params);
+      */
     }
 
     if (this.cascadeType != null) {
@@ -399,7 +457,7 @@ public class SQLRunDAO implements RunStore {
 
           SimpleJdbcInsert fInsert = new SimpleJdbcInsert(template).withTableName("Run_SequencerPartitionContainer");
           MapSqlParameterSource fcParams = new MapSqlParameterSource();
-          fcParams.addValue("Run_runId", run.getRunId())
+          fcParams.addValue("Run_runId", run.getId())
                   .addValue("containers_containerId", containerId);
 
           try {
@@ -428,7 +486,7 @@ public class SQLRunDAO implements RunStore {
       purgeListCache(run);
     }
 
-    return run.getRunId();
+    return run.getId();
   }
 
   public synchronized int[] saveAll(Collection<Run> runs) throws IOException {
@@ -478,26 +536,67 @@ public class SQLRunDAO implements RunStore {
                 .addValue("status_statusId", run.getStatus().getStatusId())
                 .addValue("sequencerReference_sequencerReferenceId", run.getSequencerReference().getId());
 
-        if (run.getRunId() == AbstractRun.UNSAVED_ID) {
+        if (run.getId() == AbstractRun.UNSAVED_ID) {
           SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
                   .withTableName(TABLE_NAME)
                   .usingGeneratedKeyColumns("runId");
+          try {
+            run.setId(autoIncrement);
+
+            String name = namingScheme.generateNameFor("name", run);
+            run.setName(name);
+
+            if (namingScheme.validateField("name", run.getName())) {
+              params.addValue("name", name);
+
+              Number newId = insert.executeAndReturnKey(params);
+              if (newId.longValue() != run.getId()) {
+                log.error("Expected Run ID doesn't match returned value from database insert: rolling back...");
+                new NamedParameterJdbcTemplate(template).update(RUN_DELETE, new MapSqlParameterSource().addValue("runId", run.getId()));
+                throw new IOException("Something bad happened. Expected Run ID doesn't match returned value from DB insert");
+              }
+              autoIncrement = newId.longValue() + 1;
+              log.debug(run.getName() + ":: Inserted as ID " + run.getId());
+            }
+            else {
+              throw new IOException("Cannot save Run - invalid field:" + run.toString());
+            }
+          }
+          catch (MisoNamingException e) {
+            throw new IOException("Cannot save Run - issue with naming scheme", e);
+          }
+
+          /*
           String name = "RUN" + autoIncrement;
           params.addValue("name", name);
           Number newId = insert.executeAndReturnKey(params);
           run.setRunId(newId.longValue());
           run.setName(name);
-
           autoIncrement = newId.longValue() + 1;
-
           log.debug(run.getName() + ":: Inserted as ID " + run.getRunId());
+          */
         }
         else {
+          try {
+            if (namingScheme.validateField("name", run.getName())) {
+              params.addValue("runId", run.getId())
+                    .addValue("name", run.getName());
+              log.debug(run.getName() + ":: Updating as ID " + run.getId());
+              batch.add(params);
+            }
+            else {
+              throw new IOException("Cannot save Run - invalid field:" + run.toString());
+            }
+          }
+          catch (MisoNamingException e) {
+            throw new IOException("Cannot save Run - issue with naming scheme", e);
+          }
+          /*
           params.addValue("runId", run.getRunId())
                 .addValue("name", run.getName());
-
           log.debug(run.getName() + ":: Updating as ID " + run.getRunId());
           batch.add(params);
+          */
         }
 
         if (this.cascadeType != null) {
@@ -511,7 +610,7 @@ public class SQLRunDAO implements RunStore {
 
               SimpleJdbcInsert fInsert = new SimpleJdbcInsert(template).withTableName("Run_SequencerPartitionContainer");
               MapSqlParameterSource fcParams = new MapSqlParameterSource();
-              fcParams.addValue("Run_runId", run.getRunId())
+              fcParams.addValue("Run_runId", run.getId())
                       .addValue("containers_containerId", containerId);
 
               try {
@@ -557,6 +656,10 @@ public class SQLRunDAO implements RunStore {
   @Cacheable(cacheName="runListCache")
   public List<Run> listAll() {
     return template.query(RUNS_SELECT, new LazyRunMapper());
+  }
+
+  public List<Run> listAllWithLimit(long limit) throws IOException {
+    return template.query(RUNS_SELECT_LIMIT, new Object[]{limit}, new LazyRunMapper());
   }
 
   @Override
@@ -656,7 +759,7 @@ public class SQLRunDAO implements RunStore {
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
     if (r.isDeletable() &&
            (namedTemplate.update(RUN_DELETE,
-                            new MapSqlParameterSource().addValue("runId", r.getRunId())) == 1)) {
+                            new MapSqlParameterSource().addValue("runId", r.getId())) == 1)) {
       purgeListCache(r, false);
       return true;
     }
@@ -667,7 +770,7 @@ public class SQLRunDAO implements RunStore {
     public Run mapRow(ResultSet rs, int rowNum) throws SQLException {
       PlatformType platformtype = PlatformType.get(rs.getString("platformType"));
       Run r = dataObjectFactory.getRunOfType(platformtype);
-      r.setRunId(rs.getLong("runId"));
+      r.setId(rs.getLong("runId"));
       r.setAlias(rs.getString("alias"));
       r.setAccession(rs.getString("accession"));
       r.setName(rs.getString("name"));
@@ -711,7 +814,7 @@ public class SQLRunDAO implements RunStore {
     public Run mapRow(ResultSet rs, int rowNum) throws SQLException {
       PlatformType platformtype = PlatformType.get(rs.getString("platformType"));
       Run r = dataObjectFactory.getRunOfType(platformtype);
-      r.setRunId(rs.getLong("runId"));
+      r.setId(rs.getLong("runId"));
       r.setAlias(rs.getString("alias"));
       r.setAccession(rs.getString("accession"));
       r.setName(rs.getString("name"));

@@ -34,13 +34,6 @@ package uk.ac.bbsrc.tgac.miso.core.data;
  */
 public interface Barcodable extends Nameable {
    /**
-   * Returns the name of this Barcodable object.
-   *
-   * @return String name.
-   */
-  public String getName();
-
-   /**
    * Returns the label text of this Barcodable object.
    *
    * @return String labelText.

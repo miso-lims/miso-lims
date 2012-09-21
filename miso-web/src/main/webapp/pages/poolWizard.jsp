@@ -35,7 +35,7 @@
         <li>
           <div class="breadcrumbsbubbleInfo">
             <div class="trigger">
-              <a href='<c:url value="/miso/project/${project.projectId}"/>'>${project.name}</a>
+              <a href='<c:url value="/miso/project/${project.id}"/>'>${project.name}</a>
             </div>
             <div class="breadcrumbspopup">${project.alias}</div>
           </div>
@@ -164,7 +164,7 @@
       Fluxion.doAjax(
               'poolWizardControllerHelperService',
               'addStudy',
-      {'form':jQuery('#' + form).serializeArray(), 'projectId':${project.projectId}, 'url':ajaxurl},
+      {'form':jQuery('#' + form).serializeArray(), 'projectId':${project.id}, 'url':ajaxurl},
       {'doOnSuccess':function(json) {
         jQuery('#newStudyForm').html(json.html);
         jQuery('#studyTriggerDiv').html("");
@@ -177,7 +177,7 @@
     Fluxion.doAjax(
             'poolWizardControllerHelperService',
             'populateDilutions',
-    {'platformType':jQuery('#platformType').val(), 'projectId':${project.projectId}, 'url':ajaxurl},
+    {'platformType':jQuery('#platformType').val(), 'projectId':${project.id}, 'url':ajaxurl},
     {'doOnSuccess':function(json) {
       var table = jQuery('#dlTable').dataTable();
       table.fnClearTable();
@@ -252,7 +252,7 @@
     Fluxion.doAjax(
             'poolWizardControllerHelperService',
             'populateDilutions',
-    {'platformType':"Illumina", 'projectId':${project.projectId}, 'url':ajaxurl},
+    {'platformType':"Illumina", 'projectId':${project.id}, 'url':ajaxurl},
     {'doOnSuccess':function(json) {
       var table = jQuery('#dlTable').dataTable({
         "aoColumnDefs": [

@@ -84,7 +84,7 @@ public class RunAlertManager {
   private Run cloneAndAddRun(Run run) {
     Run clone = cloner.deepClone(run);
     ((RunImpl)clone).addListener(getRunListener());
-    runs.put(clone.getRunId(), clone);
+    runs.put(clone.getId(), clone);
     return clone;
   }
 
@@ -98,15 +98,15 @@ public class RunAlertManager {
       Collection<Run> persistedRuns = misoRequestManager.listAllRuns();
       int count = 1;
       for (Run r : persistedRuns) {
-        for (RunQC qc : misoRequestManager.listAllRunQCsByRunId(r.getRunId())) {
+        for (RunQC qc : misoRequestManager.listAllRunQCsByRunId(r.getId())) {
           try {
             r.addQc(qc);
           }
           catch (MalformedRunQcException e) {
-            log.warn("Cannot add RunQC to Run " + r.getRunId());
+            log.warn("Cannot add RunQC to Run " + r.getId());
           }
         }
-        log.debug("Cloning run " +count+ " of " + persistedRuns.size() + " ("+r.getRunId()+")");
+        log.debug("Cloning run " +count+ " of " + persistedRuns.size() + " ("+r.getId()+")");
         cloneAndAddRun(r);
         count++;
       }
@@ -119,7 +119,7 @@ public class RunAlertManager {
 
   private void update(Run r) throws IOException {
     if (enabled) {
-      Run clone = runs.get(r.getRunId());
+      Run clone = runs.get(r.getId());
       if (clone == null) {
         //new run - add all RunWatchers!
         for (User u : securityManager.listUsersByGroupName("RunWatchers")) {
@@ -147,18 +147,18 @@ public class RunAlertManager {
         }
       }
 
-      runs.put(r.getRunId(), clone);
+      runs.put(r.getId(), clone);
     }
   }
 
   public void addWatcher(Run run, Long userId) throws IOException {
     User user = securityManager.getUserById(userId);
     if (user != null) {
-      Run clone = runs.get(run.getRunId());
+      Run clone = runs.get(run.getId());
       if (clone == null) {
         clone = cloneAndAddRun(run);
       }
-      log.info("Added watcher " + userId + " to run " + run.getRunId());
+      log.info("Added watcher " + userId + " to run " + run.getId());
       clone.addWatcher(user);
     }
   }
@@ -166,11 +166,11 @@ public class RunAlertManager {
   public void removeWatcher(Run run, Long userId) throws IOException {
     User user = securityManager.getUserById(userId);
     if (user != null) {
-      Run clone = runs.get(run.getRunId());
+      Run clone = runs.get(run.getId());
       if (clone == null) {
         clone = cloneAndAddRun(run);
       }
-      log.info("Removed watcher " + userId + " from run " + run.getRunId());
+      log.info("Removed watcher " + userId + " from run " + run.getId());
       clone.removeWatcher(user);
     }
   }

@@ -41,7 +41,7 @@ import javax.persistence.Id;
  */
 public class TagBarcodeImpl implements TagBarcode {
 
-  public static final Long UNSAVED_ID = null;
+  public static final Long UNSAVED_ID = 0L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -54,13 +54,24 @@ public class TagBarcodeImpl implements TagBarcode {
   private String strategyName;
 
   @Override
+  @Deprecated
   public Long getTagBarcodeId() {
     return tagBarcodeId;
   }
 
   @Override
+  @Deprecated
   public void setTagBarcodeId(Long tagBarcodeId) {
     this.tagBarcodeId = tagBarcodeId;
+  }
+
+  @Override
+  public long getId() {
+    return tagBarcodeId;
+  }
+
+  public void setId(long id) {
+    this.tagBarcodeId = id;
   }
 
   @Override
@@ -118,22 +129,22 @@ public class TagBarcodeImpl implements TagBarcode {
     TagBarcode them = (TagBarcode) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
-    if (getTagBarcodeId() == UNSAVED_ID
-        || them.getTagBarcodeId() == UNSAVED_ID) {
+    if (getId() == UNSAVED_ID
+        || them.getId() == UNSAVED_ID) {
       return getName().equals(them.getName()) &&
              getSequence().equals(them.getSequence()) &&
              getPlatformType().equals(them.getPlatformType()) &&
              getStrategyName().equals(them.getStrategyName());
     }
     else {
-      return getTagBarcodeId().longValue() == them.getTagBarcodeId().longValue();
+      return getId() == them.getId();
     }
   }
 
   @Override
   public int hashCode() {
-    if (getTagBarcodeId() != UNSAVED_ID) {
-      return getTagBarcodeId().intValue();
+    if (getId() != UNSAVED_ID) {
+      return (int)getId();
     }
     else {
       int hashcode = -1;
@@ -147,8 +158,8 @@ public class TagBarcodeImpl implements TagBarcode {
 
   public int compareTo(Object o) {
     TagBarcode t = (TagBarcode)o;
-    if (getTagBarcodeId() < t.getTagBarcodeId()) return -1;
-    if (getTagBarcodeId() > t.getTagBarcodeId()) return 1;
+    if (getId() < t.getId()) return -1;
+    if (getId() > t.getId()) return 1;
     return 0;
   }
 }

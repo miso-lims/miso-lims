@@ -60,14 +60,14 @@ public interface Partition extends SecurableByProfile, Comparable {
    *
    * @return Long id.
    */
-  Long getId();
+  long getId();
 
   /**
    * Sets the id of this Partition object.
    *
    * @param id id.
    */
-  void setId(Long id);
+  void setId(long id);
 
   /**
    * Returns the partitionNumber, relative to the parent SequencerPartitionContainer, of this Partition object.

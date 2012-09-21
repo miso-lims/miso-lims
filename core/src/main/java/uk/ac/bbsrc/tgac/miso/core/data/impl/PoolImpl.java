@@ -84,19 +84,19 @@ public class PoolImpl<D extends Poolable> extends AbstractPool<D> {
     Pool them = (Pool) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
-    if (getPoolId() == AbstractPool.UNSAVED_ID
-        || them.getPoolId() == AbstractPool.UNSAVED_ID) {
+    if (getId() == AbstractPool.UNSAVED_ID
+        || them.getId() == AbstractPool.UNSAVED_ID) {
       return getCreationDate().equals(them.getCreationDate()); //&& this.getDescription().equals(them.getDescription());
     }
     else {
-      return getPoolId() == them.getPoolId();
+      return getId() == them.getId();
     }
   }
 
   @Override
   public int hashCode() {
-    if (getPoolId() != AbstractPool.UNSAVED_ID) {
-      return getPoolId().intValue();
+    if (getId() != AbstractPool.UNSAVED_ID) {
+      return (int)getId();
     }
     else {
       return getCreationDate().hashCode();

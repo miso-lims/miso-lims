@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.core.store;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -35,7 +36,7 @@ import java.util.Collection;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface ProjectStore extends Store<Project>, Cascadable, Remover<Project> {
+public interface ProjectStore extends Store<Project>, Cascadable, Remover<Project>, NamingSchemeAware<Project> {
   /**
    * Retrieve a Project from an underlying data store given a Project ID
    * <p/>
@@ -83,6 +84,15 @@ public interface ProjectStore extends Store<Project>, Cascadable, Remover<Projec
    * @throws IOException when
    */
   Collection<ProjectOverview> listOverviewsByProjectId(long projectId) throws IOException;
+
+
+  /**
+   * List all persisted objects
+   *
+   * @return Collection<Project>
+   * @throws IOException when the objects cannot be retrieved
+   */
+  Collection<Project> listAllWithLimit(long limit) throws IOException;
 
   /**
    * Save a ProjectOverview

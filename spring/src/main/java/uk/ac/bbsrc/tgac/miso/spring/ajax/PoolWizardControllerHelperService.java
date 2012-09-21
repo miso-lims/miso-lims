@@ -89,8 +89,8 @@ public class PoolWizardControllerHelperService {
             if (d1 != null) {
               for (Dilution d2 : dils) {
                 if (d2 != null && !d1.equals(d2)) {
-                  if (d1.getLibrary().getTagBarcode() != null && d2.getLibrary().getTagBarcode() != null) {
-                    if (d1.getLibrary().getTagBarcode().equals(d2.getLibrary().getTagBarcode())) {
+                  if (!d1.getLibrary().getTagBarcodes().isEmpty() && !d2.getLibrary().getTagBarcodes().isEmpty()) {
+                    if (d1.getLibrary().getTagBarcodes().equals(d2.getLibrary().getTagBarcodes())) {
                       barcodeCollision = true;
                     }
                   }
@@ -133,13 +133,13 @@ public class PoolWizardControllerHelperService {
 
           requestManager.savePool(pool);
 
-          sb.append("<a  class='dashboardresult' href='/miso/pool/"+pool.getPlatformType().getKey().toLowerCase()+"/" + pool.getPoolId() + "' target='_blank'><div  onmouseover=\"this.className='dashboardhighlight ui-corner-all'\" onmouseout=\"this.className='dashboard ui-corner-all'\"  class='dashboard ui-corner-all' >");
-          sb.append("Pool ID: <b>" + pool.getPoolId() + "</b><br/>");
+          sb.append("<a  class='dashboardresult' href='/miso/pool/"+pool.getPlatformType().getKey().toLowerCase()+"/" + pool.getId() + "' target='_blank'><div  onmouseover=\"this.className='dashboardhighlight ui-corner-all'\" onmouseout=\"this.className='dashboard ui-corner-all'\"  class='dashboard ui-corner-all' >");
+          sb.append("Pool ID: <b>" + pool.getId() + "</b><br/>");
           sb.append("Pool Name: <b>" + pool.getName() + "</b><br/>");
           sb.append("Platform Type: <b>" + pool.getPlatformType().name() + "</b><br/>");
           sb.append("Dilutions: <ul class='bullets'>");
           for (Dilution dl : (Collection<? extends Dilution>) pool.getDilutions()) {
-            sb.append("<li>" + dl.getName() + " (<a href='/miso/library/"+dl.getLibrary().getLibraryId()+"'>" + dl.getLibrary().getAlias() + "</a>)</li>");
+            sb.append("<li>" + dl.getName() + " (<a href='/miso/library/"+dl.getLibrary().getId()+"'>" + dl.getLibrary().getAlias() + "</a>)</li>");
           }
           sb.append("</ul></div></a>");
         }
@@ -188,8 +188,8 @@ public class PoolWizardControllerHelperService {
 
       requestManager.saveStudy(s);
 
-      sb.append("<a  class=\"dashboardresult\" href='/miso/study/" + s.getStudyId() + "' target='_blank'><div onmouseover=\"this.className='dashboardhighlight ui-corner-all'\" onmouseout=\"this.className='dashboard ui-corner-all'\"  class='dashboard ui-corner-all' >New Study Added:<br/>");
-      sb.append("Study ID: " + s.getStudyId() + "<br/>");
+      sb.append("<a  class=\"dashboardresult\" href='/miso/study/" + s.getId() + "' target='_blank'><div onmouseover=\"this.className='dashboardhighlight ui-corner-all'\" onmouseout=\"this.className='dashboard ui-corner-all'\"  class='dashboard ui-corner-all' >New Study Added:<br/>");
+      sb.append("Study ID: " + s.getId() + "<br/>");
       sb.append("Study Name: <b>" + s.getName() + "</b><br/>");
       sb.append("Study Alias: <b>" + s.getAlias() + "</b><br/>");
       sb.append("Study Description: <b>" + s.getDescription() + "</b></div></a><br/><hr/><br/>");
@@ -213,17 +213,26 @@ public class PoolWizardControllerHelperService {
       for (Dilution dl : dls) {
         if (dl.getLibrary().getQcPassed()) {
           //b.append("<tr id='"+dl.getDilutionId()+"'><td class='rowSelect'><input class='chkbox' type='checkbox' name='ids' value='" + dl.getDilutionId() + "'/></td>");
-          String barcode = "";
-          if (dl.getLibrary().getTagBarcode() != null) barcode = dl.getLibrary().getTagBarcode().getName();
+          StringBuilder barcode = new StringBuilder();
+          if (!dl.getLibrary().getTagBarcodes().isEmpty()) {
+            int count = 0;
+            for (TagBarcode tb : dl.getLibrary().getTagBarcodes().values()) {
+              if (dl.getLibrary().getTagBarcodes().values().size() > 1 && count > 0) {
+                barcode.append("-");
+              }
+              barcode.append(tb.getName());
+              count++;
+            }
+          }
 
-          b.append("<tr id='"+dl.getDilutionId()+"'><td class='rowSelect'></td>");
+          b.append("<tr id='"+dl.getId()+"'><td class='rowSelect'></td>");
           b.append("<td>" + dl.getName() +"</td>");
           b.append("<td>");
           b.append(barcode);
           b.append("</td>");
           b.append("</tr>");
 
-          a.add(JSONObject.fromObject("{'id':"+dl.getDilutionId()+",'name':'"+dl.getName()+"','description':'"+dl.getLibrary().getDescription()+"','library':'"+dl.getLibrary().getAlias()+"','libraryBarcode':'"+barcode+"'}"));
+          a.add(JSONObject.fromObject("{'id':"+dl.getId()+",'name':'"+dl.getName()+"','description':'"+dl.getLibrary().getDescription()+"','library':'"+dl.getLibrary().getAlias()+"','libraryBarcode':'"+barcode.toString()+"'}"));
         }
       }
 

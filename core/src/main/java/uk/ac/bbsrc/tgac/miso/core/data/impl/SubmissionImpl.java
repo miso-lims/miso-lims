@@ -83,12 +83,23 @@ public class SubmissionImpl implements Submission<Submittable, Document, Documen
     setSecurityProfile(new SecurityProfile(user));
   }
 
+  @Deprecated
   public Long getSubmissionId() {
     return submissionId;
   }
 
+  @Deprecated
   public void setSubmissionId(Long submissionId) {
     this.submissionId = submissionId;
+  }
+
+  @Override
+  public long getId() {
+    return submissionId;
+  }
+
+  public void setId(long id) {
+    this.submissionId = id;
   }
 
   public String getName() {

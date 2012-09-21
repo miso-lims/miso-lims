@@ -71,7 +71,7 @@ Sample.qc = {
       var column5 = $('sampleQcTable').rows[1].insertCell(-1);
       column5.innerHTML = "<input id='sampleQcResults' name='sampleQcResults' type='text'/><span id='units'/>";
       var column6 = $('sampleQcTable').rows[1].insertCell(-1);
-      column6.innerHTML = "<a href='javascript:void(0);' onclick='Sample.qc.addSampleQC(\"addQcForm\");'/>Add</a>";
+      column6.innerHTML = "<a href='javascript:void(0);' onclick='Sample.qc.addSampleQC();'/>Add</a>";
 
       Utils.ui.addMaxDatePicker("sampleQcDate", 0);
 
@@ -96,19 +96,17 @@ Sample.qc = {
     jQuery('#units').html(jQuery('#sampleQcType').find(":selected").attr("units"));
   },
 
-  addSampleQC : function(form) {
-    var f = $(form);
-    var uindex = f.sampleQcUser.selectedIndex;
-    var tindex = f.sampleQcType.selectedIndex;
+  addSampleQC : function() {
+    var f = Utils.mappifyForm("addQcForm");
     Fluxion.doAjax(
       'sampleControllerHelperService',
       'addSampleQC',
       {
-        'sampleId':f.sampleId.value,
-        'qcCreator':f.sampleQcUser.options[uindex].value,
-        'qcDate':f.sampleQcDate.value,
-        'qcType':f.sampleQcType.options[tindex].value,
-        'results':f.sampleQcResults.value,
+        'sampleId':f.id,
+        'qcCreator':f.sampleQcUser,
+        'qcDate':f.sampleQcDate,
+        'qcType':f.sampleQcType,
+        'results':f.sampleQcResults,
         'url':ajaxurl},
       {'updateElement':'sampleQcTable',
         'doOnSuccess':function(json) {

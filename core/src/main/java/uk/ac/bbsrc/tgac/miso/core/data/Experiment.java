@@ -47,10 +47,10 @@ import java.util.Collection;
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC)
 @JsonWriteNullProperties(false)
 @JsonIgnoreProperties({"securityProfile"})
-public interface Experiment extends SecurableByProfile, Submittable<Document>, Comparable, Deletable {
+public interface Experiment extends SecurableByProfile, Submittable<Document>, Comparable, Deletable, Nameable {
 
   /** Field UNSAVED_ID  */
-  public static final Long UNSAVED_ID = -1L;
+  public static final Long UNSAVED_ID = 0L;
 
   /** Field PREFIX  */
   public static final String PREFIX = "EXP";
@@ -60,6 +60,7 @@ public interface Experiment extends SecurableByProfile, Submittable<Document>, C
    *
    * @return Long experimentId.
    */
+  @Deprecated
   public Long getExperimentId();
 
   /**
@@ -68,7 +69,10 @@ public interface Experiment extends SecurableByProfile, Submittable<Document>, C
    * @param experimentId the id of this Experiment object.
    *
    */
+  @Deprecated
   public void setExperimentId(Long experimentId);
+
+  public void setId(long id);
 
   /**
    * Returns the study of this Experiment object.

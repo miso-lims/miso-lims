@@ -104,7 +104,7 @@ public class ProjectD3GraphController {
         JSONArray substudiesArray = new JSONArray();
         substudyJSON.put("name", study.getName());
         substudyJSON.put("description", study.getAlias());
-        Collection<Experiment> experiments = requestManager.listAllExperimentsByStudyId(study.getStudyId());
+        Collection<Experiment> experiments = requestManager.listAllExperimentsByStudyId(study.getId());
         if (experiments.size() > 0) {
           JSONObject experimentJSON = new JSONObject();
           JSONArray experimentsArray = new JSONArray();
@@ -133,7 +133,7 @@ public class ProjectD3GraphController {
       sampleJSON.put("name", "Samples");
       sampleJSON.put("description", "");
       for (Sample sample : samples) {
-        Collection<Library> libraries = requestManager.listAllLibrariesBySampleId(sample.getSampleId());
+        Collection<Library> libraries = requestManager.listAllLibrariesBySampleId(sample.getId());
         if (libraries.size() == 0) {
 
           String sampleQC = "0";

@@ -70,16 +70,16 @@ public class DefaultEntityNamingScheme<T extends Nameable> implements MisoNaming
 
   @Override
   public String getSchemeName() {
-    return "Default MISO Entity Naming Scheme";
+    return "DefaultEntityNamingScheme";
   }
 
   @Override
   public String generateNameFor(String fieldName, T o) throws MisoNamingException {
-    if (DefaultMisoEntityPrefix.valueOf(o.getClass().getSimpleName()) == null) {
+    if (DefaultMisoEntityPrefix.get(o.getClass().getSimpleName()) == null) {
       throw new MisoNamingException("Cannot generate a MISO name from an object of this type");
     }
-    System.out.println("Generating name :: " + DefaultMisoEntityPrefix.valueOf(o.getClass().getSimpleName()).name());
-    return DefaultMisoEntityPrefix.valueOf(o.getClass().getSimpleName()).name();
+    log.info("Generating name :: " + DefaultMisoEntityPrefix.get(o.getClass().getSimpleName()).name() + o.getId());
+    return DefaultMisoEntityPrefix.get(o.getClass().getSimpleName()).name() + o.getId();
   }
 
   @Override

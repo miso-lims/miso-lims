@@ -27,7 +27,7 @@ function validate_library(form) {
     'validateLibraryAlias',
   {'alias':jQuery('#alias').val(), 'url':ajaxurl},
   {
-    'doOnSuccess': function(json) { if (json.html === "OK") { process_validate_library(form); }},
+    'doOnSuccess': function(json) { if (json.response === "OK") { process_validate_library(form); }},
     'doOnError':function(json) { alert(json.error); }
   }
   );

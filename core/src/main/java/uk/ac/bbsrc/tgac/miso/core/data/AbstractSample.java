@@ -51,7 +51,7 @@ import java.util.HashSet;
 @Entity
 @Table(name = "`Sample`")
 public abstract class AbstractSample implements Sample {
-  public static final Long UNSAVED_ID = null;
+  public static final Long UNSAVED_ID = 0L;
   private static final long serialVersionUID = 1L;
 
   @Id
@@ -95,13 +95,24 @@ public abstract class AbstractSample implements Sample {
   public void setProject(Project project) {
     this.project = project;
   }
-
+  @Deprecated
   public Long getSampleId() {
     return sampleId;
   }
 
+  @Deprecated
   public void setSampleId(Long sampleId) {
     this.sampleId = sampleId;
+  }
+
+  @Override
+  public long getId() {
+    return sampleId;
+  }
+
+  @Override
+  public void setId(long id) {
+    this.sampleId = id;
   }
 
   public String getAccession() {
@@ -253,7 +264,7 @@ public abstract class AbstractSample implements Sample {
   }
 
   public boolean isDeletable() {
-    return getSampleId() != AbstractSample.UNSAVED_ID &&
+    return getId() != AbstractSample.UNSAVED_ID &&
            getLibraries().isEmpty() &&
            getNotes().isEmpty() &&
            getSampleQCs().isEmpty();    
@@ -299,7 +310,7 @@ public abstract class AbstractSample implements Sample {
     Sample them = (Sample) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
-    if (getSampleId().equals(AbstractSample.UNSAVED_ID) || them.getSampleId().equals(AbstractSample.UNSAVED_ID)) {
+    if (getId() == AbstractSample.UNSAVED_ID || them.getId() == AbstractSample.UNSAVED_ID) {
       if (getName() != null && them.getName() != null) {
         return getName().equals(them.getName());
       }
@@ -308,14 +319,14 @@ public abstract class AbstractSample implements Sample {
       }
     }
     else {
-      return getSampleId().longValue() == them.getSampleId().longValue();
+      return getId() == them.getId();
     }
   }
 
   @Override
   public int hashCode() {
-    if (getSampleId() != null && !getSampleId().equals(AbstractSample.UNSAVED_ID)) {
-      return getSampleId().intValue();
+    if (getId() != 0L && getId() != AbstractSample.UNSAVED_ID) {
+      return (int)getId();
     }
     else {
       final int PRIME = 37;
@@ -332,9 +343,9 @@ public abstract class AbstractSample implements Sample {
   @Override
   public int compareTo(Object o) {
     Sample s = (Sample)o;
-    if (getSampleId() != null && s.getSampleId() != null) {
-      if (getSampleId() < s.getSampleId()) return -1;
-      if (getSampleId() > s.getSampleId()) return 1;
+    if (getId() != 0L && s.getId() != 0L) {
+      if (getId() < s.getId()) return -1;
+      if (getId() > s.getId()) return 1;
     }
     else if (getAlias() != null && s.getAlias() != null) {
       return getAlias().compareTo(s.getAlias());
@@ -345,7 +356,7 @@ public abstract class AbstractSample implements Sample {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append(getSampleId());
+    sb.append(getId());
     sb.append(" : ");
     sb.append(getName());
     sb.append(" : ");

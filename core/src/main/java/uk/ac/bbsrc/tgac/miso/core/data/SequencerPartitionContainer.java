@@ -48,6 +48,7 @@ public interface SequencerPartitionContainer<T extends Partition> extends Secura
    *
    * @return Long containerId.
    */
+  @Deprecated
   Long getContainerId();
 
   /**
@@ -56,7 +57,17 @@ public interface SequencerPartitionContainer<T extends Partition> extends Secura
    * @param containerId the id of this Container object
    *
    */
+  @Deprecated
   void setContainerId(Long containerId);
+
+  public void setId(long id);
+
+  /**
+   * Sets the name of this Container object.
+   *
+   * @param name name.
+   */
+  public void setName(String name);
 
   /**
    * Returns the run of this Container object.

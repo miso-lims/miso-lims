@@ -40,7 +40,7 @@ import java.util.Queue;
  * @since 0.0.3
  */
 public class AbstractPrintJob implements PrintJob {
-  public static final Long UNSAVED_ID = null;
+  public static final Long UNSAVED_ID = 0L;
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long jobId = AbstractPrintJob.UNSAVED_ID;

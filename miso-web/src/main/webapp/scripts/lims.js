@@ -27,7 +27,13 @@ jQuery.ajaxSetup({cache: false});
 var ajaxurl = '/miso/fluxion.ajax';
 
 var Utils = Utils || {
-
+  mappifyForm : function(formName) {
+    var values = {};
+    jQuery.each(jQuery('#'+formName).serializeArray(), function(i, field) {
+      values[field.name] = field.value;
+    });
+    return values;
+  }
 };
 
 Utils.timer = {

@@ -295,7 +295,7 @@ public class EditSampleController {
       requestManager.saveSample(sample);
       session.setComplete();
       model.clear();
-      return "redirect:/miso/sample/" + sample.getSampleId();
+      return "redirect:/miso/sample/" + sample.getId();
     }
     catch (IOException ex) {
       if (log.isDebugEnabled()) {

@@ -103,7 +103,7 @@ public class EditLS454PoolController {
       for (Experiment e : requestManager.listAllExperiments()) {
         if (e.getPlatform().getPlatformType().equals(p.getPlatformType())) {
           if (experimentId != null) {
-            if (!e.getExperimentId().equals(experimentId)) {
+            if (e.getId() != experimentId) {
               es.add(e);
             }
           }
@@ -281,7 +281,7 @@ public class EditLS454PoolController {
     }
 
     requestManager.savePool(p);
-    return "redirect:/miso/pool/ls454/" + p.getPoolId();
+    return "redirect:/miso/pool/ls454/" + p.getId();
   }
 
   @RequestMapping(method = RequestMethod.POST)
@@ -296,7 +296,7 @@ public class EditLS454PoolController {
       requestManager.savePool(pool);
       session.setComplete();
       model.clear();
-      return "redirect:/miso/pool/ls454/" + pool.getPoolId();
+      return "redirect:/miso/pool/ls454/" + pool.getId();
     }
     catch (IOException ex) {
       if (log.isDebugEnabled()) {

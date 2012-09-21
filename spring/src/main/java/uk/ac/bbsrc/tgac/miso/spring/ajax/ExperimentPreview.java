@@ -64,20 +64,20 @@ public class ExperimentPreview {
 
     try {
       Experiment e = requestManager.getExperimentById(Long.parseLong(experimentId));
-      Collection<Run> runs = requestManager.listRunsByExperimentId(e.getExperimentId());
+      Collection<Run> runs = requestManager.listRunsByExperimentId(e.getId());
 
       session.setAttribute("experiment", e);
 
       StringBuilder rb = new StringBuilder();
       for (Run r : runs) {
-        rb.append("<li><a href='/miso/run/").append(r.getRunId()).append("'>").append(r.getName()).append("</a></li>");
+        rb.append("<li><a href='/miso/run/").append(r.getId()).append("'>").append(r.getName()).append("</a></li>");
       }
 
       StringBuilder sb = new StringBuilder();
       if (e.getPool() != null) {
         for (Dilution dil : e.getPool().getDilutions()) {
           Sample s = dil.getLibrary().getSample();
-          sb.append("<li><a href='/miso/sample/").append(s.getSampleId()).append("'>").append(s.getName()).append("</a></li>");
+          sb.append("<li><a href='/miso/sample/").append(s.getId()).append("'>").append(s.getName()).append("</a></li>");
         }
 
         /*

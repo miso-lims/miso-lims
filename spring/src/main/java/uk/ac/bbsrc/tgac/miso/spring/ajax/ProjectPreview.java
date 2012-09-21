@@ -66,7 +66,7 @@ public class ProjectPreview {
 
       String studyHTML = "";
       for (Study r : project.getStudies()) {
-         studyHTML+="<li><a href='/miso/study/"+r.getStudyId()+"/project/"+project.getProjectId()+"'>"+r.getName()+"</a></li>";
+         studyHTML+="<li><a href='/miso/study/"+r.getId()+"/project/"+project.getId()+"'>"+r.getName()+"</a></li>";
       }
       StringBuilder b = new StringBuilder();
       b.append("<div onclick=\"Effect.toggle('preview"+projectId+"','blind'); return false;\">" +

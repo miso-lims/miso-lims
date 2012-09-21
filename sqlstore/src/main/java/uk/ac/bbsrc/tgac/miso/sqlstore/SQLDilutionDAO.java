@@ -31,6 +31,8 @@ import net.sf.ehcache.CacheManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCR;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.*;
 import uk.ac.bbsrc.tgac.miso.core.store.EmPCRStore;
 import uk.ac.bbsrc.tgac.miso.core.store.DilutionStore;
@@ -219,6 +221,19 @@ public class SQLDilutionDAO implements DilutionStore {
   private LibraryStore libraryDAO;
   private Store<SecurityProfile> securityProfileDAO;
   private CascadeType cascadeType;
+
+  @Autowired
+  private MisoNamingScheme<Dilution> namingScheme;
+
+  @Override
+  public MisoNamingScheme<Dilution> getNamingScheme() {
+    return namingScheme;
+  }
+
+  @Override
+  public void setNamingScheme(MisoNamingScheme<Dilution> namingScheme) {
+    this.namingScheme = namingScheme;
+  }
 
   @Autowired
   private CacheManager cacheManager;
@@ -434,28 +449,74 @@ public class SQLDilutionDAO implements DilutionStore {
 
     MapSqlParameterSource params = new MapSqlParameterSource();
     params.addValue("concentration", dilution.getConcentration())
-            .addValue("library_libraryId", dilution.getLibrary().getLibraryId())
+            .addValue("library_libraryId", dilution.getLibrary().getId())
             .addValue("creationDate", dilution.getCreationDate())
             .addValue("securityProfile_profileId", securityProfileId)
             .addValue("dilutionUserName", dilution.getDilutionCreator());
 
-    if (dilution.getDilutionId() == AbstractDilution.UNSAVED_ID) {
+    if (dilution.getId() == AbstractDilution.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
                               .withTableName("LibraryDilution")
                               .usingGeneratedKeyColumns("dilutionId");
+      try {
+        dilution.setId(DbUtils.getAutoIncrement(template, "LibraryDilution"));
+
+        String name = namingScheme.generateNameFor("name", dilution);
+        dilution.setName(name);
+
+        if (namingScheme.validateField("name", dilution.getName())) {
+          String barcode = name + "::" + dilution.getLibrary().getAlias();
+          params.addValue("name", name);
+
+          params.addValue("identificationBarcode", barcode);
+
+          Number newId = insert.executeAndReturnKey(params);
+          if (newId.longValue() != dilution.getId()) {
+            log.error("Expected LibraryDilution ID doesn't match returned value from database insert: rolling back...");
+            new NamedParameterJdbcTemplate(template).update(LIBRARY_DILUTION_DELETE, new MapSqlParameterSource().addValue("dilutionId", dilution.getId()));
+            throw new IOException("Something bad happened. Expected LibraryDilution ID doesn't match returned value from DB insert");
+          }
+        }
+        else {
+          throw new IOException("Cannot save LibraryDilution - invalid field:" + dilution.toString());
+        }
+      }
+      catch (MisoNamingException e) {
+        throw new IOException("Cannot save LibraryDilution - issue with naming scheme", e);
+      }
+
+      /*
       String name = "LDI"+ DbUtils.getAutoIncrement(template, "LibraryDilution");
       params.addValue("name", name);
       params.addValue("identificationBarcode", name + "::" + dilution.getLibrary().getAlias());      
       Number newId = insert.executeAndReturnKey(params);
       dilution.setDilutionId(newId.longValue());
       dilution.setName(name);
+      */
     }
     else {
+      try {
+        if (namingScheme.validateField("name", dilution.getName())) {
+          params.addValue("dilutionId", dilution.getId())
+                .addValue("name", dilution.getName())
+                .addValue("identificationBarcode", dilution.getName() + "::" + dilution.getLibrary().getAlias());
+          NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+          namedTemplate.update(LIBRARY_DILUTION_UPDATE, params);
+        }
+        else {
+          throw new IOException("Cannot save LibraryDilution - invalid field:" + dilution.toString());
+        }
+      }
+      catch (MisoNamingException e) {
+        throw new IOException("Cannot save LibraryDilution - issue with naming scheme", e);
+      }
+      /*
       params.addValue("dilutionId", dilution.getDilutionId())
             .addValue("name", dilution.getName())
             .addValue("identificationBarcode", dilution.getName() + "::" + dilution.getLibrary().getAlias());
       NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
       namedTemplate.update(LIBRARY_DILUTION_UPDATE, params);
+      */
     }
 
     if (this.cascadeType != null) {
@@ -466,12 +527,12 @@ public class SQLDilutionDAO implements DilutionStore {
       else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (l != null) {
           Cache pc = cacheManager.getCache("libraryCache");
-          pc.remove(DbUtils.hashCodeCacheKeyFor(l.getLibraryId()));
+          pc.remove(DbUtils.hashCodeCacheKeyFor(l.getId()));
         }
       }
     }
 
-    return dilution.getDilutionId();
+    return dilution.getId();
   }
 
   @Cacheable(cacheName="emPCRDilutionCache",
@@ -513,28 +574,73 @@ public class SQLDilutionDAO implements DilutionStore {
 
     MapSqlParameterSource params = new MapSqlParameterSource();
     params.addValue("concentration", dilution.getConcentration())
-            .addValue("emPCR_pcrId", dilution.getEmPCR().getPcrId())
+            .addValue("emPCR_pcrId", dilution.getEmPCR().getId())
             .addValue("creationDate", dilution.getCreationDate())
             .addValue("dilutionUserName", dilution.getDilutionCreator())
             .addValue("securityProfile_profileId", securityProfileId);
 
-    if (dilution.getDilutionId() == AbstractDilution.UNSAVED_ID) {
+    if (dilution.getId() == AbstractDilution.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
                               .withTableName("emPCRDilution")
                               .usingGeneratedKeyColumns("dilutionId");
+
+      try {
+        dilution.setId(DbUtils.getAutoIncrement(template, "emPCRDilution"));
+
+        String name = namingScheme.generateNameFor("name", dilution);
+        dilution.setName(name);
+        if (namingScheme.validateField("name", dilution.getName())) {
+          String barcode = name + "::" + dilution.getEmPCR().getName();
+          params.addValue("name", name);
+
+          params.addValue("identificationBarcode", barcode);
+
+          Number newId = insert.executeAndReturnKey(params);
+          if (newId.longValue() != dilution.getId()) {
+            log.error("Expected emPCRDilution ID doesn't match returned value from database insert: rolling back...");
+            new NamedParameterJdbcTemplate(template).update(EMPCR_DILUTION_DELETE, new MapSqlParameterSource().addValue("dilutionId", dilution.getId()));
+            throw new IOException("Something bad happened. Expected emPCRDilution ID doesn't match returned value from DB insert");
+          }
+        }
+        else {
+          throw new IOException("Cannot save emPCRDilution - invalid field:" + dilution.toString());
+        }
+      }
+      catch (MisoNamingException e) {
+        throw new IOException("Cannot save emPCRDilution - issue with naming scheme", e);
+      }
+      /*
       String name = "EDI"+DbUtils.getAutoIncrement(template, "emPCRDilution");
       params.addValue("name", name);
       params.addValue("identificationBarcode", name + "::" + dilution.getEmPCR().getName());
       Number newId = insert.executeAndReturnKey(params);
       dilution.setDilutionId(newId.longValue());
       dilution.setName(name);
+      */
     }
     else {
+      try {
+        if (namingScheme.validateField("name", dilution.getName())) {
+          params.addValue("dilutionId", dilution.getId())
+                .addValue("name", dilution.getName())
+                .addValue("identificationBarcode", dilution.getName() + "::" + dilution.getLibrary().getAlias());
+          NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+          namedTemplate.update(EMPCR_DILUTION_UPDATE, params);
+        }
+        else {
+          throw new IOException("Cannot save emPCRDilution - invalid field:" + dilution.toString());
+        }
+      }
+      catch (MisoNamingException e) {
+        throw new IOException("Cannot save emPCRDilution - issue with naming scheme", e);
+      }
+      /*
       params.addValue("dilutionId", dilution.getDilutionId())
             .addValue("name", dilution.getName())
             .addValue("identificationBarcode", dilution.getName() + "::" + dilution.getEmPCR().getName());
       NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
       namedTemplate.update(EMPCR_DILUTION_UPDATE, params);
+      */
     }
 
     if (this.cascadeType != null) {
@@ -544,13 +650,13 @@ public class SQLDilutionDAO implements DilutionStore {
       }
       else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (e != null) {
-          Cache pc = cacheManager.getCache("emPcrCache");
-          pc.remove(DbUtils.hashCodeCacheKeyFor(e.getPcrId()));
+          Cache pc = cacheManager.getCache("empcrCache");
+          pc.remove(DbUtils.hashCodeCacheKeyFor(e.getId()));
         }
       }
     }
 
-    return dilution.getDilutionId();
+    return dilution.getId();
   }
 
   public long save(Dilution dilution) throws IOException {
@@ -609,7 +715,7 @@ public class SQLDilutionDAO implements DilutionStore {
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
     if (d.isDeletable() &&
            (namedTemplate.update(LIBRARY_DILUTION_DELETE,
-                                 new MapSqlParameterSource().addValue("dilutionId", d.getDilutionId())) == 1)) {
+                                 new MapSqlParameterSource().addValue("dilutionId", d.getId())) == 1)) {
       Library l = d.getLibrary();
       if(this.cascadeType.equals(CascadeType.PERSIST)) {
         if (l != null) libraryDAO.save(l);
@@ -617,7 +723,7 @@ public class SQLDilutionDAO implements DilutionStore {
       else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (l != null) {
           Cache pc = cacheManager.getCache("libraryCache");
-          pc.remove(DbUtils.hashCodeCacheKeyFor(l.getLibraryId()));
+          pc.remove(DbUtils.hashCodeCacheKeyFor(l.getId()));
         }
       }
       return true;
@@ -640,15 +746,15 @@ public class SQLDilutionDAO implements DilutionStore {
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
     if (d.isDeletable() &&
            (namedTemplate.update(EMPCR_DILUTION_DELETE,
-                                 new MapSqlParameterSource().addValue("dilutionId", d.getDilutionId())) == 1)) {
+                                 new MapSqlParameterSource().addValue("dilutionId", d.getId())) == 1)) {
       emPCR e = d.getEmPCR();
       if (this.cascadeType.equals(CascadeType.PERSIST)) {
         if (e != null) emPcrDAO.save(e);
       }
       else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (e != null) {
-          Cache pc = cacheManager.getCache("emPcrCache");
-          pc.remove(DbUtils.hashCodeCacheKeyFor(e.getPcrId()));
+          Cache pc = cacheManager.getCache("empcrCache");
+          pc.remove(DbUtils.hashCodeCacheKeyFor(e.getId()));
         }
       }
       return true;
@@ -659,7 +765,7 @@ public class SQLDilutionDAO implements DilutionStore {
   public class LazyLibraryDilutionMapper implements RowMapper<LibraryDilution> {
     public LibraryDilution mapRow(ResultSet rs, int rowNum) throws SQLException {
       LibraryDilution libraryDilution = dataObjectFactory.getLibraryDilution();
-      libraryDilution.setDilutionId(rs.getLong("dilutionId"));
+      libraryDilution.setId(rs.getLong("dilutionId"));
       libraryDilution.setName(rs.getString("name"));
       libraryDilution.setConcentration(rs.getDouble("concentration"));
       libraryDilution.setIdentificationBarcode(rs.getString("identificationBarcode"));
@@ -684,7 +790,7 @@ public class SQLDilutionDAO implements DilutionStore {
   public class LibraryDilutionMapper implements RowMapper<LibraryDilution> {
     public LibraryDilution mapRow(ResultSet rs, int rowNum) throws SQLException {
       LibraryDilution libraryDilution = dataObjectFactory.getLibraryDilution();
-      libraryDilution.setDilutionId(rs.getLong("dilutionId"));
+      libraryDilution.setId(rs.getLong("dilutionId"));
       libraryDilution.setName(rs.getString("name"));
       libraryDilution.setConcentration(rs.getDouble("concentration"));
       libraryDilution.setIdentificationBarcode(rs.getString("identificationBarcode"));
@@ -708,7 +814,7 @@ public class SQLDilutionDAO implements DilutionStore {
   public class LazyEmPCRDilutionMapper implements RowMapper<emPCRDilution> {
     public emPCRDilution mapRow(ResultSet rs, int rowNum) throws SQLException {
       emPCRDilution pcrDilution = dataObjectFactory.getEmPCRDilution();
-      pcrDilution.setDilutionId(rs.getLong("dilutionId"));
+      pcrDilution.setId(rs.getLong("dilutionId"));
       pcrDilution.setName(rs.getString("name"));
       pcrDilution.setConcentration(rs.getDouble("concentration"));
       pcrDilution.setIdentificationBarcode(rs.getString("identificationBarcode"));
@@ -732,7 +838,7 @@ public class SQLDilutionDAO implements DilutionStore {
   public class EmPCRDilutionMapper implements RowMapper<emPCRDilution> {
     public emPCRDilution mapRow(ResultSet rs, int rowNum) throws SQLException {
       emPCRDilution pcrDilution = dataObjectFactory.getEmPCRDilution();
-      pcrDilution.setDilutionId(rs.getLong("dilutionId"));
+      pcrDilution.setId(rs.getLong("dilutionId"));
       pcrDilution.setName(rs.getString("name"));
       pcrDilution.setConcentration(rs.getDouble("concentration"));
       pcrDilution.setIdentificationBarcode(rs.getString("identificationBarcode"));

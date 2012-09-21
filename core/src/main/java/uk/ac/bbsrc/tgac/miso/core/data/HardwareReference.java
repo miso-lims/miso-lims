@@ -37,7 +37,7 @@ import java.net.InetAddress;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface HardwareReference {
+public interface HardwareReference extends Nameable {
   /**
    * Sets the id of this HardwareReference object.
    *
@@ -47,26 +47,12 @@ public interface HardwareReference {
   void setId(Long id);
 
   /**
-   * Returns the id of this HardwareReference object.
-   *
-   * @return Long id.
-   */
-  Long getId();
-
-  /**
    * Sets the name of this HardwareReference object.
    *
    * @param name name.
    *
    */
   void setName(String name);
-
-  /**
-   * Returns the name of this HardwareReference object.
-   *
-   * @return String name.
-   */
-  String getName();
 
   /**
    * Sets the availability of this HardwareReference object.

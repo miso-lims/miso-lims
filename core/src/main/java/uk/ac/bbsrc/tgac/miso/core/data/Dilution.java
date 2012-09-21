@@ -49,6 +49,7 @@ public interface Dilution extends SecurableByProfile, Barcodable, Comparable, De
    *
    * @return Long
    */
+  @Deprecated
   public Long getDilutionId();
 
   /**
@@ -57,6 +58,7 @@ public interface Dilution extends SecurableByProfile, Barcodable, Comparable, De
    * @param dilutionId dilutionId.
    *
    */
+  @Deprecated
   public void setDilutionId(Long dilutionId);
 
   /**

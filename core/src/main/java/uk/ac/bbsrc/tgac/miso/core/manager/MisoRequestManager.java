@@ -199,6 +199,16 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
+  public Collection<Project> listAllProjectsWithLimit(long limit) throws IOException {
+    if (projectStore != null) {
+      return projectStore.listAllWithLimit(limit);
+    }
+    else {
+      throw new IOException("No projectStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
   public Collection<Project> listAllProjectsBySearch(String query) throws IOException {
     if (projectStore != null) {
       return projectStore.listBySearch(query);
@@ -222,6 +232,16 @@ public class MisoRequestManager implements RequestManager {
   public Collection<Run> listAllRuns() throws IOException {
     if (runStore != null) {
       return runStore.listAll();
+    }
+    else {
+      throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public Collection<Run> listAllRunsWithLimit(long limit) throws IOException {
+    if (runStore != null) {
+      return runStore.listAllWithLimit(limit);
     }
     else {
       throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
@@ -337,6 +357,16 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
+  public Collection<Sample> listAllSamplesWithLimit(long limit) throws IOException {
+    if (sampleStore != null) {
+      return sampleStore.listAllWithLimit(limit);
+    }
+    else {
+      throw new IOException("No sampleStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
   public Collection<Sample> listAllSamplesBySearch(String query) throws IOException {
     if (sampleStore != null) {
       return sampleStore.listBySearch(query);
@@ -400,6 +430,16 @@ public class MisoRequestManager implements RequestManager {
   public Collection<Library> listAllLibraries() throws IOException {
     if (libraryStore != null) {
       return libraryStore.listAll();
+    }
+    else {
+      throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public Collection<Library> listAllLibrariesWithLimit(long limit) throws IOException {
+    if (libraryStore != null) {
+      return libraryStore.listAllWithLimit(limit);
     }
     else {
       throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
@@ -817,6 +857,16 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
+  public Collection<Experiment> listAllExperimentsWithLimit(long limit) throws IOException {
+    if (experimentStore != null) {
+      return experimentStore.listAllWithLimit(limit);
+    }
+    else {
+      throw new IOException("No experimentStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
   public Collection<Experiment> listAllExperimentsBySearch(String query) throws IOException {
     if (experimentStore != null) {
       return experimentStore.listBySearch(query);
@@ -840,6 +890,16 @@ public class MisoRequestManager implements RequestManager {
   public Collection<Study> listAllStudies() throws IOException {
     if (studyStore != null) {
       return studyStore.listAll();
+    }
+    else {
+      throw new IOException("No studyStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public Collection<Study> listAllStudiesWithLimit(long limit) throws IOException {
+    if (studyStore != null) {
+      return studyStore.listAllWithLimit(limit);
     }
     else {
       throw new IOException("No studyStore available. Check that it has been declared in the Spring config.");
@@ -1513,6 +1573,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
+  @Deprecated
   public long saveIlluminaPool(IlluminaPool pool) throws IOException {
     if (poolStore != null) {
       return poolStore.saveIlluminaPool(pool);
@@ -1523,6 +1584,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
+  @Deprecated
   public long saveLS454Pool(LS454Pool pool) throws IOException {
     if (poolStore != null) {
       return poolStore.save454Pool(pool);
@@ -1533,6 +1595,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
+  @Deprecated
   public long saveSolidPool(SolidPool pool) throws IOException {
     if (poolStore != null) {
       return poolStore.saveSolidPool(pool);

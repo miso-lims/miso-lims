@@ -69,6 +69,7 @@ public interface Library extends SecurableByProfile, Comparable, Barcodable, Loc
    *
    * @return Long libraryId.
    */
+  @Deprecated
   public Long getLibraryId();
 
   /**
@@ -76,7 +77,10 @@ public interface Library extends SecurableByProfile, Comparable, Barcodable, Loc
    *
    * @param libraryId libraryId.
    */
+  @Deprecated
   public void setLibraryId(Long libraryId);
+
+  public void setId(long id);
 
   /**
    * Sets the name of this Library object.

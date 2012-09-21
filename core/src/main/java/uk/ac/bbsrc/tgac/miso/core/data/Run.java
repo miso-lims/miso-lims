@@ -48,7 +48,7 @@ import java.util.Date;
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC)
 @JsonWriteNullProperties(false)
 @JsonIgnoreProperties({"securityProfile","submissionDocument"})
-public interface Run extends SecurableByProfile, Submittable<Document>, Comparable, Reportable, Watchable, Deletable {
+public interface Run extends SecurableByProfile, Submittable<Document>, Comparable, Reportable, Watchable, Deletable, Nameable {
   /** Field PREFIX  */
   public static final String PREFIX = "RUN";
 
@@ -57,6 +57,7 @@ public interface Run extends SecurableByProfile, Submittable<Document>, Comparab
    *
    * @return Long runId.
    */
+  @Deprecated
   public Long getRunId();
 
   /**
@@ -64,7 +65,10 @@ public interface Run extends SecurableByProfile, Submittable<Document>, Comparab
    *
    * @param runId runId.
    */
+  @Deprecated
   public void setRunId(Long runId);
+
+  public void setId(long id);
 
   /**
    * Returns the sequencerReference of this Run object.
@@ -121,13 +125,6 @@ public interface Run extends SecurableByProfile, Submittable<Document>, Comparab
    * @param alias String.
    */
   public void setAlias(String alias);
-
-  /**
-   * Returns the name of this Run object.
-   *
-   * @return String name.
-   */
-  public String getName();
 
   /**
    * Sets the name of this Run object.

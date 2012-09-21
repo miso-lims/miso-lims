@@ -44,7 +44,7 @@ import java.util.HashSet;
  * @since 0.0.2
  */
 public abstract class AbstractExperiment implements Experiment {
-  public static final Long UNSAVED_ID = null;
+  public static final Long UNSAVED_ID = 0L;
 
   @OneToOne(cascade = CascadeType.ALL)
   private SecurityProfile securityProfile;
@@ -84,12 +84,23 @@ public abstract class AbstractExperiment implements Experiment {
     this.study = study;
   }
 
+  @Deprecated
   public Long getExperimentId() {
     return experimentId;
   }
 
+  @Deprecated
   public void setExperimentId(Long experimentId) {
     this.experimentId = experimentId;
+  }
+
+  @Override
+  public long getId() {
+    return experimentId;
+  }
+
+  public void setId(long id) {
+    this.experimentId = id;
   }
 
   public String getAccession() {
@@ -231,7 +242,7 @@ public abstract class AbstractExperiment implements Experiment {
 */
 
   public boolean isDeletable() {
-    return getExperimentId() != AbstractExperiment.UNSAVED_ID;
+    return getId() != AbstractExperiment.UNSAVED_ID;
     /*&&
            getKits().isEmpty() &&
            getPool() == null;
@@ -275,8 +286,8 @@ public abstract class AbstractExperiment implements Experiment {
     Experiment them = (Experiment) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
-    if (getExperimentId() == AbstractExperiment.UNSAVED_ID
-        || them.getExperimentId() == AbstractExperiment.UNSAVED_ID) {
+    if (getId() == AbstractExperiment.UNSAVED_ID
+        || them.getId() == AbstractExperiment.UNSAVED_ID) {
       if (getName() != null && them.getName() != null) {
         return getName().equals(them.getName());
       }
@@ -285,14 +296,14 @@ public abstract class AbstractExperiment implements Experiment {
       }
     }
     else {
-      return getExperimentId().longValue() == them.getExperimentId().longValue();
+      return getId() == them.getId();
     }
   }
 
   @Override
   public int hashCode() {
-    if (getExperimentId() != AbstractExperiment.UNSAVED_ID) {
-      return getExperimentId().intValue();
+    if (getId() != AbstractExperiment.UNSAVED_ID) {
+      return (int)getId();
     }
     else {
       final int PRIME = 37;
@@ -327,8 +338,8 @@ public abstract class AbstractExperiment implements Experiment {
   @Override
   public int compareTo(Object o) {
     Experiment t = (Experiment)o;
-    if (getExperimentId() < t.getExperimentId()) return -1;
-    if (getExperimentId() > t.getExperimentId()) return 1;
+    if (getId() < t.getId()) return -1;
+    if (getId() > t.getId()) return 1;
     return 0;
   }
 }

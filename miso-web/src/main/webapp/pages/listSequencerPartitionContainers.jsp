@@ -54,7 +54,7 @@
           <td>${container.platformType.key}</td>
           <td>
             <c:if test="${not empty container.run}">
-              <a href='<c:url value="/miso/run/${container.run.runId}"/>'>${container.run.alias}</a>
+              <a href='<c:url value="/miso/run/${container.run.id}"/>'>${container.run.alias}</a>
             </c:if>
           </td>
           <td>
@@ -63,7 +63,7 @@
             </c:if>
           </td>
           <td class="misoicon"
-              onclick="window.location.href='<c:url value="/miso/container/${container.containerId}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
+              onclick="window.location.href='<c:url value="/miso/container/${container.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
         </tr>
       </c:forEach>
       </tbody>

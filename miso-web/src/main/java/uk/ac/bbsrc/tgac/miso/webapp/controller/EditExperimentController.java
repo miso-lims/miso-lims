@@ -226,7 +226,7 @@ public class EditExperimentController {
       requestManager.saveExperiment(experiment);
       session.setComplete();
       model.clear();
-      return "redirect:/miso/experiment/" + experiment.getExperimentId();
+      return "redirect:/miso/experiment/" + experiment.getId();
     }
     catch (IOException ex) {
       if (log.isDebugEnabled()) {

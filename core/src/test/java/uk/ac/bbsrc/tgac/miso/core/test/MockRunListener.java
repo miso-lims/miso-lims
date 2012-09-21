@@ -60,7 +60,7 @@ public class MockRunListener implements RunListener {
 
   @Override
   public void runStarted(RunEvent r) {
-    log.info("Run "+r.getEventObject().getRunId()+" started");
+    log.info("Run "+r.getEventObject().getId()+" started");
     for (ResponderService responder : getResponderServices()) {
       if (responder.respondsTo(r)) {
         responder.generateResponse(r);
@@ -70,7 +70,7 @@ public class MockRunListener implements RunListener {
 
   @Override
   public void runCompleted(RunEvent r) {
-    log.info("Run "+r.getEventObject().getRunId()+" completed");
+    log.info("Run "+r.getEventObject().getId()+" completed");
     for (ResponderService responder : getResponderServices()) {
       if (responder.respondsTo(r)) {
         responder.generateResponse(r);
@@ -80,7 +80,7 @@ public class MockRunListener implements RunListener {
 
   @Override
   public void runFailed(RunEvent r) {
-    log.info("Run "+r.getEventObject().getRunId()+" failed");
+    log.info("Run "+r.getEventObject().getId()+" failed");
     for (ResponderService responder : getResponderServices()) {
       if (responder.respondsTo(r)) {
         responder.generateResponse(r);
@@ -90,7 +90,7 @@ public class MockRunListener implements RunListener {
 
   @Override
   public void runQcAdded(RunEvent r) {
-    log.info("Run "+r.getEventObject().getRunId()+" qc added");
+    log.info("Run "+r.getEventObject().getId()+" qc added");
     for (ResponderService responder : getResponderServices()) {
       if (responder.respondsTo(r)) {
         responder.generateResponse(r);

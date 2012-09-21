@@ -37,7 +37,7 @@
 <sessionConversation:insertSessionConversationId attributeName="container"/>
 <h1>
     <c:choose>
-        <c:when test="${not empty container.containerId}">Edit</c:when>
+        <c:when test="${container.id != 0}">Edit</c:when>
         <c:otherwise>Create</c:otherwise>
     </c:choose> Sequencer Partition Container
     <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
@@ -48,7 +48,7 @@
     <td class="h">Container ID:</td>
     <td>
       <c:choose>
-        <c:when test="${not empty container.containerId}"><input type='hidden' id='containerId' name='containerId' value='${container.containerId}'/>${container.containerId}</c:when>
+        <c:when test="${container.id != 0}"><input type='hidden' id='containerId' name='id' value='${container.id}'/>${container.id}</c:when>
         <c:otherwise><i>Unsaved</i></c:otherwise>
       </c:choose>
     </td>
@@ -58,7 +58,7 @@
     <td>Platform:</td>
     <td>
       <c:choose>
-        <c:when test="${not empty container.containerId and not empty container.platformType}">
+        <c:when test="${container.id != 0 and not empty container.platformType}">
           <div id="platformTypesDiv">${container.platformType.key}</div>
         </c:when>
         <c:otherwise>
@@ -67,7 +67,7 @@
       </c:choose>
     </td>
   </tr>
-<c:if test="${empty container.containerId}">
+<c:if test="${container.id == 0}">
   <tr>
     <td>Sequencer:</td>
     <td id="sequencerReferenceSelect">
@@ -83,7 +83,7 @@
     <td width="50%" valign="top">
       <h2>Container Parameters</h2>
       <div id="containerPartitions">
-      <c:if test="${not empty container.containerId}">
+      <c:if test="${container.id != 0}">
         <div class="note ui-corner-all">
           <c:if test="${multiplexed and not empty container.identificationBarcode}">
             <ul class="sddm">
@@ -96,10 +96,10 @@
                      onmouseover="mcancelclosetime()"
                      onmouseout="mclosetime()">
                   <a href="javascript:void(0);"
-                     onclick="Container.generateCasava17DemultiplexCSV(${container.containerId});">Demultiplex
+                     onclick="Container.generateCasava17DemultiplexCSV(${container.id});">Demultiplex
                     CSV (pre-1.8)</a>
                   <a href="javascript:void(0);"
-                     onclick="Container.generateCasava18DemultiplexCSV(${container.containerId});">Demultiplex
+                     onclick="Container.generateCasava18DemultiplexCSV(${container.id});">Demultiplex
                     CSV (1.8+)</a>
                 </div>
               </li>
@@ -125,7 +125,7 @@
                     <c:if test="${(container.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                                                     or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
                       <a href="javascript:void(0);"
-                         onclick="editContainerIdBarcode(jQuery('#idBarcode'), 0)">
+                         onclick="Container.ui.editContainerIdBarcode(jQuery('#idBarcode'))">
                         <span class="fg-button ui-icon ui-icon-pencil"></span>
                       </a>
                     </c:if>
@@ -146,7 +146,7 @@
                     <c:if test="${(container.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                                                     or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
                       <a href="javascript:void(0);"
-                         onclick="editContainerLocationBarcode(jQuery('#locationBarcode'), 0)">
+                         onclick="Container.ui.editContainerLocationBarcode(jQuery('#locationBarcode'), 0)">
                         <span class="fg-button ui-icon ui-icon-pencil"></span>
                       </a>
                     </c:if>
@@ -167,7 +167,7 @@
                     <c:if test="${(container.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                                                     or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
                       <a href="javascript:void(0);"
-                         onclick="editContainerValidationBarcode(jQuery('#validationBarcode'), 0)">
+                         onclick="Container.ui.editContainerValidationBarcode(jQuery('#validationBarcode'), 0)">
                         <span class="fg-button ui-icon ui-icon-pencil"></span>
                       </a>
                     </c:if>
@@ -195,7 +195,7 @@
                       <c:when test="${not empty partition.pool}">
                         <ul partition="${partitionCount.index}" bind="partitions[${partitionCount.index}].pool" class="runPartitionDroppable">
                         <div class="dashboard">
-                          <a href='<c:url value="/miso/pool/${fn:toLowerCase(container.platformType.key)}/${partition.pool.poolId}"/>'>
+                          <a href='<c:url value="/miso/pool/${fn:toLowerCase(container.platformType.key)}/${partition.pool.id}"/>'>
                               ${partition.pool.name}
                             (${partition.pool.creationDate})
                           </a><br/>
@@ -210,7 +210,7 @@
                                   <input type="hidden"
                                          name="partitions[${partitionCount.index}].pool"
                                          id="pId${partitionCount.index}"
-                                         value="${partition.pool.poolId}"/>
+                                         value="${partition.pool.id}"/>
                                 </c:when>
                                 <c:otherwise>
                                   <i>No experiment linked to this pool</i>
@@ -244,7 +244,7 @@
 </div>
 
 <script type="text/javascript">
-  <c:if test="${empty container.containerId or empty container.platformType}">
+  <c:if test="${container.id == 0 or empty container.platformType}">
     jQuery(document).ready(function() {
       Container.ui.populatePlatformTypes();
     });

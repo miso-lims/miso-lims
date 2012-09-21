@@ -133,7 +133,7 @@ public class SQLLibraryQCDAO implements LibraryQcStore {
   @Transactional(readOnly = false, rollbackFor = IOException.class)
   public long save(LibraryQC libraryQC) throws IOException {
     MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("library_libraryId", libraryQC.getLibrary().getLibraryId())
+    params.addValue("library_libraryId", libraryQC.getLibrary().getId())
             //.addValue("qcUserName", SecurityContextHolder.getContext().getAuthentication().getName())
             .addValue("qcUserName", libraryQC.getQcCreator())
             .addValue("qcDate", libraryQC.getQcDate())
@@ -141,15 +141,15 @@ public class SQLLibraryQCDAO implements LibraryQcStore {
             .addValue("results", libraryQC.getResults())
             .addValue("insertSize", libraryQC.getInsertSize());
 
-    if (libraryQC.getQcId() == AbstractLibraryQC.UNSAVED_ID) {
+    if (libraryQC.getId() == AbstractLibraryQC.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
                               .withTableName(TABLE_NAME)
                               .usingGeneratedKeyColumns("qcId");
       Number newId = insert.executeAndReturnKey(params);
-      libraryQC.setQcId(newId.longValue());
+      libraryQC.setId(newId.longValue());
     }
     else {
-      params.addValue("qcId", libraryQC.getQcId());
+      params.addValue("qcId", libraryQC.getId());
       NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
       namedTemplate.update(LIBRARY_QC_UPDATE, params);
     }
@@ -162,18 +162,18 @@ public class SQLLibraryQCDAO implements LibraryQcStore {
       else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (l != null) {
           Cache pc = cacheManager.getCache("libraryCache");
-          pc.remove(DbUtils.hashCodeCacheKeyFor(l.getLibraryId()));
+          pc.remove(DbUtils.hashCodeCacheKeyFor(l.getId()));
         }
       }
       else if (this.cascadeType.equals(CascadeType.ALL)) {
         if (l != null) {
           libraryDAO.save(l);
           Cache pc = cacheManager.getCache("libraryCache");
-          pc.remove(DbUtils.hashCodeCacheKeyFor(l.getLibraryId()));
+          pc.remove(DbUtils.hashCodeCacheKeyFor(l.getId()));
         }
       }
     }
-    return libraryQC.getQcId();
+    return libraryQC.getId();
   }
 
   public LibraryQC get(long qcId) throws IOException {
@@ -205,7 +205,7 @@ public class SQLLibraryQCDAO implements LibraryQcStore {
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
     if (qc.isDeletable() &&
            (namedTemplate.update(LIBRARY_QC_DELETE,
-                                 new MapSqlParameterSource().addValue("qcId", qc.getQcId())) == 1)) {
+                                 new MapSqlParameterSource().addValue("qcId", qc.getId())) == 1)) {
       Library l = qc.getLibrary();
       if (this.cascadeType.equals(CascadeType.PERSIST)) {
         if (l != null) libraryDAO.save(l);
@@ -213,7 +213,7 @@ public class SQLLibraryQCDAO implements LibraryQcStore {
       else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (l != null) {
           Cache pc = cacheManager.getCache("libraryCache");
-          pc.remove(DbUtils.hashCodeCacheKeyFor(l.getLibraryId()));
+          pc.remove(DbUtils.hashCodeCacheKeyFor(l.getId()));
         }
       }
       return true;
@@ -224,7 +224,7 @@ public class SQLLibraryQCDAO implements LibraryQcStore {
   public class LazyLibraryQcMapper implements RowMapper<LibraryQC> {
     public LibraryQC mapRow(ResultSet rs, int rowNum) throws SQLException {
       LibraryQC s = dataObjectFactory.getLibraryQC();
-      s.setQcId(rs.getLong("qcId"));
+      s.setId(rs.getLong("qcId"));
       s.setQcCreator(rs.getString("qcUserName"));
       s.setQcDate(rs.getDate("qcDate"));
       s.setResults(rs.getDouble("results"));
@@ -244,7 +244,7 @@ public class SQLLibraryQCDAO implements LibraryQcStore {
   public class LibraryQcMapper implements RowMapper<LibraryQC> {
     public LibraryQC mapRow(ResultSet rs, int rowNum) throws SQLException {
       LibraryQC s = dataObjectFactory.getLibraryQC();
-      s.setQcId(rs.getLong("qcId"));
+      s.setId(rs.getLong("qcId"));
       s.setQcCreator(rs.getString("qcUserName"));
       s.setQcDate(rs.getDate("qcDate"));
       s.setResults(rs.getDouble("results"));

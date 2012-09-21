@@ -31,6 +31,8 @@ import net.sf.ehcache.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import com.eaglegenomics.simlims.core.SecurityProfile;
+import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.ExperimentStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
@@ -73,6 +75,9 @@ public class SQLStudyDAO implements StudyStore {
   public static final String STUDIES_SELECT =
           "SELECT studyId, name, description, alias, accession, securityProfile_profileId, project_projectId, studyType " +
           "FROM "+TABLE_NAME;
+
+  public static final String STUDIES_SELECT_LIMIT =
+          STUDIES_SELECT + " ORDER BY studyId DESC LIMIT ?";
 
   public static final String STUDY_SELECT_BY_ID =
           STUDIES_SELECT + " " + "WHERE studyId = ?";
@@ -126,6 +131,19 @@ public class SQLStudyDAO implements StudyStore {
   private ExperimentStore experimentDAO;
   private Store<SecurityProfile> securityProfileDAO;
   private CascadeType cascadeType;
+
+  @Autowired
+  private MisoNamingScheme<Study> namingScheme;
+
+  @Override
+  public MisoNamingScheme<Study> getNamingScheme() {
+    return namingScheme;
+  }
+
+  @Override
+  public void setNamingScheme(MisoNamingScheme<Study> namingScheme) {
+    this.namingScheme = namingScheme;
+  }
 
   @Autowired
   private CacheManager cacheManager;
@@ -214,15 +232,40 @@ public class SQLStudyDAO implements StudyStore {
             .addValue("project_projectId", study.getProject().getProjectId())
             .addValue("studyType", study.getStudyType());
 
-    if (study.getStudyId() == AbstractStudy.UNSAVED_ID) {
+    if (study.getId() == AbstractStudy.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
                             .withTableName(TABLE_NAME)
                             .usingGeneratedKeyColumns("studyId");
+      try {
+        study.setId(DbUtils.getAutoIncrement(template, TABLE_NAME));
+
+        String name = namingScheme.generateNameFor("name", study);
+        study.setName(name);
+
+        if (namingScheme.validateField("name", study.getName())) {
+          params.addValue("name", name);
+
+          Number newId = insert.executeAndReturnKey(params);
+          if (newId.longValue() != study.getId()) {
+            log.error("Expected Study ID doesn't match returned value from database insert: rolling back...");
+            new NamedParameterJdbcTemplate(template).update(STUDY_DELETE, new MapSqlParameterSource().addValue("studyId", study.getId()));
+            throw new IOException("Something bad happened. Expected Study ID doesn't match returned value from DB insert");
+          }
+        }
+        else {
+          throw new IOException("Cannot save Study - invalid field:" + study.toString());
+        }
+      }
+      catch (MisoNamingException e) {
+        throw new IOException("Cannot save Study - issue with naming scheme", e);
+      }
+      /*
       String name = "STU"+ DbUtils.getAutoIncrement(template, TABLE_NAME);
       params.addValue("name", name);
       Number newId = insert.executeAndReturnKey(params);
       study.setStudyId(newId.longValue());
       study.setName(name);
+      */
 
       Project p = study.getProject();
 
@@ -231,7 +274,7 @@ public class SQLStudyDAO implements StudyStore {
 
       MapSqlParameterSource poParams = new MapSqlParameterSource();
       poParams.addValue("Project_projectId", p.getProjectId())
-              .addValue("studies_studyId", study.getStudyId());
+              .addValue("studies_studyId", study.getId());
       try {
         pInsert.execute(poParams);
       }
@@ -240,10 +283,26 @@ public class SQLStudyDAO implements StudyStore {
       }
     }
     else {
+      try {
+        if (namingScheme.validateField("name", study.getName())) {
+          params.addValue("studyId", study.getId())
+                .addValue("name", study.getName());
+          NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+          namedTemplate.update(STUDY_UPDATE, params);
+        }
+        else {
+          throw new IOException("Cannot save Study - invalid field:" + study.toString());
+        }
+      }
+      catch (MisoNamingException e) {
+        throw new IOException("Cannot save Study - issue with naming scheme", e);
+      }
+      /*
       params.addValue("studyId", study.getStudyId())
               .addValue("name", study.getName());
       NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
       namedTemplate.update(STUDY_UPDATE, params);
+      */
     }
 
     if (this.cascadeType != null) {
@@ -261,7 +320,7 @@ public class SQLStudyDAO implements StudyStore {
       }
     }
 
-    return study.getStudyId();
+    return study.getId();
   }
 
   @Cacheable(cacheName="studyListCache",
@@ -275,6 +334,10 @@ public class SQLStudyDAO implements StudyStore {
   )
   public List<Study> listAll() {
     return template.query(STUDIES_SELECT, new LazyStudyMapper());
+  }
+
+  public List<Study> listAllWithLimit(long limit) throws IOException {
+    return template.query(STUDIES_SELECT_LIMIT, new Object[]{limit}, new LazyStudyMapper());
   }
 
   @Override
@@ -302,7 +365,7 @@ public class SQLStudyDAO implements StudyStore {
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
     if (study.isDeletable() &&
            (namedTemplate.update(STUDY_DELETE,
-                                 new MapSqlParameterSource().addValue("studyId", study.getStudyId())) == 1)) {
+                                 new MapSqlParameterSource().addValue("studyId", study.getId())) == 1)) {
       Project p = study.getProject();
       if (this.cascadeType.equals(CascadeType.PERSIST)) {
         if (p!=null) projectDAO.save(p);
@@ -365,7 +428,7 @@ public class SQLStudyDAO implements StudyStore {
   public class LazyStudyMapper implements RowMapper<Study> {
     public Study mapRow(ResultSet rs, int rowNum) throws SQLException {
       Study s = dataObjectFactory.getStudy();
-      s.setStudyId(rs.getLong("studyId"));
+      s.setId(rs.getLong("studyId"));
       s.setName(rs.getString("name"));
       s.setAlias(rs.getString("alias"));
       s.setAccession(rs.getString("accession"));
@@ -385,7 +448,7 @@ public class SQLStudyDAO implements StudyStore {
   public class StudyMapper implements RowMapper<Study> {
     public Study mapRow(ResultSet rs, int rowNum) throws SQLException {
       Study s = dataObjectFactory.getStudy();
-      s.setStudyId(rs.getLong("studyId"));
+      s.setId(rs.getLong("studyId"));
       s.setName(rs.getString("name"));
       s.setAlias(rs.getString("alias"));
       s.setAccession(rs.getString("accession"));

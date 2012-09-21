@@ -149,13 +149,16 @@ public interface RequestManager {
    * defined as either read or write access.
    */
   public Collection<Project> listAllProjects() throws IOException;
+  public Collection<Project> listAllProjectsWithLimit(long limit) throws IOException;
   public Collection<Project> listAllProjectsBySearch(String query) throws IOException;
   public Collection<ProjectOverview> listAllOverviewsByProjectId(long projectId) throws IOException;
 
   public Collection<Study> listAllStudies() throws IOException;
+  public Collection<Study> listAllStudiesWithLimit(long limit) throws IOException;
   public Collection<Study> listAllStudiesBySearch(String query) throws IOException;
 
   public Collection<Experiment> listAllExperiments() throws IOException;
+  public Collection<Experiment> listAllExperimentsWithLimit(long limit) throws IOException;
   public Collection<Experiment> listAllExperimentsBySearch(String query) throws IOException;
 
   /**
@@ -164,6 +167,7 @@ public interface RequestManager {
    */
   //public Collection<Request> listAllRequests(User user, Project project) throws IOException;
   public Collection<Run> listAllRuns() throws IOException;
+  public Collection<Run> listAllRunsWithLimit(long limit) throws IOException;
   public Collection<Run> listAllRunsBySearch(String query) throws IOException;
   public Collection<Run> listAllRunsByProjectId(long projectId) throws IOException;
   public Collection<Run> listRunsByPoolId(long poolId) throws IOException;
@@ -182,6 +186,7 @@ public interface RequestManager {
   public Collection<SequencerPartitionContainer<SequencerPoolPartition>> listAllSequencerPartitionContainers() throws IOException;
 
   public Collection<Sample> listAllSamples() throws IOException;
+  public Collection<Sample> listAllSamplesWithLimit(long limit) throws IOException;
   public Collection<Sample> listAllSamplesBySearch(String query) throws IOException;
   public Collection<Sample> listAllSamplesByProjectId(long projectId) throws IOException;
   public Collection<Sample> listAllSamplesByExperimentId(long experimentId) throws IOException;
@@ -191,6 +196,7 @@ public interface RequestManager {
   public Collection<SampleQC> listAllSampleQCsBySampleId(long sampleId) throws IOException;
 
   public Collection<Library> listAllLibraries() throws IOException;
+  public Collection<Library> listAllLibrariesWithLimit(long limit) throws IOException;
   public Collection<Library> listAllLibrariesBySearch(String query) throws IOException;
   public Collection<Library> listAllLibrariesByProjectId(long projectId) throws IOException;
   public Collection<Library> listAllLibrariesBySampleId(long sampleId) throws IOException;

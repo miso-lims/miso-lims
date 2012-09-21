@@ -37,11 +37,16 @@ import java.util.Date;
  * @since 0.0.2
  */
 public interface QC extends Securable, Comparable, Deletable {
+  public long getId();
+
+  public void setId(long id);
+
   /**
    * Returns the qcId of this QC object.
    *
    * @return Long qcId.
    */
+  @Deprecated
   public Long getQcId();
 
   /**
@@ -49,6 +54,7 @@ public interface QC extends Securable, Comparable, Deletable {
    *
    * @param qcId qcId.
    */
+  @Deprecated
   public void setQcId(Long qcId);
 
   /**

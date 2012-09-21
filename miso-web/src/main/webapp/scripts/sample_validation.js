@@ -27,7 +27,7 @@ function validate_sample(form) {
     'validateSampleAlias',
   {'alias':jQuery('#alias').val(), 'url':ajaxurl},
   {
-    'doOnSuccess': function(json) { if (json.html === "OK") { process_validate_sample(form); }},
+    'doOnSuccess': function(json) { if (json.response === "OK") { process_validate_sample(form); }},
     'doOnError':function(json) { alert(json.error); }
   }
   );

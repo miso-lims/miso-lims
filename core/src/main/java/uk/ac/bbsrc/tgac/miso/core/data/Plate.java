@@ -50,6 +50,7 @@ public interface Plate<T extends LinkedList<S>, S> extends SecurableByProfile, B
    *
    * @return Long
    */
+  @Deprecated
   public Long getPlateId();
 
   /**
@@ -58,14 +59,15 @@ public interface Plate<T extends LinkedList<S>, S> extends SecurableByProfile, B
    * @param plateId Long.
    *
    */
+  @Deprecated
   public void setPlateId(Long plateId);
 
   /**
-   * Returns the name of this Plate object.
+   * Sets the ID of this Plate object.
    *
-   * @return String name.
+   * @param id long.
    */
-  public String getName();
+  public void setId(long id);
 
   /**
    * Sets the name of this Plate object.

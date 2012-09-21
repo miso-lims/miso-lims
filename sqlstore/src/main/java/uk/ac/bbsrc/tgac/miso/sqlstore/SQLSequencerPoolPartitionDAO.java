@@ -208,7 +208,7 @@ public class SQLSequencerPoolPartitionDAO implements PartitionStore {
           .addValue("securityProfile_profileId", securityProfileId);
 
     if (partition.getPool() != null) {
-      params.addValue("pool_poolId", partition.getPool().getPoolId());
+      params.addValue("pool_poolId", partition.getPool().getId());
 
       // if this pool is marked as ready to run, and is now added to a partition, unmark it
       if (partition.getPool().getReadyToRun()) {

@@ -224,7 +224,7 @@ public class EditSubmissionController {
       requestManager.saveSubmission(submission);
       session.setComplete();
       model.clear();
-      return "redirect:/miso/submission/"+submission.getSubmissionId();
+      return "redirect:/miso/submission/"+submission.getId();
     }
     catch (IOException ex) {
       if (log.isDebugEnabled()) {

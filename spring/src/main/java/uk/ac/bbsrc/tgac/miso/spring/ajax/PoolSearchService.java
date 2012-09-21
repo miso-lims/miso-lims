@@ -115,7 +115,7 @@ public class PoolSearchService {
     }
     b.append("</i>");
 
-    b.append("<input type='hidden' id='pId" + p.getPoolId() + "' value='" + p.getPoolId() + "'/></div>");
+    b.append("<input type='hidden' id='pId" + p.getId() + "' value='" + p.getId() + "'/></div>");
     b.append("<div style='position: absolute; bottom: 0; right: 0; font-size: 24px; font-weight: bold; color:#BBBBBB'>" + p.getPlatformType().getKey() + "</div>");
     b.append("</div>");
     return b.toString();

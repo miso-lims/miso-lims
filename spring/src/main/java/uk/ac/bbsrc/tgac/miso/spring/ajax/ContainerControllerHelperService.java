@@ -431,13 +431,13 @@ public class ContainerControllerHelperService {
     }
   }
 
-  private String poolHtml(Pool p, int partition) {
+  private String poolHtml(Pool<? extends Poolable> p, int partition) {
     StringBuilder b = new StringBuilder();
     try {
       b.append("<div style='position:relative' onMouseOver='this.className=\"dashboardhighlight\"' onMouseOut='this.className=\"dashboard\"' class='dashboard'>");
       b.append("<div style=\"float:left\"><b>" + p.getName() + " (" + p.getCreationDate() + ")</b><br/>");
 
-      Collection<Dilution> ds = p.getDilutions();
+      Collection<? extends Dilution> ds = p.getDilutions();
       for (Dilution d : ds) {
         b.append("<span>" + d.getName() + " (" + d.getLibrary().getSample().getProject().getAlias() + ")</span><br/>");
       }
@@ -451,7 +451,7 @@ public class ContainerControllerHelperService {
 
       if (p.getExperiments().size() == 0) {
         Set<Project> pooledProjects = new HashSet<Project>();
-        Collection<Dilution> dils = p.getDilutions();
+        Collection<? extends Dilution> dils = p.getDilutions();
         for (Dilution d : dils) {
           pooledProjects.add(d.getLibrary().getSample().getProject());
         }
@@ -464,16 +464,16 @@ public class ContainerControllerHelperService {
           }
           else {
             for (Study s : studies) {
-              b.append("<option value='" + s.getStudyId() + "'>" + s.getAlias() + " (" + s.getName() + " - " + s.getStudyType() + ")</option>");
+              b.append("<option value='" + s.getId() + "'>" + s.getAlias() + " (" + s.getName() + " - " + s.getStudyType() + ")</option>");
             }
           }
         }
         b.append("</select>");
-        b.append("<input id='studySelectButton-"+partition+"_"+p.getPoolId()+"' type='button' onclick=\"Container.partition.selectContainerStudy('" + partition + "', " + p.getPoolId() + ");\" class=\"ui-state-default ui-corner-all\" value='Select Study'/>");
+        b.append("<input id='studySelectButton-"+partition+"_"+p.getId()+"' type='button' onclick=\"Container.partition.selectContainerStudy('" + partition + "', " + p.getId() + ");\" class=\"ui-state-default ui-corner-all\" value='Select Study'/>");
         b.append("</div></div>");
       }
 
-      b.append("<input type='hidden' name='partitions[" + partition + "].pool' id='pId" + p.getPoolId() + "' value='" + p.getPoolId() + "'/></div>");
+      b.append("<input type='hidden' name='partitions[" + partition + "].pool' id='pId" + p.getId() + "' value='" + p.getId() + "'/></div>");
       b.append("<div style='position: absolute; bottom: 0; right: 0; font-size: 24px; font-weight: bold; color:#BBBBBB'>" + p.getPlatformType().getKey() + "</div>");
       b.append("<span style='position: absolute; top: 0; right: 0;' onclick='Container.pool.confirmPoolRemove(this);' class='float-right ui-icon ui-icon-circle-close'></span>");
       b.append("</div>");
@@ -563,7 +563,7 @@ public class ContainerControllerHelperService {
                     sb.append(e.getStudy().getProject().getAlias() + " (" + e.getName() + ": " + p.getPool().getDilutions().size() + " dilutions)<br/>");
                   }
                   sb.append("</i>");
-                  sb.append("<input type='hidden' name='partitions[" + (p.getPartitionNumber() - 1) + "].pool' id='pId" + (p.getPartitionNumber() - 1) + "' value='"+p.getPool().getPoolId()+"'/>");
+                  sb.append("<input type='hidden' name='partitions[" + (p.getPartitionNumber() - 1) + "].pool' id='pId" + (p.getPartitionNumber() - 1) + "' value='"+p.getPool().getId()+"'/>");
                 }
                 else {
                   sb.append("<i>No experiment linked to this pool</i>");
@@ -586,7 +586,8 @@ public class ContainerControllerHelperService {
 
             Map<String, Object> responseMap = new HashMap<String, Object>();
             responseMap.put("html", sb.toString());
-            responseMap.put("verify", confirm.toString());
+            responseMap.put("barcode", f.getIdentificationBarcode());
+            responseMap.put("verify", confirm);
             return JSONUtils.JSONObjectResponse(responseMap);
           }
           else {

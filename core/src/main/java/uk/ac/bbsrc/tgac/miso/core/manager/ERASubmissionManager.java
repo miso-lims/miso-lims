@@ -474,7 +474,7 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
       try{
 
           UploadReport report=t.uploadSequenceData(dataFiles, end);
-          uploadReports.put(s.getSubmissionId(),report);
+          uploadReports.put(s.getId(),report);
 
           return("attempting to upload files...");
       }

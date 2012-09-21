@@ -34,7 +34,7 @@
 <form:form method="POST" commandName="project" autocomplete="off">
 <sessionConversation:insertSessionConversationId attributeName="project"/>
 <h1><c:choose><c:when
-        test="${not empty project.projectId}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose>
+        test="${project.id != 0}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose>
   Project
     <button type="button" class="fg-button ui-state-default ui-corner-all"
             onclick="return validate_project(this.form);">Save
@@ -49,12 +49,12 @@
   information about a Project proposal.
 </div>
 
-<c:if test="${not empty project.projectId}">
+<c:if test="${project.id != 0}">
   <div id="trafdiv" class="ui-corner-all" onclick="location.href='#';">
-    <div id="pro${project.projectId}traf"></div>
+    <div id="pro${project.id}traf"></div>
     <script type="text/javascript">
       jQuery(document).ready(function() {
-        Project.ui.editProjectTrafficLight(${project.projectId});
+        Project.ui.editProjectTrafficLight(${project.id});
 
         jQuery("#trafdiv").colorbox({width:"90%", inline:true, href:"#trafpanel"});
       });
@@ -77,7 +77,7 @@
     <td class="h">Project ID:</td>
     <td>
       <c:choose>
-        <c:when test="${not empty project.projectId}">${project.projectId}</c:when>
+        <c:when test="${project.id != 0}">${project.id}</c:when>
         <c:otherwise><i>Unsaved</i></c:otherwise>
       </c:choose>
     </td>
@@ -86,7 +86,7 @@
     <td class="h">Name:</td>
     <td>
       <c:choose>
-        <c:when test="${not empty project.projectId}">${project.name}</c:when>
+        <c:when test="${project.id != 0}">${project.name}</c:when>
         <c:otherwise><i>Unsaved</i></c:otherwise>
       </c:choose>
     </td>
@@ -124,8 +124,8 @@
 
 
 <div id="projectoverviews">
-  <c:if test="${not empty project.projectId}">
-    <a class="add" href="javascript:void(0);" onclick="Project.overview.showProjectOverviewDialog(${project.projectId});">Add
+  <c:if test="${project.id != 0}">
+    <a class="add" href="javascript:void(0);" onclick="Project.overview.showProjectOverviewDialog(${project.id});">Add
       Overview</a><br/>
   </c:if>
   <c:choose>
@@ -363,7 +363,7 @@
 </div>
 <div id="issuesdiv" class="note" style="display:none;">
   <c:choose>
-    <c:when test="${not empty project.projectId}">
+    <c:when test="${project.id != 0}">
       To link issues to this project please enter your issue keys here, separated by a single comma, e.g. FOO-1,FOO-2,FOO-3:<br/>
       <input type="text" id="previewKeys" name="previewKeys"/>
       <button type="button" class="br-button ui-state-default ui-corner-all" onclick="Project.issues.previewIssueKeys();">Preview
@@ -384,7 +384,7 @@
 </div>
 
 <%@ include file="permissions.jsp" %>
-<c:if test="${empty project.projectId}">
+<c:if test="${project.id == 0}">
   <script type="text/javascript">
     jQuery(document).ready(function() {
       //show import pane by default if project is unsaved
@@ -400,7 +400,7 @@
 </form:form>
 
 <c:choose>
-<c:when test="${not empty project.projectId}">
+<c:when test="${project.id != 0}">
 <div id="simplebox">
   <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#upload_arrowclick'), 'uploaddiv');">Project Files
     <div id="upload_arrowclick" class="toggleLeft"></div>
@@ -415,7 +415,7 @@
                 enctype="multipart/form-data"
                 target="target_upload"
                 onsubmit="Utils.fileUpload.fileUploadProgress('ajax_upload_form', 'statusdiv', Utils.fileUpload.processingOverlay);">
-            <input type="hidden" name="projectId" value="${project.projectId}"/>
+            <input type="hidden" name="id" value="${project.id}"/>
             <input type="file" name="file"/>
             <button type="submit" class="br-button ui-state-default ui-corner-all">Upload</button>
           </form>
@@ -428,8 +428,8 @@
 
   <div id="projectfiles">
     <c:forEach items="${projectFiles}" var="file">
-      <a href="<c:url value='/miso/download/project/${project.projectId}/${file.key}'/>">
-        <a class="listbox" href="<c:url value='/miso/download/project/${project.projectId}/${file.key}'/>">
+      <a href="<c:url value='/miso/download/project/${project.id}/${file.key}'/>">
+        <a class="listbox" href="<c:url value='/miso/download/project/${project.id}/${file.key}'/>">
           <div onMouseOver="this.className='boxlistboxhighlight'" onMouseOut="this.className='boxlistbox'"
                class="boxlistbox">
               ${file.value}
@@ -456,15 +456,15 @@
       <div id="samplemenu"
            onmouseover="mcancelclosetime()"
            onmouseout="mclosetime()">
-        <a href='<c:url value="/miso/sample/new/${project.projectId}"/>'>Add Samples</a>
+        <a href='<c:url value="/miso/sample/new/${project.id}"/>'>Add Samples</a>
         <c:if test="${not empty project.samples}">
           <a href='javascript:void(0);' onclick='bulkSampleQcTable();'>QC Samples</a>
-          <a href='<c:url value="/miso/library/new/${project.samples[0].sampleId}#tab-2"/>'>Add
+          <a href='<c:url value="/miso/library/new/${project.samples[0].id}#tab-2"/>'>Add
             Libraries</a>
           <a href="javascript:void(0);" onclick="Project.barcode.selectSampleBarcodesToPrint('#sample_table');">Print Barcodes ...</a>
-          <a href="javascript:void(0);" onclick="generateSampleDeliveryForm(${project.projectId});">Get
+          <a href="javascript:void(0);" onclick="generateSampleDeliveryForm(${project.id});">Get
             Delivery Form</a>
-          <a href="javascript:void(0);" onclick="Project.ui.uploadSampleDeliveryForm(${project.projectId});">Import
+          <a href="javascript:void(0);" onclick="Project.ui.uploadSampleDeliveryForm(${project.id});">Import
             Delivery Form</a>
           <a href='<c:url value="/miso/sample/receipt"/>'>Receive Samples</a>
         </c:if>
@@ -483,7 +483,7 @@
                     enctype="multipart/form-data"
                     target="deliveryform_target_upload"
                     onsubmit="Utils.fileUpload.fileUploadProgress('deliveryform_upload_form', 'deliveryform_statusdiv', Project.ui.deliveryFormUploadSuccess);">
-                <input type="hidden" name="projectId" value="${project.projectId}"/>
+                <input type="hidden" name="id" value="${project.id}"/>
                 <input type="file" name="file"/>
                 <button type="submit" class="br-button ui-state-default ui-corner-all">Upload</button>
                 <button type="button" class="br-button ui-state-default ui-corner-all"
@@ -515,7 +515,7 @@
         </thead>
         <tbody>
         <c:forEach items="${project.samples}" var="sample">
-          <tr sampleId="${sample.sampleId}" onMouseOver="this.className='highlightrow'"
+          <tr sampleId="${sample.id}" onMouseOver="this.className='highlightrow'"
               onMouseOut="this.className='normalrow'">
             <td><b>${sample.name}</b></td>
             <td>${sample.alias}</td>
@@ -524,9 +524,9 @@
             <td>${sample.receivedDate}</td>
             <td>${sample.qcPassed}</td>
             <td class="misoicon"
-                onclick="window.location.href='<c:url value="/miso/sample/${sample.sampleId}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
+                onclick="window.location.href='<c:url value="/miso/sample/${sample.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
             <sec:authorize access="hasRole('ROLE_ADMIN')">
-              <td class="misoicon" onclick="Sample.deleteSample(${sample.sampleId}, Utils.page.pageReload);"><span class="ui-icon ui-icon-trash"/></td>
+              <td class="misoicon" onclick="Sample.deleteSample(${sample.id}, Utils.page.pageReload);"><span class="ui-icon ui-icon-trash"/></td>
             </sec:authorize>
           </tr>
         </c:forEach>
@@ -553,7 +553,7 @@
            onmouseout="mclosetime()">
 
         <c:if test="${not empty project.samples}">
-          <a href='<c:url value="/miso/library/new/${project.samples[0].sampleId}#tab-2"/>'>Add Libraries</a>
+          <a href='<c:url value="/miso/library/new/${project.samples[0].id}#tab-2"/>'>Add Libraries</a>
         </c:if>
 
         <c:if test="${not empty projectLibraries}">
@@ -585,7 +585,7 @@
         </thead>
         <tbody>
         <c:forEach items="${projectLibraries}" var="library">
-          <tr libraryId="${library.libraryId}" onMouseOver="this.className='highlightrow'"
+          <tr libraryId="${library.id}" onMouseOver="this.className='highlightrow'"
               onMouseOut="this.className='normalrow'">
             <td><b>${library.name}</b></td>
             <td>${library.alias}</td>
@@ -603,9 +603,9 @@
             <td><c:forEach var="qc" items="${library.libraryQCs}" end="0">${qc.insertSize}</c:forEach></td>
             <td>${library.qcPassed}</td>
             <td class="misoicon"
-                onclick="window.location.href='<c:url value="/miso/library/${library.libraryId}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
+                onclick="window.location.href='<c:url value="/miso/library/${library.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
             <sec:authorize access="hasRole('ROLE_ADMIN')">
-              <td class="misoicon" onclick="Library.deleteLibrary(${library.libraryId}, Utils.page.pageReload);"><span class="ui-icon ui-icon-trash"/></td>
+              <td class="misoicon" onclick="Library.deleteLibrary(${library.id}, Utils.page.pageReload);"><span class="ui-icon ui-icon-trash"/></td>
             </sec:authorize>
           </tr>
         </c:forEach>
@@ -636,7 +636,7 @@
             <a href='javascript:void(0);' onclick='bulkEmPcrTable();' class="add">Add EmPCRs</a>
           </c:if>
           <a href="javascript:void(0);" onclick="Project.barcode.selectLibraryDilutionBarcodesToPrint('#librarydils_table');">Print Barcodes ...</a>
-          <a href='<c:url value="/miso/poolwizard/new/${project.projectId}"/>'>Create Pools</a>
+          <a href='<c:url value="/miso/poolwizard/new/${project.id}"/>'>Create Pools</a>
         </c:if>
       </div>
     </li>
@@ -659,7 +659,7 @@
         </thead>
         <tbody>
         <c:forEach items="${projectLibraryDilutions}" var="dil">
-          <tr dilutionId="${dil.dilutionId}" onMouseOver="this.className='highlightrow'"
+          <tr dilutionId="${dil.id}" onMouseOver="this.className='highlightrow'"
               onMouseOut="this.className='normalrow'">
             <td><b>${dil.name}</b></td>
             <td>${dil.library.alias}<c:if test="${not empty dil.library.tagBarcode}"> (${dil.library.tagBarcode.name})</c:if></td>
@@ -668,9 +668,9 @@
             <td>${dil.library.platformName}</td>
             <td>${dil.concentration}</td>
             <td class="misoicon"
-                onclick="window.location.href='<c:url value="/miso/library/${dil.library.libraryId}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
+                onclick="window.location.href='<c:url value="/miso/library/${dil.library.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
             <sec:authorize access="hasRole('ROLE_ADMIN')">
-              <td class="misoicon" onclick="Library.dilution.deleteLibraryDilution(${dil.dilutionId}, Utils.page.pageReload);"><span class="ui-icon ui-icon-trash"/></td>
+              <td class="misoicon" onclick="Library.dilution.deleteLibraryDilution(${dil.id}, Utils.page.pageReload);"><span class="ui-icon ui-icon-trash"/></td>
             </sec:authorize>
           </tr>
         </c:forEach>
@@ -722,7 +722,7 @@
         </thead>
         <tbody>
         <c:forEach items="${projectPools}" var="pool">
-          <tr poolId="${pool.poolId}" onMouseOver="this.className='highlightrow'"
+          <tr poolId="${pool.id}" onMouseOver="this.className='highlightrow'"
               onMouseOut="this.className='normalrow'">
             <td><b>${pool.name}</b></td>
             <td>${pool.alias}</td>
@@ -730,9 +730,9 @@
             <td>${pool.creationDate}</td>
             <td>${pool.concentration}</td>
             <td class="misoicon"
-                onclick="window.location.href='<c:url value="/miso/pool/${fn:toLowerCase(pool.platformType.key)}/${pool.poolId}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
+                onclick="window.location.href='<c:url value="/miso/pool/${fn:toLowerCase(pool.platformType.key)}/${pool.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
             <sec:authorize access="hasRole('ROLE_ADMIN')">
-              <td class="misoicon" onclick="Pool.deletePool(${pool.poolId}, Utils.page.pageReload);"><span class="ui-icon ui-icon-trash"/></td>
+              <td class="misoicon" onclick="Pool.deletePool(${pool.id}, Utils.page.pageReload);"><span class="ui-icon ui-icon-trash"/></td>
             </sec:authorize>
           </tr>
         </c:forEach>
@@ -784,7 +784,7 @@
         </thead>
         <tbody>
         <c:forEach items="${projectEmPcrs}" var="pcr">
-          <tr pcrId="${pcr.pcrId}" onMouseOver="this.className='highlightrow'"
+          <tr pcrId="${pcr.id}" onMouseOver="this.className='highlightrow'"
               onMouseOut="this.className='normalrow'">
             <td><b>${pcr.name}</b></td>
             <td>${pcr.libraryDilution.name}</td>
@@ -792,9 +792,9 @@
             <td>${pcr.creationDate}</td>
             <td>${pcr.concentration}</td>
             <td class="misoicon"
-                onclick="window.location.href='<c:url value="/miso/library/${pcr.libraryDilution.library.libraryId}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
+                onclick="window.location.href='<c:url value="/miso/library/${pcr.libraryDilution.library.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
             <sec:authorize access="hasRole('ROLE_ADMIN')">
-              <td class="misoicon" onclick="Library.empcr.deleteEmPCR(${pcr.pcrId}, Utils.page.pageReload);"><span class="ui-icon ui-icon-trash"/></td>
+              <td class="misoicon" onclick="Library.empcr.deleteEmPCR(${pcr.id}, Utils.page.pageReload);"><span class="ui-icon ui-icon-trash"/></td>
             </sec:authorize>
           </tr>
         </c:forEach>
@@ -832,7 +832,7 @@
            onmouseover="mcancelclosetime()"
            onmouseout="mclosetime()">
         <c:if test="${not empty projectEmPcrDilutions}">
-          <a href='<c:url value="/miso/poolwizard/new/${project.projectId}"/>'>Create Pools</a>
+          <a href='<c:url value="/miso/poolwizard/new/${project.id}"/>'>Create Pools</a>
         </c:if>
       </div>
     </li>
@@ -853,16 +853,16 @@
         </thead>
         <tbody>
         <c:forEach items="${projectEmPcrDilutions}" var="dil">
-          <tr dilutionId="${dil.dilutionId}" onMouseOver="this.className='highlightrow'"
+          <tr dilutionId="${dil.id}" onMouseOver="this.className='highlightrow'"
               onMouseOut="this.className='normalrow'">
             <td><b>${dil.name}</b></td>
             <td>${dil.dilutionCreator}</td>
             <td>${dil.creationDate}</td>
             <td>${dil.concentration}</td>
             <td class="misoicon"
-                onclick="window.location.href='<c:url value="/miso/library/${dil.library.libraryId}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
+                onclick="window.location.href='<c:url value="/miso/library/${dil.library.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
             <sec:authorize access="hasRole('ROLE_ADMIN')">
-              <td class="misoicon" onclick="Library.empcr.deleteEmPCRDilution(${dil.dilutionId}, Utils.page.pageReload);"><span class="ui-icon ui-icon-trash"/></td>
+              <td class="misoicon" onclick="Library.empcr.deleteEmPCRDilution(${dil.id}, Utils.page.pageReload);"><span class="ui-icon ui-icon-trash"/></td>
             </sec:authorize>
           </tr>
         </c:forEach>
@@ -896,9 +896,9 @@
       <div id="studymenu"
            onmouseover="mcancelclosetime()"
            onmouseout="mclosetime()">
-        <a href='<c:url value="/miso/study/new/${project.projectId}"/> '>Add new Study</a>
-        <a href='<c:url value="/miso/experimentwizard/new/${project.projectId}"/> '>Create Experiments</a>
-        <a href='<c:url value="/miso/poolwizard/new/${project.projectId}"/> '>Create Pools</a>
+        <a href='<c:url value="/miso/study/new/${project.id}"/> '>Add new Study</a>
+        <a href='<c:url value="/miso/experimentwizard/new/${project.id}"/> '>Create Experiments</a>
+        <a href='<c:url value="/miso/poolwizard/new/${project.id}"/> '>Create Pools</a>
       </div>
     </li>
   </ul>
@@ -916,14 +916,14 @@
         </thead>
         <tbody>
         <c:forEach items="${project.studies}" var="study">
-          <tr studyId="${study.studyId}" onMouseOver="this.className='highlightrow'"
+          <tr studyId="${study.id}" onMouseOver="this.className='highlightrow'"
               onMouseOut="this.className='normalrow'">
             <td><b>${study.name}</b></td>
             <td>${study.alias}</td>
             <td class="misoicon"
-                onclick="window.location.href='<c:url value="/miso/study/${study.studyId}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
+                onclick="window.location.href='<c:url value="/miso/study/${study.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
             <sec:authorize access="hasRole('ROLE_ADMIN')">
-              <td class="misoicon" onclick="Study.deleteStudy(${study.studyId}, Utils.page.pageReload);"><span class="ui-icon ui-icon-trash"/></td>
+              <td class="misoicon" onclick="Study.deleteStudy(${study.id}, Utils.page.pageReload);"><span class="ui-icon ui-icon-trash"/></td>
             </sec:authorize>
           </tr>
         </c:forEach>
@@ -953,7 +953,7 @@
     </thead>
     <tbody>
     <c:forEach items="${projectRuns}" var="run" varStatus="runCount">
-      <tr runId="${run.runId}" onMouseOver="this.className='highlightrow'"
+      <tr runId="${run.id}" onMouseOver="this.className='highlightrow'"
           onMouseOut="this.className='normalrow'">
         <td><b>${run.name}</b></td>
         <td>${run.alias}</td>
@@ -965,7 +965,7 @@
                   <td id="partition${runCount.count}_${fCount.count}_${partition.partitionNumber}"
                       class="smallbox">${partition.partitionNumber}</td>
                   <c:forEach items="${partition.pool.experiments}" var="experiment">
-                    <c:if test="${experiment.study.project.projectId eq project.projectId}">
+                    <c:if test="${experiment.study.project.id eq project.id}">
                       <script type="text/javascript">
                         jQuery(document).ready(function() {
                           jQuery('#partition${runCount.count}_${fCount.count}_${partition.partitionNumber}').addClass("partitionOccupied");
@@ -981,9 +981,9 @@
             </c:if>
           </c:forEach>
         </td>
-        <td class="misoicon" onclick="window.location.href='<c:url value="/miso/run/${run.runId}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
+        <td class="misoicon" onclick="window.location.href='<c:url value="/miso/run/${run.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
         <sec:authorize access="hasRole('ROLE_ADMIN')">
-          <td class="misoicon" onclick="Run.deleteRun(${run.runId}, Utils.page.pageReload);"><span class="ui-icon ui-icon-trash"/></td>
+          <td class="misoicon" onclick="Run.deleteRun(${run.id}, Utils.page.pageReload);"><span class="ui-icon ui-icon-trash"/></td>
         </sec:authorize>
       </tr>
     </c:forEach>
@@ -1017,8 +1017,8 @@ jQuery(document).ready(function() {
                              countDirection: 'down'
                            });
 
-  <c:if test="${not empty project.projectId}">
-    Project.issues.getProjectIssues(${project.projectId});
+  <c:if test="${project.id != 0}">
+    Project.issues.getProjectIssues(${project.id});
   </c:if>
 });
 
@@ -1249,7 +1249,7 @@ function generateSampleDeliveryForm(projectId) {
         jQuery(this).parent().addClass('row_selected');
     });
 
-    jQuery("div.toolbar").html("<button onclick=\"Project.ui.processSampleDeliveryForm(${project.projectId});\" class=\"fg-button ui-state-default ui-corner-all\">Generate Form</button>");
+    jQuery("div.toolbar").html("<button onclick=\"Project.ui.processSampleDeliveryForm(${project.id});\" class=\"fg-button ui-state-default ui-corner-all\">Generate Form</button>");
   }
 }
 </c:if>
@@ -1835,7 +1835,7 @@ function bulkEmPcrDilutionTable() {
 }
 </c:if>
 
-<c:if test="${not empty project.projectId}">
+<c:if test="${project.id != 0}">
   var duration = 500, i = 0, root;
   var r = 960 / 2;
 
@@ -1855,7 +1855,7 @@ function bulkEmPcrDilutionTable() {
           .append("svg:g")
           .attr("transform", "translate(" + r + "," + r + ")");
 
-  d3.json("/miso/d3graph/project/" + ${project.projectId}, function(json) {
+  d3.json("/miso/d3graph/project/" + ${project.id}, function(json) {
     json.x0 = 800;
     json.y0 = 0;
     update(root = json);

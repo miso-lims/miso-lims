@@ -448,7 +448,7 @@ public class SampleControllerHelperService {
       if (sample.getReceivedDate() == null) {
         response.put("name", sample.getName());
         response.put("desc", sample.getDescription());
-        response.put("id", sample.getSampleId());
+        response.put("id", sample.getId());
         response.put("type", sample.getSampleType());
         response.put("project", sample.getProject().getName());
         return response;

@@ -57,7 +57,7 @@ import java.util.Date;
 public interface Sample extends SecurableByProfile, Submittable<Document>, Barcodable, Locatable, Reportable, Comparable, Deletable {
 
   /** Field UNSAVED_ID  */
-  public static final Long UNSAVED_ID = -1L;
+  public static final Long UNSAVED_ID = 0L;
   /** Field PREFIX  */
   public static final String PREFIX = "SAM";
 
@@ -66,6 +66,7 @@ public interface Sample extends SecurableByProfile, Submittable<Document>, Barco
    *
    * @return Long sampleId.
    */
+  @Deprecated
   public Long getSampleId();
 
   /**
@@ -73,7 +74,10 @@ public interface Sample extends SecurableByProfile, Submittable<Document>, Barco
    *
    * @param sampleId sampleId.
    */
+  @Deprecated
   public void setSampleId(Long sampleId);
+
+  public void setId(long id);
 
   /**
    * Returns the accession of this Sample object.

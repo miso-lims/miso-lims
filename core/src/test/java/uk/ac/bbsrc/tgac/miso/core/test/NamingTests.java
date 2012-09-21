@@ -76,7 +76,7 @@ public class NamingTests {
   public void testSampleNaming() throws MisoNamingException {
     //DefaultEntityNamingScheme<Sample> entityNameValidationScheme = new DefaultEntityNamingScheme(Sample.class);
     Sample s = dataObjectFactory.getSample();
-    s.setSampleId(1L);
+    s.setId(1L);
     String name = sampleNamingScheme.generateNameFor("name", s);
     s.setName(name);
     Assert.assertTrue(sampleNamingScheme.validateField("name", s.getName()));
@@ -91,7 +91,7 @@ public class NamingTests {
   public void testLibraryNaming() throws MisoNamingException {
     //DefaultEntityNamingScheme<Library> entityNameValidationScheme = new DefaultEntityNamingScheme(Library.class);
     Library l = dataObjectFactory.getLibrary();
-    l.setLibraryId(1L);
+    l.setId(1L);
     String name = libraryNamingScheme.generateNameFor("name", l);
     l.setName(name);
     Assert.assertTrue(libraryNamingScheme.validateField("name", l.getName()));

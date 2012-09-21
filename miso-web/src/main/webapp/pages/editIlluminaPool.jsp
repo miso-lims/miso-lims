@@ -36,7 +36,7 @@
         <form:form method="POST" commandName="pool" autocomplete="off" onsubmit="return validate_pool(this);">
           <sessionConversation:insertSessionConversationId attributeName="pool"/>
             <h1><c:choose><c:when
-                    test="${not empty pool.poolId}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose>
+                    test="${pool.id != 0}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose>
                 Illumina Pool
                 <button type="submit" class="fg-button ui-state-default ui-corner-all">Save
                 </button>
@@ -61,7 +61,7 @@
                             <div id="idBarcodeMenu"
                                  onmouseover="mcancelclosetime()"
                                  onmouseout="mclosetime()">
-                                <a href="javascript:void(0);" onclick="Pool.barcode.printPoolBarcodes(${pool.poolId});">Print</a>
+                                <a href="javascript:void(0);" onclick="Pool.barcode.printPoolBarcodes(${pool.id});">Print</a>
                             </div>
                         </li>
                     </ul>
@@ -70,7 +70,7 @@
                             Fluxion.doAjax(
                                     'poolControllerHelperService',
                                     'getPoolBarcode',
-                            {'poolId':${pool.poolId},
+                            {'poolId':${pool.id},
                                 'url':ajaxurl
                             },
                             {'doOnSuccess':function(json) {
@@ -88,7 +88,7 @@
                     <td class="h">Pool ID:</td>
                     <td>
                         <c:choose>
-                            <c:when test="${not empty pool.poolId}">${pool.poolId}</c:when>
+                            <c:when test="${pool.id != 0}">${pool.id}</c:when>
                             <c:otherwise><i>Unsaved</i></c:otherwise>
                         </c:choose>
                     </td>
@@ -97,7 +97,7 @@
                     <td class="h">Pool Name:</td>
                     <td>
                         <c:choose>
-                            <c:when test="${not empty pool.poolId}">${pool.name}</c:when>
+                            <c:when test="${pool.id != 0}">${pool.name}</c:when>
                             <c:otherwise><i>Unsaved</i></c:otherwise>
                         </c:choose>
                     </td>
@@ -113,7 +113,7 @@
                 <tr>
                     <td class="h">Creation Date:</td>
                     <td><c:choose>
-                        <c:when test="${not empty pool.poolId}"><fmt:formatDate pattern="dd/MM/yy" type="both"
+                        <c:when test="${pool.id != 0}"><fmt:formatDate pattern="dd/MM/yy" type="both"
                                                                                 value="${pool.creationDate}"/></c:when>
                         <c:otherwise><form:input path="creationDate"/></c:otherwise>
                     </c:choose>
@@ -135,10 +135,10 @@
                   <c:forEach items="${pool.experiments}" var="exp">
                     <div onMouseOver="this.className='dashboardhighlight'" onMouseOut="this.className='dashboard'" class="dashboard">
                       <span class='float-left'>
-                      <input type="hidden" id="experiments${exp.experimentId}" value="${exp.experimentId}" name="experiments"/>
-                      <b>Experiment:</b> <a href="<c:url value="/miso/experiment/${exp.experimentId}"/>">${exp.alias} (${exp.name})</a><br/>
+                      <input type="hidden" id="experiments${exp.id}" value="${exp.id}" name="experiments"/>
+                      <b>Experiment:</b> <a href="<c:url value="/miso/experiment/${exp.id}"/>">${exp.alias} (${exp.name})</a><br/>
                       <b>Description:</b> ${exp.description}<br/>
-                      <b>Project:</b> <a href="<c:url value="/miso/project/${exp.study.project.projectId}"/>">${exp.study.project.alias} (${exp.study.project.name})</a><br/>
+                      <b>Project:</b> <a href="<c:url value="/miso/project/${exp.study.project.id}"/>">${exp.study.project.alias} (${exp.study.project.name})</a><br/>
                       </span>
                       <span onclick='Utils.ui.confirmRemove(jQuery(this).parent());' class='float-right ui-icon ui-icon-circle-close'></span>
                     </div>
@@ -167,10 +167,10 @@
                   <c:forEach items="${pool.dilutions}" var="dil">
                     <div onMouseOver="this.className='dashboardhighlight'" onMouseOut="this.className='dashboard'" class="dashboard">
                       <span style="float:left">
-                      <input type="hidden" id="dilutions${dil.dilutionId}" value="${dil.name}" name="dilutions"/>
+                      <input type="hidden" id="dilutions${dil.id}" value="${dil.name}" name="dilutions"/>
                       <b>Dilution:</b> ${dil.name}<br/>
-                      <b>Library:</b> <a href="<c:url value="/miso/library/${dil.library.libraryId}"/>">${dil.library.alias} (${dil.library.name})</a><br/>
-                      <b>Sample:</b> <a href="<c:url value="/miso/sample/${dil.library.sample.sampleId}"/>">${dil.library.sample.alias} (${dil.library.sample.name})</a><br/>
+                      <b>Library:</b> <a href="<c:url value="/miso/library/${dil.library.id}"/>">${dil.library.alias} (${dil.library.name})</a><br/>
+                      <b>Sample:</b> <a href="<c:url value="/miso/sample/${dil.library.sample.id}"/>">${dil.library.sample.alias} (${dil.library.sample.name})</a><br/>
                       <c:choose>
                         <c:when test="${fn:length(pool.dilutions) > 1}">
                           <c:choose>
@@ -189,7 +189,7 @@
                             </c:when>
                             <c:otherwise>
                               <b>Barcode:</b>
-                              <a href="<c:url value="/miso/library/${dil.library.libraryId}"/>">Choose tag barcode</a>
+                              <a href="<c:url value="/miso/library/${dil.library.id}"/>">Choose tag barcode</a>
                               </span>
                               <span class="counter">
                                 <img src="<c:url value='/styles/images/status/red.png'/>" border='0'>

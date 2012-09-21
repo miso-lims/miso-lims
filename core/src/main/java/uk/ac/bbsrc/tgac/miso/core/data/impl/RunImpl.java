@@ -85,7 +85,7 @@ public class RunImpl extends AbstractRun {
 
   public void addSequencerPartitionContainer(SequencerPartitionContainer<SequencerPoolPartition> f) {
     f.setSecurityProfile(getSecurityProfile());
-    if (f.getContainerId() == null && f.getIdentificationBarcode() == null) {
+    if (f.getId() == 0L && f.getIdentificationBarcode() == null) {
       //can't validate it so add it anyway. this will only usually be the case for new run population.
       this.containers.add(f);
     }

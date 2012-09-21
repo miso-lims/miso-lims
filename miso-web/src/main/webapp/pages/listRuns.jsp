@@ -110,7 +110,7 @@
                     <td>${run.status.startDate}</td>
                     <td>${run.status.completionDate}</td>
                     <td>${run.platformType}</td>
-                    <td class="misoicon" onclick="window.location.href='<c:url value="/miso/run/${run.runId}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
+                    <td class="misoicon" onclick="window.location.href='<c:url value="/miso/run/${run.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
                 </tr>
 
             </c:forEach>

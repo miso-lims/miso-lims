@@ -104,7 +104,7 @@ public class RunQcAddedResponderService extends AbstractResponderService {
         }
 
         a.setAlertTitle(qcType + "Run QC Added : " + r.getAlias());
-        a.setAlertText("The following Run has been QCed: "+r.getAlias()+" ("+event.getEventMessage()+"). "+qcInfo+"Please view Run " +r.getRunId()+ " in MISO for more information.");
+        a.setAlertText("The following Run has been QCed: "+r.getAlias()+" ("+event.getEventMessage()+"). "+qcInfo+"Please view Run " +r.getId()+ " in MISO for more information.");
 
         for (AlerterService as : alerterServices) {
           try {
