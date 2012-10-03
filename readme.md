@@ -37,8 +37,9 @@ All being well after a few minutes (it can take a while to download all the requ
 You will need to install MySQL v5 or greater. You will then need the two latest MISO database dumps. These are available
 from our repository here:
 
-[https://repos.tgac.bbsrc.ac.uk/miso/latest/sql/lims-schema-20120921.sql]
-[https://repos.tgac.bbsrc.ac.uk/miso/latest/sql/miso_type_data_20120921.sql]
+https://repos.tgac.bbsrc.ac.uk/miso/latest/sql/lims-schema-20120921.sql
+
+https://repos.tgac.bbsrc.ac.uk/miso/latest/sql/miso_type_data_20120921.sql
 
 Log in to your local MySQL install, and create a database called 'lims':
 
@@ -63,10 +64,10 @@ Then populate the database with the two dumps by running the following commands 
 
 1.2 ) Setting up the MISO web application
 
-You will need a suitable Java web application container, such as Tomcat 6.x ([http://tomcat.apache.org/download-60.cgi]),
+You will need a suitable Java web application container, such as Tomcat 6.x (http://tomcat.apache.org/download-60.cgi),
 to deploy MISO. Once Tomcat has been installed, download the latest MISO WAR file. The latest WAR file can be found here:
 
-[https://repos.tgac.bbsrc.ac.uk/miso/latest/ROOT.war]
+https://repos.tgac.bbsrc.ac.uk/miso/latest/ROOT.war
 
 Copy this file to your `<tomcat-install>/webapps/` directory. DO NOT START TOMCAT YET. Instead, follow the configuration steps below.
 
@@ -84,8 +85,7 @@ MISO uses JNDI (Java Naming and Directory Interface) to configure the connection
 up in the step 1.1. To configure Tomcat to manage the JNDI datasource, please create a file called `ROOT.xml` in the following
 directory `<tomcat-install>/conf/Catalina/localhost` and populate it with the following information:
 
-<pre>
-<Context path="/ROOT" docBase="${catalina.home}/webapps/ROOT" debug="1">
+    <Context path="/ROOT" docBase="${catalina.home}/webapps/ROOT" debug="1">
       <Resource name="jdbc/MISODB" type="javax.sql.DataSource"
       driverClassName="com.mysql.jdbc.Driver"
       initialSize="32"
@@ -115,16 +115,14 @@ directory `<tomcat-install>/conf/Catalina/localhost` and populate it with the fo
       username="statsuser"
       password="statspass"/>
       -->
-</Context>
-</pre>
+    </Context>
 
 If the `<tomcat-install>/conf/Catalina/localhost` directory doesn't exist (usually due to a fresh Tomcat install), either create
 it yourself, or cycle a Tomcat startup/shutdown and it should appear.
 
 If your Tomcat install has the autoDeploy="true" flag set in server.xml, if you delete the `webapps/ROOT` directory and the ROOT.war
 file, Tomcat will delete the context ROOT.xml file. Either set autoDeploy to false, and manually deploy your webapp, or make
-the ROOT.xml file undeletable by using 'chattr +i' ('chattr -i' will undo this operation). See:
-[https://issues.apache.org/bugzilla/show_bug.cgi?id=40050]
+the ROOT.xml file undeletable by using 'chattr +i' ('chattr -i' will undo this operation). See: https://issues.apache.org/bugzilla/show_bug.cgi?id=40050
 
 Again, if your database and Tomcat install are on different machines, then you will need to change the connection URL above to
 the name of your remote database server:
@@ -134,8 +132,9 @@ the name of your remote database server:
 You will need to copy the mysql connector library and the JNDI File Factory library to your Tomcat install to ensure the JNDI system can see the MISO database.
 Grab the jar files from:
 
-[https://repos.tgac.bbsrc.ac.uk/miso/common/mysql-connector-java-5.1.10.jar]
-[https://repos.tgac.bbsrc.ac.uk/miso/common/jndi-file-factory-1.0.jar]
+https://repos.tgac.bbsrc.ac.uk/miso/common/mysql-connector-java-5.1.10.jar
+
+https://repos.tgac.bbsrc.ac.uk/miso/common/jndi-file-factory-1.0.jar
 
 And copy them to <tomcat-install>/lib/
 
@@ -155,7 +154,7 @@ The default path is `/storage/miso`. It is recommended that create this path on 
 MISO achieves userspace configuration via extra properties files kept in the storage directory specified by the `miso.baseDirectory`
 property (see 2.2 above). Default versions of these files are available here:
 
-[https://repos.tgac.bbsrc.ac.uk/miso/latest/miso_userspace_properties.tar.gz]
+https://repos.tgac.bbsrc.ac.uk/miso/latest/miso_userspace_properties.tar.gz
 
 Unpack this file to your MISO storage directory, which again is `/storage/miso` by default. You should see 4 files:
 
@@ -198,7 +197,7 @@ To set the `security.method` property to use the local MISO database and start t
     cd <tomcat-install>/bin/
     JAVA_OPTS="$JAVA_OPTS -Dsecurity.method=jdbc -Xmx768M" ./startup.sh
 
-All going well, you should be able to go to [http://localhost:8080/] and log in to MISO using the admin/admin username and password combination.
+All going well, you should be able to go to http://localhost:8080/ and log in to MISO using the admin/admin username and password combination.
 
 ~ **********************************************************************
 ~
