@@ -179,9 +179,13 @@ are unsure. There is a default admin user that is shipped with the MISO database
 To set the `security.method` property, use local environment variables on Tomcat startup. Please see the "Starting MISO" section below.
 
 > NB: You are likely to see startup errors like the one below if you do not set this property, and start Tomcat as outlined in section 3!
+
 > 20-Oct-2010 11:08:28 org.apache.catalina.core.StandardContext start
+
 > SEVERE: Error listenerStart
+
 > 20-Oct-2010 11:08:28 org.apache.catalina.core.StandardContext start
+
 > SEVERE: Context [/tgac] startup failed due to previous errors
 
 2.5 ) Submission properties
@@ -199,12 +203,7 @@ To set the `security.method` property to use the local MISO database and start t
 
 All going well, you should be able to go to http://localhost:8080/ and log in to MISO using the admin/admin username and password combination.
 
-~ **********************************************************************
-~
-~ NB: Please remember that if you need to set any properties in the userspace properties files, you will need to make sure that
-~ you stop Tomcat, make the changes and then restart it.
-~
-~ **********************************************************************
+> NB: Please remember that if you need to set any properties in the userspace properties files, you will need to make sure that you stop Tomcat, make the changes and then restart it.
 
   [1]: http://www.tgac.ac.uk/        "TGAC"
   [2]: http://www.tgac.ac.uk/miso/  "MISO"
