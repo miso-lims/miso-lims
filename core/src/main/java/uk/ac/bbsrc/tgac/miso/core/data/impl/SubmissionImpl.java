@@ -48,7 +48,9 @@ import java.util.*;
 public class SubmissionImpl implements Submission<Submittable, Document, Document> {
   protected static final Logger log = LoggerFactory.getLogger(SubmissionImpl.class);
 
-  private Long submissionId;
+  public static final Long UNSAVED_ID = 0L;
+
+  private Long submissionId = UNSAVED_ID;
   private String name;
   private String alias;
   private String accession;
