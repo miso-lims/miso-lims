@@ -30,6 +30,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
+import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +53,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.RunProcessingUtils;
 
 import javax.servlet.http.HttpSession;
@@ -1064,6 +1066,14 @@ public class RunControllerHelperService {
 
     try {
       Pool<? extends Poolable> p = null;
+
+      if (barcode != null && !"".equals(barcode)) {
+        if (LimsUtils.isBase64String(barcode)) {
+          //Base64-encoded string, most likely a barcode image beeped in. decode and search
+          barcode = new String(Base64.decodeBase64(barcode));
+        }
+      }
+
       if (json.has("platform") && !"".equals(json.getString("platform"))) {
         PlatformType pt = PlatformType.get(json.getString("platform"));
         if (pt != null) {

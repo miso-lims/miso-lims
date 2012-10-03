@@ -95,6 +95,35 @@ Project.ui = {
     jQuery('#deliveryformdiv').css("display", "none");
   },
 
+  downloadBulkInputForm : function(projectId, documentFormat) {
+    Fluxion.doAjax(
+      'projectControllerHelperService',
+      'downloadBulkInputForm',
+      {
+        'projectId':projectId,
+        'documentFormat':documentFormat,
+        'url':ajaxurl
+      },
+      {'doOnSuccess':function (json) {
+          Utils.page.pageRedirect('/miso/download/project/' + projectId + '/' + json.response);
+        }
+      }
+    );
+  },
+
+  bulkInputFormUploadSuccess : function() {
+    //jQuery('#inputform_statusdiv').html("Bulk input form processed.");
+    //visualise imported entities via lightbox
+  },
+
+  uploadBulkInputForm : function(projectId) {
+    jQuery('#inputformdiv').css("display", "block");
+  },
+
+  cancelBulkInputFormUpload : function() {
+    jQuery('#inputformdiv').css("display", "none");
+  },
+
   addPoolEmPCR : function(tableId) {
     alert("This function is not available at present");
   },

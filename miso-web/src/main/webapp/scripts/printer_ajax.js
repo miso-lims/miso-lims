@@ -24,6 +24,35 @@
 var Print = Print || {};
 
 Print.ui = {
+  changePrinterServiceRow : function(printService) {
+    Fluxion.doAjax(
+      'printerControllerHelperService',
+      'changePrinterServiceRow',
+      {
+        'serviceName':printService,
+        'url':ajaxurl
+      },
+      {'doOnSuccess':function(json) {
+        jQuery('#host-' + printService).html(json.hostname);
+        jQuery('#edit-' + printService).html(json.edit);
+      }
+    });
+  },
+
+  editPrinterService : function(serviceName) {
+    Fluxion.doAjax(
+      'printerControllerHelperService',
+      'editPrinterService',
+      {
+        'serviceName':serviceName,
+        'host':jQuery('#newhost-' + serviceName).val(),
+        'url':ajaxurl
+      },
+      {'doOnSuccess':Utils.page.pageReload
+      }
+    );
+  },
+
   getPrinterFormEntities : function() {
     var self = this;
     Fluxion.doAjax(

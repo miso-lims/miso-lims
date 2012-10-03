@@ -30,6 +30,8 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
+import org.krysalis.barcode4j.BarcodeDimension;
+import org.krysalis.barcode4j.BarcodeGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,7 +89,25 @@ public class PlateControllerHelperService {
       Plate plate = requestManager.getPlateById(plateId);
       barcodeFactory.setPointPixels(1.5f);
       barcodeFactory.setBitmapResolution(600);
-      RenderedImage bi = barcodeFactory.generateSquareDataMatrix(plate, 400);
+      RenderedImage bi = null;
+
+      if (json.has("barcodeGenerator")) {
+        BarcodeDimension dim = new BarcodeDimension(100, 100);
+        if (json.has("dimensionWidth") && json.has("dimensionHeight")) {
+          dim = new BarcodeDimension(json.getDouble("dimensionWidth"), json.getDouble("dimensionHeight"));
+        }
+        BarcodeGenerator bg = BarcodeFactory.lookupGenerator(json.getString("barcodeGenerator"));
+        if (bg != null) {
+          bi = barcodeFactory.generateBarcode(plate, bg, dim);
+        }
+        else {
+          return JSONUtils.SimpleJSONError("'"+json.getString("barcodeGenerator") + "' is not a valid barcode generator type");
+        }
+      }
+      else {
+        bi = barcodeFactory.generateSquareDataMatrix(plate, 400);
+      }
+
       if (bi != null) {
         File tempimage = misoFileManager.generateTemporaryFile("barcode-", ".png", temploc);
         if (ImageIO.write(bi, "png", tempimage)) {

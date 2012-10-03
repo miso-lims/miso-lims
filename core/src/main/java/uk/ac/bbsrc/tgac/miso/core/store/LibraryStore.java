@@ -28,6 +28,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
 
 import java.io.IOException;
@@ -102,7 +103,17 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
    * @return LibraryType
    * @throws IOException when
    */
-  LibraryType getLibraryTypeByDescription(String description) throws IOException;  
+  LibraryType getLibraryTypeByDescription(String description) throws IOException;
+
+  /**
+   * Get a LibraryType given a LibraryType description and platform
+   *
+   * @param description of type String
+   * @param platformType of type PlatformType
+   * @return LibraryType
+   * @throws IOException when
+   */
+  LibraryType getLibraryTypeByDescriptionAndPlatform(String description, PlatformType platformType) throws IOException;
 
   /**
    * Get a LibrarySelectionType given a LibrarySelectionType ID

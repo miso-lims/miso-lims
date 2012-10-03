@@ -421,17 +421,22 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
       props.load(in);
       System.out.print("properties loaded...");
 
-      Connection jdbcConnection = DriverManager.getConnection(props.getProperty("db.url"), props.getProperty("db.username"), props.getProperty("db.password"));
-      IDatabaseConnection connection = new DatabaseConnection(jdbcConnection);
-      DatabaseConfig config = connection.getConfig();
-      config.setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, new MySqlDataTypeFactory());
-      System.out.print("mysql connection set...");
-
-      dataSet = new QueryDataSet(connection);
-      for (String table : tables) {
-        dataSet.addTable(table);
+      try {
+        Connection jdbcConnection = DriverManager.getConnection(props.getProperty("db.url"), props.getProperty("db.username"), props.getProperty("db.password"));
+        IDatabaseConnection connection = new DatabaseConnection(jdbcConnection);
+        DatabaseConfig config = connection.getConfig();
+        config.setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, new MySqlDataTypeFactory());
+        System.out.print("mysql connection set...");
+        dataSet = new QueryDataSet(connection);
+        for (String table : tables) {
+          dataSet.addTable(table);
+        }
+        System.out.print("dataset ready.\n");
       }
-      System.out.print("dataset ready.\n");
+      catch(SQLException sqle) {
+        System.out.println("\n*********\nSEVERE :: Cannot connect to test database. Skipping DB tests. You might end up with a non-working MISO instance! Please check your test.db.properties file and specify a working MISO db to test against.\n\n");
+        sqle.printStackTrace();
+      }
     }
     return dataSet;
   }

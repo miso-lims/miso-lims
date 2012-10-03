@@ -229,6 +229,50 @@ public class PrinterControllerHelperService {
     }
   }
 
+  public JSONObject changePrinterServiceRow(HttpSession session, JSONObject json) {
+    try {
+      JSONObject response = new JSONObject();
+      String serviceName = json.getString("serviceName");
+
+      MisoPrintService bps = printManager.getPrintService(serviceName);
+
+      response.put("hostname", "<input type='text' id='newhost-" + serviceName + "' value='" + bps.getPrintContext().getHost() + "'/>");
+      response.put("edit", "<a href='javascript:void(0);' onclick='Print.ui.editPrinterService(\"" + serviceName+ "\");'>Save</a>");
+      return response;
+    }
+    catch (Exception e) {
+      log.error("Unable to edit this printer service: ", e);
+      return JSONUtils.SimpleJSONError("Unable to edit this printer service: " + e.getMessage());
+    }
+  }
+
+  public JSONObject editPrinterService(HttpSession session, JSONObject json) {
+    try {
+      if (json.has("serviceName") && !json.get("serviceName").equals("")) {
+        MisoPrintService bps = printManager.getPrintService(json.getString("serviceName"));
+        if (bps != null) {
+          PrintContext pc = bps.getPrintContext();
+          JSONObject contextFields = new JSONObject();
+          contextFields.put("host", json.getString("host"));
+          PrintServiceUtils.mapJSONToContextFields(contextFields, pc);
+          bps.setPrintContext(pc);
+          printManager.storePrintService(bps);
+          return JSONUtils.SimpleJSONResponse("done");
+        }
+        else {
+          return JSONUtils.SimpleJSONError("No printer service of name: " + json.getString("serviceName"));
+        }
+      }
+      else {
+        return JSONUtils.SimpleJSONError("No printer service name supplied.");
+      }
+    }
+    catch (Exception e) {
+      log.error("Failed to edit printer service: ", e);
+      return JSONUtils.SimpleJSONError("Failed to edit printer service: " + e.getMessage());
+    }
+  }
+
   public JSONObject reprintJob(HttpSession session, JSONObject json) {
     if (json.has("jobId")) {
       try {

@@ -30,6 +30,9 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
+import org.apache.commons.codec.binary.Base64;
+import org.krysalis.barcode4j.BarcodeDimension;
+import org.krysalis.barcode4j.BarcodeGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +55,7 @@ import uk.ac.bbsrc.tgac.miso.core.manager.PrintManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 import javax.imageio.ImageIO;
 import javax.print.PrintException;
@@ -90,6 +94,10 @@ public class PoolControllerHelperService {
     StringBuilder sb = new StringBuilder();
     sb.append("<div id='dilslist' class='checklist' style='width: 100%;'>");
     for (String s : codes) {
+      if (LimsUtils.isBase64String(s)) {
+        //Base64-encoded string, most likely a barcode image beeped in. decode and search
+        s = new String(Base64.decodeBase64(s));
+      }
       LibraryDilution ed = requestManager.getLibraryDilutionByBarcode(s);
       if (ed != null) {
         sb.append("<span>");
@@ -109,6 +117,10 @@ public class PoolControllerHelperService {
     StringBuilder sb = new StringBuilder();
     sb.append("<div id='dilslist' class='checklist' style='width: 100%;'>");
     for (String s : codes) {
+      if (LimsUtils.isBase64String(s)) {
+        //Base64-encoded string, most likely a barcode image beeped in. decode and search
+        s = new String(Base64.decodeBase64(s));
+      }
       emPCRDilution ed = requestManager.getEmPcrDilutionByBarcode(s);
       if (ed != null) {
         sb.append("<span>");
@@ -312,7 +324,26 @@ public class PoolControllerHelperService {
       Pool pool = requestManager.getPoolById(poolId);
       barcodeFactory.setPointPixels(1.5f);
       barcodeFactory.setBitmapResolution(600);
-      RenderedImage bi = barcodeFactory.generateSquareDataMatrix(pool, 400);
+
+      RenderedImage bi = null;
+
+      if (json.has("barcodeGenerator")) {
+        BarcodeDimension dim = new BarcodeDimension(100, 100);
+        if (json.has("dimensionWidth") && json.has("dimensionHeight")) {
+          dim = new BarcodeDimension(json.getDouble("dimensionWidth"), json.getDouble("dimensionHeight"));
+        }
+        BarcodeGenerator bg = BarcodeFactory.lookupGenerator(json.getString("barcodeGenerator"));
+        if (bg != null) {
+          bi = barcodeFactory.generateBarcode(pool, bg, dim);
+        }
+        else {
+          return JSONUtils.SimpleJSONError("'"+json.getString("barcodeGenerator") + "' is not a valid barcode generator type");
+        }
+      }
+      else {
+        bi = barcodeFactory.generateSquareDataMatrix(pool, 400);
+      }
+
       if (bi != null) {
         File tempimage = misoFileManager.generateTemporaryFile("barcode-", ".png", temploc);
         if (ImageIO.write(bi, "png", tempimage)) {
@@ -428,7 +459,12 @@ public class PoolControllerHelperService {
     String platformType = json.getString("platform").toUpperCase();
     try {
       if (searchStr.length() > 1) {
-        String str = searchStr.toLowerCase();
+        if (LimsUtils.isBase64String(searchStr)) {
+          //Base64-encoded string, most likely a barcode image beeped in. decode and search
+          searchStr = new String(Base64.decodeBase64(searchStr));
+        }
+
+        //String str = searchStr.toLowerCase();
         StringBuilder b = new StringBuilder();
         List<LibraryDilution> dilutions = new ArrayList<LibraryDilution>(requestManager.listAllLibraryDilutionsBySearch(searchStr, PlatformType.valueOf(platformType)));
         int numMatches = 0;
@@ -471,7 +507,11 @@ public class PoolControllerHelperService {
     String platformType = json.getString("platform").toUpperCase();
     try {
       if (searchStr.length() > 1) {
-        String str = searchStr.toLowerCase();
+        if (LimsUtils.isBase64String(searchStr)) {
+          //Base64-encoded string, most likely a barcode image beeped in. decode and search
+          searchStr = new String(Base64.decodeBase64(searchStr));
+        }
+        //String str = searchStr.toLowerCase();
         StringBuilder b = new StringBuilder();
         List<emPCRDilution> dilutions = new ArrayList<emPCRDilution>(requestManager.listAllEmPcrDilutionsBySearch(searchStr, PlatformType.valueOf(platformType)));
         int numMatches = 0;

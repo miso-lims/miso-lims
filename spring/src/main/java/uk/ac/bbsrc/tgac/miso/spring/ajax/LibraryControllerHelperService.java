@@ -33,6 +33,8 @@ import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
+import org.krysalis.barcode4j.BarcodeDimension;
+import org.krysalis.barcode4j.BarcodeGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -162,7 +164,25 @@ public class LibraryControllerHelperService {
       Library library = requestManager.getLibraryById(libraryId);
       barcodeFactory.setPointPixels(1.5f);
       barcodeFactory.setBitmapResolution(600);
-      RenderedImage bi = barcodeFactory.generateSquareDataMatrix(library, 400);
+      RenderedImage bi = null;
+
+      if (json.has("barcodeGenerator")) {
+        BarcodeDimension dim = new BarcodeDimension(100, 100);
+        if (json.has("dimensionWidth") && json.has("dimensionHeight")) {
+          dim = new BarcodeDimension(json.getDouble("dimensionWidth"), json.getDouble("dimensionHeight"));
+        }
+        BarcodeGenerator bg = BarcodeFactory.lookupGenerator(json.getString("barcodeGenerator"));
+        if (bg != null) {
+          bi = barcodeFactory.generateBarcode(library, bg, dim);
+        }
+        else {
+          return JSONUtils.SimpleJSONError("'"+json.getString("barcodeGenerator") + "' is not a valid barcode generator type");
+        }
+      }
+      else {
+        bi = barcodeFactory.generateSquareDataMatrix(library, 400);
+      }
+
       if (bi != null) {
         File tempimage = misoFileManager.generateTemporaryFile("barcode-", ".png", temploc);
         if (ImageIO.write(bi, "png", tempimage)) {
@@ -373,14 +393,15 @@ public class LibraryControllerHelperService {
           try {
             SecurityProfile sp = null;
             Sample sample = null;
-            String libAlias = null;
+            //String libAlias = null;
             String sampleAlias = j.getString("parentSample");
 
             for (Sample s : p.getSamples()) {
               if (s.getAlias().equals(sampleAlias)) {
                 sp = s.getSecurityProfile();
                 sample = s;
-
+                break;
+                /*
                 if (sampleNamingScheme.validateField("alias", s.getAlias())) {
                   Pattern pat = Pattern.compile(sampleNamingScheme.getValidationRegex("alias"));
                   Matcher mat = pat.matcher(s.getAlias());
@@ -390,11 +411,11 @@ public class LibraryControllerHelperService {
                   if (libraryNamingScheme.validateField("alias", la)) {
                     libAlias = la;
                   }
-                }
+                }*/
               }
             }
 
-            if (sample != null && libAlias != null) {
+            if (sample != null) { // && libAlias != null) {
               String descr = j.getString("description");
               String platform = j.getString("platform");
               String type = j.getString("libraryType");
@@ -403,9 +424,12 @@ public class LibraryControllerHelperService {
               String locationBarcode = j.getString("locationBarcode");
 
               Library library = new LibraryImpl();
-              library.setSecurityProfile(sp);
               library.setSample(sample);
+
+              String libAlias = libraryNamingScheme.generateNameFor("alias", library);
+
               library.setAlias(libAlias);
+              library.setSecurityProfile(sp);
               library.setDescription(descr);
               library.setPlatformName(platform);
               library.setCreationDate(new Date());
@@ -993,7 +1017,6 @@ public class LibraryControllerHelperService {
       return JSONUtils.SimpleJSONError("Failed to add EmPCR Dilutions to this EmPCR: " + e.getMessage());
     }
   }
-
 
   public JSONObject changeLibraryQCRow(HttpSession session, JSONObject json) {
     try {

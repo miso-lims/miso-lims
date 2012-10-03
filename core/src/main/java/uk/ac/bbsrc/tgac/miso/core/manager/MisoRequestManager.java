@@ -1907,6 +1907,16 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
+  public LibraryType getLibraryTypeByDescriptionAndPlatform(String description, PlatformType platformType) throws IOException {
+    if (libraryStore != null) {
+      return libraryStore.getLibraryTypeByDescriptionAndPlatform(description, platformType);
+    }
+    else {
+      throw new IOException("No libraryStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
   public LibrarySelectionType getLibrarySelectionTypeById(long typeId) throws IOException {
     if (libraryStore != null) {
       return libraryStore.getLibrarySelectionTypeById(typeId);

@@ -89,6 +89,7 @@ public class SQLLibraryDAO implements LibraryStore {
 
   public static final String LIBRARIES_SELECT_BY_SEARCH =
           LIBRARIES_SELECT + " WHERE " +
+          "identificationBarcode LIKE ? OR " +
           "name LIKE ? OR " +
           "alias LIKE ? OR " +
           "description LIKE ? ";
@@ -138,7 +139,11 @@ public class SQLLibraryDAO implements LibraryStore {
 
   public static final String LIBRARY_TYPE_SELECT_BY_DESCRIPTION =
           LIBRARY_TYPES_SELECT +
-          " WHERE description = ?";  
+          " WHERE description = ?";
+
+  public static final String LIBRARY_TYPE_SELECT_BY_DESCRIPTION_AND_PLATFORM =
+          LIBRARY_TYPES_SELECT +
+          " WHERE description = ? AND platformType = ?";
 
   public static final String LIBRARY_TYPES_SELECT_BY_PLATFORM =
           "SELECT libraryTypeId, description, platformType " +
@@ -540,7 +545,7 @@ public class SQLLibraryDAO implements LibraryStore {
 
   public List<Library> listBySearch(String query) {
     String mySQLQuery = "%" + query + "%";
-    return template.query(LIBRARIES_SELECT_BY_SEARCH, new Object[]{mySQLQuery,mySQLQuery,mySQLQuery}, new LazyLibraryMapper());
+    return template.query(LIBRARIES_SELECT_BY_SEARCH, new Object[]{mySQLQuery,mySQLQuery,mySQLQuery,mySQLQuery}, new LazyLibraryMapper());
   }
 
   @Transactional(readOnly = false, rollbackFor = IOException.class)
@@ -589,6 +594,12 @@ public class SQLLibraryDAO implements LibraryStore {
 
   public LibraryType getLibraryTypeByDescription(String description) throws IOException {
     List eResults = template.query(LIBRARY_TYPE_SELECT_BY_DESCRIPTION, new Object[]{description}, new LibraryTypeMapper());
+    LibraryType e = eResults.size() > 0 ? (LibraryType) eResults.get(0) : null;
+    return e;
+  }
+
+  public LibraryType getLibraryTypeByDescriptionAndPlatform(String description, PlatformType platformType) throws IOException {
+    List eResults = template.query(LIBRARY_TYPE_SELECT_BY_DESCRIPTION_AND_PLATFORM, new Object[]{description, platformType}, new LibraryTypeMapper());
     LibraryType e = eResults.size() > 0 ? (LibraryType) eResults.get(0) : null;
     return e;
   }

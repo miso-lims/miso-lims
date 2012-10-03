@@ -28,6 +28,7 @@ public class DefaultSampleNamingScheme implements RequestManagerAwareNamingSchem
   protected static final Logger log = LoggerFactory.getLogger(DefaultSampleNamingScheme.class);
 
   private Map<String, Pattern> validationMap = new HashMap<String, Pattern>();
+  private Map<String, NameGenerator<Sample>> customNameGeneratorMap = new HashMap<String, NameGenerator<Sample>>();
   private RequestManager requestManager;
 
   public DefaultSampleNamingScheme() {
@@ -61,22 +62,34 @@ public class DefaultSampleNamingScheme implements RequestManagerAwareNamingSchem
 
   @Override
   public String generateNameFor(String fieldName, Sample s) throws MisoNamingException {
-    if ("alias".equals(fieldName)) {
-      throw new MisoNamingException("Alias generation not available. Validation via validateName is available.");
-    }
-    else {
-      if (validationMap.keySet().contains(fieldName)) {
-        Method m = fieldCheck(fieldName);
-        if (m != null) {
-          log.info("Generating name for '"+fieldName+"' :: " + DefaultMisoEntityPrefix.get(Sample.class.getSimpleName()).name() + s.getId());
-          return DefaultMisoEntityPrefix.get(Sample.class.getSimpleName()).name() + s.getId();
-        }
-        else {
-          throw new MisoNamingException("No such nameable field.");
-        }
+    if (customNameGeneratorMap.get(fieldName) != null) {
+      NameGenerator<Sample> sng = customNameGeneratorMap.get(fieldName);
+      String customName = sng.generateName(s);
+      if (validateField(fieldName, customName)) {
+        return customName;
       }
       else {
-        throw new MisoNamingException("Generation of names on field '"+fieldName+"' not available.");
+        throw new MisoNamingException("Custom naming generator '"+sng.getGeneratorName()+"' supplied for Sample field '"+fieldName+"' generated an invalid name according to the validation scheme '"+validationMap.get(fieldName)+"'");
+      }
+    }
+    else {
+      if ("alias".equals(fieldName)) {
+        throw new MisoNamingException("Alias generation not available. Validation via validateName is available.");
+      }
+      else {
+        if (validationMap.keySet().contains(fieldName)) {
+          Method m = fieldCheck(fieldName);
+          if (m != null) {
+            log.info("Generating name for '"+fieldName+"' :: " + DefaultMisoEntityPrefix.get(Sample.class.getSimpleName()).name() + s.getId());
+            return DefaultMisoEntityPrefix.get(Sample.class.getSimpleName()).name() + s.getId();
+          }
+          else {
+            throw new MisoNamingException("No such nameable field.");
+          }
+        }
+        else {
+          throw new MisoNamingException("Generation of names on field '"+fieldName+"' not available.");
+        }
       }
     }
   }
@@ -102,6 +115,16 @@ public class DefaultSampleNamingScheme implements RequestManagerAwareNamingSchem
       }
     }
     return false;
+  }
+
+  @Override
+  public void registerCustomNameGenerator(String fieldName, NameGenerator<Sample> sampleNameGenerator) {
+    this.customNameGeneratorMap.put(fieldName, sampleNameGenerator);
+  }
+
+  @Override
+  public void unregisterCustomNameGenerator(String fieldName) {
+    this.customNameGeneratorMap.remove(fieldName);
   }
 
   private Method fieldCheck(String fieldName) {

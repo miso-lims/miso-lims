@@ -89,6 +89,7 @@ public class SQLSampleDAO implements SampleStore {
 
   public static final String SAMPLES_SELECT_BY_SEARCH =
           SAMPLES_SELECT + " WHERE " +
+          "identificationBarcode LIKE ? OR " +
           "name LIKE ? OR " +
           "alias LIKE ? OR " +
           "description LIKE ? OR " +
@@ -436,7 +437,7 @@ public class SQLSampleDAO implements SampleStore {
 
   public List<Sample> listBySearch(String query) {
     String mySQLQuery = "%" + query + "%";
-    return template.query(SAMPLES_SELECT_BY_SEARCH, new Object[]{mySQLQuery,mySQLQuery,mySQLQuery,mySQLQuery}, new LazySampleMapper());
+    return template.query(SAMPLES_SELECT_BY_SEARCH, new Object[]{mySQLQuery,mySQLQuery,mySQLQuery,mySQLQuery,mySQLQuery}, new LazySampleMapper());
   }
 
   @Transactional(readOnly = false, rollbackFor = IOException.class)

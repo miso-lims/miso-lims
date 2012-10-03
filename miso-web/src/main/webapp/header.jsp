@@ -70,7 +70,8 @@
   <link rel="stylesheet" href="<c:url value='/styles/style.css?ts=${timestamp.time}'/>" type="text/css">
   <title>MISO LIMS <c:if test="${not empty title}">- ${title}</c:if></title>
   <script type="text/javascript" src="<c:url value='/scripts/scriptaculous/prototype.js'/>"></script>
-  <script type="text/javascript" src="<c:url value='/scripts/fluxion-ajax/fluxion-ajax.js?ts=${timestamp.time}'/>"></script>
+  <script type="text/javascript"
+          src="<c:url value='/scripts/fluxion-ajax/fluxion-ajax.js?ts=${timestamp.time}'/>"></script>
 
   <!--Scriptaculous JS scripts below -->
   <script type="text/javascript" src="<c:url value='/scripts/scriptaculous/scriptaculous.js'/>"></script>
@@ -101,6 +102,9 @@
   <!-- D3.js for Graphics -->
   <script type="text/javascript" src="<c:url value='/scripts/d3v2/d3.v2.min.js'/>"></script>
 
+  <!-- unicode regexs for il8n validation -->
+  <script type="text/javascript" src="<c:url value='/scripts/xregexp-all-min.js'/>"></script>
+
   <!-- LIMS -->
   <script type="text/javascript" src="<c:url value='/scripts/lims.js?ts=${timestamp.time}'/>"></script>
   <script type="text/javascript" src="<c:url value='/scripts/search.js?ts=${timestamp.time}'/>"></script>
@@ -111,11 +115,13 @@
   <script type="text/javascript" src="<c:url value='/scripts/project_ajax.js?ts=${timestamp.time}'/>"></script>
   <script type="text/javascript" src="<c:url value='/scripts/reporting_ajax.js?ts=${timestamp.time}'/>"></script>
   <script type="text/javascript" src="<c:url value='/scripts/sample_ajax.js?ts=${timestamp.time}'/>"></script>
-  <script type="text/javascript" src="<c:url value='/scripts/sequencer_reference_ajax.js?ts=${timestamp.time}'/>"></script>
+  <script type="text/javascript"
+          src="<c:url value='/scripts/sequencer_reference_ajax.js?ts=${timestamp.time}'/>"></script>
   <script type="text/javascript" src="<c:url value='/scripts/study_ajax.js?ts=${timestamp.time}'/>"></script>
 
   <!-- form validations -->
-  <script type="text/javascript" src="<c:url value='/scripts/experiment_validation.js?ts=${timestamp.time}'/>"></script>
+  <script type="text/javascript"
+          src="<c:url value='/scripts/experiment_validation.js?ts=${timestamp.time}'/>"></script>
   <script type="text/javascript" src="<c:url value='/scripts/library_validation.js?ts=${timestamp.time}'/>"></script>
   <script type="text/javascript" src="<c:url value='/scripts/pool_validation.js?ts=${timestamp.time}'/>"></script>
   <script type="text/javascript" src="<c:url value='/scripts/project_validation.js?ts=${timestamp.time}'/>"></script>
@@ -125,7 +131,8 @@
   <!-- give $ back to prototype -->
   <script type="text/javascript">jQuery.noConflict();</script>
 
-  <script type="text/javascript" src="<c:url value='/scripts/multi_select_drag_drop.js?ts=${timestamp.time}'/>"></script>
+  <script type="text/javascript"
+          src="<c:url value='/scripts/multi_select_drag_drop.js?ts=${timestamp.time}'/>"></script>
 
   <link rel="shortcut icon" href="<c:url value='/styles/images/favicon.ico'/>" type="image/x-icon"/>
 

@@ -23,6 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
+import org.apache.commons.codec.binary.Base64;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
@@ -41,6 +42,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.event.Alert;
 import uk.ac.bbsrc.tgac.miso.core.event.type.AlertLevel;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
@@ -149,7 +151,7 @@ public class DashboardHelperService {
       if (projects.size() > 0) {
 //        Collections.sort(projects);
         for (Project p : projects) {
-          b.append("<a class=\"dashboardresult\" href=\"/miso/project/" + p.getProjectId() + "\"><div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
+          b.append("<a class=\"dashboardresult\" href=\"/miso/project/" + p.getProjectId() + "\"><div onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
           b.append("Name: <b>" + p.getName() + "</b><br/>");
           b.append("Alias: <b>" + p.getAlias() + "</b><br/>");
           b.append("</div></a>");
@@ -269,6 +271,10 @@ public class DashboardHelperService {
       List<Library> libraries;
       StringBuilder b = new StringBuilder();
       if (!"".equals(searchStr)) {
+        if (LimsUtils.isBase64String(searchStr)) {
+          //Base64-encoded string, most likely a barcode image beeped in. decode and search
+          searchStr = new String(Base64.decodeBase64(searchStr));
+        }
         libraries = new ArrayList<Library>(requestManager.listAllLibrariesBySearch(searchStr));
       }
       else {
@@ -301,6 +307,10 @@ public class DashboardHelperService {
       List<Sample> samples;
       StringBuilder b = new StringBuilder();
       if (!"".equals(searchStr)) {
+        if (LimsUtils.isBase64String(searchStr)) {
+          //Base64-encoded string, most likely a barcode image beeped in. decode and search
+          searchStr = new String(Base64.decodeBase64(searchStr));
+        }
         samples = new ArrayList<Sample>(requestManager.listAllSamplesBySearch(searchStr));
       }
       else {

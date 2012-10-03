@@ -23,17 +23,21 @@
 
 package uk.ac.bbsrc.tgac.miso.core.test;
 
+import com.eaglegenomics.simlims.core.User;
 import junit.framework.TestCase;
 import org.junit.Test;
 import org.odftoolkit.odfdom.doc.OdfTextDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.DefaultLibraryNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.util.FormUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -50,11 +54,15 @@ import java.util.List;
 public class FormUtilsTests {
   protected static final Logger log = LoggerFactory.getLogger(FormUtilsTests.class);
 
-  private static File testFile;
+  private static File testSampleDeliveryFile;
+  private static File testSampleBulkInputOdsFile;
+  private static File testSampleBulkInputXlsFile;
 
   static {
     try {
-      testFile = File.createTempFile("test-sampleDeliveryForm", ".odt");
+      testSampleDeliveryFile = File.createTempFile("test-sampleDeliveryForm", ".odt");
+      testSampleBulkInputOdsFile = File.createTempFile("test-sampleBulkInputOds", ".ods");
+      testSampleBulkInputXlsFile = File.createTempFile("test-sampleBulkInputXls", ".xlsx");
     }
     catch (IOException e) {
       e.printStackTrace();
@@ -65,7 +73,7 @@ public class FormUtilsTests {
   @Test
   public void testCreateSampleDeliveryForm() {
     try {
-      uk.ac.bbsrc.tgac.miso.core.util.FormUtils.createSampleDeliveryForm(generateSamples(), testFile);
+      uk.ac.bbsrc.tgac.miso.core.util.FormUtils.createSampleDeliveryForm(generateSamples(), testSampleDeliveryFile);
     }
     catch (Exception e) {
       e.printStackTrace();
@@ -76,7 +84,7 @@ public class FormUtilsTests {
   @Test
   public void testConvertToPdf() {
     try {
-      OdfTextDocument oDoc = uk.ac.bbsrc.tgac.miso.core.util.FormUtils.createSampleDeliveryForm(generateSamples(), testFile);
+      OdfTextDocument oDoc = uk.ac.bbsrc.tgac.miso.core.util.FormUtils.createSampleDeliveryForm(generateSamples(), testSampleDeliveryFile);
       uk.ac.bbsrc.tgac.miso.core.util.FormUtils.convertToPDF(oDoc);
     }
     catch (Exception e) {
@@ -88,7 +96,7 @@ public class FormUtilsTests {
   @Test
   public void testImportSampleDeliveryForm() {
     try {
-      List<Sample> samples = uk.ac.bbsrc.tgac.miso.core.util.FormUtils.importSampleDeliveryForm(testFile);
+      List<Sample> samples = uk.ac.bbsrc.tgac.miso.core.util.FormUtils.importSampleDeliveryForm(testSampleDeliveryFile);
       int numExpected = generateSamples().size();
       if (samples.size() != numExpected) {
         log.error("Expected samples in: " + numExpected + ". Number imported: " + samples.size());
@@ -101,6 +109,47 @@ public class FormUtilsTests {
     catch (Exception e) {
       e.printStackTrace();
       TestCase.fail();
+    }
+    finally {
+      testSampleDeliveryFile.delete();
+    }
+  }
+
+  @Test
+  public void testImportBulkInputODS() {
+    try {
+      InputStream in = FormUtilsTests.class.getClassLoader().getResourceAsStream("test-bulk_input.ods");
+      LimsUtils.writeFile(in, testSampleBulkInputOdsFile);
+      User u = new UserImpl();
+      u.setLoginName("testBulkImportUser");
+      List<Sample> samples = FormUtils.importSampleInputSpreadsheet(testSampleBulkInputOdsFile, u, new MockFormTestRequestManager(), new DefaultLibraryNamingScheme());
+      log.info("Imported :: " + LimsUtils.join(samples, " | "));
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+      TestCase.fail();
+    }
+    finally {
+      testSampleBulkInputOdsFile.delete();
+    }
+  }
+
+  @Test
+  public void testImportBulkInputXLS() {
+    try {
+      InputStream in = FormUtilsTests.class.getClassLoader().getResourceAsStream("test-bulk_input.xlsx");
+      LimsUtils.writeFile(in, testSampleBulkInputXlsFile);
+      User u = new UserImpl();
+      u.setLoginName("testBulkImportUser");
+      List<Sample> samples = FormUtils.importSampleInputSpreadsheet(testSampleBulkInputXlsFile, u, new MockFormTestRequestManager(), new DefaultLibraryNamingScheme());
+      log.info("Imported :: " + LimsUtils.join(samples, " | "));
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+      TestCase.fail();
+    }
+    finally {
+      testSampleBulkInputXlsFile.delete();
     }
   }
 

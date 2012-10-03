@@ -20,4 +20,6 @@ public interface MisoNamingScheme<T> {
   void setValidationRegex(String fieldName, String validationRegex) throws MisoNamingException;
   String getValidationRegex(String fieldName) throws MisoNamingException ;
   boolean validateField(String fieldName, String entityName) throws MisoNamingException;
+  void registerCustomNameGenerator(String fieldName, NameGenerator<T> nameGenerator);
+  void unregisterCustomNameGenerator(String fieldName);
 }

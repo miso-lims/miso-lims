@@ -28,6 +28,7 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
+import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
@@ -415,6 +417,13 @@ public class ContainerControllerHelperService {
     int partition = json.getInt("partition");
 
     try {
+      if (barcode != null && !"".equals(barcode)) {
+        if (LimsUtils.isBase64String(barcode)) {
+          //Base64-encoded string, most likely a barcode image beeped in. decode and search
+          barcode = new String(Base64.decodeBase64(barcode));
+        }
+      }
+
       Pool p = requestManager.getPoolByBarcode(barcode);
       SequencerPartitionContainer<SequencerPoolPartition> lf =
               (SequencerPartitionContainer<SequencerPoolPartition>)session.getAttribute("container_"+json.getString("container_cId"));

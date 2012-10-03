@@ -76,7 +76,7 @@
     <security:intercept-url pattern="/miso/**"
                             access="hasRole('ROLE_INTERNAL') or hasRole('ROLE_EXTERNAL')"/>
 
-    <security:session-management invalid-session-url="/login.jsp"/>
+    <security:session-management invalid-session-url="/login.jsp" session-fixation-protection="none"/>
   </security:http>
 
   <bean id="concurrencyFilter" class="org.springframework.security.web.session.ConcurrentSessionFilter">
@@ -88,7 +88,7 @@
 
   <bean id="sas" class="org.springframework.security.web.authentication.session.ConcurrentSessionControlStrategy">
     <property name="maximumSessions" value="-1"/>
-    <property name="exceptionIfMaximumExceeded" value="false"/>
+    <!--<property name="exceptionIfMaximumExceeded" value="false"/>-->
     <constructor-arg name="sessionRegistry" ref="sessionRegistry"/>
   </bean>
 

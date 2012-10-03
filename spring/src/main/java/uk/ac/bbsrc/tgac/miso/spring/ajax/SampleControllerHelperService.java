@@ -27,6 +27,9 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.opensymphony.util.FileUtils;
 import net.sf.json.JSONArray;
+import org.apache.commons.codec.binary.Base64;
+import org.krysalis.barcode4j.BarcodeDimension;
+import org.krysalis.barcode4j.BarcodeGenerator;
 import uk.ac.bbsrc.tgac.miso.core.data.PrintJob;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import com.eaglegenomics.simlims.core.User;
@@ -439,10 +442,15 @@ public class SampleControllerHelperService {
     return JSONUtils.SimpleJSONResponse("Note saved successfully");
   }
 
-
   public JSONObject getSampleByBarcode(HttpSession session, JSONObject json) {
     JSONObject response = new JSONObject();
     String barcode = json.getString("barcode");
+    if (LimsUtils.isBase64String(barcode)) {
+      log.info(barcode + "is base64");
+      //Base64-encoded string, most likely a barcode image beeped in. decode and search
+      barcode = new String(Base64.decodeBase64(barcode));
+    }
+
     try {
       Sample sample = requestManager.getSampleByBarcode(barcode);
       if (sample.getReceivedDate() == null) {
@@ -490,7 +498,25 @@ public class SampleControllerHelperService {
       Sample sample = requestManager.getSampleById(sampleId);
       barcodeFactory.setPointPixels(1.5f);
       barcodeFactory.setBitmapResolution(600);
-      RenderedImage bi = barcodeFactory.generateSquareDataMatrix(sample, 400);
+      RenderedImage bi = null;
+
+      if (json.has("barcodeGenerator")) {
+        BarcodeDimension dim = new BarcodeDimension(100, 100);
+        if (json.has("dimensionWidth") && json.has("dimensionHeight")) {
+          dim = new BarcodeDimension(json.getDouble("dimensionWidth"), json.getDouble("dimensionHeight"));
+        }
+        BarcodeGenerator bg = BarcodeFactory.lookupGenerator(json.getString("barcodeGenerator"));
+        if (bg != null) {
+          bi = barcodeFactory.generateBarcode(sample, bg, dim);
+        }
+        else {
+          return JSONUtils.SimpleJSONError("'"+json.getString("barcodeGenerator") + "' is not a valid barcode generator type");
+        }
+      }
+      else {
+        bi = barcodeFactory.generateSquareDataMatrix(sample, 400);
+      }
+
       if (bi != null) {
         File tempimage = misoFileManager.generateTemporaryFile("barcode-", ".png", temploc);
         if (ImageIO.write(bi, "png", tempimage)) {

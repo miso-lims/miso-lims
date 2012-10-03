@@ -80,6 +80,8 @@
     <security:intercept-url pattern="/miso/**" access="hasRole('ROLE_INTERNAL')"/>
 
     <security:logout invalidate-session="true" logout-success-url="/loggedOut.jsp"/>
+
+    <security:session-management invalid-session-url="/login.jsp" session-fixation-protection="none"/>
   </security:http>
 
   <oauth:consumer resource-details-service-ref="resourceDetails" oauth-failure-page="/oauth_error.jsp">
@@ -120,7 +122,7 @@
 
   <bean id="sas" class="org.springframework.security.web.authentication.session.ConcurrentSessionControlStrategy">
     <property name="maximumSessions" value="-1"/>
-    <property name="exceptionIfMaximumExceeded" value="false"/>
+    <!--<property name="exceptionIfMaximumExceeded" value="false"/>-->
     <constructor-arg name="sessionRegistry" ref="sessionRegistry"/>
   </bean>
 

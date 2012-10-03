@@ -458,15 +458,18 @@
            onmouseout="mclosetime()">
         <a href='<c:url value="/miso/sample/new/${project.id}"/>'>Add Samples</a>
         <c:if test="${not empty project.samples}">
-          <a href='javascript:void(0);' onclick='bulkSampleQcTable();'>QC Samples</a>
-          <a href='<c:url value="/miso/library/new/${project.samples[0].id}#tab-2"/>'>Add
-            Libraries</a>
-          <a href="javascript:void(0);" onclick="Project.barcode.selectSampleBarcodesToPrint('#sample_table');">Print Barcodes ...</a>
-          <a href="javascript:void(0);" onclick="generateSampleDeliveryForm(${project.id});">Get
-            Delivery Form</a>
-          <a href="javascript:void(0);" onclick="Project.ui.uploadSampleDeliveryForm(${project.id});">Import
-            Delivery Form</a>
+          <a href="javascript:void(0);" onclick="generateSampleDeliveryForm(${project.id});">Get Delivery Form</a>
+          <a href="javascript:void(0);" onclick="Project.ui.uploadSampleDeliveryForm(${project.id});">Import Delivery Form</a>
+          <%--
+          <hr>
+          <a href="javascript:void(0);" onclick="getBulkInputForm(${project.id});">Get Bulk Input Form</a>
+          <a href="javascript:void(0);" onclick="Project.ui.uploadBulkInputForm(${project.id});">Import Bulk Input Form</a>
+          --%>
+          <hr>
           <a href='<c:url value="/miso/sample/receipt"/>'>Receive Samples</a>
+          <a href='javascript:void(0);' onclick='bulkSampleQcTable();'>QC Samples</a>
+          <a href='<c:url value="/miso/library/new/${project.samples[0].id}#tab-2"/>'>Add Libraries</a>
+          <a href="javascript:void(0);" onclick="Project.barcode.selectSampleBarcodesToPrint('#sample_table');">Print Barcodes ...</a>
         </c:if>
       </div>
     </li>
@@ -493,6 +496,31 @@
               <iframe id='deliveryform_target_upload' name='deliveryform_target_upload' src=''
                       style='display: none'></iframe>
               <div id="deliveryform_statusdiv"></div>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <div id="inputformdiv" class="simplebox" style="display:none;">
+        <table class="in">
+          <tr>
+            <td>
+              <form method='post'
+                    id='inputform_upload_form'
+                    action="<c:url value="/miso/upload/project/bulk-input-form"/>"
+                    enctype="multipart/form-data"
+                    target="inputform_target_upload"
+                    onsubmit="Utils.fileUpload.fileUploadProgress('inputform_upload_form', 'inputform_statusdiv', Project.ui.bulkInputFormUploadSuccess);">
+                <input type="hidden" name="id" value="${project.id}"/>
+                <input type="file" name="file"/>
+                <button type="submit" class="br-button ui-state-default ui-corner-all">Upload</button>
+                <button type="button" class="br-button ui-state-default ui-corner-all"
+                        onclick="Project.ui.cancelBulkInputFormUpload();">Cancel
+                </button>
+              </form>
+              <iframe id='inputform_target_upload' name='inputform_target_upload' src=''
+                      style='display: none'></iframe>
+              <div id="inputform_statusdiv"></div>
             </td>
           </tr>
         </table>
@@ -995,6 +1023,7 @@
 
 <div id="addProjectOverviewDialog" title="Create new Overview"></div>
 <div id="addProjectOverviewNoteDialog" title="Create new Note"></div>
+<div id="getBulkInputFormDialog" title="Get Bulk Input Form"></div>
 
 <script type="text/javascript">
 jQuery(document).ready(function() {
@@ -1251,6 +1280,37 @@ function generateSampleDeliveryForm(projectId) {
 
     jQuery("div.toolbar").html("<button onclick=\"Project.ui.processSampleDeliveryForm(${project.id});\" class=\"fg-button ui-state-default ui-corner-all\">Generate Form</button>");
   }
+}
+
+function getBulkInputForm(projectId) {
+  jQuery('#getBulkInputFormDialog')
+    .html("<form>" +
+      "<fieldset class='dialog'>" +
+      "<p>Select desired document format</p><br/>" +
+      "<label for='formTypeOds'>OpenOffice (ODS)</label>" +
+      "<input type='radio' name='formType' id='formTypeOds' class='text ui-widget-content ui-corner-all' value='ods'/>" +
+      "<label for='formTypeXlsx'>Excel (XLSX)</label>" +
+      "<input type='radio' name='formType' id='formTypeXls' class='text ui-widget-content ui-corner-all' value='xlsx'/>" +
+      "</fieldset></form>");
+
+  jQuery(function() {
+    jQuery('#getBulkInputFormDialog').dialog({
+      autoOpen: false,
+      width: 400,
+      modal: true,
+      resizable: false,
+      buttons: {
+        "Get Form": function() {
+          Project.ui.downloadBulkInputForm(projectId, jQuery('input[name=formType]:checked').val());
+          jQuery(this).dialog('close');
+        },
+        "Cancel": function() {
+          jQuery(this).dialog('close');
+        }
+      }
+    });
+  });
+  jQuery('#getBulkInputFormDialog').dialog('open');
 }
 </c:if>
 

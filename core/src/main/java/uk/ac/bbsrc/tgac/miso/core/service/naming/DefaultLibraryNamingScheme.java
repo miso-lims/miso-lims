@@ -8,6 +8,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,6 +29,7 @@ public class DefaultLibraryNamingScheme implements RequestManagerAwareNamingSche
   protected static final Logger log = LoggerFactory.getLogger(DefaultLibraryNamingScheme.class);
 
   private Map<String, Pattern> validationMap = new HashMap<String, Pattern>();
+  private Map<String, NameGenerator<Library>> customNameGeneratorMap = new HashMap<String, NameGenerator<Library>>();
   private RequestManager requestManager;
 
   public DefaultLibraryNamingScheme() {
@@ -61,22 +63,59 @@ public class DefaultLibraryNamingScheme implements RequestManagerAwareNamingSche
 
   @Override
   public String generateNameFor(String fieldName, Library l) throws MisoNamingException {
-    if ("alias".equals(fieldName)) {
-      throw new MisoNamingException("Alias generation not available. Validation via validateName is available.");
+    if (customNameGeneratorMap.get(fieldName) != null) {
+      NameGenerator<Library> lng = customNameGeneratorMap.get(fieldName);
+      String customName = lng.generateName(l);
+      if (validateField(fieldName, customName)) {
+        return customName;
+      }
+      else {
+        throw new MisoNamingException("Custom naming generator '"+lng.getGeneratorName()+"' supplied for Library field '"+fieldName+"' generated an invalid name according to the validation scheme '"+validationMap.get(fieldName)+"'");
+      }
     }
     else {
-      if (validationMap.keySet().contains(fieldName)) {
-        Method m = fieldCheck(fieldName);
-        if (m != null) {
-          log.info("Generating name for '"+fieldName+"' :: " + DefaultMisoEntityPrefix.get(Library.class.getSimpleName()).name() + l.getId());
-          return DefaultMisoEntityPrefix.get(Library.class.getSimpleName()).name() + l.getId();
+      if ("alias".equals(fieldName)) {
+        if (l.getSample() != null) {
+          Pattern samplePattern = Pattern.compile("([A-z0-9]+)_S([A-z0-9]+)_(.*)");
+          Matcher m = samplePattern.matcher(l.getSample().getAlias());
+
+          if (m.matches()) {
+            try {
+              int numLibs = requestManager.listAllLibrariesBySampleId(l.getSample().getId()).size();
+              String la = m.group(1) + "_" + "L" + m.group(2) + "-"+(numLibs+1)+"_" + m.group(3);
+              if (validateField("alias", la)) {
+                return la;
+              }
+              else {
+                throw new MisoNamingException("Generated invalid Library alias for: " + l.toString());
+              }
+            }
+            catch (IOException e) {
+              throw new MisoNamingException("Cannot generate Library alias for: " + l.toString(), e);
+            }
+          }
+          else {
+            throw new MisoNamingException("Cannot generate Library alias for: " + l.toString() + " from supplied sample alias: " + l.getSample().getAlias());
+          }
         }
         else {
-          throw new MisoNamingException("No such nameable field.");
+          throw new MisoNamingException("This alias generation scheme requires the Library to have a parent Sample set.");
         }
       }
       else {
-        throw new MisoNamingException("Generation of names on field '"+fieldName+"' not available.");
+        if (validationMap.keySet().contains(fieldName)) {
+          Method m = fieldCheck(fieldName);
+          if (m != null) {
+            log.info("Generating name for '"+fieldName+"' :: " + DefaultMisoEntityPrefix.get(Library.class.getSimpleName()).name() + l.getId());
+            return DefaultMisoEntityPrefix.get(Library.class.getSimpleName()).name() + l.getId();
+          }
+          else {
+            throw new MisoNamingException("No such nameable field.");
+          }
+        }
+        else {
+          throw new MisoNamingException("Generation of names on field '"+fieldName+"' not available.");
+        }
       }
     }
   }
@@ -102,6 +141,16 @@ public class DefaultLibraryNamingScheme implements RequestManagerAwareNamingSche
       }
     }
     return false;
+  }
+
+  @Override
+  public void registerCustomNameGenerator(String fieldName, NameGenerator<Library> libraryNameGenerator) {
+    this.customNameGeneratorMap.put(fieldName, libraryNameGenerator);
+  }
+
+  @Override
+  public void unregisterCustomNameGenerator(String fieldName) {
+    this.customNameGeneratorMap.remove(fieldName);
   }
 
   private Method fieldCheck(String fieldName) {

@@ -3,7 +3,6 @@ package uk.ac.bbsrc.tgac.miso.core.service.naming;
 import net.sourceforge.fluxion.spi.ServiceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -20,30 +19,30 @@ import java.util.regex.Pattern;
  * Info
  *
  * @author Rob Davey
- * @date 29/08/12
- * @since 0.1.7
+ * @date 27/09/12
+ * @since 0.1.8
  */
 @ServiceProvider
-public class DefaultEntityNamingScheme<T extends Nameable> implements MisoNamingScheme<T> {
-  protected static final Logger log = LoggerFactory.getLogger(DefaultEntityNamingScheme.class);
+public class AllowAnythingEntityNamingScheme<T extends Nameable> implements MisoNamingScheme<T> {
+  protected static final Logger log = LoggerFactory.getLogger(AllowAnythingEntityNamingScheme.class);
 
   private Class<T> type;
   private Map<String, Pattern> validationMap = new HashMap<String, Pattern>();
   private Map<String, NameGenerator<T>> customNameGeneratorMap = new HashMap<String, NameGenerator<T>>();
 
-  public DefaultEntityNamingScheme() {
+  public AllowAnythingEntityNamingScheme() {
     try {
       type = (Class<T>)Class.forName("uk.ac.bbsrc.tgac.miso.core.data.Nameable");
-      validationMap.put("name", Pattern.compile("([A-Z]{3})([0-9]+)"));
+      validationMap.put("name", Pattern.compile("(.*)"));
     }
     catch (ClassNotFoundException e) {
       e.printStackTrace();
     }
   }
 
-  public DefaultEntityNamingScheme(Class<T> type) {
+  public AllowAnythingEntityNamingScheme(Class<T> type) {
     this.type = type;
-    validationMap.put("name", Pattern.compile("([A-Z]{3})([0-9]+)"));
+    validationMap.put("name", Pattern.compile("(.*)"));
   }
 
   @Override
@@ -71,7 +70,7 @@ public class DefaultEntityNamingScheme<T extends Nameable> implements MisoNaming
 
   @Override
   public String getSchemeName() {
-    return "DefaultEntityNamingScheme";
+    return "AllowAnythingEntityNamingScheme";
   }
 
   @Override
@@ -87,11 +86,8 @@ public class DefaultEntityNamingScheme<T extends Nameable> implements MisoNaming
       }
     }
     else {
-      if (DefaultMisoEntityPrefix.get(o.getClass().getSimpleName()) == null) {
-        throw new MisoNamingException("Cannot generate a MISO name from an object of this type");
-      }
-      log.info("Generating name :: " + DefaultMisoEntityPrefix.get(o.getClass().getSimpleName()).name() + o.getId());
-      return DefaultMisoEntityPrefix.get(o.getClass().getSimpleName()).name() + o.getId();
+      log.info("Generating name for " + o.getClass().getSimpleName() +" :: " + o.getId());
+      return ""+o.getId();
     }
   }
 
@@ -108,15 +104,7 @@ public class DefaultEntityNamingScheme<T extends Nameable> implements MisoNaming
 
   @Override
   public boolean validateField(String fieldName, String entityName) throws MisoNamingException {
-    String prefix = entityName.substring(0, 3);
-    if (fieldCheck(fieldName)) {
-      Pattern p = validationMap.get(fieldName);
-      if (p != null) {
-        Matcher mat = p.matcher(entityName);
-        return DefaultMisoEntityPrefix.getByName(prefix) != null && mat.matches();
-      }
-    }
-    return false;
+    return !"".equals(entityName) && fieldCheck(fieldName);
   }
 
   @Override

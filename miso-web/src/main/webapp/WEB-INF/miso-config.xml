@@ -85,4 +85,6 @@
   <bean id="sampleNamingScheme" name="sampleNamingScheme" class="uk.ac.bbsrc.tgac.miso.core.service.naming.DefaultSampleNamingScheme"/>
   <bean id="libraryNamingScheme" name="libraryNamingScheme" class="uk.ac.bbsrc.tgac.miso.core.service.naming.DefaultLibraryNamingScheme"/>
 
+  <bean id="nameGeneratorResolverService" name="nameGeneratorResolverService" class="uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNameGeneratorResolverService"/>
+
 </beans>

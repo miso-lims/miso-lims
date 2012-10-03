@@ -91,18 +91,18 @@
                 </li>
             </ul>
             <script type="text/javascript">
-                jQuery(document).ready(function() {
-                    Fluxion.doAjax(
-                            'plateControllerHelperService',
-                            'getPlateBarcode',
-                            {'plateId':${plate.id},
-                                'url':ajaxurl
-                            },
-                            {'doOnSuccess':function(json) {
-                                jQuery('#idBarcode').html("<img style='border:0;' src='<c:url value='/temp/'/>" + json.img + "'/>");
-                            }
-                            });
+              jQuery(document).ready(function() {
+                Fluxion.doAjax(
+                  'plateControllerHelperService',
+                  'getPlateBarcode',
+                  {'plateId':${plate.id},
+                    'url':ajaxurl
+                  },
+                  {'doOnSuccess':function(json) {
+                    jQuery('#idBarcode').html("<img style='height:30px; border:0;' src='<c:url value='/temp/'/>" + json.img + "'/>");
+                  }
                 });
+              });
             </script>
         </c:if>
     </div>

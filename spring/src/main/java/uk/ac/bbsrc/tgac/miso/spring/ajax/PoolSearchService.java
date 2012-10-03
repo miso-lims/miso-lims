@@ -27,12 +27,14 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
+import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
@@ -65,6 +67,11 @@ public class PoolSearchService {
       try {
         Collection<Pool<? extends Poolable>> pools = null;
         if (searchStr != null && !searchStr.equals("")) {
+          if (LimsUtils.isBase64String(searchStr)) {
+            //Base64-encoded string, most likely a barcode image beeped in. decode and search
+            searchStr = new String(Base64.decodeBase64(searchStr));
+          }
+
           if (readyOnly) {
             pools = requestManager.listReadyPoolsByPlatformAndSearch(PlatformType.valueOf(platformType), searchStr);
           }

@@ -75,7 +75,7 @@ public class NotificationUtils {
       JSONArray a = JSONArray.fromObject(payload.get(key));
       List<JSONObject> all = a.subList(0, a.size());
       //for (JSONObject o : (Iterable<JSONObject>)a) {
-      for (List<JSONObject> chunk : NotificationUtils.chopped(all, splitterBatchSize)) {
+      for (List<JSONObject> chunk : NotificationUtils.chunkList(all, splitterBatchSize)) {
         Map<String, String> runMap = new HashMap<String, String>();
         JSONArray aa = new JSONArray();
         for (JSONObject o : chunk) {
@@ -90,7 +90,7 @@ public class NotificationUtils {
   }
 
   // chops a list into non-view sublists of length L
-  public static <T> List<List<T>> chopped(List<T> list, final int L) {
+  public static <T> List<List<T>> chunkList(List<T> list, final int L) {
     List<List<T>> parts = new ArrayList<List<T>>();
     final int N = list.size();
     for (int i = 0; i < N; i += L) {

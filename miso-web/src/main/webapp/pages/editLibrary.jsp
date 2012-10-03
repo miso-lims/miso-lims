@@ -125,31 +125,31 @@
       <span style="float: left; font-size: 24px; font-weight: bold; color:#BBBBBB">ID</span>
         <c:if test="${not empty library.identificationBarcode}">
           <ul class="barcode-ddm">
-              <li><a
-                      onmouseover="mopen('idBarcodeMenu')"
-                      onmouseout="mclosetime()"><span style="float:right; margin-top:6px;" class="ui-icon ui-icon-triangle-1-s"></span><span id="idBarcode" style="float:right"></span></a>
+            <li><a
+                    onmouseover="mopen('idBarcodeMenu')"
+                    onmouseout="mclosetime()"><span style="float:right; margin-top:6px;" class="ui-icon ui-icon-triangle-1-s"></span><span id="idBarcode" style="float:right"></span></a>
 
-                  <div id="idBarcodeMenu"
-                       onmouseover="mcancelclosetime()"
-                       onmouseout="mclosetime()">
-                      <a href="javascript:void(0);" onclick="Library.barcode.printLibraryBarcodes(${library.id});">Print</a>
-                  </div>
-              </li>
+              <div id="idBarcodeMenu"
+                   onmouseover="mcancelclosetime()"
+                   onmouseout="mclosetime()">
+                  <a href="javascript:void(0);" onclick="Library.barcode.printLibraryBarcodes(${library.id});">Print</a>
+              </div>
+            </li>
           </ul>
           <%-- <div style="clear:both"></div> --%>
             <script type="text/javascript">
-                jQuery(document).ready(function() {
-                    Fluxion.doAjax(
-                            'libraryControllerHelperService',
-                            'getLibraryBarcode',
-                    {'libraryId':${library.id},
-                        'url':ajaxurl
-                    },
-                    {'doOnSuccess':function(json) {
-                        jQuery('#idBarcode').html("<img style='border:0;' src='<c:url value='/temp/'/>" + json.img + "'/>");
-                    }
-                    });
+              jQuery(document).ready(function() {
+                Fluxion.doAjax(
+                  'libraryControllerHelperService',
+                  'getLibraryBarcode',
+                {'libraryId':${library.id},
+                  'url':ajaxurl
+                },
+                {'doOnSuccess':function(json) {
+                  jQuery('#idBarcode').html("<img style='height:30px; border:0;' src='<c:url value='/temp/'/>" + json.img + "'/>");
+                }
                 });
+              });
             </script>
         </c:if>
     </div>

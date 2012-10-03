@@ -98,6 +98,7 @@ public interface RequestManager {
   public LibraryQC getLibraryQCById(long qcId) throws IOException;
   public LibraryType getLibraryTypeById(long libraryId) throws IOException;
   public LibraryType getLibraryTypeByDescription(String description) throws IOException;
+  public LibraryType getLibraryTypeByDescriptionAndPlatform(String description, PlatformType platformType) throws IOException;
   public LibrarySelectionType getLibrarySelectionTypeById(long librarySelectionTypeId) throws IOException;
   public LibrarySelectionType getLibrarySelectionTypeByName(String name) throws IOException;
   public LibraryStrategyType getLibraryStrategyTypeById(long libraryStrategyTypeId) throws IOException;

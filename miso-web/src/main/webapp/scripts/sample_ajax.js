@@ -449,6 +449,9 @@ Sample.ui = {
   receiveSample : function(input) {
     var barcode = jQuery(input).val();
     if (!Utils.validation.isNullCheck(barcode)) {
+      barcode = Utils.validation.base64Check(barcode);
+      jQuery(input).val(barcode);
+
       Fluxion.doAjax(
         'sampleControllerHelperService',
         'getSampleByBarcode',
@@ -465,14 +468,17 @@ Sample.ui = {
             }
 
             //unbind to stop change error happening every time
-            jQuery(input).unbind('keyup');
+            //jQuery(input).unbind('keyup');
 
             //clear and focus
             jQuery(input).val("");
             jQuery(input).focus();
 
             //rebind after setting focus
-            jQuery(input).keyup(Utils.timer.timedFunc(Sample.ui.receiveSample(this), 400));
+            //jQuery(input).keyup(Utils.timer.timedFunc(Sample.ui.receiveSample(this), 400));
+            Utils.timer.typewatchFunc(jQuery('#searchSampleByBarcode'), function() {
+              Sample.ui.receiveSample(jQuery('#searchSampleByBarcode'));
+            }, 600, 4);
           },
           'doOnError':
           function(json) {

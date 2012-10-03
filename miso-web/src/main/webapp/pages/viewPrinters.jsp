@@ -50,6 +50,9 @@
               <th>Type</th>
               <th>Recent Print Jobs</th>
               <th>Enabled</th>
+              <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+                <th>Edit</th>
+              </c:if>
             </tr>
             </thead>
             <tbody>
@@ -57,7 +60,7 @@
             <c:forEach items="${barcodePrinters}" var="service">
               <tr>
                 <td>${service.name}</td>
-                <td>${service.printContext.host}</td>
+                <td id='host-${service.name}'>${service.printContext.host}</td>
                 <td>${service.printContext.name}</td>
                 <td>
                   <a href='<c:url value="/miso/admin/configuration/printers/barcode/${service.name}"/>'>View</a>
@@ -75,6 +78,11 @@
                     </c:otherwise>
                   </c:choose>
                 </td>
+                <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+                  <td id='edit-${service.name}' class="misoicon"/>
+                    <a href='javascript:void(0);' onclick="Print.ui.changePrinterServiceRow('${service.name}');"><span class="ui-icon ui-icon-pencil"/></a>
+                  </td>
+                </c:if>
               </tr>
             </c:forEach>
 

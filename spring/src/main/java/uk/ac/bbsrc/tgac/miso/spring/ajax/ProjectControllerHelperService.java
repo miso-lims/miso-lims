@@ -732,6 +732,28 @@ public class ProjectControllerHelperService {
     }
   }
 
+  public JSONObject downloadBulkInputForm(HttpSession session, JSONObject json) {
+    if (json.has("projectId") && json.has("documentFormat")) {
+      Long projectId = json.getLong("projectId");
+      String documentFormat = json.getString("documentFormat");
+      try {
+        File f = misoFileManager.getNewFile(
+          Project.class,
+          projectId.toString(),
+          "BulkInputForm-" + LimsUtils.getCurrentDateAsString() + "." + documentFormat);
+        FormUtils.createSampleInputSpreadsheet(requestManager.getProjectById(projectId).getSamples(), f);
+        return JSONUtils.SimpleJSONResponse("" + f.getName().hashCode());
+      }
+      catch (Exception e) {
+        e.printStackTrace();
+        return JSONUtils.SimpleJSONError("Failed to get bulk input form: " + e.getMessage());
+      }
+    }
+    else {
+      return JSONUtils.SimpleJSONError("Missing project ID or document format supplied.");
+    }
+ }
+
   public JSONObject watchOverview(HttpSession session, JSONObject json) {
     Long overviewId = json.getLong("overviewId");
     try {

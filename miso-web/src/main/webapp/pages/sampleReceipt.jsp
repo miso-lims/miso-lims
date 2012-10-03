@@ -50,10 +50,10 @@
     <form id="samples" commandName="sample" autocomplete="off" onsubmit="">
       <div>
         Barcode:<input type="text"
-                       onkeyup="Utils.timer.timedFunc(Sample.ui.receiveSample(this), 400);"
                        size="40"
                        id="searchSampleByBarcode"
                        name="searchSampleByBarcode">
+
         <span id="msgspan"></span>
 
         <h2>Sample Information</h2>
@@ -69,6 +69,10 @@
   jQuery('#searchSampleByBarcode').keypress(function(e) {
     if (e.which == 13) return false;
   });
+
+  Utils.timer.typewatchFunc(jQuery('#searchSampleByBarcode'), function() {
+    Sample.ui.receiveSample(jQuery('#searchSampleByBarcode'));
+  }, 600, 4);
 </script>
 <%@ include file="adminsub.jsp" %>
 

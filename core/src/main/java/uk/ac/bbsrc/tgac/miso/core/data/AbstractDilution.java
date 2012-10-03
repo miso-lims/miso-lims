@@ -178,7 +178,7 @@ public abstract class AbstractDilution implements Dilution, Comparable {
     // just compare IDs.
     if (getId() == AbstractDilution.UNSAVED_ID
         || them.getId() == AbstractDilution.UNSAVED_ID) {
-      return getName().equals(them.getName()) &&
+      return getCreationDate().equals(them.getCreationDate()) &&
              getDilutionCreator().equals(them.getDilutionCreator()) &&
              getConcentration().equals(them.getConcentration());
     }
@@ -195,7 +195,7 @@ public abstract class AbstractDilution implements Dilution, Comparable {
     else {
       final int PRIME = 37;
       int hashcode = 1;
-      if (getName() != null) hashcode = PRIME * hashcode + getName().hashCode();
+      if (getCreationDate() != null) hashcode = PRIME * hashcode + getCreationDate().hashCode();
       if (getDilutionCreator() != null) hashcode = PRIME * hashcode + getDilutionCreator().hashCode();
       if (getConcentration() != null) hashcode = PRIME * hashcode + getConcentration().hashCode();
       return hashcode;

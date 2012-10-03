@@ -42,13 +42,19 @@ import org.krysalis.barcode4j.impl.upcean.UPCABean;
 import org.krysalis.barcode4j.impl.upcean.UPCEBean;
 import org.krysalis.barcode4j.output.bitmap.BitmapCanvasProvider;
 import org.krysalis.barcode4j.tools.UnitConv;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
+
+import org.apache.commons.codec.binary.Base64;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.factory.barcode
@@ -60,6 +66,8 @@ import java.io.OutputStream;
  * @since 0.0.3
  */
 public class BarcodeFactory {
+  protected static final Logger log = LoggerFactory.getLogger(BarcodeFactory.class);
+
   public final BarcodeGenerator CODABAR = new CodabarBean();
   public final BarcodeGenerator CODE128 = new Code128Bean();
   public final BarcodeGenerator CODE39 = new Code39Bean();
@@ -80,6 +88,28 @@ public class BarcodeFactory {
   private int orientation = 0;
   private String outputType = "png";
   private float pointPixels = 4.0f;
+
+  private static final Map<String, BarcodeGenerator> generators = new HashMap<String, BarcodeGenerator>();
+
+  public BarcodeFactory() {
+    generators.put("CODABAR", CODABAR);
+    generators.put("CODE128", CODE128);
+    generators.put("CODE39", CODE39);
+    generators.put("DATAMATRIX", DATAMATRIX);
+    generators.put("EAN128", EAN128);
+    generators.put("EAN13", EAN13);
+    generators.put("EAN8", EAN8);
+    generators.put("INTERLEAVED2OF5", INTERLEAVED2OF5);
+    generators.put("PDF417", PDF417);
+    generators.put("ROYALMAILCBC", ROYALMAILCBC);
+    generators.put("UPCA", UPCA);
+    generators.put("UPCE", UPCE);
+    generators.put("USPSINTELLIGENTMAIL", USPSINTELLIGENTMAIL);
+  }
+
+  public static BarcodeGenerator lookupGenerator(String name) {
+    return generators.get(name);
+  }
 
   public void setPointPixels(float pointPixels) {
     this.pointPixels = pointPixels;
@@ -127,17 +157,20 @@ public class BarcodeFactory {
 
   private RenderedImage getImage(Barcodable barcodable, BarcodeGenerator barcodeGenerator, BarcodeDimension dimension) throws IOException {
     String input = barcodable.getIdentificationBarcode();
+
     if (input != null && !"".equals(input)) {
+      String enc = new String(Base64.encodeBase64(input.getBytes("UTF-8")));
+
       BitmapCanvasProvider provider = new BitmapCanvasProvider(bitmapResolution, imageType, antialias, orientation);
       provider.establishDimensions(dimension);
       if (barcodeGenerator instanceof AbstractBarcodeBean) {
         AbstractBarcodeBean bean = (AbstractBarcodeBean)barcodeGenerator;
         bean.setModuleWidth(UnitConv.in2mm(pointPixels / bitmapResolution));
         bean.doQuietZone(false);
-        bean.generateBarcode(provider, input);
+        bean.generateBarcode(provider, enc);
       }
       else {
-        barcodeGenerator.generateBarcode(provider, input);
+        barcodeGenerator.generateBarcode(provider, enc);
       }
       provider.finish();
       return provider.getBufferedImage();
@@ -151,6 +184,10 @@ public class BarcodeFactory {
 
   public RenderedImage generateBarcode(Barcodable barcodable, BarcodeGenerator barcodeGenerator) throws IOException {
     return getImage(barcodable, barcodeGenerator, new BarcodeDimension(100, 100));
+  }
+
+  public RenderedImage generateBarcode(Barcodable barcodable, BarcodeGenerator barcodeGenerator, BarcodeDimension dim) throws IOException {
+    return getImage(barcodable, barcodeGenerator, dim);
   }
 
   public void generateBarcode(Barcodable barcodable, BarcodeGenerator barcodeGenerator, OutputStream output) throws IOException {

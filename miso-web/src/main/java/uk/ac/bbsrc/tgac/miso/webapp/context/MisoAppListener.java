@@ -43,7 +43,9 @@ import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoRequestManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.PrintManager;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoEntityNamingSchemeResolverService;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNameGeneratorResolverService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NameGenerator;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
 import uk.ac.bbsrc.tgac.miso.core.service.tagbarcode.TagBarcodeStrategy;
@@ -111,11 +113,25 @@ public class MisoAppListener implements ServletContextListener {
     //set up naming schemes
     MisoEntityNamingSchemeResolverService entityNamingSchemeResolverService = (MisoEntityNamingSchemeResolverService)context.getBean("entityNamingSchemeResolverService");
     Collection<MisoNamingScheme<?>> mnss = entityNamingSchemeResolverService.getNamingSchemes();
+
+    MisoNameGeneratorResolverService nameGeneratorResolverService = (MisoNameGeneratorResolverService)context.getBean("nameGeneratorResolverService");
+    Collection<NameGenerator<?>> ngs = nameGeneratorResolverService.getNameGenerators();
+
     for (MisoNamingScheme<?> mns : mnss) {
       log.info("Got naming scheme: " + mns.getSchemeName());
       String classname = mns.namingSchemeFor().getSimpleName().toLowerCase();
 
       if (misoProperties.containsKey("miso.naming.scheme."+classname) && misoProperties.get("miso.naming.scheme."+classname).equals(mns.getSchemeName())) {
+        for (String key : misoProperties.keySet()) {
+          if (key.startsWith("miso.naming.generator."+classname)) {
+            String genprop = key.substring(key.lastIndexOf(".")+1);
+            NameGenerator ng = nameGeneratorResolverService.getNameGenerator(misoProperties.get("miso.naming.generator."+classname+"."+genprop));
+            if (ng != null) {
+              mns.registerCustomNameGenerator(genprop, ng);
+            }
+          }
+        }
+
         log.info("Replacing default "+classname+"NamingScheme with " + mns.getSchemeName());
         ((DefaultListableBeanFactory)context.getBeanFactory()).removeBeanDefinition(classname+"NamingScheme");
         context.getBeanFactory().registerSingleton(classname+"NamingScheme", mns);

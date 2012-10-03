@@ -57,6 +57,12 @@ public class LimsUtils {
 
   protected static final Logger log = LoggerFactory.getLogger(LimsUtils.class);
 
+  private static final Pattern p = Pattern.compile("^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{4})$");
+
+  public static boolean isBase64String(String base64) {
+    return p.matcher(base64).matches();
+  }
+
   public static boolean isUrlValid(URL url) {
     try {
       HttpURLConnection connection = (HttpURLConnection)url.openConnection();
