@@ -327,7 +327,7 @@ public class SQLExperimentDAO implements ExperimentStore {
           Number newId = insert.executeAndReturnKey(params);
           if (newId.longValue() != experiment.getId()) {
             log.error("Expected Experiment ID doesn't match returned value from database insert: rolling back...");
-            new NamedParameterJdbcTemplate(template).update(EXPERIMENT_DELETE, new MapSqlParameterSource().addValue("experimentId", experiment.getId()));
+            new NamedParameterJdbcTemplate(template).update(EXPERIMENT_DELETE, new MapSqlParameterSource().addValue("experimentId", newId.longValue()));
             throw new IOException("Something bad happened. Expected Experiment ID doesn't match returned value from DB insert");
           }
         }

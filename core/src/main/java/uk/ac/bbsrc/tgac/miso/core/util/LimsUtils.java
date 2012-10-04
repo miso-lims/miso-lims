@@ -650,4 +650,28 @@ public class LimsUtils {
   public static String capitalise(String s) {
     return Character.toUpperCase(s.charAt(0)) + s.substring(1);
   }
+
+  public static List<Class<?>> getAllInterfaces(Class<?> cls) {
+    if (cls == null) {
+      return null;
+    }
+    List<Class<?>> list = new ArrayList<Class<?>>();
+    while (cls != null) {
+      Class[] interfaces = cls.getInterfaces();
+      for (int i = 0; i < interfaces.length; i++) {
+        if (!list.contains(interfaces[i])) {
+          list.add(interfaces[i]);
+        }
+        List superInterfaces = getAllInterfaces(interfaces[i]);
+        for (Iterator it = superInterfaces.iterator(); it.hasNext(); ) {
+          Class intface = (Class) it.next();
+          if (!list.contains(intface)) {
+            list.add(intface);
+          }
+        }
+      }
+      cls = cls.getSuperclass();
+    }
+    return list;
+  }
 }

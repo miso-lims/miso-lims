@@ -352,7 +352,7 @@ public class SQLSampleDAO implements SampleStore {
             Number newId = insert.executeAndReturnKey(params);
             if (newId.longValue() != sample.getId()) {
               log.error("Expected Sample ID doesn't match returned value from database insert: rolling back...");
-              new NamedParameterJdbcTemplate(template).update(SAMPLE_DELETE, new MapSqlParameterSource().addValue("sampleId", sample.getId()));
+              new NamedParameterJdbcTemplate(template).update(SAMPLE_DELETE, new MapSqlParameterSource().addValue("sampleId", newId.longValue()));
               throw new IOException("Something bad happened. Expected Sample ID doesn't match returned value from DB insert");
             }
           }

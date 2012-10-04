@@ -379,7 +379,7 @@ public class SQLLibraryDAO implements LibraryStore {
           Number newId = insert.executeAndReturnKey(params);
           if (newId.longValue() != library.getId()) {
             log.error("Expected library ID doesn't match returned value from database insert: rolling back...");
-            new NamedParameterJdbcTemplate(template).update(LIBRARY_DELETE, new MapSqlParameterSource().addValue("libraryId", library.getId()));
+            new NamedParameterJdbcTemplate(template).update(LIBRARY_DELETE, new MapSqlParameterSource().addValue("libraryId", newId.longValue()));
             throw new IOException("Something bad happened. Expected library ID doesn't match returned value from DB insert");
           }
         }

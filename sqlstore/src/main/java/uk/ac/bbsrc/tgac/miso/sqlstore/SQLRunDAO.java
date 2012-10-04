@@ -404,7 +404,7 @@ public class SQLRunDAO implements RunStore {
           Number newId = insert.executeAndReturnKey(params);
           if (newId.longValue() != run.getId()) {
             log.error("Expected Run ID doesn't match returned value from database insert: rolling back...");
-            new NamedParameterJdbcTemplate(template).update(RUN_DELETE, new MapSqlParameterSource().addValue("runId", run.getId()));
+            new NamedParameterJdbcTemplate(template).update(RUN_DELETE, new MapSqlParameterSource().addValue("runId", newId.longValue()));
             throw new IOException("Something bad happened. Expected Run ID doesn't match returned value from DB insert");
           }
         }
@@ -552,7 +552,7 @@ public class SQLRunDAO implements RunStore {
               Number newId = insert.executeAndReturnKey(params);
               if (newId.longValue() != run.getId()) {
                 log.error("Expected Run ID doesn't match returned value from database insert: rolling back...");
-                new NamedParameterJdbcTemplate(template).update(RUN_DELETE, new MapSqlParameterSource().addValue("runId", run.getId()));
+                new NamedParameterJdbcTemplate(template).update(RUN_DELETE, new MapSqlParameterSource().addValue("runId", newId.longValue()));
                 throw new IOException("Something bad happened. Expected Run ID doesn't match returned value from DB insert");
               }
               autoIncrement = newId.longValue() + 1;

@@ -248,7 +248,7 @@ public class SQLStudyDAO implements StudyStore {
           Number newId = insert.executeAndReturnKey(params);
           if (newId.longValue() != study.getId()) {
             log.error("Expected Study ID doesn't match returned value from database insert: rolling back...");
-            new NamedParameterJdbcTemplate(template).update(STUDY_DELETE, new MapSqlParameterSource().addValue("studyId", study.getId()));
+            new NamedParameterJdbcTemplate(template).update(STUDY_DELETE, new MapSqlParameterSource().addValue("studyId", newId.longValue()));
             throw new IOException("Something bad happened. Expected Study ID doesn't match returned value from DB insert");
           }
         }

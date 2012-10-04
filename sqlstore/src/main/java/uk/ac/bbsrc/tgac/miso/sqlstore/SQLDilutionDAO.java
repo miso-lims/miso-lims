@@ -473,7 +473,7 @@ public class SQLDilutionDAO implements DilutionStore {
           Number newId = insert.executeAndReturnKey(params);
           if (newId.longValue() != dilution.getId()) {
             log.error("Expected LibraryDilution ID doesn't match returned value from database insert: rolling back...");
-            new NamedParameterJdbcTemplate(template).update(LIBRARY_DILUTION_DELETE, new MapSqlParameterSource().addValue("dilutionId", dilution.getId()));
+            new NamedParameterJdbcTemplate(template).update(LIBRARY_DILUTION_DELETE, new MapSqlParameterSource().addValue("dilutionId", newId.longValue()));
             throw new IOException("Something bad happened. Expected LibraryDilution ID doesn't match returned value from DB insert");
           }
         }
@@ -598,7 +598,7 @@ public class SQLDilutionDAO implements DilutionStore {
           Number newId = insert.executeAndReturnKey(params);
           if (newId.longValue() != dilution.getId()) {
             log.error("Expected emPCRDilution ID doesn't match returned value from database insert: rolling back...");
-            new NamedParameterJdbcTemplate(template).update(EMPCR_DILUTION_DELETE, new MapSqlParameterSource().addValue("dilutionId", dilution.getId()));
+            new NamedParameterJdbcTemplate(template).update(EMPCR_DILUTION_DELETE, new MapSqlParameterSource().addValue("dilutionId", newId.longValue()));
             throw new IOException("Something bad happened. Expected emPCRDilution ID doesn't match returned value from DB insert");
           }
         }

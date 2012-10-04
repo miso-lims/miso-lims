@@ -326,7 +326,7 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
           Number newId = insert.executeAndReturnKey(params);
           if (newId.longValue() != sequencerPartitionContainer.getId()) {
             log.error("Expected SequencerPartitionContainer ID doesn't match returned value from database insert: rolling back...");
-            new NamedParameterJdbcTemplate(template).update(SEQUENCER_PARTITION_CONTAINER_DELETE, new MapSqlParameterSource().addValue("containerId", sequencerPartitionContainer.getId()));
+            new NamedParameterJdbcTemplate(template).update(SEQUENCER_PARTITION_CONTAINER_DELETE, new MapSqlParameterSource().addValue("containerId", newId.longValue()));
             throw new IOException("Something bad happened. Expected SequencerPartitionContainer ID doesn't match returned value from DB insert");
           }
         }

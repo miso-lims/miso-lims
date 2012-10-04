@@ -102,6 +102,7 @@ public abstract class AbstractProject implements Project {
     return projectId;
   }
 
+  @Override
   public void setId(long id) {
     this.projectId = id;
   }

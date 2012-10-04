@@ -931,7 +931,7 @@ public class SQLPoolDAO implements PoolStore {
           Number newId = insert.executeAndReturnKey(params);
           if (newId.longValue() != pool.getId()) {
             log.error("Expected Pool ID doesn't match returned value from database insert: rolling back...");
-            new NamedParameterJdbcTemplate(template).update(POOL_DELETE, new MapSqlParameterSource().addValue("poolId", pool.getId()));
+            new NamedParameterJdbcTemplate(template).update(POOL_DELETE, new MapSqlParameterSource().addValue("poolId", newId.longValue()));
             throw new IOException("Something bad happened. Expected Pool ID doesn't match returned value from DB insert");
           }
         }

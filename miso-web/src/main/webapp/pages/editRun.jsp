@@ -117,10 +117,10 @@
                     <c:choose>
                         <c:when test="${not empty run.status and run.status.health.key ne 'Unknown'}"><form:radiobuttons
                                 id="platformTypes" path="platformType" items="${platformTypes}"
-                                onchange="Run.ui.changePlatformType(this, '${run.id}');"
+                                onchange="Run.ui.changePlatformType(this);"
                                 disabled="disabled"/></c:when>
                         <c:otherwise><form:radiobuttons id="platformTypes" path="platformType" items="${platformTypes}"
-                                                        onchange="Run.ui.changePlatformType(this, '${run.id}');"/></c:otherwise>
+                                                        onchange="Run.ui.changePlatformType(this);"/></c:otherwise>
 
                     </c:choose>
                 </td>

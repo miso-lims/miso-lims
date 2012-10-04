@@ -320,12 +320,12 @@ public class SQLProjectDAO implements ProjectStore {
             .addValue("securityProfile_profileId", securityProfileId)
             .addValue("progress", project.getProgress().getKey());
 
-    if (project.getProjectId() == AbstractProject.UNSAVED_ID) {
+    if (project.getId() == AbstractProject.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
               .withTableName(TABLE_NAME)
               .usingGeneratedKeyColumns("projectId");
       try {
-        project.setProjectId(DbUtils.getAutoIncrement(template, TABLE_NAME));
+        project.setId(DbUtils.getAutoIncrement(template, TABLE_NAME));
 
         String name = namingScheme.generateNameFor("name", project);
         project.setName(name);
@@ -334,9 +334,9 @@ public class SQLProjectDAO implements ProjectStore {
           params.addValue("name", name);
 
           Number newId = insert.executeAndReturnKey(params);
-          if (newId != project.getProjectId()) {
-            log.error("Expected Project ID doesn't match returned value from database insert: rolling back...");
-            new NamedParameterJdbcTemplate(template).update(PROJECT_DELETE, new MapSqlParameterSource().addValue("projectId", project.getProjectId()));
+          if (newId.longValue() != project.getId()) {
+            log.error("Expected Project ID ('"+project.getId()+"') doesn't match returned value ('"+newId.longValue()+"') from database insert: rolling back...");
+            new NamedParameterJdbcTemplate(template).update(PROJECT_DELETE, new MapSqlParameterSource().addValue("projectId", newId.longValue()));
             throw new IOException("Something bad happened. Expected Project ID doesn't match returned value from DB insert");
           }
         }
@@ -358,7 +358,7 @@ public class SQLProjectDAO implements ProjectStore {
     else {
       try {
         if (namingScheme.validateField("name", project.getName())) {
-          params.addValue("projectId", project.getProjectId())
+          params.addValue("projectId", project.getId())
                 .addValue("name", project.getName());
           NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
           namedTemplate.update(PROJECT_UPDATE, params);

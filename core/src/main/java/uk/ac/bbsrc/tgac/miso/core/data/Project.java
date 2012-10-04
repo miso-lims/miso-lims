@@ -60,6 +60,8 @@ public interface Project extends com.eaglegenomics.simlims.core.Project,
   /** Field PREFIX  */
   public static final String PREFIX = "PRO";
 
+  public void setId(long id);
+
   /**
    * Returns the alias of this Project object.
    *

@@ -88,7 +88,13 @@ public class DefaultEntityNamingScheme<T extends Nameable> implements MisoNaming
     }
     else {
       if (DefaultMisoEntityPrefix.get(o.getClass().getSimpleName()) == null) {
-        throw new MisoNamingException("Cannot generate a MISO name from an object of this type");
+        for (Class<?> i : LimsUtils.getAllInterfaces(o.getClass())) {
+          if (DefaultMisoEntityPrefix.get(i.getSimpleName()) != null) {
+            log.info("Generating name based on interface :: " + DefaultMisoEntityPrefix.get(i.getSimpleName()).name() + o.getId());
+            return DefaultMisoEntityPrefix.get(i.getSimpleName()).name() + o.getId();
+          }
+        }
+        throw new MisoNamingException("Cannot generate a MISO name from an object of type: " + o.getClass().getSimpleName());
       }
       log.info("Generating name :: " + DefaultMisoEntityPrefix.get(o.getClass().getSimpleName()).name() + o.getId());
       return DefaultMisoEntityPrefix.get(o.getClass().getSimpleName()).name() + o.getId();

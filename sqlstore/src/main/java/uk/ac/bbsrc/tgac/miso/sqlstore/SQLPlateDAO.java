@@ -240,7 +240,7 @@ public class SQLPlateDAO implements PlateStore {
           Number newId = insert.executeAndReturnKey(params);
           if (newId.longValue() != plate.getId()) {
             log.error("Expected Plate ID doesn't match returned value from database insert: rolling back...");
-            new NamedParameterJdbcTemplate(template).update(PLATE_DELETE, new MapSqlParameterSource().addValue("plateId", plate.getId()));
+            new NamedParameterJdbcTemplate(template).update(PLATE_DELETE, new MapSqlParameterSource().addValue("plateId", newId.longValue()));
             throw new IOException("Something bad happened. Expected Plate ID doesn't match returned value from DB insert");
           }
         }

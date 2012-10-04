@@ -211,7 +211,7 @@ public class SQLTgacSubmissionDAO implements Store<Submission>, NamingSchemeAwar
           Number newId = insert.executeAndReturnKey(params);
           if (newId.longValue() != submission.getId()) {
             log.error("Expected Submission ID doesn't match returned value from database insert: rolling back...");
-            new NamedParameterJdbcTemplate(template).update(SUBMISSION_DELETE, new MapSqlParameterSource().addValue("submissionId", submission.getId()));
+            new NamedParameterJdbcTemplate(template).update(SUBMISSION_DELETE, new MapSqlParameterSource().addValue("submissionId", newId.longValue()));
             throw new IOException("Something bad happened. Expected Submission ID doesn't match returned value from DB insert");
           }
         }

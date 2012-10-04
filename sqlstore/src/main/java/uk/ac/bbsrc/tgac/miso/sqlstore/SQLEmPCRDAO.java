@@ -190,7 +190,7 @@ public class SQLEmPCRDAO implements EmPCRStore {
           Number newId = insert.executeAndReturnKey(params);
           if (newId.longValue() != pcr.getId()) {
             log.error("Expected emPCR ID doesn't match returned value from database insert: rolling back...");
-            new NamedParameterJdbcTemplate(template).update(EMPCR_DELETE, new MapSqlParameterSource().addValue("pcrId", pcr.getId()));
+            new NamedParameterJdbcTemplate(template).update(EMPCR_DELETE, new MapSqlParameterSource().addValue("pcrId", newId.longValue()));
             throw new IOException("Something bad happened. Expected emPCR ID doesn't match returned value from DB insert");
           }
         }
