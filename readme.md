@@ -20,7 +20,7 @@ MISO: An open source LIMS for small-to-large scale sequencing centres
 
 VERSION 0.1.8 (Oxygen)
 
-0) BUILDING
+1) BUILDING
 -----------
 
 You will need [Maven 2.2.1] [3] to build MISO (*NOTE Not Maven 3!*). Once you have grabbed the code and installed Maven, in the root of the project (you should see a pom.xml file and module directories like `analysis-server` and `core` etc) call:
@@ -29,10 +29,24 @@ You will need [Maven 2.2.1] [3] to build MISO (*NOTE Not Maven 3!*). Once you ha
 
 All being well after a few minutes (it can take a while to download all the required artifacts given the speed of your connection), you should see `BUILD SUCCESSFUL`.
 
-1) INSTALLING
+2) UPGRADING
+------------
+
+If you are upgrading from a previous version of MISO, you will need to follow these steps:
+
+* Backup your existing database and apply any database patches in https://repos.tgac.bbsrc.ac.uk/miso/latest/sql/patches
+* Stop Tomcat
+* Delete (or move) the old `<tomcat>/webapps/ROOT.war`
+* Delete the `<tomcat>webapps/ROOT` directory
+* Copy the newly built `miso-web/target/ROOT.war` to `<tomcat>/webapps`
+* Restart Tomcat
+
+Done!
+
+3) INSTALLING
 -------------
 
-1.1 ) Setting up the MISO database
+3.1 ) Setting up the MISO database
 
 You will need to install MySQL v5 or greater. You will then need the two latest MISO database dumps. These are available
 from our repository here:
@@ -62,7 +76,7 @@ Then populate the database with the two dumps by running the following commands 
     mysql -u tgaclims -p -D lims < lims-schema-20120921.sql
     mysql -u tgaclims -p -D lims < miso_type_data_20120921.sql
 
-1.2 ) Setting up the MISO web application
+3.2 ) Setting up the MISO web application
 
 You will need a suitable Java web application container, such as Tomcat 6.x (http://tomcat.apache.org/download-60.cgi),
 to deploy MISO. Once Tomcat has been installed, download the latest MISO WAR file. The latest WAR file can be found here:
@@ -71,7 +85,7 @@ https://repos.tgac.bbsrc.ac.uk/miso/latest/ROOT.war
 
 Copy this file to your `<tomcat-install>/webapps/` directory. DO NOT START TOMCAT YET. Instead, follow the configuration steps below.
 
-2 ) CONFIGURATION
+4 ) CONFIGURATION
 -----------------
 
 MISO is configured using the Tomcat context xml system, the main miso.properties file that resides in the
@@ -79,7 +93,7 @@ MISO is configured using the Tomcat context xml system, the main miso.properties
 
 Make sure that these options are correct for your system at the time of container startup.
 
-2.1 ) Setting the database environment
+4.1 ) Setting the database environment
 
 MISO uses JNDI (Java Naming and Directory Interface) to configure the connection to the underlying MySQL database that you set
 up in the step 1.1. To configure Tomcat to manage the JNDI datasource, please create a file called `ROOT.xml` in the following
@@ -138,7 +152,7 @@ https://repos.tgac.bbsrc.ac.uk/miso/common/jndi-file-factory-1.0.jar
 
 And copy them to <tomcat-install>/lib/
 
-2.2 ) Setting up miso.properties file
+4.2 ) Setting up miso.properties file
 
 The main miso.properties file is located in the `<tomcat-install>/lib/classes/` directory.
 
@@ -149,7 +163,7 @@ The default path is `/storage/miso`. It is recommended that create this path on 
 
 > NB: You shouldn't need to change the miso.properties file as long as the /storage/miso directory exists on your filesystem and is writeable!
 
-2.3 ) Setting up userspace properties
+4.3 ) Setting up userspace properties
 
 MISO achieves userspace configuration via extra properties files kept in the storage directory specified by the `miso.baseDirectory`
 property (see 2.2 above). Default versions of these files are available here:
@@ -163,7 +177,7 @@ Unpack this file to your MISO storage directory, which again is `/storage/miso` 
 * security.properties - properties to set the security environment (see 2.4 below).
 * submission.properties - properties to set the submission environment (see 2.5 below).
 
-2.4 ) Setting the security environment
+4.4 ) Setting the security environment
 
 MISO can use either LDAP or SQL as an authentication mechanism, and will need to know where your chosen method resides. These
 properties need to be set before the container is started, and relate to properties files stored on disk.
@@ -188,12 +202,12 @@ To set the `security.method` property, use local environment variables on Tomcat
 
 > SEVERE: Context [/tgac] startup failed due to previous errors
 
-2.5 ) Submission properties
+4.5 ) Submission properties
 
 MISO is able to submit sequence data to the major sequence archives, i.e. the SRA at the EBI, and the EMBL GenBank. Currently,
 only ERA submissions are supported out-of-the-box. The settings for these services are specified in the `submission.properties` file.
 
-3 ) STARTING MISO
+5 ) STARTING MISO
 -----------------
 
 To set the `security.method` property to use the local MISO database and start the Tomcat instance, run the following command, which will use the JDBC security.method and assign 768MB RAM to the Java heap:
