@@ -42,11 +42,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Created by IntelliJ IDEA.
- * User: collesa
- * Date: 04/04/12
+ * User: davey
+ * Date: 08/10/12
  * Time: 15:15
- * To change this template use File | Settings | File Templates.
  */
 @ServiceProvider
 public class IRODSFilepathGenerator implements FilePathGenerator {
@@ -81,8 +79,8 @@ public class IRODSFilepathGenerator implements FilePathGenerator {
     Pool<? extends Poolable> pool = partition.getPool();
     if (pool != null) {
       if (pool.getExperiments() != null) {
-        Collection<Experiment> experiments = pool.getExperiments();
-        Experiment experiment = experiments.iterator().next();
+        //Collection<Experiment> experiments = pool.getExperiments();
+        //Experiment experiment = experiments.iterator().next();
         StringBuilder filePath = new StringBuilder();
         try {
           IRODSGenQueryBuilder builder = new IRODSGenQueryBuilder(true, null);
@@ -120,7 +118,7 @@ public class IRODSFilepathGenerator implements FilePathGenerator {
         return new File(filePath.toString());
       }
       else {
-        throw new SubmissionException("partition.getPool=null!");
+        throw new SubmissionException("No experiments");
       }
     }
     else {
