@@ -30,6 +30,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Submittable;
 import uk.ac.bbsrc.tgac.miso.core.data.decorator.AbstractSubmittableDecorator;
 import uk.ac.bbsrc.tgac.miso.core.util.TgacSubmissionConstants;
 
+import java.util.Properties;
+
 /**
  * Decorates a Sample so that an ERA submission XML document can be built from it
  *
@@ -39,20 +41,20 @@ import uk.ac.bbsrc.tgac.miso.core.util.TgacSubmissionConstants;
  */
 public class EraSampleDecorator extends AbstractSubmittableDecorator<Document> {
 
-  public EraSampleDecorator(Submittable submittable, Document submission) {
-    super(submittable);
+  public EraSampleDecorator(Submittable submittable, Properties submissionProperties, Document submission) {
+    super(submittable, submissionProperties);
     this.submission = submission;
   }
 
   public void buildSubmission() {
-    submittable.buildSubmission();
+    //submittable.buildSubmission();
 
     Sample sample = (Sample)submittable;
     Element s = submission.createElementNS(null, "SAMPLE");
 
     s.setAttribute("alias", sample.getAlias());
 
-    s.setAttribute("center_name", TgacSubmissionConstants.CENTRE_NAME.getKey());
+    s.setAttribute("center_name", submissionProperties.getProperty("submission.centreName"));
 
     Element sampleTitle = submission.createElementNS(null, "TITLE");
     sampleTitle.setTextContent(sample.getAlias());

@@ -28,9 +28,6 @@ import org.w3c.dom.Element;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.decorator.submission.era.*;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.*;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaRun;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ls454.LS454Run;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.solid.SolidRun;
 import java.util.*;
 
 /**
@@ -40,7 +37,6 @@ import java.util.*;
  * @since 0.0.2
  */
 public class ERASubmissionFactory {
-
   /**
    * Generate a SRA XML fragment from a homogenous collection of Submittable elements
    *
@@ -48,18 +44,18 @@ public class ERASubmissionFactory {
    * @param submittables of type Collection
    * @param submittableType of type String
    */
-  public static void generateSubmissionXML(Document doc, Collection submittables, String submittableType) {
+  public static void generateSubmissionXML(Document doc, Collection submittables, String submittableType, Properties submissionProperties) {
     if (submittableType.equals("study")) {
-      generateStudySubmissionXML(doc, submittables);
+      generateStudySubmissionXML(doc, submittables, submissionProperties);
     }
     else if (submittableType.equals("sample")) {
-      generateSampleSubmissionXML(doc, submittables);
+      generateSampleSubmissionXML(doc, submittables, submissionProperties);
     }
     else if (submittableType.equals("experiment")) {
-      generateExperimentSubmissionXML(doc, submittables);
+      generateExperimentSubmissionXML(doc, submittables, submissionProperties);
     }
     else if (submittableType.equals("run")) {
-      generatePartitionRunSubmissionXML(doc, submittables);
+      generatePartitionRunSubmissionXML(doc, submittables, submissionProperties);
     }
     else {
 
@@ -72,8 +68,8 @@ public class ERASubmissionFactory {
    * @param doc of type Document
    * @param submission of type SubmissionImpl
    */
-  public static void generateParentSubmissionXML(Document doc, Submission submission) {
-    new EraSubmissionDecorator(submission, doc).buildSubmission();  
+  public static void generateParentSubmissionXML(Document doc, Submission submission, Properties submissionProperties) {
+    new EraSubmissionDecorator(submission, submissionProperties, doc).buildSubmission();
   }
 
  /**
@@ -82,8 +78,8 @@ public class ERASubmissionFactory {
    * @param doc of type Document
    * @param s of type Study
    */
-  public static void generateStudySubmissionXML(Document doc, Study s) {
-    new EraStudyDecorator(s, doc).buildSubmission();
+  public static void generateStudySubmissionXML(Document doc, Study s, Properties submissionProperties) {
+    new EraStudyDecorator(s, submissionProperties, doc).buildSubmission();
   }
 
   /**
@@ -92,14 +88,14 @@ public class ERASubmissionFactory {
    * @param doc of type Document
    * @param c of type Collection<Study>
    */
-  public static void generateStudySubmissionXML(Document doc, Collection<Study> c) {
+  public static void generateStudySubmissionXML(Document doc, Collection<Study> c, Properties submissionProperties) {
     if (c.size() > 1) {
       Element set = doc.createElementNS(null, "STUDY_SET");
       doc.appendChild(set);
     }
 
     for (Study s : c) {
-      generateStudySubmissionXML(doc, s);
+      generateStudySubmissionXML(doc, s, submissionProperties);
     }
   }
 
@@ -109,8 +105,8 @@ public class ERASubmissionFactory {
    * @param doc of type Document
    * @param e of type Experiment
    */
-  public static void generateExperimentSubmissionXML(Document doc, Experiment e) {
-    new EraExperimentDecorator(e, doc).buildSubmission();  
+  public static void generateExperimentSubmissionXML(Document doc, Experiment e, Properties submissionProperties) {
+    new EraExperimentDecorator(e, submissionProperties, doc).buildSubmission();
   }
 
   /**
@@ -119,14 +115,14 @@ public class ERASubmissionFactory {
    * @param doc of type Document
    * @param c of type Collection<Experiment>
    */
-  public static void generateExperimentSubmissionXML(Document doc, Collection<Experiment> c) {
+  public static void generateExperimentSubmissionXML(Document doc, Collection<Experiment> c, Properties submissionProperties) {
     if (c.size() > 1) {
       Element set = doc.createElementNS(null, "EXPERIMENT_SET");
       doc.appendChild(set);
     }
 
     for (Experiment e : c) {
-      generateExperimentSubmissionXML(doc, e);
+      generateExperimentSubmissionXML(doc, e, submissionProperties);
     }
   }
 
@@ -136,8 +132,8 @@ public class ERASubmissionFactory {
    * @param doc of type Document
    * @param s of type Sample
    */
-  public static void generateSampleSubmissionXML(Document doc, Sample s) {
-    new EraSampleDecorator(s, doc).buildSubmission();
+  public static void generateSampleSubmissionXML(Document doc, Sample s, Properties submissionProperties) {
+    new EraSampleDecorator(s, submissionProperties, doc).buildSubmission();
   }
 
   /**
@@ -146,14 +142,14 @@ public class ERASubmissionFactory {
    * @param doc of type Document
    * @param c of type Collection<Sample>
    */
-  public static void generateSampleSubmissionXML(Document doc, Collection<Sample> c) {
+  public static void generateSampleSubmissionXML(Document doc, Collection<Sample> c, Properties submissionProperties) {
     if (c.size() > 1) {
       Element set = doc.createElementNS(null, "SAMPLE_SET");
       doc.appendChild(set);
     }
 
     for (Sample s : c) {
-      generateSampleSubmissionXML(doc, s);
+      generateSampleSubmissionXML(doc, s, submissionProperties);
     }
   }
 
@@ -164,8 +160,8 @@ public class ERASubmissionFactory {
    * @param doc of type Document
    * @param p of type SequencerExperimentPartition
    */
-  public static void generatePartitionRunSubmissionXML(Document doc, SequencerPoolPartition p) {
-    new EraRunDecorator(p, doc).buildSubmission();
+  public static void generatePartitionRunSubmissionXML(Document doc, SequencerPoolPartition p, Properties submissionProperties) {
+    new EraRunDecorator(p, submissionProperties, doc).buildSubmission();
   }
 
  /**
@@ -176,8 +172,8 @@ public class ERASubmissionFactory {
    * @param p of type SequencerExperimentPartition
    * @param r of type Run
    */
-  public static void generatePartitionRunSubmissionXML(Document doc, SequencerPoolPartition p, Run r) {
-    new EraRunDecorator(p, r, doc).buildSubmission();
+  public static void generatePartitionRunSubmissionXML(Document doc, SequencerPoolPartition p, Run r, Properties submissionProperties) {
+    new EraRunDecorator(p, r, submissionProperties, doc).buildSubmission();
   }
 
   /**
@@ -186,14 +182,14 @@ public class ERASubmissionFactory {
    * @param doc of type Document
    * @param c of type Collection<SequencerPoolPartition>
    */
-  public static void generatePartitionRunSubmissionXML(Document doc, Collection<SequencerPoolPartition> c) {
+  public static void generatePartitionRunSubmissionXML(Document doc, Collection<SequencerPoolPartition> c, Properties submissionProperties) {
     if (c.size() > 1) {
       Element set = doc.createElementNS(null, "RUN_SET");
       doc.appendChild(set);
     }
 
     for (SequencerPoolPartition p : c) {
-      generatePartitionRunSubmissionXML(doc, p);
+      generatePartitionRunSubmissionXML(doc, p, submissionProperties);
     }
   }
 
@@ -203,50 +199,16 @@ public class ERASubmissionFactory {
    * @param doc of type Document
    * @param r of type Run
    */
-  public static void generateFullRunSubmissionXML(Document doc, Run r) {
-
+  public static void generateFullRunSubmissionXML(Document doc, Run r, Properties submissionProperties) {
     Element runSet = doc.createElementNS(null, "RUN_SET");
     doc.appendChild(runSet);
 
     for (SequencerPartitionContainer<SequencerPoolPartition> f : ((RunImpl)r).getSequencerPartitionContainers()) {
       for (SequencerPoolPartition p : f.getPartitions()) {
         if (p.getPool() != null) {
-          generatePartitionRunSubmissionXML(doc, p, r);
+          generatePartitionRunSubmissionXML(doc, p, r, submissionProperties);
         }
       }
     }
-
-    /*
-    if (r instanceof IlluminaRun) {
-      for (Flowcell f : ((IlluminaRun) r).getFlowcells()) {
-        for (SequencerPoolPartition l : ((LaneFlowcell) f).getPartitions()) {
-          if (l.getPool() != null) {
-            generatePartitionRunSubmissionXML(doc, l);
-          }
-        }
-      }
-    }
-    else if (r instanceof LS454Run) {
-      for (Flowcell f : ((LS454Run) r).getFlowcells()) {
-        for (Chamber c : ((ChamberFlowcell) f).getPartitions()) {
-          if (c.getPool() != null) {
-            generatePartitionRunSubmissionXML(doc, c);
-          }
-        }
-      }
-    }
-    else if (r instanceof SolidRun) {
-      for (Flowcell f : ((SolidRun) r).getFlowcells()) {
-        for (Chamber c : ((ChamberFlowcell) f).getPartitions()) {
-          if (c.getPool() != null) {
-            generatePartitionRunSubmissionXML(doc, c);
-          }
-        }
-      }
-    }
-    else {
-
-    }
-    */
   }
 }

@@ -40,6 +40,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
+import java.util.Properties;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.test
@@ -78,7 +79,7 @@ public class EraSubmissionTests {
           log.debug("Error while attempting to build document");
       }
 
-      new EraStudyDecorator(s, submissionDocument).buildSubmission();
+      new EraStudyDecorator(s, new Properties(), submissionDocument).buildSubmission();
       try{
       SubmissionUtils.transform(submissionDocument,
               new File("/tmp/testSubmission.xml"));

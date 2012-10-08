@@ -70,6 +70,7 @@ public class PacBioRun extends RunImpl {
   }
 
   public void buildSubmission() {
+    /*
     try {
       DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
       submissionDocument = docBuilder.newDocument();
@@ -78,6 +79,7 @@ public class PacBioRun extends RunImpl {
       e.printStackTrace();
     }
     ERASubmissionFactory.generateFullRunSubmissionXML(submissionDocument, this);
+    */
   }
 
   /**

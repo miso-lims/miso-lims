@@ -32,6 +32,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.TgacSubmissionConstants;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Decorates an Experiment so that an ERA Experiment submission XML document can be built from it
@@ -42,20 +43,20 @@ import java.util.List;
  */
 public class EraExperimentDecorator extends AbstractSubmittableDecorator<Document> {
 
-  public EraExperimentDecorator(Submittable submittable, Document submission) {
-    super(submittable);
+  public EraExperimentDecorator(Submittable submittable, Properties submissionProperties, Document submission) {
+    super(submittable, submissionProperties);
     this.submission = submission;
   }
 
   public void buildSubmission() {
-    submittable.buildSubmission();
+    //submittable.buildSubmission();
     Experiment e = (Experiment)submittable;
     
     if (submission != null) {
       Element experiment = submission.createElementNS(null, "EXPERIMENT");
       experiment.setAttribute("alias", e.getAlias());
       //experiment.setAttribute("accession", e.getAccession());
-      experiment.setAttribute("center_name", TgacSubmissionConstants.CENTRE_NAME.getKey());
+      experiment.setAttribute("center_name", submissionProperties.getProperty("submission.centreName"));
       //submission.appendChild(experiment);
 
       Element experimentTitle = submission.createElementNS(null, "TITLE");
@@ -64,7 +65,7 @@ public class EraExperimentDecorator extends AbstractSubmittableDecorator<Documen
 
       Element studyRef = submission.createElementNS(null, "STUDY_REF");
       studyRef.setAttribute("refname", e.getStudy().getAlias());
-      studyRef.setAttribute("refcenter", TgacSubmissionConstants.CENTRE_NAME.getKey());
+      studyRef.setAttribute("refcenter", submissionProperties.getProperty("submission.centreName"));
       if (e.getStudy().getAccession() != null && !"".equals(e.getStudy().getAccession())) {
         studyRef.setAttribute("accession", e.getStudy().getAccession());
       }
@@ -78,7 +79,7 @@ public class EraExperimentDecorator extends AbstractSubmittableDecorator<Documen
       design.appendChild(designDescription);
 
       Element sampleDescriptor = submission.createElementNS(null, "SAMPLE_DESCRIPTOR");
-      sampleDescriptor.setAttribute("refcenter", TgacSubmissionConstants.CENTRE_NAME.getKey());
+      sampleDescriptor.setAttribute("refcenter", submissionProperties.getProperty("submission.centreName"));
 
       Library relevantLibrary = null;
 
@@ -92,6 +93,7 @@ public class EraExperimentDecorator extends AbstractSubmittableDecorator<Documen
             relevantLibrary = dil.getLibrary();
             Element member = submission.createElementNS(null, "MEMBER");
             member.setAttribute("member_name", dil.getName());
+            member.setAttribute("refcenter", submissionProperties.getProperty("submission.centreName"));
             member.setAttribute("refname", relevantLibrary.getSample().getAlias());
             if (relevantLibrary.getSample().getAccession() != null && !"".equals(relevantLibrary.getSample().getAccession())) {
               sampleDescriptor.setAttribute("accession", relevantLibrary.getSample().getAccession());
@@ -116,6 +118,7 @@ public class EraExperimentDecorator extends AbstractSubmittableDecorator<Documen
           for (Dilution dil : e.getPool().getDilutions()) {
             relevantLibrary = dil.getLibrary();
             sampleDescriptor.setAttribute("refname", relevantLibrary.getSample().getAlias());
+            sampleDescriptor.setAttribute("refcenter", submissionProperties.getProperty("submission.centreName"));
             if (relevantLibrary.getSample().getAccession() != null && !"".equals(relevantLibrary.getSample().getAccession())) {
               sampleDescriptor.setAttribute("accession", relevantLibrary.getSample().getAccession());
             }

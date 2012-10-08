@@ -375,6 +375,7 @@ public class SubmissionControllerHelperService {
           for (Run r : runs) {
             sb.append("<li>");
             sb.append("<a href='/miso/run/" + r.getId() + "'><b>" + r.getName() + "</b> : " + r.getAlias() + "</a>");
+            sb.append("<input type='hidden' id='RUN_"+r.getId()+"' name='RUN_"+r.getId()+"' value='"+r.getId()+"'/>");
             sb.append("<ul>");
 
             //creates HTML list of partition containers for each run

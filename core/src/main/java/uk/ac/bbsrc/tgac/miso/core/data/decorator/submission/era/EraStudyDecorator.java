@@ -29,6 +29,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Submittable;
 import uk.ac.bbsrc.tgac.miso.core.data.decorator.AbstractSubmittableDecorator;
 
+import java.util.Properties;
+
 /**
  * Decorates a Study so that an ERA Study submission XML document can be built from it
  *
@@ -38,19 +40,19 @@ import uk.ac.bbsrc.tgac.miso.core.data.decorator.AbstractSubmittableDecorator;
  */
 public class EraStudyDecorator extends AbstractSubmittableDecorator<Document> {
 
-  public EraStudyDecorator(Submittable submittable, Document submission) {
-    super(submittable);
+  public EraStudyDecorator(Submittable submittable, Properties submissionProperties, Document submission) {
+    super(submittable, submissionProperties);
     this.submission = submission;
   }
 
   public void buildSubmission() {
-    submittable.buildSubmission();
+    //submittable.buildSubmission();
 
     Study s = (Study)submittable;
     if (submission != null) {
 
       Element study = submission.createElement("STUDY");
-      study.setAttribute("accession", s.getAccession());
+      //study.setAttribute("accession", s.getAccession());
       study.setAttribute("alias", s.getAlias());
 
       Element studyDescriptor = submission.createElementNS(null, "DESCRIPTOR");

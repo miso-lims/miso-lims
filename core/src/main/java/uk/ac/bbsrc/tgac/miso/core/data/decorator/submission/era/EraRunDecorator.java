@@ -32,11 +32,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.decorator.AbstractSubmittableDecorator;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.service.submission.FilePathGenerator;
 import uk.ac.bbsrc.tgac.miso.core.service.submission.TGACIlluminaFilepathGenerator;
-import uk.ac.bbsrc.tgac.miso.core.util.TgacSubmissionConstants;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Properties;
 
 /**
  * Decorates a SequencerPoolPartition so that an ERA Run submission XML document can be built from it
@@ -49,13 +49,13 @@ public class EraRunDecorator extends AbstractSubmittableDecorator<Document> {
 
   private Run r;
   protected static final Logger log = LoggerFactory.getLogger(EraRunDecorator.class);
-  public EraRunDecorator(Submittable submittable, Document submission) {
-    super(submittable);
+  public EraRunDecorator(Submittable submittable, Properties submissionProperties, Document submission) {
+    super(submittable, submissionProperties);
     this.submission = submission;
   }
 
-  public EraRunDecorator(Submittable submittable, Run r, Document submission) {
-    super(submittable);
+  public EraRunDecorator(Submittable submittable, Run r, Properties submissionProperties, Document submission) {
+    super(submittable, submissionProperties);
     this.submission = submission;
     this.r = r;
   }
@@ -66,54 +66,49 @@ public class EraRunDecorator extends AbstractSubmittableDecorator<Document> {
     if (p.getPool() != null) {
       Pool<? extends Poolable> pool = p.getPool();
 
-      log.debug("pool:" + pool.getName());
       //TODO - fix this. not great.
-      //Run r = p.getFlowcell().getRun();
       Run r = p.getSequencerPartitionContainer().getRun();
 
       if (r == null) r = this.r;
 
       if (r != null) {
-
         Element run = submission.createElementNS(null, "RUN");
         run.setAttribute("alias", r.getName());
-        run.setAttribute("run_center", TgacSubmissionConstants.CENTRE_ACRONYM.getKey());
+        run.setAttribute("run_center", submissionProperties.getProperty("submission.centreName"));
         if (r.getStatus()!= null && r.getStatus().getHealth().equals(HealthType.Completed)) {
           DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
           run.setAttribute("run_date", df.format(r.getStatus().getCompletionDate()));
         }
-        run.setAttribute("center_name", TgacSubmissionConstants.CENTRE_NAME.getKey());
-        //doc.appendChild(run);
+        run.setAttribute("center_name", submissionProperties.getProperty("submission.centreName"));
+
         Collection<Experiment> es = pool.getExperiments();
         for (Experiment e : es) {
           Element experimentRef = submission.createElementNS(null, "EXPERIMENT_REF");
-          experimentRef.setAttribute("refname", e.getName());
-          experimentRef.setAttribute("refcenter", TgacSubmissionConstants.CENTRE_NAME.getKey());
+          experimentRef.setAttribute("refname", e.getAlias());
+          experimentRef.setAttribute("refcenter", submissionProperties.getProperty("submission.centreName"));
           run.appendChild(experimentRef);
         }
 
         Element dataBlock = submission.createElementNS(null, "DATA_BLOCK");
-        //dataBlock.setAttribute("name", l.getFlowcell().getName());
         dataBlock.setAttribute("sector", Integer.toString(p.getPartitionNumber()));
-        //dataBlock.setAttribute("region", "0"); // tile number
 
         Element files = submission.createElementNS(null, "FILES");
         Collection<? extends Dilution> dilutions = pool.getDilutions();
+
         FilePathGenerator fpg = new TGACIlluminaFilepathGenerator();
+        String basePath = submissionProperties.getProperty("submission.baseReadPath");
+        if (basePath != null) {
+          fpg = new TGACIlluminaFilepathGenerator(basePath);
+        }
+
         for(Dilution libraryDilution : dilutions) {
-
-            //replace with FPG call?
-           // String fileName=libraryDilution.getLibrary().getName()+"_"+
-           //         libraryDilution.getLibrary().getTagBarcode().getSequence()+
-           //         "_L00"+p.getPartitionNumber()+"*.fastq.gz";
-
-          try{
+          try {
             String fileName = fpg.generateFilePath(p,libraryDilution).getName();
             Element file = submission.createElementNS(null,"FILE");
             file.setAttribute("filename", fileName);
             file.setAttribute("filetype", "fastq");
-            //file.setAttribute("checksum_method", "MD5");
-            //file.setAttribute("checksum", "not implemented yet");
+            file.setAttribute("checksum_method", "MD5");
+            file.setAttribute("checksum", "");
             Element readLabel = submission.createElementNS(null, "READ_LABEL");
             file.appendChild(readLabel);
             files.appendChild(file);
@@ -123,15 +118,7 @@ public class EraRunDecorator extends AbstractSubmittableDecorator<Document> {
           }
         }
         dataBlock.appendChild(files);
-
         run.appendChild(dataBlock);
-  /*
-        for (String s : p.getDataFile()) {
-          Element file = doc.createElementNS(null, "FILE");
-          file.setAttribute("filename", s);
-          file.setAttribute("filetype", s.substring(s.lastIndexOf("."), s.length()));
-        }
-  */
 
         if (submission.getElementsByTagName("RUN_SET").item(0) != null) {
           submission.getElementsByTagName("RUN_SET").item(0).appendChild(run);
@@ -140,13 +127,6 @@ public class EraRunDecorator extends AbstractSubmittableDecorator<Document> {
           submission.appendChild(run);
         }
       }
-      /*
-      else {
-        Element runSet=submission.createElementNS(null,"RUN_SET");
-        submission.appendChild(runSet);
-        runSet.appendChild(run);
-      }
-      */
     }
   }
 }

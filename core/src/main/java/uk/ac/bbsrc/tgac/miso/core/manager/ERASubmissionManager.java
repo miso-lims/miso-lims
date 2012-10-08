@@ -72,12 +72,18 @@ import java.util.*;
  * @since 0.0.2
  */
 public class ERASubmissionManager implements SubmissionManager<Set<Submittable<Document>>, URL, Document> {
+  @Autowired
+  private Properties submissionProperties;
+
+  public void setSubmissionProperties(Properties submissionProperties) {
+    this.submissionProperties = submissionProperties;
+  }
 
   @Autowired
   private RequestManager requestManager;
 
   public void setRequestManager(RequestManager requestManager) {
-  this.requestManager = requestManager;
+    this.requestManager = requestManager;
   }
 
   @Autowired
@@ -90,15 +96,25 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
   /** Field log  */
   protected static final Logger log = LoggerFactory.getLogger(ERASubmissionManager.class);
 
+  private String centreName;
   private String accountName;
   private String dropBox;
   private String authKey;
-  private String proxyHost;
-  private String proxyUser;
-  private String proxyPass;
+  //private String proxyHost;
+  //private String proxyUser;
+  //private String proxyPass;
   private URL submissionEndPoint;
   private String submissionStoragePath;
   private Map<Long,UploadReport> uploadReports = new HashMap<Long,UploadReport>();
+  /**
+   * Sets the centreName of this ERASubmissionManager object.
+   *
+   * @param centreName centreName.
+   */
+  public void setCentreName(String centreName) {
+    this.centreName = centreName;
+  }
+
   /**
    * Sets the accountName of this ERASubmissionManager object.
    *
@@ -131,27 +147,27 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
    *
    * @param proxyHost proxyHost.
    */
-  public void setProxyHost(String proxyHost) {
-    this.proxyHost = proxyHost;
-  }
+//  public void setProxyHost(String proxyHost) {
+//    this.proxyHost = proxyHost;
+//  }
 
   /**
    * Sets the proxyUser of this ERASubmissionManager object if a proxy needs to be traversed
    *
    * @param proxyUser proxyUser.
    */
-  public void setProxyUser(String proxyUser) {
-    this.proxyUser = proxyUser;
-  }
+//  public void setProxyUser(String proxyUser) {
+//    this.proxyUser = proxyUser;
+//  }
 
   /**
    * Sets the proxyPass of this ERASubmissionManager object if a proxy needs to be traversed
    *
    * @param proxyPass proxyPass.
    */
-  public void setProxyPass(String proxyPass) {
-    this.proxyPass = proxyPass;
-  }
+//  public void setProxyPass(String proxyPass) {
+//    this.proxyPass = proxyPass;
+//  }
 
   /**
    * Sets the submissionEndPoint of this ERASubmissionManager object.
@@ -225,7 +241,7 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
         for (String key : map.keySet()) {
           List<Submittable<Document>> submittables = map.get(key);
           Document submissionDocument = docBuilder.newDocument();
-          ERASubmissionFactory.generateSubmissionXML(submissionDocument, submittables, key);
+          ERASubmissionFactory.generateSubmissionXML(submissionDocument, submittables, key, submissionProperties);
 
           //generate xml files on disk
           SubmissionUtils.transform(submissionDocument,
@@ -239,7 +255,7 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
         }
 
         Document submissionDocument = docBuilder.newDocument();
-        ERASubmissionFactory.generateParentSubmissionXML(submissionDocument, submission);
+        ERASubmissionFactory.generateParentSubmissionXML(submissionDocument, submission, submissionProperties);
         SubmissionUtils.transform(submissionDocument,
                                   new File(subPath,
                                            File.separator+
@@ -276,7 +292,7 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
       DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 
       if (submissionEndPoint == null) {
-        throw new SubmissionException("No submission endpoint configured. Please check the Spring miso-config.xml file.");
+        throw new SubmissionException("No submission endpoint configured. Please check your submission.properties file.");
       }
 
       if (submissionData == null || submissionData.size() == 0) {
@@ -287,10 +303,17 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
         throw new SubmissionException("An accountName, dropBox and authKey must be supplied!");
       }
 
+      if (centreName == null) {
+        throw new SubmissionException("No centreName configured. Please check your submission.properties file and specify your Center Name as given by the SRA.");
+      }
+
       String curl = "curl -k ";
 
       StringBuilder sb = new StringBuilder();
       sb.append(curl);
+      String proxyHost = submissionProperties.getProperty("submission.proxyHost");
+      String proxyUser = submissionProperties.getProperty("submission.proxyUser");
+      String proxyPass = submissionProperties.getProperty("submission.proxyPass");
 
       if (proxyHost != null && !proxyHost.equals("")) {
         sb.append("-x ").append(proxyHost);
@@ -306,7 +329,6 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
 
       //submit via REST to endpoint
       try {
-
         Map<String, List<Submittable<Document>>> map = new HashMap<String, List<Submittable<Document>>>();
         map.put("study", new ArrayList<Submittable<Document>>());
         map.put("sample", new ArrayList<Submittable<Document>>());
@@ -319,7 +341,7 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
         for (Submittable<Document> s : submissionData) {
           if (s instanceof Submission) {
             //s.buildSubmission();
-            ERASubmissionFactory.generateParentSubmissionXML(submissionXml, (Submission) s);
+            ERASubmissionFactory.generateParentSubmissionXML(submissionXml, (Submission) s, submissionProperties);
             subName = ((Submission) s).getName();
           }
           else if (s instanceof Study) {
@@ -337,39 +359,28 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
         }
 
         if (submissionXml != null && subName != null) {
-
           String url = getSubmissionEndPoint() + "?auth=ERA%20" + dropBox + "%20" + authKey;
-
           HttpClient httpclient = getEvilTrustingTrustManager(new DefaultHttpClient());
-
-              HttpPost httppost = new HttpPost(url);
-
+          HttpPost httppost = new HttpPost(url);
           MultipartEntity reqEntity = new MultipartEntity();
 
           String submissionXmlFileName = subName + File.separator + subName + "_submission.xml";
 
           File subtmp = new File(submissionStoragePath + submissionXmlFileName);
-
           SubmissionUtils.transform(submissionXml, subtmp, true);
 
           reqEntity.addPart("SUBMISSION", new FileBody(subtmp));
-
           for (String key : map.keySet()) {
-
             List<Submittable<Document>> submittables = map.get(key);
-
             String submittableXmlFileName = subName
                                             + File.separator
                                             + subName
                                             + "_"
                                             + key.toLowerCase()
                                             + ".xml";
-
             File elementTmp = new File(submissionStoragePath + submittableXmlFileName);
-
             Document submissionDocument = docBuilder.newDocument();
-
-            ERASubmissionFactory.generateSubmissionXML(submissionDocument, submittables, key);
+            ERASubmissionFactory.generateSubmissionXML(submissionDocument, submittables, key, submissionProperties);
             SubmissionUtils.transform(submissionDocument, elementTmp, true);
             reqEntity.addPart(key.toUpperCase(), new FileBody(elementTmp));
           }
@@ -380,9 +391,7 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
           if (response.getStatusLine().getStatusCode() == 200) {
             HttpEntity resEntity = response.getEntity();
             try {
-
               Document submissionReport = docBuilder.newDocument();
-
               SubmissionUtils.transform(resEntity.getContent(), submissionReport);
               DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
               File savedReport = new File(submissionStoragePath
@@ -402,7 +411,6 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
             }
           }
           else {
-
             throw new SubmissionException("Response from submission endpoint (" + url + ") was not OK (200). Was: " + response.getStatusLine().getStatusCode());
           }
         }
@@ -447,57 +455,57 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
   }
 
   public String submitSequenceData(Submission s){
-      Set<File> dataFiles = new HashSet<File>();
-      FilePathGenerator FPG = new TGACIlluminaFilepathGenerator();
-      //FilePathGenerator FPG = new FakeFilepathGenerator();
+    Set<File> dataFiles = new HashSet<File>();
+    FilePathGenerator FPG = new TGACIlluminaFilepathGenerator();
+    //FilePathGenerator FPG = new FakeFilepathGenerator();
 
-      for(Object o: s.getSubmissionElements()){
-          if(o instanceof SequencerPoolPartition){
-            SequencerPoolPartition l = (SequencerPoolPartition) o;
-           //  if( l.getPool()!=null){
+    for(Object o: s.getSubmissionElements()){
+      if(o instanceof SequencerPoolPartition){
+        SequencerPoolPartition l = (SequencerPoolPartition) o;
+       //  if( l.getPool()!=null){
 //            Collection<LibraryDilution> ld=l.getPool().getDilutions();
 //              LibraryDilution libd=ld.iterator().next();
-            try{
-            dataFiles = FPG.generateFilePaths(l);
-            }catch(SubmissionException submissionException){submissionException.printStackTrace();}
-
-          }
+        try {
+          dataFiles = FPG.generateFilePaths(l);
+        }
+        catch (SubmissionException submissionException){
+          submissionException.printStackTrace();
+        }
       }
+    }
 
-
-      if(dataFiles.size()>0){
+    if(dataFiles.size()>0){
       TransferMethod t = new FTPTransferMethod();
       EndPoint end = new ERAEndpoint();
       end.setDestination("localhost");
       //end.setDestination(submissionEndPoint.toExternalForm());
 
-      try{
+      try {
+        UploadReport report=t.uploadSequenceData(dataFiles, end);
+        uploadReports.put(s.getId(),report);
 
-          UploadReport report=t.uploadSequenceData(dataFiles, end);
-          uploadReports.put(s.getId(),report);
-
-          return("attempting to upload files...");
+        return("Attempting to upload files...");
       }
-      catch (Exception e){e.printStackTrace();
-      return ("there was an error");
+      catch (Exception e) {
+        e.printStackTrace();
+        return ("There was an error: " + e.getMessage());
       }
-      }
-      else return("No datafiles were found to upload");
-
+    }
+    else return("No datafiles were found to upload");
   }
 
-    @Override
-    public UploadReport getUploadProgress(Long submissionId) {
-
-        try{
-
-        return uploadReports.get(submissionId);
-        }
-        catch(Exception e){e.printStackTrace(); return null;}
-
+  @Override
+  public UploadReport getUploadProgress(Long submissionId) {
+    try{
+      return uploadReports.get(submissionId);
     }
+    catch(Exception e){
+      e.printStackTrace();
+    }
+    return null;
+  }
 
-    public void setTransferMethod(TransferMethod transferMethod){
+  public void setTransferMethod(TransferMethod transferMethod) {
 
   }
    /*
@@ -507,17 +515,13 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
     */
 
   public String prettifySubmissionMetadata(Submission submission) throws SubmissionException {
-
-
-      StringBuilder sb = new StringBuilder();
+    StringBuilder sb = new StringBuilder();
     try {
       Collection<File> files = misoFileManager.getFiles(Submission.class, submission.getName());
 
       InputStream in = null;
       for (File f : files) {
-
         if (f.getName().contains("submission")) {
-
           in = ERASubmissionManager.class.getResourceAsStream("/submission/xsl/eraSubmission.xsl");
           if (in != null) {
             String xsl = LimsUtils.inputStreamToString(in);
@@ -528,8 +532,6 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
 
       for (File f : files) {
         if (f.getName().contains("study")) {
-
-
           in = ERASubmissionManager.class.getResourceAsStream("/submission/xsl/eraStudy.xsl");
           if (in != null) {
             String xsl = LimsUtils.inputStreamToString(in);

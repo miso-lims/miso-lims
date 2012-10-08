@@ -43,13 +43,13 @@ import java.util.*;
  */
 public class EraSubmissionDecorator extends AbstractSubmittableDecorator<Document> {
 
-  public EraSubmissionDecorator(Submission submittable, Document submission) {
-    super(submittable);
+  public EraSubmissionDecorator(Submission submittable, Properties submissionProperties, Document submission) {
+    super(submittable, submissionProperties);
     this.submission = submission;
   }
 
   public void buildSubmission() {
-    submittable.buildSubmission();
+    //submittable.buildSubmission();
     Submission sub = (Submission)submittable;
 
     if (submission != null) {
@@ -58,16 +58,18 @@ public class EraSubmissionDecorator extends AbstractSubmittableDecorator<Documen
       DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
       s.setAttribute("submission_date", df.format(new Date()));
       //s.setAttribute("submission_comment", submission.getComment());
-      s.setAttribute("center_name", TgacSubmissionConstants.CENTRE_ACRONYM.getKey());
+      s.setAttribute("center_name", submissionProperties.getProperty("submission.centreName"));
 
       Element title = submission.createElementNS(null, "TITLE");
       title.setTextContent(sub.getTitle());
       s.appendChild(title);
 
       Element contacts = submission.createElementNS(null, "CONTACTS");
-      Element contact = submission.createElementNS(null, "CONTACT");
-      contact.setAttribute("name", "Robert Davey"); //TODO - add submitterName to Submission object
-      contacts.appendChild(contact);
+      for (String contactName : submissionProperties.getProperty("submission.contacts").split(",")) {
+        Element contact = submission.createElementNS(null, "CONTACT");
+        contact.setAttribute("name", contactName);
+        contacts.appendChild(contact);
+      }
       s.appendChild(contacts);
 
       SubmissionActionType sat = sub.getSubmissionActionType();

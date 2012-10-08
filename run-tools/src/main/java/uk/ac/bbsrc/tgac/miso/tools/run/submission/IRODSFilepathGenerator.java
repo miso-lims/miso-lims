@@ -21,22 +21,23 @@
  * *********************************************************************
  */
 
-package uk.ac.bbsrc.tgac.miso.core.service.submission;
+package uk.ac.bbsrc.tgac.miso.tools.run.submission;
 
 import net.sourceforge.fluxion.spi.ServiceProvider;
+import org.irods.jargon.core.connection.IRODSAccount;
+import org.irods.jargon.core.exception.JargonException;
+import org.irods.jargon.core.pub.*;
+import org.irods.jargon.core.query.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.*;
 import uk.ac.bbsrc.tgac.miso.core.exception.SubmissionException;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.core.service.submission.FilePathGenerator;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -48,15 +49,27 @@ import java.util.regex.Pattern;
  * To change this template use File | Settings | File Templates.
  */
 @ServiceProvider
-public class TGACIlluminaFilepathGenerator implements FilePathGenerator {
-  protected static final Logger log = LoggerFactory.getLogger(TGACIlluminaFilepathGenerator.class);
+public class IRODSFilepathGenerator implements FilePathGenerator {
+  protected static final Logger log = LoggerFactory.getLogger(IRODSFilepathGenerator.class);
 
   String basePath = "";
+  private IRODSFileSystem irodsFileSystem;
+  private IRODSAccount account;
+  private IRODSAccessObjectFactory irodsAccessObjectFactory;
+  private IRODSGenQueryExecutor queryExecutorAO;
 
-  public TGACIlluminaFilepathGenerator() {}
+  public IRODSFilepathGenerator(IRODSFileSystem irodsFileSystem, IRODSAccount account) {
+    this.irodsFileSystem = irodsFileSystem;
+    this.account = account;
 
-  public TGACIlluminaFilepathGenerator(String basePath) {
-    this.basePath = basePath;
+    try {
+      this.irodsAccessObjectFactory = irodsFileSystem.getIRODSAccessObjectFactory();
+      this.queryExecutorAO = irodsAccessObjectFactory.getIRODSGenQueryExecutor(account);
+    }
+    catch (JargonException e) {
+      log.error("Cannot create IRODSFilepathGenerator instance: " + e.getMessage());
+      e.printStackTrace();
+    }
   }
 
   public void setBaseReadPath(String basePath) {
@@ -71,22 +84,39 @@ public class TGACIlluminaFilepathGenerator implements FilePathGenerator {
         Collection<Experiment> experiments = pool.getExperiments();
         Experiment experiment = experiments.iterator().next();
         StringBuilder filePath = new StringBuilder();
-        if (!"".equals(basePath)) {
-          filePath.append(partition.getSequencerPartitionContainer().getRun().getFilePath() + "/Data/Intensities/BaseCalls/PAP/Project_" +
-                            experiment.getStudy().getProject().getAlias() + "/Sample_" + l.getLibrary().getName() + "/" +
-                            l.getLibrary().getName());
-        }
-        else {
-          filePath.append(basePath + "/" + experiment.getStudy().getProject().getAlias() + "/Sample_" + l.getLibrary().getName() + "/" +
-                            l.getLibrary().getName());
-        }
-        if (l.getLibrary().getTagBarcodes() != null && !l.getLibrary().getTagBarcodes().isEmpty()) {
-          filePath.append("_");
-          for (TagBarcode tb : l.getLibrary().getTagBarcodes().values()) {
-            filePath.append(tb.getSequence());
+        try {
+          IRODSGenQueryBuilder builder = new IRODSGenQueryBuilder(true, null);
+          try {
+            builder.addSelectAsGenQueryValue(RodsGenQueryEnum.COL_DATA_NAME)
+              .addConditionAsGenQueryField(
+                      RodsGenQueryEnum.COL_META_DATA_ATTR_NAME,
+                      QueryConditionOperators.EQUAL, "run_alias")
+              .addConditionAsGenQueryField(
+                      RodsGenQueryEnum.COL_META_DATA_ATTR_VALUE,
+                      QueryConditionOperators.EQUAL, partition.getSequencerPartitionContainer().getRun().getAlias())
+              .addConditionAsGenQueryField(
+                      RodsGenQueryEnum.COL_DATA_NAME,
+                      QueryConditionOperators.LIKE, l.getName()+"%")
+              .addOrderByGenQueryField(
+                      RodsGenQueryEnum.COL_DATA_NAME,
+                      GenQueryOrderByField.OrderByType.ASC);
+            IRODSGenQueryFromBuilder irodsQuery = builder.exportIRODSQueryFromBuilder(1);
+            List<String> filePaths = new ArrayList<String>();
+            collateResults(queryExecutorAO.executeIRODSQuery(irodsQuery, 0), filePaths);
+            log.info(LimsUtils.join(filePaths, " , "));
+          }
+          catch (GenQueryBuilderException e) {
+            log.error("error building query", e);
+            throw new JargonException("error building query", e);
+          }
+          catch (JargonQueryException jqe) {
+            log.error("error executing query", jqe);
+            throw new JargonException("error executing query", jqe);
           }
         }
-        filePath.append("_L00" + partition.getPartitionNumber() + "*.fastq.gz");
+        catch (JargonException e) {
+          e.printStackTrace();
+        }
         return new File(filePath.toString());
       }
       else {
@@ -95,6 +125,17 @@ public class TGACIlluminaFilepathGenerator implements FilePathGenerator {
     }
     else {
       throw new SubmissionException("Collection of experiments is empty");
+    }
+  }
+
+  private void collateResults(IRODSQueryResultSet resultSet, List<String> filePaths) throws JargonException, JargonQueryException {
+    for (IRODSQueryResultRow row : resultSet.getResults()) {
+      String col = row.getColumn(0);
+      filePaths.add(col);
+      log.info("Got: " + col);
+    }
+    if (resultSet.isHasMoreRecords()) {
+      collateResults(queryExecutorAO.getMoreResults(resultSet), filePaths);
     }
   }
 

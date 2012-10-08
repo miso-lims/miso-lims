@@ -25,6 +25,8 @@ package uk.ac.bbsrc.tgac.miso.core.data.decorator;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Submittable;
 
+import java.util.Properties;
+
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.decorator
  * <p/>
@@ -34,10 +36,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.Submittable;
  * @since 0.0.2
  */
 public abstract class AbstractSubmittableDecorator<O> implements Submittable<O> {
+  protected final Properties submissionProperties;
   protected final Submittable submittable;
   protected O submission;
 
-  public AbstractSubmittableDecorator(Submittable submittable) {
+  public AbstractSubmittableDecorator(Submittable submittable, Properties submissionProperties) {
     this.submittable = submittable;
+    this.submissionProperties = submissionProperties;
   }
 }

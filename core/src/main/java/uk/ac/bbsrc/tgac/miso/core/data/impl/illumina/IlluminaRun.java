@@ -118,6 +118,7 @@ public class IlluminaRun extends RunImpl {
   }
 
   public void buildSubmission() {
+    /*
     try {
       DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
       submissionDocument = docBuilder.newDocument();
@@ -126,6 +127,7 @@ public class IlluminaRun extends RunImpl {
       e.printStackTrace();
     }
     ERASubmissionFactory.generateFullRunSubmissionXML(submissionDocument, this);
+    */
   }
 
   @Override

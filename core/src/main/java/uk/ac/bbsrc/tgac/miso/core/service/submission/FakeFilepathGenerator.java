@@ -23,6 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.service.submission;
 
+import net.sourceforge.fluxion.spi.ServiceProvider;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 
@@ -40,6 +41,7 @@ import org.slf4j.LoggerFactory;
  * Time: 15:15
  * To change this template use File | Settings | File Templates.
  */
+@ServiceProvider
 public class FakeFilepathGenerator implements FilePathGenerator{
   protected static final Logger log = LoggerFactory.getLogger(FakeFilepathGenerator.class);
 

@@ -206,7 +206,8 @@ public class SQLTgacSubmissionDAO implements Store<Submission>, NamingSchemeAwar
         submission.setName(name);
 
         if (namingScheme.validateField("name", submission.getName())) {
-          params.addValue("name", name);
+          params.addValue("name", name)
+                .addValue("creationDate", new Date());
 
           Number newId = insert.executeAndReturnKey(params);
           if (newId.longValue() != submission.getId()) {
@@ -393,12 +394,6 @@ public class SQLTgacSubmissionDAO implements Store<Submission>, NamingSchemeAwar
           log.debug(t.getName() + ": added " + sample.getName());
         }
 
-        for (Experiment experiment : experimentDAO.listBySubmissionId(rs.getLong("submissionId"))) {
-          t.addSubmissionElement(experiment);
-          log.debug(t.getName() + ": added " + experiment.getName());
-        }
-        //not sure what this bit's for- re-using flowcells? If so, shouldn't it choose the last run in the list, not the first?
-        //gets all the partitions for this submission from the Submission_Partition_Dilution table
         for (SequencerPoolPartition partition : partitionDAO.listBySubmissionId(rs.getLong("submissionId"))) {
           //for each partition, lists all the runs on the flowcell/container
           SequencerPoolPartition newPartition = new PartitionImpl();
@@ -408,6 +403,7 @@ public class SQLTgacSubmissionDAO implements Store<Submission>, NamingSchemeAwar
 
           Pool<Dilution> newPool = new PoolImpl<Dilution>();
           Pool<? extends Poolable> oldPool = partition.getPool();
+          newPool.setId(oldPool.getId());
           newPool.setExperiments(oldPool.getExperiments());
 
           List<Run> runs = new ArrayList<Run>(runDAO.listBySequencerPartitionContainerId(partition.getSequencerPartitionContainer().getId()));
@@ -430,6 +426,17 @@ public class SQLTgacSubmissionDAO implements Store<Submission>, NamingSchemeAwar
           }
           //adds the new pool to the partition
           newPartition.setPool(newPool);
+
+          //replace any existing experiment-linked pools with the new pool
+          for (Experiment experiment : experimentDAO.listBySubmissionId(rs.getLong("submissionId"))) {
+            if (experiment.getPool().getId() == newPool.getId()) {
+              experiment.setPool(newPool);
+              t.addSubmissionElement(experiment);
+              log.debug(t.getName() + ": added " + experiment.getName());
+              break;
+            }
+          }
+
           //adds the partition to the submission
           log.debug("submission " + t.getId() + " new partition " + newPartition.getId() + " contains dilutions " + newPartition.getPool().getDilutions().toString());
           t.addSubmissionElement(newPartition);

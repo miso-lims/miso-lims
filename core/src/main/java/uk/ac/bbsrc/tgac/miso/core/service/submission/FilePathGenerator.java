@@ -23,6 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.service.submission;
 
+import net.sourceforge.fluxion.spi.Spi;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.exception.SubmissionException;
@@ -36,12 +37,15 @@ import java.util.Set;
  * @author Antony Colles
  * @since 0.1.6
  */
+@Spi
 public interface FilePathGenerator {
   /**
    * Generates file Paths for sequence datafiles
    *
-   //* @param dataFiles set of datafiles
+   * @param partition
+   * @param libraryDilution
    * @return Object response
+   * @throws uk.ac.bbsrc.tgac.miso.core.exception.SubmissionException
    */
   public File generateFilePath(SequencerPoolPartition partition, Dilution libraryDilution) throws SubmissionException;
 
