@@ -42,30 +42,30 @@
   <build>
     <plugins>
       <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-dependency-plugin</artifactId>
-          <version>2.0</version>
-          <executions>
-              <execution>
-                  <id>copy</id>
-                  <phase>process-sources</phase>
-                  <goals>
-                      <goal>copy</goal>
-                  </goals>
-                  <configuration>
-                      <artifactItems>
-                          <artifactItem>
-                              <groupId>org.aspectj</groupId>
-                              <artifactId>aspectjweaver</artifactId>
-                              <version>1.6.8</version>
-                              <type>jar</type>
-                              <overWrite>true</overWrite>
-                              <outputDirectory>${project.build.directory}/dependency</outputDirectory>
-                          </artifactItem>
-                      </artifactItems>
-                  </configuration>
-              </execution>
-          </executions>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.0</version>
+        <executions>
+          <execution>
+            <id>copy</id>
+            <phase>process-sources</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.aspectj</groupId>
+                  <artifactId>aspectjweaver</artifactId>
+                  <version>1.6.8</version>
+                  <type>jar</type>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${project.build.directory}/dependency</outputDirectory>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
 
       <plugin>
@@ -76,6 +76,15 @@
           <target>1.6</target>
         </configuration>
       </plugin>
+
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.5</version>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+
       <plugin>
         <groupId>org.liquibase</groupId>
         <artifactId>liquibase-maven-plugin</artifactId>
@@ -235,6 +244,8 @@
             <artifactId>maven-surefire-plugin</artifactId>
             <version>2.5</version>
             <configuration>
+              <skip>false</skip>
+
               <includes>
                 <include>**/*Suite.java</include>
               </includes>
