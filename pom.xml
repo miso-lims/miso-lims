@@ -150,12 +150,12 @@
     <repository>
       <id>miso-releases</id>
       <name>MISO repository</name>
-      <url>scp://repos.tgac.bbsrc.ac.uk/var/www/html/maven/miso/releases</url>
+      <url>scp://repos.tgac.bbsrc.ac.uk/storage/html/maven/miso/releases</url>
     </repository>
     <snapshotRepository>
       <id>miso-snapshots</id>
       <name>MISO snapshot repository</name>
-      <url>scp://repos.tgac.bbsrc.ac.uk/var/www/html/maven/miso/snapshots</url>
+      <url>scp://repos.tgac.bbsrc.ac.uk/storage/html/maven/miso/snapshots</url>
     </snapshotRepository>
   </distributionManagement>
 
