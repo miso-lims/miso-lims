@@ -42,11 +42,30 @@
   <build>
     <plugins>
       <plugin>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.5</version>
-        <configuration>
-          <testFailureIgnore>true</testFailureIgnore>
-        </configuration>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>2.0</version>
+          <executions>
+              <execution>
+                  <id>copy</id>
+                  <phase>process-sources</phase>
+                  <goals>
+                      <goal>copy</goal>
+                  </goals>
+                  <configuration>
+                      <artifactItems>
+                          <artifactItem>
+                              <groupId>org.aspectj</groupId>
+                              <artifactId>aspectjweaver</artifactId>
+                              <version>1.6.8</version>
+                              <type>jar</type>
+                              <overWrite>true</overWrite>
+                              <outputDirectory>${project.build.directory}/dependency</outputDirectory>
+                          </artifactItem>
+                      </artifactItems>
+                  </configuration>
+              </execution>
+          </executions>
       </plugin>
 
       <plugin>
@@ -104,6 +123,14 @@
     </repository>
   </repositories>
   <dependencies>
+    <dependency>
+        <groupId>org.aspectj</groupId>
+        <artifactId>aspectjweaver</artifactId>
+        <version>1.6.8</version>
+        <scope>test</scope>
+    </dependency>
+
+
     <dependency>
       <groupId>${parent.groupId}</groupId>
       <artifactId>core</artifactId>
@@ -205,13 +232,17 @@
       <build>
         <plugins>
           <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
             <version>2.5</version>
             <configuration>
               <includes>
                 <include>**/*Suite.java</include>
               </includes>
+              <reportFormat>brief</reportFormat>
+              <useFile>false</useFile>
+              <forkMode>once</forkMode>
+              <!-- ENABLE THIS IF TIMING TESTS -->
+              <!-- <argLine>-ea -Xmx768m -javaagent:target/dependency/aspectjweaver-1.6.8.jar</argLine> -->
             </configuration>
           </plugin>
         </plugins>

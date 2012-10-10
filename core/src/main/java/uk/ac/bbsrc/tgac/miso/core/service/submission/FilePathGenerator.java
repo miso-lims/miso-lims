@@ -47,7 +47,7 @@ public interface FilePathGenerator {
    * @return Object response
    * @throws uk.ac.bbsrc.tgac.miso.core.exception.SubmissionException
    */
-  public File generateFilePath(SequencerPoolPartition partition, Dilution libraryDilution) throws SubmissionException;
+  public Set<File> generateFilePath(SequencerPoolPartition partition, Dilution libraryDilution) throws SubmissionException;
 
   public Set<File> generateFilePaths(SequencerPoolPartition partition) throws SubmissionException;
 }

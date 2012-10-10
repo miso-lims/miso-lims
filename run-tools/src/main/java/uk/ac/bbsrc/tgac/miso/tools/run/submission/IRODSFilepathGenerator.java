@@ -75,13 +75,12 @@ public class IRODSFilepathGenerator implements FilePathGenerator {
   }
 
   @Override
-  public File generateFilePath(SequencerPoolPartition partition, Dilution l) throws SubmissionException {
+  public Set<File> generateFilePath(SequencerPoolPartition partition, Dilution l) throws SubmissionException {
     Pool<? extends Poolable> pool = partition.getPool();
     if (pool != null) {
       if (pool.getExperiments() != null) {
-        //Collection<Experiment> experiments = pool.getExperiments();
-        //Experiment experiment = experiments.iterator().next();
-        StringBuilder filePath = new StringBuilder();
+        List<String> filePaths = new ArrayList<String>();
+        Set<File> fps = new HashSet<File>();
         try {
           IRODSGenQueryBuilder builder = new IRODSGenQueryBuilder(true, null);
           try {
@@ -99,7 +98,6 @@ public class IRODSFilepathGenerator implements FilePathGenerator {
                       RodsGenQueryEnum.COL_DATA_NAME,
                       GenQueryOrderByField.OrderByType.ASC);
             IRODSGenQueryFromBuilder irodsQuery = builder.exportIRODSQueryFromBuilder(1);
-            List<String> filePaths = new ArrayList<String>();
             collateResults(queryExecutorAO.executeIRODSQuery(irodsQuery, 0), filePaths);
             log.info(LimsUtils.join(filePaths, " , "));
           }
@@ -115,7 +113,11 @@ public class IRODSFilepathGenerator implements FilePathGenerator {
         catch (JargonException e) {
           e.printStackTrace();
         }
-        return new File(filePath.toString());
+
+        for (String fp : filePaths) {
+          fps.add(new File(fp));
+        }
+        return fps;
       }
       else {
         throw new SubmissionException("No experiments");
@@ -160,13 +162,13 @@ public class IRODSFilepathGenerator implements FilePathGenerator {
         }
         else {
           for (Dilution l : libraryDilutions) {
-            File file=generateFilePath(partition,l);
-            filePaths.add(file);
+            Set<File> files=generateFilePath(partition,l);
+            filePaths.addAll(files);
           }
         }
       }
     }
-    return (filePaths);
+    return filePaths;
   }
 
   private class IlluminaFilenameFilter implements FilenameFilter {

@@ -22,11 +22,12 @@
  */
 
 var Submission = Submission || {
-  saveSubmission : function(submissionId, JSON) {
+  saveSubmission : function(submissionId, form) {
+    var arr = form.serializeArray();
     Fluxion.doAjax(
       'submissionControllerHelperService',
       'saveSubmission',
-      {'submissionId':submissionId, 'url':ajaxurl, 'form':JSON},
+      {'submissionId':submissionId, 'url':ajaxurl, 'form':arr},
       {'doOnSuccess':function(json) {
           Utils.page.pageReload();
         }

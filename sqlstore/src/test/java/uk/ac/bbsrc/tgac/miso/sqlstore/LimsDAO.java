@@ -120,6 +120,8 @@ public class LimsDAO extends LimsDAOTestCase {
 //        TestCase.assertNotNull(d);
 //        TestCase.assertNotNull(d.getDilutionId());
 //      }
+
+      ((MockSQLSecurityDAO)getSecurityDAO()).clearCaches();
     }
     catch (Exception e) {
       e.printStackTrace();
@@ -421,7 +423,7 @@ public class LimsDAO extends LimsDAOTestCase {
       System.out.println(
               "Expected number of RunQC: " + expected + ", actual: " + actual);
 
-      for (RunQC d : random(getRunQcDAO(), actual, 1)) {
+      for (RunQC d : random(getRunQcDAO(), actual, 5)) {
         TestCase.assertNotNull(d);
         TestCase.assertNotNull(d.getId());
       }
@@ -562,6 +564,7 @@ public class LimsDAO extends LimsDAOTestCase {
     }
   }
 
+  /*
   @Test
   public void testSubmissions() {
     try {
@@ -577,7 +580,7 @@ public class LimsDAO extends LimsDAOTestCase {
       System.out.println(
               "Expected number of submissions: " + expected + ", actual: " + actual);
 
-      for (Submission d : random(getSubmissionDAO(), actual, 5)) {
+      for (Submission d : random(getSubmissionDAO(), actual, 1)) {
         TestCase.assertNotNull(d);
         TestCase.assertNotNull(d.getId());
       }
@@ -587,4 +590,5 @@ public class LimsDAO extends LimsDAOTestCase {
       TestCase.fail();
     }
   }
+  */
 }

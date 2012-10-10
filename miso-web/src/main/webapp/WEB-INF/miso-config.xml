@@ -65,11 +65,13 @@
   </bean>
 
   <bean id="submissionManager" class="uk.ac.bbsrc.tgac.miso.core.manager.ERASubmissionManager">
+    <property name="submissionProperties" value="#{propertyConfigurer.getPropertiesAsProperties()}"/>
+    <property name="centreName" value="${submission.centreName}"/>
     <property name="accountName" value="${submission.accountName}"/>
     <property name="dropBox" value="${submission.dropBox}"/>
     <property name="authKey" value="${submission.authKey}"/>
     <property name="submissionEndPoint" value="${submission.submissionEndPoint}"/>
-    <property name="proxyHost" value="${submission.proxyHost}"/>
+    <!-- <property name="proxyHost" value="${submission.proxyHost}"/> -->
     <property name="submissionStoragePath" value="${miso.submissionStorageDirectory}"/>
   </bean>
 

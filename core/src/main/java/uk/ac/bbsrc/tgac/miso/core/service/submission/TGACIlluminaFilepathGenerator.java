@@ -64,7 +64,7 @@ public class TGACIlluminaFilepathGenerator implements FilePathGenerator {
   }
 
   @Override
-  public File generateFilePath(SequencerPoolPartition partition, Dilution l) throws SubmissionException {
+  public Set<File> generateFilePath(SequencerPoolPartition partition, Dilution l) throws SubmissionException {
     Pool<? extends Poolable> pool = partition.getPool();
     if (pool != null) {
       if (pool.getExperiments() != null) {
@@ -87,7 +87,9 @@ public class TGACIlluminaFilepathGenerator implements FilePathGenerator {
           }
         }
         filePath.append("_L00" + partition.getPartitionNumber() + "*.fastq.gz");
-        return new File(filePath.toString());
+        Set<File> files = new HashSet<File>();
+        files.add(new File(filePath.toString()));
+        return files;
       }
       else {
         throw new SubmissionException("partition.getPool=null!");
@@ -121,13 +123,13 @@ public class TGACIlluminaFilepathGenerator implements FilePathGenerator {
         }
         else {
           for (Dilution l : libraryDilutions) {
-            File file=generateFilePath(partition,l);
-            filePaths.add(file);
+            Set<File> files = generateFilePath(partition,l);
+            filePaths.addAll(files);
           }
         }
       }
     }
-    return (filePaths);
+    return filePaths;
   }
 
   private class IlluminaFilenameFilter implements FilenameFilter {

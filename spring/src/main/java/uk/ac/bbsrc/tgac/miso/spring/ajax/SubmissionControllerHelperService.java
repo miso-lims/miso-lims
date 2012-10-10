@@ -49,6 +49,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.submission.UploadJob;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 import javax.servlet.http.HttpSession;
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
@@ -422,12 +423,9 @@ public class SubmissionControllerHelperService {
                     //gets all the dilutions in that partition's pool.
                     Collection<? extends Dilution> libraryDilutions = part.getPool().getDilutions();
 
-                    //creates a filpathgenerator
                     FilePathGenerator fpg = new TGACIlluminaFilepathGenerator();
                     sb.append("<ul>");
 
-                    //this is failing- it's ticking all the dilutions, regardless of whether they're in the submission. I reckon it's checking the wrong Partition somehow.
-                    //Better method might be to create a list of dilutions in each submission partition, and check each dilution in the menu list against it.
                     for (Dilution d : libraryDilutions) {
                       sb.append("<li><input type='checkbox'  name='DIL_" + d.getId() + "' id='DIL" + d.getId() + "_PAR" + part.getId() + "' value='PAR_" + part.getId() + "' ");
 
@@ -436,7 +434,6 @@ public class SubmissionControllerHelperService {
                         for (Object o : sub.getSubmissionElements()) {
                           if (o.equals(part)) {
                             SequencerPoolPartition subPart = (SequencerPoolPartition) o;
-                            //this is causing problems- it's returning dilutions from the original partition!
                             for (Dilution bla : subPart.getPool().getDilutions()) {
                               if (bla.getId() == d.getId()) {
                                 sb.append(" checked='checked' ");
@@ -445,7 +442,13 @@ public class SubmissionControllerHelperService {
                           }
                         }
                       }
-                      sb.append(">" + d.getLibrary().getName() + d.getName() + ": (" + fpg.generateFilePath(part, d).getName() + ")</li>");
+                      sb.append(">" + d.getLibrary().getName() + d.getName() + ": ");
+                      sb.append("<ul>");
+                      for (File f : fpg.generateFilePath(part, d)) {
+                        sb.append("<li>" + f.getName() + "</li>");
+                      }
+                      sb.append("</ul>");
+                      sb.append("</li>");
                     }
                     sb.append("</ul>");
                   }

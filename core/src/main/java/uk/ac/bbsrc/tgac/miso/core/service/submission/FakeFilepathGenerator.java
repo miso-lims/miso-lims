@@ -47,9 +47,10 @@ public class FakeFilepathGenerator implements FilePathGenerator{
 
   //returns a HashSet containing 3 files on the local drive.
   @Override
-  public File generateFilePath(SequencerPoolPartition partition, Dilution libraryDilution) {
-    File datafile = new File("/storage/miso/datafiles/datafile1.dat");
-    return datafile;
+  public Set<File> generateFilePath(SequencerPoolPartition partition, Dilution libraryDilution) {
+    Set<File> files = new HashSet<File>();
+    files.add(new File("/storage/miso/datafiles/datafile1.dat"));
+    return files;
   }
 
   @Override

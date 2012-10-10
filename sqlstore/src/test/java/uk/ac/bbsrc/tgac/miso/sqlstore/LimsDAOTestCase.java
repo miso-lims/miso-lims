@@ -474,7 +474,8 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
     LobHandler lh = new DefaultLobHandler();
     JdbcTemplate template = new JdbcTemplate(datasource);
 
-    securityDAO = new SQLSecurityDAO();
+    //securityDAO = new SQLSecurityDAO();
+    securityDAO = new MockSQLSecurityDAO();
     securityDAO.setLobHandler(lh);
     securityDAO.setJdbcTemplate(template);
 
@@ -491,7 +492,6 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
     plateDAO = new SQLPlateDAO();
     platformDAO = new SQLPlatformDAO();
     poolDAO = new SQLPoolDAO();
-    projectDAO = new SQLProjectDAO();
     printJobDAO = new SQLPrintJobDAO();
     printServiceDAO = new SQLPrintServiceDAO();
     runDAO = new SQLRunDAO();
@@ -504,6 +504,8 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
     studyDAO = new SQLStudyDAO();
     submissionDAO = new SQLTgacSubmissionDAO();
     watcherDAO = new SQLWatcherDAO();
+
+    projectDAO = new MockSQLProjectDAO();
 
     //just use a basic SQL auth for testing
     LocalSecurityManager sm = new LocalSecurityManager();

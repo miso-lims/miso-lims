@@ -43,10 +43,10 @@
                     <c:otherwise>Create</c:otherwise>
                 </c:choose> Submission
                 <c:if test="${submission.id != 0}">
-                <input type="button" value="Save" class="fg-button ui-state-default ui-corner-all" onclick="Submission.saveSubmission(${submission.id},jQuery(form).serializeArray())"/>
+                <input type="button" value="Save" class="fg-button ui-state-default ui-corner-all" onclick="Submission.saveSubmission(${submission.id},jQuery(form))"/>
                 </c:if>
                 <c:if test="${submission.id == 0}">
-                <input type="button" value="Save" class="fg-button ui-state-default ui-corner-all" onclick="Submission.saveSubmission(-1,jQuery(form).serializeArray())"/>
+                <input type="button" value="Save" class="fg-button ui-state-default ui-corner-all" onclick="Submission.saveSubmission(-1,jQuery(form))"/>
                 </c:if>
             </h1>
             <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help

@@ -33,6 +33,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.service.submission.FilePathGenerator;
 import uk.ac.bbsrc.tgac.miso.core.service.submission.TGACIlluminaFilepathGenerator;
 
+import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
@@ -103,15 +104,17 @@ public class EraRunDecorator extends AbstractSubmittableDecorator<Document> {
 
         for(Dilution libraryDilution : dilutions) {
           try {
-            String fileName = fpg.generateFilePath(p,libraryDilution).getName();
-            Element file = submission.createElementNS(null,"FILE");
-            file.setAttribute("filename", fileName);
-            file.setAttribute("filetype", "fastq");
-            file.setAttribute("checksum_method", "MD5");
-            file.setAttribute("checksum", "");
-            Element readLabel = submission.createElementNS(null, "READ_LABEL");
-            file.appendChild(readLabel);
-            files.appendChild(file);
+            for (File f : fpg.generateFilePath(p,libraryDilution)) {
+              String fileName = f.getName();
+              Element file = submission.createElementNS(null,"FILE");
+              file.setAttribute("filename", fileName);
+              file.setAttribute("filetype", "fastq");
+              file.setAttribute("checksum_method", "MD5");
+              file.setAttribute("checksum", "");
+              Element readLabel = submission.createElementNS(null, "READ_LABEL");
+              file.appendChild(readLabel);
+              files.appendChild(file);
+            }
           }
           catch (Exception e) {
             e.printStackTrace();
