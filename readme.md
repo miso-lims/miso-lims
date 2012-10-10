@@ -27,6 +27,12 @@ You will need [Maven 2.2.1] [3] to build MISO (*NOTE Not Maven 3!*). Once you ha
 
     mvn clean install -P external
 
+This will *NOT* run unit tests. To enable unit tests of database sanity, use:
+
+    mvn -DsqlTests=true install -P external
+
+In order for the tests to work, you will need a MISO database set up as per the instructions below, and the correct properties specified in `sqlstore/src/test/resources/test.db.properties`.
+
 All being well after a few minutes (it can take a while to download all the required artifacts given the speed of your connection), you should see `BUILD SUCCESSFUL`.
 
 2) UPGRADING
