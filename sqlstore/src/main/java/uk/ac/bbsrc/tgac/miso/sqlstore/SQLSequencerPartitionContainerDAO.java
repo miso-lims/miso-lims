@@ -314,6 +314,7 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
               .withTableName(TABLE_NAME)
               .usingGeneratedKeyColumns("containerId");
+      /*
       try {
         sequencerPartitionContainer.setId(DbUtils.getAutoIncrement(template, TABLE_NAME));
 
@@ -337,12 +338,12 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
       catch (MisoNamingException e) {
         throw new IOException("Cannot save SequencerPartitionContainer - issue with naming scheme", e);
       }
-      /*
-      Number newId = insert.executeAndReturnKey(params);
-      sequencerPartitionContainer.setContainerId(newId.longValue());
       */
+      Number newId = insert.executeAndReturnKey(params);
+      sequencerPartitionContainer.setId(newId.longValue());
     }
     else {
+      /*
       try {
         if (namingScheme.validateField("name", sequencerPartitionContainer.getName())) {
           params.addValue("containerId", sequencerPartitionContainer.getId())
@@ -357,11 +358,10 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
       catch (MisoNamingException e) {
         throw new IOException("Cannot save SequencerPartitionContainer - issue with naming scheme", e);
       }
-      /*
-      params.addValue("containerId", sequencerPartitionContainer.getContainerId());
+      */
+      params.addValue("containerId", sequencerPartitionContainer.getId());
       NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
       namedTemplate.update(SEQUENCER_PARTITION_CONTAINER_UPDATE, params);
-      */
     }
 
     //MapSqlParameterSource delparams = new MapSqlParameterSource();
