@@ -157,6 +157,8 @@ Submission.ui = {
             'previewSubmissionMetadata',
     {'submissionId':submissionId,'url':ajaxurl},
     {'doOnSuccess':function(json) {
+        Utils.page.pageReload();
+
         var win = window.open('', 'windowName');
         win.document.open('text/xml');
         //win.document.write("<?xml version='1.0' encoding='UTF-8'?>");
@@ -165,6 +167,17 @@ Submission.ui = {
         //doc = doc.replace(">","&gt");
         win.document.write(json.metadata);
         win.document.close();
+      }
+    });
+  },
+
+  downloadSubmissionMetadata : function(submissionId) {
+    Fluxion.doAjax(
+            'submissionControllerHelperService',
+            'downloadSubmissionMetadata',
+    {'submissionId':submissionId,'url':ajaxurl},
+    {'doOnSuccess':function(json) {
+        Utils.page.pageRedirect('/miso/download/submission/' + submissionId + '/' + json.response);
       }
     });
   },

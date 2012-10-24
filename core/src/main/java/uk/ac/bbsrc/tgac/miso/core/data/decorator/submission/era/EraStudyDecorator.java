@@ -46,11 +46,8 @@ public class EraStudyDecorator extends AbstractSubmittableDecorator<Document> {
   }
 
   public void buildSubmission() {
-    //submittable.buildSubmission();
-
     Study s = (Study)submittable;
     if (submission != null) {
-
       Element study = submission.createElement("STUDY");
       //study.setAttribute("accession", s.getAccession());
       study.setAttribute("alias", s.getAlias());
@@ -73,9 +70,10 @@ public class EraStudyDecorator extends AbstractSubmittableDecorator<Document> {
       centerProjectName.setTextContent(s.getProject().getAlias());
       studyDescriptor.appendChild(centerProjectName);
 
-      //Element studyAbstract = doc.createElementNS(null, "STUDY_ABSTRACT");
-      //studyAbstract.setTextContent(getAbstract());
-      //studyDescriptor.appendChild(studyAbstract);
+      Element studyAbstract = submission.createElementNS(null, "STUDY_ABSTRACT");
+      //TODO - add Study.getAbstract()
+      studyAbstract.setTextContent(s.getAbstract());
+      studyDescriptor.appendChild(studyAbstract);
 
       Element studyDescription = submission.createElementNS(null, "STUDY_DESCRIPTION");
       studyDescription.setTextContent(s.getDescription());

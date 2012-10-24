@@ -42,7 +42,7 @@ public abstract class AbstractQC implements QC {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long qcId = AbstractQC.UNSAVED_ID;
+  private long qcId = AbstractQC.UNSAVED_ID;
 
   private String qcUserName;
   private QcType qcType;
@@ -63,8 +63,8 @@ public abstract class AbstractQC implements QC {
     return qcId;
   }
 
-  public void setId(long id) {
-    this.qcId = id;
+  public void setId(long qcId) {
+    this.qcId = qcId;
   }
 
   public String getQcCreator() {
@@ -104,7 +104,7 @@ public abstract class AbstractQC implements QC {
       return false;
     if (obj == this)
       return true;
-    if (!(obj instanceof AbstractQC))
+    if (!(obj instanceof QC))
       return false;
     QC them = (QC) obj;
     // If not saved, then compare resolved actual objects. Otherwise
@@ -122,7 +122,7 @@ public abstract class AbstractQC implements QC {
 
   @Override
   public int hashCode() {
-    if (getId() != AbstractQC.UNSAVED_ID) {
+    if (getId() != 0L && getId() != AbstractQC.UNSAVED_ID) {
       return (int)getId();
     }
     else {
@@ -141,5 +141,18 @@ public abstract class AbstractQC implements QC {
     if (getId() < t.getId()) return -1;
     if (getId() > t.getId()) return 1;
     return 0;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append(getId());
+    sb.append(" : ");
+    sb.append(getQcCreator());
+    sb.append(" : ");
+    sb.append(getQcDate());
+    sb.append(" : ");
+    sb.append(getQcType());
+    return sb.toString();
   }
 }

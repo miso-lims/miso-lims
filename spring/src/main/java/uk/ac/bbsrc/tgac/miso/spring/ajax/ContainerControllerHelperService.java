@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
@@ -80,7 +81,7 @@ public class ContainerControllerHelperService {
       Map<String, Object> responseMap = new HashMap<String, Object>();
       if (pt != null) {
         SequencerPartitionContainer<SequencerPoolPartition> lf = dataObjectFactory.getSequencerPartitionContainer(pt, user);
-        session.setAttribute("container_"+cId, lf);
+        session.setAttribute("container_" + cId, lf);
 
         StringBuilder srb = new StringBuilder();
         srb.append("<select name='sequencer' id='sequencerReference' onchange='Container.ui.populateContainerOptions(this);'>");
@@ -122,7 +123,7 @@ public class ContainerControllerHelperService {
     b.append("<span id='containerspan'>Containers: ");
     PlatformType pt = sr.getPlatform().getPlatformType();
     for (int i = 0; i < sr.getPlatform().getNumContainers(); i++) {
-      b.append("<input id='container" + (i + 1) + "' name='containerselect' onchange='Container.ui.changeContainer("+sr.getPlatform().getNumContainers()+", \"" + pt.getKey() + "\", " + sr.getId() + ");' type='radio' value='" + (i + 1) + "'/>" + (i + 1));
+      b.append("<input id='container" + (i + 1) + "' name='containerselect' onchange='Container.ui.changeContainer(" + sr.getPlatform().getNumContainers() + ", \"" + pt.getKey() + "\", " + sr.getId() + ");' type='radio' value='" + (i + 1) + "'/>" + (i + 1));
     }
     b.append("</span><br/>");
     b.append("<div id='containerdiv' class='note ui-corner-all'> </div>");
@@ -185,7 +186,7 @@ public class ContainerControllerHelperService {
         b.append("</div>");
 
         SequencerPartitionContainer<SequencerPoolPartition> lf =
-                (SequencerPartitionContainer<SequencerPoolPartition>)session.getAttribute("container_"+json.getString("container_cId"));
+                (SequencerPartitionContainer<SequencerPoolPartition>) session.getAttribute("container_" + json.getString("container_cId"));
         lf.setPartitionLimit(1);
         lf.initEmptyPartitions();
       }
@@ -207,7 +208,7 @@ public class ContainerControllerHelperService {
         b.append("</div>");
 
         SequencerPartitionContainer<SequencerPoolPartition> lf =
-                (SequencerPartitionContainer<SequencerPoolPartition>)session.getAttribute("container_"+json.getString("container_cId"));
+                (SequencerPartitionContainer<SequencerPoolPartition>) session.getAttribute("container_" + json.getString("container_cId"));
         lf.setPartitionLimit(8);
         lf.initEmptyPartitions();
       }
@@ -270,10 +271,10 @@ public class ContainerControllerHelperService {
         b.append("</table>");
 
         SequencerPartitionContainer<SequencerPoolPartition> lf =
-                (SequencerPartitionContainer<SequencerPoolPartition>)session.getAttribute("container_"+json.getString("container_cId"));
+                (SequencerPartitionContainer<SequencerPoolPartition>) session.getAttribute("container_" + json.getString("container_cId"));
         lf.setPartitionLimit(6);
         lf.initEmptyPartitions();
-        session.setAttribute("container_"+json.getString("container_cId"), lf);
+        session.setAttribute("container_" + json.getString("container_cId"), lf);
       }
       else {
         b.append("<input id='chamber1' name='container0Select' onchange='Container.ui.changeContainerSolidChamber(this, 0);' type='radio' value='1'/>1 ");
@@ -348,10 +349,10 @@ public class ContainerControllerHelperService {
     b.append("<th>Pool</th>");
 
     SequencerPartitionContainer<SequencerPoolPartition> lf =
-            (SequencerPartitionContainer<SequencerPoolPartition>)session.getAttribute("container_"+json.getString("container_cId"));
+            (SequencerPartitionContainer<SequencerPoolPartition>) session.getAttribute("container_" + json.getString("container_cId"));
     lf.setPartitionLimit(numChambers);
     lf.initEmptyPartitions();
-    session.setAttribute("container_"+json.getString("container_cId"), lf);
+    session.setAttribute("container_" + json.getString("container_cId"), lf);
 
     for (int i = 0; i < numChambers; i++) {
       b.append("<tr><td>" + (i + 1) + "</td>");
@@ -373,10 +374,10 @@ public class ContainerControllerHelperService {
     b.append("<th>Pool</th>");
 
     SequencerPartitionContainer<SequencerPoolPartition> lf =
-            (SequencerPartitionContainer<SequencerPoolPartition>)session.getAttribute("container_"+json.getString("container_cId"));
+            (SequencerPartitionContainer<SequencerPoolPartition>) session.getAttribute("container_" + json.getString("container_cId"));
     lf.setPartitionLimit(numChambers);
     lf.initEmptyPartitions();
-    session.setAttribute("container_"+json.getString("container_cId"), lf);
+    session.setAttribute("container_" + json.getString("container_cId"), lf);
 
     for (int i = 0; i < numChambers; i++) {
       b.append("<tr><td>" + (i + 1) + "</td>");
@@ -398,13 +399,13 @@ public class ContainerControllerHelperService {
     b.append("<th>Pool</th>");
 
     SequencerPartitionContainer<SequencerPoolPartition> lf =
-            (SequencerPartitionContainer<SequencerPoolPartition>)session.getAttribute("container_"+json.getString("container_cId"));
+            (SequencerPartitionContainer<SequencerPoolPartition>) session.getAttribute("container_" + json.getString("container_cId"));
     lf.setPartitionLimit(numChambers);
     lf.initEmptyPartitions();
-    session.setAttribute("container_"+json.getString("container_cId"), lf);
+    session.setAttribute("container_" + json.getString("container_cId"), lf);
 
     for (int i = 0; i < numChambers; i++) {
-      b.append("<tr><td>"+(i+1)+"</td>");
+      b.append("<tr><td>" + (i + 1) + "</td>");
       b.append("<td width='90%'><div id='p_div_" + container + "-" + i + "' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='partitions[" + i + "].pool' partition='" + i + "' ondblclick='Container.partition.populatePartition(this);'>");
       b.append("</tr>");
     }
@@ -426,7 +427,7 @@ public class ContainerControllerHelperService {
 
       Pool p = requestManager.getPoolByBarcode(barcode);
       SequencerPartitionContainer<SequencerPoolPartition> lf =
-              (SequencerPartitionContainer<SequencerPoolPartition>)session.getAttribute("container_"+json.getString("container_cId"));
+              (SequencerPartitionContainer<SequencerPoolPartition>) session.getAttribute("container_" + json.getString("container_cId"));
       if (lf.getPlatformType().equals(p.getPlatformType())) {
         return JSONUtils.JSONObjectResponse("html", poolHtml(p, partition));
       }
@@ -478,7 +479,7 @@ public class ContainerControllerHelperService {
           }
         }
         b.append("</select>");
-        b.append("<input id='studySelectButton-"+partition+"_"+p.getId()+"' type='button' onclick=\"Container.partition.selectContainerStudy('" + partition + "', " + p.getId() + ");\" class=\"ui-state-default ui-corner-all\" value='Select Study'/>");
+        b.append("<input id='studySelectButton-" + partition + "_" + p.getId() + "' type='button' onclick=\"Container.partition.selectContainerStudy('" + partition + "', " + p.getId() + ");\" class=\"ui-state-default ui-corner-all\" value='Select Study'/>");
         b.append("</div></div>");
       }
 
@@ -572,7 +573,7 @@ public class ContainerControllerHelperService {
                     sb.append(e.getStudy().getProject().getAlias() + " (" + e.getName() + ": " + p.getPool().getDilutions().size() + " dilutions)<br/>");
                   }
                   sb.append("</i>");
-                  sb.append("<input type='hidden' name='partitions[" + (p.getPartitionNumber() - 1) + "].pool' id='pId" + (p.getPartitionNumber() - 1) + "' value='"+p.getPool().getId()+"'/>");
+                  sb.append("<input type='hidden' name='partitions[" + (p.getPartitionNumber() - 1) + "].pool' id='pId" + (p.getPartitionNumber() - 1) + "' value='" + p.getPool().getId() + "'/>");
                 }
                 else {
                   sb.append("<i>No experiment linked to this pool</i>");
@@ -615,6 +616,37 @@ public class ContainerControllerHelperService {
     }
     else {
       return JSONUtils.SimpleJSONError("Please supply a barcode to lookup.");
+    }
+  }
+
+  public JSONObject listSequencePartitionContainersDataTable(HttpSession session, JSONObject json) {
+    try {
+      JSONObject j = new JSONObject();
+      JSONArray jsonArray = new JSONArray();
+      for (SequencerPartitionContainer<SequencerPoolPartition> sequencePartitionContainer : requestManager.listAllSequencerPartitionContainers()) {
+        String run = "";
+        String sequencer = "";
+        if (sequencePartitionContainer.getRun() != null) {
+          run = "<a href=\"/miso/run/" + sequencePartitionContainer.getRun().getId() + "\">" + sequencePartitionContainer.getRun().getAlias() + "</a>";
+          if (sequencePartitionContainer.getRun().getSequencerReference() != null) {
+            sequencer = "<a href=\"/miso/sequencer/" + sequencePartitionContainer.getRun().getSequencerReference().getId() + "\">"
+                        + sequencePartitionContainer.getRun().getSequencerReference().getPlatform().getNameAndModel() + "</a>";
+          }
+        }
+        jsonArray.add("['" +
+                      (sequencePartitionContainer.getIdentificationBarcode() != null ? sequencePartitionContainer.getIdentificationBarcode() :"") +"','" +
+                      (sequencePartitionContainer.getPlatformType()!=null? sequencePartitionContainer.getPlatformType().getKey() : "") + "','" +
+                      run + "','" +
+                      sequencer + "','" +
+                      "<a href=\"/miso/container/" + sequencePartitionContainer.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
+
+      }
+      j.put("array", jsonArray);
+      return j;
+    }
+    catch (IOException e) {
+      log.debug("Failed", e);
+      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
   }
 

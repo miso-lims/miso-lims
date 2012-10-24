@@ -61,17 +61,7 @@ public class ListSequencerPartitionContainerController {
   }
 
   @RequestMapping("/containers")
-  public ModelAndView listContainers(ModelMap model) throws IOException {
-    try {
-      Collection<SequencerPartitionContainer<SequencerPoolPartition>> lp = requestManager.listAllSequencerPartitionContainers();
-      model.addAttribute("containers", lp);
-      return new ModelAndView("/pages/listSequencerPartitionContainers.jsp", model);
-    }
-    catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to list containers", ex);
-      }
-      throw ex;
-    }
+  public ModelAndView listContainers() throws IOException {
+    return new ModelAndView("/pages/listSequencerPartitionContainers.jsp");
   }
 }

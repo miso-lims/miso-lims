@@ -166,6 +166,18 @@ ul.bullets li {
     list-style: none;
 }
 
+ul.shorterbullets {
+    margin: 1em 0;
+}
+
+ul.shorterbullets li {
+    margin-left: -2em;
+    margin-bottom: 0.5em;
+    background: url(images/bullet.gif) left no-repeat;
+    padding-left: 1em;
+    list-style: none;
+}
+
 table.list {
     background-color: #CDCDCD;
     margin: 10px 0pt 15px;

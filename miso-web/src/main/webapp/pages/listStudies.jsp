@@ -28,67 +28,23 @@
   Time: 08:51:03
 --%>
 <%@ include file="../header.jsp" %>
+<script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
+<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" type="text/css">
+<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables_themeroller.css'/>">
 
 <div id="maincontent">
     <div id="contentcolumn">
         <h1>
-            <div id="totalCount">
+            <div id="totalCount">Studies
             </div>
         </h1>
 
-        <form id="filter-form">Filter: <input name="filter" id="filter" value="" maxlength="30" size="30" type="text">
-        </form>
-        <br/>
-        <table class="list" id="table">
-            <thead>
-            <tr>
-                <th>Study Name</th>
-                <th>Study Alias</th>
-                <th>Description</th>
-                <th class="fit">Edit</th>
-            </tr>
-            </thead>
-            <tbody>
-            <c:forEach items="${studies}" var="study">
-                <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-                    <td><b>${study.name}</b></td>
-                    <td>${study.alias}</td>
-                    <td>${study.description}</td>
-                    <td class="misoicon"
-                        onclick="window.location.href='<c:url value="/miso/study/${study.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
-                </tr>
-            </c:forEach>
-            </tbody>
-        </table>
+    <table cellpadding="0" cellspacing="0" border="0" class="display" id="listingStudiesTable">
+    </table>
         <script type="text/javascript">
             jQuery(document).ready(function() {
-                writeTotalNo();
-                jQuery("#table").tablesorter({
-                    headers: {
-                        3: {
-                            sorter: false
-                        }
-                    }
-                });
+             Study.ui.createListingStudiesTable();
             });
-
-            jQuery(function() {
-                var theTable = jQuery("#table");
-
-                jQuery("#filter").keyup(function() {
-                    jQuery.uiTableFilter(theTable, this.value);
-                    writeTotalNo();
-                });
-
-                jQuery('#filter-form').submit(function() {
-                    theTable.find("tbody > tr:visible > td:eq(1)").mousedown();
-                    return false;
-                }).focus(); //Give focus to input field
-            });
-
-            function writeTotalNo() {
-                jQuery('#totalCount').html(jQuery('#table>tbody>tr:visible').length.toString() + " Studies");
-            }
         </script>
     </div>
 </div>

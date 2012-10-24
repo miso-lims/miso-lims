@@ -253,7 +253,9 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
   }
 
   private void fillInRun(SequencerPartitionContainer<SequencerPoolPartition> container) throws IOException {
-    container.setRun(runDAO.getLatestRunIdRunBySequencerPartitionContainerId(container.getId()));
+    if (container != null) {
+      container.setRun(runDAO.getLatestRunIdRunBySequencerPartitionContainerId(container.getId()));
+    }
   }
 
   private void fillInRun(SequencerPartitionContainer<SequencerPoolPartition> container, long runId) throws IOException {
@@ -314,10 +316,10 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
               .withTableName(TABLE_NAME)
               .usingGeneratedKeyColumns("containerId");
-      /*
-      try {
+      //try {
         sequencerPartitionContainer.setId(DbUtils.getAutoIncrement(template, TABLE_NAME));
 
+        /*
         String name = namingScheme.generateNameFor("name", sequencerPartitionContainer);
         sequencerPartitionContainer.setName(name);
 
@@ -334,6 +336,7 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
         else {
           throw new IOException("Cannot save SequencerPartitionContainer - invalid field:" + sequencerPartitionContainer.toString());
         }
+
       }
       catch (MisoNamingException e) {
         throw new IOException("Cannot save SequencerPartitionContainer - issue with naming scheme", e);
@@ -359,6 +362,7 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
         throw new IOException("Cannot save SequencerPartitionContainer - issue with naming scheme", e);
       }
       */
+
       params.addValue("containerId", sequencerPartitionContainer.getId());
       NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
       namedTemplate.update(SEQUENCER_PARTITION_CONTAINER_UPDATE, params);

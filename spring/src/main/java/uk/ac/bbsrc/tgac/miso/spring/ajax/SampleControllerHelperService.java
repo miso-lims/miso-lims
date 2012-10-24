@@ -107,7 +107,7 @@ public class SampleControllerHelperService {
         }
         else {
           log.error("Sample alias not valid: " + alias);
-          return JSONUtils.SimpleJSONError("The following sample alias doesn't conform to the chosen naming scheme ("+sampleNamingScheme.getValidationRegex("alias")+") or already exists: " + json.getString("alias"));
+          return JSONUtils.SimpleJSONError("The following sample alias doesn't conform to the chosen naming scheme (" + sampleNamingScheme.getValidationRegex("alias") + ") or already exists: " + json.getString("alias"));
         }
       }
       catch (MisoNamingException e) {
@@ -174,7 +174,7 @@ public class SampleControllerHelperService {
               saveSet.add(news);
             }
             else {
-              return JSONUtils.SimpleJSONError("The following sample alias doesn't conform to the chosen naming scheme ("+sampleNamingScheme.getValidationRegex("alias")+") or already exists: " + j.getString("alias"));
+              return JSONUtils.SimpleJSONError("The following sample alias doesn't conform to the chosen naming scheme (" + sampleNamingScheme.getValidationRegex("alias") + ") or already exists: " + j.getString("alias"));
             }
           }
           catch (ParseException e) {
@@ -202,7 +202,7 @@ public class SampleControllerHelperService {
           Collections.sort(sortedList, new AliasComparator(Sample.class));
 
           for (Sample sample : sortedList) {
-            if ((Boolean)session.getServletContext().getAttribute("taxonLookupEnabled")) {
+            if ((Boolean) session.getServletContext().getAttribute("taxonLookupEnabled")) {
               log.info("Checking taxon: " + sample.getScientificName());
               String taxon = TaxonomyUtils.checkScientificNameAtNCBI(sample.getScientificName());
               if (taxon != null) {
@@ -510,7 +510,7 @@ public class SampleControllerHelperService {
           bi = barcodeFactory.generateBarcode(sample, bg, dim);
         }
         else {
-          return JSONUtils.SimpleJSONError("'"+json.getString("barcodeGenerator") + "' is not a valid barcode generator type");
+          return JSONUtils.SimpleJSONError("'" + json.getString("barcodeGenerator") + "' is not a valid barcode generator type");
         }
       }
       else {
@@ -539,7 +539,9 @@ public class SampleControllerHelperService {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
 
       String serviceName = null;
-      if (json.has("serviceName")) { serviceName = json.getString("serviceName"); }
+      if (json.has("serviceName")) {
+        serviceName = json.getString("serviceName");
+      }
 
       MisoPrintService<File, PrintContext<File>> mps = null;
       if (serviceName == null) {
@@ -566,7 +568,7 @@ public class SampleControllerHelperService {
             requestManager.saveSample(sample);
           }
           File f = mps.getLabelFor(sample);
-          if (f!=null) thingsToPrint.add(f);
+          if (f != null) thingsToPrint.add(f);
         }
         catch (IOException e) {
           e.printStackTrace();
@@ -650,6 +652,27 @@ public class SampleControllerHelperService {
     catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
+    }
+  }
+
+  public JSONObject listSamplesDataTable(HttpSession session, JSONObject json) {
+    try {
+      JSONObject j = new JSONObject();
+      JSONArray jsonArray = new JSONArray();
+      for (Sample sample : requestManager.listAllSamples()) {
+        jsonArray.add("['" + sample.getName() + "','" +
+                      sample.getAlias() + "','" +
+                      sample.getSampleType() + "','" +
+                      (sample.getQcPassed() != null ? sample.getQcPassed().toString() : "") + "','" +
+                      "<a href=\"/miso/sample/" + sample.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
+
+      }
+      j.put("array", jsonArray);
+      return j;
+    }
+    catch (IOException e) {
+      log.debug("Failed", e);
+      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
   }
 

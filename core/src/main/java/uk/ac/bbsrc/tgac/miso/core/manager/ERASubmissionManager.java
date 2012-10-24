@@ -62,6 +62,7 @@ import java.net.URL;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -106,6 +107,9 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
   private URL submissionEndPoint;
   private String submissionStoragePath;
   private Map<Long,UploadReport> uploadReports = new HashMap<Long,UploadReport>();
+
+  private DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+
   /**
    * Sets the centreName of this ERASubmissionManager object.
    *
@@ -214,6 +218,9 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
        //subPath = misoFileManager.storeFile(submission.getClass(),submission.getName());
       DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 
+      String d = df.format(new Date());
+      submissionProperties.put("submissionDate", d);
+
       if (LimsUtils.checkDirectory(subPath, true)) {
         Map<String, List<Submittable<Document>>> map = new HashMap<String, List<Submittable<Document>>>();
         map.put("study", new ArrayList<Submittable<Document>>());
@@ -244,24 +251,29 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
           ERASubmissionFactory.generateSubmissionXML(submissionDocument, submittables, key, submissionProperties);
 
           //generate xml files on disk
-          SubmissionUtils.transform(submissionDocument,
-                                    new File(subPath,
-                                             File.separator+
-                                             submission.getName()+
-                                             "_"+
-                                             key+
-                                             ".xml"));
+          File f = new File(subPath,
+                            File.separator
+                            + submission.getName()
+                            + "_"
+                            + key
+                            + "_"
+                            + d
+                            + ".xml");
+          if (f.exists()) {
+            f.delete();
+          }
+          SubmissionUtils.transform(submissionDocument, f);
+
           sb.append(SubmissionUtils.transform(submissionDocument, true));
         }
 
         Document submissionDocument = docBuilder.newDocument();
         ERASubmissionFactory.generateParentSubmissionXML(submissionDocument, submission, submissionProperties);
-        SubmissionUtils.transform(submissionDocument,
-                                  new File(subPath,
-                                           File.separator+
-                                           submission.getName()+
-                                           "_submission.xml"),
-                                  true);
+        File f = new File(subPath, File.separator + submission.getName() + "_submission_"+d+".xml");
+        if (f.exists()) {
+          f.delete();
+        }
+        SubmissionUtils.transform(submissionDocument, f, true);
 
         sb.append(SubmissionUtils.transform(submissionDocument, true));
       }
@@ -274,6 +286,9 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
     }
     catch (IOException e) {
       throw new SubmissionException("Cannot write to submission storage directory: " + subPath + ". Please check this directory exists and is writable.");
+    }
+    finally {
+      submissionProperties.remove("submissionDate");
     }
 
     return sb.toString();
@@ -338,6 +353,9 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
         Document submissionXml = docBuilder.newDocument();
         String subName = null;
 
+        String d = df.format(new Date());
+        submissionProperties.put("submissionDate", d);
+
         for (Submittable<Document> s : submissionData) {
           if (s instanceof Submission) {
             //s.buildSubmission();
@@ -364,7 +382,7 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
           HttpPost httppost = new HttpPost(url);
           MultipartEntity reqEntity = new MultipartEntity();
 
-          String submissionXmlFileName = subName + File.separator + subName + "_submission.xml";
+          String submissionXmlFileName = subName + File.separator + subName + "_submission_"+d+".xml";
 
           File subtmp = new File(submissionStoragePath + submissionXmlFileName);
           SubmissionUtils.transform(submissionXml, subtmp, true);
@@ -377,6 +395,8 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
                                             + subName
                                             + "_"
                                             + key.toLowerCase()
+                                            + "_"
+                                            + d
                                             + ".xml";
             File elementTmp = new File(submissionStoragePath + submittableXmlFileName);
             Document submissionDocument = docBuilder.newDocument();
@@ -393,12 +413,11 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
             try {
               Document submissionReport = docBuilder.newDocument();
               SubmissionUtils.transform(resEntity.getContent(), submissionReport);
-              DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
               File savedReport = new File(submissionStoragePath
                                           + subName
                                           + File.separator
                                           + "report_"
-                                          + df.format(new Date())
+                                          + d
                                           + ".xml");
               SubmissionUtils.transform(submissionReport, savedReport);
               return submissionReport;
@@ -408,6 +427,9 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
             }
             catch (TransformerException e) {
               e.printStackTrace();
+            }
+            finally {
+              submissionProperties.remove("submissionDate");
             }
           }
           else {
@@ -423,6 +445,9 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
       }
       catch (TransformerException e) {
         e.printStackTrace();
+      }
+      finally {
+        submissionProperties.remove("submissionDate");
       }
     }
     catch (ParserConfigurationException e) {
@@ -508,20 +533,44 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
   public void setTransferMethod(TransferMethod transferMethod) {
 
   }
-   /*
-    public FTPUploadReport getUploadReport(Submission submission){
-         return uploadReports.get(submission);
-    }
-    */
+
+ /*
+  public FTPUploadReport getUploadReport(Submission submission){
+       return uploadReports.get(submission);
+  }
+  */
 
   public String prettifySubmissionMetadata(Submission submission) throws SubmissionException {
     StringBuilder sb = new StringBuilder();
     try {
       Collection<File> files = misoFileManager.getFiles(Submission.class, submission.getName());
 
+      Date latestDate = null;
+
+      //get latest submitted xmls
+      try {
+        for (File f : files) {
+          if (f.getName().contains("submission_")) {
+            String d = f.getName().substring(f.getName().lastIndexOf("_")+1, f.getName().lastIndexOf("."));
+            Date test =  df.parse(d);
+            if (latestDate == null || test.after(latestDate)) {
+              latestDate = test;
+            }
+          }
+        }
+      }
+      catch (ParseException e) {
+        log.error("No timestamped submission metadata documents. Falling back to simple names: " + e.getMessage());
+      }
+
+      String dateStr = "";
+      if (latestDate != null) {
+        dateStr = "_"+df.format(latestDate);
+      }
+
       InputStream in = null;
       for (File f : files) {
-        if (f.getName().contains("submission")) {
+        if (f.getName().contains("submission"+dateStr)) {
           in = ERASubmissionManager.class.getResourceAsStream("/submission/xsl/eraSubmission.xsl");
           if (in != null) {
             String xsl = LimsUtils.inputStreamToString(in);
@@ -531,7 +580,7 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
       }
 
       for (File f : files) {
-        if (f.getName().contains("study")) {
+        if (f.getName().contains("study"+dateStr)) {
           in = ERASubmissionManager.class.getResourceAsStream("/submission/xsl/eraStudy.xsl");
           if (in != null) {
             String xsl = LimsUtils.inputStreamToString(in);
@@ -541,7 +590,7 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
       }
 
       for (File f : files) {
-        if (f.getName().contains("sample")) {
+        if (f.getName().contains("sample"+dateStr)) {
           in = ERASubmissionManager.class.getResourceAsStream("/submission/xsl/eraSample.xsl");
           if (in != null) {
             String xsl = LimsUtils.inputStreamToString(in);
@@ -551,7 +600,7 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
       }
 
       for (File f : files) {
-        if (f.getName().contains("experiment")) {
+        if (f.getName().contains("experiment"+dateStr)) {
           in = ERASubmissionManager.class.getResourceAsStream("/submission/xsl/eraExperiment.xsl");
           if (in != null) {
             String xsl = LimsUtils.inputStreamToString(in);
@@ -561,7 +610,7 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
       }
 
       for (File f : files) {
-        if (f.getName().contains("run")) {
+        if (f.getName().contains("run"+dateStr)) {
           in = ERASubmissionManager.class.getResourceAsStream("/submission/xsl/eraRun.xsl");
           if (in != null) {
             String xsl = LimsUtils.inputStreamToString(in);

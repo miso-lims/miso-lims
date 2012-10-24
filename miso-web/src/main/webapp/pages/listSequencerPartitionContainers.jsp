@@ -24,80 +24,21 @@
 <%@ include file="../header.jsp" %>
 
 <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.popup.js'/>"></script>
+<script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
+<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" type="text/css">
+<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables_themeroller.css'/>">
 <div id="maincontent">
   <div id="contentcolumn">
     <h1>
-      <div id="totalCount"></div>
+      <div id="totalCount">Partition Containers</div>
     </h1>
-    <a href="<c:url value='/miso/container/new'/>" class="add">Create Partition Container</a>
 
-    <form id="filter-form">Filter: <input name="filter" id="filter" value="" maxlength="30" size="30" type="text">
-    </form>
-    <br/>
-    <table class="list" id="table">
-      <thead>
-      <tr>
-        <th>Name</th>
-        <th>ID Barcode</th>
-        <th>Platform</th>
-        <th>Last Associated Run</th>
-        <th>Last Sequencer Used</th>
-        <%--<th>Populated Partitions</th>--%>
-        <th class="fit">Edit</th>
-      </tr>
-      </thead>
-      <tbody>
-      <c:forEach items="${containers}" var="container" varStatus="fCount">
-        <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-          <td>${container.name}</td>
-          <td>${container.identificationBarcode}</td>
-          <td>${container.platformType.key}</td>
-          <td>
-            <c:if test="${not empty container.run}">
-              <a href='<c:url value="/miso/run/${container.run.id}"/>'>${container.run.alias}</a>
-            </c:if>
-          </td>
-          <td>
-            <c:if test="${not empty container.run and not empty container.run.sequencerReference}">
-              <a href='<c:url value="/miso/sequencer/${container.run.sequencerReference.id}"/>'>${container.run.sequencerReference.platform.nameAndModel}</a>
-            </c:if>
-          </td>
-          <td class="misoicon"
-              onclick="window.location.href='<c:url value="/miso/container/${container.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
-        </tr>
-      </c:forEach>
-      </tbody>
+    <table cellpadding="0" cellspacing="0" border="0" class="display" id="listingContainersTable">
     </table>
     <script type="text/javascript">
       jQuery(document).ready(function() {
-        writeTotalNo();
-        jQuery("#table").tablesorter({
-           headers: {
-             5: {
-               sorter: false
-             }
-           }
-         });
+        Container.ui.createListingContainersTable();
       });
-
-      jQuery(function() {
-        var theTable = jQuery("#table");
-
-        jQuery("#filter").keyup(function() {
-          jQuery.uiTableFilter(theTable, this.value);
-          writeTotalNo();
-        });
-
-        jQuery('#filter-form').submit(
-          function() {
-            theTable.find("tbody > tr:visible > td:eq(1)").mousedown();
-            return false;
-          }).focus(); //Give focus to input field
-      });
-
-      function writeTotalNo() {
-        jQuery('#totalCount').html(jQuery('#table>tbody>tr:visible').length.toString() + " Partition Containers");
-      }
     </script>
   </div>
 </div>

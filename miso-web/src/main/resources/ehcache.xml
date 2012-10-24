@@ -171,6 +171,11 @@
            eternal="true"
            overflowToDisk="false" statistics="true"/>
 
+    <cache name="poolListCache"
+           maxElementsInMemory="1"
+           eternal="true"
+           overflowToDisk="false" statistics="true"/>
+
     <cache name="projectListCache"
            maxElementsInMemory="1"
            eternal="true"

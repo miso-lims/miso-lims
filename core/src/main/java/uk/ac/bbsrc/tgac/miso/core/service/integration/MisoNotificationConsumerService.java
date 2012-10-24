@@ -56,9 +56,8 @@ public class MisoNotificationConsumerService implements NotificationConsumerServ
   @Override
   public Collection<NotificationConsumerStrategy> getConsumerStrategies() {
     //lazily load available strategies
-    log.info("Grabbing strategies...");
+    log.debug("Grabbing strategies...");
     if (strategyMap == null) {
-      log.info("...lazily");
       ServiceLoader<NotificationConsumerStrategy> consumerLoader = ServiceLoader.load(NotificationConsumerStrategy.class);
       Iterator<NotificationConsumerStrategy> consumerIterator = consumerLoader.iterator();
 

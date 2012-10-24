@@ -72,23 +72,8 @@ public class ListPoolsController {
   }
 
   @RequestMapping("/pools")
-  public ModelAndView listPools(ModelMap model) throws IOException {
-    try {
-      List<Pool<? extends Poolable>> ipools = requestManager.listAllIlluminaPools();
-      List<Pool<? extends Poolable>> lpools = requestManager.listAll454Pools();
-      List<Pool<? extends Poolable>> spools = requestManager.listAllSolidPools();
-      model.addAttribute("illuminaPools", ipools);
-      model.addAttribute("ls454Pools", lpools);
-      model.addAttribute("solidPools", spools);
-
-      return new ModelAndView("/pages/listPools.jsp", model);
-    }
-    catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to list pools", ex);
-      }
-      throw ex;
-    }
+  public ModelAndView listPools() throws IOException {
+    return new ModelAndView("/pages/listPools.jsp");
   }
 
   @RequestMapping("/pools/ready")
@@ -96,7 +81,7 @@ public class ListPoolsController {
     try {
       List<Pool> ipools = new ArrayList<Pool>();
       List<Pool> ipoolsUsed = new ArrayList<Pool>();
-      for (Pool p: requestManager.listReadyIlluminaPools()) {
+      for (Pool p : requestManager.listReadyIlluminaPools()) {
         if (requestManager.listRunsByPoolId(p.getId()).isEmpty()) {
           ipools.add(p);
         }
@@ -107,7 +92,7 @@ public class ListPoolsController {
 
       List<Pool> lpools = new ArrayList<Pool>();
       List<Pool> lpoolsUsed = new ArrayList<Pool>();
-      for (Pool p: requestManager.listReady454Pools()) {
+      for (Pool p : requestManager.listReady454Pools()) {
         if (requestManager.listRunsByPoolId(p.getId()).isEmpty()) {
           lpools.add(p);
         }
@@ -118,7 +103,7 @@ public class ListPoolsController {
 
       List<Pool> spools = new ArrayList<Pool>();
       List<Pool> spoolsUsed = new ArrayList<Pool>();
-      for (Pool p: requestManager.listReadySolidPools()) {
+      for (Pool p : requestManager.listReadySolidPools()) {
         if (requestManager.listRunsByPoolId(p.getId()).isEmpty()) {
           spools.add(p);
         }

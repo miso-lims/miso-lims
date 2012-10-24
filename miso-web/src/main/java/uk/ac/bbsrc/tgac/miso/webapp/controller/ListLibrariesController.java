@@ -77,16 +77,6 @@ public class ListLibrariesController {
 
   @RequestMapping("/libraries")
   public ModelAndView listLibraries() throws Exception {
-    try {
-      List<Library> libraries = new ArrayList<Library>(requestManager.listAllLibraries());
-      Collections.sort(libraries, new AliasComparator(Library.class));
-      return new ModelAndView("/pages/listLibraries.jsp", "libraries", libraries);
-    }
-    catch (Exception ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to list libraries", ex);
-      }
-      throw ex;
-    }
+    return new ModelAndView("/pages/listLibraries.jsp");
   }
 }

@@ -115,6 +115,8 @@
   <script type="text/javascript" src="<c:url value='/scripts/project_ajax.js?ts=${timestamp.time}'/>"></script>
   <script type="text/javascript" src="<c:url value='/scripts/reporting_ajax.js?ts=${timestamp.time}'/>"></script>
   <script type="text/javascript" src="<c:url value='/scripts/sample_ajax.js?ts=${timestamp.time}'/>"></script>
+  <script type="text/javascript" src="<c:url value='/scripts/run_ajax.js?ts=${timestamp.time}'/>"></script>
+  <script type="text/javascript" src="<c:url value='/scripts/sequencer_partition_container_ajax.js?ts=${timestamp.time}'/>"></script>
   <script type="text/javascript"
           src="<c:url value='/scripts/sequencer_reference_ajax.js?ts=${timestamp.time}'/>"></script>
   <script type="text/javascript" src="<c:url value='/scripts/study_ajax.js?ts=${timestamp.time}'/>"></script>

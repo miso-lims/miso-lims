@@ -59,18 +59,7 @@ public class ListProjectsController {
   }
 
   @RequestMapping("/projects")
-  public ModelAndView listProjects(ModelMap model) throws Exception {
-    try {
-//      List<Project> projects = new ArrayList<Project>(requestManager.listAllProjects());
-//      Collections.sort(projects, new AliasComparator(Project.class));
-      model.addAttribute("projects", requestManager.listAllProjects());
-      return new ModelAndView("/pages/listProjects.jsp", model);
-    }
-    catch (Exception ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to list projects", ex);
-      }
-      throw ex;
-    }
+  public ModelAndView listProjects() throws Exception {
+    return new ModelAndView("/pages/listProjects.jsp");
   }
 }

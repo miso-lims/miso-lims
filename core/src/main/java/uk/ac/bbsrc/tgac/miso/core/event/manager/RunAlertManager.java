@@ -137,6 +137,7 @@ public class RunAlertManager {
         Set<RunQC> clonedQCs = new HashSet<RunQC>(clone.getRunQCs());
         for (RunQC qc : r.getRunQCs()) {
           if (!clonedQCs.contains(qc)) {
+            log.info("Adding QC: " + qc.toString());
             try {
               clone.addQc(cloner.deepClone(qc));
             }

@@ -60,8 +60,11 @@ public interface RequestManager {
   public long saveLibraryNote(Library library, Note note) throws IOException;
   public long saveLibraryQC(LibraryQC libraryQC) throws IOException;
   public long savePool(Pool pool) throws IOException;
+  @Deprecated
   public long saveIlluminaPool(IlluminaPool pool) throws IOException;
+  @Deprecated
   public long saveLS454Pool(LS454Pool pool) throws IOException;
+  @Deprecated
   public long saveSolidPool(SolidPool pool) throws IOException;
   public long saveEmPCR(emPCR pcr) throws IOException;
   public long saveEmPCRDilution(emPCRDilution dilution) throws IOException;
@@ -238,11 +241,17 @@ public interface RequestManager {
   public Collection<Pool<? extends Poolable>> listReadyPoolsByPlatformAndSearch(PlatformType platformType, String query) throws IOException;
   public Collection<Pool<? extends Poolable>> listPoolsByProjectId(long projectId) throws IOException;
   public Collection<Pool<? extends Poolable>> listPoolsByLibraryId(long libraryId) throws IOException;
+  @Deprecated
   public List<Pool<? extends Poolable>> listAllIlluminaPools() throws IOException;
+  @Deprecated
   public List<Pool<? extends Poolable>> listAll454Pools() throws IOException;
+  @Deprecated
   public List<Pool<? extends Poolable>> listAllSolidPools() throws IOException;
+  @Deprecated
   public List<Pool<? extends Poolable>> listReadyIlluminaPools() throws IOException;
+  @Deprecated
   public List<Pool<? extends Poolable>> listReady454Pools() throws IOException;
+  @Deprecated
   public List<Pool<? extends Poolable>> listReadySolidPools() throws IOException;
 
   /**

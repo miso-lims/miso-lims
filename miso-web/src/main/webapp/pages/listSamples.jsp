@@ -28,69 +28,22 @@
   Time: 08:51:03
 --%>
 <%@ include file="../header.jsp" %>
+<script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
+<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" type="text/css">
+<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables_themeroller.css'/>">
 
 <div id="maincontent">
     <div id="contentcolumn">
         <h1>
-            <div id="totalCount">
+            <div id="totalCount">Samples
             </div></h1>
-        <a href='<c:url value="/miso/sample/new"/>' class="add">Add Sample</a>
 
-        <form id="filter-form">Filter: <input name="filter" id="filter" value="" maxlength="30" size="30" type="text">
-        </form>
-        <br/>
-        <table class="list" id="table">
-            <thead>
-            <tr>
-                <th>Sample Name</th>
-                <th>Sample Alias</th>
-                <th>Type</th>
-                <th>QC Passed</th>
-                <th class="fit">Edit</th>
-            </tr>
-            </thead>
-            <tbody>
-            <c:forEach items="${samples}" var="sample">
-                <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-                    <td><b>${sample.name}</b></td>
-                    <td>${sample.alias}</td>
-                    <td>${sample.sampleType}</td>
-                    <td>${sample.qcPassed}</td>
-                    <td class="misoicon"
-                        onclick="window.location.href='<c:url value="/miso/sample/${sample.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
-                </tr>
-            </c:forEach>
-            </tbody>
-        </table>
+    <table cellpadding="0" cellspacing="0" border="0" class="display" id="listingSamplesTable">
+    </table>
         <script type="text/javascript">
             jQuery(document).ready(function() {
-                writeTotalNo();
-                jQuery("#table").tablesorter({
-                    headers: {
-                        4: {
-                            sorter: false
-                        }
-                    }
-                });
+            Sample.ui.createListingSamplesTable();
             });
-
-            jQuery(function() {
-                var theTable = jQuery("#table");
-
-                jQuery("#filter").keyup(function() {
-                    jQuery.uiTableFilter(theTable, this.value);
-                    writeTotalNo();
-                });
-
-                jQuery('#filter-form').submit(function() {
-                    theTable.find("tbody > tr:visible > td:eq(1)").mousedown();
-                    return false;
-                }).focus(); //Give focus to input field
-            });
-
-            function writeTotalNo() {
-                jQuery('#totalCount').html(jQuery('#table>tbody>tr:visible').length.toString() + " Samples");
-            }
         </script>
     </div>
 </div>

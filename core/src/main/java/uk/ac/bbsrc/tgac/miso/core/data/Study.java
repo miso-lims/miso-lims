@@ -128,6 +128,21 @@ public interface Study extends SecurableByProfile, Submittable<Document>, Compar
   public void setAlias(String alias);
 
   /**
+   * Returns the abstract of this Study object.
+   *
+   * @return String abstract.
+   */
+  public String getAbstract();
+
+  /**
+   * Sets the abstract of this Study object.
+   *
+   * @param abs abs.
+   */
+  public void setAbstract(String abs);
+
+
+  /**
    * Returns the studyType of this Study object.
    *
    * @return String studyType.

@@ -1147,6 +1147,28 @@ public class LibraryControllerHelperService {
     }
   }
 
+  public JSONObject listLibrariesDataTable(HttpSession session, JSONObject json) {
+    try {
+      JSONObject j = new JSONObject();
+      JSONArray jsonArray = new JSONArray();
+      for (Library library : requestManager.listAllLibraries()) {
+        jsonArray.add("['" + library.getName() + "','" +
+                      library.getAlias() + "','" +
+                      library.getLibraryType().getDescription() + "','" +
+                      library.getSample().getName()+ "','" +
+                      library.getQcPassed().toString()+ "','" +
+                      "<a href=\"/miso/library/" + library.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
+
+      }
+      j.put("array", jsonArray);
+      return j;
+    }
+    catch (IOException e) {
+      log.debug("Failed", e);
+      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
+    }
+  }
+
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
   }

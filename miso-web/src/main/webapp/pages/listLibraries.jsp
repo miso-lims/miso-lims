@@ -28,70 +28,22 @@
   Time: 08:51:03
 --%>
 <%@ include file="../header.jsp" %>
+<script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
+<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" type="text/css">
+<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables_themeroller.css'/>">
 
 <div id="maincontent">
     <div id="contentcolumn">
         <h1>
-            <div id="totalCount">
+            <div id="totalCount"> Libraries
             </div></h1>
 
-        <form id="filter-form">Filter: <input name="filter" id="filter" value="" maxlength="30" size="30" type="text">
-        </form>
-        <br/>
-        <table class="list" id="table">
-            <thead>
-            <tr>
-                <th>Library Name</th>
-                <th>Library Alias</th>
-                <th>Library Type</th>
-                <th>Sample Name</th>
-                <th>QC Passed</th>
-                <th class="fit">Edit</th>
-            </tr>
-            </thead>
-            <tbody>
-            <c:forEach items="${libraries}" var="library">
-                <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-                    <td><b>${library.name}</b></td>
-                    <td>${library.alias}</td>
-                    <td>${library.libraryType.description}</td>
-                    <td>${library.sample.name}</td>
-                    <td>${library.qcPassed}</td>
-                    <td class="misoicon"
-                        onclick="window.location.href='<c:url value="/miso/library/${library.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
-                </tr>
-            </c:forEach>
-            </tbody>
-        </table>
+    <table cellpadding="0" cellspacing="0" border="0" class="display" id="listingLibrariesTable">
+    </table>
         <script type="text/javascript">
             jQuery(document).ready(function() {
-                writeTotalNo();
-                jQuery("#table").tablesorter({
-                    headers: {
-                        5: {
-                            sorter: false
-                        }
-                    }
-                });
+             Library.ui.createListingLibrariesTable();
             });
-
-            jQuery(function() {
-                var theTable = jQuery("#table");
-
-                jQuery("#filter").keyup(function() {
-                    jQuery.uiTableFilter(theTable, this.value);
-                    writeTotalNo();
-                });
-
-                jQuery('#filter-form').submit(function() {
-                    theTable.find("tbody > tr:visible > td:eq(1)").mousedown();
-                    return false;
-                }).focus(); //Give focus to input field
-            });
-
-            function writeTotalNo() {
-                jQuery('#totalCount').html(jQuery('#table>tbody>tr:visible').length.toString() + " Libraries");
-            }
         </script>
     </div>
 </div>

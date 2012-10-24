@@ -203,6 +203,184 @@ Pool.ui = {
         }
       }
     );
+  },
+
+  createListingPoolsTable : function() {
+    jQuery('#listingIlluminaPoolsTable').html("<img src='../styles/images/ajax-loader.gif'/>");
+    jQuery.fn.dataTableExt.oSort['no-ipo-asc'] = function(x, y) {
+      var a = parseInt(x.replace(/^IPO/i, ""));
+      var b = parseInt(y.replace(/^IPO/i, ""));
+      return ((a < b) ? -1 : ((a > b) ? 1 : 0));
+    };
+    jQuery.fn.dataTableExt.oSort['no-ipo-desc'] = function(x, y) {
+      var a = parseInt(x.replace(/^IPO/i, ""));
+      var b = parseInt(y.replace(/^IPO/i, ""));
+      return ((a < b) ? 1 : ((a > b) ? -1 : 0));
+    };
+    jQuery('#listingLs454PoolsTable').html("<img src='../styles/images/ajax-loader.gif'/>");
+    jQuery.fn.dataTableExt.oSort['no-lpo-asc'] = function(x, y) {
+      var a = parseInt(x.replace(/^LPO/i, ""));
+      var b = parseInt(y.replace(/^LPO/i, ""));
+      return ((a < b) ? -1 : ((a > b) ? 1 : 0));
+    };
+    jQuery.fn.dataTableExt.oSort['no-lpo-desc'] = function(x, y) {
+      var a = parseInt(x.replace(/^LPO/i, ""));
+      var b = parseInt(y.replace(/^LPO/i, ""));
+      return ((a < b) ? 1 : ((a > b) ? -1 : 0));
+    };
+    jQuery('#listingSolidPoolsTable').html("<img src='../styles/images/ajax-loader.gif'/>");
+    jQuery.fn.dataTableExt.oSort['no-spo-asc'] = function(x, y) {
+      var a = parseInt(x.replace(/^SPO/i, ""));
+      var b = parseInt(y.replace(/^SPO/i, ""));
+      return ((a < b) ? -1 : ((a > b) ? 1 : 0));
+    };
+    jQuery.fn.dataTableExt.oSort['no-spo-desc'] = function(x, y) {
+      var a = parseInt(x.replace(/^SPO/i, ""));
+      var b = parseInt(y.replace(/^SPO/i, ""));
+      return ((a < b) ? 1 : ((a > b) ? -1 : 0));
+    };
+    Fluxion.doAjax(
+            'poolControllerHelperService',
+            'listPoolsDataTable',
+            {
+              'url':ajaxurl
+            },
+            {'doOnSuccess': function(json) {
+              jQuery('#listingIlluminaPoolsTable').html('');
+              jQuery('#listingIlluminaPoolsTable').dataTable({
+                                                          "aaData": json.illuminaArray,
+                                                          "aoColumns": [
+                                                            { "sTitle": "Name", "sType":"no-ipo"},
+                                                            { "sTitle": "Alias"},
+                                                            { "sTitle": "Date Created"},
+                                                            { "sTitle": "Information"},
+                                                            { "sTitle": "Average Insert Size"},
+                                                            { "sTitle": "Edit"}
+                                                          ],
+                                                          "bJQueryUI": true,
+                                                          "iDisplayLength":  25,
+                                                          "aaSorting":[
+                                                            [0,"desc"]
+                                                          ] ,
+                                                          "fnRowCallback": function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                                                            Fluxion.doAjax(
+                                                                    'poolControllerHelperService',
+                                                                    'checkInfoByPoolId',
+                                                                    {
+                                                                      'poolId':aData[3],
+                                                                      'url':ajaxurl
+                                                                    },
+                                                                    {'doOnSuccess': function(json) {
+                                                                      jQuery('td:eq(3)', nRow).html(json.response);
+                                                                    }
+                                                                    }
+                                                            );
+
+                                                            Fluxion.doAjax(
+                                                                    'poolControllerHelperService',
+                                                                    'checkAverageInsertSizeByPoolId',
+                                                                    {
+                                                                      'poolId':aData[4],
+                                                                      'url':ajaxurl
+                                                                    },
+                                                                    {'doOnSuccess': function(json) {
+                                                                      jQuery('td:eq(4)', nRow).html(json.response);
+                                                                    }
+                                                                    }
+                                                            );
+                                                          }
+                                                        });
+              jQuery('#listingLs454PoolsTable').html('');
+              jQuery('#listingLs454PoolsTable').dataTable({
+                                                          "aaData": json.ls454Array,
+                                                          "aoColumns": [
+                                                            { "sTitle": "Name", "sType":"no-lpo"},
+                                                            { "sTitle": "Alias"},
+                                                            { "sTitle": "Date Created"},
+                                                            { "sTitle": "Information"},
+                                                            { "sTitle": "Average Insert Size"},
+                                                            { "sTitle": "Edit"}
+                                                          ],
+                                                          "bJQueryUI": true,
+                                                          "iDisplayLength":  25,
+                                                          "aaSorting":[
+                                                            [0,"desc"]
+                                                          ] ,
+                                                          "fnRowCallback": function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                                                            Fluxion.doAjax(
+                                                                    'poolControllerHelperService',
+                                                                    'checkInfoByPoolId',
+                                                                    {
+                                                                      'poolId':aData[3],
+                                                                      'url':ajaxurl
+                                                                    },
+                                                                    {'doOnSuccess': function(json) {
+                                                                      jQuery('td:eq(3)', nRow).html(json.response);
+                                                                    }
+                                                                    }
+                                                            );
+
+                                                            Fluxion.doAjax(
+                                                                    'poolControllerHelperService',
+                                                                    'checkAverageInsertSizeByPoolId',
+                                                                    {
+                                                                      'poolId':aData[4],
+                                                                      'url':ajaxurl
+                                                                    },
+                                                                    {'doOnSuccess': function(json) {
+                                                                      jQuery('td:eq(4)', nRow).html(json.response);
+                                                                    }
+                                                                    }
+                                                            );
+                                                          }
+                                                        });
+              jQuery('#listingSolidPoolsTable').html('');
+              jQuery('#listingSolidPoolsTable').dataTable({
+                                                          "aaData": json.solidArray,
+                                                          "aoColumns": [
+                                                            { "sTitle": "Name", "sType":"no-spo"},
+                                                            { "sTitle": "Alias"},
+                                                            { "sTitle": "Date Created"},
+                                                            { "sTitle": "Information"},
+                                                            { "sTitle": "Average Insert Size"},
+                                                            { "sTitle": "Edit"}
+                                                          ],
+                                                          "bJQueryUI": true,
+                                                          "iDisplayLength":  25,
+                                                          "aaSorting":[
+                                                            [0,"desc"]
+                                                          ] ,
+                                                          "fnRowCallback": function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                                                            Fluxion.doAjax(
+                                                                    'poolControllerHelperService',
+                                                                    'checkInfoByPoolId',
+                                                                    {
+                                                                      'poolId':aData[3],
+                                                                      'url':ajaxurl
+                                                                    },
+                                                                    {'doOnSuccess': function(json) {
+                                                                      jQuery('td:eq(3)', nRow).html(json.response);
+                                                                    }
+                                                                    }
+                                                            );
+
+                                                            Fluxion.doAjax(
+                                                                    'poolControllerHelperService',
+                                                                    'checkAverageInsertSizeByPoolId',
+                                                                    {
+                                                                      'poolId':aData[4],
+                                                                      'url':ajaxurl
+                                                                    },
+                                                                    {'doOnSuccess': function(json) {
+                                                                      jQuery('td:eq(4)', nRow).html(json.response);
+                                                                    }
+                                                                    }
+                                                            );
+                                                          }
+                                                        });
+            }
+            }
+    );
   }
 };
 

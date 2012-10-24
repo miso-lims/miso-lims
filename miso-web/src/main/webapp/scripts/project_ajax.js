@@ -28,33 +28,92 @@ var Project = Project || {
 Project.ui = {
   editProjectTrafficLight : function(projectId) {
     Fluxion.doAjax(
-      'projectControllerHelperService',
-      'editProjectTrafficLight',
-      {
-        'projectId':projectId,
-        'url':ajaxurl
-      },
-      {'doOnSuccess': function(json) {
-          jQuery('#pro' + projectId + 'traf').html(json.html);
-        }
-      }
+            'projectControllerHelperService',
+            'editProjectTrafficLight',
+            {
+              'projectId':projectId,
+              'url':ajaxurl
+            },
+            {'doOnSuccess': function(json) {
+              jQuery('#pro' + projectId + 'traf').html(json.html);
+            }
+            }
     );
   },
 
   listProjectTrafficLight : function() {
     jQuery('.overviewstat').html("<img src='../styles/images/ajax-loader.gif'/>");
     Fluxion.doAjax(
-      'projectControllerHelperService',
-      'listProjectTrafficLight',
-      {
-        'url':ajaxurl
-      },
-      {'doOnSuccess': function(json) {
-          jQuery.each(json, function(i, val) {
-            jQuery('#pro' + i + 'overview').html(val)
-          });
-        }
-      }
+            'projectControllerHelperService',
+            'listProjectTrafficLight',
+            {
+              'url':ajaxurl
+            },
+            {'doOnSuccess': function(json) {
+              jQuery.each(json, function(i, val) {
+                jQuery('#pro' + i + 'overview').html(val)
+              });
+            }
+            }
+    );
+  },
+
+  createListingProjectsTable : function() {
+    jQuery('#listingProjectsTable').html("<img src='../styles/images/ajax-loader.gif'/>");
+    jQuery.fn.dataTableExt.oSort['no-pro-asc'] = function(x, y) {
+      var a = parseInt(x.replace(/^PRO/i, ""));
+      var b = parseInt(y.replace(/^PRO/i, ""));
+      return ((a < b) ? -1 : ((a > b) ? 1 : 0));
+    };
+    jQuery.fn.dataTableExt.oSort['no-pro-desc'] = function(x, y) {
+      var a = parseInt(x.replace(/^PRO/i, ""));
+      var b = parseInt(y.replace(/^PRO/i, ""));
+      return ((a < b) ? 1 : ((a > b) ? -1 : 0));
+    };
+    Fluxion.doAjax(
+            'projectControllerHelperService',
+            'listProjectsDataTable',
+            {
+              'url':ajaxurl
+            },
+            {'doOnSuccess': function(json) {
+              jQuery('#listingProjectsTable').html('');
+              jQuery('#listingProjectsTable').dataTable({
+                                                          "aaData": json.projectsArray,
+                                                          "aoColumns": [
+                                                            { "sTitle": "Project Name", "sType":"no-pro"},
+                                                            { "sTitle": "Alias"},
+                                                            { "sTitle": "Description"},
+                                                            { "sTitle": "Progress"},
+                                                            { "sTitle": "Overview"},
+                                                            { "sTitle": "Edit"}
+                                                          ],
+                                                          "bJQueryUI": true,
+                                                          "iDisplayLength":  25,
+                                                          "aaSorting":[
+                                                            [0,"desc"]
+                                                          ],
+                                                          "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
+                                                          "fnRowCallback": function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+
+                                                            Fluxion.doAjax(
+                                                                    'projectControllerHelperService',
+                                                                    'checkOverviewByProjectId',
+                                                                    {
+                                                                      'projectId':aData[4],
+                                                                      'url':ajaxurl
+                                                                    },
+                                                                    {'doOnSuccess': function(json) {
+                                                                      jQuery('td:eq(4)', nRow).html(json.response);
+                                                                    }
+                                                                    }
+                                                            );
+                                                          }
+                                                        });
+              jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
+              jQuery("#toolbar").append("<button style=\"margin-left:5px;\" onclick=\"window.location.href='/miso/project/new';\" class=\"fg-button ui-state-default ui-corner-all\">Add Project</button>");
+            }
+            }
     );
   },
 
@@ -69,17 +128,17 @@ Project.ui = {
     }
 
     Fluxion.doAjax(
-      'projectControllerHelperService',
-      'generateSampleDeliveryForm',
-      {
-        'projectId':projectId,
-        'samples':aReturn,
-        'url':ajaxurl
-      },
-      {'doOnSuccess':function (json) {
-          Utils.page.pageRedirect('/miso/download/project/' + projectId + '/' + json.response);
-        }
-      }
+            'projectControllerHelperService',
+            'generateSampleDeliveryForm',
+            {
+              'projectId':projectId,
+              'samples':aReturn,
+              'url':ajaxurl
+            },
+            {'doOnSuccess':function (json) {
+              Utils.page.pageRedirect('/miso/download/project/' + projectId + '/' + json.response);
+            }
+            }
     );
   },
 
@@ -97,17 +156,17 @@ Project.ui = {
 
   downloadBulkInputForm : function(projectId, documentFormat) {
     Fluxion.doAjax(
-      'projectControllerHelperService',
-      'downloadBulkInputForm',
-      {
-        'projectId':projectId,
-        'documentFormat':documentFormat,
-        'url':ajaxurl
-      },
-      {'doOnSuccess':function (json) {
-          Utils.page.pageRedirect('/miso/download/project/' + projectId + '/' + json.response);
-        }
-      }
+            'projectControllerHelperService',
+            'downloadBulkInputForm',
+            {
+              'projectId':projectId,
+              'documentFormat':documentFormat,
+              'url':ajaxurl
+            },
+            {'doOnSuccess':function (json) {
+              Utils.page.pageRedirect('/miso/download/project/' + projectId + '/' + json.response);
+            }
+            }
     );
   },
 
@@ -151,15 +210,15 @@ Project.ui = {
     if (aReturn.length > 0) {
       if (validate_sample_qcs(aReturn)) {
         Fluxion.doAjax(
-          'sampleControllerHelperService',
-          'bulkAddSampleQCs',
-          {
-            'qcs':aReturn,
-            'url':ajaxurl
-          },
-          {
-            'doOnSuccess':self.processBulkSampleQcTable
-          }
+                'sampleControllerHelperService',
+                'bulkAddSampleQCs',
+                {
+                  'qcs':aReturn,
+                  'url':ajaxurl
+                },
+                {
+                  'doOnSuccess':self.processBulkSampleQcTable
+                }
         );
       }
       else {
@@ -211,15 +270,15 @@ Project.ui = {
     if (aReturn.length > 0) {
       if (validate_empcrs(aReturn)) {
         Fluxion.doAjax(
-          'libraryControllerHelperService',
-          'bulkAddEmPcrs',
-          {
-            'pcrs':aReturn,
-            'url':ajaxurl
-          },
-          {
-            'doOnSuccess':self.processBulkEmPcrTable
-          }
+                'libraryControllerHelperService',
+                'bulkAddEmPcrs',
+                {
+                  'pcrs':aReturn,
+                  'url':ajaxurl
+                },
+                {
+                  'doOnSuccess':self.processBulkEmPcrTable
+                }
         );
       }
       else {
@@ -272,15 +331,15 @@ Project.ui = {
     if (aReturn.length > 0) {
       if (validate_empcr_dilutions(aReturn)) {
         Fluxion.doAjax(
-          'libraryControllerHelperService',
-          'bulkAddEmPcrDilutions',
-          {
-            'dilutions':aReturn,
-            'url':ajaxurl
-          },
-          {
-            'doOnSuccess':self.processBulkEmPcrDilutionTable
-          });
+                'libraryControllerHelperService',
+                'bulkAddEmPcrDilutions',
+                {
+                  'dilutions':aReturn,
+                  'url':ajaxurl
+                },
+                {
+                  'doOnSuccess':self.processBulkEmPcrDilutionTable
+                });
       }
       else {
         alert("The results field can only contain integers or decimals.");
@@ -316,122 +375,122 @@ Project.overview = {
   showProjectOverviewDialog : function(projectId) {
     var self = this;
     jQuery('#addProjectOverviewDialog')
-      .html("<form>" +
-        "<fieldset class='dialog'><label for='principalInvestigator'>Principal Investigator</label>" +
-        "<input type='text' name='principalInvestigator' id='principalInvestigator' class='text ui-widget-content ui-corner-all' />" +
-        "<label for='numProposedSamples'>No. Proposed Samples</label>" +
-        "<input type='text' name='numProposedSamples' id='numProposedSamples' class='text ui-widget-content ui-corner-all' />" +
-        "</fieldset></form>");
+            .html("<form>" +
+                  "<fieldset class='dialog'><label for='principalInvestigator'>Principal Investigator</label>" +
+                  "<input type='text' name='principalInvestigator' id='principalInvestigator' class='text ui-widget-content ui-corner-all' />" +
+                  "<label for='numProposedSamples'>No. Proposed Samples</label>" +
+                  "<input type='text' name='numProposedSamples' id='numProposedSamples' class='text ui-widget-content ui-corner-all' />" +
+                  "</fieldset></form>");
 
     jQuery(function() {
       jQuery('#addProjectOverviewDialog').dialog({
-        autoOpen: false,
-        width: 400,
-        modal: true,
-        resizable: false,
-        buttons: {
-          "Add Overview": function() {
-            self.addProjectOverview(projectId, jQuery('#principalInvestigator').val(), jQuery('#numProposedSamples').val());
-            jQuery(this).dialog('close');
-          },
-          "Cancel": function() {
-            jQuery(this).dialog('close');
-          }
-        }
-      });
+                                                   autoOpen: false,
+                                                   width: 400,
+                                                   modal: true,
+                                                   resizable: false,
+                                                   buttons: {
+                                                     "Add Overview": function() {
+                                                       self.addProjectOverview(projectId, jQuery('#principalInvestigator').val(), jQuery('#numProposedSamples').val());
+                                                       jQuery(this).dialog('close');
+                                                     },
+                                                     "Cancel": function() {
+                                                       jQuery(this).dialog('close');
+                                                     }
+                                                   }
+                                                 });
     });
     jQuery('#addProjectOverviewDialog').dialog('open');
   },
 
   addProjectOverview : function(projectId, pi, nsamples) {
     Fluxion.doAjax(
-      'projectControllerHelperService',
-      'addProjectOverview',
-      {
-        'projectId':projectId,
-        'principalInvestigator':pi,
-        'numProposedSamples':nsamples,
-        'url':ajaxurl
-      },
-      {
-        'doOnSuccess':Utils.page.pageReload
-      }
+            'projectControllerHelperService',
+            'addProjectOverview',
+            {
+              'projectId':projectId,
+              'principalInvestigator':pi,
+              'numProposedSamples':nsamples,
+              'url':ajaxurl
+            },
+            {
+              'doOnSuccess':Utils.page.pageReload
+            }
     );
   },
 
   showProjectOverviewNoteDialog : function(overviewId) {
     var self = this;
     jQuery('#addProjectOverviewNoteDialog')
-      .html("<form>" +
-        "<fieldset class='dialog'>" +
-        "<label for='internalOnly'>Internal Only?</label>" +
-        "<input type='checkbox' checked='checked' name='internalOnly' id='internalOnly' class='text ui-widget-content ui-corner-all' />" +
-        "<br/>" +
-        "<label for='notetext'>Text</label>" +
-        "<input type='text' name='notetext' id='notetext' class='text ui-widget-content ui-corner-all' />" +
-        "</fieldset></form>");
+            .html("<form>" +
+                  "<fieldset class='dialog'>" +
+                  "<label for='internalOnly'>Internal Only?</label>" +
+                  "<input type='checkbox' checked='checked' name='internalOnly' id='internalOnly' class='text ui-widget-content ui-corner-all' />" +
+                  "<br/>" +
+                  "<label for='notetext'>Text</label>" +
+                  "<input type='text' name='notetext' id='notetext' class='text ui-widget-content ui-corner-all' />" +
+                  "</fieldset></form>");
 
     jQuery(function() {
       jQuery('#addProjectOverviewNoteDialog').dialog({
-        autoOpen: false,
-        width: 400,
-        modal: true,
-        resizable: false,
-        buttons: {
-          "Add Note": function() {
-            self.addProjectOverviewNote(overviewId, jQuery('#internalOnly').val(), jQuery('#notetext').val());
-            jQuery(this).dialog('close');
-          },
-          "Cancel": function() {
-            jQuery(this).dialog('close');
-          }
-        }
-      });
+                                                       autoOpen: false,
+                                                       width: 400,
+                                                       modal: true,
+                                                       resizable: false,
+                                                       buttons: {
+                                                         "Add Note": function() {
+                                                           self.addProjectOverviewNote(overviewId, jQuery('#internalOnly').val(), jQuery('#notetext').val());
+                                                           jQuery(this).dialog('close');
+                                                         },
+                                                         "Cancel": function() {
+                                                           jQuery(this).dialog('close');
+                                                         }
+                                                       }
+                                                     });
     });
     jQuery('#addProjectOverviewNoteDialog').dialog('open');
   },
 
   addProjectOverviewNote : function(overviewId, internalOnly, text) {
     Fluxion.doAjax(
-      'projectControllerHelperService',
-      'addProjectOverviewNote',
-      {
-        'overviewId':overviewId,
-        'internalOnly':internalOnly,
-        'text':text,
-        'url':ajaxurl
-      },
-      {
-        'doOnSuccess':Utils.page.pageReload
-      }
+            'projectControllerHelperService',
+            'addProjectOverviewNote',
+            {
+              'overviewId':overviewId,
+              'internalOnly':internalOnly,
+              'text':text,
+              'url':ajaxurl
+            },
+            {
+              'doOnSuccess':Utils.page.pageReload
+            }
     );
   },
 
   unlockProjectOverview : function(overviewId) {
     Fluxion.doAjax(
-      'projectControllerHelperService',
-      'unlockProjectOverview',
-      {
-        'overviewId':overviewId,
-        'url':ajaxurl
-      },
-      {
-        'doOnSuccess':Utils.page.pageReload
-      }
+            'projectControllerHelperService',
+            'unlockProjectOverview',
+            {
+              'overviewId':overviewId,
+              'url':ajaxurl
+            },
+            {
+              'doOnSuccess':Utils.page.pageReload
+            }
     );
   },
 
   lockProjectOverview : function(overviewId) {
     Fluxion.doAjax(
-      'projectControllerHelperService',
-      'lockProjectOverview',
-      {
-        'overviewId':overviewId,
-        'url':ajaxurl
-      },
-      {
-        'doOnSuccess':Utils.page.pageReload
-      }
+            'projectControllerHelperService',
+            'lockProjectOverview',
+            {
+              'overviewId':overviewId,
+              'url':ajaxurl
+            },
+            {
+              'doOnSuccess':Utils.page.pageReload
+            }
     );
   }
 };
@@ -449,19 +508,19 @@ Project.issues = {
     var issue = jQuery('#previewKey').val();
     if (issue !== "undefined" && issue !== "") {
       Fluxion.doAjax(
-        'projectControllerHelperService',
-        'previewIssues',
-        {
-          'issues':[
-            {
-              "key":issue
-            }
-          ],
-          'url':ajaxurl
-        },
-        {
-          'doOnSuccess':self.importIssue
-        }
+              'projectControllerHelperService',
+              'previewIssues',
+              {
+                'issues':[
+                  {
+                    "key":issue
+                  }
+                ],
+                'url':ajaxurl
+              },
+              {
+                'doOnSuccess':self.importIssue
+              }
       );
     }
     else {
@@ -471,7 +530,7 @@ Project.issues = {
 
   importIssue : function(json) {
     if (json.invalidIssues === "undefined" || json.invalidIssues.length == 0
-          && json.validIssues !== "undefined" && json.validIssues.length > 0) {
+                                                      && json.validIssues !== "undefined" && json.validIssues.length > 0) {
       var key = json.validIssues[0].key;
       var issue = json.validIssues[0].fields;
       var issueurl = json.validIssues[0].url;
@@ -504,15 +563,15 @@ Project.issues = {
       }
 
       Fluxion.doAjax(
-        'projectControllerHelperService',
-        'previewIssues',
-        {
-          'issues':issues,
-          'url':ajaxurl
-        },
-        {
-          'doOnSuccess':self.previewIssues
-        }
+              'projectControllerHelperService',
+              'previewIssues',
+              {
+                'issues':issues,
+                'url':ajaxurl
+              },
+              {
+                'doOnSuccess':self.previewIssues
+              }
       );
     }
     else {
@@ -553,15 +612,15 @@ Project.issues = {
   getProjectIssues : function(projectId) {
     var self = this;
     Fluxion.doAjax(
-      'projectControllerHelperService',
-      'getIssues',
-      {
-        'projectId':projectId,
-        'url':ajaxurl
-      },
-      {
-        'doOnSuccess':self.processIssues
-      }
+            'projectControllerHelperService',
+            'getIssues',
+            {
+              'projectId':projectId,
+              'url':ajaxurl
+            },
+            {
+              'doOnSuccess':self.processIssues
+            }
     );
   },
 
@@ -619,17 +678,17 @@ Project.barcode = {
   printAllSampleBarcodes : function(projectId) {
     if (confirm("Are you sure you want to print all sample barcodes?")) {
       Fluxion.doAjax(
-        'projectControllerHelperService',
-        'printAllSampleBarcodes',
-        {
-          'projectId':projectId,
-          'url':ajaxurl
-        },
-        {
-          'doOnSuccess':function (json) {
-            alert(json.response);
-          }
-        }
+              'projectControllerHelperService',
+              'printAllSampleBarcodes',
+              {
+                'projectId':projectId,
+                'url':ajaxurl
+              },
+              {
+                'doOnSuccess':function (json) {
+                  alert(json.response);
+                }
+              }
       );
     }
   },
@@ -637,17 +696,17 @@ Project.barcode = {
   printAllLibraryBarcodes : function(projectId) {
     if (confirm("Are you sure you want to print all library barcodes?")) {
       Fluxion.doAjax(
-        'projectControllerHelperService',
-        'printAllLibraryBarcodes',
-        {
-          'projectId':projectId,
-          'url':ajaxurl
-        },
-        {
-          'doOnSuccess':function (json) {
-            alert(json.response);
-          }
-        }
+              'projectControllerHelperService',
+              'printAllLibraryBarcodes',
+              {
+                'projectId':projectId,
+                'url':ajaxurl
+              },
+              {
+                'doOnSuccess':function (json) {
+                  alert(json.response);
+                }
+              }
       );
     }
   },
@@ -655,17 +714,17 @@ Project.barcode = {
   printAllLibraryDilutionBarcodes : function(projectId) {
     if (confirm("Are you sure you want to print all library dilution barcodes?")) {
       Fluxion.doAjax(
-        'projectControllerHelperService',
-        'printAllLibraryDilutionBarcodes',
-        {
-          'projectId':projectId,
-          'url':ajaxurl
-        },
-        {
-          'doOnSuccess':function (json) {
-            alert(json.response);
-          }
-        }
+              'projectControllerHelperService',
+              'printAllLibraryDilutionBarcodes',
+              {
+                'projectId':projectId,
+                'url':ajaxurl
+              },
+              {
+                'doOnSuccess':function (json) {
+                  alert(json.response);
+                }
+              }
       );
     }
   },
@@ -688,20 +747,20 @@ Project.barcode = {
                      'qcPassed'];
 
       var oTable = jQuery(tableId).dataTable({
-         "aoColumnDefs": [
-           {
-             "bUseRendered": false,
-             "aTargets": [ 0 ]
-           }
-         ],
-         "bPaginate": false,
-         "bInfo": false,
-         "bJQueryUI": true,
-         "bAutoWidth": true,
-         "bSort": false,
-         "bFilter": false,
-         "sDom": '<<"toolbar">f>r<t>ip>'
-       });
+                                               "aoColumnDefs": [
+                                                 {
+                                                   "bUseRendered": false,
+                                                   "aTargets": [ 0 ]
+                                                 }
+                                               ],
+                                               "bPaginate": false,
+                                               "bInfo": false,
+                                               "bJQueryUI": true,
+                                               "bAutoWidth": true,
+                                               "bSort": false,
+                                               "bFilter": false,
+                                               "sDom": '<<"toolbar">f>r<t>ip>'
+                                             });
 
       jQuery(tableId).find("tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"" + tableId + "\", this);'></span></th>");
       jQuery(tableId).find("tr:gt(0)").prepend("<td class='rowSelect'></td>");
@@ -730,56 +789,56 @@ Project.barcode = {
     }
 
     Fluxion.doAjax(
-      'printerControllerHelperService',
-      'listAvailableServices',
-      {
-        'serviceClass':'uk.ac.bbsrc.tgac.miso.core.data.Sample',
-        'url':ajaxurl
-      },
-      {
-        'doOnSuccess':function (json) {
-          jQuery('#printServiceSelectDialog')
-            .html("<form>" +
-              "<fieldset class='dialog'>" +
-              "<select name='serviceSelect' id='serviceSelect' class='ui-widget-content ui-corner-all'>" +
-              json.services +
-              "</select></fieldset></form>");
+            'printerControllerHelperService',
+            'listAvailableServices',
+            {
+              'serviceClass':'uk.ac.bbsrc.tgac.miso.core.data.Sample',
+              'url':ajaxurl
+            },
+            {
+              'doOnSuccess':function (json) {
+                jQuery('#printServiceSelectDialog')
+                        .html("<form>" +
+                              "<fieldset class='dialog'>" +
+                              "<select name='serviceSelect' id='serviceSelect' class='ui-widget-content ui-corner-all'>" +
+                              json.services +
+                              "</select></fieldset></form>");
 
-          jQuery(function() {
-            jQuery('#printServiceSelectDialog').dialog({
-              autoOpen: false,
-              width: 400,
-              modal: true,
-              resizable: false,
-              buttons: {
-                "Print": function() {
-                  Fluxion.doAjax(
-                    'projectControllerHelperService',
-                    'printSelectedSampleBarcodes',
-                    {
-                      'serviceName':jQuery('#serviceSelect').val(),
-                      'samples':samples,
-                      'url':ajaxurl
-                    },
-                    {
-                      'doOnSuccess':function (json) {
-                      alert(json.response);
-                    }
-                  });
-                  jQuery(this).dialog('close');
-                },
-                "Cancel": function() {
-                  jQuery(this).dialog('close');
-                }
+                jQuery(function() {
+                  jQuery('#printServiceSelectDialog').dialog({
+                                                               autoOpen: false,
+                                                               width: 400,
+                                                               modal: true,
+                                                               resizable: false,
+                                                               buttons: {
+                                                                 "Print": function() {
+                                                                   Fluxion.doAjax(
+                                                                           'projectControllerHelperService',
+                                                                           'printSelectedSampleBarcodes',
+                                                                           {
+                                                                             'serviceName':jQuery('#serviceSelect').val(),
+                                                                             'samples':samples,
+                                                                             'url':ajaxurl
+                                                                           },
+                                                                           {
+                                                                             'doOnSuccess':function (json) {
+                                                                               alert(json.response);
+                                                                             }
+                                                                           });
+                                                                   jQuery(this).dialog('close');
+                                                                 },
+                                                                 "Cancel": function() {
+                                                                   jQuery(this).dialog('close');
+                                                                 }
+                                                               }
+                                                             });
+                });
+                jQuery('#printServiceSelectDialog').dialog('open');
+              },
+              'doOnError':function (json) {
+                alert(json.error);
               }
-            });
-          });
-          jQuery('#printServiceSelectDialog').dialog('open');
-        },
-        'doOnError':function (json) {
-          alert(json.error);
-        }
-      }
+            }
     );
   },
 
@@ -803,20 +862,20 @@ Project.barcode = {
                      'insertSize'];
 
       var oTable = jQuery(tableId).dataTable({
-         "aoColumnDefs": [
-           {
-             "bUseRendered": false,
-             "aTargets": [ 0 ]
-           }
-         ],
-         "bPaginate": false,
-         "bInfo": false,
-         "bJQueryUI": true,
-         "bAutoWidth": true,
-         "bSort": false,
-         "bFilter": false,
-         "sDom": '<<"toolbar">f>r<t>ip>'
-       });
+                                               "aoColumnDefs": [
+                                                 {
+                                                   "bUseRendered": false,
+                                                   "aTargets": [ 0 ]
+                                                 }
+                                               ],
+                                               "bPaginate": false,
+                                               "bInfo": false,
+                                               "bJQueryUI": true,
+                                               "bAutoWidth": true,
+                                               "bSort": false,
+                                               "bFilter": false,
+                                               "sDom": '<<"toolbar">f>r<t>ip>'
+                                             });
 
       jQuery(tableId).find("tr:first").prepend("<th>Select</th>");
       jQuery(tableId).find("tr:gt(0)").prepend("<td class='rowSelect'></td>");
@@ -845,57 +904,57 @@ Project.barcode = {
     }
 
     Fluxion.doAjax(
-      'printerControllerHelperService',
-      'listAvailableServices',
-      {
-        'serviceClass':'uk.ac.bbsrc.tgac.miso.core.data.Library',
-        'url':ajaxurl
-      },
-      {
-        'doOnSuccess':function (json) {
-          jQuery('#printServiceSelectDialog')
-            .html("<form>" +
-              "<fieldset class='dialog'>" +
-              "<select name='serviceSelect' id='serviceSelect' class='ui-widget-content ui-corner-all'>" +
-              json.services +
-              "</select></fieldset></form>");
+            'printerControllerHelperService',
+            'listAvailableServices',
+            {
+              'serviceClass':'uk.ac.bbsrc.tgac.miso.core.data.Library',
+              'url':ajaxurl
+            },
+            {
+              'doOnSuccess':function (json) {
+                jQuery('#printServiceSelectDialog')
+                        .html("<form>" +
+                              "<fieldset class='dialog'>" +
+                              "<select name='serviceSelect' id='serviceSelect' class='ui-widget-content ui-corner-all'>" +
+                              json.services +
+                              "</select></fieldset></form>");
 
-          jQuery(function() {
-            jQuery('#printServiceSelectDialog').dialog({
-               autoOpen: false,
-               width: 400,
-               modal: true,
-               resizable: false,
-               buttons: {
-                 "Print": function() {
-                   Fluxion.doAjax(
-                     'projectControllerHelperService',
-                     'printSelectedLibraryBarcodes',
-                     {
-                       'serviceName':jQuery('#serviceSelect').val(),
-                       'libraries':libraries,
-                       'url':ajaxurl
-                     },
-                     {
-                       'doOnSuccess':function (json) {
-                         alert(json.response);
-                       }
-                     }
-                   );
-                   jQuery(this).dialog('close');
-                 },
-                 "Cancel": function() {
-                   jQuery(this).dialog('close');
-                 }
-               }
-             });
-          });
-          jQuery('#printServiceSelectDialog').dialog('open');
-        },
-        'doOnError':function (json) {
-          alert(json.error);
-        }
-      }
+                jQuery(function() {
+                  jQuery('#printServiceSelectDialog').dialog({
+                                                               autoOpen: false,
+                                                               width: 400,
+                                                               modal: true,
+                                                               resizable: false,
+                                                               buttons: {
+                                                                 "Print": function() {
+                                                                   Fluxion.doAjax(
+                                                                           'projectControllerHelperService',
+                                                                           'printSelectedLibraryBarcodes',
+                                                                           {
+                                                                             'serviceName':jQuery('#serviceSelect').val(),
+                                                                             'libraries':libraries,
+                                                                             'url':ajaxurl
+                                                                           },
+                                                                           {
+                                                                             'doOnSuccess':function (json) {
+                                                                               alert(json.response);
+                                                                             }
+                                                                           }
+                                                                   );
+                                                                   jQuery(this).dialog('close');
+                                                                 },
+                                                                 "Cancel": function() {
+                                                                   jQuery(this).dialog('close');
+                                                                 }
+                                                               }
+                                                             });
+                });
+                jQuery('#printServiceSelectDialog').dialog('open');
+              },
+              'doOnError':function (json) {
+                alert(json.error);
+              }
+            }
     );
   },
 
@@ -917,20 +976,20 @@ Project.barcode = {
                      'concentration'];
 
       var oTable = jQuery(tableId).dataTable({
-         "aoColumnDefs": [
-           {
-             "bUseRendered": false,
-             "aTargets": [ 0 ]
-           }
-         ],
-         "bPaginate": false,
-         "bInfo": false,
-         "bJQueryUI": true,
-         "bAutoWidth": true,
-         "bSort": false,
-         "bFilter": false,
-         "sDom": '<<"toolbar">f>r<t>ip>'
-       });
+                                               "aoColumnDefs": [
+                                                 {
+                                                   "bUseRendered": false,
+                                                   "aTargets": [ 0 ]
+                                                 }
+                                               ],
+                                               "bPaginate": false,
+                                               "bInfo": false,
+                                               "bJQueryUI": true,
+                                               "bAutoWidth": true,
+                                               "bSort": false,
+                                               "bFilter": false,
+                                               "sDom": '<<"toolbar">f>r<t>ip>'
+                                             });
 
       jQuery(tableId).find("tr:first").prepend("<th>Select</th>");
       jQuery(tableId).find("tr:gt(0)").prepend("<td class='rowSelect'></td>");
@@ -959,57 +1018,57 @@ Project.barcode = {
     }
 
     Fluxion.doAjax(
-      'printerControllerHelperService',
-      'listAvailableServices',
-      {
-        'serviceClass':'uk.ac.bbsrc.tgac.miso.core.data.Dilution',
-        'url':ajaxurl
-      },
-      {
-        'doOnSuccess':function (json) {
-          jQuery('#printServiceSelectDialog')
-            .html("<form>" +
-              "<fieldset class='dialog'>" +
-              "<select name='serviceSelect' id='serviceSelect' class='ui-widget-content ui-corner-all'>" +
-              json.services +
-              "</select></fieldset></form>");
+            'printerControllerHelperService',
+            'listAvailableServices',
+            {
+              'serviceClass':'uk.ac.bbsrc.tgac.miso.core.data.Dilution',
+              'url':ajaxurl
+            },
+            {
+              'doOnSuccess':function (json) {
+                jQuery('#printServiceSelectDialog')
+                        .html("<form>" +
+                              "<fieldset class='dialog'>" +
+                              "<select name='serviceSelect' id='serviceSelect' class='ui-widget-content ui-corner-all'>" +
+                              json.services +
+                              "</select></fieldset></form>");
 
-          jQuery(function() {
-            jQuery('#printServiceSelectDialog').dialog({
-               autoOpen: false,
-               width: 400,
-               modal: true,
-               resizable: false,
-               buttons: {
-                 "Print": function() {
-                   Fluxion.doAjax(
-                     'projectControllerHelperService',
-                     'printSelectedLibraryDilutionBarcodes',
-                     {
-                       'serviceName':jQuery('#serviceSelect').val(),
-                       'dilutions':dilutions,
-                       'url':ajaxurl
-                     },
-                     {
-                       'doOnSuccess':function (json) {
-                         alert(json.response);
-                       }
-                     }
-                   );
-                   jQuery(this).dialog('close');
-                 },
-                 "Cancel": function() {
-                   jQuery(this).dialog('close');
-                 }
-               }
-             });
-          });
-          jQuery('#printServiceSelectDialog').dialog('open');
-        },
-        'doOnError':function (json) {
-          alert(json.error);
-        }
-      }
+                jQuery(function() {
+                  jQuery('#printServiceSelectDialog').dialog({
+                                                               autoOpen: false,
+                                                               width: 400,
+                                                               modal: true,
+                                                               resizable: false,
+                                                               buttons: {
+                                                                 "Print": function() {
+                                                                   Fluxion.doAjax(
+                                                                           'projectControllerHelperService',
+                                                                           'printSelectedLibraryDilutionBarcodes',
+                                                                           {
+                                                                             'serviceName':jQuery('#serviceSelect').val(),
+                                                                             'dilutions':dilutions,
+                                                                             'url':ajaxurl
+                                                                           },
+                                                                           {
+                                                                             'doOnSuccess':function (json) {
+                                                                               alert(json.response);
+                                                                             }
+                                                                           }
+                                                                   );
+                                                                   jQuery(this).dialog('close');
+                                                                 },
+                                                                 "Cancel": function() {
+                                                                   jQuery(this).dialog('close');
+                                                                 }
+                                                               }
+                                                             });
+                });
+                jQuery('#printServiceSelectDialog').dialog('open');
+              },
+              'doOnError':function (json) {
+                alert(json.error);
+              }
+            }
     );
   }
 };
@@ -1017,31 +1076,31 @@ Project.barcode = {
 Project.alert = {
   watchOverview : function(overviewId) {
     Fluxion.doAjax(
-      'projectControllerHelperService',
-      'watchOverview',
-      {
-        'overviewId':overviewId,
-        'url':ajaxurl
-      },
-      {'doOnSuccess':function (json) {
-          Utils.page.pageReload();
-        }
-      }
+            'projectControllerHelperService',
+            'watchOverview',
+            {
+              'overviewId':overviewId,
+              'url':ajaxurl
+            },
+            {'doOnSuccess':function (json) {
+              Utils.page.pageReload();
+            }
+            }
     );
   },
 
   unwatchOverview : function(overviewId) {
     Fluxion.doAjax(
-      'projectControllerHelperService',
-      'unwatchOverview',
-      {
-        'overviewId':overviewId,
-        'url':ajaxurl
-      },
-      {'doOnSuccess':function (json) {
-          Utils.page.pageReload();
-        }
-      }
+            'projectControllerHelperService',
+            'unwatchOverview',
+            {
+              'overviewId':overviewId,
+              'url':ajaxurl
+            },
+            {'doOnSuccess':function (json) {
+              Utils.page.pageReload();
+            }
+            }
     );
   }
 };

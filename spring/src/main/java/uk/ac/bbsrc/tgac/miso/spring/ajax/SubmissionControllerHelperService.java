@@ -40,17 +40,22 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubmissionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.SubmissionActionType;
 import uk.ac.bbsrc.tgac.miso.core.exception.SubmissionException;
+import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.SubmissionManager;
 import uk.ac.bbsrc.tgac.miso.core.service.submission.FilePathGenerator;
 import uk.ac.bbsrc.tgac.miso.core.service.submission.TGACIlluminaFilepathGenerator;
 import uk.ac.bbsrc.tgac.miso.core.service.submission.UploadReport;
 import uk.ac.bbsrc.tgac.miso.core.service.submission.UploadJob;
+import uk.ac.bbsrc.tgac.miso.core.util.FormUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -70,6 +75,10 @@ public class SubmissionControllerHelperService {
   private RequestManager requestManager;
   @Autowired
   private SubmissionManager submissionManager;
+  @Autowired
+  private MisoFilesManager misoFileManager;
+
+  private DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
   //Saves a new submission to the DB, or updates an existing submission, based on details sent vie AJAX from
   //editSubmission.jsp
@@ -166,7 +175,7 @@ public class SubmissionControllerHelperService {
         submission.setSubmissionActionType(action);
 
         try {
-          String s = "<pre>" + submissionManager.generateSubmissionMetadata(submission) + "</pre>";
+          String s = submissionManager.generateSubmissionMetadata(submission);
           return JSONUtils.JSONObjectResponse("metadata", s);
         }
         catch (SubmissionException se) {
@@ -181,9 +190,62 @@ public class SubmissionControllerHelperService {
     return JSONUtils.SimpleJSONError("Cannot build submission metadata");
   }
 
+  public JSONObject downloadSubmissionMetadata(HttpSession session, JSONObject json) {
+    Long submissionId = json.getLong("submissionId");
+
+    try {
+      Submission submission = requestManager.getSubmissionById(submissionId);
+      Collection<File> files = misoFileManager.getFiles(Submission.class, submission.getName());
+
+      Date latestDate = null;
+
+      //get latest submitted xmls
+      try {
+        for (File f : files) {
+          if (f.getName().contains("submission_")) {
+            String d = f.getName().substring(f.getName().lastIndexOf("_")+1, f.getName().lastIndexOf("."));
+            Date test =  df.parse(d);
+            if (latestDate == null || test.after(latestDate)) {
+              latestDate = test;
+            }
+          }
+        }
+      }
+      catch (ParseException e) {
+        log.error("No timestamped submission metadata documents. Falling back to simple names: " + e.getMessage());
+      }
+
+      String dateStr = "";
+      if (latestDate != null) {
+        dateStr = "_"+df.format(latestDate);
+      }
+
+      Set<File> filesToZip = new HashSet<File>();
+      for (File f : files) {
+        if (!"".equals(dateStr) && f.getName().contains(dateStr) && f.getName().endsWith(".xml")) {
+          filesToZip.add(f);
+        }
+      }
+
+      File zipFile = misoFileManager.getNewFile(Submission.class, submission.getName(), "bundle"+dateStr+".zip");
+      LimsUtils.zipFiles(filesToZip, zipFile);
+
+      File f = misoFileManager.getFile(
+              Submission.class,
+              submission.getName(),
+              zipFile.getName());
+
+      return JSONUtils.SimpleJSONResponse("" + f.getName().hashCode());
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+      return JSONUtils.SimpleJSONError("Failed to generate submission metadata zip file: " + e.getMessage());
+    }
+  }
+
   /*
- generates SubmissionMetadata from the submission Object, sets the action to 'validate'
- submits metadata to SRA and parses feedback
+  generates SubmissionMetadata from the submission Object, sets the action to 'validate'
+  submits metadata to SRA and parses feedback
   */
   public JSONObject validateSubmissionMetadata(HttpSession session, JSONObject json) {
     try {
@@ -493,5 +555,9 @@ public class SubmissionControllerHelperService {
 
   public void setSubmissionManager(SubmissionManager submissionManager) {
     this.submissionManager = submissionManager;
+  }
+
+  public void setMisoFileManager(MisoFilesManager misoFileManager) {
+    this.misoFileManager = misoFileManager;
   }
 }

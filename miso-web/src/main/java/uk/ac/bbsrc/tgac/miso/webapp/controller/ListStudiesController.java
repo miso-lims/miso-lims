@@ -72,7 +72,8 @@ public class ListStudiesController {
   }
 
   @RequestMapping(value = "/studies/rest/", method = RequestMethod.GET)
-  public @ResponseBody
+  public
+  @ResponseBody
   Collection<Study> jsonRest() throws IOException {
     //User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     return requestManager.listAllStudies();
@@ -80,16 +81,6 @@ public class ListStudiesController {
 
   @RequestMapping("/studies")
   public ModelAndView listStudies() throws Exception {
-    try {
-//      List<Study> studies = new ArrayList<Study>(requestManager.listAllStudies());
-//      Collections.sort(studies, new AliasComparator(Study.class));
-      return new ModelAndView("/pages/listStudies.jsp", "studies", requestManager.listAllStudies());
-    }
-    catch (Exception ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to list studies", ex);
-      }
-      throw ex;
-    }
+    return new ModelAndView("/pages/listStudies.jsp");
   }
 }

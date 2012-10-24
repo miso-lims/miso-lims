@@ -23,12 +23,15 @@
   --%>
 
 <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.popup.js'/>"></script>
+<script src="<c:url value='/scripts/datatables_utils.js'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
+<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" type="text/css">
+<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables_themeroller.css'/>">
 
 <h1>
-    <div id="totalProjectCount">
+    <div id="totalProjectCount"> Projects
     </div>
 </h1>
-<a href="<c:url value='/miso/project/new'/>" class="add">Create Project</a>
 
 <div style="clear:both"/>
 <div id="traftrigger" onclick="readJson()" class="ui-corner-all">
@@ -51,74 +54,20 @@
             </div>
 
             <div id='chart'>
-
                 <%--chart will go here--%>
             </div>
         </div>
     </div>
 </div>
 
-<form id="filter-form">Filter: <input name="filter" id="filter" value="" maxlength="30" size="30" type="text"/>
-
-    <select id="progressFilter">
-        <option value="">Progress Filter</option>
-        <option value="UNKNOWN">UNKNOWN</option>
-        <option value="ACTIVE">ACTIVE</option>
-        <option value="INACTIVE">INACTIVE</option>
-        <option value="CANCELLED">CANCELLED</option>
-        <option value="PROPOSED">PROPOSED</option>
-        <option value="PENDING">PENDING</option>
-        <option value="APPROVED">APPROVED</option>
-        <option value="COMPLETED">COMPLETED</option>
-    </select></form>
-<br/>
-<table class="list" id="table">
-    <thead>
-    <tr>
-        <th>Project Name</th>
-        <th>Project Alias</th>
-        <th>Project Description</th>
-        <th>Progress</th>
-        <th class="trafficlightcolumn">Overview Status
-        </th>
-        <th class="fit">Edit</th>
-    </tr>
-    </thead>
-    <tbody>
-    <c:forEach items="${projects}" var="project">
-        <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-            <td>
-                <b>${project.name}</b>
-            </td>
-            <td>${project.alias}</td>
-            <td>${project.description}</td>
-            <td>${project.progress}</td>
-            <td align="center" valign="center">
-                <div id="pro${project.id}overview" class="overviewstat"></div>
-            </td>
-            <td class="misoicon" onclick="window.location.href='<c:url value="/miso/project/${project.id}"/>'">
-                <span class="ui-icon ui-icon-pencil"/></td>
-        </tr>
-    </c:forEach>
-    </tbody>
+<table cellpadding="0" cellspacing="0" border="0" class="display" id="listingProjectsTable">
 </table>
 <script type="text/javascript">
 var fun, state = "tree";
 
 jQuery(document).ready(function() {
-  writeTotalNo();
   jQuery("#traftrigger").colorbox({width:"90%", inline:true, href:"#trafpanel"});
-  Project.ui.listProjectTrafficLight();
-  jQuery("#table").tablesorter({
-    headers: {
-      4: {
-        sorter: false
-      },
-      5: {
-        sorter: false
-      }
-    }
-  });
+  Project.ui.createListingProjectsTable();
 });
 
 

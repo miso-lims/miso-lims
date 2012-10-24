@@ -69,6 +69,8 @@ public abstract class AbstractStudy implements Study {
   private String description;
   @Column(name = "accession")
   private String accession;
+  @Column(name = "abstract")
+  private String abs;
   @Column(name = "studyType")
   private String studyType;
   @Column(name = "alias")
@@ -131,6 +133,14 @@ public abstract class AbstractStudy implements Study {
 
   public void setAlias(String alias) {
     this.alias = alias;
+  }
+
+  public String getAbstract() {
+    return abs;
+  }
+
+  public void setAbstract(String abs) {
+    this.abs = abs;
   }
 
   public String getStudyType() {

@@ -471,6 +471,27 @@ public class ExperimentControllerHelperService {
     }
   }
 
+  public JSONObject listExperimentsDataTable(HttpSession session, JSONObject json) {
+    try {
+      JSONObject j = new JSONObject();
+      JSONArray jsonArray = new JSONArray();
+      for (Experiment experiment : requestManager.listAllExperiments()) {
+        jsonArray.add("['" + experiment.getName() + "','" +
+                      experiment.getAlias() + "','" +
+                      experiment.getDescription() + "','" +
+                      experiment.getPlatform().getPlatformType().getKey() + " "+ experiment.getPlatform().getInstrumentModel()+ "','" +
+                      "<a href=\"/miso/experiment/" + experiment.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
+
+      }
+      j.put("experimentsArray", jsonArray);
+      return j;
+    }
+    catch (IOException e) {
+      log.debug("Failed", e);
+      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
+    }
+  }
+
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
   }

@@ -28,8 +28,11 @@ import org.w3c.dom.Element;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.decorator.AbstractSubmittableDecorator;
 import uk.ac.bbsrc.tgac.miso.core.data.type.SubmissionActionType;
+import uk.ac.bbsrc.tgac.miso.core.service.submission.FilePathGenerator;
+import uk.ac.bbsrc.tgac.miso.core.service.submission.TGACIlluminaFilepathGenerator;
 import uk.ac.bbsrc.tgac.miso.core.util.TgacSubmissionConstants;
 
+import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -49,15 +52,13 @@ public class EraSubmissionDecorator extends AbstractSubmittableDecorator<Documen
   }
 
   public void buildSubmission() {
-    //submittable.buildSubmission();
     Submission sub = (Submission)submittable;
 
     if (submission != null) {
       Element s = submission.createElementNS(null, "SUBMISSION");
       s.setAttribute("alias", sub.getAlias());
-      DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-      s.setAttribute("submission_date", df.format(new Date()));
-      //s.setAttribute("submission_comment", submission.getComment());
+      s.setAttribute("submission_date", submissionProperties.getProperty("submissionDate"));
+      s.setAttribute("submission_comment", sub.getDescription());
       s.setAttribute("center_name", submissionProperties.getProperty("submission.centreName"));
 
       Element title = submission.createElementNS(null, "TITLE");
@@ -80,6 +81,9 @@ public class EraSubmissionDecorator extends AbstractSubmittableDecorator<Documen
       map.put("experiment", new ArrayList<Submittable<Document>>());
       map.put("run", new ArrayList<Submittable<Document>>());
 
+      Map<SequencerPoolPartition, Collection<? extends Poolable>> dataFilePoolables =
+              new HashMap<SequencerPoolPartition, Collection<? extends Poolable>>();
+
       Set<Submittable<Document>> subs = sub.getSubmissionElements();
       for (Submittable<Document> subtype : subs) {
         if (subtype instanceof Study) {
@@ -93,10 +97,12 @@ public class EraSubmissionDecorator extends AbstractSubmittableDecorator<Documen
         }
         else if (subtype instanceof SequencerPoolPartition) {
           map.get("run").add(subtype);
+
+          SequencerPoolPartition p = (SequencerPoolPartition)subtype;
+          if (p.getPool() != null) {
+            dataFilePoolables.put(p, p.getPool().getPoolableElements());
+          }
         }
-//        else if (subtype instanceof Lane) {
-//          map.get("run").add(subtype);
-//        }
       }
 
       Element actions = submission.createElementNS(null, "ACTIONS");
@@ -109,13 +115,13 @@ public class EraSubmissionDecorator extends AbstractSubmittableDecorator<Documen
             if (sat.equals(SubmissionActionType.VALIDATE)) {
               Element validate = submission.createElementNS(null, "VALIDATE");
               validate.setAttribute("schema", key);
-              validate.setAttribute("source", sub.getName()+"_"+key+".xml");
+              validate.setAttribute("source", sub.getName()+"_"+key+"_"+submissionProperties.getProperty("submissionDate")+".xml");
               action.appendChild(validate);
             }
             else if (sat.equals(SubmissionActionType.ADD)) {
               Element add = submission.createElementNS(null, "ADD");
               add.setAttribute("schema", key);
-              add.setAttribute("source", sub.getName()+"_"+key+".xml");
+              add.setAttribute("source", sub.getName()+"_"+key+"_"+submissionProperties.getProperty("submissionDate")+".xml");
               action.appendChild(add);
             }
           }
@@ -126,6 +132,33 @@ public class EraSubmissionDecorator extends AbstractSubmittableDecorator<Documen
         }
       }
       s.appendChild(actions);
+
+      Element files = submission.createElementNS(null, "FILES");
+
+      FilePathGenerator fpg = new TGACIlluminaFilepathGenerator();
+      String basePath = submissionProperties.getProperty("submission.baseReadPath");
+      if (basePath != null) {
+        fpg = new TGACIlluminaFilepathGenerator(basePath);
+      }
+
+      for(SequencerPoolPartition part : dataFilePoolables.keySet()) {
+        for (Dilution po : part.getPool().getDilutions()) {
+          try {
+            for (File f : fpg.generateFilePath(part,po)) {
+              String fileName = f.getName();
+              Element file = submission.createElementNS(null,"FILE");
+              file.setAttribute("filename", fileName);
+              file.setAttribute("checksum_method", "MD5");
+              file.setAttribute("checksum", "");
+              files.appendChild(file);
+            }
+          }
+          catch (Exception e) {
+            e.printStackTrace();
+          }
+        }
+      }
+      s.appendChild(files);
 
       if (submission.getElementsByTagName("SUBMISSION_SET").item(0) != null) {
         submission.getElementsByTagName("SUBMISSION_SET").item(0).appendChild(s);

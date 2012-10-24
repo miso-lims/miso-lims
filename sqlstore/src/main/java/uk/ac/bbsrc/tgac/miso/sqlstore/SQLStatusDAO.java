@@ -126,7 +126,7 @@ public class SQLStatusDAO implements StatusStore {
       e.printStackTrace();
     }
 
-    if (status.getStatusId() == null) {
+    if (status.getStatusId() == 0L) {
       Status savedStatus = getByRunName(status.getRunName());
       if (savedStatus == null) {
         SimpleJdbcInsert insert = new SimpleJdbcInsert(template)

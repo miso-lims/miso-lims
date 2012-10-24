@@ -79,16 +79,6 @@ public class ListSamplesController {
 
   @RequestMapping("/samples")
   public ModelAndView listSamples() throws Exception {
-    try {
-      List<Sample> samples = new ArrayList<Sample>(requestManager.listAllSamples());
-      Collections.sort(samples, new AliasComparator(Sample.class));
-      return new ModelAndView("/pages/listSamples.jsp", "samples", samples);
-    }
-    catch (Exception ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to list samples", ex);
-      }
-      throw ex;
-    }
+    return new ModelAndView("/pages/listSamples.jsp");
   }
 }

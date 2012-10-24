@@ -48,6 +48,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
@@ -374,6 +375,9 @@ public class SQLRunDAO implements RunStore {
       statusId = statusDAO.save(s);
       run.setStatus(s);
     }
+    else {
+      log.warn("No status available to save for run: " + run.getAlias());
+    }
 
     MapSqlParameterSource params = new MapSqlParameterSource();
     params.addValue("accession", run.getAccession())
@@ -496,13 +500,18 @@ public class SQLRunDAO implements RunStore {
     long autoIncrement = DbUtils.getAutoIncrement(template, TABLE_NAME);
 
     for (Run run : runs) {
+      Long securityProfileId = run.getSecurityProfile().getProfileId();
+      if (securityProfileId == null || (this.cascadeType != null)) {// && this.cascadeType.equals(CascadeType.PERSIST))) {
+        securityProfileId = securityProfileDAO.save(run.getSecurityProfile());
+      }
+
       Long statusId = null;
       if (run.getStatus() != null) {
         Status s = run.getStatus();
         statusId = s.getStatusId();
         //if no status has ever been saved to the database for this run
         //we want to create one, cascading or not
-        if (statusId == null || (this.cascadeType != null && this.cascadeType.equals(CascadeType.PERSIST))) {
+        if (statusId == StatusImpl.UNSAVED_ID || (this.cascadeType != null && this.cascadeType.equals(CascadeType.PERSIST))) {
           if (s.getRunName() == null) {
             s.setRunName(run.getAlias());
           }
@@ -511,15 +520,11 @@ public class SQLRunDAO implements RunStore {
             s.setInstrumentName(run.getSequencerReference().getName());
           }
         }
-
-        try {
-          statusDAO.save(s);
-        }
-        catch (IOException e) {
-          log.warn("Couldn't save status for run: " + run.getName()+". This isn't fatal, but probably should be investigated!");
-          e.printStackTrace();
-        }
+        statusId = statusDAO.save(s);
         run.setStatus(s);
+      }
+      else {
+        log.warn("No status available to save for run: " + run.getAlias());
       }
 
       try {
@@ -532,8 +537,8 @@ public class SQLRunDAO implements RunStore {
                 .addValue("cycles", run.getCycles())
                 .addValue("filePath", run.getFilePath())
                 .addValue("platformType", run.getPlatformType().getKey())
-                .addValue("securityProfile_profileId", run.getSecurityProfile().getProfileId())
-                .addValue("status_statusId", run.getStatus().getStatusId())
+                .addValue("securityProfile_profileId", securityProfileId)
+                .addValue("status_statusId", statusId)
                 .addValue("sequencerReference_sequencerReferenceId", run.getSequencerReference().getId());
 
         if (run.getId() == AbstractRun.UNSAVED_ID) {

@@ -75,7 +75,8 @@ Run.qc = {
       var column7 = $('runQcTable').rows[1].insertCell(-1);
       column7.innerHTML = "<input id='runQcDoNotProcess' name='runQcDoNotProcess' type='checkbox'/>";
       var column8 = $('runQcTable').rows[1].insertCell(-1);
-      column8.innerHTML = "<a href='javascript:void(0);' onclick='Run.qc.addRunQC(\"runQcTable\");'/>Add</a>";
+      //column8.innerHTML = "<a href='javascript:void(0);' onclick='Run.qc.addRunQC(\"runQcTable\");'/>Add</a>";
+      column8.innerHTML = "<a href='javascript:void(0);' onclick='Run.qc.addRunQC(this);'/>Add</a>";
 
       Utils.ui.addMaxDatePicker("runQcDate", 0);
 
@@ -107,11 +108,13 @@ Run.qc = {
     }
   },
 
-  addRunQC : function(table) {
+  addRunQC : function(row) {
     var a = [];
-    jQuery('.partitionOccupied', 'td', '.containerSummary').each(function() {
+    //jQuery(jQuery(row).parent().parent(), '.partitionOccupied', 'td', '.containerSummary').each(function() {
+    jQuery('.partitionOccupied', jQuery(row).parent().parent()).each(function() {
       a.push({id:this.id});
     });
+
     var runid = jQuery("input[name='runId']").val();
     var qctype = jQuery("select[name='runQcType'] :selected").val();
     var donotprocess = jQuery("input[name='runQcDoNotProcess']").is(":checked");
@@ -188,6 +191,46 @@ Run.ui = {
         }
       );
     }
+  },
+
+  createListingRunsTable : function() {
+    jQuery('#listingRunsTable').html("<img src='../styles/images/ajax-loader.gif'/>");
+    jQuery.fn.dataTableExt.oSort['no-run-asc'] = function(x, y) {
+      var a = parseInt(x.replace(/^RUN/i, ""));
+      var b = parseInt(y.replace(/^RUN/i, ""));
+      return ((a < b) ? -1 : ((a > b) ? 1 : 0));
+    };
+    jQuery.fn.dataTableExt.oSort['no-run-desc'] = function(x, y) {
+      var a = parseInt(x.replace(/^RUN/i, ""));
+      var b = parseInt(y.replace(/^RUN/i, ""));
+      return ((a < b) ? 1 : ((a > b) ? -1 : 0));
+    };
+    Fluxion.doAjax(
+            'runControllerHelperService',
+            'listRunsDataTable',
+            {
+              'url':ajaxurl
+            },
+            {'doOnSuccess': function(json) {
+              jQuery('#listingRunsTable').html('');
+              jQuery('#listingRunsTable').dataTable({
+                                                          "aaData": json.runsArray,
+                                                          "aoColumns": [
+                                                            { "sTitle": "Run Name", "sType":"no-run"},
+                                                            { "sTitle": "Alias"},
+                                                            { "sTitle": "Status"},
+                                                            { "sTitle": "Start Date"},
+                                                            { "sTitle": "End Date"},
+                                                            { "sTitle": "Type"},
+                                                            { "sTitle": "Edit"}
+                                                          ],
+                                                          "bJQueryUI": true,
+                                                          "iDisplayLength":  25,
+                                                          "aaSorting":[[0,"desc"]]
+                                                        });
+            }
+            }
+    );
   },
 
   changeLS454Chamber : function(t, container) {

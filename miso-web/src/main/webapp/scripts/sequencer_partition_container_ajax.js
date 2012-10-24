@@ -143,6 +143,40 @@ Container.ui = {
     if (confirm("Remove this pool?")) {
       jQuery(t).parent().remove();
     }
+  },
+
+  createListingContainersTable : function() {
+    jQuery('#listingContainersTable').html("<img src='../styles/images/ajax-loader.gif'/>");
+    Fluxion.doAjax(
+            'containerControllerHelperService',
+            'listSequencePartitionContainersDataTable',
+            {
+              'url':ajaxurl
+            },
+            {'doOnSuccess': function(json) {
+              jQuery('#listingContainersTable').html('');
+              jQuery('#listingContainersTable').dataTable({
+                                                         "aaData": json.array,
+                                                         "aoColumns": [
+                                                           //{ "sTitle": "Name"},
+                                                           { "sTitle": "ID Barcode"},
+                                                           { "sTitle": "Platform"},
+                                                           { "sTitle": "Last Associated Run"},
+                                                           { "sTitle": "Last Sequencer Used"},
+                                                           { "sTitle": "Edit"}
+                                                         ],
+                                                         "bJQueryUI": true,
+                                                         "iDisplayLength":  25,
+                                                         "aaSorting":[
+                                                           [0,"desc"]
+                                                         ],
+                  "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>'
+                                                       });
+    jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
+jQuery("#toolbar").append("<button style=\"margin-left:5px;\" onclick=\"window.location.href='/miso/container/new';\" class=\"fg-button ui-state-default ui-corner-all\">Create Partition Container</button>");
+            }
+            }
+    );
   }
 };
 

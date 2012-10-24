@@ -28,22 +28,62 @@ Experiment.ui = {
     Fluxion.doAjax(
             'experimentWizardControllerHelperService',
             'addStudyExperiment',
-    {'form':jQuery('#' + form).serializeArray(), 'url':ajaxurl},
-    {'doOnSuccess':function(json) {
-      Utils.page.pageRedirect('/miso/study/' + json.studyId);
-    }
-    });
+            {'form':jQuery('#' + form).serializeArray(), 'url':ajaxurl},
+            {'doOnSuccess':function(json) {
+              Utils.page.pageRedirect('/miso/study/' + json.studyId);
+            }
+            });
   },
 
   addExperimentForm : function(id) {
     Fluxion.doAjax(
             'experimentWizardControllerHelperService',
             'addExperimentForm',
-    {'newid':id, 'url':ajaxurl},
-    {'doOnSuccess':function(json) {
-      jQuery('#experimentWizardForm').append(json.html);
-    }
-    });
+            {'newid':id, 'url':ajaxurl},
+            {'doOnSuccess':function(json) {
+              jQuery('#experimentWizardForm').append(json.html);
+            }
+            });
+  },
+
+  createListingExperimentsTable : function() {
+    jQuery('#listingExperimentsTable').html("<img src='../styles/images/ajax-loader.gif'/>");
+    jQuery.fn.dataTableExt.oSort['no-exp-asc'] = function(x, y) {
+      var a = parseInt(x.replace(/^EXP/i, ""));
+      var b = parseInt(y.replace(/^EXP/i, ""));
+      return ((a < b) ? -1 : ((a > b) ? 1 : 0));
+    };
+    jQuery.fn.dataTableExt.oSort['no-exp-desc'] = function(x, y) {
+      var a = parseInt(x.replace(/^EXP/i, ""));
+      var b = parseInt(y.replace(/^EXP/i, ""));
+      return ((a < b) ? 1 : ((a > b) ? -1 : 0));
+    };
+    Fluxion.doAjax(
+            'experimentControllerHelperService',
+            'listExperimentsDataTable',
+            {
+              'url':ajaxurl
+            },
+            {'doOnSuccess': function(json) {
+              jQuery('#listingExperimentsTable').html('');
+              jQuery('#listingExperimentsTable').dataTable({
+                                                             "aaData": json.experimentsArray,
+                                                             "aoColumns": [
+                                                               { "sTitle": "Experiment Name", "sType":"no-exp"},
+                                                               { "sTitle": "Alias"},
+                                                               { "sTitle": "Description"},
+                                                               { "sTitle": "Platform"},
+                                                               { "sTitle": "Edit"}
+                                                             ],
+                                                             "bJQueryUI": true,
+                                                             "iDisplayLength":  25,
+                                                             "aaSorting":[
+                                                               [0,"desc"]
+                                                             ]
+                                                           });
+            }
+            }
+    );
   },
 
   confirmRemoveExperiment : function(id) {
@@ -59,12 +99,12 @@ Experiment.pool = {
     var pool = jQuery(p);
     var id = '#selPool';
     if (!Utils.validation.isNullCheck(newid)) {
-      id = '#selPool'+newid;
+      id = '#selPool' + newid;
     }
     var poolSel = jQuery(id);
     if (poolSel.is(':empty')) {
       var newpool = pool.clone().appendTo(poolSel);
-      newpool.append("<input type='hidden' id='pool"+pool.attr("bind")+"' name='pool' value='"+pool.attr("bind")+"'/>");
+      newpool.append("<input type='hidden' id='pool" + pool.attr("bind") + "' name='pool' value='" + pool.attr("bind") + "'/>");
       newpool.remove('.pType');
       newpool.append("<span style='position: absolute; top: 0; right: 0;' onclick='Experiment.pool.confirmPoolRemove(this);' class='float-right ui-icon ui-icon-circle-close'></span>");
       newpool.removeAttr("ondblclick");
@@ -90,23 +130,23 @@ Experiment.pool = {
       jQuery('#poolList').html("<img src='/styles/images/ajax-loader.gif'/>");
     }
     else {
-      jQuery('#poolList'+id).html("<img src='/styles/images/ajax-loader.gif'/>");
+      jQuery('#poolList' + id).html("<img src='/styles/images/ajax-loader.gif'/>");
     }
     Fluxion.doAjax(
             'experimentWizardControllerHelperService',
             'loadPoolsByPlatform',
-    {'platformId':jQuery(select).val(), 'newid':id, 'url':ajaxurl},
-    {'doOnSuccess':function(json) {
-      if (Utils.validation.isNullCheck(id)) {
-        jQuery('#poolList').html("");
-        jQuery('#poolList').html(json.html);
-      }
-      else {
-        jQuery('#poolList'+id).html("");
-        jQuery('#poolList'+id).html(json.html);
-      }
-    }
-    });
+            {'platformId':jQuery(select).val(), 'newid':id, 'url':ajaxurl},
+            {'doOnSuccess':function(json) {
+              if (Utils.validation.isNullCheck(id)) {
+                jQuery('#poolList').html("");
+                jQuery('#poolList').html(json.html);
+              }
+              else {
+                jQuery('#poolList' + id).html("");
+                jQuery('#poolList' + id).html(json.html);
+              }
+            }
+            });
   }
 };
 
@@ -115,8 +155,8 @@ Experiment.kit = {
     Fluxion.doAjax(
             'experimentControllerHelperService',
             'lookupKitByIdentificationBarcode',
-    {'barcode':barcode, 'url':ajaxurl},
-    {'doOnSuccess':fillKitSelector}
+            {'barcode':barcode, 'url':ajaxurl},
+            {'doOnSuccess':fillKitSelector}
     );
   },
 
@@ -124,8 +164,8 @@ Experiment.kit = {
     Fluxion.doAjax(
             'experimentControllerHelperService',
             'lookupKitByLotNumber',
-    {'lotNumber':lotNumber, 'url':ajaxurl},
-    {'doOnSuccess':fillKitSelector}
+            {'lotNumber':lotNumber, 'url':ajaxurl},
+            {'doOnSuccess':fillKitSelector}
     );
   },
 
@@ -134,11 +174,11 @@ Experiment.kit = {
       Fluxion.doAjax(
               'experimentControllerHelperService',
               'lookupKitDescriptorByPartNumber',
-      {'partNumber':t.value, 'url':ajaxurl},
-      {'doOnSuccess':function(json) {
-        jQuery("#kitDescriptor").val(json.id);
-      }
-      });
+              {'partNumber':t.value, 'url':ajaxurl},
+              {'doOnSuccess':function(json) {
+                jQuery("#kitDescriptor").val(json.id);
+              }
+              });
     };
     Utils.timer.timedFunc(func, 200);
   },
@@ -153,8 +193,8 @@ Experiment.kit = {
     Fluxion.doAjax(
             'experimentControllerHelperService',
             'getLibraryKitDescriptors',
-    {'experimentId':experimentId, 'multiplexed':multiplexed, 'url':ajaxurl},
-    {'doOnSuccess':self.processLibraryKitList}
+            {'experimentId':experimentId, 'multiplexed':multiplexed, 'url':ajaxurl},
+            {'doOnSuccess':self.processLibraryKitList}
     );
   },
 
@@ -213,29 +253,29 @@ Experiment.kit = {
 
     jQuery(function() {
       jQuery('#addKitDialog').dialog({
-        autoOpen: false,
-        width: 400,
-        modal: true,
-        resizable: false,
-        buttons: {
-          "Add Library Kit": function() {
-            var b = this;
+                                       autoOpen: false,
+                                       width: 400,
+                                       modal: true,
+                                       resizable: false,
+                                       buttons: {
+                                         "Add Library Kit": function() {
+                                           var b = this;
 
-            if (jQuery("#addKitForm").validate().form()) {
-              if (multiplexed == "true") {
-                self.addLibraryKit(experimentId, jQuery('#kitDescriptor').val(), jQuery('#partNumber').val(), jQuery('#multiplexingKitType').val(), jQuery('#multiplexingKitBarcode').val(), jQuery('#lotNumber').val());
-              }
-              else {
-                self.addLibraryKit(experimentId, jQuery('#kitDescriptor').val(), jQuery('#partNumber').val(), undefined, undefined, jQuery('#lotNumber').val());
-              }
-              jQuery(b).dialog('close');
-            }
-          },
-          "Cancel": function() {
-            jQuery(this).dialog('close');
-          }
-        }
-      });
+                                           if (jQuery("#addKitForm").validate().form()) {
+                                             if (multiplexed == "true") {
+                                               self.addLibraryKit(experimentId, jQuery('#kitDescriptor').val(), jQuery('#partNumber').val(), jQuery('#multiplexingKitType').val(), jQuery('#multiplexingKitBarcode').val(), jQuery('#lotNumber').val());
+                                             }
+                                             else {
+                                               self.addLibraryKit(experimentId, jQuery('#kitDescriptor').val(), jQuery('#partNumber').val(), undefined, undefined, jQuery('#lotNumber').val());
+                                             }
+                                             jQuery(b).dialog('close');
+                                           }
+                                         },
+                                         "Cancel": function() {
+                                           jQuery(this).dialog('close');
+                                         }
+                                       }
+                                     });
     });
     jQuery('#addKitDialog').dialog('open');
     jQuery('#addKitDialog').parent().css("width", "auto");
@@ -246,11 +286,11 @@ Experiment.kit = {
       Fluxion.doAjax(
               'experimentControllerHelperService',
               'addLibraryKit',
-      {'experimentId':experimentId, 'kitDescriptor':kitDescriptorId, 'partNumber':partNumber, 'lotNumber':lotNumber, 'url':ajaxurl},
-      {'doOnSuccess':function(json) {
-        alert("Added");
-      }
-      });
+              {'experimentId':experimentId, 'kitDescriptor':kitDescriptorId, 'partNumber':partNumber, 'lotNumber':lotNumber, 'url':ajaxurl},
+              {'doOnSuccess':function(json) {
+                alert("Added");
+              }
+              });
     }
     else {
 
@@ -263,8 +303,8 @@ Experiment.kit = {
     Fluxion.doAjax(
             'experimentControllerHelperService',
             'getEmPcrKitDescriptors',
-    {'experimentId':experimentId, 'url':ajaxurl},
-    {'doOnSuccess':self.processEmPcrKitList}
+            {'experimentId':experimentId, 'url':ajaxurl},
+            {'doOnSuccess':self.processEmPcrKitList}
     );
   },
 
@@ -303,24 +343,24 @@ Experiment.kit = {
 
     jQuery(function() {
       jQuery('#addKitDialog').dialog({
-        autoOpen: false,
-        width: 400,
-        modal: true,
-        resizable: false,
-        buttons: {
-          "Add EmPCR Kit": function() {
-            var b = this;
+                                       autoOpen: false,
+                                       width: 400,
+                                       modal: true,
+                                       resizable: false,
+                                       buttons: {
+                                         "Add EmPCR Kit": function() {
+                                           var b = this;
 
-            if (jQuery("#addKitForm").validate().form()) {
-              self.addEmPcrKit(experimentId, jQuery('#kitDescriptor').val(), jQuery('#partNumber').val(), jQuery('#lotNumber').val());
-              jQuery(b).dialog('close');
-            }
-          },
-          "Cancel": function() {
-            jQuery(this).dialog('close');
-          }
-        }
-      });
+                                           if (jQuery("#addKitForm").validate().form()) {
+                                             self.addEmPcrKit(experimentId, jQuery('#kitDescriptor').val(), jQuery('#partNumber').val(), jQuery('#lotNumber').val());
+                                             jQuery(b).dialog('close');
+                                           }
+                                         },
+                                         "Cancel": function() {
+                                           jQuery(this).dialog('close');
+                                         }
+                                       }
+                                     });
     });
     jQuery('#addKitDialog').dialog('open');
   },
@@ -329,11 +369,11 @@ Experiment.kit = {
     Fluxion.doAjax(
             'experimentControllerHelperService',
             'addEmPcrKit',
-    {'experimentId':experimentId, 'kitDescriptor':kitDescriptorId, 'partNumber':partNumber, 'lotNumber':lotNumber, 'url':ajaxurl},
-    {'doOnSuccess':function(json) {
-      alert("Added");
-    }
-    });
+            {'experimentId':experimentId, 'kitDescriptor':kitDescriptorId, 'partNumber':partNumber, 'lotNumber':lotNumber, 'url':ajaxurl},
+            {'doOnSuccess':function(json) {
+              alert("Added");
+            }
+            });
   },
 
   //clustering
@@ -342,8 +382,8 @@ Experiment.kit = {
     Fluxion.doAjax(
             'experimentControllerHelperService',
             'getClusteringKitDescriptors',
-    {'experimentId':experimentId, 'url':ajaxurl},
-    {'doOnSuccess':self.processClusteringKitList}
+            {'experimentId':experimentId, 'url':ajaxurl},
+            {'doOnSuccess':self.processClusteringKitList}
     );
   },
 
@@ -382,24 +422,24 @@ Experiment.kit = {
 
     jQuery(function() {
       jQuery('#addKitDialog').dialog({
-        autoOpen: false,
-        width: 400,
-        modal: true,
-        resizable: false,
-        buttons: {
-          "Add Clustering Kit": function() {
-            var b = this;
+                                       autoOpen: false,
+                                       width: 400,
+                                       modal: true,
+                                       resizable: false,
+                                       buttons: {
+                                         "Add Clustering Kit": function() {
+                                           var b = this;
 
-            if (jQuery("#addKitForm").validate().form()) {
-              self.addClusteringKit(experimentId, jQuery('#kitDescriptor').val(), jQuery('#partNumber').val(), jQuery('#lotNumber').val());
-              jQuery(b).dialog('close');
-            }
-          },
-          "Cancel": function() {
-            jQuery(this).dialog('close');
-          }
-        }
-      });
+                                           if (jQuery("#addKitForm").validate().form()) {
+                                             self.addClusteringKit(experimentId, jQuery('#kitDescriptor').val(), jQuery('#partNumber').val(), jQuery('#lotNumber').val());
+                                             jQuery(b).dialog('close');
+                                           }
+                                         },
+                                         "Cancel": function() {
+                                           jQuery(this).dialog('close');
+                                         }
+                                       }
+                                     });
     });
     jQuery('#addKitDialog').dialog('open');
   },
@@ -408,11 +448,11 @@ Experiment.kit = {
     Fluxion.doAjax(
             'experimentControllerHelperService',
             'addClusteringKit',
-    {'experimentId':experimentId, 'kitDescriptor':kitDescriptorId, 'partNumber':partNumber, 'lotNumber':lotNumber, 'url':ajaxurl},
-    {'doOnSuccess':function(json) {
-      alert("Added");
-    }
-    });
+            {'experimentId':experimentId, 'kitDescriptor':kitDescriptorId, 'partNumber':partNumber, 'lotNumber':lotNumber, 'url':ajaxurl},
+            {'doOnSuccess':function(json) {
+              alert("Added");
+            }
+            });
   },
 
   //sequencing
@@ -421,8 +461,8 @@ Experiment.kit = {
     Fluxion.doAjax(
             'experimentControllerHelperService',
             'getSequencingKitDescriptors',
-    {'experimentId':experimentId, 'url':ajaxurl},
-    {'doOnSuccess':self.processSequencingKitList}
+            {'experimentId':experimentId, 'url':ajaxurl},
+            {'doOnSuccess':self.processSequencingKitList}
     );
   },
 
@@ -461,24 +501,24 @@ Experiment.kit = {
 
     jQuery(function() {
       jQuery('#addKitDialog').dialog({
-        autoOpen: false,
-        width: 400,
-        modal: true,
-        resizable: false,
-        buttons: {
-          "Add Sequencing Kit": function() {
-            var b = this;
+                                       autoOpen: false,
+                                       width: 400,
+                                       modal: true,
+                                       resizable: false,
+                                       buttons: {
+                                         "Add Sequencing Kit": function() {
+                                           var b = this;
 
-            if (jQuery("#addKitForm").validate().form()) {
-              self.addSequencingKit(experimentId, jQuery('#kitDescriptor').val(), jQuery('#partNumber').val(), jQuery('#lotNumber').val());
-              jQuery(b).dialog('close');
-            }
-          },
-          "Cancel": function() {
-            jQuery(this).dialog('close');
-          }
-        }
-      });
+                                           if (jQuery("#addKitForm").validate().form()) {
+                                             self.addSequencingKit(experimentId, jQuery('#kitDescriptor').val(), jQuery('#partNumber').val(), jQuery('#lotNumber').val());
+                                             jQuery(b).dialog('close');
+                                           }
+                                         },
+                                         "Cancel": function() {
+                                           jQuery(this).dialog('close');
+                                         }
+                                       }
+                                     });
     });
     jQuery('#addKitDialog').dialog('open');
   },
@@ -487,10 +527,10 @@ Experiment.kit = {
     Fluxion.doAjax(
             'experimentControllerHelperService',
             'addSequencingKit',
-    {'experimentId':experimentId, 'kitDescriptor':kitDescriptorId, 'partNumber':partNumber, 'lotNumber':lotNumber, 'url':ajaxurl},
-    {'doOnSuccess':function(json) {
-      alert("Added");
-    }
-    });
+            {'experimentId':experimentId, 'kitDescriptor':kitDescriptorId, 'partNumber':partNumber, 'lotNumber':lotNumber, 'url':ajaxurl},
+            {'doOnSuccess':function(json) {
+              alert("Added");
+            }
+            });
   }
 };

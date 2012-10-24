@@ -107,11 +107,12 @@
             </table>
 
             <c:if test="${submission.id != 0}">
-                <span style="float:right"><a href="javascript:void(0);" onclick="Submission.ui.previewSubmissionMetadata(${submission.id});">Preview Raw Submission Metadata</a></span><br/>
+                <span style="float:right"><a href="javascript:void(0);" onclick="Submission.ui.previewSubmissionMetadata(${submission.id});">Preview Submission Metadata</a></span><br/>
+                <span style="float:right"><a href="javascript:void(0);" onclick="Submission.ui.downloadSubmissionMetadata(${submission.id});">Download Submission Metadata</a></span><br/>
                 <span style="float:right"><a href="javascript:void(0);" onclick="Submission.validateSubmissionMetadata(${submission.id});">Validate Submission Metadata</a></span><br/>
                 <span style="float:right"><a href="javascript:void(0);" onclick="Submission.submitSubmissionMetadata(${submission.id});">Submit Submission Metadata</a></span><br/>
-                <span style="float:right"><a href="javascript:void(0);" onclick="Submission.submitSequenceData(${submission.id});">Submit Sequence Data</a></span>
-                 <div id="submissionreport"></div>
+                <%-- <span style="float:right"><a href="javascript:void(0);" onclick="Submission.submitSequenceData(${submission.id});">Submit Sequence Data</a></span> --%>
+                <div id="submissionreport"></div>
 
                 <c:if test="${not empty prettyMetadata}">
                     <h3>Submission Metadata</h3>

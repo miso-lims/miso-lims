@@ -74,16 +74,16 @@ public class RestSignatureFilter extends OncePerRequestFilter {
 
     try {
       if (!SignatureHelper.validateSignature(url, signature, apiKey)) {
-        logger.info("REST KEY INVALID");
+        logger.error("REST KEY INVALID");
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "REST signature failed validation.");
       }
     } catch (Exception e) {
-      logger.info("UNABLE TO UNDERTAKE SIGNATURE VALIDATION");
+      logger.error("UNABLE TO UNDERTAKE SIGNATURE VALIDATION");
       e.printStackTrace();
       response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "The REST Security Server experienced an internal error.");
     }
 
-    logger.info("REST KEY OK. Security!");
+    logger.debug("REST KEY OK. Security!");
 
     User user = new User("notification", "none", true, true, true, true, AuthorityUtils.createAuthorityList("ROLE_INTERNAL"));
     PreAuthenticatedAuthenticationToken newAuthentication = new PreAuthenticatedAuthenticationToken(user, user.getPassword(), user.getAuthorities());
@@ -94,7 +94,7 @@ public class RestSignatureFilter extends OncePerRequestFilter {
       SecurityContext sc = SecurityContextHolder.getContextHolderStrategy().getContext();
       sc.setAuthentication(newAuthentication);
       SecurityContextHolder.getContextHolderStrategy().setContext(sc);
-      logger.info("Set context - chaining");
+      logger.debug("Set context - chaining");
     }
     catch (AuthenticationException a) {
       a.printStackTrace();

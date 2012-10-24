@@ -72,24 +72,15 @@ public class ListExperimentsController {
   }
 
   @RequestMapping(value = "/experiments/rest/", method = RequestMethod.GET)
-  public @ResponseBody
+  public
+  @ResponseBody
   Collection<Experiment> jsonRest() throws IOException {
-      //User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      return requestManager.listAllExperiments();
+    //User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    return requestManager.listAllExperiments();
   }
 
   @RequestMapping("/experiments")
   public ModelAndView listExperiments() throws Exception {
-    try {
-      List<Experiment> experiments = new ArrayList<Experiment>(requestManager.listAllExperiments());
-      Collections.sort(experiments, new AliasComparator(Experiment.class));
-      return new ModelAndView("/pages/listExperiments.jsp", "experiments", experiments);
-    }
-    catch (Exception ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to list experiments", ex);
-      }
-      throw ex;
-    }
+    return new ModelAndView("/pages/listExperiments.jsp");
   }
 }

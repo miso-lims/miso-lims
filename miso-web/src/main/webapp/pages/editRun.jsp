@@ -95,7 +95,7 @@
         <td class="h">Run ID:</td>
         <td>
             <c:choose>
-                <c:when test="${run.id != 0}"><input type='hidden' id='runId' name='id'
+                <c:when test="${run.id != 0}"><input type='hidden' id='runId' name='runId'
                                                              value='${run.id}'/>${run.id}</c:when>
                 <c:otherwise><i>Unsaved</i></c:otherwise>
             </c:choose>

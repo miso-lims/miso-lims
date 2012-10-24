@@ -109,8 +109,8 @@ public class EraRunDecorator extends AbstractSubmittableDecorator<Document> {
               Element file = submission.createElementNS(null,"FILE");
               file.setAttribute("filename", fileName);
               file.setAttribute("filetype", "fastq");
-              file.setAttribute("checksum_method", "MD5");
-              file.setAttribute("checksum", "");
+              //file.setAttribute("checksum_method", "MD5");
+              //file.setAttribute("checksum", "");
               Element readLabel = submission.createElementNS(null, "READ_LABEL");
               file.appendChild(readLabel);
               files.appendChild(file);

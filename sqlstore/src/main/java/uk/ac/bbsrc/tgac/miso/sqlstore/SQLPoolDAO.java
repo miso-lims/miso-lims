@@ -29,6 +29,7 @@ import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
@@ -343,6 +344,27 @@ public class SQLPoolDAO implements PoolStore {
 
   public void setCascadeType(CascadeType cascadeType) {
     this.cascadeType = cascadeType;
+  }
+
+  private void purgeListCache(Pool p, boolean replace) {
+    Cache cache = cacheManager.getCache("poolListCache");
+    if (cache.getKeys().size() > 0) {
+      Object cachekey = cache.getKeys().get(0);
+      List<Pool> c = (List<Pool>)cache.get(cachekey).getValue();
+      if (c.remove(p)) {
+        if (replace) {
+          c.add(p);
+        }
+      }
+      else {
+        c.add(p);
+      }
+      cache.put(new Element(cachekey, c));
+    }
+  }
+
+  private void purgeListCache(Pool p) {
+    purgeListCache(p, true);
   }
 
   public Pool getPoolByExperiment(Experiment e) {
@@ -1044,6 +1066,8 @@ public class SQLPoolDAO implements PoolStore {
       watcherDAO.saveWatchedEntityUser(pool, u);
     }
 
+    purgeListCache(pool);
+
     return pool.getId();
   }
 
@@ -1082,6 +1106,15 @@ public class SQLPoolDAO implements PoolStore {
     return e;
   }
 
+  @Cacheable(cacheName="poolListCache",
+      keyGenerator = @KeyGenerator(
+              name = "HashCodeCacheKeyGenerator",
+              properties = {
+                      @Property(name="includeMethod", value="false"),
+                      @Property(name="includeParameterTypes", value="false")
+              }
+      )
+  )
   public Collection<Pool<? extends Poolable>> listAll() throws IOException {
     return template.query(POOL_SELECT, new PoolMapper());
   }

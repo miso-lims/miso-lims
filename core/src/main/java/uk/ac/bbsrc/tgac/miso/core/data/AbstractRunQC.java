@@ -82,19 +82,20 @@ public abstract class AbstractRunQC extends AbstractQC implements RunQC {
   /**
    * Equivalency is based on getRunId() if set, otherwise on name
    */
+  /*
   @Override
   public boolean equals(Object obj) {
     if (obj == null)
       return false;
     if (obj == this)
       return true;
-    if (!(obj instanceof AbstractRunQC))
+    if (!(obj instanceof RunQC))
       return false;
     RunQC them = (RunQC) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
-    if (this.getId() == AbstractRunQC.UNSAVED_ID
-        || them.getId() == AbstractRunQC.UNSAVED_ID) {
+    if (this.getId() == AbstractQC.UNSAVED_ID
+        || them.getId() == AbstractQC.UNSAVED_ID) {
       return this.getQcCreator().equals(them.getQcCreator())
              && this.getQcDate().equals(them.getQcDate())
              && this.getQcType().equals(them.getQcType());
@@ -106,7 +107,7 @@ public abstract class AbstractRunQC extends AbstractQC implements RunQC {
 
   @Override
   public int hashCode() {
-    if (getId() != AbstractRunQC.UNSAVED_ID) {
+    if (getId() != 0L && getId() != AbstractQC.UNSAVED_ID) {
       return (int)getId();
     }
     else {
@@ -118,4 +119,5 @@ public abstract class AbstractRunQC extends AbstractQC implements RunQC {
       return hashcode;
     }
   }
+  */
 }

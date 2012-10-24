@@ -28,92 +28,25 @@
   Time: 08:51:03
 --%>
 <%@ include file="../header.jsp" %>
+<script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
+<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" type="text/css">
+<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables_themeroller.css'/>">
 
-<%--<script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.popup.js'/>"></script>--%>
 <div id="maincontent">
-    <div id="contentcolumn">
-        <h1>
-            <div id="totalCount">
-            </div></h1>
+  <div id="contentcolumn">
+    <h1>
+      <div id="totalCount"> Experiments
+      </div>
+    </h1>
 
-        <form id="filter-form">Filter: <input name="filter" id="filter" value="" maxlength="30" size="30" type="text">
-        </form>
-        <br/>
-        <table class="list" id="table">
-            <thead>
-            <tr>
-                <%--<sec:authorize access="hasRole('ROLE_ADMIN')">--%>
-                    <%--<th>ID</th>--%>
-                <%--</sec:authorize>--%>
-                <th>Experiment Name</th>
-                <th>Experiment Alias</th>
-                <th>Description</th>
-                <th>Platform</th>
-                <th class="fit">Edit</th>
-            </tr>
-            </thead>
-            <tbody>
-            <c:forEach items="${experiments}" var="experiment">
-                <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-                    <%--<sec:authorize access="hasRole('ROLE_ADMIN')">--%>
-                        <%--<td>--%>
-                                <%--${experiment.experimentId}--%>
-                        <%--</td>--%>
-                    <%--</sec:authorize>--%>
-                    <td>
-                       <b>${experiment.name}</b>
-                        <%--<div class="bubbleInfo">--%>
-                            <%--<div class="trigger"><b>${experiment.name}</b>--%>
-                                <%--<span class="fg-button ui-icon ui-icon-info"></span></div>--%>
-
-                            <%--<div class="popup">--%>
-                                <%--<ul class="popup-bullets">--%>
-                                   <%--<!-- <li><b>Description:</b> ${experiment.description}<br/></li>-->--%>
-                                    <%--<li><b>Owner:</b> ${experiment.securityProfile.owner.fullName}</li>--%>
-                                <%--</ul>--%>
-                            <%--</div>--%>
-                        <%--</div>--%>
-                    </td>
-                    <td>${experiment.alias}</td>
-                    <td>${experiment.description}</td>
-                    <td>${experiment.platform.platformType.key} - ${experiment.platform.instrumentModel}</td>
-                    <td class="misoicon"
-                        onclick="window.location.href='<c:url value="/miso/experiment/${experiment.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
-                </tr>
-            </c:forEach>
-            </tbody>
-        </table>
-        <script type="text/javascript">
-            jQuery(document).ready(function() {
-                writeTotalNo();
-                jQuery("#table").tablesorter({
-                    headers: {
-                        4: {
-                            sorter: false
-                        }
-                    }
-                });
-            });
-
-            jQuery(function() {
-                var theTable = jQuery("#table");
-
-                jQuery("#filter").keyup(function() {
-                    jQuery.uiTableFilter(theTable, this.value);
-                    writeTotalNo();
-                });
-
-                jQuery('#filter-form').submit(function() {
-                    theTable.find("tbody > tr:visible > td:eq(1)").mousedown();
-                    return false;
-                }).focus(); //Give focus to input field
-            });
-
-            function writeTotalNo() {
-                jQuery('#totalCount').html(jQuery('#table>tbody>tr:visible').length.toString() + " Experiments");
-            }
-        </script>
-    </div>
+    <table cellpadding="0" cellspacing="0" border="0" class="display" id="listingExperimentsTable">
+    </table>
+    <script type="text/javascript">
+      jQuery(document).ready(function() {
+        Experiment.ui.createListingExperimentsTable();
+      });
+    </script>
+  </div>
 </div>
 <%@ include file="adminsub.jsp" %>
 

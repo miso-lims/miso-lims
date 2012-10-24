@@ -269,6 +269,19 @@ public class ProjectControllerHelperService {
     }
   }
 
+  public JSONObject checkOverviewByProjectId(HttpSession session, JSONObject json) {
+    try {
+      JSONObject j = new JSONObject();
+      Long projectId = json.getLong("projectId");
+        j.put("response", checkOverviews(projectId));
+      return j;
+    }
+    catch (IOException e) {
+      log.debug("Failed", e);
+      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
+    }
+  }
+
   private String checkOverviews(Long projectId) throws IOException {
     StringBuilder sb = new StringBuilder();
     Collection<ProjectOverview> overviews = requestManager.listAllOverviewsByProjectId(projectId);
@@ -297,13 +310,12 @@ public class ProjectControllerHelperService {
       JSONObject j = new JSONObject();
       JSONArray jsonArray = new JSONArray();
       for (Project project : requestManager.listAllProjects()) {
-
-
         jsonArray.add("['" + project.getName() + "','" +
                       project.getAlias() + "','" +
                       project.getDescription() + "','" +
                       project.getProgress().getKey() + "','" +
-                      checkOverviews(project.getProjectId()) + "','" +
+//                      checkOverviews(project.getProjectId()) + "','" +
+                      project.getProjectId()  + "','" +
                       "<a href=\"/miso/project/" + project.getProjectId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
 
       }
@@ -738,9 +750,9 @@ public class ProjectControllerHelperService {
       String documentFormat = json.getString("documentFormat");
       try {
         File f = misoFileManager.getNewFile(
-          Project.class,
-          projectId.toString(),
-          "BulkInputForm-" + LimsUtils.getCurrentDateAsString() + "." + documentFormat);
+                Project.class,
+                projectId.toString(),
+                "BulkInputForm-" + LimsUtils.getCurrentDateAsString() + "." + documentFormat);
         FormUtils.createSampleInputSpreadsheet(requestManager.getProjectById(projectId).getSamples(), f);
         return JSONUtils.SimpleJSONResponse("" + f.getName().hashCode());
       }
@@ -752,7 +764,7 @@ public class ProjectControllerHelperService {
     else {
       return JSONUtils.SimpleJSONError("Missing project ID or document format supplied.");
     }
- }
+  }
 
   public JSONObject watchOverview(HttpSession session, JSONObject json) {
     Long overviewId = json.getLong("overviewId");

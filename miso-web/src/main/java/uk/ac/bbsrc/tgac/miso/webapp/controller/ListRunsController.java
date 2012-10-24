@@ -78,16 +78,6 @@ public class ListRunsController {
 
   @RequestMapping("/runs")
   public ModelAndView listRuns() throws Exception {
-    try {
-      List<Run> runs = new ArrayList<Run>(requestManager.listAllRuns());
-      Collections.sort(runs, new AliasComparator(Run.class));
-      return new ModelAndView("/pages/listRuns.jsp", "runs", runs);
-    }
-    catch (Exception ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to list runs", ex);
-      }
-      throw ex;
-    }
+      return new ModelAndView("/pages/listRuns.jsp");
   }
 }

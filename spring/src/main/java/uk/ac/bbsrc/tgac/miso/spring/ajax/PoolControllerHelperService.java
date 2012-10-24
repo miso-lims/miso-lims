@@ -337,7 +337,7 @@ public class PoolControllerHelperService {
           bi = barcodeFactory.generateBarcode(pool, bg, dim);
         }
         else {
-          return JSONUtils.SimpleJSONError("'"+json.getString("barcodeGenerator") + "' is not a valid barcode generator type");
+          return JSONUtils.SimpleJSONError("'" + json.getString("barcodeGenerator") + "' is not a valid barcode generator type");
         }
       }
       else {
@@ -367,7 +367,9 @@ public class PoolControllerHelperService {
       JSONArray ss = JSONArray.fromObject(json.getString("pools"));
 
       String serviceName = null;
-      if (json.has("serviceName")) { serviceName = json.getString("serviceName"); }
+      if (json.has("serviceName")) {
+        serviceName = json.getString("serviceName");
+      }
 
       MisoPrintService<File, PrintContext<File>> mps = null;
       if (serviceName == null) {
@@ -390,7 +392,7 @@ public class PoolControllerHelperService {
           Pool pool = requestManager.getPoolById(poolId);
 
           File f = mps.getLabelFor(pool);
-          if (f!=null) thingsToPrint.add(f);
+          if (f != null) thingsToPrint.add(f);
         }
         catch (IOException e) {
           e.printStackTrace();
@@ -476,13 +478,13 @@ public class PoolControllerHelperService {
               (d.getLibrary().getAlias().toLowerCase().contains(str) || d.getLibrary().getName().toLowerCase().contains(str)) ||
               (d.getLibrary().getSample().getAlias().toLowerCase().contains(str) || d.getLibrary().getSample().getName().toLowerCase().contains(str))) {
           */
-            b.append("<div onmouseover=\"this.className='autocompleteboxhighlight'\" onmouseout=\"this.className='autocompletebox'\" class=\"autocompletebox\"" +
-                     " onclick=\"Pool.search.poolSearchSelectDilution('" + d.getId() + "', '" + d.getName() + "')\">" +
-                     "<b>Dilution: " + d.getName() + "</b><br/>" +
-                     "<b>Library: " + d.getLibrary().getAlias() + "</b><br/>" +
-                     "<b>Sample: " + d.getLibrary().getSample().getAlias() + "</b><br/>" +
-                     "</div>");
-            numMatches++;
+          b.append("<div onmouseover=\"this.className='autocompleteboxhighlight'\" onmouseout=\"this.className='autocompletebox'\" class=\"autocompletebox\"" +
+                   " onclick=\"Pool.search.poolSearchSelectDilution('" + d.getId() + "', '" + d.getName() + "')\">" +
+                   "<b>Dilution: " + d.getName() + "</b><br/>" +
+                   "<b>Library: " + d.getLibrary().getAlias() + "</b><br/>" +
+                   "<b>Sample: " + d.getLibrary().getSample().getAlias() + "</b><br/>" +
+                   "</div>");
+          numMatches++;
           //}
         }
         if (numMatches == 0) {
@@ -523,13 +525,13 @@ public class PoolControllerHelperService {
               (d.getLibrary().getAlias().toLowerCase().contains(str) || d.getLibrary().getName().toLowerCase().contains(str)) ||
               (d.getLibrary().getSample().getAlias().toLowerCase().contains(str) || d.getLibrary().getSample().getName().toLowerCase().contains(str))) {
           */
-            b.append("<div onmouseover=\"this.className='autocompleteboxhighlight'\" onmouseout=\"this.className='autocompletebox'\" class=\"autocompletebox\"" +
-                     " onclick=\"Pool.search.poolSearchSelectDilution('" + d.getId() + "', '" + d.getName() + "')\">" +
-                     "<b>Dilution: " + d.getName() + "</b><br/>" +
-                     "<b>Library: " + d.getLibrary().getAlias() + "</b><br/>" +
-                     "<b>Sample: " + d.getLibrary().getSample().getAlias() + "</b><br/>" +
-                     "</div>");
-            numMatches++;
+          b.append("<div onmouseover=\"this.className='autocompleteboxhighlight'\" onmouseout=\"this.className='autocompletebox'\" class=\"autocompletebox\"" +
+                   " onclick=\"Pool.search.poolSearchSelectDilution('" + d.getId() + "', '" + d.getName() + "')\">" +
+                   "<b>Dilution: " + d.getName() + "</b><br/>" +
+                   "<b>Library: " + d.getLibrary().getAlias() + "</b><br/>" +
+                   "<b>Sample: " + d.getLibrary().getSample().getAlias() + "</b><br/>" +
+                   "</div>");
+          numMatches++;
           //}
         }
         if (numMatches == 0) {
@@ -578,7 +580,7 @@ public class PoolControllerHelperService {
             }
           }
           sb.append("</select>");
-          sb.append("<input id='studySelectButton-"+partition+"_"+p.getId()+"' type='button' onclick=\"Run.container.selectStudy('" + partition + "', " + p.getId() + "," + project.getProjectId() + ");\" class=\"ui-state-default ui-corner-all\" value='Select Study'/>");
+          sb.append("<input id='studySelectButton-" + partition + "_" + p.getId() + "' type='button' onclick=\"Run.container.selectStudy('" + partition + "', " + p.getId() + "," + project.getProjectId() + ");\" class=\"ui-state-default ui-corner-all\" value='Select Study'/>");
           sb.append("</div><br/>");
         }
         sb.append("</div>");
@@ -645,7 +647,7 @@ public class PoolControllerHelperService {
   public JSONObject listPoolAverageInsertSizes(HttpSession session, JSONObject json) {
     try {
       JSONObject j = new JSONObject();
-      for (Pool<? extends Poolable> pool: requestManager.listAllPools()) {
+      for (Pool<? extends Poolable> pool : requestManager.listAllPools()) {
         StringBuilder b = new StringBuilder();
         Collection<? extends Dilution> dls = pool.getDilutions();
         if (dls.size() > 0) {
@@ -662,7 +664,7 @@ public class PoolControllerHelperService {
             }
           }
           if (count > 0) {
-            b.append(Math.round(sum / count)+" bp");
+            b.append(Math.round(sum / count) + " bp");
           }
         }
         else {
@@ -670,6 +672,70 @@ public class PoolControllerHelperService {
         }
         j.put(pool.getId(), b.toString());
       }
+      return j;
+    }
+    catch (IOException e) {
+      log.debug("Failed", e);
+      return JSONUtils.SimpleJSONError(e.getMessage());
+    }
+  }
+
+  public JSONObject checkAverageInsertSizeByPoolId(HttpSession session, JSONObject json) {
+    try {
+      JSONObject j = new JSONObject();
+      Long poolId = json.getLong("poolId");
+      Pool pool = requestManager.getPoolById(poolId);
+      StringBuilder b = new StringBuilder();
+      Collection<? extends Dilution> dls = pool.getDilutions();
+      if (dls.size() > 0) {
+        int sum = 0;
+        int count = 0;
+        for (Dilution ld : dls) {
+          List<LibraryQC> libraryQCs = new ArrayList<LibraryQC>(requestManager.listAllLibraryQCsByLibraryId(ld.getLibrary().getId()));
+          if (libraryQCs.size() > 0) {
+            LibraryQC libraryQC = libraryQCs.get(libraryQCs.size() - 1);
+            sum += libraryQC.getInsertSize();
+            count++;
+          }
+        }
+        if (count > 0) {
+          b.append(Math.round(sum / count) + " bp");
+        }
+      }
+      else {
+        b.append("No QC");
+      }
+      j.put("response", b.toString());
+      return j;
+    }
+    catch (IOException e) {
+      log.debug("Failed", e);
+      return JSONUtils.SimpleJSONError(e.getMessage());
+    }
+  }
+
+  public JSONObject checkInfoByPoolId(HttpSession session, JSONObject json) {
+    try {
+      JSONObject j = new JSONObject();
+      Long poolId = json.getLong("poolId");
+      Pool pool = requestManager.getPoolById(poolId);
+      StringBuilder info = new StringBuilder();
+      if (pool.getDilutions().size() > 0) {
+        info.append("<ul class=\"shorterbullets\">");
+        Collection<? extends Dilution> dls = pool.getDilutions();
+        for (Dilution dilution : dls) {
+          info.append("<li><b>" + dilution.getName() + "</b>");
+          info.append("<br/><small><u>" + dilution.getLibrary().getSample().getProject().getAlias() + "</u>");
+          info.append("<br/>" + dilution.getLibrary().getAlias() + " (" + dilution.getLibrary().getName() + ")");
+          info.append("<br/>" + dilution.getLibrary().getDescription() + " (" + dilution.getLibrary().getSample().getName() + ")</small>");
+          info.append("</li>");
+        }
+        info.append("</ul>");
+      }
+      else {
+        info.append("No Dilution");
+      }
+      j.put("response", info.toString());
       return j;
     }
     catch (IOException e) {
@@ -699,6 +765,52 @@ public class PoolControllerHelperService {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
     }
+  }
+
+  public JSONObject listPoolsDataTable(HttpSession session, JSONObject json) {
+    try {
+      JSONObject j = new JSONObject();
+      JSONArray illuminaArray = new JSONArray();
+      JSONArray ls454Array = new JSONArray();
+      JSONArray solidArray = new JSONArray();
+      for (Pool pool : requestManager.listAllPools()) {
+        String platform = pool.getPlatformType().getKey().toLowerCase();
+        if (platform.equals("illumina")) {
+          illuminaArray.add(poolDataTable(pool.getId(), pool.getPlatformType().getKey().toLowerCase()));
+        }
+        else if (platform.equals("ls454")) {
+          ls454Array.add(poolDataTable(pool.getId(), pool.getPlatformType().getKey().toLowerCase()));
+        }
+        else if (platform.equals("solid")) {
+          solidArray.add(poolDataTable(pool.getId(), pool.getPlatformType().getKey().toLowerCase()));
+        }
+      }
+      j.put("illuminaArray", illuminaArray);
+      j.put("ls454Array",ls454Array);
+      j.put("solidArray",solidArray);
+      return j;
+    }
+    catch (IOException e) {
+      log.debug("Failed", e);
+      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
+    }
+  }
+
+  public String poolDataTable(Long poolId, String platform) {
+    try {
+      Pool pool = requestManager.getPoolById(poolId);
+      return "['" + pool.getName() + "','" +
+             (pool.getAlias() != null ? pool.getAlias() : "") + "','" +
+             (pool.getCreationDate() != null ? pool.getCreationDate().toString() : "") + "','" +
+             poolId + "','" +
+             poolId + "','" +
+             "<a href=\"/miso/pool/" + platform + "/" + pool.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']";
+    }
+    catch (IOException e) {
+      log.debug("Failed", e);
+      return e.getMessage();
+    }
+
   }
 
   public void setSecurityManager(SecurityManager securityManager) {

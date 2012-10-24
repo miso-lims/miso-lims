@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
@@ -32,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
+import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.SubmissionManager;
 
@@ -88,6 +90,27 @@ public class StudyControllerHelperService {
     catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
+    }
+  }
+
+  public JSONObject listStudiesDataTable(HttpSession session, JSONObject json) {
+    try {
+      JSONObject j = new JSONObject();
+      JSONArray jsonArray = new JSONArray();
+      for (Study study : requestManager.listAllStudies()) {
+        jsonArray.add("['" + study.getName() + "','" +
+                      study.getAlias() + "','" +
+                      study.getDescription() + "','" +
+                      study.getStudyType() + "','" +
+                      "<a href=\"/miso/study/" + study.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
+
+      }
+      j.put("array", jsonArray);
+      return j;
+    }
+    catch (IOException e) {
+      log.debug("Failed", e);
+      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
   }
 }

@@ -23,8 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
-import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
-import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.*;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import org.slf4j.Logger;
@@ -35,10 +34,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
@@ -94,6 +92,33 @@ public class DownloadController {
       throw new SecurityException("Access denied");
     }
   }
+
+  @RequestMapping(value = "/submission/{id}/{hashcode}", method = RequestMethod.GET)
+  protected void downloadSubmissionFile(@PathVariable Long id,
+                                     @PathVariable Integer hashcode,
+                                     HttpServletResponse response)
+          throws Exception {
+    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    Submission submission = requestManager.getSubmissionById(id);
+    if (submission.userCanRead(user)) {
+      lookupAndRetrieveFile(Submission.class, "SUB"+id, hashcode, response);
+    }
+    else {
+      throw new SecurityException("Access denied");
+    }
+  }
+
+  /*
+  @RequestMapping(value = "/{type}/{id}/{hashcode}", method = RequestMethod.GET)
+  protected void downloadFile(@PathVariable String type,
+                              @PathVariable String id,
+                              @PathVariable Integer hashcode,
+                              HttpServletResponse response)
+          throws Exception {
+    //User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    lookupAndRetrieveFile(Class.forName(LimsUtils.capitalise(type)), id, hashcode, response);
+  }
+  */
 
   @RequestMapping(value = "/libraryqc/{id}/{hashcode}", method = RequestMethod.GET)
   protected void downloadLibraryQcFile(@PathVariable Long id,

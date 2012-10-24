@@ -44,7 +44,9 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 /**
  * Utility class to provde helpful functions to MISO
@@ -324,6 +326,34 @@ public class LimsUtils {
       return false;
     }
     return true;
+  }
+
+  public static void zipFiles(Set<File> files, File outpath) throws IOException {
+    // Create a buffer for reading the files
+    byte[] buf = new byte[1024];
+
+    ZipOutputStream out = new ZipOutputStream(new FileOutputStream(outpath));
+
+    // Compress the files
+    for (File f : files) {
+      FileInputStream in = new FileInputStream(f);
+
+      // Add ZIP entry to output stream.
+      out.putNextEntry(new ZipEntry(f.getName()));
+
+      // Transfer bytes from the file to the ZIP file
+      int len;
+      while ((len = in.read(buf)) > 0) {
+          out.write(buf, 0, len);
+      }
+
+      // Complete the entry
+      out.closeEntry();
+      in.close();
+    }
+
+    // Complete the ZIP file
+    out.close();
   }
 
   public static void writeFile(InputStream in, File path) throws IOException {
