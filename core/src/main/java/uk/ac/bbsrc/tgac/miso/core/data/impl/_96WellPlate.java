@@ -25,8 +25,12 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.Plate;
+import uk.ac.bbsrc.tgac.miso.core.data.Plateable;
 
+import java.io.Serializable;
 import java.util.LinkedList;
+import java.util.Set;
 
 /**
  * A concrete Plate implementation representing a 96-well plate, comprising 96 {@link Library} elements.
@@ -35,7 +39,7 @@ import java.util.LinkedList;
  * @date 05-Sep-2011
  * @since 0.1.1
  */
-public class _96WellPlate extends PlateImpl<Library> {
+public class _96WellPlate extends PlateImpl<Library> implements Plateable, Serializable {
   public static final int MAX_ELEMENTS = 96;
 
   public _96WellPlate() {
@@ -43,7 +47,7 @@ public class _96WellPlate extends PlateImpl<Library> {
   }
 
   public _96WellPlate(User user) {
-    super(user);
+    super(MAX_ELEMENTS, user);
   }
 
   @Override
@@ -69,5 +73,10 @@ public class _96WellPlate extends PlateImpl<Library> {
   @Override
   public Class getElementType() {
     return Library.class;
+  }
+
+  @Override
+  public <T> Set<Plate<LinkedList<T>, T>> getPlates() throws Exception {
+    throw new Exception("96-well plates have no internal plate structure");
   }
 }

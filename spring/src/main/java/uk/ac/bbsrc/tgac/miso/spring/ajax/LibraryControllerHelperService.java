@@ -282,10 +282,10 @@ public class LibraryControllerHelperService {
         try {
           Long dilutionId = l.getLong("dilutionId");
           String platform = l.getString("platform");
-          Dilution dilution = requestManager.getDilutionByIdAndPlatform(dilutionId, PlatformType.get(platform));
+          LibraryDilution dilution = requestManager.getLibraryDilutionById(dilutionId);
           //autosave the barcode if none has been previously generated
           if (dilution.getIdentificationBarcode() == null || "".equals(dilution.getIdentificationBarcode())) {
-            requestManager.saveDilution(dilution);
+            requestManager.saveLibraryDilution(dilution);
           }
           File f = mps.getLabelFor(dilution);
           if (f!=null) thingsToPrint.add(f);
@@ -648,8 +648,8 @@ public class LibraryControllerHelperService {
         String qcDate = qc.getString("qcDate");
         String insertSize = qc.getString("insertSize");
 
-        if (qcPassed == null || qcPassed.equals("") ||
-            qcType == null || qcType.equals("") ||
+        //if (qcPassed == null || qcPassed.equals("") ||
+        if (qcType == null || qcType.equals("") ||
             results == null || results.equals("") ||
             qcCreator == null || qcCreator.equals("") ||
             qcDate == null || qcDate.equals("") ||
@@ -1084,7 +1084,7 @@ public class LibraryControllerHelperService {
       if (user.isAdmin()) {
         if (json.has("libraryDilutionId")) {
           Long libraryDilutionId = json.getLong("libraryDilutionId");
-          requestManager.deleteDilution(requestManager.getLibraryDilutionById(libraryDilutionId));
+          requestManager.deleteLibraryDilution(requestManager.getLibraryDilutionById(libraryDilutionId));
           return JSONUtils.SimpleJSONResponse("LibraryDilution deleted");
         }
         else {
@@ -1130,7 +1130,7 @@ public class LibraryControllerHelperService {
       if (user.isAdmin()) {
         if (json.has("deleteEmPCRDilution")) {
           Long deleteEmPCRDilution = json.getLong("deleteEmPCRDilution");
-          requestManager.deleteDilution(requestManager.getEmPcrDilutionById(deleteEmPCRDilution));
+          requestManager.deleteEmPcrDilution(requestManager.getEmPcrDilutionById(deleteEmPCRDilution));
           return JSONUtils.SimpleJSONResponse("EmPCRDilution deleted");
         }
         else {
@@ -1152,11 +1152,15 @@ public class LibraryControllerHelperService {
       JSONObject j = new JSONObject();
       JSONArray jsonArray = new JSONArray();
       for (Library library : requestManager.listAllLibraries()) {
+        String qcpassed = "Unknown";
+        if (library.getQcPassed() != null) {
+          qcpassed = library.getQcPassed().toString();
+        }
         jsonArray.add("['" + library.getName() + "','" +
                       library.getAlias() + "','" +
                       library.getLibraryType().getDescription() + "','" +
                       library.getSample().getName()+ "','" +
-                      library.getQcPassed().toString()+ "','" +
+                      qcpassed + "','" +
                       "<a href=\"/miso/library/" + library.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
 
       }

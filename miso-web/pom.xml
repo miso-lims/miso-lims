@@ -28,7 +28,7 @@
   <parent>
     <artifactId>miso</artifactId>
     <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-    <version>0.1.8</version>
+    <version>0.1.9-SNAPSHOT</version>
   </parent>
 
   <groupId>${parent.groupId}</groupId>
@@ -65,7 +65,7 @@
                 <artifactItem>
                   <groupId>net.sourceforge.fluxion.ajax</groupId>
                   <artifactId>fluxion-ajax-js</artifactId>
-                  <version>1.0-alpha-10</version>
+                  <version>1.0-alpha-12</version>
                   <type>jar</type>
                   <overWrite>true</overWrite>
                 </artifactItem>
@@ -129,7 +129,7 @@
       </dependencies>
 
       <properties>
-        <spring-version>3.0.7.RELEASE</spring-version>
+        <spring-version>3.1.3.RELEASE</spring-version>
       </properties>
 
     </profile>
@@ -182,77 +182,8 @@
       </dependencies>
 
       <properties>
-        <spring-version>3.0.7.RELEASE</spring-version>
+        <spring-version>3.1.3.RELEASE</spring-version>
       </properties>
-    </profile>
-
-    <profile>
-      <id>internal</id>
-      <activation>
-        <property>
-          <name>release</name>
-          <value>internal</value>
-        </property>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-war-plugin</artifactId>
-            <configuration>
-              <webResources>
-                <resource>
-                  <directory>src/main/resources</directory>
-                  <targetPath>WEB-INF/classes</targetPath>
-                  <filtering>true</filtering>
-                  <excludes>
-                    <exclude>sql/*</exclude>
-                    <exclude>internal/*</exclude>
-                    <exclude>external/*</exclude>
-                    <exclude>db4o/*</exclude>
-                  </excludes>
-                </resource>
-                <resource>
-                  <directory>src/main/resources/sql</directory>
-                  <targetPath>WEB-INF</targetPath>
-                  <filtering>true</filtering>
-                  <includes>
-                    <include>db-config.xml</include>
-                  </includes>
-                </resource>
-              </webResources>
-            </configuration>
-          </plugin>
-        </plugins>
-        <resources>
-          <resource>
-            <directory>src/main/resources/internal</directory>
-            <filtering>true</filtering>
-            <includes>
-              <include>miso.properties</include>
-            </includes>
-            <excludes>
-              <exclude>../external/*</exclude>
-              <exclude>../db4o/*</exclude>
-            </excludes>
-          </resource>
-          <resource>
-            <directory>src/main/resources</directory>
-            <filtering>true</filtering>
-            <includes>
-              <include>conan/</include>
-              <include>fluxion/</include>
-              <include>status/</include>
-            </includes>
-            <excludes>
-              <exclude>../sql/*</exclude>
-              <exclude>../internal/*</exclude>
-              <exclude>../external/*</exclude>
-              <exclude>../db4o/*</exclude>
-            </excludes>
-          </resource>
-        </resources>
-      </build>
     </profile>
 
     <profile>
@@ -356,31 +287,26 @@
       <artifactId>spring</artifactId>
       <version>${parent.version}</version>
     </dependency>
-
     <dependency>
       <groupId>${parent.groupId}</groupId>
       <artifactId>integration-tools</artifactId>
       <version>${parent.version}</version>
     </dependency>
-
     <dependency>
       <groupId>${parent.groupId}</groupId>
       <artifactId>run-tools</artifactId>
       <version>${parent.version}</version>
     </dependency>
-
     <dependency>
       <groupId>${parent.groupId}</groupId>
       <artifactId>runstats-client</artifactId>
       <version>${parent.version}</version>
     </dependency>
-
     <dependency>
       <groupId>${parent.groupId}</groupId>
       <artifactId>notification-consumer-services</artifactId>
       <version>${parent.version}</version>
     </dependency>
-
     <dependency>
       <groupId>${parent.groupId}</groupId>
       <artifactId>tagbarcode-strategies</artifactId>
@@ -395,12 +321,12 @@
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-taglibs</artifactId>
-      <version>${spring-version}</version>
+      <version>${spring-security-version}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-web</artifactId>
-      <version>${spring-version}</version>
+      <version>${spring-security-version}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
@@ -413,36 +339,30 @@
       <version>${spring-version}</version>
     </dependency>
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>jstl</artifactId>
-      <version>${jstl-version}</version>
-    </dependency>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-      <version>2.5</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>jsp-api</artifactId>
-      <version>2.0</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>cglib</groupId>
-      <artifactId>cglib-nodep</artifactId>
-      <version>2.2.2</version>
-    </dependency>
-    <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-core</artifactId>
-      <version>${spring-version}</version>
+      <version>${spring-security-version}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-config</artifactId>
-      <version>${spring-version}</version>
+      <version>${spring-security-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-ldap</artifactId>
+      <version>${spring-security-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security.oauth</groupId>
+      <artifactId>spring-security-oauth</artifactId>
+      <version>1.0.0.RELEASE</version>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-codec</groupId>
+          <artifactId>commons-codec</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
@@ -471,6 +391,29 @@
     </dependency>
 
     <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>jstl</artifactId>
+      <version>${jstl-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <version>2.5</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>jsp-api</artifactId>
+      <version>2.0</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>cglib</groupId>
+      <artifactId>cglib-nodep</artifactId>
+      <version>2.2.2</version>
+    </dependency>
+
+    <dependency>
       <groupId>net.sf.ehcache</groupId>
       <artifactId>ehcache</artifactId>
       <type>pom</type>
@@ -488,6 +431,7 @@
       <artifactId>javassist</artifactId>
       <version>${javassist-version}</version>
     </dependency>
+
     <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
@@ -501,35 +445,15 @@
     </dependency>
 
     <dependency>
-      <groupId>org.springframework.security</groupId>
-      <artifactId>spring-security-ldap</artifactId>
-      <version>${spring-version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.springframework.security.oauth</groupId>
-      <artifactId>spring-security-oauth</artifactId>
-      <version>1.0.0.M3</version>
-      <exclusions>
-        <exclusion>
-          <groupId>commons-codec</groupId>
-          <artifactId>commons-codec</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <dependency>
       <groupId>net.sourceforge.fluxion.ajax</groupId>
       <artifactId>fluxion-ajax-3</artifactId>
       <version>1.0-alpha-4</version>
     </dependency>
-
     <dependency>
       <groupId>net.sourceforge.fluxion.ajax</groupId>
       <artifactId>fluxion-ajax-js</artifactId>
-      <version>1.0-alpha-10</version>
+      <version>1.0-alpha-12</version>
     </dependency>
-
     <dependency>
       <groupId>net.sourceforge.fluxion.ajax.beans</groupId>
       <artifactId>fluxion-ajax-beans</artifactId>
@@ -601,8 +525,9 @@
     <log4j-version>1.2.16</log4j-version>
     <slf4j-log4j-version>1.6.0</slf4j-log4j-version>
     <jetty-version>6.1.7</jetty-version>
-    <spring-version>3.0.7.RELEASE</spring-version>
-    <spring-integration-version>2.1.0.RELEASE</spring-integration-version>
+    <spring-version>3.1.3.RELEASE</spring-version>
+    <spring-security-version>3.1.3.RELEASE</spring-security-version>
+    <spring-integration-version>2.2.0.RELEASE</spring-integration-version>
     <mysql-version>5.1.10</mysql-version>
   </properties>
 </project>

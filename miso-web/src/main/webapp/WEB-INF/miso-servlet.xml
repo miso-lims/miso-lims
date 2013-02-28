@@ -25,19 +25,23 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-                           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd"
+       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+                           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd"
        default-autowire="byName">
 
     <!-- <context:load-time-weaver aspectj-weaving="on" weaver-class="org.springframework.instrument.classloading.ReflectiveLoadTimeWeaver"/> -->
+    <!--<mvc:annotation-driven />-->
+
+    <tx:annotation-driven proxy-target-class="true" />
 
     <context:component-scan annotation-config="true" base-package="com.eaglegenomics.simlims"/>
     <context:component-scan annotation-config="true" base-package="uk.ac.bbsrc.tgac.miso"/>
     <context:component-scan annotation-config="true" base-package="net.sourceforge.fluxion.ajax"/>
 
-    <bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping"/>
+    <!-- <bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping"/> -->
 
-    <bean name="misoWebBinder" class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+    <!-- <bean name="misoWebBinder" class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
         <property name="cacheSeconds" value="0"/>
         <property name="webBindingInitializer">
             <bean class="uk.ac.bbsrc.tgac.miso.spring.LimsBindingInitializer"/>
@@ -53,11 +57,32 @@
         </property>
         <property name="sessionAttributeStore" ref="sessionConversationAttributeStore"/>
     </bean>
+    -->
+  <!--
+    <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+      <property name="cacheSeconds" value="0"/>
+      <property name="webBindingInitializer">
+          <bean class="uk.ac.bbsrc.tgac.miso.spring.LimsBindingInitializer"/>
+      </property>
+      <property name="messageConverters">
+          <list>
+             <bean class="org.springframework.http.converter.ByteArrayHttpMessageConverter" />
+             <bean class="org.springframework.http.converter.StringHttpMessageConverter" />
+             <bean class="org.springframework.http.converter.FormHttpMessageConverter" />
+             <bean class="org.springframework.http.converter.xml.SourceHttpMessageConverter" />
+             <bean class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter"/>
+          </list>
+      </property>
+      <property name="sessionAttributeStore" ref="sessionConversationAttributeStore"/>
+    </bean>
+    -->
+
+    <bean name="webBindingInitializer" class="uk.ac.bbsrc.tgac.miso.spring.LimsBindingInitializer"/>
 
     <bean name="inputDataXmlView" class="uk.ac.bbsrc.tgac.miso.webapp.controller.InputDataXmlView"/>
 
-    <bean id="sessionConversationAttributeStore" class="uk.ac.bbsrc.tgac.miso.webapp.util.SessionConversationAttributeStore">
-      <property name="numConversationsToKeep" value="100"/>
-    </bean>
+    <!-- <bean id="sessionConversationAttributeStore" class="uk.ac.bbsrc.tgac.miso.webapp.util.SessionConversationAttributeStore">
+      <property name="numConversationsToKeep" value="1000"/>
+    </bean> -->
 
 </beans>

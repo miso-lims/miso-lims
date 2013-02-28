@@ -31,13 +31,16 @@ import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
+import java.io.Serializable;
+import java.util.Collection;
+
 /**
  * Info
  *
  * @author Rob Davey
  * @since 0.0.2
  */
-public class PoolImpl<D extends Poolable> extends AbstractPool<D> {
+public class PoolImpl<P extends Poolable> extends AbstractPool<P> implements Serializable {
   public static final String PREFIX = "MPO";
 
   private String units = "";
@@ -69,40 +72,6 @@ public class PoolImpl<D extends Poolable> extends AbstractPool<D> {
     this.platformType = platformType;
   }
 
-  /**
-   * Equivalency is based on getProjectId() if set, otherwise on name,
-   * description and creation date.
-   */
-  @Override
-  public boolean equals(Object obj) {
-    if (obj == null)
-      return false;
-    if (obj == this)
-      return true;
-    if (!(obj instanceof Pool))
-      return false;
-    Pool them = (Pool) obj;
-    // If not saved, then compare resolved actual objects. Otherwise
-    // just compare IDs.
-    if (getId() == AbstractPool.UNSAVED_ID
-        || them.getId() == AbstractPool.UNSAVED_ID) {
-      return getCreationDate().equals(them.getCreationDate()); //&& this.getDescription().equals(them.getDescription());
-    }
-    else {
-      return getId() == them.getId();
-    }
-  }
-
-  @Override
-  public int hashCode() {
-    if (getId() != AbstractPool.UNSAVED_ID) {
-      return (int)getId();
-    }
-    else {
-      return getCreationDate().hashCode();
-    }
-  }
-
   @Override
   public String toString() {
     StringBuffer sb = new StringBuffer();
@@ -114,9 +83,5 @@ public class PoolImpl<D extends Poolable> extends AbstractPool<D> {
     sb.append(" : ");
     sb.append(getConcentration());
     return sb.toString();
-  }
-
-  public int compareTo(Object o) {
-    return this.equals(o) ? 0 : 1;
   }
 }

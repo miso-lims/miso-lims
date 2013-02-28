@@ -23,8 +23,10 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+//import com.fasterxml.jackson.annotation.*;
+//import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonWriteNullProperties;
+import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.w3c.dom.Document;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
@@ -33,7 +35,6 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 
 /**
  * A Project represents the top level object in the MISO data model. A Project couples together {@link Study} and
@@ -47,7 +48,8 @@ import java.util.List;
  * @since 0.0.2
  */
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
-@JsonWriteNullProperties(false)
+//@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
+@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
 @JsonIgnoreProperties({"securityProfile"})
 public interface Project extends com.eaglegenomics.simlims.core.Project,
                                  Comparable,
@@ -56,7 +58,8 @@ public interface Project extends com.eaglegenomics.simlims.core.Project,
                                  Reportable,
                                  Deletable,
                                  Watchable,
-                                 Nameable {
+                                 Nameable,
+                                 Alertable {
   /** Field PREFIX  */
   public static final String PREFIX = "PRO";
 

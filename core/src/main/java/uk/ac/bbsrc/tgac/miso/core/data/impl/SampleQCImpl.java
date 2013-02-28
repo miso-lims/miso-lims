@@ -23,11 +23,12 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
+
+import java.io.Serializable;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.impl
@@ -37,7 +38,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
  * @author Rob Davey
  * @since 0.0.2
  */
-public class SampleQCImpl extends AbstractSampleQC {
+public class SampleQCImpl extends AbstractSampleQC implements Serializable {
   /**
    * Construct a new SampleQCImpl
    */

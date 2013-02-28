@@ -32,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
@@ -85,31 +86,49 @@ public class PoolAlertManager {
     this.enabled = enabled;
   }
 
-  private Pool cloneAndAdd(Pool pool) {
-    for (User u : poolWatchers) {
-      pool.addWatcher(u);
-    }
-
-    Pool clone = cloner.deepClone(pool);
-    ((PoolImpl)clone).addListener(getPoolListener());
-    pools.put(clone.getId(), clone);
-    return clone;
+  public void applyListeners(Pool pool) {
+    pool.addListener(getPoolListener());
   }
 
-  public void indexify() throws IOException {
-    log.info("Setting up...");
+  public void removeListeners(Pool pool) {
+    pool.removeListener(getPoolListener());
+  }
+
+  public void push(Pool pool) {
     if (enabled) {
-      log.info("Indexifying...");
-      pools.clear();
-
-      log.info("Setting pool listeners and watcher groups...");
-      poolWatchers.clear();
-      poolWatchers.addAll(securityManager.listUsersByGroupName("PoolWatchers"));
-
-      Collection<Pool<? extends Poolable>> persistedPools = misoRequestManager.listAllPools();
-      for (Pool p : persistedPools) {
-        cloneAndAdd(p);
+      if (pool != null) {
+        Pool clone = cloner.deepClone(pool);
+        if (clone != null) {
+          applyListeners(clone);
+          if (pools.containsKey(pool.getId())) {
+            log.debug("Not replacing " + clone.getId() + ": Ready? " + clone.getReadyToRun());
+          }
+          else {
+            pools.put(pool.getId(), clone);
+            log.debug("Queued " + clone.getId() + ": Ready? " + clone.getReadyToRun());
+          }
+        }
       }
+    }
+    else {
+      log.warn("Alerting system disabled.");
+    }
+  }
+
+  public void pop(Pool pool) {
+    if (enabled) {
+      if (pool!= null) {
+        Pool clone = pools.get(pool.getId());
+        if (clone != null) {
+          removeListeners(clone);
+          clone = null;
+          pools.remove(pool.getId());
+          log.debug("Dequeued " + pool.getId());
+        }
+      }
+    }
+    else {
+      log.warn("Alerting system disabled.");
     }
   }
 
@@ -121,9 +140,15 @@ public class PoolAlertManager {
     if (enabled) {
       Pool clone = pools.get(p.getId());
       if (clone == null) {
-        log.info("New pool - adding all PoolWatchers and cloning!");
-        clone = cloneAndAdd(p);
-
+        log.debug("Update: no clone - pushing");
+        //new run - add all PoolWatchers!
+        for (User u : securityManager.listUsersByGroupName("PoolWatchers")) {
+          p.addWatcher(u);
+        }
+        push(p);
+      }
+      else {
+        log.debug("Update: got clone of " + clone.getId());
         //TODO EVIL EVIL EVIL FIX UPON PAIN OF DEATH
         if (clone.getReadyToRun()) {
           try {
@@ -133,39 +158,41 @@ public class PoolAlertManager {
             m.invoke(clone);
           }
           catch (Exception e) {
-            log.debug("Cannot fire pool ready event: " + e.getMessage());
+            log.error("Cannot fire pool ready event: " + e.getMessage());
             e.printStackTrace();
           }
         }
-      }
-      else {
-        log.info("Updating Pool " + clone.getId() + " ...");
+        else {
+          log.debug("Updating Pool " + clone.getId() + " ...");
 
-        //find any watchable setters on the clone and call the respective getter from the clone parent
-        //i.e. clone.setFoo(parent.getFoo()); where @WatchableSetter Class.setFoo(T t);
-        /*
-        for (Method setter : clone.getClass().getMethods()) {
-          if (setter.getAnnotation(WatchableSetter.class)) {
-            try {
-              Method getter = clone.getClass().getMethod(setter.getName().replaceFirst("set", "get"));
-              setter.invoke(clone, getter.invoke(p));
-            }
-            catch (NoSuchMethodException e) {
-              e.printStackTrace();
-            }
-            catch (InvocationTargetException e) {
-              e.printStackTrace();
-            }
-            catch (IllegalAccessException e) {
-              e.printStackTrace();
+          //find any watchable setters on the clone and call the respective getter from the clone parent
+          //i.e. clone.setFoo(parent.getFoo()); where @WatchableSetter Class.setFoo(T t);
+          /*
+          for (Method setter : clone.getClass().getMethods()) {
+            if (setter.getAnnotation(WatchableSetter.class)) {
+              try {
+                Method getter = clone.getClass().getMethod(setter.getName().replaceFirst("set", "get"));
+                setter.invoke(clone, getter.invoke(p));
+              }
+              catch (NoSuchMethodException e) {
+                e.printStackTrace();
+              }
+              catch (InvocationTargetException e) {
+                e.printStackTrace();
+              }
+              catch (IllegalAccessException e) {
+                e.printStackTrace();
+              }
             }
           }
+          */
+          //TODO the above will get rid of this necessity to call each method explicitly
+          clone.setReadyToRun(p.getReadyToRun());
         }
-        */
-        //TODO the above will get rid of this necessity to call each method explicitly
-        clone.setReadyToRun(p.getReadyToRun());
+
+        pop(clone);
+        push(p);
       }
-      pools.put(p.getId(), clone);
     }
   }
 
@@ -174,9 +201,12 @@ public class PoolAlertManager {
     if (user != null) {
       Pool clone = pools.get(pool.getId());
       if (clone == null) {
-        clone = cloneAndAdd(pool);
+        pool.addWatcher(user);
+        push(pool);
       }
-      clone.addWatcher(user);
+      else {
+        clone.addWatcher(user);
+      }
     }
   }
 
@@ -185,9 +215,12 @@ public class PoolAlertManager {
     if (user != null && pool.getWatchers().contains(user)) {
       Pool clone = pools.get(pool.getId());
       if (clone == null) {
-        clone = cloneAndAdd(pool);
+        pool.removeWatcher(user);
+        push(pool);
       }
-      clone.removeWatcher(user);
+      else {
+        clone.removeWatcher(user);
+      }
     }
   }
 

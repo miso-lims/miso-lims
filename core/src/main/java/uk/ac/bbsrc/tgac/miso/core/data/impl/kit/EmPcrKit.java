@@ -25,6 +25,8 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl.kit;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractKit;
 
+import java.io.Serializable;
+
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.impl.kit
  * <p/>
@@ -33,6 +35,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.AbstractKit;
  * @author Rob Davey
  * @since 0.0.2
  */
-public class EmPcrKit extends AbstractKit {
+public class EmPcrKit extends AbstractKit implements Serializable {
   public static final String PREFIX = "EKT";
 }

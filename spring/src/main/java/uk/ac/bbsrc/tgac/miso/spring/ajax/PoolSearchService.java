@@ -38,7 +38,10 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * uk.ac.bbsrc.tgac.miso.miso.spring.ajax
@@ -88,7 +91,7 @@ public class PoolSearchService {
           }
         }
         if (pools.size() > 0) {
-          for (Pool pool : pools) {
+          for (Pool<? extends Poolable> pool : pools) {
             b.append(poolHtml(pool));
           }
         }
@@ -105,14 +108,104 @@ public class PoolSearchService {
     return JSONUtils.JSONObjectResponse("html", "");
   }
 
-  private String poolHtml(Pool p) {
+  public JSONObject poolSearchElements(HttpSession session, JSONObject json) {
+    String searchStr = json.getString("str");
+    String platformType = json.getString("platform").toUpperCase();
+    try {
+      if (searchStr.length() > 1) {
+        if (LimsUtils.isBase64String(searchStr)) {
+          //Base64-encoded string, most likely a barcode image beeped in. decode and search
+          searchStr = new String(Base64.decodeBase64(searchStr));
+        }
+
+        //String str = searchStr.toLowerCase();
+        StringBuilder b = new StringBuilder();
+        List<? extends Dilution> dilutions = new ArrayList<Dilution>(requestManager.listDilutionsBySearch(searchStr, PlatformType.valueOf(platformType)));
+        int numMatches = 0;
+        for (Dilution d : dilutions) {
+          //have to use onmousedown because of blur firing before onclick and hiding the div before it can be added
+          b.append("<div onmouseover=\"this.className='autocompleteboxhighlight'\" onmouseout=\"this.className='autocompletebox'\" class=\"autocompletebox\"" +
+                   " onmousedown=\"Pool.search.poolSearchSelectElement('" + d.getId() + "', '" + d.getName() + "')\">" +
+                   "<b>Dilution: " + d.getName() + "</b><br/>" +
+                   "<b>Library: " + d.getLibrary().getAlias() + "</b><br/>" +
+                   "<b>Sample: " + d.getLibrary().getSample().getAlias() + "</b><br/>" +
+                   "</div>");
+          numMatches++;
+        }
+
+        List<Plate<? extends List<? extends Plateable>, ? extends Plateable>> poolables = new ArrayList<Plate<? extends List<? extends Plateable>, ? extends Plateable>>(requestManager.listAllPlatesBySearch(searchStr));
+        for (Plate<? extends List<? extends Plateable>, ? extends Plateable> d : poolables) {
+          //have to use onmousedown because of blur firing before onclick and hiding the div before it can be added
+          b.append("<div onmouseover=\"this.className='autocompleteboxhighlight'\" onmouseout=\"this.className='autocompletebox'\" class=\"autocompletebox\"" +
+                   " onmousedown=\"Pool.search.poolSearchSelectElement('" + d.getId() + "', '" + d.getName() + "')\">" +
+                   "<b>Plate: " + d.getName() + "</b><br/>" +
+                   "<b>Size: " + d.getSize() + "</b><br/>");
+
+          if (!d.getElements().isEmpty()) {
+            Plateable element = d.getElements().get(0);
+            if (element instanceof Library) {
+              Library l = (Library)element;
+              b.append("<b>Project: " + l.getSample().getProject().getAlias() + "</b><br/>");
+            }
+            else if (element instanceof Dilution) {
+              Dilution l = (Dilution)element;
+              b.append("<b>Project: " + l.getLibrary().getSample().getProject().getAlias() + "</b><br/>");
+            }
+            else if (element instanceof Sample) {
+              Sample l = (Sample)element;
+              b.append("<b>Project: " + l.getProject().getAlias() + "</b><br/>");
+            }
+          }
+          b.append("</div>");
+          numMatches++;
+        }
+
+        if (numMatches == 0) {
+          return JSONUtils.JSONObjectResponse("html", "No matches");
+        }
+        else {
+          return JSONUtils.JSONObjectResponse("html", "<div class=\"autocomplete\"><ul>" + b.toString() + "</ul></div>");
+        }
+      }
+      else {
+        return JSONUtils.JSONObjectResponse("html", "Need a longer search pattern ...");
+      }
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+      return JSONUtils.SimpleJSONError("Could not complete pool element search: " + e.getMessage());
+    }
+  }
+
+  private String poolHtml(Pool<? extends Poolable> p) {
     StringBuilder b = new StringBuilder();
     b.append("<div style='position:relative' onMouseOver='this.className=\"dashboardhighlight\"' onMouseOut='this.className=\"dashboard\"' class='dashboard' ondblclick='Run.container.insertPoolNextAvailable(this);'>");
     b.append("<div style=\"float:left\"><b>" + p.getName() + " (" + p.getCreationDate() + ")</b><br/>");
 
-    Collection<Dilution> ds = p.getDilutions();
-    for (Dilution d : ds) {
-      b.append("<span>" + d.getName() + " (" + d.getLibrary().getSample().getProject().getAlias() + ")</span><br/>");
+    Collection<? extends Poolable> ds = p.getPoolableElements();
+    for (Poolable d : ds) {
+      if (d instanceof Dilution) {
+        b.append("<span>" + d.getName() + " (" + ((Dilution)d).getLibrary().getSample().getProject().getAlias() + ")</span><br/>");
+      }
+      else if (d instanceof Plate) {
+        Plate<LinkedList<Plateable>, Plateable> plate = (Plate<LinkedList<Plateable>, Plateable>)d;
+        if (!plate.getElements().isEmpty()) {
+          Plateable element = plate.getElements().getFirst();
+          if (element instanceof Library) {
+            Library l = (Library)element;
+            b.append("<span>" + d.getName() + " ["+plate.getSize()+"-well] (" + l.getSample().getProject().getAlias() + ")</span><br/>");
+          }
+          else if (element instanceof Dilution) {
+
+          }
+          else if (element instanceof Sample) {
+
+          }
+        }
+      }
+      else {
+        b.append("<span>" + d.getName() + "</span><br/>");
+      }
     }
 
     b.append("<br/><i>");

@@ -218,5 +218,19 @@ Submission.ui = {
     for (var i = 0; i < json.uploadJobs.length; i++) {
       jQuery("#progressbar"+i).progressbar({ value: json.uploadJobs[i].percent });
     }
+  },
+
+  togglePartitionContents : function(checkbox) {
+    var box = jQuery(checkbox);
+    if (box.is(":checked")) {
+      jQuery("ul input[type=checkbox]", jQuery(checkbox).parent()).each(function() {
+        jQuery(this).attr("checked", "checked");
+      });
+    }
+    else {
+      jQuery("ul input[type=checkbox]", jQuery(checkbox).parent()).each(function() {
+        jQuery(this).removeAttr("checked");
+      });
+    }
   }
 };

@@ -26,14 +26,21 @@
        xmlns:tx="http://www.springframework.org/schema/tx" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:jee="http://www.springframework.org/schema/jee"
        xmlns:ehcache="http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-                        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+                        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
                         http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring
-                        http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring/ehcache-spring-1.2.xsd http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.0.xsd"
+                        http://ehcache-spring-annotations.googlecode.com/svn/schema/ehcache-spring/ehcache-spring-1.2.xsd
+                        http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.1.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd"
        default-autowire="byName">
 
-  <tx:annotation-driven/>
+  <!-- <tx:annotation-driven/> -->
   <ehcache:annotation-driven cache-manager="cacheManager" proxy-target-class="true"/>
+  <bean id="cacheManager" name="cacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean"/>
+  <bean id="limsHashKeyGenerator" class="com.googlecode.ehcache.annotations.key.HashCodeCacheKeyGenerator">
+    <property name="includeMethod" value="false"/>
+    <property name="includeParameterTypes" value="false"/>
+  </bean>
 
   <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
     <property name="dataSource" ref="dataSource"/>
@@ -42,13 +49,6 @@
   <jee:jndi-lookup id="dataSource"
                    jndi-name="/jdbc/MISODB"
                    resource-ref="true"/>
-
-  <bean id="cacheManager" name="cacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean"/>
-
-  <bean id="limsHashKeyGenerator" class="com.googlecode.ehcache.annotations.key.HashCodeCacheKeyGenerator">
-    <property name="includeMethod" value="false"/>
-    <property name="includeParameterTypes" value="false"/>
-  </bean>
 
   <!-- Spring JDBC TEMPLATES STUFF -->
   <bean name="interfaceTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
@@ -60,6 +60,39 @@
 
   <bean name="nativeJdbcExtractor"
         class="org.springframework.jdbc.support.nativejdbc.CommonsDbcpNativeJdbcExtractor"/>
+
+  <bean id="daoLookup" name="daoLookup" class="uk.ac.bbsrc.tgac.miso.sqlstore.util.DaoLookup">
+    <property name="daos">
+      <map key-type="java.lang.Class">
+        <entry key="uk.ac.bbsrc.tgac.miso.core.event.Alert" value-ref="alertStore"/>
+        <entry key="uk.ac.bbsrc.tgac.miso.core.data.impl.emPCR" value-ref="emPCRStore"/>
+        <entry key="uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution" value-ref="emPCRDilutionStore"/>
+        <entry key="uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution" value-ref="libraryDilutionStore"/>
+        <entry key="uk.ac.bbsrc.tgac.miso.core.data.Experiment" value-ref="experimentStore"/>
+        <entry key="uk.ac.bbsrc.tgac.miso.core.data.Kit" value-ref="kitStore"/>
+        <entry key="uk.ac.bbsrc.tgac.miso.core.data.Library" value-ref="libraryStore"/>
+        <entry key="uk.ac.bbsrc.tgac.miso.core.data.LibraryQC" value-ref="libraryQcStore"/>
+        <entry key="com.eaglegenomics.simlims.core.Note" value-ref="noteStore"/>
+        <entry key="uk.ac.bbsrc.tgac.miso.core.data.Partition" value-ref="partitionStore"/>
+        <entry key="uk.ac.bbsrc.tgac.miso.core.data.Plate" value-ref="plateStore"/>
+        <entry key="uk.ac.bbsrc.tgac.miso.core.data.Platform" value-ref="platformStore"/>
+        <entry key="uk.ac.bbsrc.tgac.miso.core.data.Pool" value-ref="poolStore"/>
+        <entry key="uk.ac.bbsrc.tgac.miso.core.data.PoolQC" value-ref="poolQcStore"/>
+        <entry key="uk.ac.bbsrc.tgac.miso.core.data.PrintJob" value-ref="printJobStore"/>
+        <entry key="uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService" value-ref="printServiceStore"/>
+        <entry key="uk.ac.bbsrc.tgac.miso.core.data.Project" value-ref="projectStore"/>
+        <entry key="uk.ac.bbsrc.tgac.miso.core.data.Run" value-ref="runStore"/>
+        <entry key="uk.ac.bbsrc.tgac.miso.core.data.RunQC" value-ref="runQcStore"/>
+        <entry key="uk.ac.bbsrc.tgac.miso.core.data.Sample" value-ref="sampleStore"/>
+        <entry key="uk.ac.bbsrc.tgac.miso.core.data.SampleQC" value-ref="sampleQcStore"/>
+        <entry key="uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer" value-ref="sequencerPartitionContainerStore"/>
+        <entry key="uk.ac.bbsrc.tgac.miso.core.data.SequencerReference" value-ref="sequencerReferenceStore"/>
+        <entry key="uk.ac.bbsrc.tgac.miso.core.data.Status" value-ref="statusStore"/>
+        <entry key="uk.ac.bbsrc.tgac.miso.core.data.Study" value-ref="studyStore"/>
+        <entry key="uk.ac.bbsrc.tgac.miso.core.data.Submission" value-ref="submissionStore"/>
+      </map>
+    </property>
+  </bean>
 
   <bean id="sqlProjectDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO">
     <property name="cascadeType">
@@ -87,8 +120,19 @@
     <property name="jdbcTemplate" ref="interfaceTemplate"/>
   </bean>
 
-  <bean id="sqlDilutionDAO"
-        class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLDilutionDAO">
+  <bean id="sqlEmPCRDilutionDAO"
+        class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLEmPCRDilutionDAO">
+    <property name="cascadeType">
+      <value type="javax.persistence.CascadeType">REMOVE</value>
+    </property>
+    <property name="securityProfileDAO" ref="sqlSecurityProfileDAO"/>
+    <property name="emPcrDAO" ref="sqlEmPCRDAO"/>
+    <property name="libraryDAO" ref="sqlLibraryDAO"/>
+    <property name="jdbcTemplate" ref="interfaceTemplate"/>
+  </bean>
+
+  <bean id="sqlLibraryDilutionDAO"
+        class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryDilutionDAO">
     <property name="cascadeType">
       <value type="javax.persistence.CascadeType">REMOVE</value>
     </property>
@@ -104,7 +148,8 @@
       <value type="javax.persistence.CascadeType">REMOVE</value>
     </property>
     <property name="securityProfileDAO" ref="sqlSecurityProfileDAO"/>
-    <property name="dilutionDAO" ref="sqlDilutionDAO"/>
+    <property name="libraryDilutionDAO" ref="sqlLibraryDilutionDAO"/>
+    <property name="emPCRDilutionDAO" ref="sqlEmPCRDilutionDAO"/>
     <property name="jdbcTemplate" ref="interfaceTemplate"/>
   </bean>
 
@@ -211,7 +256,7 @@
     <property name="noteDAO" ref="sqlNoteDAO"/>
     <property name="poolDAO" ref="sqlPoolDAO"/>
     <property name="sampleDAO" ref="sqlSampleDAO"/>
-    <property name="dilutionDAO" ref="sqlDilutionDAO"/>
+    <property name="dilutionDAO" ref="sqlLibraryDilutionDAO"/>
     <property name="libraryQcDAO" ref="sqlLibraryQCDAO"/>
     <property name="securityProfileDAO" ref="sqlSecurityProfileDAO"/>
     <property name="jdbcTemplate" ref="interfaceTemplate"/>
@@ -235,9 +280,18 @@
     </property>
     <property name="securityManager" ref="securityManager"/>
     <property name="securityProfileDAO" ref="sqlSecurityProfileDAO"/>
-    <property name="dilutionDAO" ref="sqlDilutionDAO"/>
     <property name="experimentDAO" ref="sqlExperimentDAO"/>
+    <property name="poolQcDAO" ref="sqlPoolQCDAO"/>
     <property name="watcherDAO" ref="sqlWatcherDAO"/>
+    <property name="jdbcTemplate" ref="interfaceTemplate"/>
+  </bean>
+
+  <bean id="sqlPoolQCDAO"
+        class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLPoolQCDAO">
+    <property name="cascadeType">
+      <value type="javax.persistence.CascadeType">ALL</value>
+    </property>
+    <property name="poolDAO" ref="sqlPoolDAO"/>
     <property name="jdbcTemplate" ref="interfaceTemplate"/>
   </bean>
 
@@ -277,7 +331,7 @@
 
   <bean id="sqlSubmissionDAO"
         class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLTgacSubmissionDAO">
-    <property name="dilutionDAO" ref="sqlDilutionDAO"/>
+    <property name="dilutionDAO" ref="sqlLibraryDilutionDAO"/>
     <property name="experimentDAO" ref="sqlExperimentDAO"/>
     <property name="partitionDAO" ref="sqlPartitionDAO"/>
     <property name="sampleDAO" ref="sqlSampleDAO"/>
@@ -307,6 +361,8 @@
       <value type="javax.persistence.CascadeType">PERSIST</value>
     </property>
     <property name="libraryDAO" ref="sqlLibraryDAO"/>
+    <property name="sampleDAO" ref="sqlSampleDAO"/>
+    <property name="dilutionDAO" ref="sqlLibraryDilutionDAO"/>
     <property name="securityProfileDAO" ref="sqlSecurityProfileDAO"/>
     <property name="jdbcTemplate" ref="interfaceTemplate"/>
   </bean>
@@ -345,16 +401,27 @@
     </property>
   </bean>
 
-  <bean name="dilutionStore" class="org.springframework.aop.framework.ProxyFactoryBean">
+  <bean name="emPCRDilutionStore" class="org.springframework.aop.framework.ProxyFactoryBean">
     <property name="proxyInterfaces">
-      <value>uk.ac.bbsrc.tgac.miso.core.store.DilutionStore</value>
+      <value>uk.ac.bbsrc.tgac.miso.core.store.EmPCRDilutionStore</value>
     </property>
     <property name="interceptorNames">
       <list>
-        <value>sqlDilutionDAO</value>
+        <value>sqlEmPCRDilutionDAO</value>
       </list>
     </property>
   </bean>
+
+  <bean name="libraryDilutionStore" class="org.springframework.aop.framework.ProxyFactoryBean">
+      <property name="proxyInterfaces">
+        <value>uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore</value>
+      </property>
+      <property name="interceptorNames">
+        <list>
+          <value>sqlLibraryDilutionDAO</value>
+        </list>
+      </property>
+    </bean>
 
   <bean name="emPCRStore" class="org.springframework.aop.framework.ProxyFactoryBean">
     <property name="proxyInterfaces">
@@ -462,6 +529,17 @@
     <property name="interceptorNames">
       <list>
         <value>sqlPoolDAO</value>
+      </list>
+    </property>
+  </bean>
+
+  <bean name="poolQcStore" class="org.springframework.aop.framework.ProxyFactoryBean">
+    <property name="proxyInterfaces">
+      <value>uk.ac.bbsrc.tgac.miso.core.store.PoolQcStore</value>
+    </property>
+    <property name="interceptorNames">
+      <list>
+        <value>sqlPoolQCDAO</value>
       </list>
     </property>
   </bean>

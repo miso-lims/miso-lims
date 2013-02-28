@@ -30,11 +30,14 @@ import com.googlecode.ehcache.annotations.Property;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
+import org.codehaus.jackson.type.TypeReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRPool;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.event.manager.PoolAlertManager;
+import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolQcException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.*;
@@ -48,6 +51,8 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.transaction.annotation.Transactional;
+import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
+import uk.ac.bbsrc.tgac.miso.sqlstore.util.DaoLookup;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution;
@@ -58,6 +63,7 @@ import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 
 import javax.persistence.CascadeType;
 import java.io.IOException;
+import java.lang.reflect.ParameterizedType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
@@ -74,7 +80,7 @@ public class SQLPoolDAO implements PoolStore {
   private static final String TABLE_NAME = "Pool";
 
   private static final String POOL_SELECT =
-          "SELECT poolId, concentration, identificationBarcode, name, alias, creationDate, securityProfile_profileId, platformType, ready " +
+          "SELECT poolId, concentration, identificationBarcode, name, alias, creationDate, securityProfile_profileId, platformType, ready, qcPassed " +
           "FROM "+TABLE_NAME;
 
   public static final String POOL_SELECT_BY_POOL_ID =
@@ -97,11 +103,14 @@ public class SQLPoolDAO implements PoolStore {
 
   public static final String POOL_UPDATE =
           "UPDATE "+TABLE_NAME+" " +
-          "SET alias=:alias, concentration=:concentration, identificationBarcode=:identificationBarcode, creationDate=:creationDate, securityProfile_profileId=:securityProfile_profileId, platformType=:platformType, ready=:ready " +
+          "SET alias=:alias, concentration=:concentration, identificationBarcode=:identificationBarcode, creationDate=:creationDate, securityProfile_profileId=:securityProfile_profileId, platformType=:platformType, ready=:ready, qcPassed=:qcPassed " +
           "WHERE poolId=:poolId";
 
   public static final String POOL_DELETE =
           "DELETE FROM "+TABLE_NAME+" WHERE poolId=:poolId";
+
+  public static final String POOL_ELEMENT_SELECT_BY_POOL_ID =
+          "SELECT pool_poolId, elementType, elementId FROM Pool_Elements WHERE pool_poolId = ?";
 
   public static final String POOL_EXPERIMENT_DELETE_BY_POOL_ID =
           "DELETE FROM Pool_Experiment " +
@@ -117,8 +126,11 @@ public class SQLPoolDAO implements PoolStore {
           "LEFT JOIN emPCR e ON e.dilution_dilutionId = ld.dilutionId " +
           "LEFT JOIN emPCRDilution ed ON ed.emPCR_pcrId = e.pcrId " +
 
-          "LEFT JOIN Pool_LibraryDilution pld ON pld.dilutions_dilutionId = ld.dilutionId " +
-          "LEFT JOIN Pool_emPCRDilution ple ON ple.dilutions_dilutionId = ed.dilutionId " +
+          //"LEFT JOIN Pool_LibraryDilution pld ON pld.dilutions_dilutionId = ld.dilutionId " +
+          //"LEFT JOIN Pool_emPCRDilution ple ON ple.dilutions_dilutionId = ed.dilutionId " +
+
+          "LEFT JOIN Pool_Elements pld ON pld.elementId = ld.dilutionId " +
+          "LEFT JOIN Pool_Elements ple ON ple.elementId = ed.dilutionId " +
 
           "INNER JOIN "+TABLE_NAME+" pool ON pool.poolId = pld.pool_poolId " +
           "OR pool.poolId = ple.pool_poolId " +
@@ -132,15 +144,18 @@ public class SQLPoolDAO implements PoolStore {
           "LEFT JOIN emPCR e ON e.dilution_dilutionId = ld.dilutionId " +
           "LEFT JOIN emPCRDilution ed ON ed.emPCR_pcrId = e.pcrId " +
 
-          "LEFT JOIN Pool_LibraryDilution pld ON pld.dilutions_dilutionId = ld.dilutionId " +
-          "LEFT JOIN Pool_emPCRDilution ple ON ple.dilutions_dilutionId = ed.dilutionId " +
+          //"LEFT JOIN Pool_LibraryDilution pld ON pld.dilutions_dilutionId = ld.dilutionId " +
+          //"LEFT JOIN Pool_emPCRDilution ple ON ple.dilutions_dilutionId = ed.dilutionId " +
+
+          "LEFT JOIN Pool_Elements pld ON pld.elementId = ld.dilutionId " +
+          "LEFT JOIN Pool_Elements ple ON ple.elementId = ed.dilutionId " +
 
           "INNER JOIN "+TABLE_NAME+" pool ON pool.poolId = pld.pool_poolId " +
           "OR pool.poolId = ple.pool_poolId " +
           "WHERE li.libraryId=?";
 
-  public static final String LIBRARY_DILUTION_POOL_DELETE_BY_POOL_ID =
-          "DELETE FROM Pool_LibraryDilution " +
+  public static final String POOL_ELEMENT_DELETE_BY_POOL_ID =
+          "DELETE FROM Pool_Elements " +
           "WHERE pool_poolId=:pool_poolId";
 
   //ILLUMINA
@@ -159,22 +174,24 @@ public class SQLPoolDAO implements PoolStore {
   public static final String ILLUMINA_POOL_SELECT_BY_ID_BARCODE =
           ILLUMINA_POOL_SELECT + " AND identificationBarcode=?";
 
+  /*
   public static final String ILLUMINA_POOL_BY_RELATED_LANE =
-          "SELECT l.laneId, ip.poolId, ip.concentration, ip.identificationBarcode, ip.name, ip.alias, ip.creationDate, ip.securityProfile_profileId, ip.platformType, ip.ready " +
+          "SELECT l.laneId, ip.poolId, ip.concentration, ip.identificationBarcode, ip.name, ip.alias, ip.creationDate, ip.securityProfile_profileId, ip.platformType, ip.ready, ip.qcPassed " +
           "FROM Lane l, "+TABLE_NAME+" ip " +
           "WHERE l.poolId=ip.poolId " +
           "AND ip.platformType='Illumina' " +
           "AND l.laneId=?";
 
   public static final String ILLUMINA_POOLS_BY_RELATED_LIBRARY_DILUTION =
-          "SELECT ip.poolId, ip.concentration, ip.identificationBarcode, ip.name, ip.alias, ip.creationDate, ip.securityProfile_profileId, ip.platformType, ip.ready " +
+          "SELECT ip.poolId, ip.concentration, ip.identificationBarcode, ip.name, ip.alias, ip.creationDate, ip.securityProfile_profileId, ip.platformType, ip.ready, ip.qcPassed " +
           "FROM "+TABLE_NAME+" ip, Pool_LibraryDilution p " +
           "WHERE ip.poolId=p.pool_poolId " +
           "AND ip.platformType='Illumina' " +
           "AND p.dilutions_dilutionId=?";
+  */
 
   public static final String ILLUMINA_POOL_SELECT_BY_EXPERIMENT_ID =
-          "SELECT ip.poolId, ip.concentration, ip.identificationBarcode, ip.name, ip.alias, ip.creationDate, ip.securityProfile_profileId, ip.platformType, ip.ready " +
+          "SELECT ip.poolId, ip.concentration, ip.identificationBarcode, ip.name, ip.alias, ip.creationDate, ip.securityProfile_profileId, ip.platformType, ip.ready, ip.qcPassed " +
           "FROM "+TABLE_NAME+" ip, Pool_Experiment pe " +
           "WHERE ip.poolId=pe.pool_poolId " +
           "AND ip.platformType='Illumina' " +
@@ -193,6 +210,7 @@ public class SQLPoolDAO implements PoolStore {
   public static final String LS454_POOL_SELECT_BY_ID_BARCODE =
           LS454_POOL_SELECT + " AND identificationBarcode=?";
 
+  /*
   public static final String LS454_POOL_BY_RELATED_CHAMBER =
           "SELECT c.chamberId, ip.poolId, ip.concentration, ip.identificationBarcode, ip.name, ip.alias, ip.creationDate, ip.securityProfile_profileId, ip.platformType, ip.ready " +
           "FROM Chamber c, "+TABLE_NAME+" ip " +
@@ -206,9 +224,10 @@ public class SQLPoolDAO implements PoolStore {
           "WHERE ip.poolId=ip.pool_poolId " +
           "AND ip.platformType='LS454' " +
           "AND p.dilutions_dilutionId=?";
+  */
 
   public static final String LS454_POOL_SELECT_BY_EXPERIMENT_ID =
-          "SELECT ip.poolId, ip.concentration, ip.identificationBarcode, ip.name, ip.alias, ip.creationDate, ip.securityProfile_profileId, ip.platformType, ip.ready " +
+          "SELECT ip.poolId, ip.concentration, ip.identificationBarcode, ip.name, ip.alias, ip.creationDate, ip.securityProfile_profileId, ip.platformType, ip.ready, ip.qcPassed " +
           "FROM "+TABLE_NAME+" ip, Pool_Experiment pe " +
           "WHERE ip.poolId=pe.pool_poolId " +
           "AND ip.platformType='LS454' " +
@@ -233,6 +252,7 @@ public class SQLPoolDAO implements PoolStore {
   public static final String SOLID_POOL_SELECT_BY_ID_BARCODE =
           SOLID_POOL_SELECT + " AND identificationBarcode=?";
 
+  /*
   public static final String SOLID_POOL_BY_RELATED_CHAMBER =
           "SELECT c.chamberId, ip.poolId, ip.concentration, ip.identificationBarcode, ip.name, ip.alias, ip.creationDate, ip.securityProfile_profileId, ip.platformType, ip.ready " +
           "FROM Chamber c, "+TABLE_NAME+" ip " +
@@ -246,9 +266,10 @@ public class SQLPoolDAO implements PoolStore {
           "WHERE ip.poolId=ip.pool_poolId " +
           "AND ip.platformType='Solid' " +
           "AND p.dilutions_dilutionId=?";
+  */
 
   public static final String SOLID_POOL_SELECT_BY_EXPERIMENT_ID =
-          "SELECT ip.poolId, ip.concentration, ip.identificationBarcode, ip.name, ip.alias, ip.creationDate, ip.securityProfile_profileId, ip.platformType, ip.ready " +
+          "SELECT ip.poolId, ip.concentration, ip.identificationBarcode, ip.name, ip.alias, ip.creationDate, ip.securityProfile_profileId, ip.platformType, ip.ready, ip.qcPassed " +
           "FROM "+TABLE_NAME+" ip, Pool_Experiment pe " +
           "WHERE ip.poolId=pe.pool_poolId " +
           "AND ip.platformType='Solid' " +
@@ -267,29 +288,39 @@ public class SQLPoolDAO implements PoolStore {
   public static final String EMPCR_POOL_SELECT_BY_POOL_ID =
           EMPCR_POOL_SELECT + " AND poolId = ?";
 
-  public static final String EMPCR_DILUTION_POOL_DELETE_BY_POOL_ID =
-          "DELETE FROM Pool_emPCRDilution " +
-          "WHERE pool_poolId=:pool_poolId";
-
   protected static final Logger log = LoggerFactory.getLogger(SQLPoolDAO.class);
 
   private JdbcTemplate template;
-  private DilutionStore dilutionDAO;
   private ExperimentStore experimentDAO;
+  private PoolQcStore poolQcDAO;
   private Store<SecurityProfile> securityProfileDAO;
   private WatcherStore watcherDAO;
   private CascadeType cascadeType;
 
   @Autowired
-  private MisoNamingScheme<Pool> namingScheme;
+  private PoolAlertManager poolAlertManager;
+
+  public void setPoolAlertManager(PoolAlertManager poolAlertManager) {
+    this.poolAlertManager = poolAlertManager;
+  }
+
+  @Autowired
+  private DaoLookup daoLookup;
+
+  public void setDaoLookup(DaoLookup daoLookup) {
+      this.daoLookup = daoLookup;
+    }
+
+  @Autowired
+  private MisoNamingScheme<Pool<? extends Poolable>> namingScheme;
 
   @Override
-  public MisoNamingScheme<Pool> getNamingScheme() {
+  public MisoNamingScheme<Pool<? extends Poolable>> getNamingScheme() {
     return namingScheme;
   }
 
   @Override
-  public void setNamingScheme(MisoNamingScheme<Pool> namingScheme) {
+  public void setNamingScheme(MisoNamingScheme<Pool<? extends Poolable>> namingScheme) {
     this.namingScheme = namingScheme;
   }
 
@@ -330,12 +361,12 @@ public class SQLPoolDAO implements PoolStore {
     this.template = template;
   }
 
-  public void setDilutionDAO(DilutionStore dilutionDAO) {
-    this.dilutionDAO = dilutionDAO;
-  }
-
   public void setExperimentDAO(ExperimentStore experimentDAO) {
     this.experimentDAO = experimentDAO;
+  }
+
+  public void setPoolQcDAO(PoolQcStore poolQcDAO) {
+    this.poolQcDAO = poolQcDAO;
   }
 
   public void setWatcherDAO(WatcherStore watcherDAO) {
@@ -370,543 +401,19 @@ public class SQLPoolDAO implements PoolStore {
   public Pool getPoolByExperiment(Experiment e) {
     if (e.getPlatform() != null) {
       if (e.getPlatform().getPlatformType().equals(PlatformType.ILLUMINA)) {
-        List eResults = template.query(ILLUMINA_POOL_SELECT_BY_EXPERIMENT_ID, new Object[]{e.getId()}, new PoolMapper());
-        Pool p = eResults.size() > 0 ? (Pool) eResults.get(0) : null;
-        return p;
+        List<Pool<? extends Poolable>> eResults = template.query(ILLUMINA_POOL_SELECT_BY_EXPERIMENT_ID, new Object[]{e.getId()}, new PoolMapper());
+        return eResults.size() > 0 ? eResults.get(0) : null;
       }
       else if (e.getPlatform().getPlatformType().equals(PlatformType.LS454)) {
-        List eResults = template.query(LS454_POOL_SELECT_BY_EXPERIMENT_ID, new Object[]{e.getId()}, new PoolMapper());
-        Pool p = eResults.size() > 0 ? (Pool) eResults.get(0) : null;
-        return p;
+        List<Pool<? extends Poolable>> eResults = template.query(LS454_POOL_SELECT_BY_EXPERIMENT_ID, new Object[]{e.getId()}, new PoolMapper());
+        return eResults.size() > 0 ? eResults.get(0) : null;
       }
       else if (e.getPlatform().getPlatformType().equals(PlatformType.SOLID)) {
-        List eResults = template.query(SOLID_POOL_SELECT_BY_EXPERIMENT_ID, new Object[]{e.getId()}, new PoolMapper());
-        Pool p = eResults.size() > 0 ? (Pool) eResults.get(0) : null;
-        return p;
+        List<Pool<? extends Poolable>> eResults = template.query(SOLID_POOL_SELECT_BY_EXPERIMENT_ID, new Object[]{e.getId()}, new PoolMapper());
+        return eResults.size() > 0 ? eResults.get(0) : null;
       }
     }
     return null;
-  }
-
-  @Cacheable(cacheName = "poolCache",
-             keyGenerator = @KeyGenerator(
-                     name = "HashCodeCacheKeyGenerator",
-                     properties = {
-                             @Property(name = "includeMethod", value = "false"),
-                             @Property(name = "includeParameterTypes", value = "false")
-                     }
-             )
-  )
-  public Pool getPoolById(long poolId) throws IOException {
-    List eResults = template.query(POOL_SELECT_BY_POOL_ID, new Object[]{poolId}, new PoolMapper());
-    Pool e = eResults.size() > 0 ? (Pool) eResults.get(0) : null;
-    return e;
-  }
-
-  public Pool getIlluminaPoolByBarcode(String barcode) throws IOException {
-    List eResults = template.query(ILLUMINA_POOL_SELECT_BY_ID_BARCODE, new Object[]{barcode}, new PoolMapper());
-    Pool e = eResults.size() > 0 ? (Pool) eResults.get(0) : null;
-    return e;
-  }
-
-  @Cacheable(cacheName = "poolCache",
-             keyGenerator = @KeyGenerator(
-                     name = "HashCodeCacheKeyGenerator",
-                     properties = {
-                             @Property(name = "includeMethod", value = "false"),
-                             @Property(name = "includeParameterTypes", value = "false")
-                     }
-             )
-  )
-  public Pool getIlluminaPoolById(long poolId) throws IOException {
-    List eResults = template.query(ILLUMINA_POOL_SELECT_BY_POOL_ID, new Object[]{poolId}, new PoolMapper());
-    return eResults.size() > 0 ? (Pool)eResults.get(0) : null;
-  }
-
-  public List<Pool<? extends Poolable>> listAllIlluminaPools() throws IOException {
-    return template.query(ILLUMINA_POOL_SELECT, new PoolMapper());
-  }
-
-  public List<Pool<? extends Poolable>> listReadyIlluminaPools() throws IOException {
-    return template.query(ILLUMINA_POOL_SELECT_BY_READY, new PoolMapper());
-  }
-
-  @Deprecated
-  public long saveIlluminaPool(IlluminaPool pool) throws IOException {
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-
-    Long securityProfileId = pool.getSecurityProfile().getProfileId();
-    if (securityProfileId == null || (this.cascadeType != null)) { // && this.cascadeType.equals(CascadeType.PERSIST))) {
-      securityProfileId = securityProfileDAO.save(pool.getSecurityProfile());
-    }
-
-    MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("concentration", pool.getConcentration())
-            .addValue("alias", pool.getAlias())
-            .addValue("creationDate", pool.getCreationDate())
-            .addValue("securityProfile_profileId", securityProfileId)
-                    //.addValue("identificationBarcode", pool.getIdentificationBarcode())
-            .addValue("platformType", PlatformType.ILLUMINA.getKey())
-            .addValue("ready", pool.getReadyToRun());
-
-    if (pool.getId() == AbstractPool.UNSAVED_ID) {
-      SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-              .withTableName(TABLE_NAME)
-              .usingGeneratedKeyColumns("poolId");
-      String name = IlluminaPool.PREFIX + DbUtils.getAutoIncrement(template, TABLE_NAME);
-      params.addValue("name", name);
-      params.addValue("identificationBarcode", name + "::" + PlatformType.ILLUMINA.getKey());
-      Number newId = insert.executeAndReturnKey(params);
-      pool.setId(newId.longValue());
-      pool.setName(name);
-    }
-    else {
-      params.addValue("poolId", pool.getId())
-              .addValue("name", pool.getName())
-              .addValue("identificationBarcode", pool.getName() + "::" + PlatformType.ILLUMINA.getKey());
-      NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-      namedTemplate.update(POOL_UPDATE, params);
-    }
-
-    MapSqlParameterSource delparams = new MapSqlParameterSource();
-    delparams.addValue("pool_poolId", pool.getId());
-    NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-    namedTemplate.update(LIBRARY_DILUTION_POOL_DELETE_BY_POOL_ID, delparams);
-
-    if (pool.getDilutions() != null && !pool.getDilutions().isEmpty()) {
-      SimpleJdbcInsert eInsert = new SimpleJdbcInsert(template)
-              .withTableName("Pool_LibraryDilution");
-
-      Cache dc = cacheManager.getCache("libraryDilutionCache");
-
-      for (Dilution d : pool.getDilutions()) {
-        MapSqlParameterSource esParams = new MapSqlParameterSource();
-        esParams.addValue("dilutions_dilutionId", d.getId())
-                .addValue("pool_poolId", pool.getId());
-
-        eInsert.execute(esParams);
-
-        if (this.cascadeType != null) {
-          if (this.cascadeType.equals(CascadeType.PERSIST)) {
-            dilutionDAO.save(d);
-          }
-          else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-            dc.remove(DbUtils.hashCodeCacheKeyFor(d.getId()));
-          }
-        }
-      }
-    }
-
-    MapSqlParameterSource poolparams = new MapSqlParameterSource();
-    poolparams.addValue("pool_poolId", pool.getId());
-    NamedParameterJdbcTemplate poolNamedTemplate = new NamedParameterJdbcTemplate(template);
-    poolNamedTemplate.update(POOL_EXPERIMENT_DELETE_BY_POOL_ID, poolparams);
-
-    if (pool.getExperiments() != null && !pool.getExperiments().isEmpty()) {
-      Cache ec = cacheManager.getCache("experimentCache");
-
-      SimpleJdbcInsert eInsert = new SimpleJdbcInsert(template)
-              .withTableName("Pool_Experiment");
-
-      for (Experiment e : pool.getExperiments()) {
-        MapSqlParameterSource esParams = new MapSqlParameterSource();
-        esParams.addValue("experiments_experimentId", e.getId())
-                .addValue("pool_poolId", pool.getId());
-
-        eInsert.execute(esParams);
-
-        if (this.cascadeType != null) {
-          if (this.cascadeType.equals(CascadeType.PERSIST)) {
-            experimentDAO.save(e);
-          }
-          else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-            ec.remove(DbUtils.hashCodeCacheKeyFor(e.getId()));
-          }
-        }
-      }
-    }
-
-    watcherDAO.removeWatchedEntityByUser(pool, user);
-
-    for (User u : pool.getWatchers()) {
-      watcherDAO.saveWatchedEntityUser(pool, u);
-    }
-
-    return pool.getId();
-  }
-
-  public Pool get454PoolByBarcode(String barcode) throws IOException {
-    List eResults = template.query(LS454_POOL_SELECT_BY_ID_BARCODE, new Object[]{barcode}, new PoolMapper());
-    Pool e = eResults.size() > 0 ? (Pool) eResults.get(0) : null;
-    return e;
-  }
-
-  @Cacheable(cacheName = "poolCache",
-             keyGenerator = @KeyGenerator(
-                     name = "HashCodeCacheKeyGenerator",
-                     properties = {
-                             @Property(name = "includeMethod", value = "false"),
-                             @Property(name = "includeParameterTypes", value = "false")
-                     }
-             )
-  )
-  public Pool get454PoolById(long poolId) throws IOException {
-    List eResults = template.query(LS454_POOL_SELECT_BY_POOL_ID, new Object[]{poolId}, new PoolMapper());
-    Pool e = eResults.size() > 0 ? (Pool) eResults.get(0) : null;
-    return e;
-  }
-
-  public List<Pool<? extends Poolable>> listAll454Pools() throws IOException {
-    return template.query(LS454_POOL_SELECT, new PoolMapper());
-  }
-
-  public List<Pool<? extends Poolable>> listReady454Pools() throws IOException {
-    return template.query(LS454_POOL_SELECT_BY_READY, new PoolMapper());
-  }
-
-  @Deprecated
-  public long save454Pool(LS454Pool pool) throws IOException {
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-
-    Long securityProfileId = pool.getSecurityProfile().getProfileId();
-    if (securityProfileId == null || (this.cascadeType != null)) { // && this.cascadeType.equals(CascadeType.PERSIST))) {
-      securityProfileId = securityProfileDAO.save(pool.getSecurityProfile());
-    }
-
-    MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("concentration", pool.getConcentration())
-            .addValue("alias", pool.getAlias())
-            .addValue("creationDate", pool.getCreationDate())
-            .addValue("securityProfile_profileId", securityProfileId)
-            .addValue("platformType", PlatformType.LS454.getKey())
-            .addValue("ready", pool.getReadyToRun());
-
-    if (pool.getId() == AbstractPool.UNSAVED_ID) {
-      SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-              .withTableName(TABLE_NAME)
-              .usingGeneratedKeyColumns("poolId");
-      String name = LS454Pool.PREFIX + DbUtils.getAutoIncrement(template, TABLE_NAME);
-      params.addValue("name", name);
-      params.addValue("identificationBarcode", name + "::" + PlatformType.LS454.getKey());
-      Number newId = insert.executeAndReturnKey(params);
-      pool.setId(newId.longValue());
-      pool.setName(name);
-    }
-    else {
-      params.addValue("poolId", pool.getId())
-              .addValue("name", pool.getName())
-              .addValue("identificationBarcode", pool.getName() + "::" + PlatformType.LS454.getKey());
-      NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-      namedTemplate.update(POOL_UPDATE, params);
-    }
-
-    MapSqlParameterSource delparams = new MapSqlParameterSource();
-    delparams.addValue("pool_poolId", pool.getId());
-    NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-    namedTemplate.update(EMPCR_DILUTION_POOL_DELETE_BY_POOL_ID, delparams);
-
-    if (pool.getDilutions() != null && !pool.getDilutions().isEmpty()) {
-      SimpleJdbcInsert eInsert = new SimpleJdbcInsert(template)
-              .withTableName("Pool_emPCRDilution");
-      Cache dc = cacheManager.getCache("emPCRDilutionCache");
-      for (Dilution d : pool.getDilutions()) {
-        MapSqlParameterSource esParams = new MapSqlParameterSource();
-        esParams.addValue("dilutions_dilutionId", d.getId())
-                .addValue("pool_poolId", pool.getId());
-
-        eInsert.execute(esParams);
-
-        if (this.cascadeType != null) {
-          if (this.cascadeType.equals(CascadeType.PERSIST)) {
-            dilutionDAO.save(d);
-          }
-          else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-            dc.remove(DbUtils.hashCodeCacheKeyFor(d.getId()));
-          }
-        }
-      }
-    }
-
-    MapSqlParameterSource poolparams = new MapSqlParameterSource();
-    poolparams.addValue("pool_poolId", pool.getId());
-    NamedParameterJdbcTemplate poolNamedTemplate = new NamedParameterJdbcTemplate(template);
-    poolNamedTemplate.update(POOL_EXPERIMENT_DELETE_BY_POOL_ID, poolparams);
-
-    if (pool.getExperiments() != null && !pool.getExperiments().isEmpty()) {
-      SimpleJdbcInsert eInsert = new SimpleJdbcInsert(template)
-              .withTableName("Pool_Experiment");
-      Cache ec = cacheManager.getCache("experimentCache");
-      for (Experiment e : pool.getExperiments()) {
-        MapSqlParameterSource esParams = new MapSqlParameterSource();
-        esParams.addValue("experiments_experimentId", e.getId())
-                .addValue("pool_poolId", pool.getId());
-
-        eInsert.execute(esParams);
-
-        if (this.cascadeType != null) {
-          if (this.cascadeType.equals(CascadeType.PERSIST)) {
-            experimentDAO.save(e);
-          }
-          else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-            ec.remove(DbUtils.hashCodeCacheKeyFor(e.getId()));
-          }
-        }
-      }
-    }
-
-    watcherDAO.removeWatchedEntityByUser(pool, user);
-
-    for (User u : pool.getWatchers()) {
-      watcherDAO.saveWatchedEntityUser(pool, u);
-    }
-
-    return pool.getId();
-  }
-
-  public Pool getSolidPoolByBarcode(String barcode) throws IOException {
-    List eResults = template.query(SOLID_POOL_SELECT_BY_ID_BARCODE, new Object[]{barcode}, new PoolMapper());
-    Pool e = eResults.size() > 0 ? (Pool) eResults.get(0) : null;
-    return e;
-  }
-
-  @Cacheable(cacheName = "poolCache",
-             keyGenerator = @KeyGenerator(
-                     name = "HashCodeCacheKeyGenerator",
-                     properties = {
-                             @Property(name = "includeMethod", value = "false"),
-                             @Property(name = "includeParameterTypes", value = "false")
-                     }
-             )
-  )
-  public Pool getSolidPoolById(long poolId) throws IOException {
-    List eResults = template.query(SOLID_POOL_SELECT_BY_POOL_ID, new Object[]{poolId}, new PoolMapper());
-    Pool e = eResults.size() > 0 ? (Pool) eResults.get(0) : null;
-    return e;
-  }
-
-  public List<Pool<? extends Poolable>> listAllSolidPools() throws IOException {
-    return template.query(SOLID_POOL_SELECT, new PoolMapper());
-  }
-
-  public List<Pool<? extends Poolable>> listReadySolidPools() throws IOException {
-    return template.query(SOLID_POOL_SELECT_BY_READY, new PoolMapper());
-  }
-
-  @Deprecated
-  public long saveSolidPool(SolidPool pool) throws IOException {
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-
-    Long securityProfileId = pool.getSecurityProfile().getProfileId();
-    if (securityProfileId == null || (this.cascadeType != null)) { // && this.cascadeType.equals(CascadeType.PERSIST))) {
-      securityProfileId = securityProfileDAO.save(pool.getSecurityProfile());
-    }
-
-    MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("concentration", pool.getConcentration())
-            .addValue("alias", pool.getAlias())
-            .addValue("creationDate", pool.getCreationDate())
-            .addValue("securityProfile_profileId", securityProfileId)
-            .addValue("platformType", PlatformType.SOLID.getKey())
-            .addValue("ready", pool.getReadyToRun());
-
-    if (pool.getId() == AbstractPool.UNSAVED_ID) {
-      SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-              .withTableName(TABLE_NAME)
-              .usingGeneratedKeyColumns("poolId");
-      String name = SolidPool.PREFIX + DbUtils.getAutoIncrement(template, TABLE_NAME);
-      params.addValue("name", name);
-      params.addValue("identificationBarcode", name + "::" + PlatformType.SOLID.getKey());
-      Number newId = insert.executeAndReturnKey(params);
-      pool.setId(newId.longValue());
-      pool.setName(name);
-    }
-    else {
-      params.addValue("poolId", pool.getId())
-              .addValue("name", pool.getName())
-              .addValue("identificationBarcode", pool.getName() + "::" + PlatformType.SOLID.getKey());
-      NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-      namedTemplate.update(POOL_UPDATE, params);
-    }
-
-    MapSqlParameterSource delparams = new MapSqlParameterSource();
-    delparams.addValue("pool_poolId", pool.getId());
-    NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-    namedTemplate.update(EMPCR_DILUTION_POOL_DELETE_BY_POOL_ID, delparams);
-
-    if (pool.getDilutions() != null && !pool.getDilutions().isEmpty()) {
-      SimpleJdbcInsert eInsert = new SimpleJdbcInsert(template)
-              .withTableName("Pool_emPCRDilution");
-      Cache dc = cacheManager.getCache("emPCRDilutionCache");
-      for (Dilution d : pool.getDilutions()) {
-        MapSqlParameterSource esParams = new MapSqlParameterSource();
-        esParams.addValue("dilutions_dilutionId", d.getId())
-                .addValue("pool_poolId", pool.getId());
-
-        eInsert.execute(esParams);
-
-        if (this.cascadeType != null) {
-          if (this.cascadeType.equals(CascadeType.PERSIST)) {
-            dilutionDAO.save(d);
-          }
-          else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-            dc.remove(DbUtils.hashCodeCacheKeyFor(d.getId()));
-          }
-        }
-      }
-    }
-
-    MapSqlParameterSource poolparams = new MapSqlParameterSource();
-    poolparams.addValue("pool_poolId", pool.getId());
-    NamedParameterJdbcTemplate poolNamedTemplate = new NamedParameterJdbcTemplate(template);
-    poolNamedTemplate.update(POOL_EXPERIMENT_DELETE_BY_POOL_ID, poolparams);
-
-    if (pool.getExperiments() != null && !pool.getExperiments().isEmpty()) {
-      SimpleJdbcInsert eInsert = new SimpleJdbcInsert(template)
-              .withTableName("Pool_Experiment");
-      Cache ec = cacheManager.getCache("experimentCache");
-      for (Experiment e : pool.getExperiments()) {
-        MapSqlParameterSource esParams = new MapSqlParameterSource();
-        esParams.addValue("experiments_experimentId", e.getId())
-                .addValue("pool_poolId", pool.getId());
-
-        eInsert.execute(esParams);
-
-        if (this.cascadeType != null) {
-          if (this.cascadeType.equals(CascadeType.PERSIST)) {
-            experimentDAO.save(e);
-          }
-          else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-            ec.remove(DbUtils.hashCodeCacheKeyFor(e.getId()));
-          }
-        }
-      }
-    }
-
-    watcherDAO.removeWatchedEntityByUser(pool, user);
-
-    for (User u : pool.getWatchers()) {
-      watcherDAO.saveWatchedEntityUser(pool, u);
-    }
-
-    return pool.getId();
-  }
-
-  @Cacheable(cacheName = "poolCache",
-             keyGenerator = @KeyGenerator(
-                     name = "HashCodeCacheKeyGenerator",
-                     properties = {
-                             @Property(name = "includeMethod", value = "false"),
-                             @Property(name = "includeParameterTypes", value = "false")
-                     }
-             )
-  )
-  public emPCRPool getEmPCRPoolById(long poolId) throws IOException {
-    List eResults = template.query(EMPCR_POOL_SELECT_BY_POOL_ID, new Object[]{poolId}, new EmPCRPoolMapper());
-    emPCRPool e = eResults.size() > 0 ? (emPCRPool) eResults.get(0) : null;
-    return e;
-  }
-
-  public List<emPCRPool> listAllEmPCRPools() throws IOException {
-    return template.query(EMPCR_POOL_SELECT, new EmPCRPoolMapper());
-  }
-
-  @Deprecated
-  public long saveEmPCRPool(emPCRPool pool) throws IOException {
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-
-    Long securityProfileId = pool.getSecurityProfile().getProfileId();
-    if (securityProfileId == null || (this.cascadeType != null)) { // && this.cascadeType.equals(CascadeType.PERSIST))) {
-      securityProfileId = securityProfileDAO.save(pool.getSecurityProfile());
-    }
-
-    MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("concentration", pool.getConcentration())
-            .addValue("alias", pool.getAlias())
-            .addValue("creationDate", pool.getCreationDate())
-            .addValue("securityProfile_profileId", securityProfileId)
-            .addValue("platformType", pool.getPlatformType().getKey())
-            .addValue("ready", pool.getReadyToRun());
-
-    if (pool.getId() == AbstractPool.UNSAVED_ID) {
-      SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-              .withTableName(TABLE_NAME)
-              .usingGeneratedKeyColumns("poolId");
-      String name = emPCRPool.PREFIX + DbUtils.getAutoIncrement(template, TABLE_NAME);
-      params.addValue("name", name);
-      params.addValue("identificationBarcode", name + "::" + pool.getPlatformType().getKey());
-      Number newId = insert.executeAndReturnKey(params);
-      pool.setId(newId.longValue());
-      pool.setName(name);
-    }
-    else {
-      params.addValue("poolId", pool.getId())
-              .addValue("name", pool.getName())
-              .addValue("identificationBarcode", pool.getName() + "::" + pool.getPlatformType().getKey());
-      NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-      namedTemplate.update(POOL_UPDATE, params);
-    }
-
-    MapSqlParameterSource delparams = new MapSqlParameterSource();
-    delparams.addValue("pool_poolId", pool.getId());
-    NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-    namedTemplate.update(LIBRARY_DILUTION_POOL_DELETE_BY_POOL_ID, delparams);
-
-    if (pool.getDilutions() != null && !pool.getDilutions().isEmpty()) {
-      SimpleJdbcInsert eInsert = new SimpleJdbcInsert(template)
-              .withTableName("Pool_LibraryDilution");
-      Cache dc = cacheManager.getCache("libraryDilutionCache");
-      for (Dilution d : pool.getDilutions()) {
-        MapSqlParameterSource esParams = new MapSqlParameterSource();
-        esParams.addValue("dilutions_dilutionId", d.getId())
-                .addValue("pool_poolId", pool.getId());
-
-        eInsert.execute(esParams);
-
-        if (this.cascadeType != null) {
-          if (this.cascadeType.equals(CascadeType.PERSIST)) {
-            dilutionDAO.save(d);
-          }
-          else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-            dc.remove(DbUtils.hashCodeCacheKeyFor(d.getId()));
-          }
-        }
-      }
-    }
-
-    MapSqlParameterSource poolparams = new MapSqlParameterSource();
-    poolparams.addValue("pool_poolId", pool.getId());
-    NamedParameterJdbcTemplate poolNamedTemplate = new NamedParameterJdbcTemplate(template);
-    poolNamedTemplate.update(POOL_EXPERIMENT_DELETE_BY_POOL_ID, poolparams);
-
-    if (pool.getExperiments() != null && !pool.getExperiments().isEmpty()) {
-      SimpleJdbcInsert eInsert = new SimpleJdbcInsert(template)
-              .withTableName("Pool_Experiment");
-      Cache ec = cacheManager.getCache("experimentCache");
-      for (Experiment e : pool.getExperiments()) {
-        MapSqlParameterSource esParams = new MapSqlParameterSource();
-        esParams.addValue("experiments_experimentId", e.getId())
-                .addValue("pool_poolId", pool.getId());
-
-        eInsert.execute(esParams);
-
-        if (this.cascadeType != null) {
-          if (this.cascadeType.equals(CascadeType.PERSIST)) {
-            experimentDAO.save(e);
-          }
-          else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-            ec.remove(DbUtils.hashCodeCacheKeyFor(e.getId()));
-          }
-        }
-      }
-    }
-
-    watcherDAO.removeWatchedEntityByUser(pool, user);
-
-    for (User u : pool.getWatchers()) {
-      watcherDAO.saveWatchedEntityUser(pool, u);
-    }
-
-    return pool.getId();
   }
 
   @Transactional(readOnly = false, rollbackFor = Exception.class)
@@ -933,6 +440,14 @@ public class SQLPoolDAO implements PoolStore {
             .addValue("securityProfile_profileId", securityProfileId)
             .addValue("platformType", pool.getPlatformType().getKey())
             .addValue("ready", pool.getReadyToRun());
+            //.addValue("qcPassed", pool.getQcPassed());
+
+    if (pool.getQcPassed() != null) {
+      params.addValue("qcPassed", pool.getQcPassed().toString());
+    }
+    else {
+      params.addValue("qcPassed", pool.getQcPassed());
+    }
 
     if (pool.getId() == AbstractPool.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
@@ -998,33 +513,40 @@ public class SQLPoolDAO implements PoolStore {
       */
     }
 
+    log.info("Unlinking elements from pool " + pool.getId());
     MapSqlParameterSource delparams = new MapSqlParameterSource();
     delparams.addValue("pool_poolId", pool.getId());
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-    namedTemplate.update(LIBRARY_DILUTION_POOL_DELETE_BY_POOL_ID, delparams);
-    namedTemplate.update(EMPCR_DILUTION_POOL_DELETE_BY_POOL_ID, delparams);
+    namedTemplate.update(POOL_ELEMENT_DELETE_BY_POOL_ID, delparams);
 
-    if (pool.getDilutions() != null && !pool.getDilutions().isEmpty()) {
-      String type = pool.getDilutions().iterator().next().getClass().getSimpleName();
+    if (pool.getPoolableElements() != null && !pool.getPoolableElements().isEmpty()) {
+      String type = pool.getPoolableElements().iterator().next().getClass().getSimpleName();
 
-      SimpleJdbcInsert eInsert = new SimpleJdbcInsert(template).withTableName("Pool_"+type);
+      SimpleJdbcInsert eInsert = new SimpleJdbcInsert(template).withTableName("Pool_Elements");
       String lc = type.substring(0,1).toLowerCase() + type.substring(1);
 
       Cache dc = cacheManager.getCache(lc+"Cache");
 
-      for (Dilution d : pool.getDilutions()) {
-        log.debug("Linking "+d.getName() + " to " + pool.getName());
+      for (Poolable d : pool.getPoolableElements()) {
+        log.info("Linking "+d.getName() + " to " + pool.getName());
         MapSqlParameterSource esParams = new MapSqlParameterSource();
-        esParams.addValue("dilutions_dilutionId", d.getId())
-                .addValue("pool_poolId", pool.getId());
+        esParams.addValue("elementId", d.getId())
+                .addValue("pool_poolId", pool.getId())
+                .addValue("elementType", d.getClass().getName());
 
         eInsert.execute(esParams);
 
         if (this.cascadeType != null) {
           if (this.cascadeType.equals(CascadeType.PERSIST)) {
-            dilutionDAO.save(d);
+            Store<? super Poolable> dao = daoLookup.lookup(d.getClass());
+            if (dao != null) {
+              dao.save(d);
+            }
           }
           else if (this.cascadeType.equals(CascadeType.REMOVE)) {
+            if (d instanceof Plate) {
+              dc = cacheManager.getCache("plateCache");
+            }
             dc.remove(DbUtils.hashCodeCacheKeyFor(d.getId()));
           }
         }
@@ -1094,16 +616,14 @@ public class SQLPoolDAO implements PoolStore {
                      }
              )
   )
-  public Pool get(long poolId) throws IOException {
-    List eResults = template.query(POOL_SELECT_BY_POOL_ID, new Object[]{poolId}, new PoolMapper());
-    Pool e = eResults.size() > 0 ? (Pool) eResults.get(0) : null;
-    return e;
+  public Pool<? extends Poolable> get(long poolId) throws IOException {
+    List<Pool<? extends Poolable>> eResults = template.query(POOL_SELECT_BY_POOL_ID, new Object[]{poolId}, new PoolMapper());
+    return eResults.size() > 0 ? eResults.get(0) : null;
   }
 
-  public Pool lazyGet(long poolId) throws IOException {
-    List eResults = template.query(POOL_SELECT_BY_POOL_ID, new Object[]{poolId}, new LazyPoolMapper());
-    Pool e = eResults.size() > 0 ? (Pool) eResults.get(0) : null;
-    return e;
+  public Pool<? extends Poolable> lazyGet(long poolId) throws IOException {
+    List<Pool<? extends Poolable>> eResults = template.query(POOL_SELECT_BY_POOL_ID, new Object[]{poolId}, new PoolMapper(true));
+    return eResults.size() > 0 ? eResults.get(0) : null;
   }
 
   @Cacheable(cacheName="poolListCache",
@@ -1142,6 +662,10 @@ public class SQLPoolDAO implements PoolStore {
     return template.query(POOL_SELECT_BY_PLATFORM_AND_READY_AND_SEARCH, new Object[]{platformType.getKey(), mySQLQuery, mySQLQuery, mySQLQuery}, new PoolMapper());
   }
 
+  public Collection<? extends Poolable> listPoolableElementsByPoolId(long poolId) throws IOException {
+    return template.query(POOL_ELEMENT_SELECT_BY_POOL_ID, new Object[]{poolId}, new PoolableMapper());
+  }
+
   @TriggersRemove(
           cacheName = "poolCache",
           keyGenerator = @KeyGenerator(
@@ -1152,7 +676,7 @@ public class SQLPoolDAO implements PoolStore {
                   }
           )
   )
-  public boolean remove(Pool pool) throws IOException {
+  public boolean remove(Pool<? extends Poolable> pool) throws IOException {
     MapSqlParameterSource poolparams = new MapSqlParameterSource();
     poolparams.addValue("pool_poolId", pool.getId());
     poolparams.addValue("poolId", pool.getId());
@@ -1161,20 +685,18 @@ public class SQLPoolDAO implements PoolStore {
     boolean ok = true;
     if (pool.isDeletable() && poolNamedTemplate.update(POOL_DELETE, poolparams) == 1) {
       if (!pool.getDilutions().isEmpty()) {
-        Dilution d = (Dilution) pool.getDilutions().iterator().next();
-        Cache dc = null;
-        if (d instanceof LibraryDilution) {
-          ok = (poolNamedTemplate.update(LIBRARY_DILUTION_POOL_DELETE_BY_POOL_ID, poolparams) == 1);
-          dc = cacheManager.getCache("libraryDilutionCache");
-        }
-        else {
-          ok = (poolNamedTemplate.update(EMPCR_DILUTION_POOL_DELETE_BY_POOL_ID, poolparams) == 1);
-          dc = cacheManager.getCache("emPCRDilutionCache");
-        }
+        Poolable d = pool.getPoolableElements().iterator().next();
+        ok = (poolNamedTemplate.update(POOL_ELEMENT_DELETE_BY_POOL_ID, poolparams) == 1);
+        String type = d.getClass().getSimpleName();
+        String lc = type.substring(0,1).toLowerCase() + type.substring(1);
+        Cache dc = cacheManager.getCache(lc+"Cache");
 
         if (this.cascadeType != null) {
           if (this.cascadeType.equals(CascadeType.PERSIST)) {
-            dilutionDAO.save(d);
+            Store<? super Poolable> dao = daoLookup.lookup(d.getClass());
+            if (dao != null) {
+              dao.save(d);
+            }
           }
           else if (this.cascadeType.equals(CascadeType.REMOVE)) {
             if (dc != null) dc.remove(DbUtils.hashCodeCacheKeyFor(d.getId()));
@@ -1202,32 +724,53 @@ public class SQLPoolDAO implements PoolStore {
     return false;
   }
 
-  public class PoolMapper implements RowMapper<Pool<? extends Poolable>> {
+  public class PoolMapper extends CacheAwareRowMapper<Pool<? extends Poolable>> {
+    public PoolMapper() {
+      super((Class<Pool<? extends Poolable>>)((ParameterizedType)new TypeReference<Pool<? extends Poolable>>(){}.getType()).getRawType());
+    }
+
+    public PoolMapper(boolean lazy) {
+      super((Class<Pool<? extends Poolable>>)((ParameterizedType)new TypeReference<Pool<? extends Poolable>>(){}.getType()).getRawType(), lazy);
+    }
+
+    @Override
     public Pool<? extends Poolable> mapRow(ResultSet rs, int rowNum) throws SQLException {
-      Pool p = null;
+      long id = rs.getLong("poolId");
+
+      if (isCacheEnabled()) {
+        Element element;
+        if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
+          log.debug("Cache hit on map for Pool " + id);
+          return (Pool<? extends Poolable>)element.getObjectValue();
+        }
+      }
+
+      Pool<? extends Poolable> p = null;
       try {
         p = dataObjectFactory.getPool();
         PlatformType pt = PlatformType.get(rs.getString("platformType"));
         p.setPlatformType(pt);
 
         if (pt != null) {
-          List<? extends Dilution> dilutions = new ArrayList<Dilution>(dilutionDAO.listAllDilutionsByPoolAndPlatform(rs.getLong("poolId"), pt));
-          Collections.sort(dilutions);
-          p.setPoolableElements(dilutions);
+          Collection<? extends Poolable> poolables = listPoolableElementsByPoolId(id);
+          p.setPoolableElements(poolables);
         }
 
-        p.setId(rs.getLong("poolId"));
+        p.setId(id);
         p.setName(rs.getString("name"));
         p.setAlias(rs.getString("alias"));
         p.setCreationDate(rs.getDate("creationDate"));
         p.setConcentration(rs.getDouble("concentration"));
         p.setIdentificationBarcode(rs.getString("identificationBarcode"));
         p.setReadyToRun(rs.getBoolean("ready"));
+        if (rs.getString("qcPassed") != null) {
+          p.setQcPassed(Boolean.parseBoolean(rs.getString("qcPassed")));
+        }
+        else {
+          p.setQcPassed(null);
+        }
 
         p.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
-
-        p.setExperiments(experimentDAO.listByPoolId(rs.getLong("poolId")));
-
         p.setWatchers(new HashSet<User>(watcherDAO.getWatchersByEntityName(p.getWatchableIdentifier())));
         if (p.getSecurityProfile() != null &&
             p.getSecurityProfile().getOwner() != null) {
@@ -1236,213 +779,61 @@ public class SQLPoolDAO implements PoolStore {
         for (User u : watcherDAO.getWatchersByWatcherGroup("PoolWatchers")) {
           p.addWatcher(u);
         }
-      }
-      catch (IOException e1) {
-        log.error("Cannot map from database to Pool: ", e1);
-        e1.printStackTrace();
-      }
-      return p;
-    }
-  }
 
-  public class LazyPoolMapper implements RowMapper<Pool<? extends Poolable>> {
-    public Pool<? extends Poolable> mapRow(ResultSet rs, int rowNum) throws SQLException {
-      Pool p = null;
-      try {
-        p = dataObjectFactory.getPool();
-        PlatformType pt = PlatformType.get(rs.getString("platformType"));
-        p.setPlatformType(pt);
+        if (!isLazy()) {
+          p.setExperiments(experimentDAO.listByPoolId(id));
 
-        if (pt != null) {
-          List<? extends Dilution> dilutions = new ArrayList<Dilution>(dilutionDAO.listAllDilutionsByPoolAndPlatform(rs.getLong("poolId"), pt));
-          Collections.sort(dilutions);
-          p.setPoolableElements(dilutions);
-        }
-
-        p.setId(rs.getLong("poolId"));
-        p.setName(rs.getString("name"));
-        p.setAlias(rs.getString("alias"));
-        p.setCreationDate(rs.getDate("creationDate"));
-        p.setConcentration(rs.getDouble("concentration"));
-        p.setIdentificationBarcode(rs.getString("identificationBarcode"));
-        p.setReadyToRun(rs.getBoolean("ready"));
-
-        p.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
-
-        //p.setExperiments(experimentDAO.listByPoolId(rs.getLong("poolId")));
-
-        p.setWatchers(new HashSet<User>(watcherDAO.getWatchersByEntityName(p.getWatchableIdentifier())));
-        if (p.getSecurityProfile() != null &&
-            p.getSecurityProfile().getOwner() != null) {
-          p.addWatcher(p.getSecurityProfile().getOwner());
-        }
-        for (User u : watcherDAO.getWatchersByWatcherGroup("PoolWatchers")) {
-          p.addWatcher(u);
+          for (PoolQC qc : poolQcDAO.listByPoolId(id)) {
+           p.addQc(qc);
+          }
         }
       }
       catch (IOException e1) {
         log.error("Cannot map from database to Pool: ", e1);
         e1.printStackTrace();
       }
+      catch (MalformedPoolQcException e) {
+        log.error("Cannot add PoolQC to pool: ", e);
+        e.printStackTrace();
+      }
+
+      if (poolAlertManager != null) {
+        poolAlertManager.push(p);
+      }
+
+      if (isCacheEnabled()) {
+        lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id) ,p));
+      }
+
       return p;
     }
   }
 
-  public class IlluminaPoolMapper implements RowMapper<IlluminaPool> {
-    public IlluminaPool mapRow(ResultSet rs, int rowNum) throws SQLException {
-      IlluminaPool illuminaPool = dataObjectFactory.getIlluminaPool();
-      illuminaPool.setId(rs.getLong("poolId"));
-      illuminaPool.setName(rs.getString("name"));
-      illuminaPool.setAlias(rs.getString("alias"));
-      illuminaPool.setCreationDate(rs.getDate("creationDate"));
-      illuminaPool.setConcentration(rs.getDouble("concentration"));
-      illuminaPool.setIdentificationBarcode(rs.getString("identificationBarcode"));
-      illuminaPool.setPlatformType(PlatformType.ILLUMINA);
-      illuminaPool.setReadyToRun(rs.getBoolean("ready"));
-
-      //illuminaPool.setLastUpdated(rs.getTimestamp("lastUpdated"));
+  public class PoolableMapper implements RowMapper<Poolable> {
+    public Poolable mapRow(ResultSet rs, int rowNum) throws SQLException {
+      Long poolId = rs.getLong("pool_poolId");
+      Long elementId = rs.getLong("elementId");
+      String type = rs.getString("elementType");
 
       try {
-        illuminaPool.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
-        List<LibraryDilution> dilutions = new ArrayList<LibraryDilution>(dilutionDAO.listByIlluminaPoolId(rs.getLong("poolId")));
-        Collections.sort(dilutions);
-        illuminaPool.setPoolableElements(dilutions);
-        illuminaPool.setExperiments(experimentDAO.listByPoolId(rs.getLong("poolId")));
-
-        illuminaPool.setWatchers(new HashSet<User>(watcherDAO.getWatchersByEntityName(illuminaPool.getWatchableIdentifier())));
-        if (illuminaPool.getSecurityProfile() != null &&
-            illuminaPool.getSecurityProfile().getOwner() != null) {
-          illuminaPool.addWatcher(illuminaPool.getSecurityProfile().getOwner());
+        Class<? extends Poolable> clz = Class.forName(type).asSubclass(Poolable.class);
+        Store<? extends Poolable> dao = daoLookup.lookup(clz);
+        if (dao != null) {
+          log.debug("Mapping poolable -> " + poolId + " : " + type + " : " + elementId);
+          Poolable p = dao.get(elementId);
+          log.debug("\\_ got " + p.getName());
+          return p;
         }
-        for (User u : watcherDAO.getWatchersByWatcherGroup("PoolWatchers")) {
-          illuminaPool.addWatcher(u);
+        else {
+          throw new SQLException("No DAO found or more than one found.");
         }
       }
-      catch (IOException e1) {
-        log.error("Cannot map from database to IlluminaPool: ", e1);
-        e1.printStackTrace();
+      catch (ClassNotFoundException e) {
+        throw new SQLException("Cannot resolve element type to a valid class", e);
       }
-      return illuminaPool;
-    }
-  }
-
-  public class LS454PoolMapper implements RowMapper<LS454Pool> {
-    public LS454Pool mapRow(ResultSet rs, int rowNum) throws SQLException {
-      LS454Pool ls454Pool = dataObjectFactory.getLS454Pool();
-      ls454Pool.setId(rs.getLong("poolId"));
-      ls454Pool.setName(rs.getString("name"));
-      ls454Pool.setAlias(rs.getString("alias"));
-      ls454Pool.setCreationDate(rs.getDate("creationDate"));
-      ls454Pool.setConcentration(rs.getDouble("concentration"));
-      ls454Pool.setIdentificationBarcode(rs.getString("identificationBarcode"));
-      ls454Pool.setPlatformType(PlatformType.LS454);
-      ls454Pool.setReadyToRun(rs.getBoolean("ready"));
-
-      //ls454Pool.setLastUpdated(rs.getTimestamp("lastUpdated"));
-
-      try {
-        ls454Pool.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
-        List<emPCRDilution> dilutions = new ArrayList<emPCRDilution>(dilutionDAO.listByLS454PoolId(rs.getLong("poolId")));
-        ls454Pool.setPoolableElements(dilutions);
-        Collections.sort(dilutions);
-        ls454Pool.setExperiments(experimentDAO.listByPoolId(rs.getLong("poolId")));
-
-        ls454Pool.setWatchers(new HashSet<User>(watcherDAO.getWatchersByEntityName(ls454Pool.getWatchableIdentifier())));
-        if (ls454Pool.getSecurityProfile() != null &&
-            ls454Pool.getSecurityProfile().getOwner() != null) {
-          ls454Pool.addWatcher(ls454Pool.getSecurityProfile().getOwner());
-        }
-        for (User u : watcherDAO.getWatchersByWatcherGroup("PoolWatchers")) {
-          ls454Pool.addWatcher(u);
-        }
+      catch (IOException e) {
+        throw new SQLException("Cannot retrieve poolable element: [" + type +" ] " + elementId);
       }
-      catch (IOException e1) {
-        log.error("Cannot map from database to LS454Pool: ", e1);
-        e1.printStackTrace();
-      }
-      return ls454Pool;
-    }
-  }
-
-  public class SolidPoolMapper implements RowMapper<SolidPool> {
-    public SolidPool mapRow(ResultSet rs, int rowNum) throws SQLException {
-      SolidPool solidPool = dataObjectFactory.getSolidPool();
-      solidPool.setId(rs.getLong("poolId"));
-      solidPool.setName(rs.getString("name"));
-      solidPool.setAlias(rs.getString("alias"));
-      solidPool.setCreationDate(rs.getDate("creationDate"));
-      solidPool.setConcentration(rs.getDouble("concentration"));
-      solidPool.setIdentificationBarcode(rs.getString("identificationBarcode"));
-      solidPool.setPlatformType(PlatformType.SOLID);
-      solidPool.setReadyToRun(rs.getBoolean("ready"));
-
-      //solidPool.setLastUpdated(rs.getTimestamp("lastUpdated"));
-
-      try {
-        solidPool.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
-        List<emPCRDilution> dilutions = new ArrayList<emPCRDilution>(dilutionDAO.listBySolidPoolId(rs.getLong("poolId")));
-        Collections.sort(dilutions);
-        solidPool.setPoolableElements(dilutions);
-
-        solidPool.setExperiments(experimentDAO.listByPoolId(rs.getLong("poolId")));
-
-        solidPool.setWatchers(new HashSet<User>(watcherDAO.getWatchersByEntityName(solidPool.getWatchableIdentifier())));
-        if (solidPool.getSecurityProfile() != null &&
-            solidPool.getSecurityProfile().getOwner() != null) {
-          solidPool.addWatcher(solidPool.getSecurityProfile().getOwner());
-        }
-        for (User u : watcherDAO.getWatchersByWatcherGroup("PoolWatchers")) {
-          solidPool.addWatcher(u);
-        }
-      }
-      catch (IOException e1) {
-        log.error("Cannot map from database to SolidPool: ", e1);
-        e1.printStackTrace();
-      }
-      return solidPool;
-    }
-  }
-
-  public class EmPCRPoolMapper implements RowMapper<emPCRPool> {
-    public emPCRPool mapRow(ResultSet rs, int rowNum) throws SQLException {
-      PlatformType platformType = PlatformType.get(rs.getString("platformType"));
-      if (platformType != null) {
-        emPCRPool pool = dataObjectFactory.getEmPCRPool(platformType);
-        pool.setId(rs.getLong("poolId"));
-        pool.setName(rs.getString("name"));
-        pool.setAlias(rs.getString("alias"));
-        pool.setCreationDate(rs.getDate("creationDate"));
-        pool.setConcentration(rs.getDouble("concentration"));
-        pool.setIdentificationBarcode(rs.getString("identificationBarcode"));
-        pool.setPlatformType(platformType);
-        pool.setReadyToRun(rs.getBoolean("ready"));
-
-        //pool.setLastUpdated(rs.getTimestamp("lastUpdated"));
-
-        try {
-          pool.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
-          List<LibraryDilution> dilutions = new ArrayList<LibraryDilution>(dilutionDAO.listByEmPCRPoolId(rs.getLong("poolId")));
-          Collections.sort(dilutions);
-          pool.setPoolableElements(dilutions);
-
-          pool.setExperiments(experimentDAO.listByPoolId(rs.getLong("poolId")));
-
-          pool.setWatchers(new HashSet<User>(watcherDAO.getWatchersByEntityName(pool.getWatchableIdentifier())));
-          if (pool.getSecurityProfile() != null &&
-              pool.getSecurityProfile().getOwner() != null) {
-            pool.addWatcher(pool.getSecurityProfile().getOwner());
-          }
-          for (User u : watcherDAO.getWatchersByWatcherGroup("PoolWatchers")) {
-            pool.addWatcher(u);
-          }
-        }
-        catch (IOException e1) {
-          log.error("Cannot map from database to emPCRPool: ", e1);
-          e1.printStackTrace();
-        }
-        return pool;
-      }
-      return null;
     }
   }
 }

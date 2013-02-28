@@ -145,7 +145,7 @@ public class EditUserController {
     }
   }
 
-  @RequestMapping(value = "/tech/user/{userId}", method = RequestMethod.POST)
+  @RequestMapping(value = "/tech/user", method = RequestMethod.POST)
   public String techProcessSubmit(@ModelAttribute("user") User user,
                                   ModelMap model, SessionStatus session) throws IOException {
     try {
@@ -162,7 +162,7 @@ public class EditUserController {
     }
   }
 
-  @RequestMapping(value = "/admin/user/{userId}", method = RequestMethod.POST)
+  @RequestMapping(value = "/admin/user", method = RequestMethod.POST)
   public String adminProcessSubmit(@ModelAttribute("user") User user,
                                    ModelMap model, SessionStatus session) throws IOException {
     try {

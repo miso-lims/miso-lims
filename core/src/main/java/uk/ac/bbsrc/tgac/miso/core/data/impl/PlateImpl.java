@@ -26,9 +26,12 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPlate;
+import uk.ac.bbsrc.tgac.miso.core.data.Plate;
+import uk.ac.bbsrc.tgac.miso.core.data.Plateable;
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 
-import java.util.Collection;
-import java.util.LinkedList;
+import java.io.Serializable;
+import java.util.*;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.impl
@@ -39,25 +42,49 @@ import java.util.LinkedList;
  * @date 13-Sep-2011
  * @since 0.1.1
  */
-public class PlateImpl<T> extends AbstractPlate<LinkedList<T>, T> {
+public class PlateImpl<T extends Plateable> extends AbstractPlate<LinkedList<T>, T> implements Serializable {
   public LinkedList<T> elements = new LinkedList<T>();
+  private Set<Pool<Plate<LinkedList<T>, T>>> pools = new HashSet<Pool<Plate<LinkedList<T>, T>>>();
+
+  private int size = 96;
 
   public PlateImpl() {
     setSecurityProfile(new SecurityProfile());
   }
 
-  public PlateImpl(User user) {
+  public PlateImpl(int size) {
+    setSecurityProfile(new SecurityProfile());
+    this.size = size;
+  }
+
+  public PlateImpl(int size, User user) {
     setSecurityProfile(new SecurityProfile(user));
+    this.size = size;
   }
 
   @Override
   public int getSize() {
+    if (elements.isEmpty()) {
+      return this.size;
+    }
     return elements.size();
+  }
+
+  @Override
+  public void setSize(int size) throws Exception {
+    if (size != this.size) {
+      throw new Exception("Unable to set size of a plate once it has been constructed");
+    }
   }
 
   @Override
   public LinkedList<T> getElements() {
     return elements;
+  }
+
+  @Override
+  public void setElements(LinkedList<T> elements) {
+    this.elements = elements;
   }
 
   @Override
@@ -67,11 +94,16 @@ public class PlateImpl<T> extends AbstractPlate<LinkedList<T>, T> {
 
   @Override
   public Class getElementType() {
-    return Object.class;
+    return Plateable.class;
   }
 
   @Override
   public Collection<T> getInternalPoolableElements() {
     return getElements();
+  }
+
+  @Override
+  public Set<Pool<Plate<LinkedList<T>, T>>> getPools() {
+    return pools;
   }
 }

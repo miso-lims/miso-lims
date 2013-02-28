@@ -23,10 +23,10 @@
 
 <%--
   Created by IntelliJ IDEA.
-  User: bian
+  User: bian, davey
   Date: 19-Apr-2010
-  Time: 11:24:27
-
+  Updated: 06-Dec-2012
+  Time: 14:22
 --%>
 <%@ include file="../header.jsp" %>
 <script src="<c:url value='/scripts/datatables_utils.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
@@ -35,96 +35,51 @@
 <link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables_themeroller.css'/>">
 
 <div id="maincontent">
-<div id="contentcolumn">
-<h1>Pools</h1>
+  <div id="contentcolumn">
+    <h1>Pools</h1>
 
-<div id="tabs">
-<ul>
-  <li><a href="#tab-1"><span>Illumina Pools</span></a></li>
-  <li><a href="#tab-2"><span>LS454 Pools</span></a></li>
-  <li><a href="#tab-3"><span>Solid Pools</span></a></li>
-</ul>
+    <div id="tabs">
+      <ul>
+        <c:forEach items="${platformTypes}" var="pt" varStatus="c">
+          <li><a href="#tab-${c.count}"><span>${pt} Pools</span></a></li>
+        </c:forEach>
+      </ul>
 
-<div id="tab-1">
-  <h1>
-    <div id="illuminatotalCount">Illumina Pools
+      <c:forEach items="${platformTypes}" var="pt" varStatus="c">
+        <div id="tab-${c.count}">
+          <h1>
+            <div id="${pt}totalCount">${pt} Pools</div>
+          </h1>
+          <ul class="sddm">
+            <li><a
+                    onmouseover="mopen('ipomenu')"
+                    onmouseout="mclosetime()">Options <span style="float:right"
+                                                            class="ui-icon ui-icon-triangle-1-s"></span></a>
+
+              <div id="ipomenu"
+                   onmouseover="mcancelclosetime()"
+                   onmouseout="mclosetime()">
+                <a href='<c:url value="/miso/pool/new"/>'>Add Pool</a>
+                <a href='javascript:void(0);' onclick="Pool.barcode.selectPoolBarcodesToPrint('#${fn:toLowerCase(pt)}'); return false;">Print Barcodes
+                  ...</a>
+              </div>
+            </li>
+          </ul>
+          <table cellpadding="0" cellspacing="0" border="0" class="display" id="listing${pt}PoolsTable"></table>
+          <script type="text/javascript">
+            jQuery(document).ready(function() {
+              Pool.ui.createListingPoolsTable('${pt}');
+            });
+          </script>
+        </div>
+      </c:forEach>
+      <script type="text/javascript">
+        jQuery(document).ready(function() {
+          jQuery("#tabs").tabs();
+        });
+      </script>
     </div>
-  </h1>
-  <ul class="sddm">
-    <li><a
-            onmouseover="mopen('ipomenu')"
-            onmouseout="mclosetime()">Options <span style="float:right"
-                                                    class="ui-icon ui-icon-triangle-1-s"></span></a>
-
-      <div id="ipomenu"
-           onmouseover="mcancelclosetime()"
-           onmouseout="mclosetime()">
-        <a href='<c:url value="/miso/pool/illumina/new"/>'>Add Illumina Pool</a>
-        <a href='javascript:void(0);' onclick="Pool.barcode.selectPoolBarcodesToPrint('#illumina'); return false;">Print Barcodes
-          ...</a>
-      </div>
-    </li>
-  </ul>
-<table cellpadding="0" cellspacing="0" border="0" class="display" id="listingIlluminaPoolsTable">
-</table>
-</div>
-
-<div id="tab-2">
-  <h1>
-    <div id="ls454totalCount">LS454 Pools
-    </div>
-  </h1>
-  <ul class="sddm">
-    <li><a
-            onmouseover="mopen('lpomenu')"
-            onmouseout="mclosetime()">Options <span style="float:right"
-                                                    class="ui-icon ui-icon-triangle-1-s"></span></a>
-
-      <div id="lpomenu"
-           onmouseover="mcancelclosetime()"
-           onmouseout="mclosetime()">
-        <a href='<c:url value="/miso/pool/ls454/new"/>'>Add LS454 Pool</a>
-        <a href='javascript:void(0);' onclick="Pool.barcode.selectPoolBarcodesToPrint('#ls454'); return false;">Print Barcodes
-          ...</a>
-      </div>
-    </li>
-  </ul>
-<table cellpadding="0" cellspacing="0" border="0" class="display" id="listingLs454PoolsTable">
-</table>
-</div>
-
-<div id="tab-3">
-  <h1>
-    <div id="solidtotalCount">Solid Pools
-    </div>
-  </h1>
-  <ul class="sddm">
-    <li><a
-            onmouseover="mopen('spomenu')"
-            onmouseout="mclosetime()">Options <span style="float:right"
-                                                    class="ui-icon ui-icon-triangle-1-s"></span></a>
-
-      <div id="spomenu"
-           onmouseover="mcancelclosetime()"
-           onmouseout="mclosetime()">
-        <a href='<c:url value="/miso/pool/solid/new"/>'>Add Solid Pool</a>
-        <a href='javascript:void(0);' onclick="Pool.barcode.selectPoolBarcodesToPrint('#solid'); return false;">Print Barcodes
-          ...</a>
-      </div>
-    </li>
-  </ul>
-<table cellpadding="0" cellspacing="0" border="0" class="display" id="listingSolidPoolsTable">
-</table>
-  <script type="text/javascript">
-    jQuery(document).ready(function() {
-      jQuery("#tabs").tabs();
-      Pool.ui.createListingPoolsTable();
-    });
-  </script>
-</div>
-
-</div>
-</div>
+  </div>
 </div>
 
 <%@ include file="adminsub.jsp" %>

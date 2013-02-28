@@ -26,6 +26,7 @@ package uk.ac.bbsrc.tgac.miso.core.data.type;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.io.Serializable;
 
 /**
  * Provides model access to the underlying MISO LibraryType lookup table. These types should match the SRA submission schema for
@@ -36,7 +37,7 @@ import javax.persistence.Id;
  * @author Rob Davey
  * @since 0.0.2
  */
-public class LibraryType implements Comparable {
+public class LibraryType implements Comparable, Serializable {
   public static final Long UNSAVED_ID = 0L;
 
   /** Field libraryTypeId  */

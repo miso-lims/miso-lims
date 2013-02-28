@@ -255,6 +255,12 @@ public class EditProjectController {
     return dilutions;
   }
 
+  public Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> populateProjectPlates(long projectId) throws IOException {
+    List<Plate<? extends List<? extends Plateable>, ? extends Plateable>> plates = new ArrayList<Plate<? extends List<? extends Plateable>, ? extends Plateable>>(requestManager.listAllPlatesByProjectId(projectId));
+    Collections.sort(plates);
+    return plates;
+  }
+
   @RequestMapping(value = "/graph/{projectId}", method = RequestMethod.GET)
   public
   @ResponseBody
@@ -374,6 +380,7 @@ public class EditProjectController {
         model.put("projectEmPcrDilutions", populateProjectEmPcrDilutions(emPcrs));
 
         model.put("projectPools", populateProjectPools(projectId));
+        model.put("projectPlates", populateProjectPlates(projectId));
       }
 
       if (project == null) {

@@ -25,6 +25,9 @@ package uk.ac.bbsrc.tgac.miso.core.event.manager;
 
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import com.googlecode.ehcache.annotations.KeyGenerator;
+import com.googlecode.ehcache.annotations.Property;
+import com.googlecode.ehcache.annotations.TriggersRemove;
 import com.rits.cloning.Cloner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,6 +85,22 @@ public class ProjectAlertManager {
     this.projectOverviewListener = projectOverviewListener;
   }
 
+  public void applyListeners(Project project) {
+    project.addListener(getProjectListener());
+  }
+
+  public void removeListeners(Project project) {
+    project.removeListener(getProjectListener());
+  }
+
+  public void applyListeners(ProjectOverview overview) {
+    overview.addListener(getProjectOverviewListener());
+  }
+
+  public void removeListeners(ProjectOverview overview) {
+    overview.removeListener(getProjectOverviewListener());
+  }
+
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
   }
@@ -90,30 +109,55 @@ public class ProjectAlertManager {
     this.enabled = enabled;
   }
 
-  private Project cloneAndAddProject(Project project) {
-    Project clone = cloner.deepClone(project);
-    ((ProjectImpl)clone).addListener(getProjectListener());
+  public void push(Project project) {
+    if (enabled) {
+      if (project != null) {
+        Project clone = cloner.deepClone(project);
+        if (clone != null) {
+          if (projects.containsKey(project.getId())) {
+            if (clone.getProgress() != null) {
+              log.debug("Not replacing " + clone.getId() + ": " + clone.getProgress().name());
+            }
+          }
+          else {
+            applyListeners(clone);
 
-    for (ProjectOverview clonedOverview : clone.getOverviews()) {
-      clonedOverview.setProject(project);
-      clonedOverview.addListener(getProjectOverviewListener());
+            for (ProjectOverview po : clone.getOverviews()) {
+              applyListeners(po);
+            }
+
+            projects.put(project.getId(), clone);
+            if (clone.getProgress() != null) {
+              log.debug("Queued " + clone.getId() + ": " + clone.getProgress().name());
+            }
+          }
+        }
+      }
     }
-
-    projects.put(clone.getProjectId(), clone);
-    return clone;
+    else {
+      log.warn("Alerting system disabled.");
+    }
   }
 
-  public void indexify() throws IOException {
+  public void pop(Project project) {
     if (enabled) {
-      log.info("Indexifying projects...");
-      projects.clear();
+      if (project != null) {
+        Project clone = projects.get(project.getId());
+        if (clone != null) {
+          removeListeners(clone);
+          for (ProjectOverview po : clone.getOverviews()) {
+            removeListeners(po);
+            po = null;
+          }
 
-      log.info("Setting project listeners and watcher groups...");
-      Collection<Project> persistedProjects = misoRequestManager.listAllProjects();
-      for (Project p : persistedProjects) {
-        p.setOverviews(misoRequestManager.listAllOverviewsByProjectId(p.getProjectId()));
-        cloneAndAddProject(p);
+          clone = null;
+          projects.remove(project.getId());
+          log.debug("Dequeued " + project.getId());
+        }
       }
+    }
+    else {
+      log.warn("Alerting system disabled.");
     }
   }
 
@@ -124,8 +168,9 @@ public class ProjectAlertManager {
   private void update(Project p) throws IOException {
     if (enabled) {
       //don't just replace the object - set required fields otherwise we have to reset all the object's listeners
-      Project clone = projects.get(p.getProjectId());
+      Project clone = projects.get(p.getId());
       if (clone == null) {
+        log.debug("Update: no clone - pushing");
         //new project - add all ProjectWatchers!
         for (User u : securityManager.listUsersByGroupName("ProjectWatchers")) {
           p.addWatcher(u);
@@ -133,28 +178,30 @@ public class ProjectAlertManager {
             po.addWatcher(u);
           }
         }
-        clone = cloneAndAddProject(p);
+        push(p);
       }
-      log.debug("Got clone of " + clone.getProjectId());
-      clone.setProgress(cloner.deepClone(p.getProgress()));
+      else {
+        log.debug("Update: got clone of " + clone.getId());
+        clone.setProgress(cloner.deepClone(p.getProgress()));
 
-      log.debug("Checking " + p.getOverviews().size() + " overviews of Project " + clone.getProjectId());
-      for (ProjectOverview po : p.getOverviews()) {
-        ProjectOverview cloneOverview = clone.getOverviewById(po.getOverviewId());
-        if (cloneOverview != null) {
-          log.debug("Updating overview "+cloneOverview.getOverviewId()+" ...");
-          cloneOverview.setAllSampleQcPassed(po.getAllSampleQcPassed());
-          cloneOverview.setLibraryPreparationComplete(po.getLibraryPreparationComplete());
-          cloneOverview.setAllLibrariesQcPassed(po.getAllLibrariesQcPassed());
-          cloneOverview.setAllPoolsConstructed(po.getAllPoolsConstructed());
-          cloneOverview.setAllRunsCompleted(po.getAllRunsCompleted());
-          cloneOverview.setPrimaryAnalysisCompleted(po.getPrimaryAnalysisCompleted());
+        for (ProjectOverview po : p.getOverviews()) {
+          ProjectOverview cloneOverview = clone.getOverviewById(po.getOverviewId());
+          if (cloneOverview != null) {
+            cloneOverview.setAllSampleQcPassed(po.getAllSampleQcPassed());
+            cloneOverview.setLibraryPreparationComplete(po.getLibraryPreparationComplete());
+            cloneOverview.setAllLibrariesQcPassed(po.getAllLibrariesQcPassed());
+            cloneOverview.setAllPoolsConstructed(po.getAllPoolsConstructed());
+            cloneOverview.setAllRunsCompleted(po.getAllRunsCompleted());
+            cloneOverview.setPrimaryAnalysisCompleted(po.getPrimaryAnalysisCompleted());
+          }
+          else {
+            log.debug("Original project has an overview, but it seems it hasn't been cloned.");
+          }
         }
-        else {
-          log.debug("Original project has an overview, but it seems it hasn't been cloned.");
-        }
+
+        pop(clone);
+        push(p);
       }
-      projects.put(p.getProjectId(), clone);
     }
   }
 
@@ -191,17 +238,26 @@ public class ProjectAlertManager {
   public void addWatcher(Project project, Long userId) throws IOException {
     User user = securityManager.getUserById(userId);
     if (user != null) {
-      Project clone = projects.get(project.getProjectId());
-      log.debug("Added watcher " + userId + " to project " + project.getProjectId());
+      Project clone = projects.get(project.getId());
+      log.debug("Added watcher " + userId + " to project " + project.getId());
       if (clone == null) {
-        clone = cloneAndAddProject(project);
-      }
-      clone.addWatcher(user);
+        project.addWatcher(user);
+        for (ProjectOverview po : project.getOverviews()) {
+          ProjectOverview pOverview = project.getOverviewById(po.getOverviewId());
+          if (pOverview != null) {
+            pOverview.addWatcher(user);
+          }
+        }
 
-      for (ProjectOverview po : clone.getOverviews()) {
-        ProjectOverview cloneOverview = clone.getOverviewById(po.getOverviewId());
-        if (cloneOverview != null) {
-          cloneOverview.addWatcher(user);
+        push(project);
+      }
+      else {
+        clone.addWatcher(user);
+        for (ProjectOverview po : clone.getOverviews()) {
+          ProjectOverview cloneOverview = clone.getOverviewById(po.getOverviewId());
+          if (cloneOverview != null) {
+            cloneOverview.addWatcher(user);
+          }
         }
       }
     }
@@ -210,17 +266,25 @@ public class ProjectAlertManager {
   public void removeWatcher(Project project, Long userId) throws IOException {
     User user = securityManager.getUserById(userId);
     if (user != null) {
-      Project clone = projects.get(project.getProjectId());
+      Project clone = projects.get(project.getId());
       if (clone == null) {
-        clone = cloneAndAddProject(project);
-      }
-      log.debug("Removed watcher " + userId + " from project " + project.getProjectId());
-      clone.removeWatcher(user);
+        project.removeWatcher(user);
+        for (ProjectOverview po : project.getOverviews()) {
+          ProjectOverview pOverview = project.getOverviewById(po.getOverviewId());
+          if (pOverview != null) {
+            pOverview.removeWatcher(user);
+          }
+        }
 
-      for (ProjectOverview po : clone.getOverviews()) {
-        ProjectOverview cloneOverview = clone.getOverviewById(po.getOverviewId());
-        if (cloneOverview != null) {
-          cloneOverview.removeWatcher(user);
+        push(project);
+      }
+      else {
+        clone.removeWatcher(user);
+        for (ProjectOverview po : clone.getOverviews()) {
+          ProjectOverview cloneOverview = clone.getOverviewById(po.getOverviewId());
+          if (cloneOverview != null) {
+            cloneOverview.removeWatcher(user);
+          }
         }
       }
     }

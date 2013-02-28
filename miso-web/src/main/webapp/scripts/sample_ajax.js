@@ -477,10 +477,10 @@ Sample.ui = {
                         jQuery(input).focus();
 
                         //rebind after setting focus
-                        //jQuery(input).keyup(Utils.timer.timedFunc(Sample.ui.receiveSample(this), 400));
-                        Utils.timer.typewatchFunc(jQuery('#searchSampleByBarcode'), function() {
-                          Sample.ui.receiveSample(jQuery('#searchSampleByBarcode'));
-                        }, 600, 4);
+// Fixed for MISO-353 commented
+//                        Utils.timer.typewatchFunc(jQuery('#searchSampleByBarcode'), function() {
+//                          Sample.ui.receiveSample(jQuery('#searchSampleByBarcode'));
+//                        }, 100, 4);
                       },
                 'doOnError':
                         function(json) {

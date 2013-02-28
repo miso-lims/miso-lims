@@ -23,12 +23,18 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
+import com.eaglegenomics.simlims.core.Note;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.*;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.exception.MalformedDilutionException;
+import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
+import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryQcException;
+import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleQcException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 
 import java.io.IOException;
@@ -58,7 +64,57 @@ public class ProjectRestController {
 
   @RequestMapping(value = "{projectId}", method = RequestMethod.GET)
   public @ResponseBody Project jsonRest(@PathVariable Long projectId) throws IOException {
-    return requestManager.getProjectById(projectId);
+    Project project = requestManager.getProjectById(projectId);
+
+    for (Sample s : project.getSamples()) {
+      if (s.getLibraries().isEmpty()) {
+        for (Library l : requestManager.listAllLibrariesBySampleId(s.getId())) {
+          try {
+            s.addLibrary(l);
+          }
+          catch (MalformedLibraryException e) {
+            e.printStackTrace();
+          }
+        }
+      }
+
+      if (s.getSampleQCs().isEmpty()) {
+        for (SampleQC qc : requestManager.listAllSampleQCsBySampleId(s.getId())) {
+          try {
+            s.addQc(qc);
+          }
+          catch (MalformedSampleQcException e) {
+            e.printStackTrace();
+          }
+        }
+      }
+    }
+    return project;
+  }
+
+  @RequestMapping(value = "{projectId}/libraries", method = RequestMethod.GET)
+  public @ResponseBody Collection<Library> getProjectLibraries(@PathVariable Long projectId) throws IOException {
+    Collection<Library> lp = requestManager.listAllLibrariesByProjectId(projectId);
+    for (Library l : lp) {
+      for (LibraryDilution dil : requestManager.listAllLibraryDilutionsByLibraryId(l.getId())) {
+        try {
+          l.addDilution(dil);
+        }
+        catch (MalformedDilutionException e) {
+          e.printStackTrace();
+        }
+      }
+
+      for (LibraryQC qc : requestManager.listAllLibraryQCsByLibraryId(l.getId())) {
+        try {
+          l.addQc(qc);
+        }
+        catch (MalformedLibraryQcException e) {
+          e.printStackTrace();
+        }
+      }
+    }
+    return lp;
   }
 
   @RequestMapping(method = RequestMethod.GET)

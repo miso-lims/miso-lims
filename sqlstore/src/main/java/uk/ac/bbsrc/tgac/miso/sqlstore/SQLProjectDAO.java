@@ -27,9 +27,7 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.googlecode.ehcache.annotations.*;
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
+import net.sf.ehcache.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,10 +40,12 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
+import uk.ac.bbsrc.tgac.miso.core.event.manager.ProjectAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.*;
+import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
@@ -55,6 +55,7 @@ import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.regex.Matcher;
 
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore
@@ -193,6 +194,13 @@ public class SQLProjectDAO implements ProjectStore {
   private RunStore runDAO;
   private NoteStore noteDAO;
   private WatcherStore watcherDAO;
+
+  @Autowired
+  private ProjectAlertManager projectAlertManager;
+
+  public void setProjectAlertManager(ProjectAlertManager projectAlertManager) {
+    this.projectAlertManager = projectAlertManager;
+  }
 
   @Autowired
   private MisoNamingScheme<Project> namingScheme;
@@ -491,11 +499,11 @@ public class SQLProjectDAO implements ProjectStore {
       )
   )
   public List<Project> listAll() {
-    return template.query(PROJECTS_SELECT, new LazyProjectMapper());
+    return template.query(PROJECTS_SELECT, new ProjectMapper(true));
   }
 
   public List<Project> listAllWithLimit(long limit) throws IOException {
-    return template.query(PROJECTS_SELECT_LIMIT, new Object[]{limit}, new LazyProjectMapper());
+    return template.query(PROJECTS_SELECT_LIMIT, new Object[]{limit}, new ProjectMapper(true));
   }
 
   @Override
@@ -568,14 +576,14 @@ public class SQLProjectDAO implements ProjectStore {
   }
 
   public Project lazyGet(long projectId) throws IOException {
-    List eResults = template.query(PROJECT_SELECT_BY_ID, new Object[]{projectId}, new LazyProjectMapper());
+    List eResults = template.query(PROJECT_SELECT_BY_ID, new Object[]{projectId}, new ProjectMapper(true));
     Project e = eResults.size() > 0 ? (Project) eResults.get(0) : null;
     return e;
   }
 
   public List<Project> listBySearch(String query) {
-    String mySQLQuery = "%" + query + "%";
-    return template.query(PROJECTS_SELECT_BY_SEARCH, new Object[]{mySQLQuery,mySQLQuery,mySQLQuery}, new LazyProjectMapper());
+    String mySQLQuery = "%" + query.replaceAll("_", Matcher.quoteReplacement("\\_")) + "%";
+    return template.query(PROJECTS_SELECT_BY_SEARCH, new Object[]{mySQLQuery,mySQLQuery,mySQLQuery}, new ProjectMapper(true));
   }
 
   public Project getByStudyId(long studyId) throws IOException {
@@ -591,96 +599,122 @@ public class SQLProjectDAO implements ProjectStore {
   }
 
   public ProjectOverview lazyGetProjectOverviewById(long overviewId) throws IOException {
-    List eResults = template.query(OVERVIEW_SELECT_BY_ID, new Object[]{overviewId}, new LazyProjectOverviewMapper());
+    List eResults = template.query(OVERVIEW_SELECT_BY_ID, new Object[]{overviewId}, new ProjectOverviewMapper(true));
     ProjectOverview e = eResults.size() > 0 ? (ProjectOverview) eResults.get(0) : null;
     return e;
   }
 
   public List<ProjectOverview> listOverviewsByProjectId(long projectId) throws IOException {
-    return template.query(OVERVIEW_SELECT_BY_RELATED_PROJECT, new Object[]{projectId}, new LazyProjectOverviewMapper());
+    return template.query(OVERVIEW_SELECT_BY_RELATED_PROJECT, new Object[]{projectId}, new ProjectOverviewMapper(true));
   }
 
   public List<String> listIssueKeysByProjectId(long projectId) throws IOException {
     return template.queryForList(ISSUE_KEYS_SELECT_BY_PROJECT_ID, new Object[]{projectId}, String.class);
   }
 
-  public class LazyProjectMapper implements RowMapper<Project> {
+  public class ProjectMapper extends CacheAwareRowMapper<Project> {
+    public ProjectMapper() {
+      super(Project.class);
+    }
+
+    public ProjectMapper(boolean lazy) {
+      super(Project.class, lazy);
+    }
+
+    @Override
     public Project mapRow(ResultSet rs, int rowNum) throws SQLException {
-      Project project = dataObjectFactory.getProject();
-      project.setProjectId(rs.getLong("projectId"));
-      project.setName(rs.getString("name"));
-      project.setAlias(rs.getString("alias"));
-      project.setDescription(rs.getString("description"));
-      project.setCreationDate(rs.getDate("creationDate"));
-      project.setProgress(ProgressType.get(rs.getString("progress")));
-      project.setLastUpdated(rs.getTimestamp("lastUpdated"));
+      long id = rs.getLong("projectId");
+      Project project = null;
 
       try {
-        project.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
-        project.setIssueKeys(listIssueKeysByProjectId(rs.getLong("projectId")));
-        project.setWatchers(new HashSet<User>(watcherDAO.getWatchersByEntityName(project.getWatchableIdentifier())));
-        if (project.getSecurityProfile() != null &&
-            project.getSecurityProfile().getOwner() != null)
-          project.addWatcher(project.getSecurityProfile().getOwner());
-        for (User u : watcherDAO.getWatchersByWatcherGroup("ProjectWatchers")) {
-          project.addWatcher(u);
+        if (isCacheEnabled()) {
+          Element element;
+          if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
+            log.debug("Cache hit on map for Project " + id);
+            return (Project)element.getObjectValue();
+          }
+        }
+
+        project = dataObjectFactory.getProject();
+        project.setProjectId(id);
+        project.setName(rs.getString("name"));
+        project.setAlias(rs.getString("alias"));
+        project.setDescription(rs.getString("description"));
+        project.setCreationDate(rs.getDate("creationDate"));
+        project.setProgress(ProgressType.get(rs.getString("progress")));
+        project.setLastUpdated(rs.getTimestamp("lastUpdated"));
+
+        try {
+          project.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
+          project.setIssueKeys(listIssueKeysByProjectId(id));
+          project.setWatchers(new HashSet<User>(watcherDAO.getWatchersByEntityName(project.getWatchableIdentifier())));
+          if (project.getSecurityProfile() != null &&
+              project.getSecurityProfile().getOwner() != null)
+            project.addWatcher(project.getSecurityProfile().getOwner());
+          for (User u : watcherDAO.getWatchersByWatcherGroup("ProjectWatchers")) {
+            project.addWatcher(u);
+          }
+
+          if (!isLazy()) {
+            Collection<ProjectOverview> overviews = listOverviewsByProjectId(id);
+//            for (ProjectOverview po : overviews) {
+//              po.setProject(project);
+//            }
+            project.setOverviews(overviews);
+            project.setSamples(sampleDAO.listByProjectId(id));
+            project.setStudies(studyDAO.listByProjectId(id));
+          }
+        }
+        catch (IOException e1) {
+          e1.printStackTrace();
+        }
+
+        if (projectAlertManager != null) {
+          projectAlertManager.push(project);
+        }
+
+        if (isCacheEnabled()) {
+          lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id) ,project));
+          log.debug("Cache put for Project " + id);
         }
       }
-      catch (IOException e1) {
-        e1.printStackTrace();
+      catch(net.sf.ehcache.CacheException ce) {
+        ce.printStackTrace();
+      }
+      catch(UnsupportedOperationException uoe) {
+        uoe.printStackTrace();
       }
       return project;
     }
   }
 
-  public class ProjectMapper implements RowMapper<Project> {
-    public Project mapRow(ResultSet rs, int rowNum) throws SQLException {
-      Project project = dataObjectFactory.getProject();
-      project.setProjectId(rs.getLong("projectId"));
-      project.setName(rs.getString("name"));
-      project.setAlias(rs.getString("alias"));
-      project.setDescription(rs.getString("description"));
-      project.setCreationDate(rs.getDate("creationDate"));
-      project.setProgress(ProgressType.get(rs.getString("progress")));
-      project.setLastUpdated(rs.getTimestamp("lastUpdated"));
-
-      try {
-        project.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
-
-        Collection<ProjectOverview> overviews = listOverviewsByProjectId(rs.getLong("projectId"));
-        for (ProjectOverview po : overviews) {
-          po.setProject(project);
-        }
-        project.setOverviews(overviews);
-
-        project.setSamples(sampleDAO.listByProjectId(rs.getLong("projectId")));
-        project.setStudies(studyDAO.listByProjectId(rs.getLong("projectId")));
-        project.setIssueKeys(listIssueKeysByProjectId(rs.getLong("projectId")));
-
-        project.setWatchers(new HashSet<User>(watcherDAO.getWatchersByEntityName(project.getWatchableIdentifier())));
-        if (project.getSecurityProfile() != null &&
-            project.getSecurityProfile().getOwner() != null)
-          project.addWatcher(project.getSecurityProfile().getOwner());
-        for (User u : watcherDAO.getWatchersByWatcherGroup("ProjectWatchers")) {
-          project.addWatcher(u);
-        }
-      }
-      catch (IOException e1) {
-        e1.printStackTrace();
-      }
-      return project;
+  public class ProjectOverviewMapper extends CacheAwareRowMapper<ProjectOverview> {
+    public ProjectOverviewMapper() {
+      super(ProjectOverview.class);
     }
-  }
 
-  public class LazyProjectOverviewMapper implements RowMapper<ProjectOverview> {
+    public ProjectOverviewMapper(boolean lazy) {
+      super(ProjectOverview.class, lazy);
+    }
+
+    @Override
     public ProjectOverview mapRow(ResultSet rs, int rowNum) throws SQLException {
+      long id = rs.getLong("overviewId");
+
+      if (isCacheEnabled()) {
+        Element element;
+        if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
+          log.debug("Cache hit on map for ProjectOverview " + id);
+          return (ProjectOverview)element.getObjectValue();
+        }
+      }
       ProjectOverview overview = new ProjectOverview();
 
       try {
         Project p = lazyGet(rs.getLong("project_projectId"));
         overview.setProject(p);
 
-        overview.setOverviewId(rs.getLong("overviewId"));
+        overview.setOverviewId(id);
         overview.setPrincipalInvestigator(rs.getString("principalInvestigator"));
         overview.setStartDate(rs.getDate("startDate"));
         overview.setEndDate(rs.getDate("endDate"));
@@ -694,11 +728,10 @@ public class SQLProjectDAO implements ProjectStore {
         overview.setPrimaryAnalysisCompleted(rs.getBoolean("primaryAnalysisCompleted"));
         overview.setLastUpdated(rs.getTimestamp("lastUpdated"));
 
-        //overview.setSamples(sampleDAO.listByProjectId(rs.getLong("project_projectId")));
         overview.setSamples(p.getSamples());
         overview.setLibraries(libraryDAO.listByProjectId(rs.getLong("project_projectId")));
         overview.setRuns(runDAO.listByProjectId(rs.getLong("project_projectId")));
-        overview.setNotes(noteDAO.listByProjectOverview(rs.getLong("overviewId")));
+        overview.setNotes(noteDAO.listByProjectOverview(id));
 
         overview.setWatchers(new HashSet<User>(watcherDAO.getWatchersByEntityName(overview.getWatchableIdentifier())));
         if (overview.getProject().getSecurityProfile() != null &&
@@ -712,48 +745,9 @@ public class SQLProjectDAO implements ProjectStore {
         e.printStackTrace();
       }
 
-      return overview;
-    }
-  }
-
-  public class ProjectOverviewMapper implements RowMapper<ProjectOverview> {
-    public ProjectOverview mapRow(ResultSet rs, int rowNum) throws SQLException {
-      ProjectOverview overview = new ProjectOverview();
-
-      try {
-        Project p = lazyGet(rs.getLong("project_projectId"));
-        overview.setProject(p);
-
-        overview.setOverviewId(rs.getLong("overviewId"));
-        overview.setPrincipalInvestigator(rs.getString("principalInvestigator"));
-        overview.setStartDate(rs.getDate("startDate"));
-        overview.setEndDate(rs.getDate("endDate"));
-        overview.setNumProposedSamples(rs.getInt("numProposedSamples"));
-        overview.setLocked(rs.getBoolean("locked"));
-        overview.setAllSampleQcPassed(rs.getBoolean("allSampleQcPassed"));
-        overview.setLibraryPreparationComplete(rs.getBoolean("libraryPreparationComplete"));
-        overview.setAllLibrariesQcPassed(rs.getBoolean("allLibraryQcPassed"));
-        overview.setAllPoolsConstructed(rs.getBoolean("allPoolsConstructed"));
-        overview.setAllRunsCompleted(rs.getBoolean("allRunsCompleted"));
-        overview.setPrimaryAnalysisCompleted(rs.getBoolean("primaryAnalysisCompleted"));
-        overview.setLastUpdated(rs.getTimestamp("lastUpdated"));
-
-        //overview.setSamples(sampleDAO.listByProjectId(rs.getLong("project_projectId")));
-        overview.setSamples(p.getSamples());
-        overview.setLibraries(libraryDAO.listByProjectId(rs.getLong("project_projectId")));
-        overview.setRuns(runDAO.listByProjectId(rs.getLong("project_projectId")));
-        overview.setNotes(noteDAO.listByProjectOverview(rs.getLong("overviewId")));
-
-        overview.setWatchers(new HashSet<User>(watcherDAO.getWatchersByEntityName(overview.getWatchableIdentifier())));
-        if (overview.getProject().getSecurityProfile() != null &&
-            overview.getProject().getSecurityProfile().getOwner() != null)
-          overview.addWatcher(overview.getProject().getSecurityProfile().getOwner());
-        for (User u : watcherDAO.getWatchersByWatcherGroup("ProjectWatchers")) {
-          overview.addWatcher(u);
-        }
-      }
-      catch (IOException e) {
-        e.printStackTrace();
+      if (isCacheEnabled()) {
+        lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id) ,overview));
+        log.debug("Cache put for overview " + id);
       }
 
       return overview;

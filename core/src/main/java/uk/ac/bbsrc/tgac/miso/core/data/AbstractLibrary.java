@@ -68,6 +68,7 @@ public abstract class AbstractLibrary implements Library {
 
   private Collection<LibraryQC> libraryQCs = new HashSet<LibraryQC>();
   private Collection<LibraryDilution> libraryDilutions = new HashSet<LibraryDilution>();
+  private Set<Plate<? extends LinkedList<Library>, Library>> plates = new HashSet<Plate<? extends LinkedList<Library>, Library>>();
 
   private SecurityProfile securityProfile;
   private Sample sample;
@@ -283,6 +284,19 @@ public abstract class AbstractLibrary implements Library {
   public void setNotes(Collection<Note> notes) {
     this.notes = notes;
   }  
+
+  @Override
+  public Set<Plate<? extends LinkedList<Library>, Library>> getPlates() {
+    return plates;
+  }
+
+  public void addPlate(Plate<? extends LinkedList<Library>, Library> plate) {
+    this.plates.add(plate);
+  }
+
+  public void setPlates(Set<Plate<? extends LinkedList<Library>, Library>> plates) {
+    this.plates = plates;
+  }
 
   public Date getLastUpdated() {
     return lastUpdated;

@@ -67,7 +67,7 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
     this.attemptRunPopulation = attemptRunPopulation;
   }
 
-  private final String runDirRegex = "[\\d]+_([A-z0-9]+)_([\\d]+)_([A-z0-9_\\-]*)";
+  private final String runDirRegex = "[\\d]+_([A-z0-9]+)_([\\d]+)_([A-z0-9_\\+\\-]*)";
   private final Pattern p = Pattern.compile(runDirRegex);
   private final DateFormat logDateFormat = new SimpleDateFormat("MM'/'dd'/'yyyy','HH:mm:ss");
   private final DateFormat anotherLogDateFormat = new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH:mm:ss");
@@ -189,7 +189,7 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
             }
           }
           else {
-            log.debug("Updating existing run and status: " + runName);
+            log.info("Updating existing run and status: " + runName);
 
             r.setPlatformType(PlatformType.ILLUMINA);
             r.setDescription(m.group(3));

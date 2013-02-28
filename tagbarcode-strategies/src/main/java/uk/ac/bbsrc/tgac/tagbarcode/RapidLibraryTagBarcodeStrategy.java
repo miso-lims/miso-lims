@@ -86,7 +86,8 @@ public class RapidLibraryTagBarcodeStrategy implements TagBarcodeStrategy, Reque
         try {
           List<TagBarcode> barcodes = new ArrayList<TagBarcode>(requestManager.listAllTagBarcodesByPlatform(PlatformType.LS454.getKey()));
           for (TagBarcode t : barcodes) {
-            if (t.getName() != null &&
+            if (getName().equals(t.getStrategyName()) &&
+                t.getName() != null &&
                 t.getName().startsWith("RL")) {
               log.debug("Registering tag barcode: " + t.getName());
               tagBarcodeMap.get(1).add(t);

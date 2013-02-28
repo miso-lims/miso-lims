@@ -35,7 +35,7 @@
 
 <div id="maincontent">
 <div id="contentcolumn">
-<form:form method="POST" commandName="experiment" autocomplete="off" onsubmit="return validate_experiment(this);">
+<form:form action="/miso/experiment" method="POST" commandName="experiment" autocomplete="off" onsubmit="return validate_experiment(this);">
 <sessionConversation:insertSessionConversationId attributeName="experiment"/>
 <h1>
     <c:choose>
@@ -171,7 +171,8 @@
           <c:choose>
             <c:when test="${not empty experiment.platform and empty availablePools}">
               No ${experiment.platform.platformType.key} pools available. Would you like to
-              <a href='<c:url value="/miso/pool/${fn:toLowerCase(experiment.platform.platformType.key)}/new/${experiment.id}"/>'>
+              <%-- <a href='<c:url value="/miso/pool/${fn:toLowerCase(experiment.platform.platformType.key)}/new/${experiment.id}"/>'> --%>
+              <a href='<c:url value="/miso/pool/new/${experiment.id}"/>'>
               create a pool</a>?
             </c:when>
             <c:otherwise>
@@ -186,7 +187,8 @@
                 <c:otherwise>
                   Please select a Pool below to be associated with this Experiment
                   <c:if test="${experiment.id != 0 or not empty experiment.platform}">
-                    <b>OR</b> <a href='<c:url value="/miso/pool/${fn:toLowerCase(experiment.platform.platformType.key)}/new/${experiment.id}"/>'> create a new pool</a>?
+                    <%-- <b>OR</b> <a href='<c:url value="/miso/pool/${fn:toLowerCase(experiment.platform.platformType.key)}/new/${experiment.id}"/>'> create a new pool</a>? --%>
+                    <b>OR</b> <a href='<c:url value="/miso/pool/new/${experiment.id}"/>'> create a new pool</a>?
                   </c:if>
                 </c:otherwise>
               </c:choose>
@@ -210,7 +212,8 @@
               <div onMouseOver="this.className='dashboardhighlight'" onMouseOut="this.className='dashboard'" class="dashboard">
                 <span class='float-left'>
                 <input type="hidden" id="pool${experiment.pool.id}" value="${experiment.pool.id}" name="pool"/>
-                <b>Pool:</b> <a href='<c:url value="/miso/pool/${fn:toLowerCase(experiment.platform.platformType.key)}/${experiment.pool.id}"/>'>${experiment.pool.name}</a><br/>
+                <%-- <b>Pool:</b> <a href='<c:url value="/miso/pool/${fn:toLowerCase(experiment.platform.platformType.key)}/${experiment.pool.id}"/>'>${experiment.pool.name}</a><br/> --%>
+                <b>Pool:</b> <a href='<c:url value="/miso/pool/${experiment.pool.id}"/>'>${experiment.pool.name}</a><br/>
                 <b>Dilutions:</b><br/>
                 <i>
                   <c:forEach items="${experiment.pool.dilutions}" var="dil">

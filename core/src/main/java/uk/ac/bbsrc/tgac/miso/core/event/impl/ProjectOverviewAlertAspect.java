@@ -24,7 +24,6 @@
 package uk.ac.bbsrc.tgac.miso.core.event.impl;
 
 import com.eaglegenomics.simlims.core.User;
-import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

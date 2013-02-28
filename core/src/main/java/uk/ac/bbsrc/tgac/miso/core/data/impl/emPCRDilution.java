@@ -28,6 +28,8 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 
+import java.io.Serializable;
+
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.impl
  * <p/>
@@ -36,7 +38,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
  * @author Rob Davey
  * @since 0.0.2
  */
-public class emPCRDilution extends AbstractDilution {
+public class emPCRDilution extends AbstractDilution implements Serializable {
   private emPCR emPCR;
   public static final String UNITS = "beads/&#181;l";
 

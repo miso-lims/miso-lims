@@ -23,9 +23,10 @@
   -->
 
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:aop="http://www.springframework.org/schema/aop"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd"
        default-autowire="byName">
 
   <bean name="watchManager" class="uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager"/>
@@ -199,83 +200,83 @@
 <!-- ASPECT CONFIG -->
   <aop:config>
     <aop:aspect id="overviewWatcherUpdateAspect" ref="projectOverviewAlertAspectBean">
-      <aop:pointcut id="overviewWatcherAddPointcut" type="aspectj"
+      <aop:pointcut id="overviewWatcherAddPointcut"
                     expression="execution(* uk.ac.bbsrc.tgac.miso.core.store.WatcherStore.saveWatchedEntityUser(uk.ac.bbsrc.tgac.miso.core.data.Watchable,com.eaglegenomics.simlims.core.User)) and args(overview,user)"/>
       <aop:after-returning pointcut-ref="overviewWatcherAddPointcut" method="addWatcher" arg-names="overview,user"/>
 
-      <aop:pointcut id="overviewWatcherRemovePointcut" type="aspectj"
+      <aop:pointcut id="overviewWatcherRemovePointcut"
                     expression="execution(* uk.ac.bbsrc.tgac.miso.core.store.WatcherStore.removeWatchedEntityByUser(uk.ac.bbsrc.tgac.miso.core.data.Watchable,com.eaglegenomics.simlims.core.User)) and args(overview,user)"/>
       <aop:after-returning pointcut-ref="overviewWatcherRemovePointcut" method="removeWatcher" arg-names="overview,user"/>
 
-      <aop:pointcut id="overviewWatchPointcut" type="aspectj"
+      <aop:pointcut id="overviewWatchPointcut"
         expression="execution(* uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager.watch(uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview,com.eaglegenomics.simlims.core.User)) and args(overview,user)"/>
       <aop:after-returning pointcut-ref="overviewWatchPointcut" method="addWatcher" arg-names="overview,user"/>
 
-      <aop:pointcut id="overviewUnwatchPointcut" type="aspectj"
+      <aop:pointcut id="overviewUnwatchPointcut"
         expression="execution(* uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager.unwatch(uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview,com.eaglegenomics.simlims.core.User)) and args(overview,user)"/>
       <aop:after-returning pointcut-ref="overviewUnwatchPointcut" method="removeWatcher" arg-names="overview,user"/>
     </aop:aspect>
 
     <aop:aspect id="projectAlertAspect" ref="projectAlertAspectBean">
-      <aop:pointcut id="projectAlertPointcut" type="aspectj"
+      <aop:pointcut id="projectAlertPointcut"
         expression="execution(* uk.ac.bbsrc.tgac.miso.core.manager.RequestManager.saveProject(uk.ac.bbsrc.tgac.miso.core.data.Project))"/>
       <aop:after-returning pointcut-ref="projectAlertPointcut" method="update" returning="projectId"/>
 
-      <aop:pointcut id="projectWatcherRemovePointcut" type="aspectj"
+      <aop:pointcut id="projectWatcherRemovePointcut"
                     expression="execution(* uk.ac.bbsrc.tgac.miso.core.store.WatcherStore.removeWatchedEntityByUser(uk.ac.bbsrc.tgac.miso.core.data.Watchable,com.eaglegenomics.simlims.core.User)) and args(project,user)"/>
       <aop:after-returning pointcut-ref="projectWatcherRemovePointcut" method="removeWatcher" arg-names="project,user"/>
 
-      <aop:pointcut id="projectWatcherAddPointcut" type="aspectj"
+      <aop:pointcut id="projectWatcherAddPointcut"
                     expression="execution(* uk.ac.bbsrc.tgac.miso.core.store.WatcherStore.saveWatchedEntityUser(uk.ac.bbsrc.tgac.miso.core.data.Watchable,com.eaglegenomics.simlims.core.User)) and args(project,user)"/>
       <aop:after-returning pointcut-ref="projectWatcherAddPointcut" method="addWatcher" arg-names="project,user"/>
 
-      <aop:pointcut id="projectWatchPointcut" type="aspectj"
+      <aop:pointcut id="projectWatchPointcut"
         expression="execution(* uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager.watch(uk.ac.bbsrc.tgac.miso.core.data.Project,com.eaglegenomics.simlims.core.User)) and args(project,user)"/>
       <aop:after-returning pointcut-ref="projectWatchPointcut" method="addWatcher" arg-names="project,user"/>
 
-      <aop:pointcut id="projectUnwatchPointcut" type="aspectj"
+      <aop:pointcut id="projectUnwatchPointcut"
         expression="execution(* uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager.unwatch(uk.ac.bbsrc.tgac.miso.core.data.Project,com.eaglegenomics.simlims.core.User)) and args(project,user)"/>
       <aop:after-returning pointcut-ref="projectUnwatchPointcut" method="removeWatcher" arg-names="project,user"/>
     </aop:aspect>
 
     <aop:aspect id="runAlertAspect" ref="runAlertAspectBean">
-      <aop:pointcut id="runAlertPointcut" type="aspectj"
+      <aop:pointcut id="runAlertPointcut"
         expression="execution(* uk.ac.bbsrc.tgac.miso.core.manager.RequestManager.saveRun(uk.ac.bbsrc.tgac.miso.core.data.Run))"/>
       <aop:after-returning pointcut-ref="runAlertPointcut" method="update" returning="runId"/>
 
-      <aop:pointcut id="runWatchPointcut" type="aspectj"
+      <aop:pointcut id="runWatchPointcut"
         expression="execution(* uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager.watch(uk.ac.bbsrc.tgac.miso.core.data.Run,com.eaglegenomics.simlims.core.User)) and args(run,user)"/>
       <aop:after-returning pointcut-ref="runWatchPointcut" method="addWatcher" arg-names="run,user"/>
 
-      <aop:pointcut id="runUnwatchPointcut" type="aspectj"
+      <aop:pointcut id="runUnwatchPointcut"
         expression="execution(* uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager.unwatch(uk.ac.bbsrc.tgac.miso.core.data.Run,com.eaglegenomics.simlims.core.User)) and args(run,user)"/>
       <aop:after-returning pointcut-ref="runUnwatchPointcut" method="removeWatcher" arg-names="run,user"/>
     </aop:aspect>
 
     <aop:aspect id="poolAlertAspect" ref="poolAlertAspectBean">
-      <aop:pointcut id="poolAlertPointcut" type="aspectj"
+      <aop:pointcut id="poolAlertPointcut"
         expression="execution(* uk.ac.bbsrc.tgac.miso.core.manager.RequestManager.savePool(uk.ac.bbsrc.tgac.miso.core.data.Pool)) and args(pool)"/>
       <aop:after-returning pointcut-ref="poolAlertPointcut" method="update" arg-names="pool"/>
 
-      <aop:pointcut id="poolWatcherAddPointcut" type="aspectj"
+      <aop:pointcut id="poolWatcherAddPointcut"
                     expression="execution(* uk.ac.bbsrc.tgac.miso.core.store.WatcherStore.saveWatchedEntityUser(uk.ac.bbsrc.tgac.miso.core.data.Watchable,com.eaglegenomics.simlims.core.User)) and args(pool,user)"/>
       <aop:after-returning pointcut-ref="poolWatcherAddPointcut" method="addWatcher" arg-names="pool,user"/>
 
-      <aop:pointcut id="poolWatcherRemovePointcut" type="aspectj"
+      <aop:pointcut id="poolWatcherRemovePointcut"
                     expression="execution(* uk.ac.bbsrc.tgac.miso.core.store.WatcherStore.removeWatchedEntityByUser(uk.ac.bbsrc.tgac.miso.core.data.Watchable,com.eaglegenomics.simlims.core.User)) and args(pool,user)"/>
       <aop:after-returning pointcut-ref="poolWatcherRemovePointcut" method="removeWatcher" arg-names="pool,user"/>
 
-      <aop:pointcut id="poolWatchPointcut" type="aspectj"
+      <aop:pointcut id="poolWatchPointcut"
         expression="execution(* uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager.watch(uk.ac.bbsrc.tgac.miso.core.data.Pool,com.eaglegenomics.simlims.core.User)) and args(pool,user)"/>
       <aop:after-returning pointcut-ref="poolWatchPointcut" method="addWatcher" arg-names="pool,user"/>
 
-      <aop:pointcut id="poolUnwatchPointcut" type="aspectj"
+      <aop:pointcut id="poolUnwatchPointcut"
         expression="execution(* uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager.unwatch(uk.ac.bbsrc.tgac.miso.core.data.Pool,com.eaglegenomics.simlims.core.User)) and args(pool,user)"/>
       <aop:after-returning pointcut-ref="poolUnwatchPointcut" method="removeWatcher" arg-names="pool,user"/>
     </aop:aspect>
 
     <aop:aspect id="userUpdateAspect" ref="userUpdateAspectBean">
-      <aop:pointcut id="userUpdatePointcut" type="aspectj"
+      <aop:pointcut id="userUpdatePointcut"
         expression="execution(* com.eaglegenomics.simlims.core.manager.SecurityManager.saveUser(com.eaglegenomics.simlims.core.User))"/>
       <aop:after-returning pointcut-ref="userUpdatePointcut" method="update" returning="userId"/>
     </aop:aspect>

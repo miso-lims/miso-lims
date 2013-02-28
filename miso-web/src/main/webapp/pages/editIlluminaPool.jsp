@@ -107,7 +107,7 @@
                     <td><form:input path="alias"/></td>
                 </tr>
                 <tr>
-                    <td class="h">Concentration</td>
+                    <td class="h">Desired Concentration</td>
                     <td><form:input path="concentration"/></td>
                 </tr>
                 <tr>
@@ -119,13 +119,90 @@
                     </c:choose>
                     </td>
                 </tr>
+                <tr bgcolor="yellow">
+                  <td>QC Passed:</td>
+                  <td>
+                    <form:radiobutton path="qcPassed" value="" label="Unknown"/>
+                    <form:radiobutton path="qcPassed" value="true" label="True"/>
+                    <form:radiobutton path="qcPassed" value="false" label="False"/>
+                  </td>
+                </tr>
                 <tr>
                     <td class="h">Ready To Run</td>
                     <td><form:checkbox path="readyToRun"/></td>
                 </tr>
+
             </table>
             <%@ include file="permissions.jsp" %>
             <br/>
+
+            <c:if test="${pool.id != 0}">
+            <h1>
+                <div id="qcsTotalCount">
+                </div>
+            </h1>
+            <ul class="sddm">
+                <li><a
+                        onmouseover="mopen('qcmenu')"
+                        onmouseout="mclosetime()">Options <span style="float:right"
+                                                                class="ui-icon ui-icon-triangle-1-s"></span></a>
+
+                    <div id="qcmenu"
+                         onmouseover="mcancelclosetime()"
+                         onmouseout="mclosetime()">
+                        <a href='javascript:void(0);' class="add"
+                           onclick="Pool.qc.insertPoolQCRow(${pool.id}); return false;">Add Pool QC</a>
+                    </div>
+                </li>
+            </ul>
+            <span style="clear:both">
+              <div id="addPoolQC"></div>
+              <div id='addQcForm'>
+                  <table class="list" id="poolQcTable">
+                      <thead>
+                      <tr>
+                          <th>QCed By</th>
+                          <th>QC Date</th>
+                          <th>Method</th>
+                          <th>Results</th>
+                          <c:if test="${(library.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
+                                          or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+                              <th align="center">Edit</th>
+                          </c:if>
+                      </tr>
+                      </thead>
+                      <tbody>
+                      <c:if test="${not empty pool.poolQCs}">
+                          <c:forEach items="${pool.poolQCs}" var="qc">
+                              <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
+                                  <td>${qc.qcCreator}</td>
+                                  <td><fmt:formatDate value="${qc.qcDate}"/></td>
+                                  <td>${qc.qcType.name}</td>
+                                  <td id="result${qc.id}">${qc.results} ${qc.qcType.units}</td>
+                                  <c:if test="${(library.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
+                                                  or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+                                      <td id="edit${qc.id}" align="center"><a href="javascript:void(0);" onclick="Pool.qc.changePoolQCRow('${qc.id}','${pool.id}')">
+                                          <span class="ui-icon ui-icon-pencil"></span></a></td>
+                                  </c:if>
+                              </tr>
+                          </c:forEach>
+                      </c:if>
+                      </tbody>
+                  </table>
+                  <input type='hidden' id='qcPoolId' name='id' value='${pool.id}'/>
+              </div>
+              <script type="text/javascript">
+                  jQuery(document).ready(function() {
+                      jQuery("#poolQcTable").tablesorter({
+                          headers: {
+                          }
+                      });
+
+                      jQuery('#qcsTotalCount').html(jQuery('#poolQcTable>tbody>tr:visible').length.toString() + " QCs");
+                  });
+              </script>
+            </span>
+            </c:if>
 
             <h1>Experiments</h1>
             <div class="note">
@@ -244,6 +321,8 @@
                 </td>
             </tr>
         </table>
+
+
     </div>
 </div>
 

@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import com.eaglegenomics.simlims.core.User;
+import org.codehaus.jackson.annotate.JsonIgnore;
 
 import java.util.Collection;
 import java.util.Set;
@@ -40,6 +41,7 @@ public interface Watchable {
    * Returns the Set of {@link User}s watching this Watchable object
    * @return the Set of watchers for this object
    */
+  @JsonIgnore
   Set<User> getWatchers();
 
   /**
@@ -65,5 +67,6 @@ public interface Watchable {
    * itself, such as a unique name or ID.
    * @return a String representing the watchable identifier for this object
    */
+  @JsonIgnore
   String getWatchableIdentifier();
 }

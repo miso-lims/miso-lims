@@ -62,7 +62,14 @@ public class RunD3CalendarController {
       Collection<Run> runs = requestManager.listAllRuns();
       JSONArray runsArray = new JSONArray();
       for (Run r : runs) {
-        runsArray.add(JSONObject.fromObject("{'ID':'" + r.getId() + "','Name':'" + r.getName() + "','Start':'" + r.getStatus().getStartDate() + "','Stop':'" + r.getStatus().getCompletionDate() + "','Instrument':'" + r.getSequencerReference().getId() + "','InstrumentName':'" +  r.getSequencerReference().getPlatform().getInstrumentModel() + "','Health':'" + r.getStatus().getHealth() + "','Description':'" + r.getDescription()+  "'}"));
+        runsArray.add(JSONObject.fromObject("{'ID':'" + r.getId()
+                                            + "','Name':'" + r.getName()
+                                            + "','Start':'" + (r.getStatus() != null ? r.getStatus().getStartDate() : "")
+                                            + "','Stop':'" + (r.getStatus() != null ? r.getStatus().getCompletionDate() : "")
+                                            + "','Instrument':'" + r.getSequencerReference().getId()
+                                            + "','InstrumentName':'" +  r.getSequencerReference().getPlatform().getInstrumentModel()
+                                            + "','Health':'" + (r.getStatus() != null && r.getStatus().getHealth() != null ? r.getStatus().getHealth().getKey() : "")
+                                            + "','Description':'" + r.getDescription()+  "'}"));
       }
       return runsArray;
     }

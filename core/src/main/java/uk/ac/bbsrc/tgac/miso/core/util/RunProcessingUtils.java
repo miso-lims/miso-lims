@@ -73,7 +73,7 @@ public class RunProcessingUtils {
                   .append(l.getPartitionNumber()).append(",")
                   //.append(ld.getLibrary().getSample().getName()).append(",")
                   //.append(ld.getLibrary().getSample().getAlias().replaceAll("\\s", "")).append(",");
-                  .append(ld.getLibrary().getName()).append(",")
+                  .append(f.getId()).append("_").append(ld.getLibrary().getName()).append("_").append(ld.getName()).append(",")
                   .append(ld.getLibrary().getSample().getAlias().replaceAll("\\s", "")).append(",");
 
           if (ld.getLibrary().getTagBarcodes() != null && !ld.getLibrary().getTagBarcodes().isEmpty() && p.getDilutions().size() > 1) {

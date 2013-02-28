@@ -24,23 +24,16 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import com.eaglegenomics.simlims.core.Note;
-import net.sourceforge.fluxion.spi.ServiceProvider;
-import net.sourceforge.fluxion.spi.Spi;
-import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import org.w3c.dom.Document;
-import uk.ac.bbsrc.tgac.miso.core.data.visitor.SubmittableVisitor;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleQcException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 import javax.persistence.*;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
+import java.util.*;
 
 /**
  * Skeleton implementation of a Sample
@@ -68,6 +61,8 @@ public abstract class AbstractSample implements Sample {
   private Collection<SampleQC> sampleQCs = new HashSet<SampleQC>();
 
   private Collection<Note> notes = new HashSet<Note>();
+
+  private Set<Plate<? extends LinkedList<Sample>, Sample>> plates = new HashSet<Plate<? extends LinkedList<Sample>, Sample>>();
 
   @Transient
   public Document submissionDocument;
@@ -254,6 +249,19 @@ public abstract class AbstractSample implements Sample {
   public void setNotes(Collection<Note> notes) {
     this.notes = notes;
   }  
+
+  @Override
+  public Set<Plate<? extends LinkedList<Sample>, Sample>> getPlates() {
+    return plates;
+  }
+
+  public void addPlate(Plate<? extends LinkedList<Sample>, Sample> plate) {
+    this.plates.add(plate);
+  }
+
+  public void setPlates(Set<Plate<? extends LinkedList<Sample>, Sample>> plates) {
+    this.plates = plates;
+  }
 
   public Date getLastUpdated() {
     return lastUpdated;

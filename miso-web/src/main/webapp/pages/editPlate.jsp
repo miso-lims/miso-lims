@@ -25,15 +25,15 @@
 <script type="text/javascript" src="<c:url value='/scripts/plate_ajax.js?ts=${timestamp.time}'/>"></script>
 
 <script src="<c:url value='/scripts/datatables_utils.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
-<script src="<c:url value='/scripts/jquery/datatables/jquery.dataTables.min.js'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.mini.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.datepicker.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.checkbox.js'/>" type="text/javascript"></script>
-<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/datatable.css'/>" type="text/css">
+<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" type="text/css">
 
 <div id="maincontent">
 <div id="contentcolumn">
-<form:form method="POST" commandName="plate" autocomplete="off" onsubmit="return validate_plate(this);">
+<form:form  action="/miso/plate" method="POST" commandName="plate" autocomplete="off" onsubmit="return validate_plate(this);">
   <sessionConversation:insertSessionConversationId attributeName="plate"/>
 <h1>
     <c:choose>
@@ -80,8 +80,8 @@
                 <li><a
                         onmouseover="mopen('idBarcodeMenu')"
                         onmouseout="mclosetime()"><span style="float:right; margin-top:6px;"
-                                                        class="ui-icon ui-icon-triangle-1-s"></span><span id="idBarcode"
-                                                                                                          style="float:right"></span></a>
+                                                    class="ui-icon ui-icon-triangle-1-s"></span>
+                        <span id="idBarcode" style="float:right"></span></a>
 
                     <div id="idBarcodeMenu"
                          onmouseover="mcancelclosetime()"
@@ -108,91 +108,180 @@
     </div>
     <div id="printServiceSelectDialog" title="Select a Printer"></div>
 </div>
-<div>
-    <table class="in">
-        <tr>
-            <td class="h">Plate ID:</td>
-            <td>
-                <c:choose>
-                    <c:when test="${plate.id != 0}">${plate.id}</c:when>
-                    <c:otherwise><i>Unsaved</i></c:otherwise>
-                </c:choose>
+  <div>
+      <table class="in">
+          <tr>
+              <td class="h">Plate ID:</td>
+              <td>
+                  <c:choose>
+                      <c:when test="${plate.id != 0}">${plate.id}</c:when>
+                      <c:otherwise><i>Unsaved</i></c:otherwise>
+                  </c:choose>
+              </td>
+          </tr>
+          <tr>
+              <td>Name:</td>
+              <td>
+                  <c:choose>
+                      <c:when test="${plate.id != 0}">${plate.name}</c:when>
+                      <c:otherwise><i>Unsaved</i></c:otherwise>
+                  </c:choose>
+              </td>
+          </tr>
+          <tr>
+              <td>Description:</td>
+              <td><form:input path="description"/><span id="descriptioncounter" class="counter"></span></td>
+          </tr>
+          <tr>
+              <td>Creation Date:</td>
+              <td>
+                  <form:input path="creationDate" id="creationdatepicker"/>
+                  <script type="text/javascript">
+                      Utils.ui.addMaxDatePicker("creationdatepicker", 0);
+                  </script>
+              </td>
+          </tr>
+          <tr>
+              <td>Size:</td>
+              <td>
+                  <form:input path="size" id="size"/>
+              </td>
+          </tr>
+          <tr>
+              <c:choose>
+                  <c:when test="${plate.id == 0 or empty plate.plateMaterialType}">
+                      <td>Plate Material Type:</td>
+                      <td>
+                          <form:radiobuttons id="plateMaterialType" path="plateMaterialType" onchange="Plate.tagbarcode.getPlateBarcodesByMaterialType(this);"/>
+                      </td>
+                  </c:when>
+                  <c:otherwise>
+                      <td>Plate Material Type</td>
+                      <td>${plate.plateMaterialType}</td>
+                  </c:otherwise>
+              </c:choose>
+          </tr>
+          <tr>
+            <td id="plateBarcodeSelect">
+              <i>Please choose a material type above...</i>
             </td>
-        </tr>
-        <tr>
-            <td>Name:</td>
-            <td>
-                <c:choose>
-                    <c:when test="${plate.id != 0}">${plate.name}</c:when>
-                    <c:otherwise><i>Unsaved</i></c:otherwise>
-                </c:choose>
-            </td>
-        </tr>
-        <tr>
-            <td>Description:</td>
-            <td><form:input path="description"/><span id="descriptioncounter" class="counter"></span></td>
-        </tr>
-        <tr>
-            <td>Creation Date:</td>
-            <td>
-                <form:input path="creationDate" id="creationdatepicker"/>
-                <script type="text/javascript">
-                    Utils.ui.addDatePicker("creationdatepicker");
-                </script>
-            </td>
-        </tr>
-        <tr>
-            <td>Size:</td>
-            <td>
-                <form:input path="size" id="size"/>
-            </td>
-        </tr>
-        <tr>
-            <c:choose>
-                <c:when test="${plate.id == 0 or empty plate.plateMaterialType}">
-                    <td>Plate Material Type:</td>
-                    <td>
-                        <form:radiobuttons id="plateMaterialType" path="plateMaterialType" onchange="Plate.tagbarcode.getPlateBarcodesByMaterialType(this);"/>
-                    </td>
-                </c:when>
-                <c:otherwise>
-                    <td>Plate Material Type</td>
-                    <td>${plate.plateMaterialType}</td>
-                </c:otherwise>
-            </c:choose>
-        </tr>
-        <tr>
-          <td id="plateBarcodeSelect">
-            <i>Please choose a material type above...</i>
-          </td>
-        </tr>
+          </tr>
+        <%--
+          <tr>
+              <c:choose>
+                  <c:when test="${empty plate.plateId or empty plate.tagBarcode}">
+                      <td>Tag Barcode:</td>
+                      <td>
+                          <form:select id="tagBarcodes" path="tagBarcode">
+                            <form:option value="" label="No Barcode"/>
+                            <form:options items="${availableTagBarcodes}" itemLabel="name" itemValue="tagBarcodeId" />
+                          </form:select>
+                      </td>
+                  </c:when>
+                  <c:otherwise>
+                      <td>Tag Barcode:</td>
+                      <td>
+                          <form:select id="tagBarcodes" path="tagBarcode">
+                            <form:option value="" label="No Barcode"/>
+                            <form:options items="${availableTagBarcodes}" itemLabel="name" itemValue="tagBarcodeId" />
+                          </form:select>
+                      </td>
+                  </c:otherwise>
+              </c:choose>
+          </tr>
+          --%>
+      </table>
       <%--
-        <tr>
-            <c:choose>
-                <c:when test="${empty plate.plateId or empty plate.tagBarcode}">
-                    <td>Tag Barcode:</td>
-                    <td>
-                        <form:select id="tagBarcodes" path="tagBarcode">
-                          <form:option value="" label="No Barcode"/>
-                          <form:options items="${availableTagBarcodes}" itemLabel="name" itemValue="tagBarcodeId" />
-                        </form:select>
-                    </td>
-                </c:when>
-                <c:otherwise>
-                    <td>Tag Barcode:</td>
-                    <td>
-                        <form:select id="tagBarcodes" path="tagBarcode">
-                          <form:option value="" label="No Barcode"/>
-                          <form:options items="${availableTagBarcodes}" itemLabel="name" itemValue="tagBarcodeId" />
-                        </form:select>
-                    </td>
-                </c:otherwise>
-            </c:choose>
-        </tr>
-        --%>
-    </table>
-</div>
-</form:form>
+      <c:if test="${plate.id != 0}">
+        <div id="notes">
+          <h1>Notes</h1>
+          <ul class="sddm">
+            <li><a onmouseover="mopen('notesmenu')"
+                   onmouseout="mclosetime()">Options <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span></a>
+              <div id="notesmenu"
+                   onmouseover="mcancelclosetime()"
+                   onmouseout="mclosetime()">
+                <a onclick="Plate.ui.showPlateNoteDialog(${plate.id});" href="javascript:void(0);" class="add">Add Note</a>
+              </div>
+            </li>
+          </ul>
+          <c:if test="${fn:length(plate.notes) > 0}">
+            <div class="note" style="clear:both">
+              <c:forEach items="${plate.notes}" var="note" varStatus="n">
+                <div class="exppreview" id="plate-notes-${n.count}">
+                  <b>${note.creationDate}</b>: ${note.text}
+                  <span class="float-right"
+                        style="font-weight:bold; color:#C0C0C0;">${note.owner.loginName}</span>
+                </div>
+              </c:forEach>
+            </div>
+          </c:if>
+          <div id="addPlateNoteDialog" title="Create new Note"></div>
+        </div>
+        <br/>
+      </c:if>
+    --%>
+  </form:form>
+
+        <a name="plate_elements"></a>
+
+        <h1>
+          Elements
+        </h1>
+        <ul class="sddm">
+          <li><a
+                  onmouseover="mopen('qcmenu')"
+                  onmouseout="mclosetime()">Options <span style="float:right"
+                                                          class="ui-icon ui-icon-triangle-1-s"></span></a>
+            <div id="qcmenu"
+                 onmouseover="mcancelclosetime()"
+                 onmouseout="mclosetime()">
+              <c:if test="${plate.id == 0}">
+                <a href="javascript:void(0);" onclick="Plate.ui.downloadPlateInputForm();">Get Plate Input Form</a>
+                <a href="javascript:void(0);" class="add" onclick="Plate.ui.uploadPlateInputForm();">Import Plate Input Form</a>
+              </c:if>
+            </div>
+          </li>
+        </ul>
+        <span style="clear:both">
+          <c:if test="${plate.id == 0}">
+          <div id="plateformdiv" class="simplebox" style="display:none;">
+            <table class="in">
+              <tr>
+                <td>
+                  <form method='post'
+                        id='plateform_upload_form'
+                        action='<c:url value="/miso/upload/plate/plate-form"/>'
+                        enctype="multipart/form-data"
+                        target="plateform_target_upload"
+                        onsubmit="Utils.fileUpload.fileUploadProgress('plateform_upload_form', 'plateform_statusdiv', Plate.ui.plateInputFormUploadSuccess);">
+                    <input type="file" name="file"/>
+                    <button type="submit" class="br-button ui-state-default ui-corner-all">Upload</button>
+                    <button type="button" class="br-button ui-state-default ui-corner-all"
+                            onclick="Plate.ui.cancelPlateInputFormUpload();">Cancel
+                    </button>
+                  </form>
+                  <iframe id='plateform_target_upload' name='plateform_target_upload' style='display: none'></iframe>
+                  <div id="plateform_statusdiv"></div>
+                  <div id="plateform_import"></div>
+                </td>
+              </tr>
+            </table>
+          </div>
+          </c:if>
+
+          <div id="importPlateElements"></div>
+          <table cellpadding="0" cellspacing="0" border="0" class="display" id="plateElementsTable"></table>
+          <script type="text/javascript">
+            <c:if test="${plate.id != 0}">
+            jQuery(document).ready(function() {
+              Plate.ui.createPlateElementsTable('${plate.id}');
+            });
+            </c:if>
+          </script>
+        </span>
+        <br/>
+  </div>
 </div>
 </div>
 <%@ include file="adminsub.jsp" %>

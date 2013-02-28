@@ -1601,4 +1601,82 @@ opacity: 0.3;
     text-align: center;
 }
 
+/*stats db perbasecontent*/
+
+
+.line{
+stroke-width: 2px;
+}
+
+.circle{
+stroke-width: 2px;}
+
+.labelG{
+	stroke: blue;
+
+}
+
+.labelA{
+	stroke: red;
+}
+
+
+.labelT{
+	stroke: green;
+
+}
+
+.labelC{
+	stroke: black;
+
+}
+
+.circleG{
+	stroke: blue;
+	fill: white;
+
+}
+
+.circleA{
+	stroke: red;
+	fill: white;
+
+}
+
+
+.circleT{
+	stroke: green;
+	fill: white;
+
+}
+
+
+.circleC{
+	stroke: black;
+	fill: white;
+
+}
+
+.lineG{
+	stroke: blue;
+
+}
+
+.lineA{
+	stroke: red;
+
+}
+
+
+.lineT{
+	stroke: green;
+
+}
+
+
+.lineC{
+	stroke: black;
+
+}
+
 /*statsdb ends*/

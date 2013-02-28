@@ -85,7 +85,7 @@ public class EditLS454PoolController {
 
   private List<? extends Dilution> populateAvailableDilutions(User user, Pool pool) throws IOException {
     ArrayList<emPCRDilution> libs = new ArrayList<emPCRDilution>();
-    for (Dilution l : requestManager.listAllDilutionsByPlatform(PlatformType.LS454)) {
+    for (Dilution l : requestManager.listAllEmPcrDilutionsByPlatform(PlatformType.LS454)) {
       if (!pool.getDilutions().contains(l)) {
         if (l.userCanRead(user)) {
           libs.add((emPCRDilution) l);
@@ -143,7 +143,7 @@ public class EditLS454PoolController {
         model.put("title", "New 454 Pool");
       }
       else {
-        pool = requestManager.getLS454PoolById(poolId);
+        pool = requestManager.getPoolById(poolId);
         model.put("title", "454 Pool " + poolId);
       }
 
@@ -183,7 +183,7 @@ public class EditLS454PoolController {
         model.put("title", "New Ls454 Pool");
       }
       else {
-        pool = requestManager.getLS454PoolById(poolId);
+        pool = requestManager.getPoolById(poolId);
         model.put("title", "Ls454 Pool " + poolId);
       }
 

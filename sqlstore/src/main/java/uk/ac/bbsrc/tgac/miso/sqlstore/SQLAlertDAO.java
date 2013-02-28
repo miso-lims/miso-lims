@@ -29,7 +29,10 @@ import com.googlecode.ehcache.annotations.Cacheable;
 import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
 import com.googlecode.ehcache.annotations.TriggersRemove;
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheException;
 import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,12 +42,15 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.transaction.annotation.Transactional;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.event.Alert;
 import uk.ac.bbsrc.tgac.miso.core.event.impl.DefaultAlert;
 import uk.ac.bbsrc.tgac.miso.core.event.impl.SystemAlert;
 import uk.ac.bbsrc.tgac.miso.core.event.type.AlertLevel;
 import uk.ac.bbsrc.tgac.miso.core.store.AlertStore;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
+import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 import java.io.IOException;
 import java.sql.ResultSet;
@@ -226,26 +232,58 @@ public class SQLAlertDAO implements AlertStore {
     return template.query(UNREAD_ALERTS_BY_LEVEL, new Object[]{alertLevel.getKey()}, new AlertMapper());
   }
 
-  public class AlertMapper implements RowMapper<Alert> {
+  public class AlertMapper extends CacheAwareRowMapper<Alert> {
+    public AlertMapper() {
+      super(Alert.class);
+    }
+
+    public AlertMapper(boolean lazy) {
+      super(Alert.class, lazy);
+    }
+
+    @Override
     public Alert mapRow(ResultSet rs, int rowNum) throws SQLException {
+      long id = rs.getLong("alertId");
       Alert a = null;
+
       try {
-        if (rs.getLong("userId") == LimsUtils.SYSTEM_USER_ID) {
-          a = new SystemAlert();
+        if (isCacheEnabled()) {
+          Element element;
+          if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
+            log.debug("Cache hit on map for Alert " + id);
+            return (Alert)element.getObjectValue();
+          }
         }
-        else {
-          User u = securityManager.getUserById(rs.getLong("userId"));
-          a = new DefaultAlert(u);
+
+
+        try {
+          if (rs.getLong("userId") == LimsUtils.SYSTEM_USER_ID) {
+            a = new SystemAlert();
+          }
+          else {
+            User u = securityManager.getUserById(rs.getLong("userId"));
+            a = new DefaultAlert(u);
+          }
+          a.setAlertId(id);
+          a.setAlertTitle(rs.getString("title"));
+          a.setAlertText(rs.getString("text"));
+          a.setAlertRead(rs.getBoolean("isRead"));
+          a.setAlertLevel(AlertLevel.get(rs.getString("level")));
+          a.setAlertDate(rs.getDate("date"));
         }
-        a.setAlertId(rs.getLong("alertId"));
-        a.setAlertTitle(rs.getString("title"));
-        a.setAlertText(rs.getString("text"));
-        a.setAlertRead(rs.getBoolean("isRead"));
-        a.setAlertLevel(AlertLevel.get(rs.getString("level")));
-        a.setAlertDate(rs.getDate("date"));
+        catch (IOException e1) {
+          e1.printStackTrace();
+        }
+
+        if (isCacheEnabled()) {
+          lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id), a));
+        }
       }
-      catch (IOException e1) {
-        e1.printStackTrace();
+      catch(CacheException ce) {
+        ce.printStackTrace();
+      }
+      catch(UnsupportedOperationException uoe) {
+        uoe.printStackTrace();
       }
       return a;
     }

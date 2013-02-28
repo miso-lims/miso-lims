@@ -23,7 +23,10 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import org.codehaus.jackson.annotate.JsonWriteNullProperties;
+//import com.fasterxml.jackson.annotation.*;
+//import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
@@ -35,9 +38,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
  * @date 10-May-2011
  * @since 0.0.3
  */
-
-@JsonSerialize(typing = JsonSerialize.Typing.STATIC)
-@JsonWriteNullProperties(false)
+@JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
+//@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
+@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
 public interface TagBarcode extends Comparable, Nameable {
   /**
    * Returns the tagId of this TagBarcode object.

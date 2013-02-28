@@ -25,15 +25,23 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:security="http://www.springframework.org/schema/security"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:context="http://www.springframework.org/schema/context"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-                        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+                        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd"
        default-autowire="byName">
 
   <bean id="securityManager" name="securityManager"
         class="com.eaglegenomics.simlims.core.manager.LocalSecurityManager"/>
 
   <security:global-method-security secured-annotations="enabled" jsr250-annotations="enabled"/>
+
+ <!-- don't want to have a SS filter here as the userless REST auth should have taken care of that -->
+  <security:http pattern="/miso/consumer/**" security="none"/>
+  <security:http pattern="/miso/rest/**" security="none"/>
+
+  <security:http pattern="/styles/**" security="none"/><!-- filters="none"/> -->
+  <security:http pattern="/scripts/**" security="none"/><!-- filters="none"/> -->
+  <security:http pattern="/images/**" security="none"/><!-- filters="none"/> -->
+  <security:http pattern="/registerUser" security="none"/><!-- filters="none"/> -->
 
   <security:http access-denied-page="/accessDenied.jsp" use-expressions="true" auto-config="false"
                  entry-point-ref="loginUrlAuthenticationEntryPoint">
@@ -45,11 +53,6 @@
     <security:logout logout-success-url="/loggedOut.jsp"/>
 
     <security:intercept-url pattern="/login.jsp" access="permitAll"/>
-
-    <security:intercept-url pattern="/styles/**" filters="none"/>
-    <security:intercept-url pattern="/scripts/**" filters="none"/>
-    <security:intercept-url pattern="/images/**" filters="none"/>
-    <security:intercept-url pattern="/registerUser" filters="none"/>
 
     <security:intercept-url pattern="/miso/fluxion.ajax"
                             access="hasRole('ROLE_INTERNAL') or hasRole('ROLE_EXTERNAL')"/>
@@ -69,9 +72,6 @@
                             access="hasRole('ROLE_INTERNAL') or hasRole('ROLE_EXTERNAL')"/>
     <security:intercept-url pattern="/miso/mainMenu"
                             access="hasRole('ROLE_INTERNAL') or hasRole('ROLE_EXTERNAL')"/>
-
-    <!-- don't want to have a SS filter here as the userless REST auth should have taken care of that -->
-    <security:intercept-url pattern="/miso/consumer/**" access="isAuthenticated"/> <!-- filters="none"/> -->
 
     <security:intercept-url pattern="/miso/**"
                             access="hasRole('ROLE_INTERNAL') or hasRole('ROLE_EXTERNAL')"/>
@@ -131,6 +131,10 @@
     <property name="rolePrefix" value="${security.jdbc.rolePrefix}"/>
     <property name="enableAuthorities" value="${security.jdbc.enableAuthorities}"/>
     <property name="jdbcTemplate" ref="interfaceTemplate"/>
+  </bean>
+
+  <bean id="restSignatureFilter" class="uk.ac.bbsrc.tgac.miso.webapp.context.RestSignatureFilter">
+    <property name="securityManager" ref="securityManager"/>
   </bean>
 
 </beans>

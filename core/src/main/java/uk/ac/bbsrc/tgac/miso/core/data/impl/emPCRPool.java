@@ -27,6 +27,8 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
+import java.io.Serializable;
+
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.impl
  * <p/>
@@ -35,7 +37,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
  * @author Rob Davey
  * @since 0.1.4
  */
-public class emPCRPool extends PoolImpl<LibraryDilution> {
+public class emPCRPool extends PoolImpl<LibraryDilution> implements Serializable {
   public static final String PREFIX = "EPO";
   private final String units = "nM";
 

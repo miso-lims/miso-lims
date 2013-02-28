@@ -31,6 +31,12 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.support.nativejdbc.CommonsDbcpNativeJdbcExtractor;
 import org.springframework.jndi.JndiObjectFactoryBean;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.context.support.XmlWebApplicationContext;
@@ -42,6 +48,7 @@ import uk.ac.bbsrc.tgac.miso.core.factory.issuetracker.IssueTrackerFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoRequestManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.PrintManager;
+import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoEntityNamingSchemeResolverService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNameGeneratorResolverService;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
@@ -86,6 +93,7 @@ public class MisoAppListener implements ServletContextListener {
    */
   public void contextInitialized(ServletContextEvent event) {
     ServletContext application = event.getServletContext();
+
     XmlWebApplicationContext context = (XmlWebApplicationContext)WebApplicationContextUtils.getRequiredWebApplicationContext(application);
 
     //resolve property file configuration placeholders
@@ -132,9 +140,16 @@ public class MisoAppListener implements ServletContextListener {
           }
         }
 
-        log.info("Replacing default "+classname+"NamingScheme with " + mns.getSchemeName());
-        ((DefaultListableBeanFactory)context.getBeanFactory()).removeBeanDefinition(classname+"NamingScheme");
-        context.getBeanFactory().registerSingleton(classname+"NamingScheme", mns);
+        if ("nameable".equals(classname)) {
+          log.info("Replacing default global namingScheme with " + mns.getSchemeName());
+          ((DefaultListableBeanFactory)context.getBeanFactory()).removeBeanDefinition("namingScheme");
+          context.getBeanFactory().registerSingleton("namingScheme", mns);
+        }
+        else {
+          log.info("Replacing default "+classname+"NamingScheme with " + mns.getSchemeName());
+          ((DefaultListableBeanFactory)context.getBeanFactory()).removeBeanDefinition(classname+"NamingScheme");
+          context.getBeanFactory().registerSingleton(classname+"NamingScheme", mns);
+        }
       }
 
       for (String key : misoProperties.keySet()) {
@@ -199,15 +214,50 @@ public class MisoAppListener implements ServletContextListener {
       PoolAlertManager poam = (PoolAlertManager)context.getBean("poolAlertManager");
       poam.setRequestManager(rm);
       poam.setSecurityManager(sm);
+    }
 
+    if (misoProperties.containsKey("miso.db.caching.mappers.enabled")) {
+      boolean mapperCachingEnabled = Boolean.parseBoolean(misoProperties.get("miso.db.caching.mappers.enabled"));
+      //TODO do something with this - probably set caching throughout DAOs
+    }
+
+    if ("true".equals(misoProperties.get("miso.db.caching.precache.enabled"))) {
+      log.info("Precaching. This may take a while.");
       try {
-        ram.indexify();
-        pam.indexify();
-        poam.indexify();
+        RequestManager rm = (RequestManager)context.getBean("requestManager");
+
+        User userdetails = new User("precacher", "none", true, true, true, true, AuthorityUtils.createAuthorityList("ROLE_ADMIN,ROLE_INTERNAL"));
+        PreAuthenticatedAuthenticationToken newAuthentication = new PreAuthenticatedAuthenticationToken(userdetails, userdetails.getPassword(), userdetails.getAuthorities());
+        newAuthentication.setAuthenticated(true);
+        newAuthentication.setDetails(userdetails);
+
+        try {
+          SecurityContext sc = SecurityContextHolder.getContextHolderStrategy().getContext();
+          sc.setAuthentication(newAuthentication);
+          SecurityContextHolder.getContextHolderStrategy().setContext(sc);
+        }
+        catch (AuthenticationException a) {
+          a.printStackTrace();
+        }
+
+        log.info("\\_ projects...");
+        log.info("" + rm.listAllProjects().size());
+        log.info("\\_ samples...");
+        log.info("" + rm.listAllSamples().size());
+        log.info("\\_ libraries...");
+        log.info("" + rm.listAllLibraries().size());
+        log.info("\\_ dilutions...");
+        log.info("" + rm.listAllLibraryDilutions().size());
+        log.info("" + rm.listAllEmPcrDilutions().size());
+        log.info("\\_ pools...");
+        log.info("" + rm.listAllPools().size());
+        log.info("\\_ plates...");
+        log.info("" + rm.listAllPlates().size());
+        log.info("\\_ runs...");
+        log.info("" + rm.listAllRuns().size());
       }
       catch (IOException e) {
         e.printStackTrace();
-        log.error("Unable to set up alerting system: " + e.getMessage());
       }
     }
 

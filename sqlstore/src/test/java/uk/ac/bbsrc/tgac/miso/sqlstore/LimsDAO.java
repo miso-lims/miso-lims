@@ -112,9 +112,10 @@ public class LimsDAO extends LimsDAOTestCase {
       int lc = getDataSet().getTable("LibraryDilution").getRowCount();
 
       int expected = ec + lc;
-      int actual = getDilutionDAO().count();
-      TestCase.assertEquals("Wrong number of dilutions", expected, actual);
-      System.out.println("Expected number of dilutions: " + expected + ", actual: " + actual);
+      int actualL = getEmPCRDilutionDAO().count();
+      int actualE = getLibraryDilutionDAO().count();
+      TestCase.assertEquals("Wrong number of dilutions", expected, (actualL + actualE));
+      System.out.println("Expected number of dilutions: " + expected + ", actual: " + (actualL + actualE));
 
 //      for (Dilution d : random(getDilutionDAO(), actual, 5)) {
 //        TestCase.assertNotNull(d);

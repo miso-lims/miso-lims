@@ -23,6 +23,9 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+//import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonIgnore;
+
 /**
  * This interface simply describes an object that can be barcoded to denote its identity,
  * i.e. have an identification String that represents a scannable barcode. For physical
@@ -38,6 +41,7 @@ public interface Barcodable extends Nameable {
    *
    * @return String labelText.
    */
+  @JsonIgnore
   public String getLabelText();
 
   /**

@@ -68,7 +68,7 @@
                 <td>${ipool.identificationBarcode}</td>
                 <td>${ipool.creationDate}</td>
                 <td class="misoicon"
-                    onclick="window.location.href='<c:url value="/miso/pool/illumina/${ipool.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
+                    onclick="window.location.href='<c:url value="/miso/pool/${ipool.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
             </tr>
         </c:forEach>
         </tbody>
@@ -96,7 +96,7 @@
                   <td>${ipool.identificationBarcode}</td>
                   <td>${ipool.creationDate}</td>
                   <td class="misoicon"
-                      onclick="window.location.href='<c:url value="/miso/pool/illumina/${ipool.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
+                      onclick="window.location.href='<c:url value="/miso/pool/${ipool.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
               </tr>
           </c:forEach>
           </tbody>
@@ -153,7 +153,7 @@
                 <td>${lpool.identificationBarcode}</td>
                 <td>${lpool.creationDate}</td>
                 <td class="misoicon"
-                    onclick="window.location.href='<c:url value="/miso/pool/ls454/${lpool.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
+                    onclick="window.location.href='<c:url value="/miso/pool/${lpool.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
             </tr>
         </c:forEach>
         </tbody>
@@ -181,7 +181,7 @@
                   <td>${lpool.identificationBarcode}</td>
                   <td>${lpool.creationDate}</td>
                   <td class="misoicon"
-                      onclick="window.location.href='<c:url value="/miso/pool/ls454/${lpool.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
+                      onclick="window.location.href='<c:url value="/miso/pool/${lpool.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
               </tr>
           </c:forEach>
           </tbody>
@@ -237,7 +237,7 @@
                 <td>${spool.identificationBarcode}</td>
                 <td>${spool.creationDate}</td>
                 <td class="misoicon"
-                    onclick="window.location.href='<c:url value="/miso/pool/solid/${spool.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
+                    onclick="window.location.href='<c:url value="/miso/pool/${spool.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
             </tr>
 
         </c:forEach>
@@ -266,7 +266,7 @@
                   <td>${spool.identificationBarcode}</td>
                   <td>${spool.creationDate}</td>
                   <td class="misoicon"
-                      onclick="window.location.href='<c:url value="/miso/pool/solid/${spool.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
+                      onclick="window.location.href='<c:url value="/miso/pool/${spool.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
               </tr>
           </c:forEach>
           </tbody>

@@ -34,6 +34,7 @@ import javax.persistence.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import java.io.Serializable;
 
 /**
  * Concrete implementation of an Experiment
@@ -42,7 +43,7 @@ import javax.xml.parsers.ParserConfigurationException;
  * @since 0.0.2
  */
 @Entity
-public class ExperimentImpl extends AbstractExperiment {
+public class ExperimentImpl extends AbstractExperiment implements Serializable {
   /**
    * Construct a new Experiment with a default empty SecurityProfile
    */

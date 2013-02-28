@@ -26,7 +26,7 @@
 <center>
     <h2>New User Registration</h2>
     <br/>
-    <form:form method="POST" commandName="user" autocomplete="off">
+    <form:form action="/miso/registerUser" method="POST" commandName="user" autocomplete="off">
         <table>
             <tr>
                 <td>Login name:</td>

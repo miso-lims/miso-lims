@@ -25,11 +25,11 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
-import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Plate;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 
 /**
@@ -40,9 +40,13 @@ import java.util.LinkedList;
  * @author Rob Davey
  * @since 0.1.4
  */
-public class PlatePool extends PoolImpl<Plate<LinkedList<Library>, Library>> {
-  public static final String PREFIX = "WPO";
+public class PlatePool extends PoolImpl<Plate<LinkedList<Library>, Library>> implements Serializable {
+  public static final String PREFIX = "UPO";
   private final String units = "nM";
+
+  public PlatePool() {
+    setSecurityProfile(new SecurityProfile());
+  }
 
   public PlatePool(PlatformType platformType) {
     setSecurityProfile(new SecurityProfile());

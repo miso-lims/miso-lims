@@ -23,7 +23,7 @@
 <%@ include file="../header.jsp" %>
 <div id="maincontent">
 <div id="contentcolumn">
-<form:form method="POST" commandName="kitDescriptor" autocomplete="off" >
+<form:form action="/miso/kitdescriptor" method="POST" commandName="kitDescriptor" autocomplete="off" >
 
   <sessionConversation:insertSessionConversationId attributeName="kitDescriptor"/>
 

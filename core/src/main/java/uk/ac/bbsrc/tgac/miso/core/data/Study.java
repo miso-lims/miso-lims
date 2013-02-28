@@ -23,8 +23,12 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+//import com.fasterxml.jackson.annotation.*;
+//import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonWriteNullProperties;
+import org.codehaus.jackson.annotate.JsonManagedReference;
+import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import org.w3c.dom.Document;
@@ -38,8 +42,9 @@ import java.util.Collection;
  * @author Rob Davey
  * @since 0.0.2
  */
-@JsonSerialize(typing = JsonSerialize.Typing.STATIC)
-@JsonWriteNullProperties(false)
+@JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
+//@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
+@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
 @JsonIgnoreProperties({"securityProfile"})
 public interface Study extends SecurableByProfile, Submittable<Document>, Comparable, Deletable, Nameable {
 
@@ -69,6 +74,7 @@ public interface Study extends SecurableByProfile, Submittable<Document>, Compar
    *
    * @return Project project.
    */
+  @JsonBackReference(value="project")
   public Project getProject();
 
   /**
@@ -169,6 +175,7 @@ public interface Study extends SecurableByProfile, Submittable<Document>, Compar
    *
    * @return Collection<Experiment> experiments.
    */
+  //@JsonManagedReference(value="experiments")
   public Collection<Experiment> getExperiments();
   
   /**

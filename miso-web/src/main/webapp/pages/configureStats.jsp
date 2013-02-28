@@ -28,12 +28,10 @@
   Time: 16:13:02
   
 --%>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-
 <%@ include file="../header.jsp" %>
 
 <div id="contentcolumn">
-<form:form method="POST" commandName="machineReferences" autocomplete="off">
-    
+<form:form  method="POST" commandName="machineReferences" autocomplete="off">
+
 </form:form>
 </div>

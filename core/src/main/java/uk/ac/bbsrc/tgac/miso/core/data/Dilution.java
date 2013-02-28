@@ -23,9 +23,11 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import net.sourceforge.fluxion.spi.ServiceProvider;
+//import com.fasterxml.jackson.annotation.*;
+//import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonWriteNullProperties;
+import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import java.util.Date;
@@ -38,11 +40,13 @@ import java.util.Date;
  * @author Rob Davey
  * @since 0.0.2
  */
-@JsonSerialize(typing = JsonSerialize.Typing.STATIC)
-@JsonWriteNullProperties(false)
-@JsonIgnoreProperties({"securityProfile","library"})
+@JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
+//@JsonInclude(JsonInclude.Include.NON_NULL)
+//@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
+@JsonTypeInfo(use= JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
+@JsonIgnoreProperties({"securityProfile","internalPoolableElements"})
 @PrintableBarcode
-public interface Dilution extends SecurableByProfile, Barcodable, Comparable, Deletable, Poolable {
+public interface Dilution extends SecurableByProfile, Barcodable, Comparable, Deletable, Poolable<Dilution, Dilution>, Plateable {
 
   /**
    * Gets the current dilutionId
@@ -60,13 +64,6 @@ public interface Dilution extends SecurableByProfile, Barcodable, Comparable, De
    */
   @Deprecated
   public void setDilutionId(Long dilutionId);
-
-  /**
-   * Returns the name of this Dilution object.
-   *
-   * @return String name.
-   */
-  public String getName();
 
   /**
    * Method setName sets the name of this Dilution object.
@@ -125,5 +122,6 @@ public interface Dilution extends SecurableByProfile, Barcodable, Comparable, De
    *
    * @return Library library.
    */
+  @JsonBackReference(value="library")
   public Library getLibrary();
 }

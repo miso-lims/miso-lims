@@ -33,6 +33,7 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 /**
  * Created by IntelliJ IDEA.
@@ -61,5 +62,15 @@ public class FakeFilepathGenerator implements FilePathGenerator{
       dataFiles.add(datafile);
     }
     return dataFiles;
+  }
+
+  @Override
+  public String getName() {
+    return "Fake File Path Generator";
+  }
+
+  @Override
+  public PlatformType generatesFilePathsFor() {
+    return null;
   }
 }

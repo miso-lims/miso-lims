@@ -25,32 +25,31 @@ package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
-import com.opensymphony.util.FileUtils;
+//import com.fasterxml.jackson.core.type.TypeReference;
+//import com.fasterxml.jackson.databind.ObjectMapper;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.type.TypeReference;
 import org.krysalis.barcode4j.BarcodeDimension;
 import org.krysalis.barcode4j.BarcodeGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-import uk.ac.bbsrc.tgac.miso.core.data.Plate;
-import uk.ac.bbsrc.tgac.miso.core.data.PrintJob;
-import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.*;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatePool;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlateMaterialType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoPrintException;
 import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeFactory;
-import uk.ac.bbsrc.tgac.miso.core.factory.barcode.MisoJscriptFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.PrintManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
+import uk.ac.bbsrc.tgac.miso.core.util.FormUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 import javax.imageio.ImageIO;
@@ -58,6 +57,7 @@ import javax.servlet.http.HttpSession;
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.util.*;
 
 /**
@@ -86,7 +86,8 @@ public class PlateControllerHelperService {
     Long plateId = json.getLong("plateId");
     File temploc = new File(session.getServletContext().getRealPath("/")+"temp/");
     try {
-      Plate plate = requestManager.getPlateById(plateId);
+      //Plate<LinkedList<Plateable>, Plateable> plate = requestManager.<LinkedList<Plateable>, Plateable> getPlateById(plateId);
+      Plate<? extends List<? extends Plateable>, ? extends Plateable> plate = requestManager.getPlateById(plateId);
       barcodeFactory.setPointPixels(1.5f);
       barcodeFactory.setBitmapResolution(600);
       RenderedImage bi = null;
@@ -151,7 +152,8 @@ public class PlateControllerHelperService {
       for (JSONObject s : (Iterable<JSONObject>) ss) {
         try {
           Long plateId = s.getLong("plateId");
-          Plate plate = requestManager.getPlateById(plateId);
+          //Plate<LinkedList<Plateable>, Plateable>  plate = requestManager.<LinkedList<Plateable>, Plateable> getPlateById(plateId);
+          Plate<? extends List<? extends Plateable>, ? extends Plateable>  plate = requestManager.getPlateById(plateId);
           //autosave the barcode if none has been previously generated
           if (plate.getIdentificationBarcode() == null || "".equals(plate.getIdentificationBarcode())) {
             requestManager.savePlate(plate);
@@ -185,7 +187,8 @@ public class PlateControllerHelperService {
       String newLocation = LimsUtils.lookupLocation(locationBarcode);
       if (newLocation != null) {
         User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-        Plate plate = requestManager.getPlateById(plateId);
+        //Plate<LinkedList<Plateable>, Plateable> plate = requestManager.<LinkedList<Plateable>, Plateable> getPlateById(plateId);
+        Plate<? extends List<? extends Plateable>, ? extends Plateable> plate = requestManager.getPlateById(plateId);
         plate.setLocationBarcode(locationBarcode);
         /*
         Note note = new Note();
@@ -210,13 +213,13 @@ public class PlateControllerHelperService {
     return JSONUtils.SimpleJSONResponse("Plate saved successfully");
   }
 
-  public JSONObject getBarcodesForMaterialType(HttpSession session, JSONObject json) {
+  public JSONObject getTagBarcodesForMaterialType(HttpSession session, JSONObject json) {
     Map<String, Object> responseMap = new HashMap<String, Object>();
     if (json.has("materialType") && !"".equals(json.getString("materialType"))) {
       String materialType = json.getString("materialType");
       StringBuilder srb = new StringBuilder();
       srb.append("<select name='tagBarcode' id='tagBarcodes'>");
-      srb.append("<option value='0' selected='selected'>Please select...</option>");
+      srb.append("<option value='0' selected='selected'>No barcode</option>");
 //      for (TagBarcode tb : requestManager.listPlateBarcodesByMaterialType(PlateMaterialType.get(materialType))) {
 //        srb.append("<option value='" + tb.getTagBarcodeId() + "'>" + tb.getName() + " ("+ tb.getSequence()+")</option>");
 //      }
@@ -228,6 +231,201 @@ public class PlateControllerHelperService {
       return JSONUtils.SimpleJSONError("Unrecognised MaterialType");
     }
     return JSONUtils.JSONObjectResponse(responseMap);
+  }
+
+  public JSONObject downloadPlateInputForm(HttpSession session, JSONObject json) {
+    if (json.has("documentFormat")) {
+      String documentFormat = json.getString("documentFormat");
+      try {
+        File f = misoFileManager.getNewFile(
+                Plate.class,
+                "forms",
+                "PlateInputForm-" + LimsUtils.getCurrentDateAsString() + "." + documentFormat);
+        FormUtils.createPlateInputSpreadsheet(f);
+        return JSONUtils.SimpleJSONResponse("" + f.getName().hashCode());
+      }
+      catch (Exception e) {
+        e.printStackTrace();
+        return JSONUtils.SimpleJSONError("Failed to get plate input form: " + e.getMessage());
+      }
+    }
+    else {
+      return JSONUtils.SimpleJSONError("Missing project ID or document format supplied.");
+    }
+  }
+
+  public JSONObject saveImportedElements(HttpSession session, JSONObject json) {
+    if (json.has("elements")) {
+      Plate currentPlate = null;
+      Pool currentPool = null;
+
+      try {
+        String description = json.getString("description");
+        String creationDate = json.getString("creationDate");
+        String plateMaterialType = null;
+        if (json.has("plateMaterialType") && !json.getString("plateMaterialType").equals("")) {
+          plateMaterialType = json.getString("plateMaterialType");
+        }
+
+        JSONObject elements = json.getJSONObject("elements");
+        JSONArray pools = JSONArray.fromObject(elements.get("pools"));
+        JSONArray savedPlates = new JSONArray();
+        ObjectMapper mapper = new ObjectMapper();
+
+        for (JSONArray innerPoolList : (Iterable<JSONArray>) pools) {
+          for (JSONObject pool : (Iterable<JSONObject>) innerPoolList) {
+            log.info(pool.toString());
+
+            PlatePool platePool = mapper.readValue(pool.toString(), new TypeReference<PlatePool>() {});
+            currentPool = platePool;
+
+            for (Plate<LinkedList<Library>, Library> plate : platePool.getPoolableElements()) {
+              JSONObject j = new JSONObject();
+
+//              if (json.has("tagBarcode")) {
+//                String tagBarcode = json.getString("tagBarcode");
+//                plate.setTagBarcode(requestManager.listAllTagBarcodesByStrategyName());
+//              }
+
+              if (plate.getDescription() == null) {
+                plate.setDescription(description);
+              }
+
+              if (plate.getCreationDate() == null) {
+                //plate.setCreationDate(DateFormat.getInstance().parse(creationDate));
+              }
+
+              if (plate.getPlateMaterialType() == null && plateMaterialType != null) {
+                plate.setPlateMaterialType(PlateMaterialType.valueOf(plateMaterialType));
+              }
+              log.info("Saving plate: " + plate.toString());
+              currentPlate = plate;
+              long plateId = requestManager.savePlate(plate);
+              j.put("plateId", plateId);
+              savedPlates.add(j);
+              currentPlate = null;
+            }
+
+            log.info("Saving pool: " + pool.toString());
+            requestManager.savePool(platePool);
+            currentPool = null;
+          }
+        }
+        JSONObject resp = new JSONObject();
+        resp.put("plates", savedPlates);
+        return resp;
+      }
+      catch (IOException e) {
+        if (currentPool != null) {
+          log.error("Error saving pool elements on new plate save. Deleting pool " + currentPool.toString());
+          //clear out child elements to make sure plate meets delete requirements
+          currentPool.getPoolableElements().clear();
+          try {
+            requestManager.deletePool(currentPool);
+          }
+          catch (IOException e1) {
+            log.error("Cannot delete pool. Nothing left to do.");
+            e1.printStackTrace();
+          }
+        }
+
+        if (currentPlate != null) {
+          log.error("Error saving plate elements on new plate save. Deleting plate " + currentPlate.toString());
+          //clear out child elements to make sure plate meets delete requirements
+          currentPlate.getElements().clear();
+          try {
+            requestManager.deletePlate(currentPlate);
+          }
+          catch (IOException e1) {
+            log.error("Cannot delete plate. Nothing left to do.");
+            e1.printStackTrace();
+          }
+        }
+
+        log.error("Caused by...");
+        e.printStackTrace();
+        return JSONUtils.SimpleJSONError("Cannot save imported plate: " + e.getMessage());
+      }
+    }
+    else {
+      return JSONUtils.SimpleJSONError("No valid plates available to save");
+    }
+  }
+
+  public JSONObject plateElementsDataTable(HttpSession session, JSONObject json) {
+    if (json.has("plateId")) {
+      try {
+        JSONObject j = new JSONObject();
+        JSONArray jsonArray = new JSONArray();
+        long plateId = json.getLong("plateId");
+
+        Plate<? extends List<? extends Plateable>, ? extends Plateable> plate = requestManager.getPlateById(plateId);
+        if (plate != null) {
+          for (Plateable p : plate.getElements()) {
+            if (p instanceof Library) {
+              Library l = (Library)p;
+              String strategyName = "No barcode";
+
+              StringBuilder seqbuilder = new StringBuilder();
+              if (!l.getTagBarcodes().isEmpty()) {
+                int count = 1;
+                Collection<TagBarcode> barcodes = l.getTagBarcodes().values();
+                for (TagBarcode tb : barcodes) {
+                  strategyName = tb.getStrategyName();
+                  seqbuilder.append(tb.getSequence());
+                  if (l.getTagBarcodes().values().size() > 1 && count < l.getTagBarcodes().values().size()) {
+                    seqbuilder.append("-");
+                  }
+                  count++;
+                }
+              }
+              else {
+                log.info("No tag barcodes!");
+              }
+
+              jsonArray.add("['" +
+                l.getName() + "','" +
+                l.getAlias() + "','" +
+                strategyName + "','" +
+                seqbuilder.toString() + "','" +
+                "<a href=\"/miso/library/" + l.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
+            }
+          }
+        }
+        j.put("elementsArray", jsonArray);
+        return j;
+      }
+      catch (IOException e) {
+        log.debug("Failed", e);
+        return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
+      }
+    }
+    else {
+      return JSONUtils.SimpleJSONError("No plates to show");
+    }
+  }
+
+  public JSONObject deletePlate(HttpSession session, JSONObject json) {
+    try {
+      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+      if (user.isAdmin()) {
+        if (json.has("plateId")) {
+          Long plateId = json.getLong("plateId");
+          requestManager.deletePlate(requestManager.getPlateById(plateId));
+          return JSONUtils.SimpleJSONResponse("Plate deleted");
+        }
+        else {
+          return JSONUtils.SimpleJSONError("No plate specified to delete.");
+        }
+      }
+      else {
+        return JSONUtils.SimpleJSONError("Only admins can delete objects.");
+      }
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+      return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
+    }
   }
 
   public void setSecurityManager(SecurityManager securityManager) {

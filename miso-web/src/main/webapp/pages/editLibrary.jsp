@@ -35,11 +35,12 @@
 <div id="maincontent">
 <div id="contentcolumn">
 <c:if test="${library.id == 0}">
-<script src="<c:url value='/scripts/jquery/datatables/jquery.dataTables.min.js'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.mini.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.datepicker.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.checkbox.js'/>" type="text/javascript"></script>
-<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/datatable.css'/>" type="text/css">
+<script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.radio.js'/>" type="text/javascript"></script>
+<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" type="text/css">
 
 <div id="tabs">
 <ul>
@@ -50,7 +51,7 @@
 <div id="tab-1">
 </c:if>
 
-<form:form method="POST" commandName="library" autocomplete="off" acceptCharset="utf-8">
+<form:form  action="/miso/library" method="POST" commandName="library" autocomplete="off" acceptCharset="utf-8">
 <sessionConversation:insertSessionConversationId attributeName="library"/>
 <h1>
     <c:choose>
@@ -206,7 +207,18 @@
 </tr>
 <tr>
     <td>Description:</td>
-    <td><form:input path="description" class="validateable"/><span id="descriptioncounter" class="counter"></span></td>
+    <td>
+
+        <c:choose>
+            <c:when test='${not empty library.sample}'>
+                <form:input path="description" value="${library.sample.description}" class="validateable"/>
+            </c:when>
+            <c:otherwise>
+                <form:input path="description" class="validateable"/>
+            </c:otherwise>
+        </c:choose>
+
+      <span id="descriptioncounter" class="counter"></span></td>
         <%-- <td><a href="void(0);" onclick="popup('help/libraryDescription.html');">Help</a></td> --%>
 </tr>
 <tr>
@@ -336,11 +348,14 @@
 </tr>
 
 <tr bgcolor="yellow">
-    <td>QC Passed:</td>
-    <td>
-        <form:checkbox path="qcPassed"/>
-    </td>
+  <td>QC Passed:</td>
+  <td>
+    <form:radiobutton path="qcPassed" value="" label="Unknown"/>
+    <form:radiobutton path="qcPassed" value="true" label="True"/>
+    <form:radiobutton path="qcPassed" value="false" label="False"/>
+  </td>
 </tr>
+
 <c:choose>
     <c:when test="${!empty library.sample and library.securityProfile.profileId eq library.sample.project.securityProfile.profileId}">
         <tr>
@@ -498,14 +513,10 @@
             headers: {
             }
         });
-    });
-    jQuery(document).ready(function() {
-        writeTotalNo();
-    });
-    function writeTotalNo() {
+
         jQuery('#qcsTotalCount').html(jQuery('#libraryQcTable>tbody>tr:visible').length.toString() + " QCs");
         jQuery('#ldsTotalCount').html(jQuery('#libraryDilutionTable>tbody>tr:visible').length.toString() + " Library Dilutions");
-    }
+    });
 </script>
 
 <h1>
@@ -799,7 +810,8 @@
             <th>Strategy <span header="strategyType" class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
                                onclick="DatatableUtils.fillDown('#cinput', this);"></span></th>
             <th>Barcode Kit<span header="barcodeStrategy" class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
-                               onclick="Library.ui.fillDownTagBarcodeStrategySelects('#cinput', this);"></span></th>
+                               onclick="Library.ui.fillDownTagBarcodeStrategySelects('#cinput', this);"></span>
+            </th>
             <th>Tag Barcodes<span header="tagBarcodes" class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
                                onclick="Library.ui.fillDownTagBarcodeSelects('#cinput', this);"></span></th>
             <th>Location Barcode <span header="locationBarcode" class="ui-icon ui-icon-arrowstop-1-s"
@@ -981,7 +993,7 @@ function setEditables(datatable) {
         return value;
     },
     {
-        loadurl : '../../rest/library/librarytypes',
+        loadurl : '../../library/librarytypes',
         loaddata : function (value, settings) {
           DatatableUtils.collapseInputs('#cinput');
           var row = datatable.fnGetPosition(this)[0];
@@ -1056,7 +1068,7 @@ function setEditables(datatable) {
         return value;
     },
     {
-        loadurl : '../../rest/library/barcodeStrategies',
+        loadurl : '../../library/barcodeStrategies',
         loaddata : function (value, settings) {
           DatatableUtils.collapseInputs('#cinput');
           var row = datatable.fnGetPosition(this)[0];
@@ -1087,20 +1099,23 @@ function setEditables(datatable) {
            'url':ajaxurl
           },
           {'doOnSuccess':function(json) {
-            jQuery(nTr.cells[cell+1]).html("");
+            var randomId = makeid();
+            jQuery(nTr.cells[cell+1]).html("<div id='"+randomId+"'></div>");
             for (var i = 0; i < json.numApplicableBarcodes; i++) {
-              jQuery(nTr.cells[cell+1]).append("<span class='tagBarcodeSelectDiv' position='"+(i+1)+"' id='tagbarcodes"+(i+1)+"'>- <i>Select...</i></span>");
-              if (json.numApplicableBarcodes > 1 && i == 0) {
-                jQuery(nTr.cells[cell+1]).append("|");
+              //jQuery(nTr.cells[cell+1]).append("<span class='tagBarcodeSelectDiv' position='"+(i+1)+"' id='tagbarcodes"+(i+1)+"'>- <i>Select...</i></span>");
+                jQuery('#'+randomId).append("<span class='tagBarcodeSelectDiv' position='"+(i+1)+"' id='tagbarcodes"+(i+1)+"'>- <i>Select...</i></span>");
+                if (json.numApplicableBarcodes > 1 && i == 0) {
+               // jQuery(nTr.cells[cell+1]).append("|");
+                  jQuery('#'+randomId).append("|");
               }
             }
 
             //bind editable to selects
-            jQuery("#cinput .tagBarcodeSelectDiv").editable(function(value, settings) {
+           jQuery("#cinput .tagBarcodeSelectDiv").editable(function(value, settings) {
                 return value;
             },
             {
-                loadurl : '../../rest/library/barcodesForPosition',
+                loadurl : '../../library/barcodesForPosition',
                 loaddata : function (value, settings) {
                   var ret = {};
                   ret["position"] = jQuery(this).attr("position");
@@ -1158,6 +1173,17 @@ function setEditables(datatable) {
             };
         }
     });
+}
+
+function makeid()
+{
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+    for( var i=0; i < 5; i++ )
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+    return text;
 }
 
 function submitBulkLibraries() {

@@ -24,6 +24,8 @@
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
 import com.eaglegenomics.simlims.core.Note;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +45,8 @@ import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.store.ExperimentStore;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
 import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
+import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
+import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 import javax.persistence.CascadeType;
 import java.io.IOException;
@@ -130,6 +134,13 @@ public class SQLKitDAO implements KitStore {
   private JdbcTemplate template;
   private NoteStore noteDAO;
   private CascadeType cascadeType;
+
+  @Autowired
+  private CacheManager cacheManager;
+
+  public void setCacheManager(CacheManager cacheManager) {
+    this.cacheManager = cacheManager;
+  }
 
   @Autowired
   private DataObjectFactory dataObjectFactory;
@@ -225,50 +236,25 @@ public class SQLKitDAO implements KitStore {
     return kit.getId();
   }
 
-  public class LazyKitMapper implements RowMapper<Kit> {
-    public Kit mapRow(ResultSet rs, int rowNum) throws SQLException {
-      Kit kit = null;
-
-      try {
-        KitDescriptor kd = getKitDescriptorById(rs.getInt("kitDescriptorId"));
-        KitType kitType = kd.getKitType();
-
-        if (kitType.equals(KitType.CLUSTERING)) {
-          kit = new ClusterKit();
-        }
-        else if (kitType.equals(KitType.EMPCR)) {
-          kit = new EmPcrKit();
-        }
-        else if (kitType.equals(KitType.LIBRARY)) {
-          kit = new LibraryKit();
-        }
-        else if (kitType.equals(KitType.MULTIPLEXING)) {
-          kit = new MultiplexingKit();
-        }
-        else if (kitType.equals(KitType.SEQUENCING)) {
-          kit = new SequencingKit();
-        }
-        else {
-          throw new SQLException("Unsupported KitType: "+kitType.getKey());
-        }
-
-        kit.setId(rs.getLong("kitId"));
-        kit.setIdentificationBarcode(rs.getString("identificationBarcode"));
-        kit.setLocationBarcode(rs.getString("locationBarcode"));
-        kit.setLotNumber(rs.getString("lotNumber"));
-        kit.setKitDate(rs.getDate("kitDate"));
-        kit.setKitDescriptor(kd);
-        kit.setNotes(noteDAO.listByKit(rs.getLong("kitId")));
-      }
-      catch (IOException e) {
-        e.printStackTrace();
-      }
-      return kit;
+  public class KitMapper extends CacheAwareRowMapper<Kit> {
+    public KitMapper() {
+      super(Kit.class);
     }
-  }
 
-  public class KitMapper implements RowMapper<Kit> {
+    public KitMapper(boolean lazy) {
+      super(Kit.class, lazy);
+    }
+
     public Kit mapRow(ResultSet rs, int rowNum) throws SQLException {
+      long id = rs.getLong("kitId");
+
+      if (isCacheEnabled()) {
+        Element element;
+        if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
+          log.debug("Cache hit on map for Kit " + id);
+          return (Kit)element.getObjectValue();
+        }
+      }
       Kit kit = null;
 
       try {
@@ -294,7 +280,7 @@ public class SQLKitDAO implements KitStore {
           throw new SQLException("Unsupported KitType: "+kitType.getKey());
         }
 
-        kit.setId(rs.getLong("kitId"));
+        kit.setId(id);
         kit.setIdentificationBarcode(rs.getString("identificationBarcode"));
         kit.setLocationBarcode(rs.getString("locationBarcode"));
         kit.setLotNumber(rs.getString("lotNumber"));
@@ -332,7 +318,7 @@ public class SQLKitDAO implements KitStore {
   }
   
   public long saveKitDescriptor(KitDescriptor kd) throws IOException {
-    log.info("Saving " + kd.toString() + " : " + kd.getKitType() + " : " + kd.getPlatformType());
+    //log.info("Saving " + kd.toString() + " : " + kd.getKitType() + " : " + kd.getPlatformType());
     MapSqlParameterSource params = new MapSqlParameterSource();
 
     params.addValue("name", kd.getName())
@@ -371,11 +357,11 @@ public class SQLKitDAO implements KitStore {
       
       kd.setKitType(KitType.get(rs.getString("kitType")));
 
-      log.info("Set kit type for descriptor " + kd.getKitDescriptorId() + " to " + kd.getKitType());
+      //log.info("Set kit type for descriptor " + kd.getKitDescriptorId() + " to " + kd.getKitType());
 
       kd.setPlatformType(PlatformType.get(rs.getString("platformType")));
       
-      log.info("Set platform type for descriptor " + kd.getKitDescriptorId() + " to " + kd.getPlatformType());
+      //log.info("Set platform type for descriptor " + kd.getKitDescriptorId() + " to " + kd.getPlatformType());
       return kd;
     }
   }

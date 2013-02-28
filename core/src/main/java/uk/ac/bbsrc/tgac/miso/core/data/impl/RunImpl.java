@@ -32,6 +32,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.*;
 
 import javax.persistence.CascadeType;
 import javax.persistence.OneToMany;
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 
@@ -43,7 +44,7 @@ import java.util.List;
  * @author Rob Davey
  * @since 0.1.0
  */
-public class RunImpl extends AbstractRun {
+public class RunImpl extends AbstractRun implements Serializable {
   protected static final Logger log = LoggerFactory.getLogger(RunImpl.class);
 
   @OneToMany(cascade = CascadeType.ALL)

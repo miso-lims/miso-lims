@@ -26,6 +26,7 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 
+import java.io.Serializable;
 import java.net.InetAddress;
 
 /**
@@ -34,7 +35,7 @@ import java.net.InetAddress;
  * @author Rob Davey
  * @since 0.0.2
  */
-public class SequencerReferenceImpl extends AbstractSequencerReference {
+public class SequencerReferenceImpl extends AbstractSequencerReference implements Serializable {
   /**
    * Constructor SequencerReferenceImpl creates a new SequencerReference instance
    *

@@ -28,6 +28,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.AbstractRunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunException;
 
+import java.io.Serializable;
+
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.impl
  * <p/>
@@ -36,7 +38,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunException;
  * @author Rob Davey
  * @since 0.0.3
  */
-public class RunQCImpl extends AbstractRunQC {
+public class RunQCImpl extends AbstractRunQC implements Serializable {
   /**
    * Construct a new RunQCImpl
    */

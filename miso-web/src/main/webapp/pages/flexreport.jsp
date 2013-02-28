@@ -35,6 +35,7 @@
 <div id="tabs">
 <ul>
     <li><a href="#tabProjects"><span>Projects Report</span></a></li>
+    <li><a href="#tabProjectRunLane"><span>Project - Run - Lane Report</span></a></li>
     <li><a href="#tabSamples"><span>Samples Report</span></a></li>
     <li><a href="#tabLibraries"><span>Libraries Report</span></a></li>
     <li><a href="#tabRuns"><span>Runs Report</span></a></li>
@@ -100,13 +101,72 @@
             <td valign="top" width="50%" id="projectOverviewCell" class="ui-widget ui-widget-content  ui-corner-all">
             </td>
             <td align="center" width="50%">
-                <div id="projectStatusChart" class="ui-widget ui-widget-content  ui-corner-all"></div>
+                <div id="projectStatusChartWrapper">
+                    <div id="projectStatusChart" class="ui-widget ui-widget-content  ui-corner-all"></div>
+                </div>
             </td>
         </tr>
     </table>
     <br/>
 
     <div id="projectsFlexReport" class="ui-widget ui-widget-content  ui-corner-all"></div>
+
+
+</div>
+
+<div id="tabProjectRunLane">
+
+    <h1>
+        <div id="tabProjectRunLane_title">Project - Run - Lane Report</div>
+    </h1>
+
+    <fieldset>
+        <legend> Filter Projects</legend>
+        <table border="0">
+            <tr>
+                <td><b>Project</b> Name, Alias, Description Contains:</td>
+                <td><input type="text" id="projectRunLaneReportSearchInput" size="20"/></td>
+            </tr>
+            <tr>
+                <td><b>Run</b> Completed From :</td>
+                <td>
+                    <input id="projectRunLanefrom" name="from" type="text" value=""/>
+                    <script type="text/javascript">
+                        Utils.ui.addDatePicker("projectRunLanefrom");
+                    </script>
+                    To :
+                    <input id="projectRunLaneto" name="to" type="text" value=""/>
+                    <script type="text/javascript">
+                        Utils.ui.addDatePicker("projectRunLaneto");
+                    </script>
+                </td>
+            </tr>
+
+            <%--<button class="fg-button ui-state-default ui-corner-all"--%>
+                    <%--id="generateProjectRunLaneFlexReportButton"--%>
+                    <%--onclick="Reports.generateProjectRunLaneFlexReport();">--%>
+                <%--Generate Report--%>
+            <%--</button>--%>
+            <button class="fg-button ui-state-default ui-corner-all" id="searchProjectRunLane"
+                    onclick="Reports.search.searchProjectRunLane();">
+                Search
+            </button>
+        </table>
+    </fieldset>
+
+    <form name="generateProjectsFlexReportForm" id="generateProjectRunLaneFlexReportForm">
+        <div id="projectRunLaneResultTable">Please search for projects to be reported...</div>
+    </form>
+
+    <br/>
+    <hr/>
+    <div width="100%" class="ui-widget ui-widget-content  ui-corner-all">
+        <div id="projectRunLaneCell">
+        </div>
+    </div>
+    <br/>
+
+    <div id="projectRunLaneFlexFlexReport" class="ui-widget ui-widget-content  ui-corner-all"></div>
 
 
 </div>
@@ -182,7 +242,14 @@
             <td valign="top" width="50%" id="sampleOverviewCell" class="ui-widget ui-widget-content  ui-corner-all">
             </td>
             <td align="center" width="50%">
-                <div id="sampleStatusChart" class="ui-widget ui-widget-content  ui-corner-all"></div>
+                <div class="ui-widget ui-widget-content  ui-corner-all">
+                    <div id="sampleTypesChartWarpper">
+                        <div id="sampleTypesChart"></div>
+                    </div>
+                    <div id="sampleQcChartWarpper">
+                        <div id="sampleQcChart"></div>
+                    </div>
+                </div>
             </td>
         </tr>
     </table>
@@ -262,7 +329,15 @@
             <td valign="top" width="50%" id="libraryOverviewCell" class="ui-widget ui-widget-content  ui-corner-all">
             </td>
             <td align="center" width="50%">
-                <div id="libraryStatusChart" class="ui-widget ui-widget-content  ui-corner-all"></div>
+
+                <div class="ui-widget ui-widget-content  ui-corner-all">
+                    <div id="libraryPlatformChartWarpper">
+                        <div id="libraryPlatformChart"></div>
+                    </div>
+                    <div id="libraryQcChartWarpper">
+                        <div id="libraryQcChart"></div>
+                    </div>
+                </div>
             </td>
         </tr>
     </table>
@@ -335,7 +410,16 @@
             <td valign="top" width="50%" id="runOverviewCell" class="ui-widget ui-widget-content  ui-corner-all">
             </td>
             <td align="center" wiPrevdth="50%">
-                <div id="runStatusChart" class="ui-widget ui-widget-content  ui-corner-all"></div>
+
+                <div class="ui-widget ui-widget-content  ui-corner-all">
+
+                    <div id="runStatusChartWrapper">
+                        <div id="runStatusChart"></div>
+                    </div>
+                    <div id="runPlatformChartWarpper">
+                        <div id="runPlatformChart"></div>
+                    </div>
+                </div>
             </td>
         </tr>
     </table>
@@ -401,7 +485,8 @@
             </tr>
 
         </table>
-         <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#legendlist_arrowclick'), 'legendlist');">Colour Schema
+        <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#legendlist_arrowclick'), 'legendlist');">
+            Colour Schema
             <div id="legendlist_arrowclick" class="toggleLeft"></div>
         </div>
         <div id="legendlist" style="display:none;"></div>
@@ -416,16 +501,16 @@
 </div>
 
 <script type="text/javascript">
-  jQuery("#tabs").tabs();
+    jQuery("#tabs").tabs();
 
-  jQuery(document).ready(function() {
-    Reports.ui.prepareTable();
-    Reports.ui.initProjects();
-    Reports.ui.initSamples();
-    Reports.ui.initLibraries();
-    Reports.ui.initRuns();
-    Reports.ui.getSequencersList();
-  });
+    jQuery(document).ready(function () {
+        Reports.ui.prepareTable();
+        Reports.ui.initProjects();
+        Reports.ui.initSamples();
+        Reports.ui.initLibraries();
+        Reports.ui.initRuns();
+        Reports.ui.getSequencersList();
+    });
 </script>
 
 

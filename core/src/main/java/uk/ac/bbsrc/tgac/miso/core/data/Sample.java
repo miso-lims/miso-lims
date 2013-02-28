@@ -24,10 +24,12 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import com.eaglegenomics.simlims.core.Note;
-import net.sourceforge.fluxion.spi.ServiceProvider;
-import net.sourceforge.fluxion.spi.Spi;
+//import com.fasterxml.jackson.annotation.*;
+//import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonWriteNullProperties;
+import org.codehaus.jackson.annotate.JsonManagedReference;
+import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.w3c.dom.Document;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
@@ -51,10 +53,11 @@ import java.util.Date;
  * @since 0.0.2
  */
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
-@JsonWriteNullProperties(false)
-@JsonIgnoreProperties({"project","securityProfile","submissionDocument"})
+//@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
+@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
+@JsonIgnoreProperties({"securityProfile","submissionDocument"})
 @PrintableBarcode
-public interface Sample extends SecurableByProfile, Submittable<Document>, Barcodable, Locatable, Reportable, Comparable, Deletable {
+public interface Sample extends SecurableByProfile, Submittable<Document>, Barcodable, Locatable, Reportable, Comparable, Deletable, Plateable {
 
   /** Field UNSAVED_ID  */
   public static final Long UNSAVED_ID = 0L;
@@ -161,6 +164,7 @@ public interface Sample extends SecurableByProfile, Submittable<Document>, Barco
    *
    * @return Project project.
    */
+  @JsonBackReference(value="project")
   public Project getProject();
 
   /**
@@ -204,6 +208,7 @@ public interface Sample extends SecurableByProfile, Submittable<Document>, Barco
    *
    * @return Collection<Library> libraries.
    */
+  //@JsonManagedReference
   public Collection<Library> getLibraries();
 
   /**
@@ -261,6 +266,7 @@ public interface Sample extends SecurableByProfile, Submittable<Document>, Barco
    *
    * @return Collection<SampleQC> sampleQCs.
    */
+  //@JsonManagedReference(value="sampleqcs")
   public Collection<SampleQC> getSampleQCs();
 
   /**

@@ -24,10 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,8 +105,9 @@ public class EditPlateController {
   }
 
   @RequestMapping(value = "/rest/{plateId}", method = RequestMethod.GET)
-  public @ResponseBody Plate jsonRest(@PathVariable Long plateId) throws IOException {
-      return requestManager.getPlateById(plateId);
+  public @ResponseBody Plate<? extends List<? extends Plateable>, ? extends Plateable> jsonRest(@PathVariable Long plateId) throws IOException {
+    //return requestManager.<LinkedList<Plateable>, Plateable> getPlateById(plateId);
+    return requestManager.getPlateById(plateId);
   }
 
   @RequestMapping(value = "/{plateId}", method = RequestMethod.GET)
@@ -117,12 +115,13 @@ public class EditPlateController {
                                 ModelMap model) throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Plate plate = null;
+      Plate<? extends List<? extends Plateable>, ? extends Plateable> plate = null;
       if (plateId == AbstractPlate.UNSAVED_ID) {
         plate = dataObjectFactory.getPlateOfSize(96, user);
         model.put("title", "New Plate");
       }
       else {
+        //plate = requestManager.<LinkedList<Plateable>, Plateable> getPlateById(plateId);
         plate = requestManager.getPlateById(plateId);
         model.put("title", "Plate "+plateId);
       }
@@ -155,8 +154,27 @@ public class EditPlateController {
     }
   }
 
+  @RequestMapping(value = "/import", method = RequestMethod.GET)
+  public ModelAndView importPlate(ModelMap model) throws IOException {
+    try {
+      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+      Plate<? extends List<? extends Plateable>, ? extends Plateable> plate = dataObjectFactory.getPlateOfSize(96, user);
+      model.put("title", "Import Plate");
+      model.put("formObj", plate);
+      model.put("plate", plate);
+      model.put("availableTagBarcodes", populateAvailableTagBarcodes());
+      return new ModelAndView("/pages/importPlate.jsp", model);
+    }
+    catch (IOException ex) {
+      if (log.isDebugEnabled()) {
+        log.debug("Failed to show Plate", ex);
+      }
+      throw ex;
+    }
+  }
+
   @RequestMapping(method = RequestMethod.POST)
-  public String processSubmit(@ModelAttribute("plate") Plate plate,
+  public String processSubmit(@ModelAttribute("plate") Plate<LinkedList<Plateable>, Plateable> plate,
                               ModelMap model,
                               SessionStatus session) throws IOException {
     try {

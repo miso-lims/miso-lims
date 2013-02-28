@@ -28,7 +28,7 @@
   <parent>
     <artifactId>miso</artifactId>
     <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-    <version>0.1.8</version>
+    <version>0.1.9-SNAPSHOT</version>
   </parent>
 
   <groupId>${parent.groupId}</groupId>
@@ -88,6 +88,11 @@
       <version>1.4</version>
     </dependency>
     <dependency>
+      <groupId>commons-net</groupId>
+      <artifactId>commons-net</artifactId>
+      <version>2.0</version>
+    </dependency>
+    <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-web</artifactId>
       <version>${spring-version}</version>
@@ -101,7 +106,7 @@
     <dependency>
       <groupId>org.irods.jargon</groupId>
       <artifactId>jargon-core</artifactId>
-      <version>3.1.1</version>
+      <version>3.1.4</version>
     </dependency>
     <dependency>
       <groupId>net.sf.json-lib</groupId>
@@ -112,6 +117,6 @@
   </dependencies>
 
   <properties>
-    <spring-integration-version>2.1.0.RELEASE</spring-integration-version>
+    <spring-integration-version>2.2.0.RELEASE</spring-integration-version>
   </properties>
 </project>

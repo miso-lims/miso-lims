@@ -297,4 +297,50 @@ public class RunStatsManager {
     }
     return laneQuality;
   }
+
+  public JSONObject getPerPositionBaseContentForLane(Run run, int laneNumber) throws RunStatsException {
+    Map<RunProperty, String> map = new HashMap<RunProperty, String>();
+    map.put(RunProperty.run, run.getAlias());
+    map.put(RunProperty.lane, String.valueOf(laneNumber));
+    String pair;
+    if (run.getPairedEnd()) {
+      pair = "1";
+    }
+    else {
+      pair = "2";
+    }
+    map.put(RunProperty.pair, pair);
+
+    JSONObject laneQuality = new JSONObject();
+    Map<String, ReportTable> resultMap = new HashMap<String, ReportTable>();
+    try {
+      resultMap = reportsDecorator.getPerPositionBaseContent(map);
+
+      ArrayList<String> base_content_a = new ArrayList<String>(Arrays.asList(resultMap.get("base_content_a").toCSV().split("\n")));
+      ArrayList<String> base_content_c = new ArrayList<String>(Arrays.asList(resultMap.get("base_content_c").toCSV().split("\n")));
+      ArrayList<String> base_content_g = new ArrayList<String>(Arrays.asList(resultMap.get("base_content_g").toCSV().split("\n")));
+      ArrayList<String> base_content_t = new ArrayList<String>(Arrays.asList(resultMap.get("base_content_t").toCSV().split("\n")));
+
+      if (base_content_a.size() > 1) {
+        JSONArray jsonArray = new JSONArray();
+        for (int index = 1; index < base_content_a.size(); index++) {
+          JSONObject eachBase = new JSONObject();
+          eachBase.put("base", base_content_a.get(index).split(",")[0]);
+          eachBase.put("G", base_content_g.get(index).split(",")[2]);
+          eachBase.put("A", base_content_a.get(index).split(",")[2]);
+          eachBase.put("T", base_content_t.get(index).split(",")[2]);
+          eachBase.put("C", base_content_c.get(index).split(",")[2]);
+          jsonArray.add(eachBase);
+        }
+        laneQuality.put("stats", jsonArray);
+      }
+      else {
+        laneQuality.put("stats", JSONArray.fromObject("[]"));
+      }
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+    }
+    return laneQuality;
+  }
 }

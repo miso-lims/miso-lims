@@ -681,6 +681,10 @@ public class LimsUtils {
     return Character.toUpperCase(s.charAt(0)) + s.substring(1);
   }
 
+  public static String noddyCamelCaseify(String s) {
+    return Character.toLowerCase(s.charAt(0)) + s.substring(1);
+  }
+
   public static List<Class<?>> getAllInterfaces(Class<?> cls) {
     if (cls == null) {
       return null;

@@ -28,10 +28,7 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 import javax.persistence.*;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Skeleton implementation of a Dilution
@@ -53,6 +50,8 @@ public abstract class AbstractDilution implements Dilution, Comparable {
   private Double concentration;
   private String identificationBarcode;
   private String dilutionUserName;
+  private Set<Pool<Dilution>> pools = new HashSet<Pool<Dilution>>();
+  private Set<Plate<LinkedList<Dilution>, Dilution>> plates = new HashSet<Plate<LinkedList<Dilution>, Dilution>>();
 
   @Deprecated
   public Long getDilutionId() {
@@ -118,10 +117,27 @@ public abstract class AbstractDilution implements Dilution, Comparable {
   }
 
   @Override
-  public Collection<? extends Dilution> getInternalPoolableElements() {
+  public Collection<Dilution> getInternalPoolableElements() {
     Set<Dilution> dil = new HashSet<Dilution>();
     dil.add(this);
     return dil;
+  }
+
+  public Set<Pool<Dilution>> getPools() {
+    return pools;
+  }
+
+  @Override
+  public Set<Plate<LinkedList<Dilution>, Dilution>> getPlates() {
+    return plates;
+  }
+
+  public void addPlate(Plate<LinkedList<Dilution>, Dilution> plate) {
+    this.plates.add(plate);
+  }
+
+  public void setPlates(Set<Plate<LinkedList<Dilution>, Dilution>> plates) {
+    this.plates = plates;
   }
 
   public SecurityProfile getSecurityProfile() {

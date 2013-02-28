@@ -32,9 +32,10 @@
   <%--</form>--%>
   <%--</span><br/>--%>
 
-  <h2>Sample Receipt</h2>
+  <h2>Sample Processing</h2>
   <ul class="bullets">
     <li><a href="<c:url value="/miso/sample/receipt"/>">Receive Samples</a></li>
+    <li><a href="<c:url value="/miso/plate/import"/>">Import Plate Sheet</a></li>
   </ul>
 
   <h2>Sequencing</h2>

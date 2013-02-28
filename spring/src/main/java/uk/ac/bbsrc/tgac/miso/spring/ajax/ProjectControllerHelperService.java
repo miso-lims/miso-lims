@@ -24,8 +24,9 @@
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
 import com.eaglegenomics.simlims.core.Note;
-import com.opensymphony.util.FileUtils;
+//import com.fasterxml.jackson.databind.ObjectMapper;
 import net.sf.json.JSONArray;
+import org.codehaus.jackson.map.ObjectMapper;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
@@ -36,11 +37,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.*;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoPrintException;
-import uk.ac.bbsrc.tgac.miso.core.factory.barcode.MisoJscriptFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.PrintManager;
@@ -273,7 +272,7 @@ public class ProjectControllerHelperService {
     try {
       JSONObject j = new JSONObject();
       Long projectId = json.getLong("projectId");
-        j.put("response", checkOverviews(projectId));
+      j.put("response", checkOverviews(projectId));
       return j;
     }
     catch (IOException e) {
@@ -315,8 +314,8 @@ public class ProjectControllerHelperService {
                       project.getDescription() + "','" +
                       project.getProgress().getKey() + "','" +
 //                      checkOverviews(project.getProjectId()) + "','" +
-                      project.getProjectId()  + "','" +
-                      "<a href=\"/miso/project/" + project.getProjectId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
+                      project.getProjectId() + "','" +
+                      "<a href=\"/miso/project/" + project.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
 
       }
       j.put("projectsArray", jsonArray);
@@ -727,9 +726,9 @@ public class ProjectControllerHelperService {
           samples.add(requestManager.getSampleById(j.getLong("sampleId")));
         }
         File f = misoFileManager.getNewFile(
-                Project.class,
-                projectId.toString(),
-                "SampleDeliveryForm-" + LimsUtils.getCurrentDateAsString() + ".odt");
+            Project.class,
+            projectId.toString(),
+            "SampleDeliveryForm-" + LimsUtils.getCurrentDateAsString() + ".odt");
 
         FormUtils.createSampleDeliveryForm(samples, f);
         return JSONUtils.SimpleJSONResponse("" + f.getName().hashCode());
@@ -744,21 +743,103 @@ public class ProjectControllerHelperService {
     }
   }
 
-  public JSONObject downloadBulkInputForm(HttpSession session, JSONObject json) {
+  public JSONObject downloadBulkSampleInputForm(HttpSession session, JSONObject json) {
     if (json.has("projectId") && json.has("documentFormat")) {
       Long projectId = json.getLong("projectId");
       String documentFormat = json.getString("documentFormat");
       try {
         File f = misoFileManager.getNewFile(
-                Project.class,
-                projectId.toString(),
-                "BulkInputForm-" + LimsUtils.getCurrentDateAsString() + "." + documentFormat);
+            Project.class,
+            projectId.toString(),
+            "BulkInputForm-" + LimsUtils.getCurrentDateAsString() + "." + documentFormat);
         FormUtils.createSampleInputSpreadsheet(requestManager.getProjectById(projectId).getSamples(), f);
         return JSONUtils.SimpleJSONResponse("" + f.getName().hashCode());
       }
       catch (Exception e) {
         e.printStackTrace();
         return JSONUtils.SimpleJSONError("Failed to get bulk input form: " + e.getMessage());
+      }
+    }
+    else {
+      return JSONUtils.SimpleJSONError("Missing project ID or document format supplied.");
+    }
+  }
+
+  public JSONObject visualiseBulkSampleInputForm(HttpSession session, JSONObject json) {
+    JSONObject samplelist = (JSONObject) session.getAttribute("bulksamples");
+    JSONArray samples = samplelist.getJSONArray("bulksamples");
+    if (samples != null) {
+      StringBuilder sb = new StringBuilder();
+      sb.append("<div style='width: 100%;'>");
+      ObjectMapper mapper = new ObjectMapper();
+      for (JSONObject sam : (Iterable<JSONObject>) samples) {
+        Sample s = null;
+        try {
+          s = mapper.readValue(sam.toString(), SampleImpl.class);
+          sb.append("<a class=\"dashboardresult\" href=\"/miso/sample/" + s.getId() + "\"><div onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
+          sb.append("Name: <b>" + s.getName() + "</b><br/>");
+          sb.append("Alias: <b>" + s.getAlias() + "</b><br/>");
+
+          Set<Pool> pools = new HashSet<Pool>();
+
+          for (Library l : s.getLibraries()) {
+            if (!l.getLibraryDilutions().isEmpty()) {
+              for (Dilution ld : l.getLibraryDilutions()) {
+                if (!ld.getPools().isEmpty()) {
+                  pools.addAll(ld.getPools());
+                }
+              }
+            }
+          }
+
+          if (!pools.isEmpty()) {
+            sb.append("Pools: <ul>");
+            for (Pool p : pools) {
+              sb.append("<li>")
+                  .append(p.getName())
+                  .append(" (")
+                  .append(p.getAlias())
+                  .append(") - ")
+                  .append(p.getDilutions().size())
+                  .append(" dilutions<li>");
+            }
+            sb.append("</ul><br/>");
+          }
+
+          sb.append("</div></a>");
+        }
+        catch (IOException e) {
+          e.printStackTrace();
+        }
+        finally {
+          sb.append("</div>");
+          session.removeAttribute("bulksamples");
+        }
+      }
+
+      return JSONUtils.SimpleJSONResponse(sb.toString());
+    }
+    else {
+      return JSONUtils.SimpleJSONError("Failed to get bulk input sheet from session.");
+    }
+  }
+
+  public JSONObject downloadPlateInputForm(HttpSession session, JSONObject json) {
+    if (json.has("projectId") && json.has("documentFormat")) {
+      Long projectId = json.getLong("projectId");
+      String documentFormat = json.getString("documentFormat");
+      try {
+        File f = misoFileManager.getNewFile(
+            Project.class,
+            projectId.toString(),
+            "PlateInputForm-" + LimsUtils.getCurrentDateAsString() + "." + documentFormat);
+        //TODO select a single sample to base sheet on?
+        FormUtils.createPlateInputSpreadsheet(f);
+        return JSONUtils.SimpleJSONResponse("" + f.getName().hashCode());
+      }
+      catch (Exception e) {
+        e.printStackTrace();
+        return JSONUtils.SimpleJSONError("Failed to get plate input form: " + e.getMessage());
       }
     }
     else {
@@ -807,5 +888,28 @@ public class ProjectControllerHelperService {
       e.printStackTrace();
     }
     return JSONUtils.SimpleJSONError("Unable to watch/unwatch overview");
+  }
+
+  public JSONObject listWatchOverview(HttpSession session, JSONObject json) {
+    Long overviewId = json.getLong("overviewId");
+    StringBuilder sb = new StringBuilder();
+    JSONObject j = new JSONObject();
+    try {
+      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+      ProjectOverview overview = requestManager.getProjectOverviewById(overviewId);
+      sb.append("<ul class='bullets' style='margin-left: -30px;'>");
+      for (User theUser : overview.getWatchers()) {
+        sb.append("<li>");
+        sb.append(theUser.getFullName());
+        sb.append("</li>");
+      }
+      sb.append("</ul>");
+      j.put("watchers", sb.toString());
+      return j;
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+    }
+    return JSONUtils.SimpleJSONError("Unable to list watchers");
   }
 }

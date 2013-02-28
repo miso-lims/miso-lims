@@ -128,31 +128,22 @@ public class IntegrationUtils {
     }
   }
 
-  public static byte[] compress(byte[] content) {
+  public static byte[] compress(byte[] content) throws IOException {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     Base64OutputStream b64os = new Base64OutputStream(baos);
-    try {
-      GZIPOutputStream gzip = new GZIPOutputStream(b64os);
-      gzip.write(content);
-      gzip.close();
-    } catch(IOException e) {
-      throw new RuntimeException(e);
-    }
-    //System.out.printf("Compression ratio %f\n", (1.0f * content.length/baos.size()));
+    GZIPOutputStream gzip = new GZIPOutputStream(b64os);
+    gzip.write(content);
+    gzip.close();
     return baos.toByteArray();
   }
 
-  public static byte[] decompress(byte[] contentBytes) {
+  public static byte[] decompress(byte[] contentBytes) throws IOException {
     ByteArrayOutputStream out = new ByteArrayOutputStream();
-    try{
-      GZIPInputStream bis = new GZIPInputStream(new Base64InputStream(new ByteArrayInputStream(contentBytes)));
-      byte[] buffer = new byte[1024*4];
-      int n = 0;
-      while (-1 != (n = bis.read(buffer))) {
-        out.write(buffer, 0, n);
-      }
-    } catch(IOException e) {
-        throw new RuntimeException(e);
+    GZIPInputStream bis = new GZIPInputStream(new Base64InputStream(new ByteArrayInputStream(contentBytes)));
+    byte[] buffer = new byte[1024*4];
+    int n = 0;
+    while (-1 != (n = bis.read(buffer))) {
+      out.write(buffer, 0, n);
     }
     return out.toByteArray();
   }

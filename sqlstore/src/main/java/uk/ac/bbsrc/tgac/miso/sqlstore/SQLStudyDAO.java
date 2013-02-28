@@ -48,6 +48,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.transaction.annotation.Transactional;
+import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractStudy;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
@@ -60,6 +61,7 @@ import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.regex.Matcher;
 
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore
@@ -333,11 +335,11 @@ public class SQLStudyDAO implements StudyStore {
       )
   )
   public List<Study> listAll() {
-    return template.query(STUDIES_SELECT, new LazyStudyMapper());
+    return template.query(STUDIES_SELECT, new StudyMapper(true));
   }
 
   public List<Study> listAllWithLimit(long limit) throws IOException {
-    return template.query(STUDIES_SELECT_LIMIT, new Object[]{limit}, new LazyStudyMapper());
+    return template.query(STUDIES_SELECT_LIMIT, new Object[]{limit}, new StudyMapper(true));
   }
 
   @Override
@@ -346,8 +348,8 @@ public class SQLStudyDAO implements StudyStore {
   }
 
   public List<Study> listBySearch(String query) {
-    String mySQLQuery = "%" + query + "%";
-    return template.query(STUDIES_SELECT_BY_SEARCH, new Object[]{mySQLQuery,mySQLQuery,mySQLQuery}, new LazyStudyMapper());
+    String mySQLQuery = "%" + query.replaceAll("_", Matcher.quoteReplacement("\\_")) + "%";
+    return template.query(STUDIES_SELECT_BY_SEARCH, new Object[]{mySQLQuery,mySQLQuery,mySQLQuery}, new StudyMapper(true));
   }
 
   @Transactional(readOnly = false, rollbackFor = IOException.class)
@@ -398,13 +400,13 @@ public class SQLStudyDAO implements StudyStore {
   }
 
   public Study lazyGet(long studyId) throws IOException {
-    List eResults = template.query(STUDY_SELECT_BY_ID, new Object[]{studyId}, new LazyStudyMapper());
+    List eResults = template.query(STUDY_SELECT_BY_ID, new Object[]{studyId}, new StudyMapper(true));
     Study e = eResults.size() > 0 ? (Study) eResults.get(0) : null;
     return e;
   }
 
   public List<Study> listByProjectId(long projectId) throws IOException {
-    return template.query(STUDIES_BY_RELATED_PROJECT, new Object[]{projectId}, new LazyStudyMapper());
+    return template.query(STUDIES_BY_RELATED_PROJECT, new Object[]{projectId}, new StudyMapper(true));
   }
 
   public List<Study> listBySubmissionId(long submissionId) throws IOException {
@@ -425,30 +427,27 @@ public class SQLStudyDAO implements StudyStore {
     return template.queryForList(STUDY_TYPES_SELECT, String.class);
   }
 
-  public class LazyStudyMapper implements RowMapper<Study> {
-    public Study mapRow(ResultSet rs, int rowNum) throws SQLException {
-      Study s = dataObjectFactory.getStudy();
-      s.setId(rs.getLong("studyId"));
-      s.setName(rs.getString("name"));
-      s.setAlias(rs.getString("alias"));
-      s.setAccession(rs.getString("accession"));
-      s.setDescription(rs.getString("description"));
-      s.setStudyType(rs.getString("studyType"));
-      try {
-        s.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
-        s.setProject(projectDAO.lazyGet(rs.getLong("project_projectId")));
-      }
-      catch (IOException e1) {
-        e1.printStackTrace();
-      }
-      return s;
+  public class StudyMapper extends CacheAwareRowMapper<Study> {
+    public StudyMapper() {
+      super(Study.class);
     }
-  }
 
-  public class StudyMapper implements RowMapper<Study> {
+    public StudyMapper(boolean lazy) {
+      super(Study.class, lazy);
+    }
+
     public Study mapRow(ResultSet rs, int rowNum) throws SQLException {
+      long id = rs.getLong("studyId");
+
+      if (isCacheEnabled()) {
+        Element element;
+        if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
+          log.debug("Cache hit on map for Study " + id);
+          return (Study)element.getObjectValue();
+        }
+      }
       Study s = dataObjectFactory.getStudy();
-      s.setId(rs.getLong("studyId"));
+      s.setId(id);
       s.setName(rs.getString("name"));
       s.setAlias(rs.getString("alias"));
       s.setAccession(rs.getString("accession"));
@@ -456,10 +455,16 @@ public class SQLStudyDAO implements StudyStore {
       s.setStudyType(rs.getString("studyType"));
       try {
         s.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
-        s.setProject(projectDAO.get(rs.getLong("project_projectId")));
 
-        for (Experiment e : experimentDAO.listByStudyId(rs.getLong("studyId"))) {
-          s.addExperiment(e);
+        if (!isLazy()) {
+          s.setProject(projectDAO.get(rs.getLong("project_projectId")));
+
+          for (Experiment e : experimentDAO.listByStudyId(id)) {
+            s.addExperiment(e);
+          }
+        }
+        else {
+          s.setProject(projectDAO.lazyGet(rs.getLong("project_projectId")));
         }
       }
       catch (IOException e1) {
@@ -468,6 +473,11 @@ public class SQLStudyDAO implements StudyStore {
       catch (MalformedExperimentException e) {
         e.printStackTrace();
       }
+
+      if (isCacheEnabled()) {
+        lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id) ,s));
+      }
+
       return s;
     }
   }

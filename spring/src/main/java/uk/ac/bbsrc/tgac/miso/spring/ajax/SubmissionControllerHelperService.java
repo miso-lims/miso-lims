@@ -38,15 +38,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubmissionImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.SubmissionActionType;
 import uk.ac.bbsrc.tgac.miso.core.exception.SubmissionException;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.SubmissionManager;
-import uk.ac.bbsrc.tgac.miso.core.service.submission.FilePathGenerator;
-import uk.ac.bbsrc.tgac.miso.core.service.submission.TGACIlluminaFilepathGenerator;
-import uk.ac.bbsrc.tgac.miso.core.service.submission.UploadReport;
-import uk.ac.bbsrc.tgac.miso.core.service.submission.UploadJob;
+import uk.ac.bbsrc.tgac.miso.core.service.submission.*;
 import uk.ac.bbsrc.tgac.miso.core.util.FormUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -77,6 +75,8 @@ public class SubmissionControllerHelperService {
   private SubmissionManager submissionManager;
   @Autowired
   private MisoFilesManager misoFileManager;
+  @Autowired
+  private FilePathGeneratorResolverService filePathGeneratorResolverService;
 
   private DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
@@ -139,7 +139,8 @@ public class SubmissionControllerHelperService {
 
             for (SequencerPoolPartition nextPartition : newPartitions) {
               if (nextPartition.getId() == partitionId) {
-                Dilution dilution = requestManager.getDilutionByIdAndPlatform(dilutionId, nextPartition.getPool().getPlatformType());
+                //Dilution dilution = requestManager.getDilutionByIdAndPlatform(dilutionId, nextPartition.getPool().getPlatformType());
+                Dilution dilution = requestManager.getLibraryDilutionById(dilutionId);
                 Pool pool = nextPartition.getPool();
                 pool.addPoolableElement(dilution);
               }
@@ -467,7 +468,7 @@ public class SubmissionControllerHelperService {
                   if (partitionInvolved) {
                     //If the partition was involved in the project, it is listed
                     sb.append("<li><input type='checkbox' id='" + r.getId() + "_" + partitionContainer.getId() + "_" + part.getPartitionNumber() + "' name='partition' " +
-                              "itemLabel='" + part.getPartitionNumber() + "' itemValue='PAR" + part.getId() + "' value='PAR" + part.getId() + "'");
+                              "itemLabel='" + part.getPartitionNumber() + "' itemValue='PAR" + part.getId() + "' value='PAR" + part.getId() + "' onclick='Submission.ui.togglePartitionContents(this)'");
 
                     if (sub != null) {
                       // checks checkboxes if the partition is in the submission
@@ -479,13 +480,17 @@ public class SubmissionControllerHelperService {
                     sb.append("/>");
                     //adds the Partition info: number, name, experiments etc.
                     sb.append("<b>Partition " + part.getPartitionNumber() + "</b> : " + part.getPool().getName() + " (" + LimsUtils.join(involvedExperiments, ",") + ")");
-                    sb.append("</li>");
 
                     //creates HTML for list of library dilutions and corresponding datafiles.
                     //gets all the dilutions in that partition's pool.
                     Collection<? extends Dilution> libraryDilutions = part.getPool().getDilutions();
 
-                    FilePathGenerator fpg = new TGACIlluminaFilepathGenerator();
+                    FilePathGenerator fpg = filePathGeneratorResolverService.getFilePathGenerator(r.getPlatformType());
+                    if (fpg == null) {
+                      log.warn("No file path generator found for '"+r.getPlatformType().getKey()+"'. Falling back to fake path generator.");
+                      fpg = new FakeFilepathGenerator();
+                    }
+
                     sb.append("<ul>");
 
                     for (Dilution d : libraryDilutions) {
@@ -504,15 +509,18 @@ public class SubmissionControllerHelperService {
                           }
                         }
                       }
-                      sb.append(">" + d.getLibrary().getName() + d.getName() + ": ");
+                      sb.append(">" + partitionContainer.getId() + "_" + d.getLibrary().getName() + "_" + d.getName() + ": ");
                       sb.append("<ul>");
                       for (File f : fpg.generateFilePath(part, d)) {
                         sb.append("<li>" + f.getName() + "</li>");
                       }
+                      //end filepaths
                       sb.append("</ul>");
                       sb.append("</li>");
                     }
+                     //end dilutions
                     sb.append("</ul>");
+                    sb.append("</li>");
                   }
                 }
               }
@@ -559,5 +567,9 @@ public class SubmissionControllerHelperService {
 
   public void setMisoFileManager(MisoFilesManager misoFileManager) {
     this.misoFileManager = misoFileManager;
+  }
+
+  public void setFilePathGeneratorResolverService(FilePathGeneratorResolverService filePathGeneratorResolverService) {
+    this.filePathGeneratorResolverService = filePathGeneratorResolverService;
   }
 }

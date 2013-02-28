@@ -27,6 +27,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 /**
  * A KitDescriptor handles information about a consumable element that is generally typed by a name, manufacturer and part number. Kits use
@@ -36,7 +37,7 @@ import javax.persistence.*;
  * @since 0.0.2
  */
 @Entity
-public class KitDescriptor {
+public class KitDescriptor implements Serializable {
 
   /** Field UNSAVED_ID  */
   public static final Long UNSAVED_ID = 0L;

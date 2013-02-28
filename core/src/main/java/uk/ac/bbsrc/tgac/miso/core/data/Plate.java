@@ -23,14 +23,19 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+//import com.fasterxml.jackson.annotation.*;
+//import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonWriteNullProperties;
+import org.codehaus.jackson.annotate.JsonManagedReference;
+import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlateMaterialType;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * A Plate represents a collection of sequenceable material, typed by that material object, usually a List of {@link Library}
@@ -40,11 +45,12 @@ import java.util.LinkedList;
  * @date 25-Jul-2011
  * @since 0.0.3
  */
-@JsonSerialize(typing = JsonSerialize.Typing.STATIC)
-@JsonWriteNullProperties(false)
+@JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
+//@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
+@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
 @JsonIgnoreProperties({"securityProfile"})
 @PrintableBarcode
-public interface Plate<T extends LinkedList<S>, S> extends SecurableByProfile, Barcodable, Locatable, Comparable, Deletable, Poolable {
+public interface Plate<T extends List<S>, S> extends SecurableByProfile, Barcodable, Locatable, Comparable, Deletable, Poolable<Plate<LinkedList<S>, S>, S> {
   /**
    * Gets the current plateId
    *
@@ -139,6 +145,8 @@ public interface Plate<T extends LinkedList<S>, S> extends SecurableByProfile, B
    */
   public int getSize();
 
+  public void setSize(int size) throws Exception;
+
   public Class getElementType();
 
   /**
@@ -146,7 +154,10 @@ public interface Plate<T extends LinkedList<S>, S> extends SecurableByProfile, B
    *
    * @return T element.
    */
+  //@JsonManagedReference
   public T getElements();
+
+  public void setElements(T elements);
 
   /**
    * Adds an Element to this Plate object

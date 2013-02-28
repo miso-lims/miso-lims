@@ -26,6 +26,7 @@ package uk.ac.bbsrc.tgac.miso.core.data.type;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.io.Serializable;
 
 /**
  * Provides model access to the underlying MISO QcType lookup table. These types should hold manufacturer platform information for QC analysis. 
@@ -35,7 +36,7 @@ import javax.persistence.Id;
  * @author Rob Davey
  * @since 0.0.2
  */
-public class QcType implements Comparable {
+public class QcType implements Comparable, Serializable {
   public static final Long UNSAVED_ID = 0L;
 
   /** Field libraryTypeId  */

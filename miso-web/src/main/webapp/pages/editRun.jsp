@@ -31,6 +31,8 @@
 <%@ include file="../header.jsp" %>
 
 <script src="<c:url value='/scripts/statsdb.js'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/statsdbperbasecontent.js'/>" type="text/javascript"></script>
+
 <script type="text/javascript" src="<c:url value='/scripts/run_ajax.js?ts=${timestamp.time}'/>"></script>
 <script type="text/javascript" src="<c:url value='/scripts/run_validation.js?ts=${timestamp.time}'/>"></script>
 <script type="text/javascript" src="<c:url value='/scripts/stats_ajax.js?ts=${timestamp.time}'/>"></script>
@@ -40,7 +42,7 @@
     <c:otherwise><div id="maincontent"></c:otherwise>
 </c:choose>
 <div id="contentcolumn">
-<form:form method="POST" modelAttribute="run" autocomplete="off" onsubmit="return validate_run(this);">
+<form:form  action="/miso/run" method="POST" modelAttribute="run" autocomplete="off" onsubmit="return validate_run(this);">
 
 <sessionConversation:insertSessionConversationId attributeName="run"/>
 
@@ -54,9 +56,18 @@
 <div style='display:none'>
     <div id="graphpanel">
         <div id="statresultgraph">
+            <center><h2>Sample <span id=chartSample></span> Partition <span id=chartPartition></span> Statistics</h2>
+            </center>
             <div id="statstable"></div>
-            <div><h2>Quality Profile</h2></div>
-            <div id="statschart"></div>
+
+            <div style="width: 45%; left: 10px; position: absolute;"><h2>Quality Profile</h2>
+                <div id="statschartqualityprofile" style="width: 100%; position: absolute;"></div>
+            </div>
+            <div style="width: 45%; right: 10px; position: absolute;"><h2>Per Base Content</h2>
+                <div id="statschartperbasecontent" style="width: 100%; right: 10px; position: absolute;"></div>
+            </div>
+
+
             <div id="statschartmessage"></div>
         </div>
     </div>
@@ -96,7 +107,7 @@
         <td>
             <c:choose>
                 <c:when test="${run.id != 0}"><input type='hidden' id='runId' name='runId'
-                                                             value='${run.id}'/>${run.id}</c:when>
+                                                     value='${run.id}'/>${run.id}</c:when>
                 <c:otherwise><i>Unsaved</i></c:otherwise>
             </c:choose>
         </td>
@@ -514,7 +525,8 @@
                                     <c:choose>
                                         <c:when test="${not empty partition.pool}">
                                             <div class="dashboard">
-                                                <a href='<c:url value="/miso/pool/${fn:toLowerCase(run.platformType.key)}/${partition.pool.id}"/>'>
+                                                <%-- <a href='<c:url value="/miso/pool/${fn:toLowerCase(run.platformType.key)}/${partition.pool.id}"/>'> --%>
+                                                <a href='<c:url value="/miso/pool/${partition.pool.id}"/>'>
                                                         ${partition.pool.name}
                                                     (${partition.pool.creationDate})
                                                 </a><br/>
@@ -550,7 +562,8 @@
                                     </c:choose>
                                 </td>
                                 <c:if test="${statsAvailable}">
-                                    <td><img id = "charttrigger"  src="<c:url value='/styles/images/chart-bar-icon.png'/>" border="0"
+                                    <td><img id="charttrigger" src="<c:url value='/styles/images/chart-bar-icon.png'/>"
+                                             border="0"
                                              onclick="Stats.getPartitionStats(${run.id}, ${partition.partitionNumber}); checkstats(${run.id}, ${partition.partitionNumber}); ">
                                     </td>
                                 </c:if>
@@ -565,7 +578,7 @@
         </c:forEach>
     </c:otherwise>
 </c:choose>
-<%-- <form:hidden path="sequencerPartitionContainers"/> --%>
+    <%-- <form:hidden path="sequencerPartitionContainers"/> --%>
 </div>
 </td>
 <td width="50%" valign="top">
@@ -638,21 +651,62 @@
     });
 
     function checkstats(runId, lane) {
-     jQuery('#statschart').html('');
+
+        jQuery('#statschartmessage').html("");
+
+        jQuery('#statschartqualityprofile').html('<img src="<c:url value="/styles/images/loading.gif"/>"/>');
+
         Fluxion.doAjax(
                 'statsControllerHelperService',
                 'getSummaryRunstatsDiagram',
                 {'runId':runId, 'lane':lane, 'url':ajaxurl},
                 {'doOnSuccess':
                         function(json) {
+                            jQuery('#statschartqualityprofile').html("");
                             readStats(json);
+                        }
+                }
+        );
+
+        jQuery('#statschartmessage').html("");
+
+        jQuery('#statschartperbasecontent').html('<img src="<c:url value="/styles/images/loading.gif"/>"/>');
+
+        Fluxion.doAjax(
+                'statsControllerHelperService',
+                'getPerPositionBaseContentDiagram',
+                {'runId':runId, 'lane':lane, 'url':ajaxurl},
+                {'doOnSuccess':
+                        function(json) {
+                            readStatsperbasecontent(json);
                         }
                 }
         );
     }
 
-    function readStats(json){
+    function readStats(json) {
         readStatsdb(json);
+    }
+
+    function checkstatsperbasecontent(runId, lane) {
+        jQuery('#statschartmessage').html("");
+        jQuery('#chartheader').html("Per Base Percentage");
+        jQuery('#statschart').html('<img src="<c:url value="/styles/images/loading.gif"/>"/>');
+
+        Fluxion.doAjax(
+                'statsControllerHelperService',
+                'getPerPositionBaseContentDiagram',
+                {'runId':runId, 'lane':lane, 'url':ajaxurl},
+                {'doOnSuccess':
+                        function(json) {
+                            readStatsperbasecontent(json);
+                        }
+                }
+        );
+    }
+
+    function readStatsperbasecontent(json) {
+        readStatsdbperbasecontent(json);
     }
 </script>
 

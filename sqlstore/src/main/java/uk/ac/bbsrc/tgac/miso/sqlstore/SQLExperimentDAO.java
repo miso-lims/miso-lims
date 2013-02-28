@@ -43,6 +43,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.*;
+import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
@@ -52,6 +53,7 @@ import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.regex.Matcher;
 
 /**
  * A data access object designed for retrieving Experiments from the LIMS database.  This DAO should be
@@ -439,11 +441,11 @@ public class SQLExperimentDAO implements ExperimentStore {
       )
   )
   public List<Experiment> listAll() {
-    return template.query(EXPERIMENTS_SELECT, new LazyExperimentMapper());
+    return template.query(EXPERIMENTS_SELECT, new ExperimentMapper(true));
   }
 
   public List<Experiment> listAllWithLimit(long limit) throws IOException {
-    return template.query(EXPERIMENTS_SELECT_LIMIT, new Object[]{limit}, new LazyExperimentMapper());
+    return template.query(EXPERIMENTS_SELECT_LIMIT, new Object[]{limit}, new ExperimentMapper(true));
   }
 
   @Override
@@ -452,8 +454,8 @@ public class SQLExperimentDAO implements ExperimentStore {
   }
 
   public List<Experiment> listBySearch(String query) {
-    String mySQLQuery = "%" + query + "%";
-    return template.query(EXPERIMENTS_SELECT_BY_SEARCH, new Object[]{mySQLQuery,mySQLQuery,mySQLQuery}, new LazyExperimentMapper());
+    String mySQLQuery = "%" + query.replaceAll("_", Matcher.quoteReplacement("\\_")) + "%";
+    return template.query(EXPERIMENTS_SELECT_BY_SEARCH, new Object[]{mySQLQuery,mySQLQuery,mySQLQuery}, new ExperimentMapper(true));
   }
 
   public List<Experiment> listByStudyId(long studyId) {
@@ -463,7 +465,7 @@ public class SQLExperimentDAO implements ExperimentStore {
   }
 
   public List<Experiment> listByRunId(long runId) {
-    return template.query(EXPERIMENTS_BY_RELATED_RUN, new Object[]{runId}, new LazyExperimentMapper());
+    return template.query(EXPERIMENTS_BY_RELATED_RUN, new Object[]{runId}, new ExperimentMapper(true));
   }
 
   public List<Experiment> listBySubmissionId(long submissionId) throws IOException {
@@ -471,17 +473,17 @@ public class SQLExperimentDAO implements ExperimentStore {
   }
 
   public List<Experiment> listByPoolId(long poolId) {
-    return template.query(EXPERIMENTS_BY_RELATED_POOL, new Object[]{poolId}, new LazyExperimentMapper());
+    return template.query(EXPERIMENTS_BY_RELATED_POOL, new Object[]{poolId}, new ExperimentMapper(true));
   }
 
   public Experiment getByLaneId(long laneId) {
-    List results = template.query(EXPERIMENT_BY_RELATED_LANE, new Object[]{laneId}, new LazyExperimentMapper());
+    List results = template.query(EXPERIMENT_BY_RELATED_LANE, new Object[]{laneId}, new ExperimentMapper(true));
     Experiment e = results.size() > 0 ? (Experiment) results.get(0) : null;
     return e;
   }
 
   public Experiment getByChamberId(long chamberId) {
-    List results = template.query(EXPERIMENT_BY_RELATED_CHAMBER, new Object[]{chamberId}, new LazyExperimentMapper());
+    List results = template.query(EXPERIMENT_BY_RELATED_CHAMBER, new Object[]{chamberId}, new ExperimentMapper(true));
     Experiment e = results.size() > 0 ? (Experiment) results.get(0) : null;
     return e;
   }
@@ -502,7 +504,7 @@ public class SQLExperimentDAO implements ExperimentStore {
   }
 
   public Experiment lazyGet(long experimentId) throws IOException {
-    List eResults = template.query(EXPERIMENT_SELECT_BY_ID, new Object[]{experimentId}, new LazyExperimentMapper());
+    List eResults = template.query(EXPERIMENT_SELECT_BY_ID, new Object[]{experimentId}, new ExperimentMapper(true));
     Experiment e = eResults.size() > 0 ? (Experiment) eResults.get(0) : null;
     return e;
   }
@@ -547,34 +549,27 @@ public class SQLExperimentDAO implements ExperimentStore {
     return false;
   }
 
-  public class LazyExperimentMapper implements RowMapper<Experiment> {
-    public Experiment mapRow(ResultSet rs, int rowNum) throws SQLException {
-      Experiment e = dataObjectFactory.getExperiment();
-      e.setId(rs.getLong("experimentId"));
-      e.setName(rs.getString("name"));
-      e.setAlias(rs.getString("alias"));
-      e.setAccession(rs.getString("accession"));
-      e.setDescription(rs.getString("description"));
-      e.setTitle(rs.getString("title"));
-      try {
-        e.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
-
-        e.setStudy(studyDAO.lazyGet(rs.getLong("study_studyId")));
-
-        Platform p = platformDAO.get(rs.getLong("platform_platformId"));
-        e.setPlatform(p);
-      }
-      catch (IOException e1) {
-        e1.printStackTrace();
-      }
-      return e;
+  public class ExperimentMapper extends CacheAwareRowMapper<Experiment> {
+    public ExperimentMapper() {
+      super(Experiment.class);
     }
-  }
 
-  public class ExperimentMapper implements RowMapper<Experiment> {
+    public ExperimentMapper(boolean lazy) {
+      super(Experiment.class, lazy);
+    }
+
     public Experiment mapRow(ResultSet rs, int rowNum) throws SQLException {
+      long id = rs.getLong("experimentId");
+
+      if (isCacheEnabled()) {
+        Element element;
+        if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
+          log.debug("Cache hit on map for experiment " + id);
+          return (Experiment)element.getObjectValue();
+        }
+      }
       Experiment e = dataObjectFactory.getExperiment();
-      e.setId(rs.getLong("experimentId"));
+      e.setId(id);
       e.setName(rs.getString("name"));
       e.setAlias(rs.getString("alias"));
       e.setAccession(rs.getString("accession"));
@@ -586,12 +581,20 @@ public class SQLExperimentDAO implements ExperimentStore {
 
         Platform p = platformDAO.get(rs.getLong("platform_platformId"));
         e.setPlatform(p);
-        e.setPool(poolDAO.getPoolByExperiment(e));
-        e.setKits(kitDAO.listByExperiment(rs.getLong("experimentId")));
+
+        if (!isLazy()) {
+          e.setPool(poolDAO.getPoolByExperiment(e));
+          e.setKits(kitDAO.listByExperiment(rs.getLong("experimentId")));
+        }
       }
       catch (IOException e1) {
         e1.printStackTrace();
       }
+
+      if (isCacheEnabled()) {
+        lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id), e));
+      }
+
       return e;
     }
   }

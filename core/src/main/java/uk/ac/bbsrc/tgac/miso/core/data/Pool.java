@@ -23,13 +23,17 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import net.sourceforge.fluxion.spi.ServiceProvider;
+//import com.fasterxml.jackson.annotation.*;
+//import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonWriteNullProperties;
+import org.codehaus.jackson.annotate.JsonManagedReference;
+import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedDilutionException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
+import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolQcException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 import java.util.Collection;
@@ -48,11 +52,13 @@ import java.util.Date;
  * @author Rob Davey
  * @since 0.0.2
  */
-@JsonSerialize(typing = JsonSerialize.Typing.STATIC)
-@JsonWriteNullProperties(false)
-@JsonIgnoreProperties({"securityProfile"})
+@JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
+//@JsonInclude(JsonInclude.Include.NON_NULL)
+//@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
+@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
+@JsonIgnoreProperties({"securityProfile","dilutions"})
 @PrintableBarcode
-public interface Pool<P extends Poolable> extends SecurableByProfile, Comparable, Barcodable, Watchable, Deletable {
+public interface Pool<P extends Poolable> extends SecurableByProfile, Comparable, Barcodable, Watchable, Deletable, Alertable {
   /**
    * Returns the poolId of this Pool object.
    *
@@ -73,7 +79,7 @@ public interface Pool<P extends Poolable> extends SecurableByProfile, Comparable
   /**
    * Sets the ID of this Pool object.
    *
-   * @param ID long.
+   * @param id long.
    */
   public void setId(long id);
 
@@ -113,13 +119,14 @@ public interface Pool<P extends Poolable> extends SecurableByProfile, Comparable
    *
    * @param poolables poolables.
    */
-  public void setPoolableElements(Collection<P> poolables);
+  public <T extends Poolable> void setPoolableElements(Collection<T> poolables);
 
   /**
    * Returns the Poolable elements of this Pool object.
    *
    * @return Collection<D> poolables.
    */
+  //@JsonManagedReference
   public Collection<P> getPoolableElements();
 
   /**
@@ -127,14 +134,8 @@ public interface Pool<P extends Poolable> extends SecurableByProfile, Comparable
    *
    * @return Collection<D> poolables.
    */
+  //@JsonManagedReference
   public Collection<? extends Dilution> getDilutions();
-
-  /**
-   *  Convenience method to set Dilution elements of this Pool object.
-   *
-   * @param dilutions Dilutions.
-   */
-  public void setDilutions(Collection<P> dilutions);
 
   /**
    * Registers an Experiment to this Pool
@@ -156,6 +157,7 @@ public interface Pool<P extends Poolable> extends SecurableByProfile, Comparable
    *
    * @return Experiment experiment.
    */
+  //@JsonManagedReference
   public Collection<Experiment> getExperiments();
 
   /**
@@ -213,6 +215,36 @@ public interface Pool<P extends Poolable> extends SecurableByProfile, Comparable
    * @param ready Boolean.
    */
   public void setReadyToRun(boolean ready);
+
+  /**
+   * Registers that a LibraryQC has been carried out on this Library
+   *
+   * @param poolQC of type PoolQC
+   * @throws MalformedPoolQcException when the PoolQC being added is not valid
+   */
+  public void addQc(PoolQC poolQC) throws MalformedPoolQcException;
+
+  /**
+   * Returns the poolQCs of this Pool object.
+   *
+   * @return Collection<PoolQC> poolQCs.
+   */
+  //@JsonManagedReference(value = "poolqcs")
+  public Collection<PoolQC> getPoolQCs();
+
+  /**
+   * Returns the qcPassed of this Pool object.
+   *
+   * @return Boolean qcPassed.
+   */
+  public Boolean getQcPassed();
+
+  /**
+   * Sets the qcPassed attribute of this Pool object. This should be true when a suitable QC has been carried out that passes a given result.
+   *
+   * @param qcPassed qcPassed.
+   */
+  public void setQcPassed(Boolean qcPassed);
 
   Date getLastUpdated();
 

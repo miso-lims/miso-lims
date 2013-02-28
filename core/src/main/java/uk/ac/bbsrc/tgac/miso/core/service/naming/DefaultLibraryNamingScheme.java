@@ -32,9 +32,12 @@ public class DefaultLibraryNamingScheme implements RequestManagerAwareNamingSche
   private Map<String, NameGenerator<Library>> customNameGeneratorMap = new HashMap<String, NameGenerator<Library>>();
   private RequestManager requestManager;
 
+  public static final String DEFAULT_NAME_REGEX = "([A-Z]{3})([0-9]+)";
+  public static final String DEFAULT_ALIAS_REGEX = "([A-z0-9]+)_L([A-z0-9]+)-([A-Z0-9]+)_(.*)";
+
   public DefaultLibraryNamingScheme() {
-    validationMap.put("name", Pattern.compile("([A-Z]{3})([0-9]+)"));
-    validationMap.put("alias", Pattern.compile("([A-z0-9]+)_L([A-z0-9]+)-([0-9]+)_(.*)"));
+    validationMap.put("name", Pattern.compile(DEFAULT_NAME_REGEX));
+    validationMap.put("alias", Pattern.compile(DEFAULT_ALIAS_REGEX));
   }
 
   @Override

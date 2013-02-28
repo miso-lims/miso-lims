@@ -35,6 +35,7 @@ import org.springframework.util.Assert;
 import org.springframework.web.bind.support.SessionAttributeStore;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 
 /**
  * This class handles how session scoped model attributes are stored and
@@ -62,10 +63,11 @@ public class SessionConversationAttributeStore implements SessionAttributeStore,
   private int _numConversationsToKeep = 10;
 
   @Autowired
-  private AnnotationMethodHandlerAdapter annotationMethodHandlerAdapter;
+  //3.0.x -> 3.1.x change required - private AnnotationMethodHandlerAdapter annotationMethodHandlerAdapter;
+  private RequestMappingHandlerAdapter requestMappingHandlerAdapter;
 
   public void afterPropertiesSet() throws Exception {
-    annotationMethodHandlerAdapter.setSessionAttributeStore(this);
+    requestMappingHandlerAdapter.setSessionAttributeStore(this);
   }
 
   /* (non-Javadoc)

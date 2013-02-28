@@ -47,6 +47,8 @@ import uk.ac.bbsrc.tgac.miso.core.store.PartitionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
+import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
+import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 import javax.persistence.CascadeType;
 import java.io.IOException;
@@ -188,7 +190,7 @@ public class SQLSequencerPoolPartitionDAO implements PartitionStore {
 
   @Override
   @Transactional(readOnly = false, rollbackFor = IOException.class)
-  @TriggersRemove(cacheName = "partitionCache",
+  @TriggersRemove(cacheName = "sequencerPoolPartitionCache",
                   keyGenerator = @KeyGenerator(
                           name = "HashCodeCacheKeyGenerator",
                           properties = {
@@ -251,7 +253,7 @@ public class SQLSequencerPoolPartitionDAO implements PartitionStore {
       )
   )
   public List<SequencerPoolPartition> listAll() throws IOException {
-    return template.query(PARTITIONS_SELECT, new LazyPartitionMapper());
+    return template.query(PARTITIONS_SELECT, new PartitionMapper(true));
   }
 
   @Override
@@ -259,7 +261,7 @@ public class SQLSequencerPoolPartitionDAO implements PartitionStore {
     return template.queryForInt("SELECT count(*) FROM "+TABLE_NAME);
   }
 
-  @Cacheable(cacheName="partitionCache",
+  @Cacheable(cacheName="sequencerPoolPartitionCache",
                   keyGenerator = @KeyGenerator(
                           name = "HashCodeCacheKeyGenerator",
                           properties = {
@@ -274,7 +276,7 @@ public class SQLSequencerPoolPartitionDAO implements PartitionStore {
   }
 
   public SequencerPoolPartition lazyGet(long partitionId) throws IOException {
-    List eResults = template.query(PARTITION_SELECT_BY_ID, new Object[]{partitionId}, new LazyPartitionMapper());
+    List eResults = template.query(PARTITION_SELECT_BY_ID, new Object[]{partitionId}, new PartitionMapper(true));
     return eResults.size() > 0 ? (SequencerPoolPartition) eResults.get(0) : null;
   }
 
@@ -283,11 +285,11 @@ public class SQLSequencerPoolPartitionDAO implements PartitionStore {
   }
 
   public Collection<SequencerPoolPartition> listBySequencerPartitionContainerId(long sequencerPartitionContainerId) throws IOException {
-    return template.query(PARTITIONS_BY_RELATED_SEQUENCER_PARTITION_CONTAINER, new Object[]{sequencerPartitionContainerId}, new LazyPartitionMapper());
+    return template.query(PARTITIONS_BY_RELATED_SEQUENCER_PARTITION_CONTAINER, new Object[]{sequencerPartitionContainerId}, new PartitionMapper(true));
   }
 
   public List<SequencerPoolPartition> listByPoolId(long poolId) throws IOException {
-    return template.query(PARTITIONS_BY_RELATED_POOL, new Object[]{poolId}, new LazyPartitionMapper());
+    return template.query(PARTITIONS_BY_RELATED_POOL, new Object[]{poolId}, new PartitionMapper(true));
   }
 
   public List<SequencerPoolPartition> listBySubmissionId(long submissionId) throws IOException {
@@ -295,39 +297,46 @@ public class SQLSequencerPoolPartitionDAO implements PartitionStore {
   }  
 
   public List<SequencerPoolPartition> listByProjectId(long projectId) throws IOException {
-    return template.query(PARTITIONS_BY_RELATED_PROJECT, new Object[]{projectId}, new LazyPartitionMapper());
+    return template.query(PARTITIONS_BY_RELATED_PROJECT, new Object[]{projectId}, new PartitionMapper(true));
   }
 
-  public class LazyPartitionMapper implements RowMapper<SequencerPoolPartition> {
-    public SequencerPoolPartition mapRow(ResultSet rs, int rowNum) throws SQLException {
-      SequencerPoolPartition l = dataObjectFactory.getSequencerPoolPartition();
-      l.setId(rs.getLong("partitionId"));
-      l.setPartitionNumber(rs.getInt("partitionNumber"));
-      try {
-        l.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
-        l.setPool(poolDAO.get(rs.getLong("pool_poolId")));
-        //l.setSequencerPartitionContainer(sequencerPartitionContainerDAO.getSequencerPartitionContainerByPartitionId(rs.getLong("partitionId")));
-      }
-      catch (IOException e1) {
-        e1.printStackTrace();
-      }
-      return l;
+  public class PartitionMapper extends CacheAwareRowMapper<SequencerPoolPartition> {
+    public PartitionMapper() {
+      super(SequencerPoolPartition.class);
     }
-  }
 
-  public class PartitionMapper implements RowMapper<SequencerPoolPartition> {
+    public PartitionMapper(boolean lazy) {
+      super(SequencerPoolPartition.class, lazy);
+    }
+
     public SequencerPoolPartition mapRow(ResultSet rs, int rowNum) throws SQLException {
+      long id = rs.getLong("partitionId");
+
+      if (isCacheEnabled()) {
+        Element element;
+        if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
+          log.debug("Cache hit on map for SequencerPoolPartition " + id);
+          return (SequencerPoolPartition)element.getObjectValue();
+        }
+      }
       SequencerPoolPartition l = dataObjectFactory.getSequencerPoolPartition();
-      l.setId(rs.getLong("partitionId"));
+      l.setId(id);
       l.setPartitionNumber(rs.getInt("partitionNumber"));
       try {
         l.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
         l.setPool(poolDAO.get(rs.getLong("pool_poolId")));
-        l.setSequencerPartitionContainer(sequencerPartitionContainerDAO.getSequencerPartitionContainerByPartitionId(rs.getLong("partitionId")));
+        if (!isLazy()) {
+          l.setSequencerPartitionContainer(sequencerPartitionContainerDAO.getSequencerPartitionContainerByPartitionId(id));
+        }
       }
       catch (IOException e1) {
         e1.printStackTrace();
       }
+
+      if (isCacheEnabled()) {
+        lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id) ,l));
+      }
+
       return l;
     }
   }

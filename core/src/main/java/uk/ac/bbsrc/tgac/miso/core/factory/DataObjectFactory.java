@@ -33,6 +33,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.pacbio.PacBioPool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.solid.SolidPool;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * uk.ac.bbsrc.tgac.miso.core.factory
  * <p/>
@@ -90,12 +93,16 @@ public abstract class DataObjectFactory {
   public abstract emPCR getEmPCR();
   public abstract emPCR getEmPCR(User user);
 
-  public abstract Plate getPlateOfSize(int size);
-  public abstract Plate getPlateOfSize(int size, User user);
+  //public abstract <T extends List<S>, S extends Plateable> Plate<T, S> getPlateOfSize(int size);
+  //public abstract <T extends List<S>, S extends Plateable> Plate<T, S> getPlateOfSize(int size, User user);
+  public abstract Plate<LinkedList<Plateable>, Plateable> getPlateOfSize(int size);
+  public abstract Plate<LinkedList<Plateable>, Plateable> getPlateOfSize(int size, User user);
 
-  public abstract Pool getPool();
-  public abstract Pool getPool(User user);  
-  public abstract Pool getPoolOfType(PlatformType platformType, User user);
+  public abstract Pool<? extends Poolable> getPool();
+  public abstract Pool<? extends Poolable> getPool(User user);
+  public abstract Pool<? extends Poolable> getPoolOfType(PlatformType platformType, User user);
+
+  public abstract PoolQC getPoolQC();
 
   public abstract IlluminaPool getIlluminaPool();
   public abstract IlluminaPool getIlluminaPool(User user);

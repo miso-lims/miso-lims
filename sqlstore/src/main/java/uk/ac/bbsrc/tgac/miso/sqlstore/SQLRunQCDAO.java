@@ -28,6 +28,9 @@ import com.googlecode.ehcache.annotations.Property;
 import com.googlecode.ehcache.annotations.TriggersRemove;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -43,6 +46,7 @@ import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.store.RunQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
+import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 import javax.persistence.CascadeType;
@@ -95,7 +99,9 @@ public class SQLRunQCDAO implements RunQcStore {
           "SELECT rqc.runQc_runQcId, rqc.containers_containerId, rqc.partitionNumber " +
           "FROM RunQC_Partition rqc " +
           "WHERE rqc.runQc_runQcId = ?";
-  
+
+  protected static final Logger log = LoggerFactory.getLogger(SQLRunQCDAO.class);
+
   private JdbcTemplate template;
   private SequencerPartitionContainerStore sequencerPartitionContainerDAO;
   private RunStore runDAO;
@@ -203,17 +209,17 @@ public class SQLRunQCDAO implements RunQcStore {
   }
 
   public RunQC lazyGet(long qcId) throws IOException {
-    List eResults = template.query(RUN_QC_SELECT_BY_ID, new Object[]{qcId}, new LazyRunQcMapper());
+    List eResults = template.query(RUN_QC_SELECT_BY_ID, new Object[]{qcId}, new RunQcMapper(true));
     RunQC e = eResults.size() > 0 ? (RunQC) eResults.get(0) : null;
     return e;
   }
 
   public Collection<RunQC> listByRunId(long runId) throws IOException {
-    return new LinkedList(template.query(RUN_QC_SELECT_BY_RUN_ID, new Object[]{runId}, new LazyRunQcMapper()));
+    return new LinkedList(template.query(RUN_QC_SELECT_BY_RUN_ID, new Object[]{runId}, new RunQcMapper(true)));
   }
 
   public Collection<RunQC> listAll() throws IOException {
-    return template.query(RUN_QC, new LazyRunQcMapper());
+    return template.query(RUN_QC, new RunQcMapper(true));
   }
 
   @Override
@@ -225,17 +231,6 @@ public class SQLRunQCDAO implements RunQcStore {
     return template.query(PARTITIONS_BY_RUN_QC, new Object[]{runQcId}, new PartitionMapper());
   }
 
-  @Transactional(readOnly = false, rollbackFor = IOException.class)
-  @TriggersRemove(
-          cacheName="empcrCache",
-          keyGenerator = @KeyGenerator(
-              name = "HashCodeCacheKeyGenerator",
-              properties = {
-                      @Property(name="includeMethod", value="false"),
-                      @Property(name="includeParameterTypes", value="false")
-              }
-          )
-  )
   public boolean remove(RunQC qc) throws IOException {
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
     if (qc.isDeletable() &&
@@ -274,40 +269,41 @@ public class SQLRunQCDAO implements RunQcStore {
     }
   }
 
-  public class LazyRunQcMapper implements RowMapper<RunQC> {
-    public RunQC mapRow(ResultSet rs, int rowNum) throws SQLException {
-      RunQC s = dataObjectFactory.getRunQC();
-      s.setId(rs.getLong("qcId"));
-      s.setQcCreator(rs.getString("qcUserName"));
-      s.setQcDate(rs.getDate("qcDate"));
-      s.setInformation(rs.getString("information"));
-      s.setDoNotProcess(rs.getBoolean("doNotProcess"));
-
-      try {
-        s.setQcType(getRunQcTypeById(rs.getLong("qcMethod")));
-        s.setPartitionSelections(new ArrayList<Partition>(listPartitionSelectionsByRunQcId(rs.getLong("qcId"))));
-      }
-      catch (IOException e) {
-        e.printStackTrace();
-      }
-
-      return s;
+  public class RunQcMapper extends CacheAwareRowMapper<RunQC> {
+    public RunQcMapper() {
+      //run qcs aren't cached at present
+      super(RunQC.class, false, false);
     }
-  }
 
-  public class RunQcMapper implements RowMapper<RunQC> {
+    public RunQcMapper(boolean lazy) {
+      //run qcs aren't cached at present
+      super(RunQC.class, lazy, false);
+    }
+
     public RunQC mapRow(ResultSet rs, int rowNum) throws SQLException {
+      long id = rs.getLong("qcId");
+
+      if (isCacheEnabled()) {
+        Element element;
+        if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
+          log.debug("Cache hit on map for RunQC " + id);
+          return (RunQC)element.getObjectValue();
+        }
+      }
       RunQC s = dataObjectFactory.getRunQC();
-      s.setId(rs.getLong("qcId"));
+      s.setId(id);
       s.setQcCreator(rs.getString("qcUserName"));
       s.setQcDate(rs.getDate("qcDate"));
       s.setInformation(rs.getString("information"));
       s.setDoNotProcess(rs.getBoolean("doNotProcess"));
       
       try {
-        s.setRun(runDAO.get(rs.getLong("run_runId")));
         s.setQcType(getRunQcTypeById(rs.getLong("qcMethod")));
-        s.setPartitionSelections(new ArrayList<Partition>(listPartitionSelectionsByRunQcId(rs.getLong("qcId"))));
+        s.setPartitionSelections(new ArrayList<Partition>(listPartitionSelectionsByRunQcId(id)));
+
+        if (!isLazy()) {
+          s.setRun(runDAO.get(rs.getLong("run_runId")));
+        }
       }
       catch (IOException e) {
         e.printStackTrace();
@@ -315,6 +311,11 @@ public class SQLRunQCDAO implements RunQcStore {
       catch (MalformedRunException e) {
         e.printStackTrace();
       }
+
+      if (isCacheEnabled()) {
+        lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id) ,s));
+      }
+
       return s;
     }
   }

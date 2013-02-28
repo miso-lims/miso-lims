@@ -146,7 +146,7 @@ public class EditSolidPoolController {
         model.put("title", "New SOLiD Pool");
       }
       else {
-        pool = requestManager.getSolidPoolById(poolId);
+        pool = requestManager.getPoolById(poolId);
         model.put("title", "SOLiD Pool "+poolId);
       }
 
@@ -186,7 +186,7 @@ public class EditSolidPoolController {
         model.put("title", "New Solid Pool");
       }
       else {
-        pool = requestManager.getSolidPoolById(poolId);
+        pool = requestManager.getPoolById(poolId);
         model.put("title", "Solid Pool "+poolId);
       }
 
@@ -251,7 +251,7 @@ public class EditSolidPoolController {
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, pool, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, pool, securityManager.listAllUsers()));
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, pool, securityManager.listAllGroups()));
-      return new ModelAndView("/pages/editIlluminaPool.jsp", model);
+      return new ModelAndView("/pages/editSolidPool.jsp", model);
     }
     catch (IOException ex) {
       if (log.isDebugEnabled()) {

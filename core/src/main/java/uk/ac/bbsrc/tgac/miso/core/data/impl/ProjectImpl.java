@@ -33,6 +33,8 @@ import org.slf4j.LoggerFactory;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractProject;
 import uk.ac.bbsrc.tgac.miso.core.factory.submission.ERASubmissionFactory;
 
+import java.io.Serializable;
+
 /**
  * Concrete implementation of a Project, inheriting from the simlims core Project
  * 
@@ -40,7 +42,7 @@ import uk.ac.bbsrc.tgac.miso.core.factory.submission.ERASubmissionFactory;
  * @since 0.0.2
  */
 @Entity
-public class ProjectImpl extends AbstractProject {
+public class ProjectImpl extends AbstractProject implements Serializable {
   /**
    * Construct a new Project with a default empty SecurityProfile
    */

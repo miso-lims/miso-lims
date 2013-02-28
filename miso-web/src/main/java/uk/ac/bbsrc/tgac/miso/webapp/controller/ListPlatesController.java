@@ -25,6 +25,8 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +61,7 @@ public class ListPlatesController {
   @RequestMapping("/plates")
   public ModelAndView listPlates(ModelMap model) throws IOException {
     try {
-      Collection<Plate> lp = requestManager.listAllPlates();
+      Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> lp = requestManager.listAllPlates();
       model.addAttribute("plates", lp);
       return new ModelAndView("/pages/listPlates.jsp", model);
     }

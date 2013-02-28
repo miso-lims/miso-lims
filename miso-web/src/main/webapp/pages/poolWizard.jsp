@@ -23,8 +23,8 @@
 <%@ include file="../header.jsp" %>
 <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.breadcrumbs.popup.js'/>"></script>
 <script src="<c:url value='/scripts/datatables_utils.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
-<script src="<c:url value='/scripts/jquery/datatables/jquery.dataTables.min.js'/>" type="text/javascript"></script>
-<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/datatable.css'/>" type="text/css">
+<script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
+<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" type="text/css">
 
 <div id="maincontent">
   <div id="contentcolumn">
@@ -100,7 +100,7 @@
         </td>
       </tr>
       <tr>
-        <td>Pool Concentration:</td>
+        <td>Desired Concentration:</td>
         <td>
           <input type="text" id="concentration" name="concentration"/><br/>
         </td>
@@ -113,7 +113,68 @@
       </tr>
       </tbody>
     </table>
-    
+
+    <h1>
+        <div id="qcsTotalCount">
+        </div>
+    </h1>
+    <ul class="sddm">
+        <li><a
+                onmouseover="mopen('qcmenu')"
+                onmouseout="mclosetime()">Options <span style="float:right"
+                                                        class="ui-icon ui-icon-triangle-1-s"></span></a>
+
+            <div id="qcmenu"
+                 onmouseover="mcancelclosetime()"
+                 onmouseout="mclosetime()">
+                <a href='javascript:void(0);' class="add"
+                   onclick="Pool.wizard.insertPoolQCRow(); return false;">Add Pool QC</a>
+            </div>
+        </li>
+    </ul>
+    <span style="clear:both">
+      <div id="addPoolQC"></div>
+      <div id='addQcForm'>
+          <table class="list" id="poolQcTable">
+              <thead>
+              <tr>
+                  <th>QC Date</th>
+                  <th>Method</th>
+                  <th>Results</th>
+              </tr>
+              </thead>
+              <tbody>
+              <c:if test="${not empty pool.poolQCs}">
+                  <c:forEach items="${pool.poolQCs}" var="qc">
+                      <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
+                          <td>${qc.qcCreator}</td>
+                          <td><fmt:formatDate value="${qc.qcDate}"/></td>
+                          <td>${qc.qcType.name}</td>
+                          <td id="result${qc.id}">${qc.results} ${qc.qcType.units}</td>
+                          <c:if test="${(library.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
+                                          or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+                              <td id="edit${qc.id}" align="center"><a href="javascript:void(0);" onclick="Pool.qc.changePoolQCRow('${qc.id}','${pool.id}')">
+                                  <span class="ui-icon ui-icon-pencil"></span></a></td>
+                          </c:if>
+                      </tr>
+                  </c:forEach>
+              </c:if>
+              </tbody>
+          </table>
+          <input type='hidden' id='qcPoolId' name='id' value='${pool.id}'/>
+      </div>
+      <script type="text/javascript">
+          jQuery(document).ready(function() {
+              jQuery("#poolQcTable").tablesorter({
+                  headers: {
+                  }
+              });
+
+              jQuery('#qcsTotalCount').html(jQuery('#poolQcTable>tbody>tr:visible').length.toString() + " QCs");
+          });
+      </script>
+    </span>
+
     <table width="100%">
       <tbody>
       <tr>
@@ -201,8 +262,8 @@
   }
 
   function createNewPool() {
-    if (jQuery('#concentration').val() == null || jQuery('#concentration').val() == "") {
-      alert('You have not enterted a concentration for the new pool');
+    if (Utils.validation.isNullCheck(jQuery('#concentration').val())) {
+      alert('You have not entered a final desired concentration for the new pool');
     }
     else {
       jQuery('#createPoolButton').attr('disabled', 'disabled');
@@ -226,6 +287,7 @@
        'platformType':jQuery('#platformType').val(),
        'alias':jQuery('#alias').val(),
        'concentration':jQuery('#concentration').val(),
+       'qcs':Utils.mappifyTable('poolQcTable'),
        'url':ajaxurl },
       {'doOnSuccess':function(json) {
         jQuery('#poolResult').append(json.html);

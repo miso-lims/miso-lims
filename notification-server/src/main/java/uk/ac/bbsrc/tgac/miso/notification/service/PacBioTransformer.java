@@ -40,10 +40,7 @@ import uk.ac.bbsrc.tgac.miso.tools.run.util.FileSetTransformer;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FilenameFilter;
-import java.io.IOException;
+import java.io.*;
 import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -244,6 +241,7 @@ public class PacBioTransformer implements FileSetTransformer<String, String, Fil
                 e.printStackTrace();
               }
               catch (IOException e) {
+                log.error(runName + ":: Unable to process run: " + e.getMessage());
                 e.printStackTrace();
               }
             }
@@ -252,7 +250,7 @@ public class PacBioTransformer implements FileSetTransformer<String, String, Fil
               PacBioServiceWrapper pacbioServiceWrapper = ApplicationContextProvider.getApplicationContext().getBean(run.getString("sequencerName"), PacBioServiceWrapper.class);
               PacBioService pacbioService = pacbioServiceWrapper.getPacBioService();
 
-              String plateStatus = pacbioService.getPlateStatus(run.getString("plateId"));
+              String plateStatus = pacbioService.getPlateStatus(URLEncoder.encode(run.getString("plateId"), "UTF-8"));
               if ("Complete".equals(plateStatus)) {
                 log.debug(runName + " :: Completed");
                 if (!run.has("completionDate")) {
@@ -277,6 +275,9 @@ public class PacBioTransformer implements FileSetTransformer<String, String, Fil
             }
             catch (InterrogationException e) {
               log.warn(e.getMessage() + ". Attempting fall-back date resolution...");
+            }
+            catch (UnsupportedEncodingException e) {
+              log.warn(e.getMessage() + ". Cannot encode plateId to be URL friendly.");
             }
           }
         }

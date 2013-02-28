@@ -23,7 +23,11 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.context;
 
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
 import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.util.*;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -31,7 +35,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContext;
@@ -39,6 +45,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.web.filter.OncePerRequestFilter;
+import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.integration.util.SignatureHelper;
 
 /**
@@ -54,26 +61,76 @@ import uk.ac.bbsrc.tgac.miso.integration.util.SignatureHelper;
 public class RestSignatureFilter extends OncePerRequestFilter {
   @Autowired
   AuthenticationManager authenticationManager;
+  @Autowired
+  SecurityManager securityManager;
+
+  public void setSecurityManager(SecurityManager securityManager) {
+    this.securityManager = securityManager;
+  }
 
   @Override
   protected void doFilterInternal(HttpServletRequest request,
                                   HttpServletResponse response,
                                   FilterChain filterChain) throws ServletException, IOException {
-    //String url = SignatureHelper.createSortedUrl(request);
-    String url = request.getHeader(SignatureHelper.URL_X_HEADER);
+    User userdetails = null;
+    com.eaglegenomics.simlims.core.User user = null;
+    logger.info("HEADERS: ");
+    Enumeration es = request.getHeaderNames();
+    while (es.hasMoreElements()) {
+      String key = (String) es.nextElement();
+      logger.info(key + " -> " + request.getHeader(key));
+    }
+
+    String loginName = request.getHeader(SignatureHelper.USER_HEADER);
+    if (loginName == null) {
+      if (SecurityContextHolder.getContext() != null && SecurityContextHolder.getContext().getAuthentication() != null) {
+        logger.info("User already logged in - chaining");
+        filterChain.doFilter(request, response);
+      }
+      throw new BadCredentialsException("Cannot enact RESTful request without a user specified!");
+    }
+
+    if (loginName.equals("notification")) {
+      logger.info("Incoming notification request");
+      userdetails = new User("notification", "none", true, true, true, true, AuthorityUtils.createAuthorityList("ROLE_INTERNAL"));
+    }
+    else {
+      logger.info("Incoming user REST API request");
+      user = securityManager.getUserByLoginName(loginName);
+      if (user != null) {
+        userdetails = LimsSecurityUtils.toUserDetails(user);
+      }
+    }
+
+    //String url = request.getHeader(SignatureHelper.URL_X_HEADER);
 
     String signature = request.getHeader(SignatureHelper.SIGNATURE_HEADER);
     if (signature == null) {
-      signature = request.getHeader(SignatureHelper.SIGNATURE_X_HEADER);
+      throw new BadCredentialsException("Cannot enact RESTful request without a signature!");
     }
 
-    String apiKey = request.getHeader(SignatureHelper.APIKEY_HEADER);
-    if (apiKey == null) {
-      apiKey = request.getHeader(SignatureHelper.APIKEY_X_HEADER);
+    boolean validSignature = false;
+    try {
+      if (loginName.equals("notification")) {
+        validSignature = SignatureHelper.validateSignature(request, SignatureHelper.PUBLIC_KEY, signature);
+      }
+      else {
+        validSignature = SignatureHelper.validateSignature(request,
+                                                           SignatureHelper.generatePrivateUserKey(
+                                                             (user.getUserId() + "::" + user.getPassword())
+                                                                     .getBytes("UTF-8")),
+                                                           signature);
+      }
+    }
+    catch (InvalidKeyException e) {
+      e.printStackTrace();
+    }
+    catch (Exception e) {
+      e.printStackTrace();
     }
 
     try {
-      if (!SignatureHelper.validateSignature(url, signature, apiKey)) {
+      if (!validSignature) {
         logger.error("REST KEY INVALID");
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "REST signature failed validation.");
       }
@@ -85,20 +142,24 @@ public class RestSignatureFilter extends OncePerRequestFilter {
 
     logger.debug("REST KEY OK. Security!");
 
-    User user = new User("notification", "none", true, true, true, true, AuthorityUtils.createAuthorityList("ROLE_INTERNAL"));
-    PreAuthenticatedAuthenticationToken newAuthentication = new PreAuthenticatedAuthenticationToken(user, user.getPassword(), user.getAuthorities());
-    newAuthentication.setAuthenticated(true);
-    newAuthentication.setDetails(user);
+    if (userdetails != null) {
+      PreAuthenticatedAuthenticationToken newAuthentication = new PreAuthenticatedAuthenticationToken(userdetails, userdetails.getPassword(), userdetails.getAuthorities());
+      newAuthentication.setAuthenticated(true);
+      newAuthentication.setDetails(userdetails);
 
-    try {
-      SecurityContext sc = SecurityContextHolder.getContextHolderStrategy().getContext();
-      sc.setAuthentication(newAuthentication);
-      SecurityContextHolder.getContextHolderStrategy().setContext(sc);
-      logger.debug("Set context - chaining");
+      try {
+        SecurityContext sc = SecurityContextHolder.getContextHolderStrategy().getContext();
+        sc.setAuthentication(newAuthentication);
+        SecurityContextHolder.getContextHolderStrategy().setContext(sc);
+        logger.debug("Set context - chaining");
+      }
+      catch (AuthenticationException a) {
+        a.printStackTrace();
+      }
+      filterChain.doFilter(request, response);
     }
-    catch (AuthenticationException a) {
-      a.printStackTrace();
+    else {
+      throw new AuthenticationCredentialsNotFoundException("No valid user found to authenticate");
     }
-    filterChain.doFilter(request, response);
   }
 }

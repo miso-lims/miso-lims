@@ -110,7 +110,7 @@ public class StatsController {
   }
 
 
-  @RequestMapping(value = "/sequencer/{referenceId}", method = RequestMethod.POST)
+  @RequestMapping(value = "/sequencer", method = RequestMethod.POST)
   public String processSubmit(@ModelAttribute("sequencerReference") SequencerReference sr,
                               ModelMap model, SessionStatus session) throws IOException {
     try {

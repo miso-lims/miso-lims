@@ -35,7 +35,10 @@ import javax.persistence.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import java.io.Serializable;
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.Set;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.impl
@@ -46,7 +49,7 @@ import java.util.Collection;
  * @since 0.0.2
  */
 @Entity
-public class SampleImpl extends AbstractSample {
+public class SampleImpl extends AbstractSample implements Serializable {
   /**
    * Construct a new Sample with a default empty SecurityProfile
    */

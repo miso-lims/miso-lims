@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.ldap.core.DistinguishedName;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.ldap.userdetails.InetOrgPerson;
 import org.springframework.security.ldap.userdetails.LdapUserDetails;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
@@ -113,6 +114,19 @@ public class LimsSecurityUtils {
     p.setDn(newDn);
 
     return p.createUserDetails();
+  }
+
+  public static org.springframework.security.core.userdetails.User toUserDetails(User user) {
+    Collection<GrantedAuthority> auths = user.getPermissionsAsAuthorities();
+    return new org.springframework.security.core.userdetails.User(
+              user.getLoginName(),
+              user.getPassword(),
+              user.isActive(),
+              user.isActive(),
+              user.isActive(),
+              user.isActive(),
+              auths
+            );
   }
 
   /**

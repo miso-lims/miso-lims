@@ -45,6 +45,8 @@ import uk.ac.bbsrc.tgac.miso.core.manager.BarcodePrintManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.PrintManager;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintContextResolverService;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
+import uk.ac.bbsrc.tgac.miso.core.store.Store;
+import uk.ac.bbsrc.tgac.miso.sqlstore.util.DaoLookup;
 
 import javax.persistence.CascadeType;
 import javax.sql.DataSource;
@@ -53,6 +55,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -92,9 +96,11 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
                   "Note",
                   "Partition",
                   "Plate",
-                  "Plate_Library",
+                  "Plate_Elements",
                   "Platform",
                   "Pool",
+                  "PoolQC",
+                  "Pool_Elements",
                   "Pool_Experiment",
                   "Pool_LibraryDilution",
                   "Pool_emPCRDilution",
@@ -148,8 +154,9 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
   private DataSource datasource;
 
   private SQLAlertDAO alertDAO;
-  private SQLDilutionDAO dilutionDAO;
+  private SQLLibraryDilutionDAO libraryDilutionDAO;
   private SQLEmPCRDAO emPCRDAO;
+  private SQLEmPCRDilutionDAO emPCRDilutionDAO;
   private SQLExperimentDAO experimentDAO;
   private SQLKitDAO kitDAO;
   private SQLLibraryDAO libraryDAO;
@@ -159,6 +166,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
   private SQLPlateDAO plateDAO;
   private SQLPlatformDAO platformDAO;
   private SQLPoolDAO poolDAO;
+  private SQLPoolQCDAO poolQcDAO;
   private SQLPrintJobDAO printJobDAO;
   private SQLPrintServiceDAO printServiceDAO;
   private SQLProjectDAO projectDAO;
@@ -175,9 +183,20 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
   private SQLTgacSubmissionDAO submissionDAO;
   private SQLWatcherDAO watcherDAO;
 
+  private DaoLookup daoLookup;
+
   public DataSource getDataSource() {
     if (datasource != null) {
       return datasource;
+    }
+    else {
+      return null;
+    }
+  }
+
+  public DaoLookup getDaoLookup() {
+    if (daoLookup != null) {
+      return daoLookup;
     }
     else {
       return null;
@@ -193,9 +212,9 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
     }
   }
 
-  public SQLDilutionDAO getDilutionDAO() {
-    if (dilutionDAO != null) {
-      return dilutionDAO;
+  public SQLLibraryDilutionDAO getLibraryDilutionDAO() {
+    if (libraryDilutionDAO != null) {
+      return libraryDilutionDAO;
     }
     else {
       return null;
@@ -205,6 +224,15 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
   public SQLEmPCRDAO getEmPCRDAO() {
     if (emPCRDAO != null) {
       return emPCRDAO;
+    }
+    else {
+      return null;
+    }
+  }
+
+  public SQLEmPCRDilutionDAO getEmPCRDilutionDAO() {
+    if (emPCRDilutionDAO != null) {
+      return emPCRDilutionDAO;
     }
     else {
       return null;
@@ -277,6 +305,15 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
   public SQLPoolDAO getPoolDAO() {
     if (poolDAO != null) {
       return poolDAO;
+    }
+    else {
+      return null;
+    }
+  }
+
+  public SQLPoolQCDAO getPoolQcDAO() {
+    if (poolQcDAO != null) {
+      return poolQcDAO;
     }
     else {
       return null;
@@ -421,22 +458,17 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
       props.load(in);
       System.out.print("properties loaded...");
 
-      try {
-        Connection jdbcConnection = DriverManager.getConnection(props.getProperty("db.url"), props.getProperty("db.username"), props.getProperty("db.password"));
-        IDatabaseConnection connection = new DatabaseConnection(jdbcConnection);
-        DatabaseConfig config = connection.getConfig();
-        config.setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, new MySqlDataTypeFactory());
-        System.out.print("mysql connection set...");
-        dataSet = new QueryDataSet(connection);
-        for (String table : tables) {
-          dataSet.addTable(table);
-        }
-        System.out.print("dataset ready.\n");
+      Connection jdbcConnection = DriverManager.getConnection(props.getProperty("db.url"), props.getProperty("db.username"), props.getProperty("db.password"));
+      IDatabaseConnection connection = new DatabaseConnection(jdbcConnection);
+      DatabaseConfig config = connection.getConfig();
+      config.setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, new MySqlDataTypeFactory());
+      System.out.print("mysql connection set...");
+
+      dataSet = new QueryDataSet(connection);
+      for (String table : tables) {
+        dataSet.addTable(table);
       }
-      catch(SQLException sqle) {
-        System.out.println("\n*********\nSEVERE :: Cannot connect to test database. Skipping DB tests. You might end up with a non-working MISO instance! Please check your test.db.properties file and specify a working MISO db to test against.\n\n");
-        sqle.printStackTrace();
-      }
+      System.out.print("dataset ready.\n");
     }
     return dataSet;
   }
@@ -481,8 +513,9 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
 
     securityProfileDAO = new SQLSecurityProfileDAO();
     alertDAO = new SQLAlertDAO();
-    dilutionDAO = new SQLDilutionDAO();
+    libraryDilutionDAO = new SQLLibraryDilutionDAO();
     emPCRDAO = new SQLEmPCRDAO();
+    emPCRDilutionDAO = new SQLEmPCRDilutionDAO();
     experimentDAO = new SQLExperimentDAO();
     kitDAO = new SQLKitDAO();
     libraryDAO = new SQLLibraryDAO();
@@ -492,6 +525,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
     plateDAO = new SQLPlateDAO();
     platformDAO = new SQLPlatformDAO();
     poolDAO = new SQLPoolDAO();
+    poolQcDAO = new SQLPoolQCDAO();
     printJobDAO = new SQLPrintJobDAO();
     printServiceDAO = new SQLPrintServiceDAO();
     runDAO = new SQLRunDAO();
@@ -507,6 +541,8 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
 
     projectDAO = new MockSQLProjectDAO();
 
+    Map<Class<?>, Store<?>> daos = new HashMap<Class<?>, Store<?>>();
+
     //just use a basic SQL auth for testing
     LocalSecurityManager sm = new LocalSecurityManager();
     sm.setSecurityStore(securityDAO);
@@ -515,19 +551,31 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
 
     alertDAO.setJdbcTemplate(template);
     alertDAO.setSecurityManager(sm);
+    daos.put(uk.ac.bbsrc.tgac.miso.core.event.Alert.class, alertDAO);
 
-    dilutionDAO.setJdbcTemplate(template);
-    dilutionDAO.setSecurityProfileDAO(securityProfileDAO);
-    dilutionDAO.setLibraryDAO(libraryDAO);
-    dilutionDAO.setEmPcrDAO(emPCRDAO);
-    dilutionDAO.setCascadeType(CascadeType.PERSIST);
-    dilutionDAO.setDataObjectFactory(dataObjectFactory);
+    libraryDilutionDAO.setJdbcTemplate(template);
+    libraryDilutionDAO.setSecurityProfileDAO(securityProfileDAO);
+    libraryDilutionDAO.setLibraryDAO(libraryDAO);
+    libraryDilutionDAO.setEmPcrDAO(emPCRDAO);
+    libraryDilutionDAO.setCascadeType(CascadeType.PERSIST);
+    libraryDilutionDAO.setDataObjectFactory(dataObjectFactory);
+    daos.put(uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution.class, libraryDilutionDAO);
 
     emPCRDAO.setJdbcTemplate(template);
     emPCRDAO.setSecurityProfileDAO(securityProfileDAO);
-    emPCRDAO.setDilutionDAO(dilutionDAO);
+    emPCRDAO.setLibraryDilutionDAO(libraryDilutionDAO);
+    emPCRDAO.setEmPCRDilutionDAO(emPCRDilutionDAO);
     emPCRDAO.setCascadeType(CascadeType.PERSIST);
     emPCRDAO.setDataObjectFactory(dataObjectFactory);
+    daos.put(uk.ac.bbsrc.tgac.miso.core.data.impl.emPCR.class, emPCRDAO);
+
+    emPCRDilutionDAO.setJdbcTemplate(template);
+    emPCRDilutionDAO.setSecurityProfileDAO(securityProfileDAO);
+    emPCRDilutionDAO.setEmPcrDAO(emPCRDAO);
+    emPCRDilutionDAO.setLibraryDAO(libraryDAO);
+    emPCRDilutionDAO.setCascadeType(CascadeType.PERSIST);
+    emPCRDilutionDAO.setDataObjectFactory(dataObjectFactory);
+    daos.put(uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution.class, emPCRDilutionDAO);
 
     experimentDAO.setJdbcTemplate(template);
     experimentDAO.setSecurityProfileDAO(securityProfileDAO);
@@ -539,27 +587,32 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
     experimentDAO.setStudyDAO(studyDAO);
     experimentDAO.setCascadeType(CascadeType.PERSIST);
     experimentDAO.setDataObjectFactory(dataObjectFactory);
+    daos.put(uk.ac.bbsrc.tgac.miso.core.data.Experiment.class, experimentDAO);
 
     kitDAO.setJdbcTemplate(template);
     kitDAO.setNoteDAO(noteDAO);
     kitDAO.setCascadeType(CascadeType.PERSIST);
     kitDAO.setDataObjectFactory(dataObjectFactory);
+    daos.put(uk.ac.bbsrc.tgac.miso.core.data.Kit.class, kitDAO);
 
     libraryDAO.setJdbcTemplate(template);
     libraryDAO.setSecurityProfileDAO(securityProfileDAO);
     libraryDAO.setNoteDAO(noteDAO);
     libraryDAO.setSampleDAO(sampleDAO);
     libraryDAO.setLibraryQcDAO(libraryQcDAO);
-    libraryDAO.setDilutionDAO(dilutionDAO);
+    libraryDAO.setDilutionDAO(libraryDilutionDAO);
     libraryDAO.setCascadeType(CascadeType.PERSIST);
     libraryDAO.setDataObjectFactory(dataObjectFactory);
+    daos.put(uk.ac.bbsrc.tgac.miso.core.data.Library.class, libraryDAO);
 
     libraryQcDAO.setJdbcTemplate(template);
     libraryQcDAO.setLibraryDAO(libraryDAO);
     libraryQcDAO.setDataObjectFactory(dataObjectFactory);
+    daos.put(uk.ac.bbsrc.tgac.miso.core.data.LibraryQC.class, libraryQcDAO);
 
     noteDAO.setJdbcTemplate(template);
     noteDAO.setSecurityDAO(securityDAO);
+    daos.put(com.eaglegenomics.simlims.core.Note.class, noteDAO);
 
     partitionDAO.setJdbcTemplate(template);
     partitionDAO.setSecurityProfileDAO(securityProfileDAO);
@@ -567,29 +620,42 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
     partitionDAO.setPoolDAO(poolDAO);
     partitionDAO.setCascadeType(CascadeType.PERSIST);
     partitionDAO.setDataObjectFactory(dataObjectFactory);
+    daos.put(uk.ac.bbsrc.tgac.miso.core.data.Partition.class, partitionDAO);
 
     plateDAO.setJdbcTemplate(template);
     plateDAO.setSecurityProfileDAO(securityProfileDAO);
     plateDAO.setLibraryDAO(libraryDAO);
+    plateDAO.setSampleDAO(sampleDAO);
+    plateDAO.setDilutionDAO(libraryDilutionDAO);
     plateDAO.setCascadeType(CascadeType.PERSIST);
     plateDAO.setDataObjectFactory(dataObjectFactory);
+    daos.put(uk.ac.bbsrc.tgac.miso.core.data.Plate.class, plateDAO);
 
     platformDAO.setJdbcTemplate(template);
+    daos.put(uk.ac.bbsrc.tgac.miso.core.data.Platform.class, platformDAO);
 
     poolDAO.setJdbcTemplate(template);
     poolDAO.setSecurityProfileDAO(securityProfileDAO);
-    poolDAO.setDilutionDAO(dilutionDAO);
     poolDAO.setExperimentDAO(experimentDAO);
+    poolDAO.setPoolQcDAO(poolQcDAO);
     poolDAO.setWatcherDAO(watcherDAO);
     poolDAO.setCascadeType(CascadeType.PERSIST);
     poolDAO.setDataObjectFactory(dataObjectFactory);
+    daos.put(uk.ac.bbsrc.tgac.miso.core.data.Pool.class, poolDAO);
+
+    poolQcDAO.setJdbcTemplate(template);
+    poolQcDAO.setPoolDAO(poolDAO);
+    poolQcDAO.setDataObjectFactory(dataObjectFactory);
+    daos.put(uk.ac.bbsrc.tgac.miso.core.data.PoolQC.class, poolQcDAO);
 
     printJobDAO.setJdbcTemplate(template);
+    daos.put(uk.ac.bbsrc.tgac.miso.core.data.PrintJob.class, printJobDAO);
 
     MisoPrintContextResolverService mpcrs = new MisoPrintContextResolverService();
     PrintManager<MisoPrintService, ?> pm = new BarcodePrintManager(mpcrs);
     printServiceDAO.setPrintManager(pm);
     printServiceDAO.setJdbcTemplate(template);
+    daos.put(MisoPrintService.class, printServiceDAO);
 
     projectDAO.setJdbcTemplate(template);
     projectDAO.setSecurityProfileDAO(securityProfileDAO);
@@ -601,6 +667,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
     projectDAO.setWatcherDAO(watcherDAO);
     projectDAO.setCascadeType(CascadeType.PERSIST);
     projectDAO.setDataObjectFactory(dataObjectFactory);
+    daos.put(uk.ac.bbsrc.tgac.miso.core.data.Project.class, projectDAO);
 
     runDAO.setJdbcTemplate(template);
     runDAO.setSecurityProfileDAO(securityProfileDAO);
@@ -612,11 +679,13 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
     runDAO.setWatcherDAO(watcherDAO);
     runDAO.setCascadeType(CascadeType.PERSIST);
     runDAO.setDataObjectFactory(dataObjectFactory);
+    daos.put(uk.ac.bbsrc.tgac.miso.core.data.Run.class, runDAO);
 
     runQcDAO.setJdbcTemplate(template);
     runQcDAO.setRunDAO(runDAO);
     runQcDAO.setSequencerPartitionContainerDAO(sequencerPartitionContainerDAO);
     runQcDAO.setDataObjectFactory(dataObjectFactory);
+    daos.put(uk.ac.bbsrc.tgac.miso.core.data.RunQC.class, runQcDAO);
 
     sampleDAO.setJdbcTemplate(template);
     sampleDAO.setSecurityProfileDAO(securityProfileDAO);
@@ -626,10 +695,12 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
     sampleDAO.setSampleQcDAO(sampleQcDAO);
     sampleDAO.setCascadeType(CascadeType.PERSIST);
     sampleDAO.setDataObjectFactory(dataObjectFactory);
+    daos.put(uk.ac.bbsrc.tgac.miso.core.data.Sample.class, sampleDAO);
 
     sampleQcDAO.setJdbcTemplate(template);
     sampleQcDAO.setSampleDAO(sampleDAO);
     sampleQcDAO.setDataObjectFactory(dataObjectFactory);
+    daos.put(uk.ac.bbsrc.tgac.miso.core.data.SampleQC.class, sampleQcDAO);
 
     sequencerPartitionContainerDAO.setJdbcTemplate(template);
     sequencerPartitionContainerDAO.setSecurityProfileDAO(securityProfileDAO);
@@ -637,10 +708,12 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
     sequencerPartitionContainerDAO.setRunDAO(runDAO);
     sequencerPartitionContainerDAO.setCascadeType(CascadeType.PERSIST);
     sequencerPartitionContainerDAO.setDataObjectFactory(dataObjectFactory);
+    daos.put(uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer.class, sequencerPartitionContainerDAO);
 
     sequencerReferenceDAO.setJdbcTemplate(template);
     sequencerReferenceDAO.setDataObjectFactory(dataObjectFactory);
     sequencerReferenceDAO.setPlatformDAO(platformDAO);
+    daos.put(uk.ac.bbsrc.tgac.miso.core.data.SequencerReference.class, sequencerReferenceDAO);
 
     studyDAO.setJdbcTemplate(template);
     studyDAO.setSecurityProfileDAO(securityProfileDAO);
@@ -648,6 +721,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
     studyDAO.setProjectDAO(projectDAO);
     studyDAO.setCascadeType(CascadeType.PERSIST);
     studyDAO.setDataObjectFactory(dataObjectFactory);
+    daos.put(uk.ac.bbsrc.tgac.miso.core.data.Study.class, studyDAO);
 
     submissionDAO.setJdbcTemplate(template);
     submissionDAO.setPartitionDAO(partitionDAO);
@@ -656,13 +730,21 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
     submissionDAO.setSampleDAO(sampleDAO);
     submissionDAO.setStudyDAO(studyDAO);
     submissionDAO.setDataObjectFactory(dataObjectFactory);
-    submissionDAO.setDilutionDAO(dilutionDAO);
+    submissionDAO.setDilutionDAO(libraryDilutionDAO);
+    daos.put(uk.ac.bbsrc.tgac.miso.core.data.Submission.class, submissionDAO);
 
     statusDAO.setJdbcTemplate(template);
     statusDAO.setDataObjectFactory(dataObjectFactory);
+    daos.put(uk.ac.bbsrc.tgac.miso.core.data.Status.class, statusDAO);
 
     watcherDAO.setJdbcTemplate(template);
     watcherDAO.setSecurityManager(sm);
+
+    daoLookup = new DaoLookup();
+    daoLookup.setDaos(daos);
+
+    poolDAO.setDaoLookup(daoLookup);
+    plateDAO.setDaoLookup(daoLookup);
   }
 
   @After
@@ -761,7 +843,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
                  "platformName VARCHAR(255) default NULL," +
                  "alias VARCHAR(30) default NULL," +
                  "paired BIT NOT NULL," +
-                 "qcPassed BIT default NULL," +
+                 "qcPassed VARCHAR(5) default NULL," +
                  "PRIMARY KEY  (libraryId)" +
                  ");");
 
@@ -861,9 +943,11 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
                  ");");
 
     runStatement(conn,
-                 "CREATE TABLE Plate_Library (" +
+                 "CREATE TABLE Plate_Elements (" +
                  "plate_plateId BIGINT NOT NULL," +
-                 "library_libraryId BIGINT NOT NULL" +
+                 "elementType VARCHAR(255) NOT NULL" +
+                 "elementPosition INTEGER NOT NULL" +
+                 "elementId BIGINT NOT NULL" +
                  ");");
 
     runStatement(conn,
@@ -878,7 +962,19 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
                  "experiment_experimentId BIGINT default NULL," +
                  "platformType VARCHAR(20) NOT NULL," +
                  "ready BOOLEAN NOT NULL," +
+                 "qcPassed VARCHAR(5) default NULL," +
                  "PRIMARY KEY  (poolId)" +
+                 ");");
+
+    runStatement(conn,
+                 "CREATE TABLE PoolQC (" +
+                 "qcId BIGINT NOT NULL," +
+                 "pool_poolId BIGINT NOT NULL," +
+                 "qcUserName VARCHAR(255) NOT NULL," +
+                 "qcDate TIMESTAMP NOT NULL," +
+                 "qcMethod BIGINT NOT NULL," +
+                 "results DOUBLE default NULL," +
+                 "PRIMARY KEY (qcId)" +
                  ");");
 
     runStatement(conn,
@@ -888,15 +984,10 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
                  ");");
 
     runStatement(conn,
-                 "CREATE TABLE Pool_LibraryDilution (" +
+                 "CREATE TABLE Pool_Elements (" +
                  "pool_poolId BIGINT NOT NULL," +
-                 "dilutions_dilutionId BIGINT NOT NULL" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE Pool_emPCRDilution (" +
-                 "pool_poolId BIGINT NOT NULL," +
-                 "dilutions_dilutionId BIGINT NOT NULL" +
+                 "elementType VARCHAR(255) NOT NULL" +
+                 "elementId BIGINT NOT NULL" +
                  ");");
 
     runStatement(conn,

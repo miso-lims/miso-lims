@@ -29,13 +29,15 @@ import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 
+import java.io.Serializable;
+
 /**
  * Concrete implementation of a LibraryQC
  *
  * @author Rob Davey
  * @since 0.0.2
  */
-public class LibraryQCImpl extends AbstractLibraryQC {
+public class LibraryQCImpl extends AbstractLibraryQC implements Serializable {
   /**
    * Construct a new LibraryQC
    */

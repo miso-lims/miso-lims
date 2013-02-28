@@ -239,29 +239,9 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
-  public long saveIlluminaPool(IlluminaPool pool) throws IOException {
-    if (writeCheck(pool)) {
-      return super.savePool(pool);
-    }
-    else {
-      throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this Pool");
-    }
-  }
-
-  @Override
-  public long saveLS454Pool(LS454Pool pool) throws IOException {
-    if (writeCheck(pool)) {
-      return super.savePool(pool);
-    }
-    else {
-      throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this Pool");
-    }
-  }
-
-  @Override
-  public long saveSolidPool(SolidPool pool) throws IOException {
-    if (writeCheck(pool)) {
-      return super.savePool(pool);
+  public long savePoolQC(PoolQC poolQC) throws IOException {
+    if (writeCheck(poolQC.getPool())) {
+      return super.savePoolQC(poolQC);
     }
     else {
       throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this Pool");
@@ -374,17 +354,10 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
-  public Pool<? extends Poolable> getIlluminaPoolByBarcode(String barcode) throws IOException {
-    Pool<? extends Poolable> o = super.getIlluminaPoolByBarcode(barcode);
-    if (readCheck(o)) return o;
-    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Pool " + o.getId());
-  }
-
-  @Override
-  public Pool<? extends Poolable> getIlluminaPoolById(long poolId) throws IOException {
-    Pool<? extends Poolable> o = super.getIlluminaPoolById(poolId);
-    if (readCheck(o)) return o;
-    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Pool " + o.getId());
+  public PoolQC getPoolQCById(long qcId) throws IOException {
+    PoolQC o = super.getPoolQCById(qcId);
+    if (readCheck(o.getPool())) return o;
+    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read parent Pool " + o.getPool().getId() + " for PoolQC " + qcId);
   }
 
   @Override
@@ -409,6 +382,27 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
+  public Dilution getDilutionByBarcode(String barcode) throws IOException {
+    Dilution o = super.getDilutionByBarcode(barcode);
+    if (readCheck(o)) return o;
+    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Dilution " + o.getId());
+  }
+
+  @Override
+  public Dilution getDilutionByIdAndPlatform(long dilutionid, PlatformType platformType) throws IOException {
+    Dilution o = super.getDilutionByIdAndPlatform(dilutionid, platformType);
+    if (readCheck(o)) return o;
+    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Dilution " + o.getId());
+  }
+  @Override
+
+  public Dilution getDilutionByBarcodeAndPlatform(String barcode, PlatformType platformType) throws IOException {
+    Dilution o = super.getDilutionByBarcodeAndPlatform(barcode, platformType);
+    if (readCheck(o)) return o;
+    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Dilution " + o.getId());
+  }
+
+  @Override
   public LibraryDilution getLibraryDilutionById(long dilutionId) throws IOException {
     LibraryDilution o = super.getLibraryDilutionById(dilutionId);
     if (readCheck(o)) return o;
@@ -418,6 +412,13 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public LibraryDilution getLibraryDilutionByBarcode(String barcode) throws IOException {
     LibraryDilution o = super.getLibraryDilutionByBarcode(barcode);
+    if (readCheck(o)) return o;
+    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read LibraryDilution " + o.getId());
+  }
+
+  @Override
+  public LibraryDilution getLibraryDilutionByBarcodeAndPlatform(String barcode, PlatformType platformType) throws IOException {
+    LibraryDilution o = super.getLibraryDilutionByBarcodeAndPlatform(barcode, platformType);
     if (readCheck(o)) return o;
     else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read LibraryDilution " + o.getId());
   }
@@ -451,24 +452,17 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
+  public emPCRDilution getEmPcrDilutionByBarcodeAndPlatform(String barcode, PlatformType platformType) throws IOException {
+    emPCRDilution o = super.getEmPcrDilutionByBarcodeAndPlatform(barcode, platformType);
+    if (readCheck(o)) return o;
+    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read emPCRDilution " + o.getId());
+  }
+
+  @Override
   public SequencerPartitionContainer<SequencerPoolPartition> getSequencerPartitionContainerById(long containerId) throws IOException {
     SequencerPartitionContainer o = super.getSequencerPartitionContainerById(containerId);
     if (readCheck(o)) return o;
     else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read SequencerPartitionContainer " + containerId);
-  }
-
-  @Override
-  public Pool<? extends Poolable> getLS454PoolById(long poolId) throws IOException {
-    Pool<? extends Poolable> o = super.getLS454PoolById(poolId);
-    if (readCheck(o)) return o;
-    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read LS454Pool " + poolId);
-  }
-
-  @Override
-  public Pool<? extends Poolable> getLS454PoolByBarcode(String barcode) throws IOException {
-    Pool<? extends Poolable> o = super.getLS454PoolByBarcode(barcode);
-    if (readCheck(o)) return o;
-    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read LS454Pool " + o.getId());
   }
 
   @Override
@@ -536,20 +530,6 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
-  public Pool<? extends Poolable> getSolidPoolById(long poolId) throws IOException {
-    Pool<? extends Poolable> o = super.getSolidPoolById(poolId);
-    if (readCheck(o)) return o;
-    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read SolidPool " + poolId);
-  }
-
-  @Override
-  public Pool<? extends Poolable> getSolidPoolByBarcode(String barcode) throws IOException {
-    Pool<? extends Poolable> o = super.getSolidPoolByBarcode(barcode);
-    if (readCheck(o)) return o;
-    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read SolidPool " + o.getId());
-  }
-
-  @Override
   public Status getStatusByRunName(String runName) throws IOException {
     Run o = super.getRunByAlias(runName);
     if (readCheck(o)) return super.getStatusByRunName(runName);
@@ -568,6 +548,20 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
     Submission o = super.getSubmissionById(submissionId);
     if (readCheck(o)) return o;
     else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Submission " + submissionId);
+  }
+
+  @Override
+  public Plate<? extends List<? extends Plateable>, ? extends Plateable> getPlateById(long plateId) throws IOException {
+    Plate<? extends List<? extends Plateable>, ? extends Plateable> p = super.getPlateById(plateId);
+    if (readCheck(p)) return p;
+    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Plate " + plateId);
+  }
+
+  @Override
+  public <T extends List<S>, S extends Plateable> Plate<T, S> getPlateByBarcode(String barcode) throws IOException {
+    Plate<T, S> p = super.<T, S> getPlateByBarcode(barcode);
+    if (readCheck(p)) return p;
+    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Plate " + p.getId());
   }
 
   /* lists */
@@ -943,6 +937,30 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
+  public Collection<Dilution> listDilutionsBySearch(String query, PlatformType platformType) throws IOException {
+    User user = getCurrentUser();
+    Collection<Dilution> accessibles = new HashSet<Dilution>();
+    for (Dilution dilution : super.listDilutionsBySearch(query, platformType)) {
+      if (dilution.userCanRead(user)) {
+        accessibles.add(dilution);
+      }
+    }
+    return accessibles;
+  }
+
+  @Override
+  public Collection<Dilution> listAllDilutionsByProjectAndPlatform(long projectId, PlatformType platformType) throws IOException {
+    User user = getCurrentUser();
+    Collection<Dilution> accessibles = new HashSet<Dilution>();
+    for (Dilution dilution : super.listAllDilutionsByProjectAndPlatform(projectId, platformType)) {
+      if (dilution.userCanRead(user)) {
+        accessibles.add(dilution);
+      }
+    }
+    return accessibles;
+  }
+
+  @Override
   public Collection<LibraryDilution> listAllLibraryDilutions() throws IOException {
     User user = getCurrentUser();
     Collection<LibraryDilution> accessibles = new HashSet<LibraryDilution>();
@@ -979,10 +997,46 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
+  public Collection<LibraryDilution> listAllLibraryDilutionsByProjectId(long projectId) throws IOException {
+    User user = getCurrentUser();
+    Collection<LibraryDilution> accessibles = new HashSet<LibraryDilution>();
+    for (LibraryDilution dilution : super.listAllLibraryDilutionsByProjectId(projectId)) {
+      if (dilution.userCanRead(user)) {
+        accessibles.add(dilution);
+      }
+    }
+    return accessibles;
+  }
+
+  @Override
   public Collection<LibraryDilution> listAllLibraryDilutionsBySearch(String query, PlatformType platformType) throws IOException {
     User user = getCurrentUser();
     Collection<LibraryDilution> accessibles = new HashSet<LibraryDilution>();
     for (LibraryDilution dilution : super.listAllLibraryDilutionsBySearch(query, platformType)) {
+      if (dilution.userCanRead(user)) {
+        accessibles.add(dilution);
+      }
+    }
+    return accessibles;
+  }
+
+  @Override
+  public Collection<LibraryDilution> listAllLibraryDilutionsByProjectAndPlatform(long projectId, PlatformType platformType) throws IOException {
+    User user = getCurrentUser();
+    Collection<LibraryDilution> accessibles = new HashSet<LibraryDilution>();
+    for (LibraryDilution dilution : super.listAllLibraryDilutionsByProjectAndPlatform(projectId, platformType)) {
+      if (dilution.userCanRead(user)) {
+        accessibles.add(dilution);
+      }
+    }
+    return accessibles;
+  }
+
+  @Override
+  public Collection<LibraryDilution> listAllLibraryDilutionsByPoolAndPlatform(long poolId, PlatformType platformType) throws IOException {
+    User user = getCurrentUser();
+    Collection<LibraryDilution> accessibles = new HashSet<LibraryDilution>();
+    for (LibraryDilution dilution : super.listAllLibraryDilutionsByPoolAndPlatform(poolId, platformType)) {
       if (dilution.userCanRead(user)) {
         accessibles.add(dilution);
       }
@@ -1027,6 +1081,18 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
+  public Collection<emPCRDilution> listAllEmPcrDilutionsByProjectId(long projectId) throws IOException {
+    User user = getCurrentUser();
+    Collection<emPCRDilution> accessibles = new HashSet<emPCRDilution>();
+    for (emPCRDilution dilution : super.listAllEmPcrDilutionsByProjectId(projectId)) {
+      if (dilution.userCanRead(user)) {
+        accessibles.add(dilution);
+      }
+    }
+    return accessibles;
+  }
+
+  @Override
   public Collection<emPCRDilution> listAllEmPcrDilutionsBySearch(String query, PlatformType platformType) throws IOException {
     User user = getCurrentUser();
     Collection<emPCRDilution> accessibles = new HashSet<emPCRDilution>();
@@ -1039,10 +1105,10 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
-  public Collection<? extends Dilution> listAllDilutionsByProjectAndPlatform(long projectId, PlatformType platformType) throws IOException {
+  public Collection<emPCRDilution> listAllEmPcrDilutionsByProjectAndPlatform(long projectId, PlatformType platformType) throws IOException {
     User user = getCurrentUser();
-    Collection<Dilution> accessibles = new HashSet<Dilution>();
-    for (Dilution dilution : super.listAllDilutionsByProjectAndPlatform(projectId, platformType)) {
+    Collection<emPCRDilution> accessibles = new HashSet<emPCRDilution>();
+    for (emPCRDilution dilution : super.listAllEmPcrDilutionsByProjectAndPlatform(projectId, platformType)) {
       if (dilution.userCanRead(user)) {
         accessibles.add(dilution);
       }
@@ -1051,10 +1117,10 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
-  public Collection<? extends Dilution> listAllDilutionsByPlatform(PlatformType platformType) throws IOException {
+  public Collection<emPCRDilution> listAllEmPcrDilutionsByPoolAndPlatform(long poolId, PlatformType platformType) throws IOException {
     User user = getCurrentUser();
-    Collection<Dilution> accessibles = new HashSet<Dilution>();
-    for (Dilution dilution : super.listAllDilutionsByPlatform(platformType)) {
+    Collection<emPCRDilution> accessibles = new HashSet<emPCRDilution>();
+    for (emPCRDilution dilution : super.listAllEmPcrDilutionsByPoolAndPlatform(poolId, platformType)) {
       if (dilution.userCanRead(user)) {
         accessibles.add(dilution);
       }
@@ -1165,77 +1231,12 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
-  public List<Pool<? extends Poolable>> listAllIlluminaPools() throws IOException {
+  public List<PoolQC> listAllPoolQCsByPoolId(long poolId) throws IOException {
     User user = getCurrentUser();
-    ArrayList<Pool<? extends Poolable>> accessibles = new ArrayList<Pool<? extends Poolable>>();
-    for (Pool<? extends Poolable> pool : super.listAllIlluminaPools()) {
-      if (pool.userCanRead(user)) {
-        accessibles.add(pool);
-      }
-    }
-    Collections.sort(accessibles);
-    return accessibles;
-  }
-
-  @Override
-  public List<Pool<? extends Poolable>> listAll454Pools() throws IOException {
-    User user = getCurrentUser();
-    ArrayList<Pool<? extends Poolable>> accessibles = new ArrayList<Pool<? extends Poolable>>();
-    for (Pool<? extends Poolable> pool : super.listAll454Pools()) {
-      if (pool.userCanRead(user)) {
-        accessibles.add(pool);
-      }
-    }
-    Collections.sort(accessibles);
-    return accessibles;
-  }
-
-  @Override
-  public List<Pool<? extends Poolable>> listAllSolidPools() throws IOException {
-    User user = getCurrentUser();
-    ArrayList<Pool<? extends Poolable>> accessibles = new ArrayList<Pool<? extends Poolable>>();
-    for (Pool<? extends Poolable> pool : super.listAllSolidPools()) {
-      if (pool.userCanRead(user)) {
-        accessibles.add(pool);
-      }
-    }
-    Collections.sort(accessibles);
-    return accessibles;
-  }
-
-  @Override
-  public List<Pool<? extends Poolable>> listReadyIlluminaPools() throws IOException {
-    User user = getCurrentUser();
-    ArrayList<Pool<? extends Poolable>> accessibles = new ArrayList<Pool<? extends Poolable>>();
-    for (Pool<? extends Poolable> pool : super.listReadyIlluminaPools()) {
-      if (pool.userCanRead(user)) {
-        accessibles.add(pool);
-      }
-    }
-    Collections.sort(accessibles);
-    return accessibles;
-  }
-
-  @Override
-  public List<Pool<? extends Poolable>> listReady454Pools() throws IOException {
-    User user = getCurrentUser();
-    ArrayList<Pool<? extends Poolable>> accessibles = new ArrayList<Pool<? extends Poolable>>();
-    for (Pool<? extends Poolable> pool : super.listReady454Pools()) {
-      if (pool.userCanRead(user)) {
-        accessibles.add(pool);
-      }
-    }
-    Collections.sort(accessibles);
-    return accessibles;
-  }
-
-  @Override
-  public List<Pool<? extends Poolable>> listReadySolidPools() throws IOException {
-    User user = getCurrentUser();
-    ArrayList<Pool<? extends Poolable>> accessibles = new ArrayList<Pool<? extends Poolable>>();
-    for (Pool<? extends Poolable> pool : super.listReadySolidPools()) {
-      if (pool.userCanRead(user)) {
-        accessibles.add(pool);
+    ArrayList<PoolQC> accessibles = new ArrayList<PoolQC>();
+    for (PoolQC qc : super.listAllPoolQCsByPoolId(poolId)) {
+      if (qc.userCanRead(user)) {
+        accessibles.add(qc);
       }
     }
     Collections.sort(accessibles);
@@ -1398,6 +1399,42 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
     return accessibles;
   }
 
+  @Override
+  public Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> listAllPlates() throws IOException {
+    User user = getCurrentUser();
+    Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> accessibles = new HashSet<Plate<? extends List<? extends Plateable>, ? extends Plateable>>();
+    for (Plate<? extends List<? extends Plateable>, ? extends Plateable> plate : super.listAllPlates()) {
+      if (plate.userCanRead(user)) {
+        accessibles.add(plate);
+      }
+    }
+    return accessibles;
+  }
+
+  @Override
+  public Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> listAllPlatesByProjectId(long projectId) throws IOException {
+    User user = getCurrentUser();
+    Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> accessibles = new HashSet<Plate<? extends List<? extends Plateable>, ? extends Plateable>>();
+    for (Plate<? extends List<? extends Plateable>, ? extends Plateable> plate : super.listAllPlatesByProjectId(projectId)) {
+      if (plate.userCanRead(user)) {
+        accessibles.add(plate);
+      }
+    }
+    return accessibles;
+  }
+
+  @Override
+  public Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> listAllPlatesBySearch(String str) throws IOException {
+    User user = getCurrentUser();
+    Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> accessibles = new HashSet<Plate<? extends List<? extends Plateable>, ? extends Plateable>>();
+    for (Plate<? extends List<? extends Plateable>, ? extends Plateable> plate : super.listAllPlatesBySearch(str)) {
+      if (plate.userCanRead(user)) {
+        accessibles.add(plate);
+      }
+    }
+    return accessibles;
+  }
+
   /* deletes */
   @Override
   public void deleteProject(Project project) throws IOException {
@@ -1440,6 +1477,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
       super.deleteEmPCR(empcr);
     }
   }
+
   @Override
   public void deleteRun(Run run) throws IOException {
     if (getCurrentUser().isAdmin()) {
@@ -1469,9 +1507,16 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
-  public void deleteDilution(Dilution dilution) throws IOException {
+  public void deleteLibraryDilution(LibraryDilution dilution) throws IOException {
     if (getCurrentUser().isAdmin()) {
-      super.deleteDilution(dilution);
+      super.deleteLibraryDilution(dilution);
+    }
+  }
+
+  @Override
+  public void deleteEmPcrDilution(emPCRDilution dilution) throws IOException {
+    if (getCurrentUser().isAdmin()) {
+      super.deleteEmPcrDilution(dilution);
     }
   }
 
@@ -1486,6 +1531,20 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   public void deletePool(Pool pool) throws IOException {
     if (getCurrentUser().isAdmin()) {
       super.deletePool(pool);
+    }
+  }
+
+  @Override
+  public void deletePoolQC(PoolQC poolQc) throws IOException {
+    if (getCurrentUser().isAdmin()) {
+      super.deletePoolQC(poolQc);
+    }
+  }
+
+  @Override
+  public void deletePlate(Plate plate) throws IOException {
+    if (getCurrentUser().isAdmin()) {
+      super.deletePlate(plate);
     }
   }
 }

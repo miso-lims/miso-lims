@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.*;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.SubmissionException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 
@@ -130,6 +131,16 @@ public class TGACIlluminaFilepathGenerator implements FilePathGenerator {
       }
     }
     return filePaths;
+  }
+
+  @Override
+  public String getName() {
+    return "TGAC Illumina File Path Generator";
+  }
+
+  @Override
+  public PlatformType generatesFilePathsFor() {
+    return PlatformType.ILLUMINA;
   }
 
   private class IlluminaFilenameFilter implements FilenameFilter {

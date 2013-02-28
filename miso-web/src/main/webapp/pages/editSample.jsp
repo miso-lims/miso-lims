@@ -31,11 +31,11 @@
 <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.breadcrumbs.popup.js'/>"></script>
 
 <script src="<c:url value='/scripts/datatables_utils.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
-<script src="<c:url value='/scripts/jquery/datatables/jquery.dataTables.min.js'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.mini.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.datepicker.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.checkbox.js'/>" type="text/javascript"></script>
-<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/datatable.css'/>" type="text/css">
+<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" type="text/css">
 
 <div id="maincontent">
 <div id="contentcolumn">
@@ -49,7 +49,7 @@
 <div id="tab-1">
 </c:if>
 
-<form:form method="POST" commandName="sample" autocomplete="off" acceptCharset="utf-8">
+<form:form  action="/miso/sample" method="POST" commandName="sample" autocomplete="off" acceptCharset="utf-8">
 <sessionConversation:insertSessionConversationId attributeName="sample"/>
 <h1>
   <c:choose>
@@ -368,13 +368,10 @@
     </span>
   <script type="text/javascript">
     jQuery(document).ready(function() {
-      writeTotalNo();
       jQuery("#sampleQcTable").tablesorter();
-    });
-    function writeTotalNo() {
       jQuery('#qcsTotalCount').html(jQuery('#sampleQcTable>tbody>tr:visible').length.toString() + " QCs");
       jQuery('#librariesTotalCount').html(jQuery('#library_table>tbody>tr:visible').length.toString() + " Libraries");
-    }
+    });
   </script>
   <br/>
   <%--

@@ -25,6 +25,14 @@ package uk.ac.bbsrc.tgac.miso.core.security;
 
 import com.eaglegenomics.simlims.core.Securable;
 import com.eaglegenomics.simlims.core.SecurityProfile;
+//import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+//import com.fasterxml.jackson.annotation.JsonIgnore;
+//import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+//import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.codehaus.jackson.annotate.JsonTypeInfo;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 /**
  * Allows an object to be read/write secured by a supplied {@link SecurityProfile}

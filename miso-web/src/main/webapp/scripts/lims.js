@@ -27,10 +27,35 @@ jQuery.ajaxSetup({cache: false});
 var ajaxurl = '/miso/fluxion.ajax';
 
 var Utils = Utils || {
+  /** Maps a form element's child input elements to a JSON object. */
   mappifyForm : function(formName) {
     var values = {};
     jQuery.each(jQuery('#'+formName).serializeArray(), function(i, field) {
       values[field.name] = field.value;
+    });
+    return values;
+  },
+
+  /** Maps a standard DOM container's (div, span, etc) child input elements to a JSON object. */
+  mappifyInputs : function(parentContainerName) {
+    var values = {};
+    jQuery.each(jQuery('#'+parentContainerName).find(":input").serializeArray(), function(i, field) {
+      values[field.name] = field.value;
+    });
+    return values;
+  },
+
+  mappifyTable : function(table) {
+    var values = [];
+    jQuery.each(jQuery('#'+table).find("tr:gt(0)"), function() {
+      var rowval = {};
+      jQuery.each(jQuery(this).find("td"), function() {
+        var td = jQuery(this);
+        if (!Utils.validation.isNullCheck(td.attr("name"))) {
+          rowval[td.attr("name")] = td.html();
+        }
+      });
+      values.push(rowval);
     });
     return values;
   }
@@ -155,7 +180,7 @@ Utils.ui = {
 Utils.fileUpload = {
   fileUploadProgress : function(formname, divname, successfunc) {
     var self = this;
-    self.processingOverlay();
+    //self.processingOverlay();
 
     Fluxion.doAjaxUpload(
       formname,

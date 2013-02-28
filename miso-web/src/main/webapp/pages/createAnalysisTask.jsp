@@ -39,7 +39,7 @@
   </c:forEach>
 </c:if>
 
-<form:form id="taskForm" method="POST" autocomplete="off">
+<form:form  action="/miso/analysis/task" id="taskForm" method="POST" autocomplete="off">
   <c:if test="${not empty run}">
     <input type="hidden" name="sample-sheet-string" value=""/>
   </c:if>

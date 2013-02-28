@@ -33,7 +33,7 @@
 
 <div id="maincontent">
 <div id="contentcolumn">
-<form:form method="POST" commandName="container" autocomplete="off" onsubmit="return validate_container(this);">
+<form:form  action="/miso/container" method="POST" commandName="container" autocomplete="off" onsubmit="return validate_container(this);">
 <sessionConversation:insertSessionConversationId attributeName="container"/>
 <h1>
     <c:choose>
@@ -122,6 +122,7 @@
                   <td>ID Barcode:</td>
                   <td>
                     <span id="idBarcode">${container.identificationBarcode}</span>
+                    <form:hidden path="identificationBarcode"/>
                     <c:if test="${(container.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                                                     or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
                       <a href="javascript:void(0);"
@@ -143,6 +144,7 @@
                   <td>Location:</td>
                   <td>
                     <span id="locationBarcode">${container.locationBarcode}</span>
+                    <form:hidden path="locationBarcode"/>
                     <c:if test="${(container.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                                                     or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
                       <a href="javascript:void(0);"
@@ -164,6 +166,7 @@
                   <td>Validation:</td>
                   <td>
                     <span id="validationBarcode">${container.validationBarcode}</span>
+                    <form:hidden path="validationBarcode"/>
                     <c:if test="${(container.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                                                     or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
                       <a href="javascript:void(0);"
@@ -195,7 +198,8 @@
                       <c:when test="${not empty partition.pool}">
                         <ul partition="${partitionCount.index}" bind="partitions[${partitionCount.index}].pool" class="runPartitionDroppable">
                         <div class="dashboard">
-                          <a href='<c:url value="/miso/pool/${fn:toLowerCase(container.platformType.key)}/${partition.pool.id}"/>'>
+                          <%-- <a href='<c:url value="/miso/pool/${fn:toLowerCase(container.platformType.key)}/${partition.pool.id}"/>'> --%>
+                          <a href='<c:url value="/miso/pool/${partition.pool.id}"/>'>
                               ${partition.pool.name}
                             (${partition.pool.creationDate})
                           </a><br/>

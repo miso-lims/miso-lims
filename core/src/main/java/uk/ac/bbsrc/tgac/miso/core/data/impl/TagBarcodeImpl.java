@@ -29,6 +29,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.io.Serializable;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.impl
@@ -39,7 +40,7 @@ import javax.persistence.Id;
  * @date 10-May-2011
  * @since 0.0.3
  */
-public class TagBarcodeImpl implements TagBarcode {
+public class TagBarcodeImpl implements TagBarcode, Serializable {
 
   public static final Long UNSAVED_ID = 0L;
 

@@ -30,6 +30,7 @@ import uk.ac.bbsrc.tgac.miso.core.event.type.AlertLevel;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -41,7 +42,7 @@ import java.util.Date;
  * @date 07/10/11
  * @since 0.1.2
  */
-public class DefaultAlert implements Alert {
+public class DefaultAlert implements Alert, Serializable {
   public static final Long UNSAVED_ID = 0L;
 
   @Id

@@ -23,6 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.store;
 
+import net.sourceforge.fluxion.spi.Spi;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
@@ -42,25 +43,7 @@ import java.util.List;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface PoolStore extends Store<Pool<? extends Poolable>>, Remover<Pool>, NamingSchemeAware<Pool> {
-  /**
-   * Get a Pool given a Pool ID
-   *
-   * @param poolId of type long
-   * @return Pool
-   * @throws IOException when
-   */
-  Pool<? extends Poolable> getPoolById(long poolId) throws IOException;
-
-  /**
-   * Save a Pool
-   *
-   * @param pool of type Pool
-   * @return long
-   * @throws IOException when
-   */
-  long save(Pool<? extends Poolable> pool) throws IOException;
-
+public interface PoolStore extends Store<Pool<? extends Poolable>>, Remover<Pool<? extends Poolable>>, NamingSchemeAware<Pool<? extends Poolable>> {
   /**
    * Get a Pool given a barcode and its platform
    *
@@ -80,24 +63,6 @@ public interface PoolStore extends Store<Pool<? extends Poolable>>, Remover<Pool
    * @throws IOException when
    */
   Collection<Pool<? extends Poolable>> listByLibraryId(long libraryId) throws IOException;
-
-  /**
-   * Get an IlluminaPool given an identification barcode
-   *
-   * @param barcode of type String
-   * @return IlluminaPool
-   * @throws IOException when
-   */
-  Pool<? extends Poolable> getIlluminaPoolByBarcode(String barcode) throws IOException;
-
-  /**
-   * Get an IlluminaPool given an IlluminaPool ID
-   *
-   * @param poolId of type long
-   * @return IlluminaPool
-   * @throws IOException when
-   */
-  Pool<? extends Poolable> getIlluminaPoolById(long poolId) throws IOException;
 
   /**
    * List all Pools that are related to a given {@link uk.ac.bbsrc.tgac.miso.core.data.Project}
@@ -145,115 +110,6 @@ public interface PoolStore extends Store<Pool<? extends Poolable>>, Remover<Pool
    * @throws IOException when
    */
   List<Pool<? extends Poolable>> listReadyByPlatformAndSearch(PlatformType platformType, String query) throws IOException;
-
-  /**
-   * List all IlluminaPools
-   *
-   * @return List<IlluminaPool>
-   * @throws IOException when
-   */
-  List<Pool<? extends Poolable>> listAllIlluminaPools() throws IOException;
-
-  /**
-   * List all ready to run IlluminaPools
-   *
-   * @return List<IlluminaPool>
-   * @throws IOException when
-   */
-  List<Pool<? extends Poolable>> listReadyIlluminaPools() throws IOException;
-
-  /**
-   * Save an IlluminaPool
-   *
-   * @param pool of type IlluminaPool
-   * @return long
-   * @throws IOException when
-   */
-  long saveIlluminaPool(IlluminaPool pool) throws IOException;
-
-  /**
-   * Get a LS454Pool given an identification barcode
-   *
-   * @param barcode of type String
-   * @return LS454Pool
-   * @throws IOException when
-   */
-  Pool<? extends Poolable> get454PoolByBarcode(String barcode) throws IOException;
-
-  /**
-   * Get a LS454Pool given a LS454Pool ID
-   *
-   * @param poolId of type long
-   * @return LS454Pool
-   * @throws IOException when
-   */
-  Pool<? extends Poolable> get454PoolById(long poolId) throws IOException;
-
-  /**
-   * List all LS454Pools
-   *
-   * @return List<LS454Pool>
-   * @throws IOException when
-   */
-  List<Pool<? extends Poolable>> listAll454Pools() throws IOException;
-
-  /**
-   * List all LS454Pools
-   *
-   * @return List<LS454Pool>
-   * @throws IOException when
-   */
-  List<Pool<? extends Poolable>> listReady454Pools() throws IOException;
-
-  /**
-   * Save a LS454Pool
-   *
-   * @param pool of type LS454Pool
-   * @return long
-   * @throws IOException when
-   */
-  long save454Pool(LS454Pool pool) throws IOException;
-
-  /**
-   * Get a SolidPool given an identification barcode
-   *
-   * @param barcode of type String
-   * @return SolidPool
-   * @throws IOException when
-   */
-  Pool<? extends Poolable> getSolidPoolByBarcode(String barcode) throws IOException;
-
-  /**
-   * Get a SolidPool given a SolidPool ID
-   *
-   * @param poolId of type long
-   * @return SolidPool
-   * @throws IOException when
-   */
-  Pool<? extends Poolable> getSolidPoolById(long poolId) throws IOException;
-
-  /**
-   * List all SolidPools
-   * @return List<SolidPool>
-   * @throws IOException when
-   */
-  List<Pool<? extends Poolable>> listAllSolidPools() throws IOException;
-
-  /**
-   * List all SolidPools
-   * @return List<SolidPool>
-   * @throws IOException when
-   */
-  List<Pool<? extends Poolable>> listReadySolidPools() throws IOException;
-  
-  /**
-   * Save a SolidPool
-   *
-   * @param pool of type SolidPool
-   * @return long
-   * @throws IOException when
-   */
-  long saveSolidPool(SolidPool pool) throws IOException;
 
   /**
    * Get any Pool related to an Experiment given an Experiment ID

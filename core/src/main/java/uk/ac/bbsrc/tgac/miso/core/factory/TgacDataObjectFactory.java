@@ -38,6 +38,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.solid.SolidPool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.solid.SolidRun;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * uk.ac.bbsrc.tgac.miso.core.factory
  * <p/>
@@ -137,30 +140,23 @@ public class TgacDataObjectFactory extends DataObjectFactory {
   }
 
   @Override
-  public Plate getPlateOfSize(int size) {
-    if (size == 96) return new _96WellPlate();
-    else if (size == 384) return new _384WellPlate();
-    else {
-      return new PlateImpl();
-    }
+  //public <T extends List<S>, S extends Plateable> Plate<T, S> getPlateOfSize(int size) {
+  public Plate<LinkedList<Plateable>, Plateable> getPlateOfSize(int size) {
+    return new PlateImpl<Plateable>(size);
   }
 
   @Override
-  public Plate getPlateOfSize(int size, User user) {
-    if (size == 96) return new _96WellPlate(user);
-    else if (size == 384) return new _384WellPlate(user);
-    else {
-      return new PlateImpl(user);
-    }
+  public Plate<LinkedList<Plateable>, Plateable> getPlateOfSize(int size, User user) {
+    return new PlateImpl<Plateable>(size, user);
   }
 
   @Override
-  public Pool getPool() {
-    return new PoolImpl();
+  public Pool<? extends Poolable> getPool() {
+    return new PoolImpl<Poolable>();
   }
 
-  public Pool getPool(User user) {
-    return new PoolImpl(user);
+  public Pool<? extends Poolable> getPool(User user) {
+    return new PoolImpl<Poolable>(user);
   }
 
   @Override
@@ -216,6 +212,11 @@ public class TgacDataObjectFactory extends DataObjectFactory {
   @Override
   public LibraryQC getLibraryQC() {
     return new LibraryQCImpl();
+  }
+
+  @Override
+  public PoolQC getPoolQC() {
+    return new PoolQCImpl();
   }
 
   @Override

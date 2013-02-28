@@ -69,7 +69,6 @@ public class RunAlertAspect {
     }
   }
 
-  //@Override
   public void update(Long runId) {
     try {
       runAlertManager.update(runId);

@@ -28,6 +28,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -40,7 +41,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "`Status`")
-public class StatusImpl implements Status {
+public class StatusImpl implements Status, Serializable {
   public static final Long UNSAVED_ID = 0L;
 
   @Id

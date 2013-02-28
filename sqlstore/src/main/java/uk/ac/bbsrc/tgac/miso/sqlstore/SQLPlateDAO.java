@@ -24,11 +24,14 @@
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.google.common.collect.LinkedListMultimap;
 import com.googlecode.ehcache.annotations.Cacheable;
 import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
 import com.googlecode.ehcache.annotations.TriggersRemove;
 import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
+import org.codehaus.jackson.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,23 +41,24 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.transaction.annotation.Transactional;
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractPlate;
-import uk.ac.bbsrc.tgac.miso.core.data.Plate;
+import uk.ac.bbsrc.tgac.miso.core.data.*;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlateMaterialType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
-import uk.ac.bbsrc.tgac.miso.core.store.PlateStore;
-import uk.ac.bbsrc.tgac.miso.core.store.Store;
+import uk.ac.bbsrc.tgac.miso.core.store.*;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
+import uk.ac.bbsrc.tgac.miso.sqlstore.util.DaoLookup;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 import javax.persistence.CascadeType;
 import java.io.IOException;
+import java.lang.reflect.ParameterizedType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore
@@ -98,6 +102,25 @@ public class SQLPlateDAO implements PlateStore {
           PLATE_BARCODES_SELECT +
           " WHERE materialType = ? ORDER by plateBarcodeId";
 
+  public static final String PLATE_ELEMENT_SELECT_BY_PLATE_ID =
+          "SELECT * FROM Plate_Elements " +
+          "WHERE plate_plateId=? ORDER BY elementPosition";
+
+  public static final String PLATE_ELEMENT_DELETE_BY_PLATE_ID =
+          "DELETE FROM Plate_Elements " +
+          "WHERE plate_plateId=:plate_plateId";
+
+  public static String PLATES_SELECT_BY_PROJECT_ID =
+          "SELECT pl.* FROM Project p " +
+          "INNER JOIN Sample sa ON sa.project_projectId = p.projectId " +
+          "INNER JOIN Library li ON li.sample_sampleId = sa.sampleId " +
+          "INNER JOIN Plate_Elements pe ON li.libraryId = pe.elementId " +
+          "INNER JOIN Plate pl ON pl.plateId = pe.plate_plateId " +
+          "WHERE p.projectId = ? AND pe.elementType = '" + Library.class.getName() + "'";
+
+  public static String PLATE_SELECT_BY_SEARCH =
+          PLATE_SELECT + " WHERE name LIKE :search OR identificationBarcode LIKE :search";
+
   protected static final Logger log = LoggerFactory.getLogger(SQLPlateDAO.class);
 
   @Autowired
@@ -106,18 +129,27 @@ public class SQLPlateDAO implements PlateStore {
   private JdbcTemplate template;
   private CascadeType cascadeType;
   private LibraryStore libraryDAO;
+  private SampleStore sampleDAO;
+  private LibraryDilutionStore dilutionDAO;
   private Store<SecurityProfile> securityProfileDAO;
 
   @Autowired
-  private MisoNamingScheme<Plate> namingScheme;
+  private DaoLookup daoLookup;
+
+  public void setDaoLookup(DaoLookup daoLookup) {
+      this.daoLookup = daoLookup;
+    }
+
+  @Autowired
+  private MisoNamingScheme<Plate<? extends List<? extends Plateable>, ? extends Plateable>> namingScheme;
 
   @Override
-  public MisoNamingScheme<Plate> getNamingScheme() {
+  public MisoNamingScheme<Plate<? extends List<? extends Plateable>, ? extends Plateable>> getNamingScheme() {
     return namingScheme;
   }
 
   @Override
-  public void setNamingScheme(MisoNamingScheme<Plate> namingScheme) {
+  public void setNamingScheme(MisoNamingScheme<Plate<? extends List<? extends Plateable>, ? extends Plateable>> namingScheme) {
     this.namingScheme = namingScheme;
   }
 
@@ -134,6 +166,14 @@ public class SQLPlateDAO implements PlateStore {
 
   public void setLibraryDAO(LibraryStore libraryDAO) {
     this.libraryDAO = libraryDAO;
+  }
+
+  public void setSampleDAO(SampleStore sampleDAO) {
+    this.sampleDAO = sampleDAO;
+  }
+
+  public void setDilutionDAO(LibraryDilutionStore dilutionDAO) {
+    this.dilutionDAO = dilutionDAO;
   }
 
   public Store<SecurityProfile> getSecurityProfileDAO() {
@@ -158,9 +198,9 @@ public class SQLPlateDAO implements PlateStore {
   }
 
   @Override
-  public Plate lazyGet(long plateId) throws IOException {
-    List eResults = template.query(PLATE_SELECT_BY_ID, new Object[]{plateId}, new LazyPlateMapper());
-    return eResults.size() > 0 ? (Plate) eResults.get(0) : null;
+  public Plate<? extends List<? extends Plateable>, ? extends Plateable> lazyGet(long plateId) throws IOException {
+    List<Plate<? extends List<? extends Plateable>, ? extends Plateable>> eResults = template.query(PLATE_SELECT_BY_ID, new Object[]{plateId}, new PlateMapper(true));
+    return eResults.size() > 0 ? eResults.get(0) : null;
   }
 
   @Override
@@ -173,19 +213,34 @@ public class SQLPlateDAO implements PlateStore {
       }
     )
   )
-  public Plate get(long plateId) throws IOException {
-    List eResults = template.query(PLATE_SELECT_BY_ID, new Object[]{plateId}, new PlateMapper());
-    return eResults.size() > 0 ? (Plate) eResults.get(0) : null;
+  public Plate<? extends List<? extends Plateable>, ? extends Plateable> get(long plateId) throws IOException {
+    List<Plate<? extends List<? extends Plateable>, ? extends Plateable>> eResults = template.query(PLATE_SELECT_BY_ID, new Object[]{plateId}, new PlateMapper());
+    return eResults.size() > 0 ? eResults.get(0) : null;
   }
 
-  public Plate getPlateByIdentificationBarcode(String barcode) throws IOException {
-    List eResults = template.query(PLATE_SELECT_BY_ID_BARCODE, new Object[]{barcode}, new PlateMapper());
-    return eResults.size() > 0 ? (Plate) eResults.get(0) : null;
+  public Plate<? extends List<? extends Plateable>, ? extends Plateable> getPlateByIdentificationBarcode(String barcode) throws IOException {
+    List<Plate<? extends List<? extends Plateable>, ? extends Plateable>> eResults = template.query(PLATE_SELECT_BY_ID_BARCODE, new Object[]{barcode}, new PlateMapper());
+    return eResults.size() > 0 ? eResults.get(0) : null;
   }
 
   @Override
-  public Collection<Plate> listAll() throws IOException {
+  public Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> listAll() throws IOException {
     return template.query(PLATE_SELECT, new PlateMapper());
+  }
+
+  public List<Plate<? extends List<? extends Plateable>, ? extends Plateable>> listByProjectId(long projectId) throws IOException {
+    List<Plate<? extends List<? extends Plateable>, ? extends Plateable>> plates = template.query(PLATES_SELECT_BY_PROJECT_ID, new Object[]{projectId}, new PlateMapper(true));
+    Collections.sort(plates);
+    return plates;
+  }
+
+  @Override
+  public List<Plate<? extends List<? extends Plateable>, ? extends Plateable>> listBySearch(String query) throws IOException {
+    String squery = "%" + query + "%";
+    MapSqlParameterSource params = new MapSqlParameterSource();
+    params.addValue("search", squery);
+    NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+    return namedTemplate.query(PLATE_SELECT_BY_SEARCH, params, new PlateMapper(true));
   }
 
   @Override
@@ -205,7 +260,7 @@ public class SQLPlateDAO implements PlateStore {
       }
     )
   )
-  public long save(Plate plate) throws IOException {
+  public long save(Plate<? extends List<? extends Plateable>, ? extends Plateable> plate) throws IOException {
     Long securityProfileId = plate.getSecurityProfile().getProfileId();
     if (securityProfileId == SecurityProfile.UNSAVED_ID  ||
         (this.cascadeType != null)) { // && this.cascadeType.equals(CascadeType.PERSIST))) {
@@ -218,8 +273,11 @@ public class SQLPlateDAO implements PlateStore {
           .addValue("plateMaterialType", plate.getPlateMaterialType().getKey())
           .addValue("locationBarcode", plate.getLocationBarcode())
           .addValue("size", plate.getSize())
-          .addValue("tagBarcodeId", plate.getTagBarcode().getId())
           .addValue("securityProfile_profileId", securityProfileId);
+
+    if (plate.getTagBarcode() != null) {
+      params.addValue("tagBarcodeId", plate.getTagBarcode().getId());
+    }
 
     if (plate.getId() == AbstractPlate.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
@@ -232,7 +290,14 @@ public class SQLPlateDAO implements PlateStore {
         plate.setName(name);
 
         if (namingScheme.validateField("name", plate.getName())) {
-          String barcode = name + "::" + plate.getTagBarcode();
+          String barcode = "";
+          if (plate.getTagBarcode() != null) {
+            barcode = plate.getName() + "::" + plate.getTagBarcode();
+          }
+          else {
+            //TODO this should be alias
+            barcode = plate.getName() + "::" + plate.getDescription();
+          }          
           params.addValue("name", name);
 
           params.addValue("identificationBarcode", barcode);
@@ -262,10 +327,18 @@ public class SQLPlateDAO implements PlateStore {
     }
     else {
       try {
+        String plateBarcode = "";
+        if (plate.getTagBarcode() != null) {
+          plateBarcode = plate.getName() + "::" + plate.getTagBarcode();
+        }
+        else {
+          //TODO this should be alias
+          plateBarcode = plate.getName() + "::" + plate.getDescription();
+        }
         if (namingScheme.validateField("name", plate.getName())) {
           params.addValue("plateId", plate.getId())
                 .addValue("name", plate.getName())
-                .addValue("identificationBarcode", plate.getName() + "::" + plate.getTagBarcode());
+                .addValue("identificationBarcode", plateBarcode);
           NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
           namedTemplate.update(PLATE_UPDATE, params);
         }
@@ -287,22 +360,35 @@ public class SQLPlateDAO implements PlateStore {
 
     if (this.cascadeType != null && this.cascadeType.equals(CascadeType.PERSIST)) {
       if (!plate.getElements().isEmpty()) {
-
-        /*
+        String eType = plate.getElementType().getName();
         MapSqlParameterSource eparams = new MapSqlParameterSource();
-        eparams.addValue("library_libraryId", library.getLibraryId());
-        NamedParameterJdbcTemplate libNamedTemplate = new NamedParameterJdbcTemplate(template);
-        libNamedTemplate.update(LIBRARY_TAGBARCODE_DELETE_BY_LIBRARY_ID, eparams);
+        eparams.addValue("plate_plateId", plate.getId());
+        NamedParameterJdbcTemplate nt = new NamedParameterJdbcTemplate(template);
+        nt.update(PLATE_ELEMENT_DELETE_BY_PLATE_ID, eparams);
 
         SimpleJdbcInsert eInsert = new SimpleJdbcInsert(template)
-                .withTableName("Library_TagBarcode");
+                .withTableName("Plate_Elements");
 
-        MapSqlParameterSource ltParams = new MapSqlParameterSource();
-        ltParams.addValue("library_libraryId", library.getLibraryId())
-                .addValue("barcode_barcodeId", library.getTagBarcode().getTagBarcodeId());
+        int pos = 1;
+        for (Plateable n : plate.getElements()) {
+          if (n.getId() == 0) {
+            Store<? super Plateable> dao = daoLookup.lookup(n.getClass());
+            if (dao != null) {
+              dao.save(n);
+            }
+            else {
+              log.error("No dao class found for " + n.getClass().getName());
+            }
+          }
+          MapSqlParameterSource ltParams = new MapSqlParameterSource();
+          ltParams.addValue("plate_plateId", plate.getId())
+                  .addValue("elementType", eType)
+                  .addValue("elementPosition", pos)
+                  .addValue("elementId", n.getId());
 
-        eInsert.execute(ltParams);
-        */
+          eInsert.execute(ltParams);
+          pos++;
+        }
       }
     }    
 
@@ -322,17 +408,43 @@ public class SQLPlateDAO implements PlateStore {
   )
   public boolean remove(Plate plate) throws IOException {
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-    return plate.isDeletable() &&
+    if (plate.isDeletable() &&
            (namedTemplate.update(PLATE_DELETE,
-                                 new MapSqlParameterSource().addValue("plateId", plate.getId())) == 1);
+                                 new MapSqlParameterSource().addValue("plateId", plate.getId())) == 1)) {
+      MapSqlParameterSource eparams = new MapSqlParameterSource();
+      eparams.addValue("plate_plateId", plate.getId());
+      namedTemplate.update(PLATE_ELEMENT_DELETE_BY_PLATE_ID, eparams);
+      return true;
+    }
+    return false;
   }
 
-  public class LazyPlateMapper implements RowMapper<Plate> {
-    public Plate mapRow(ResultSet rs, int rowNum) throws SQLException {
-      int plateSize = rs.getInt("size");
+  public class PlateMapper extends CacheAwareRowMapper<Plate<? extends List<? extends Plateable>, ? extends Plateable>> {
+    public PlateMapper() {
+      super((Class<Plate<? extends List<? extends Plateable>, ? extends Plateable>>)((ParameterizedType)new TypeReference<Plate<? extends List<? extends Plateable>, ? extends Plateable>>(){}.getType()).getRawType());
+    }
 
-      Plate plate = dataObjectFactory.getPlateOfSize(plateSize);
-      plate.setId(rs.getLong("plateId"));
+    public PlateMapper(boolean lazy) {
+      super((Class<Plate<? extends List<? extends Plateable>, ? extends Plateable>>)((ParameterizedType)new TypeReference<Plate<? extends List<? extends Plateable>, ? extends Plateable>>(){}.getType()).getRawType(), lazy);
+    }
+
+    @Override
+    public Plate<? extends List<? extends Plateable>, ? extends Plateable> mapRow(ResultSet rs, int rowNum) throws SQLException {
+      long id = rs.getLong("plateId");
+
+      if (isCacheEnabled()) {
+        Element element;
+        if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
+          log.debug("Cache hit on map for Plate " + id);
+          return (Plate<? extends List<? extends Plateable>, ? extends Plateable>)element.getObjectValue();
+        }
+      }
+
+      int plateSize = rs.getInt("size");
+      
+      //Plate<LinkedList<Plateable>, ? extends Plateable> plate = dataObjectFactory.<LinkedList<Plateable>, Plateable> getPlateOfSize(plateSize);
+      Plate<LinkedList<Plateable>, Plateable> plate = dataObjectFactory.getPlateOfSize(plateSize);
+      plate.setId(id);
       plate.setName(rs.getString("name"));
       plate.setCreationDate(rs.getDate("creationDate"));
       plate.setDescription(rs.getString("description"));
@@ -345,39 +457,61 @@ public class SQLPlateDAO implements PlateStore {
         plate.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
         plate.setPlateMaterialType(PlateMaterialType.get(rs.getString("plateMaterialType")));
         plate.setTagBarcode(libraryDAO.getTagBarcodeById(rs.getLong("tagBarcodeId")));
+
+        if (!isLazy()) {
+          plate.setElements(resolvePlateElements(plate.getId()));
+        }
       }
       catch (IOException e1) {
         e1.printStackTrace();
       }
+
+      if (isCacheEnabled()) {
+        lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id) ,plate));
+      }
+
       return plate;
     }
   }
 
-  public class PlateMapper implements RowMapper<Plate> {
-    public Plate mapRow(ResultSet rs, int rowNum) throws SQLException {
-      int plateSize = rs.getInt("size");
-      
-      Plate plate = dataObjectFactory.getPlateOfSize(plateSize);
-      plate.setId(rs.getLong("plateId"));
-      plate.setName(rs.getString("name"));
-      plate.setCreationDate(rs.getDate("creationDate"));
-      plate.setDescription(rs.getString("description"));
-      plate.setIdentificationBarcode(rs.getString("identificationBarcode"));
-      plate.setLocationBarcode(rs.getString("locationBarcode"));
-
-      //plate.setLastUpdated(rs.getTimestamp("lastUpdated"));
-
-      try {
-        plate.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
-        plate.setPlateMaterialType(PlateMaterialType.get(rs.getString("plateMaterialType")));
-        plate.setTagBarcode(libraryDAO.getTagBarcodeById(rs.getLong("tagBarcodeId")));
-
-        //plate.setElements();
+  private LinkedList<Plateable> resolvePlateElements(long plateId) throws IOException, SQLException {
+    try {
+      LinkedList<Plateable> elements = new LinkedList<Plateable>();
+      List<Map<String, Object>> rows = template.queryForList(PLATE_ELEMENT_SELECT_BY_PLATE_ID, plateId);
+      for (Map<String, Object> map : rows) {
+        Class<? extends Plateable> clz = Class.forName((String)map.get("elementType")).asSubclass(Plateable.class);
+        Store<? extends Plateable> dao = daoLookup.lookup(clz);
+        if (dao != null) {
+          elements.add(dao.get((Long) map.get("elementId")));
+        }
+        else {
+          throw new SQLException("No DAO found or more than one found.");
+        }
       }
-      catch (IOException e1) {
-        e1.printStackTrace();
+      return elements;
+    }
+    catch (ClassNotFoundException e) {
+      throw new IOException(e);
+    }
+  }
+
+  private Store<? extends Plateable> daoLookup(Class<?> elementType) throws IllegalArgumentException {
+    if (Plateable.class.isAssignableFrom(elementType)) {
+      if (Library.class.isAssignableFrom(elementType)) {
+        return libraryDAO;
       }
-      return plate;
+      else if (Sample.class.isAssignableFrom(elementType)) {
+        return sampleDAO;
+      }
+      else if (Dilution.class.isAssignableFrom(elementType)) {
+        return dilutionDAO;
+      }
+      else {
+        return null;
+      }
+    }
+    else {
+      throw new IllegalArgumentException("Element type " + elementType.getName() + " is not a valid Plateable type");
     }
   }
 }

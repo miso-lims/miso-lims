@@ -89,7 +89,7 @@ public class EditIlluminaPoolController {
 
   private List<? extends Dilution> populateAvailableDilutions(Pool pool) throws IOException {
     ArrayList<LibraryDilution> libs = new ArrayList<LibraryDilution>();
-    for (Dilution l : requestManager.listAllDilutionsByPlatform(PlatformType.ILLUMINA)) {
+    for (Dilution l : requestManager.listAllLibraryDilutionsByPlatform(PlatformType.ILLUMINA)) {
       if (!pool.getDilutions().contains(l)) {
         libs.add((LibraryDilution)l);
       }
@@ -145,7 +145,7 @@ public class EditIlluminaPoolController {
         model.put("title", "New Illumina Pool");
       }
       else {
-        pool = requestManager.getIlluminaPoolById(poolId);
+        pool = requestManager.getPoolById(poolId);
         model.put("title", "Illumina Pool "+poolId);
       }
 
@@ -179,13 +179,14 @@ public class EditIlluminaPoolController {
                                 ModelMap model) throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Pool pool = null;
+      Pool<? extends Poolable> pool = null;
       if (poolId == AbstractPool.UNSAVED_ID) {
-        pool = dataObjectFactory.getIlluminaPool(user);
+        pool = dataObjectFactory.getPool(user);
+        pool.setPlatformType(PlatformType.ILLUMINA);
         model.put("title", "New Illumina Pool");
       }
       else {
-        pool = requestManager.getIlluminaPoolById(poolId);
+        pool = requestManager.getPoolById(poolId);
         model.put("title", "Illumina Pool "+poolId);
       }
 

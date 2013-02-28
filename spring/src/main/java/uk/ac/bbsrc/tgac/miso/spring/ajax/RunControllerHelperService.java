@@ -853,36 +853,6 @@ public class RunControllerHelperService {
   }
   */
 
-  public JSONObject validateIlluminaPoolBarcode(HttpSession session, JSONObject json) throws IOException {
-    Pool ip = requestManager.getIlluminaPoolByBarcode(json.getString("barcode"));
-    if (ip != null) {
-      return JSONUtils.JSONObjectResponse("valid", "valid");
-    }
-    else {
-      return JSONUtils.JSONObjectResponse("invalid", "invalid");
-    }
-  }
-
-  public JSONObject validateLS454PoolBarcode(HttpSession session, JSONObject json) throws IOException {
-    Pool ip = requestManager.getLS454PoolByBarcode(json.getString("barcode"));
-    if (ip != null) {
-      return JSONUtils.JSONObjectResponse("valid", "valid");
-    }
-    else {
-      return JSONUtils.JSONObjectResponse("invalid", "invalid");
-    }
-  }
-
-  public JSONObject validateSolidPoolBarcode(HttpSession session, JSONObject json) throws IOException {
-    Pool ip = requestManager.getSolidPoolByBarcode(json.getString("barcode"));
-    if (ip != null) {
-      return JSONUtils.JSONObjectResponse("valid", "valid");
-    }
-    else {
-      return JSONUtils.JSONObjectResponse("invalid", "invalid");
-    }
-  }
-
   private String getPlatformRunOptions(Run run) throws IOException {
     StringBuilder b = new StringBuilder();
     b.append("<span id='containerspan'>Containers: ");

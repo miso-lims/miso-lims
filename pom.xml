@@ -30,7 +30,7 @@
   <groupId>uk.ac.bbsrc.tgac.miso</groupId>
   <artifactId>miso</artifactId>
   <packaging>pom</packaging>
-  <version>0.1.8</version>
+  <version>0.1.9-SNAPSHOT</version>
   <name>MISO Framework</name>
   <url>http://www.tgac.ac.uk/miso</url>
 
@@ -83,8 +83,8 @@
 
   <!-- Bug Tracker -->
   <issueManagement>
-    <system>sourceforge</system>
-    <url>https://sourceforge.net/tracker/?group_id=226286</url>
+    <system>jira</system>
+    <url>http://jira.tgac.bbsrc.ac.uk/browse/MISO</url>
   </issueManagement>
 
   <!-- Developer Listing -->
@@ -94,7 +94,7 @@
       <name>Rob Davey</name>
       <email>robert.davey@tgac.ac.uk</email>
       <organization>TGAC</organization>
-      <organizationUrl>http://www.tgac.ac.uk/bioinformatics/sequence-informatics/core-bioinformatics/</organizationUrl>
+      <organizationUrl>http://www.tgac.ac.uk/bioinformatics/sequencing-informatics/</organizationUrl>
       <roles>
         <role>administrator</role>
         <role>Developer</role>
@@ -147,6 +147,7 @@
 
   <!-- Maven repository deploy -->
   <distributionManagement>
+    <downloadUrl>https://repos.tgac.bbsrc.ac.uk/maven/repo</downloadUrl>
     <repository>
       <id>miso-releases</id>
       <name>MISO repository</name>
@@ -168,8 +169,8 @@
     </repository>
 
     <repository>
-      <id>tgac-legacy</id>
-      <name>TGAC legacy repository</name>
+      <id>tgac-repo</id>
+      <name>TGAC Maven Repository</name>
       <url>https://repos.tgac.bbsrc.ac.uk/maven/repo</url>
       <releases>
         <enabled>true</enabled>
@@ -181,25 +182,17 @@
       </snapshots>
     </repository>
 
+    <!--
     <repository>
-      <id>miso-releases</id>
-      <name>MISO repository</name>
-      <url>https://repos.tgac.bbsrc.ac.uk/maven/miso/releases</url>
-      <releases>
-        <enabled>true</enabled>
-        <updatePolicy>always</updatePolicy>
-      </releases>
-    </repository>
-
-    <repository>
-      <id>miso-snapshots</id>
-      <name>MISO snapshot repository</name>
-      <url>https://repos.tgac.bbsrc.ac.uk/maven/miso/snapshots</url>
+      <id>apache-snapshots</id>
+      <name>apache snapshots repository</name>
+      <url>http://repository.apache.org/snapshots</url>
       <snapshots>
         <enabled>true</enabled>
-        <updatePolicy>always</updatePolicy>
+        <updatePolicy>never</updatePolicy>
       </snapshots>
     </repository>
+    -->
 
     <repository>
       <id>spring-snapshot</id>
@@ -379,7 +372,8 @@
 
   <properties>
     <simlims-version>0.0.4-SNAPSHOT</simlims-version>
-    <spring-version>3.0.7.RELEASE</spring-version>
+    <spring-version>3.1.3.RELEASE</spring-version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
 </project>

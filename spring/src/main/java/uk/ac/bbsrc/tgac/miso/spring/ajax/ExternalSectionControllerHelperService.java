@@ -25,16 +25,14 @@ package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
 import com.eaglegenomics.simlims.core.manager.*;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.Project;
-import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.manager.*;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
@@ -103,131 +101,134 @@ public class ExternalSectionControllerHelperService {
   }
 
   public JSONObject projectStatus(HttpSession session, JSONObject json) {
+    JSONObject jsonObject = new JSONObject();
     try {
       Long projectId = json.getLong("projectId");
-      StringBuilder sb = new StringBuilder();
+      StringBuilder projectSb = new StringBuilder();
+      StringBuilder runSb = new StringBuilder();
+      StringBuilder sampleQcSb = new StringBuilder();
       Project project = requestManager.getProjectById(projectId);
-      sb.append("<div class='report'>");
-      sb.append("<b>Project Name: </b> " + project.getName());
-      sb.append("<br/><br/>");
-      sb.append("<b>Project Alias: </b> " + project.getAlias());
-      sb.append("<br/><br/>");
-      sb.append("<b>Project Description: </b> " + project.getDescription());
-      sb.append("<br/><br/>");
-      sb.append("<b>Progress: </b> " + project.getProgress().name());
-      sb.append("<br/><br/>");
+      projectSb.append("<div class='report'>");
+      projectSb.append("<b>Project Name: </b> " + project.getName());
+      projectSb.append("<br/><br/>");
+      projectSb.append("<b>Project Alias: </b> " + project.getAlias());
+      projectSb.append("<br/><br/>");
+      projectSb.append("<b>Project Description: </b> " + project.getDescription());
+      projectSb.append("<br/><br/>");
+      projectSb.append("<b>Progress: </b> " + project.getProgress().name());
+      projectSb.append("<br/><br/>");
       if (project.getOverviews().size() > 0) {
         for (ProjectOverview overview : project.getOverviews()) {
-          sb.append("<div><ol id=\"progress\">\n" +
-                    "            <li class=\"sample-qc-step\">\n");
-          sb.append("<div class=\"");
+          projectSb.append("<div><ol id=\"progress\">\n" +
+                           "            <li class=\"sample-qc-step\">\n");
+          projectSb.append("<div class=\"");
           if (overview.getAllSampleQcPassed() && overview.getLibraryPreparationComplete()) {
-            sb.append("left mid-progress-done");
+            projectSb.append("left mid-progress-done");
           }
           else if (overview.getAllSampleQcPassed()) {
-            sb.append("left-progress-done");
+            projectSb.append("left-progress-done");
           }
           else {
-            sb.append("left");
+            projectSb.append("left");
           }
-          sb.append("\">\n");
-          sb.append("                <span>Sample QCs</span>\n" +
-                    "              </div>\n" +
-                    "            </li>\n" +
-                    "\n" +
-                    "            <li class=\"lib-prep-step\">\n");
-          sb.append("<div class=\"");
+          projectSb.append("\">\n");
+          projectSb.append("                <span>Sample QCs</span>\n" +
+                           "              </div>\n" +
+                           "            </li>\n" +
+                           "\n" +
+                           "            <li class=\"lib-prep-step\">\n");
+          projectSb.append("<div class=\"");
           if (overview.getLibraryPreparationComplete() && overview.getAllLibrariesQcPassed()) {
-            sb.append("mid-progress-done");
+            projectSb.append("mid-progress-done");
           }
           else if (overview.getLibraryPreparationComplete()) {
-            sb.append("left-progress-done");
+            projectSb.append("left-progress-done");
           }
           else {
-            sb.append("");
+            projectSb.append("");
           }
-          sb.append("\">\n");
-          sb.append("                <span>Libraries prepared</span>\n" +
-                    "              </div>\n" +
-                    "            </li>\n" +
-                    "\n" +
-                    "            <li class=\"lib-qc-step\">\n");
-          sb.append("<div class=\"");
+          projectSb.append("\">\n");
+          projectSb.append("                <span>Libraries prepared</span>\n" +
+                           "              </div>\n" +
+                           "            </li>\n" +
+                           "\n" +
+                           "            <li class=\"lib-qc-step\">\n");
+          projectSb.append("<div class=\"");
           if (overview.getAllLibrariesQcPassed() && overview.getAllPoolsConstructed()) {
-            sb.append("mid-progress-done");
+            projectSb.append("mid-progress-done");
           }
           else if (overview.getAllLibrariesQcPassed()) {
-            sb.append("left-progress-done");
+            projectSb.append("left-progress-done");
           }
           else {
-            sb.append("");
+            projectSb.append("");
           }
-          sb.append("\">\n");
-          sb.append("                <span>Library QCs</span>\n" +
-                    "              </div>\n" +
-                    "            </li>\n" +
-                    "\n" +
-                    "            <li class=\"pools-step\">\n");
-          sb.append("<div class=\"");
+          projectSb.append("\">\n");
+          projectSb.append("                <span>Library QCs</span>\n" +
+                           "              </div>\n" +
+                           "            </li>\n" +
+                           "\n" +
+                           "            <li class=\"pools-step\">\n");
+          projectSb.append("<div class=\"");
           if (overview.getAllPoolsConstructed() && overview.getAllRunsCompleted()) {
-            sb.append("mid-progress-done");
+            projectSb.append("mid-progress-done");
           }
           else if (overview.getAllPoolsConstructed()) {
-            sb.append("left-progress-done");
+            projectSb.append("left-progress-done");
           }
           else {
-            sb.append("");
+            projectSb.append("");
           }
-          sb.append("\">\n");
-          sb.append("                <span>Pools Constructed</span>\n" +
-                    "              </div>\n" +
-                    "            </li>\n" +
-                    "\n" +
-                    "            <li class=\"runs-step\">\n");
-          sb.append("<div class=\"");
+          projectSb.append("\">\n");
+          projectSb.append("                <span>Pools Constructed</span>\n" +
+                           "              </div>\n" +
+                           "            </li>\n" +
+                           "\n" +
+                           "            <li class=\"runs-step\">\n");
+          projectSb.append("<div class=\"");
           if (overview.getAllRunsCompleted() && overview.getPrimaryAnalysisCompleted()) {
-            sb.append("mid-progress-done");
+            projectSb.append("mid-progress-done");
           }
           else if (overview.getAllRunsCompleted()) {
-            sb.append("left-progress-done");
+            projectSb.append("left-progress-done");
           }
           else {
-            sb.append("");
+            projectSb.append("");
           }
-          sb.append("\">\n");
-          sb.append("                <span>Runs Completed</span>\n" +
-                    "              </div>\n" +
-                    "            </li>\n" +
-                    "\n" +
-                    "            <li class=\"primary-analysis-step\">\n");
-          sb.append("<div class=\"");
+          projectSb.append("\">\n");
+          projectSb.append("                <span>Runs Completed</span>\n" +
+                           "              </div>\n" +
+                           "            </li>\n" +
+                           "\n" +
+                           "            <li class=\"primary-analysis-step\">\n");
+          projectSb.append("<div class=\"");
           if (overview.getPrimaryAnalysisCompleted()) {
-            sb.append("right mid-progress-done");
+            projectSb.append("right mid-progress-done");
           }
           else {
-            sb.append("right");
+            projectSb.append("right");
           }
-          sb.append("\">\n");
-          sb.append("                <span>Primary Analysis</span>\n" +
-                    "              </div>\n" +
-                    "            </li>\n" +
-                    "          </ol></div>\n" +
-                    "          <p style=\"clear:both\"/>");
+          projectSb.append("\">\n");
+          projectSb.append("                <span>Primary Analysis</span>\n" +
+                           "              </div>\n" +
+                           "            </li>\n" +
+                           "          </ol></div>\n" +
+                           "          <p style=\"clear:both\"/>");
         }
       }
       Collection<Sample> samples = requestManager.listAllSamplesByProjectId(projectId);
       if (samples.size() > 0) {
         int sampleQCPassed = 0;
-        sb.append("<table class=\"list\">\n" +
-                  "            <thead>\n" +
-                  "            <tr>\n" +
-                  "                <th>Sample Name</th>\n" +
-                  "                <th>Sample Alias</th>\n" +
-                  "                <th>Type</th>\n" +
-                  "                <th>QC Passed</th>\n" +
-                  "            </tr>\n" +
-                  "            </thead>\n" +
-                  "            <tbody>");
+//        sb.append("<table class=\"list\">\n" +
+//                  "            <thead>\n" +
+//                  "            <tr>\n" +
+//                  "                <th>Sample Name</th>\n" +
+//                  "                <th>Sample Alias</th>\n" +
+//                  "                <th>Type</th>\n" +
+//                  "                <th>QC Passed</th>\n" +
+//                  "            </tr>\n" +
+//                  "            </thead>\n" +
+//                  "            <tbody>");
         for (Sample sample : samples) {
           Boolean passed = sample.getQcPassed();
           String passStr;
@@ -241,95 +242,147 @@ public class ExternalSectionControllerHelperService {
           else {
             passStr = passed.toString();
           }
-          sb.append("<tr>\n" +
-                    "                    <td><b>" + sample.getName() + "</b></td>\n" +
-                    "                    <td>" + sample.getAlias() + "</td>\n" +
-                    "                    <td>" + sample.getSampleType() + "</td>\n" +
-                    "                    <td>" + passStr + "</td>\n" +
-                    "                </tr>");
+//          sb.append("<tr>\n" +
+//                    "                    <td><b>" + sample.getName() + "</b></td>\n" +
+//                    "                    <td>" + sample.getAlias() + "</td>\n" +
+//                    "                    <td>" + sample.getSampleType() + "</td>\n" +
+//                    "                    <td>" + passStr + "</td>\n" +
+//                    "                </tr>");
         }
-        sb.append("</tbody></table>");
-        sb.append("Sample QC Passed: " + sampleQCPassed + " out of " + samples.size() + ".<br/><br/>");
+//        sb.append("</tbody></table>");
+        sampleQcSb.append("Sample QC Passed: " + sampleQCPassed + " out of " + samples.size() + ".<br/><br/>");
       }
 
       else {
-        sb.append("<b>Sample:</b> None.<br/><br/>");
+        //   sb.append("<b>Sample:</b> None.<br/><br/>");
       }
 
-      Collection<Library> libraries = requestManager.listAllLibrariesByProjectId(projectId);
-      if (libraries.size() > 0) {
-        int libraryQCPassed = 0;
-        sb.append("<table class=\"list\">\n" +
-                  "            <thead>\n" +
-                  "            <tr>\n" +
-                  "                <th>Library Name</th>\n" +
-                  "                <th>Library Alias</th>\n" +
-                  "                <th>Type</th>\n" +
-                  "                <th>QC</th>\n" +
-                  "            </tr>\n" +
-                  "            </thead>\n" +
-                  "            <tbody>");
-        for (Library library : libraries) {
-          Boolean passed = library.getQcPassed();
-          String passStr;
-          if (passed == null) {
-            passStr = "Unknown";
-          }
-          else if (passed) {
-            passStr = passed.toString();
-            libraryQCPassed++;
-          }
-          else {
-            passStr = passed.toString();
-          }
-          sb.append("<tr>\n" +
-                    "                    <td><b>" + library.getName() + "</b></td>\n" +
-                    "                    <td>" + library.getAlias() + "</td>\n" +
-                    "                    <td>" + library.getLibraryType() + "</td>\n" +
-                    "                    <td>" + passStr + "</td>\n" +
-                    "                </tr>");
+//      Collection<Library> libraries = requestManager.listAllLibrariesByProjectId(projectId);
+//      if (libraries.size() > 0) {
+//        int libraryQCPassed = 0;
+//        sb.append("<table class=\"list\">\n" +
+//                  "            <thead>\n" +
+//                  "            <tr>\n" +
+//                  "                <th>Library Name</th>\n" +
+//                  "                <th>Library Alias</th>\n" +
+//                  "                <th>Type</th>\n" +
+//                  "                <th>QC</th>\n" +
+//                  "            </tr>\n" +
+//                  "            </thead>\n" +
+//                  "            <tbody>");
+//        for (Library library : libraries) {
+//          Boolean passed = library.getQcPassed();
+//          String passStr;
+//          if (passed == null) {
+//            passStr = "Unknown";
+//          }
+//          else if (passed) {
+//            passStr = passed.toString();
+//            libraryQCPassed++;
+//          }
+//          else {
+//            passStr = passed.toString();
+//          }
+//          sb.append("<tr>\n" +
+//                    "                    <td><b>" + library.getName() + "</b></td>\n" +
+//                    "                    <td>" + library.getAlias() + "</td>\n" +
+//                    "                    <td>" + library.getLibraryType() + "</td>\n" +
+//                    "                    <td>" + passStr + "</td>\n" +
+//                    "                </tr>");
+//        }
+//        sb.append("</tbody>\n" +
+//                  "        </table>");
+//        sb.append("Library QC Passed: " + libraryQCPassed + " out of " + libraries.size() + ".<br/><br/>");
+//      }
+//
+//      else {
+//        sb.append("<b>Library:</b> None.<br/><br/>");
+//      }
+
+      jsonObject.put("projectJson", projectSb.toString());
+      jsonObject.put("sampleQcJson", sampleQcSb.toString());
+      return jsonObject;
+    }
+    catch (IOException e) {
+      log.debug("Failed", e);
+      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
+    }
+  }
+
+  public JSONObject listSamplesDataTable(HttpSession session, JSONObject json) {
+    try {
+      Long projectId = json.getLong("projectId");
+      JSONObject j = new JSONObject();
+      JSONArray jsonArray = new JSONArray();
+      for (Sample sample : requestManager.listAllSamplesByProjectId(projectId)) {
+        String sampleQubit = "not available";
+        if (requestManager.listAllSampleQCsBySampleId(sample.getId()).size() > 0) {
+          ArrayList<SampleQC> sampleQcList = new ArrayList(requestManager.listAllSampleQCsBySampleId(sample.getId()));
+          SampleQC lastQc = sampleQcList.get(sampleQcList.size() - 1);
+          sampleQubit = (lastQc.getResults() != null ? lastQc.getResults().toString() + " ng/µl" : "not available");
         }
-        sb.append("</tbody>\n" +
-                  "        </table>");
-        sb.append("Library QC Passed: " + libraryQCPassed + " out of " + libraries.size() + ".<br/><br/>");
-      }
+        jsonArray.add("['" +
+                      (sample.getAlias() != null ? sample.getAlias() : "") + "','" +
+                      (sample.getSampleType() != null ? sample.getSampleType() : "") + "','" +
+                      (sample.getQcPassed() != null ? sample.getQcPassed().toString() : "") + "','" +
+                      sampleQubit + "','" +
+                      (sample.getReceivedDate() != null ? sample.getReceivedDate().toString() : "not available") + "']");
 
-      else {
-        sb.append("<b>Library:</b> None.<br/><br/>");
       }
+      j.put("array", jsonArray);
+      return j;
+    }
+    catch (IOException e) {
+      log.debug("Failed", e);
+      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
+    }
+  }
 
-      Collection<Run> runs = requestManager.listAllRunsByProjectId(projectId);
-      if (runs.size() > 0) {
-        int runQCPassed = 0;
-        sb.append("<table class=\"list\">\n" +
-                  "            <thead>\n" +
-                  "            <tr>\n" +
-                  "                <th>Run Name</th>\n" +
-                  "                <th>Run Alias</th>\n" +
-                  "                <th>Status</th>\n" +
-                  "            </tr>\n" +
-                  "            </thead>\n" +
-                  "            <tbody>");
-        for (Run run : runs) {
-          sb.append("<tr>\n" +
-                    "                    <td><b>" + run.getName() + "</b></td>\n" +
-                    "                    <td>" + run.getAlias() + "</td>\n" +
-                    "                    <td>" + run.getStatus().getHealth().getKey() + "</td>\n" +
-                    "                </tr>");
-          if (run.getRunQCs().size() > 0) {
-            runQCPassed++;
+  public JSONObject listRunsDataTable(HttpSession session, JSONObject json) {
+    try {
+      Long projectId = json.getLong("projectId");
+      JSONObject j = new JSONObject();
+      JSONArray jsonArray = new JSONArray();
+      for (Run run : requestManager.listAllRunsByProjectId(projectId)) {
+        if (!run.getStatus().getHealth().getKey().equals("Failed")) {
+
+          StringBuilder sb = new StringBuilder();
+          Collection<SequencerPartitionContainer<SequencerPoolPartition>> spcs = requestManager.listSequencerPartitionContainersByRunId(run.getId());
+          if (spcs.size() > 0) {
+            sb.append("<ul>");
+            for (SequencerPartitionContainer<SequencerPoolPartition> spc : spcs) {
+
+              if (spc.getPartitions().size() > 0) {
+                for (SequencerPoolPartition spp : spc.getPartitions()) {
+                  if (spp.getPool() != null) {
+                    if (spp.getPool().getDilutions().size() > 0) {
+                      for (Dilution dilution : spp.getPool().getDilutions()) {
+                        Sample sample = dilution.getLibrary().getSample();
+                        if (sample.getProject().equals(requestManager.getProjectById(projectId))) {
+                          sb.append("<li>");
+                          sb.append(sample.getAlias());
+                          sb.append("</li>");
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            sb.append("</ul>");
           }
+          jsonArray.add("['" +
+                        run.getName() + "','" +
+                        (run.getStatus() != null && run.getStatus().getHealth() != null ? run.getStatus().getHealth().getKey() : "") + "','" +
+                        (run.getStatus() != null && run.getStatus().getStartDate() != null ? run.getStatus().getStartDate().toString() : "") + "','" +
+                        (run.getStatus() != null && run.getStatus().getCompletionDate() != null ? run.getStatus().getCompletionDate().toString() : "") + "','" +
+                        (run.getPlatformType() != null ? run.getPlatformType().getKey() : "") + "','" +
+                        sb.toString() + "']");
+
         }
-        sb.append("</tbody>\n" +
-                  "        </table>");
-        sb.append("Run QC Passed: " + runQCPassed + " out of " + runs.size() + ".<br/><br/>");
       }
-
-      else {
-        sb.append("<b>Run:</b> None.");
-      }
-
-      return JSONUtils.JSONObjectResponse("html", sb.toString());
+      j.put("array", jsonArray);
+      return j;
     }
     catch (IOException e) {
       log.debug("Failed", e);

@@ -44,6 +44,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.*;
+import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
@@ -58,6 +59,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
 
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore
@@ -423,11 +425,11 @@ public class SQLSampleDAO implements SampleStore {
       )
   )
   public List<Sample> listAll() {
-    return template.query(SAMPLES_SELECT, new LazySampleMapper());
+    return template.query(SAMPLES_SELECT, new SampleMapper(true));
   }
 
   public List<Sample> listAllWithLimit(long limit) throws IOException {
-    return template.query(SAMPLES_SELECT_LIMIT, new Object[]{limit}, new LazySampleMapper());
+    return template.query(SAMPLES_SELECT_LIMIT, new Object[]{limit}, new SampleMapper(true));
   }
 
   @Override
@@ -436,8 +438,8 @@ public class SQLSampleDAO implements SampleStore {
   }
 
   public List<Sample> listBySearch(String query) {
-    String mySQLQuery = "%" + query + "%";
-    return template.query(SAMPLES_SELECT_BY_SEARCH, new Object[]{mySQLQuery,mySQLQuery,mySQLQuery,mySQLQuery,mySQLQuery}, new LazySampleMapper());
+    String mySQLQuery = "%" + query.replaceAll("_", Matcher.quoteReplacement("\\_")) + "%";
+    return template.query(SAMPLES_SELECT_BY_SEARCH, new Object[]{mySQLQuery,mySQLQuery,mySQLQuery,mySQLQuery,mySQLQuery}, new SampleMapper(true));
   }
 
   @Transactional(readOnly = false, rollbackFor = IOException.class)
@@ -489,29 +491,29 @@ public class SQLSampleDAO implements SampleStore {
   }
 
   public Sample lazyGet(long sampleId) throws IOException {
-    List eResults = template.query(SAMPLE_SELECT_BY_ID, new Object[]{sampleId}, new LazySampleMapper());
+    List eResults = template.query(SAMPLE_SELECT_BY_ID, new Object[]{sampleId}, new SampleMapper(true));
     Sample e = eResults.size() > 0 ? (Sample) eResults.get(0) : null;
     return e;
   }
 
   public Sample getByBarcode(String barcode) throws IOException {
-    List eResults = template.query(SAMPLE_SELECT_BY_IDENTIFICATION_BARCODE, new Object[]{barcode}, new LazySampleMapper());
+    List eResults = template.query(SAMPLE_SELECT_BY_IDENTIFICATION_BARCODE, new Object[]{barcode}, new SampleMapper(true));
     Sample e = eResults.size() > 0 ? (Sample) eResults.get(0) : null;
     return e;
   }
 
   public List<Sample> listByProjectId(long projectId) throws IOException {
-    List<Sample> samples = template.query(SAMPLES_SELECT_BY_PROJECT_ID, new Object[]{projectId}, new LazySampleMapper());
+    List<Sample> samples = template.query(SAMPLES_SELECT_BY_PROJECT_ID, new Object[]{projectId}, new SampleMapper(true));
     Collections.sort(samples);
     return samples;
   }
 
   public List<Sample> listByExperimentId(long experimentId) throws IOException {
-    return template.query(SAMPLES_SELECT_BY_EXPERIMENT_ID, new Object[]{experimentId}, new LazySampleMapper());
+    return template.query(SAMPLES_SELECT_BY_EXPERIMENT_ID, new Object[]{experimentId}, new SampleMapper(true));
   }
 
   public Collection<Sample> listByAlias(String alias) throws IOException {
-    return template.query(SAMPLE_SELECT_BY_ALIAS, new Object[]{alias}, new LazySampleMapper());
+    return template.query(SAMPLE_SELECT_BY_ALIAS, new Object[]{alias}, new SampleMapper(true));
   }
 
   public List<String> listAllSampleTypes() throws IOException {
@@ -522,44 +524,28 @@ public class SQLSampleDAO implements SampleStore {
     return template.query(SAMPLES_BY_RELATED_SUBMISSION, new Object[]{submissionId}, new SampleMapper());  
   }
 
-  public class LazySampleMapper implements RowMapper<Sample> {
-    public Sample mapRow(ResultSet rs, int rowNum) throws SQLException {
-      Sample s = dataObjectFactory.getSample();
-      s.setId(rs.getLong("sampleId"));
-      s.setName(rs.getString("name"));
-      s.setAlias(rs.getString("alias"));
-      s.setAccession(rs.getString("accession"));
-      s.setDescription(rs.getString("description"));
-      s.setScientificName(rs.getString("scientificName"));
-      s.setTaxonIdentifier(rs.getString("taxonIdentifier"));
-      s.setIdentificationBarcode(rs.getString("identificationBarcode"));
-      s.setLocationBarcode(rs.getString("locationBarcode"));
-      s.setSampleType(rs.getString("sampleType"));
-      s.setReceivedDate(rs.getDate("receivedDate"));
-      if (rs.getString("qcPassed") != null) {
-        s.setQcPassed(Boolean.parseBoolean(rs.getString("qcPassed")));
-      }
-      else {
-        s.setQcPassed(null);
-      }
-
-      //s.setLastUpdated(rs.getTimestamp("lastUpdated"));
-
-      try {
-        s.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
-        s.setProject(projectDAO.lazyGet(rs.getLong("project_projectId")));
-      }
-      catch (IOException e1) {
-        e1.printStackTrace();
-      }
-      return s;
+  public class SampleMapper extends CacheAwareRowMapper<Sample> {
+    public SampleMapper() {
+      super(Sample.class);
     }
-  }
 
-  public class SampleMapper implements RowMapper<Sample> {
+    public SampleMapper(boolean lazy) {
+      super(Sample.class, lazy);
+    }
+
+    @Override
     public Sample mapRow(ResultSet rs, int rowNum) throws SQLException {
+      long id = rs.getLong("sampleId");
+
+      if (isCacheEnabled()) {
+        Element element;
+        if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
+          log.debug("Cache hit on map for Sample " + id);
+          return (Sample)element.getObjectValue();
+        }
+      }
       Sample s = dataObjectFactory.getSample();
-      s.setId(rs.getLong("sampleId"));
+      s.setId(id);
       s.setName(rs.getString("name"));
       s.setAlias(rs.getString("alias"));
       s.setAccession(rs.getString("accession"));
@@ -581,17 +567,22 @@ public class SQLSampleDAO implements SampleStore {
 
       try {
         s.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
-        s.setProject(projectDAO.get(rs.getLong("project_projectId")));
+        if (!isLazy()) {
+          s.setProject(projectDAO.get(rs.getLong("project_projectId")));
 
-        for (Library l : libraryDAO.listBySampleId(rs.getLong("sampleId"))) {
-          s.addLibrary(l);
+          for (Library l : libraryDAO.listBySampleId(id)) {
+            s.addLibrary(l);
+          }
+
+          for (SampleQC qc : sampleQcDAO.listBySampleId(id)) {
+            s.addQc(qc);
+          }
+
+          s.setNotes(noteDAO.listBySample(id));
         }
-
-        for (SampleQC qc : sampleQcDAO.listBySampleId(rs.getLong("sampleId"))) {
-          s.addQc(qc);
+        else {
+          s.setProject(projectDAO.lazyGet(rs.getLong("project_projectId")));
         }
-
-        s.setNotes(noteDAO.listBySample(rs.getLong("sampleId")));
       }
       catch (IOException e1) {
         e1.printStackTrace();
@@ -602,6 +593,11 @@ public class SQLSampleDAO implements SampleStore {
       catch (MalformedSampleQcException e) {
         e.printStackTrace();
       }
+
+      if (isCacheEnabled()) {
+        lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id) ,s));
+      }
+
       return s;
     }
   }

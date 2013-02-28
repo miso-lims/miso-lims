@@ -47,6 +47,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -149,7 +150,8 @@ public class DashboardHelperService {
       }
 
       if (projects.size() > 0) {
-//        Collections.sort(projects);
+        Collections.sort(projects);
+        Collections.reverse(projects);
         for (Project p : projects) {
           b.append("<a class=\"dashboardresult\" href=\"/miso/project/" + p.getProjectId() + "\"><div onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
           b.append("Name: <b>" + p.getName() + "</b><br/>");
@@ -182,7 +184,8 @@ public class DashboardHelperService {
       }
 
       if (studies.size() > 0) {
-//        Collections.sort(studies);
+        Collections.sort(studies);
+        Collections.reverse(studies);
         for (Study s : studies) {
           b.append("<a class=\"dashboardresult\" href=\"/miso/study/" + s.getId() + "\"><div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
           b.append("Name: <b>" + s.getName() + "</b><br/>");
@@ -214,7 +217,8 @@ public class DashboardHelperService {
       }
 
       if (experiments.size() > 0) {
-//        Collections.sort(experiments);
+        Collections.sort(experiments);
+        Collections.reverse(experiments);
         for (Experiment e : experiments) {
           b.append("<a class=\"dashboardresult\" href=\"/miso/experiment/" + e.getId() + "\"><div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
           b.append("Name: <b>" + e.getName() + "</b><br/>");
@@ -246,7 +250,8 @@ public class DashboardHelperService {
       }
 
       if (runs.size() > 0) {
-//        Collections.sort(runs);
+        Collections.sort(runs);
+        Collections.reverse(runs);
         for (Run r : runs) {
           b.append("<a class=\"dashboardresult\" href=\"/miso/run/" + r.getId() + "\"><div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
           b.append("Name: <b>" + r.getName() + "</b><br/>");
@@ -282,7 +287,8 @@ public class DashboardHelperService {
       }
 
       if (libraries.size() > 0) {
-//        Collections.sort(libraries);
+        Collections.sort(libraries);
+        Collections.reverse(libraries);
         for (Library l : libraries) {
           b.append("<a class=\"dashboardresult\" href=\"/miso/library/" + l.getId() + "\"><div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
           b.append("Name: <b>" + l.getName() + "</b><br/>");
@@ -318,7 +324,8 @@ public class DashboardHelperService {
       }
 
       if (samples.size() > 0) {
-//        Collections.sort(samples);
+        Collections.sort(samples);
+        Collections.reverse(samples);
         for (Sample s : samples) {
           b.append("<a class=\"dashboardresult\" href=\"/miso/sample/" + s.getId() + "\"><div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
           b.append("Name: <b>" + s.getName() + "</b><br/>");

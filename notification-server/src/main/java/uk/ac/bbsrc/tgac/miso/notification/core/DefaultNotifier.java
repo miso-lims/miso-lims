@@ -204,7 +204,8 @@ public class DefaultNotifier {
               //sign messages and inject url into message headers via HeaderEnricher
               Map<String, SignedHeaderValueMessageProcessor<String>> urlHeaderToSign = new HashMap<String, SignedHeaderValueMessageProcessor<String>>();
               URI su = URI.create(uri);
-              urlHeaderToSign.put("url", new SignedHeaderValueMessageProcessor<String>(su.getPath()+"?"));
+              urlHeaderToSign.put("x-url", new SignedHeaderValueMessageProcessor<String>(su.getPath()));
+              urlHeaderToSign.put("x-user", new SignedHeaderValueMessageProcessor<String>("notification"));
               NotificationMessageEnricher signer = new NotificationMessageEnricher(urlHeaderToSign);
               signer.setMessageProcessor(new MethodInvokingMessageProcessor(notificationUtils, "signMessageHeaders"));
 
@@ -217,7 +218,8 @@ public class DefaultNotifier {
               signChannel.subscribe(mth);
 
               DefaultHttpHeaderMapper hm = new DefaultHttpHeaderMapper();
-              String[] names = {"Accept", "url", "signature", "apikey"};
+              hm.setUserDefinedHeaderPrefix("");
+              String[] names = {"Accept", "x-url", "x-signature", "x-user"};
               hm.setBeanFactory(context.getBeanFactory());
               hm.setOutboundHeaderNames(names);
               hm.setInboundHeaderNames(names);
@@ -252,7 +254,6 @@ public class DefaultNotifier {
             tog.setChannelResolver(channelResolver);
             tog.setConnectionFactory(tnccf);
             tog.setRequestTimeout(10000);
-            tog.setReplyTimeout(10000);
             tog.setRequiresReply(false);
             tog.setOutputChannel(outputChannel);
 

@@ -26,9 +26,17 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 import com.eaglegenomics.simlims.core.Note;
 
 import com.eaglegenomics.simlims.core.User;
+//import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+//import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+//import com.fasterxml.jackson.annotation.JsonTypeInfo;
+//import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+//import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonWriteNullProperties;
+import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
+import org.jfree.base.log.DefaultLog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.ProjectOverviewListener;
@@ -38,6 +46,7 @@ import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.*;
 
@@ -50,9 +59,12 @@ import java.util.*;
  * @since 0.0.2
  */
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
-@JsonWriteNullProperties(false)
+//@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
+@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
 @JsonIgnoreProperties({"project","samples","libraries","runs","qcPassedSamples"})
-public class ProjectOverview implements Watchable {
+public class ProjectOverview implements Watchable, Alertable, Serializable {
+  protected static final Logger log = LoggerFactory.getLogger(ProjectOverview.class);
+
   public static final Long UNSAVED_ID = 0L;
 
   @Id
@@ -186,14 +198,17 @@ public class ProjectOverview implements Watchable {
     this.lastUpdated = lastUpdated;
   }
 
+  @Override
   public Set<MisoListener> getListeners() {
     return this.listeners;
   }
 
+  @Override
   public boolean addListener(MisoListener listener) {
     return listeners.add(listener);
   }
 
+  @Override
   public boolean removeListener(MisoListener listener) {
     return listeners.remove(listener);
   }
@@ -380,11 +395,11 @@ public class ProjectOverview implements Watchable {
     }
   }
 
-  public String toString() {
-    StringBuffer sb = new StringBuffer();
-    for (Field f : this.getClass().getDeclaredFields()) {
-      sb.append(f.toString() + ":");
-    }
-    return sb.toString();
-  }
+//  public String toString() {
+//    StringBuffer sb = new StringBuffer();
+//    for (Field f : this.getClass().getDeclaredFields()) {
+//      sb.append(f.toString() + ":");
+//    }
+//    return sb.toString();
+//  }
 }

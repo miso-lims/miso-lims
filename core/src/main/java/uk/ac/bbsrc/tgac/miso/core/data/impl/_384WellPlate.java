@@ -27,12 +27,16 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPlate;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Plate;
+import uk.ac.bbsrc.tgac.miso.core.data.Plateable;
 import uk.ac.bbsrc.tgac.miso.core.service.plate.Default384WellPlateConversionStrategy;
 import uk.ac.bbsrc.tgac.miso.core.service.plate.PlateConversionStrategy;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
+import java.io.Serializable;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * A concrete Plate implementation representing a 384-well plate, comprising 4 quartile {@link _96WellPlate}s.
@@ -41,7 +45,7 @@ import java.util.List;
  * @date 05-Sep-2011
  * @since 0.1.1
  */
-public class _384WellPlate extends PlateImpl<_96WellPlate> {
+public class _384WellPlate extends PlateImpl<_96WellPlate> implements Serializable {
   public static final int MAX_ELEMENTS = 4;
   public PlateConversionStrategy<_96WellPlate> plateConversionStrategy = new Default384WellPlateConversionStrategy();
 
@@ -50,7 +54,7 @@ public class _384WellPlate extends PlateImpl<_96WellPlate> {
   }
 
   public _384WellPlate(User user) {
-    super(user);
+    super(MAX_ELEMENTS, user);
   }
 
   public void setConversionStrategy(PlateConversionStrategy<_96WellPlate> plateConversionStrategy) {

@@ -290,54 +290,6 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
       }
     });
 
-    /*
-    binder.registerCustomEditor(IlluminaPool.class, new PropertyEditorSupport() {
-      @Override
-      public void setAsText(String element) throws IllegalArgumentException {
-        setValue(resolveIlluminaPool(element));
-      }
-    });
-    */
-    
-    binder.registerCustomEditor(IlluminaPool.class, "illuminaPools", new CustomCollectionEditor(Set.class) {
-      @Override
-      protected Object convertElement(Object element) {
-        return resolveIlluminaPool(element);
-      }
-    });
-
-    /*
-    binder.registerCustomEditor(LS454Pool.class, new PropertyEditorSupport() {
-      @Override
-      public void setAsText(String element) throws IllegalArgumentException {
-        setValue(resolveLS454Pool(element));
-      }
-    });
-    */
-
-    binder.registerCustomEditor(LS454Pool.class, "ls454Pools", new CustomCollectionEditor(Set.class) {
-      @Override
-      protected Object convertElement(Object element) {
-        return resolveLS454Pool(element);
-      }
-    });
-
-    /*
-    binder.registerCustomEditor(SolidPool.class, new PropertyEditorSupport() {
-      @Override
-      public void setAsText(String element) throws IllegalArgumentException {
-        setValue(resolveSolidPool(element));
-      }
-    });
-    */
-    
-    binder.registerCustomEditor(SolidPool.class, "solidPools", new CustomCollectionEditor(Set.class) {
-      @Override
-      protected Object convertElement(Object element) {
-        return resolveSolidPool(element);
-      }
-    });
-
     binder.registerCustomEditor(List.class, "partitions", new CustomCollectionEditor(List.class) {
       @Override
       protected Object convertElement(Object element) {
@@ -544,6 +496,13 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
       @Override
       protected Object convertElement(Object element) {
         return resolveKitDescriptor(element);
+      }
+    });
+
+    binder.registerCustomEditor(Set.class, "poolableElements", new CustomCollectionEditor(Set.class) {
+      @Override
+      protected Object convertElement(Object element) {
+        return resolvePoolable(element);
       }
     });
   }
@@ -890,83 +849,6 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
     }
   }
 
-  /**
-   * Resolve an IlluminaPool object from an ID String
-   *
-   * @param element of type Object
-   * @return IlluminaPool
-   * @throws IllegalArgumentException when
-   */
-  private Pool resolveIlluminaPool(Object element) throws IllegalArgumentException {
-    Long id = null;
-    if (element instanceof String) {
-      String s = (String)element;
-      if (!"".equals(s)) {
-        id = NumberUtils.parseNumber((String) element, Long.class).longValue();
-      }
-    }
-    try {
-      return id != null ? requestManager.getIlluminaPoolById(id) : null;
-    }
-    catch (IOException e) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to resolve pool " + element, e);
-      }
-      throw new IllegalArgumentException(e);
-    }
-  }
-
-  /**
-   * Resolve a LS454Pool object from an ID String
-   *
-   * @param element of type Object
-   * @return LS454Pool
-   * @throws IllegalArgumentException when
-   */
-  private Pool resolveLS454Pool(Object element) throws IllegalArgumentException {
-    Long id = null;
-    if (element instanceof String) {
-      String s = (String)element;
-      if (!"".equals(s)) {
-        id = NumberUtils.parseNumber((String) element, Long.class).longValue();
-      }
-    }
-    try {
-      return id != null ? requestManager.getLS454PoolById(id) : null;
-    }
-    catch (IOException e) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to resolve pool " + element, e);
-      }
-      throw new IllegalArgumentException(e);
-    }
-  }
-
-  /**
-   * Resolve a SolidPool object from an ID String
-   *
-   * @param element of type Object
-   * @return SolidPool
-   * @throws IllegalArgumentException when
-   */
-  private Pool resolveSolidPool(Object element) throws IllegalArgumentException {
-    Long id = null;
-    if (element instanceof String) {
-      String s = (String)element;
-      if (!"".equals(s)) {
-        id = NumberUtils.parseNumber((String) element, Long.class).longValue();
-      }
-    }
-    try {
-      return id != null ? requestManager.getSolidPoolById(id) : null;
-    }
-    catch (IOException e) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to resolve pool " + element, e);
-      }
-      throw new IllegalArgumentException(e);
-    }
-  }
 
   /**
    * Resolve a Partition object from an ID String
@@ -1364,5 +1246,46 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
       }
       throw new IllegalArgumentException(e);
     }
+  }
+
+  /**
+   * Resolve a Poolable object from a PREFIX
+   *
+   * @param element of type Object
+   * @return Poolable
+   * @throws IllegalArgumentException when
+   */
+  private Poolable resolvePoolable(Object element) throws IllegalArgumentException {
+    Long id = null;
+    if (element instanceof String) {
+      String prefix = ((String)element).substring(0, 3);
+      String ident = ((String)element).substring(3);
+      id = NumberUtils.parseNumber(ident, Long.class).longValue();
+
+      try {
+        if ("LDI".equals(prefix)) {
+          log.info(prefix + ":" + ident + " -> LibraryDilution");
+          return id != null ? requestManager.getLibraryDilutionById(id) : null;
+        }
+        else if ("EDI".equals(prefix)) {
+          log.info(prefix + ":" + ident + " -> EmPCRDilution");
+          return id != null ? requestManager.getEmPcrDilutionById(id) : null;
+        }
+        else if ("PLA".equals(prefix)) {
+          log.info(prefix + ":" + ident + " -> Plate");
+          return id != null ? requestManager.getPlateById(id) : null;
+        }
+        else {
+          log.debug("Failed to resolve poolable element with identifier: " + prefix+ident);
+        }
+      }
+      catch (IOException e) {
+        if (log.isDebugEnabled()) {
+          log.debug("Failed to resolve poolable element " + element, e);
+        }
+        throw new IllegalArgumentException(e);
+      }
+    }
+    return null;
   }
 }

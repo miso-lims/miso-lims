@@ -31,6 +31,7 @@ import org.springframework.util.AutoPopulatingList;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -42,7 +43,7 @@ import java.util.List;
  * @date 14-May-2012
  * @since 0.1.6
  */
-public class SequencerPartitionContainerImpl extends AbstractSequencerPartitionContainer<SequencerPoolPartition> {
+public class SequencerPartitionContainerImpl extends AbstractSequencerPartitionContainer<SequencerPoolPartition> implements Serializable {
   protected static final Logger log = LoggerFactory.getLogger(SequencerPartitionContainerImpl.class);
 
   private List<SequencerPoolPartition> partitions = new AutoPopulatingList<SequencerPoolPartition>(PartitionImpl.class);

@@ -25,7 +25,7 @@
 
 <div id="maincontent">
     <div id="contentcolumn">
-        <form:form method="POST" commandName="request" autocomplete="off">
+        <form:form  action="/miso/request" method="POST" commandName="request" autocomplete="off">
             <h1><c:choose><c:when
                     test="${not empty request.requestId}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose>
                 Request

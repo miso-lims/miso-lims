@@ -35,7 +35,7 @@
 
 <div id="maincontent">
     <div id="contentcolumn">
-        <form:form method="POST" commandName="submission" autocomplete="off" onsubmit="return validate_submission(this);">
+        <form:form action="/miso/submission" method="POST" commandName="submission" autocomplete="off" onsubmit="return validate_submission(this);">
           <sessionConversation:insertSessionConversationId attributeName="submission"/>
             <h1>
                 <c:choose>
@@ -173,12 +173,14 @@
                             <p style="cursor: pointer" id="projectTitle${project.id}" onclick="Submission.ui.populateSubmissionProject(${project.id});"><strong>${project.name}</strong> : ${project.description}</p>
                         </c:if>
                         <ul id="projectSubmission${project.id}">
-
+                          <%--
                         <c:forEach items="${project.studies}" var="study">
-                            <li><form:checkbox id="study${study.id}_${project.id}" path="submissionElements" itemLabel="${study.name}"
+                            <li>
+
+                              <form:checkbox id="study${study.id}_${project.id}" path="submissionElements" itemLabel="${study.name}"
                                                itemValue="${study.name}" value="${study.name}"/>
                                 <a href="<c:url value='/miso/study/${study.id}'/>"><b>${study.name}</b> : ${study.description}</a>
-                              <%--
+
                                 <ul>
                                     <c:forEach items="${study.experiments}" var="experiment">
                                         <li><form:checkbox id="experiment${experiment.experimentId}_${study.studyId}" path="submissionElements" itemLabel="${experiment.name}"
@@ -214,9 +216,10 @@
                                         </li>
                                     </c:forEach>
                                 </ul>
-                                --%>
+
                             </li>
                         </c:forEach>
+                          --%>
 
                         </ul>
 

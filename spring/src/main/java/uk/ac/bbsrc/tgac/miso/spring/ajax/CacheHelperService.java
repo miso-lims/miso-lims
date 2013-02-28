@@ -165,8 +165,6 @@ public class CacheHelperService {
           requestManager.savePool(p);
         }
       }
-
-      //requestManager.listAllFlowcells();      
     }
     catch (IOException e) {
       e.printStackTrace();
@@ -178,7 +176,9 @@ public class CacheHelperService {
     return JSONUtils.JSONObjectResponse("html", jQueryDialogFactory.okDialog("Cache Administration", "Barcodes regenerated successfully!"));
   }
 
+  @Deprecated
   public JSONObject reindexAlertManagers(HttpSession session, JSONObject json) {
+    /*
     try {
       log.info("Alert managers reindexing...");
       if (projectAlertManager != null) projectAlertManager.indexify();
@@ -189,6 +189,9 @@ public class CacheHelperService {
       e.printStackTrace();
       return JSONUtils.JSONObjectResponse("html", jQueryDialogFactory.okDialog("Cache Administration", "Unable to reindex alert managers: " + e.getMessage()));
     }
+
     return JSONUtils.JSONObjectResponse("html", jQueryDialogFactory.okDialog("Cache Administration", "Alert Managers reindexing!"));
+    */
+    return JSONUtils.JSONObjectResponse("html", jQueryDialogFactory.okDialog("Cache Administration", "Deprecated function. Not reindexing."));
   }
 }

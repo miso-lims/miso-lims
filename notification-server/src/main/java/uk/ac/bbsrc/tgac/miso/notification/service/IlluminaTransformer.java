@@ -451,7 +451,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
   private void checkDates(File rootFile, JSONObject run) throws IOException {
     String runName = run.getString("runName");
 
-    String runDirRegex = "(\\d{6})_[A-z0-9]+_\\d+_[A-z0-9_\\-]*";
+    String runDirRegex = "(\\d{6})_[A-z0-9]+_\\d+_[A-z0-9_\\+\\-]*";
     Matcher startMatcher = Pattern.compile(runDirRegex).matcher(runName);
     if (startMatcher.matches()) {
       log.debug(runName + " :: Got start date -> " + startMatcher.group(1));
@@ -462,6 +462,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
     File rtaLog = new File(rootFile, "/Data/RTALogs/Log.txt");
     File rtaLog2 = new File(rootFile, "/Data/Log.txt");
     File eventsLog = new File(rootFile, "/Events.log");
+    File rtaComplete = new File(rootFile, "/RTAComplete.txt");
 
     if (rtaLog.exists() && rtaLog.canRead()) {
       Matcher m = LimsUtils.tailGrep(rtaLog, runCompleteLogPattern, 10);
@@ -551,11 +552,11 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
       }
     }
 
-    //last ditch attempt with Events.log
+    //still nothing? attempt with Events.log
     if (!run.has("completionDate")) {
       //attempt to get latest log file entry date
       if (eventsLog.exists() && eventsLog.canRead()) {
-        log.debug(runName + " :: Last ditch attempt. Checking events log...");
+        log.debug(runName + " :: Checking events log...");
         Pattern p = Pattern.compile(
                 "\\.*\\s+(\\d{1,2}\\/\\d{2}\\/\\d{4})\\s+(\\d{1,2}:\\d{2}:\\d{2}).\\d+.*"
         );
@@ -563,6 +564,22 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
         Matcher m = LimsUtils.tailGrep(eventsLog, p, 50);
         if (m != null && m.groupCount() > 0) {
           log.debug(runName + " :: Got last log event date -> " + m.group(1)+","+m.group(2));
+          run.put("completionDate", m.group(1)+","+m.group(2));
+        }
+      }
+    }
+
+    // last ditch attempt with RTAComplete.txt
+    if (!run.has("completionDate")) {
+      if (rtaComplete.exists() && rtaComplete.canRead()) {
+        log.debug(runName + " :: Last ditch attempt. Checking RTAComplete log...");
+        Pattern p = Pattern.compile(
+                "\\.*(\\d{1,2}\\/\\d{1,2}\\/\\d{4}),(\\d{1,2}:\\d{1,2}:\\d{1,2}).\\d+.*"
+        );
+
+        Matcher m = LimsUtils.tailGrep(rtaComplete, p, 2);
+        if (m != null && m.groupCount() > 0) {
+          log.debug(runName + " :: Got RTAComplete date -> " + m.group(1)+","+m.group(2));
           run.put("completionDate", m.group(1)+","+m.group(2));
         }
       }

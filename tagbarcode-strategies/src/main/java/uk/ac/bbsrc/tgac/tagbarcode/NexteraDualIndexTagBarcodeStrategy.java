@@ -86,7 +86,7 @@ public class NexteraDualIndexTagBarcodeStrategy implements TagBarcodeStrategy, R
         try {
           List<TagBarcode> barcodes = new ArrayList<TagBarcode>(requestManager.listAllTagBarcodesByPlatform(PlatformType.ILLUMINA.getKey()));
           for (TagBarcode t : barcodes) {
-            if (t.getName() != null) {
+            if (getName().equals(t.getStrategyName()) && t.getName() != null) {
               log.debug("Registering tag barcode: " + t.getName());
               if (t.getName().startsWith("N7")) {
                 tagBarcodeMap.get(1).add(t);

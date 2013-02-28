@@ -26,6 +26,8 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
@@ -53,6 +55,8 @@ import java.util.*;
 @Entity
 @Table(name = "`Run`")
 public abstract class AbstractRun implements Run {
+  protected static final Logger log = LoggerFactory.getLogger(AbstractRun.class);
+
   public static final Long UNSAVED_ID = 0L;
 
   @Id
@@ -290,14 +294,17 @@ public abstract class AbstractRun implements Run {
 
   public abstract void buildReport();
 
+  @Override
   public Set<MisoListener> getListeners() {
     return this.listeners;
   }
 
+  @Override
   public boolean addListener(MisoListener listener) {
     return listeners.add(listener);
   }
 
+  @Override
   public boolean removeListener(MisoListener listener) {
     return listeners.remove(listener);
   }

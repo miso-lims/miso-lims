@@ -33,16 +33,6 @@
   Note that the interface will display these pipelines in declaration order, with the first pipeline as the default
   -->
 
-  <pipeline name="tgac_primary_analysis" creator="tgaclims">
-    <processes>
-      <process name="BCL_To_FASTQ"/>
-      <process name="CASAVA_MAKE"/>
-      <process name="FASTQC"/>
-      <process name="STATSQC"/>
-      <process name="Stats_Database_Population"/>
-    </processes>
-  </pipeline>
-
   <pipeline name="gzip" creator="tgaclims">
     <processes>
       <process name="lsf_gzip"/>

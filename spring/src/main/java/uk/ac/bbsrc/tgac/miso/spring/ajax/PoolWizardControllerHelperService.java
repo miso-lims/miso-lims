@@ -39,11 +39,16 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedDilutionException;
+import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolException;
+import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolQcException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -65,6 +70,9 @@ public class PoolWizardControllerHelperService {
 
   public JSONObject addPool(HttpSession session, JSONObject json) {
     JSONObject response = new JSONObject();
+
+    DateFormat df = new SimpleDateFormat("dd/mm/yyyy");
+
     String alias = json.getString("alias");
     Double concentration = json.getDouble("concentration");
     PlatformType platformType = PlatformType.get(json.getString("platformType"));
@@ -76,8 +84,32 @@ public class PoolWizardControllerHelperService {
       ids.add(j.getLong("dilutionId"));
     }
 
+    List<PoolQC> pqcs = new ArrayList<PoolQC>();
+    JSONArray qcs = JSONArray.fromObject(json.get("qcs"));
+    for (JSONObject q : (Iterable<JSONObject>) qcs) {
+      PoolQC s = dataObjectFactory.getPoolQC();
+
+      try {
+        s.setResults(Double.valueOf(q.getString("poolQcResults")));
+        s.setQcCreator(SecurityContextHolder.getContext().getAuthentication().getName());
+        s.setQcDate(df.parse(q.getString("poolQcDate")));
+        s.setQcType(requestManager.getPoolQcTypeById(q.getLong("poolQcType")));
+      }
+      catch (IOException e) {
+        e.printStackTrace();
+        return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
+      }
+      catch (ParseException e) {
+        e.printStackTrace();
+        return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
+      }
+      pqcs.add(s);
+    }
+
     if (ids.size() > 0 && platformType != null && concentration != null) {
       try {
+        User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+
         List<Dilution> dils = new ArrayList<Dilution>();
         for (Long id : ids) {
           dils.add(requestManager.getDilutionByIdAndPlatform(id, platformType));
@@ -101,7 +133,7 @@ public class PoolWizardControllerHelperService {
         }
 
         if (!barcodeCollision) {
-	      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+
           Pool pool;
           //TODO special type of pool for LibraryDilutions that will go on to be emPCRed as a whole
           if (dils.get(0) instanceof LibraryDilution &&
@@ -126,14 +158,32 @@ public class PoolWizardControllerHelperService {
               pool.addPoolableElement(d);
             }
             catch (MalformedDilutionException dle) {
-              log.debug("Failed", dle);
+              log.error("Failed", dle);
               return JSONUtils.SimpleJSONError("Failed: " + dle.getMessage());
+            }
+          }
+
+          for (PoolQC qc : pqcs) {
+            try {
+              qc.setPool(pool);
+              pool.addQc(qc);
+            }
+            catch (MalformedPoolException e) {
+              e.printStackTrace();
+              log.error("Failed", e);
+              return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
+            }
+            catch (MalformedPoolQcException e) {
+              e.printStackTrace();
+              log.error("Failed", e);
+              return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
             }
           }
 
           requestManager.savePool(pool);
 
-          sb.append("<a  class='dashboardresult' href='/miso/pool/"+pool.getPlatformType().getKey().toLowerCase()+"/" + pool.getId() + "' target='_blank'><div  onmouseover=\"this.className='dashboardhighlight ui-corner-all'\" onmouseout=\"this.className='dashboard ui-corner-all'\"  class='dashboard ui-corner-all' >");
+          //sb.append("<a  class='dashboardresult' href='/miso/pool/"+pool.getPlatformType().getKey().toLowerCase()+"/" + pool.getId() + "' target='_blank'><div  onmouseover=\"this.className='dashboardhighlight ui-corner-all'\" onmouseout=\"this.className='dashboard ui-corner-all'\"  class='dashboard ui-corner-all' >");
+          sb.append("<a  class='dashboardresult' href='/miso/pool/"+pool.getId() + "' target='_blank'><div  onmouseover=\"this.className='dashboardhighlight ui-corner-all'\" onmouseout=\"this.className='dashboard ui-corner-all'\"  class='dashboard ui-corner-all' >");
           sb.append("Pool ID: <b>" + pool.getId() + "</b><br/>");
           sb.append("Pool Name: <b>" + pool.getName() + "</b><br/>");
           sb.append("Platform Type: <b>" + pool.getPlatformType().name() + "</b><br/>");
@@ -141,14 +191,24 @@ public class PoolWizardControllerHelperService {
           for (Dilution dl : (Collection<? extends Dilution>) pool.getDilutions()) {
             sb.append("<li>" + dl.getName() + " (<a href='/miso/library/"+dl.getLibrary().getId()+"'>" + dl.getLibrary().getAlias() + "</a>)</li>");
           }
-          sb.append("</ul></div></a>");
+          sb.append("</ul>");
+
+          sb.append("QCs: <ul class='bullets'>");
+          for (PoolQC qc : (Collection<PoolQC>) pool.getPoolQCs()) {
+            sb.append("<li>")
+              .append(qc.getResults()).append(" ").append(qc.getQcType().getUnits())
+              .append(" (").append(qc.getQcType().getName()).append(")</li>");
+          }
+          sb.append("</ul>");
+
+          sb.append("</div></a>");
         }
         else {
           throw new IOException("Tag barcode collision. Two or more selection dilutions have the same tag barcode and therefore cannot be pooled together.");          
         }
       }
       catch (IOException e) {
-        log.debug("Failed", e);
+        log.error("Failed", e);
         return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
       }
     }

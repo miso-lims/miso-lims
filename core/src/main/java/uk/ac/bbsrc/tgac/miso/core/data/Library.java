@@ -24,9 +24,11 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import com.eaglegenomics.simlims.core.Note;
-import net.sourceforge.fluxion.spi.ServiceProvider;
+//import com.fasterxml.jackson.annotation.*;
+//import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonWriteNullProperties;
+import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
@@ -35,12 +37,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedDilutionException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryQcException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
-import uk.ac.bbsrc.tgac.miso.core.service.tagbarcode.TagBarcodeStrategy;
+import uk.ac.bbsrc.tgac.miso.core.util.jackson.LibrarySerializer;
 
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * A Library is the first step in constructing sequenceable material from an initial {@link Sample}.
@@ -55,11 +56,12 @@ import java.util.Map;
  * @author Rob Davey
  * @since 0.0.2
  */
-@JsonSerialize(typing = JsonSerialize.Typing.STATIC)
-@JsonWriteNullProperties(false)
-@JsonIgnoreProperties({"securityProfile","sample"})
+@JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)//, using = LibrarySerializer.class)
+//@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
+@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
+@JsonIgnoreProperties({"securityProfile"})
 @PrintableBarcode
-public interface Library extends SecurableByProfile, Comparable, Barcodable, Locatable, Deletable {
+public interface Library extends SecurableByProfile, Comparable, Barcodable, Locatable, Deletable, Plateable {
 
   /** Field PREFIX  */
   public static final String PREFIX = "LIB";
@@ -136,6 +138,7 @@ public interface Library extends SecurableByProfile, Comparable, Barcodable, Loc
    *
    * @return Sample sample.
    */
+  //@JsonBackReference
   public Sample getSample();
 
   /**
@@ -172,6 +175,7 @@ public interface Library extends SecurableByProfile, Comparable, Barcodable, Loc
    *
    * @return Collection<LibraryQC> libraryQCs.
    */
+  //@JsonManagedReference(value = "libraryqcs")
   public Collection<LibraryQC> getLibraryQCs();
 
   /**
@@ -187,6 +191,7 @@ public interface Library extends SecurableByProfile, Comparable, Barcodable, Loc
    *
    * @return Collection<LibraryDilution> libraryDilutions.
    */
+  //@JsonManagedReference(value = "librarydilutions")
   public Collection<LibraryDilution> getLibraryDilutions();
 
   /**

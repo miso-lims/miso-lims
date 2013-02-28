@@ -23,10 +23,15 @@
 
 package uk.ac.bbsrc.tgac.miso.core.store;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Plate;
+import uk.ac.bbsrc.tgac.miso.core.data.Plateable;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Defines a DAO interface for storing Plates
@@ -35,7 +40,10 @@ import java.io.IOException;
  * @date 12-Sep-2011
  * @since 0.1.1
  */
-public interface PlateStore extends Store<Plate>, Cascadable, Remover<Plate>, NamingSchemeAware<Plate> {
+public interface PlateStore extends Store<Plate<? extends List<? extends Plateable>, ? extends Plateable>>,
+                                    Cascadable,
+                                    Remover<Plate<? extends List<? extends Plateable>, ? extends Plateable>>,
+                                    NamingSchemeAware<Plate<? extends List<? extends Plateable>, ? extends Plateable>> {
   /**
    * Retrieve a Plate from an underlying data store given a Plate ID
    * <p/>
@@ -46,7 +54,14 @@ public interface PlateStore extends Store<Plate>, Cascadable, Remover<Plate>, Na
    * @return Plate
    * @throws java.io.IOException when
    */
-  Plate lazyGet(long plateId) throws IOException;
+  <T extends List<S>, S extends Plateable> Plate<T, S> lazyGet(long plateId) throws IOException;
+
+  @Override
+  public Plate<? extends List<? extends Plateable>, ? extends Plateable> get(long id) throws IOException;
+
+  public List<Plate<? extends List<? extends Plateable>, ? extends Plateable>> listByProjectId(long projectId) throws IOException;
+
+  public List<Plate<? extends List<? extends Plateable>, ? extends Plateable>> listBySearch(String str) throws IOException;
 
   /**
    * Retrieve a Plate from an underlying data store given an identification barcode
@@ -55,5 +70,5 @@ public interface PlateStore extends Store<Plate>, Cascadable, Remover<Plate>, Na
    * @return Plate
    * @throws java.io.IOException when
    */
-  Plate getPlateByIdentificationBarcode(String barcode) throws IOException;
+  <T extends List<S>, S extends Plateable> Plate<T, S> getPlateByIdentificationBarcode(String barcode) throws IOException;
 }

@@ -37,6 +37,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 import javax.persistence.CascadeType;
 import javax.persistence.OneToOne;
+import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -45,7 +46,7 @@ import java.util.*;
  * @author Rob Davey
  * @since 0.0.2
  */
-public class SubmissionImpl implements Submission<Submittable, Document, Document> {
+public class SubmissionImpl implements Submission<Submittable, Document, Document>, Serializable {
   protected static final Logger log = LoggerFactory.getLogger(SubmissionImpl.class);
 
   public static final Long UNSAVED_ID = 0L;

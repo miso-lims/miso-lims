@@ -28,6 +28,9 @@ import com.googlecode.ehcache.annotations.Property;
 import com.googlecode.ehcache.annotations.TriggersRemove;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryQcStore;
@@ -45,6 +48,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
+import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 import javax.persistence.CascadeType;
@@ -95,6 +99,8 @@ public class SQLLibraryQCDAO implements LibraryQcStore {
 
   public static final String LIBRARY_QC_DELETE =
          "DELETE FROM "+TABLE_NAME+" WHERE qcId=:qcId";
+
+  protected static final Logger log = LoggerFactory.getLogger(SQLLibraryQCDAO.class);
 
   private JdbcTemplate template;
   private LibraryStore libraryDAO;
@@ -183,17 +189,17 @@ public class SQLLibraryQCDAO implements LibraryQcStore {
   }
 
   public LibraryQC  lazyGet(long qcId) throws IOException {
-    List eResults = template.query(LIBRARY_QC_SELECT_BY_ID, new Object[]{qcId}, new LazyLibraryQcMapper());
+    List eResults = template.query(LIBRARY_QC_SELECT_BY_ID, new Object[]{qcId}, new LibraryQcMapper(true));
     LibraryQC  e = eResults.size() > 0 ? (LibraryQC) eResults.get(0) : null;
     return e;
   }
 
   public Collection<LibraryQC> listByLibraryId(long libraryId) throws IOException {
-    return template.query(LIBRARY_QC_SELECT_BY_LIBRARY_ID, new Object[]{libraryId}, new LazyLibraryQcMapper());
+    return template.query(LIBRARY_QC_SELECT_BY_LIBRARY_ID, new Object[]{libraryId}, new LibraryQcMapper(true));
   }
 
   public Collection<LibraryQC> listAll() throws IOException {
-    return template.query(LIBRARY_QC, new LazyLibraryQcMapper());
+    return template.query(LIBRARY_QC, new LibraryQcMapper(true));
   }
 
   @Override
@@ -221,28 +227,28 @@ public class SQLLibraryQCDAO implements LibraryQcStore {
     return false;
   }
 
-  public class LazyLibraryQcMapper implements RowMapper<LibraryQC> {
-    public LibraryQC mapRow(ResultSet rs, int rowNum) throws SQLException {
-      LibraryQC s = dataObjectFactory.getLibraryQC();
-      s.setId(rs.getLong("qcId"));
-      s.setQcCreator(rs.getString("qcUserName"));
-      s.setQcDate(rs.getDate("qcDate"));
-      s.setResults(rs.getDouble("results"));
-      s.setInsertSize(rs.getInt("insertSize"));
-
-      try {
-        s.setQcType(getLibraryQcTypeById(rs.getLong("qcMethod")));
-      }
-      catch (IOException e) {
-        e.printStackTrace();
-      }
-
-      return s;
+  public class LibraryQcMapper extends CacheAwareRowMapper<LibraryQC> {
+    public LibraryQcMapper() {
+      //library qcs aren't cached at present
+      super(LibraryQC.class, false, false);
     }
-  }
 
-  public class LibraryQcMapper implements RowMapper<LibraryQC> {
+    public LibraryQcMapper(boolean lazy) {
+      //library qcs aren't cached at present
+      super(LibraryQC.class, lazy, false);
+    }
+
+    @Override
     public LibraryQC mapRow(ResultSet rs, int rowNum) throws SQLException {
+      long id = rs.getLong("qcId");
+
+      if (isCacheEnabled()) {
+        Element element;
+        if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
+          log.debug("Cache hit on map for LibraryQC " + id);
+          return (LibraryQC)element.getObjectValue();
+        }
+      }
       LibraryQC s = dataObjectFactory.getLibraryQC();
       s.setId(rs.getLong("qcId"));
       s.setQcCreator(rs.getString("qcUserName"));
@@ -251,8 +257,11 @@ public class SQLLibraryQCDAO implements LibraryQcStore {
       s.setInsertSize(rs.getInt("insertSize"));
 
       try {
-        s.setLibrary(libraryDAO.get(rs.getLong("library_libraryId")));
         s.setQcType(getLibraryQcTypeById(rs.getLong("qcMethod")));
+
+        if (!isLazy()) {
+          s.setLibrary(libraryDAO.get(rs.getLong("library_libraryId")));
+        }
       }
       catch (IOException e) {
         e.printStackTrace();
@@ -260,6 +269,11 @@ public class SQLLibraryQCDAO implements LibraryQcStore {
       catch (MalformedLibraryException e) {
         e.printStackTrace();
       }
+
+      if (isCacheEnabled()) {
+        lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id) ,s));
+      }
+
       return s;
     }
   }

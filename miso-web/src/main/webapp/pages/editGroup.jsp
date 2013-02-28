@@ -26,7 +26,7 @@
 
 <div id="maincontent">
     <div id="contentcolumn">
-        <form:form method="POST" commandName="group" autocomplete="off">
+        <form:form action="/miso/admin/group" method="POST" commandName="group" autocomplete="off">
 
           <sessionConversation:insertSessionConversationId attributeName="group"/>
 

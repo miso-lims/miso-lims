@@ -35,6 +35,7 @@ import javax.persistence.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import java.io.Serializable;
 
 /**
  * Concrete implementation of a Study
@@ -43,7 +44,7 @@ import javax.xml.parsers.ParserConfigurationException;
  * @since 0.0.2
  */
 @Entity
-public class StudyImpl extends AbstractStudy {
+public class StudyImpl extends AbstractStudy implements Serializable {
 
   /**
    * Construct a new Study with a default empty SecurityProfile

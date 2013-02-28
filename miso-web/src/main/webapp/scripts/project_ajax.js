@@ -79,37 +79,37 @@ Project.ui = {
             {'doOnSuccess': function(json) {
               jQuery('#listingProjectsTable').html('');
               jQuery('#listingProjectsTable').dataTable({
-                                                          "aaData": json.projectsArray,
-                                                          "aoColumns": [
-                                                            { "sTitle": "Project Name", "sType":"no-pro"},
-                                                            { "sTitle": "Alias"},
-                                                            { "sTitle": "Description"},
-                                                            { "sTitle": "Progress"},
-                                                            { "sTitle": "Overview"},
-                                                            { "sTitle": "Edit"}
-                                                          ],
-                                                          "bJQueryUI": true,
-                                                          "iDisplayLength":  25,
-                                                          "aaSorting":[
-                                                            [0,"desc"]
-                                                          ],
-                                                          "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
-                                                          "fnRowCallback": function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                "aaData": json.projectsArray,
+                "aoColumns": [
+                  { "sTitle": "Project Name", "sType":"no-pro"},
+                  { "sTitle": "Alias"},
+                  { "sTitle": "Description"},
+                  { "sTitle": "Progress"},
+                  { "sTitle": "Overview"},
+                  { "sTitle": "Edit"}
+                ],
+                "bJQueryUI": true,
+                "iDisplayLength":  25,
+                "aaSorting":[
+                  [0,"desc"]
+                ],
+                "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
+                "fnRowCallback": function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
 
-                                                            Fluxion.doAjax(
-                                                                    'projectControllerHelperService',
-                                                                    'checkOverviewByProjectId',
-                                                                    {
-                                                                      'projectId':aData[4],
-                                                                      'url':ajaxurl
-                                                                    },
-                                                                    {'doOnSuccess': function(json) {
-                                                                      jQuery('td:eq(4)', nRow).html(json.response);
-                                                                    }
-                                                                    }
-                                                            );
-                                                          }
-                                                        });
+                  Fluxion.doAjax(
+                          'projectControllerHelperService',
+                          'checkOverviewByProjectId',
+                          {
+                            'projectId':aData[4],
+                            'url':ajaxurl
+                          },
+                          {'doOnSuccess': function(json) {
+                            jQuery('td:eq(4)', nRow).html(json.response);
+                          }
+                          }
+                  );
+                }
+              });
               jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
               jQuery("#toolbar").append("<button style=\"margin-left:5px;\" onclick=\"window.location.href='/miso/project/new';\" class=\"fg-button ui-state-default ui-corner-all\">Add Project</button>");
             }
@@ -128,17 +128,17 @@ Project.ui = {
     }
 
     Fluxion.doAjax(
-            'projectControllerHelperService',
-            'generateSampleDeliveryForm',
-            {
-              'projectId':projectId,
-              'samples':aReturn,
-              'url':ajaxurl
-            },
-            {'doOnSuccess':function (json) {
-              Utils.page.pageRedirect('/miso/download/project/' + projectId + '/' + json.response);
-            }
-            }
+      'projectControllerHelperService',
+      'generateSampleDeliveryForm',
+      {
+        'projectId':projectId,
+        'samples':aReturn,
+        'url':ajaxurl
+      },
+      {'doOnSuccess':function (json) {
+          Utils.page.pageRedirect('/miso/download/project/' + projectId + '/' + json.response);
+        }
+      }
     );
   },
 
@@ -154,33 +154,201 @@ Project.ui = {
     jQuery('#deliveryformdiv').css("display", "none");
   },
 
-  downloadBulkInputForm : function(projectId, documentFormat) {
+  downloadBulkSampleInputForm : function(projectId, documentFormat) {
     Fluxion.doAjax(
-            'projectControllerHelperService',
-            'downloadBulkInputForm',
-            {
-              'projectId':projectId,
-              'documentFormat':documentFormat,
-              'url':ajaxurl
-            },
-            {'doOnSuccess':function (json) {
-              Utils.page.pageRedirect('/miso/download/project/' + projectId + '/' + json.response);
-            }
-            }
+      'projectControllerHelperService',
+      'downloadBulkSampleInputForm',
+      {
+        'projectId':projectId,
+        'documentFormat':documentFormat,
+        'url':ajaxurl
+      },
+      {'doOnSuccess':function (json) {
+          Utils.page.pageRedirect('/miso/download/project/' + projectId + '/' + json.response);
+        }
+      }
     );
   },
 
-  bulkInputFormUploadSuccess : function() {
-    //jQuery('#inputform_statusdiv').html("Bulk input form processed.");
-    //visualise imported entities via lightbox
+  bulkSampleInputFormUploadSuccess : function() {
+    jQuery('#inputform_statusdiv').html("");
+    Fluxion.doAjax(
+      'projectControllerHelperService',
+      'visualiseBulkSampleInputForm',
+      {'url':ajaxurl},
+      {'updateElement':'inputform_statusdiv'}
+    );
   },
 
-  uploadBulkInputForm : function(projectId) {
+  uploadBulkSampleInputForm : function(projectId) {
     jQuery('#inputformdiv').css("display", "block");
   },
 
-  cancelBulkInputFormUpload : function() {
+  cancelBulkSampleInputFormUpload : function() {
     jQuery('#inputformdiv').css("display", "none");
+  },
+
+  downloadPlateInputForm : function(projectId, documentFormat) {
+    Fluxion.doAjax(
+      'projectControllerHelperService',
+      'downloadPlateInputForm',
+      {
+        'projectId':projectId,
+        'documentFormat':documentFormat,
+        'url':ajaxurl
+      },
+      {'doOnSuccess':function (json) {
+          Utils.page.pageRedirect('/miso/download/project/' + projectId + '/' + json.response);
+        }
+      }
+    );
+  },
+
+  uploadPlateInputForm : function() {
+    jQuery('#plateformdiv').css("display", "block");
+  },
+
+  cancelPlateInputFormUpload : function() {
+    jQuery('#plateformdiv').css("display", "none");
+  },
+
+  plateInputFormUploadSuccess : function(json) {
+    jQuery('#plateform_statusdiv').html("Processing...");
+    Project.ui.processPlateUpload(json.frameId);
+  },
+
+  processPlateUpload : function(frameId) {
+    var iframe = document.getElementById(frameId);
+    var iframedoc = iframe.document;
+        if (iframe.contentDocument)
+            iframedoc = iframe.contentDocument;
+        else if (iframe.contentWindow)
+            iframedoc = iframe.contentWindow.document;
+    var response = jQuery(iframedoc).contents().find('body:first').find('#uploadresponsebody').val();
+    if(!Utils.validation.isNullCheck(response)) {
+      var json = jQuery.parseJSON(response);
+      if(!Utils.validation.isNullCheck(json.pools)) {
+        jQuery('#plateform_statusdiv').html("Processing... complete.");
+        for (var i = 0; i < json.pools.length; i++) {
+          jQuery.each(json.pools[i], function(key, value) {
+            jQuery('#plateform_import').append("<div id='importbox-" + key + "' class='simplebox backwhite'>");
+            var pool = value;
+            var impb = jQuery('#importbox-'+key);
+            impb.append("<span style='float:right;'><button type='button' class='fg-button ui-state-default ui-corner-all' onclick='Project.ui.removeImportBox(this);'>Cancel</button>");
+            impb.append("<button type='button' class='fg-button ui-state-default ui-corner-all' onclick='Project.ui.saveImportedElements(\""+frameId+"\");'>Import</button></span>");
+            impb.append("Pool alias: <b>"+pool.alias+"</b></br>");
+            for (var j = 0; j < pool.poolableElements.length; j++) {
+              var plate = pool.poolableElements[j];
+              impb.append(plate.elements.length+"-well plate: <b>"+plate.identificationBarcode+"</b>");
+              impb.append("<ul>");
+              for (var k = 0; k < plate.elements.length; k++) {
+                var library = plate.elements[k];
+                impb.append("<li>"+library.alias+"</li>")
+              }
+              impb.append("</ul>");
+            }
+            impb.append("</div>");
+          });
+        }
+      }
+    }
+    else {
+      setTimeout(function()
+      {
+        Project.ui.processPlateUpload(frameId)
+      }, 2000);
+    }
+  },
+
+  removeImportBox : function(button) {
+    if (confirm("Are you sure you want to cancel the plate import?")) {
+      jQuery(button).parent().parent().remove();
+    }
+  },
+
+  saveImportedElements : function(frameId) {
+    var iframe = document.getElementById(frameId);
+    var iframedoc = iframe.document;
+        if (iframe.contentDocument)
+            iframedoc = iframe.contentDocument;
+        else if (iframe.contentWindow)
+            iframedoc = iframe.contentWindow.document;
+    var response = jQuery(iframedoc).contents().find('body:first').find('#uploadresponsebody').val();
+    if(!Utils.validation.isNullCheck(response)) {
+      var json = jQuery.parseJSON(response);
+      Fluxion.doAjax(
+        'projectControllerHelperService',
+        'saveImportedElements',
+        {
+          'elements':json,
+          'url':ajaxurl
+        },
+        {
+          'doOnSuccess':Project.ui.createPlateElementsTable()
+        }
+      );
+    }
+  },
+
+  createPlateElementsTable : function() {
+    jQuery('#plateElementsTable').html("<img src='../styles/images/ajax-loader.gif'/>");
+    jQuery.fn.dataTableExt.oSort['no-pla-asc'] = function(x, y) {
+      var a = parseInt(x.replace(/^PLA/i, ""));
+      var b = parseInt(y.replace(/^PLA/i, ""));
+      return ((a < b) ? -1 : ((a > b) ? 1 : 0));
+    };
+    jQuery.fn.dataTableExt.oSort['no-pla-desc'] = function(x, y) {
+      var a = parseInt(x.replace(/^PLA/i, ""));
+      var b = parseInt(y.replace(/^PLA/i, ""));
+      return ((a < b) ? 1 : ((a > b) ? -1 : 0));
+    };
+    Fluxion.doAjax(
+      'projectControllerHelperService',
+      'plateElementsDataTable',
+      {
+        'url':ajaxurl
+      },
+      {'doOnSuccess': function(json) {
+        jQuery('#plateElementsTable').html('');
+        jQuery('#plateElementsTable').dataTable({
+          "aaData": json.elementsArray,
+          "aoColumns": [
+            { "sTitle": "Name", "sType":"no-pla"},
+            { "sTitle": "Alias"},
+            { "sTitle": "Description"},
+            { "sTitle": "Edit"}
+          ],
+          "bJQueryUI": true,
+          "iDisplayLength":  25,
+          "aaSorting":[
+            [0,"desc"]
+          ],
+          "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>'
+          /*
+          ,
+
+          "fnRowCallback": function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+
+            Fluxion.doAjax(
+                    'projectControllerHelperService',
+                    'checkOverviewByProjectId',
+                    {
+                      'projectId':aData[4],
+                      'url':ajaxurl
+                    },
+                    {'doOnSuccess': function(json) {
+                      jQuery('td:eq(4)', nRow).html(json.response);
+                    }
+                    }
+            );
+          }
+          */
+        });
+        jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
+        //jQuery("#toolbar").append("<button style=\"margin-left:5px;\" onclick=\"window.location.href='/miso/project/new';\" class=\"fg-button ui-state-default ui-corner-all\">Add Project</button>");
+      }
+      }
+    );
   },
 
   addPoolEmPCR : function(tableId) {
@@ -1099,6 +1267,21 @@ Project.alert = {
             },
             {'doOnSuccess':function (json) {
               Utils.page.pageReload();
+            }
+            }
+    );
+  }  ,
+
+  listWatchOverview : function(overviewId) {
+    Fluxion.doAjax(
+            'projectControllerHelperService',
+            'listWatchOverview',
+            {
+              'overviewId':overviewId,
+              'url':ajaxurl
+            },
+            {'doOnSuccess':function (json) {
+              jQuery('#watchersList'+overviewId).html(json.watchers);
             }
             }
     );

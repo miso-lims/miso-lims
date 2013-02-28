@@ -103,14 +103,13 @@ public class NotificationUtils {
 
   public Map<String, Object> signMessageHeaders(Message<?> message) {
     MessageHeaders headers = message.getHeaders();
-    String url = headers.get("url", String.class);
+    String url = headers.get(SignatureHelper.URL_X_HEADER, String.class);
 
     Map<String, Object> newheaders = new HashMap<String, Object>();
     newheaders.put("Accept", "*/*");
-    newheaders.put(SignatureHelper.APIKEY_HEADER,
-                SignatureHelper.API_KEY);
-    newheaders.put(SignatureHelper.TIMESTAMP_HEADER,
-                "\"" + System.currentTimeMillis() + "\"");
+    newheaders.put(SignatureHelper.URL_X_HEADER, url);
+    newheaders.put(SignatureHelper.USER_HEADER, "notification");
+    newheaders.put(SignatureHelper.TIMESTAMP_HEADER, "\"" + System.currentTimeMillis() + "\"");
 
     //sign only those headers that are Strings
     Map<String, List<String>> stringHeaders = new HashMap<String, List<String>>();
@@ -124,10 +123,13 @@ public class NotificationUtils {
     }
 
     try {
-      log.debug("HEADERS -> " + stringHeaders + ":" + url + ":" + SignatureHelper.PRIVATE_KEY);
+      log.debug("HEADERS -> " + stringHeaders + ":" + url + ":" + "notification");
 
-       newheaders.put(SignatureHelper.SIGNATURE_HEADER,
-                   SignatureHelper.createSignature(stringHeaders, url, SignatureHelper.PRIVATE_KEY));
+      newheaders.put(SignatureHelper.SIGNATURE_HEADER,
+                     SignatureHelper.createSignature(
+                             stringHeaders,
+                             url,
+                             SignatureHelper.PUBLIC_KEY));
     } catch (Exception e) {
        e.printStackTrace();
     }

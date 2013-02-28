@@ -25,13 +25,19 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
+import org.codehaus.jackson.map.annotate.JsonDeserialize;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
 import uk.ac.bbsrc.tgac.miso.core.event.model.PoolEvent;
 import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedDilutionException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
+import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolException;
+import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolQcException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
+import uk.ac.bbsrc.tgac.miso.core.util.jackson.PooledElementDeserializer;
 
 import javax.persistence.*;
 import java.util.*;
@@ -43,6 +49,8 @@ import java.util.*;
  * @since 0.0.2
  */
 public abstract class AbstractPool<P extends Poolable> implements Pool<P> {
+  protected static final Logger log = LoggerFactory.getLogger(AbstractPool.class);
+
   public static final Long UNSAVED_ID = 0L;
 
   @Id
@@ -54,12 +62,16 @@ public abstract class AbstractPool<P extends Poolable> implements Pool<P> {
 
   private String name;
   private String alias;
+
   private Collection<P> pooledElements = new HashSet<P>();
   private Collection<Experiment> experiments = new HashSet<Experiment>();
   private Date creationDate;
   private Double concentration;
   private String identificationBarcode;
   private boolean readyToRun = false;
+
+  private Collection<PoolQC> poolQCs = new HashSet<PoolQC>();
+  private Boolean qcPassed;
 
   private Date lastUpdated;
 
@@ -112,8 +124,22 @@ public abstract class AbstractPool<P extends Poolable> implements Pool<P> {
   }
 
   @Override
-  public void setPoolableElements(Collection<P> pooledElements) {
-    this.pooledElements = pooledElements;
+  @JsonDeserialize(using = PooledElementDeserializer.class)
+  public <T extends Poolable> void setPoolableElements(Collection<T> poolables) {
+    this.pooledElements.clear();
+    for (T poolable : poolables) {
+      if (poolable != null) {
+        if (poolable instanceof Poolable) {
+          this.pooledElements.add((P)poolable);
+        }
+        else {
+          log.error(poolable.getClass().getName());
+        }
+      }
+      else {
+        log.error("Null poolable");
+      }
+    }
   }
 
   @Override
@@ -130,30 +156,12 @@ public abstract class AbstractPool<P extends Poolable> implements Pool<P> {
   @Override
   public Collection<? extends Dilution> getDilutions() {
     Set<Dilution> allDilutions = new HashSet<Dilution>();
-    for (P poolable : getPoolableElements()) {
-      allDilutions.addAll(poolable.getInternalPoolableElements());
-    }
-    return allDilutions;
-  }
-
-  /**
-   * Convenience method to set Dilutions to this Pool given that the Pooled Elements may well either be a set of
-   * single dilutions, or a single plate comprising a number of dilutions within that plate, or something else entirely
-   *
-   * @return Collection<? extends Dilution> dilutions.
-   */
-  @Override
-  public void setDilutions(Collection<P> dilutions) {
-    if (dilutions != null) {
-      for (P p : dilutions) {
-        if (p instanceof Dilution) {
-          setPoolableElements(dilutions);
-        }
+    for (Poolable poolable : getPoolableElements()) {
+      if (poolable instanceof Dilution) {
+        allDilutions.add((Dilution)poolable);
       }
     }
-    else {
-      setPoolableElements(dilutions);
-    }
+    return allDilutions;
   }
 
   @Override
@@ -223,6 +231,28 @@ public abstract class AbstractPool<P extends Poolable> implements Pool<P> {
     }
   }
 
+  public void addQc(PoolQC poolQc) throws MalformedPoolQcException {
+    this.poolQCs.add(poolQc);
+    try {
+      poolQc.setPool(this);
+    }
+    catch (MalformedPoolException e) {
+      e.printStackTrace();
+    }
+  }
+
+  public Collection<PoolQC> getPoolQCs() {
+    return poolQCs;
+  }
+
+  public Boolean getQcPassed() {
+    return qcPassed;
+  }
+
+  public void setQcPassed(Boolean qcPassed) {
+    this.qcPassed = qcPassed;
+  }
+
   public Date getLastUpdated() {
     return lastUpdated;
   }
@@ -251,14 +281,17 @@ public abstract class AbstractPool<P extends Poolable> implements Pool<P> {
     setSecurityProfile(parent.getSecurityProfile());
   }  
 
+  @Override
   public Set<MisoListener> getListeners() {
     return this.listeners;
   }
 
+  @Override
   public boolean addListener(MisoListener listener) {
     return listeners.add(listener);
   }
 
+  @Override
   public boolean removeListener(MisoListener listener) {
     return listeners.remove(listener);
   }

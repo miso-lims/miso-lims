@@ -201,7 +201,8 @@ table.dataTable tr.even td.sorting_3 { background-color: #F9F9FF; }
 .sorting_asc_disabled { background: url('../images/sort_asc_disabled.png') no-repeat center right; }
 .sorting_desc_disabled { background: url('../images/sort_desc_disabled.png') no-repeat center right; }
  
-table.dataTable th:active {
+table.dataTable thead th:active,
+table.dataTable thead td:active {
 	outline: none;
 }
 
@@ -215,5 +216,13 @@ table.dataTable th:active {
 
 .dataTables_scrollBody {
 	*margin-top: -1px;
+	-webkit-overflow-scrolling: touch;
 }
 
+table.display tr.even.row_selected td {
+	background-color: #B0BED9;
+}
+
+table.display tr.odd.row_selected td {
+	background-color: #9FAFD1;
+}

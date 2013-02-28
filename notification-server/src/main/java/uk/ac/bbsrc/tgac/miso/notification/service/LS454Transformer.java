@@ -30,12 +30,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.integration.Message;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
+import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationUtils;
 import uk.ac.bbsrc.tgac.miso.tools.run.RunFolderConstants;
 import uk.ac.bbsrc.tgac.miso.tools.run.util.FileSetTransformer;
 
 import javax.xml.transform.TransformerException;
 import java.io.File;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -129,8 +131,9 @@ public class LS454Transformer implements FileSetTransformer<String, String, File
               File runLogFile = new File(recentProcessingDir, "gsRunProcessor.log");
               if (runLogFile.exists()) {
                 String runLog = LimsUtils.fileToString(runLogFile);
-                //TODO probably have to escape the status log
-                //run.put("status", URLEncoder.encode(runLog, "UTF-8").replace('+', ' '));
+
+                String compstat = URLEncoder.encode(new String(IntegrationUtils.compress(runLog.getBytes())), "UTF-8");
+                run.put("status", compstat);
 
                 Matcher completeMatcher = Pattern.compile("^\\[([A-z]{3} [A-z]{3} \\d{2} \\d{2}:\\d{2}:\\d{2} \\d{4})\\].*Job complete\\.$").matcher(runLog);
                 if (completeMatcher.find()) {
@@ -150,7 +153,7 @@ public class LS454Transformer implements FileSetTransformer<String, String, File
             }
           }
           catch (IOException e) {
-            log.error(recentProcessingDir.getAbsolutePath()+" :: Unable to read");
+            log.error(recentProcessingDir.getAbsolutePath()+" :: Unable to process runLog: " + e.getMessage());
           }
         }
       }

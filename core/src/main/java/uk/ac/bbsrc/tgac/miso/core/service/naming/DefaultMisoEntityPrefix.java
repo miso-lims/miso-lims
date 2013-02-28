@@ -21,6 +21,7 @@ public enum DefaultMisoEntityPrefix {
    LDI("LibraryDilution"),
    PLA("Plate"),
    PRO("Project"),
+   UPO("Pool"),
    RUN("Run"),
    SAM("Sample"),
    SPC("SequencerPartitionContainer"),

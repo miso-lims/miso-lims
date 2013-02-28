@@ -130,4 +130,24 @@ public class StatsControllerHelperService {
       return JSONUtils.SimpleJSONError("Failed");
     }
   }
+
+
+  public JSONObject getPerPositionBaseContentDiagram(HttpSession session, JSONObject json) {
+    Long runId = json.getLong("runId");
+    Integer lane = json.getInt("lane");
+    StringBuilder b = new StringBuilder();
+    try {
+      Run run = requestManager.getRunById(runId);
+      JSONObject resultJson = runStatsManager.getPerPositionBaseContentForLane(run, lane);
+      return resultJson;
+    }
+    catch (IOException e) {
+      log.debug("Failed", e);
+      return JSONUtils.SimpleJSONError("Failed");
+    }
+    catch (RunStatsException e) {
+      log.debug("Failed", e);
+      return JSONUtils.SimpleJSONError("Failed");
+    }
+  }
 }

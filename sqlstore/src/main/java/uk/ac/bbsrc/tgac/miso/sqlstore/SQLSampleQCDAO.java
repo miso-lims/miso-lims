@@ -25,6 +25,9 @@ package uk.ac.bbsrc.tgac.miso.sqlstore;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleQcStore;
@@ -41,6 +44,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
+import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 import javax.persistence.CascadeType;
@@ -90,6 +94,8 @@ public class SQLSampleQCDAO implements SampleQcStore {
 
   public static final String SAMPLE_QC_DELETE =
           "DELETE FROM "+TABLE_NAME+" WHERE qcId=:qcId";
+
+  protected static final Logger log = LoggerFactory.getLogger(SQLSampleQCDAO.class);
 
   private JdbcTemplate template;
   private SampleStore sampleDAO;
@@ -176,17 +182,17 @@ public class SQLSampleQCDAO implements SampleQcStore {
   }
 
   public SampleQC lazyGet(long qcId) throws IOException {
-    List eResults = template.query(SAMPLE_QC_SELECT_BY_ID, new Object[]{qcId}, new LazySampleQcMapper());
+    List eResults = template.query(SAMPLE_QC_SELECT_BY_ID, new Object[]{qcId}, new SampleQcMapper(true));
     SampleQC e = eResults.size() > 0 ? (SampleQC) eResults.get(0) : null;
     return e;
   }
 
   public Collection<SampleQC> listBySampleId(long sampleId) throws IOException {
-    return new LinkedList(template.query(SAMPLE_QC_SELECT_BY_SAMPLE_ID, new Object[]{sampleId}, new LazySampleQcMapper()));
+    return new LinkedList(template.query(SAMPLE_QC_SELECT_BY_SAMPLE_ID, new Object[]{sampleId}, new SampleQcMapper(true)));
   }
 
   public Collection<SampleQC> listAll() throws IOException {
-    return template.query(SAMPLE_QC, new LazySampleQcMapper());
+    return template.query(SAMPLE_QC, new SampleQcMapper(true));
   }
 
   @Override
@@ -214,36 +220,39 @@ public class SQLSampleQCDAO implements SampleQcStore {
     return false;
   }
 
-  public class LazySampleQcMapper implements RowMapper<SampleQC> {
-    public SampleQC mapRow(ResultSet rs, int rowNum) throws SQLException {
-      SampleQC s = dataObjectFactory.getSampleQC();
-      s.setId(rs.getLong("qcId"));
-      s.setQcCreator(rs.getString("qcUserName"));
-      s.setQcDate(rs.getDate("qcDate"));
-      s.setResults(rs.getDouble("results"));
-
-      try {
-        s.setQcType(getSampleQcTypeById(rs.getLong("qcMethod")));
-      }
-      catch (IOException e) {
-        e.printStackTrace();
-      }
-
-      return s;
+  public class SampleQcMapper extends CacheAwareRowMapper<SampleQC> {
+    public SampleQcMapper() {
+      //sample qcs aren't cached at present
+      super(SampleQC.class, false, false);
     }
-  }
 
-  public class SampleQcMapper implements RowMapper<SampleQC> {
+    public SampleQcMapper(boolean lazy) {
+      //sample qcs aren't cached at present
+      super(SampleQC.class, lazy, false);
+    }
+
     public SampleQC mapRow(ResultSet rs, int rowNum) throws SQLException {
+      long id = rs.getLong("qcId");
+
+      if (isCacheEnabled()) {
+        Element element;
+        if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
+          log.debug("Cache hit on map for SampleQC " + id);
+          return (SampleQC)element.getObjectValue();
+        }
+      }
       SampleQC s = dataObjectFactory.getSampleQC();
-      s.setId(rs.getLong("qcId"));
+      s.setId(id);
       s.setQcCreator(rs.getString("qcUserName"));
       s.setQcDate(rs.getDate("qcDate"));
       s.setResults(rs.getDouble("results"));
 
       try {
-        s.setSample(sampleDAO.get(rs.getLong("sample_sampleId")));
         s.setQcType(getSampleQcTypeById(rs.getLong("qcMethod")));
+
+        if (!isLazy()) {
+          s.setSample(sampleDAO.get(rs.getLong("sample_sampleId")));
+        }
       }
       catch (IOException e) {
         e.printStackTrace();
@@ -251,6 +260,11 @@ public class SQLSampleQCDAO implements SampleQcStore {
       catch (MalformedSampleException e) {
         e.printStackTrace();
       }
+
+      if (isCacheEnabled()) {
+        lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id) ,s));
+      }
+
       return s;
     }
   }

@@ -50,9 +50,11 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.event.manager.RunAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.*;
+import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
@@ -62,6 +64,7 @@ import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.regex.Matcher;
 
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore
@@ -200,6 +203,13 @@ public class SQLRunDAO implements RunStore {
   private NoteStore noteDAO;
   private WatcherStore watcherDAO;
   private CascadeType cascadeType;
+
+  @Autowired
+  private RunAlertManager runAlertManager;
+
+  public void setRunAlertManager(RunAlertManager runAlertManager) {
+    this.runAlertManager = runAlertManager;
+  }
 
   @Autowired
   private MisoNamingScheme<Run> namingScheme;
@@ -660,11 +670,11 @@ public class SQLRunDAO implements RunStore {
   @Override
   @Cacheable(cacheName="runListCache")
   public List<Run> listAll() {
-    return template.query(RUNS_SELECT, new LazyRunMapper());
+    return template.query(RUNS_SELECT, new RunMapper(true));
   }
 
   public List<Run> listAllWithLimit(long limit) throws IOException {
-    return template.query(RUNS_SELECT_LIMIT, new Object[]{limit}, new LazyRunMapper());
+    return template.query(RUNS_SELECT_LIMIT, new Object[]{limit}, new RunMapper(true));
   }
 
   @Override
@@ -674,23 +684,23 @@ public class SQLRunDAO implements RunStore {
 
   @Override
   public List<Run> listBySearch(String query) {
-    String mySQLQuery = "%" + query + "%";
-    return template.query(RUNS_SELECT_BY_SEARCH, new Object[]{mySQLQuery,mySQLQuery,mySQLQuery}, new LazyRunMapper());
+    String mySQLQuery = "%" + query.replaceAll("_", Matcher.quoteReplacement("\\_")) + "%";
+    return template.query(RUNS_SELECT_BY_SEARCH, new Object[]{mySQLQuery,mySQLQuery,mySQLQuery}, new RunMapper(true));
   }
 
   @Override
   public List<Run> listByProjectId(long projectId) throws IOException {
-    return template.query(RUNS_SELECT_BY_PROJECT_ID, new Object[]{projectId}, new LazyRunMapper());
+    return template.query(RUNS_SELECT_BY_PROJECT_ID, new Object[]{projectId}, new RunMapper(true));
   }
 
   @Override
   public List<Run> listByPlatformId(long platformId) throws IOException {
-    return template.query(RUNS_SELECT_BY_PLATFORM_ID, new Object[]{platformId}, new LazyRunMapper());
+    return template.query(RUNS_SELECT_BY_PLATFORM_ID, new Object[]{platformId}, new RunMapper(true));
   }
 
   @Override
   public List<Run> listByStatus(String health) throws IOException {
-    return template.query(RUNS_SELECT_BY_STATUS_HEALTH, new Object[]{health}, new LazyRunMapper());
+    return template.query(RUNS_SELECT_BY_STATUS_HEALTH, new Object[]{health}, new RunMapper(true));
   }
 
   @Deprecated
@@ -706,18 +716,18 @@ public class SQLRunDAO implements RunStore {
 
   @Override
   public List<Run> listBySequencerPartitionContainerId(long containerId) throws IOException {
-    return template.query(RUNS_SELECT_BY_SEQUENCER_PARTITION_CONTAINER_ID, new Object[]{containerId}, new LazyRunMapper());
+    return template.query(RUNS_SELECT_BY_SEQUENCER_PARTITION_CONTAINER_ID, new Object[]{containerId}, new RunMapper(true));
   }
 
   public Run getLatestStartDateRunBySequencerPartitionContainerId(long containerId) throws IOException {
-    List eResults = template.query(LATEST_RUN_STARTED_SELECT_BY_SEQUENCER_PARTITION_CONTAINER_ID, new Object[]{containerId}, new LazyRunMapper());
+    List eResults = template.query(LATEST_RUN_STARTED_SELECT_BY_SEQUENCER_PARTITION_CONTAINER_ID, new Object[]{containerId}, new RunMapper(true));
     Run r = eResults.size() > 0 ? (Run)eResults.get(0) : null;
     if (r == null) { r = getLatestRunIdRunBySequencerPartitionContainerId(containerId); }
     return r;
   }
 
   public Run getLatestRunIdRunBySequencerPartitionContainerId(long containerId) throws IOException {
-    List eResults = template.query(LATEST_RUN_ID_SELECT_BY_SEQUENCER_PARTITION_CONTAINER_ID, new Object[]{containerId}, new LazyRunMapper());
+    List eResults = template.query(LATEST_RUN_ID_SELECT_BY_SEQUENCER_PARTITION_CONTAINER_ID, new Object[]{containerId}, new RunMapper(true));
     return eResults.size() > 0 ? (Run)eResults.get(0) : null;
   }
 
@@ -744,7 +754,7 @@ public class SQLRunDAO implements RunStore {
 
   @Override
   public Run lazyGet(long runId) throws IOException {
-    List eResults = template.query(RUN_SELECT_BY_ID, new Object[]{runId}, new LazyRunMapper());
+    List eResults = template.query(RUN_SELECT_BY_ID, new Object[]{runId}, new RunMapper(true));
     return eResults.size() > 0 ? (Run) eResults.get(0) : null;
   }
 
@@ -771,55 +781,29 @@ public class SQLRunDAO implements RunStore {
     return false;
   }
 
-  public class LazyRunMapper implements RowMapper<Run> {
-    public Run mapRow(ResultSet rs, int rowNum) throws SQLException {
-      PlatformType platformtype = PlatformType.get(rs.getString("platformType"));
-      Run r = dataObjectFactory.getRunOfType(platformtype);
-      r.setId(rs.getLong("runId"));
-      r.setAlias(rs.getString("alias"));
-      r.setAccession(rs.getString("accession"));
-      r.setName(rs.getString("name"));
-      r.setDescription(rs.getString("description"));
-      r.setPlatformRunId(rs.getInt("platformRunId"));
-      r.setPairedEnd(rs.getBoolean("pairedEnd"));
-      r.setCycles(rs.getInt("cycles"));
-      r.setFilePath(rs.getString("filePath"));
-      r.setPlatformType(platformtype);
-
-      try {
-        r.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
-        r.setStatus(statusDAO.get(rs.getLong("status_statusId")));
-        r.setSequencerReference(sequencerReferenceDAO.get(rs.getLong("sequencerReference_sequencerReferenceId")));
-
-        /*
-        for (RunQC qc : runQcDAO.listByRunId(rs.getLong("runId"))) {
-          r.addQc(qc);
-        }
-        */
-
-        r.setWatchers(new HashSet<User>(watcherDAO.getWatchersByEntityName(r.getWatchableIdentifier())));
-        if (r.getSecurityProfile() != null &&
-            r.getSecurityProfile().getOwner() != null)
-          r.addWatcher(r.getSecurityProfile().getOwner());
-        for (User u : watcherDAO.getWatchersByWatcherGroup("RunWatchers")) {
-          r.addWatcher(u);
-        }
-      }
-      catch (IOException e1) {
-        e1.printStackTrace();
-      }
-      catch (Exception e) {
-        e.printStackTrace();
-      }
-      return r;
+  public class RunMapper extends CacheAwareRowMapper<Run> {
+    public RunMapper() {
+      super(Run.class);
     }
-  }
 
-  public class RunMapper implements RowMapper<Run> {
+    public RunMapper(boolean lazy) {
+      super(Run.class, lazy);
+    }
+
     public Run mapRow(ResultSet rs, int rowNum) throws SQLException {
+      long id = rs.getLong("runId");
+
+      if (isCacheEnabled()) {
+        Element element;
+        if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
+          log.debug("Cache hit on map for Run " + id);
+          return (Run)element.getObjectValue();
+        }
+      }
+
       PlatformType platformtype = PlatformType.get(rs.getString("platformType"));
       Run r = dataObjectFactory.getRunOfType(platformtype);
-      r.setId(rs.getLong("runId"));
+      r.setId(id);
       r.setAlias(rs.getString("alias"));
       r.setAccession(rs.getString("accession"));
       r.setName(rs.getString("name"));
@@ -834,22 +818,24 @@ public class SQLRunDAO implements RunStore {
         r.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
         r.setStatus(statusDAO.get(rs.getLong("status_statusId")));
         r.setSequencerReference(sequencerReferenceDAO.get(rs.getLong("sequencerReference_sequencerReferenceId")));
-
-        List<SequencerPartitionContainer<SequencerPoolPartition>> ss = sequencerPartitionContainerDAO.listAllSequencerPartitionContainersByRunId(rs.getLong("runId"));
-        ((RunImpl)r).setSequencerPartitionContainers(ss);
-
-        for (RunQC qc : runQcDAO.listByRunId(rs.getLong("runId"))) {
-          r.addQc(qc);
-        }
-
-        r.setNotes(noteDAO.listByRun(rs.getLong("runId")));
-
         r.setWatchers(new HashSet<User>(watcherDAO.getWatchersByEntityName(r.getWatchableIdentifier())));
         if (r.getSecurityProfile() != null &&
             r.getSecurityProfile().getOwner() != null)
           r.addWatcher(r.getSecurityProfile().getOwner());
         for (User u : watcherDAO.getWatchersByWatcherGroup("RunWatchers")) {
           r.addWatcher(u);
+        }
+
+        if (!isLazy()) {
+          List<SequencerPartitionContainer<SequencerPoolPartition>> ss =
+              sequencerPartitionContainerDAO.listAllSequencerPartitionContainersByRunId(id);
+          ((RunImpl)r).setSequencerPartitionContainers(ss);
+
+          for (RunQC qc : runQcDAO.listByRunId(id)) {
+            r.addQc(qc);
+          }
+
+          r.setNotes(noteDAO.listByRun(id));
         }
       }
       catch (IOException e1) {
@@ -858,6 +844,15 @@ public class SQLRunDAO implements RunStore {
       catch (Exception e) {
         e.printStackTrace();
       }
+
+      if (runAlertManager != null) {
+        runAlertManager.push(r);
+      }
+
+      if (isCacheEnabled()) {
+        lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id) ,r));
+      }
+
       return r;
     }
   }

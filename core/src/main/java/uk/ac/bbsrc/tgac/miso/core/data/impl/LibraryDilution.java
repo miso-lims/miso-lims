@@ -28,8 +28,12 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.Plate;
 
+import java.io.Serializable;
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.Set;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.impl
@@ -39,7 +43,7 @@ import java.util.Collection;
  * @author Rob Davey
  * @since 0.0.2
  */
-public class LibraryDilution extends AbstractDilution {
+public class LibraryDilution extends AbstractDilution implements Serializable {
   private Library library;
   public static final String UNITS = "nM";
 

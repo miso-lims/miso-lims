@@ -236,8 +236,6 @@ public class SQLSecurityProfileDAO implements Store<SecurityProfile> {
       sp = new SecurityProfile();
     }
 
-    //log.info(sp.toString());
-
     return sp;
   }
 

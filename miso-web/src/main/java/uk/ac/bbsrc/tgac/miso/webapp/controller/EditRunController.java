@@ -40,6 +40,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.*;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.event.manager.RunAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
@@ -74,6 +75,9 @@ public class EditRunController {
   @Autowired
   private JdbcTemplate interfaceTemplate;
 
+  @Autowired
+  private RunAlertManager runAlertManager;
+
   private RunStatsManager runStatsManager;
 
   public void setInterfaceTemplate(JdbcTemplate interfaceTemplate) {
@@ -90,6 +94,10 @@ public class EditRunController {
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
+  }
+
+  public void setRunAlertManager(RunAlertManager runAlertManager) {
+    this.runAlertManager = runAlertManager;
   }
 
   public void setRunStatsManager(RunStatsManager runStatsManager) {
@@ -253,7 +261,7 @@ public class EditRunController {
         }
         else {
           model.put("title", "Run " + runId);
-          model.put("availablePools", populateAvailablePools(run.getPlatformType(), user));
+          //model.put("availablePools", populateAvailablePools(run.getPlatformType(), user));
           model.put("multiplexed", isMultiplexed(runId));
           try {
             if (runStatsManager != null) {
@@ -265,6 +273,8 @@ public class EditRunController {
           catch (RunStatsException e) {
             e.printStackTrace();
           }
+
+          //runAlertManager.push(run);
         }
       }
 
@@ -314,11 +324,13 @@ public class EditRunController {
   @RequestMapping(method = RequestMethod.POST)
   public String processSubmit(@ModelAttribute("run") Run run,
                               ModelMap model, SessionStatus session) throws IOException, MalformedRunException {
+    log.info("POSTING " + run.getName() + ":" + run.getStatus().getHealth().name());
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       if (!run.userCanWrite(user)) {
         throw new SecurityException("Permission denied.");
       }
+
       requestManager.saveRun(run);
       session.setComplete();
       model.clear();

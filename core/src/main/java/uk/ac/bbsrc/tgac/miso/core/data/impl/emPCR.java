@@ -33,6 +33,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -45,7 +46,7 @@ import java.util.HashSet;
  * @author Rob Davey
  * @since 0.0.2
  */
-public class emPCR implements SecurableByProfile, Comparable, Deletable, Nameable {
+public class emPCR implements SecurableByProfile, Comparable, Deletable, Nameable, Serializable {
   public static final Long UNSAVED_ID = 0L;
 
   public static final String UNITS = "beads/&#181;l";

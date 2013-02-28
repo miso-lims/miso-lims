@@ -42,11 +42,14 @@ import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.mechanism.NotificationMessageConsumerMechanism;
 import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
+import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationUtils;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -96,7 +99,7 @@ public class LS454NotificationMessageConsumerMechanism implements NotificationMe
     DateFormat gsLogDateFormat = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy");
     DateFormat startDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-    Pattern p = Pattern.compile("R_(\\d{4}_\\d{2}_\\d{2}_\\d{2}_\\d{2}_\\d{2})_([A-Za-z0-9]+)_([A-z0-9\\-]*)");
+    Pattern p = Pattern.compile("R_(\\d{4}_\\d{2}_\\d{2}_\\d{2}_\\d{2}_\\d{2})_([A-Za-z0-9]+)_([A-z0-9\\+\\-]*)");
 
     StringBuilder sb = new StringBuilder();
 
@@ -106,7 +109,21 @@ public class LS454NotificationMessageConsumerMechanism implements NotificationMe
       log.debug("Processing " + runName);
 
       if (run.has("status")) {
-        String runLog = run.getString("status");
+        String runLog = "";
+        if (!"".equals(run.getString("status"))) {
+          try {
+            runLog = new String(IntegrationUtils.decompress(URLDecoder.decode(run.getString("status"), "UTF-8").getBytes()));
+          }
+          catch (UnsupportedEncodingException e) {
+            log.error("Cannot decode status runLog: " + e.getMessage());
+            e.printStackTrace();
+          }
+          catch (IOException e) {
+            log.error("Cannot decompress and decode incoming status: " + e.getMessage());
+            e.printStackTrace();
+          }
+        }
+
         if (!runLog.startsWith("ERROR")) {
           Status is = new LS454Status(runLog);
           is.setHealth(ht);
@@ -178,6 +195,16 @@ public class LS454NotificationMessageConsumerMechanism implements NotificationMe
                 r.setDescription(m.group(3));
                 //TODO check this properly
                 r.setPairedEnd(false);
+
+                if (r.getStatus() != null && run.has("status")) {
+                  r.getStatus().setHealth(ht);
+                }
+                else {
+                  if (run.has("status")) {
+                    r.setStatus(is);
+                  }
+                }
+
                 r.getStatus().setInstrumentName(m.group(2));
 
                 if (r.getSequencerReference() == null) {

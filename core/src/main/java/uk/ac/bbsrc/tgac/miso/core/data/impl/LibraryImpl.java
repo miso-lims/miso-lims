@@ -30,6 +30,8 @@ import org.slf4j.LoggerFactory;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 
+import java.io.Serializable;
+
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.impl
  * <p/>
@@ -38,7 +40,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
  * @author Rob Davey
  * @since 0.0.2
  */
-public class LibraryImpl extends AbstractLibrary {
+public class LibraryImpl extends AbstractLibrary implements Serializable {
   protected static final Logger log = LoggerFactory.getLogger(LibraryImpl.class);
 
   /**

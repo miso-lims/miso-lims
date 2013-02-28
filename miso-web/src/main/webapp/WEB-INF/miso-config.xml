@@ -24,8 +24,7 @@
 
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:jee="http://www.springframework.org/schema/jee"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.0.xsd"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd"
        default-autowire="byName">
 
   <bean id="jspViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
@@ -71,7 +70,6 @@
     <property name="dropBox" value="${submission.dropBox}"/>
     <property name="authKey" value="${submission.authKey}"/>
     <property name="submissionEndPoint" value="${submission.submissionEndPoint}"/>
-    <!-- <property name="proxyHost" value="${submission.proxyHost}"/> -->
     <property name="submissionStoragePath" value="${miso.submissionStorageDirectory}"/>
   </bean>
 
@@ -88,5 +86,7 @@
   <bean id="libraryNamingScheme" name="libraryNamingScheme" class="uk.ac.bbsrc.tgac.miso.core.service.naming.DefaultLibraryNamingScheme"/>
 
   <bean id="nameGeneratorResolverService" name="nameGeneratorResolverService" class="uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNameGeneratorResolverService"/>
+
+  <bean id="filePathGeneratorResolverService" name="filePathGeneratorResolverService" class="uk.ac.bbsrc.tgac.miso.core.service.submission.MisoFilePathGeneratorResolverService"/>
 
 </beans>

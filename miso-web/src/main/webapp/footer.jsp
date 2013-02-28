@@ -25,8 +25,8 @@
 <div id="footer">
     <br/>
 
-    <p>&copy; 2010 - 2012 Brought to you by <a href="http://www.tgac.ac.uk/" target="_blank">The Genome Analysis Centre</a>
-       and the element <a href="http://en.wikipedia.org/wiki/Oxygen" target="_blank">oxygen</a> | Version: 0.1.8</p>
+    <p>&copy; 2010 - 2013 Brought to you by <a href="http://www.tgac.ac.uk/" target="_blank">The Genome Analysis Centre</a>
+       and the element <a href="http://en.wikipedia.org/wiki/Fluorine" target="_blank">fluorine</a> | Version: 0.1.9</p>
 </div>
 </body>
 </html>

@@ -23,19 +23,27 @@
   -->
 
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:security="http://www.springframework.org/schema/security"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:context="http://www.springframework.org/schema/context"
        xmlns:oauth="http://www.springframework.org/schema/security/oauth"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-                        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd
-                        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
-                        http://www.springframework.org/schema/security/oauth http://www.springframework.org/schema/security/spring-security-oauth.xsd"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+                           http://www.springframework.org/schema/security/oauth http://www.springframework.org/schema/security/spring-security-oauth-1.0.xsd
+                           http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd"
        default-autowire="byName">
 
   <bean id="securityManager" name="securityManager" class="uk.ac.bbsrc.tgac.miso.core.security.LDAPSecurityManager"/>
 
   <security:global-method-security secured-annotations="enabled" jsr250-annotations="enabled"/>
+
+  <!-- don't want to have a SS filter here as the userless REST auth should have taken care of that -->
+  <security:http pattern="/miso/consumer/**" security="none"/>
+  <security:http pattern="/miso/rest/**" security="none"/>
+  <security:http pattern="/styles/**" security="none"/>
+  <!-- filters="none"/> -->
+  <security:http pattern="/scripts/**" security="none"/>
+  <!-- filters="none"/> -->
+  <security:http pattern="/images/**" security="none"/>
+  <!-- filters="none"/> -->
 
   <!-- <security:http access-denied-page="/accessDenied.jsp" use-expressions="true"> -->
   <security:http access-denied-page="/accessDenied.jsp" use-expressions="true" auto-config="false"
@@ -48,9 +56,6 @@
 
     <security:intercept-url pattern="/login.jsp" access="permitAll"/>
 
-    <security:intercept-url pattern="/styles/**" filters="none"/>
-    <security:intercept-url pattern="/scripts/**" filters="none"/>
-    <security:intercept-url pattern="/images/**" filters="none"/>
     <security:intercept-url pattern="/registerUser"
                             access="hasRole('ROLE_INTERNAL')"/>
 
@@ -75,8 +80,10 @@
 
     <!-- don't want to have a SS filter here as the userless REST auth should have taken care of that -->
     <!--<security:intercept-url pattern="/miso/consumer/**" access="isAuthenticated"/>-->
-    <security:intercept-url pattern="/miso/consumer/**" filters="none"/>
-
+    <!--
+    <security:intercept-url pattern="/miso/consumer/**" access="permitAll"/>
+    <security:intercept-url pattern="/miso/rest/**" access="permitAll"/>
+     -->
     <security:intercept-url pattern="/miso/**" access="hasRole('ROLE_INTERNAL')"/>
 
     <security:logout invalidate-session="true" logout-success-url="/loggedOut.jsp"/>
@@ -84,6 +91,7 @@
     <security:session-management invalid-session-url="/login.jsp" session-fixation-protection="none"/>
   </security:http>
 
+  <!--
   <oauth:consumer resource-details-service-ref="resourceDetails" oauth-failure-page="/oauth_error.jsp">
     <oauth:url pattern="/project/**" httpMethod="GET" resources="jiraIssues"/>
   </oauth:consumer>
@@ -98,11 +106,18 @@
                     access-token-url="http://your.jira.host/plugins/servlet/oauth/access-token"
                     accepts-authorization-header="true"/>
   </oauth:resource-details-service>
+  -->
 
   <bean id="ajaxSessionFilter" class="uk.ac.bbsrc.tgac.miso.webapp.context.AjaxSessionFilter">
-      <constructor-arg ref="httpSessionSecurityContextRepository"/>
-      <property name="invalidSessionUrl" value="/login.jsp"/>
-      <property name="authenticationFailureHandler" ref="failureHandler"/>
+    <constructor-arg ref="httpSessionSecurityContextRepository"/>
+    <property name="invalidSessionStrategy" ref="invalidSessionStrategy"/>
+    <property name="authenticationFailureHandler" ref="failureHandler"/>
+  </bean>
+
+  <bean id="invalidSessionStrategy"
+    class="org.springframework.security.web.session.SimpleRedirectInvalidSessionStrategy">
+    <constructor-arg value="/login.jsp"/>
+    <property name="createNewSession" value="false"/>
   </bean>
 
   <bean id="httpSessionSecurityContextRepository"
@@ -204,5 +219,9 @@
     <property name="rolePrefix" value="${security.ldap.rolePrefix}"/>
     <property name="searchSubtree" value="${security.ldap.searchSubtree}"/>
     <property name="convertToUpperCase" value="${security.ldap.convertToUpperCase}"/>
+  </bean>
+
+  <bean id="restSignatureFilter" class="uk.ac.bbsrc.tgac.miso.webapp.context.RestSignatureFilter">
+    <property name="securityManager" ref="securityManager"/>
   </bean>
 </beans>

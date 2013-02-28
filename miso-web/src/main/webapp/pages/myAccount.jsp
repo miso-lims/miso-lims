@@ -31,7 +31,8 @@
       <div class="portlet-header">My Account</div>
       <div class="portlet-content">
         User: ${userRealName}<br/>
-        Groups: ${userGroups}
+        Groups: ${userGroups}<br/><br/>
+        API Key: ${apiKey}
       </div>
     </div>
 

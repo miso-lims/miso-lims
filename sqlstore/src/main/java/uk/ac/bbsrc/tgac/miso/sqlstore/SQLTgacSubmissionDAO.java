@@ -95,7 +95,7 @@ public class SQLTgacSubmissionDAO implements Store<Submission>, NamingSchemeAwar
   protected static final Logger log = LoggerFactory.getLogger(SQLTgacSubmissionDAO.class);
 
   private JdbcTemplate template;
-  private DilutionStore dilutionDAO;
+  private LibraryDilutionStore libraryDilutionDAO;
   private ExperimentStore experimentDAO;
   private PartitionStore partitionDAO;
   private RunStore runDAO;
@@ -122,8 +122,8 @@ public class SQLTgacSubmissionDAO implements Store<Submission>, NamingSchemeAwar
     this.dataObjectFactory = dataObjectFactory;
   }
 
-  public void setDilutionDAO(DilutionStore dilutionDAO) {
-    this.dilutionDAO = dilutionDAO;
+  public void setDilutionDAO(LibraryDilutionStore libraryDilutionDAO) {
+    this.libraryDilutionDAO = libraryDilutionDAO;
   }
 
   public void setExperimentDAO(ExperimentStore experimentDAO) {
@@ -416,7 +416,7 @@ public class SQLTgacSubmissionDAO implements Store<Submission>, NamingSchemeAwar
 
           log.debug("dilutionIdList for partition " + partition.getId() + "from DB table:" + dilutionIdList.toString());
           for (Long id : dilutionIdList) {
-            Dilution dil = dilutionDAO.getDilutionByIdAndPlatform(id, partition.getPool().getPlatformType());
+            Dilution dil = libraryDilutionDAO.getLibraryDilutionByIdAndPlatform(id, partition.getPool().getPlatformType());
             try {
               newPool.addPoolableElement(dil);
             }

@@ -114,6 +114,10 @@ public class PacBioNotificationMessageConsumerMechanism implements NotificationM
               log.error("Cannot decode status xml: " + e.getMessage());
               e.printStackTrace();
             }
+            catch (IOException e) {
+              log.error("Cannot decompress and decode incoming status: " + e.getMessage());
+              e.printStackTrace();
+            }
           }
         }
       }

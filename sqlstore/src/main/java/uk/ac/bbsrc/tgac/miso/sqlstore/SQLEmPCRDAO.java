@@ -28,11 +28,13 @@ import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.store.DilutionStore;
+import uk.ac.bbsrc.tgac.miso.core.store.EmPCRDilutionStore;
+import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.EmPCRStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import com.googlecode.ehcache.annotations.Cacheable;
@@ -45,6 +47,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.transaction.annotation.Transactional;
+import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCR;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
@@ -96,7 +99,8 @@ public class SQLEmPCRDAO implements EmPCRStore {
   protected static final Logger log = LoggerFactory.getLogger(SQLEmPCRDAO.class);
 
   private JdbcTemplate template;
-  private DilutionStore dilutionDAO;
+  private LibraryDilutionStore libraryDilutionDAO;
+  private EmPCRDilutionStore emPCRDilutionDAO;
   private CascadeType cascadeType;
   private Store<SecurityProfile> securityProfileDAO;
 
@@ -135,9 +139,13 @@ public class SQLEmPCRDAO implements EmPCRStore {
     this.template = template;
   }
 
-  public void setDilutionDAO(DilutionStore dilutionDAO) {
-    this.dilutionDAO = dilutionDAO;
-  }  
+  public void setLibraryDilutionDAO(LibraryDilutionStore libraryDilutionDAO) {
+    this.libraryDilutionDAO = libraryDilutionDAO;
+  }
+
+  public void setEmPCRDilutionDAO(EmPCRDilutionStore emPCRDilutionDAO) {
+    this.emPCRDilutionDAO = emPCRDilutionDAO;
+  }
 
   public void setCascadeType(CascadeType cascadeType) {
     this.cascadeType = cascadeType;
@@ -152,7 +160,7 @@ public class SQLEmPCRDAO implements EmPCRStore {
   }
 
   @Transactional(readOnly = false, rollbackFor = IOException.class)
-  @TriggersRemove(cacheName="empcrCache",
+  @TriggersRemove(cacheName="emPCRCache",
                   keyGenerator = @KeyGenerator(
                           name = "HashCodeCacheKeyGenerator",
                           properties = {
@@ -235,7 +243,7 @@ public class SQLEmPCRDAO implements EmPCRStore {
     if (this.cascadeType != null) {
       LibraryDilution ld = pcr.getLibraryDilution();
       if (this.cascadeType.equals(CascadeType.PERSIST)) {
-        if (ld != null) dilutionDAO.save(ld);
+        if (ld != null) libraryDilutionDAO.save(ld);
       }
       else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (ld != null) {
@@ -248,7 +256,7 @@ public class SQLEmPCRDAO implements EmPCRStore {
     return pcr.getId();
   }
 
-  @Cacheable(cacheName="empcrCache",
+  @Cacheable(cacheName="emPCRCache",
                   keyGenerator = @KeyGenerator(
                           name = "HashCodeCacheKeyGenerator",
                           properties = {
@@ -264,7 +272,7 @@ public class SQLEmPCRDAO implements EmPCRStore {
   }
 
   public emPCR lazyGet(long pcrId) throws IOException {
-    List eResults = template.query(EMPCR_SELECT_BY_PCR_ID, new Object[]{pcrId}, new LazyEmPCRMapper());
+    List eResults = template.query(EMPCR_SELECT_BY_PCR_ID, new Object[]{pcrId}, new EmPCRMapper(true));
     emPCR e = eResults.size() > 0 ? (emPCR) eResults.get(0) : null;
     return e;
   }
@@ -274,7 +282,7 @@ public class SQLEmPCRDAO implements EmPCRStore {
   }
 
   public Collection<emPCR> listAll() throws IOException {
-    return template.query(EMPCR_SELECT, new LazyEmPCRMapper());
+    return template.query(EMPCR_SELECT, new EmPCRMapper(true));
   }
 
   @Override
@@ -288,7 +296,7 @@ public class SQLEmPCRDAO implements EmPCRStore {
 
   @Transactional(readOnly = false, rollbackFor = IOException.class)
   @TriggersRemove(
-          cacheName="empcrCache",
+          cacheName="emPCRCache",
           keyGenerator = @KeyGenerator (
               name = "HashCodeCacheKeyGenerator",
               properties = {
@@ -304,7 +312,7 @@ public class SQLEmPCRDAO implements EmPCRStore {
                             new MapSqlParameterSource().addValue("pcrId", e.getId())) == 1)) {
       LibraryDilution ld = e.getLibraryDilution();
       if (this.cascadeType.equals(CascadeType.PERSIST)) {
-        if (ld != null) dilutionDAO.save(ld);
+        if (ld != null) libraryDilutionDAO.save(ld);
       }
       else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (ld != null) {
@@ -317,31 +325,28 @@ public class SQLEmPCRDAO implements EmPCRStore {
     return false;
   }
 
-  public class EmPCRMapper implements RowMapper<emPCR> {
-    public emPCR mapRow(ResultSet rs, int rowNum) throws SQLException {
-      emPCR pcr = dataObjectFactory.getEmPCR();
-      pcr.setId(rs.getLong("pcrId"));
-      pcr.setConcentration(rs.getDouble("concentration"));
-      pcr.setName(rs.getString("name"));
-      pcr.setCreationDate(rs.getDate("creationDate"));
-      pcr.setPcrCreator(rs.getString("pcrUserName"));
-
-      try {
-        pcr.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
-        pcr.setLibraryDilution(dilutionDAO.getLibraryDilutionById(rs.getLong("dilution_dilutionId")));
-        pcr.setEmPcrDilutions(dilutionDAO.listAllByEmPCRId(rs.getLong("pcrId")));
-      }
-      catch (IOException e1) {
-        e1.printStackTrace();
-      }
-      return pcr;
+  public class EmPCRMapper extends CacheAwareRowMapper<emPCR> {
+    public EmPCRMapper() {
+      super(emPCR.class);
     }
-  }
 
-  public class LazyEmPCRMapper implements RowMapper<emPCR> {
+    public EmPCRMapper(boolean lazy) {
+      super(emPCR.class, lazy);
+    }
+
     public emPCR mapRow(ResultSet rs, int rowNum) throws SQLException {
+      long id = rs.getLong("pcrId");
+
+      if (isCacheEnabled()) {
+        Element element;
+        if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
+          log.debug("Cache hit on map for emPCR " + id);
+          return (emPCR)element.getObjectValue();
+        }
+      }
+
       emPCR pcr = dataObjectFactory.getEmPCR();
-      pcr.setId(rs.getLong("pcrId"));
+      pcr.setId(id);
       pcr.setConcentration(rs.getDouble("concentration"));
       pcr.setName(rs.getString("name"));
       pcr.setCreationDate(rs.getDate("creationDate"));
@@ -349,11 +354,19 @@ public class SQLEmPCRDAO implements EmPCRStore {
 
       try {
         pcr.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
-        pcr.setLibraryDilution(dilutionDAO.getLibraryDilutionById(rs.getLong("dilution_dilutionId")));
+        pcr.setLibraryDilution(libraryDilutionDAO.get(rs.getLong("dilution_dilutionId")));
+        if (!isLazy()) {
+          pcr.setEmPcrDilutions(emPCRDilutionDAO.listAllByEmPCRId(id));
+        }
       }
       catch (IOException e1) {
         e1.printStackTrace();
       }
+
+      if (isCacheEnabled()) {
+        lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id), pcr));
+      }
+
       return pcr;
     }
   }

@@ -33,6 +33,7 @@ import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
 import com.googlecode.ehcache.annotations.TriggersRemove;
 import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 import org.apache.poi.openxml4j.exceptions.InvalidOperationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -49,6 +50,8 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.support.lob.LobHandler;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
+import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 import javax.sql.rowset.serial.SerialBlob;
 import javax.sql.rowset.serial.SerialException;
@@ -314,7 +317,7 @@ public class SQLSecurityDAO implements SecurityStore {
   }
 
   public Collection<User> listUsersByGroupName(String name) throws IOException {
-    return template.query(USERS_SELECT_BY_GROUP_NAME, new Object[]{name}, new LazyUserMapper());
+    return template.query(USERS_SELECT_BY_GROUP_NAME, new Object[]{name}, new UserMapper(true));
   }
 
   public long saveGroup(Group group) throws IOException {
@@ -372,10 +375,28 @@ public class SQLSecurityDAO implements SecurityStore {
     return securityProfileDAO.get(profileId);
   }
 
-  public class UserMapper implements RowMapper<User> {
+  public class UserMapper extends CacheAwareRowMapper<User> {
+    public UserMapper() {
+      super(User.class);
+    }
+
+    public UserMapper(boolean lazy) {
+      super(User.class, lazy);
+    }
+
     public User mapRow(ResultSet rs, int rowNum) throws SQLException {
+      long id = rs.getLong("userId");
+
+      if (isCacheEnabled()) {
+        Element element;
+        if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
+          log.debug("Cache hit on map for User " + id);
+          return (User)element.getObjectValue();
+        }
+      }
+
       User user = new UserImpl();
-      user.setUserId(rs.getLong("userId"));
+      user.setUserId(id);
       user.setActive(rs.getBoolean("active"));
       user.setAdmin(rs.getBoolean("admin"));
       user.setExternal(rs.getBoolean("external"));
@@ -395,37 +416,18 @@ public class SQLSecurityDAO implements SecurityStore {
             user.setRoles(roles);
           }
         }
-        user.setGroups(listGroupsByUserId(user.getUserId()));
+        if (!isLazy()) {
+          user.setGroups(listGroupsByUserId(id));
+        }
       }
       catch (IOException e) {
         e.printStackTrace();
       }
-      return user;
-    }
-  }
 
-  public class LazyUserMapper implements RowMapper<User> {
-    public User mapRow(ResultSet rs, int rowNum) throws SQLException {
-      User user = new UserImpl();
-      user.setUserId(rs.getLong("userId"));
-      user.setActive(rs.getBoolean("active"));
-      user.setAdmin(rs.getBoolean("admin"));
-      user.setExternal(rs.getBoolean("external"));
-      user.setFullName(rs.getString("fullName"));
-      user.setInternal(rs.getBoolean("internal"));
-      user.setLoginName(rs.getString("loginName"));
-      user.setPassword(rs.getString("password"));
-      user.setEmail(rs.getString("email"));
-
-      Blob roleblob = rs.getBlob("roles");
-      if (roleblob != null) {
-        if (roleblob.length() > 0) {
-          byte[] rbytes = roleblob.getBytes(1, (int)roleblob.length());
-          String s1 = new String(rbytes);
-          String[] roles = s1.split(",");
-          user.setRoles(roles);
-        }
+      if (isCacheEnabled()) {
+        lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id) ,user));
       }
+
       return user;
     }
   }

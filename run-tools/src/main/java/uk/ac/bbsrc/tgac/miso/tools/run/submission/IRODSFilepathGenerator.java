@@ -31,6 +31,7 @@ import org.irods.jargon.core.query.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.SubmissionException;
 import uk.ac.bbsrc.tgac.miso.core.service.submission.FilePathGenerator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -55,6 +56,11 @@ public class IRODSFilepathGenerator implements FilePathGenerator {
   private IRODSAccount account;
   private IRODSAccessObjectFactory irodsAccessObjectFactory;
   private IRODSGenQueryExecutor queryExecutorAO;
+
+  public IRODSFilepathGenerator() {
+    //no-arg constructor
+    //TODO this will result in borked behaviour, but means the resolver service can instantiate it
+  }
 
   public IRODSFilepathGenerator(IRODSFileSystem irodsFileSystem, IRODSAccount account) {
     this.irodsFileSystem = irodsFileSystem;
@@ -169,6 +175,16 @@ public class IRODSFilepathGenerator implements FilePathGenerator {
       }
     }
     return filePaths;
+  }
+
+  @Override
+  public String getName() {
+    return "IRODS Illumina File Path Generator";
+  }
+
+  @Override
+  public PlatformType generatesFilePathsFor() {
+    return null; //return PlatformType.ILLUMINA;
   }
 
   private class IlluminaFilenameFilter implements FilenameFilter {

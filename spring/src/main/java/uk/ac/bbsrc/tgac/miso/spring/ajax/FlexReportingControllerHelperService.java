@@ -192,7 +192,7 @@ public class FlexReportingControllerHelperService {
     try {
       JSONObject response = new JSONObject();
       JSONArray a = JSONArray.fromObject(json.get("form"));
-      ArrayList<Project> projects = new ArrayList<Project>();
+      List<Project> projects = new ArrayList<Project>();
       JSONArray statusList = new JSONArray();
 
       Map<String, Integer> map = new HashMap<String, Integer>();
@@ -215,7 +215,7 @@ public class FlexReportingControllerHelperService {
         Integer no = map.containsKey(progress) ? map.get(progress) : 0;
         if (no > 0) {
           jsonArray.add("['" + progress + "'," + no + "]");
-          statusList.add(JSONObject.fromObject("{'label': '" + progress + " " + no + "','value':'" + no + "'}"));
+          statusList.add(JSONObject.fromObject("{'name': '" + progress + "','y':" + no + "}"));
         }
       }
       response.put("graph", statusList);
@@ -229,7 +229,7 @@ public class FlexReportingControllerHelperService {
     }
   }
 
-  public JSONArray buildProjectReport(ArrayList<Project> projects) {
+  public JSONArray buildProjectReport(List<Project> projects) {
     JSONArray jsonArray = new JSONArray();
     for (Project project : projects) {
       jsonArray.add("['" + (project.getName().replace("+", "-")).replace("'", "\\'") + "','" +
@@ -238,6 +238,195 @@ public class FlexReportingControllerHelperService {
                     project.getProgress().name() + "']");
     }
     return jsonArray;
+  }
+
+
+  public JSONObject searchProjectsByRunCompletionDateandString(HttpSession session, JSONObject json) {
+    String searchStr = json.getString("str");
+    String from = json.getString("from");
+    String to = json.getString("to");
+    JSONArray jsonArray = new JSONArray();
+    JSONObject jsonObject = new JSONObject();
+    try {
+
+      Collection<Project> projects = null;
+      if (searchStr != null && !searchStr.equals("")) {
+        projects = requestManager.listAllProjectsBySearch(searchStr);
+      }
+      else {
+        projects = requestManager.listAllProjects();
+      }
+
+      for (Project project : projects) {
+        Boolean projectBool = false;
+        Collection<Run> runs = requestManager.listAllRunsByProjectId(project.getProjectId());
+        for (Run run : runs) {
+
+          if (from != null && !from.equals("") &&
+              to != null && !to.equals("")) {
+            if (run.getStatus() != null && run.getStatus().getCompletionDate() != null) {
+
+              DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+              Date startDate = df.parse(from);
+              Date endDate = df.parse(to);
+              Date runDate = run.getStatus().getCompletionDate();
+
+              if (runDate.after(startDate) && runDate.before(endDate)) {
+                projectBool = true;
+              }
+            }
+          }
+          else {
+            projectBool = true;
+          }
+
+        }
+        if (projectBool) {
+          jsonArray.add(projectRunLaneRowBuilder(project));
+        }
+      }
+
+      jsonObject.put("html", jsonArray);
+      return jsonObject;
+    }
+    catch (Exception e) {
+      log.debug("Failed", e);
+      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
+    }
+  }
+
+
+  public String projectRunLaneRowBuilder(Project project) {
+    StringBuilder sb = new StringBuilder();
+    try {
+      Collection<Run> runs = requestManager.listAllRunsByProjectId(project.getProjectId());
+      if (runs.size() > 0) {
+        sb.append("<ul>");
+        for (Run run : runs) {
+          sb.append("<li>");
+          sb.append(run.getName() + " - " + run.getAlias());
+          Collection<SequencerPartitionContainer<SequencerPoolPartition>> spcs = requestManager.listSequencerPartitionContainersByRunId(run.getId());
+          if (spcs.size() > 0) {
+            sb.append("<ul>");
+            for (SequencerPartitionContainer<SequencerPoolPartition> spc : spcs) {
+
+              if (spc.getPartitions().size() > 0) {
+                for (SequencerPoolPartition spp : spc.getPartitions()) {
+                  if (spp.getPool() != null) {
+                    if (spp.getPool().getExperiments().size() > 0) {
+                      for (Experiment experiment : spp.getPool().getExperiments()) {
+                        if (experiment.getStudy().getProject().equals(project)) {
+
+                          sb.append("<li>");
+                          sb.append("Lane " + spp.getPartitionNumber() + ": " + spp.getPool().getAlias());
+                          sb.append("</li>");
+
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+
+            sb.append("</ul>");
+          }
+          sb.append("</li>");
+        }
+        sb.append("</ul>");
+      }
+
+      //return "['<input class=\"chkboxprojectrunlane\" id=\"" + project.getProjectId() +
+      //       "\" type=\"checkbox\" name=\"projectIds\" value=\"" + project.getProjectId() + "\" id=\"" + project.getProjectId() + "\"/>','"
+      //       + project.getName() + "','"
+      return "['" + project.getName() + "','"
+             + project.getAlias() + "','"
+             + project.getProgress().name() + "','"
+             + sb.toString() + "']";
+    }
+    catch (IOException e) {
+      log.debug("Failed", e);
+      return "Failed: " + e.getMessage();
+    }
+  }
+
+  public JSONObject generateProjectRunLaneFlexReport(HttpSession session, JSONObject json) {
+    try {
+      JSONObject response = new JSONObject();
+      JSONArray a = JSONArray.fromObject(json.get("form"));
+      List<Project> projects = new ArrayList<Project>();
+
+      for (JSONObject j : (Iterable<JSONObject>) a) {
+        if (j.getString("name").equals("projectIds")) {
+          Project p = requestManager.getProjectById(j.getLong("value"));
+          if (p != null) {
+            projects.add(p);
+          }
+        }
+      }
+
+      response.put("reportTable", buildProjectRunLaneReport(projects));
+      return response;
+    }
+    catch (IOException e) {
+      log.debug("Failed", e);
+      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
+    }
+  }
+
+  public JSONArray buildProjectRunLaneReport(List<Project> projects) {
+    JSONArray jsonArray = new JSONArray();
+    StringBuilder sb = new StringBuilder();
+    try {
+
+      for (Project project : projects) {
+        Collection<Run> runs = requestManager.listAllRunsByProjectId(project.getProjectId());
+        if (runs.size() > 0) {
+          sb.append("<ul>");
+          for (Run run : runs) {
+            sb.append("<li>");
+            sb.append(run.getName() + " - " + run.getAlias());
+            Collection<SequencerPartitionContainer<SequencerPoolPartition>> spcs = requestManager.listSequencerPartitionContainersByRunId(run.getId());
+            if (spcs.size() > 0) {
+              sb.append("<ul>");
+              for (SequencerPartitionContainer<SequencerPoolPartition> spc : spcs) {
+
+                if (spc.getPartitions().size() > 0) {
+                  for (SequencerPoolPartition spp : spc.getPartitions()) {
+                    if (spp.getPool() != null) {
+                      if (spp.getPool().getExperiments().size() > 0) {
+                        for (Experiment experiment : spp.getPool().getExperiments()) {
+                          if (experiment.getStudy().getProject().equals(project)) {
+
+                            sb.append("<li>");
+                            sb.append("Lane " + spp.getPartitionNumber() + ": " + spp.getPool().getAlias());
+                            sb.append("</li>");
+
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+
+              sb.append("</ul>");
+            }
+            sb.append("</li>");
+          }
+          sb.append("</ul>");
+        }
+        jsonArray.add("['" + (project.getName().replace("+", "-")).replace("'", "\\'") + "','" +
+                      (project.getAlias().replace("+", "-")).replace("'", "\\'") + "','" +
+                      (project.getDescription().replace("+", "-")).replace("'", "\\'") + "','" +
+                      sb.toString() + "']");
+      }
+      return jsonArray;
+    }
+    catch (Exception e) {
+      log.debug("Failed", e);
+      return jsonArray;
+    }
   }
 
   public JSONObject initSamples(HttpSession session, JSONObject json) {
@@ -361,7 +550,7 @@ public class FlexReportingControllerHelperService {
       for (String sampleType : requestManager.listAllSampleTypes()) {
         Integer no = typeMap.containsKey(sampleType) ? typeMap.get(sampleType) : 0;
         if (no > 0) {
-          graphArray.add(JSONObject.fromObject("{'label': '" + sampleType + " " + no + "','value':'" + no + "'}"));
+          graphArray.add(JSONObject.fromObject("{'name': '" + sampleType + "','y':" + no + "}"));
           Integer received = 0;
           Integer qcpassed = 0;
           Integer qcfailed = 0;
@@ -394,9 +583,9 @@ public class FlexReportingControllerHelperService {
       }
       overviewRelationArray.add("['Total'," + totalCreated + "," + totalReceived + "," + totalQcPassed + "," + totalQcFailed + "]");
 
-      qcGraphArray.add(JSONObject.fromObject("{'label': 'QC Passed " + totalQcPassed + "','value':'" + totalQcPassed + "'}"));
-      qcGraphArray.add(JSONObject.fromObject("{'label': 'QC Not Passed " + totalQcFailed + "','value':'" + totalQcFailed + "'}"));
-      qcGraphArray.add(JSONObject.fromObject("{'label': 'QC Unknown " + totalQcUnknown + "','value':'" + totalQcUnknown + "'}"));
+      qcGraphArray.add(JSONObject.fromObject("{'name': 'QC Passed ','y':" + totalQcPassed + "}"));
+      qcGraphArray.add(JSONObject.fromObject("{'name': 'QC Not Passed ','y':" + totalQcFailed + "}"));
+      qcGraphArray.add(JSONObject.fromObject("{'name': 'QC Unknown ','y':" + totalQcUnknown + "}"));
 
       response.put("overviewRelationTable", overviewRelationArray);
       response.put("graph", graphArray);
@@ -452,6 +641,10 @@ public class FlexReportingControllerHelperService {
   }
 
   public String libraryFormRowBuilder(Library library) {
+    String qc = "unknown";
+    if (library.getQcPassed() != null) {
+      qc = library.getQcPassed().toString();
+    }
     return "['<input class=\"chkboxlibraries\" id=\"" + library.getId() +
            "\" type=\"checkbox\" name=\"libraryIds\" value=\"" + library.getId() + "\" id=\"" + library.getId() + "\"/>','"
            + library.getName() + "','"
@@ -459,7 +652,7 @@ public class FlexReportingControllerHelperService {
            + library.getDescription() + "','"
            + library.getPlatformName() + "','"
            + library.getLibraryType().getDescription() + "','"
-           + library.getQcPassed().toString() + "']";
+           + qc + "']";
   }
 
   public JSONObject searchLibrariesByCreationDateandString(HttpSession session, JSONObject json) {
@@ -545,13 +738,13 @@ public class FlexReportingControllerHelperService {
       for (Map.Entry<String, Integer> entry : platformMap.entrySet()) {
         String platform = entry.getKey();
         Object no = entry.getValue();
-        graphArray.add(JSONObject.fromObject("{'label': '" + platform + " " + no + "','value':'" + no + "'}"));
+        graphArray.add(JSONObject.fromObject("{'name': '" + platform + "','y':" + no + "}"));
       }
 
       for (Map.Entry<String, Integer> entry : typeMap.entrySet()) {
         String libraryType = entry.getKey();
         Object no = entry.getValue();
-        typeGraphArray.add(JSONObject.fromObject("{'label': '" + libraryType + " " + no + "','value':'" + no + "'}"));
+        typeGraphArray.add(JSONObject.fromObject("{'name': '" + libraryType + "','y':" + no + "}"));
 
         for (Map.Entry<String, Integer> platformEntry : platformMap.entrySet()) {
           String platform = platformEntry.getKey();
@@ -577,8 +770,8 @@ public class FlexReportingControllerHelperService {
 
       overviewRelationArray.add("['Total',''," + qcPassed + "," + qcNotPassed + "," + (qcPassed + qcNotPassed) + "]");
 
-      qcGraphArray.add(JSONObject.fromObject("{'label': 'QC Passed " + qcPassed + "','value':'" + qcPassed + "'}"));
-      qcGraphArray.add(JSONObject.fromObject("{'label': 'QC Not Passed " + qcNotPassed + "','value':'" + qcNotPassed + "'}"));
+      qcGraphArray.add(JSONObject.fromObject("{'name': 'QC Passed ','y':" + qcPassed + "}"));
+      qcGraphArray.add(JSONObject.fromObject("{'name': 'QC Not Passed ','y':" + qcNotPassed + "}"));
 
       response.put("overviewRelationTable", overviewRelationArray);
       response.put("graph", graphArray);
@@ -594,15 +787,18 @@ public class FlexReportingControllerHelperService {
   }
 
   public JSONArray buildLibraryReport(ArrayList<Library> libraries) {
-
     JSONArray jsonArray = new JSONArray();
     for (Library library : libraries) {
+      String qc = "unknown";
+      if (library.getQcPassed() != null) {
+        qc = library.getQcPassed().toString();
+      }
       jsonArray.add("['" + (library.getName().replace("+", "-")).replace("'", "\\'") + "','" +
                     (library.getAlias().replace("+", "-")).replace("'", "\\'") + "','" +
                     (library.getDescription().replace("+", "-")).replace("'", "\\'") + "','" +
                     library.getPlatformName() + "','" +
                     library.getLibraryType().getDescription() + "','" +
-                    library.getQcPassed().toString() + "']");
+                    qc + "']");
     }
     return jsonArray;
   }
@@ -640,8 +836,8 @@ public class FlexReportingControllerHelperService {
     return "['<input class=\"chkboxruns\" id=\"" + run.getId() + "\" type=\"checkbox\" name=\"runIds\" value=\"" + run.getId() + "\" id=\"" + run.getId() + "\"/>','"
            + run.getName() + "','"
            + run.getAlias() + "','"
-           + run.getStatus().getHealth().getKey() + "','"
-           + run.getPlatformType().getKey() + "']";
+           + (run.getStatus() != null && run.getStatus().getHealth() != null ? run.getStatus().getHealth().getKey() : "") + "','"
+           + (run.getPlatformType() != null ? run.getPlatformType().getKey() : "") + "']";
   }
 
   public JSONObject searchRunsByCreationDateandString(HttpSession session, JSONObject json) {
@@ -663,11 +859,11 @@ public class FlexReportingControllerHelperService {
 
       for (Run run : runs) {
         if ((platform.equals("all") || platform.equals(run.getPlatformType().getKey()))
-            && (status.equals("all") || status.equals(run.getStatus().getHealth().getKey()))) {
+            && (status.equals("all") || (run.getStatus() != null && run.getStatus().getHealth() != null ? status.equals(run.getStatus().getHealth().getKey()) : true))) {
 
           if (from != null && !from.equals("") &&
               to != null && !to.equals("")) {
-            if (run.getStatus().getCompletionDate() != null) {
+            if (run.getStatus() != null && run.getStatus().getCompletionDate() != null) {
 
               DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
               Date startDate = df.parse(from);
@@ -715,9 +911,11 @@ public class FlexReportingControllerHelperService {
             count++;
             platformTypeMap.put(run.getPlatformType().getKey(), count);
 
-            int countQC = statusMap.containsKey(run.getStatus().getHealth().getKey()) ? statusMap.get(run.getStatus().getHealth().getKey()) : 0;
-            countQC++;
-            statusMap.put(run.getStatus().getHealth().getKey(), countQC);
+            if (run.getStatus() != null && run.getStatus().getHealth() != null) {
+              int countQC = statusMap.containsKey(run.getStatus().getHealth().getKey()) ? statusMap.get(run.getStatus().getHealth().getKey()) : 0;
+              countQC++;
+              statusMap.put(run.getStatus().getHealth().getKey(), countQC);
+            }
           }
         }
       }
@@ -725,7 +923,7 @@ public class FlexReportingControllerHelperService {
       for (String platformString : PlatformType.getKeys()) {
         Integer no = platformTypeMap.containsKey(platformString) ? platformTypeMap.get(platformString) : 0;
         if (no > 0) {
-          platformGraphArray.add(JSONObject.fromObject("{'label': '" + platformString + " " + no + "','value':'" + no + "'}"));
+          platformGraphArray.add(JSONObject.fromObject("{'name': '" + platformString + "','y':" + no + "}"));
           overviewArray.add("['Platform Type: " + platformString + "'," + no + "]");
         }
       }
@@ -733,7 +931,7 @@ public class FlexReportingControllerHelperService {
       for (String healthString : HealthType.getKeys()) {
         Integer no = statusMap.containsKey(healthString) ? statusMap.get(healthString) : 0;
         if (no > 0) {
-          graphArray.add(JSONObject.fromObject("{'label': '" + healthString + " " + no + "','value':'" + no + "'}"));
+          graphArray.add(JSONObject.fromObject("{'name': '" + healthString + "','y':" + no + "}"));
           overviewArray.add("['Run Status: " + healthString + "'," + no + "]");
         }
       }
@@ -755,7 +953,7 @@ public class FlexReportingControllerHelperService {
     for (Run run : runs) {
       jsonArray.add("['" + (run.getName().replace("+", "-")).replace("'", "\\'") + "','" +
                     (run.getAlias().replace("+", "-")).replace("'", "\\'") + "','" +
-                    run.getStatus().getHealth().getKey() + "','" +
+                    (run.getStatus() != null && run.getStatus().getHealth() != null ? run.getStatus().getHealth().getKey() : "") + "','" +
                     run.getPlatformType().getKey() + "']");
     }
     return jsonArray;
@@ -874,7 +1072,7 @@ public class FlexReportingControllerHelperService {
       return projectJSON;
     }
     catch (IOException
-            e) {
+        e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }

@@ -276,14 +276,17 @@ public abstract class AbstractProject implements Project {
 
   public abstract void buildReport();
 
+  @Override
   public Set<MisoListener> getListeners() {
     return this.listeners;
   }
 
+  @Override
   public boolean addListener(MisoListener listener) {
     return listeners.add(listener);
   }
 
+  @Override
   public boolean removeListener(MisoListener listener) {
     return listeners.remove(listener);
   }
