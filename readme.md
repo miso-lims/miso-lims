@@ -17,6 +17,8 @@ MISO: An open source LIMS for small-to-large scale sequencing centres
 >
 > You should have received a copy of the GNU General Public License
 > along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+> 
+> You can follow MISO development on Twitter: @misolims (https://twitter.com/misolims), @froggleston (https://twitter.com/froggleston)
 
 VERSION 0.1.9 (Flourine)
 
