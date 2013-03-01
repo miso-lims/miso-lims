@@ -159,13 +159,6 @@ public class SQLRunDAO implements RunStore {
           "LEFT JOIN "+TABLE_NAME+" ra ON rf.Run_runId = ra.runId " +
           "WHERE pool.poolId=?";
 
-  public static String RUNS_SELECT_BY_FLOWCELL_ID =
-          "SELECT ra.* " +
-          "FROM Flowcell f " +
-          "INNER JOIN Run_Flowcell rf ON flowcell.flowcellId = rf.flowcells_flowcellId " +
-          "LEFT JOIN "+TABLE_NAME+" ra ON rf.Run_runId = ra.runId " +
-          "WHERE flowcell.flowcellId=?";
-
   public static String RUNS_SELECT_BY_SEQUENCER_PARTITION_CONTAINER_ID =
           "SELECT ra.* " +
           "FROM SequencerPartitionContainer container " +
@@ -252,12 +245,6 @@ public class SQLRunDAO implements RunStore {
   public void setRunQcDAO(RunQcStore runQcDAO) {
     this.runQcDAO = runQcDAO;
   }
-
-  /*
-  public void setFlowcellDAO(FlowcellStore flowcellDAO) {
-    this.flowcellDAO = flowcellDAO;
-  }
-  */
 
   public void setSequencerPartitionContainerDAO(SequencerPartitionContainerStore sequencerPartitionContainerDAO) {
     this.sequencerPartitionContainerDAO = sequencerPartitionContainerDAO;

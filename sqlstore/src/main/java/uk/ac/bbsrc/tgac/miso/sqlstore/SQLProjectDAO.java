@@ -153,6 +153,7 @@ public class SQLProjectDAO implements ProjectStore {
           "LEFT JOIN Sample sa ON exsa.samples_sampleId = sa.sampleId " +
           "WHERE p.projectId=?";
 
+  @Deprecated
   public static final String OVERVIEW_RELATED_INFORMATION_BY_PROJECT_ID =
           "SELECT " +
           "p.projectId, " +

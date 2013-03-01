@@ -347,8 +347,8 @@ public abstract class AbstractPool<P extends Poolable> implements Pool<P> {
     else if (type.equals(PlatformType.IONTORRENT)) {
       return "TPO";
     }
-    //must be an EmPCR Pool
-    return "EPO";
+    //must be a universal Pool
+    return "UPO";
   }
 
   public boolean isDeletable() {

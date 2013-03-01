@@ -113,24 +113,6 @@ public class SQLExperimentDAO implements ExperimentStore {
           "WHERE pe.experiments_experimentId=e.experimentId " +
           "AND pe.pool_poolId=?";
 
-  public static final String EXPERIMENTS_BY_RELATED_RUN =
-          "SELECT e.experimentId, e.name, e.description, e.alias, e.accession, e.title, e.platform_platformId, e.securityProfile_profileId, e.study_studyId, er.runs_runId " +
-          "FROM "+TABLE_NAME+" e, Experiment_Run er " +
-          "WHERE er.Experiment_experimentId=e.experimentId " +
-          "AND er.runs_runId=?";
-
-  public static final String EXPERIMENT_BY_RELATED_LANE =
-          "SELECT e.experimentId, e.name, e.description, e.alias, e.accession, e.title, e.platform_platformId, e.securityProfile_profileId, e.study_studyId, er.runs_runId " +
-          "FROM "+TABLE_NAME+" e, Lane l " +
-          "WHERE e.experimentId=l.experiment_experimentId " +
-          "AND l.laneId=?";  
-
-  public static final String EXPERIMENT_BY_RELATED_CHAMBER =
-          "SELECT e.experimentId, e.name, e.description, e.alias, e.accession, e.title, e.platform_platformId, e.securityProfile_profileId, e.study_studyId, er.runs_runId " +
-          "FROM "+TABLE_NAME+" e, Partition c " +
-          "WHERE e.experimentId=c.experiment_experimentId " +
-          "AND c.chamberId=?";
-
   public static final String EXPERIMENT_BY_RELATED_PARTITION =
           "SELECT e.experimentId, e.name, e.description, e.alias, e.accession, e.title, e.platform_platformId, e.securityProfile_profileId, e.study_studyId, er.runs_runId " +
           "FROM "+TABLE_NAME+" e, Partition l " +
@@ -464,28 +446,12 @@ public class SQLExperimentDAO implements ExperimentStore {
     return es;
   }
 
-  public List<Experiment> listByRunId(long runId) {
-    return template.query(EXPERIMENTS_BY_RELATED_RUN, new Object[]{runId}, new ExperimentMapper(true));
-  }
-
   public List<Experiment> listBySubmissionId(long submissionId) throws IOException {
     return template.query(EXPERIMENTS_BY_RELATED_SUBMISSION, new Object[]{submissionId}, new ExperimentMapper());  
   }
 
   public List<Experiment> listByPoolId(long poolId) {
     return template.query(EXPERIMENTS_BY_RELATED_POOL, new Object[]{poolId}, new ExperimentMapper(true));
-  }
-
-  public Experiment getByLaneId(long laneId) {
-    List results = template.query(EXPERIMENT_BY_RELATED_LANE, new Object[]{laneId}, new ExperimentMapper(true));
-    Experiment e = results.size() > 0 ? (Experiment) results.get(0) : null;
-    return e;
-  }
-
-  public Experiment getByChamberId(long chamberId) {
-    List results = template.query(EXPERIMENT_BY_RELATED_CHAMBER, new Object[]{chamberId}, new ExperimentMapper(true));
-    Experiment e = results.size() > 0 ? (Experiment) results.get(0) : null;
-    return e;
   }
 
   @Cacheable(cacheName="experimentCache",

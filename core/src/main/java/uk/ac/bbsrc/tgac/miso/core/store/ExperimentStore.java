@@ -58,24 +58,6 @@ public interface ExperimentStore extends Store<Experiment>, Cascadable, Remover<
   Collection<Experiment> listBySearch(String query) throws IOException;
 
   /**
-   * Get an Experiment placed on a given Lane by a Lane ID 
-   *
-   * @param laneId of type long
-   * @return Experiment
-   * @throws IOException when
-   */
-  Experiment getByLaneId(long laneId) throws IOException;
-
-  /**
-   * Get an Experiment placed on a given Chamber by a Chamber ID
-   *
-   * @param chamberId of type long
-   * @return Experiment
-   * @throws IOException when
-   */
-  Experiment getByChamberId(long chamberId) throws IOException;
-
-  /**
    * List all Experiments that are part of a Study given a Study ID
    *
    * @param studyId of type long

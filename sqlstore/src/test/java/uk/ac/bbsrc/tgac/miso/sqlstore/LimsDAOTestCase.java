@@ -81,7 +81,6 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
                   "Alert",
                   "Experiment",
                   "Experiment_Kit",
-                  "Experiment_Run",
                   "Kit",
                   "KitDescriptor",
                   "Kit_Note",
@@ -102,8 +101,6 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
                   "PoolQC",
                   "Pool_Elements",
                   "Pool_Experiment",
-                  "Pool_LibraryDilution",
-                  "Pool_emPCRDilution",
                   "PrintJob",
                   "PrintService",
                   "Project",
@@ -787,12 +784,6 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
                  "CREATE TABLE Experiment_Kit (" +
                  "experiments_experimentId BIGINT NOT NULL," +
                  "kits_kitId BIGINT NOT NULL" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE Experiment_Run (" +
-                 "Experiment_experimentId BIGINT NOT NULL," +
-                 "runs_runId BIGINT NOT NULL" +
                  ");");
 
     runStatement(conn,

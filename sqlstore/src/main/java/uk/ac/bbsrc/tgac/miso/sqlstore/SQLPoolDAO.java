@@ -126,9 +126,6 @@ public class SQLPoolDAO implements PoolStore {
           "LEFT JOIN emPCR e ON e.dilution_dilutionId = ld.dilutionId " +
           "LEFT JOIN emPCRDilution ed ON ed.emPCR_pcrId = e.pcrId " +
 
-          //"LEFT JOIN Pool_LibraryDilution pld ON pld.dilutions_dilutionId = ld.dilutionId " +
-          //"LEFT JOIN Pool_emPCRDilution ple ON ple.dilutions_dilutionId = ed.dilutionId " +
-
           "LEFT JOIN Pool_Elements pld ON pld.elementId = ld.dilutionId " +
           "LEFT JOIN Pool_Elements ple ON ple.elementId = ed.dilutionId " +
 
@@ -143,9 +140,6 @@ public class SQLPoolDAO implements PoolStore {
 
           "LEFT JOIN emPCR e ON e.dilution_dilutionId = ld.dilutionId " +
           "LEFT JOIN emPCRDilution ed ON ed.emPCR_pcrId = e.pcrId " +
-
-          //"LEFT JOIN Pool_LibraryDilution pld ON pld.dilutions_dilutionId = ld.dilutionId " +
-          //"LEFT JOIN Pool_emPCRDilution ple ON ple.dilutions_dilutionId = ed.dilutionId " +
 
           "LEFT JOIN Pool_Elements pld ON pld.elementId = ld.dilutionId " +
           "LEFT JOIN Pool_Elements ple ON ple.elementId = ed.dilutionId " +
@@ -168,27 +162,8 @@ public class SQLPoolDAO implements PoolStore {
   public static final String ILLUMINA_POOL_SELECT_BY_READY =
           ILLUMINA_POOL_SELECT + " AND ready=1";
 
-//  public static final String ILLUMINA_POOL_SELECT_BY_EXPERIMENT_ID =
-//          ILLUMINA_POOL_SELECT + " AND experiment_experimentId=?";
-
   public static final String ILLUMINA_POOL_SELECT_BY_ID_BARCODE =
           ILLUMINA_POOL_SELECT + " AND identificationBarcode=?";
-
-  /*
-  public static final String ILLUMINA_POOL_BY_RELATED_LANE =
-          "SELECT l.laneId, ip.poolId, ip.concentration, ip.identificationBarcode, ip.name, ip.alias, ip.creationDate, ip.securityProfile_profileId, ip.platformType, ip.ready, ip.qcPassed " +
-          "FROM Lane l, "+TABLE_NAME+" ip " +
-          "WHERE l.poolId=ip.poolId " +
-          "AND ip.platformType='Illumina' " +
-          "AND l.laneId=?";
-
-  public static final String ILLUMINA_POOLS_BY_RELATED_LIBRARY_DILUTION =
-          "SELECT ip.poolId, ip.concentration, ip.identificationBarcode, ip.name, ip.alias, ip.creationDate, ip.securityProfile_profileId, ip.platformType, ip.ready, ip.qcPassed " +
-          "FROM "+TABLE_NAME+" ip, Pool_LibraryDilution p " +
-          "WHERE ip.poolId=p.pool_poolId " +
-          "AND ip.platformType='Illumina' " +
-          "AND p.dilutions_dilutionId=?";
-  */
 
   public static final String ILLUMINA_POOL_SELECT_BY_EXPERIMENT_ID =
           "SELECT ip.poolId, ip.concentration, ip.identificationBarcode, ip.name, ip.alias, ip.creationDate, ip.securityProfile_profileId, ip.platformType, ip.ready, ip.qcPassed " +
@@ -209,22 +184,6 @@ public class SQLPoolDAO implements PoolStore {
 
   public static final String LS454_POOL_SELECT_BY_ID_BARCODE =
           LS454_POOL_SELECT + " AND identificationBarcode=?";
-
-  /*
-  public static final String LS454_POOL_BY_RELATED_CHAMBER =
-          "SELECT c.chamberId, ip.poolId, ip.concentration, ip.identificationBarcode, ip.name, ip.alias, ip.creationDate, ip.securityProfile_profileId, ip.platformType, ip.ready " +
-          "FROM Chamber c, "+TABLE_NAME+" ip " +
-          "WHERE c.poolId=ip.poolId " +
-          "AND ip.platformType='LS454' " +
-          "AND c.chamberId=?";
-
-  public static final String LS454_POOLS_BY_RELATED_EMPCR_DILUTION =
-          "SELECT ip.poolId, ip.concentration, ip.identificationBarcode, ip.name, ip.alias, ip.creationDate, ip.securityProfile_profileId, ip.platformType, ip.ready " +
-          "FROM "+TABLE_NAME+" ip, Pool_emPCRDilution p " +
-          "WHERE ip.poolId=ip.pool_poolId " +
-          "AND ip.platformType='LS454' " +
-          "AND p.dilutions_dilutionId=?";
-  */
 
   public static final String LS454_POOL_SELECT_BY_EXPERIMENT_ID =
           "SELECT ip.poolId, ip.concentration, ip.identificationBarcode, ip.name, ip.alias, ip.creationDate, ip.securityProfile_profileId, ip.platformType, ip.ready, ip.qcPassed " +
@@ -251,22 +210,6 @@ public class SQLPoolDAO implements PoolStore {
 
   public static final String SOLID_POOL_SELECT_BY_ID_BARCODE =
           SOLID_POOL_SELECT + " AND identificationBarcode=?";
-
-  /*
-  public static final String SOLID_POOL_BY_RELATED_CHAMBER =
-          "SELECT c.chamberId, ip.poolId, ip.concentration, ip.identificationBarcode, ip.name, ip.alias, ip.creationDate, ip.securityProfile_profileId, ip.platformType, ip.ready " +
-          "FROM Chamber c, "+TABLE_NAME+" ip " +
-          "WHERE c.poolId=ip.poolId " +
-          "AND ip.platformType='Solid' " +
-          "AND c.chamberId=?";
-
-  public static final String SOLID_POOLS_BY_RELATED_EMPCR_DILUTION =
-          "SELECT ip.poolId, ip.concentration, ip.identificationBarcode, ip.name, ip.alias, ip.creationDate, ip.securityProfile_profileId, ip.platformType, ip.ready " +
-          "FROM "+TABLE_NAME+" ip, Pool_emPCRDilution p " +
-          "WHERE ip.poolId=ip.pool_poolId " +
-          "AND ip.platformType='Solid' " +
-          "AND p.dilutions_dilutionId=?";
-  */
 
   public static final String SOLID_POOL_SELECT_BY_EXPERIMENT_ID =
           "SELECT ip.poolId, ip.concentration, ip.identificationBarcode, ip.name, ip.alias, ip.creationDate, ip.securityProfile_profileId, ip.platformType, ip.ready, ip.qcPassed " +

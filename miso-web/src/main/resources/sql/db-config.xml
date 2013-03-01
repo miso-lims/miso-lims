@@ -205,7 +205,6 @@
       <value type="javax.persistence.CascadeType">PERSIST</value>
     </property>
     <property name="securityManager" ref="securityManager"/>
-    <!--<property name="flowcellDAO" ref="sqlFlowcellDAO"/>-->
     <property name="sequencerPartitionContainerDAO" ref="sqlSequencerPartitionContainerDAO"/>
     <property name="securityProfileDAO" ref="sqlSecurityProfileDAO"/>
     <property name="sequencerReferenceDAO" ref="sqlSequencerReferenceDAO"/>
