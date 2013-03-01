@@ -627,7 +627,7 @@ public class SQLProjectDAO implements ProjectStore {
       Project project = null;
 
       try {
-        if (isCacheEnabled()) {
+        if (isCacheEnabled() && lookupCache(cacheManager) != null) {
           Element element;
           if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
             log.debug("Cache hit on map for Project " + id);
@@ -673,7 +673,7 @@ public class SQLProjectDAO implements ProjectStore {
           projectAlertManager.push(project);
         }
 
-        if (isCacheEnabled()) {
+        if (isCacheEnabled() && lookupCache(cacheManager) != null) {
           lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id) ,project));
           log.debug("Cache put for Project " + id);
         }
@@ -701,7 +701,7 @@ public class SQLProjectDAO implements ProjectStore {
     public ProjectOverview mapRow(ResultSet rs, int rowNum) throws SQLException {
       long id = rs.getLong("overviewId");
 
-      if (isCacheEnabled()) {
+      if (isCacheEnabled() && lookupCache(cacheManager) != null) {
         Element element;
         if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
           log.debug("Cache hit on map for ProjectOverview " + id);
@@ -745,7 +745,7 @@ public class SQLProjectDAO implements ProjectStore {
         e.printStackTrace();
       }
 
-      if (isCacheEnabled()) {
+      if (isCacheEnabled() && lookupCache(cacheManager) != null) {
         lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id) ,overview));
         log.debug("Cache put for overview " + id);
       }

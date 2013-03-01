@@ -561,7 +561,7 @@ public class SQLExperimentDAO implements ExperimentStore {
     public Experiment mapRow(ResultSet rs, int rowNum) throws SQLException {
       long id = rs.getLong("experimentId");
 
-      if (isCacheEnabled()) {
+      if (isCacheEnabled() && lookupCache(cacheManager) != null) {
         Element element;
         if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
           log.debug("Cache hit on map for experiment " + id);
@@ -591,7 +591,7 @@ public class SQLExperimentDAO implements ExperimentStore {
         e1.printStackTrace();
       }
 
-      if (isCacheEnabled()) {
+      if (isCacheEnabled() && lookupCache(cacheManager) != null) {
         lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id), e));
       }
 

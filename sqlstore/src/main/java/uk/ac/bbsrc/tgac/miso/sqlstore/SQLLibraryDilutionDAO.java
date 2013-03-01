@@ -443,7 +443,7 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
     public LibraryDilution mapRow(ResultSet rs, int rowNum) throws SQLException {
       long id = rs.getLong("dilutionId");
 
-      if (isCacheEnabled()) {
+      if (isCacheEnabled() && lookupCache(cacheManager) != null) {
         Element element;
         if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
           log.debug("Cache hit on map for LibraryDilution " + id);
@@ -474,7 +474,7 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
         e1.printStackTrace();
       }
 
-      if (isCacheEnabled()) {
+      if (isCacheEnabled() && lookupCache(cacheManager) != null) {
         lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id), libraryDilution));
       }
 

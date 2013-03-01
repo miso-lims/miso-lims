@@ -312,7 +312,7 @@ public class SQLSequencerPoolPartitionDAO implements PartitionStore {
     public SequencerPoolPartition mapRow(ResultSet rs, int rowNum) throws SQLException {
       long id = rs.getLong("partitionId");
 
-      if (isCacheEnabled()) {
+      if (isCacheEnabled() && lookupCache(cacheManager) != null) {
         Element element;
         if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
           log.debug("Cache hit on map for SequencerPoolPartition " + id);
@@ -333,7 +333,7 @@ public class SQLSequencerPoolPartitionDAO implements PartitionStore {
         e1.printStackTrace();
       }
 
-      if (isCacheEnabled()) {
+      if (isCacheEnabled() && lookupCache(cacheManager) != null) {
         lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id) ,l));
       }
 

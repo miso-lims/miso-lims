@@ -247,7 +247,7 @@ public class SQLAlertDAO implements AlertStore {
       Alert a = null;
 
       try {
-        if (isCacheEnabled()) {
+        if (isCacheEnabled() && lookupCache(cacheManager) != null) {
           Element element;
           if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
             log.debug("Cache hit on map for Alert " + id);
@@ -275,7 +275,7 @@ public class SQLAlertDAO implements AlertStore {
           e1.printStackTrace();
         }
 
-        if (isCacheEnabled()) {
+        if (isCacheEnabled() && lookupCache(cacheManager) != null) {
           lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id), a));
         }
       }

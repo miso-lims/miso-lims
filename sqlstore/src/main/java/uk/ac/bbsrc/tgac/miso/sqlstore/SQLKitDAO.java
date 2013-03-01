@@ -248,7 +248,7 @@ public class SQLKitDAO implements KitStore {
     public Kit mapRow(ResultSet rs, int rowNum) throws SQLException {
       long id = rs.getLong("kitId");
 
-      if (isCacheEnabled()) {
+      if (isCacheEnabled() && lookupCache(cacheManager) != null) {
         Element element;
         if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
           log.debug("Cache hit on map for Kit " + id);

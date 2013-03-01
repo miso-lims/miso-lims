@@ -84,17 +84,26 @@ public abstract class CacheAwareRowMapper<T> implements RowMapper<T> {
     return cacheEnabled;
   }
 
+  public void setCacheEnabled(boolean cacheEnabled) {
+    this.cacheEnabled = cacheEnabled;
+  }
+
   public String getCacheName() {
     return this.cacheName;
   }
 
   public Cache lookupCache(CacheManager cacheManager) throws CacheException, UnsupportedOperationException {
     if (cacheEnabled) {
-      Cache c = cacheManager.getCache(getCacheName());
-      if (c != null) {
-        return c;
+      if (cacheManager != null) {
+        Cache c = cacheManager.getCache(getCacheName());
+        if (c != null) {
+          return c;
+        }
+        throw new CacheException("No such cache: " + getCacheName());
       }
-      throw new CacheException("No such cache: " + getCacheName());
+      else {
+        return null;
+      }
     }
     else {
       throw new UnsupportedOperationException("Cannot lookup cache when mapping caches aren't enabled");

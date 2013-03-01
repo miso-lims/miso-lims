@@ -715,7 +715,7 @@ public class SQLLibraryDAO implements LibraryStore {
     public Library mapRow(ResultSet rs, int rowNum) throws SQLException {
       long id = rs.getLong("libraryId");
 
-      if (isCacheEnabled()) {
+      if (isCacheEnabled() && lookupCache(cacheManager) != null) {
         Element element;
         if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
           log.debug("Cache hit on map for library " + id);
@@ -782,7 +782,7 @@ public class SQLLibraryDAO implements LibraryStore {
         e.printStackTrace();
       }
 
-      if (isCacheEnabled()) {
+      if (isCacheEnabled() && lookupCache(cacheManager) != null) {
         lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id) ,library));
       }
 

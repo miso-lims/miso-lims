@@ -793,7 +793,7 @@ public class SQLRunDAO implements RunStore {
     public Run mapRow(ResultSet rs, int rowNum) throws SQLException {
       long id = rs.getLong("runId");
 
-      if (isCacheEnabled()) {
+      if (isCacheEnabled() && lookupCache(cacheManager) != null) {
         Element element;
         if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
           log.debug("Cache hit on map for Run " + id);
@@ -849,7 +849,7 @@ public class SQLRunDAO implements RunStore {
         runAlertManager.push(r);
       }
 
-      if (isCacheEnabled()) {
+      if (isCacheEnabled() && lookupCache(cacheManager) != null) {
         lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id) ,r));
       }
 

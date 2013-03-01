@@ -439,7 +439,7 @@ public class SQLStudyDAO implements StudyStore {
     public Study mapRow(ResultSet rs, int rowNum) throws SQLException {
       long id = rs.getLong("studyId");
 
-      if (isCacheEnabled()) {
+      if (isCacheEnabled() && lookupCache(cacheManager) != null) {
         Element element;
         if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
           log.debug("Cache hit on map for Study " + id);
@@ -474,7 +474,7 @@ public class SQLStudyDAO implements StudyStore {
         e.printStackTrace();
       }
 
-      if (isCacheEnabled()) {
+      if (isCacheEnabled() && lookupCache(cacheManager) != null) {
         lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id) ,s));
       }
 

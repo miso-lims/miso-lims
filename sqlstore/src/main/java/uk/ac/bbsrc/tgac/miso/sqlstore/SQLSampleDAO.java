@@ -537,7 +537,7 @@ public class SQLSampleDAO implements SampleStore {
     public Sample mapRow(ResultSet rs, int rowNum) throws SQLException {
       long id = rs.getLong("sampleId");
 
-      if (isCacheEnabled()) {
+      if (isCacheEnabled() && lookupCache(cacheManager) != null) {
         Element element;
         if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
           log.debug("Cache hit on map for Sample " + id);
@@ -594,7 +594,7 @@ public class SQLSampleDAO implements SampleStore {
         e.printStackTrace();
       }
 
-      if (isCacheEnabled()) {
+      if (isCacheEnabled() && lookupCache(cacheManager) != null) {
         lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id) ,s));
       }
 

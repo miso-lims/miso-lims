@@ -737,7 +737,7 @@ public class SQLPoolDAO implements PoolStore {
     public Pool<? extends Poolable> mapRow(ResultSet rs, int rowNum) throws SQLException {
       long id = rs.getLong("poolId");
 
-      if (isCacheEnabled()) {
+      if (isCacheEnabled() && lookupCache(cacheManager) != null) {
         Element element;
         if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
           log.debug("Cache hit on map for Pool " + id);
@@ -801,7 +801,7 @@ public class SQLPoolDAO implements PoolStore {
         poolAlertManager.push(p);
       }
 
-      if (isCacheEnabled()) {
+      if (isCacheEnabled() && lookupCache(cacheManager) != null) {
         lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id) ,p));
       }
 

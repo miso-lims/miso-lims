@@ -423,7 +423,7 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
     public T mapRow(ResultSet rs, int rowNum) throws SQLException {
       long id = rs.getLong("containerId");
 
-      if (isCacheEnabled()) {
+      if (isCacheEnabled() && lookupCache(cacheManager) != null) {
         Element element;
         if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
           log.debug("Cache hit on map for SequencerPartitionContainer " + id);
@@ -457,7 +457,7 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
         e1.printStackTrace();
       }
 
-      if (isCacheEnabled()) {
+      if (isCacheEnabled() && lookupCache(cacheManager) != null) {
         lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id) ,s));
       }
 
@@ -479,7 +479,7 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
     public SequencerPartitionContainer<SequencerPoolPartition> mapRow(ResultSet rs, int rowNum) throws SQLException {
       long id = rs.getLong("containerId");
 
-      if (isCacheEnabled()) {
+      if (isCacheEnabled() && lookupCache(cacheManager) != null) {
         Element element;
         if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
           log.debug("Cache hit on map for SequencerPartitionContainer " + id);
@@ -513,7 +513,7 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
         e1.printStackTrace();
       }
 
-      if (isCacheEnabled()) {
+      if (isCacheEnabled() && lookupCache(cacheManager) != null) {
         lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id) ,s));
       }
 
