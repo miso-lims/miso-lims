@@ -92,6 +92,9 @@
     <constructor-arg name="sessionRegistry" ref="sessionRegistry"/>
   </bean>
 
+  <bean id="httpSessionSecurityContextRepository"
+        class="org.springframework.security.web.context.HttpSessionSecurityContextRepository"/>
+
   <security:authentication-manager alias="authenticationManager">
     <security:authentication-provider user-service-ref="jdbcUserAuthService">
       <security:password-encoder ref="passwordEncoder"/>
@@ -134,6 +137,7 @@
   </bean>
 
   <bean id="restSignatureFilter" class="uk.ac.bbsrc.tgac.miso.webapp.context.RestSignatureFilter">
+    <constructor-arg ref="httpSessionSecurityContextRepository"/>
     <property name="securityManager" ref="securityManager"/>
   </bean>
 

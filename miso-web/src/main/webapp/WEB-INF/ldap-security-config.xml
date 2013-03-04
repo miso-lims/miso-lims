@@ -222,6 +222,7 @@
   </bean>
 
   <bean id="restSignatureFilter" class="uk.ac.bbsrc.tgac.miso.webapp.context.RestSignatureFilter">
+    <constructor-arg ref="httpSessionSecurityContextRepository"/>
     <property name="securityManager" ref="securityManager"/>
   </bean>
 </beans>

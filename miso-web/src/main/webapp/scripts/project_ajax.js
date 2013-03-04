@@ -1045,7 +1045,7 @@ Project.barcode = {
                                                "sDom": '<<"toolbar">f>r<t>ip>'
                                              });
 
-      jQuery(tableId).find("tr:first").prepend("<th>Select</th>");
+      jQuery(tableId).find("tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"" + tableId + "\", this);'></span></th>");
       jQuery(tableId).find("tr:gt(0)").prepend("<td class='rowSelect'></td>");
 
       jQuery(tableId).find('.rowSelect').click(function() {
@@ -1159,7 +1159,7 @@ Project.barcode = {
                                                "sDom": '<<"toolbar">f>r<t>ip>'
                                              });
 
-      jQuery(tableId).find("tr:first").prepend("<th>Select</th>");
+      jQuery(tableId).find("tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"" + tableId + "\", this);'></span></th>");
       jQuery(tableId).find("tr:gt(0)").prepend("<td class='rowSelect'></td>");
 
       jQuery(tableId).find('.rowSelect').click(function() {

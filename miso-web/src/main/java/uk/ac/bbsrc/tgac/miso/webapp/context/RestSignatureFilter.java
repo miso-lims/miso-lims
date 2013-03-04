@@ -44,6 +44,9 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
+import org.springframework.security.web.context.HttpRequestResponseHolder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.filter.OncePerRequestFilter;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.integration.util.SignatureHelper;
@@ -64,6 +67,25 @@ public class RestSignatureFilter extends OncePerRequestFilter {
   @Autowired
   SecurityManager securityManager;
 
+  private SecurityContextRepository securityContextRepository = new HttpSessionSecurityContextRepository();
+
+  /**
+   * Creates a new RestSignatureFilter instance with a default HttpSessionSecurityContextRepository set
+   */
+  public RestSignatureFilter() {
+    super();
+  }
+
+  /**
+   * Creates a new RestSignatureFilter instance with a defined SecurityContextRepository
+   *
+   * @param securityContextRepository of type SecurityContextRepository
+   */
+  public RestSignatureFilter(SecurityContextRepository securityContextRepository) {
+    super();
+    this.securityContextRepository = securityContextRepository;
+  }
+
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
   }
@@ -83,8 +105,10 @@ public class RestSignatureFilter extends OncePerRequestFilter {
 
     String loginName = request.getHeader(SignatureHelper.USER_HEADER);
     if (loginName == null) {
-      if (SecurityContextHolder.getContext() != null && SecurityContextHolder.getContext().getAuthentication() != null) {
+      SecurityContext sc = securityContextRepository.loadContext(new HttpRequestResponseHolder(request, response));
+      if (sc != null && sc.getAuthentication() != null) {
         logger.info("User already logged in - chaining");
+        SecurityContextHolder.getContextHolderStrategy().setContext(sc);
         filterChain.doFilter(request, response);
       }
       throw new BadCredentialsException("Cannot enact RESTful request without a user specified!");

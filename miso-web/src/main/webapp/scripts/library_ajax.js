@@ -400,33 +400,33 @@ Library.barcode = {
 
                 jQuery(function() {
                   jQuery('#printServiceSelectDialog').dialog({
-                                                               autoOpen: false,
-                                                               width: 400,
-                                                               modal: true,
-                                                               resizable: false,
-                                                               buttons: {
-                                                                 "Print": function() {
-                                                                   Fluxion.doAjax(
-                                                                           'libraryControllerHelperService',
-                                                                           'printLibraryBarcodes',
-                                                                           {
-                                                                             'serviceName':jQuery('#serviceSelect').val(),
-                                                                             'libraries':libraries,
-                                                                             'url':ajaxurl
-                                                                           },
-                                                                           {
-                                                                             'doOnSuccess':function (json) {
-                                                                               alert(json.response);
-                                                                             }
-                                                                           }
-                                                                   );
-                                                                   jQuery(this).dialog('close');
-                                                                 },
-                                                                 "Cancel": function() {
-                                                                   jQuery(this).dialog('close');
-                                                                 }
-                                                               }
-                                                             });
+                     autoOpen: false,
+                     width: 400,
+                     modal: true,
+                     resizable: false,
+                     buttons: {
+                       "Print": function() {
+                         Fluxion.doAjax(
+                                 'libraryControllerHelperService',
+                                 'printLibraryBarcodes',
+                                 {
+                                   'serviceName':jQuery('#serviceSelect').val(),
+                                   'libraries':libraries,
+                                   'url':ajaxurl
+                                 },
+                                 {
+                                   'doOnSuccess':function (json) {
+                                     alert(json.response);
+                                   }
+                                 }
+                         );
+                         jQuery(this).dialog('close');
+                       },
+                       "Cancel": function() {
+                         jQuery(this).dialog('close');
+                       }
+                     }
+                   });
                 });
                 jQuery('#printServiceSelectDialog').dialog('open');
               },
@@ -459,34 +459,34 @@ Library.barcode = {
 
                 jQuery(function() {
                   jQuery('#printServiceSelectDialog').dialog({
-                                                               autoOpen: false,
-                                                               width: 400,
-                                                               modal: true,
-                                                               resizable: false,
-                                                               buttons: {
-                                                                 "Print": function() {
-                                                                   Fluxion.doAjax(
-                                                                           'libraryControllerHelperService',
-                                                                           'printLibraryDilutionBarcodes',
-                                                                           {
-                                                                             'serviceName':jQuery('#serviceSelect').val(),
-                                                                             'dilutions':dilutions,
-                                                                             'platform':platform,
-                                                                             'url':ajaxurl
-                                                                           },
-                                                                           {
-                                                                             'doOnSuccess':function (json) {
-                                                                               alert(json.response);
-                                                                             }
-                                                                           }
-                                                                   );
-                                                                   jQuery(this).dialog('close');
-                                                                 },
-                                                                 "Cancel": function() {
-                                                                   jQuery(this).dialog('close');
-                                                                 }
-                                                               }
-                                                             });
+                     autoOpen: false,
+                     width: 400,
+                     modal: true,
+                     resizable: false,
+                     buttons: {
+                       "Print": function() {
+                         Fluxion.doAjax(
+                                 'libraryControllerHelperService',
+                                 'printLibraryDilutionBarcodes',
+                                 {
+                                   'serviceName':jQuery('#serviceSelect').val(),
+                                   'dilutions':dilutions,
+                                   'platform':platform,
+                                   'url':ajaxurl
+                                 },
+                                 {
+                                   'doOnSuccess':function (json) {
+                                     alert(json.response);
+                                   }
+                                 }
+                         );
+                         jQuery(this).dialog('close');
+                       },
+                       "Cancel": function() {
+                         jQuery(this).dialog('close');
+                       }
+                     }
+                   });
                 });
                 jQuery('#printServiceSelectDialog').dialog('open');
               },
@@ -508,20 +508,20 @@ Library.barcode = {
 
     jQuery(function() {
       jQuery('#changeLibraryLocationDialog').dialog({
-                                                      autoOpen: false,
-                                                      width: 400,
-                                                      modal: true,
-                                                      resizable: false,
-                                                      buttons: {
-                                                        "Save": function() {
-                                                          self.changeLibraryLocation(libraryId, jQuery('#locationBarcodeInput').val());
-                                                          jQuery(this).dialog('close');
-                                                        },
-                                                        "Cancel": function() {
-                                                          jQuery(this).dialog('close');
-                                                        }
-                                                      }
-                                                    });
+        autoOpen: false,
+        width: 400,
+        modal: true,
+        resizable: false,
+        buttons: {
+          "Save": function() {
+            self.changeLibraryLocation(libraryId, jQuery('#locationBarcodeInput').val());
+            jQuery(this).dialog('close');
+          },
+          "Cancel": function() {
+            jQuery(this).dialog('close');
+          }
+        }
+      });
     });
     jQuery('#changeLibraryLocationDialog').dialog('open');
   },
@@ -599,37 +599,37 @@ Library.ui = {
 
                   //bind editable to selects
                   jQuery("#cinput .tagBarcodeSelectDiv").editable(function(value, settings) {
-                                                                    return value;
-                                                                  },
-                                                                  {
-                                                                    loadurl : '../../rest/library/barcodesForPosition',
-                                                                    loaddata : function (value, settings) {
-                                                                      var ret = {};
-                                                                      ret["position"] = jQuery(this).attr("position");
-                                                                      if (!Utils.validation.isNullCheck(tdtext)) {
-                                                                        ret['barcodeStrategy'] = tdtext;
-                                                                      }
-                                                                      else {
-                                                                        ret['barcodeStrategy'] = '';
-                                                                      }
+                    return value;
+                  },
+                  {
+                    loadurl : '../../library/barcodesForPosition',
+                    loaddata : function (value, settings) {
+                      var ret = {};
+                      ret["position"] = jQuery(this).attr("position");
+                      if (!Utils.validation.isNullCheck(tdtext)) {
+                        ret['barcodeStrategy'] = tdtext;
+                      }
+                      else {
+                        ret['barcodeStrategy'] = '';
+                      }
 
-                                                                      return ret;
-                                                                    },
-                                                                    type : 'select',
-                                                                    onblur: 'submit',
-                                                                    placeholder : '',
-                                                                    style : 'inherit',
-                                                                    //                callback: function(tValue, z) {
-                                                                    //                    var tPos = datatable.fnGetPosition(this);
-                                                                    //                    datatable.fnUpdate(tValue, tPos[0], tPos[1]);
-                                                                    //                },
-                                                                    submitdata : function(tvalue, tsettings) {
-                                                                      return {
-                                                                        "row_id": this.parentNode.getAttribute('id'),
-                                                                        "column": table.fnGetPosition(this)[2]
-                                                                      };
-                                                                    }
-                                                                  });
+                      return ret;
+                    },
+                    type : 'select',
+                    onblur: 'submit',
+                    placeholder : '',
+                    style : 'inherit',
+                    //                callback: function(tValue, z) {
+                    //                    var tPos = datatable.fnGetPosition(this);
+                    //                    datatable.fnUpdate(tValue, tPos[0], tPos[1]);
+                    //                },
+                    submitdata : function(tvalue, tsettings) {
+                      return {
+                        "row_id": this.parentNode.getAttribute('id'),
+                        "column": table.fnGetPosition(this)[2]
+                      };
+                    }
+                  });
                 });
               }
               });
@@ -677,21 +677,21 @@ Library.ui = {
             }
             else {
               Fluxion.doAjax(
-                      'libraryControllerHelperService',
-                      'getBarcodesPositions',
-                      {'strategy':stratText,
-                        'url':ajaxurl
-                      },
-                      {'doOnSuccess':function(json) {
-                        cell.html("");
-                        for (var i = 0; i < json.numApplicableBarcodes; i++) {
-                          cell.append("<span class='tagBarcodeSelectDiv' position='" + (i + 1) + "' id='tagbarcodes" + (i + 1) + "'>- <i>Select...</i></span>");
-                          if (json.numApplicableBarcodes > 1 && i == 0) {
-                            cell.append("|");
-                          }
-                        }
-                      }
-                      });
+                'libraryControllerHelperService',
+                'getBarcodesPositions',
+                {'strategy':stratText,
+                  'url':ajaxurl
+                },
+                {'doOnSuccess':function(json) {
+                  cell.html("");
+                  for (var i = 0; i < json.numApplicableBarcodes; i++) {
+                    cell.append("<span class='tagBarcodeSelectDiv' position='" + (i + 1) + "' id='tagbarcodes" + (i + 1) + "'>- <i>Select...</i></span>");
+                    if (json.numApplicableBarcodes > 1 && i == 0) {
+                      cell.append("|");
+                    }
+                  }
+                }
+              });
             }
           }
           else {
@@ -704,37 +704,37 @@ Library.ui = {
 
         //bind editable to selects
         jQuery("#cinput .tagBarcodeSelectDiv").editable(function(value, settings) {
-                                                          return value;
-                                                        },
-                                                        {
-                                                          loadurl : '../../rest/library/barcodesForPosition',
-                                                          loaddata : function (value, settings) {
-                                                            var ret = {};
-                                                            ret["position"] = jQuery(this).attr("position");
-                                                            if (!Utils.validation.isNullCheck(stratText)) {
-                                                              ret['barcodeStrategy'] = stratText;
-                                                            }
-                                                            else {
-                                                              ret['barcodeStrategy'] = '';
-                                                            }
+          return value;
+        },
+        {
+          loadurl : '../../library/barcodesForPosition',
+          loaddata : function (value, settings) {
+            var ret = {};
+            ret["position"] = jQuery(this).attr("position");
+            if (!Utils.validation.isNullCheck(stratText)) {
+              ret['barcodeStrategy'] = stratText;
+            }
+            else {
+              ret['barcodeStrategy'] = '';
+            }
 
-                                                            return ret;
-                                                          },
-                                                          type : 'select',
-                                                          onblur: 'submit',
-                                                          placeholder : '',
-                                                          style : 'inherit',
-                                                          //                callback: function(tValue, z) {
-                                                          //                    var tPos = datatable.fnGetPosition(this);
-                                                          //                    datatable.fnUpdate(tValue, tPos[0], tPos[1]);
-                                                          //                },
-                                                          submitdata : function(tvalue, tsettings) {
-                                                            return {
-                                                              "row_id": this.parentNode.getAttribute('id'),
-                                                              "column": table.fnGetPosition(this)[2]
-                                                            };
-                                                          }
-                                                        });
+            return ret;
+          },
+          type : 'select',
+          onblur: 'submit',
+          placeholder : '',
+          style : 'inherit',
+          //                callback: function(tValue, z) {
+          //                    var tPos = datatable.fnGetPosition(this);
+          //                    datatable.fnUpdate(tValue, tPos[0], tPos[1]);
+          //                },
+          submitdata : function(tvalue, tsettings) {
+            return {
+              "row_id": this.parentNode.getAttribute('id'),
+              "column": table.fnGetPosition(this)[2]
+            };
+          }
+        });
       });
     }
   },
@@ -753,20 +753,20 @@ Library.ui = {
 
     jQuery(function() {
       jQuery('#addLibraryNoteDialog').dialog({
-                                               autoOpen: false,
-                                               width: 400,
-                                               modal: true,
-                                               resizable: false,
-                                               buttons: {
-                                                 "Add Note": function() {
-                                                   self.addLibraryNote(libraryId, jQuery('#internalOnly').val(), jQuery('#notetext').val());
-                                                   jQuery(this).dialog('close');
-                                                 },
-                                                 "Cancel": function() {
-                                                   jQuery(this).dialog('close');
-                                                 }
-                                               }
-                                             });
+         autoOpen: false,
+         width: 400,
+         modal: true,
+         resizable: false,
+         buttons: {
+           "Add Note": function() {
+             self.addLibraryNote(libraryId, jQuery('#internalOnly').val(), jQuery('#notetext').val());
+             jQuery(this).dialog('close');
+           },
+           "Cancel": function() {
+             jQuery(this).dialog('close');
+           }
+         }
+       });
     });
     jQuery('#addLibraryNoteDialog').dialog('open');
   },
@@ -811,21 +811,21 @@ Library.ui = {
             {'doOnSuccess': function(json) {
               jQuery('#listingLibrariesTable').html('');
               jQuery('#listingLibrariesTable').dataTable({
-                                                           "aaData": json.array,
-                                                           "aoColumns": [
-                                                             { "sTitle": "Library Name", "sType":"no-lib"},
-                                                             { "sTitle": "Alias"},
-                                                             { "sTitle": "Type"},
-                                                             { "sTitle": "Sample Name", "sType":"no-sam"},
-                                                             { "sTitle": "QC Passed"},
-                                                             { "sTitle": "Edit"}
-                                                           ],
-                                                           "bJQueryUI": true,
-                                                           "iDisplayLength":  25,
-                                                           "aaSorting":[
-                                                             [0,"desc"]
-                                                           ]
-                                                         });
+                 "aaData": json.array,
+                 "aoColumns": [
+                   { "sTitle": "Library Name", "sType":"no-lib"},
+                   { "sTitle": "Alias"},
+                   { "sTitle": "Type"},
+                   { "sTitle": "Sample Name", "sType":"no-sam"},
+                   { "sTitle": "QC Passed"},
+                   { "sTitle": "Edit"}
+                 ],
+                 "bJQueryUI": true,
+                 "iDisplayLength":  25,
+                 "aaSorting":[
+                   [0,"desc"]
+                 ]
+               });
             }
             }
     );
