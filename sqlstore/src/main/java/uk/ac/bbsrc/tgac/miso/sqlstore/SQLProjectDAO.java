@@ -283,19 +283,7 @@ public class SQLProjectDAO implements ProjectStore {
 
   private void purgeListCache(Project p, boolean replace) {
     Cache cache = cacheManager.getCache("projectListCache");
-    if (cache.getKeys().size() > 0) {
-      Object cachekey = cache.getKeys().get(0);
-      List<Project> c = (List<Project>)cache.get(cachekey).getValue();
-      if (c.remove(p)) {
-        if (replace) {
-          c.add(p);
-        }
-      }
-      else {
-        c.add(p);
-      }
-      cache.put(new Element(cachekey, c));
-    }
+    DbUtils.updateListCache(cache, replace, p, Project.class);
   }
 
   private void purgeListCache(Project p) {
@@ -304,7 +292,7 @@ public class SQLProjectDAO implements ProjectStore {
 
   @Transactional(readOnly = false, rollbackFor = Exception.class)
   @TriggersRemove(
-          cacheName = "projectCache",
+          cacheName = {"projectCache", "lazyProjectCache"},
           keyGenerator = @KeyGenerator(
                   name = "HashCodeCacheKeyGenerator",
                   properties = {
@@ -514,7 +502,7 @@ public class SQLProjectDAO implements ProjectStore {
 
   @Transactional(readOnly = false, rollbackFor = IOException.class)
   @TriggersRemove(
-          cacheName = "projectCache",
+          cacheName = {"projectCache", "lazyProjectCache"},
           keyGenerator = @KeyGenerator(
                   name = "HashCodeCacheKeyGenerator",
                   properties = {
@@ -631,7 +619,7 @@ public class SQLProjectDAO implements ProjectStore {
         if (isCacheEnabled() && lookupCache(cacheManager) != null) {
           Element element;
           if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
-            log.debug("Cache hit on map for Project " + id);
+            log.info("Cache hit on map for Project " + id);
             return (Project)element.getObjectValue();
           }
         }

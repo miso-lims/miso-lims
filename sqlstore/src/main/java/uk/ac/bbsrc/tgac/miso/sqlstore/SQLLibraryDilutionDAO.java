@@ -292,7 +292,7 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
   }
 
   @Transactional(readOnly = false, rollbackFor = Exception.class)
-  @TriggersRemove(cacheName="libraryDilutionCache",
+  @TriggersRemove(cacheName={"libraryDilutionCache", "lazyLibraryDilutionCache"},
                   keyGenerator = @KeyGenerator(
                           name = "HashCodeCacheKeyGenerator",
                           properties = {
@@ -386,8 +386,9 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
       }
       else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (l != null) {
-          Cache pc = cacheManager.getCache("libraryCache");
-          pc.remove(DbUtils.hashCodeCacheKeyFor(l.getId()));
+//          Cache pc = cacheManager.getCache("libraryCache");
+//          pc.remove(DbUtils.hashCodeCacheKeyFor(l.getId()));
+          DbUtils.updateCaches(cacheManager, l, Library.class);
         }
       }
     }
@@ -402,7 +403,7 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
 
   @Transactional(readOnly = false, rollbackFor = IOException.class)
   @TriggersRemove(
-    cacheName="libraryDilutionCache",
+    cacheName={"libraryDilutionCache", "lazyLibraryDilutionCache"},
     keyGenerator = @KeyGenerator (
       name = "HashCodeCacheKeyGenerator",
       properties = {
@@ -422,8 +423,9 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
       }
       else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (l != null) {
-          Cache pc = cacheManager.getCache("libraryCache");
-          pc.remove(DbUtils.hashCodeCacheKeyFor(l.getId()));
+          //Cache pc = cacheManager.getCache("libraryCache");
+          //pc.remove(DbUtils.hashCodeCacheKeyFor(l.getId()));
+          DbUtils.updateCaches(cacheManager, l, Library.class);
         }
       }
       return true;

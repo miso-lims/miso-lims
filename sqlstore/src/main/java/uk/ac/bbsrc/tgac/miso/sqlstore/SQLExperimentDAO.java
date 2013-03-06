@@ -245,19 +245,7 @@ public class SQLExperimentDAO implements ExperimentStore {
 
   private void purgeListCache(Experiment experiment, boolean replace) {
     Cache cache = cacheManager.getCache("experimentListCache");
-    if (cache.getKeys().size() > 0) {
-      Object cachekey = cache.getKeys().get(0);
-      List<Experiment> c = (List<Experiment>)cache.get(cachekey).getValue();
-      if (c.remove(experiment)) {
-        if (replace) {
-          c.add(experiment);
-        }
-      }
-      else {
-        c.add(experiment);
-      }
-      cache.put(new Element(cachekey, c));
-    }
+    DbUtils.updateListCache(cache, replace, experiment, Experiment.class);
   }
 
   private void purgeListCache(Experiment experiment) {
@@ -271,7 +259,7 @@ public class SQLExperimentDAO implements ExperimentStore {
    * @param experiment the experiment to write
    */
   @Transactional(readOnly = false, rollbackFor = IOException.class)
-  @TriggersRemove(cacheName="experimentCache",
+  @TriggersRemove(cacheName={"experimentCache", "lazyExperimentCache"},
                   keyGenerator = @KeyGenerator(
                           name = "HashCodeCacheKeyGenerator",
                           properties = {
@@ -372,8 +360,9 @@ public class SQLExperimentDAO implements ExperimentStore {
           DbUtils.flushCache(cacheManager, "poolCache");
         }
         else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-          Cache pc = cacheManager.getCache("poolCache");
-          pc.remove(DbUtils.hashCodeCacheKeyFor(experiment.getPool().getId()));
+          //Cache pc = cacheManager.getCache("poolCache");
+          //pc.remove(DbUtils.hashCodeCacheKeyFor(experiment.getPool().getId()));
+          DbUtils.updateCaches(cacheManager, experiment.getPool(), Pool.class);
         }
       }
 
@@ -383,8 +372,9 @@ public class SQLExperimentDAO implements ExperimentStore {
       }
       else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (s != null) {
-          Cache pc = cacheManager.getCache("studyCache");
-          pc.remove(DbUtils.hashCodeCacheKeyFor(s.getId()));
+          //Cache pc = cacheManager.getCache("studyCache");
+          //pc.remove(DbUtils.hashCodeCacheKeyFor(s.getId()));
+          DbUtils.updateCaches(cacheManager, s, Study.class);
         }
       }
 
@@ -477,7 +467,7 @@ public class SQLExperimentDAO implements ExperimentStore {
 
   @Transactional(readOnly = false, rollbackFor = IOException.class)
   @TriggersRemove(
-          cacheName="experimentCache",
+          cacheName={"experimentCache", "lazyExperimentCache"},
           keyGenerator = @KeyGenerator (
               name = "HashCodeCacheKeyGenerator",
               properties = {
@@ -495,21 +485,26 @@ public class SQLExperimentDAO implements ExperimentStore {
       if (this.cascadeType.equals(CascadeType.PERSIST)) {
         if (s!=null) studyDAO.save(s);
         if (experiment.getPool() != null) {
-          DbUtils.flushCache(cacheManager, "poolCache");
+          //DbUtils.flushCache(cacheManager, "poolCache");
+          DbUtils.updateCaches(cacheManager, experiment.getPool(), Pool.class);
         }
       }
       else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (s != null) {
-          Cache sc = cacheManager.getCache("studyCache");
-          sc.remove(DbUtils.hashCodeCacheKeyFor(s.getId()));
+          //Cache sc = cacheManager.getCache("studyCache");
+          //sc.remove(DbUtils.hashCodeCacheKeyFor(s.getId()));
+          DbUtils.updateCaches(cacheManager, s, Study.class);
 
           if (experiment.getPool() != null) {
-            Cache pc = cacheManager.getCache("poolCache");
-            pc.remove(DbUtils.hashCodeCacheKeyFor(experiment.getPool().getId()));
+            //Cache pc = cacheManager.getCache("poolCache");
+            //pc.remove(DbUtils.hashCodeCacheKeyFor(experiment.getPool().getId()));
+            DbUtils.updateCaches(cacheManager, experiment.getPool(), Pool.class);
           }
         }
-        purgeListCache(experiment, false);
       }
+
+      purgeListCache(experiment, false);
+
       return true;
     }
     return false;

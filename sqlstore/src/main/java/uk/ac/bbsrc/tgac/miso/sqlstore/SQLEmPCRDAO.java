@@ -160,7 +160,7 @@ public class SQLEmPCRDAO implements EmPCRStore {
   }
 
   @Transactional(readOnly = false, rollbackFor = IOException.class)
-  @TriggersRemove(cacheName="emPCRCache",
+  @TriggersRemove(cacheName={"emPCRCache", "lazyEmPCRCache"},
                   keyGenerator = @KeyGenerator(
                           name = "HashCodeCacheKeyGenerator",
                           properties = {
@@ -247,8 +247,9 @@ public class SQLEmPCRDAO implements EmPCRStore {
       }
       else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (ld != null) {
-          Cache pc = cacheManager.getCache("libraryDilutionCache");
-          pc.remove(DbUtils.hashCodeCacheKeyFor(ld.getId()));
+          //Cache pc = cacheManager.getCache("libraryDilutionCache");
+          //pc.remove(DbUtils.hashCodeCacheKeyFor(ld.getId()));
+          DbUtils.updateCaches(cacheManager, ld, LibraryDilution.class);
         }
       }
     }
@@ -296,7 +297,7 @@ public class SQLEmPCRDAO implements EmPCRStore {
 
   @Transactional(readOnly = false, rollbackFor = IOException.class)
   @TriggersRemove(
-          cacheName="emPCRCache",
+          cacheName={"emPCRCache", "lazyEmPCRCache"},
           keyGenerator = @KeyGenerator (
               name = "HashCodeCacheKeyGenerator",
               properties = {
@@ -316,8 +317,9 @@ public class SQLEmPCRDAO implements EmPCRStore {
       }
       else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (ld != null) {
-          Cache pc = cacheManager.getCache("emPCRDilutionCache");
-          pc.remove(DbUtils.hashCodeCacheKeyFor(ld.getId()));
+          //Cache pc = cacheManager.getCache("emPCRDilutionCache");
+          //pc.remove(DbUtils.hashCodeCacheKeyFor(ld.getId()));
+          DbUtils.updateCaches(cacheManager, ld, LibraryDilution.class);
         }
       }
       return true;

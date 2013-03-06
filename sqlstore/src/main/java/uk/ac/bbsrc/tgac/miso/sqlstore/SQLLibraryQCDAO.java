@@ -23,10 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
-import com.googlecode.ehcache.annotations.KeyGenerator;
-import com.googlecode.ehcache.annotations.Property;
-import com.googlecode.ehcache.annotations.TriggersRemove;
-import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import org.slf4j.Logger;
@@ -40,14 +36,12 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
@@ -55,9 +49,7 @@ import javax.persistence.CascadeType;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -167,15 +159,17 @@ public class SQLLibraryQCDAO implements LibraryQcStore {
       }
       else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (l != null) {
-          Cache pc = cacheManager.getCache("libraryCache");
-          pc.remove(DbUtils.hashCodeCacheKeyFor(l.getId()));
+          //Cache pc = cacheManager.getCache("libraryCache");
+          //pc.remove(DbUtils.hashCodeCacheKeyFor(l.getId()));
+          DbUtils.updateCaches(cacheManager, l, Library.class);
         }
       }
       else if (this.cascadeType.equals(CascadeType.ALL)) {
         if (l != null) {
           libraryDAO.save(l);
-          Cache pc = cacheManager.getCache("libraryCache");
-          pc.remove(DbUtils.hashCodeCacheKeyFor(l.getId()));
+          //Cache pc = cacheManager.getCache("libraryCache");
+          //pc.remove(DbUtils.hashCodeCacheKeyFor(l.getId()));
+          DbUtils.updateCaches(cacheManager, l, Library.class);
         }
       }
     }
@@ -218,8 +212,9 @@ public class SQLLibraryQCDAO implements LibraryQcStore {
       }
       else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (l != null) {
-          Cache pc = cacheManager.getCache("libraryCache");
-          pc.remove(DbUtils.hashCodeCacheKeyFor(l.getId()));
+          //Cache pc = cacheManager.getCache("libraryCache");
+          //pc.remove(DbUtils.hashCodeCacheKeyFor(l.getId()));
+          DbUtils.updateCaches(cacheManager, l, Library.class);
         }
       }
       return true;

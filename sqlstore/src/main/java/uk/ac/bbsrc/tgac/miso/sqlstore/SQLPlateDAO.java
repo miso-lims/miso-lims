@@ -251,7 +251,7 @@ public class SQLPlateDAO implements PlateStore {
   @Override
   @Transactional(readOnly = false, rollbackFor = Exception.class)
   @TriggersRemove(
-    cacheName="plateCache",
+    cacheName={"plateCache", "lazyPlateCache"},
     keyGenerator = @KeyGenerator(
       name = "HashCodeCacheKeyGenerator",
       properties = {
@@ -397,7 +397,7 @@ public class SQLPlateDAO implements PlateStore {
 
   @Override
   @TriggersRemove(
-    cacheName="plateCache",
+    cacheName={"plateCache", "lazyPlateCache"},
     keyGenerator = @KeyGenerator(
       name = "HashCodeCacheKeyGenerator",
       properties = {

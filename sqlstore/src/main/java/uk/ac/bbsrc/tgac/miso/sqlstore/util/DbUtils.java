@@ -24,15 +24,16 @@
 package uk.ac.bbsrc.tgac.miso.sqlstore.util;
 
 import com.googlecode.ehcache.annotations.key.HashCodeCacheKeyGenerator;
-import net.sf.ehcache.CacheException;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Ehcache;
+import net.sf.ehcache.*;
+import net.sf.ehcache.constructs.blocking.BlockingCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.DatabaseMetaDataCallback;
 import org.springframework.jdbc.support.JdbcUtils;
 import org.springframework.jdbc.support.MetaDataAccessException;
+import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -41,6 +42,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -159,6 +161,48 @@ public class DbUtils {
     }
     else {
       throw new CacheException("No cacheManager declared. Please check your Spring config, or supply a non-null manager");
+    }
+  }
+
+  public static <T> Cache lookupCache(CacheManager cacheManager, Class<T> cacheClass, boolean lazy) {
+    if (lazy) {
+      return cacheManager.getCache("lazy"+ LimsUtils.capitalise(cacheClass.getSimpleName())+"Cache");
+    }
+    else {
+      return cacheManager.getCache(LimsUtils.noddyCamelCaseify(cacheClass.getSimpleName())+"Cache");
+    }
+  }
+
+  public static <T extends Nameable> void updateCaches(CacheManager cacheManager, T obj, Class<T> cacheClass) {
+    Cache cache = DbUtils.lookupCache(cacheManager, cacheClass, true);
+    if (cache != null && cache.getKeys().size() > 0) {
+      log.info("Removing " + cacheClass.getSimpleName() + " " + obj.getId() + " from " + cache.getName());
+      BlockingCache c = new BlockingCache(cache);
+      c.remove(DbUtils.hashCodeCacheKeyFor(obj.getId()));
+    }
+
+    cache = DbUtils.lookupCache(cacheManager, cacheClass, false);
+    if (cache != null && cache.getKeys().size() > 0) {
+      log.info("Removing " + cacheClass.getSimpleName() + " " + obj.getId() + " from " + cache.getName());
+      BlockingCache c = new BlockingCache(cache);
+      c.remove(DbUtils.hashCodeCacheKeyFor(obj.getId()));
+    }
+  }
+
+  public static <T> void updateListCache(Cache cache, boolean replace, T obj, Class<T> cacheClass) {
+    if (cache != null && cache.getKeys().size() > 0) {
+      BlockingCache c = new BlockingCache(cache);
+      Object cachekey = c.getKeys().get(0);
+      List<T> e = (List<T>)c.get(cachekey).getObjectValue();
+      if (e.remove(obj)) {
+        if (replace) {
+          e.add(obj);
+        }
+      }
+      else {
+        e.add(obj);
+      }
+      c.put(new Element(cachekey, e));
     }
   }
 

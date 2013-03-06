@@ -312,25 +312,8 @@ public class SQLRunDAO implements RunStore {
   }
 
   private void purgeListCache(Run run, boolean replace) {
-    Cache rcache = cacheManager.getCache("runListCache");
-    if (rcache != null) {
-      BlockingCache cache = new BlockingCache(rcache);
-      if (cache.getKeys().size() > 0) {
-        Object cachekey = cache.getKeys().get(0);
-        if (cachekey != null) {
-          List<Run> cachedruns = (List<Run>)cache.get(cachekey).getValue();
-          if (cachedruns.remove(run)) {
-            if (replace) {
-              cachedruns.add(run);
-            }
-          }
-          else {
-            cachedruns.add(run);
-          }
-          cache.put(new Element(cachekey, cachedruns));
-        }
-      }
-    }
+    Cache cache = cacheManager.getCache("runListCache");
+    DbUtils.updateListCache(cache, replace, run, Run.class);
   }
 
   private void purgeListCache(Run run) {
@@ -339,7 +322,7 @@ public class SQLRunDAO implements RunStore {
 
   @Override
   @Transactional(readOnly = false, rollbackFor = IOException.class)
-  @TriggersRemove(cacheName = "runCache",
+  @TriggersRemove(cacheName = {"runCache", "lazyRunCache"},
                   keyGenerator = @KeyGenerator(
                           name = "HashCodeCacheKeyGenerator",
                           properties = {
@@ -748,7 +731,7 @@ public class SQLRunDAO implements RunStore {
   @Override
   @Transactional(readOnly = false, rollbackFor = IOException.class)
   @TriggersRemove(
-          cacheName="runCache",
+          cacheName = {"runCache", "lazyRunCache"},
           keyGenerator = @KeyGenerator (
               name = "HashCodeCacheKeyGenerator",
               properties = {

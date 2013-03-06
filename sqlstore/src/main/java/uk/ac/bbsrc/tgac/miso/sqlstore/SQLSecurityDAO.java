@@ -178,7 +178,7 @@ public class SQLSecurityDAO implements SecurityStore {
   }
 
   @Transactional(readOnly = false, rollbackFor = IOException.class)
-  @TriggersRemove(cacheName = "userCache",
+  @TriggersRemove(cacheName = {"userCache", "lazyUserCache"},
                   keyGenerator = @KeyGenerator(
                           name = "HashCodeCacheKeyGenerator",
                           properties = {

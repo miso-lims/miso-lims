@@ -23,10 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
-import com.googlecode.ehcache.annotations.KeyGenerator;
-import com.googlecode.ehcache.annotations.Property;
-import com.googlecode.ehcache.annotations.TriggersRemove;
-import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import org.slf4j.Logger;
@@ -187,15 +183,17 @@ public class SQLRunQCDAO implements RunQcStore {
       }
       else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (r != null) {
-          Cache pc = cacheManager.getCache("runCache");
-          pc.remove(DbUtils.hashCodeCacheKeyFor(r.getId()));
+          //Cache pc = cacheManager.getCache("runCache");
+          //pc.remove(DbUtils.hashCodeCacheKeyFor(r.getId()));
+          DbUtils.updateCaches(cacheManager, r, Run.class);
         }
       }
       else if (this.cascadeType.equals(CascadeType.ALL)) {
         if (r != null) {
           runDAO.save(r);
-          Cache pc = cacheManager.getCache("runCache");
-          pc.remove(DbUtils.hashCodeCacheKeyFor(r.getId()));
+          //Cache pc = cacheManager.getCache("runCache");
+          //pc.remove(DbUtils.hashCodeCacheKeyFor(r.getId()));
+          DbUtils.updateCaches(cacheManager, r, Run.class);
         }
       }
     }
@@ -242,8 +240,9 @@ public class SQLRunQCDAO implements RunQcStore {
       }
       else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (r != null) {
-          Cache pc = cacheManager.getCache("runCache");
-          pc.remove(DbUtils.hashCodeCacheKeyFor(r.getId()));
+          //Cache pc = cacheManager.getCache("runCache");
+          //pc.remove(DbUtils.hashCodeCacheKeyFor(r.getId()));
+          DbUtils.updateCaches(cacheManager, r, Run.class);
         }
       }
       return true;

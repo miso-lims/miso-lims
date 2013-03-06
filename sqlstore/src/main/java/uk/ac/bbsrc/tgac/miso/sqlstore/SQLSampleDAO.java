@@ -31,6 +31,7 @@ import net.sf.ehcache.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import org.slf4j.Logger;
@@ -236,19 +237,7 @@ public class SQLSampleDAO implements SampleStore {
 
   private void purgeListCache(Sample s, boolean replace) {
     Cache cache = cacheManager.getCache("sampleListCache");
-    if (cache.getKeys().size() > 0) {
-      Object cachekey = cache.getKeys().get(0);
-      List<Sample> c = (List<Sample>)cache.get(cachekey).getValue();
-      if (c.remove(s)) {
-        if (replace) {
-          c.add(s);
-        }
-      }
-      else {
-        c.add(s);
-      }
-      cache.put(new Element(cachekey, c));
-    }
+    DbUtils.updateListCache(cache, replace, s, Sample.class);
   }
 
   private void purgeListCache(Sample s) {
@@ -296,7 +285,7 @@ public class SQLSampleDAO implements SampleStore {
   }
 
   @Transactional(readOnly = false, rollbackFor = IOException.class)
-  @TriggersRemove(cacheName="sampleCache",
+  @TriggersRemove(cacheName={"sampleCache", "lazySampleCache"},
         keyGenerator = @KeyGenerator(
               name = "HashCodeCacheKeyGenerator",
               properties = {
@@ -310,7 +299,6 @@ public class SQLSampleDAO implements SampleStore {
     if (this.cascadeType != null){// && this.cascadeType.equals(CascadeType.PERSIST) || this.cascadeType.equals(CascadeType.REMOVE)) {
       securityProfileId = securityProfileDAO.save(sample.getSecurityProfile());
     }
-
     MapSqlParameterSource params = new MapSqlParameterSource();
     params.addValue("alias", sample.getAlias())
             .addValue("accession", sample.getAccession())
@@ -368,8 +356,8 @@ public class SQLSampleDAO implements SampleStore {
       }
     }
     else {
-      List<Sample> as = new ArrayList<Sample>(listByAlias(sample.getAlias()));
-      if (!as.isEmpty() && as.get(0) != null && as.get(0).getId() != sample.getId()) {
+      SqlRowSet ss = template.queryForRowSet(SAMPLE_SELECT_BY_ALIAS, new Object[]{sample.getAlias()});
+      if (ss.next() && ss.getLong("sampleId") != sample.getId()) {
         throw new IOException("UPD: A sample with this alias already exists in the database");
       }
       else {
@@ -394,15 +382,14 @@ public class SQLSampleDAO implements SampleStore {
     if (this.cascadeType != null) {
       Project p = sample.getProject();
       if (this.cascadeType.equals(CascadeType.PERSIST)) {
-        if (p!=null) projectDAO.save(p);
+        if (p!=null) {
+          projectDAO.save(p);
+        }
       }
       else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (p != null) {
-          Cache pc = cacheManager.getCache("projectCache");
-          pc.remove(DbUtils.hashCodeCacheKeyFor(p.getProjectId()));
+          DbUtils.updateCaches(cacheManager, p, Project.class);
         }
-
-        purgeListCache(sample);
       }
 
       if (!sample.getNotes().isEmpty()) {
@@ -410,6 +397,8 @@ public class SQLSampleDAO implements SampleStore {
           noteDAO.saveSampleNote(sample, n);
         }
       }
+
+      purgeListCache(sample);
     }
 
     return sample.getId();
@@ -444,7 +433,7 @@ public class SQLSampleDAO implements SampleStore {
 
   @Transactional(readOnly = false, rollbackFor = IOException.class)
   @TriggersRemove(
-          cacheName="sampleCache",
+          cacheName={"sampleCache", "lazySampleCache"},
           keyGenerator = @KeyGenerator (
               name = "HashCodeCacheKeyGenerator",
               properties = {
@@ -464,12 +453,14 @@ public class SQLSampleDAO implements SampleStore {
       }
       else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (p != null) {
-          Cache pc = cacheManager.getCache("projectCache");
-          pc.remove(DbUtils.hashCodeCacheKeyFor(p.getProjectId()));
-
-          purgeListCache(sample, false);
+          //Cache pc = cacheManager.getCache("projectCache");
+          //pc.remove(DbUtils.hashCodeCacheKeyFor(p.getProjectId()));
+          DbUtils.updateCaches(cacheManager, p, Project.class);
         }
       }
+
+      purgeListCache(sample, false);
+
       return true;
     }
     return false;
@@ -540,10 +531,10 @@ public class SQLSampleDAO implements SampleStore {
       if (isCacheEnabled() && lookupCache(cacheManager) != null) {
         Element element;
         if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
-          log.debug("Cache hit on map for Sample " + id);
           return (Sample)element.getObjectValue();
         }
       }
+
       Sample s = dataObjectFactory.getSample();
       s.setId(id);
       s.setName(rs.getString("name"));
@@ -596,6 +587,24 @@ public class SQLSampleDAO implements SampleStore {
 
       if (isCacheEnabled() && lookupCache(cacheManager) != null) {
         lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id) ,s));
+        /*
+        Cache c = lookupCache(cacheManager);
+        Sample cached = (Sample)c.get(DbUtils.hashCodeCacheKeyFor(id));
+        if (cached != null) {
+          log.info("Cached date: " + cached.getReceivedDate());
+          log.info("Current date: " + s.getReceivedDate());
+
+          log.info("Replacing sample "+id+" in " + c.getName());
+          c.put(new Element(DbUtils.hashCodeCacheKeyFor(id) ,s));
+          Sample after = (Sample)c.get(DbUtils.hashCodeCacheKeyFor(id));
+          log.info("Replaced date: " + after.getReceivedDate());
+        }
+        else {
+          log.info("Putting sample "+id+" in " + c.getName());
+          log.info("Current date: " + s.getReceivedDate());
+          c.put(new Element(DbUtils.hashCodeCacheKeyFor(id) ,s));
+        }
+        */
       }
 
       return s;

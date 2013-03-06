@@ -51,6 +51,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.transaction.annotation.Transactional;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DaoLookup;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
@@ -322,19 +323,7 @@ public class SQLPoolDAO implements PoolStore {
 
   private void purgeListCache(Pool p, boolean replace) {
     Cache cache = cacheManager.getCache("poolListCache");
-    if (cache.getKeys().size() > 0) {
-      Object cachekey = cache.getKeys().get(0);
-      List<Pool> c = (List<Pool>)cache.get(cachekey).getValue();
-      if (c.remove(p)) {
-        if (replace) {
-          c.add(p);
-        }
-      }
-      else {
-        c.add(p);
-      }
-      cache.put(new Element(cachekey, c));
-    }
+    DbUtils.updateListCache(cache, replace, p, Pool.class);
   }
 
   private void purgeListCache(Pool p) {
@@ -360,7 +349,7 @@ public class SQLPoolDAO implements PoolStore {
   }
 
   @Transactional(readOnly = false, rollbackFor = Exception.class)
-  @TriggersRemove(cacheName = "poolCache",
+  @TriggersRemove(cacheName = {"poolCache", "lazyPoolCache"},
                   keyGenerator = @KeyGenerator(
                           name = "HashCodeCacheKeyGenerator",
                           properties = {
@@ -469,6 +458,7 @@ public class SQLPoolDAO implements PoolStore {
       String lc = type.substring(0,1).toLowerCase() + type.substring(1);
 
       Cache dc = cacheManager.getCache(lc+"Cache");
+      Cache ldc = cacheManager.getCache("lazy"+ type + "Cache");
 
       for (Poolable d : pool.getPoolableElements()) {
         log.info("Linking "+d.getName() + " to " + pool.getName());
@@ -489,8 +479,10 @@ public class SQLPoolDAO implements PoolStore {
           else if (this.cascadeType.equals(CascadeType.REMOVE)) {
             if (d instanceof Plate) {
               dc = cacheManager.getCache("plateCache");
+              ldc = cacheManager.getCache("lazyPlateCache");
             }
-            dc.remove(DbUtils.hashCodeCacheKeyFor(d.getId()));
+            if (dc != null) dc.remove(DbUtils.hashCodeCacheKeyFor(d.getId()));
+            if (ldc != null) ldc.remove(DbUtils.hashCodeCacheKeyFor(d.getId()));
           }
         }
       }
@@ -502,7 +494,7 @@ public class SQLPoolDAO implements PoolStore {
     poolNamedTemplate.update(POOL_EXPERIMENT_DELETE_BY_POOL_ID, poolparams);
 
     if (pool.getExperiments() != null && !pool.getExperiments().isEmpty()) {
-      Cache ec = cacheManager.getCache("experimentCache");
+      //Cache ec = cacheManager.getCache("experimentCache");
 
       SimpleJdbcInsert eInsert = new SimpleJdbcInsert(template)
               .withTableName("Pool_Experiment");
@@ -519,7 +511,8 @@ public class SQLPoolDAO implements PoolStore {
             experimentDAO.save(e);
           }
           else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-            ec.remove(DbUtils.hashCodeCacheKeyFor(e.getId()));
+            //ec.remove(DbUtils.hashCodeCacheKeyFor(e.getId()));
+            DbUtils.updateCaches(cacheManager, e, Experiment.class);
           }
         }
       }
@@ -610,7 +603,7 @@ public class SQLPoolDAO implements PoolStore {
   }
 
   @TriggersRemove(
-          cacheName = "poolCache",
+          cacheName = {"poolCache", "lazyPoolCache"},
           keyGenerator = @KeyGenerator(
                   name = "HashCodeCacheKeyGenerator",
                   properties = {
@@ -633,6 +626,7 @@ public class SQLPoolDAO implements PoolStore {
         String type = d.getClass().getSimpleName();
         String lc = type.substring(0,1).toLowerCase() + type.substring(1);
         Cache dc = cacheManager.getCache(lc+"Cache");
+        Cache ldc = cacheManager.getCache("lazy"+type+"Cache");
 
         if (this.cascadeType != null) {
           if (this.cascadeType.equals(CascadeType.PERSIST)) {
@@ -643,13 +637,14 @@ public class SQLPoolDAO implements PoolStore {
           }
           else if (this.cascadeType.equals(CascadeType.REMOVE)) {
             if (dc != null) dc.remove(DbUtils.hashCodeCacheKeyFor(d.getId()));
+            if (ldc != null) ldc.remove(DbUtils.hashCodeCacheKeyFor(d.getId()));
           }
         }
       }
 
       if (!pool.getExperiments().isEmpty()) {
         ok = (poolNamedTemplate.update(POOL_EXPERIMENT_DELETE_BY_POOL_ID, poolparams) == 1);
-        Cache ec = cacheManager.getCache("experimentCache");
+        //Cache ec = cacheManager.getCache("experimentCache");
         Collection<Experiment> exps = pool.getExperiments();
         for (Experiment e : exps) {
           if (this.cascadeType != null) {
@@ -657,7 +652,8 @@ public class SQLPoolDAO implements PoolStore {
               experimentDAO.save(e);
             }
             else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-              ec.remove(DbUtils.hashCodeCacheKeyFor(e.getId()));
+              //ec.remove(DbUtils.hashCodeCacheKeyFor(e.getId()));
+              DbUtils.updateCaches(cacheManager, e, Experiment.class);
             }
           }
         }

@@ -160,15 +160,17 @@ public class SQLSampleQCDAO implements SampleQcStore {
       }
       else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (s != null) {
-          Cache pc = cacheManager.getCache("sampleCache");
-          pc.remove(DbUtils.hashCodeCacheKeyFor(s.getId()));
+          //Cache pc = cacheManager.getCache("sampleCache");
+          //pc.remove(DbUtils.hashCodeCacheKeyFor(s.getId()));
+          DbUtils.updateCaches(cacheManager, s, Sample.class);
         }
       }
       else if (this.cascadeType.equals(CascadeType.ALL)) {
         if (s!=null) {
           sampleDAO.save(s);
-          Cache pc = cacheManager.getCache("sampleCache");
-          pc.remove(DbUtils.hashCodeCacheKeyFor(s.getId()));
+          //Cache pc = cacheManager.getCache("sampleCache");
+          //pc.remove(DbUtils.hashCodeCacheKeyFor(s.getId()));
+          DbUtils.updateCaches(cacheManager, s, Sample.class);
         }
       }
     }
@@ -211,8 +213,9 @@ public class SQLSampleQCDAO implements SampleQcStore {
       }
       else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (s != null) {
-          Cache pc = cacheManager.getCache("sampleCache");
-          pc.remove(DbUtils.hashCodeCacheKeyFor(s.getId()));
+          //Cache pc = cacheManager.getCache("sampleCache");
+          //pc.remove(DbUtils.hashCodeCacheKeyFor(s.getId()));
+          DbUtils.updateCaches(cacheManager, s, Sample.class);
         }
       }
       return true;

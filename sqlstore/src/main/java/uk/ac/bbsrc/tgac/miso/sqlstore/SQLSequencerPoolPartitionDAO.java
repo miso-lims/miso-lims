@@ -169,19 +169,7 @@ public class SQLSequencerPoolPartitionDAO implements PartitionStore {
 
   private void purgeListCache(SequencerPoolPartition s, boolean replace) {
     Cache cache = cacheManager.getCache("partitionListCache");
-    if (cache.getKeys().size() > 0) {
-      Object cachekey = cache.getKeys().get(0);
-      List<SequencerPoolPartition> c = (List<SequencerPoolPartition>)cache.get(cachekey).getValue();
-      if (c.remove(s)) {
-        if (replace) {
-          c.add(s);
-        }
-      }
-      else {
-        c.add(s);
-      }
-      cache.put(new Element(cachekey, c));
-    }
+    DbUtils.updateListCache(cache, replace, s, SequencerPoolPartition.class);
   }
 
   private void purgeListCache(SequencerPoolPartition s) {
@@ -190,7 +178,7 @@ public class SQLSequencerPoolPartitionDAO implements PartitionStore {
 
   @Override
   @Transactional(readOnly = false, rollbackFor = IOException.class)
-  @TriggersRemove(cacheName = "sequencerPoolPartitionCache",
+  @TriggersRemove(cacheName = {"sequencerPoolPartitionCache", "lazySequencerPoolPartitionCache"},
                   keyGenerator = @KeyGenerator(
                           name = "HashCodeCacheKeyGenerator",
                           properties = {

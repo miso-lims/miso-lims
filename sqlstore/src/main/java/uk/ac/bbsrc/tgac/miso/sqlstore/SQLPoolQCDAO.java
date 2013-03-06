@@ -158,15 +158,17 @@ public class SQLPoolQCDAO implements PoolQcStore {
       }
       else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (l != null) {
-          Cache pc = cacheManager.getCache("poolCache");
-          pc.remove(DbUtils.hashCodeCacheKeyFor(l.getId()));
+          //Cache pc = cacheManager.getCache("poolCache");
+          //pc.remove(DbUtils.hashCodeCacheKeyFor(l.getId()));
+          DbUtils.updateCaches(cacheManager, l, Pool.class);
         }
       }
       else if (this.cascadeType.equals(CascadeType.ALL)) {
         if (l != null) {
           poolDAO.save(l);
-          Cache pc = cacheManager.getCache("poolCache");
-          pc.remove(DbUtils.hashCodeCacheKeyFor(l.getId()));
+          //Cache pc = cacheManager.getCache("poolCache");
+          //pc.remove(DbUtils.hashCodeCacheKeyFor(l.getId()));
+          DbUtils.updateCaches(cacheManager, l, Pool.class);
         }
       }
     }
@@ -207,8 +209,9 @@ public class SQLPoolQCDAO implements PoolQcStore {
       }
       else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (l != null) {
-          Cache pc = cacheManager.getCache("poolCache");
-          pc.remove(DbUtils.hashCodeCacheKeyFor(l.getId()));
+          //Cache pc = cacheManager.getCache("poolCache");
+          //pc.remove(DbUtils.hashCodeCacheKeyFor(l.getId()));
+          DbUtils.updateCaches(cacheManager, l, Pool.class);
         }
       }
       return true;

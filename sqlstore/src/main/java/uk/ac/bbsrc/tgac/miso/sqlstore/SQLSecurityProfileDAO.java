@@ -109,7 +109,7 @@ public class SQLSecurityProfileDAO implements Store<SecurityProfile> {
   }
 
   @Transactional(readOnly = false, rollbackFor = IOException.class)
-  @TriggersRemove(cacheName="securityProfileCache",
+  @TriggersRemove(cacheName={"securityProfileCache"},
                   keyGenerator = @KeyGenerator(
                           name = "HashCodeCacheKeyGenerator",
                           properties = {

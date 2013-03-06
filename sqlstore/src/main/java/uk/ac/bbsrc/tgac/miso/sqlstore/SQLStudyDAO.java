@@ -191,19 +191,7 @@ public class SQLStudyDAO implements StudyStore {
 
   private void purgeListCache(Study s, boolean replace) {
     Cache cache = cacheManager.getCache("studyListCache");
-    if (cache.getKeys().size() > 0) {
-      Object cachekey = cache.getKeys().get(0);
-      List<Study> c = (List<Study>)cache.get(cachekey).getValue();
-      if (c.remove(s)) {
-        if (replace) {
-          c.add(s);
-        }
-      }
-      else {
-        c.add(s);
-      }
-      cache.put(new Element(cachekey, c));
-    }
+    DbUtils.updateListCache(cache, replace, s, Study.class);
   }
 
   private void purgeListCache(Study s) {
@@ -211,7 +199,7 @@ public class SQLStudyDAO implements StudyStore {
   }
 
   @Transactional(readOnly = false, rollbackFor = IOException.class)
-  @TriggersRemove(cacheName="studyCache",
+  @TriggersRemove(cacheName={"studyCache", "lazyStudyCache"},
                   keyGenerator = @KeyGenerator(
                           name = "HashCodeCacheKeyGenerator",
                           properties = {
@@ -314,12 +302,13 @@ public class SQLStudyDAO implements StudyStore {
       }
       else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (p != null) {
-          Cache pc = cacheManager.getCache("projectCache");
-          pc.remove(DbUtils.hashCodeCacheKeyFor(p.getProjectId()));
+          //Cache pc = cacheManager.getCache("projectCache");
+          //pc.remove(DbUtils.hashCodeCacheKeyFor(p.getProjectId()));
+          DbUtils.updateCaches(cacheManager, p, Project.class);
         }
-
-        purgeListCache(study);
       }
+
+      purgeListCache(study);
     }
 
     return study.getId();
@@ -354,7 +343,7 @@ public class SQLStudyDAO implements StudyStore {
 
   @Transactional(readOnly = false, rollbackFor = IOException.class)
   @TriggersRemove(
-          cacheName="studyCache",
+          cacheName={"studyCache", "lazyStudyCache"},
           keyGenerator = @KeyGenerator (
               name = "HashCodeCacheKeyGenerator",
               properties = {
@@ -374,11 +363,14 @@ public class SQLStudyDAO implements StudyStore {
       }
       else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (p != null) {
-          Cache pc = cacheManager.getCache("projectCache");
-          pc.remove(DbUtils.hashCodeCacheKeyFor(p.getProjectId()));
+          //Cache pc = cacheManager.getCache("projectCache");
+          //pc.remove(DbUtils.hashCodeCacheKeyFor(p.getProjectId()));
+          DbUtils.updateCaches(cacheManager, p, Project.class);
         }
-        purgeListCache(study, false);
       }
+
+      purgeListCache(study, false);
+
       return true;
     }
     return false;

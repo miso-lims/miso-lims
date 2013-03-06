@@ -303,19 +303,7 @@ public class SQLLibraryDAO implements LibraryStore {
 
   private void purgeListCache(Library l, boolean replace) {
     Cache cache = cacheManager.getCache("libraryListCache");
-    if (cache.getKeys().size() > 0) {
-      Object cachekey = cache.getKeys().get(0);
-      List<Library> c = (List<Library>)cache.get(cachekey).getValue();
-      if (c.remove(l)) {
-        if (replace) {
-          c.add(l);
-        }
-      }
-      else {
-        c.add(l);
-      }
-      cache.put(new Element(cachekey, c));
-    }
+    DbUtils.updateListCache(cache, replace, l, Library.class);
   }
 
   private void purgeListCache(Library l) {
@@ -323,7 +311,7 @@ public class SQLLibraryDAO implements LibraryStore {
   }
 
   @Transactional(readOnly = false, rollbackFor = Exception.class)
-  @TriggersRemove(cacheName = "libraryCache",
+  @TriggersRemove(cacheName = {"libraryCache", "lazyLibraryCache"},
                   keyGenerator = @KeyGenerator(
                           name = "HashCodeCacheKeyGenerator",
                           properties = {
@@ -463,15 +451,17 @@ public class SQLLibraryDAO implements LibraryStore {
         sampleDAO.save(library.getSample());
       }
       else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-        Cache poolCache = cacheManager.getCache("poolCache");
+        //Cache poolCache = cacheManager.getCache("poolCache");
         for (Pool p : poolDAO.listByLibraryId(library.getId())) {
-          poolCache.remove(DbUtils.hashCodeCacheKeyFor(p.getId()));
+          //poolCache.remove(DbUtils.hashCodeCacheKeyFor(p.getId()));
+          DbUtils.updateCaches(cacheManager, p, Pool.class);
         }
 
-        Cache sampleCache = cacheManager.getCache("sampleCache");
-        if (library.getSample() != null) sampleCache.remove(DbUtils.hashCodeCacheKeyFor(library.getSample().getId()));
-
-        purgeListCache(library);
+        //Cache sampleCache = cacheManager.getCache("sampleCache");
+        if (library.getSample() != null) {
+          //sampleCache.remove(DbUtils.hashCodeCacheKeyFor(library.getSample().getId()));
+          DbUtils.updateCaches(cacheManager, library.getSample(), Sample.class);
+        }
       }
 
       if (!library.getNotes().isEmpty()) {
@@ -479,6 +469,8 @@ public class SQLLibraryDAO implements LibraryStore {
           noteDAO.saveLibraryNote(library, n);
         }
       }
+
+      purgeListCache(library);
     }
 
     return library.getId();
@@ -564,7 +556,7 @@ public class SQLLibraryDAO implements LibraryStore {
 
   @Transactional(readOnly = false, rollbackFor = IOException.class)
   @TriggersRemove(
-          cacheName="libraryCache",
+          cacheName = {"libraryCache", "lazyLibraryCache"},
           keyGenerator = @KeyGenerator (
               name = "HashCodeCacheKeyGenerator",
               properties = {
@@ -579,22 +571,31 @@ public class SQLLibraryDAO implements LibraryStore {
            (namedTemplate.update(LIBRARY_DELETE,
                             new MapSqlParameterSource().addValue("libraryId", library.getId())) == 1)) {
       if (this.cascadeType.equals(CascadeType.PERSIST)) {
-        if (!poolDAO.listByLibraryId(library.getId()).isEmpty()) {
-          DbUtils.flushCache(cacheManager, "poolCache");
+//        if (!poolDAO.listByLibraryId(library.getId()).isEmpty()) {
+          //DbUtils.flushCache(cacheManager, "poolCache");
+//        }
+        for (Pool p : poolDAO.listByLibraryId(library.getId())) {
+          //poolCache.remove(DbUtils.hashCodeCacheKeyFor(p.getId()));
+          DbUtils.updateCaches(cacheManager, p, Pool.class);
         }
         sampleDAO.save(library.getSample());
       }
       else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-        Cache poolCache = cacheManager.getCache("poolCache");
+        //Cache poolCache = cacheManager.getCache("poolCache");
         for (Pool p : poolDAO.listByLibraryId(library.getId())) {
-          poolCache.remove(DbUtils.hashCodeCacheKeyFor(p.getId()));
+          //poolCache.remove(DbUtils.hashCodeCacheKeyFor(p.getId()));
+          DbUtils.updateCaches(cacheManager, p, Pool.class);
         }
 
-        Cache sampleCache = cacheManager.getCache("sampleCache");
-        if (library.getSample() != null) sampleCache.remove(DbUtils.hashCodeCacheKeyFor(library.getSample().getId()));
-
-        purgeListCache(library, false);
+        //Cache sampleCache = cacheManager.getCache("sampleCache");
+        if (library.getSample() != null) {
+          //sampleCache.remove(DbUtils.hashCodeCacheKeyFor(library.getSample().getId()));
+          DbUtils.updateCaches(cacheManager, library.getSample(), Sample.class);
+        }
       }
+
+      purgeListCache(library, false);
+
       return true;
     }
     return false;
