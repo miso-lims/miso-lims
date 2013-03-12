@@ -182,7 +182,7 @@ public class SubmissionImpl implements Submission<Submittable, Document, Documen
         submittables.add(s);
     }
     else {
-      log.info(s.getClass().getSimpleName() + " already exists in the Submission payload. Not adding.");
+      log.debug(s.getClass().getSimpleName() + " already exists in the Submission payload. Not adding.");
     }
   }
 

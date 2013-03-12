@@ -420,12 +420,9 @@ public class SubmissionControllerHelperService {
       if (json.has("projectId") && !json.get("projectId").equals("")) {
         StringBuilder sb = new StringBuilder();
         Long projectId = json.getLong("projectId");
-        Collection<LibraryDilution> projectDilutions = requestManager.listAllLibraryDilutionsByProjectId(projectId);
 
         Project p = requestManager.getProjectById(projectId);
-        Collection<Study> studies = requestManager.listAllStudiesByProjectId(p.getProjectId());
-        p.setStudies(studies);
-        for (Study s : studies) {
+        for (Study s : p.getStudies()) {
           Collection<Experiment> experiments = requestManager.listAllExperimentsByStudyId(s.getId());
           s.setExperiments(experiments);
         }
@@ -483,7 +480,7 @@ public class SubmissionControllerHelperService {
 
                     //creates HTML for list of library dilutions and corresponding datafiles.
                     //gets all the dilutions in that partition's pool.
-                    Collection<? extends Dilution> libraryDilutions = part.getPool().getDilutions();
+                    Collection<? extends Poolable> poolables = part.getPool().getPoolableElements();
 
                     FilePathGenerator fpg = filePathGeneratorResolverService.getFilePathGenerator(r.getPlatformType());
                     if (fpg == null) {
@@ -493,7 +490,7 @@ public class SubmissionControllerHelperService {
 
                     sb.append("<ul>");
 
-                    for (Dilution d : libraryDilutions) {
+                    for (Poolable d : poolables) {
                       sb.append("<li><input type='checkbox'  name='DIL_" + d.getId() + "' id='DIL" + d.getId() + "_PAR" + part.getId() + "' value='PAR_" + part.getId() + "' ");
 
                       if (sub != null && sub.getSubmissionElements().contains(part)) {
@@ -501,21 +498,48 @@ public class SubmissionControllerHelperService {
                         for (Object o : sub.getSubmissionElements()) {
                           if (o.equals(part)) {
                             SequencerPoolPartition subPart = (SequencerPoolPartition) o;
-                            for (Dilution bla : subPart.getPool().getDilutions()) {
-                              if (bla.getId() == d.getId()) {
+                            for (Poolable bla : subPart.getPool().getPoolableElements()) {
+                              if (bla.getClass().equals(d.getClass()) && bla.getId() == d.getId()) {
                                 sb.append(" checked='checked' ");
                               }
                             }
                           }
                         }
                       }
-                      sb.append(">" + partitionContainer.getId() + "_" + d.getLibrary().getName() + "_" + d.getName() + ": ");
-                      sb.append("<ul>");
-                      for (File f : fpg.generateFilePath(part, d)) {
-                        sb.append("<li>" + f.getName() + "</li>");
+
+                      if (d instanceof Dilution) {
+                        sb.append(">" + partitionContainer.getId() + "_" + ((Dilution)d).getLibrary().getName() + "_" + d.getName() + ": ");
+                        sb.append("<ul>");
+                        try {
+                          for (File f : fpg.generateFilePath(part, (Dilution)d)) {
+                            sb.append("<li>" + f.getName() + "</li>");
+                          }
+                        }
+                        catch (SubmissionException e1) {
+                          log.debug("Failed to generate path for data file in submission: ", e1);
+                          e1.printStackTrace();
+                          return JSONUtils.SimpleJSONError("Failed to populate project for submission");
+                        }
+                        sb.append("</ul>");
                       }
-                      //end filepaths
-                      sb.append("</ul>");
+                      else if (d instanceof Plate) {
+                        sb.append(">" + partitionContainer.getId() + "_" + d.getName() + ": ");
+                        /*
+                        sb.append("<ul>");
+                        try {
+                          for (File f : fpg.generateFilePath(part, (Plate)d)) {
+                            sb.append("<li>" + f.getName() + "</li>");
+                          }
+                        }
+                        catch (SubmissionException e1) {
+                          log.debug("Failed to generate path for data file in submission: ", e1);
+                          e1.printStackTrace();
+                          return JSONUtils.SimpleJSONError("Failed to populate project for submission");
+                        }
+                        sb.append("</ul>");
+                        */
+                      }
+
                       sb.append("</li>");
                     }
                      //end dilutions
@@ -539,11 +563,6 @@ public class SubmissionControllerHelperService {
         }
         return JSONUtils.JSONObjectResponse("html", sb.toString());
       }
-    }
-    catch (SubmissionException e) {
-      log.debug("Failed to generate path for data file in submission: ", e);
-      e.printStackTrace();
-      return JSONUtils.SimpleJSONError("Failed to populate project for submission");
     }
     catch (IOException e) {
       log.debug("Failed to populate project for submission: ", e);

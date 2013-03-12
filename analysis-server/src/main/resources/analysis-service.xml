@@ -37,6 +37,7 @@
         <value>classpath:analysis.properties</value>
       </list>
     </property>
+    <property name="ignoreResourceNotFound" value="true"/>
   </bean>
 
   <bean name="analysisRequestService" class="uk.ac.bbsrc.tgac.miso.analysis.service.AnalysisRequestService">

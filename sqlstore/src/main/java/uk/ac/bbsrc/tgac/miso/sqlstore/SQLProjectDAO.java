@@ -619,7 +619,7 @@ public class SQLProjectDAO implements ProjectStore {
         if (isCacheEnabled() && lookupCache(cacheManager) != null) {
           Element element;
           if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
-            log.info("Cache hit on map for Project " + id);
+            log.debug("Cache hit on map for Project " + id);
             return (Project)element.getObjectValue();
           }
         }

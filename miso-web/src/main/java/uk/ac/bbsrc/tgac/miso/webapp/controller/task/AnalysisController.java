@@ -137,6 +137,8 @@ public class AnalysisController {
 
       map.put("sample-sheet-string", RunProcessingUtils.buildIlluminaDemultiplexCSV(run, f, "1.8.2", user.getFullName()).replaceAll("\n", "\\\n"));
 
+      map.put("username", user.getLoginName());
+
       model.put("defaultRunValues", map);
 
       List<String> pipelineNames = new ArrayList<String>();
