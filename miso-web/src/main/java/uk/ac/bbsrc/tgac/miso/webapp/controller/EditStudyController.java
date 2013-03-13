@@ -49,6 +49,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 @Controller
@@ -173,6 +174,7 @@ public class EditStudyController {
         study.setProject(project);
         if (Arrays.asList(user.getRoles()).contains("ROLE_TECH")) {
             SecurityProfile sp = new SecurityProfile(user);
+            LimsUtils.inheritUsersAndGroups(study, project.getSecurityProfile());
             study.setSecurityProfile(sp);
         } else {
             study.inheritPermissions(project);

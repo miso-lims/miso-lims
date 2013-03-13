@@ -89,7 +89,12 @@ public abstract class AbstractPartition implements Partition {
   }
 
   public void inheritPermissions(SecurableByProfile parent) throws SecurityException {
-    setSecurityProfile(parent.getSecurityProfile());
+    if (parent.getSecurityProfile().getOwner() != null) {
+      setSecurityProfile(parent.getSecurityProfile());
+    }
+    else {
+      throw new SecurityException("Cannot inherit permissions when parent object owner is not set!");
+    }
   }  
 
   public abstract void buildSubmission();

@@ -51,6 +51,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.solid.SolidPool;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 @Controller
@@ -187,6 +188,7 @@ public class EditExperimentController {
             experiment.setStudy(study);
             if (Arrays.asList(user.getRoles()).contains("ROLE_TECH")) {
                 SecurityProfile sp = new SecurityProfile(user);
+                LimsUtils.inheritUsersAndGroups(experiment, study.getSecurityProfile());
                 experiment.setSecurityProfile(sp);
             } else {
                 experiment.inheritPermissions(study);

@@ -1173,9 +1173,90 @@
 
 <script type="text/javascript">
 jQuery(document).ready(function () {
-    //remove any overlays
+  /*
+    remove any overlays
     jQuery.colorbox.remove();
+    jQuery("#sample_table").tablesorter({
+                                            sortList: [
+                                                [1, 0]
+                                            ],
+                                            headers: {
+                                                1: {
+                                                    sorter: 'digit'
+                                                },
 
+                                                2: {
+                                                    sorter: false
+                                                },
+                                                3: {
+                                                    sorter: false
+                                                },
+                                                4: {
+                                                    sorter: false
+                                                },
+                                                5: {
+                                                    sorter: false
+                                                },
+                                                6: {
+                                                    sorter: false
+                                                },
+                                                7: {
+                                                    sorter: false
+                                                }
+                                            }
+                                        });
+    jQuery("#library_table").tablesorter({
+                                             sortList: [
+                                                 [1, 0]
+                                             ],
+                                             headers: {
+                                                 1: {
+                                                     sorter: 'digit'
+                                                 },
+                                                 2: {
+                                                     sorter: false
+                                                 },
+                                                 3: {
+                                                     sorter: false
+                                                 },
+                                                 4: {
+                                                     sorter: false
+                                                 },
+                                                 5: {
+                                                     sorter: false
+                                                 },
+                                                 6: {
+                                                     sorter: false
+                                                 },
+                                                 7: {
+                                                     sorter: false
+                                                 },
+                                                 8: {
+                                                     sorter: false
+                                                 },
+                                                 9: {
+                                                     sorter: false
+                                                 }
+                                             }
+                                         });
+    */
+    jQuery("#librarydils_table").tablesorter({
+                                                 headers: {
+                                                     6: {
+                                                         sorter: false
+                                                     },
+                                                     7: {
+                                                         sorter: false
+                                                     }
+                                                 }
+                                             });
+    jQuery("#librarydils_table").tablesorter({
+                                                 headers: {
+                                                     4: {
+                                                         sorter: false
+                                                     }
+                                                 }
+                                             });
     jQuery('#alias')
             .simplyCountable({
                                  counter: '#aliascounter',

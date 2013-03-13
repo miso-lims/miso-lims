@@ -108,7 +108,7 @@ public class AnalysisController {
       map.put("basecall-path", run.getFilePath()+"/Data/Intensities/BaseCalls");
       map.put("fastq-path", run.getFilePath()+"/Data/Intensities/BaseCalls/PAP");
       map.put("makefile-path", run.getFilePath()+"/Data/Intensities/BaseCalls/PAP/Makefile");
-      map.put("sample-sheet-path", run.getFilePath()+"/Data/Intensities/BaseCalls/SampleSheet.csv");
+      map.put("sample-sheet-path", run.getFilePath()+"/Data/Intensities/BaseCalls/SampleSheet-pap.csv");
       map.put("instrument-id", run.getSequencerReference().getName());
 
       if ("Illumina MiSeq".equals(run.getSequencerReference().getPlatform().getInstrumentModel())) {
@@ -137,7 +137,11 @@ public class AnalysisController {
 
       map.put("sample-sheet-string", RunProcessingUtils.buildIlluminaDemultiplexCSV(run, f, "1.8.2", user.getFullName()).replaceAll("\n", "\\\n"));
 
+      map.put("contaminant-list", "phix_174,ecoli,xanthomonas_campestris");
+
       map.put("username", user.getLoginName());
+
+      map.put("paired-end", String.valueOf(run.getPairedEnd()));
 
       model.put("defaultRunValues", map);
 

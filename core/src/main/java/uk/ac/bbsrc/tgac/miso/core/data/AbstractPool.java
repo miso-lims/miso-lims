@@ -127,17 +127,19 @@ public abstract class AbstractPool<P extends Poolable> implements Pool<P> {
   @JsonDeserialize(using = PooledElementDeserializer.class)
   public <T extends Poolable> void setPoolableElements(Collection<T> poolables) {
     this.pooledElements.clear();
-    for (T poolable : poolables) {
-      if (poolable != null) {
-        if (poolable instanceof Poolable) {
-          this.pooledElements.add((P)poolable);
+    if (poolables != null && !poolables.isEmpty()) {
+      for (T poolable : poolables) {
+        if (poolable != null) {
+          if (poolable instanceof Poolable) {
+            this.pooledElements.add((P)poolable);
+          }
+          else {
+            log.error(poolable.getClass().getName());
+          }
         }
         else {
-          log.error(poolable.getClass().getName());
+          log.error("Null poolable");
         }
-      }
-      else {
-        log.error("Null poolable");
       }
     }
   }
@@ -278,8 +280,13 @@ public abstract class AbstractPool<P extends Poolable> implements Pool<P> {
   }
 
   public void inheritPermissions(SecurableByProfile parent) throws SecurityException {
-    setSecurityProfile(parent.getSecurityProfile());
-  }  
+    if (parent.getSecurityProfile().getOwner() != null) {
+      setSecurityProfile(parent.getSecurityProfile());
+    }
+    else {
+      throw new SecurityException("Cannot inherit permissions when parent object owner is not set!");
+    }
+  }
 
   @Override
   public Set<MisoListener> getListeners() {

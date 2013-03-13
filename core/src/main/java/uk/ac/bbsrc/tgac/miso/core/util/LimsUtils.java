@@ -23,8 +23,10 @@
 
 package uk.ac.bbsrc.tgac.miso.core.util;
 
+import com.eaglegenomics.simlims.core.SecurityProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 import java.io.*;
 import java.lang.reflect.Field;
@@ -707,5 +709,13 @@ public class LimsUtils {
       cls = cls.getSuperclass();
     }
     return list;
+  }
+
+  public static void inheritUsersAndGroups(SecurableByProfile child, SecurityProfile parentProfile) {
+    SecurityProfile childProfile = child.getSecurityProfile();
+    childProfile.setReadGroups(parentProfile.getReadGroups());
+    childProfile.setWriteGroups(parentProfile.getWriteGroups());
+    childProfile.setReadUsers(parentProfile.getReadUsers());
+    childProfile.setWriteUsers(parentProfile.getWriteUsers());
   }
 }

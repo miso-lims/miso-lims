@@ -188,8 +188,13 @@ public class emPCR implements SecurableByProfile, Comparable, Deletable, Nameabl
   }
 
   public void inheritPermissions(SecurableByProfile parent) throws SecurityException {
-    setSecurityProfile(parent.getSecurityProfile());
-  }  
+    if (parent.getSecurityProfile().getOwner() != null) {
+      setSecurityProfile(parent.getSecurityProfile());
+    }
+    else {
+      throw new SecurityException("Cannot inherit permissions when parent object owner is not set!");
+    }
+  }
 
   public boolean userCanRead(User user) {
     return securityProfile.userCanRead(user);

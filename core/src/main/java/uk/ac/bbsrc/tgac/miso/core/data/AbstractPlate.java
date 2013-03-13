@@ -210,7 +210,12 @@ public abstract class AbstractPlate<T extends List<S>, S extends Plateable> impl
 
   @Override
   public void inheritPermissions(SecurableByProfile parent) throws SecurityException {
-    setSecurityProfile(parent.getSecurityProfile());
+    if (parent.getSecurityProfile().getOwner() != null) {
+      setSecurityProfile(parent.getSecurityProfile());
+    }
+    else {
+      throw new SecurityException("Cannot inherit permissions when parent object owner is not set!");
+    }
   }
 
   @Override
