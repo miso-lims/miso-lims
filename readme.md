@@ -91,6 +91,10 @@ to deploy MISO. Once Tomcat has been installed, download the latest MISO WAR fil
 
 https://repos.tgac.bbsrc.ac.uk/miso/latest/ROOT.war
 
+If you're the thrill-seeking type, nightly builds which are "bleeding edge" can be found here:
+
+https://repos.tgac.bbsrc.ac.uk/miso/nightly/ROOT-<version>_<buildNumber>_<revision>.war
+
 Copy this file to your `<tomcat-install>/webapps/` directory. DO NOT START TOMCAT YET. Instead, follow the configuration steps below.
 
 4 ) CONFIGURATION
