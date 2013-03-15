@@ -20,7 +20,7 @@ MISO: An open source LIMS for small-to-large scale sequencing centres
 > 
 > You can follow MISO development on Twitter: @misolims (https://twitter.com/misolims), @froggleston (https://twitter.com/froggleston)
 
-VERSION 0.1.9 (Flourine)
+VERSION 0.2.0-SNAPSHOT (Neon)
 
 1) BUILDING
 -----------
