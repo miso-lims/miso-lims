@@ -190,6 +190,11 @@ public class ContainerControllerHelperService {
         lf.setPartitionLimit(1);
         lf.initEmptyPartitions();
       }
+      else if ("Illumina HiSeq 2500".equals(sr.getPlatform().getInstrumentModel())) {
+        b.append("<input id='lane2' name='container0Select' onchange='Container.ui.changeContainerIlluminaLane(this, 0);' type='radio' value='2'/>2 ");
+        b.append("<input id='lane8' name='container0Select' onchange='Container.ui.changeContainerIlluminaLane(this, 0);' type='radio' value='8'/>8 ");
+        b.append("<div id='containerdiv0'> </div>");
+      }
       else {
         b.append("<i class='italicInfo'>Click in a partition box to beep/type in barcodes, or double click a pool on the right to sequentially add pools to the container</i>");
         b.append("<table class='in'>");
@@ -337,6 +342,32 @@ public class ContainerControllerHelperService {
       }
     }
     return JSONUtils.SimpleJSONError("No platform specified");
+  }
+
+  public JSONObject changeIlluminaLane(HttpSession session, JSONObject json) {
+    int numLanes = json.getInt("numLanes");
+    int container = json.getInt("container");
+    StringBuilder b = new StringBuilder();
+    b.append("<i class='italicInfo'>Click in a partition box to beep/type in barcodes, or double click a pool on the right to sequentially add pools to the container</i>");
+    b.append("<table class='in'>");
+    b.append("<th>Lane No.</th>");
+    b.append("<th>Pool</th>");
+
+    SequencerPartitionContainer<SequencerPoolPartition> lf =
+            (SequencerPartitionContainer<SequencerPoolPartition>) session.getAttribute("container_" + json.getString("container_cId"));
+    lf.setPartitionLimit(numLanes);
+    lf.initEmptyPartitions();
+    session.setAttribute("container_" + json.getString("container_cId"), lf);
+
+    for (int i = 0; i < numLanes; i++) {
+      b.append("<tr><td>" + (i + 1) + "</td>");
+      b.append("<td width='90%'><div id='p_div_" + container + "-" + i + "' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='partitions[" + i + "].pool' partition='" + i + "' ondblclick='Container.partition.populatePartition(this);'>");
+      b.append("</ul></div></td>");
+      b.append("</tr>");
+    }
+    b.append("</table>");
+
+    return JSONUtils.SimpleJSONResponse(b.toString());
   }
 
   public JSONObject changeLS454Chamber(HttpSession session, JSONObject json) {

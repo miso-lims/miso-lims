@@ -233,6 +233,14 @@ Run.ui = {
     );
   },
 
+  changeIlluminaLane: function (t, container) {
+    Fluxion.doAjax(
+            'runControllerHelperService',
+            'changeIlluminaLane',
+            {'platform': 'Illumina', 'run_cId': jQuery('input[name=run_cId]').val(), 'numLanes': jQuery(t).val(), 'container': container, 'url': ajaxurl},
+            {'updateElement': 'containerdiv' + container});
+  },
+
   changeLS454Chamber: function (t, container) {
     Fluxion.doAjax(
             'runControllerHelperService',

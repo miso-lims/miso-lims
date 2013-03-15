@@ -115,6 +115,14 @@ Container.ui = {
       {'updateElement':'containerdiv'});
   },
 
+  changeContainerIlluminaLane : function(t, container) {
+    Fluxion.doAjax(
+      'containerControllerHelperService',
+      'changeIlluminaLane',
+      {'platform':'Illumina', 'container_cId':jQuery('input[name=container_cId]').val(), 'numLanes':jQuery(t).val(), 'container':container, 'url':ajaxurl},
+      {'updateElement':'containerdiv'+container});
+  },
+
   changeContainerLS454Chamber : function(t, container) {
     Fluxion.doAjax(
       'containerControllerHelperService',

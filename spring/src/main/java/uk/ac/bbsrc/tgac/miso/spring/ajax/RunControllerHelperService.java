@@ -257,6 +257,22 @@ public class RunControllerHelperService {
       f.initEmptyPartitions();
       run.addSequencerPartitionContainer(f);
     }
+    else if ("Illumina HiSeq 2500".equals(run.getSequencerReference().getPlatform().getInstrumentModel())) {
+      b.append("<h2>Container 1</h2>");
+      b.append("<table class='in'>");
+      b.append("<tr><td>ID:</td><td><button onclick='Run.container.lookupContainer(this, 0);' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'><input type='text' id='sequencerPartitionContainers[0].identificationBarcode' name='sequencerPartitionContainers[0].identificationBarcode'/></div></td></tr>");
+      b.append("<tr><td>Location:</td><td><input type='text' id='sequencerPartitionContainers[0].locationBarcode' name='sequencerPartitionContainers[0].locationBarcode'/></td></tr>");
+      b.append("<tr><td>Paired:</td><td><input type='checkbox' id='sequencerPartitionContainers[0].paired' name='sequencerPartitionContainers[0].paired' value='false'/></td></tr>");
+      b.append("</table>");
+      b.append("<div id='partitionErrorDiv'> </div>");
+      b.append("<div id='partitionDiv'>");
+      b.append("<input id='lane2' name='container0Select' onchange='Run.ui.changeIlluminaLane(this, 0);' type='radio' value='2'/>2 ");
+      b.append("<input id='lane8' name='container0Select' onchange='Run.ui.changeIlluminaLane(this, 0);' type='radio' value='8'/>8 ");
+      b.append("<div id='containerdiv0'> </div>");
+
+      SequencerPartitionContainer<SequencerPoolPartition> f = dataObjectFactory.getSequencerPartitionContainer();
+      run.addSequencerPartitionContainer(f);
+    }
     else {
       int numContainers = json.getInt("numContainers");
       run.getSequencerPartitionContainers().clear();
@@ -289,6 +305,29 @@ public class RunControllerHelperService {
         run.addSequencerPartitionContainer(f);
       }
     }
+    return JSONUtils.SimpleJSONResponse(b.toString());
+  }
+
+  public JSONObject changeIlluminaLane(HttpSession session, JSONObject json) {
+    int numLanes = json.getInt("numLanes");
+    int container = json.getInt("container");
+    StringBuilder b = new StringBuilder();
+    b.append("<table class='in'>");
+    b.append("<th>Lane No.</th>");
+    b.append("<th>Pool</th>");
+
+    IlluminaRun run = (IlluminaRun) session.getAttribute("run_" + json.getString("run_cId"));
+    SequencerPartitionContainer<SequencerPoolPartition> f = run.getSequencerPartitionContainers().get(container);
+    f.setPartitionLimit(numLanes);
+    f.initEmptyPartitions();
+
+    for (int i = 0; i < numLanes; i++) {
+      b.append("<tr><td>" + (i + 1) + "</td>");
+      b.append("<td width='90%'><div id='p_div_" + container + "-" + i + "' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + container + "].partitions[" + i + "].pool' partition='" + container + "_" + i + "'></ul></div></td>");
+      b.append("</tr>");
+    }
+    b.append("</table>");
+
     return JSONUtils.SimpleJSONResponse(b.toString());
   }
 
