@@ -256,7 +256,7 @@ public class SubmissionUtils {
    */
   public static void transform(File fromPath, Writer toWriter) throws TransformerException, IOException {
     Reader reader = bomCheck(fromPath);
-    TransformerFactory.newInstance().newTransformer().transform(new StreamSource(fromPath), new StreamResult(toWriter));
+    TransformerFactory.newInstance().newTransformer().transform(new StreamSource(reader), new StreamResult(toWriter));
   }
 
   /**
@@ -275,7 +275,8 @@ public class SubmissionUtils {
   private static char[] UTF32LE = {0xFF, 0xFE, 0x00, 0x00};
   private static char[] UTF16BE = {0xFE, 0xFF};
   private static char[] UTF16LE = {0xFF, 0xFE};
-  private static char[] UTF8 = {0xEF, 0xBB, 0xBF, '\uFEFF'};
+  private static char[] UTF8 = {0xEF, 0xBB, 0xBF};
+  private static char[] OTHER = {'\uFEFF'};
 
   private static Reader bomCheck(File fromPath) throws IOException {
     StreamSource bomcheck = new StreamSource(new FileReader(fromPath));
@@ -303,6 +304,9 @@ public class SubmissionUtils {
       return;
     }
     if (removeBOM(reader, UTF8)) {
+      return;
+    }
+    if (removeBOM(reader, OTHER)) {
       return;
     }
   }
