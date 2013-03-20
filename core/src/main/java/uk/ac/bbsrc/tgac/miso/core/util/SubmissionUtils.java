@@ -192,7 +192,15 @@ public class SubmissionUtils {
    *
    */
   public static void transform(InputStream in, Document toDocument) throws TransformerException {
-    TransformerFactory.newInstance().newTransformer().transform(new StreamSource(in), new DOMResult(toDocument));
+    Reader reader = new BufferedReader(new InputStreamReader(in));
+    try {
+      removeBOM(reader);
+      TransformerFactory.newInstance().newTransformer().transform(new StreamSource(in), new DOMResult(toDocument));
+    }
+    catch (Exception e) {
+      throw new TransformerException("Cannot remove byte-order-mark from XML file");
+    }
+
   }
 
   /**
@@ -204,7 +212,13 @@ public class SubmissionUtils {
    *
    */
   public static void transform(Reader reader, Document toDocument) throws TransformerException {
-    TransformerFactory.newInstance().newTransformer().transform(new StreamSource(reader), new DOMResult(toDocument));
+    try {
+      removeBOM(reader);
+      TransformerFactory.newInstance().newTransformer().transform(new StreamSource(reader), new DOMResult(toDocument));
+    }
+    catch (Exception e) {
+      throw new TransformerException("Cannot remove byte-order-mark from XML file");
+    }
   }
 
   /**
@@ -261,7 +275,7 @@ public class SubmissionUtils {
   private static char[] UTF32LE = {0xFF, 0xFE, 0x00, 0x00};
   private static char[] UTF16BE = {0xFE, 0xFF};
   private static char[] UTF16LE = {0xFF, 0xFE};
-  private static char[] UTF8 = {0xEF, 0xBB, 0xBF};
+  private static char[] UTF8 = {0xEF, 0xBB, 0xBF, '\uFEFF'};
 
   private static Reader bomCheck(File fromPath) throws IOException {
     StreamSource bomcheck = new StreamSource(new FileReader(fromPath));
