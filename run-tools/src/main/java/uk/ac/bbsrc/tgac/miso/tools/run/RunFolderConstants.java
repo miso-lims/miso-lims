@@ -33,8 +33,8 @@ package uk.ac.bbsrc.tgac.miso.tools.run;
  * @since 0.1.2
  */
 public interface RunFolderConstants {
-  String ILLUMINA_FOLDER_REGEX = ".*/[\\d]+_[A-z0-9]+_[\\d]+_[A-z0-9_\\+\\-]*";
-  String ILLUMINA_FOLDER_CAPTURE_REGEX = ".*/([\\d]+_[A-z0-9]+_[\\d]+_[A-z0-9_\\-\\+]*)/.*";
+  String ILLUMINA_FOLDER_REGEX = ".*/[\\d]+_[A-z0-9\\-]+_[\\d]+_[A-z0-9_\\+\\-]*";
+  String ILLUMINA_FOLDER_CAPTURE_REGEX = ".*/([\\d]+_[A-z0-9\\-]+_[\\d]+_[A-z0-9_\\-\\+]*)/.*";
 
   String SOLID_FOLDER_REGEX = ".*/[A-z0-9]+_[0-9]{8}_.*";
   String SOLID_FOLDER_CAPTURE_REGEX = ".*/([A-z0-9]+)_([0-9]{8})_(.*)/.*";
