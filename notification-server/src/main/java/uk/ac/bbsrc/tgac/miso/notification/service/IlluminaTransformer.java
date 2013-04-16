@@ -422,16 +422,16 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
             }
           }
           catch (ParserConfigurationException e) {
-            //e.printStackTrace();
             log.error("Error configuring parser: " + e.getMessage());
+            e.printStackTrace();
           }
           catch (TransformerException e) {
-            //e.printStackTrace();
             log.error("Error transforming XML: " + e.getMessage());
+            e.printStackTrace();
           }
           catch (IOException e) {
-            //e.printStackTrace();
             log.error("Error with file IO: " + e.getMessage());
+            e.printStackTrace();
           }
         }
         else {
