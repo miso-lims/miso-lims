@@ -29,6 +29,7 @@ import org.w3c.dom.Node;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.UnicodeReader;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -62,7 +63,7 @@ public class SolidStatus extends StatusImpl {
   public void parseStatusXml(String statusXml) {
     try {
       Document statusDoc = SubmissionUtils.emptyDocument();
-      SubmissionUtils.transform(new StringReader(statusXml), statusDoc);
+      SubmissionUtils.transform(new UnicodeReader(statusXml), statusDoc);
       String runDirRegex = "([A-Za-z0-9]+)_([0-9]{8})_(.*)";
       Pattern runRegex = Pattern.compile(runDirRegex);
 

@@ -42,6 +42,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.mechanism.NotificationMessageConsumerMechanism;
 import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.UnicodeReader;
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationUtils;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -253,7 +254,7 @@ public class LS454NotificationMessageConsumerMechanism implements NotificationMe
                 if (run.has("runparams")) {
                   try {
                     Document paramsDoc = SubmissionUtils.emptyDocument();
-                    SubmissionUtils.transform(new StringReader(run.getString("runparams")), paramsDoc);
+                    SubmissionUtils.transform(new UnicodeReader(run.getString("runparams")), paramsDoc);
 
                     Element runInfo = (Element)paramsDoc.getElementsByTagName("run").item(0);
                     String runDesc = runInfo.getElementsByTagName("shortName").item(0).getTextContent();

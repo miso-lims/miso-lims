@@ -32,6 +32,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
 import uk.ac.bbsrc.tgac.miso.core.factory.submission.ERASubmissionFactory;
+import uk.ac.bbsrc.tgac.miso.core.util.UnicodeReader;
 
 import javax.persistence.*;
 import javax.xml.parsers.DocumentBuilder;
@@ -68,7 +69,7 @@ public class IlluminaRun extends RunImpl {
     try {
       Document statusDoc = SubmissionUtils.emptyDocument();
       if (statusXml != null && !"".equals(statusXml)) {
-        SubmissionUtils.transform(new StringReader(statusXml), statusDoc);
+        SubmissionUtils.transform(new UnicodeReader(statusXml), statusDoc);
 
         String runName = (statusDoc.getElementsByTagName("RunName").item(0).getTextContent());
         setPairedEnd(false);

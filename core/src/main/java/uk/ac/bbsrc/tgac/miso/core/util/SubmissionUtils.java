@@ -192,10 +192,11 @@ public class SubmissionUtils {
    *
    */
   public static void transform(InputStream in, Document toDocument) throws TransformerException {
-    Reader reader = new BufferedReader(new InputStreamReader(in));
+    //Reader reader = new BufferedReader(new InputStreamReader(in));
     try {
-      removeBOM(reader);
-      TransformerFactory.newInstance().newTransformer().transform(new StreamSource(in), new DOMResult(toDocument));
+      //removeBOM(reader);
+      Reader reader = bomCheck(in);
+      TransformerFactory.newInstance().newTransformer().transform(new StreamSource(reader), new DOMResult(toDocument));
     }
     catch (Exception e) {
       throw new TransformerException("Cannot remove byte-order-mark from XML file");
@@ -211,9 +212,8 @@ public class SubmissionUtils {
    * @throws javax.xml.transform.TransformerException
    *
    */
-  public static void transform(Reader reader, Document toDocument) throws TransformerException {
+  public static void transform(UnicodeReader reader, Document toDocument) throws TransformerException {
     try {
-      removeBOM(reader);
       TransformerFactory.newInstance().newTransformer().transform(new StreamSource(reader), new DOMResult(toDocument));
     }
     catch (Exception e) {
@@ -230,7 +230,8 @@ public class SubmissionUtils {
    * @throws java.io.IOException
    */
   public static void transform(String fromPath, Document toDocument) throws TransformerException, IOException {
-    Reader reader = bomCheck(new File(fromPath));
+    //Reader reader = bomCheck(new File(fromPath));
+    UnicodeReader reader = new UnicodeReader(new FileInputStream(new File(fromPath)), "UTF-8");
     SubmissionUtils.transform(reader, toDocument);
   }
 
@@ -278,7 +279,26 @@ public class SubmissionUtils {
   private static char[] UTF8 = {0xEF, 0xBB, 0xBF};
   private static char[] OTHER = {'\uFEFF'};
 
+  private static Reader bomCheck(InputStream in) throws IOException {
+    UnicodeBOMInputStream bomStream = new UnicodeBOMInputStream(in);
+    if (bomStream.getBOM() != UnicodeBOMInputStream.BOM.NONE) {
+      return new BufferedReader(new InputStreamReader(bomStream.skipBOM()));
+    }
+    else {
+      return new BufferedReader(new InputStreamReader(bomStream));
+    }
+  }
+
   private static Reader bomCheck(File fromPath) throws IOException {
+    UnicodeBOMInputStream bomStream = new UnicodeBOMInputStream(new FileInputStream(fromPath));
+    if (bomStream.getBOM() != UnicodeBOMInputStream.BOM.NONE) {
+      return new BufferedReader(new InputStreamReader(bomStream.skipBOM()));
+    }
+    else {
+      return new BufferedReader(new InputStreamReader(bomStream));
+    }
+
+    /*
     StreamSource bomcheck = new StreamSource(new FileReader(fromPath));
     Reader reader = new BufferedReader(bomcheck.getReader());
     try {
@@ -288,6 +308,7 @@ public class SubmissionUtils {
     catch (Exception e) {
       throw new IOException("Cannot remove byte-order-mark from XML file");
     }
+    */
   }
 
   private static void removeBOM(Reader reader) throws Exception {

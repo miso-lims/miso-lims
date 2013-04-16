@@ -140,6 +140,10 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
               r.setFilePath(run.getString("fullPath"));
             }
 
+            if (run.has("numCycles")) {
+              r.setCycles(Integer.parseInt(run.getString("numCycles")));
+            }
+
             SequencerReference sr = null;
             if (run.has("sequencerName")) {
               sr = requestManager.getSequencerReferenceByName(run.getString("sequencerName"));
@@ -205,6 +209,10 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
 
               is.setHealth(ht);
               r.setStatus(is);
+            }
+
+            if (run.has("numCycles")) {
+              r.setCycles(Integer.parseInt(run.getString("numCycles")));
             }
 
             if (r.getSequencerReference() == null) {

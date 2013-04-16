@@ -123,15 +123,19 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
 
                 int numReads = runInfoDoc.getElementsByTagName("Read").getLength();
                 int numCycles = 0;
+                int sumCycles = 0;
                 NodeList nl = runInfoDoc.getElementsByTagName("Read");
                 for (int i = 0; i < nl.getLength(); i++) {
                   Element e = (Element)nl.item(i);
                   if (!"".equals(e.getAttributeNS(null, "NumCycles"))) {
-                    numCycles += Integer.parseInt(e.getAttributeNS(null, "NumCycles"));
+                    sumCycles += Integer.parseInt(e.getAttributeNS(null, "NumCycles"));
+                    if (!"".equals(e.getAttributeNS(null, "IsIndexedRead")) && "N".equals(e.getAttributeNS(null, "IsIndexedRead"))) {
+                      numCycles = Integer.parseInt(e.getAttributeNS(null, "NumCycles"));
+                    }
                   }
                 }
 
-                lastCycleLogFile = new File(rootFile, "/Logs/"+runName+"_Cycle"+numCycles+"_Log.00.log");
+                lastCycleLogFile = new File(rootFile, "/Logs/"+runName+"_Cycle"+sumCycles+"_Log.00.log");
 
                 //int imgCycle = new Integer(statusDoc.getElementsByTagName("ImgCycle").item(0).getTextContent());
                 //int scoreCycle = new Integer(statusDoc.getElementsByTagName("ScoreCycle").item(0).getTextContent());

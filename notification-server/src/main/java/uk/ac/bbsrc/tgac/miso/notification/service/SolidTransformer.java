@@ -33,6 +33,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.integration.ws.solid.RunArray;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.ws.solid.SolidService;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.ws.solid.SolidServiceWrapper;
 import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.UnicodeReader;
 import uk.ac.bbsrc.tgac.miso.integration.context.ApplicationContextProvider;
 import uk.ac.bbsrc.tgac.miso.tools.run.util.FileSetTransformer;
 
@@ -92,7 +93,7 @@ public class SolidTransformer implements FileSetTransformer<String, String, File
               try {
                 String statusXml = ra.getItem().get(0).getXml();
                 Document statusDoc = SubmissionUtils.emptyDocument();
-                SubmissionUtils.transform(new StringReader(statusXml), statusDoc);
+                SubmissionUtils.transform(new UnicodeReader(statusXml), statusDoc);
 
                 run.put("runName", runName);
                 run.put("fullPath", rootFile.getAbsolutePath());
