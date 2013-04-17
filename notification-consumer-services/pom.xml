@@ -56,6 +56,11 @@
       <artifactId>integration-tools</artifactId>
       <version>${parent.version}</version>
     </dependency>
+    <dependency>
+      <groupId>${parent.groupId}</groupId>
+      <artifactId>run-tools</artifactId>
+      <version>${parent.version}</version>
+    </dependency>
 
     <dependency>
       <groupId>${parent.groupId}</groupId>
