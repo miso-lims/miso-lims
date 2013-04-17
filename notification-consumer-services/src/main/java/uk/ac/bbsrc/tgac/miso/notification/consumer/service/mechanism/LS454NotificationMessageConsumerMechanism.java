@@ -44,6 +44,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.integration.mechanism.NotificationMess
 import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.UnicodeReader;
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationUtils;
+import uk.ac.bbsrc.tgac.miso.tools.run.RunFolderConstants;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -76,6 +77,9 @@ public class LS454NotificationMessageConsumerMechanism implements NotificationMe
     this.attemptRunPopulation = attemptRunPopulation;
   }
 
+  private final String runDirRegex = RunFolderConstants.LS454_FOLDER_CAPTURE_REGEX;
+  private final Pattern p = Pattern.compile(runDirRegex);
+
   @Override
   public Set<Run> consume(Message<Map<String, List<String>>> message) throws InterrogationException {
     RequestManager requestManager = message.getHeaders().get("handler", RequestManager.class);
@@ -99,8 +103,6 @@ public class LS454NotificationMessageConsumerMechanism implements NotificationMe
 
     DateFormat gsLogDateFormat = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy");
     DateFormat startDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-
-    Pattern p = Pattern.compile("R_(\\d{4}_\\d{2}_\\d{2}_\\d{2}_\\d{2}_\\d{2})_([A-Za-z0-9]+)_([A-z0-9\\+\\-]*)");
 
     StringBuilder sb = new StringBuilder();
 

@@ -40,6 +40,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.mechanism.NotificationMessageConsumerMechanism;
+import uk.ac.bbsrc.tgac.miso.tools.run.RunFolderConstants;
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -67,7 +68,7 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
     this.attemptRunPopulation = attemptRunPopulation;
   }
 
-  private final String runDirRegex = "[\\d]+_([A-z0-9]+)_([\\d]+)_([A-z0-9_\\+\\-]*)";
+  private final String runDirRegex = RunFolderConstants.ILLUMINA_FOLDER_NAME_GROUP_CAPTURE_REGEX;
   private final Pattern p = Pattern.compile(runDirRegex);
   private final DateFormat logDateFormat = new SimpleDateFormat("MM'/'dd'/'yyyy','HH:mm:ss");
   private final DateFormat anotherLogDateFormat = new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH:mm:ss");

@@ -40,6 +40,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.mechanism.NotificationMessageConsumerMechanism;
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationUtils;
+import uk.ac.bbsrc.tgac.miso.tools.run.RunFolderConstants;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -69,7 +70,7 @@ public class PacBioNotificationMessageConsumerMechanism implements NotificationM
     this.attemptRunPopulation = attemptRunPopulation;
   }
 
-  private final String runDirRegex = "(\\d{4}_\\d{2}_\\d{2})_(.*)";
+  private final String runDirRegex = RunFolderConstants.PACBIO_FOLDER_NAME_GROUP_CAPTURE_REGEX;
   private final Pattern p = Pattern.compile(runDirRegex);
 
   @Override
