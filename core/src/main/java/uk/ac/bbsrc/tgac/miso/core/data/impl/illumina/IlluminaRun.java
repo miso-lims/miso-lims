@@ -81,7 +81,7 @@ public class IlluminaRun extends RunImpl {
           }
         }
 
-        String runDirRegex = "[\\d]+_([A-z0-9]\\-)+_([\\d])+_([A-z0-9_\\+\\-]*)";
+        String runDirRegex = "[\\d]+_([A-z0-9\\-])+_([\\d])+_([A-z0-9_\\+\\-]*)";
         Matcher m = Pattern.compile(runDirRegex).matcher(runName);
         if (m.matches()) {
           setPlatformRunId(Integer.parseInt(m.group(2)));
