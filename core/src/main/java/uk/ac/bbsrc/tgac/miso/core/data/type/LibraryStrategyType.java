@@ -44,7 +44,7 @@ public class LibraryStrategyType implements Comparable, Serializable {
   /** Field libraryStrategyTypeId  */
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long libraryStrategyTypeId = LibraryStrategyType.UNSAVED_ID;
+  private long libraryStrategyTypeId = LibraryStrategyType.UNSAVED_ID;
   /** Field name  */
   private String name;
   /** Field description  */

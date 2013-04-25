@@ -56,7 +56,7 @@ public class DefaultPrintService implements MisoPrintService<File, PrintContext<
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long serviceId = -1L;
+  private long serviceId = -1L;
 
   @Override
   public long getServiceId() {

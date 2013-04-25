@@ -51,7 +51,7 @@ public class SubmissionImpl implements Submission<Submittable, Document, Documen
 
   public static final Long UNSAVED_ID = 0L;
 
-  private Long submissionId = UNSAVED_ID;
+  private long submissionId = UNSAVED_ID;
   private String name;
   private String alias;
   private String accession;

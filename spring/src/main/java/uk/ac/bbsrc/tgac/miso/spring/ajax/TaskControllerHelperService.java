@@ -95,6 +95,17 @@ public class TaskControllerHelperService {
     }
   }
 
+  public JSONObject populateFailedTasks(HttpSession session, JSONObject json) {
+    try {
+      JSONObject j = new JSONObject();
+      j.put("failedTasks", getAnalysisQueryService().getFailedTasks());
+      return j;
+    }
+    catch (IntegrationException e) {
+      return JSONUtils.SimpleJSONError("Cannot populate running tasks: " + e.getMessage());
+    }
+  }
+
   public JSONObject populateCompletedTasks(HttpSession session, JSONObject json) {
     try {
       JSONObject j = new JSONObject();

@@ -141,7 +141,7 @@ public class RestSignatureFilter extends OncePerRequestFilter {
       else {
         validSignature = SignatureHelper.validateSignature(request,
                                                            SignatureHelper.generatePrivateUserKey(
-                                                             (user.getUserId() + "::" + user.getPassword())
+                                                             (user.getLoginName() + "::" + user.getPassword())
                                                                      .getBytes("UTF-8")),
                                                            signature);
       }

@@ -346,7 +346,7 @@ public class LimsDAO extends LimsDAOTestCase {
       TestCase.assertEquals("Wrong number of Pools", expected, actual);
       System.out.println("Expected number of Pools: " + expected + ", actual: " + actual);
 
-      for (Pool d : random(getPoolDAO(), actual, 5)) {
+      for (Pool d : random(getPoolDAO(), actual, 1)) {
         TestCase.assertNotNull(d);
         TestCase.assertNotNull(d.getId());
       }

@@ -22,9 +22,11 @@
   --%>
 <%@ include file="../header.jsp" %>
 <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.breadcrumbs.popup.js'/>"></script>
-<script src="<c:url value='/scripts/datatables_utils.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
+
 <script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
 <link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" type="text/css">
+
+<script src="<c:url value='/scripts/datatables_utils.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
 
 <div id="maincontent">
   <div id="contentcolumn">
@@ -100,7 +102,7 @@
         </td>
       </tr>
       <tr>
-        <td>Desired Concentration:</td>
+        <td>Concentration:</td>
         <td>
           <input type="text" id="concentration" name="concentration"/><br/>
         </td>
@@ -180,7 +182,7 @@
       <tr>
         <td width="50%" valign="top">
           <div class="simplebox ui-corner-all">
-            <h2>Available Dilutions</h2>
+            <h2>Available Poolables</h2>
             <button id="createPoolButton" onClick="createNewPool();"
                     class="fg-button ui-state-default ui-corner-all">Create New Pool
             </button>
@@ -263,7 +265,7 @@
 
   function createNewPool() {
     if (Utils.validation.isNullCheck(jQuery('#concentration').val())) {
-      alert('You have not entered a final desired concentration for the new pool');
+      alert('You have not entered a final concentration for the new pool');
     }
     else {
       jQuery('#createPoolButton').attr('disabled', 'disabled');
@@ -323,11 +325,19 @@
             "aTargets": [ 0 ]
           }
         ],
-        "bPaginate": false,
+        "aaSorting": [ [2,'asc'] ],
+        "aoColumns": [
+          null,
+          null,
+          { "sType": 'natural' },
+          { "sType": 'natural' },
+          { "sType": 'natural' },
+          { "sType": 'natural' }
+        ],
+        "iDisplayLength": 50,
         "bInfo": true,
         "bJQueryUI": true,
         "bAutoWidth": true,
-        "bSort": false,
         "bFilter": true,
         "sDom": '<<"toolbar">f>r<t>ip>'
       });

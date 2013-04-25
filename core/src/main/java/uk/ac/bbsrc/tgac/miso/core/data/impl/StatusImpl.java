@@ -46,7 +46,7 @@ public class StatusImpl implements Status, Serializable {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long statusId = StatusImpl.UNSAVED_ID;
+  private long statusId = StatusImpl.UNSAVED_ID;
 
   @Enumerated(EnumType.STRING)
   private HealthType health;

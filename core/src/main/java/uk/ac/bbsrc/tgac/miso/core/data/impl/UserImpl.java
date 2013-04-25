@@ -58,7 +58,7 @@ public class UserImpl implements User, Serializable, Comparable {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long userId = UserImpl.UNSAVED_ID;
+  private long userId = UserImpl.UNSAVED_ID;
   private String fullName = "";
   private String loginName = "";
   private String email = "";

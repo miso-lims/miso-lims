@@ -44,7 +44,7 @@ public class KitDescriptor implements Serializable {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long kitDescriptorId = KitDescriptor.UNSAVED_ID;
+  private long kitDescriptorId = KitDescriptor.UNSAVED_ID;
   private String name = "";
   private Double version = 0.0D;
   private String manufacturer = "";

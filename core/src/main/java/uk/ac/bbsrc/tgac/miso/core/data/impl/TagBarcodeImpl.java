@@ -46,7 +46,7 @@ public class TagBarcodeImpl implements TagBarcode, Serializable {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long tagBarcodeId = UNSAVED_ID;
+  private long tagBarcodeId = UNSAVED_ID;
 
   private static final long serialVersionUID = 1L;
   private String name;

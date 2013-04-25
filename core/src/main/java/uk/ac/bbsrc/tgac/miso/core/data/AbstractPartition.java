@@ -40,7 +40,7 @@ public abstract class AbstractPartition implements Partition {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long id = AbstractPartition.UNSAVED_ID;
+  private long id = AbstractPartition.UNSAVED_ID;
 
   @OneToOne(cascade = CascadeType.ALL)
   private SecurityProfile securityProfile = null;

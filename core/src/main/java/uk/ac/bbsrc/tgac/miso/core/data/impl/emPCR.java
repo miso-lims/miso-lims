@@ -53,7 +53,7 @@ public class emPCR implements SecurableByProfile, Comparable, Deletable, Nameabl
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long pcrId = emPCR.UNSAVED_ID;
+  private long pcrId = emPCR.UNSAVED_ID;
   private String pcrCreator;
   private String name;
   private Date creationDate;
@@ -194,7 +194,7 @@ public class emPCR implements SecurableByProfile, Comparable, Deletable, Nameabl
     else {
       throw new SecurityException("Cannot inherit permissions when parent object owner is not set!");
     }
-  }
+  }  
 
   public boolean userCanRead(User user) {
     return securityProfile.userCanRead(user);

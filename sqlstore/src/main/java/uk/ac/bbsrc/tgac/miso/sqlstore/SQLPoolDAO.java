@@ -445,7 +445,7 @@ public class SQLPoolDAO implements PoolStore {
       */
     }
 
-    log.info("Unlinking elements from pool " + pool.getId());
+    //log.info("Unlinking elements from pool " + pool.getId());
     MapSqlParameterSource delparams = new MapSqlParameterSource();
     delparams.addValue("pool_poolId", pool.getId());
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
@@ -461,7 +461,7 @@ public class SQLPoolDAO implements PoolStore {
       Cache ldc = cacheManager.getCache("lazy"+ type + "Cache");
 
       for (Poolable d : pool.getPoolableElements()) {
-        log.info("Linking "+d.getName() + " to " + pool.getName());
+        //log.debug("Linking "+d.getName() + " to " + pool.getName());
         MapSqlParameterSource esParams = new MapSqlParameterSource();
         esParams.addValue("elementId", d.getId())
                 .addValue("pool_poolId", pool.getId())
@@ -481,8 +481,10 @@ public class SQLPoolDAO implements PoolStore {
               dc = cacheManager.getCache("plateCache");
               ldc = cacheManager.getCache("lazyPlateCache");
             }
-            if (dc != null) dc.remove(DbUtils.hashCodeCacheKeyFor(d.getId()));
-            if (ldc != null) ldc.remove(DbUtils.hashCodeCacheKeyFor(d.getId()));
+            //if (dc != null) dc.remove(DbUtils.hashCodeCacheKeyFor(d.getId()));
+            //if (ldc != null) ldc.remove(DbUtils.hashCodeCacheKeyFor(d.getId()));
+            if (dc != null) DbUtils.updateCaches(cacheManager, d, Poolable.class);
+            if (ldc != null) DbUtils.updateCaches(cacheManager, d, Poolable.class);
           }
         }
       }
@@ -636,8 +638,15 @@ public class SQLPoolDAO implements PoolStore {
             }
           }
           else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-            if (dc != null) dc.remove(DbUtils.hashCodeCacheKeyFor(d.getId()));
-            if (ldc != null) ldc.remove(DbUtils.hashCodeCacheKeyFor(d.getId()));
+            if (d instanceof Plate) {
+              dc = cacheManager.getCache("plateCache");
+              ldc = cacheManager.getCache("lazyPlateCache");
+            }
+
+            //if (dc != null) dc.remove(DbUtils.hashCodeCacheKeyFor(d.getId()));
+            //if (ldc != null) ldc.remove(DbUtils.hashCodeCacheKeyFor(d.getId()));
+            if (dc != null) DbUtils.updateCaches(cacheManager, d, Poolable.class);
+            if (ldc != null) DbUtils.updateCaches(cacheManager, d, Poolable.class);
           }
         }
       }
@@ -760,7 +769,7 @@ public class SQLPoolDAO implements PoolStore {
         if (dao != null) {
           log.debug("Mapping poolable -> " + poolId + " : " + type + " : " + elementId);
           Poolable p = dao.get(elementId);
-          log.debug("\\_ got " + p.getName());
+          log.debug("\\_ got " + p.getId() + " : " + p.getName());
           return p;
         }
         else {

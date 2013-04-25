@@ -62,12 +62,13 @@ public abstract class AbstractProject implements Project {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long projectId = AbstractProject.UNSAVED_ID;
+  private long projectId = AbstractProject.UNSAVED_ID;
 
   @OneToMany(cascade = CascadeType.ALL)
   private Collection<Request> requests = new HashSet<Request>();
 
   private Collection<Sample> samples = new HashSet<Sample>();
+  private Collection<Run> runs = new HashSet<Run>();
   private Collection<Study> studies = new HashSet<Study>();
   private Collection<ProjectOverview> overviews = new HashSet<ProjectOverview>();
   private Collection<String> issueKeys = new HashSet<String>();
@@ -120,6 +121,10 @@ public abstract class AbstractProject implements Project {
     return samples;
   }
 
+  public Collection<Run> getRuns() {
+    return runs;
+  }
+
   public Collection<Study> getStudies() {
     return studies;
   }
@@ -166,6 +171,16 @@ public abstract class AbstractProject implements Project {
     this.samples = samples;
     try {
       Collections.sort(Arrays.asList(this.samples), new AliasComparator(Sample.class));
+    }
+    catch (NoSuchMethodException e) {
+      e.printStackTrace();
+    }
+  }
+
+  public void setRuns(Collection<Run> runs) {
+    this.runs = runs;
+    try {
+      Collections.sort(Arrays.asList(this.runs), new AliasComparator(Run.class));
     }
     catch (NoSuchMethodException e) {
       e.printStackTrace();

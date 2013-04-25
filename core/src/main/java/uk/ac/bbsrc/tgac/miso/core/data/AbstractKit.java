@@ -40,7 +40,7 @@ public abstract class AbstractKit implements Kit {
   public static final Long UNSAVED_ID = 0L;
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long kitId = AbstractKit.UNSAVED_ID;
+  private long kitId = AbstractKit.UNSAVED_ID;
   private String identificationBarcode;
   private String locationBarcode;
 

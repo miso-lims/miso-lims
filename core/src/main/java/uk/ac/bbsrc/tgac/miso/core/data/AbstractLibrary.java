@@ -52,7 +52,7 @@ public abstract class AbstractLibrary implements Library {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long libraryId = AbstractLibrary.UNSAVED_ID;
+  private long libraryId = AbstractLibrary.UNSAVED_ID;
 
   private String name;
   private String description;

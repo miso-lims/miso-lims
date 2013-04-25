@@ -99,6 +99,9 @@
     <link rel="stylesheet" href="<c:url value='/scripts/jquery/colorbox/colorbox.css'/>"
           type="text/css">
 
+    <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.tablesorter.min.js'/>"></script>
+    <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.metadata.js'/>"></script>
+
     <!-- D3.js for Graphics -->
     <script type="text/javascript" src="<c:url value='/scripts/d3v2/d3.v2.min.js'/>"></script>
 

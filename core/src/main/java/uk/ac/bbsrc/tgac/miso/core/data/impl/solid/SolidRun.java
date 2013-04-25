@@ -74,7 +74,7 @@ public class SolidRun extends RunImpl {
   public SolidRun(String statusXml, User user) {
     try {
       if (statusXml != null && !"".equals(statusXml)) {
-        String runDirRegex = "([A-z0-9]+)_([0-9]{8})_(.*)";
+        String runDirRegex = "([A-z0-9\\-]+)_([0-9]{8})_(.*)";
         Pattern runRegex = Pattern.compile(runDirRegex);
         Document statusDoc = SubmissionUtils.emptyDocument();
         SubmissionUtils.transform(new UnicodeReader(statusXml), statusDoc);

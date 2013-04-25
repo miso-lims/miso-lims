@@ -41,18 +41,19 @@ import java.util.regex.Pattern;
 public class IssueJsonConverter {
   public static JSONObject jiraToMiso(JSONObject json) {
     //convert all REST urls to relevant JIRA web interface URLs
-    Pattern issuePattern = Pattern.compile("(http://[A-z0-9\\.]+)/rest/api/2.0.alpha1/issue/([A-Z]+-[\\d]+)");
+    Pattern issuePattern = Pattern.compile("(http://[A-z0-9\\.]+)/rest/api/2/issue/([0-9]+)");
+    Pattern issuelinkPattern = Pattern.compile("(http://[A-z0-9\\.]+)/rest/api/2/issueLink/[0-9]+");
     //Pattern votePattern = Pattern.compile("(http://[A-z0-9\\.]+)/rest/api/2.0.alpha1/issue/([A-Z]+-[\\d]+)/votes");
-    Pattern userPattern = Pattern.compile("(http://[A-z0-9\\.]+)/rest/api/2.0.alpha1/user\\?username\\=([A-z0-9]+)");
-    Pattern projectPattern = Pattern.compile("(http://[A-z0-9\\.]+)/rest/api/2.0.alpha1/project/([A-Z]+)");
-    Pattern commentPattern = Pattern.compile("(http://[A-z0-9\\.]+)/rest/api/2.0.alpha1/comment/([0-9]+)");
+    Pattern userPattern = Pattern.compile("(http://[A-z0-9\\.]+)/rest/api/2/user\\?username\\=([A-z0-9]+)");
+    Pattern projectPattern = Pattern.compile("(http://[A-z0-9\\.]+)/rest/api/2/project/([A-Z]+)");
+    Pattern commentPattern = Pattern.compile("(http://[A-z0-9\\.]+)/rest/api/2/issue/([0-9]+)/comment/([0-9]+)");
 
     String issueKey = json.getString("key");
 
     if (json.getString("self") != null) {
       Matcher m = issuePattern.matcher(json.getString("self"));
       if (m.matches()) {
-        json.put("url", m.group(1)+"/browse/"+m.group(2));
+        json.put("url", m.group(1) + "/browse/" + issueKey);
       }
     }
 
@@ -66,51 +67,61 @@ public class IssueJsonConverter {
       }
       */
 
-      JSONObject assigneeValue = fields.getJSONObject("assignee").getJSONObject("value");
+      JSONObject assigneeValue = fields.getJSONObject("assignee");
       Matcher m = userPattern.matcher(assigneeValue.getString("self"));
       if (m.matches()) {
-        assigneeValue.put("url", m.group(1)+"/secure/ViewProfile.jspa?name="+m.group(2));
+        assigneeValue.put("url", m.group(1) + "/secure/ViewProfile.jspa?name=" + m.group(2));
       }
 
-      JSONObject reporterValue = fields.getJSONObject("reporter").getJSONObject("value");
+      JSONObject reporterValue = fields.getJSONObject("reporter");
       m = userPattern.matcher(reporterValue.getString("self"));
       if (m.matches()) {
-        reporterValue.put("url", m.group(1)+"/secure/ViewProfile.jspa?name="+m.group(2));
+        reporterValue.put("url", m.group(1) + "/secure/ViewProfile.jspa?name=" + m.group(2));
       }
 
-      JSONObject projectValue = fields.getJSONObject("project").getJSONObject("value");
+      JSONObject projectValue = fields.getJSONObject("project");
       m = projectPattern.matcher(projectValue.getString("self"));
       if (m.matches()) {
-        projectValue.put("url", m.group(1)+"/browse/"+m.group(2));
+        projectValue.put("url", m.group(1) + "/secure/EditIssue!default.jspa?id=" + m.group(2));
       }
 
-      JSONArray links = fields.getJSONObject("links").getJSONArray("value");
-      for (JSONObject link : (Iterable<JSONObject>)links) {
-        m = issuePattern.matcher(link.getString("issue"));
+      JSONArray links = fields.getJSONArray("issuelinks");
+      for (JSONObject link : (Iterable<JSONObject>) links) {
+        m = issuelinkPattern.matcher(link.getString("self"));
         if (m.matches()) {
-          link.put("url", m.group(1)+"/browse/"+m.group(2));
+          String linkIssueKey;
+          if (link.get("inwardIssue") != null ) {
+            linkIssueKey = (link.getJSONObject("inwardIssue")).getString("key");
+          }
+          else if (link.get("outwardIssue") != null ) {
+            linkIssueKey = (link.getJSONObject("outwardIssue")).getString("key");
+          }
+          else {
+            linkIssueKey = "";
+          }
+          link.put("url", m.group(1) + "/browse/" + linkIssueKey);
         }
       }
 
-      JSONArray subtasks = fields.getJSONObject("sub-tasks").getJSONArray("value");
-      for (JSONObject subtask : (Iterable<JSONObject>)subtasks) {
-        m = issuePattern.matcher(subtask.getString("issue"));
+      JSONArray subtasks = fields.getJSONArray("subtasks");
+      for (JSONObject subtask : (Iterable<JSONObject>) subtasks) {
+        m = issuePattern.matcher(subtask.getString("self"));
         if (m.matches()) {
-          subtask.put("url", m.group(1)+"/browse/"+m.group(2));
+          subtask.put("url", m.group(1) + "/browse/" + subtask.getString("key"));
         }
       }
 
-      JSONArray comments = fields.getJSONObject("comment").getJSONArray("value");
-      for (JSONObject comment : (Iterable<JSONObject>)comments) {
+      JSONArray comments = fields.getJSONObject("comment").getJSONArray("comments");
+      for (JSONObject comment : (Iterable<JSONObject>) comments) {
         m = commentPattern.matcher(comment.getString("self"));
         if (m.matches()) {
-          comment.put("url", m.group(1)+"/browse/"+issueKey+"?focusedCommentId="+m.group(2)+"&page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel#comment-"+m.group(2));
+          comment.put("url", m.group(1) + "/browse/" + issueKey + "?focusedCommentId=" + m.group(3) + "&page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel#comment-" + m.group(3));
         }
 
         JSONObject authorValue = comment.getJSONObject("author");
         m = commentPattern.matcher(authorValue.getString("self"));
         if (m.matches()) {
-         authorValue.put("url", m.group(1)+"/secure/ViewProfile.jspa?name="+m.group(2));
+          authorValue.put("url", m.group(1) + "/secure/ViewProfile.jspa?name=" + m.group(2));
         }
       }
     }

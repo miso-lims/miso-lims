@@ -30,12 +30,13 @@
 <%@ include file="../header.jsp" %>
 <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.breadcrumbs.popup.js'/>"></script>
 
-<script src="<c:url value='/scripts/datatables_utils.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.mini.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.datepicker.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.checkbox.js'/>" type="text/javascript"></script>
 <link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" type="text/css">
+
+<script src="<c:url value='/scripts/datatables_utils.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
 
 <div id="maincontent">
 <div id="contentcolumn">
@@ -443,8 +444,8 @@
         <c:forEach items="${sample.libraries}" var="library">
           <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
             <td><b>${library.name}</b></td>
-            <td> ${library.alias} </td>
-            <td> ${library.libraryType.description} </td>
+            <td>${library.alias}</td>
+            <td>${library.libraryType.description}</td>
             <td>${library.qcPassed}</td>
             <td class="misoicon"
                 onclick="window.location.href='<c:url value="/miso/library/${library.id}"/>'"><span
@@ -455,15 +456,22 @@
       </table>
     </span>
   <script type="text/javascript">
-    jQuery(document).ready(function() {
-      jQuery("#library_table").tablesorter({
-        headers: {
-          4: {
-            sorter: false
-          }
-        }
+      jQuery(document).ready(function () {
+        var datatable = jQuery('#library_table')
+          .dataTable({
+            "aaSorting": [ [1,'asc'] ],
+            "aoColumns": [
+            null,
+            { "sType": 'natural' },
+            null,
+            null,
+            null
+            ],
+            "iDisplayLength": 50,
+            "bJQueryUI": true,
+            "bRetrieve": true
+          });
       });
-    });
   </script>
   <br/>
 </c:if>
@@ -831,6 +839,11 @@ function submitBulkSamples() {
 <c:if test="${not empty sample.libraries}">
 <script type="text/javascript">
 function bulkLibraryQcTable() {
+  //destroy current table and recreate
+  jQuery('#library_table').dataTable().fnDestroy();
+  //bug fix to reset table width
+  jQuery('#library_table').removeAttr("style");
+
   jQuery('#library_table').addClass("display");
 
   //remove edit header and column
@@ -988,6 +1001,11 @@ function bulkLibraryQcTable() {
 
 function bulkLibraryDilutionTable() {
   if (!jQuery('#library_table').hasClass("display")) {
+    //destroy current table and recreate
+    jQuery('#library_table').dataTable().fnDestroy();
+    //bug fix to reset table width
+    jQuery('#library_table').removeAttr("style");
+
     jQuery('#library_table').addClass("display");
 
     //remove edit header and column

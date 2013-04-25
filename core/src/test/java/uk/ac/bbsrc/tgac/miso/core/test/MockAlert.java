@@ -39,7 +39,7 @@ import java.util.Date;
  * @since 0.1.2
  */
 public class MockAlert implements Alert {
-  private Long alertId;
+  private long alertId;
   private String alertTitle;
   private String alertText;
   private User user;

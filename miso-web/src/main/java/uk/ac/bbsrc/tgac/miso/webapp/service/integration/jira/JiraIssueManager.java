@@ -63,7 +63,7 @@ public class JiraIssueManager implements IssueTrackerManager {
 
   public String baseTrackerUrl;
   private final String restApiUrl = "/rest/api/";
-  public String jiraRestApiVersion = "2.0.alpha1";
+  public String jiraRestApiVersion = "2";
 
   public final String jiraIssueSuffix = restApiUrl+jiraRestApiVersion+"/issue/";
 

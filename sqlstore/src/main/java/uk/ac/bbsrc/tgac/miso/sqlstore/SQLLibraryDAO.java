@@ -444,8 +444,12 @@ public class SQLLibraryDAO implements LibraryStore {
     if (this.cascadeType != null) {
       if (this.cascadeType.equals(CascadeType.PERSIST)) {
         //total fudge to clear out the pool cache if this library is used in any pool by way of a dilution
-        if (!poolDAO.listByLibraryId(library.getId()).isEmpty()) {
-          DbUtils.flushCache(cacheManager, "poolCache");
+//        if (!poolDAO.listByLibraryId(library.getId()).isEmpty()) {
+//          DbUtils.flushCache(cacheManager, "poolCache");
+//        }
+        for (Pool p : poolDAO.listByLibraryId(library.getId())) {
+          //poolCache.remove(DbUtils.hashCodeCacheKeyFor(p.getId()));
+          DbUtils.updateCaches(cacheManager, p, Pool.class);
         }
 
         sampleDAO.save(library.getSample());

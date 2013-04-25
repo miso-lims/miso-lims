@@ -97,16 +97,22 @@ public class PoolAlertManager {
   public void push(Pool pool) {
     if (enabled) {
       if (pool != null) {
-        Pool clone = cloner.deepClone(pool);
-        if (clone != null) {
-          applyListeners(clone);
-          if (pools.containsKey(pool.getId())) {
-            log.debug("Not replacing " + clone.getId() + ": Ready? " + clone.getReadyToRun());
+        log.debug("Attempting to clone pool " + pool.getId());
+        try {
+          Pool clone = cloner.deepClone(pool);
+          if (clone != null) {
+            applyListeners(clone);
+            if (pools.containsKey(pool.getId())) {
+              log.debug("Not replacing Pool " + clone.getId() + ": Ready? " + clone.getReadyToRun());
+            }
+            else {
+              pools.put(pool.getId(), clone);
+              log.debug("Queued Pool " + clone.getId() + ": Ready? " + clone.getReadyToRun());
+            }
           }
-          else {
-            pools.put(pool.getId(), clone);
-            log.debug("Queued " + clone.getId() + ": Ready? " + clone.getReadyToRun());
-          }
+        }
+        catch (Exception e) {
+          e.printStackTrace();
         }
       }
     }

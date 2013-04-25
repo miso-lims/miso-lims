@@ -224,8 +224,8 @@ public class SQLSecurityDAO implements SecurityStore {
       params.addValue("password", passwordCodecService.encrypt(user.getPassword()));
     }
     else {
-      log.warn("No PasswordCodecService has been wired to this SQLSecurityDAO. This means your passwords are being " +
-               "stored in plaintext. Please specify a PasswordCodecService in your Spring config and (auto)wire it " +
+      log.warn("No PasswordCodecService has been wired to this SQLSecurityDAO. This means your passwords may be being " +
+               "stored in plaintext, if not already encrypted. Please specify a PasswordCodecService in your Spring config and (auto)wire it " +
                "to this DAO.");
       params.addValue("password", user.getPassword());
     }

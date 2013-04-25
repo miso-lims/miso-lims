@@ -989,6 +989,24 @@ public class PoolControllerHelperService {
     }
   }
 
+  public JSONObject checkConcentrationByPoolId(HttpSession session, JSONObject json) {
+   try {
+     JSONObject j = new JSONObject();
+     Long poolId = json.getLong("poolId");
+     Pool pool = requestManager.getPoolById(poolId);
+     double concentration = pool.getConcentration();
+     j.put("response", concentration);
+     return j;
+   }
+   catch (IOException e) {
+     log.debug("Failed", e);
+     return JSONUtils.SimpleJSONError(e.getMessage());
+   }
+ }
+
+
+
+
   public JSONObject checkInfoByPoolId(HttpSession session, JSONObject json) {
     try {
       JSONObject j = new JSONObject();
@@ -1100,6 +1118,7 @@ public class PoolControllerHelperService {
           pout.add(pool.getName());
           pout.add(pool.getAlias() != null ? pool.getAlias() : "");
           pout.add(pool.getCreationDate() != null ? pool.getCreationDate().toString() : "");
+          pout.add(pool.getId());
           pout.add(pool.getId());
           pout.add(pool.getId());
           pout.add("<a href=\"/miso/pool/" + pool.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>");

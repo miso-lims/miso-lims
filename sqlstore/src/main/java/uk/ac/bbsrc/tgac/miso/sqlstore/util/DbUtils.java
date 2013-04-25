@@ -176,14 +176,14 @@ public class DbUtils {
   public static <T extends Nameable> void updateCaches(CacheManager cacheManager, T obj, Class<T> cacheClass) {
     Cache cache = DbUtils.lookupCache(cacheManager, cacheClass, true);
     if (cache != null && cache.getKeys().size() > 0) {
-      log.info("Removing " + cacheClass.getSimpleName() + " " + obj.getId() + " from " + cache.getName());
+      log.debug("Removing " + cacheClass.getSimpleName() + " " + obj.getId() + " from " + cache.getName());
       BlockingCache c = new BlockingCache(cache);
       c.remove(DbUtils.hashCodeCacheKeyFor(obj.getId()));
     }
 
     cache = DbUtils.lookupCache(cacheManager, cacheClass, false);
     if (cache != null && cache.getKeys().size() > 0) {
-      log.info("Removing " + cacheClass.getSimpleName() + " " + obj.getId() + " from " + cache.getName());
+      log.debug("Removing " + cacheClass.getSimpleName() + " " + obj.getId() + " from " + cache.getName());
       BlockingCache c = new BlockingCache(cache);
       c.remove(DbUtils.hashCodeCacheKeyFor(obj.getId()));
     }

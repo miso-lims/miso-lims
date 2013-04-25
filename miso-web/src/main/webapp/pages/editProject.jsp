@@ -515,6 +515,24 @@
           </c:forEach>
           </tbody>
       </table>
+      <script type="text/javascript">
+
+          jQuery(document).ready(function () {
+            var datatable = jQuery('#study_table')
+              .dataTable({
+                "aaSorting": [ [1,'asc'] ],
+                "aoColumns": [
+                null,
+                { "sType": 'natural' },
+                null
+                  <sec:authorize access="hasRole('ROLE_ADMIN')">,null</sec:authorize>
+                ],
+                "iDisplayLength": 50,
+                "bJQueryUI": true,
+                "bRetrieve": true
+              });
+          });
+      </script>
     </span>
 </div>
 
@@ -673,6 +691,27 @@
           </c:forEach>
           </tbody>
       </table>
+      <script type="text/javascript">
+          jQuery(document).ready(function () {
+            var datatable = jQuery('#sample_table')
+              .dataTable({
+                "aaSorting": [ [1,'asc'] ],
+                "aoColumns": [
+                null,
+                { "sType": 'natural' },
+                { "sType": 'natural' },
+                null,
+                null,
+                null,
+                null
+                  <sec:authorize access="hasRole('ROLE_ADMIN')">,null</sec:authorize>
+                ],
+                "iDisplayLength": 50,
+                "bJQueryUI": true,
+                "bRetrieve": true
+              });
+          });
+      </script>
     </span>
 </div>
 
@@ -757,6 +796,29 @@
           </c:forEach>
           </tbody>
       </table>
+      <script type="text/javascript">
+          jQuery(document).ready(function () {
+            var datatable = jQuery('#library_table')
+              .dataTable({
+                "aaSorting": [ [1,'asc'] ],
+                "aoColumns": [
+                null,
+                { "sType": 'natural' },
+                { "sType": 'natural' },
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+                  <sec:authorize access="hasRole('ROLE_ADMIN')">,null</sec:authorize>
+                ],
+                "iDisplayLength": 50,
+                "bJQueryUI": true,
+                "bRetrieve": true
+              });
+          });
+      </script>
     </span>
 </div>
 
@@ -828,6 +890,27 @@
           </c:forEach>
           </tbody>
       </table>
+      <script type="text/javascript">
+          jQuery(document).ready(function () {
+            var datatable = jQuery('#librarydils_table')
+              .dataTable({
+                "aaSorting": [ [1,'asc'], [3,'asc'] ],
+                "aoColumns": [
+                null,
+                { "sType": 'natural' },
+                null,
+                null,
+                null,
+                null,
+                null
+                  <sec:authorize access="hasRole('ROLE_ADMIN')">,null</sec:authorize>
+                ],
+                "iDisplayLength": 50,
+                "bJQueryUI": true,
+                "bRetrieve": true
+              });
+          });
+      </script>
     </span>
 </div>
 
@@ -894,6 +977,26 @@
           </c:forEach>
           </tbody>
       </table>
+      <script type="text/javascript">
+          jQuery(document).ready(function () {
+            var datatable = jQuery('#pools_table')
+              .dataTable({
+                "aaSorting": [ [1,'asc'], [3,'asc'] ],
+                "aoColumns": [
+                null,
+                { "sType": 'natural' },
+                null,
+                null,
+                null,
+                null
+                  <sec:authorize access="hasRole('ROLE_ADMIN')">,null</sec:authorize>
+                ],
+                "iDisplayLength": 50,
+                "bJQueryUI": true,
+                "bRetrieve": true
+              });
+          });
+      </script>
     </span>
 </div>
 
@@ -959,18 +1062,26 @@
           </c:forEach>
           </tbody>
       </table>
+      <script type="text/javascript">
+          jQuery(document).ready(function () {
+            var datatable = jQuery('#empcrs_table')
+              .dataTable({
+                "aaSorting": [ [1,'asc'], [3,'asc'] ],
+                "aoColumns": [
+                null,
+                null,
+                null,
+                null,
+                null
+                  <sec:authorize access="hasRole('ROLE_ADMIN')">,null</sec:authorize>
+                ],
+                "iDisplayLength": 50,
+                "bJQueryUI": true,
+                "bRetrieve": true
+              });
+          });
+      </script>
     </span>
-    <script type="text/javascript">
-        jQuery(document).ready(function () {
-            jQuery("#librarydils_table").tablesorter({
-                                                         headers: {
-                                                             5: {
-                                                                 sorter: false
-                                                             }
-                                                         }
-                                                     });
-        });
-    </script>
 </div>
 
 <div class="sectionDivider"
@@ -1030,18 +1141,26 @@
           </c:forEach>
           </tbody>
       </table>
+      <script type="text/javascript">
+          jQuery(document).ready(function () {
+            var datatable = jQuery('#empcrdils_table')
+              .dataTable({
+                "aaSorting": [ [2,'asc'] ],
+                "aoColumns": [
+                null,
+                null,
+                null,
+                null,
+                null
+                  <sec:authorize access="hasRole('ROLE_ADMIN')">,null</sec:authorize>
+                ],
+                "iDisplayLength": 50,
+                "bJQueryUI": true,
+                "bRetrieve": true
+              });
+          });
+      </script>
     </span>
-    <script type="text/javascript">
-        jQuery(document).ready(function () {
-            jQuery("#librarydils_table").tablesorter({
-                                                         headers: {
-                                                             4: {
-                                                                 sorter: false
-                                                             }
-                                                         }
-                                                     });
-        });
-    </script>
 </div>
 
 <div class="sectionDivider"
@@ -1100,6 +1219,24 @@
           </c:forEach>
           </tbody>
       </table>
+      <script type="text/javascript">
+          jQuery(document).ready(function () {
+            var datatable = jQuery('#plates_table')
+              .dataTable({
+                "aaSorting": [ [0,'asc'], [2,'asc'] ],
+                "aoColumns": [
+                null,
+                null,
+                null,
+                null
+                  <sec:authorize access="hasRole('ROLE_ADMIN')">,null</sec:authorize>
+                ],
+                "iDisplayLength": 50,
+                "bJQueryUI": true,
+                "bRetrieve": true
+              });
+          });
+      </script>
     </span>
 </div>
 
@@ -1116,7 +1253,7 @@
         <tr>
             <th>Run Name</th>
             <th>Run Alias</th>
-            <th>Lanes/Chambers</th>
+            <th>Partitions</th>
             <th class="fit">Edit</th>
             <sec:authorize access="hasRole('ROLE_ADMIN')">
                 <th class="fit">DELETE</th>
@@ -1163,6 +1300,24 @@
         </c:forEach>
         </tbody>
     </table>
+  <script type="text/javascript">
+      jQuery(document).ready(function () {
+        var datatable = jQuery('#run_table')
+          .dataTable({
+            "aaSorting": [ [0,'asc'], [1,'asc'] ],
+            "aoColumns": [
+            null,
+            null,
+            null,
+            null
+              <sec:authorize access="hasRole('ROLE_ADMIN')">,null</sec:authorize>
+            ],
+            "iDisplayLength": 50,
+            "bJQueryUI": true,
+            "bRetrieve": true
+          });
+      });
+  </script>
 </div>
 </c:when>
 </c:choose>
@@ -1173,90 +1328,6 @@
 
 <script type="text/javascript">
 jQuery(document).ready(function () {
-  /*
-    remove any overlays
-    jQuery.colorbox.remove();
-    jQuery("#sample_table").tablesorter({
-                                            sortList: [
-                                                [1, 0]
-                                            ],
-                                            headers: {
-                                                1: {
-                                                    sorter: 'digit'
-                                                },
-
-                                                2: {
-                                                    sorter: false
-                                                },
-                                                3: {
-                                                    sorter: false
-                                                },
-                                                4: {
-                                                    sorter: false
-                                                },
-                                                5: {
-                                                    sorter: false
-                                                },
-                                                6: {
-                                                    sorter: false
-                                                },
-                                                7: {
-                                                    sorter: false
-                                                }
-                                            }
-                                        });
-    jQuery("#library_table").tablesorter({
-                                             sortList: [
-                                                 [1, 0]
-                                             ],
-                                             headers: {
-                                                 1: {
-                                                     sorter: 'digit'
-                                                 },
-                                                 2: {
-                                                     sorter: false
-                                                 },
-                                                 3: {
-                                                     sorter: false
-                                                 },
-                                                 4: {
-                                                     sorter: false
-                                                 },
-                                                 5: {
-                                                     sorter: false
-                                                 },
-                                                 6: {
-                                                     sorter: false
-                                                 },
-                                                 7: {
-                                                     sorter: false
-                                                 },
-                                                 8: {
-                                                     sorter: false
-                                                 },
-                                                 9: {
-                                                     sorter: false
-                                                 }
-                                             }
-                                         });
-    */
-    jQuery("#librarydils_table").tablesorter({
-                                                 headers: {
-                                                     6: {
-                                                         sorter: false
-                                                     },
-                                                     7: {
-                                                         sorter: false
-                                                     }
-                                                 }
-                                             });
-    jQuery("#librarydils_table").tablesorter({
-                                                 headers: {
-                                                     4: {
-                                                         sorter: false
-                                                     }
-                                                 }
-                                             });
     jQuery('#alias')
             .simplyCountable({
                                  counter: '#aliascounter',
@@ -1281,6 +1352,11 @@ jQuery(document).ready(function () {
 <c:if test="${not empty project.samples}">
 function bulkSampleQcTable() {
     if (!jQuery('#sample_table').hasClass("display")) {
+        //destroy current table and recreate
+        jQuery('#sample_table').dataTable().fnDestroy();
+        //bug fix to reset table width
+        jQuery('#sample_table').removeAttr("style");
+
         jQuery('#sample_table').addClass("display");
 
         //remove edit and delete header and column
@@ -1323,20 +1399,20 @@ function bulkSampleQcTable() {
         jQuery("#sample_table tr:gt(0)").append("<td class='defaultEditable'></td>");
 
         var datatable = jQuery('#sample_table').dataTable({
-                                                              "aoColumnDefs": [
-                                                                  {
-                                                                      "bUseRendered": false,
-                                                                      "aTargets": [ 0 ]
-                                                                  }
-                                                              ],
-                                                              "bPaginate": false,
-                                                              "bInfo": false,
-                                                              "bJQueryUI": true,
-                                                              "bAutoWidth": true,
-                                                              "bSort": false,
-                                                              "bFilter": false,
-                                                              "sDom": '<<"toolbar">f>r<t>ip>'
-                                                          });
+            "aoColumnDefs": [
+              {
+                "bUseRendered": false,
+                "aTargets": [ 0 ]
+              }
+            ],
+            "bPaginate": false,
+            "bInfo": false,
+            "bJQueryUI": true,
+            "bAutoWidth": true,
+            "bSort": false,
+            "bFilter": false,
+            "sDom": '<<"toolbar">f>r<t>ip>'
+        });
 
         jQuery('#sample_table').find("tr:gt(0)").each(function () {
             for (var i = 0; i < this.cells.length; i++) {
@@ -1455,6 +1531,11 @@ function bulkSampleQcTable() {
 
 function generateSampleDeliveryForm(projectId) {
     if (!jQuery('#sample_table').hasClass("display")) {
+        //destroy current table and recreate
+        jQuery('#sample_table').dataTable().fnDestroy();
+        //bug fix to reset table width
+        jQuery('#sample_table').removeAttr("style");
+
         jQuery('#sample_table').addClass("display");
 
         //remove edit header and column
@@ -1523,20 +1604,20 @@ function getBulkSampleInputForm(projectId) {
 
     jQuery(function () {
         jQuery('#getBulkSampleInputFormDialog').dialog({
-                                                           autoOpen: false,
-                                                           width: 400,
-                                                           modal: true,
-                                                           resizable: false,
-                                                           buttons: {
-                                                               "Get Form": function () {
-                                                                   Project.ui.downloadBulkSampleInputForm(projectId, jQuery('input[name=formType]:checked').val());
-                                                                   jQuery(this).dialog('close');
-                                                               },
-                                                               "Cancel": function () {
-                                                                   jQuery(this).dialog('close');
-                                                               }
-                                                           }
-                                                       });
+           autoOpen: false,
+           width: 400,
+           modal: true,
+           resizable: false,
+           buttons: {
+               "Get Form": function () {
+                   Project.ui.downloadBulkSampleInputForm(projectId, jQuery('input[name=formType]:checked').val());
+                   jQuery(this).dialog('close');
+               },
+               "Cancel": function () {
+                   jQuery(this).dialog('close');
+               }
+           }
+       });
     });
     jQuery('#getBulkSampleInputFormDialog').dialog('open');
 }
@@ -1554,20 +1635,20 @@ function getPlateInputForm(projectId) {
 
     jQuery(function () {
         jQuery('#getPlateInputFormDialog').dialog({
-                                                      autoOpen: false,
-                                                      width: 400,
-                                                      modal: true,
-                                                      resizable: false,
-                                                      buttons: {
-                                                          "Get Form": function () {
-                                                              Project.ui.downloadPlateInputForm(projectId, jQuery('input[name=formType]:checked').val());
-                                                              jQuery(this).dialog('close');
-                                                          },
-                                                          "Cancel": function () {
-                                                              jQuery(this).dialog('close');
-                                                          }
-                                                      }
-                                                  });
+          autoOpen: false,
+          width: 400,
+          modal: true,
+          resizable: false,
+          buttons: {
+              "Get Form": function () {
+                  Project.ui.downloadPlateInputForm(projectId, jQuery('input[name=formType]:checked').val());
+                  jQuery(this).dialog('close');
+              },
+              "Cancel": function () {
+                  jQuery(this).dialog('close');
+              }
+          }
+      });
     });
     jQuery('#getPlateInputFormDialog').dialog('open');
 }
@@ -1577,6 +1658,11 @@ function getPlateInputForm(projectId) {
 <c:if test="${not empty projectLibraries}">
 function bulkLibraryQcTable() {
     if (!jQuery('#library_table').hasClass("display")) {
+        //destroy current table and recreate
+        jQuery('#library_table').dataTable().fnDestroy();
+        //bug fix to reset table width
+        jQuery('#library_table').removeAttr("style");
+
         jQuery('#library_table').addClass("display");
 
         //remove edit header and column
@@ -1766,6 +1852,11 @@ function bulkLibraryQcTable() {
 
 function bulkLibraryDilutionTable() {
     if (!jQuery('#library_table').hasClass("display")) {
+        //destroy current table and recreate
+        jQuery('#library_table').dataTable().fnDestroy();
+        //bug fix to reset table width
+        jQuery('#library_table').removeAttr("style");
+
         jQuery('#library_table').addClass("display");
 
         //remove edit header and column
@@ -1903,6 +1994,11 @@ function bulkLibraryDilutionTable() {
 <c:if test="${existsAnyEmPcrLibrary and not empty projectLibraryDilutions}">
 function bulkEmPcrTable() {
     if (!jQuery('#librarydils_table').hasClass("display")) {
+        //destroy current table and recreate
+        jQuery('#librarydils_table').dataTable().fnDestroy();
+        //bug fix to reset table width
+        jQuery('#librarydils_table').removeAttr("style");
+
         jQuery('#librarydils_table').addClass("display");
         //remove edit header and column
         jQuery('#librarydils_table tr:first th:gt(4)').remove();
@@ -2033,6 +2129,11 @@ function bulkEmPcrTable() {
 <c:if test="${not empty projectEmPcrs}">
 function bulkEmPcrDilutionTable() {
     if (!jQuery('#empcrs_table').hasClass("display")) {
+        //destroy current table and recreate
+        jQuery('#empcrs_table').dataTable().fnDestroy();
+        //bug fix to reset table width
+        jQuery('#empcrs_table').removeAttr("style");
+
         jQuery('#empcrs_table').addClass("display");
         //remove edit header and column
         jQuery('#empcrs_table tr:first th:gt(4)').remove();

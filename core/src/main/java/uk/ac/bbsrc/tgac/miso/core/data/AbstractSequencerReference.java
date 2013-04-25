@@ -40,7 +40,7 @@ public abstract class AbstractSequencerReference implements SequencerReference {
 
   public static final Long UNSAVED_ID = 0L;
 
-  private Long id = AbstractSequencerReference.UNSAVED_ID; 
+  private long id = AbstractSequencerReference.UNSAVED_ID;
   private String name;
   private Platform platform;
   private Boolean available;

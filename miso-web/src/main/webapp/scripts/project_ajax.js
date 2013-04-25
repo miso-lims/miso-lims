@@ -702,18 +702,18 @@ Project.issues = {
       var key = json.validIssues[0].key;
       var issue = json.validIssues[0].fields;
       var issueurl = json.validIssues[0].url;
-      jQuery('#alias').val(issue.summary.value);
-      jQuery('#description').val(issue.description.value);
+      jQuery('#alias').val(issue.summary);
+      jQuery('#description').val(issue.description);
 
       jQuery('#issues').append("<div id='importbox" + 0 + "' class='simplebox backwhite'>");
       jQuery('#importbox' + 0).append("<button type='button' style='float:right;' class='fg-button ui-state-default ui-corner-all' onclick='Project.issues.removeIssueBox(this);'>Unlink</button>");
       jQuery('#importbox' + 0).append("<h2 onclick=\"Utils.page.newWindow('" + issueurl + "');\">Issue " + key + "</h2><br/>");
-      jQuery('#importbox' + 0).append("<b>Summary:</b> " + issue.summary.value + "<br/>");
-      jQuery('#importbox' + 0).append("<b>Description:</b> " + issue.description.value + "<br/>");
-      jQuery('#importbox' + 0).append("<b>Reporter:</b> <a href='javascript:void(0);' onclick=\"Utils.page.newWindow('" + issue.reporter.value.url + "');\">" + issue.reporter.value.displayName + "</a><br/>");
-      jQuery('#importbox' + 0).append("<b>Assignee:</b> <a href='javascript:void(0);' onclick=\"Utils.page.newWindow('" + issue.assignee.value.url + "');\">" + issue.assignee.value.displayName + "</a><br/>");
-      jQuery('#importbox' + 0).append("<b>Created:</b> " + issue.created.value + "<br/>");
-      jQuery('#importbox' + 0).append("<b>Updated:</b> " + issue.updated.value + "<br/>");
+      jQuery('#importbox' + 0).append("<b>Summary:</b> " + issue.summary + "<br/>");
+      jQuery('#importbox' + 0).append("<b>Description:</b> " + issue.description + "<br/>");
+      jQuery('#importbox' + 0).append("<b>Reporter:</b> <a href='javascript:void(0);' onclick=\"Utils.page.newWindow('" + issue.reporter.url + "');\">" + issue.reporter.displayName + "</a><br/>");
+      jQuery('#importbox' + 0).append("<b>Assignee:</b> <a href='javascript:void(0);' onclick=\"Utils.page.newWindow('" + issue.assignee.url + "');\">" + issue.assignee.displayName + "</a><br/>");
+      jQuery('#importbox' + 0).append("<b>Created:</b> " + issue.created + "<br/>");
+      jQuery('#importbox' + 0).append("<b>Updated:</b> " + issue.updated + "<br/>");
       jQuery('#importbox' + 0).append("<input type='hidden' value='on' name='_issueKeys'/>");
       jQuery('#importbox' + 0).append("<input type='hidden' name='issueKeys' id='issueKeys0' value='" + key + "'><hr/>");
       jQuery('#issues').append("</div>");
@@ -756,12 +756,12 @@ Project.issues = {
         jQuery('#issues').append("<div id='previewbox" + i + "' class='simplebox backwhite'>");
         jQuery('#previewbox' + i).append("<button type='button' style='float:right;' class='fg-button ui-state-default ui-corner-all' onclick='Project.issues.removeIssueBox(this);'>Unlink</button>");
         jQuery('#previewbox' + i).append("<h2 onclick=\"Utils.page.newWindow('" + issueurl + "');\">Issue " + key + "</h2><br/>");
-        jQuery('#previewbox' + i).append("<b>Summary:</b> " + issue.summary.value + "<br/>");
-        jQuery('#previewbox' + i).append("<b>Description:</b> " + issue.description.value + "<br/>");
-        jQuery('#previewbox' + i).append("<b>Reporter:</b> <a href='javascript:void(0);' onclick=\"Utils.page.newWindow('" + issue.reporter.value.url + "');\">" + issue.reporter.value.displayName + "</a><br/>");
-        jQuery('#previewbox' + i).append("<b>Assignee:</b> <a href='javascript:void(0);' onclick=\"Utils.page.newWindow('" + issue.assignee.value.url + "');\">" + issue.assignee.value.displayName + "</a><br/>");
-        jQuery('#previewbox' + i).append("<b>Created:</b> " + issue.created.value + "<br/>");
-        jQuery('#previewbox' + i).append("<b>Updated:</b> " + issue.updated.value + "<br/>");
+        jQuery('#previewbox' + i).append("<b>Summary:</b> " + issue.summary + "<br/>");
+        jQuery('#previewbox' + i).append("<b>Description:</b> " + issue.description + "<br/>");
+        jQuery('#previewbox' + i).append("<b>Reporter:</b> <a href='javascript:void(0);' onclick=\"Utils.page.newWindow('" + issue.reporter.url + "');\">" + issue.reporter.displayName + "</a><br/>");
+        jQuery('#previewbox' + i).append("<b>Assignee:</b> <a href='javascript:void(0);' onclick=\"Utils.page.newWindow('" + issue.assignee.url + "');\">" + issue.assignee.displayName + "</a><br/>");
+        jQuery('#previewbox' + i).append("<b>Created:</b> " + issue.created + "<br/>");
+        jQuery('#previewbox' + i).append("<b>Updated:</b> " + issue.updated + "<br/>");
         jQuery('#previewbox' + i).append("<input type='hidden' name='issueKeys' id='issueKeys" + i + "' value='" + key + "'><hr/>");
         jQuery('#issues').append("</div>");
       }
@@ -802,32 +802,32 @@ Project.issues = {
         jQuery('#issues').append("<div id='issuebox" + i + "' class='simplebox backwhite'>");
         jQuery('#issuebox' + i).append("<button type='button' style='float:right;' class='fg-button ui-state-default ui-corner-all' onclick='Project.issues.removeIssueBox(this);'>Remove</button>");
         jQuery('#issuebox' + i).append("<h2 onclick=\"Utils.page.newWindow('" + issueurl + "');\">Issue " + key + "</h2><br/>");
-        jQuery('#issuebox' + i).append("<b>Summary:</b> " + issue.summary.value + "<br/>");
-        jQuery('#issuebox' + i).append("<b>Description:</b> " + issue.description.value + "<br/>");
-        jQuery('#issuebox' + i).append("<b>Reporter:</b> <a href='javascript:void(0);' onclick=\"Utils.page.newWindow('" + issue.reporter.value.url + "');\">" + issue.reporter.value.displayName + "</a><br/>");
-        jQuery('#issuebox' + i).append("<b>Assignee:</b> <a href='javascript:void(0);' onclick=\"Utils.page.newWindow('" + issue.assignee.value.url + "');\">" + issue.assignee.value.displayName + "</a><br/>");
-        jQuery('#issuebox' + i).append("<b>Created:</b> " + issue.created.value + "<br/>");
-        jQuery('#issuebox' + i).append("<b>Updated:</b> " + issue.updated.value + "<br/>");
+        jQuery('#issuebox' + i).append("<b>Summary:</b> " + issue.summary + "<br/>");
+        jQuery('#issuebox' + i).append("<b>Description:</b> " + issue.description + "<br/>");
+        jQuery('#issuebox' + i).append("<b>Reporter:</b> <a href='javascript:void(0);' onclick=\"Utils.page.newWindow('" + issue.reporter.url + "');\">" + issue.reporter.displayName + "</a><br/>");
+        jQuery('#issuebox' + i).append("<b>Assignee:</b> <a href='javascript:void(0);' onclick=\"Utils.page.newWindow('" + issue.assignee.url + "');\">" + issue.assignee.displayName + "</a><br/>");
+        jQuery('#issuebox' + i).append("<b>Created:</b> " + issue.created + "<br/>");
+        jQuery('#issuebox' + i).append("<b>Updated:</b> " + issue.updated + "<br/>");
 
-        if (issue["links"].value.length > 0) {
+        if (issue["issuelinks"].length > 0) {
           jQuery('#issuebox' + i).append("<h4>Links</h4>");
-          for (var j = 0; j < issue["links"].value.length; j++) {
-            var link = issue["links"].value[j];
-            jQuery('#issuebox' + i).append(link.type.description + " <a href='javascript:void(0);' onclick=\"Utils.page.newWindow('" + link.url + "');\">" + link.issueKey + "</a><br/>");
+          for (var j = 0; j < issue["issuelinks"].length; j++) {
+            var link = issue["issuelinks"][j];
+            jQuery('#issuebox' + i).append(link.type.outward + " <a href='javascript:void(0);' onclick=\"Utils.page.newWindow('" + link.url + "');\">" + link.url+ "</a><br/>");
           }
         }
 
         if (issue["sub-tasks"].value.length > 0) {
           jQuery('#issuebox' + i).append("<h4>Subtasks</h4>");
-          for (var j = 0; j < issue["sub-tasks"].value.length; j++) {
-            var subtask = issue["sub-tasks"].value[j];
+          for (var j = 0; j < issue["subtasks"].length; j++) {
+            var subtask = issue["subtasks"][j];
             jQuery('#issuebox' + i).append("<a href='javascript:void(0);' onclick=\"Utils.page.newWindow('" + subtask.url + "');\">" + subtask.url + "</a><br/>");
           }
         }
 
         jQuery('#issuebox' + i).append("<h4>Comments</h4>");
-        for (var k = 0; k < issue["comment"].value.length; k++) {
-          var comment = issue["comment"].value[k];
+        for (var k = 0; k < issue["comment"]["comments"].length; k++) {
+          var comment = issue["comment"]["comments"][k];
           jQuery('#issuebox' + i).append("<div id='commentbox" + i + "_" + k + "' class='simplebox backwhite' onclick=\"Utils.page.newWindow('" + comment.url + "');\">");
           jQuery('#commentbox' + i + "_" + k).append("<a href='javascript:void(0);' onclick=\"Utils.page.newWindow('" + comment.author.url + "');\">" + comment.author.displayName + "</a>");
           jQuery('#commentbox' + i + "_" + k).append(" at " + comment.created + "<br/>");
@@ -899,6 +899,11 @@ Project.barcode = {
 
   selectSampleBarcodesToPrint : function(tableId) {
     if (!jQuery(tableId).hasClass("display")) {
+      //destroy current table and recreate
+      jQuery(tableId).dataTable().fnDestroy();
+      //bug fix to reset table width
+      jQuery(tableId).removeAttr("style");
+
       jQuery(tableId).addClass("display");
 
       jQuery(tableId).find('tr:first th:eq(5)').remove();
@@ -1012,6 +1017,11 @@ Project.barcode = {
 
   selectLibraryBarcodesToPrint : function(tableId) {
     if (!jQuery(tableId).hasClass("display")) {
+      //destroy current table and recreate
+      jQuery(tableId).dataTable().fnDestroy();
+      //bug fix to reset table width
+      jQuery(tableId).removeAttr("style");
+
       jQuery(tableId).addClass("display");
 
       jQuery(tableId).find('tr:first th:eq(7)').remove();
@@ -1128,6 +1138,11 @@ Project.barcode = {
 
   selectLibraryDilutionBarcodesToPrint : function(tableId) {
     if (!jQuery(tableId).hasClass("display")) {
+      //destroy current table and recreate
+      jQuery(tableId).dataTable().fnDestroy();
+      //bug fix to reset table width
+      jQuery(tableId).removeAttr("style");
+
       jQuery(tableId).addClass("display");
 
       jQuery(tableId).find('tr:first th:eq(5)').remove();

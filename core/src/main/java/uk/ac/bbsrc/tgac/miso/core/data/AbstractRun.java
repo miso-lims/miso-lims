@@ -61,7 +61,7 @@ public abstract class AbstractRun implements Run {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long runId = AbstractRun.UNSAVED_ID;
+  private long runId = AbstractRun.UNSAVED_ID;
 
   @Transient
   public Document submissionDocument;

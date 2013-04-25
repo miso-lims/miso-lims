@@ -55,7 +55,7 @@ public abstract class AbstractPool<P extends Poolable> implements Pool<P> {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long poolId = AbstractPool.UNSAVED_ID;
+  private long poolId = AbstractPool.UNSAVED_ID;
 
   @OneToOne(cascade = CascadeType.ALL)
   private SecurityProfile securityProfile;  
@@ -286,7 +286,7 @@ public abstract class AbstractPool<P extends Poolable> implements Pool<P> {
     else {
       throw new SecurityException("Cannot inherit permissions when parent object owner is not set!");
     }
-  }
+  }  
 
   @Override
   public Set<MisoListener> getListeners() {
