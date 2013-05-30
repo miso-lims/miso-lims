@@ -64,31 +64,37 @@ Print.ui = {
   },
 
   processPrinterServiceRow : function(json) {
-    jQuery('#printerTable tr:first th:eq(4)').remove();
-    jQuery('#printerTable tr:first th:eq(3)').remove();
+    if (!jQuery('#printerTable').attr("addInProgress")) {
+      jQuery('#printerTable').attr("addInProgress", "true");
+      jQuery('#printerTable tr:first th:eq(4)').remove();
+      jQuery('#printerTable tr:first th:eq(3)').remove();
 
-    jQuery('#printerTable').find("tr").each(function() {
-      jQuery(this).find("td:eq(4)").remove();
-      jQuery(this).find("td:eq(3)").remove();
-    });
+      jQuery('#printerTable').find("tr").each(function() {
+        jQuery(this).find("td:eq(4)").remove();
+        jQuery(this).find("td:eq(3)").remove();
+      });
 
-    jQuery('#printerTable tr:first').append("<th>Printable Entity</th><th>Available</th><th></th>");
+      jQuery('#printerTable tr:first').append("<th>Printable Entity</th><th>Available</th><th></th>");
 
-    $('printerTable').insertRow(1);
+      $('printerTable').insertRow(1);
 
-    var column1 = $('printerTable').rows[1].insertCell(-1);
-    column1.innerHTML = "<input id='serviceName' name='serviceName' type='text'/>";
-    var column2 = $('printerTable').rows[1].insertCell(-1);
-    column2.innerHTML = "<i>Set in context fields</i>";
-    var column3 = $('printerTable').rows[1].insertCell(-1);
-    column3.innerHTML = "<select id='contexts' name='context' onchange='Print.ui.getContextFieldsForContext(this)'>" +json.contexts+ "</select><br/><div id='contextFields' name='contextFields'/>";
-    var column4 = $('printerTable').rows[1].insertCell(-1);
-    column4.innerHTML = "<select id='barcodables' name='printServiceFor'>" +json.barcodables+ "</select>";
-    var column5 = $('printerTable').rows[1].insertCell(-1);
-    column5.innerHTML = "<div id='available'></div>";
-    var column6 = $('printerTable').rows[1].insertCell(-1);
-    column6.id = "addTd";
-    column6.innerHTML = "Add";
+      var column1 = $('printerTable').rows[1].insertCell(-1);
+      column1.innerHTML = "<input id='serviceName' name='serviceName' type='text'/>";
+      var column2 = $('printerTable').rows[1].insertCell(-1);
+      column2.innerHTML = "<i>Set in context fields</i>";
+      var column3 = $('printerTable').rows[1].insertCell(-1);
+      column3.innerHTML = "<select id='contexts' name='context' onchange='Print.ui.getContextFieldsForContext(this)'>" +json.contexts+ "</select><br/><div id='contextFields' name='contextFields'/>";
+      var column4 = $('printerTable').rows[1].insertCell(-1);
+      column4.innerHTML = "<select id='barcodables' name='printServiceFor'>" +json.barcodables+ "</select>";
+      var column5 = $('printerTable').rows[1].insertCell(-1);
+      column5.innerHTML = "<div id='available'></div>";
+      var column6 = $('printerTable').rows[1].insertCell(-1);
+      column6.id = "addTd";
+      column6.innerHTML = "Add";
+    }
+    else {
+      alert("Cannot add another printer service when one is already in progress.")
+    }
   },
 
   getContextFieldsForContext : function(contextSelect) {
@@ -143,6 +149,8 @@ Print.service = {
   },
 
   addPrinterService : function() {
+    jQuery('#printerTable').removeAttr("addInProgress");
+
     var f = Utils.mappifyForm("addPrinterForm");
     var cf = {};
     jQuery('input[id*="contextField-"]').each(function(e) {
