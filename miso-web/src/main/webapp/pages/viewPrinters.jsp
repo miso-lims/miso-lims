@@ -29,17 +29,60 @@
   
 --%>
 <%@ include file="../header.jsp" %>
-
 <script type="text/javascript" src="<c:url value='/scripts/printer_ajax.js?ts=${timestamp.time}'/>"></script>
 
 <div id="maincontent">
   <div id="contentcolumn">
-    <c:if test="${not empty barcodePrinters}">
-      <h1>Printers</h1>
-      <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-        <a href='javascript:void(0);' class="add" onclick="Print.ui.getPrinterFormEntities(); return false;">Add Printer
-          Service</a><br/>
-      </c:if>
+    <c:choose>
+      <c:when test="${not empty barcodePrinter}">
+        <h1>Printer ${barcodePrinter.name}</h1>
+        <table class="list" id="printerTable">
+          <thead>
+          <tr>
+            <th>Job ID</th>
+            <th>Date</th>
+            <th>User</th>
+            <th>Status</th>
+            <th>Elements</th>
+          </tr>
+          </thead>
+          <tbody>
+          <c:forEach items="${printJobs}" var="job">
+            <tr>
+              <td>${job.jobId}</td>
+              <td>${job.printDate}</td>
+              <td>${job.printUser.loginName}</td>
+              <td>${job.status}</td>
+              <td><c:forEach items="${job.queuedElements}" var="element">
+                ${element}<br/>
+              </c:forEach>
+              </td>
+            </tr>
+          </c:forEach>
+          </tbody>
+        </table>
+
+        <script type="text/javascript">
+          jQuery(document).ready(function () {
+            jQuery("#printerTable").tablesorter({
+              headers: {
+                3: {
+                  sorter: false
+                },
+                4: {
+                  sorter: false
+                }
+              }
+            });
+          });
+        </script>
+      </c:when>
+      <c:otherwise>
+        <h1>Printers</h1>
+        <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+          <a href='javascript:void(0);' class="add" onclick="Print.ui.getPrinterFormEntities(); return false;">Add
+            Printer Service</a><br/>
+        </c:if>
 
         <form id='addPrinterForm'>
           <table class="list" id="printerTable">
@@ -89,62 +132,19 @@
             </tbody>
           </table>
         </form>
-    </c:if>
 
-    <script type="text/javascript">
-      jQuery('.miso-button').hover(
-        function() {
-          jQuery(this).addClass('ui-state-hover');
-        },
-        function() {
-          jQuery(this).removeClass('ui-state-hover');
-        }
-      );
-    </script>
-
-    <c:if test="${not empty barcodePrinter}">
-      <h1>Printer ${barcodePrinter.name}</h1>
-      <table class="list" id="printerTable">
-        <thead>
-        <tr>
-          <th>Job ID</th>
-          <th>Date</th>
-          <th>User</th>
-          <th>Status</th>
-          <th>Elements</th>
-        </tr>
-        </thead>
-        <tbody>
-        <c:forEach items="${printJobs}" var="job">
-          <tr>
-            <td>${job.jobId}</td>
-            <td>${job.printDate}</td>
-            <td>${job.printUser.loginName}</td>
-            <td>${job.status}</td>
-            <td><c:forEach items="${job.queuedElements}" var="element">
-              ${element}<br/>
-            </c:forEach>
-            </td>
-          </tr>
-        </c:forEach>
-        </tbody>
-      </table>
-
-      <script type="text/javascript">
-        jQuery(document).ready(function() {
-          jQuery("#printerTable").tablesorter({
-            headers: {
-              3: {
-                sorter: false
+        <script type="text/javascript">
+          jQuery('.miso-button').hover(
+              function () {
+                jQuery(this).addClass('ui-state-hover');
               },
-              4: {
-                sorter: false
+              function () {
+                jQuery(this).removeClass('ui-state-hover');
               }
-            }
-          });
-        });
-      </script>
-    </c:if>
+          );
+        </script>
+      </c:otherwise>
+    </c:choose>
 
     <c:choose>
       <c:when test="${not empty userPrintJobs}">
