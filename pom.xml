@@ -302,6 +302,15 @@
           <licenseLocation>clover.license</licenseLocation>
         </configuration>
       </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.9</version>
+        <configuration>
+          <stylesheetfile>${basedir}/src/main/javadoc/stylesheet.css</stylesheetfile>
+        </configuration>
+      </plugin>      
     </plugins>
 
     <pluginManagement>
@@ -313,7 +322,6 @@
         </plugin>
       </plugins>
     </pluginManagement>
-
   </build>
 
   <dependencies>
