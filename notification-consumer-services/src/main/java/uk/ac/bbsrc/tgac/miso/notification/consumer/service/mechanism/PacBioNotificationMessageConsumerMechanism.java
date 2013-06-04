@@ -185,7 +185,6 @@ public class PacBioNotificationMessageConsumerMechanism implements NotificationM
                   r.setStatus(is);
 
                   r.setSequencerReference(sr);
-                  runsToSave.add(r);
                 }
                 else {
                   log.error("\\_ Cannot save " + is.getRunName() + ": no sequencer reference available.");
