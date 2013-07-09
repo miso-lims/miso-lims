@@ -30,6 +30,7 @@ import javax.persistence.*;
 import com.eaglegenomics.simlims.core.Request;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
+import org.apache.commons.lang.BooleanUtils;
 import org.w3c.dom.Document;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
@@ -247,7 +248,16 @@ public abstract class AbstractProject implements Project {
   }  
 
   public boolean userCanRead(User user) {
-    return securityProfile.userCanRead(user);
+    try {
+      Boolean bool = false;
+      if (BooleanUtils.isTrue(securityProfile.userCanRead(user))) {
+        bool = true;
+      }
+      return bool;
+    }
+    catch (NullPointerException e) {
+      return false;
+    }
   }
 
   public boolean userCanWrite(User user) {

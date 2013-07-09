@@ -133,6 +133,9 @@ public class EraSubmissionDecorator extends AbstractSubmittableDecorator<Documen
       }
       s.appendChild(actions);
 
+      /*
+      * FILES element deprecated in SRA 1.5
+      *
       Element files = submission.createElementNS(null, "FILES");
 
       FilePathGenerator fpg = new TGACIlluminaFilepathGenerator();
@@ -159,6 +162,7 @@ public class EraSubmissionDecorator extends AbstractSubmittableDecorator<Documen
         }
       }
       s.appendChild(files);
+      */
 
       if (submission.getElementsByTagName("SUBMISSION_SET").item(0) != null) {
         submission.getElementsByTagName("SUBMISSION_SET").item(0).appendChild(s);

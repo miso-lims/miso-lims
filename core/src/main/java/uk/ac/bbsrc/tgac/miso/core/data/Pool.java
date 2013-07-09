@@ -44,7 +44,7 @@ import java.util.Date;
  * if necessary. Pools provide the link between the {@link Sample} tree and the {@link Run} tree of the MISO data model,
  * which means that multiple samples from multiple {@link Project}s can be pooled together.
  * <p/>
- * Pools are typed by the {@link Poolable> interface type they can accept, and as such, Pools can accept {@link Dilution}
+ * Pools are typed by the {@link Poolable} interface type they can accept, and as such, Pools can accept {@link Dilution}
  * and {@link Plate} objects at present. At creation time, a Pool is said to be "ready to run", which makes it easy to
  * categorise and list Pools according to whether they have been placed on a {@link SequencerPoolPartition} (at which
  * point ready to run becomes false) or not.

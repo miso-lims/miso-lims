@@ -121,7 +121,7 @@ public class MisoLdapAuthenticationFilter extends UsernamePasswordAuthentication
         return;
       }
 
-      successfulAuthentication(request, response, authResult);
+      successfulAuthentication(request, response, chain, authResult);
 
       // this will verify that the LDAP user is mirrored into the LIMS DB
 //      Object p = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -140,6 +140,14 @@ public class MisoLdapAuthenticationFilter extends UsernamePasswordAuthentication
         User dbu = securityManager.getUserByLoginName(u.getLoginName());
         if (dbu == null || (dbu != null && !dbu.equals(u))) {
           long userId = securityManager.saveUser(u);
+        }
+        else if (dbu != null) {
+          // check if the user is same with the ldap user (skipped the password field)
+          dbu.setPassword(u.getPassword());
+          if (dbu.equals(u)) {
+            // save the user with ldap password, this is for when ldap password changed.
+            securityManager.saveUser(dbu);
+          }
         }
       }
     }

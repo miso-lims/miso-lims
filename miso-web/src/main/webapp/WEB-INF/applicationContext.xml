@@ -40,6 +40,8 @@
   <!-- this will be wrapped in on the given build profile, i.e. 'mvn clean install -D database=sql' or 'mvn clean install -D database=db4o' -->
   <import resource="db-config.xml"/>
 
+  <import resource="integration-config.xml"/>
+
   <import resource="event-config.xml"/>
   <import resource="logging-config.xml"/>
 

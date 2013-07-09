@@ -27,7 +27,7 @@
          updateCheck="true"
          monitoring="autodetect"
          dynamicConfig="true">
-    <diskStore path="/storage/miso/cache"/>
+    <diskStore path="${miso.baseDirectory}cache"/>
     <defaultCache
             maxElementsInMemory="10000"
             eternal="false"
