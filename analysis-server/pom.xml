@@ -78,7 +78,7 @@
     </dependency>
 
     <dependency>
-        <groupId>${parent.groupId}</groupId>
+      <groupId>${parent.groupId}</groupId>
       <artifactId>core</artifactId>
       <version>${parent.version}</version>
     </dependency>
@@ -189,6 +189,13 @@
       </snapshots>
     </repository>
   </repositories>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>onejar-maven-plugin.googlecode.com</id>
+      <url>http://onejar-maven-plugin.googlecode.com/svn/mavenrepo</url>
+    </pluginRepository>
+  </pluginRepositories>
 
   <properties>
     <spring-version>3.1.3.RELEASE</spring-version>
