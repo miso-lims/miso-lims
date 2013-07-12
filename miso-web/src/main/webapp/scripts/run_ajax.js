@@ -462,6 +462,7 @@ Run.container = {
               },
                 'doOnError': function (json) {
                   newpool.remove();
+                  alert("Error adding pool, no Study is present.");
                 }
               }
       );
