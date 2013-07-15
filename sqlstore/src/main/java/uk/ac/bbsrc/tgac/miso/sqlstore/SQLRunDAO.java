@@ -115,7 +115,7 @@ public class SQLRunDAO implements RunStore {
           "INNER JOIN Run_SequencerPartitionContainer rf ON r.runId = rf.Run_runId" +
           "LEFT JOIN SequencerPartitionContainer f ON f.containerId = rf.containers_containerId " +
           "LEFT JOIN SequencerPartitionContainer_Partition fl ON f.containerId = fl.container_containerId " +
-          "LEFT JOIN Partition l ON fl.partitions_partitionId = l.partitionId " +
+          "LEFT JOIN `Partition` l ON fl.partitions_partitionId = l.partitionId " +
 
           "WHERE l.experiment_experimentId = ?";
 
@@ -138,9 +138,9 @@ public class SQLRunDAO implements RunStore {
           "LEFT JOIN Experiment ex ON st.studyId = ex.study_studyId " +
           "INNER JOIN Pool_Experiment pex ON ex.experimentId = pex.experiments_experimentId " +
           "LEFT JOIN Pool pool ON pool.poolId = pex.pool_poolId " +
-          "LEFT JOIN Partition c ON pool.poolId = c.pool_poolId " +
+          "LEFT JOIN `Partition` c ON pool.poolId = c.pool_poolId " +
           "LEFT JOIN SequencerPartitionContainer_Partition fc ON c.partitionId = fc.partitions_partitionId " +
-          "LEFT JOIN Partition l ON pool.poolId = l.pool_poolId " +
+          "LEFT JOIN `Partition` l ON pool.poolId = l.pool_poolId " +
           "LEFT JOIN SequencerPartitionContainer fa ON fc.container_containerId = fa.containerId " +
 
           "INNER JOIN Run_SequencerPartitionContainer rf ON fa.containerId = rf.containers_containerId " +
@@ -150,7 +150,7 @@ public class SQLRunDAO implements RunStore {
   public static String RUNS_SELECT_BY_POOL_ID =
           "SELECT DISTINCT ra.* " +
           "FROM Pool pool " +
-          "LEFT JOIN Partition c ON pool.poolId = c.pool_poolId " +
+          "LEFT JOIN `Partition` c ON pool.poolId = c.pool_poolId " +
           "LEFT JOIN SequencerPartitionContainer_Partition fc ON c.partitionId = fc.partitions_partitionId " +
 
           "LEFT JOIN SequencerPartitionContainer fa ON fc.container_containerId = fa.containerId " +

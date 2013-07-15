@@ -66,7 +66,7 @@ import java.util.List;
  * @since 0.1.6
  */
 public class SQLSequencerPoolPartitionDAO implements PartitionStore {
-  private static final String TABLE_NAME = "Partition";
+  private static final String TABLE_NAME = "`Partition`";
 
   public static final String PARTITIONS_SELECT =
           "SELECT partitionId, partitionNumber, pool_poolId, securityProfile_profileId " +
