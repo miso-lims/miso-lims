@@ -109,7 +109,7 @@ public class EditGroupController {
     return adminSetupForm(groupId, model);
   }
 
-  @RequestMapping(value = "/admin/group/new", method = RequestMethod.POST)
+  @RequestMapping(value = "/admin/group", method = RequestMethod.POST)
   public String adminProcessSubmitNew(@ModelAttribute("group") Group group, ModelMap model, SessionStatus session) throws IOException {
     return adminProcessSubmit(group, model, session);
   }
