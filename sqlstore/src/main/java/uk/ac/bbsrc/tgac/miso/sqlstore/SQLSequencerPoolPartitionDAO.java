@@ -212,7 +212,7 @@ public class SQLSequencerPoolPartitionDAO implements PartitionStore {
     
     if (partition.getId() == AbstractPartition.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-        .withTableName(TABLE_NAME)
+        .withTableName("Partition")
         .usingGeneratedKeyColumns("partitionId");
       Number newId = insert.executeAndReturnKey(params);
       partition.setId(newId.longValue());
