@@ -245,40 +245,40 @@ public class PacBioTransformer implements FileSetTransformer<String, String, Fil
                 e.printStackTrace();
               }
             }
+          }
 
-            try {
-              PacBioServiceWrapper pacbioServiceWrapper = ApplicationContextProvider.getApplicationContext().getBean(run.getString("sequencerName"), PacBioServiceWrapper.class);
-              PacBioService pacbioService = pacbioServiceWrapper.getPacBioService();
+          try {
+            PacBioServiceWrapper pacbioServiceWrapper = ApplicationContextProvider.getApplicationContext().getBean(run.getString("sequencerName"), PacBioServiceWrapper.class);
+            PacBioService pacbioService = pacbioServiceWrapper.getPacBioService();
 
-              String plateStatus = pacbioService.getPlateStatus(URLEncoder.encode(run.getString("plateId"), "UTF-8"));
-              if ("Complete".equals(plateStatus)) {
-                log.debug(runName + " :: Completed");
-                if (!run.has("completionDate")) {
-                  run.put("completionDate", "");
-                }
-                map.get("Completed").add(run);
+            String plateStatus = pacbioService.getPlateStatus(URLEncoder.encode(run.getString("plateId"), "UTF-8"));
+            if ("Complete".equals(plateStatus)) {
+              log.debug(runName + " :: Completed");
+              if (!run.has("completionDate")) {
+                run.put("completionDate", "");
               }
-              else if ("Running".equals(plateStatus) || "Failed".equals(plateStatus)) {
-                log.debug(runName + " :: "+plateStatus);
-                map.get(plateStatus).add(run);
+              map.get("Completed").add(run);
+            }
+            else if ("Running".equals(plateStatus) || "Failed".equals(plateStatus)) {
+              log.debug(runName + " :: "+plateStatus);
+              map.get(plateStatus).add(run);
+            }
+            else {
+              if ("Aborted".equals(plateStatus)) {
+                log.debug(runName + " :: Aborted");
+                map.get("Failed").add(run);
               }
-              else {
-                if ("Aborted".equals(plateStatus)) {
-                  log.debug(runName + " :: Aborted");
-                  map.get("Failed").add(run);
-                }
-                else if ("Ready".equals(plateStatus)) {
-                  log.debug(runName + " :: Unknown");
-                  map.get("Unknown").add(run);
-                }
+              else if ("Ready".equals(plateStatus)) {
+                log.debug(runName + " :: Unknown");
+                map.get("Unknown").add(run);
               }
             }
-            catch (InterrogationException e) {
-              log.warn(e.getMessage() + ". Attempting fall-back date resolution...");
-            }
-            catch (UnsupportedEncodingException e) {
-              log.warn(e.getMessage() + ". Cannot encode plateId to be URL friendly.");
-            }
+          }
+          catch (InterrogationException e) {
+            log.warn(e.getMessage() + ". Attempting fall-back date resolution...");
+          }
+          catch (UnsupportedEncodingException e) {
+            log.warn(e.getMessage() + ". Cannot encode plateId to be URL friendly.");
           }
         }
         else {
