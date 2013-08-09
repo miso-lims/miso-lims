@@ -68,9 +68,6 @@ public class ProjectRestController {
   public @ResponseBody String jsonRest(@PathVariable Long projectId) throws IOException {
     Project project = requestManager.getProjectById(projectId);
 
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.getSerializationConfig().addMixInAnnotations(Library.class, LibraryRecursionAvoidanceMixin.class);
-
     for (Sample s : project.getSamples()) {
       if (s.getLibraries().isEmpty()) {
         for (Library l : requestManager.listAllLibrariesBySampleId(s.getId())) {
@@ -95,11 +92,13 @@ public class ProjectRestController {
       }
     }
 
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.getSerializationConfig().addMixInAnnotations(Library.class, LibraryRecursionAvoidanceMixin.class);
     return mapper.writeValueAsString(project);
   }
 
   @RequestMapping(value = "{projectId}/libraries", method = RequestMethod.GET)
-  public @ResponseBody Collection<Library> getProjectLibraries(@PathVariable Long projectId) throws IOException {
+  public @ResponseBody String getProjectLibraries(@PathVariable Long projectId) throws IOException {
     Collection<Library> lp = requestManager.listAllLibrariesByProjectId(projectId);
     for (Library l : lp) {
       for (LibraryDilution dil : requestManager.listAllLibraryDilutionsByLibraryId(l.getId())) {
@@ -120,17 +119,24 @@ public class ProjectRestController {
         }
       }
     }
-    return lp;
+
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.getSerializationConfig().addMixInAnnotations(Library.class, LibraryRecursionAvoidanceMixin.class);
+    return mapper.writeValueAsString(lp);
   }
 
   @RequestMapping(method = RequestMethod.GET)
   public @ResponseBody
-  Collection<Project> jsonRest() throws IOException {
+  //Collection<Project> jsonRest() throws IOException {
+  String jsonRest() throws IOException {
     Collection<Project> lp = requestManager.listAllProjects();
     for (Project p : lp) {
       p.setSamples(requestManager.listAllSamplesByProjectId(p.getProjectId()));
       p.setStudies(requestManager.listAllStudiesByProjectId(p.getProjectId()));
     }
-    return lp;
+
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.getSerializationConfig().addMixInAnnotations(Library.class, LibraryRecursionAvoidanceMixin.class);
+    return mapper.writeValueAsString(lp);
   }
 }

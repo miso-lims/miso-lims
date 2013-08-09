@@ -29,19 +29,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
-import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-import uk.ac.bbsrc.tgac.miso.core.service.tagbarcode.TagBarcodeStrategy;
-import uk.ac.bbsrc.tgac.miso.core.service.tagbarcode.TagBarcodeStrategyResolverService;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * A controller to handle all REST requests for Libraries
@@ -64,7 +54,6 @@ public class LibraryRestController {
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
   }
-
 
   @RequestMapping(value = "{libraryId}", method = RequestMethod.GET)
   public @ResponseBody Library jsonRest(@PathVariable Long libraryId) throws IOException {

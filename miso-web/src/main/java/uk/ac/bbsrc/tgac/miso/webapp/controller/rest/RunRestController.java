@@ -24,7 +24,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.*;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import org.slf4j.Logger;
