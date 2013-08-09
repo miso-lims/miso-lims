@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import com.eaglegenomics.simlims.core.Note;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryQcException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleQcException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.core.util.jackson.LibraryRecursionAvoidanceMixin;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -63,8 +65,11 @@ public class ProjectRestController {
   }
 
   @RequestMapping(value = "{projectId}", method = RequestMethod.GET)
-  public @ResponseBody Project jsonRest(@PathVariable Long projectId) throws IOException {
+  public @ResponseBody String jsonRest(@PathVariable Long projectId) throws IOException {
     Project project = requestManager.getProjectById(projectId);
+
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.getSerializationConfig().addMixInAnnotations(Library.class, LibraryRecursionAvoidanceMixin.class);
 
     for (Sample s : project.getSamples()) {
       if (s.getLibraries().isEmpty()) {
@@ -89,7 +94,8 @@ public class ProjectRestController {
         }
       }
     }
-    return project;
+
+    return mapper.writeValueAsString(project);
   }
 
   @RequestMapping(value = "{projectId}/libraries", method = RequestMethod.GET)
