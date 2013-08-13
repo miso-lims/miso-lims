@@ -60,6 +60,15 @@
                 Project.ui.editProjectTrafficLight(${project.id});
 
                 jQuery("#trafdiv").colorbox({width: "90%", inline: true, href: "#trafpanel"});
+
+
+                // Natural Sorting
+                jQuery.fn.dataTableExt.oSort['natural-asc'] = function (a, b) {
+                    return DatatableUtils.naturalSort(a, b);
+                };
+                jQuery.fn.dataTableExt.oSort['natural-desc'] = function (a, b) {
+                    return DatatableUtils.naturalSort(a, b) * -1;
+                };
             });
         </script>
     </div>
