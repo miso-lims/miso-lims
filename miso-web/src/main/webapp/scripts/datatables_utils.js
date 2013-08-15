@@ -147,10 +147,12 @@ DatatableUtils = {
   }
 };
 
-// Natural Sorting
-jQuery.fn.dataTableExt.oSort['natural-asc'] = function(a, b) {
-  return DatatableUtils.naturalSort(a, b);
-};
-jQuery.fn.dataTableExt.oSort['natural-desc'] = function(a, b) {
-  return DatatableUtils.naturalSort(a, b) * -1;
-};
+jQuery(document).ready(function () {
+  // Natural Sorting
+  jQuery.fn.dataTableExt.oSort['natural-asc'] = function (a, b) {
+    return DatatableUtils.naturalSort(a, b);
+  };
+  jQuery.fn.dataTableExt.oSort['natural-desc'] = function (a, b) {
+    return DatatableUtils.naturalSort(a, b) * -1;
+  };
+});

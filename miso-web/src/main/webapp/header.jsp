@@ -98,17 +98,6 @@
           type="text/css">
     <link rel="stylesheet" href="<c:url value='/scripts/jquery/colorbox/colorbox.css'/>"
           type="text/css">
-    <script type="text/javascript">
-        jQuery(document).ready(function () {
-            // Natural Sorting
-            jQuery.fn.dataTableExt.oSort['natural-asc'] = function (a, b) {
-                return DatatableUtils.naturalSort(a, b);
-            };
-            jQuery.fn.dataTableExt.oSort['natural-desc'] = function (a, b) {
-                return DatatableUtils.naturalSort(a, b) * -1;
-            };
-        });
-    </script>
 
     <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.tablesorter.min.js'/>"></script>
     <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.metadata.js'/>"></script>
