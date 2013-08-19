@@ -200,7 +200,9 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
             r.setDescription(m.group(3));
 
             if (r.getStatus() != null && run.has("status")) {
-              r.getStatus().setHealth(ht);
+              if (!r.getStatus().getHealth().equals(HealthType.Failed) && !r.getStatus().getHealth().equals(HealthType.Completed)) {
+                r.getStatus().setHealth(ht);
+              }
               r.getStatus().setXml(run.getString("status"));
             }
             else {
@@ -365,7 +367,7 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
                   }
                 }
                 else if (r.getSequencerReference().getPlatform().getInstrumentModel().contains("2500")) {
-                  if (f.getPartitions().size() != 2 || f.getPartitions().size() != 8) {
+                  if (f.getPartitions().size() != 2 && f.getPartitions().size() != 8) {
                     log.warn(f.getName()+":: WARNING - number of partitions found ("+f.getPartitions().size()+") doesn't match usual number of HiSeq 2500 partitions (2/8)");
                   }
                 }

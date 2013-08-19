@@ -200,7 +200,9 @@ public class LS454NotificationMessageConsumerMechanism implements NotificationMe
                 r.setPairedEnd(false);
 
                 if (r.getStatus() != null && run.has("status")) {
-                  r.getStatus().setHealth(ht);
+                  if (!r.getStatus().getHealth().equals(HealthType.Failed) && !r.getStatus().getHealth().equals(HealthType.Completed)) {
+                    r.getStatus().setHealth(ht);
+                  }
                 }
                 else {
                   if (run.has("status")) {
