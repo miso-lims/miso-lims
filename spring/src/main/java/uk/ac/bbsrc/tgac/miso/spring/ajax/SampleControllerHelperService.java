@@ -633,25 +633,33 @@ public class SampleControllerHelperService {
   }
 
   public JSONObject deleteSample(HttpSession session, JSONObject json) {
+    User user;
     try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      if (user.isAdmin()) {
-        if (json.has("sampleId")) {
-          Long sampleId = json.getLong("sampleId");
-          requestManager.deleteSample(requestManager.getSampleById(sampleId));
-          return JSONUtils.SimpleJSONResponse("Sample deleted");
-        }
-        else {
-          return JSONUtils.SimpleJSONError("No sample specified to delete.");
-        }
-      }
-      else {
-        return JSONUtils.SimpleJSONError("Only admins can delete objects.");
-      }
+      user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     }
     catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
+    }
+
+    if (user != null && user.isAdmin()) {
+      if (json.has("sampleId")) {
+        Long sampleId = json.getLong("sampleId");
+        try {
+          requestManager.deleteSample(requestManager.getSampleById(sampleId));
+          return JSONUtils.SimpleJSONResponse("Sample deleted");
+        }
+        catch (IOException e) {
+          e.printStackTrace();
+          return JSONUtils.SimpleJSONError("Cannot delete sample: " + e.getMessage());
+        }
+      }
+      else {
+        return JSONUtils.SimpleJSONError("No sample specified to delete.");
+      }
+    }
+    else {
+      return JSONUtils.SimpleJSONError("Only logged-in admins can delete objects.");
     }
   }
 

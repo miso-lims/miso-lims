@@ -406,25 +406,33 @@ public class PlateControllerHelperService {
   }
 
   public JSONObject deletePlate(HttpSession session, JSONObject json) {
+    User user;
     try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      if (user.isAdmin()) {
-        if (json.has("plateId")) {
-          Long plateId = json.getLong("plateId");
-          requestManager.deletePlate(requestManager.getPlateById(plateId));
-          return JSONUtils.SimpleJSONResponse("Plate deleted");
-        }
-        else {
-          return JSONUtils.SimpleJSONError("No plate specified to delete.");
-        }
-      }
-      else {
-        return JSONUtils.SimpleJSONError("Only admins can delete objects.");
-      }
+      user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     }
     catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
+    }
+
+    if (user != null && user.isAdmin()) {
+      if (json.has("plateId")) {
+        Long plateId = json.getLong("plateId");
+        try {
+          requestManager.deletePlate(requestManager.getPlateById(plateId));
+          return JSONUtils.SimpleJSONResponse("Plate deleted");
+        }
+        catch (IOException e) {
+          e.printStackTrace();
+          return JSONUtils.SimpleJSONError("Cannot delete plate: " + e.getMessage());
+        }
+      }
+      else {
+        return JSONUtils.SimpleJSONError("No plate specified to delete.");
+      }
+    }
+    else {
+      return JSONUtils.SimpleJSONError("Only logged-in admins can delete objects.");
     }
   }
 

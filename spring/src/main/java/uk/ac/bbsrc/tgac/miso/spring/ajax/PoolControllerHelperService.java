@@ -1085,25 +1085,33 @@ public class PoolControllerHelperService {
   }
 
   public JSONObject deletePool(HttpSession session, JSONObject json) {
+    User user;
     try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      if (user.isAdmin()) {
-        if (json.has("poolId")) {
-          Long poolId = json.getLong("poolId");
-          requestManager.deletePool(requestManager.getPoolById(poolId));
-          return JSONUtils.SimpleJSONResponse("Pool deleted");
-        }
-        else {
-          return JSONUtils.SimpleJSONError("No pool specified to delete.");
-        }
-      }
-      else {
-        return JSONUtils.SimpleJSONError("Only admins can delete objects.");
-      }
+      user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     }
     catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
+    }
+
+    if (user != null && user.isAdmin()) {
+      if (json.has("poolId")) {
+        Long poolId = json.getLong("poolId");
+        try {
+          requestManager.deletePool(requestManager.getPoolById(poolId));
+          return JSONUtils.SimpleJSONResponse("Pool deleted");
+        }
+        catch (IOException e) {
+          e.printStackTrace();
+          return JSONUtils.SimpleJSONError("Cannot delete pool: " + e.getMessage());
+        }
+      }
+      else {
+        return JSONUtils.SimpleJSONError("No pool specified to delete.");
+      }
+    }
+    else {
+      return JSONUtils.SimpleJSONError("Only logged-in admins can delete objects.");
     }
   }
 

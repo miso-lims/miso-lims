@@ -71,25 +71,33 @@ public class StudyControllerHelperService {
   }
 
   public JSONObject deleteStudy(HttpSession session, JSONObject json) {
+    User user;
     try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      if (user.isAdmin()) {
-        if (json.has("studyId")) {
-          Long studyId = json.getLong("studyId");
-          requestManager.deleteStudy(requestManager.getStudyById(studyId));
-          return JSONUtils.SimpleJSONResponse("Study deleted");
-        }
-        else {
-          return JSONUtils.SimpleJSONError("No study specified to delete.");
-        }
-      }
-      else {
-        return JSONUtils.SimpleJSONError("Only admins can delete objects.");
-      }
+      user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     }
     catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
+    }
+
+    if (user != null && user.isAdmin()) {
+      if (json.has("studyId")) {
+        Long studyId = json.getLong("studyId");
+        try {
+          requestManager.deleteStudy(requestManager.getStudyById(studyId));
+          return JSONUtils.SimpleJSONResponse("Study deleted");
+        }
+        catch (IOException e) {
+          e.printStackTrace();
+          return JSONUtils.SimpleJSONError("Cannot delete study: " + e.getMessage());
+        }
+      }
+      else {
+        return JSONUtils.SimpleJSONError("No study specified to delete.");
+      }
+    }
+    else {
+      return JSONUtils.SimpleJSONError("Only admins can delete objects.");
     }
   }
 

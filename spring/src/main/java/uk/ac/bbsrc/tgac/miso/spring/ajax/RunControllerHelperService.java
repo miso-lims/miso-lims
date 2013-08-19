@@ -1179,25 +1179,33 @@ public class RunControllerHelperService {
   }
 
   public JSONObject deleteRun(HttpSession session, JSONObject json) {
+    User user;
     try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      if (user.isAdmin()) {
-        if (json.has("runId")) {
-          Long runId = json.getLong("runId");
-          requestManager.deleteRun(requestManager.getRunById(runId));
-          return JSONUtils.SimpleJSONResponse("Run deleted");
-        }
-        else {
-          return JSONUtils.SimpleJSONError("No run specified to delete.");
-        }
-      }
-      else {
-        return JSONUtils.SimpleJSONError("Only admins can delete objects.");
-      }
+      user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     }
     catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
+    }
+
+    if (user != null && user.isAdmin()) {
+      if (json.has("runId")) {
+        Long runId = json.getLong("runId");
+        try {
+          requestManager.deleteRun(requestManager.getRunById(runId));
+          return JSONUtils.SimpleJSONResponse("Run deleted");
+        }
+        catch (IOException e) {
+          e.printStackTrace();
+          return JSONUtils.SimpleJSONError("Cannot delete run: " + e.getMessage());
+        }
+      }
+      else {
+        return JSONUtils.SimpleJSONError("No run specified to delete.");
+      }
+    }
+    else {
+      return JSONUtils.SimpleJSONError("Only admins can delete objects.");
     }
   }
 
