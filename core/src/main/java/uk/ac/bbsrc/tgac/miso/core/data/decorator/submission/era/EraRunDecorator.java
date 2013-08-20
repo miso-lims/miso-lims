@@ -73,61 +73,83 @@ public class EraRunDecorator extends AbstractSubmittableDecorator<Document> {
       if (r == null) r = this.r;
 
       if (r != null) {
-        Element run = submission.createElementNS(null, "RUN");
-        run.setAttribute("alias", r.getName());
-        run.setAttribute("run_center", submissionProperties.getProperty("submission.centreName"));
-        if (r.getStatus()!= null && r.getStatus().getHealth().equals(HealthType.Completed)) {
-          DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-          run.setAttribute("run_date", df.format(r.getStatus().getCompletionDate()));
-        }
-        run.setAttribute("center_name", submissionProperties.getProperty("submission.centreName"));
+        Collection<? extends Poolable> poolables = pool.getPoolableElements();
 
-        Collection<Experiment> es = pool.getExperiments();
-        for (Experiment e : es) {
-          Element experimentRef = submission.createElementNS(null, "EXPERIMENT_REF");
-          experimentRef.setAttribute("refname", e.getAlias());
-          experimentRef.setAttribute("refcenter", submissionProperties.getProperty("submission.centreName"));
-          run.appendChild(experimentRef);
-        }
+        for (Poolable poolable : poolables) {
+          Element run = submission.createElementNS(null, "RUN");
+          run.setAttribute("alias", "L00"+p.getPartitionNumber()+":"+poolable.getName()+":"+r.getAlias());
+          run.setAttribute("run_center", submissionProperties.getProperty("submission.centreName"));
+          if (r.getStatus()!= null && r.getStatus().getHealth().equals(HealthType.Completed)) {
+            DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+            run.setAttribute("run_date", df.format(r.getStatus().getCompletionDate()));
+          }
+          run.setAttribute("center_name", submissionProperties.getProperty("submission.centreName"));
 
-        Element dataBlock = submission.createElementNS(null, "DATA_BLOCK");
-        dataBlock.setAttribute("sector", Integer.toString(p.getPartitionNumber()));
+          Collection<Experiment> es = pool.getExperiments();
+          for (Experiment e : es) {
+            Element experimentRef = submission.createElementNS(null, "EXPERIMENT_REF");
+            experimentRef.setAttribute("refname", e.getAlias());
+            experimentRef.setAttribute("refcenter", submissionProperties.getProperty("submission.centreName"));
+            run.appendChild(experimentRef);
+          }
 
-        Element files = submission.createElementNS(null, "FILES");
-        Collection<? extends Dilution> dilutions = pool.getDilutions();
+          Element dataBlock = submission.createElementNS(null, "DATA_BLOCK");
+          dataBlock.setAttribute("sector", Integer.toString(p.getPartitionNumber()));
+          if (poolables.size() > 1) {
+            //multiplexed
+            dataBlock.setAttribute("member_name", poolable.getName());
+          }
 
-        FilePathGenerator fpg = new TGACIlluminaFilepathGenerator();
-        String basePath = submissionProperties.getProperty("submission.baseReadPath");
-        if (basePath != null) {
-          fpg = new TGACIlluminaFilepathGenerator(basePath);
-        }
+          Element files = submission.createElementNS(null, "FILES");
 
-        for(Dilution libraryDilution : dilutions) {
+//          FilePathGenerator fpg = new TGACIlluminaFilepathGenerator();
+//          String basePath = submissionProperties.getProperty("submission.baseReadPath");
+//          if (basePath != null) {
+//            fpg = new TGACIlluminaFilepathGenerator(basePath);
+//          }
+
           try {
-            for (File f : fpg.generateFilePath(p,libraryDilution)) {
-              String fileName = f.getName();
-              Element file = submission.createElementNS(null,"FILE");
-              file.setAttribute("filename", fileName);
-              file.setAttribute("filetype", "fastq");
-              //file.setAttribute("checksum_method", "MD5");
-              //file.setAttribute("checksum", "");
-              Element readLabel = submission.createElementNS(null, "READ_LABEL");
-              file.appendChild(readLabel);
-              files.appendChild(file);
+            Element file = submission.createElementNS(null,"FILE");
+            file.setAttribute("filename", r.getAlias()+"/"+"00"+p.getPartitionNumber()+"/"+poolable.getName()+"_R1.fastq.gz");
+            file.setAttribute("filetype", "fastq");
+            file.setAttribute("quality_scoring_system","phred");
+            file.setAttribute("quality_encoding", "ascii");
+            file.setAttribute("ascii_offset", "!");
+            file.setAttribute("checksum_method", "MD5");
+            file.setAttribute("checksum", "");
+            Element readLabel = submission.createElementNS(null, "READ_LABEL");
+            readLabel.setTextContent("1");
+            file.appendChild(readLabel);
+            files.appendChild(file);
+
+            if (r.getPairedEnd()) {
+              Element file2 = submission.createElementNS(null,"FILE");
+              file2.setAttribute("filename", r.getAlias()+"/"+"00"+p.getPartitionNumber()+"/"+poolable.getName()+"_R2.fastq.gz");
+              file2.setAttribute("filetype", "fastq");
+              file2.setAttribute("quality_scoring_system","phred");
+              file2.setAttribute("quality_encoding", "ascii");
+              file2.setAttribute("ascii_offset", "!");
+              file2.setAttribute("checksum_method", "MD5");
+              file2.setAttribute("checksum", "");
+              Element readLabel2 = submission.createElementNS(null, "READ_LABEL");
+              readLabel2.setTextContent("2");
+              file2.appendChild(readLabel2);
+              files.appendChild(file2);
             }
           }
           catch (Exception e) {
             e.printStackTrace();
           }
-        }
-        dataBlock.appendChild(files);
-        run.appendChild(dataBlock);
 
-        if (submission.getElementsByTagName("RUN_SET").item(0) != null) {
-          submission.getElementsByTagName("RUN_SET").item(0).appendChild(run);
-        }
-        else {
-          submission.appendChild(run);
+          dataBlock.appendChild(files);
+          run.appendChild(dataBlock);
+
+          if (submission.getElementsByTagName("RUN_SET").item(0) != null) {
+            submission.getElementsByTagName("RUN_SET").item(0).appendChild(run);
+          }
+          else {
+            submission.appendChild(run);
+          }
         }
       }
     }

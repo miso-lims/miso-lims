@@ -45,7 +45,7 @@ import java.util.*;
 //@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
 @JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
 @JsonIgnoreProperties({"securityProfile"})
-public interface Submission<I, O, R> extends Submittable<O>, SecurableByProfile, Nameable {
+public interface Submission<I, O, R> extends Submittable<O>, SecurableByProfile, Nameable, Comparable {
 
   public static final Long UNSAVED_ID = 0L;
 

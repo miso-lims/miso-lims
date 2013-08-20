@@ -251,4 +251,12 @@ public class SubmissionImpl implements Submission<Submittable, Document, Documen
     submittables.add(this);
     return (Document)manager.submit(submittables);
   }
+
+  @Override
+  public int compareTo(Object o) {
+    Submission t = (Submission)o;
+    if (getId() < t.getId()) return -1;
+    if (getId() > t.getId()) return 1;
+    return 0;
+  }
 }
