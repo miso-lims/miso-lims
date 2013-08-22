@@ -238,7 +238,7 @@ public class LimsDAO extends LimsDAOTestCase {
   public void testPartitions() {
     try {
       // get row count of experiments in the dataset
-      int expected = getDataSet().getTable("Partition").getRowCount();
+      int expected = getDataSet().getTable("_Partition").getRowCount();
 
       // get number of experiments from the DAO
       int actual = getPartitionDAO().count();
