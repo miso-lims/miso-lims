@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.core.service.submission;
 
+import java.net.URI;
+
 /**
  * Created by IntelliJ IDEA.
  * User: collesa
@@ -31,16 +33,15 @@ package uk.ac.bbsrc.tgac.miso.core.service.submission;
  * To change this template use File | Settings | File Templates.
  */
 public class ERAEndpoint implements EndPoint {
+  private URI destination;
 
-    private String destination;
+  @Override
+  public void setDestination(URI d) {
+    destination = d;
+  }
 
-    @Override
-    public void setDestination(String d) {
-        destination=d;
-    }
-
-    @Override
-    public String getDestination() {
-        return destination;
-    }
+  @Override
+  public URI getDestination() {
+    return destination;
+  }
 }

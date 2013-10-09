@@ -28,19 +28,22 @@
   Time: 12:07
  --%>
 <%@ include file="../header.jsp" %>
-<script src="<c:url value='/scripts/sequencer_partition_container_ajax.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
-<script src="<c:url value='/scripts/sequencer_partition_container_validation.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/sequencer_partition_container_ajax.js?ts=${timestamp.time}'/>"
+        type="text/javascript"></script>
+<script src="<c:url value='/scripts/sequencer_partition_container_validation.js?ts=${timestamp.time}'/>"
+        type="text/javascript"></script>
 
 <div id="maincontent">
 <div id="contentcolumn">
-<form:form  action="/miso/container" method="POST" commandName="container" autocomplete="off" onsubmit="return validate_container(this);">
+<form:form action="/miso/container" method="POST" commandName="container" autocomplete="off"
+           onsubmit="return validate_container(this);">
 <sessionConversation:insertSessionConversationId attributeName="container"/>
 <h1>
-    <c:choose>
-        <c:when test="${container.id != 0}">Edit</c:when>
-        <c:otherwise>Create</c:otherwise>
-    </c:choose> Sequencer Partition Container
-    <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
+  <c:choose>
+    <c:when test="${container.id != 0}">Edit</c:when>
+    <c:otherwise>Create</c:otherwise>
+  </c:choose> Sequencer Partition Container
+  <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
 </h1>
 
 <table class="in">
@@ -48,7 +51,8 @@
     <td class="h">Container ID:</td>
     <td>
       <c:choose>
-        <c:when test="${container.id != 0}"><input type='hidden' id='containerId' name='id' value='${container.id}'/>${container.id}</c:when>
+        <c:when test="${container.id != 0}"><input type='hidden' id='containerId' name='id'
+                                                   value='${container.id}'/>${container.id}</c:when>
         <c:otherwise><i>Unsaved</i></c:otherwise>
       </c:choose>
     </td>
@@ -67,14 +71,14 @@
       </c:choose>
     </td>
   </tr>
-<c:if test="${container.id == 0}">
-  <tr>
-    <td>Sequencer:</td>
-    <td id="sequencerReferenceSelect">
-      <i>Please choose a platform above...</i>
-    </td>
-  </tr>
-</c:if>
+  <c:if test="${container.id == 0}">
+    <tr>
+      <td>Sequencer:</td>
+      <td id="sequencerReferenceSelect">
+        <i>Please choose a platform above...</i>
+      </td>
+    </tr>
+  </c:if>
 </table>
 
 <table width="100%">
@@ -82,127 +86,132 @@
   <tr>
     <td width="50%" valign="top">
       <h2>Container Parameters</h2>
-      <div id="containerPartitions">
-      <c:if test="${container.id != 0}">
-        <div class="note ui-corner-all">
-          <c:if test="${multiplexed and not empty container.identificationBarcode}">
-            <ul class="sddm">
-              <li><a
-                      onmouseover="mopen('containermenu')"
-                      onmouseout="mclosetime()">Options <span style="float:right"
-                                                              class="ui-icon ui-icon-triangle-1-s"></span></a>
 
-                <div class="run" id="containermenu"
-                     onmouseover="mcancelclosetime()"
-                     onmouseout="mclosetime()">
-                  <a href="javascript:void(0);"
-                     onclick="Container.generateCasava17DemultiplexCSV(${container.id});">Demultiplex
-                    CSV (pre-1.8)</a>
-                  <a href="javascript:void(0);"
-                     onclick="Container.generateCasava18DemultiplexCSV(${container.id});">Demultiplex
-                    CSV (1.8+)</a>
-                </div>
-              </li>
-            </ul>
-          </c:if>
-          <div style="clear:both"></div>
-          <table class="in">
-            <tr>
-              <c:choose>
-                <c:when test="${empty container.identificationBarcode}">
-                  <td>ID Barcode:</td>
-                  <td>
-                    <button onclick="Container.lookupContainer(this);" type="button" class="right-button ui-state-default ui-corner-all">Lookup</button>
-                    <div style="overflow: hidden">
-                      <form:input path="identificationBarcode"/>
-                    </div>
-                  </td>
-                </c:when>
-                <c:otherwise>
-                  <td>ID Barcode:</td>
-                  <td>
-                    <span id="idBarcode">${container.identificationBarcode}</span>
-                    <form:hidden path="identificationBarcode"/>
-                    <c:if test="${(container.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
-                                                    or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-                      <a href="javascript:void(0);"
-                         onclick="Container.ui.editContainerIdBarcode(jQuery('#idBarcode'))">
-                        <span class="fg-button ui-icon ui-icon-pencil"></span>
-                      </a>
-                    </c:if>
-                  </td>
-                </c:otherwise>
-              </c:choose>
-            </tr>
-            <tr>
-              <c:choose>
-                <c:when test="${empty container.locationBarcode}">
-                  <td>Location:</td>
-                  <td><form:input path="locationBarcode"/></td>
-                </c:when>
-                <c:otherwise>
-                  <td>Location:</td>
-                  <td>
-                    <span id="locationBarcode">${container.locationBarcode}</span>
-                    <form:hidden path="locationBarcode"/>
-                    <c:if test="${(container.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
-                                                    or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-                      <a href="javascript:void(0);"
-                         onclick="Container.ui.editContainerLocationBarcode(jQuery('#locationBarcode'), 0)">
-                        <span class="fg-button ui-icon ui-icon-pencil"></span>
-                      </a>
-                    </c:if>
-                  </td>
-                </c:otherwise>
-              </c:choose>
-            </tr>
-            <tr>
-              <c:choose>
-                <c:when test="${empty container.validationBarcode}">
-                  <td>Validation:</td>
-                  <td><form:input path="validationBarcode"/></td>
-                </c:when>
-                <c:otherwise>
-                  <td>Validation:</td>
-                  <td>
-                    <span id="validationBarcode">${container.validationBarcode}</span>
-                    <form:hidden path="validationBarcode"/>
-                    <c:if test="${(container.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
-                                                    or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-                      <a href="javascript:void(0);"
-                         onclick="Container.ui.editContainerValidationBarcode(jQuery('#validationBarcode'), 0)">
-                        <span class="fg-button ui-icon ui-icon-pencil"></span>
-                      </a>
-                    </c:if>
-                  </td>
-                </c:otherwise>
-              </c:choose>
-            </tr>
-            <%--
-            <tr>
-              <td>Paired: ${container.paired}</td>
-            </tr>
-            --%>
-          </table>
-          <div id='partitionErrorDiv'> </div>
-          <div id="partitionDiv">
-            <i class="italicInfo">Click in a partition box to beep/type in barcodes, or double click a pool on the right to sequentially add pools to the container</i>
+      <div id="containerPartitions">
+        <c:if test="${container.id != 0}">
+          <div class="note ui-corner-all">
+            <c:if test="${multiplexed and not empty container.identificationBarcode}">
+              <ul class="sddm">
+                <li>
+                  <a onmouseover="mopen('containermenu')" onmouseout="mclosetime()">Options
+                    <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
+                  </a>
+
+                  <div class="run" id="containermenu"
+                       onmouseover="mcancelclosetime()"
+                       onmouseout="mclosetime()">
+                    <a href="javascript:void(0);"
+                       onclick="Container.generateCasava17DemultiplexCSV(${container.id});">Demultiplex
+                      CSV (pre-1.8)</a>
+                    <a href="javascript:void(0);"
+                       onclick="Container.generateCasava18DemultiplexCSV(${container.id});">Demultiplex
+                      CSV (1.8+)</a>
+                  </div>
+                </li>
+              </ul>
+            </c:if>
+            <div style="clear:both"></div>
             <table class="in">
-              <th>Partition No.</th>
-              <th>Pool</th>
-              <c:forEach items="${container.partitions}" var="partition" varStatus="partitionCount">
+              <tr>
+                <c:choose>
+                  <c:when test="${empty container.identificationBarcode}">
+                    <td>ID Barcode:</td>
+                    <td>
+                      <button onclick="Container.lookupContainer(this);" type="button"
+                              class="right-button ui-state-default ui-corner-all">Lookup
+                      </button>
+                      <div style="overflow: hidden">
+                        <form:input path="identificationBarcode"/>
+                      </div>
+                    </td>
+                  </c:when>
+                  <c:otherwise>
+                    <td>ID Barcode:</td>
+                    <td>
+                      <span id="idBarcode">${container.identificationBarcode}</span>
+                      <form:hidden path="identificationBarcode"/>
+                      <c:if test="${(container.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
+                                                    or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+                        <a href="javascript:void(0);"
+                           onclick="Container.ui.editContainerIdBarcode(jQuery('#idBarcode'))">
+                          <span class="fg-button ui-icon ui-icon-pencil"></span>
+                        </a>
+                      </c:if>
+                    </td>
+                  </c:otherwise>
+                </c:choose>
+              </tr>
+              <tr>
+                <c:choose>
+                  <c:when test="${empty container.locationBarcode}">
+                    <td>Location:</td>
+                    <td><form:input path="locationBarcode"/></td>
+                  </c:when>
+                  <c:otherwise>
+                    <td>Location:</td>
+                    <td>
+                      <span id="locationBarcode">${container.locationBarcode}</span>
+                      <form:hidden path="locationBarcode"/>
+                      <c:if test="${(container.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
+                                                    or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+                        <a href="javascript:void(0);"
+                           onclick="Container.ui.editContainerLocationBarcode(jQuery('#locationBarcode'), 0)">
+                          <span class="fg-button ui-icon ui-icon-pencil"></span>
+                        </a>
+                      </c:if>
+                    </td>
+                  </c:otherwise>
+                </c:choose>
+              </tr>
+              <tr>
+                <c:choose>
+                  <c:when test="${empty container.validationBarcode}">
+                    <td>Validation:</td>
+                    <td><form:input path="validationBarcode"/></td>
+                  </c:when>
+                  <c:otherwise>
+                    <td>Validation:</td>
+                    <td>
+                      <span id="validationBarcode">${container.validationBarcode}</span>
+                      <form:hidden path="validationBarcode"/>
+                      <c:if test="${(container.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
+                                                    or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+                        <a href="javascript:void(0);"
+                           onclick="Container.ui.editContainerValidationBarcode(jQuery('#validationBarcode'), 0)">
+                          <span class="fg-button ui-icon ui-icon-pencil"></span>
+                        </a>
+                      </c:if>
+                    </td>
+                  </c:otherwise>
+                </c:choose>
+              </tr>
+                <%--
                 <tr>
-                  <td>${partition.partitionNumber}</td>
-                  <td width="90%">
-                    <c:choose>
-                      <c:when test="${not empty partition.pool}">
-                        <ul partition="${partitionCount.index}" bind="partitions[${partitionCount.index}].pool" class="runPartitionDroppable">
-                        <div class="dashboard">
-                          <%-- <a href='<c:url value="/miso/pool/${fn:toLowerCase(container.platformType.key)}/${partition.pool.id}"/>'> --%>
-                          <a href='<c:url value="/miso/pool/${partition.pool.id}"/>'>
-                              ${partition.pool.name}
-                            (${partition.pool.creationDate})
-                          </a><br/>
+                  <td>Paired: ${container.paired}</td>
+                </tr>
+                --%>
+            </table>
+            <div id='partitionErrorDiv'></div>
+            <div id="partitionDiv">
+              <i class="italicInfo">Click in a partition box to beep/type in barcodes, or double click a pool on the
+                right to sequentially add pools to the container</i>
+              <table class="in">
+                <th>Partition No.</th>
+                <th>Pool</th>
+                <c:forEach items="${container.partitions}" var="partition" varStatus="partitionCount">
+                  <tr>
+                    <td>${partition.partitionNumber}</td>
+                    <td width="90%">
+                      <c:choose>
+                        <c:when test="${not empty partition.pool}">
+                          <ul partition="${partitionCount.index}" bind="partitions[${partitionCount.index}].pool"
+                              class="runPartitionDroppable">
+                            <div class="dashboard">
+                                <%-- <a href='<c:url value="/miso/pool/${fn:toLowerCase(container.platformType.key)}/${partition.pool.id}"/>'> --%>
+                              <a href='<c:url value="/miso/pool/${partition.pool.id}"/>'>
+                                  ${partition.pool.name}
+                                (${partition.pool.creationDate})
+                              </a><br/>
                             <span style="font-size:8pt">
                               <c:choose>
                                 <c:when test="${not empty partition.pool.experiments}">
@@ -221,23 +230,57 @@
                                 </c:otherwise>
                               </c:choose>
                             </span>
-                        </div>
-                        </ul>
-                      </c:when>
-                      <c:otherwise>
-                        <div id="p_div_${partitionCount.index}"
-                             class="elementListDroppableDiv">
-                          <ul class='runPartitionDroppable' bind='partitions[${partitionCount.index}].pool' partition='${partitionCount.index}' ondblclick='Container.partition.populatePartition(this);'/></ul>
-                        </div>
-                      </c:otherwise>
-                    </c:choose>
-                  </td>
-                </tr>
-              </c:forEach>
-            </table>
+                            </div>
+                          </ul>
+                        </c:when>
+                        <c:otherwise>
+                          <div id="p_div_${partitionCount.index}"
+                               class="elementListDroppableDiv">
+                            <ul class='runPartitionDroppable' bind='partitions[${partitionCount.index}].pool'
+                                partition='${partitionCount.index}'
+                                ondblclick='Container.partition.populatePartition(this);'/>
+                            </ul>
+                          </div>
+                        </c:otherwise>
+                      </c:choose>
+                    </td>
+                  </tr>
+                </c:forEach>
+              </table>
+            </div>
           </div>
-        </div>
-      </c:if>
+        </c:if>
+      </div>
+    </td>
+    <td width="50%" valign="top">
+      <h2>Available Pools</h2>
+      <c:choose>
+        <c:when test="${not empty container.platformType}">
+          <input id="showOnlyReady" type="checkbox" checked="true"
+                 onclick="Container.pool.toggleReadyToRunCheck(this, '${container.platformType.key}');"/>Only Ready to Run pools?
+          <div align="right" style="margin-top: -23px; margin-bottom:3px">Filter:
+            <input type="text" size="8" id="searchPools" name="searchPools"/>
+          </div>
+          <script type="text/javascript">
+            Utils.timer.typewatchFunc(jQuery('#searchPools'), function () {
+              Container.pool.poolSearch(jQuery('#searchPools').val(), '${container.platformType.key}');
+            }, 300, 2);
+          </script>
+        </c:when>
+        <c:otherwise>
+          <input id="showOnlyReady" type="checkbox" checked="true"
+                 onclick="Container.pool.toggleReadyToRunCheck(this, jQuery('input[name=platformType]:checked').val());"/>Only Ready to Run pools?
+          <div align="right" style="margin-top: -23px; margin-bottom:3px">Filter:
+            <input type="text" size="8" id="searchPools" name="searchPools"/>
+          </div>
+          <script type="text/javascript">
+            Utils.timer.typewatchFunc(jQuery('#searchPools'), function () {
+              Container.pool.poolSearch(jQuery('#searchPools').val(), jQuery('input[name=platformType]:checked').val());
+            }, 300, 2);
+          </script>
+        </c:otherwise>
+      </c:choose>
+      <div id='poolList' class="elementList ui-corner-all" style="height:500px">
       </div>
     </td>
   </tr>
@@ -249,9 +292,9 @@
 
 <script type="text/javascript">
   <c:if test="${container.id == 0 or empty container.platformType}">
-    jQuery(document).ready(function() {
-      Container.ui.populatePlatformTypes();
-    });
+  jQuery(document).ready(function () {
+    Container.ui.populatePlatformTypes();
+  });
   </c:if>
 </script>
 

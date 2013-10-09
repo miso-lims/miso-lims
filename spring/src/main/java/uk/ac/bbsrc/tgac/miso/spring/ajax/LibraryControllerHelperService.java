@@ -207,7 +207,7 @@ public class LibraryControllerHelperService {
       String serviceName = null;
       if (json.has("serviceName")) { serviceName = json.getString("serviceName"); }
 
-      MisoPrintService<File, PrintContext<File>> mps = null;
+      MisoPrintService<File, Barcodable, PrintContext<File>> mps = null;
       if (serviceName == null) {
         Collection<MisoPrintService> services = printManager.listPrintServicesByBarcodeableClass(Library.class);
         if (services.size() == 1) {
@@ -261,7 +261,7 @@ public class LibraryControllerHelperService {
       String serviceName = null;
       if (json.has("serviceName")) { serviceName = json.getString("serviceName"); }
 
-      MisoPrintService<File, PrintContext<File>> mps = null;
+      MisoPrintService<File, Barcodable, PrintContext<File>> mps = null;
       if (serviceName == null) {
         Collection<MisoPrintService> services = printManager.listPrintServicesByBarcodeableClass(LibraryDilution.class);
         if (services.size() == 1) {
@@ -662,12 +662,21 @@ public class LibraryControllerHelperService {
       if (ok) {
         Map<String, Object> map = new HashMap<String, Object>();
         JSONArray a = new JSONArray();
+        JSONArray errors = new JSONArray();
         for (JSONObject qc : (Iterable<JSONObject>)qcs) {
           JSONObject j = addLibraryQC(session, qc);
           j.put("libraryId", qc.getString("libraryId"));
-          a.add(j);
+          if (j.has("error")) {
+            errors.add(j);
+          }
+          else {
+            a.add(j);
+          }
         }
         map.put("saved", a);
+        if (!errors.isEmpty()) {
+          map.put("errors", errors);
+        }
         return JSONUtils.JSONObjectResponse(map);
       }
       else {
@@ -776,12 +785,21 @@ public class LibraryControllerHelperService {
       if (ok) {
         Map<String, Object> map = new HashMap<String, Object>();
         JSONArray a = new JSONArray();
+        JSONArray errors = new JSONArray();
         for (JSONObject dil : (Iterable<JSONObject>)dilutions) {
           JSONObject j = addLibraryDilution(session, dil);
           j.put("libraryId", dil.getString("libraryId"));
-          a.add(j);
+          if (j.has("error")) {
+            errors.add(j);
+          }
+          else {
+            a.add(j);
+          }
         }
         map.put("saved", a);
+        if (!errors.isEmpty()) {
+          map.put("errors", errors);
+        }
         return JSONUtils.JSONObjectResponse(map);
       }
       else {
@@ -958,12 +976,21 @@ public class LibraryControllerHelperService {
       if (ok) {
         Map<String, Object> map = new HashMap<String, Object>();
         JSONArray a = new JSONArray();
+        JSONArray errors = new JSONArray();
         for (JSONObject pcr : (Iterable<JSONObject>)pcrs) {
           JSONObject j = addEmPcr(session, pcr);
           j.put("dilutionId", pcr.getString("dilutionId"));
-          a.add(j);
+          if (j.has("error")) {
+            errors.add(j);
+          }
+          else {
+            a.add(j);
+          }
         }
         map.put("saved", a);
+        if (!errors.isEmpty()) {
+          map.put("errors", errors);
+        }
         return JSONUtils.JSONObjectResponse(map);
       }
       else {
@@ -996,15 +1023,23 @@ public class LibraryControllerHelperService {
 
       //persist
       if (ok) {
-        log.info("EmPCR Dilutions OK, saving...");
         Map<String, Object> map = new HashMap<String, Object>();
         JSONArray a = new JSONArray();
+        JSONArray errors = new JSONArray();
         for (JSONObject dil : (Iterable<JSONObject>)dilutions) {
           JSONObject j = addEmPcrDilution(session, dil);
           j.put("pcrId", dil.getString("pcrId"));
-          a.add(j);
+          if (j.has("error")) {
+            errors.add(j);
+          }
+          else {
+            a.add(j);
+          }
         }
         map.put("saved", a);
+        if (!errors.isEmpty()) {
+          map.put("errors", errors);
+        }
         return JSONUtils.JSONObjectResponse(map);
       }
       else {

@@ -71,7 +71,7 @@ import java.util.regex.Pattern;
 public class FormUtils {
   protected static final Logger log = LoggerFactory.getLogger(FormUtils.class);
 
-  private static final Pattern digitPattern = Pattern.compile("(^[0-9]+)");
+  private static final Pattern digitPattern = Pattern.compile("(^[0-9]+)[\\.0-9]*");
   private static final Pattern samplePattern = Pattern.compile("([A-z0-9]+)_S([A-z0-9]+)_(.*)");
 
   public static void createSampleInputSpreadsheet(Collection<Sample> samples, File outpath) throws Exception {
@@ -136,7 +136,7 @@ public class FormUtils {
 
   //private static Map<String, Pool<Plate<LinkedList<Library>, Library>>> process384PlateInputODS(OdfSpreadsheetDocument oDoc, User u, RequestManager manager, MisoNamingScheme<Library> libraryNamingScheme) throws Exception {
   private static Map<String, PlatePool> process384PlateInputODS(OdfSpreadsheetDocument oDoc, User u, RequestManager manager, MisoNamingScheme<Library> libraryNamingScheme) throws Exception {
-    ((RequestManagerAwareNamingScheme)libraryNamingScheme).setRequestManager(manager);
+    ((RequestManagerAwareNamingScheme) libraryNamingScheme).setRequestManager(manager);
 
     List<Sample> samples = new ArrayList<Sample>();
     OdfTable oTable = oDoc.getTableList().get(0);
@@ -155,7 +155,7 @@ public class FormUtils {
       pt = PlatformType.get(platformCell.getStringValue());
     }
     if (pt == null) {
-      throw new InputFormException("Cannot resolve Platform type from: '" + platformCell.getStringValue() +"'");
+      throw new InputFormException("Cannot resolve Platform type from: '" + platformCell.getStringValue() + "'");
     }
     else {
       log.info("Got platform type: " + pt.getKey());
@@ -171,11 +171,11 @@ public class FormUtils {
         lt = manager.getLibraryTypeByDescriptionAndPlatform(type, pt);
       }
       else {
-        throw new InputFormException("Selected library type '"+typeCell.getStringValue()+"' doesn't match platform type: '" + platformCell.getStringValue() +"'");
+        throw new InputFormException("Selected library type '" + typeCell.getStringValue() + "' doesn't match platform type: '" + platformCell.getStringValue() + "'");
       }
     }
     if (lt == null) {
-      throw new InputFormException("Cannot resolve Library type from: '" + typeCell.getStringValue() +"'");
+      throw new InputFormException("Cannot resolve Library type from: '" + typeCell.getStringValue() + "'");
     }
     else {
       log.info("Got library type: " + lt.getDescription());
@@ -187,7 +187,7 @@ public class FormUtils {
       ls = manager.getLibrarySelectionTypeByName(selectionCell.getStringValue());
     }
     if (ls == null) {
-      throw new InputFormException("Cannot resolve Library Selection type from: '" + selectionCell.getStringValue() +"'");
+      throw new InputFormException("Cannot resolve Library Selection type from: '" + selectionCell.getStringValue() + "'");
     }
     else {
       log.info("Got library selection type: " + ls.getName());
@@ -199,7 +199,7 @@ public class FormUtils {
       lst = manager.getLibraryStrategyTypeByName(strategyCell.getStringValue());
     }
     if (lst == null) {
-      throw new InputFormException("Cannot resolve Library Strategy type from: '" + strategyCell.getStringValue() +"'");
+      throw new InputFormException("Cannot resolve Library Strategy type from: '" + strategyCell.getStringValue() + "'");
     }
     else {
       log.info("Got library strategy type: " + lst.getName());
@@ -211,7 +211,7 @@ public class FormUtils {
       plateBarcode = plateBarcodeCell.getStringValue();
     }
     if (plateBarcode == null) {
-      throw new InputFormException("Cannot resolve plate barcode from: '" + plateBarcodeCell.getStringValue() +"'");
+      throw new InputFormException("Cannot resolve plate barcode from: '" + plateBarcodeCell.getStringValue() + "'");
     }
     else {
       log.info("Got plate parcode: " + plateBarcode);
@@ -245,11 +245,11 @@ public class FormUtils {
               log.info("Got sample: " + s.getAlias());
             }
             else {
-              throw new InputFormException("Multiple samples retrieved with this alias: '"+sampleAliasCell.getStringValue()+"'. Cannot process.");
+              throw new InputFormException("Multiple samples retrieved with this alias: '" + sampleAliasCell.getStringValue() + "'. Cannot process.");
             }
           }
           else {
-            throw new InputFormException("No such sample '"+sampleAliasCell.getStringValue()+"'in database. Samples need to be created before using the form input functionality");
+            throw new InputFormException("No such sample '" + sampleAliasCell.getStringValue() + "'in database. Samples need to be created before using the form input functionality");
           }
         }
         else {
@@ -308,7 +308,7 @@ public class FormUtils {
               }
             }
             catch (NumberFormatException nfe) {
-              throw new InputFormException("Supplied Sample QC concentration for sample '"+sampleAliasCell.getStringValue()+"' is invalid", nfe);
+              throw new InputFormException("Supplied Sample QC concentration for sample '" + sampleAliasCell.getStringValue() + "' is invalid", nfe);
             }
           }
 
@@ -320,7 +320,7 @@ public class FormUtils {
 
             Matcher mat = samplePattern.matcher(s.getAlias());
             if (mat.matches()) {
-              String libAlias = plateBarcode+"_"+"L"+mat.group(2)+"-"+platePosCell.getStringValue()+"_"+entityIDCell.getStringValue();
+              String libAlias = plateBarcode + "_" + "L" + mat.group(2) + "-" + platePosCell.getStringValue() + "_" + entityIDCell.getStringValue();
               //String libAlias = libraryNamingScheme.generateNameFor("alias", library);
               //library.setAlias(libAlias);
 
@@ -338,10 +338,16 @@ public class FormUtils {
                 int insertSize = 0;
                 try {
                   String bp = libraryQcInsertSizeCell.getStringValue();
-                  insertSize = Integer.valueOf(digitPattern.matcher(bp).group(1));
+                  Matcher m = digitPattern.matcher(bp);
+                  if (m.matches()) {
+                    insertSize = Integer.valueOf(m.group(1));
+                  }
+                  else {
+                    throw new InputFormException("Supplied Library insert size for library '" + libAlias + "' (" + s.getAlias() + ") is invalid");
+                  }
                 }
                 catch (NumberFormatException nfe) {
-                  throw new InputFormException("Supplied Library insert size for library '"+libAlias+"' ("+s.getAlias()+") is invalid", nfe);
+                  throw new InputFormException("Supplied Library insert size for library '" + libAlias + "' (" + s.getAlias() + ") is invalid", nfe);
                 }
 
                 try {
@@ -366,7 +372,7 @@ public class FormUtils {
                   }
                 }
                 catch (NumberFormatException nfe) {
-                  throw new InputFormException("Supplied Library QC concentration for library '"+libAlias+"' ("+s.getAlias()+") is invalid", nfe);
+                  throw new InputFormException("Supplied Library QC concentration for library '" + libAlias + "' (" + s.getAlias() + ") is invalid", nfe);
                 }
               }
 
@@ -401,11 +407,11 @@ public class FormUtils {
                     library.setTagBarcodes(tbs);
                   }
                   else {
-                    throw new InputFormException("Barcode Kit specified but no tag barcodes entered for: '"+sampleAliasCell.getStringValue()+"'.");
+                    throw new InputFormException("Barcode Kit specified but no tag barcodes entered for: '" + sampleAliasCell.getStringValue() + "'.");
                   }
                 }
                 else {
-                  throw new InputFormException("No tag barcodes associated with this kit definition: '"+barcodeKitCell.getStringValue()+"'.");
+                  throw new InputFormException("No tag barcodes associated with this kit definition: '" + barcodeKitCell.getStringValue() + "'.");
                 }
               }
 
@@ -438,13 +444,13 @@ public class FormUtils {
               if (!"".equals(poolConvertedMolarityCell.getStringValue())) {
                 Pool<Plate<LinkedList<Library>, Library>> p = pools.get(poolNumberCell.getStringValue());
                 if (p != null) {
-                  log.debug("Retrieved pool "+poolNumberCell.getStringValue());
+                  log.debug("Retrieved pool " + poolNumberCell.getStringValue());
                   try {
                     double d = Double.valueOf(poolConvertedMolarityCell.getStringValue());
                     p.setConcentration(d);
                   }
                   catch (NumberFormatException nfe) {
-                    throw new InputFormException("Supplied pool concentration for pool '"+poolNumberCell.getStringValue()+"' is invalid", nfe);
+                    throw new InputFormException("Supplied pool concentration for pool '" + poolNumberCell.getStringValue() + "' is invalid", nfe);
                   }
                 }
               }
@@ -478,7 +484,7 @@ public class FormUtils {
 
   //private static Map<String, Pool<Plate<LinkedList<Library>, Library>>> process384PlateInputXLSX(XSSFWorkbook wb, User u, RequestManager manager, MisoNamingScheme<Library> libraryNamingScheme) throws Exception {
   private static Map<String, PlatePool> process384PlateInputXLSX(XSSFWorkbook wb, User u, RequestManager manager, MisoNamingScheme<Library> libraryNamingScheme) throws Exception {
-    ((RequestManagerAwareNamingScheme)libraryNamingScheme).setRequestManager(manager);
+    ((RequestManagerAwareNamingScheme) libraryNamingScheme).setRequestManager(manager);
 
     List<Sample> samples = new ArrayList<Sample>();
     XSSFSheet sheet = wb.getSheetAt(0);
@@ -497,7 +503,7 @@ public class FormUtils {
       pt = PlatformType.get(getCellValueAsString(platformCell));
     }
     if (pt == null) {
-      throw new InputFormException("Cannot resolve Platform type from: '" + getCellValueAsString(platformCell) +"'");
+      throw new InputFormException("Cannot resolve Platform type from: '" + getCellValueAsString(platformCell) + "'");
     }
     else {
       log.info("Got platform type: " + pt.getKey());
@@ -513,11 +519,11 @@ public class FormUtils {
         lt = manager.getLibraryTypeByDescriptionAndPlatform(type, pt);
       }
       else {
-        throw new InputFormException("Selected library type '"+getCellValueAsString(typeCell)+"' doesn't match platform type: '" + getCellValueAsString(platformCell) +"'");
+        throw new InputFormException("Selected library type '" + getCellValueAsString(typeCell) + "' doesn't match platform type: '" + getCellValueAsString(platformCell) + "'");
       }
     }
     if (lt == null) {
-      throw new InputFormException("Cannot resolve Library type from: '" + getCellValueAsString(typeCell) +"'");
+      throw new InputFormException("Cannot resolve Library type from: '" + getCellValueAsString(typeCell) + "'");
     }
     else {
       log.info("Got library type: " + lt.getDescription());
@@ -529,7 +535,7 @@ public class FormUtils {
       ls = manager.getLibrarySelectionTypeByName(getCellValueAsString(selectionCell));
     }
     if (ls == null) {
-      throw new InputFormException("Cannot resolve Library Selection type from: '" + getCellValueAsString(selectionCell) +"'");
+      throw new InputFormException("Cannot resolve Library Selection type from: '" + getCellValueAsString(selectionCell) + "'");
     }
     else {
       log.info("Got library selection type: " + ls.getName());
@@ -541,7 +547,7 @@ public class FormUtils {
       lst = manager.getLibraryStrategyTypeByName(getCellValueAsString(strategyCell));
     }
     if (lst == null) {
-      throw new InputFormException("Cannot resolve Library Strategy type from: '" + getCellValueAsString(strategyCell) +"'");
+      throw new InputFormException("Cannot resolve Library Strategy type from: '" + getCellValueAsString(strategyCell) + "'");
     }
     else {
       log.info("Got library strategy type: " + lst.getName());
@@ -553,7 +559,7 @@ public class FormUtils {
       plateBarcode = getCellValueAsString(plateBarcodeCell);
     }
     if (plateBarcode == null) {
-      throw new InputFormException("Cannot resolve plate barcode from: '" + getCellValueAsString(plateBarcodeCell) +"'");
+      throw new InputFormException("Cannot resolve plate barcode from: '" + getCellValueAsString(plateBarcodeCell) + "'");
     }
     else {
       log.info("Got plate barcode: " + plateBarcode);
@@ -577,7 +583,7 @@ public class FormUtils {
       }
 
       //cell defs
-      XSSFCell sampleAliasCell = row.getCell(1);
+      XSSFCell sampleAliasCell = row.getCell(2);
 
       Sample s = null;
       if (getCellValueAsString(sampleAliasCell) != null) {
@@ -589,11 +595,11 @@ public class FormUtils {
             log.info("Got sample: " + s.getAlias());
           }
           else {
-            throw new InputFormException("Multiple samples retrieved with this alias: '"+salias+"'. Cannot process.");
+            throw new InputFormException("Multiple samples retrieved with this alias: '" + salias + "'. Cannot process.");
           }
         }
         else {
-          throw new InputFormException("No such sample '"+salias+"'in database. Samples need to be created before using the form input functionality");
+          throw new InputFormException("No such sample '" + salias + "'in database. Samples need to be created before using the form input functionality");
         }
       }
       else {
@@ -608,21 +614,22 @@ public class FormUtils {
         XSSFCell sampleQcCell = row.getCell(4);
         //XSSFCell sampleAmountCell = row.getCell(5);
         //XSSFCell sampleWaterAmountCell = row.getCell(6);
-        XSSFCell barcodeKitCell = row.getCell(7);
-        XSSFCell barcodeTagsCell = row.getCell(8);
-        XSSFCell libraryQcCell = row.getCell(9);
-        XSSFCell libraryQcInsertSizeCell = row.getCell(10);
-        XSSFCell libraryQcMolarityCell = row.getCell(11);
-        XSSFCell libraryQcPassFailCell = row.getCell(12);
-        //XSSFCell libraryAmountCell = row.getCell(13);
-        //XSSFCell libraryWaterAmountCell = row.getCell(14);
-        //XSSFCell dilutionQcCell = row.getCell(15);
-        XSSFCell dilutionMolarityCell = row.getCell(16);
-        //XSSFCell dilutionAmountCell = row.getCell(17);
-        //XSSFCell dilutionWaterAmountCell = row.getCell(18);
-        XSSFCell poolQcCell = row.getCell(19);
-        //XSSFCell poolAverageInsertSizeCell = row.getCell(20);
-        XSSFCell poolConvertedMolarityCell = row.getCell(21);
+        XSSFCell libraryDescriptionCell = row.getCell(7);
+        XSSFCell barcodeKitCell = row.getCell(8);
+        XSSFCell barcodeTagsCell = row.getCell(9);
+        XSSFCell libraryQcCell = row.getCell(10);
+        XSSFCell libraryQcInsertSizeCell = row.getCell(11);
+        XSSFCell libraryQcMolarityCell = row.getCell(12);
+        XSSFCell libraryQcPassFailCell = row.getCell(13);
+        //XSSFCell libraryAmountCell = row.getCell(14);
+        //XSSFCell libraryWaterAmountCell = row.getCell(15);
+        //XSSFCell dilutionQcCell = row.getCell(16);
+        XSSFCell dilutionMolarityCell = row.getCell(17);
+        //XSSFCell dilutionAmountCell = row.getCell(18);
+        //XSSFCell dilutionWaterAmountCell = row.getCell(19);
+        XSSFCell poolQcCell = row.getCell(20);
+        //XSSFCell poolAverageInsertSizeCell = row.getCell(21);
+        XSSFCell poolConvertedMolarityCell = row.getCell(22);
 
         //add pool, if any
         if (getCellValueAsString(poolNumberCell) != null) {
@@ -635,6 +642,7 @@ public class FormUtils {
             pool.setCreationDate(new Date());
             pools.put(poolNum, pool);
             log.info("Added pool: " + poolNum);
+            manager.savePool(pool);
           }
         }
 
@@ -646,14 +654,21 @@ public class FormUtils {
             sqc.setResults(Double.valueOf(getCellValueAsString(sampleQcCell)));
             sqc.setQcCreator(u.getLoginName());
             sqc.setQcDate(new Date());
-            sqc.setQcType(manager.getSampleQcTypeByName("Picogreen"));
+            if (manager.getSampleQcTypeByName("Picogreen") != null) {
+              sqc.setQcType(manager.getSampleQcTypeByName("Picogreen"));
+            }
+            else {
+              sqc.setQcType(manager.getSampleQcTypeByName("QuBit"));
+            }
             if (!s.getSampleQCs().contains(sqc)) {
               s.addQc(sqc);
+              manager.saveSampleQC(sqc);
+              manager.saveSample(s);
               log.info("Added sample QC: " + sqc.toString());
             }
           }
           catch (NumberFormatException nfe) {
-            throw new InputFormException("Supplied Sample QC concentration for sample '"+getCellValueAsString(sampleAliasCell)+"' is invalid", nfe);
+            throw new InputFormException("Supplied Sample QC concentration for sample '" + getCellValueAsString(sampleAliasCell) + "' is invalid", nfe);
           }
         }
 
@@ -666,7 +681,7 @@ public class FormUtils {
 
           Matcher mat = samplePattern.matcher(s.getAlias());
           if (mat.matches()) {
-            String libAlias = plateBarcode+"_"+"L"+mat.group(2)+"-"+platePos+"_"+getCellValueAsString(entityIDCell);
+            String libAlias = plateBarcode + "_" + "L" + mat.group(2) + "-" + platePos + "_" + getCellValueAsString(entityIDCell);
             //String libAlias = libraryNamingScheme.generateNameFor("alias", library);
             //library.setAlias(libAlias);
 
@@ -684,10 +699,16 @@ public class FormUtils {
               int insertSize = 0;
               try {
                 String bp = getCellValueAsString(libraryQcInsertSizeCell);
-                insertSize = Integer.valueOf(digitPattern.matcher(bp).group(1));
+                Matcher m = digitPattern.matcher(bp);
+                if (m.matches()) {
+                  insertSize = Integer.valueOf(m.group(1));
+                }
+                else {
+                  throw new InputFormException("Supplied Library insert size for library '" + libAlias + "' (" + s.getAlias() + ") is invalid");
+                }
               }
               catch (NumberFormatException nfe) {
-                throw new InputFormException("Supplied Library insert size for library '"+libAlias+"' ("+s.getAlias()+") is invalid", nfe);
+                throw new InputFormException("Supplied Library insert size for library '" + libAlias + "' (" + s.getAlias() + ") is invalid", nfe);
               }
 
               try {
@@ -700,6 +721,7 @@ public class FormUtils {
                 lqc.setQcType(manager.getLibraryQcTypeByName("Bioanalyzer"));
                 if (!library.getLibraryQCs().contains(lqc)) {
                   library.addQc(lqc);
+                  manager.saveLibraryQC(lqc);
                   log.info("Added library QC: " + lqc.toString());
                 }
 
@@ -712,7 +734,7 @@ public class FormUtils {
                 }
               }
               catch (NumberFormatException nfe) {
-                throw new InputFormException("Supplied Library QC concentration for library '"+libAlias+"' ("+s.getAlias()+") is invalid", nfe);
+                throw new InputFormException("Supplied Library QC concentration for library '" + libAlias + "' (" + s.getAlias() + ") is invalid", nfe);
               }
             }
 
@@ -749,11 +771,11 @@ public class FormUtils {
                   library.setTagBarcodes(tbs);
                 }
                 else {
-                  throw new InputFormException("Barcode Kit specified but no tag barcodes entered for: '"+s.getAlias()+"'.");
+                  throw new InputFormException("Barcode Kit specified but no tag barcodes entered for: '" + s.getAlias() + "'.");
                 }
               }
               else {
-                throw new InputFormException("No tag barcodes associated with the kit definition '"+getCellValueAsString(barcodeKitCell)+"' for sample: '"+s.getAlias()+"'.");
+                throw new InputFormException("No tag barcodes associated with the kit definition '" + getCellValueAsString(barcodeKitCell) + "' for sample: '" + s.getAlias() + "'.");
               }
             }
 
@@ -790,17 +812,18 @@ public class FormUtils {
               String poolNum = getCellValueAsString(poolNumberCell);
               Pool<Plate<LinkedList<Library>, Library>> p = pools.get(poolNum);
               if (p != null) {
-                log.debug("Retrieved pool "+poolNum);
+                log.debug("Retrieved pool " + poolNum);
                 try {
                   p.setConcentration(Double.valueOf(getCellValueAsString(poolConvertedMolarityCell)));
                 }
                 catch (NumberFormatException nfe) {
-                  throw new InputFormException("Supplied pool concentration for pool '"+poolNum+"' is invalid", nfe);
+                  throw new InputFormException("Supplied pool concentration for pool '" + poolNum + "' is invalid", nfe);
                 }
               }
             }
 
             log.info("Added library: " + library.toString());
+            manager.saveLibrary(library);
 
             if (getCellValueAsString(platePosCell) != null && libraryPlate != null) {
               //libraryPlate.setElement(getCellValueAsString(platePosCell), library);
@@ -833,7 +856,7 @@ public class FormUtils {
       return process384PlateInputXLSX(wb, u, manager, libraryNamingScheme);
     }
     else if (inPath.getName().endsWith(".ods")) {
-      OdfSpreadsheetDocument oDoc = (OdfSpreadsheetDocument)OdfDocument.loadDocument(inPath);
+      OdfSpreadsheetDocument oDoc = (OdfSpreadsheetDocument) OdfDocument.loadDocument(inPath);
       return process384PlateInputODS(oDoc, u, manager, libraryNamingScheme);
     }
     else {
@@ -842,17 +865,20 @@ public class FormUtils {
   }
 
   private static List<Sample> processSampleInputODS(OdfSpreadsheetDocument oDoc, User u, RequestManager manager, MisoNamingScheme<Library> libraryNamingScheme) throws Exception {
-    ((RequestManagerAwareNamingScheme)libraryNamingScheme).setRequestManager(manager);
+    ((RequestManagerAwareNamingScheme) libraryNamingScheme).setRequestManager(manager);
 
     List<Sample> samples = new ArrayList<Sample>();
     OdfTable oTable = oDoc.getTableList().get(0);
 
     //process global headers
     OdfTableCell pairedCell = oTable.getCellByPosition("A2");
-    boolean paired = false;
-    if (pairedCell.getBooleanValue() != null) {
+    boolean paired;
+    if (pairedCell != null && pairedCell.getBooleanValue() != null) {
       paired = pairedCell.getBooleanValue();
       log.info("Got paired: " + paired);
+    }
+    else {
+      throw new InputFormException("'Paired' cell is empty. Please specify TRUE or FALSE.");
     }
 
     OdfTableCell platformCell = oTable.getCellByPosition("B2");
@@ -861,7 +887,7 @@ public class FormUtils {
       pt = PlatformType.get(platformCell.getStringValue());
     }
     if (pt == null) {
-      throw new InputFormException("Cannot resolve Platform type from: '" + platformCell.getStringValue() +"'");
+      throw new InputFormException("Cannot resolve Platform type from: '" + platformCell.getStringValue() + "'");
     }
     else {
       log.info("Got platform type: " + pt.getKey());
@@ -877,11 +903,11 @@ public class FormUtils {
         lt = manager.getLibraryTypeByDescriptionAndPlatform(type, pt);
       }
       else {
-        throw new InputFormException("Selected library type '"+typeCell.getStringValue()+"' doesn't match platform type: '" + platformCell.getStringValue() +"'");
+        throw new InputFormException("Selected library type '" + typeCell.getStringValue() + "' doesn't match platform type: '" + platformCell.getStringValue() + "'");
       }
     }
     if (lt == null) {
-      throw new InputFormException("Cannot resolve Library type from: '" + typeCell.getStringValue() +"'");
+      throw new InputFormException("Cannot resolve Library type from: '" + typeCell.getStringValue() + "'");
     }
     else {
       log.info("Got library type: " + lt.getDescription());
@@ -893,7 +919,7 @@ public class FormUtils {
       ls = manager.getLibrarySelectionTypeByName(selectionCell.getStringValue());
     }
     if (ls == null) {
-      throw new InputFormException("Cannot resolve Library Selection type from: '" + selectionCell.getStringValue() +"'");
+      throw new InputFormException("Cannot resolve Library Selection type from: '" + selectionCell.getStringValue() + "'");
     }
     else {
       log.info("Got library selection type: " + ls.getName());
@@ -905,7 +931,7 @@ public class FormUtils {
       lst = manager.getLibraryStrategyTypeByName(strategyCell.getStringValue());
     }
     if (lst == null) {
-      throw new InputFormException("Cannot resolve Library Strategy type from: '" + strategyCell.getStringValue() +"'");
+      throw new InputFormException("Cannot resolve Library Strategy type from: '" + strategyCell.getStringValue() + "'");
     }
     else {
       log.info("Got library strategy type: " + lst.getName());
@@ -925,7 +951,7 @@ public class FormUtils {
         }
 
         //cell defs
-        OdfTableCell sampleAliasCell = oTable.getCellByPosition(1, ri);
+        OdfTableCell sampleAliasCell = oTable.getCellByPosition(2, ri);
 
         Sample s = null;
         if (!"".equals(sampleAliasCell.getStringValue())) {
@@ -936,11 +962,11 @@ public class FormUtils {
               log.info("Got sample: " + s.getAlias());
             }
             else {
-              throw new InputFormException("Multiple samples retrieved with this alias: '"+sampleAliasCell.getStringValue()+"'. Cannot process.");
+              throw new InputFormException("Multiple samples retrieved with this alias: '" + sampleAliasCell.getStringValue() + "'. Cannot process.");
             }
           }
           else {
-            throw new InputFormException("No such sample '"+sampleAliasCell.getStringValue()+"'in database. Samples need to be created before using the form input functionality");
+            throw new InputFormException("No such sample '" + sampleAliasCell.getStringValue() + "'in database. Samples need to be created before using the form input functionality");
           }
         }
         else {
@@ -950,191 +976,40 @@ public class FormUtils {
 
         //sample OK - good to go
         if (s != null) {
-          OdfTableCell poolNumberCell = oTable.getCellByPosition(2, ri);
-          OdfTableCell sampleQcCell = oTable.getCellByPosition(3, ri);
-          //OdfTableCell sampleAmountCell = oTable.getCellByPosition(4, ri);
-          //OdfTableCell sampleWaterAmountCell = oTable.getCellByPosition(5, ri);
-          OdfTableCell barcodeKitCell = oTable.getCellByPosition(6, ri);
-          OdfTableCell barcodeTagsCell = oTable.getCellByPosition(7, ri);
-          OdfTableCell libraryQcCell = oTable.getCellByPosition(8, ri);
-          OdfTableCell libraryQcInsertSizeCell = oTable.getCellByPosition(9, ri);
-          OdfTableCell libraryQcMolarityCell = oTable.getCellByPosition(10, ri);
-          OdfTableCell libraryQcPassFailCell = oTable.getCellByPosition(11, ri);
-          //OdfTableCell libraryAmountCell = oTable.getCellByPosition(12, ri);
-          //OdfTableCell libraryWaterAmountCell = oTable.getCellByPosition(13, ri);
-          //OdfTableCell dilutionQcCell = oTable.getCellByPosition(14, ri);
-          OdfTableCell dilutionMolarityCell = oTable.getCellByPosition(15, ri);
-          //OdfTableCell dilutionAmountCell = oTable.getCellByPosition(16, ri);
-          //OdfTableCell dilutionWaterAmountCell = oTable.getCellByPosition(17, ri);
-          OdfTableCell poolQcCell = oTable.getCellByPosition(18, ri);
-          //OdfTableCell poolAverageInsertSizeCell = oTable.getCellByPosition(19, ri);
-          OdfTableCell poolConvertedMolarityCell = oTable.getCellByPosition(20, ri);
+          String projectAliasCell = oTable.getCellByPosition(1, ri).getStringValue();
+          String poolNumberCell = oTable.getCellByPosition(3, ri).getStringValue();
+          String sampleQcCell = oTable.getCellByPosition(4, ri).getStringValue();
+          //String sampleAmountCell = oTable.getCellByPosition(5, ri).getStringValue();
+          //String sampleWaterAmountCell = oTable.getCellByPosition(6, ri).getStringValue();
+          String libraryDescriptionCell = oTable.getCellByPosition(7, ri).getStringValue();
+          String barcodeKitCell = oTable.getCellByPosition(8, ri).getStringValue();
+          String barcodeTagsCell = oTable.getCellByPosition(9, ri).getStringValue();
+          String libraryQcCell = oTable.getCellByPosition(10, ri).getStringValue();
+          String libraryQcInsertSizeCell = oTable.getCellByPosition(11, ri).getStringValue();
+          String libraryQcMolarityCell = oTable.getCellByPosition(12, ri).getStringValue();
+          String libraryQcPassFailCell = oTable.getCellByPosition(13, ri).getStringValue();
+          //String libraryAmountCell = oTable.getCellByPosition(14, ri).getStringValue();
+          //String libraryWaterAmountCell = oTable.getCellByPosition(15, ri).getStringValue();
+          //String dilutionQcCell = oTable.getCellByPosition(16, ri).getStringValue();
+          String dilutionMolarityCell = oTable.getCellByPosition(17, ri).getStringValue();
+          //String dilutionAmountCell = oTable.getCellByPosition(18, ri).getStringValue();
+          //String dilutionWaterAmountCell = oTable.getCellByPosition(19, ri).getStringValue();
+          String poolQcCell = oTable.getCellByPosition(20, ri).getStringValue();
+          //String poolAverageInsertSizeCell = oTable.getCellByPosition(21, ri).getStringValue().getStringValue();
+          String poolConvertedMolarityCell = oTable.getCellByPosition(22, ri).getStringValue();
 
           //add pool, if any
-          if (!"".equals(poolNumberCell.getStringValue())) {
-            if (!pools.containsKey(poolNumberCell.getStringValue())) {
-              Pool<Dilution> pool = new PoolImpl<Dilution>();
-              pool.setAlias(poolNumberCell.getStringValue());
-              pools.put(poolNumberCell.getStringValue(), pool);
-              log.info("Added pool: " + poolNumberCell.getStringValue());
-            }
-          }
+          processPool(poolNumberCell, poolConvertedMolarityCell, pools);
+          processSampleQC(sampleQcCell, s, u, manager);
 
-          //process sample QC
-          if (!"".equals(sampleQcCell.getStringValue())) {
-            try {
-              SampleQC sqc = new SampleQCImpl();
-              sqc.setSample(s);
-              sqc.setResults(Double.valueOf(sampleQcCell.getStringValue()));
-              sqc.setQcCreator(u.getLoginName());
-              sqc.setQcDate(new Date());
-              sqc.setQcType(manager.getSampleQcTypeByName("QuBit"));
-              if (!s.getSampleQCs().contains(sqc)) {
-                s.addQc(sqc);
-                log.info("Added sample QC: " + sqc.toString());
-              }
-            }
-            catch (NumberFormatException nfe) {
-              throw new InputFormException("Supplied Sample QC concentration for sample '"+sampleAliasCell.getStringValue()+"' is invalid", nfe);
-            }
-          }
-
-          if (!"".equals(libraryQcCell.getStringValue())) {
-            //create library
-            Library library = new LibraryImpl();
-            library.setSample(s);
-            library.setSecurityProfile(s.getSecurityProfile());
-            library.setDescription(s.getDescription());
-            library.setCreationDate(new Date());
-            library.setPlatformName(pt.name());
-            library.setLibraryType(lt);
-            library.setLibrarySelectionType(ls);
-            library.setLibraryStrategyType(lst);
-            library.setPaired(paired);
-
-            String libAlias = libraryNamingScheme.generateNameFor("alias", library);
-
-            library.setAlias(libAlias);
-
-            if (!"".equals(libraryQcMolarityCell.getStringValue())) {
-              int insertSize = 0;
-              try {
-                String bp = libraryQcInsertSizeCell.getStringValue();
-                insertSize = Integer.valueOf(digitPattern.matcher(bp).group(1));
-              }
-              catch (NumberFormatException nfe) {
-                throw new InputFormException("Supplied Library insert size for library '"+libAlias+"' ("+s.getAlias()+") is invalid", nfe);
-              }
-
-              try {
-                LibraryQC lqc = new LibraryQCImpl();
-                lqc.setLibrary(library);
-                lqc.setInsertSize(insertSize);
-                lqc.setResults(Double.valueOf(libraryQcMolarityCell.getStringValue()));
-                lqc.setQcCreator(u.getLoginName());
-                lqc.setQcDate(new Date());
-                lqc.setQcType(manager.getLibraryQcTypeByName("Bioanalyzer"));
-                if (!library.getLibraryQCs().contains(lqc)) {
-                  library.addQc(lqc);
-                  log.info("Added library QC: " + lqc.toString());
-                }
-
-                if (insertSize == 0 && lqc.getResults() == 0) {
-                  library.setQcPassed(false);
-                }
-                else {
-                  //TODO check libraryQcPassFailCell?
-                  library.setQcPassed(true);
-                }
-              }
-              catch (NumberFormatException nfe) {
-                throw new InputFormException("Supplied Library QC concentration for library '"+libAlias+"' ("+s.getAlias()+") is invalid", nfe);
-              }
-            }
-
-            if (!"".equals(barcodeKitCell.getStringValue())) {
-              Collection<TagBarcode> bcs = manager.listAllTagBarcodesByStrategyName(barcodeKitCell.getStringValue());
-              if (!bcs.isEmpty()) {
-                String tags = barcodeTagsCell.getStringValue();
-                if (!"".equals(tags)) {
-                  HashMap<Integer, TagBarcode> tbs = new HashMap<Integer, TagBarcode>();
-                  if (tags.contains("-")) {
-                    String[] splits = tags.split("-");
-                    int count = 1;
-                    for (String tag : splits) {
-                      for (TagBarcode tb : bcs) {
-                        if (tb.getName().equals(tag)) {
-                          //set tag barcodes
-                          tbs.put(count, tb);
-                          count++;
-                        }
-                      }
-                    }
-                  }
-                  else {
-                    for (TagBarcode tb : bcs) {
-                      if (tb.getName().equals(tags)) {
-                        //set tag barcode
-                        tbs.put(1, tb);
-                      }
-                    }
-                  }
-
-                  library.setTagBarcodes(tbs);
-                }
-                else {
-                  throw new InputFormException("Barcode Kit specified but no tag barcodes entered for: '"+sampleAliasCell.getStringValue()+"'.");
-                }
-              }
-              else {
-                throw new InputFormException("No tag barcodes associated with this kit definition: '"+barcodeKitCell.getStringValue()+"'.");
-              }
-            }
-
+          Library library = processLibrary(libraryQcCell, libraryDescriptionCell, libraryQcPassFailCell, s, pt, lt, ls, lst, paired, libraryNamingScheme);
+          if (library != null) {
+            processLibraryQC(libraryQcCell, libraryQcMolarityCell, libraryQcInsertSizeCell, library, u, manager);
+            processBarcodes(barcodeKitCell, barcodeTagsCell, library, manager);
+            processDilutions(dilutionMolarityCell, library, pools.get(poolNumberCell), u);
             log.info("Added library: " + library.toString());
-
-            if (!"".equals(dilutionMolarityCell.getStringValue())) {
-              try {
-                LibraryDilution ldi = new LibraryDilution();
-                ldi.setLibrary(library);
-                ldi.setSecurityProfile(library.getSecurityProfile());
-                ldi.setConcentration(Double.valueOf(dilutionMolarityCell.getStringValue()));
-                ldi.setCreationDate(new Date());
-                ldi.setDilutionCreator(u.getLoginName());
-                if (!library.getLibraryDilutions().contains(ldi)) {
-                  library.addDilution(ldi);
-                  log.info("Added library dilution: " + ldi.toString());
-                }
-
-                Pool<Dilution> p = pools.get(poolNumberCell.getStringValue());
-                if (p != null) {
-                  p.addPoolableElement(ldi);
-                  log.info("Added library dilution to pool: " + p.toString());
-                }
-              }
-              catch (NumberFormatException nfe) {
-                throw new InputFormException("Supplied LibraryDilution concentration for library '"+libAlias+"' ("+s.getAlias()+") is invalid", nfe);
-              }
-            }
-
-            if (!"".equals(poolConvertedMolarityCell.getStringValue())) {
-              Pool<Dilution> p = pools.get(poolNumberCell.getStringValue());
-              if (p != null) {
-                log.info("Retrieved pool "+poolNumberCell.getStringValue());
-                try {
-                  double d = Double.valueOf(poolConvertedMolarityCell.getStringValue());
-                  log.info("Got conc " + d);
-                  p.setConcentration(d);
-                }
-                catch (NumberFormatException nfe) {
-                  throw new InputFormException("Supplied pool concentration for pool '"+poolNumberCell.getStringValue()+"' is invalid", nfe);
-                }
-              }
-            }
-
             s.addLibrary(library);
           }
-
           samples.add(s);
         }
       }
@@ -1144,7 +1019,7 @@ public class FormUtils {
   }
 
   private static List<Sample> processSampleInputXLSX(XSSFWorkbook wb, User u, RequestManager manager, MisoNamingScheme<Library> libraryNamingScheme) throws Exception {
-    ((RequestManagerAwareNamingScheme)libraryNamingScheme).setRequestManager(manager);
+    ((RequestManagerAwareNamingScheme) libraryNamingScheme).setRequestManager(manager);
 
     List<Sample> samples = new ArrayList<Sample>();
     XSSFSheet sheet = wb.getSheetAt(0);
@@ -1154,8 +1029,14 @@ public class FormUtils {
 
     //process global headers
     XSSFCell pairedCell = glrow.getCell(0);
-    boolean paired = pairedCell.getBooleanCellValue();
-    log.info("Got paired: " + paired);
+    boolean paired;
+    if (getCellValueAsString(pairedCell) != null) {
+      paired = pairedCell.getBooleanCellValue();
+      log.info("Got paired: " + paired);
+    }
+    else {
+      throw new InputFormException("'Paired' cell is empty. Please specify TRUE or FALSE.");
+    }
 
     XSSFCell platformCell = glrow.getCell(1);
     PlatformType pt = null;
@@ -1163,7 +1044,7 @@ public class FormUtils {
       pt = PlatformType.get(getCellValueAsString(platformCell));
     }
     if (pt == null) {
-      throw new InputFormException("Cannot resolve Platform type from: '" + getCellValueAsString(platformCell) +"'");
+      throw new InputFormException("Cannot resolve Platform type from: '" + getCellValueAsString(platformCell) + "'");
     }
     else {
       log.info("Got platform type: " + pt.getKey());
@@ -1179,11 +1060,11 @@ public class FormUtils {
         lt = manager.getLibraryTypeByDescriptionAndPlatform(type, pt);
       }
       else {
-        throw new InputFormException("Selected library type '"+getCellValueAsString(typeCell)+"' doesn't match platform type: '" + getCellValueAsString(platformCell) +"'");
+        throw new InputFormException("Selected library type '" + getCellValueAsString(typeCell) + "' doesn't match platform type: '" + getCellValueAsString(platformCell) + "'");
       }
     }
     if (lt == null) {
-      throw new InputFormException("Cannot resolve Library type from: '" + getCellValueAsString(typeCell) +"'");
+      throw new InputFormException("Cannot resolve Library type from: '" + getCellValueAsString(typeCell) + "'");
     }
     else {
       log.info("Got library type: " + lt.getDescription());
@@ -1195,7 +1076,7 @@ public class FormUtils {
       ls = manager.getLibrarySelectionTypeByName(getCellValueAsString(selectionCell));
     }
     if (ls == null) {
-      throw new InputFormException("Cannot resolve Library Selection type from: '" + getCellValueAsString(selectionCell) +"'");
+      throw new InputFormException("Cannot resolve Library Selection type from: '" + getCellValueAsString(selectionCell) + "'");
     }
     else {
       log.info("Got library selection type: " + ls.getName());
@@ -1207,7 +1088,7 @@ public class FormUtils {
       lst = manager.getLibraryStrategyTypeByName(getCellValueAsString(strategyCell));
     }
     if (lst == null) {
-      throw new InputFormException("Cannot resolve Library Strategy type from: '" + getCellValueAsString(strategyCell) +"'");
+      throw new InputFormException("Cannot resolve Library Strategy type from: '" + getCellValueAsString(strategyCell) + "'");
     }
     else {
       log.info("Got library strategy type: " + lst.getName());
@@ -1228,7 +1109,7 @@ public class FormUtils {
       }
 
       //cell defs
-      XSSFCell sampleAliasCell = row.getCell(1);
+      XSSFCell sampleAliasCell = row.getCell(2);
 
       Sample s = null;
       if (getCellValueAsString(sampleAliasCell) != null) {
@@ -1240,11 +1121,11 @@ public class FormUtils {
             log.info("Got sample: " + s.getAlias());
           }
           else {
-            throw new InputFormException("Multiple samples retrieved with this alias: '"+salias+"'. Cannot process.");
+            throw new InputFormException("Multiple samples retrieved with this alias: '" + salias + "'. Cannot process.");
           }
         }
         else {
-          throw new InputFormException("No such sample '"+salias+"'in database. Samples need to be created before using the form input functionality");
+          throw new InputFormException("No such sample '" + salias + "'in database. Samples need to be created before using the form input functionality");
         }
       }
       else {
@@ -1254,197 +1135,252 @@ public class FormUtils {
 
       //sample OK - good to go
       if (s != null) {
-        XSSFCell poolNumberCell = row.getCell(2);
-        XSSFCell sampleQcCell = row.getCell(3);
-        //XSSFCell sampleAmountCell = row.getCell(4);
-        //XSSFCell sampleWaterAmountCell = row.getCell(5);
-        XSSFCell barcodeKitCell = row.getCell(6);
-        XSSFCell barcodeTagsCell = row.getCell(7);
-        XSSFCell libraryQcCell = row.getCell(8);
-        XSSFCell libraryQcInsertSizeCell = row.getCell(9);
-        XSSFCell libraryQcMolarityCell = row.getCell(10);
-        XSSFCell libraryQcPassFailCell = row.getCell(11);
-        //XSSFCell libraryAmountCell = row.getCell(12);
-        //XSSFCell libraryWaterAmountCell = row.getCell(13);
-        //XSSFCell dilutionQcCell = row.getCell(14);
-        XSSFCell dilutionMolarityCell = row.getCell(15);
-        //XSSFCell dilutionAmountCell = row.getCell(16);
-        //XSSFCell dilutionWaterAmountCell = row.getCell(17);
-        XSSFCell poolQcCell = row.getCell(18);
-        //XSSFCell poolAverageInsertSizeCell = row.getCell(19);
-        XSSFCell poolConvertedMolarityCell = row.getCell(20);
+        String projectAliasCell = getCellValueAsString(row.getCell(1));
+        String poolNumberCell = getCellValueAsString(row.getCell(3));
+        String sampleQcCell = getCellValueAsString(row.getCell(4));
+        //String sampleAmountCell = getCellValueAsString(row.getCell(5));
+        //String sampleWaterAmountCell = getCellValueAsString(row.getCell(6));
+        String libraryDescriptionCell = getCellValueAsString(row.getCell(7));
+        String barcodeKitCell = getCellValueAsString(row.getCell(8));
+        String barcodeTagsCell = getCellValueAsString(row.getCell(9));
+        String libraryQcCell = getCellValueAsString(row.getCell(10));
+        String libraryQcInsertSizeCell = getCellValueAsString(row.getCell(11));
+        String libraryQcMolarityCell = getCellValueAsString(row.getCell(12));
+        String libraryQcPassFailCell = getCellValueAsString(row.getCell(13));
+        //String libraryAmountCell = getCellValueAsString(row.getCell(14));
+        //String libraryWaterAmountCell = getCellValueAsString(row.getCell(15));
+        //String dilutionQcCell = getCellValueAsString(row.getCell(16));
+        String dilutionMolarityCell = getCellValueAsString(row.getCell(17));
+        //String dilutionAmountCell = getCellValueAsString(row.getCell(18));
+        //String dilutionWaterAmountCell = getCellValueAsString(row.getCell(19));
+        String poolQcCell = getCellValueAsString(row.getCell(20));
+        //String poolAverageInsertSizeCell = getCellValueAsString(row.getCell(21));
+        String poolConvertedMolarityCell = getCellValueAsString(row.getCell(22));
 
         //add pool, if any
-        if (getCellValueAsString(poolNumberCell) != null) {
-          String poolNum = String.valueOf(new Double(getCellValueAsString(poolNumberCell)).intValue());
-          if (!pools.containsKey(poolNum)) {
-            Pool<Dilution> pool = new PoolImpl<Dilution>();
-            pool.setAlias(poolNum);
-            pools.put(poolNum, pool);
-            log.info("Added pool: " + poolNum);
-          }
-        }
+        processPool(poolNumberCell, poolConvertedMolarityCell, pools);
+        processSampleQC(sampleQcCell, s, u, manager);
 
-        //process sample QC
-        if (getCellValueAsString(sampleQcCell) != null) {
-          try {
-            SampleQC sqc = new SampleQCImpl();
-            sqc.setSample(s);
-            sqc.setResults(Double.valueOf(getCellValueAsString(sampleQcCell)));
-            sqc.setQcCreator(u.getLoginName());
-            sqc.setQcDate(new Date());
-            sqc.setQcType(manager.getSampleQcTypeByName("QuBit"));
-            if (!s.getSampleQCs().contains(sqc)) {
-              s.addQc(sqc);
-              log.info("Added sample QC: " + sqc.toString());
-            }
-          }
-          catch (NumberFormatException nfe) {
-            throw new InputFormException("Supplied Sample QC concentration for sample '"+getCellValueAsString(sampleAliasCell)+"' is invalid", nfe);
-          }
-        }
-
-        if (getCellValueAsString(libraryQcCell) != null) {
-          //create library
-          Library library = new LibraryImpl();
-          library.setSample(s);
-
-          String libAlias = libraryNamingScheme.generateNameFor("alias", library);
-
-          library.setAlias(libAlias);
-          library.setSecurityProfile(s.getSecurityProfile());
-          library.setDescription(s.getDescription());
-          library.setCreationDate(new Date());
-          library.setPlatformName(pt.name());
-          library.setLibraryType(lt);
-          library.setLibrarySelectionType(ls);
-          library.setLibraryStrategyType(lst);
-          library.setPaired(paired);
-
-          if (getCellValueAsString(libraryQcMolarityCell) != null) {
-            int insertSize = 0;
-            try {
-              String bp = getCellValueAsString(libraryQcInsertSizeCell);
-              insertSize = Integer.valueOf(digitPattern.matcher(bp).group(1));
-            }
-            catch (NumberFormatException nfe) {
-              throw new InputFormException("Supplied Library insert size for library '"+libAlias+"' ("+s.getAlias()+") is invalid", nfe);
-            }
-
-            try {
-              LibraryQC lqc = new LibraryQCImpl();
-              lqc.setLibrary(library);
-              lqc.setInsertSize(insertSize);
-              lqc.setResults(Double.valueOf(getCellValueAsString(libraryQcMolarityCell)));
-              lqc.setQcCreator(u.getLoginName());
-              lqc.setQcDate(new Date());
-              lqc.setQcType(manager.getLibraryQcTypeByName("Bioanalyzer"));
-              if (!library.getLibraryQCs().contains(lqc)) {
-                library.addQc(lqc);
-                log.info("Added library QC: " + lqc.toString());
-              }
-
-              if (insertSize == 0 && lqc.getResults() == 0) {
-                library.setQcPassed(false);
-              }
-              else {
-                //TODO check libraryQcPassFailCell?
-                library.setQcPassed(true);
-              }
-            }
-            catch (NumberFormatException nfe) {
-              throw new InputFormException("Supplied Library QC concentration for library '"+libAlias+"' ("+s.getAlias()+") is invalid", nfe);
-            }
-          }
-
-          if (getCellValueAsString(barcodeKitCell) != null) {
-            Collection<TagBarcode> bcs = manager.listAllTagBarcodesByStrategyName(getCellValueAsString(barcodeKitCell));
-            if (!bcs.isEmpty()) {
-              String tags = getCellValueAsString(barcodeTagsCell);
-              if (!"".equals(tags)) {
-                HashMap<Integer, TagBarcode> tbs = new HashMap<Integer, TagBarcode>();
-                if (tags.contains("-")) {
-                  String[] splits = tags.split("-");
-                  int count = 1;
-                  for (String tag : splits) {
-                    for (TagBarcode tb : bcs) {
-                      if (tb.getName().equals(tag)) {
-                        //set tag barcodes
-                        tbs.put(count, tb);
-                        count++;
-                      }
-                    }
-                  }
-                }
-                else {
-                  for (TagBarcode tb : bcs) {
-                    if (tb.getName().equals(tags)) {
-                      //set tag barcode
-                      tbs.put(1, tb);
-                    }
-                  }
-                }
-
-                library.setTagBarcodes(tbs);
-              }
-              else {
-                throw new InputFormException("Barcode Kit specified but no tag barcodes entered for: '"+s.getAlias()+"'.");
-              }
-            }
-            else {
-              throw new InputFormException("No tag barcodes associated with this kit definition: '"+s.getAlias()+"'.");
-            }
-          }
-
+        Library library = processLibrary(libraryQcCell, libraryDescriptionCell, libraryQcPassFailCell, s, pt, lt, ls, lst, paired, libraryNamingScheme);
+        if (library != null) {
+          processLibraryQC(libraryQcCell, libraryQcMolarityCell, libraryQcInsertSizeCell, library, u, manager);
+          processBarcodes(barcodeKitCell, barcodeTagsCell, library, manager);
+          processDilutions(dilutionMolarityCell, library, pools.get(poolNumberCell), u);
           log.info("Added library: " + library.toString());
-
-          if (getCellValueAsString(dilutionMolarityCell) != null) {
-            try {
-              LibraryDilution ldi = new LibraryDilution();
-              ldi.setLibrary(library);
-              ldi.setSecurityProfile(library.getSecurityProfile());
-              ldi.setConcentration(Double.valueOf(getCellValueAsString(dilutionMolarityCell)));
-              ldi.setCreationDate(new Date());
-              ldi.setDilutionCreator(u.getLoginName());
-              if (!library.getLibraryDilutions().contains(ldi)) {
-                library.addDilution(ldi);
-                log.info("Added library dilution: " + ldi.toString());
-              }
-
-              if (getCellValueAsString(poolNumberCell) != null) {
-                String poolNum = String.valueOf(new Double(getCellValueAsString(poolNumberCell)).intValue());
-                Pool<Dilution> p = pools.get(poolNum);
-                if (p != null) {
-                  p.addPoolableElement(ldi);
-                  log.info("Added library dilution to pool: " + p.toString());
-                }
-              }
-            }
-            catch (NumberFormatException nfe) {
-              throw new InputFormException("Supplied LibraryDilution concentration for library '"+libAlias+"' ("+s.getAlias()+") is invalid", nfe);
-            }
-          }
-
-          if (getCellValueAsString(poolConvertedMolarityCell) != null) {
-            if (getCellValueAsString(poolNumberCell) != null) {
-              String poolNum = String.valueOf(new Double(getCellValueAsString(poolNumberCell)).intValue());
-              Pool<Dilution> p = pools.get(poolNum);
-              if (p != null) {
-                try {
-                  p.setConcentration(Double.valueOf(getCellValueAsString(poolConvertedMolarityCell)));
-                }
-                catch (NumberFormatException nfe) {
-                  throw new InputFormException("Supplied pool concentration for pool '"+poolNum+"' is invalid", nfe);
-                }
-              }
-            }
-          }
+          s.addLibrary(library);
         }
-
         samples.add(s);
       }
     }
     return samples;
+  }
+
+  private static void processPool(String poolAlias, String poolConvertedMolarity, Map<String, Pool<Dilution>> pools) throws Exception {
+    if (!"".equals(poolAlias)) {
+      if (!pools.containsKey(poolAlias)) {
+        Pool<Dilution> pool = new PoolImpl<Dilution>();
+        pool.setAlias(poolAlias);
+        pools.put(poolAlias, pool);
+        log.info("Added pool: " + poolAlias);
+      }
+
+      if (!"".equals(poolConvertedMolarity)) {
+        Pool<Dilution> p = pools.get(poolAlias);
+        if (p != null) {
+          log.info("Retrieved pool " + poolAlias);
+          try {
+            double d = Double.valueOf(poolConvertedMolarity);
+            log.info("Got conc " + d);
+            p.setConcentration(d);
+          }
+          catch (NumberFormatException nfe) {
+            throw new InputFormException("Supplied pool concentration for pool '" + poolAlias + "' is invalid", nfe);
+          }
+        }
+      }
+    }
+  }
+
+  private static void processSampleQC(String sampleQc, Sample s, User u, RequestManager manager) throws Exception {
+    //process sample QC
+    if (!"".equals(sampleQc)) {
+      try {
+        SampleQC sqc = new SampleQCImpl();
+        sqc.setSample(s);
+        sqc.setResults(Double.valueOf(sampleQc));
+        sqc.setQcCreator(u.getLoginName());
+        sqc.setQcDate(new Date());
+        sqc.setQcType(manager.getSampleQcTypeByName("QuBit"));
+        if (!s.getSampleQCs().contains(sqc)) {
+          s.addQc(sqc);
+          log.info("Added sample QC: " + sqc.toString());
+        }
+      }
+      catch (NumberFormatException nfe) {
+        throw new InputFormException("Supplied Sample QC concentration for sample '" + sampleQc + "' is invalid", nfe);
+      }
+    }
+  }
+
+  private static Library processLibrary(String libraryQc,
+                                        String libraryDescription,
+                                        String libraryQcPassFail,
+                                        Sample s,
+                                        PlatformType pt,
+                                        LibraryType lt,
+                                        LibrarySelectionType ls,
+                                        LibraryStrategyType lst,
+                                        boolean paired,
+                                        MisoNamingScheme<Library> libraryNamingScheme) throws Exception {
+    if (!"".equals(libraryQc)) {
+      //create library
+      Library library = new LibraryImpl();
+      library.setSample(s);
+      library.setSecurityProfile(s.getSecurityProfile());
+      if (!"".equals(libraryDescription)) {
+        library.setDescription(libraryDescription);
+      }
+      else {
+        library.setDescription(s.getDescription());
+      }
+      library.setCreationDate(new Date());
+      library.setPlatformName(pt.name());
+      library.setLibraryType(lt);
+      library.setLibrarySelectionType(ls);
+      library.setLibraryStrategyType(lst);
+      library.setPaired(paired);
+
+      if (!"".equals(libraryQcPassFail)) {
+        library.setQcPassed(Boolean.parseBoolean(libraryQcPassFail));
+      }
+
+      String libAlias = libraryNamingScheme.generateNameFor("alias", library);
+
+      library.setAlias(libAlias);
+
+      return library;
+    }
+    return null;
+  }
+
+  private static void processLibraryQC(String libraryQc,
+                                       String libraryQcMolarity,
+                                       String libraryQcInsertSize,
+                                       Library library,
+                                       User u,
+                                       RequestManager manager) throws Exception {
+    if (!"".equals(libraryQcMolarity)) {
+      int insertSize = 0;
+      try {
+        Matcher m = digitPattern.matcher(libraryQcInsertSize);
+        if (m.matches()) {
+          insertSize = Integer.valueOf(m.group(1));
+        }
+        else {
+          throw new InputFormException("Supplied Library insert size for library '" + library.getAlias() + "' (" + library.getSample().getAlias() + ") is invalid");
+        }
+      }
+      catch (NumberFormatException nfe) {
+        throw new InputFormException("Supplied Library insert size for library '" + library.getAlias() + "' (" + library.getSample().getAlias() + ") is invalid", nfe);
+      }
+
+      try {
+        LibraryQC lqc = new LibraryQCImpl();
+        lqc.setLibrary(library);
+        lqc.setInsertSize(insertSize);
+        lqc.setResults(Double.valueOf(libraryQcMolarity));
+        lqc.setQcCreator(u.getLoginName());
+        lqc.setQcDate(new Date());
+        QcType lqct = manager.getLibraryQcTypeByName(libraryQc);
+        if (lqct != null) {
+          lqc.setQcType(manager.getLibraryQcTypeByName(libraryQc));
+          if (!library.getLibraryQCs().contains(lqc)) {
+            library.addQc(lqc);
+            log.info("Added library QC: " + lqc.toString());
+          }
+        }
+        else {
+          throw new InputFormException("No such Library QC type '" + libraryQc + "'");
+        }
+
+        if (insertSize == 0 && lqc.getResults() == 0) {
+          library.setQcPassed(false);
+        }
+        else {
+          //TODO check libraryQcPassFailCell?
+          library.setQcPassed(true);
+        }
+      }
+      catch (NumberFormatException nfe) {
+        throw new InputFormException("Supplied Library QC concentration for library '" + library.getAlias() + "' (" + library.getSample().getAlias() + ") is invalid", nfe);
+      }
+    }
+  }
+
+  private static void processBarcodes(String barcodeKit, String barcodeTags, Library library, RequestManager manager) throws Exception {
+    if (!"".equals(barcodeKit)) {
+      Collection<TagBarcode> bcs = manager.listAllTagBarcodesByStrategyName(barcodeKit);
+      if (!bcs.isEmpty()) {
+        if (!"".equals(barcodeTags)) {
+          HashMap<Integer, TagBarcode> tbs = new HashMap<Integer, TagBarcode>();
+          if (barcodeTags.contains("-")) {
+            String[] splits = barcodeTags.split("-");
+            int count = 1;
+            for (String tag : splits) {
+              for (TagBarcode tb : bcs) {
+                if (tb.getName().equals(tag)) {
+                  //set tag barcodes
+                  tbs.put(count, tb);
+                  count++;
+                }
+              }
+            }
+          }
+          else {
+            for (TagBarcode tb : bcs) {
+              if (tb.getName().equals(barcodeTags)) {
+                //set tag barcode
+                tbs.put(1, tb);
+              }
+            }
+          }
+
+          library.setTagBarcodes(tbs);
+        }
+        else {
+          throw new InputFormException("Barcode Kit specified but no tag barcodes entered for: '" + library.getSample().getAlias() + "'.");
+        }
+      }
+      else {
+        throw new InputFormException("No tag barcodes associated with this kit definition: '" + library.getSample().getAlias() + "'.");
+      }
+    }
+  }
+
+  private static void processDilutions(String dilutionMolarity, Library library, Pool<Dilution> p, User u) throws Exception {
+    if (!"".equals(dilutionMolarity)) {
+      try {
+        LibraryDilution ldi = new LibraryDilution();
+        ldi.setLibrary(library);
+        ldi.setSecurityProfile(library.getSecurityProfile());
+        ldi.setConcentration(Double.valueOf(dilutionMolarity));
+        ldi.setCreationDate(new Date());
+        ldi.setDilutionCreator(u.getLoginName());
+        if (!library.getLibraryDilutions().contains(ldi)) {
+          library.addDilution(ldi);
+          log.info("Added library dilution: " + ldi.toString());
+        }
+
+        //Pool<Dilution> p = pools.get(poolNumberCell.getStringValue());
+        if (p != null) {
+          p.addPoolableElement(ldi);
+          log.info("Added library dilution to pool: " + p.toString());
+        }
+      }
+      catch (NumberFormatException nfe) {
+        throw new InputFormException("Supplied LibraryDilution concentration for library '" + library.getAlias() + "' (" + library.getSample().getAlias() + ") is invalid", nfe);
+      }
+    }
   }
 
   public static List<Sample> importSampleInputSpreadsheet(File inPath, User u, RequestManager manager, MisoNamingScheme<Library> libraryNamingScheme) throws Exception {
@@ -1453,7 +1389,7 @@ public class FormUtils {
       return processSampleInputXLSX(wb, u, manager, libraryNamingScheme);
     }
     else if (inPath.getName().endsWith(".ods")) {
-      OdfSpreadsheetDocument oDoc = (OdfSpreadsheetDocument)OdfDocument.loadDocument(inPath);
+      OdfSpreadsheetDocument oDoc = (OdfSpreadsheetDocument) OdfDocument.loadDocument(inPath);
       return processSampleInputODS(oDoc, u, manager, libraryNamingScheme);
     }
     else {
@@ -1464,13 +1400,20 @@ public class FormUtils {
   private static String getCellValueAsString(XSSFCell cell) {
     if (cell != null) {
       switch (cell.getCellType()) {
-        case XSSFCell.CELL_TYPE_BLANK: return null;
-        case XSSFCell.CELL_TYPE_BOOLEAN: return String.valueOf(cell.getBooleanCellValue());
-        case XSSFCell.CELL_TYPE_ERROR: return cell.getErrorCellString();
-        case XSSFCell.CELL_TYPE_FORMULA: return cell.getRawValue();
-        case XSSFCell.CELL_TYPE_NUMERIC: return String.valueOf(cell.getNumericCellValue());
-        case XSSFCell.CELL_TYPE_STRING: return cell.getStringCellValue();
-        default: return null;
+        case XSSFCell.CELL_TYPE_BLANK:
+          return null;
+        case XSSFCell.CELL_TYPE_BOOLEAN:
+          return String.valueOf(cell.getBooleanCellValue());
+        case XSSFCell.CELL_TYPE_ERROR:
+          return cell.getErrorCellString();
+        case XSSFCell.CELL_TYPE_FORMULA:
+          return cell.getRawValue();
+        case XSSFCell.CELL_TYPE_NUMERIC:
+          return String.valueOf(cell.getNumericCellValue());
+        case XSSFCell.CELL_TYPE_STRING:
+          return cell.getStringCellValue();
+        default:
+          return null;
       }
     }
     return null;
@@ -1546,7 +1489,7 @@ public class FormUtils {
       for (OdfTableRow row : oTable.getRowList()) {
         if (count % 2 != 0) {
           for (int i = 0; i < row.getCellCount(); i++) {
-            row.getCellByIndex(i).setCellBackgroundColor("#EEEEEE");  
+            row.getCellByIndex(i).setCellBackgroundColor("#EEEEEE");
           }
         }
         count++;

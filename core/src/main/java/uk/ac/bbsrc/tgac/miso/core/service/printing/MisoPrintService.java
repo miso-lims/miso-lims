@@ -24,11 +24,9 @@
 package uk.ac.bbsrc.tgac.miso.core.service.printing;
 
 import net.sourceforge.fluxion.spi.Spi;
-import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
-import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeLabelFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
+import uk.ac.bbsrc.tgac.miso.core.service.printing.schema.BarcodableSchema;
 
-import java.io.File;
 import java.io.IOException;
 
 /**
@@ -41,7 +39,7 @@ import java.io.IOException;
  * @since 0.0.3
  */
 @Spi
-public interface MisoPrintService<T, C extends PrintContext<T>> {
+public interface MisoPrintService<T, S, C extends PrintContext<T>> {
   long getServiceId();
   void setServiceId(long serviceId);
   String getName();
@@ -50,10 +48,10 @@ public interface MisoPrintService<T, C extends PrintContext<T>> {
   void setEnabled(boolean enabled);
   C getPrintContext();
   void setPrintContext(C pc);
-  public BarcodeLabelFactory<T> getBarcodeLabelFactory();
-  public void setBarcodeLabelFactory(BarcodeLabelFactory<T> barcodeLabelFactory);
   boolean print(T content) throws IOException;
-  void setPrintServiceFor(Class<? extends Barcodable> c);
-  Class<? extends Barcodable> getPrintServiceFor();
-  public T getLabelFor(Barcodable b);
+  void setPrintServiceFor(Class<? extends S> c);
+  Class<? extends S> getPrintServiceFor();
+  public T getLabelFor(S b);
+  void setBarcodableSchema(BarcodableSchema<T, S> barcodableSchema);
+  BarcodableSchema getBarcodableSchema();
 }

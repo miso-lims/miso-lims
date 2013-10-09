@@ -35,15 +35,13 @@
   Sample
 
   <input type="radio" id="reportTypeRun" onchange="changeReportType(this);" name="reportType" value="Run"/>Run
-
   <hr/>
 
   Please select the type of report above to begin.
 </div>
 
-
 <script type="text/javascript">
-  jQuery(document).ready(function() {
+  jQuery(document).ready(function () {
     Reports.ui.prepareTable();
   });
 </script>

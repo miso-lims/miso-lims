@@ -144,24 +144,26 @@ public class RunStatsManager {
 
           //clear any previous barcode query
           map.remove(RunProperty.barcode);
-
           if (part.getPool() != null) {
             Pool<? extends Poolable> pool = part.getPool();
             for (Dilution d : pool.getDilutions()) {
               Library l = d.getLibrary();
-              if (l.getTagBarcode() != null) {
-                try {
-                  map.put(RunProperty.barcode, l.getTagBarcode().getSequence());
-                  rt = reports.getAverageValues(map);
-                  if (rt != null) {
-                    partition.put(l.getTagBarcode().getSequence(), JSONArray.fromObject(rt.toJSON()));
+              if (!l.getTagBarcodes().isEmpty()) {
+                for (TagBarcode tb : l.getTagBarcodes().values()) {
+                  map.remove(RunProperty.barcode);
+                  try {
+                    map.put(RunProperty.barcode, tb.getSequence());
+                    rt = reports.getAverageValues(map);
+                    if (rt != null) {
+                      partition.put(tb.getSequence(), JSONArray.fromObject(rt.toJSON()));
+                    }
                   }
-                }
-                catch (SQLException e) {
-                  e.printStackTrace();
-                }
-                catch (IOException e) {
-                  e.printStackTrace();
+                  catch (SQLException e) {
+                    e.printStackTrace();
+                  }
+                  catch (IOException e) {
+                    e.printStackTrace();
+                  }
                 }
               }
             }
@@ -207,19 +209,22 @@ public class RunStatsManager {
             Pool<? extends Poolable> pool = part.getPool();
             for (Dilution d : pool.getDilutions()) {
               Library l = d.getLibrary();
-              if (l.getTagBarcode() != null) {
-                try {
-                  map.put(RunProperty.barcode, l.getTagBarcode().getSequence());
-                  rt = reports.getAverageValues(map);
-                  if (rt != null) {
-                    partition.put(l.getTagBarcode().getSequence(), JSONArray.fromObject(rt.toJSON()));
+              if (!l.getTagBarcodes().isEmpty()) {
+                for (TagBarcode tb : l.getTagBarcodes().values()) {
+                  map.remove(RunProperty.barcode);
+                  try {
+                    map.put(RunProperty.barcode, tb.getSequence());
+                    rt = reports.getAverageValues(map);
+                    if (rt != null) {
+                      partition.put(tb.getSequence(), JSONArray.fromObject(rt.toJSON()));
+                    }
                   }
-                }
-                catch (SQLException e) {
-                  e.printStackTrace();
-                }
-                catch (IOException e) {
-                  e.printStackTrace();
+                  catch (SQLException e) {
+                    e.printStackTrace();
+                  }
+                  catch (IOException e) {
+                    e.printStackTrace();
+                  }
                 }
               }
             }
@@ -250,9 +255,8 @@ public class RunStatsManager {
     map.put(RunProperty.pair, pair);
 
     JSONObject laneQuality = new JSONObject();
-    Map<String, ReportTable> resultMap = new HashMap<String, ReportTable>();
     try {
-      resultMap = reportsDecorator.getPerPositionBaseSequenceQuality(map);
+        Map<String, ReportTable> resultMap = reportsDecorator.getPerPositionBaseSequenceQuality(map);
 
 //      for (Map.Entry<String, ReportTable> entry : resultMap.entrySet()) {
 //        System.out.println("Key : " + entry.getKey()
@@ -312,9 +316,8 @@ public class RunStatsManager {
     map.put(RunProperty.pair, pair);
 
     JSONObject laneQuality = new JSONObject();
-    Map<String, ReportTable> resultMap = new HashMap<String, ReportTable>();
     try {
-      resultMap = reportsDecorator.getPerPositionBaseContent(map);
+      Map<String, ReportTable> resultMap = reportsDecorator.getPerPositionBaseContent(map);
 
       ArrayList<String> base_content_a = new ArrayList<String>(Arrays.asList(resultMap.get("base_content_a").toCSV().split("\n")));
       ArrayList<String> base_content_c = new ArrayList<String>(Arrays.asList(resultMap.get("base_content_c").toCSV().split("\n")));

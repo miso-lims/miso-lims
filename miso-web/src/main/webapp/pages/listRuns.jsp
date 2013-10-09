@@ -34,25 +34,17 @@
 <link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" type="text/css">
 <link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables_themeroller.css'/>">
 
-
 <div id="maincontent">
   <div id="contentcolumn">
     <h1>
       <div id="totalCount">Runs
       </div>
     </h1>
-
     <table cellpadding="0" cellspacing="0" border="0" class="display" id="listingRunsTable">
     </table>
     <script type="text/javascript">
-
-      jQuery(document).ready(function() {
+      jQuery(document).ready(function () {
         Run.ui.createListingRunsTable();
-//        jQuery('#table').find('tr').each(function() {
-//          if (jQuery(this.cells[2]).html() === "Completed" && Utils.validation.isNullCheck(jQuery(this.cells[4]).html())) {
-//            jQuery(this.cells[4]).addClass("error");
-//          }
-//        });
       });
     </script>
   </div>

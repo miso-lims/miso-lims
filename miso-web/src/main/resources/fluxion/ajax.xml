@@ -119,6 +119,10 @@
           class="uk.ac.bbsrc.tgac.miso.spring.ajax.FlexReportingControllerHelperService">
     </bean>
 
+    <bean id="projectsTreeControllerHelperService"
+              class="uk.ac.bbsrc.tgac.miso.spring.ajax.ProjectTreeControllerHelperService">
+        </bean>
+
     <bean id="experimentControllerHelperService"
           class="uk.ac.bbsrc.tgac.miso.spring.ajax.ExperimentControllerHelperService">
     </bean>

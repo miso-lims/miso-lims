@@ -26,18 +26,13 @@ package uk.ac.bbsrc.tgac.miso.core.manager;
 import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.PrintJob;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.MisoPrintJob;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoPrintException;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
+import uk.ac.bbsrc.tgac.miso.core.service.printing.schema.BarcodableSchema;
 
-import javax.print.DocFlavor;
-import javax.print.PrintException;
-import javax.print.PrintService;
-import javax.print.attribute.PrintServiceAttributeSet;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -72,4 +67,8 @@ public interface PrintManager<T, C> {
   public Collection<? extends PrintJob> listPrintJobsByUser(User user) throws IOException;
 
   public PrintJob print(C content, String printServiceName, User user) throws MisoPrintException;
+
+  public Collection<BarcodableSchema> getBarcodableSchemas();
+  public BarcodableSchema getBarcodableSchema(String barcodableStateName) throws IOException;
+
 }

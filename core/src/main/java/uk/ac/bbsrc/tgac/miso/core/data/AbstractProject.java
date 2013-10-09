@@ -233,7 +233,7 @@ public abstract class AbstractProject implements Project {
            getSamples().isEmpty() &&
            getStudies().isEmpty();
   }
-  
+
   public SecurityProfile getSecurityProfile() {
     return securityProfile;
   }
@@ -245,7 +245,7 @@ public abstract class AbstractProject implements Project {
   public void inheritPermissions(SecurableByProfile parent) throws SecurityException {
     //projects have no parents
     //setSecurityProfile(parent.getSecurityProfile());
-  }  
+  }
 
   public boolean userCanRead(User user) {
     try {

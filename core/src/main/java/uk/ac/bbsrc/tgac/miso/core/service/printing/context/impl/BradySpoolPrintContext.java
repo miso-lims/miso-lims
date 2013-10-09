@@ -27,6 +27,7 @@ import com.opensymphony.util.FileUtils;
 import net.sourceforge.fluxion.spi.ServiceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeLabelFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.factory.ImageRasterBarcodeLabelFactory;
@@ -49,7 +50,6 @@ import java.io.IOException;
 public class BradySpoolPrintContext implements PrintContext<File> {
   protected static final Logger log = LoggerFactory.getLogger(BradySpoolPrintContext.class);
   private BradySpoolPrintStrategy ps = new BradySpoolPrintStrategy();
-  private BarcodeLabelFactory<File> labelFactory = new ImageRasterBarcodeLabelFactory();
   public String host;
   private PrintService printService;
 
@@ -72,14 +72,6 @@ public class BradySpoolPrintContext implements PrintContext<File> {
 
   public void setHost(String host) {
     this.host = host;
-  }
-
-  public BarcodeLabelFactory<File> getLabelFactory() {
-    return labelFactory;
-  }
-
-  public void setLabelFactory(BarcodeLabelFactory<File> labelFactory) {
-    this.labelFactory = labelFactory;
   }
 
   @Override

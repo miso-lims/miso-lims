@@ -23,69 +23,68 @@
 
 <%@ include file="../header.jsp" %>
 <div id="maincontent">
-    <div id="contentcolumn">
-        <form:form  action="/miso/sequencer" method="POST" commandName="sequencerReference" autocomplete="off">
-          <sessionConversation:insertSessionConversationId attributeName="sequencerReference"/>
-            <h1>
-                Edit Sequencer Reference
-                <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
-            </h1>
-            <div class="breadcrumbs">
-                <ul>
-                    <li>
-                        <a href="<c:url value='/miso/'/>">Home</a>
-                    </li>
-                    <li>
-                        <div class="breadcrumbsbubbleInfo">
-                            <div class="trigger">
-                                <a href='<c:url value="/miso/stats"/>'>Sequencer References</a>
-                            </div>
-                            <div class="breadcrumbspopup">
-                                All Sequencer References
-                            </div>
-                        </div>
-                    </li>
-                </ul>
+  <div id="contentcolumn">
+    <form:form action="/miso/sequencer" method="POST" commandName="sequencerReference" autocomplete="off">
+      <sessionConversation:insertSessionConversationId attributeName="sequencerReference"/>
+      <h1>
+        Edit Sequencer Reference
+        <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
+      </h1>
+      <div class="breadcrumbs">
+        <ul>
+          <li>
+            <a href="<c:url value='/miso/'/>">Home</a>
+          </li>
+          <li>
+            <div class="breadcrumbsbubbleInfo">
+              <div class="trigger">
+                <a href='<c:url value="/miso/stats"/>'>Sequencer References</a>
+              </div>
+              <div class="breadcrumbspopup">
+                All Sequencer References
+              </div>
             </div>
-            <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
-                <div id="note_arrowclick" class="toggleLeft"></div>
-            </div>
-            <div id="notediv" class="note" style="display:none;">A Sequencer Reference represents a sequencer. This may be
-                a machine physically attached to a sequencer itself, or more commonly, a cluster or storage machine that
-                holds the run directories.
-            </div>
-            <h2>Sequencer Information</h2>
+          </li>
+        </ul>
+      </div>
+      <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
+        <div id="note_arrowclick" class="toggleLeft"></div>
+      </div>
+      <div id="notediv" class="note" style="display:none;">A Sequencer Reference represents a sequencer. This may be
+        a machine physically attached to a sequencer itself, or more commonly, a cluster or storage machine that
+        holds the run directories.
+      </div>
+      <h2>Sequencer Information</h2>
 
-            <table class="in">
-                <tr>
-                    <td class="h">Sequencer Reference ID:</td>
-                    <td>
-                        <c:choose>
-                            <c:when test="${sequencerReference.id != 0}">${sequencerReference.id}</c:when>
-                            <c:otherwise><i>Unsaved</i></c:otherwise>
-                        </c:choose>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Platform:</td>
-                    <td>${sequencerReference.platform.nameAndModel}</td>
-                </tr>
-                <tr>
-                    <td class="h">Name:</td>
-                    <td><form:input path="name"/><span id="namecounter" class="counter"></span></td>
-                </tr>
-                <tr>
-                    <td>IP Address:</td>
-                    <td>
-                        <input type="text" id="ipAddress" name="ipAddress" value="${trimmedIpAddress}"/>
-                        <input type="hidden" value="on" name="_ipAddress"/>
-                    </td>
-                </tr>
-            </table>
-
-            <br/>
-        </form:form>
-    </div>
+      <table class="in">
+        <tr>
+          <td class="h">Sequencer Reference ID:</td>
+          <td>
+            <c:choose>
+              <c:when test="${sequencerReference.id != 0}">${sequencerReference.id}</c:when>
+              <c:otherwise><i>Unsaved</i></c:otherwise>
+            </c:choose>
+          </td>
+        </tr>
+        <tr>
+          <td>Platform:</td>
+          <td>${sequencerReference.platform.nameAndModel}</td>
+        </tr>
+        <tr>
+          <td class="h">Name:</td>
+          <td><form:input path="name"/><span id="namecounter" class="counter"></span></td>
+        </tr>
+        <tr>
+          <td>IP Address:</td>
+          <td>
+            <input type="text" id="ipAddress" name="ipAddress" value="${trimmedIpAddress}"/>
+            <input type="hidden" value="on" name="_ipAddress"/>
+          </td>
+        </tr>
+      </table>
+      <br/>
+    </form:form>
+  </div>
 </div>
 
 <%@ include file="adminsub.jsp" %>

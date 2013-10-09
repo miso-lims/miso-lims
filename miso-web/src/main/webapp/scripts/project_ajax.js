@@ -26,98 +26,97 @@ var Project = Project || {
 };
 
 Project.ui = {
-  editProjectTrafficLight : function(projectId) {
+  editProjectTrafficLight: function (projectId) {
     Fluxion.doAjax(
-            'projectControllerHelperService',
-            'editProjectTrafficLight',
-            {
-              'projectId':projectId,
-              'url':ajaxurl
-            },
-            {'doOnSuccess': function(json) {
-              jQuery('#pro' + projectId + 'traf').html(json.html);
-            }
-            }
+      'projectControllerHelperService',
+      'editProjectTrafficLight',
+      {
+        'projectId': projectId,
+        'url': ajaxurl
+      },
+      {'doOnSuccess': function (json) {
+        jQuery('#pro' + projectId + 'traf').html(json.html);
+      }
+      }
     );
   },
 
-  listProjectTrafficLight : function() {
+  listProjectTrafficLight: function () {
     jQuery('.overviewstat').html("<img src='../styles/images/ajax-loader.gif'/>");
     Fluxion.doAjax(
-            'projectControllerHelperService',
-            'listProjectTrafficLight',
-            {
-              'url':ajaxurl
-            },
-            {'doOnSuccess': function(json) {
-              jQuery.each(json, function(i, val) {
-                jQuery('#pro' + i + 'overview').html(val)
-              });
-            }
-            }
+      'projectControllerHelperService',
+      'listProjectTrafficLight',
+      {
+        'url': ajaxurl
+      },
+      {'doOnSuccess': function (json) {
+        jQuery.each(json, function (i, val) {
+          jQuery('#pro' + i + 'overview').html(val)
+        });
+      }
+      }
     );
   },
 
-  createListingProjectsTable : function() {
+  createListingProjectsTable: function () {
     jQuery('#listingProjectsTable').html("<img src='../styles/images/ajax-loader.gif'/>");
-    jQuery.fn.dataTableExt.oSort['no-pro-asc'] = function(x, y) {
+    jQuery.fn.dataTableExt.oSort['no-pro-asc'] = function (x, y) {
       var a = parseInt(x.replace(/^PRO/i, ""));
       var b = parseInt(y.replace(/^PRO/i, ""));
       return ((a < b) ? -1 : ((a > b) ? 1 : 0));
     };
-    jQuery.fn.dataTableExt.oSort['no-pro-desc'] = function(x, y) {
+    jQuery.fn.dataTableExt.oSort['no-pro-desc'] = function (x, y) {
       var a = parseInt(x.replace(/^PRO/i, ""));
       var b = parseInt(y.replace(/^PRO/i, ""));
       return ((a < b) ? 1 : ((a > b) ? -1 : 0));
     };
     Fluxion.doAjax(
-            'projectControllerHelperService',
-            'listProjectsDataTable',
-            {
-              'url':ajaxurl
-            },
-            {'doOnSuccess': function(json) {
-              jQuery('#listingProjectsTable').html('');
-              jQuery('#listingProjectsTable').dataTable({
-                "aaData": json.projectsArray,
-                "aoColumns": [
-                  { "sTitle": "Project Name", "sType":"no-pro"},
-                  { "sTitle": "Alias"},
-                  { "sTitle": "Description"},
-                  { "sTitle": "Progress"},
-                  { "sTitle": "Overview"},
-                  { "sTitle": "Edit"}
-                ],
-                "bJQueryUI": true,
-                "iDisplayLength":  25,
-                "aaSorting":[
-                  [0,"desc"]
-                ],
-                "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
-                "fnRowCallback": function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-
-                  Fluxion.doAjax(
-                          'projectControllerHelperService',
-                          'checkOverviewByProjectId',
-                          {
-                            'projectId':aData[4],
-                            'url':ajaxurl
-                          },
-                          {'doOnSuccess': function(json) {
-                            jQuery('td:eq(4)', nRow).html(json.response);
-                          }
-                          }
-                  );
-                }
-              });
-              jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
-              jQuery("#toolbar").append("<button style=\"margin-left:5px;\" onclick=\"window.location.href='/miso/project/new';\" class=\"fg-button ui-state-default ui-corner-all\">Add Project</button>");
-            }
-            }
+      'projectControllerHelperService',
+      'listProjectsDataTable',
+      {
+        'url': ajaxurl
+      },
+      {'doOnSuccess': function (json) {
+        jQuery('#listingProjectsTable').html('');
+        jQuery('#listingProjectsTable').dataTable({
+          "aaData": json.projectsArray,
+          "aoColumns": [
+            { "sTitle": "Project Name", "sType": "no-pro"},
+            { "sTitle": "Alias"},
+            { "sTitle": "Description"},
+            { "sTitle": "Progress"},
+            { "sTitle": "Overview"},
+            { "sTitle": "Edit"}
+          ],
+          "bJQueryUI": true,
+          "iDisplayLength": 25,
+          "aaSorting": [
+            [0, "desc"]
+          ],
+          "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
+          "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+            Fluxion.doAjax(
+              'projectControllerHelperService',
+              'checkOverviewByProjectId',
+              {
+                'projectId': aData[4],
+                'url': ajaxurl
+              },
+              {'doOnSuccess': function (json) {
+                jQuery('td:eq(4)', nRow).html(json.response);
+              }
+              }
+            );
+          }
+        });
+        jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
+        jQuery("#toolbar").append("<button style=\"margin-left:5px;\" onclick=\"window.location.href='/miso/project/new';\" class=\"fg-button ui-state-default ui-corner-all\">Add Project</button>");
+      }
+      }
     );
   },
 
-  processSampleDeliveryForm : function(projectId) {
+  processSampleDeliveryForm: function (projectId) {
     var table = jQuery('#sample_table').dataTable();
     var aReturn = [];
     var aTrs = DatatableUtils.fnGetSelected(table);
@@ -131,119 +130,119 @@ Project.ui = {
       'projectControllerHelperService',
       'generateSampleDeliveryForm',
       {
-        'projectId':projectId,
-        'samples':aReturn,
-        'url':ajaxurl
+        'projectId': projectId,
+        'samples': aReturn,
+        'url': ajaxurl
       },
-      {'doOnSuccess':function (json) {
-          Utils.page.pageRedirect('/miso/download/project/' + projectId + '/' + json.response);
-        }
+      {'doOnSuccess': function (json) {
+        Utils.page.pageRedirect('/miso/download/project/' + projectId + '/' + json.response);
+      }
       }
     );
   },
 
-  deliveryFormUploadSuccess : function() {
+  deliveryFormUploadSuccess: function () {
     jQuery('#deliveryform_statusdiv').html("Samples imported.");
   },
 
-  uploadSampleDeliveryForm : function(projectId) {
+  uploadSampleDeliveryForm: function (projectId) {
     jQuery('#deliveryformdiv').css("display", "block");
   },
 
-  cancelSampleDeliveryFormUpload : function() {
+  cancelSampleDeliveryFormUpload: function () {
     jQuery('#deliveryformdiv').css("display", "none");
   },
 
-  downloadBulkSampleInputForm : function(projectId, documentFormat) {
+  downloadBulkSampleInputForm: function (projectId, documentFormat) {
     Fluxion.doAjax(
       'projectControllerHelperService',
       'downloadBulkSampleInputForm',
       {
-        'projectId':projectId,
-        'documentFormat':documentFormat,
-        'url':ajaxurl
+        'projectId': projectId,
+        'documentFormat': documentFormat,
+        'url': ajaxurl
       },
-      {'doOnSuccess':function (json) {
-          Utils.page.pageRedirect('/miso/download/project/' + projectId + '/' + json.response);
-        }
+      {'doOnSuccess': function (json) {
+        Utils.page.pageRedirect('/miso/download/project/' + projectId + '/' + json.response);
+      }
       }
     );
   },
 
-  bulkSampleInputFormUploadSuccess : function() {
+  bulkSampleInputFormUploadSuccess: function () {
     jQuery('#inputform_statusdiv').html("");
     Fluxion.doAjax(
       'projectControllerHelperService',
       'visualiseBulkSampleInputForm',
-      {'url':ajaxurl},
-      {'updateElement':'inputform_statusdiv'}
+      {'url': ajaxurl},
+      {'updateElement': 'inputform_statusdiv'}
     );
   },
 
-  uploadBulkSampleInputForm : function(projectId) {
+  uploadBulkSampleInputForm: function (projectId) {
     jQuery('#inputformdiv').css("display", "block");
   },
 
-  cancelBulkSampleInputFormUpload : function() {
+  cancelBulkSampleInputFormUpload: function () {
     jQuery('#inputformdiv').css("display", "none");
   },
 
-  downloadPlateInputForm : function(projectId, documentFormat) {
+  downloadPlateInputForm: function (projectId, documentFormat) {
     Fluxion.doAjax(
       'projectControllerHelperService',
       'downloadPlateInputForm',
       {
-        'projectId':projectId,
-        'documentFormat':documentFormat,
-        'url':ajaxurl
+        'projectId': projectId,
+        'documentFormat': documentFormat,
+        'url': ajaxurl
       },
-      {'doOnSuccess':function (json) {
-          Utils.page.pageRedirect('/miso/download/project/' + projectId + '/' + json.response);
-        }
+      {'doOnSuccess': function (json) {
+        Utils.page.pageRedirect('/miso/download/project/' + projectId + '/' + json.response);
+      }
       }
     );
   },
 
-  uploadPlateInputForm : function() {
+  uploadPlateInputForm: function () {
     jQuery('#plateformdiv').css("display", "block");
   },
 
-  cancelPlateInputFormUpload : function() {
+  cancelPlateInputFormUpload: function () {
     jQuery('#plateformdiv').css("display", "none");
   },
 
-  plateInputFormUploadSuccess : function(json) {
+  plateInputFormUploadSuccess: function (json) {
     jQuery('#plateform_statusdiv').html("Processing...");
     Project.ui.processPlateUpload(json.frameId);
   },
 
-  processPlateUpload : function(frameId) {
+  processPlateUpload: function (frameId) {
     var iframe = document.getElementById(frameId);
     var iframedoc = iframe.document;
-        if (iframe.contentDocument)
-            iframedoc = iframe.contentDocument;
-        else if (iframe.contentWindow)
-            iframedoc = iframe.contentWindow.document;
+    if (iframe.contentDocument)
+      iframedoc = iframe.contentDocument;
+    else if (iframe.contentWindow)
+      iframedoc = iframe.contentWindow.document;
     var response = jQuery(iframedoc).contents().find('body:first').find('#uploadresponsebody').val();
-    if(!Utils.validation.isNullCheck(response)) {
+    if (!Utils.validation.isNullCheck(response)) {
       var json = jQuery.parseJSON(response);
-      if(!Utils.validation.isNullCheck(json.pools)) {
+      if (!Utils.validation.isNullCheck(json.pools)) {
         jQuery('#plateform_statusdiv').html("Processing... complete.");
         for (var i = 0; i < json.pools.length; i++) {
-          jQuery.each(json.pools[i], function(key, value) {
+          jQuery.each(json.pools[i], function (key, value) {
             jQuery('#plateform_import').append("<div id='importbox-" + key + "' class='simplebox backwhite'>");
             var pool = value;
-            var impb = jQuery('#importbox-'+key);
+            var impb = jQuery('#importbox-' + key);
             impb.append("<span style='float:right;'><button type='button' class='fg-button ui-state-default ui-corner-all' onclick='Project.ui.removeImportBox(this);'>Cancel</button>");
-            impb.append("<button type='button' class='fg-button ui-state-default ui-corner-all' onclick='Project.ui.saveImportedElements(\""+frameId+"\");'>Import</button></span>");
-            impb.append("Pool alias: <b>"+pool.alias+"</b></br>");
+            impb.append("<button type='button' class='fg-button ui-state-default ui-corner-all' onclick='Project.ui.saveImportedElements(\"" + frameId + "\");'>Import</button></span>");
+            impb.append("Pool alias: <b>" + pool.alias + "</b></br>");
             for (var j = 0; j < pool.poolableElements.length; j++) {
               var plate = pool.poolableElements[j];
-              impb.append(plate.elements.length+"-well plate: <b>"+plate.identificationBarcode+"</b>");
+              impb.append(plate.elements.length + "-well plate: <b>" + plate.identificationBarcode + "</b>");
               impb.append("<ul>");
               for (var k = 0; k < plate.elements.length; k++) {
                 var library = plate.elements[k];
-                impb.append("<li>"+library.alias+"</li>")
+                impb.append("<li>" + library.alias + "</li>")
               }
               impb.append("</ul>");
             }
@@ -253,51 +252,50 @@ Project.ui = {
       }
     }
     else {
-      setTimeout(function()
-      {
+      setTimeout(function () {
         Project.ui.processPlateUpload(frameId)
       }, 2000);
     }
   },
 
-  removeImportBox : function(button) {
+  removeImportBox: function (button) {
     if (confirm("Are you sure you want to cancel the plate import?")) {
       jQuery(button).parent().parent().remove();
     }
   },
 
-  saveImportedElements : function(frameId) {
+  saveImportedElements: function (frameId) {
     var iframe = document.getElementById(frameId);
     var iframedoc = iframe.document;
-        if (iframe.contentDocument)
-            iframedoc = iframe.contentDocument;
-        else if (iframe.contentWindow)
-            iframedoc = iframe.contentWindow.document;
+    if (iframe.contentDocument)
+      iframedoc = iframe.contentDocument;
+    else if (iframe.contentWindow)
+      iframedoc = iframe.contentWindow.document;
     var response = jQuery(iframedoc).contents().find('body:first').find('#uploadresponsebody').val();
-    if(!Utils.validation.isNullCheck(response)) {
+    if (!Utils.validation.isNullCheck(response)) {
       var json = jQuery.parseJSON(response);
       Fluxion.doAjax(
         'projectControllerHelperService',
         'saveImportedElements',
         {
-          'elements':json,
-          'url':ajaxurl
+          'elements': json,
+          'url': ajaxurl
         },
         {
-          'doOnSuccess':Project.ui.createPlateElementsTable()
+          'doOnSuccess': Project.ui.createPlateElementsTable()
         }
       );
     }
   },
 
-  createPlateElementsTable : function() {
+  createPlateElementsTable: function () {
     jQuery('#plateElementsTable').html("<img src='../styles/images/ajax-loader.gif'/>");
-    jQuery.fn.dataTableExt.oSort['no-pla-asc'] = function(x, y) {
+    jQuery.fn.dataTableExt.oSort['no-pla-asc'] = function (x, y) {
       var a = parseInt(x.replace(/^PLA/i, ""));
       var b = parseInt(y.replace(/^PLA/i, ""));
       return ((a < b) ? -1 : ((a > b) ? 1 : 0));
     };
-    jQuery.fn.dataTableExt.oSort['no-pla-desc'] = function(x, y) {
+    jQuery.fn.dataTableExt.oSort['no-pla-desc'] = function (x, y) {
       var a = parseInt(x.replace(/^PLA/i, ""));
       var b = parseInt(y.replace(/^PLA/i, ""));
       return ((a < b) ? 1 : ((a > b) ? -1 : 0));
@@ -306,43 +304,43 @@ Project.ui = {
       'projectControllerHelperService',
       'plateElementsDataTable',
       {
-        'url':ajaxurl
+        'url': ajaxurl
       },
-      {'doOnSuccess': function(json) {
+      {'doOnSuccess': function (json) {
         jQuery('#plateElementsTable').html('');
         jQuery('#plateElementsTable').dataTable({
           "aaData": json.elementsArray,
           "aoColumns": [
-            { "sTitle": "Name", "sType":"no-pla"},
+            { "sTitle": "Name", "sType": "no-pla"},
             { "sTitle": "Alias"},
             { "sTitle": "Description"},
             { "sTitle": "Edit"}
           ],
           "bJQueryUI": true,
-          "iDisplayLength":  25,
-          "aaSorting":[
-            [0,"desc"]
+          "iDisplayLength": 25,
+          "aaSorting": [
+            [0, "desc"]
           ],
           "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>'
           /*
-          ,
+           ,
 
-          "fnRowCallback": function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+           "fnRowCallback": function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
 
-            Fluxion.doAjax(
-                    'projectControllerHelperService',
-                    'checkOverviewByProjectId',
-                    {
-                      'projectId':aData[4],
-                      'url':ajaxurl
-                    },
-                    {'doOnSuccess': function(json) {
-                      jQuery('td:eq(4)', nRow).html(json.response);
-                    }
-                    }
-            );
-          }
-          */
+           Fluxion.doAjax(
+           'projectControllerHelperService',
+           'checkOverviewByProjectId',
+           {
+           'projectId':aData[4],
+           'url':ajaxurl
+           },
+           {'doOnSuccess': function(json) {
+           jQuery('td:eq(4)', nRow).html(json.response);
+           }
+           }
+           );
+           }
+           */
         });
         jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
         //jQuery("#toolbar").append("<button style=\"margin-left:5px;\" onclick=\"window.location.href='/miso/project/new';\" class=\"fg-button ui-state-default ui-corner-all\">Add Project</button>");
@@ -351,11 +349,11 @@ Project.ui = {
     );
   },
 
-  addPoolEmPCR : function(tableId) {
+  addPoolEmPCR: function (tableId) {
     alert("This function is not available at present");
   },
 
-  saveBulkSampleQc : function() {
+  saveBulkSampleQc: function () {
     var self = this;
     Utils.ui.disableButton('bulkSampleQcButton');
     DatatableUtils.collapseInputs('#sample_table');
@@ -366,7 +364,7 @@ Project.ui = {
     var aTrs = DatatableUtils.fnGetSelected(table);
     for (var i = 0; i < aTrs.length; i++) {
       var obj = {};
-      jQuery(aTrs[i]).find("td:gt(0)").each(function() {
+      jQuery(aTrs[i]).find("td:gt(0)").each(function () {
         var at = jQuery(this).attr("name");
         obj[at] = jQuery(this).text();
       });
@@ -378,15 +376,15 @@ Project.ui = {
     if (aReturn.length > 0) {
       if (validate_sample_qcs(aReturn)) {
         Fluxion.doAjax(
-                'sampleControllerHelperService',
-                'bulkAddSampleQCs',
-                {
-                  'qcs':aReturn,
-                  'url':ajaxurl
-                },
-                {
-                  'doOnSuccess':self.processBulkSampleQcTable
-                }
+          'sampleControllerHelperService',
+          'bulkAddSampleQCs',
+          {
+            'qcs': aReturn,
+            'url': ajaxurl
+          },
+          {
+            'doOnSuccess': self.processBulkSampleQcTable
+          }
         );
       }
       else {
@@ -400,24 +398,47 @@ Project.ui = {
     }
   },
 
-  processBulkSampleQcTable : function(json) {
+  processBulkSampleQcTable: function (json) {
     Utils.ui.reenableButton('bulkSampleQcButton', "Save QCs");
 
     var a = json.saved;
     for (var i = 0; i < a.length; i++) {
-      jQuery('#sample_table').find("tr:gt(0)").each(function() {
+      jQuery('#sample_table').find("tr:gt(0)").each(function () {
         if (jQuery(this).attr("sampleId") === a[i].sampleId) {
-          jQuery(this).find("td").each(function() {
+          jQuery(this).removeClass('row_selected');
+          jQuery(this).addClass('row_saved');
+          jQuery(this).find("td").each(function () {
             jQuery(this).css('background', '#CCFF99');
+            if (jQuery(this).hasClass('rowSelect')) {
+              jQuery(this).removeClass('rowSelect');
+              jQuery(this).removeAttr('name');
+            }
           });
         }
       });
     }
 
-    Utils.timer.timedFunc(Utils.page.pageReload(), 1000);
+    if (json.errors) {
+      var errors = json.errors;
+      var errorStr = "";
+      for (var i = 0; i < errors.length; i++) {
+        errorStr += errors[i].error + "\n";
+        jQuery('#sample_table').find("tr:gt(0)").each(function () {
+          if (jQuery(this).attr("sampleId") === errors[i].sampleId) {
+            jQuery(this).find("td").each(function () {
+              jQuery(this).css('background', '#EE9966');
+            });
+          }
+        });
+      }
+      alert("There were errors in your bulk input. The green rows have been saved, please fix the red rows:\n\n" + errorStr);
+    }
+    else {
+      Utils.timer.timedFunc(Utils.page.pageReload(), 1000);
+    }
   },
 
-  saveBulkEmPcrs : function() {
+  saveBulkEmPcrs: function () {
     var self = this;
     Utils.ui.disableButton('bulkEmPcrButton');
     DatatableUtils.collapseInputs('#librarydils_table');
@@ -427,7 +448,7 @@ Project.ui = {
     var aTrs = DatatableUtils.fnGetSelected(table);
     for (var i = 0; i < aTrs.length; i++) {
       var obj = {};
-      jQuery(aTrs[i]).find("td:gt(0)").each(function() {
+      jQuery(aTrs[i]).find("td:gt(0)").each(function () {
         var at = jQuery(this).attr("name");
         obj[at] = jQuery(this).text();
       });
@@ -438,15 +459,15 @@ Project.ui = {
     if (aReturn.length > 0) {
       if (validate_empcrs(aReturn)) {
         Fluxion.doAjax(
-                'libraryControllerHelperService',
-                'bulkAddEmPcrs',
-                {
-                  'pcrs':aReturn,
-                  'url':ajaxurl
-                },
-                {
-                  'doOnSuccess':self.processBulkEmPcrTable
-                }
+          'libraryControllerHelperService',
+          'bulkAddEmPcrs',
+          {
+            'pcrs': aReturn,
+            'url': ajaxurl
+          },
+          {
+            'doOnSuccess': self.processBulkEmPcrTable
+          }
         );
       }
       else {
@@ -460,24 +481,47 @@ Project.ui = {
     }
   },
 
-  processBulkEmPcrTable : function(json) {
+  processBulkEmPcrTable: function (json) {
     Utils.ui.reenableButton('bulkEmPcrButton', "Save EmPCRs");
 
     var a = json.saved;
     for (var i = 0; i < a.length; i++) {
-      jQuery('#librarydils_table').find("tr:gt(0)").each(function() {
+      jQuery('#librarydils_table').find("tr:gt(0)").each(function () {
         if (jQuery(this).attr("dilutionId") === a[i].dilutionId) {
-          jQuery(this).find("td").each(function() {
+          jQuery(this).removeClass('row_selected');
+          jQuery(this).addClass('row_saved');
+          jQuery(this).find("td").each(function () {
             jQuery(this).css('background', '#CCFF99');
+            if (jQuery(this).hasClass('rowSelect')) {
+              jQuery(this).removeClass('rowSelect');
+              jQuery(this).removeAttr('name');
+            }
           });
         }
       });
     }
 
-    Utils.timer.timedFunc(Utils.page.pageReload(), 1000);
+    if (json.errors) {
+      var errors = json.errors;
+      var errorStr = "";
+      for (var i = 0; i < errors.length; i++) {
+        errorStr += errors[i].error + "\n";
+        jQuery('#librarydils_table').find("tr:gt(0)").each(function () {
+          if (jQuery(this).attr("dilutionId") === errors[i].dilutionId) {
+            jQuery(this).find("td").each(function () {
+              jQuery(this).css('background', '#EE9966');
+            });
+          }
+        });
+      }
+      alert("There were errors in your bulk input. The green rows have been saved, please fix the red rows:\n\n" + errorStr);
+    }
+    else {
+      Utils.timer.timedFunc(Utils.page.pageReload(), 1000);
+    }
   },
 
-  saveBulkEmPcrDilutions : function() {
+  saveBulkEmPcrDilutions: function () {
     var self = this;
     Utils.ui.disableButton('bulkEmPcrDilutionButton');
     DatatableUtils.collapseInputs('#empcrs_table');
@@ -487,7 +531,7 @@ Project.ui = {
     var aTrs = DatatableUtils.fnGetSelected(table);
     for (var i = 0; i < aTrs.length; i++) {
       var obj = {};
-      jQuery(aTrs[i]).find("td:gt(0)").each(function() {
+      jQuery(aTrs[i]).find("td:gt(0)").each(function () {
         var at = jQuery(this).attr("name");
         obj[at] = jQuery(this).text();
       });
@@ -499,15 +543,15 @@ Project.ui = {
     if (aReturn.length > 0) {
       if (validate_empcr_dilutions(aReturn)) {
         Fluxion.doAjax(
-                'libraryControllerHelperService',
-                'bulkAddEmPcrDilutions',
-                {
-                  'dilutions':aReturn,
-                  'url':ajaxurl
-                },
-                {
-                  'doOnSuccess':self.processBulkEmPcrDilutionTable
-                });
+          'libraryControllerHelperService',
+          'bulkAddEmPcrDilutions',
+          {
+            'dilutions': aReturn,
+            'url': ajaxurl
+          },
+          {
+            'doOnSuccess': self.processBulkEmPcrDilutionTable
+          });
       }
       else {
         alert("The results field can only contain integers or decimals.");
@@ -520,175 +564,197 @@ Project.ui = {
     }
   },
 
-  processBulkEmPcrDilutionTable : function(json) {
+  processBulkEmPcrDilutionTable: function (json) {
     Utils.ui.reenableButton('bulkEmPcrDilutionButton', "Save Dilutions");
 
     var a = json.saved;
     for (var i = 0; i < a.length; i++) {
-      jQuery('#empcrs_table').find("tr:gt(0)").each(function() {
+      jQuery('#empcrs_table').find("tr:gt(0)").each(function () {
         if (jQuery(this).attr("pcrId") === a[i].pcrId) {
-          jQuery(this).find("td").each(function() {
+          jQuery(this).removeClass('row_selected');
+          jQuery(this).addClass('row_saved');
+          jQuery(this).find("td").each(function () {
             jQuery(this).css('background', '#CCFF99');
+            if (jQuery(this).hasClass('rowSelect')) {
+              jQuery(this).removeClass('rowSelect');
+              jQuery(this).removeAttr('name');
+            }
           });
         }
       });
     }
 
-    //reload page after a second
-    Utils.timer.timedFunc(Utils.page.pageReload(), 1000);
+    if (json.errors) {
+      var errors = json.errors;
+      var errorStr = "";
+      for (var i = 0; i < errors.length; i++) {
+        errorStr += errors[i].error + "\n";
+        jQuery('#empcrs_table').find("tr:gt(0)").each(function () {
+          if (jQuery(this).attr("pcrId") === errors[i].pcrId) {
+            jQuery(this).find("td").each(function () {
+              jQuery(this).css('background', '#EE9966');
+            });
+          }
+        });
+      }
+      alert("There were errors in your bulk input. The green rows have been saved, please fix the red rows:\n\n" + errorStr);
+    }
+    else {
+      Utils.timer.timedFunc(Utils.page.pageReload(), 1000);
+    }
   }
 };
 
 Project.overview = {
-  showProjectOverviewDialog : function(projectId) {
+  showProjectOverviewDialog: function (projectId) {
     var self = this;
     jQuery('#addProjectOverviewDialog')
-            .html("<form>" +
-                  "<fieldset class='dialog'><label for='principalInvestigator'>Principal Investigator</label>" +
-                  "<input type='text' name='principalInvestigator' id='principalInvestigator' class='text ui-widget-content ui-corner-all' />" +
-                  "<label for='numProposedSamples'>No. Proposed Samples</label>" +
-                  "<input type='text' name='numProposedSamples' id='numProposedSamples' class='text ui-widget-content ui-corner-all' />" +
-                  "</fieldset></form>");
+        .html("<form>" +
+              "<fieldset class='dialog'><label for='principalInvestigator'>Principal Investigator</label>" +
+              "<input type='text' name='principalInvestigator' id='principalInvestigator' class='text ui-widget-content ui-corner-all' />" +
+              "<label for='numProposedSamples'>No. Proposed Samples</label>" +
+              "<input type='text' name='numProposedSamples' id='numProposedSamples' class='text ui-widget-content ui-corner-all' />" +
+              "</fieldset></form>");
 
-    jQuery(function() {
+    jQuery(function () {
       jQuery('#addProjectOverviewDialog').dialog({
-                                                   autoOpen: false,
-                                                   width: 400,
-                                                   modal: true,
-                                                   resizable: false,
-                                                   buttons: {
-                                                     "Add Overview": function() {
-                                                       self.addProjectOverview(projectId, jQuery('#principalInvestigator').val(), jQuery('#numProposedSamples').val());
-                                                       jQuery(this).dialog('close');
-                                                     },
-                                                     "Cancel": function() {
-                                                       jQuery(this).dialog('close');
-                                                     }
-                                                   }
-                                                 });
+        autoOpen: false,
+        width: 400,
+        modal: true,
+        resizable: false,
+        buttons: {
+          "Add Overview": function () {
+            self.addProjectOverview(projectId, jQuery('#principalInvestigator').val(), jQuery('#numProposedSamples').val());
+            jQuery(this).dialog('close');
+          },
+          "Cancel": function () {
+            jQuery(this).dialog('close');
+          }
+        }
+      });
     });
     jQuery('#addProjectOverviewDialog').dialog('open');
   },
 
-  addProjectOverview : function(projectId, pi, nsamples) {
+  addProjectOverview: function (projectId, pi, nsamples) {
     Fluxion.doAjax(
-            'projectControllerHelperService',
-            'addProjectOverview',
-            {
-              'projectId':projectId,
-              'principalInvestigator':pi,
-              'numProposedSamples':nsamples,
-              'url':ajaxurl
-            },
-            {
-              'doOnSuccess':Utils.page.pageReload
-            }
+      'projectControllerHelperService',
+      'addProjectOverview',
+      {
+        'projectId': projectId,
+        'principalInvestigator': pi,
+        'numProposedSamples': nsamples,
+        'url': ajaxurl
+      },
+      {
+        'doOnSuccess': Utils.page.pageReload
+      }
     );
   },
 
-  showProjectOverviewNoteDialog : function(overviewId) {
+  showProjectOverviewNoteDialog: function (overviewId) {
     var self = this;
     jQuery('#addProjectOverviewNoteDialog')
-            .html("<form>" +
-                  "<fieldset class='dialog'>" +
-                  "<label for='internalOnly'>Internal Only?</label>" +
-                  "<input type='checkbox' checked='checked' name='internalOnly' id='internalOnly' class='text ui-widget-content ui-corner-all' />" +
-                  "<br/>" +
-                  "<label for='notetext'>Text</label>" +
-                  "<input type='text' name='notetext' id='notetext' class='text ui-widget-content ui-corner-all' />" +
-                  "</fieldset></form>");
+      .html("<form>" +
+            "<fieldset class='dialog'>" +
+            "<label for='internalOnly'>Internal Only?</label>" +
+            "<input type='checkbox' checked='checked' name='internalOnly' id='internalOnly' class='text ui-widget-content ui-corner-all' />" +
+            "<br/>" +
+            "<label for='notetext'>Text</label>" +
+            "<input type='text' name='notetext' id='notetext' class='text ui-widget-content ui-corner-all' />" +
+            "</fieldset></form>");
 
-    jQuery(function() {
+    jQuery(function () {
       jQuery('#addProjectOverviewNoteDialog').dialog({
-                                                       autoOpen: false,
-                                                       width: 400,
-                                                       modal: true,
-                                                       resizable: false,
-                                                       buttons: {
-                                                         "Add Note": function() {
-                                                           self.addProjectOverviewNote(overviewId, jQuery('#internalOnly').val(), jQuery('#notetext').val());
-                                                           jQuery(this).dialog('close');
-                                                         },
-                                                         "Cancel": function() {
-                                                           jQuery(this).dialog('close');
-                                                         }
-                                                       }
-                                                     });
+        autoOpen: false,
+        width: 400,
+        modal: true,
+        resizable: false,
+        buttons: {
+          "Add Note": function () {
+            self.addProjectOverviewNote(overviewId, jQuery('#internalOnly').val(), jQuery('#notetext').val());
+            jQuery(this).dialog('close');
+          },
+          "Cancel": function () {
+            jQuery(this).dialog('close');
+          }
+        }
+      });
     });
     jQuery('#addProjectOverviewNoteDialog').dialog('open');
   },
 
-  addProjectOverviewNote : function(overviewId, internalOnly, text) {
+  addProjectOverviewNote: function (overviewId, internalOnly, text) {
     Fluxion.doAjax(
-            'projectControllerHelperService',
-            'addProjectOverviewNote',
-            {
-              'overviewId':overviewId,
-              'internalOnly':internalOnly,
-              'text':text,
-              'url':ajaxurl
-            },
-            {
-              'doOnSuccess':Utils.page.pageReload
-            }
+      'projectControllerHelperService',
+      'addProjectOverviewNote',
+      {
+        'overviewId': overviewId,
+        'internalOnly': internalOnly,
+        'text': text,
+        'url': ajaxurl
+      },
+      {
+        'doOnSuccess': Utils.page.pageReload
+      }
     );
   },
 
-  unlockProjectOverview : function(overviewId) {
+  unlockProjectOverview: function (overviewId) {
     Fluxion.doAjax(
-            'projectControllerHelperService',
-            'unlockProjectOverview',
-            {
-              'overviewId':overviewId,
-              'url':ajaxurl
-            },
-            {
-              'doOnSuccess':Utils.page.pageReload
-            }
+      'projectControllerHelperService',
+      'unlockProjectOverview',
+      {
+        'overviewId': overviewId,
+        'url': ajaxurl
+      },
+      {
+        'doOnSuccess': Utils.page.pageReload
+      }
     );
   },
 
-  lockProjectOverview : function(overviewId) {
+  lockProjectOverview: function (overviewId) {
     Fluxion.doAjax(
-            'projectControllerHelperService',
-            'lockProjectOverview',
-            {
-              'overviewId':overviewId,
-              'url':ajaxurl
-            },
-            {
-              'doOnSuccess':Utils.page.pageReload
-            }
+      'projectControllerHelperService',
+      'lockProjectOverview',
+      {
+        'overviewId': overviewId,
+        'url': ajaxurl
+      },
+      {
+        'doOnSuccess': Utils.page.pageReload
+      }
     );
   }
 };
 
 Project.issues = {
-  removeIssueBox : function(closespan) {
+  removeIssueBox: function (closespan) {
     if (confirm("Are you sure you want to unlink this issue from this project?")) {
       var boxId = jQuery(closespan).parent().attr("id");
       jQuery('#' + boxId).remove();
     }
   },
 
-  importProjectFromIssue : function() {
+  importProjectFromIssue: function () {
     var self = this;
     var issue = jQuery('#previewKey').val();
     if (issue !== "undefined" && issue !== "") {
       Fluxion.doAjax(
-              'projectControllerHelperService',
-              'previewIssues',
-              {
-                'issues':[
-                  {
-                    "key":issue
-                  }
-                ],
-                'url':ajaxurl
-              },
-              {
-                'doOnSuccess':self.importIssue
-              }
+        'projectControllerHelperService',
+        'previewIssues',
+        {
+          'issues': [
+            {
+              "key": issue
+            }
+          ],
+          'url': ajaxurl
+        },
+        {
+          'doOnSuccess': self.importIssue
+        }
       );
     }
     else {
@@ -696,9 +762,11 @@ Project.issues = {
     }
   },
 
-  importIssue : function(json) {
-    if (json.invalidIssues === "undefined" || json.invalidIssues.length == 0
-                                                      && json.validIssues !== "undefined" && json.validIssues.length > 0) {
+  importIssue: function (json) {
+    if (json.invalidIssues === "undefined" ||
+        json.invalidIssues.length == 0 &&
+        json.validIssues !== "undefined" &&
+        json.validIssues.length > 0) {
       var key = json.validIssues[0].key;
       var issue = json.validIssues[0].fields;
       var issueurl = json.validIssues[0].url;
@@ -720,26 +788,26 @@ Project.issues = {
     }
   },
 
-  previewIssueKeys : function() {
+  previewIssueKeys: function () {
     var self = this;
     var inKeys = jQuery('#previewKeys').val();
     if (inKeys !== "undefined" && inKeys !== "") {
       var issueKeys = inKeys.replace(/[\s]*/, "").split(",");
       var issues = [];
       for (var i = 0; i < issueKeys.length; i++) {
-        issues[i] = {"key":issueKeys[i]};
+        issues[i] = {"key": issueKeys[i]};
       }
 
       Fluxion.doAjax(
-              'projectControllerHelperService',
-              'previewIssues',
-              {
-                'issues':issues,
-                'url':ajaxurl
-              },
-              {
-                'doOnSuccess':self.previewIssues
-              }
+        'projectControllerHelperService',
+        'previewIssues',
+        {
+          'issues': issues,
+          'url': ajaxurl
+        },
+        {
+          'doOnSuccess': self.previewIssues
+        }
       );
     }
     else {
@@ -747,7 +815,7 @@ Project.issues = {
     }
   },
 
-  previewIssues : function(json) {
+  previewIssues: function (json) {
     if (json.validIssues !== "undefined" && json.validIssues.length > 0) {
       for (var i = 0; i < json.validIssues.length; i++) {
         var key = json.validIssues[i].key;
@@ -777,22 +845,22 @@ Project.issues = {
     jQuery('#issues').append("<input type='hidden' value='on' name='_issueKeys'/>");
   },
 
-  getProjectIssues : function(projectId) {
+  getProjectIssues: function (projectId) {
     var self = this;
     Fluxion.doAjax(
-            'projectControllerHelperService',
-            'getIssues',
-            {
-              'projectId':projectId,
-              'url':ajaxurl
-            },
-            {
-              'doOnSuccess':self.processIssues
-            }
+      'projectControllerHelperService',
+      'getIssues',
+      {
+        'projectId': projectId,
+        'url': ajaxurl
+      },
+      {
+        'doOnSuccess': self.processIssues
+      }
     );
   },
 
-  processIssues : function(json) {
+  processIssues: function (json) {
     if (json.issues !== "undefined" && json.issues.length > 0) {
       jQuery('#issues').html("");
       for (var i = 0; i < json.issues.length; i++) {
@@ -813,7 +881,7 @@ Project.issues = {
           jQuery('#issuebox' + i).append("<h4>Links</h4>");
           for (var j = 0; j < issue["issuelinks"].length; j++) {
             var link = issue["issuelinks"][j];
-            jQuery('#issuebox' + i).append(link.type.outward + " <a href='javascript:void(0);' onclick=\"Utils.page.newWindow('" + link.url + "');\">" + link.url+ "</a><br/>");
+            jQuery('#issuebox' + i).append(link.type.outward + " <a href='javascript:void(0);' onclick=\"Utils.page.newWindow('" + link.url + "');\">" + link.url + "</a><br/>");
           }
         }
 
@@ -843,61 +911,61 @@ Project.issues = {
 };
 
 Project.barcode = {
-  printAllSampleBarcodes : function(projectId) {
+  printAllSampleBarcodes: function (projectId) {
     if (confirm("Are you sure you want to print all sample barcodes?")) {
       Fluxion.doAjax(
-              'projectControllerHelperService',
-              'printAllSampleBarcodes',
-              {
-                'projectId':projectId,
-                'url':ajaxurl
-              },
-              {
-                'doOnSuccess':function (json) {
-                  alert(json.response);
-                }
-              }
+        'projectControllerHelperService',
+        'printAllSampleBarcodes',
+        {
+          'projectId': projectId,
+          'url': ajaxurl
+        },
+        {
+          'doOnSuccess': function (json) {
+            alert(json.response);
+          }
+        }
       );
     }
   },
 
-  printAllLibraryBarcodes : function(projectId) {
+  printAllLibraryBarcodes: function (projectId) {
     if (confirm("Are you sure you want to print all library barcodes?")) {
       Fluxion.doAjax(
-              'projectControllerHelperService',
-              'printAllLibraryBarcodes',
-              {
-                'projectId':projectId,
-                'url':ajaxurl
-              },
-              {
-                'doOnSuccess':function (json) {
-                  alert(json.response);
-                }
-              }
+        'projectControllerHelperService',
+        'printAllLibraryBarcodes',
+        {
+          'projectId': projectId,
+          'url': ajaxurl
+        },
+        {
+          'doOnSuccess': function (json) {
+            alert(json.response);
+          }
+        }
       );
     }
   },
 
-  printAllLibraryDilutionBarcodes : function(projectId) {
+  printAllLibraryDilutionBarcodes: function (projectId) {
     if (confirm("Are you sure you want to print all library dilution barcodes?")) {
       Fluxion.doAjax(
-              'projectControllerHelperService',
-              'printAllLibraryDilutionBarcodes',
-              {
-                'projectId':projectId,
-                'url':ajaxurl
-              },
-              {
-                'doOnSuccess':function (json) {
-                  alert(json.response);
-                }
-              }
+        'projectControllerHelperService',
+        'printAllLibraryDilutionBarcodes',
+        {
+          'projectId': projectId,
+          'url': ajaxurl
+        },
+        {
+          'doOnSuccess': function (json) {
+            alert(json.response);
+          }
+        }
       );
     }
   },
 
-  selectSampleBarcodesToPrint : function(tableId) {
+  selectSampleBarcodesToPrint: function (tableId) {
     if (!jQuery(tableId).hasClass("display")) {
       //destroy current table and recreate
       jQuery(tableId).dataTable().fnDestroy();
@@ -907,7 +975,7 @@ Project.barcode = {
       jQuery(tableId).addClass("display");
 
       jQuery(tableId).find('tr:first th:eq(5)').remove();
-      jQuery(tableId).find("tr").each(function() {
+      jQuery(tableId).find("tr").each(function () {
         jQuery(this).removeAttr("onmouseover").removeAttr("onmouseout");
         jQuery(this).find("td:eq(5)").remove();
       });
@@ -920,25 +988,25 @@ Project.barcode = {
                      'qcPassed'];
 
       var oTable = jQuery(tableId).dataTable({
-                                               "aoColumnDefs": [
-                                                 {
-                                                   "bUseRendered": false,
-                                                   "aTargets": [ 0 ]
-                                                 }
-                                               ],
-                                               "bPaginate": false,
-                                               "bInfo": false,
-                                               "bJQueryUI": true,
-                                               "bAutoWidth": true,
-                                               "bSort": false,
-                                               "bFilter": false,
-                                               "sDom": '<<"toolbar">f>r<t>ip>'
-                                             });
+        "aoColumnDefs": [
+          {
+            "bUseRendered": false,
+            "aTargets": [ 0 ]
+          }
+        ],
+        "bPaginate": false,
+        "bInfo": false,
+        "bJQueryUI": true,
+        "bAutoWidth": true,
+        "bSort": false,
+        "bFilter": false,
+        "sDom": '<<"toolbar">f>r<t>ip>'
+      });
 
       jQuery(tableId).find("tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"" + tableId + "\", this);'></span></th>");
       jQuery(tableId).find("tr:gt(0)").prepend("<td class='rowSelect'></td>");
 
-      jQuery(tableId).find('.rowSelect').click(function() {
+      jQuery(tableId).find('.rowSelect').click(function () {
         if (jQuery(this).parent().hasClass('row_selected')) {
           jQuery(this).parent().removeClass('row_selected');
         }
@@ -953,69 +1021,69 @@ Project.barcode = {
     }
   },
 
-  printSelectedSampleBarcodes : function(tableId) {
+  printSelectedSampleBarcodes: function (tableId) {
     var samples = [];
     var table = jQuery(tableId).dataTable();
     var nodes = DatatableUtils.fnGetSelected(table);
     for (var i = 0; i < nodes.length; i++) {
-      samples[i] = {'sampleId':jQuery(nodes[i]).attr("sampleId")};
+      samples[i] = {'sampleId': jQuery(nodes[i]).attr("sampleId")};
     }
 
     Fluxion.doAjax(
-            'printerControllerHelperService',
-            'listAvailableServices',
-            {
-              'serviceClass':'uk.ac.bbsrc.tgac.miso.core.data.Sample',
-              'url':ajaxurl
-            },
-            {
-              'doOnSuccess':function (json) {
-                jQuery('#printServiceSelectDialog')
-                        .html("<form>" +
-                              "<fieldset class='dialog'>" +
-                              "<select name='serviceSelect' id='serviceSelect' class='ui-widget-content ui-corner-all'>" +
-                              json.services +
-                              "</select></fieldset></form>");
+      'printerControllerHelperService',
+      'listAvailableServices',
+      {
+        'serviceClass': 'uk.ac.bbsrc.tgac.miso.core.data.Sample',
+        'url': ajaxurl
+      },
+      {
+        'doOnSuccess': function (json) {
+          jQuery('#printServiceSelectDialog')
+            .html("<form>" +
+                  "<fieldset class='dialog'>" +
+                  "<select name='serviceSelect' id='serviceSelect' class='ui-widget-content ui-corner-all'>" +
+                  json.services +
+                  "</select></fieldset></form>");
 
-                jQuery(function() {
-                  jQuery('#printServiceSelectDialog').dialog({
-                                                               autoOpen: false,
-                                                               width: 400,
-                                                               modal: true,
-                                                               resizable: false,
-                                                               buttons: {
-                                                                 "Print": function() {
-                                                                   Fluxion.doAjax(
-                                                                           'projectControllerHelperService',
-                                                                           'printSelectedSampleBarcodes',
-                                                                           {
-                                                                             'serviceName':jQuery('#serviceSelect').val(),
-                                                                             'samples':samples,
-                                                                             'url':ajaxurl
-                                                                           },
-                                                                           {
-                                                                             'doOnSuccess':function (json) {
-                                                                               alert(json.response);
-                                                                             }
-                                                                           });
-                                                                   jQuery(this).dialog('close');
-                                                                 },
-                                                                 "Cancel": function() {
-                                                                   jQuery(this).dialog('close');
-                                                                 }
-                                                               }
-                                                             });
-                });
-                jQuery('#printServiceSelectDialog').dialog('open');
-              },
-              'doOnError':function (json) {
-                alert(json.error);
+          jQuery(function () {
+            jQuery('#printServiceSelectDialog').dialog({
+              autoOpen: false,
+              width: 400,
+              modal: true,
+              resizable: false,
+              buttons: {
+                "Print": function () {
+                  Fluxion.doAjax(
+                    'projectControllerHelperService',
+                    'printSelectedSampleBarcodes',
+                    {
+                      'serviceName': jQuery('#serviceSelect').val(),
+                      'samples': samples,
+                      'url': ajaxurl
+                    },
+                    {
+                      'doOnSuccess': function (json) {
+                        alert(json.response);
+                      }
+                    });
+                  jQuery(this).dialog('close');
+                },
+                "Cancel": function () {
+                  jQuery(this).dialog('close');
+                }
               }
-            }
+            });
+          });
+          jQuery('#printServiceSelectDialog').dialog('open');
+        },
+        'doOnError': function (json) {
+          alert(json.error);
+        }
+      }
     );
   },
 
-  selectLibraryBarcodesToPrint : function(tableId) {
+  selectLibraryBarcodesToPrint: function (tableId) {
     if (!jQuery(tableId).hasClass("display")) {
       //destroy current table and recreate
       jQuery(tableId).dataTable().fnDestroy();
@@ -1025,7 +1093,7 @@ Project.barcode = {
       jQuery(tableId).addClass("display");
 
       jQuery(tableId).find('tr:first th:eq(7)').remove();
-      jQuery(tableId).find("tr").each(function() {
+      jQuery(tableId).find("tr").each(function () {
         jQuery(this).removeAttr("onmouseover").removeAttr("onmouseout");
         jQuery(this).find("td:eq(7)").remove();
       });
@@ -1040,25 +1108,25 @@ Project.barcode = {
                      'insertSize'];
 
       var oTable = jQuery(tableId).dataTable({
-                                               "aoColumnDefs": [
-                                                 {
-                                                   "bUseRendered": false,
-                                                   "aTargets": [ 0 ]
-                                                 }
-                                               ],
-                                               "bPaginate": false,
-                                               "bInfo": false,
-                                               "bJQueryUI": true,
-                                               "bAutoWidth": true,
-                                               "bSort": false,
-                                               "bFilter": false,
-                                               "sDom": '<<"toolbar">f>r<t>ip>'
-                                             });
+        "aoColumnDefs": [
+          {
+            "bUseRendered": false,
+            "aTargets": [ 0 ]
+          }
+        ],
+        "bPaginate": false,
+        "bInfo": false,
+        "bJQueryUI": true,
+        "bAutoWidth": true,
+        "bSort": false,
+        "bFilter": false,
+        "sDom": '<<"toolbar">f>r<t>ip>'
+      });
 
       jQuery(tableId).find("tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"" + tableId + "\", this);'></span></th>");
       jQuery(tableId).find("tr:gt(0)").prepend("<td class='rowSelect'></td>");
 
-      jQuery(tableId).find('.rowSelect').click(function() {
+      jQuery(tableId).find('.rowSelect').click(function () {
         if (jQuery(this).parent().hasClass('row_selected')) {
           jQuery(this).parent().removeClass('row_selected');
         }
@@ -1073,70 +1141,70 @@ Project.barcode = {
     }
   },
 
-  printSelectedLibraryBarcodes : function(tableId) {
+  printSelectedLibraryBarcodes: function (tableId) {
     var libraries = [];
     var table = jQuery(tableId).dataTable();
     var nodes = DatatableUtils.fnGetSelected(table);
     for (var i = 0; i < nodes.length; i++) {
-      libraries[i] = {'libraryId':jQuery(nodes[i]).attr("libraryId")};
+      libraries[i] = {'libraryId': jQuery(nodes[i]).attr("libraryId")};
     }
 
     Fluxion.doAjax(
-            'printerControllerHelperService',
-            'listAvailableServices',
-            {
-              'serviceClass':'uk.ac.bbsrc.tgac.miso.core.data.Library',
-              'url':ajaxurl
-            },
-            {
-              'doOnSuccess':function (json) {
-                jQuery('#printServiceSelectDialog')
-                        .html("<form>" +
-                              "<fieldset class='dialog'>" +
-                              "<select name='serviceSelect' id='serviceSelect' class='ui-widget-content ui-corner-all'>" +
-                              json.services +
-                              "</select></fieldset></form>");
+      'printerControllerHelperService',
+      'listAvailableServices',
+      {
+        'serviceClass': 'uk.ac.bbsrc.tgac.miso.core.data.Library',
+        'url': ajaxurl
+      },
+      {
+        'doOnSuccess': function (json) {
+          jQuery('#printServiceSelectDialog')
+            .html("<form>" +
+                  "<fieldset class='dialog'>" +
+                  "<select name='serviceSelect' id='serviceSelect' class='ui-widget-content ui-corner-all'>" +
+                  json.services +
+                  "</select></fieldset></form>");
 
-                jQuery(function() {
-                  jQuery('#printServiceSelectDialog').dialog({
-                                                               autoOpen: false,
-                                                               width: 400,
-                                                               modal: true,
-                                                               resizable: false,
-                                                               buttons: {
-                                                                 "Print": function() {
-                                                                   Fluxion.doAjax(
-                                                                           'projectControllerHelperService',
-                                                                           'printSelectedLibraryBarcodes',
-                                                                           {
-                                                                             'serviceName':jQuery('#serviceSelect').val(),
-                                                                             'libraries':libraries,
-                                                                             'url':ajaxurl
-                                                                           },
-                                                                           {
-                                                                             'doOnSuccess':function (json) {
-                                                                               alert(json.response);
-                                                                             }
-                                                                           }
-                                                                   );
-                                                                   jQuery(this).dialog('close');
-                                                                 },
-                                                                 "Cancel": function() {
-                                                                   jQuery(this).dialog('close');
-                                                                 }
-                                                               }
-                                                             });
-                });
-                jQuery('#printServiceSelectDialog').dialog('open');
-              },
-              'doOnError':function (json) {
-                alert(json.error);
+          jQuery(function () {
+            jQuery('#printServiceSelectDialog').dialog({
+              autoOpen: false,
+              width: 400,
+              modal: true,
+              resizable: false,
+              buttons: {
+                "Print": function () {
+                  Fluxion.doAjax(
+                    'projectControllerHelperService',
+                    'printSelectedLibraryBarcodes',
+                    {
+                      'serviceName': jQuery('#serviceSelect').val(),
+                      'libraries': libraries,
+                      'url': ajaxurl
+                    },
+                    {
+                      'doOnSuccess': function (json) {
+                        alert(json.response);
+                      }
+                    }
+                  );
+                  jQuery(this).dialog('close');
+                },
+                "Cancel": function () {
+                  jQuery(this).dialog('close');
+                }
               }
-            }
+            });
+          });
+          jQuery('#printServiceSelectDialog').dialog('open');
+        },
+        'doOnError': function (json) {
+          alert(json.error);
+        }
+      }
     );
   },
 
-  selectLibraryDilutionBarcodesToPrint : function(tableId) {
+  selectLibraryDilutionBarcodesToPrint: function (tableId) {
     if (!jQuery(tableId).hasClass("display")) {
       //destroy current table and recreate
       jQuery(tableId).dataTable().fnDestroy();
@@ -1146,7 +1214,7 @@ Project.barcode = {
       jQuery(tableId).addClass("display");
 
       jQuery(tableId).find('tr:first th:eq(5)').remove();
-      jQuery(tableId).find("tr").each(function() {
+      jQuery(tableId).find("tr").each(function () {
         jQuery(this).removeAttr("onmouseover").removeAttr("onmouseout");
         jQuery(this).find("td:eq(5)").remove();
       });
@@ -1159,25 +1227,25 @@ Project.barcode = {
                      'concentration'];
 
       var oTable = jQuery(tableId).dataTable({
-                                               "aoColumnDefs": [
-                                                 {
-                                                   "bUseRendered": false,
-                                                   "aTargets": [ 0 ]
-                                                 }
-                                               ],
-                                               "bPaginate": false,
-                                               "bInfo": false,
-                                               "bJQueryUI": true,
-                                               "bAutoWidth": true,
-                                               "bSort": false,
-                                               "bFilter": false,
-                                               "sDom": '<<"toolbar">f>r<t>ip>'
-                                             });
+        "aoColumnDefs": [
+          {
+            "bUseRendered": false,
+            "aTargets": [ 0 ]
+          }
+        ],
+        "bPaginate": false,
+        "bInfo": false,
+        "bJQueryUI": true,
+        "bAutoWidth": true,
+        "bSort": false,
+        "bFilter": false,
+        "sDom": '<<"toolbar">f>r<t>ip>'
+      });
 
       jQuery(tableId).find("tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"" + tableId + "\", this);'></span></th>");
       jQuery(tableId).find("tr:gt(0)").prepend("<td class='rowSelect'></td>");
 
-      jQuery(tableId).find('.rowSelect').click(function() {
+      jQuery(tableId).find('.rowSelect').click(function () {
         if (jQuery(this).parent().hasClass('row_selected')) {
           jQuery(this).parent().removeClass('row_selected');
         }
@@ -1192,113 +1260,113 @@ Project.barcode = {
     }
   },
 
-  printSelectedLibraryDilutionBarcodes : function(tableId) {
+  printSelectedLibraryDilutionBarcodes: function (tableId) {
     var dilutions = [];
     var table = jQuery(tableId).dataTable();
     var nodes = DatatableUtils.fnGetSelected(table);
     for (var i = 0; i < nodes.length; i++) {
-      dilutions[i] = {'dilutionId':jQuery(nodes[i]).attr("dilutionId")};
+      dilutions[i] = {'dilutionId': jQuery(nodes[i]).attr("dilutionId")};
     }
 
     Fluxion.doAjax(
-            'printerControllerHelperService',
-            'listAvailableServices',
-            {
-              'serviceClass':'uk.ac.bbsrc.tgac.miso.core.data.Dilution',
-              'url':ajaxurl
-            },
-            {
-              'doOnSuccess':function (json) {
-                jQuery('#printServiceSelectDialog')
-                        .html("<form>" +
-                              "<fieldset class='dialog'>" +
-                              "<select name='serviceSelect' id='serviceSelect' class='ui-widget-content ui-corner-all'>" +
-                              json.services +
-                              "</select></fieldset></form>");
+      'printerControllerHelperService',
+      'listAvailableServices',
+      {
+        'serviceClass': 'uk.ac.bbsrc.tgac.miso.core.data.Dilution',
+        'url': ajaxurl
+      },
+      {
+        'doOnSuccess': function (json) {
+          jQuery('#printServiceSelectDialog')
+            .html("<form>" +
+                  "<fieldset class='dialog'>" +
+                  "<select name='serviceSelect' id='serviceSelect' class='ui-widget-content ui-corner-all'>" +
+                  json.services +
+                  "</select></fieldset></form>");
 
-                jQuery(function() {
-                  jQuery('#printServiceSelectDialog').dialog({
-                                                               autoOpen: false,
-                                                               width: 400,
-                                                               modal: true,
-                                                               resizable: false,
-                                                               buttons: {
-                                                                 "Print": function() {
-                                                                   Fluxion.doAjax(
-                                                                           'projectControllerHelperService',
-                                                                           'printSelectedLibraryDilutionBarcodes',
-                                                                           {
-                                                                             'serviceName':jQuery('#serviceSelect').val(),
-                                                                             'dilutions':dilutions,
-                                                                             'url':ajaxurl
-                                                                           },
-                                                                           {
-                                                                             'doOnSuccess':function (json) {
-                                                                               alert(json.response);
-                                                                             }
-                                                                           }
-                                                                   );
-                                                                   jQuery(this).dialog('close');
-                                                                 },
-                                                                 "Cancel": function() {
-                                                                   jQuery(this).dialog('close');
-                                                                 }
-                                                               }
-                                                             });
-                });
-                jQuery('#printServiceSelectDialog').dialog('open');
-              },
-              'doOnError':function (json) {
-                alert(json.error);
+          jQuery(function () {
+            jQuery('#printServiceSelectDialog').dialog({
+              autoOpen: false,
+              width: 400,
+              modal: true,
+              resizable: false,
+              buttons: {
+                "Print": function () {
+                  Fluxion.doAjax(
+                    'projectControllerHelperService',
+                    'printSelectedLibraryDilutionBarcodes',
+                    {
+                      'serviceName': jQuery('#serviceSelect').val(),
+                      'dilutions': dilutions,
+                      'url': ajaxurl
+                    },
+                    {
+                      'doOnSuccess': function (json) {
+                        alert(json.response);
+                      }
+                    }
+                  );
+                  jQuery(this).dialog('close');
+                },
+                "Cancel": function () {
+                  jQuery(this).dialog('close');
+                }
               }
-            }
+            });
+          });
+          jQuery('#printServiceSelectDialog').dialog('open');
+        },
+        'doOnError': function (json) {
+          alert(json.error);
+        }
+      }
     );
   }
 };
 
 Project.alert = {
-  watchOverview : function(overviewId) {
+  watchOverview: function (overviewId) {
     Fluxion.doAjax(
-            'projectControllerHelperService',
-            'watchOverview',
-            {
-              'overviewId':overviewId,
-              'url':ajaxurl
-            },
-            {'doOnSuccess':function (json) {
-              Utils.page.pageReload();
-            }
-            }
+      'projectControllerHelperService',
+      'watchOverview',
+      {
+        'overviewId': overviewId,
+        'url': ajaxurl
+      },
+      {'doOnSuccess': function (json) {
+        Utils.page.pageReload();
+      }
+      }
     );
   },
 
-  unwatchOverview : function(overviewId) {
+  unwatchOverview: function (overviewId) {
     Fluxion.doAjax(
-            'projectControllerHelperService',
-            'unwatchOverview',
-            {
-              'overviewId':overviewId,
-              'url':ajaxurl
-            },
-            {'doOnSuccess':function (json) {
-              Utils.page.pageReload();
-            }
-            }
+      'projectControllerHelperService',
+      'unwatchOverview',
+      {
+        'overviewId': overviewId,
+        'url': ajaxurl
+      },
+      {'doOnSuccess': function (json) {
+        Utils.page.pageReload();
+      }
+      }
     );
-  }  ,
+  },
 
-  listWatchOverview : function(overviewId) {
+  listWatchOverview: function (overviewId) {
     Fluxion.doAjax(
-            'projectControllerHelperService',
-            'listWatchOverview',
-            {
-              'overviewId':overviewId,
-              'url':ajaxurl
-            },
-            {'doOnSuccess':function (json) {
-              jQuery('#watchersList'+overviewId).html(json.watchers);
-            }
-            }
+      'projectControllerHelperService',
+      'listWatchOverview',
+      {
+        'overviewId': overviewId,
+        'url': ajaxurl
+      },
+      {'doOnSuccess': function (json) {
+        jQuery('#watchersList' + overviewId).html(json.watchers);
+      }
+      }
     );
   }
 };

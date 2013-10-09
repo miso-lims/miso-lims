@@ -133,7 +133,7 @@ public class PlateControllerHelperService {
       String serviceName = null;
       if (json.has("serviceName")) { serviceName = json.getString("serviceName"); }
 
-      MisoPrintService<File, PrintContext<File>> mps = null;
+      MisoPrintService<File, Barcodable, PrintContext<File>> mps = null;
       if (serviceName == null) {
         Collection<MisoPrintService> services = printManager.listPrintServicesByBarcodeableClass(Plate.class);
         if (services.size() == 1) {

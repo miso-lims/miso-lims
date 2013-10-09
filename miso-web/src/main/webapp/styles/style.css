@@ -1678,5 +1678,8 @@ stroke-width: 2px;}
 	stroke: black;
 
 }
+a.DTTT_button{
+    margin-left:10px ! important;
+}
 
 /*statsdb ends*/

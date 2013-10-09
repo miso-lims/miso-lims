@@ -221,6 +221,7 @@ public class FlexReportingControllerHelperService {
       response.put("graph", statusList);
       response.put("overviewTable", jsonArray);
       response.put("reportTable", buildProjectReport(projects));
+      response.put("detailTable", buildProjectDetailReport(projects));
       return response;
     }
     catch (IOException e) {
@@ -240,11 +241,65 @@ public class FlexReportingControllerHelperService {
     return jsonArray;
   }
 
+  public JSONArray buildProjectDetailReport(List<Project> projects) {
+    JSONArray jsonArray = new JSONArray();
+    try {
+      for (Project project : projects) {
+        Set<Library> librariesInRun = new HashSet<Library>();
+        for (Run run : requestManager.listAllRunsByProjectId(project.getProjectId())) {
+          Collection<SequencerPartitionContainer<SequencerPoolPartition>> spcs = requestManager.listSequencerPartitionContainersByRunId(run.getId());
+          if (spcs.size() > 0) {
+            for (SequencerPartitionContainer<SequencerPoolPartition> spc : spcs) {
+
+              if (spc.getPartitions().size() > 0) {
+                for (SequencerPoolPartition spp : spc.getPartitions()) {
+                  if (spp.getPool() != null) {
+                    if (spp.getPool().getDilutions().size() > 0) {
+                      for (Dilution dilution : spp.getPool().getDilutions()) {
+                        Library libraryInRun = dilution.getLibrary();
+                        if (libraryInRun.getSample().getProject().equals(requestManager.getProjectById(project.getProjectId()))) {
+                          if (librariesInRun.add(libraryInRun)) {
+
+                            jsonArray.add("['" + project.getName() + "','" +
+                                          libraryInRun.getSample().getName() + "','" +
+                                          libraryInRun.getName() + "','" +
+                                          run.getName() + "','" +
+                                          run.getStatus().getHealth().getKey() + "']");
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+
+        }
+        for (Library library : requestManager.listAllLibrariesByProjectId(project.getProjectId())) {
+          if (!librariesInRun.contains(library)) {
+            Sample sample = library.getSample();
+            jsonArray.add("['" + project.getName() + "','" +
+                          sample.getName() + "','" +
+                          library.getName() + "','NA','NA']");
+          }
+        }
+
+      }
+      return jsonArray;
+    }
+    catch (IOException e) {
+      log.debug("Failed", e);
+      return jsonArray;
+    }
+  }
+
 
   public JSONObject searchProjectsByRunCompletionDateandString(HttpSession session, JSONObject json) {
     String searchStr = json.getString("str");
     String from = json.getString("from");
     String to = json.getString("to");
+
     JSONArray jsonArray = new JSONArray();
     JSONObject jsonObject = new JSONObject();
     try {
@@ -295,7 +350,6 @@ public class FlexReportingControllerHelperService {
     }
   }
 
-
   public String projectRunLaneRowBuilder(Project project) {
     StringBuilder sb = new StringBuilder();
     try {
@@ -304,7 +358,9 @@ public class FlexReportingControllerHelperService {
         sb.append("<ul>");
         for (Run run : runs) {
           sb.append("<li>");
-          sb.append(run.getName() + " - " + run.getAlias());
+          sb.append("<input class=\"runsinproject" + project.getProjectId() + "\" id=\"" + run.getName() +
+                    "\" type=\"checkbox\" name=\"runIds\" value=\"" + run.getId() + "\" />");
+          sb.append(run.getName() + " - " + run.getStatus().getHealth().getKey() + " - " + run.getAlias());
           Collection<SequencerPartitionContainer<SequencerPoolPartition>> spcs = requestManager.listSequencerPartitionContainersByRunId(run.getId());
           if (spcs.size() > 0) {
             sb.append("<ul>");
@@ -318,7 +374,8 @@ public class FlexReportingControllerHelperService {
                         if (experiment.getStudy().getProject().equals(project)) {
 
                           sb.append("<li>");
-                          sb.append("Lane " + spp.getPartitionNumber() + ": " + spp.getPool().getAlias());
+                          sb.append("Lane " + spp.getPartitionNumber() + ": ");
+                          sb.append(" <b>" + spp.getPool().getName() + "</b> － " + spp.getPool().getAlias());
                           sb.append("</li>");
 
                         }
@@ -339,7 +396,8 @@ public class FlexReportingControllerHelperService {
       //return "['<input class=\"chkboxprojectrunlane\" id=\"" + project.getProjectId() +
       //       "\" type=\"checkbox\" name=\"projectIds\" value=\"" + project.getProjectId() + "\" id=\"" + project.getProjectId() + "\"/>','"
       //       + project.getName() + "','"
-      return "['" + project.getName() + "','"
+      return "['<input id=\"" + project.getProjectId() +
+             "\" type=\"radio\" name=\"projectId\" value=\"" + project.getProjectId() + "\" />','" + project.getName() + "','"
              + project.getAlias() + "','"
              + project.getProgress().name() + "','"
              + sb.toString() + "']";
@@ -350,22 +408,26 @@ public class FlexReportingControllerHelperService {
     }
   }
 
-  public JSONObject generateProjectRunLaneFlexReport(HttpSession session, JSONObject json) {
+  public JSONObject generateSampleRelationReport(HttpSession session, JSONObject json) {
     try {
       JSONObject response = new JSONObject();
       JSONArray a = JSONArray.fromObject(json.get("form"));
-      List<Project> projects = new ArrayList<Project>();
+      Project p  = null;
+      List<Run> runs = new ArrayList<Run>();
 
       for (JSONObject j : (Iterable<JSONObject>) a) {
-        if (j.getString("name").equals("projectIds")) {
-          Project p = requestManager.getProjectById(j.getLong("value"));
-          if (p != null) {
-            projects.add(p);
+        if (j.getString("name").equals("projectId")) {
+          p = requestManager.getProjectById(j.getLong("value"));
+        }
+        if (j.getString("name").equals("runIds")) {
+          Run r = requestManager.getRunById(j.getLong("value"));
+          if (r != null) {
+            runs.add(r);
           }
         }
       }
 
-      response.put("reportTable", buildProjectRunLaneReport(projects));
+      response.put("reportTable", buildSampleRelationReport(p, runs));
       return response;
     }
     catch (IOException e) {
@@ -374,56 +436,58 @@ public class FlexReportingControllerHelperService {
     }
   }
 
-  public JSONArray buildProjectRunLaneReport(List<Project> projects) {
+  public JSONArray buildSampleRelationReport(Project project, List<Run> runs) {
     JSONArray jsonArray = new JSONArray();
     StringBuilder sb = new StringBuilder();
     try {
 
-      for (Project project : projects) {
-        Collection<Run> runs = requestManager.listAllRunsByProjectId(project.getProjectId());
-        if (runs.size() > 0) {
-          sb.append("<ul>");
-          for (Run run : runs) {
-            sb.append("<li>");
-            sb.append(run.getName() + " - " + run.getAlias());
-            Collection<SequencerPartitionContainer<SequencerPoolPartition>> spcs = requestManager.listSequencerPartitionContainersByRunId(run.getId());
-            if (spcs.size() > 0) {
-              sb.append("<ul>");
-              for (SequencerPartitionContainer<SequencerPoolPartition> spc : spcs) {
+      Set<Library> librariesInRun = new HashSet<Library>();
+      for (Run run : runs) {
+        Collection<SequencerPartitionContainer<SequencerPoolPartition>> spcs = requestManager.listSequencerPartitionContainersByRunId(run.getId());
+        if (spcs.size() > 0) {
+          for (SequencerPartitionContainer<SequencerPoolPartition> spc : spcs) {
 
-                if (spc.getPartitions().size() > 0) {
-                  for (SequencerPoolPartition spp : spc.getPartitions()) {
-                    if (spp.getPool() != null) {
-                      if (spp.getPool().getExperiments().size() > 0) {
-                        for (Experiment experiment : spp.getPool().getExperiments()) {
-                          if (experiment.getStudy().getProject().equals(project)) {
+            if (spc.getPartitions().size() > 0) {
+              for (SequencerPoolPartition spp : spc.getPartitions()) {
+                if (spp.getPool() != null) {
+                  if (spp.getPool().getDilutions().size() > 0) {
+                    for (Dilution dilution : spp.getPool().getDilutions()) {
+                      Library libraryInRun = dilution.getLibrary();
+                      if (libraryInRun.getSample().getProject().equals(requestManager.getProjectById(project.getProjectId()))) {
+                        if (librariesInRun.add(libraryInRun)) {
+                          Sample sample = libraryInRun.getSample();
 
-                            sb.append("<li>");
-                            sb.append("Lane " + spp.getPartitionNumber() + ": " + spp.getPool().getAlias());
-                            sb.append("</li>");
-
+                          StringBuilder tagBarcode = new StringBuilder();
+                          for (Map.Entry<Integer, TagBarcode> entry: libraryInRun.getTagBarcodes().entrySet()){
+                                tagBarcode.append(entry.getKey().toString()+": "+entry.getValue().getName()+" ("+entry.getValue().getSequence()+")<br/>");
                           }
+
+                          List list = new ArrayList(libraryInRun.getLibraryQCs());
+                          LibraryQC libraryQc = (LibraryQC) list.get(list.size()-1);
+
+                          jsonArray.add("['" + sample.getAlias() + "','" +
+                                        sample.getDescription() + "','" +
+                                        sample.getSampleType() + "','" +
+                                        libraryInRun.getName() + "','" +
+                                        dilution.getName() + "','" +
+                                        tagBarcode.toString() + "','" +
+                                        libraryQc.getInsertSize().toString()+ "','" +
+                                        run.getAlias() + "','" +
+                                        spp.getPartitionNumber().toString() + "']");
                         }
                       }
                     }
                   }
                 }
               }
-
-              sb.append("</ul>");
             }
-            sb.append("</li>");
           }
-          sb.append("</ul>");
         }
-        jsonArray.add("['" + (project.getName().replace("+", "-")).replace("'", "\\'") + "','" +
-                      (project.getAlias().replace("+", "-")).replace("'", "\\'") + "','" +
-                      (project.getDescription().replace("+", "-")).replace("'", "\\'") + "','" +
-                      sb.toString() + "']");
       }
+
       return jsonArray;
     }
-    catch (Exception e) {
+    catch (IOException e) {
       log.debug("Failed", e);
       return jsonArray;
     }
@@ -433,15 +497,15 @@ public class FlexReportingControllerHelperService {
     try {
       JSONObject jsonObject = new JSONObject();
       StringBuilder a = new StringBuilder();
-      Collection<Sample> samples = requestManager.listAllSamples();
-      JSONArray jsonArray = new JSONArray();
-      for (Sample sample : samples) {
-        jsonArray.add(sampleFormRowBuilder(sample));
-      }
+     // Collection<Sample> samples = requestManager.listAllSamples();
+     // JSONArray jsonArray = new JSONArray();
+     // for (Sample sample : samples) {
+      //  jsonArray.add(sampleFormRowBuilder(sample));
+      //}
       for (String sampleType : requestManager.listAllSampleTypes()) {
         a.append("<option value=\"" + sampleType + "\">" + sampleType + "</option>");
       }
-      jsonObject.put("html", jsonArray);
+      //jsonObject.put("html", jsonArray);
       jsonObject.put("type", "<option value=\"all\">all</option>" + a.toString());
       return jsonObject;
     }
@@ -618,26 +682,26 @@ public class FlexReportingControllerHelperService {
   // Starting Library
 
   public JSONObject initLibraries(HttpSession session, JSONObject json) {
-    try {
+//    try {
       JSONObject jsonObject = new JSONObject();
-      JSONArray jsonArray = new JSONArray();
+     // JSONArray jsonArray = new JSONArray();
       StringBuilder a = new StringBuilder();
-      Collection<Library> libraries = requestManager.listAllLibraries();
-      for (Library library : libraries) {
-        jsonArray.add(libraryFormRowBuilder(library));
-      }
+     // Collection<Library> libraries = requestManager.listAllLibraries();
+     // for (Library library : libraries) {
+     //   jsonArray.add(libraryFormRowBuilder(library));
+     // }
 
       for (String platform : PlatformType.getKeys()) {
         a.append("<option value=\"" + platform + "\">" + platform + "</option>");
       }
-      jsonObject.put("html", jsonArray);
+     // jsonObject.put("html", jsonArray);
       jsonObject.put("platform", "<option value=\"all\">all</option>" + a.toString());
       return jsonObject;
-    }
-    catch (IOException e) {
-      log.debug("Failed", e);
-      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
-    }
+//    }
+//    catch (IOException e) {
+//      log.debug("Failed", e);
+//      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
+//    }
   }
 
   public String libraryFormRowBuilder(Library library) {
@@ -804,15 +868,15 @@ public class FlexReportingControllerHelperService {
   }
 
   public JSONObject initRuns(HttpSession session, JSONObject json) {
-    try {
+//    try {
       JSONObject jsonObject = new JSONObject();
-      JSONArray jsonArray = new JSONArray();
+     // JSONArray jsonArray = new JSONArray();
       StringBuilder a = new StringBuilder();
       StringBuilder c = new StringBuilder();
-      Collection<Run> runs = requestManager.listAllRuns();
-      for (Run run : runs) {
-        jsonArray.add(runFormRowBuilder(run));
-      }
+      //Collection<Run> runs = requestManager.listAllRuns();
+     // for (Run run : runs) {
+     //   jsonArray.add(runFormRowBuilder(run));
+     // }
 
       for (String platform : PlatformType.getKeys()) {
         a.append("<option value=\"" + platform + "\">" + platform + "</option>");
@@ -821,15 +885,15 @@ public class FlexReportingControllerHelperService {
       for (String healthString : HealthType.getKeys()) {
         c.append("<option value=\"" + healthString + "\">" + healthString + "</option>");
       }
-      jsonObject.put("html", jsonArray);
+     // jsonObject.put("html", jsonArray);
       jsonObject.put("platform", "<option value=\"all\">all</option>" + a.toString());
       jsonObject.put("status", "<option value=\"all\">all</option>" + c.toString());
       return jsonObject;
-    }
-    catch (IOException e) {
-      log.debug("Failed", e);
-      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
-    }
+//    }
+//    catch (IOException e) {
+//      log.debug("Failed", e);
+//      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
+//    }
   }
 
   public String runFormRowBuilder(Run run) {

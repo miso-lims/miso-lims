@@ -149,6 +149,12 @@ public class AnalysisController {
 
       map.put("paired-end", String.valueOf(run.getPairedEnd()));
 
+      map.put("email-report", "on");
+      map.put("ignore-missing-stats", "on");
+      map.put("ignore-missing-bcls", "on");
+      map.put("ignore-missing-controls", "on");
+      map.put("allow-mismatch", "on");
+
       model.put("defaultRunValues", map);
 
       List<String> pipelineNames = new ArrayList<String>();

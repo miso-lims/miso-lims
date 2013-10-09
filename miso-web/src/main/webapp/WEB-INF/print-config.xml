@@ -27,14 +27,18 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd"
        default-autowire="byName">
 
-  <bean id="barcodeFactory" class="uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeFactory"/>
-  <bean id="jscriptFactory" class="uk.ac.bbsrc.tgac.miso.core.factory.barcode.MisoJscriptFactory"/>
+    <bean id="barcodeFactory" class="uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeFactory"/>
+    <bean id="jscriptFactory" class="uk.ac.bbsrc.tgac.miso.core.factory.barcode.MisoJscriptFactory"/>
 
-  <bean id="printContextResolverService" name="printStrategyResolverService" class="uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintContextResolverService"/>
+    <bean id="printContextResolverService" name="printStrategyResolverService"
+          class="uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintContextResolverService"/>
+    <bean id="barcodeSchemaContextResolverService" name="barcodableSchemaResolverService"
+          class="uk.ac.bbsrc.tgac.miso.core.service.printing.MisoBarcodableSchemaResolverService"/>
 
-  <bean id="bradyFtpPrintStrategy" class="uk.ac.bbsrc.tgac.miso.core.service.printing.strategy.impl.BradyFtpPrintStrategy"/>
+    <bean id="bradyFtpPrintStrategy"
+          class="uk.ac.bbsrc.tgac.miso.core.service.printing.strategy.impl.BradyFtpPrintStrategy"/>
 
-  <bean id="printManager" class="uk.ac.bbsrc.tgac.miso.core.manager.BarcodePrintManager">
-    <constructor-arg index="0" ref="printContextResolverService"/>
-  </bean>
+    <bean id="printManager" class="uk.ac.bbsrc.tgac.miso.core.manager.BarcodePrintManager">
+        <constructor-arg index="0" ref="printContextResolverService"/>
+    </bean>
 </beans>

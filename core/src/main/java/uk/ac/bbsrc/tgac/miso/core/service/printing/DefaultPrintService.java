@@ -27,8 +27,8 @@ import net.sourceforge.fluxion.spi.ServiceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
-import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeLabelFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
+import uk.ac.bbsrc.tgac.miso.core.service.printing.schema.BarcodableSchema;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -46,13 +46,13 @@ import java.io.IOException;
  * @since 0.0.3
  */
 @ServiceProvider
-public class DefaultPrintService implements MisoPrintService<File, PrintContext<File>> {
+public class DefaultPrintService implements MisoPrintService<File, Barcodable, PrintContext<File>> {
   protected static final Logger log = LoggerFactory.getLogger(DefaultPrintService.class);
   private String name;
   private boolean enabled = true;
-  private BarcodeLabelFactory<File> blf;
   private PrintContext<File> pc;
   private Class<? extends Barcodable> printServiceFor;
+  private BarcodableSchema<File, Barcodable> barcodableSchema;
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -99,13 +99,13 @@ public class DefaultPrintService implements MisoPrintService<File, PrintContext<
   }
 
   @Override
-  public BarcodeLabelFactory<File> getBarcodeLabelFactory() {
-    return blf;
+  public BarcodableSchema<File, Barcodable> getBarcodableSchema(){
+    return barcodableSchema;
   }
 
   @Override
-  public void setBarcodeLabelFactory(BarcodeLabelFactory<File> blf) {
-    this.blf = blf;
+  public void setBarcodableSchema(BarcodableSchema<File, Barcodable> barcodableSchema){
+    this.barcodableSchema = barcodableSchema;
   }
 
   @Override
@@ -135,7 +135,7 @@ public class DefaultPrintService implements MisoPrintService<File, PrintContext<
 
   public File getLabelFor(Barcodable b) {
     if (getPrintServiceFor().isAssignableFrom(b.getClass())) {
-      return getPrintContext().getLabelFactory().getLabel(b);
+      return getBarcodableSchema().getPrintableLabel(b);
     }
     return null;
   }

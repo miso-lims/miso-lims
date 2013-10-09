@@ -27,8 +27,6 @@ import uk.ac.ebi.fgpt.conan.lsf.AbstractLSFProcess;
 import uk.ac.ebi.fgpt.conan.model.ConanParameter;
 
 import java.io.File;
-import java.util.Collection;
-import java.util.Date;
 import java.util.Map;
 
 /**
@@ -47,17 +45,20 @@ public abstract class AbstractTgacLsfProcess extends AbstractLSFProcess {
   protected String getLSFOutputFilePath(Map<ConanParameter, String> parameters) throws IllegalArgumentException {
     final File parentDir = new File(System.getProperty("user.home"));
 
-    // files to write output to
-    File outputDir = new File(parentDir, ".conan");
+    File conanOutput = generateOutputDir(parentDir, ".conan", parameters);
 
+    // lsf output file
+    return new File(conanOutput, getName() + ".lsfoutput.txt").getAbsolutePath();
+  }
+
+  protected File generateOutputDir(File parentDir, String dirname, Map<ConanParameter, String> parameters) {
+    File outputDir = new File(parentDir, dirname);
     for (ConanParameter parameter : parameters.keySet()) {
       if (parameter.getName().contains("Accession")) {
-        outputDir = new File(new File(parentDir, ".conan"), parameters.get(parameter));
+        outputDir = new File(new File(parentDir, dirname), parameters.get(parameter));
         break;
       }
     }
-
-    // lsf output file
-    return new File(outputDir, getName() + ".lsfoutput.txt").getAbsolutePath();
+    return outputDir;
   }
 }

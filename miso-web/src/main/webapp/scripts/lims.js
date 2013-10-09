@@ -28,28 +28,28 @@ var ajaxurl = '/miso/fluxion.ajax';
 
 var Utils = Utils || {
   /** Maps a form element's child input elements to a JSON object. */
-  mappifyForm : function(formName) {
+  mappifyForm: function (formName) {
     var values = {};
-    jQuery.each(jQuery('#'+formName).serializeArray(), function(i, field) {
+    jQuery.each(jQuery('#' + formName).serializeArray(), function (i, field) {
       values[field.name] = field.value;
     });
     return values;
   },
 
   /** Maps a standard DOM container's (div, span, etc) child input elements to a JSON object. */
-  mappifyInputs : function(parentContainerName) {
+  mappifyInputs: function (parentContainerName) {
     var values = {};
-    jQuery.each(jQuery('#'+parentContainerName).find(":input").serializeArray(), function(i, field) {
+    jQuery.each(jQuery('#' + parentContainerName).find(":input").serializeArray(), function (i, field) {
       values[field.name] = field.value;
     });
     return values;
   },
 
-  mappifyTable : function(table) {
+  mappifyTable: function (table) {
     var values = [];
-    jQuery.each(jQuery('#'+table).find("tr:gt(0)"), function() {
+    jQuery.each(jQuery('#' + table).find("tr:gt(0)"), function () {
       var rowval = {};
-      jQuery.each(jQuery(this).find("td"), function() {
+      jQuery.each(jQuery(this).find("td"), function () {
         var td = jQuery(this);
         if (!Utils.validation.isNullCheck(td.attr("name"))) {
           rowval[td.attr("name")] = td.html();
@@ -62,15 +62,15 @@ var Utils = Utils || {
 };
 
 Utils.timer = {
-  timedFunc : function() {
+  timedFunc: function () {
     var timer;
-    return function(func, time) {
+    return function (func, time) {
       clearTimeout(timer);
       timer = setTimeout(func, time);
     };
   },
 
-  typewatchFunc : function(obj, func, wait, capturelength) {
+  typewatchFunc: function (obj, func, wait, capturelength) {
     var options = {
       callback: func,
       wait: wait,
@@ -80,14 +80,14 @@ Utils.timer = {
     jQuery(obj).typeWatch(options);
   },
 
-  queueFunctions : function(funcs) {
+  queueFunctions: function (funcs) {
     if (Object.prototype.toString.apply(funcs) === '[object Array]') {
       for (var i = 0; i < funcs.length; i++) {
         var f = funcs[i];
-        jQuery('body').queue("queue", function() {
+        jQuery('body').queue("queue", function () {
           f();
           if (i < (funcs.length - 1)) {
-            setTimeout(function() {
+            setTimeout(function () {
               jQuery('body').dequeue("queue");
             }, 1000);
           }
@@ -99,26 +99,33 @@ Utils.timer = {
 };
 
 Utils.ui = {
-  checkUser : function(username) {
+  checkUser: function (username) {
     Fluxion.doAjax(
       'dashboard',
       'checkUser',
-      {'username':username, 'url':ajaxurl},
-      {'':''}
+      {'username': username, 'url': ajaxurl},
+      {'': ''}
     );
   },
 
-  checkAll : function(field) {
+  checkAll: function (field) {
     var self = this;
     for (i = 0; i < self._N(field).length; i++) self._N(field)[i].checked = true;
   },
 
-  uncheckAll : function(field) {
+  checkAllConfirm: function (field, message) {
+    if (confirm(message)) {
+      var self = this;
+      for (i = 0; i < self._N(field).length; i++) self._N(field)[i].checked = true;
+    }
+  },
+
+  uncheckAll: function (field) {
     var self = this;
     for (i = 0; i < self._N(field).length; i++) self._N(field)[i].checked = false;
   },
 
-  uncheckOthers : function(field, item) {
+  uncheckOthers: function (field, item) {
     var self = this;
     for (i = 0; i < self._N(field).length; i++) {
       if (self._N(field)[i] != item) {
@@ -127,12 +134,12 @@ Utils.ui = {
     }
   },
 
-  _N : function(element) {
+  _N: function (element) {
     if (typeof element == 'string') element = document.getElementsByName(element);
     return Element.extend(element);
   },
 
-  toggleRightInfo : function(div, id) {
+  toggleRightInfo: function (div, id) {
     if (jQuery(div).hasClass("toggleRight")) {
       jQuery(div).removeClass("toggleRight").addClass("toggleRightDown");
     }
@@ -142,7 +149,7 @@ Utils.ui = {
     jQuery("#" + id).toggle("blind", {}, 500);
   },
 
-  toggleLeftInfo : function(div, id) {
+  toggleLeftInfo: function (div, id) {
     if (jQuery(div).hasClass("toggleLeft")) {
       jQuery(div).removeClass("toggleLeft").addClass("toggleLeftDown");
     }
@@ -152,25 +159,25 @@ Utils.ui = {
     jQuery("#" + id).toggle("blind", {}, 500);
   },
 
-  addDatePicker : function(id) {
-    jQuery("#" + id).datepicker({dateFormat:'dd/mm/yy',showButtonPanel: true});
+  addDatePicker: function (id) {
+    jQuery("#" + id).datepicker({dateFormat: 'dd/mm/yy', showButtonPanel: true});
   },
 
-  addMaxDatePicker : function(id, maxDateOffset) {
-    jQuery("#" + id).datepicker({dateFormat:'dd/mm/yy',showButtonPanel: true, maxDate:maxDateOffset});
+  addMaxDatePicker: function (id, maxDateOffset) {
+    jQuery("#" + id).datepicker({dateFormat: 'dd/mm/yy', showButtonPanel: true, maxDate: maxDateOffset});
   },
 
-  disableButton : function(buttonDiv) {
+  disableButton: function (buttonDiv) {
     jQuery('#' + buttonDiv).attr('disabled', 'disabled');
     jQuery('#' + buttonDiv).html("Processing...");
   },
 
-  reenableButton : function(buttonDiv, text) {
+  reenableButton: function (buttonDiv, text) {
     jQuery('#' + buttonDiv).removeAttr('disabled');
     jQuery('#' + buttonDiv).html(text);
   },
 
-  confirmRemove : function(obj) {
+  confirmRemove: function (obj) {
     if (confirm("Are you sure you wish to remove this item?")) {
       obj.remove();
     }
@@ -178,7 +185,7 @@ Utils.ui = {
 };
 
 Utils.fileUpload = {
-  fileUploadProgress : function(formname, divname, successfunc) {
+  fileUploadProgress: function (formname, divname, successfunc) {
     var self = this;
     //self.processingOverlay();
 
@@ -186,39 +193,40 @@ Utils.fileUpload = {
       formname,
       'fileUploadProgressBean',
       'checkUploadStatus',
-      {'url':ajaxurl},
-      {'statusElement':divname, 'progressElement':'trash', 'doOnSuccess':successfunc},
-      {'':''}
+      {'url': ajaxurl},
+      {'statusElement': divname, 'progressElement': 'trash', 'doOnSuccess': successfunc},
+      {'': ''}
     );
   },
 
-  processingOverlay : function() {
-    jQuery.colorbox({width:"30%",html:"Processing..."});
+  processingOverlay: function () {
+    jQuery.colorbox({width: "30%", html: "Processing..."});
   }
 };
 
 Utils.validation = {
   //_base64 : XRegExp('^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{4})$'),
-  _unicodeWord : XRegExp('^[\\p{L}0-9_\\^\\-\\.\\s]+$'),
+  _unicodeWord: XRegExp('^[\\p{L}0-9_\\^\\-\\.\\s]+$'),
 
-  isNullCheck : function(value) {
+  isNullCheck: function (value) {
     return (value === "" || value === " " || value === "undefined" || value === "&nbsp;" || value === undefined);
   },
 
-  validate_input_field : function(field, name, okstatus) {
+  validate_input_field: function (field, name, okstatus) {
     var self = this;
     var errormsg = '';
     //if (!jQuery(field).val().match(/^[a-zA-Z0-9_\^\-\.\s]+$/)) {
     if (!self._unicodeWord.test(jQuery(field).val())) {
       okstatus = false;
-      errormsg = "In the " + name + " " + jQuery(field).attr("id") + " field you CAN use alpha numeric values with the following symbols:\n"
-                         + "^ - _ .\n"
-              + "but you CANNOT use slashes, comma, brackets, single or double quotes, and it CANNOT end with a space or be empty\n\n";
+      errormsg = "In the " + name + " " + jQuery(field).attr("id") +
+                 " field you CAN use alpha numeric values with the following symbols:\n" +
+                 "^ - _ .\n" +
+                 "but you CANNOT use slashes, comma, brackets, single or double quotes, and it CANNOT end with a space or be empty\n\n";
     }
-    return {"okstatus":okstatus, "errormsg":errormsg};
+    return {"okstatus": okstatus, "errormsg": errormsg};
   },
 
-  base64Check : function(str) {
+  base64Check: function (str) {
     var base64 = new RegExp('^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{4})$');
     if (base64.test(str)) {
       return Utils.codec.base64_decode(str);
@@ -231,10 +239,10 @@ Utils.validation = {
 
 Utils.codec = {
   // private property
-  _keyStr : "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
+  _keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
 
   // public method for encoding
-  base64_encode : function (input) {
+  base64_encode: function (input) {
     var self = this;
     var output = "";
     var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
@@ -254,7 +262,8 @@ Utils.codec = {
 
       if (isNaN(chr2)) {
         enc3 = enc4 = 64;
-      } else if (isNaN(chr3)) {
+      }
+      else if (isNaN(chr3)) {
         enc4 = 64;
       }
 
@@ -266,7 +275,7 @@ Utils.codec = {
   },
 
   // public method for decoding
-  base64_decode : function (input) {
+  base64_decode: function (input) {
     var self = this;
     var output = "";
     var chr1, chr2, chr3;
@@ -300,14 +309,12 @@ Utils.codec = {
   },
 
   // private method for UTF-8 encoding
-  _utf8_encode : function (string) {
+  _utf8_encode: function (string) {
     string = string.replace(/\r\n/g, "\n");
     var utftext = "";
 
     for (var n = 0; n < string.length; n++) {
-
       var c = string.charCodeAt(n);
-
       if (c < 128) {
         utftext += String.fromCharCode(c);
       }
@@ -320,22 +327,19 @@ Utils.codec = {
         utftext += String.fromCharCode(((c >> 6) & 63) | 128);
         utftext += String.fromCharCode((c & 63) | 128);
       }
-
     }
 
     return utftext;
   },
 
   // private method for UTF-8 decoding
-  _utf8_decode : function (utftext) {
+  _utf8_decode: function (utftext) {
     var string = "";
     var i = 0;
     var c = c1 = c2 = 0;
 
     while (i < utftext.length) {
-
       c = utftext.charCodeAt(i);
-
       if (c < 128) {
         string += String.fromCharCode(c);
         i++;
@@ -351,18 +355,17 @@ Utils.codec = {
         string += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
         i += 3;
       }
-
     }
     return string;
   }
 };
 
 Utils.page = {
-  pageReload : function() {
+  pageReload: function () {
     window.location.reload(true);
   },
 
-  newWindow : function(url) {
+  newWindow: function (url) {
     newwindow = window.open(url, 'name', 'height=500,width=500,menubar=yes,status=yes,scrollbars=yes');
     if (window.focus) {
       newwindow.focus()
@@ -370,23 +373,23 @@ Utils.page = {
     return false;
   },
 
-  pageRedirect : function(url) {
+  pageRedirect: function (url) {
     window.location = url;
   }
 };
 
 Utils.alert = {
-  checkAlerts : function() {
+  checkAlerts: function () {
     var self = this;
     Fluxion.doAjax(
-            'dashboard',
-            'checkAlerts',
-            {'url':ajaxurl},
-            {'ajaxType':'periodical', 'updateFrequency':30, 'doOnSuccess':self.processMyAccountAlerts}
+      'dashboard',
+      'checkAlerts',
+      {'url': ajaxurl},
+      {'ajaxType': 'periodical', 'updateFrequency': 30, 'doOnSuccess': self.processMyAccountAlerts}
     );
   },
 
-  processMyAccountAlerts : function(json) {
+  processMyAccountAlerts: function (json) {
     if (json.newAlerts) {
       if (!jQuery("#myAccountSpan").hasClass("unreadAlertSpan")) {
         jQuery("#myAccountSpan").addClass("unreadAlertSpan");
@@ -407,17 +410,17 @@ Utils.alert = {
     }
   },
 
-  loadAlerts : function() {
+  loadAlerts: function () {
     var self = this;
     Fluxion.doAjax(
-            'dashboard',
-            'getAlerts',
-            {'url':ajaxurl},
-            {'ajaxType':'periodical', 'updateFrequency':30, 'doOnSuccess':self.processAlerts}
+      'dashboard',
+      'getAlerts',
+      {'url': ajaxurl},
+      {'ajaxType': 'periodical', 'updateFrequency': 30, 'doOnSuccess': self.processAlerts}
     );
   },
 
-  processAlerts : function(json) {
+  processAlerts: function (json) {
     if (Utils.validation.isNullCheck(json.html)) {
       jQuery('#alertList').html("<i style='color: gray'>No unread alerts</i>");
     }
@@ -426,7 +429,7 @@ Utils.alert = {
     }
   },
 
-  processSystemAlerts : function(json) {
+  processSystemAlerts: function (json) {
     if (Utils.validation.isNullCheck(json.html)) {
       jQuery('#systemAlertList').html("<i style='color: gray'>No unread alerts</i>");
     }
@@ -435,25 +438,25 @@ Utils.alert = {
     }
   },
 
-  confirmAlertRead : function(alert) {
+  confirmAlertRead: function (alert) {
     if (confirm("Mark this alert as read?")) {
       var a = jQuery(alert).parent();
       Fluxion.doAjax(
-              'dashboard',
-              'setAlertAsRead',
-              {'alertId':a.attr('alertId'),'url':ajaxurl},
-              {'doOnSuccess':a.remove()}
+        'dashboard',
+        'setAlertAsRead',
+        {'alertId': a.attr('alertId'), 'url': ajaxurl},
+        {'doOnSuccess': a.remove()}
       );
     }
   },
 
-  confirmAllAlertsRead : function() {
+  confirmAllAlertsRead: function () {
     if (confirm("Mark all alerts as read?")) {
       Fluxion.doAjax(
         'dashboard',
         'setAllAlertsAsRead',
-        {'url':ajaxurl},
-        {'doOnSuccess': function(json) {
+        {'url': ajaxurl},
+        {'doOnSuccess': function (json) {
           jQuery('#alertList').html("<i style='color: gray'>No unread alerts</i>");
           Utils.alert.checkAlerts();
         }

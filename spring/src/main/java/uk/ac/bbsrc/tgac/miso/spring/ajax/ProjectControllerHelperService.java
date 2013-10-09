@@ -442,7 +442,7 @@ public class ProjectControllerHelperService {
         serviceName = json.getString("serviceName");
       }
 
-      MisoPrintService<File, PrintContext<File>> mps = null;
+      MisoPrintService<File, Barcodable, PrintContext<File>> mps = null;
       if (serviceName == null) {
         Collection<MisoPrintService> services = printManager.listPrintServicesByBarcodeableClass(Sample.class);
         if (services.size() == 1) {
@@ -489,7 +489,7 @@ public class ProjectControllerHelperService {
         serviceName = json.getString("serviceName");
       }
 
-      MisoPrintService<File, PrintContext<File>> mps = null;
+      MisoPrintService<File, Barcodable, PrintContext<File>> mps = null;
       if (serviceName == null) {
         Collection<MisoPrintService> services = printManager.listPrintServicesByBarcodeableClass(Sample.class);
         if (services.size() == 1) {
@@ -536,7 +536,7 @@ public class ProjectControllerHelperService {
         serviceName = json.getString("serviceName");
       }
 
-      MisoPrintService<File, PrintContext<File>> mps = null;
+      MisoPrintService<File, Barcodable, PrintContext<File>> mps = null;
       if (serviceName == null) {
         Collection<MisoPrintService> services = printManager.listPrintServicesByBarcodeableClass(Library.class);
         if (services.size() == 1) {
@@ -583,7 +583,7 @@ public class ProjectControllerHelperService {
         serviceName = json.getString("serviceName");
       }
 
-      MisoPrintService<File, PrintContext<File>> mps = null;
+      MisoPrintService<File, Barcodable, PrintContext<File>> mps = null;
       if (serviceName == null) {
         Collection<MisoPrintService> services = printManager.listPrintServicesByBarcodeableClass(Library.class);
         if (services.size() == 1) {
@@ -631,7 +631,7 @@ public class ProjectControllerHelperService {
         serviceName = json.getString("serviceName");
       }
 
-      MisoPrintService<File, PrintContext<File>> mps = null;
+      MisoPrintService<File, Barcodable, PrintContext<File>> mps = null;
       if (serviceName == null) {
         Collection<MisoPrintService> services = printManager.listPrintServicesByBarcodeableClass(Dilution.class);
         if (services.size() == 1) {
@@ -678,7 +678,7 @@ public class ProjectControllerHelperService {
         serviceName = json.getString("serviceName");
       }
 
-      MisoPrintService<File, PrintContext<File>> mps = null;
+      MisoPrintService<File, Barcodable, PrintContext<File>> mps = null;
       if (serviceName == null) {
         Collection<MisoPrintService> services = printManager.listPrintServicesByBarcodeableClass(Dilution.class);
         if (services.size() == 1) {
@@ -726,9 +726,9 @@ public class ProjectControllerHelperService {
           samples.add(requestManager.getSampleById(j.getLong("sampleId")));
         }
         File f = misoFileManager.getNewFile(
-            Project.class,
-            projectId.toString(),
-            "SampleDeliveryForm-" + LimsUtils.getCurrentDateAsString() + ".odt");
+                Project.class,
+                projectId.toString(),
+                "SampleDeliveryForm-" + LimsUtils.getCurrentDateAsString() + ".odt");
 
         FormUtils.createSampleDeliveryForm(samples, f);
         return JSONUtils.SimpleJSONResponse("" + f.getName().hashCode());
@@ -749,9 +749,9 @@ public class ProjectControllerHelperService {
       String documentFormat = json.getString("documentFormat");
       try {
         File f = misoFileManager.getNewFile(
-            Project.class,
-            projectId.toString(),
-            "BulkInputForm-" + LimsUtils.getCurrentDateAsString() + "." + documentFormat);
+                Project.class,
+                projectId.toString(),
+                "BulkInputForm-" + LimsUtils.getCurrentDateAsString() + "." + documentFormat);
         FormUtils.createSampleInputSpreadsheet(requestManager.getProjectById(projectId).getSamples(), f);
         return JSONUtils.SimpleJSONResponse("" + f.getName().hashCode());
       }
@@ -767,6 +767,14 @@ public class ProjectControllerHelperService {
 
   public JSONObject visualiseBulkSampleInputForm(HttpSession session, JSONObject json) {
     JSONObject samplelist = (JSONObject) session.getAttribute("bulksamples");
+    if (samplelist == null) {
+      JSONObject error = (JSONObject) session.getAttribute("bulkerror");
+      if (error != null) {
+        return JSONUtils.SimpleJSONError("Failed to get bulk input sheet from session: " + error.getString("bulkerror"));
+      }
+      return JSONUtils.SimpleJSONError("Failed to get bulk input sheet from session.");
+    }
+
     JSONArray samples = samplelist.getJSONArray("bulksamples");
     if (samples != null) {
       StringBuilder sb = new StringBuilder();
@@ -796,12 +804,12 @@ public class ProjectControllerHelperService {
             sb.append("Pools: <ul>");
             for (Pool p : pools) {
               sb.append("<li>")
-                  .append(p.getName())
-                  .append(" (")
-                  .append(p.getAlias())
-                  .append(") - ")
-                  .append(p.getDilutions().size())
-                  .append(" dilutions<li>");
+                .append(p.getName())
+                .append(" (")
+                .append(p.getAlias())
+                .append(") - ")
+                .append(p.getDilutions().size())
+                .append(" dilutions<li>");
             }
             sb.append("</ul><br/>");
           }
@@ -830,9 +838,9 @@ public class ProjectControllerHelperService {
       String documentFormat = json.getString("documentFormat");
       try {
         File f = misoFileManager.getNewFile(
-            Project.class,
-            projectId.toString(),
-            "PlateInputForm-" + LimsUtils.getCurrentDateAsString() + "." + documentFormat);
+                Project.class,
+                projectId.toString(),
+                "PlateInputForm-" + LimsUtils.getCurrentDateAsString() + "." + documentFormat);
         //TODO select a single sample to base sheet on?
         FormUtils.createPlateInputSpreadsheet(f);
         return JSONUtils.SimpleJSONResponse("" + f.getName().hashCode());

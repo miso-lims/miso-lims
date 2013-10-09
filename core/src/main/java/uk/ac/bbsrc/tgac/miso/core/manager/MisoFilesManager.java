@@ -140,21 +140,47 @@ public class MisoFilesManager implements FilesManager {
     return null;
   }
 
-  public void storeFile(Object type, String qualifier, File file) throws IOException {
+  public File storeFile(Object type, String qualifier, File file) throws IOException {
+    return storeFile(type.getClass(), qualifier, file);
   }
 
   public File generateTemporaryFile(String prefix, String suffix, File baseDir) throws IOException {
-    return File.createTempFile(prefix,suffix,baseDir);
+    if (baseDir.exists()) {
+      return File.createTempFile(prefix,suffix,baseDir);
+    }
+    else {
+      log.warn("MISO temporary files directory doesn't seem to exist. Trying to create it...");
+      if (baseDir.mkdirs()) {
+        log.warn("MISO temporary files directory created.. retrying file generation...");
+        return File.createTempFile(prefix,suffix,baseDir);
+      }
+      else {
+        throw new IOException("Could not create MISO temporary file directory ("+baseDir+"). Please create this directory or allow the parent to be writable to MISO.");
+      }
+    }
   }
 
   public File generateTemporaryFile(String prefix, String suffix) throws IOException {
-    return File.createTempFile(prefix,suffix,new File(fileStorageDirectory, "/temp/"));
+    File tempPath = new File(fileStorageDirectory, "/temp/");
+    if (tempPath.exists()) {
+      return File.createTempFile(prefix,suffix,tempPath);
+    }
+    else {
+      log.warn("MISO temporary files directory doesn't seem to exist. Trying to create it...");
+      if (tempPath.mkdirs()) {
+        log.warn("MISO temporary files directory created.. retrying file generation...");
+        return File.createTempFile(prefix,suffix,tempPath);
+      }
+      else {
+        throw new IOException("Could not create MISO temporary file directory ("+tempPath+"). Please create this directory or allow the parent to be writable to MISO.");
+      }
+    }
   }
 
   public Collection<File> getFiles(Class type, String qualifier) throws IOException  {
-      log.debug("getFiles called for qualifier:..." + qualifier);
+    //log.debug("getFiles called for qualifier:..." + qualifier);
     File path = new File(fileStorageDirectory+"/"+type.getSimpleName().toLowerCase()+"/"+qualifier+"/");
-      log.debug("filepath:..." + path.getAbsolutePath());
+    //log.debug("filepath:..." + path.getAbsolutePath());
 
     if (path.exists()) {
       if (path.canRead()) {

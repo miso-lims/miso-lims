@@ -135,7 +135,11 @@ public class LDAPSecurityManager extends LocalSecurityManager {
           if ("".equals(user.getLoginName()) || user.getLoginName() == null) {
             throw new IOException("Cannot save user with no login name.");
           }
-          
+
+          if ("".equals(user.getPassword()) || user.getPassword() == null) {
+            throw new IOException("Cannot save user with no password.");
+          }
+
           return super.saveUser(user);
         }
         else {

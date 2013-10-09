@@ -25,71 +25,74 @@
 
 <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.popup.js'/>"></script>
 <div id="maincontent">
-    <div id="contentcolumn">
-        <h1>
-            <div id="totalCount"></div></h1>
-             <a href="<c:url value='/miso/plate/new'/>" class="add">Create Plate</a>
-        <form id="filter-form">Filter: <input name="filter" id="filter" value="" maxlength="30" size="30" type="text">
-        </form>
-        <br/>
-        <table class="list" id="table">
-            <thead>
-            <tr>
-                <th>Name</th>
-                <th>Description</th>
-                <th>Creation Date</th>
-                <th>Size</th>
-                <th>Material Type</th>
-                <th>Tag Barcode</th>
-                <th class="fit">Edit</th>
-            </tr>
-            </thead>
-            <tbody>
-            <c:forEach items="${plates}" var="plate">
-                <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-                    <td>${plate.name}</td>
-                    <td>${plate.description}</td>
-                    <td>${plate.creationDate}</td>
-                    <td>${plate.size}</td>
-                    <td>${plate.plateMaterialType}</td>
-                    <td>${plate.tagBarcode.sequence}</td>
-                    <td class="misoicon"
-                        onclick="window.location.href='<c:url value="/miso/plate/${plate.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td>
-                </tr>
-            </c:forEach>
-            </tbody>
-        </table>
-        <script type="text/javascript">
-            jQuery(document).ready(function() {
-                writeTotalNo();
-                jQuery("#table").tablesorter({
-                    headers: {
-                        5: {
-                            sorter: false
-                        }
-                    }
-                });
-            });
+  <div id="contentcolumn">
+    <h1>
+      <div id="totalCount"></div>
+    </h1>
+    <a href="<c:url value='/miso/plate/new'/>" class="add">Create Plate</a>
 
-            jQuery(function() {
-                var theTable = jQuery("#table");
-
-                jQuery("#filter").keyup(function() {
-                    jQuery.uiTableFilter(theTable, this.value);
-                    writeTotalNo();
-                });
-
-                jQuery('#filter-form').submit(function() {
-                    theTable.find("tbody > tr:visible > td:eq(1)").mousedown();
-                    return false;
-                }).focus(); //Give focus to input field
-            });
-
-            function writeTotalNo() {
-                jQuery('#totalCount').html(jQuery('#table>tbody>tr:visible').length.toString() + " Plates");
+    <form id="filter-form">Filter: <input name="filter" id="filter" value="" maxlength="30" size="30" type="text">
+    </form>
+    <br/>
+    <table class="list" id="table">
+      <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Creation Date</th>
+        <th>Size</th>
+        <th>Material Type</th>
+        <th>Tag Barcode</th>
+        <th class="fit">Edit</th>
+      </tr>
+      </thead>
+      <tbody>
+      <c:forEach items="${plates}" var="plate">
+        <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
+          <td>${plate.name}</td>
+          <td>${plate.description}</td>
+          <td>${plate.creationDate}</td>
+          <td>${plate.size}</td>
+          <td>${plate.plateMaterialType}</td>
+          <td>${plate.tagBarcode.sequence}</td>
+          <td class="misoicon"
+              onclick="window.location.href='<c:url value="/miso/plate/${plate.id}"/>'"><span
+              class="ui-icon ui-icon-pencil"/></td>
+        </tr>
+      </c:forEach>
+      </tbody>
+    </table>
+    <script type="text/javascript">
+      jQuery(document).ready(function () {
+        writeTotalNo();
+        jQuery("#table").tablesorter({
+          headers: {
+            5: {
+              sorter: false
             }
-        </script>
-    </div>
+          }
+        });
+      });
+
+      jQuery(function () {
+        var theTable = jQuery("#table");
+
+        jQuery("#filter").keyup(function () {
+          jQuery.uiTableFilter(theTable, this.value);
+          writeTotalNo();
+        });
+
+        jQuery('#filter-form').submit(function () {
+          theTable.find("tbody > tr:visible > td:eq(1)").mousedown();
+          return false;
+        }).focus(); //Give focus to input field
+      });
+
+      function writeTotalNo() {
+        jQuery('#totalCount').html(jQuery('#table>tbody>tr:visible').length.toString() + " Plates");
+      }
+    </script>
+  </div>
 </div>
 <%@ include file="adminsub.jsp" %>
 

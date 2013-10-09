@@ -27,16 +27,16 @@
 
 <p>This list only shows manual activities for which you have the rights to work with.</p>
 
-        <br/><br/>
+<br/><br/>
 <table class="list">
-<c:forEach items="${activities}" var="activity">
-  <tr>
-    <td>
+  <c:forEach items="${activities}" var="activity">
+    <tr>
+      <td>
         <b>${activity.name}</b>
-    </td>
-    <td class="fit"><a href='<c:url value="/miso/activity/process/${activity.uniqueIdentifier}"/>'>Edit</a></td>
-  </tr>
-</c:forEach>
+      </td>
+      <td class="fit"><a href='<c:url value="/miso/activity/process/${activity.uniqueIdentifier}"/>'>Edit</a></td>
+    </tr>
+  </c:forEach>
 </table>
 
 <%@ include file="../footer.jsp" %>

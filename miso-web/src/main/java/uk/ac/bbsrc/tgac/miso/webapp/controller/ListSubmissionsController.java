@@ -23,6 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Submission;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import org.slf4j.Logger;
@@ -33,6 +34,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * com.eaglegenomics.miso.web
@@ -63,7 +67,9 @@ public class ListSubmissionsController {
   @RequestMapping("/submissions")
   public ModelAndView listSubmissions() throws IOException {
     try {
-      return new ModelAndView("/pages/listSubmissions.jsp", "submissions", requestManager.listAllSubmissions());
+      List<Submission> subs = new ArrayList<Submission>(requestManager.listAllSubmissions());
+      Collections.sort(subs);
+      return new ModelAndView("/pages/listSubmissions.jsp", "submissions", subs);
     }
     catch (IOException ex) {
       if (log.isDebugEnabled()) {

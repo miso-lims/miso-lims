@@ -55,7 +55,7 @@ var Stats = Stats || {
   getPartitionStats : function(runId, partitionNumber) {
     jQuery("#chartSample").html(runId);
     jQuery("#chartPartition").html(partitionNumber);
-     Fluxion.doAjax(
+    Fluxion.doAjax(
       'statsControllerHelperService',
       'getPartitionStats',
       {'runId':runId, 'partitionNumber':partitionNumber,'url':ajaxurl},
@@ -72,14 +72,12 @@ var Stats = Stats || {
             text += "</tbody></table>";
             jQuery("#statstable").html(text);
             jQuery.colorbox({width:"90%",height:"120%",html:jQuery("#graphpanel").html()});
-//                        jQuery.colorbox({width:"90%",html:text});
           }
         },
         'doOnError':
         function(json) {
           jQuery("#statstable").html(text);
           jQuery.colorbox({width:"90%",height:"100%",html:jQuery("#graphpanel").html()});
-//              jQuery.colorbox({width:"90%",html:json.error});
         }
       }
     );

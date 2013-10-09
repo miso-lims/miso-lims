@@ -25,11 +25,11 @@
 
 <h1>Requests</h1>
 <ul>
-    <c:forEach items="${requests}" var="request">
-        <li>${request}</li>
-        <li><a href='<c:url value="/miso/request/${request.requestId}"/>'>Edit Request</a></li>
-        <li><a href='<c:url value="/miso/request/view/${request.requestId}"/>'>Show Status and Results</a></li>
-    </c:forEach>
+  <c:forEach items="${requests}" var="request">
+    <li>${request}</li>
+    <li><a href='<c:url value="/miso/request/${request.requestId}"/>'>Edit Request</a></li>
+    <li><a href='<c:url value="/miso/request/view/${request.requestId}"/>'>Show Status and Results</a></li>
+  </c:forEach>
 </ul>
 
 <%@ include file="../footer.jsp" %>

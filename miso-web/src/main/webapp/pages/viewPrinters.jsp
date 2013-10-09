@@ -93,6 +93,7 @@
               <th>Type</th>
               <th>Recent Print Jobs</th>
               <th>Enabled</th>
+              <th>Schema</th>
               <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
                 <th>Edit</th>
               </c:if>
@@ -112,18 +113,21 @@
                 <td>
                   <c:choose>
                     <c:when test="${service.enabled}">
-                      <span class="miso-button ui-state-default ui-corner-all ui-icon ui-icon-check"
-                            onclick="Print.service.disablePrintService('${service.name}');">Disable</span>
+                          <span class="miso-button ui-state-default ui-corner-all ui-icon ui-icon-check"
+                                onclick="Print.service.disablePrintService('${service.name}');">Disable</span>
                     </c:when>
                     <c:otherwise>
-                      <span class="miso-button ui-state-default ui-corner-all ui-icon ui-icon-closethick"
-                            onclick="Print.service.enablePrintService('${service.name}');">Enable</span>
+                          <span class="miso-button ui-state-default ui-corner-all ui-icon ui-icon-closethick"
+                                onclick="Print.service.enablePrintService('${service.name}');">Enable</span>
                     </c:otherwise>
                   </c:choose>
                 </td>
+                <td>${service.barcodableSchema.name}</td>
                 <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
                   <td id='edit-${service.name}' class="misoicon"/>
-                    <a href='javascript:void(0);' onclick="Print.ui.changePrinterServiceRow('${service.name}');"><span class="ui-icon ui-icon-pencil"/></a>
+                  <a href='javascript:void(0);'
+                     onclick="Print.ui.changePrinterServiceRow('${service.name}');"><span
+                      class="ui-icon ui-icon-pencil"/></a>
                   </td>
                 </c:if>
               </tr>
@@ -135,12 +139,12 @@
 
         <script type="text/javascript">
           jQuery('.miso-button').hover(
-              function () {
-                jQuery(this).addClass('ui-state-hover');
-              },
-              function () {
-                jQuery(this).removeClass('ui-state-hover');
-              }
+            function () {
+              jQuery(this).addClass('ui-state-hover');
+            },
+            function () {
+              jQuery(this).removeClass('ui-state-hover');
+            }
           );
         </script>
       </c:otherwise>
@@ -179,7 +183,7 @@
         </table>
 
         <script type="text/javascript">
-          jQuery(document).ready(function() {
+          jQuery(document).ready(function () {
             jQuery("#printerTable").tablesorter({
               headers: {
                 4: {

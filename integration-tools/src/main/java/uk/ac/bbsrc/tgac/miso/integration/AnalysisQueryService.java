@@ -44,8 +44,8 @@ import java.util.Iterator;
 public class AnalysisQueryService {
   protected static final Logger log = LoggerFactory.getLogger(AnalysisQueryService.class);
 
-  private String analysisServerHost = "localhost";
-  private int analysisServerPort = 7898;
+  private String analysisServerHost;
+  private int analysisServerPort;
 
   public void setAnalysisServerHost(String analysisServerHost) {
     this.analysisServerHost = analysisServerHost;

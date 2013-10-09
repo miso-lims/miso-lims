@@ -26,9 +26,7 @@ package uk.ac.bbsrc.tgac.miso.core.service.printing.context.impl;
 import net.sourceforge.fluxion.spi.ServiceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeLabelFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.factory.BradyJscriptBarcodeLabelFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.strategy.impl.BradyFtpPrintStrategy;
 
 import java.io.File;
@@ -47,7 +45,6 @@ import java.io.IOException;
 public class BradyFtpPrintContext implements PrintContext<File> {
   protected static final Logger log = LoggerFactory.getLogger(BradyFtpPrintContext.class);
   private BradyFtpPrintStrategy ps = new BradyFtpPrintStrategy();
-  private BarcodeLabelFactory<File> labelFactory = new BradyJscriptBarcodeLabelFactory();
   public String host;
   public String username;
   public String password;
@@ -78,14 +75,6 @@ public class BradyFtpPrintContext implements PrintContext<File> {
 
   public void setPrintStrategy(BradyFtpPrintStrategy ps) {
     this.ps = ps;
-  }
-
-  public BarcodeLabelFactory<File> getLabelFactory() {
-    return labelFactory;
-  }
-
-  public void setLabelFactory(BarcodeLabelFactory<File> labelFactory) {
-    this.labelFactory = labelFactory;
   }
 
   @Override

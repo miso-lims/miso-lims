@@ -28,50 +28,50 @@
 <p>Some stuff here. Current execution complete, etc.</p>
 
 <ul>
-    <c:forEach var="execCount" begin="1" end="${request.executionCount}" step="1">
-        <li><a href='<c:url value="/miso/request/view/${request.requestId}/${execCount}"/>'>View results for
-            execution ${execCount}</a></li>
-    </c:forEach>
+  <c:forEach var="execCount" begin="1" end="${request.executionCount}" step="1">
+    <li><a href='<c:url value="/miso/request/view/${request.requestId}/${execCount}"/>'>View results for
+      execution ${execCount}</a></li>
+  </c:forEach>
 </ul>
 
 <h2>Notes</h2>
 <ul>
-    <c:forEach items="${request.notes}" var="note">
-        <c:choose>
-            <c:when test="${not note.internalOnly}">
-                <li><fmt:formatDate value="${note.creationDate}"/>, ${note.owner.fullName}: ${note.text}</li>
-            </c:when>
-            <c:otherwise>
-                <sec:authorize access="hasRole('ROLE_INTERNAL')">
-                    <li><fmt:formatDate value="${note.creationDate}"/>, ${note.owner.fullName}: ${note.text}</li>
-                </sec:authorize>
-            </c:otherwise>
-        </c:choose>
-    </c:forEach>
+  <c:forEach items="${request.notes}" var="note">
+    <c:choose>
+      <c:when test="${not note.internalOnly}">
+        <li><fmt:formatDate value="${note.creationDate}"/>, ${note.owner.fullName}: ${note.text}</li>
+      </c:when>
+      <c:otherwise>
+        <sec:authorize access="hasRole('ROLE_INTERNAL')">
+          <li><fmt:formatDate value="${note.creationDate}"/>, ${note.owner.fullName}: ${note.text}</li>
+        </sec:authorize>
+      </c:otherwise>
+    </c:choose>
+  </c:forEach>
 </ul>
 
 <h2>Create New Note</h2>
 
 <form action='<c:url value="/miso/note"/>' method="POST">
-    <table>
-        <tr>
-            <td>Note:</td>
-            <td>
-                <input type="hidden" name="requestId" value="${request.requestId}"/>
-                <textarea name="text">Type note in here</textarea>
-            </td>
-        </tr>
-        <sec:authorize access="hasRole('ROLE_INTERNAL')">
-            <tr>
-                <td>Internal only?:</td>
-                <td><input type="checkbox" name="internalOnly" value="true"/></td>
-            </tr>
-        </sec:authorize>
-        <tr>
-            <td></td>
-            <td><input type="submit"/></td>
-        </tr>
-    </table>
+  <table>
+    <tr>
+      <td>Note:</td>
+      <td>
+        <input type="hidden" name="requestId" value="${request.requestId}"/>
+        <textarea name="text">Type note in here</textarea>
+      </td>
+    </tr>
+    <sec:authorize access="hasRole('ROLE_INTERNAL')">
+      <tr>
+        <td>Internal only?:</td>
+        <td><input type="checkbox" name="internalOnly" value="true"/></td>
+      </tr>
+    </sec:authorize>
+    <tr>
+      <td></td>
+      <td><input type="submit"/></td>
+    </tr>
+  </table>
 </form>
 
 <%@ include file="../footer.jsp" %>

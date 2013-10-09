@@ -296,7 +296,12 @@ Tasks.ui = {
     jQuery('input[type=hidden]').each(function(e) {
       var n = jQuery(this).attr("name");
       var v = jQuery(this).attr("value");
-      jQuery('input[name*="'+n.replace('default-','')+'"]').val(v);
+      var act = n.replace('default-','');
+      var inp = jQuery('input[name="'+act+'"]');
+      if (inp.attr("type") == "checkbox" && v == "on") {
+        inp.attr("checked", "checked");
+      }
+      inp.val(v);
     });
   }
 };
@@ -306,6 +311,9 @@ Tasks.job = {
     var self = this;
     var okString = "Please fix the following issues:\n\n";
     var ok = true;
+
+    Utils.ui.disableButton('submitTaskButton');
+
     jQuery('#pipelineDetails').find('input').each(function(e) {
       var inp = jQuery(this);
       if (inp.attr("type") == "checkbox") {
@@ -345,6 +353,8 @@ Tasks.job = {
       });
     }
     else {
+      Utils.ui.reenableButton('submitTaskButton', "Submit Task");
+
       jQuery('#pipelineDetails').find('input').each(function(e) {
         if (jQuery(this).attr("disabled")) {
           jQuery(this).removeAttr("disabled");
@@ -355,6 +365,8 @@ Tasks.job = {
   },
 
   processTaskSubmission : function(json) {
+    Utils.ui.reenableButton('submitTaskButton', "Submit Task");
+
     if (json.response) {
       if (confirm(json.response+". Return to Analysis page?")) {
         Utils.page.pageRedirect('/miso/analysis');

@@ -81,156 +81,198 @@ public class SQLPoolDAO implements PoolStore {
   private static final String TABLE_NAME = "Pool";
 
   private static final String POOL_SELECT =
-          "SELECT poolId, concentration, identificationBarcode, name, alias, creationDate, securityProfile_profileId, platformType, ready, qcPassed " +
-          "FROM "+TABLE_NAME;
+      "SELECT poolId, concentration, identificationBarcode, name, alias, creationDate, securityProfile_profileId, platformType, ready, qcPassed " +
+      "FROM " + TABLE_NAME;
 
   public static final String POOL_SELECT_BY_POOL_ID =
-          POOL_SELECT + " WHERE poolId=?";
+      POOL_SELECT + " WHERE poolId=?";
 
   public static final String POOL_SELECT_BY_PLATFORM =
-          POOL_SELECT + " WHERE platformType=?";
+      POOL_SELECT + " WHERE platformType=?";
 
   public static final String POOL_SELECT_BY_PLATFORM_AND_SEARCH =
-          POOL_SELECT + " WHERE platformType=? AND " +
-          "(name LIKE ? OR " +
-          "alias LIKE ? OR " +
-          "identificationBarcode LIKE ?) ";
+      POOL_SELECT + " WHERE platformType=? AND " +
+      "(name LIKE ? OR " +
+      "alias LIKE ? OR " +
+      "identificationBarcode LIKE ?) ";
 
   public static final String POOL_SELECT_BY_PLATFORM_AND_READY =
-          POOL_SELECT_BY_PLATFORM + " AND ready=1";
+      POOL_SELECT_BY_PLATFORM + " AND ready=1";
 
   public static final String POOL_SELECT_BY_PLATFORM_AND_READY_AND_SEARCH =
-          POOL_SELECT_BY_PLATFORM_AND_SEARCH + " AND ready=1";
+      POOL_SELECT_BY_PLATFORM_AND_SEARCH + " AND ready=1";
 
   public static final String POOL_UPDATE =
-          "UPDATE "+TABLE_NAME+" " +
-          "SET alias=:alias, concentration=:concentration, identificationBarcode=:identificationBarcode, creationDate=:creationDate, securityProfile_profileId=:securityProfile_profileId, platformType=:platformType, ready=:ready, qcPassed=:qcPassed " +
-          "WHERE poolId=:poolId";
+      "UPDATE " + TABLE_NAME + " " +
+      "SET alias=:alias, concentration=:concentration, identificationBarcode=:identificationBarcode, creationDate=:creationDate, securityProfile_profileId=:securityProfile_profileId, platformType=:platformType, ready=:ready, qcPassed=:qcPassed " +
+      "WHERE poolId=:poolId";
 
   public static final String POOL_DELETE =
-          "DELETE FROM "+TABLE_NAME+" WHERE poolId=:poolId";
+      "DELETE FROM " + TABLE_NAME + " WHERE poolId=:poolId";
 
   public static final String POOL_ELEMENT_SELECT_BY_POOL_ID =
-          "SELECT pool_poolId, elementType, elementId FROM Pool_Elements WHERE pool_poolId = ?";
+      "SELECT pool_poolId, elementType, elementId FROM Pool_Elements WHERE pool_poolId = ?";
 
   public static final String POOL_EXPERIMENT_DELETE_BY_POOL_ID =
-          "DELETE FROM Pool_Experiment " +
-          "WHERE pool_poolId=:pool_poolId";
+      "DELETE FROM Pool_Experiment " +
+      "WHERE pool_poolId=:pool_poolId";
 
+  /*
   public static final String POOL_SELECT_BY_RELATED_PROJECT =
-          "SELECT DISTINCT pool.* " +
-          "FROM Project p " +
-          "INNER JOIN Sample sa ON sa.project_projectId = p.projectId " +
-          "INNER JOIN Library li ON li.sample_sampleId = sa.sampleId " +
-          "INNER JOIN LibraryDilution ld ON ld.library_libraryId = li.libraryId " +
+    "SELECT DISTINCT pool.* " +
+    "FROM Project p " +
+    "INNER JOIN Sample sa ON sa.project_projectId = p.projectId " +
+    "INNER JOIN Library li ON li.sample_sampleId = sa.sampleId " +
+    "INNER JOIN LibraryDilution ld ON ld.library_libraryId = li.libraryId " +
 
-          "LEFT JOIN emPCR e ON e.dilution_dilutionId = ld.dilutionId " +
-          "LEFT JOIN emPCRDilution ed ON ed.emPCR_pcrId = e.pcrId " +
+    "LEFT JOIN emPCR e ON e.dilution_dilutionId = ld.dilutionId " +
+    "LEFT JOIN emPCRDilution ed ON ed.emPCR_pcrId = e.pcrId " +
 
-          "LEFT JOIN Pool_Elements pld ON pld.elementId = ld.dilutionId " +
-          "LEFT JOIN Pool_Elements ple ON ple.elementId = ed.dilutionId " +
+    "LEFT JOIN Pool_Elements pld ON pld.elementId = ld.dilutionId " +
+    "LEFT JOIN Pool_Elements ple ON ple.elementId = ed.dilutionId " +
 
-          "INNER JOIN "+TABLE_NAME+" pool ON pool.poolId = pld.pool_poolId " +
-          "OR pool.poolId = ple.pool_poolId " +
-          "WHERE p.projectId=?";
+    "INNER JOIN " + TABLE_NAME + " pool ON pool.poolId = pld.pool_poolId " +
+    "OR pool.poolId = ple.pool_poolId " +
+    "WHERE p.projectId=?";
+  */
+
+  public static final String EMPCR_POOL_SELECT_BY_RELATED_PROJECT =
+      "SELECT DISTINCT pool.* " +
+      "FROM Project p " +
+      "INNER JOIN Sample sa ON sa.project_projectId = p.projectId " +
+      "INNER JOIN Library li ON li.sample_sampleId = sa.sampleId " +
+      "INNER JOIN LibraryDilution ld ON ld.library_libraryId = li.libraryId " +
+
+      "LEFT JOIN emPCR e ON e.dilution_dilutionId = ld.dilutionId " +
+      "LEFT JOIN emPCRDilution ed ON ed.emPCR_pcrId = e.pcrId " +
+
+      "LEFT JOIN Pool_Elements ple ON ple.elementId = ed.dilutionId " +
+
+      "INNER JOIN " + TABLE_NAME + " pool ON pool.poolId = ple.pool_poolId " +
+      "WHERE p.projectId=?";
+
+  public static final String DILUTION_POOL_SELECT_BY_RELATED_PROJECT =
+      "SELECT DISTINCT pool.* " +
+      "FROM Project p " +
+      "INNER JOIN Sample sa ON sa.project_projectId = p.projectId " +
+      "INNER JOIN Library li ON li.sample_sampleId = sa.sampleId " +
+      "INNER JOIN LibraryDilution ld ON ld.library_libraryId = li.libraryId " +
+
+      "LEFT JOIN Pool_Elements pld ON pld.elementId = ld.dilutionId " +
+
+      "INNER JOIN " + TABLE_NAME + " pool ON pool.poolId = pld.pool_poolId " +
+      "WHERE p.projectId=?";
+
+  public static final String PLATE_POOL_SELECT_BY_RELATED_PROJECT =
+      "SELECT DISTINCT pool.* " +
+      "FROM Project p " +
+      "INNER JOIN Sample sa ON sa.project_projectId = p.projectId " +
+      "INNER JOIN Library li ON li.sample_sampleId = sa.sampleId " +
+      "INNER JOIN Plate_Elements pe ON li.libraryId = pe.elementId " +
+      "INNER JOIN Plate pl ON pl.plateId = pe.plate_plateId " +
+
+      "LEFT JOIN Pool_Elements pld ON pld.elementId = pl.plateId " +
+
+      "INNER JOIN " + TABLE_NAME + " pool ON pool.poolId = pld.pool_poolId " +
+      "WHERE p.projectId=?";
 
   public static final String POOL_SELECT_BY_RELATED_LIBRARY =
-          "SELECT DISTINCT pool.* " +
-          "FROM Library li " +
-          "INNER JOIN LibraryDilution ld ON ld.library_libraryId = li.libraryId " +
+      "SELECT DISTINCT pool.* " +
+      "FROM Library li " +
+      "INNER JOIN LibraryDilution ld ON ld.library_libraryId = li.libraryId " +
 
-          "LEFT JOIN emPCR e ON e.dilution_dilutionId = ld.dilutionId " +
-          "LEFT JOIN emPCRDilution ed ON ed.emPCR_pcrId = e.pcrId " +
+      "LEFT JOIN emPCR e ON e.dilution_dilutionId = ld.dilutionId " +
+      "LEFT JOIN emPCRDilution ed ON ed.emPCR_pcrId = e.pcrId " +
 
-          "LEFT JOIN Pool_Elements pld ON pld.elementId = ld.dilutionId " +
-          "LEFT JOIN Pool_Elements ple ON ple.elementId = ed.dilutionId " +
+      "LEFT JOIN Pool_Elements pld ON pld.elementId = ld.dilutionId " +
+      "LEFT JOIN Pool_Elements ple ON ple.elementId = ed.dilutionId " +
 
-          "INNER JOIN "+TABLE_NAME+" pool ON pool.poolId = pld.pool_poolId " +
-          "OR pool.poolId = ple.pool_poolId " +
-          "WHERE li.libraryId=?";
+      "INNER JOIN " + TABLE_NAME + " pool ON pool.poolId = pld.pool_poolId " +
+      "OR pool.poolId = ple.pool_poolId " +
+      "WHERE li.libraryId=?";
 
   public static final String POOL_ELEMENT_DELETE_BY_POOL_ID =
-          "DELETE FROM Pool_Elements " +
-          "WHERE pool_poolId=:pool_poolId";
+      "DELETE FROM Pool_Elements " +
+      "WHERE pool_poolId=:pool_poolId";
 
   //ILLUMINA
   public static final String ILLUMINA_POOL_SELECT =
-          POOL_SELECT + " WHERE platformType='Illumina'";
+      POOL_SELECT + " WHERE platformType='Illumina'";
 
   public static final String ILLUMINA_POOL_SELECT_BY_POOL_ID =
-          ILLUMINA_POOL_SELECT + " AND poolId=?";
+      ILLUMINA_POOL_SELECT + " AND poolId=?";
 
   public static final String ILLUMINA_POOL_SELECT_BY_READY =
-          ILLUMINA_POOL_SELECT + " AND ready=1";
+      ILLUMINA_POOL_SELECT + " AND ready=1";
 
   public static final String ILLUMINA_POOL_SELECT_BY_ID_BARCODE =
-          ILLUMINA_POOL_SELECT + " AND identificationBarcode=?";
+      ILLUMINA_POOL_SELECT + " AND identificationBarcode=?";
 
   public static final String ILLUMINA_POOL_SELECT_BY_EXPERIMENT_ID =
-          "SELECT ip.poolId, ip.concentration, ip.identificationBarcode, ip.name, ip.alias, ip.creationDate, ip.securityProfile_profileId, ip.platformType, ip.ready, ip.qcPassed " +
-          "FROM "+TABLE_NAME+" ip, Pool_Experiment pe " +
-          "WHERE ip.poolId=pe.pool_poolId " +
-          "AND ip.platformType='Illumina' " +
-          "AND pe.experiments_experimentId=?";
+      "SELECT ip.poolId, ip.concentration, ip.identificationBarcode, ip.name, ip.alias, ip.creationDate, ip.securityProfile_profileId, ip.platformType, ip.ready, ip.qcPassed " +
+      "FROM " + TABLE_NAME + " ip, Pool_Experiment pe " +
+      "WHERE ip.poolId=pe.pool_poolId " +
+      "AND ip.platformType='Illumina' " +
+      "AND pe.experiments_experimentId=?";
 
   //454
   public static final String LS454_POOL_SELECT =
-          POOL_SELECT + " WHERE platformType='LS454'";
+      POOL_SELECT + " WHERE platformType='LS454'";
 
   public static final String LS454_POOL_SELECT_BY_POOL_ID =
-          LS454_POOL_SELECT + " AND poolId=?";
+      LS454_POOL_SELECT + " AND poolId=?";
 
   public static final String LS454_POOL_SELECT_BY_READY =
-          LS454_POOL_SELECT + " AND ready=1";
+      LS454_POOL_SELECT + " AND ready=1";
 
   public static final String LS454_POOL_SELECT_BY_ID_BARCODE =
-          LS454_POOL_SELECT + " AND identificationBarcode=?";
+      LS454_POOL_SELECT + " AND identificationBarcode=?";
 
   public static final String LS454_POOL_SELECT_BY_EXPERIMENT_ID =
-          "SELECT ip.poolId, ip.concentration, ip.identificationBarcode, ip.name, ip.alias, ip.creationDate, ip.securityProfile_profileId, ip.platformType, ip.ready, ip.qcPassed " +
-          "FROM "+TABLE_NAME+" ip, Pool_Experiment pe " +
-          "WHERE ip.poolId=pe.pool_poolId " +
-          "AND ip.platformType='LS454' " +
-          "AND pe.experiments_experimentId=?";
+      "SELECT ip.poolId, ip.concentration, ip.identificationBarcode, ip.name, ip.alias, ip.creationDate, ip.securityProfile_profileId, ip.platformType, ip.ready, ip.qcPassed " +
+      "FROM " + TABLE_NAME + " ip, Pool_Experiment pe " +
+      "WHERE ip.poolId=pe.pool_poolId " +
+      "AND ip.platformType='LS454' " +
+      "AND pe.experiments_experimentId=?";
 
   public static final String EMPCR_DILUTIONS_BY_RELATED_LS454_POOL_ID =
-          "SELECT p.dilutions_dilutionId, l.concentration, l.emPCR_pcrId, l.identificationBarcode, l.name, l.alias, l.creationDate, l.securityProfile_profileId " +
-          "FROM emPCRDilution l, Pool_emPCRDilution p " +
-          "WHERE l.dilutionId=p.dilutions_dilutionId " +
-          "AND p.pool_poolId=?";
+      "SELECT p.dilutions_dilutionId, l.concentration, l.emPCR_pcrId, l.identificationBarcode, l.name, l.alias, l.creationDate, l.securityProfile_profileId " +
+      "FROM emPCRDilution l, Pool_emPCRDilution p " +
+      "WHERE l.dilutionId=p.dilutions_dilutionId " +
+      "AND p.pool_poolId=?";
 
   //SOLiD
   public static final String SOLID_POOL_SELECT =
-          POOL_SELECT + " WHERE platformType='Solid'";
+      POOL_SELECT + " WHERE platformType='Solid'";
 
   public static final String SOLID_POOL_SELECT_BY_POOL_ID =
-          SOLID_POOL_SELECT + " AND poolId=?";
+      SOLID_POOL_SELECT + " AND poolId=?";
 
   public static final String SOLID_POOL_SELECT_BY_READY =
-          SOLID_POOL_SELECT + " AND ready=1";
+      SOLID_POOL_SELECT + " AND ready=1";
 
   public static final String SOLID_POOL_SELECT_BY_ID_BARCODE =
-          SOLID_POOL_SELECT + " AND identificationBarcode=?";
+      SOLID_POOL_SELECT + " AND identificationBarcode=?";
 
   public static final String SOLID_POOL_SELECT_BY_EXPERIMENT_ID =
-          "SELECT ip.poolId, ip.concentration, ip.identificationBarcode, ip.name, ip.alias, ip.creationDate, ip.securityProfile_profileId, ip.platformType, ip.ready, ip.qcPassed " +
-          "FROM "+TABLE_NAME+" ip, Pool_Experiment pe " +
-          "WHERE ip.poolId=pe.pool_poolId " +
-          "AND ip.platformType='Solid' " +
-          "AND pe.experiments_experimentId=?";
+      "SELECT ip.poolId, ip.concentration, ip.identificationBarcode, ip.name, ip.alias, ip.creationDate, ip.securityProfile_profileId, ip.platformType, ip.ready, ip.qcPassed " +
+      "FROM " + TABLE_NAME + " ip, Pool_Experiment pe " +
+      "WHERE ip.poolId=pe.pool_poolId " +
+      "AND ip.platformType='Solid' " +
+      "AND pe.experiments_experimentId=?";
 
   public static final String EMPCR_DILUTIONS_BY_RELATED_SOLID_POOL_ID =
-          "SELECT p.dilutions_dilutionId, l.concentration, l.emPCR_pcrId, l.identificationBarcode, l.name, l.alias, l.creationDate, l.securityProfile_profileId " +
-          "FROM emPCRDilution l, Pool_emPCRDilution p " +
-          "WHERE l.dilutionId=p.dilutions_dilutionId " +
-          "AND p.pool_poolId=?";
+      "SELECT p.dilutions_dilutionId, l.concentration, l.emPCR_pcrId, l.identificationBarcode, l.name, l.alias, l.creationDate, l.securityProfile_profileId " +
+      "FROM emPCRDilution l, Pool_emPCRDilution p " +
+      "WHERE l.dilutionId=p.dilutions_dilutionId " +
+      "AND p.pool_poolId=?";
 
   //EMPCR
   public static final String EMPCR_POOL_SELECT =
-          POOL_SELECT + " WHERE platformType='Solid' OR platformType='LS454' AND name LIKE 'EFO%'";
+      POOL_SELECT + " WHERE platformType='Solid' OR platformType='LS454' AND name LIKE 'EFO%'";
 
   public static final String EMPCR_POOL_SELECT_BY_POOL_ID =
-          EMPCR_POOL_SELECT + " AND poolId = ?";
+      EMPCR_POOL_SELECT + " AND poolId = ?";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLPoolDAO.class);
 
@@ -252,8 +294,8 @@ public class SQLPoolDAO implements PoolStore {
   private DaoLookup daoLookup;
 
   public void setDaoLookup(DaoLookup daoLookup) {
-      this.daoLookup = daoLookup;
-    }
+    this.daoLookup = daoLookup;
+  }
 
   @Autowired
   private MisoNamingScheme<Pool<? extends Poolable>> namingScheme;
@@ -351,11 +393,11 @@ public class SQLPoolDAO implements PoolStore {
   @Transactional(readOnly = false, rollbackFor = Exception.class)
   @TriggersRemove(cacheName = {"poolCache", "lazyPoolCache"},
                   keyGenerator = @KeyGenerator(
-                          name = "HashCodeCacheKeyGenerator",
-                          properties = {
-                                  @Property(name = "includeMethod", value = "false"),
-                                  @Property(name = "includeParameterTypes", value = "false")
-                          })
+                      name = "HashCodeCacheKeyGenerator",
+                      properties = {
+                          @Property(name = "includeMethod", value = "false"),
+                          @Property(name = "includeParameterTypes", value = "false")
+                      })
   )
   public long save(Pool<? extends Poolable> pool) throws IOException {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
@@ -367,12 +409,12 @@ public class SQLPoolDAO implements PoolStore {
 
     MapSqlParameterSource params = new MapSqlParameterSource();
     params.addValue("concentration", pool.getConcentration())
-            .addValue("alias", pool.getAlias())
-            .addValue("creationDate", pool.getCreationDate())
-            .addValue("securityProfile_profileId", securityProfileId)
-            .addValue("platformType", pool.getPlatformType().getKey())
-            .addValue("ready", pool.getReadyToRun());
-            //.addValue("qcPassed", pool.getQcPassed());
+        .addValue("alias", pool.getAlias())
+        .addValue("creationDate", pool.getCreationDate())
+        .addValue("securityProfile_profileId", securityProfileId)
+        .addValue("platformType", pool.getPlatformType().getKey())
+        .addValue("ready", pool.getReadyToRun());
+    //.addValue("qcPassed", pool.getQcPassed());
 
     if (pool.getQcPassed() != null) {
       params.addValue("qcPassed", pool.getQcPassed().toString());
@@ -383,8 +425,8 @@ public class SQLPoolDAO implements PoolStore {
 
     if (pool.getId() == AbstractPool.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-              .withTableName(TABLE_NAME)
-              .usingGeneratedKeyColumns("poolId");
+          .withTableName(TABLE_NAME)
+          .usingGeneratedKeyColumns("poolId");
       try {
         pool.setId(DbUtils.getAutoIncrement(template, TABLE_NAME));
 
@@ -424,8 +466,8 @@ public class SQLPoolDAO implements PoolStore {
       try {
         if (namingScheme.validateField("name", pool.getName())) {
           params.addValue("poolId", pool.getId())
-                .addValue("name", pool.getName())
-                .addValue("identificationBarcode", pool.getName() + "::" + pool.getPlatformType().getKey());
+              .addValue("name", pool.getName())
+              .addValue("identificationBarcode", pool.getName() + "::" + pool.getPlatformType().getKey());
           NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
           namedTemplate.update(POOL_UPDATE, params);
         }
@@ -455,17 +497,17 @@ public class SQLPoolDAO implements PoolStore {
       String type = pool.getPoolableElements().iterator().next().getClass().getSimpleName();
 
       SimpleJdbcInsert eInsert = new SimpleJdbcInsert(template).withTableName("Pool_Elements");
-      String lc = type.substring(0,1).toLowerCase() + type.substring(1);
+      String lc = type.substring(0, 1).toLowerCase() + type.substring(1);
 
-      Cache dc = cacheManager.getCache(lc+"Cache");
-      Cache ldc = cacheManager.getCache("lazy"+ type + "Cache");
+      Cache dc = cacheManager.getCache(lc + "Cache");
+      Cache ldc = cacheManager.getCache("lazy" + type + "Cache");
 
       for (Poolable d : pool.getPoolableElements()) {
         //log.debug("Linking "+d.getName() + " to " + pool.getName());
         MapSqlParameterSource esParams = new MapSqlParameterSource();
         esParams.addValue("elementId", d.getId())
-                .addValue("pool_poolId", pool.getId())
-                .addValue("elementType", d.getClass().getName());
+            .addValue("pool_poolId", pool.getId())
+            .addValue("elementType", d.getClass().getName());
 
         eInsert.execute(esParams);
 
@@ -499,12 +541,12 @@ public class SQLPoolDAO implements PoolStore {
       //Cache ec = cacheManager.getCache("experimentCache");
 
       SimpleJdbcInsert eInsert = new SimpleJdbcInsert(template)
-              .withTableName("Pool_Experiment");
+          .withTableName("Pool_Experiment");
 
       for (Experiment e : pool.getExperiments()) {
         MapSqlParameterSource esParams = new MapSqlParameterSource();
         esParams.addValue("experiments_experimentId", e.getId())
-                .addValue("pool_poolId", pool.getId());
+            .addValue("pool_poolId", pool.getId());
 
         eInsert.execute(esParams);
 
@@ -542,16 +584,21 @@ public class SQLPoolDAO implements PoolStore {
   }
 
   public Collection<Pool<? extends Poolable>> listByProjectId(long projectId) throws IOException {
-    return template.query(POOL_SELECT_BY_RELATED_PROJECT, new Object[]{projectId}, new PoolMapper());
+    List<Pool<? extends Poolable>> lpools = template.query(DILUTION_POOL_SELECT_BY_RELATED_PROJECT, new Object[]{projectId}, new PoolMapper());
+    List<Pool<? extends Poolable>> epools = template.query(EMPCR_POOL_SELECT_BY_RELATED_PROJECT, new Object[]{projectId}, new PoolMapper());
+    List<Pool<? extends Poolable>> ppools = template.query(PLATE_POOL_SELECT_BY_RELATED_PROJECT, new Object[]{projectId}, new PoolMapper());
+    lpools.addAll(epools);
+    lpools.addAll(ppools);
+    return lpools;
   }
 
   @Cacheable(cacheName = "poolCache",
              keyGenerator = @KeyGenerator(
-                     name = "HashCodeCacheKeyGenerator",
-                     properties = {
-                             @Property(name = "includeMethod", value = "false"),
-                             @Property(name = "includeParameterTypes", value = "false")
-                     }
+                 name = "HashCodeCacheKeyGenerator",
+                 properties = {
+                     @Property(name = "includeMethod", value = "false"),
+                     @Property(name = "includeParameterTypes", value = "false")
+                 }
              )
   )
   public Pool<? extends Poolable> get(long poolId) throws IOException {
@@ -564,14 +611,14 @@ public class SQLPoolDAO implements PoolStore {
     return eResults.size() > 0 ? eResults.get(0) : null;
   }
 
-  @Cacheable(cacheName="poolListCache",
-      keyGenerator = @KeyGenerator(
-              name = "HashCodeCacheKeyGenerator",
-              properties = {
-                      @Property(name="includeMethod", value="false"),
-                      @Property(name="includeParameterTypes", value="false")
-              }
-      )
+  @Cacheable(cacheName = "poolListCache",
+             keyGenerator = @KeyGenerator(
+                 name = "HashCodeCacheKeyGenerator",
+                 properties = {
+                     @Property(name = "includeMethod", value = "false"),
+                     @Property(name = "includeParameterTypes", value = "false")
+                 }
+             )
   )
   public Collection<Pool<? extends Poolable>> listAll() throws IOException {
     return template.query(POOL_SELECT, new PoolMapper());
@@ -579,7 +626,7 @@ public class SQLPoolDAO implements PoolStore {
 
   @Override
   public int count() throws IOException {
-    return template.queryForInt("SELECT count(*) FROM "+TABLE_NAME);
+    return template.queryForInt("SELECT count(*) FROM " + TABLE_NAME);
   }
 
   public List<Pool<? extends Poolable>> listAllByPlatform(PlatformType platformType) throws IOException {
@@ -605,14 +652,14 @@ public class SQLPoolDAO implements PoolStore {
   }
 
   @TriggersRemove(
-          cacheName = {"poolCache", "lazyPoolCache"},
-          keyGenerator = @KeyGenerator(
-                  name = "HashCodeCacheKeyGenerator",
-                  properties = {
-                          @Property(name = "includeMethod", value = "false"),
-                          @Property(name = "includeParameterTypes", value = "false")
-                  }
-          )
+      cacheName = {"poolCache", "lazyPoolCache"},
+      keyGenerator = @KeyGenerator(
+          name = "HashCodeCacheKeyGenerator",
+          properties = {
+              @Property(name = "includeMethod", value = "false"),
+              @Property(name = "includeParameterTypes", value = "false")
+          }
+      )
   )
   public boolean remove(Pool<? extends Poolable> pool) throws IOException {
     MapSqlParameterSource poolparams = new MapSqlParameterSource();
@@ -626,9 +673,9 @@ public class SQLPoolDAO implements PoolStore {
         Poolable d = pool.getPoolableElements().iterator().next();
         ok = (poolNamedTemplate.update(POOL_ELEMENT_DELETE_BY_POOL_ID, poolparams) == 1);
         String type = d.getClass().getSimpleName();
-        String lc = type.substring(0,1).toLowerCase() + type.substring(1);
-        Cache dc = cacheManager.getCache(lc+"Cache");
-        Cache ldc = cacheManager.getCache("lazy"+type+"Cache");
+        String lc = type.substring(0, 1).toLowerCase() + type.substring(1);
+        Cache dc = cacheManager.getCache(lc + "Cache");
+        Cache ldc = cacheManager.getCache("lazy" + type + "Cache");
 
         if (this.cascadeType != null) {
           if (this.cascadeType.equals(CascadeType.PERSIST)) {
@@ -674,11 +721,13 @@ public class SQLPoolDAO implements PoolStore {
 
   public class PoolMapper extends CacheAwareRowMapper<Pool<? extends Poolable>> {
     public PoolMapper() {
-      super((Class<Pool<? extends Poolable>>)((ParameterizedType)new TypeReference<Pool<? extends Poolable>>(){}.getType()).getRawType());
+      super((Class<Pool<? extends Poolable>>) ((ParameterizedType) new TypeReference<Pool<? extends Poolable>>() {
+      }.getType()).getRawType());
     }
 
     public PoolMapper(boolean lazy) {
-      super((Class<Pool<? extends Poolable>>)((ParameterizedType)new TypeReference<Pool<? extends Poolable>>(){}.getType()).getRawType(), lazy);
+      super((Class<Pool<? extends Poolable>>) ((ParameterizedType) new TypeReference<Pool<? extends Poolable>>() {
+      }.getType()).getRawType(), lazy);
     }
 
     @Override
@@ -689,7 +738,7 @@ public class SQLPoolDAO implements PoolStore {
         Element element;
         if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
           log.debug("Cache hit on map for Pool " + id);
-          return (Pool<? extends Poolable>)element.getObjectValue();
+          return (Pool<? extends Poolable>) element.getObjectValue();
         }
       }
 
@@ -732,7 +781,7 @@ public class SQLPoolDAO implements PoolStore {
           p.setExperiments(experimentDAO.listByPoolId(id));
 
           for (PoolQC qc : poolQcDAO.listByPoolId(id)) {
-           p.addQc(qc);
+            p.addQc(qc);
           }
         }
       }
@@ -750,7 +799,7 @@ public class SQLPoolDAO implements PoolStore {
       }
 
       if (isCacheEnabled() && lookupCache(cacheManager) != null) {
-        lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id) ,p));
+        lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id), p));
       }
 
       return p;
@@ -769,7 +818,13 @@ public class SQLPoolDAO implements PoolStore {
         if (dao != null) {
           log.debug("Mapping poolable -> " + poolId + " : " + type + " : " + elementId);
           Poolable p = dao.get(elementId);
-          log.debug("\\_ got " + p.getId() + " : " + p.getName());
+
+          if (p != null) {
+            log.debug("\\_ got " + p.getId() + " : " + p.getName());
+          }
+          else {
+            log.debug("\\_ got null");
+          }
           return p;
         }
         else {
@@ -780,7 +835,7 @@ public class SQLPoolDAO implements PoolStore {
         throw new SQLException("Cannot resolve element type to a valid class", e);
       }
       catch (IOException e) {
-        throw new SQLException("Cannot retrieve poolable element: [" + type +" ] " + elementId);
+        throw new SQLException("Cannot retrieve poolable element: [" + type + " ] " + elementId);
       }
     }
   }

@@ -21,7 +21,6 @@
  * *********************************************************************
  */
 
-
 function naturalSort(a, b) {
   var re = /(^-?[0-9]+(\.?[0-9]*)[df]?e?[0-9]?$|^0x[0-9a-f]+$|[0-9]+)/gi,
           sre = /(^[ ]*|[ ]*$)/g,
@@ -57,7 +56,6 @@ function naturalSort(a, b) {
   }
   return 0;
 };
-
 
 jQuery(document).ready(function () {
   // Natural Sorting

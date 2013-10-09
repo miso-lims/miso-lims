@@ -87,6 +87,7 @@ Container.ui = {
       {'doOnSuccess':
         function(json) {
           jQuery('#sequencerReferenceSelect').html(json.sequencers);
+          Container.pool.poolSearch("", form.value);
         }
       }
     );
@@ -162,23 +163,23 @@ Container.ui = {
         'url':ajaxurl
       },
       {'doOnSuccess': function(json) {
-          jQuery('#listingContainersTable').html('');
-          jQuery('#listingContainersTable').dataTable({
-           "aaData": json.array,
-           "aoColumns": [
-             //{ "sTitle": "Name"},
-             { "sTitle": "ID Barcode"},
-             { "sTitle": "Platform"},
-             { "sTitle": "Last Associated Run"},
-             { "sTitle": "Last Sequencer Used"},
-             { "sTitle": "Edit"}
-           ],
-           "bJQueryUI": true,
-           "iDisplayLength":  25,
-           "aaSorting":[
-             [0,"desc"]
-           ],
-            "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>'
+        jQuery('#listingContainersTable').html('');
+        jQuery('#listingContainersTable').dataTable({
+         "aaData": json.array,
+         "aoColumns": [
+           //{ "sTitle": "Name"},
+           { "sTitle": "ID Barcode"},
+           { "sTitle": "Platform"},
+           { "sTitle": "Last Associated Run"},
+           { "sTitle": "Last Sequencer Used"},
+           { "sTitle": "Edit"}
+         ],
+         "bJQueryUI": true,
+         "iDisplayLength":  25,
+         "aaSorting":[
+           [0,"desc"]
+         ],
+          "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>'
          });
          jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
          jQuery("#toolbar").append("<button style=\"margin-left:5px;\" onclick=\"window.location.href='/miso/container/new';\" class=\"fg-button ui-state-default ui-corner-all\">Create Partition Container</button>");
@@ -196,7 +197,11 @@ Container.partition = {
       var ul = jQuery("ul[partition='"+(partitionNum-1)+"']");
       if (ul.length > 0) {
         if (!Utils.validation.isNullCheck(ul.html()) && ul.find("div").length > 0) {
-          a.html("<input type='text' id='poolBarcode"+partitionNum+"' name='poolBarcode"+partitionNum+"' partition='"+partitionNum+"' onkeyup='Utils.timer.timedFunc(Container.pool.getPool(this), 300);'/><br/><span id='msg"+partitionNum+"'/>");
+          //a.html("<input type='text' id='poolBarcode"+partitionNum+"' name='poolBarcode"+partitionNum+"' partition='"+partitionNum+"' onkeyup='Utils.timer.timedFunc(Container.pool.getPool(this), 300);'/><br/><span id='msg"+partitionNum+"'/>");
+          a.html("<input type='text' id='poolBarcode"+partitionNum+"' name='poolBarcode"+partitionNum+"' partition='"+partitionNum+"'/><br/><span id='msg"+partitionNum+"'/>");
+          Utils.timer.typewatchFunc(jQuery("#poolBarcode"+partitionNum), function() {
+            Container.pool.getPool(jQuery("#poolBarcode"+partitionNum));
+          }, 400, 4);
         }
         else {
           alert("Please enter a pool for partition " + (partitionNum));
@@ -204,7 +209,11 @@ Container.partition = {
       }
     }
     else {
-      a.html("<input type='text' id='poolBarcode"+partitionNum+"' name='poolBarcode"+partitionNum+"' partition='"+partitionNum+"' onkeyup='Utils.timer.timedFunc(Container.pool.getPool(this), 300);'/><br/><span id='msg"+partitionNum+"'/>");
+      //a.html("<input type='text' id='poolBarcode"+partitionNum+"' name='poolBarcode"+partitionNum+"' partition='"+partitionNum+"' onkeyup='Utils.timer.timedFunc(Container.pool.getPool(this), 300);'/><br/><span id='msg"+partitionNum+"'/>");
+      a.html("<input type='text' id='poolBarcode"+partitionNum+"' name='poolBarcode"+partitionNum+"' partition='"+partitionNum+"'/><br/><span id='msg"+partitionNum+"'/>");
+      Utils.timer.typewatchFunc(jQuery("#poolBarcode"+partitionNum), function() {
+        Container.pool.getPool(jQuery("#poolBarcode"+partitionNum));
+      }, 400, 4);
     }
   },
 
@@ -228,10 +237,62 @@ Container.partition = {
         }
       }
     );
+  },
+
+  insertPoolNextAvailable: function (poolLi) {
+    var pool = jQuery(poolLi);
+    jQuery('.runPartitionDroppable:empty:first').each(function () {
+      var newpool = pool.clone().appendTo(jQuery(this));
+      newpool.removeAttr("ondblclick");
+      newpool.find('input').attr("name", jQuery(this).attr("bind"));
+
+      Fluxion.doAjax(
+        'poolControllerHelperService',
+        'checkPoolExperiment',
+        {'poolId': newpool.find('input').val(), 'partition': jQuery(this).attr("partition"), 'url': ajaxurl},
+        {'doOnSuccess': function (json) {
+          newpool.append(json.html);
+          newpool.append("<span style='position: absolute; top: 0; right: 0;' onclick='Container.pool.confirmPoolRemove(this);' class='float-right ui-icon ui-icon-circle-close'></span>");
+        },
+          'doOnError': function (json) {
+            newpool.remove();
+            alert("Error adding pool, no Study is present.");
+          }
+        }
+      );
+    });
   }
 };
 
 Container.pool = {
+  toggleReadyToRunCheck: function (checkbox, platform) {
+    var self = this;
+    self.poolSearch(jQuery('#searchPools').val(), platform);
+  },
+
+  poolSearch: function (input, platform) {
+    var readyBool = false;
+    if (jQuery('#showOnlyReady').attr('checked')) {
+      readyBool = true;
+    }
+    jQuery('#poolList').html("<img src='/styles/images/ajax-loader.gif'/>");
+    Fluxion.doAjax(
+      'poolSearchService',
+      'poolSearch',
+      {'str': input, 'readyOnly': readyBool, 'platformType': platform, 'url': ajaxurl},
+      {
+        "doOnSuccess": function (json) {
+          jQuery('#poolList').html(json.html);
+          jQuery('#poolList .dashboard').each(function() {
+            var inp = jQuery(this);
+            inp.dblclick(function() {
+              Container.partition.insertPoolNextAvailable(inp);
+            });
+          });
+        }
+    });
+  },
+
   getPool : function(t) {
     var a = jQuery(t);
     var platform = jQuery("input[name='platformTypes']:checked").val();
@@ -249,5 +310,11 @@ Container.pool = {
         }}
       }
     );
+  },
+
+  confirmPoolRemove: function (t) {
+    if (confirm("Remove this pool?")) {
+      jQuery(t).parent().remove();
+    }
   }
 };

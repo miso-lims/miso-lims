@@ -24,7 +24,6 @@
 package uk.ac.bbsrc.tgac.miso.core.service.printing.context;
 
 import net.sourceforge.fluxion.spi.Spi;
-import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeLabelFactory;
 
 import java.io.IOException;
 
@@ -43,5 +42,4 @@ public interface PrintContext<T> {
   public String getName();
   public String getDescription();
   public String getHost();
-  public BarcodeLabelFactory<T> getLabelFactory();
 }

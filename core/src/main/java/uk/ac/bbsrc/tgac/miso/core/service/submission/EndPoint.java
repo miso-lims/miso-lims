@@ -23,10 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.service.submission;
 
-import javax.xml.ws.Endpoint;
-import java.io.File;
 import java.net.URI;
-import java.util.Set;
 
 /**
  * An interface that defines an EndPoint object that can recieve datafiles
@@ -39,10 +36,8 @@ public interface EndPoint<T extends URI> {
    * Accepts sequence Datafiles
    *
    * @param destination  String
-
    */
-  public void setDestination(String destination);
+  public void setDestination(T destination);
 
-  public String getDestination();
-
+  public T getDestination();
 }

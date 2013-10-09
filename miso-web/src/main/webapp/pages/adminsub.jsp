@@ -61,6 +61,7 @@
   <h2>Print Jobs</h2>
   <ul class="bullets">
     <li><a href="<c:url value="/miso/printjobs"/>">My Print Jobs</a></li>
+    <li><a href="<c:url value="/miso/custombarcode"/>">Custom Barcode Printing</a></li>
     <sec:authorize access="hasRole('ROLE_ADMIN')">
       <li><a href="<c:url value="/miso/admin/configuration/printers"/>">Printers</a></li>
     </sec:authorize>

@@ -32,6 +32,7 @@
 <div id="maincontent">
   <div id="contentcolumn">
     <h1>Create Pool Wizard</h1>
+
     <div class="breadcrumbs">
       <ul>
         <li><a href='<c:url value="/"/>'>Home</a></li>
@@ -49,7 +50,6 @@
 
     <div id="studyTriggerDiv">
       <input id="newStudyTrigger" type="radio" onchange="jQuery('#newStudyForm').slideToggle();"/> Create a new Study
-      <%-- <input id="selectStudyTrigger" type="radio" onchange="jQuery('#selectStudyForm').slideToggle();"/> Select an existing Study --%>
     </div>
     <div id="newStudyForm" style="display:none;">
       <button onClick="addStudy('newStudy');"
@@ -75,14 +75,6 @@
       </form>
       <br/>
     </div>
-      <%--
-    <div id="selectStudyForm" style="display:none;">
-        <form:select id="studies" path="study">
-          <form:option value="" label="Select study..."/>
-          <form:options items="${existingStudies}" itemLabel="alias" itemValue="studyId"/>
-        </form:select>
-    </div>
-      --%>
     <hr/>
     <br/>
     This system will create <b>ONE</b> pool for each of the selected dilutions below:
@@ -93,7 +85,8 @@
       <tr>
         <td>Platform Type:</td>
         <td>
-          <select id="platformType" name="platformType" onchange="selectDilutionsByPlatform();">${platforms}</select>
+          <select id="platformType" name="platformType"
+                  onchange="selectDilutionsByPlatform();">${platforms}</select>
         </td>
       </tr>
       <tr>
@@ -118,63 +111,64 @@
     </table>
 
     <h1>
-        <div id="qcsTotalCount">
-        </div>
+      <div id="qcsTotalCount">
+      </div>
     </h1>
     <ul class="sddm">
-        <li><a
-                onmouseover="mopen('qcmenu')"
-                onmouseout="mclosetime()">Options <span style="float:right"
-                                                        class="ui-icon ui-icon-triangle-1-s"></span></a>
+      <li>
+        <a onmouseover="mopen('qcmenu')" onmouseout="mclosetime()">Options
+          <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
+        </a>
 
-            <div id="qcmenu"
-                 onmouseover="mcancelclosetime()"
-                 onmouseout="mclosetime()">
-                <a href='javascript:void(0);' class="add"
-                   onclick="Pool.wizard.insertPoolQCRow(); return false;">Add Pool QC</a>
-            </div>
-        </li>
+        <div id="qcmenu"
+             onmouseover="mcancelclosetime()"
+             onmouseout="mclosetime()">
+          <a href='javascript:void(0);' class="add"
+             onclick="Pool.wizard.insertPoolQCRow(); return false;">Add Pool QC</a>
+        </div>
+      </li>
     </ul>
     <span style="clear:both">
       <div id="addPoolQC"></div>
       <div id='addQcForm'>
-          <table class="list" id="poolQcTable">
-              <thead>
-              <tr>
-                  <th>QC Date</th>
-                  <th>Method</th>
-                  <th>Results</th>
-              </tr>
-              </thead>
-              <tbody>
-              <c:if test="${not empty pool.poolQCs}">
-                  <c:forEach items="${pool.poolQCs}" var="qc">
-                      <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-                          <td>${qc.qcCreator}</td>
-                          <td><fmt:formatDate value="${qc.qcDate}"/></td>
-                          <td>${qc.qcType.name}</td>
-                          <td id="result${qc.id}">${qc.results} ${qc.qcType.units}</td>
-                          <c:if test="${(library.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
+        <table class="list" id="poolQcTable">
+          <thead>
+          <tr>
+            <th>QC Date</th>
+            <th>Method</th>
+            <th>Results</th>
+          </tr>
+          </thead>
+          <tbody>
+          <c:if test="${not empty pool.poolQCs}">
+            <c:forEach items="${pool.poolQCs}" var="qc">
+              <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
+                <td>${qc.qcCreator}</td>
+                <td><fmt:formatDate value="${qc.qcDate}"/></td>
+                <td>${qc.qcType.name}</td>
+                <td id="result${qc.id}">${qc.results} ${qc.qcType.units}</td>
+                <c:if test="${(library.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                                           or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-                              <td id="edit${qc.id}" align="center"><a href="javascript:void(0);" onclick="Pool.qc.changePoolQCRow('${qc.id}','${pool.id}')">
-                                  <span class="ui-icon ui-icon-pencil"></span></a></td>
-                          </c:if>
-                      </tr>
-                  </c:forEach>
-              </c:if>
-              </tbody>
-          </table>
-          <input type='hidden' id='qcPoolId' name='id' value='${pool.id}'/>
+                  <td id="edit${qc.id}" align="center"><a href="javascript:void(0);"
+                                                          onclick="Pool.qc.changePoolQCRow('${qc.id}','${pool.id}')">
+                    <span class="ui-icon ui-icon-pencil"></span></a></td>
+                </c:if>
+              </tr>
+            </c:forEach>
+          </c:if>
+          </tbody>
+        </table>
+        <input type='hidden' id='qcPoolId' name='id' value='${pool.id}'/>
       </div>
       <script type="text/javascript">
-          jQuery(document).ready(function() {
-              jQuery("#poolQcTable").tablesorter({
-                  headers: {
-                  }
-              });
-
-              jQuery('#qcsTotalCount').html(jQuery('#poolQcTable>tbody>tr:visible').length.toString() + " QCs");
+        jQuery(document).ready(function () {
+          jQuery("#poolQcTable").tablesorter({
+            headers: {
+            }
           });
+
+          jQuery('#qcsTotalCount').html(jQuery('#poolQcTable>tbody>tr:visible').length.toString() + " QCs");
+        });
       </script>
     </span>
 
@@ -184,16 +178,21 @@
         <td width="50%" valign="top">
           <div class="simplebox ui-corner-all">
             <h2>Available Poolables</h2>
+            <button id="selectallbutton" onClick="selectallrows();"
+                    class="ui-state-default ui-corner-all">Select All
+            </button>
+            <button id="selectnonebutton" onClick="selectnorow();"
+                    class=" ui-state-default ui-corner-all">Select None
+            </button>
+
             <button id="createPoolButton" onClick="createNewPool();"
                     class="fg-button ui-state-default ui-corner-all">Create New Pool
             </button>
             <table id="dlTable" class="display">
               <thead>
               <tr>
-                <th>Select <span sel="none" header="select" class="ui-icon ui-icon-arrowstop-1-s" style="float:right"
-                                 onclick="DatatableUtils.toggleSelectAll('#dlTable', this);"></span>
+                <th>Dilution ID
                 </th>
-                <th>Dilution ID</th>
                 <th>Dilution Name</th>
                 <th>Parent Library</th>
                 <th>Description</th>
@@ -214,11 +213,14 @@
       </tr>
       </tbody>
     </table>
-    </div>
+  </div>
 </div>
 
 <script type="text/javascript">
-  var headers = ['rowsel','dilutionId','dilutionName','library','description','libraryBarcode'];
+  var ldselected = [];
+  var dilutions;
+  var oTable;
+  var headers = ['dilutionId', 'dilutionName', 'library', 'description', 'libraryBarcode'];
 
   function addStudy(form) {
     if (jQuery('#studyDescription').val() == "") {
@@ -226,41 +228,33 @@
     }
     else {
       Fluxion.doAjax(
-              'poolWizardControllerHelperService',
-              'addStudy',
-      {'form':jQuery('#' + form).serializeArray(), 'projectId':${project.id}, 'url':ajaxurl},
-      {'doOnSuccess':function(json) {
-        jQuery('#newStudyForm').html(json.html);
-        jQuery('#studyTriggerDiv').html("");
-      }
+        'poolWizardControllerHelperService',
+        'addStudy',
+        {'form': jQuery('#' + form).serializeArray(), 'projectId':${project.id}, 'url': ajaxurl},
+        {'doOnSuccess': function (json) {
+          jQuery('#newStudyForm').html(json.html);
+          jQuery('#studyTriggerDiv').html("");
+        }
       });
     }
   }
 
   function selectDilutionsByPlatform() {
+    dilutions = [];
     Fluxion.doAjax(
-            'poolWizardControllerHelperService',
-            'populateDilutions',
-    {'platformType':jQuery('#platformType').val(), 'projectId':${project.id}, 'url':ajaxurl},
-    {'doOnSuccess':function(json) {
-      var table = jQuery('#dlTable').dataTable();
-      table.fnClearTable();
-
-      jQuery.each(json.dilutions, function(index, value) {
-        var a = table.fnAddData(["",value.id, value.name, value.library, value.description, value.libraryBarcode]);
-        var nTr = table.fnSettings().aoData[a[0]].nTr;
-        jQuery(nTr.cells[0]).addClass("rowSelect");
-      });
-
-      jQuery('#dlTable .rowSelect').click(function() {
-        if (jQuery(this).parent().hasClass('row_selected')) {
-          jQuery(this).parent().removeClass('row_selected');
-        }
-        else {
-          jQuery(this).parent().addClass('row_selected');
-        }
-      });
-    }
+      'poolWizardControllerHelperService',
+      'populateDilutions',
+      {'platformType': jQuery('#platformType').val(), 'projectId':${project.id}, 'url': ajaxurl},
+      {'doOnSuccess': function (json) {
+        var table = jQuery('#dlTable').dataTable();
+        table.fnClearTable();
+        dilutions = json.dilutions;
+        jQuery.each(dilutions, function (index, value) {
+          var a = table.fnAddData([value.id, value.name, value.library, value.description, value.libraryBarcode]);
+          var nTr = table.fnSettings().aoData[a[0]].nTr;
+        });
+        ldselected = [];
+      }
     });
   }
 
@@ -272,94 +266,132 @@
       jQuery('#createPoolButton').attr('disabled', 'disabled');
       jQuery('#createPoolButton').html("Processing...");
 
-      var table = jQuery('#dlTable').dataTable();
-      var nodes = DatatableUtils.fnGetSelected(table);
-      var arr = [];
-      for (var i = 0; i < nodes.length; i++) {
-        var obj = {};
-        for (var j = 1; j < (nodes[i].cells.length); j++) {
-            obj[headers[j]] = jQuery(nodes[i].cells[j]).text();
-        }
-        arr.push(JSON.stringify(obj));
-      }
-
       Fluxion.doAjax(
-              'poolWizardControllerHelperService',
-              'addPool',
-      {'dilutions':"[" + arr.join(',') + "]",
-       'platformType':jQuery('#platformType').val(),
-       'alias':jQuery('#alias').val(),
-       'concentration':jQuery('#concentration').val(),
-       'qcs':Utils.mappifyTable('poolQcTable'),
-       'url':ajaxurl },
-      {'doOnSuccess':function(json) {
-        jQuery('#poolResult').append(json.html);
-        if (jQuery("#removeDilutions").attr('checked')) {
-          for (var i = 0; i < nodes.length; i++) {
-            table.fnDeleteRow(nodes[i]);
+        'poolWizardControllerHelperService',
+        'addPool',
+        {'dilutions': ldselected,
+          'platformType': jQuery('#platformType').val(),
+          'alias': jQuery('#alias').val(),
+          'concentration': jQuery('#concentration').val(),
+          'qcs': Utils.mappifyTable('poolQcTable'),
+          'url': ajaxurl},
+        {'doOnSuccess': function (json) {
+          jQuery('#poolResult').append(json.html);
+          if (jQuery("#removeDilutions").attr('checked')) {
+            var anSelected = fnGetSelected(oTable);
+            jQuery.each(anSelected, function (index, value) {
+              oTable.fnDeleteRow(value);
+            });
+
           }
+          jQuery('#concentration').val("");
+          jQuery('#alias').val("");
+          selectnorow();
+          jQuery('#createPoolButton').removeAttr('disabled');
+          jQuery('#createPoolButton').html("Create New Pool");
+        },
+        'doOnError': function (json) {
+          alert(json.error);
+          jQuery('#createPoolButton').removeAttr('disabled');
+          jQuery('#createPoolButton').html("Create New Pool");
         }
-        jQuery('#concentration').val("");
-        jQuery('#alias').val("");
-        jQuery('#createPoolButton').removeAttr('disabled');
-        jQuery('#createPoolButton').html("Create New Pool");
-      },
-      'doOnError':function(json) {
-        alert(json.error);
-        jQuery('#createPoolButton').removeAttr('disabled');
-        jQuery('#createPoolButton').html("Create New Pool");
-      }
       });
     }
   }
 
-  jQuery(document).ready(function() {
-    Fluxion.doAjax(
-            'poolWizardControllerHelperService',
-            'populateDilutions',
-    {'platformType':"Illumina", 'projectId':${project.id}, 'url':ajaxurl},
-    {'doOnSuccess':function(json) {
-      var table = jQuery('#dlTable').dataTable({
-        "aoColumnDefs": [
-          {
-            "bUseRendered": false,
-            "aTargets": [ 0 ]
-          }
-        ],
-        "aaSorting": [ [2,'asc'] ],
-        "aoColumns": [
-          null,
-          null,
-          { "sType": 'natural' },
-          { "sType": 'natural' },
-          { "sType": 'natural' },
-          { "sType": 'natural' }
-        ],
-        "iDisplayLength": 50,
-        "bInfo": true,
-        "bJQueryUI": true,
-        "bAutoWidth": true,
-        "bFilter": true,
-        "sDom": '<<"toolbar">f>r<t>ip>'
-      });
+  function fnGetSelected(oTableLocal) {
+    var aReturn = new Array();
+    var aTrs = oTableLocal.fnGetNodes();
 
-      jQuery.each(json.dilutions, function(index, value) {
-        var a = table.fnAddData(["",value.id, value.name, value.library, value.description, value.libraryBarcode]);
-        var nTr = table.fnSettings().aoData[a[0]].nTr;
-        jQuery(nTr.cells[0]).addClass("rowSelect");
-      });
-
-      jQuery('#dlTable .rowSelect').click(function() {
-        if (jQuery(this).parent().hasClass('row_selected')) {
-          jQuery(this).parent().removeClass('row_selected');
-        }
-        else {
-          jQuery(this).parent().addClass('row_selected');
-        }
-      });
+    for (var i = 0; i < aTrs.length; i++) {
+      if (jQuery(aTrs[i]).hasClass('row_selected')) {
+        aReturn.push(aTrs[i]);
+      }
     }
+    return aReturn;
+  }
+
+  jQuery(document).ready(function () {
+    Fluxion.doAjax(
+      'poolWizardControllerHelperService',
+      'populateDilutions',
+      {'platformType': "Illumina", 'projectId':${project.id}, 'url': ajaxurl},
+      {'doOnSuccess': function (json) {
+        oTable = jQuery('#dlTable').dataTable({
+          "aoColumnDefs": [
+            {
+              "bUseRendered": false,
+              "aTargets": [ 0 ]
+            }
+          ],
+          "aaSorting": [
+            [1, 'asc']
+          ],
+          "aoColumns": [
+            null,
+            { "sType": 'natural' },
+            { "sType": 'natural' },
+            { "sType": 'natural' },
+            { "sType": 'natural' }
+          ],
+          "fnRowCallback": function (nRow, aData, iDisplayIndex) {
+            if (jQuery.inArray(aData[0], ldselected) != -1) {
+              jQuery(nRow).addClass('row_selected');
+            }
+            return nRow;
+          },
+          "iDisplayLength": 50,
+          "bInfo": true,
+          "bJQueryUI": true,
+          "bAutoWidth": true,
+          "bFilter": true,
+          "sDom": '<<"toolbar">f>r<t>ip>'
+        });
+        dilutions = json.dilutions;
+
+        jQuery.each(dilutions, function (index, value) {
+          var a = oTable.fnAddData([value.id, value.name, value.library, value.description, value.libraryBarcode]);
+          var nTr = oTable.fnSettings().aoData[a[0]].nTr;
+        });
+      }
+    });
+
+    /* Click event handler */
+    jQuery('#dlTable tbody tr').live('click', function () {
+      var aData = oTable.fnGetData(this);
+      var iId = aData[0];
+
+      if (jQuery.inArray(iId, ldselected) == -1) {
+        ldselected[ldselected.length++] = iId;
+      }
+      else {
+        ldselected = jQuery.grep(ldselected, function (value) {
+          return value != iId;
+        });
+      }
+      jQuery(this).toggleClass('row_selected');
     });
   });
+
+  function selectallrows() {
+    jQuery.each(dilutions, function (index, value) {
+      if (jQuery.inArray(value.id, ldselected) == -1) {
+        ldselected[ldselected.length++] = value.id;
+      }
+    });
+    jQuery.each(jQuery('#dlTable tbody tr'), function (index, value) {
+      jQuery(this).addClass('row_selected');
+    });
+  }
+
+  function selectnorow() {
+    ldselected = [];
+    jQuery.each(jQuery('#dlTable tbody tr'), function (index, value) {
+      var aData = oTable.fnGetData(this);
+      var iId = aData[0];
+      jQuery(this).removeClass('row_selected');
+    });
+  }
 </script>
 
 <%@ include file="adminsub.jsp" %>

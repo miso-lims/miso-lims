@@ -75,8 +75,8 @@
       <script type="text/javascript">
         jQuery(document).ready(function() {
           jQuery("#runStatusTable").tablesorter({
-                                                  headers: { }
-                                                });
+            headers: { }
+          });
         });
 
         jQuery(function() {
@@ -87,10 +87,10 @@
           });
 
           jQuery('#filter-form').submit(
-                  function() {
-                    theTable.find("tbody > tr:visible > td:eq(1)").mousedown();
-                    return false;
-                  }).focus(); //Give focus to input field
+            function() {
+              theTable.find("tbody > tr:visible > td:eq(1)").mousedown();
+              return false;
+            }).focus(); //Give focus to input field
         });
       </script>
     </c:if>
@@ -209,8 +209,6 @@
         </c:if>
       </c:otherwise>
     </c:choose>
-
-
   </div>
 </div>
 

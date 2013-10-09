@@ -55,7 +55,7 @@ public class IntegrationUtils {
     }
     catch (IOException e) {
       e.printStackTrace();
-      throw new IntegrationException(e.getMessage());
+      throw new IntegrationException("Cannot connect to "+host+":"+port+". Cause: "+e.getMessage());
     }
   }
 

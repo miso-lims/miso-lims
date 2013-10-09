@@ -39,9 +39,7 @@ public interface TransferMethod {
    * Uploads sequence Datafiles
    *
    * @param dataFiles  set of datafiles
-   * @return Object response
+   * @return UploadReport response
    */
   public UploadReport uploadSequenceData(Set<File> dataFiles, EndPoint endpoint) throws SubmissionException;
-
-
 }

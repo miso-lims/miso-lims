@@ -54,11 +54,11 @@ Plate.barcode = {
       {
         'doOnSuccess':function (json) {
           jQuery('#printServiceSelectDialog')
-                  .html("<form>" +
-                        "<fieldset class='dialog'>" +
-                        "<select name='serviceSelect' id='serviceSelect' class='ui-widget-content ui-corner-all'>" +
-                        json.services +
-                        "</select></fieldset></form>");
+            .html("<form>" +
+                  "<fieldset class='dialog'>" +
+                  "<select name='serviceSelect' id='serviceSelect' class='ui-widget-content ui-corner-all'>" +
+                  json.services +
+                  "</select></fieldset></form>");
 
           jQuery(function() {
             jQuery('#printServiceSelectDialog').dialog({
@@ -114,28 +114,28 @@ Plate.barcode = {
   showPlateLocationChangeDialog : function(plateId) {
     var self = this;
     jQuery('#changePlateLocationDialog')
-            .html("<form>" +
-                  "<fieldset class='dialog'>" +
-                  "<label for='notetext'>New Location:</label>" +
-                  "<input type='text' name='locationBarcode' id='locationBarcode' class='text ui-widget-content ui-corner-all'/>" +
-                  "</fieldset></form>");
+      .html("<form>" +
+            "<fieldset class='dialog'>" +
+            "<label for='notetext'>New Location:</label>" +
+            "<input type='text' name='locationBarcode' id='locationBarcode' class='text ui-widget-content ui-corner-all'/>" +
+            "</fieldset></form>");
 
     jQuery(function() {
-        jQuery('#changePlateLocationDialog').dialog({
-            autoOpen: false,
-            width: 400,
-            modal: true,
-            resizable: false,
-            buttons: {
-                "Save": function() {
-                    self.changePlateLocation(plateId, jQuery('#locationBarcode').val());
-                    jQuery(this).dialog('close');
-                },
-                "Cancel": function() {
-                    jQuery(this).dialog('close');
-                }
-            }
-        });
+      jQuery('#changePlateLocationDialog').dialog({
+        autoOpen: false,
+        width: 400,
+        modal: true,
+        resizable: false,
+        buttons: {
+          "Save": function() {
+            self.changePlateLocation(plateId, jQuery('#locationBarcode').val());
+            jQuery(this).dialog('close');
+          },
+          "Cancel": function() {
+            jQuery(this).dialog('close');
+          }
+        }
+      });
     });
     jQuery('#changePlateLocationDialog').dialog('open');
   },
@@ -203,10 +203,10 @@ Plate.ui = {
   processPlateUpload : function(frameId) {
     var iframe = document.getElementById(frameId);
     var iframedoc = iframe.document;
-        if (iframe.contentDocument)
-            iframedoc = iframe.contentDocument;
-        else if (iframe.contentWindow)
-            iframedoc = iframe.contentWindow.document;
+    if (iframe.contentDocument)
+        iframedoc = iframe.contentDocument;
+    else if (iframe.contentWindow)
+        iframedoc = iframe.contentWindow.document;
     var response = jQuery(iframedoc).contents().find('body:first').find('#uploadresponsebody').val();
     if(!Utils.validation.isNullCheck(response)) {
       var json = jQuery.parseJSON(response);
@@ -258,10 +258,10 @@ Plate.ui = {
     Utils.ui.disableButton("saveImportedElementsButton");
     var iframe = document.getElementById(frameId);
     var iframedoc = iframe.document;
-        if (iframe.contentDocument)
-            iframedoc = iframe.contentDocument;
-        else if (iframe.contentWindow)
-            iframedoc = iframe.contentWindow.document;
+    if (iframe.contentDocument)
+        iframedoc = iframe.contentDocument;
+    else if (iframe.contentWindow)
+        iframedoc = iframe.contentWindow.document;
     var response = jQuery(iframedoc).contents().find('body:first').find('#uploadresponsebody').val();
     if(!Utils.validation.isNullCheck(response)) {
       var json = jQuery.parseJSON(response);

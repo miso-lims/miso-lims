@@ -120,8 +120,9 @@ public class EditExperimentController {
 
   @RequestMapping(value = "/rest/{experimentId}", method = RequestMethod.GET)
   public @ResponseBody Experiment jsonRest(@PathVariable Long experimentId) throws IOException {
-      return requestManager.getExperimentById(experimentId);
+    return requestManager.getExperimentById(experimentId);
   }
+
   @RequestMapping(value = "/{experimentId}", method = RequestMethod.GET)
   public ModelAndView setupForm(@PathVariable Long experimentId,
                                 ModelMap model) throws IOException {
@@ -182,18 +183,19 @@ public class EditExperimentController {
         throw new SecurityException("Permission denied.");
       }
 
-        if (studyId != null) {
-            Study study = requestManager.getStudyById(studyId);
-            model.addAttribute("study", study);
-            experiment.setStudy(study);
-            if (Arrays.asList(user.getRoles()).contains("ROLE_TECH")) {
-                SecurityProfile sp = new SecurityProfile(user);
-                LimsUtils.inheritUsersAndGroups(experiment, study.getSecurityProfile());
-                experiment.setSecurityProfile(sp);
-            } else {
-                experiment.inheritPermissions(study);
-            }
+      if (studyId != null) {
+        Study study = requestManager.getStudyById(studyId);
+        model.addAttribute("study", study);
+        experiment.setStudy(study);
+        if (Arrays.asList(user.getRoles()).contains("ROLE_TECH")) {
+          SecurityProfile sp = new SecurityProfile(user);
+          LimsUtils.inheritUsersAndGroups(experiment, study.getSecurityProfile());
+          experiment.setSecurityProfile(sp);
         }
+        else {
+          experiment.inheritPermissions(study);
+        }
+      }
 
       model.put("formObj", experiment);
       model.put("experiment", experiment);

@@ -57,6 +57,7 @@
         <span id="msgspan"></span>
 
         <h2>Sample Information</h2>
+
         <div id="sample_pan"></div>
         <br/>
         <br/>
@@ -66,11 +67,11 @@
   </div>
 </div>
 <script type="text/javascript">
-  jQuery('#searchSampleByBarcode').keypress(function(e) {
+  jQuery('#searchSampleByBarcode').keypress(function (e) {
     if (e.which == 13) return false;
   });
 
-  Utils.timer.typewatchFunc(jQuery('#searchSampleByBarcode'), function() {
+  Utils.timer.typewatchFunc(jQuery('#searchSampleByBarcode'), function () {
     Sample.ui.receiveSample(jQuery('#searchSampleByBarcode'));
   }, 400, 4);
 </script>

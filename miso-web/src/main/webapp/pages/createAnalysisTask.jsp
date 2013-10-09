@@ -29,7 +29,7 @@
 
 <h1>
   New Analysis Task
-  <input type="button" value="Submit Task" class="fg-button ui-state-default ui-corner-all" onclick="Tasks.job.submitAnalysisTask();"/>
+  <input id="submitTaskButton" type="button" value="Submit Task" class="fg-button ui-state-default ui-corner-all" onclick="Tasks.job.submitAnalysisTask();"/>
 </h1>
 
 <c:if test="${not empty run}">

@@ -33,8 +33,8 @@
 
   <!-- analysis server -->
   <bean name="analysisQueryService" class="uk.ac.bbsrc.tgac.miso.integration.AnalysisQueryService">
-    <property name="analysisServerHost" value="${analysisServerHost}"/>
-    <property name="analysisServerPort" value="${analysisServerPort}"/>
+    <property name="analysisServerHost" value="${miso.analysis.server.host}"/>
+    <property name="analysisServerPort" value="${miso.analysis.server.port}"/>
   </bean>
 
   <bean name="notificationConsumerService" class="uk.ac.bbsrc.tgac.miso.core.service.integration.MisoNotificationConsumerService"/>
