@@ -1076,7 +1076,8 @@
             [3, 'asc']
           ],
           "aoColumns": [
-            null,
+            { "sType": 'natural' },
+            { "sType": 'natural' },
             null,
             null,
             null,
