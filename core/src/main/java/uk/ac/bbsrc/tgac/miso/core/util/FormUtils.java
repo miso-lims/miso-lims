@@ -25,6 +25,8 @@ package uk.ac.bbsrc.tgac.miso.core.util;
 
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -42,6 +44,7 @@ import org.odftoolkit.odfdom.dom.element.table.TableTableRowElement;
 import org.odftoolkit.odfdom.incubator.doc.text.OdfTextParagraph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Node;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.*;
@@ -69,6 +72,7 @@ import java.util.regex.Pattern;
  * @since 0.1.1
  */
 public class FormUtils {
+
   protected static final Logger log = LoggerFactory.getLogger(FormUtils.class);
 
   private static final Pattern digitPattern = Pattern.compile("(^[0-9]+)[\\.0-9]*");
@@ -132,6 +136,40 @@ public class FormUtils {
     else {
       throw new IllegalArgumentException("Can only produce plate input forms in ods or xlsx formats.");
     }
+  }
+
+  public static void createPlateExportForm(File outpath, JSONArray jsonArray) throws Exception {
+    InputStream in = null;
+    in = FormUtils.class.getResourceAsStream("/forms/ods/plate_input.xlsx");
+    if (in != null) {
+      XSSFWorkbook oDoc = new XSSFWorkbook(in);
+
+      XSSFSheet sheet = oDoc.getSheet("Input");
+      FileOutputStream fileOut = new FileOutputStream(outpath);
+      int i=4;
+      for (JSONObject jsonObject : (Iterable<JSONObject>) jsonArray) {
+        String sampleinwell = jsonObject.getString("value");
+        //"sampleid:wellid:samplealias:projectname"
+        String sampleId = sampleinwell.split(":")[0];
+        String wellId = sampleinwell.split(":")[1];
+        String sampleAlias = sampleinwell.split(":")[2];
+        String projectName = sampleinwell.split(":")[3];
+        XSSFRow row = sheet.createRow(i);
+        XSSFCell cellA = row.createCell(0);
+        cellA.setCellValue(wellId);
+        XSSFCell cellB = row.createCell(1);
+        cellB.setCellValue(projectName);
+        XSSFCell cellC = row.createCell(2);
+        cellC.setCellValue(sampleAlias);
+        i++;
+      }
+      oDoc.write(fileOut);
+      fileOut.close();
+    }
+    else {
+      throw new IOException("Could not read from resource.");
+    }
+
   }
 
   //private static Map<String, Pool<Plate<LinkedList<Library>, Library>>> process384PlateInputODS(OdfSpreadsheetDocument oDoc, User u, RequestManager manager, MisoNamingScheme<Library> libraryNamingScheme) throws Exception {

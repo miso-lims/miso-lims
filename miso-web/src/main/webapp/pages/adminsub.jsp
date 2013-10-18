@@ -36,6 +36,7 @@
   <ul class="bullets">
     <li><a href="<c:url value="/miso/sample/receipt"/>">Receive Samples</a></li>
     <li><a href="<c:url value="/miso/plate/import"/>">Import Plate Sheet</a></li>
+    <li><a href="<c:url value="/miso/plate/export"/>">Export Plate Sheet</a></li>
   </ul>
 
   <h2>Sequencing</h2>

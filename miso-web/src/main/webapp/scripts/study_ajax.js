@@ -25,13 +25,13 @@ var Study = Study || {
   deleteStudy : function(studyId, successfunc) {
     if (confirm("Are you sure you really want to delete STU" + studyId + "? This operation is permanent!")) {
       Fluxion.doAjax(
-              'studyControllerHelperService',
-              'deleteStudy',
-              {'studyId':studyId, 'url':ajaxurl},
-              {'doOnSuccess':function(json) {
-                successfunc();
-              }
-              });
+        'studyControllerHelperService',
+        'deleteStudy',
+        {'studyId':studyId, 'url':ajaxurl},
+        {'doOnSuccess':function(json) {
+          successfunc();
+        }
+      });
     }
   }
 };
@@ -50,30 +50,30 @@ Study.ui = {
       return ((a < b) ? 1 : ((a > b) ? -1 : 0));
     };
     Fluxion.doAjax(
-            'studyControllerHelperService',
-            'listStudiesDataTable',
-            {
-              'url':ajaxurl
-            },
-            {'doOnSuccess': function(json) {
-              jQuery('#listingStudiesTable').html('');
-              jQuery('#listingStudiesTable').dataTable({
-                                                         "aaData": json.array,
-                                                         "aoColumns": [
-                                                           { "sTitle": "Study Name", "sType":"no-stu"},
-                                                           { "sTitle": "Alias"},
-                                                           { "sTitle": "Description"},
-                                                           { "sTitle": "Type"},
-                                                           { "sTitle": "Edit"}
-                                                         ],
-                                                         "bJQueryUI": true,
-                                                         "iDisplayLength":  25,
-                                                         "aaSorting":[
-                                                           [0,"desc"]
-                                                         ]
-                                                       });
-            }
-            }
+      'studyControllerHelperService',
+      'listStudiesDataTable',
+      {
+        'url':ajaxurl
+      },
+      {'doOnSuccess': function(json) {
+        jQuery('#listingStudiesTable').html('');
+        jQuery('#listingStudiesTable').dataTable({
+          "aaData": json.array,
+          "aoColumns": [
+            { "sTitle": "Study Name", "sType":"no-stu"},
+            { "sTitle": "Alias"},
+            { "sTitle": "Description"},
+            { "sTitle": "Type"},
+            { "sTitle": "Edit"}
+          ],
+          "bJQueryUI": true,
+          "iDisplayLength":  25,
+          "aaSorting":[
+            [0,"desc"]
+          ]
+        });
+      }
+      }
     );
   }
 };

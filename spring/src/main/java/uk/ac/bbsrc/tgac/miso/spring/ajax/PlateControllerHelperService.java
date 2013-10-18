@@ -84,7 +84,7 @@ public class PlateControllerHelperService {
 
   public JSONObject getPlateBarcode(HttpSession session, JSONObject json) {
     Long plateId = json.getLong("plateId");
-    File temploc = new File(session.getServletContext().getRealPath("/")+"temp/");
+    File temploc = new File(session.getServletContext().getRealPath("/") + "temp/");
     try {
       //Plate<LinkedList<Plateable>, Plateable> plate = requestManager.<LinkedList<Plateable>, Plateable> getPlateById(plateId);
       Plate<? extends List<? extends Plateable>, ? extends Plateable> plate = requestManager.getPlateById(plateId);
@@ -102,7 +102,7 @@ public class PlateControllerHelperService {
           bi = barcodeFactory.generateBarcode(plate, bg, dim);
         }
         else {
-          return JSONUtils.SimpleJSONError("'"+json.getString("barcodeGenerator") + "' is not a valid barcode generator type");
+          return JSONUtils.SimpleJSONError("'" + json.getString("barcodeGenerator") + "' is not a valid barcode generator type");
         }
       }
       else {
@@ -131,7 +131,9 @@ public class PlateControllerHelperService {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
 
       String serviceName = null;
-      if (json.has("serviceName")) { serviceName = json.getString("serviceName"); }
+      if (json.has("serviceName")) {
+        serviceName = json.getString("serviceName");
+      }
 
       MisoPrintService<File, Barcodable, PrintContext<File>> mps = null;
       if (serviceName == null) {
@@ -153,13 +155,13 @@ public class PlateControllerHelperService {
         try {
           Long plateId = s.getLong("plateId");
           //Plate<LinkedList<Plateable>, Plateable>  plate = requestManager.<LinkedList<Plateable>, Plateable> getPlateById(plateId);
-          Plate<? extends List<? extends Plateable>, ? extends Plateable>  plate = requestManager.getPlateById(plateId);
+          Plate<? extends List<? extends Plateable>, ? extends Plateable> plate = requestManager.getPlateById(plateId);
           //autosave the barcode if none has been previously generated
           if (plate.getIdentificationBarcode() == null || "".equals(plate.getIdentificationBarcode())) {
             requestManager.savePlate(plate);
           }
           File f = mps.getLabelFor(plate);
-          if (f!=null) thingsToPrint.add(f);
+          if (f != null) thingsToPrint.add(f);
         }
         catch (IOException e) {
           e.printStackTrace();
@@ -238,9 +240,9 @@ public class PlateControllerHelperService {
       String documentFormat = json.getString("documentFormat");
       try {
         File f = misoFileManager.getNewFile(
-                Plate.class,
-                "forms",
-                "PlateInputForm-" + LimsUtils.getCurrentDateAsString() + "." + documentFormat);
+            Plate.class,
+            "forms",
+            "PlateInputForm-" + LimsUtils.getCurrentDateAsString() + "." + documentFormat);
         FormUtils.createPlateInputSpreadsheet(f);
         return JSONUtils.SimpleJSONResponse("" + f.getName().hashCode());
       }
@@ -276,7 +278,8 @@ public class PlateControllerHelperService {
           for (JSONObject pool : (Iterable<JSONObject>) innerPoolList) {
             log.info(pool.toString());
 
-            PlatePool platePool = mapper.readValue(pool.toString(), new TypeReference<PlatePool>() {});
+            PlatePool platePool = mapper.readValue(pool.toString(), new TypeReference<PlatePool>() {
+            });
             currentPool = platePool;
 
             for (Plate<LinkedList<Library>, Library> plate : platePool.getPoolableElements()) {
@@ -363,7 +366,7 @@ public class PlateControllerHelperService {
         if (plate != null) {
           for (Plateable p : plate.getElements()) {
             if (p instanceof Library) {
-              Library l = (Library)p;
+              Library l = (Library) p;
               String strategyName = "No barcode";
 
               StringBuilder seqbuilder = new StringBuilder();
@@ -384,11 +387,11 @@ public class PlateControllerHelperService {
               }
 
               jsonArray.add("['" +
-                l.getName() + "','" +
-                l.getAlias() + "','" +
-                strategyName + "','" +
-                seqbuilder.toString() + "','" +
-                "<a href=\"/miso/library/" + l.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
+                            l.getName() + "','" +
+                            l.getAlias() + "','" +
+                            strategyName + "','" +
+                            seqbuilder.toString() + "','" +
+                            "<a href=\"/miso/library/" + l.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
             }
           }
         }
@@ -434,6 +437,63 @@ public class PlateControllerHelperService {
     else {
       return JSONUtils.SimpleJSONError("Only logged-in admins can delete objects.");
     }
+  }
+
+
+  public JSONObject searchSamples(HttpSession session, JSONObject json) {
+    String searchStr = json.getString("str");
+    try {
+      List<Sample> samples;
+      StringBuilder b = new StringBuilder();
+      if (!"".equals(searchStr)) {
+        samples = new ArrayList<Sample>(requestManager.listAllSamplesBySearch(searchStr));
+      }
+      else {
+        samples = new ArrayList<Sample>(requestManager.listAllSamplesWithLimit(250));
+      }
+
+      if (samples.size() > 0) {
+        Collections.sort(samples);
+        Collections.reverse(samples);
+        for (Sample s : samples) {
+          b.append("<div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" "
+                   + " " + "class=\"dashboard\">");
+          b.append("<input type=\"hidden\" id=\"" + s.getId() + "\" name=\"" + s.getName() + "\" projectname=\"" + s.getProject().getName() + "\" samplealias=\"" + s.getAlias() + "\"/>");
+          b.append("Name: <b>" + s.getName() + "</b><br/>");
+          b.append("Alias: <b>" + s.getAlias() + "</b><br/>");
+          b.append("</div>");
+        }
+      }
+      else {
+        b.append("No matches");
+      }
+      return JSONUtils.JSONObjectResponse("html", b.toString());
+    }
+    catch (IOException e) {
+      log.debug("Failed", e);
+      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
+    }
+  }
+
+  public JSONObject exportSampleForm(HttpSession session, JSONObject json) {
+//    if (json.has("projectId") && json.has("documentFormat")) {
+      try {
+        JSONArray a = JSONArray.fromObject(json.getString("form"));
+        File f = misoFileManager.getNewFile(
+            Plate.class,
+            "forms",
+            "PlateInputForm-" + LimsUtils.getCurrentDateAsString() + ".xlsx");
+        FormUtils.createPlateExportForm(f, a);
+        return JSONUtils.SimpleJSONResponse("" + f.getName().hashCode());
+      }
+      catch (Exception e) {
+        e.printStackTrace();
+        return JSONUtils.SimpleJSONError("Failed to get plate input form: " + e.getMessage());
+      }
+//    }
+//    else {
+//      return JSONUtils.SimpleJSONError("Missing project ID or document format supplied.");
+//    }
   }
 
   public void setSecurityManager(SecurityManager securityManager) {
