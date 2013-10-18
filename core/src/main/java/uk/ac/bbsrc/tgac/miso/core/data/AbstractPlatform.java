@@ -45,7 +45,7 @@ public abstract class AbstractPlatform implements Platform {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long platformId = AbstractPlatform.UNSAVED_ID;
+  private long platformId = AbstractPlatform.UNSAVED_ID;
 
   @OneToOne(targetEntity = AbstractRun.class, mappedBy = "platform")
   private Run run;

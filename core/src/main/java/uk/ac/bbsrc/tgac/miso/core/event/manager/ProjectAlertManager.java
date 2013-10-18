@@ -116,7 +116,7 @@ public class ProjectAlertManager {
         if (clone != null) {
           if (projects.containsKey(project.getId())) {
             if (clone.getProgress() != null) {
-              log.debug("Not replacing " + clone.getId() + ": " + clone.getProgress().name());
+              log.debug("Not replacing Project " + clone.getId() + ": " + clone.getProgress().name());
             }
           }
           else {
@@ -128,7 +128,7 @@ public class ProjectAlertManager {
 
             projects.put(project.getId(), clone);
             if (clone.getProgress() != null) {
-              log.debug("Queued " + clone.getId() + ": " + clone.getProgress().name());
+              log.debug("Queued Project " + clone.getId() + ": " + clone.getProgress().name());
             }
           }
         }

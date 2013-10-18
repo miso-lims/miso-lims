@@ -42,7 +42,7 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long containerId = AbstractSequencerPartitionContainer.UNSAVED_ID;
+  private long containerId = AbstractSequencerPartitionContainer.UNSAVED_ID;
 
   private String identificationBarcode;
   private String locationBarcode;

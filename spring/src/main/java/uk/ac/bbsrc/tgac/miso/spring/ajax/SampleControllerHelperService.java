@@ -30,8 +30,7 @@ import net.sf.json.JSONArray;
 import org.apache.commons.codec.binary.Base64;
 import org.krysalis.barcode4j.BarcodeDimension;
 import org.krysalis.barcode4j.BarcodeGenerator;
-import uk.ac.bbsrc.tgac.miso.core.data.PrintJob;
-import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.*;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import net.sf.json.JSONObject;
@@ -41,10 +40,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoPrintException;
@@ -190,10 +188,10 @@ public class SampleControllerHelperService {
         Set<Sample> samples = new HashSet<Sample>(requestManager.listAllSamples());
         // relative complement to find objects that aren't already persisted
         Set<Sample> complement = LimsUtils.relativeComplementByProperty(
-                Sample.class,
-                "getAlias",
-                saveSet,
-                samples);
+            Sample.class,
+            "getAlias",
+            saveSet,
+            samples);
 
         if (complement != null && !complement.isEmpty()) {
           List<Sample> sortedList = new ArrayList<Sample>(complement);
@@ -307,8 +305,13 @@ public class SampleControllerHelperService {
       if (json.has("sampleId") && !json.get("sampleId").equals("")) {
         Long sampleId = Long.parseLong(json.getString("sampleId"));
         Sample sample = requestManager.getSampleById(sampleId);
-        if (json.has("qcPassed") && json.getString("qcPassed").equals("true")) {
-          sample.setQcPassed(true);
+        if (json.get("qcPassed") != null) {
+          if ("true".equals(json.getString("qcPassed"))) {
+            sample.setQcPassed(true);
+          }
+          else if ("false".equals(json.getString("qcPassed"))) {
+            sample.setQcPassed(false);
+          }
         }
 
         SampleQC newQc = dataObjectFactory.getSampleQC();
@@ -395,12 +398,21 @@ public class SampleControllerHelperService {
       if (ok) {
         Map<String, Object> map = new HashMap<String, Object>();
         JSONArray a = new JSONArray();
+        JSONArray errors = new JSONArray();
         for (JSONObject qc : (Iterable<JSONObject>) qcs) {
           JSONObject j = addSampleQC(session, qc);
           j.put("sampleId", qc.getString("sampleId"));
-          a.add(j);
+          if (j.has("error")) {
+            errors.add(j);
+          }
+          else {
+            a.add(j);
+          }
         }
         map.put("saved", a);
+        if (!errors.isEmpty()) {
+          map.put("errors", errors);
+        }
         return JSONUtils.JSONObjectResponse(map);
       }
       else {
@@ -543,11 +555,14 @@ public class SampleControllerHelperService {
         serviceName = json.getString("serviceName");
       }
 
-      MisoPrintService<File, PrintContext<File>> mps = null;
+      MisoPrintService<File, Barcodable, PrintContext<File>> mps = null;
       if (serviceName == null) {
         Collection<MisoPrintService> services = printManager.listPrintServicesByBarcodeableClass(Sample.class);
         if (services.size() == 1) {
           mps = services.iterator().next();
+          if (mps == null) {
+            return JSONUtils.SimpleJSONError("Unable to resolve a print service for Samples. A service seems to be recognised but cannot be resolved.");
+          }
         }
         else {
           return JSONUtils.SimpleJSONError("No serviceName specified, but more than one available service able to print this barcode type.");
@@ -555,6 +570,9 @@ public class SampleControllerHelperService {
       }
       else {
         mps = printManager.getPrintService(serviceName);
+        if (mps == null) {
+          return JSONUtils.SimpleJSONError("Unable to resolve a print service for Samples with the name '" + serviceName + "'.");
+        }
       }
 
       Queue<File> thingsToPrint = new LinkedList<File>();
@@ -633,25 +651,33 @@ public class SampleControllerHelperService {
   }
 
   public JSONObject deleteSample(HttpSession session, JSONObject json) {
+    User user;
     try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      if (user.isAdmin()) {
-        if (json.has("sampleId")) {
-          Long sampleId = json.getLong("sampleId");
-          requestManager.deleteSample(requestManager.getSampleById(sampleId));
-          return JSONUtils.SimpleJSONResponse("Sample deleted");
-        }
-        else {
-          return JSONUtils.SimpleJSONError("No sample specified to delete.");
-        }
-      }
-      else {
-        return JSONUtils.SimpleJSONError("Only admins can delete objects.");
-      }
+      user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     }
     catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
+    }
+
+    if (user != null && user.isAdmin()) {
+      if (json.has("sampleId")) {
+        Long sampleId = json.getLong("sampleId");
+        try {
+          requestManager.deleteSample(requestManager.getSampleById(sampleId));
+          return JSONUtils.SimpleJSONResponse("Sample deleted");
+        }
+        catch (IOException e) {
+          e.printStackTrace();
+          return JSONUtils.SimpleJSONError("Cannot delete sample: " + e.getMessage());
+        }
+      }
+      else {
+        return JSONUtils.SimpleJSONError("No sample specified to delete.");
+      }
+    }
+    else {
+      return JSONUtils.SimpleJSONError("Only logged-in admins can delete objects.");
     }
   }
 

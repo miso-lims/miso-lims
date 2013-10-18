@@ -438,9 +438,10 @@ public class EraExperimentDecorator extends AbstractSubmittableDecorator<Documen
 //          cycleCount.setTextContent("120");
 //          type.appendChild(cycleCount);
 
-          Element sequenceLength = submission.createElementNS(null, "SEQUENCE_LENGTH");
-          sequenceLength.setTextContent("120");
-          type.appendChild(sequenceLength);
+//DEPRECATED SRA 1.5
+//          Element sequenceLength = submission.createElementNS(null, "SEQUENCE_LENGTH");
+//          sequenceLength.setTextContent("120");
+//          type.appendChild(sequenceLength);
         }
         else if (e.getPlatform().getPlatformType().equals(PlatformType.LS454)) {
           Element type = submission.createElementNS(null, "LS454");
@@ -450,6 +451,8 @@ public class EraExperimentDecorator extends AbstractSubmittableDecorator<Documen
           model.setTextContent(e.getPlatform().getInstrumentModel());
           type.appendChild(model);
 
+//DEPRECATED SRA 1.5
+          /*
           Element keySequence = submission.createElementNS(null, "KEY_SEQUENCE");
           if (relevantLibrary != null &&
               relevantLibrary.getLibraryType() != null &&
@@ -471,6 +474,7 @@ public class EraExperimentDecorator extends AbstractSubmittableDecorator<Documen
           //ls454 400bp (max 500?)
           flowCount.setTextContent("400");
           type.appendChild(flowCount);
+          */
         }
         else if (e.getPlatform().getPlatformType().equals(PlatformType.SOLID)) {
           Element type = submission.createElementNS(null, "ABI_SOLID");
@@ -479,7 +483,8 @@ public class EraExperimentDecorator extends AbstractSubmittableDecorator<Documen
           Element model = submission.createElementNS(null, "INSTRUMENT_MODEL");
           model.setTextContent(e.getPlatform().getInstrumentModel());
           type.appendChild(model);
-
+//DEPRECATED SRA 1.5
+          /*
           Element colourMatrix = submission.createElementNS(null, "COLOR_MATRIX");
           Element colour = submission.createElementNS(null, "COLOR");
           colour.setAttribute("dibase", "");
@@ -489,15 +494,16 @@ public class EraExperimentDecorator extends AbstractSubmittableDecorator<Documen
           Element colourMatrixCode = submission.createElementNS(null, "COLOR_MATRIX_CODE");
           type.appendChild(colourMatrixCode);
 
-//DEPRECATED SRA 1.2          
-//          Element cycleCount = submission.createElementNS(null, "CYCLE_COUNT");
-//          cycleCount.setTextContent("40");
-//          type.appendChild(cycleCount);
-
           Element sequenceLength = submission.createElementNS(null, "SEQUENCE_LENGTH");
           ////solid 40bp (max 50?)
           sequenceLength.setTextContent("40");
           type.appendChild(sequenceLength);
+          */
+
+//DEPRECATED SRA 1.2
+//          Element cycleCount = submission.createElementNS(null, "CYCLE_COUNT");
+//          cycleCount.setTextContent("40");
+//          type.appendChild(cycleCount);
         }
         else {
 

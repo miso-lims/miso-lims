@@ -47,6 +47,7 @@ import org.springframework.integration.transformer.MessageTransformingHandler;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.ws.pacbio.PacBioServiceWrapper;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.ws.solid.SolidServiceWrapper;
+import uk.ac.bbsrc.tgac.miso.notification.manager.NotificationRequestManager;
 import uk.ac.bbsrc.tgac.miso.notification.util.NotificationMessageEnricher;
 import uk.ac.bbsrc.tgac.miso.notification.util.NotificationUtils;
 import uk.ac.bbsrc.tgac.miso.tools.run.MultiFileQueueMessageSource;
@@ -86,6 +87,8 @@ public class DefaultNotifier {
 
       CompositeFileListFilter statusFilter = (CompositeFileListFilter) context.getBean("statusFilter");
 
+      Map<String, Set<File>> allDataPaths = new HashMap<String, Set<File>>();
+
       for (String platformType : PlatformType.getKeys()) {
         platformType = platformType.toLowerCase();
 
@@ -104,6 +107,8 @@ public class DefaultNotifier {
               log.debug("Added " + path);
             }
           }
+
+          allDataPaths.put(platformType, paths);
 
           if (platformType.equals("solid")) {
             for (String key : props.stringPropertyNames()) {
@@ -270,6 +275,10 @@ public class DefaultNotifier {
         else {
           log.warn("You have not specified a list of " + platformType + " paths to scan. Please add a " + platformType.toLowerCase() + ".dataPaths property in notification.properties if you wish to track this platform");
         }
+
+        NotificationRequestManager nrm = (NotificationRequestManager)context.getBean("notificationRequestManager");
+        nrm.setApplicationContext(context);
+        nrm.setDataPaths(allDataPaths);
       }
     }
     catch (FileNotFoundException e) {

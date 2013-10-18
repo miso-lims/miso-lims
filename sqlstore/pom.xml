@@ -28,7 +28,7 @@
   <parent>
     <artifactId>miso</artifactId>
     <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-    <version>0.1.9</version>
+    <version>0.2.0</version>
   </parent>
 
   <groupId>${parent.groupId}</groupId>
@@ -74,6 +74,7 @@
         <configuration>
           <source>1.6</source>
           <target>1.6</target>
+          <encoding>${project.build.sourceEncoding}</encoding>
         </configuration>
       </plugin>
 
@@ -131,14 +132,14 @@
       <layout>default</layout>
     </repository>
   </repositories>
+
   <dependencies>
     <dependency>
-        <groupId>org.aspectj</groupId>
-        <artifactId>aspectjweaver</artifactId>
-        <version>1.6.12</version>
-        <scope>test</scope>
+      <groupId>org.aspectj</groupId>
+      <artifactId>aspectjweaver</artifactId>
+      <version>1.6.12</version>
+      <scope>test</scope>
     </dependency>
-
 
     <dependency>
       <groupId>${parent.groupId}</groupId>
@@ -211,16 +212,11 @@
       <artifactId>ehcache-spring-annotations</artifactId>
       <version>1.2.0</version>
     </dependency>
-      <dependency>
-          <groupId>bouncycastle</groupId>
-          <artifactId>bcprov-jdk14</artifactId>
-          <version>138</version>
-      </dependency>
-      <dependency>
-          <groupId>bouncycastle</groupId>
-          <artifactId>bcprov-jdk14</artifactId>
-          <version>138</version>
-      </dependency>
+    <dependency>
+      <groupId>bouncycastle</groupId>
+      <artifactId>bcprov-jdk14</artifactId>
+      <version>138</version>
+    </dependency>
   </dependencies>
   <properties>
     <spring-version>3.1.3.RELEASE</spring-version>

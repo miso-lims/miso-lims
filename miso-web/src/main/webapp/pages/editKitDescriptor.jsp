@@ -22,86 +22,84 @@
   --%>
 <%@ include file="../header.jsp" %>
 <div id="maincontent">
-<div id="contentcolumn">
-<form:form action="/miso/kitdescriptor" method="POST" commandName="kitDescriptor" autocomplete="off" >
+  <div id="contentcolumn">
+    <form:form action="/miso/kitdescriptor" method="POST" commandName="kitDescriptor" autocomplete="off">
 
-  <sessionConversation:insertSessionConversationId attributeName="kitDescriptor"/>
+      <sessionConversation:insertSessionConversationId attributeName="kitDescriptor"/>
 
-    <h1><c:choose><c:when
-            test="${kitDescriptor.kitDescriptorId != 0}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose>
+      <h1><c:choose><c:when
+          test="${kitDescriptor.kitDescriptorId != 0}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose>
         Kit Descriptor
         <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
-    </h1>
-    <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
+      </h1>
+      <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
         <div id="note_arrowclick" class="toggleLeft"></div>
-    </div>
-    <div id="notediv" class="note" style="display:none;">Kit Descriptor contains information about Consumable
-    </div>
-    <h2>Kit Descriptor Information</h2>
-    <table class="in">
+      </div>
+      <div id="notediv" class="note" style="display:none;">Kit Descriptor contains information about Consumable
+      </div>
+      <h2>Kit Descriptor Information</h2>
+      <table class="in">
         <tr>
-            <td class="h">ID:</td>
-            <td>
-                <c:choose>
-                    <c:when test="${kitDescriptor.kitDescriptorId != 0}">${kitDescriptor.kitDescriptorId}</c:when>
-                    <c:otherwise><i>Unsaved</i></c:otherwise>
-                </c:choose>
-            </td>
+          <td class="h">ID:</td>
+          <td>
+            <c:choose>
+              <c:when test="${kitDescriptor.kitDescriptorId != 0}">${kitDescriptor.kitDescriptorId}</c:when>
+              <c:otherwise><i>Unsaved</i></c:otherwise>
+            </c:choose>
+          </td>
         </tr>
         <tr>
-            <td class="h">Name:</td>
-            <td><form:input path="name"/></td>
+          <td class="h">Name:</td>
+          <td><form:input path="name"/></td>
         </tr>
         <tr>
-            <td class="h">Version:</td>
-            <td><form:input path="version"/></td>
+          <td class="h">Version:</td>
+          <td><form:input path="version"/></td>
         </tr>
         <tr>
-            <td class="h">Manufacturer:</td>
-            <td><form:input path="manufacturer"/></td>
+          <td class="h">Manufacturer:</td>
+          <td><form:input path="manufacturer"/></td>
         </tr>
         <tr>
-            <td class="h">Part Number:</td>
-            <td><form:input path="partNumber"/></td>
+          <td class="h">Part Number:</td>
+          <td><form:input path="partNumber"/></td>
         </tr>
         <tr>
-            <td class="h">Stock Level:</td>
-            <td><form:input path="stockLevel"/></td>
+          <td class="h">Stock Level:</td>
+          <td><form:input path="stockLevel"/></td>
         </tr>
         <tr>
-        <c:choose>
+          <c:choose>
             <c:when test="${kitDescriptor.kitDescriptorId == 0 or empty kitDescriptor.kitType}">
-                <td>Kit Type:</td>
-                <td>
-                    <form:select id="kitTypes" path="kitType" items="${kitTypes}"/>
-                </td>
+              <td>Kit Type:</td>
+              <td>
+                <form:select id="kitTypes" path="kitType" items="${kitTypes}"/>
+              </td>
             </c:when>
             <c:otherwise>
-                <td>Kit Type</td>
-                <td>${kitDescriptor.kitType}</td>
+              <td>Kit Type</td>
+              <td>${kitDescriptor.kitType}</td>
             </c:otherwise>
-        </c:choose>
+          </c:choose>
         </tr>
         <tr>
-        <c:choose>
+          <c:choose>
             <c:when test="${kitDescriptor.kitDescriptorId == 0 or empty kitDescriptor.platformType}">
-                <td>Platform Type:</td>
-                <td>
-                    <form:select id="platformTypes" path="platformType" items="${platformTypes}"/>
-                </td>
+              <td>Platform Type:</td>
+              <td>
+                <form:select id="platformTypes" path="platformType" items="${platformTypes}"/>
+              </td>
             </c:when>
             <c:otherwise>
-                <td>Platform Type</td>
-                <td>${kitDescriptor.platformType}</td>
+              <td>Platform Type</td>
+              <td>${kitDescriptor.platformType}</td>
             </c:otherwise>
-        </c:choose>
+          </c:choose>
         </tr>
-    </table>
-</form:form>
-
+      </table>
+    </form:form>
+  </div>
 </div>
-</div>
-
 
 <%@ include file="adminsub.jsp" %>
 

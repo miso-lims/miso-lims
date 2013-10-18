@@ -43,7 +43,7 @@ public class AbstractPrintJob implements PrintJob {
   public static final Long UNSAVED_ID = 0L;
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long jobId = AbstractPrintJob.UNSAVED_ID;
+  private long jobId = AbstractPrintJob.UNSAVED_ID;
   private Date printDate;
   private User printUser;
   private Queue<?> queuedElements;

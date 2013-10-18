@@ -173,6 +173,11 @@ public class EditPlateController {
     }
   }
 
+  @RequestMapping(value = "/export", method = RequestMethod.GET)
+  public ModelAndView exportPlate(ModelMap model) throws IOException {
+      return new ModelAndView("/pages/exportPlate.jsp", model);
+  }
+
   @RequestMapping(method = RequestMethod.POST)
   public String processSubmit(@ModelAttribute("plate") Plate<LinkedList<Plateable>, Plateable> plate,
                               ModelMap model,

@@ -23,34 +23,34 @@
 
 <%@ include file="../header.jsp" %>
 <table class="list" id="table">
-    <thead>
-    <tr>
-        <th>Alert Date</th>
-        <th>Title</th>
-        <th>Text</th>
-        <th>Level</th>
+  <thead>
+  <tr>
+    <th>Alert Date</th>
+    <th>Title</th>
+    <th>Text</th>
+    <th>Level</th>
+  </tr>
+  </thead>
+  <tbody>
+  <c:forEach items="${alerts}" var="alert">
+    <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
+      <td>${alert.alertDate}</td>
+      <td>${alert.alertTitle}</td>
+      <td>${alert.alertText}</td>
+      <td>${alert.alertLevel.key}</td>
     </tr>
-    </thead>
-    <tbody>
-    <c:forEach items="${alerts}" var="alert">
-        <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-            <td>${alert.alertDate}</td>
-            <td>${alert.alertTitle}</td>
-            <td>${alert.alertText}</td>
-            <td>${alert.alertLevel.key}</td>
-        </tr>
-    </c:forEach>
-    </tbody>
+  </c:forEach>
+  </tbody>
 </table>
 
 <script type="text/javascript">
-jQuery(document).ready(function() {
+  jQuery(document).ready(function () {
     jQuery("#table").tablesorter({
-         headers: {
-             2: {
-                 sorter: false
-             }
-         }
-     });
-});
+      headers: {
+        2: {
+          sorter: false
+        }
+      }
+    });
+  });
 </script>

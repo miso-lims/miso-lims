@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import com.eaglegenomics.simlims.core.Note;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryQcException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleQcException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.core.util.jackson.LibraryRecursionAvoidanceMixin;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -63,7 +65,7 @@ public class ProjectRestController {
   }
 
   @RequestMapping(value = "{projectId}", method = RequestMethod.GET)
-  public @ResponseBody Project jsonRest(@PathVariable Long projectId) throws IOException {
+  public @ResponseBody String jsonRest(@PathVariable Long projectId) throws IOException {
     Project project = requestManager.getProjectById(projectId);
 
     for (Sample s : project.getSamples()) {
@@ -89,11 +91,14 @@ public class ProjectRestController {
         }
       }
     }
-    return project;
+
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.getSerializationConfig().addMixInAnnotations(Library.class, LibraryRecursionAvoidanceMixin.class);
+    return mapper.writeValueAsString(project);
   }
 
   @RequestMapping(value = "{projectId}/libraries", method = RequestMethod.GET)
-  public @ResponseBody Collection<Library> getProjectLibraries(@PathVariable Long projectId) throws IOException {
+  public @ResponseBody String getProjectLibraries(@PathVariable Long projectId) throws IOException {
     Collection<Library> lp = requestManager.listAllLibrariesByProjectId(projectId);
     for (Library l : lp) {
       for (LibraryDilution dil : requestManager.listAllLibraryDilutionsByLibraryId(l.getId())) {
@@ -114,17 +119,24 @@ public class ProjectRestController {
         }
       }
     }
-    return lp;
+
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.getSerializationConfig().addMixInAnnotations(Library.class, LibraryRecursionAvoidanceMixin.class);
+    return mapper.writeValueAsString(lp);
   }
 
   @RequestMapping(method = RequestMethod.GET)
   public @ResponseBody
-  Collection<Project> jsonRest() throws IOException {
+  //Collection<Project> jsonRest() throws IOException {
+  String jsonRest() throws IOException {
     Collection<Project> lp = requestManager.listAllProjects();
     for (Project p : lp) {
       p.setSamples(requestManager.listAllSamplesByProjectId(p.getProjectId()));
       p.setStudies(requestManager.listAllStudiesByProjectId(p.getProjectId()));
     }
-    return lp;
+
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.getSerializationConfig().addMixInAnnotations(Library.class, LibraryRecursionAvoidanceMixin.class);
+    return mapper.writeValueAsString(lp);
   }
 }

@@ -93,6 +93,14 @@ public class DownloadController {
     }
   }
 
+  @RequestMapping(value = "/plate/forms/{hashcode}", method = RequestMethod.GET)
+  protected void downloadPlateExportFile(@PathVariable Integer hashcode,
+                                     HttpServletResponse response)
+      throws Exception {
+    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+      lookupAndRetrieveFile(Plate.class,  "forms", hashcode, response);
+  }
+
   @RequestMapping(value = "/submission/{id}/{hashcode}", method = RequestMethod.GET)
   protected void downloadSubmissionFile(@PathVariable Long id,
                                      @PathVariable Integer hashcode,

@@ -69,7 +69,7 @@ public class ProjectOverview implements Watchable, Alertable, Serializable {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long overviewId = ProjectOverview.UNSAVED_ID;
+  private long overviewId = ProjectOverview.UNSAVED_ID;
 
   private Project project;
 

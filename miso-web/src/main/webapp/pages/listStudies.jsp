@@ -33,20 +33,20 @@
 <link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables_themeroller.css'/>">
 
 <div id="maincontent">
-    <div id="contentcolumn">
-        <h1>
-            <div id="totalCount">Studies
-            </div>
-        </h1>
+  <div id="contentcolumn">
+    <h1>
+      <div id="totalCount">Studies
+      </div>
+    </h1>
 
     <table cellpadding="0" cellspacing="0" border="0" class="display" id="listingStudiesTable">
     </table>
-        <script type="text/javascript">
-            jQuery(document).ready(function() {
-             Study.ui.createListingStudiesTable();
-            });
-        </script>
-    </div>
+    <script type="text/javascript">
+      jQuery(document).ready(function () {
+        Study.ui.createListingStudiesTable();
+      });
+    </script>
+  </div>
 </div>
 <%@ include file="adminsub.jsp" %>
 

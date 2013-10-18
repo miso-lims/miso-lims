@@ -97,13 +97,13 @@ public class RunAlertManager {
           applyListeners(clone);
           if (runs.containsKey(run.getId())) {
             if (clone.getStatus() != null) {
-              log.debug("Not replacing " + clone.getId() + ": " + clone.getStatus().getHealth().name());
+              log.debug("Not replacing Run " + clone.getId() + ": " + clone.getStatus().getHealth().name());
             }
           }
           else {
             runs.put(run.getId(), clone);
             if (clone.getStatus() != null) {
-              log.debug("Queued " + clone.getId() + ": " + clone.getStatus().getHealth().name());
+              log.debug("Queued Run " + clone.getId() + ": " + clone.getStatus().getHealth().name());
             }
           }
         }

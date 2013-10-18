@@ -68,7 +68,7 @@ public class TaxonomyUtils {
         log.info(out);
         try {
           Document d = SubmissionUtils.emptyDocument();
-          SubmissionUtils.transform(new StringReader(out), d);
+          SubmissionUtils.transform(new UnicodeReader(out), d);
           NodeList nl = d.getElementsByTagName("Id");
           for (int i = 0; i < nl.getLength(); i++) {
             Element e = (Element)nl.item(i);

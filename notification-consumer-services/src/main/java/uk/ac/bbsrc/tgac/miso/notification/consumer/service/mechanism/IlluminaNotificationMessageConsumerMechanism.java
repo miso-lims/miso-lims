@@ -40,6 +40,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.mechanism.NotificationMessageConsumerMechanism;
+import uk.ac.bbsrc.tgac.miso.tools.run.RunFolderConstants;
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -67,7 +68,7 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
     this.attemptRunPopulation = attemptRunPopulation;
   }
 
-  private final String runDirRegex = "[\\d]+_([A-z0-9]+)_([\\d]+)_([A-z0-9_\\+\\-]*)";
+  private final String runDirRegex = RunFolderConstants.ILLUMINA_FOLDER_NAME_GROUP_CAPTURE_REGEX;
   private final Pattern p = Pattern.compile(runDirRegex);
   private final DateFormat logDateFormat = new SimpleDateFormat("MM'/'dd'/'yyyy','HH:mm:ss");
   private final DateFormat anotherLogDateFormat = new SimpleDateFormat("yyyy'-'MM'-'dd'T'HH:mm:ss");
@@ -140,6 +141,10 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
               r.setFilePath(run.getString("fullPath"));
             }
 
+            if (run.has("numCycles")) {
+              r.setCycles(Integer.parseInt(run.getString("numCycles")));
+            }
+
             SequencerReference sr = null;
             if (run.has("sequencerName")) {
               sr = requestManager.getSequencerReferenceByName(run.getString("sequencerName"));
@@ -195,7 +200,9 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
             r.setDescription(m.group(3));
 
             if (r.getStatus() != null && run.has("status")) {
-              r.getStatus().setHealth(ht);
+              if (!r.getStatus().getHealth().equals(HealthType.Failed) && !r.getStatus().getHealth().equals(HealthType.Completed)) {
+                r.getStatus().setHealth(ht);
+              }
               r.getStatus().setXml(run.getString("status"));
             }
             else {
@@ -205,6 +212,10 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
 
               is.setHealth(ht);
               r.setStatus(is);
+            }
+
+            if (run.has("numCycles")) {
+              r.setCycles(Integer.parseInt(run.getString("numCycles")));
             }
 
             if (r.getSequencerReference() == null) {
@@ -289,6 +300,12 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
                     else {
                       lf.setPlatformType(PlatformType.ILLUMINA);
                     }
+
+                    if (run.has("laneCount") && run.getInt("laneCount") != lf.getPartitions().size()) {
+                      log.warn(r.getAlias() + ":: Previously saved flowcell lane count does not match notification-supplied value from RunInfo.xml. Setting new partitionLimit");
+                      lf.setPartitionLimit(run.getInt("laneCount"));
+                    }
+
                     ((RunImpl)r).addSequencerPartitionContainer(lf);
                   }
                   else {
@@ -305,9 +322,15 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
                   else {
                     f.setPlatformType(PlatformType.ILLUMINA);
                   }
-                  if (r.getSequencerReference().getPlatform().getInstrumentModel().contains("MiSeq")) {
-                    f.setPartitionLimit(1);
+                  if (run.has("laneCount")) {
+                    f.setPartitionLimit(run.getInt("laneCount"));
                   }
+                  else {
+                    if (r.getSequencerReference().getPlatform().getInstrumentModel().contains("MiSeq")) {
+                      f.setPartitionLimit(1);
+                    }
+                  }
+
                   f.initEmptyPartitions();
                   f.setIdentificationBarcode(run.getString("containerId"));
                   ((RunImpl)r).addSequencerPartitionContainer(f);
@@ -326,8 +349,13 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
 
               if (f.getPartitions().isEmpty()) {
                 //log.info("No partitions found for run " + r.getName() + " (container "+f.getContainerId()+")");
-                if (r.getSequencerReference().getPlatform().getInstrumentModel().contains("MiSeq")) {
-                  f.setPartitionLimit(1);
+                if (run.has("laneCount")) {
+                  f.setPartitionLimit(run.getInt("laneCount"));
+                }
+                else {
+                  if (r.getSequencerReference().getPlatform().getInstrumentModel().contains("MiSeq")) {
+                    f.setPartitionLimit(1);
+                  }
                 }
                 f.initEmptyPartitions();
               }
@@ -336,6 +364,11 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
                 if (r.getSequencerReference().getPlatform().getInstrumentModel().contains("MiSeq")) {
                   if (f.getPartitions().size() != 1) {
                     log.warn(f.getName()+":: WARNING - number of partitions found ("+f.getPartitions().size()+") doesn't match usual number of MiSeq partitions (1)");
+                  }
+                }
+                else if (r.getSequencerReference().getPlatform().getInstrumentModel().contains("2500")) {
+                  if (f.getPartitions().size() != 2 && f.getPartitions().size() != 8) {
+                    log.warn(f.getName()+":: WARNING - number of partitions found ("+f.getPartitions().size()+") doesn't match usual number of HiSeq 2500 partitions (2/8)");
                   }
                 }
                 else {

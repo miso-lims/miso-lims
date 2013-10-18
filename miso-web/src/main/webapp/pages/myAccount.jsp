@@ -36,80 +36,93 @@
       </div>
     </div>
 
-      <div class="column">
-        <sec:authorize access="hasRole('ROLE_ADMIN')">
-          <div class="portlet">
-            <div class="portlet-header">MISO Configuration</div>
-            <div class="portlet-content">
+    <div class="column">
+      <sec:authorize access="hasRole('ROLE_ADMIN')">
+        <div class="portlet">
+          <div class="portlet-header">MISO Configuration</div>
+          <div class="portlet-content">
               <%--
               <a href="<c:url value='/miso/admin/configuration/general'/>">General</a><br/>
               <a href="<c:url value='/miso/admin/configuration/database'/>">Database</a><br/>
               <a href="<c:url value='/miso/admin/configuration/security'/>">Security</a><br/>
               --%>
-              <a href="<c:url value='/miso/admin/configuration/printers'/>">Barcode Printers</a>
-            </div>
+            <a href="<c:url value='/miso/admin/configuration/printers'/>">Barcode Printers</a>
           </div>
+        </div>
 
-          <div class="portlet">
-            <div class="portlet-header">Cache Administration</div>
-            <div class="portlet-content">
-              <a href="javascript:void(0);" onclick="flushAllCaches();">Flush All Caches</a><br/>
-              <a href="javascript:void(0);" onclick="viewCacheStats();">Flush Cache...</a><br/>
-              <a href="javascript:void(0);" onclick="viewCacheStats();">View Cache Stats</a><br/>
-              <a href="javascript:void(0);" onclick="regenAllBarcodes();">Regenerate All Barcodes</a><br/>
-              <a href="javascript:void(0);" onclick="reindexAlertManagers();">Reindex Alert Managers</a>
-            </div>
-          </div>
-        </sec:authorize>
-
-        <sec:authorize access="hasRole('ROLE_ADMIN') or hasRole('ROLE_SUBMITTER')">
-          <div class="portlet">
-            <div class="portlet-header">Submissions</div>
-            <div class="portlet-content">
-              <a href="<c:url value='/miso/submission/new'/>">Prepare new Submission</a><br/>
-              <a href="<c:url value='/miso/submissions'/>">List Submissions</a>
-            </div>
-          </div>
-        </sec:authorize>
-
-        <sec:authorize access="hasRole('ROLE_ADMIN') or hasRole('ROLE_TECH')">
-          <div class="portlet">
-            <div class="portlet-header">Sequencing Machines</div>
-            <div class="portlet-content">
-              <a href="<c:url value='/miso/stats/ls454'/>">454</a><br/>
-              <a href="<c:url value='/miso/stats/illumina'/>">Illumina</a><br/>
-              <a href="<c:url value='/miso/stats/solid'/>">SOLiD</a><br/><br/>
-              <a href="<c:url value='/miso/stats/pacbio'/>">PacBio</a><br/><br/>
-              <a href="<c:url value='/miso/stats'/>">Configure</a>
-            </div>
-          </div>
-        </sec:authorize>
         <div class="portlet">
-          <div class="portlet-header">Reporting</div>
+          <div class="portlet-header">Cache Administration</div>
           <div class="portlet-content">
-            <a href="<c:url value='/miso/flexreports'/>">Reports</a><br/>
+            <a href="javascript:void(0);" onclick="flushAllCaches();">Flush All Caches</a><br/>
+            <a href="javascript:void(0);" onclick="viewCacheStats();">Flush Cache...</a><br/>
+            <a href="javascript:void(0);" onclick="viewCacheStats();">View Cache Stats</a><br/>
+            <a href="javascript:void(0);" onclick="regenAllBarcodes();">Regenerate All Barcodes</a><br/>
+            <a href="javascript:void(0);" onclick="reindexAlertManagers();">Reindex Alert Managers</a>
           </div>
+        </div>
+      </sec:authorize>
+
+      <sec:authorize access="hasRole('ROLE_ADMIN') or hasRole('ROLE_SUBMITTER')">
+        <div class="portlet">
+          <div class="portlet-header">Submissions</div>
+          <div class="portlet-content">
+            <a href="<c:url value='/miso/submission/new'/>">Prepare new Submission</a><br/>
+            <a href="<c:url value='/miso/submissions'/>">List Submissions</a>
+          </div>
+        </div>
+      </sec:authorize>
+
+      <sec:authorize access="hasRole('ROLE_ADMIN') or hasRole('ROLE_TECH')">
+        <div class="portlet">
+          <div class="portlet-header">Sequencing Machines</div>
+          <div class="portlet-content">
+            <a href="<c:url value='/miso/stats/ls454'/>">454</a><br/>
+            <a href="<c:url value='/miso/stats/illumina'/>">Illumina</a><br/>
+            <a href="<c:url value='/miso/stats/solid'/>">SOLiD</a><br/>
+            <a href="<c:url value='/miso/stats/pacbio'/>">PacBio</a><br/><br/>
+            <a href="<c:url value='/miso/stats'/>">Configure</a>
+          </div>
+        </div>
+      </sec:authorize>
+
+      <sec:authorize access="hasRole('ROLE_ADMIN') or hasRole('ROLE_TECH')">
+        <div class="portlet">
+          <div class="portlet-header">Custom Barcode</div>
+          <div class="portlet-content">
+            <a href="<c:url value='/miso/custombarcode'/>">Custom Barcode Printing</a><br/>
+          </div>
+        </div>
+      </sec:authorize>
+      <div class="portlet">
+        <div class="portlet-header">Reporting</div>
+        <div class="portlet-content">
+          <a href="<c:url value='/miso/flexreports'/>">Reports</a><br/>
         </div>
       </div>
+    </div>
 
-      <div class="column">
-        <div class="portlet">
-          <div class="portlet-header">My Alerts</div>
-          <div class="portlet-content">
-            <input id="showReadAlerts" type="checkbox" onclick="toggleShowReadAlerts();"/>Show Read Alerts
-            <a href="javascript:void(0)" style="float:right;" onclick="Utils.alert.confirmAllAlertsRead();">Mark All Alerts as Read</a>
-            <div id="alertList" class="elementList" style="max-height: 380px"><i style="color: gray">No unread alerts</i></div>
-          </div>
+    <div class="column">
+      <div class="portlet">
+        <div class="portlet-header">My Alerts</div>
+        <div class="portlet-content">
+          <input id="showReadAlerts" type="checkbox" onclick="toggleShowReadAlerts();"/>Show Read Alerts
+          <a href="javascript:void(0)" style="float:right;" onclick="Utils.alert.confirmAllAlertsRead();">Mark
+            All Alerts as Read</a>
+
+          <div id="alertList" class="elementList" style="max-height: 380px"><i style="color: gray">No unread
+            alerts</i></div>
         </div>
-        <sec:authorize access="hasRole('ROLE_ADMIN')">
+      </div>
+      <sec:authorize access="hasRole('ROLE_ADMIN')">
         <div class="portlet">
           <div class="portlet-header">Recent Activity Alerts</div>
           <div class="portlet-content">
-            <div id="systemAlertList" class="elementList" style="max-height: 380px"><i style="color: gray">No system alerts</i></div>
+            <div id="systemAlertList" class="elementList" style="max-height: 380px"><i style="color: gray">No
+              system alerts</i></div>
           </div>
         </div>
-        </sec:authorize>
-      </div>
+      </sec:authorize>
+    </div>
   </div>
 </div>
 
@@ -166,7 +179,7 @@
 </style>
 
 <script type="text/javascript">
-  jQuery(document).ready(function() {
+  jQuery(document).ready(function () {
     toggleShowReadAlerts();
     getSystemAlerts();
   });
@@ -175,19 +188,19 @@
     Fluxion.doAjax(
       'cacheHelperService',
       'flushAllCaches',
-      {'url':ajaxurl},
-      {'doOnSuccess':function(json) {
+      {'url': ajaxurl},
+      {'doOnSuccess': function (json) {
         jQuery("body").append(json.html);
         jQuery("#dialog").dialog("destroy");
 
         jQuery("#dialog-message").dialog({
-           modal: true,
-           buttons: {
-             Ok: function() {
-               jQuery(this).dialog('close');
-             }
-           }
-         });
+          modal: true,
+          buttons: {
+            Ok: function () {
+              jQuery(this).dialog('close');
+            }
+          }
+        });
       }
       }
     );
@@ -197,20 +210,20 @@
     Fluxion.doAjax(
       'cacheHelperService',
       'flushCache',
-      {'url':ajaxurl,'cache':cacheName},
-      {'doOnSuccess':function(json) {
+      {'url': ajaxurl, 'cache': cacheName},
+      {'doOnSuccess': function (json) {
         jQuery("body").append(json.html);
         jQuery("#dialog").dialog("destroy");
 
         jQuery("#dialog-message").dialog({
-           zIndex: 10000,
-           modal: true,
-           buttons: {
-             Ok: function() {
-               jQuery(this).dialog('close');
-             }
-           }
-         });
+          zIndex: 10000,
+          modal: true,
+          buttons: {
+            Ok: function () {
+              jQuery(this).dialog('close');
+            }
+          }
+        });
       }
       }
     );
@@ -220,17 +233,17 @@
     Fluxion.doAjax(
       'cacheHelperService',
       'viewCacheStats',
-      {'url':ajaxurl},
-      {'doOnSuccess':function(json) {
+      {'url': ajaxurl},
+      {'doOnSuccess': function (json) {
         var stats = "<b>Cache Stats:</b><br/><table class='list'><thead><tr><th>Name</th><th>Elements</th><th>Hits</th><th>Search Times</th><th>Flush</th></tr></thead><tbody>";
         for (var key in json.caches) {
           if (json.caches.hasOwnProperty(key)) {
             var cache = json.caches[key];
-            stats += "<tr><td>"+cache.name+"</td><td>"+cache.size+"</td><td>"+cache.hits+"</td><td>"+cache.searchtimes+"</td><td><a href='#' onclick='flushCache(\""+cache.name+"\");'>Flush</a></td></tr>";
+            stats += "<tr><td>" + cache.name + "</td><td>" + cache.size + "</td><td>" + cache.hits + "</td><td>" + cache.searchtimes + "</td><td><a href='#' onclick='flushCache(\"" + cache.name + "\");'>Flush</a></td></tr>";
           }
         }
         stats += "</tbody></table>";
-        jQuery.colorbox({width:"80%",html:stats});
+        jQuery.colorbox({width: "80%", html: stats});
       }
       }
     );
@@ -240,60 +253,60 @@
     Fluxion.doAjax(
       'cacheHelperService',
       'regenerateAllBarcodes',
-      {'url':ajaxurl},
-      {'doOnSuccess':function(json) {
+      {'url': ajaxurl},
+      {'doOnSuccess': function (json) {
         jQuery("body").append(json.html);
         jQuery("#dialog").dialog("destroy");
 
         jQuery("#dialog-message").dialog({
-           modal: true,
-           buttons: {
-             Ok: function() {
-               jQuery(this).dialog('close');
-             }
-           }
-         });
+          modal: true,
+          buttons: {
+            Ok: function () {
+              jQuery(this).dialog('close');
+            }
+          }
+        });
       }
       }
     );
   }
 
   function reindexAlertManagers() {
-      Fluxion.doAjax(
-          'cacheHelperService',
-          'reindexAlertManagers',
-          {'url':ajaxurl},
-          {'doOnSuccess':function(json) {
-                  jQuery("body").append(json.html);
-                  jQuery("#dialog").dialog("destroy");
+    Fluxion.doAjax(
+      'cacheHelperService',
+      'reindexAlertManagers',
+      {'url': ajaxurl},
+      {'doOnSuccess': function (json) {
+        jQuery("body").append(json.html);
+        jQuery("#dialog").dialog("destroy");
 
-                  jQuery("#dialog-message").dialog({
-                      modal: true,
-                      buttons: {
-                          Ok: function() {
-                              jQuery(this).dialog('close');
-                          }
-                      }
-                  });
-              }
+        jQuery("#dialog-message").dialog({
+          modal: true,
+          buttons: {
+            Ok: function () {
+              jQuery(this).dialog('close');
+            }
           }
-      );
+        });
+      }
+      }
+    );
   }
 
-  jQuery(function() {
+  jQuery(function () {
     jQuery(".column").sortable({
       connectWith: '.column',
       handle: '.portlet-header'
     });
 
     jQuery(".portlet").addClass("ui-widget ui-widget-content ui-helper-clearfix ui-corner-all")
-            .find(".portlet-header")
-            .addClass("ui-widget-header ui-corner-all")
-            .prepend('<span class="ui-icon ui-icon-minusthick"></span>')
-            .end()
-            .find(".portlet-content");
+        .find(".portlet-header")
+        .addClass("ui-widget-header ui-corner-all")
+        .prepend('<span class="ui-icon ui-icon-minusthick"></span>')
+        .end()
+        .find(".portlet-content");
 
-    jQuery(".portlet-header .ui-icon").click(function() {
+    jQuery(".portlet-header .ui-icon").click(function () {
       jQuery(this).toggleClass("ui-icon-minusthick").toggleClass("ui-icon-plusthick");
       jQuery(this).parents(".portlet:first").find(".portlet-content").toggle();
     });
@@ -303,19 +316,19 @@
 
   function toggleShowReadAlerts() {
     Fluxion.doAjax(
-            'dashboard',
-            'getAlerts',
-    {'showReadAlerts':jQuery('input[id=showReadAlerts]').is(':checked'), 'url':ajaxurl},
-    {'doOnSuccess':Utils.alert.processAlerts}
+      'dashboard',
+      'getAlerts',
+      {'showReadAlerts': jQuery('input[id=showReadAlerts]').is(':checked'), 'url': ajaxurl},
+      {'doOnSuccess': Utils.alert.processAlerts}
     );
   }
 
   function getSystemAlerts() {
     Fluxion.doAjax(
-            'dashboard',
-            'getSystemAlerts',
-    {'url':ajaxurl},
-    {'doOnSuccess':Utils.alert.processSystemAlerts}
+      'dashboard',
+      'getSystemAlerts',
+      {'url': ajaxurl},
+      {'doOnSuccess': Utils.alert.processSystemAlerts}
     );
   }
 </script>

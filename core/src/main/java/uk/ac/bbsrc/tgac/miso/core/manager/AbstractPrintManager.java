@@ -32,9 +32,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.PrintJob;
 import uk.ac.bbsrc.tgac.miso.core.data.PrintableBarcode;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoPrintException;
+import uk.ac.bbsrc.tgac.miso.core.service.printing.BarcodableSchemaResolverService;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.PrintContextResolverService;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
+import uk.ac.bbsrc.tgac.miso.core.service.printing.schema.BarcodableSchema;
 import uk.ac.bbsrc.tgac.miso.core.store.PrintJobStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PrintServiceStore;
 
@@ -57,6 +59,8 @@ public abstract class AbstractPrintManager<C> implements PrintManager<MisoPrintS
 
   @Autowired
   private PrintContextResolverService printContextResolverService;
+  @Autowired
+  private BarcodableSchemaResolverService barcodableSchemaResolverService;
 
   private Map<String, Class<? extends Barcodable>> barcodableMap;
 
@@ -77,12 +81,24 @@ public abstract class AbstractPrintManager<C> implements PrintManager<MisoPrintS
     this.printContextResolverService = printContextResolverService;
   }
 
+  public void setBarcodableSchemaResolverService(BarcodableSchemaResolverService barcodableSchemaResolverService) {
+    this.barcodableSchemaResolverService = barcodableSchemaResolverService;
+  }
+
   public Collection<PrintContext> getPrintContexts() {
     return printContextResolverService.getPrintContexts();
   }
 
   public PrintContext getPrintContext(String name) {
     return printContextResolverService.getPrintContext(name);
+  }
+
+  public Collection<BarcodableSchema> getBarcodableSchemas() {
+    return barcodableSchemaResolverService.getBarcodableSchemas();
+  }
+
+  public BarcodableSchema getBarcodableSchema(String barcodableStateName) {
+    return barcodableSchemaResolverService.getBarcodableSchema(barcodableStateName);
   }
 
   @Override

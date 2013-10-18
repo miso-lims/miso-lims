@@ -37,57 +37,57 @@ var Submission = Submission || {
 
   validateSubmissionMetadata : function(submissionId) {
     Fluxion.doAjax(
-            'submissionControllerHelperService',
-            'validateSubmissionMetadata',
-    {'submissionId':submissionId,'url':ajaxurl},
-    {'doOnSuccess':function(json) {
-      jQuery('#submissionreport').empty();
-      if (json.ok) {
-      }
-      else {
-        if (json.errors) {
-          jQuery('#submissionreport').append("<h2>Errors</h2><div id='submissionreporterror' class='flasherror'></div>")
-          for (var i = 0; i < json.errors.length; i++) {
-            jQuery('#submissionreporterror').append(json.errors[i] + "<br/>");
-          }
+      'submissionControllerHelperService',
+      'validateSubmissionMetadata',
+      {'submissionId':submissionId,'url':ajaxurl},
+      {'doOnSuccess':function(json) {
+        jQuery('#submissionreport').empty();
+        if (json.ok) {
         }
+        else {
+          if (json.errors) {
+            jQuery('#submissionreport').append("<h2>Errors</h2><div id='submissionreporterror' class='flasherror'></div>")
+            for (var i = 0; i < json.errors.length; i++) {
+              jQuery('#submissionreporterror').append(json.errors[i] + "<br/>");
+            }
+          }
 
-        if (json.infos) {
-          jQuery('#submissionreport').append("<h2>Info</h2><div id='submissionreportinfo' class='flashinfo'></div>")
-          for (var i = 0; i < json.infos.length; i++) {
-            jQuery('#submissionreportinfo').append(json.infos[i] + "<br/>");
+          if (json.infos) {
+            jQuery('#submissionreport').append("<h2>Info</h2><div id='submissionreportinfo' class='flashinfo'></div>")
+            for (var i = 0; i < json.infos.length; i++) {
+              jQuery('#submissionreportinfo').append(json.infos[i] + "<br/>");
+            }
           }
         }
       }
-    }
     });
   },
 
   submitSubmissionMetadata : function(submissionId) {
     Fluxion.doAjax(
-            'submissionControllerHelperService',
-            'submitSubmissionMetadata',
-    {'submissionId':submissionId,'url':ajaxurl},
-    {'doOnSuccess':function(json) {
-      jQuery('#submissionreport').empty();
-      if (json.ok) {
-      }
-      else {
-        if (json.errors) {
-          jQuery('#submissionreport').append("<h2>Errors</h2><div id='submissionreporterror' class='flasherror'></div>")
-          for (var i = 0; i < json.errors.length; i++) {
-            jQuery('#submissionreporterror').append(json.errors[i] + "<br/>");
-          }
+      'submissionControllerHelperService',
+      'submitSubmissionMetadata',
+      {'submissionId':submissionId,'url':ajaxurl},
+      {'doOnSuccess':function(json) {
+        jQuery('#submissionreport').empty();
+        if (json.ok) {
         }
+        else {
+          if (json.errors) {
+            jQuery('#submissionreport').append("<h2>Errors</h2><div id='submissionreporterror' class='flasherror'></div>")
+            for (var i = 0; i < json.errors.length; i++) {
+              jQuery('#submissionreporterror').append(json.errors[i] + "<br/>");
+            }
+          }
 
-        if (json.infos) {
-          jQuery('#submissionreport').append("<h2>Info</h2><div id='submissionreportinfo' class='flashinfo'></div>")
-          for (var i = 0; i < json.infos.length; i++) {
-            jQuery('#submissionreportinfo').append(json.infos[i] + "<br/>");
+          if (json.infos) {
+            jQuery('#submissionreport').append("<h2>Info</h2><div id='submissionreportinfo' class='flashinfo'></div>")
+            for (var i = 0; i < json.infos.length; i++) {
+              jQuery('#submissionreportinfo').append(json.infos[i] + "<br/>");
+            }
           }
         }
       }
-    }
     });
   },
 
@@ -128,22 +128,23 @@ Submission.ui = {
   populateSubmissionProject : function(projectId, submissionId) {
     if (jQuery('#project' + projectId).hasClass("jstree-closed")) {
       Fluxion.doAjax(
-              'submissionControllerHelperService',
-              'populateSubmissionProject',
-      {
-        'projectId':projectId,
-        'submissionId':submissionId,
-        'url':ajaxurl
-      },
-      {
-        'doOnSuccess': function(json) {
-          if (jQuery('#runList'+projectId).length > 0) {
-            jQuery('#project' + projectId).find('#runList'+projectId).remove();
+        'submissionControllerHelperService',
+        'populateSubmissionProject',
+        {
+          'projectId':projectId,
+          'submissionId':submissionId,
+          'url':ajaxurl
+        },
+        {
+          'doOnSuccess': function(json) {
+            if (jQuery('#runList'+projectId).length > 0) {
+              jQuery('#project' + projectId).find('#runList'+projectId).remove();
+            }
+            jQuery('#project' + projectId).append(json.html);
+            jQuery('#project' + projectId).removeClass("jstree-closed").addClass("jstree-open");
           }
-          jQuery('#project' + projectId).append(json.html);
-          jQuery('#project' + projectId).removeClass("jstree-closed").addClass("jstree-open");
         }
-      });
+      );
     }
     else{
       jQuery('#runList' + projectId).hide('slow');
@@ -153,41 +154,43 @@ Submission.ui = {
 
   previewSubmissionMetadata : function(submissionId) {
     Fluxion.doAjax(
-            'submissionControllerHelperService',
-            'previewSubmissionMetadata',
-    {'submissionId':submissionId,'url':ajaxurl},
-    {'doOnSuccess':function(json) {
-        Utils.page.pageReload();
+      'submissionControllerHelperService',
+      'previewSubmissionMetadata',
+      {'submissionId':submissionId,'url':ajaxurl},
+      {'doOnSuccess':function(json) {
+          Utils.page.pageReload();
 
-        var win = window.open('', 'windowName');
-        win.document.open('text/xml');
-        //win.document.write("<?xml version='1.0' encoding='UTF-8'?>");
-        //var doc = json.metadata;
-        //doc = doc.replace("<","&lt");
-        //doc = doc.replace(">","&gt");
-        win.document.write(json.metadata);
-        win.document.close();
+          var win = window.open('', 'windowName');
+          win.document.open('text/xml');
+          //win.document.write("<?xml version='1.0' encoding='UTF-8'?>");
+          //var doc = json.metadata;
+          //doc = doc.replace("<","&lt");
+          //doc = doc.replace(">","&gt");
+          win.document.write(json.metadata);
+          win.document.close();
+        }
       }
-    });
+    );
   },
 
   downloadSubmissionMetadata : function(submissionId) {
     Fluxion.doAjax(
-            'submissionControllerHelperService',
-            'downloadSubmissionMetadata',
-    {'submissionId':submissionId,'url':ajaxurl},
-    {'doOnSuccess':function(json) {
-        Utils.page.pageRedirect('/miso/download/submission/' + submissionId + '/' + json.response);
+      'submissionControllerHelperService',
+      'downloadSubmissionMetadata',
+      {'submissionId':submissionId,'url':ajaxurl},
+      {'doOnSuccess':function(json) {
+          Utils.page.pageRedirect('/miso/download/submission/' + submissionId + '/' + json.response);
+        }
       }
-    });
+    );
   },
 
   displayUploadProgress : function(submissionId) {
     Fluxion.doAjax(
       'submissionControllerHelperService',
       'checkUploadProgress',
-    {'submissionId':submissionId,'url':ajaxurl},
-    {'doOnSuccess':function(json) {
+      {'submissionId':submissionId,'url':ajaxurl},
+      {'doOnSuccess':function(json) {
         jQuery('#submissionreport').append("<p>" + json.message + "</p>");
         for (var i = 0; i < json.uploadJobs.length; i++) {
           jQuery('#submissionreport').append(
@@ -206,12 +209,13 @@ Submission.ui = {
   updateUploadProgress : function(submissionId) {
     var self = this;
     Fluxion.doAjax(
-            'submissionControllerHelperService',
-            'checkUploadProgress',
-    {'submissionId':submissionId,'url':ajaxurl},
-    {'ajaxType':'periodical', 'updateFrequency':5},
-    {'doOnSuccess':self.actuallyUpdateProgress
-    });
+      'submissionControllerHelperService',
+      'checkUploadProgress',
+      {'submissionId':submissionId,'url':ajaxurl},
+      {'ajaxType':'periodical', 'updateFrequency':5},
+      {'doOnSuccess':self.actuallyUpdateProgress
+      }
+    );
   },
 
   actuallyUpdateProgress : function(json) {

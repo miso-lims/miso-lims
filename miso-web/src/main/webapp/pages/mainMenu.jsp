@@ -31,76 +31,88 @@
   </div>
 --%>
 <table width="100%">
-    <tbody>
-    <tr>
-        <td width="auto" valign="top">
-            <table align="center">
-                <tr>
-                    <td width="50%">
-                        <div class="widget_title ui-corner-top">Project <input type="text" size="20" id="searchProject"
-                                                                               name="searchProject"/></div>
-                        <div class="widget ui-corner-bottom">
-                            <div id="searchProjectresult">
-                            </div>
-                        </div>
+  <tbody>
+  <tr>
+    <td width="auto" valign="top">
+      <table align="center">
+        <tr>
+          <td width="50%">
+            <div class="widget_title ui-corner-top">Project <input type="text" size="20" id="searchProject"
+                                                                   name="searchProject"/></div>
+            <div class="widget ui-corner-bottom">
+              <div id="searchProjectresult">
+              </div>
+            </div>
 
-                    </td>
-                    <td width="50%">
-                        <div class="widget_title ui-corner-top">Run <input type="text" size="20" id="searchRun"
-                                                                           name="searchRun"/></div>
-                        <div class="widget ui-corner-bottom">
-                            <div id="searchRunresult"></div>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td width="50%">
-                        <div class="widget_title ui-corner-top">Study <input type="text" size="20" id="searchStudy"
-                                                                             name="searchStudy"/></div>
-                        <div class="widget ui-corner-bottom">
-                            <div id="searchStudyresult">
-                            </div>
-                        </div>
-                    </td>
-                    <td width="50%">
-                        <div class="widget_title ui-corner-top">Sample <input type="text" size="20" id="searchSample"
-                                                                              name="searchSample"/></div>
-                        <div class="widget ui-corner-bottom">
-                            <div id="searchSampleresult">
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td width="50%">
-                        <div class="widget_title ui-corner-top">Experiment <input type="text" size="20"
-                                                                                  id="searchExperiment"
-                                                                                  name="searchExperiment"/></div>
-                        <div class="widget ui-corner-bottom">
-                            <div id="searchExperimentresult"><img
-                                    src="<c:url value='/styles/images/ajax-loader.gif'/>"/></div>
-                        </div>
-                    </td>
-                    <td width="50%">
-                        <div class="widget_title ui-corner-top">Library <input type="text" size="20" id="searchLibrary"
-                                                                               name="searchLibrary"/></div>
-                        <div class="widget ui-corner-bottom">
-                            <div id="searchLibraryresult">
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-            </table>
-        </td>
+          </td>
+          <td width="50%">
+            <div class="widget_title ui-corner-top">Run <input type="text" size="20" id="searchRun"
+                                                               name="searchRun"/></div>
+            <div class="widget ui-corner-bottom">
+              <div id="searchRunresult"></div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td width="50%">
+            <div class="widget_title ui-corner-top">Study <input type="text" size="20" id="searchStudy"
+                                                                 name="searchStudy"/></div>
+            <div class="widget ui-corner-bottom">
+              <div id="searchStudyresult">
+              </div>
+            </div>
+          </td>
+          <td width="50%">
+            <div class="widget_title ui-corner-top">Sample <input type="text" size="20" id="searchSample"
+                                                                  name="searchSample"/></div>
+            <div class="widget ui-corner-bottom">
+              <div id="searchSampleresult">
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td width="50%">
+            <div class="widget_title ui-corner-top">Experiment <input type="text" size="20"
+                                                                      id="searchExperiment"
+                                                                      name="searchExperiment"/></div>
+            <div class="widget ui-corner-bottom">
+              <div id="searchExperimentresult"><img
+                  src="<c:url value='/styles/images/ajax-loader.gif'/>"/></div>
+            </div>
+          </td>
+          <td width="50%">
+            <div class="widget_title ui-corner-top">Library <input type="text" size="20" id="searchLibrary"
+                                                                   name="searchLibrary"/></div>
+            <div class="widget ui-corner-bottom">
+              <div id="searchLibraryresult">
+              </div>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </td>
 </table>
 <script type="text/javascript">
-    Search.loadAll();
-    Utils.timer.typewatchFunc(jQuery('#searchProject'), function(){Search.dashboardSearch(jQuery('#searchProject'))}, 300, 2);
-    Utils.timer.typewatchFunc(jQuery('#searchRun'), function(){Search.dashboardSearch(jQuery('#searchRun'))}, 300, 2);
-    Utils.timer.typewatchFunc(jQuery('#searchStudy'), function(){Search.dashboardSearch(jQuery('#searchStudy'))}, 300, 2);
-    Utils.timer.typewatchFunc(jQuery('#searchSample'), function(){Search.dashboardSearch(jQuery('#searchSample'))}, 300, 2);
-    Utils.timer.typewatchFunc(jQuery('#searchExperiment'), function(){Search.dashboardSearch(jQuery('#searchExperiment'))}, 300, 2);
-    Utils.timer.typewatchFunc(jQuery('#searchLibrary'), function(){Search.dashboardSearch(jQuery('#searchLibrary'))}, 300, 2);
+  Search.loadAll();
+  Utils.timer.typewatchFunc(jQuery('#searchProject'), function () {
+    Search.dashboardSearch(jQuery('#searchProject'))
+  }, 300, 2);
+  Utils.timer.typewatchFunc(jQuery('#searchRun'), function () {
+    Search.dashboardSearch(jQuery('#searchRun'))
+  }, 300, 2);
+  Utils.timer.typewatchFunc(jQuery('#searchStudy'), function () {
+    Search.dashboardSearch(jQuery('#searchStudy'))
+  }, 300, 2);
+  Utils.timer.typewatchFunc(jQuery('#searchSample'), function () {
+    Search.dashboardSearch(jQuery('#searchSample'))
+  }, 300, 2);
+  Utils.timer.typewatchFunc(jQuery('#searchExperiment'), function () {
+    Search.dashboardSearch(jQuery('#searchExperiment'))
+  }, 300, 2);
+  Utils.timer.typewatchFunc(jQuery('#searchLibrary'), function () {
+    Search.dashboardSearch(jQuery('#searchLibrary'))
+  }, 300, 2);
 </script>
 
 <%@ include file="../footer.jsp" %>

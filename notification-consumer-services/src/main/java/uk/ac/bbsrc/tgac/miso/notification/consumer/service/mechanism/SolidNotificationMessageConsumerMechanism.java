@@ -39,6 +39,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.mechanism.NotificationMessageConsumerMechanism;
+import uk.ac.bbsrc.tgac.miso.tools.run.RunFolderConstants;
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -66,6 +67,9 @@ public class SolidNotificationMessageConsumerMechanism implements NotificationMe
     this.attemptRunPopulation = attemptRunPopulation;
   }
 
+  private final String runDirRegex = RunFolderConstants.SOLID_FOLDER_NAME_GROUP_CAPTURE_REGEX;
+  private final Pattern p = Pattern.compile(runDirRegex);
+
   @Override
   public Set<Run> consume(Message<Map<String, List<String>>> message) throws InterrogationException {
     RequestManager requestManager = message.getHeaders().get("handler", RequestManager.class);
@@ -90,7 +94,6 @@ public class SolidNotificationMessageConsumerMechanism implements NotificationMe
     DateFormat logDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
     DateFormat simpleLogDateFormat = new SimpleDateFormat("yyyyMMdd");
     Pattern simpleDateRegex = Pattern.compile("[0-9]{8}");
-    Pattern p = Pattern.compile("([A-z0-9]+)_([0-9]{8})_(.*)");
 
     StringBuilder sb = new StringBuilder();
 

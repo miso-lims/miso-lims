@@ -42,7 +42,9 @@ import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.mechanism.NotificationMessageConsumerMechanism;
 import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.UnicodeReader;
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationUtils;
+import uk.ac.bbsrc.tgac.miso.tools.run.RunFolderConstants;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -75,6 +77,9 @@ public class LS454NotificationMessageConsumerMechanism implements NotificationMe
     this.attemptRunPopulation = attemptRunPopulation;
   }
 
+  private final String runDirRegex = RunFolderConstants.LS454_FOLDER_CAPTURE_REGEX;
+  private final Pattern p = Pattern.compile(runDirRegex);
+
   @Override
   public Set<Run> consume(Message<Map<String, List<String>>> message) throws InterrogationException {
     RequestManager requestManager = message.getHeaders().get("handler", RequestManager.class);
@@ -98,8 +103,6 @@ public class LS454NotificationMessageConsumerMechanism implements NotificationMe
 
     DateFormat gsLogDateFormat = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy");
     DateFormat startDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-
-    Pattern p = Pattern.compile("R_(\\d{4}_\\d{2}_\\d{2}_\\d{2}_\\d{2}_\\d{2})_([A-Za-z0-9]+)_([A-z0-9\\+\\-]*)");
 
     StringBuilder sb = new StringBuilder();
 
@@ -197,7 +200,9 @@ public class LS454NotificationMessageConsumerMechanism implements NotificationMe
                 r.setPairedEnd(false);
 
                 if (r.getStatus() != null && run.has("status")) {
-                  r.getStatus().setHealth(ht);
+                  if (!r.getStatus().getHealth().equals(HealthType.Failed) && !r.getStatus().getHealth().equals(HealthType.Completed)) {
+                    r.getStatus().setHealth(ht);
+                  }
                 }
                 else {
                   if (run.has("status")) {
@@ -253,7 +258,7 @@ public class LS454NotificationMessageConsumerMechanism implements NotificationMe
                 if (run.has("runparams")) {
                   try {
                     Document paramsDoc = SubmissionUtils.emptyDocument();
-                    SubmissionUtils.transform(new StringReader(run.getString("runparams")), paramsDoc);
+                    SubmissionUtils.transform(new UnicodeReader(run.getString("runparams")), paramsDoc);
 
                     Element runInfo = (Element)paramsDoc.getElementsByTagName("run").item(0);
                     String runDesc = runInfo.getElementsByTagName("shortName").item(0).getTextContent();

@@ -64,31 +64,39 @@ Print.ui = {
   },
 
   processPrinterServiceRow : function(json) {
-    jQuery('#printerTable tr:first th:eq(4)').remove();
-    jQuery('#printerTable tr:first th:eq(3)').remove();
+    if (!jQuery('#printerTable').attr("addInProgress")) {
+      jQuery('#printerTable').attr("addInProgress", "true");
+      jQuery('#printerTable tr:first th:eq(4)').remove();
+      jQuery('#printerTable tr:first th:eq(3)').remove();
 
-    jQuery('#printerTable').find("tr").each(function() {
-      jQuery(this).find("td:eq(4)").remove();
-      jQuery(this).find("td:eq(3)").remove();
-    });
+      jQuery('#printerTable').find("tr").each(function() {
+        jQuery(this).find("td:eq(4)").remove();
+        jQuery(this).find("td:eq(3)").remove();
+      });
 
-    jQuery('#printerTable tr:first').append("<th>Printable Entity</th><th>Available</th><th></th>");
+      jQuery('#printerTable tr:first').append("<th>Printable Entity</th><th>Available</th><th></th>");
 
-    $('printerTable').insertRow(1);
+      $('printerTable').insertRow(1);
 
-    var column1 = $('printerTable').rows[1].insertCell(-1);
-    column1.innerHTML = "<input id='serviceName' name='serviceName' type='text'/>";
-    var column2 = $('printerTable').rows[1].insertCell(-1);
-    column2.innerHTML = "<i>Set in context fields</i>";
-    var column3 = $('printerTable').rows[1].insertCell(-1);
-    column3.innerHTML = "<select id='contexts' name='context' onchange='Print.ui.getContextFieldsForContext(this)'>" +json.contexts+ "</select><br/><div id='contextFields' name='contextFields'/>";
-    var column4 = $('printerTable').rows[1].insertCell(-1);
-    column4.innerHTML = "<select id='barcodables' name='printServiceFor'>" +json.barcodables+ "</select>";
-    var column5 = $('printerTable').rows[1].insertCell(-1);
-    column5.innerHTML = "<div id='available'></div>";
-    var column6 = $('printerTable').rows[1].insertCell(-1);
-    column6.id = "addTd";
-    column6.innerHTML = "Add";
+      var column1 = $('printerTable').rows[1].insertCell(-1);
+      column1.innerHTML = "<input id='serviceName' name='serviceName' type='text'/>";
+      var column2 = $('printerTable').rows[1].insertCell(-1);
+      column2.innerHTML = "<i>Set in context fields</i>";
+      var column3 = $('printerTable').rows[1].insertCell(-1);
+      column3.innerHTML = "<select id='contexts' name='context' onchange='Print.ui.getContextFieldsForContext(this)'>" +json.contexts+ "</select><br/><div id='contextFields' name='contextFields'/>";
+      var column4 = $('printerTable').rows[1].insertCell(-1);
+      column4.innerHTML = "<select id='barcodableSchemas' name='printSchema'>" +json.barcodableSchemas+ "</select>";
+      var column5 = $('printerTable').rows[1].insertCell(-1);
+      column5.innerHTML = "<select id='barcodables' name='printServiceFor'>" +json.barcodables+ "</select>";
+      var column6 = $('printerTable').rows[1].insertCell(-1);
+      column6.innerHTML = "<div id='available'></div>";
+      var column7 = $('printerTable').rows[1].insertCell(-1);
+      column7.id = "addTd";
+      column7.innerHTML = "Add";
+    }
+    else {
+      alert("Cannot add another printer service when one is already in progress.")
+    }
   },
 
   getContextFieldsForContext : function(contextSelect) {
@@ -143,6 +151,8 @@ Print.service = {
   },
 
   addPrinterService : function() {
+    jQuery('#printerTable').removeAttr("addInProgress");
+
     var f = Utils.mappifyForm("addPrinterForm");
     var cf = {};
     jQuery('input[id*="contextField-"]').each(function(e) {
@@ -158,6 +168,7 @@ Print.service = {
         'contextName':f.context,
         'contextFields':cf,
         'serviceFor':f.printServiceFor,
+        'schema':f.printSchema,
         'url':ajaxurl},
       {'doOnSuccess':Utils.page.pageReload,
        'doOnError':function(json) {
@@ -203,5 +214,135 @@ Print.service = {
         alert(json.response);
       }
     });
+  },
+
+  printCustomBarcodes: function () {
+    var samples = [];
+    for (var i = 0; i < arguments.length; i++) {
+      samples[i] = {'sampleId': arguments[i]};
+    }
+
+    Fluxion.doAjax(
+      'printerControllerHelperService',
+      'listAvailableServices',
+      {
+        'serviceClass': 'net.sf.json.JSONObject',
+        'url': ajaxurl
+      },
+      {
+        'doOnSuccess': function (json) {
+          jQuery('#printServiceSelectDialog')
+                  .html("<form>" +
+                        "<fieldset class='dialog'>" +
+                        "<select name='serviceSelect' id='serviceSelect' class='ui-widget-content ui-corner-all'>" +
+                        json.services +
+                        "</select></fieldset></form>");
+
+          jQuery(function () {
+            var barcodeitornot = 'no';
+            if (jQuery('#barcodeit').is(':checked')) {
+              barcodeitornot = 'yes';
+            }
+            jQuery('#printServiceSelectDialog').dialog({
+              autoOpen: false,
+              width: 400,
+              modal: true,
+              resizable: false,
+              buttons: {
+                "Print": function () {
+                  Fluxion.doAjax(
+                    'printerControllerHelperService',
+                    'printCustomBarcode',
+                    {
+                      'serviceName': jQuery('#serviceSelect').val(),
+                      'line1': jQuery('#customPrintLine1').val(),
+                      'line2': jQuery('#customPrintLine2').val(),
+                      'line3': jQuery('#customPrintLine3').val(),
+                      'barcodeit': barcodeitornot,
+                      'url': ajaxurl
+                    },
+                    {
+                      'doOnSuccess': function (json) {
+                        alert(json.response);
+                      }
+                    }
+                  );
+                  jQuery(this).dialog('close');
+                },
+                "Cancel": function () {
+                  jQuery(this).dialog('close');
+                }
+              }
+            });
+          });
+          jQuery('#printServiceSelectDialog').dialog('open');
+        },
+        'doOnError': function (json) {
+          alert(json.error);
+        }
+      }
+    );
+  },
+
+  printCustom1DBarcodes: function () {
+    var samples = [];
+    for (var i = 0; i < arguments.length; i++) {
+      samples[i] = {'sampleId': arguments[i]};
+    }
+
+    Fluxion.doAjax(
+      'printerControllerHelperService',
+      'listAvailableServices',
+      {
+        'serviceClass': 'net.sf.json.JSONObject',
+        'url': ajaxurl
+      },
+      {
+        'doOnSuccess': function (json) {
+          jQuery('#printServiceSelectDialog')
+            .html("<form>" +
+                  "<fieldset class='dialog'>" +
+                  "<select name='serviceSelect' id='serviceSelect' class='ui-widget-content ui-corner-all'>" +
+                  json.services +
+                  "</select></fieldset></form>");
+
+          jQuery(function () {
+            jQuery('#printServiceSelectDialog').dialog({
+              autoOpen: false,
+              width: 400,
+              modal: true,
+              resizable: false,
+              buttons: {
+                "Print": function () {
+                  Fluxion.doAjax(
+                    'printerControllerHelperService',
+                    'printCustom1DBarcode',
+                    {
+                      'serviceName': jQuery('#serviceSelect').val(),
+                      'line1': jQuery('#custom1DPrintLine1').val(),
+                      'line2': jQuery('#custom1DPrintLine2').val(),
+                      'url': ajaxurl
+                    },
+                    {
+                      'doOnSuccess': function (json) {
+                        alert(json.response);
+                      }
+                    }
+                  );
+                  jQuery(this).dialog('close');
+                },
+                "Cancel": function () {
+                  jQuery(this).dialog('close');
+                }
+              }
+            });
+          });
+          jQuery('#printServiceSelectDialog').dialog('open');
+        },
+        'doOnError': function (json) {
+          alert(json.error);
+        }
+      }
+    );
   }
 };

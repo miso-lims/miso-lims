@@ -55,7 +55,7 @@ public abstract class AbstractStudy implements Study {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long studyId = AbstractStudy.UNSAVED_ID;
+  private long studyId = AbstractStudy.UNSAVED_ID;
 
   @Transient
   public Document submissionDocument;
@@ -191,7 +191,7 @@ public abstract class AbstractStudy implements Study {
     else {
       throw new SecurityException("Cannot inherit permissions when parent object owner is not set!");
     }
-  }
+  }  
 
   public boolean userCanRead(User user) {
     return securityProfile.userCanRead(user);

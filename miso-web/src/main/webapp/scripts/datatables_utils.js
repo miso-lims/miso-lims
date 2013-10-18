@@ -27,14 +27,13 @@
  * Date: 17-Aug-2011
  * Time: 16:37:48
  */
-
 var DatatableUtils = DatatableUtils || {};
 
 DatatableUtils = {
-  collapseInputs : function(tableselector) {
+  collapseInputs: function (tableselector) {
     var tableObj = jQuery(tableselector);
     var table = tableObj.dataTable();
-    tableObj.find("input,select").each(function() {
+    tableObj.find("input,select").each(function () {
       var tr = jQuery(this).parent().parent().parent();
       var td = jQuery(this).parent().parent();
       var row = tr.parent().children().index(tr);
@@ -53,21 +52,25 @@ DatatableUtils = {
     tableObj.dataTable();
   },
 
-  toggleSelectAll : function(tableselector, span) {
+  toggleSelectAll: function (tableselector, span) {
     var tableObj = jQuery(tableselector);
     var s = jQuery(span);
     var sel = s.attr("sel");
     if (sel == "none") {
-      tableObj.find('tbody tr').each(function() { jQuery(this).addClass('row_selected') });
+      tableObj.find('tbody tr').each(function () {
+        jQuery(this).addClass('row_selected')
+      });
       s.attr("sel", "all");
     }
     else {
-      tableObj.find('tbody tr').each(function() { jQuery(this).removeClass('row_selected') });
+      tableObj.find('tbody tr').each(function () {
+        jQuery(this).removeClass('row_selected')
+      });
       s.attr("sel", "none");
     }
   },
 
-  fillDown : function(tableselector, th) {
+  fillDown: function (tableselector, th) {
     var self = this;
     self.collapseInputs(tableselector);
 
@@ -99,7 +102,7 @@ DatatableUtils = {
     }
   },
 
-  fnGetSelected : function(datatable) {
+  fnGetSelected: function (datatable) {
     var aReturn = new Array();
     var aTrs = datatable.fnGetNodes();
     for (var i = 0; i < aTrs.length; i++) {
@@ -110,3 +113,5 @@ DatatableUtils = {
     return aReturn;
   }
 };
+
+

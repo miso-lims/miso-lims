@@ -30,6 +30,8 @@ import org.slf4j.LoggerFactory;
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationException;
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationUtils;
 
+import java.util.Iterator;
+
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.service.task
  * <p/>
@@ -42,8 +44,8 @@ import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationUtils;
 public class AnalysisQueryService {
   protected static final Logger log = LoggerFactory.getLogger(AnalysisQueryService.class);
 
-  private String analysisServerHost = "localhost";
-  private int analysisServerPort = 7898;
+  private String analysisServerHost;
+  private int analysisServerPort;
 
   public void setAnalysisServerHost(String analysisServerHost) {
     this.analysisServerHost = analysisServerHost;
@@ -112,8 +114,43 @@ public class AnalysisQueryService {
           log.error(error);
           throw new IntegrationException("Analysis query returned an error: " + error);
         }
+        else {
+          JSONArray n = new JSONArray();
+          for (JSONObject task : (Iterable<JSONObject>)r) {
+            if (!task.getString("statusMessage").contains("Failed")) {
+              n.add(task);
+            }
+          }
+          return n;
+        }
+      }
+    }
+    return JSONArray.fromObject("[]");
+  }
 
-        return JSONArray.fromObject(response);
+  public JSONArray getFailedTasks() throws IntegrationException {
+    JSONObject q1 = new JSONObject();
+    q1.put("query", "getPendingTasks");
+    String query = q1.toString();
+
+    String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket(analysisServerHost, analysisServerPort), query);
+    if (!"".equals(response)) {
+      JSONArray r = JSONArray.fromObject(response);
+      if (!r.isEmpty()) {
+        if (r.size() == 1 && r.getJSONObject(0).has("error")) {
+          String error = r.getJSONObject(0).getString("error");
+          log.error(error);
+          throw new IntegrationException("Analysis query returned an error: " + error);
+        }
+        else {
+          JSONArray n = new JSONArray();
+          for (JSONObject task : (Iterable<JSONObject>)r) {
+            if (task.getString("statusMessage").contains("Failed")) {
+              n.add(task);
+            }
+          }
+          return n;
+        }
       }
     }
     return JSONArray.fromObject("[]");

@@ -5,10 +5,10 @@ html {
 
 body {
     font: 80% "Trebuchet MS", Helvetica; /*width: 956px; */
-    width: 90%;
+    /*width: 90%;*/
     text-align: left;
     color: #333;
-    margin: 2em auto;
+    /*margin: 2em auto;*/
     background: #FFF;
     padding: 1.3em;
     border: 0.3em solid #EAEAEA;
@@ -1677,6 +1677,9 @@ stroke-width: 2px;}
 .lineC{
 	stroke: black;
 
+}
+a.DTTT_button{
+    margin-left:10px ! important;
 }
 
 /*statsdb ends*/

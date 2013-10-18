@@ -480,7 +480,8 @@ public class SubmissionControllerHelperService {
 
                     //creates HTML for list of library dilutions and corresponding datafiles.
                     //gets all the dilutions in that partition's pool.
-                    Collection<? extends Poolable> poolables = part.getPool().getPoolableElements();
+                    List<? extends Poolable> poolables = new ArrayList<Poolable>(part.getPool().getPoolableElements());
+                    Collections.sort(poolables);
 
                     FilePathGenerator fpg = filePathGeneratorResolverService.getFilePathGenerator(r.getPlatformType());
                     if (fpg == null) {

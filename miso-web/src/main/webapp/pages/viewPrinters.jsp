@@ -29,17 +29,60 @@
   
 --%>
 <%@ include file="../header.jsp" %>
-
 <script type="text/javascript" src="<c:url value='/scripts/printer_ajax.js?ts=${timestamp.time}'/>"></script>
 
 <div id="maincontent">
   <div id="contentcolumn">
-    <c:if test="${not empty barcodePrinters}">
-      <h1>Printers</h1>
-      <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-        <a href='javascript:void(0);' class="add" onclick="Print.ui.getPrinterFormEntities(); return false;">Add Printer
-          Service</a><br/>
-      </c:if>
+    <c:choose>
+      <c:when test="${not empty barcodePrinter}">
+        <h1>Printer ${barcodePrinter.name}</h1>
+        <table class="list" id="printerTable">
+          <thead>
+          <tr>
+            <th>Job ID</th>
+            <th>Date</th>
+            <th>User</th>
+            <th>Status</th>
+            <th>Elements</th>
+          </tr>
+          </thead>
+          <tbody>
+          <c:forEach items="${printJobs}" var="job">
+            <tr>
+              <td>${job.jobId}</td>
+              <td>${job.printDate}</td>
+              <td>${job.printUser.loginName}</td>
+              <td>${job.status}</td>
+              <td><c:forEach items="${job.queuedElements}" var="element">
+                ${element}<br/>
+              </c:forEach>
+              </td>
+            </tr>
+          </c:forEach>
+          </tbody>
+        </table>
+
+        <script type="text/javascript">
+          jQuery(document).ready(function () {
+            jQuery("#printerTable").tablesorter({
+              headers: {
+                3: {
+                  sorter: false
+                },
+                4: {
+                  sorter: false
+                }
+              }
+            });
+          });
+        </script>
+      </c:when>
+      <c:otherwise>
+        <h1>Printers</h1>
+        <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+          <a href='javascript:void(0);' class="add" onclick="Print.ui.getPrinterFormEntities(); return false;">Add
+            Printer Service</a><br/>
+        </c:if>
 
         <form id='addPrinterForm'>
           <table class="list" id="printerTable">
@@ -50,6 +93,7 @@
               <th>Type</th>
               <th>Recent Print Jobs</th>
               <th>Enabled</th>
+              <th>Schema</th>
               <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
                 <th>Edit</th>
               </c:if>
@@ -69,18 +113,21 @@
                 <td>
                   <c:choose>
                     <c:when test="${service.enabled}">
-                      <span class="miso-button ui-state-default ui-corner-all ui-icon ui-icon-check"
-                            onclick="Print.service.disablePrintService('${service.name}');">Disable</span>
+                          <span class="miso-button ui-state-default ui-corner-all ui-icon ui-icon-check"
+                                onclick="Print.service.disablePrintService('${service.name}');">Disable</span>
                     </c:when>
                     <c:otherwise>
-                      <span class="miso-button ui-state-default ui-corner-all ui-icon ui-icon-closethick"
-                            onclick="Print.service.enablePrintService('${service.name}');">Enable</span>
+                          <span class="miso-button ui-state-default ui-corner-all ui-icon ui-icon-closethick"
+                                onclick="Print.service.enablePrintService('${service.name}');">Enable</span>
                     </c:otherwise>
                   </c:choose>
                 </td>
+                <td>${service.barcodableSchema.name}</td>
                 <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
                   <td id='edit-${service.name}' class="misoicon"/>
-                    <a href='javascript:void(0);' onclick="Print.ui.changePrinterServiceRow('${service.name}');"><span class="ui-icon ui-icon-pencil"/></a>
+                  <a href='javascript:void(0);'
+                     onclick="Print.ui.changePrinterServiceRow('${service.name}');"><span
+                      class="ui-icon ui-icon-pencil"/></a>
                   </td>
                 </c:if>
               </tr>
@@ -89,62 +136,19 @@
             </tbody>
           </table>
         </form>
-    </c:if>
 
-    <script type="text/javascript">
-      jQuery('.miso-button').hover(
-        function() {
-          jQuery(this).addClass('ui-state-hover');
-        },
-        function() {
-          jQuery(this).removeClass('ui-state-hover');
-        }
-      );
-    </script>
-
-    <c:if test="${not empty barcodePrinter}">
-      <h1>Printer ${barcodePrinter.name}</h1>
-      <table class="list" id="printerTable">
-        <thead>
-        <tr>
-          <th>Job ID</th>
-          <th>Date</th>
-          <th>User</th>
-          <th>Status</th>
-          <th>Elements</th>
-        </tr>
-        </thead>
-        <tbody>
-        <c:forEach items="${printJobs}" var="job">
-          <tr>
-            <td>${job.jobId}</td>
-            <td>${job.printDate}</td>
-            <td>${job.printUser.loginName}</td>
-            <td>${job.status}</td>
-            <td><c:forEach items="${job.queuedElements}" var="element">
-              ${element}<br/>
-            </c:forEach>
-            </td>
-          </tr>
-        </c:forEach>
-        </tbody>
-      </table>
-
-      <script type="text/javascript">
-        jQuery(document).ready(function() {
-          jQuery("#printerTable").tablesorter({
-            headers: {
-              3: {
-                sorter: false
-              },
-              4: {
-                sorter: false
-              }
+        <script type="text/javascript">
+          jQuery('.miso-button').hover(
+            function () {
+              jQuery(this).addClass('ui-state-hover');
+            },
+            function () {
+              jQuery(this).removeClass('ui-state-hover');
             }
-          });
-        });
-      </script>
-    </c:if>
+          );
+        </script>
+      </c:otherwise>
+    </c:choose>
 
     <c:choose>
       <c:when test="${not empty userPrintJobs}">
@@ -179,7 +183,7 @@
         </table>
 
         <script type="text/javascript">
-          jQuery(document).ready(function() {
+          jQuery(document).ready(function () {
             jQuery("#printerTable").tablesorter({
               headers: {
                 4: {

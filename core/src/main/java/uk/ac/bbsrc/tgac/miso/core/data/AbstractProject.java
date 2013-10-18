@@ -30,6 +30,7 @@ import javax.persistence.*;
 import com.eaglegenomics.simlims.core.Request;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
+import org.apache.commons.lang.BooleanUtils;
 import org.w3c.dom.Document;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
@@ -62,12 +63,13 @@ public abstract class AbstractProject implements Project {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long projectId = AbstractProject.UNSAVED_ID;
+  private long projectId = AbstractProject.UNSAVED_ID;
 
   @OneToMany(cascade = CascadeType.ALL)
   private Collection<Request> requests = new HashSet<Request>();
 
   private Collection<Sample> samples = new HashSet<Sample>();
+  private Collection<Run> runs = new HashSet<Run>();
   private Collection<Study> studies = new HashSet<Study>();
   private Collection<ProjectOverview> overviews = new HashSet<ProjectOverview>();
   private Collection<String> issueKeys = new HashSet<String>();
@@ -118,6 +120,10 @@ public abstract class AbstractProject implements Project {
 
   public Collection<Sample> getSamples() {
     return samples;
+  }
+
+  public Collection<Run> getRuns() {
+    return runs;
   }
 
   public Collection<Study> getStudies() {
@@ -172,6 +178,16 @@ public abstract class AbstractProject implements Project {
     }
   }
 
+  public void setRuns(Collection<Run> runs) {
+    this.runs = runs;
+    try {
+      Collections.sort(Arrays.asList(this.runs), new AliasComparator(Run.class));
+    }
+    catch (NoSuchMethodException e) {
+      e.printStackTrace();
+    }
+  }
+
   public void addSample(Sample sample) {
     this.samples.add(sample);
     try {
@@ -217,7 +233,7 @@ public abstract class AbstractProject implements Project {
            getSamples().isEmpty() &&
            getStudies().isEmpty();
   }
-  
+
   public SecurityProfile getSecurityProfile() {
     return securityProfile;
   }
@@ -229,10 +245,19 @@ public abstract class AbstractProject implements Project {
   public void inheritPermissions(SecurableByProfile parent) throws SecurityException {
     //projects have no parents
     //setSecurityProfile(parent.getSecurityProfile());
-  }  
+  }
 
   public boolean userCanRead(User user) {
-    return securityProfile.userCanRead(user);
+    try {
+      Boolean bool = false;
+      if (BooleanUtils.isTrue(securityProfile.userCanRead(user))) {
+        bool = true;
+      }
+      return bool;
+    }
+    catch (NullPointerException e) {
+      return false;
+    }
   }
 
   public boolean userCanWrite(User user) {

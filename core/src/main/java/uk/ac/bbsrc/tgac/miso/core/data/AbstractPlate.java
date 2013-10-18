@@ -46,7 +46,7 @@ public abstract class AbstractPlate<T extends List<S>, S extends Plateable> impl
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long plateId = AbstractPlate.UNSAVED_ID;
+  private long plateId = AbstractPlate.UNSAVED_ID;
 
   private SecurityProfile securityProfile;
   private String name;

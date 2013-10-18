@@ -32,6 +32,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.factory.submission.ERASubmissionFactory;
 import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.UnicodeReader;
 
 import javax.persistence.*;
 import javax.xml.parsers.DocumentBuilder;
@@ -73,10 +74,10 @@ public class SolidRun extends RunImpl {
   public SolidRun(String statusXml, User user) {
     try {
       if (statusXml != null && !"".equals(statusXml)) {
-        String runDirRegex = "([A-z0-9]+)_([0-9]{8})_(.*)";
+        String runDirRegex = "([A-z0-9\\-]+)_([0-9]{8})_(.*)";
         Pattern runRegex = Pattern.compile(runDirRegex);
         Document statusDoc = SubmissionUtils.emptyDocument();
-        SubmissionUtils.transform(new StringReader(statusXml), statusDoc);
+        SubmissionUtils.transform(new UnicodeReader(statusXml), statusDoc);
 
         String runName;
         if (statusDoc.getDocumentElement().getTagName().equals("error")) {

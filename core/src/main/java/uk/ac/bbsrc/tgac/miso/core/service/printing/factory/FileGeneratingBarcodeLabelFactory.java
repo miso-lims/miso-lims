@@ -26,14 +26,10 @@ package uk.ac.bbsrc.tgac.miso.core.service.printing.factory;
 import com.eaglegenomics.simlims.core.User;
 import com.opensymphony.util.FileUtils;
 import net.sourceforge.fluxion.spi.ServiceProvider;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
-import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
-import uk.ac.bbsrc.tgac.miso.core.data.Plate;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeLabelFactory;
-import uk.ac.bbsrc.tgac.miso.core.factory.barcode.MisoJscriptFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.*;
+import uk.ac.bbsrc.tgac.miso.core.service.printing.schema.BarcodableSchema;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,7 +44,7 @@ import java.io.IOException;
  * @since 0.1.6
  */
 @ServiceProvider
-public class BradyJscriptBarcodeLabelFactory implements BarcodeLabelFactory<File> {
+public class FileGeneratingBarcodeLabelFactory<T> implements BarcodeLabelFactory<File, T, BarcodableSchema<File, T>> {
   private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
   private MisoFilesManager misoFileManager;
 
@@ -63,21 +59,11 @@ public class BradyJscriptBarcodeLabelFactory implements BarcodeLabelFactory<File
   }
 
   @Override
-  public File getLabel(Barcodable b) {
+  public File getLabel(BarcodableSchema<File, T> s,T b) {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
 
-      String labelScript = null;
-
-      if (b instanceof Sample) {
-        labelScript = MisoJscriptFactory.minus80TubeBarcodeLabel(b.getName(), b.getLabelText(), b.getIdentificationBarcode());
-      }
-      else if (b instanceof Plate) {
-        labelScript = MisoJscriptFactory.plateBarcodeLabel(b.getName(), b.getLabelText(), b.getIdentificationBarcode());
-      }
-      else {
-        labelScript = MisoJscriptFactory.standardTubeBarcodeLabel(b.getName(), b.getLabelText(), b.getIdentificationBarcode());
-      }
+      String labelScript = s.getRawState(b);
 
       File f = misoFileManager.generateTemporaryFile(user.getLoginName() + "_"+b.getClass().getSimpleName().toLowerCase()+"-", ".printjob");
       FileUtils.write(f, labelScript);

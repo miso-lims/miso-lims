@@ -23,8 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.core.store;
 
-import net.sourceforge.fluxion.spi.Spi;
-
 import java.io.IOException;
 import java.util.Collection;
 

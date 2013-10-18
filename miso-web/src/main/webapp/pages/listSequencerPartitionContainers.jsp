@@ -36,7 +36,7 @@
     <table cellpadding="0" cellspacing="0" border="0" class="display" id="listingContainersTable">
     </table>
     <script type="text/javascript">
-      jQuery(document).ready(function() {
+      jQuery(document).ready(function () {
         Container.ui.createListingContainersTable();
       });
     </script>

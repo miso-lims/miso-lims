@@ -23,7 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.core.manager;
 
-//import com.sun.xml.internal.bind.v2.schemagen.xmlschema.Element;
 import net.sf.json.JSONArray;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -41,9 +40,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
-//import sun.jdbc.odbc.ee.PoolWorker;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.*;
 import uk.ac.bbsrc.tgac.miso.core.service.submission.*;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
@@ -58,6 +55,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.io.*;
+import java.net.URI;
 import java.net.URL;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -502,8 +500,7 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
     if(dataFiles.size()>0){
       TransferMethod t = new FTPTransferMethod();
       EndPoint end = new ERAEndpoint();
-      end.setDestination("localhost");
-      //end.setDestination(submissionEndPoint.toExternalForm());
+      end.setDestination(URI.create("ftp://localhost"));
 
       try {
         UploadReport report=t.uploadSequenceData(dataFiles, end);

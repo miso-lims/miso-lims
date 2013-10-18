@@ -170,8 +170,11 @@ public class UploadController {
       }
     }
     catch (Exception e) {
-      log.error("SAMPLE IMPORT FAIL:", e);
-      throw new IOException(e);
+      log.error("SAMPLE IMPORT FAIL:" + e.getMessage());
+      //JSONObject o = new JSONObject();
+      //o.put("bulkerror", "Cannot import bulk spreadsheet: " + e.getMessage());
+      //log.error(o.toString());
+      //request.getSession(false).setAttribute("bulkerror", o);
     }
   }
 

@@ -44,10 +44,7 @@ import uk.ac.ebi.fgpt.conan.model.ConanPipeline;
 import uk.ac.ebi.fgpt.conan.model.ConanTask;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller
@@ -106,14 +103,23 @@ public class AnalysisController {
       Map<String, String> map = new HashMap<String,String>();
       map.put("RunAccession", run.getAlias());
       map.put("basecall-path", run.getFilePath()+"/Data/Intensities/BaseCalls");
-      map.put("fastq-path", run.getFilePath()+"/Data/Intensities/BaseCalls/PAP");
-      map.put("makefile-path", run.getFilePath()+"/Data/Intensities/BaseCalls/PAP/Makefile");
-      map.put("sample-sheet-path", run.getFilePath()+"/Data/Intensities/BaseCalls/SampleSheet-pap.csv");
+//      map.put("fastq-path", run.getFilePath()+"/Data/Intensities/BaseCalls/PAP");
+//      map.put("makefile-path", run.getFilePath()+"/Data/Intensities/BaseCalls/PAP/Makefile");
+//      map.put("sample-sheet-path", run.getFilePath()+"/Data/Intensities/BaseCalls/SampleSheet-pap.csv");
+
+      map.put("fastq-path", "/net/tgac-ngs-qc/vol/qc/"+run.getAlias()+"/PAP");
+      map.put("makefile-path", "/net/tgac-ngs-qc/vol/qc/"+run.getAlias()+"/PAP/Makefile");
+      map.put("sample-sheet-path", "/net/tgac-ngs-qc/vol/qc/"+run.getAlias()+"/SampleSheet-PAP.csv");
+
       map.put("instrument-id", run.getSequencerReference().getName());
 
       if ("Illumina MiSeq".equals(run.getSequencerReference().getPlatform().getInstrumentModel())) {
         //append the base mask property for miseq runs
-        map.put("use-bases-mask", "y"+run.getCycles()+",i6,y"+run.getCycles());
+        String basesMask = "y"+run.getCycles()+",i6";
+        if (run.getPairedEnd()) {
+          basesMask += ",y"+run.getCycles();
+        }
+        map.put("use-bases-mask", basesMask);
       }
 
       SequencerPartitionContainer<SequencerPoolPartition> f = ((RunImpl) run).getSequencerPartitionContainers().get(0);
@@ -143,13 +149,21 @@ public class AnalysisController {
 
       map.put("paired-end", String.valueOf(run.getPairedEnd()));
 
+      map.put("email-report", "on");
+      map.put("ignore-missing-stats", "on");
+      map.put("ignore-missing-bcls", "on");
+      map.put("ignore-missing-controls", "on");
+      map.put("allow-mismatch", "on");
+
       model.put("defaultRunValues", map);
 
       List<String> pipelineNames = new ArrayList<String>();
       for (JSONObject pipeline : (Iterable<JSONObject>)queryService.getPipelines()) {
         pipelineNames.add(pipeline.getString("name"));
       }
+      Collections.sort(pipelineNames);
       model.put("pipelines", pipelineNames);
+
       return new ModelAndView("/pages/createAnalysisTask.jsp", model);
     }
   }

@@ -51,30 +51,32 @@
             <div id="${pt}totalCount">${pt} Pools</div>
           </h1>
           <ul class="sddm">
-            <li><a
-                    onmouseover="mopen('ipomenu')"
-                    onmouseout="mclosetime()">Options <span style="float:right"
-                                                            class="ui-icon ui-icon-triangle-1-s"></span></a>
+            <li>
+              <a onmouseover="mopen('ipomenu')" onmouseout="mclosetime()">Options
+                <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
+              </a>
 
               <div id="ipomenu"
                    onmouseover="mcancelclosetime()"
                    onmouseout="mclosetime()">
                 <a href='<c:url value="/miso/pool/new"/>'>Add Pool</a>
-                <a href='javascript:void(0);' onclick="Pool.barcode.selectPoolBarcodesToPrint('#${fn:toLowerCase(pt)}'); return false;">Print Barcodes
+                <a href='javascript:void(0);'
+                   onclick="Pool.barcode.selectPoolBarcodesToPrint('#${fn:toLowerCase(pt)}'); return false;">Print
+                  Barcodes
                   ...</a>
               </div>
             </li>
           </ul>
           <table cellpadding="0" cellspacing="0" border="0" class="display" id="listing${pt}PoolsTable"></table>
           <script type="text/javascript">
-            jQuery(document).ready(function() {
+            jQuery(document).ready(function () {
               Pool.ui.createListingPoolsTable('${pt}');
             });
           </script>
         </div>
       </c:forEach>
       <script type="text/javascript">
-        jQuery(document).ready(function() {
+        jQuery(document).ready(function () {
           jQuery("#tabs").tabs();
         });
       </script>

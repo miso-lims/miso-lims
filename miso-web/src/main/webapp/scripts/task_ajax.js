@@ -37,47 +37,55 @@ Tasks.ui = {
 
   processRunningTasks : function(json) {
     jQuery('#runningThrobber').remove();
-    for (var i = 0; i < json.runningTasks.length; i++) {
-      var task = json.runningTasks[i];
-      var processRuns = task.conanProcessRuns;
-      var rowtext = "<td>"+task.id+"</td><td>"+task.name+"</td><td>"+task.pipeline.name+"</td><td>"+task.statusMessage+"</td><td>"+new Date(task.startDate)+"</td>";
-      rowtext += "<td><table width='100%' border='0'><tr>";
-      for (var j = 0; j < task.pipeline.processes.length; j++) {
-        rowtext += "<td id='"+task.id+"-"+task.pipeline.processes[j].name+"'>"+task.pipeline.processes[j].name+"</td>";
-      }
 
-      rowtext += "</tr></table></td>";
-      jQuery('#runningTasks > tbody:last')
-        .append(jQuery('<tr>')
-          .append(rowtext)
-      );
+    // clear table
+    jQuery('#runningTasks tbody').html("");
 
-      for (var j = 0; j < task.pipeline.processes.length; j++) {
-        var process = task.pipeline.processes[j];
-        for (var k = 0; k < processRuns.length; k++) {
-          if (processRuns[k].processName === process.name) {
-            if (processRuns[k].exitValue == 0) {
-              jQuery('#'+task.id+"-"+task.pipeline.processes[j].name).addClass("ok");
-              jQuery('#'+task.id+"-"+task.pipeline.processes[j].name).attr("title", "Finished: " + new Date(processRuns[k].endDate));
-            }
-            else if (processRuns[k].exitValue == -1) {
-              jQuery('#'+task.id+"-"+task.pipeline.processes[j].name).addClass("running");
-              jQuery('#'+task.id+"-"+task.pipeline.processes[j].name).attr("title", "Started: " + new Date(processRuns[k].startDate));
-            }
-            else if (processRuns[k].exitValue == 1 || processRuns[k].exitValue == 255) {
-              jQuery('#'+task.id+"-"+task.pipeline.processes[j].name).addClass("error");
+    if (json.runningTasks.length > 0) {
+      for (var i = 0; i < json.runningTasks.length; i++) {
+        var task = json.runningTasks[i];
+        var processRuns = task.conanProcessRuns;
+        var rowtext = "<td>"+task.id+"</td><td>"+task.name+"</td><td>"+task.pipeline.name+"</td><td>"+task.statusMessage+"</td><td>"+new Date(task.startDate)+"</td>";
+        rowtext += "<td><table width='100%' border='0'><tr>";
+        for (var j = 0; j < task.pipeline.processes.length; j++) {
+          rowtext += "<td id='"+task.id+"-"+task.pipeline.processes[j].name+"'>"+task.pipeline.processes[j].name+"</td>";
+        }
+
+        rowtext += "</tr></table></td>";
+        jQuery('#runningTasks > tbody:last')
+          .append(jQuery('<tr>')
+            .append(rowtext)
+        );
+
+        for (var j = 0; j < task.pipeline.processes.length; j++) {
+          var process = task.pipeline.processes[j];
+          for (var k = 0; k < processRuns.length; k++) {
+            if (processRuns[k].processName === process.name) {
+              if (processRuns[k].exitValue == 0) {
+                jQuery('#'+task.id+"-"+task.pipeline.processes[j].name).addClass("ok");
+                jQuery('#'+task.id+"-"+task.pipeline.processes[j].name).attr("title", "Finished: " + new Date(processRuns[k].endDate));
+              }
+              else if (processRuns[k].exitValue == -1) {
+                jQuery('#'+task.id+"-"+task.pipeline.processes[j].name).addClass("running");
+                jQuery('#'+task.id+"-"+task.pipeline.processes[j].name).attr("title", "Started: " + new Date(processRuns[k].startDate));
+              }
+              else if (processRuns[k].exitValue == 1 || processRuns[k].exitValue == 255) {
+                jQuery('#'+task.id+"-"+task.pipeline.processes[j].name).addClass("error");
+              }
             }
           }
         }
       }
+      /*
+      jQuery("#runningTasks").tablesorter({
+        sortInitialOrder: 'desc',
+        headers: {
+          4: { sorter: false },
+          6: { sorter: false }
+        }
+      });
+      */
     }
-
-    jQuery("#runningTasks").tablesorter({
-      headers: {
-        4: { sorter: false },
-        6: { sorter: false }
-      }
-    });
   },
 
   populatePendingTasks : function() {
@@ -93,20 +101,63 @@ Tasks.ui = {
 
   processPendingTasks : function(json) {
     jQuery('#pendingThrobber').remove();
-    for (var i = 0; i < json.pendingTasks.length; i++) {
-      var task = json.pendingTasks[i];
-      var rowtext = "<td>"+task.id+"</td><td>"+task.name+"</td><td>"+task.pipeline.name+"</td><td>"+task.statusMessage+"</td><td>"+new Date(task.startDate)+"</td>";
-      jQuery('#pendingTasks > tbody:last')
-        .append(jQuery('<tr>')
-          .append(rowtext)
-      );
-    }
+    // clear table
+    jQuery('#pendingTasks tbody').html("");
 
-    jQuery("#pendingTasks").tablesorter({
-      headers: {
-        4: { sorter: false }
+    if (json.pendingTasks.length > 0) {
+      for (var i = 0; i < json.pendingTasks.length; i++) {
+        var task = json.pendingTasks[i];
+        var rowtext = "<td>"+task.id+"</td><td>"+task.name+"</td><td>"+task.pipeline.name+"</td><td>"+task.statusMessage+"</td><td>"+new Date(task.startDate)+"</td>";
+        jQuery('#pendingTasks > tbody:last')
+          .append(jQuery('<tr>')
+            .append(rowtext)
+        );
       }
-    });
+      /*
+      jQuery("#pendingTasks").tablesorter({
+        sortInitialOrder: 'desc',
+        headers: {
+          4: { sorter: false }
+        }
+      });
+      */
+    }
+  },
+
+  populateFailedTasks : function() {
+    var self = this;
+    jQuery('#failedDiv').prepend('<img id="failedThrobber" src="/styles/images/ajax-loader.gif"/>');
+    Fluxion.doAjax(
+            'taskControllerHelperService',
+            'populateFailedTasks',
+    {'url':ajaxurl},
+    {'doOnSuccess':self.processFailedTasks}
+    );
+  },
+
+  processFailedTasks : function(json) {
+    jQuery('#failedThrobber').remove();
+    // clear table
+    jQuery('#failedTasks tbody').html("");
+
+    if (json.failedTasks.length > 0) {
+      for (var i = 0; i < json.failedTasks.length; i++) {
+        var task = json.failedTasks[i];
+        var rowtext = "<td>"+task.id+"</td><td>"+task.name+"</td><td>"+task.pipeline.name+"</td><td>"+task.statusMessage+"</td><td>"+new Date(task.startDate)+"</td>";
+        jQuery('#failedTasks > tbody:last')
+          .append(jQuery('<tr>')
+            .append(rowtext)
+        );
+      }
+      /*
+      jQuery("#pendingTasks").tablesorter({
+        sortInitialOrder: 'desc',
+        headers: {
+          4: { sorter: false }
+        }
+      });
+      */
+    }
   },
 
   populateCompletedTasks : function() {
@@ -122,21 +173,27 @@ Tasks.ui = {
 
   processCompletedTasks : function(json) {
     jQuery('#completedThrobber').remove();
+    // clear table
+    jQuery('#completedTasks tbody').html("");
 
-    for (var i = 0; i < json.completedTasks.length; i++) {
-      var task = json.completedTasks[i];
-      var rowtext = "<td>"+task.id+"</td><td>"+task.name+"</td><td>"+task.pipeline.name+"</td><td>"+task.statusMessage+"</td><td>"+new Date(task.startDate)+"</td><td>"+new Date(task.completionDate)+"</td><td>"+task.currentState+"</td>";
-      jQuery('#completedTasks > tbody:last')
-        .append(jQuery('<tr>')
-          .append(rowtext)
-      );
-    }
-
-    jQuery("#completedTasks").tablesorter({
-      headers: {
-        4: { sorter: false }
+    if (json.completedTasks.length > 0) {
+      for (var i = 0; i < json.completedTasks.length; i++) {
+        var task = json.completedTasks[i];
+        var rowtext = "<td>"+task.id+"</td><td>"+task.name+"</td><td>"+task.pipeline.name+"</td><td>"+task.statusMessage+"</td><td>"+new Date(task.startDate)+"</td><td>"+new Date(task.completionDate)+"</td><td>"+task.currentState+"</td>";
+        jQuery('#completedTasks > tbody:last')
+          .append(jQuery('<tr>')
+            .append(rowtext)
+        );
       }
-    });
+      /*
+      jQuery("#completedTasks").tablesorter({
+        sortInitialOrder: 'desc',
+        headers: {
+          4: { sorter: false }
+        }
+      });
+      */
+    }
   },
 
   populatePipelines : function() {
@@ -239,7 +296,12 @@ Tasks.ui = {
     jQuery('input[type=hidden]').each(function(e) {
       var n = jQuery(this).attr("name");
       var v = jQuery(this).attr("value");
-      jQuery('input[name*="'+n.replace('default-','')+'"]').val(v);
+      var act = n.replace('default-','');
+      var inp = jQuery('input[name="'+act+'"]');
+      if (inp.attr("type") == "checkbox" && v == "on") {
+        inp.attr("checked", "checked");
+      }
+      inp.val(v);
     });
   }
 };
@@ -249,6 +311,9 @@ Tasks.job = {
     var self = this;
     var okString = "Please fix the following issues:\n\n";
     var ok = true;
+
+    Utils.ui.disableButton('submitTaskButton');
+
     jQuery('#pipelineDetails').find('input').each(function(e) {
       var inp = jQuery(this);
       if (inp.attr("type") == "checkbox") {
@@ -288,6 +353,8 @@ Tasks.job = {
       });
     }
     else {
+      Utils.ui.reenableButton('submitTaskButton', "Submit Task");
+
       jQuery('#pipelineDetails').find('input').each(function(e) {
         if (jQuery(this).attr("disabled")) {
           jQuery(this).removeAttr("disabled");
@@ -298,6 +365,8 @@ Tasks.job = {
   },
 
   processTaskSubmission : function(json) {
+    Utils.ui.reenableButton('submitTaskButton', "Submit Task");
+
     if (json.response) {
       if (confirm(json.response+". Return to Analysis page?")) {
         Utils.page.pageRedirect('/miso/analysis');

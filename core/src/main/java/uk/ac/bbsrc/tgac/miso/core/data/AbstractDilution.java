@@ -44,7 +44,7 @@ public abstract class AbstractDilution implements Dilution, Comparable {
   
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long dilutionId = AbstractDilution.UNSAVED_ID;
+  private long dilutionId = AbstractDilution.UNSAVED_ID;
   private String name;
   private Date creationDate;
   private Double concentration;
@@ -197,8 +197,7 @@ public abstract class AbstractDilution implements Dilution, Comparable {
     Dilution them = (Dilution) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
-    if (getId() == AbstractDilution.UNSAVED_ID
-        || them.getId() == AbstractDilution.UNSAVED_ID) {
+    if (AbstractDilution.UNSAVED_ID == getId() || AbstractDilution.UNSAVED_ID == them.getId()) {
       return getCreationDate().equals(them.getCreationDate()) &&
              getDilutionCreator().equals(them.getDilutionCreator()) &&
              getConcentration().equals(them.getConcentration());
@@ -210,7 +209,7 @@ public abstract class AbstractDilution implements Dilution, Comparable {
 
   @Override
   public int hashCode() {
-    if (getId() != AbstractDilution.UNSAVED_ID) {
+    if (AbstractDilution.UNSAVED_ID != getId()) {
       return (int)getId();
     }
     else {

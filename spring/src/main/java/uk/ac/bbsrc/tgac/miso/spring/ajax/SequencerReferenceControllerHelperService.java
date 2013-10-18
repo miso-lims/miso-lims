@@ -129,25 +129,33 @@ public class SequencerReferenceControllerHelperService {
   }
 
   public JSONObject deleteSequencerReference(HttpSession session, JSONObject json) {
+    User user;
     try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      if (user.isAdmin()) {
-        if (json.has("refId")) {
-          Long refId = json.getLong("refId");
-          requestManager.deleteSequencerReference(requestManager.getSequencerReferenceById(refId));
-          return JSONUtils.SimpleJSONResponse("Sequencer Reference deleted");
-        }
-        else {
-          return JSONUtils.SimpleJSONError("No Sequencer Reference specified to delete.");
-        }
-      }
-      else {
-        return JSONUtils.SimpleJSONError("Only admins can delete objects.");
-      }
+      user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     }
     catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
+    }
+
+    if (user != null && user.isAdmin()) {
+      if (json.has("refId")) {
+        Long refId = json.getLong("refId");
+        try {
+          requestManager.deleteSequencerReference(requestManager.getSequencerReferenceById(refId));
+          return JSONUtils.SimpleJSONResponse("Sequencer Reference deleted");
+        }
+        catch (IOException e) {
+          e.printStackTrace();
+          return JSONUtils.SimpleJSONError("Cannot delete sequencer reference: " + e.getMessage());
+        }
+      }
+      else {
+        return JSONUtils.SimpleJSONError("No Sequencer Reference specified to delete.");
+      }
+    }
+    else {
+      return JSONUtils.SimpleJSONError("Only admins can delete objects.");
     }
   }
 

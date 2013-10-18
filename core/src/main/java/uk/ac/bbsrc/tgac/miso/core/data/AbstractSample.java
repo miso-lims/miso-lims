@@ -49,7 +49,7 @@ public abstract class AbstractSample implements Sample {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long sampleId = AbstractSample.UNSAVED_ID;
+  private long sampleId = AbstractSample.UNSAVED_ID;
 
   private Project project;
 
@@ -327,8 +327,11 @@ public abstract class AbstractSample implements Sample {
       if (getName() != null && them.getName() != null) {
         return getName().equals(them.getName());
       }
-      else {
+      else if (getAlias() != null && them.getAlias() != null) {
         return getAlias().equals(them.getAlias());
+      }
+      else {
+        return false;
       }
     }
     else {

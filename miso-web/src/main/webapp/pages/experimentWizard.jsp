@@ -62,7 +62,6 @@
         </table>
         <br/>
         <hr/>
-
       </form>
     </div>
   </div>
@@ -141,7 +140,6 @@
       alert("Title, Alias and Description cannot be empty");
     }
   }
-
 </script>
 
 <%@ include file="adminsub.jsp" %>

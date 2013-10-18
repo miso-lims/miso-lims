@@ -51,7 +51,7 @@ public class SubmissionImpl implements Submission<Submittable, Document, Documen
 
   public static final Long UNSAVED_ID = 0L;
 
-  private Long submissionId = UNSAVED_ID;
+  private long submissionId = UNSAVED_ID;
   private String name;
   private String alias;
   private String accession;
@@ -250,5 +250,13 @@ public class SubmissionImpl implements Submission<Submittable, Document, Documen
   public Document submit(SubmissionManager manager) throws SubmissionException {
     submittables.add(this);
     return (Document)manager.submit(submittables);
+  }
+
+  @Override
+  public int compareTo(Object o) {
+    Submission t = (Submission)o;
+    if (getId() < t.getId()) return -1;
+    if (getId() > t.getId()) return 1;
+    return 0;
   }
 }

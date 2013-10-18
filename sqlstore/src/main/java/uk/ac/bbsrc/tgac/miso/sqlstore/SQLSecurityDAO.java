@@ -191,9 +191,9 @@ public class SQLSecurityDAO implements SecurityStore {
     Blob roleBlob = null;
     if (user.getRoles() != null) {
       List<String> roles = new ArrayList<String>(Arrays.asList(user.getRoles()));
-      if (user.isExternal()) roles.add("ROLE_EXTERNAL");
-      if (user.isInternal()) roles.add("ROLE_INTERNAL");
-      if (user.isAdmin()) roles.add("ROLE_ADMIN");
+      if (user.isExternal() && !roles.contains("ROLE_EXTERNAL")) roles.add("ROLE_EXTERNAL");
+      if (user.isInternal() && !roles.contains("ROLE_INTERNAL")) roles.add("ROLE_INTERNAL");
+      if (user.isAdmin() && !roles.contains("ROLE_ADMIN")) roles.add("ROLE_ADMIN");
       user.setRoles(roles.toArray(new String[user.getRoles().length]));
 
       try {
@@ -224,8 +224,8 @@ public class SQLSecurityDAO implements SecurityStore {
       params.addValue("password", passwordCodecService.encrypt(user.getPassword()));
     }
     else {
-      log.warn("No PasswordCodecService has been wired to this SQLSecurityDAO. This means your passwords are being " +
-               "stored in plaintext. Please specify a PasswordCodecService in your Spring config and (auto)wire it " +
+      log.warn("No PasswordCodecService has been wired to this SQLSecurityDAO. This means your passwords may be being " +
+               "stored in plaintext, if not already encrypted. Please specify a PasswordCodecService in your Spring config and (auto)wire it " +
                "to this DAO.");
       params.addValue("password", user.getPassword());
     }

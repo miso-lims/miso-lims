@@ -238,7 +238,7 @@ public class LimsDAO extends LimsDAOTestCase {
   public void testPartitions() {
     try {
       // get row count of experiments in the dataset
-      int expected = getDataSet().getTable("Partition").getRowCount();
+      int expected = getDataSet().getTable("_Partition").getRowCount();
 
       // get number of experiments from the DAO
       int actual = getPartitionDAO().count();
@@ -346,7 +346,7 @@ public class LimsDAO extends LimsDAOTestCase {
       TestCase.assertEquals("Wrong number of Pools", expected, actual);
       System.out.println("Expected number of Pools: " + expected + ", actual: " + actual);
 
-      for (Pool d : random(getPoolDAO(), actual, 5)) {
+      for (Pool d : random(getPoolDAO(), actual, 1)) {
         TestCase.assertNotNull(d);
         TestCase.assertNotNull(d.getId());
       }

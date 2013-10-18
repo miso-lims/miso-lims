@@ -24,10 +24,9 @@
   --%>
 
 <h1>Projects</h1>
-
 <ul>
-    <li><a href="<c:url value="/miso/projects"/>">List Projects</a></li>
-    <li><a href="<c:url value="/miso/project/new"/>">Create Project</a></li>
+  <li><a href="<c:url value="/miso/projects"/>">List Projects</a></li>
+  <li><a href="<c:url value="/miso/project/new"/>">Create Project</a></li>
 </ul>
 
 <%@ include file="../footer.jsp" %>

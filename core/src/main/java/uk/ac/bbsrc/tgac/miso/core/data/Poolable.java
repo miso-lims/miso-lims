@@ -41,7 +41,7 @@ import java.util.Set;
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
 //@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
 @JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
-public interface Poolable<T extends Poolable<T, S>, S> extends Nameable {
+public interface Poolable<T extends Poolable<T, S>, S> extends Nameable, Comparable {
   @JsonIgnore
   <S> Collection<S> getInternalPoolableElements();
   @JsonIgnore

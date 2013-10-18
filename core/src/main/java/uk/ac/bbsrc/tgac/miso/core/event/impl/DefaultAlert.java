@@ -47,7 +47,7 @@ public class DefaultAlert implements Alert, Serializable {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long alertId = UNSAVED_ID;
+  private long alertId = UNSAVED_ID;
   private String alertTitle;
   private String alertText;
   private User user;

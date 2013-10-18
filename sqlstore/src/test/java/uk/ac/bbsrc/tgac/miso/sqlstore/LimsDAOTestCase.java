@@ -93,7 +93,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
                   "Library_Note",
                   "Library_TagBarcode",
                   "Note",
-                  "Partition",
+                  "_Partition",
                   "Plate",
                   "Plate_Elements",
                   "Platform",
@@ -910,7 +910,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
                  ");");
 
     runStatement(conn,
-                 "CREATE TABLE Partition (" +
+                 "CREATE TABLE _Partition (" +
                  "partitionId BIGINT NOT NULL," +
                  "partitionNumber TINYINT NOT NULL," +
                  "pool_poolId BIGINT default NULL," +

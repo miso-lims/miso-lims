@@ -592,7 +592,7 @@ public class PoolControllerHelperService {
         serviceName = json.getString("serviceName");
       }
 
-      MisoPrintService<File, PrintContext<File>> mps = null;
+      MisoPrintService<File, Barcodable, PrintContext<File>> mps = null;
       if (serviceName == null) {
         Collection<MisoPrintService> services = printManager.listPrintServicesByBarcodeableClass(Pool.class);
         if (services.size() == 1) {
@@ -989,6 +989,24 @@ public class PoolControllerHelperService {
     }
   }
 
+  public JSONObject checkConcentrationByPoolId(HttpSession session, JSONObject json) {
+   try {
+     JSONObject j = new JSONObject();
+     Long poolId = json.getLong("poolId");
+     Pool pool = requestManager.getPoolById(poolId);
+     double concentration = pool.getConcentration();
+     j.put("response", concentration);
+     return j;
+   }
+   catch (IOException e) {
+     log.debug("Failed", e);
+     return JSONUtils.SimpleJSONError(e.getMessage());
+   }
+ }
+
+
+
+
   public JSONObject checkInfoByPoolId(HttpSession session, JSONObject json) {
     try {
       JSONObject j = new JSONObject();
@@ -1067,25 +1085,33 @@ public class PoolControllerHelperService {
   }
 
   public JSONObject deletePool(HttpSession session, JSONObject json) {
+    User user;
     try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      if (user.isAdmin()) {
-        if (json.has("poolId")) {
-          Long poolId = json.getLong("poolId");
-          requestManager.deletePool(requestManager.getPoolById(poolId));
-          return JSONUtils.SimpleJSONResponse("Pool deleted");
-        }
-        else {
-          return JSONUtils.SimpleJSONError("No pool specified to delete.");
-        }
-      }
-      else {
-        return JSONUtils.SimpleJSONError("Only admins can delete objects.");
-      }
+      user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     }
     catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
+    }
+
+    if (user != null && user.isAdmin()) {
+      if (json.has("poolId")) {
+        Long poolId = json.getLong("poolId");
+        try {
+          requestManager.deletePool(requestManager.getPoolById(poolId));
+          return JSONUtils.SimpleJSONResponse("Pool deleted");
+        }
+        catch (IOException e) {
+          e.printStackTrace();
+          return JSONUtils.SimpleJSONError("Cannot delete pool: " + e.getMessage());
+        }
+      }
+      else {
+        return JSONUtils.SimpleJSONError("No pool specified to delete.");
+      }
+    }
+    else {
+      return JSONUtils.SimpleJSONError("Only logged-in admins can delete objects.");
     }
   }
 
@@ -1100,6 +1126,7 @@ public class PoolControllerHelperService {
           pout.add(pool.getName());
           pout.add(pool.getAlias() != null ? pool.getAlias() : "");
           pout.add(pool.getCreationDate() != null ? pool.getCreationDate().toString() : "");
+          pout.add(pool.getId());
           pout.add(pool.getId());
           pout.add(pool.getId());
           pout.add("<a href=\"/miso/pool/" + pool.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>");

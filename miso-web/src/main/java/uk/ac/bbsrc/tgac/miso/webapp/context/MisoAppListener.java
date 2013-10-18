@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.context;
 
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import org.apache.log4j.PropertyConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -93,6 +94,9 @@ public class MisoAppListener implements ServletContextListener {
    */
   public void contextInitialized(ServletContextEvent event) {
     ServletContext application = event.getServletContext();
+
+    //load logging system manually so that we get the placeholders ${} swapped out for real values
+    PropertyConfigurator.configure(application.getRealPath("/")+"/WEB-INF/log4j.miso.properties");
 
     XmlWebApplicationContext context = (XmlWebApplicationContext)WebApplicationContextUtils.getRequiredWebApplicationContext(application);
 

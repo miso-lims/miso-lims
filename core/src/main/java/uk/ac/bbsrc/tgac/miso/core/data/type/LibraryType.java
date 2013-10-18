@@ -43,7 +43,7 @@ public class LibraryType implements Comparable, Serializable {
   /** Field libraryTypeId  */
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long libraryTypeId = LibraryType.UNSAVED_ID;
+  private long libraryTypeId = LibraryType.UNSAVED_ID;
   /** Field description  */
   private String description;
   /** Field platformType  */

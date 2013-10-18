@@ -68,7 +68,7 @@ public abstract class AbstractExperiment implements Experiment {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long experimentId = AbstractExperiment.UNSAVED_ID;
+  private long experimentId = AbstractExperiment.UNSAVED_ID;
   private String accession;
 
   @OneToOne(targetEntity = PlatformImpl.class, cascade = CascadeType.ALL)

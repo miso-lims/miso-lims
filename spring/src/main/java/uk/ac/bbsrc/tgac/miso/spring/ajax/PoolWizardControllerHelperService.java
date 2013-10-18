@@ -78,11 +78,7 @@ public class PoolWizardControllerHelperService {
     PlatformType platformType = PlatformType.get(json.getString("platformType"));
 
     StringBuilder sb = new StringBuilder();
-    List<Long> ids = new ArrayList<Long>();
-    JSONArray a = JSONArray.fromObject(json.get("dilutions"));
-    for (JSONObject j : (Iterable<JSONObject>) a) {
-      ids.add(j.getLong("dilutionId"));
-    }
+    List<Integer> ids  = JSONArray.fromObject(json.getString("dilutions"));
 
     List<PoolQC> pqcs = new ArrayList<PoolQC>();
     JSONArray qcs = JSONArray.fromObject(json.get("qcs"));
@@ -111,8 +107,8 @@ public class PoolWizardControllerHelperService {
         User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
 
         List<Dilution> dils = new ArrayList<Dilution>();
-        for (Long id : ids) {
-          dils.add(requestManager.getDilutionByIdAndPlatform(id, platformType));
+        for (Integer id : ids) {
+          dils.add(requestManager.getDilutionByIdAndPlatform(id.longValue(), platformType));
         }
 
         boolean barcodeCollision = false;
@@ -183,28 +179,28 @@ public class PoolWizardControllerHelperService {
           requestManager.savePool(pool);
 
           //sb.append("<a  class='dashboardresult' href='/miso/pool/"+pool.getPlatformType().getKey().toLowerCase()+"/" + pool.getId() + "' target='_blank'><div  onmouseover=\"this.className='dashboardhighlight ui-corner-all'\" onmouseout=\"this.className='dashboard ui-corner-all'\"  class='dashboard ui-corner-all' >");
-          sb.append("<a  class='dashboardresult' href='/miso/pool/"+pool.getId() + "' target='_blank'><div  onmouseover=\"this.className='dashboardhighlight ui-corner-all'\" onmouseout=\"this.className='dashboard ui-corner-all'\"  class='dashboard ui-corner-all' >");
+          sb.append("<a  class='dashboardresult' href='/miso/pool/" + pool.getId() + "' target='_blank'><div  onmouseover=\"this.className='dashboardhighlight ui-corner-all'\" onmouseout=\"this.className='dashboard ui-corner-all'\"  class='dashboard ui-corner-all' >");
           sb.append("Pool ID: <b>" + pool.getId() + "</b><br/>");
           sb.append("Pool Name: <b>" + pool.getName() + "</b><br/>");
           sb.append("Platform Type: <b>" + pool.getPlatformType().name() + "</b><br/>");
           sb.append("Dilutions: <ul class='bullets'>");
           for (Dilution dl : (Collection<? extends Dilution>) pool.getDilutions()) {
-            sb.append("<li>" + dl.getName() + " (<a href='/miso/library/"+dl.getLibrary().getId()+"'>" + dl.getLibrary().getAlias() + "</a>)</li>");
+            sb.append("<li>" + dl.getName() + " (<a href='/miso/library/" + dl.getLibrary().getId() + "'>" + dl.getLibrary().getAlias() + "</a>)</li>");
           }
           sb.append("</ul>");
 
           sb.append("QCs: <ul class='bullets'>");
           for (PoolQC qc : (Collection<PoolQC>) pool.getPoolQCs()) {
             sb.append("<li>")
-              .append(qc.getResults()).append(" ").append(qc.getQcType().getUnits())
-              .append(" (").append(qc.getQcType().getName()).append(")</li>");
+                .append(qc.getResults()).append(" ").append(qc.getQcType().getUnits())
+                .append(" (").append(qc.getQcType().getName()).append(")</li>");
           }
           sb.append("</ul>");
 
           sb.append("</div></a>");
         }
         else {
-          throw new IOException("Tag barcode collision. Two or more selection dilutions have the same tag barcode and therefore cannot be pooled together.");          
+          throw new IOException("Tag barcode collision. Two or more selection dilutions have the same tag barcode and therefore cannot be pooled together.");
         }
       }
       catch (IOException e) {
@@ -215,7 +211,7 @@ public class PoolWizardControllerHelperService {
     else {
       sb.append("<br/>No dilution available to save.");
     }
-    
+
     response.put("html", sb.toString());
     return response;
   }
@@ -285,14 +281,14 @@ public class PoolWizardControllerHelperService {
             }
           }
 
-          b.append("<tr id='"+dl.getId()+"'><td class='rowSelect'></td>");
-          b.append("<td>" + dl.getName() +"</td>");
+          b.append("<tr id='" + dl.getId() + "'><td class='rowSelect'></td>");
+          b.append("<td>" + dl.getName() + "</td>");
           b.append("<td>");
           b.append(barcode);
           b.append("</td>");
           b.append("</tr>");
 
-          a.add(JSONObject.fromObject("{'id':"+dl.getId()+",'name':'"+dl.getName()+"','description':'"+dl.getLibrary().getDescription()+"','library':'"+dl.getLibrary().getAlias()+"','libraryBarcode':'"+barcode.toString()+"'}"));
+          a.add(JSONObject.fromObject("{'id':" + dl.getId() + ",'name':'" + dl.getName() + "','description':'" + dl.getLibrary().getDescription() + "','library':'" + dl.getLibrary().getAlias() + "','libraryBarcode':'" + barcode.toString() + "'}"));
         }
       }
 

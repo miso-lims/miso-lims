@@ -41,6 +41,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.integration.contract.InterrogationResu
 import uk.ac.bbsrc.tgac.miso.core.service.integration.contract.impl.MisoPerlDaemonQuery;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.mechanism.InterrogationMechanism;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.strategy.SequencerInterrogationStrategy;
+import uk.ac.bbsrc.tgac.miso.core.util.UnicodeReader;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -92,7 +93,7 @@ public class IlluminaSequencerInterrogationStrategy implements SequencerInterrog
             }
 
             Document statusDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-            SubmissionUtils.transform(new StringReader(j.getString("xml")), statusDoc);
+            SubmissionUtils.transform(new UnicodeReader(j.getString("xml")), statusDoc);
             String runStarted = statusDoc.getElementsByTagName("RunStarted").item(0).getTextContent();
             status.setStartDate(new SimpleDateFormat("EEEE, MMMMM dd, yyyy h:mm aaa").parse(runStarted));
             status.setInstrumentName(statusDoc.getElementsByTagName("InstrumentName").item(0).getTextContent());
@@ -208,7 +209,7 @@ public class IlluminaSequencerInterrogationStrategy implements SequencerInterrog
             }
 
             Document statusDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-            SubmissionUtils.transform(new StringReader(j.getString("xml")), statusDoc);
+            SubmissionUtils.transform(new UnicodeReader(j.getString("xml")), statusDoc);
             String runStarted = statusDoc.getElementsByTagName("RunStarted").item(0).getTextContent();
             status.setStartDate(new SimpleDateFormat("EEEE, MMMMM dd, yyyy h:mm aaa").parse(runStarted));
             status.setInstrumentName(statusDoc.getElementsByTagName("InstrumentName").item(0).getTextContent());

@@ -207,7 +207,7 @@ public class LibraryControllerHelperService {
       String serviceName = null;
       if (json.has("serviceName")) { serviceName = json.getString("serviceName"); }
 
-      MisoPrintService<File, PrintContext<File>> mps = null;
+      MisoPrintService<File, Barcodable, PrintContext<File>> mps = null;
       if (serviceName == null) {
         Collection<MisoPrintService> services = printManager.listPrintServicesByBarcodeableClass(Library.class);
         if (services.size() == 1) {
@@ -261,7 +261,7 @@ public class LibraryControllerHelperService {
       String serviceName = null;
       if (json.has("serviceName")) { serviceName = json.getString("serviceName"); }
 
-      MisoPrintService<File, PrintContext<File>> mps = null;
+      MisoPrintService<File, Barcodable, PrintContext<File>> mps = null;
       if (serviceName == null) {
         Collection<MisoPrintService> services = printManager.listPrintServicesByBarcodeableClass(LibraryDilution.class);
         if (services.size() == 1) {
@@ -662,12 +662,21 @@ public class LibraryControllerHelperService {
       if (ok) {
         Map<String, Object> map = new HashMap<String, Object>();
         JSONArray a = new JSONArray();
+        JSONArray errors = new JSONArray();
         for (JSONObject qc : (Iterable<JSONObject>)qcs) {
           JSONObject j = addLibraryQC(session, qc);
           j.put("libraryId", qc.getString("libraryId"));
-          a.add(j);
+          if (j.has("error")) {
+            errors.add(j);
+          }
+          else {
+            a.add(j);
+          }
         }
         map.put("saved", a);
+        if (!errors.isEmpty()) {
+          map.put("errors", errors);
+        }
         return JSONUtils.JSONObjectResponse(map);
       }
       else {
@@ -776,12 +785,21 @@ public class LibraryControllerHelperService {
       if (ok) {
         Map<String, Object> map = new HashMap<String, Object>();
         JSONArray a = new JSONArray();
+        JSONArray errors = new JSONArray();
         for (JSONObject dil : (Iterable<JSONObject>)dilutions) {
           JSONObject j = addLibraryDilution(session, dil);
           j.put("libraryId", dil.getString("libraryId"));
-          a.add(j);
+          if (j.has("error")) {
+            errors.add(j);
+          }
+          else {
+            a.add(j);
+          }
         }
         map.put("saved", a);
+        if (!errors.isEmpty()) {
+          map.put("errors", errors);
+        }
         return JSONUtils.JSONObjectResponse(map);
       }
       else {
@@ -958,12 +976,21 @@ public class LibraryControllerHelperService {
       if (ok) {
         Map<String, Object> map = new HashMap<String, Object>();
         JSONArray a = new JSONArray();
+        JSONArray errors = new JSONArray();
         for (JSONObject pcr : (Iterable<JSONObject>)pcrs) {
           JSONObject j = addEmPcr(session, pcr);
           j.put("dilutionId", pcr.getString("dilutionId"));
-          a.add(j);
+          if (j.has("error")) {
+            errors.add(j);
+          }
+          else {
+            a.add(j);
+          }
         }
         map.put("saved", a);
+        if (!errors.isEmpty()) {
+          map.put("errors", errors);
+        }
         return JSONUtils.JSONObjectResponse(map);
       }
       else {
@@ -996,15 +1023,23 @@ public class LibraryControllerHelperService {
 
       //persist
       if (ok) {
-        log.info("EmPCR Dilutions OK, saving...");
         Map<String, Object> map = new HashMap<String, Object>();
         JSONArray a = new JSONArray();
+        JSONArray errors = new JSONArray();
         for (JSONObject dil : (Iterable<JSONObject>)dilutions) {
           JSONObject j = addEmPcrDilution(session, dil);
           j.put("pcrId", dil.getString("pcrId"));
-          a.add(j);
+          if (j.has("error")) {
+            errors.add(j);
+          }
+          else {
+            a.add(j);
+          }
         }
         map.put("saved", a);
+        if (!errors.isEmpty()) {
+          map.put("errors", errors);
+        }
         return JSONUtils.JSONObjectResponse(map);
       }
       else {
@@ -1056,94 +1091,126 @@ public class LibraryControllerHelperService {
   }
 
   public JSONObject deleteLibrary(HttpSession session, JSONObject json) {
+    User user;
     try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      if (user.isAdmin()) {
-        if (json.has("libraryId")) {
-          Long libraryId = json.getLong("libraryId");
-          requestManager.deleteLibrary(requestManager.getLibraryById(libraryId));
-          return JSONUtils.SimpleJSONResponse("Library deleted");
-        }
-        else {
-          return JSONUtils.SimpleJSONError("No library specified to delete.");
-        }
-      }
-      else {
-        return JSONUtils.SimpleJSONError("Only admins can delete objects.");
-      }
+      user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     }
     catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
+    }
+
+    if (user != null && user.isAdmin()) {
+      if (json.has("libraryId")) {
+        Long libraryId = json.getLong("libraryId");
+        try {
+          requestManager.deleteLibrary(requestManager.getLibraryById(libraryId));
+          return JSONUtils.SimpleJSONResponse("Library deleted");
+        }
+        catch (IOException e) {
+          e.printStackTrace();
+          return JSONUtils.SimpleJSONError("Cannot delete library: " + e.getMessage());
+        }
+      }
+      else {
+        return JSONUtils.SimpleJSONError("No library specified to delete.");
+      }
+    }
+    else {
+      return JSONUtils.SimpleJSONError("Only logged-in admins can delete objects.");
     }
   }
 
   public JSONObject deleteLibraryDilution(HttpSession session, JSONObject json) {
+    User user;
     try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      if (user.isAdmin()) {
-        if (json.has("libraryDilutionId")) {
-          Long libraryDilutionId = json.getLong("libraryDilutionId");
-          requestManager.deleteLibraryDilution(requestManager.getLibraryDilutionById(libraryDilutionId));
-          return JSONUtils.SimpleJSONResponse("LibraryDilution deleted");
-        }
-        else {
-          return JSONUtils.SimpleJSONError("No lirbary dilution specified to delete.");
-        }
-      }
-      else {
-        return JSONUtils.SimpleJSONError("Only admins can delete objects.");
-      }
+      user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     }
     catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
+    }
+
+    if (user != null && user.isAdmin()) {
+      if (json.has("libraryDilutionId")) {
+        Long libraryDilutionId = json.getLong("libraryDilutionId");
+        try {
+          requestManager.deleteLibraryDilution(requestManager.getLibraryDilutionById(libraryDilutionId));
+          return JSONUtils.SimpleJSONResponse("LibraryDilution deleted");
+        }
+        catch (IOException e) {
+          e.printStackTrace();
+          return JSONUtils.SimpleJSONError("Cannot delete library dilution: " + e.getMessage());
+        }
+      }
+      else {
+        return JSONUtils.SimpleJSONError("No library dilution specified to delete.");
+      }
+    }
+    else {
+      return JSONUtils.SimpleJSONError("Only logged-in admins can delete objects.");
     }
   }
 
   public JSONObject deleteEmPCR(HttpSession session, JSONObject json) {
+    User user;
     try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      if (user.isAdmin()) {
-        if (json.has("empcrId")) {
-          Long empcrId = json.getLong("empcrId");
-          requestManager.deleteEmPCR(requestManager.getEmPcrById(empcrId));
-          return JSONUtils.SimpleJSONResponse("EmPCR deleted");
-        }
-        else {
-          return JSONUtils.SimpleJSONError("No EmPCR specified to delete.");
-        }
-      }
-      else {
-        return JSONUtils.SimpleJSONError("Only admins can delete objects.");
-      }
+      user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     }
     catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
+    }
+
+    if (user != null && user.isAdmin()) {
+      if (json.has("empcrId")) {
+        Long empcrId = json.getLong("empcrId");
+        try {
+          requestManager.deleteEmPCR(requestManager.getEmPcrById(empcrId));
+          return JSONUtils.SimpleJSONResponse("EmPCR deleted");
+        }
+        catch (IOException e) {
+          e.printStackTrace();
+          return JSONUtils.SimpleJSONError("Cannot delete EmPCR: " + e.getMessage());
+        }
+      }
+      else {
+        return JSONUtils.SimpleJSONError("No EmPCR specified to delete.");
+      }
+    }
+    else {
+      return JSONUtils.SimpleJSONError("Only logged-in admins can delete objects.");
     }
   }
 
   public JSONObject deleteEmPCRDilution(HttpSession session, JSONObject json) {
+    User user;
     try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      if (user.isAdmin()) {
-        if (json.has("deleteEmPCRDilution")) {
-          Long deleteEmPCRDilution = json.getLong("deleteEmPCRDilution");
-          requestManager.deleteEmPcrDilution(requestManager.getEmPcrDilutionById(deleteEmPCRDilution));
-          return JSONUtils.SimpleJSONResponse("EmPCRDilution deleted");
-        }
-        else {
-          return JSONUtils.SimpleJSONError("No EmPCR dilution specified to delete.");
-        }
-      }
-      else {
-        return JSONUtils.SimpleJSONError("Only admins can delete objects.");
-      }
+      user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     }
     catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
+    }
+
+    if (user != null && user.isAdmin()) {
+      if (json.has("deleteEmPCRDilution")) {
+        Long deleteEmPCRDilution = json.getLong("deleteEmPCRDilution");
+        try {
+          requestManager.deleteEmPcrDilution(requestManager.getEmPcrDilutionById(deleteEmPCRDilution));
+          return JSONUtils.SimpleJSONResponse("EmPCRDilution deleted");
+        }
+        catch (IOException e) {
+          e.printStackTrace();
+          return JSONUtils.SimpleJSONError("Cannot delete EmPCR dilution: " + e.getMessage());
+        }
+      }
+      else {
+        return JSONUtils.SimpleJSONError("No EmPCR dilution specified to delete.");
+      }
+    }
+    else {
+      return JSONUtils.SimpleJSONError("Only logged-in admins can delete objects.");
     }
   }
 

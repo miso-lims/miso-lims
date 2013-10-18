@@ -42,7 +42,7 @@ public class QcType implements Comparable, Serializable {
   /** Field libraryTypeId  */
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long qcTypeId = QcType.UNSAVED_ID;
+  private long qcTypeId = QcType.UNSAVED_ID;
   /** Field name */
   private String name;
   /** Field description  */

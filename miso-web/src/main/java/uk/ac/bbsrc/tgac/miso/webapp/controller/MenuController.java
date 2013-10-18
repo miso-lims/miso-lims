@@ -61,6 +61,11 @@ public class MenuController implements ServletContextAware {
     return "/pages/adminMenu.jsp";
   }
 
+  @RequestMapping("/custombarcode")
+  public String custombarcode() {
+    return "/pages/customBarcodePrinting.jsp";
+  }
+
   @RequestMapping("/myAccount")
   public ModelAndView myAccountMenu(ModelMap model) {
     try {
@@ -72,7 +77,7 @@ public class MenuController implements ServletContextAware {
       }
       model.put("userRealName", realName);
       //model.put("apiKey", securityManager.getPrivateKey(user));
-      model.put("apiKey", SignatureHelper.generatePrivateUserKey((user.getUserId() + "::" + user.getPassword()).getBytes("UTF-8")));
+      model.put("apiKey", SignatureHelper.generatePrivateUserKey((user.getLoginName() + "::" + user.getPassword()).getBytes("UTF-8")));
       model.put("userGroups", groups.toString());
       return new ModelAndView("/pages/myAccount.jsp", model);
     }

@@ -42,6 +42,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.transaction.annotation.Transactional;
+import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.*;
@@ -74,7 +75,7 @@ public class SQLSampleDAO implements SampleStore {
   private static final String TABLE_NAME = "Sample";
 
   public static final String SAMPLES_SELECT =
-        "SELECT sampleId, name, description, scientificName, taxonIdentifier, taxonIdentifier, alias, accession, securityProfile_profileId, identificationBarcode, locationBarcode, " +
+        "SELECT sampleId, name, description, scientificName, taxonIdentifier, alias, accession, securityProfile_profileId, identificationBarcode, locationBarcode, " +
         "sampleType, receivedDate, qcPassed, project_projectId " +
         "FROM "+TABLE_NAME;
 
@@ -96,7 +97,7 @@ public class SQLSampleDAO implements SampleStore {
           "name LIKE ? OR " +
           "alias LIKE ? OR " +
           "description LIKE ? OR " +
-          "scientificName LIKE ?";
+          "scientificName LIKE ? ";
 
   public static final String SAMPLE_UPDATE =
           "UPDATE "+TABLE_NAME+" " +
@@ -383,6 +384,12 @@ public class SQLSampleDAO implements SampleStore {
       Project p = sample.getProject();
       if (this.cascadeType.equals(CascadeType.PERSIST)) {
         if (p!=null) {
+
+          //set project progress to ACTIVE if in a prior waiting state (APPROVED)
+          if (sample.getReceivedDate() != null && p.getProgress().equals(ProgressType.APPROVED)) {
+            p.setProgress(ProgressType.ACTIVE);
+          }
+
           projectDAO.save(p);
         }
       }
@@ -428,7 +435,7 @@ public class SQLSampleDAO implements SampleStore {
 
   public List<Sample> listBySearch(String query) {
     String mySQLQuery = "%" + query.replaceAll("_", Matcher.quoteReplacement("\\_")) + "%";
-    return template.query(SAMPLES_SELECT_BY_SEARCH, new Object[]{mySQLQuery,mySQLQuery,mySQLQuery,mySQLQuery,mySQLQuery}, new SampleMapper(true));
+    return template.query(SAMPLES_SELECT_BY_SEARCH, new String[]{mySQLQuery,mySQLQuery,mySQLQuery,mySQLQuery,mySQLQuery}, new SampleMapper(true));
   }
 
   @Transactional(readOnly = false, rollbackFor = IOException.class)

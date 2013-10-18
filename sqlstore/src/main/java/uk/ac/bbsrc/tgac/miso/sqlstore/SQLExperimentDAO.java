@@ -115,7 +115,7 @@ public class SQLExperimentDAO implements ExperimentStore {
 
   public static final String EXPERIMENT_BY_RELATED_PARTITION =
           "SELECT e.experimentId, e.name, e.description, e.alias, e.accession, e.title, e.platform_platformId, e.securityProfile_profileId, e.study_studyId, er.runs_runId " +
-          "FROM "+TABLE_NAME+" e, Partition l " +
+          "FROM "+TABLE_NAME+" e, _Partition l " +
           "WHERE e.experimentId=l.experiment_experimentId " +
           "AND l.partitionId=?";
 

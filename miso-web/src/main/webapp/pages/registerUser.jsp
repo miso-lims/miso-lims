@@ -24,32 +24,32 @@
 
 <hr/>
 <center>
-    <h2>New User Registration</h2>
-    <br/>
-    <form:form action="/miso/registerUser" method="POST" commandName="user" autocomplete="off">
-        <table>
-            <tr>
-                <td>Login name:</td>
-                <td><form:input path="loginName"/></td>
-            </tr>
-            <tr>
-                <td>Full name:</td>
-                <td><form:input path="fullName"/></td>
-            </tr>
-            <tr>
-                <td>Email:</td>
-                <td><form:input path="email"/></td>
-            </tr>
-            <tr>
-                <td>Password:</td>
-                <td><form:password path="password" showPassword="true"/></td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><input type="submit" value="Submit"/></td>
-            </tr>
-        </table>
-    </form:form>
+  <h2>New User Registration</h2>
+  <br/>
+  <form:form action="/miso/registerUser" method="POST" commandName="user" autocomplete="off">
+    <table>
+      <tr>
+        <td>Login name:</td>
+        <td><form:input path="loginName"/></td>
+      </tr>
+      <tr>
+        <td>Full name:</td>
+        <td><form:input path="fullName"/></td>
+      </tr>
+      <tr>
+        <td>Email:</td>
+        <td><form:input path="email"/></td>
+      </tr>
+      <tr>
+        <td>Password:</td>
+        <td><form:password path="password" showPassword="true"/></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td><input type="submit" value="Submit"/></td>
+      </tr>
+    </table>
+  </form:form>
 </center>
 
 <%@ include file="../footer.jsp" %>
