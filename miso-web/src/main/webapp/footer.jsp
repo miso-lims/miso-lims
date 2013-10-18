@@ -26,7 +26,7 @@
     <br/>
 
     <p>&copy; 2010 - 2013 Brought to you by <a href="http://www.tgac.ac.uk/" target="_blank">The Genome Analysis Centre</a>
-       and the element <a href="http://en.wikipedia.org/wiki/Neon" target="_blank">neon</a> | Version: 0.2.0-SNAPSHOT</p>
+       and the element <a href="http://en.wikipedia.org/wiki/Neon" target="_blank">neon</a> | Version: 0.2.0</p>
 </div>
 </body>
 </html>
