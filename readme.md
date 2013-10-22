@@ -46,7 +46,7 @@ All being well after a few minutes (it can take a while to download all the requ
 
 If you are upgrading from a previous version of MISO, you will need to follow these steps:
 
-* Backup your existing database and apply any database patches in https://repos.tgac.bbsrc.ac.uk/miso/latest/sql/patches
+* Backup your existing database and apply any database patches in https://repos.tgac.ac.uk/miso/latest/sql/patches
 * Stop Tomcat
 * Delete (or move) the old `<tomcat>/webapps/ROOT.war`
 * Delete the `<tomcat>webapps/ROOT` directory
@@ -65,7 +65,7 @@ from our repository here:
 
 https://repos.tgac.ac.uk/miso/latest/sql/lims-schema.sql
 
-https://repos.tgac.bbsrc.ac.uk/miso/latest/sql/miso_type_data.sql
+https://repos.tgac.ac.uk/miso/latest/sql/miso_type_data.sql
 
 Log in to your local MySQL install, and create a database called 'lims':
 
@@ -90,14 +90,14 @@ Then populate the database with the two dumps by running the following commands 
 
 3.2 ) Setting up the MISO web application
 
-You will need a suitable Java web application container, such as Tomcat 6.x (http://tomcat.apache.org/download-60.cgi),
+You will need a suitable Java web application container, such as Tomcat 7.x (http://tomcat.apache.org/download-70.cgi),
 to deploy MISO. Once Tomcat has been installed, download the latest MISO WAR file. The latest WAR file can be found here:
 
-https://repos.tgac.bbsrc.ac.uk/miso/latest/ROOT.war
+https://repos.tgac.ac.uk/miso/latest/ROOT.war
 
 If you're the thrill-seeking type, nightly builds from the develop branch which are "bleeding edge" can be found here, following the format ROOT-{version}_{buildNumber}_{revision}.war:
 
-https://repos.tgac.bbsrc.ac.uk/miso/nightly/
+https://repos.tgac.ac.uk/miso/nightly/
 
 Copy this file to your `<tomcat-install>/webapps/` directory. DO NOT START TOMCAT YET. Instead, follow the configuration steps below.
 
@@ -162,9 +162,9 @@ the name of your remote database server:
 You will need to copy the mysql connector library and the JNDI File Factory library to your Tomcat install to ensure the JNDI system can see the MISO database.
 Grab the jar files from:
 
-https://repos.tgac.bbsrc.ac.uk/miso/common/mysql-connector-java-5.1.10.jar
+https://repos.tgac.ac.uk/miso/common/mysql-connector-java-5.1.10.jar
 
-https://repos.tgac.bbsrc.ac.uk/miso/common/jndi-file-factory-1.0.jar
+https://repos.tgac.ac.uk/miso/common/jndi-file-factory-1.0.jar
 
 And copy them to <tomcat-install>/lib/
 
@@ -184,7 +184,7 @@ The default path is `/storage/miso`. It is recommended that create this path on 
 MISO achieves userspace configuration via extra properties files kept in the storage directory specified by the `miso.baseDirectory`
 property (see 2.2 above). Default versions of these files are available here:
 
-https://repos.tgac.bbsrc.ac.uk/miso/latest/miso_userspace_properties.tar.gz
+https://repos.tgac.ac.uk/miso/latest/miso_userspace_properties.tar.gz
 
 Unpack this file to your MISO storage directory, which again is `/storage/miso` by default. You should see 4 files:
 
