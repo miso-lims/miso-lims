@@ -20,7 +20,7 @@ MISO: An open source LIMS for small-to-large scale sequencing centres
 > 
 > You can follow MISO development on Twitter: @misolims (https://twitter.com/misolims), @froggleston (https://twitter.com/froggleston)
 
-VERSION 0.2.0-SNAPSHOT (Neon)
+VERSION 0.2.0 (Neon)
 
 1) BUILDING
 -----------
@@ -59,7 +59,7 @@ Done!
 You will need to install MySQL v5 or greater. You will then need the two latest MISO database dumps. These are available
 from our repository here:
 
-https://repos.tgac.bbsrc.ac.uk/miso/latest/sql/lims-schema-20130301.sql
+https://repos.tgac.ac.uk/miso/latest/sql/lims-schema-20130807.sql
 
 https://repos.tgac.bbsrc.ac.uk/miso/latest/sql/miso_type_data_20120921.sql
 
