@@ -122,6 +122,15 @@
   <script type="text/javascript" src="<c:url value='/scripts/highcharts-2.3.5/highcharts.js'/>"></script>
 
   <link rel="shortcut icon" href="<c:url value='/styles/images/favicon.ico'/>" type="image/x-icon"/>
+
+    <!--IE check-->
+    <script type="text/javascript">
+        jQuery(document).ready(function () {
+            if (jQuery.browser.msie) {
+                alert("Internet Explorer is not supported by MISO. Please use Google Chrome, Safari or Mozilla Firefox");
+            }
+        });
+    </script>
 </head>
 
 <body>
