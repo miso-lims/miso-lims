@@ -35,17 +35,29 @@ Print.ui = {
       {'doOnSuccess':function(json) {
         jQuery('#host-' + printService).html(json.hostname);
         jQuery('#edit-' + printService).html(json.edit);
+        if(jQuery('#schema-' + printService).is(':empty')){
+          jQuery('#schema-' + printService).html(json.barcodableSchemas);
+        }else{
+          var selectedschema =  jQuery('#schema-' + printService).val();
+          jQuery('#schema-' + printService).html(json.barcodableSchemas);
+          jQuery('#schema-' + printService+' select').val(selectedschema);
+        }
       }
     });
   },
 
   editPrinterService : function(serviceName) {
+    var schema='';
+    if(!jQuery('#newschema-' + serviceName).length == 0) {
+      schema =  jQuery('#newschema-' + serviceName+' option:selected').val();
+    }
     Fluxion.doAjax(
       'printerControllerHelperService',
       'editPrinterService',
       {
         'serviceName':serviceName,
         'host':jQuery('#newhost-' + serviceName).val(),
+        'schema':schema,
         'url':ajaxurl
       },
       {'doOnSuccess':Utils.page.pageReload

@@ -274,6 +274,7 @@ public class PrinterControllerHelperService {
 
       response.put("hostname", "<input type='text' id='newhost-" + serviceName + "' value='" + bps.getPrintContext().getHost() + "'/>");
       response.put("edit", "<a href='javascript:void(0);' onclick='Print.ui.editPrinterService(\"" + serviceName + "\");'>Save</a>");
+      response.put("barcodableSchemas", "<select id='newschema-" + serviceName + "' name='printSchema'>" + listBarcodableSchemas(session, json).getString("barcodableSchemas") + "</select>");
       return response;
     }
     catch (Exception e) {
@@ -292,6 +293,10 @@ public class PrinterControllerHelperService {
           contextFields.put("host", json.getString("host"));
           PrintServiceUtils.mapJSONToContextFields(contextFields, pc);
           bps.setPrintContext(pc);
+          if (json.has("schema") && !json.get("schema").equals("")) {
+            BarcodableSchema barcodableSchema = printManager.getBarcodableSchema(json.getString("schema"));
+            bps.setBarcodableSchema(barcodableSchema);
+          }
           printManager.storePrintService(bps);
           return JSONUtils.SimpleJSONResponse("done");
         }

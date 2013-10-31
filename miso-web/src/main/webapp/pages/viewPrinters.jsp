@@ -122,7 +122,7 @@
                     </c:otherwise>
                   </c:choose>
                 </td>
-                <td>${service.barcodableSchema.name}</td>
+                <td id='schema-${service.name}'>${service.barcodableSchema.name}</td>
                 <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
                   <td id='edit-${service.name}' class="misoicon"/>
                   <a href='javascript:void(0);'
