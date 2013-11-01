@@ -1129,9 +1129,9 @@ span.counter {
 #traftrigger {
     background-color: #F8F8F8;
     border: 1px solid lightgray;
-    padding: 10px;
+    padding: 5px;
     float: right;
-    margin: 10px 10px 0px 0;
+    margin: -28px 10px 0px 0;
     cursor: pointer;
     color: #06c;
 }
