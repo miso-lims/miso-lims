@@ -133,8 +133,16 @@ public class CustomPrintService implements MisoPrintService<File, JSONObject, Pr
     return printServiceFor;
   }
 
-  public File getLabelFor(JSONObject b) {
-    return getBarcodableSchema().getPrintableLabel(b);
+  @Override
+  public File getLabelFor(JSONObject b) throws MisoPrintException {
+    BarcodableSchema<File, JSONObject> bs = getBarcodableSchema();
+    if (bs != null) {
+      return bs.getPrintableLabel(b);
+    }
+    else {
+      throw new MisoPrintException("No barcodable schema set for '"+getName()+"' service. Make sure a schema is set in the " +
+                                   "printer administration page");
+    }
   }
 
   @Override

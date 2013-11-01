@@ -71,7 +71,7 @@
     <repository>
       <id>tgac-repo</id>
       <name>TGAC Maven Repository</name>
-      <url>https://repos.tgac.bbsrc.ac.uk/maven/repo</url>
+      <url>https://repos.tgac.ac.uk/maven/repo</url>
       <releases>
         <updatePolicy>always</updatePolicy>
       </releases>

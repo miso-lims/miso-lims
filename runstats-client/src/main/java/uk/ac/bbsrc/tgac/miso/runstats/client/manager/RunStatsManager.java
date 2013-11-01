@@ -31,10 +31,12 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.runstats.client.RunStatsException;
-import uk.ac.bbsrc.tgac.qc.run.ReportTable;
-import uk.ac.bbsrc.tgac.qc.run.Reports;
-import uk.ac.bbsrc.tgac.qc.run.ReportsDecorator;
-import uk.ac.bbsrc.tgac.qc.run.RunProperty;
+import uk.ac.tgac.statsdb.exception.ConsumerException;
+import uk.ac.tgac.statsdb.run.ReportTable;
+import uk.ac.tgac.statsdb.run.Reports;
+import uk.ac.tgac.statsdb.run.ReportsDecorator;
+import uk.ac.tgac.statsdb.run.RunProperty;
+import uk.ac.tgac.statsdb.run.consumer.D3PlotConsumer;
 
 import javax.sql.DataSource;
 import java.io.IOException;
