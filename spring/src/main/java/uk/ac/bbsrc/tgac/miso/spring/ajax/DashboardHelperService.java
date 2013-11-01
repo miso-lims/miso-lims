@@ -480,7 +480,6 @@ public class DashboardHelperService {
     try {
       StringBuilder b = new StringBuilder();
       Collection<Sample> samples = requestManager.listAllSamplesByReceivedDate(100);
-      System.out.println(">>>>"+samples.toString());
 
       if (samples.size() > 0) {
         for (Sample s : samples) {
