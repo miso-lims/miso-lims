@@ -191,6 +191,7 @@ public interface RequestManager {
 
   public Collection<Sample> listAllSamples() throws IOException;
   public Collection<Sample> listAllSamplesWithLimit(long limit) throws IOException;
+  public Collection<Sample> listAllSamplesByReceivedDate(long limit) throws IOException;
   public Collection<Sample> listAllSamplesBySearch(String query) throws IOException;
   public Collection<Sample> listAllSamplesByProjectId(long projectId) throws IOException;
   public Collection<Sample> listAllSamplesByExperimentId(long experimentId) throws IOException;

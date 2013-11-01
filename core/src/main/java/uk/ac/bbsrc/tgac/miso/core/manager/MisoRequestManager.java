@@ -381,6 +381,16 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
+  public Collection<Sample> listAllSamplesByReceivedDate(long limit) throws IOException {
+    if (sampleStore != null) {
+      return sampleStore.listAllByReceivedDate(limit);
+    }
+    else {
+      throw new IOException("No sampleStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
   public Collection<Sample> listAllSamplesBySearch(String query) throws IOException {
     if (sampleStore != null) {
       return sampleStore.listBySearch(query);

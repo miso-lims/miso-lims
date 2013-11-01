@@ -461,6 +461,7 @@ public class PlateControllerHelperService {
           b.append("<input type=\"hidden\" id=\"" + s.getId() + "\" name=\"" + s.getName() + "\" projectname=\"" + s.getProject().getName() + "\" samplealias=\"" + s.getAlias() + "\"/>");
           b.append("Name: <b>" + s.getName() + "</b><br/>");
           b.append("Alias: <b>" + s.getAlias() + "</b><br/>");
+          b.append("From Project: <b>" + s.getProject().getName() + "</b><br/>");
           b.append("</div>");
         }
       }

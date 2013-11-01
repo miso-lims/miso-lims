@@ -119,4 +119,12 @@ public interface SampleStore extends Store<Sample>, Cascadable, Remover<Sample>,
    * @throws IOException when the objects cannot be retrieved
    */
   Collection<Sample> listAllWithLimit(long limit) throws IOException;
+
+  /**
+   * List all persisted objects
+   *
+   * @return Collection<Sample>
+   * @throws IOException when the objects cannot be retrieved
+   */
+  Collection<Sample> listAllByReceivedDate(long limit) throws IOException;
 }

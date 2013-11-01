@@ -82,6 +82,9 @@ public class SQLSampleDAO implements SampleStore {
   public static final String SAMPLES_SELECT_LIMIT =
           SAMPLES_SELECT + " ORDER BY sampleId DESC LIMIT ?";
 
+  public static final String SAMPLES_SELECT_RECEIVED_DATE =
+      SAMPLES_SELECT + " ORDER BY DATE(receivedDate) DESC LIMIT ?";
+
   public static final String SAMPLE_SELECT_BY_ID =
           SAMPLES_SELECT + " " + "WHERE sampleId = ?";
 
@@ -426,6 +429,10 @@ public class SQLSampleDAO implements SampleStore {
 
   public List<Sample> listAllWithLimit(long limit) throws IOException {
     return template.query(SAMPLES_SELECT_LIMIT, new Object[]{limit}, new SampleMapper(true));
+  }
+
+  public List<Sample> listAllByReceivedDate(long limit) throws IOException {
+    return template.query(SAMPLES_SELECT_RECEIVED_DATE, new Object[]{limit}, new SampleMapper(true));
   }
 
   @Override

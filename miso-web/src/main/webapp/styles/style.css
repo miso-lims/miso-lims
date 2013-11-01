@@ -8,10 +8,10 @@ body {
     /*width: 90%;*/
     text-align: left;
     color: #333;
-    /*margin: 2em auto;*/
+    margin: 0px ! important;
     background: #FFF;
-    padding: 1.3em;
-    border: 0.3em solid #EAEAEA;
+    padding: 5px;
+    /*border: 1px solid #EAEAEA;*/
 }
 
 h1 {
@@ -627,7 +627,7 @@ div.checklist {
     margin-left: 5px;
     margin-right: 5px;
     margin-bottom: 0px;
-    width: 380px;
+    width: 320px;
     height: 30px;
     text-align: center;
     color: #666666;
@@ -650,7 +650,7 @@ div.checklist {
     margin-left: 5px;
     margin-right: 5px;
     margin-bottom: 5px;
-    width: 380px;
+    width: 320px;
     height: 280px;
     overflow: auto;
 }
@@ -1549,47 +1549,60 @@ table.overviewSummary td.partitionOccupied {
 }
 
 /*statsdb*/
-.box { font: 10px sans-serif; }
-.box { stroke-width: 0.5px;  }
-.box .center { stroke-dasharray: 3 3; }
-.box .outlier { stroke: #ccc; fill: none; }
-
-.whisker {
- stroke: black; stroke-width: 0.5px;
+.box {
+    font: 10px sans-serif;
 }
 
+.box {
+    stroke-width: 0.5px;
+}
+
+.box .center {
+    stroke-dasharray: 3 3;
+}
+
+.box .outlier {
+    stroke: #ccc;
+    fill: none;
+}
+
+.whisker {
+    stroke: black;
+    stroke-width: 0.5px;
+}
 
 .basebox:hover {
-  fill: lightgray;
+    fill: lightgray;
     opacity: 0.5;
 
 }
 
-.label{
-font: 10px sans-serif;
+.label {
+    font: 10px sans-serif;
 }
 
 .path {
-stroke: red; stroke-width: 2px;
-fill: transparent;
+    stroke: red;
+    stroke-width: 2px;
+    fill: transparent;
 }
 
 .scoreboxgreen {
-fill: green;
-opacity: 0.3;
+    fill: green;
+    opacity: 0.3;
 }
 
 .scoreboxyellow {
-fill: yellow;
-opacity: 0.3;
+    fill: yellow;
+    opacity: 0.3;
 }
 
 .scoreboxred {
-fill: red;
-opacity: 0.3;
+    fill: red;
+    opacity: 0.3;
 }
 
-#statschartmessage{
+#statschartmessage {
     position: absolute;
     background: white;
     border: 2px solid #000000;
@@ -1597,89 +1610,94 @@ opacity: 0.3;
     text-align: left;
 }
 
-#statsresultgraph{
+#statsresultgraph {
     text-align: center;
 }
 
 /*stats db perbasecontent*/
 
-
-.line{
-stroke-width: 2px;
+.line {
+    stroke-width: 2px;
 }
 
-.circle{
-stroke-width: 2px;}
-
-.labelG{
-	stroke: blue;
-
+.circle {
+    stroke-width: 2px;
 }
 
-.labelA{
-	stroke: red;
-}
-
-
-.labelT{
-	stroke: green;
+.labelG {
+    stroke: blue;
 
 }
 
-.labelC{
-	stroke: black;
+.labelA {
+    stroke: red;
+}
+
+.labelT {
+    stroke: green;
 
 }
 
-.circleG{
-	stroke: blue;
-	fill: white;
+.labelC {
+    stroke: black;
 
 }
 
-.circleA{
-	stroke: red;
-	fill: white;
+.circleG {
+    stroke: blue;
+    fill: white;
 
 }
 
-
-.circleT{
-	stroke: green;
-	fill: white;
-
-}
-
-
-.circleC{
-	stroke: black;
-	fill: white;
+.circleA {
+    stroke: red;
+    fill: white;
 
 }
 
-.lineG{
-	stroke: blue;
+.circleT {
+    stroke: green;
+    fill: white;
 
 }
 
-.lineA{
-	stroke: red;
+.circleC {
+    stroke: black;
+    fill: white;
 
 }
 
+.lineG {
+    stroke: blue;
 
-.lineT{
-	stroke: green;
+}
+
+.lineA {
+    stroke: red;
 
 }
 
-
-.lineC{
-	stroke: black;
+.lineT {
+    stroke: green;
 
 }
-a.DTTT_button{
-    margin-left:10px ! important;
+
+.lineC {
+    stroke: black;
+
+}
+
+a.DTTT_button {
+    margin-left: 10px ! important;
 }
 
 /*statsdb ends*/
+
+.exportcolumn {
+    float: left;
+    margin-left: 20px;
+}
+
+.platewell {
+    margin: 20px 20px 10px 0;
+}

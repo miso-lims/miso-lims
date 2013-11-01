@@ -212,7 +212,7 @@ Reports.ui = {
         jQuery('#projectOverviewCell').html('');
         jQuery('#projectsFlexReport').html('');
         jQuery('#projectsDetailReport').html('');
-        self.createProjectFormTable(json.html);
+        //self.createProjectFormTable(json.html);
         jQuery('#projectProgress').html(json.progress);
         Utils.ui.reenableButton('resetProjectsFlexReportButton', 'Reset');
         self.prepareTable();
@@ -429,6 +429,7 @@ Reports.ui = {
         { "sTitle": "Project", "sType": "natural"},
         { "sTitle": "Sample", "sType": "natural"},
         { "sTitle": "Library", "sType": "natural"},
+        { "sTitle": "Pool", "sType": "natural"},
         { "sTitle": "Run", "sType": "natural"},
         { "sTitle": "Run Status", "sType": "natural"}
       ],

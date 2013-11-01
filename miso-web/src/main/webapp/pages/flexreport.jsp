@@ -92,7 +92,7 @@
   </fieldset>
 
   <form name="generateProjectsFlexReportForm" id="generateProjectsFlexReportForm">
-    <div id="projectsResultTable"><img src="<c:url value='/styles/images/ajax-loader.gif'/>"/></div>
+    <div id="projectsResultTable">Please search for projects to be reported...</div>
   </form>
 
   <br/>
@@ -227,7 +227,7 @@
   </fieldset>
 
   <form name="generateSamplesFlexReportForm" id="generateSamplesFlexReportForm" method="POST">
-    <div id="samplesResultTable"></div>
+    <div id="samplesResultTable">Please search for samples to be reported...</div>
   </form>
 
   <br/>
@@ -313,7 +313,7 @@
   </fieldset>
 
   <form name="generateLibrariesFlexReportForm" id="generateLibrariesFlexReportForm" method="POST">
-    <div id="librariesResultTable"></div>
+    <div id="librariesResultTable">Please search for libraries to be reported...</div>
   </form>
 
   <br/>
@@ -394,7 +394,7 @@
     </table>
   </fieldset>
   <form name="generateRunsFlexReportForm" id="generateRunsFlexReportForm" method="POST">
-    <div id="runsResultTable"></div>
+    <div id="runsResultTable">Please search for runs to be reported...</div>
   </form>
 
   <br/>

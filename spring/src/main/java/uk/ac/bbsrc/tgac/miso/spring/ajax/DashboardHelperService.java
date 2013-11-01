@@ -475,6 +475,36 @@ public class DashboardHelperService {
     return JSONUtils.SimpleJSONResponse("ok");
   }
 
+
+  public JSONObject showLatestReceivedSamples(HttpSession session, JSONObject json) {
+    try {
+      StringBuilder b = new StringBuilder();
+      Collection<Sample> samples = requestManager.listAllSamplesByReceivedDate(100);
+      System.out.println(">>>>"+samples.toString());
+
+      if (samples.size() > 0) {
+        for (Sample s : samples) {
+          if (s.getReceivedDate() != null) {
+            b.append("<a class=\"dashboardresult\" href=\"/miso/sample/" + s.getId() + "\"><div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
+            b.append("Name: <b>" + s.getName() + "</b><br/>");
+            b.append("Alias: <b>" + s.getAlias() + "</b><br/>");
+            b.append("From Project: <b>" + s.getProject().getName() + "</b><br/>");
+            b.append("Received: <b>" + s.getReceivedDate().toString() + "</b><br/>");
+            b.append("</div>");
+          }
+        }
+      }
+      else {
+        b.append("No matches");
+      }
+      return JSONUtils.JSONObjectResponse("html", b.toString());
+    }
+    catch (IOException e) {
+      log.debug("Failed", e);
+      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
+    }
+  }
+
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
   }

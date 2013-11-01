@@ -263,6 +263,7 @@ public class FlexReportingControllerHelperService {
                             jsonArray.add("['" + project.getName() + "','" +
                                           libraryInRun.getSample().getName() + "','" +
                                           libraryInRun.getName() + "','" +
+                                          spp.getPool().getName() + "','" +
                                           run.getName() + "','" +
                                           run.getStatus().getHealth().getKey() + "']");
                           }
@@ -281,7 +282,7 @@ public class FlexReportingControllerHelperService {
             Sample sample = library.getSample();
             jsonArray.add("['" + project.getName() + "','" +
                           sample.getName() + "','" +
-                          library.getName() + "','NA','NA']");
+                          library.getName() + "','NA','NA','NA']");
           }
         }
 

@@ -805,6 +805,19 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
+  public Collection<Sample> listAllSamplesByReceivedDate(long limit) throws IOException {
+    User user = getCurrentUser();
+    List<Sample> samples = new ArrayList<Sample>(super.listAllSamplesByReceivedDate(limit));
+
+    for (int i = 0; i < samples.size(); i++) {
+      if (!samples.get(i).userCanRead(user)) {
+        samples.remove(i);
+      }
+    }
+    return samples;
+  }
+
+  @Override
   public Collection<Sample> listAllSamplesBySearch(String query) throws IOException {
     User user = getCurrentUser();
     Collection<Sample> accessibles = new HashSet<Sample>();
