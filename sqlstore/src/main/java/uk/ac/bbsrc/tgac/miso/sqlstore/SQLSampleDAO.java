@@ -83,7 +83,7 @@ public class SQLSampleDAO implements SampleStore {
           SAMPLES_SELECT + " ORDER BY sampleId DESC LIMIT ?";
 
   public static final String SAMPLES_SELECT_RECEIVED_DATE =
-      SAMPLES_SELECT + " ORDER BY DATE(receivedDate) DESC LIMIT ?";
+      SAMPLES_SELECT + " group by receivedDate,project_projectId ORDER BY DATE(receivedDate) DESC LIMIT ?";
 
   public static final String SAMPLE_SELECT_BY_ID =
           SAMPLES_SELECT + " " + "WHERE sampleId = ?";

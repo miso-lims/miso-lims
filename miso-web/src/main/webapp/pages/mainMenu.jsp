@@ -34,8 +34,8 @@
           </div>
         --%>
         <div id="rightpanel" style="float:right;margin-top:10px;">
-            <div align="right">
-                <h2>Recently received samples:</h2>
+            <div align="right" style="margin-right:5px;">
+                <h2>Projects with recently<br/> received samples:</h2>
             </div>
             <div id="latestSamplesList" class="elementList ui-corner-all"
                  style="height:720px;width:200px;margin-top:10px;"
