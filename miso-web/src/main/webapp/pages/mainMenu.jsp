@@ -40,41 +40,44 @@
             <div id="latestSamplesList" class="elementList ui-corner-all"
                  style="height:720px;width:250px;margin-top:10px;"
                  align="right"></div>
-
         </div>
-        <div style="margin:20px 0 0 20px;float:left">
-            <div class="widget_title ui-corner-top">Project <input type="text" size="20"
-                                                                   id="searchProject"
-                                                                   name="searchProject"/></div>
+
+        <div class="dashboard_widget">
+            <div class="widget_title ui-corner-top">
+                Project <input type="text" size="20" id="searchProject" name="searchProject"/>
+            </div>
             <div class="widget ui-corner-bottom">
                 <div id="searchProjectresult">
                 </div>
             </div>
-            <br/>
+        </div>
 
-            <div class="widget_title ui-corner-top">Sample <input type="text" size="20"
-                                                                  id="searchSample"
-                                                                  name="searchSample"/></div>
+        <div class="dashboard_widget">
+
+            <div class="widget_title ui-corner-top">
+                Run <input type="text" size="20" id="searchRun" name="searchRun"/>
+            </div>
+            <div class="widget ui-corner-bottom">
+                <div id="searchRunresult"></div>
+            </div>
+        </div>
+
+        <div class="dashboard_widget">
+
+            <div class="widget_title ui-corner-top">
+                Sample <input type="text" size="20" id="searchSample" name="searchSample"/>
+            </div>
             <div class="widget ui-corner-bottom">
                 <div id="searchSampleresult">
                 </div>
             </div>
-
         </div>
 
-        <div style="margin:20px 0 0 20px;float:left">
+        <div class="dashboard_widget">
 
-            <div class="widget_title ui-corner-top">Run <input type="text" size="20"
-                                                               id="searchRun"
-                                                               name="searchRun"/></div>
-            <div class="widget ui-corner-bottom">
-                <div id="searchRunresult"></div>
+            <div class="widget_title ui-corner-top">
+                Library <input type="text" size="20" id="searchLibrary" name="searchLibrary"/>
             </div>
-            <br/>
-
-            <div class="widget_title ui-corner-top">Library <input type="text" size="20"
-                                                                   id="searchLibrary"
-                                                                   name="searchLibrary"/></div>
             <div class="widget ui-corner-bottom">
                 <div id="searchLibraryresult">
                 </div>

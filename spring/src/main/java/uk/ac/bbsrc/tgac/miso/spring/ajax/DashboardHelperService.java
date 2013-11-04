@@ -475,7 +475,6 @@ public class DashboardHelperService {
     return JSONUtils.SimpleJSONResponse("ok");
   }
 
-
   public JSONObject showLatestReceivedSamples(HttpSession session, JSONObject json) {
     try {
       StringBuilder b = new StringBuilder();

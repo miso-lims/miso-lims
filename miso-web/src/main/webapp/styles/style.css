@@ -541,6 +541,11 @@ a.dashboardresult {
     white-space: nowrap;
 }
 
+.dashboard_widget{
+    margin:20px 0 0 20px;
+    float:left;
+}
+
 .autocompletebox {
     font: 10px Verdana, arial, sans-serif;
     border: 1px solid lightgray;
