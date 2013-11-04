@@ -47,7 +47,7 @@ p {
 pre.wrap {
     white-space: pre-wrap; /* CSS2.1 compliant */
     white-space: -moz-pre-wrap; /* Mozilla-based browsers */
-    white-space: o-pre-wrap; /* Opera 7+ */
+    white-space: -o-pre-wrap; /* Opera 7+ */
     font: 8pt Verdana, arial, sans-serif;
 }
 
@@ -539,6 +539,11 @@ a.dashboardresult {
     text-overflow: ellipsis;
     -o-text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.dashboard_widget{
+    margin:20px 0 0 20px;
+    float:left;
 }
 
 .autocompletebox {
@@ -1317,7 +1322,7 @@ div.experimentwizard li {
     stroke-width: 1.5px;
 }
 
-/
+
 /* new CSS for dynamic D3 */
 
 circle.node {

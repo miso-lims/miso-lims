@@ -25,8 +25,12 @@
 <div id="footer">
     <br/>
 
-    <p>&copy; 2010 - 2013 Brought to you by <a href="http://www.tgac.ac.uk/" target="_blank">The Genome Analysis Centre</a>
-       and the element <a href="http://en.wikipedia.org/wiki/Sodium" target="_blank">sodium</a> | Version: 0.2.1-SNAPSHOT</p>
+    <p>
+        &copy; 2010 - <fmt:formatDate value="${timestamp}" pattern="yyyy"/>
+        Brought to you by <a href="http://www.tgac.ac.uk/" target="_blank">The Genome Analysis Centre</a>
+        and the element <a href="http://en.wikipedia.org/wiki/Sodium" target="_blank">sodium</a> | Version:
+        0.2.1-SNAPSHOT
+    </p>
 </div>
 </body>
 </html>
