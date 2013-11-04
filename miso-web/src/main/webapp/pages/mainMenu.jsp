@@ -42,46 +42,44 @@
                  align="right"></div>
 
         </div>
-        <center>
-            <div style="margin:20px 0 0 20px;float:left">
-                <div class="widget_title ui-corner-top">Project <input type="text" size="20"
-                                                                       id="searchProject"
-                                                                       name="searchProject"/></div>
-                <div class="widget ui-corner-bottom">
-                    <div id="searchProjectresult">
-                    </div>
-                </div>
-                <br/>
-
-                <div class="widget_title ui-corner-top">Sample <input type="text" size="20"
-                                                                      id="searchSample"
-                                                                      name="searchSample"/></div>
-                <div class="widget ui-corner-bottom">
-                    <div id="searchSampleresult">
-                    </div>
-                </div>
-
-            </div>
-
-            <div style="margin:20px 0 0 20px;float:left">
-
-                <div class="widget_title ui-corner-top">Run <input type="text" size="20"
-                                                                   id="searchRun"
-                                                                   name="searchRun"/></div>
-                <div class="widget ui-corner-bottom">
-                    <div id="searchRunresult"></div>
-                </div>
-                <br/>
-
-                <div class="widget_title ui-corner-top">Library <input type="text" size="20"
-                                                                       id="searchLibrary"
-                                                                       name="searchLibrary"/></div>
-                <div class="widget ui-corner-bottom">
-                    <div id="searchLibraryresult">
-                    </div>
+        <div style="margin:20px 0 0 20px;float:left">
+            <div class="widget_title ui-corner-top">Project <input type="text" size="20"
+                                                                   id="searchProject"
+                                                                   name="searchProject"/></div>
+            <div class="widget ui-corner-bottom">
+                <div id="searchProjectresult">
                 </div>
             </div>
-        </center>
+            <br/>
+
+            <div class="widget_title ui-corner-top">Sample <input type="text" size="20"
+                                                                  id="searchSample"
+                                                                  name="searchSample"/></div>
+            <div class="widget ui-corner-bottom">
+                <div id="searchSampleresult">
+                </div>
+            </div>
+
+        </div>
+
+        <div style="margin:20px 0 0 20px;float:left">
+
+            <div class="widget_title ui-corner-top">Run <input type="text" size="20"
+                                                               id="searchRun"
+                                                               name="searchRun"/></div>
+            <div class="widget ui-corner-bottom">
+                <div id="searchRunresult"></div>
+            </div>
+            <br/>
+
+            <div class="widget_title ui-corner-top">Library <input type="text" size="20"
+                                                                   id="searchLibrary"
+                                                                   name="searchLibrary"/></div>
+            <div class="widget ui-corner-bottom">
+                <div id="searchLibraryresult">
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 <script type="text/javascript">
