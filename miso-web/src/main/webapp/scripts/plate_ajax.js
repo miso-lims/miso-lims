@@ -41,7 +41,7 @@ Plate.barcode = {
   printPlateBarcodes: function () {
     var plates = [];
     for (var i = 0; i < arguments.length; i++) {
-      plates[i] = {'plateId': plates[i]};
+      plates[i] = {'plateId': arguments[i]};
     }
 
     Fluxion.doAjax(
