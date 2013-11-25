@@ -34,8 +34,8 @@
 
 <c:if test="${not empty run}">
   Selected run: <b>${run.alias}</b><br/>
-  <c:forEach items="${defaultRunValues}" var="default">
-    <input type="hidden" name="default-${default.key}" value="${default.value}"/>
+  <c:forEach items="${defaultRunValues}" var="drv">
+    <input type="hidden" name="default-${drv.key}" value="${drv.value}"/>
   </c:forEach>
 </c:if>
 
