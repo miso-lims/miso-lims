@@ -150,16 +150,16 @@
 
   <!-- Maven repository deploy -->
   <distributionManagement>
-    <downloadUrl>https://repos.tgac.bbsrc.ac.uk/maven/repo</downloadUrl>
+    <downloadUrl>https://repos.tgac.ac.uk/maven/repo</downloadUrl>
     <repository>
       <id>miso-releases</id>
       <name>MISO repository</name>
-      <url>scp://repos.tgac.bbsrc.ac.uk/storage/html/maven/miso/releases</url>
+      <url>scp://repos.tgac.ac.uk/storage/html/maven/miso/releases</url>
     </repository>
     <snapshotRepository>
       <id>miso-snapshots</id>
       <name>MISO snapshot repository</name>
-      <url>scp://repos.tgac.bbsrc.ac.uk/storage/html/maven/miso/snapshots</url>
+      <url>scp://repos.tgac.ac.uk/storage/html/maven/miso/snapshots</url>
     </snapshotRepository>
   </distributionManagement>
 
@@ -174,7 +174,7 @@
     <repository>
       <id>tgac-repo</id>
       <name>TGAC Maven Repository</name>
-      <url>https://repos.tgac.bbsrc.ac.uk/maven/repo</url>
+      <url>https://repos.tgac.ac.uk/maven/repo</url>
       <releases>
         <enabled>true</enabled>
         <updatePolicy>always</updatePolicy>
@@ -239,7 +239,7 @@
     <pluginRepository>
       <id>miso-releases</id>
       <name>MISO repository</name>
-      <url>https://repos.tgac.bbsrc.ac.uk/maven/miso/releases</url>
+      <url>https://repos.tgac.ac.uk/maven/miso/releases</url>
       <releases>
         <enabled>true</enabled>
         <updatePolicy>always</updatePolicy>
@@ -249,7 +249,7 @@
     <pluginRepository>
       <id>miso-snapshots</id>
       <name>MISO snapshot repository</name>
-      <url>https://repos.tgac.bbsrc.ac.uk/maven/miso/snapshots</url>
+      <url>https://repos.tgac.ac.uk/maven/miso/snapshots</url>
       <snapshots>
         <enabled>true</enabled>
         <updatePolicy>always</updatePolicy>
