@@ -32,7 +32,7 @@
   </ul>
 
   <div id="tab-1">
-    <i>This page refreshes every 30 seconds</i>
+    <i>This page needs to be refreshed manually</i>
 
     <h1>Running Jobs</h1>
 
@@ -184,12 +184,12 @@
       Tasks.ui.populateCompletedTasks();
 
       // update every 30 secs
-      window.setInterval(function () {
-        Tasks.ui.populateRunningTasks();
-        Tasks.ui.populatePendingTasks();
-        Tasks.ui.populateCompletedTasks();
-        Tasks.ui.populateFailedTasks();
-      }, 30000);
+//      window.setInterval(function () {
+//        Tasks.ui.populateRunningTasks();
+//        Tasks.ui.populatePendingTasks();
+//        Tasks.ui.populateCompletedTasks();
+//        Tasks.ui.populateFailedTasks();
+//      }, 30000);
     });
   </script>
 <%@ include file="../footer.jsp" %>

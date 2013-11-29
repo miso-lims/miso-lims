@@ -149,7 +149,7 @@ public class SQLPoolDAO implements PoolStore {
       "LEFT JOIN Pool_Elements ple ON ple.elementId = ed.dilutionId " +
 
       "INNER JOIN " + TABLE_NAME + " pool ON pool.poolId = ple.pool_poolId " +
-      "WHERE p.projectId=?";
+      "WHERE p.projectId = ? AND ple.elementType = 'uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution'";
 
   public static final String DILUTION_POOL_SELECT_BY_RELATED_PROJECT =
       "SELECT DISTINCT pool.* " +
@@ -161,7 +161,7 @@ public class SQLPoolDAO implements PoolStore {
       "LEFT JOIN Pool_Elements pld ON pld.elementId = ld.dilutionId " +
 
       "INNER JOIN " + TABLE_NAME + " pool ON pool.poolId = pld.pool_poolId " +
-      "WHERE p.projectId=?";
+      "WHERE p.projectId = ? AND pld.elementType = 'uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution'";
 
   public static final String PLATE_POOL_SELECT_BY_RELATED_PROJECT =
       "SELECT DISTINCT pool.* " +
@@ -174,7 +174,7 @@ public class SQLPoolDAO implements PoolStore {
       "LEFT JOIN Pool_Elements pld ON pld.elementId = pl.plateId " +
 
       "INNER JOIN " + TABLE_NAME + " pool ON pool.poolId = pld.pool_poolId " +
-      "WHERE p.projectId=?";
+      "WHERE p.projectId= ? AND pld.elementType LIKE '%Plate'";
 
   public static final String POOL_SELECT_BY_RELATED_LIBRARY =
       "SELECT DISTINCT pool.* " +

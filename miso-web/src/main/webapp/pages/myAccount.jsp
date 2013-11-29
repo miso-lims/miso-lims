@@ -166,7 +166,7 @@
     -moz-background-clip: border;
     -moz-background-inline-policy: continuous;
     -moz-background-origin: padding;
-    background: #CCDDFF none repeat scroll 0 0;
+    background: #F0F0FF none repeat scroll 0 0;
     border: 1px solid #AAAAAA;
     color: #666666;
     font-weight: bold;

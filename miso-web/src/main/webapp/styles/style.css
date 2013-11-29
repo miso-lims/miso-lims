@@ -20,7 +20,7 @@ h1 {
     margin: 0 0 0 -2px;
     color: #666666;
     text-align: center;
-    background-color: #CCDDFF;
+    background-color: #F0F0FF;
     border-bottom: 1px solid darkgray;
     border-right: 1px solid darkgray;
 }
@@ -390,7 +390,7 @@ table.containerSummary td.partitionOccupied {
     /*width: 220px;
     background: url(images/green_vr.gif) repeat-y right;
     */
-    background-color: #CCDDFF;
+    background-color: #F0F0FF;
     border-bottom: 1px solid darkgray;
     border-left: 1px solid lightgray;
     border-right: 1px solid darkgray;
@@ -621,7 +621,7 @@ div.checklist {
 }
 
 .widget_title {
-    background-color: #CCDDFF;
+    background-color: #F0F0FF;
     border: 1px solid lightgray;
     border-bottom: 0px;
     padding-top: 5px;
@@ -983,7 +983,7 @@ fieldset.dialog input.text {
     margin-left: auto;
     margin-right: auto;
     border: 1px solid darkgray;
-    background-color: #CCDDFF;
+    background-color: #F0F0FF;
     color: #666666;
 }
 

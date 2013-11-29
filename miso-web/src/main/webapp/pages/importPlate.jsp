@@ -132,7 +132,7 @@
           <div id="qcmenu"
                onmouseover="mcancelclosetime()"
                onmouseout="mclosetime()">
-            <a href="javascript:void(0);" onclick="Plate.ui.downloadPlateInputForm();">Get Plate Input Form</a>
+            <a href="/miso/plate/export">Get Plate Input Form</a>
           </div>
         </li>
       </ul>

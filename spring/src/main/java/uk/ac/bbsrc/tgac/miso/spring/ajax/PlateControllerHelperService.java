@@ -456,12 +456,13 @@ public class PlateControllerHelperService {
         Collections.sort(samples);
         Collections.reverse(samples);
         for (Sample s : samples) {
-          b.append("<div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" "
+          b.append("<div id=\"sample"+s.getId()+"\" onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" "
                    + " " + "class=\"dashboard\">");
           b.append("<input type=\"hidden\" id=\"" + s.getId() + "\" name=\"" + s.getName() + "\" projectname=\"" + s.getProject().getName() + "\" samplealias=\"" + s.getAlias() + "\"/>");
           b.append("Name: <b>" + s.getName() + "</b><br/>");
           b.append("Alias: <b>" + s.getAlias() + "</b><br/>");
           b.append("From Project: <b>" + s.getProject().getName() + "</b><br/>");
+          b.append("<button type=\"button\" class=\"fg-button ui-state-default ui-corner-all\" onclick=\"Plate.ui.insertSampleNextAvailable(jQuery('#sample"+s.getId()+"'));\">Add</button>");
           b.append("</div>");
         }
       }
