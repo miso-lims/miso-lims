@@ -141,6 +141,10 @@ Project.ui = {
     );
   },
 
+  projectFileUploadSuccess: function () {
+    jQuery('#statusdiv').html("Upload complete. Refresh to see the file.");
+  },
+
   deliveryFormUploadSuccess: function () {
     jQuery('#deliveryform_statusdiv').html("Samples imported.");
   },

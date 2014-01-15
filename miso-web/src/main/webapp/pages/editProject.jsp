@@ -435,8 +435,8 @@
                 action="<c:url value="/miso/upload/project"/>"
                 enctype="multipart/form-data"
                 target="target_upload"
-                onsubmit="Utils.fileUpload.fileUploadProgress('ajax_upload_form', 'statusdiv', Utils.fileUpload.processingOverlay);">
-            <input type="hidden" name="id" value="${project.id}"/>
+                onsubmit="Utils.fileUpload.fileUploadProgress('ajax_upload_form', 'statusdiv', Project.ui.projectFileUploadSuccess);">
+              <input type="hidden" name="projectId" value="${project.id}"/>
             <input type="file" name="file"/>
             <button type="submit" class="br-button ui-state-default ui-corner-all">Upload</button>
           </form>
