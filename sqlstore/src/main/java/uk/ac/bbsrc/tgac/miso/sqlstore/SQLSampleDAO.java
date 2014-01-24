@@ -324,7 +324,8 @@ public class SQLSampleDAO implements SampleStore {
     }
 
     if (sample.getId() == AbstractSample.UNSAVED_ID) {
-      if (!listByAlias(sample.getAlias()).isEmpty()) {
+      //if the sample naming scheme doesn't allow duplicates, and a sample alias already exists
+      if (!sampleNamingScheme.allowDuplicateEntityNameFor("alias") && !listByAlias(sample.getAlias()).isEmpty()) {
         throw new IOException("NEW: A sample with this alias already exists in the database");
       }
       else {
@@ -361,7 +362,7 @@ public class SQLSampleDAO implements SampleStore {
     }
     else {
       SqlRowSet ss = template.queryForRowSet(SAMPLE_SELECT_BY_ALIAS, new Object[]{sample.getAlias()});
-      if (ss.next() && ss.getLong("sampleId") != sample.getId()) {
+      if (!sampleNamingScheme.allowDuplicateEntityNameFor("alias") && ss.next() && ss.getLong("sampleId") != sample.getId()) {
         throw new IOException("UPD: A sample with this alias already exists in the database");
       }
       else {

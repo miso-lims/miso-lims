@@ -83,6 +83,17 @@
                 </div>
             </div>
         </div>
+
+        <div class="dashboard_widget">
+
+            <div class="widget_title ui-corner-top">
+                Library Dilution<input type="text" size="20" id="searchLibraryDilution" name="searchLibraryDilution"/>
+            </div>
+            <div class="widget ui-corner-bottom">
+                <div id="searchLibraryDilutionresult">
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 <script type="text/javascript">
@@ -99,6 +110,9 @@
     }, 300, 2);
     Utils.timer.typewatchFunc(jQuery('#searchLibrary'), function () {
         Search.dashboardSearch(jQuery('#searchLibrary'))
+    }, 300, 2);
+    Utils.timer.typewatchFunc(jQuery('#searchLibraryDilution'), function () {
+        Search.dashboardSearch(jQuery('#searchLibraryDilution'))
     }, 300, 2);
 </script>
 <%@ include file="adminsub.jsp" %>

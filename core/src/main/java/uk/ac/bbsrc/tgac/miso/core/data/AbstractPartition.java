@@ -80,6 +80,10 @@ public abstract class AbstractPartition implements Partition {
     return securityProfile.userCanWrite(user);
   }
 
+  public boolean isDeletable() {
+    return getId() != AbstractPartition.UNSAVED_ID;
+  }
+
   public void setSecurityProfile(SecurityProfile securityProfile) {
     this.securityProfile = securityProfile;
   }

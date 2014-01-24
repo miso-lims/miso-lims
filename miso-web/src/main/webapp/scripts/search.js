@@ -56,6 +56,7 @@ var Search = Search || {
     self.dashboardSearch(jQuery('#searchRun'), true);
     self.dashboardSearch(jQuery('#searchLibrary'), true);
     self.dashboardSearch(jQuery('#searchSample'), true);
+    self.dashboardSearch(jQuery('#searchLibraryDilution'), true);
   },
 
   insertResult : function(id, v) {

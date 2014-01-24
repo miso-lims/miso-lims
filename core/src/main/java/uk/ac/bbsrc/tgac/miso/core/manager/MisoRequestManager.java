@@ -697,6 +697,16 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
+  public Collection<LibraryDilution> listAllLibraryDilutionsWithLimit(long limit) throws IOException {
+    if (libraryDilutionStore != null) {
+      return libraryDilutionStore.listAllWithLimit(limit);
+    }
+    else {
+      throw new IOException("No libraryDilutionStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
   public Collection<LibraryDilution> listAllLibraryDilutionsByLibraryId(long libraryId) throws IOException {
     if (libraryDilutionStore != null) {
       return libraryDilutionStore.listByLibraryId(libraryId);
@@ -730,6 +740,16 @@ public class MisoRequestManager implements RequestManager {
   public Collection<LibraryDilution> listAllLibraryDilutionsBySearch(String query, PlatformType platformType) throws IOException {
     if (libraryDilutionStore != null) {
       return libraryDilutionStore.listAllLibraryDilutionsByPlatformAndSearch(query, platformType);
+    }
+    else {
+      throw new IOException("No libraryDilutionStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public Collection<LibraryDilution> listAllLibraryDilutionsBySearchOnly(String query) throws IOException {
+    if (libraryDilutionStore != null) {
+      return libraryDilutionStore.listAllLibraryDilutionsBySearchOnly(query);
     }
     else {
       throw new IOException("No libraryDilutionStore available. Check that it has been declared in the Spring config.");
@@ -1460,6 +1480,30 @@ public class MisoRequestManager implements RequestManager {
     if (plateStore != null) {
       if (!plateStore.remove(plate)) {
         throw new IOException("Unable to delete Plate.");
+      }
+    }
+    else {
+      throw new IOException("No plateStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public void deleteContainer(SequencerPartitionContainer container) throws IOException {
+    if (sequencerPartitionContainerStore != null) {
+      if (!sequencerPartitionContainerStore.remove(container)) {
+        throw new IOException("Unable to delete container.");
+      }
+    }
+    else {
+      throw new IOException("No plateStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public void deletePartition(SequencerPoolPartition partition) throws IOException {
+    if (partitionStore != null) {
+      if (!partitionStore.remove(partition)) {
+        throw new IOException("Unable to delete partition.");
       }
     }
     else {

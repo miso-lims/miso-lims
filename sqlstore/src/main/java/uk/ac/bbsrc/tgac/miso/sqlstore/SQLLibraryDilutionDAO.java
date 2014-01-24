@@ -85,6 +85,9 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
           "SELECT dilutionId, name, concentration, library_libraryId, identificationBarcode, creationDate, dilutionUserName, securityProfile_profileId " +
           "FROM LibraryDilution";
 
+  public static final String LIBRARY_DILUTIONS_SELECT_LIMIT =
+      LIBRARY_DILUTION_SELECT + " ORDER BY dilutionId DESC LIMIT ?";
+
   public static String LIBRARY_DILUTION_SELECT_BY_LIBRARY_PLATFORM =
           "SELECT ld.dilutionId, ld.name, ld.concentration, ld.library_libraryId, ld.identificationBarcode, ld.creationDate, ld.dilutionUserName, ld.securityProfile_profileId, l.platformName " +
           "FROM LibraryDilution ld, Library l " +
@@ -141,6 +144,12 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
           "FROM LibraryDilution ld " +
           //"WHERE l.platformName = :platformName " +
           "WHERE ld.name LIKE :search OR ld.identificationBarcode LIKE :search";
+
+  public static String LIBRARY_DILUTION_SELECT_BY_SEARCH_ONLY =
+      "SELECT ld.dilutionId, ld.name, ld.concentration, ld.library_libraryId, ld.identificationBarcode, ld.creationDate, ld.dilutionUserName, ld.securityProfile_profileId " +
+      "FROM LibraryDilution ld " +
+      //"WHERE l.platformName = :platformName " +
+      "WHERE ld.name LIKE :search OR ld.identificationBarcode LIKE :search";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLLibraryDilutionDAO.class);
 
@@ -214,6 +223,14 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
     return namedTemplate.query(LIBRARY_DILUTION_SELECT_BY_SEARCH, params, new LibraryDilutionMapper(true));
   }
 
+  public Collection<LibraryDilution> listAllLibraryDilutionsBySearchOnly(String query) {
+    String squery = "%" + query + "%";
+    MapSqlParameterSource params = new MapSqlParameterSource();
+    params.addValue("search", squery);
+    NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+    return namedTemplate.query(LIBRARY_DILUTION_SELECT_BY_SEARCH_ONLY, params, new LibraryDilutionMapper(true));
+  }
+
   public List<LibraryDilution> listByLibraryId(long libraryId) throws IOException {
     return template.query(LIBRARY_DILUTION_SELECT_BY_LIBRARY_ID, new Object[]{libraryId}, new LibraryDilutionMapper(true));
   }  
@@ -229,6 +246,10 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
 
   public Collection<LibraryDilution> listAll() throws IOException {
     return template.query(LIBRARY_DILUTION_SELECT, new LibraryDilutionMapper(true));
+  }
+
+  public Collection<LibraryDilution> listAllWithLimit(long limit) throws IOException {
+    return template.query(LIBRARY_DILUTIONS_SELECT_LIMIT, new Object[]{limit}, new LibraryDilutionMapper(true));
   }
 
   public Collection<LibraryDilution> listAllLibraryDilutionsByPlatform(PlatformType platformType) throws IOException {

@@ -606,6 +606,96 @@ Project.ui = {
     else {
       Utils.timer.timedFunc(Utils.page.pageReload(), 1000);
     }
+  },
+
+  receiveSamples: function (tableId) {
+    if (!jQuery(tableId).hasClass("display")) {
+      //destroy current table and recreate
+      jQuery(tableId).dataTable().fnDestroy();
+      //bug fix to reset table width
+      jQuery(tableId).removeAttr("style");
+
+      jQuery(tableId).addClass("display");
+
+      jQuery(tableId + ' tbody').find("tr").each(function () {
+          // remove received samples
+          if (jQuery(this).find("td:eq(4)").html() == "") {
+            jQuery(this).removeAttr("onmouseover").removeAttr("onmouseout");
+            jQuery(this).find("td:eq(4)").remove();
+          }
+          else {
+            jQuery(this).remove();
+          }
+      });
+
+      jQuery(tableId).find('tr:first th:eq(4)').remove();
+
+      var headers = ['rowsel',
+                     'name',
+                     'alias',
+                     'description',
+                     'type',
+                     'qcPassed'];
+
+
+      var oTable = jQuery(tableId).dataTable({
+                                               "aoColumnDefs": [
+                                                 {
+                                                   "bUseRendered": false,
+                                                   "aTargets": [ 0 ]
+                                                 }
+                                               ],
+                                               "bPaginate": false,
+                                               "bInfo": false,
+                                               "bJQueryUI": true,
+                                               "bAutoWidth": true,
+                                               "bSort": false,
+                                               "bFilter": false,
+                                               "sDom": '<<"toolbar">f>r<t>ip>'
+                                             });
+
+      jQuery(tableId).find("tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"" + tableId + "\", this);'></span></th>");
+      jQuery(tableId).find("tr:gt(0)").prepend("<td class='rowSelect'></td>");
+
+      jQuery(tableId).find('.rowSelect').click(function () {
+        if (jQuery(this).parent().hasClass('row_selected')) {
+          jQuery(this).parent().removeClass('row_selected');
+        }
+        else {
+          jQuery(this).parent().addClass('row_selected');
+        }
+      });
+
+      jQuery("div.toolbar").html("<button onclick=\"Project.ui.receiveSelectedSamples('" + tableId + "');\" class=\"fg-button ui-state-default ui-corner-all\">Receive Selected</button>");
+      jQuery("div.toolbar").append("<button onclick=\"Utils.page.pageReload();\" class=\"fg-button ui-state-default ui-corner-all\">Cancel</button>");
+      jQuery("div.toolbar").removeClass("toolbar");
+    }
+  },
+
+  receiveSelectedSamples: function (tableId) {
+    if (confirm("Are you sure you want to receive selected samples?")) {
+      var samples = [];
+      var table = jQuery(tableId).dataTable();
+      var nodes = DatatableUtils.fnGetSelected(table);
+      for (var i = 0; i < nodes.length; i++) {
+        samples[i] = {'sampleId': jQuery(nodes[i]).attr("sampleId")};
+      }
+
+      if (samples.length > 0) {
+        Fluxion.doAjax(
+                'sampleControllerHelperService',
+                'setSampleReceivedDateByBarcode',
+                {'samples': samples, 'url': ajaxurl},
+                {'doOnSuccess': function (json) {
+                  alert(json.result);
+                  Utils.page.pageReload();
+                }
+                });
+      }
+      else {
+        alert("No samples selected");
+      }
+    }
   }
 };
 
@@ -978,10 +1068,10 @@ Project.barcode = {
 
       jQuery(tableId).addClass("display");
 
-      jQuery(tableId).find('tr:first th:eq(5)').remove();
+      jQuery(tableId).find('tr:first th:eq(6)').remove();
       jQuery(tableId).find("tr").each(function () {
         jQuery(this).removeAttr("onmouseover").removeAttr("onmouseout");
-        jQuery(this).find("td:eq(5)").remove();
+        jQuery(this).find("td:eq(6)").remove();
       });
       //Sample Name 	Sample Alias 	Sample Description 	Type 	QC Passed
       var headers = ['rowsel',

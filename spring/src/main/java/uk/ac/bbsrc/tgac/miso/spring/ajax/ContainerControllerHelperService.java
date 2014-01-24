@@ -186,7 +186,7 @@ public class ContainerControllerHelperService {
         b.append("</div>");
 
         SequencerPartitionContainer<SequencerPoolPartition> lf =
-                (SequencerPartitionContainer<SequencerPoolPartition>) session.getAttribute("container_" + json.getString("container_cId"));
+            (SequencerPartitionContainer<SequencerPoolPartition>) session.getAttribute("container_" + json.getString("container_cId"));
         lf.setPartitionLimit(1);
         lf.initEmptyPartitions();
       }
@@ -213,7 +213,7 @@ public class ContainerControllerHelperService {
         b.append("</div>");
 
         SequencerPartitionContainer<SequencerPoolPartition> lf =
-                (SequencerPartitionContainer<SequencerPoolPartition>) session.getAttribute("container_" + json.getString("container_cId"));
+            (SequencerPartitionContainer<SequencerPoolPartition>) session.getAttribute("container_" + json.getString("container_cId"));
         lf.setPartitionLimit(8);
         lf.initEmptyPartitions();
       }
@@ -276,7 +276,7 @@ public class ContainerControllerHelperService {
         b.append("</table>");
 
         SequencerPartitionContainer<SequencerPoolPartition> lf =
-                (SequencerPartitionContainer<SequencerPoolPartition>) session.getAttribute("container_" + json.getString("container_cId"));
+            (SequencerPartitionContainer<SequencerPoolPartition>) session.getAttribute("container_" + json.getString("container_cId"));
         lf.setPartitionLimit(6);
         lf.initEmptyPartitions();
         session.setAttribute("container_" + json.getString("container_cId"), lf);
@@ -354,7 +354,7 @@ public class ContainerControllerHelperService {
     b.append("<th>Pool</th>");
 
     SequencerPartitionContainer<SequencerPoolPartition> lf =
-            (SequencerPartitionContainer<SequencerPoolPartition>) session.getAttribute("container_" + json.getString("container_cId"));
+        (SequencerPartitionContainer<SequencerPoolPartition>) session.getAttribute("container_" + json.getString("container_cId"));
     lf.setPartitionLimit(numLanes);
     lf.initEmptyPartitions();
     session.setAttribute("container_" + json.getString("container_cId"), lf);
@@ -380,7 +380,7 @@ public class ContainerControllerHelperService {
     b.append("<th>Pool</th>");
 
     SequencerPartitionContainer<SequencerPoolPartition> lf =
-            (SequencerPartitionContainer<SequencerPoolPartition>) session.getAttribute("container_" + json.getString("container_cId"));
+        (SequencerPartitionContainer<SequencerPoolPartition>) session.getAttribute("container_" + json.getString("container_cId"));
     lf.setPartitionLimit(numChambers);
     lf.initEmptyPartitions();
     session.setAttribute("container_" + json.getString("container_cId"), lf);
@@ -405,7 +405,7 @@ public class ContainerControllerHelperService {
     b.append("<th>Pool</th>");
 
     SequencerPartitionContainer<SequencerPoolPartition> lf =
-            (SequencerPartitionContainer<SequencerPoolPartition>) session.getAttribute("container_" + json.getString("container_cId"));
+        (SequencerPartitionContainer<SequencerPoolPartition>) session.getAttribute("container_" + json.getString("container_cId"));
     lf.setPartitionLimit(numChambers);
     lf.initEmptyPartitions();
     session.setAttribute("container_" + json.getString("container_cId"), lf);
@@ -430,7 +430,7 @@ public class ContainerControllerHelperService {
     b.append("<th>Pool</th>");
 
     SequencerPartitionContainer<SequencerPoolPartition> lf =
-            (SequencerPartitionContainer<SequencerPoolPartition>) session.getAttribute("container_" + json.getString("container_cId"));
+        (SequencerPartitionContainer<SequencerPoolPartition>) session.getAttribute("container_" + json.getString("container_cId"));
     lf.setPartitionLimit(numChambers);
     lf.initEmptyPartitions();
     session.setAttribute("container_" + json.getString("container_cId"), lf);
@@ -458,7 +458,7 @@ public class ContainerControllerHelperService {
 
       Pool p = requestManager.getPoolByBarcode(barcode);
       SequencerPartitionContainer<SequencerPoolPartition> lf =
-              (SequencerPartitionContainer<SequencerPoolPartition>) session.getAttribute("container_" + json.getString("container_cId"));
+          (SequencerPartitionContainer<SequencerPoolPartition>) session.getAttribute("container_" + json.getString("container_cId"));
       if (lf.getPlatformType().equals(p.getPlatformType())) {
         return JSONUtils.JSONObjectResponse("html", poolHtml(p, partition));
       }
@@ -665,8 +665,8 @@ public class ContainerControllerHelperService {
           }
         }
         jsonArray.add("['" +
-                      (sequencePartitionContainer.getIdentificationBarcode() != null ? sequencePartitionContainer.getIdentificationBarcode() :"") +"','" +
-                      (sequencePartitionContainer.getPlatformType()!=null? sequencePartitionContainer.getPlatformType().getKey() : "") + "','" +
+                      (sequencePartitionContainer.getIdentificationBarcode() != null ? sequencePartitionContainer.getIdentificationBarcode() : "") + "','" +
+                      (sequencePartitionContainer.getPlatformType() != null ? sequencePartitionContainer.getPlatformType().getKey() : "") + "','" +
                       run + "','" +
                       sequencer + "','" +
                       "<a href=\"/miso/container/" + sequencePartitionContainer.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
@@ -678,6 +678,63 @@ public class ContainerControllerHelperService {
     catch (IOException e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
+    }
+  }
+
+
+  public JSONObject checkContainer(HttpSession session, JSONObject json) {
+    try {
+      if (json.has("containerId")) {
+        Long containerId = json.getLong("containerId");
+        SequencerPartitionContainer container = requestManager.getSequencerPartitionContainerById(containerId);
+
+        if (container.getRun() != null && "Completed".equals(container.getRun().getStatus().getHealth().getKey())) {
+          return JSONUtils.SimpleJSONResponse("yes");
+        }
+        else {
+          return JSONUtils.SimpleJSONResponse("no");
+        }
+
+      }
+      else {
+        return JSONUtils.SimpleJSONError("No Sequencer Partition Container specified");
+      }
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+      return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
+    }
+  }
+
+  public JSONObject deleteContainer(HttpSession session, JSONObject json) {
+    User user;
+    try {
+      user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+      return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
+    }
+
+    if (user != null && user.isAdmin()) {
+      if (json.has("containerId")) {
+        Long containerId = json.getLong("containerId");
+        try {
+          SequencerPartitionContainer container = requestManager.getSequencerPartitionContainerById(containerId);
+          requestManager.deleteContainer(container);
+          return JSONUtils.SimpleJSONResponse("Sequencer Partition Container deleted");
+        }
+        catch (IOException e) {
+          e.printStackTrace();
+          return JSONUtils.SimpleJSONError("Cannot delete Sequencer Partition Container: " + e.getMessage());
+        }
+      }
+      else {
+        return JSONUtils.SimpleJSONError("No Sequencer Partition Container specified to delete.");
+      }
+    }
+    else {
+      return JSONUtils.SimpleJSONError("Only admins can delete objects.");
     }
   }
 

@@ -168,6 +168,11 @@ public class MisoAppListener implements ServletContextListener {
             e.printStackTrace();
           }
         }
+
+        if (key.startsWith("miso.naming.duplicates."+classname)) {
+          String prop = key.substring(key.lastIndexOf(".")+1);
+          mns.setAllowDuplicateEntityName(prop, Boolean.parseBoolean(misoProperties.get("miso.naming.duplicates."+classname+"."+prop)));
+        }
       }
     }
 

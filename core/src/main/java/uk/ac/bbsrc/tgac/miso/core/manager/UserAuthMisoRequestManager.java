@@ -986,6 +986,18 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
+  public Collection<LibraryDilution> listAllLibraryDilutionsWithLimit(long limit) throws IOException {
+    User user = getCurrentUser();
+    Collection<LibraryDilution> accessibles = new HashSet<LibraryDilution>();
+    for (LibraryDilution dilution : super.listAllLibraryDilutionsWithLimit(limit)) {
+      if (dilution.userCanRead(user)) {
+        accessibles.add(dilution);
+      }
+    }
+    return accessibles;
+  }
+
+  @Override
   public Collection<LibraryDilution> listAllLibraryDilutionsByLibraryId(long libraryId) throws IOException {
     User user = getCurrentUser();
     Collection<LibraryDilution> accessibles = new HashSet<LibraryDilution>();
@@ -1026,6 +1038,18 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
     User user = getCurrentUser();
     Collection<LibraryDilution> accessibles = new HashSet<LibraryDilution>();
     for (LibraryDilution dilution : super.listAllLibraryDilutionsBySearch(query, platformType)) {
+      if (dilution.userCanRead(user)) {
+        accessibles.add(dilution);
+      }
+    }
+    return accessibles;
+  }
+
+  @Override
+  public Collection<LibraryDilution> listAllLibraryDilutionsBySearchOnly(String query) throws IOException {
+    User user = getCurrentUser();
+    Collection<LibraryDilution> accessibles = new HashSet<LibraryDilution>();
+    for (LibraryDilution dilution : super.listAllLibraryDilutionsBySearchOnly(query)) {
       if (dilution.userCanRead(user)) {
         accessibles.add(dilution);
       }
@@ -1558,6 +1582,20 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   public void deletePlate(Plate plate) throws IOException {
     if (getCurrentUser().isAdmin()) {
       super.deletePlate(plate);
+    }
+  }
+
+  @Override
+  public void deleteContainer(SequencerPartitionContainer container) throws IOException {
+    if (getCurrentUser().isAdmin()) {
+      super.deleteContainer(container);
+    }
+  }
+
+  @Override
+  public void deletePartition(SequencerPoolPartition partition) throws IOException {
+    if (getCurrentUser().isAdmin()) {
+      super.deletePartition(partition);
     }
   }
 }

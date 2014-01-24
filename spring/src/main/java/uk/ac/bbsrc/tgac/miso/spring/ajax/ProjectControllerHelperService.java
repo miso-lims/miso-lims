@@ -728,7 +728,7 @@ public class ProjectControllerHelperService {
         File f = misoFileManager.getNewFile(
                 Project.class,
                 projectId.toString(),
-                "SampleDeliveryForm-" + LimsUtils.getCurrentDateAsString() + ".odt");
+                "SampleInformationForm-" + LimsUtils.getCurrentDateAsString() + ".odt");
 
         FormUtils.createSampleDeliveryForm(samples, f);
         return JSONUtils.SimpleJSONResponse("" + f.getName().hashCode());

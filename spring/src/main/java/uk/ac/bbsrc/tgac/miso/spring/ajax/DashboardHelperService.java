@@ -38,6 +38,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.ldap.userdetails.InetOrgPerson;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.event.Alert;
 import uk.ac.bbsrc.tgac.miso.core.event.type.AlertLevel;
@@ -257,6 +258,44 @@ public class DashboardHelperService {
           b.append("Name: <b>" + r.getName() + "</b><br/>");
           b.append("Alias: <b>" + r.getAlias() + "</b><br/>");
           b.append("</div></a>");
+        }
+      }
+      else {
+        b.append("No matches");
+      }
+      return JSONUtils.JSONObjectResponse("html", b.toString());
+    }
+    catch (IOException e) {
+      log.debug("Failed", e);
+      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
+    }
+  }
+
+  public JSONObject searchLibraryDilution(HttpSession session, JSONObject json) {
+    String searchStr = json.getString("str");
+    try {
+      List<LibraryDilution> libraryDilutions;
+      StringBuilder b = new StringBuilder();
+      if (!"".equals(searchStr)) {
+        libraryDilutions = new ArrayList<LibraryDilution>(requestManager.listAllLibraryDilutionsBySearchOnly(searchStr));
+      }
+      else {
+        libraryDilutions = new ArrayList<LibraryDilution>(requestManager.listAllLibraryDilutionsWithLimit(50));
+      }
+
+      if (libraryDilutions.size() > 0) {
+        Collections.sort(libraryDilutions);
+        Collections.reverse(libraryDilutions);
+        for (LibraryDilution ld : libraryDilutions) {
+          if (ld != null) {
+            if (ld.getLibrary() != null) {
+              b.append("<a class=\"dashboardresult\" href=\"/miso/library/" + ld.getLibrary().getId() + "\"><div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
+              b.append("Name: <b>" + ld.getName() + "</b><br/>");
+              b.append("From Library: <b>" + ld.getLibrary().getAlias() + "(" + ld.getLibrary().getName() + ")</b><br/>");
+//              b.append("From Sample: <b>" + ld.getLibrary().getSample().getAlias() + "(" + ld.getLibrary().getSample().getName() + ")</b><br/>");
+              b.append("</div></a>");
+            }
+          }
         }
       }
       else {

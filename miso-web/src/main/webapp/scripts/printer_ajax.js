@@ -356,5 +356,70 @@ Print.service = {
         }
       }
     );
+  } ,
+
+  printCustom1DBarcodesBulk: function (codes) {
+
+    if (codes === "") {
+      alert("Please input at least one barcode...");
+    }
+    var samples = [];
+    for (var i = 0; i < arguments.length; i++) {
+      samples[i] = {'sampleId': arguments[i]};
+    }
+
+    Fluxion.doAjax(
+            'printerControllerHelperService',
+            'listAvailableServices',
+            {
+              'serviceClass': 'net.sf.json.JSONObject',
+              'url': ajaxurl
+            },
+            {
+              'doOnSuccess': function (json) {
+                jQuery('#printServiceSelectDialog')
+                        .html("<form>" +
+                              "<fieldset class='dialog'>" +
+                              "<select name='serviceSelect' id='serviceSelect' class='ui-widget-content ui-corner-all'>" +
+                              json.services +
+                              "</select></fieldset></form>");
+
+                jQuery(function () {
+                  jQuery('#printServiceSelectDialog').dialog({
+                                                               autoOpen: false,
+                                                               width: 400,
+                                                               modal: true,
+                                                               resizable: false,
+                                                               buttons: {
+                                                                 "Print": function () {
+                                                                   Fluxion.doAjax(
+                                                                           'printerControllerHelperService',
+                                                                           'printCustom1DBarcodeBulk',
+                                                                           {
+                                                                             'serviceName': jQuery('#serviceSelect').val(),
+                                                                             'barcodes': codes,
+                                                                             'url': ajaxurl
+                                                                           },
+                                                                           {
+                                                                             'doOnSuccess': function (json) {
+                                                                               alert(json.response);
+                                                                             }
+                                                                           }
+                                                                   );
+                                                                   jQuery(this).dialog('close');
+                                                                 },
+                                                                 "Cancel": function () {
+                                                                   jQuery(this).dialog('close');
+                                                                 }
+                                                               }
+                                                             });
+                });
+                jQuery('#printServiceSelectDialog').dialog('open');
+              },
+              'doOnError': function (json) {
+                alert(json.error);
+              }
+            }
+    );
   }
 };

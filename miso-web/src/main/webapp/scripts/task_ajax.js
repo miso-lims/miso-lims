@@ -209,11 +209,31 @@ Tasks.ui = {
   processPipelines : function(json) {
     for (var i = 0; i < json.pipelines.length; i++) {
       var pipeline = json.pipelines[i];
-      var rowtext = "<td>"+pipeline.name+"</td><td>"+JSON.stringify(pipeline.processes)+"</td>";
-      jQuery('#pipelines > tbody:last')
-        .append(jQuery('<tr>')
-          .append(rowtext)
-      );
+
+      jQuery('#pipelines > tbody:last').append(jQuery('<tr>').append('<td>'+pipeline.name+'</td><td id="'+pipeline.name+'Details"></td>'));
+
+      var rowtext = jQuery('#'+pipeline.name+'Details');
+
+      rowtext.append("<h2>"+pipeline.name+"</h2>");
+      rowtext.append("<i>Required parameters are marked (<span style='color: red'>*</span>).</i>");
+
+      for (var j = 0; j < pipeline.processes.length; j++) {
+        var process = pipeline.processes[j];
+
+        rowtext.append("<h4>"+process.name+"</h4>");
+
+        rowtext.append("<table class='list' id='"+process.name+"-reqParams'><thead><tr><th>Name</th><th>Properties</th></tr></thead><tbody></tbody></table>");
+
+        for (var k = 0; k < process.parameters.length; k++) {
+          var parameter = process.parameters[k];
+
+          jQuery('#'+process.name+'-reqParams > tbody:last').append(jQuery('<tr>').append("<td>"+parameter.name+"</td><td>"+
+                       "Required: " + !parameter.optional + "<br/>" +
+                       "Boolean: " + parameter.boolean + "<br/>" +
+                       "Transient: " + parameter.transient + "</td>"
+          ));
+        }
+      }
     }
   },
 

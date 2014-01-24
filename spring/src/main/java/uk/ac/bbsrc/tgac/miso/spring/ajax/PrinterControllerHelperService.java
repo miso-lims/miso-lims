@@ -409,6 +409,52 @@ public class PrinterControllerHelperService {
     }
   }
 
+  public JSONObject printCustom1DBarcodeBulk(HttpSession session, JSONObject json) {
+    try {
+
+      if (json.has("barcodes")) {
+        String response = "";
+        String barcodes = json.getString("barcodes");
+        String[] codes = barcodes.split("\n");
+        User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+
+        for (String code : codes) {
+          String serviceName = json.getString("serviceName");
+
+          MisoPrintService<File, JSONObject, PrintContext<File>> mps = null;
+          mps = printManager.getPrintService(serviceName);
+
+          Queue<File> thingsToPrint = new LinkedList<File>();
+
+          JSONObject jsonObject = new JSONObject();
+
+          jsonObject.put("field1", code);
+          jsonObject.put("field2", "1");
+
+
+          File f = mps.getLabelFor(jsonObject);
+          if (f != null) thingsToPrint.add(f);
+
+          PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
+          response  += "Job " + pj.getJobId() + " : Barcodes printed.\n";
+        }
+        return JSONUtils.SimpleJSONResponse(response);
+      }
+      else {
+        return JSONUtils.SimpleJSONResponse("No barcode.");
+      }
+    }
+    catch (MisoPrintException e) {
+      e.printStackTrace();
+      return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+      return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
+    }
+  }
+
+
   public void setSecurityManager(com.eaglegenomics.simlims.core.manager.SecurityManager securityManager) {
     this.securityManager = securityManager;
   }

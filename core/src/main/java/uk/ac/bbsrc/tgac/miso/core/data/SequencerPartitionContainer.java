@@ -45,7 +45,7 @@ import java.util.List;
 //@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
 @JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
 @JsonIgnoreProperties({"securityProfile", "run"})
-public interface SequencerPartitionContainer<T extends Partition> extends SecurableByProfile, Comparable, Barcodable, Locatable {
+public interface SequencerPartitionContainer<T extends Partition> extends SecurableByProfile, Deletable, Comparable, Barcodable, Locatable {
   /**
    * Returns the containerId of this Container object.
    *

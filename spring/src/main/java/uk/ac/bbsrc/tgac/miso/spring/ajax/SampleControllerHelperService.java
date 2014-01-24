@@ -686,10 +686,12 @@ public class SampleControllerHelperService {
       JSONObject j = new JSONObject();
       JSONArray jsonArray = new JSONArray();
       for (Sample sample : requestManager.listAllSamples()) {
+
         jsonArray.add("['" + sample.getName() + "','" +
                       sample.getAlias() + "','" +
                       sample.getSampleType() + "','" +
                       (sample.getQcPassed() != null ? sample.getQcPassed().toString() : "") + "','" +
+                      getSampleLastQC(sample.getId()) + "','" +
                       "<a href=\"/miso/sample/" + sample.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
 
       }
@@ -699,6 +701,28 @@ public class SampleControllerHelperService {
     catch (IOException e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
+    }
+  }
+
+  public JSONObject getSampleLastQCRequest(HttpSession session, JSONObject json) {
+    Long sampleId = json.getLong("sampleId");
+    return JSONUtils.SimpleJSONResponse(getSampleLastQC(sampleId));
+  }
+
+  public String getSampleLastQC(Long sampleId){
+    try {
+     String sampleQCValue = "NA";
+     Collection<SampleQC> sampleQCs =  requestManager.listAllSampleQCsBySampleId(sampleId);
+      if (sampleQCs.size()>0){
+         List<SampleQC> list = new ArrayList(sampleQCs);
+        SampleQC sampleQC = list.get(list.size()-1);
+         sampleQCValue = sampleQC.getResults().toString();
+      }
+      return sampleQCValue;
+    }
+    catch (IOException e) {
+      log.debug("Failed", e);
+      return "Failed: " + e.getMessage();
     }
   }
 

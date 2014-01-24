@@ -219,10 +219,12 @@ public interface RequestManager {
   public Collection<Dilution> listAllDilutionsByProjectAndPlatform(long projectId, PlatformType platformType) throws IOException;
 
   public Collection<LibraryDilution> listAllLibraryDilutions() throws IOException;
+  public Collection<LibraryDilution> listAllLibraryDilutionsWithLimit(long limit) throws IOException;
   public Collection<LibraryDilution> listAllLibraryDilutionsByLibraryId(long libraryId) throws IOException;
   public Collection<LibraryDilution> listAllLibraryDilutionsByPlatform(PlatformType platformType) throws IOException;
   public Collection<LibraryDilution> listAllLibraryDilutionsByProjectId(long projectId) throws IOException;
   public Collection<LibraryDilution> listAllLibraryDilutionsBySearch(String query, PlatformType platformType) throws IOException;
+  public Collection<LibraryDilution> listAllLibraryDilutionsBySearchOnly(String query) throws IOException;
   public Collection<LibraryDilution> listAllLibraryDilutionsByProjectAndPlatform(long projectId, PlatformType platformType) throws IOException;
   public Collection<LibraryDilution> listAllLibraryDilutionsByPoolAndPlatform(long poolId, PlatformType platformType) throws IOException;
 
@@ -318,4 +320,6 @@ public interface RequestManager {
   public void deleteSequencerReference(SequencerReference sequencerReference) throws IOException;
   public void deletePool(Pool pool) throws IOException;
   public void deletePlate(Plate plate) throws IOException;
+  public void deletePartition(SequencerPoolPartition partition) throws IOException;
+  public void deleteContainer(SequencerPartitionContainer container) throws IOException;
 }

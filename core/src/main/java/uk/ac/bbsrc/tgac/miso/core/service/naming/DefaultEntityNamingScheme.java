@@ -135,6 +135,17 @@ public class DefaultEntityNamingScheme<T extends Nameable> implements MisoNaming
     this.customNameGeneratorMap.remove(fieldName);
   }
 
+  @Override
+  public boolean allowDuplicateEntityNameFor(String fieldName) {
+    //never allow duplicate names
+    return false;
+  }
+
+  @Override
+  public void setAllowDuplicateEntityName(String fieldName, boolean allow) {
+    log.error("Duplicate names are NOT allowed for all fields in this scheme.");
+  }
+
   private boolean fieldCheck(String fieldName) {
     try {
       Method m = namingSchemeFor().getMethod("get" + LimsUtils.capitalise(fieldName));

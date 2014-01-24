@@ -40,8 +40,8 @@
 <h1><c:choose><c:when
     test="${project.id != 0}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose>
   Project
-  <button type="button" class="fg-button ui-state-default ui-corner-all"
-          onclick="return validate_project(this.form);">Save
+  <button type="button" class="fg-button ui-state-default ui-corner-all" onclick="return validate_project(this.form);">
+    Save
   </button>
 </h1>
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
@@ -100,15 +100,14 @@
   </tr>
   <tr>
     <td class="h">Alias:</td>
-    <td><form:input path="alias" maxlength="${maxLengths['alias']}" class="validateable"/><span id="aliascounter"
-                                                                                                class="counter"></span>
+    <td><form:input path="alias" maxlength="${maxLengths['alias']}" class="validateable"/>
+      <span id="aliascounter" class="counter"></span>
     </td>
   </tr>
   <tr>
     <td class="h">Description:</td>
-    <td><form:input path="description" maxlength="${maxLengths['description']}" class="validateable"/><span
-        id="descriptioncounter"
-        class="counter"></span></td>
+    <td><form:input path="description" maxlength="${maxLengths['description']}" class="validateable"/>
+      <span id="descriptioncounter" class="counter"></span></td>
   </tr>
   <tr>
     <td>Progress:</td>
@@ -185,16 +184,18 @@
                                       or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
       <c:choose>
         <c:when test="${overview.locked}">
-          <td style="text-align:center;"><a href="javascript:void(0);"
-                                            onclick="Project.overview.unlockProjectOverview(${overview.overviewId})"><img
-              style="border:0;" alt="Unlock" title="Unlock this overview"
-              src="<c:url value='/styles/images/lock_closed.png'/>"/></a></td>
+          <td style="text-align:center;">
+            <a href="javascript:void(0);" onclick="Project.overview.unlockProjectOverview(${overview.overviewId})">
+              <img style="border:0;" alt="Unlock" title="Unlock this overview" src="<c:url value='/styles/images/lock_closed.png'/>"/>
+            </a>
+          </td>
         </c:when>
         <c:otherwise>
-          <td style="text-align:center;"><a href="javascript:void(0);"
-                                            onclick="Project.overview.lockProjectOverview(${overview.overviewId})"><img
-              style="border:0;" alt="Lock" title="Lock this overview"
-              src="<c:url value='/styles/images/lock_open.png'/>"/></a></td>
+          <td style="text-align:center;">
+            <a href="javascript:void(0);" onclick="Project.overview.lockProjectOverview(${overview.overviewId})">
+              <img style="border:0;" alt="Lock" title="Lock this overview" src="<c:url value='/styles/images/lock_open.png'/>"/>
+            </a>
+          </td>
         </c:otherwise>
       </c:choose>
     </c:if>
@@ -255,7 +256,7 @@
       <c:forEach items="${overview.notes}" var="note" varStatus="n">
         <div class="exppreview" id="overview-notes-${n.count}">
           <b>${note.creationDate}</b>: ${note.text}
-            <span class="float-right" style="font-weight:bold; color:#C0C0C0;">${note.owner.loginName}</span>
+          <span class="float-right" style="font-weight:bold; color:#C0C0C0;">${note.owner.loginName}</span>
         </div>
       </c:forEach>
     </td>
@@ -265,107 +266,101 @@
 <ol id="progress">
   <li class="sample-qc-step">
     <c:choose>
-    <c:when test="${overview.allSampleQcPassed and overview.libraryPreparationComplete}">
-    <div class="left mid-progress-done">
+      <c:when test="${overview.allSampleQcPassed and overview.libraryPreparationComplete}">
+        <div class="left mid-progress-done">
       </c:when>
       <c:when test="${overview.allSampleQcPassed}">
-      <div class="left-progress-done">
-        </c:when>
-        <c:otherwise>
+        <div class="left-progress-done">
+      </c:when>
+      <c:otherwise>
         <div class="left">
-          </c:otherwise>
-          </c:choose>
-          <span>Sample QCs</span>
-          <form:checkbox value="${overview.allSampleQcPassed}"
-                         path="overviews[${ov.count-1}].allSampleQcPassed"/>
-        </div>
+      </c:otherwise>
+    </c:choose>
+      <span>Sample QCs</span>
+      <form:checkbox value="${overview.allSampleQcPassed}" path="overviews[${ov.count-1}].allSampleQcPassed"/>
+    </div>
   </li>
 
   <li class="lib-prep-step">
     <c:choose>
-    <c:when test="${overview.libraryPreparationComplete and overview.allLibrariesQcPassed}">
-    <div class="mid-progress-done">
+      <c:when test="${overview.libraryPreparationComplete and overview.allLibrariesQcPassed}">
+        <div class="mid-progress-done">
       </c:when>
       <c:when test="${overview.libraryPreparationComplete}">
-      <div class="left-progress-done">
-        </c:when>
-        <c:otherwise>
-        <div>
-          </c:otherwise>
-          </c:choose>
-          <span>Libraries prepared</span>
-          <form:checkbox value="${overview.libraryPreparationComplete}"
-                         path="overviews[${ov.count-1}].libraryPreparationComplete"/>
-        </div>
+        <div class="left-progress-done">
+      </c:when>
+      <c:otherwise>
+      <div>
+      </c:otherwise>
+    </c:choose>
+      <span>Libraries prepared</span>
+      <form:checkbox value="${overview.libraryPreparationComplete}" path="overviews[${ov.count-1}].libraryPreparationComplete"/>
+    </div>
   </li>
 
   <li class="lib-qc-step">
     <c:choose>
-    <c:when test="${overview.allLibrariesQcPassed and overview.allPoolsConstructed}">
-    <div class="mid-progress-done">
+      <c:when test="${overview.allLibrariesQcPassed and overview.allPoolsConstructed}">
+        <div class="mid-progress-done">
       </c:when>
       <c:when test="${overview.allLibrariesQcPassed}">
-      <div class="left-progress-done">
-        </c:when>
-        <c:otherwise>
+        <div class="left-progress-done">
+      </c:when>
+      <c:otherwise>
         <div>
-          </c:otherwise>
-          </c:choose>
-          <span>Library QCs</span>
-          <form:checkbox value="${overview.allLibrariesQcPassed}"
-                         path="overviews[${ov.count-1}].allLibrariesQcPassed"/>
-        </div>
+      </c:otherwise>
+    </c:choose>
+      <span>Library QCs</span>
+      <form:checkbox value="${overview.allLibrariesQcPassed}" path="overviews[${ov.count-1}].allLibrariesQcPassed"/>
+    </div>
   </li>
 
   <li class="pools-step">
     <c:choose>
-    <c:when test="${overview.allPoolsConstructed and overview.allRunsCompleted}">
-    <div class="mid-progress-done">
+      <c:when test="${overview.allPoolsConstructed and overview.allRunsCompleted}">
+        <div class="mid-progress-done">
       </c:when>
       <c:when test="${overview.allPoolsConstructed}">
-      <div class="left-progress-done">
-        </c:when>
-        <c:otherwise>
+        <div class="left-progress-done">
+      </c:when>
+      <c:otherwise>
         <div>
-          </c:otherwise>
-          </c:choose>
-          <span>Pools Constructed</span>
-          <form:checkbox value="${overview.allPoolsConstructed}"
-                         path="overviews[${ov.count-1}].allPoolsConstructed"/>
-        </div>
+      </c:otherwise>
+    </c:choose>
+      <span>Pools Constructed</span>
+      <form:checkbox value="${overview.allPoolsConstructed}" path="overviews[${ov.count-1}].allPoolsConstructed"/>
+      </div>
   </li>
 
   <li class="runs-step">
     <c:choose>
-    <c:when test="${overview.allRunsCompleted and overview.primaryAnalysisCompleted}">
-    <div class="mid-progress-done">
+      <c:when test="${overview.allRunsCompleted and overview.primaryAnalysisCompleted}">
+        <div class="mid-progress-done">
       </c:when>
       <c:when test="${overview.allRunsCompleted}">
-      <div class="left-progress-done">
-        </c:when>
-        <c:otherwise>
+        <div class="left-progress-done">
+      </c:when>
+      <c:otherwise>
         <div>
-          </c:otherwise>
-          </c:choose>
-          <span>Runs Completed</span>
-          <form:checkbox value="${overview.allRunsCompleted}"
-                         path="overviews[${ov.count-1}].allRunsCompleted"/>
-        </div>
+      </c:otherwise>
+    </c:choose>
+      <span>Runs Completed</span>
+      <form:checkbox value="${overview.allRunsCompleted}" path="overviews[${ov.count-1}].allRunsCompleted"/>
+    </div>
   </li>
 
   <li class="primary-analysis-step">
     <c:choose>
-    <c:when test="${overview.primaryAnalysisCompleted}">
-    <div class="right mid-progress-done">
+      <c:when test="${overview.primaryAnalysisCompleted}">
+        <div class="right mid-progress-done">
       </c:when>
       <c:otherwise>
-      <div class="right">
-        </c:otherwise>
-        </c:choose>
-        <span>Primary Analysis</span>
-        <form:checkbox value="${overview.primaryAnalysisCompleted}"
-                       path="overviews[${ov.count-1}].primaryAnalysisCompleted"/>
-      </div>
+        <div class="right">
+      </c:otherwise>
+    </c:choose>
+      <span>Primary Analysis</span>
+      <form:checkbox value="${overview.primaryAnalysisCompleted}" path="overviews[${ov.count-1}].primaryAnalysisCompleted"/>
+    </div>
   </li>
 </ol>
 <p style="clear:both"/>
@@ -376,7 +371,8 @@
 </c:choose>
 </div>
 
-<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#issues_arrowclick'), 'issuesdiv');">Tracked Issues
+<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#issues_arrowclick'), 'issuesdiv');">
+  Tracked Issues
   <div id="issues_arrowclick" class="toggleLeft"></div>
 </div>
 <div id="issuesdiv" class="note" style="display:none;">
@@ -384,9 +380,8 @@
     <c:when test="${project.id != 0}">
       To link issues to this project please enter your issue keys here, separated by a single comma, e.g. FOO-1,FOO-2,FOO-3:<br/>
       <input type="text" id="previewKeys" name="previewKeys"/>
-      <button type="button" class="br-button ui-state-default ui-corner-all"
-              onclick="Project.issues.previewIssueKeys();">Preview
-        Issues
+      <button type="button" class="br-button ui-state-default ui-corner-all" onclick="Project.issues.previewIssueKeys();">
+        Preview Issues
       </button>
       <br/>
     </c:when>
@@ -394,8 +389,7 @@
       To import a project from an issue tracker, please enter an Issue Key to form the basis of this project.
       Enter a SINGLE key, e.g. FOO-1, and click Import to link this project to an external issue.<br/>
       <input type="text" id="previewKey" name="previewKey"/>
-      <button type="button" class="br-button ui-state-default ui-corner-all"
-              onclick="Project.issues.importProjectFromIssue();">
+      <button type="button" class="br-button ui-state-default ui-corner-all" onclick="Project.issues.importProjectFromIssue();">
         Import
       </button>
     </c:otherwise>
@@ -422,8 +416,8 @@
 <c:choose>
 <c:when test="${project.id != 0}">
 <div id="simplebox">
-  <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#upload_arrowclick'), 'uploaddiv');">Project
-    Files
+  <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#upload_arrowclick'), 'uploaddiv');">
+    Project Files
     <div id="upload_arrowclick" class="toggleLeft"></div>
   </div>
   <div id="uploaddiv" class="simplebox" style="display:none;">
@@ -436,7 +430,7 @@
                 enctype="multipart/form-data"
                 target="target_upload"
                 onsubmit="Utils.fileUpload.fileUploadProgress('ajax_upload_form', 'statusdiv', Project.ui.projectFileUploadSuccess);">
-              <input type="hidden" name="projectId" value="${project.id}"/>
+            <input type="hidden" name="projectId" value="${project.id}"/>
             <input type="file" name="file"/>
             <button type="submit" class="br-button ui-state-default ui-corner-all">Upload</button>
           </form>
@@ -451,9 +445,8 @@
     <c:forEach items="${projectFiles}" var="file">
       <a href="<c:url value='/miso/download/project/${project.id}/${file.key}'/>">
         <a class="listbox" href="<c:url value='/miso/download/project/${project.id}/${file.key}'/>">
-          <div onMouseOver="this.className='boxlistboxhighlight'" onMouseOut="this.className='boxlistbox'"
-               class="boxlistbox">
-              ${file.value}
+          <div onMouseOver="this.className='boxlistboxhighlight'" onMouseOut="this.className='boxlistbox'" class="boxlistbox">
+            ${file.value}
           </div>
         </a>
       </a>
@@ -462,80 +455,78 @@
 </div>
 <br/>
 
-<div class="sectionDivider"
-     onclick="Utils.ui.toggleLeftInfo(jQuery('#studies_arrowclick'), 'studiesdiv');">${fn:length(project.studies)}
-  Studies
+<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#studies_arrowclick'), 'studiesdiv');">
+  ${fn:length(project.studies)} Studies
   <div id="studies_arrowclick" class="toggleLeft"></div>
 </div>
 <div id="studiesdiv" style="display:none;">
   <h1>${fn:length(project.studies)} Studies</h1>
   <ul class="sddm">
-    <li><a
-        onmouseover="mopen('studymenu')"
-        onmouseout="mclosetime()">Options <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span></a>
+    <li>
+      <a onmouseover="mopen('studymenu')" onmouseout="mclosetime()">Options
+        <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
+      </a>
 
-      <div id="studymenu"
-           onmouseover="mcancelclosetime()"
-           onmouseout="mclosetime()">
+      <div id="studymenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
         <a href='<c:url value="/miso/study/new/${project.id}"/> '>Add new Study</a>
         <a href='<c:url value="/miso/experimentwizard/new/${project.id}"/> '>Create Experiments</a>
         <a href='<c:url value="/miso/poolwizard/new/${project.id}"/> '>Create Pools</a>
       </div>
     </li>
   </ul>
-    <span style="clear:both">
-      <table class="list" id="study_table">
-        <thead>
-        <tr>
-          <th>Study Name</th>
-          <th>Study Alias</th>
-          <th class="fit">Edit</th>
+  <span style="clear:both">
+    <table class="list" id="study_table">
+      <thead>
+      <tr>
+        <th>Study Name</th>
+        <th>Study Alias</th>
+        <th class="fit">Edit</th>
+        <sec:authorize access="hasRole('ROLE_ADMIN')">
+          <th class="fit">DELETE</th>
+        </sec:authorize>
+      </tr>
+      </thead>
+      <tbody>
+      <c:forEach items="${project.studies}" var="study">
+        <tr studyId="${study.id}" onMouseOver="this.className='highlightrow'"
+            onMouseOut="this.className='normalrow'">
+          <td><b>${study.name}</b></td>
+          <td>${study.alias}</td>
+          <td class="misoicon" onclick="window.location.href='<c:url value="/miso/study/${study.id}"/>'">
+            <span class="ui-icon ui-icon-pencil"/>
+          </td>
           <sec:authorize access="hasRole('ROLE_ADMIN')">
-            <th class="fit">DELETE</th>
+            <td class="misoicon" onclick="Study.deleteStudy(${study.id}, Utils.page.pageReload);">
+              <span class="ui-icon ui-icon-trash"/>
+            </td>
           </sec:authorize>
         </tr>
-        </thead>
-        <tbody>
-        <c:forEach items="${project.studies}" var="study">
-          <tr studyId="${study.id}" onMouseOver="this.className='highlightrow'"
-              onMouseOut="this.className='normalrow'">
-            <td><b>${study.name}</b></td>
-            <td>${study.alias}</td>
-            <td class="misoicon"
-                onclick="window.location.href='<c:url value="/miso/study/${study.id}"/>'"><span
-                class="ui-icon ui-icon-pencil"/></td>
-            <sec:authorize access="hasRole('ROLE_ADMIN')">
-              <td class="misoicon" onclick="Study.deleteStudy(${study.id}, Utils.page.pageReload);"><span
-                  class="ui-icon ui-icon-trash"/></td>
-            </sec:authorize>
-          </tr>
-        </c:forEach>
-        </tbody>
-      </table>
-      <script type="text/javascript">
-        jQuery(document).ready(function () {
-          jQuery('#study_table').dataTable({
-            "aaSorting": [
-              [1, 'asc']
-            ],
-            "aoColumns": [
-              null,
-              { "sType": 'natural' },
-              null
-              <sec:authorize access="hasRole('ROLE_ADMIN')">, null</sec:authorize>
-            ],
-            "iDisplayLength": 50,
-            "bJQueryUI": true,
-            "bRetrieve": true
-          });
+      </c:forEach>
+      </tbody>
+    </table>
+    <script type="text/javascript">
+      jQuery(document).ready(function () {
+        jQuery('#study_table').dataTable({
+          "aaSorting": [
+            [1, 'asc']
+          ],
+          "aoColumns": [
+            null,
+            { "sType": 'natural' },
+            null
+            <sec:authorize access="hasRole('ROLE_ADMIN')">, null</sec:authorize>
+          ],
+          "iDisplayLength": 50,
+          "bJQueryUI": true,
+          "bRetrieve": true
         });
-      </script>
-    </span>
+      });
+    </script>
+  </span>
 </div>
 
-<div class="sectionDivider"
-     onclick="Utils.ui.toggleLeftInfo(jQuery('#samples_arrowclick'), 'samplesdiv');">${fn:length(project.samples)}
-  Samples
+<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#samples_arrowclick'), 'samplesdiv');">
+  ${fn:length(project.samples)} Samples
   <div id="samples_arrowclick" class="toggleLeft"></div>
 </div>
 <div id="samplesdiv" style="display:none;">
@@ -545,30 +536,24 @@
       <a onmouseover="mopen('samplemenu')" onmouseout="mclosetime()">Options
         <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
       </a>
-      <div id="samplemenu"
-           onmouseover="mcancelclosetime()"
-           onmouseout="mclosetime()">
+
+      <div id="samplemenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
         <a href='<c:url value="/miso/sample/new/${project.id}"/>'>Add Samples</a>
-        <a href="javascript:void(0);" onclick="getBulkSampleInputForm(${project.id});">Get Bulk Sample Input
-          Form</a>
-        <a href="javascript:void(0);" onclick="Project.ui.uploadBulkSampleInputForm(${project.id});">Import Bulk
-          Sample Input Form</a>
+        <a href="javascript:void(0);" onclick="getBulkSampleInputForm(${project.id});">Get Bulk Sample Input Form</a>
+        <a href="javascript:void(0);" onclick="Project.ui.uploadBulkSampleInputForm(${project.id});">Import Bulk Sample Input Form</a>
         <c:if test="${not empty project.samples}">
           <hr>
-          <a href="javascript:void(0);" onclick="getPlateInputForm(${project.id});">Get Plate Input Form</a>
-          <a href="javascript:void(0);" onclick="Project.ui.uploadPlateInputForm();">Import Plate Input
-            Form</a>
+          <a href='<c:url value="/miso/importexport/exportsamplesheet"/>'>Export Sample QC Sheet</a>
+          <a href='<c:url value="/miso/importexport/importsamplesheet"/>'>Import Sample QC Sheet</a>
           <hr>
-          <a href="javascript:void(0);" onclick="generateSampleDeliveryForm(${project.id});">Get Delivery
-            Form</a>
-          <a href="javascript:void(0);" onclick="Project.ui.uploadSampleDeliveryForm(${project.id});">Import
-            Delivery Form</a>
+          <a href="javascript:void(0);" onclick="generateSampleDeliveryForm(${project.id});">Get Information Form</a>
+          <a href="javascript:void(0);" onclick="Project.ui.uploadSampleDeliveryForm(${project.id});">Import Information Form</a>
           <hr>
-          <a href='<c:url value="/miso/sample/receipt"/>'>Receive Samples</a>
+          <a href="javascript:void(0);" onclick="Project.ui.receiveSamples('#sample_table');">Receive Samples</a>
           <a href='javascript:void(0);' onclick='bulkSampleQcTable();'>QC Samples</a>
           <a href='<c:url value="/miso/library/new/${project.samples[0].id}#tab-2"/>'>Add Libraries</a>
-          <a href="javascript:void(0);"
-             onclick="Project.barcode.selectSampleBarcodesToPrint('#sample_table');">Print Barcodes ...</a>
+          <a href='<c:url value="/miso/importexport/importlibrarypoolsheet"/>'>Import Library Sheet</a>
+          <a href="javascript:void(0);" onclick="Project.barcode.selectSampleBarcodesToPrint('#sample_table');">Print Barcodes ...</a>
         </c:if>
       </div>
     </li>
@@ -588,12 +573,11 @@
               <input type="hidden" name="projectId" value="${project.id}"/>
               <input type="file" name="file"/>
               <button type="submit" class="br-button ui-state-default ui-corner-all">Upload</button>
-              <button type="button" class="br-button ui-state-default ui-corner-all"
-                      onclick="Project.ui.cancelSampleDeliveryFormUpload();">Cancel
+              <button type="button" class="br-button ui-state-default ui-corner-all" onclick="Project.ui.cancelSampleDeliveryFormUpload();">
+                Cancel
               </button>
             </form>
-            <iframe id='deliveryform_target_upload' name='deliveryform_target_upload' src=''
-                    style='display: none'></iframe>
+            <iframe id='deliveryform_target_upload' name='deliveryform_target_upload' src='' style='display: none'></iframe>
             <div id="deliveryform_statusdiv"></div>
           </td>
         </tr>
@@ -613,12 +597,11 @@
               <input type="hidden" name="projectId" value="${project.id}"/>
               <input type="file" name="file"/>
               <button type="submit" class="br-button ui-state-default ui-corner-all">Upload</button>
-              <button type="button" class="br-button ui-state-default ui-corner-all"
-                      onclick="Project.ui.cancelBulkSampleInputFormUpload();">Cancel
+              <button type="button" class="br-button ui-state-default ui-corner-all" onclick="Project.ui.cancelBulkSampleInputFormUpload();">
+                Cancel
               </button>
             </form>
-            <iframe id='inputform_target_upload' name='inputform_target_upload' src=''
-                    style='display: none'></iframe>
+            <iframe id='inputform_target_upload' name='inputform_target_upload' src='' style='display: none'></iframe>
             <div id="inputform_statusdiv"></div>
           </td>
         </tr>
@@ -638,12 +621,11 @@
               <input type="hidden" name="projectId" value="${project.id}"/>
               <input type="file" name="file"/>
               <button type="submit" class="br-button ui-state-default ui-corner-all">Upload</button>
-              <button type="button" class="br-button ui-state-default ui-corner-all"
-                      onclick="Project.ui.cancelPlateInputFormUpload();">Cancel
+              <button type="button" class="br-button ui-state-default ui-corner-all" onclick="Project.ui.cancelPlateInputFormUpload();">
+                Cancel
               </button>
             </form>
-            <iframe id='plateform_target_upload' name='plateform_target_upload'
-                    style='display: none'></iframe>
+            <iframe id='plateform_target_upload' name='plateform_target_upload' style='display: none'></iframe>
             <div id="plateform_statusdiv"></div>
             <div id="plateform_import"></div>
           </td>
@@ -660,6 +642,7 @@
         <th>Type</th>
         <th>Received Date</th>
         <th>QC Passed</th>
+        <th>QC Result</th>
         <th class="fit">Edit</th>
         <sec:authorize access="hasRole('ROLE_ADMIN')">
           <th class="fit">DELETE</th>
@@ -676,12 +659,14 @@
           <td>${sample.sampleType}</td>
           <td>${sample.receivedDate}</td>
           <td>${sample.qcPassed}</td>
-          <td class="misoicon"
-              onclick="window.location.href='<c:url value="/miso/sample/${sample.id}"/>'"><span
-              class="ui-icon ui-icon-pencil"/></td>
+          <td>${sample.id}</td>
+          <td class="misoicon" onclick="window.location.href='<c:url value="/miso/sample/${sample.id}"/>'">
+            <span class="ui-icon ui-icon-pencil"/>
+          </td>
           <sec:authorize access="hasRole('ROLE_ADMIN')">
-            <td class="misoicon" onclick="Sample.deleteSample(${sample.id}, Utils.page.pageReload);"><span
-                class="ui-icon ui-icon-trash"/></td>
+            <td class="misoicon" onclick="Sample.deleteSample(${sample.id}, Utils.page.pageReload);">
+              <span class="ui-icon ui-icon-trash"/>
+            </td>
           </sec:authorize>
         </tr>
       </c:forEach>
@@ -700,21 +685,36 @@
             null,
             null,
             null,
+            null,
             null
             <sec:authorize access="hasRole('ROLE_ADMIN')">, null</sec:authorize>
           ],
           "iDisplayLength": 50,
           "bJQueryUI": true,
-          "bRetrieve": true
+          "bRetrieve": true,
+
+          "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+            Fluxion.doAjax(
+              'sampleControllerHelperService',
+              'getSampleLastQCRequest',
+              {
+                'sampleId': aData[6],
+                'url': ajaxurl
+              },
+              {'doOnSuccess': function (json) {
+                jQuery('td:eq(6)', nRow).html(json.response);
+              }
+              }
+            );
+          }
         });
       });
     </script>
   </span>
 </div>
 
-<div class="sectionDivider"
-     onclick="Utils.ui.toggleLeftInfo(jQuery('#libraries_arrowclick'), 'librariesdiv');">${fn:length(projectLibraries)}
-  Libraries
+<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#libraries_arrowclick'), 'librariesdiv');">
+  ${fn:length(projectLibraries)} Libraries
   <div id="libraries_arrowclick" class="toggleLeft"></div>
 </div>
 <div id="librariesdiv" style="display:none;">
@@ -727,20 +727,15 @@
         <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
       </a>
 
-      <div id="librarymenu"
-           onmouseover="mcancelclosetime()"
-           onmouseout="mclosetime()">
+      <div id="librarymenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
         <c:if test="${not empty project.samples}">
           <a href='<c:url value="/miso/library/new/${project.samples[0].id}#tab-2"/>'>Add Libraries</a>
         </c:if>
 
         <c:if test="${not empty projectLibraries}">
-          <a href='javascript:void(0);' onclick='bulkLibraryQcTable();' class="add">QC these
-            Libraries</a>
-          <a href='javascript:void(0);' onclick='bulkLibraryDilutionTable();' class="add">Add Library
-            Dilutions</a>
-          <a href="javascript:void(0);"
-             onclick="Project.barcode.selectLibraryBarcodesToPrint('#library_table');">Print Barcodes ...</a>
+          <a href='javascript:void(0);' onclick='bulkLibraryQcTable();' class="add">QC these Libraries</a>
+          <a href='javascript:void(0);' onclick='bulkLibraryDilutionTable();' class="add">Add Library Dilutions</a>
+          <a href="javascript:void(0);" onclick="Project.barcode.selectLibraryBarcodesToPrint('#library_table');">Print Barcodes ...</a>
         </c:if>
       </div>
     </li>
@@ -766,8 +761,7 @@
       </thead>
       <tbody>
       <c:forEach items="${projectLibraries}" var="library">
-        <tr libraryId="${library.id}" onMouseOver="this.className='highlightrow'"
-            onMouseOut="this.className='normalrow'">
+        <tr libraryId="${library.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
           <td><b>${library.name}</b></td>
           <td>${library.alias}</td>
           <td>${library.description}</td>
@@ -783,12 +777,13 @@
           </c:if></td>
           <td><c:forEach var="qc" items="${library.libraryQCs}" end="0">${qc.insertSize}</c:forEach></td>
           <td>${library.qcPassed}</td>
-          <td class="misoicon"
-              onclick="window.location.href='<c:url value="/miso/library/${library.id}"/>'"><span
-              class="ui-icon ui-icon-pencil"/></td>
+          <td class="misoicon" onclick="window.location.href='<c:url value="/miso/library/${library.id}"/>'">
+            <span class="ui-icon ui-icon-pencil"/>
+          </td>
           <sec:authorize access="hasRole('ROLE_ADMIN')">
-            <td class="misoicon" onclick="Library.deleteLibrary(${library.id}, Utils.page.pageReload);"><span
-                class="ui-icon ui-icon-trash"/></td>
+            <td class="misoicon" onclick="Library.deleteLibrary(${library.id}, Utils.page.pageReload);">
+              <span class="ui-icon ui-icon-trash"/>
+            </td>
           </sec:authorize>
         </tr>
       </c:forEach>
@@ -821,9 +816,8 @@
   </span>
 </div>
 
-<div class="sectionDivider"
-     onclick="Utils.ui.toggleLeftInfo(jQuery('#librarydils_arrowclick'), 'librarydilsdiv');">${fn:length(projectLibraryDilutions)}
-  Library Dilutions
+<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#librarydils_arrowclick'), 'librarydilsdiv');">
+  ${fn:length(projectLibraryDilutions)} Library Dilutions
   <div id="librarydils_arrowclick" class="toggleLeft"></div>
 </div>
 <div id="librarydilsdiv" style="display:none;">
@@ -836,16 +830,12 @@
         <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
       </a>
 
-      <div id="librarydilsmenu"
-           onmouseover="mcancelclosetime()"
-           onmouseout="mclosetime()">
+      <div id="librarydilsmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
         <c:if test="${not empty projectLibraryDilutions}">
           <c:if test="${existsAnyEmPcrLibrary}">
             <a href='javascript:void(0);' onclick='bulkEmPcrTable();' class="add">Add EmPCRs</a>
           </c:if>
-          <a href="javascript:void(0);"
-             onclick="Project.barcode.selectLibraryDilutionBarcodesToPrint('#librarydils_table');">Print
-            Barcodes ...</a>
+          <a href="javascript:void(0);" onclick="Project.barcode.selectLibraryDilutionBarcodesToPrint('#librarydils_table');">Print Barcodes ...</a>
           <a href='<c:url value="/miso/poolwizard/new/${project.id}"/>'>Create Pools</a>
         </c:if>
       </div>
@@ -869,8 +859,7 @@
       </thead>
       <tbody>
       <c:forEach items="${projectLibraryDilutions}" var="dil">
-        <tr dilutionId="${dil.id}" onMouseOver="this.className='highlightrow'"
-            onMouseOut="this.className='normalrow'">
+        <tr dilutionId="${dil.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
           <td><b>${dil.name}</b></td>
           <td>${dil.library.alias}<c:if test="${not empty dil.library.tagBarcode}">
             (${dil.library.tagBarcode.name})</c:if></td>
@@ -878,13 +867,13 @@
           <td>${dil.creationDate}</td>
           <td>${dil.library.platformName}</td>
           <td>${dil.concentration}</td>
-          <td class="misoicon"
-              onclick="window.location.href='<c:url value="/miso/library/${dil.library.id}"/>'"><span
-              class="ui-icon ui-icon-pencil"/></td>
+          <td class="misoicon" onclick="window.location.href='<c:url value="/miso/library/${dil.library.id}"/>'">
+            <span class="ui-icon ui-icon-pencil"/>
+          </td>
           <sec:authorize access="hasRole('ROLE_ADMIN')">
-            <td class="misoicon"
-                onclick="Library.dilution.deleteLibraryDilution(${dil.id}, Utils.page.pageReload);"><span
-                class="ui-icon ui-icon-trash"/></td>
+            <td class="misoicon" onclick="Library.dilution.deleteLibraryDilution(${dil.id}, Utils.page.pageReload);">
+              <span class="ui-icon ui-icon-trash"/>
+            </td>
           </sec:authorize>
         </tr>
       </c:forEach>
@@ -916,9 +905,8 @@
   </span>
 </div>
 
-<div class="sectionDivider"
-     onclick="Utils.ui.toggleLeftInfo(jQuery('#pools_arrowclick'), 'poolsdiv');">${fn:length(projectPools)}
-  Pools
+<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#pools_arrowclick'), 'poolsdiv');">
+  ${fn:length(projectPools)} Pools
   <div id="pools_arrowclick" class="toggleLeft"></div>
 </div>
 <div id="poolsdiv" style="display:none;">
@@ -931,16 +919,12 @@
         <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
       </a>
 
-      <div id="poolsmenu"
-           onmouseover="mcancelclosetime()"
-           onmouseout="mclosetime()">
+      <div id="poolsmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
         <c:if test="${not empty projectPools}">
           <c:if test="${existsAnyEmPcrLibrary}">
-            <a href='javascript:void(0);' onclick="Project.ui.addPoolEmPCR('#pools_table');" class="add">Add
-              Pool EmPCR</a>
+            <a href='javascript:void(0);' onclick="Project.ui.addPoolEmPCR('#pools_table');" class="add">Add Pool EmPCR</a>
           </c:if>
-          <a href="javascript:void(0);" onclick="Pool.barcode.selectPoolBarcodesToPrint('#pools_table');">Print
-            Barcodes ...</a>
+          <a href="javascript:void(0);" onclick="Pool.barcode.selectPoolBarcodesToPrint('#pools_table');">Print Barcodes ...</a>
         </c:if>
       </div>
     </li>
@@ -962,19 +946,20 @@
       </thead>
       <tbody>
       <c:forEach items="${projectPools}" var="pool">
-        <tr poolId="${pool.id}" onMouseOver="this.className='highlightrow'"
-            onMouseOut="this.className='normalrow'">
+        <tr poolId="${pool.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
           <td><b>${pool.name}</b></td>
           <td>${pool.alias}</td>
           <td>${pool.platformType.key}</td>
           <td>${pool.creationDate}</td>
           <td>${pool.concentration}</td>
             <%-- <td class="misoicon" onclick="window.location.href='<c:url value="/miso/pool/${fn:toLowerCase(pool.platformType.key)}/${pool.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td> --%>
-          <td class="misoicon" onclick="window.location.href='<c:url value="/miso/pool/${pool.id}"/>'"><span
-              class="ui-icon ui-icon-pencil"/></td>
+          <td class="misoicon" onclick="window.location.href='<c:url value="/miso/pool/${pool.id}"/>'">
+            <span class="ui-icon ui-icon-pencil"/>
+          </td>
           <sec:authorize access="hasRole('ROLE_ADMIN')">
-            <td class="misoicon" onclick="Pool.deletePool(${pool.id}, Utils.page.pageReload);"><span
-                class="ui-icon ui-icon-trash"/></td>
+            <td class="misoicon" onclick="Pool.deletePool(${pool.id}, Utils.page.pageReload);">
+              <span class="ui-icon ui-icon-trash"/>
+            </td>
           </sec:authorize>
         </tr>
       </c:forEach>
@@ -1009,8 +994,8 @@
   TODO - only show these options if some of the libraries have the right platform!
    At the moment you can create emPCRs and EmPcrDilutions for Illumina libraries!
 --%>
-<div class="sectionDivider"
-     onclick="Utils.ui.toggleLeftInfo(jQuery('#empcrs_arrowclick'), 'empcrsdiv');">${fn:length(projectEmPcrs)} EmPCRs
+<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#empcrs_arrowclick'), 'empcrsdiv');">
+  ${fn:length(projectEmPcrs)} EmPCRs
   <div id="empcrs_arrowclick" class="toggleLeft"></div>
 </div>
 <div id="empcrsdiv" style="display:none;">
@@ -1023,12 +1008,9 @@
         <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
       </a>
 
-      <div id="empcrsmenu"
-           onmouseover="mcancelclosetime()"
-           onmouseout="mclosetime()">
+      <div id="empcrsmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
         <c:if test="${not empty projectEmPcrs}">
-          <a href='javascript:void(0);' onclick='bulkEmPcrDilutionTable();' class="add">Add EmPCR
-            Dilutions</a>
+          <a href='javascript:void(0);' onclick='bulkEmPcrDilutionTable();' class="add">Add EmPCR Dilutions</a>
         </c:if>
       </div>
     </li>
@@ -1050,19 +1032,19 @@
       </thead>
       <tbody>
       <c:forEach items="${projectEmPcrs}" var="pcr">
-        <tr pcrId="${pcr.id}" onMouseOver="this.className='highlightrow'"
-            onMouseOut="this.className='normalrow'">
+        <tr pcrId="${pcr.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
           <td><b>${pcr.name}</b></td>
           <td>${pcr.libraryDilution.name}</td>
           <td>${pcr.pcrCreator}</td>
           <td>${pcr.creationDate}</td>
           <td>${pcr.concentration}</td>
-          <td class="misoicon"
-              onclick="window.location.href='<c:url value="/miso/library/${pcr.libraryDilution.library.id}"/>'">
-            <span class="ui-icon ui-icon-pencil"/></td>
+          <td class="misoicon" onclick="window.location.href='<c:url value="/miso/library/${pcr.libraryDilution.library.id}"/>'">
+            <span class="ui-icon ui-icon-pencil"/>
+          </td>
           <sec:authorize access="hasRole('ROLE_ADMIN')">
-            <td class="misoicon" onclick="Library.empcr.deleteEmPCR(${pcr.id}, Utils.page.pageReload);"><span
-                class="ui-icon ui-icon-trash"/></td>
+            <td class="misoicon" onclick="Library.empcr.deleteEmPCR(${pcr.id}, Utils.page.pageReload);">
+              <span class="ui-icon ui-icon-trash"/>
+            </td>
           </sec:authorize>
         </tr>
       </c:forEach>
@@ -1082,7 +1064,8 @@
             null,
             null,
             null
-            <sec:authorize access="hasRole('ROLE_ADMIN')">, null</sec:authorize>
+            <sec:authorize access="hasRole('ROLE_ADMIN')">,
+            null</sec:authorize>
           ],
           "iDisplayLength": 50,
           "bJQueryUI": true,
@@ -1093,9 +1076,8 @@
   </span>
 </div>
 
-<div class="sectionDivider"
-     onclick="Utils.ui.toggleLeftInfo(jQuery('#empcrdils_arrowclick'), 'empcrdilsdiv');">${fn:length(projectEmPcrDilutions)}
-  EmPCR Dilutions
+<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#empcrdils_arrowclick'), 'empcrdilsdiv');">
+  ${fn:length(projectEmPcrDilutions)} EmPCR Dilutions
   <div id="empcrdils_arrowclick" class="toggleLeft"></div>
 </div>
 <div id="empcrdilsdiv" style="display:none;">
@@ -1108,9 +1090,7 @@
         <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
       </a>
 
-      <div id="empcrdilsmenu"
-           onmouseover="mcancelclosetime()"
-           onmouseout="mclosetime()">
+      <div id="empcrdilsmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
         <c:if test="${not empty projectEmPcrDilutions}">
           <a href='<c:url value="/miso/poolwizard/new/${project.id}"/>'>Create Pools</a>
         </c:if>
@@ -1133,19 +1113,18 @@
       </thead>
       <tbody>
       <c:forEach items="${projectEmPcrDilutions}" var="dil">
-        <tr dilutionId="${dil.id}" onMouseOver="this.className='highlightrow'"
-            onMouseOut="this.className='normalrow'">
+        <tr dilutionId="${dil.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
           <td><b>${dil.name}</b></td>
           <td>${dil.dilutionCreator}</td>
           <td>${dil.creationDate}</td>
           <td>${dil.concentration}</td>
-          <td class="misoicon"
-              onclick="window.location.href='<c:url value="/miso/library/${dil.library.id}"/>'"><span
-              class="ui-icon ui-icon-pencil"/></td>
+          <td class="misoicon" onclick="window.location.href='<c:url value="/miso/library/${dil.library.id}"/>'">
+            <span class="ui-icon ui-icon-pencil"/>
+          </td>
           <sec:authorize access="hasRole('ROLE_ADMIN')">
-            <td class="misoicon"
-                onclick="Library.empcr.deleteEmPCRDilution(${dil.id}, Utils.page.pageReload);"><span
-                class="ui-icon ui-icon-trash"/></td>
+            <td class="misoicon" onclick="Library.empcr.deleteEmPCRDilution(${dil.id}, Utils.page.pageReload);">
+              <span class="ui-icon ui-icon-trash"/>
+            </td>
           </sec:authorize>
         </tr>
       </c:forEach>
@@ -1174,9 +1153,8 @@
   </span>
 </div>
 
-<div class="sectionDivider"
-     onclick="Utils.ui.toggleLeftInfo(jQuery('#plates_arrowclick'), 'platesdiv');">${fn:length(projectPlates)}
-  Plates
+<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#plates_arrowclick'), 'platesdiv');">
+  ${fn:length(projectPlates)} Plates
   <div id="plates_arrowclick" class="toggleLeft"></div>
 </div>
 <div id="platesdiv" style="display:none;">
@@ -1189,13 +1167,10 @@
         <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
       </a>
 
-      <div id="platesmenu"
-           onmouseover="mcancelclosetime()"
-           onmouseout="mclosetime()">
+      <div id="platesmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
         <a href="<c:url value="/miso/plate/import"/>">Import Plate Sheet</a>
         <c:if test="${not empty projectPlates}">
-          <a href="javascript:void(0);" onclick="Plate.barcode.selectPlateBarcodesToPrint('#plates_table');">Print
-            Barcodes ...</a>
+          <a href="javascript:void(0);" onclick="Plate.barcode.selectPlateBarcodesToPrint('#plates_table');">Print Barcodes ...</a>
         </c:if>
       </div>
     </li>
@@ -1215,17 +1190,18 @@
       </thead>
       <tbody>
       <c:forEach items="${projectPlates}" var="plate">
-        <tr poolId="${plate.id}" onMouseOver="this.className='highlightrow'"
-            onMouseOut="this.className='normalrow'">
+        <tr poolId="${plate.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
           <td><b>${plate.name}</b></td>
           <td>${plate.size}</td>
           <td>${plate.creationDate}</td>
             <%-- <td class="misoicon" onclick="window.location.href='<c:url value="/miso/pool/${fn:toLowerCase(pool.platformType.key)}/${pool.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td> --%>
-          <td class="misoicon" onclick="window.location.href='<c:url value="/miso/plate/${plate.id}"/>'"><span
-              class="ui-icon ui-icon-pencil"/></td>
+          <td class="misoicon" onclick="window.location.href='<c:url value="/miso/plate/${plate.id}"/>'">
+            <span class="ui-icon ui-icon-pencil"/>
+          </td>
           <sec:authorize access="hasRole('ROLE_ADMIN')">
-            <td class="misoicon" onclick="Plate.deletePlate(${plate.id}, Utils.page.pageReload);"><span
-                class="ui-icon ui-icon-trash"/></td>
+            <td class="misoicon" onclick="Plate.deletePlate(${plate.id}, Utils.page.pageReload);">
+              <span class="ui-icon ui-icon-trash"/>
+            </td>
           </sec:authorize>
         </tr>
       </c:forEach>
@@ -1254,9 +1230,8 @@
   </span>
 </div>
 
-<div class="sectionDivider"
-     onclick="Utils.ui.toggleLeftInfo(jQuery('#runs_arrowclick'), 'runsdiv');">${fn:length(projectRuns)}
-  Runs
+<div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#runs_arrowclick'), 'runsdiv');">
+  ${fn:length(projectRuns)} Runs
   <div id="runs_arrowclick" class="toggleLeft"></div>
 </div>
 <div id="runsdiv" style="display:none;">
@@ -1276,8 +1251,7 @@
     </thead>
     <tbody>
     <c:forEach items="${projectRuns}" var="run" varStatus="runCount">
-      <tr runId="${run.id}" onMouseOver="this.className='highlightrow'"
-          onMouseOut="this.className='normalrow'">
+      <tr runId="${run.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
         <td><b>${run.name}</b></td>
         <td>${run.alias}</td>
         <td>
@@ -1304,11 +1278,13 @@
             </c:if>
           </c:forEach>
         </td>
-        <td class="misoicon" onclick="window.location.href='<c:url value="/miso/run/${run.id}"/>'"><span
-            class="ui-icon ui-icon-pencil"/></td>
+        <td class="misoicon" onclick="window.location.href='<c:url value="/miso/run/${run.id}"/>'">
+          <span class="ui-icon ui-icon-pencil"/>
+        </td>
         <sec:authorize access="hasRole('ROLE_ADMIN')">
-          <td class="misoicon" onclick="Run.deleteRun(${run.id}, Utils.page.pageReload);"><span
-              class="ui-icon ui-icon-trash"/></td>
+          <td class="misoicon" onclick="Run.deleteRun(${run.id}, Utils.page.pageReload);">
+            <span class="ui-icon ui-icon-trash"/>
+          </td>
         </sec:authorize>
       </tr>
     </c:forEach>
@@ -1626,14 +1602,14 @@ function generateSampleDeliveryForm(projectId) {
 
 function getBulkSampleInputForm(projectId) {
   jQuery('#getBulkSampleInputFormDialog')
-      .html("<form>" +
-            "<fieldset class='dialog'>" +
-            "<p>Select desired document format</p><br/>" +
-            "<label for='formTypeOds'>OpenOffice (ODS)</label>" +
-            "<input type='radio' name='formType' id='formTypeOds' class='text ui-widget-content ui-corner-all' value='ods'/>" +
-            "<label for='formTypeXlsx'>Excel (XLSX)</label>" +
-            "<input type='radio' name='formType' id='formTypeXls' class='text ui-widget-content ui-corner-all' value='xlsx'/>" +
-            "</fieldset></form>");
+    .html("<form>" +
+          "<fieldset class='dialog'>" +
+          "<p>Select desired document format</p><br/>" +
+          "<label for='formTypeOds'>OpenOffice (ODS)</label>" +
+          "<input type='radio' name='formType' id='formTypeOds' class='text ui-widget-content ui-corner-all' value='ods'/>" +
+          "<label for='formTypeXlsx'>Excel (XLSX)</label>" +
+          "<input type='radio' name='formType' id='formTypeXls' class='text ui-widget-content ui-corner-all' value='xlsx'/>" +
+          "</fieldset></form>");
 
   jQuery(function () {
     jQuery('#getBulkSampleInputFormDialog').dialog({
@@ -1657,14 +1633,14 @@ function getBulkSampleInputForm(projectId) {
 
 function getPlateInputForm(projectId) {
   jQuery('#getPlateInputFormDialog')
-      .html("<form>" +
-            "<fieldset class='dialog'>" +
-            "<p>Select desired document format</p><br/>" +
-            "<label for='formTypeOds'>OpenOffice (ODS)</label>" +
-            "<input type='radio' name='formType' id='formTypeOds' class='text ui-widget-content ui-corner-all' value='ods'/>" +
-            "<label for='formTypeXlsx'>Excel (XLSX)</label>" +
-            "<input type='radio' name='formType' id='formTypeXls' class='text ui-widget-content ui-corner-all' value='xlsx'/>" +
-            "</fieldset></form>");
+    .html("<form>" +
+          "<fieldset class='dialog'>" +
+          "<p>Select desired document format</p><br/>" +
+          "<label for='formTypeOds'>OpenOffice (ODS)</label>" +
+          "<input type='radio' name='formType' id='formTypeOds' class='text ui-widget-content ui-corner-all' value='ods'/>" +
+          "<label for='formTypeXlsx'>Excel (XLSX)</label>" +
+          "<input type='radio' name='formType' id='formTypeXls' class='text ui-widget-content ui-corner-all' value='xlsx'/>" +
+          "</fieldset></form>");
 
   jQuery(function () {
     jQuery('#getPlateInputFormDialog').dialog({
@@ -1790,95 +1766,91 @@ function bulkLibraryQcTable() {
     jQuery("div.toolbar").append("<button onclick=\"Utils.page.pageReload();\" class=\"fg-button ui-state-default ui-corner-all\">Cancel</button>");
     jQuery("div.toolbar").removeClass("toolbar");
 
-    jQuery('#library_table .defaultEditable')
-      .editable(function (value, settings) {
-          return value;
-        },
-        {
-          callback: function (sValue, y) {
-            var aPos = datatable.fnGetPosition(this);
-            datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-          },
-          submitdata: function (value, settings) {
-            return {
-              "row_id": this.parentNode.getAttribute('id'),
-              "column": datatable.fnGetPosition(this)[2]
-            };
-          },
-          onblur: 'submit',
-          placeholder: '',
-          height: '14px'
-        });
+    jQuery('#library_table .defaultEditable') .editable(function (value, settings) {
+      return value;
+    },
+    {
+      callback: function (sValue, y) {
+        var aPos = datatable.fnGetPosition(this);
+        datatable.fnUpdate(sValue, aPos[0], aPos[1]);
+      },
+      submitdata: function (value, settings) {
+        return {
+          "row_id": this.parentNode.getAttribute('id'),
+          "column": datatable.fnGetPosition(this)[2]
+        };
+      },
+      onblur: 'submit',
+      placeholder: '',
+      height: '14px'
+    });
 
-    jQuery("#library_table .typeSelect")
-      .editable(function (value, settings) {
-          return value;
-        },
-        {
-          data: '{${libraryQcTypesString}}',
-          type: 'select',
-          onblur: 'submit',
-          placeholder: '',
-          style: 'inherit',
-          callback: function (sValue, y) {
-            var aPos = datatable.fnGetPosition(this);
-            datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-          },
-          submitdata: function (value, settings) {
-            return {
-              "row_id": this.parentNode.getAttribute('id'),
-              "column": datatable.fnGetPosition(this)[2]
-            };
-          }
-        });
+    jQuery("#library_table .typeSelect") .editable(function (value, settings) {
+      return value;
+    },
+    {
+      data: '{${libraryQcTypesString}}',
+      type: 'select',
+      onblur: 'submit',
+      placeholder: '',
+      style: 'inherit',
+      callback: function (sValue, y) {
+        var aPos = datatable.fnGetPosition(this);
+        datatable.fnUpdate(sValue, aPos[0], aPos[1]);
+      },
+      submitdata: function (value, settings) {
+        return {
+          "row_id": this.parentNode.getAttribute('id'),
+          "column": datatable.fnGetPosition(this)[2]
+        };
+      }
+    });
 
-    jQuery("#library_table .dateSelect")
-      .editable(function (value, settings) {
-          return value;
-        },
-        {
-          type: 'datepicker',
-          width: '100px',
-          onblur: 'submit',
-          placeholder: '',
-          style: 'inherit',
-          datepicker: {
-            dateFormat: 'dd/mm/yy',
-            showButtonPanel: true,
-            maxDate: 0
-          },
-          callback: function (sValue, y) {
-            var aPos = datatable.fnGetPosition(this);
-            datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-          },
-          submitdata: function (value, settings) {
-            return {
-              "row_id": this.parentNode.getAttribute('id'),
-              "column": datatable.fnGetPosition(this)[2]
-            };
-          }
-        });
+    jQuery("#library_table .dateSelect").editable(function (value, settings) {
+      return value;
+    },
+    {
+      type: 'datepicker',
+      width: '100px',
+      onblur: 'submit',
+      placeholder: '',
+      style: 'inherit',
+      datepicker: {
+        dateFormat: 'dd/mm/yy',
+        showButtonPanel: true,
+        maxDate: 0
+      },
+      callback: function (sValue, y) {
+        var aPos = datatable.fnGetPosition(this);
+        datatable.fnUpdate(sValue, aPos[0], aPos[1]);
+      },
+      submitdata: function (value, settings) {
+        return {
+          "row_id": this.parentNode.getAttribute('id'),
+          "column": datatable.fnGetPosition(this)[2]
+        };
+      }
+    });
 
-    jQuery("#library_table .passedCheck")
-      .editable(function (value, settings) {
-          return value;
-        },
-        {
-          type: 'qcradio',
-          onblur: 'submit',
-          placeholder: '',
-          style: 'inherit',
-          callback: function (sValue, y) {
-            var aPos = datatable.fnGetPosition(this);
-            datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-          },
-          submitdata: function (value, settings) {
-            return {
-              "row_id": this.parentNode.getAttribute('id'),
-              "column": datatable.fnGetPosition(this)[2]
-            };
-          }
-        });
+    jQuery("#library_table .passedCheck") .editable(function (value, settings) {
+      return value;
+    },
+    {
+      type: 'qcradio',
+      onblur: 'submit',
+      placeholder: '',
+      style: 'inherit',
+      callback: function (sValue, y) {
+        var aPos = datatable.fnGetPosition(this);
+        datatable.fnUpdate(sValue, aPos[0], aPos[1]);
+      },
+      submitdata: function (value, settings) {
+        return {
+          "row_id": this.parentNode.getAttribute('id'),
+          "column": datatable.fnGetPosition(this)[2]
+        };
+      }
+    });
   }
 }
 
@@ -1972,52 +1944,50 @@ function bulkLibraryDilutionTable() {
     jQuery("div.toolbar").append("<button onclick=\"Utils.page.pageReload();\" class=\"fg-button ui-state-default ui-corner-all\">Cancel</button>");
     jQuery("div.toolbar").removeClass("toolbar");
 
-    jQuery('#library_table .defaultEditable')
-      .editable(function (value, settings) {
-        return value;
+    jQuery('#library_table .defaultEditable').editable(function (value, settings) {
+      return value;
+    },
+    {
+      callback: function (sValue, y) {
+        var aPos = datatable.fnGetPosition(this);
+        datatable.fnUpdate(sValue, aPos[0], aPos[1]);
       },
-      {
-        callback: function (sValue, y) {
-          var aPos = datatable.fnGetPosition(this);
-          datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-        },
-        submitdata: function (value, settings) {
-          return {
-            "row_id": this.parentNode.getAttribute('id'),
-            "column": datatable.fnGetPosition(this)[2]
-          };
-        },
-        onblur: 'submit',
-        placeholder: '',
-        height: '14px'
-      });
+      submitdata: function (value, settings) {
+        return {
+          "row_id": this.parentNode.getAttribute('id'),
+          "column": datatable.fnGetPosition(this)[2]
+        };
+      },
+      onblur: 'submit',
+      placeholder: '',
+      height: '14px'
+    });
 
-    jQuery("#library_table .dateSelect")
-      .editable(function (value, settings) {
-        return value;
+    jQuery("#library_table .dateSelect").editable(function (value, settings) {
+      return value;
+    },
+    {
+      type: 'datepicker',
+      width: '100px',
+      onblur: 'submit',
+      placeholder: '',
+      style: 'inherit',
+      datepicker: {
+        dateFormat: 'dd/mm/yy',
+        showButtonPanel: true,
+        maxDate: 0
       },
-      {
-        type: 'datepicker',
-        width: '100px',
-        onblur: 'submit',
-        placeholder: '',
-        style: 'inherit',
-        datepicker: {
-          dateFormat: 'dd/mm/yy',
-          showButtonPanel: true,
-          maxDate: 0
-        },
-        callback: function (sValue, y) {
-          var aPos = datatable.fnGetPosition(this);
-          datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-        },
-        submitdata: function (value, settings) {
-          return {
-            "row_id": this.parentNode.getAttribute('id'),
-            "column": datatable.fnGetPosition(this)[2]
-          };
-        }
-      });
+      callback: function (sValue, y) {
+        var aPos = datatable.fnGetPosition(this);
+        datatable.fnUpdate(sValue, aPos[0], aPos[1]);
+      },
+      submitdata: function (value, settings) {
+        return {
+          "row_id": this.parentNode.getAttribute('id'),
+          "column": datatable.fnGetPosition(this)[2]
+        };
+      }
+    });
   }
 }
 </c:if>
@@ -2106,52 +2076,50 @@ function bulkEmPcrTable() {
     jQuery("div.toolbar").append("<button onclick=\"Utils.page.pageReload();\" class=\"fg-button ui-state-default ui-corner-all\">Cancel</button>");
     jQuery("div.toolbar").removeClass("toolbar");
 
-    jQuery('#librarydils_table .defaultEditable')
-      .editable(function (value, settings) {
-        return value;
+    jQuery('#librarydils_table .defaultEditable').editable(function (value, settings) {
+      return value;
+    },
+    {
+      callback: function (sValue, y) {
+        var aPos = datatable.fnGetPosition(this);
+        datatable.fnUpdate(sValue, aPos[0], aPos[1]);
       },
-      {
-        callback: function (sValue, y) {
-          var aPos = datatable.fnGetPosition(this);
-          datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-        },
-        submitdata: function (value, settings) {
-          return {
-            "row_id": this.parentNode.getAttribute('id'),
-            "column": datatable.fnGetPosition(this)[2]
-          };
-        },
-        onblur: 'submit',
-        placeholder: '',
-        height: '14px'
-      });
+      submitdata: function (value, settings) {
+        return {
+          "row_id": this.parentNode.getAttribute('id'),
+          "column": datatable.fnGetPosition(this)[2]
+        };
+      },
+      onblur: 'submit',
+      placeholder: '',
+      height: '14px'
+    });
 
-    jQuery("#librarydils_table .dateSelect")
-      .editable(function (value, settings) {
-        return value;
+    jQuery("#librarydils_table .dateSelect").editable(function (value, settings) {
+      return value;
+    },
+    {
+      type: 'datepicker',
+      width: '100px',
+      onblur: 'submit',
+      placeholder: '',
+      style: 'inherit',
+      datepicker: {
+        dateFormat: 'dd/mm/yy',
+        showButtonPanel: true,
+        maxDate: 0
       },
-      {
-        type: 'datepicker',
-        width: '100px',
-        onblur: 'submit',
-        placeholder: '',
-        style: 'inherit',
-        datepicker: {
-          dateFormat: 'dd/mm/yy',
-          showButtonPanel: true,
-          maxDate: 0
-        },
-        callback: function (sValue, y) {
-          var aPos = datatable.fnGetPosition(this);
-          datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-        },
-        submitdata: function (value, settings) {
-          return {
-            "row_id": this.parentNode.getAttribute('id'),
-            "column": datatable.fnGetPosition(this)[2]
-          };
-        }
-      });
+      callback: function (sValue, y) {
+        var aPos = datatable.fnGetPosition(this);
+        datatable.fnUpdate(sValue, aPos[0], aPos[1]);
+      },
+      submitdata: function (value, settings) {
+        return {
+          "row_id": this.parentNode.getAttribute('id'),
+          "column": datatable.fnGetPosition(this)[2]
+        };
+      }
+    });
   }
 }
 </c:if>
@@ -2235,52 +2203,50 @@ function bulkEmPcrDilutionTable() {
     jQuery("div.toolbar").append("<button onclick=\"Utils.page.pageReload();\" class=\"fg-button ui-state-default ui-corner-all\">Cancel</button>");
     jQuery("div.toolbar").removeClass("toolbar");
 
-    jQuery('#empcrs_table .defaultEditable')
-      .editable(function (value, settings) {
-        return value;
+    jQuery('#empcrs_table .defaultEditable').editable(function (value, settings) {
+      return value;
+    },
+    {
+      callback: function (sValue, y) {
+        var aPos = datatable.fnGetPosition(this);
+        datatable.fnUpdate(sValue, aPos[0], aPos[1]);
       },
-      {
-        callback: function (sValue, y) {
-          var aPos = datatable.fnGetPosition(this);
-          datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-        },
-        submitdata: function (value, settings) {
-          return {
-            "row_id": this.parentNode.getAttribute('id'),
-            "column": datatable.fnGetPosition(this)[2]
-          };
-        },
-        onblur: 'submit',
-        placeholder: '',
-        height: '14px'
-      });
+      submitdata: function (value, settings) {
+        return {
+          "row_id": this.parentNode.getAttribute('id'),
+          "column": datatable.fnGetPosition(this)[2]
+        };
+      },
+      onblur: 'submit',
+      placeholder: '',
+      height: '14px'
+    });
 
-    jQuery("#empcrs_table .dateSelect")
-      .editable(function (value, settings) {
-        return value;
+    jQuery("#empcrs_table .dateSelect").editable(function (value, settings) {
+      return value;
+    },
+    {
+      type: 'datepicker',
+      width: '100px',
+      onblur: 'submit',
+      placeholder: '',
+      style: 'inherit',
+      datepicker: {
+        dateFormat: 'dd/mm/yy',
+        showButtonPanel: true,
+        maxDate: 0
       },
-      {
-        type: 'datepicker',
-        width: '100px',
-        onblur: 'submit',
-        placeholder: '',
-        style: 'inherit',
-        datepicker: {
-          dateFormat: 'dd/mm/yy',
-          showButtonPanel: true,
-          maxDate: 0
-        },
-        callback: function (sValue, y) {
-          var aPos = datatable.fnGetPosition(this);
-          datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-        },
-        submitdata: function (value, settings) {
-          return {
-            "row_id": this.parentNode.getAttribute('id'),
-            "column": datatable.fnGetPosition(this)[2]
-          };
-        }
-      });
+      callback: function (sValue, y) {
+        var aPos = datatable.fnGetPosition(this);
+        datatable.fnUpdate(sValue, aPos[0], aPos[1]);
+      },
+      submitdata: function (value, settings) {
+        return {
+          "row_id": this.parentNode.getAttribute('id'),
+          "column": datatable.fnGetPosition(this)[2]
+        };
+      }
+    });
   }
 }
 </c:if>
@@ -2290,20 +2256,21 @@ var duration = 500, i = 0, root;
 var r = 960 / 2;
 
 var tree = d3.layout.tree()
-    .size([360, r - 120])
-    .separation(function (a, b) {
-                  return (a.parent == b.parent ? 1 : 2) / a.depth;
-                });
+  .size([360, r - 120])
+  .separation(function (a, b) {
+    return (a.parent == b.parent ? 1 : 2) / a.depth;
+  });
 
 var diagonal = d3.svg.diagonal.radial()
-    .projection(function (d) {
-                  return [d.y, d.x / 180 * Math.PI];
-                });
+  .projection(function (d) {
+    return [d.y, d.x / 180 * Math.PI];
+  });
+
 var vis = d3.select("#chart").append("svg:svg")
-    .attr("width", r * 2)
-    .attr("height", r * 2 - 150)
-    .append("svg:g")
-    .attr("transform", "translate(" + r + "," + r + ")");
+  .attr("width", r * 2)
+  .attr("height", r * 2 - 150)
+  .append("svg:g")
+  .attr("transform", "translate(" + r + "," + r + ")");
 
 d3.json("/miso/d3graph/project/" + ${project.id}, function (json) {
   json.x0 = 800;
@@ -2340,8 +2307,7 @@ function update(source) {
     .attr("d", diagonal)
     .remove();
 
-  var node = vis.selectAll("circle.node")
-    .data(nodes);
+  var node = vis.selectAll("circle.node").data(nodes);
 
   // Enter any new nodes at the parent's previous position.
   node.enter().append("svg:circle")
@@ -2361,7 +2327,7 @@ function update(source) {
         : d.color == 1 ? "lightgreen"
         : d.color == 2 ? "gray"
         : "steelblue";
-     })
+    })
     .style("stroke-width", "1px")
     .attr("transform", function (d) {
       return "rotate (" + (source.x0 - 90) + ")translate(" + source.y0 + ")";
@@ -2372,7 +2338,6 @@ function update(source) {
         : d.color == 2 ? "gray"
         : "steelblue";
      })
-
     .on("click", click)
     .append("svg:title")
     .text(function (d) {
@@ -2415,7 +2380,6 @@ function update(source) {
   // Transition exiting nodes to the parent's new position.
   node.exit().transition()
     .duration(duration)
-
     .attr("dx", function (d) {
       return source.x;
     })
@@ -2464,7 +2428,6 @@ function update(source) {
     .attr("dx", "8")
     .attr("dy", "31em")
     .remove();
-
 
   // Stash the old positions for transition.
   nodes.forEach(function (d) {

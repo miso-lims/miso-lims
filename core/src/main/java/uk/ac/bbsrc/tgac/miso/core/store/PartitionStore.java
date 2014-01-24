@@ -35,7 +35,7 @@ import java.util.Collection;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface PartitionStore extends Store<SequencerPoolPartition>, Cascadable {
+public interface PartitionStore extends Store<SequencerPoolPartition>, Cascadable, Remover<SequencerPoolPartition> {
   /**
    * Retrieve a Partition from an underlying data store given a Partition ID
    * <p/>

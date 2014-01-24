@@ -29,6 +29,7 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 //import com.fasterxml.jackson.databind.ObjectMapper;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import org.codehaus.jackson.Version;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.ObjectWriter;
@@ -45,6 +46,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatePool;
+import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.util.FormUtils;
@@ -70,6 +72,8 @@ public class UploadController {
   @Autowired
   public FilesManager filesManager;
   @Autowired
+  private MisoFilesManager misoFileManager;
+  @Autowired
   public MisoFormsService misoFormsService;
   @Autowired
   private MisoNamingScheme<Library> libraryNamingScheme;
@@ -86,6 +90,10 @@ public class UploadController {
     this.filesManager = filesManager;
   }
 
+  public void setMisoFileManager(MisoFilesManager misoFileManager) {
+    this.misoFileManager = misoFileManager;
+  }
+
   public void setMisoFormsService(MisoFormsService misoFormsService) {
     this.misoFormsService = misoFormsService;
   }
@@ -95,14 +103,14 @@ public class UploadController {
   }
 
   private Class lookupCoreClass(String className) throws ClassNotFoundException {
-    return this.getClass().getClassLoader().loadClass("uk.ac.bbsrc.tgac.miso.core."+className);
+    return this.getClass().getClassLoader().loadClass("uk.ac.bbsrc.tgac.miso.core." + className);
   }
 
   public void uploadFile(Class type, String qualifier, MultipartFile fileItem) throws IOException {
-    File dir = new File(filesManager.getFileStorageDirectory()+File.separator+type.getSimpleName().toLowerCase()+File.separator+qualifier);
+    File dir = new File(filesManager.getFileStorageDirectory() + File.separator + type.getSimpleName().toLowerCase() + File.separator + qualifier);
     if (LimsUtils.checkDirectory(dir, true)) {
       log.info("Attempting to store " + dir.toString() + File.separator + fileItem.getOriginalFilename());
-      fileItem.transferTo(new File(dir+File.separator+fileItem.getOriginalFilename().replaceAll("\\s", "_")));
+      fileItem.transferTo(new File(dir + File.separator + fileItem.getOriginalFilename().replaceAll("\\s", "_")));
     }
     else {
       throw new IOException("Cannot upload file - check that the directory specified in miso.properties exists and is writable");
@@ -127,7 +135,7 @@ public class UploadController {
   public String uploadProjectSampleDeliveryForm(MultipartHttpServletRequest request) throws IOException {
     String projectId = request.getParameter("projectId");
 
-    boolean taxonCheck = (Boolean)request.getSession().getServletContext().getAttribute("taxonLookupEnabled");
+    boolean taxonCheck = (Boolean) request.getSession().getServletContext().getAttribute("taxonLookupEnabled");
 
     try {
       for (MultipartFile fileItem : getMultipartFiles(request)) {
@@ -196,8 +204,9 @@ public class UploadController {
         ObjectMapper mapper = new ObjectMapper();
         mapper.getSerializationConfig().addMixInAnnotations(Sample.class, SampleRecursionAvoidanceMixin.class);
 
-        String s = mapper.writerWithType(new TypeReference<Collection<PlatePool>>() {})
-                         .writeValueAsString(pooledPlates.values());
+        String s = mapper.writerWithType(new TypeReference<Collection<PlatePool>>() {
+        })
+            .writeValueAsString(pooledPlates.values());
         a.add(JSONArray.fromObject(s));
       }
       o.put("pools", a);
@@ -206,7 +215,7 @@ public class UploadController {
       response.setContentType("text/html");
 
       PrintWriter out = response.getWriter();
-      out.println("<input type='hidden' id='uploadresponsebody' value='"+o.toString()+"'/>");
+      out.println("<input type='hidden' id='uploadresponsebody' value='" + o.toString() + "'/>");
     }
     catch (Exception e) {
       e.printStackTrace();
@@ -229,8 +238,9 @@ public class UploadController {
         ObjectMapper mapper = new ObjectMapper();
         mapper.getSerializationConfig().addMixInAnnotations(Sample.class, SampleRecursionAvoidanceMixin.class);
 
-        String s = mapper.writerWithType(new TypeReference<Collection<PlatePool>>() {})
-                         .writeValueAsString(pooledPlates.values());
+        String s = mapper.writerWithType(new TypeReference<Collection<PlatePool>>() {
+        })
+            .writeValueAsString(pooledPlates.values());
         a.add(JSONArray.fromObject(s));
       }
       o.put("pools", a);
@@ -239,8 +249,54 @@ public class UploadController {
       response.setContentType("text/html");
 
       PrintWriter out = response.getWriter();
-      out.println("<input type='hidden' id='uploadresponsebody' value='"+o.toString()+"'/>");
+      out.println("<input type='hidden' id='uploadresponsebody' value='" + o.toString() + "'/>");
     }
+    catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  @RequestMapping(value = "/importexport/samplesheet", method = RequestMethod.POST)
+  public void uploadSampleSheet(MultipartHttpServletRequest request, HttpServletResponse response) throws IOException {
+    try {
+      JSONArray a = new JSONArray();
+      for (MultipartFile fileItem : getMultipartFiles(request)) {
+        uploadFile(Sample.class, "forms", fileItem);
+        File f = filesManager.getFile(Sample.class, "forms", fileItem.getOriginalFilename().replaceAll("\\s+", "_"));
+        User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+        a = FormUtils.processSampleSheetImport(f, user, requestManager);
+      }
+      File file = misoFileManager.getNewFile(
+          Library.class,
+          "forms",
+          "LibraryPoolExportForm-" + LimsUtils.getCurrentDateAsString() + ".xlsx");
+      FormUtils.createLibraryPoolExportForm(file, a);
+
+      response.setContentType("text/html");
+      PrintWriter out = response.getWriter();
+      out.println("<input type='hidden' id='uploadresponsebody' value='" + file.getName().hashCode() + "'/>");
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  @RequestMapping(value = "/importexport/librarypoolsheet", method = RequestMethod.POST)
+  public void uploadLibraryPoolSheet(MultipartHttpServletRequest request, HttpServletResponse response) throws IOException {
+    try {
+      String result = "";
+      for (MultipartFile fileItem : getMultipartFiles(request)) {
+        uploadFile(Library.class, "forms", fileItem);
+        File f = filesManager.getFile(Library.class, "forms", fileItem.getOriginalFilename().replaceAll("\\s+", "_"));
+        User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+        result = FormUtils.processLibraryPoolSheetImport(f, user, requestManager);
+      }
+
+      response.setContentType("text/html");
+      PrintWriter out = response.getWriter();
+      out.println("<input type='hidden' id='uploadresponsebody' value='" + result + "'/>");
+    }
+
     catch (Exception e) {
       e.printStackTrace();
     }
@@ -251,7 +307,7 @@ public class UploadController {
     String libraryId = request.getParameter("libraryId");
 
     for (MultipartFile fileItem : getMultipartFiles(request)) {
-      uploadFile(LibraryQC.class, libraryId+File.separator+"qc"+File.separator, fileItem);
+      uploadFile(LibraryQC.class, libraryId + File.separator + "qc" + File.separator, fileItem);
     }
   }
 
@@ -260,7 +316,7 @@ public class UploadController {
     String sampleId = request.getParameter("sampleId");
 
     for (MultipartFile fileItem : getMultipartFiles(request)) {
-      uploadFile(SampleQC.class, sampleId+File.separator+"qc"+File.separator, fileItem);
+      uploadFile(SampleQC.class, sampleId + File.separator + "qc" + File.separator, fileItem);
     }
   }
 

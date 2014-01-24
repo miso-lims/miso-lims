@@ -39,7 +39,7 @@ import java.util.List;
  * @author Rob Davey
  * @since 0.1.6
  */
-public interface SequencerPartitionContainerStore extends Store<SequencerPartitionContainer<SequencerPoolPartition>>, NamingSchemeAware<SequencerPartitionContainer<SequencerPoolPartition>> {
+public interface SequencerPartitionContainerStore extends Store<SequencerPartitionContainer<SequencerPoolPartition>>, NamingSchemeAware<SequencerPartitionContainer<SequencerPoolPartition>>, Remover<SequencerPartitionContainer<SequencerPoolPartition>> {
   /**
    * Retrieve a SequencerPartitionContainer from an underlying data store given a SequencerPartitionContainer ID
    * <p/>

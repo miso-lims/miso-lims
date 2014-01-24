@@ -22,20 +22,20 @@
  */
 
 var Container = Container || {
-  lookupContainer : function(t) {
+  lookupContainer: function (t) {
     var self = this;
     var barcode = jQuery("input", jQuery(t).parent()).val();
     if (!Utils.validation.isNullCheck(barcode)) {
       Fluxion.doAjax(
-        'containerControllerHelperService',
-        'lookupContainer',
-        {'barcode':barcode,'url':ajaxurl},
-        {'doOnSuccess':self.processLookup}
+              'containerControllerHelperService',
+              'lookupContainer',
+              {'barcode': barcode, 'url': ajaxurl},
+              {'doOnSuccess': self.processLookup}
       );
     }
   },
 
-  processLookup : function(json) {
+  processLookup: function (json) {
     if (json.err) {
       jQuery('#partitionErrorDiv').html(json.err);
     }
@@ -43,164 +43,196 @@ var Container = Container || {
       if (json.verify) {
         var dialogStr = "Container Properties\n\n";
         for (var key in json.verify) {
-          dialogStr += "Partition "+ key + ": " + json.verify[key] + "\n";
+          dialogStr += "Partition " + key + ": " + json.verify[key] + "\n";
         }
 
-        if (confirm("Found container '"+json.barcode+"'. Import this container?\n\n"+dialogStr)) {
+        if (confirm("Found container '" + json.barcode + "'. Import this container?\n\n" + dialogStr)) {
           jQuery('#partitionErrorDiv').html("");
           jQuery('#partitionDiv').html(json.html);
         }
       }
     }
+  },
+
+  deleteContainer: function (id) {
+    if (confirm("Are you sure you want to delete this Container?")) {
+      Fluxion.doAjax(
+              'containerControllerHelperService',
+              'checkContainer',
+              {'containerId': id, 'url': ajaxurl},
+              {'doOnSuccess': function (json) {
+                if (json.response == 'yes') {
+                  if (confirm("This container is in a completed run, are you sure to delete it?")) {
+                    Container.confirmedDeleteContainer(id);
+                  }
+                }
+                else {
+                  Container.confirmedDeleteContainer(id);
+                }
+              }
+              }
+      );
+    }
+  },
+
+  confirmedDeleteContainer: function (id) {
+    Fluxion.doAjax(
+            'containerControllerHelperService',
+            'deleteContainer',
+            {'containerId': id, 'url': ajaxurl},
+            {'doOnSuccess': function (json) {
+              alert(json.response);
+              window.location.href = "/miso/containers";
+            }
+            }
+    );
   }
 };
 
 Container.ui = {
-  editContainerIdBarcode : function(span) {
+  editContainerIdBarcode: function (span) {
     var s = jQuery(span);
     s.html("<input type='text' id='identificationBarcode' name='identificationBarcode' value='" + s.html() + "'/>" +
            "<button onclick='Container.lookupContainer(this);' type='button' class='fg-button ui-state-default ui-corner-all'>Lookup</button>");
   },
 
-  editContainerLocationBarcode : function(span, fc) {
+  editContainerLocationBarcode: function (span, fc) {
     var s = jQuery(span);
     s.html("<input type='text' id='locationBarcode' name='locationBarcode' value='" + s.html() + "'/>");
   },
 
-  populatePlatformTypes : function() {
+  populatePlatformTypes: function () {
     Fluxion.doAjax(
-      'containerControllerHelperService',
-      'getPlatformTypes',
-    {'url':ajaxurl},
-    {
-      'doOnSuccess': function(json) {
-        jQuery('#platformTypesDiv').html(json.html);
-      }
-    });
+            'containerControllerHelperService',
+            'getPlatformTypes',
+            {'url': ajaxurl},
+            {
+              'doOnSuccess': function (json) {
+                jQuery('#platformTypesDiv').html(json.html);
+              }
+            });
   },
 
-  changeContainerPlatformType : function(form) {
+  changeContainerPlatformType: function (form) {
     Fluxion.doAjax(
-      'containerControllerHelperService',
-      'changePlatformType',
-      {'platformtype':form.value, 'container_cId':jQuery('input[name=container_cId]').val(), 'url':ajaxurl},
-      {'doOnSuccess':
-        function(json) {
-          jQuery('#sequencerReferenceSelect').html(json.sequencers);
-          Container.pool.poolSearch("", form.value);
-        }
-      }
+            'containerControllerHelperService',
+            'changePlatformType',
+            {'platformtype': form.value, 'container_cId': jQuery('input[name=container_cId]').val(), 'url': ajaxurl},
+            {'doOnSuccess': function (json) {
+              jQuery('#sequencerReferenceSelect').html(json.sequencers);
+              Container.pool.poolSearch("", form.value);
+            }
+            }
     );
   },
 
-  populateContainerOptions : function(form) {
+  populateContainerOptions: function (form) {
     if (form.value != 0) {
       Fluxion.doAjax(
-        'containerControllerHelperService',
-        'populateContainerOptions',
-        {'sequencerReference':form.value, 'url':ajaxurl},
-        {'doOnSuccess':
-          function(json) {
-            jQuery('#containerPartitions').html(json.partitions);
-          }
-        }
+              'containerControllerHelperService',
+              'populateContainerOptions',
+              {'sequencerReference': form.value, 'url': ajaxurl},
+              {'doOnSuccess': function (json) {
+                jQuery('#containerPartitions').html(json.partitions);
+              }
+              }
       );
     }
   },
 
-  changeContainer : function(numContainers, platform, seqrefId) {
+  changeContainer: function (numContainers, platform, seqrefId) {
     Fluxion.doAjax(
-      'containerControllerHelperService',
-      'changeContainer',
-      {'platform':platform, 'container_cId':jQuery('input[name=container_cId]').val(), 'numContainers':numContainers, 'sequencerReferenceId':seqrefId, 'url':ajaxurl},
-      {'updateElement':'containerdiv'});
+            'containerControllerHelperService',
+            'changeContainer',
+            {'platform': platform, 'container_cId': jQuery('input[name=container_cId]').val(), 'numContainers': numContainers, 'sequencerReferenceId': seqrefId, 'url': ajaxurl},
+            {'updateElement': 'containerdiv'});
   },
 
-  changeContainerIlluminaLane : function(t, container) {
+  changeContainerIlluminaLane: function (t, container) {
     Fluxion.doAjax(
-      'containerControllerHelperService',
-      'changeIlluminaLane',
-      {'platform':'Illumina', 'container_cId':jQuery('input[name=container_cId]').val(), 'numLanes':jQuery(t).val(), 'container':container, 'url':ajaxurl},
-      {'updateElement':'containerdiv'+container});
+            'containerControllerHelperService',
+            'changeIlluminaLane',
+            {'platform': 'Illumina', 'container_cId': jQuery('input[name=container_cId]').val(), 'numLanes': jQuery(t).val(), 'container': container, 'url': ajaxurl},
+            {'updateElement': 'containerdiv' + container});
   },
 
-  changeContainerLS454Chamber : function(t, container) {
+  changeContainerLS454Chamber: function (t, container) {
     Fluxion.doAjax(
-      'containerControllerHelperService',
-      'changeChamber',
-      {'platform':'LS454', 'container_cId':jQuery('input[name=container_cId]').val(), 'numChambers':jQuery(t).val(), 'container':container, 'url':ajaxurl},
-      {'updateElement':'containerdiv'+container});
+            'containerControllerHelperService',
+            'changeChamber',
+            {'platform': 'LS454', 'container_cId': jQuery('input[name=container_cId]').val(), 'numChambers': jQuery(t).val(), 'container': container, 'url': ajaxurl},
+            {'updateElement': 'containerdiv' + container});
   },
 
-  changeContainerSolidChamber : function(t, container) {
+  changeContainerSolidChamber: function (t, container) {
     Fluxion.doAjax(
-      'containerControllerHelperService',
-      'changeChamber',
-      {'platform':'Solid', 'container_cId':jQuery('input[name=container_cId]').val(), 'numChambers':jQuery(t).val(), 'container':container, 'url':ajaxurl},
-      {'updateElement':'containerdiv'+container});
+            'containerControllerHelperService',
+            'changeChamber',
+            {'platform': 'Solid', 'container_cId': jQuery('input[name=container_cId]').val(), 'numChambers': jQuery(t).val(), 'container': container, 'url': ajaxurl},
+            {'updateElement': 'containerdiv' + container});
   },
 
-  changeContainerPacBioChamber : function(t, container) {
+  changeContainerPacBioChamber: function (t, container) {
     Fluxion.doAjax(
-      'containerControllerHelperService',
-      'changeChamber',
-      {'platform':'PacBio', 'container_cId':jQuery('input[name=container_cId]').val(), 'numChambers':jQuery(t).val(), 'container':container, 'url':ajaxurl},
-      {'updateElement':'containerdiv'+container});
+            'containerControllerHelperService',
+            'changeChamber',
+            {'platform': 'PacBio', 'container_cId': jQuery('input[name=container_cId]').val(), 'numChambers': jQuery(t).val(), 'container': container, 'url': ajaxurl},
+            {'updateElement': 'containerdiv' + container});
   },
 
-  confirmPoolRemove : function(t) {
+  confirmPoolRemove: function (t) {
     if (confirm("Remove this pool?")) {
       jQuery(t).parent().remove();
     }
   },
 
-  createListingContainersTable : function() {
+  createListingContainersTable: function () {
     jQuery('#listingContainersTable').html("<img src='../styles/images/ajax-loader.gif'/>");
     Fluxion.doAjax(
-      'containerControllerHelperService',
-      'listSequencePartitionContainersDataTable',
-      {
-        'url':ajaxurl
-      },
-      {'doOnSuccess': function(json) {
-        jQuery('#listingContainersTable').html('');
-        jQuery('#listingContainersTable').dataTable({
-         "aaData": json.array,
-         "aoColumns": [
-           //{ "sTitle": "Name"},
-           { "sTitle": "ID Barcode"},
-           { "sTitle": "Platform"},
-           { "sTitle": "Last Associated Run"},
-           { "sTitle": "Last Sequencer Used"},
-           { "sTitle": "Edit"}
-         ],
-         "bJQueryUI": true,
-         "iDisplayLength":  25,
-         "aaSorting":[
-           [0,"desc"]
-         ],
-          "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>'
-         });
-         jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
-         jQuery("#toolbar").append("<button style=\"margin-left:5px;\" onclick=\"window.location.href='/miso/container/new';\" class=\"fg-button ui-state-default ui-corner-all\">Create Partition Container</button>");
-        }
-      }
+            'containerControllerHelperService',
+            'listSequencePartitionContainersDataTable',
+            {
+              'url': ajaxurl
+            },
+            {'doOnSuccess': function (json) {
+              jQuery('#listingContainersTable').html('');
+              jQuery('#listingContainersTable').dataTable({
+                                                            "aaData": json.array,
+                                                            "aoColumns": [
+                                                              //{ "sTitle": "Name"},
+                                                              { "sTitle": "ID Barcode"},
+                                                              { "sTitle": "Platform"},
+                                                              { "sTitle": "Last Associated Run"},
+                                                              { "sTitle": "Last Sequencer Used"},
+                                                              { "sTitle": "Edit"}
+                                                            ],
+                                                            "bJQueryUI": true,
+                                                            "iDisplayLength": 25,
+                                                            "aaSorting": [
+                                                              [0, "desc"]
+                                                            ],
+                                                            "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>'
+                                                          });
+              jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
+              jQuery("#toolbar").append("<button style=\"margin-left:5px;\" onclick=\"window.location.href='/miso/container/new';\" class=\"fg-button ui-state-default ui-corner-all\">Create Partition Container</button>");
+            }
+            }
     );
   }
 };
 
 Container.partition = {
-  populatePartition : function(t) {
+  populatePartition: function (t) {
     var a = jQuery(t);
     var partitionNum = a.attr("partition");
     if (partitionNum > 0) {
-      var ul = jQuery("ul[partition='"+(partitionNum-1)+"']");
+      var ul = jQuery("ul[partition='" + (partitionNum - 1) + "']");
       if (ul.length > 0) {
         if (!Utils.validation.isNullCheck(ul.html()) && ul.find("div").length > 0) {
           //a.html("<input type='text' id='poolBarcode"+partitionNum+"' name='poolBarcode"+partitionNum+"' partition='"+partitionNum+"' onkeyup='Utils.timer.timedFunc(Container.pool.getPool(this), 300);'/><br/><span id='msg"+partitionNum+"'/>");
-          a.html("<input type='text' id='poolBarcode"+partitionNum+"' name='poolBarcode"+partitionNum+"' partition='"+partitionNum+"'/><br/><span id='msg"+partitionNum+"'/>");
-          Utils.timer.typewatchFunc(jQuery("#poolBarcode"+partitionNum), function() {
-            Container.pool.getPool(jQuery("#poolBarcode"+partitionNum));
+          a.html("<input type='text' id='poolBarcode" + partitionNum + "' name='poolBarcode" + partitionNum + "' partition='" + partitionNum + "'/><br/><span id='msg" + partitionNum + "'/>");
+          Utils.timer.typewatchFunc(jQuery("#poolBarcode" + partitionNum), function () {
+            Container.pool.getPool(jQuery("#poolBarcode" + partitionNum));
           }, 400, 4);
         }
         else {
@@ -210,32 +242,30 @@ Container.partition = {
     }
     else {
       //a.html("<input type='text' id='poolBarcode"+partitionNum+"' name='poolBarcode"+partitionNum+"' partition='"+partitionNum+"' onkeyup='Utils.timer.timedFunc(Container.pool.getPool(this), 300);'/><br/><span id='msg"+partitionNum+"'/>");
-      a.html("<input type='text' id='poolBarcode"+partitionNum+"' name='poolBarcode"+partitionNum+"' partition='"+partitionNum+"'/><br/><span id='msg"+partitionNum+"'/>");
-      Utils.timer.typewatchFunc(jQuery("#poolBarcode"+partitionNum), function() {
-        Container.pool.getPool(jQuery("#poolBarcode"+partitionNum));
+      a.html("<input type='text' id='poolBarcode" + partitionNum + "' name='poolBarcode" + partitionNum + "' partition='" + partitionNum + "'/><br/><span id='msg" + partitionNum + "'/>");
+      Utils.timer.typewatchFunc(jQuery("#poolBarcode" + partitionNum), function () {
+        Container.pool.getPool(jQuery("#poolBarcode" + partitionNum));
       }, 400, 4);
     }
   },
 
-  selectContainerStudy : function(partition, poolId) {
-    Utils.ui.disableButton('studySelectButton-'+partition+'_'+poolId);
-    var studyId = jQuery("select[name='poolStudies"+partition+"'] :selected").val();
+  selectContainerStudy: function (partition, poolId) {
+    Utils.ui.disableButton('studySelectButton-' + partition + '_' + poolId);
+    var studyId = jQuery("select[name='poolStudies" + partition + "'] :selected").val();
 
     Fluxion.doAjax(
-      'containerControllerHelperService',
-      'selectStudyForPool',
-      {'poolId':poolId, 'studyId':studyId, 'sequencerReferenceId':jQuery('#sequencerReference').val(), 'url':ajaxurl},
-      {'doOnSuccess':
-        function(json) {
-          var div = jQuery("#studySelectDiv"+partition).parent();
-          jQuery("#studySelectDiv"+partition).remove();
-          div.append(json.html);
-        },
-        'doOnError':
-        function(json) {
-          Utils.ui.reenableButton('studySelectButton-'+partition+'_'+poolId, "Select Study");
-        }
-      }
+            'containerControllerHelperService',
+            'selectStudyForPool',
+            {'poolId': poolId, 'studyId': studyId, 'sequencerReferenceId': jQuery('#sequencerReference').val(), 'url': ajaxurl},
+            {'doOnSuccess': function (json) {
+              var div = jQuery("#studySelectDiv" + partition).parent();
+              jQuery("#studySelectDiv" + partition).remove();
+              div.append(json.html);
+            },
+              'doOnError': function (json) {
+                Utils.ui.reenableButton('studySelectButton-' + partition + '_' + poolId, "Select Study");
+              }
+            }
     );
   },
 
@@ -247,18 +277,18 @@ Container.partition = {
       newpool.find('input').attr("name", jQuery(this).attr("bind"));
 
       Fluxion.doAjax(
-        'poolControllerHelperService',
-        'checkPoolExperiment',
-        {'poolId': newpool.find('input').val(), 'partition': jQuery(this).attr("partition"), 'url': ajaxurl},
-        {'doOnSuccess': function (json) {
-          newpool.append(json.html);
-          newpool.append("<span style='position: absolute; top: 0; right: 0;' onclick='Container.pool.confirmPoolRemove(this);' class='float-right ui-icon ui-icon-circle-close'></span>");
-        },
-          'doOnError': function (json) {
-            newpool.remove();
-            alert("Error adding pool, no Study is present.");
-          }
-        }
+              'poolControllerHelperService',
+              'checkPoolExperiment',
+              {'poolId': newpool.find('input').val(), 'partition': jQuery(this).attr("partition"), 'url': ajaxurl},
+              {'doOnSuccess': function (json) {
+                newpool.append(json.html);
+                newpool.append("<span style='position: absolute; top: 0; right: 0;' onclick='Container.pool.confirmPoolRemove(this);' class='float-right ui-icon ui-icon-circle-close'></span>");
+              },
+                'doOnError': function (json) {
+                  newpool.remove();
+                  alert("Error adding pool, no Study is present.");
+                }
+              }
       );
     });
   }
@@ -277,38 +307,39 @@ Container.pool = {
     }
     jQuery('#poolList').html("<img src='/styles/images/ajax-loader.gif'/>");
     Fluxion.doAjax(
-      'poolSearchService',
-      'poolSearch',
-      {'str': input, 'readyOnly': readyBool, 'platformType': platform, 'url': ajaxurl},
-      {
-        "doOnSuccess": function (json) {
-          jQuery('#poolList').html(json.html);
-          jQuery('#poolList .dashboard').each(function() {
-            var inp = jQuery(this);
-            inp.dblclick(function() {
-              Container.partition.insertPoolNextAvailable(inp);
+            'poolSearchService',
+            'poolSearch',
+            {'str': input, 'readyOnly': readyBool, 'platformType': platform, 'url': ajaxurl},
+            {
+              "doOnSuccess": function (json) {
+                jQuery('#poolList').html(json.html);
+                jQuery('#poolList .dashboard').each(function () {
+                  var inp = jQuery(this);
+                  inp.dblclick(function () {
+                    Container.partition.insertPoolNextAvailable(inp);
+                  });
+                });
+              }
             });
-          });
-        }
-    });
   },
 
-  getPool : function(t) {
+  getPool: function (t) {
     var a = jQuery(t);
     var platform = jQuery("input[name='platformTypes']:checked").val();
     var pNum = a.attr("partition");
     Fluxion.doAjax(
-      'containerControllerHelperService',
-      'getPoolByBarcode',
-      {'platform':platform, 'container_cId':jQuery('input[name=container_cId]').val(), 'partition':pNum, 'barcode':a.val(),'url':ajaxurl},
-      {'doOnSuccess':function(json) {
-        if (json.err) {
-          jQuery("#msg"+pNum).html(json.err);
-        }
-        else {
-          a.parent().html(json.html);
-        }}
-      }
+            'containerControllerHelperService',
+            'getPoolByBarcode',
+            {'platform': platform, 'container_cId': jQuery('input[name=container_cId]').val(), 'partition': pNum, 'barcode': a.val(), 'url': ajaxurl},
+            {'doOnSuccess': function (json) {
+              if (json.err) {
+                jQuery("#msg" + pNum).html(json.err);
+              }
+              else {
+                a.parent().html(json.html);
+              }
+            }
+            }
     );
   },
 

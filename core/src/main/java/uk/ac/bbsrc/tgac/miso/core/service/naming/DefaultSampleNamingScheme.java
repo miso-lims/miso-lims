@@ -27,11 +27,14 @@ import java.util.regex.Pattern;
 public class DefaultSampleNamingScheme implements RequestManagerAwareNamingScheme<Sample> {
   protected static final Logger log = LoggerFactory.getLogger(DefaultSampleNamingScheme.class);
 
+  private Map<String, Boolean> allowDuplicateMap = new HashMap<String, Boolean>();
   private Map<String, Pattern> validationMap = new HashMap<String, Pattern>();
   private Map<String, NameGenerator<Sample>> customNameGeneratorMap = new HashMap<String, NameGenerator<Sample>>();
   private RequestManager requestManager;
 
   public DefaultSampleNamingScheme() {
+    allowDuplicateMap.put("name", false);
+    allowDuplicateMap.put("alias", false);
     validationMap.put("name", Pattern.compile("([A-Z]{3})([0-9]+)"));
     validationMap.put("alias", Pattern.compile("([A-z0-9]+)_S([A-z0-9]+)_(.*)"));
   }
@@ -125,6 +128,18 @@ public class DefaultSampleNamingScheme implements RequestManagerAwareNamingSchem
   @Override
   public void unregisterCustomNameGenerator(String fieldName) {
     this.customNameGeneratorMap.remove(fieldName);
+  }
+
+  @Override
+  public boolean allowDuplicateEntityNameFor(String fieldName) {
+    return fieldCheck(fieldName) != null && allowDuplicateMap.get(fieldName);
+  }
+
+  @Override
+  public void setAllowDuplicateEntityName(String fieldName, boolean allow) {
+    if (allowDuplicateMap.containsKey(fieldName) && fieldCheck(fieldName) != null) {
+      allowDuplicateMap.put(fieldName, allow);
+    }
   }
 
   private Method fieldCheck(String fieldName) {

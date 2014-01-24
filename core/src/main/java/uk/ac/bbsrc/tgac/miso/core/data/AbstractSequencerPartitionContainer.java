@@ -102,6 +102,10 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
     return getPlatformType().name()+" " + getValidationBarcode();
   }
 
+  public boolean isDeletable() {
+    return getId() != AbstractSequencerPartitionContainer.UNSAVED_ID;
+  }
+
   public String getValidationBarcode() {
     return validationBarcode;
   }
