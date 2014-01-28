@@ -1207,6 +1207,35 @@ public class PoolControllerHelperService {
     }
   }
 
+  public JSONObject createElementSelectDataTable(HttpSession session, JSONObject json) {
+    if (json.has("platform") && !"".equals(json.getString("platform"))) {
+      try {
+        String platform = json.getString("platform");
+        JSONObject j = new JSONObject();
+        JSONArray arr = new JSONArray();
+        for (LibraryDilution libraryDilution : requestManager.listAllLibraryDilutionsByPlatform((PlatformType.get(platform)))) {
+          JSONArray pout = new JSONArray();
+          pout.add(libraryDilution.getName());
+          pout.add(libraryDilution.getLibrary().getName() + "-" + libraryDilution.getLibrary().getAlias());
+          pout.add(libraryDilution.getLibrary().getSample().getName() + "-" + libraryDilution.getLibrary().getSample().getAlias());
+          pout.add(libraryDilution.getLibrary().getSample().getProject().getName() + "-" + libraryDilution.getLibrary().getSample().getProject().getAlias());
+          pout.add("<div style='cursor:pointer;' onmousedown=\"Pool.search.poolSearchSelectElement('" + libraryDilution.getId() + "', '"
+                   + libraryDilution.getName() + "')\"><span class=\"ui-icon ui-icon-plusthick\"></span></div>");
+          arr.add(pout);
+        }
+        j.put("poolelements", arr);
+        return j;
+      }
+      catch (IOException e) {
+        log.debug("Failed", e);
+        return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
+      }
+    }
+    else {
+      return JSONUtils.SimpleJSONError("No platform specified");
+    }
+  }
+
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
   }

@@ -29,6 +29,9 @@
 
 --%>
 <%@ include file="../header.jsp" %>
+<script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/datatables_utils.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/natural_sort.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
 
 <div id="maincontent">
 <div id="contentcolumn">
@@ -114,7 +117,7 @@
           ${pool.platformType.key}
         </c:when>
         <c:otherwise>
-          <form:select id="platformType" path="platformType" items="${platformTypes}"/>
+          <form:select id="platformType" path="platformType" onchange="Pool.ui.prepareElements();" items="${platformTypes}"/>
         </c:otherwise>
       </c:choose>
     </td>
@@ -331,58 +334,75 @@
 </form:form>
 
 <h2 class="hrule">Select poolable elements:</h2>
-<table class="in">
-  <tr>
-    <td width="30%" style="vertical-align:top">
-      <label for="searchElements"><b>Search poolable elements:</b></label><br/>
-      <%-- <input type="text" id='ldiInput' name="ldiInput" value="" onKeyup="Utils.timer.timedFunc(poolSearchLibraryDilution(this, 'ILLUMINA'),200);"/> --%>
-      <input type="text" id='searchElements' name="searchElements"/>
 
-      <div id='searchElementsResult'></div>
-    </td>
-    <td width="30%" style="vertical-align:top">
-      <label for="ldiBarcodes"><b>Select elements by barcode(s):</b></label><br/>
-      <textarea id="ldiBarcodes" name="ldiBarcodes" rows="6" cols="40"></textarea><br/>
-      <button type="button" class="br-button ui-state-default ui-corner-all"
-              onclick="Pool.ui.selectElementsByBarcodes(jQuery('#ldiBarcodes').val());">Select
-      </button>
-      <div id="importlist"></div>
-    </td>
-    <td width="30%" style="vertical-align:top">
-      <b>Select elements by barcode file:</b><br/>
+<div id="elementSelectDatatableDiv">
 
-      <form method='post'
-            id='ajax_upload_form'
-            action="<c:url value="/miso/upload/dilution-to-pool"/>"
-            enctype="multipart/form-data"
-            target="target_upload"
-            onsubmit="Pool.ui.dilutionFileUploadProgress();">
-        <input type="file" name="file"/><br/>
-        <button type="submit" class="br-button ui-state-default ui-corner-all">Upload</button>
-      </form>
-      <iframe id='target_upload' name='target_upload' src='' style='display: none'></iframe>
-      <div id="statusdiv"></div>
-      <div id="dilimportfile"></div>
-    </td>
-  </tr>
-</table>
+</div>
+
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+        <c:choose>
+        <c:when test="${pool.id != 0}">
+        Pool.ui.createElementSelectDatatable('${pool.platformType.key}');
+        </c:when>
+        <c:otherwise>
+        Pool.ui.createElementSelectDatatable('Illumina');
+        </c:otherwise>
+        </c:choose>
+    });
+</script>
+<%--<table class="in">--%>
+  <%--<tr>--%>
+    <%--<td width="30%" style="vertical-align:top">--%>
+      <%--<label for="searchElements"><b>Search poolable elements:</b></label><br/>--%>
+      <%--&lt;%&ndash; <input type="text" id='ldiInput' name="ldiInput" value="" onKeyup="Utils.timer.timedFunc(poolSearchLibraryDilution(this, 'ILLUMINA'),200);"/> &ndash;%&gt;--%>
+      <%--<input type="text" id='searchElements' name="searchElements"/>--%>
+
+      <%--<div id='searchElementsResult'></div>--%>
+    <%--</td>--%>
+    <%--<td width="30%" style="vertical-align:top">--%>
+      <%--<label for="ldiBarcodes"><b>Select elements by barcode(s):</b></label><br/>--%>
+      <%--<textarea id="ldiBarcodes" name="ldiBarcodes" rows="6" cols="40"></textarea><br/>--%>
+      <%--<button type="button" class="br-button ui-state-default ui-corner-all"--%>
+              <%--onclick="Pool.ui.selectElementsByBarcodes(jQuery('#ldiBarcodes').val());">Select--%>
+      <%--</button>--%>
+      <%--<div id="importlist"></div>--%>
+    <%--</td>--%>
+    <%--<td width="30%" style="vertical-align:top">--%>
+      <%--<b>Select elements by barcode file:</b><br/>--%>
+
+      <%--<form method='post'--%>
+            <%--id='ajax_upload_form'--%>
+            <%--action="<c:url value="/miso/upload/dilution-to-pool"/>"--%>
+            <%--enctype="multipart/form-data"--%>
+            <%--target="target_upload"--%>
+            <%--onsubmit="Pool.ui.dilutionFileUploadProgress();">--%>
+        <%--<input type="file" name="file"/><br/>--%>
+        <%--<button type="submit" class="br-button ui-state-default ui-corner-all">Upload</button>--%>
+      <%--</form>--%>
+      <%--<iframe id='target_upload' name='target_upload' src='' style='display: none'></iframe>--%>
+      <%--<div id="statusdiv"></div>--%>
+      <%--<div id="dilimportfile"></div>--%>
+    <%--</td>--%>
+  <%--</tr>--%>
+<%--</table>--%>
 </div>
 </div>
 
 <script type="text/javascript">
   Utils.ui.addMaxDatePicker("creationDate", 0);
-  <c:choose>
-  <c:when test="${pool.id != 0}">
-  Utils.timer.typewatchFunc(jQuery('#searchElements'), function () {
-    Pool.search.poolSearchElements(jQuery('#searchElements'), '${pool.platformType.key}')
-  }, 300, 2);
-  </c:when>
-  <c:otherwise>
-  Utils.timer.typewatchFunc(jQuery('#searchElements'), function () {
-    Pool.search.poolSearchElements(jQuery('#searchElements'), jQuery('#platformType').val())
-  }, 300, 2);
-  </c:otherwise>
-  </c:choose>
+  <%--<c:choose>--%>
+  <%--<c:when test="${pool.id != 0}">--%>
+  <%--Utils.timer.typewatchFunc(jQuery('#searchElements'), function () {--%>
+    <%--Pool.search.poolSearchElements(jQuery('#searchElements'), '${pool.platformType.key}')--%>
+  <%--}, 300, 2);--%>
+  <%--</c:when>--%>
+  <%--<c:otherwise>--%>
+  <%--Utils.timer.typewatchFunc(jQuery('#searchElements'), function () {--%>
+    <%--Pool.search.poolSearchElements(jQuery('#searchElements'), jQuery('#platformType').val())--%>
+  <%--}, 300, 2);--%>
+  <%--</c:otherwise>--%>
+  <%--</c:choose>--%>
 </script>
 
 <%@ include file="adminsub.jsp" %>

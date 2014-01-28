@@ -463,6 +463,44 @@ Pool.ui = {
       }
       }
     );
+  },
+
+  createElementSelectDatatable : function(platform) {
+    jQuery('#elementSelectDatatableDiv').html("<table cellpadding='0' width='100%' cellspacing='0' border='0' class='display' id='elementSelectDatatable'></table>");
+    jQuery('#elementSelectDatatable').html("<img src='../styles/images/ajax-loader.gif'/>");
+    Fluxion.doAjax(
+            'poolControllerHelperService',
+            'createElementSelectDataTable',
+            {
+              'url':ajaxurl,
+              'platform':platform
+            },
+            {'doOnSuccess': function(json) {
+
+              jQuery('#elementSelectDatatable').html('');
+              jQuery('#elementSelectDatatable').dataTable({
+                                            "aaData": json.poolelements,
+                                            "aoColumns": [
+                                              { "sTitle": "Dilution Name", "sType":"natural"},
+                                              { "sTitle": "Library", "sType":"natural"},
+                                              { "sTitle": "Sample", "sType":"natural"},
+                                              { "sTitle": "Project", "sType":"natural"},
+                                              { "sTitle": "Add"}
+                                            ],
+                                            "bJQueryUI": true,
+                                            "iDisplayLength":  25,
+                                            "aaSorting":[
+                                              [0,"desc"]
+                                            ]
+                                          });
+
+            }
+            }
+    );
+  },
+
+  prepareElements : function () {
+    Pool.ui.createElementSelectDatatable(jQuery('#platformType').val());
   }
 };
 
