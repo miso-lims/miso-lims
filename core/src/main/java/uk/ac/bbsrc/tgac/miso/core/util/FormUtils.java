@@ -217,7 +217,7 @@ public class FormUtils {
         XSSFCell cellE = row.createCell(4);
         cellE.setCellValue(jsonObject.getString("well"));
         XSSFCell cellF = row.createCell(5);
-        cellE.setCellValue(jsonObject.getString("adaptor"));
+        cellF.setCellValue(jsonObject.getString("adaptor"));
       }
       oDoc.write(fileOut);
       fileOut.close();
@@ -686,7 +686,13 @@ public class FormUtils {
           jsonObject.put("sampleName", getCellValueAsString(sampleNameCell));
           jsonObject.put("sampleAlias", getCellValueAsString(sampleAliasCell));
           jsonObject.put("well", getCellValueAsString(wellCell));
-          jsonObject.put("adaptor", getCellValueAsString(adaptorCell));
+          if ((getCellValueAsString(adaptorCell)) != null) {
+            jsonObject.put("adaptor", getCellValueAsString(adaptorCell));
+          }
+          else {
+            jsonObject.put("adaptor", "");
+
+          }
 
           jsonArray.add(jsonObject);
           XSSFCell qcResultCell = null;
