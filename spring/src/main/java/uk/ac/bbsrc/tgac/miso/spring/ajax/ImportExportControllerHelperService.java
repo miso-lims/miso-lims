@@ -23,39 +23,36 @@
 
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
+import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.type.TypeReference;
-import org.krysalis.barcode4j.BarcodeDimension;
-import org.krysalis.barcode4j.BarcodeGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatePool;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlateMaterialType;
-import uk.ac.bbsrc.tgac.miso.core.exception.MisoPrintException;
-import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeFactory;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.*;
+import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.exception.InputFormException;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
-import uk.ac.bbsrc.tgac.miso.core.manager.PrintManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
 import uk.ac.bbsrc.tgac.miso.core.util.FormUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
-import javax.imageio.ImageIO;
 import javax.servlet.http.HttpSession;
-import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
@@ -72,6 +69,10 @@ public class ImportExportControllerHelperService {
   private RequestManager requestManager;
   @Autowired
   private MisoFilesManager misoFileManager;
+  @Autowired
+  private SecurityManager securityManager;
+
+  private static final Pattern digitPattern = Pattern.compile("(^[0-9]+)[\\.0-9]*");
 
   public JSONObject searchSamples(HttpSession session, JSONObject json) {
     String searchStr = json.getString("str");
@@ -87,7 +88,6 @@ public class ImportExportControllerHelperService {
 
       if (samples.size() > 0) {
         Collections.sort(samples);
-        Collections.reverse(samples);
         for (Sample s : samples) {
           String dnaOrRNA = "O";
           if ("GENOMIC".equals(s.getSampleType())
@@ -127,7 +127,7 @@ public class ImportExportControllerHelperService {
       File f = misoFileManager.getNewFile(
           Sample.class,
           "forms",
-          "SampleExportForm-" + LimsUtils.getCurrentDateAsString() + ".xlsx");
+          "SampleExportForm-" + LimsUtils.getCurrentDateAsString(new SimpleDateFormat("yyyyMMdd-hhmmss")) + ".xlsx");
       FormUtils.createSampleExportForm(f, a);
       return JSONUtils.SimpleJSONResponse("" + f.getName().hashCode());
     }
@@ -137,6 +137,364 @@ public class ImportExportControllerHelperService {
     }
   }
 
+  public JSONObject confirmSamplesUpload(HttpSession session, JSONObject json) throws Exception {
+    JSONArray jsonArray = JSONArray.fromObject(json.get("table"));
+    // add samples
+    for (JSONArray jsonArrayElement : (Iterable<JSONArray>) jsonArray) {
+
+      Sample s = null;
+      if (jsonArrayElement.get(3) != null && !"".equals(jsonArrayElement.getString(3))) {
+        String salias = jsonArrayElement.getString(3);
+        Collection<Sample> ss = requestManager.listSamplesByAlias(salias);
+        if (!ss.isEmpty()) {
+          if (ss.size() == 1) {
+            s = ss.iterator().next();
+            log.info("Got sample: " + s.getAlias());
+          }
+          else {
+            throw new InputFormException("Multiple samples retrieved with this alias: '" + salias + "'. Cannot process.");
+          }
+        }
+        else {
+          throw new InputFormException("No such sample '" + salias + "'in database. Samples need to be created before using the form input functionality");
+        }
+      }
+      else {
+        log.info("Blank sample row found. Ending import.");
+        break;
+      }
+
+      Date date = new Date();
+      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+      //sample OK - good to go
+
+      try {
+        if (s != null) {
+          if (jsonArrayElement.get(6) != null) {
+            SampleQC sqc = new SampleQCImpl();
+            sqc.setSample(s);
+            sqc.setResults(jsonArrayElement.getDouble(6));
+            sqc.setQcCreator(user.getLoginName());
+            sqc.setQcDate(date);
+            if (requestManager.getSampleQcTypeByName("Picogreen") != null) {
+              sqc.setQcType(requestManager.getSampleQcTypeByName("Picogreen"));
+            }
+            else {
+              sqc.setQcType(requestManager.getSampleQcTypeByName("QuBit"));
+            }
+            if (!s.getSampleQCs().contains(sqc)) {
+              s.addQc(sqc);
+              requestManager.saveSampleQC(sqc);
+              requestManager.saveSample(s);
+              log.info("Added sample QC: " + sqc.toString());
+            }
+            if (jsonArrayElement.get(7) != null && !"".equals(jsonArrayElement.getString(7))) {
+              s.setQcPassed(Boolean.parseBoolean(jsonArrayElement.getString(7)));
+              requestManager.saveSample(s);
+            }
+            if (jsonArrayElement.get(8) != null && !"".equals(jsonArrayElement.getString(8))) {
+              List<String> notesList = Arrays.asList((jsonArrayElement.getString(8)).split(";"));
+              for (String notetext : notesList) {
+                Note note = new Note();
+                note.setCreationDate(date);
+                note.setOwner(user);
+                note.setText(notetext);
+                if (!s.getNotes().contains(note)) {
+                  s.addNote(note);
+                  requestManager.saveSampleNote(s, note);
+                  requestManager.saveSample(s);
+                  log.info("Added sample Note for Well: " + note.toString());
+                }
+              }
+            }
+          }
+        }
+      }
+      catch (Exception e) {
+        throw new Exception(e);
+      }
+    }
+    // create library & pool sheet
+    File file = misoFileManager.getNewFile(
+        Library.class,
+        "forms",
+        "LibraryPoolExportForm-" + LimsUtils.getCurrentDateAsString(new SimpleDateFormat("yyyyMMdd-hhmmss")) + ".xlsx");
+    FormUtils.createLibraryPoolExportForm(file, jsonArray);
+    return JSONUtils.SimpleJSONResponse("" + file.getName().hashCode());
+  }
+
+  public JSONObject confirmLibrariesPoolsUpload(HttpSession session, JSONObject json) throws Exception {
+    Date date = new Date();
+    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    JSONObject jsonObject = JSONObject.fromObject(json.get("sheet"));
+    Map<String, Pool> pools = new HashMap<String, Pool>();
+
+    Boolean paired = Boolean.parseBoolean(jsonObject.getString("paired"));
+
+
+    PlatformType pt = null;
+    if (jsonObject.getString("platform") != null) {
+      pt = PlatformType.get(jsonObject.getString("platform"));
+    }
+
+    LibraryType lt = null;
+    if (jsonObject.getString("type") != null) {
+      lt = requestManager.getLibraryTypeByDescriptionAndPlatform(jsonObject.getString("type"), pt);
+    }
+
+    LibrarySelectionType ls = null;
+    if (jsonObject.getString("selection") != null) {
+      ls = requestManager.getLibrarySelectionTypeByName(jsonObject.getString("selection"));
+    }
+
+
+    LibraryStrategyType lst = null;
+    if (jsonObject.getString("strategy") != null) {
+      lst = requestManager.getLibraryStrategyTypeByName(jsonObject.getString("strategy"));
+    }
+
+    if (jsonObject.get("rows") != null) {
+
+      for (JSONArray jsonArrayElement : (Iterable<JSONArray>) JSONArray.fromObject(jsonObject.get("rows").toString().replace("\\\"","'"))) {
+
+        Sample s = null;
+        if (jsonArrayElement.get(1) != null && !"".equals(jsonArrayElement.getString(1))) {
+          String salias = jsonArrayElement.getString(1);
+          Collection<Sample> ss = requestManager.listSamplesByAlias(salias);
+          if (!ss.isEmpty()) {
+            if (ss.size() == 1) {
+              s = ss.iterator().next();
+              log.info("Got sample: " + s.getAlias());
+            }
+            else {
+              throw new InputFormException("Multiple samples retrieved with this alias: '" + salias + "'. Cannot process.");
+            }
+          }
+          else {
+            throw new InputFormException("No such sample '" + salias + "'in database. Samples need to be created before using the form input functionality");
+          }
+        }
+        else {
+          log.info("Blank sample row found. Ending import.");
+          break;
+        }
+
+
+        try {
+
+          //sample OK - good to go
+          if (s != null) {
+            Library library = new LibraryImpl();
+            library.setSample(s);
+            library.setAlias(jsonArrayElement.getString(3));
+            library.setSecurityProfile(s.getSecurityProfile());
+            library.setDescription(jsonArrayElement.getString(4));
+            library.setCreationDate(new Date());
+            library.setPlatformName(pt.name());
+            library.setLibraryType(lt);
+            library.setLibrarySelectionType(ls);
+            library.setLibraryStrategyType(lst);
+            library.setPaired(paired);
+
+
+            int insertSize = 0;
+            try {
+              String bp = jsonArrayElement.getString(6);
+              Matcher m = digitPattern.matcher(bp);
+              if (m.matches()) {
+                insertSize = Integer.valueOf(m.group(1));
+              }
+              else {
+                throw new InputFormException("Supplied Library insert size for library '" + jsonArrayElement.getString(3) + "' (" + s.getAlias() + ") is invalid");
+              }
+            }
+            catch (NumberFormatException nfe) {
+              throw new InputFormException("Supplied Library insert size for library '" + jsonArrayElement.getString(3) + "' (" + s.getAlias() + ") is invalid", nfe);
+            }
+
+
+            if (jsonArrayElement.getString(5) != null && !"".equals(jsonArrayElement.getString(5))) {
+              try {
+                LibraryQC lqc = new LibraryQCImpl();
+                lqc.setLibrary(library);
+                lqc.setInsertSize(insertSize);
+                lqc.setResults(Double.valueOf(jsonArrayElement.getString(5)));
+                lqc.setQcCreator(user.getLoginName());
+                lqc.setQcDate(new Date());
+                lqc.setQcType(requestManager.getLibraryQcTypeByName("Qubit"));
+
+                if (!library.getLibraryQCs().contains(lqc)) {
+                  library.addQc(lqc);
+                  requestManager.saveLibraryQC(lqc);
+                  log.info("Added library QC: " + lqc.toString());
+                }
+
+                if (insertSize == 0 && lqc.getResults() == 0) {
+                  library.setQcPassed(false);
+                }
+                else {
+                  if (jsonArrayElement.getString(8) != null && !"".equals(jsonArrayElement.getString(8))) {
+                    library.setQcPassed(Boolean.parseBoolean(jsonArrayElement.getString(8)));
+                  }
+                }
+              }
+              catch (NumberFormatException nfe) {
+                throw new InputFormException("Supplied Library QC concentration for library '" + jsonArrayElement.getString(3) + "' (" + s.getAlias() + ") is invalid", nfe);
+              }
+            }
+
+            if (jsonArrayElement.getString(7) != null && !"".equals(jsonArrayElement.getString(7))) {
+              try {
+                LibraryQC lqc = new LibraryQCImpl();
+                lqc.setLibrary(library);
+                lqc.setInsertSize(insertSize);
+                lqc.setResults(Double.valueOf(jsonArrayElement.getString(7)));
+                lqc.setQcCreator(user.getLoginName());
+                lqc.setQcDate(new Date());
+                lqc.setQcType(requestManager.getLibraryQcTypeByName("Bioanalyzer"));
+                if (!library.getLibraryQCs().contains(lqc)) {
+                  library.addQc(lqc);
+                  requestManager.saveLibraryQC(lqc);
+                  log.info("Added library QC: " + lqc.toString());
+                }
+
+                if (insertSize == 0 && lqc.getResults() == 0) {
+                  library.setQcPassed(false);
+                }
+                else {
+                  if (jsonArrayElement.getString(8) != null && !"".equals(jsonArrayElement.getString(8))) {
+                    library.setQcPassed(Boolean.parseBoolean(jsonArrayElement.getString(8)));
+                  }
+                }
+              }
+              catch (NumberFormatException nfe) {
+                throw new InputFormException("Supplied Library QC concentration for library '" + jsonArrayElement.getString(3) + "' (" + s.getAlias() + ") is invalid", nfe);
+              }
+            }
+
+
+            if (jsonArrayElement.getString(9) != null && !"".equals(jsonArrayElement.getString(9))) {
+              Collection<TagBarcode> bcs = requestManager.listAllTagBarcodesByStrategyName(jsonArrayElement.getString(9));
+              if (!bcs.isEmpty()) {
+                String tags = jsonArrayElement.getString(10);
+                if (!"".equals(tags)) {
+                  HashMap<Integer, TagBarcode> tbs = new HashMap<Integer, TagBarcode>();
+                  if (tags.contains("-")) {
+                    String[] splits = tags.split("-");
+                    int count = 1;
+                    for (String tag : splits) {
+                      for (TagBarcode tb : bcs) {
+                        if (tb.getName().equals(tag)) {
+                          //set tag barcodes
+                          tbs.put(count, tb);
+                          count++;
+                        }
+                      }
+                    }
+                  }
+                  else {
+                    for (TagBarcode tb : bcs) {
+                      if (tb.getName().equals(tags) || tb.getSequence().equals(tags)) {
+                        //set tag barcode
+                        tbs.put(1, tb);
+                        log.info("Got tag barcode: " + tb.getName());
+                        break;
+                      }
+                    }
+                  }
+
+                  library.setTagBarcodes(tbs);
+                }
+                else {
+                  throw new InputFormException("Barcode Kit specified but no tag barcodes entered for library '" + jsonArrayElement.getString(3) + "'.");
+                }
+              }
+              else {
+                throw new InputFormException("No tag barcodes associated with the kit definition '" + jsonArrayElement.getString(9) + "' library '" + jsonArrayElement.getString(3) + "'.");
+              }
+            }
+
+
+            LibraryDilution ldi = new LibraryDilution();
+
+            if (jsonArrayElement.getString(11) != null && !"".equals(jsonArrayElement.getString(11))) {
+              try {
+                ldi.setLibrary(library);
+                ldi.setSecurityProfile(library.getSecurityProfile());
+                ldi.setConcentration(Double.valueOf(jsonArrayElement.getString(11)));
+                ldi.setCreationDate(new Date());
+                ldi.setDilutionCreator(user.getLoginName());
+                if (!library.getLibraryDilutions().contains(ldi)) {
+                  library.addDilution(ldi);
+                  log.info("Added library dilution: " + ldi.toString());
+                }
+                requestManager.saveLibraryDilution(ldi);
+              }
+              catch (NumberFormatException nfe) {
+                throw new InputFormException("Supplied LibraryDilution concentration for library '" + jsonArrayElement.getString(3) + "' (" + s.getAlias() + ") is invalid", nfe);
+              }
+            }
+
+            log.info("Added library: " + library.toString());
+            requestManager.saveLibrary(library);
+
+            Pattern poolPattern = Pattern.compile("^[IiUu][Pp][Oo]([0-9]*)");
+            if (jsonArrayElement.getString(12) != null && !"".equals(jsonArrayElement.getString(12))) {
+              String poolName = jsonArrayElement.getString(12);
+
+              Matcher m = poolPattern.matcher(poolName);
+              if (m.matches()) {
+                Pool existedPool = requestManager.getPoolById(Integer.valueOf(m.group(1)));
+                pools.put(poolName, existedPool);
+                if (jsonArrayElement.getString(13) != null && !"".equals(jsonArrayElement.getString(13))) {
+                  existedPool.setConcentration(Double.valueOf(jsonArrayElement.getString(13)));
+                }
+                if (ldi != null) {
+                  existedPool.addPoolableElement(ldi);
+                }
+                requestManager.savePool(existedPool);
+              }
+              else {
+                Pool pool = new PoolImpl();
+                if (!pools.containsKey(poolName)) {
+                  pool.setAlias("pool" + poolName);
+                  pool.setPlatformType(pt);
+                  pool.setReadyToRun(true);
+                  pool.setCreationDate(new Date());
+                  if (jsonArrayElement.getString(13) != null && !"".equals(jsonArrayElement.getString(13))) {
+                    pool.setConcentration(Double.valueOf(jsonArrayElement.getString(13)));
+                  }
+                  else {
+                    pool.setConcentration(0.0);
+                  }
+                  pools.put(poolName, pool);
+                  log.info("Added pool: " + poolName);
+                  if (ldi != null) {
+                    pool.addPoolableElement(ldi);
+                  }
+                  requestManager.savePool(pool);
+                }
+                else {
+                  pool = pools.get(poolName);
+                  if (ldi != null) {
+                    pool.addPoolableElement(ldi);
+                    requestManager.savePool(pool);
+                  }
+                }
+              }
+            }
+
+
+          }
+
+        }
+        catch (Exception e) {
+          throw new Exception(e);
+        }
+      }
+    }
+    return JSONUtils.SimpleJSONResponse("ok");
+  }
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
@@ -144,6 +502,10 @@ public class ImportExportControllerHelperService {
 
   public void setMisoFileManager(MisoFilesManager misoFileManager) {
     this.misoFileManager = misoFileManager;
+  }
+
+  public void setSecurityManager(SecurityManager securityManager) {
+    this.securityManager = securityManager;
   }
 
 }

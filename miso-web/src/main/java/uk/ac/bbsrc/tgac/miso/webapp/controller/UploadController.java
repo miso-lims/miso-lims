@@ -259,22 +259,16 @@ public class UploadController {
   @RequestMapping(value = "/importexport/samplesheet", method = RequestMethod.POST)
   public void uploadSampleSheet(MultipartHttpServletRequest request, HttpServletResponse response) throws IOException {
     try {
-      JSONArray a = new JSONArray();
+      JSONArray jsonArray = new JSONArray();
       for (MultipartFile fileItem : getMultipartFiles(request)) {
         uploadFile(Sample.class, "forms", fileItem);
         File f = filesManager.getFile(Sample.class, "forms", fileItem.getOriginalFilename().replaceAll("\\s+", "_"));
         User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-        a = FormUtils.processSampleSheetImport(f, user, requestManager);
+        jsonArray = FormUtils.preProcessSampleSheetImport(f, user, requestManager);
       }
-      File file = misoFileManager.getNewFile(
-          Library.class,
-          "forms",
-          "LibraryPoolExportForm-" + LimsUtils.getCurrentDateAsString() + ".xlsx");
-      FormUtils.createLibraryPoolExportForm(file, a);
-
       response.setContentType("text/html");
       PrintWriter out = response.getWriter();
-      out.println("<input type='hidden' id='uploadresponsebody' value='" + file.getName().hashCode() + "'/>");
+      out.println("<input type='hidden' id='uploadresponsebody' value='" + jsonArray + "'/>");
     }
     catch (Exception e) {
       e.printStackTrace();
@@ -284,12 +278,12 @@ public class UploadController {
   @RequestMapping(value = "/importexport/librarypoolsheet", method = RequestMethod.POST)
   public void uploadLibraryPoolSheet(MultipartHttpServletRequest request, HttpServletResponse response) throws IOException {
     try {
-      String result = "";
+      JSONObject result = new JSONObject();
       for (MultipartFile fileItem : getMultipartFiles(request)) {
         uploadFile(Library.class, "forms", fileItem);
         File f = filesManager.getFile(Library.class, "forms", fileItem.getOriginalFilename().replaceAll("\\s+", "_"));
         User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-        result = FormUtils.processLibraryPoolSheetImport(f, user, requestManager);
+        result = FormUtils.preProcessLibraryPoolSheetImport(f, user, requestManager);
       }
 
       response.setContentType("text/html");

@@ -467,7 +467,7 @@ Pool.ui = {
 
   createElementSelectDatatable : function(platform) {
     jQuery('#elementSelectDatatableDiv').html("<table cellpadding='0' width='100%' cellspacing='0' border='0' class='display' id='elementSelectDatatable'></table>");
-    jQuery('#elementSelectDatatable').html("<img src='../styles/images/ajax-loader.gif'/>");
+    jQuery('#elementSelectDatatable').html("<img src='/styles/images/ajax-loader.gif'/>");
     Fluxion.doAjax(
             'poolControllerHelperService',
             'createElementSelectDataTable',

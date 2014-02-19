@@ -8,6 +8,10 @@
 
 <%@ include file="../header.jsp" %>
 <script type="text/javascript" src="<c:url value='/scripts/import_export_ajax.js?ts=${timestamp.time}'/>"></script>
+<script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
+<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" type="text/css">
+<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables_themeroller.css'/>"
+      type="text/css">
 
 <div id="maincontent">
     <div id="contentcolumn">
@@ -24,7 +28,7 @@
                               id='samplesheet_upload_form'
                               action='<c:url value="/miso/upload/importexport/samplesheet"/>'
                               enctype="multipart/form-data"
-                              target="plateform_target_upload"
+                              target="uploadSampleSheet"
                               onsubmit="Utils.fileUpload.fileUploadProgress('samplesheet_upload_form', 'samplesheet_statusdiv', ImportExport.sampleSheetUploadSuccess);">
                             <input type="file" name="file"/>
                             <button type="submit" class="br-button ui-state-default ui-corner-all">Upload</button>
@@ -32,13 +36,11 @@
                                     onclick="ImportExport.cancelSampleSheetUpload();">Cancel
                             </button>
                         </form>
-                        <%--<iframe id='plateform_target_upload' name='plateform_target_upload' style='display: none'></iframe>--%>
-                        <div id="samplesheet_statusdiv"></div>
-                        <%--<div id="plateform_import"></div>--%>
                     </td>
                 </tr>
             </table>
         </div>
+        <div id="samplesheet_statusdiv"></div>
 
     </div>
 </div>

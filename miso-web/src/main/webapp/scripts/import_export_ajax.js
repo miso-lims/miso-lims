@@ -21,6 +21,8 @@
  * *********************************************************************
  */
 
+var sampleJSONArray = null;
+var librariesPoolsJSON = null;
 var ImportExport = ImportExport || {
 
   searchSamples: function (text) {
@@ -98,7 +100,6 @@ var ImportExport = ImportExport || {
     jQuery('#samplesheet_statusdiv').html("Processing...");
     ImportExport.processSampleSheetUpload(json.frameId);
   },
-
   processSampleSheetUpload: function (frameId) {
     var iframe = document.getElementById(frameId);
     var iframedoc = iframe.document;
@@ -108,8 +109,33 @@ var ImportExport = ImportExport || {
       iframedoc = iframe.contentWindow.document;
     var response = jQuery(iframedoc).contents().find('body:first').find('#uploadresponsebody').val();
     if (!Utils.validation.isNullCheck(response)) {
-      jQuery('#samplesheet_statusdiv').html("Processing... complete. Now Generating Library and Pool Export Sheet.");
-      Utils.page.pageRedirect('/miso/download/library/forms/' + response);
+      response = jQuery.parseJSON(response);
+      jQuery('#samplesheetformdiv').css("display", "none");
+      jQuery('#samplesheet_statusdiv').html("<button type=\"button\" id=\"confirmSamplesUploadButton\" class=\"br-button ui-state-default ui-corner-all\" " +
+                                            "onclick=\"ImportExport.confirmSamplesUpload();\">Confirm and Get Library & Pool Sheet</button>" +
+                                            "<button type=\"button\" id=\"cancelSamplesUploadButton\" class=\"br-button ui-state-default ui-corner-all\" " +
+                                            "onclick=\"window.location='/miso/importexport/importsamplesheet';\">Cancel</button>" +
+                                            "<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" class=\"display\" id=\"sampleSheetUploadSuccessTable\"></table>");
+      jQuery('#sampleSheetUploadSuccessTable').dataTable({
+                                                           "aaData": response,
+                                                           "aoColumns": [
+                                                             { "sTitle": "Project"},
+                                                             { "sTitle": "Client"},
+                                                             { "sTitle": "Sample Name"},
+                                                             { "sTitle": "Sample Alias"},
+                                                             { "sTitle": "Well"},
+                                                             { "sTitle": "Adaptor"},
+                                                             { "sTitle": "QC value"},
+                                                             { "sTitle": "QC Passed"},
+                                                             { "sTitle": "Notes"}
+                                                           ],
+                                                           "bPaginate": false,
+                                                           "bFilter": false,
+                                                           "bSort": false,
+                                                           "bJQueryUI": true
+                                                         });
+
+    sampleJSONArray = response;
     }
     else {
       setTimeout(function () {
@@ -122,6 +148,25 @@ var ImportExport = ImportExport || {
     jQuery('#samplesheetformdiv').css("display", "none");
   },
 
+  confirmSamplesUpload: function () {
+    Utils.ui.disableButton("confirmSamplesUploadButton");
+    Fluxion.doAjax(
+            'importExportControllerHelperService',
+            'confirmSamplesUpload',
+            {
+              'table': sampleJSONArray,
+              'url': ajaxurl
+            },
+            {'doOnSuccess': function (json) {
+              sampleJSONArray = null;
+              alert("Imported, now generating Library & Pool sheet..");
+              jQuery('#confirmSamplesUploadButton').html("Imported");
+              Utils.page.pageRedirect('/miso/download/library/forms/' + json.response);
+            }
+            }
+    );
+  },
+
   processLibraryPoolSheetUpload: function (frameId) {
     var iframe = document.getElementById(frameId);
     var iframedoc = iframe.document;
@@ -131,7 +176,38 @@ var ImportExport = ImportExport || {
       iframedoc = iframe.contentWindow.document;
     var response = jQuery(iframedoc).contents().find('body:first').find('#uploadresponsebody').val();
     if (!Utils.validation.isNullCheck(response)) {
-      jQuery('#librarypoolsheet_statusdiv').html("Processing... complete.<br/><br/>Jump to <a href='/miso/libraries'>List Libraries</a> & <a href='/miso/pools'>List Pools</a>");
+      response = jQuery.parseJSON(response);
+      jQuery('#librarypoolsheetformdiv').css("display", "none");
+      jQuery('#librarypoolsheet_statusdiv').html("<button type=\"button\" id=\"confirmLibrariesPoolsUploadButton\" class=\"br-button ui-state-default ui-corner-all\" " +
+                                            "onclick=\"ImportExport.confirmLibrariesPoolsUpload();\">Confirm Upload</button>" +
+                                            "<button type=\"button\" id=\"cancelLibrariesPoolsUploadButton\" class=\"br-button ui-state-default ui-corner-all\" " +
+                                            "onclick=\"window.location='/miso/importexport/importlibrarypoolsheet';\">Cancel</button>" +
+                                            "<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" class=\"display\" id=\"librarypoolSheetUploadSuccessTable\"></table>");
+      jQuery('#librarypoolSheetUploadSuccessTable').dataTable({
+                                                           "aaData": response['rows'],
+                                                           "aoColumns": [
+                                                             { "sTitle": "Sample Name"},
+                                                             { "sTitle": "Sample Alias"},
+                                                             { "sTitle": "Well"},
+                                                             { "sTitle": "Library Alias"},
+                                                             { "sTitle": "Library Description"},
+                                                             { "sTitle": "Qubit Conc"},
+                                                             { "sTitle": "Insert Size (bp)"},
+                                                             { "sTitle": "Molarity (nm)"},
+                                                             { "sTitle": "QC Passed"},
+                                                             { "sTitle": "Barcode Kit"},
+                                                             { "sTitle": "Barcode Tag"},
+                                                             { "sTitle": "LDI Conc"},
+                                                             { "sTitle": "Pool Name"},
+                                                             { "sTitle": "Pool Molarity (nm)"}
+                                                           ],
+                                                           "bPaginate": false,
+                                                           "bFilter": false,
+                                                           "bSort": false,
+                                                           "bJQueryUI": true
+                                                         });
+
+      librariesPoolsJSON = response;
     }
     else {
       setTimeout(function () {
@@ -147,5 +223,23 @@ var ImportExport = ImportExport || {
 
   cancelLibraryPoolSheetUpload: function () {
     jQuery('#librarypoolsheetformdiv').css("display", "none");
+  },
+
+  confirmLibrariesPoolsUpload: function () {
+    Utils.ui.disableButton("confirmLibrariesPoolsUploadButton");
+    Fluxion.doAjax(
+            'importExportControllerHelperService',
+            'confirmLibrariesPoolsUpload',
+            {
+              'sheet': librariesPoolsJSON,
+              'url': ajaxurl
+            },
+            {'doOnSuccess': function (json) {
+              librariesPoolsJSON = null;
+              alert("Imported.");
+              jQuery('#confirmLibrariesPoolsUploadButton').html("Imported");
+            }
+            }
+    );
   }
 };

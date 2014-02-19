@@ -204,20 +204,22 @@ public class FormUtils {
       XSSFSheet sheet = oDoc.getSheet("library_pool_export");
       FileOutputStream fileOut = new FileOutputStream(outpath);
 
-      for (JSONObject jsonObject : (Iterable<JSONObject>) jsonArray) {
-        XSSFRow row = sheet.createRow(jsonObject.getInt("row") + 1);
+      int i = 6;
+      for (JSONArray jsonArrayElement : (Iterable<JSONArray>) jsonArray) {
+        XSSFRow row = sheet.createRow(i);
         XSSFCell cellA = row.createCell(0);
-        cellA.setCellValue(jsonObject.getString("projectName"));
+        cellA.setCellValue(jsonArrayElement.getString(0));
         XSSFCell cellB = row.createCell(1);
-        cellB.setCellValue(jsonObject.getString("projectAlias"));
+        cellB.setCellValue(jsonArrayElement.getString(1));
         XSSFCell cellC = row.createCell(2);
-        cellC.setCellValue(jsonObject.getString("sampleName"));
+        cellC.setCellValue(jsonArrayElement.getString(2));
         XSSFCell cellD = row.createCell(3);
-        cellD.setCellValue(jsonObject.getString("sampleAlias"));
+        cellD.setCellValue(jsonArrayElement.getString(3));
         XSSFCell cellE = row.createCell(4);
-        cellE.setCellValue(jsonObject.getString("well"));
+        cellE.setCellValue(jsonArrayElement.getString(4));
         XSSFCell cellF = row.createCell(5);
-        cellF.setCellValue(jsonObject.getString("adaptor"));
+        cellF.setCellValue(jsonArrayElement.getString(5));
+        i++;
       }
       oDoc.write(fileOut);
       fileOut.close();
@@ -637,6 +639,133 @@ public class FormUtils {
     return pools;
   }
 
+  public static JSONArray preProcessSampleSheetImport(File inPath, User u, RequestManager manager) throws Exception {
+    if (inPath.getName().endsWith(".xlsx")) {
+      XSSFWorkbook wb = new XSSFWorkbook(new FileInputStream(inPath));
+      JSONArray jsonArray = new JSONArray();
+      XSSFSheet sheet = wb.getSheetAt(0);
+      int rows = sheet.getPhysicalNumberOfRows();
+      for (int ri = 5; ri < rows; ri++) {
+        XSSFRow row = sheet.getRow(ri);
+        XSSFCell sampleAliasCell = row.getCell(3);
+        Sample s = null;
+        if (getCellValueAsString(sampleAliasCell) != null) {
+          String salias = getCellValueAsString(sampleAliasCell);
+          Collection<Sample> ss = manager.listSamplesByAlias(salias);
+          if (!ss.isEmpty()) {
+            if (ss.size() == 1) {
+              s = ss.iterator().next();
+              log.info("Got sample: " + s.getAlias());
+            }
+            else {
+              throw new InputFormException("Multiple samples retrieved with this alias: '" + salias + "'. Cannot process.");
+            }
+          }
+          else {
+            throw new InputFormException("No such sample '" + salias + "'in database. Samples need to be created before using the form input functionality");
+          }
+        }
+        else {
+          log.info("Blank sample row found. Ending import.");
+          break;
+        }
+
+        //sample OK - good to go
+        if (s != null) {
+          JSONArray sampleArray = new JSONArray();
+
+          XSSFCell projectNameCell = row.getCell(0);
+          XSSFCell projectAliasCell = row.getCell(1);
+          XSSFCell sampleNameCell = row.getCell(2);
+          XSSFCell wellCell = row.getCell(4);
+          XSSFCell adaptorCell = row.getCell(5);
+          XSSFCell qcPassedCell = row.getCell(13);
+
+          sampleArray.add(getCellValueAsString(projectNameCell));
+          sampleArray.add(getCellValueAsString(projectAliasCell));
+          sampleArray.add(getCellValueAsString(sampleNameCell));
+          sampleArray.add(getCellValueAsString(sampleAliasCell));
+          sampleArray.add(getCellValueAsString(wellCell));
+          if ((getCellValueAsString(adaptorCell)) != null) {
+            sampleArray.add(getCellValueAsString(adaptorCell));
+          }
+          else {
+            sampleArray.add("");
+
+          }
+
+          XSSFCell qcResultCell = null;
+
+
+          if ("GENOMIC".equals(s.getSampleType())
+              || "METAGENOMIC".equals(s.getSampleType())) {
+            qcResultCell = row.getCell(6);
+          }
+          else if ("NON GENOMIC".equals(s.getSampleType())
+                   || "VIRAL RNA".equals(s.getSampleType())
+                   || "TRANSCRIPTOMIC".equals(s.getSampleType())
+                   || "METATRANSCRIPTOMIC".equals(s.getSampleType())) {
+            qcResultCell = row.getCell(7);
+          }
+          else {
+
+            if (!"NA".equals(getCellValueAsString(row.getCell(6)))) {
+              qcResultCell = row.getCell(6);
+            }
+            else if (!"NA".equals(getCellValueAsString(row.getCell(7)))) {
+              qcResultCell = row.getCell(7);
+            }
+          }
+
+
+          XSSFCell rinCell = row.getCell(8);
+          XSSFCell sample260280Cell = row.getCell(9);
+          XSSFCell sample260230Cell = row.getCell(10);
+          Date date = new Date();
+
+          try {
+            if (getCellValueAsString(qcResultCell) != null && !"NA".equals(getCellValueAsString(qcResultCell))) {
+
+              sampleArray.add(Double.valueOf(getCellValueAsString(qcResultCell)));
+              if (getCellValueAsString(qcPassedCell) != null) {
+                if ("Y".equals(getCellValueAsString(qcPassedCell)) || "y".equals(getCellValueAsString(qcPassedCell))) {
+                  sampleArray.add("true");
+                }
+                else if ("N".equals(getCellValueAsString(qcPassedCell)) || "n".equals(getCellValueAsString(qcPassedCell))) {
+                  sampleArray.add("false");
+                }
+
+              }
+            }
+            else {
+              sampleArray.add("");
+              sampleArray.add("");
+            }
+
+            StringBuilder noteSB = new StringBuilder();
+            if (getCellValueAsString(rinCell) != null && !"".equals(getCellValueAsString(rinCell)) && !"NA".equals(getCellValueAsString(rinCell))) {
+              noteSB.append("RIN:" + getCellValueAsString(rinCell) + ";");
+            }
+            if (getCellValueAsString(sample260280Cell) != null && !"".equals(getCellValueAsString(sample260280Cell))) {
+              noteSB.append("260/280:" + getCellValueAsString(sample260280Cell) + ";");
+            }
+            if (getCellValueAsString(sample260230Cell) != null && !"".equals(getCellValueAsString(sample260230Cell))) {
+              noteSB.append("260/230:" + getCellValueAsString(sample260230Cell) + ";");
+            }
+            sampleArray.add(noteSB.toString());
+          }
+          catch (NumberFormatException nfe) {
+            throw new InputFormException("Supplied Sample QC concentration for sample '" + getCellValueAsString(sampleAliasCell) + "' is invalid", nfe);
+          }
+          jsonArray.add(sampleArray);
+        }
+      }
+      return jsonArray;
+    }
+    else {
+      throw new UnsupportedOperationException("Cannot process bulk input files other than xls, xlsx, and ods.");
+    }
+  }
 
   public static JSONArray processSampleSheetImport(File inPath, User u, RequestManager manager) throws Exception {
     if (inPath.getName().endsWith(".xlsx")) {
@@ -797,6 +926,199 @@ public class FormUtils {
         }
       }
       return jsonArray;
+    }
+    else {
+      throw new UnsupportedOperationException("Cannot process bulk input files other than xls, xlsx, and ods.");
+    }
+  }
+
+  public static JSONObject preProcessLibraryPoolSheetImport(File inPath, User u, RequestManager manager) throws Exception {
+    if (inPath.getName().endsWith(".xlsx")) {
+      JSONObject jsonObject = new JSONObject();
+      JSONArray sampleArray = new JSONArray();
+      XSSFWorkbook wb = new XSSFWorkbook(new FileInputStream(inPath));
+      XSSFSheet sheet = wb.getSheetAt(0);
+
+      XSSFRow glrow = sheet.getRow(1);
+
+      //process global headers
+      XSSFCell pairedCell = glrow.getCell(0);
+      jsonObject.put("paired", getCellValueAsString(pairedCell));
+
+      XSSFCell platformCell = glrow.getCell(1);
+      if (getCellValueAsString(platformCell) != null) {
+        jsonObject.put("platform", getCellValueAsString(platformCell));
+      }
+      else {
+        throw new InputFormException("Cannot resolve Platform type from: '" + getCellValueAsString(platformCell) + "'");
+      }
+
+      XSSFCell typeCell = glrow.getCell(2);
+      if (getCellValueAsString(typeCell) != null) {
+        String[] split = getCellValueAsString(typeCell).split("-");
+        String plat = split[0];
+        String type = split[1];
+        if (getCellValueAsString(platformCell).equals(plat)) {
+          jsonObject.put("type", type);
+        }
+        else {
+          throw new InputFormException("Selected library type '" + getCellValueAsString(typeCell) + "' doesn't match platform type: '" + getCellValueAsString(platformCell) + "'");
+        }
+      }
+      else {
+        throw new InputFormException("Cannot resolve Library type from: '" + getCellValueAsString(typeCell) + "'");
+      }
+
+      XSSFCell selectionCell = glrow.getCell(3);
+      if (getCellValueAsString(selectionCell) != null) {
+        jsonObject.put("selection", getCellValueAsString(selectionCell));
+      }
+      else {
+        throw new InputFormException("Cannot resolve Library Selection type from: '" + getCellValueAsString(selectionCell) + "'");
+      }
+
+      XSSFCell strategyCell = glrow.getCell(4);
+      if (getCellValueAsString(strategyCell) != null) {
+        jsonObject.put("strategy", getCellValueAsString(strategyCell));
+      }
+      else {
+        throw new InputFormException("Cannot resolve Library Strategy type from: '" + getCellValueAsString(strategyCell) + "'");
+      }
+
+      int rows = sheet.getPhysicalNumberOfRows();
+      for (int ri = 6; ri < rows; ri++) {
+        JSONArray rowsJSONArray = new JSONArray();
+        XSSFRow row = sheet.getRow(ri);
+        XSSFCell sampleNameCell = row.getCell(2);
+        XSSFCell sampleAliasCell = row.getCell(3);
+        Sample s = null;
+        if (getCellValueAsString(sampleAliasCell) != null) {
+          String salias = getCellValueAsString(sampleAliasCell);
+          Collection<Sample> ss = manager.listSamplesByAlias(salias);
+          if (!ss.isEmpty()) {
+            if (ss.size() == 1) {
+              s = ss.iterator().next();
+              log.info("Got sample: " + s.getAlias());
+            }
+            else {
+              throw new InputFormException("Multiple samples retrieved with this alias: '" + salias + "'. Cannot process.");
+            }
+          }
+          else {
+            throw new InputFormException("No such sample '" + salias + "'in database. Samples need to be created before using the form input functionality");
+          }
+        }
+        else {
+          log.info("Blank sample row found. Ending import.");
+          break;
+        }
+
+        //sample OK - good to go
+        if (s != null) {
+          XSSFCell barcodeKitCell = row.getCell(9);
+          XSSFCell barcodeTagsCell = row.getCell(10);
+          XSSFCell libraryQubitCell = row.getCell(6);
+          XSSFCell libraryQcInsertSizeCell = row.getCell(7);
+          XSSFCell libraryQcMolarityCell = row.getCell(8);
+          XSSFCell qcPassedCell = row.getCell(11);
+          XSSFCell libraryDescriptionCell = row.getCell(12);
+          XSSFCell wellCell = row.getCell(4);
+          XSSFCell dilutionMolarityCell = row.getCell(16);
+          XSSFCell poolNameCell = row.getCell(21);
+          XSSFCell poolConvertedMolarityCell = row.getCell(20);
+
+
+          rowsJSONArray.add(getCellValueAsString(sampleNameCell));
+          rowsJSONArray.add(getCellValueAsString(sampleAliasCell));
+          rowsJSONArray.add(getCellValueAsString(wellCell));
+
+          String libAlias = "";
+          Matcher mat = samplePattern.matcher(s.getAlias());
+          if (mat.matches()) {
+            String platePos = getCellValueAsString(wellCell);
+            libAlias = mat.group(1) + "_" + "L" + mat.group(2) + "-" + platePos + "_" + mat.group(3);
+          }
+          rowsJSONArray.add(libAlias);
+
+          String libDesc = s.getDescription();
+          if (getCellValueAsString(libraryDescriptionCell) != null && "".equals(getCellValueAsString(libraryDescriptionCell))) {
+            libDesc = getCellValueAsString(libraryDescriptionCell);
+          }
+          rowsJSONArray.add(libDesc);
+
+          if (getCellValueAsString(libraryQubitCell) != null) {
+            rowsJSONArray.add(getCellValueAsString(libraryQubitCell));
+          }
+          else {
+            rowsJSONArray.add("");
+          }
+
+          if (getCellValueAsString(libraryQcInsertSizeCell) != null) {
+            rowsJSONArray.add(getCellValueAsString(libraryQcInsertSizeCell));
+          }
+          else {
+            rowsJSONArray.add("");
+          }
+
+          if (getCellValueAsString(libraryQcMolarityCell) != null) {
+            rowsJSONArray.add(getCellValueAsString(libraryQcMolarityCell));
+          }
+          else {
+            rowsJSONArray.add("");
+          }
+
+
+          if (getCellValueAsString(qcPassedCell) != null) {
+            if ("Y".equals(getCellValueAsString(qcPassedCell)) || "y".equals(getCellValueAsString(qcPassedCell))) {
+              rowsJSONArray.add("true");
+            }
+            else if ("N".equals(getCellValueAsString(qcPassedCell)) || "n".equals(getCellValueAsString(qcPassedCell))) {
+              rowsJSONArray.add("false");
+            }
+          }
+          else {
+            rowsJSONArray.add("");
+          }
+
+          if (getCellValueAsString(barcodeKitCell) != null) {
+            rowsJSONArray.add(getCellValueAsString(barcodeKitCell));
+          }
+          else {
+            rowsJSONArray.add("");
+          }
+
+          if (getCellValueAsString(barcodeTagsCell) != null) {
+            rowsJSONArray.add(getCellValueAsString(barcodeTagsCell));
+          }
+          else {
+            rowsJSONArray.add("");
+          }
+
+          if (getCellValueAsString(dilutionMolarityCell) != null) {
+            rowsJSONArray.add(getCellValueAsString(dilutionMolarityCell));
+          }
+          else {
+            rowsJSONArray.add("");
+          }
+
+          if (getCellValueAsString(poolNameCell) != null) {
+            rowsJSONArray.add(getCellValueAsString(poolNameCell));
+          }
+          else {
+            rowsJSONArray.add("");
+          }
+
+          if (getCellValueAsString(poolConvertedMolarityCell) != null) {
+            rowsJSONArray.add(getCellValueAsString(poolConvertedMolarityCell));
+          }
+          else {
+            rowsJSONArray.add("");
+          }
+        }
+        sampleArray.add(rowsJSONArray);
+      }
+      jsonObject.put("rows", sampleArray);
+      return jsonObject;
     }
     else {
       throw new UnsupportedOperationException("Cannot process bulk input files other than xls, xlsx, and ods.");

@@ -8,6 +8,10 @@
 
 <%@ include file="../header.jsp" %>
 <script type="text/javascript" src="<c:url value='/scripts/import_export_ajax.js?ts=${timestamp.time}'/>"></script>
+<script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
+<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" type="text/css">
+<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables_themeroller.css'/>"
+      type="text/css">
 
 <div id="maincontent">
     <div id="contentcolumn">
@@ -32,13 +36,11 @@
                                     onclick="ImportExport.cancelLibraryPoolSheetUpload();">Cancel
                             </button>
                         </form>
-                        <%--<iframe id='plateform_target_upload' name='plateform_target_upload' style='display: none'></iframe>--%>
-                        <div id="librarypoolsheet_statusdiv"></div>
-                        <%--<div id="plateform_import"></div>--%>
                     </td>
                 </tr>
             </table>
         </div>
+        <div id="librarypoolsheet_statusdiv"></div>
     </div>
 </div>
 <script type="text/javascript">
