@@ -1352,13 +1352,13 @@ function bulkSampleQcTable() {
 
     //remove edit and delete header and column
     jQuery('#sample_table tr:first th:gt(5)').remove();
+    jQuery('#sample_table tr:first th:eq(4)').remove();
 
     var headers = ['rowsel',
                    'name',
                    'alias',
                    'description',
                    'sampleType',
-                   'receivedDate',
                    'qcPassed',
                    'qcDate',
                    'qcType',
@@ -1371,14 +1371,15 @@ function bulkSampleQcTable() {
       }
       else {
         jQuery(this).removeAttr("onmouseover").removeAttr("onmouseout");
-        jQuery(this).find("td:gt(5)").remove();
-        jQuery(this).find("td:eq(5)").addClass("passedCheck");
+        jQuery(this).find("td:eq(4)").remove();
+        jQuery(this).find("td:gt(4)").remove();
+        jQuery(this).find("td:eq(4)").addClass("passedCheck");
       }
     });
 
     //headers
     jQuery("#sample_table tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"#sample_table\", this);'></span></th>");
-    jQuery('#sample_table tr:first th:eq(6)').html("QC Passed <span header='qcPassed' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\"#sample_table\", this);'></span>");
+    jQuery('#sample_table tr:first th:eq(5)').html("QC Passed <span header='qcPassed' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\"#sample_table\", this);'></span>");
     jQuery("#sample_table tr:first").append("<th>QC Date <span header='qcDate' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\"#sample_table\", this);'></span></th>");
     jQuery("#sample_table tr:first").append("<th>QC Method <span header='qcType' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\"#sample_table\", this);'></span></th>");
     jQuery("#sample_table tr:first").append("<th>Results</th>");
@@ -1402,7 +1403,6 @@ function bulkSampleQcTable() {
         { "sType": 'natural' },
         { "sType": 'natural' },
         null,
-        {"bSortable": false},
         {"bSortable": false},
         {"bSortable": false},
         {"bSortable": false},
