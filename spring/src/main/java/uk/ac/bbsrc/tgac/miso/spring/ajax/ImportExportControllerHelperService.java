@@ -255,7 +255,7 @@ public class ImportExportControllerHelperService {
 
     if (jsonObject.get("rows") != null) {
 
-      for (JSONArray jsonArrayElement : (Iterable<JSONArray>) JSONArray.fromObject(jsonObject.get("rows").toString().replace("\\\"","'"))) {
+      for (JSONArray jsonArrayElement : (Iterable<JSONArray>) JSONArray.fromObject(jsonObject.get("rows").toString().replace("\\\"", "'"))) {
 
         Sample s = null;
         if (jsonArrayElement.get(1) != null && !"".equals(jsonArrayElement.getString(1))) {
@@ -372,118 +372,119 @@ public class ImportExportControllerHelperService {
               }
             }
 
+            if (library.getQcPassed() || library.getQcPassed() == null) {
 
-            if (jsonArrayElement.getString(9) != null && !"".equals(jsonArrayElement.getString(9))) {
-              Collection<TagBarcode> bcs = requestManager.listAllTagBarcodesByStrategyName(jsonArrayElement.getString(9));
-              if (!bcs.isEmpty()) {
-                String tags = jsonArrayElement.getString(10);
-                if (!"".equals(tags)) {
-                  HashMap<Integer, TagBarcode> tbs = new HashMap<Integer, TagBarcode>();
-                  if (tags.contains("-")) {
-                    String[] splits = tags.split("-");
-                    int count = 1;
-                    for (String tag : splits) {
-                      for (TagBarcode tb : bcs) {
-                        if (tb.getName().equals(tag)) {
-                          //set tag barcodes
-                          tbs.put(count, tb);
-                          count++;
+              if (jsonArrayElement.getString(9) != null && !"".equals(jsonArrayElement.getString(9))) {
+                Collection<TagBarcode> bcs = requestManager.listAllTagBarcodesByStrategyName(jsonArrayElement.getString(9));
+                if (!bcs.isEmpty()) {
+                  String tags = jsonArrayElement.getString(10);
+                  if (!"".equals(tags)) {
+                    HashMap<Integer, TagBarcode> tbs = new HashMap<Integer, TagBarcode>();
+                    if (tags.contains("-")) {
+                      String[] splits = tags.split("-");
+                      int count = 1;
+                      for (String tag : splits) {
+                        for (TagBarcode tb : bcs) {
+                          if (tb.getName().equals(tag)) {
+                            //set tag barcodes
+                            tbs.put(count, tb);
+                            count++;
+                          }
                         }
                       }
                     }
-                  }
-                  else {
-                    for (TagBarcode tb : bcs) {
-                      if (tb.getName().equals(tags) || tb.getSequence().equals(tags)) {
-                        //set tag barcode
-                        tbs.put(1, tb);
-                        log.info("Got tag barcode: " + tb.getName());
-                        break;
+                    else {
+                      for (TagBarcode tb : bcs) {
+                        if (tb.getName().equals(tags) || tb.getSequence().equals(tags)) {
+                          //set tag barcode
+                          tbs.put(1, tb);
+                          log.info("Got tag barcode: " + tb.getName());
+                          break;
+                        }
                       }
                     }
-                  }
 
-                  library.setTagBarcodes(tbs);
-                }
-                else {
-                  throw new InputFormException("Barcode Kit specified but no tag barcodes entered for library '" + jsonArrayElement.getString(3) + "'.");
-                }
-              }
-              else {
-                throw new InputFormException("No tag barcodes associated with the kit definition '" + jsonArrayElement.getString(9) + "' library '" + jsonArrayElement.getString(3) + "'.");
-              }
-            }
-
-
-            LibraryDilution ldi = new LibraryDilution();
-
-            if (jsonArrayElement.getString(11) != null && !"".equals(jsonArrayElement.getString(11))) {
-              try {
-                ldi.setLibrary(library);
-                ldi.setSecurityProfile(library.getSecurityProfile());
-                ldi.setConcentration(Double.valueOf(jsonArrayElement.getString(11)));
-                ldi.setCreationDate(new Date());
-                ldi.setDilutionCreator(user.getLoginName());
-                if (!library.getLibraryDilutions().contains(ldi)) {
-                  library.addDilution(ldi);
-                  log.info("Added library dilution: " + ldi.toString());
-                }
-                requestManager.saveLibraryDilution(ldi);
-              }
-              catch (NumberFormatException nfe) {
-                throw new InputFormException("Supplied LibraryDilution concentration for library '" + jsonArrayElement.getString(3) + "' (" + s.getAlias() + ") is invalid", nfe);
-              }
-            }
-
-            log.info("Added library: " + library.toString());
-            requestManager.saveLibrary(library);
-
-            Pattern poolPattern = Pattern.compile("^[IiUu][Pp][Oo]([0-9]*)");
-            if (jsonArrayElement.getString(12) != null && !"".equals(jsonArrayElement.getString(12))) {
-              String poolName = jsonArrayElement.getString(12);
-
-              Matcher m = poolPattern.matcher(poolName);
-              if (m.matches()) {
-                Pool existedPool = requestManager.getPoolById(Integer.valueOf(m.group(1)));
-                pools.put(poolName, existedPool);
-                if (jsonArrayElement.getString(13) != null && !"".equals(jsonArrayElement.getString(13))) {
-                  existedPool.setConcentration(Double.valueOf(jsonArrayElement.getString(13)));
-                }
-                if (ldi != null) {
-                  existedPool.addPoolableElement(ldi);
-                }
-                requestManager.savePool(existedPool);
-              }
-              else {
-                Pool pool = new PoolImpl();
-                if (!pools.containsKey(poolName)) {
-                  pool.setAlias("pool" + poolName);
-                  pool.setPlatformType(pt);
-                  pool.setReadyToRun(true);
-                  pool.setCreationDate(new Date());
-                  if (jsonArrayElement.getString(13) != null && !"".equals(jsonArrayElement.getString(13))) {
-                    pool.setConcentration(Double.valueOf(jsonArrayElement.getString(13)));
+                    library.setTagBarcodes(tbs);
                   }
                   else {
-                    pool.setConcentration(0.0);
+                    throw new InputFormException("Barcode Kit specified but no tag barcodes entered for library '" + jsonArrayElement.getString(3) + "'.");
                   }
-                  pools.put(poolName, pool);
-                  log.info("Added pool: " + poolName);
-                  if (ldi != null) {
-                    pool.addPoolableElement(ldi);
-                  }
-                  requestManager.savePool(pool);
                 }
                 else {
-                  pool = pools.get(poolName);
+                  throw new InputFormException("No tag barcodes associated with the kit definition '" + jsonArrayElement.getString(9) + "' library '" + jsonArrayElement.getString(3) + "'.");
+                }
+              }
+
+
+              LibraryDilution ldi = new LibraryDilution();
+
+              if (jsonArrayElement.getString(11) != null && !"".equals(jsonArrayElement.getString(11))) {
+                try {
+                  ldi.setLibrary(library);
+                  ldi.setSecurityProfile(library.getSecurityProfile());
+                  ldi.setConcentration(Double.valueOf(jsonArrayElement.getString(11)));
+                  ldi.setCreationDate(new Date());
+                  ldi.setDilutionCreator(user.getLoginName());
+                  if (!library.getLibraryDilutions().contains(ldi)) {
+                    library.addDilution(ldi);
+                    log.info("Added library dilution: " + ldi.toString());
+                  }
+                  requestManager.saveLibraryDilution(ldi);
+                }
+                catch (NumberFormatException nfe) {
+                  throw new InputFormException("Supplied LibraryDilution concentration for library '" + jsonArrayElement.getString(3) + "' (" + s.getAlias() + ") is invalid", nfe);
+                }
+              }
+
+              log.info("Added library: " + library.toString());
+              requestManager.saveLibrary(library);
+
+              Pattern poolPattern = Pattern.compile("^[IiUu][Pp][Oo]([0-9]*)");
+              if (jsonArrayElement.getString(12) != null && !"".equals(jsonArrayElement.getString(12))) {
+                String poolName = jsonArrayElement.getString(12);
+
+                Matcher m = poolPattern.matcher(poolName);
+                if (m.matches()) {
+                  Pool existedPool = requestManager.getPoolById(Integer.valueOf(m.group(1)));
+                  pools.put(poolName, existedPool);
+                  if (jsonArrayElement.getString(13) != null && !"".equals(jsonArrayElement.getString(13))) {
+                    existedPool.setConcentration(Double.valueOf(jsonArrayElement.getString(13)));
+                  }
                   if (ldi != null) {
-                    pool.addPoolableElement(ldi);
+                    existedPool.addPoolableElement(ldi);
+                  }
+                  requestManager.savePool(existedPool);
+                }
+                else {
+                  Pool pool = new PoolImpl();
+                  if (!pools.containsKey(poolName)) {
+                    pool.setAlias("pool" + poolName);
+                    pool.setPlatformType(pt);
+                    pool.setReadyToRun(true);
+                    pool.setCreationDate(new Date());
+                    if (jsonArrayElement.getString(13) != null && !"".equals(jsonArrayElement.getString(13))) {
+                      pool.setConcentration(Double.valueOf(jsonArrayElement.getString(13)));
+                    }
+                    else {
+                      pool.setConcentration(0.0);
+                    }
+                    pools.put(poolName, pool);
+                    log.info("Added pool: " + poolName);
+                    if (ldi != null) {
+                      pool.addPoolableElement(ldi);
+                    }
                     requestManager.savePool(pool);
+                  }
+                  else {
+                    pool = pools.get(poolName);
+                    if (ldi != null) {
+                      pool.addPoolableElement(ldi);
+                      requestManager.savePool(pool);
+                    }
                   }
                 }
               }
             }
-
 
           }
 
