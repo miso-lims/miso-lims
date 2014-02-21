@@ -24,7 +24,7 @@
 <%@ include file="../header.jsp" %>
 <div id="maincontent">
   <div id="contentcolumn">
-    <form:form action="/miso/sequencer" method="POST" commandName="sequencerReference" autocomplete="off">
+    <form:form action="/miso/stats/sequencer" method="POST" commandName="sequencerReference" autocomplete="off">
       <sessionConversation:insertSessionConversationId attributeName="sequencerReference"/>
       <h1>
         Edit Sequencer Reference
