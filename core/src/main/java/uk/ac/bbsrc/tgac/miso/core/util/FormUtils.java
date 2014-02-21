@@ -1033,10 +1033,10 @@ public class FormUtils {
           rowsJSONArray.add(getCellValueAsString(wellCell));
 
           String libAlias = "";
-          Matcher mat = samplePattern.matcher(s.getAlias());
+          Matcher mat = samplePattern.matcher(getCellValueAsString(sampleAliasCell));
           if (mat.matches()) {
             String platePos = getCellValueAsString(wellCell);
-            libAlias = mat.group(1) + "_" + "L" + mat.group(2) + "-" + platePos + "_" + mat.group(3);
+            libAlias = mat.group(1) + "_" + "L" + mat.group(2) + "-" + platePos.toUpperCase() + "_" + mat.group(3);
           }
           rowsJSONArray.add(libAlias);
 
