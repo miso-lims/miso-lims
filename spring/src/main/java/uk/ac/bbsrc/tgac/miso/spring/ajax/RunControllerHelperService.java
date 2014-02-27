@@ -1217,8 +1217,8 @@ public class RunControllerHelperService {
         jsonArray.add("['" + run.getName() + "','" +
                       run.getAlias() + "','" +
                       (run.getStatus() != null && run.getStatus().getHealth() != null ? run.getStatus().getHealth().getKey() : "") + "','" +
-                      (run.getStatus() != null && run.getStatus().getStartDate() != null ? run.getStatus().getStartDate().toString() : "") + "','" +
-                      (run.getStatus() != null && run.getStatus().getCompletionDate() != null ? run.getStatus().getCompletionDate().toString() : "") + "','" +
+                      (run.getStatus() != null && run.getStatus().getStartDate() != null ? LimsUtils.getDateAsString(run.getStatus().getStartDate()) : "") + "','" +
+                      (run.getStatus() != null && run.getStatus().getCompletionDate() != null ? LimsUtils.getDateAsString(run.getStatus().getCompletionDate()) : "") + "','" +
                       (run.getPlatformType() != null ? run.getPlatformType().getKey() : "") + "','" +
                       "<a href=\"/miso/run/" + run.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
 

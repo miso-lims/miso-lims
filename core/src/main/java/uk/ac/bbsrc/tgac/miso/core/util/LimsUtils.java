@@ -581,6 +581,11 @@ public class LimsUtils {
     return getCurrentDateAsString(new SimpleDateFormat("yyyyMMdd"));
   }
 
+  public static String getDateAsString(Date date) {
+    DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+    return df.format(date);
+  }
+
   public static final Pattern linePattern = Pattern.compile(".*\r?\n");
 
   public static Matcher grep(CharBuffer cb, Pattern pattern) {
