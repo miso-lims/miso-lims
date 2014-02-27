@@ -459,7 +459,7 @@ Run.container = {
       newpool.find('input').attr("name", jQuery(this).attr("bind"));
 
       Fluxion.doAjax(
-        'poolControllerHelperService',
+        'runControllerHelperService',
         'checkPoolExperiment',
         {'poolId': newpool.find('input').val(), 'partition': jQuery(this).attr("partition"), 'url': ajaxurl},
         {'doOnSuccess': function (json) {

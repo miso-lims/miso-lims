@@ -274,13 +274,13 @@
         </c:when>
         <c:otherwise>
           <input id="showOnlyReady" type="checkbox" checked="true"
-                 onclick="Container.pool.toggleReadyToRunCheck(this, jQuery('input[name=platformType]:checked').val());"/>Only Ready to Run pools?
+                 onclick="Container.pool.toggleReadyToRunCheck(this, jQuery('input[name=platformTypes]:checked').val());"/>Only Ready to Run pools?
           <div align="right" style="margin-top: -23px; margin-bottom:3px">Filter:
             <input type="text" size="8" id="searchPools" name="searchPools"/>
           </div>
           <script type="text/javascript">
             Utils.timer.typewatchFunc(jQuery('#searchPools'), function () {
-              Container.pool.poolSearch(jQuery('#searchPools').val(), jQuery('input[name=platformType]:checked').val());
+              Container.pool.poolSearch(jQuery('#searchPools').val(), jQuery('input[name=platformTypes]:checked').val());
             }, 300, 2);
           </script>
         </c:otherwise>
