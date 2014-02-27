@@ -184,6 +184,7 @@ public class SolidNotificationMessageConsumerMechanism implements NotificationMe
             else {
               log.debug("Updating existing run and status: " + is.getRunName());
 
+              r.setAlias(runName);
               r.setPlatformType(PlatformType.SOLID);
 
               if (r.getSequencerReference() == null) {

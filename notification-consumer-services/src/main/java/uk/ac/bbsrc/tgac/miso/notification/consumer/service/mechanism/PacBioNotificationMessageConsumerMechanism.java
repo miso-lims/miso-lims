@@ -193,6 +193,8 @@ public class PacBioNotificationMessageConsumerMechanism implements NotificationM
               else {
                 log.info("\\_ Updating existing run and status: " + is.getRunName());
 
+                r.setAlias(runName);
+
                 r.setPlatformType(PlatformType.PACBIO);
                 r.setDescription(m.group(2));
                 r.setPairedEnd(false);

@@ -45,8 +45,8 @@ public interface RunFolderConstants {
   //R_2009_11_30_08_46_52_FLX02090498_Administrator_JR2JR4JR6JR7
   String LS454_FOLDER_REGEX = ".*/R_\\d{4}_\\d{2}_\\d{2}_\\d{2}_\\d{2}_\\d{2}_[A-z0-9\\+\\-]+_[A-Za-z0-9]+_[A-z0-9\\+\\-]+.*";
   String LS454_FOLDER_CAPTURE_REGEX = "R_(\\d{4}_\\d{2}_\\d{2}_\\d{2}_\\d{2}_\\d{2})_([A-Za-z0-9\\+\\-]+)_([A-z0-9\\+\\-]*)";
-  String LS454_SIGNAL_FOLDER_REGEX = "D_\\d{4}_\\d{2}_\\d{2}_\\d{2}_\\d{2}_\\d{2}_[A-z0-9]+_signalProcessing.*";
-  String LS454_IMAGE_FOLDER_REGEX = "D_\\d{4}_\\d{2}_\\d{2}_\\d{2}_\\d{2}_\\d{2}_[A-z0-9]+_imageProcessingOnly.*";
+  String LS454_SIGNAL_FOLDER_REGEX = "D_\\d{4}_\\d{2}_\\d{2}_\\d{2}_\\d{2}_\\d{2}_[A-z0-9\\+\\-]+_signalProcessing.*";
+  String LS454_IMAGE_FOLDER_REGEX = "D_\\d{4}_\\d{2}_\\d{2}_\\d{2}_\\d{2}_\\d{2}_[A-z0-9\\+\\-]+_imageProcessingOnly.*";
 
   String PACBIO_FOLDER_REGEX = ".*/\\d{4}_\\d{2}_\\d{2}_.*";
   String PACBIO_FOLDER_CAPTURE_REGEX = ".*/(\\d{4}_\\d{2}_\\d{2})_(.*)/.*";

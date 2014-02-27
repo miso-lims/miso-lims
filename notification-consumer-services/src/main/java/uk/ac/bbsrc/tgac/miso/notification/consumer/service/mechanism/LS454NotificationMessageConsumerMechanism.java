@@ -193,8 +193,9 @@ public class LS454NotificationMessageConsumerMechanism implements NotificationMe
               else {
                 log.debug("\\_ Updating existing run and status: " + is.getRunName());
 
-                r.setPlatformType(PlatformType.LS454);
+                r.setAlias(runName);
 
+                r.setPlatformType(PlatformType.LS454);
                 r.setDescription(m.group(3));
                 //TODO check this properly
                 r.setPairedEnd(false);

@@ -196,6 +196,8 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
           else {
             log.info("Updating existing run and status: " + runName);
 
+            //always overwrite any previous alias with the correct run alias
+            r.setAlias(runName);
             r.setPlatformType(PlatformType.ILLUMINA);
             r.setDescription(m.group(3));
 
