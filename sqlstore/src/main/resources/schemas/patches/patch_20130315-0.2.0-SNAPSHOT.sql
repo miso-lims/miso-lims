@@ -1,1 +1,1 @@
-INSERT INTO `lims`.`Platform` (name, instrumentModel, numContainers) VALUES("Illumina", "Illumina HiSeq 2500", 1);
+INSERT INTO `lims`.`Platform` (name, instrumentModel, description, numContainers) VALUES("Illumina", "Illumina HiSeq 2500", "4-channel flowgram", 1);
