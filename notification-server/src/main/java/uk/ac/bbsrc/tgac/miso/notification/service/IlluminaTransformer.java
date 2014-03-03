@@ -105,6 +105,8 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
 
           try {
             boolean complete = true;
+            boolean failed = false;
+
             String runName = rootFile.getName();
 
             run.put("runName", runName);
@@ -147,12 +149,8 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                   File dir = new File(rootFile, "/Logs/");
                   FileFilter fileFilter = new WildcardFileFilter("*Post Run Step.log");
                   File[] filterFiles = dir.listFiles(fileFilter);
-                  if (filterFiles!=null){
-                  List filterFilesList = Arrays.asList(filterFiles);
-
-                  if (filterFilesList.size() > 0) {
+                  if (filterFiles != null && filterFiles.length > 0) {
                     lastCycleLogFileExists = true;
-                  }
                   }
                 }
 
@@ -212,10 +210,19 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                   run.put("containerId", runParamDoc.getElementsByTagName("Barcode").item(0).getTextContent());
                 }
               }
+              else {
+                FileFilter fileFilter = new WildcardFileFilter("runParameters.xml*");
+                File[] filterFiles = rootFile.listFiles(fileFilter);
+                if (rootFile.listFiles(fileFilter) != null && filterFiles.length > 0) {
+                  failed = true;
+                }
+              }
 
               checkDates(rootFile, run);
 
-              boolean failed = checkLogs(rootFile, run);
+              if (!failed) {
+                failed = checkLogs(rootFile, run);
+              }
 
               if (complete) {
                 if (!new File(rootFile, "/Basecalling_Netcopy_complete.txt").exists() && !lastCycleLogFileExists) {
@@ -332,9 +339,19 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                   run.put("containerId", runParamDoc.getElementsByTagName("Barcode").item(0).getTextContent());
                 }
               }
+              else {
+                FileFilter fileFilter = new WildcardFileFilter("runParameters.xml*");
+                File[] filterFiles = rootFile.listFiles(fileFilter);
+                if (rootFile.listFiles(fileFilter) != null && filterFiles.length > 0) {
+                  failed = true;
+                }
+              }
 
               checkDates(rootFile, run);
-              boolean failed = checkLogs(rootFile, run);
+
+              if (!failed) {
+                failed = checkLogs(rootFile, run);
+              }
 
               if (!completeFile.exists()) {
                 if (run.has("completionDate")) {
@@ -428,9 +445,19 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                     run.put("containerId", runParamDoc.getElementsByTagName("Barcode").item(0).getTextContent());
                   }
                 }
+                else {
+                  FileFilter fileFilter = new WildcardFileFilter("runParameters.xml*");
+                  File[] filterFiles = rootFile.listFiles(fileFilter);
+                  if (rootFile.listFiles(fileFilter) != null && filterFiles.length > 0) {
+                    failed = true;
+                  }
+                }
 
                 checkDates(rootFile, run);
-                boolean failed = checkLogs(rootFile, run);
+
+                if (!failed) {
+                  failed = checkLogs(rootFile, run);
+                }
 
                 if (complete) {
                   if (!new File(rootFile, "/Basecalling_Netcopy_complete.txt").exists() &&
@@ -498,7 +525,9 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                 run.put("status", "<error><RunName>" + runName + "</RunName><ErrorMessage>Cannot read status file</ErrorMessage></error>");
 
                 checkDates(rootFile, run);
-                boolean failed = checkLogs(rootFile, run);
+                if (!failed) {
+                  failed = checkLogs(rootFile, run);
+                }
 
                 if (!completeFile.exists()) {
                   if (!new File(rootFile, "/Basecalling_Netcopy_complete.txt").exists()) {
@@ -527,7 +556,9 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
               run.put("status", "<error><RunName>" + runName + "</RunName><ErrorMessage>No status file exists</ErrorMessage></error>");
 
               checkDates(rootFile, run);
-              boolean failed = checkLogs(rootFile, run);
+              if (!failed) {
+                failed = checkLogs(rootFile, run);
+              }
 
               if (!completeFile.exists()) {
                 if (!new File(rootFile, "/Basecalling_Netcopy_complete.txt").exists()) {
