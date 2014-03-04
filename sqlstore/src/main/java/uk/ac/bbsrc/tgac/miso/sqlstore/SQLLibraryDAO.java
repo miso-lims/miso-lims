@@ -598,6 +598,11 @@ public class SQLLibraryDAO implements LibraryStore {
         }
       }
 
+      //remove any child library QCs
+      for (LibraryQC lqc : library.getLibraryQCs()) {
+        libraryQcDAO.remove(lqc);
+      }
+
       purgeListCache(library, false);
 
       return true;
