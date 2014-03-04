@@ -121,6 +121,9 @@ public class LS454Transformer implements FileSetTransformer<String, String, File
                 }
               }
             }
+            else {
+              log.error("No signalProcessing/fullProcessingAmplicons folder detected. Cannot process run "+runName+".");
+            }
           }
           catch (IOException e) {
             log.error(recentImageDir.getAbsolutePath()+" :: Unable to read");
@@ -150,6 +153,9 @@ public class LS454Transformer implements FileSetTransformer<String, String, File
                 log.debug(runName+" :: Unknown");
                 map.get("Unknown").add(run);
               }
+            }
+            else {
+              log.error("No imageProcessingOnly folder detected. Cannot process run "+runName+".");
             }
           }
           catch (IOException e) {
