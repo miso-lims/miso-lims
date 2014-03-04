@@ -308,8 +308,8 @@ public abstract class AbstractLibrary implements Library {
 
   public boolean isDeletable() {
     return getId() != AbstractLibrary.UNSAVED_ID &&
-           getLibraryDilutions().isEmpty() &&
-           getLibraryQCs().isEmpty();    
+           getLibraryDilutions().isEmpty();
+           //&& getLibraryQCs().isEmpty();
   }
 
   public boolean userCanRead(User user) {
