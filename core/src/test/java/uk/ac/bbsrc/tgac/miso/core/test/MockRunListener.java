@@ -49,6 +49,8 @@ public class MockRunListener implements RunListener {
   protected static final Logger log = LoggerFactory.getLogger(MockRunListener.class);
   private Collection<? extends ResponderService> responderServices = new HashSet<ResponderService>();
 
+  private String baseURL = "";
+
   public Collection<? extends ResponderService> getResponderServices() {
     return responderServices;
   }
@@ -56,6 +58,11 @@ public class MockRunListener implements RunListener {
   public void setResponderServices(Collection<? extends ResponderService> responderServices) {
     log.info("Setting " + responderServices.size() + " responder(s)");
     this.responderServices = responderServices;
+  }
+
+  @Override
+  public void setBaseURL(String baseURL) {
+    this.baseURL = "http://mock.miso.server/miso/";
   }
 
   @Override
