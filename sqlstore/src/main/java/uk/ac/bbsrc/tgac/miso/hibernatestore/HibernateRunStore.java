@@ -43,6 +43,7 @@ import java.lang.Object;import java.lang.String;import java.lang.SuppressWarning
  * @author Rob Davey
  * @since 0.0.2
  */
+@Deprecated
 public class HibernateRunStore  extends HibernateDaoSupport implements Store<Run> {
   @Transactional(readOnly = false)
   public long save(Run run) throws IOException {
@@ -55,6 +56,11 @@ public class HibernateRunStore  extends HibernateDaoSupport implements Store<Run
   public Run get(long runId) throws IOException {
     //may have to check for null before the cast
     return (Run) getHibernateTemplate().get(AbstractRun.class, runId);
+  }
+
+  @Override
+  public Run lazyGet(long id) throws IOException {
+    return get(id);
   }
 
   @Transactional(readOnly = true)

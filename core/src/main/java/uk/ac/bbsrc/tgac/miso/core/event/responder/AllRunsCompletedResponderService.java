@@ -86,7 +86,13 @@ public class AllRunsCompletedResponderService extends AbstractResponderService {
       for (User user : po.getWatchers()) {
         Alert a = new DefaultAlert(user);
         a.setAlertTitle("All runs have now completed for project " + po.getProject().getAlias() + "(" + po.getProject().getName() + ")");
-        a.setAlertText("The following runs associated with this Project have been completed: "+po.getProject().getAlias()+" ("+event.getEventMessage()+"). Please view Project " +po.getProject().getProjectId() + " in MISO for more information");
+
+        StringBuilder at = new StringBuilder();
+        at.append("The following runs associated with this Project have been completed: "+po.getProject().getAlias()+" ("+event.getEventMessage()+"). Please view Project " +po.getProject().getId() + " in MISO for more information");
+        if (event.getEventContext().has("baseURL")) {
+          at.append(":\n\n" + event.getEventContext().getString("baseURL")+"/project/"+po.getProject().getId());
+        }
+        a.setAlertText(at.toString());
 
         for (AlerterService as : alerterServices) {
           try {

@@ -37,6 +37,7 @@ import java.io.Serializable;
  * @author Rob Davey
  * @since 0.1.4
  */
+@Deprecated
 public class emPCRPool extends PoolImpl<LibraryDilution> implements Serializable {
   public static final String PREFIX = "EPO";
   private final String units = "nM";

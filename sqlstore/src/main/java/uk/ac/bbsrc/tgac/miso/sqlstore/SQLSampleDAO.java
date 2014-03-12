@@ -42,6 +42,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.transaction.annotation.Transactional;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
@@ -388,7 +389,6 @@ public class SQLSampleDAO implements SampleStore {
       Project p = sample.getProject();
       if (this.cascadeType.equals(CascadeType.PERSIST)) {
         if (p!=null) {
-
           //set project progress to ACTIVE if in a prior waiting state (APPROVED)
           if (sample.getReceivedDate() != null && p.getProgress().equals(ProgressType.APPROVED)) {
             p.setProgress(ProgressType.ACTIVE);
@@ -400,6 +400,9 @@ public class SQLSampleDAO implements SampleStore {
       else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (p != null) {
           DbUtils.updateCaches(cacheManager, p, Project.class);
+          for (ProjectOverview po : p.getOverviews()) {
+            DbUtils.updateCaches(cacheManager, po, ProjectOverview.class);
+          }
         }
       }
 
@@ -468,8 +471,6 @@ public class SQLSampleDAO implements SampleStore {
       }
       else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (p != null) {
-          //Cache pc = cacheManager.getCache("projectCache");
-          //pc.remove(DbUtils.hashCodeCacheKeyFor(p.getProjectId()));
           DbUtils.updateCaches(cacheManager, p, Project.class);
         }
       }
@@ -602,24 +603,6 @@ public class SQLSampleDAO implements SampleStore {
 
       if (isCacheEnabled() && lookupCache(cacheManager) != null) {
         lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id) ,s));
-        /*
-        Cache c = lookupCache(cacheManager);
-        Sample cached = (Sample)c.get(DbUtils.hashCodeCacheKeyFor(id));
-        if (cached != null) {
-          log.info("Cached date: " + cached.getReceivedDate());
-          log.info("Current date: " + s.getReceivedDate());
-
-          log.info("Replacing sample "+id+" in " + c.getName());
-          c.put(new Element(DbUtils.hashCodeCacheKeyFor(id) ,s));
-          Sample after = (Sample)c.get(DbUtils.hashCodeCacheKeyFor(id));
-          log.info("Replaced date: " + after.getReceivedDate());
-        }
-        else {
-          log.info("Putting sample "+id+" in " + c.getName());
-          log.info("Current date: " + s.getReceivedDate());
-          c.put(new Element(DbUtils.hashCodeCacheKeyFor(id) ,s));
-        }
-        */
       }
 
       return s;

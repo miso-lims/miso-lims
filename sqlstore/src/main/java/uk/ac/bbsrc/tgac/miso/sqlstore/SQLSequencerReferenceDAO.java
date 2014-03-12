@@ -144,6 +144,11 @@ public class SQLSequencerReferenceDAO implements SequencerReferenceStore {
     return e;
   }
 
+  @Override
+  public SequencerReference lazyGet(long id) throws IOException {
+    return get(id);
+  }
+
   public SequencerReference getByRunId(long runId) throws IOException {
     List eResults = template.query(SEQUENCER_REFERENCE_SELECT_BY_RELATED_RUN, new Object[]{runId}, new SequencerReferenceMapper());
     SequencerReference e = eResults.size() > 0 ? (SequencerReference) eResults.get(0) : null;

@@ -96,7 +96,7 @@ public class RestSignatureFilter extends OncePerRequestFilter {
                                   FilterChain filterChain) throws ServletException, IOException {
     User userdetails = null;
     com.eaglegenomics.simlims.core.User user = null;
-    logger.info("HEADERS: ");
+    logger.debug("HEADERS: ");
     Enumeration es = request.getHeaderNames();
     while (es.hasMoreElements()) {
       String key = (String) es.nextElement();
@@ -107,7 +107,7 @@ public class RestSignatureFilter extends OncePerRequestFilter {
     if (loginName == null) {
       SecurityContext sc = securityContextRepository.loadContext(new HttpRequestResponseHolder(request, response));
       if (sc != null && sc.getAuthentication() != null) {
-        logger.info("User already logged in - chaining");
+        logger.debug("User already logged in - chaining");
         SecurityContextHolder.getContextHolderStrategy().setContext(sc);
         filterChain.doFilter(request, response);
       }
@@ -119,7 +119,7 @@ public class RestSignatureFilter extends OncePerRequestFilter {
       userdetails = new User("notification", "none", true, true, true, true, AuthorityUtils.createAuthorityList("ROLE_INTERNAL"));
     }
     else {
-      logger.info("Incoming user REST API request");
+      logger.debug("Incoming user REST API request");
       user = securityManager.getUserByLoginName(loginName);
       if (user != null) {
         userdetails = LimsSecurityUtils.toUserDetails(user);

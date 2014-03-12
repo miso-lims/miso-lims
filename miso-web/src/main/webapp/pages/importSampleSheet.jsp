@@ -17,7 +17,7 @@
     <div id="contentcolumn">
 
         <h1>
-            Sample Sheet Import & Library Sheet Export
+            Sample Sheet Import
         </h1>
 
         <div id="samplesheetformdiv" class="simplebox ui-corner-all">

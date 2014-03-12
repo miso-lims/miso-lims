@@ -180,12 +180,17 @@ public class PoolSearchService {
   private String poolHtml(Pool<? extends Poolable> p) {
     StringBuilder b = new StringBuilder();
     b.append("<div style='position:relative' onMouseOver='this.className=\"dashboardhighlight\"' onMouseOut='this.className=\"dashboard\"' class='dashboard'>");
-    b.append("<div style=\"float:left\"><b>" + p.getName() + " (" + p.getCreationDate() + ")</b><br/>");
+    if (LimsUtils.isStringEmptyOrNull(p.getAlias())) {
+      b.append("<div style=\"float:left\"><b>" + p.getName() + " : "+p.getCreationDate()+"</b><br/>");
+    }
+    else {
+      b.append("<div style=\"float:left\"><b>" + p.getName() + " (" + p.getAlias() + ") : "+p.getCreationDate()+"</b><br/>");
+    }
 
     Collection<? extends Poolable> ds = p.getPoolableElements();
     for (Poolable d : ds) {
       if (d instanceof Dilution) {
-        b.append("<span>" + d.getName() + " (" + ((Dilution)d).getLibrary().getSample().getProject().getAlias() + ")</span><br/>");
+        b.append("<span>" + d.getName() + " (" + ((Dilution)d).getLibrary().getSample().getProject().getAlias() + ") : "+((Dilution) d).getConcentration()+" "+((Dilution) d).getUnits()+"</span><br/>");
       }
       else if (d instanceof Plate) {
         Plate<LinkedList<Plateable>, Plateable> plate = (Plate<LinkedList<Plateable>, Plateable>)d;
@@ -196,10 +201,12 @@ public class PoolSearchService {
             b.append("<span>" + d.getName() + " ["+plate.getSize()+"-well] (" + l.getSample().getProject().getAlias() + ")</span><br/>");
           }
           else if (element instanceof Dilution) {
-
+            Dilution dl = (Dilution)element;
+            b.append("<span>" + dl.getName() + " ["+plate.getSize()+"-well] (" + dl.getLibrary().getSample().getProject().getAlias() + ")</span><br/>");
           }
           else if (element instanceof Sample) {
-
+            Sample s = (Sample)element;
+            b.append("<span>" + s.getName() + " ["+plate.getSize()+"-well] (" + s.getProject().getAlias() + ")</span><br/>");
           }
         }
       }

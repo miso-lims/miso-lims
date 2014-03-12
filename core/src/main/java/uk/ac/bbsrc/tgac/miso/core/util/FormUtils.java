@@ -195,6 +195,73 @@ public class FormUtils {
 
   }
 
+  public static void createLibraryPoolExportFormFromWeb(File outpath, JSONArray jsonArray, String barcodekit) throws Exception {
+    InputStream in = null;
+    in = FormUtils.class.getResourceAsStream("/forms/ods/export_libraries_pools.xlsx");
+    if (in != null) {
+      XSSFWorkbook oDoc = new XSSFWorkbook(in);
+
+      XSSFSheet sheet = oDoc.getSheet("library_pool_export");
+      FileOutputStream fileOut = new FileOutputStream(outpath);
+      XSSFRow row2 = sheet.getRow(1);
+
+      int i = 6;
+      for (JSONObject jsonObject : (Iterable<JSONObject>) jsonArray) {
+        if ("paired".equals(jsonObject.getString("name"))) {
+          XSSFCell row2cellA = row2.createCell(0);
+          row2cellA.setCellValue(jsonObject.getString("value"));
+        }
+        else if ("platform".equals(jsonObject.getString("name"))) {
+          XSSFCell row2cellB = row2.createCell(1);
+          row2cellB.setCellValue(jsonObject.getString("value"));
+        }
+        else if ("type".equals(jsonObject.getString("name"))) {
+          XSSFCell row2cellC = row2.createCell(2);
+          row2cellC.setCellValue(jsonObject.getString("value"));
+        }
+        else if ("selection".equals(jsonObject.getString("name"))) {
+          XSSFCell row2cellD = row2.createCell(3);
+          row2cellD.setCellValue(jsonObject.getString("value"));
+        }
+        else if ("strategy".equals(jsonObject.getString("name"))) {
+          XSSFCell row2cellE = row2.createCell(4);
+          row2cellE.setCellValue(jsonObject.getString("value"));
+        }
+        if ("sampleinwell".equals(jsonObject.getString("name"))) {
+          String sampleinwell = jsonObject.getString("value");
+          //"sampleid:wellid:samplealias:projectname:projectalias:dnaOrRNA"
+          String sampleId = sampleinwell.split(":")[0];
+          String wellId = sampleinwell.split(":")[1];
+          String sampleAlias = sampleinwell.split(":")[2];
+          String projectName = sampleinwell.split(":")[3];
+          String projectAlias = sampleinwell.split(":")[4];
+          XSSFRow row = sheet.createRow(i);
+          XSSFCell cellA = row.createCell(0);
+          cellA.setCellValue(projectName);
+          XSSFCell cellB = row.createCell(1);
+          cellB.setCellValue(projectAlias);
+          XSSFCell cellC = row.createCell(2);
+          cellC.setCellValue(sampleId);
+          XSSFCell cellD = row.createCell(3);
+          cellD.setCellValue(sampleAlias);
+          XSSFCell cellE = row.createCell(4);
+          cellE.setCellValue(wellId);
+          if (barcodekit!=null){
+            XSSFCell cellJ = row.createCell(9);
+            cellJ.setCellValue(barcodekit);
+          }
+          i++;
+        }
+      }
+      oDoc.write(fileOut);
+      fileOut.close();
+    }
+    else {
+      throw new IOException("Could not read from resource.");
+    }
+
+  }
+
   public static void createLibraryPoolExportForm(File outpath, JSONArray jsonArray) throws Exception {
     InputStream in = null;
     in = FormUtils.class.getResourceAsStream("/forms/ods/export_libraries_pools.xlsx");

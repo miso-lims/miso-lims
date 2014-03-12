@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import uk.ac.bbsrc.tgac.miso.core.event.Event;
 import uk.ac.bbsrc.tgac.miso.core.event.ResponderService;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -45,6 +46,12 @@ public class DefaultListener implements MisoListener {
   protected static final Logger log = LoggerFactory.getLogger(DefaultListener.class);
   private Collection<? extends ResponderService> responderServices = new HashSet<ResponderService>();
 
+  private String baseURL = "";
+
+  public void setBaseURL(String baseURL) {
+    this.baseURL = baseURL;
+  }
+
   @Override
   public Collection<? extends ResponderService> getResponderServices() {
     return responderServices;
@@ -56,6 +63,10 @@ public class DefaultListener implements MisoListener {
 
   @Override
   public void stateChanged(Event event) {
+    if (!LimsUtils.isStringEmptyOrNull(baseURL)) {
+      event.getEventContext().put("baseURL", baseURL);
+    }
+
     log.info("State change detected: " + event.getEventType() + ". Checking "+getResponderServices().size()+" responders");
     for (ResponderService responder : getResponderServices()) {
       if (responder.respondsTo(event)) {

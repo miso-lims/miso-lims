@@ -46,7 +46,7 @@ public interface SampleQcStore extends Store<SampleQC>, Remover<SampleQC> {
    * @return SampleQC
    * @throws IOException when
    */
-  SampleQC lazyGet(long qcId) throws IOException;
+  //SampleQC lazyGet(long qcId) throws IOException;
 
   /**
    * List all SampleQCs performed on a Sample given a parent Sample ID

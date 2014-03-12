@@ -431,13 +431,10 @@
               <td>ID:</td>
               <td>
                 <span id="idBarcode">${container.identificationBarcode}</span>
-                <c:if test="${(container.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
-                                                    or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-                  <a href="javascript:void(0);"
-                     onclick="Run.ui.editContainerIdBarcode(jQuery('#idBarcode'), ${containerCount.index})">
-                    <span class="fg-button ui-icon ui-icon-pencil"></span>
-                  </a>
-                </c:if>
+                <a href="javascript:void(0);"
+                   onclick="Run.ui.editContainerIdBarcode(jQuery('#idBarcode'), ${containerCount.index})">
+                  <span class="fg-button ui-icon ui-icon-pencil"></span>
+                </a>
               </td>
             </c:otherwise>
           </c:choose>

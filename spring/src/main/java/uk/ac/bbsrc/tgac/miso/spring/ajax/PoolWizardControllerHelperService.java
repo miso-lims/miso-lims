@@ -78,7 +78,7 @@ public class PoolWizardControllerHelperService {
     PlatformType platformType = PlatformType.get(json.getString("platformType"));
 
     StringBuilder sb = new StringBuilder();
-    List<Integer> ids  = JSONArray.fromObject(json.getString("dilutions"));
+    List<Integer> ids = JSONArray.fromObject(json.getString("dilutions"));
 
     List<PoolQC> pqcs = new ArrayList<PoolQC>();
     JSONArray qcs = JSONArray.fromObject(json.get("qcs"));
@@ -129,7 +129,6 @@ public class PoolWizardControllerHelperService {
         }
 
         if (!barcodeCollision) {
-
           Pool pool;
           //TODO special type of pool for LibraryDilutions that will go on to be emPCRed as a whole
           if (dils.get(0) instanceof LibraryDilution &&
@@ -267,28 +266,30 @@ public class PoolWizardControllerHelperService {
       List<Dilution> dls = new ArrayList<Dilution>(requestManager.listAllDilutionsByProjectAndPlatform(projectId, platformType));
       Collections.sort(dls);
       for (Dilution dl : dls) {
-        if (dl.getLibrary().getQcPassed()) {
-          //b.append("<tr id='"+dl.getDilutionId()+"'><td class='rowSelect'><input class='chkbox' type='checkbox' name='ids' value='" + dl.getDilutionId() + "'/></td>");
-          StringBuilder barcode = new StringBuilder();
-          if (!dl.getLibrary().getTagBarcodes().isEmpty()) {
-            int count = 0;
-            for (TagBarcode tb : dl.getLibrary().getTagBarcodes().values()) {
-              if (dl.getLibrary().getTagBarcodes().values().size() > 1 && count > 0) {
-                barcode.append("-");
+        if (dl.getLibrary().getQcPassed() != null) {
+          if (dl.getLibrary().getQcPassed()) {
+            //b.append("<tr id='"+dl.getDilutionId()+"'><td class='rowSelect'><input class='chkbox' type='checkbox' name='ids' value='" + dl.getDilutionId() + "'/></td>");
+            StringBuilder barcode = new StringBuilder();
+            if (!dl.getLibrary().getTagBarcodes().isEmpty()) {
+              int count = 0;
+              for (TagBarcode tb : dl.getLibrary().getTagBarcodes().values()) {
+                if (dl.getLibrary().getTagBarcodes().values().size() > 1 && count > 0) {
+                  barcode.append("-");
+                }
+                barcode.append(tb.getName());
+                count++;
               }
-              barcode.append(tb.getName());
-              count++;
             }
+
+            b.append("<tr id='" + dl.getId() + "'><td class='rowSelect'></td>");
+            b.append("<td>" + dl.getName() + "</td>");
+            b.append("<td>");
+            b.append(barcode);
+            b.append("</td>");
+            b.append("</tr>");
+
+            a.add(JSONObject.fromObject("{'id':" + dl.getId() + ",'name':'" + dl.getName() + "','description':'" + dl.getLibrary().getDescription() + "','library':'" + dl.getLibrary().getAlias() + "','libraryBarcode':'" + barcode.toString() + "'}"));
           }
-
-          b.append("<tr id='" + dl.getId() + "'><td class='rowSelect'></td>");
-          b.append("<td>" + dl.getName() + "</td>");
-          b.append("<td>");
-          b.append(barcode);
-          b.append("</td>");
-          b.append("</tr>");
-
-          a.add(JSONObject.fromObject("{'id':" + dl.getId() + ",'name':'" + dl.getName() + "','description':'" + dl.getLibrary().getDescription() + "','library':'" + dl.getLibrary().getAlias() + "','libraryBarcode':'" + barcode.toString() + "'}"));
         }
       }
 

@@ -34,7 +34,6 @@ import org.codehaus.jackson.type.TypeReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRPool;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.PoolAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolQcException;
@@ -51,15 +50,9 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.transaction.annotation.Transactional;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DaoLookup;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaPool;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ls454.LS454Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.solid.SolidPool;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 
 import javax.persistence.CascadeType;
@@ -414,7 +407,6 @@ public class SQLPoolDAO implements PoolStore {
         .addValue("securityProfile_profileId", securityProfileId)
         .addValue("platformType", pool.getPlatformType().getKey())
         .addValue("ready", pool.getReadyToRun());
-    //.addValue("qcPassed", pool.getQcPassed());
 
     if (pool.getQcPassed() != null) {
       params.addValue("qcPassed", pool.getQcPassed().toString());
@@ -453,14 +445,6 @@ public class SQLPoolDAO implements PoolStore {
       catch (MisoNamingException e) {
         throw new IOException("Cannot save Pool - issue with naming scheme", e);
       }
-      /*
-      String name = AbstractPool.lookupPrefix(pool.getPlatformType())+ DbUtils.getAutoIncrement(template, TABLE_NAME);
-      params.addValue("name", name);
-      params.addValue("identificationBarcode", name + "::" + pool.getPlatformType().getKey());
-      Number newId = insert.executeAndReturnKey(params);
-      pool.setPoolId(newId.longValue());
-      pool.setName(name);
-      */
     }
     else {
       try {
@@ -478,16 +462,8 @@ public class SQLPoolDAO implements PoolStore {
       catch (MisoNamingException e) {
         throw new IOException("Cannot save Pool - issue with naming scheme", e);
       }
-      /*
-      params.addValue("poolId", pool.getPoolId())
-              .addValue("name", pool.getName())
-              .addValue("identificationBarcode", pool.getName() + "::" + pool.getPlatformType().getKey());
-      NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-      namedTemplate.update(POOL_UPDATE, params);
-      */
     }
 
-    //log.info("Unlinking elements from pool " + pool.getId());
     MapSqlParameterSource delparams = new MapSqlParameterSource();
     delparams.addValue("pool_poolId", pool.getId());
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
@@ -503,7 +479,6 @@ public class SQLPoolDAO implements PoolStore {
       Cache ldc = cacheManager.getCache("lazy" + type + "Cache");
 
       for (Poolable d : pool.getPoolableElements()) {
-        //log.debug("Linking "+d.getName() + " to " + pool.getName());
         MapSqlParameterSource esParams = new MapSqlParameterSource();
         esParams.addValue("elementId", d.getId())
             .addValue("pool_poolId", pool.getId())
@@ -523,8 +498,6 @@ public class SQLPoolDAO implements PoolStore {
               dc = cacheManager.getCache("plateCache");
               ldc = cacheManager.getCache("lazyPlateCache");
             }
-            //if (dc != null) dc.remove(DbUtils.hashCodeCacheKeyFor(d.getId()));
-            //if (ldc != null) ldc.remove(DbUtils.hashCodeCacheKeyFor(d.getId()));
             if (dc != null) DbUtils.updateCaches(cacheManager, d, Poolable.class);
             if (ldc != null) DbUtils.updateCaches(cacheManager, d, Poolable.class);
           }
@@ -538,8 +511,6 @@ public class SQLPoolDAO implements PoolStore {
     poolNamedTemplate.update(POOL_EXPERIMENT_DELETE_BY_POOL_ID, poolparams);
 
     if (pool.getExperiments() != null && !pool.getExperiments().isEmpty()) {
-      //Cache ec = cacheManager.getCache("experimentCache");
-
       SimpleJdbcInsert eInsert = new SimpleJdbcInsert(template)
           .withTableName("Pool_Experiment");
 
@@ -555,7 +526,6 @@ public class SQLPoolDAO implements PoolStore {
             experimentDAO.save(e);
           }
           else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-            //ec.remove(DbUtils.hashCodeCacheKeyFor(e.getId()));
             DbUtils.updateCaches(cacheManager, e, Experiment.class);
           }
         }
@@ -606,6 +576,7 @@ public class SQLPoolDAO implements PoolStore {
     return eResults.size() > 0 ? eResults.get(0) : null;
   }
 
+  @Override
   public Pool<? extends Poolable> lazyGet(long poolId) throws IOException {
     List<Pool<? extends Poolable>> eResults = template.query(POOL_SELECT_BY_POOL_ID, new Object[]{poolId}, new PoolMapper(true));
     return eResults.size() > 0 ? eResults.get(0) : null;
@@ -689,9 +660,6 @@ public class SQLPoolDAO implements PoolStore {
               dc = cacheManager.getCache("plateCache");
               ldc = cacheManager.getCache("lazyPlateCache");
             }
-
-            //if (dc != null) dc.remove(DbUtils.hashCodeCacheKeyFor(d.getId()));
-            //if (ldc != null) ldc.remove(DbUtils.hashCodeCacheKeyFor(d.getId()));
             if (dc != null) DbUtils.updateCaches(cacheManager, d, Poolable.class);
             if (ldc != null) DbUtils.updateCaches(cacheManager, d, Poolable.class);
           }
@@ -700,7 +668,6 @@ public class SQLPoolDAO implements PoolStore {
 
       if (!pool.getExperiments().isEmpty()) {
         ok = (poolNamedTemplate.update(POOL_EXPERIMENT_DELETE_BY_POOL_ID, poolparams) == 1);
-        //Cache ec = cacheManager.getCache("experimentCache");
         Collection<Experiment> exps = pool.getExperiments();
         for (Experiment e : exps) {
           if (this.cascadeType != null) {
@@ -708,7 +675,6 @@ public class SQLPoolDAO implements PoolStore {
               experimentDAO.save(e);
             }
             else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-              //ec.remove(DbUtils.hashCodeCacheKeyFor(e.getId()));
               DbUtils.updateCaches(cacheManager, e, Experiment.class);
             }
           }

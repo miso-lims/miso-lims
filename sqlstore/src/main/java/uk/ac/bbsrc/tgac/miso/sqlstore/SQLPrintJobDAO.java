@@ -151,6 +151,11 @@ public class SQLPrintJobDAO implements PrintJobStore {
     return e;
   }
 
+  @Override
+  public PrintJob lazyGet(long id) throws IOException {
+    return get(id);
+  }
+
   public Collection<PrintJob> listAll() throws IOException {
     return template.query(PRINT_JOB_SELECT, new PrintJobMapper());
   }

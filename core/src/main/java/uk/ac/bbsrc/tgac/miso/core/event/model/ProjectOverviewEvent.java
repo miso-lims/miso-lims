@@ -23,6 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.event.model;
 
+import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.event.Event;
 import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
@@ -40,6 +41,7 @@ public class ProjectOverviewEvent implements Event<ProjectOverview> {
   private ProjectOverview projectOverview;
   private String message;
   private MisoEventType eventType;
+  private JSONObject eventContext = new JSONObject();
 
   public ProjectOverviewEvent(ProjectOverview projectOverview, MisoEventType eventType, String message) {
     this.projectOverview = projectOverview;
@@ -50,6 +52,15 @@ public class ProjectOverviewEvent implements Event<ProjectOverview> {
   @Override
   public ProjectOverview getEventObject() {
     return this.projectOverview;
+  }
+
+  @Override
+  public JSONObject getEventContext() {
+    return eventContext;
+  }
+
+  public void setEventContext(JSONObject eventContext) {
+    this.eventContext = eventContext;
   }
 
   @Override

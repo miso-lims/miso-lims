@@ -52,6 +52,18 @@ public interface Store<T> {
   public T get(long id) throws IOException;
 
   /**
+   * Retrieve an object from an underlying data store given an ID
+   * <p/>
+   * This method intends to retrieve objects in an 'ignorant' fashion, i.e. will not populate
+   * parent or child objects that could lead to a circular dependency
+   *
+   * @param id of type long
+   * @return T
+   * @throws IOException when
+   */
+  public T lazyGet(long id) throws IOException;
+
+  /**
    * List all persisted objects of a given type T
    *
    * @return Collection<T>

@@ -31,10 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.*;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaPool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ls454.LS454Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.solid.SolidPool;
 import uk.ac.bbsrc.tgac.miso.core.data.type.*;
 import uk.ac.bbsrc.tgac.miso.core.event.Alert;
 import uk.ac.bbsrc.tgac.miso.core.store.*;
@@ -61,6 +58,8 @@ public class MisoRequestManager implements RequestManager {
   private EmPCRStore emPCRStore;
   @Autowired
   private ExperimentStore experimentStore;
+  @Autowired
+  private EntityGroupStore entityGroupStore;
   @Autowired
   private KitStore kitStore;
   @Autowired
@@ -120,6 +119,10 @@ public class MisoRequestManager implements RequestManager {
 
   public void setExperimentStore(ExperimentStore experimentStore) {
     this.experimentStore = experimentStore;
+  }
+
+  public void setEntityGroupStore(EntityGroupStore entityGroupStore) {
+    this.entityGroupStore = entityGroupStore;
   }
 
   public void setKitStore(KitStore kitStore) {
@@ -1488,6 +1491,18 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
+  public void deleteEntityGroup(EntityGroup<? extends Nameable, ? extends Nameable> entityGroup) throws IOException {
+    if (entityGroupStore != null) {
+      if (!entityGroupStore.remove(entityGroup)) {
+        throw new IOException("Unable to delete EntityGroup.");
+      }
+    }
+    else {
+      throw new IOException("No entityGroupStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
   public void deleteContainer(SequencerPartitionContainer container) throws IOException {
     if (sequencerPartitionContainerStore != null) {
       if (!sequencerPartitionContainerStore.remove(container)) {
@@ -1830,6 +1845,16 @@ public class MisoRequestManager implements RequestManager {
     }
     else {
       throw new IOException("No alertStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public long saveEntityGroup(EntityGroup<? extends Nameable, ? extends Nameable> entityGroup) throws IOException {
+    if (entityGroupStore != null) {
+      return entityGroupStore.save(entityGroup);
+    }
+    else {
+      throw new IOException("No entityGroupStore available. Check that it has been declared in the Spring config.");
     }
   }
 
@@ -2516,6 +2541,16 @@ public class MisoRequestManager implements RequestManager {
     }
     else {
       throw new IOException("No alertStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public EntityGroup<? extends Nameable, ? extends Nameable> getEntityGroupById(long entityGroupId) throws IOException {
+    if (entityGroupStore != null) {
+      return entityGroupStore.get(entityGroupId);
+    }
+    else {
+      throw new IOException("No entityGroupStore available. Check that it has been declared in the Spring config.");
     }
   }
 }

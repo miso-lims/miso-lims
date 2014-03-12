@@ -23,29 +23,14 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.*;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.context.ServletContextAware;
 import org.springframework.web.servlet.ModelAndView;
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractProject;
-import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.manager.*;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
-import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
-
-import javax.servlet.ServletContext;
-import java.io.IOException;
-import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -56,12 +41,8 @@ import java.util.Map;
  */
 @Controller
 public class ExternalSectionController  {
-
-
-
   @Autowired
   private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
-
   @Autowired
   private uk.ac.bbsrc.tgac.miso.core.manager.RequestManager requestManager;
   @Autowired
@@ -83,5 +64,4 @@ public class ExternalSectionController  {
   public ModelAndView external(ModelMap model) {
     return new ModelAndView("/pages/external/externalMain.jsp", model);
   }
-
 }

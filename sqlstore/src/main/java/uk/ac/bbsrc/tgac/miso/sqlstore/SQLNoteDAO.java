@@ -240,6 +240,11 @@ public class SQLNoteDAO implements NoteStore {
     return e;
   }
 
+  @Override
+  public Note lazyGet(long id) throws IOException {
+    return get(id);
+  }
+
   public Collection<Note> listAll() throws IOException {
     return template.query(NOTES_SELECT, new NoteMapper());
   }

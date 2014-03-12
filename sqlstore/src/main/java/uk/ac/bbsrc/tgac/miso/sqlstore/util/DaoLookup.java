@@ -24,13 +24,26 @@ public class DaoLookup {
   }
 
   public <T> Store<T> lookup(Class<? extends T> clz) {
-    for (Class<?> type : daos.keySet()) {
+    Class<?> type = getAssignableClassFromClass(clz);
+    if (type != null) {
+      return (Store<T>)daos.get(getAssignableClassFromClass(clz));
+    }
+    return null;
+  }
+
+  public Set<Class<?>> getDaoKeys() {
+    return daos.keySet();
+  }
+
+  public Class<?> getAssignableClassFromClass(Class<?> clz) {
+    for (Class<?> type : getDaoKeys()) {
       if (type.isAssignableFrom(clz)) {
-        return (Store<T>)daos.get(type);
+        return type;
       }
     }
     return null;
   }
+
   /*
   public <T> Set<Store<? extends T>> lookup(Class<?> clz) {
     if (daos == null) {

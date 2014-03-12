@@ -205,7 +205,7 @@ public class RunAlertManager {
     User user = securityManager.getUserById(userId);
     if (user != null) {
       for (Run r : runs.values()) {
-        if (user.getGroups().contains(securityManager.getGroupByName("RunWatchers"))) {
+        if (user.getGroups() != null && user.getGroups().contains(securityManager.getGroupByName("RunWatchers"))) {
           addWatcher(r, userId);
         }
         else {

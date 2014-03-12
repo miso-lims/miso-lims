@@ -50,7 +50,7 @@ public interface SequencerPartitionContainerStore extends Store<SequencerPartiti
    * @return SequencerPartitionContainer
    * @throws java.io.IOException when
    */
-  SequencerPartitionContainer<SequencerPoolPartition> lazyGet(long sequencerPartitionContainerId) throws IOException;
+  //SequencerPartitionContainer<SequencerPoolPartition> lazyGet(long sequencerPartitionContainerId) throws IOException;
 
   /**
    * Get the SequencerPartitionContainer that contains a given {@link SequencerPoolPartition}

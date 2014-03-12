@@ -54,7 +54,7 @@ public interface PlateStore extends Store<Plate<? extends List<? extends Plateab
    * @return Plate
    * @throws java.io.IOException when
    */
-  <T extends List<S>, S extends Plateable> Plate<T, S> lazyGet(long plateId) throws IOException;
+  //<T extends List<S>, S extends Plateable> Plate<T, S> lazyGet(long plateId) throws IOException;
 
   @Override
   public Plate<? extends List<? extends Plateable>, ? extends Plateable> get(long id) throws IOException;

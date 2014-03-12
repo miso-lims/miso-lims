@@ -23,16 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.security;
 
-import java.security.SignatureException;
-
-import org.apache.commons.codec.binary.Base64;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.encoding.PasswordEncoder;
-import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 
 /**
  * A service class that encodes plaintext passwords into their hashed Base64-encoded counterparts
@@ -41,29 +32,10 @@ import javax.crypto.spec.SecretKeySpec;
  * @author Rob Davey
  * @since 0.0.2
  */
-public final class PasswordCodecService {
-  /** Field log  */
-  protected static final Logger log = LoggerFactory.getLogger(PasswordCodecService.class);
+public interface PasswordCodecService {
 
-  /** Field instance  */
-  private static PasswordCodecService instance;
-  private PasswordEncoder encoder;
-
-  public PasswordEncoder getEncoder() {
-    return encoder;
-  }
-
-  public void setEncoder(PasswordEncoder encoder) {
-    this.encoder = encoder;
-  }
-
-  /**
-   * Constructor PasswordCodecService creates a new PasswordCodecService instance with a SHA
-   * password encoder as default
-   */
-  private PasswordCodecService() {
-    encoder = new ShaPasswordEncoder();
-  }
+  PasswordEncoder getEncoder();
+  void setEncoder(PasswordEncoder encoder);
 
   /**
    * Encrypt a plaintext String using a PasswordEncoder strategy, with a null salt.
@@ -71,9 +43,7 @@ public final class PasswordCodecService {
    * @param plaintext of type String
    * @return String the encrypted String of the given plaintext String
    */
-  public synchronized String encrypt(String plaintext) {
-    return encrypt(plaintext, null);
-  }
+  String encrypt(String plaintext);
 
   /**
    * Encrypt a plaintext String using a PasswordEncoder strategy, with a given salt.
@@ -81,51 +51,5 @@ public final class PasswordCodecService {
    * @param plaintext of type String
    * @return String the encrypted String of the given plaintext String
    */
-  public synchronized String encrypt(String plaintext, byte[] salt) {
-    return encoder.encodePassword(plaintext, salt);
-  }
-
-  /**
-   * Encrypt a plaintext String using a hmac_sha1 salt
-   *
-   * @param key of type String
-   * @param plaintext of type String
-   * @return String the encrypted String of the given plaintext String
-   * @throws SignatureException when the HMAC is unable to be generated
-   */
-  public synchronized String encryptHMACSHA1(String key, String plaintext) throws java.security.SignatureException
-  {
-    String result;
-    try {
-      // get an hmac_sha1 key from the raw key bytes
-      SecretKeySpec signingKey = new SecretKeySpec(key.getBytes(), "HmacSHA1");
-
-      // get an hmac_sha1 Mac instance and initialize with the signing key
-      Mac mac = Mac.getInstance("HmacSHA1");
-      mac.init(signingKey);
-
-      // compute the hmac on input data bytes
-      byte[] rawHmac = mac.doFinal(plaintext.getBytes());
-
-      // base64-encode the hmac
-      //result = new BASE64Encoder().encode(rawHmac);
-      result = new Base64().encodeToString(rawHmac);
-    }
-    catch (Exception e) {
-      throw new SignatureException("Failed to generate HMAC : " + e.getMessage());
-    }
-    return result;
-  }
-
-  /**
-   * Returns a singleton (as far as singletons are actually singletons!) instance of a PasswordCodecService object.
-   *
-   * @return PasswordCodecService instance.
-   */
-  public static synchronized PasswordCodecService getInstance() {
-    if(instance == null) {
-       instance = new PasswordCodecService();
-    }
-    return instance;
-  }
+  String encrypt(String plaintext, byte[] salt);
 }

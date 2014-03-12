@@ -23,6 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.event.model;
 
+import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.event.Event;
 import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
@@ -40,6 +41,7 @@ public class PoolEvent implements Event<Pool> {
   private Pool pool;
   private String message;
   private MisoEventType eventType;
+  private JSONObject eventContext = new JSONObject();
 
   public PoolEvent(Pool pool, MisoEventType eventType, String message) {
     this.pool = pool;
@@ -59,5 +61,14 @@ public class PoolEvent implements Event<Pool> {
   @Override
   public String getEventMessage() {
     return message;
+  }
+
+  @Override
+  public JSONObject getEventContext() {
+    return eventContext;
+  }
+
+  public void setEventContext(JSONObject eventContext) {
+    this.eventContext = eventContext;
   }
 }

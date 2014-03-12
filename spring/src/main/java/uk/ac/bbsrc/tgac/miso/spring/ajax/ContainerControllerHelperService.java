@@ -34,7 +34,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.AutoPopulatingList;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
@@ -43,6 +45,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.net.URLDecoder;
 import java.util.*;
 
 /**
@@ -530,11 +533,43 @@ public class ContainerControllerHelperService {
     StringBuilder b = new StringBuilder();
     try {
       b.append("<div style='position:relative' onMouseOver='this.className=\"dashboardhighlight\"' onMouseOut='this.className=\"dashboard\"' class='dashboard'>");
-      b.append("<div style=\"float:left\"><b>" + p.getName() + " (" + p.getCreationDate() + ")</b><br/>");
+      if (LimsUtils.isStringEmptyOrNull(p.getAlias())) {
+        b.append("<div style=\"float:left\"><b>" + p.getName() + " : "+p.getCreationDate()+"</b><br/>");
+      }
+      else {
+        b.append("<div style=\"float:left\"><b>" + p.getName() + " (" + p.getAlias() + ") : "+p.getCreationDate()+"</b><br/>");
+      }
 
-      Collection<? extends Dilution> ds = p.getDilutions();
-      for (Dilution d : ds) {
-        b.append("<span>" + d.getName() + " (" + d.getLibrary().getSample().getProject().getAlias() + ")</span><br/>");
+      Collection<? extends Poolable> ds = p.getPoolableElements();
+      Set<Project> pooledProjects = new HashSet<Project>();
+      for (Poolable d : ds) {
+        if (d instanceof Dilution) {
+          pooledProjects.add(((Dilution)d).getLibrary().getSample().getProject());
+          b.append("<span>" + d.getName() + " (" + ((Dilution)d).getLibrary().getSample().getProject().getAlias() + ") : "+((Dilution) d).getConcentration()+" "+((Dilution) d).getUnits()+"</span><br/>");
+        }
+        else if (d instanceof Plate) {
+          Plate<LinkedList<Plateable>, Plateable> plate = (Plate<LinkedList<Plateable>, Plateable>)d;
+          if (!plate.getElements().isEmpty()) {
+            //TODO - should we look through all plate elements to get all projects?
+            Plateable element = plate.getElements().getFirst();
+            if (element instanceof Library) {
+              Library l = (Library)element;
+              pooledProjects.add(l.getSample().getProject());
+              b.append("<span>" + d.getName() + " ["+plate.getSize()+"-well] (" + l.getSample().getProject().getAlias() + ")</span><br/>");
+            }
+            else if (element instanceof Dilution) {
+              Dilution dl = (Dilution)element;
+              b.append("<span>" + dl.getName() + " ["+plate.getSize()+"-well] (" + dl.getLibrary().getSample().getProject().getAlias() + ")</span><br/>");
+            }
+            else if (element instanceof Sample) {
+              Sample s = (Sample)element;
+              b.append("<span>" + s.getName() + " ["+plate.getSize()+"-well] (" + s.getProject().getAlias() + ")</span><br/>");
+            }
+          }
+        }
+        else {
+          b.append("<span>" + d.getName() + "</span><br/>");
+        }
       }
 
       b.append("<br/><i>");
@@ -545,23 +580,6 @@ public class ContainerControllerHelperService {
       b.append("</i>");
 
       if (p.getExperiments().size() == 0) {
-        Set<Project> pooledProjects = new HashSet<Project>();
-        Collection<? extends Poolable> pes = p.getPoolableElements();
-        for (Poolable d : pes) {
-          if (d instanceof Dilution) {
-            pooledProjects.add(((Dilution)d).getLibrary().getSample().getProject());
-          }
-          else if (d instanceof Plate) {
-            Plate plate = (Plate)d;
-            if (!plate.getElements().isEmpty()) {
-              if (plate.getElementType().equals(Library.class)) {
-                Library l = (Library)plate.getElements().get(0);
-                pooledProjects.add(l.getSample().getProject());
-              }
-            }
-          }
-        }
-
         b.append("<div style='float:left; clear:both'>");
         for (Project project : pooledProjects) {
           b.append("<div id='studySelectDiv" + partition + "_" + project.getProjectId() + "'>");
@@ -654,6 +672,27 @@ public class ContainerControllerHelperService {
             sb.append("<table class='in'>");
             sb.append("<th>Partition No.</th>");
             sb.append("<th>Pool</th>");
+
+            if (f.getPartitions().isEmpty()) {
+              //something went wrong previously. a saved container shouldn't have empty partitions - recreate
+              json.put("platform", f.getPlatformType().getKey());
+
+              session.setAttribute("container_" + json.getString("container_cId"), f);
+
+              //reset container
+              changeContainer(session, json);
+            }
+            else if (f.getPartitions() == null) {
+              //something went wrong previously. a saved container shouldn't have null partition set - recreate
+              f.setPartitions(new AutoPopulatingList<SequencerPoolPartition>(PartitionImpl.class));
+              json.put("platform", f.getPlatformType().getKey());
+
+              session.setAttribute("container_" + json.getString("container_cId"), f);
+
+              //reset container
+              changeContainer(session, json);
+            }
+
             for (SequencerPoolPartition p : f.getPartitions()) {
               sb.append("<tr>");
               sb.append("<td>" + p.getPartitionNumber() + "</td>");

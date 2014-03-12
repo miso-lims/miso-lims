@@ -263,21 +263,23 @@
   </tr>
   </tbody>
 </table>
+
 <ol id="progress">
   <li class="sample-qc-step">
     <c:choose>
-      <c:when test="${overview.allSampleQcPassed and overview.libraryPreparationComplete}">
-        <div class="left mid-progress-done">
-      </c:when>
-      <c:when test="${overview.allSampleQcPassed}">
-        <div class="left-progress-done">
-      </c:when>
-      <c:otherwise>
-        <div class="left">
-      </c:otherwise>
+    <c:when test="${overview.allSampleQcPassed and overview.libraryPreparationComplete}">
+    <div class="left mid-progress-done">
+    </c:when>
+    <c:when test="${overview.allSampleQcPassed}">
+    <div class="left-progress-done">
+    </c:when>
+    <c:otherwise>
+    <div class="left">
+    </c:otherwise>
     </c:choose>
-      <span>Sample QCs</span>
-      <form:checkbox value="${overview.allSampleQcPassed}" path="overviews[${ov.count-1}].allSampleQcPassed"/>
+    <span>Sample QCs</span>
+    <form:checkbox value="${overview.allSampleQcPassed}"
+                   path="overviews[${ov.count-1}].allSampleQcPassed"/>
     </div>
   </li>
 
@@ -363,13 +365,83 @@
     </div>
   </li>
 </ol>
+
 <p style="clear:both"/>
+
+<div id="overviewsamplegroups">
+<c:if test="${project.id != 0}">
+  <c:if test="${empty overview.sampleGroup}">
+    <a class="add" href="javascript:void(0);" onclick="Project.overview.addSampleGroupTable(${project.id}, ${overview.id});">Add Sample Group</a><br/>
+  </c:if>
+  <div id="sampleGroupTableDiv${overview.overviewId}"></div>
+</c:if>
+<span style="clear:both">
+  <c:if test="${not empty overview.sampleGroup}">
+  <h1>Sample Group ${overview.sampleGroup.id}</h1>
+  <ul class="sddm">
+    <li>
+      <a onmouseover="mopen('samplegroupmenu')" onmouseout="mclosetime()">Options
+        <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
+      </a>
+
+      <div id="samplegroupmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
+        <a href="javascript:void(0);" onclick="Project.overview.addSamplesToGroupTable(${project.id}, ${overview.id}, ${overview.sampleGroup.id});">Add more Samples</a>
+      </div>
+    </li>
+  </ul>
+  <span style="clear:both">
+    <table class="list" id="overview_samplegroup_table_${overview.sampleGroup.id}">
+      <thead>
+      <tr>
+        <th>Sample Name</th>
+        <th>Sample Alias</th>
+        <th class="fit">Edit</th>
+        <th class="fit">REMOVE</th>
+      </tr>
+      </thead>
+      <tbody>
+      <c:forEach items="${overview.sampleGroup.entities}" var="sample">
+        <tr sampleId="${sample.id}" onMouseOver="this.className='highlightrow'"
+            onMouseOut="this.className='normalrow'">
+          <td><b>${sample.name}</b></td>
+          <td>${sample.alias}</td>
+          <td class="misoicon" onclick="window.location.href='<c:url value="/miso/sample/${sample.id}"/>'">
+            <span class="ui-icon ui-icon-pencil"/>
+          </td>
+          <td class="misoicon" onclick="Sample.removeSampleFromGroup(${sample.id}, ${overview.sampleGroup.id}, Utils.page.pageReload);">
+            <span class="ui-icon ui-icon-trash"/>
+          </td>
+        </tr>
+      </c:forEach>
+      </tbody>
+    </table>
+  </span>
+  <script type="text/javascript">
+    jQuery(document).ready(function () {
+      jQuery('#overview_samplegroup_table_'+${overview.sampleGroup.id}).dataTable({
+        "aaSorting": [
+          [1, 'asc']
+        ],
+        "aoColumns": [
+          null,
+          { "sType": 'natural' },
+          null
+          <sec:authorize access="hasRole('ROLE_ADMIN')">, null</sec:authorize>
+        ],
+        "iDisplayLength": 50,
+        "bJQueryUI": true,
+        "bRetrieve": true
+      });
+    });
+  </script>
+  </c:if>
+</span>
+</div>
 </div>
 
 </c:forEach>
 </c:when>
 </c:choose>
-</div>
 
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#issues_arrowclick'), 'issuesdiv');">
   Tracked Issues
@@ -530,290 +602,540 @@
   <div id="samples_arrowclick" class="toggleLeft"></div>
 </div>
 <div id="samplesdiv" style="display:none;">
-  <h1>${fn:length(project.samples)} Samples</h1>
-  <ul class="sddm">
-    <li>
-      <a onmouseover="mopen('samplemenu')" onmouseout="mclosetime()">Options
-        <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
-      </a>
 
-      <div id="samplemenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
-        <a href='<c:url value="/miso/sample/new/${project.id}"/>'>Add Samples</a>
-        <a href="javascript:void(0);" onclick="getBulkSampleInputForm(${project.id});">Get Bulk Sample Input Form</a>
-        <a href="javascript:void(0);" onclick="Project.ui.uploadBulkSampleInputForm(${project.id});">Import Bulk Sample Input Form</a>
-        <c:if test="${not empty project.samples}">
-          <hr>
-          <a href='<c:url value="/miso/importexport/exportsamplesheet"/>'>Export Sample QC Sheet</a>
-          <a href='<c:url value="/miso/importexport/importsamplesheet"/>'>Import Sample QC Sheet</a>
-          <hr>
-          <a href="javascript:void(0);" onclick="generateSampleDeliveryForm(${project.id});">Get Information Form</a>
-          <a href="javascript:void(0);" onclick="Project.ui.uploadSampleDeliveryForm(${project.id});">Import Information Form</a>
-          <hr>
-          <a href="javascript:void(0);" onclick="Project.ui.receiveSamples('#sample_table');">Receive Samples</a>
-          <a href='javascript:void(0);' onclick='bulkSampleQcTable();'>QC Samples</a>
-          <a href='<c:url value="/miso/library/new/${project.samples[0].id}#tab-2"/>'>Add Libraries</a>
-          <a href='<c:url value="/miso/importexport/importlibrarypoolsheet"/>'>Import Library Sheet</a>
-          <a href="javascript:void(0);" onclick="Project.barcode.selectSampleBarcodesToPrint('#sample_table');">Print Barcodes ...</a>
+  <div id="sampletabs">
+    <ul>
+      <li><a href="#samtab-1"><span>All</span></a></li>
+      <c:if test="${not empty project.overviews}">
+        <li><a href="#samtab-2"><span>By Group</span></a></li>
+      </c:if>
+    </ul>
+
+    <div id="samtab-1">
+      <h1>${fn:length(project.samples)} Samples</h1>
+      <ul class="sddm">
+        <li>
+          <a onmouseover="mopen('samplemenu')" onmouseout="mclosetime()">Options
+            <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
+          </a>
+
+          <div id="samplemenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
+            <a href='<c:url value="/miso/sample/new/${project.id}"/>'>Add Samples</a>
+            <a href="javascript:void(0);" onclick="getBulkSampleInputForm(${project.id});">Get Bulk Sample Input Form</a>
+            <a href="javascript:void(0);" onclick="Project.ui.uploadBulkSampleInputForm();">Import Bulk Sample Input Form</a>
+            <c:if test="${not empty project.samples}">
+              <hr>
+              <a href='<c:url value="/miso/importexport/exportsamplesheet"/>'>Export Sample QC Sheet</a>
+              <a href='<c:url value="/miso/importexport/importsamplesheet"/>'>Import Sample QC Sheet</a>
+              <hr>
+              <a href="javascript:void(0);" onclick="generateSampleDeliveryForm('#sample_table', ${project.id});">Get Information Form</a>
+              <a href="javascript:void(0);" onclick="Project.ui.uploadSampleDeliveryForm();">Import Information Form</a>
+              <hr>
+              <a href="javascript:void(0);" onclick="Project.ui.receiveSamples('#sample_table');">Receive Samples</a>
+              <a href="javascript:void(0);" onclick="bulkSampleQcTable('#sample_table');">QC Samples</a>
+              <a href='<c:url value="/miso/library/new/${project.samples[0].id}#tab-2"/>'>Add Libraries</a>
+              <a href='<c:url value="/miso/importexport/importlibrarypoolsheet"/>'>Import Library Sheet</a>
+              <a href="javascript:void(0);" onclick="Project.barcode.selectSampleBarcodesToPrint('#sample_table');">Print Barcodes ...</a>
+            </c:if>
+          </div>
+        </li>
+      </ul>
+
+      <span style="clear:both">
+        <div id="deliveryformdiv" class="simplebox" style="display:none;">
+          <table class="in">
+            <tr>
+              <td>
+                <form method='post'
+                      id='deliveryform_upload_form'
+                      action='<c:url value="/miso/upload/project/sample-delivery-form"/>'
+                      enctype="multipart/form-data"
+                      target="deliveryform_target_upload"
+                      onsubmit="Utils.fileUpload.fileUploadProgress('deliveryform_upload_form', 'deliveryform_statusdiv', Project.ui.deliveryFormUploadSuccess);">
+                  <input type="hidden" name="projectId" value="${project.id}"/>
+                  <input type="file" name="file"/>
+                  <button type="submit" class="br-button ui-state-default ui-corner-all">Upload</button>
+                  <button type="button" class="br-button ui-state-default ui-corner-all" onclick="Project.ui.cancelSampleDeliveryFormUpload();">
+                    Cancel
+                  </button>
+                </form>
+                <iframe id='deliveryform_target_upload' name='deliveryform_target_upload' src='' style='display: none'></iframe>
+                <div id="deliveryform_statusdiv"></div>
+              </td>
+            </tr>
+          </table>
+        </div>
+
+        <div id="inputformdiv" class="simplebox" style="display:none;">
+          <table class="in">
+            <tr>
+              <td>
+                <form method='post'
+                      id='inputform_upload_form'
+                      action='<c:url value="/miso/upload/project/bulk-input-form"/>'
+                      enctype="multipart/form-data"
+                      target="inputform_target_upload"
+                      onsubmit="Utils.fileUpload.fileUploadProgress('inputform_upload_form', 'inputform_statusdiv', Project.ui.bulkSampleInputFormUploadSuccess);">
+                  <input type="hidden" name="projectId" value="${project.id}"/>
+                  <input type="file" name="file"/>
+                  <button type="submit" class="br-button ui-state-default ui-corner-all">Upload</button>
+                  <button type="button" class="br-button ui-state-default ui-corner-all" onclick="Project.ui.cancelBulkSampleInputFormUpload();">
+                    Cancel
+                  </button>
+                </form>
+                <iframe id='inputform_target_upload' name='inputform_target_upload' src='' style='display: none'></iframe>
+                <div id="inputform_statusdiv"></div>
+              </td>
+            </tr>
+          </table>
+        </div>
+
+        <div id="plateformdiv" class="simplebox" style="display:none;">
+          <table class="in">
+            <tr>
+              <td>
+                <form method='post'
+                      id='plateform_upload_form'
+                      action='<c:url value="/miso/upload/project/plate-form"/>'
+                      enctype="multipart/form-data"
+                      target="plateform_target_upload"
+                      onsubmit="Utils.fileUpload.fileUploadProgress('plateform_upload_form', 'plateform_statusdiv', Project.ui.plateInputFormUploadSuccess);">
+                  <input type="hidden" name="projectId" value="${project.id}"/>
+                  <input type="file" name="file"/>
+                  <button type="submit" class="br-button ui-state-default ui-corner-all">Upload</button>
+                  <button type="button" class="br-button ui-state-default ui-corner-all" onclick="Project.ui.cancelPlateInputFormUpload();">
+                    Cancel
+                  </button>
+                </form>
+                <iframe id='plateform_target_upload' name='plateform_target_upload' style='display: none'></iframe>
+                <div id="plateform_statusdiv"></div>
+                <div id="plateform_import"></div>
+              </td>
+            </tr>
+          </table>
+        </div>
+
+        <table class="list" id="sample_table">
+          <thead>
+          <tr>
+            <th>Sample Name</th>
+            <th>Sample Alias</th>
+            <th>Sample Description</th>
+            <th>Type</th>
+            <th>Received Date</th>
+            <th>QC Passed</th>
+            <th>QC Result</th>
+            <th class="fit">Edit</th>
+            <sec:authorize access="hasRole('ROLE_ADMIN')">
+              <th class="fit">DELETE</th>
+            </sec:authorize>
+          </tr>
+          </thead>
+          <tbody>
+          <c:forEach items="${project.samples}" var="sample">
+            <tr sampleId="${sample.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
+              <td><b>${sample.name}</b></td>
+              <td>${sample.alias}</td>
+              <td>${sample.description}</td>
+              <td>${sample.sampleType}</td>
+              <td>${sample.receivedDate}</td>
+              <td>${sample.qcPassed}</td>
+              <td>${sample.id}</td>
+              <td class="misoicon" onclick="window.location.href='<c:url value="/miso/sample/${sample.id}"/>'">
+                <span class="ui-icon ui-icon-pencil"/>
+              </td>
+              <sec:authorize access="hasRole('ROLE_ADMIN')">
+                <td class="misoicon" onclick="Sample.deleteSample(${sample.id}, Utils.page.pageReload);">
+                  <span class="ui-icon ui-icon-trash"/>
+                </td>
+              </sec:authorize>
+            </tr>
+          </c:forEach>
+          </tbody>
+        </table>
+        <script type="text/javascript">
+          jQuery(document).ready(function () {
+            jQuery('#sample_table').dataTable({
+              "aaSorting": [
+                [1, 'asc']
+              ],
+              "aoColumns": [
+                null,
+                { "sType": 'natural' },
+                { "sType": 'natural' },
+                null,
+                null,
+                null,
+                null,
+                null
+                <sec:authorize access="hasRole('ROLE_ADMIN')">, null</sec:authorize>
+              ],
+              "iDisplayLength": 50,
+              "bJQueryUI": true,
+              "bRetrieve": true,
+
+              "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                Fluxion.doAjax(
+                  'sampleControllerHelperService',
+                  'getSampleLastQCRequest',
+                  {
+                    'sampleId': aData[6],
+                    'url': ajaxurl
+                  },
+                  {'doOnSuccess': function (json) {
+                    jQuery('td:eq(6)', nRow).html(json.response);
+                  }
+                  }
+                );
+              }
+            });
+          });
+        </script>
+      </span>
+    </div>
+
+    <div id="samtab-2">
+      <c:forEach items="${project.overviews}" var="overview" varStatus="ov">
+        <c:if test="${not empty overview.sampleGroup}">
+          <div id="overviewsamdiv${overview.overviewId}" class="ui-corner-all simplebox">
+            <h1>Group ${overview.sampleGroup.id} Samples</h1>
+            <ul class="sddm">
+              <li>
+                <a onmouseover="mopen('samplegroupmenu${overview.sampleGroup.id}')" onmouseout="mclosetime()">Options
+                  <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
+                </a>
+
+                <div id="samplegroupmenu${overview.sampleGroup.id}" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
+                  <c:if test="${not empty overview.sampleGroup.entities}">
+                    <hr>
+                    <a href='<c:url value="/miso/importexport/exportsamplesheet"/>'>Export Sample QC Sheet</a>
+                    <a href='<c:url value="/miso/importexport/importsamplesheet"/>'>Import Sample QC Sheet</a>
+                    <hr>
+                    <a href="javascript:void(0);" onclick="generateSampleDeliveryForm('#overview_samplegroup_table_'+${overview.id}, ${project.id});">Get Information Form</a>
+                    <a href="javascript:void(0);" onclick="Project.ui.uploadSampleDeliveryForm();">Import Information Form</a>
+                    <hr>
+                    <a href="javascript:void(0);" onclick="Project.ui.receiveSamples('#overview_samplegroup_table_'+${overview.id});">Receive Samples</a>
+                    <a href="javascript:void(0);" onclick="bulkSampleQcTable('#overview_samplegroup_table_'+${overview.id});">QC Samples</a>
+                    <%-- <a href='<c:url value="/miso/library/new/${overview.sampleGroup.entities.id}#tab-2"/>'>Add Libraries</a> --%>
+                    <a href='<c:url value="/miso/importexport/importlibrarypoolsheet"/>'>Import Library Sheet</a>
+                    <a href="javascript:void(0);" onclick="Project.barcode.selectSampleBarcodesToPrint('#overview_samplegroup_table_'+${overview.id});">Print Barcodes ...</a>
+                  </c:if>
+                </div>
+              </li>
+            </ul>
+
+            <span style="clear:both">
+              <table class="list" id="overview_samplegroup_table_${overview.id}">
+                <thead>
+                <tr>
+                  <th>Sample Name</th>
+                  <th>Sample Alias</th>
+                  <th>Sample Description</th>
+                  <th>Type</th>
+                  <th>Received Date</th>
+                  <th>QC Passed</th>
+                  <th>QC Result</th>
+                  <th class="fit">Edit</th>
+                  <sec:authorize access="hasRole('ROLE_ADMIN')">
+                    <th class="fit">DELETE</th>
+                  </sec:authorize>
+                </tr>
+                </thead>
+                <tbody>
+                <c:forEach items="${overview.sampleGroup.entities}" var="sample">
+                  <tr sampleId="${sample.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
+                    <td><b>${sample.name}</b></td>
+                    <td>${sample.alias}</td>
+                    <td>${sample.description}</td>
+                    <td>${sample.sampleType}</td>
+                    <td>${sample.receivedDate}</td>
+                    <td>${sample.qcPassed}</td>
+                    <td>${sample.id}</td>
+                    <td class="misoicon" onclick="window.location.href='<c:url value="/miso/sample/${sample.id}"/>'">
+                      <span class="ui-icon ui-icon-pencil"/>
+                    </td>
+                    <sec:authorize access="hasRole('ROLE_ADMIN')">
+                      <td class="misoicon" onclick="Sample.deleteSample(${sample.id}, Utils.page.pageReload);">
+                        <span class="ui-icon ui-icon-trash"/>
+                      </td>
+                    </sec:authorize>
+                  </tr>
+                </c:forEach>
+                </tbody>
+              </table>
+              <script type="text/javascript">
+                jQuery(document).ready(function () {
+                  jQuery('#overview_samplegroup_table_'+${overview.id}).dataTable({
+                    "aaSorting": [
+                      [1, 'asc']
+                    ],
+                    "aoColumns": [
+                      null,
+                      { "sType": 'natural' },
+                      { "sType": 'natural' },
+                      null,
+                      null,
+                      null,
+                      null,
+                      null
+                      <sec:authorize access="hasRole('ROLE_ADMIN')">, null</sec:authorize>
+                    ],
+                    "iDisplayLength": 50,
+                    "bJQueryUI": true,
+                    "bRetrieve": true,
+
+                    "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                      Fluxion.doAjax(
+                        'sampleControllerHelperService',
+                        'getSampleLastQCRequest',
+                        {
+                          'sampleId': aData[6],
+                          'url': ajaxurl
+                        },
+                        {'doOnSuccess': function (json) {
+                          jQuery('td:eq(6)', nRow).html(json.response);
+                        }
+                        }
+                      );
+                    }
+                  });
+                });
+              </script>
+            </span>
+          </div>
         </c:if>
-      </div>
-    </li>
-  </ul>
-
-  <span style="clear:both">
-    <div id="deliveryformdiv" class="simplebox" style="display:none;">
-      <table class="in">
-        <tr>
-          <td>
-            <form method='post'
-                  id='deliveryform_upload_form'
-                  action='<c:url value="/miso/upload/project/sample-delivery-form"/>'
-                  enctype="multipart/form-data"
-                  target="deliveryform_target_upload"
-                  onsubmit="Utils.fileUpload.fileUploadProgress('deliveryform_upload_form', 'deliveryform_statusdiv', Project.ui.deliveryFormUploadSuccess);">
-              <input type="hidden" name="projectId" value="${project.id}"/>
-              <input type="file" name="file"/>
-              <button type="submit" class="br-button ui-state-default ui-corner-all">Upload</button>
-              <button type="button" class="br-button ui-state-default ui-corner-all" onclick="Project.ui.cancelSampleDeliveryFormUpload();">
-                Cancel
-              </button>
-            </form>
-            <iframe id='deliveryform_target_upload' name='deliveryform_target_upload' src='' style='display: none'></iframe>
-            <div id="deliveryform_statusdiv"></div>
-          </td>
-        </tr>
-      </table>
-    </div>
-
-    <div id="inputformdiv" class="simplebox" style="display:none;">
-      <table class="in">
-        <tr>
-          <td>
-            <form method='post'
-                  id='inputform_upload_form'
-                  action='<c:url value="/miso/upload/project/bulk-input-form"/>'
-                  enctype="multipart/form-data"
-                  target="inputform_target_upload"
-                  onsubmit="Utils.fileUpload.fileUploadProgress('inputform_upload_form', 'inputform_statusdiv', Project.ui.bulkSampleInputFormUploadSuccess);">
-              <input type="hidden" name="projectId" value="${project.id}"/>
-              <input type="file" name="file"/>
-              <button type="submit" class="br-button ui-state-default ui-corner-all">Upload</button>
-              <button type="button" class="br-button ui-state-default ui-corner-all" onclick="Project.ui.cancelBulkSampleInputFormUpload();">
-                Cancel
-              </button>
-            </form>
-            <iframe id='inputform_target_upload' name='inputform_target_upload' src='' style='display: none'></iframe>
-            <div id="inputform_statusdiv"></div>
-          </td>
-        </tr>
-      </table>
-    </div>
-
-    <div id="plateformdiv" class="simplebox" style="display:none;">
-      <table class="in">
-        <tr>
-          <td>
-            <form method='post'
-                  id='plateform_upload_form'
-                  action='<c:url value="/miso/upload/project/plate-form"/>'
-                  enctype="multipart/form-data"
-                  target="plateform_target_upload"
-                  onsubmit="Utils.fileUpload.fileUploadProgress('plateform_upload_form', 'plateform_statusdiv', Project.ui.plateInputFormUploadSuccess);">
-              <input type="hidden" name="projectId" value="${project.id}"/>
-              <input type="file" name="file"/>
-              <button type="submit" class="br-button ui-state-default ui-corner-all">Upload</button>
-              <button type="button" class="br-button ui-state-default ui-corner-all" onclick="Project.ui.cancelPlateInputFormUpload();">
-                Cancel
-              </button>
-            </form>
-            <iframe id='plateform_target_upload' name='plateform_target_upload' style='display: none'></iframe>
-            <div id="plateform_statusdiv"></div>
-            <div id="plateform_import"></div>
-          </td>
-        </tr>
-      </table>
-    </div>
-
-    <table class="list" id="sample_table">
-      <thead>
-      <tr>
-        <th>Sample Name</th>
-        <th>Sample Alias</th>
-        <th>Sample Description</th>
-        <th>Type</th>
-        <th>Received Date</th>
-        <th>QC Passed</th>
-        <th>QC Result</th>
-        <th class="fit">Edit</th>
-        <sec:authorize access="hasRole('ROLE_ADMIN')">
-          <th class="fit">DELETE</th>
-        </sec:authorize>
-      </tr>
-      </thead>
-      <tbody>
-      <c:forEach items="${project.samples}" var="sample">
-        <tr sampleId="${sample.id}" onMouseOver="this.className='highlightrow'"
-            onMouseOut="this.className='normalrow'">
-          <td><b>${sample.name}</b></td>
-          <td>${sample.alias}</td>
-          <td>${sample.description}</td>
-          <td>${sample.sampleType}</td>
-          <td>${sample.receivedDate}</td>
-          <td>${sample.qcPassed}</td>
-          <td>${sample.id}</td>
-          <td class="misoicon" onclick="window.location.href='<c:url value="/miso/sample/${sample.id}"/>'">
-            <span class="ui-icon ui-icon-pencil"/>
-          </td>
-          <sec:authorize access="hasRole('ROLE_ADMIN')">
-            <td class="misoicon" onclick="Sample.deleteSample(${sample.id}, Utils.page.pageReload);">
-              <span class="ui-icon ui-icon-trash"/>
-            </td>
-          </sec:authorize>
-        </tr>
       </c:forEach>
-      </tbody>
-    </table>
-    <script type="text/javascript">
-      jQuery(document).ready(function () {
-        jQuery('#sample_table').dataTable({
-          "aaSorting": [
-            [1, 'asc']
-          ],
-          "aoColumns": [
-            null,
-            { "sType": 'natural' },
-            { "sType": 'natural' },
-            null,
-            null,
-            null,
-            null,
-            null
-            <sec:authorize access="hasRole('ROLE_ADMIN')">, null</sec:authorize>
-          ],
-          "iDisplayLength": 50,
-          "bJQueryUI": true,
-          "bRetrieve": true,
-
-          "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-            Fluxion.doAjax(
-              'sampleControllerHelperService',
-              'getSampleLastQCRequest',
-              {
-                'sampleId': aData[6],
-                'url': ajaxurl
-              },
-              {'doOnSuccess': function (json) {
-                jQuery('td:eq(6)', nRow).html(json.response);
-              }
-              }
-            );
-          }
-        });
-      });
-    </script>
-  </span>
+    </div>
+  </div>
+  <script type="text/javascript">
+    jQuery(document).ready(function () {
+      jQuery("#sampletabs").tabs();
+    });
+  </script>
 </div>
 
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#libraries_arrowclick'), 'librariesdiv');">
   ${fn:length(projectLibraries)} Libraries
   <div id="libraries_arrowclick" class="toggleLeft"></div>
 </div>
+
 <div id="librariesdiv" style="display:none;">
-  <a name="library"></a>
+  <div id="librarytabs">
+    <ul>
+      <li><a href="#libtab-1"><span>All</span></a></li>
+      <c:if test="${not empty project.overviews}">
+        <li><a href="#libtab-2"><span>By Group</span></a></li>
+      </c:if>
+    </ul>
 
-  <h1>${fn:length(projectLibraries)} Libraries</h1>
-  <ul class="sddm">
-    <li>
-      <a onmouseover="mopen('librarymenu')" onmouseout="mclosetime()">Options
-        <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
-      </a>
+    <div id="libtab-1">
+      <a name="library"></a>
 
-      <div id="librarymenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
-        <c:if test="${not empty project.samples}">
-          <a href='<c:url value="/miso/library/new/${project.samples[0].id}#tab-2"/>'>Add Libraries</a>
+      <h1>${fn:length(projectLibraries)} Libraries</h1>
+      <ul class="sddm">
+        <li>
+          <a onmouseover="mopen('librarymenu')" onmouseout="mclosetime()">Options
+            <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
+          </a>
+
+          <div id="librarymenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
+            <c:if test="${not empty project.samples}">
+              <a href='<c:url value="/miso/library/new/${project.samples[0].id}#tab-2"/>'>Add Libraries</a>
+            </c:if>
+
+            <c:if test="${not empty projectLibraries}">
+              <a href="javascript:void(0);" onclick="bulkLibraryQcTable('#library_table');" class="add">QC these Libraries</a>
+              <a href="javascript:void(0);" onclick="bulkLibraryDilutionTable('#library_table');" class="add">Add Library Dilutions</a>
+              <a href="javascript:void(0);" onclick="Project.barcode.selectLibraryBarcodesToPrint('#library_table');">Print Barcodes ...</a>
+            </c:if>
+          </div>
+        </li>
+      </ul>
+
+      <span style="clear:both">
+        <table class="list" id="library_table">
+          <thead>
+          <tr>
+            <th>Library Name</th>
+            <th>Library Alias</th>
+            <th>Library Description</th>
+            <th>Library Type</th>
+            <th>Library Platform</th>
+            <th>Tag Barcodes</th>
+            <th>Insert Size</th>
+            <th>QC Passed</th>
+            <th class="fit">Edit</th>
+            <sec:authorize access="hasRole('ROLE_ADMIN')">
+              <th class="fit">DELETE</th>
+            </sec:authorize>
+          </tr>
+          </thead>
+          <tbody>
+          <c:forEach items="${projectLibraries}" var="library">
+            <tr libraryId="${library.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
+              <td><b>${library.name}</b></td>
+              <td>${library.alias}</td>
+              <td>${library.description}</td>
+              <td>${library.libraryType.description}</td>
+              <td>${library.platformName}</td>
+              <td><c:if test="${not empty library.tagBarcodes}">
+                <c:forEach items="${library.tagBarcodes}" varStatus="status" var="barcodemap">
+                  ${status.count}: ${barcodemap.value.name} (${barcodemap.value.sequence})
+                  <c:if test="${status.count lt fn:length(library.tagBarcodes)}">
+                    <br/>
+                  </c:if>
+                </c:forEach>
+              </c:if></td>
+              <td><c:forEach var="qc" items="${library.libraryQCs}" end="0">${qc.insertSize}</c:forEach></td>
+              <td>${library.qcPassed}</td>
+              <td class="misoicon" onclick="window.location.href='<c:url value="/miso/library/${library.id}"/>'">
+                <span class="ui-icon ui-icon-pencil"/>
+              </td>
+              <sec:authorize access="hasRole('ROLE_ADMIN')">
+                <td class="misoicon" onclick="Library.deleteLibrary(${library.id}, Utils.page.pageReload);">
+                  <span class="ui-icon ui-icon-trash"/>
+                </td>
+              </sec:authorize>
+            </tr>
+          </c:forEach>
+          </tbody>
+        </table>
+        <script type="text/javascript">
+          jQuery(document).ready(function () {
+            jQuery('#library_table').dataTable({
+              "aaSorting": [
+                [1, 'asc']
+              ],
+              "aoColumns": [
+                null,
+                { "sType": 'natural' },
+                { "sType": 'natural' },
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+                <sec:authorize access="hasRole('ROLE_ADMIN')">, null</sec:authorize>
+              ],
+              "iDisplayLength": 50,
+              "bJQueryUI": true,
+              "bRetrieve": true
+            });
+          });
+        </script>
+      </span>
+    </div>
+    <div id="libtab-2">
+      <c:forEach items="${project.overviews}" var="overview" varStatus="ov">
+        <c:if test="${not empty overview.sampleGroup}">
+        <div id="overviewlibdiv${overview.overviewId}" class="ui-corner-all simplebox">
+          <h1>Group ${overview.sampleGroup.id} Libraries</h1>
+          <ul class="sddm">
+            <li>
+              <a onmouseover="mopen('librarygroupmenu${overview.sampleGroup.id}')" onmouseout="mclosetime()">Options
+                <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
+              </a>
+
+              <div id="librarygroupmenu${overview.sampleGroup.id}" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
+                <c:if test="${not empty project.samples}">
+                  <a href='<c:url value="/miso/library/new/${project.samples[0].id}#tab-2"/>'>Add Libraries</a>
+                </c:if>
+
+                <c:if test="${not empty projectLibraries}">
+                  <a href="javascript:void(0);" onclick="bulkLibraryQcTable('#overview_librarygroup_table_${overview.id}');" class="add">QC these Libraries</a>
+                  <a href="javascript:void(0);" onclick="bulkLibraryDilutionTable('#overview_librarygroup_table_${overview.id}');" class="add">Add Library Dilutions</a>
+                  <a href="javascript:void(0);" onclick="Project.barcode.selectLibraryBarcodesToPrint('#overview_librarygroup_table_${overview.id}');">Print Barcodes ...</a>
+                </c:if>
+              </div>
+            </li>
+          </ul>
+
+          <span style="clear:both">
+            <c:if test="${not empty libraryGroupMap[overview.id]}">
+            <table class="list" id="overview_librarygroup_table_${overview.id}">
+              <thead>
+              <tr>
+                <th>Library Name</th>
+                <th>Library Alias</th>
+                <th>Library Description</th>
+                <th>Library Type</th>
+                <th>Library Platform</th>
+                <th>Tag Barcodes</th>
+                <th>Insert Size</th>
+                <th>QC Passed</th>
+                <th class="fit">Edit</th>
+                <sec:authorize access="hasRole('ROLE_ADMIN')">
+                  <th class="fit">DELETE</th>
+                </sec:authorize>
+              </tr>
+              </thead>
+              <tbody>
+              <c:forEach items="${libraryGroupMap[overview.id]}" var="grouplib" varStatus="lg">
+                <tr libraryId="${grouplib.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
+                  <td><b>${grouplib.name}</b></td>
+                  <td>${grouplib.alias}</td>
+                  <td>${grouplib.description}</td>
+                  <td>${grouplib.libraryType.description}</td>
+                  <td>${grouplib.platformName}</td>
+                  <td><c:if test="${not empty grouplib.tagBarcodes}">
+                    <c:forEach items="${grouplib.tagBarcodes}" varStatus="status" var="barcodemap">
+                      ${status.count}: ${barcodemap.value.name} (${barcodemap.value.sequence})
+                      <c:if test="${status.count lt fn:length(grouplib.tagBarcodes)}">
+                        <br/>
+                      </c:if>
+                    </c:forEach>
+                  </c:if></td>
+                  <td><c:forEach var="qc" items="${grouplib.libraryQCs}" end="0">${qc.insertSize}</c:forEach></td>
+                  <td>${grouplib.qcPassed}</td>
+                  <td class="misoicon" onclick="window.location.href='<c:url value="/miso/library/${grouplib.id}"/>'">
+                    <span class="ui-icon ui-icon-pencil"/>
+                  </td>
+                  <sec:authorize access="hasRole('ROLE_ADMIN')">
+                    <td class="misoicon" onclick="Library.deleteLibrary(${grouplib.id}, Utils.page.pageReload);">
+                      <span class="ui-icon ui-icon-trash"/>
+                    </td>
+                  </sec:authorize>
+                </tr>
+              </c:forEach>
+              </tbody>
+            </table>
+            <script type="text/javascript">
+              jQuery(document).ready(function () {
+                jQuery('#overview_librarygroup_table_'+${overview.id}).dataTable({
+                  "aaSorting": [
+                    [1, 'asc']
+                  ],
+                  "aoColumns": [
+                    null,
+                    { "sType": 'natural' },
+                    { "sType": 'natural' },
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                    <sec:authorize access="hasRole('ROLE_ADMIN')">, null</sec:authorize>
+                  ],
+                  "iDisplayLength": 50,
+                  "bJQueryUI": true,
+                  "bRetrieve": true
+                });
+              });
+            </script>
+            </c:if>
+          </span>
+        </div>
         </c:if>
-
-        <c:if test="${not empty projectLibraries}">
-          <a href='javascript:void(0);' onclick='bulkLibraryQcTable();' class="add">QC these Libraries</a>
-          <a href='javascript:void(0);' onclick='bulkLibraryDilutionTable();' class="add">Add Library Dilutions</a>
-          <a href="javascript:void(0);" onclick="Project.barcode.selectLibraryBarcodesToPrint('#library_table');">Print Barcodes ...</a>
-        </c:if>
-      </div>
-    </li>
-  </ul>
-
-  <span style="clear:both">
-    <table class="list" id="library_table">
-      <thead>
-      <tr>
-        <th>Library Name</th>
-        <th>Library Alias</th>
-        <th>Library Description</th>
-        <th>Library Type</th>
-        <th>Library Platform</th>
-        <th>Tag Barcodes</th>
-        <th>Insert Size</th>
-        <th>QC Passed</th>
-        <th class="fit">Edit</th>
-        <sec:authorize access="hasRole('ROLE_ADMIN')">
-          <th class="fit">DELETE</th>
-        </sec:authorize>
-      </tr>
-      </thead>
-      <tbody>
-      <c:forEach items="${projectLibraries}" var="library">
-        <tr libraryId="${library.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-          <td><b>${library.name}</b></td>
-          <td>${library.alias}</td>
-          <td>${library.description}</td>
-          <td>${library.libraryType.description}</td>
-          <td>${library.platformName}</td>
-          <td><c:if test="${not empty library.tagBarcodes}">
-            <c:forEach items="${library.tagBarcodes}" varStatus="status" var="barcodemap">
-              ${status.count}: ${barcodemap.value.name} (${barcodemap.value.sequence})
-              <c:if test="${status.count lt fn:length(library.tagBarcodes)}">
-                <br/>
-              </c:if>
-            </c:forEach>
-          </c:if></td>
-          <td><c:forEach var="qc" items="${library.libraryQCs}" end="0">${qc.insertSize}</c:forEach></td>
-          <td>${library.qcPassed}</td>
-          <td class="misoicon" onclick="window.location.href='<c:url value="/miso/library/${library.id}"/>'">
-            <span class="ui-icon ui-icon-pencil"/>
-          </td>
-          <sec:authorize access="hasRole('ROLE_ADMIN')">
-            <td class="misoicon" onclick="Library.deleteLibrary(${library.id}, Utils.page.pageReload);">
-              <span class="ui-icon ui-icon-trash"/>
-            </td>
-          </sec:authorize>
-        </tr>
       </c:forEach>
-      </tbody>
-    </table>
+    </div>
     <script type="text/javascript">
       jQuery(document).ready(function () {
-        jQuery('#library_table').dataTable({
-          "aaSorting": [
-            [1, 'asc']
-          ],
-          "aoColumns": [
-            null,
-            { "sType": 'natural' },
-            { "sType": 'natural' },
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-            <sec:authorize access="hasRole('ROLE_ADMIN')">, null</sec:authorize>
-          ],
-          "iDisplayLength": 50,
-          "bJQueryUI": true,
-          "bRetrieve": true
-        });
+        jQuery("#librarytabs").tabs();
       });
     </script>
-  </span>
+  </div>
 </div>
 
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#librarydils_arrowclick'), 'librarydilsdiv');">
@@ -1064,8 +1386,7 @@
             null,
             null,
             null
-            <sec:authorize access="hasRole('ROLE_ADMIN')">,
-            null</sec:authorize>
+            <sec:authorize access="hasRole('ROLE_ADMIN')">, null</sec:authorize>
           ],
           "iDisplayLength": 50,
           "bJQueryUI": true,
@@ -1340,1118 +1661,38 @@ jQuery(document).ready(function () {
   </c:if>
 });
 
+</script>
+
 <c:if test="${not empty project.samples}">
-function bulkSampleQcTable() {
-  if (!jQuery('#sample_table').hasClass("display")) {
-    //destroy current table and recreate
-    jQuery('#sample_table').dataTable().fnDestroy();
-    //bug fix to reset table width
-    jQuery('#sample_table').removeAttr("style");
-
-    jQuery('#sample_table').addClass("display");
-
-    //remove edit and delete header and column
-    jQuery('#sample_table tr:first th:gt(5)').remove();
-    jQuery('#sample_table tr:first th:eq(4)').remove();
-
-    var headers = ['rowsel',
-                   'name',
-                   'alias',
-                   'description',
-                   'sampleType',
-                   'qcPassed',
-                   'qcDate',
-                   'qcType',
-                   'results'];
-
-    jQuery('#sample_table').find("tr").each(function () {
-      //remove rows where the sample QC has already passed
-      if (jQuery(this).find("td:eq(5)").html() == "true") {
-        jQuery(this).remove();
-      }
-      else {
-        jQuery(this).removeAttr("onmouseover").removeAttr("onmouseout");
-        jQuery(this).find("td:eq(4)").remove();
-        jQuery(this).find("td:gt(4)").remove();
-        jQuery(this).find("td:eq(4)").addClass("passedCheck");
-      }
-    });
-
-    //headers
-    jQuery("#sample_table tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"#sample_table\", this);'></span></th>");
-    jQuery('#sample_table tr:first th:eq(5)').html("QC Passed <span header='qcPassed' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\"#sample_table\", this);'></span>");
-    jQuery("#sample_table tr:first").append("<th>QC Date <span header='qcDate' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\"#sample_table\", this);'></span></th>");
-    jQuery("#sample_table tr:first").append("<th>QC Method <span header='qcType' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\"#sample_table\", this);'></span></th>");
-    jQuery("#sample_table tr:first").append("<th>Results</th>");
-
-    //columns
-    jQuery("#sample_table tr:gt(0)").prepend("<td class='rowSelect'></td>");
-    jQuery("#sample_table tr:gt(0)").append("<td class='dateSelect'></td>");
-    jQuery("#sample_table tr:gt(0)").append("<td class='typeSelect'></td>");
-    jQuery("#sample_table tr:gt(0)").append("<td class='defaultEditable'></td>");
-
-    var datatable = jQuery('#sample_table').dataTable({
-      "aoColumnDefs": [
-        {
-          "bUseRendered": false,
-          "aTargets": [ 0 ]
-        }
-      ],
-      "aoColumns": [
-        {"bSortable": false},
-        { "sType": 'natural' },
-        { "sType": 'natural' },
-        { "sType": 'natural' },
-        null,
-        {"bSortable": false},
-        {"bSortable": false},
-        {"bSortable": false},
-        {"bSortable": false}
-      ],
-      "bPaginate": false,
-      "bInfo": false,
-      "bJQueryUI": true,
-      "bAutoWidth": true,
-      "bSort": true,
-      "bFilter": false,
-      "sDom": '<<"toolbar">f>r<t>ip>'
-    });
-
-    jQuery('#sample_table').find("tr:gt(0)").each(function () {
-      for (var i = 0; i < this.cells.length; i++) {
-        jQuery(this.cells[i]).attr("name", headers[i]);
-      }
-    });
-
-    jQuery('#sample_table .rowSelect').click(function () {
-      if (jQuery(this).parent().hasClass('row_selected'))
-        jQuery(this).parent().removeClass('row_selected');
-      else if (!jQuery(this).parent().hasClass('row_saved'))
-        jQuery(this).parent().addClass('row_selected');
-    });
-
-    //jQuery("div.toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
-    jQuery("div.toolbar").html("<button id=\"bulkSampleQcButton\" onclick=\"Project.ui.saveBulkSampleQc();\" class=\"fg-button ui-state-default ui-corner-all\">Save QCs</button>");
-    jQuery("div.toolbar").append("<button onclick=\"Utils.page.pageReload();\" class=\"fg-button ui-state-default ui-corner-all\">Cancel</button>");
-    jQuery("div.toolbar").removeClass("toolbar");
-
-    jQuery('#sample_table .defaultEditable').editable(
-      function (value, settings) {
-        return value;
-      },
-      {
-        callback: function (sValue, y) {
-          var aPos = datatable.fnGetPosition(this);
-          datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-        },
-        submitdata: function (value, settings) {
-          return {
-            "row_id": this.parentNode.getAttribute('id'),
-            "column": datatable.fnGetPosition(this)[2]
-          };
-        },
-        onblur: 'submit',
-        placeholder: '',
-        height: '14px'
-      }
-    );
-
-    jQuery(".typeSelect").editable(
-      function (value, settings) {
-        return value;
-      },
-      {
-        data: '{${sampleQcTypesString}}',
-        type: 'select',
-        onblur: 'submit',
-        placeholder: '',
-        style: 'inherit',
-        callback: function (sValue, y) {
-          var aPos = datatable.fnGetPosition(this);
-          datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-        },
-        submitdata: function (value, settings) {
-          return {
-            "row_id": this.parentNode.getAttribute('id'),
-            "column": datatable.fnGetPosition(this)[2]
-          };
-        }
-      }
-    );
-
-    jQuery(".dateSelect").editable(
-      function (value, settings) {
-        return value;
-      },
-      {
-        type: 'datepicker',
-        width: '100px',
-        onblur: 'submit',
-        placeholder: '',
-        style: 'inherit',
-        datepicker: {
-          dateFormat: 'dd/mm/yy',
-          showButtonPanel: true,
-          maxDate: 0
-        },
-        callback: function (sValue, y) {
-          var aPos = datatable.fnGetPosition(this);
-          datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-        },
-        submitdata: function (value, settings) {
-          return {
-            "row_id": this.parentNode.getAttribute('id'),
-            "column": datatable.fnGetPosition(this)[2]
-          };
-        }
-      }
-    );
-
-    jQuery(".passedCheck").editable(
-      function (value, settings) {
-        return value;
-      },
-      {
-        //type : 'checkbox',
-        type: 'qcradio',
-        onblur: 'submit',
-        placeholder: '',
-        style: 'inherit',
-        callback: function (sValue, y) {
-          var aPos = datatable.fnGetPosition(this);
-          datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-        },
-        submitdata: function (value, settings) {
-          return {
-            "row_id": this.parentNode.getAttribute('id'),
-            "column": datatable.fnGetPosition(this)[2]
-          };
-        }
-      }
-    );
-  }
-}
-
-function generateSampleDeliveryForm(projectId) {
-  if (!jQuery('#sample_table').hasClass("display")) {
-    //destroy current table and recreate
-    jQuery('#sample_table').dataTable().fnDestroy();
-    //bug fix to reset table width
-    jQuery('#sample_table').removeAttr("style");
-
-    jQuery('#sample_table').addClass("display");
-
-    //remove edit header and column
-    jQuery('#sample_table tr:first th:gt(4)').remove();
-
-    var headers = ['rowsel',
-                   'name',
-                   'alias',
-                   'description',
-                   'sampleType',
-                   'qcPassed'];
-
-    jQuery('#sample_table').find("tr").each(function () {
-      jQuery(this).removeAttr("onmouseover").removeAttr("onmouseout");
-      jQuery(this).find("td:gt(4)").remove();
-    });
-
-    //headers
-    jQuery("#sample_table tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"#sample_table\", this);'></span></th>");
-    jQuery("#sample_table tr:gt(0)").prepend("<td class='rowSelect'></td>");
-
-    jQuery('#sample_table').dataTable({
-      "aoColumnDefs": [
-        {
-          "bUseRendered": false,
-          "aTargets": [ 0 ]
-        }
-      ],
-      "aoColumns": [
-        {"bSortable": false},
-        { "sType": 'natural' },
-        { "sType": 'natural' },
-        { "sType": 'natural' },
-        null,
-        { "sType": 'natural' }
-      ],
-      "bPaginate": false,
-      "bInfo": false,
-      "bJQueryUI": true,
-      "bAutoWidth": true,
-      "bFilter": false,
-      "sDom": '<<"toolbar">f>r<t>ip>'
-    });
-
-    jQuery('#sample_table').find("tr:gt(0)").each(function () {
-      for (var i = 0; i < this.cells.length; i++) {
-        jQuery(this.cells[i]).attr("name", headers[i]);
-      }
-    });
-
-    jQuery('#sample_table .rowSelect').click(function () {
-      if (jQuery(this).parent().hasClass('row_selected'))
-        jQuery(this).parent().removeClass('row_selected');
-      else if (!jQuery(this).parent().hasClass('row_saved'))
-        jQuery(this).parent().addClass('row_selected');
-    });
-
-    jQuery("div.toolbar").html("<button onclick=\"Project.ui.processSampleDeliveryForm(${project.id});\" class=\"fg-button ui-state-default ui-corner-all\">Generate Form</button>");
-  }
-}
-
-function getBulkSampleInputForm(projectId) {
-  jQuery('#getBulkSampleInputFormDialog')
-    .html("<form>" +
-          "<fieldset class='dialog'>" +
-          "<p>Select desired document format</p><br/>" +
-          "<label for='formTypeOds'>OpenOffice (ODS)</label>" +
-          "<input type='radio' name='formType' id='formTypeOds' class='text ui-widget-content ui-corner-all' value='ods'/>" +
-          "<label for='formTypeXlsx'>Excel (XLSX)</label>" +
-          "<input type='radio' name='formType' id='formTypeXls' class='text ui-widget-content ui-corner-all' value='xlsx'/>" +
-          "</fieldset></form>");
-
-  jQuery(function () {
-    jQuery('#getBulkSampleInputFormDialog').dialog({
-      autoOpen: false,
-      width: 400,
-      modal: true,
-      resizable: false,
-      buttons: {
-        "Get Form": function () {
-          Project.ui.downloadBulkSampleInputForm(projectId, jQuery('input[name=formType]:checked').val());
-          jQuery(this).dialog('close');
-        },
-        "Cancel": function () {
-          jQuery(this).dialog('close');
-        }
-      }
-    });
-  });
-  jQuery('#getBulkSampleInputFormDialog').dialog('open');
-}
-
-function getPlateInputForm(projectId) {
-  jQuery('#getPlateInputFormDialog')
-    .html("<form>" +
-          "<fieldset class='dialog'>" +
-          "<p>Select desired document format</p><br/>" +
-          "<label for='formTypeOds'>OpenOffice (ODS)</label>" +
-          "<input type='radio' name='formType' id='formTypeOds' class='text ui-widget-content ui-corner-all' value='ods'/>" +
-          "<label for='formTypeXlsx'>Excel (XLSX)</label>" +
-          "<input type='radio' name='formType' id='formTypeXls' class='text ui-widget-content ui-corner-all' value='xlsx'/>" +
-          "</fieldset></form>");
-
-  jQuery(function () {
-    jQuery('#getPlateInputFormDialog').dialog({
-      autoOpen: false,
-      width: 400,
-      modal: true,
-      resizable: false,
-      buttons: {
-        "Get Form": function () {
-          Project.ui.downloadPlateInputForm(projectId, jQuery('input[name=formType]:checked').val());
-          jQuery(this).dialog('close');
-        },
-        "Cancel": function () {
-          jQuery(this).dialog('close');
-        }
-      }
-    });
-  });
-  jQuery('#getPlateInputFormDialog').dialog('open');
-}
-
+    <script type="text/javascript">
+        var projectId_sample = ${project.id};
+        var sampleQcTypesString = {${sampleQcTypesString}};
+    </script>
+    <script src="<c:url value='/scripts/editProject_sample.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
 </c:if>
 
 <c:if test="${not empty projectLibraries}">
-function bulkLibraryQcTable() {
-  if (!jQuery('#library_table').hasClass("display")) {
-    //destroy current table and recreate
-    jQuery('#library_table').dataTable().fnDestroy();
-    //bug fix to reset table width
-    jQuery('#library_table').removeAttr("style");
-
-    jQuery('#library_table').addClass("display");
-
-    //remove edit header and column
-    jQuery('#library_table tr:first th:gt(7)').remove();
-    jQuery('#library_table tr:first th:eq(5)').remove();
-
-    var libraryheaders = ['rowsel',
-                          'name',
-                          'alias',
-                          'description',
-                          'libraryType',
-                          'platform',
-      //'tagBarcode',
-                          'insertSize',
-                          'qcPassed',
-                          'qcDate',
-                          'qcType',
-                          'results'];
-
-    jQuery('#library_table').find("tr").each(function () {
-      if (jQuery(this).find("td:eq(7)").html() == "true") {
-        jQuery(this).remove();
-      }
-      else {
-        jQuery(this).removeAttr("onmouseover").removeAttr("onmouseout");
-        jQuery(this).find("td:gt(7)").remove();
-        jQuery(this).find("td:eq(5)").remove();
-        jQuery(this).find("td:eq(7)").addClass("passedCheck");
-      }
-    });
-
-    //headers
-    jQuery("#library_table tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"#library_table\", this);'></span></th>");
-    jQuery('#library_table tr:first th:eq(7)').html("QC Passed <span header='qcPassed' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\"#library_table\", this);'></span>");
-    jQuery("#library_table tr:first").append("<th>QC Date <span header='qcDate' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\"#library_table\", this);'></span></th>");
-    jQuery("#library_table tr:first").append("<th>QC Method <span header='qcType' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\"#library_table\", this);'></span></th>");
-    <%--jQuery("#library_table tr:first").append("<th>Insert Size</th>");--%>
-    jQuery("#library_table tr:first").append("<th>Concentration</th>");
-
-    //columns
-    jQuery("#library_table tr:gt(0)").prepend("<td class='rowSelect'></td>");
-    jQuery("#library_table tr:gt(0)").find("td:eq(6)").addClass("defaultEditable");
-    jQuery("#library_table tr:gt(0)").find("td:eq(7)").addClass("passedCheck");
-    jQuery("#library_table tr:gt(0)").append("<td class='dateSelect'></td>");
-    jQuery("#library_table tr:gt(0)").append("<td class='typeSelect'></td>");
-    jQuery("#library_table tr:gt(0)").append("<td class='defaultEditable'></td>");
-
-    var datatable = jQuery('#library_table').dataTable({
-      "aoColumnDefs": [
-        {
-          "bUseRendered": false,
-          "aTargets": [ 0 ]
-        }
-      ],
-      "aoColumns": [
-        {"bSortable": false},
-        { "sType": 'natural' },
-        { "sType": 'natural' },
-        { "sType": 'natural' },
-        null,
-        null,
-        null,
-        {"bSortable": false},
-        {"bSortable": false},
-        {"bSortable": false},
-        {"bSortable": false}
-      ],
-      "bPaginate": false,
-      "bInfo": false,
-      "bJQueryUI": true,
-      "bAutoWidth": true,
-      "bSort": true,
-      "bFilter": true,
-      "sDom": '<<"toolbar">f>r<t>ip>'
-    });
-
-    jQuery('#library_table').find("tr:gt(0)").each(function () {
-      for (var i = 0; i < this.cells.length; i++) {
-        jQuery(this.cells[i]).attr("name", libraryheaders[i]);
-      }
-    });
-
-    jQuery('#library_table .rowSelect').click(function () {
-      if (jQuery(this).parent().hasClass('row_selected'))
-        jQuery(this).parent().removeClass('row_selected');
-      else if (!jQuery(this).parent().hasClass('row_saved'))
-        jQuery(this).parent().addClass('row_selected');
-    });
-
-    //jQuery("div.toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
-    jQuery("div.toolbar").html("<button id=\"bulkLibraryQcButton\" onclick=\"Sample.qc.saveBulkLibraryQc();\" class=\"fg-button ui-state-default ui-corner-all\">Save QCs</button>");
-    jQuery("div.toolbar").append("<button onclick=\"Utils.page.pageReload();\" class=\"fg-button ui-state-default ui-corner-all\">Cancel</button>");
-    jQuery("div.toolbar").removeClass("toolbar");
-
-    jQuery('#library_table .defaultEditable') .editable(function (value, settings) {
-      return value;
-    },
-    {
-      callback: function (sValue, y) {
-        var aPos = datatable.fnGetPosition(this);
-        datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-      },
-      submitdata: function (value, settings) {
-        return {
-          "row_id": this.parentNode.getAttribute('id'),
-          "column": datatable.fnGetPosition(this)[2]
-        };
-      },
-      onblur: 'submit',
-      placeholder: '',
-      height: '14px'
-    });
-
-    jQuery("#library_table .typeSelect") .editable(function (value, settings) {
-      return value;
-    },
-    {
-      data: '{${libraryQcTypesString}}',
-      type: 'select',
-      onblur: 'submit',
-      placeholder: '',
-      style: 'inherit',
-      callback: function (sValue, y) {
-        var aPos = datatable.fnGetPosition(this);
-        datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-      },
-      submitdata: function (value, settings) {
-        return {
-          "row_id": this.parentNode.getAttribute('id'),
-          "column": datatable.fnGetPosition(this)[2]
-        };
-      }
-    });
-
-    jQuery("#library_table .dateSelect").editable(function (value, settings) {
-      return value;
-    },
-    {
-      type: 'datepicker',
-      width: '100px',
-      onblur: 'submit',
-      placeholder: '',
-      style: 'inherit',
-      datepicker: {
-        dateFormat: 'dd/mm/yy',
-        showButtonPanel: true,
-        maxDate: 0
-      },
-      callback: function (sValue, y) {
-        var aPos = datatable.fnGetPosition(this);
-        datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-      },
-      submitdata: function (value, settings) {
-        return {
-          "row_id": this.parentNode.getAttribute('id'),
-          "column": datatable.fnGetPosition(this)[2]
-        };
-      }
-    });
-
-    jQuery("#library_table .passedCheck") .editable(function (value, settings) {
-      return value;
-    },
-    {
-      type: 'qcradio',
-      onblur: 'submit',
-      placeholder: '',
-      style: 'inherit',
-      callback: function (sValue, y) {
-        var aPos = datatable.fnGetPosition(this);
-        datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-      },
-      submitdata: function (value, settings) {
-        return {
-          "row_id": this.parentNode.getAttribute('id'),
-          "column": datatable.fnGetPosition(this)[2]
-        };
-      }
-    });
-  }
-}
-
-function bulkLibraryDilutionTable() {
-  if (!jQuery('#library_table').hasClass("display")) {
-    //destroy current table and recreate
-    jQuery('#library_table').dataTable().fnDestroy();
-    //bug fix to reset table width
-    jQuery('#library_table').removeAttr("style");
-
-    jQuery('#library_table').addClass("display");
-
-    //remove edit header and column
-    jQuery('#library_table tr:first th:gt(7)').remove();
-    jQuery('#library_table tr:first th:eq(5)').remove();
-
-    var dilutionheaders = ['rowsel',
-                           'name',
-                           'alias',
-                           'description',
-                           'libraryType',
-                           'platform',
-                           'insertSize',
-                           'qcPassed',
-                           'dilutionDate',
-                           'results'];
-
-    jQuery('#library_table').find("tr").each(function () {
-      if (jQuery(this).find("td:eq(7)").html() == "false") {
-        jQuery(this).remove();
-      }
-      else {
-        jQuery(this).removeAttr("onmouseover").removeAttr("onmouseout");
-        jQuery(this).find("td:gt(7)").remove();
-        jQuery(this).find("td:eq(5)").remove();
-      }
-    });
-
-    //headers
-    jQuery("#library_table tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"#library_table\", this);'></span></th>");
-    jQuery("#library_table tr:first").append("<th>Dilution Date <span header='dilutionDate' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\"#library_table\", this);'></span></th>");
-    jQuery("#library_table tr:first").append("<th>Concentration <span header='qcType' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\"#library_table\", this);'></span></th>");
-
-    //columns
-    jQuery("#library_table tr:gt(0)").prepend("<td class='rowSelect'></td>");
-    jQuery("#library_table tr:gt(0)").append("<td class='dateSelect'></td>");
-    jQuery("#library_table tr:gt(0)").append("<td class='defaultEditable'></td>");
-
-    var datatable = jQuery('#library_table').dataTable({
-      "aoColumnDefs": [
-        {
-          "bUseRendered": false,
-          "aTargets": [ 0 ]
-        }
-      ],
-      "aoColumns": [
-        {"bSortable": false},
-        { "sType": 'natural' },
-        { "sType": 'natural' },
-        { "sType": 'natural' },
-        null,
-        {"bSortable": false},
-        {"bSortable": false},
-        {"bSortable": false},
-        {"bSortable": false},
-        {"bSortable": false}
-      ],
-      "bPaginate": false,
-      "bInfo": false,
-      "bJQueryUI": true,
-      "bAutoWidth": true,
-      "bSort": true,
-      "bFilter": false,
-      "sDom": '<<"toolbar">f>r<t>ip>'
-    });
-
-    jQuery('#library_table').find("tr:gt(0)").each(function () {
-      for (var i = 0; i < this.cells.length; i++) {
-        jQuery(this.cells[i]).attr("name", dilutionheaders[i]);
-      }
-    });
-
-    jQuery('#library_table .rowSelect').click(function () {
-      if (jQuery(this).parent().hasClass('row_selected'))
-        jQuery(this).parent().removeClass('row_selected');
-      else if (!jQuery(this).parent().hasClass('row_saved'))
-        jQuery(this).parent().addClass('row_selected');
-    });
-
-    jQuery("div.toolbar").html("<button id=\"bulkLibraryDilutionButton\" onclick=\"Sample.library.saveBulkLibraryDilutions();\" class=\"fg-button ui-state-default ui-corner-all\">Save Dilutions</button>");
-    jQuery("div.toolbar").append("<button onclick=\"Utils.page.pageReload();\" class=\"fg-button ui-state-default ui-corner-all\">Cancel</button>");
-    jQuery("div.toolbar").removeClass("toolbar");
-
-    jQuery('#library_table .defaultEditable').editable(function (value, settings) {
-      return value;
-    },
-    {
-      callback: function (sValue, y) {
-        var aPos = datatable.fnGetPosition(this);
-        datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-      },
-      submitdata: function (value, settings) {
-        return {
-          "row_id": this.parentNode.getAttribute('id'),
-          "column": datatable.fnGetPosition(this)[2]
-        };
-      },
-      onblur: 'submit',
-      placeholder: '',
-      height: '14px'
-    });
-
-    jQuery("#library_table .dateSelect").editable(function (value, settings) {
-      return value;
-    },
-    {
-      type: 'datepicker',
-      width: '100px',
-      onblur: 'submit',
-      placeholder: '',
-      style: 'inherit',
-      datepicker: {
-        dateFormat: 'dd/mm/yy',
-        showButtonPanel: true,
-        maxDate: 0
-      },
-      callback: function (sValue, y) {
-        var aPos = datatable.fnGetPosition(this);
-        datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-      },
-      submitdata: function (value, settings) {
-        return {
-          "row_id": this.parentNode.getAttribute('id'),
-          "column": datatable.fnGetPosition(this)[2]
-        };
-      }
-    });
-  }
-}
+    <script type="text/javascript">
+        var libraryQcTypesString = {${libraryQcTypesString}};
+    </script>
+    <script src="<c:url value='/scripts/editProject_library.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
 </c:if>
 
 <c:if test="${existsAnyEmPcrLibrary and not empty projectLibraryDilutions}">
-function bulkEmPcrTable() {
-  if (!jQuery('#librarydils_table').hasClass("display")) {
-    //destroy current table and recreate
-    jQuery('#librarydils_table').dataTable().fnDestroy();
-    //bug fix to reset table width
-    jQuery('#librarydils_table').removeAttr("style");
-
-    jQuery('#librarydils_table').addClass("display");
-    //remove edit header and column
-    jQuery('#librarydils_table tr:first th:gt(4)').remove();
-
-    var dilutionheaders = ['rowsel',
-                           'dilName',
-                           'dilCreator',
-                           'dilDate',
-                           'libPlatform',
-                           'dilConc',
-                           'pcrDate',
-                           'results'];
-
-    jQuery('#librarydils_table').find("tr").each(function () {
-      jQuery(this).removeAttr("onmouseover").removeAttr("onmouseout");
-      jQuery(this).find("td:gt(4)").remove();
-    });
-
-    //headers
-    jQuery("#librarydils_table tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"#librarydils_table\", this);'></span></th>");
-    jQuery("#librarydils_table tr:first").append("<th>PCR Date <span header='pcrDate' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\"#librarydils_table\", this);'></span></th>");
-    jQuery("#librarydils_table tr:first").append("<th>Concentration</th>");
-
-    //columns
-    jQuery("#librarydils_table tr:gt(0)").prepend("<td class='rowSelect'></td>");
-    jQuery("#librarydils_table tr:gt(0)").append("<td class='dateSelect'></td>");
-    jQuery("#librarydils_table tr:gt(0)").append("<td class='defaultEditable'></td>");
-
-    var datatable = jQuery('#librarydils_table').dataTable({
-      "aoColumnDefs": [
-        {
-          "bUseRendered": false,
-          "aTargets": [ 0 ]
-        }
-      ],
-      "aoColumns": [
-        {"bSortable": false},
-        { "sType": 'natural' },
-        null,
-        null,
-        null,
-        null,
-        {"bSortable": false},
-        {"bSortable": false}
-      ],
-      "bPaginate": false,
-      "bInfo": false,
-      "bJQueryUI": true,
-      "bAutoWidth": true,
-      "bSort": true,
-      "bFilter": false,
-      "sDom": '<<"toolbar">f>r<t>ip>'
-    });
-
-    jQuery('#librarydils_table').find("tr:gt(0)").each(function () {
-      for (var i = 0; i < this.cells.length; i++) {
-        jQuery(this.cells[i]).attr("name", dilutionheaders[i]);
-      }
-
-      var platform = jQuery(this.cells[4]).text();
-      if (platform === "Illumina") {
-        datatable.fnDeleteRow(this);
-      }
-    });
-
-    jQuery('#librarydils_table .rowSelect').click(function () {
-      if (jQuery(this).parent().hasClass('row_selected'))
-        jQuery(this).parent().removeClass('row_selected');
-      else if (!jQuery(this).parent().hasClass('row_saved'))
-        jQuery(this).parent().addClass('row_selected');
-    });
-
-    jQuery("div.toolbar").html("<button id=\"bulkEmPcrButton\" onclick=\"Project.ui.saveBulkEmPcrs();\" class=\"fg-button ui-state-default ui-corner-all\">Save EmPCRs</button>");
-    jQuery("div.toolbar").append("<button onclick=\"Utils.page.pageReload();\" class=\"fg-button ui-state-default ui-corner-all\">Cancel</button>");
-    jQuery("div.toolbar").removeClass("toolbar");
-
-    jQuery('#librarydils_table .defaultEditable').editable(function (value, settings) {
-      return value;
-    },
-    {
-      callback: function (sValue, y) {
-        var aPos = datatable.fnGetPosition(this);
-        datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-      },
-      submitdata: function (value, settings) {
-        return {
-          "row_id": this.parentNode.getAttribute('id'),
-          "column": datatable.fnGetPosition(this)[2]
-        };
-      },
-      onblur: 'submit',
-      placeholder: '',
-      height: '14px'
-    });
-
-    jQuery("#librarydils_table .dateSelect").editable(function (value, settings) {
-      return value;
-    },
-    {
-      type: 'datepicker',
-      width: '100px',
-      onblur: 'submit',
-      placeholder: '',
-      style: 'inherit',
-      datepicker: {
-        dateFormat: 'dd/mm/yy',
-        showButtonPanel: true,
-        maxDate: 0
-      },
-      callback: function (sValue, y) {
-        var aPos = datatable.fnGetPosition(this);
-        datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-      },
-      submitdata: function (value, settings) {
-        return {
-          "row_id": this.parentNode.getAttribute('id'),
-          "column": datatable.fnGetPosition(this)[2]
-        };
-      }
-    });
-  }
-}
+    <script src="<c:url value='/scripts/editProject_libraryDilution.js?ts=${timestamp.time}'/>"
+            type="text/javascript"></script>
 </c:if>
 
 <c:if test="${not empty projectEmPcrs}">
-function bulkEmPcrDilutionTable() {
-  if (!jQuery('#empcrs_table').hasClass("display")) {
-    //destroy current table and recreate
-    jQuery('#empcrs_table').dataTable().fnDestroy();
-    //bug fix to reset table width
-    jQuery('#empcrs_table').removeAttr("style");
-
-    jQuery('#empcrs_table').addClass("display");
-    //remove edit header and column
-    jQuery('#empcrs_table tr:first th:gt(4)').remove();
-
-    var dilutionheaders = ['rowsel',
-                           'pcrName',
-                           'libDilName',
-                           'pcrCreator',
-                           'pcrDate',
-                           'pcrConc',
-                           'pcrDilutionDate',
-                           'results'];
-
-    jQuery('#empcrs_table').find("tr").each(function () {
-      jQuery(this).removeAttr("onmouseover").removeAttr("onmouseout");
-      jQuery(this).find("td:gt(4)").remove();
-    });
-
-    //headers
-    jQuery("#empcrs_table tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"#empcrs_table\", this);'></span></th>");
-    jQuery("#empcrs_table tr:first").append("<th>Dilution Date <span header='pcrDilutionDate' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\"#empcrs_table\", this);'></span></th>");
-    jQuery("#empcrs_table tr:first").append("<th>Concentration</th>");
-
-    //columns
-    jQuery("#empcrs_table tr:gt(0)").prepend("<td class='rowSelect'></td>");
-    jQuery("#empcrs_table tr:gt(0)").append("<td class='dateSelect'></td>");
-    jQuery("#empcrs_table tr:gt(0)").append("<td class='defaultEditable'></td>");
-
-    var datatable = jQuery('#empcrs_table').dataTable({
-      "aoColumnDefs": [
-        {
-          "bUseRendered": false,
-          "aTargets": [ 0 ]
-        }
-      ],
-      "aoColumns": [
-        {"bSortable": false},
-        { "sType": 'natural' },
-        null,
-        null,
-        null,
-        null,
-        {"bSortable": false},
-        {"bSortable": false}
-      ],
-      "bPaginate": false,
-      "bInfo": false,
-      "bJQueryUI": true,
-      "bAutoWidth": true,
-      "bSort": true,
-      "bFilter": false,
-      "sDom": '<<"toolbar">f>r<t>ip>'
-    });
-
-    jQuery('#empcrs_table').find("tr:gt(0)").each(function () {
-      for (var i = 0; i < this.cells.length; i++) {
-        jQuery(this.cells[i]).attr("name", dilutionheaders[i]);
-      }
-    });
-
-    jQuery('#empcrs_table .rowSelect').click(function () {
-      if (jQuery(this).parent().hasClass('row_selected'))
-        jQuery(this).parent().removeClass('row_selected');
-      else if (!jQuery(this).parent().hasClass('row_saved'))
-        jQuery(this).parent().addClass('row_selected');
-    });
-
-    jQuery("div.toolbar").html("<button id=\"bulkEmPcrDilutionButton\" onclick=\"Project.ui.saveBulkEmPcrDilutions();\" class=\"fg-button ui-state-default ui-corner-all\">Save Dilutions</button>");
-    jQuery("div.toolbar").append("<button onclick=\"Utils.page.pageReload();\" class=\"fg-button ui-state-default ui-corner-all\">Cancel</button>");
-    jQuery("div.toolbar").removeClass("toolbar");
-
-    jQuery('#empcrs_table .defaultEditable').editable(function (value, settings) {
-      return value;
-    },
-    {
-      callback: function (sValue, y) {
-        var aPos = datatable.fnGetPosition(this);
-        datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-      },
-      submitdata: function (value, settings) {
-        return {
-          "row_id": this.parentNode.getAttribute('id'),
-          "column": datatable.fnGetPosition(this)[2]
-        };
-      },
-      onblur: 'submit',
-      placeholder: '',
-      height: '14px'
-    });
-
-    jQuery("#empcrs_table .dateSelect").editable(function (value, settings) {
-      return value;
-    },
-    {
-      type: 'datepicker',
-      width: '100px',
-      onblur: 'submit',
-      placeholder: '',
-      style: 'inherit',
-      datepicker: {
-        dateFormat: 'dd/mm/yy',
-        showButtonPanel: true,
-        maxDate: 0
-      },
-      callback: function (sValue, y) {
-        var aPos = datatable.fnGetPosition(this);
-        datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-      },
-      submitdata: function (value, settings) {
-        return {
-          "row_id": this.parentNode.getAttribute('id'),
-          "column": datatable.fnGetPosition(this)[2]
-        };
-      }
-    });
-  }
-}
+    <script src="<c:url value='/scripts/editProject_empcr.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
 </c:if>
 
 <c:if test="${project.id != 0}">
-var duration = 500, i = 0, root;
-var r = 960 / 2;
-
-var tree = d3.layout.tree()
-  .size([360, r - 120])
-  .separation(function (a, b) {
-    return (a.parent == b.parent ? 1 : 2) / a.depth;
-  });
-
-var diagonal = d3.svg.diagonal.radial()
-  .projection(function (d) {
-    return [d.y, d.x / 180 * Math.PI];
-  });
-
-var vis = d3.select("#chart").append("svg:svg")
-  .attr("width", r * 2)
-  .attr("height", r * 2 - 150)
-  .append("svg:g")
-  .attr("transform", "translate(" + r + "," + r + ")");
-
-d3.json("/miso/d3graph/project/" + ${project.id}, function (json) {
-  json.x0 = 800;
-  json.y0 = 0;
-  update(root = json);
-});
-
-function update(source) {
-  // Compute the new tree layout.
-  var nodes = tree.nodes(root);
-
-  // Update the links…
-  var link = vis.selectAll("path.link")
-    .data(tree.links(nodes), function (d) {
-      return d.target.id;
-    });
-
-  // Enter any new links at the parent's previous position.
-  link.enter().append("svg:path")
-    .attr("class", "link")
-    .attr("d", diagonal)
-    .transition()
-    .duration(duration)
-    .attr("d", diagonal);
-
-  // Transition links to their new position.
-  link.transition()
-    .duration(duration)
-    .attr("d", diagonal);
-
-  // Transition exiting nodes to the parent's new position.
-  link.exit().transition()
-    .duration(duration)
-    .attr("d", diagonal)
-    .remove();
-
-  var node = vis.selectAll("circle.node").data(nodes);
-
-  // Enter any new nodes at the parent's previous position.
-  node.enter().append("svg:circle")
-    .attr("dx", function (d) {
-      return source.x0;
-    })
-    .attr("dy", function (d) {
-      return source.y0;
-    })
-    .attr("r", 4)
-    .attr("class", "node")
-    .style("fill", function (d) {
-      return d._children ? "lightsteelblue" : "#fff";
-    })
-    .style("stroke", function (d) {
-      return d.color == 0 ? "red"
-        : d.color == 1 ? "lightgreen"
-        : d.color == 2 ? "gray"
-        : "steelblue";
-    })
-    .style("stroke-width", "1px")
-    .attr("transform", function (d) {
-      return "rotate (" + (source.x0 - 90) + ")translate(" + source.y0 + ")";
-    })
-    .style("stroke", function (d) {
-      return d.color == 0 ? "red"
-        : d.color == 1 ? "lightgreen"
-        : d.color == 2 ? "gray"
-        : "steelblue";
-     })
-    .on("click", click)
-    .append("svg:title")
-    .text(function (d) {
-      return d.description;
-    })
-    .transition()
-    .duration(duration)
-    .attr("dx", function (d) {
-      return d.x;
-    })
-    .attr("dy", function (d) {
-      return d.y;
-    })
-    .attr("transform", function (d) {
-      return "rotate (" + (d.x - 90) + ")translate(" + d.y + ")";
-    });
-
-  // Transition nodes to their new position.
-  node.transition()
-    .duration(duration)
-    .attr("dx", function (d) {
-      return d.x;
-    })
-    .attr("dy", function (d) {
-      return d.y;
-    })
-    .style("fill", function (d) {
-      return d._children ? "lightsteelblue" : "#fff";
-    })
-    .style("stroke", function (d) {
-      return d.color == 0 ? "red"
-        : d.color == 1 ? "lightgreen"
-        : d.color == 2 ? "gray"
-        : "steelblue";
-    })
-    .attr("transform", function (d) {
-      return "rotate (" + (d.x - 90) + ")translate(" + d.y + ")";
-    });
-
-  // Transition exiting nodes to the parent's new position.
-  node.exit().transition()
-    .duration(duration)
-    .attr("dx", function (d) {
-      return source.x;
-    })
-    .attr("dy", function (d) {
-      return source.y;
-    })
-    .remove();
-
-  // Update the texts…
-  var text = vis.selectAll("text")
-    .data(nodes, function (d) {
-      return d.name;
-    });
-
-  text.enter().append("svg:text")
-    .attr("class", "node1")
-    .attr("dx", "8")
-    .attr("dy", ".31em")
-    .attr("transform", function (d) {
-      return "rotate (" + (d.x - 90) + ")translate(" + d.y + ")";
-    })
-    .text(function (d) {
-      return d.name;
-    })
-    .attr("text-anchor", "start")
-    .transition()
-    .duration(duration)
-    .attr("transform", function (d) {
-      return "rotate (" + (d.x - 90) + ")translate(" + d.y + ")";
-    })
-    .attr("dx", "8")
-    .attr("dy", ".31em");
-
-  text.transition()
-    .duration(duration)
-    .attr("class", "node")
-    .attr("dx", "8")
-    .attr("dy", ".31em")
-    .attr("transform", function (d) {
-      return "rotate (" + (d.x - 90) + ")translate(" + d.y + ")";
-    });
-
-  // Transition exiting nodes to the parent's new position.
-  text.exit().transition()
-    .duration(duration)
-    .attr("dx", "8")
-    .attr("dy", "31em")
-    .remove();
-
-  // Stash the old positions for transition.
-  nodes.forEach(function (d) {
-    d.x0 = d.x;
-    d.y0 = d.y;
-  });
-}
-
-// Toggle children on click.
-function click(d) {
-  if (d.children) {
-    d._children = d.children;
-    d.children = null;
-  }
-  else {
-    d.children = d._children;
-    d._children = null;
-  }
-  update(d);
-}
-
-d3.select(self.frameElement).style("height", "1000px");
+    <script type="text/javascript">
+        var projectId_d3graph = ${project.id};
+    </script>
+    <script src="<c:url value='/scripts/editProject_existing.js?ts=${timestamp.time}'/>"
+            type="text/javascript"></script>
 </c:if>
-
-</script>
 
 <%@ include file="../footer.jsp" %>

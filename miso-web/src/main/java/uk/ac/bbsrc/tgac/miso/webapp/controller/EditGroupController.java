@@ -109,13 +109,14 @@ public class EditGroupController {
     return adminSetupForm(groupId, model);
   }
 
-  @RequestMapping(value = "/admin/group", method = RequestMethod.POST)
+  @RequestMapping(value = "/admin/group/new", method = RequestMethod.POST)
   public String adminProcessSubmitNew(@ModelAttribute("group") Group group, ModelMap model, SessionStatus session) throws IOException {
     return adminProcessSubmit(group, model, session);
   }
 
   @RequestMapping(value = "/admin/group/{groupId}", method = RequestMethod.POST)
-  public String adminProcessSubmitExisting(@ModelAttribute("group") Group group, ModelMap model, SessionStatus session) throws IOException {
+  public String adminProcessSubmitExisting(@PathVariable Long groupId, @ModelAttribute("group") Group group, ModelMap model, SessionStatus session) throws IOException {
+    group.setGroupId(groupId);
     return adminProcessSubmit(group, model, session);
   }
 

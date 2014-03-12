@@ -114,11 +114,6 @@ public class ProjectControllerHelperService {
       overview.setPrincipalInvestigator(principalInvestigator);
       overview.setProject(project);
       overview.setLocked(false);
-
-      if (project.getSamples().size() > 0) {
-        overview.setSamples(project.getSamples());
-      }
-
       project.getOverviews().add(overview);
       requestManager.saveProjectOverview(overview);
       requestManager.saveProject(project);
@@ -919,5 +914,99 @@ public class ProjectControllerHelperService {
       e.printStackTrace();
     }
     return JSONUtils.SimpleJSONError("Unable to list watchers");
+  }
+
+  public JSONObject listSamplesByProject(HttpSession session, JSONObject json) {
+    Long projectId = json.getLong("projectId");
+
+    try {
+      JSONObject j = new JSONObject();
+      JSONArray jsonArray = new JSONArray();
+      for (Sample sample : requestManager.listAllSamplesByProjectId(projectId)) {
+        jsonArray.add("{'id':'" + sample.getId() + "'," +
+                      "'name':'" + sample.getName() + "'," +
+                      "'alias':'"+sample.getAlias() + "'," +
+                      "'type':'"+sample.getSampleType() + "'," +
+                      "'description':'"+sample.getDescription() + "'}");
+      }
+      j.put("array", jsonArray);
+      return j;
+    }
+    catch (IOException e) {
+      log.debug("Failed", e);
+      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
+    }
+  }
+
+  public JSONObject addSampleGroup(HttpSession session, JSONObject json) {
+    Long overviewId = json.getLong("overviewId");
+    try {
+      ProjectOverview overview = requestManager.getProjectOverviewById(overviewId);
+
+      Set<Sample> samples = new HashSet<>();
+      if (json.has("samples")) {
+        JSONArray a = JSONArray.fromObject(json.get("samples"));
+        for (JSONObject j : (Iterable<JSONObject>) a) {
+          if (j.has("sampleId")) {
+            samples.add(requestManager.getSampleById(j.getLong("sampleId")));
+          }
+          else {
+            return JSONUtils.SimpleJSONError("Unable to add Sample Group: invalid sample set JSON has missing sampleId");
+          }
+        }
+      }
+
+      EntityGroup<ProjectOverview, Sample> osg = new EntityGroupImpl<>();
+      osg.setEntities(samples);
+      osg.setParent(overview);
+      overview.setSampleGroup(osg);
+
+      requestManager.saveProjectOverview(overview);
+      requestManager.saveProject(overview.getProject());
+
+      return JSONUtils.SimpleJSONResponse("OK");
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+      return JSONUtils.SimpleJSONError("Unable to add Sample Group: " + e.getMessage());
+    }
+  }
+
+  public JSONObject addSamplesToGroup(HttpSession session, JSONObject json) {
+    Long overviewId = json.getLong("overviewId");
+    Long groupId = json.getLong("groupId");
+    try {
+      ProjectOverview overview = requestManager.getProjectOverviewById(overviewId);
+      EntityGroup<ProjectOverview, Sample> osg = overview.getSampleGroup();
+
+      if (osg != null && groupId != null && osg.getId() == groupId.longValue()) {
+        if (json.has("samples")) {
+          JSONArray a = JSONArray.fromObject(json.get("samples"));
+          for (JSONObject j : (Iterable<JSONObject>) a) {
+            if (j.has("sampleId")) {
+              Sample s = requestManager.getSampleById(j.getLong("sampleId"));
+              if (osg.getEntities().contains(s)) {
+                log.error("Sample group already contains " + s.getName());
+              }
+              else {
+                osg.addEntity(s);
+              }
+            }
+            else {
+              return JSONUtils.SimpleJSONError("Unable to add Sample Group: invalid sample set JSON has missing sampleId");
+            }
+          }
+        }
+      }
+
+      requestManager.saveProjectOverview(overview);
+      requestManager.saveProject(overview.getProject());
+
+      return JSONUtils.SimpleJSONResponse("OK");
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+      return JSONUtils.SimpleJSONError("Unable to add Sample Group: " + e.getMessage());
+    }
   }
 }

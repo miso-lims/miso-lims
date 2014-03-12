@@ -46,7 +46,7 @@ public interface LibraryQcStore extends Store<LibraryQC>, Remover<LibraryQC> {
    * @return LibraryQC
    * @throws IOException when
    */
-  LibraryQC lazyGet(long qcId) throws IOException;
+  //LibraryQC lazyGet(long qcId) throws IOException;
 
   /**
    * List all LibraryQCs performed on a Library given a parent Library ID

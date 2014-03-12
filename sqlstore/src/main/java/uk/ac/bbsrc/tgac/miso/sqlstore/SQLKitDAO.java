@@ -170,6 +170,11 @@ public class SQLKitDAO implements KitStore {
     return eResults.size() > 0 ? (Kit) eResults.get(0) : null;
   }
 
+  @Override
+  public Kit lazyGet(long id) throws IOException {
+    return get(id);
+  }
+
   public Kit getKitByIdentificationBarcode(String barcode) throws IOException {
     List eResults = template.query(KIT_SELECT_BY_BARCODE, new Object[]{barcode}, new KitMapper());
     return eResults.size() > 0 ? (Kit) eResults.get(0) : null;

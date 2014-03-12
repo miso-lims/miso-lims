@@ -31,9 +31,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolderStrategy;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.*;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaPool;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ls454.LS454Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.solid.SolidPool;
 import uk.ac.bbsrc.tgac.miso.core.data.type.*;
 import uk.ac.bbsrc.tgac.miso.core.event.Alert;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
@@ -319,6 +316,12 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
+  public long saveEntityGroup(EntityGroup<? extends Nameable, ? extends Nameable> entityGroup) throws IOException {
+    return super.saveEntityGroup(entityGroup);
+  }
+
+//gets
+  @Override
   public SequencerPoolPartition getSequencerPoolPartitionById(long partitionId) throws IOException {
     SequencerPoolPartition o = super.getSequencerPoolPartitionById(partitionId);
     if (readCheck(o)) return o;
@@ -562,6 +565,11 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
     Plate<T, S> p = super.<T, S> getPlateByBarcode(barcode);
     if (readCheck(p)) return p;
     else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Plate " + p.getId());
+  }
+
+  @Override
+  public EntityGroup<? extends Nameable, ? extends Nameable> getEntityGroupById(long entityGroupId) throws IOException {
+    return super.getEntityGroupById(entityGroupId);
   }
 
   /* lists */
@@ -1583,6 +1591,11 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
     if (getCurrentUser().isAdmin()) {
       super.deletePlate(plate);
     }
+  }
+
+  @Override
+  public void deleteEntityGroup(EntityGroup<? extends Nameable, ? extends Nameable> entityGroup) throws IOException {
+    super.deleteEntityGroup(entityGroup);
   }
 
   @Override

@@ -25,11 +25,13 @@ var Container = Container || {
   lookupContainer: function (t) {
     var self = this;
     var barcode = jQuery("input", jQuery(t).parent()).val();
+    var seqRef = jQuery('#sequencerReference :checked').val();
+    var container_cId = jQuery('input[name=container_cId]').val();
     if (!Utils.validation.isNullCheck(barcode)) {
       Fluxion.doAjax(
         'containerControllerHelperService',
         'lookupContainer',
-        {'barcode': barcode, 'url': ajaxurl},
+        {'barcode': barcode, 'sequencerReferenceId':seqRef, 'container_cId':container_cId, 'url': ajaxurl},
         {'doOnSuccess': self.processLookup}
       );
     }

@@ -154,6 +154,11 @@ public class SQLPrintServiceDAO implements PrintServiceStore {
     return e;
   }
 
+  @Override
+  public MisoPrintService lazyGet(long id) throws IOException {
+    return get(id);
+  }
+
   public MisoPrintService getByName(String serviceName) throws IOException {
     List eResults = template.query(PRINT_SERVICE_SELECT_BY_SERVICE_NAME, new Object[]{serviceName}, new MisoPrintServiceMapper());
     MisoPrintService e = eResults.size() > 0 ? (MisoPrintService) eResults.get(0) : null;

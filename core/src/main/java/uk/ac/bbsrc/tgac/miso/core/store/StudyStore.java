@@ -46,7 +46,7 @@ public interface StudyStore extends Store<Study>, Cascadable, Remover<Study>, Na
    * @return Study
    * @throws IOException when
    */
-  Study lazyGet(long studyId) throws IOException;
+  //Study lazyGet(long studyId) throws IOException;
 
   /**
    * List all Studies that match a search criteria

@@ -15,7 +15,7 @@ import java.util.Map;
 public enum DefaultMisoEntityPrefix {
    EMP("emPCR"),
    EDI("emPCRDilution"),
-   EPO("emPCRPool"),
+   EPO("Pool"),
    EXP("Experiment"),
    LIB("Library"),
    LDI("LibraryDilution"),
@@ -26,11 +26,11 @@ public enum DefaultMisoEntityPrefix {
    SAM("Sample"),
    SPC("SequencerPartitionContainer"),
    STU("Study"),
-   IPO("IlluminaPool"),
-   SPO("SolidPool"),
-   LPO("LS454Pool"),
-   PPO("PacBioPool"),
-   TPO("TorrentPool"),
+   IPO("Pool"),
+//   SPO("SolidPool"),
+//   LPO("LS454Pool"),
+//   PPO("PacBioPool"),
+//   TPO("TorrentPool"),
    SUB("Submission");
 
   /**

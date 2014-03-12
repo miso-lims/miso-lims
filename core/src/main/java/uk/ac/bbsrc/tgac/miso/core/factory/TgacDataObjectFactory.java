@@ -160,46 +160,56 @@ public class TgacDataObjectFactory extends DataObjectFactory {
   }
 
   @Override
+  @Deprecated
   public IlluminaPool getIlluminaPool() {
     return new IlluminaPool();
   }
-  
+
+  @Deprecated
   public IlluminaPool getIlluminaPool(User user) {
     return new IlluminaPool(user);
   }
 
   @Override
+  @Deprecated
   public LS454Pool getLS454Pool() {
     return new LS454Pool();
   }
 
+  @Deprecated
   public LS454Pool getLS454Pool(User user) {
     return new LS454Pool(user);
   }
 
   @Override
+  @Deprecated
   public SolidPool getSolidPool() {
     return new SolidPool();
   }
 
+  @Deprecated
   public SolidPool getSolidPool(User user) {
     return new SolidPool(user);
   }
 
   @Override
+  @Deprecated
   public PacBioPool getPacBioPool() {
     return new PacBioPool();
   }
 
+  @Deprecated
   public PacBioPool getPacBioPool(User user) {
     return new PacBioPool(user);
   }
 
   @Override
+  @Deprecated
   public emPCRPool getEmPCRPool(PlatformType platformType) {
     return new emPCRPool(platformType);
   }
 
+  @Deprecated
   public emPCRPool getEmPCRPool(PlatformType platformType, User user) {
     return new emPCRPool(user, platformType);
   }
@@ -375,8 +385,12 @@ public class TgacDataObjectFactory extends DataObjectFactory {
     }
   }
   
-  public Pool getPoolOfType(PlatformType platformtype, User user) throws IllegalArgumentException {
+  public Pool<? extends Poolable> getPoolOfType(PlatformType platformtype, User user) throws IllegalArgumentException {
     if (platformtype != null) {
+      Pool<? extends Poolable> p = getPool(user);
+      p.setPlatformType(platformtype);
+      return p;
+      /*
       if (platformtype.equals(PlatformType.ILLUMINA)) {
         return getIlluminaPool(user);
       }
@@ -392,6 +406,7 @@ public class TgacDataObjectFactory extends DataObjectFactory {
       else {
         throw new IllegalArgumentException("Unrecognised PlatformType");
       }
+      */
     }
     else {
       throw new IllegalArgumentException("Null PlatformType supplied");

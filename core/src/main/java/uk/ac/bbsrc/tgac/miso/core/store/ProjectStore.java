@@ -47,7 +47,7 @@ public interface ProjectStore extends Store<Project>, Cascadable, Remover<Projec
    * @return Project
    * @throws IOException when
    */
-  Project lazyGet(long projectId) throws IOException;
+  //Project lazyGet(long projectId) throws IOException;
 
   /**
    * Get a parent Project related to a Study given a Study ID

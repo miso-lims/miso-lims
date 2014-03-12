@@ -69,6 +69,7 @@
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution" value-ref="emPCRDilutionStore"/>
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution" value-ref="libraryDilutionStore"/>
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.Experiment" value-ref="experimentStore"/>
+        <entry key="uk.ac.bbsrc.tgac.miso.core.data.EntityGroup" value-ref="entityGroupStore"/>
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.Kit" value-ref="kitStore"/>
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.Library" value-ref="libraryStore"/>
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.LibraryQC" value-ref="libraryQcStore"/>
@@ -81,6 +82,7 @@
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.PrintJob" value-ref="printJobStore"/>
         <entry key="uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService" value-ref="printServiceStore"/>
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.Project" value-ref="projectStore"/>
+        <entry key="uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview" value-ref="projectStore"/>
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.Run" value-ref="runStore"/>
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.RunQC" value-ref="runQcStore"/>
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.Sample" value-ref="sampleStore"/>
@@ -101,6 +103,7 @@
     <property name="securityManager" ref="securityManager"/>
     <property name="studyDAO" ref="sqlStudyDAO"/>
     <property name="sampleDAO" ref="sqlSampleDAO"/>
+    <property name="entityGroupDAO" ref="sqlEntityGroupDAO"/>
     <property name="libraryDAO" ref="sqlLibraryDAO"/>
     <property name="runDAO" ref="sqlRunDAO"/>
     <property name="noteDAO" ref="sqlNoteDAO"/>
@@ -150,6 +153,14 @@
     <property name="securityProfileDAO" ref="sqlSecurityProfileDAO"/>
     <property name="libraryDilutionDAO" ref="sqlLibraryDilutionDAO"/>
     <property name="emPCRDilutionDAO" ref="sqlEmPCRDilutionDAO"/>
+    <property name="jdbcTemplate" ref="interfaceTemplate"/>
+  </bean>
+
+  <bean id="sqlEntityGroupDAO"
+        class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLEntityGroupDAO">
+    <property name="cascadeType">
+      <value type="javax.persistence.CascadeType">REMOVE</value>
+    </property>
     <property name="jdbcTemplate" ref="interfaceTemplate"/>
   </bean>
 
@@ -407,6 +418,17 @@
     <property name="interceptorNames">
       <list>
         <value>sqlEmPCRDilutionDAO</value>
+      </list>
+    </property>
+  </bean>
+
+  <bean name="entityGroupStore" class="org.springframework.aop.framework.ProxyFactoryBean">
+    <property name="proxyInterfaces">
+      <value>uk.ac.bbsrc.tgac.miso.core.store.EntityGroupStore</value>
+    </property>
+    <property name="interceptorNames">
+      <list>
+        <value>sqlEntityGroupDAO</value>
       </list>
     </property>
   </bean>

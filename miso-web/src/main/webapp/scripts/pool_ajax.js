@@ -207,60 +207,6 @@ Pool.ui = {
     }
   },
 
-  /** Deprecated */
-  selectLibraryDilutionsByBarcodes : function(codes) {
-    if (codes === "") {
-      alert("Please input at least one barcode...");
-    }
-    else {
-      Fluxion.doAjax(
-        'poolControllerHelperService',
-        'selectLibraryDilutionsByBarcodeList',
-        {
-          'barcodes':codes,
-          'url':ajaxurl
-        },
-        {'updateElement':'dilimportlist'}
-      );
-    }
-  },
-
-  /** Deprecated */
-  select454EmPCRDilutionsByBarcodes : function(codes) {
-    if (codes === "") {
-      alert("Please input at least one barcode...");
-    }
-    else {
-      Fluxion.doAjax(
-        'poolControllerHelperService',
-        'select454EmPCRDilutionsByBarcodeList',
-        {
-          'barcodes':codes,
-          'url':ajaxurl
-        },
-        {'updateElement':'dilimportlist'}
-      );
-    }
-  },
-
-  /** Deprecated */
-  selectSolidEmPCRDilutionsByBarcodes : function(codes) {
-    if (codes === "") {
-      alert("Please input at least one barcode...");
-    }
-    else {
-      Fluxion.doAjax(
-        'poolControllerHelperService',
-        'selectSolidEmPCRDilutionsByBarcodeList',
-        {
-          'barcodes':codes,
-          'url':ajaxurl
-        },
-        {'updateElement':'dilimportlist'}
-      );
-    }
-  },
-
   dilutionFileUploadProgress : function() {
     var self = this;
     Fluxion.doAjaxUpload(
@@ -660,7 +606,7 @@ Pool.barcode = {
         }
       });
 
-      jQuery("div.toolbar").html("<button onclick=\"Pool.barcode.printSelectedPoolBarcodes('" + tableId + "');\" class=\"fg-button ui-state-default ui-corner-all\">Print Selected</button>");
+      jQuery("div.toolbar").html("<button type='button' onclick=\"Pool.barcode.printSelectedPoolBarcodes('" + tableId + "');\" class=\"fg-button ui-state-default ui-corner-all\">Print Selected</button>");
       jQuery("div.toolbar").append("<button onclick=\"Utils.page.pageReload();\" class=\"fg-button ui-state-default ui-corner-all\">Cancel</button>");
       jQuery("div.toolbar").removeClass("toolbar");
     }

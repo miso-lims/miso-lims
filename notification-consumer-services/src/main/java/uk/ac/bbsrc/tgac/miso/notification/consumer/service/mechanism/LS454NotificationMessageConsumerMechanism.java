@@ -177,7 +177,7 @@ public class LS454NotificationMessageConsumerMechanism implements NotificationMe
                     is.setCompletionDate(gsLogDateFormat.parse(run.getString("completionDate")));
                   }
                   catch (ParseException e) {
-                    log.error(e.getMessage());
+                    log.error("Cannot parse "+runName+" completion date: " +e.getMessage());
                     e.printStackTrace();
                   }
                 }
@@ -352,6 +352,9 @@ public class LS454NotificationMessageConsumerMechanism implements NotificationMe
             log.error(e.getMessage());
             e.printStackTrace();
           }
+        }
+        else {
+          log.error("Error consuming run "+runName+". Please check the gsRunProcessor.log file for this run.");
         }
       }
     }

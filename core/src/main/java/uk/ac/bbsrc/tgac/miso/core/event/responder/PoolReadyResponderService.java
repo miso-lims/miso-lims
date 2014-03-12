@@ -36,6 +36,7 @@ import uk.ac.bbsrc.tgac.miso.core.event.impl.DefaultAlert;
 import uk.ac.bbsrc.tgac.miso.core.event.model.PoolEvent;
 import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
 import uk.ac.bbsrc.tgac.miso.core.exception.AlertingException;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -83,12 +84,20 @@ public class PoolReadyResponderService extends AbstractResponderService {
       Pool p = pe.getEventObject();
 
       for (User user : p.getWatchers()) {
-        log.info("Responding to " + user.getLoginName());
-
         Alert a = new DefaultAlert(user);
-        //TODO change to p.getAlias() when added
-        a.setAlertTitle("Pool " + p.getName() + "(" + p.getId() + ")");
-        a.setAlertText("The following Pool is ready to run: "+p.getName()+" ("+event.getEventMessage()+"). Please view Pool " +p.getId() + " in MISO for more information");
+        if (!LimsUtils.isStringEmptyOrNull(p.getAlias())) {
+          a.setAlertTitle("Pool " + p.getAlias() + "(" + p.getName() + ")");
+        }
+        else {
+          a.setAlertTitle("Pool " + p.getName() + "(" + p.getId() + ")");
+        }
+
+        StringBuilder at = new StringBuilder();
+        at.append("The following Pool is ready to run: "+p.getName()+" ("+event.getEventMessage()+"). Please view Pool " +p.getId() + " in MISO for more information");
+        if (event.getEventContext().has("baseURL")) {
+          at.append(":\n\n" + event.getEventContext().getString("baseURL")+"/pool/"+p.getId());
+        }
+        a.setAlertText(at.toString());
 
         for (AlerterService as : alerterServices) {
           try {

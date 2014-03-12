@@ -137,6 +137,23 @@ public class ImportExportControllerHelperService {
     }
   }
 
+  public JSONObject exportLibraryPoolForm(HttpSession session, JSONObject json) {
+    try {
+      String barcodekit = json.getString("barcodekit");
+      JSONArray a = JSONArray.fromObject(json.getString("form"));
+      File f = misoFileManager.getNewFile(
+          Library.class,
+          "forms",
+          "LibraryPoolExportForm-" + LimsUtils.getCurrentDateAsString(new SimpleDateFormat("yyyyMMdd-hhmmss")) + ".xlsx");
+      FormUtils.createLibraryPoolExportFormFromWeb(f, a, barcodekit);
+      return JSONUtils.SimpleJSONResponse("" + f.getName().hashCode());
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+      return JSONUtils.SimpleJSONError("Failed to get plate input form: " + e.getMessage());
+    }
+  }
+
   public JSONObject confirmSamplesUpload(HttpSession session, JSONObject json) throws Exception {
     JSONArray jsonArray = JSONArray.fromObject(json.get("table"));
     // add samples
@@ -215,12 +232,12 @@ public class ImportExportControllerHelperService {
       }
     }
     // create library & pool sheet
-    File file = misoFileManager.getNewFile(
-        Library.class,
-        "forms",
-        "LibraryPoolExportForm-" + LimsUtils.getCurrentDateAsString(new SimpleDateFormat("yyyyMMdd-hhmmss")) + ".xlsx");
-    FormUtils.createLibraryPoolExportForm(file, jsonArray);
-    return JSONUtils.SimpleJSONResponse("" + file.getName().hashCode());
+//    File file = misoFileManager.getNewFile(
+//        Library.class,
+//        "forms",
+//        "LibraryPoolExportForm-" + LimsUtils.getCurrentDateAsString(new SimpleDateFormat("yyyyMMdd-hhmmss")) + ".xlsx");
+//    FormUtils.createLibraryPoolExportForm(file, jsonArray);
+    return JSONUtils.SimpleJSONResponse("ok");
   }
 
   public JSONObject confirmLibrariesPoolsUpload(HttpSession session, JSONObject json) throws Exception {

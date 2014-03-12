@@ -47,7 +47,7 @@ public interface RunQcStore extends Store<RunQC>, Remover<RunQC> {
    * @return RunQC
    * @throws java.io.IOException when
    */
-  RunQC lazyGet(long qcId) throws IOException;
+  //RunQC lazyGet(long qcId) throws IOException;
 
   /**
    * List all RunQCs performed on a Run given a parent Run ID

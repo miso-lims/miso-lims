@@ -26,9 +26,7 @@ package uk.ac.bbsrc.tgac.miso.core.event;
 import uk.ac.bbsrc.tgac.miso.core.exception.AlertingException;
 
 /**
- * uk.ac.bbsrc.tgac.miso.core.event
- * <p/>
- * Info
+ * A simple interface defining a scenario in which an {@link Alert} can be raised.
  *
  * @author Rob Davey
  * @date 29/09/11

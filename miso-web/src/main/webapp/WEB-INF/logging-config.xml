@@ -43,7 +43,7 @@
     <!-- </aop:aspect> -->
     <aop:aspect id="notificationLogAspect" ref="notificationFileLoggerAspectBean">
       <aop:pointcut id="notificationPointcut"
-                    expression="within(uk.ac.bbsrc.tgac.miso.webapp.service.integration..*) and @annotation(uk.ac.bbsrc.tgac.miso.core.logging.LoggedAction))"/>
+                    expression="within(uk.ac.bbsrc.tgac.miso.notification.consumer.service.mechanism.*.consume*) and @annotation(uk.ac.bbsrc.tgac.miso.core.logging.LoggedAction))"/>
       <aop:after-returning pointcut-ref="notificationPointcut" method="logEvent" arg-names="join"/>
       <aop:after-throwing pointcut-ref="notificationPointcut" method="logFailedEvent" throwing="e" arg-names="join, e"/>
     </aop:aspect>

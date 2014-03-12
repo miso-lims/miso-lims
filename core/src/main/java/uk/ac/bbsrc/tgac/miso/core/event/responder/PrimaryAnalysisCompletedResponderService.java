@@ -86,7 +86,13 @@ public class PrimaryAnalysisCompletedResponderService extends AbstractResponderS
       for (User user : po.getWatchers()) {
         Alert a = new DefaultAlert(user);
         a.setAlertTitle("Primary analysis for project " + po.getProject().getAlias() + "(" + po.getProject().getName() + ")");
-        a.setAlertText("The primary analysis related to this Project has completed: "+po.getProject().getAlias()+" ("+event.getEventMessage()+"). Please view Project " +po.getProject().getProjectId() + " in MISO for more information");
+
+        StringBuilder at = new StringBuilder();
+        at.append("The primary analysis related to this Project has completed: "+po.getProject().getAlias()+" ("+event.getEventMessage()+"). Please view Project " +po.getProject().getId() + " in MISO for more information");
+        if (event.getEventContext().has("baseURL")) {
+          at.append(":\n\n" + event.getEventContext().getString("baseURL")+"/project/"+po.getProject().getId());
+        }
+        a.setAlertText(at.toString());
 
         for (AlerterService as : alerterServices) {
           try {

@@ -306,6 +306,11 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
     return e;
   }
 
+  @Override
+  public LibraryDilution lazyGet(long id) throws IOException {
+    return get(id);
+  }
+
   public LibraryDilution getLibraryDilutionByBarcode(String barcode) throws IOException {
     List eResults = template.query(LIBRARY_DILUTION_SELECT_BY_IDENTIFICATION_BARCODE, new Object[]{barcode}, new LibraryDilutionMapper());
     LibraryDilution e = eResults.size() > 0 ? (LibraryDilution) eResults.get(0) : null;

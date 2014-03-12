@@ -198,6 +198,11 @@ public class SQLAlertDAO implements AlertStore {
   }
 
   @Override
+  public Alert lazyGet(long id) throws IOException {
+    return get(id);
+  }
+
+  @Override
   public Collection<Alert> listAll() throws IOException {
     return template.query(ALERTS_SELECT, new AlertMapper());
   }

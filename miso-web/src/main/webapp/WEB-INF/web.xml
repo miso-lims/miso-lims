@@ -101,6 +101,16 @@
   </servlet-mapping>
 
   <filter>
+    <filter-name>exposeRequestUrlFilter</filter-name>
+    <!-- <filter-class>uk.ac.bbsrc.tgac.miso.webapp.context.ExposeRequestUrlFilter</filter-class> -->
+    <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>exposeRequestUrlFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+  <filter>
     <filter-name>restSignatureFilter</filter-name>
     <!-- <filter-class>uk.ac.bbsrc.tgac.miso.webapp.context.RestSignatureFilter</filter-class> -->
     <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>

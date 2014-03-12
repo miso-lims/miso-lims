@@ -46,7 +46,7 @@ public interface PoolQcStore extends Store<PoolQC>, Remover<PoolQC> {
    * @return PoolQC
    * @throws java.io.IOException when
    */
-  PoolQC lazyGet(long qcId) throws IOException;
+  //PoolQC lazyGet(long qcId) throws IOException;
 
   /**
    * List all PoolQCs performed on a Pool given a parent Pool ID

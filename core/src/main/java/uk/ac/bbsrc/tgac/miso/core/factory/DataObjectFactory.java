@@ -34,7 +34,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.solid.SolidPool;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 import java.util.LinkedList;
-import java.util.List;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.factory
@@ -104,19 +103,29 @@ public abstract class DataObjectFactory {
 
   public abstract PoolQC getPoolQC();
 
+  @Deprecated
   public abstract IlluminaPool getIlluminaPool();
+  @Deprecated
   public abstract IlluminaPool getIlluminaPool(User user);
 
+  @Deprecated
   public abstract LS454Pool getLS454Pool();
+  @Deprecated
   public abstract LS454Pool getLS454Pool(User user);
 
+  @Deprecated
   public abstract SolidPool getSolidPool();
+  @Deprecated
   public abstract SolidPool getSolidPool(User user);
 
+  @Deprecated
   public abstract PacBioPool getPacBioPool();
+  @Deprecated
   public abstract PacBioPool getPacBioPool(User user);
 
+  @Deprecated
   public abstract emPCRPool getEmPCRPool(PlatformType platformType);
+  @Deprecated
   public abstract emPCRPool getEmPCRPool(PlatformType platformType, User user);
 
   public abstract Status getStatus();

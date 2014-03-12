@@ -26,6 +26,7 @@ package uk.ac.bbsrc.tgac.miso.spring.ajax;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.opensymphony.util.FileUtils;
+import net.sf.ehcache.Cache;
 import net.sf.json.JSONArray;
 import org.apache.commons.codec.binary.Base64;
 import org.krysalis.barcode4j.BarcodeDimension;
@@ -58,6 +59,7 @@ import uk.ac.bbsrc.tgac.miso.core.factory.barcode.MisoJscriptFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.PrintManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.TaxonomyUtils;
+import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpSession;
@@ -94,6 +96,8 @@ public class SampleControllerHelperService {
   private PrintManager<MisoPrintService, Queue<?>> printManager;
   @Autowired
   private MisoNamingScheme<Sample> sampleNamingScheme;
+  @Autowired
+  private CacheHelperService cacheHelperService;
 
   public JSONObject validateSampleAlias(HttpSession session, JSONObject json) {
     if (json.has("alias")) {
@@ -257,7 +261,9 @@ public class SampleControllerHelperService {
         Project p = sample.getProject();
         if (p.userCanRead(user)) {
           for (ProjectOverview po : p.getOverviews()) {
-            users.add(po.getPrincipalInvestigator());
+            if (po.getSampleGroup().getEntities().contains(sample)) {
+              users.add(po.getPrincipalInvestigator());
+            }
           }
         }
       }
@@ -681,6 +687,52 @@ public class SampleControllerHelperService {
     }
   }
 
+  public JSONObject removeSampleFromGroup(HttpSession session, JSONObject json) {
+    User user;
+    try {
+      user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+      return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
+    }
+
+    if (user != null) {
+      if (json.has("sampleId") && json.has("sampleGroupId")) {
+        Long sampleId = json.getLong("sampleId");
+        Long sampleGroupId = json.getLong("sampleGroupId");
+        try {
+          Sample s = requestManager.getSampleById(sampleId);
+          EntityGroup<? extends Nameable, ? extends Nameable> osg = requestManager.getEntityGroupById(sampleGroupId);
+          if (osg.getEntities().contains(s)) {
+            if (osg.getEntities().remove(s)) {
+              requestManager.saveEntityGroup(osg);
+
+              cacheHelperService.evictObjectFromCache(s.getProject(), Project.class);
+              return JSONUtils.SimpleJSONResponse("Sample removed from group");
+            }
+            else {
+              return JSONUtils.SimpleJSONError("Error removing sample from sample group.");
+            }
+          }
+          else {
+            return JSONUtils.SimpleJSONResponse("Sample not in this sample group!");
+          }
+        }
+        catch (IOException e) {
+          e.printStackTrace();
+          return JSONUtils.SimpleJSONError("Cannot remove sample from group: " + e.getMessage());
+        }
+      }
+      else {
+        return JSONUtils.SimpleJSONError("No sample or sample group specified to remove.");
+      }
+    }
+    else {
+      return JSONUtils.SimpleJSONError("Only logged-in users can remove objects.");
+    }
+  }
+
   public JSONObject listSamplesDataTable(HttpSession session, JSONObject json) {
     try {
       JSONObject j = new JSONObject();
@@ -752,5 +804,9 @@ public class SampleControllerHelperService {
 
   public void setSampleNamingScheme(MisoNamingScheme<Sample> sampleNamingScheme) {
     this.sampleNamingScheme = sampleNamingScheme;
+  }
+
+  public void setCacheHelperService(CacheHelperService cacheHelperService) {
+    this.cacheHelperService = cacheHelperService;
   }
 }

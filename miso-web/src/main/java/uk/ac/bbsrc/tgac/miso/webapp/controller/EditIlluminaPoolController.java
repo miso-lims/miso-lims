@@ -63,6 +63,7 @@ import java.util.*;
 @Controller
 @RequestMapping("/pool/illumina")
 @SessionAttributes("pool")
+@Deprecated
 public class EditIlluminaPoolController {
   protected static final Logger log = LoggerFactory.getLogger(EditIlluminaPoolController.class);
 

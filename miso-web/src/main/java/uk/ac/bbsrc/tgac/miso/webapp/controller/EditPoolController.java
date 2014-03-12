@@ -304,10 +304,6 @@ public class EditPoolController {
         throw new SecurityException("Permission denied.");
       }
 
-      for (Poolable d : pool.getPoolableElements()) {
-        log.info("PARAM: Linking "+d.getName() + " to " + pool.getName());
-      }
-
       requestManager.savePool(pool);
       session.setComplete();
       model.clear();

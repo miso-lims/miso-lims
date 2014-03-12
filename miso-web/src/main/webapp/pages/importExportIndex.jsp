@@ -17,29 +17,27 @@
         </h1>
 
         <div class="portlet">
-            <div class="portlet-header">Stage 1</div>
+            <div class="portlet-header">Exports</div>
             <div class="portlet-content">
-                <a href="<c:url value="/miso/importexport/exportsamplesheet"/>">Export Sample Sheet</a><br/><br/>
-                Export Sample Sheet based on either plates or tubes.
+                <a href="<c:url value="/miso/importexport/exportsamplesheet"/>">Export Sample or Library & Pool Sheet</a><br/><br/>
+                Export Sample or Library & Pool Sheet based on either plates or tubes.
             </div>
         </div>
 
         <div class="portlet">
-            <div class="portlet-header">Stage 2</div>
+            <div class="portlet-header">Import Sample Sheet</div>
             <div class="portlet-content">
-                <a href="<c:url value="/miso/importexport/importsamplesheet"/>">Sample Sheet Import, Library & Pool
-                    Sheet Export</a><br/><br/>
-                Import the Sample Sheet from stage 1 and based on the entries, save sample QC info and export library
-                and pool sheet.
+                <a href="<c:url value="/miso/importexport/importsamplesheet"/>">Sample Sheet Import</a><br/><br/>
+                Import the Sample Sheet and based on the entries, save sample QC info.
             </div>
         </div>
 
         <div class="portlet">
-            <div class="portlet-header">Stage 3</div>
+            <div class="portlet-header">Import Library & Pool Sheet</div>
             <div class="portlet-content">
                 <a href="<c:url value="/miso/importexport/importlibrarypoolsheet"/>">Library & Pool Sheet
                     Import</a><br/><br/>
-                Import the Library & Pool Sheet from stage 2 and create libraries, library dilutions and pools.
+                Import the Library & Pool Sheet and create libraries, library dilutions and pools.
             </div>
         </div>
     </div>

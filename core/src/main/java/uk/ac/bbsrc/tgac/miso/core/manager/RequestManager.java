@@ -34,10 +34,7 @@ import com.eaglegenomics.simlims.core.SecurityProfile;
 
 import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.*;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaPool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ls454.LS454Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.solid.SolidPool;
 import uk.ac.bbsrc.tgac.miso.core.data.type.*;
 import uk.ac.bbsrc.tgac.miso.core.event.Alert;
 
@@ -77,6 +74,7 @@ public interface RequestManager {
   public long saveKitDescriptor(KitDescriptor kitDescriptor) throws IOException;
   public <T extends List<S>, S extends Plateable> long savePlate(Plate<T, S> plate) throws IOException;
   public long saveAlert(Alert alert) throws IOException;
+  public long saveEntityGroup(EntityGroup<? extends Nameable, ? extends Nameable> entityGroup) throws IOException;
 
   //GETS
   public SequencerPoolPartition getSequencerPoolPartitionById(long partitionId) throws IOException;
@@ -145,6 +143,7 @@ public interface RequestManager {
   public Plate<? extends List<? extends Plateable>, ? extends Plateable> getPlateById(long plateId) throws IOException;
   public <T extends List<S>, S extends Plateable> Plate<T, S> getPlateByBarcode(String barcode) throws IOException;
   public Alert getAlertById(long alertId) throws IOException;
+  public EntityGroup<? extends Nameable, ? extends Nameable> getEntityGroupById(long entityGroupId) throws IOException;
 
 
 //LISTS
@@ -320,6 +319,7 @@ public interface RequestManager {
   public void deleteSequencerReference(SequencerReference sequencerReference) throws IOException;
   public void deletePool(Pool pool) throws IOException;
   public void deletePlate(Plate plate) throws IOException;
+  public void deleteEntityGroup(EntityGroup<? extends Nameable, ? extends Nameable> entityGroup) throws IOException;
   public void deletePartition(SequencerPoolPartition partition) throws IOException;
   public void deleteContainer(SequencerPartitionContainer container) throws IOException;
 }

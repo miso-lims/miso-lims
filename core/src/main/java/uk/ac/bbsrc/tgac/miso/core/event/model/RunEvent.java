@@ -23,6 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.event.model;
 
+import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.event.Event;
 import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
@@ -40,6 +41,7 @@ public class RunEvent implements Event<Run> {
   private Run run;
   private String message;
   private MisoEventType eventType;
+  private JSONObject eventContext = new JSONObject();
 
   public RunEvent(Run run, MisoEventType eventType, String message) {
     this.run = run;
@@ -59,5 +61,14 @@ public class RunEvent implements Event<Run> {
   @Override
   public String getEventMessage() {
     return message;
+  }
+
+  @Override
+  public JSONObject getEventContext() {
+    return eventContext;
+  }
+
+  public void setEventContext(JSONObject eventContext) {
+    this.eventContext = eventContext;
   }
 }

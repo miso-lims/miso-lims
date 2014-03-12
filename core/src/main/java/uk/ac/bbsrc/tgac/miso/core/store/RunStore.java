@@ -47,7 +47,7 @@ public interface RunStore extends Store<Run>, Cascadable, Remover<Run>, NamingSc
    * @return Run
    * @throws IOException when
    */
-  Run lazyGet(long runId) throws IOException;
+  //Run lazyGet(long runId) throws IOException;
 
   /**
    * Gets the latest Run, by start date, that is associated with the given container

@@ -46,7 +46,7 @@ public interface EmPCRStore extends Store<emPCR>, Remover<emPCR>, NamingSchemeAw
    * @return emPCR
    * @throws IOException when
    */
-  emPCR lazyGet(long emPcrId) throws IOException;
+  //emPCR lazyGet(long emPcrId) throws IOException;
 
   /**
   * List all EmPCRs by a parent {@link uk.ac.bbsrc.tgac.miso.core.data.Dilution} ID

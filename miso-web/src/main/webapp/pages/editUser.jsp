@@ -61,12 +61,46 @@
             </sec:authorize>
           </td>
         </tr>
+        <tr>
+          <td>Email Address</td>
+          <td>
+            <c:choose>
+              <c:when test="${(user.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
+                                    or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+                <form:input path="email"/>
+              </c:when>
+              <c:otherwise>
+                <sec:authorize access="hasRole('ROLE_TECH')">
+                  ${user.email}
+                </sec:authorize>
+              </c:otherwise>
+            </c:choose>
+          </td>
+        </tr>
         <sec:authorize access="hasRole('ROLE_ADMIN')">
-          <tr>
-            <td>Password:</td>
-            <td><form:password path="password" showPassword="false"/></td>
-              <%-- <a href="/changePassword">Change</a></td> --%>
-          </tr>
+          <c:choose>
+            <c:when test="${securityMethod eq 'jdbc'}">
+              <tr>
+                <td>Current Password:</td>
+                <td><form:password path="password"/></td>
+              </tr>
+              <tr>
+                <td>New Password:</td>
+                <td><input type="password" name="newpassword" id="newpassword"/></td>
+              </tr>
+              <tr>
+                <td>Confirm new Password:</td>
+                <td><input type="password" name="confirmpassword" id="confirmpassword"/></td>
+              </tr>
+            </c:when>
+            <c:otherwise>
+              <tr>
+                <td>Password:</td>
+                <td><i>Password change support only available for the 'jdbc' security method. If using LDAP, please change
+                  the user password in your LDAP server.</i></td>
+              </tr>
+            </c:otherwise>
+          </c:choose>
           <tr>
             <td>Admin?:</td>
             <td><form:checkbox path="admin"/></td>

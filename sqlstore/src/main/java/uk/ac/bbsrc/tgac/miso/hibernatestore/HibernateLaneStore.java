@@ -42,6 +42,7 @@ import java.util.Collection;
  * @author Rob Davey
  * @since 0.0.2
  */
+@Deprecated
 public class HibernateLaneStore  extends HibernateDaoSupport implements Store<Lane> {
   @Transactional(readOnly = false)
   public long save(Lane lane) throws IOException {
@@ -52,6 +53,11 @@ public class HibernateLaneStore  extends HibernateDaoSupport implements Store<La
   @Transactional(readOnly = true)
   public Lane get(long laneId) throws IOException {
     return (Lane) getHibernateTemplate().get(Lane.class, laneId);
+  }
+
+  @Override
+  public Lane lazyGet(long id) throws IOException {
+    return get(id);
   }
 
   @Transactional(readOnly = true)

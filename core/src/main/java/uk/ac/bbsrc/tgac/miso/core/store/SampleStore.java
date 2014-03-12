@@ -46,7 +46,7 @@ public interface SampleStore extends Store<Sample>, Cascadable, Remover<Sample>,
    * @return Sample
    * @throws IOException when
    */
-  Sample lazyGet(long sampleId) throws IOException;
+  //Sample lazyGet(long sampleId) throws IOException;
 
   /**
    * List all Samples that match a search criteria

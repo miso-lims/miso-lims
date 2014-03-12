@@ -46,7 +46,7 @@ public interface PartitionStore extends Store<SequencerPoolPartition>, Cascadabl
    * @return Partition
    * @throws java.io.IOException when
    */
-  SequencerPoolPartition lazyGet(long partitionId) throws IOException;
+  //SequencerPoolPartition lazyGet(long partitionId) throws IOException;
 
   /**
    * List all Partitions that are part of a Run given a Run ID

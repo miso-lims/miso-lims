@@ -220,14 +220,48 @@ public class SQLSecurityDAO implements SecurityStore {
             .addValue("roles", roleBlob)
             .addValue("email", user.getEmail());
 
-    if (passwordCodecService != null) {
-      params.addValue("password", passwordCodecService.encrypt(user.getPassword()));
+    // if the user already exists, but no password has been set, grab the existing one
+    if (user.getUserId() != UserImpl.UNSAVED_ID) {
+      User existingUser = getUserById(user.getUserId());
+      if (existingUser != null) {
+        if (user.getPassword() == null || "".equals(user.getPassword())) {
+          if (existingUser.getPassword() != null || !"".equals(existingUser.getPassword())) {
+            user.setPassword(existingUser.getPassword());
+          }
+        }
+        else {
+          //if the user already exists, check to see if the passwords match. if not, update.
+          if (passwordCodecService != null) {
+            if (!passwordCodecService.getEncoder().isPasswordValid(existingUser.getPassword(), user.getPassword(), null)) {
+              params.addValue("password", passwordCodecService.encrypt(user.getPassword()));
+            }
+            else {
+              params.addValue("password", user.getPassword());
+            }
+          }
+          else {
+            log.warn("No PasswordCodecService has been wired to this SQLSecurityDAO. This means your passwords may be being " +
+                     "stored in plaintext, or being encrypted by a downstream encoder. Please specify a PasswordCodecService " +
+                     "in your Spring config and (auto)wire it to this DAO, if required.");
+            params.addValue("password", user.getPassword());
+          }
+        }
+      }
+      else {
+        throw new IOException("Cannot find existing user with specified ID");
+      }
     }
     else {
-      log.warn("No PasswordCodecService has been wired to this SQLSecurityDAO. This means your passwords may be being " +
-               "stored in plaintext, if not already encrypted. Please specify a PasswordCodecService in your Spring config and (auto)wire it " +
-               "to this DAO.");
-      params.addValue("password", user.getPassword());
+      // if the user doesn't exist, encrypt
+      if (passwordCodecService != null) {
+        params.addValue("password", passwordCodecService.encrypt(user.getPassword()));
+      }
+      else {
+        log.warn("No PasswordCodecService has been wired to this SQLSecurityDAO. This means your passwords may be being " +
+                 "stored in plaintext, or being encrypted by a downstream encoder. Please specify a PasswordCodecService " +
+                 "in your Spring config and (auto)wire it to this DAO, if required.");
+        params.addValue("password", user.getPassword());
+      }
     }
 
     if (user.getUserId() == UserImpl.UNSAVED_ID) {

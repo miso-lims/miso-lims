@@ -143,6 +143,11 @@ public class SQLPlatformDAO implements PlatformStore {
     return e;
   }
 
+  @Override
+  public Platform lazyGet(long id) throws IOException {
+    return get(id);
+  }
+
   public class PlatformMapper implements RowMapper<Platform> {
     public Platform mapRow(ResultSet rs, int rowNum) throws SQLException {
       Platform p = new PlatformImpl();

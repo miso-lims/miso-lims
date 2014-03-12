@@ -81,11 +81,15 @@ public class LibraryPreparationCompleteResponderService extends AbstractResponde
       ProjectOverview po = re.getEventObject();
 
       for (User user : po.getWatchers()) {
-        log.info("Responding to " + user.getLoginName());
-
         Alert a = new DefaultAlert(user);
         a.setAlertTitle("Library preparation complete for project " + po.getProject().getAlias() + "(" + po.getProject().getName() + ")");
-        a.setAlertText("The following Project's Libraries have been prepared: "+po.getProject().getAlias()+" ("+event.getEventMessage()+"). Please view Project " +po.getProject().getProjectId() + " in MISO for more information");
+
+        StringBuilder at = new StringBuilder();
+        at.append("The following Project's Libraries have been prepared: "+po.getProject().getAlias()+" ("+event.getEventMessage()+"). Please view Project " +po.getProject().getId() + " in MISO for more information");
+        if (event.getEventContext().has("baseURL")) {
+          at.append(":\n\n" + event.getEventContext().getString("baseURL")+"/project/"+po.getProject().getId());
+        }
+        a.setAlertText(at.toString());
 
         for (AlerterService as : alerterServices) {
           try {

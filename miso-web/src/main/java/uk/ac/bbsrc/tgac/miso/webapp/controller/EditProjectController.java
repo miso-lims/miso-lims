@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import org.slf4j.Logger;
@@ -46,13 +45,9 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
 import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.*;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaRun;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ls454.LS454Run;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.solid.SolidRun;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryQcException;
-import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
@@ -61,8 +56,11 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
+import uk.ac.bbsrc.tgac.miso.webapp.context.ApplicationContextProvider;
 
-@Controller
+import javax.servlet.http.HttpServletRequest;
+
+ @Controller
 @RequestMapping("/project")
 @SessionAttributes("project")
 public class EditProjectController {
@@ -261,6 +259,26 @@ public class EditProjectController {
     return plates;
   }
 
+  public Map<Long, Collection<Library>> populateLibraryGroupMap(Project project, Collection<Library> projectLibraries) throws IOException {
+    Map<Long, Collection<Library>> libraryGroupMap = new HashMap<>();
+
+    for (ProjectOverview po : project.getOverviews()) {
+      if (po.getSampleGroup() != null && !po.getSampleGroup().getEntities().isEmpty()) {
+        Set<Library> libs = new HashSet<>();
+        for (Sample s : po.getSampleGroup().getEntities()) {
+          for (Library pl : projectLibraries) {
+            if (pl.getSample().equals(s)) {
+              libs.add(pl);
+            }
+          }
+        }
+        libraryGroupMap.put(po.getId(), libs);
+      }
+    }
+
+    return libraryGroupMap;
+  }
+
   @RequestMapping(value = "/graph/{projectId}", method = RequestMethod.GET)
   public
   @ResponseBody
@@ -381,6 +399,8 @@ public class EditProjectController {
 
         model.put("projectPools", populateProjectPools(projectId));
         model.put("projectPlates", populateProjectPlates(projectId));
+
+        model.put("libraryGroupMap", populateLibraryGroupMap(project, libraries));
       }
 
       if (project == null) {
@@ -404,7 +424,7 @@ public class EditProjectController {
       for (ProjectOverview po : project.getOverviews()) {
         //log.debug(po.getWatchers().toString());
         if (po.getWatchers().contains(user)) {
-          overviewMap.put(po.getOverviewId(), user.getLoginName());
+          overviewMap.put(po.getId(), user.getLoginName());
         }
       }
       model.put("overviewMap", overviewMap);
@@ -421,7 +441,7 @@ public class EditProjectController {
 
   @RequestMapping(method = RequestMethod.POST)
   public String processSubmit(@ModelAttribute("project") Project project,
-                              ModelMap model, SessionStatus session) throws IOException {
+                              ModelMap model, SessionStatus session, HttpServletRequest request) throws IOException {
     try {
       User user = securityManager
               .getUserByLoginName(SecurityContextHolder.getContext()

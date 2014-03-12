@@ -143,5 +143,9 @@
           class="uk.ac.bbsrc.tgac.miso.spring.ajax.ExternalSectionControllerHelperService">
     </bean>
 
+    <bean id="importExportControllerHelperService"
+          class="uk.ac.bbsrc.tgac.miso.spring.ajax.ImportExportControllerHelperService">
+    </bean>
+
 </beans>
 

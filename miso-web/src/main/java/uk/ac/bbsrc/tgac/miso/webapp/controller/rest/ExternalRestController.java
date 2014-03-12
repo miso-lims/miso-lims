@@ -38,6 +38,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryQcException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleQcException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -158,7 +159,7 @@ public class ExternalRestController {
         sb.append("'qcPassed':'" + (sample.getQcPassed() != null ? sample.getQcPassed().toString() : "") + "'");
         sb.append(",");
 
-        sb.append("'receivedDate':'" + (sample.getReceivedDate() != null ? sample.getReceivedDate().toString() : "not available") + "'");
+        sb.append("'receivedDate':'" + (sample.getReceivedDate() != null ? LimsUtils.getDateAsString(sample.getReceivedDate()) : "not available") + "'");
         sb.append(",");
         sb.append("'sampleType':'" + (sample.getSampleType() != null ? sample.getSampleType() : "") + "'");
         sb.append(",");

@@ -34,9 +34,6 @@ import uk.ac.bbsrc.tgac.miso.core.event.model.ProjectOverviewEvent;
 import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
 import uk.ac.bbsrc.tgac.miso.core.exception.AlertingException;
 
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  * uk.ac.bbsrc.tgac.miso.core.event.responder
  * <p/>
@@ -48,6 +45,12 @@ import java.util.Set;
  */
 public class AllLibrariesQcPassedResponderService extends AbstractResponderService {
   protected static final Logger log = LoggerFactory.getLogger(AllLibrariesQcPassedResponderService.class);
+
+  private String baseURL = "";
+
+  public void setBaseURL(String baseURL) {
+    this.baseURL = baseURL;
+  }
 
   public AllLibrariesQcPassedResponderService() {}
 
@@ -71,11 +74,15 @@ public class AllLibrariesQcPassedResponderService extends AbstractResponderServi
       ProjectOverview po = re.getEventObject();
 
       for (User user : po.getWatchers()) {
-        log.debug("Responding to " + user.getLoginName());
-
         Alert a = new DefaultAlert(user);
         a.setAlertTitle("All Library QCs passed for project " + po.getProject().getAlias() + "(" + po.getProject().getName() + ")");
-        a.setAlertText("The following Project's Libraries have been QC'ed successfully: "+po.getProject().getAlias()+" ("+event.getEventMessage()+"). Please view Project " +po.getProject().getProjectId() + " in MISO for more information");
+
+        StringBuilder at = new StringBuilder();
+        at.append("The following Project's Libraries have been QC'ed successfully: "+po.getProject().getAlias()+" ("+event.getEventMessage()+"). Please view Project " +po.getProject().getId() + " in MISO for more information");
+        if (event.getEventContext().has("baseURL")) {
+          at.append(":\n\n" + event.getEventContext().getString("baseURL")+"/project/"+po.getProject().getId());
+        }
+        a.setAlertText(at.toString());
 
         for (AlerterService as : getAlerterServices()) {
           try {

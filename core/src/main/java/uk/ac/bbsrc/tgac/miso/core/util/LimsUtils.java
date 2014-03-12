@@ -111,6 +111,10 @@ public class LimsUtils {
     return false;
   }
 
+  public static boolean isStringEmptyOrNull(String s) {
+    return "".equals(s) || s == null;
+  }
+
   /**
    * Join a collection, akin to Perl's join(), using a given delimiter to produce a single String 
    *

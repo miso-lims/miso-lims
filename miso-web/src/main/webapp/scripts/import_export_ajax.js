@@ -93,7 +93,26 @@ var ImportExport = ImportExport || {
             }
             }
     );
-    Utils.ui.reenableButton("exportSampleForm", "Export Excel");
+    Utils.ui.reenableButton("exportSampleForm", "Export Sample Sheet");
+  },
+
+  exportLibraryPoolForm: function () {
+    Utils.ui.disableButton("exportLibraryPoolForm");
+    Fluxion.doAjax(
+            'importExportControllerHelperService',
+            'exportLibraryPoolForm',
+            {
+              'barcodekit': jQuery('#barcodekit :selected').text(),
+              'form': jQuery('#sampleExportForm').serializeArray(),
+              // 'documentFormat':documentFormat,
+              'url': ajaxurl
+            },
+            {'doOnSuccess': function (json) {
+              Utils.page.pageRedirect('/miso/download/library/forms/' + json.response);
+            }
+            }
+    );
+    Utils.ui.reenableButton("exportLibraryPoolForm", "Export Library & Pool Sheet");
   },
 
   sampleSheetUploadSuccess: function (json) {
@@ -159,9 +178,8 @@ var ImportExport = ImportExport || {
             },
             {'doOnSuccess': function (json) {
               sampleJSONArray = null;
-              alert("Imported, now generating Library & Pool sheet..");
+              alert("Imported.");
               jQuery('#confirmSamplesUploadButton').html("Imported");
-              Utils.page.pageRedirect('/miso/download/library/forms/' + json.response);
             }
             }
     );

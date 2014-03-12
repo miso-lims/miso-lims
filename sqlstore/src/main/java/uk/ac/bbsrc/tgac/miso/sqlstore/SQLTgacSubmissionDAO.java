@@ -358,6 +358,11 @@ public class SQLTgacSubmissionDAO implements Store<Submission>, NamingSchemeAwar
     return e;
   }
 
+  @Override
+  public Submission lazyGet(long id) throws IOException {
+    return get(id);
+  }
+
   public Collection<Submission> listAll() throws IOException {
     return template.query(SUBMISSION_SELECT, new TgacSubmissionMapper());
   }

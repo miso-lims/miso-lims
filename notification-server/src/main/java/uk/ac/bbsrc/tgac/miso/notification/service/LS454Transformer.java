@@ -54,6 +54,10 @@ import java.util.regex.Pattern;
 public class LS454Transformer implements FileSetTransformer<String, String, File> {
   protected static final Logger log = LoggerFactory.getLogger(LS454Transformer.class);
 
+  private final Pattern runCompleteLogPattern = Pattern.compile(
+      "\\[([A-z]{3} [A-z]{3} \\d{2} \\d{2}:\\d{2}:\\d{2} \\d{4})\\].*Job complete.*"
+  );
+
   public Map<String, String> transform(Message<Set<File>> message) {
     return transform(message.getPayload());
   }
@@ -138,7 +142,8 @@ public class LS454Transformer implements FileSetTransformer<String, String, File
                 String compstat = URLEncoder.encode(new String(IntegrationUtils.compress(runLog.getBytes())), "UTF-8");
                 run.put("status", compstat);
 
-                Matcher completeMatcher = Pattern.compile("^\\[([A-z]{3} [A-z]{3} \\d{2} \\d{2}:\\d{2}:\\d{2} \\d{4})\\].*Job complete\\.$").matcher(runLog);
+                //Matcher completeMatcher = Pattern.compile("^\\[([A-z]{3} [A-z]{3} \\d{2} \\d{2}:\\d{2}:\\d{2} \\d{4})\\].*Job complete\\.$").matcher(runLog);
+                Matcher completeMatcher = runCompleteLogPattern.matcher(runLog);
                 if (completeMatcher.find()) {
                   log.debug(runName+" :: Completed");
                   run.put("completionDate", completeMatcher.group(1));

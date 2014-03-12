@@ -59,6 +59,7 @@ import java.util.*;
 @Controller
 @RequestMapping("/pool/ls454")
 @SessionAttributes("pool")
+@Deprecated
 public class EditLS454PoolController {
   protected static final Logger log = LoggerFactory.getLogger(EditLS454PoolController.class);
 
