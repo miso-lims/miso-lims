@@ -79,6 +79,9 @@ public class ListPoolsController {
   public ModelAndView listReadyPools(ModelMap model) throws IOException {
     try {
 
+      Map<String, List<Pool>> poolMap = new HashMap<>();
+      Map<String, List<Pool>> usedPoolMap = new HashMap<>();
+
       for (PlatformType pt : PlatformType.values()) {
         List<Pool> pools = new ArrayList<Pool>();
         List<Pool> poolsUsed = new ArrayList<Pool>();
@@ -91,9 +94,13 @@ public class ListPoolsController {
           }
         }
         String ident = pt.getKey();
-        model.addAttribute(ident+"Pools", pools);
-        model.addAttribute(ident+"PoolsUsed", poolsUsed);
+
+        poolMap.put(ident, pools);
+        usedPoolMap.put(ident, poolsUsed);
       }
+
+      model.addAttribute("pools", poolMap);
+      model.addAttribute("usedpools", usedPoolMap);
 
       model.addAttribute("ready", true);
       return new ModelAndView("/pages/readyPools.jsp", model);
