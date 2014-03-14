@@ -123,6 +123,9 @@ public abstract class AbstractRun implements Run {
     this.sequencerReference = sequencerReference;
   }
 
+  @Override
+  public abstract List<SequencerPartitionContainer<SequencerPoolPartition>> getSequencerPartitionContainers();
+
   public PlatformType getPlatformType() {
     return platformType;
   }

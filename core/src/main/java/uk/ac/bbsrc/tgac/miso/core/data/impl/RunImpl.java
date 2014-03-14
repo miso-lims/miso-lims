@@ -75,9 +75,10 @@ public class RunImpl extends AbstractRun implements Serializable {
     }
   }
 
+  @Override
   public List<SequencerPartitionContainer<SequencerPoolPartition>> getSequencerPartitionContainers() {
     if (this.containers != null) Collections.sort(this.containers);
-    return this.containers;
+    return containers;
   }
 
   public void setSequencerPartitionContainers(List<SequencerPartitionContainer<SequencerPoolPartition>> containers) {
@@ -99,7 +100,6 @@ public class RunImpl extends AbstractRun implements Serializable {
 
   public void buildSubmission() {
   }
-
 
   /**
    * Method buildReport ...

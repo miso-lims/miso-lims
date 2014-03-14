@@ -124,10 +124,10 @@ public class EditRunController {
     return requestManager.listAllPlatforms();
   }
 
-  public Boolean isMultiplexed(@PathVariable Long runId) throws IOException {
-    Run run = requestManager.getRunById(runId);
+  public Boolean isMultiplexed(Run run) throws IOException {
     if (run != null && run.getId() != AbstractRun.UNSAVED_ID) {
-      for (SequencerPartitionContainer<SequencerPoolPartition> f : requestManager.listSequencerPartitionContainersByRunId(run.getId())) {
+      //for (SequencerPartitionContainer<SequencerPoolPartition> f : requestManager.listSequencerPartitionContainersByRunId(run.getId())) {
+      for (SequencerPartitionContainer<SequencerPoolPartition> f : run.getSequencerPartitionContainers()) {
         for (SequencerPoolPartition p : f.getPartitions()) {
           if (p.getPool() != null && p.getPool().getDilutions().size() > 1) {
             return true;
@@ -138,8 +138,7 @@ public class EditRunController {
     return false;
   }
 
-  public Boolean hasOperationsQcPassed(@PathVariable Long runId) throws IOException {
-    Run run = requestManager.getRunById(runId);
+  public Boolean hasOperationsQcPassed(Run run) throws IOException {
     if (run != null && run.getId() != AbstractRun.UNSAVED_ID) {
       for (RunQC qc : run.getRunQCs()) {
         if ("SeqOps QC".equals(qc.getQcType().getName()) && !qc.getDoNotProcess()) {
@@ -150,8 +149,7 @@ public class EditRunController {
     return false;
   }
 
-  public Boolean hasInformaticsQcPassed(@PathVariable Long runId) throws IOException {
-    Run run = requestManager.getRunById(runId);
+  public Boolean hasInformaticsQcPassed(Run run) throws IOException {
     if (run != null && run.getId() != AbstractRun.UNSAVED_ID) {
       for (RunQC qc : run.getRunQCs()) {
         if ("SeqInfo QC".equals(qc.getQcType().getName()) && !qc.getDoNotProcess()) {
@@ -262,13 +260,13 @@ public class EditRunController {
         else {
           model.put("title", "Run " + runId);
           //model.put("availablePools", populateAvailablePools(run.getPlatformType(), user));
-          model.put("multiplexed", isMultiplexed(runId));
+          model.put("multiplexed", isMultiplexed(run));
           try {
             if (runStatsManager != null) {
               model.put("statsAvailable", runStatsManager.hasStatsForRun(run));
             }
-            model.put("operationsQcPassed", hasOperationsQcPassed(runId));
-            model.put("informaticsQcPassed", hasInformaticsQcPassed(runId));
+            model.put("operationsQcPassed", hasOperationsQcPassed(run));
+            model.put("informaticsQcPassed", hasInformaticsQcPassed(run));
           }
           catch (RunStatsException e) {
             e.printStackTrace();
