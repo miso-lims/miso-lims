@@ -93,11 +93,25 @@
         ImportExport.searchSamples(jQuery('#searchSamples').val());
         if (selection == 'tube') {
             jQuery('#sampleExportForm').html(jQuery('#tubeformholder').html() + jQuery('#librarySelectionHolder').html());
+            showPlatforms();
         }
         else if (selection == 'plate') {
             jQuery('#sampleExportForm').html(jQuery('#plateformholder').html() + jQuery('#librarySelectionHolder').html());
+            showPlatforms();
         }
         jQuery('#exportButtons').show();
+    }
+
+    function showPlatforms(){
+    Fluxion.doAjax(
+            'importExportControllerHelperService',
+            'platformsOptions',
+            {'url': ajaxurl},
+            {'doOnSuccess': function (json){
+                jQuery('#platform').append(json.html);
+            }
+            }
+    );
     }
 
 </script>
@@ -857,13 +871,8 @@
                     </tr>
                     <tr>
                         <td>Platform:</td>
-                        <td><select name="platform" id="platform">
-                            <option>Illumina</option>
-                            <option>LS454</option>
-                            <option>PacBio</option>
-                            <option>SOLiD</option>
-                            <option>IonTorrent</option>
-                            <option>Helicos</option>
+                        <td><select name="platform" id="platform" onchange="ImportExport.changePlatformName(this);">
+                            <option>Select platform</option>
                         </select></td>
                     </tr>
                     <tr>
