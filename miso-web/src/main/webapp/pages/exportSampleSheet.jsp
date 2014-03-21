@@ -878,30 +878,6 @@
                     <tr>
                         <td>Type:</td>
                         <td><select name="type" id="type">
-                            <option>Illumina-mRNA Seq</option>
-                            <option>Illumina-Mate Pair</option>
-                            <option>Illumina-Paired End</option>
-                            <option>Illumina-Small RNA</option>
-                            <option>Illumina-Single End</option>
-                            <option>LS454-Amplicon</option>
-                            <option>LS454-Transcriptome</option>
-                            <option>LS454-20kbp Paired End</option>
-                            <option>LS454-8kbp Paired End</option>
-                            <option>LS454-3kbp Paired End</option>
-                            <option>LS454-Standard Shotgun</option>
-                            <option>LS454-Rapid Shotgun</option>
-                            <option>Solid-Small RNA</option>
-                            <option>Solid-Whole Transcriptome</option>
-                            <option>Solid-SAGE</option>
-                            <option>Solid-Long Mate Pair</option>
-                            <option>Solid-Fragment</option>
-                            <option>PacBio-10kb Shotgun</option>
-                            <option>PacBio-20kb Shotgun</option>
-                            <option>PacBio-2kb Shotgun</option>
-                            <option>PacBio-Amplicon</option>
-                            <option>PacBio-BAC</option>
-                            <option>PacBio-Plasmid</option>
-                            <option>PacBio-cDNA</option>
                         </select></td>
                     </tr>
                     <tr>

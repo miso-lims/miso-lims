@@ -550,14 +550,14 @@ public class ImportExportControllerHelperService {
         List<LibraryType> types = new ArrayList<LibraryType>(requestManager.listLibraryTypesByPlatform(platform));
         Collections.sort(types);
         for (LibraryType s : types) {
-          libsb.append("<option value='" + s.getLibraryTypeId() + "'>"+s.getDescription()+"</option>");
+          libsb.append("<option>"+platform+"-"+s.getDescription()+"</option>");
         }
 
         StringBuilder tagsb = new StringBuilder();
         List<TagBarcodeStrategy> strategies = new ArrayList<TagBarcodeStrategy>(tagBarcodeStrategyResolverService.getTagBarcodeStrategiesByPlatform(PlatformType.get(platform)));
-        tagsb.append("<option value=''>No Barcode Strategy</option>");
+        tagsb.append("<option >No Barcode Strategy</option>");
         for (TagBarcodeStrategy tb : strategies) {
-          tagsb.append("<option value='" + tb.getName() + "'>"+tb.getName()+"</option>");
+          tagsb.append("<option>"+tb.getName()+"</option>");
         }
 
         map.put("libraryTypes", libsb.toString());
