@@ -283,7 +283,7 @@ function generateSampleDeliveryForm(tableName, projectId) {
         jQuery(this).parent().addClass('row_selected');
     });
 
-    jQuery("div.toolbar").html("<button type='button' onclick=\"Project.ui.processSampleDeliveryForm("+tableName+", " + projectId + ");\" class=\"fg-button ui-state-default ui-corner-all\">Generate Form</button>");
+    jQuery("div.toolbar").html("<button type='button' onclick=\"Project.ui.processSampleDeliveryForm('"+tableName+"', " + projectId + ");\" class=\"fg-button ui-state-default ui-corner-all\">Generate Form</button>");
   }
 }
 
