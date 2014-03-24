@@ -540,6 +540,34 @@ public class ImportExportControllerHelperService {
     return types;
   }
 
+  public Collection<LibraryStrategyType> populateLibraryStrategyTypes() throws IOException {
+    List<LibraryStrategyType> types = new ArrayList<LibraryStrategyType>(requestManager.listAllLibraryStrategyTypes());
+    Collections.sort(types);
+    return types;
+  }
+
+  public JSONObject libraryStrategyTypesString(HttpSession session, JSONObject json) throws IOException {
+    StringBuilder b = new StringBuilder();
+    for (LibraryStrategyType t : populateLibraryStrategyTypes()) {
+      b.append("<option>" + t.getName() + "</option>");
+    }
+    return JSONUtils.JSONObjectResponse("html", b.toString());
+  }
+
+  public Collection<LibrarySelectionType> populateLibrarySelectionTypes() throws IOException {
+    List<LibrarySelectionType> types = new ArrayList<LibrarySelectionType>(requestManager.listAllLibrarySelectionTypes());
+    Collections.sort(types);
+    return types;
+  }
+
+  public JSONObject librarySelectionTypesString(HttpSession session, JSONObject json) throws IOException {
+    StringBuilder b = new StringBuilder();
+    for (LibrarySelectionType t : populateLibrarySelectionTypes()) {
+      b.append("<option>" + t.getName() + "</option>");
+    }
+    return JSONUtils.JSONObjectResponse("html", b.toString());
+  }
+
   public JSONObject changePlatformName(HttpSession session, JSONObject json) {
     try {
       if (json.has("platform") && !json.get("platform").equals("")) {
@@ -550,14 +578,14 @@ public class ImportExportControllerHelperService {
         List<LibraryType> types = new ArrayList<LibraryType>(requestManager.listLibraryTypesByPlatform(platform));
         Collections.sort(types);
         for (LibraryType s : types) {
-          libsb.append("<option>"+platform+"-"+s.getDescription()+"</option>");
+          libsb.append("<option>" + platform + "-" + s.getDescription() + "</option>");
         }
 
         StringBuilder tagsb = new StringBuilder();
         List<TagBarcodeStrategy> strategies = new ArrayList<TagBarcodeStrategy>(tagBarcodeStrategyResolverService.getTagBarcodeStrategiesByPlatform(PlatformType.get(platform)));
         tagsb.append("<option >No Barcode Strategy</option>");
         for (TagBarcodeStrategy tb : strategies) {
-          tagsb.append("<option>"+tb.getName()+"</option>");
+          tagsb.append("<option>" + tb.getName() + "</option>");
         }
 
         map.put("libraryTypes", libsb.toString());

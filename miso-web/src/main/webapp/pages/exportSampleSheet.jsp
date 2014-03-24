@@ -94,10 +94,14 @@
         if (selection == 'tube') {
             jQuery('#sampleExportForm').html(jQuery('#tubeformholder').html() + jQuery('#librarySelectionHolder').html());
             showPlatforms();
+            showLibraryStrategyTypesString();
+            showLibrarySelectionString();
         }
         else if (selection == 'plate') {
             jQuery('#sampleExportForm').html(jQuery('#plateformholder').html() + jQuery('#librarySelectionHolder').html());
             showPlatforms();
+            showLibraryStrategyTypesString();
+            showLibrarySelectionString();
         }
         jQuery('#exportButtons').show();
     }
@@ -112,6 +116,30 @@
             }
             }
     );
+    }
+
+    function showLibraryStrategyTypesString(){
+        Fluxion.doAjax(
+                'importExportControllerHelperService',
+                'libraryStrategyTypesString',
+                {'url': ajaxurl},
+                {'doOnSuccess': function (json){
+                    jQuery('#strategy').append(json.html);
+                }
+                }
+        );
+    }
+
+    function showLibrarySelectionString(){
+        Fluxion.doAjax(
+                'importExportControllerHelperService',
+                'librarySelectionTypesString',
+                {'url': ajaxurl},
+                {'doOnSuccess': function (json){
+                    jQuery('#selection').append(json.html);
+                }
+                }
+        );
     }
 
 </script>
@@ -883,73 +911,16 @@
                     <tr>
                         <td>Selection:</td>
                         <td><select name="selection" id="selection">
-                            <option>RANDOM</option>
-                            <option>PCR</option>
-                            <option>RANDOM PCR</option>
-                            <option>RT-PCR</option>
-                            <option>HMPR</option>
-                            <option>MF</option>
-                            <option>CF-S</option>
-                            <option>CF-M</option>
-                            <option>CF-H</option>
-                            <option>CF-T</option>
-                            <option>MSLL</option>
-                            <option>cDNA</option>
-                            <option>ChIP</option>
-                            <option>Mnase</option>
-                            <option>DNAse</option>
-                            <option>Hybrid Selection</option>
-                            <option>Reduced Representation</option>
-                            <option>Restriction Digest</option>
-                            <option>5-methylcytidine antibody</option>
-                            <option>MBD2 protein methyl-CpG binding domain</option>
-                            <option>CAGE</option>
-                            <option>RACE</option>
-                            <option>size fractionation</option>
-                            <option>MDA</option>
-                            <option>padlock probes capture method</option>
-                            <option>other</option>
-                            <option>unspecified</option>
                         </select></td>
                     </tr>
                     <tr>
                         <td>Strategy:</td>
                         <td><select name="strategy" id="strategy">
-                            <option>WGS</option>
-                            <option>WGA</option>
-                            <option>WXS</option>
-                            <option>RNA-Seq</option>
-                            <option>WCS</option>
-                            <option>MiRNA-Seq</option>
-                            <option>CLONE</option>
-                            <option>POOLCLONE</option>
-                            <option>AMPLICON</option>
-                            <option>CLONEEND</option>
-                            <option>FINISHING</option>
-                            <option>ChIP-Seq</option>
-                            <option>Mnase-Seq</option>
-                            <option>Dnase-Hypersensitivity</option>
-                            <option>Bisulfite-Seq</option>
-                            <option>EST</option>
-                            <option>FL-cDNA</option>
-                            <option>CTS</option>
-                            <option>MRE-Seq</option>
-                            <option>MeDIP-Seq</option>
-                            <option>MBD-Seq</option>
-                            <option>Tn-Seq</option>
-                            <option>OTHER</option>
                         </select></td>
                     </tr>
                     <tr>
                         <td>Barcode Kit:</td>
                         <td><select name="barcodekit" id="barcodekit">
-                            <option>16s V4 Indices</option>
-                            <option>454 Rapid Library</option>
-                            <option>Bioo NEXTflex V1 Directional RNA-Seq Indices</option>
-                            <option>Bioo NEXTflex V2 Directional RNA-Seq Indices</option>
-                            <option>Nextera Dual Index</option>
-                            <option>TGAC Custom Nextera 384 Index</option>
-                            <option>TruSeq Single Index</option>
                         </select></td>
                     </tr>
                 </table>
