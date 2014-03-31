@@ -479,7 +479,7 @@ public class ImportExportControllerHelperService {
                 else {
                   Pool pool = new PoolImpl();
                   if (!pools.containsKey(poolName)) {
-                    pool.setAlias("pool" + poolName);
+                    pool.setAlias(poolName);
                     pool.setPlatformType(pt);
                     pool.setReadyToRun(true);
                     pool.setCreationDate(new Date());
