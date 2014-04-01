@@ -2635,15 +2635,24 @@ public class FormUtils {
           if (n1.getFirstChild() != null) {
             s.setAlias(n1.getFirstChild().getTextContent());
           }
-
+          //well
           Node n2 = ttre.getChildNodes().item(1);
           if (n2.getFirstChild() != null) {
-            s.setScientificName(n2.getFirstChild().getTextContent());
+            if (!"".equals(n2.getFirstChild().getTextContent())) {
+              Note noteWell = new Note();
+              noteWell.setText("well:" + n2.getFirstChild().getTextContent());
+              s.addNote(noteWell);
+            }
           }
 
           Node n3 = ttre.getChildNodes().item(2);
           if (n3.getFirstChild() != null) {
-            s.setIdentificationBarcode(n3.getFirstChild().getTextContent());
+            s.setScientificName(n3.getFirstChild().getTextContent());
+          }
+
+          Node n4 = ttre.getChildNodes().item(3);
+          if (n4.getFirstChild() != null) {
+            s.setIdentificationBarcode(n4.getFirstChild().getTextContent());
           }
 
           /*
@@ -2656,23 +2665,23 @@ public class FormUtils {
           }
           */
 
-          Node n4 = ttre.getChildNodes().item(4);
-          if (n4.getFirstChild() != null) {
-            s.setDescription(n4.getFirstChild().getTextContent());
-          }
-
-          Node n8 = ttre.getChildNodes().item(8);
-          if (n8.getFirstChild() != null) {
-            if (!"".equals(n8.getFirstChild().getTextContent())) {
-              Note note1 = new Note();
-              note1.setText("260/280:" + n8.getFirstChild().getTextContent());
-              s.addNote(note1);
-            }
+          Node n5 = ttre.getChildNodes().item(5);
+          if (n5.getFirstChild() != null) {
+            s.setDescription(n5.getFirstChild().getTextContent());
           }
 
           Node n9 = ttre.getChildNodes().item(9);
           if (n9.getFirstChild() != null) {
-            if (!"".equals("260/230:" + n9.getFirstChild().getTextContent())) {
+            if (!"".equals(n9.getFirstChild().getTextContent())) {
+              Note note1 = new Note();
+              note1.setText("260/280:" + n9.getFirstChild().getTextContent());
+              s.addNote(note1);
+            }
+          }
+
+          Node n10 = ttre.getChildNodes().item(10);
+          if (n10.getFirstChild() != null) {
+            if (!"".equals("260/230:" + n10.getFirstChild().getTextContent())) {
               Note note2 = new Note();
               note2.setText(n9.getFirstChild().getTextContent());
               s.addNote(note2);
