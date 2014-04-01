@@ -278,11 +278,14 @@ Container.partition = {
   selectContainerStudy: function (partition, poolId, projectId) {
     Utils.ui.disableButton('studySelectButton-' + partition + '_' + poolId);
     var studyId = jQuery("select[name='poolStudies" + partition + "_" + projectId + "'] :selected").val();
+    var sequencerReferenceId = jQuery("select[name='sequencer'] :selected").val();
+
+    console.log("Attempting to retrieve study " + studyId + " and sequencer reference [" + jQuery('#sequencerReference').val() + " vs. " + sequencerReferenceId +"]");
 
     Fluxion.doAjax(
       'containerControllerHelperService',
       'selectStudyForPool',
-      {'poolId': poolId, 'studyId': studyId, 'sequencerReferenceId': jQuery('#sequencerReference').val(), 'url': ajaxurl},
+      {'poolId': poolId, 'studyId': studyId, 'sequencerReferenceId': sequencerReferenceId, 'url': ajaxurl},
       {'doOnSuccess': function (json) {
         var div = jQuery("#studySelectDiv" + partition + "_" + projectId).parent();
         jQuery("#studySelectDiv" + partition + "_" + projectId).remove();

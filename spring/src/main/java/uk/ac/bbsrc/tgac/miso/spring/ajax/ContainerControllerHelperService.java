@@ -621,12 +621,15 @@ public class ContainerControllerHelperService {
     try {
       Long poolId = json.getLong("poolId");
       Pool p = requestManager.getPoolById(poolId);
+      if (p == null) { throw new Exception("Could not retrieve pool: " + poolId); };
 
       Long studyId = json.getLong("studyId");
       Study s = requestManager.getStudyById(studyId);
+      if (s == null) { throw new Exception("Could not retrieve study: " + studyId); };
 
       Long sequencerReferenceId = json.getLong("sequencerReferenceId");
       SequencerReference sr = requestManager.getSequencerReferenceById(sequencerReferenceId);
+      if (sr == null) { throw new Exception("Could not retrieve sequencer: " + sequencerReferenceId); };
 
       StringBuilder sb = new StringBuilder();
 
@@ -644,6 +647,7 @@ public class ContainerControllerHelperService {
       }
       catch (MalformedExperimentException e1) {
         e1.printStackTrace();
+        return JSONUtils.SimpleJSONError("Failed to save experiment: " + e1.getMessage());
       }
 
       sb.append("<i>");

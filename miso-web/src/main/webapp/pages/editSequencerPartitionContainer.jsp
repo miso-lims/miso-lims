@@ -76,14 +76,20 @@
       </c:choose>
     </td>
   </tr>
-  <c:if test="${container.id == 0}">
-    <tr>
-      <td>Sequencer:</td>
-      <td id="sequencerReferenceSelect">
-        <i>Please choose a platform above...</i>
-      </td>
-    </tr>
-  </c:if>
+  <c:choose>
+    <c:when test="${container.id != 0 and not empty container.run}">
+      <tr>
+        <td>Sequencer:</td>
+        <td id="sequencerReferenceSelect">${container.run.sequencerReference.name} (${container.run.sequencerReference.platform.instrumentModel})</td>
+      </tr>
+    </c:when>
+    <c:otherwise>
+      <tr>
+        <td>Sequencer:</td>
+        <td id="sequencerReferenceSelect"><i>Please choose a platform above...</i></td>
+      </tr>
+    </c:otherwise>
+  </c:choose>
 </table>
 
 <table width="100%">
