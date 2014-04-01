@@ -220,13 +220,15 @@ public class SQLSecurityDAO implements SecurityStore {
             .addValue("roles", roleBlob)
             .addValue("email", user.getEmail());
 
-    // if the user already exists, but no password has been set, grab the existing one
     if (user.getUserId() != UserImpl.UNSAVED_ID) {
       User existingUser = getUserById(user.getUserId());
       if (existingUser != null) {
+        // if the user already exists, but no password has been set, grab the existing one
+        // this is probably due to an admin change of user properties, but not a password change
         if (user.getPassword() == null || "".equals(user.getPassword())) {
           if (existingUser.getPassword() != null || !"".equals(existingUser.getPassword())) {
             user.setPassword(existingUser.getPassword());
+            params.addValue("password", user.getPassword());
           }
         }
         else {
