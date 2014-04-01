@@ -246,7 +246,7 @@ public class FormUtils {
           cellD.setCellValue(sampleAlias);
           XSSFCell cellE = row.createCell(4);
           cellE.setCellValue(wellId);
-          if (barcodekit!=null){
+          if (barcodekit != null) {
             XSSFCell cellJ = row.createCell(9);
             cellJ.setCellValue(barcodekit);
           }
@@ -2483,7 +2483,7 @@ public class FormUtils {
     return null;
   }
 
-  public static OdfTextDocument createSampleDeliveryForm(List<Sample> samples, File outpath) throws Exception {
+  public static OdfTextDocument createSampleDeliveryForm(List<Sample> samples, File outpath, Boolean plate) throws Exception {
     Collections.sort(samples, new AliasComparator(Sample.class));
 
     InputStream in = FormUtils.class.getResourceAsStream("/forms/odt/sampleDeliveryForm.odt");
@@ -2521,6 +2521,8 @@ public class FormUtils {
 
       OdfTable oTable = oDoc.getTableByName("SamplesTable");
 
+      int rowCount = 1;
+
       for (Sample s : samples) {
         OdfTableRow row = oTable.appendRow();
 
@@ -2532,21 +2534,34 @@ public class FormUtils {
 
         OdfTableCell cell1 = row.getCellByIndex(1);
         OdfTextParagraph cp1 = new OdfTextParagraph(contentDom);
-        cp1.setTextContent(s.getScientificName());
+        if (!plate) {
+          cp1.setTextContent("NA");
+        }
+        else {
+          cp1.setTextContent(getPlatePosition(rowCount));
+        }
         cp1.setProperty(StyleTextPropertiesElement.FontSize, "8pt");
         cell1.getOdfElement().appendChild(cp1);
 
         OdfTableCell cell2 = row.getCellByIndex(2);
         OdfTextParagraph cp2 = new OdfTextParagraph(contentDom);
-        cp2.setTextContent(s.getIdentificationBarcode());
+        cp2.setTextContent(s.getScientificName());
         cp2.setProperty(StyleTextPropertiesElement.FontSize, "8pt");
         cell2.getOdfElement().appendChild(cp2);
 
         OdfTableCell cell3 = row.getCellByIndex(3);
         OdfTextParagraph cp3 = new OdfTextParagraph(contentDom);
-        cp3.setTextContent(s.getSampleType());
+        cp3.setTextContent(s.getIdentificationBarcode());
         cp3.setProperty(StyleTextPropertiesElement.FontSize, "8pt");
         cell3.getOdfElement().appendChild(cp3);
+
+        OdfTableCell cell4 = row.getCellByIndex(4);
+        OdfTextParagraph cp4 = new OdfTextParagraph(contentDom);
+        cp4.setTextContent(s.getSampleType());
+        cp4.setProperty(StyleTextPropertiesElement.FontSize, "8pt");
+        cell4.getOdfElement().appendChild(cp4);
+
+        rowCount++;
       }
 
       int count = 0;
@@ -2564,6 +2579,42 @@ public class FormUtils {
     }
     else {
       throw new Exception("Could not read from resource");
+    }
+  }
+
+  public static String getPlatePosition(int rowCount) {
+    int columnIndex = (int) Math.round(rowCount / 8);
+    int remainder = rowCount % 8;
+
+    if (remainder == 0) {
+      return "H" + columnIndex;
+    }
+    else {
+      columnIndex++;
+      if (remainder == 1) {
+        return "A" + columnIndex;
+      }
+      else if (remainder == 2) {
+        return "B" + columnIndex;
+      }
+      else if (remainder == 3) {
+        return "C" + columnIndex;
+      }
+      else if (remainder == 4) {
+        return "D" + columnIndex;
+      }
+      else if (remainder == 5) {
+        return "E" + columnIndex;
+      }
+      else if (remainder == 6) {
+        return "F" + columnIndex;
+      }
+      else if (remainder == 7) {
+        return "G" + columnIndex;
+      }
+      else{
+        return "NA";
+      }
     }
   }
 
