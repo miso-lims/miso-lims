@@ -24,9 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.*;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
-import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -39,7 +37,6 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 import javax.servlet.ServletContext;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Map;
@@ -76,7 +73,7 @@ public class MenuController implements ServletContextAware {
         groups.append(role.replaceAll("ROLE_", "") + "&nbsp;");
       }
       model.put("userRealName", realName);
-      //model.put("apiKey", securityManager.getPrivateKey(user));
+      model.put("userId", user.getUserId());
       model.put("apiKey", SignatureHelper.generatePrivateUserKey((user.getLoginName() + "::" + user.getPassword()).getBytes("UTF-8")));
       model.put("userGroups", groups.toString());
       return new ModelAndView("/pages/myAccount.jsp", model);

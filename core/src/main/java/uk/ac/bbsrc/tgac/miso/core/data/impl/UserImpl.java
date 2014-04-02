@@ -87,6 +87,14 @@ public class UserImpl implements User, Serializable, Comparable {
     this.userId = userId;
   }
 
+  public long getId() {
+    return userId;
+  }
+
+  public void setId(long userId) {
+    this.userId = userId;
+  }
+
   public String getEmail() {
     return email;
   }
@@ -196,18 +204,18 @@ public class UserImpl implements User, Serializable, Comparable {
     if (!(obj instanceof UserImpl))
       return false;
     UserImpl them = (UserImpl) obj;
-    if (getUserId() == UserImpl.UNSAVED_ID || them.getUserId() == UserImpl.UNSAVED_ID) {
+    if (getId() == UserImpl.UNSAVED_ID || them.getId() == UserImpl.UNSAVED_ID) {
       return this.getLoginName().equals(them.getLoginName());
     }
     else {
-      return this.getUserId() == them.getUserId();
+      return this.getId() == them.getId();
     }
   }
 
   @Override
   public int hashCode() {
-    if (this.getUserId() != UserImpl.UNSAVED_ID) {
-      return this.getUserId().intValue();
+    if (getId() != UserImpl.UNSAVED_ID) {
+      return (int)getId();
     }
     else {
       int hashcode = 1;
@@ -236,8 +244,8 @@ public class UserImpl implements User, Serializable, Comparable {
 
   public int compareTo(Object o) {
     User t = (User)o;
-    if (getUserId() < t.getUserId()) return -1;
-    if (getUserId() > t.getUserId()) return 1;
+    if (getId() < t.getUserId()) return -1;
+    if (getId() > t.getUserId()) return 1;
     return 0;
   }
 }

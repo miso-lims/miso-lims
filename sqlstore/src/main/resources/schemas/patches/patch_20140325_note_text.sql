@@ -1,0 +1,1 @@
+ALTER TABLE lims.Note MODIFY COLUMN text TEXT;

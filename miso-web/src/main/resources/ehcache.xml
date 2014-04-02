@@ -288,7 +288,7 @@
     <cache name="userCache" eternal="true" overflowToDisk="true" statistics="true"
            maxBytesLocalHeap="5M" maxBytesLocalDisk="100M"/>
 
-    <cache name="lazyUserCache" eternal="true" overflowToDisk="true" statistics="true"
+    <cache name="lazyUserCache" eternal="true" overflowToDisk="false" statistics="true"
            maxBytesLocalHeap="3M" maxBytesLocalDisk="30M"/>
 
 <!-- LIST CACHES -->

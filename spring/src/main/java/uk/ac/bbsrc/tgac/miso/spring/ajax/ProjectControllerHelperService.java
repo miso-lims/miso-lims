@@ -712,6 +712,10 @@ public class ProjectControllerHelperService {
   }
 
   public JSONObject generateSampleDeliveryForm(HttpSession session, JSONObject json) {
+    Boolean plate = false;
+    if ("yes".equals(json.getString("plate"))){
+        plate = true;
+    }
     Long projectId = json.getLong("projectId");
     List<Sample> samples = new ArrayList<Sample>();
     if (json.has("samples")) {
@@ -725,7 +729,7 @@ public class ProjectControllerHelperService {
                 projectId.toString(),
                 "SampleInformationForm-" + LimsUtils.getCurrentDateAsString() + ".odt");
 
-        FormUtils.createSampleDeliveryForm(samples, f);
+        FormUtils.createSampleDeliveryForm(samples, f, plate);
         return JSONUtils.SimpleJSONResponse("" + f.getName().hashCode());
       }
       catch (Exception e) {

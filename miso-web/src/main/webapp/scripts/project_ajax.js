@@ -130,6 +130,7 @@ Project.ui = {
       'projectControllerHelperService',
       'generateSampleDeliveryForm',
       {
+        'plate':jQuery('input:radio[name=plateinformationform]:checked').val(),
         'projectId': projectId,
         'samples': aReturn,
         'url': ajaxurl

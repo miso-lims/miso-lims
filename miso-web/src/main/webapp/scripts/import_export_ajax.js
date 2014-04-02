@@ -259,5 +259,20 @@ var ImportExport = ImportExport || {
             }
             }
     );
+  },
+
+  changePlatformName: function (input) {
+    var self = this;
+    var platform = jQuery(input).val();
+    Fluxion.doAjax(
+            'importExportControllerHelperService',
+            'changePlatformName',
+            {'platform': platform, 'url': ajaxurl},
+            {'doOnSuccess': function (json){
+              jQuery('#type').html(json.libraryTypes);
+              jQuery('#barcodekit').html(json.tagBarcodeStrategies);
+            }
+            }
+    );
   }
 };

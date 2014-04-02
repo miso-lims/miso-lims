@@ -30,7 +30,7 @@
     <div class="portlet">
       <div class="portlet-header">My Account</div>
       <div class="portlet-content">
-        User: ${userRealName}<br/>
+        User: ${userRealName} <a href="<c:url value='/miso/user/${userId}'/>">Edit</a><br/>
         Groups: ${userGroups}<br/><br/>
         API Key: ${apiKey}
       </div>

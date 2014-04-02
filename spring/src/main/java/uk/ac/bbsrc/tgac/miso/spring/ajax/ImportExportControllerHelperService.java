@@ -43,6 +43,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.InputFormException;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.core.service.tagbarcode.TagBarcodeStrategy;
+import uk.ac.bbsrc.tgac.miso.core.service.tagbarcode.TagBarcodeStrategyResolverService;
 import uk.ac.bbsrc.tgac.miso.core.util.FormUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -71,6 +73,8 @@ public class ImportExportControllerHelperService {
   private MisoFilesManager misoFileManager;
   @Autowired
   private SecurityManager securityManager;
+  @Autowired
+  private TagBarcodeStrategyResolverService tagBarcodeStrategyResolverService;
 
   private static final Pattern digitPattern = Pattern.compile("(^[0-9]+)[\\.0-9]*");
 
@@ -475,7 +479,7 @@ public class ImportExportControllerHelperService {
                 else {
                   Pool pool = new PoolImpl();
                   if (!pools.containsKey(poolName)) {
-                    pool.setAlias("pool" + poolName);
+                    pool.setAlias(poolName);
                     pool.setPlatformType(pt);
                     pool.setReadyToRun(true);
                     pool.setCreationDate(new Date());
@@ -514,6 +518,90 @@ public class ImportExportControllerHelperService {
     return JSONUtils.SimpleJSONResponse("ok");
   }
 
+  public JSONObject platformsOptions(HttpSession session, JSONObject json) {
+    try {
+      StringBuilder b = new StringBuilder();
+      List<String> pn = new ArrayList<String>(populatePlatformNames());
+      for (String name : pn) {
+        b.append("<option>" + name + "</option>");
+      }
+      return JSONUtils.JSONObjectResponse("html", b.toString());
+    }
+    catch (IOException e) {
+      log.debug("Failed", e);
+      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
+    }
+
+  }
+
+  public Collection<String> populatePlatformNames() throws IOException {
+    List<String> types = new ArrayList<String>(requestManager.listDistinctPlatformNames());
+    Collections.sort(types);
+    return types;
+  }
+
+  public Collection<LibraryStrategyType> populateLibraryStrategyTypes() throws IOException {
+    List<LibraryStrategyType> types = new ArrayList<LibraryStrategyType>(requestManager.listAllLibraryStrategyTypes());
+    Collections.sort(types);
+    return types;
+  }
+
+  public JSONObject libraryStrategyTypesString(HttpSession session, JSONObject json) throws IOException {
+    StringBuilder b = new StringBuilder();
+    for (LibraryStrategyType t : populateLibraryStrategyTypes()) {
+      b.append("<option>" + t.getName() + "</option>");
+    }
+    return JSONUtils.JSONObjectResponse("html", b.toString());
+  }
+
+  public Collection<LibrarySelectionType> populateLibrarySelectionTypes() throws IOException {
+    List<LibrarySelectionType> types = new ArrayList<LibrarySelectionType>(requestManager.listAllLibrarySelectionTypes());
+    Collections.sort(types);
+    return types;
+  }
+
+  public JSONObject librarySelectionTypesString(HttpSession session, JSONObject json) throws IOException {
+    StringBuilder b = new StringBuilder();
+    for (LibrarySelectionType t : populateLibrarySelectionTypes()) {
+      b.append("<option>" + t.getName() + "</option>");
+    }
+    return JSONUtils.JSONObjectResponse("html", b.toString());
+  }
+
+  public JSONObject changePlatformName(HttpSession session, JSONObject json) {
+    try {
+      if (json.has("platform") && !json.get("platform").equals("")) {
+        String platform = json.getString("platform");
+        Map<String, Object> map = new HashMap<String, Object>();
+
+        StringBuilder libsb = new StringBuilder();
+        List<LibraryType> types = new ArrayList<LibraryType>(requestManager.listLibraryTypesByPlatform(platform));
+        Collections.sort(types);
+        for (LibraryType s : types) {
+          libsb.append("<option>" + platform + "-" + s.getDescription() + "</option>");
+        }
+
+        StringBuilder tagsb = new StringBuilder();
+        List<TagBarcodeStrategy> strategies = new ArrayList<TagBarcodeStrategy>(tagBarcodeStrategyResolverService.getTagBarcodeStrategiesByPlatform(PlatformType.get(platform)));
+        tagsb.append("<option >No Barcode Strategy</option>");
+        for (TagBarcodeStrategy tb : strategies) {
+          tagsb.append("<option>" + tb.getName() + "</option>");
+        }
+
+        map.put("libraryTypes", libsb.toString());
+        map.put("tagBarcodeStrategies", tagsb.toString());
+
+        return JSONUtils.JSONObjectResponse(map);
+      }
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+      log.error("Failed to retrieve library types given platform type: ", e);
+      return JSONUtils.SimpleJSONError("Failed to retrieve library types given platform type: " + e.getMessage());
+    }
+    return JSONUtils.SimpleJSONError("Cannot resolve LibraryType from selected Platform");
+  }
+
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
   }
@@ -525,5 +613,10 @@ public class ImportExportControllerHelperService {
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
   }
+
+  public void setTagBarcodeStrategyResolverService(TagBarcodeStrategyResolverService tagBarcodeStrategyResolverService) {
+    this.tagBarcodeStrategyResolverService = tagBarcodeStrategyResolverService;
+  }
+
 
 }
