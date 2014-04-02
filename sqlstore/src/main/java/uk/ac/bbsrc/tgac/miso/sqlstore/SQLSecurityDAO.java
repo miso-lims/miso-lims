@@ -177,6 +177,7 @@ public class SQLSecurityDAO implements SecurityStore {
     this.passwordCodecService = passwordCodecService;
   }
 
+  @Override
   @Transactional(readOnly = false, rollbackFor = IOException.class)
   @TriggersRemove(cacheName = {"userCache", "lazyUserCache"},
                   keyGenerator = @KeyGenerator(
@@ -298,6 +299,8 @@ public class SQLSecurityDAO implements SecurityStore {
         eInsert.execute(ugParams);
       }
     }
+
+    DbUtils.updateCaches(cacheManager.getCache("userCache"), user.getUserId());
 
     return user.getUserId();
   }

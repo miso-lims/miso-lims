@@ -51,7 +51,6 @@ import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.security.PasswordCodecService;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 @Controller
@@ -161,28 +160,6 @@ public class EditUserController {
     }
   }
 
-  /*
-  @RequestMapping(value = "/tech/user/{userId}", method = RequestMethod.GET)
-  public ModelAndView techSetupForm(@PathVariable Long userId,
-                                    ModelMap model, HttpServletRequest request) throws IOException {
-    try {
-      model.put("user", userId == UserImpl.UNSAVED_ID ? dataObjectFactory.getUser()
-                                                      : securityManager.getUserById(userId));
-
-      String securityMethod = (String)request.getSession().getServletContext().getAttribute("security.method");
-      model.put("securityMethod", securityMethod);
-
-      return new ModelAndView("/pages/editUser.jsp", model);
-    }
-    catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to show user", ex);
-      }
-      throw ex;
-    }
-  }
-*/
-
   @RequestMapping(value = "/admin/user/{userId}", method = RequestMethod.GET)
   public ModelAndView adminSetupForm(@PathVariable Long userId,
                                      ModelMap model, HttpServletRequest request) throws IOException {
@@ -204,25 +181,6 @@ public class EditUserController {
       throw ex;
     }
   }
-
-  /*
-  @RequestMapping(value = "/tech/user", method = RequestMethod.POST)
-  public String techProcessSubmit(@ModelAttribute("user") User user,
-                                  ModelMap model, SessionStatus session) throws IOException {
-    try {
-      securityManager.saveUser(user);
-      session.setComplete();
-      model.clear();
-      return "redirect:/miso/tech/users";
-    }
-    catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to update user", ex);
-      }
-      throw ex;
-    }
-  }
-*/
 
   @RequestMapping(value = "/admin/user", method = RequestMethod.POST)
   public String adminProcessSubmit(@ModelAttribute("user") User user,
@@ -289,6 +247,50 @@ public class EditUserController {
       session.setComplete();
       model.clear();
       return "redirect:/miso/admin/users";
+    }
+    catch (IOException ex) {
+      if (log.isDebugEnabled()) {
+        log.debug("Failed to update user", ex);
+      }
+      throw ex;
+    }
+  }
+
+  @RequestMapping(value = "/user", method = RequestMethod.POST)
+  public String processSubmit(@ModelAttribute("user") User user,
+                                   ModelMap model, SessionStatus session, HttpServletRequest request) throws IOException {
+    try {
+      if (!LimsUtils.isStringEmptyOrNull(request.getParameter("password")) && !LimsUtils.isStringEmptyOrNull(request.getParameter("newpassword"))) {
+        if (!LimsUtils.isStringEmptyOrNull(request.getParameter("confirmpassword"))) {
+          if (request.getParameter("newpassword").equals(request.getParameter("confirmpassword"))) {
+            if (!"".equals(request.getParameter("newpassword")) && !"".equals(request.getParameter("confirmpassword"))) {
+              if (SecurityContextHolder.getContext().getAuthentication().getName().equals(user.getLoginName())) {
+                if (passwordCodecService.getEncoder().isPasswordValid(user.getPassword(), request.getParameter("password"), null)) {
+                  log.debug("User '"+user.getLoginName()+"' attempting own password change");
+                  user.setPassword(request.getParameter("newpassword"));
+                }
+              }
+              else {
+                throw new IOException("Cannot update user - existing password check failed, or user isn't an admin.");
+              }
+            }
+            else {
+              throw new IOException("New password cannot be empty");
+            }
+          }
+          else {
+            throw new IOException("New password and confirmation don't match.");
+          }
+        }
+        else {
+          throw new IOException("You must supply a confirmation of your new password.");
+        }
+      }
+
+      securityManager.saveUser(user);
+      session.setComplete();
+      model.clear();
+      return "redirect:/miso/myAccount";
     }
     catch (IOException ex) {
       if (log.isDebugEnabled()) {
