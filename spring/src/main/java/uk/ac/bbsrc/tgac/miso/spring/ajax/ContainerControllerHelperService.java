@@ -736,13 +736,6 @@ public class ContainerControllerHelperService {
             }
             sb.append("</table>");
 
-            if (f != null) {
-              log.info("LOOKUP pre-bind:" + f.toString());
-            }
-            else {
-              log.info("WTF. Container null");
-            }
-
             Map<String, Object> responseMap = new HashMap<String, Object>();
             responseMap.put("html", sb.toString());
             responseMap.put("barcode", f.getIdentificationBarcode());

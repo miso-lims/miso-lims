@@ -250,12 +250,8 @@
                           </ul>
                         </c:when>
                         <c:otherwise>
-                          <div id="p_div_${partitionCount.index}"
-                               class="elementListDroppableDiv">
-                            <ul class='runPartitionDroppable' bind='partitions[${partitionCount.index}].pool'
-                                partition='${partitionCount.index}'
-                                ondblclick='Container.partition.populatePartition(this);'/>
-                            </ul>
+                          <div id="p_div_${partitionCount.index}" class="elementListDroppableDiv">
+                            <ul class='runPartitionDroppable' bind='partitions[${partitionCount.index}].pool' partition='${partitionCount.index}' ondblclick='Container.partition.populatePartition(this);'></ul>
                           </div>
                         </c:otherwise>
                       </c:choose>

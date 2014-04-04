@@ -254,6 +254,7 @@ Container.partition = {
 
   insertPoolNextAvailable: function (poolLi) {
     var pool = jQuery(poolLi);
+
     jQuery('.runPartitionDroppable:empty:first').each(function () {
       var newpool = pool.clone().appendTo(jQuery(this));
       newpool.removeAttr("ondblclick");
