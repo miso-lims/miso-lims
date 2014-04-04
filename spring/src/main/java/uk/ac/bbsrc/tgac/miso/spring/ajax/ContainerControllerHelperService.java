@@ -672,7 +672,7 @@ public class ContainerControllerHelperService {
           StringBuilder sb = new StringBuilder();
           if (fs.size() == 1) {
             //replace container div
-            SequencerPartitionContainer<SequencerPoolPartition> f = new ArrayList<SequencerPartitionContainer<SequencerPoolPartition>>(fs).get(0);
+            SequencerPartitionContainer<SequencerPoolPartition> f = new ArrayList<>(fs).get(0);
             sb.append("<table class='in'>");
             sb.append("<th>Partition No.</th>");
             sb.append("<th>Pool</th>");
@@ -727,7 +727,7 @@ public class ContainerControllerHelperService {
               else {
                 confirm.put(p.getPartitionNumber(), "Empty");
 
-                sb.append("<div id='p_div_" + (p.getPartitionNumber() - 1) + "' class='elementListDroppableDiv'>");
+                sb.append("<div id='p_div-" + (p.getPartitionNumber() - 1) + "' class='elementListDroppableDiv'>");
                 sb.append("<ul class='runPartitionDroppable' bind='partitions[" + (p.getPartitionNumber() - 1) + "].pool' partition='" + (p.getPartitionNumber() - 1) + "' ondblclick='Container.partition.populatePartition(this);'></ul>");
                 sb.append("</div>");
               }
@@ -736,24 +736,33 @@ public class ContainerControllerHelperService {
             }
             sb.append("</table>");
 
+            if (f != null) {
+              log.info("LOOKUP pre-bind:" + f.toString());
+            }
+            else {
+              log.info("WTF. Container null");
+            }
+
             Map<String, Object> responseMap = new HashMap<String, Object>();
             responseMap.put("html", sb.toString());
             responseMap.put("barcode", f.getIdentificationBarcode());
+            responseMap.put("containerId", f.getId());
             responseMap.put("verify", confirm);
             return JSONUtils.JSONObjectResponse(responseMap);
           }
           else {
             //choose container
-            return JSONUtils.JSONObjectResponse("html", "");
+            //return JSONUtils.JSONObjectResponse("error", "Multiple containers found with barcode "+ barcode);
+            return JSONUtils.SimpleJSONError("Multiple containers found with barcode " + barcode);
           }
         }
         else {
-          return JSONUtils.JSONObjectResponse("err", "No containers with this barcode.");
+          return JSONUtils.JSONObjectResponse("error", "No containers with this barcode.");
         }
       }
       catch (IOException e) {
         e.printStackTrace();
-        return JSONUtils.JSONObjectResponse("err", "Unable to lookup barcode.");
+        return JSONUtils.JSONObjectResponse("error", "Unable to lookup barcode.");
       }
     }
     else {
@@ -792,6 +801,22 @@ public class ContainerControllerHelperService {
     }
   }
 
+  public JSONObject removePoolFromPartition(HttpSession session, JSONObject json) {
+    if (json.has("container_cId") && json.has("partitionNum")) {
+      Integer partitionNum = json.getInt("partitionNum");
+
+      SequencerPartitionContainer<SequencerPoolPartition> lf =
+          (SequencerPartitionContainer<SequencerPoolPartition>) session.getAttribute("container_" + json.getString("container_cId"));
+      SequencerPoolPartition spp = lf.getPartitionAt(partitionNum);
+      spp.setPool(null);
+      session.setAttribute("container_" + json.getString("container_cId"), lf);
+
+      return JSONUtils.SimpleJSONResponse("OK");
+    }
+    else {
+      return JSONUtils.SimpleJSONError("No partitionId specified");
+    }
+  }
 
   public JSONObject checkContainer(HttpSession session, JSONObject json) {
     try {

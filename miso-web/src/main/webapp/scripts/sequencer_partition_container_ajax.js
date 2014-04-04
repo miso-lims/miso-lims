@@ -38,8 +38,8 @@ var Container = Container || {
   },
 
   processLookup: function (json) {
-    if (json.err) {
-      jQuery('#partitionErrorDiv').html(json.err);
+    if (json.error) {
+      jQuery('#partitionErrorDiv').html(json.error);
     }
     else {
       if (json.verify) {
@@ -49,8 +49,9 @@ var Container = Container || {
         }
 
         if (confirm("Found container '" + json.barcode + "'. Import this container?\n\n" + dialogStr)) {
-          jQuery('#partitionErrorDiv').html("");
-          jQuery('#partitionDiv').html(json.html);
+          //jQuery('#partitionErrorDiv').html("");
+          //jQuery('#partitionDiv').html(json.html);
+          window.location.href = "/miso/container/"+json.containerId;
         }
       }
     }
@@ -348,9 +349,21 @@ Container.pool = {
     );
   },
 
-  confirmPoolRemove: function (t) {
+  confirmPoolRemove: function (t, partitionNum) {
     if (confirm("Remove this pool?")) {
-      jQuery(t).parent().remove();
+      if (partitionNum === undefined) {
+        //previously unsaved container, just remove the div
+        jQuery(t).parent().remove();
+      }
+      else {
+        //previously saved container, actually remove the pool from the partition
+        Fluxion.doAjax(
+          'containerControllerHelperService',
+          'removePoolFromPartition',
+          {'container_cId': jQuery('input[name=container_cId]').val(), 'partitionNum': partitionNum, 'url': ajaxurl},
+          {'doOnSuccess': jQuery(t).parent().remove()}
+        );
+      }
     }
   }
 };

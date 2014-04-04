@@ -38,10 +38,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * uk.ac.bbsrc.tgac.miso.miso.spring.ajax
@@ -91,7 +88,9 @@ public class PoolSearchService {
           }
         }
         if (pools.size() > 0) {
-          for (Pool<? extends Poolable> pool : pools) {
+          List<Pool<? extends Poolable>> rPools = new ArrayList<>(pools);
+          Collections.reverse(rPools);
+          for (Pool<? extends Poolable> pool : rPools) {
             b.append(poolHtml(pool));
           }
         }

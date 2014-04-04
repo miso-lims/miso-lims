@@ -83,6 +83,12 @@
         <td id="sequencerReferenceSelect">${container.run.sequencerReference.name} (${container.run.sequencerReference.platform.instrumentModel})</td>
       </tr>
     </c:when>
+    <c:when test="${container.id != 0}">
+      <tr>
+        <td>Sequencer:</td>
+        <td id="sequencerReferenceSelect"><i>Not yet processed on a run - unknown</i></td>
+      </tr>
+    </c:when>
     <c:otherwise>
       <tr>
         <td>Sequencer:</td>
@@ -214,16 +220,15 @@
                         <c:when test="${not empty partition.pool}">
                           <ul partition="${partitionCount.index}" bind="partitions[${partitionCount.index}].pool"
                               class="runPartitionDroppable">
-                            <div class="dashboard">
+                            <div class="dashboard" style="position:relative">
                                 <%-- <a href='<c:url value="/miso/pool/${fn:toLowerCase(container.platformType.key)}/${partition.pool.id}"/>'> --%>
                               <a href='<c:url value="/miso/pool/${partition.pool.id}"/>'>
                                   ${partition.pool.name}
                                 (${partition.pool.creationDate})
                               </a><br/>
-                            <span style="font-size:8pt">
+                              <span style="font-size:8pt">
                               <c:choose>
                                 <c:when test="${not empty partition.pool.experiments}">
-
                                   <i><c:forEach items="${partition.pool.experiments}" var="experiment">
                                     ${experiment.study.project.alias} (${experiment.name}: ${fn:length(partition.pool.dilutions)} dilutions)<br/>
                                   </c:forEach>
@@ -237,7 +242,10 @@
                                   <i>No experiment linked to this pool</i>
                                 </c:otherwise>
                               </c:choose>
-                            </span>
+                              </span>
+                              <c:if test="${empty container.run or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+                              <span style='position: absolute; top: 0; right: 0;' onclick='Container.pool.confirmPoolRemove(this, "${partition.partitionNumber}");' class='float-right ui-icon ui-icon-circle-close'></span>
+                              </c:if>
                             </div>
                           </ul>
                         </c:when>
@@ -299,11 +307,16 @@
 </div>
 
 <script type="text/javascript">
-  <c:if test="${container.id == 0 or empty container.platformType}">
-  jQuery(document).ready(function () {
-    Container.ui.populatePlatformTypes();
-  });
-  </c:if>
+  <c:choose>
+    <c:when test="${container.id == 0 or empty container.platformType}">
+      jQuery(document).ready(function () {
+        Container.ui.populatePlatformTypes();
+      });
+    </c:when>
+    <c:otherwise>
+      Container.pool.poolSearch("", '${container.platformType.key}');
+    </c:otherwise>
+  </c:choose>
 </script>
 
 <%@ include file="adminsub.jsp" %>

@@ -42,6 +42,7 @@ import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
@@ -135,6 +136,9 @@ public class EditSequencerPartitionContainerController {
       if (!container.userCanWrite(user)) {
         throw new SecurityException("Permission denied.");
       }
+
+      log.info("Post-bind:" + container.toString());
+
       long containerId = requestManager.saveSequencerPartitionContainer(container);
       session.setComplete();
       model.clear();
