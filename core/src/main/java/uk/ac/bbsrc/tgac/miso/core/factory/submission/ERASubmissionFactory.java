@@ -89,10 +89,8 @@ public class ERASubmissionFactory {
    * @param c of type Collection<Study>
    */
   public static void generateStudySubmissionXML(Document doc, Collection<Study> c, Properties submissionProperties) {
-    if (c.size() > 1) {
-      Element set = doc.createElementNS(null, "STUDY_SET");
-      doc.appendChild(set);
-    }
+    Element set = doc.createElementNS(null, "STUDY_SET");
+    doc.appendChild(set);
 
     for (Study s : c) {
       generateStudySubmissionXML(doc, s, submissionProperties);
@@ -116,10 +114,8 @@ public class ERASubmissionFactory {
    * @param c of type Collection<Experiment>
    */
   public static void generateExperimentSubmissionXML(Document doc, Collection<Experiment> c, Properties submissionProperties) {
-    if (c.size() > 1) {
-      Element set = doc.createElementNS(null, "EXPERIMENT_SET");
-      doc.appendChild(set);
-    }
+    Element set = doc.createElementNS(null, "EXPERIMENT_SET");
+    doc.appendChild(set);
 
     for (Experiment e : c) {
       generateExperimentSubmissionXML(doc, e, submissionProperties);
@@ -143,10 +139,8 @@ public class ERASubmissionFactory {
    * @param c of type Collection<Sample>
    */
   public static void generateSampleSubmissionXML(Document doc, Collection<Sample> c, Properties submissionProperties) {
-    if (c.size() > 1) {
-      Element set = doc.createElementNS(null, "SAMPLE_SET");
-      doc.appendChild(set);
-    }
+    Element set = doc.createElementNS(null, "SAMPLE_SET");
+    doc.appendChild(set);
 
     for (Sample s : c) {
       generateSampleSubmissionXML(doc, s, submissionProperties);
@@ -183,10 +177,8 @@ public class ERASubmissionFactory {
    * @param c of type Collection<SequencerPoolPartition>
    */
   public static void generatePartitionRunSubmissionXML(Document doc, Collection<SequencerPoolPartition> c, Properties submissionProperties) {
-    if (c.size() > 1) {
-      Element set = doc.createElementNS(null, "RUN_SET");
-      doc.appendChild(set);
-    }
+    Element set = doc.createElementNS(null, "RUN_SET");
+    doc.appendChild(set);
 
     for (SequencerPoolPartition p : c) {
       generatePartitionRunSubmissionXML(doc, p, submissionProperties);

@@ -282,8 +282,6 @@ Container.partition = {
     var studyId = jQuery("select[name='poolStudies" + partition + "_" + projectId + "'] :selected").val();
     var sequencerReferenceId = jQuery("select[name='sequencer'] :selected").val();
 
-    console.log("Attempting to retrieve study " + studyId + " and sequencer reference [" + jQuery('#sequencerReference').val() + " vs. " + sequencerReferenceId +"]");
-
     Fluxion.doAjax(
       'containerControllerHelperService',
       'selectStudyForPool',

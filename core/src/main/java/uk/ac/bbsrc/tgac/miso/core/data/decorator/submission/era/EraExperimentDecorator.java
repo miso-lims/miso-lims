@@ -569,14 +569,7 @@ public class EraExperimentDecorator extends AbstractSubmittableDecorator<Documen
 */
       experiment.appendChild(processing);
 
-      if(submission.getElementsByTagName("EXPERIMENT_SET").item(0) != null) {
-        submission.getElementsByTagName("EXPERIMENT_SET").item(0).appendChild(experiment);
-      }
-      else {
-        Element expSet = submission.createElementNS(null, "EXPERIMENT_SET");
-        submission.appendChild(expSet);
-        expSet.appendChild(experiment);
-      }
+      submission.getElementsByTagName("EXPERIMENT_SET").item(0).appendChild(experiment);
     }
   }
 }

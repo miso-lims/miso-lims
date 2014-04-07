@@ -84,14 +84,6 @@ public class EraSampleDecorator extends AbstractSubmittableDecorator<Document> {
     sampleDescription.setTextContent(sample.getDescription());
     s.appendChild(sampleDescription);
 
-    if (submission.getElementsByTagName("SAMPLE_SET").item(0) != null) {
-      submission.getElementsByTagName("SAMPLE_SET").item(0).appendChild(s);
-    }
-    else {
-      Element sampleSet=submission.createElementNS(null,"SAMPLE_SET");
-      submission.appendChild(sampleSet);
-      sampleSet.appendChild(s);
-
-    }
+    submission.getElementsByTagName("SAMPLE_SET").item(0).appendChild(s);
   }
 }

@@ -170,8 +170,6 @@ public class EditUserController {
       String securityMethod = (String)request.getSession().getServletContext().getAttribute("security.method");
       model.put("securityMethod", securityMethod);
 
-      log.info("security method " + securityMethod);
-
       return new ModelAndView("/pages/editUser.jsp", model);
     }
     catch (IOException ex) {

@@ -180,13 +180,14 @@ public class SubmissionControllerHelperService {
           return JSONUtils.JSONObjectResponse("metadata", s);
         }
         catch (SubmissionException se) {
-          return JSONUtils.SimpleJSONError(se.getMessage());
+          return JSONUtils.SimpleJSONError("Cannot preview submission metadata: " + se.getMessage());
         }
       }
     }
     catch (Exception e) {
-      log.debug("Failed to get submission metadata: ", e);
-      return JSONUtils.SimpleJSONError("Failed to get submission metadata");
+      e.printStackTrace();
+      log.error("Failed to get submission metadata: ", e);
+      return JSONUtils.SimpleJSONError("Failed to get submission metadata: " + e.getMessage());
     }
     return JSONUtils.SimpleJSONError("Cannot build submission metadata");
   }
@@ -275,7 +276,8 @@ public class SubmissionControllerHelperService {
       }
     }
     catch (Exception e) {
-      log.debug("Failed to get submission metadata: ", e);
+      e.printStackTrace();
+      log.error("Failed to get submission metadata: ", e);
       return JSONUtils.SimpleJSONError("Failed to get submission metadata");
     }
     return JSONUtils.SimpleJSONError("Cannot build submission metadata");
@@ -306,10 +308,11 @@ public class SubmissionControllerHelperService {
       }
     }
     catch (Exception e) {
-      log.debug("Failed to get submission metadata: ", e);
-      return JSONUtils.SimpleJSONError("Failed to get submission metadata");
+      e.printStackTrace();
+      log.error("Failed to submit submission metadata: ", e);
+      return JSONUtils.SimpleJSONError("Failed to submit submission metadata: " + e.getMessage());
     }
-    return JSONUtils.SimpleJSONError("Cannot build submission metadata");
+    return JSONUtils.SimpleJSONError("Cannot submit submission metadata");
   }
 
   public JSONObject submitSequenceData(HttpSession session, JSONObject json) {
@@ -325,8 +328,9 @@ public class SubmissionControllerHelperService {
       }
     }
     catch (Exception e) {
-      log.debug("Failed to submit sequence data: ", e);
-      return JSONUtils.SimpleJSONError("Failed to submit sequence data");
+      e.printStackTrace();
+      log.error("Failed to submit sequence data: ", e);
+      return JSONUtils.SimpleJSONError("Failed to submit sequence data: " + e.getMessage());
     }
   }
 
@@ -361,11 +365,11 @@ public class SubmissionControllerHelperService {
       }
     }
     catch (Exception e) {
-      log.debug("Failed to get upload progress ", e);
+      log.error("Failed to get upload progress ", e);
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Failed to get upload report" + e.getMessage());
     }
-    log.debug("Failed to get upload progress ");
+    log.error("Failed to get upload progress ");
     return JSONUtils.SimpleJSONError("Failed to get upload progress");
   }
 
@@ -400,7 +404,7 @@ public class SubmissionControllerHelperService {
       }
     }
     catch (Exception e) {
-      log.debug("Failed to open project nodes for submission: ", e);
+      log.error("Failed to open project nodes for submission: ", e);
       return JSONUtils.SimpleJSONError("Failed to open project nodes for submission");
     }
     return JSONUtils.SimpleJSONError("Cannot open project nodes for submission");
@@ -517,7 +521,7 @@ public class SubmissionControllerHelperService {
                           }
                         }
                         catch (SubmissionException e1) {
-                          log.debug("Failed to generate path for data file in submission: ", e1);
+                          log.error("Failed to generate path for data file in submission: ", e1);
                           e1.printStackTrace();
                           return JSONUtils.SimpleJSONError("Failed to populate project for submission");
                         }
@@ -533,7 +537,7 @@ public class SubmissionControllerHelperService {
                           }
                         }
                         catch (SubmissionException e1) {
-                          log.debug("Failed to generate path for data file in submission: ", e1);
+                          log.error("Failed to generate path for data file in submission: ", e1);
                           e1.printStackTrace();
                           return JSONUtils.SimpleJSONError("Failed to populate project for submission");
                         }
@@ -566,7 +570,7 @@ public class SubmissionControllerHelperService {
       }
     }
     catch (IOException e) {
-      log.debug("Failed to populate project for submission: ", e);
+      log.error("Failed to populate project for submission: ", e);
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Failed to populate project for submission");
     }
