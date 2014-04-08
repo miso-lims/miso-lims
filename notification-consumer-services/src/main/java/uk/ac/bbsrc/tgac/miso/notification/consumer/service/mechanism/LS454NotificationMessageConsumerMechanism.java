@@ -284,12 +284,12 @@ public class LS454NotificationMessageConsumerMechanism implements NotificationMe
                       if (ptp.getElementsByTagName("padLayout").getLength() > 0 && ptp.getElementsByTagName("padLayout").item(0) != null) {
                         int numPartitions = Integer.parseInt(ptp.getElementsByTagName("padLayout").item(0).getTextContent().split("_")[0]);
                         SequencerPartitionContainer f = new SequencerPartitionContainerImpl();
-                        if (f.getPlatformType() == null && r.getPlatformType() != null) {
-                          f.setPlatformType(r.getPlatformType());
+                        if (f.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
+                          f.setPlatform(r.getSequencerReference().getPlatform());
                         }
-                        else {
-                          f.setPlatformType(PlatformType.LS454);
-                        }
+//                        else {
+//                          f.setPlatformType(PlatformType.LS454);
+//                        }
                         f.setPartitionLimit(numPartitions);
                         f.initEmptyPartitions();
                         f.setIdentificationBarcode(ptpId);
@@ -301,12 +301,12 @@ public class LS454NotificationMessageConsumerMechanism implements NotificationMe
                     else {
                       SequencerPartitionContainer f = fs.iterator().next();
                       log.debug("\\_ Got SequencerPartitionContainer " + f.getId());
-                      if (f.getPlatformType() == null && r.getPlatformType() != null) {
-                        f.setPlatformType(r.getPlatformType());
+                      if (f.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
+                        f.setPlatform(r.getSequencerReference().getPlatform());
                       }
-                      else {
-                        f.setPlatformType(PlatformType.LS454);
-                      }
+//                      else {
+//                        f.setPlatformType(PlatformType.LS454);
+//                      }
                       if (f.getIdentificationBarcode() == null || "".equals(f.getIdentificationBarcode())) {
                         f.setIdentificationBarcode(ptpId);
                         long flowId = requestManager.saveSequencerPartitionContainer(f);

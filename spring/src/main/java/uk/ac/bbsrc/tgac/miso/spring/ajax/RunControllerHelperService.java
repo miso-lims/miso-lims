@@ -1096,7 +1096,8 @@ public class RunControllerHelperService {
       List<SequencerPartitionContainer> fs = new ArrayList<SequencerPartitionContainer>(r.getSequencerPartitionContainers());
       if (!fs.isEmpty()) {
         SequencerPartitionContainer f = fs.get(container);
-        if (f.getPlatformType().equals(p.getPlatformType())) {
+        //if (f.getPlatformType().equals(p.getPlatformType())) {
+        if (f.getPlatform().getPlatformType().equals(p.getPlatformType())) {
           return JSONUtils.JSONObjectResponse("html", poolHtml(p, container, partition));
         }
         else {

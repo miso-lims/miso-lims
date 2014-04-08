@@ -296,12 +296,12 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
                     if (lf.getSecurityProfile() != null && r.getSecurityProfile() == null) {
                       r.setSecurityProfile(lf.getSecurityProfile());
                     }
-                    if (lf.getPlatformType() == null && r.getPlatformType() != null) {
-                      lf.setPlatformType(r.getPlatformType());
+                    if (lf.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
+                      lf.setPlatform(r.getSequencerReference().getPlatform());
                     }
-                    else {
-                      lf.setPlatformType(PlatformType.ILLUMINA);
-                    }
+//                    else {
+//                      lf.setPlatformType(PlatformType.ILLUMINA);
+//                    }
 
                     if (run.has("laneCount") && run.getInt("laneCount") != lf.getPartitions().size()) {
                       log.warn(r.getAlias() + ":: Previously saved flowcell lane count does not match notification-supplied value from RunInfo.xml. Setting new partitionLimit");
@@ -318,12 +318,13 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
                 else {
                   SequencerPartitionContainer<SequencerPoolPartition> f = new SequencerPartitionContainerImpl();
                   f.setSecurityProfile(r.getSecurityProfile());
-                  if (f.getPlatformType() == null && r.getPlatformType() != null) {
-                    f.setPlatformType(r.getPlatformType());
+                  if (f.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
+                    f.setPlatform(r.getSequencerReference().getPlatform());
                   }
-                  else {
-                    f.setPlatformType(PlatformType.ILLUMINA);
-                  }
+//                  else {
+//                    f.setPlatformType(PlatformType.ILLUMINA);
+//                  }
+
                   if (run.has("laneCount")) {
                     f.setPartitionLimit(run.getInt("laneCount"));
                   }
@@ -342,12 +343,12 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
             else {
               SequencerPartitionContainer<SequencerPoolPartition> f = fs.iterator().next();
               f.setSecurityProfile(r.getSecurityProfile());
-              if (f.getPlatformType() == null && r.getPlatformType() != null) {
-                f.setPlatformType(r.getPlatformType());
+              if (f.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
+                f.setPlatform(r.getSequencerReference().getPlatform());
               }
-              else {
-                f.setPlatformType(PlatformType.ILLUMINA);
-              }
+//              else {
+//                f.setPlatformType(PlatformType.ILLUMINA);
+//              }
 
               if (f.getPartitions().isEmpty()) {
                 //log.info("No partitions found for run " + r.getName() + " (container "+f.getContainerId()+")");

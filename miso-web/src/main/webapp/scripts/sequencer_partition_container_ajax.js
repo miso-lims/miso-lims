@@ -134,10 +134,12 @@ Container.ui = {
       Fluxion.doAjax(
         'containerControllerHelperService',
         'populateContainerOptions',
-        {'sequencerReference': form.value, 'url': ajaxurl},
+        {'sequencerReference': form.value, 'container_cId': jQuery('input[name=container_cId]').val(), 'url': ajaxurl},
         {'doOnSuccess': function (json) {
-          jQuery('#containerPartitions').html(json.partitions);
-        }
+            if (json.partitions) {
+              jQuery('#containerPartitions').html(json.partitions);
+            }
+          }
         }
       );
     }

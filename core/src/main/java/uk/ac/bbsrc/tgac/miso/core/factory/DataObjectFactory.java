@@ -75,8 +75,8 @@ public abstract class DataObjectFactory {
 
   public abstract SequencerPartitionContainer<SequencerPoolPartition> getSequencerPartitionContainer();
   public abstract SequencerPartitionContainer<SequencerPoolPartition> getSequencerPartitionContainer(User user);
-  public abstract SequencerPartitionContainer<SequencerPoolPartition> getSequencerPartitionContainer(PlatformType platformType);
-  public abstract SequencerPartitionContainer<SequencerPoolPartition> getSequencerPartitionContainer(PlatformType platformType, User user);
+  public abstract SequencerPartitionContainer<SequencerPoolPartition> getSequencerPartitionContainer(Platform platformType);
+  public abstract SequencerPartitionContainer<SequencerPoolPartition> getSequencerPartitionContainer(Platform platformType, User user);
 
   public abstract SequencerPoolPartition getSequencerPoolPartition();
 

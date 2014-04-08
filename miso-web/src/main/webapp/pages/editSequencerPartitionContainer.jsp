@@ -56,8 +56,7 @@
     <td class="h">Container ID:</td>
     <td>
       <c:choose>
-        <c:when test="${container.id != 0}"><input type='hidden' id='containerId' name='id'
-                                                   value='${container.id}'/>${container.id}</c:when>
+        <c:when test="${container.id != 0}"><input type='hidden' id='containerId' name='id' value='${container.id}'/>${container.id}</c:when>
         <c:otherwise><i>Unsaved</i></c:otherwise>
       </c:choose>
     </td>
@@ -67,8 +66,8 @@
     <td>Platform:</td>
     <td>
       <c:choose>
-        <c:when test="${container.id != 0 and not empty container.platformType}">
-          <div id="platformTypesDiv">${container.platformType.key}</div>
+        <c:when test="${container.id != 0 and not empty container.platform}">
+          <div id="platformTypesDiv">${container.platform.platformType.key}</div>
         </c:when>
         <c:otherwise>
           <div id="platformTypesDiv"></div>
@@ -77,10 +76,10 @@
     </td>
   </tr>
   <c:choose>
-    <c:when test="${container.id != 0 and not empty container.run}">
+    <c:when test="${container.id != 0 and not empty container.platform}">
       <tr>
         <td>Sequencer:</td>
-        <td id="sequencerReferenceSelect">${container.run.sequencerReference.name} (${container.run.sequencerReference.platform.instrumentModel})</td>
+        <td id="sequencerReferenceSelect">${container.platform.instrumentModel}</td>
       </tr>
     </c:when>
     <c:when test="${container.id != 0}">
@@ -267,15 +266,15 @@
     <td width="50%" valign="top">
       <h2>Available Pools</h2>
       <c:choose>
-        <c:when test="${not empty container.platformType}">
+        <c:when test="${not empty container.platform}">
           <input id="showOnlyReady" type="checkbox" checked="true"
-                 onclick="Container.pool.toggleReadyToRunCheck(this, '${container.platformType.key}');"/>Only Ready to Run pools?
+                 onclick="Container.pool.toggleReadyToRunCheck(this, '${container.platform.platformType.key}');"/>Only Ready to Run pools?
           <div align="right" style="margin-top: -23px; margin-bottom:3px">Filter:
             <input type="text" size="8" id="searchPools" name="searchPools"/>
           </div>
           <script type="text/javascript">
             Utils.timer.typewatchFunc(jQuery('#searchPools'), function () {
-              Container.pool.poolSearch(jQuery('#searchPools').val(), '${container.platformType.key}');
+              Container.pool.poolSearch(jQuery('#searchPools').val(), '${container.platform.platformType.key}');
             }, 300, 2);
           </script>
         </c:when>
@@ -304,13 +303,13 @@
 
 <script type="text/javascript">
   <c:choose>
-    <c:when test="${container.id == 0 or empty container.platformType}">
+    <c:when test="${container.id == 0 or empty container.platform}">
       jQuery(document).ready(function () {
         Container.ui.populatePlatformTypes();
       });
     </c:when>
     <c:otherwise>
-      Container.pool.poolSearch("", '${container.platformType.key}');
+      Container.pool.poolSearch("", '${container.platform.platformType.key}');
     </c:otherwise>
   </c:choose>
 </script>

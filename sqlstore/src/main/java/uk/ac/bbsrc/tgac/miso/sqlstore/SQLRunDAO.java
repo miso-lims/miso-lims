@@ -434,8 +434,8 @@ public class SQLRunDAO implements RunStore {
       if (this.cascadeType.equals(CascadeType.PERSIST)) {
         for (SequencerPartitionContainer<SequencerPoolPartition> l : ((RunImpl)run).getSequencerPartitionContainers()) {
           l.setSecurityProfile(run.getSecurityProfile());
-          if (l.getPlatformType() == null) {
-            l.setPlatformType(run.getPlatformType());
+          if (l.getPlatform().getPlatformType() == null) {
+            l.getPlatform().setPlatformType(run.getPlatformType());
           }
           long containerId = sequencerPartitionContainerDAO.save(l);
 
@@ -588,8 +588,11 @@ public class SQLRunDAO implements RunStore {
           if (this.cascadeType.equals(CascadeType.PERSIST)) {
             for (SequencerPartitionContainer<SequencerPoolPartition> l : ((RunImpl)run).getSequencerPartitionContainers()) {
               l.setSecurityProfile(run.getSecurityProfile());
-              if (l.getPlatformType() == null) {
-                l.setPlatformType(run.getPlatformType());
+              //if (l.getPlatformType() == null) {
+//                l.setPlatformType(run.getPlatformType());
+//              }
+              if (l.getPlatform() == null) {
+                l.setPlatform(run.getSequencerReference().getPlatform());
               }
               long containerId = sequencerPartitionContainerDAO.save(l);
 

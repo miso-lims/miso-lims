@@ -465,16 +465,16 @@ public class TgacDataObjectFactory extends DataObjectFactory {
   }
 
   @Override
-  public SequencerPartitionContainer<SequencerPoolPartition> getSequencerPartitionContainer(PlatformType platformType) {
+  public SequencerPartitionContainer<SequencerPoolPartition> getSequencerPartitionContainer(Platform platformType) {
     SequencerPartitionContainer<SequencerPoolPartition> s = new SequencerPartitionContainerImpl();
-    s.setPlatformType(platformType);
+    s.setPlatform(platformType);
     return s;
   }
 
   @Override
-  public SequencerPartitionContainer<SequencerPoolPartition> getSequencerPartitionContainer(PlatformType platformType, User user) {
+  public SequencerPartitionContainer<SequencerPoolPartition> getSequencerPartitionContainer(Platform platformType, User user) {
     SequencerPartitionContainer<SequencerPoolPartition> s = new SequencerPartitionContainerImpl(user);
-    s.setPlatformType(platformType);
+    s.setPlatform(platformType);
     return s;
   }
 

@@ -67,7 +67,7 @@ public class ContainerRestController {
       sb.append("{");
       sb.append("\"containerId\":\"" + sequencerPartitionContainer.getId() + "\",");
       sb.append("\"identificationBarcode\":\"" + sequencerPartitionContainer.getIdentificationBarcode() + "\",");
-      sb.append("\"platformType\":\"" + sequencerPartitionContainer.getPlatformType() + "\",");
+      sb.append("\"platform\":\"" + sequencerPartitionContainer.getPlatform().getNameAndModel() + "\",");
       sb.append("\"partitions\":[");
       int ip = 0;
       for (SequencerPoolPartition partition : sequencerPartitionContainer.getPartitions()) {

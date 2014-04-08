@@ -47,10 +47,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.store.PartitionStore;
-import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
-import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
-import uk.ac.bbsrc.tgac.miso.core.store.Store;
+import uk.ac.bbsrc.tgac.miso.core.store.*;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
@@ -76,7 +73,7 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
   private static final String TABLE_NAME = "SequencerPartitionContainer";
 
   private static final String SEQUENCER_PARTITION_CONTAINER_SELECT =
-      "SELECT containerId, platformType, identificationBarcode, locationBarcode, validationBarcode, securityProfile_profileId FROM " + TABLE_NAME;
+      "SELECT containerId, platform, identificationBarcode, locationBarcode, validationBarcode, securityProfile_profileId FROM " + TABLE_NAME;
 
   public static final String SEQUENCER_PARTITION_CONTAINER_DELETE =
       "DELETE FROM " + TABLE_NAME + " WHERE containerId=:containerId";
@@ -85,13 +82,13 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
       SEQUENCER_PARTITION_CONTAINER_SELECT + " WHERE containerId=?";
 
   private static final String SEQUENCER_PARTITION_CONTAINER_SELECT_BY_PARTITION_ID =
-      "SELECT s.containerId, s.platformType, s.identificationBarcode, s.locationBarcode, s.validationBarcode, s.securityProfile_profileId " +
+      "SELECT s.containerId, s.platform, s.identificationBarcode, s.locationBarcode, s.validationBarcode, s.securityProfile_profileId " +
       "FROM " + TABLE_NAME + " s, SequencerPartitionContainer_Partition sp " +
       "WHERE s.containerId=sp.container_containerId " +
       "AND sp.partitions_partitionId=?";
 
   private static final String SEQUENCER_PARTITION_CONTAINER_SELECT_BY_RELATED_RUN =
-      "SELECT DISTINCT f.containerId, f.platformType, f.identificationBarcode, f.locationBarcode, f.validationBarcode, f.securityProfile_profileId " +
+      "SELECT DISTINCT f.containerId, f.platform, f.identificationBarcode, f.locationBarcode, f.validationBarcode, f.securityProfile_profileId " +
       "FROM " + TABLE_NAME + " f, Run_SequencerPartitionContainer rf " +
       "WHERE f.containerId=rf.containers_containerId " +
       "AND rf.run_runId=?";
@@ -109,7 +106,7 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
 
   public static final String SEQUENCER_PARTITION_CONTAINER_UPDATE =
       "UPDATE " + TABLE_NAME + " " +
-      "SET platformType=:platformType, identificationBarcode=:identificationBarcode, locationBarcode=:locationBarcode, validationBarcode=:validationBarcode, securityProfile_profileId:=securityProfile_profileId " +
+      "SET platform=:platform, identificationBarcode=:identificationBarcode, locationBarcode=:locationBarcode, validationBarcode=:validationBarcode, securityProfile_profileId:=securityProfile_profileId " +
       "WHERE containerId=:containerId";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLSequencerPartitionContainerDAO.class);
@@ -119,6 +116,8 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
   private Store<SecurityProfile> securityProfileDAO;
   private JdbcTemplate template;
   private CascadeType cascadeType;
+
+  private PlatformStore platformDAO;
 
   @Autowired
   private MisoNamingScheme<SequencerPartitionContainer<SequencerPoolPartition>> namingScheme;
@@ -153,6 +152,10 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
 
   public void setRunDAO(RunStore runDAO) {
     this.runDAO = runDAO;
+  }
+
+  public void setPlatformDAO(PlatformStore platformDAO) {
+    this.platformDAO = platformDAO;
   }
 
   public Store<SecurityProfile> getSecurityProfileDAO() {
@@ -298,8 +301,12 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
     params.addValue("locationBarcode", sequencerPartitionContainer.getLocationBarcode());
     params.addValue("validationBarcode", sequencerPartitionContainer.getValidationBarcode());
 
-    if (sequencerPartitionContainer.getPlatformType() != null) {
-      params.addValue("platformType", sequencerPartitionContainer.getPlatformType().getKey());
+//    if (sequencerPartitionContainer.getPlatformType() != null) {
+//      params.addValue("platformType", sequencerPartitionContainer.getPlatformType().getKey());
+//    }
+
+    if (sequencerPartitionContainer.getPlatform() != null) {
+      params.addValue("platform", sequencerPartitionContainer.getPlatform().getPlatformId());
     }
 
     if (sequencerPartitionContainer.getId() == AbstractSequencerPartitionContainer.UNSAVED_ID) {
@@ -486,12 +493,21 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
         }
         s.setPartitions(partitions);
 
-        if ((rs.getString("platformType") == null || "".equals(rs.getString("platformType"))) && s.getRun() != null) {
-          s.setPlatformType(s.getRun().getPlatformType());
+//        if ((rs.getString("platformType") == null || "".equals(rs.getString("platformType"))) && s.getRun() != null) {
+//          s.setPlatformType(s.getRun().getPlatformType());
+//        }
+//        else {
+//          s.setPlatformType(PlatformType.get(rs.getString("platformType")));
+//        }
+
+//        if () {
+//          s.setPlatform(s.getRun().getSequencerReference().getPlatform());
+//        }
+//        else {
+        if (rs.getLong("platform") != 0) {
+          s.setPlatform(platformDAO.get(rs.getLong("platform")));
         }
-        else {
-          s.setPlatformType(PlatformType.get(rs.getString("platformType")));
-        }
+//        }
 
         s.setIdentificationBarcode(rs.getString("identificationBarcode"));
         s.setLocationBarcode(rs.getString("locationBarcode"));

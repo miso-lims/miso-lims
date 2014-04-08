@@ -263,12 +263,12 @@ public class PacBioNotificationMessageConsumerMechanism implements NotificationM
                         if (lf.getSecurityProfile() != null && r.getSecurityProfile() == null) {
                           r.setSecurityProfile(lf.getSecurityProfile());
                         }
-                        if (lf.getPlatformType() == null && r.getPlatformType() != null) {
-                          lf.setPlatformType(r.getPlatformType());
+                        if (lf.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
+                          lf.setPlatform(r.getSequencerReference().getPlatform());
                         }
-                        else {
-                          lf.setPlatformType(PlatformType.PACBIO);
-                        }
+//                        else {
+//                          lf.setPlatformType(PlatformType.PACBIO);
+//                        }
                         ((RunImpl)r).addSequencerPartitionContainer(lf);
                       }
                       else {
@@ -285,12 +285,12 @@ public class PacBioNotificationMessageConsumerMechanism implements NotificationM
                         if (run.has("plateId") && !"".equals(run.getString("plateId"))) {
                           f.setIdentificationBarcode(run.getString("plateId"));
                         }
-                        if (f.getPlatformType() == null && r.getPlatformType() != null) {
-                          f.setPlatformType(r.getPlatformType());
+                        if (f.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
+                          f.setPlatform(r.getSequencerReference().getPlatform());
                         }
-                        else {
-                          f.setPlatformType(PlatformType.PACBIO);
-                        }
+//                        else {
+//                          f.setPlatformType(PlatformType.PACBIO);
+//                        }
                         f.setRun(r);
                         log.info("\\_ Created new container with "+f.getPartitions().size()+" partitions");
                         long flowId = requestManager.saveSequencerPartitionContainer(f);
@@ -316,12 +316,12 @@ public class PacBioNotificationMessageConsumerMechanism implements NotificationM
                 else {
                   SequencerPartitionContainer f = fs.iterator().next();
                   f.setSecurityProfile(r.getSecurityProfile());
-                  if (f.getPlatformType() == null && r.getPlatformType() != null) {
-                    f.setPlatformType(r.getPlatformType());
+                  if (f.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
+                    f.setPlatform(r.getSequencerReference().getPlatform());
                   }
-                  else {
-                    f.setPlatformType(PlatformType.PACBIO);
-                  }
+//                  else {
+//                    f.setPlatformType(PlatformType.PACBIO);
+//                  }
                   if (f.getIdentificationBarcode() == null || "".equals(f.getIdentificationBarcode())) {
                     if (run.has("plateId") && !"".equals(run.getString("plateId"))) {
                       f.setIdentificationBarcode(run.getString("plateId"));

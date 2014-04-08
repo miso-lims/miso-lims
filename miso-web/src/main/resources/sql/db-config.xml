@@ -243,6 +243,7 @@
     </property>
     <property name="partitionDAO" ref="sqlPartitionDAO"/>
     <property name="runDAO" ref="sqlRunDAO"/>
+    <property name="platformDAO" ref="sqlPlatformDAO"/>
     <property name="securityProfileDAO" ref="sqlSecurityProfileDAO"/>
     <property name="jdbcTemplate" ref="interfaceTemplate"/>
   </bean>

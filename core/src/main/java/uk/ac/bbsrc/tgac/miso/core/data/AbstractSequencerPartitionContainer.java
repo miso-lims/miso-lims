@@ -52,7 +52,7 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
 
   @OneToOne(cascade = CascadeType.ALL)
   private SecurityProfile securityProfile;
-  private PlatformType platformType;
+  private Platform platform;
   private String validationBarcode;
 
   @Deprecated
@@ -99,7 +99,7 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
   }
 
   public String getLabelText() {
-    return getPlatformType().name()+" " + getValidationBarcode();
+    return getPlatform().getPlatformType().name()+" " + getValidationBarcode();
   }
 
   public boolean isDeletable() {
@@ -136,22 +136,14 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
     this.run = run;
   }
 
-  /**
-   * Returns the platformType of this Run object.
-   *
-   * @return PlatformType platformType.
-   */
-  public PlatformType getPlatformType() {
-    return platformType;
+  @Override
+  public Platform getPlatform() {
+    return platform;
   }
 
-  /**
-   * Sets the platformType of this Run object.
-   *
-   * @param platformType PlatformType.
-   */
-  public void setPlatformType(PlatformType platformType) {
-    this.platformType = platformType;
+  @Override
+  public void setPlatform(Platform platform) {
+    this.platform = platform;
   }
 
   public boolean userCanRead(User user) {

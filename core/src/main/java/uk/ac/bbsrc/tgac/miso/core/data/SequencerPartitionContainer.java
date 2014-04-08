@@ -122,18 +122,18 @@ public interface SequencerPartitionContainer<T extends Partition> extends Secura
   void initEmptyPartitions();
 
   /**
-   * Returns the platformType of this Run object.
+   * Returns the platform of this Container object.
    *
-   * @return PlatformType platformType.
+   * @return Platform platform.
    */
-  public PlatformType getPlatformType();
+  public Platform getPlatform();
 
   /**
-   * Sets the platformType of this Run object.
+   * Sets the platform of this Container object.
    *
-   * @param platformType PlatformType.
+   * @param platform Platform.
    */
-  public void setPlatformType(PlatformType platformType);
+  public void setPlatform(Platform platform);
 
   /**
    * If this container has been validated by an external piece of equipment, retrieve this barcode string
