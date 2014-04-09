@@ -77,15 +77,15 @@ public class ContainerControllerHelperService {
   public JSONObject changePlatformType(HttpSession session, JSONObject json) {
     String newContainerType = json.getString("platformtype");
     PlatformType pt = PlatformType.get(newContainerType);
-    String cId = json.getString("container_cId");
+    //String cId = json.getString("container_cId");
     try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+      //User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
 
       Map<String, Object> responseMap = new HashMap<String, Object>();
       if (pt != null) {
-        //SequencerPartitionContainer<SequencerPoolPartition> lf = dataObjectFactory.getSequencerPartitionContainer(pt, user);
-        SequencerPartitionContainer<SequencerPoolPartition> lf = dataObjectFactory.getSequencerPartitionContainer(user);
-        session.setAttribute("container_" + cId, lf);
+        // don't create a new container - one should already be available in the session, either presaved or not
+        //SequencerPartitionContainer<SequencerPoolPartition> lf = dataObjectFactory.getSequencerPartitionContainer(user);
+        //session.setAttribute("container_" + cId, lf);
 
         StringBuilder srb = new StringBuilder();
         srb.append("<select name='sequencer' id='sequencerReference' onchange='Container.ui.populateContainerOptions(this);'>");
@@ -116,22 +116,25 @@ public class ContainerControllerHelperService {
 
       if (lf.getPlatform() == null) {
         if(lf.getId() == AbstractSequencerPartitionContainer.UNSAVED_ID) {
-          log.info("populateContainerOptions: null platform, unsaved container");
           SequencerReference sr = requestManager.getSequencerReferenceById(sequencerReferenceId);
-          Map<String, Object> responseMap = new HashMap<String, Object>();
+          Map<String, Object> responseMap = new HashMap<>();
           responseMap.put("partitions", getContainerOptions(sr));
+          responseMap.put("platformId", sr.getPlatform().getPlatformId());
           return JSONUtils.JSONObjectResponse(responseMap);
         }
         else {
-          log.info("populateContainerOptions: null platform, saved container");
           SequencerReference sr = requestManager.getSequencerReferenceById(sequencerReferenceId);
           lf.setPlatform(sr.getPlatform());
-          return JSONUtils.SimpleJSONResponse("Container platform set");
+          Map<String, Object> responseMap = new HashMap<>();
+          responseMap.put("platformId", sr.getPlatform().getPlatformId());
+          return JSONUtils.JSONObjectResponse(responseMap);
         }
       }
       else {
-        log.info("populateContainerOptions: " + lf.getPlatform().toString());
-        return JSONUtils.SimpleJSONResponse("Container platform already set");
+        Map<String, Object> responseMap = new HashMap<>();
+        SequencerReference sr = requestManager.getSequencerReferenceById(sequencerReferenceId);
+        responseMap.put("platformId", sr.getPlatform().getPlatformId());
+        return JSONUtils.JSONObjectResponse(responseMap);
       }
     }
     catch (IOException e) {
@@ -653,17 +656,21 @@ public class ContainerControllerHelperService {
       Study s = requestManager.getStudyById(studyId);
       if (s == null) { throw new Exception("Could not retrieve study: " + studyId); };
 
-      Long sequencerReferenceId = json.getLong("sequencerReferenceId");
-      SequencerReference sr = requestManager.getSequencerReferenceById(sequencerReferenceId);
-      if (sr == null) { throw new Exception("Could not retrieve sequencer: " + sequencerReferenceId); };
+      //Long sequencerReferenceId = json.getLong("sequencerReferenceId");
+      //SequencerReference sr = requestManager.getSequencerReferenceById(sequencerReferenceId);
+      //if (sr == null) { throw new Exception("Could not retrieve sequencer: " + sequencerReferenceId); };
+
+      Long platformId = json.getLong("platformId");
+      Platform platform = requestManager.getPlatformById(platformId);
+      if (platform == null) { throw new Exception("Could not retrieve Platform:" + platformId); };
 
       StringBuilder sb = new StringBuilder();
 
       Experiment e = dataObjectFactory.getExperiment();
       e.setAlias("EXP_AUTOGEN_" + s.getName() + "_" + s.getStudyType() + "_" + (s.getExperiments().size() + 1));
-      e.setTitle(s.getProject().getName() + " " + sr.getPlatform().getPlatformType().getKey() + " " + s.getStudyType() + " experiment (Auto-gen)");
+      e.setTitle(s.getProject().getName() + " " + platform.getPlatformType().getKey() + " " + s.getStudyType() + " experiment (Auto-gen)");
       e.setDescription(s.getProject().getAlias());
-      e.setPlatform(sr.getPlatform());
+      e.setPlatform(platform);
       e.setStudy(s);
       e.setSecurityProfile(s.getSecurityProfile());
 

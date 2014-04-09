@@ -79,7 +79,7 @@
     <c:when test="${container.id != 0 and not empty container.platform}">
       <tr>
         <td>Sequencer:</td>
-        <td id="sequencerReferenceSelect">${container.platform.instrumentModel}</td>
+        <td id="sequencerReferenceSelect" platformId="${container.platform.platformId}">${container.platform.instrumentModel}</td>
       </tr>
     </c:when>
     <c:when test="${container.id != 0}">

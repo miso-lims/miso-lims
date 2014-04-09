@@ -49,8 +49,6 @@ var Container = Container || {
         }
 
         if (confirm("Found container '" + json.barcode + "'. Import this container?\n\n" + dialogStr)) {
-          //jQuery('#partitionErrorDiv').html("");
-          //jQuery('#partitionDiv').html(json.html);
           window.location.href = "/miso/container/"+json.containerId;
         }
       }
@@ -136,9 +134,10 @@ Container.ui = {
         'populateContainerOptions',
         {'sequencerReference': form.value, 'container_cId': jQuery('input[name=container_cId]').val(), 'url': ajaxurl},
         {'doOnSuccess': function (json) {
-            if (json.partitions) {
-              jQuery('#containerPartitions').html(json.partitions);
-            }
+          jQuery('#sequencerReferenceSelect').attr("platformId", json.platformId);
+          if (json.partitions) {
+            jQuery('#containerPartitions').html(json.partitions);
+          }
           }
         }
       );
@@ -282,12 +281,14 @@ Container.partition = {
   selectContainerStudy: function (partition, poolId, projectId) {
     Utils.ui.disableButton('studySelectButton-' + partition + '_' + poolId);
     var studyId = jQuery("select[name='poolStudies" + partition + "_" + projectId + "'] :selected").val();
-    var sequencerReferenceId = jQuery("select[name='sequencer'] :selected").val();
+    //var sequencerReferenceId = jQuery("select[name='sequencer'] :selected").val();
+
+    var platformId = jQuery("#sequencerReferenceSelect").attr("platformId");
 
     Fluxion.doAjax(
       'containerControllerHelperService',
       'selectStudyForPool',
-      {'poolId': poolId, 'studyId': studyId, 'sequencerReferenceId': sequencerReferenceId, 'url': ajaxurl},
+      {'poolId': poolId, 'studyId': studyId, 'platformId': platformId, 'url': ajaxurl},
       {'doOnSuccess': function (json) {
         var div = jQuery("#studySelectDiv" + partition + "_" + projectId).parent();
         jQuery("#studySelectDiv" + partition + "_" + projectId).remove();
