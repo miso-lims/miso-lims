@@ -722,6 +722,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
     sequencerPartitionContainerDAO.setJdbcTemplate(template);
     sequencerPartitionContainerDAO.setSecurityProfileDAO(securityProfileDAO);
     sequencerPartitionContainerDAO.setPartitionDAO(partitionDAO);
+    sequencerPartitionContainerDAO.setPlatformDAO(platformDAO);
     sequencerPartitionContainerDAO.setRunDAO(runDAO);
     sequencerPartitionContainerDAO.setCascadeType(CascadeType.PERSIST);
     sequencerPartitionContainerDAO.setDataObjectFactory(dataObjectFactory);
@@ -1272,7 +1273,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
     runStatement(conn,
                  "CREATE TABLE SequencerPartitionContainer (" +
                  "containerId BIGINT NOT NULL," +
-                 "platformType VARCHAR(50) DEFAULT NULL," +
+                 "platform BIGINT DEFAULT NULL," +
                  "securityProfile_profileId BIGINT default NULL," +
                  "identificationBarcode VARCHAR(255) default NULL," +
                  "locationBarcode VARCHAR(255) default NULL," +
