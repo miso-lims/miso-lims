@@ -333,6 +333,8 @@ public class ImportExportControllerHelperService {
               throw new InputFormException("Supplied Library insert size for library '" + jsonArrayElement.getString(3) + "' (" + s.getAlias() + ") is invalid", nfe);
             }
 
+            log.info("Added library: " + library.toString());
+            requestManager.saveLibrary(library);
 
             if (jsonArrayElement.getString(5) != null && !"".equals(jsonArrayElement.getString(5))) {
               try {
@@ -392,6 +394,9 @@ public class ImportExportControllerHelperService {
                 throw new InputFormException("Supplied Library QC concentration for library '" + jsonArrayElement.getString(3) + "' (" + s.getAlias() + ") is invalid", nfe);
               }
             }
+
+            log.info("Added library: " + library.toString());
+            requestManager.saveLibrary(library);
 
             if (library.getQcPassed() || library.getQcPassed() == null) {
 
@@ -506,6 +511,9 @@ public class ImportExportControllerHelperService {
                 }
               }
             }
+
+            log.info("Added library: " + library.toString());
+            requestManager.saveLibrary(library);
 
           }
 
