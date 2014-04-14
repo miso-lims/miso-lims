@@ -260,7 +260,7 @@ public class MisoFilesManager implements FilesManager {
       log.warn("MISO files directory doesn't seem to exist. Trying to create it...");
       if (path.mkdirs()) {
         log.warn("MISO files directory created.. retrying file listing...");
-        return getFile(type, qualifier, fileName);
+        return getFile(type, qualifier, fileName, createIfNotExist);
       }
       else {
         throw new IOException("Could not create MISO file directory ("+path+"). Please create this directory or allow the parent to be writable to MISO.");

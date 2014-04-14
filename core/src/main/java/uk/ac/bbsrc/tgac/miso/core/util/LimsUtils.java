@@ -537,6 +537,13 @@ public class LimsUtils {
     return sb.toString();
   }
 
+  public static File stringToFile(String s, File f) throws IOException {
+    PrintWriter p = new PrintWriter(f);
+    p.println(s);
+    safeClose(p);
+    return f;
+  }
+
   /**
    * Reads the contents of an InputStream into a byte[]
    *
@@ -746,5 +753,10 @@ public class LimsUtils {
     childProfile.setWriteGroups(parentProfile.getWriteGroups());
     childProfile.setReadUsers(parentProfile.getReadUsers());
     childProfile.setWriteUsers(parentProfile.getWriteUsers());
+  }
+
+  public static String getSimpleCurrentDate() {
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+   	return sdf.format(new Date());
   }
 }
