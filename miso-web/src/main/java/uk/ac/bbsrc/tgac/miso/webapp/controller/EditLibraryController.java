@@ -343,6 +343,7 @@ public class EditLibraryController {
         if (Arrays.asList(user.getRoles()).contains("ROLE_TECH")) {
           SecurityProfile sp = new SecurityProfile(user);
           LimsUtils.inheritUsersAndGroups(library, sample.getSecurityProfile());
+          sp.setOwner(user);
           library.setSecurityProfile(sp);
         }
         else {
