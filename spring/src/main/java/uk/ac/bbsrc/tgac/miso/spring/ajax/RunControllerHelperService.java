@@ -45,11 +45,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
+import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.RunProcessingUtils;
 
 import javax.servlet.http.HttpSession;
+import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -73,9 +75,15 @@ public class RunControllerHelperService {
   private WatchManager watchManager;
   @Autowired
   private DataObjectFactory dataObjectFactory;
+  @Autowired
+  private MisoFilesManager misoFileManager;
 
   public void setWatchManager(WatchManager watchManager) {
     this.watchManager = watchManager;
+  }
+
+  public void setMisoFileManager(MisoFilesManager misoFileManager) {
+    this.misoFileManager = misoFileManager;
   }
 
   public JSONObject changePlatformType(HttpSession session, JSONObject json) {
@@ -990,6 +998,11 @@ public class RunControllerHelperService {
       }
 
       String sheet = RunProcessingUtils.buildIlluminaDemultiplexCSV(r, f, casavaVersion, user.getFullName());
+
+      File out = misoFileManager.getNewFile(Run.class, r.getAlias(), "samplesheet-"+LimsUtils.getSimpleCurrentDate()+".csv");
+      LimsUtils.stringToFile(sheet, out);
+      log.debug("SampleSheet for " + r.getAlias() + " written to " + out.getAbsolutePath());
+
       return JSONUtils.SimpleJSONResponse(sheet);
     }
     return JSONUtils.SimpleJSONError("No run or container found with that ID.");

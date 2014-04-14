@@ -232,6 +232,7 @@ public class EditSampleController {
           if (Arrays.asList(user.getRoles()).contains("ROLE_TECH")) {
             SecurityProfile sp = new SecurityProfile(user);
             LimsUtils.inheritUsersAndGroups(sample, project.getSecurityProfile());
+            sp.setOwner(user);
             sample.setSecurityProfile(sp);
           }
           else {

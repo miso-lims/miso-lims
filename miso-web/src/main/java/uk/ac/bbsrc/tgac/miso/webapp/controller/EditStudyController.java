@@ -173,11 +173,12 @@ public class EditStudyController {
         model.addAttribute("project", project);
         study.setProject(project);
         if (Arrays.asList(user.getRoles()).contains("ROLE_TECH")) {
-            SecurityProfile sp = new SecurityProfile(user);
-            LimsUtils.inheritUsersAndGroups(study, project.getSecurityProfile());
-            study.setSecurityProfile(sp);
+          SecurityProfile sp = new SecurityProfile(user);
+          LimsUtils.inheritUsersAndGroups(study, project.getSecurityProfile());
+          sp.setOwner(user);
+          study.setSecurityProfile(sp);
         } else {
-            study.inheritPermissions(project);
+          study.inheritPermissions(project);
         }
 
         if (!study.userCanWrite(user)) {
