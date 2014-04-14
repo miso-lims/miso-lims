@@ -338,6 +338,7 @@
   <br/>
 
   <div id="librariesFlexReport" class="ui-widget ui-widget-content  ui-corner-all"></div>
+  <div id="librariesRelationQC" class="ui-widget ui-widget-content  ui-corner-all"></div>
 </div>
 
 <div id="tabRuns">
@@ -352,6 +353,20 @@
         <td>Name, Alias, Description Contains:</td>
         <td><input type="text" id="runReportSearchInput" size="20"/></td>
       </tr>
+        <tr>
+            <td>Started From :</td>
+            <td>
+                <input id="runStartedFrom" name="runStartedFrom" type="text" value=""/>
+                <script type="text/javascript">
+                    Utils.ui.addDatePicker("runStartedFrom");
+                </script>
+                To :
+                <input id="runStartedTo" name="runStartedFrom" type="text" value=""/>
+                <script type="text/javascript">
+                    Utils.ui.addDatePicker("runStartedTo");
+                </script>
+            </td>
+        </tr>
       <tr>
         <td>Completed From :</td>
         <td>
@@ -420,6 +435,7 @@
   <br/>
 
   <div id="runsFlexReport" class="ui-widget ui-widget-content  ui-corner-all"></div>
+  <div id="runsPartitionReport" class="ui-widget ui-widget-content  ui-corner-all"></div>
 </div>
 
 <div style="height:1000px;" id="tabResource">
