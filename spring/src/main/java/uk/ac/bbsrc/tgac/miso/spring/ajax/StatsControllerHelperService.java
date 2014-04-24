@@ -32,6 +32,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.integration.NotificationQueryService;
+import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationException;
 import uk.ac.bbsrc.tgac.miso.runstats.client.RunStatsException;
 import uk.ac.bbsrc.tgac.miso.runstats.client.manager.RunStatsManager;
 
@@ -56,6 +58,9 @@ public class StatsControllerHelperService {
 
   private RunStatsManager runStatsManager;
 
+  @Autowired
+  private NotificationQueryService notificationQueryService;
+
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
   }
@@ -66,6 +71,10 @@ public class StatsControllerHelperService {
 
   public void setRunStatsManager(RunStatsManager runStatsManager) {
     this.runStatsManager = runStatsManager;
+  }
+
+  public void setNotificationQueryService(NotificationQueryService notificationQueryService) {
+    this.notificationQueryService = notificationQueryService;
   }
 
   public JSONObject getRunStats(HttpSession session, JSONObject json) {
@@ -111,11 +120,9 @@ public class StatsControllerHelperService {
     }
   }
 
-
   public JSONObject getSummaryRunstatsDiagram(HttpSession session, JSONObject json) {
     Long runId = json.getLong("runId");
     Integer lane = json.getInt("lane");
-    StringBuilder b = new StringBuilder();
     try {
       Run run = requestManager.getRunById(runId);
       JSONObject resultJson = runStatsManager.getPerPositionBaseSequenceQualityForLane(run, lane);
@@ -131,23 +138,16 @@ public class StatsControllerHelperService {
     }
   }
 
-
-  public JSONObject getPerPositionBaseContentDiagram(HttpSession session, JSONObject json) {
-    Long runId = json.getLong("runId");
-    Integer lane = json.getInt("lane");
-    StringBuilder b = new StringBuilder();
+  public JSONObject getInterOpMetrics(HttpSession session, JSONObject json) {
+    String runAlias = json.getString("runAlias");
+    String platformType = json.getString("platformType").toLowerCase();
     try {
-      Run run = requestManager.getRunById(runId);
-      JSONObject resultJson = runStatsManager.getPerPositionBaseContentForLane(run, lane);
-      return resultJson;
+      return notificationQueryService.getInterOpMetrics(runAlias , platformType);
     }
-    catch (IOException e) {
+    catch (IntegrationException e) {
+      e.printStackTrace();
       log.debug("Failed", e);
-      return JSONUtils.SimpleJSONError("Failed");
-    }
-    catch (RunStatsException e) {
-      log.debug("Failed", e);
-      return JSONUtils.SimpleJSONError("Failed");
+      return JSONUtils.SimpleJSONError("Failed to retrieve InterOp metrics: " + e.getMessage());
     }
   }
 }

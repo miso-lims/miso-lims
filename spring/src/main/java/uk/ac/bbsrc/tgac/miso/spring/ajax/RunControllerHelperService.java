@@ -254,6 +254,7 @@ public class RunControllerHelperService {
       b.append("</div>");
 
       SequencerPartitionContainer<SequencerPoolPartition> f = dataObjectFactory.getSequencerPartitionContainer();
+      f.setPlatform(run.getSequencerReference().getPlatform());
       f.setPartitionLimit(1);
       f.initEmptyPartitions();
       run.addSequencerPartitionContainer(f);
@@ -272,6 +273,7 @@ public class RunControllerHelperService {
       b.append("<div id='containerdiv0'> </div>");
 
       SequencerPartitionContainer<SequencerPoolPartition> f = dataObjectFactory.getSequencerPartitionContainer();
+      f.setPlatform(run.getSequencerReference().getPlatform());
       run.addSequencerPartitionContainer(f);
     }
     else {
@@ -302,6 +304,7 @@ public class RunControllerHelperService {
         b.append("</div>");
 
         SequencerPartitionContainer<SequencerPoolPartition> f = dataObjectFactory.getSequencerPartitionContainer();
+        f.setPlatform(run.getSequencerReference().getPlatform());
         f.initEmptyPartitions();
         run.addSequencerPartitionContainer(f);
       }
@@ -319,6 +322,7 @@ public class RunControllerHelperService {
 
     IlluminaRun run = (IlluminaRun) session.getAttribute("run_" + json.getString("run_cId"));
     SequencerPartitionContainer<SequencerPoolPartition> f = run.getSequencerPartitionContainers().get(container);
+    f.setPlatform(run.getSequencerReference().getPlatform());
     f.setPartitionLimit(numLanes);
     f.initEmptyPartitions();
 
@@ -356,6 +360,7 @@ public class RunControllerHelperService {
       b.append("</div>");
 
       SequencerPartitionContainer<SequencerPoolPartition> f = dataObjectFactory.getSequencerPartitionContainer();
+      f.setPlatform(run.getSequencerReference().getPlatform());
       run.addSequencerPartitionContainer(f);
     }
     return JSONUtils.SimpleJSONResponse(b.toString());
@@ -371,6 +376,7 @@ public class RunControllerHelperService {
 
     LS454Run run = (LS454Run) session.getAttribute("run_" + json.getString("run_cId"));
     SequencerPartitionContainer<SequencerPoolPartition> f = run.getSequencerPartitionContainers().get(container);
+    f.setPlatform(run.getSequencerReference().getPlatform());
     f.setPartitionLimit(numChambers);
     f.initEmptyPartitions();
 
@@ -421,6 +427,7 @@ public class RunControllerHelperService {
       b.append("<div id='containerdiv" + i + "'> </div>");
       b.append("</div>");
       SequencerPartitionContainer<SequencerPoolPartition> f = dataObjectFactory.getSequencerPartitionContainer();
+      f.setPlatform(run.getSequencerReference().getPlatform());
       run.addSequencerPartitionContainer(f);
     }
     return JSONUtils.SimpleJSONResponse(b.toString());
@@ -432,6 +439,7 @@ public class RunControllerHelperService {
 
     SolidRun run = (SolidRun) session.getAttribute("run_" + json.getString("run_cId"));
     SequencerPartitionContainer<SequencerPoolPartition> f = run.getSequencerPartitionContainers().get(container);
+    f.setPlatform(run.getSequencerReference().getPlatform());
     f.setPartitionLimit(numChambers);
     f.initEmptyPartitions();
 
@@ -476,6 +484,7 @@ public class RunControllerHelperService {
       b.append("<div id='containerdiv" + i + "'> </div>");
       b.append("</div>");
       SequencerPartitionContainer<SequencerPoolPartition> f = dataObjectFactory.getSequencerPartitionContainer();
+      f.setPlatform(run.getSequencerReference().getPlatform());
       run.addSequencerPartitionContainer(f);
     }
     return JSONUtils.SimpleJSONResponse(b.toString());
@@ -487,6 +496,7 @@ public class RunControllerHelperService {
 
     PacBioRun run = (PacBioRun) session.getAttribute("run_" + json.getString("run_cId"));
     SequencerPartitionContainer<SequencerPoolPartition> f = run.getSequencerPartitionContainers().get(container);
+    f.setPlatform(run.getSequencerReference().getPlatform());
     f.setPartitionLimit(numChambers);
     f.initEmptyPartitions();
 

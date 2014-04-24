@@ -237,13 +237,29 @@
 <c:if test="${run.id != 0}">
   <c:if test="${statsAvailable}">
     <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#stats_arrowclick'), 'stats');">Statistics
-      <div id="stats_arrowclick" class="toggleLeftDown"></div>
+      <div id="stats_arrowclick" class="toggleLeft"></div>
     </div>
     <div id="stats">
       <h1>Statistics</h1>
 
       <div id="summarydiv"></div>
     </div>
+  </c:if>
+
+  <c:if test="${run.status.health.key ne 'Failed' and run.status.health.key ne 'Stopped' and metrixEnabled}">
+  <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#metrix_arrowclick'), 'metrix');">InterOp Metrics
+    <div id="metrix_arrowclick" class="toggleLeft"></div>
+  </div>
+  <div id="metrix">
+    <h1>InterOp Metrics</h1>
+
+    <div id="metrixdiv"></div>
+  </div>
+  <script type="text/javascript">
+    jQuery(document).ready(function () {
+      Stats.getInterOpMetrics('${run.alias}', '${run.platformType.key}');
+    });
+  </script>
   </c:if>
 
   <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#notes_arrowclick'), 'notes');">Notes

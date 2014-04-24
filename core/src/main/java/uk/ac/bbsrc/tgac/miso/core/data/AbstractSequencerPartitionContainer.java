@@ -25,7 +25,6 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 import javax.persistence.*;

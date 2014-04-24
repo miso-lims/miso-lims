@@ -74,6 +74,9 @@ public class NotificationRequestService {
       else if (j.getString("query").toLowerCase().contains("parameters")) {
         return queryRunParameters(j);
       }
+      else if (j.getString("query").toLowerCase().contains("interop")) {
+        return queryInterOpMetrics(j);
+      }
       else {
         return testService(j);
       }
@@ -82,15 +85,39 @@ public class NotificationRequestService {
   }
 
   private String queryRunStatus(JSONObject request) {
-    return notificationRequestManager.queryRunStatus(request);
+    try {
+      return notificationRequestManager.queryRunStatus(request);
+    }
+    catch(Exception ise) {
+      return "{\"error\":\"Cannot retrieve run status: "+ise.getMessage()+"\"}";
+    }
   }
 
   private String queryRunInfo(JSONObject request) {
-    return notificationRequestManager.queryRunInfo(request);
+    try {
+      return notificationRequestManager.queryRunInfo(request);
+    }
+    catch(Exception ise) {
+      return "{\"error\":\"Cannot retrieve run information: "+ise.getMessage()+"\"}";
+    }
   }
 
   private String queryRunParameters(JSONObject request) {
-    return notificationRequestManager.queryRunParameters(request);
+    try {
+      return notificationRequestManager.queryRunParameters(request);
+    }
+    catch(Exception ise) {
+      return "{\"error\":\"Cannot retrieve run parameters: "+ise.getMessage()+"\"}";
+    }
+  }
+
+  private String queryInterOpMetrics(JSONObject request) {
+    try {
+      return notificationRequestManager.queryInterOpMetrics(request);
+    }
+    catch(Exception ise) {
+      return "{\"error\":\"Cannot retrieve InterOp metrics: "+ise.getMessage()+"\"}";
+    }
   }
 
   private String testService(JSONObject request) {

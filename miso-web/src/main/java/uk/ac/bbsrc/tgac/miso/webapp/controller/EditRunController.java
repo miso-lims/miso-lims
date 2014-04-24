@@ -53,6 +53,8 @@ import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.runstats.client.RunStatsException;
 import uk.ac.bbsrc.tgac.miso.runstats.client.manager.RunStatsManager;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
+import uk.ac.bbsrc.tgac.miso.webapp.context.ApplicationContextProvider;
+import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 import javax.xml.transform.TransformerException;
@@ -79,6 +81,13 @@ public class EditRunController {
   private RunAlertManager runAlertManager;
 
   private RunStatsManager runStatsManager;
+
+  @Autowired
+  private ApplicationContextProvider applicationContextProvider;
+
+  public void setApplicationContextProvider(ApplicationContextProvider applicationContextProvider) {
+    this.applicationContextProvider = applicationContextProvider;
+  }
 
   public void setInterfaceTemplate(JdbcTemplate interfaceTemplate) {
     this.interfaceTemplate = interfaceTemplate;
@@ -137,6 +146,14 @@ public class EditRunController {
     }
     return false;
   }
+
+  @ModelAttribute("metrixEnabled")
+  public Boolean isMetrixEnabled() {
+    MisoPropertyExporter exporter = (MisoPropertyExporter)applicationContextProvider.getApplicationContext().getBean("propertyConfigurer");
+    Map<String, String> misoProperties = exporter.getResolvedProperties();
+    return misoProperties.containsKey("miso.notification.interop.enabled") && Boolean.parseBoolean(misoProperties.get("miso.notification.interop.enabled"));
+  }
+
 
   public Boolean hasOperationsQcPassed(Run run) throws IOException {
     if (run != null && run.getId() != AbstractRun.UNSAVED_ID) {

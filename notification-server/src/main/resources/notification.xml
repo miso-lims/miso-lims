@@ -58,7 +58,7 @@
 
   <ip:tcp-connection-factory id="notificationRequestServer"
                              type="server"
-                             port="7899"
+                             port="8787"
                              using-nio="false"
                              single-use="true"
                              deserializer="tcpDeserializer"/>

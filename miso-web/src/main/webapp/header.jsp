@@ -119,7 +119,8 @@
   <script src="<c:url value='/scripts/menus.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
 
   <!-- high charts-->
-  <script type="text/javascript" src="<c:url value='/scripts/highcharts-2.3.5/highcharts.js'/>"></script>
+  <script type="text/javascript" src="<c:url value='/scripts/highcharts/highcharts.js'/>"></script>
+  <script type="text/javascript" src="<c:url value='/scripts/highcharts/highcharts-more.js'/>"></script>
 
   <link rel="shortcut icon" href="<c:url value='/styles/images/favicon.ico'/>" type="image/x-icon"/>
 

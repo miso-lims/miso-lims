@@ -37,6 +37,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
@@ -413,7 +414,7 @@ public class FlexReportingControllerHelperService {
     try {
       JSONObject response = new JSONObject();
       JSONArray a = JSONArray.fromObject(json.get("form"));
-      Project p  = null;
+      Project p = null;
       List<Run> runs = new ArrayList<Run>();
 
       for (JSONObject j : (Iterable<JSONObject>) a) {
@@ -459,12 +460,12 @@ public class FlexReportingControllerHelperService {
                           Sample sample = libraryInRun.getSample();
 
                           StringBuilder tagBarcode = new StringBuilder();
-                          for (Map.Entry<Integer, TagBarcode> entry: libraryInRun.getTagBarcodes().entrySet()){
-                                tagBarcode.append(entry.getKey().toString()+": "+entry.getValue().getName()+" ("+entry.getValue().getSequence()+")<br/>");
+                          for (Map.Entry<Integer, TagBarcode> entry : libraryInRun.getTagBarcodes().entrySet()) {
+                            tagBarcode.append(entry.getKey().toString() + ": " + entry.getValue().getName() + " (" + entry.getValue().getSequence() + ")<br/>");
                           }
 
                           List list = new ArrayList(libraryInRun.getLibraryQCs());
-                          LibraryQC libraryQc = (LibraryQC) list.get(list.size()-1);
+                          LibraryQC libraryQc = (LibraryQC) list.get(list.size() - 1);
 
                           jsonArray.add("['" + sample.getAlias() + "','" +
                                         sample.getDescription() + "','" +
@@ -472,7 +473,7 @@ public class FlexReportingControllerHelperService {
                                         libraryInRun.getName() + "','" +
                                         dilution.getName() + "','" +
                                         tagBarcode.toString() + "','" +
-                                        libraryQc.getInsertSize().toString()+ "','" +
+                                        libraryQc.getInsertSize().toString() + "','" +
                                         run.getAlias() + "','" +
                                         spp.getPartitionNumber().toString() + "']");
                         }
@@ -498,9 +499,9 @@ public class FlexReportingControllerHelperService {
     try {
       JSONObject jsonObject = new JSONObject();
       StringBuilder a = new StringBuilder();
-     // Collection<Sample> samples = requestManager.listAllSamples();
-     // JSONArray jsonArray = new JSONArray();
-     // for (Sample sample : samples) {
+      // Collection<Sample> samples = requestManager.listAllSamples();
+      // JSONArray jsonArray = new JSONArray();
+      // for (Sample sample : samples) {
       //  jsonArray.add(sampleFormRowBuilder(sample));
       //}
       for (String sampleType : requestManager.listAllSampleTypes()) {
@@ -684,20 +685,20 @@ public class FlexReportingControllerHelperService {
 
   public JSONObject initLibraries(HttpSession session, JSONObject json) {
 //    try {
-      JSONObject jsonObject = new JSONObject();
-     // JSONArray jsonArray = new JSONArray();
-      StringBuilder a = new StringBuilder();
-     // Collection<Library> libraries = requestManager.listAllLibraries();
-     // for (Library library : libraries) {
-     //   jsonArray.add(libraryFormRowBuilder(library));
-     // }
+    JSONObject jsonObject = new JSONObject();
+    // JSONArray jsonArray = new JSONArray();
+    StringBuilder a = new StringBuilder();
+    // Collection<Library> libraries = requestManager.listAllLibraries();
+    // for (Library library : libraries) {
+    //   jsonArray.add(libraryFormRowBuilder(library));
+    // }
 
-      for (String platform : PlatformType.getKeys()) {
-        a.append("<option value=\"" + platform + "\">" + platform + "</option>");
-      }
-     // jsonObject.put("html", jsonArray);
-      jsonObject.put("platform", "<option value=\"all\">all</option>" + a.toString());
-      return jsonObject;
+    for (String platform : PlatformType.getKeys()) {
+      a.append("<option value=\"" + platform + "\">" + platform + "</option>");
+    }
+    // jsonObject.put("html", jsonArray);
+    jsonObject.put("platform", "<option value=\"all\">all</option>" + a.toString());
+    return jsonObject;
 //    }
 //    catch (IOException e) {
 //      log.debug("Failed", e);
@@ -843,6 +844,7 @@ public class FlexReportingControllerHelperService {
       response.put("qcgraph", qcGraphArray);
       response.put("typegraph", typeGraphArray);
       response.put("reportTable", buildLibraryReport(libraries));
+      response.put("relationQCTable", buildrelationQCTable(libraries));
       return response;
     }
     catch (IOException e) {
@@ -868,28 +870,49 @@ public class FlexReportingControllerHelperService {
     return jsonArray;
   }
 
+  public JSONArray buildrelationQCTable(ArrayList<Library> libraries) {
+    JSONArray jsonArray = new JSONArray();
+    for (Library library : libraries) {
+      String qc = "unknown";
+      String sampleQC = "unknown";
+      if (library.getQcPassed() != null) {
+        qc = library.getQcPassed().toString();
+      }
+      if (library.getSample().getQcPassed() != null) {
+        sampleQC = library.getSample().getQcPassed().toString();
+      }
+      jsonArray.add("['" + library.getSample().getProject().getName() + "','" +
+                    library.getName() + "','" +
+                    qc + "','" +
+                    LimsUtils.getDateAsString(library.getCreationDate()) + "','" +
+                    library.getSample().getName() + "','" +
+                    sampleQC + "']");
+    }
+    return jsonArray;
+  }
+
   public JSONObject initRuns(HttpSession session, JSONObject json) {
 //    try {
-      JSONObject jsonObject = new JSONObject();
-     // JSONArray jsonArray = new JSONArray();
-      StringBuilder a = new StringBuilder();
-      StringBuilder c = new StringBuilder();
-      //Collection<Run> runs = requestManager.listAllRuns();
-     // for (Run run : runs) {
-     //   jsonArray.add(runFormRowBuilder(run));
-     // }
+    JSONObject jsonObject = new JSONObject();
+    // JSONArray jsonArray = new JSONArray();
+    StringBuilder a = new StringBuilder();
+    StringBuilder c = new StringBuilder();
+    //Collection<Run> runs = requestManager.listAllRuns();
+    // for (Run run : runs) {
+    //   jsonArray.add(runFormRowBuilder(run));
+    // }
 
-      for (String platform : PlatformType.getKeys()) {
-        a.append("<option value=\"" + platform + "\">" + platform + "</option>");
-      }
+    for (String platform : PlatformType.getKeys()) {
+      a.append("<option value=\"" + platform + "\">" + platform + "</option>");
+    }
 
-      for (String healthString : HealthType.getKeys()) {
-        c.append("<option value=\"" + healthString + "\">" + healthString + "</option>");
-      }
-     // jsonObject.put("html", jsonArray);
-      jsonObject.put("platform", "<option value=\"all\">all</option>" + a.toString());
-      jsonObject.put("status", "<option value=\"all\">all</option>" + c.toString());
-      return jsonObject;
+    for (String healthString : HealthType.getKeys()) {
+      c.append("<option value=\"" + healthString + "\">" + healthString + "</option>");
+    }
+    // jsonObject.put("html", jsonArray);
+    jsonObject.put("platform", "<option value=\"all\">all</option>" + a.toString());
+    jsonObject.put("status", "<option value=\"all\">all</option>" + c.toString());
+    return jsonObject;
 //    }
 //    catch (IOException e) {
 //      log.debug("Failed", e);
@@ -911,6 +934,8 @@ public class FlexReportingControllerHelperService {
     String searchStr = json.getString("str");
     String from = json.getString("from");
     String to = json.getString("to");
+    String runStartedFrom = json.getString("runStartedFrom");
+    String runStartedTo = json.getString("runStartedTo");
     String platform = json.getString("platform");
     String status = json.getString("status");
     try {
@@ -936,6 +961,20 @@ public class FlexReportingControllerHelperService {
               Date receivedDate = run.getStatus().getCompletionDate();
 
               if (receivedDate.after(startDate) && receivedDate.before(endDate)) {
+                jsonArray.add(runFormRowBuilder(run));
+              }
+            }
+          }
+          else if (runStartedFrom != null && !runStartedFrom.equals("") &&
+                   runStartedTo != null && !runStartedTo.equals("")) {
+            if (run.getStatus() != null && run.getStatus().getCompletionDate() != null) {
+
+              DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+              Date startDate = df.parse(runStartedFrom);
+              Date endDate = df.parse(runStartedTo);
+              Date startedDate = run.getStatus().getStartDate();
+
+              if (startedDate.after(startDate) && startedDate.before(endDate)) {
                 jsonArray.add(runFormRowBuilder(run));
               }
             }
@@ -1005,6 +1044,7 @@ public class FlexReportingControllerHelperService {
       response.put("graph", graphArray);
       response.put("platformgraph", platformGraphArray);
       response.put("reportTable", buildRunReport(runs));
+      response.put("runsPartitionReport", buildRunPartitionReport(runs));
       return response;
     }
     catch (IOException e) {
@@ -1022,6 +1062,56 @@ public class FlexReportingControllerHelperService {
                     run.getPlatformType().getKey() + "']");
     }
     return jsonArray;
+  }
+
+  public JSONArray buildRunPartitionReport(ArrayList<Run> runs) {
+    JSONArray jsonArray = new JSONArray();
+    try {
+      for (Run run : runs) {
+        Collection<SequencerPartitionContainer<SequencerPoolPartition>> spcs = requestManager.listSequencerPartitionContainersByRunId(run.getId());
+        if (spcs.size() > 0) {
+          for (SequencerPartitionContainer<SequencerPoolPartition> spc : spcs) {
+
+            if (spc.getPartitions().size() > 0) {
+              for (SequencerPoolPartition spp : spc.getPartitions()) {
+                if (spp.getPool() != null) {
+                  Pool pool = spp.getPool();
+                  if (spp.getPool().getDilutions().size() > 0) {
+                    Map<String, Integer> projectMap = new HashMap<String, Integer>();
+                    for (Dilution dilution : spp.getPool().getDilutions()) {
+                      int count = projectMap.containsKey(dilution.getLibrary().getSample().getProject().getName()) ? projectMap.get(dilution.getLibrary().getSample().getProject().getName()) : 0;
+                      count++;
+                      projectMap.put(dilution.getLibrary().getSample().getProject().getName(), count);
+                    }
+                    Map<String, Integer> projectMapDisplayed = new HashMap<String, Integer>();
+                    for (Dilution dilution : spp.getPool().getDilutions()) {
+                      if (!projectMapDisplayed.containsKey(dilution.getLibrary().getSample().getProject().getName())) {
+                        jsonArray.add("['" + run.getName() + "','" +
+                                      (run.getAlias().replace("+", "-")).replace("'", "\\'") + "','" +
+                                      (run.getStatus() != null ? LimsUtils.getDateAsString(run.getStatus().getStartDate()) : "") + "','" +
+                                      pool.getName() + "','" +
+                                      spp.getPartitionNumber() + "','" +
+                                      dilution.getLibrary().getSample().getProject().getName() + "','" +
+                                      projectMap.get(dilution.getLibrary().getSample().getProject().getName()) + "','" +
+                                      spp.getPool().getDilutions().size() + "']");
+                        projectMapDisplayed.put(dilution.getLibrary().getSample().getProject().getName(), 1);
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+
+
+      }
+      return jsonArray;
+    }
+    catch (IOException e) {
+      log.debug("Failed", e);
+      return jsonArray;
+    }
   }
 
 

@@ -6,7 +6,6 @@
     <version>0.2.1-SNAPSHOT</version>
   </parent>
 
-  <groupId>${parent.groupId}</groupId>
   <version>${parent.version}</version>
   <artifactId>runstats-client</artifactId>
 
@@ -36,6 +35,12 @@
       <snapshots>
         <enabled>true</enabled>
       </snapshots>
+    </repository>
+
+    <repository>
+      <id>tgac-repo</id>
+      <name>TGAC Maven Repository</name>
+      <url>https://repos.tgac.ac.uk/maven/repo</url>
     </repository>
   </repositories>
 

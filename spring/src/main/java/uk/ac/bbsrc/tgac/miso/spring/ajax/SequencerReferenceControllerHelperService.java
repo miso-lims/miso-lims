@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
@@ -77,10 +78,18 @@ public class SequencerReferenceControllerHelperService {
     try {
       Collection<SequencerReference> sr = requestManager.listAllSequencerReferences();
       StringBuilder sb = new StringBuilder();
+        JSONObject sequencers = new JSONObject();
+        JSONArray sequencers_list = new JSONArray();
       for (SequencerReference s : sr) {
-        sb.append("<option value="+s.getId()+">"+s.getPlatform().getNameAndModel()+" - "+s.getName()+"</option>");
+          JSONObject each_sequencer = new JSONObject();
+          each_sequencer.put("id",s.getId());
+          each_sequencer.put("name_model",s.getPlatform().getNameAndModel());
+          each_sequencer.put("name",s.getName());
+          sequencers_list.add(each_sequencer);
+//          sb.append("<option value="+s.getId()+">"+s.getPlatform().getNameAndModel()+" - "+s.getName()+"</option>");
       }
-      return JSONUtils.JSONObjectResponse("sequencers", sb.toString());
+        sequencers.put("sequencers", sequencers_list);
+      return sequencers;
     }
     catch (IOException e) {
       e.printStackTrace();
