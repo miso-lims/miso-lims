@@ -103,6 +103,8 @@ var Reports = Reports || {
         }
         Reports.ui.createSampleOverviewRelationTable(json.overviewRelationTable);
         Reports.ui.createSampleResultTable(json.reportTable);
+        Reports.ui.createLibraryRelationQCTable(json.relationQCTable);
+
       }
       }
     );
@@ -156,6 +158,7 @@ var Reports = Reports || {
         }
         Reports.ui.createRunOverviewTable(json.overviewTable);
         Reports.ui.createRunResultTable(json.reportTable);
+        Reports.ui.createRunsPartitionReport(json.runsPartitionReport);
       }
       }
     );
@@ -547,6 +550,33 @@ Reports.ui = {
       "bSort": false
     });
   },
+  createLibraryRelationQCTable: function (array) {
+    jQuery('#librariesRelationQC').html('<table cellpadding="0" cellspacing="0" border="0" class="display" id="librariesRelationQCTable"></table>');
+    jQuery('#librariesRelationQCTable').dataTable({
+      "aaData": array,
+      "aoColumns": [
+        { "sTitle": "Project Name", "sType": "natural"},
+        { "sTitle": "Library Name", "sType": "natural"},
+        { "sTitle": "Alias", "sType": "natural"},
+        { "sTitle": "Description"},
+        { "sTitle": "Platform"},
+        { "sTitle": "Library Type"},
+        { "sTitle": "QC Passed"},
+        { "sTitle": "Creation Date"},
+        { "sTitle": "Sample Name", "sType": "natural"},
+        { "sTitle": "QC Passed"}
+      ],
+      "aaSorting": [
+        [0, "desc"]
+      ],
+      "bJQueryUI": true,
+      "sDom": 'T<"clear">lfrtip',
+      "bJQueryUI": true,
+      "oTableTools": {
+        "sSwfPath": "/scripts/jquery/datatables/swf/copy_csv_xls_pdf.swf"
+      }
+    });
+  },
 
   createLibraryOverviewTable: function (array) {
     jQuery('#libraryOverviewCell').append('<br/><br/><table cellpadding="0" cellspacing="0" border="0" class="display" id="libraryOverviewTable"></table>');
@@ -608,28 +638,73 @@ Reports.ui = {
     });
   },
 
+  createRunsPartitionReport: function (array) {
+    jQuery('#runsPartitionReport').html('<table cellpadding="0" cellspacing="0" border="0" class="display" id="runsPartitionReportTable"></table>');
+    jQuery('#runsPartitionReportTable').dataTable({
+      "aaData": array,
+      "aoColumns": [
+        { "sTitle": "Run Name", "sType": "natural"},
+        { "sTitle": "Run Alias", "sType": "natural"},
+        { "sTitle": "Start Date"},
+        { "sTitle": "Pool Name"},
+        { "sTitle": "Partition No."},
+        { "sTitle": "Project Name"},
+        { "sTitle": "No. of LDs in pool belongs to project"},
+        { "sTitle": "No. of LDs in pool in total"}
+      ],
+      "aaSorting": [
+        [0, "desc"]
+      ],
+      "sDom": 'T<"clear">lfrtip',
+      "bJQueryUI": true,
+      "oTableTools": {
+        "sSwfPath": "/scripts/jquery/datatables/swf/copy_csv_xls_pdf.swf"
+       }
+    });
+  },
+
   getSequencersList: function () {
     var self = this;
     Fluxion.doAjax(
-      'sequencerReferenceControllerHelperService',
-      'listSequencers',
-      {'url': ajaxurl},
-      {'doOnSuccess': function (json) {
-        var list = "<select id='sequencers' name='sequencers' onchange='Reports.ui.updateCalendar();'> <option value=0> All </option>" + json.sequencers + "</select>";
-        jQuery('#sequencerslist').html("<b> Sequencer Machines: </b>" + list);
-        self.generateColors();
+            'sequencerReferenceControllerHelperService',
+            'listSequencers',
+            {'url': ajaxurl},
+            {'doOnSuccess': function (json) {
+              var list = "<select id='sequencers' name='sequencers' onchange='Reports.ui.updateCalendar();'> <option value=0> All </option>;"
 
-        init(jQuery('#datepicking').val(), jQuery('#sequencers').val(), jQuery('#sequencers option:last').val());
-        addRestrictedDatePicker("calendarfrom");
-        addRestrictedDatePicker("calendarto");
+              for (var i = 0; i < json.sequencers.length; i++) {
+                list += "<option value=" + json.sequencers[i].id + ">" + json.sequencers[i].name_model + " - " + json.sequencers[i].name + "</option>"
+              }
 
-        self.updateCalendar();
-      }
-      }
+              list += "</select>";
+              jQuery('#sequencerslist').html("<b> Sequencer Machines: </b>" + list);
+              self.generateColors();
+
+              init(jQuery('#datepicking').val(), jQuery('#sequencers').val(), self.findMaxValue(jQuery('#sequencers')));
+              addRestrictedDatePicker("calendarfrom");
+              addRestrictedDatePicker("calendarto");
+
+              self.updateCalendar();
+            }
+            }
     );
   },
 
+  findMaxValue: function (element) {
+    var maxValue = undefined;
+    jQuery('option', element).each(function () {
+      var val = jQuery(this).attr('value');
+      val = parseInt(val, 10);
+      if (maxValue === undefined || maxValue < val) {
+        maxValue = val;
+      }
+    });
+    return maxValue;
+  },
+
+
   updateCalendar: function () {
+    var self = this;
     if (jQuery('#sequencers').val() == 0) {
       jQuery("#listtoggle").fadeIn();
     }
@@ -638,34 +713,33 @@ Reports.ui = {
     }
 
     if (jQuery('#datepicking').val() == "custom") {
-      jQuery("#calendarfrom").val("");
-      jQuery("#calendarto").val("");
+//            jQuery("#calendarfrom").val("");
+//            jQuery("#calendarto").val("");
       jQuery("#custom").show();
     }
     else {
       jQuery("#custom").hide();
-      drawCalendar(jQuery('#datepicking').val(), jQuery('#sequencers').val(), jQuery('#sequencers option:last').val());
     }
+    drawCalendar(jQuery('#datepicking').val(), jQuery('#sequencers').val(), self.findMaxValue(jQuery('#sequencers')));
   },
 
   resetCalendar: function () {
     jQuery("#calendarfrom").val("");
     jQuery("#calendarto").val("");
-    drawCalendar("cyear", jQuery('#sequencers').val(), jQuery('#sequencers option:last').val());
+    drawCalendar("cyear", jQuery('#sequencers').val(), self.findMaxValue(jQuery('#sequencers')));
   },
 
   generateColors: function () {
-    var size = jQuery('#sequencers option:last').val();
+    var size = jQuery('#sequencers').children('option').length;
     var color = "<table>";
-    var tempcolour = d3.scale.category20();
+    var tempcolour = ["#1f77b4", "#aec7e8", "#ff7f0e", "#ffbb78", "#2ca02c", "#98df8a", "#d62728", "#ff9896", "#9467bd", "#c5b0d5", "#8c564b", "#c49c94", "#e377c2", "#f7b6d2", "#7f7f7f", "#c7c7c7", "#bcbd22", "#dbdb8d", "#17becf", "#9edae5" ];
 
     for (var i = 1; i < size; i++) {
       if ((i % 2) > 0) {
         color += "<tr>";
       }
       var label = jQuery("#sequencers option").eq(i).text();
-      var temp = parseInt(i) * parseInt(i);
-      color += "<td bgcolor=" + tempcolour(temp) + "> <font color='black'> <b> " + label + "</b> </font></td>";
+      color += "<td bgcolor=" + tempcolour[jQuery("#sequencers option").eq(i).val()] + "> <font color='black'> <b> " + label + "</b> </font></td>";
       if ((i % 2) == 0) {
         color += "</tr>";
       }
@@ -887,6 +961,7 @@ Reports.search = {
       'searchRunsByCreationDateandString',
       {'str': jQuery('#runReportSearchInput').val(),
         'from': jQuery('#runfrom').val(), 'to': jQuery('#runto').val(),
+        'runStartedFrom': jQuery('#runStartedFrom').val(), 'runStartedTo': jQuery('#runStartedTo').val(),
         'platform': jQuery('#runPlatform option:selected').val(),
         'status': jQuery('#runStatus option:selected').val(),
         'url': ajaxurl},
