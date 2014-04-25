@@ -569,7 +569,7 @@ Reports.ui = {
       "aaSorting": [
         [0, "desc"]
       ],
-      "bJQueryUI": true
+      "bJQueryUI": true,
       "sDom": 'T<"clear">lfrtip',
       "bJQueryUI": true,
       "oTableTools": {
