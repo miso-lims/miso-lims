@@ -244,8 +244,8 @@ function generateSampleDeliveryForm(tableName, projectId) {
     });
 
 //headers
-    jQuery(tableName + " tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\""+tableName+"\", this);'></span></th>");
-    jQuery(tableName + " tr:gt(0)").prepend("<td class='rowSelect'></td>");
+    jQuery(tableName + " tr:first").prepend("<th width='5%'>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\""+tableName+"\", this);'></span></th>");
+    jQuery(tableName + " tr:gt(0)").prepend("<td width='5%' class='rowSelect'></td>");
 
     sTable.dataTable({
       "aoColumnDefs": [

@@ -1259,6 +1259,10 @@ Project.barcode = {
         jQuery(this).removeAttr("onmouseover").removeAttr("onmouseout");
         jQuery(this).find("td:eq(6)").remove();
       });
+
+      jQuery(tableId).find("tr:first").prepend("<th width='5%'>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"" + tableId + "\", this);'></span></th>");
+      jQuery(tableId).find("tr:gt(0)").prepend("<td width='5%' class='rowSelect'></td>");
+
       //Sample Name 	Sample Alias 	Sample Description 	Type 	QC Passed
       var headers = ['rowsel',
                      'name',
@@ -1274,17 +1278,27 @@ Project.barcode = {
             "aTargets": [ 0 ]
           }
         ],
+        "aaSorting": [
+          [2, 'asc']
+        ],
         "bPaginate": false,
         "bInfo": false,
         "bJQueryUI": true,
         "bAutoWidth": true,
-        "bSort": false,
+        "aoColumns": [
+          {"bSortable": false},
+          { "sType": 'natural' },
+          { "sType": 'natural' },
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+      ],
         "bFilter": false,
         "sDom": '<<"toolbar">f>r<t>ip>'
       });
-
-      jQuery(tableId).find("tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"" + tableId + "\", this);'></span></th>");
-      jQuery(tableId).find("tr:gt(0)").prepend("<td class='rowSelect'></td>");
 
       jQuery(tableId).find('.rowSelect').click(function () {
         if (jQuery(this).parent().hasClass('row_selected')) {
@@ -1372,15 +1386,19 @@ Project.barcode = {
 
       jQuery(tableId).addClass("display");
 
-      jQuery(tableId).find('tr:first th:eq(7)').remove();
+      jQuery(tableId).find('tr:first th:eq(8)').remove();
       jQuery(tableId).find("tr").each(function () {
         jQuery(this).removeAttr("onmouseover").removeAttr("onmouseout");
-        jQuery(this).find("td:eq(7)").remove();
+        jQuery(this).find("td:eq(8)").remove();
       });
+
+      jQuery(tableId).find("tr:first").prepend("<th width='5%'>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"" + tableId + "\", this);'></span></th>");
+      jQuery(tableId).find("tr:gt(0)").prepend("<td width='5%' class='rowSelect'></td>");
       //Library Name 	Library Alias 	Library Description 	Library Type 	Library Platform 	Tag Barcode 	Insert Size
       var headers = ['rowsel',
                      'name',
                      'alias',
+                     'date',
                      'description',
                      'libraryType',
                      'platform',
@@ -1394,17 +1412,30 @@ Project.barcode = {
             "aTargets": [ 0 ]
           }
         ],
+        "aaSorting": [
+          [2, 'asc']
+        ],
         "bPaginate": false,
         "bInfo": false,
         "bJQueryUI": true,
         "bAutoWidth": true,
-        "bSort": false,
+
+         "aoColumns": [
+           {"bSortable": false},
+           { "sType": 'natural' },
+           { "sType": 'natural' },
+           { "sType": 'natural' },
+           null,
+           null,
+           null,
+           null,
+           null,
+           null,
+           null
+         ],
         "bFilter": false,
         "sDom": '<<"toolbar">f>r<t>ip>'
       });
-
-      jQuery(tableId).find("tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"" + tableId + "\", this);'></span></th>");
-      jQuery(tableId).find("tr:gt(0)").prepend("<td class='rowSelect'></td>");
 
       jQuery(tableId).find('.rowSelect').click(function () {
         if (jQuery(this).parent().hasClass('row_selected')) {
@@ -1498,6 +1529,9 @@ Project.barcode = {
         jQuery(this).removeAttr("onmouseover").removeAttr("onmouseout");
         jQuery(this).find("td:eq(5)").remove();
       });
+
+      jQuery(tableId).find("tr:first").prepend("<th width='5%'>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"" + tableId + "\", this);'></span></th>");
+      jQuery(tableId).find("tr:gt(0)").prepend("<td width='5%' class='rowSelect'></td>");
       //Dilution Name 	Dilution Creator 	Dilution Creation Date 	Dilution Platform 	Dilution Concentration
       var headers = ['rowsel',
                      'name',
@@ -1513,17 +1547,26 @@ Project.barcode = {
             "aTargets": [ 0 ]
           }
         ],
+        "aaSorting": [
+           [2, 'asc']
+        ],
         "bPaginate": false,
         "bInfo": false,
         "bJQueryUI": true,
         "bAutoWidth": true,
-        "bSort": false,
+        "aoColumns": [
+          {"bSortable": false},
+          { "sType": 'natural' },
+          { "sType": 'natural' },
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
         "bFilter": false,
         "sDom": '<<"toolbar">f>r<t>ip>'
       });
-
-      jQuery(tableId).find("tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"" + tableId + "\", this);'></span></th>");
-      jQuery(tableId).find("tr:gt(0)").prepend("<td class='rowSelect'></td>");
 
       jQuery(tableId).find('.rowSelect').click(function () {
         if (jQuery(this).parent().hasClass('row_selected')) {

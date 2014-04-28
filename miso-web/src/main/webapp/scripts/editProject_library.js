@@ -37,12 +37,13 @@ function bulkLibraryQcTable(tableName) {
     lTable.addClass("display");
 
     //remove edit header and column
-    jQuery(tableName + ' tr:first th:gt(7)').remove();
-    jQuery(tableName + ' tr:first th:eq(5)').remove();
+    jQuery(tableName + ' tr:first th:gt(8)').remove();
+    jQuery(tableName + ' tr:first th:eq(6)').remove();
 
     var libraryheaders = ['rowsel',
                           'name',
                           'alias',
+                          'date',
                           'description',
                           'libraryType',
                           'platform',
@@ -54,28 +55,28 @@ function bulkLibraryQcTable(tableName) {
                           'results'];
 
     lTable.find("tr").each(function () {
-      if (jQuery(this).find("td:eq(7)").html() == "true") {
+      if (jQuery(this).find("td:eq(8)").html() == "true") {
         jQuery(this).remove();
       }
       else {
         jQuery(this).removeAttr("onmouseover").removeAttr("onmouseout");
-        jQuery(this).find("td:gt(7)").remove();
-        jQuery(this).find("td:eq(5)").remove();
-        jQuery(this).find("td:eq(7)").addClass("passedCheck");
+        jQuery(this).find("td:gt(8)").remove();
+        jQuery(this).find("td:eq(4)").remove();
+        jQuery(this).find("td:eq(8)").addClass("passedCheck");
       }
     });
 
     //headers
     jQuery(tableName + " tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"#library_table\", this);'></span></th>");
-    jQuery(tableName + ' tr:first th:eq(7)').html("QC Passed <span header='qcPassed' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\"#library_table\", this);'></span>");
+    jQuery(tableName + ' tr:first th:eq(8)').html("QC Passed <span header='qcPassed' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\"#library_table\", this);'></span>");
     jQuery(tableName + " tr:first").append("<th>QC Date <span header='qcDate' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\"#library_table\", this);'></span></th>");
     jQuery(tableName + " tr:first").append("<th>QC Method <span header='qcType' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.fillDown(\"#library_table\", this);'></span></th>");
     jQuery(tableName + " tr:first").append("<th>Concentration</th>");
 
     //columns
     jQuery(tableName + " tr:gt(0)").prepend("<td class='rowSelect'></td>");
-    jQuery(tableName + " tr:gt(0)").find("td:eq(6)").addClass("defaultEditable");
-    jQuery(tableName + " tr:gt(0)").find("td:eq(7)").addClass("passedCheck");
+    jQuery(tableName + " tr:gt(0)").find("td:eq(7)").addClass("defaultEditable");
+    jQuery(tableName + " tr:gt(0)").find("td:eq(8)").addClass("passedCheck");
     jQuery(tableName + " tr:gt(0)").append("<td class='dateSelect'></td>");
     jQuery(tableName + " tr:gt(0)").append("<td class='typeSelect'></td>");
     jQuery(tableName + " tr:gt(0)").append("<td class='defaultEditable'></td>");
@@ -89,6 +90,7 @@ function bulkLibraryQcTable(tableName) {
                                        ],
                                        "aoColumns": [
                                          {"bSortable": false},
+                                         { "sType": 'natural' },
                                          { "sType": 'natural' },
                                          { "sType": 'natural' },
                                          { "sType": 'natural' },
@@ -226,12 +228,13 @@ function bulkLibraryDilutionTable(tableName) {
     lTable.addClass("display");
 
     //remove edit header and column
-    jQuery(tableName + ' tr:first th:gt(7)').remove();
-    jQuery(tableName + ' tr:first th:eq(5)').remove();
+    jQuery(tableName + ' tr:first th:gt(8)').remove();
+    jQuery(tableName + ' tr:first th:eq(6)').remove();
 
     var dilutionheaders = ['rowsel',
                            'name',
                            'alias',
+                           'date',
                            'description',
                            'libraryType',
                            'platform',
@@ -241,13 +244,13 @@ function bulkLibraryDilutionTable(tableName) {
                            'results'];
 
     lTable.find("tr").each(function () {
-      if (jQuery(this).find("td:eq(7)").html() == "false") {
+      if (jQuery(this).find("td:eq(8)").html() == "false") {
         jQuery(this).remove();
       }
       else {
         jQuery(this).removeAttr("onmouseover").removeAttr("onmouseout");
-        jQuery(this).find("td:gt(7)").remove();
-        jQuery(this).find("td:eq(5)").remove();
+        jQuery(this).find("td:gt(8)").remove();
+        jQuery(this).find("td:eq(6)").remove();
       }
     });
 
@@ -270,6 +273,7 @@ function bulkLibraryDilutionTable(tableName) {
                                        ],
                                        "aoColumns": [
                                          {"bSortable": false},
+                                         { "sType": 'natural' },
                                          { "sType": 'natural' },
                                          { "sType": 'natural' },
                                          { "sType": 'natural' },
