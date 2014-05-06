@@ -61,7 +61,7 @@ function bulkLibraryQcTable(tableName) {
       else {
         jQuery(this).removeAttr("onmouseover").removeAttr("onmouseout");
         jQuery(this).find("td:gt(8)").remove();
-        jQuery(this).find("td:eq(4)").remove();
+        jQuery(this).find("td:eq(6)").remove();
         jQuery(this).find("td:eq(8)").addClass("passedCheck");
       }
     });
@@ -87,6 +87,9 @@ function bulkLibraryQcTable(tableName) {
                                            "bUseRendered": false,
                                            "aTargets": [ 0 ]
                                          }
+                                       ],
+                                       "aaSorting": [
+                                         [2, 'asc']
                                        ],
                                        "aoColumns": [
                                          {"bSortable": false},
