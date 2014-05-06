@@ -1254,10 +1254,10 @@ Project.barcode = {
 
       jQuery(tableId).addClass("display");
 
-      jQuery(tableId).find('tr:first th:eq(6)').remove();
+      jQuery(tableId).find('tr:first th:gt(6)').remove();
       jQuery(tableId).find("tr").each(function () {
         jQuery(this).removeAttr("onmouseover").removeAttr("onmouseout");
-        jQuery(this).find("td:eq(6)").remove();
+        jQuery(this).find("td:gt(6)").remove();
       });
 
       jQuery(tableId).find("tr:first").prepend("<th width='5%'>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"" + tableId + "\", this);'></span></th>");
@@ -1289,7 +1289,6 @@ Project.barcode = {
           {"bSortable": false},
           { "sType": 'natural' },
           { "sType": 'natural' },
-          null,
           null,
           null,
           null,
@@ -1386,10 +1385,10 @@ Project.barcode = {
 
       jQuery(tableId).addClass("display");
 
-      jQuery(tableId).find('tr:first th:eq(8)').remove();
+      jQuery(tableId).find('tr:first th:gt(8)').remove();
       jQuery(tableId).find("tr").each(function () {
         jQuery(this).removeAttr("onmouseover").removeAttr("onmouseout");
-        jQuery(this).find("td:eq(8)").remove();
+        jQuery(this).find("td:gt(8)").remove();
       });
 
       jQuery(tableId).find("tr:first").prepend("<th width='5%'>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"" + tableId + "\", this);'></span></th>");
@@ -1425,7 +1424,6 @@ Project.barcode = {
            { "sType": 'natural' },
            { "sType": 'natural' },
            { "sType": 'natural' },
-           null,
            null,
            null,
            null,
@@ -1524,10 +1522,10 @@ Project.barcode = {
 
       jQuery(tableId).addClass("display");
 
-      jQuery(tableId).find('tr:first th:eq(5)').remove();
+      jQuery(tableId).find('tr:first th:gt(5)').remove();
       jQuery(tableId).find("tr").each(function () {
         jQuery(this).removeAttr("onmouseover").removeAttr("onmouseout");
-        jQuery(this).find("td:eq(5)").remove();
+        jQuery(this).find("td:gt(5)").remove();
       });
 
       jQuery(tableId).find("tr:first").prepend("<th width='5%'>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"" + tableId + "\", this);'></span></th>");
@@ -1558,7 +1556,6 @@ Project.barcode = {
           {"bSortable": false},
           { "sType": 'natural' },
           { "sType": 'natural' },
-          null,
           null,
           null,
           null,
