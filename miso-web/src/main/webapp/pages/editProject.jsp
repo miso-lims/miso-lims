@@ -958,6 +958,7 @@
           <tr>
             <th>Library Name</th>
             <th>Library Alias</th>
+            <th>Date</th>
             <th>Library Description</th>
             <th>Library Type</th>
             <th>Library Platform</th>
@@ -975,6 +976,7 @@
             <tr libraryId="${library.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
               <td><b>${library.name}</b></td>
               <td>${library.alias}</td>
+              <td>${library.creationDate}</td>
               <td>${library.description}</td>
               <td>${library.libraryType.description}</td>
               <td>${library.platformName}</td>
@@ -1008,6 +1010,7 @@
               ],
               "aoColumns": [
                 null,
+                { "sType": 'natural' },
                 { "sType": 'natural' },
                 { "sType": 'natural' },
                 null,
@@ -1058,6 +1061,7 @@
               <tr>
                 <th>Library Name</th>
                 <th>Library Alias</th>
+                <th>Date</th>
                 <th>Library Description</th>
                 <th>Library Type</th>
                 <th>Library Platform</th>
@@ -1075,6 +1079,7 @@
                 <tr libraryId="${grouplib.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
                   <td><b>${grouplib.name}</b></td>
                   <td>${grouplib.alias}</td>
+                  <td>${grouplib.creationDate}</td>
                   <td>${grouplib.description}</td>
                   <td>${grouplib.libraryType.description}</td>
                   <td>${grouplib.platformName}</td>
@@ -1108,6 +1113,7 @@
                   ],
                   "aoColumns": [
                     null,
+                    { "sType": 'natural' },
                     { "sType": 'natural' },
                     { "sType": 'natural' },
                     null,
