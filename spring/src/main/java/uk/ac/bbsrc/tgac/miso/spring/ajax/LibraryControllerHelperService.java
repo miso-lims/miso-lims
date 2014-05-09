@@ -112,7 +112,7 @@ public class LibraryControllerHelperService {
       String alias = json.getString("alias");
       try {
         if (libraryNamingScheme.validateField("alias", alias)) {
-          log.info("Library alias OK!");
+          log.debug("Library alias OK!");
           return JSONUtils.SimpleJSONResponse("OK");
         }
         else {

@@ -212,6 +212,7 @@
 <tr>
   <td>Description:</td>
   <td>
+    <%-- FIX MISO-107
     <c:choose>
       <c:when test='${not empty library.sample}'>
         <form:input path="description" value="${library.sample.description}" class="validateable"/>
@@ -220,6 +221,8 @@
         <form:input path="description" class="validateable"/>
       </c:otherwise>
     </c:choose>
+    --%>
+    <form:input path="description" class="validateable"/>
     <span id="descriptioncounter" class="counter"></span></td>
 </tr>
 <tr>
