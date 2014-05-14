@@ -91,6 +91,10 @@ public interface Run extends SecurableByProfile, Submittable<Document>, Comparab
 
   public List<SequencerPartitionContainer<SequencerPoolPartition>> getSequencerPartitionContainers();
 
+  public void setSequencerPartitionContainers(List<SequencerPartitionContainer<SequencerPoolPartition>> containers);
+
+  public void addSequencerPartitionContainer(SequencerPartitionContainer<SequencerPoolPartition> sequencerPartitionContainer);
+
   /**
    * Returns the platformType of this Run object.
    *

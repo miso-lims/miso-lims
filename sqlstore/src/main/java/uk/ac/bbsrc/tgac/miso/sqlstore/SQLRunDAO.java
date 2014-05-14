@@ -283,31 +283,9 @@ public class SQLRunDAO implements RunStore {
   }
 
   private void purgeCaches(Collection<Run> runs) {
-    Cache lcache = cacheManager.getCache("runListCache");
-    if (lcache != null) {
-      BlockingCache listCache = new BlockingCache(lcache);
-      if (listCache.getKeys().size() > 0) {
-        Object cachekey = listCache.getKeys().get(0);
-        if (cachekey != null) {
-          List<Run> cachedruns = (List<Run>)listCache.get(cachekey).getValue();
-          for (Run run : runs) {
-            cachedruns.remove(run);
-            cachedruns.add(run);
-          }
-          listCache.put(new Element(cachekey, cachedruns));
-        }
-      }
-    }
-
-    Cache rcache = cacheManager.getCache("runCache");
-    if (rcache != null) {
-      BlockingCache cache = new BlockingCache(rcache);
-      HashCodeCacheKeyGenerator keygen = new HashCodeCacheKeyGenerator();
-      for (Run run : runs) {
-        Long cachekey = keygen.generateKey(run);
-        cache.remove(cachekey);
-        cache.put(new Element(cachekey, run));
-      }
+    for (Run run : runs) {
+      purgeListCache(run, true);
+      DbUtils.updateCaches(cacheManager, run, Run.class);
     }
   }
 
@@ -399,13 +377,6 @@ public class SQLRunDAO implements RunStore {
       catch (MisoNamingException e) {
         throw new IOException("Cannot save Run - issue with naming scheme", e);
       }
-      /*
-      String name = "RUN" + DbUtils.getAutoIncrement(template, TABLE_NAME);
-      params.addValue("name", name);
-      Number newId = insert.executeAndReturnKey(params);
-      run.setRunId(newId.longValue());
-      run.setName(name);
-      */
     }
     else {
       try {
@@ -422,17 +393,11 @@ public class SQLRunDAO implements RunStore {
       catch (MisoNamingException e) {
         throw new IOException("Cannot save Run - issue with naming scheme", e);
       }
-      /*
-      params.addValue("runId", run.getRunId())
-            .addValue("name", run.getName());
-      NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-      namedTemplate.update(RUN_UPDATE, params);
-      */
     }
 
     if (this.cascadeType != null) {
       if (this.cascadeType.equals(CascadeType.PERSIST)) {
-        for (SequencerPartitionContainer<SequencerPoolPartition> l : ((RunImpl)run).getSequencerPartitionContainers()) {
+        for (SequencerPartitionContainer<SequencerPoolPartition> l : run.getSequencerPartitionContainers()) {
           l.setSecurityProfile(run.getSecurityProfile());
           if (l.getPlatform().getPlatformType() == null) {
             l.getPlatform().setPlatformType(run.getPlatformType());
@@ -550,16 +515,6 @@ public class SQLRunDAO implements RunStore {
           catch (MisoNamingException e) {
             throw new IOException("Cannot save Run - issue with naming scheme", e);
           }
-
-          /*
-          String name = "RUN" + autoIncrement;
-          params.addValue("name", name);
-          Number newId = insert.executeAndReturnKey(params);
-          run.setRunId(newId.longValue());
-          run.setName(name);
-          autoIncrement = newId.longValue() + 1;
-          log.debug(run.getName() + ":: Inserted as ID " + run.getRunId());
-          */
         }
         else {
           try {
@@ -576,21 +531,12 @@ public class SQLRunDAO implements RunStore {
           catch (MisoNamingException e) {
             throw new IOException("Cannot save Run - issue with naming scheme", e);
           }
-          /*
-          params.addValue("runId", run.getRunId())
-                .addValue("name", run.getName());
-          log.debug(run.getName() + ":: Updating as ID " + run.getRunId());
-          batch.add(params);
-          */
         }
 
         if (this.cascadeType != null) {
           if (this.cascadeType.equals(CascadeType.PERSIST)) {
-            for (SequencerPartitionContainer<SequencerPoolPartition> l : ((RunImpl)run).getSequencerPartitionContainers()) {
+            for (SequencerPartitionContainer<SequencerPoolPartition> l : run.getSequencerPartitionContainers()) {
               l.setSecurityProfile(run.getSecurityProfile());
-              //if (l.getPlatformType() == null) {
-//                l.setPlatformType(run.getPlatformType());
-//              }
               if (l.getPlatform() == null) {
                 l.setPlatform(run.getSequencerReference().getPlatform());
               }
@@ -802,7 +748,7 @@ public class SQLRunDAO implements RunStore {
         if (!isLazy()) {
           List<SequencerPartitionContainer<SequencerPoolPartition>> ss =
               sequencerPartitionContainerDAO.listAllSequencerPartitionContainersByRunId(id);
-          ((RunImpl)r).setSequencerPartitionContainers(ss);
+          r.setSequencerPartitionContainers(ss);
 
           for (RunQC qc : runQcDAO.listByRunId(id)) {
             r.addQc(qc);
