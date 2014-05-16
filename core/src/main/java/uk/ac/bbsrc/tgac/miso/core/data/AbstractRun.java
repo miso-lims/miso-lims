@@ -83,7 +83,7 @@ public abstract class AbstractRun implements Run {
   @OneToOne(targetEntity = StatusImpl.class, cascade = CascadeType.ALL)
   private Status status;
 
-  private Collection<RunQC> runQCs = new HashSet<RunQC>();
+  private Collection<RunQC> runQCs = new TreeSet<RunQC>();
 
   private Collection<Note> notes = new HashSet<Note>();
 
