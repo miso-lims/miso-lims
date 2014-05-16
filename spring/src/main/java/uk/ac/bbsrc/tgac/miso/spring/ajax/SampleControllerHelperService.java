@@ -769,7 +769,7 @@ public class SampleControllerHelperService {
       if (sampleQCs.size()>0){
         List<SampleQC> list = new ArrayList(sampleQCs);
         try {
-          Collections.sort(list, new DateComparator(SampleQC.class, "getQcDate"));
+          Collections.sort(list, new DateComparator(SampleQC.class, "getQcDate", true));
         }
         catch (NoSuchMethodException e) {
           e.printStackTrace();
