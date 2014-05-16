@@ -52,6 +52,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
+import uk.ac.bbsrc.tgac.miso.core.util.DateComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeFactory;
@@ -766,9 +767,16 @@ public class SampleControllerHelperService {
      String sampleQCValue = "NA";
      Collection<SampleQC> sampleQCs =  requestManager.listAllSampleQCsBySampleId(sampleId);
       if (sampleQCs.size()>0){
-         List<SampleQC> list = new ArrayList(sampleQCs);
+        List<SampleQC> list = new ArrayList(sampleQCs);
+        try {
+          Collections.sort(list, new DateComparator(SampleQC.class, "getQcDate"));
+        }
+        catch (NoSuchMethodException e) {
+          e.printStackTrace();
+          log.error("Cannot sort SampleQCs by date: " + e.getMessage());
+        }
         SampleQC sampleQC = list.get(list.size()-1);
-         sampleQCValue = sampleQC.getResults().toString();
+        sampleQCValue = sampleQC.getResults().toString();
       }
       return sampleQCValue;
     }
