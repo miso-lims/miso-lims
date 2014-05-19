@@ -88,6 +88,16 @@
       </div>
     </li>
   </ul>
+  <c:if test="${not empty nextLibrary}">
+    <span style="float:right; padding-top: 5px; padding-left: 6px">
+      <a class='arrowright' href='<c:url value="/miso/library/${nextLibrary.id}"/>'>Next Library <b>${nextLibrary.name}</b></a>
+    </span>
+  </c:if>
+  <c:if test="${not empty previousLibrary}">
+    <span style="float:right; padding-top: 5px">
+      <a class='arrowleft' href='<c:url value="/miso/library/${previousLibrary.id}"/>'>Previous Library <b>${previousLibrary.name}</b></a>
+    </span>
+  </c:if>
 </div>
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
   <div id="note_arrowclick" class="toggleLeft"></div>

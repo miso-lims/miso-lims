@@ -84,6 +84,41 @@ public class EditSampleController {
     this.securityManager = securityManager;
   }
 
+  public Map<String, Sample> getAdjacentSamplesInGroup(Sample s, @RequestParam(value = "entityGroupId", required = true) Long entityGroupId) throws IOException {
+    return Collections.emptyMap();
+  }
+
+  public Map<String, Sample> getAdjacentSamplesInProject(Sample s, @RequestParam(value = "projectId", required = false) Long projectId) throws IOException {
+    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    Project p = s.getProject();
+    Sample prevS = null;
+    Sample nextS = null;
+
+    if (p != null && p.getId() == projectId) {
+      if (!p.getSamples().isEmpty()) {
+        Map<String, Sample> ret = new HashMap<>();
+        List<Sample> ss = new ArrayList<>(p.getSamples());
+        Collections.sort(ss);
+        for (int i = 0; i < ss.size(); i++) {
+          if (ss.get(i).equals(s)) {
+            if (i != 0 && ss.get(i-1) != null) {
+              prevS = ss.get(i-1);
+            }
+
+            if (i != ss.size()-1 && ss.get(i+1) != null) {
+              nextS = ss.get(i+1);
+            }
+            break;
+          }
+        }
+        ret.put("previousSample", prevS);
+        ret.put("nextSample", nextS);
+        return ret;
+      }
+    }
+    return Collections.emptyMap();
+  }
+
   public Collection<Project> populateProjects(@RequestParam(value = "projectId", required = false) Long projectId) throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
@@ -199,6 +234,11 @@ public class EditSampleController {
       model.put("sample", sample);
       model.put("sampleTypes", requestManager.listAllSampleTypes());
       model.put("accessibleProjects", populateProjects(null));
+      Map<String, Sample> adjacentSamples = getAdjacentSamplesInProject(sample, sample.getProject().getProjectId());
+      if (!adjacentSamples.isEmpty()) {
+        model.put("previousSample", adjacentSamples.get("previousSample"));
+        model.put("nextSample", adjacentSamples.get("nextSample"));
+      }
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, sample, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, sample, securityManager.listAllUsers()));
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, sample, securityManager.listAllGroups()));
@@ -252,6 +292,12 @@ public class EditSampleController {
           model.addAttribute("project", project);
           sample.setProject(project);
           sample.inheritPermissions(project);
+
+          Map<String, Sample> adjacentSamples = getAdjacentSamplesInProject(sample, sample.getProject().getProjectId());
+          if (!adjacentSamples.isEmpty()) {
+            model.put("previousSample", adjacentSamples.get("previousSample"));
+            model.put("nextSample", adjacentSamples.get("nextSample"));
+          }
         }
         else {
           model.put("accessibleProjects", populateProjects(null));

@@ -80,6 +80,16 @@
         </div>
       </li>
     </ul>
+    <c:if test="${not empty nextSample}">
+      <span style="float:right; padding-top: 5px; padding-left: 6px">
+        <a class='arrowright' href='<c:url value="/miso/sample/${nextSample.id}"/>'>Next Sample <b>${nextSample.name}</b></a>
+      </span>
+    </c:if>
+    <c:if test="${not empty previousSample}">
+      <span style="float:right; padding-top: 5px">
+        <a class='arrowleft' href='<c:url value="/miso/sample/${previousSample.id}"/>'>Previous Sample <b>${previousSample.name}</b></a>
+      </span>
+    </c:if>
   </div>
 </c:if>
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
