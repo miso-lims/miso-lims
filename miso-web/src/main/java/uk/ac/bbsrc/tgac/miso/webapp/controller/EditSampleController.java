@@ -188,21 +188,28 @@ public class EditSampleController {
     }
   }
 
-  public List<Pool<? extends Poolable>> getPoolsBySample(Sample s) throws IOException {
-    List<Pool<? extends Poolable>> pools = new ArrayList<>(requestManager.listPoolsBySampleId(s.getId()));
-    Collections.sort(pools);
-    return pools;
+  private Set<Pool<? extends Poolable>> getPoolsBySample(Sample s) throws IOException {
+    if (!s.getLibraries().isEmpty()) {
+      Set<Pool<? extends Poolable>> pools = new TreeSet<>();
+      for (Library l : s.getLibraries()) {
+        List<Pool<? extends Poolable>> prs = new ArrayList<>(requestManager.listPoolsByLibraryId(l.getId()));
+        pools.addAll(prs);
+      }
+      return pools;
+    }
+    return Collections.emptySet();
   }
 
-  public Set<Run> getRunsBySample(Sample s) throws IOException {
-    List<Pool<? extends Poolable>> pools = new ArrayList<>(requestManager.listPoolsBySampleId(s.getId()));
-    Collections.sort(pools);
-    Set<Run> runs = new TreeSet<>();
-    for (Pool<? extends Poolable> pool : pools) {
-      Collection<Run> prs = requestManager.listRunsByPoolId(pool.getId());
-      runs.addAll(prs);
+  private Set<Run> getRunsBySamplePools(Set<Pool<? extends Poolable>> pools) throws IOException {
+    if (!pools.isEmpty()) {
+      Set<Run> runs = new TreeSet<>();
+      for (Pool<? extends Poolable> pool : pools) {
+        Collection<Run> prs = requestManager.listRunsByPoolId(pool.getId());
+        runs.addAll(prs);
+      }
+      return runs;
     }
-    return runs;
+    return Collections.emptySet();
   }
 
   @ModelAttribute("maxLengths")
@@ -287,8 +294,9 @@ public class EditSampleController {
         model.put("nextSample", adjacentSamples.get("nextSample"));
       }
 
-      model.put("samplePools", getPoolsBySample(sample));
-      model.put("sampleRuns", getRunsBySample(sample));
+      Set<Pool<? extends Poolable>> pools = getPoolsBySample(sample);
+      model.put("samplePools", pools);
+      model.put("sampleRuns", getRunsBySamplePools(pools));
 
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, sample, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, sample, securityManager.listAllUsers()));
@@ -363,8 +371,9 @@ public class EditSampleController {
       model.put("sample", sample);
       model.put("sampleTypes", requestManager.listAllSampleTypes());
 
-      model.put("samplePools", getPoolsBySample(sample));
-      model.put("sampleRuns", getRunsBySample(sample));
+      Set<Pool<? extends Poolable>> pools = getPoolsBySample(sample);
+      model.put("samplePools", pools);
+      model.put("sampleRuns", getRunsBySamplePools(pools));
 
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, sample, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, sample, securityManager.listAllUsers()));

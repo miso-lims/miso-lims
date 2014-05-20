@@ -151,14 +151,15 @@ public class EditLibraryController {
   }
 
   public List<Pool<? extends Poolable>> getPoolsByLibrary(Library l) throws IOException {
-    List<Pool<? extends Poolable>> pools = new ArrayList<>(requestManager.listPoolsByLibraryId(l.getId()));
-    Collections.sort(pools);
-    return pools;
+    if (!l.getLibraryDilutions().isEmpty()) {
+      List<Pool<? extends Poolable>> pools = new ArrayList<>(requestManager.listPoolsByLibraryId(l.getId()));
+      Collections.sort(pools);
+      return pools;
+    }
+    return Collections.emptyList();
   }
 
-  public Set<Run> getRunsByLibrary(Library l) throws IOException {
-    List<Pool<? extends Poolable>> pools = new ArrayList<>(requestManager.listPoolsByLibraryId(l.getId()));
-    Collections.sort(pools);
+  public Set<Run> getRunsByLibraryPools(List<Pool<? extends Poolable>> pools) throws IOException {
     Set<Run> runs = new TreeSet<>();
     for (Pool<? extends Poolable> pool : pools) {
       Collection<Run> prs = requestManager.listRunsByPoolId(pool.getId());
@@ -402,8 +403,9 @@ public class EditLibraryController {
         model.put("nextLibrary", adjacentLibraries.get("nextLibrary"));
       }
 
-      model.put("libraryPools", getPoolsByLibrary(library));
-      model.put("libraryRuns", getRunsByLibrary(library));
+      List<Pool<? extends Poolable>> pools = getPoolsByLibrary(library);
+      model.put("libraryPools", pools);
+      model.put("libraryRuns", getRunsByLibraryPools(pools));
 
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, library, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, library, securityManager.listAllUsers()));
@@ -487,8 +489,9 @@ public class EditLibraryController {
         model.put("nextLibrary", adjacentLibraries.get("nextLibrary"));
       }
 
-      model.put("libraryPools", getPoolsByLibrary(library));
-      model.put("libraryRuns", getRunsByLibrary(library));
+      List<Pool<? extends Poolable>> pools = getPoolsByLibrary(library);
+      model.put("libraryPools", pools);
+      model.put("libraryRuns", getRunsByLibraryPools(pools));
 
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, library, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, library, securityManager.listAllUsers()));
