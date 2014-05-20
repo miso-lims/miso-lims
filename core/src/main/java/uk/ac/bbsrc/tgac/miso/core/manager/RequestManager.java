@@ -246,6 +246,7 @@ public interface RequestManager {
   public Collection<Pool<? extends Poolable>> listReadyPoolsByPlatformAndSearch(PlatformType platformType, String query) throws IOException;
   public Collection<Pool<? extends Poolable>> listPoolsByProjectId(long projectId) throws IOException;
   public Collection<Pool<? extends Poolable>> listPoolsByLibraryId(long libraryId) throws IOException;
+  public Collection<Pool<? extends Poolable>> listPoolsBySampleId(long sampleId) throws IOException;
   public Collection<PoolQC> listAllPoolQCsByPoolId(long poolId) throws IOException;
 
   /**

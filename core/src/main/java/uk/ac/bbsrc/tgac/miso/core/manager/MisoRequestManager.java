@@ -584,6 +584,16 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
+  public Collection<Pool<? extends Poolable>> listPoolsBySampleId(long sampleId) throws IOException {
+    if (poolStore != null) {
+      return poolStore.listBySampleId(sampleId);
+    }
+    else {
+      throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
   public Collection<PoolQC> listAllPoolQCsByPoolId(long poolId) throws IOException {
     if (poolQcStore != null) {
       return poolQcStore.listByPoolId(poolId);

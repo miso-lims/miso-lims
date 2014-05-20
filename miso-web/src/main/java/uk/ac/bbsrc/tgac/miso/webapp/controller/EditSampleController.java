@@ -188,6 +188,23 @@ public class EditSampleController {
     }
   }
 
+  public List<Pool<? extends Poolable>> getPoolsBySample(Sample s) throws IOException {
+    List<Pool<? extends Poolable>> pools = new ArrayList<>(requestManager.listPoolsBySampleId(s.getId()));
+    Collections.sort(pools);
+    return pools;
+  }
+
+  public Set<Run> getRunsBySample(Sample s) throws IOException {
+    List<Pool<? extends Poolable>> pools = new ArrayList<>(requestManager.listPoolsBySampleId(s.getId()));
+    Collections.sort(pools);
+    Set<Run> runs = new TreeSet<>();
+    for (Pool<? extends Poolable> pool : pools) {
+      Collection<Run> prs = requestManager.listRunsByPoolId(pool.getId());
+      runs.addAll(prs);
+    }
+    return runs;
+  }
+
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
     return DbUtils.getColumnSizes(interfaceTemplate, "Sample");
@@ -269,6 +286,10 @@ public class EditSampleController {
         model.put("previousSample", adjacentSamples.get("previousSample"));
         model.put("nextSample", adjacentSamples.get("nextSample"));
       }
+
+      model.put("samplePools", getPoolsBySample(sample));
+      model.put("sampleRuns", getRunsBySample(sample));
+
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, sample, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, sample, securityManager.listAllUsers()));
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, sample, securityManager.listAllGroups()));
@@ -341,6 +362,10 @@ public class EditSampleController {
       model.put("formObj", sample);
       model.put("sample", sample);
       model.put("sampleTypes", requestManager.listAllSampleTypes());
+
+      model.put("samplePools", getPoolsBySample(sample));
+      model.put("sampleRuns", getRunsBySample(sample));
+
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, sample, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, sample, securityManager.listAllUsers()));
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, sample, securityManager.listAllGroups()));

@@ -150,6 +150,23 @@ public class EditLibraryController {
     return Collections.emptyMap();
   }
 
+  public List<Pool<? extends Poolable>> getPoolsByLibrary(Library l) throws IOException {
+    List<Pool<? extends Poolable>> pools = new ArrayList<>(requestManager.listPoolsByLibraryId(l.getId()));
+    Collections.sort(pools);
+    return pools;
+  }
+
+  public Set<Run> getRunsByLibrary(Library l) throws IOException {
+    List<Pool<? extends Poolable>> pools = new ArrayList<>(requestManager.listPoolsByLibraryId(l.getId()));
+    Collections.sort(pools);
+    Set<Run> runs = new TreeSet<>();
+    for (Pool<? extends Poolable> pool : pools) {
+      Collection<Run> prs = requestManager.listRunsByPoolId(pool.getId());
+      runs.addAll(prs);
+    }
+    return runs;
+  }
+
   public Collection<LibraryType> populateLibraryTypesByPlatform(String platform) throws IOException {
     List<LibraryType> types = new ArrayList<LibraryType>(requestManager.listLibraryTypesByPlatform(platform));
     Collections.sort(types);
@@ -368,6 +385,7 @@ public class EditLibraryController {
 
       model.put("formObj", library);
       model.put("library", library);
+
       Collection<emPCR> pcrs = populateEmPcrs(user, library);
       model.put("emPCRs", pcrs);
       model.put("emPcrDilutions", populateEmPcrDilutions(user, pcrs));
@@ -383,6 +401,9 @@ public class EditLibraryController {
         model.put("previousLibrary", adjacentLibraries.get("previousLibrary"));
         model.put("nextLibrary", adjacentLibraries.get("nextLibrary"));
       }
+
+      model.put("libraryPools", getPoolsByLibrary(library));
+      model.put("libraryRuns", getRunsByLibrary(library));
 
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, library, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, library, securityManager.listAllUsers()));
@@ -465,6 +486,9 @@ public class EditLibraryController {
         model.put("previousLibrary", adjacentLibraries.get("previousLibrary"));
         model.put("nextLibrary", adjacentLibraries.get("nextLibrary"));
       }
+
+      model.put("libraryPools", getPoolsByLibrary(library));
+      model.put("libraryRuns", getRunsByLibrary(library));
 
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, library, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, library, securityManager.listAllUsers()));
