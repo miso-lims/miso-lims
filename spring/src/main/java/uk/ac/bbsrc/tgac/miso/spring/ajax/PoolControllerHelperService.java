@@ -588,9 +588,9 @@ public class PoolControllerHelperService {
         Collection<? extends Dilution> dls = pool.getDilutions();
         for (Dilution dilution : dls) {
           info.append("<li><b>" + dilution.getName() + "</b>");
-          info.append("<br/><small><u>" + dilution.getLibrary().getSample().getProject().getAlias() + "</u>");
-          info.append("<br/>" + dilution.getLibrary().getAlias() + " (" + dilution.getLibrary().getName() + ")");
-          info.append("<br/>" + dilution.getLibrary().getDescription() + " (" + dilution.getLibrary().getSample().getName() + ")</small>");
+          info.append("<br/><small><u><a href='/miso/project/"+dilution.getLibrary().getSample().getProject().getId()+"'>" + dilution.getLibrary().getSample().getProject().getAlias() + "</a></u>");
+          info.append("<br/><a href='/miso/library/"+dilution.getLibrary().getId()+"'>" + dilution.getLibrary().getAlias() + " (" + dilution.getLibrary().getName() + ")</a>");
+          info.append("<br/><a href='/miso/sample/"+dilution.getLibrary().getSample().getId()+"'>" + dilution.getLibrary().getSample().getDescription() + " (" + dilution.getLibrary().getSample().getName() + ")</a></small>");
           info.append("</li>");
         }
         info.append("</ul>");
@@ -602,20 +602,20 @@ public class PoolControllerHelperService {
           if (p instanceof Dilution) {
             Dilution dilution = (Dilution)p;
             info.append("<li><b>" + dilution.getName() + "</b>");
-            info.append("<br/><small><u>" + dilution.getLibrary().getSample().getProject().getAlias() + "</u>");
-            info.append("<br/>" + dilution.getLibrary().getAlias() + " (" + dilution.getLibrary().getName() + ")");
-            info.append("<br/>" + dilution.getLibrary().getDescription() + " (" + dilution.getLibrary().getSample().getName() + ")</small>");
+            info.append("<br/><small><u><a href='/miso/project/"+dilution.getLibrary().getSample().getProject().getId()+"'>" + dilution.getLibrary().getSample().getProject().getAlias() + "</a></u>");
+            info.append("<br/><a href='/miso/library/"+dilution.getLibrary().getId()+"'>" + dilution.getLibrary().getAlias() + " (" + dilution.getLibrary().getName() + ")</a>");
+            info.append("<br/><a href='/miso/sample/"+dilution.getLibrary().getSample().getId()+"'>" + dilution.getLibrary().getSample().getDescription() + " (" + dilution.getLibrary().getSample().getName() + ")</a></small>");
             info.append("</li>");
           }
           else if (p instanceof Plate) {
             Plate<LinkedList<Plateable>, Plateable> plate = (Plate<LinkedList<Plateable>, Plateable>)p;
-            info.append("<li><b>" + plate.getName() + "</b> ["+plate.getSize()+"-well]");
+            info.append("<li><b><a href='/miso/plate/"+plate.getId()+"'>" + plate.getName() + "</b> ["+plate.getSize()+"-well]</a>");
             if (!plate.getElements().isEmpty()) {
               info.append("<br/><small><u>"+plate.getSize()+"-well "+plate.getElementType().getSimpleName()+" plate</u>");
               Plateable element = plate.getElements().getFirst();
               if (element instanceof Library) {
                 Library l = (Library)element;
-                info.append("<br/><small><u>" + l.getSample().getProject().getAlias() + " ("+l.getSample().getProject().getName()+")</u>");
+                info.append("<br/><small><u><a href='/miso/project/"+l.getSample().getProject().getId()+"'>" + l.getSample().getProject().getAlias() + " ("+l.getSample().getProject().getName()+")</a></u>");
                 info.append("<br/>Platform: " + l.getPlatformName());
                 info.append("<br/>Type: " + l.getLibraryType().getDescription());
                 info.append("<br/>Selection: " + l.getLibrarySelectionType().getName());
@@ -623,7 +623,7 @@ public class PoolControllerHelperService {
               }
               else if (element instanceof Dilution) {
                 Dilution l = (Dilution)element;
-                info.append("<br/><small><u>" + l.getLibrary().getSample().getProject().getAlias() + " ("+l.getLibrary().getSample().getProject().getName()+")</u>");
+                info.append("<br/><small><u><a href='/miso/project/"+l.getLibrary().getSample().getProject().getId()+"'>" + l.getLibrary().getSample().getProject().getAlias() + " ("+l.getLibrary().getSample().getProject().getName()+")</a></u>");
                 info.append("<br/>Platform: " + l.getLibrary().getPlatformName());
                 info.append("<br/>Type: " + l.getLibrary().getLibraryType().getDescription());
                 info.append("<br/>Selection: " + l.getLibrary().getLibrarySelectionType().getName());
@@ -631,7 +631,7 @@ public class PoolControllerHelperService {
               }
               else if (element instanceof Sample) {
                 Sample l = (Sample)element;
-                info.append("<br/><small><u>" + l.getProject().getAlias() + " ("+l.getProject().getName()+")</u>");
+                info.append("<br/><small><u><a href='/miso/project/"+l.getProject().getId()+"'>" + l.getProject().getAlias() + " ("+l.getProject().getName()+")</a></u>");
               }
             }
             info.append("</li>");
