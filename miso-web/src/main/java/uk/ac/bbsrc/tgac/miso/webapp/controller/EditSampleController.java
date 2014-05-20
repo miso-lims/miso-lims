@@ -40,6 +40,7 @@ import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.eaglegenomics.simlims.core.User;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
@@ -85,6 +86,35 @@ public class EditSampleController {
   }
 
   public Map<String, Sample> getAdjacentSamplesInGroup(Sample s, @RequestParam(value = "entityGroupId", required = true) Long entityGroupId) throws IOException {
+    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    Project p = s.getProject();
+    EntityGroup<? extends Nameable, Sample> sgroup = (EntityGroup<? extends Nameable, Sample>) requestManager.getEntityGroupById(entityGroupId);
+
+    Sample prevS = null;
+    Sample nextS = null;
+
+    if (p != null) {
+      if (!sgroup.getEntities().isEmpty()) {
+        Map<String, Sample> ret = new HashMap<>();
+        List<Sample> ss = new ArrayList<>(sgroup.getEntities());
+        Collections.sort(ss);
+        for (int i = 0; i < ss.size(); i++) {
+          if (ss.get(i).equals(s)) {
+            if (i != 0 && ss.get(i-1) != null) {
+              prevS = ss.get(i-1);
+            }
+
+            if (i != ss.size()-1 && ss.get(i+1) != null) {
+              nextS = ss.get(i+1);
+            }
+            break;
+          }
+        }
+        ret.put("previousSample", prevS);
+        ret.put("nextSample", nextS);
+        return ret;
+      }
+    }
     return Collections.emptyMap();
   }
 
