@@ -84,6 +84,25 @@ public class NotificationRequestManager {
     this.dataPaths = dataPaths;
   }
 
+  public String queryRunProgress(JSONObject request) throws IllegalStateException, IllegalArgumentException {
+    File folder = lookupRunAliasPath(request);
+    if (folder != null) {
+      String platformType = request.getString("platform").toLowerCase();
+      Map<String, String> status = parseRunFolder(platformType, folder);
+      for (String s : status.keySet()) {
+        if (!"".equals(status.get(s))) {
+          log.debug("queryRunProgress: " + s);
+          JSONArray runs = JSONArray.fromObject(status.get(s));
+          if (!runs.isEmpty()) {
+            return "{'progress':'"+s+"'}";
+          }
+        }
+      }
+    }
+
+    return "";
+  }
+
   public String queryRunStatus(JSONObject request) throws IllegalStateException, IllegalArgumentException {
     File folder = lookupRunAliasPath(request);
     if (folder != null) {
@@ -161,9 +180,7 @@ public class NotificationRequestManager {
           if (!runs.isEmpty()) {
             JSONObject run = runs.getJSONObject(0);
             if (run.has("metrix")) {
-              String response = run.getString("metrix");
-              log.debug("queryInterOpMetrics: " + response);
-              return response;
+              return run.getString("metrix");
             }
           }
         }

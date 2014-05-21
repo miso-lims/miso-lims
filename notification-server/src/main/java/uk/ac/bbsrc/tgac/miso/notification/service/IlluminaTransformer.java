@@ -163,6 +163,20 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                     if (filterFiles != null && filterFiles.length > 0) {
                       lastCycleLogFileExists = true;
                     }
+                    else {
+                      File cycleTimeLog = new File(rootFile, "/Logs/CycleTimes.txt");
+                      if (cycleTimeLog.exists() && cycleTimeLog.canRead()) {
+                        //check last line of CycleTimes.txt
+                        Pattern p = Pattern.compile(
+                          "(\\d{1,2}\\/\\d{1,2}\\/\\d{4})\\s+(\\d{2}:\\d{2}:\\d{2})\\.\\d{3}\\s+[A-z0-9]+\\s+" + sumCycles + "\\s+End\\s{1}Imaging"
+                        );
+
+                        Matcher m = LimsUtils.tailGrep(cycleTimeLog, p, 10);
+                        if (m != null && m.groupCount() > 0) {
+                          lastCycleLogFileExists = true;
+                        }
+                      }
+                    }
                   }
 
                   //int imgCycle = new Integer(statusDoc.getElementsByTagName("ImgCycle").item(0).getTextContent());

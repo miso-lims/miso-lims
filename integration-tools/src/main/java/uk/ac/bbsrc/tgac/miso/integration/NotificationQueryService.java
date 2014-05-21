@@ -28,13 +28,23 @@ public class NotificationQueryService {
     this.notificationServerPort = notificationServerPort;
   }
 
-  public JSONObject getInterOpMetrics(String runAlias, String platformType) throws IntegrationException {
-    JSONObject q1 = new JSONObject();
-    q1.put("query", "queryInterOpMetrics");
-    q1.put("run", runAlias);
-    q1.put("platform", platformType);
-    String query = q1.toString();
+  public JSONObject getRunProgress(String runAlias, String platformType) throws IntegrationException {
+    JSONObject q = new JSONObject();
+    q.put("query", "queryRunProgress");
+    q.put("run", runAlias);
+    q.put("platform", platformType);
+    return doQuery(q.toString());
+  }
 
+  public JSONObject getInterOpMetrics(String runAlias, String platformType) throws IntegrationException {
+    JSONObject q = new JSONObject();
+    q.put("query", "queryInterOpMetrics");
+    q.put("run", runAlias);
+    q.put("platform", platformType);
+    return doQuery(q.toString());
+  }
+
+  private JSONObject doQuery(String query) throws IntegrationException {
     String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket(notificationServerHost, notificationServerPort), query);
     if (!"".equals(response)) {
       JSONObject r = JSONObject.fromObject(response);

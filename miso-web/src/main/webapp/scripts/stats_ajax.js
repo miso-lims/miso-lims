@@ -22,6 +22,21 @@
  */
 
 var Stats = Stats || {
+  checkRunProgress : function(runAlias, platformType) {
+    Fluxion.doAjax(
+      'statsControllerHelperService',
+      'updateRunProgress',
+      {'runAlias':runAlias, 'platformType':platformType, 'url':ajaxurl},
+      {'doOnSuccess':
+        function(json) {
+          if (json.progress) {
+            jQuery('input[name=status\\.health][value=' + json.progress + ']').prop('checked', true);
+          }
+        }
+      }
+    );
+  },
+
   getRunStats : function(runId) {
     jQuery('#summarydiv').html("<img src='/styles/images/ajax-loader.gif'/>");
 

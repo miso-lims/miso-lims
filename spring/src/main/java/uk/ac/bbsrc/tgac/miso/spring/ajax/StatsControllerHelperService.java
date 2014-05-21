@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.integration.NotificationQueryService;
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationException;
@@ -142,12 +143,43 @@ public class StatsControllerHelperService {
     String runAlias = json.getString("runAlias");
     String platformType = json.getString("platformType").toLowerCase();
     try {
-      return notificationQueryService.getInterOpMetrics(runAlias , platformType);
+      return notificationQueryService.getInterOpMetrics(runAlias, platformType);
     }
     catch (IntegrationException e) {
       e.printStackTrace();
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed to retrieve InterOp metrics: " + e.getMessage());
+    }
+  }
+
+  public JSONObject updateRunProgress(HttpSession session, JSONObject json) {
+    String runAlias = json.getString("runAlias");
+    String platformType = json.getString("platformType").toLowerCase();
+    try {
+      JSONObject response = notificationQueryService.getRunProgress(runAlias, platformType);
+      if (response.has("progress")) {
+        String progress = response.getString("progress");
+        Run run = requestManager.getRunByAlias(runAlias);
+        if (run != null && run.getStatus() != null && !run.getStatus().getHealth().equals(HealthType.valueOf(progress))) {
+          if (!run.getStatus().getHealth().equals(HealthType.Failed) && !run.getStatus().getHealth().equals(HealthType.Completed)) {
+            run.getStatus().setHealth(HealthType.valueOf(progress));
+            requestManager.saveRun(run);
+            return response;
+          }
+        }
+        return JSONUtils.SimpleJSONError("No run progress change necessary for run " + runAlias);
+      }
+      return JSONUtils.SimpleJSONError("No run progress available for run " + runAlias);
+    }
+    catch (IntegrationException e) {
+      e.printStackTrace();
+      log.debug("Failed", e);
+      return JSONUtils.SimpleJSONError("Failed to retrieve run progress: " + e.getMessage());
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+      log.debug("Failed", e);
+      return JSONUtils.SimpleJSONError("Failed to retrieve run progress: " + e.getMessage());
     }
   }
 }
