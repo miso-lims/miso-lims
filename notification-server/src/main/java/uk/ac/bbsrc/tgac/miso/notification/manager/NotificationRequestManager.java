@@ -170,7 +170,7 @@ public class NotificationRequestManager {
       }
     }
     else {
-      return "{\"error\":\"Cannot find run folder \""+request.getString("run")+"}";
+      return "{\"error\":\"Cannot find run folder "+request.getString("run")+"\"}";
     }
 
     return "";
