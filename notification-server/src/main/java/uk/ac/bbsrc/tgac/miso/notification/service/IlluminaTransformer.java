@@ -280,7 +280,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                 else {
                   if (!completeFile.exists()) {
                     if (!new File(rootFile, "/Basecalling_Netcopy_complete.txt").exists() &&
-                        (lastCycleLogFile != null && !lastCycleLogFile.exists())) {
+                        (lastCycleLogFile != null && !lastCycleLogFileExists)) {
                       log.debug(countStr + runName + " :: A Basecalling_Netcopy_complete_ReadX.txt doesn't exist and last cycle log file doesn't exist.");
                       if (failed) {
                         log.debug("Run has likely failed.");
