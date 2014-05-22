@@ -154,22 +154,23 @@ public class StatsControllerHelperService {
 
   public JSONObject updateRunProgress(HttpSession session, JSONObject json) {
     String runAlias = json.getString("runAlias");
-    String platformType = json.getString("platformType").toLowerCase();
     try {
-      JSONObject response = notificationQueryService.getRunProgress(runAlias, platformType);
-      if (response.has("progress")) {
-        String progress = response.getString("progress");
-        Run run = requestManager.getRunByAlias(runAlias);
-        if (run != null && run.getStatus() != null && !run.getStatus().getHealth().equals(HealthType.valueOf(progress))) {
-          if (!run.getStatus().getHealth().equals(HealthType.Failed) && !run.getStatus().getHealth().equals(HealthType.Completed)) {
+      Run run = requestManager.getRunByAlias(runAlias);
+      if (run != null && run.getStatus() != null && run.getStatus().getHealth().equals(HealthType.Unknown)) {
+        String platformType = json.getString("platformType").toLowerCase();
+        JSONObject response = notificationQueryService.getRunProgress(runAlias, platformType);
+        if (response.has("progress")) {
+          String progress = response.getString("progress");
+          if (!run.getStatus().getHealth().equals(HealthType.valueOf(progress))) {
             run.getStatus().setHealth(HealthType.valueOf(progress));
             requestManager.saveRun(run);
             return response;
           }
+          return JSONUtils.SimpleJSONResponse("No run progress change necessary for run " + runAlias);
         }
-        return JSONUtils.SimpleJSONResponse("No run progress change necessary for run " + runAlias);
+        return JSONUtils.SimpleJSONResponse("No run progress available for run " + runAlias);
       }
-      return JSONUtils.SimpleJSONResponse("No run progress available for run " + runAlias);
+      return JSONUtils.SimpleJSONResponse("Run already set to non-Unknown: " + runAlias);
     }
     catch (IntegrationException e) {
       e.printStackTrace();

@@ -95,7 +95,6 @@ public class NotificationRequestManager {
 
       for (String s : status.keySet()) {
         if (!"".equals(status.get(s))) {
-          log.debug("queryRunProgress: " + s);
           JSONArray runs = JSONArray.fromObject(status.get(s));
           if (!runs.isEmpty()) {
             return "{'progress':'"+s+"'}";

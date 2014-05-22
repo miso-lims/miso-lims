@@ -33,9 +33,7 @@ public class NotificationQueryService {
     q.put("query", "queryRunProgress");
     q.put("run", runAlias);
     q.put("platform", platformType);
-    JSONObject resp = doQuery(q.toString());
-    log.info(resp.toString());
-    return resp;
+    return doQuery(q.toString());
   }
 
   public JSONObject getInterOpMetrics(String runAlias, String platformType) throws IntegrationException {
