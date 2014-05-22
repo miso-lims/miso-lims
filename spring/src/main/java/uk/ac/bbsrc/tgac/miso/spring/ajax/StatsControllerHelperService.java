@@ -167,9 +167,9 @@ public class StatsControllerHelperService {
             return response;
           }
         }
-        return JSONUtils.SimpleJSONError("No run progress change necessary for run " + runAlias);
+        return JSONUtils.SimpleJSONResponse("No run progress change necessary for run " + runAlias);
       }
-      return JSONUtils.SimpleJSONError("No run progress available for run " + runAlias);
+      return JSONUtils.SimpleJSONResponse("No run progress available for run " + runAlias);
     }
     catch (IntegrationException e) {
       e.printStackTrace();
