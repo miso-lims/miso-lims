@@ -32,6 +32,9 @@ var Stats = Stats || {
           if (json.progress) {
             jQuery('input[name=status\\.health][value=' + json.progress + ']').prop('checked', true);
           }
+          if (json.response) {
+            console.log(json.response);
+          }
         }
       }
     );

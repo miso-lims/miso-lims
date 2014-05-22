@@ -404,6 +404,11 @@ public class EditLibraryController {
       }
 
       List<Pool<? extends Poolable>> pools = getPoolsByLibrary(library);
+      Map<Long, Library> poolLibraryMap = new HashMap<>();
+      for (Pool pool : pools) {
+        poolLibraryMap.put(pool.getId(), library);
+      }
+      model.put("poolLibraryMap", poolLibraryMap);
       model.put("libraryPools", pools);
       model.put("libraryRuns", getRunsByLibraryPools(pools));
 
@@ -490,6 +495,11 @@ public class EditLibraryController {
       }
 
       List<Pool<? extends Poolable>> pools = getPoolsByLibrary(library);
+      Map<Long, Library> poolLibraryMap = new HashMap<>();
+      for (Pool pool : pools) {
+        poolLibraryMap.put(pool.getId(), library);
+      }
+      model.put("poolLibraryMap", poolLibraryMap);
       model.put("libraryPools", pools);
       model.put("libraryRuns", getRunsByLibraryPools(pools));
 

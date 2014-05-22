@@ -594,15 +594,17 @@
                   <c:forEach items="${container.partitions}" var="partition">
                     <td id="partition${runCount.count}_${fCount.count}_${partition.partitionNumber}"
                         class="smallbox">${partition.partitionNumber}</td>
-                    <c:forEach items="${partition.pool.experiments}" var="experiment">
-                      <c:if test="${experiment.study.project.id eq sample.project.id}">
-                        <script type="text/javascript">
-                          jQuery(document).ready(function () {
-                            jQuery('#partition${runCount.count}_${fCount.count}_${partition.partitionNumber}').addClass("partitionOccupied");
+                    <c:if test="${not empty poolSampleMap[partition.pool.id]}">
+                      <script type="text/javascript">
+                        jQuery(document).ready(function () {
+                          jQuery('#partition${runCount.count}_${fCount.count}_${partition.partitionNumber}').addClass("partitionOccupied");
+                          jQuery('#partition${runCount.count}_${fCount.count}_${partition.partitionNumber}').prop("title", "${partition.pool.name}");
+                          jQuery('#partition${runCount.count}_${fCount.count}_${partition.partitionNumber}').click(function() {
+                            Utils.page.pageRedirect("/miso/pool/${partition.pool.id}");
                           });
-                        </script>
-                      </c:if>
-                    </c:forEach>
+                        });
+                      </script>
+                    </c:if>
                   </c:forEach>
                 </tr>
               </table>

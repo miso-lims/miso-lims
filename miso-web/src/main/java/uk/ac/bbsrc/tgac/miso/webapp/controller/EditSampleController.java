@@ -295,8 +295,14 @@ public class EditSampleController {
       }
 
       Set<Pool<? extends Poolable>> pools = getPoolsBySample(sample);
+      Map<Long, Sample> poolSampleMap = new HashMap<>();
+      for (Pool pool : pools) {
+        poolSampleMap.put(pool.getId(), sample);
+      }
+      model.put("poolSampleMap", poolSampleMap);
       model.put("samplePools", pools);
       model.put("sampleRuns", getRunsBySamplePools(pools));
+
 
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, sample, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, sample, securityManager.listAllUsers()));
@@ -372,6 +378,11 @@ public class EditSampleController {
       model.put("sampleTypes", requestManager.listAllSampleTypes());
 
       Set<Pool<? extends Poolable>> pools = getPoolsBySample(sample);
+      Map<Long, Sample> poolSampleMap = new HashMap<>();
+      for (Pool pool : pools) {
+        poolSampleMap.put(pool.getId(), sample);
+      }
+      model.put("poolSampleMap", poolSampleMap);
       model.put("samplePools", pools);
       model.put("sampleRuns", getRunsBySamplePools(pools));
 

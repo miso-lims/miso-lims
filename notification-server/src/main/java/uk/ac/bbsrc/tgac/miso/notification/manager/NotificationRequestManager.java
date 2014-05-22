@@ -89,6 +89,10 @@ public class NotificationRequestManager {
     if (folder != null) {
       String platformType = request.getString("platform").toLowerCase();
       Map<String, String> status = parseRunFolder(platformType, folder);
+      if (status.isEmpty()) {
+        return "{'response':'No runs found with alias "+request.getString("run")+"'}";
+      }
+
       for (String s : status.keySet()) {
         if (!"".equals(status.get(s))) {
           log.debug("queryRunProgress: " + s);
@@ -96,6 +100,9 @@ public class NotificationRequestManager {
           if (!runs.isEmpty()) {
             return "{'progress':'"+s+"'}";
           }
+        }
+        else {
+          return "{'response':'No runs found with status "+s+" with alias "+request.getString("run")+"'}";
         }
       }
     }
