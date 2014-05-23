@@ -844,7 +844,7 @@ public class FlexReportingControllerHelperService {
       response.put("qcgraph", qcGraphArray);
       response.put("typegraph", typeGraphArray);
       response.put("reportTable", buildLibraryReport(libraries));
-      response.put("relationQCTable", buildrelationQCTable(libraries));
+      response.put("relationQCTable", buildRelationQCTable(libraries));
       return response;
     }
     catch (IOException e) {
@@ -870,7 +870,7 @@ public class FlexReportingControllerHelperService {
     return jsonArray;
   }
 
-  public JSONArray buildrelationQCTable(ArrayList<Library> libraries) {
+  public JSONArray buildRelationQCTable(ArrayList<Library> libraries) {
     JSONArray jsonArray = new JSONArray();
     for (Library library : libraries) {
       String qc = "unknown";
@@ -881,8 +881,13 @@ public class FlexReportingControllerHelperService {
       if (library.getSample().getQcPassed() != null) {
         sampleQC = library.getSample().getQcPassed().toString();
       }
+
       jsonArray.add("['" + library.getSample().getProject().getName() + "','" +
                     library.getName() + "','" +
+                    library.getAlias() + "','" +
+                    library.getDescription() + "','" +
+                    library.getPlatformName() + "','" +
+                    library.getLibraryType().getDescription() + "','" +
                     qc + "','" +
                     LimsUtils.getDateAsString(library.getCreationDate()) + "','" +
                     library.getSample().getName() + "','" +
