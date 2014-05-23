@@ -101,6 +101,125 @@ var Stats = Stats || {
     );
   },
 
+  getInterOpMetricsForLane : function(runAlias, platformType, laneNum) {
+    Fluxion.doAjax(
+      'statsControllerHelperService',
+      'getInterOpMetricsForLane',
+      {'runAlias':runAlias, 'platformType':platformType, 'lane':laneNum, 'url':ajaxurl},
+      {'doOnSuccess':
+        function(json) {
+          var out = "";
+          out += "<h2>Metrics</h2>";
+          out += "<table class='list' id='metricsTable'><thead><tr id='qheaders'><th>Lane No.</th></tr></thead><tbody></tbody></table>";
+
+          out += "<div id='metrixchartsdiv'><table id='metricsPlotTable'><tbody><tr><td style='width:26%' id='densityBoxPlot'></td><td style='width:26%' id='qualityScorePlot'></td><td style='width:26%' id='qualityQ30ByCyclePlot'></td></tr></tbody></table></div>";
+
+          jQuery.colorbox({width:"90%",height:"90%",html:out});
+
+          for (var lane = 1; lane < json.summary.numLanes+1; lane++) {
+            if (lane == laneNum) {
+              jQuery('#metricsTable > tbody').append('<tr id="lane'+lane+'"><td>Lane '+lane+'</td></tr>');
+            }
+          }
+
+          var cd = json.tileMetrics.clusterDensities;
+          jQuery.each(cd, function(index, obj) {
+            jQuery.each(obj, function(key, value) {
+              if (obj.lane == laneNum) {
+                if (key == "density") {
+                  if (jQuery('#qheaders th[id=density]').length == 0) {
+                    jQuery('#qheaders').append("<th id='density'>Density "+obj.units+"</th>");
+                  }
+                  jQuery('#metricsTable tr:last').append('<td>'+obj.density+' &plusmn; '+obj.densitySD+'</td>');
+                }
+
+                if (key == "densityPassingFilter") {
+                  if (jQuery('#qheaders th[id=densityPassingFilter]').length == 0) {
+                    jQuery('#qheaders').append("<th id='densityPassingFilter'>Density PF "+obj.units+"</th>");
+                  }
+                  jQuery('#metricsTable tr:last').append('<td>'+obj.densityPassingFilter+' &plusmn; '+obj.densityPassingFilterSD+'</td>');
+                }
+
+                if (key == "densityPercentPassed") {
+                  if (jQuery('#qheaders th[id=densityPercentPassed]').length == 0) {
+                    jQuery('#qheaders').append("<th id='densityPercentPassed'>Density Passed %</th>");
+                  }
+                  jQuery('#metricsTable tr:last').append('<td>'+obj.densityPercentPassed+'</td>');
+                }
+              }
+            });
+          });
+
+          var qm = json.qualityMetrics.perLaneQualityScores;
+          //"perLaneQualityScores":[{"lane":1,">Q20":96.64105035802294,">Q30":88.9216603526773,">Q40":20.68262353622945,"raw":[{"5":"46492415"},{"6":"20471476"},{"7":"143103000"},{"8":"55734604"},{"9":"12254404"},{"10":"67201395"},{"11":"22793269"},{"12":"22546252"},{"13":"23825791"},{"14":"12566510"},{"15":"65735037"},{"17":"52210617"},{"16":"26216691"},{"19":"67752596"},{"18":"85193076"},{"21":"34161879"},{"20":"132913093"},{"23":"139165499"},{"22":"48120848"},{"25":"193049152"},{"24":"163817129"},{"27":"273124858"},{"26":"186226529"},{"29":"368992273"},{"28":"124516853"},{"31":"779584637"},{"30":"455167706"},{"34":"2119454108"},{"35":"4050550629"},{"32":"572390834"},{"33":"1281578553"},{"38":"1008199209"},{"39":"1631854913"},{"36":"867398267"},{"37":"1944280122"},{"40":"1723703686"},{"41":"2734900938"}]}
+          jQuery.each(qm, function(index, obj) {
+            jQuery.each(obj, function(key, value) {
+              if (obj.lane == laneNum) {
+                if (key != "lane" && key != "raw") {
+                  if (jQuery('#qheaders th[id='+key.replace(">", "")+']').length == 0) {
+                    jQuery('#qheaders').append("<th id='"+key.replace(">", "")+"'>Quality "+key.replace(">", "&gt;")+"</th>");
+                    jQuery('#metricsTable tr:last').append('<td>'+value+'</td>');
+                  }
+                  else {
+                    jQuery('#metricsTable tr:last').append('<td>'+value+'</td>');
+                  }
+                }
+              }
+            });
+          });
+
+          //phasing metrics
+          //"phasingMetrics":[{"lane":1,"1":{"phasing":"0.2","prephasing":"0.254"},"Index":{"phasing":"0","prephasing":"0"}}]
+          var pm = json.tileMetrics.phasingMetrics;
+          jQuery.each(pm, function(index, obj) {
+            if (obj.lane == laneNum) {
+              var output = "";
+              jQuery.each(obj, function(key, value) {
+                if (key != "lane") {
+                  if (jQuery('#qheaders th[id=phasing]').length == 0) {
+                    jQuery('#qheaders').append("<th id='phasing'>Phasing / Prephasing</th>");
+                  }
+
+                  if (key == "Index") {
+                    output += "Index: " + value.phasing+" / "+value.prephasing;
+                  }
+                  else {
+                    output += "Read "+key+": "+value.phasing+" / "+value.prephasing;
+                  }
+                  output += "</br>";
+                }
+              });
+              jQuery('#metricsTable tr:last').append("<td>"+output+"</td>");
+            }
+          });
+
+          //error metrics
+          var em = json.errorMetrics.rates;
+          jQuery.each(em, function(index, obj) {
+            jQuery.each(obj, function(key, value) {
+              if (obj.lane == laneNum) {
+                if (key == "meanError") {
+                  if (jQuery('#qheaders th[id='+key+']').length == 0) {
+                    jQuery('#qheaders').append("<th id='"+key+"'>Mean Error</th>");
+                  }
+                  jQuery('#metricsTable tr:last').append("<td>"+value+" &plusmn; "+obj.errorSD+"</td>");
+                }
+              }
+            });
+          });
+
+          Stats.qualityQ30ByCyclePlot(json.qualityMetrics.perCycleQualityScores);
+          Stats.densityBoxPlot(json.tileMetrics.clusterDensities, json.summary.numLanes, laneNum);
+          Stats.qualityScorePlot(json.qualityMetrics.combinedReadQualityScores.raw, json.qualityMetrics.perLaneQualityScores, json.summary.numLanes, laneNum);
+        },
+        'doOnError':
+        function(json) {
+          jQuery('#metrixchartsdiv').html(json.error);
+        }
+      }
+    );
+  },
+
   getInterOpMetrics : function(runAlias, platformType) {
     jQuery('#metrixdiv').html("<img src='/styles/images/ajax-loader.gif'/>");
 
@@ -284,36 +403,50 @@ var Stats = Stats || {
     });
   },
 
-  intensityByCyclePlot : function(json, cycleNum, numLanes) {
+  intensityByCyclePlot : function(json, cycleNum, numLanes, laneNum) {
     var allLanesA = [];
     var allLanesC = [];
     var allLanesT = [];
     var allLanesG = [];
 
-    jQuery.each(json, function(lane, obj) {
-      if (obj.lane == 1) {
-        for (var j = 0; j < obj.intA.length; j++) {
-          allLanesA.push(obj.intA[j]);
-          allLanesC.push(obj.intC[j]);
-          allLanesT.push(obj.intT[j]);
-          allLanesG.push(obj.intG[j]);
+    if (typeof laneNum !== "undefined") {
+      jQuery.each(json, function(lane, obj) {
+        if (obj.lane == laneNum) {
+          for (var j = 0; j < obj.intA.length; j++) {
+            allLanesA.push(obj.intA[j]);
+            allLanesC.push(obj.intC[j]);
+            allLanesT.push(obj.intT[j]);
+            allLanesG.push(obj.intG[j]);
+          }
         }
-      }
-      else {
-        for (var i = 0; i < obj.intA.length; i++) {
-          allLanesA[i] += obj.intA[i];
-          allLanesC[i] += obj.intC[i];
-          allLanesT[i] += obj.intT[i];
-          allLanesG[i] += obj.intG[i];
+      });
+    }
+    else {
+      jQuery.each(json, function(lane, obj) {
+        if (obj.lane == 1) {
+          for (var j = 0; j < obj.intA.length; j++) {
+            allLanesA.push(obj.intA[j]);
+            allLanesC.push(obj.intC[j]);
+            allLanesT.push(obj.intT[j]);
+            allLanesG.push(obj.intG[j]);
+          }
         }
-      }
-    });
+        else {
+          for (var i = 0; i < obj.intA.length; i++) {
+            allLanesA[i] += obj.intA[i];
+            allLanesC[i] += obj.intC[i];
+            allLanesT[i] += obj.intT[i];
+            allLanesG[i] += obj.intG[i];
+          }
+        }
+      });
 
-    for (var i = 0; i < allLanesA.length; i++) {
-      allLanesA[i] = allLanesA[i]/numLanes;
-      allLanesC[i] = allLanesC[i]/numLanes;
-      allLanesT[i] = allLanesT[i]/numLanes;
-      allLanesG[i] = allLanesG[i]/numLanes;
+      for (var i = 0; i < allLanesA.length; i++) {
+        allLanesA[i] = allLanesA[i]/numLanes;
+        allLanesC[i] = allLanesC[i]/numLanes;
+        allLanesT[i] = allLanesT[i]/numLanes;
+        allLanesG[i] = allLanesG[i]/numLanes;
+      }
     }
 
     var chart1 = new Highcharts.Chart({
@@ -371,7 +504,7 @@ var Stats = Stats || {
     });
   },
 
-  qualityScorePlot : function(combined, perLane, numLanes) {
+  qualityScorePlot : function(combined, perLane, numLanes, laneNum) {
     var cq10 = 0;
     var cq20 = 0;
     var cq30 = 0;
@@ -379,93 +512,155 @@ var Stats = Stats || {
     var cq50 = 0;
     var cqdata = [];
 
-    for (var i = 0; i < combined.length; i++) {
-      if (i >= 0 && i < 10) {
-        cq10 += combined[i];
-      }
+    var seriesData = [];
+    var yAxis = [];
+    var legend = {layout: 'vertical',align: 'right',verticalAlign: 'middle',borderWidth: 0};
 
-      if (i >= 10 && i < 20) {
-        cq20 += combined[i];
-      }
-
-      if (i >= 20 && i < 30) {
-        cq30 += combined[i];
-      }
-
-      if (i >= 30 && i < 40) {
-        cq40 += combined[i];
-      }
-
-      if (i >= 40) {
-        cq50 += combined[i];
-      }
-    }
-
-    var readtotal = cq10+cq20+cq30+cq40+cq50;
-    cqdata.push(cq10);
-    cqdata.push(cq20);
-    cqdata.push(cq30);
-    cqdata.push(cq40);
-    cqdata.push(cq50);
-
-    var seriesData = [{
-      name:'Combined',
-      data: cqdata,
-      type: 'column',
-      tooltip: {
-        formatter: function() {
-          return (this.y/1000000).toFixed(0) + 'm reads >Q'+this.x+'<br/><em>' + ((this.y/readtotal)*100).toFixed(2) + '%</em><br/>';
-        }
-      }
-    }];
-
-    if (numLanes > 1) {
+    if (typeof laneNum !== "undefined") {
       jQuery.each(perLane, function(index, obj) {
-        var rawdata = obj.raw;
+        if (obj.lane == laneNum) {
+          var rawdata = obj.raw;
 
-        var q10 = 0;
-        var q20 = 0;
-        var q30 = 0;
-        var q40 = 0;
-        var q50 = 0;
-        var qdata = [];
+          var q10 = 0;
+          var q20 = 0;
+          var q30 = 0;
+          var q40 = 0;
+          var q50 = 0;
+          var qdata = [];
 
-        for (var i = 0; i < rawdata.length; i++) {
-          if (i >= 0 && i < 10) {
-            q10 += rawdata[i];
+          for (var i = 0; i < rawdata.length; i++) {
+            if (i >= 0 && i < 10) {
+              q10 += rawdata[i];
+            }
+
+            if (i >= 10 && i < 20) {
+              q20 += rawdata[i];
+            }
+
+            if (i >= 20 && i < 30) {
+              q30 += rawdata[i];
+            }
+
+            if (i >= 30 && i < 40) {
+              q40 += rawdata[i];
+            }
+
+            if (i >= 40) {
+              q50 += rawdata[i];
+            }
           }
 
-          if (i >= 10 && i < 20) {
-            q20 += rawdata[i];
-          }
+          qdata.push(q10);
+          qdata.push(q20);
+          qdata.push(q30);
+          qdata.push(q40);
+          qdata.push(q50);
 
-          if (i >= 20 && i < 30) {
-            q30 += rawdata[i];
-          }
+          var lreadtotal = q10+q20+q30+q40+q50;
 
-          if (i >= 30 && i < 40) {
-            q40 += rawdata[i];
-          }
+          seriesData.push({name:'Lane '+(index+1), yAxis:0, data:qdata, type: 'column', tooltip: {
+            formatter: function() {
+              return (this.y/1000000).toFixed(0) + 'm reads >Q'+this.x+'<br/><em>' + ((this.y/lreadtotal)*100).toFixed(2) + '%</em><br/>';
+            }
+          }});
 
-          if (i >= 40) {
-            q50 += rawdata[i];
-          }
+          yAxis.push({title: {text: 'Reads Per Lane'}, plotLines: [{ value: 0, width: 1, color: '#808080' }]});
+          legend.enabled = false;
+        }
+      });
+    }
+    else {
+      for (var i = 0; i < combined.length; i++) {
+        if (i >= 0 && i < 10) {
+          cq10 += combined[i];
         }
 
-        qdata.push(q10);
-        qdata.push(q20);
-        qdata.push(q30);
-        qdata.push(q40);
-        qdata.push(q50);
+        if (i >= 10 && i < 20) {
+          cq20 += combined[i];
+        }
 
-        var lreadtotal = cq10+cq20+cq30+cq40+cq50;
+        if (i >= 20 && i < 30) {
+          cq30 += combined[i];
+        }
 
-        seriesData.push({name:'Lane '+(index+1), yAxis:1, data:qdata, type: 'column', tooltip: {
+        if (i >= 30 && i < 40) {
+          cq40 += combined[i];
+        }
+
+        if (i >= 40) {
+          cq50 += combined[i];
+        }
+      }
+
+      var readtotal = cq10+cq20+cq30+cq40+cq50;
+      cqdata.push(cq10);
+      cqdata.push(cq20);
+      cqdata.push(cq30);
+      cqdata.push(cq40);
+      cqdata.push(cq50);
+
+      seriesData = [{
+        name:'Combined',
+        data: cqdata,
+        type: 'column',
+        tooltip: {
           formatter: function() {
-            return (this.y/1000000).toFixed(0) + 'm reads >Q'+this.x+'<br/><em>' + ((this.y/lreadtotal)*100).toFixed(2) + '%</em><br/>';
+            return (this.y/1000000).toFixed(0) + 'm reads >Q'+this.x+'<br/><em>' + ((this.y/readtotal)*100).toFixed(2) + '%</em><br/>';
           }
-        }});
-      });
+        }
+      }];
+
+      if (numLanes > 1) {
+        jQuery.each(perLane, function(index, obj) {
+          var rawdata = obj.raw;
+
+          var q10 = 0;
+          var q20 = 0;
+          var q30 = 0;
+          var q40 = 0;
+          var q50 = 0;
+          var qdata = [];
+
+          for (var i = 0; i < rawdata.length; i++) {
+            if (i >= 0 && i < 10) {
+              q10 += rawdata[i];
+            }
+
+            if (i >= 10 && i < 20) {
+              q20 += rawdata[i];
+            }
+
+            if (i >= 20 && i < 30) {
+              q30 += rawdata[i];
+            }
+
+            if (i >= 30 && i < 40) {
+              q40 += rawdata[i];
+            }
+
+            if (i >= 40) {
+              q50 += rawdata[i];
+            }
+          }
+
+          qdata.push(q10);
+          qdata.push(q20);
+          qdata.push(q30);
+          qdata.push(q40);
+          qdata.push(q50);
+
+          var lreadtotal = cq10+cq20+cq30+cq40+cq50;
+
+          seriesData.push({name:'Lane '+(index+1), yAxis:1, data:qdata, type: 'column', tooltip: {
+            formatter: function() {
+              return (this.y/1000000).toFixed(0) + 'm reads >Q'+this.x+'<br/><em>' + ((this.y/lreadtotal)*100).toFixed(2) + '%</em><br/>';
+            }
+          }});
+        });
+      }
+
+      yAxis.push({title: {text: 'Total Reads'},plotLines: [{value: 0,width: 1,color: '#808080'}]});
+      yAxis.push({title: {text: 'Reads Per Lane'},opposite:true,plotLines: [{value: 0,width: 1,color: '#808080'}]});
     }
 
     var chart2 = new Highcharts.Chart({
@@ -480,67 +675,73 @@ var Stats = Stats || {
       xAxis: {
         categories: [0,10,20,30,40]
       },
-      yAxis: [{
-        title: {
-          text: 'Total Reads'
-        },
-        plotLines: [{
-          value: 0,
-          width: 1,
-          color: '#808080'
-        }]},{
-        //per lane column
-        title: {
-          text: 'Reads Per Lane'
-        },
-        opposite:true,
-        plotLines: [{
-          value: 0,
-          width: 1,
-          color: '#808080'
-        }]
-      }],
-      legend: {
-        layout: 'vertical',
-        align: 'right',
-        verticalAlign: 'middle',
-        borderWidth: 0
-      },
+      yAxis: yAxis,
+      legend: legend,
       series: seriesData
     });
   },
 
-  densityBoxPlot : function(json, numLanes) {
+  densityBoxPlot : function(json, numLanes, laneNum) {
     var cats = [];
     var densityData = [];
     var densityDataPF = [];
 
-    for (var i = 1; i < numLanes+1; i++) {
-      cats.push(i);
+    if (typeof laneNum !== "undefined") {
+      cats.push(laneNum);
+
+      jQuery.each(json, function(index, obj) {
+        if (obj.lane == laneNum) {
+          var dd = [];
+          //the smallest observation (sample minimum)
+          dd[0] = obj.densityMin;
+          //lower quartile (Q1)
+          dd[1] = obj.densityQ1;
+          //median (Q2)
+          dd[2] = obj.density;
+          //upper quartile (Q3)
+          dd[3] = obj.densityQ3;
+          //largest observation (sample maximum)
+          dd[4] = obj.densityMax;
+          densityData.push(dd);
+
+          var ddPF = [];
+          ddPF[0] = obj.densityPassingFilterMin;
+          ddPF[1] = obj.densityPassingFilterQ1;
+          ddPF[2] = obj.densityPassingFilter;
+          ddPF[3] = obj.densityPassingFilterQ3;
+          ddPF[4] = obj.densityPassingFilterMax;
+          densityDataPF.push(ddPF);
+        }
+      });
     }
+    else {
+      for (var i = 1; i < numLanes+1; i++) {
+        cats.push(i);
+      }
 
-    jQuery.each(json, function(index, obj) {
-      var dd = [];
-      //the smallest observation (sample minimum)
-      dd[0] = obj.densityMin;
-      //lower quartile (Q1)
-      dd[1] = obj.densityQ1;
-      //median (Q2)
-      dd[2] = obj.density;
-      //upper quartile (Q3)
-      dd[3] = obj.densityQ3;
-      //largest observation (sample maximum)
-      dd[4] = obj.densityMax;
-      densityData.push(dd);
+      jQuery.each(json, function(index, obj) {
+        var dd = [];
+        //the smallest observation (sample minimum)
+        dd[0] = obj.densityMin;
+        //lower quartile (Q1)
+        dd[1] = obj.densityQ1;
+        //median (Q2)
+        dd[2] = obj.density;
+        //upper quartile (Q3)
+        dd[3] = obj.densityQ3;
+        //largest observation (sample maximum)
+        dd[4] = obj.densityMax;
+        densityData.push(dd);
 
-      var ddPF = [];
-      ddPF[0] = obj.densityPassingFilterMin;
-      ddPF[1] = obj.densityPassingFilterQ1;
-      ddPF[2] = obj.densityPassingFilter;
-      ddPF[3] = obj.densityPassingFilterQ3;
-      ddPF[4] = obj.densityPassingFilterMax;
-      densityDataPF.push(ddPF);
-    });
+        var ddPF = [];
+        ddPF[0] = obj.densityPassingFilterMin;
+        ddPF[1] = obj.densityPassingFilterQ1;
+        ddPF[2] = obj.densityPassingFilter;
+        ddPF[3] = obj.densityPassingFilterQ3;
+        ddPF[4] = obj.densityPassingFilterMax;
+        densityDataPF.push(ddPF);
+      });
+    }
 
     var chart3 = new Highcharts.Chart({
       chart: {

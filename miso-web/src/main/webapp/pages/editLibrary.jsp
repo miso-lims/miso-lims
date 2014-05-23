@@ -29,10 +29,12 @@
 
 --%>
 <%@ include file="../header.jsp" %>
-<script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.breadcrumbs.popup.js'/>"></script>
+<script src="<c:url value='/scripts/jquery/js/jquery.breadcrumbs.popup.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/datatables_utils.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
-<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" type="text/css">
+<link href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" rel="stylesheet" type="text/css">
+
+<script src="<c:url value='/scripts/stats_ajax.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
 
 <div id="maincontent">
 <div id="contentcolumn">
@@ -861,9 +863,12 @@
                         jQuery(document).ready(function () {
                           jQuery('#partition${runCount.count}_${fCount.count}_${partition.partitionNumber}').addClass("partitionOccupied");
                           jQuery('#partition${runCount.count}_${fCount.count}_${partition.partitionNumber}').prop("title", "${partition.pool.name}");
-                          jQuery('#partition${runCount.count}_${fCount.count}_${partition.partitionNumber}').click(function() {
-                            Utils.page.pageRedirect("/miso/pool/${partition.pool.id}");
-                          });
+                          <c:if test="${metrixEnabled}">
+                            jQuery('#partition${runCount.count}_${fCount.count}_${partition.partitionNumber}').click(function() {
+                              //TODO open colorbox with SAV style plots in
+                              Stats.getInterOpMetricsForLane('${run.alias}', '${partition.pool.platformType}', '${partition.partitionNumber}');
+                            });
+                          </c:if>
                         });
                       </script>
                     </c:if>

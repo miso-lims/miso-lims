@@ -44,6 +44,15 @@ public class NotificationQueryService {
     return doQuery(q.toString());
   }
 
+  public JSONObject getInterOpMetricsForLane(String runAlias, String platformType, int lane) throws IntegrationException {
+    JSONObject q = new JSONObject();
+    q.put("query", "queryInterOpMetrics");
+    q.put("run", runAlias);
+    q.put("platform", platformType);
+    q.put("lane", lane);
+    return doQuery(q.toString());
+  }
+
   private JSONObject doQuery(String query) throws IntegrationException {
     String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket(notificationServerHost, notificationServerPort), query);
     if (!"".equals(response)) {

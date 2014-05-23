@@ -152,6 +152,20 @@ public class StatsControllerHelperService {
     }
   }
 
+  public JSONObject getInterOpMetricsForLane(HttpSession session, JSONObject json) {
+    String runAlias = json.getString("runAlias");
+    String platformType = json.getString("platformType").toLowerCase();
+    int laneNum = json.getInt("lane");
+    try {
+      return notificationQueryService.getInterOpMetricsForLane(runAlias, platformType, laneNum);
+    }
+    catch (IntegrationException e) {
+      e.printStackTrace();
+      log.debug("Failed", e);
+      return JSONUtils.SimpleJSONError("Failed to retrieve InterOp metrics: " + e.getMessage());
+    }
+  }
+
   public JSONObject updateRunProgress(HttpSession session, JSONObject json) {
     String runAlias = json.getString("runAlias");
     try {
