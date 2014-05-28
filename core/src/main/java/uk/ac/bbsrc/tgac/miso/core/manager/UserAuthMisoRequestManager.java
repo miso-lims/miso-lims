@@ -1398,6 +1398,18 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
+  public Collection<Study> listAllStudiesByLibraryId(long libraryId) throws IOException {
+    User user = getCurrentUser();
+    Collection<Study> accessibles = new HashSet<Study>();
+    for (Study study : super.listAllStudiesByLibraryId(libraryId)) {
+      if (study.userCanRead(user)) {
+        accessibles.add(study);
+      }
+    }
+    return accessibles;
+  }
+
+  @Override
   public Collection<SequencerPoolPartition> listAllSequencerPoolPartitions() throws IOException {
     User user = getCurrentUser();
     Collection<SequencerPoolPartition> accessibles = new HashSet<SequencerPoolPartition>();

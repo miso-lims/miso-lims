@@ -527,14 +527,18 @@
                           ${partition.pool.name}
                         (${partition.pool.creationDate})
                       </a><br/>
-                      <span style="font-size:8pt">
+                      <span style="font-size:8pt" id='partition_span_${partitionCount.index}'>
                         <c:choose>
                           <c:when test="${not empty partition.pool.experiments}">
-                            <i><c:forEach items="${partition.pool.experiments}"
-                                          var="experiment">
+                            <i><c:forEach items="${partition.pool.experiments}" var="experiment">
                               ${experiment.study.project.alias} (${experiment.name}: ${fn:length(partition.pool.dilutions)} dilutions)<br/>
                             </c:forEach>
                             </i>
+                            <script>
+                              jQuery(document).ready(function () {
+                                Run.container.checkPoolExperiment('#partition_span_${partitionCount.index}', ${partition.pool.id}, ${partitionCount.index});
+                              });
+                            </script>
                             <input type="hidden"
                                    name="sequencerPartitionContainers[${containerCount.index}].partitions[${partitionCount.index}].pool"
                                    id="pId${partitionCount.index}"

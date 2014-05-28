@@ -159,6 +159,7 @@ public interface RequestManager {
   public Collection<Study> listAllStudies() throws IOException;
   public Collection<Study> listAllStudiesWithLimit(long limit) throws IOException;
   public Collection<Study> listAllStudiesBySearch(String query) throws IOException;
+  public Collection<Study> listAllStudiesByLibraryId(long libraryId) throws IOException;
 
   public Collection<Experiment> listAllExperiments() throws IOException;
   public Collection<Experiment> listAllExperimentsWithLimit(long limit) throws IOException;

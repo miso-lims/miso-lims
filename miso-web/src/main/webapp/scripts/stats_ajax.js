@@ -214,7 +214,7 @@ var Stats = Stats || {
         },
         'doOnError':
         function(json) {
-          jQuery('#metrixchartsdiv').html(json.error);
+          alert(json.error);
         }
       }
     );
