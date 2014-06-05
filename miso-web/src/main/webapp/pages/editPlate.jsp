@@ -30,30 +30,17 @@
 <form:form action="/miso/plate" method="POST" commandName="plate" autocomplete="off">
 <sessionConversation:insertSessionConversationId attributeName="plate"/>
 <nav class="navbar navbar-default" role="navigation">
-    <div class="navbar-header">
+   <div class="navbar-header">
       <span class="navbar-brand navbar-center">
         <c:choose>
-            <c:when test="${plate.id != 0}">Edit</c:when>
-            <c:otherwise>Create</c:otherwise>
+          <c:when test="${plate.id != 0}">Edit</c:when>
+          <c:otherwise>Create</c:otherwise>
         </c:choose> Plate
       </span>
-    </div>
-    <div class="navbar-right container-fluid">
-
-        <c:choose>
-            <c:when test="${plate.id != 0}">
-                <button type="button" class="btn btn-default navbar-btn"
-                        onclick="return validate_plate(this.form,${plate.id});">Save Plate
-                </button>
-            </c:when>
-            <c:otherwise>
-                <button type="button" class="btn btn-default navbar-btn" onclick="return validate_plate(this.form);">
-                    Save Plate
-                </button>
-            </c:otherwise>
-        </c:choose>
-
-    </div>
+   </div>
+   <div class="navbar-right container-fluid">
+      <button type="button" class="btn btn-default navbar-btn" onclick="return validate_plate(this.form);">Save</button>
+   </div>
 </nav>
 
 <h2>Plate Information</h2>
@@ -171,49 +158,84 @@
                 </c:otherwise>
             </c:choose>
         </tr>
-    </table>
-    </form:form>
+        --%>
+  </table>
+    <%--
+    <c:if test="${plate.id != 0}">
+      <div id="notes">
+        <h1>Notes</h1>
+        <ul class="sddm">
+          <li><a onmouseover="mopen('notesmenu')"
+                 onmouseout="mclosetime()">Options <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span></a>
+            <div id="notesmenu"
+                 onmouseover="mcancelclosetime()"
+                 onmouseout="mclosetime()">
+              <a onclick="Plate.ui.showPlateNoteDialog(${plate.id});" href="javascript:void(0);" class="add">Add Note</a>
+            </div>
+          </li>
+        </ul>
+        <c:if test="${fn:length(plate.notes) > 0}">
+          <div class="note" style="clear:both">
+            <c:forEach items="${plate.notes}" var="note" varStatus="n">
+              <div class="exppreview" id="plate-notes-${n.count}">
+                <b>${note.creationDate}</b>: ${note.text}
+                <span class="float-right"
+                      style="font-weight:bold; color:#C0C0C0;">${note.owner.loginName}</span>
+              </div>
+            </c:forEach>
+          </div>
+        </c:if>
+        <div id="addPlateNoteDialog" title="Create new Note"></div>
+      </div>
+      <br/>
+    </c:if>
+  --%>
+  </form:form>
 
-    <a name="plate_elements"></a>
+  <a name="plate_elements"></a>
 
+  <nav id="navbar-el" class="navbar navbar-default navbar-static" role="navigation">
+    <div class="navbar-header">
+      <span class="navbar-brand navbar-center">Elements</span>
+    </div>
+    <div class="collapse navbar-collapse bs-example-js-navbar-collapse">
+      <ul class="nav navbar-nav navbar-right">
+      <c:if test="${plate.id == 0}">
+        <li id="el-menu" class="dropdown">
+          <a id="eldrop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Options <b class="caret"></b></a>
+          <ul class="dropdown-menu dropdown-menu-float-right" role="menu" aria-labelledby="eldrop1">
+            <li role="presentation"><a href="javascript:void(0);" onclick="Plate.ui.downloadPlateInputForm();">Get Plate Input Form</a></li>
+            <li role="presentation"><a href="javascript:void(0);" class="add" onclick="Plate.ui.uploadPlateInputForm();">Import Plate Input Form</a></li>
+          </ul>
+        </li>
+      </c:if>
+      </ul>
+    </div>
+  </nav>
 
-    <nav class="navbar navbar-default" role="navigation">
-        <div class="navbar-header">
-      <span class="navbar-brand navbar-center">
-       Elements
-      </span>
-        </div>
-        <%--<div class="navbar-right container-fluid">--%>
-        <%--<button class="btn btn-default navbar-btn" id="saveElements"--%>
-        <%--onclick="Plate.ui.saveElements('${plate.id}');">Save elements--%>
-        <%--</button>--%>
-        <%--</div>--%>
-    </nav>
-
-    <br/>
-
-
-    <c:choose>
-    <c:when test="${plate.id == 0}">
-        <i>Please save plate info above first, you can then populate elements...</i>
-    </c:when>
-    <c:otherwise>
-
-    <br/>
-    <br/>
-
-    <div id="plateformholder">
-
-        <form id="elementsForm">
-
-        </form>
-        <br/>
-
-            <%--<button type="button" id="createPoolButton" onClick="addBulkSamples();"--%>
-            <%--class="btn btn-default navbar-btn">Add Selected Samples--%>
-            <%--</button>--%>
-        <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered display"
-               id="sampleSelectionTable">
+  <span style="clear:both">
+    <c:if test="${plate.id == 0}">
+      <div id="plateformdiv" class="simplebox" style="display:none;">
+        <table class="in">
+          <tr>
+            <td>
+              <form method='post'
+                    id='plateform_upload_form'
+                    action='<c:url value="/miso/upload/plate/plate-form"/>'
+                    enctype="multipart/form-data"
+                    target="plateform_target_upload"
+                    onsubmit="Utils.fileUpload.fileUploadProgress('plateform_upload_form', 'plateform_statusdiv', Plate.ui.plateInputFormUploadSuccess);">
+                <input type="file" name="file"/>
+                <button type="submit" class="br-button ui-state-default ui-corner-all">Upload</button>
+                <button type="button" class="br-button ui-state-default ui-corner-all"
+                        onclick="Plate.ui.cancelPlateInputFormUpload();">Cancel
+                </button>
+              </form>
+              <iframe id='plateform_target_upload' name='plateform_target_upload' style='display: none'></iframe>
+              <div id="plateform_statusdiv"></div>
+              <div id="plateform_import"></div>
+            </td>
+          </tr>
         </table>
     </div>
 </div>

@@ -42,7 +42,7 @@
               </span>
            </div>
         </nav>
-        <table class="table table-bordered table-striped" id="printerTable">
+        <table class="list" id="printerTable">
           <thead>
           <tr>
             <th>Job ID</th>
@@ -171,7 +171,7 @@
               </span>
            </div>
         </nav>
-        <table class="table table-bordered table-striped" id="printerTable">
+        <table class="list" id="printerTable">
           <thead>
           <tr>
             <th>Job ID</th>

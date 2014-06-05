@@ -65,7 +65,7 @@
     </span>
   </div>
   <div class="navbar-right container-fluid">
-    <button class="btn btn-default navbar-btn" href='javascript:void(0);' onclick="return validate_sample(this.form);">Save</button>
+    <button type="button" class="btn btn-default navbar-btn" onclick="return validate_sample(this.form);">Save</button>
   </div>
 </nav>
 
@@ -523,8 +523,8 @@
         <ul class="nav navbar-nav navbar-right">
           <li id="library-menu" class="dropdown">
             <a id="librarydrop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Options <b class="caret"></b></a>
-            <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="librarydrop1">
-              <li role="presentation"><a href='<c:url value="/miso/library/new/${sample.id}"/>'>Add Library</a></li>
+            <ul class="dropdown-menu dropdown-menu-float-right" role="menu" aria-labelledby="librarydrop1">
+              <li role="presentation"><a href='<c:url value="/miso/library/new/${sample.id}"/>' class="add">Add Library</a></li>
               <c:if test="${not empty sample.libraries}">
               <li role="presentation"><a href='javascript:void(0);' onclick='bulkLibraryQcTable();'>Bulk QC these Libraries</a></li>
               <li role="presentation"><a href='javascript:void(0);' onclick='bulkLibraryDilutionTable();'>Bulk Add Library Dilutions</a></li>

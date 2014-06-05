@@ -27,27 +27,23 @@
 <div id="maincontent">
   <div id="contentcolumn">
     <nav class="navbar navbar-default" role="navigation">
-      <div class="navbar-header">
-        <span class="navbar-brand navbar-center">
-          <div>${fn:length(groups)} Groups</div>
-        </span>
-      </div>
-      <div class="collapse navbar-collapse bs-example-js-navbar-collapse">
-        <ul class="nav navbar-nav navbar-right">
-          <li id="pro-menu" class="dropdown">
-            <a id="pro-drop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Options <b class="caret"></b></a>
-            <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="pro-drop1">
-              <sec:authorize access="hasRole('ROLE_TECH')">
-              <li role="presentation"><a href="<c:url value="/miso/tech/group/new"/>">Add Group</a></li>
-              </sec:authorize>
-              <sec:authorize access="hasRole('ROLE_ADMIN')">
-              <li role="presentation"><a href="<c:url value="/miso/admin/group/new"/>">Add Group</a></li>
-              </sec:authorize>
-            </ul>
-          </li>
-        </ul>
-      </div>
+       <div class="navbar-header">
+          <span class="navbar-brand navbar-center">
+            <div id="totalCount"> Groups</div>
+          </span>
+       </div>
     </nav>
+    <form id="filter-form">Filter: <input name="filter" id="filter" value="" maxlength="30" size="30" type="text">
+    </form>
+    <br/>
+
+    <sec:authorize access="hasRole('ROLE_TECH')">
+      <a href="<c:url value="/miso/tech/group/new"/>" class="add">Add Group</a>
+    </sec:authorize>
+
+    <sec:authorize access="hasRole('ROLE_ADMIN')">
+      <a href="<c:url value="/miso/admin/group/new"/>" class="add">Add Group</a>
+    </sec:authorize>
 
     <table class="table table-bordered table-striped display" id="table">
       <thead>

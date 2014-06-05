@@ -167,7 +167,6 @@
 <%@ include file="permissions.jsp" %>
 
 <c:if test="${pool.id != 0}">
-<div id="poolqcs" class="panel panel-default padded-panel">
   <nav id="navbar-qc" class="navbar navbar-default navbar-static" role="navigation">
     <div class="navbar-header">
       <span id="qcsTotalCount" class="navbar-brand navbar-center">Sample QCs</span>
@@ -176,9 +175,9 @@
       <ul class="nav navbar-nav navbar-right">
         <li id="qc-menu" class="dropdown">
           <a id="qcdrop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Options <b class="caret"></b></a>
-          <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="qcdrop1">
+          <ul class="dropdown-menu dropdown-menu-float-right" role="menu" aria-labelledby="qcdrop1">
             <li role="presentation">
-              <a href='javascript:void(0);' onclick="Pool.qc.insertPoolQCRow(${pool.id});">Add Pool QC</a>
+              <a href='javascript:void(0);' class="add" onclick="Pool.qc.insertPoolQCRow(${pool.id});">Add Pool QC</a>
             </li>
           </ul>
         </li>
@@ -237,12 +236,11 @@
 </div>
 </c:if>
 
-<div id="poolexps" class="panel panel-default padded-panel container-fluid">
-  <nav id="navbar-exp" class="navbar navbar-default navbar-static" role="navigation">
-    <div class="navbar-header">
-      <span class="navbar-brand navbar-center">Experiments</span>
-    </div>
-  </nav>
+<nav id="navbar-qc" class="navbar navbar-default navbar-static" role="navigation">
+  <div class="navbar-header">
+    <span class="navbar-brand navbar-center">Experiments</span>
+  </div>
+</nav>
 
   <div class="row-fluid">
     <div class="col-sm-12 col-md-6 small-pad">
@@ -297,12 +295,17 @@
   </div>
 </div>
 
-<div id="poolelems" class="panel panel-default padded-panel">
-  <nav id="navbar-elems" class="navbar navbar-default navbar-static" role="navigation">
-    <div class="navbar-header">
-      <span class="navbar-brand navbar-center">Pooled Elements</span>
-    </div>
-  </nav>
+      <div id='exptresult'></div>
+    </td>
+  </tr>
+</table>
+<br/>
+
+<nav id="navbar-qc" class="navbar navbar-default navbar-static" role="navigation">
+  <div class="navbar-header">
+    <span class="navbar-brand navbar-center">Pooled Elements</span>
+  </div>
+</nav>
 
   <div class="note">
     <h2>Selected elements(s):</h2>

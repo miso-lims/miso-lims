@@ -33,14 +33,14 @@
 <div id="maincontent">
   <div id="contentcolumn">
     <nav class="navbar navbar-default" role="navigation">
-      <div class="navbar-header">
-        <span class="navbar-brand navbar-center">
-          Receive Samples
-        </span>
-      </div>
-      <div class="navbar-right container-fluid">
-        <button class="btn btn-default navbar-btn" href='javascript:void(0);' onclick="Sample.ui.setSampleReceiveDate('#sample_pan');">Save</button>
-      </div>
+       <div class="navbar-header">
+          <span class="navbar-brand navbar-center">
+            Receive Samples
+          </span>
+         <div class="navbar-right container-fluid">
+           <button type="submit" class="btn btn-default navbar-btn" onclick="Sample.ui.setSampleReceiveDate('#sample_pan');"> Save</button>
+         </div>
+       </div>
     </nav>
 
     <form id="samples" commandName="sample" autocomplete="off" onsubmit="">

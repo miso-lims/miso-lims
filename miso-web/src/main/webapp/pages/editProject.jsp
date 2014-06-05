@@ -31,6 +31,13 @@
 <link href="<c:url value='/scripts/jquery/fileupload/css/jquery.fileupload.css'/>" rel="stylesheet" type="text/css">
 <link href="<c:url value='/scripts/jquery/fileupload/css/jquery.fileupload-ui.css'/>" rel="stylesheet" type="text/css">
 
+<script src="<c:url value='/scripts/datatables_utils.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/natural_sort.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.mini.js'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.datepicker.js'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.checkbox.js'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.radio.js'/>" type="text/javascript"></script>
 <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.breadcrumbs.popup.js'/>"></script>
 <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.popup.js'/>"></script>
 
@@ -111,21 +118,13 @@
   </tr>
   <tr>
     <td class="h">Alias:</td>
-    <td>
-      <div class="input-group">
-        <form:input path="alias" maxlength="${maxLengths['alias']}" class="validateable form-control"/>
-        <span id="aliascounter" class="input-group-addon"></span>
-      </div>
-    </td>
+    <td><form:input path="alias" maxlength="${maxLengths['alias']}" class="validateable form-control"/></td>
+    <td><span id="aliascounter" class="counter"></span></td>
   </tr>
   <tr>
     <td class="h">Description:</td>
-    <td>
-      <div class="input-group">
-        <form:input path="description" maxlength="${maxLengths['description']}" class="validateable form-control"/>
-        <span id="descriptioncounter" class="input-group-addon"></span>
-      </div>
-    </td>
+    <td><form:input path="description" maxlength="${maxLengths['description']}" class="validateable form-control"/></td>
+    <td><span id="descriptioncounter" class="counter"></span></td>
   </tr>
   <tr>
     <td>Progress:</td>
@@ -441,7 +440,7 @@
       <ul class="nav navbar-nav navbar-right">
         <li id="samgroup-menu" class="dropdown">
           <a id="samgroupdrop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Options <b class="caret"></b></a>
-          <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="samgroupdrop1">
+          <ul class="dropdown-menu dropdown-menu-float-right" role="menu" aria-labelledby="samgroupdrop1">
             <li role="presentation">
               <a href="javascript:void(0);" onclick="Project.overview.addSamplesToGroupTable(${project.id}, ${overview.id}, ${overview.sampleGroup.id});">Add more Samples</a>
             </li>
@@ -553,14 +552,14 @@
   Project Files
   <div id="upload_arrowclick" class="toggleLeft"></div>
 </div>
-<div id="uploaddiv" class="panel panel-default padded-panel" style="display:none;">
+<div id="uploaddiv" class="simplebox" style="display:none;">
   <table class="in">
     <tr>
       <td>
         <span id="upload-area">
           <div class="fileupload-buttonbar">
             <div class="fileupload-buttonbar">
-              <div>
+              <div class="col-lg-7">
                 <span class="btn btn-success fileinput-button">
                   <i class="glyphicon glyphicon-plus"></i>
                   <span>Add files...</span>
@@ -602,17 +601,13 @@
 
   <div id="projectfiles">
     <c:forEach items="${projectFiles}" var="file">
-      <div id="file${file.key}">
-        <div onMouseOver="this.className='boxlistboxhighlight'" onMouseOut="this.className='boxlistbox'" class="boxlistbox">
-          <a href="<c:url value='/miso/download/project/${project.id}/${file.key}'/>">${file.value}</a>
-          <c:if test="${(project.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
-                          or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-          <a href='#' onclick="Project.ui.deleteProjectFile('${project.id}', '${file.value}', '${file.key}');">
-            <i class="fa fa-trash-o fa-lg fa-fw pull-right" style="padding-top:4px"></i>
-          </a>
-          </c:if>
-        </div>
-      </div>
+      <a href="<c:url value='/miso/download/project/${project.id}/${file.key}'/>">
+        <a class="listbox" href="<c:url value='/miso/download/project/${project.id}/${file.key}'/>">
+          <div onMouseOver="this.className='boxlistboxhighlight'" onMouseOut="this.className='boxlistbox'" class="boxlistbox">
+            ${file.value}
+          </div>
+        </a>
+      </a>
     </c:forEach>
   </div>
 </div>
@@ -621,7 +616,7 @@
   ${fn:length(project.studies)} Studies
   <div id="studies_arrowclick" class="toggleLeft"></div>
 </div>
-<div id="studiesdiv" class="panel panel-default padded-panel" style="display:none;">
+<div id="studiesdiv" style="display:none;">
   <nav id="navbar-stu" class="navbar navbar-default navbar-static" role="navigation">
     <div class="navbar-header">
       <span class="navbar-brand navbar-center">${fn:length(project.studies)} Studies</span>
@@ -630,8 +625,8 @@
       <ul class="nav navbar-nav navbar-right">
         <li id="stu-menu" class="dropdown">
           <a id="studrop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Options <b class="caret"></b></a>
-          <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="studrop1">
-            <li role="presentation"><a href='<c:url value="/miso/study/new/${project.id}"/>'>Add new Study</a></li>
+          <ul class="dropdown-menu dropdown-menu-float-right" role="menu" aria-labelledby="studrop1">
+            <li role="presentation"><a href='<c:url value="/miso/study/new/${project.id}"/>' class="add">Add new Study</a></li>
             <li role="presentation"><a href='<c:url value="/miso/experimentwizard/new/${project.id}"/>'>Create Experiments</a></li>
             <li role="presentation"><a href='<c:url value="/miso/poolwizard/new/${project.id}"/>'>Create Pools</a></li>
           </ul>
@@ -714,8 +709,8 @@
           <ul class="nav navbar-nav navbar-right">
             <li id="sam-menu" class="dropdown">
               <a id="samdrop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Options <b class="caret"></b></a>
-              <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="samdrop1">
-                <li role="presentation"><a href='<c:url value="/miso/sample/new/${project.id}"/>'>Add Samples</a></li>
+              <ul class="dropdown-menu dropdown-menu-float-right" role="menu" aria-labelledby="samdrop1">
+                <li role="presentation"><a href='<c:url value="/miso/sample/new/${project.id}"/>' class="add">Add Samples</a></li>
                 <li role="presentation"><a href="javascript:void(0);" onclick="Project.ui.receiveSamples('#sample_table');">Receive Samples</a></li>
                 <li role="presentation"><a href="javascript:void(0);" onclick="bulkSampleQcTable('#sample_table');">QC Samples</a></li>
                 <li role="presentation"><a href="javascript:void(0);" onclick="Project.barcode.selectSampleBarcodesToPrint('#sample_table');">Print Barcodes</a></li>
@@ -906,7 +901,7 @@
                   <li id="gsam-menu" class="dropdown">
                     <c:if test="${not empty overview.sampleGroup.entities}">
                       <a id="gsamdrop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Options <b class="caret"></b></a>
-                      <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="gsamdrop1">
+                      <ul class="dropdown-menu dropdown-menu-float-right" role="menu" aria-labelledby="gsamdrop1">
                         <li role="presentation"><a href="javascript:void(0);" onclick="Project.ui.receiveSamples('#overview_samplegroup_table_'+${overview.id});">Receive Samples</a></li>
                         <li role="presentation"><a href="javascript:void(0);" onclick="bulkSampleQcTable('#overview_samplegroup_table_'+${overview.id});">QC Samples</a></li>
                         <li role="presentation"><a href="javascript:void(0);" onclick="Project.barcode.selectSampleBarcodesToPrint('#overview_samplegroup_table_'+${overview.id});">Print Barcodes</a></li>
@@ -1038,14 +1033,14 @@
           <ul class="nav navbar-nav navbar-right">
             <li id="lib-menu" class="dropdown">
               <a id="libdrop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Options <b class="caret"></b></a>
-              <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="libdrop1">
+              <ul class="dropdown-menu dropdown-menu-float-right" role="menu" aria-labelledby="libdrop1">
                 <c:if test="${not empty project.samples}">
-                  <li role="presentation"><a href='<c:url value="/miso/library/new/${project.samples[0].id}#tab-2"/>'>Add Libraries</a></li>
+                  <li role="presentation"><a href='<c:url value="/miso/library/new/${project.samples[0].id}#tab-2"/>' class="add">Add Libraries</a></li>
                 </c:if>
 
                 <c:if test="${not empty projectLibraries}">
                   <li role="presentation"><a href="javascript:void(0);" onclick="bulkLibraryQcTable('#library_table');">QC these Libraries</a></li>
-                  <li role="presentation"><a href="javascript:void(0);" onclick="bulkLibraryDilutionTable('#library_table');">Add Library Dilutions</a></li>
+                  <li role="presentation"><a href="javascript:void(0);" onclick="bulkLibraryDilutionTable('#library_table');" class="add">Add Library Dilutions</a></li>
                   <li role="presentation"><a href="javascript:void(0);" onclick="Project.barcode.selectLibraryBarcodesToPrint('#library_table');">Print Barcodes</a></li>
                 </c:if>
               </ul>
@@ -1143,14 +1138,14 @@
               <ul class="nav navbar-nav navbar-right">
                 <li id="glib-menu" class="dropdown">
                   <a id="glibdrop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Options <b class="caret"></b></a>
-                  <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="glibdrop1">
+                  <ul class="dropdown-menu dropdown-menu-float-right" role="menu" aria-labelledby="glibdrop1">
                     <c:if test="${not empty project.samples}">
-                      <li role="presentation"><a href='<c:url value="/miso/library/new/${project.samples[0].id}#tab-2"/>'>Add Libraries</a></li>
+                      <li role="presentation"><a href='<c:url value="/miso/library/new/${project.samples[0].id}#tab-2"/>' class="add">Add Libraries</a></li>
                     </c:if>
 
                     <c:if test="${not empty projectLibraries}">
                       <li role="presentation"><a href="javascript:void(0);" onclick="bulkLibraryQcTable('#overview_librarygroup_table_${overview.id}');">QC these Libraries</a></li>
-                      <li role="presentation"><a href="javascript:void(0);" onclick="bulkLibraryDilutionTable('#overview_librarygroup_table_${overview.id}');">Add Library Dilutions</a></li>
+                      <li role="presentation"><a href="javascript:void(0);" onclick="bulkLibraryDilutionTable('#overview_librarygroup_table_${overview.id}');" class="add">Add Library Dilutions</a></li>
                       <li role="presentation"><a href="javascript:void(0);" onclick="Project.barcode.selectLibraryBarcodesToPrint('#overview_librarygroup_table_${overview.id}');">Print Barcodes</a></li>
                     </c:if>
                   </ul>
@@ -1263,10 +1258,10 @@
       <ul class="nav navbar-nav navbar-right">
         <li id="ldi-menu" class="dropdown">
           <a id="ldidrop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Options <b class="caret"></b></a>
-          <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="ldidrop1">
+          <ul class="dropdown-menu dropdown-menu-float-right" role="menu" aria-labelledby="ldidrop1">
             <c:if test="${not empty projectLibraryDilutions}">
               <c:if test="${existsAnyEmPcrLibrary}">
-              <li role="presentation"><a href='javascript:void(0);' onclick='bulkEmPcrTable();'>Add EmPCRs</a></li>
+              <li role="presentation"><a href='javascript:void(0);' onclick='bulkEmPcrTable();' class="add">Add EmPCRs</a></li>
               </c:if>
               <li role="presentation"><a href="javascript:void(0);" onclick="Project.barcode.selectLibraryDilutionBarcodesToPrint('#librarydils_table');">Print Barcodes</a></li>
               <li role="presentation"><a href='<c:url value="/miso/poolwizard/new/${project.id}"/>'>Create Pools</a></li>
@@ -1355,10 +1350,10 @@
       <ul class="nav navbar-nav navbar-right">
         <li id="pool-menu" class="dropdown">
           <a id="pooldrop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Options <b class="caret"></b></a>
-          <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="pooldrop1">
+          <ul class="dropdown-menu dropdown-menu-float-right" role="menu" aria-labelledby="pooldrop1">
             <c:if test="${not empty projectPools}">
               <c:if test="${existsAnyEmPcrLibrary}">
-                <li role="presentation"><a href='javascript:void(0);' onclick="Project.ui.addPoolEmPCR('#pools_table');">Add Pool EmPCR</a></li>
+                <li role="presentation"><a href='javascript:void(0);' onclick="Project.ui.addPoolEmPCR('#pools_table');" class="add">Add Pool EmPCR</a></li>
               </c:if>
                 <li role="presentation"><a href="javascript:void(0);" onclick="Pool.barcode.selectPoolBarcodesToPrint('#pools_table');">Print Barcodes</a></li>
             </c:if>
@@ -1448,8 +1443,8 @@
         <c:if test="${not empty projectEmPcrs}">
           <li id="empcr-menu" class="dropdown">
             <a id="empcrdrop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Options <b class="caret"></b></a>
-            <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="empcrdrop1">
-              <li role="presentation"><a href='javascript:void(0);' onclick='bulkEmPcrDilutionTable();'>Add EmPCR Dilutions</a></li>
+            <ul class="dropdown-menu dropdown-menu-float-right" role="menu" aria-labelledby="empcrdrop1">
+              <li role="presentation"><a href='javascript:void(0);' onclick='bulkEmPcrDilutionTable();' class="add">Add EmPCR Dilutions</a></li>
             </ul>
           </li>
         </c:if>
@@ -1532,6 +1527,25 @@
         <c:if test="${not empty projectEmPcrDilutions}">
           <li id="edi-menu" class="dropdown">
             <a id="edidrop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Options <b class="caret"></b></a>
+            <ul class="dropdown-menu dropdown-menu-float-right" role="menu" aria-labelledby="edidrop1">
+              <li role="presentation"><a href='<c:url value="/miso/poolwizard/new/${project.id}"/>'>Create Pools</a></li>
+            </ul>
+          </li>
+        </c:if>
+      </ul>
+    </div>
+  </nav>
+
+  <ul class="sddm">
+    <li>
+      <a onmouseover="mopen('empcrdilsmenu')" onmouseout="mclosetime()">Options
+        <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
+      </a>
+
+      <div id="empcrdilsmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
+        <c:if test="${not empty projectEmPcrDilutions}">
+          <li id="edi-menu" class="dropdown">
+            <a id="edidrop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Options <b class="caret"></b></a>
             <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="edidrop1">
               <li role="presentation"><a href='<c:url value="/miso/poolwizard/new/${project.id}"/>'>Create Pools</a></li>
             </ul>
@@ -1611,7 +1625,7 @@
       <ul class="nav navbar-nav navbar-right">
         <li id="pla-menu" class="dropdown">
           <a id="pladrop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Options <b class="caret"></b></a>
-          <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="pladrop1">
+          <ul class="dropdown-menu dropdown-menu-float-right" role="menu" aria-labelledby="pladrop1">
             <li role="presentation"><a href="<c:url value="/miso/plate/import"/>">Import Plate Sheet</a></li>
             <c:if test="${not empty projectPlates}">
               <li role="presentation"><a href="javascript:void(0);" onclick="Plate.barcode.selectPlateBarcodesToPrint('#plates_table');">Print Barcodes</a></li>
@@ -1681,7 +1695,7 @@
   ${fn:length(projectRuns)} Runs
   <div id="runs_arrowclick" class="toggleLeft"></div>
 </div>
-<div id="runsdiv" class="panel panel-default padded-panel" style="display:none;">
+<div id="runsdiv" style="display:none;">
   <nav id="navbar-run" class="navbar navbar-default navbar-static" role="navigation">
     <div class="navbar-header">
       <span class="navbar-brand navbar-center">${fn:length(projectRuns)} Runs</span>
@@ -1691,7 +1705,7 @@
       <ul class="nav navbar-nav navbar-right">
         <li id="run-menu" class="dropdown">
           <a id="rundrop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Options <b class="caret"></b></a>
-          <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="rundrop1">
+          <ul class="dropdown-menu dropdown-menu-float-right" role="menu" aria-labelledby="rundrop1">
             <li role="presentation"></li>
           </ul>
         </li>

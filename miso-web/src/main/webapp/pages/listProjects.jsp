@@ -23,26 +23,22 @@
   --%>
 
 <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.popup.js'/>"></script>
+<script src="<c:url value='/scripts/datatables_utils.js'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
+<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" type="text/css">
+<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables_themeroller.css'/>">
+<nav class="navbar navbar-default" role="navigation">
+   <div class="navbar-header">
+      <span class="navbar-brand navbar-center">
+        <div id="totalProjectCount"> Projects</div>
+      </span>
+   </div>
+</nav>
 
-<div id="maincontent">
-  <div id="contentcolumn">
-    <nav class="navbar navbar-default" role="navigation">
-       <div class="navbar-header">
-          <span class="navbar-brand navbar-center">
-            <div id="totalProjectCount"> Projects</div>
-          </span>
-       </div>
-      <div class="collapse navbar-collapse bs-example-js-navbar-collapse">
-        <ul class="nav navbar-nav navbar-right">
-          <li id="pro-menu" class="dropdown">
-            <a id="pro-drop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Options <b class="caret"></b></a>
-            <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="pro-drop1">
-              <li role="presentation"><a href="<c:url value="/miso/project/new"/>">Add Project</a></li>
-            </ul>
-          </li>
-        </ul>
-      </div>
-    </nav>
+<div style="clear:both"/>
+<div id="traftrigger" onclick="readJson()" class="ui-corner-all">
+  Projects Tree
+</div>
 
     <%--<div style="clear:both"/>
     <div id="traftrigger" onclick="readJson()" class="ui-corner-all">
