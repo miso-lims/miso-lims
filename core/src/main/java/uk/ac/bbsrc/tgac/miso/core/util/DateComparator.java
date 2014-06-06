@@ -23,6 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.util;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Comparator;
 import java.util.Date;
@@ -40,9 +41,15 @@ public class DateComparator implements Comparator {
   private Method method;
   private boolean isAscending = true;
   private boolean isNullsLast = true;
+  private boolean fallBackToId = false;
   private static final Object[] EMPTY_OBJECT_ARRAY = new Object[]{};
 
   public DateComparator(Class c, String methodName) throws NoSuchMethodException, IllegalArgumentException {
+    this(c, methodName, false);
+  }
+
+  public DateComparator(Class c, String methodName, boolean fallBackToId) throws NoSuchMethodException, IllegalArgumentException {
+    this.fallBackToId = fallBackToId;
     method = c.getMethod(methodName);
     Class returnClass = method.getReturnType();
     if (returnClass.getName().equals("void")) {
@@ -91,7 +98,32 @@ public class DateComparator implements Comparator {
     } else if (c1.after(c2)) {
         return 1;
     } else {
-        return 0;
+      if (fallBackToId) {
+        Method mid1 = null;
+        Method mid2 = null;
+
+        try {
+          mid1 = object1.getClass().getMethod("getId");
+          mid2 = object2.getClass().getMethod("getId");
+        }
+        catch (NoSuchMethodException e) {
+          //fail silently and return equality
+        }
+        if (mid1 != null && mid2 != null) {
+          try {
+            Long id1 = (Long)mid1.invoke(object1);
+            Long id2 = (Long)mid2.invoke(object2);
+            return id1.compareTo(id2);
+          }
+          catch (InvocationTargetException e) {
+            //fail silently and return equality
+          }
+          catch (IllegalAccessException e) {
+            //fail silently and return equality
+          }
+        }
+      }
+      return 0;
     }
   }
 }

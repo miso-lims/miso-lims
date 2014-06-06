@@ -122,6 +122,19 @@ public class SQLStudyDAO implements StudyStore {
           "WHERE s.studyId=ss.studies_studyId " +
           "AND ss.submission_submissionId=?";
 
+  public static final String STUDIES_BY_RELATED_LIBRARY =
+      "SELECT " +
+      "stu.* FROM Study stu " +
+      "INNER JOIN Experiment exp ON stu.studyId = exp.study_studyId " +
+      "INNER JOIN Pool_Experiment pex ON exp.experimentId = pex.experiments_experimentId " +
+      "INNER JOIN Pool pool ON pool.poolId = pex.pool_poolId " +
+      "INNER JOIN Pool_Elements pel ON pel.pool_poolId = pex.pool_poolId " +
+      "INNER JOIN LibraryDilution ldi ON ldi.dilutionId = pel.elementId " +
+      "INNER JOIN Library lib ON ldi.library_libraryId = lib.libraryId " +
+      "INNER JOIN Sample sam ON sam.sampleId = lib.sample_sampleId " +
+      "INNER JOIN Project pro ON pro.projectId = sam.project_projectId " +
+      "WHERE sam.project_projectId = stu.project_projectId AND lib.libraryId = ?";
+
   public static final String STUDY_TYPES_SELECT =
           "SELECT name " +
           "FROM StudyType";
@@ -403,6 +416,10 @@ public class SQLStudyDAO implements StudyStore {
 
   public List<Study> listBySubmissionId(long submissionId) throws IOException {
     return template.query(STUDIES_BY_RELATED_SUBMISSION, new Object[]{submissionId}, new StudyMapper());
+  }
+
+  public List<Study> listByLibraryId(long libraryId) throws IOException {
+    return template.query(STUDIES_BY_RELATED_LIBRARY, new Object[]{libraryId}, new StudyMapper(true));
   }
 
   public Study getByExperimentId(long experimentId) throws IOException {

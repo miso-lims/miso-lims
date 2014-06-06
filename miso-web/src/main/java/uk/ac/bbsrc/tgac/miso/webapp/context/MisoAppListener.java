@@ -260,6 +260,10 @@ public class MisoAppListener implements ServletContextListener {
 
         log.info("\\_ projects...");
         log.info("" + rm.listAllProjects().size());
+        log.info("\\_ studies...");
+        log.info("" + rm.listAllStudies().size());
+        log.info("\\_ experiments...");
+        log.info("" + rm.listAllExperiments().size());
         log.info("\\_ samples...");
         log.info("" + rm.listAllSamples().size());
         log.info("\\_ libraries...");
@@ -271,6 +275,8 @@ public class MisoAppListener implements ServletContextListener {
         log.info("" + rm.listAllPools().size());
         log.info("\\_ plates...");
         log.info("" + rm.listAllPlates().size());
+        log.info("\\_ sequencer partition containers...");
+        log.info("" + rm.listAllSequencerPartitionContainers().size());
         log.info("\\_ runs...");
         log.info("" + rm.listAllRuns().size());
       }

@@ -70,7 +70,7 @@ public abstract class AbstractPool<P extends Poolable> implements Pool<P> {
   private String identificationBarcode;
   private boolean readyToRun = false;
 
-  private Collection<PoolQC> poolQCs = new HashSet<PoolQC>();
+  private Collection<PoolQC> poolQCs = new TreeSet<PoolQC>();
   private Boolean qcPassed;
 
   private Date lastUpdated;

@@ -740,7 +740,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
    */
   private Experiment resolveExperiment(Object element) throws IllegalArgumentException {
     Long id = null;
-    log.info("Resolving experiment: " + element.toString());
+    //log.info("Resolving experiment: " + element.toString());
     if (element instanceof String) {
 //      if (((String)element).startsWith(Experiment.PREFIX)) {
 //        String ident = ((String)element).substring(Experiment.PREFIX.length());
@@ -944,11 +944,11 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
       try {
         if ("LDI".equals(prefix)) {
-          log.debug(prefix + ":" + ident + " -> Dilution");
+          //log.debug(prefix + ":" + ident + " -> Dilution");
           return id != null ? requestManager.getLibraryDilutionById(id) : null;
         }
         else if ("EDI".equals(prefix)) {
-          log.debug(prefix + ":" + ident + " -> Dilution");
+          //log.debug(prefix + ":" + ident + " -> Dilution");
           return id != null ? requestManager.getEmPcrDilutionById(id) : null;
         }
         else {

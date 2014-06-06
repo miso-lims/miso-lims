@@ -1060,6 +1060,7 @@ ul.popup-bullets li {
 
 .breadcrumbs {
     background: #ffffff;
+    margin-bottom: 20px;
 }
 
 .breadcrumbs ul {
@@ -1078,6 +1079,26 @@ ul.popup-bullets li {
     float: left;
     padding-left: 10px;
     font-weight: bold;
+}
+
+.breadcrumbs span a.arrowright {
+    display: block;
+    background-image: url(images/bc_separator.png);
+    background-repeat: no-repeat;
+    background-position: right;
+    padding-right: 15px;
+    color: #454545;
+    height: 16px !important;
+}
+
+.breadcrumbs span a.arrowleft {
+    display: block;
+    background-image: url(images/bc_separator-left.png);
+    background-repeat: no-repeat;
+    background-position: left;
+    padding-left: 15px;
+    color: #454545;
+    height: 16px !important;
 }
 
 .breadcrumbs a {

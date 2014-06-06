@@ -184,6 +184,22 @@ public class SQLPoolDAO implements PoolStore {
       "OR pool.poolId = ple.pool_poolId " +
       "WHERE li.libraryId=?";
 
+  public static final String POOL_SELECT_BY_RELATED_SAMPLE =
+      "SELECT DISTINCT pool.* " +
+      "FROM Sample s " +
+      "INNER JOIN Library li ON li.sample_sampleId = s.sampleId " +
+      "INNER JOIN LibraryDilution ld ON ld.library_libraryId = li.libraryId " +
+
+      "LEFT JOIN emPCR e ON e.dilution_dilutionId = ld.dilutionId " +
+      "LEFT JOIN emPCRDilution ed ON ed.emPCR_pcrId = e.pcrId " +
+
+      "LEFT JOIN Pool_Elements pld ON pld.elementId = ld.dilutionId " +
+      "LEFT JOIN Pool_Elements ple ON ple.elementId = ed.dilutionId " +
+
+      "INNER JOIN " + TABLE_NAME + " pool ON pool.poolId = pld.pool_poolId " +
+      "OR pool.poolId = ple.pool_poolId " +
+      "WHERE s.sampleId=?";
+
   public static final String POOL_ELEMENT_DELETE_BY_POOL_ID =
       "DELETE FROM Pool_Elements " +
       "WHERE pool_poolId=:pool_poolId";
@@ -547,6 +563,10 @@ public class SQLPoolDAO implements PoolStore {
   public Pool<? extends Poolable> getPoolByBarcode(String barcode, PlatformType platformType) throws IOException {
     List<Pool<? extends Poolable>> pools = listAllByPlatformAndSearch(platformType, barcode);
     return pools.size() == 1 ? pools.get(0) : null;
+  }
+
+  public Collection<Pool<? extends Poolable>> listBySampleId(long sampleId) throws IOException {
+    return template.query(POOL_SELECT_BY_RELATED_SAMPLE, new Object[]{sampleId}, new PoolMapper());
   }
 
   public Collection<Pool<? extends Poolable>> listByLibraryId(long libraryId) throws IOException {

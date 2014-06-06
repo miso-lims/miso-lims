@@ -282,15 +282,20 @@ public class LimsUtils {
   }
 
   public static String findHyperlinks(String text) {
-    Pattern p = Pattern.compile("(?i)\\b((?:[a-z][\\w-]+:(?:/{1,3}|[a-z0-9%])|www\\d{0,3}[.]|[a-z0-9.\\-]+[.][a-z]{2,4}/)(?:[^\\s()<>]+|\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\))+(?:\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\)|[^\\s`!()\\[\\]{};:'\".,<>?«»“”‘’]))");
-    Matcher m = p.matcher(text);
+    if (!LimsUtils.isStringEmptyOrNull(text)) {
+      Pattern p = Pattern.compile("(?i)\\b((?:[a-z][\\w-]+:(?:/{1,3}|[a-z0-9%])|www\\d{0,3}[.]|[a-z0-9.\\-]+[.][a-z]{2,4}/)(?:[^\\s()<>]+|\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\))+(?:\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\)|[^\\s`!()\\[\\]{};:'\".,<>?«»“”‘’]))");
+      Matcher m = p.matcher(text);
 
-    StringBuffer sb = new StringBuffer();
-    while (m.find()) {
-      m.appendReplacement(sb, "<a href='$0'>$0</a>");
+      StringBuffer sb = new StringBuffer();
+      while (m.find()) {
+        m.appendReplacement(sb, "<a href='$0'>$0</a>");
+      }
+      m.appendTail(sb);
+      return sb.toString();
     }
-    m.appendTail(sb);
-    return sb.toString();
+    else {
+      return "";
+    }
   }
 
   public static String lookupLocation(String locationBarcode) {

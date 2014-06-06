@@ -83,7 +83,7 @@ public abstract class AbstractRun implements Run {
   @OneToOne(targetEntity = StatusImpl.class, cascade = CascadeType.ALL)
   private Status status;
 
-  private Collection<RunQC> runQCs = new HashSet<RunQC>();
+  private Collection<RunQC> runQCs = new TreeSet<RunQC>();
 
   private Collection<Note> notes = new HashSet<Note>();
 
@@ -125,6 +125,12 @@ public abstract class AbstractRun implements Run {
 
   @Override
   public abstract List<SequencerPartitionContainer<SequencerPoolPartition>> getSequencerPartitionContainers();
+
+  @Override
+  public abstract void setSequencerPartitionContainers(List<SequencerPartitionContainer<SequencerPoolPartition>> containers);
+
+  @Override
+  public abstract void addSequencerPartitionContainer(SequencerPartitionContainer<SequencerPoolPartition> sequencerPartitionContainer);
 
   public PlatformType getPlatformType() {
     return platformType;

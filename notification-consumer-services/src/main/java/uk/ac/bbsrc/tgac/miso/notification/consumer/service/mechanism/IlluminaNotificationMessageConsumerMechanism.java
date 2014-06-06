@@ -31,7 +31,6 @@ import org.springframework.integration.Message;
 import org.springframework.util.Assert;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaStatus;
@@ -40,6 +39,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.mechanism.NotificationMessageConsumerMechanism;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.tools.run.RunFolderConstants;
 
 import java.io.IOException;
@@ -79,7 +79,7 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
     RequestManager requestManager = message.getHeaders().get("handler", RequestManager.class);
     Assert.notNull(requestManager, "Cannot consume MISO notification messages without a RequestManager.");
     Map<String, List<String>> statuses = message.getPayload();
-    Set<Run> output = new HashSet<Run>();
+    Set<Run> output = new HashSet<>();
     for (String key : statuses.keySet()) {
       HealthType ht = HealthType.valueOf(key);
       JSONArray runs = (JSONArray) JSONArray.fromObject(statuses.get(key)).get(0);
@@ -92,8 +92,8 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
   }
 
   private Map<String, Run> processRunJSON(HealthType ht, JSONArray runs, RequestManager requestManager) {
-    Map<String, Run> updatedRuns = new HashMap<String, Run>();
-    List<Run> runsToSave = new ArrayList<Run>();
+    Map<String, Run> updatedRuns = new HashMap<>();
+    List<Run> runsToSave = new ArrayList<>();
     StringBuilder sb = new StringBuilder();
 
     for (JSONObject run : (Iterable<JSONObject>) runs) {
@@ -113,6 +113,13 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
           log.warn("Cannot find run by the alias "+runName+". This usually means the run hasn't been previously imported. If attemptRunPopulation is false, processing will not take place for this run!");
         }
       }
+
+      /*
+      if (run.has("metrix")) {
+        JSONObject metrix = run.getJSONObject("metrix");
+        log.info(metrix.toString());
+      }
+      */
 
       try {
         if (attemptRunPopulation) {
@@ -199,13 +206,23 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
             //always overwrite any previous alias with the correct run alias
             r.setAlias(runName);
             r.setPlatformType(PlatformType.ILLUMINA);
-            r.setDescription(m.group(3));
 
-            if (r.getStatus() != null && run.has("status")) {
+            //update description if empty
+            if (LimsUtils.isStringEmptyOrNull(r.getDescription())) {
+              r.setDescription(m.group(3));
+            }
+
+            if (r.getStatus() != null) {
               if (!r.getStatus().getHealth().equals(HealthType.Failed) && !r.getStatus().getHealth().equals(HealthType.Completed)) {
                 r.getStatus().setHealth(ht);
               }
-              r.getStatus().setXml(run.getString("status"));
+
+              if (run.has("status")) {
+                r.getStatus().setXml(run.getString("status"));
+              }
+              else {
+                log.debug("No new status XML information coming through from notification system...");
+              }
             }
             else {
               if (run.has("status")) {
@@ -286,7 +303,7 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
           }
 
           if (r.getSequencerReference() != null) {
-            Collection<SequencerPartitionContainer<SequencerPoolPartition>> fs = ((RunImpl)r).getSequencerPartitionContainers();
+            Collection<SequencerPartitionContainer<SequencerPoolPartition>> fs = r.getSequencerPartitionContainers();
             if (fs.isEmpty()) {
               if (run.has("containerId") && !"".equals(run.getString("containerId"))) {
                 Collection<SequencerPartitionContainer<SequencerPoolPartition>> pfs = requestManager.listSequencerPartitionContainersByBarcode(run.getString("containerId"));
@@ -299,16 +316,13 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
                     if (lf.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
                       lf.setPlatform(r.getSequencerReference().getPlatform());
                     }
-//                    else {
-//                      lf.setPlatformType(PlatformType.ILLUMINA);
-//                    }
 
                     if (run.has("laneCount") && run.getInt("laneCount") != lf.getPartitions().size()) {
                       log.warn(r.getAlias() + ":: Previously saved flowcell lane count does not match notification-supplied value from RunInfo.xml. Setting new partitionLimit");
                       lf.setPartitionLimit(run.getInt("laneCount"));
                     }
 
-                    ((RunImpl)r).addSequencerPartitionContainer(lf);
+                    r.addSequencerPartitionContainer(lf);
                   }
                   else {
                     //more than one flowcell hit to this barcode
@@ -321,9 +335,6 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
                   if (f.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
                     f.setPlatform(r.getSequencerReference().getPlatform());
                   }
-//                  else {
-//                    f.setPlatformType(PlatformType.ILLUMINA);
-//                  }
 
                   if (run.has("laneCount")) {
                     f.setPartitionLimit(run.getInt("laneCount"));
@@ -336,7 +347,7 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
 
                   f.initEmptyPartitions();
                   f.setIdentificationBarcode(run.getString("containerId"));
-                  ((RunImpl)r).addSequencerPartitionContainer(f);
+                  r.addSequencerPartitionContainer(f);
                 }
               }
             }
@@ -346,12 +357,8 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
               if (f.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
                 f.setPlatform(r.getSequencerReference().getPlatform());
               }
-//              else {
-//                f.setPlatformType(PlatformType.ILLUMINA);
-//              }
 
               if (f.getPartitions().isEmpty()) {
-                //log.info("No partitions found for run " + r.getName() + " (container "+f.getContainerId()+")");
                 if (run.has("laneCount")) {
                   f.setPartitionLimit(run.getInt("laneCount"));
                 }

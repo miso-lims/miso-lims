@@ -527,14 +527,18 @@
                           ${partition.pool.name}
                         (${partition.pool.creationDate})
                       </a><br/>
-                      <span style="font-size:8pt">
+                      <span style="font-size:8pt" id='partition_span_${partitionCount.index}'>
                         <c:choose>
                           <c:when test="${not empty partition.pool.experiments}">
-                            <i><c:forEach items="${partition.pool.experiments}"
-                                          var="experiment">
+                            <i><c:forEach items="${partition.pool.experiments}" var="experiment">
                               ${experiment.study.project.alias} (${experiment.name}: ${fn:length(partition.pool.dilutions)} dilutions)<br/>
                             </c:forEach>
                             </i>
+                            <script>
+                              jQuery(document).ready(function () {
+                                Run.container.checkPoolExperiment('#partition_span_${partitionCount.index}', ${partition.pool.id}, ${partitionCount.index});
+                              });
+                            </script>
                             <input type="hidden"
                                    name="sequencerPartitionContainers[${containerCount.index}].partitions[${partitionCount.index}].pool"
                                    id="pId${partitionCount.index}"
@@ -645,17 +649,21 @@
       maxCount: ${maxLengths['description']},
       countDirection: 'down'
     });
+
     <c:choose>
     <c:when test="${not empty run.platformType}">
-    Run.pool.poolSearch("", '${run.platformType.key}');
+      Run.pool.poolSearch("", '${run.platformType.key}');
+      <c:if test="${run.id != 0}">
+        Stats.checkRunProgress('${run.alias}', '${run.platformType.key}');
+      </c:if>
     </c:when>
     <c:otherwise>
-    Run.pool.poolSearch("", jQuery('input[name=platformType]:checked').val());
+      Run.pool.poolSearch("", jQuery('input[name=platformType]:checked').val());
     </c:otherwise>
     </c:choose>
 
     <c:if test="${statsAvailable}">
-    Stats.getRunStats(${run.id});
+      Stats.getRunStats(${run.id});
     </c:if>
   });
 

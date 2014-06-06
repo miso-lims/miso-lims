@@ -83,7 +83,16 @@ public interface StudyStore extends Store<Study>, Cascadable, Remover<Study>, Na
    * @throws IOException when
    */
   Collection<Study> listBySubmissionId(long submissionId) throws IOException;
-  
+
+  /**
+   * List all Studies that are carried out as part of a related Library given a Library ID
+   *
+   * @param libraryId of type long
+   * @return Collection<Study>
+   * @throws IOException when
+   */
+  Collection<Study> listByLibraryId(long libraryId) throws IOException;
+
   /**
    * List all StudyTypes
    *

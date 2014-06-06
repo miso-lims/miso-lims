@@ -84,6 +84,31 @@ public class NotificationRequestManager {
     this.dataPaths = dataPaths;
   }
 
+  public String queryRunProgress(JSONObject request) throws IllegalStateException, IllegalArgumentException {
+    File folder = lookupRunAliasPath(request);
+    if (folder != null) {
+      String platformType = request.getString("platform").toLowerCase();
+      Map<String, String> status = parseRunFolder(platformType, folder);
+      if (status.isEmpty()) {
+        return "{'response':'No runs found with alias "+request.getString("run")+"'}";
+      }
+
+      for (String s : status.keySet()) {
+        if (!"".equals(status.get(s))) {
+          JSONArray runs = JSONArray.fromObject(status.get(s));
+          if (!runs.isEmpty()) {
+            return "{'progress':'"+s+"'}";
+          }
+        }
+        else {
+          return "{'response':'No runs found with status "+s+" with alias "+request.getString("run")+"'}";
+        }
+      }
+    }
+
+    return "";
+  }
+
   public String queryRunStatus(JSONObject request) throws IllegalStateException, IllegalArgumentException {
     File folder = lookupRunAliasPath(request);
     if (folder != null) {
@@ -161,16 +186,14 @@ public class NotificationRequestManager {
           if (!runs.isEmpty()) {
             JSONObject run = runs.getJSONObject(0);
             if (run.has("metrix")) {
-              String response = run.getString("metrix");
-              log.debug("queryInterOpMetrics: " + response);
-              return response;
+              return run.getString("metrix");
             }
           }
         }
       }
     }
     else {
-      return "{\"error\":\"Cannot find run folder \""+request.getString("run")+"}";
+      return "{\"error\":\"Cannot find run folder "+request.getString("run")+"\"}";
     }
 
     return "";

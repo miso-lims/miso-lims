@@ -45,6 +45,7 @@ var Reports = Reports || {
       }
     );
   },
+
   generateProjectRunLaneFlexReport: function () {
     Utils.ui.disableButton('generateProjectRunLaneFlexReportButton');
     jQuery('#generateProjectRunLaneFlexReportFormHeader').html('<img src=\"/styles/images/ajax-loader.gif\"/>');
@@ -63,6 +64,7 @@ var Reports = Reports || {
       }
     );
   },
+
   generateSampleRelationReport: function () {
     Utils.ui.disableButton('generateSampleRelationReportButton');
     jQuery('#generateProjectRunLaneFlexReportFormHeader').html('<img src=\"/styles/images/ajax-loader.gif\"/>');
@@ -103,8 +105,6 @@ var Reports = Reports || {
         }
         Reports.ui.createSampleOverviewRelationTable(json.overviewRelationTable);
         Reports.ui.createSampleResultTable(json.reportTable);
-        Reports.ui.createLibraryRelationQCTable(json.relationQCTable);
-
       }
       }
     );
@@ -132,6 +132,7 @@ var Reports = Reports || {
         }
         Reports.ui.createLibraryOverviewRelationTable(json.overviewRelationTable);
         Reports.ui.createLibraryResultTable(json.reportTable);
+        Reports.ui.createLibraryRelationQCTable(json.relationQCTable);
       }
       }
     );
@@ -211,11 +212,17 @@ Reports.ui = {
       {"doOnSuccess": function (json) {
         jQuery('#generateProjectsFlexReportButton').fadeIn();
         jQuery('#generateProjectsFlexReportForm').fadeIn();
-        jQuery('#projectStatusChart').html('');
+
+        jQuery('#projectOverviewFlexReportTable').css("visibility", "hidden");
         jQuery('#projectOverviewCell').html('');
+        jQuery('#projectStatusChart').html('');
+
+        jQuery('#projectsFlexReport').css("visibility", "hidden");
         jQuery('#projectsFlexReport').html('');
+
+        jQuery('#projectsDetailReport').css("visibility", "hidden");
         jQuery('#projectsDetailReport').html('');
-        //self.createProjectFormTable(json.html);
+
         jQuery('#projectProgress').html(json.progress);
         Utils.ui.reenableButton('resetProjectsFlexReportButton', 'Reset');
         self.prepareTable();
@@ -234,10 +241,16 @@ Reports.ui = {
       {"doOnSuccess": function (json) {
         jQuery('#generateSamplesFlexReportButton').fadeIn();
         jQuery('#generateSamplesFlexReportForm').fadeIn();
+
+        jQuery('#sampleOverviewFlexReportTable').css("visibility", "hidden");
         jQuery('#sampleStatusChart').html('');
         jQuery('#sampleOverviewCell').html('');
+        jQuery('#sampleTypesChart').html('');
+        jQuery('#sampleQcChart').html('');
+
+        jQuery('#samplesFlexReport').css("visibility", "hidden");
         jQuery('#samplesFlexReport').html('');
-        //self.createSampleFormTable(json.html);
+
         jQuery('#sampleType').html(json.type);
         Utils.ui.reenableButton('resetSamplesFlexReportButton', 'Reset');
         self.prepareTable();
@@ -256,10 +269,19 @@ Reports.ui = {
       {"doOnSuccess": function (json) {
         jQuery('#generateLibrariesFlexReportButton').fadeIn();
         jQuery('#generateLibrariesFlexReportForm').fadeIn();
-        jQuery('#libraryStatusChart').html('');
+
+        jQuery('#libraryOverviewFlexReportTable').css("visibility", "hidden");
         jQuery('#libraryOverviewCell').html('');
+        jQuery('#libraryStatusChart').html('');
+        jQuery('#libraryPlatformChart').html('');
+        jQuery('#libraryQcChart').html('');
+
+        jQuery('#librariesFlexReport').css("visibility", "hidden");
         jQuery('#librariesFlexReport').html('');
-        //self.createLibraryFormTable(json.html);
+
+        jQuery('#librariesRelationQC').css("visibility", "hidden");
+        jQuery('#librariesRelationQC').html('');
+
         jQuery('#libraryPlatform').html(json.platform);
         Utils.ui.reenableButton('resetLibrariesFlexReportButton', 'Reset');
         self.prepareTable();
@@ -278,10 +300,18 @@ Reports.ui = {
       {"doOnSuccess": function (json) {
         jQuery('#generateRunsFlexReportButton').fadeIn();
         jQuery('#generateRunsFlexReportForm').fadeIn();
-        jQuery('#runStatusChart').html('');
+
+        jQuery('#runOverviewFlexReportTable').css("visibility", "hidden");
         jQuery('#runOverviewCell').html('');
+        jQuery('#runStatusChart').html('');
+        jQuery('#runPlatformChart').html('');
+
+        jQuery('#runsFlexReport').css("visibility", "hidden");
         jQuery('#runsFlexReport').html('');
-        //self.createRunFormTable(json.html);
+
+        jQuery('#runsPartitionReport').css("visibility", "hidden");
+        jQuery('#runsPartitionReport').html('');
+
         jQuery('#runPlatform').html(json.platform);
         jQuery('#runStatus').html(json.status);
         Utils.ui.reenableButton('resetRunsFlexReportButton', 'Reset');
@@ -396,6 +426,7 @@ Reports.ui = {
   },
 
   createProjectOverviewTable: function (array) {
+    jQuery('#projectOverviewFlexReportTable').css("visibility", "visible");
     jQuery('#projectOverviewCell').html('<table cellpadding="0" cellspacing="0" border="0" class="display" id="projectOverviewTable"></table>');
     jQuery('#projectOverviewTable').dataTable({
       "aaData": array,
@@ -408,6 +439,7 @@ Reports.ui = {
   },
 
   createProjectResultTable: function (array) {
+    jQuery('#projectsFlexReport').css("visibility", "visible");
     jQuery('#projectsFlexReport').html('<table cellpadding="0" cellspacing="0" border="0" class="display" id="projectsFlexReportTable"></table>');
     jQuery('#projectsFlexReportTable').dataTable({
       "aaData": array,
@@ -425,6 +457,7 @@ Reports.ui = {
   },
 
   createProjectDetailTable: function (array) {
+    jQuery('#projectsDetailReport').css("visibility", "visible");
     jQuery('#projectsDetailReport').html('<table cellpadding="0" cellspacing="0" border="0" class="display" id="projectsDetailReportTable"></table>');
     jQuery('#projectsDetailReportTable').dataTable({
       "aaData": array,
@@ -439,7 +472,7 @@ Reports.ui = {
       "aaSorting": [
         [0, "asc"]
       ],
-      "sDom": 'T<"clear">lfrtip',
+      "sDom": '<"H"lTf>r<t<"F"ip>',
       "bJQueryUI": true,
       "oTableTools": {
         "sSwfPath": "/scripts/jquery/datatables/swf/copy_csv_xls_pdf.swf"
@@ -448,6 +481,7 @@ Reports.ui = {
   },
 
   createProjectRunLaneResultTable: function (array) {
+    jQuery('#projectRunLaneFlexReport').css("visibility", "visible");
     jQuery('#projectRunLaneFlexReport').html('<table cellpadding="0" cellspacing="0" border="0" class="display" id="projectRunLaneFlexReportTable"></table>');
     jQuery('#projectRunLaneFlexReportTable').dataTable({
       "aaData": array,
@@ -463,7 +497,9 @@ Reports.ui = {
       "bJQueryUI": true
     });
   },
+
   createSampleRelationReportResultTable: function (array) {
+    jQuery('#projectRunLaneFlexReport').css("visibility", "visible");
     jQuery('#projectRunLaneFlexReport').html('<table cellpadding="0" cellspacing="0" border="0" class="display" id="projectRunLaneFlexReportTable"></table>');
     jQuery('#projectRunLaneFlexReportTable').dataTable({
       "aaData": array,
@@ -478,7 +514,7 @@ Reports.ui = {
         { "sTitle": "Run Alias", "sType": "natural"},
         { "sTitle": "Lane"}
       ],
-      "sDom": 'T<"clear">lfrtip',
+      "sDom": '<"H"lTf>r<t<"F"ip>',
       "bJQueryUI": true,
       "oTableTools": {
         "sSwfPath": "/scripts/jquery/datatables/swf/copy_csv_xls_pdf.swf"
@@ -487,6 +523,7 @@ Reports.ui = {
   },
 
   createSampleOverviewRelationTable: function (array) {
+    jQuery('#sampleOverviewFlexReportTable').css("visibility", "visible");
     jQuery('#sampleOverviewCell').append('<table cellpadding="0" cellspacing="0" border="0" class="display" id="sampleOverviewRelationTable"></table>');
     jQuery('#sampleOverviewRelationTable').dataTable({
       "aaData": array,
@@ -506,6 +543,7 @@ Reports.ui = {
   },
 
   createSampleOverviewTable: function (array) {
+    jQuery('#sampleOverviewFlexReportTable').css("visibility", "visible");
     jQuery('#sampleOverviewCell').append('<br/><br/><table cellpadding="0" cellspacing="0" border="0" class="display" id="sampleOverviewTable"></table>');
     jQuery('#sampleOverviewTable').dataTable({
       "aaData": array,
@@ -518,6 +556,7 @@ Reports.ui = {
   },
 
   createSampleResultTable: function (array) {
+    jQuery('#samplesFlexReport').css("visibility", "visible");
     jQuery('#samplesFlexReport').html('<table cellpadding="0" cellspacing="0" border="0" class="display" id="samplesFlexReportTable"></table>');
     jQuery('#samplesFlexReportTable').dataTable({
       "aaData": array,
@@ -536,6 +575,7 @@ Reports.ui = {
   },
 
   createLibraryOverviewRelationTable: function (array) {
+    jQuery('#libraryOverviewFlexReportTable').css("visibility", "visible");
     jQuery('#libraryOverviewCell').append('<table cellpadding="0" cellspacing="0" border="0" class="display" id="libraryOverviewRelationTable"></table>');
     jQuery('#libraryOverviewRelationTable').dataTable({
       "aaData": array,
@@ -550,7 +590,9 @@ Reports.ui = {
       "bSort": false
     });
   },
+
   createLibraryRelationQCTable: function (array) {
+    jQuery('#librariesRelationQC').css("visibility", "visible");
     jQuery('#librariesRelationQC').html('<table cellpadding="0" cellspacing="0" border="0" class="display" id="librariesRelationQCTable"></table>');
     jQuery('#librariesRelationQCTable').dataTable({
       "aaData": array,
@@ -569,8 +611,7 @@ Reports.ui = {
       "aaSorting": [
         [0, "desc"]
       ],
-      "bJQueryUI": true,
-      "sDom": 'T<"clear">lfrtip',
+      "sDom": '<"H"lTf>r<t<"F"ip>',
       "bJQueryUI": true,
       "oTableTools": {
         "sSwfPath": "/scripts/jquery/datatables/swf/copy_csv_xls_pdf.swf"
@@ -579,6 +620,7 @@ Reports.ui = {
   },
 
   createLibraryOverviewTable: function (array) {
+    jQuery('#libraryOverviewFlexReportTable').css("visibility", "visible");
     jQuery('#libraryOverviewCell').append('<br/><br/><table cellpadding="0" cellspacing="0" border="0" class="display" id="libraryOverviewTable"></table>');
     jQuery('#libraryOverviewTable').dataTable({
       "aaData": array,
@@ -591,6 +633,7 @@ Reports.ui = {
   },
 
   createLibraryResultTable: function (array) {
+    jQuery('#librariesFlexReport').css("visibility", "visible");
     jQuery('#librariesFlexReport').html('<table cellpadding="0" cellspacing="0" border="0" class="display" id="librariesFlexReportTable"></table>');
     jQuery('#librariesFlexReportTable').dataTable({
       "aaData": array,
@@ -610,6 +653,7 @@ Reports.ui = {
   },
 
   createRunOverviewTable: function (array) {
+    jQuery('#runOverviewFlexReportTable').css("visibility", "visible");
     jQuery('#runOverviewCell').html('<table cellpadding="0" cellspacing="0" border="0" class="display" id="runOverviewTable"></table>');
     jQuery('#runOverviewTable').dataTable({
       "aaData": array,
@@ -622,6 +666,7 @@ Reports.ui = {
   },
 
   createRunResultTable: function (array) {
+    jQuery('#runsFlexReport').css("visibility", "visible");
     jQuery('#runsFlexReport').html('<table cellpadding="0" cellspacing="0" border="0" class="display" id="runsFlexReportTable"></table>');
     jQuery('#runsFlexReportTable').dataTable({
       "aaData": array,
@@ -639,6 +684,7 @@ Reports.ui = {
   },
 
   createRunsPartitionReport: function (array) {
+    jQuery('#runsPartitionReport').css("visibility", "visible");
     jQuery('#runsPartitionReport').html('<table cellpadding="0" cellspacing="0" border="0" class="display" id="runsPartitionReportTable"></table>');
     jQuery('#runsPartitionReportTable').dataTable({
       "aaData": array,
@@ -655,7 +701,7 @@ Reports.ui = {
       "aaSorting": [
         [0, "desc"]
       ],
-      "sDom": 'T<"clear">lfrtip',
+      "sDom": '<"H"lTf>r<t<"F"ip>',
       "bJQueryUI": true,
       "oTableTools": {
         "sSwfPath": "/scripts/jquery/datatables/swf/copy_csv_xls_pdf.swf"
@@ -666,27 +712,27 @@ Reports.ui = {
   getSequencersList: function () {
     var self = this;
     Fluxion.doAjax(
-            'sequencerReferenceControllerHelperService',
-            'listSequencers',
-            {'url': ajaxurl},
-            {'doOnSuccess': function (json) {
-              var list = "<select id='sequencers' name='sequencers' onchange='Reports.ui.updateCalendar();'> <option value=0> All </option>;"
+      'sequencerReferenceControllerHelperService',
+      'listSequencers',
+      {'url': ajaxurl},
+      {'doOnSuccess': function (json) {
+        var list = "<select id='sequencers' name='sequencers' onchange='Reports.ui.updateCalendar();'> <option value=0> All </option>;"
 
-              for (var i = 0; i < json.sequencers.length; i++) {
-                list += "<option value=" + json.sequencers[i].id + ">" + json.sequencers[i].name_model + " - " + json.sequencers[i].name + "</option>"
-              }
+        for (var i = 0; i < json.sequencers.length; i++) {
+          list += "<option value=" + json.sequencers[i].id + ">" + json.sequencers[i].name_model + " - " + json.sequencers[i].name + "</option>"
+        }
 
-              list += "</select>";
-              jQuery('#sequencerslist').html("<b> Sequencer Machines: </b>" + list);
-              self.generateColors();
+        list += "</select>";
+        jQuery('#sequencerslist').html("<b> Sequencer Machines: </b>" + list);
+        self.generateColors();
 
-              init(jQuery('#datepicking').val(), jQuery('#sequencers').val(), self.findMaxValue(jQuery('#sequencers')));
-              addRestrictedDatePicker("calendarfrom");
-              addRestrictedDatePicker("calendarto");
+        init(jQuery('#datepicking').val(), jQuery('#sequencers').val(), self.findMaxValue(jQuery('#sequencers')));
+        addRestrictedDatePicker("calendarfrom");
+        addRestrictedDatePicker("calendarto");
 
-              self.updateCalendar();
-            }
-            }
+        self.updateCalendar();
+      }
+      }
     );
   },
 
@@ -836,6 +882,7 @@ Reports.chart = {
           return data[i].label;
         });
   },
+
   plotHighChartsPieChart: function (data, div, title) {
     var chart = new Highcharts.Chart({
       chart: {
@@ -893,6 +940,7 @@ Reports.search = {
       }
     );
   },
+
   searchProjectRunLane: function () {
     Utils.ui.disableButton('searchProjectRunLane');
     jQuery('#projectRunLaneResultTable').html('<img src=\"/styles/images/ajax-loader.gif\"/>');

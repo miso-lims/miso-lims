@@ -58,7 +58,7 @@ public abstract class AbstractSample implements Sample {
 
   private Collection<Library> libraries = new HashSet<Library>();
 
-  private Collection<SampleQC> sampleQCs = new HashSet<SampleQC>();
+  private Collection<SampleQC> sampleQCs = new TreeSet<SampleQC>();
 
   private Collection<Note> notes = new HashSet<Note>();
 

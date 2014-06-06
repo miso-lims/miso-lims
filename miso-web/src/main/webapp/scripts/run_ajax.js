@@ -475,6 +475,21 @@ Run.container = {
     });
   },
 
+  checkPoolExperiment: function(t, poolId, partitionNum) {
+    Fluxion.doAjax(
+      'runControllerHelperService',
+      'checkPoolExperiment',
+      {'poolId': poolId, 'partition': partitionNum, 'url': ajaxurl},
+      {'doOnSuccess': function (json) {
+        jQuery(t).append(json.html);
+      },
+        'doOnError': function (json) {
+          alert("Error populating partition: " + json.error);
+        }
+      }
+    );
+  },
+
   selectStudy: function (partition, poolId, projectId) {
     Utils.ui.disableButton('studySelectButton-' + partition + '_' + poolId);
     var studyId = jQuery("select[name='poolStudies" + partition + "_" + projectId + "'] :selected").val();

@@ -28,16 +28,18 @@
   Time: 15:09:06
 --%>
 <%@ include file="../header.jsp" %>
-<script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.breadcrumbs.popup.js'/>"></script>
+<script src="<c:url value='/scripts/jquery/js/jquery.breadcrumbs.popup.js'/>" type="text/javascript"></script>
 
 <script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.mini.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.datepicker.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.checkbox.js'/>" type="text/javascript"></script>
-<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" type="text/css">
+<link href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" rel="stylesheet" type="text/css">
 
 <script src="<c:url value='/scripts/datatables_utils.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/natural_sort.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
+
+<script src="<c:url value='/scripts/stats_ajax.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
 
 <div id="maincontent">
 <div id="contentcolumn">
@@ -80,6 +82,16 @@
         </div>
       </li>
     </ul>
+    <c:if test="${not empty nextSample}">
+      <span style="float:right; padding-top: 5px; padding-left: 6px">
+        <a class='arrowright' href='<c:url value="/miso/sample/${nextSample.id}"/>'>Next Sample <b>${nextSample.name}</b></a>
+      </span>
+    </c:if>
+    <c:if test="${not empty previousSample}">
+      <span style="float:right; padding-top: 5px">
+        <a class='arrowleft' href='<c:url value="/miso/sample/${previousSample.id}"/>'>Previous Sample <b>${previousSample.name}</b></a>
+      </span>
+    </c:if>
   </div>
 </c:if>
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
@@ -479,7 +491,166 @@
       });
     });
   </script>
-  <br/>
+
+  <c:if test="${not empty samplePools}">
+    <br/>
+    <h1>${fn:length(samplePools)} Pools</h1>
+    <ul class="sddm">
+      <li>
+        <a onmouseover="mopen('poolsmenu')" onmouseout="mclosetime()">Options
+          <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
+        </a>
+
+        <div id="poolsmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
+        <a href="javascript:void(0);" onclick="Pool.barcode.selectPoolBarcodesToPrint('#pools_table');">Print Barcodes ...</a>
+        </div>
+      </li>
+    </ul>
+
+    <span style="clear:both">
+      <table class="list" id="pools_table">
+        <thead>
+        <tr>
+          <th>Pool Name</th>
+          <th>Pool Alias</th>
+          <th>Pool Platform</th>
+          <th>Pool Creation Date</th>
+          <th>Pool Concentration</th>
+          <th class="fit">Edit</th>
+          <sec:authorize access="hasRole('ROLE_ADMIN')">
+            <th class="fit">DELETE</th>
+          </sec:authorize>
+        </tr>
+        </thead>
+        <tbody>
+        <c:forEach items="${samplePools}" var="pool">
+          <tr poolId="${pool.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
+            <td><b>${pool.name}</b></td>
+            <td>${pool.alias}</td>
+            <td>${pool.platformType.key}</td>
+            <td>${pool.creationDate}</td>
+            <td>${pool.concentration}</td>
+              <%-- <td class="misoicon" onclick="window.location.href='<c:url value="/miso/pool/${fn:toLowerCase(pool.platformType.key)}/${pool.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td> --%>
+            <td class="misoicon" onclick="window.location.href='<c:url value="/miso/pool/${pool.id}"/>'">
+              <span class="ui-icon ui-icon-pencil"/>
+            </td>
+            <sec:authorize access="hasRole('ROLE_ADMIN')">
+              <td class="misoicon" onclick="Pool.deletePool(${pool.id}, Utils.page.pageReload);">
+                <span class="ui-icon ui-icon-trash"/>
+              </td>
+            </sec:authorize>
+          </tr>
+        </c:forEach>
+        </tbody>
+      </table>
+      <script type="text/javascript">
+        jQuery(document).ready(function () {
+          jQuery('#pools_table').dataTable({
+            "aaSorting": [
+              [1, 'asc'],
+              [3, 'asc']
+            ],
+            "aoColumns": [
+              null,
+              { "sType": 'natural' },
+              null,
+              null,
+              null,
+              null
+              <sec:authorize access="hasRole('ROLE_ADMIN')">, null</sec:authorize>
+            ],
+            "iDisplayLength": 50,
+            "bJQueryUI": true,
+            "bRetrieve": true
+          });
+        });
+      </script>
+    </span>
+  </c:if>
+
+  <c:if test="${not empty sampleRuns}">
+    <br/>
+    <h1>${fn:length(sampleRuns)} Runs</h1>
+
+    <table class="list" id="run_table">
+      <thead>
+      <tr>
+        <th>Run Name</th>
+        <th>Run Alias</th>
+        <th>Partitions</th>
+        <th class="fit">Edit</th>
+        <sec:authorize access="hasRole('ROLE_ADMIN')">
+          <th class="fit">DELETE</th>
+        </sec:authorize>
+      </tr>
+      </thead>
+      <tbody>
+      <c:forEach items="${sampleRuns}" var="run" varStatus="runCount">
+        <tr runId="${run.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
+          <td><b>${run.name}</b></td>
+          <td>${run.alias}</td>
+          <td>
+            <c:forEach items="${run.sequencerPartitionContainers}" var="container" varStatus="fCount">
+              <table class="containerSummary">
+                <tr>
+                  <c:forEach items="${container.partitions}" var="partition">
+                    <td id="partition${runCount.count}_${fCount.count}_${partition.partitionNumber}"
+                        class="smallbox">${partition.partitionNumber}</td>
+                    <c:if test="${not empty poolSampleMap[partition.pool.id]}">
+                      <script type="text/javascript">
+                        jQuery(document).ready(function () {
+                          jQuery('#partition${runCount.count}_${fCount.count}_${partition.partitionNumber}').addClass("partitionOccupied");
+                          jQuery('#partition${runCount.count}_${fCount.count}_${partition.partitionNumber}').prop("title", "${partition.pool.name}");
+                          <c:if test="${metrixEnabled}">
+                            jQuery('#partition${runCount.count}_${fCount.count}_${partition.partitionNumber}').click(function() {
+                              //TODO open colorbox with SAV style plots in
+                              Stats.getInterOpMetricsForLane('${run.alias}', '${partition.pool.platformType}', '${partition.partitionNumber}');
+                            });
+                          </c:if>
+                        });
+                      </script>
+                    </c:if>
+                  </c:forEach>
+                </tr>
+              </table>
+              <c:if test="${fn:length(run.sequencerPartitionContainers) > 1}">
+                <br/>
+              </c:if>
+            </c:forEach>
+          </td>
+          <td class="misoicon" onclick="window.location.href='<c:url value="/miso/run/${run.id}"/>'">
+            <span class="ui-icon ui-icon-pencil"/>
+          </td>
+          <sec:authorize access="hasRole('ROLE_ADMIN')">
+            <td class="misoicon" onclick="Run.deleteRun(${run.id}, Utils.page.pageReload);">
+              <span class="ui-icon ui-icon-trash"/>
+            </td>
+          </sec:authorize>
+        </tr>
+      </c:forEach>
+      </tbody>
+    </table>
+    <script type="text/javascript">
+      jQuery(document).ready(function () {
+        jQuery('#run_table').dataTable({
+          "aaSorting": [
+            [0, 'asc'],
+            [1, 'asc']
+          ],
+          "aoColumns": [
+            null,
+            null,
+            null,
+            null
+            <sec:authorize access="hasRole('ROLE_ADMIN')">, null</sec:authorize>
+          ],
+          "iDisplayLength": 50,
+          "bJQueryUI": true,
+          "bRetrieve": true
+        });
+      });
+    </script>
+  </c:if>
 </c:if>
 
 <c:if test="${sample.id == 0 and not empty sample.project}">

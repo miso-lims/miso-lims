@@ -81,10 +81,12 @@ public class RunImpl extends AbstractRun implements Serializable {
     return containers;
   }
 
+  @Override
   public void setSequencerPartitionContainers(List<SequencerPartitionContainer<SequencerPoolPartition>> containers) {
     this.containers = containers;
   }
 
+  @Override
   public void addSequencerPartitionContainer(SequencerPartitionContainer<SequencerPoolPartition> f) {
     f.setSecurityProfile(getSecurityProfile());
     if (f.getId() == 0L && f.getIdentificationBarcode() == null) {

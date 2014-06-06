@@ -339,7 +339,6 @@ public class EditRunController {
   @RequestMapping(method = RequestMethod.POST)
   public String processSubmit(@ModelAttribute("run") Run run,
                               ModelMap model, SessionStatus session) throws IOException, MalformedRunException {
-    log.info("POSTING " + run.getName() + ":" + run.getStatus().getHealth().name());
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       if (!run.userCanWrite(user)) {

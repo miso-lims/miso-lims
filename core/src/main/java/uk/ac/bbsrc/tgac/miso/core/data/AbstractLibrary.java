@@ -66,7 +66,7 @@ public abstract class AbstractLibrary implements Library {
 
   private Boolean paired;
 
-  private Collection<LibraryQC> libraryQCs = new HashSet<LibraryQC>();
+  private Collection<LibraryQC> libraryQCs = new TreeSet<LibraryQC>();
   private Collection<LibraryDilution> libraryDilutions = new HashSet<LibraryDilution>();
   private Set<Plate<? extends LinkedList<Library>, Library>> plates = new HashSet<Plate<? extends LinkedList<Library>, Library>>();
 

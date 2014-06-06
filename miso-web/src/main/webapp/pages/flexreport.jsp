@@ -26,13 +26,15 @@
 <script src="<c:url value='/scripts/datatables_utils.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/natural_sort.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
+
 <script src="<c:url value='/scripts/jquery/datatables/js/TableTools.js'/>" type="text/javascript"></script>
+<link href="<c:url value='/scripts/jquery/datatables/css/dataTables.tableTools.css'/>" rel="stylesheet" type="text/css">
+
 <script src="<c:url value='/scripts/jquery/datatables/js/ZeroClipboard.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.datepicker.js'/>" type="text/javascript"></script>
-<script type="text/javascript" src="<c:url value='/scripts/runCalendar.js?ts=${timestamp.time}'/>"></script>
-<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" type="text/css">
-<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables_themeroller.css'/>"
-      type="text/css">
+<script src="<c:url value='/scripts/runCalendar.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
+<link href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" rel="stylesheet" type="text/css">
+<link href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables_themeroller.css'/>" rel="stylesheet" type="text/css">
 
 <div id="tabs">
 <ul>
@@ -92,26 +94,25 @@
   </fieldset>
 
   <form name="generateProjectsFlexReportForm" id="generateProjectsFlexReportForm">
-    <div id="projectsResultTable">Please search for projects to be reported...</div>
+    <div id="projectsResultTable"><i>Please search for projects to be reported...</i></div>
   </form>
 
   <br/>
-  <hr/>
-  <table width="100%" border="0">
+  <table width="100%" border="0" id="projectOverviewFlexReportTable" style='visibility: hidden'>
     <tr>
-      <td valign="top" width="50%" id="projectOverviewCell" class="ui-widget ui-widget-content  ui-corner-all">
+      <td valign="top" width="50%" id="projectOverviewCell" class="ui-widget ui-widget-content ui-corner-all">
       </td>
       <td align="center" width="50%">
         <div id="projectStatusChartWrapper">
-          <div id="projectStatusChart" class="ui-widget ui-widget-content  ui-corner-all"></div>
+          <div id="projectStatusChart" class="ui-widget ui-widget-content ui-corner-all"></div>
         </div>
       </td>
     </tr>
   </table>
   <br/>
 
-  <div id="projectsFlexReport" class="ui-widget ui-widget-content  ui-corner-all"></div>
-  <div id="projectsDetailReport" class="ui-widget ui-widget-content  ui-corner-all"></div>
+  <div id="projectsFlexReport" class="ui-widget ui-widget-content ui-corner-all" style='visibility: hidden'></div>
+  <div id="projectsDetailReport" class="ui-widget ui-widget-content ui-corner-all" style='visibility: hidden'></div>
 </div>
 
 <div id="tabProjectRunLane">
@@ -153,18 +154,10 @@
   </fieldset>
 
   <form name="generateProjectsFlexReportForm" id="generateProjectRunLaneFlexReportForm">
-    <div id="projectRunLaneResultTable">Please search for projects to be reported...</div>
+    <div id="projectRunLaneResultTable"><i>Please search for projects to be reported...</i></div>
   </form>
 
-  <br/>
-  <hr/>
-  <div width="100%" class="ui-widget ui-widget-content  ui-corner-all">
-    <div id="projectRunLaneCell">
-    </div>
-  </div>
-  <br/>
-
-  <div id="projectRunLaneFlexReport" class="ui-widget ui-widget-content  ui-corner-all"></div>
+  <div id='projectRunLaneFlexReport' class='ui-widget ui-widget-content ui-corner-all' style='visibility: hidden'></div>
 </div>
 
 <div id="tabSamples">
@@ -227,21 +220,21 @@
   </fieldset>
 
   <form name="generateSamplesFlexReportForm" id="generateSamplesFlexReportForm" method="POST">
-    <div id="samplesResultTable">Please search for samples to be reported...</div>
+    <div id="samplesResultTable"><i>Please search for samples to be reported...</i></div>
   </form>
 
   <br/>
-  <hr/>
-  <table width="100%" border="0">
+
+  <table width="100%" border="0" id='sampleOverviewFlexReportTable' style='visibility: hidden'>
     <tr>
       <td valign="top" width="50%" id="sampleOverviewCell" class="ui-widget ui-widget-content  ui-corner-all">
       </td>
       <td align="center" width="50%">
         <div class="ui-widget ui-widget-content  ui-corner-all">
-          <div id="sampleTypesChartWarpper">
+          <div id="sampleTypesChartWrapper">
             <div id="sampleTypesChart"></div>
           </div>
-          <div id="sampleQcChartWarpper">
+          <div id="sampleQcChartWrapper">
             <div id="sampleQcChart"></div>
           </div>
         </div>
@@ -250,7 +243,7 @@
   </table>
   <br/>
 
-  <div id="samplesFlexReport" class="ui-widget ui-widget-content  ui-corner-all"></div>
+  <div id="samplesFlexReport" class="ui-widget ui-widget-content  ui-corner-all" style='visibility: hidden'></div>
 </div>
 
 <div id="tabLibraries">
@@ -313,22 +306,21 @@
   </fieldset>
 
   <form name="generateLibrariesFlexReportForm" id="generateLibrariesFlexReportForm" method="POST">
-    <div id="librariesResultTable">Please search for libraries to be reported...</div>
+    <div id="librariesResultTable"><i>Please search for libraries to be reported...</i></div>
   </form>
 
   <br/>
-  <hr/>
-  <table width="100%" border="0">
+  <table width="100%" border="0" id='libraryOverviewFlexReportTable' style='visibility: hidden'>
     <tr>
       <td valign="top" width="50%" id="libraryOverviewCell" class="ui-widget ui-widget-content  ui-corner-all">
       </td>
       <td align="center" width="50%">
 
         <div class="ui-widget ui-widget-content  ui-corner-all">
-          <div id="libraryPlatformChartWarpper">
+          <div id="libraryPlatformChartWrapper">
             <div id="libraryPlatformChart"></div>
           </div>
-          <div id="libraryQcChartWarpper">
+          <div id="libraryQcChartWrapper">
             <div id="libraryQcChart"></div>
           </div>
         </div>
@@ -337,8 +329,8 @@
   </table>
   <br/>
 
-  <div id="librariesFlexReport" class="ui-widget ui-widget-content  ui-corner-all"></div>
-  <div id="librariesRelationQC" class="ui-widget ui-widget-content  ui-corner-all"></div>
+  <div id="librariesFlexReport" class="ui-widget ui-widget-content  ui-corner-all" style='visibility: hidden'></div>
+  <div id="librariesRelationQC" class="ui-widget ui-widget-content  ui-corner-all" style='visibility: hidden'></div>
 </div>
 
 <div id="tabRuns">
@@ -409,12 +401,11 @@
     </table>
   </fieldset>
   <form name="generateRunsFlexReportForm" id="generateRunsFlexReportForm" method="POST">
-    <div id="runsResultTable">Please search for runs to be reported...</div>
+    <div id="runsResultTable"><i>Please search for runs to be reported...</i></div>
   </form>
 
   <br/>
-  <hr/>
-  <table width="100%" border="0">
+  <table width="100%" border="0" id="runOverviewFlexReportTable" style='visibility: hidden'>
     <tr>
       <td valign="top" width="50%" id="runOverviewCell" class="ui-widget ui-widget-content  ui-corner-all">
       </td>
@@ -425,7 +416,7 @@
           <div id="runStatusChartWrapper">
             <div id="runStatusChart"></div>
           </div>
-          <div id="runPlatformChartWarpper">
+          <div id="runPlatformChartWrapper">
             <div id="runPlatformChart"></div>
           </div>
         </div>
@@ -434,8 +425,8 @@
   </table>
   <br/>
 
-  <div id="runsFlexReport" class="ui-widget ui-widget-content  ui-corner-all"></div>
-  <div id="runsPartitionReport" class="ui-widget ui-widget-content  ui-corner-all"></div>
+  <div id="runsFlexReport" class="ui-widget ui-widget-content  ui-corner-all" style='visibility: hidden'></div>
+  <div id="runsPartitionReport" class="ui-widget ui-widget-content  ui-corner-all" style='visibility: hidden'></div>
 </div>
 
 <div style="height:1000px;" id="tabResource">

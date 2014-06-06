@@ -1276,6 +1276,19 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
+  public List<Pool<? extends Poolable>> listPoolsBySampleId(long sampleId) throws IOException {
+    User user = getCurrentUser();
+    ArrayList<Pool<? extends Poolable>> accessibles = new ArrayList<Pool<? extends Poolable>>();
+    for (Pool<? extends Poolable> pool : super.listPoolsBySampleId(sampleId)) {
+      if (pool.userCanRead(user)) {
+        accessibles.add(pool);
+      }
+    }
+    Collections.sort(accessibles);
+    return accessibles;
+  }
+
+  @Override
   public List<PoolQC> listAllPoolQCsByPoolId(long poolId) throws IOException {
     User user = getCurrentUser();
     ArrayList<PoolQC> accessibles = new ArrayList<PoolQC>();
@@ -1377,6 +1390,18 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
     User user = getCurrentUser();
     Collection<Study> accessibles = new HashSet<Study>();
     for (Study study : super.listAllStudiesByProjectId(projectId)) {
+      if (study.userCanRead(user)) {
+        accessibles.add(study);
+      }
+    }
+    return accessibles;
+  }
+
+  @Override
+  public Collection<Study> listAllStudiesByLibraryId(long libraryId) throws IOException {
+    User user = getCurrentUser();
+    Collection<Study> accessibles = new HashSet<Study>();
+    for (Study study : super.listAllStudiesByLibraryId(libraryId)) {
       if (study.userCanRead(user)) {
         accessibles.add(study);
       }
