@@ -463,6 +463,29 @@ public class SampleControllerHelperService {
     return JSONUtils.SimpleJSONResponse("Note saved successfully");
   }
 
+  public JSONObject deleteSampleNote(HttpSession session, JSONObject json) {
+    Long sampleId = json.getLong("sampleId");
+    Long noteId = json.getLong("noteId");
+
+    try {
+      Sample sample = requestManager.getSampleById(sampleId);
+      Note note = requestManager.getNoteById(noteId);
+      if (sample.getNotes().contains(note)) {
+        sample.getNotes().remove(note);
+        requestManager.deleteNote(note);
+        requestManager.saveSample(sample);
+        return JSONUtils.SimpleJSONResponse("OK");
+      }
+      else {
+        return JSONUtils.SimpleJSONError("Sample does not have note " + noteId + ". Cannot remove");
+      }
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+      return JSONUtils.SimpleJSONError("Cannot remove note: " + e.getMessage());
+    }
+  }
+
   public JSONObject getSampleByBarcode(HttpSession session, JSONObject json) {
     JSONObject response = new JSONObject();
     String barcode = json.getString("barcode");

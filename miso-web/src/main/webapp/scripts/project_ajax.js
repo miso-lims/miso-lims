@@ -797,6 +797,17 @@ Project.overview = {
     );
   },
 
+  deleteProjectOverviewNote: function (overviewId, noteId) {
+    if (confirm("Are you sure you want to delete this note?")) {
+      Fluxion.doAjax(
+        'projectControllerHelperService',
+        'deleteProjectOverviewNote',
+        {'overviewId': overviewId, 'noteId': noteId, 'url': ajaxurl},
+        {'doOnSuccess': Utils.page.pageReload}
+      );
+    }
+  },
+
   addSampleGroupTable: function (projectId, overviewId) {
     var tableDiv = "#sampleGroupTableDiv"+overviewId;
     var tableId = "#sampleGroupTable"+overviewId;

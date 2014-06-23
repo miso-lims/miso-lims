@@ -114,13 +114,6 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
         }
       }
 
-      /*
-      if (run.has("metrix")) {
-        JSONObject metrix = run.getJSONObject("metrix");
-        log.info(metrix.toString());
-      }
-      */
-
       try {
         if (attemptRunPopulation) {
           if (r == null) {

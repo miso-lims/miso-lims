@@ -215,7 +215,13 @@
               <div class="exppreview" id="plate-notes-${n.count}">
                 <b>${note.creationDate}</b>: ${note.text}
                 <span class="float-right"
-                      style="font-weight:bold; color:#C0C0C0;">${note.owner.loginName}</span>
+                      style="font-weight:bold; color:#C0C0C0;">${note.owner.loginName}
+                  <c:if test="${(project.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
+                                or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+                  <span style="color:#000000"><a href='#' onclick="Plate.ui.deletePlateNote('${plate.id}', '${note.noteId}');">
+                  <span class="ui-icon ui-icon-trash" style="clear: both; position: relative; float: right; margin-top: -15px;"/></a></span>
+                  </c:if>
+                </span>
               </div>
             </c:forEach>
           </div>

@@ -114,12 +114,6 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
             String runName = rootFile.getName();
 
             if (!finishedCache.keySet().contains(runName)) {
-              MetrixContainer mc = new MetrixContainer(rootFile.getAbsolutePath());
-              JSONObject allOut = new MetrixContainerDecorator(mc).toJSON();
-              //log.info(allOut.toString());
-
-              run.put("metrix", allOut);
-
               run.put("runName", runName);
               run.put("fullPath", rootFile.getCanonicalPath()); //follow symlinks!
 
@@ -133,10 +127,6 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
 
                   Document runInfoDoc = SubmissionUtils.emptyDocument();
                   SubmissionUtils.transform(runInfo, runInfoDoc);
-
-                  //runName = statusDoc.getElementsByTagName("RunName").item(0).getTextContent();
-                  //run.put("runName", runName);
-                  //run.put("sequencerName", statusDoc.getElementsByTagName("InstrumentName").item(0).getTextContent());
 
                   int numReads = runInfoDoc.getElementsByTagName("Read").getLength();
                   int numCycles = 0;
@@ -178,10 +168,6 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                       }
                     }
                   }
-
-                  //int imgCycle = new Integer(statusDoc.getElementsByTagName("ImgCycle").item(0).getTextContent());
-                  //int scoreCycle = new Integer(statusDoc.getElementsByTagName("ScoreCycle").item(0).getTextContent());
-                  //int callCycle = new Integer(statusDoc.getElementsByTagName("CallCycle").item(0).getTextContent());
 
                   run.put("numCycles", numCycles);
 
@@ -610,6 +596,14 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
             }
             else {
               log.info("Run already scanned. Getting cached version " + runName);
+
+              //if a completed run has been moved (e.g. archived), update the new path
+              JSONObject json = JSONObject.fromObject(finishedCache.get(runName));
+              if (json.has("fullPath") && !rootFile.getCanonicalPath().equals(json.getString("fullPath"))) {
+                log.info("Cached path changed. Updating " + runName);
+                json.put("fullPath", rootFile.getCanonicalPath());
+                finishedCache.put(runName, json.toString());
+              }
               map.get("Completed").add(finishedCache.get(runName));
             }
           }
@@ -812,6 +806,75 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
       }
     }
     return failed;
+  }
+
+  private JSONObject parseInterOp(File rootFile) throws IOException {
+    MetrixContainer mc = new MetrixContainer(rootFile.getAbsolutePath());
+    return new MetrixContainerDecorator(mc).toJSON();
+  }
+
+  public JSONArray transformInterOpOnly(Set<File> files) {
+    log.info("Processing InterOp files for " + files.size() + " Illumina run directories...");
+    int count = 0;
+
+    JSONArray map = new JSONArray();
+    for (File rootFile : files) {
+      count++;
+      String countStr = "[#" + count + "/" + files.size() + "] ";
+      log.info("Processing " + countStr + rootFile.getName());
+
+      JSONObject run = new JSONObject();
+      if (rootFile.isDirectory()) {
+        if (rootFile.canRead()) {
+          try {
+            String runName = rootFile.getName();
+            if (!finishedCache.keySet().contains(runName)) {
+              //parse interop if completed cache doesn't hold this run
+              JSONObject metrix = parseInterOp(rootFile);
+              if (metrix != null) {
+                run.put("metrix", metrix);
+              }
+              else {
+                run.put("error", "Cannot provide metrics - parsing failed.");
+              }
+              run.put("runName", runName);
+              map.add(run);
+            }
+            else {
+              JSONObject cachedRun = JSONObject.fromObject(finishedCache.get(runName));
+              if (!cachedRun.has("metrix")) {
+                JSONObject metrix = parseInterOp(rootFile);
+                if (metrix != null) {
+                  run.put("metrix", metrix);
+                  cachedRun.put("metrix", metrix);
+                  finishedCache.put(runName, cachedRun.toString());
+                }
+                else {
+                  run.put("error", "Cannot provide metrics - parsing failed.");
+                }
+              }
+              else {
+                run.put("metrix", cachedRun.get("metrix"));
+              }
+              run.put("runName", runName);
+              map.add(run);
+            }
+          }
+          catch (IOException e) {
+            log.error("Error with file IO: " + e.getMessage());
+            e.printStackTrace();
+          }
+        }
+        else {
+          log.error(rootFile.getName() + " :: Permission denied");
+          run.put("runName", rootFile.getName());
+          run.put("error", "Cannot read into run directory. Permission denied.");
+          map.add(run);
+        }
+      }
+    }
+
+    return map;
   }
 
   public byte[] transformToJson(Set<File> files) {

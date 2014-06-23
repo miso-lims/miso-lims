@@ -514,6 +514,17 @@ Sample.ui = {
     );
   },
 
+  deleteSampleNote: function (sampleId, noteId) {
+    if (confirm("Are you sure you want to delete this note?")) {
+      Fluxion.doAjax(
+        'sampleControllerHelperService',
+        'deleteSampleNote',
+        {'sampleId': sampleId, 'noteId': noteId, 'url': ajaxurl},
+        {'doOnSuccess': Utils.page.pageReload}
+      );
+    }
+  },
+
   receiveSample: function (input) {
     var barcode = jQuery(input).val();
     if (!Utils.validation.isNullCheck(barcode)) {

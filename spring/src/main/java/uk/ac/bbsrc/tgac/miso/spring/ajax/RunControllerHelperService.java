@@ -1046,6 +1046,30 @@ public class RunControllerHelperService {
     return JSONUtils.SimpleJSONResponse("Note saved successfully");
   }
 
+  public JSONObject deleteRunNote(HttpSession session, JSONObject json) {
+    Long runId = json.getLong("runId");
+    Long noteId = json.getLong("noteId");
+
+    try {
+      Run run = requestManager.getRunById(runId);
+      Note note = requestManager.getNoteById(noteId);
+      if (run.getNotes().contains(note)) {
+        run.getNotes().remove(note);
+        requestManager.deleteNote(note);
+        requestManager.saveRun(run);
+        return JSONUtils.SimpleJSONResponse("OK");
+      }
+      else {
+        return JSONUtils.SimpleJSONError("Sample does not have note " + noteId + ". Cannot remove");
+      }
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+      return JSONUtils.SimpleJSONError("Cannot remove note: " + e.getMessage());
+    }
+  }
+
+
   public JSONObject watchRun(HttpSession session, JSONObject json) {
     Long runId = json.getLong("runId");
     try {

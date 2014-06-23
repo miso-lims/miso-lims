@@ -798,6 +798,17 @@ Library.ui = {
     );
   },
 
+  deleteLibraryNote: function (libraryId, noteId) {
+    if (confirm("Are you sure you want to delete this note?")) {
+      Fluxion.doAjax(
+        'libraryControllerHelperService',
+        'deleteLibraryNote',
+        {'libraryId': libraryId, 'noteId': noteId, 'url': ajaxurl},
+        {'doOnSuccess': Utils.page.pageReload}
+      );
+    }
+  },
+
   createListingLibrariesTable: function () {
     jQuery('#listingLibrariesTable').html("<img src='../styles/images/ajax-loader.gif'/>");
     jQuery.fn.dataTableExt.oSort['no-lib-asc'] = function (x, y) {

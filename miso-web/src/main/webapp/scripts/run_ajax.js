@@ -310,6 +310,17 @@ Run.ui = {
         'doOnSuccess': Utils.page.pageReload
       }
     );
+  },
+
+  deleteRunNote: function (runId, noteId) {
+    if (confirm("Are you sure you want to delete this note?")) {
+      Fluxion.doAjax(
+        'runControllerHelperService',
+        'deleteRunNote',
+        {'runId': runId, 'noteId': noteId, 'url': ajaxurl},
+        {'doOnSuccess': Utils.page.pageReload}
+      );
+    }
   }
 };
 

@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.sqlstore;
 
 import com.eaglegenomics.simlims.core.Note;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
@@ -41,7 +42,9 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
+import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
+import javax.persistence.CascadeType;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -95,6 +98,9 @@ public class SQLNoteDAO implements NoteStore {
           "FROM "+TABLE_NAME+" n, Run_Note rn " +
           "WHERE n.noteId=rn.notes_noteId " +
           "AND rn.run_runId=?";
+
+  public static final String NOTE_DELETE =
+      "DELETE FROM " + TABLE_NAME + " WHERE noteId=:noteId";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLNoteDAO.class);
   private SecurityStore securityDAO;
@@ -232,6 +238,12 @@ public class SQLNoteDAO implements NoteStore {
       //ignore
     }
     return note.getNoteId();
+  }
+
+  @Override
+  public boolean remove(Note note) throws IOException {
+    NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+    return (namedTemplate.update(NOTE_DELETE, new MapSqlParameterSource().addValue("noteId", note.getNoteId())) == 1);
   }
 
   public Note get(long noteId) throws IOException {

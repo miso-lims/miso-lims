@@ -156,6 +156,29 @@ public class ProjectControllerHelperService {
     return JSONUtils.SimpleJSONResponse("ok");
   }
 
+  public JSONObject deleteProjectOverviewNote(HttpSession session, JSONObject json) {
+    Long overviewId = json.getLong("overviewId");
+    Long noteId = json.getLong("noteId");
+
+    try {
+      ProjectOverview po = requestManager.getProjectOverviewById(overviewId);
+      Note note = requestManager.getNoteById(noteId);
+      if (po.getNotes().contains(note)) {
+        po.getNotes().remove(note);
+        requestManager.deleteNote(note);
+        requestManager.saveProjectOverview(po);
+        return JSONUtils.SimpleJSONResponse("OK");
+      }
+      else {
+        return JSONUtils.SimpleJSONError("Project Overview does not have note " + noteId + ". Cannot remove");
+      }
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+      return JSONUtils.SimpleJSONError("Cannot remove note: " + e.getMessage());
+    }
+  }
+
   public JSONObject unlockProjectOverview(HttpSession session, JSONObject json) {
     Long overviewId = json.getLong("overviewId");
     try {

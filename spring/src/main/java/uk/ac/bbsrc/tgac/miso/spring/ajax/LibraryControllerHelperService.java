@@ -157,6 +157,29 @@ public class LibraryControllerHelperService {
     return JSONUtils.SimpleJSONResponse("Note saved successfully");
   }
 
+  public JSONObject deleteLibraryNote(HttpSession session, JSONObject json) {
+    Long libraryId = json.getLong("libraryId");
+    Long noteId = json.getLong("noteId");
+
+    try {
+      Library library = requestManager.getLibraryById(libraryId);
+      Note note = requestManager.getNoteById(noteId);
+      if (library.getNotes().contains(note)) {
+        library.getNotes().remove(note);
+        requestManager.deleteNote(note);
+        requestManager.saveLibrary(library);
+        return JSONUtils.SimpleJSONResponse("OK");
+      }
+      else {
+        return JSONUtils.SimpleJSONError("Library does not have note " + noteId + ". Cannot remove");
+      }
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+      return JSONUtils.SimpleJSONError("Cannot remove note: " + e.getMessage());
+    }
+  }
+
   public JSONObject getLibraryBarcode(HttpSession session, JSONObject json) {
     Long libraryId = json.getLong("libraryId");
     File temploc = new File(session.getServletContext().getRealPath("/")+"temp/");
