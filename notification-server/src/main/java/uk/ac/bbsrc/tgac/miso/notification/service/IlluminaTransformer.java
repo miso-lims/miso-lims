@@ -118,7 +118,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
               run.put("fullPath", rootFile.getCanonicalPath()); //follow symlinks!
 
               if (!oldStatusFile.exists() && !newStatusFile.exists()) {
-                //probably MiSeq
+                //probably MiSeq/NextSeq
                 File otherRunParameters = new File(rootFile, "/runParameters.xml");
                 Boolean lastCycleLogFileExists = false;
                 File lastCycleLogFile = null;

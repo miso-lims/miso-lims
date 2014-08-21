@@ -200,7 +200,8 @@ public class ContainerControllerHelperService {
 
     try {
       SequencerReference sr = requestManager.getSequencerReferenceById(seqRefId);
-      if ("Illumina MiSeq".equals(sr.getPlatform().getInstrumentModel())) {
+      String instrumentModel = sr.getPlatform().getInstrumentModel();
+      if ("Illumina MiSeq".equals(instrumentModel) || "Illumina NextSeq 500".equals(instrumentModel)) {
         b.append("<i class='italicInfo'>Click in a partition box to beep/type in barcodes, or double click a pool on the right to sequentially add pools to the container</i>");
         b.append("<table class='in'>");
         b.append("<th>Lane No.</th>");

@@ -235,8 +235,8 @@ public class RunControllerHelperService {
     StringBuilder b = new StringBuilder();
     IlluminaRun run = (IlluminaRun) session.getAttribute("run_" + json.getString("run_cId"));
     run.getSequencerPartitionContainers().clear();
-
-    if ("Illumina MiSeq".equals(run.getSequencerReference().getPlatform().getInstrumentModel())) {
+    String instrumentModel = run.getSequencerReference().getPlatform().getInstrumentModel();
+    if ("Illumina MiSeq".equals(instrumentModel) || "Illumina NextSeq 500".equals(instrumentModel)) {
       b.append("<h2>Container 1</h2>");
       b.append("<table class='in'>");
       b.append("<tr><td>ID:</td><td><button onclick='Run.container.lookupContainer(this, 0);' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'><input type='text' id='sequencerPartitionContainers[0].identificationBarcode' name='sequencerPartitionContainers[0].identificationBarcode'/></div></td></tr>");
