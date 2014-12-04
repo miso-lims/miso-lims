@@ -26,18 +26,18 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
+import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.RunProcessingUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.jackson.ContainerRecursionAvoidanceMixin;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -70,15 +70,16 @@ public class RunRestController {
   }
 
   @RequestMapping(value = "{runId}", method = RequestMethod.GET)
-  public @ResponseBody Run jsonRest(@PathVariable Long runId) throws IOException {
-    return requestManager.getRunById(runId);
+  public @ResponseBody String jsonRest(@PathVariable Long runId) throws IOException {
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.getSerializationConfig().addMixInAnnotations(SequencerPartitionContainer.class, ContainerRecursionAvoidanceMixin.class);
+    return mapper.writeValueAsString(requestManager.getRunById(runId));
   }
 
   @RequestMapping(value = "{runAlias}/samplesheet", method = RequestMethod.GET)
   public @ResponseBody String getSampleSheetForRun(@PathVariable String runAlias) throws IOException {
     Run r = requestManager.getRunByAlias(runAlias);
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-
     if (r != null) {
       Collection<SequencerPartitionContainer<SequencerPoolPartition>> conts = ((RunImpl)r).getSequencerPartitionContainers();
       if (!conts.isEmpty() && conts.size() == 1) {
