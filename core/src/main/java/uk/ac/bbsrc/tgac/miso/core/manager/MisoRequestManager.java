@@ -1535,6 +1535,18 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
+  public void deleteNote(Note note) throws IOException {
+    if (noteStore != null) {
+      if (!noteStore.remove(note)) {
+        throw new IOException("Unable to delete note.");
+      }
+    }
+    else {
+      throw new IOException("No noteStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
   public void deletePartition(SequencerPoolPartition partition) throws IOException {
     if (partitionStore != null) {
       if (!partitionStore.remove(partition)) {

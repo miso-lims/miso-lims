@@ -324,4 +324,5 @@ public interface RequestManager {
   public void deleteEntityGroup(EntityGroup<? extends Nameable, ? extends Nameable> entityGroup) throws IOException;
   public void deletePartition(SequencerPoolPartition partition) throws IOException;
   public void deleteContainer(SequencerPartitionContainer container) throws IOException;
+  public void deleteNote(Note note) throws IOException;
 }

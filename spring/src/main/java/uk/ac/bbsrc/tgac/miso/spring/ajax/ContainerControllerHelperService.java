@@ -200,7 +200,8 @@ public class ContainerControllerHelperService {
 
     try {
       SequencerReference sr = requestManager.getSequencerReferenceById(seqRefId);
-      if ("Illumina MiSeq".equals(sr.getPlatform().getInstrumentModel())) {
+      String instrumentModel = sr.getPlatform().getInstrumentModel();
+      if ("Illumina MiSeq".equals(instrumentModel) || "Illumina NextSeq 500".equals(instrumentModel)) {
         b.append("<i class='italicInfo'>Click in a partition box to beep/type in barcodes, or double click a pool on the right to sequentially add pools to the container</i>");
         b.append("<table class='in'>");
         b.append("<th>Lane No.</th>");
@@ -586,7 +587,7 @@ public class ContainerControllerHelperService {
           }
         }
         sb.append("</select>");
-        sb.append("<input id='studySelectButton-" + partition + "_" + p.getId() + "' type='button' onclick=\"Run.container.selectStudy('" + partition + "', " + p.getId() + "," + project.getProjectId() + ");\" class=\"ui-state-default ui-corner-all\" value='Select Study'/>");
+        sb.append("<input id='studySelectButton-" + partition + "_" + p.getId() + "' type='button' onclick=\"Container.partition.selectContainerStudy('" + partition + "', " + p.getId() + "," + project.getProjectId() + ");\" class=\"ui-state-default ui-corner-all\" value='Select Study'/>");
         sb.append("</div><br/>");
       }
       sb.append("</div>");

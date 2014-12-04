@@ -134,4 +134,13 @@ public interface NoteStore extends Store<Note> {
    * @throws IOException when
    */
   long saveRunNote(Run run, Note note) throws IOException;
+
+  /**
+   * Remove note
+   *
+   * @param note Note
+   * @return boolean true if removed successfully
+   * @throws java.io.IOException when the object cannot be removed
+   */
+  public boolean remove(Note note) throws IOException;
 }

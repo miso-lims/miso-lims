@@ -114,13 +114,6 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
         }
       }
 
-      /*
-      if (run.has("metrix")) {
-        JSONObject metrix = run.getJSONObject("metrix");
-        log.info(metrix.toString());
-      }
-      */
-
       try {
         if (attemptRunPopulation) {
           if (r == null) {
@@ -363,7 +356,8 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
                   f.setPartitionLimit(run.getInt("laneCount"));
                 }
                 else {
-                  if (r.getSequencerReference().getPlatform().getInstrumentModel().contains("MiSeq")) {
+                  String instrumentModel = r.getSequencerReference().getPlatform().getInstrumentModel();
+                  if (instrumentModel.contains("MiSeq") || instrumentModel.contains("NextSeq")) {
                     f.setPartitionLimit(1);
                   }
                 }
@@ -373,7 +367,7 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
                 //log.info("Got "+f.getPartitions().size()+" partitions for run " + r.getName() + " (container "+f.getContainerId()+")");
                 if (r.getSequencerReference().getPlatform().getInstrumentModel().contains("MiSeq")) {
                   if (f.getPartitions().size() != 1) {
-                    log.warn(f.getName()+":: WARNING - number of partitions found ("+f.getPartitions().size()+") doesn't match usual number of MiSeq partitions (1)");
+                    log.warn(f.getName()+":: WARNING - number of partitions found ("+f.getPartitions().size()+") doesn't match usual number of MiSeq/NextSeq partitions (1)");
                   }
                 }
                 else if (r.getSequencerReference().getPlatform().getInstrumentModel().contains("2500")) {

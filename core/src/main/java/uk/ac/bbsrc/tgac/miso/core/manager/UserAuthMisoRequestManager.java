@@ -1636,4 +1636,11 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
       super.deletePartition(partition);
     }
   }
+
+  @Override
+  public void deleteNote(Note note) throws IOException {
+    if (getCurrentUser().isAdmin() || getCurrentUser().equals(note.getOwner())) {
+      super.deleteNote(note);
+    }
+  }
 }
