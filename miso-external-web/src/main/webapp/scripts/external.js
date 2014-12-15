@@ -4,7 +4,7 @@ var globalshapassword = null;
 function login(form) {
   Utils.ui.disableButton('login_button');
   var sendusername = jQuery('#username').val();
-  var sendshapassword = ldapPasswordHash(jQuery('#password').val());
+  var sendshapassword = jdbcPasswordHash(jQuery('#password').val());
   Fluxion.doAjax(
           'externalSectionControllerHelperService',
           'loginDisplayProjects',
@@ -101,4 +101,8 @@ function createListingRunsTable(runArray) {
 
 function ldapPasswordHash(password){
   return "{SHA}"+CryptoJS.SHA1(password).toString(CryptoJS.enc.Base64);
+}
+
+function jdbcPasswordHash(password){
+  return CryptoJS.SHA1(password);
 }
