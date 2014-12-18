@@ -141,6 +141,22 @@ public class ImportExportControllerHelperService {
     }
   }
 
+  public JSONObject generateCSVBAC(HttpSession session, JSONObject json) {
+    try {
+      JSONArray a = JSONArray.fromObject(json.getString("form"));
+      File f = misoFileManager.getNewFile(
+          Plate.class,
+          "csv",
+          "Illumina-Nextera-6x-384-barcode-" + LimsUtils.getCurrentDateAsString(new SimpleDateFormat("yyyyMMdd-hhmmss")) + ".csv");
+      FormUtils.generateCSVBAC(f, a);
+      return JSONUtils.SimpleJSONResponse("" + f.getName().hashCode());
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+      return JSONUtils.SimpleJSONError("Failed to get plate input form: " + e.getMessage());
+    }
+  }
+
   public JSONObject exportLibraryPoolForm(HttpSession session, JSONObject json) {
     try {
       String barcodekit = json.getString("barcodekit");
@@ -305,102 +321,107 @@ public class ImportExportControllerHelperService {
 
           //sample OK - good to go
           if (s != null) {
+            String proceedKey = jsonArrayElement.getString(14);
+
             Library library = new LibraryImpl();
-            library.setSample(s);
-            library.setAlias(jsonArrayElement.getString(3));
-            library.setSecurityProfile(s.getSecurityProfile());
-            library.setDescription(jsonArrayElement.getString(4));
-            library.setCreationDate(new Date());
-            library.setPlatformName(pt.getKey());
-            library.setLibraryType(lt);
-            library.setLibrarySelectionType(ls);
-            library.setLibraryStrategyType(lst);
-            library.setPaired(paired);
 
-
-            int insertSize = 0;
-            try {
-              String bp = jsonArrayElement.getString(6);
-              Matcher m = digitPattern.matcher(bp);
-              if (m.matches()) {
-                insertSize = Integer.valueOf(m.group(1));
-              }
-              else {
-                throw new InputFormException("Supplied Library insert size for library '" + jsonArrayElement.getString(3) + "' (" + s.getAlias() + ") is invalid");
-              }
+            if ("A".equals(proceedKey) || "L".equals(proceedKey)) {
+              library.setAlias(jsonArrayElement.getString(3));
             }
-            catch (NumberFormatException nfe) {
-              throw new InputFormException("Supplied Library insert size for library '" + jsonArrayElement.getString(3) + "' (" + s.getAlias() + ") is invalid", nfe);
+            else if ("U".equals(proceedKey) || "P".equals(proceedKey)) {
+              library = requestManager.getLibraryByAlias(jsonArrayElement.getString(3));
             }
 
-            log.info("Added library: " + library.toString());
-            requestManager.saveLibrary(library);
+            if ("A".equals(proceedKey) || "L".equals(proceedKey) || "U".equals(proceedKey)) {
 
-            if (jsonArrayElement.getString(5) != null && !"".equals(jsonArrayElement.getString(5))) {
+              library.setSample(s);
+              library.setSecurityProfile(s.getSecurityProfile());
+              library.setDescription(jsonArrayElement.getString(4));
+              library.setCreationDate(new Date());
+              library.setPlatformName(pt.getKey());
+              library.setLibraryType(lt);
+              library.setLibrarySelectionType(ls);
+              library.setLibraryStrategyType(lst);
+              library.setPaired(paired);
+
+              int insertSize = 0;
               try {
-                LibraryQC lqc = new LibraryQCImpl();
-                lqc.setLibrary(library);
-                lqc.setInsertSize(insertSize);
-                lqc.setResults(Double.valueOf(jsonArrayElement.getString(5)));
-                lqc.setQcCreator(user.getLoginName());
-                lqc.setQcDate(new Date());
-                lqc.setQcType(requestManager.getLibraryQcTypeByName("Qubit"));
-
-                if (!library.getLibraryQCs().contains(lqc)) {
-                  library.addQc(lqc);
-                  requestManager.saveLibraryQC(lqc);
-                  log.info("Added library QC: " + lqc.toString());
-                }
-
-                if (insertSize == 0 && lqc.getResults() == 0) {
-                  library.setQcPassed(false);
+                String bp = jsonArrayElement.getString(6);
+                Matcher m = digitPattern.matcher(bp);
+                if (m.matches()) {
+                  insertSize = Integer.valueOf(m.group(1));
                 }
                 else {
-                  if (jsonArrayElement.getString(8) != null && !"".equals(jsonArrayElement.getString(8))) {
-                    library.setQcPassed(Boolean.parseBoolean(jsonArrayElement.getString(8)));
-                  }
+                  throw new InputFormException("Supplied Library insert size for library '" + jsonArrayElement.getString(3) + "' (" + s.getAlias() + ") is invalid");
                 }
               }
               catch (NumberFormatException nfe) {
-                throw new InputFormException("Supplied Library QC concentration for library '" + jsonArrayElement.getString(3) + "' (" + s.getAlias() + ") is invalid", nfe);
+                throw new InputFormException("Supplied Library insert size for library '" + jsonArrayElement.getString(3) + "' (" + s.getAlias() + ") is invalid", nfe);
               }
-            }
 
-            if (jsonArrayElement.getString(7) != null && !"".equals(jsonArrayElement.getString(7))) {
-              try {
-                LibraryQC lqc = new LibraryQCImpl();
-                lqc.setLibrary(library);
-                lqc.setInsertSize(insertSize);
-                lqc.setResults(Double.valueOf(jsonArrayElement.getString(7)));
-                lqc.setQcCreator(user.getLoginName());
-                lqc.setQcDate(new Date());
-                lqc.setQcType(requestManager.getLibraryQcTypeByName("Bioanalyzer"));
-                if (!library.getLibraryQCs().contains(lqc)) {
-                  library.addQc(lqc);
-                  requestManager.saveLibraryQC(lqc);
-                  log.info("Added library QC: " + lqc.toString());
-                }
+              log.info("Added library: " + library.toString());
+              requestManager.saveLibrary(library);
+              if (jsonArrayElement.getString(5) != null && !"".equals(jsonArrayElement.getString(5))) {
+                try {
+                  LibraryQC lqc = new LibraryQCImpl();
+                  lqc.setLibrary(library);
+                  lqc.setInsertSize(insertSize);
+                  lqc.setResults(Double.valueOf(jsonArrayElement.getString(5)));
+                  lqc.setQcCreator(user.getLoginName());
+                  lqc.setQcDate(new Date());
+                  lqc.setQcType(requestManager.getLibraryQcTypeByName("Qubit"));
 
-                if (insertSize == 0 && lqc.getResults() == 0) {
-                  library.setQcPassed(false);
-                }
-                else {
-                  if (jsonArrayElement.getString(8) != null && !"".equals(jsonArrayElement.getString(8))) {
-                    library.setQcPassed(Boolean.parseBoolean(jsonArrayElement.getString(8)));
+                  if (!library.getLibraryQCs().contains(lqc)) {
+                    library.addQc(lqc);
+                    requestManager.saveLibraryQC(lqc);
+                    log.info("Added library QC: " + lqc.toString());
+                  }
+
+                  if (insertSize == 0 && lqc.getResults() == 0) {
+                    library.setQcPassed(false);
+                  }
+                  else {
+                    if (jsonArrayElement.getString(8) != null && !"".equals(jsonArrayElement.getString(8))) {
+                      library.setQcPassed(Boolean.parseBoolean(jsonArrayElement.getString(8)));
+                    }
                   }
                 }
+                catch (NumberFormatException nfe) {
+                  throw new InputFormException("Supplied Library QC concentration for library '" + jsonArrayElement.getString(3) + "' (" + s.getAlias() + ") is invalid", nfe);
+                }
               }
-              catch (NumberFormatException nfe) {
-                throw new InputFormException("Supplied Library QC concentration for library '" + jsonArrayElement.getString(3) + "' (" + s.getAlias() + ") is invalid", nfe);
+
+              if (jsonArrayElement.getString(7) != null && !"".equals(jsonArrayElement.getString(7))) {
+                try {
+                  LibraryQC lqc = new LibraryQCImpl();
+                  lqc.setLibrary(library);
+                  lqc.setInsertSize(insertSize);
+                  lqc.setResults(Double.valueOf(jsonArrayElement.getString(7)));
+                  lqc.setQcCreator(user.getLoginName());
+                  lqc.setQcDate(new Date());
+                  lqc.setQcType(requestManager.getLibraryQcTypeByName("Bioanalyzer"));
+                  if (!library.getLibraryQCs().contains(lqc)) {
+                    library.addQc(lqc);
+                    requestManager.saveLibraryQC(lqc);
+                    log.info("Added library QC: " + lqc.toString());
+                  }
+
+                  if (insertSize == 0 && lqc.getResults() == 0) {
+                    library.setQcPassed(false);
+                  }
+                  else {
+                    if (jsonArrayElement.getString(8) != null && !"".equals(jsonArrayElement.getString(8))) {
+                      library.setQcPassed(Boolean.parseBoolean(jsonArrayElement.getString(8)));
+                    }
+                  }
+                }
+                catch (NumberFormatException nfe) {
+                  throw new InputFormException("Supplied Library QC concentration for library '" + jsonArrayElement.getString(3) + "' (" + s.getAlias() + ") is invalid", nfe);
+                }
               }
-            }
 
-            log.info("Added library: " + library.toString());
-            requestManager.saveLibrary(library);
 
-            if (library.getQcPassed() || library.getQcPassed() == null) {
-
-              if (jsonArrayElement.getString(9) != null && !"".equals(jsonArrayElement.getString(9))) {
+              if (jsonArrayElement.getString(9) != null && !"".equals(jsonArrayElement.getString(9)) && (library.getQcPassed() || library.getQcPassed() == null) ) {
                 Collection<TagBarcode> bcs = requestManager.listAllTagBarcodesByStrategyName(jsonArrayElement.getString(9));
                 if (!bcs.isEmpty()) {
                   String tags = jsonArrayElement.getString(10);
@@ -440,6 +461,13 @@ public class ImportExportControllerHelperService {
                   throw new InputFormException("No tag barcodes associated with the kit definition '" + jsonArrayElement.getString(9) + "' library '" + jsonArrayElement.getString(3) + "'.");
                 }
               }
+
+              log.info("Added library: " + library.toString());
+              requestManager.saveLibrary(library);
+            }
+
+            if ((library.getQcPassed() || library.getQcPassed() == null) && ("A".equals(proceedKey) || "P".equals(proceedKey))) {
+
 
 
               LibraryDilution ldi = new LibraryDilution();
@@ -510,11 +538,10 @@ public class ImportExportControllerHelperService {
                   }
                 }
               }
+
+              log.info("Added library: " + library.toString());
+              requestManager.saveLibrary(library);
             }
-
-            log.info("Added library: " + library.toString());
-            requestManager.saveLibrary(library);
-
           }
 
         }
