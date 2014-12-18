@@ -51,15 +51,12 @@ import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
-import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
-import uk.ac.bbsrc.tgac.miso.core.util.DateComparator;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.*;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeFactory;
 import uk.ac.bbsrc.tgac.miso.core.factory.barcode.MisoJscriptFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.PrintManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-import uk.ac.bbsrc.tgac.miso.core.util.TaxonomyUtils;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 import javax.imageio.ImageIO;
@@ -793,13 +790,11 @@ public class SampleControllerHelperService {
      Collection<SampleQC> sampleQCs =  requestManager.listAllSampleQCsBySampleId(sampleId);
       if (sampleQCs.size()>0){
         List<SampleQC> list = new ArrayList(sampleQCs);
-        try {
-          Collections.sort(list, new DateComparator(SampleQC.class, "getQcDate", true));
-        }
-        catch (NoSuchMethodException e) {
-          e.printStackTrace();
-          log.error("Cannot sort SampleQCs by date: " + e.getMessage());
-        }
+        Collections.sort(list, new Comparator<SampleQC>() {
+          public int compare(SampleQC sqc1, SampleQC sqc2) {
+            return (int) sqc1.getId() - (int) sqc2.getId();
+          }
+        });
         SampleQC sampleQC = list.get(list.size()-1);
         sampleQCValue = sampleQC.getResults().toString();
       }

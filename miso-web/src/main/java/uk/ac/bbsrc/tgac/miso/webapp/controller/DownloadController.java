@@ -100,6 +100,13 @@ public class DownloadController {
       lookupAndRetrieveFile(Plate.class,  "forms", hashcode, response);
   }
 
+  @RequestMapping(value = "/plate/csv/{hashcode}", method = RequestMethod.GET)
+  protected void downloadPlateCSVExportFile(@PathVariable Integer hashcode,
+                                         HttpServletResponse response)
+      throws Exception {
+    lookupAndRetrieveFile(Plate.class,  "csv", hashcode, response);
+  }
+
   @RequestMapping(value = "/sample/forms/{hashcode}", method = RequestMethod.GET)
   protected void downloadSampleExportFile(@PathVariable Integer hashcode,
                                          HttpServletResponse response)

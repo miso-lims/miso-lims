@@ -296,8 +296,6 @@ Container.partition = {
   selectContainerStudy: function (partition, poolId, projectId) {
     Utils.ui.disableButton('studySelectButton-' + partition + '_' + poolId);
     var studyId = jQuery("select[name='poolStudies" + partition + "_" + projectId + "'] :selected").val();
-    //var sequencerReferenceId = jQuery("select[name='sequencer'] :selected").val();
-
     var platformId = jQuery("#sequencerReferenceSelect").attr("platformId");
 
     Fluxion.doAjax(
