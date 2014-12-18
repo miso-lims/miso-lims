@@ -160,7 +160,7 @@ public class FlexReportingControllerHelperService {
               Date endDate = df.parse(to);
               Date creationDate = project.getCreationDate();
 
-              if (creationDate.after(startDate) && creationDate.before(endDate)) {
+              if ((creationDate.after(startDate) && creationDate.before(endDate)) || creationDate.equals(startDate) || creationDate.equals(endDate)) {
                 jsonArray.add(projectRowBuilder(project));
               }
             }
@@ -328,7 +328,7 @@ public class FlexReportingControllerHelperService {
               Date endDate = df.parse(to);
               Date runDate = run.getStatus().getCompletionDate();
 
-              if (runDate.after(startDate) && runDate.before(endDate)) {
+              if ((runDate.after(startDate) && runDate.before(endDate)) || runDate.equals(startDate) || runDate.equals(endDate)) {
                 projectBool = true;
               }
             }
@@ -564,7 +564,7 @@ public class FlexReportingControllerHelperService {
               Date endDate = df.parse(to);
               Date receivedDate = sample.getReceivedDate();
 
-              if (receivedDate.after(startDate) && receivedDate.before(endDate)) {
+              if ((receivedDate.after(startDate) && receivedDate.before(endDate)) || receivedDate.equals(startDate) || receivedDate.equals(endDate)) {
                 jsonArray.add(sampleFormRowBuilder(sample));
               }
             }
@@ -750,7 +750,7 @@ public class FlexReportingControllerHelperService {
             Date startDate = df.parse(from);
             Date endDate = df.parse(to);
             Date receivedDate = library.getCreationDate();
-            if (receivedDate.after(startDate) && receivedDate.before(endDate)) {
+            if ((receivedDate.after(startDate) && receivedDate.before(endDate)) || receivedDate.equals(startDate) || receivedDate.equals(endDate)) {
               jsonArray.add(libraryFormRowBuilder(library));
             }
           }
@@ -818,14 +818,17 @@ public class FlexReportingControllerHelperService {
           Integer libqcfailed = 0;
           for (Library l : libraries) {
             if (l.getLibraryType().getDescription().equals(libraryType) && l.getPlatformName().equals(platform)) {
-              if (l.getQcPassed()) {
-                libqcpassed++;
+              if (l.getQcPassed() != null) {
+                if (l.getQcPassed()) {
+                  libqcpassed++;
+                }
               }
               else {
                 libqcfailed++;
               }
             }
           }
+
           if (libqcpassed > 0 || libqcfailed > 0) {
             overviewRelationArray.add("['" + libraryType + "','" + platform + "'," + libqcpassed + "," + libqcfailed + "," + (libqcpassed + libqcfailed) + "]");
             qcPassed += libqcpassed;
@@ -965,7 +968,7 @@ public class FlexReportingControllerHelperService {
               Date endDate = df.parse(to);
               Date receivedDate = run.getStatus().getCompletionDate();
 
-              if (receivedDate.after(startDate) && receivedDate.before(endDate)) {
+              if ((receivedDate.after(startDate) && receivedDate.before(endDate)) || receivedDate.equals(startDate) || receivedDate.equals(endDate)) {
                 jsonArray.add(runFormRowBuilder(run));
               }
             }
@@ -979,7 +982,7 @@ public class FlexReportingControllerHelperService {
               Date endDate = df.parse(runStartedTo);
               Date startedDate = run.getStatus().getStartDate();
 
-              if (startedDate.after(startDate) && startedDate.before(endDate)) {
+              if ((startedDate.after(startDate) && startedDate.before(endDate)) || startedDate.equals(startDate) || startedDate.equals(endDate)){
                 jsonArray.add(runFormRowBuilder(run));
               }
             }
