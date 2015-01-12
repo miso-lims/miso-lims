@@ -810,7 +810,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
 
   private JSONObject parseInterOp(File rootFile) throws IOException {
     MetrixContainer mc = new MetrixContainer(rootFile.getAbsolutePath());
-    return new MetrixContainerDecorator(mc).toJSON();
+    return JSONObject.fromObject(new MetrixContainerDecorator(mc));
   }
 
   public JSONArray transformInterOpOnly(Set<File> files) {
