@@ -238,17 +238,17 @@ var Stats = Stats || {
 
           jQuery('#metrixdiv').append("<div id='metrixchartsdiv'><table id='metricsPlotTable'><tbody><tr><td style='width:45%' id='qualityQ30ByCyclePlot'></td><td id='qualityScorePlot'></td></tr><tr><td id='densityBoxPlot'></td><td id='intensityByCyclePlot'></td></tr></tbody></table></div>");
 
-          Stats.qualityQ30ByCyclePlot(json.qualityMetrics.perCycleQualityScores);
-          Stats.intensityByCyclePlot(json.intensityMetrics.averages, json.summary.currentCycle, json.summary.numLanes);
-          Stats.densityBoxPlot(json.tileMetrics.clusterDensities, json.summary.numLanes);
-          Stats.qualityScorePlot(json.qualityMetrics.combinedReadQualityScores.raw, json.qualityMetrics.perLaneQualityScores, json.summary.numLanes);
-
           jQuery('#metrixdiv').append("<h2>Metrics</h2>");
           jQuery('#metrixdiv').append("<table class='list' id='metricsTable'><thead><tr id='qheaders'><th>Lane No.</th></tr></thead><tbody></tbody></table>");
 
           for (var lane = 1; lane < json.summary.numLanes+1; lane++) {
             jQuery('#metricsTable > tbody').append('<tr id="lane'+lane+'"><td>Lane '+lane+'</td></tr>');
           }
+
+          Stats.qualityQ30ByCyclePlot(json.qualityMetrics.perCycleQualityScores);
+          Stats.intensityByCyclePlot(json.intensityMetrics.averageCorrected, json.summary.currentCycle, json.summary.numLanes);
+          Stats.densityBoxPlot(json.tileMetrics.clusterDensities, json.summary.numLanes);
+          Stats.qualityScorePlot(json.qualityMetrics.combinedReadQualityScores.raw, json.qualityMetrics.perLaneQualityScores, json.summary.numLanes);
 
           //tile metrics
           //{"clusterDensities":[{"lane":1,"density":"834","densitySD":"92","densityPassingFilter":"722","densityPassingFilterSD":"50","densityPercentPassed":"86.6","units":"K/mm2"}]
