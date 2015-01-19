@@ -45,8 +45,8 @@ import java.util.*;
  * @since 0.1.6
  */
 @ServiceProvider
-public class BiooNEXTflexTagBarcodeStrategy implements TagBarcodeStrategy, RequestManagerAware {
-  protected static final Logger log = LoggerFactory.getLogger(BiooNEXTflexTagBarcodeStrategy.class);
+public class BiooNEXTflexV2TagBarcodeStrategy implements TagBarcodeStrategy, RequestManagerAware {
+  protected static final Logger log = LoggerFactory.getLogger(BiooNEXTflexV2TagBarcodeStrategy.class);
 
   private Map<Integer, Set<TagBarcode>> tagBarcodeMap = new HashMap<Integer, Set<TagBarcode>>();
 
@@ -64,7 +64,7 @@ public class BiooNEXTflexTagBarcodeStrategy implements TagBarcodeStrategy, Reque
 
   @Override
   public final String getName() {
-    return "Bioo NEXTflex Directional RNA-Seq Indices";
+    return "Bioo NEXTflex V2 Directional RNA-Seq Indices";
   }
 
   @Override
