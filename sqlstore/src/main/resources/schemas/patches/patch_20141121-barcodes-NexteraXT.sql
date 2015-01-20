@@ -3,6 +3,7 @@ USE lims;
 
 INSERT INTO `lims`.`TagBarcodes` (name, sequence, platformName, strategyName) VALUES("S502", "CTCTCTAT", "Illumina", "Nextera Dual Index");
 INSERT INTO `lims`.`TagBarcodes` (name, sequence, platformName, strategyName) VALUES("S503", "TATCCTCT", "Illumina", "Nextera Dual Index");
+INSERT INTO `lims`.`TagBarcodes` (name, sequence, platformName, strategyName) VALUES("S504", "AGAGTAGA", "Illumina", "Nextera Dual Index");
 INSERT INTO `lims`.`TagBarcodes` (name, sequence, platformName, strategyName) VALUES("S505", "GTAAGGAG", "Illumina", "Nextera Dual Index");
 INSERT INTO `lims`.`TagBarcodes` (name, sequence, platformName, strategyName) VALUES("S506", "ACTGCATA", "Illumina", "Nextera Dual Index");
 INSERT INTO `lims`.`TagBarcodes` (name, sequence, platformName, strategyName) VALUES("S507", "AAGGAGTA", "Illumina", "Nextera Dual Index");
