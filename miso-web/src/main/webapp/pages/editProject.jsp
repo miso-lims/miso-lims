@@ -431,8 +431,8 @@
         "aoColumns": [
           null,
           { "sType": 'natural' },
+          null,
           null
-          <sec:authorize access="hasRole('ROLE_ADMIN')">, null</sec:authorize>
         ],
         "iDisplayLength": 50,
         "bJQueryUI": true,

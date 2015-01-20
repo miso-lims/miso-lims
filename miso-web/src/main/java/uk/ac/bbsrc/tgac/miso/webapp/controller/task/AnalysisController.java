@@ -107,9 +107,9 @@ public class AnalysisController {
 //      map.put("makefile-path", run.getFilePath()+"/Data/Intensities/BaseCalls/PAP/Makefile");
 //      map.put("sample-sheet-path", run.getFilePath()+"/Data/Intensities/BaseCalls/SampleSheet-pap.csv");
 
-      map.put("fastq-path", "/net/tgac-ngs-qc/vol/qc/"+run.getAlias()+"/PAP");
-      map.put("makefile-path", "/net/tgac-ngs-qc/vol/qc/"+run.getAlias()+"/PAP/Makefile");
-      map.put("sample-sheet-path", "/net/tgac-ngs-qc/vol/qc/"+run.getAlias()+"/SampleSheet-PAP.csv");
+      map.put("fastq-path", "/net/tgac-labdata-nfs/ifs/TGAC/NGS_data/qc/"+run.getAlias()+"/PAP");
+      map.put("makefile-path", "/net/tgac-labdata-nfs/ifs/TGAC/NGS_data/qc/"+run.getAlias()+"/PAP/Makefile");
+      map.put("sample-sheet-path", "/net/tgac-labdata-nfs/ifs/TGAC/NGS_data/qc/"+run.getAlias()+"/SampleSheet-PAP.csv");
 
       map.put("instrument-id", run.getSequencerReference().getName());
 
@@ -138,7 +138,8 @@ public class AnalysisController {
         }
       }
 
-      if ("Illumina MiSeq".equals(run.getSequencerReference().getPlatform().getInstrumentModel())) {
+      String instrumentModel = run.getSequencerReference().getPlatform().getInstrumentModel();
+      if ("Illumina MiSeq".equals(instrumentModel) || "Illumina NextSeq 500".equals(instrumentModel)) {
         //append the base mask property for miseq runs
         String basesMask = "y"+run.getCycles()+",i"+indexValue;
         if (run.getPairedEnd()) {
