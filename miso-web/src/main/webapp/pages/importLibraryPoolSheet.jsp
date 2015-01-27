@@ -8,17 +8,16 @@
 
 <%@ include file="../header.jsp" %>
 <script type="text/javascript" src="<c:url value='/scripts/import_export_ajax.js?ts=${timestamp.time}'/>"></script>
-<script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
-<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" type="text/css">
-<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables_themeroller.css'/>"
-      type="text/css">
 
 <div id="maincontent">
     <div id="contentcolumn">
-
-        <h1>
-            Library & Pool Sheet Import
-        </h1>
+      <nav class="navbar navbar-default" role="navigation">
+         <div class="navbar-header">
+            <span class="navbar-brand navbar-center">
+              Library / Pool Sheet Import
+            </span>
+         </div>
+      </nav>
 
         <div id="librarypoolsheetformdiv" class="simplebox ui-corner-all">
             <table class="in">

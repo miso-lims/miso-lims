@@ -23,9 +23,14 @@
 
 <%@ include file="../header.jsp" %>
 
-<h1>
-  <div id="title">Reports</div>
-</h1>
+<nav class="navbar navbar-default" role="navigation">
+   <div class="navbar-header">
+      <span class="navbar-brand navbar-center">
+        <div id="title">Reports</div>
+      </span>
+   </div>
+</nav>
+
 <div id="reportTable">
   <br/>
   <input type="radio" id="reportTypeProject" onchange="changeReportType(this);" name="reportType" value="Project"/>

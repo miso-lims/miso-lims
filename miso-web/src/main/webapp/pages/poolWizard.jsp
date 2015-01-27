@@ -23,15 +23,15 @@
 <%@ include file="../header.jsp" %>
 <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.breadcrumbs.popup.js'/>"></script>
 
-<script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
-<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" type="text/css">
-
-<script src="<c:url value='/scripts/datatables_utils.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
-<script src="<c:url value='/scripts/natural_sort.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
-
 <div id="maincontent">
   <div id="contentcolumn">
-    <h1>Create Pool Wizard</h1>
+    <nav class="navbar navbar-default" role="navigation">
+       <div class="navbar-header">
+          <span class="navbar-brand navbar-center">
+            Create Pool Wizard
+          </span>
+       </div>
+    </nav>
 
     <div class="breadcrumbs">
       <ul>
@@ -67,7 +67,7 @@
           <tr>
             <td>Study Description:</td>
             <td>
-              <input type="text" id="studyDescription" name="studyDescription"/>
+              <input type="text" id="studyDescription" name="studyDescription" class="form-control"/>
             </td>
           </tr>
           </tbody>
@@ -92,13 +92,13 @@
       <tr>
         <td>Pool Alias:</td>
         <td>
-          <input type="text" id="alias" name="alias"/><br/>
+          <input type="text" id="alias" name="alias" class="form-control"/><br/>
         </td>
       </tr>
       <tr>
         <td>Concentration:</td>
         <td>
-          <input type="text" id="concentration" name="concentration"/><br/>
+          <input type="text" id="concentration" name="concentration" class="form-control"/><br/>
         </td>
       </tr>
       <tr>
@@ -110,28 +110,28 @@
       </tbody>
     </table>
 
-    <h1>
-      <div id="qcsTotalCount">
+    <nav id="navbar-poolqc" class="navbar navbar-default navbar-static" role="navigation">
+      <div class="navbar-header">
+        <span id="qcsTotalCount" class="navbar-brand navbar-center">Pool QCs</span>
       </div>
-    </h1>
-    <ul class="sddm">
-      <li>
-        <a onmouseover="mopen('qcmenu')" onmouseout="mclosetime()">Options
-          <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
-        </a>
+      <div class="collapse navbar-collapse bs-example-js-navbar-collapse">
+        <ul class="nav navbar-nav navbar-right">
+          <li id="poolqc-menu" class="dropdown">
+            <a id="poolqcdrop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Options <b class="caret"></b></a>
+            <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="poolqcdrop1">
+              <li role="presentation">
+                <a href='javascript:void(0);' onclick="Pool.wizard.insertPoolQCRow();">Add Pool QC</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </nav>
 
-        <div id="qcmenu"
-             onmouseover="mcancelclosetime()"
-             onmouseout="mclosetime()">
-          <a href='javascript:void(0);' class="add"
-             onclick="Pool.wizard.insertPoolQCRow(); return false;">Add Pool QC</a>
-        </div>
-      </li>
-    </ul>
     <span style="clear:both">
       <div id="addPoolQC"></div>
       <div id='addQcForm'>
-        <table class="list" id="poolQcTable">
+        <table class="table table-bordered table-striped" id="poolQcTable">
           <thead>
           <tr>
             <th>QC Date</th>
@@ -151,7 +151,7 @@
                                           or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
                   <td id="edit${qc.id}" align="center"><a href="javascript:void(0);"
                                                           onclick="Pool.qc.changePoolQCRow('${qc.id}','${pool.id}')">
-                    <span class="ui-icon ui-icon-pencil"></span></a></td>
+                    <span class="fa fa-pencil-square-o fa-lg"></span></a></td>
                 </c:if>
               </tr>
             </c:forEach>
@@ -188,7 +188,7 @@
             <button id="createPoolButton" onClick="createNewPool();"
                     class="fg-button ui-state-default ui-corner-all">Create New Pool
             </button>
-            <table id="dlTable" class="display">
+            <table id="dlTable" class="table table-striped table-bordered display">
               <thead>
               <tr>
                 <th>Dilution ID
@@ -342,10 +342,9 @@
           },
           "iDisplayLength": 50,
           "bInfo": true,
-          "bJQueryUI": true,
+          "bJQueryUI": false,
           "bAutoWidth": true,
-          "bFilter": true,
-          "sDom": '<<"toolbar">f>r<t>ip>'
+          "bFilter": true
         });
         dilutions = json.dilutions;
 

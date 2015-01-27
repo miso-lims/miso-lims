@@ -35,9 +35,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.zip.GZIPInputStream;
 
 /**
  * Utility class to aid the submission of data to repositories
@@ -140,14 +137,8 @@ public class SubmissionUtils {
     Transformer transformer = TransformerFactory.newInstance().newTransformer();
     transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 
-    Reader reader;
-    if (isCompressed(Files.readAllBytes(Paths.get(fromPath.toURI())))) {
-      GZIPInputStream gzis = new GZIPInputStream(new FileInputStream(fromPath));
-      reader = bomCheck(gzis);
-    }
-    else {
-      reader = bomCheck(fromPath);
-    }
+    Reader reader = bomCheck(fromPath);
+
     StringWriter sw = new StringWriter();
     transformer.transform(new StreamSource(reader), new StreamResult(sw));
     return sw.toString();
@@ -168,14 +159,7 @@ public class SubmissionUtils {
     transformer.setOutputProperty(OutputKeys.INDENT, "yes");
     if (omitXmlDeclaration) transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
 
-    Reader reader;
-    if (isCompressed(Files.readAllBytes(Paths.get(fromPath.toURI())))) {
-      GZIPInputStream gzis = new GZIPInputStream(new FileInputStream(fromPath));
-      reader = bomCheck(gzis);
-    }
-    else {
-      reader = bomCheck(fromPath);
-    }
+    Reader reader = bomCheck(fromPath);
 
     StringWriter sw = new StringWriter();
     transformer.transform(new StreamSource(reader), new StreamResult(sw));
@@ -195,14 +179,7 @@ public class SubmissionUtils {
    * @throws java.io.IOException
    */
   public static void transform(File fromPath, Document toDocument) throws TransformerException, IOException {
-    Reader reader;
-    if (isCompressed(Files.readAllBytes(Paths.get(fromPath.toURI())))) {
-      GZIPInputStream gzis = new GZIPInputStream(new FileInputStream(fromPath));
-      reader = bomCheck(gzis);
-    }
-    else {
-      reader = bomCheck(fromPath);
-    }
+    Reader reader = bomCheck(fromPath);
     TransformerFactory.newInstance().newTransformer().transform(new StreamSource(reader), new DOMResult(toDocument));
   }
 
@@ -215,7 +192,9 @@ public class SubmissionUtils {
    *
    */
   public static void transform(InputStream in, Document toDocument) throws TransformerException {
+    //Reader reader = new BufferedReader(new InputStreamReader(in));
     try {
+      //removeBOM(reader);
       Reader reader = bomCheck(in);
       TransformerFactory.newInstance().newTransformer().transform(new StreamSource(reader), new DOMResult(toDocument));
     }
@@ -251,15 +230,8 @@ public class SubmissionUtils {
    * @throws java.io.IOException
    */
   public static void transform(String fromPath, Document toDocument) throws TransformerException, IOException {
-    UnicodeReader reader;
-    if (isCompressed(Files.readAllBytes(Paths.get(fromPath)))) {
-      GZIPInputStream gzis = new GZIPInputStream(new FileInputStream(fromPath));
-      reader = new UnicodeReader(gzis, "UTF-8");
-    }
-    else {
-      reader = new UnicodeReader(new FileInputStream(new File(fromPath)), "UTF-8");
-    }
-
+    //Reader reader = bomCheck(new File(fromPath));
+    UnicodeReader reader = new UnicodeReader(new FileInputStream(new File(fromPath)), "UTF-8");
     SubmissionUtils.transform(reader, toDocument);
   }
 
@@ -284,14 +256,7 @@ public class SubmissionUtils {
    * @throws java.io.IOException
    */
   public static void transform(File fromPath, Writer toWriter) throws TransformerException, IOException {
-    Reader reader;
-    if (isCompressed(Files.readAllBytes(Paths.get(fromPath.toURI())))) {
-      GZIPInputStream gzis = new GZIPInputStream(new FileInputStream(fromPath));
-      reader = bomCheck(gzis);
-    }
-    else {
-      reader = bomCheck(fromPath);
-    }
+    Reader reader = bomCheck(fromPath);
     TransformerFactory.newInstance().newTransformer().transform(new StreamSource(reader), new StreamResult(toWriter));
   }
 
@@ -332,6 +297,18 @@ public class SubmissionUtils {
     else {
       return new BufferedReader(new InputStreamReader(bomStream));
     }
+
+    /*
+    StreamSource bomcheck = new StreamSource(new FileReader(fromPath));
+    Reader reader = new BufferedReader(bomcheck.getReader());
+    try {
+      removeBOM(reader);
+      return reader;
+    }
+    catch (Exception e) {
+      throw new IOException("Cannot remove byte-order-mark from XML file");
+    }
+    */
   }
 
   private static void removeBOM(Reader reader) throws Exception {
@@ -367,9 +344,5 @@ public class SubmissionUtils {
       }
     }
     return true;
-  }
-
-  public static boolean isCompressed(byte[] bytes) throws IOException {
-    return !((bytes == null) || (bytes.length < 2)) && ((bytes[0] == (byte) (GZIPInputStream.GZIP_MAGIC)) && (bytes[1] == (byte) (GZIPInputStream.GZIP_MAGIC >> 8)));
   }
 }

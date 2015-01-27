@@ -180,7 +180,7 @@ public class ExperimentWizardControllerHelperService {
             "                    <input type=\"hidden\" class=\"expids\" name=\"expids\" value=\"" + newId + "\"/>" +
             "                    <td class=\"h\">Title:</td>\n" +
             "                    <td><input type=\"text\" id=\"title" + newId + "\" class=\"needcheck\" name=\"title" + newId + "\"/>" +
-            "<span onclick=\"Experiment.ui.confirmRemoveExperiment(" + newId + ");\" class=\"float-right ui-icon ui-icon-circle-close\" style=\"cursor:pointer;\"></span>\n" +
+            "<span onclick=\"Experiment.ui.confirmRemoveExperiment(" + newId + ");\" class=\"fa fa-fw fa-2x fa-times-circle-o pull-right\" style=\"cursor:pointer;\"></span>\n" +
             "                </td></tr>\n" +
             "                <tr>\n" +
             "                    <td class=\"h\">Alias:</td>\n" +

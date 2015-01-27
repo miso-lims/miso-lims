@@ -30,11 +30,7 @@
 function bulkSampleQcTable(tableName) {
   var sTable = jQuery(tableName);
   if (!sTable.hasClass("display")) {
-    //destroy current table and recreate
     sTable.dataTable().fnDestroy();
-    //bug fix to reset table width
-    sTable.removeAttr("style");
-
     sTable.addClass("display");
 
     //remove edit and delete header and column
@@ -97,11 +93,10 @@ function bulkSampleQcTable(tableName) {
       ],
       "bPaginate": false,
       "bInfo": false,
-      "bJQueryUI": true,
+      "bJQueryUI": false,
       "bAutoWidth": true,
       "bSort": true,
-      "bFilter": false,
-      "sDom": '<<"toolbar">f>r<t>ip>'
+      "bFilter": false
     });
 
     sTable.find("tr:gt(0)").each(function () {
@@ -118,6 +113,7 @@ function bulkSampleQcTable(tableName) {
     });
 
     //jQuery("div.toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
+    jQuery(tableName+"_wrapper").prepend("<div class='float-right toolbar'></div>");
     jQuery("div.toolbar").html("<input type='button' value='Save QCs' id=\"bulkSampleQcButton\" onclick=\"Project.ui.saveBulkSampleQc('"+tableName+"');\" class=\"fg-button ui-state-default ui-corner-all\"/>");
     jQuery("div.toolbar").append("<input type='button' value='Cancel' onclick=\"Utils.page.pageReload();\" class=\"fg-button ui-state-default ui-corner-all\"/>");
     jQuery("div.toolbar").removeClass("toolbar");
@@ -224,8 +220,6 @@ function generateSampleDeliveryForm(tableName, projectId) {
   if (!sTable.hasClass("display")) {
     //destroy current table and recreate
     sTable.dataTable().fnDestroy();
-    //bug fix to reset table width
-    sTable.removeAttr("style");
     sTable.addClass("display");
 
     //remove edit header and column
@@ -264,10 +258,9 @@ function generateSampleDeliveryForm(tableName, projectId) {
       ],
       "bPaginate": false,
       "bInfo": false,
-      "bJQueryUI": true,
+      "bJQueryUI": false,
       "bAutoWidth": true,
-      "bFilter": false,
-      "sDom": '<<"toolbar">f>r<t>ip>'
+      "bFilter": false
     });
 
     sTable.find("tr:gt(0)").each(function () {
@@ -283,6 +276,7 @@ function generateSampleDeliveryForm(tableName, projectId) {
         jQuery(this).parent().addClass('row_selected');
     });
 
+    jQuery(tableName+"_wrapper").prepend("<div class='float-right toolbar'></div>");
     jQuery("div.toolbar").html("Plate: <input type='radio' name='plateinformationform' value='yes'/>Yes |<input type='radio' name='plateinformationform' value='no' checked='checked'/>No " + "<button type='button' onclick=\"Project.ui.processSampleDeliveryForm('"+tableName+"', " + projectId + ");\" class=\"fg-button ui-state-default ui-corner-all\">Generate Form</button>");
   }
 }

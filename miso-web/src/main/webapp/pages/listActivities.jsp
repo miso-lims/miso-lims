@@ -28,7 +28,7 @@
 <p>This list only shows manual activities for which you have the rights to work with.</p>
 
 <br/><br/>
-<table class="list">
+<table class="table table-bordered table-striped">
   <c:forEach items="${activities}" var="activity">
     <tr>
       <td>

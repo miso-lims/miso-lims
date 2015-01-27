@@ -41,6 +41,7 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.*;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.RunAlertManager;
+import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
@@ -72,6 +73,9 @@ public class EditRunController {
   private RequestManager requestManager;
 
   @Autowired
+  private FilesManager filesManager;
+
+  @Autowired
   private DataObjectFactory dataObjectFactory;
 
   @Autowired
@@ -99,6 +103,10 @@ public class EditRunController {
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
+  }
+
+  public void setFilesManager(FilesManager filesManager) {
+    this.filesManager = filesManager;
   }
 
   public void setSecurityManager(SecurityManager securityManager) {
@@ -135,7 +143,6 @@ public class EditRunController {
 
   public Boolean isMultiplexed(Run run) throws IOException {
     if (run != null && run.getId() != AbstractRun.UNSAVED_ID) {
-      //for (SequencerPartitionContainer<SequencerPoolPartition> f : requestManager.listSequencerPartitionContainersByRunId(run.getId())) {
       for (SequencerPartitionContainer<SequencerPoolPartition> f : run.getSequencerPartitionContainers()) {
         for (SequencerPoolPartition p : f.getPartitions()) {
           if (p.getPool() != null && p.getPool().getDilutions().size() > 1) {
@@ -177,6 +184,20 @@ public class EditRunController {
     return false;
   }
 
+  public Map<Integer, String> populateRunFiles(Long runId) throws IOException {
+    if (runId != AbstractRun.UNSAVED_ID) {
+      Run s = requestManager.getRunById(runId);
+      if (s != null) {
+        Map<Integer, String> fileMap = new HashMap<Integer, String>();
+        for (String f : filesManager.getFileNames(Run.class, runId.toString())) {
+          fileMap.put(f.hashCode(), f);
+        }
+        return fileMap;
+      }
+    }
+    return Collections.emptyMap();
+  }
+
   public Collection<Pool<? extends Poolable>> populateAvailablePools(User user) throws IOException {
     return requestManager.listAllPools();
   }
@@ -209,46 +230,6 @@ public class EditRunController {
     return setupForm(AbstractRun.UNSAVED_ID, model);
   }
 
-/*  @RequestMapping(value = "/new/experiment/{experimentId}", method = RequestMethod.GET)
-  public ModelAndView newAssignedRun(@PathVariable Long experimentId,
-                                     ModelMap model) throws IOException {
-    //clear any existing run in the model
-    model.addAttribute("run", null);
-    return setupForm(AbstractRun.UNSAVED_ID, experimentId, model);
-  }*/
-
-/*  @RequestMapping(value = "/{runId}", method = RequestMethod.GET)
-  public ModelAndView setupForm(@PathVariable Long runId,
-                                ModelMap model) throws IOException {
-
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Run run = requestManager.getRunById(runId);
-      if (run != null) {
-        if (!run.userCanRead(user)) {
-          throw new SecurityException("Permission denied.");
-        }
-
-        model.put("formObj", run);
-        model.put("run", run);
-        model.put("owners", LimsSecurityUtils.getPotentialOwners(user, run, securityManager.listAllUsers()));
-        model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, run, securityManager.listAllUsers()));
-        model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, run, securityManager.listAllGroups()));
-      }
-      else {
-        throw new SecurityException("No such Run");
-      }
-      return new ModelAndView("/pages/editRun.jsp", model);
-    }
-    catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to show experiment", ex);
-      }
-      throw ex;
-    }
-  } */
-
-
   @RequestMapping(value = "/rest/{runId}", method = RequestMethod.GET)
   public
   @ResponseBody
@@ -276,20 +257,21 @@ public class EditRunController {
         }
         else {
           model.put("title", "Run " + runId);
-          //model.put("availablePools", populateAvailablePools(run.getPlatformType(), user));
           model.put("multiplexed", isMultiplexed(run));
           try {
             if (runStatsManager != null) {
               model.put("statsAvailable", runStatsManager.hasStatsForRun(run));
             }
+            else {
+              log.warn("No runStatsManager available. No stats will be parsed.");
+            }
             model.put("operationsQcPassed", hasOperationsQcPassed(run));
             model.put("informaticsQcPassed", hasInformaticsQcPassed(run));
           }
           catch (RunStatsException e) {
+            model.put("error", MisoWebUtils.generateErrorDivMessage("Cannot retrieve generate run stats: " + run.getAlias(), e.getMessage()));
             e.printStackTrace();
           }
-
-          //runAlertManager.push(run);
         }
       }
 
@@ -316,6 +298,8 @@ public class EditRunController {
 
       model.put("formObj", run);
       model.put("run", run);
+      model.put("runFiles", populateRunFiles(runId));
+
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, run, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, run, securityManager.listAllUsers()));
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, run, securityManager.listAllGroups()));

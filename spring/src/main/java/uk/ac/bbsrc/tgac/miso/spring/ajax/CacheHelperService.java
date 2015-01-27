@@ -160,7 +160,7 @@ public class CacheHelperService {
         }
       }
 
-      for (emPCRDilution ed : requestManager.listAllEmPcrDilutions()) {
+      for (emPCRDilution ed : requestManager.listAllEmPCRDilutions()) {
         if (ed.getIdentificationBarcode() == null || "".equals(ed.getIdentificationBarcode())) {
           requestManager.saveEmPCRDilution(ed);
         }

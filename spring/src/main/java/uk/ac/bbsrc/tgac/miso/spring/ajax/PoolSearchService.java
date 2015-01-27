@@ -117,9 +117,8 @@ public class PoolSearchService {
           searchStr = new String(Base64.decodeBase64(searchStr));
         }
 
-        //String str = searchStr.toLowerCase();
         StringBuilder b = new StringBuilder();
-        List<? extends Dilution> dilutions = new ArrayList<Dilution>(requestManager.listDilutionsBySearch(searchStr, PlatformType.valueOf(platformType)));
+        List<? extends Dilution> dilutions = new ArrayList<>(requestManager.listDilutionsBySearch(searchStr, PlatformType.valueOf(platformType)));
         int numMatches = 0;
         for (Dilution d : dilutions) {
           //have to use onmousedown because of blur firing before onclick and hiding the div before it can be added
@@ -178,12 +177,12 @@ public class PoolSearchService {
 
   private String poolHtml(Pool<? extends Poolable> p) {
     StringBuilder b = new StringBuilder();
-    b.append("<div style='position:relative' onMouseOver='this.className=\"dashboardhighlight\"' onMouseOut='this.className=\"dashboard\"' class='dashboard'>");
+    b.append("<a class='list-group-item' href='javascript:void(0)'");
     if (LimsUtils.isStringEmptyOrNull(p.getAlias())) {
-      b.append("<div style=\"float:left\"><b>" + p.getName() + " : "+p.getCreationDate()+"</b><br/>");
+      b.append("<div><b>" + p.getName() + " : "+p.getCreationDate()+"</b><br/>");
     }
     else {
-      b.append("<div style=\"float:left\"><b>" + p.getName() + " (" + p.getAlias() + ") : "+p.getCreationDate()+"</b><br/>");
+      b.append("<div><b>" + p.getName() + " (" + p.getAlias() + ") : "+p.getCreationDate()+"</b><br/>");
     }
 
     Collection<? extends Poolable> ds = p.getPoolableElements();
@@ -223,7 +222,7 @@ public class PoolSearchService {
 
     b.append("<input type='hidden' id='pId" + p.getId() + "' value='" + p.getId() + "'/></div>");
     b.append("<div style='position: absolute; bottom: 0; right: 0; font-size: 24px; font-weight: bold; color:#BBBBBB'>" + p.getPlatformType().getKey() + "</div>");
-    b.append("</div>");
+    b.append("</a>");
     return b.toString();
   }
 

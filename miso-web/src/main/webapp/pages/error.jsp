@@ -25,17 +25,23 @@
 
 <div id="maincontent">
   <div id="contentcolumn">
-    <h1>Error</h1>
-    Please copy the URL in the address bar and the <b>full</b> text below and raise a
-    <a href="http://tracker.tgac.ac.uk/browse/MISO">JIRA ticket in the MISO project</a>, describing what you were
-    trying to do when this error occurred.<br/><br/>
+    <div class="panel panel-danger">
+      <div class="panel-heading">
+        <h3 class="panel-title">Error</h3>
+      </div>
+      <div class="panel-body">
+        Please copy the URL in the address bar and the <b>full</b> text below and raise a
+        <a href="http://tracker.tgac.ac.uk/browse/MISO">JIRA ticket in the MISO project</a>, describing what you were
+        trying to do when this error occurred.<br/><br/>
 
-    <h2>${pageContext.exception.message}</h2><br/>
-    <ul>
-      <c:forEach items="${pageContext.exception.stackTrace}" var="trace">
-        <li>${trace}</li>
-      </c:forEach>
-    </ul>
+        <h2>${pageContext.exception.message}</h2><br/>
+        <ul>
+          <c:forEach items="${pageContext.exception.stackTrace}" var="trace">
+            <li>${trace}</li>
+          </c:forEach>
+        </ul>
+      </div>
+    </div>
   </div>
 </div>
 

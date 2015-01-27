@@ -262,7 +262,7 @@
     <dependency>
       <groupId>org.reflections</groupId>
       <artifactId>reflections</artifactId>
-      <version>0.9.5</version>
+      <version>0.9.9-RC1</version>
     </dependency>
 
     <dependency>

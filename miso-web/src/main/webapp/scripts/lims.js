@@ -187,7 +187,6 @@ Utils.ui = {
 Utils.fileUpload = {
   fileUploadProgress: function (formname, divname, successfunc) {
     var self = this;
-    //self.processingOverlay();
 
     Fluxion.doAjaxUpload(
       formname,
@@ -197,6 +196,10 @@ Utils.fileUpload = {
       {'statusElement': divname, 'progressElement': 'trash', 'doOnSuccess': successfunc},
       {'': ''}
     );
+  },
+
+  fileUploadSuccess: function (div) {
+    jQuery(div).html("Upload complete. Refresh to see the file.");
   },
 
   processingOverlay: function () {
@@ -391,23 +394,18 @@ Utils.alert = {
 
   processMyAccountAlerts: function (json) {
     if (json.newAlerts) {
-      if (!jQuery("#myAccountSpan").hasClass("unreadAlertSpan")) {
-        jQuery("#myAccountSpan").addClass("unreadAlertSpan");
+      if (!jQuery("#alertMenuDropdown").hasClass("unreadAlertSpan")) {
+        jQuery("#alertMenuDropdown").addClass("unreadAlertSpan");
       }
-
-      if (!jQuery("#myAccountLink").hasClass("unreadAlertLink")) {
-        jQuery("#myAccountLink").addClass("unreadAlertLink");
-      }
+      jQuery("#alertMenuDropdown").html("<span class='badge'>"+json.newAlerts+"</span>");
     }
     else {
-      if (jQuery("#myAccountSpan").hasClass("unreadAlertSpan")) {
-        jQuery("#myAccountSpan").removeClass("unreadAlertSpan");
+      if (jQuery("#alertMenuDropdown").hasClass("unreadAlertSpan")) {
+        jQuery("#alertMenuDropdown").removeClass("unreadAlertSpan");
       }
-
-      if (jQuery("#myAccountLink").hasClass("unreadAlertLink")) {
-        jQuery("#myAccountLink").removeClass("unreadAlertLink");
-      }
+      jQuery("#alertMenuDropdown").html("");
     }
+    Utils.alert.loadAlerts();
   },
 
   loadAlerts: function () {
@@ -416,13 +414,13 @@ Utils.alert = {
       'dashboard',
       'getAlerts',
       {'url': ajaxurl},
-      {'ajaxType': 'periodical', 'updateFrequency': 30, 'doOnSuccess': self.processAlerts}
+      {'doOnSuccess': self.processAlerts}
     );
   },
 
   processAlerts: function (json) {
     if (Utils.validation.isNullCheck(json.html)) {
-      jQuery('#alertList').html("<i style='color: gray'>No unread alerts</i>");
+      jQuery('#alertList').html("<li style='color: gray'>No unread alerts</li>");
     }
     else {
       jQuery('#alertList').html(json.html);

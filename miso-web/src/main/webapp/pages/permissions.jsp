@@ -25,8 +25,12 @@
   Permissions
   <div id="permissions_arrowclick" class="toggleLeft"></div>
 </div>
-<div id="permissions" class="note" style="display:none">
-  <h2>Permissions</h2>
+<div id="permissions" class="panel panel-default padded-panel" style="display:none">
+  <nav id="navbar-pro-over${overview.overviewId}" class="navbar navbar-default navbar-static" role="navigation">
+    <div class="navbar-header">
+      <span class="navbar-brand navbar-center">Permissions</span>
+    </div>
+  </nav>
   <table class="in">
     <tr>
       <td class="h">Owner:</td>
@@ -68,10 +72,11 @@
           / <a href="javascript:void(0);"
                onclick="Utils.ui.uncheckAll('securityProfile.readUsers'); return false;">None</a></td>
         <td>
-          <div id="readUsers" class="checklist">
+          <div id="readUsers" class="checklist panel panel-default">
             <form:checkboxes items="${accessibleUsers}" path="securityProfile.readUsers"
                              itemLabel="fullName"
-                             itemValue="userId"/>
+                             itemValue="userId"
+                             element="div class='checkbox'"/>
           </div>
         </td>
       </tr>
@@ -83,10 +88,11 @@
                onclick="Utils.ui.uncheckAll('securityProfile.writeUsers'); return false;">None</a>
         </td>
         <td>
-          <div id="writeUsers" class="checklist">
+          <div id="writeUsers" class="checklist panel panel-default">
             <form:checkboxes items="${accessibleUsers}" path="securityProfile.writeUsers"
                              itemLabel="fullName"
-                             itemValue="userId"/>
+                             itemValue="userId"
+                             element="div class='checkbox'"/>
           </div>
         </td>
       </tr>
@@ -98,10 +104,11 @@
                onclick="Utils.ui.uncheckAll('securityProfile.readGroups'); return false;">None</a>
         </td>
         <td>
-          <div id="readGroups" class="checklist">
+          <div id="readGroups" class="checklist panel panel-default">
             <form:checkboxes items="${accessibleGroups}" path="securityProfile.readGroups"
                              itemLabel="name"
-                             itemValue="groupId"/>
+                             itemValue="groupId"
+                             element="div class='checkbox'"/>
           </div>
         </td>
       </tr>
@@ -113,10 +120,11 @@
                onclick="Utils.ui.uncheckAll('securityProfile.writeGroups'); return false;">None</a>
         </td>
         <td>
-          <div id="writeGroups" class="checklist">
+          <div id="writeGroups" class="checklist panel panel-default">
             <form:checkboxes items="${accessibleGroups}" path="securityProfile.writeGroups"
                              itemLabel="name"
-                             itemValue="groupId"/>
+                             itemValue="groupId"
+                             element="div class='checkbox'"/>
           </div>
         </td>
       </tr>

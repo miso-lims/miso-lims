@@ -295,7 +295,7 @@ public class LS454NotificationMessageConsumerMechanism implements NotificationMe
                         f.setIdentificationBarcode(ptpId);
 
                         log.debug("\\_ Created new SequencerPartitionContainer with "+f.getPartitions().size()+" partitions");
-                        ((RunImpl)r).addSequencerPartitionContainer(f);
+                        r.addSequencerPartitionContainer(f);
                       }
                     }
                     else {

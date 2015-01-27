@@ -29,10 +29,8 @@ function bulkEmPcrTable() {
   if (!jQuery('#librarydils_table').hasClass("display")) {
     //destroy current table and recreate
     jQuery('#librarydils_table').dataTable().fnDestroy();
-    //bug fix to reset table width
-    jQuery('#librarydils_table').removeAttr("style");
-
     jQuery('#librarydils_table').addClass("display");
+
     //remove edit header and column
     jQuery('#librarydils_table tr:first th:gt(4)').remove();
 
@@ -61,30 +59,29 @@ function bulkEmPcrTable() {
     jQuery("#librarydils_table tr:gt(0)").append("<td class='defaultEditable'></td>");
 
     var datatable = jQuery('#librarydils_table').dataTable({
-                                                             "aoColumnDefs": [
-                                                               {
-                                                                 "bUseRendered": false,
-                                                                 "aTargets": [ 0 ]
-                                                               }
-                                                             ],
-                                                             "aoColumns": [
-                                                               {"bSortable": false},
-                                                               { "sType": 'natural' },
-                                                               null,
-                                                               null,
-                                                               null,
-                                                               null,
-                                                               {"bSortable": false},
-                                                               {"bSortable": false}
-                                                             ],
-                                                             "bPaginate": false,
-                                                             "bInfo": false,
-                                                             "bJQueryUI": true,
-                                                             "bAutoWidth": true,
-                                                             "bSort": true,
-                                                             "bFilter": false,
-                                                             "sDom": '<<"toolbar">f>r<t>ip>'
-                                                           });
+       "aoColumnDefs": [
+         {
+           "bUseRendered": false,
+           "aTargets": [ 0 ]
+         }
+       ],
+       "aoColumns": [
+         {"bSortable": false},
+         { "sType": 'natural' },
+         null,
+         null,
+         null,
+         null,
+         {"bSortable": false},
+         {"bSortable": false}
+       ],
+       "bPaginate": false,
+       "bInfo": false,
+       "bJQueryUI": false,
+       "bAutoWidth": true,
+       "bSort": true,
+       "bFilter": false
+     });
 
     jQuery('#librarydils_table').find("tr:gt(0)").each(function () {
       for (var i = 0; i < this.cells.length; i++) {
@@ -104,53 +101,54 @@ function bulkEmPcrTable() {
         jQuery(this).parent().addClass('row_selected');
     });
 
+    jQuery("#librarydils_table_wrapper").prepend("<div class='float-right toolbar'></div>");
     jQuery("div.toolbar").html("<input type='button' value='Save EmPCRs' id=\"bulkEmPcrButton\" onclick=\"Project.ui.saveBulkEmPcrs();\" class=\"fg-button ui-state-default ui-corner-all\"/>");
     jQuery("div.toolbar").append("<input type='button' value='Cancel' onclick=\"Utils.page.pageReload();\" class=\"fg-button ui-state-default ui-corner-all\"/>");
     jQuery("div.toolbar").removeClass("toolbar");
 
     jQuery('#librarydils_table .defaultEditable').editable(function (value, settings) {
-                                                             return value;
-                                                           },
-                                                           {
-                                                             callback: function (sValue, y) {
-                                                               var aPos = datatable.fnGetPosition(this);
-                                                               datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-                                                             },
-                                                             submitdata: function (value, settings) {
-                                                               return {
-                                                                 "row_id": this.parentNode.getAttribute('id'),
-                                                                 "column": datatable.fnGetPosition(this)[2]
-                                                               };
-                                                             },
-                                                             onblur: 'submit',
-                                                             placeholder: '',
-                                                             height: '14px'
-                                                           });
+       return value;
+     },
+     {
+       callback: function (sValue, y) {
+         var aPos = datatable.fnGetPosition(this);
+         datatable.fnUpdate(sValue, aPos[0], aPos[1]);
+       },
+       submitdata: function (value, settings) {
+         return {
+           "row_id": this.parentNode.getAttribute('id'),
+           "column": datatable.fnGetPosition(this)[2]
+         };
+       },
+       onblur: 'submit',
+       placeholder: '',
+       height: '14px'
+     });
 
     jQuery("#librarydils_table .dateSelect").editable(function (value, settings) {
-                                                        return value;
-                                                      },
-                                                      {
-                                                        type: 'datepicker',
-                                                        width: '100px',
-                                                        onblur: 'submit',
-                                                        placeholder: '',
-                                                        style: 'inherit',
-                                                        datepicker: {
-                                                          dateFormat: 'dd/mm/yy',
-                                                          showButtonPanel: true,
-                                                          maxDate: 0
-                                                        },
-                                                        callback: function (sValue, y) {
-                                                          var aPos = datatable.fnGetPosition(this);
-                                                          datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-                                                        },
-                                                        submitdata: function (value, settings) {
-                                                          return {
-                                                            "row_id": this.parentNode.getAttribute('id'),
-                                                            "column": datatable.fnGetPosition(this)[2]
-                                                          };
-                                                        }
-                                                      });
+      return value;
+    },
+    {
+      type: 'datepicker',
+      width: '100px',
+      onblur: 'submit',
+      placeholder: '',
+      style: 'inherit',
+      datepicker: {
+        dateFormat: 'dd/mm/yy',
+        showButtonPanel: true,
+        maxDate: 0
+      },
+      callback: function (sValue, y) {
+        var aPos = datatable.fnGetPosition(this);
+        datatable.fnUpdate(sValue, aPos[0], aPos[1]);
+      },
+      submitdata: function (value, settings) {
+        return {
+          "row_id": this.parentNode.getAttribute('id'),
+          "column": datatable.fnGetPosition(this)[2]
+        };
+      }
+    });
   }
 }

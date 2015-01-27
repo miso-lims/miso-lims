@@ -29,11 +29,20 @@
       <c:when test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
         <form:form action="/miso/admin/user" method="POST" commandName="user" autocomplete="off">
           <sessionConversation:insertSessionConversationId attributeName="user"/>
-          <h1><c:choose><c:when
-              test="${not empty user.userId}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose>
-            User
-            <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
-          </h1>
+          <nav class="navbar navbar-default" role="navigation">
+             <div class="navbar-header">
+                <span class="navbar-brand navbar-center">
+                  <c:choose>
+                    <c:when test="${not empty user.userId}">Edit</c:when>
+                    <c:otherwise>Create</c:otherwise>
+                  </c:choose> User
+                </span>
+             </div>
+             <div class="navbar-right container-fluid">
+                <button type="submit" class="btn btn-default navbar-btn">Save</button>
+             </div>
+          </nav>
+
           <table class="in">
             <tr>
               <td class="h">User ID:</td>
@@ -43,7 +52,7 @@
               <td>Full name:</td>
               <td>
                 <sec:authorize access="hasRole('ROLE_ADMIN')">
-                  <form:input path="fullName"/>
+                  <form:input path="fullName" class="form-control"/>
                 </sec:authorize>
 
                 <sec:authorize access="hasRole('ROLE_TECH')">
@@ -55,7 +64,7 @@
               <td>Login name:</td>
               <td>
                 <sec:authorize access="hasRole('ROLE_ADMIN')">
-                  <form:input path="loginName"/>
+                  <form:input path="loginName" class="form-control"/>
                 </sec:authorize>
 
                 <sec:authorize access="hasRole('ROLE_TECH')">
@@ -69,7 +78,7 @@
                 <c:choose>
                   <c:when test="${(user.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                                         or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-                    <form:input path="email"/>
+                    <form:input path="email" class="form-control"/>
                   </c:when>
                   <c:otherwise>
                     <sec:authorize access="hasRole('ROLE_TECH')">
@@ -126,7 +135,8 @@
                 <div id="groups" class="checklist">
                   <form:checkboxes items="${groups}" path="groups"
                                    itemLabel="name"
-                                   itemValue="groupId"/>
+                                   itemValue="groupId"
+                                   element="div class='checkbox'"/>
                 </div>
               </td>
             </tr>
@@ -134,7 +144,7 @@
               <td>Supplemental Roles:</td>
               <td>
                 <div id="roles" class="checklist">
-                  <form:checkboxes items="${roles}" path="roles"/>
+                  <form:checkboxes items="${roles}" path="roles" element="div class='checkbox'"/>
                 </div>
               </td>
             </tr>
@@ -144,9 +154,16 @@
       <c:otherwise>
         <form:form action="/miso/user" method="POST" commandName="user" autocomplete="off">
           <sessionConversation:insertSessionConversationId attributeName="user"/>
-          <h1>Edit Your Account
-            <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
-          </h1>
+          <nav class="navbar navbar-default" role="navigation">
+            <div class="navbar-header">
+              <span class="navbar-brand navbar-center">
+                Edit Your Account
+              </span>
+            </div>
+            <div class="navbar-right container-fluid">
+              <button type="submit" class="btn btn-default navbar-btn" href='javascript:void(0);'>Save</button>
+            </div>
+          </nav>
           <table class="in">
             <tr>
               <td class="h">User ID:</td>
@@ -169,7 +186,7 @@
               <td>
                 <c:choose>
                   <c:when test="${user.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username}">
-                    <form:input path="email"/>
+                    <form:input path="email" class="form-control"/>
                   </c:when>
                   <c:otherwise>
                     ${user.email}

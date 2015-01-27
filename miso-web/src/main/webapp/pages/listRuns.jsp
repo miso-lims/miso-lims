@@ -30,17 +30,17 @@
 <%@ include file="../header.jsp" %>
 <script type="text/javascript" src="<c:url value='/scripts/runCalendar.js?ts=${timestamp.time}'/>"></script>
 <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.popup.js'/>"></script>
-<script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
-<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" type="text/css">
-<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables_themeroller.css'/>">
 
 <div id="maincontent">
   <div id="contentcolumn">
-    <h1>
-      <div id="totalCount">Runs
-      </div>
-    </h1>
-    <table cellpadding="0" cellspacing="0" border="0" class="display" id="listingRunsTable">
+    <nav class="navbar navbar-default" role="navigation">
+       <div class="navbar-header">
+          <span class="navbar-brand navbar-center">
+            <div id="totalCount"> Runs</div>
+          </span>
+       </div>
+    </nav>
+    <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered display" id="listingRunsTable">
     </table>
     <script type="text/javascript">
       jQuery(document).ready(function () {

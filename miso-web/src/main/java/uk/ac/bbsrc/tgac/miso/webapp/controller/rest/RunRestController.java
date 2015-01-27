@@ -91,10 +91,7 @@ public class RunRestController {
   
   @RequestMapping(method = RequestMethod.GET)
   public @ResponseBody
-  String jsonRest() throws IOException {
-    Collection<Run> lr = requestManager.listAllRuns();
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.getSerializationConfig().addMixInAnnotations(SequencerPartitionContainer.class, ContainerRecursionAvoidanceMixin.class);
-    return mapper.writeValueAsString(lr);
+  Collection<Run> jsonRest() throws IOException {
+    return requestManager.listAllRuns();
   }
 }

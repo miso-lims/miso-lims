@@ -1,0 +1,291 @@
+body {
+  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-size: 14px;
+  line-height: 1.42857143;
+}
+
+.navbar {
+  margin-bottom: 2px;
+}
+
+.navbar-default {
+  background-color: #F0F0FF;
+}
+
+.navbar-default .navbar-brand {
+  color: #666666;
+  font-size: 2em;
+  font-weight: bold;
+  float: none;
+  margin-right: auto;
+  margin-left: auto;
+  width: 60%;
+}
+
+.navbar-center {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  text-align: center;
+  margin: auto;
+  height:100%;
+}
+
+.navbar-miso-header {
+  background-color: #FFFFFF;
+  border-color: #e7e7e7;
+  margin-bottom: 0;
+  height: 103px;
+  position: relative;
+}
+
+.navbar-miso-header>.navbar-top-links {
+  margin-top:50px;
+}
+
+.barcodes .barcodeArea {
+  height: 41px;
+}
+
+.barcodeArea>.nav>li>a {
+  padding:0;
+}
+
+.barcodes>.nav>li>a {
+  padding:0;
+}
+
+.form-control {
+  height: 30px;
+  padding: 6px 8px;
+  font-size: inherit;
+}
+
+.form-control-progress {
+  height: 30px;
+  margin-bottom: 0px;
+}
+
+.form-control-progress>.progress-bar {
+  line-height: 29px;
+}
+
+.dropdown-menu-float-right>li>a {
+  float: right;
+}
+
+.ui-tabs .ui-tabs-panel {
+  padding: 0;
+}
+
+.panel-primary {
+  border-color: #d3d3d3;
+}
+
+.panel-primary>.panel-heading {
+  color: #5e5e5e;
+  background-color: #F0F0FF;
+  border-color: #d3d3d3;
+}
+
+.panel-login {
+  color: #5e5e5e;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top:30px;
+  float: none;
+  width:440px;
+}
+
+.panel-login>.panel-heading>.panel-title {
+  font-weight: bold;
+}
+
+.login-addon {
+  height: 30px;
+  padding-left: 10px;
+  padding-right: 20px;
+  margin-bottom: 3px;
+}
+
+.panel-login .input-group .form-control {
+  float:none;
+  font-size: 11pt;
+}
+
+.panel-dashboard {
+  /* width:15%;
+  min-width:275px; */
+  margin-right:2px;
+}
+.panel-dashboard>.panel-heading {
+  height:50px;
+}
+.panel-dashboard>.panel-heading>.panel-title {
+  margin-top:6px;
+}
+
+.navbar-panel-heading {
+  height: 50px;
+  border-bottom: 1px solid transparent;
+  border-top-right-radius: 3px;
+  border-top-left-radius: 3px;
+}
+
+.panel-dashboard>.navbar>.panel-title {
+  padding: 10px 15px;
+  margin-top:6px;
+  color: #5e5e5e;
+  background-color: #F0F0FF;
+  border-color: #d3d3d3;
+}
+.panel-dashboard>.panel-heading>.form-control {
+  width:30%;
+}
+.panel-dashboard>.panel-body {
+  height:330px;
+  padding:2px;
+}
+
+.padded-panel {
+  padding: .2em;
+}
+
+.panel-body>.list-group {
+  height: 100%;
+  min-height: 40px;
+  overflow: auto;
+}
+.panel-body>.list-group>.list-group-item div {
+  font: 10px Verdana, arial, sans-serif;
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -o-text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#poolList>.list-group-item {
+  font: 10px Verdana, arial, sans-serif;
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -o-text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.runPartitionDroppable>.list-group-item {
+  font: 10px Verdana, arial, sans-serif;
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -o-text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.messages-dropdown .dropdown-menu .message-preview .avatar,
+.messages-dropdown .dropdown-menu .message-preview .name,
+.messages-dropdown .dropdown-menu .message-preview .message,
+.messages-dropdown .dropdown-menu .message-preview .time {
+  display: block;
+}
+
+.messages-dropdown .dropdown-menu .message-preview .avatar {
+  float: left;
+  margin-right: 15px;
+}
+
+.messages-dropdown .dropdown-menu .message-preview .name {
+  font-weight: bold;
+}
+
+.messages-dropdown .dropdown-menu .message-preview .message {
+  font-size: 12px;
+}
+
+.messages-dropdown .dropdown-menu .message-preview .time {
+  font-size: 12px;
+}
+
+input[type="radio"] {
+  margin-right: 3px;
+  margin-left: 3px;
+}
+
+table.overviewSummary td:last-child {
+  border-right-width: 1px;
+}
+
+.checklist>.checkbox {
+  padding-left: 25px;
+  margin-top: 2px;
+  margin-bottom: 3px;
+}
+
+.breadcrumbs>.btn-group a {
+  background-image: none;
+}
+
+.header-margin {
+  margin-top:10px;
+  margin-bottom:10px;
+}
+
+.header-margin-h5 {
+  margin-top:10px;
+  margin-bottom:10px;
+  margin-left:3px;
+}
+
+h5>.header-icon {
+  color: #8E8E8E;
+  margin-right: -5px;
+}
+
+h3>.header-icon {
+  color: #8E8E8E;
+  margin-right: -5px;
+  margin-top: -10px;
+}
+
+.small-pad {
+  padding-left:2px;
+  padding-right:2px;
+}
+
+td .partition-number {
+  font-weight: bold;
+  font-size: 30pt;
+  color: #B3B3B3;
+  width: 30px;
+}
+
+.state-key {
+  font: 10px Verdana, arial, sans-serif;
+  cursor: pointer;
+  text-overflow: ellipsis;
+  -o-text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 92%;
+}
+
+h5>.state-key {
+  width: 220px;
+  margin-top: -10px;
+  margin-right: 34px;
+}
+
+.panel-heading>.state-key {
+  width: 220px;
+  margin-top: -1px;
+  margin-right: 24px;
+}
+
+.miso-fa-2x-addon {
+  height: 30px;
+  padding-left: 7px;
+  padding-right: 22px;
+  padding-top: 5px;
+  margin-bottom: 4px;
+}

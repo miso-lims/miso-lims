@@ -272,7 +272,7 @@ public class SolidNotificationMessageConsumerMechanism implements NotificationMe
 //                      else {
 //                        lf.setPlatformType(PlatformType.SOLID);
 //                      }
-                      ((RunImpl)r).addSequencerPartitionContainer(lf);
+                      r.addSequencerPartitionContainer(lf);
                     }
                   }
                   else {
@@ -288,7 +288,7 @@ public class SolidNotificationMessageConsumerMechanism implements NotificationMe
 //                      f.setPlatformType(PlatformType.SOLID);
 //                    }
                     //f.setPaired(r.getPairedEnd());
-                    ((RunImpl)r).addSequencerPartitionContainer(f);
+                    r.addSequencerPartitionContainer(f);
                   }
                 }
               }

@@ -25,7 +25,13 @@
 
 <div id="maincontent">
   <div id="contentcolumn">
-    <h1>My Account</h1>
+    <nav class="navbar navbar-default" role="navigation">
+       <div class="navbar-header">
+          <span class="navbar-brand navbar-center">
+            My Account
+          </span>
+       </div>
+    </nav>
 
     <div class="portlet">
       <div class="portlet-header">My Account</div>

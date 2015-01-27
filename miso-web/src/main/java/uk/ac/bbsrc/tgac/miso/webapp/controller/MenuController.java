@@ -118,11 +118,6 @@ public class MenuController implements ServletContextAware {
     return "/pages/projectMenu.jsp";
   }
 
-  @RequestMapping("/activity/menu")
-  public String activityMenu() {
-    return "/pages/activityMenu.jsp";
-  }
-
   @Override
   public void setServletContext(ServletContext servletContext) {
     this.servletContext = servletContext;

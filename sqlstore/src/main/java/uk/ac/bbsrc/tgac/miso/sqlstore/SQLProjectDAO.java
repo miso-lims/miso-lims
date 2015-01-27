@@ -33,20 +33,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.OverviewSampleGroup;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.ProjectAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.store.*;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
@@ -645,7 +642,7 @@ public class SQLProjectDAO implements ProjectStore {
         try {
           project.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
           project.setIssueKeys(listIssueKeysByProjectId(id));
-          project.setWatchers(new HashSet<User>(watcherDAO.getWatchersByEntityName(project.getWatchableIdentifier())));
+          project.setWatchers(new HashSet<>(watcherDAO.getWatchersByEntityName(project.getWatchableIdentifier())));
           if (project.getSecurityProfile() != null &&
               project.getSecurityProfile().getOwner() != null)
             project.addWatcher(project.getSecurityProfile().getOwner());
@@ -654,10 +651,11 @@ public class SQLProjectDAO implements ProjectStore {
           }
 
           if (!isLazy()) {
-            Collection<ProjectOverview> overviews = listOverviewsByProjectId(id);
-            project.setOverviews(overviews);
             project.setSamples(sampleDAO.listByProjectId(id));
             project.setStudies(studyDAO.listByProjectId(id));
+
+            Collection<ProjectOverview> overviews = listOverviewsByProjectId(id);
+            project.setOverviews(overviews);
           }
         }
         catch (IOException e1) {
@@ -723,7 +721,7 @@ public class SQLProjectDAO implements ProjectStore {
         overview.setPrimaryAnalysisCompleted(rs.getBoolean("primaryAnalysisCompleted"));
         overview.setLastUpdated(rs.getTimestamp("lastUpdated"));
 
-        EntityGroup<ProjectOverview, Sample> osg = entityGroupDAO.getEntityGroupByParent(overview, overview.getClass());
+        HierarchicalEntityGroup<ProjectOverview, Sample> osg = entityGroupDAO.getEntityGroupByParent(overview, overview.getClass());
         if (osg != null) {
           osg.setParent(overview);
           overview.setSampleGroup(osg);
@@ -733,7 +731,7 @@ public class SQLProjectDAO implements ProjectStore {
         overview.setRuns(runDAO.listByProjectId(rs.getLong("project_projectId")));
         overview.setNotes(noteDAO.listByProjectOverview(id));
 
-        overview.setWatchers(new HashSet<User>(watcherDAO.getWatchersByEntityName(overview.getWatchableIdentifier())));
+        overview.setWatchers(new HashSet<>(watcherDAO.getWatchersByEntityName(overview.getWatchableIdentifier())));
         if (overview.getProject().getSecurityProfile() != null &&
             overview.getProject().getSecurityProfile().getOwner() != null)
           overview.addWatcher(overview.getProject().getSecurityProfile().getOwner());

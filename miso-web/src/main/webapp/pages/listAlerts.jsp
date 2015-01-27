@@ -22,7 +22,7 @@
   --%>
 
 <%@ include file="../header.jsp" %>
-<table class="list" id="table">
+<table class="table table-bordered table-striped" id="table">
   <thead>
   <tr>
     <th>Alert Date</th>

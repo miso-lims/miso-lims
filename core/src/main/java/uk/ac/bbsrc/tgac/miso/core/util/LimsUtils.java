@@ -441,7 +441,7 @@ public class LimsUtils {
         sb.append(" or is not creatable");
       }
       sb.append(". Please create this directory and ensure that it is writable.");
-      throw new IOException(sb.toString()); 
+      throw new IOException(sb.toString());
     }
     else {
       if (attemptMkdir) {
@@ -594,7 +594,7 @@ public class LimsUtils {
   }
 
   public static String getCurrentDateAsString() {
-    return getCurrentDateAsString(new SimpleDateFormat("yyyyMMdd"));
+    return getCurrentDateAsString(new SimpleDateFormat("yyyy-MM-dd"));
   }
 
   public static String getDateAsString(Date date) {

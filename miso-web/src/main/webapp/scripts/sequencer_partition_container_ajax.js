@@ -93,13 +93,19 @@ var Container = Container || {
 Container.ui = {
   editContainerIdBarcode: function (span) {
     var s = jQuery(span);
-    s.html("<input type='text' id='identificationBarcode' name='identificationBarcode' value='" + s.html() + "'/>" +
-           "<button onclick='Container.lookupContainer(this);' type='button' class='fg-button ui-state-default ui-corner-all'>Lookup</button>");
+    if (!s.prop("edit")) {
+      s.prop("edit", "true");
+      s.html("<input type='text' id='identificationBarcode' name='identificationBarcode' value='" + s.html() + "' class='form-control'/>");
+           //"<button onclick='Container.lookupContainer(this);' type='button' class='fg-button ui-state-default ui-corner-all'>Lookup</button>");
+    }
   },
 
   editContainerLocationBarcode: function (span, fc) {
     var s = jQuery(span);
-    s.html("<input type='text' id='locationBarcode' name='locationBarcode' value='" + s.html() + "'/>");
+    if (!s.prop("edit")) {
+      s.prop("edit", "true");
+      s.html("<input type='text' id='locationBarcode' name='locationBarcode' value='" + s.html() + "' class='form-control'/>");
+    }
   },
 
   populatePlatformTypes: function () {
@@ -210,13 +216,13 @@ Container.ui = {
             { "sTitle": "Last Sequencer Used"},
             { "sTitle": "Edit"}
           ],
-          "bJQueryUI": true,
+          "bJQueryUI": false,
           "iDisplayLength": 25,
           "aaSorting": [
             [0, "desc"]
-          ],
-          "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>'
+          ]
         });
+        jQuery("#listingContainersTable_wrapper").prepend("<div class='float-right toolbar'></div>");
         jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
         jQuery("#toolbar").append("<button style=\"margin-left:5px;\" onclick=\"window.location.href='/miso/container/new';\" class=\"fg-button ui-state-default ui-corner-all\">Create Partition Container</button>");
       }
@@ -234,7 +240,7 @@ Container.partition = {
       if (ul.length > 0) {
         if (!Utils.validation.isNullCheck(ul.html()) && ul.find("div").length > 0) {
           //a.html("<input type='text' id='poolBarcode"+partitionNum+"' name='poolBarcode"+partitionNum+"' partition='"+partitionNum+"' onkeyup='Utils.timer.timedFunc(Container.pool.getPool(this), 300);'/><br/><span id='msg"+partitionNum+"'/>");
-          a.html("<input type='text' id='poolBarcode" + partitionNum + "' name='poolBarcode" + partitionNum + "' partition='" + partitionNum + "'/><br/><span id='msg" + partitionNum + "'/>");
+          a.html("<input type='text' id='poolBarcode" + partitionNum + "' name='poolBarcode" + partitionNum + "' partition='" + partitionNum + "' class='form-control'/><br/><span id='msg" + partitionNum + "'/>");
           Utils.timer.typewatchFunc(jQuery("#poolBarcode" + partitionNum), function () {
             Container.pool.getPool(jQuery("#poolBarcode" + partitionNum));
           }, 400, 4);
@@ -246,7 +252,7 @@ Container.partition = {
     }
     else {
       //a.html("<input type='text' id='poolBarcode"+partitionNum+"' name='poolBarcode"+partitionNum+"' partition='"+partitionNum+"' onkeyup='Utils.timer.timedFunc(Container.pool.getPool(this), 300);'/><br/><span id='msg"+partitionNum+"'/>");
-      a.html("<input type='text' id='poolBarcode" + partitionNum + "' name='poolBarcode" + partitionNum + "' partition='" + partitionNum + "'/><br/><span id='msg" + partitionNum + "'/>");
+      a.html("<input type='text' id='poolBarcode" + partitionNum + "' name='poolBarcode" + partitionNum + "' partition='" + partitionNum + "' class='form-control'/><br/><span id='msg" + partitionNum + "'/>");
       Utils.timer.typewatchFunc(jQuery("#poolBarcode" + partitionNum), function () {
         Container.pool.getPool(jQuery("#poolBarcode" + partitionNum));
       }, 400, 4);
@@ -267,7 +273,7 @@ Container.partition = {
         {'poolId': newpool.find('input').val(), 'partition': jQuery(this).attr("partition"), 'url': ajaxurl},
         {'doOnSuccess': function (json) {
           newpool.append(json.html);
-          newpool.append("<span style='position: absolute; top: 0; right: 0;' onclick='Container.pool.confirmPoolRemove(this);' class='float-right ui-icon ui-icon-circle-close'></span>");
+          newpool.append("<span style='position: absolute; top: 0; right: 0;' onclick='Container.pool.confirmPoolRemove(this);' class='fa fa-fw fa-2x fa-times-circle-o pull-right'></span>");
         },
           'doOnError': function (json) {
             newpool.remove();
@@ -334,7 +340,7 @@ Container.pool = {
       {
         "doOnSuccess": function (json) {
           jQuery('#poolList').html(json.html);
-          jQuery('#poolList .dashboard').each(function () {
+          jQuery('#poolList .list-group-item').each(function () {
             var inp = jQuery(this);
             inp.dblclick(function () {
               Container.partition.insertPoolNextAvailable(inp);

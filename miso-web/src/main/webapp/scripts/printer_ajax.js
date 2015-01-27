@@ -91,7 +91,7 @@ Print.ui = {
       $('printerTable').insertRow(1);
 
       var column1 = $('printerTable').rows[1].insertCell(-1);
-      column1.innerHTML = "<input id='serviceName' name='serviceName' type='text'/>";
+      column1.innerHTML = "<input id='serviceName' name='serviceName' type='text' class='form-control'/>";
       var column2 = $('printerTable').rows[1].insertCell(-1);
       column2.innerHTML = "<i>Set in context fields</i>";
       var column3 = $('printerTable').rows[1].insertCell(-1);
@@ -104,7 +104,7 @@ Print.ui = {
       column6.innerHTML = "<div id='available'></div>";
       var column7 = $('printerTable').rows[1].insertCell(-1);
       column7.id = "addTd";
-      column7.innerHTML = "Add";
+      column7.innerHTML = "<i>Add printer address...</i>";
     }
     else {
       alert("Cannot add another printer service when one is already in progress.")
@@ -127,7 +127,7 @@ Print.ui = {
     var fields = json.contextFields;
     for (var key in fields) {
       if (fields.hasOwnProperty(key)) {
-        jQuery('#contextFields').append(key +": <input id='contextField-"+key+"' field='"+key+"' type='text' value='"+fields[key]+"'/><br/>");
+        jQuery('#contextFields').append(key +": <input id='contextField-"+key+"' field='"+key+"' type='text' value='"+fields[key]+"' class='form-control'/><br/>");
       }
     }
     jQuery('#contextField-host').keyup(function() { Print.service.validatePrinter(this) });
@@ -150,7 +150,7 @@ Print.service = {
             $('available').innerHTML = json.html;
             if (json.html == "OK") {
               $('available').setAttribute("style", "background-color:green");
-              $('addTd').innerHTML = "<a href='javascript:void(0);' onclick='Print.service.addPrinterService();'/>Add</a>";
+              $('addTd').innerHTML = "<div style='text-align:center;'><a href='javascript:void(0);' onclick='Print.service.addPrinterService();'/><span class='fa fa-fw fa-lg fa-plus-square-o'></span></a></div>";
             }
             else {
               $('available').setAttribute("style", "background-color:red");

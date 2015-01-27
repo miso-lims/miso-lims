@@ -32,10 +32,13 @@
 
 <div id="maincontent">
 
-<h1>
-    Export Samples or Library & Pool Sheet
-</h1>
-
+<nav class="navbar navbar-default" role="navigation">
+   <div class="navbar-header">
+      <span class="navbar-brand navbar-center">
+        Export Samples or Library & Pool Sheet
+      </span>
+   </div>
+</nav>
 
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
     <div id="note_arrowclick" class="toggleLeft"></div>
@@ -49,7 +52,7 @@
 
     <div align="right">
         Filter:
-        <input id="searchSamples" type="text" name="searchSamples" size="8"/>
+        <input id="searchSamples" type="text" name="searchSamples" size="8" class="form-control"/>
     </div>
     <div id="sampleList" class="elementList ui-corner-all" style="height:800px;width:200px;" align="right">Select sample
         sheet type on the left first...

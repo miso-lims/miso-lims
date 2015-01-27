@@ -73,7 +73,7 @@ public class SQLPlateDAO implements PlateStore {
   private static final String TABLE_NAME = "Plate";
 
   public static final String PLATE_SELECT =
-          "SELECT plateId, name, description, creationDate, plateMaterialType, identificationBarcode, locationBarcode, size, tagBarcodeId, securityProfile_profileId " +
+          "SELECT plateId, name, description, creationDate, plateMaterialType, identificationBarcode, locationBarcode, size, securityProfile_profileId " +
           "FROM "+TABLE_NAME;
 
   public static final String PLATE_SELECT_BY_ID =
@@ -84,7 +84,7 @@ public class SQLPlateDAO implements PlateStore {
 
   public static final String PLATE_UPDATE =
           "UPDATE "+TABLE_NAME+" " +
-          "SET plateId=:plateId, name=:name, description=:description, creationDate=:creationDate, plateMaterialType=:plateMaterialType, identificationBarcode=:identificationBarcode, locationBarcode=:locationBarcode, size=:size, tagBarcodeId=:tagBarcodeId, securityProfile_profileId=:securityProfile_profileId " +
+          "SET plateId=:plateId, name=:name, description=:description, creationDate=:creationDate, plateMaterialType=:plateMaterialType, identificationBarcode=:identificationBarcode, locationBarcode=:locationBarcode, size=:size, securityProfile_profileId=:securityProfile_profileId " +
           "WHERE plateId=:plateId";
 
   public static final String PLATE_DELETE =
@@ -275,10 +275,6 @@ public class SQLPlateDAO implements PlateStore {
           .addValue("size", plate.getSize())
           .addValue("securityProfile_profileId", securityProfileId);
 
-    if (plate.getTagBarcode() != null) {
-      params.addValue("tagBarcodeId", plate.getTagBarcode().getId());
-    }
-
     if (plate.getId() == AbstractPlate.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
                             .withTableName(TABLE_NAME)
@@ -291,13 +287,8 @@ public class SQLPlateDAO implements PlateStore {
 
         if (namingScheme.validateField("name", plate.getName())) {
           String barcode = "";
-          if (plate.getTagBarcode() != null) {
-            barcode = plate.getName() + "::" + plate.getTagBarcode();
-          }
-          else {
             //TODO this should be alias
             barcode = plate.getName() + "::" + plate.getDescription();
-          }          
           params.addValue("name", name);
 
           params.addValue("identificationBarcode", barcode);
@@ -328,13 +319,9 @@ public class SQLPlateDAO implements PlateStore {
     else {
       try {
         String plateBarcode = "";
-        if (plate.getTagBarcode() != null) {
-          plateBarcode = plate.getName() + "::" + plate.getTagBarcode();
-        }
-        else {
+
           //TODO this should be alias
           plateBarcode = plate.getName() + "::" + plate.getDescription();
-        }
         if (namingScheme.validateField("name", plate.getName())) {
           params.addValue("plateId", plate.getId())
                 .addValue("name", plate.getName())
@@ -456,7 +443,6 @@ public class SQLPlateDAO implements PlateStore {
       try {
         plate.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
         plate.setPlateMaterialType(PlateMaterialType.get(rs.getString("plateMaterialType")));
-        plate.setTagBarcode(libraryDAO.getTagBarcodeById(rs.getLong("tagBarcodeId")));
 
         if (!isLazy()) {
           plate.setElements(resolvePlateElements(plate.getId()));

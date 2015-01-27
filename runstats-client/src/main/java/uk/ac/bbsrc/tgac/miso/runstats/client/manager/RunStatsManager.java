@@ -94,6 +94,7 @@ public class RunStatsManager {
       return rt != null && !rt.isEmpty();
     }
     catch (SQLException e) {
+      log.error("Cannot get StatsDB stats for run " + run.getAlias() + ": " + e.getMessage());
       e.printStackTrace();
       return false;
     }
@@ -113,15 +114,17 @@ public class RunStatsManager {
       report.put("runSummary", JSONArray.fromObject(rt.toJSON()));
     }
     catch (SQLException e) {
+      log.error("Cannot get StatsDB stats for run " + run.getAlias() + ": " + e.getMessage());
       e.printStackTrace();
     }
     catch (IOException e) {
+      log.error("Cannot get StatsDB stats for run " + run.getAlias() + ": " + e.getMessage());
       e.printStackTrace();
     }
 
-    if (!((RunImpl) run).getSequencerPartitionContainers().isEmpty()) {
+    if (!run.getSequencerPartitionContainers().isEmpty()) {
       JSONObject containers = new JSONObject();
-      for (SequencerPartitionContainer<SequencerPoolPartition> container : ((RunImpl) run).getSequencerPartitionContainers()) {
+      for (SequencerPartitionContainer<SequencerPoolPartition> container : run.getSequencerPartitionContainers()) {
         JSONObject f = new JSONObject();
         f.put("idBarcode", container.getIdentificationBarcode());
 
@@ -138,9 +141,11 @@ public class RunStatsManager {
             }
           }
           catch (SQLException e) {
+            log.error("Cannot get StatsDB stats for run " + run.getAlias() + ": " + e.getMessage());
             e.printStackTrace();
           }
           catch (IOException e) {
+            log.error("Cannot get StatsDB stats for run " + run.getAlias() + ": " + e.getMessage());
             e.printStackTrace();
           }
 
@@ -161,9 +166,11 @@ public class RunStatsManager {
                     }
                   }
                   catch (SQLException e) {
+                    log.error("Cannot get StatsDB stats for run " + run.getAlias() + ": " + e.getMessage());
                     e.printStackTrace();
                   }
                   catch (IOException e) {
+                    log.error("Cannot get StatsDB stats for run " + run.getAlias() + ": " + e.getMessage());
                     e.printStackTrace();
                   }
                 }
@@ -195,16 +202,18 @@ public class RunStatsManager {
       }
     }
     catch (SQLException e) {
+      log.error("Cannot get StatsDB stats for run " + run.getAlias() + ": " + e.getMessage());
       e.printStackTrace();
     }
     catch (IOException e) {
+      log.error("Cannot get StatsDB stats for run " + run.getAlias() + ": " + e.getMessage());
       e.printStackTrace();
     }
 
     //clear any previous barcode query
     map.remove(RunProperty.barcode);
-    if (!((RunImpl) run).getSequencerPartitionContainers().isEmpty()) {
-      for (SequencerPartitionContainer<SequencerPoolPartition> container : ((RunImpl) run).getSequencerPartitionContainers()) {
+    if (!run.getSequencerPartitionContainers().isEmpty()) {
+      for (SequencerPartitionContainer<SequencerPoolPartition> container : run.getSequencerPartitionContainers()) {
         SequencerPoolPartition part = container.getPartitionAt(laneNumber);
         if (part.getPartitionNumber() == laneNumber) {
           if (part.getPool() != null) {
@@ -222,9 +231,11 @@ public class RunStatsManager {
                     }
                   }
                   catch (SQLException e) {
+                    log.error("Cannot get StatsDB stats for run " + run.getAlias() + ": " + e.getMessage());
                     e.printStackTrace();
                   }
                   catch (IOException e) {
+                    log.error("Cannot get StatsDB stats for run " + run.getAlias() + ": " + e.getMessage());
                     e.printStackTrace();
                   }
                 }

@@ -95,7 +95,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-war-plugin</artifactId>
-	          <version>2.3</version>
+            <version>2.3</version>
             <configuration>
               <webResources>
                 <resource>
@@ -539,6 +539,13 @@
       <version>0.8.2</version>
     </dependency>
     -->
+
+    <dependency>
+      <groupId>com.mikesamuel</groupId>
+      <artifactId>json-sanitizer</artifactId>
+      <version>[1.0,)</version>
+    </dependency>
+
   </dependencies>
   <properties>
     <jdom-version>1.1</jdom-version>

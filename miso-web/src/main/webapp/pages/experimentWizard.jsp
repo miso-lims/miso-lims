@@ -33,12 +33,17 @@
   <div id="contentcolumn">
     <div id="result">
       <form id="experimentWizardForm" method="POST" autocomplete="off">
-        <h1>
-          Create Experiment Wizard
-          <button type="button" class="fg-button ui-state-default ui-corner-all"
-                  onclick="checkform('experimentWizardForm');">Save
-          </button>
-        </h1>
+        <nav class="navbar navbar-default" role="navigation">
+           <div class="navbar-header">
+              <span class="navbar-brand navbar-center">
+                Create Experiment Wizard
+              </span>
+           </div>
+           <div class="navbar-right container-fluid">
+              <button type="button" class="btn btn-default navbar-btn" onclick="checkform('experimentWizardForm');">Save</button>
+           </div>
+        </nav>
+
         <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
           <div id="note_arrowclick" class="toggleLeft"></div>
         </div>

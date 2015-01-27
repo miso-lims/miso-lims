@@ -26,7 +26,11 @@
 
 <div id="maincontent">
   <div id="contentcolumn">
-    <h1>Technician Menu</h1>
+    <nav class="navbar navbar-default" role="navigation">
+      <div class="navbar-header">
+        <span class="navbar-brand navbar-center">Technician Menu</span>
+      </div>
+    </nav>
 
     <div class="column">
       <div class="portlet">

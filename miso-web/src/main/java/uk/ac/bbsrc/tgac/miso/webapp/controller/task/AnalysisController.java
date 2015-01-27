@@ -113,7 +113,7 @@ public class AnalysisController {
 
       map.put("instrument-id", run.getSequencerReference().getName());
 
-      SequencerPartitionContainer<SequencerPoolPartition> f = ((RunImpl) run).getSequencerPartitionContainers().get(0);
+      SequencerPartitionContainer<SequencerPoolPartition> f = run.getSequencerPartitionContainers().get(0);
       String laneValue = "8";
       String naType = "dna";
       String indexValue = "6";

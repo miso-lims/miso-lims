@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
 import com.eaglegenomics.simlims.core.Note;
 //import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.json.JsonSanitizer;
 import net.sf.json.JSONArray;
 import org.codehaus.jackson.map.ObjectMapper;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
@@ -146,7 +147,7 @@ public class ProjectControllerHelperService {
       note.setCreationDate(new Date());
       overview.getNotes().add(note);
       requestManager.saveProjectOverviewNote(overview, note);
-      requestManager.saveProject(project);
+      requestManager.saveProjectOverview(overview);
     }
     catch (IOException e) {
       e.printStackTrace();
@@ -327,13 +328,12 @@ public class ProjectControllerHelperService {
       JSONObject j = new JSONObject();
       JSONArray jsonArray = new JSONArray();
       for (Project project : requestManager.listAllProjects()) {
-        jsonArray.add("['" + project.getName() + "','" +
-                      project.getAlias() + "','" +
-                      project.getDescription() + "','" +
-                      project.getProgress().getKey() + "','" +
-//                      checkOverviews(project.getProjectId()) + "','" +
-                      project.getProjectId() + "','" +
-                      "<a href=\"/miso/project/" + project.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
+        jsonArray.add(JsonSanitizer.sanitize("[\"" + project.getName() + "\",\"" +
+                     project.getAlias() + "\",\"" +
+                     project.getDescription() + "\",\"" +
+                     project.getProgress().getKey() + "\",\"" +
+                     project.getProjectId() + "\",\"" +
+                     "<a href=\"/miso/project/" + project.getId() + "\"><span class=\"fa fa-pencil-square-o fa-lg\"></span></a>" + "\"]"));
 
       }
       j.put("projectsArray", jsonArray);
@@ -925,15 +925,16 @@ public class ProjectControllerHelperService {
     StringBuilder sb = new StringBuilder();
     JSONObject j = new JSONObject();
     try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+      //User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       ProjectOverview overview = requestManager.getProjectOverviewById(overviewId);
-      sb.append("<ul class='bullets' style='margin-left: -30px;'>");
+      //sb.append("<ul class='bullets' style='margin-left: -30px;'>");
       for (User theUser : overview.getWatchers()) {
-        sb.append("<li>");
-        sb.append(theUser.getFullName());
+        sb.append("<li role='presentation'>");
+        sb.append("<a href='/miso/user/"+theUser.getUserId()+"'>"+theUser.getFullName()+"</a>");
         sb.append("</li>");
       }
-      sb.append("</ul>");
+      //sb.append("</ul>");
+      sb.append("<li class='divider'></li><li><a class='text-center' href='#'><strong>See All Watchers</strong><i class='fa fa-angle-right fa-fw'></i></a></li>");
       j.put("watchers", sb.toString());
       return j;
     }
@@ -950,11 +951,11 @@ public class ProjectControllerHelperService {
       JSONObject j = new JSONObject();
       JSONArray jsonArray = new JSONArray();
       for (Sample sample : requestManager.listAllSamplesByProjectId(projectId)) {
-        jsonArray.add("{'id':'" + sample.getId() + "'," +
-                      "'name':'" + sample.getName() + "'," +
-                      "'alias':'"+sample.getAlias() + "'," +
-                      "'type':'"+sample.getSampleType() + "'," +
-                      "'description':'"+sample.getDescription() + "'}");
+        jsonArray.add(JsonSanitizer.sanitize("{\"id\":\"" + sample.getId() + "\"," +
+                      "\"name\":\"" + sample.getName() + "\"," +
+                      "\"alias\":\""+sample.getAlias() + "\"," +
+                      "\"type\":\""+sample.getSampleType() + "\"," +
+                      "\"description\":\""+sample.getDescription() + "\"}"));
       }
       j.put("array", jsonArray);
       return j;
@@ -983,7 +984,7 @@ public class ProjectControllerHelperService {
         }
       }
 
-      EntityGroup<ProjectOverview, Sample> osg = new EntityGroupImpl<>();
+      HierarchicalEntityGroup<ProjectOverview, Sample> osg = new HierarchicalEntityGroupImpl<>();
       osg.setEntities(samples);
       osg.setParent(overview);
       overview.setSampleGroup(osg);
@@ -1004,9 +1005,9 @@ public class ProjectControllerHelperService {
     Long groupId = json.getLong("groupId");
     try {
       ProjectOverview overview = requestManager.getProjectOverviewById(overviewId);
-      EntityGroup<ProjectOverview, Sample> osg = overview.getSampleGroup();
+      HierarchicalEntityGroup<ProjectOverview, Sample> osg = overview.getSampleGroup();
 
-      if (osg != null && groupId != null && osg.getId() == groupId.longValue()) {
+      if (osg != null && groupId != null && osg.getId() == groupId) {
         if (json.has("samples")) {
           JSONArray a = JSONArray.fromObject(json.get("samples"));
           for (JSONObject j : (Iterable<JSONObject>) a) {
@@ -1034,6 +1035,27 @@ public class ProjectControllerHelperService {
     catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Unable to add Sample Group: " + e.getMessage());
+    }
+  }
+
+  public JSONObject deleteProjectFile(HttpSession session, JSONObject json) {
+    Long projectId = json.getLong("projectId");
+    String fileName = json.getString("fileName");
+    try {
+      Project project = requestManager.getProjectById(projectId);
+      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+      if (user.isAdmin() || (project.getSecurityProfile().getOwner() != null && project.getSecurityProfile().getOwner().equals(user))) {
+        File f = misoFileManager.getFile(Project.class, projectId.toString(), fileName);
+        if (f.exists() && f.delete()) {
+          return JSONUtils.SimpleJSONResponse("OK");
+        }
+        return JSONUtils.SimpleJSONError("File does not exist or is not deletable");
+      }
+      return JSONUtils.SimpleJSONError("Only an admin or project owner can delete this project's files.");
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+      return JSONUtils.SimpleJSONError("Unable to delete Project file: " + e.getMessage());
     }
   }
 }

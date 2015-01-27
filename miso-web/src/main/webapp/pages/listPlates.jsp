@@ -26,15 +26,19 @@
 <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.popup.js'/>"></script>
 <div id="maincontent">
   <div id="contentcolumn">
-    <h1>
-      <div id="totalCount"></div>
-    </h1>
+    <nav class="navbar navbar-default" role="navigation">
+       <div class="navbar-header">
+          <span class="navbar-brand navbar-center">
+            <div id="totalCount"> Plates</div>
+          </span>
+       </div>
+    </nav>
     <a href="<c:url value='/miso/plate/new'/>" class="add">Create Plate</a>
 
-    <form id="filter-form">Filter: <input name="filter" id="filter" value="" maxlength="30" size="30" type="text">
+    <form id="filter-form">Filter: <input name="filter" id="filter" value="" maxlength="30" size="30" type="text" class="form-control">
     </form>
     <br/>
-    <table class="list" id="table">
+    <table class="table table-bordered table-striped" id="table">
       <thead>
       <tr>
         <th>Name</th>
@@ -42,7 +46,6 @@
         <th>Creation Date</th>
         <th>Size</th>
         <th>Material Type</th>
-        <th>Tag Barcode</th>
         <th class="fit">Edit</th>
       </tr>
       </thead>
@@ -54,10 +57,9 @@
           <td>${plate.creationDate}</td>
           <td>${plate.size}</td>
           <td>${plate.plateMaterialType}</td>
-          <td>${plate.tagBarcode.sequence}</td>
           <td class="misoicon"
               onclick="window.location.href='<c:url value="/miso/plate/${plate.id}"/>'"><span
-              class="ui-icon ui-icon-pencil"/></td>
+              class="fa fa-pencil-square-o fa-lg"/></td>
         </tr>
       </c:forEach>
       </tbody>

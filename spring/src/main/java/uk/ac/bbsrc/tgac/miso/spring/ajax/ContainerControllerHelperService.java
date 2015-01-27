@@ -190,9 +190,9 @@ public class ContainerControllerHelperService {
     StringBuilder b = new StringBuilder();
     b.append("<h2>Container</h2>");
     b.append("<table class='in'>");
-    b.append("<tr><td>ID:</td><td><button onclick='Container.lookupContainer(this);' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'><input type='text' id='identificationBarcode' name='identificationBarcode'/><input type='hidden' value='on' name='_identificationBarcode'></div></td></tr>");
-    b.append("<tr><td>Location:</td><td><input type='text' id='locationBarcode' name='locationBarcode'/><input type='hidden' value='on' name='_locationBarcode'></td></tr>");
-    b.append("<tr><td>Validation:</td><td><input type='text' id='validationBarcode' name='validationBarcode'/><input type='hidden' value='on' name='_validationBarcode'></td></tr>");
+    b.append("<tr><td>ID:</td><td><button onclick='Container.lookupContainer(this);' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'><input type='text' id='identificationBarcode' name='identificationBarcode' class='form-control'/><input type='hidden' value='on' name='_identificationBarcode'></div></td></tr>");
+    b.append("<tr><td>Location:</td><td><input type='text' id='locationBarcode' name='locationBarcode' class='form-control'/><input type='hidden' value='on' name='_locationBarcode'></td></tr>");
+    b.append("<tr><td>Validation:</td><td><input type='text' id='validationBarcode' name='validationBarcode' class='form-control'/><input type='hidden' value='on' name='_validationBarcode'></td></tr>");
     b.append("<tr><td>Paired:</td><td><input type='checkbox' id='paired' name='paired' value='false'/><input type='hidden' value='on' name='_paired'></td></tr>");
     b.append("</table>");
     b.append("<div id='partitionErrorDiv'> </div>");
@@ -204,10 +204,10 @@ public class ContainerControllerHelperService {
       if ("Illumina MiSeq".equals(instrumentModel) || "Illumina NextSeq 500".equals(instrumentModel)) {
         b.append("<i class='italicInfo'>Click in a partition box to beep/type in barcodes, or double click a pool on the right to sequentially add pools to the container</i>");
         b.append("<table class='in'>");
-        b.append("<th>Lane No.</th>");
-        b.append("<th>Pool</th>");
+        //b.append("<th>Lane No.</th>");
+        //b.append("<th>Pool</th>");
 
-        b.append("<tr><td>1 </td><td width='90%'><div id='p_div-0'><ul class='runPartitionDroppable' bind='partitions[0].pool' partition='0' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
+        b.append("<tr><td class='partition-number'>1</td><td><div id='p_div-0'><ul class='runPartitionDroppable' bind='partitions[0].pool' partition='0' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
         b.append("</table>");
         b.append("</div>");
 
@@ -229,17 +229,17 @@ public class ContainerControllerHelperService {
       else {
         b.append("<i class='italicInfo'>Click in a partition box to beep/type in barcodes, or double click a pool on the right to sequentially add pools to the container</i>");
         b.append("<table class='in'>");
-        b.append("<th>Lane No.</th>");
-        b.append("<th>Pool</th>");
+        //b.append("<th>Lane No.</th>");
+        //b.append("<th>Pool</th>");
 
-        b.append("<tr><td>1 </td><td width='90%'><div id='p_div-0'><ul class='runPartitionDroppable' bind='partitions[0].pool' partition='0' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
-        b.append("<tr><td>2 </td><td width='90%'><div id='p_div-1'><ul class='runPartitionDroppable' bind='partitions[1].pool' partition='1' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
-        b.append("<tr><td>3 </td><td width='90%'><div id='p_div-2'><ul class='runPartitionDroppable' bind='partitions[2].pool' partition='2' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
-        b.append("<tr><td>4 </td><td width='90%'><div id='p_div-3'><ul class='runPartitionDroppable' bind='partitions[3].pool' partition='3' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
-        b.append("<tr><td>5 </td><td width='90%'><div id='p_div-4'><ul class='runPartitionDroppable' bind='partitions[4].pool' partition='4' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
-        b.append("<tr><td>6 </td><td width='90%'><div id='p_div-5'><ul class='runPartitionDroppable' bind='partitions[5].pool' partition='5' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
-        b.append("<tr><td>7 </td><td width='90%'><div id='p_div-6'><ul class='runPartitionDroppable' bind='partitions[6].pool' partition='6' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
-        b.append("<tr><td>8 </td><td width='90%'><div id='p_div-7'><ul class='runPartitionDroppable' bind='partitions[7].pool' partition='7' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
+        b.append("<tr><td class='partition-number'>1</td><td><div id='p_div-0'><ul class='runPartitionDroppable' bind='partitions[0].pool' partition='0' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
+        b.append("<tr><td class='partition-number'>2</td><td><div id='p_div-1'><ul class='runPartitionDroppable' bind='partitions[1].pool' partition='1' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
+        b.append("<tr><td class='partition-number'>3</td><td><div id='p_div-2'><ul class='runPartitionDroppable' bind='partitions[2].pool' partition='2' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
+        b.append("<tr><td class='partition-number'>4</td><td><div id='p_div-3'><ul class='runPartitionDroppable' bind='partitions[3].pool' partition='3' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
+        b.append("<tr><td class='partition-number'>5</td><td><div id='p_div-4'><ul class='runPartitionDroppable' bind='partitions[4].pool' partition='4' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
+        b.append("<tr><td class='partition-number'>6</td><td><div id='p_div-5'><ul class='runPartitionDroppable' bind='partitions[5].pool' partition='5' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
+        b.append("<tr><td class='partition-number'>7</td><td><div id='p_div-6'><ul class='runPartitionDroppable' bind='partitions[6].pool' partition='6' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
+        b.append("<tr><td class='partition-number'>8</td><td><div id='p_div-7'><ul class='runPartitionDroppable' bind='partitions[7].pool' partition='7' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
         b.append("</table>");
         b.append("</div>");
 
@@ -263,9 +263,9 @@ public class ContainerControllerHelperService {
     StringBuilder b = new StringBuilder();
     b.append("<h2>Container</h2>");
     b.append("<table class='in'>");
-    b.append("<tr><td>ID:</td><td><input type='text' id='identificationBarcode' name='identificationBarcode'/><input type='hidden' value='on' name='_identificationBarcode'><button onclick='Container.lookupContainer(this);' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button></td></tr>");
-    b.append("<tr><td>Location:</td><td><input type='text' id='locationBarcode' name='locationBarcode'/><input type='hidden' value='on' name='_locationBarcode'></td></tr>");
-    b.append("<tr><td>Validation:</td><td><input type='text' id='validationBarcode' name='validationBarcode'/><input type='hidden' value='on' name='_validationBarcode'></td></tr>");
+    b.append("<tr><td>ID:</td><td><input type='text' id='identificationBarcode' name='identificationBarcode' class='form-control'/><input type='hidden' value='on' name='_identificationBarcode'><button onclick='Container.lookupContainer(this);' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button></td></tr>");
+    b.append("<tr><td>Location:</td><td><input type='text' id='locationBarcode' name='locationBarcode' class='form-control'/><input type='hidden' value='on' name='_locationBarcode'></td></tr>");
+    b.append("<tr><td>Validation:</td><td><input type='text' id='validationBarcode' name='validationBarcode' class='form-control'/><input type='hidden' value='on' name='_validationBarcode'></td></tr>");
     b.append("<tr><td>Paired:</td><td><input type='checkbox' id='paired' name='paired'/><input type='hidden' value='on' name='_paired'></td></tr>");
     b.append("</table>");
     b.append("<div id='partitionErrorDiv'> </div>");
@@ -287,9 +287,9 @@ public class ContainerControllerHelperService {
       SequencerReference sr = requestManager.getSequencerReferenceById(seqRefId);
       b.append("<h2>Container</h2>");
       b.append("<table class='in'>");
-      b.append("<tr><td>ID:</td><td><button onclick='Container.lookupContainer(this);' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'><input type='text' id='identificationBarcode' name='identificationBarcode'/><input type='hidden' value='on' name='_identificationBarcode'></div></td></tr>");
-      b.append("<tr><td>Location:</td><td><input type='text' id='locationBarcode' name='locationBarcode'/><input type='hidden' value='on' name='_locationBarcode'></td></tr>");
-      b.append("<tr><td>Validation:</td><td><input type='text' id='validationBarcode' name='validationBarcode'/><input type='hidden' value='on' name='_validationBarcode'></td></tr>");
+      b.append("<tr><td>ID:</td><td><button onclick='Container.lookupContainer(this);' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'><input type='text' id='identificationBarcode' name='identificationBarcode' class='form-control'/><input type='hidden' value='on' name='_identificationBarcode'></div></td></tr>");
+      b.append("<tr><td>Location:</td><td><input type='text' id='locationBarcode' name='locationBarcode' class='form-control'/><input type='hidden' value='on' name='_locationBarcode'></td></tr>");
+      b.append("<tr><td>Validation:</td><td><input type='text' id='validationBarcode' name='validationBarcode' class='form-control'/><input type='hidden' value='on' name='_validationBarcode'></td></tr>");
       b.append("<tr><td>Paired:</td><td><input type='checkbox' id='paired' name='paired'/><input type='hidden' value='on' name='_paired'></td></tr>");
       b.append("</table>");
       b.append("<div id='partitionErrorDiv'> </div>");
@@ -333,9 +333,9 @@ public class ContainerControllerHelperService {
     StringBuilder b = new StringBuilder();
     b.append("<h2>Container</h2>");
     b.append("<table class='in'>");
-    b.append("<tr><td>ID:</td><td><input type='text' id='identificationBarcode' name='identificationBarcode'/><input type='hidden' value='on' name='_identificationBarcode'><button onclick='Container.lookupContainer(this);' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button></td></tr>");
-    b.append("<tr><td>Location:</td><td><input type='text' id='locationBarcode' name='locationBarcode'/><input type='hidden' value='on' name='_locationBarcode'></td></tr>");
-    b.append("<tr><td>Validation:</td><td><input type='text' id='validationBarcode' name='validationBarcode'/><input type='hidden' value='on' name='_validationBarcode'></td></tr>");
+    b.append("<tr><td>ID:</td><td><input type='text' id='identificationBarcode' name='identificationBarcode' class='form-control'/><input type='hidden' value='on' name='_identificationBarcode'><button onclick='Container.lookupContainer(this);' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button></td></tr>");
+    b.append("<tr><td>Location:</td><td><input type='text' id='locationBarcode' name='locationBarcode' class='form-control'/><input type='hidden' value='on' name='_locationBarcode'></td></tr>");
+    b.append("<tr><td>Validation:</td><td><input type='text' id='validationBarcode' name='validationBarcode' class='form-control'/><input type='hidden' value='on' name='_validationBarcode'></td></tr>");
     b.append("<tr><td>Paired:</td><td><input type='checkbox' id='paired' name='paired'/><input type='hidden' value='on' name='_paired'></td></tr>");
     b.append("</table>");
     b.append("<div id='partitionErrorDiv'> </div>");
@@ -382,8 +382,8 @@ public class ContainerControllerHelperService {
     StringBuilder b = new StringBuilder();
     b.append("<i class='italicInfo'>Click in a partition box to beep/type in barcodes, or double click a pool on the right to sequentially add pools to the container</i>");
     b.append("<table class='in'>");
-    b.append("<th>Lane No.</th>");
-    b.append("<th>Pool</th>");
+    //b.append("<th>Lane No.</th>");
+    //b.append("<th>Pool</th>");
 
     SequencerPartitionContainer<SequencerPoolPartition> lf =
         (SequencerPartitionContainer<SequencerPoolPartition>) session.getAttribute("container_" + json.getString("container_cId"));
@@ -392,8 +392,8 @@ public class ContainerControllerHelperService {
     session.setAttribute("container_" + json.getString("container_cId"), lf);
 
     for (int i = 0; i < numLanes; i++) {
-      b.append("<tr><td>" + (i + 1) + "</td>");
-      b.append("<td width='90%'><div id='p_div_" + container + "-" + i + "' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='partitions[" + i + "].pool' partition='" + i + "' ondblclick='Container.partition.populatePartition(this);'>");
+      b.append("<tr><td class='partition-number'>" + (i + 1) + "</td>");
+      b.append("<td><div id='p_div_" + container + "-" + i + "' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='partitions[" + i + "].pool' partition='" + i + "' ondblclick='Container.partition.populatePartition(this);'>");
       b.append("</ul></div></td>");
       b.append("</tr>");
     }
@@ -572,7 +572,7 @@ public class ContainerControllerHelperService {
           }
         }
       }
-      sb.append("<div style='float:left; clear:both'>");
+      sb.append("<div>");
       for (Project project : pooledProjects) {
         sb.append("<div id='studySelectDiv" + partition + "_" + project.getProjectId() + "'>");
         sb.append(project.getAlias() + ": <select name='poolStudies" + partition + "_" + project.getProjectId() + "' id='poolStudies" + partition + "_" + project.getProjectId() + "'>");
@@ -674,7 +674,7 @@ public class ContainerControllerHelperService {
 
       b.append("<input type='hidden' name='partitions[" + partition + "].pool' id='pId" + p.getId() + "' value='" + p.getId() + "'/></div>");
       b.append("<div style='position: absolute; bottom: 0; right: 0; font-size: 24px; font-weight: bold; color:#BBBBBB'>" + p.getPlatformType().getKey() + "</div>");
-      b.append("<span style='position: absolute; top: 0; right: 0;' onclick='Container.pool.confirmPoolRemove(this);' class='float-right ui-icon ui-icon-circle-close'></span>");
+      b.append("<span style='position: absolute; top: 0; right: 0;' onclick='Container.pool.confirmPoolRemove(this);' class='fa fa-fw fa-2x fa-times-circle-o pull-right'></span>");
       b.append("</div>");
     }
     catch (IOException e) {
@@ -859,7 +859,7 @@ public class ContainerControllerHelperService {
                       (sequencePartitionContainer.getPlatform() != null && sequencePartitionContainer.getPlatform().getPlatformType() != null ? sequencePartitionContainer.getPlatform().getPlatformType().getKey() : "") + "','" +
                       run + "','" +
                       sequencer + "','" +
-                      "<a href=\"/miso/container/" + sequencePartitionContainer.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
+                      "<a href=\"/miso/container/" + sequencePartitionContainer.getId() + "\"><span class=\"fa fa-pencil-square-o fa-lg\"></span></a>" + "']");
 
       }
       j.put("array", jsonArray);

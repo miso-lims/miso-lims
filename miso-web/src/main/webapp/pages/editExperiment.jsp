@@ -30,7 +30,6 @@
 --%>
 <%@ include file="../header.jsp" %>
 
-<script type="text/javascript" src="<c:url value='/scripts/run_ajax.js?ts=${timestamp.time}'/>"></script>
 <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.breadcrumbs.popup.js'/>"></script>
 
 <div id="maincontent">
@@ -38,13 +37,19 @@
 <form:form action="/miso/experiment" method="POST" commandName="experiment" autocomplete="off"
            onsubmit="return validate_experiment(this);">
 <sessionConversation:insertSessionConversationId attributeName="experiment"/>
-<h1>
-  <c:choose>
-    <c:when test="${experiment.id != 0}">Edit</c:when>
-    <c:otherwise>Create</c:otherwise>
-  </c:choose> Experiment
-  <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
-</h1>
+<nav class="navbar navbar-default" role="navigation">
+   <div class="navbar-header">
+      <span class="navbar-brand navbar-center">
+        <c:choose>
+          <c:when test="${experiment.id != 0}">Edit</c:when>
+          <c:otherwise>Create</c:otherwise>
+        </c:choose> Experiment
+      </span>
+   </div>
+   <div class="navbar-right container-fluid">
+      <button type="button" type="submit" class="btn btn-default navbar-btn">Save</button>
+   </div>
+</nav>
 <div class="breadcrumbs">
   <ul>
     <li>
@@ -105,26 +110,33 @@
 </tr>
 <tr>
   <td class="h">Title:</td>
-  <td><form:input path="title"/><span id="titlecounter" class="counter"></span></td>
-    <%--<td><a href="void(0);" onclick="popup('help/experimentTitle.html');">Help</a></td>--%>
+  <td>
+    <div class="input-group">
+      <form:input path="title" class="form-control"/><span id="titlecounter" class="input-group-addon"></span>
+    </div>
+  </td>
 </tr>
 <tr>
   <td class="h">Alias:</td>
-  <td><form:input path="alias" class="validateable"/><span id="aliascounter" class="counter"></span></td>
-    <%--<td><a href="void(0);" onclick="popup('help/experimentAlias.html');">Help</a></td>--%>
+  <td>
+    <div class="input-group">
+      <form:input path="alias" class="validateable form-control"/><span id="aliascounter" class="input-group-addon"></span>
+    </div>
+  </td>
 </tr>
 <tr>
   <td class="h">Description:</td>
-  <td><form:input path="description" class="validateable"/><span id="descriptioncounter" class="counter"></span></td>
-    <%--<td><a href="void(0);" onclick="popup('help/experimentDescription.html');">Help</a></td>--%>
+  <td>
+    <div class="input-group">
+      <form:input path="description" class="validateable form-control"/><span id="descriptioncounter" class="input-group-addon"></span>
+    </div>
+  </td>
 </tr>
 <c:if test="${not empty experiment.accession}">
   <tr>
     <td class="h">Accession:</td>
-    <td><a href="http://www.ebi.ac.uk/ena/data/view/${experiment.accession}"
-           target="_blank">${experiment.accession}</a>
+    <td><a href="http://www.ebi.ac.uk/ena/data/view/${experiment.accession}" target="_blank">${experiment.accession}</a>
     </td>
-      <%--<td><a href="void(0);" onclick="popup('help/experimentAccession.html');">Help</a></td>--%>
   </tr>
 </c:if>
 <tr>
@@ -230,8 +242,7 @@
                   </c:forEach>
                 </i>
                 </span>
-            <span onclick='Utils.ui.confirmRemove(jQuery(this).parent());'
-                  class='float-right ui-icon ui-icon-circle-close'></span>
+            <span onclick='Utils.ui.confirmRemove(jQuery(this).parent());' class='fa fa-fw fa-2x fa-times-circle-o pull-right'></span>
           </div>
           <input type="hidden" value="on" name="_pool"/>
         </div>
@@ -241,7 +252,13 @@
 </div>
 
 <div id="tab-2">
-  <h1>Consumables</h1>
+  <nav class="navbar navbar-default" role="navigation">
+     <div class="navbar-header">
+        <span class="navbar-brand navbar-center">
+          Cnsumables
+        </span>
+     </div>
+  </nav>
 
   <div id="addKitDialog" title="Assign a kit to this experiment"></div>
 
@@ -260,7 +277,7 @@
          ">Add Library Kit</a><br/>
 
   <form id='addLibraryKitForm'>
-    <table class="list" id="libraryKitTable">
+    <table class="table table-bordered table-striped" id="libraryKitTable">
       <thead>
       <tr>
         <th>Name</th>
@@ -291,7 +308,7 @@
          onclick="Experiment.kit.showEmPcrKitDialog(${experiment.id}); return false;">Add EmPCR Kit</a><br/>
 
       <form id='addEmPcrKitForm'>
-        <table class="list" id="emPcrKitTable">
+        <table class="table table-bordered table-striped" id="emPcrKitTable">
           <thead>
           <tr>
             <th>Name</th>
@@ -321,7 +338,7 @@
          onclick="Experiment.kit.showClusteringKitDialog(${experiment.id}); return false;">Add Clustering Kit</a><br/>
 
       <form id='addClusteringKitForm'>
-        <table class="list" id="clusteringKitTable">
+        <table class="table table-bordered table-striped" id="clusteringKitTable">
           <thead>
           <tr>
             <th>Name</th>
@@ -352,7 +369,7 @@
      onclick="Experiment.kit.showSequencingKitDialog(${experiment.id}); return false;">Add Sequencing Kit</a><br/>
 
   <form id='addSequencingKitForm'>
-    <table class="list" id="sequencingKitTable">
+    <table class="table table-bordered table-striped" id="sequencingKitTable">
       <thead>
       <tr>
         <th>Name</th>

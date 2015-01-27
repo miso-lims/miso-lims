@@ -25,7 +25,13 @@
 
 <div id="maincontent">
   <div id="contentcolumn">
-    <h1>Admin</h1>
+    <nav class="navbar navbar-default" role="navigation">
+       <div class="navbar-header">
+          <span class="navbar-brand navbar-center">
+            Admin
+          </span>
+       </div>
+    </nav>
 
     <div class="column">
       <div class="portlet">

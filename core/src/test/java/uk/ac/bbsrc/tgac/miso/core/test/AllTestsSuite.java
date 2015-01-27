@@ -42,7 +42,9 @@ import org.junit.runners.Suite;
   EraSubmissionTests.class,
   FormUtilsTests.class,
   PlateTests.class,
-  RunTests.class
+  RunTests.class,
+  TypeProcessorTests.class,
+  WorkflowTests.class
 })
 
 public class AllTestsSuite {

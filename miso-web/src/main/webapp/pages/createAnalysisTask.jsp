@@ -27,10 +27,16 @@
 <div id="maincontent">
 <div id="contentcolumn">
 
-<h1>
-  New Analysis Task
-  <input id="submitTaskButton" type="button" value="Submit Task" class="fg-button ui-state-default ui-corner-all" onclick="Tasks.job.submitAnalysisTask();"/>
-</h1>
+<nav class="navbar navbar-default" role="navigation">
+   <div class="navbar-header">
+      <span class="navbar-brand navbar-center">
+        New Analysis Task
+      </span>
+   </div>
+   <div class="navbar-right container-fluid">
+      <button type="button" class="btn btn-default navbar-btn" value="Submit Task" onclick="Tasks.job.submitAnalysisTask();">Submit Task</button>
+   </div>
+</nav>
 
 <c:if test="${not empty run}">
   Selected run: <b>${run.alias}</b><br/>

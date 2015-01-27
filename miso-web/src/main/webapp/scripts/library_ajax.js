@@ -70,15 +70,15 @@ Library.qc = {
       var column2 = $('libraryQcTable').rows[1].insertCell(-1);
       column2.innerHTML = "<input id='libraryQcUser' name='libraryQcUser' type='hidden' value='" + $('currentUser').innerHTML + "'/>" + $('currentUser').innerHTML;
       var column3 = $('libraryQcTable').rows[1].insertCell(-1);
-      column3.innerHTML = "<input id='libraryQcDate' name='libraryQcDate' type='text'/>";
+      column3.innerHTML = "<input id='libraryQcDate' name='libraryQcDate' type='text' class='form-control'/>";
       var column4 = $('libraryQcTable').rows[1].insertCell(-1);
       column4.innerHTML = "<select id='libraryQcType' name='libraryQcType' onchange='Library.qc.changeLibraryQcUnits(this);'/>";
       var column5 = $('libraryQcTable').rows[1].insertCell(-1);
-      column5.innerHTML = "<input id='libraryQcResults' name='libraryQcResults' type='text'/><span id='units'/>";
+      column5.innerHTML = "<div class='input-group'><input id='libraryQcResults' name='libraryQcResults' type='text' class='form-control'/><span class='input-group-addon' id='units'/></div>";
       var column6 = $('libraryQcTable').rows[1].insertCell(-1);
-      column6.innerHTML = "<input id='libraryQcInsertSize' name='libraryQcInsertSize' type='text'/> bp";
+      column6.innerHTML = "<input id='libraryQcInsertSize' name='libraryQcInsertSize' type='text' class='form-control'/> bp";
       var column7 = $('libraryQcTable').rows[1].insertCell(-1);
-      column7.innerHTML = "<a href='javascript:void(0);' onclick='Library.qc.addLibraryQC();'/>Add</a>";
+      column7.innerHTML = "<div style='text-align:center;'><a href='javascript:void(0);' onclick='Library.qc.addLibraryQC();'/><span class='fa fa-fw fa-lg fa-plus-square-o'></span></a></div>";
 
       Utils.ui.addMaxDatePicker("libraryQcDate", 0);
 
@@ -171,15 +171,15 @@ Library.dilution = {
       var column2 = $('libraryDilutionTable').rows[1].insertCell(-1);
       column2.innerHTML = "<input id='libraryDilutionCreator' name='libraryDilutionCreator' type='hidden' value='" + $('currentUser').innerHTML + "'/>" + $('currentUser').innerHTML;
       var column3 = $('libraryDilutionTable').rows[1].insertCell(-1);
-      column3.innerHTML = "<input id='libraryDilutionDate' name='libraryDilutionDate' type='text'/>";
+      column3.innerHTML = "<input id='libraryDilutionDate' name='libraryDilutionDate' type='text' class='form-control'/>";
       //var column5=$('libraryDilutionTable').rows[1].insertCell(-1);
       //column5.innerHTML="<input id='libraryDilutionBarcode' name='libraryDilutionBarcode' type='text'/>";
       var column6 = $('libraryDilutionTable').rows[1].insertCell(-1);
-      column6.innerHTML = "<input id='libraryDilutionResults' name='libraryDilutionResults' type='text'/>";
+      column6.innerHTML = "<input id='libraryDilutionResults' name='libraryDilutionResults' type='text' class='form-control'/>";
       var column7 = $('libraryDilutionTable').rows[1].insertCell(-1);
       column7.innerHTML = "<i>Generated on save</i>";
       var column8 = $('libraryDilutionTable').rows[1].insertCell(-1);
-      column8.innerHTML = "<a href='javascript:void(0);' onclick='Library.dilution.addLibraryDilution();'/>Add</a>";
+      column8.innerHTML = "<div style='text-align:center;'><a href='javascript:void(0);' onclick='Library.dilution.addLibraryDilution();'/><span class='fa fa-fw fa-lg fa-plus-square-o'></span></a></div>";
 
       Utils.ui.addMaxDatePicker("libraryDilutionDate", 0);
     }
@@ -266,11 +266,11 @@ Library.empcr = {
       var column3 = $('emPcrTable').rows[1].insertCell(-1);
       column3.innerHTML = "<input id='emPcrCreator' name='emPcrCreator' type='hidden' value='" + $('currentUser').innerHTML + "'/>" + $('currentUser').innerHTML;
       var column4 = $('emPcrTable').rows[1].insertCell(-1);
-      column4.innerHTML = "<input id='emPcrDate' name='emPcrDate' type='text'/>";
+      column4.innerHTML = "<input id='emPcrDate' name='emPcrDate' type='text' class='form-control'/>";
       var column5 = $('emPcrTable').rows[1].insertCell(-1);
-      column5.innerHTML = "<input id='emPcrResults' name='emPcrResults' type='text'/>";
+      column5.innerHTML = "<input id='emPcrResults' name='emPcrResults' type='text' class='form-control'/>";
       var column6 = $('emPcrTable').rows[1].insertCell(-1);
-      column6.innerHTML = "<a href='javascript:void(0);' onclick='Library.empcr.addEmPcr();'/>Add</a>";
+      column6.innerHTML = "<div style='text-align:center;'><a href='javascript:void(0);' onclick='Library.empcr.addEmPcr();'/><span class='fa fa-fw fa-lg fa-plus-square-o'></span></a></div>";
 
       Utils.ui.addMaxDatePicker("emPcrDate", 0);
     }
@@ -311,13 +311,13 @@ Library.empcr = {
       var column3 = $('emPcrDilutionTable').rows[1].insertCell(-1);
       column3.innerHTML = "<input id='emPcrDilutionCreator' name='emPcrDilutionCreator' type='hidden' value='" + $('currentUser').innerHTML + "'/>" + $('currentUser').innerHTML;
       var column4 = $('emPcrDilutionTable').rows[1].insertCell(-1);
-      column4.innerHTML = "<input id='emPcrDilutionDate' name='emPcrDilutionDate' type='text'/>";
+      column4.innerHTML = "<input id='emPcrDilutionDate' name='emPcrDilutionDate' type='text' class='form-control'/>";
       //var column5=$('emPcrDilutionTable').rows[1].insertCell(-1);
       //column5.innerHTML="<input id='emPcrDilutionBarcode' name='emPcrDilutionBarcode' type='text'/>";
       var column6 = $('emPcrDilutionTable').rows[1].insertCell(-1);
-      column6.innerHTML = "<input id='emPcrDilutionResults' name='emPcrDilutionResults' type='text'/>";
+      column6.innerHTML = "<input id='emPcrDilutionResults' name='emPcrDilutionResults' type='text' class='form-control'/>";
       var column7 = $('emPcrDilutionTable').rows[1].insertCell(-1);
-      column7.innerHTML = "<a href='javascript:void(0);' onclick='Library.empcr.addEmPcrDilution();'/>Add</a>";
+      column7.innerHTML = "<div style='text-align:center;'><a href='javascript:void(0);' onclick='Library.empcr.addEmPcrDilution();'/><span class='fa fa-fw fa-lg fa-plus-square-o'></span></a></div>";
 
       Utils.ui.addMaxDatePicker("emPcrDilutionDate", 0);
     }
@@ -501,7 +501,7 @@ Library.barcode = {
       .html("<form>" +
             "<fieldset class='dialog'>" +
             "<label for='notetext'>New Location:</label>" +
-            "<input type='text' name='locationBarcodeInput' id='locationBarcodeInput' class='text ui-widget-content ui-corner-all'/>" +
+            "<input type='text' name='locationBarcodeInput' id='locationBarcodeInput' class='form-control'/>" +
             "</fieldset></form>");
 
     jQuery(function () {
@@ -763,10 +763,10 @@ Library.ui = {
       .html("<form>" +
             "<fieldset class='dialog'>" +
             "<label for='internalOnly'>Internal Only?</label>" +
-            "<input type='checkbox' checked='checked' name='internalOnly' id='internalOnly' class='text ui-widget-content ui-corner-all' />" +
+            "<input type='checkbox' checked='checked' name='internalOnly' id='internalOnly'/>" +
             "<br/>" +
             "<label for='notetext'>Text</label>" +
-            "<input type='text' name='notetext' id='notetext' class='text ui-widget-content ui-corner-all' />" +
+            "<input type='text' name='notetext' id='notetext' class='form-control'/>" +
             "</fieldset></form>");
 
     jQuery(function () {
@@ -809,6 +809,22 @@ Library.ui = {
     }
   },
 
+  deleteLibraryFile: function(libraryId, fileName, fileKey) {
+    Fluxion.doAjax(
+      'libraryControllerHelperService',
+      'deleteLibraryFile',
+      {
+        'libraryId': libraryId,
+        'fileName': fileName,
+        'url': ajaxurl
+      },
+      {'doOnSuccess': function (json) {
+        jQuery('#file'+fileKey).remove();
+      }
+      }
+    );
+  },
+
   createListingLibrariesTable: function () {
     jQuery('#listingLibrariesTable').html("<img src='../styles/images/ajax-loader.gif'/>");
     jQuery.fn.dataTableExt.oSort['no-lib-asc'] = function (x, y) {
@@ -849,7 +865,7 @@ Library.ui = {
             { "sTitle": "QC Passed"},
             { "sTitle": "Edit"}
           ],
-          "bJQueryUI": true,
+          "bJQueryUI": false,
           "iDisplayLength": 25,
           "aaSorting": [
             [0, "desc"]

@@ -328,7 +328,7 @@ Reports.ui = {
   },
 
   createProjectFormTable: function (array) {
-    jQuery('#projectsResultTable').html('<table cellpadding="0" cellspacing="0" border="0" class="display" id="projectsResultFormTable"></table>');
+    jQuery('#projectsResultTable').html('<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered display" id="projectsResultFormTable"></table>');
     jQuery('#projectsResultFormTable').dataTable({
       "aaData": array,
       "aoColumns": [
@@ -341,13 +341,12 @@ Reports.ui = {
       "bPaginate": false,
       "bFilter": false,
       "bSort": false,
-      "sDom": '<"top"i>',
       "bAutoWidth": false
     });
   },
 
   createProjectRunLaneFormTable: function (array) {
-    jQuery('#projectRunLaneResultTable').html('<table cellpadding="0" cellspacing="0" border="0" class="display" id="projectRunLaneResultFormTable"></table>');
+    jQuery('#projectRunLaneResultTable').html('<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered display" id="projectRunLaneResultFormTable"></table>');
     jQuery('#projectRunLaneResultFormTable').dataTable({
       "aaData": array,
       "aoColumns": [
@@ -360,13 +359,12 @@ Reports.ui = {
       "bPaginate": false,
       "bFilter": false,
       "bSort": false,
-      "sDom": '<"top"i>',
       "bAutoWidth": false
     });
   },
 
   createSampleFormTable: function (array) {
-    jQuery('#samplesResultTable').html('<table cellpadding="0" cellspacing="0" border="0" class="display" id="samplesResultFormTable"></table>');
+    jQuery('#samplesResultTable').html('<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered display" id="samplesResultFormTable"></table>');
     jQuery('#samplesResultFormTable').dataTable({
       "aaData": array,
       "aoColumns": [
@@ -380,13 +378,12 @@ Reports.ui = {
       "bPaginate": false,
       "bFilter": false,
       "bSort": false,
-      "sDom": '<"top"i>',
       "bAutoWidth": false
     });
   },
 
   createLibraryFormTable: function (array) {
-    jQuery('#librariesResultTable').html('<table cellpadding="0" cellspacing="0" border="0" class="display" id="librariesResultFormTable"></table>');
+    jQuery('#librariesResultTable').html('<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered display" id="librariesResultFormTable"></table>');
     jQuery('#librariesResultFormTable').dataTable({
       "aaData": array,
       "aoColumns": [
@@ -401,13 +398,12 @@ Reports.ui = {
       "bPaginate": false,
       "bFilter": false,
       "bSort": false,
-      "sDom": '<"top"i>',
       "bAutoWidth": false
     });
   },
 
   createRunFormTable: function (array) {
-    jQuery('#runsResultTable').html('<table cellpadding="0" cellspacing="0" border="0" class="display" id="runsResultFormTable"></table>');
+    jQuery('#runsResultTable').html('<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered display" id="runsResultFormTable"></table>');
     jQuery('#runsResultFormTable').dataTable({
       "aaData": array,
       "aoColumns": [
@@ -420,27 +416,26 @@ Reports.ui = {
       "bPaginate": false,
       "bFilter": false,
       "bSort": false,
-      "sDom": '<"top"i>',
       "bAutoWidth": false
     });
   },
 
   createProjectOverviewTable: function (array) {
     jQuery('#projectOverviewFlexReportTable').css("visibility", "visible");
-    jQuery('#projectOverviewCell').html('<table cellpadding="0" cellspacing="0" border="0" class="display" id="projectOverviewTable"></table>');
+    jQuery('#projectOverviewCell').html('<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered display" id="projectOverviewTable"></table>');
     jQuery('#projectOverviewTable').dataTable({
       "aaData": array,
       "aoColumns": [
         { "sTitle": "Status"},
         { "sTitle": "Amount"}
       ],
-      "bJQueryUI": true
+      "bJQueryUI": false
     });
   },
 
   createProjectResultTable: function (array) {
     jQuery('#projectsFlexReport').css("visibility", "visible");
-    jQuery('#projectsFlexReport').html('<table cellpadding="0" cellspacing="0" border="0" class="display" id="projectsFlexReportTable"></table>');
+    jQuery('#projectsFlexReport').html('<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered display" id="projectsFlexReportTable"></table>');
     jQuery('#projectsFlexReportTable').dataTable({
       "aaData": array,
       "aoColumns": [
@@ -452,13 +447,13 @@ Reports.ui = {
       "aaSorting": [
         [0, "desc"]
       ],
-      "bJQueryUI": true
+      "bJQueryUI": false
     });
   },
 
   createProjectDetailTable: function (array) {
     jQuery('#projectsDetailReport').css("visibility", "visible");
-    jQuery('#projectsDetailReport').html('<table cellpadding="0" cellspacing="0" border="0" class="display" id="projectsDetailReportTable"></table>');
+    jQuery('#projectsDetailReport').html('<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered display" id="projectsDetailReportTable"></table>');
     jQuery('#projectsDetailReportTable').dataTable({
       "aaData": array,
       "aoColumns": [
@@ -473,7 +468,7 @@ Reports.ui = {
         [0, "asc"]
       ],
       "sDom": '<"H"lTf>r<t<"F"ip>',
-      "bJQueryUI": true,
+      "bJQueryUI": false,
       "oTableTools": {
         "sSwfPath": "/scripts/jquery/datatables/swf/copy_csv_xls_pdf.swf"
       }
@@ -482,7 +477,7 @@ Reports.ui = {
 
   createProjectRunLaneResultTable: function (array) {
     jQuery('#projectRunLaneFlexReport').css("visibility", "visible");
-    jQuery('#projectRunLaneFlexReport').html('<table cellpadding="0" cellspacing="0" border="0" class="display" id="projectRunLaneFlexReportTable"></table>');
+    jQuery('#projectRunLaneFlexReport').html('<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered display" id="projectRunLaneFlexReportTable"></table>');
     jQuery('#projectRunLaneFlexReportTable').dataTable({
       "aaData": array,
       "aoColumns": [
@@ -494,13 +489,13 @@ Reports.ui = {
       "aaSorting": [
         [0, "desc"]
       ],
-      "bJQueryUI": true
+      "bJQueryUI": false
     });
   },
 
   createSampleRelationReportResultTable: function (array) {
     jQuery('#projectRunLaneFlexReport').css("visibility", "visible");
-    jQuery('#projectRunLaneFlexReport').html('<table cellpadding="0" cellspacing="0" border="0" class="display" id="projectRunLaneFlexReportTable"></table>');
+    jQuery('#projectRunLaneFlexReport').html('<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered display" id="projectRunLaneFlexReportTable"></table>');
     jQuery('#projectRunLaneFlexReportTable').dataTable({
       "aaData": array,
       "aoColumns": [
@@ -515,7 +510,7 @@ Reports.ui = {
         { "sTitle": "Lane"}
       ],
       "sDom": '<"H"lTf>r<t<"F"ip>',
-      "bJQueryUI": true,
+      "bJQueryUI": false,
       "oTableTools": {
         "sSwfPath": "/scripts/jquery/datatables/swf/copy_csv_xls_pdf.swf"
       }
@@ -524,7 +519,7 @@ Reports.ui = {
 
   createSampleOverviewRelationTable: function (array) {
     jQuery('#sampleOverviewFlexReportTable').css("visibility", "visible");
-    jQuery('#sampleOverviewCell').append('<table cellpadding="0" cellspacing="0" border="0" class="display" id="sampleOverviewRelationTable"></table>');
+    jQuery('#sampleOverviewCell').append('<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered display" id="sampleOverviewRelationTable"></table>');
     jQuery('#sampleOverviewRelationTable').dataTable({
       "aaData": array,
       "aoColumns": [
@@ -537,27 +532,27 @@ Reports.ui = {
       "aaSorting": [
         [0, "desc"]
       ],
-      "bJQueryUI": true,
+      "bJQueryUI": false,
       "bSort": false
     });
   },
 
   createSampleOverviewTable: function (array) {
     jQuery('#sampleOverviewFlexReportTable').css("visibility", "visible");
-    jQuery('#sampleOverviewCell').append('<br/><br/><table cellpadding="0" cellspacing="0" border="0" class="display" id="sampleOverviewTable"></table>');
+    jQuery('#sampleOverviewCell').append('<br/><br/><table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered display" id="sampleOverviewTable"></table>');
     jQuery('#sampleOverviewTable').dataTable({
       "aaData": array,
       "aoColumns": [
         { "sTitle": "Status"},
         { "sTitle": "Amount"}
       ],
-      "bJQueryUI": true
+      "bJQueryUI": false
     });
   },
 
   createSampleResultTable: function (array) {
     jQuery('#samplesFlexReport').css("visibility", "visible");
-    jQuery('#samplesFlexReport').html('<table cellpadding="0" cellspacing="0" border="0" class="display" id="samplesFlexReportTable"></table>');
+    jQuery('#samplesFlexReport').html('<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered display" id="samplesFlexReportTable"></table>');
     jQuery('#samplesFlexReportTable').dataTable({
       "aaData": array,
       "aoColumns": [
@@ -570,13 +565,13 @@ Reports.ui = {
       "aaSorting": [
         [0, "desc"]
       ],
-      "bJQueryUI": true
+      "bJQueryUI": false
     });
   },
 
   createLibraryOverviewRelationTable: function (array) {
     jQuery('#libraryOverviewFlexReportTable').css("visibility", "visible");
-    jQuery('#libraryOverviewCell').append('<table cellpadding="0" cellspacing="0" border="0" class="display" id="libraryOverviewRelationTable"></table>');
+    jQuery('#libraryOverviewCell').append('<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered display" id="libraryOverviewRelationTable"></table>');
     jQuery('#libraryOverviewRelationTable').dataTable({
       "aaData": array,
       "aoColumns": [
@@ -586,14 +581,14 @@ Reports.ui = {
         { "sTitle": "QC Failed"},
         { "sTitle": "Total"}
       ],
-      "bJQueryUI": true,
+      "bJQueryUI": false,
       "bSort": false
     });
   },
 
   createLibraryRelationQCTable: function (array) {
     jQuery('#librariesRelationQC').css("visibility", "visible");
-    jQuery('#librariesRelationQC').html('<table cellpadding="0" cellspacing="0" border="0" class="display" id="librariesRelationQCTable"></table>');
+    jQuery('#librariesRelationQC').html('<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered display" id="librariesRelationQCTable"></table>');
     jQuery('#librariesRelationQCTable').dataTable({
       "aaData": array,
       "aoColumns": [
@@ -612,7 +607,7 @@ Reports.ui = {
         [0, "desc"]
       ],
       "sDom": '<"H"lTf>r<t<"F"ip>',
-      "bJQueryUI": true,
+      "bJQueryUI": false,
       "oTableTools": {
         "sSwfPath": "/scripts/jquery/datatables/swf/copy_csv_xls_pdf.swf"
       }
@@ -621,20 +616,20 @@ Reports.ui = {
 
   createLibraryOverviewTable: function (array) {
     jQuery('#libraryOverviewFlexReportTable').css("visibility", "visible");
-    jQuery('#libraryOverviewCell').append('<br/><br/><table cellpadding="0" cellspacing="0" border="0" class="display" id="libraryOverviewTable"></table>');
+    jQuery('#libraryOverviewCell').append('<br/><br/><table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered display" id="libraryOverviewTable"></table>');
     jQuery('#libraryOverviewTable').dataTable({
       "aaData": array,
       "aoColumns": [
         { "sTitle": "Status"},
         { "sTitle": "Amount"}
       ],
-      "bJQueryUI": true
+      "bJQueryUI": false
     });
   },
 
   createLibraryResultTable: function (array) {
     jQuery('#librariesFlexReport').css("visibility", "visible");
-    jQuery('#librariesFlexReport').html('<table cellpadding="0" cellspacing="0" border="0" class="display" id="librariesFlexReportTable"></table>');
+    jQuery('#librariesFlexReport').html('<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered display" id="librariesFlexReportTable"></table>');
     jQuery('#librariesFlexReportTable').dataTable({
       "aaData": array,
       "aoColumns": [
@@ -648,26 +643,26 @@ Reports.ui = {
       "aaSorting": [
         [0, "desc"]
       ],
-      "bJQueryUI": true
+      "bJQueryUI": false
     });
   },
 
   createRunOverviewTable: function (array) {
     jQuery('#runOverviewFlexReportTable').css("visibility", "visible");
-    jQuery('#runOverviewCell').html('<table cellpadding="0" cellspacing="0" border="0" class="display" id="runOverviewTable"></table>');
+    jQuery('#runOverviewCell').html('<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered display" id="runOverviewTable"></table>');
     jQuery('#runOverviewTable').dataTable({
       "aaData": array,
       "aoColumns": [
         { "sTitle": "Status"},
         { "sTitle": "Amount"}
       ],
-      "bJQueryUI": true
+      "bJQueryUI": false
     });
   },
 
   createRunResultTable: function (array) {
     jQuery('#runsFlexReport').css("visibility", "visible");
-    jQuery('#runsFlexReport').html('<table cellpadding="0" cellspacing="0" border="0" class="display" id="runsFlexReportTable"></table>');
+    jQuery('#runsFlexReport').html('<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered display" id="runsFlexReportTable"></table>');
     jQuery('#runsFlexReportTable').dataTable({
       "aaData": array,
       "aoColumns": [
@@ -679,13 +674,13 @@ Reports.ui = {
       "aaSorting": [
         [0, "desc"]
       ],
-      "bJQueryUI": true
+      "bJQueryUI": false
     });
   },
 
   createRunsPartitionReport: function (array) {
     jQuery('#runsPartitionReport').css("visibility", "visible");
-    jQuery('#runsPartitionReport').html('<table cellpadding="0" cellspacing="0" border="0" class="display" id="runsPartitionReportTable"></table>');
+    jQuery('#runsPartitionReport').html('<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered display" id="runsPartitionReportTable"></table>');
     jQuery('#runsPartitionReportTable').dataTable({
       "aaData": array,
       "aoColumns": [
@@ -702,7 +697,7 @@ Reports.ui = {
         [0, "desc"]
       ],
       "sDom": '<"H"lTf>r<t<"F"ip>',
-      "bJQueryUI": true,
+      "bJQueryUI": false,
       "oTableTools": {
         "sSwfPath": "/scripts/jquery/datatables/swf/copy_csv_xls_pdf.swf"
        }

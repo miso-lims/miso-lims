@@ -68,13 +68,13 @@
                 <p>Please select a project to view.</p>
             </div>
             <div id="externalSampleStatusWrapper">
-                <table cellpadding="0" cellspacing="0" border="0" class="display" id="externalSampleStatus">
+                <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered display" id="externalSampleStatus">
                 </table>
             </div>
             <div id="externalSampleQcStatus">
             </div>
             <div id="externalRunStatusWrapper">
-                <table cellpadding="0" cellspacing="0" border="0" class="display" id="externalRunStatus">
+                <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered display" id="externalRunStatus">
                 </table>
             </div>
         </div>

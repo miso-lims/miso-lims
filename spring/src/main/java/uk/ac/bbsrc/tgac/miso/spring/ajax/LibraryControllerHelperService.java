@@ -27,6 +27,7 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import com.google.json.JsonSanitizer;
 import com.opensymphony.util.FileUtils;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONException;
@@ -106,6 +107,42 @@ public class LibraryControllerHelperService {
   private MisoNamingScheme<Sample> sampleNamingScheme;
   @Autowired
   private MisoNamingScheme<Library> libraryNamingScheme;
+
+  public void setSecurityManager(SecurityManager securityManager) {
+    this.securityManager = securityManager;
+  }
+
+  public void setRequestManager(RequestManager requestManager) {
+    this.requestManager = requestManager;
+  }
+
+  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
+    this.dataObjectFactory = dataObjectFactory;
+  }
+
+  public void setBarcodeFactory(BarcodeFactory barcodeFactory) {
+    this.barcodeFactory = barcodeFactory;
+  }
+
+  public void setMisoFileManager(MisoFilesManager misoFileManager) {
+    this.misoFileManager = misoFileManager;
+  }
+
+  public void setPrintManager(PrintManager<MisoPrintService, Queue<?>> printManager) {
+    this.printManager = printManager;
+  }
+
+  public void setTagBarcodeStrategyResolverService(TagBarcodeStrategyResolverService tagBarcodeStrategyResolverService) {
+    this.tagBarcodeStrategyResolverService = tagBarcodeStrategyResolverService;
+  }
+
+  public void setSampleNamingScheme(MisoNamingScheme<Sample> sampleNamingScheme) {
+    this.sampleNamingScheme = sampleNamingScheme;
+  }
+
+  public void setLibraryNamingScheme(MisoNamingScheme<Library> libraryNamingScheme) {
+    this.libraryNamingScheme = libraryNamingScheme;
+  }
 
   public JSONObject validateLibraryAlias(HttpSession session, JSONObject json) {
     if (json.has("alias")) {
@@ -841,7 +878,7 @@ public class LibraryControllerHelperService {
       JSONObject response = new JSONObject();
       Long dilutionId = Long.parseLong(json.getString("dilutionId"));
       LibraryDilution dilution = requestManager.getLibraryDilutionById(dilutionId);
-      response.put("results", "<input type='text' id='" + dilutionId + "' value='" + dilution.getConcentration() + "'/>");
+      response.put("results", "<input type='text' id='" + dilutionId + "' value='" + dilution.getConcentration() + "' class='form-control'/>");
       response.put("edit", "<a href='javascript:void(0);' onclick='Library.dilution.editLibraryDilution(\"" + dilutionId + "\");'>Save</a>");
       return response;
     }
@@ -924,7 +961,7 @@ public class LibraryControllerHelperService {
       }
       if (json.has("pcrId") && !json.get("pcrId").equals("")) {
         Long pcrId = Long.parseLong(json.getString("pcrId"));
-        emPCR pcr = requestManager.getEmPcrById(pcrId);
+        emPCR pcr = requestManager.getEmPCRById(pcrId);
         emPCRDilution newDilution = dataObjectFactory.getEmPCRDilution();
         newDilution.setSecurityProfile(pcr.getSecurityProfile());
         newDilution.setDilutionCreator(json.getString("pcrDilutionCreator"));
@@ -940,7 +977,7 @@ public class LibraryControllerHelperService {
         sb.append("</tr>");
         
         File temploc = new File(session.getServletContext().getRealPath("/")+"temp/");
-        for (emPCRDilution dil : requestManager.listAllEmPcrDilutionsByEmPcrId(pcrId)) {
+        for (emPCRDilution dil : requestManager.listAllEmPCRDilutionsByEmPcrId(pcrId)) {
           sb.append("<tr>");
           sb.append("<td>"+dil.getId()+"</td>");
           sb.append("<td>"+dil.getDilutionCreator()+"</td>");
@@ -1083,8 +1120,8 @@ public class LibraryControllerHelperService {
       LibraryQC libraryQc = requestManager.getLibraryQCById(qcId);
       Long libraryId = Long.parseLong(json.getString("libraryId"));
 
-      response.put("results", "<input type='text' id='results" + qcId + "' value='" + libraryQc.getResults() + "'/>");
-      response.put("insertSize", "<input type='text' id='insertSize" + qcId + "' value='" + libraryQc.getInsertSize() + "'/>");
+      response.put("results", "<input type='text' id='results" + qcId + "' value='" + libraryQc.getResults() + "' class='form-control'/>");
+      response.put("insertSize", "<input type='text' id='insertSize" + qcId + "' value='" + libraryQc.getInsertSize() + "' class='form-control'/>");
       response.put("edit", "<a href='javascript:void(0);' onclick='Library.qc.editLibraryQC(\"" + qcId + "\",\"" + libraryId + "\");'>Save</a>");
       return response;
     }
@@ -1189,7 +1226,7 @@ public class LibraryControllerHelperService {
       if (json.has("empcrId")) {
         Long empcrId = json.getLong("empcrId");
         try {
-          requestManager.deleteEmPCR(requestManager.getEmPcrById(empcrId));
+          requestManager.deleteEmPCR(requestManager.getEmPCRById(empcrId));
           return JSONUtils.SimpleJSONResponse("EmPCR deleted");
         }
         catch (IOException e) {
@@ -1220,7 +1257,7 @@ public class LibraryControllerHelperService {
       if (json.has("deleteEmPCRDilution")) {
         Long deleteEmPCRDilution = json.getLong("deleteEmPCRDilution");
         try {
-          requestManager.deleteEmPcrDilution(requestManager.getEmPcrDilutionById(deleteEmPCRDilution));
+          requestManager.deleteEmPCRDilution(requestManager.getEmPCRDilutionById(deleteEmPCRDilution));
           return JSONUtils.SimpleJSONResponse("EmPCRDilution deleted");
         }
         catch (IOException e) {
@@ -1246,12 +1283,12 @@ public class LibraryControllerHelperService {
         if (library.getQcPassed() != null) {
           qcpassed = library.getQcPassed().toString();
         }
-        jsonArray.add("['" + library.getName() + "','" +
-                      library.getAlias() + "','" +
-                      library.getLibraryType().getDescription() + "','" +
-                      library.getSample().getName()+ "','" +
-                      qcpassed + "','" +
-                      "<a href=\"/miso/library/" + library.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
+        jsonArray.add(JsonSanitizer.sanitize("[\"" + library.getName() + "\",\"" +
+                     library.getAlias() + "\",\"" +
+                     library.getLibraryType().getDescription() + "\",\"" +
+                     library.getSample().getName() + "\",\"" +
+                     qcpassed + "\",\"" +
+                     "<a href=\"/miso/library/" + library.getId() + "\"><span class=\"fa fa-pencil-square-o fa-lg\"></span></a>" + "\"]"));
 
       }
       j.put("array", jsonArray);
@@ -1263,39 +1300,24 @@ public class LibraryControllerHelperService {
     }
   }
 
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
-
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
-  }
-
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
-  }
-
-  public void setBarcodeFactory(BarcodeFactory barcodeFactory) {
-    this.barcodeFactory = barcodeFactory;
-  }
-
-  public void setMisoFileManager(MisoFilesManager misoFileManager) {
-    this.misoFileManager = misoFileManager;
-  }
-  
-  public void setPrintManager(PrintManager<MisoPrintService, Queue<?>> printManager) {
-    this.printManager = printManager;
-  }
-
-  public void setTagBarcodeStrategyResolverService(TagBarcodeStrategyResolverService tagBarcodeStrategyResolverService) {
-    this.tagBarcodeStrategyResolverService = tagBarcodeStrategyResolverService;
-  }
-
-  public void setSampleNamingScheme(MisoNamingScheme<Sample> sampleNamingScheme) {
-    this.sampleNamingScheme = sampleNamingScheme;
-  }
-
-  public void setLibraryNamingScheme(MisoNamingScheme<Library> libraryNamingScheme) {
-    this.libraryNamingScheme = libraryNamingScheme;
+  public JSONObject deleteLibraryFile(HttpSession session, JSONObject json) {
+    Long libraryId = json.getLong("libraryId");
+    String fileName = json.getString("fileName");
+    try {
+      Library library = requestManager.getLibraryById(libraryId);
+      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+      if (user.isAdmin() || (library.getSecurityProfile().getOwner() != null && library.getSecurityProfile().getOwner().equals(user))) {
+        File f = misoFileManager.getFile(Library.class, libraryId.toString(), fileName);
+        if (f.exists() && f.delete()) {
+          return JSONUtils.SimpleJSONResponse("OK");
+        }
+        return JSONUtils.SimpleJSONError("File does not exist or is not deletable");
+      }
+      return JSONUtils.SimpleJSONError("Only an admin or library owner can delete this library's files.");
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+      return JSONUtils.SimpleJSONError("Unable to delete file: " + e.getMessage());
+    }
   }
 }

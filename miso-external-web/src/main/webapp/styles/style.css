@@ -492,21 +492,17 @@ a.listbox {
 }
 
 .boxlistbox {
-    font: 10px Verdana, arial, sans-serif;
     border: 1px solid lightgray;
     margin: 5px;
     padding: 5px;
-    cursor: pointer;
 }
 
 .boxlistboxhighlight {
-    font: 10px Verdana, arial, sans-serif;
     border: 1px solid lightgray;
     margin: 5px;
     padding: 5px;
     background-color: #F0F0F6;
     color: #111;
-    cursor: pointer;
 }
 
 a.dashboardresult {

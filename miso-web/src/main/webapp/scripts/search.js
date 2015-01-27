@@ -48,17 +48,6 @@ var Search = Search || {
     return true;
   },
 
-  loadAll : function() {
-    var self = this;
-    self.dashboardSearch(jQuery('#searchProject'), true);
-//    self.dashboardSearch(jQuery('#searchStudy'), true);
-//    self.dashboardSearch(jQuery('#searchExperiment'), true);
-    self.dashboardSearch(jQuery('#searchRun'), true);
-    self.dashboardSearch(jQuery('#searchLibrary'), true);
-    self.dashboardSearch(jQuery('#searchSample'), true);
-    self.dashboardSearch(jQuery('#searchLibraryDilution'), true);
-  },
-
   insertResult : function(id, v) {
     var i = $(id);
     i.value = v;
