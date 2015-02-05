@@ -29,7 +29,7 @@ public enum DefaultMisoEntityPrefix {
    IPO("Pool"),
 //   SPO("SolidPool"),
 //   LPO("LS454Pool"),
-//   PPO("PacBioPool"),
+   PPO("PacBioPool"),
 //   TPO("TorrentPool"),
    SUB("Submission");
 
