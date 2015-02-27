@@ -11,7 +11,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
  * @date 22/10/13
  * @since 0.2.1-SNAPSHOT
  */
-public class OverviewSampleGroup extends EntityGroupImpl<ProjectOverview, Sample> {
+public class OverviewSampleGroup extends HierarchicalEntityGroupImpl<ProjectOverview, Sample> {
   private ProjectOverview parent;
   private long groupId;
   private String name;
