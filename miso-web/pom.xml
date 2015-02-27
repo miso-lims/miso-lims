@@ -268,11 +268,13 @@
       <url>http://www.hasbanana.com/maven/repo</url>
     </repository>
 
+    <!--
     <repository>
       <id>sonatype-sourceforge-snapshots</id>
       <name>Sonatype SF Repository</name>
       <url>http://oss.sonatype.org/content/repositories/sourceforge-snapshots/</url>
     </repository>
+    -->
 
     <repository>
       <id>Atlassian Maven Repository</id>
@@ -518,19 +520,19 @@
     <dependency>
       <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
       <artifactId>oauth-signature</artifactId>
-      <version>1.5</version>
+      <version>1.19</version>
     </dependency>
 
     <dependency>
       <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
       <artifactId>oauth-client</artifactId>
-      <version>1.5</version>
+      <version>1.19</version>
     </dependency>
 
     <dependency>
       <groupId>com.sun.jersey.contribs</groupId>
       <artifactId>jersey-apache-client</artifactId>
-      <version>1.5</version>
+      <version>1.19</version>
     </dependency>
     <!--
     <dependency>
