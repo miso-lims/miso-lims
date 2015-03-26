@@ -1,7 +1,7 @@
 MISO: An open source LIMS for small-to-large scale sequencing centres
 ---------------------------------------------------------------------
 Copyright (c) 2010-2012. The Genome Analysis Centre, Norwich, UK
-MISO project contacts: Robert Davey (robert.davey@bbsrc.ac.uk), Mario Caccamo (mario.caccamo@bbsrc.ac.uk)
+MISO project contacts: Robert Davey (robert.davey@tgac.ac.uk), Mario Caccamo (mario.caccamo@tgac.ac.uk)
 
 ~ **********************************************************************
 ~
@@ -30,8 +30,8 @@ VERSION 0.1.6-RC (Carbon)
 You will need to install MySQL v5 or greater. You will then need the two latest MISO database dumps. These are available
 from our repository here:
 
-https://repos.tgac.bbsrc.ac.uk/miso/lims-schema-20120621.sql
-https://repos.tgac.bbsrc.ac.uk/miso/miso_type_data_20120620.sql
+https://repos.tgac.ac.uk/miso/lims-schema-20120621.sql
+https://repos.tgac.ac.uk/miso/miso_type_data_20120620.sql
 
 Log in to your local MySQL install, and create a database called 'lims':
 
@@ -59,7 +59,7 @@ mysql -u tgaclims -p -D lims < miso_type_data_20120620.sql
 You will need a suitable Java web application container, such as Tomcat 6.x (http://tomcat.apache.org/download-60.cgi),
 to deploy MISO. Once Tomcat has been installed, download the latest MISO WAR file. The latest WAR file can be found here:
 
-https://repos.tgac.bbsrc.ac.uk/miso/ROOT.war
+https://repos.tgac.ac.uk/miso/ROOT.war
 
 Copy this file to your <tomcat-install>/webapps/ directory. DO NOT START TOMCAT YET. Instead, follow the configuration steps below.
 
@@ -131,8 +131,8 @@ the name of your remote database server:
 You will need to copy the mysql connector library and the JNDI File Factory library to your Tomcat install to ensure the JNDI system can see the MISO database.
 Grab the jar files from:
 
-https://repos.tgac.bbsrc.ac.uk/miso/mysql-connector-java-5.1.10.jar
-https://repos.tgac.bbsrc.ac.uk/miso/jndi-file-factory-1.0.jar
+https://repos.tgac.ac.uk/miso/mysql-connector-java-5.1.10.jar
+https://repos.tgac.ac.uk/miso/jndi-file-factory-1.0.jar
 
 And copy them to <tomcat-install>/lib/
 
@@ -156,7 +156,7 @@ The default path is '/storage/miso'. It is recommended that you do not change th
 MISO achieves userspace configuration via extra properties files kept in the storage directory specified by the miso.baseDirectory
 property (see 2.2 above). Default versions of these files are available here:
 
-https://repos.tgac.bbsrc.ac.uk/miso/miso_userspace_properties.tar.gz
+https://repos.tgac.ac.uk/miso/miso_userspace_properties.tar.gz
 
 Unpack this file to your MISO storage directory, which is /storage/miso by default. You should see 3 files:
 
