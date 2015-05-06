@@ -3628,20 +3628,21 @@ public class FormUtils {
 
           rowsJSONArray.add(getCellValueAsString(sampleNameCell));
           rowsJSONArray.add(getCellValueAsString(sampleAliasCell));
-          rowsJSONArray.add(getCellValueAsString(wellCell));
+          rowsJSONArray.add(getCellValueAsString(wellCell).replaceAll("\\s",""));
 
           XSSFCell proceedKeyCell = row.getCell(22);
 
           String proceedKey = "A";
 
           if (getCellValueAsString(proceedKeyCell) != null) {
-            if ("L".equals(getCellValueAsString(proceedKeyCell).toUpperCase())) {
+            String proceedKeyString = getCellValueAsString(proceedKeyCell).toUpperCase().replaceAll("\\s","");
+            if ("L".equals(proceedKeyString)) {
               proceedKey = "L";
             }
-            else if ("U".equals(getCellValueAsString(proceedKeyCell).toUpperCase())) {
+            else if ("U".equals(proceedKeyString)) {
               proceedKey = "U";
             }
-            else if ("P".equals(getCellValueAsString(proceedKeyCell).toUpperCase())) {
+            else if ("P".equals(proceedKeyString)) {
               proceedKey = "P";
             }
           }
