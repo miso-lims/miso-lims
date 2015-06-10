@@ -269,6 +269,12 @@ public class PacBioNotificationMessageConsumerMechanism implements NotificationM
 //                        else {
 //                          lf.setPlatformType(PlatformType.PACBIO);
 //                        }
+                        JSONArray cells = run.getJSONArray("cells");
+                        if (cells.size() > lf.getPartitions().size()) {
+                          lf.setPartitionLimit(cells.size());
+                          lf.initEmptyPartitions();
+                        }
+
                         ((RunImpl)r).addSequencerPartitionContainer(lf);
                       }
                       else {
@@ -296,7 +302,7 @@ public class PacBioNotificationMessageConsumerMechanism implements NotificationM
                         long flowId = requestManager.saveSequencerPartitionContainer(f);
                         f.setId(flowId);
                         ((RunImpl)r).addSequencerPartitionContainer(f);
-                        //TODO match up samples to libraries and pools?
+                        //TODO match up samples to libraries and pools? Or match up pool numbers
                         /*
                         for (JSONObject obj : (Iterable<JSONObject>)cells) {
                           int cellindex = obj.getInt("index");
