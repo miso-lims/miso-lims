@@ -246,7 +246,7 @@
     </div>
   </c:if>
 
-  <c:if test="${run.status.health.key ne 'Failed' and run.status.health.key ne 'Stopped' and metrixEnabled}">
+  <c:if test="${run.status.health.key ne 'Failed' and run.status.health.key ne 'Stopped' and metrixEnabled and run.platformType.key eq 'Illumina'}">
   <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#metrix_arrowclick'), 'metrix');">InterOp Metrics
     <div id="metrix_arrowclick" class="toggleLeft"></div>
   </div>
