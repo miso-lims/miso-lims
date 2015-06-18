@@ -337,6 +337,14 @@ public class PacBioNotificationMessageConsumerMechanism implements NotificationM
                       requestManager.saveSequencerPartitionContainer(f);
                     }
                   }
+                  JSONArray cells = run.getJSONArray("cells");
+                  if (cells.size() > f.getPartitions().size()) {
+                    int numNewcells = cells.size()-f.getPartitions().size();
+                    f.setPartitionLimit(cells.size());
+                    for (int i=0; i<numNewcells; i++){
+                      f.addNewPartition();
+                    }
+                  }
                 }
 
                 updatedRuns.put(r.getAlias(), r);
