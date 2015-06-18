@@ -93,6 +93,7 @@ public class SequencerPartitionContainerImpl extends AbstractSequencerPartitionC
     }
   }
 
+  @Override
   public void addNewPartition() {
     if (getPartitions().size() < partitionLimit) {
       PartitionImpl partition = new PartitionImpl();

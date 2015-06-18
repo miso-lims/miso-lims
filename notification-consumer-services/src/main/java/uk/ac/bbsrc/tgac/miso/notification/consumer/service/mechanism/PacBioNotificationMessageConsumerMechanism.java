@@ -271,8 +271,11 @@ public class PacBioNotificationMessageConsumerMechanism implements NotificationM
 //                        }
                         JSONArray cells = run.getJSONArray("cells");
                         if (cells.size() > lf.getPartitions().size()) {
+                          int numNewcells = cells.size()-lf.getPartitions().size();
                           lf.setPartitionLimit(cells.size());
-                          lf.initEmptyPartitions();
+                          for (int i=0; i<numNewcells; i++){
+                            lf.addNewPartition();
+                          }
                         }
 
                         ((RunImpl)r).addSequencerPartitionContainer(lf);

@@ -148,4 +148,11 @@ public interface SequencerPartitionContainer<T extends Partition> extends Secura
    * @param validationBarcode
    */
   public void setValidationBarcode(String validationBarcode);
+
+  /**
+   * Add new partition
+   *
+   *
+   */
+  public void addNewPartition();
 }
