@@ -271,8 +271,11 @@ public class PacBioNotificationMessageConsumerMechanism implements NotificationM
 //                        }
                         JSONArray cells = run.getJSONArray("cells");
                         if (cells.size() > lf.getPartitions().size()) {
+                          int numNewcells = cells.size()-lf.getPartitions().size();
                           lf.setPartitionLimit(cells.size());
-                          lf.initEmptyPartitions();
+                          for (int i=0; i<numNewcells; i++){
+                            lf.addNewPartition();
+                          }
                         }
 
                         ((RunImpl)r).addSequencerPartitionContainer(lf);
@@ -332,6 +335,14 @@ public class PacBioNotificationMessageConsumerMechanism implements NotificationM
                     if (run.has("plateId") && !"".equals(run.getString("plateId"))) {
                       f.setIdentificationBarcode(run.getString("plateId"));
                       requestManager.saveSequencerPartitionContainer(f);
+                    }
+                  }
+                  JSONArray cells = run.getJSONArray("cells");
+                  if (cells.size() > f.getPartitions().size()) {
+                    int numNewcells = cells.size()-f.getPartitions().size();
+                    f.setPartitionLimit(cells.size());
+                    for (int i=0; i<numNewcells; i++){
+                      f.addNewPartition();
                     }
                   }
                 }
