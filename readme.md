@@ -24,7 +24,6 @@ For Full MISO Documentation please visit our documentation website:
 https://documentation.tgac.ac.uk/display/MISO/MISO+Documentation+Home
 
 
-
 VERSION 0.2.0 (Neon)
 
 1) BUILDING
