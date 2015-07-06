@@ -975,7 +975,7 @@ public class FlexReportingControllerHelperService {
           }
           else if (runStartedFrom != null && !runStartedFrom.equals("") &&
                    runStartedTo != null && !runStartedTo.equals("")) {
-            if (run.getStatus() != null && run.getStatus().getCompletionDate() != null) {
+            if (run.getStatus() != null && run.getStatus().getStartDate() != null) {
 
               DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
               Date startDate = df.parse(runStartedFrom);
