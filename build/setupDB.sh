@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
-source script.properties
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+source "$DIR/context.properties"
 DB_ARGS=($DB_HOST $DB_NAME $DB_USER $DB_PASS)
 MYSQL=`which mysql`
 Q1="CREATE DATABASE IF NOT EXISTS $DB_NAME;"
@@ -15,4 +16,6 @@ do
 	fi
 done
 $MYSQL -u root -e "$SQL"
-echo "Database $DB_NAME and user $DB_USER created with password $DB_PASS"
+echo "Database $DB_NAME and user $DB_USER created"
+$MYSQL -D $DB_NAME < /home/wshaheer/Development/repositories/miso-lims/sqlstore/src/main/resources/schemas/lims-schema-20150617.sql
+$MYSQL -D $DB_NAME < /home/wshaheer/Development/repositories/miso-lims/sqlstore/src/main/resources/schemas/miso_type_data_20120921.sql
