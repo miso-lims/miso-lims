@@ -1,4 +1,6 @@
 #!/bin/bash
+
+# Get script directory
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 set -e
 source "$DIR/context.properties"
