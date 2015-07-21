@@ -1,0 +1,13 @@
+[Unit]
+Description=MISO Notification Server
+
+[Server]
+Type=forking
+StandardOutput=null
+StandardError=journal
+WorkingDirectory=<path-to-notification-server>/service
+Environment=<path-to-miso-lims>
+ExecStart=/usr/bin/java -jar $MISO_DIR/notification-server/service/notification-server-0.2.1-SNAPSHOT.one-jar.jar
+
+[Install]
+WantedBy=multi-user.target
