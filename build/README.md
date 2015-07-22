@@ -5,7 +5,7 @@ For the purposes of this setup, it is assumed that the host machine has the foll
   1. MySQL  
   Configurations have been tested against v5.6. Install using [MySQL APT repository](https://dev.mysql.com/doc/mysql-apt-repo-quick-guide/en/).
   2. MySQL Development Headers  
-  Required to set login paths used by script to create/update **miso db**. Issue the following to install and configure (Linux/Ubuntu):  
+  Required to set login paths used by script to create/update **miso db**. Issue the following to install and configure:  
   ```bash
   ~$ sudo apt-get update
   ~$ sudo apt-get install libmysqlcliend-dev
