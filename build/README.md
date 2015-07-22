@@ -26,3 +26,4 @@ The setup scripts require the following to be installed, but if not, will stop e
   2. Apache Maven (version 2.2.1 or greater required, _tested against v3.0.5_)
 
 test
+another test
