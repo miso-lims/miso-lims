@@ -13,7 +13,7 @@ For the purposes of this setup, it is assumed that the host machine has the foll
   ```
   In the above instructions, replace `<mysql-db-host>` with appropriate db host name, _e.g. localhost_. When prompted, enter the **MySQL** db root/admin password. Repeat the last command, replacing `client` with `miso-lims` and `root` with **miso-lims** db username, and when prompted db user password, as set in **context.properties**
   3. Tomcat Server (as a system service)  
-  At the time of testing, only v7 of Apache Tomcat was available as an Ubuntu system service (_via apt repository_). For later versions, there are documentations at the [Apache Tomcat](http://tomcat.apache.org/) website on daemonizing tomcat server for other versions. After installation, edit `<catalina-home>/conf/tomcat-user.xml` and add the following tags: 
+  At the time of testing, only v7 of Apache Tomcat was available as an Ubuntu system service (_via apt repository_). For later versions, there are documentations at the [Apache Tomcat](http://tomcat.apache.org/) website on daemonizing tomcat server for other versions. After installation, edit `<catalina-home>/conf/tomcat-user.xml` and add the following tags:
   ```xml
   <role rolename="manager-script"/>
   <user username="<tomcat-user>" password="<tomcat-pass>" roles="manager-script"/>
