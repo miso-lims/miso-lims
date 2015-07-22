@@ -6,6 +6,6 @@
 # Maven build directory.
 target/
 
-# build/ (WAR file and extracted folder)
+# ROOT (WAR file and extracted folder)
 build/ROOT.war
 build/ROOT/
