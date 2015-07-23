@@ -20,6 +20,9 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 public class OicrSampleNamingScheme implements RequestManagerAwareNamingScheme<Sample> {
   protected static final Logger log = LoggerFactory.getLogger(OicrSampleNamingScheme.class);
 
+  public static final String NAME_REGEX = "([A-Z]{3})([0-9]+)";
+  public static final String ALIAS_REGEX = "([A-Z]{3,5})_([0-9]{3,4}|[0-9][CR][0-9]{1,2})_(nn|[A-Z]{1}[a-z]{1})_([nRPXMCFE])_(nn|\\d{2})_(\\d{1,2})-(\\d{1,2})_(D|R)(_S?\\d{1,2})?";
+
   private Map<String, Boolean> allowDuplicateMap = new HashMap<String, Boolean>();
   private Map<String, Pattern> validationMap = new HashMap<String, Pattern>();
   private Map<String, NameGenerator<Sample>> customNameGeneratorMap = new HashMap<String, NameGenerator<Sample>>();
@@ -28,12 +31,8 @@ public class OicrSampleNamingScheme implements RequestManagerAwareNamingScheme<S
   public OicrSampleNamingScheme() {
     allowDuplicateMap.put("name", false);
     allowDuplicateMap.put("alias", false);
-    validationMap.put("name", Pattern.compile("([A-Z]{3})([0-9]+)"));
-    validationMap
-        .put(
-            "alias",
-            Pattern
-                .compile("([A-Z]{3,5})_([0-9]{3,4}|[0-9][CR][0-9]{1,2})_(nn|[A-Z]{1}[a-z]{1})_([nRPXMCFE])_(nn|\\d{2})_(\\d{1,2})-(\\d{1,2})_(D|R)(_S?\\d{1,2})?"));
+    validationMap.put("name", Pattern.compile(NAME_REGEX));
+    validationMap.put("alias", Pattern.compile(ALIAS_REGEX));
   }
 
   @Override
@@ -57,7 +56,7 @@ public class OicrSampleNamingScheme implements RequestManagerAwareNamingScheme<S
 
   @Override
   public String getSchemeName() {
-    return "DefaultSampleNamingScheme";
+    return OicrSampleNamingScheme.class.getSimpleName();
   }
 
   @Override
