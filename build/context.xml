@@ -1,0 +1,29 @@
+<Context path="/ROOT" docBase="${catalina.base}/webapps/ROOT" debug="1">
+	<Resource name="jdbc/MISODB" type="javax.sql.DataSource"
+		driverClassName="com.mysql.jdbc.Driver"
+		initialSize="32"
+		maxIdle="10"
+		maxActive="100"
+		maxWait="1000"
+		removeAbandoned="true"
+		removeAbandonedTimeout="120"
+		logAbandoned="true"
+		testWhileIdle="true"
+		testOnBorrow="true"
+		testOnReturn="true"
+		validationQuery="select 1"
+		url="jdbc:mysql://localhost:3306/lims?autoReconnect=true&amp;zeroDateTimeBehavior=convertToNull&amp;useUnicode=true&amp;characterEncoding=UTF-8"
+		username="tgaclims"
+		password="tgaclims"/>
+	<Resource name="file/CONAN_PROPERTIES" type="java.util.File"
+		factory="uk.ac.ebi.fgpt.naming.factory.FileFactory"
+		path="../webapps/ROOT/WEB-INF/conan.properties"/>
+<!-- uncomment if using the Stats DB -->
+<!--
+	<Resource name="jdbc/STATSDB" type="javax.sql.DataSource"
+		driverClassName="com.mysql.jdbc.Driver" initialSize="32" maxIdle="32" maxActive="100" maxWait="-1"
+		url="jdbc:mysql://your_stats_db_server:3306/run_statistics?zeroDateTimeBehavior=convertToNull&amp;useUnicode=true&amp;characterEncoding=UTF-8"
+		username="statsuser"
+		password="statspass"/>
+-->
+</Context>
