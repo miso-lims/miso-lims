@@ -1,6 +1,5 @@
-USE lims;
 
-#ALTER TABLE `lims`.`Pool` ADD COLUMN `qcPassed` VARCHAR(5) DEFAULT NULL;
+#ALTER TABLE `Pool` ADD COLUMN `qcPassed` VARCHAR(5) DEFAULT NULL;
 
 #CREATE TABLE `PoolQC` (
 #  `qcId` bigint(20) NOT NULL auto_increment,
@@ -12,6 +11,6 @@ USE lims;
 #  PRIMARY KEY  (`qcId`)
 #) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
-ALTER TABLE `lims`.`Library` CHANGE `qcPassed` `qcPassed` VARCHAR(5) DEFAULT NULL;
-UPDATE `lims`.`Library` SET qcPassed="false" WHERE qcPassed="0";
-UPDATE `lims`.`Library` SET qcPassed="true" WHERE qcPassed="1";
+ALTER TABLE `Library` CHANGE `qcPassed` `qcPassed` VARCHAR(5) DEFAULT NULL;
+UPDATE `Library` SET qcPassed="false" WHERE qcPassed="0";
+UPDATE `Library` SET qcPassed="true" WHERE qcPassed="1";
