@@ -1,4 +1,3 @@
-USE lims;
 
 CREATE TABLE `SequencerPartitionContainer` (
   `containerId` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -36,8 +35,8 @@ CREATE TABLE `Submission_Partition` (
   PRIMARY KEY (`submission_submissionId`,`partitions_partitionId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
-ALTER TABLE `lims`.`RunQC_Partition` CHANGE `flowcells_flowcellId` `containers_containerId` BIGINT(20) DEFAULT NULL;
-ALTER TABLE `lims`.`Platform` CHANGE `numFlowcells` `numContainers` TINYINT(4) NOT NULL;
+ALTER TABLE `RunQC_Partition` CHANGE `flowcells_flowcellId` `containers_containerId` BIGINT(20) DEFAULT NULL;
+ALTER TABLE `Platform` CHANGE `numFlowcells` `numContainers` TINYINT(4) NOT NULL;
 
 INSERT INTO SequencerPartitionContainer(containerId, securityProfile_profileId, identificationBarcode, locationBarcode, platformType, validationBarcode)
 SELECT flowcellId, securityProfile_profileId, identificationBarcode, locationBarcode, platformType, validationBarcode FROM Flowcell;
