@@ -746,11 +746,20 @@ public class PoolControllerHelperService {
               if (pool.getPoolableElements().size() > 1) {
                 Map<Integer, TagBarcode> barcodes = dilution.getLibrary().getTagBarcodes();
                 if (!barcodes.isEmpty()) {
-                  info.append("<b>Barcodes:</b></br>");
-                  for (Integer key : dilution.getLibrary().getTagBarcodes().keySet()) {
-                    info.append(key+":"+barcodes.get(key).getName()+ " ("+barcodes.get(key).getSequence()+")<br/>");
+                  String out = "<b>Barcodes:</b></br>";
+                  for (Integer key : barcodes.keySet()) {
+                    TagBarcode tb = barcodes.get(key);
+                    if (tb != null) {
+                      out += key + ":" + tb.getName() + " (" + tb.getSequence() + ")<br/>";
+                      out += "<span class='counter'><img src='/styles/images/status/green.png' border='0'></span>";
+                    }
+                    else {
+                      out += "Error retrieving barcode ["+key+"] for library "+dilution.getLibrary().getName()+". Please check libraries for this pool.";
+                      out += "<span class='counter'><img src='/styles/images/status/red.png' border='0'></span>";
+                      break;
+                    }
                   }
-                  info.append("<span class='counter'><img src='/styles/images/status/green.png' border='0'></span>");
+                  info.append(out);
                 }
                 else {
                   info.append("<b>Barcode:</b>");
