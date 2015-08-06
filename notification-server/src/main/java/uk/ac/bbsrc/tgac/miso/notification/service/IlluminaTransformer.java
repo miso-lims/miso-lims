@@ -64,6 +64,18 @@ import java.util.regex.Pattern;
  */
 public class IlluminaTransformer implements FileSetTransformer<String, String, File> {
   protected static final Logger log = LoggerFactory.getLogger(IlluminaTransformer.class);
+  
+  private static final String JSON_RUN_NAME = "runName";
+  private static final String JSON_FULL_PATH = "fullPath";
+  private static final String JSON_RUN_INFO = "runinfo";
+  private static final String JSON_RUN_PARAMS = "runparams";
+  private static final String JSON_STATUS = "status";
+  private static final String JSON_SEQUENCER_NAME = "sequencerName";
+  private static final String JSON_CONTAINER_ID = "containerId";
+  private static final String JSON_LANE_COUNT = "laneCount";
+  private static final String JSON_NUM_CYCLES = "numCycles";
+  private static final String JSON_START_DATE = "startDate";
+  private static final String JSON_COMPLETE_DATE = "completionDate";
 
   private Map<String, String> finishedCache = new HashMap<>();
 
@@ -114,8 +126,8 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
             String runName = rootFile.getName();
 
             if (!finishedCache.keySet().contains(runName)) {
-              run.put("runName", runName);
-              run.put("fullPath", rootFile.getCanonicalPath()); //follow symlinks!
+              run.put(JSON_RUN_NAME, runName);
+              run.put(JSON_FULL_PATH, rootFile.getCanonicalPath()); //follow symlinks!
 
               if (!oldStatusFile.exists() && !newStatusFile.exists()) {
                 //probably MiSeq/NextSeq
@@ -123,7 +135,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                 Boolean lastCycleLogFileExists = false;
                 File lastCycleLogFile = null;
                 if (runInfo.exists()) {
-                  run.put("runinfo", SubmissionUtils.transform(runInfo));
+                  run.put(JSON_RUN_INFO, SubmissionUtils.transform(runInfo));
 
                   Document runInfoDoc = SubmissionUtils.emptyDocument();
                   SubmissionUtils.transform(runInfo, runInfoDoc);
@@ -169,7 +181,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                     }
                   }
 
-                  run.put("numCycles", numCycles);
+                  run.put(JSON_NUM_CYCLES, numCycles);
 
                   if (!new File(rootFile, "/Basecalling_Netcopy_complete_SINGLEREAD.txt").exists()) {
                     for (int i = 0; i < numReads; i++) {
@@ -183,13 +195,13 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                     }
                   }
 
-                  run.put("sequencerName", runInfoDoc.getElementsByTagName("Instrument").item(0).getTextContent());
+                  run.put(JSON_SEQUENCER_NAME, runInfoDoc.getElementsByTagName("Instrument").item(0).getTextContent());
 
                   if (runInfoDoc.getElementsByTagName("FlowcellId").getLength() != 0) {
-                    run.put("containerlId", runInfoDoc.getElementsByTagName("FlowcellId").item(0).getTextContent());
+                    run.put(JSON_CONTAINER_ID, runInfoDoc.getElementsByTagName("FlowcellId").item(0).getTextContent());
                   }
                   else if (runInfoDoc.getElementsByTagName("Flowcell").getLength() != 0) {
-                    run.put("containerId", runInfoDoc.getElementsByTagName("Flowcell").item(0).getTextContent());
+                    run.put(JSON_CONTAINER_ID, runInfoDoc.getElementsByTagName("Flowcell").item(0).getTextContent());
                   }
 
                   if (runInfoDoc.getElementsByTagName("FlowcellLayout").getLength() != 0) {
@@ -197,28 +209,28 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                     if (n.getLength() != 0) {
                       Node attr = n.getNamedItem("LaneCount");
                       if (attr != null) {
-                        run.put("laneCount", attr.getTextContent());
+                        run.put(JSON_LANE_COUNT, attr.getTextContent());
                       }
                     }
                   }
                 }
 
                 if (runParameters.exists()) {
-                  run.put("runparams", SubmissionUtils.transform(runParameters));
+                  run.put(JSON_RUN_PARAMS, SubmissionUtils.transform(runParameters));
                   Document runParamDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
                   SubmissionUtils.transform(runParameters, runParamDoc);
 
-                  if (!run.has("containerId") && runParamDoc.getElementsByTagName("Barcode").getLength() != 0) {
-                    run.put("containerId", runParamDoc.getElementsByTagName("Barcode").item(0).getTextContent());
+                  if (!run.has(JSON_CONTAINER_ID) && runParamDoc.getElementsByTagName("Barcode").getLength() != 0) {
+                    run.put(JSON_CONTAINER_ID, runParamDoc.getElementsByTagName("Barcode").item(0).getTextContent());
                   }
                 }
                 else if (otherRunParameters.exists()) {
-                  run.put("runparams", SubmissionUtils.transform(otherRunParameters));
+                  run.put(JSON_RUN_PARAMS, SubmissionUtils.transform(otherRunParameters));
                   Document runParamDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
                   SubmissionUtils.transform(otherRunParameters, runParamDoc);
 
-                  if (!run.has("containerId") && runParamDoc.getElementsByTagName("Barcode").getLength() != 0) {
-                    run.put("containerId", runParamDoc.getElementsByTagName("Barcode").item(0).getTextContent());
+                  if (!run.has(JSON_CONTAINER_ID) && runParamDoc.getElementsByTagName("Barcode").getLength() != 0) {
+                    run.put(JSON_CONTAINER_ID, runParamDoc.getElementsByTagName("Barcode").item(0).getTextContent());
                   }
                 }
                 else {
@@ -232,7 +244,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                 checkDates(rootFile, run);
 
                 if (!failed) {
-                  failed = checkLogs(rootFile, run);
+                  failed = checkLogs(rootFile);
                 }
 
                 if (complete) {
@@ -301,29 +313,29 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                   SubmissionUtils.transform(oldStatusFile, statusDoc);
 
                   runName = statusDoc.getElementsByTagName("RunName").item(0).getTextContent();
-                  run.put("runName", runName);
+                  run.put(JSON_RUN_NAME, runName);
 
-                  run.put("status", SubmissionUtils.transform(oldStatusFile));
+                  run.put(JSON_STATUS, SubmissionUtils.transform(oldStatusFile));
                 }
                 else {
-                  run.put("status", "<error><RunName>" + runName + "</RunName><ErrorMessage>Cannot read status file</ErrorMessage></error>");
+                  run.put(JSON_STATUS, "<error><RunName>" + runName + "</RunName><ErrorMessage>Cannot read status file</ErrorMessage></error>");
                 }
 
                 if (runInfo.exists() && runInfo.canRead()) {
-                  run.put("runinfo", SubmissionUtils.transform(runInfo));
+                  run.put(JSON_RUN_INFO, SubmissionUtils.transform(runInfo));
 
                   Document runInfoDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
                   SubmissionUtils.transform(runInfo, runInfoDoc);
 
-                  if (!run.has("sequencerName")) {
-                    run.put("sequencerName", runInfoDoc.getElementsByTagName("Instrument").item(0).getTextContent());
+                  if (!run.has(JSON_SEQUENCER_NAME)) {
+                    run.put(JSON_SEQUENCER_NAME, runInfoDoc.getElementsByTagName("Instrument").item(0).getTextContent());
                   }
 
                   if (runInfoDoc.getElementsByTagName("FlowcellId").getLength() != 0) {
-                    run.put("containerId", runInfoDoc.getElementsByTagName("FlowcellId").item(0).getTextContent());
+                    run.put(JSON_CONTAINER_ID, runInfoDoc.getElementsByTagName("FlowcellId").item(0).getTextContent());
                   }
                   else if (runInfoDoc.getElementsByTagName("Flowcell").getLength() != 0) {
-                    run.put("containerId", runInfoDoc.getElementsByTagName("Flowcell").item(0).getTextContent());
+                    run.put(JSON_CONTAINER_ID, runInfoDoc.getElementsByTagName("Flowcell").item(0).getTextContent());
                   }
 
                   if (runInfoDoc.getElementsByTagName("FlowcellLayout").getLength() != 0) {
@@ -331,23 +343,23 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                     if (n.getLength() != 0) {
                       Node attr = n.getNamedItem("LaneCount");
                       if (attr != null) {
-                        run.put("laneCount", attr.getTextContent());
+                        run.put(JSON_LANE_COUNT, attr.getTextContent());
                       }
                     }
                   }
                 }
 
                 if (runParameters.exists() && runParameters.canRead()) {
-                  run.put("runparams", SubmissionUtils.transform(runParameters));
+                  run.put(JSON_RUN_PARAMS, SubmissionUtils.transform(runParameters));
                   Document runParamDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
                   SubmissionUtils.transform(runParameters, runParamDoc);
 
-                  if (!run.has("sequencerName")) {
-                    run.put("sequencerName", runParamDoc.getElementsByTagName("ScannerID").item(0).getTextContent());
+                  if (!run.has(JSON_SEQUENCER_NAME)) {
+                    run.put(JSON_SEQUENCER_NAME, runParamDoc.getElementsByTagName("ScannerID").item(0).getTextContent());
                   }
 
-                  if (!run.has("containerId") && runParamDoc.getElementsByTagName("Barcode").getLength() != 0) {
-                    run.put("containerId", runParamDoc.getElementsByTagName("Barcode").item(0).getTextContent());
+                  if (!run.has(JSON_CONTAINER_ID) && runParamDoc.getElementsByTagName("Barcode").getLength() != 0) {
+                    run.put(JSON_CONTAINER_ID, runParamDoc.getElementsByTagName("Barcode").item(0).getTextContent());
                   }
                 }
                 else {
@@ -361,11 +373,11 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                 checkDates(rootFile, run);
 
                 if (!failed) {
-                  failed = checkLogs(rootFile, run);
+                  failed = checkLogs(rootFile);
                 }
 
                 if (!completeFile.exists()) {
-                  if (run.has("completionDate")) {
+                  if (run.has(JSON_COMPLETE_DATE)) {
                     log.debug(countStr + runName + " :: Completed");
                     map.get("Completed").add(run);
                   }
@@ -391,7 +403,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                   SubmissionUtils.transform(newStatusFile, statusDoc);
 
                   runName = statusDoc.getElementsByTagName("RunName").item(0).getTextContent();
-                  run.put("runName", runName);
+                  run.put(JSON_RUN_NAME, runName);
 
                   int numReads = new Integer(statusDoc.getElementsByTagName("NumberOfReads").item(0).getTextContent());
                   int numCycles = new Integer(statusDoc.getElementsByTagName("NumCycles").item(0).getTextContent());
@@ -399,7 +411,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                   int scoreCycle = new Integer(statusDoc.getElementsByTagName("ScoreCycle").item(0).getTextContent());
                   int callCycle = new Integer(statusDoc.getElementsByTagName("CallCycle").item(0).getTextContent());
 
-                  run.put("numCycles", numCycles);
+                  run.put(JSON_NUM_CYCLES, numCycles);
 
                   if (!new File(rootFile, "/Basecalling_Netcopy_complete_SINGLEREAD.txt").exists()) {
                     for (int i = 0; i < numReads; i++) {
@@ -413,23 +425,23 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                     }
                   }
 
-                  run.put("status", SubmissionUtils.transform(newStatusFile));
+                  run.put(JSON_STATUS, SubmissionUtils.transform(newStatusFile));
 
                   if (runInfo.exists()) {
-                    run.put("runinfo", SubmissionUtils.transform(runInfo));
+                    run.put(JSON_RUN_INFO, SubmissionUtils.transform(runInfo));
 
                     Document runInfoDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
                     SubmissionUtils.transform(runInfo, runInfoDoc);
 
-                    if (!run.has("sequencerName")) {
-                      run.put("sequencerName", runInfoDoc.getElementsByTagName("Instrument").item(0).getTextContent());
+                    if (!run.has(JSON_SEQUENCER_NAME)) {
+                      run.put(JSON_SEQUENCER_NAME, runInfoDoc.getElementsByTagName("Instrument").item(0).getTextContent());
                     }
 
                     if (runInfoDoc.getElementsByTagName("FlowcellId").getLength() != 0) {
-                      run.put("containerId", runInfoDoc.getElementsByTagName("FlowcellId").item(0).getTextContent());
+                      run.put(JSON_CONTAINER_ID, runInfoDoc.getElementsByTagName("FlowcellId").item(0).getTextContent());
                     }
                     else if (runInfoDoc.getElementsByTagName("Flowcell").getLength() != 0) {
-                      run.put("containerId", runInfoDoc.getElementsByTagName("Flowcell").item(0).getTextContent());
+                      run.put(JSON_CONTAINER_ID, runInfoDoc.getElementsByTagName("Flowcell").item(0).getTextContent());
                     }
 
                     if (runInfoDoc.getElementsByTagName("FlowcellLayout").getLength() != 0) {
@@ -437,23 +449,23 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                       if (n.getLength() != 0) {
                         Node attr = n.getNamedItem("LaneCount");
                         if (attr != null) {
-                          run.put("laneCount", attr.getTextContent());
+                          run.put(JSON_LANE_COUNT, attr.getTextContent());
                         }
                       }
                     }
                   }
 
                   if (runParameters.exists()) {
-                    run.put("runparams", SubmissionUtils.transform(runParameters));
+                    run.put(JSON_RUN_PARAMS, SubmissionUtils.transform(runParameters));
                     Document runParamDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
                     SubmissionUtils.transform(runParameters, runParamDoc);
 
-                    if (!run.has("sequencerName")) {
-                      run.put("sequencerName", runParamDoc.getElementsByTagName("ScannerID").item(0).getTextContent());
+                    if (!run.has(JSON_SEQUENCER_NAME)) {
+                      run.put(JSON_SEQUENCER_NAME, runParamDoc.getElementsByTagName("ScannerID").item(0).getTextContent());
                     }
 
-                    if (!run.has("containerId") && runParamDoc.getElementsByTagName("Barcode").getLength() != 0) {
-                      run.put("containerId", runParamDoc.getElementsByTagName("Barcode").item(0).getTextContent());
+                    if (!run.has(JSON_CONTAINER_ID) && runParamDoc.getElementsByTagName("Barcode").getLength() != 0) {
+                      run.put(JSON_CONTAINER_ID, runParamDoc.getElementsByTagName("Barcode").item(0).getTextContent());
                     }
                   }
                   else {
@@ -467,7 +479,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                   checkDates(rootFile, run);
 
                   if (!failed) {
-                    failed = checkLogs(rootFile, run);
+                    failed = checkLogs(rootFile);
                   }
 
                   if (complete) {
@@ -533,11 +545,11 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                   }
                 }
                 else {
-                  run.put("status", "<error><RunName>" + runName + "</RunName><ErrorMessage>Cannot read status file</ErrorMessage></error>");
+                  run.put(JSON_STATUS, "<error><RunName>" + runName + "</RunName><ErrorMessage>Cannot read status file</ErrorMessage></error>");
 
                   checkDates(rootFile, run);
                   if (!failed) {
-                    failed = checkLogs(rootFile, run);
+                    failed = checkLogs(rootFile);
                   }
 
                   if (!completeFile.exists()) {
@@ -564,11 +576,11 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                 }
               }
               else {
-                run.put("status", "<error><RunName>" + runName + "</RunName><ErrorMessage>No status file exists</ErrorMessage></error>");
+                run.put(JSON_STATUS, "<error><RunName>" + runName + "</RunName><ErrorMessage>No status file exists</ErrorMessage></error>");
 
                 checkDates(rootFile, run);
                 if (!failed) {
-                  failed = checkLogs(rootFile, run);
+                  failed = checkLogs(rootFile);
                 }
 
                 if (!completeFile.exists()) {
@@ -650,7 +662,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
     Matcher startMatcher = Pattern.compile(runDirRegex).matcher(runName);
     if (startMatcher.matches()) {
       log.debug(runName + " :: Got start date -> " + startMatcher.group(1));
-      run.put("startDate", startMatcher.group(1));
+      run.put(JSON_START_DATE, startMatcher.group(1));
     }
 
     File cycleTimeLog = new File(rootFile, "/Logs/CycleTimes.txt");
@@ -663,19 +675,19 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
       Matcher m = LimsUtils.tailGrep(rtaLog, runCompleteLogPattern, 10);
       if (m != null && m.groupCount() > 0) {
         log.debug(runName + " :: Got RTALogs Log.txt completion date -> " + m.group(1));
-        run.put("completionDate", m.group(1));
+        run.put(JSON_COMPLETE_DATE, m.group(1));
       }
     }
     else if (rtaLog2.exists() && rtaLog2.canRead()) {
       Matcher m = LimsUtils.tailGrep(rtaLog2, runCompleteLogPattern, 10);
       if (m != null && m.groupCount() > 0) {
         log.debug(runName + " :: Got Log.txt completion date -> " + m.group(1));
-        run.put("completionDate", m.group(1));
+        run.put(JSON_COMPLETE_DATE, m.group(1));
       }
     }
 
-    if (run.has("numCycles") && cycleTimeLog.exists() && cycleTimeLog.canRead()) {
-      int numCycles = run.getInt("numCycles");
+    if (run.has(JSON_NUM_CYCLES) && cycleTimeLog.exists() && cycleTimeLog.canRead()) {
+      int numCycles = run.getInt(JSON_NUM_CYCLES);
       Pattern p = Pattern.compile(
           "(\\d{1,2}\\/\\d{1,2}\\/\\d{4})\\s+(\\d{2}:\\d{2}:\\d{2})\\.\\d{3}\\s+[A-z0-9]+\\s+" + numCycles + "\\s+End\\s{1}Imaging"
       );
@@ -683,15 +695,15 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
       Matcher m = LimsUtils.tailGrep(cycleTimeLog, p, 10);
       if (m != null && m.groupCount() > 0) {
         String cycleDateStr = m.group(1) + "," + m.group(2);
-        if (run.has("completionDate")) {
+        if (run.has(JSON_COMPLETE_DATE)) {
           log.debug(runName + " :: Checking " + cycleDateStr + " vs. " + run.getString("completionDate"));
           try {
             Date cycleDate = logDateFormat.parse(cycleDateStr);
-            Date cDate = logDateFormat.parse(run.getString("completionDate"));
+            Date cDate = logDateFormat.parse(run.getString(JSON_COMPLETE_DATE));
 
             if (cycleDate.after(cDate)) {
               log.debug(runName + " :: Cycletimes completion date is newer -> " + cycleDateStr);
-              run.put("completionDate", cycleDateStr);
+              run.put(JSON_COMPLETE_DATE, cycleDateStr);
             }
           }
           catch (ParseException e) {
@@ -701,25 +713,25 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
       }
     }
 
-    if (!run.has("completionDate")) {
+    if (!run.has(JSON_COMPLETE_DATE)) {
       //attempt to get latest log file entry date
       if (rtaLog.exists() && rtaLog.canRead()) {
         Matcher m = LimsUtils.tailGrep(rtaLog, lastDateEntryLogPattern, 1);
         if (m != null && m.groupCount() > 0) {
           log.debug(runName + " :: Got RTALogs Log.txt last entry date -> " + m.group(1));
-          run.put("completionDate", m.group(1));
+          run.put(JSON_COMPLETE_DATE, m.group(1));
         }
       }
       else if (rtaLog2.exists() && rtaLog2.canRead()) {
         Matcher m = LimsUtils.tailGrep(rtaLog2, lastDateEntryLogPattern, 1);
         if (m != null && m.groupCount() > 0) {
           log.debug(runName + " :: Got Log.txt last entry date -> " + m.group(1));
-          run.put("completionDate", m.group(1));
+          run.put(JSON_COMPLETE_DATE, m.group(1));
         }
       }
 
-      if (run.has("numCycles") && cycleTimeLog.exists() && cycleTimeLog.canRead()) {
-        int numCycles = run.getInt("numCycles");
+      if (run.has(JSON_NUM_CYCLES) && cycleTimeLog.exists() && cycleTimeLog.canRead()) {
+        int numCycles = run.getInt(JSON_NUM_CYCLES);
         Pattern p = Pattern.compile(
             "(\\d{1,2}\\/\\d{1,2}\\/\\d{4})\\s+(\\d{2}:\\d{2}:\\d{2})\\.\\d{3}\\s+[A-z0-9]+\\s+" + numCycles + "\\s+End\\s{1}Imaging"
         );
@@ -728,15 +740,15 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
         if (m != null && m.groupCount() > 0) {
           log.debug(runName + " :: Got cycletimes last entry date -> " + m.group(1) + "," + m.group(2));
           String cycleDateStr = m.group(1) + "," + m.group(2);
-          if (run.has("completionDate")) {
-            log.debug(runName + " :: Checking " + cycleDateStr + " vs. " + run.getString("completionDate"));
+          if (run.has(JSON_COMPLETE_DATE)) {
+            log.debug(runName + " :: Checking " + cycleDateStr + " vs. " + run.getString(JSON_COMPLETE_DATE));
             try {
               Date cycleDate = logDateFormat.parse(cycleDateStr);
-              Date cDate = logDateFormat.parse(run.getString("completionDate"));
+              Date cDate = logDateFormat.parse(run.getString(JSON_COMPLETE_DATE));
 
               if (cycleDate.after(cDate)) {
                 log.debug(runName + " :: Cycletimes completion date is newer -> " + cycleDateStr);
-                run.put("completionDate", cycleDateStr);
+                run.put(JSON_COMPLETE_DATE, cycleDateStr);
               }
             }
             catch (ParseException e) {
@@ -748,7 +760,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
     }
 
     //still nothing? attempt with Events.log
-    if (!run.has("completionDate")) {
+    if (!run.has(JSON_COMPLETE_DATE)) {
       //attempt to get latest log file entry date
       if (eventsLog.exists() && eventsLog.canRead()) {
         log.debug(runName + " :: Checking events log...");
@@ -759,13 +771,13 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
         Matcher m = LimsUtils.tailGrep(eventsLog, p, 50);
         if (m != null && m.groupCount() > 0) {
           log.debug(runName + " :: Got last log event date -> " + m.group(1) + "," + m.group(2));
-          run.put("completionDate", m.group(1) + "," + m.group(2));
+          run.put(JSON_COMPLETE_DATE, m.group(1) + "," + m.group(2));
         }
       }
     }
 
     // last ditch attempt with RTAComplete.txt
-    if (!run.has("completionDate")) {
+    if (!run.has(JSON_COMPLETE_DATE)) {
       if (rtaComplete.exists() && rtaComplete.canRead()) {
         log.debug(runName + " :: Last ditch attempt. Checking RTAComplete log...");
         Pattern p = Pattern.compile(
@@ -775,19 +787,17 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
         Matcher m = LimsUtils.tailGrep(rtaComplete, p, 2);
         if (m != null && m.groupCount() > 0) {
           log.debug(runName + " :: Got RTAComplete date -> " + m.group(1) + "," + m.group(2));
-          run.put("completionDate", m.group(1) + "," + m.group(2));
+          run.put(JSON_COMPLETE_DATE, m.group(1) + "," + m.group(2));
         }
       }
     }
 
-    if (!run.has("completionDate")) {
-      run.put("completionDate", "null");
+    if (!run.has(JSON_COMPLETE_DATE)) {
+      run.put(JSON_COMPLETE_DATE, "null");
     }
   }
 
-  private Boolean checkLogs(File rootFile, JSONObject run) throws IOException {
-    String runName = run.getString("runName");
-
+  private Boolean checkLogs(File rootFile) throws IOException {
     File rtaLogDir = new File(rootFile, "/Data/RTALogs/");
     boolean failed = false;
     if (rtaLogDir.exists()) {
