@@ -118,7 +118,6 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
           JSONObject run = new JSONObject();
           File oldStatusFile = new File(rootFile, "/Data/Status.xml");
           File newStatusFile = new File(rootFile, "/Data/reports/Status.xml");
-          File runParameters = new File(rootFile, "/runParameters.xml");
           File runInfo = new File(rootFile, "/RunInfo.xml");
           File completeFile = new File(rootFile, "/Run.completed");
 
@@ -134,7 +133,6 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
 
               if (!oldStatusFile.exists() && !newStatusFile.exists()) {
                 //probably MiSeq/NextSeq
-                File otherRunParameters = new File(rootFile, "/runParameters.xml");
                 Boolean lastCycleLogFileExists = false;
                 File lastCycleLogFile = null;
                 if (runInfo.exists()) {
@@ -218,34 +216,8 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                   }
                 }
 
-                if (runParameters.exists()) {
-                  run.put(JSON_RUN_PARAMS, SubmissionUtils.transform(runParameters));
-                  Document runParamDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-                  SubmissionUtils.transform(runParameters, runParamDoc);
-
-                  if (!run.has(JSON_CONTAINER_ID) && runParamDoc.getElementsByTagName("Barcode").getLength() != 0) {
-                    run.put(JSON_CONTAINER_ID, runParamDoc.getElementsByTagName("Barcode").item(0).getTextContent());
-                  }
-
-                  run.put("kits", checkKits(runParamDoc));
-                }
-                else if (otherRunParameters.exists()) {
-                  run.put(JSON_RUN_PARAMS, SubmissionUtils.transform(otherRunParameters));
-                  Document runParamDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-                  SubmissionUtils.transform(otherRunParameters, runParamDoc);
-
-                  if (!run.has(JSON_CONTAINER_ID) && runParamDoc.getElementsByTagName("Barcode").getLength() != 0) {
-                    run.put(JSON_CONTAINER_ID, runParamDoc.getElementsByTagName("Barcode").item(0).getTextContent());
-                  }
-
-                  run.put("kits", checkKits(runParamDoc));
-                }
-                else {
-                  FileFilter fileFilter = new WildcardFileFilter("runParameters.xml*");
-                  File[] filterFiles = rootFile.listFiles(fileFilter);
-                  if (rootFile.listFiles(fileFilter) != null && filterFiles.length > 0) {
-                    failed = true;
-                  }
+                if (checkRunParams(run, rootFile)) {
+                  failed = true;
                 }
 
                 checkDates(rootFile, run);
@@ -314,7 +286,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                   }
                 }
               }
-              else if (oldStatusFile.exists()) {
+              else if (oldStatusFile.exists()) { // TODO: numCycles missing from JSON
                 if (oldStatusFile.canRead()) {
                   Document statusDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
                   SubmissionUtils.transform(oldStatusFile, statusDoc);
@@ -328,55 +300,9 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                   run.put(JSON_STATUS, "<error><RunName>" + runName + "</RunName><ErrorMessage>Cannot read status file</ErrorMessage></error>");
                 }
 
-                if (runInfo.exists() && runInfo.canRead()) {
-                  run.put(JSON_RUN_INFO, SubmissionUtils.transform(runInfo));
-
-                  Document runInfoDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-                  SubmissionUtils.transform(runInfo, runInfoDoc);
-
-                  if (!run.has(JSON_SEQUENCER_NAME)) {
-                    run.put(JSON_SEQUENCER_NAME, runInfoDoc.getElementsByTagName("Instrument").item(0).getTextContent());
-                  }
-
-                  if (runInfoDoc.getElementsByTagName("FlowcellId").getLength() != 0) {
-                    run.put(JSON_CONTAINER_ID, runInfoDoc.getElementsByTagName("FlowcellId").item(0).getTextContent());
-                  }
-                  else if (runInfoDoc.getElementsByTagName("Flowcell").getLength() != 0) {
-                    run.put(JSON_CONTAINER_ID, runInfoDoc.getElementsByTagName("Flowcell").item(0).getTextContent());
-                  }
-
-                  if (runInfoDoc.getElementsByTagName("FlowcellLayout").getLength() != 0) {
-                    NamedNodeMap n = runInfoDoc.getElementsByTagName("FlowcellLayout").item(0).getAttributes();
-                    if (n.getLength() != 0) {
-                      Node attr = n.getNamedItem("LaneCount");
-                      if (attr != null) {
-                        run.put(JSON_LANE_COUNT, attr.getTextContent());
-                      }
-                    }
-                  }
-                }
-
-                if (runParameters.exists() && runParameters.canRead()) {
-                  run.put(JSON_RUN_PARAMS, SubmissionUtils.transform(runParameters));
-                  Document runParamDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-                  SubmissionUtils.transform(runParameters, runParamDoc);
-
-                  if (!run.has(JSON_SEQUENCER_NAME)) {
-                    run.put(JSON_SEQUENCER_NAME, runParamDoc.getElementsByTagName("ScannerID").item(0).getTextContent());
-                  }
-
-                  if (!run.has(JSON_CONTAINER_ID) && runParamDoc.getElementsByTagName("Barcode").getLength() != 0) {
-                    run.put(JSON_CONTAINER_ID, runParamDoc.getElementsByTagName("Barcode").item(0).getTextContent());
-                  }
-
-                  run.put("kits", checkKits(runParamDoc));
-                }
-                else {
-                  FileFilter fileFilter = new WildcardFileFilter("runParameters.xml*");
-                  File[] filterFiles = rootFile.listFiles(fileFilter);
-                  if (rootFile.listFiles(fileFilter) != null && filterFiles.length > 0) {
-                    failed = true;
-                  }
+                checkRunInfo(runInfo, run);
+                if (checkRunParams(run, rootFile)) {
+                  failed = true;
                 }
 
                 checkDates(rootFile, run);
@@ -436,55 +362,9 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
 
                   run.put(JSON_STATUS, SubmissionUtils.transform(newStatusFile));
 
-                  if (runInfo.exists()) {
-                    run.put(JSON_RUN_INFO, SubmissionUtils.transform(runInfo));
-
-                    Document runInfoDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-                    SubmissionUtils.transform(runInfo, runInfoDoc);
-
-                    if (!run.has(JSON_SEQUENCER_NAME)) {
-                      run.put(JSON_SEQUENCER_NAME, runInfoDoc.getElementsByTagName("Instrument").item(0).getTextContent());
-                    }
-
-                    if (runInfoDoc.getElementsByTagName("FlowcellId").getLength() != 0) {
-                      run.put(JSON_CONTAINER_ID, runInfoDoc.getElementsByTagName("FlowcellId").item(0).getTextContent());
-                    }
-                    else if (runInfoDoc.getElementsByTagName("Flowcell").getLength() != 0) {
-                      run.put(JSON_CONTAINER_ID, runInfoDoc.getElementsByTagName("Flowcell").item(0).getTextContent());
-                    }
-
-                    if (runInfoDoc.getElementsByTagName("FlowcellLayout").getLength() != 0) {
-                      NamedNodeMap n = runInfoDoc.getElementsByTagName("FlowcellLayout").item(0).getAttributes();
-                      if (n.getLength() != 0) {
-                        Node attr = n.getNamedItem("LaneCount");
-                        if (attr != null) {
-                          run.put(JSON_LANE_COUNT, attr.getTextContent());
-                        }
-                      }
-                    }
-                  }
-
-                  if (runParameters.exists()) {
-                    run.put(JSON_RUN_PARAMS, SubmissionUtils.transform(runParameters));
-                    Document runParamDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-                    SubmissionUtils.transform(runParameters, runParamDoc);
-
-                    if (!run.has(JSON_SEQUENCER_NAME)) {
-                      run.put(JSON_SEQUENCER_NAME, runParamDoc.getElementsByTagName("ScannerID").item(0).getTextContent());
-                    }
-
-                    if (!run.has(JSON_CONTAINER_ID) && runParamDoc.getElementsByTagName("Barcode").getLength() != 0) {
-                      run.put(JSON_CONTAINER_ID, runParamDoc.getElementsByTagName("Barcode").item(0).getTextContent());
-                    }
-
-                    run.put("kits", checkKits(runParamDoc));
-                  }
-                  else {
-                    FileFilter fileFilter = new WildcardFileFilter("runParameters.xml*");
-                    File[] filterFiles = rootFile.listFiles(fileFilter);
-                    if (rootFile.listFiles(fileFilter) != null && filterFiles.length > 0) {
-                      failed = true;
-                    }
+                  checkRunInfo(runInfo, run);
+                  if (checkRunParams(run, rootFile)) {
+                    failed = true;
                   }
 
                   checkDates(rootFile, run);
@@ -638,6 +518,86 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
     }
 
     return smap;
+  }
+  
+  /**
+   * Checks for the RunInfo file. If found, its contents are added to the run data. The container ID, lane count, and sequencer name are 
+   * also added to the run data if found in the RunInfo file
+   * 
+   * @param runInfo the RunInfo.xml file
+   * @param run JSON representation of the sequencer run
+   * @throws TransformerException
+   * @throws IOException
+   * @throws ParserConfigurationException
+   */
+  private void checkRunInfo(File runInfo, JSONObject run) throws TransformerException, IOException, ParserConfigurationException {
+    if (runInfo.exists() && runInfo.canRead()) {
+      run.put(JSON_RUN_INFO, SubmissionUtils.transform(runInfo));
+
+      Document runInfoDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+      SubmissionUtils.transform(runInfo, runInfoDoc);
+
+      if (!run.has(JSON_SEQUENCER_NAME) && runInfoDoc.getElementsByTagName("Instrument").getLength() != 0) {
+        run.put(JSON_SEQUENCER_NAME, runInfoDoc.getElementsByTagName("Instrument").item(0).getTextContent());
+      }
+
+      if (runInfoDoc.getElementsByTagName("FlowcellId").getLength() != 0) {
+        run.put(JSON_CONTAINER_ID, runInfoDoc.getElementsByTagName("FlowcellId").item(0).getTextContent());
+      }
+      else if (runInfoDoc.getElementsByTagName("Flowcell").getLength() != 0) {
+        run.put(JSON_CONTAINER_ID, runInfoDoc.getElementsByTagName("Flowcell").item(0).getTextContent());
+      }
+
+      if (runInfoDoc.getElementsByTagName("FlowcellLayout").getLength() != 0) {
+        NamedNodeMap n = runInfoDoc.getElementsByTagName("FlowcellLayout").item(0).getAttributes();
+        if (n.getLength() != 0) {
+          Node attr = n.getNamedItem("LaneCount");
+          if (attr != null) {
+            run.put(JSON_LANE_COUNT, attr.getTextContent());
+          }
+        }
+      }
+    }
+  }
+  
+  /**
+   * Checks for the runParameters file. If found, its contents are added to the run data. The sequencer name and container ID found in 
+   * runParameters.xml are also added to the run data if not already included. If no runParameters.xml file is found, this method looks 
+   * for a file beginning with "runParameters.xml" which indicates the run has failed
+   * 
+   * @param run JSON representation of the sequencer run
+   * @param rootFile run directory
+   * @return true if runParameters.xml is missing, but runParameters.xml* is found, which indicates run failure; false otherwise
+   * @throws TransformerException
+   * @throws IOException
+   * @throws ParserConfigurationException
+   */
+  private boolean checkRunParams(JSONObject run, File rootFile) throws TransformerException, IOException, ParserConfigurationException {
+    final File runParameters = new File(rootFile, "/runParameters.xml");
+    
+    if (runParameters.exists() && runParameters.canRead()) {
+      run.put(JSON_RUN_PARAMS, SubmissionUtils.transform(runParameters));
+      Document runParamDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+      SubmissionUtils.transform(runParameters, runParamDoc);
+
+      if (!run.has(JSON_SEQUENCER_NAME) && runParamDoc.getElementsByTagName("ScannerID").getLength() != 0) {
+        run.put(JSON_SEQUENCER_NAME, runParamDoc.getElementsByTagName("ScannerID").item(0).getTextContent());
+      }
+
+      if (!run.has(JSON_CONTAINER_ID) && runParamDoc.getElementsByTagName("Barcode").getLength() != 0) {
+        run.put(JSON_CONTAINER_ID, runParamDoc.getElementsByTagName("Barcode").item(0).getTextContent());
+      }
+      
+      run.put("kits", checkKits(runParamDoc));
+    }
+    else {
+      FileFilter fileFilter = new WildcardFileFilter("runParameters.xml*"); // TODO: what is this looking for?
+      File[] filterFiles = rootFile.listFiles(fileFilter);
+      if (rootFile.listFiles(fileFilter) != null && filterFiles.length > 0) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private void checkDates(File rootFile, JSONObject run) throws IOException {
