@@ -27,6 +27,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import nki.core.MetrixContainer;
 import nki.decorators.MetrixContainerDecorator;
+
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameter;
 import org.springframework.integration.Message;
 import org.w3c.dom.*;
+
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
 import uk.ac.bbsrc.tgac.miso.notification.util.NotificationUtils;
@@ -42,6 +44,7 @@ import uk.ac.bbsrc.tgac.miso.tools.run.util.FileSetTransformer;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
@@ -584,34 +587,8 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                 }
               }
               else {
-                run.put(JSON_STATUS, "<error><RunName>" + runName + "</RunName><ErrorMessage>No status file exists</ErrorMessage></error>");
-
-                checkDates(rootFile, run);
-                if (!failed) {
-                  failed = checkLogs(rootFile);
-                }
-
-                if (!completeFile.exists()) {
-                  if (!new File(rootFile, "/Basecalling_Netcopy_complete.txt").exists()) {
-                    log.debug(countStr + runName + " :: Status.xml doesn't exist and Basecalling_Netcopy_complete.txt/Run.completed doesn't exist.");
-                    if (failed) {
-                      log.debug("Run has likely failed.");
-                      map.get("Failed").add(run);
-                    }
-                    else {
-                      log.debug("Run is unknown.");
-                      map.get("Unknown").add(run);
-                    }
-                  }
-                  else {
-                    log.debug(countStr + runName + " :: Status.xml doesn't exist but Basecalling_Netcopy_complete.txt exists. Run is completed");
-                    map.get("Completed").add(run);
-                  }
-                }
-                else {
-                  log.debug(countStr + runName + " :: Basecalling_Netcopy_complete.txt exists and Run.completed exists. Run is complete");
-                  map.get("Completed").add(run);
-                }
+                // Should be unreachable
+                log.error("Unreachable condition reached on run "+runName);
               }
             }
             else {
