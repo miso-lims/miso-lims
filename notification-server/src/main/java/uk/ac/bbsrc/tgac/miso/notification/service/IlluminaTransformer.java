@@ -124,13 +124,15 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
           final File oldStatusFile = new File(rootFile, "/Data/Status.xml");
           final File newStatusFile = new File(rootFile, "/Data/reports/Status.xml");
           final File runInfo = new File(rootFile, "/RunInfo.xml");
+          final File runParameters = new File(rootFile, "/runParameters.xml");
           final File completeFile = new File(rootFile, "/Run.completed");
 
           try {
-            boolean complete = true;
+            boolean readCompleteFilesFound = true;
             boolean failed = false;
 
             String runName = rootFile.getName();
+            log.debug(countStr + "Processing" + runName);
 
             if (!finishedCache.keySet().contains(runName)) {
               run.put(JSON_RUN_NAME, runName);
@@ -140,26 +142,21 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                 //probably MiSeq/NextSeq
                 Boolean lastCycleLogFileExists = false;
                 File lastCycleLogFile = null;
-                if (runInfo.exists()) {
+                
+                Document runInfoDoc = getDocument(runInfo);
+                int numReads = 0;
+                if (runInfoDoc != null) {
                   run.put(JSON_RUN_INFO, SubmissionUtils.transform(runInfo));
-
-                  Document runInfoDoc = SubmissionUtils.emptyDocument();
-                  SubmissionUtils.transform(runInfo, runInfoDoc);
-
-                  int numReads = runInfoDoc.getElementsByTagName("Read").getLength();
-                  int numCycles = 0;
-                  int sumCycles = 0;
-                  NodeList nl = runInfoDoc.getElementsByTagName("Read");
-                  for (int i = 0; i < nl.getLength(); i++) {
-                    Element e = (Element) nl.item(i);
-                    if (!"".equals(e.getAttributeNS(null, "NumCycles"))) {
-                      sumCycles += Integer.parseInt(e.getAttributeNS(null, "NumCycles"));
-                      if (!"".equals(e.getAttributeNS(null, "IsIndexedRead")) && "N".equals(e.getAttributeNS(null, "IsIndexedRead"))) {
-                        numCycles = Integer.parseInt(e.getAttributeNS(null, "NumCycles"));
-                      }
-                    }
+                  checkRunInfo(runInfoDoc, run);
+                  if (numReads == 0) {
+                    numReads = runInfoDoc.getElementsByTagName("Read").getLength();
                   }
 
+                  int sumCycles = 0;
+                  if (run.has(JSON_NUM_CYCLES)) {
+                    sumCycles = run.getInt(JSON_NUM_CYCLES);
+                  }
+                  
                   lastCycleLogFile = new File(rootFile, "/Logs/" + runName + "_Cycle" + sumCycles + "_Log.00.log");
                   if (lastCycleLogFile.exists()) {
                     lastCycleLogFileExists = true;
@@ -186,42 +183,14 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                       }
                     }
                   }
-
-                  run.put(JSON_NUM_CYCLES, numCycles);
-
-                  if (!new File(rootFile, "/Basecalling_Netcopy_complete_SINGLEREAD.txt").exists()) {
-                    for (int i = 0; i < numReads; i++) {
-                      if (!new File(rootFile, "/Basecalling_Netcopy_complete_Read" + (i + 1) + ".txt").exists()) {
-                        if (!new File(rootFile, "/Basecalling_Netcopy_complete_READ" + (i + 1) + ".txt").exists()) {
-                          log.debug(countStr + runName + " :: No Basecalling_Netcopy_complete_Read" + (i + 1) + ".txt / Basecalling_Netcopy_complete_READ" + (i + 1) + ".txt!");
-                          complete = false;
-                          break;
-                        }
-                      }
-                    }
-                  }
-
-                  run.put(JSON_SEQUENCER_NAME, runInfoDoc.getElementsByTagName("Instrument").item(0).getTextContent());
-
-                  if (runInfoDoc.getElementsByTagName("FlowcellId").getLength() != 0) {
-                    run.put(JSON_CONTAINER_ID, runInfoDoc.getElementsByTagName("FlowcellId").item(0).getTextContent());
-                  }
-                  else if (runInfoDoc.getElementsByTagName("Flowcell").getLength() != 0) {
-                    run.put(JSON_CONTAINER_ID, runInfoDoc.getElementsByTagName("Flowcell").item(0).getTextContent());
-                  }
-
-                  if (runInfoDoc.getElementsByTagName("FlowcellLayout").getLength() != 0) {
-                    NamedNodeMap n = runInfoDoc.getElementsByTagName("FlowcellLayout").item(0).getAttributes();
-                    if (n.getLength() != 0) {
-                      Node attr = n.getNamedItem("LaneCount");
-                      if (attr != null) {
-                        run.put(JSON_LANE_COUNT, attr.getTextContent());
-                      }
-                    }
-                  }
                 }
 
-                if (checkRunParams(run, rootFile)) {
+                Document runParamDoc = getDocument(runParameters);
+                if (runParamDoc != null) {
+                  run.put(JSON_RUN_PARAMS, SubmissionUtils.transform(runParameters));
+                  checkRunParams(runParamDoc, run);
+                }
+                else if (checkRunParametersXFile(rootFile)) {
                   failed = true;
                 }
 
@@ -230,10 +199,12 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                 if (!failed) {
                   failed = checkLogs(rootFile);
                 }
+                
+                readCompleteFilesFound = checkReadCompleteFiles(rootFile, numReads);
 
-                if (complete) {
+                if (readCompleteFilesFound) {
                   if (!new File(rootFile, "/Basecalling_Netcopy_complete.txt").exists() && !lastCycleLogFileExists) {
-                    log.debug(countStr + runName + " :: All Basecalling_Netcopy_complete_ReadX.txt exist but Basecalling_Netcopy_complete.txt doesn't exist and last cycle log file doesn't exist.");
+                    log.debug(runName + " :: All Basecalling_Netcopy_complete_ReadX.txt exist but Basecalling_Netcopy_complete.txt doesn't exist and last cycle log file doesn't exist.");
                     if (failed) {
                       log.debug("Run has likely failed.");
                       map.get(STATUS_FAILED).add(run);
@@ -244,7 +215,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                     }
                   }
                   else if (new File(rootFile, "/Basecalling_Netcopy_complete.txt").exists() && !lastCycleLogFileExists) {
-                    log.debug(countStr + runName + " :: All Basecalling_Netcopy_complete_ReadX.txt exist and Basecalling_Netcopy_complete.txt exists but last cycle log file doesn't exist.");
+                    log.debug(runName + " :: All Basecalling_Netcopy_complete_ReadX.txt exist and Basecalling_Netcopy_complete.txt exists but last cycle log file doesn't exist.");
                     if (failed) {
                       log.debug("Run has likely failed.");
                       map.get(STATUS_FAILED).add(run);
@@ -255,7 +226,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                     }
                   }
                   else {
-                    log.debug(countStr + runName + " :: All Basecalling_Netcopy_complete*.txt exist and last cycle log file exists. Run is complete");
+                    log.debug(runName + " :: All Basecalling_Netcopy_complete*.txt exist and last cycle log file exists. Run is complete");
                     map.get(STATUS_COMPLETE).add(run);
                   }
                 }
@@ -263,7 +234,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                   if (!completeFile.exists()) {
                     if (!new File(rootFile, "/Basecalling_Netcopy_complete.txt").exists() &&
                         (lastCycleLogFile != null && !lastCycleLogFileExists)) {
-                      log.debug(countStr + runName + " :: A Basecalling_Netcopy_complete_ReadX.txt doesn't exist and last cycle log file doesn't exist.");
+                      log.debug(runName + " :: A Basecalling_Netcopy_complete_ReadX.txt doesn't exist and last cycle log file doesn't exist.");
                       if (failed) {
                         log.debug("Run has likely failed.");
                         map.get(STATUS_FAILED).add(run);
@@ -274,7 +245,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                       }
                     }
                     else {
-                      log.debug(countStr + runName + " :: Basecalling_Netcopy_complete*.txt don't exist and last cycle log file doesn't exist.");
+                      log.debug(runName + " :: Basecalling_Netcopy_complete*.txt don't exist and last cycle log file doesn't exist.");
                       if (failed) {
                         log.debug("Run has likely failed.");
                         map.get(STATUS_FAILED).add(run);
@@ -286,27 +257,37 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                     }
                   }
                   else {
-                    log.debug(countStr + runName + " :: Basecalling_Netcopy_complete*.txt don't exist and last cycle log file doesn't exist, but RTAComplete.txt exists. Run is complete");
+                    log.debug(runName + " :: Basecalling_Netcopy_complete*.txt don't exist and last cycle log file doesn't exist, but RTAComplete.txt exists. Run is complete");
                     map.get(STATUS_COMPLETE).add(run);
                   }
                 }
               }
-              else if (oldStatusFile.exists()) { // TODO: numCycles missing from JSON
-                if (oldStatusFile.canRead()) {
-                  Document statusDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-                  SubmissionUtils.transform(oldStatusFile, statusDoc);
-
+              else if (oldStatusFile.exists()) {
+                int numReads = 0;
+                Document statusDoc = getDocument(oldStatusFile); 
+                if (statusDoc != null) {
+                  run.put(JSON_STATUS, SubmissionUtils.transform(oldStatusFile));
                   runName = statusDoc.getElementsByTagName("RunName").item(0).getTextContent();
                   run.put(JSON_RUN_NAME, runName);
-
-                  run.put(JSON_STATUS, SubmissionUtils.transform(oldStatusFile));
                 }
                 else {
                   run.put(JSON_STATUS, "<error><RunName>" + runName + "</RunName><ErrorMessage>Cannot read status file</ErrorMessage></error>");
                 }
-
-                checkRunInfo(runInfo, run);
-                if (checkRunParams(run, rootFile)) {
+                Document runInfoDoc = getDocument(runInfo);
+                if (runInfoDoc != null) {
+                  run.put(JSON_RUN_INFO, SubmissionUtils.transform(runInfo));
+                  checkRunInfo(runInfoDoc, run);
+                  if (numReads == 0) {
+                    numReads = runInfoDoc.getElementsByTagName("Read").getLength();
+                  }
+                }
+                
+                Document runParamDoc = getDocument(runParameters);
+                if (runParamDoc != null) {
+                  run.put(JSON_RUN_PARAMS, SubmissionUtils.transform(runParameters));
+                  checkRunParams(runParamDoc, run);
+                }
+                else if (checkRunParametersXFile(rootFile)) {
                   failed = true;
                 }
 
@@ -316,9 +297,11 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                   failed = checkLogs(rootFile);
                 }
 
+                readCompleteFilesFound = checkReadCompleteFiles(rootFile, numReads);
+                
                 if (!completeFile.exists()) {
                   if (run.has(JSON_COMPLETE_DATE)) {
-                    log.debug(countStr + runName + " :: Completed");
+                    log.debug(runName + " :: Completed");
                     map.get(STATUS_COMPLETE).add(run);
                   }
                   else {
@@ -327,130 +310,116 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                       map.get(STATUS_FAILED).add(run);
                     }
                     else {
-                      log.debug(countStr + runName + " :: Running");
+                      log.debug(runName + " :: Running");
                       map.get(STATUS_RUNNING).add(run);
                     }
                   }
                 }
                 else {
-                  log.debug(countStr + runName + " :: Completed");
+                  log.debug(runName + " :: Completed");
                   map.get(STATUS_COMPLETE).add(run);
                 }
               }
               else if (newStatusFile.exists()) {
-                if (newStatusFile.canRead()) {
-                  Document statusDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-                  SubmissionUtils.transform(newStatusFile, statusDoc);
-
+                int numReads = 0;
+                boolean someChecks = false; // TODO: rename this // TODO: default?
+                Document statusDoc = getDocument(newStatusFile); 
+                if (statusDoc != null) {
+                  run.put(JSON_STATUS, SubmissionUtils.transform(newStatusFile));
                   runName = statusDoc.getElementsByTagName("RunName").item(0).getTextContent();
                   run.put(JSON_RUN_NAME, runName);
-
-                  int numReads = new Integer(statusDoc.getElementsByTagName("NumberOfReads").item(0).getTextContent());
-                  int numCycles = new Integer(statusDoc.getElementsByTagName("NumCycles").item(0).getTextContent());
-                  int imgCycle = new Integer(statusDoc.getElementsByTagName("ImgCycle").item(0).getTextContent());
-                  int scoreCycle = new Integer(statusDoc.getElementsByTagName("ScoreCycle").item(0).getTextContent());
-                  int callCycle = new Integer(statusDoc.getElementsByTagName("CallCycle").item(0).getTextContent());
-
-                  run.put(JSON_NUM_CYCLES, numCycles);
-
-                  if (!new File(rootFile, "/Basecalling_Netcopy_complete_SINGLEREAD.txt").exists()) {
-                    for (int i = 0; i < numReads; i++) {
-                      if (!new File(rootFile, "/Basecalling_Netcopy_complete_Read" + (i + 1) + ".txt").exists()) {
-                        if (!new File(rootFile, "/Basecalling_Netcopy_complete_READ" + (i + 1) + ".txt").exists()) {
-                          log.debug(countStr + runName + " :: No Basecalling_Netcopy_complete_Read" + (i + 1) + ".txt / Basecalling_Netcopy_complete_READ" + (i + 1) + ".txt!");
-                          complete = false;
-                          break;
-                        }
-                      }
-                    }
+                  
+                  if (statusDoc.getElementsByTagName("NumberOfReads").getLength() != 0) {
+                    numReads = new Integer(statusDoc.getElementsByTagName("NumberOfReads").item(0).getTextContent());
                   }
-
-                  run.put(JSON_STATUS, SubmissionUtils.transform(newStatusFile));
-
-                  checkRunInfo(runInfo, run);
-                  if (checkRunParams(run, rootFile)) {
-                    failed = true;
-                  }
-
-                  checkDates(rootFile, run);
-
-                  if (!failed) {
-                    failed = checkLogs(rootFile);
-                  }
-
-                  if (complete) {
-                    if (!new File(rootFile, "/Basecalling_Netcopy_complete.txt").exists() &&
-                        (numCycles != imgCycle || numCycles != scoreCycle || numCycles != callCycle)) {
-                      log.debug(countStr + runName + " :: All Basecalling_Netcopy_complete_ReadX.txt exist but Basecalling_Netcopy_complete.txt doesn't exist and cycles don't match.");
-                      if (failed) {
-                        log.debug("Run has likely failed.");
-                        map.get(STATUS_FAILED).add(run);
-                      }
-                      else {
-                        log.debug("Run is unknown.");
-                        map.get(STATUS_UNKNOWN).add(run);
-                      }
-                    }
-                    else if (new File(rootFile, "/Basecalling_Netcopy_complete.txt").exists() &&
-                             (numCycles != imgCycle || numCycles != scoreCycle || numCycles != callCycle)) {
-                      log.debug(countStr + runName + " :: All Basecalling_Netcopy_complete_ReadX.txt exist and Basecalling_Netcopy_complete.txt exists but cycles don't match.");
-                      if (failed) {
-                        log.debug("Run has likely failed.");
-                        map.get(STATUS_FAILED).add(run);
-                      }
-                      else {
-                        log.debug("Run is unknown.");
-                        map.get(STATUS_UNKNOWN).add(run);
-                      }
-                    }
-                    else {
-                      log.debug(countStr + runName + " :: All Basecalling_Netcopy_complete*.txt exist and cycles match. Run is complete");
-                      map.get(STATUS_COMPLETE).add(run);
-                    }
-                  }
-                  else {
-                    if (!completeFile.exists()) {
-                      if (!new File(rootFile, "/Basecalling_Netcopy_complete.txt").exists() &&
-                          (numCycles != imgCycle || numCycles != scoreCycle || numCycles != callCycle)) {
-                        log.debug(countStr + runName + " :: A Basecalling_Netcopy_complete_ReadX.txt doesn't exist and cycles don't match.");
-                        if (failed) {
-                          log.debug("Run has likely failed.");
-                          map.get(STATUS_FAILED).add(run);
-                        }
-                        else {
-                          log.debug("Run is not complete.");
-                          map.get(STATUS_RUNNING).add(run);
-                        }
-                      }
-                      else {
-                        log.debug(countStr + runName + " :: Basecalling_Netcopy_complete*.txt don't exist and cycles don't match.");
-                        if (failed) {
-                          log.debug("Run has likely failed.");
-                          map.get(STATUS_FAILED).add(run);
-                        }
-                        else {
-                          log.debug("Run is unknown.");
-                          map.get(STATUS_UNKNOWN).add(run);
-                        }
-                      }
-                    }
-                    else {
-                      log.debug(countStr + runName + " :: Basecalling_Netcopy_complete*.txt don't exist and cycles don't match, but Run.completed exists. Run is complete");
-                      map.get(STATUS_COMPLETE).add(run);
+                  
+                  if (statusDoc.getElementsByTagName("NumberOfReads").getLength() != 0) {
+                    int numCycles = new Integer(statusDoc.getElementsByTagName("NumCycles").item(0).getTextContent());
+                    run.put(JSON_NUM_CYCLES, numCycles);
+                    
+                    if (statusDoc.getElementsByTagName("ImgCycle").getLength() != 0
+                        && statusDoc.getElementsByTagName("ScoreCycle").getLength() != 0
+                        && statusDoc.getElementsByTagName("CallCycle").getLength() != 0) {
+                      int imgCycle = new Integer(statusDoc.getElementsByTagName("ImgCycle").item(0).getTextContent());
+                      int scoreCycle = new Integer(statusDoc.getElementsByTagName("ScoreCycle").item(0).getTextContent());
+                      int callCycle = new Integer(statusDoc.getElementsByTagName("CallCycle").item(0).getTextContent());
+                      someChecks = numCycles != imgCycle || numCycles != scoreCycle || numCycles != callCycle;
                     }
                   }
                 }
                 else {
                   run.put(JSON_STATUS, "<error><RunName>" + runName + "</RunName><ErrorMessage>Cannot read status file</ErrorMessage></error>");
-
-                  checkDates(rootFile, run);
-                  if (!failed) {
-                    failed = checkLogs(rootFile);
+                }
+                
+                Document runInfoDoc = getDocument(runInfo);
+                if (runInfoDoc != null) {
+                  run.put(JSON_RUN_INFO, SubmissionUtils.transform(runInfo));
+                  checkRunInfo(runInfoDoc, run);
+                  if (numReads == 0) {
+                    numReads = runInfoDoc.getElementsByTagName("Read").getLength();
                   }
+                }
+                
+                Document runParamDoc = getDocument(runParameters);
+                if (runParamDoc != null) {
+                  run.put(JSON_RUN_PARAMS, SubmissionUtils.transform(runParameters));
+                  checkRunParams(runParamDoc, run);
+                }
+                else if (checkRunParametersXFile(rootFile)) {
+                  failed = true;
+                }
 
+                checkDates(rootFile, run);
+
+                if (!failed) {
+                  failed = checkLogs(rootFile);
+                }
+                
+                readCompleteFilesFound = checkReadCompleteFiles(rootFile, numReads);
+
+                if (readCompleteFilesFound) {
+                  if (!new File(rootFile, "/Basecalling_Netcopy_complete.txt").exists() && someChecks) {
+                    log.debug(runName + " :: All Basecalling_Netcopy_complete_ReadX.txt exist but Basecalling_Netcopy_complete.txt doesn't exist and cycles don't match.");
+                    if (failed) {
+                      log.debug("Run has likely failed.");
+                      map.get(STATUS_FAILED).add(run);
+                    }
+                    else {
+                      log.debug("Run is unknown.");
+                      map.get(STATUS_UNKNOWN).add(run);
+                    }
+                  }
+                  else if (new File(rootFile, "/Basecalling_Netcopy_complete.txt").exists() && someChecks) {
+                    log.debug(runName + " :: All Basecalling_Netcopy_complete_ReadX.txt exist and Basecalling_Netcopy_complete.txt exists but cycles don't match.");
+                    if (failed) {
+                      log.debug("Run has likely failed.");
+                      map.get(STATUS_FAILED).add(run);
+                    }
+                    else {
+                      log.debug("Run is unknown.");
+                      map.get(STATUS_UNKNOWN).add(run);
+                    }
+                  }
+                  else {
+                    log.debug(runName + " :: All Basecalling_Netcopy_complete*.txt exist and cycles match. Run is complete");
+                    map.get(STATUS_COMPLETE).add(run);
+                  }
+                }
+                else {
                   if (!completeFile.exists()) {
-                    if (!new File(rootFile, "/Basecalling_Netcopy_complete.txt").exists()) {
-                      log.debug(countStr + runName + " :: Cannot read Status.xml and Basecalling_Netcopy_complete.txt/Run.completed doesn't exist.");
+                    if (!new File(rootFile, "/Basecalling_Netcopy_complete.txt").exists() && someChecks) {
+                      log.debug(runName + " :: A Basecalling_Netcopy_complete_ReadX.txt doesn't exist and cycles don't match.");
+                      if (failed) {
+                        log.debug("Run has likely failed.");
+                        map.get(STATUS_FAILED).add(run);
+                      }
+                      else {
+                        log.debug("Run is not complete.");
+                        map.get(STATUS_RUNNING).add(run);
+                      }
+                    }
+                    else {
+                      log.debug(runName + " :: Basecalling_Netcopy_complete*.txt don't exist and cycles don't match.");
                       if (failed) {
                         log.debug("Run has likely failed.");
                         map.get(STATUS_FAILED).add(run);
@@ -460,20 +429,16 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                         map.get(STATUS_UNKNOWN).add(run);
                       }
                     }
-                    else {
-                      map.get(STATUS_COMPLETE).add(run);
-                      log.debug(countStr + runName + " :: Cannot read Status.xml and Basecalling_Netcopy_complete.txt exists. Run is unknown");
-                    }
                   }
                   else {
-                    log.debug(countStr + runName + " :: Basecalling_Netcopy_complete.txt exists and Run.completed exists. Run is complete");
+                    log.debug(runName + " :: Basecalling_Netcopy_complete*.txt don't exist and cycles don't match, but Run.completed exists. Run is complete");
                     map.get(STATUS_COMPLETE).add(run);
                   }
                 }
               }
               else {
                 // Should be unreachable
-                log.error("Unreachable condition reached examining run "+runName);
+                log.error("Unexpected condition reached examining run "+runName);
               }
             }
             else {
@@ -526,83 +491,126 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
   }
   
   /**
-   * Checks for the RunInfo file. If found, its contents are added to the run data. The container ID, lane count, and sequencer name are 
-   * also added to the run data if found in the RunInfo file
+   * Checks if an XML file is readable and if so, creates a Document for reading it
    * 
-   * @param runInfo the RunInfo.xml file
+   * @param file The file to read
+   * @return The Document if the file is readable; null otherwise
+   * @throws ParserConfigurationException
+   * @throws TransformerException
+   * @throws IOException
+   */
+  private static Document getDocument(File file) throws ParserConfigurationException, TransformerException, IOException {
+    if (!file.exists() || !file.canRead()) return null;
+    
+    Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+    SubmissionUtils.transform(file, doc);
+    return doc;
+  }
+  
+  /**
+   * Reads a RunInfo document, looks for total number of cycles, container ID, and lane count, and adds to the run any of these that are 
+   * not already included
+   * 
+   * @param runInfoDoc the RunInfo.xml Document
    * @param run JSON representation of the sequencer run
    * @throws TransformerException
    * @throws IOException
    * @throws ParserConfigurationException
    */
-  private void checkRunInfo(File runInfo, JSONObject run) throws TransformerException, IOException, ParserConfigurationException {
-    if (runInfo.exists() && runInfo.canRead()) {
-      run.put(JSON_RUN_INFO, SubmissionUtils.transform(runInfo));
-
-      Document runInfoDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-      SubmissionUtils.transform(runInfo, runInfoDoc);
-
-      if (!run.has(JSON_SEQUENCER_NAME) && runInfoDoc.getElementsByTagName("Instrument").getLength() != 0) {
-        run.put(JSON_SEQUENCER_NAME, runInfoDoc.getElementsByTagName("Instrument").item(0).getTextContent());
-      }
-
-      if (runInfoDoc.getElementsByTagName("FlowcellId").getLength() != 0) {
-        run.put(JSON_CONTAINER_ID, runInfoDoc.getElementsByTagName("FlowcellId").item(0).getTextContent());
-      }
-      else if (runInfoDoc.getElementsByTagName("Flowcell").getLength() != 0) {
-        run.put(JSON_CONTAINER_ID, runInfoDoc.getElementsByTagName("Flowcell").item(0).getTextContent());
-      }
-
-      if (runInfoDoc.getElementsByTagName("FlowcellLayout").getLength() != 0) {
-        NamedNodeMap n = runInfoDoc.getElementsByTagName("FlowcellLayout").item(0).getAttributes();
-        if (n.getLength() != 0) {
-          Node attr = n.getNamedItem("LaneCount");
-          if (attr != null) {
-            run.put(JSON_LANE_COUNT, attr.getTextContent());
+  private void checkRunInfo(Document runInfoDoc, JSONObject run) {
+    if (!run.has(JSON_NUM_CYCLES)) {
+      int sumCycles = 0;
+      NodeList nl = runInfoDoc.getElementsByTagName("Read");
+      if (nl.getLength() > 0) {
+        for (int i = 0; i < nl.getLength(); i++) {
+          Element e = (Element) nl.item(i);
+          if (!"".equals(e.getAttributeNS(null, "NumCycles"))) {
+            sumCycles += Integer.parseInt(e.getAttributeNS(null, "NumCycles"));
           }
+        }
+        run.put(JSON_NUM_CYCLES, sumCycles);
+      }
+    }
+
+    if (!run.has(JSON_SEQUENCER_NAME) && runInfoDoc.getElementsByTagName("Instrument").getLength() != 0) {
+      run.put(JSON_SEQUENCER_NAME, runInfoDoc.getElementsByTagName("Instrument").item(0).getTextContent());
+    }
+
+    if (runInfoDoc.getElementsByTagName("FlowcellId").getLength() != 0) {
+      run.put(JSON_CONTAINER_ID, runInfoDoc.getElementsByTagName("FlowcellId").item(0).getTextContent());
+    }
+    else if (runInfoDoc.getElementsByTagName("Flowcell").getLength() != 0) {
+      run.put(JSON_CONTAINER_ID, runInfoDoc.getElementsByTagName("Flowcell").item(0).getTextContent());
+    }
+
+    if (runInfoDoc.getElementsByTagName("FlowcellLayout").getLength() != 0) {
+      NamedNodeMap n = runInfoDoc.getElementsByTagName("FlowcellLayout").item(0).getAttributes();
+      if (n.getLength() != 0) {
+        Node attr = n.getNamedItem("LaneCount");
+        if (attr != null) {
+          run.put(JSON_LANE_COUNT, attr.getTextContent());
         }
       }
     }
   }
   
   /**
-   * Checks for the runParameters file. If found, its contents are added to the run data. The sequencer name and container ID found in 
-   * runParameters.xml are also added to the run data if not already included. If no runParameters.xml file is found, this method looks 
-   * for a file beginning with "runParameters.xml" which indicates the run has failed
+   * Reads the runParameters.xml document, looks for the sequencer name and container ID, and adds to the run any of these that are not 
+   * already included
    * 
+   * @param runParamDoc the runParameters.xml Document
    * @param run JSON representation of the sequencer run
-   * @param rootFile run directory
    * @return true if runParameters.xml is missing, but runParameters.xml* is found, which indicates run failure; false otherwise
    * @throws TransformerException
    * @throws IOException
    * @throws ParserConfigurationException
    */
-  private boolean checkRunParams(JSONObject run, File rootFile) throws TransformerException, IOException, ParserConfigurationException {
-    final File runParameters = new File(rootFile, "/runParameters.xml");
-    
-    if (runParameters.exists() && runParameters.canRead()) {
-      run.put(JSON_RUN_PARAMS, SubmissionUtils.transform(runParameters));
-      Document runParamDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-      SubmissionUtils.transform(runParameters, runParamDoc);
-
-      if (!run.has(JSON_SEQUENCER_NAME) && runParamDoc.getElementsByTagName("ScannerID").getLength() != 0) {
-        run.put(JSON_SEQUENCER_NAME, runParamDoc.getElementsByTagName("ScannerID").item(0).getTextContent());
-      }
-
-      if (!run.has(JSON_CONTAINER_ID) && runParamDoc.getElementsByTagName("Barcode").getLength() != 0) {
-        run.put(JSON_CONTAINER_ID, runParamDoc.getElementsByTagName("Barcode").item(0).getTextContent());
-      }
-      
-      run.put("kits", checkKits(runParamDoc));
+  private void checkRunParams(Document runParamDoc, JSONObject run) {
+    if (!run.has(JSON_SEQUENCER_NAME) && runParamDoc.getElementsByTagName("ScannerID").getLength() != 0) {
+      run.put(JSON_SEQUENCER_NAME, runParamDoc.getElementsByTagName("ScannerID").item(0).getTextContent());
     }
-    else {
-      FileFilter fileFilter = new WildcardFileFilter("runParameters.xml*"); // TODO: what is this looking for?
-      File[] filterFiles = rootFile.listFiles(fileFilter);
-      if (rootFile.listFiles(fileFilter) != null && filterFiles.length > 0) {
-        return true;
-      }
+
+    if (!run.has(JSON_CONTAINER_ID) && runParamDoc.getElementsByTagName("Barcode").getLength() != 0) {
+      run.put(JSON_CONTAINER_ID, runParamDoc.getElementsByTagName("Barcode").item(0).getTextContent());
+    }
+    
+    run.put("kits", checkKits(runParamDoc));
+  }
+  
+  /**
+   * Looks for a file in the run directory that begins with "runParameters.xml"
+   * 
+   * @param rootFile run directory
+   * @return true if any such files are found; false otherwise
+   */
+  private boolean checkRunParametersXFile(File rootFile) {
+    FileFilter fileFilter = new WildcardFileFilter("runParameters.xml*"); // TODO: what is this looking for?
+    File[] filterFiles = rootFile.listFiles(fileFilter);
+    if (rootFile.listFiles(fileFilter) != null && filterFiles.length > 0) {
+      return true;
     }
     return false;
+  }
+  
+  /**
+   * Checks for existance the expected Basecalling_Netcopy_complete_X files for a completed run
+   * 
+   * @param rootFile run directory
+   * @param numReads number of reads
+   * @return true if the expected files exist; false otherwise
+   */
+  private boolean checkReadCompleteFiles(File rootFile, int numReads) {
+    if (!new File(rootFile, "/Basecalling_Netcopy_complete_SINGLEREAD.txt").exists()) {
+      if (numReads < 1) return false;
+      for (int i = 1; i <= numReads; i++) {
+        if (!new File(rootFile, "/Basecalling_Netcopy_complete_Read" + (i) + ".txt").exists()
+        && !new File(rootFile, "/Basecalling_Netcopy_complete_READ" + (i) + ".txt").exists()) {
+          log.debug(rootFile.getName() + " :: No Basecalling_Netcopy_complete_Read" + (i) + ".txt / Basecalling_Netcopy_complete_READ" + (i) + ".txt!");
+          return false;
+        }
+      }
+    }
+    return true;
   }
 
   private void checkDates(File rootFile, JSONObject run) throws IOException {
