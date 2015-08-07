@@ -132,7 +132,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
             boolean failed = false;
 
             String runName = rootFile.getName();
-            log.debug(countStr + "Processing" + runName);
+            log.debug(countStr + "Processing run " + runName);
 
             if (!finishedCache.keySet().contains(runName)) {
               run.put(JSON_RUN_NAME, runName);
