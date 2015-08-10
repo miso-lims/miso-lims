@@ -190,8 +190,8 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                   run.put(JSON_RUN_PARAMS, SubmissionUtils.transform(runParameters));
                   checkRunParams(runParamDoc, run);
                 }
-                else if (checkRunParametersXFile(rootFile)) {
-                  failed = true;
+                else {
+                  failed = checkRunParametersXFile(rootFile);
                 }
 
                 checkDates(rootFile, run);
@@ -287,8 +287,8 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                   run.put(JSON_RUN_PARAMS, SubmissionUtils.transform(runParameters));
                   checkRunParams(runParamDoc, run);
                 }
-                else if (checkRunParametersXFile(rootFile)) {
-                  failed = true;
+                else {
+                  failed = checkRunParametersXFile(rootFile);
                 }
 
                 checkDates(rootFile, run);
@@ -322,7 +322,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
               }
               else if (newStatusFile.exists()) {
                 int numReads = 0;
-                boolean someChecks = false; // TODO: rename this // TODO: default?
+                boolean cycleMismatch = false;
                 Document statusDoc = getDocument(newStatusFile); 
                 if (statusDoc != null) {
                   run.put(JSON_STATUS, SubmissionUtils.transform(newStatusFile));
@@ -343,7 +343,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                       int imgCycle = new Integer(statusDoc.getElementsByTagName("ImgCycle").item(0).getTextContent());
                       int scoreCycle = new Integer(statusDoc.getElementsByTagName("ScoreCycle").item(0).getTextContent());
                       int callCycle = new Integer(statusDoc.getElementsByTagName("CallCycle").item(0).getTextContent());
-                      someChecks = numCycles != imgCycle || numCycles != scoreCycle || numCycles != callCycle;
+                      cycleMismatch = numCycles != imgCycle || numCycles != scoreCycle || numCycles != callCycle;
                     }
                   }
                 }
@@ -365,8 +365,8 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                   run.put(JSON_RUN_PARAMS, SubmissionUtils.transform(runParameters));
                   checkRunParams(runParamDoc, run);
                 }
-                else if (checkRunParametersXFile(rootFile)) {
-                  failed = true;
+                else {
+                  failed = checkRunParametersXFile(rootFile);
                 }
 
                 checkDates(rootFile, run);
@@ -378,7 +378,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                 readCompleteFilesFound = checkReadCompleteFiles(rootFile, numReads);
 
                 if (readCompleteFilesFound) {
-                  if (!new File(rootFile, "/Basecalling_Netcopy_complete.txt").exists() && someChecks) {
+                  if (!new File(rootFile, "/Basecalling_Netcopy_complete.txt").exists() && cycleMismatch) {
                     log.debug(runName + " :: All Basecalling_Netcopy_complete_ReadX.txt exist but Basecalling_Netcopy_complete.txt doesn't exist and cycles don't match.");
                     if (failed) {
                       log.debug("Run has likely failed.");
@@ -389,7 +389,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                       map.get(STATUS_UNKNOWN).add(run);
                     }
                   }
-                  else if (new File(rootFile, "/Basecalling_Netcopy_complete.txt").exists() && someChecks) {
+                  else if (new File(rootFile, "/Basecalling_Netcopy_complete.txt").exists() && cycleMismatch) {
                     log.debug(runName + " :: All Basecalling_Netcopy_complete_ReadX.txt exist and Basecalling_Netcopy_complete.txt exists but cycles don't match.");
                     if (failed) {
                       log.debug("Run has likely failed.");
@@ -407,7 +407,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                 }
                 else {
                   if (!completeFile.exists()) {
-                    if (!new File(rootFile, "/Basecalling_Netcopy_complete.txt").exists() && someChecks) {
+                    if (!new File(rootFile, "/Basecalling_Netcopy_complete.txt").exists() && cycleMismatch) {
                       log.debug(runName + " :: A Basecalling_Netcopy_complete_ReadX.txt doesn't exist and cycles don't match.");
                       if (failed) {
                         log.debug("Run has likely failed.");
@@ -578,13 +578,13 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
   }
   
   /**
-   * Looks for a file in the run directory that begins with "runParameters.xml"
+   * Looks for a file in the run directory that begins with "runParameters.xml" which may indicate a failure
    * 
    * @param rootFile run directory
    * @return true if any such files are found; false otherwise
    */
   private boolean checkRunParametersXFile(File rootFile) {
-    FileFilter fileFilter = new WildcardFileFilter("runParameters.xml*"); // TODO: what is this looking for?
+    FileFilter fileFilter = new WildcardFileFilter("runParameters.xml*");
     File[] filterFiles = rootFile.listFiles(fileFilter);
     if (rootFile.listFiles(fileFilter) != null && filterFiles.length > 0) {
       return true;
@@ -613,6 +613,13 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
     return true;
   }
 
+  /**
+   * Attempts to find the sequencer run's start and end date, and add them to the run data
+   * 
+   * @param rootFile run directory
+   * @param run JSON representation of the sequencer run
+   * @throws IOException
+   */
   private void checkDates(File rootFile, JSONObject run) throws IOException {
     String runName = run.getString("runName");
 
@@ -755,6 +762,14 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
     }
   }
 
+  /**
+   * Checks files in the run directory's /Data/RTALogs/ subdirectory for a log message indicating run failure
+   * 
+   * @param rootFile run directory
+   * @return true if a message is found that indicates run failure; false otherwise. A return value of false is not conclusive evidence 
+   * that a run has completed or that it was successful
+   * @throws IOException
+   */
   private Boolean checkLogs(File rootFile) throws IOException {
     File rtaLogDir = new File(rootFile, "/Data/RTALogs/");
     boolean failed = false;
