@@ -36,12 +36,11 @@ import org.springframework.batch.core.JobParameter;
 import org.springframework.integration.Message;
 import org.w3c.dom.*;
 
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
 import uk.ac.bbsrc.tgac.miso.notification.util.NotificationUtils;
+import uk.ac.bbsrc.tgac.miso.notification.util.PossiblyGzippedFileUtils;
 import uk.ac.bbsrc.tgac.miso.tools.run.util.FileSetTransformer;
 
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
@@ -121,11 +120,11 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
       if (rootFile.isDirectory()) {
         if (rootFile.canRead()) {
           JSONObject run = new JSONObject();
-          final File oldStatusFile = new File(rootFile, "/Data/Status.xml");
-          final File newStatusFile = new File(rootFile, "/Data/reports/Status.xml");
-          final File runInfo = new File(rootFile, "/RunInfo.xml");
-          final File runParameters = new File(rootFile, "/runParameters.xml");
-          final File completeFile = new File(rootFile, "/Run.completed");
+          final String oldStatusPath = "/Data/Status.xml";
+          final String newStatusPath = "/Data/reports/Status.xml";
+          final String runInfoPath = "/RunInfo.xml";
+          final String runParametersPath = "/runParameters.xml";
+          final String completeFilePath = "/Run.completed";
 
           try {
             boolean readCompleteFilesFound = true;
@@ -138,12 +137,11 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
               run.put(JSON_RUN_NAME, runName);
               run.put(JSON_FULL_PATH, rootFile.getCanonicalPath()); //follow symlinks!
 
-              if (!oldStatusFile.exists() && !newStatusFile.exists()) {
+              if (!PossiblyGzippedFileUtils.checkExists(rootFile, oldStatusPath) && !PossiblyGzippedFileUtils.checkExists(rootFile, newStatusPath)) {
                 //probably MiSeq/NextSeq
                 Boolean lastCycleLogFileExists = false;
-                File lastCycleLogFile = null;
                 
-                Document runInfoDoc = getXmlDocument(runInfo);
+                Document runInfoDoc = PossiblyGzippedFileUtils.getXmlDocument(rootFile, runInfoPath);
                 int numReads = 0;
                 if (runInfoDoc != null) {
                   run.put(JSON_RUN_INFO, runInfoDoc.getTextContent());
@@ -157,8 +155,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                     sumCycles = run.getInt(JSON_NUM_CYCLES);
                   }
                   
-                  lastCycleLogFile = new File(rootFile, "/Logs/" + runName + "_Cycle" + sumCycles + "_Log.00.log");
-                  if (lastCycleLogFile.exists()) {
+                  if (PossiblyGzippedFileUtils.checkExists(rootFile, "/Logs/" + runName + "_Cycle" + sumCycles + "_Log.00.log")) {
                     lastCycleLogFileExists = true;
                   }
                   else {
@@ -169,14 +166,14 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                       lastCycleLogFileExists = true;
                     }
                     else {
-                      File cycleTimeLog = new File(rootFile, "/Logs/CycleTimes.txt");
-                      if (cycleTimeLog.exists() && cycleTimeLog.canRead()) {
+                      String cycleTimeLogPath = "/Logs/CycleTimes.txt";
+                      if (PossiblyGzippedFileUtils.checkExistsReadable(rootFile, cycleTimeLogPath)) {
                         //check last line of CycleTimes.txt
                         Pattern p = Pattern.compile(
                           "(\\d{1,2}\\/\\d{1,2}\\/\\d{4})\\s+(\\d{2}:\\d{2}:\\d{2})\\.\\d{3}\\s+[A-z0-9]+\\s+" + sumCycles + "\\s+End\\s{1}Imaging"
                         );
-
-                        Matcher m = LimsUtils.tailGrep(cycleTimeLog, p, 10);
+                        
+                        Matcher m = PossiblyGzippedFileUtils.tailGrep(rootFile, "/Logs/CycleTimes.txt", p, 10);
                         if (m != null && m.groupCount() > 0) {
                           lastCycleLogFileExists = true;
                         }
@@ -185,7 +182,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                   }
                 }
 
-                Document runParamDoc = getXmlDocument(runParameters);
+                Document runParamDoc = PossiblyGzippedFileUtils.getXmlDocument(rootFile, runParametersPath);
                 if (runParamDoc != null) {
                   run.put(JSON_RUN_PARAMS, runParamDoc.getTextContent());
                   checkRunParams(runParamDoc, run);
@@ -203,7 +200,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                 readCompleteFilesFound = checkReadCompleteFiles(rootFile, numReads);
 
                 if (readCompleteFilesFound) {
-                  if (!new File(rootFile, "/Basecalling_Netcopy_complete.txt").exists() && !lastCycleLogFileExists) {
+                  if (!PossiblyGzippedFileUtils.checkExists(rootFile, "/Basecalling_Netcopy_complete.txt") && !lastCycleLogFileExists) {
                     log.debug(runName + " :: All Basecalling_Netcopy_complete_ReadX.txt exist but Basecalling_Netcopy_complete.txt doesn't exist and last cycle log file doesn't exist.");
                     if (failed) {
                       log.debug("Run has likely failed.");
@@ -214,7 +211,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                       map.get(STATUS_UNKNOWN).add(run);
                     }
                   }
-                  else if (new File(rootFile, "/Basecalling_Netcopy_complete.txt").exists() && !lastCycleLogFileExists) {
+                  else if (PossiblyGzippedFileUtils.checkExists(rootFile, "/Basecalling_Netcopy_complete.txt") && !lastCycleLogFileExists) {
                     log.debug(runName + " :: All Basecalling_Netcopy_complete_ReadX.txt exist and Basecalling_Netcopy_complete.txt exists but last cycle log file doesn't exist.");
                     if (failed) {
                       log.debug("Run has likely failed.");
@@ -231,9 +228,9 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                   }
                 }
                 else {
-                  if (!completeFile.exists()) {
-                    if (!new File(rootFile, "/Basecalling_Netcopy_complete.txt").exists() &&
-                        (lastCycleLogFile != null && !lastCycleLogFileExists)) {
+                  if (!PossiblyGzippedFileUtils.checkExists(rootFile, completeFilePath)) {
+                    if (!PossiblyGzippedFileUtils.checkExists(rootFile, "/Basecalling_Netcopy_complete.txt") &&
+                        (runInfoDoc != null && !lastCycleLogFileExists)) {
                       log.debug(runName + " :: A Basecalling_Netcopy_complete_ReadX.txt doesn't exist and last cycle log file doesn't exist.");
                       if (failed) {
                         log.debug("Run has likely failed.");
@@ -262,9 +259,9 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                   }
                 }
               }
-              else if (oldStatusFile.exists()) {
+              else if (PossiblyGzippedFileUtils.checkExists(rootFile, oldStatusPath)) {
                 int numReads = 0;
-                Document statusDoc = getXmlDocument(oldStatusFile); 
+                Document statusDoc = PossiblyGzippedFileUtils.getXmlDocument(rootFile, oldStatusPath);
                 if (statusDoc != null) {
                   run.put(JSON_STATUS, statusDoc.getTextContent());
                   runName = statusDoc.getElementsByTagName("RunName").item(0).getTextContent();
@@ -273,7 +270,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                 else {
                   run.put(JSON_STATUS, "<error><RunName>" + runName + "</RunName><ErrorMessage>Cannot read status file</ErrorMessage></error>");
                 }
-                Document runInfoDoc = getXmlDocument(runInfo);
+                Document runInfoDoc = PossiblyGzippedFileUtils.getXmlDocument(rootFile, runInfoPath);
                 if (runInfoDoc != null) {
                   run.put(JSON_RUN_INFO, runInfoDoc.getTextContent());
                   checkRunInfo(runInfoDoc, run);
@@ -282,7 +279,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                   }
                 }
                 
-                Document runParamDoc = getXmlDocument(runParameters);
+                Document runParamDoc = PossiblyGzippedFileUtils.getXmlDocument(rootFile, runParametersPath);
                 if (runParamDoc != null) {
                   run.put(JSON_RUN_PARAMS, runParamDoc.getTextContent());
                   checkRunParams(runParamDoc, run);
@@ -299,7 +296,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
 
                 readCompleteFilesFound = checkReadCompleteFiles(rootFile, numReads);
                 
-                if (!completeFile.exists()) {
+                if (!PossiblyGzippedFileUtils.checkExists(rootFile, completeFilePath)) {
                   if (run.has(JSON_COMPLETE_DATE)) {
                     log.debug(runName + " :: Completed");
                     map.get(STATUS_COMPLETE).add(run);
@@ -320,10 +317,10 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                   map.get(STATUS_COMPLETE).add(run);
                 }
               }
-              else if (newStatusFile.exists()) {
+              else if (PossiblyGzippedFileUtils.checkExists(rootFile, newStatusPath)) {
                 int numReads = 0;
                 boolean cycleMismatch = false;
-                Document statusDoc = getXmlDocument(newStatusFile); 
+                Document statusDoc = PossiblyGzippedFileUtils.getXmlDocument(rootFile, newStatusPath);
                 if (statusDoc != null) {
                   run.put(JSON_STATUS, statusDoc.getTextContent());
                   runName = statusDoc.getElementsByTagName("RunName").item(0).getTextContent();
@@ -351,7 +348,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                   run.put(JSON_STATUS, "<error><RunName>" + runName + "</RunName><ErrorMessage>Cannot read status file</ErrorMessage></error>");
                 }
                 
-                Document runInfoDoc = getXmlDocument(runInfo);
+                Document runInfoDoc = PossiblyGzippedFileUtils.getXmlDocument(rootFile, runInfoPath);
                 if (runInfoDoc != null) {
                   run.put(JSON_RUN_INFO, runInfoDoc.getTextContent());
                   checkRunInfo(runInfoDoc, run);
@@ -360,7 +357,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                   }
                 }
                 
-                Document runParamDoc = getXmlDocument(runParameters);
+                Document runParamDoc = PossiblyGzippedFileUtils.getXmlDocument(rootFile, runParametersPath);
                 if (runParamDoc != null) {
                   run.put(JSON_RUN_PARAMS, runParamDoc.getTextContent());
                   checkRunParams(runParamDoc, run);
@@ -378,7 +375,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                 readCompleteFilesFound = checkReadCompleteFiles(rootFile, numReads);
 
                 if (readCompleteFilesFound) {
-                  if (!new File(rootFile, "/Basecalling_Netcopy_complete.txt").exists() && cycleMismatch) {
+                  if (!PossiblyGzippedFileUtils.checkExists(rootFile, "/Basecalling_Netcopy_complete.txt") && cycleMismatch) {
                     log.debug(runName + " :: All Basecalling_Netcopy_complete_ReadX.txt exist but Basecalling_Netcopy_complete.txt doesn't exist and cycles don't match.");
                     if (failed) {
                       log.debug("Run has likely failed.");
@@ -389,7 +386,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                       map.get(STATUS_UNKNOWN).add(run);
                     }
                   }
-                  else if (new File(rootFile, "/Basecalling_Netcopy_complete.txt").exists() && cycleMismatch) {
+                  else if (PossiblyGzippedFileUtils.checkExists(rootFile, "/Basecalling_Netcopy_complete.txt") && cycleMismatch) {
                     log.debug(runName + " :: All Basecalling_Netcopy_complete_ReadX.txt exist and Basecalling_Netcopy_complete.txt exists but cycles don't match.");
                     if (failed) {
                       log.debug("Run has likely failed.");
@@ -406,8 +403,8 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                   }
                 }
                 else {
-                  if (!completeFile.exists()) {
-                    if (!new File(rootFile, "/Basecalling_Netcopy_complete.txt").exists() && cycleMismatch) {
+                  if (!PossiblyGzippedFileUtils.checkExists(rootFile, completeFilePath)) {
+                    if (!PossiblyGzippedFileUtils.checkExists(rootFile, "/Basecalling_Netcopy_complete.txt") && cycleMismatch) {
                       log.debug(runName + " :: A Basecalling_Netcopy_complete_ReadX.txt doesn't exist and cycles don't match.");
                       if (failed) {
                         log.debug("Run has likely failed.");
@@ -488,23 +485,6 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
     }
 
     return smap;
-  }
-  
-  /**
-   * Checks if an XML file is readable and if so, creates a Document for reading it
-   * 
-   * @param file The file to read
-   * @return The Document if the file is readable; null otherwise
-   * @throws ParserConfigurationException
-   * @throws TransformerException
-   * @throws IOException
-   */
-  private static Document getXmlDocument(File file) throws ParserConfigurationException, TransformerException, IOException {
-    if (!file.exists() || !file.canRead()) return null;
-    
-    Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-    SubmissionUtils.transform(file, doc);
-    return doc;
   }
   
   /**
@@ -600,11 +580,11 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
    * @return true if the expected files exist; false otherwise
    */
   private boolean checkReadCompleteFiles(File rootFile, int numReads) {
-    if (!new File(rootFile, "/Basecalling_Netcopy_complete_SINGLEREAD.txt").exists()) {
+    if (!PossiblyGzippedFileUtils.checkExists(rootFile, "/Basecalling_Netcopy_complete_SINGLEREAD.txt")) {
       if (numReads < 1) return false;
       for (int i = 1; i <= numReads; i++) {
-        if (!new File(rootFile, "/Basecalling_Netcopy_complete_Read" + (i) + ".txt").exists()
-        && !new File(rootFile, "/Basecalling_Netcopy_complete_READ" + (i) + ".txt").exists()) {
+        if (!PossiblyGzippedFileUtils.checkExists(rootFile, "/Basecalling_Netcopy_complete_Read" + (i) + ".txt")
+        && !PossiblyGzippedFileUtils.checkExists(rootFile, "/Basecalling_Netcopy_complete_READ" + (i) + ".txt")) {
           log.debug(rootFile.getName() + " :: No Basecalling_Netcopy_complete_Read" + (i) + ".txt / Basecalling_Netcopy_complete_READ" + (i) + ".txt!");
           return false;
         }
@@ -629,35 +609,35 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
       log.debug(runName + " :: Got start date -> " + startMatcher.group(1));
       run.put(JSON_START_DATE, startMatcher.group(1));
     }
+    
+    String cycleTimeLogPath = "/Logs/CycleTimes.txt";
+    String rtaLogPath = "/Data/RTALogs/Log.txt";
+    String rtaLog2Path = "/Data/Log.txt";
+    String eventsLogPath = "/Events.log";
+    String rtaCompletePath = "/RTAComplete.txt";
 
-    File cycleTimeLog = new File(rootFile, "/Logs/CycleTimes.txt");
-    File rtaLog = new File(rootFile, "/Data/RTALogs/Log.txt");
-    File rtaLog2 = new File(rootFile, "/Data/Log.txt");
-    File eventsLog = new File(rootFile, "/Events.log");
-    File rtaComplete = new File(rootFile, "/RTAComplete.txt");
-
-    if (rtaLog.exists() && rtaLog.canRead()) {
-      Matcher m = LimsUtils.tailGrep(rtaLog, runCompleteLogPattern, 10);
+    if (PossiblyGzippedFileUtils.checkExistsReadable(rootFile, rtaLogPath)) {
+      Matcher m = PossiblyGzippedFileUtils.tailGrep(rootFile, rtaLogPath, runCompleteLogPattern, 10);
       if (m != null && m.groupCount() > 0) {
         log.debug(runName + " :: Got RTALogs Log.txt completion date -> " + m.group(1));
         run.put(JSON_COMPLETE_DATE, m.group(1));
       }
     }
-    else if (rtaLog2.exists() && rtaLog2.canRead()) {
-      Matcher m = LimsUtils.tailGrep(rtaLog2, runCompleteLogPattern, 10);
+    else if (PossiblyGzippedFileUtils.checkExistsReadable(rootFile, rtaLog2Path)) {
+      Matcher m = PossiblyGzippedFileUtils.tailGrep(rootFile, rtaLog2Path, runCompleteLogPattern, 10);
       if (m != null && m.groupCount() > 0) {
         log.debug(runName + " :: Got Log.txt completion date -> " + m.group(1));
         run.put(JSON_COMPLETE_DATE, m.group(1));
       }
     }
 
-    if (run.has(JSON_NUM_CYCLES) && cycleTimeLog.exists() && cycleTimeLog.canRead()) {
+    if (run.has(JSON_NUM_CYCLES) && PossiblyGzippedFileUtils.checkExistsReadable(rootFile, cycleTimeLogPath)) {
       int numCycles = run.getInt(JSON_NUM_CYCLES);
       Pattern p = Pattern.compile(
           "(\\d{1,2}\\/\\d{1,2}\\/\\d{4})\\s+(\\d{2}:\\d{2}:\\d{2})\\.\\d{3}\\s+[A-z0-9]+\\s+" + numCycles + "\\s+End\\s{1}Imaging"
       );
 
-      Matcher m = LimsUtils.tailGrep(cycleTimeLog, p, 10);
+      Matcher m = PossiblyGzippedFileUtils.tailGrep(rootFile, cycleTimeLogPath, p, 10);
       if (m != null && m.groupCount() > 0) {
         String cycleDateStr = m.group(1) + "," + m.group(2);
         if (run.has(JSON_COMPLETE_DATE)) {
@@ -680,28 +660,28 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
 
     if (!run.has(JSON_COMPLETE_DATE)) {
       //attempt to get latest log file entry date
-      if (rtaLog.exists() && rtaLog.canRead()) {
-        Matcher m = LimsUtils.tailGrep(rtaLog, lastDateEntryLogPattern, 1);
+      if (PossiblyGzippedFileUtils.checkExistsReadable(rootFile, rtaLogPath)) {
+        Matcher m = PossiblyGzippedFileUtils.tailGrep(rootFile, rtaLogPath, lastDateEntryLogPattern, 1);
         if (m != null && m.groupCount() > 0) {
           log.debug(runName + " :: Got RTALogs Log.txt last entry date -> " + m.group(1));
           run.put(JSON_COMPLETE_DATE, m.group(1));
         }
       }
-      else if (rtaLog2.exists() && rtaLog2.canRead()) {
-        Matcher m = LimsUtils.tailGrep(rtaLog2, lastDateEntryLogPattern, 1);
+      else if (PossiblyGzippedFileUtils.checkExistsReadable(rootFile, rtaLog2Path)) {
+        Matcher m = PossiblyGzippedFileUtils.tailGrep(rootFile, rtaLog2Path, lastDateEntryLogPattern, 1);
         if (m != null && m.groupCount() > 0) {
           log.debug(runName + " :: Got Log.txt last entry date -> " + m.group(1));
           run.put(JSON_COMPLETE_DATE, m.group(1));
         }
       }
 
-      if (run.has(JSON_NUM_CYCLES) && cycleTimeLog.exists() && cycleTimeLog.canRead()) {
+      if (run.has(JSON_NUM_CYCLES) && PossiblyGzippedFileUtils.checkExistsReadable(rootFile, cycleTimeLogPath)) {
         int numCycles = run.getInt(JSON_NUM_CYCLES);
         Pattern p = Pattern.compile(
             "(\\d{1,2}\\/\\d{1,2}\\/\\d{4})\\s+(\\d{2}:\\d{2}:\\d{2})\\.\\d{3}\\s+[A-z0-9]+\\s+" + numCycles + "\\s+End\\s{1}Imaging"
         );
 
-        Matcher m = LimsUtils.tailGrep(cycleTimeLog, p, 10);
+        Matcher m = PossiblyGzippedFileUtils.tailGrep(rootFile, cycleTimeLogPath, p, 10);
         if (m != null && m.groupCount() > 0) {
           log.debug(runName + " :: Got cycletimes last entry date -> " + m.group(1) + "," + m.group(2));
           String cycleDateStr = m.group(1) + "," + m.group(2);
@@ -727,13 +707,13 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
     //still nothing? attempt with Events.log
     if (!run.has(JSON_COMPLETE_DATE)) {
       //attempt to get latest log file entry date
-      if (eventsLog.exists() && eventsLog.canRead()) {
+      if (PossiblyGzippedFileUtils.checkExistsReadable(rootFile, eventsLogPath)) {
         log.debug(runName + " :: Checking events log...");
         Pattern p = Pattern.compile(
             "\\.*\\s+(\\d{1,2}\\/\\d{2}\\/\\d{4})\\s+(\\d{1,2}:\\d{2}:\\d{2}).\\d+.*"
         );
 
-        Matcher m = LimsUtils.tailGrep(eventsLog, p, 50);
+        Matcher m = PossiblyGzippedFileUtils.tailGrep(rootFile, eventsLogPath, p, 50);
         if (m != null && m.groupCount() > 0) {
           log.debug(runName + " :: Got last log event date -> " + m.group(1) + "," + m.group(2));
           run.put(JSON_COMPLETE_DATE, m.group(1) + "," + m.group(2));
@@ -743,13 +723,13 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
 
     // last ditch attempt with RTAComplete.txt
     if (!run.has(JSON_COMPLETE_DATE)) {
-      if (rtaComplete.exists() && rtaComplete.canRead()) {
+      if (PossiblyGzippedFileUtils.checkExistsReadable(rootFile, rtaCompletePath)) {
         log.debug(runName + " :: Last ditch attempt. Checking RTAComplete log...");
         Pattern p = Pattern.compile(
             "\\.*(\\d{1,2}\\/\\d{1,2}\\/\\d{4}),(\\d{1,2}:\\d{1,2}:\\d{1,2}).\\d+.*"
         );
 
-        Matcher m = LimsUtils.tailGrep(rtaComplete, p, 2);
+        Matcher m = PossiblyGzippedFileUtils.tailGrep(rootFile, rtaCompletePath, p, 2);
         if (m != null && m.groupCount() > 0) {
           log.debug(runName + " :: Got RTAComplete date -> " + m.group(1) + "," + m.group(2));
           run.put(JSON_COMPLETE_DATE, m.group(1) + "," + m.group(2));
@@ -779,10 +759,10 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
       for (File f : rtaLogDir.listFiles(new FilenameFilter() {
         @Override
         public boolean accept(File dir, String name) {
-          return (name.endsWith("Log_00.txt") || name.equals("Log.txt"));
+          return (name.endsWith("Log_00.txt") || name.endsWith("Log_00.txt.gz") || name.equals("Log.txt") || name.equals("Log.txt.gz"));
         }
       })) {
-        Matcher m = LimsUtils.tailGrep(f, p, 5);
+        Matcher m = PossiblyGzippedFileUtils.tailGrep(f, p, 5);
         if (m != null && m.groupCount() > 0) {
           failed = true;
         }
