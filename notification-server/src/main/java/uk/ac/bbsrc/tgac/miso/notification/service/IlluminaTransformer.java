@@ -143,10 +143,10 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                 Boolean lastCycleLogFileExists = false;
                 File lastCycleLogFile = null;
                 
-                Document runInfoDoc = getDocument(runInfo);
+                Document runInfoDoc = getXmlDocument(runInfo);
                 int numReads = 0;
                 if (runInfoDoc != null) {
-                  run.put(JSON_RUN_INFO, SubmissionUtils.transform(runInfo));
+                  run.put(JSON_RUN_INFO, runInfoDoc.getTextContent());
                   checkRunInfo(runInfoDoc, run);
                   if (numReads == 0) {
                     numReads = runInfoDoc.getElementsByTagName("Read").getLength();
@@ -185,9 +185,9 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                   }
                 }
 
-                Document runParamDoc = getDocument(runParameters);
+                Document runParamDoc = getXmlDocument(runParameters);
                 if (runParamDoc != null) {
-                  run.put(JSON_RUN_PARAMS, SubmissionUtils.transform(runParameters));
+                  run.put(JSON_RUN_PARAMS, runParamDoc.getTextContent());
                   checkRunParams(runParamDoc, run);
                 }
                 else {
@@ -264,27 +264,27 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
               }
               else if (oldStatusFile.exists()) {
                 int numReads = 0;
-                Document statusDoc = getDocument(oldStatusFile); 
+                Document statusDoc = getXmlDocument(oldStatusFile); 
                 if (statusDoc != null) {
-                  run.put(JSON_STATUS, SubmissionUtils.transform(oldStatusFile));
+                  run.put(JSON_STATUS, statusDoc.getTextContent());
                   runName = statusDoc.getElementsByTagName("RunName").item(0).getTextContent();
                   run.put(JSON_RUN_NAME, runName);
                 }
                 else {
                   run.put(JSON_STATUS, "<error><RunName>" + runName + "</RunName><ErrorMessage>Cannot read status file</ErrorMessage></error>");
                 }
-                Document runInfoDoc = getDocument(runInfo);
+                Document runInfoDoc = getXmlDocument(runInfo);
                 if (runInfoDoc != null) {
-                  run.put(JSON_RUN_INFO, SubmissionUtils.transform(runInfo));
+                  run.put(JSON_RUN_INFO, runInfoDoc.getTextContent());
                   checkRunInfo(runInfoDoc, run);
                   if (numReads == 0) {
                     numReads = runInfoDoc.getElementsByTagName("Read").getLength();
                   }
                 }
                 
-                Document runParamDoc = getDocument(runParameters);
+                Document runParamDoc = getXmlDocument(runParameters);
                 if (runParamDoc != null) {
-                  run.put(JSON_RUN_PARAMS, SubmissionUtils.transform(runParameters));
+                  run.put(JSON_RUN_PARAMS, runParamDoc.getTextContent());
                   checkRunParams(runParamDoc, run);
                 }
                 else {
@@ -323,9 +323,9 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
               else if (newStatusFile.exists()) {
                 int numReads = 0;
                 boolean cycleMismatch = false;
-                Document statusDoc = getDocument(newStatusFile); 
+                Document statusDoc = getXmlDocument(newStatusFile); 
                 if (statusDoc != null) {
-                  run.put(JSON_STATUS, SubmissionUtils.transform(newStatusFile));
+                  run.put(JSON_STATUS, statusDoc.getTextContent());
                   runName = statusDoc.getElementsByTagName("RunName").item(0).getTextContent();
                   run.put(JSON_RUN_NAME, runName);
                   
@@ -351,18 +351,18 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                   run.put(JSON_STATUS, "<error><RunName>" + runName + "</RunName><ErrorMessage>Cannot read status file</ErrorMessage></error>");
                 }
                 
-                Document runInfoDoc = getDocument(runInfo);
+                Document runInfoDoc = getXmlDocument(runInfo);
                 if (runInfoDoc != null) {
-                  run.put(JSON_RUN_INFO, SubmissionUtils.transform(runInfo));
+                  run.put(JSON_RUN_INFO, runInfoDoc.getTextContent());
                   checkRunInfo(runInfoDoc, run);
                   if (numReads == 0) {
                     numReads = runInfoDoc.getElementsByTagName("Read").getLength();
                   }
                 }
                 
-                Document runParamDoc = getDocument(runParameters);
+                Document runParamDoc = getXmlDocument(runParameters);
                 if (runParamDoc != null) {
-                  run.put(JSON_RUN_PARAMS, SubmissionUtils.transform(runParameters));
+                  run.put(JSON_RUN_PARAMS, runParamDoc.getTextContent());
                   checkRunParams(runParamDoc, run);
                 }
                 else {
@@ -499,7 +499,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
    * @throws TransformerException
    * @throws IOException
    */
-  private static Document getDocument(File file) throws ParserConfigurationException, TransformerException, IOException {
+  private static Document getXmlDocument(File file) throws ParserConfigurationException, TransformerException, IOException {
     if (!file.exists() || !file.canRead()) return null;
     
     Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
