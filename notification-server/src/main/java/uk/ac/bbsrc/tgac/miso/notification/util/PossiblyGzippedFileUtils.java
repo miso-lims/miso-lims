@@ -43,7 +43,7 @@ public class PossiblyGzippedFileUtils {
    * @param file the file to check
    * @return true if the filename ends with ".gz"; false otherwise
    */
-  private static boolean isGzipped(File file) {
+  public static boolean isGzipped(File file) {
     return file.getName().endsWith(GZIP_EXTENSION);
   }
 
