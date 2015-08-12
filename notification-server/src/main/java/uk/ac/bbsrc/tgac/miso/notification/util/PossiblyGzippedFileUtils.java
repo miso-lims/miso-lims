@@ -189,12 +189,14 @@ public class PossiblyGzippedFileUtils {
       done = false;
       Matcher m = null;
       while (!done) {
-        if (m == null)
-          m = pattern.matcher(lineText[i]);
-        else
-          m.reset(lineText[i]);
-        if (m.find()) {
-          return m;
+        if (lineText[i] != null) { // may be less lines in file than requested
+          if (m == null)
+            m = pattern.matcher(lineText[i]);
+          else
+            m.reset(lineText[i]);
+          if (m.find()) {
+            return m;
+          }
         }
         i++;
         if (i == lineText.length) i = 0;
