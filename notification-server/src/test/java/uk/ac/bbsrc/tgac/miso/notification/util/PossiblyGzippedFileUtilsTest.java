@@ -17,8 +17,8 @@ import org.w3c.dom.Document;
 
 public class PossiblyGzippedFileUtilsTest {
 
-  private static final String h1080_84_raw = "/runs/111110_h1080_0084_AC08UPACXX_raw";
-  private static final String h1080_84_gzip = "/runs/111110_h1080_0084_AC08UPACXX_raw";
+  private static final String h1080_84_raw = "/runs/raw/Completed/111110_h1080_0084_AC08UPACXX";
+  private static final String h1080_84_gzip = "/runs/gzipped/Completed/111110_h1080_0084_AC08UPACXX";
   
   private static final String runInfo = "RunInfo.xml";
   private static final String cycleTimes = "/Logs/CycleTimes.txt";

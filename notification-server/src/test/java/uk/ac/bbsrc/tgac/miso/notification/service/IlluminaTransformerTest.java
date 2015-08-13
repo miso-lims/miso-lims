@@ -14,9 +14,9 @@ import org.junit.Test;
 
 public class IlluminaTransformerTest {
   
-  private static final String h1080_84_raw = "/runs/111110_h1080_0084_AC08UPACXX_raw";
-  private static final String h1080_84_gzip = "/runs/111110_h1080_0084_AC08UPACXX_raw";
-  private static final String m753_25_running = "/runs/150812_M00753_0025_000000000-AHEN9_running";
+  private static final String h1080_84_raw = "/runs/raw/Completed/111110_h1080_0084_AC08UPACXX";
+  private static final String h1080_84_gzip = "/runs/gzipped/Completed/111110_h1080_0084_AC08UPACXX";
+  private static final String m753_25_running = "/runs/raw/Running/150812_M00753_0025_000000000-AHEN9";
   
   private String getResourcePath(String path) {
     return this.getClass().getResource(path).getPath();
@@ -52,8 +52,8 @@ public class IlluminaTransformerTest {
   }
   
   private void assertEqualRuns(JSONObject run1, JSONObject run2) throws JSONException {
+    // Note: FULL_PATH expected to be different
     assertEqualFields(run1, run2, IlluminaTransformer.JSON_RUN_NAME);
-    assertEqualFields(run1, run2, IlluminaTransformer.JSON_FULL_PATH);
     assertEqualFields(run1, run2, IlluminaTransformer.JSON_RUN_INFO);
     assertEqualFields(run1, run2, IlluminaTransformer.JSON_RUN_PARAMS);
     assertEqualFields(run1, run2, IlluminaTransformer.JSON_STATUS);

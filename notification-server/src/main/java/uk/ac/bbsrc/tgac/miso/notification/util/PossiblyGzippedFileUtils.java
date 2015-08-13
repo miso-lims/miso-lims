@@ -167,7 +167,7 @@ public class PossiblyGzippedFileUtils {
   private static Matcher tailGrepGzipped(File file, Pattern pattern, int lines) throws FileNotFoundException, IOException {
     try (InputStream is = new FileInputStream(file);
         InputStream gis = new GZIPInputStream(is);
-        Reader r = new InputStreamReader(is);
+        Reader r = new InputStreamReader(gis);
         BufferedReader br = new BufferedReader(r)) {
       String[] lineText = new String[lines];
       
