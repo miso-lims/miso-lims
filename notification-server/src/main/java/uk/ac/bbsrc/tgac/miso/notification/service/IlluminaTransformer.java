@@ -558,7 +558,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
    * that a run has completed or that it was successful
    * @throws IOException
    */
-  private Boolean checkLoggedFailures(File rootFile) throws IOException {
+  private boolean checkLoggedFailures(File rootFile) throws IOException {
     File rtaLogDir = new File(rootFile, "/Data/RTALogs/");
     boolean failed = false;
     if (rtaLogDir.exists()) {
@@ -579,7 +579,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
     return failed;
   }
   
-  private String checkRunStatus(JSONObject run, File rootFile, int numReads, boolean lastCycleComplete) throws IOException { // TODO: recheck logic and messages
+  private String checkRunStatus(JSONObject run, File rootFile, int numReads, boolean lastCycleComplete) throws IOException {
     final String runName = run.getString(JSON_RUN_NAME);
     
     boolean baseCompleteFileFound = PossiblyGzippedFileUtils.checkExists(rootFile, "/Basecalling_Netcopy_complete.txt");
@@ -621,7 +621,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
         }
         else {
           // Missing ReadX files, no Run.completed, BaseComplete undetermined, lastCycle undetermined
-          log.debug(runName + " :: Basecalling_Netcopy_complete*.txt don't exist and no evidence of last cycle completion.");
+          log.debug(runName + " :: Basecalling_Netcopy_complete*.txt don't exist.");
           returnStatus = STATUS_UNKNOWN;
         }
       }
