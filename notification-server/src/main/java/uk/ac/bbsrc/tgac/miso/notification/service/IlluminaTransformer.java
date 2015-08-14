@@ -157,8 +157,10 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
               // Get main stuff from Status.xml
               if (statusDoc != null) {
                 run.put(JSON_STATUS, SubmissionUtils.transform(statusDoc));
-                runName = statusDoc.getElementsByTagName("RunName").item(0).getTextContent();
-                run.put(JSON_RUN_NAME, runName);
+                if (statusDoc.getElementsByTagName("RunName").getLength() > 0) {
+                  runName = statusDoc.getElementsByTagName("RunName").item(0).getTextContent();
+                  run.put(JSON_RUN_NAME, runName);
+                }
                 
                 if (statusDoc.getElementsByTagName("NumberOfReads").getLength() != 0) {
                   numReads = new Integer(statusDoc.getElementsByTagName("NumberOfReads").item(0).getTextContent());
@@ -180,8 +182,8 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                 checkRunParams(runParamDoc, run);
               }
               
-              checkDates(rootFile, run);
               boolean lastCycleComplete = checkCycles(rootFile, run, statusDoc, runInfoDoc);
+              checkDates(rootFile, run);
               String status = checkRunStatus(run, rootFile, numReads, lastCycleComplete);
               map.get(status).add(run);
             }
@@ -320,10 +322,14 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
     int numCycles = 0;
     
     if (statusDoc != null) {
-      if (statusDoc.getElementsByTagName("NumberCycles").getLength() != 0) {
+      if (statusDoc.getElementsByTagName("NumCycles").getLength() != 0) {
         numCycles = new Integer(statusDoc.getElementsByTagName("NumCycles").item(0).getTextContent());
+      }
+      else if (statusDoc.getElementsByTagName("NumberCycles").getLength() != 0) {
+        numCycles = new Integer(statusDoc.getElementsByTagName("NumberCycles").item(0).getTextContent());
+      }
+      if (numCycles > 0) {
         run.put(JSON_NUM_CYCLES, numCycles);
-        
         if (statusDoc.getElementsByTagName("ImgCycle").getLength() != 0
             && statusDoc.getElementsByTagName("ScoreCycle").getLength() != 0
             && statusDoc.getElementsByTagName("CallCycle").getLength() != 0) {
@@ -335,18 +341,16 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
       }
     }
     
-    if (runInfoDoc != null) {
-      if (numCycles == 0) {
-        NodeList nl = runInfoDoc.getElementsByTagName("Read");
-        if (nl.getLength() > 0) {
-          for (int i = 0; i < nl.getLength(); i++) {
-            Element e = (Element) nl.item(i);
-            if (!"".equals(e.getAttributeNS(null, "NumCycles"))) {
-              numCycles += Integer.parseInt(e.getAttributeNS(null, "NumCycles"));
-            }
+    if (numCycles == 0 && runInfoDoc != null) {
+      NodeList nl = runInfoDoc.getElementsByTagName("Read");
+      if (nl.getLength() > 0) {
+        for (int i = 0; i < nl.getLength(); i++) {
+          Element e = (Element) nl.item(i);
+          if (!"".equals(e.getAttributeNS(null, "NumCycles"))) {
+            numCycles += Integer.parseInt(e.getAttributeNS(null, "NumCycles"));
           }
-          run.put(JSON_NUM_CYCLES, numCycles);
         }
+        run.put(JSON_NUM_CYCLES, numCycles);
       }
     }
     
@@ -423,22 +427,44 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
     final String rtaLog2Path = "/Data/Log.txt";
     final String eventsLogPath = "/Events.log";
     final String rtaCompletePath = "/RTAComplete.txt";
+    
+    String completed = null;
 
+    // check RTA logs
     if (PossiblyGzippedFileUtils.checkExistsReadable(rootFile, rtaLogPath)) {
       Matcher m = PossiblyGzippedFileUtils.tailGrep(rootFile, rtaLogPath, runCompleteLogPattern, 10);
       if (m != null && m.groupCount() > 0) {
-        log.debug(runName + " :: Got RTALogs Log.txt completion date -> " + m.group(1));
-        run.put(JSON_COMPLETE_DATE, m.group(1));
+        completed = m.group(1);
+        log.debug(runName + " :: Got RTALogs Log.txt completion date -> " + completed);
       }
     }
     else if (PossiblyGzippedFileUtils.checkExistsReadable(rootFile, rtaLog2Path)) {
       Matcher m = PossiblyGzippedFileUtils.tailGrep(rootFile, rtaLog2Path, runCompleteLogPattern, 10);
       if (m != null && m.groupCount() > 0) {
-        log.debug(runName + " :: Got Log.txt completion date -> " + m.group(1));
-        run.put(JSON_COMPLETE_DATE, m.group(1));
+        completed = m.group(1);
+        log.debug(runName + " :: Got Log.txt completion date -> " + completed);
       }
     }
-
+    
+    if (completed == null) {
+    //attempt to get latest log file entry date
+      if (PossiblyGzippedFileUtils.checkExistsReadable(rootFile, rtaLogPath)) {
+        Matcher m = PossiblyGzippedFileUtils.tailGrep(rootFile, rtaLogPath, lastDateEntryLogPattern, 1);
+        if (m != null && m.groupCount() > 0) {
+          completed = m.group(1);
+          log.debug(runName + " :: Got RTALogs Log.txt last entry date -> " + completed);
+        }
+      }
+      else if (PossiblyGzippedFileUtils.checkExistsReadable(rootFile, rtaLog2Path)) {
+        Matcher m = PossiblyGzippedFileUtils.tailGrep(rootFile, rtaLog2Path, lastDateEntryLogPattern, 1);
+        if (m != null && m.groupCount() > 0) {
+          completed = m.group(1);
+          log.debug(runName + " :: Got Log.txt last entry date -> " + completed);
+        }
+      }
+    }
+    
+    // Try CycleTimes.txt
     if (run.has(JSON_NUM_CYCLES) && PossiblyGzippedFileUtils.checkExistsReadable(rootFile, cycleTimeLogPath)) {
       int numCycles = run.getInt(JSON_NUM_CYCLES);
       Pattern p = Pattern.compile(
@@ -448,15 +474,19 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
       Matcher m = PossiblyGzippedFileUtils.tailGrep(rootFile, cycleTimeLogPath, p, 10);
       if (m != null && m.groupCount() > 0) {
         String cycleDateStr = m.group(1) + "," + m.group(2);
-        if (run.has(JSON_COMPLETE_DATE)) {
-          log.debug(runName + " :: Checking " + cycleDateStr + " vs. " + run.getString("completionDate"));
+        if (completed == null) {
+          completed = cycleDateStr;
+          log.debug(runName + " :: Got CycleTimes.txt last cycle date -> " + completed);
+        }
+        else { // check if this time is newer
+          log.debug(runName + " :: Checking " + cycleDateStr + " vs. " + completed);
           try {
             Date cycleDate = logDateFormat.parse(cycleDateStr);
-            Date cDate = logDateFormat.parse(run.getString(JSON_COMPLETE_DATE));
+            Date cDate = logDateFormat.parse(completed);
 
             if (cycleDate.after(cDate)) {
-              log.debug(runName + " :: Cycletimes completion date is newer -> " + cycleDateStr);
-              run.put(JSON_COMPLETE_DATE, cycleDateStr);
+              completed = cycleDateStr;
+              log.debug(runName + " :: Cycletimes completion date is newer -> " + completed);
             }
           }
           catch (ParseException e) {
@@ -466,54 +496,8 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
       }
     }
 
-    if (!run.has(JSON_COMPLETE_DATE)) {
-      //attempt to get latest log file entry date
-      if (PossiblyGzippedFileUtils.checkExistsReadable(rootFile, rtaLogPath)) {
-        Matcher m = PossiblyGzippedFileUtils.tailGrep(rootFile, rtaLogPath, lastDateEntryLogPattern, 1);
-        if (m != null && m.groupCount() > 0) {
-          log.debug(runName + " :: Got RTALogs Log.txt last entry date -> " + m.group(1));
-          run.put(JSON_COMPLETE_DATE, m.group(1));
-        }
-      }
-      else if (PossiblyGzippedFileUtils.checkExistsReadable(rootFile, rtaLog2Path)) {
-        Matcher m = PossiblyGzippedFileUtils.tailGrep(rootFile, rtaLog2Path, lastDateEntryLogPattern, 1);
-        if (m != null && m.groupCount() > 0) {
-          log.debug(runName + " :: Got Log.txt last entry date -> " + m.group(1));
-          run.put(JSON_COMPLETE_DATE, m.group(1));
-        }
-      }
-
-      if (run.has(JSON_NUM_CYCLES) && PossiblyGzippedFileUtils.checkExistsReadable(rootFile, cycleTimeLogPath)) {
-        int numCycles = run.getInt(JSON_NUM_CYCLES);
-        Pattern p = Pattern.compile(
-            "(\\d{1,2}\\/\\d{1,2}\\/\\d{4})\\s+(\\d{2}:\\d{2}:\\d{2})\\.\\d{3}\\s+[A-z0-9]+\\s+" + numCycles + "\\s+End\\s{1}Imaging"
-        );
-
-        Matcher m = PossiblyGzippedFileUtils.tailGrep(rootFile, cycleTimeLogPath, p, 10);
-        if (m != null && m.groupCount() > 0) {
-          log.debug(runName + " :: Got cycletimes last entry date -> " + m.group(1) + "," + m.group(2));
-          String cycleDateStr = m.group(1) + "," + m.group(2);
-          if (run.has(JSON_COMPLETE_DATE)) {
-            log.debug(runName + " :: Checking " + cycleDateStr + " vs. " + run.getString(JSON_COMPLETE_DATE));
-            try {
-              Date cycleDate = logDateFormat.parse(cycleDateStr);
-              Date cDate = logDateFormat.parse(run.getString(JSON_COMPLETE_DATE));
-
-              if (cycleDate.after(cDate)) {
-                log.debug(runName + " :: Cycletimes completion date is newer -> " + cycleDateStr);
-                run.put(JSON_COMPLETE_DATE, cycleDateStr);
-              }
-            }
-            catch (ParseException e) {
-              log.debug(runName + " :: Oops. Can't parse dates. Falling back!");
-            }
-          }
-        }
-      }
-    }
-
     //still nothing? attempt with Events.log
-    if (!run.has(JSON_COMPLETE_DATE)) {
+    if (completed == null) {
       //attempt to get latest log file entry date
       if (PossiblyGzippedFileUtils.checkExistsReadable(rootFile, eventsLogPath)) {
         log.debug(runName + " :: Checking events log...");
@@ -523,14 +507,14 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
 
         Matcher m = PossiblyGzippedFileUtils.tailGrep(rootFile, eventsLogPath, p, 50);
         if (m != null && m.groupCount() > 0) {
-          log.debug(runName + " :: Got last log event date -> " + m.group(1) + "," + m.group(2));
-          run.put(JSON_COMPLETE_DATE, m.group(1) + "," + m.group(2));
+          completed = m.group(1) + "," + m.group(2);
+          log.debug(runName + " :: Got last log event date -> " + completed);
         }
       }
     }
 
     // last ditch attempt with RTAComplete.txt
-    if (!run.has(JSON_COMPLETE_DATE)) {
+    if (completed == null) {
       if (PossiblyGzippedFileUtils.checkExistsReadable(rootFile, rtaCompletePath)) {
         log.debug(runName + " :: Last ditch attempt. Checking RTAComplete log...");
         Pattern p = Pattern.compile(
@@ -539,15 +523,14 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
 
         Matcher m = PossiblyGzippedFileUtils.tailGrep(rootFile, rtaCompletePath, p, 2);
         if (m != null && m.groupCount() > 0) {
-          log.debug(runName + " :: Got RTAComplete date -> " + m.group(1) + "," + m.group(2));
-          run.put(JSON_COMPLETE_DATE, m.group(1) + "," + m.group(2));
+          completed = m.group(1) + "," + m.group(2);
+          log.debug(runName + " :: Got RTAComplete date -> " + completed);
         }
       }
     }
-
-    if (!run.has(JSON_COMPLETE_DATE)) {
-      run.put(JSON_COMPLETE_DATE, "null");
-    }
+    
+    if (completed == null) completed = "null";
+    run.put(JSON_COMPLETE_DATE, completed);
   }
 
   /**
