@@ -1,4 +1,3 @@
-USE lims;
 
 CREATE TABLE `Plate_Elements` (
   `plate_plateId` bigint(20) NOT NULL,
