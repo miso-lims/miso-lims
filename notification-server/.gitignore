@@ -1,2 +1,3 @@
-# log directory created by unit tests
+# logs created by unit tests
 logs/
+metrixDaemon.log
