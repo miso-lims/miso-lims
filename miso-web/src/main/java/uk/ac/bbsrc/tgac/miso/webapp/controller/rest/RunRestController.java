@@ -38,6 +38,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.RunProcessingUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.jackson.ContainerRecursionAvoidanceMixin;
+import uk.ac.bbsrc.tgac.miso.core.util.jackson.UserInfoMixin;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -73,6 +74,7 @@ public class RunRestController {
   public @ResponseBody String jsonRest(@PathVariable Long runId) throws IOException {
     ObjectMapper mapper = new ObjectMapper();
     mapper.getSerializationConfig().addMixInAnnotations(SequencerPartitionContainer.class, ContainerRecursionAvoidanceMixin.class);
+    mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
     return mapper.writeValueAsString(requestManager.getRunById(runId));
   }
 
@@ -95,6 +97,7 @@ public class RunRestController {
     Collection<Run> lr = requestManager.listAllRuns();
     ObjectMapper mapper = new ObjectMapper();
     mapper.getSerializationConfig().addMixInAnnotations(SequencerPartitionContainer.class, ContainerRecursionAvoidanceMixin.class);
+    mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
     return mapper.writeValueAsString(lr);
   }
 }

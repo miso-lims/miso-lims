@@ -23,15 +23,20 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
+import com.eaglegenomics.simlims.core.Note;
+import com.eaglegenomics.simlims.core.User;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.core.util.jackson.ProjectSampleRecursionAvoidanceMixin;
 import uk.ac.bbsrc.tgac.miso.core.util.jackson.SampleRecursionAvoidanceMixin;
+import uk.ac.bbsrc.tgac.miso.core.util.jackson.UserInfoMixin;
 
 import java.io.IOException;
 
@@ -60,7 +65,9 @@ public class LibraryRestController {
   @RequestMapping(value = "{libraryId}", method = RequestMethod.GET)
   public @ResponseBody String jsonRest(@PathVariable Long libraryId) throws IOException {
     ObjectMapper mapper = new ObjectMapper();
+    mapper.getSerializationConfig().addMixInAnnotations(Project.class, ProjectSampleRecursionAvoidanceMixin.class);
     mapper.getSerializationConfig().addMixInAnnotations(Sample.class, SampleRecursionAvoidanceMixin.class);
+    mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
     return mapper.writeValueAsString(requestManager.getLibraryById(libraryId));
   }
 }
