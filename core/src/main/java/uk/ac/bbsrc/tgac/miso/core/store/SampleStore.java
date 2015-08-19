@@ -37,18 +37,6 @@ import java.util.Collection;
  */
 public interface SampleStore extends Store<Sample>, Cascadable, Remover<Sample>, NamingSchemeAware<Sample> {
   /**
-   * Retrieve a Sample from an underlying data store given a Sample ID
-   * <p/>
-   * This method intends to retrieve objects in an 'ignorant' fashion, i.e.  will not populate
-   * parent or child objects that could lead to a circular dependency
-   *
-   * @param sampleId of type long
-   * @return Sample
-   * @throws IOException when
-   */
-  //Sample lazyGet(long sampleId) throws IOException;
-
-  /**
    * List all Samples that match a search criteria
    *
    * @param query of type String

@@ -35,24 +35,24 @@ import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.core.util.jackson.LibraryRecursionAvoidanceMixin;
 import uk.ac.bbsrc.tgac.miso.core.util.jackson.ProjectSampleRecursionAvoidanceMixin;
-import uk.ac.bbsrc.tgac.miso.core.util.jackson.SampleRecursionAvoidanceMixin;
 import uk.ac.bbsrc.tgac.miso.core.util.jackson.UserInfoMixin;
 
 import java.io.IOException;
 
 /**
- * A controller to handle all REST requests for Libraries
+ * A controller to handle all REST requests for Samples
  *
  * @author Rob Davey
- * @date 16-Aug-2011
- * @since 0.1.0
+ * @date 19-Aug-2015
+ * @since 0.2.1-SNAPSHOT
  */
 @Controller
-@RequestMapping("/rest/library")
-@SessionAttributes("library")
-public class LibraryRestController {
-  protected static final Logger log = LoggerFactory.getLogger(LibraryRestController.class);
+@RequestMapping("/rest/sample")
+@SessionAttributes("sample")
+public class SampleRestController {
+  protected static final Logger log = LoggerFactory.getLogger(SampleRestController.class);
 
   @Autowired
   private RequestManager requestManager;
@@ -61,21 +61,21 @@ public class LibraryRestController {
     this.requestManager = requestManager;
   }
 
-  @RequestMapping(value = "{libraryId}", method = RequestMethod.GET)
-  public @ResponseBody String getLibraryById(@PathVariable Long libraryId) throws IOException {
+  @RequestMapping(value = "{sampleId}", method = RequestMethod.GET)
+  public @ResponseBody String getSampleById(@PathVariable Long sampleId) throws IOException {
     ObjectMapper mapper = new ObjectMapper();
+    mapper.getSerializationConfig().addMixInAnnotations(Project.class, ProjectSampleRecursionAvoidanceMixin.class);
+    mapper.getSerializationConfig().addMixInAnnotations(Library.class, LibraryRecursionAvoidanceMixin.class);
+    mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
     try {
-      Library l = requestManager.getLibraryById(libraryId);
-      if (l != null) {
-        mapper.getSerializationConfig().addMixInAnnotations(Project.class, ProjectSampleRecursionAvoidanceMixin.class);
-        mapper.getSerializationConfig().addMixInAnnotations(Sample.class, SampleRecursionAvoidanceMixin.class);
-        mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
-        return mapper.writeValueAsString(l);
+      Sample s = requestManager.getSampleById(sampleId);
+      if (s != null) {
+        return mapper.writeValueAsString(s);
       }
-      return mapper.writeValueAsString(JSONUtils.SimpleJSONError("No such library with that ID.").put("libraryId", libraryId));
+      return mapper.writeValueAsString(JSONUtils.SimpleJSONError("No such sample with that ID.").put("sampleId", sampleId));
     }
     catch (IOException ioe) {
-      return mapper.writeValueAsString(JSONUtils.SimpleJSONError(ioe.getMessage()).put("libraryId", libraryId));
+      return mapper.writeValueAsString(JSONUtils.SimpleJSONError(ioe.getMessage()).put("sampleId", sampleId));
     }
   }
 }

@@ -38,16 +38,13 @@ import java.util.Collection;
  */
 public interface ProjectStore extends Store<Project>, Cascadable, Remover<Project>, NamingSchemeAware<Project> {
   /**
-   * Retrieve a Project from an underlying data store given a Project ID
-   * <p/>
-   * This method intends to retrieve objects in an 'ignorant' fashion, i.e.  will not populate
-   * parent or child objects that could lead to a circular dependency
+   * Get a Project given an alias
    *
-   * @param projectId of type long
+   * @param alias of type String
    * @return Project
    * @throws IOException when
    */
-  //Project lazyGet(long projectId) throws IOException;
+  Project getByAlias(String alias) throws IOException;
 
   /**
    * Get a parent Project related to a Study given a Study ID

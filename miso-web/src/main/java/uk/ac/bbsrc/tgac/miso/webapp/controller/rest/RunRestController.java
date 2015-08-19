@@ -33,8 +33,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import uk.ac.bbsrc.tgac.miso.core.data.*;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.RunProcessingUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.jackson.ContainerRecursionAvoidanceMixin;
@@ -44,9 +45,7 @@ import java.io.IOException;
 import java.util.Collection;
 
 /**
- * uk.ac.bbsrc.tgac.miso.webapp.controller.rest
- * <p/>
- * Info
+ * A controller to handle all REST requests for Runs
  *
  * @author Rob Davey
  * @date 01-Sep-2011
@@ -71,11 +70,37 @@ public class RunRestController {
   }
 
   @RequestMapping(value = "{runId}", method = RequestMethod.GET)
-  public @ResponseBody String jsonRest(@PathVariable Long runId) throws IOException {
+  public @ResponseBody String getRunById(@PathVariable Long runId) throws IOException {
+    ObjectMapper mapper = new ObjectMapper();
+    try {
+      Run r = requestManager.getRunById(runId);
+      if (r != null) {
+        mapper.getSerializationConfig().addMixInAnnotations(SequencerPartitionContainer.class, ContainerRecursionAvoidanceMixin.class);
+        mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
+        return mapper.writeValueAsString(r);
+      }
+      return mapper.writeValueAsString(JSONUtils.SimpleJSONError("No such run with that ID.").put("runId", runId));
+    }
+    catch (IOException ioe) {
+      return mapper.writeValueAsString(JSONUtils.SimpleJSONError(ioe.getMessage()).put("runId", runId));
+    }
+  }
+
+  @RequestMapping(value = "/alias/{runAlias}", method = RequestMethod.GET)
+  public @ResponseBody String getRunByAlias(@PathVariable String runAlias) throws IOException {
     ObjectMapper mapper = new ObjectMapper();
     mapper.getSerializationConfig().addMixInAnnotations(SequencerPartitionContainer.class, ContainerRecursionAvoidanceMixin.class);
     mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
-    return mapper.writeValueAsString(requestManager.getRunById(runId));
+    try {
+      Run r = requestManager.getRunByAlias(runAlias);
+      if (r != null) {
+        return mapper.writeValueAsString(r);
+      }
+      return mapper.writeValueAsString(JSONUtils.SimpleJSONError("No such run with that ID.").put("runAlias", runAlias));
+    }
+    catch (IOException ioe) {
+      return mapper.writeValueAsString(JSONUtils.SimpleJSONError(ioe.getMessage()).put("runAlias", runAlias));
+    }
   }
 
   @RequestMapping(value = "{runAlias}/samplesheet", method = RequestMethod.GET)
@@ -83,7 +108,7 @@ public class RunRestController {
     Run r = requestManager.getRunByAlias(runAlias);
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     if (r != null) {
-      Collection<SequencerPartitionContainer<SequencerPoolPartition>> conts = ((RunImpl)r).getSequencerPartitionContainers();
+      Collection<SequencerPartitionContainer<SequencerPoolPartition>> conts = r.getSequencerPartitionContainers();
       if (!conts.isEmpty() && conts.size() == 1) {
         return RunProcessingUtils.buildIlluminaDemultiplexCSV(r, conts.iterator().next(), "1.8", user.getLoginName());
       }
@@ -92,8 +117,7 @@ public class RunRestController {
   }
   
   @RequestMapping(method = RequestMethod.GET)
-  public @ResponseBody
-  String jsonRest() throws IOException {
+  public @ResponseBody String listAllRuns() throws IOException {
     Collection<Run> lr = requestManager.listAllRuns();
     ObjectMapper mapper = new ObjectMapper();
     mapper.getSerializationConfig().addMixInAnnotations(SequencerPartitionContainer.class, ContainerRecursionAvoidanceMixin.class);

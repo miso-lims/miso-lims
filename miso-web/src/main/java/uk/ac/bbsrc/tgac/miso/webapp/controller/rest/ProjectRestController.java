@@ -23,8 +23,9 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
-import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
+import net.sf.json.util.JSONStringer;
+import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,14 +42,13 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.jackson.LibraryRecursionAvoidanceMixin;
 import uk.ac.bbsrc.tgac.miso.core.util.jackson.SampleProjectAvoidanceMixin;
 import uk.ac.bbsrc.tgac.miso.core.util.jackson.UserInfoMixin;
+import uk.ac.bbsrc.tgac.miso.webapp.util.RestUtils;
 
 import java.io.IOException;
 import java.util.Collection;
 
 /**
- * uk.ac.bbsrc.tgac.miso.webapp.controller.rest
- * <p/>
- * Info
+ * A controller to handle all REST requests for Projects
  *
  * @author Rob Davey
  * @date 01-Sep-2011
@@ -67,39 +67,60 @@ public class ProjectRestController {
     this.requestManager = requestManager;
   }
 
-  @RequestMapping(value = "{projectId}", method = RequestMethod.GET)
-  public @ResponseBody String jsonRest(@PathVariable Long projectId) throws IOException {
-    Project project = requestManager.getProjectById(projectId);
-
-    for (Sample s : project.getSamples()) {
-      if (s.getLibraries().isEmpty()) {
-        for (Library l : requestManager.listAllLibrariesBySampleId(s.getId())) {
-          try {
-            s.addLibrary(l);
-          }
-          catch (MalformedLibraryException e) {
-            e.printStackTrace();
-          }
-        }
+  @RequestMapping(value = "/alias/{projectAlias}", method = RequestMethod.GET)
+  public @ResponseBody String getProjectByAlias(@PathVariable String projectAlias) throws IOException {
+    try {
+      Project project = requestManager.getProjectByAlias(projectAlias);
+      if (project != null) {
+        return getProjectById(project.getId());
       }
-
-      if (s.getSampleQCs().isEmpty()) {
-        for (SampleQC qc : requestManager.listAllSampleQCsBySampleId(s.getId())) {
-          try {
-            s.addQc(qc);
-          }
-          catch (MalformedSampleQcException e) {
-            e.printStackTrace();
-          }
-        }
-      }
+      return new JSONStringer().object().key("error").value("No such project with that alias.").key("projectAlias").value(projectAlias).endObject().toString();
     }
+    catch (IOException ioe) {
+      return new JSONStringer().object().key("error").value("No such project with that alias.").key("projectAlias").value(projectAlias).endObject().toString();
+    }
+  }
 
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.getSerializationConfig().addMixInAnnotations(Sample.class, SampleProjectAvoidanceMixin.class);
-    mapper.getSerializationConfig().addMixInAnnotations(Library.class, LibraryRecursionAvoidanceMixin.class);
-    mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
-    return mapper.writeValueAsString(project);
+  @RequestMapping(value = "{projectId}", method = RequestMethod.GET)
+  public @ResponseBody String getProjectById(@PathVariable Long projectId) throws IOException {
+    try {
+      Project project = requestManager.getProjectById(projectId);
+      if (project != null) {
+        for (Sample s : project.getSamples()) {
+          if (s.getLibraries().isEmpty()) {
+            for (Library l : requestManager.listAllLibrariesBySampleId(s.getId())) {
+              try {
+                s.addLibrary(l);
+              }
+              catch (MalformedLibraryException e) {
+                e.printStackTrace();
+              }
+            }
+          }
+
+          if (s.getSampleQCs().isEmpty()) {
+            for (SampleQC qc : requestManager.listAllSampleQCsBySampleId(s.getId())) {
+              try {
+                s.addQc(qc);
+              }
+              catch (MalformedSampleQcException e) {
+                e.printStackTrace();
+              }
+            }
+          }
+        }
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.getSerializationConfig().addMixInAnnotations(Sample.class, SampleProjectAvoidanceMixin.class);
+        mapper.getSerializationConfig().addMixInAnnotations(Library.class, LibraryRecursionAvoidanceMixin.class);
+        mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
+        return mapper.writeValueAsString(project);
+      }
+      return new JSONStringer().object().key("error").value("No such project with that ID.").key("projectId").value(projectId).endObject().toString();
+    }
+    catch (IOException ioe) {
+      return new JSONStringer().object().key("error").value("Couldn't get project: " + ioe.getMessage()).key("projectId").value(projectId).endObject().toString();
+    }
   }
 
   @RequestMapping(value = "{projectId}/libraries", method = RequestMethod.GET)
@@ -133,9 +154,7 @@ public class ProjectRestController {
   }
 
   @RequestMapping(method = RequestMethod.GET)
-  public @ResponseBody
-  //Collection<Project> jsonRest() throws IOException {
-  String jsonRest() throws IOException {
+  public @ResponseBody String listAllProjects() throws IOException {
     Collection<Project> lp = requestManager.listAllProjects();
     for (Project p : lp) {
       p.setSamples(requestManager.listAllSamplesByProjectId(p.getProjectId()));

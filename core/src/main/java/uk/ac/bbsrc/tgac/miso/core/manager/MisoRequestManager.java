@@ -1902,6 +1902,16 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
+  public Project getProjectByAlias(String projectAlias) throws IOException {
+    if (projectStore != null) {
+      return projectStore.getByAlias(projectAlias);
+    }
+    else {
+      throw new IOException("No projectStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
   public ProjectOverview getProjectOverviewById(long overviewId) throws IOException {
     if (projectStore != null) {
       return projectStore.getProjectOverviewById(overviewId);
