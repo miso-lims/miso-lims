@@ -1,10 +1,11 @@
 #!/bin/bash
 
 set -e
-Q1="CREATE DATABASE IF NOT EXISTS $DB_NAME;"
-Q2="GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO ${MYSQL_USER}@${DB_HOST};"
-Q3="FLUSH PRIVILEGES;"
-SQL="${Q1}${Q2}${Q3}"
+Q1="DROP DATABSE IF EXISTS $DB_NAME"
+Q2="CREATE DATABASE IF NOT EXISTS $DB_NAME;"
+Q3="GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO ${MYSQL_USER}@${DB_HOST};"
+Q4="FLUSH PRIVILEGES;"
+SQL="${Q1}${Q2}${Q3}${Q4}"
 $( mysql --host=${DB_HOST} --user=${MYSQL_USER} --password=${MYSQL_PASS} -e "$SQL" )
 echo "User $MYSQL_USER added to $DB_NAME database"
 # Add schemas to lims db
