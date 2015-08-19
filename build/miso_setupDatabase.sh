@@ -1,8 +1,8 @@
 #!/bin/bash
 
+set -e
 # Get script directory
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-set -e
 # Set Environment variables
 source "$DIR/context.properties"
 DB_ARGS=($DB_HOST $DB_NAME $DB_USER $DB_PASS)

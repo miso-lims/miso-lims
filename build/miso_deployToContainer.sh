@@ -1,8 +1,8 @@
 #!/bin/bash
 
+set -e
 # Get script directory
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-set -e
 source "$DIR/context.properties"
 # Check java installation and version
 if command -v java >/dev/null 2>&1; then
