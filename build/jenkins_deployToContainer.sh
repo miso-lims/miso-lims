@@ -1,5 +1,6 @@
-#!/bin/bash -ex
+#!/bin/bash
 
+set -e
 DIR=$( cd "$( dirname ${BASH_SOURCE[0]} )" && pwd )
 if [ -e "${DIR}/ROOT/META-INF/context.xml" ]; then
 	echo 'Context file already exits'
@@ -13,7 +14,7 @@ if [ -e "${DIR}/ROOT/META-INF/context.xml" ]; then
 else
 	# Unpack ROOT.war
 	echo 'Unpacking WAR'
-	$( mkdir -p "${DIR}/ROOT"; cd "${DIR}/ROOT"; jar xfv "${WORKSPACE}/miso-web/target/ROOT.war" )
+	$( mkdir -p "${DIR}/ROOT"; cd "${DIR}/ROOT" && jar xfv "${WORKSPACE}/miso-web/target/ROOT.war" )
 	# Application Context (edit and add to META-INF)
 	echo 'Editing context.xml'
 	sed -r \
