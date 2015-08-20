@@ -23,27 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.notification.service;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import nki.core.MetrixContainer;
-import nki.decorators.MetrixContainerDecorator;
-
-import org.apache.commons.io.filefilter.WildcardFileFilter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParameter;
-import org.springframework.integration.Message;
-import org.w3c.dom.*;
-
-import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
-import uk.ac.bbsrc.tgac.miso.notification.util.NotificationUtils;
-import uk.ac.bbsrc.tgac.miso.notification.util.PossiblyGzippedFileUtils;
-import uk.ac.bbsrc.tgac.miso.tools.run.util.FileSetTransformer;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
@@ -52,9 +31,41 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import nki.core.MetrixContainer;
+import nki.decorators.MetrixContainerDecorator;
+import nki.objects.Summary;
+import nki.parsers.illumina.ExtractionMetrics;
+import nki.parsers.xml.RunInfoHandler;
+
+import org.apache.commons.io.filefilter.WildcardFileFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobParameter;
+import org.springframework.integration.Message;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
+import uk.ac.bbsrc.tgac.miso.notification.util.NotificationUtils;
+import uk.ac.bbsrc.tgac.miso.notification.util.PossiblyGzippedFileUtils;
+import uk.ac.bbsrc.tgac.miso.tools.run.util.FileSetTransformer;
 
 /**
  * uk.ac.bbsrc.tgac.miso.notification.util
@@ -90,7 +101,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
   private final String runInfoPath = "/RunInfo.xml";
   private final String runParametersPath = "/runParameters.xml";
 
-  private Map<String, String> finishedCache = new HashMap<>();
+  private final Map<String, String> finishedCache = new HashMap<>();
 
   private final Pattern runCompleteLogPattern = Pattern.compile(
       "(\\d{1,2}\\/\\d{1,2}\\/\\d{4},\\d{2}:\\d{2}:\\d{2})\\.\\d{3},\\d+,\\d+,\\d+,Proce[s||e]sing\\s+completed\\.\\s+Run\\s+has\\s+finished\\."
@@ -621,8 +632,31 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
   }
 
   private JSONObject parseInterOp(File rootFile) throws IOException {
-    MetrixContainer mc = new MetrixContainer(rootFile.getAbsolutePath());
-    return JSONObject.fromObject(new MetrixContainerDecorator(mc).toJSON().toJSONString());
+    Document runInfo = null;
+    
+    try {
+      runInfo = PossiblyGzippedFileUtils.getXmlDocument(rootFile, "/RunInfo.xml");
+    } catch (ParserConfigurationException | TransformerException e) {
+      log.error("Error parsing file: " + e.getMessage());
+      e.printStackTrace();
+    }
+    
+    if (runInfo == null) {
+      return null;
+    }
+    else {
+      Summary sum = new Summary();
+      sum.setRunDirectory(rootFile.getCanonicalPath());
+      
+      // Metrix fails to set current cycle, and parsing ErrorMetricsOut.bin depends on this, so set it here
+      final String extractionMetricsPath = rootFile.getCanonicalPath() + "/InterOp/" + nki.constants.Constants.EXTRACTION_METRICS;
+      ExtractionMetrics eim = new ExtractionMetrics(extractionMetricsPath, 0);
+      sum.setCurrentCycle(eim.getLastCycle());
+      
+      RunInfoHandler.parseAll(runInfo, sum);
+      MetrixContainer mc = new MetrixContainer(sum, false); // Note: this is very slow, but the data is cached at least
+      return JSONObject.fromObject(new MetrixContainerDecorator(mc, true).toJSON().toJSONString());
+    }
   }
 
   public JSONArray transformInterOpOnly(Set<File> files) {
