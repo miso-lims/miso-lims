@@ -24,8 +24,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import com.eaglegenomics.simlims.core.User;
-import net.sf.json.util.JSONStringer;
-import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,15 +72,16 @@ public class ProjectRestController {
       if (project != null) {
         return getProjectById(project.getId());
       }
-      return new JSONStringer().object().key("error").value("No such project with that alias.").key("projectAlias").value(projectAlias).endObject().toString();
+      return RestUtils.error("No such project with that alias.", "projectAlias", projectAlias).toString();
     }
     catch (IOException ioe) {
-      return new JSONStringer().object().key("error").value("No such project with that alias.").key("projectAlias").value(projectAlias).endObject().toString();
+      return RestUtils.error("Cannot retrieve project: " + ioe.getMessage(), "projectAlias", projectAlias).toString();
     }
   }
 
   @RequestMapping(value = "{projectId}", method = RequestMethod.GET)
   public @ResponseBody String getProjectById(@PathVariable Long projectId) throws IOException {
+    ObjectMapper mapper = new ObjectMapper();
     try {
       Project project = requestManager.getProjectById(projectId);
       if (project != null) {
@@ -109,17 +108,15 @@ public class ProjectRestController {
             }
           }
         }
-
-        ObjectMapper mapper = new ObjectMapper();
         mapper.getSerializationConfig().addMixInAnnotations(Sample.class, SampleProjectAvoidanceMixin.class);
         mapper.getSerializationConfig().addMixInAnnotations(Library.class, LibraryRecursionAvoidanceMixin.class);
         mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
         return mapper.writeValueAsString(project);
       }
-      return new JSONStringer().object().key("error").value("No such project with that ID.").key("projectId").value(projectId).endObject().toString();
+      return mapper.writeValueAsString(RestUtils.error("No such project with that ID.", "projectId", projectId.toString()));
     }
     catch (IOException ioe) {
-      return new JSONStringer().object().key("error").value("Couldn't get project: " + ioe.getMessage()).key("projectId").value(projectId).endObject().toString();
+      return mapper.writeValueAsString(RestUtils.error("Cannot retrieve project: " + ioe.getMessage(), "projectId", projectId.toString()));
     }
   }
 

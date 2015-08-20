@@ -25,7 +25,6 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
-import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +39,7 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.RunProcessingUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.jackson.ContainerRecursionAvoidanceMixin;
 import uk.ac.bbsrc.tgac.miso.core.util.jackson.UserInfoMixin;
+import uk.ac.bbsrc.tgac.miso.webapp.util.RestUtils;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -79,10 +79,10 @@ public class RunRestController {
         mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
         return mapper.writeValueAsString(r);
       }
-      return mapper.writeValueAsString(JSONUtils.SimpleJSONError("No such run with that ID.").put("runId", runId));
+      return mapper.writeValueAsString(RestUtils.error("No such run with that ID.", "runId", runId.toString()));
     }
     catch (IOException ioe) {
-      return mapper.writeValueAsString(JSONUtils.SimpleJSONError(ioe.getMessage()).put("runId", runId));
+      return mapper.writeValueAsString(RestUtils.error("Cannot retrieve run: " + ioe.getMessage(), "runId", runId.toString()));
     }
   }
 
@@ -96,10 +96,10 @@ public class RunRestController {
       if (r != null) {
         return mapper.writeValueAsString(r);
       }
-      return mapper.writeValueAsString(JSONUtils.SimpleJSONError("No such run with that ID.").put("runAlias", runAlias));
+      return mapper.writeValueAsString(RestUtils.error("No such run with that alias.", "runAlias", runAlias.toString()));
     }
     catch (IOException ioe) {
-      return mapper.writeValueAsString(JSONUtils.SimpleJSONError(ioe.getMessage()).put("runAlias", runAlias));
+      return mapper.writeValueAsString(RestUtils.error("Cannot retrieve run: " + ioe.getMessage(), "runAlias", runAlias));
     }
   }
 
@@ -113,7 +113,7 @@ public class RunRestController {
         return RunProcessingUtils.buildIlluminaDemultiplexCSV(r, conts.iterator().next(), "1.8", user.getLoginName());
       }
     }
-    return JSONUtils.SimpleJSONError("Unable to find a run with the alias: '" + runAlias+ "'").toString();
+    return RestUtils.error("No such run with that alias.", "runAlias", runAlias.toString()).toString();
   }
   
   @RequestMapping(method = RequestMethod.GET)

@@ -24,7 +24,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import com.eaglegenomics.simlims.core.User;
-import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +37,7 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.jackson.LibraryRecursionAvoidanceMixin;
 import uk.ac.bbsrc.tgac.miso.core.util.jackson.ProjectSampleRecursionAvoidanceMixin;
 import uk.ac.bbsrc.tgac.miso.core.util.jackson.UserInfoMixin;
+import uk.ac.bbsrc.tgac.miso.webapp.util.RestUtils;
 
 import java.io.IOException;
 
@@ -72,10 +72,10 @@ public class SampleRestController {
       if (s != null) {
         return mapper.writeValueAsString(s);
       }
-      return mapper.writeValueAsString(JSONUtils.SimpleJSONError("No such sample with that ID.").put("sampleId", sampleId));
+      return mapper.writeValueAsString(RestUtils.error("No such sample with that ID.", "sampleId", sampleId.toString()));
     }
     catch (IOException ioe) {
-      return mapper.writeValueAsString(JSONUtils.SimpleJSONError(ioe.getMessage()).put("sampleId", sampleId));
+      return mapper.writeValueAsString(RestUtils.error("Cannot retrieve sample: " + ioe.getMessage(), "sampleId", sampleId.toString()));
     }
   }
 }

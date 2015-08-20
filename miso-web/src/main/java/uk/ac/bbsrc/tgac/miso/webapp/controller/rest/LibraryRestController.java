@@ -24,7 +24,6 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import com.eaglegenomics.simlims.core.User;
-import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,8 +37,10 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.jackson.ProjectSampleRecursionAvoidanceMixin;
 import uk.ac.bbsrc.tgac.miso.core.util.jackson.SampleRecursionAvoidanceMixin;
 import uk.ac.bbsrc.tgac.miso.core.util.jackson.UserInfoMixin;
+import uk.ac.bbsrc.tgac.miso.webapp.util.RestUtils;
 
 import java.io.IOException;
+import java.util.Collection;
 
 /**
  * A controller to handle all REST requests for Libraries
@@ -72,10 +73,20 @@ public class LibraryRestController {
         mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
         return mapper.writeValueAsString(l);
       }
-      return mapper.writeValueAsString(JSONUtils.SimpleJSONError("No such library with that ID.").put("libraryId", libraryId));
+      return mapper.writeValueAsString(RestUtils.error("No such library with that ID.", "libraryId", libraryId.toString()));
     }
     catch (IOException ioe) {
-      return mapper.writeValueAsString(JSONUtils.SimpleJSONError(ioe.getMessage()).put("libraryId", libraryId));
+      return mapper.writeValueAsString(RestUtils.error("Cannot retrieve library: " + ioe.getMessage(), "libraryId", libraryId.toString()));
     }
+  }
+
+  @RequestMapping(method = RequestMethod.GET)
+  public @ResponseBody String listAllLibraries() throws IOException {
+    Collection<Library> libraries = requestManager.listAllLibraries();
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.getSerializationConfig().addMixInAnnotations(Project.class, ProjectSampleRecursionAvoidanceMixin.class);
+    mapper.getSerializationConfig().addMixInAnnotations(Sample.class, SampleRecursionAvoidanceMixin.class);
+    mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
+    return mapper.writeValueAsString(libraries);
   }
 }

@@ -30,7 +30,6 @@ import java.util.Collection;
 import com.eaglegenomics.simlims.core.User;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +42,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.jackson.UserInfoMixin;
+import uk.ac.bbsrc.tgac.miso.webapp.util.RestUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -77,10 +77,10 @@ public class PoolRestController {
         mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
         return mapper.writeValueAsString(p);
       }
-      return (JSONUtils.SimpleJSONError("No such pool with that ID.").put("poolId", poolId)).toString();
+      return mapper.writeValueAsString(RestUtils.error("No such pool with that ID.", "poolId", poolId.toString()));
     }
     catch (IOException ioe) {
-      return mapper.writeValueAsString(JSONUtils.SimpleJSONError(ioe.getMessage()).put("poolId", poolId));
+      return mapper.writeValueAsString(RestUtils.error("Cannot retrieve pool: " + ioe.getMessage(), "poolId", poolId.toString()));
     }
   }
 

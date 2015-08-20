@@ -10,9 +10,10 @@ import net.sf.json.JSONObject;
  * @since 0.2.1-SNAPSHOT
  */
 public class RestUtils {
-  public static JSONObject error(String error) {
+  public static JSONObject error(String error, String objectKey, String objectValue) {
     JSONObject o = new JSONObject();
     o.put("error", error);
+    o.put(objectKey, objectValue);
     return o;
   }
 
