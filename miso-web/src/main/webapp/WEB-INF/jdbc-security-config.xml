@@ -101,7 +101,7 @@
     </security:authentication-provider>
   </security:authentication-manager>
 
-  <bean id="passwordEncoder" class="org.springframework.security.authentication.encoding.ShaPasswordEncoder"/>
+  <bean id="passwordEncoder" class="org.springframework.security.authentication.encoding.LdapShaPasswordEncoder"/>
 
   <bean id="passwordCodecService" class="uk.ac.bbsrc.tgac.miso.core.security.ShaPasswordCodecService">
     <property name="encoder" ref="passwordEncoder"/>

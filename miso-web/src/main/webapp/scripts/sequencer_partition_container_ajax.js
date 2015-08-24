@@ -233,8 +233,12 @@ Container.partition = {
       var ul = jQuery("ul[partition='" + (partitionNum - 1) + "']");
       if (ul.length > 0) {
         if (!Utils.validation.isNullCheck(ul.html()) && ul.find("div").length > 0) {
-          //a.html("<input type='text' id='poolBarcode"+partitionNum+"' name='poolBarcode"+partitionNum+"' partition='"+partitionNum+"' onkeyup='Utils.timer.timedFunc(Container.pool.getPool(this), 300);'/><br/><span id='msg"+partitionNum+"'/>");
-          a.html("<input type='text' id='poolBarcode" + partitionNum + "' name='poolBarcode" + partitionNum + "' partition='" + partitionNum + "'/><br/><span id='msg" + partitionNum + "'/>");
+          a.html("<input type='text' style='width: 90%' id='poolBarcode" + partitionNum + "' name='poolBarcode" + partitionNum + "' partition='" + partitionNum + "'/><button onclick='Container.partition.clearPartition("+partitionNum+")' type='button' class='fg-button ui-state-default ui-corner-all'>Cancel</button><br/><span id='msg" + partitionNum + "'/>");
+
+          Utils.ui.escape(jQuery("#poolBarcode" + partitionNum), function () {
+            a.html("");
+          });
+
           Utils.timer.typewatchFunc(jQuery("#poolBarcode" + partitionNum), function () {
             Container.pool.getPool(jQuery("#poolBarcode" + partitionNum));
           }, 400, 4);
@@ -245,12 +249,20 @@ Container.partition = {
       }
     }
     else {
-      //a.html("<input type='text' id='poolBarcode"+partitionNum+"' name='poolBarcode"+partitionNum+"' partition='"+partitionNum+"' onkeyup='Utils.timer.timedFunc(Container.pool.getPool(this), 300);'/><br/><span id='msg"+partitionNum+"'/>");
-      a.html("<input type='text' id='poolBarcode" + partitionNum + "' name='poolBarcode" + partitionNum + "' partition='" + partitionNum + "'/><br/><span id='msg" + partitionNum + "'/>");
+      a.html("<input type='text' style='width: 90%' id='poolBarcode" + partitionNum + "' name='poolBarcode" + partitionNum + "' partition='" + partitionNum + "'/><button onclick='Container.partition.clearPartition("+partitionNum+")' type='button' class='fg-button ui-state-default ui-corner-all'>Cancel</button><br/><span id='msg" + partitionNum + "'/>");
+
+      Utils.ui.escape(jQuery("#poolBarcode" + partitionNum), function () {
+        a.html("");
+      });
+
       Utils.timer.typewatchFunc(jQuery("#poolBarcode" + partitionNum), function () {
         Container.pool.getPool(jQuery("#poolBarcode" + partitionNum));
       }, 400, 4);
     }
+  },
+
+  clearPartition: function (partitionNum) {
+    jQuery("#poolBarcode" + partitionNum).parent().html("");
   },
 
   insertPoolNextAvailable: function (poolLi) {
