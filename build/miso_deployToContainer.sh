@@ -1,8 +1,8 @@
 #!/bin/bash
 
+set -e
 # Get script directory
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-set -e
 source "$DIR/context.properties"
 # Check java installation and version
 if command -v java >/dev/null 2>&1; then
@@ -40,35 +40,33 @@ else
 	exit 1
 fi
 echo "If program exits, should not reach here"
-if [ -d "$CONTEXT_PATH" ]; then
-	echo "$CONTEXT_PATH directory already exits"
+if [ -d "${DIR}/ROOT" ]; then
+	echo "ROOT directory already exits"
 	# Application Context (edit and add to META-INF)
 	echo Editing context.xml
 	sed -i -r \
-		-e 's|ROOT|'"$CONTEXT_PATH"'|g' \
-		-e 's|(username=)[^=]*$|\1'\"$DB_USER\"'|1' \
-		-e 's|(password=)([^= >][^ />]*)|\1'\"$DB_PASS\"'|1' \
-		"$DIR/$CONTEXT_PATH/META-INF/context.xml"
+		-e 's|(username=)[^=]*$|\1'\"$MYSQL_USER\"'|1' \
+		-e 's|(password=)([^= >][^ />]*)|\1'\"$MYSQL_PASS\"'|1' \
+		"$DIR/ROOT/META-INF/context.xml"
 else
 	# Unpack ROOT.war
-	unzip "$DIR/../miso-web/target/ROOT.war" -d "$CONTEXT_PATH"
+	unzip "$DIR/../miso-web/target/ROOT.war" -d "${DIR}/ROOT"
 	# Application Context (edit and add to META-INF)
 	echo Editing context.xml
 	sed -r \
-		-e 's|ROOT|'"$CONTEXT_PATH"'|g' \
-		-e 's|(username=)[^=]*$|\1'\"$DB_USER\"'|1' \
-		-e 's|(password=)([^=][^ />]*)|\1'\"$DB_PASS\"'|1' \
-		<"$DIR/context.xml" >"$DIR/$CONTEXT_PATH/META-INF/context.xml"
+		-e 's|(username=)[^=]*$|\1'\"$MYSQL_USER\"'|1' \
+		-e 's|(password=)([^=][^ />]*)|\1'\"$MYSQL_PASS\"'|1' \
+		<"$DIR/context.xml" >"$DIR/ROOT/META-INF/context.xml"
 fi
 # MISO Storage Path (edit in WEB-INF/classes)
 echo Editing miso.properties
-sed -i -r 's|(baseDirectory:)[^:]*$|\1'"$STORAGE_PATH"'/|1' "$DIR/$CONTEXT_PATH/WEB-INF/classes/miso.properties"
-sed -i -r 's|(fileStorageDirectory:)[^:]*$|\1'"$STORAGE_PATH/files"'/|1' "$DIR/$CONTEXT_PATH/WEB-INF/classes/miso.properties"
-sed -i -r 's|(submissionStorageDirectory:)[^:]*$|\1'"$STORAGE_PATH/files/submission"'/|1' "$DIR/$CONTEXT_PATH/WEB-INF/classes/miso.properties"
+sed -i -r 's|(baseDirectory:)[^:]*$|\1'"$STORAGE_PATH"'/|1' "$DIR/ROOT/WEB-INF/classes/miso.properties"
+sed -i -r 's|(fileStorageDirectory:)[^:]*$|\1'"$STORAGE_PATH/files"'/|1' "${DIR}/ROOT/WEB-INF/classes/miso.properties"
+sed -i -r 's|(submissionStorageDirectory:)[^:]*$|\1'"${STORAGE_PATH}/files/submission"'/|1' "${DIR}/ROOT/WEB-INF/classes/miso.properties"
 # Package Application
-if [ -e "${CONTEXT_PATH}.war" ]; then
-	jar ufv "${CONTEXT_PATH}.war" -C "$DIR/$CONTEXT_PATH" .
+if [ -e "${DIR}/ROOT.war" ]; then
+	jar ufv "ROOT.war" -C "${DIR}/ROOT" .
 else
-	jar cfv "${CONTEXT_PATH}.war" -C "$DIR/$CONTEXT_PATH" .
+	jar cfv "ROOT.war" -C "${DIR}/ROOT" .
 fi
-curl --user "$TOMCAT_USER:$TOMCAT_PASS" --upload-file "${CONTEXT_PATH}.war" "http://$TOMCAT_SERVER/manager/text/deploy?path=/$CONTEXT_PATH&update=true"
+curl --user "$TOMCAT_USER:$TOMCAT_PASS" --upload-file "ROOT.war" "http://$TOMCAT_SERVER/manager/text/deploy?path=/ROOT&update=true"
