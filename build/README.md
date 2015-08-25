@@ -24,6 +24,3 @@ For the purposes of this setup, it is assumed that the host machine has the foll
 The setup scripts require the following to be installed, but if not, will stop execution and ask that they are installed and configured:
   1. Java Development Kit (version 7 or greater required, _tested against OpenJDK v7_)
   2. Apache Maven (version 2.2.1 or greater required, _tested against v3.0.5_)
-
-test
-another test
