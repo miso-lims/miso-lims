@@ -41,7 +41,7 @@ else
 	exit 1
 fi
 echo "If program exits, should not reach here"
-if [ -e "${DIR}/ROOT/META-INF/context.xml" ]; then #check to see if ROOT directory already exists
+if [ -d "${DIR}/ROOT" ]; then #check to see if ROOT directory already exists
 	echo $( ls "$DIR" )
 	echo 'Removing ROOT directory'
 	rm -rf "$DIR/ROOT"
