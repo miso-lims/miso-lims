@@ -41,14 +41,20 @@ else
 	exit 1
 fi
 echo "If program exits, should not reach here"
-if [ -e "${DIR}/ROOT/META-INF/context.xml" ]; then #check to see if ROOT directory already exists and contains context.xml file
-	echo 'Context file already exits'
+if [ -e "${DIR}/ROOT/META-INF/context.xml" ]; then #check to see if ROOT directory already exists
+	echo $( ls "$DIR" )
+	echo 'Removing ROOT directory'
+	rm -rf "$DIR/ROOT"
+	echo $( ls "$DIR" )
+	# Unpack ROOT.war
+	echo 'Unpacking WAR file'
+	unzip "$DIR/../miso-web/target/ROOT.war" -d "${DIR}/ROOT" #create ROOT directory and unpack WAR file there
 	# Application Context (edit and add to META-INF)
 	echo 'Editing context.xml'
-	sed -i -r \
+	sed -r \
 		-e 's|(username=)[^=]*$|\1'\"$MYSQL_USER\"'|1' \
-		-e 's|(password=)([^= >][^ />]*)|\1'\"$MYSQL_PASS\"'|1' \
-		"$DIR/ROOT/META-INF/context.xml" #edit in place since context.xml file already exists
+		-e 's|(password=)([^=][^ />]*)|\1'\"$MYSQL_PASS\"'|1' \
+		<"$DIR/context.xml" >"$DIR/ROOT/META-INF/context.xml" #make edits and create context.xml file under ROOT directory
 else
 	# Unpack ROOT.war
 	echo 'Unpacking WAR file'
