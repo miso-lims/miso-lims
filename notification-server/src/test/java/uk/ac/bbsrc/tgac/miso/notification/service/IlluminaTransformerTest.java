@@ -9,6 +9,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+
 import net.sf.json.JSONArray;
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
@@ -34,9 +37,9 @@ public class IlluminaTransformerTest {
   private static final String h1179_162_date_fail = "/runs/raw/Completed/dateCompleted/fail/140108_SN7001179_0162_AC3E41ACXX";
   private static final String h1179_162_minimal_1 = "/runs/raw/Completed/minimal/01/140108_SN7001179_0162_AC3E41ACXX";
   private static final String h1179_162_minimal_2 = "/runs/raw/Completed/minimal/02/140108_SN7001179_0162_AC3E41ACXX";
-  private static final String interop_runinfo_only_h1179_70 = "/runs/interop/runinfo_only/120323_h1179_0070_BC0JHTACXX";
-//  private static final String interop_no_runinfo_h1179_70 = "/runs/interop/runinfo_missing/120323_h1179_0070_BC0JHTACXX";
-  
+  private static final String interop_normal_h1179_70 = "/runs/interop/normal/120323_h1179_0070_BC0JHTACXX";
+  private static final String interop_runinfo_gzipped_h1179_70 = "/runs/interop/runinfo_gzipped/120323_h1179_0070_BC0JHTACXX";
+  private static final String interop_no_files_h1179_70 = "/runs/interop/no_files/120323_h1179_0070_BC0JHTACXX";
   
   private String getResourcePath(String path) {
     return this.getClass().getResource(path).getPath();
@@ -285,20 +288,72 @@ public class IlluminaTransformerTest {
   }
   
   @Test
-  public void testInterOpRuninfoOnly() {
+  public void testInterOpNormal() throws ParserConfigurationException, TransformerException {
     Set<File> files = new HashSet<>();
-    files.add(getResourceFile(interop_runinfo_only_h1179_70));
+    files.add(getResourceFile(interop_normal_h1179_70));
     JSONObject json = new IlluminaTransformer().transformInterOpOnly(files).getJSONObject(0);
-    // No interop files, but as long as there is a RunInfo.xml, a metrix (almost empty) will be returned
     assertTrue(json.has("metrix"));
     JSONObject metrix = json.getJSONObject("metrix");
-    assertTrue(metrix.has("summary"));
-    assertTrue(metrix.has("tileMetrics"));
-    assertTrue(metrix.has("qualityMetrics"));
-    assertTrue(metrix.has("errorMetrics"));
-    assertTrue(metrix.has("indexMetrics"));
-    assertTrue(metrix.has("extractionMetrics"));
-    assertTrue(metrix.has("intensityMetrics"));
+    assertKnownSummary(metrix);
+    assertCompleteMetrics(metrix);
+    assertCorrectQualityMetricsCombinedCalculation(metrix);
+  }
+  
+  @Test
+  public void testInterOpGzippedRunInfo() throws ParserConfigurationException, TransformerException {
+    Set<File> files = new HashSet<>();
+    files.add(getResourceFile(interop_runinfo_gzipped_h1179_70));
+    JSONObject json = new IlluminaTransformer().transformInterOpOnly(files).getJSONObject(0);
+    assertTrue(json.has("metrix"));
+    JSONObject metrix = json.getJSONObject("metrix");
+    assertKnownSummary(metrix);
+  }
+  
+  @Test
+  public void testInterOpNoFiles() throws ParserConfigurationException, TransformerException {
+    Set<File> files = new HashSet<>();
+    files.add(getResourceFile(interop_no_files_h1179_70));
+    JSONObject json = new IlluminaTransformer().transformInterOpOnly(files).getJSONObject(0);
+    assertTrue(!json.has("metrix"));
+    assertTrue(json.has("error"));
+  }
+  
+  private void assertKnownSummary(JSONObject metrix) {
+    assertTrue("C0JHTACXX".equals(metrix.getJSONObject("summary").getString("flowcellId")));
+    assertTrue("SN7001179".equals(metrix.getJSONObject("summary").getString("instrument")));
+  }
+  
+  private void assertCompleteMetrics(JSONObject metrix) {
+    assertTrue(metrix.getJSONObject("errorMetrics").getJSONArray("rates").getJSONObject(0).has("errorSD"));
+    assertTrue(metrix.getJSONObject("errorMetrics").getJSONArray("rates").getJSONObject(0).has("meanError"));
+    assertTrue(metrix.getJSONObject("extractionMetrics").getJSONArray("fwhmDistribution").size() > 0);
+    assertTrue(metrix.getJSONObject("extractionMetrics").getJSONArray("rawIntensities").size() > 0);
+    assertTrue(metrix.has("indexMetrics")); // this will be empty in our test cases
+    assertTrue(metrix.getJSONObject("intensityMetrics").getJSONArray("averageCorrected").size() > 0);
+    assertTrue(metrix.getJSONObject("intensityMetrics").getJSONArray("averageCorrectedCalledClusters").size() > 0);
+    assertTrue(metrix.getJSONObject("qualityMetrics").getJSONObject("combinedReadQualityScores").getJSONArray("raw").size() > 0);
+    assertTrue(metrix.getJSONObject("qualityMetrics").getJSONArray("perLaneQualityScores").size() > 0);
+    assertTrue(metrix.getJSONObject("tileMetrics").getJSONArray("clusterDensities").size() > 0);
+    assertTrue(metrix.getJSONObject("tileMetrics").getJSONArray("phasingMetrics").size() > 0);
+  }
+  
+  private void assertCorrectQualityMetricsCombinedCalculation(JSONObject metrix) {
+    JSONArray combinedScores = metrix.getJSONObject("qualityMetrics").getJSONObject("combinedReadQualityScores").getJSONArray("raw");
+    assertTrue(combinedScores.size() > 0);
+    // verify calculation of combined scores
+    int i = -1;
+    int combined = 0;
+    int sum = 0;
+    while (combined == 0 && i < combinedScores.size()) {
+      i++;
+      combined = combinedScores.getInt(i);
+    }
+    assertTrue(combined != 0); // There should be non-zero values
+    JSONArray perLaneScores = metrix.getJSONObject("qualityMetrics").getJSONArray("perLaneQualityScores");
+    for (int j = 0; j < perLaneScores.size(); j++) {
+      sum += perLaneScores.getJSONObject(j).getJSONArray("raw").getInt(i);
+    }
+    assertTrue(sum == combined);
   }
   
 }
