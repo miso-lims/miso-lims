@@ -69,6 +69,10 @@
           <td><form:input path="stockLevel"/></td>
         </tr>
         <tr>
+          <td class="h">Description:</td>
+          <td><form:input path="description"/></td>
+        </tr>
+        <tr>
           <c:choose>
             <c:when test="${kitDescriptor.kitDescriptorId == 0 or empty kitDescriptor.kitType}">
               <td>Kit Type:</td>

@@ -23,11 +23,17 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.impl.kit;
 
+import java.io.Serializable;
+
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-
-import javax.persistence.*;
-import java.io.Serializable;
 
 /**
  * A KitDescriptor handles information about a consumable element that is generally typed by a name, manufacturer and part number. Kits use
@@ -39,7 +45,7 @@ import java.io.Serializable;
 @Entity
 public class KitDescriptor implements Serializable {
 
-  /** Field UNSAVED_ID  */
+  /** Field UNSAVED_ID */
   public static final Long UNSAVED_ID = 0L;
 
   @Id
@@ -50,10 +56,11 @@ public class KitDescriptor implements Serializable {
   private String manufacturer = "";
   private String partNumber = "";
   private Integer stockLevel = 0;
+  private String description = "";
 
   @Enumerated(EnumType.STRING)
   private KitType kitType;
-  
+
   @Enumerated(EnumType.STRING)
   private PlatformType platformType;
 
@@ -69,7 +76,8 @@ public class KitDescriptor implements Serializable {
   /**
    * Sets the kitDescriptorId of this KitDescriptor object.
    *
-   * @param kitDescriptorId kitDescriptorId.
+   * @param kitDescriptorId
+   *          kitDescriptorId.
    */
   public void setKitDescriptorId(Long kitDescriptorId) {
     this.kitDescriptorId = kitDescriptorId;
@@ -87,7 +95,8 @@ public class KitDescriptor implements Serializable {
   /**
    * Sets the name of this KitDescriptor object.
    *
-   * @param name name.
+   * @param name
+   *          name.
    */
   public void setName(String name) {
     this.name = name;
@@ -105,7 +114,8 @@ public class KitDescriptor implements Serializable {
   /**
    * Sets the version of this KitDescriptor object.
    *
-   * @param version version.
+   * @param version
+   *          version.
    */
   public void setVersion(Double version) {
     this.version = version;
@@ -123,7 +133,8 @@ public class KitDescriptor implements Serializable {
   /**
    * Sets the manufacturer of this KitDescriptor object.
    *
-   * @param manufacturer manufacturer.
+   * @param manufacturer
+   *          manufacturer.
    */
   public void setManufacturer(String manufacturer) {
     this.manufacturer = manufacturer;
@@ -141,7 +152,8 @@ public class KitDescriptor implements Serializable {
   /**
    * Sets the partNumber of this KitDescriptor object.
    *
-   * @param partNumber partNumber.
+   * @param partNumber
+   *          partNumber.
    */
   public void setPartNumber(String partNumber) {
     this.partNumber = partNumber;
@@ -159,10 +171,30 @@ public class KitDescriptor implements Serializable {
   /**
    * Sets the stockLevel of this KitDescriptor object.
    *
-   * @param stockLevel stockLevel.
+   * @param stockLevel
+   *          stockLevel.
    */
   public void setStockLevel(Integer stockLevel) {
     this.stockLevel = stockLevel;
+  }
+
+  /**
+   * Sets the description of this KitDescriptor object.
+   *
+   * @param description
+   *          description.
+   */
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  /**
+   * Returns the description of this KitDescriptor object.
+   *
+   * @return String description.
+   */
+  public String getDescription() {
+    return description;
   }
 
   /**
@@ -177,7 +209,8 @@ public class KitDescriptor implements Serializable {
   /**
    * Sets the kitType of this KitDescriptor object.
    *
-   * @param kitType kitType.
+   * @param kitType
+   *          kitType.
    *
    */
   public void setKitType(KitType kitType) {
@@ -196,7 +229,8 @@ public class KitDescriptor implements Serializable {
   /**
    * Sets the platformType of this KitDescriptor object.
    *
-   * @param platformType platformType.
+   * @param platformType
+   *          platformType.
    */
   public void setPlatformType(PlatformType platformType) {
     this.platformType = platformType;
@@ -204,6 +238,7 @@ public class KitDescriptor implements Serializable {
 
   /**
    * Method toString ...
+   * 
    * @return String
    */
   @Override
@@ -217,9 +252,11 @@ public class KitDescriptor implements Serializable {
     sb.append(" : ");
     sb.append(getKitType());
     sb.append(" : ");
-    sb.append(getPlatformType());    
+    sb.append(getPlatformType());
     sb.append(" : ");
-    sb.append(getStockLevel());    
+    sb.append(getStockLevel());
+    sb.append(" : ");
+    sb.append(getDescription());
     return sb.toString();
   }
 }
