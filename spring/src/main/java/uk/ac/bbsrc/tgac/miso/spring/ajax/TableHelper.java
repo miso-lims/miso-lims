@@ -9,10 +9,11 @@ public class TableHelper {
   } 
 
   public static String hyperLinkify(String path, String text, Boolean image) {
-    String img = image ? "<span style=\"display: inline-block; width: 16px;\" class=\"ui-icon ui-icon-pencil\"></span>" : "";
+    String img = image ? "<span style=\"display: inline-block; width: 16px;\""
+                       + "class=\"ui-icon ui-icon-pencil\"></span>" : "";
     String hyp = "<div>"
              + img
-   				   + "<span> <a href=\"" + path + "\">" + text + "</a> </span>"
+             + "<span> <a href=\"" + path + "\">" + text + "</a> </span>"
              + "</div>";
     return hyp;
   }	
