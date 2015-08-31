@@ -847,7 +847,7 @@ Library.ui = {
             { "sTitle": "Type"},
             { "sTitle": "Sample Name", "sType": "no-sam"},
             { "sTitle": "QC Passed"},
-            { "sTitle": "Edit"}
+            //{ "sTitle": "Edit"}
           ],
           "bJQueryUI": true,
           "iDisplayLength": 25,

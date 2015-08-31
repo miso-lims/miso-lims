@@ -86,7 +86,7 @@ Project.ui = {
             { "sTitle": "Description"},
             { "sTitle": "Progress"},
             { "sTitle": "Overview"},
-            { "sTitle": "Edit"}
+            { "sTitle": "Edit"} // TODO: GLT-201
           ],
           "bJQueryUI": true,
           "iDisplayLength": 25,
@@ -319,7 +319,7 @@ Project.ui = {
             { "sTitle": "Name", "sType": "no-pla"},
             { "sTitle": "Alias"},
             { "sTitle": "Description"},
-            { "sTitle": "Edit"}
+            { "sTitle": "Edit"} // TODO: GLT-201
           ],
           "bJQueryUI": true,
           "iDisplayLength": 25,

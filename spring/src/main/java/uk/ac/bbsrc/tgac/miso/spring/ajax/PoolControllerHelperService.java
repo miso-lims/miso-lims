@@ -693,13 +693,14 @@ public class PoolControllerHelperService {
         JSONArray arr = new JSONArray();
         for (Pool pool : requestManager.listAllPoolsByPlatform(PlatformType.get(platform))) {
           JSONArray pout = new JSONArray();
-          pout.add(pool.getName());
-          pout.add(pool.getAlias() != null ? pool.getAlias() : "");
+          String defPath = "/miso/pool/";
+          pout.add(TableHelper.hyperLinkify(defPath + pool.getId(), pool.getName(), true));
+          pout.add(TableHelper.hyperLinkify(defPath + pool.getId(), pool.getAlias() != null ? pool.getAlias() : ""));
           pout.add(pool.getCreationDate() != null ? pool.getCreationDate().toString() : "");
           pout.add(pool.getId());
           pout.add(pool.getId());
           pout.add(pool.getId());
-          pout.add("<a href=\"/miso/pool/" + pool.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>");
+          //pout.add("<a href=\"/miso/pool/" + pool.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>"); // Is this it... maybe?
           arr.add(pout);
         }
         j.put("pools", arr);

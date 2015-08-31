@@ -73,7 +73,7 @@ Experiment.ui = {
             { "sTitle": "Alias"},
             { "sTitle": "Description"},
             { "sTitle": "Platform"},
-            { "sTitle": "Edit"}
+            //{ "sTitle": "Edit"}
           ],
           "bJQueryUI": true,
           "iDisplayLength": 25,

@@ -761,14 +761,14 @@ public class SampleControllerHelperService {
       JSONObject j = new JSONObject();
       JSONArray jsonArray = new JSONArray();
       for (Sample sample : requestManager.listAllSamples()) {
-
-        jsonArray.add("['" + sample.getName() + "','" +
-                      sample.getAlias() + "','" +
+        jsonArray.add("['" + 
+                      TableHelper.hyperLinkify("/miso/sample/" + sample.getId(), 
+                                                sample.getName(), true) + "','" +
+                      TableHelper.hyperLinkify("/miso/sample/" + sample.getId(), 
+                                                sample.getAlias()) + "','" + 
                       sample.getSampleType() + "','" +
                       (sample.getQcPassed() != null ? sample.getQcPassed().toString() : "") + "','" +
-                      getSampleLastQC(sample.getId()) + "','" +
-                      "<a href=\"/miso/sample/" + sample.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
-
+                      getSampleLastQC(sample.getId()) + "']");
       }
       j.put("array", jsonArray);
       return j;

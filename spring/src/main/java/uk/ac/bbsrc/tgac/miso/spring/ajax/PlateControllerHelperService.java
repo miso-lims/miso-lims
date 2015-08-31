@@ -387,11 +387,13 @@ public class PlateControllerHelperService {
               }
 
               jsonArray.add("['" +
-                            l.getName() + "','" +
-                            l.getAlias() + "','" +
+                            TableHelper.hyperLinkify("/miso/library/" + l.getId(), 
+                                                      l.getName(), true) + "','" +
+                            TableHelper.hyperLinkify("/miso/library/" + l.getId(), 
+                                                      l.getAlias()) + "','" +
                             strategyName + "','" +
-                            seqbuilder.toString() + "','" +
-                            "<a href=\"/miso/library/" + l.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
+                            seqbuilder.toString() + "']");
+                            //"<a href=\"/miso/library/" + l.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
             }
           }
         }
