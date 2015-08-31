@@ -327,7 +327,7 @@ public class ProjectControllerHelperService {
       JSONObject j = new JSONObject();
       JSONArray jsonArray = new JSONArray();
       for (Project project : requestManager.listAllProjects()) {
-        String path = "miso/project/" + project.getId();
+        String path = "/miso/project/" + project.getId();
         jsonArray.add("['" + 
                       TableHelper.hyperLinkify(path, project.getName(), true) + "','" +
                       TableHelper.hyperLinkify(path, project.getAlias()) + "','" +

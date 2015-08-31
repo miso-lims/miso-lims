@@ -477,9 +477,9 @@ public class ExperimentControllerHelperService {
       JSONArray jsonArray = new JSONArray();
       for (Experiment experiment : requestManager.listAllExperiments()) {
         jsonArray.add("['" + 
-                      TableHelper.hyperLinkify("miso/experiment/" + experiment.getId(), 
+                      TableHelper.hyperLinkify("/miso/experiment/" + experiment.getId(), 
                                                 experiment.getName(), true) + "','" +
-                      TableHelper.hyperLinkify("miso/experiment/" + experiment.getId(), 
+                      TableHelper.hyperLinkify("/miso/experiment/" + experiment.getId(), 
                                                 experiment.getAlias()) + "','" +
                       experiment.getDescription() + "','" +
                       experiment.getPlatform().getPlatformType().getKey() + " " + 
