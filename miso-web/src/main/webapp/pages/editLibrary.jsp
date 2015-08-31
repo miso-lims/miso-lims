@@ -784,6 +784,7 @@
           <th>Pool Platform</th>
           <th>Pool Creation Date</th>
           <th>Pool Concentration</th>
+          <%-- GLT-201: Comment to remove 'Edit Column' --%>
           <th class="fit">Edit</th>
           <sec:authorize access="hasRole('ROLE_ADMIN')">
             <th class="fit">DELETE</th>
@@ -793,12 +794,16 @@
         <tbody>
         <c:forEach items="${libraryPools}" var="pool">
           <tr poolId="${pool.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-            <td><b>${pool.name}</b></td>
+            <td class="misoicon" onclick="window.location.href='<c:url value="/miso/pool/${pool.id}"/>'">
+                <b>${pool.name}</b>
+            </td>
             <td>${pool.alias}</td>
             <td>${pool.platformType.key}</td>
             <td>${pool.creationDate}</td>
             <td>${pool.concentration}</td>
               <%-- <td class="misoicon" onclick="window.location.href='<c:url value="/miso/pool/${fn:toLowerCase(pool.platformType.key)}/${pool.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td> --%>
+  
+            <%-- GLT-201: Comment to remove 'Edit Column' --%>
             <td class="misoicon" onclick="window.location.href='<c:url value="/miso/pool/${pool.id}"/>'">
               <span class="ui-icon ui-icon-pencil"/>
             </td>
@@ -846,6 +851,7 @@
         <th>Run Name</th>
         <th>Run Alias</th>
         <th>Partitions</th>
+        <%-- GLT-201: Comment to remove 'Edit Column' --%>
         <th class="fit">Edit</th>
         <sec:authorize access="hasRole('ROLE_ADMIN')">
           <th class="fit">DELETE</th>
@@ -855,7 +861,9 @@
       <tbody>
       <c:forEach items="${libraryRuns}" var="run" varStatus="runCount">
         <tr runId="${run.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-          <td><b>${run.name}</b></td>
+          <td class="misoicon" onclick="window.location.href='<c:url value="/miso/run/${run.id}"/>'">
+            <b>${run.name}</b>
+          </td>
           <td>${run.alias}</td>
           <td>
             <c:forEach items="${run.sequencerPartitionContainers}" var="container" varStatus="fCount">
@@ -886,6 +894,8 @@
               </c:if>
             </c:forEach>
           </td>
+
+          <%-- GLT-201: Comment to remove 'Edit Column' --%>
           <td class="misoicon" onclick="window.location.href='<c:url value="/miso/run/${run.id}"/>'">
             <span class="ui-icon ui-icon-pencil"/>
           </td>

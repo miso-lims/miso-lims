@@ -356,6 +356,7 @@
             <th>Results</th>
             <c:if test="${(sample.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                                   or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+              <%-- GLT-201: Comment to remove 'Edit Column' --%>
               <th align="center">Edit</th>
             </c:if>
           </tr>
@@ -375,6 +376,7 @@
                 <td id="results${qc.id}">${qc.results} ${qc.qcType.units}</td>
                 <c:if test="${(sample.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                                           or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+                  <%-- GLT-201: Comment to remove 'Edit Column' --%>
                   <td id="edit${qc.id}" align="center"><a href="javascript:void(0);"
                                                           onclick="Sample.qc.changeSampleQCRow('${qc.id}','${sample.id}')">
                     <span class="ui-icon ui-icon-pencil"></span></a></td>
@@ -457,16 +459,22 @@
           <th>Library Alias</th>
           <th>Library Type</th>
           <th>QC Passed</th>
+          <%-- GLT-201: Comment to remove 'Edit Column' --%>
           <th class="fit">Edit</th>
         </tr>
         </thead>
         <tbody>
         <c:forEach items="${sample.libraries}" var="library">
           <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-            <td><b>${library.name}</b></td>
-            <td>${library.alias}</td>
+            <td class="misoicon"
+                onclick="window.location.href='<c:url value="/miso/library/${library.id}"/>'">
+                <b>${library.name}</b></td>
+            <td class="misoicon"
+                onclick="window.location.href='<c:url value="/miso/library/${library.id}"/>'">
+                ${library.alias}</td>
             <td>${library.libraryType.description}</td>
             <td>${library.qcPassed}</td>
+            <%-- GLT-201: Comment to remove 'Edit Column' --%>
             <td class="misoicon"
                 onclick="window.location.href='<c:url value="/miso/library/${library.id}"/>'"><span
                 class="ui-icon ui-icon-pencil"/></td>
@@ -519,6 +527,7 @@
           <th>Pool Platform</th>
           <th>Pool Creation Date</th>
           <th>Pool Concentration</th>
+          <%-- GLT-201: Comment to remove 'Edit Column' --%>
           <th class="fit">Edit</th>
           <sec:authorize access="hasRole('ROLE_ADMIN')">
             <th class="fit">DELETE</th>
@@ -528,12 +537,16 @@
         <tbody>
         <c:forEach items="${samplePools}" var="pool">
           <tr poolId="${pool.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-            <td><b>${pool.name}</b></td>
+            <td class="misoicon"
+                onclick="window.location.href='<c:url value="/miso/pool/${pool.id}"/>'">
+                <b>${pool.name}</b></td>
             <td>${pool.alias}</td>
             <td>${pool.platformType.key}</td>
             <td>${pool.creationDate}</td>
             <td>${pool.concentration}</td>
               <%-- <td class="misoicon" onclick="window.location.href='<c:url value="/miso/pool/${fn:toLowerCase(pool.platformType.key)}/${pool.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td> --%>
+
+            <%-- GLT-201: Comment to remove 'Edit Column' --%>
             <td class="misoicon" onclick="window.location.href='<c:url value="/miso/pool/${pool.id}"/>'">
               <span class="ui-icon ui-icon-pencil"/>
             </td>
@@ -581,6 +594,7 @@
         <th>Run Name</th>
         <th>Run Alias</th>
         <th>Partitions</th>
+        <%-- GLT-201: Comment to remove 'Edit Column' --%>
         <th class="fit">Edit</th>
         <sec:authorize access="hasRole('ROLE_ADMIN')">
           <th class="fit">DELETE</th>
@@ -590,7 +604,9 @@
       <tbody>
       <c:forEach items="${sampleRuns}" var="run" varStatus="runCount">
         <tr runId="${run.id}" onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-          <td><b>${run.name}</b></td>
+          <td class="misoicon"
+              onclick="window.location.href='<c:url value="/miso/run/${run.id}"/>'">
+              <b>${run.name}</b></td>
           <td>${run.alias}</td>
           <td>
             <c:forEach items="${run.sequencerPartitionContainers}" var="container" varStatus="fCount">
@@ -621,6 +637,7 @@
               </c:if>
             </c:forEach>
           </td>
+          <%-- GLT-201: Comment to remove 'Edit Column' --%>
           <td class="misoicon" onclick="window.location.href='<c:url value="/miso/run/${run.id}"/>'">
             <span class="ui-icon ui-icon-pencil"/>
           </td>

@@ -43,18 +43,23 @@
         <th>Size</th>
         <th>Material Type</th>
         <th>Tag Barcode</th>
+        <%-- GLT-201: Comment to remove 'Edit Column' --%>
         <th class="fit">Edit</th>
       </tr>
       </thead>
       <tbody>
       <c:forEach items="${plates}" var="plate">
         <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-          <td>${plate.name}</td>
+          <td class="misoicon"
+              onclick="window.location.href='<c:url value="/miso/plate/${plate.id}"/>'">
+              ${plate.name}</td>
           <td>${plate.description}</td>
           <td>${plate.creationDate}</td>
           <td>${plate.size}</td>
           <td>${plate.plateMaterialType}</td>
           <td>${plate.tagBarcode.sequence}</td>
+
+          <%-- GLT-201: Comment to remove 'Edit Column' --%>
           <td class="misoicon"
               onclick="window.location.href='<c:url value="/miso/plate/${plate.id}"/>'"><span
               class="ui-icon ui-icon-pencil"/></td>

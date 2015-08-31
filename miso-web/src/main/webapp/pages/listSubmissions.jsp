@@ -42,13 +42,15 @@
         <th>Submitted Date</th>
         <th class="fit">Verified</th>
         <th class="fit">Completed</th>
+        <%-- GLT-201: Comment to remove 'Edit Column' --%>
         <th class="fit">Edit</th>
       </tr>
       </thead>
       <tbody>
       <c:forEach items="${submissions}" var="submission">
         <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-          <td class="fit">
+          <td class="fit"
+              onclick="window.location.href='<c:url value="/miso/submission/${submission.id}"/>'">
               ${submission.id}
           </td>
           <td class="fit">
@@ -80,6 +82,7 @@
             </c:choose>
               ${submission.completed}
           </td>
+        <%-- GLT-201: Comment to remove 'Edit Column' --%>
           <td class="misoicon"
               onclick="window.location.href='<c:url value="/miso/submission/${submission.id}"/>'"><span
               class="ui-icon ui-icon-pencil"/></td>
