@@ -52,7 +52,7 @@
         <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
           <td class="misoicon"
               onclick="window.location.href='<c:url value="/miso/plate/${plate.id}"/>'">
-              ${plate.name}</td>
+              ${plate.name} </td>
           <td>${plate.description}</td>
           <td>${plate.creationDate}</td>
           <td>${plate.size}</td>

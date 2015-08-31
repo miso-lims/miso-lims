@@ -63,16 +63,19 @@
         <th>Alias</th>
         <th>Barcode</th>
         <th>Date Created</th>
+        <%-- GLT-201: Comment to remove 'Edit Column' --%>
         <th class="fit">Edit</th>
       </tr>
       </thead>
       <tbody>
       <c:forEach items="${pools[pt]}" var="ipool">
         <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-          <td>${ipool.name}</td>
+          <td class="misoicon" onclick="window.location.href='<c:url value="/miso/pool/${ipool.id}"/>'">
+              ${ipool.name}</td> 
           <td>${ipool.alias}</td>
           <td>${ipool.identificationBarcode}</td>
           <td>${ipool.creationDate}</td>
+          <%-- GLT-201: Comment to remove 'Edit Column' --%>
           <td class="misoicon"
               onclick="window.location.href='<c:url value="/miso/pool/${ipool.id}"/>'"><span
               class="ui-icon ui-icon-pencil"/></td>
@@ -93,16 +96,19 @@
           <th>Alias</th>
           <th>Barcode</th>
           <th>Date Created</th>
+          <%-- GLT-201: Comment to remove 'Edit Column' --%>
           <th class="fit">Edit</th>
         </tr>
         </thead>
         <tbody>
         <c:forEach items="${usedpools[pt]}" var="ipool">
           <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-            <td>${ipool.name}</td>
+            <td class="misoicon" onclick="window.location.href='<c:url value="/miso/pool/${ipool.id}"/>'">
+                ${ipool.name}</td> 
             <td>${ipool.alias}</td>
             <td>${ipool.identificationBarcode}</td>
             <td>${ipool.creationDate}</td>
+            <%-- GLT-201: Comment to remove 'Edit Column' --%>
             <td class="misoicon"
                 onclick="window.location.href='<c:url value="/miso/pool/${ipool.id}"/>'"><span
                 class="ui-icon ui-icon-pencil"/></td>
