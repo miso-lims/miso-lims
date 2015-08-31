@@ -54,6 +54,7 @@
     <thead>
     <tr>
       <th>Name</th>
+      <th>Description</th>
       <th>Version</th>
       <th>Manufacturer</th>
       <th>Part Number</th>
@@ -67,6 +68,7 @@
     <c:forEach items="${sequencing}" var="sequencing">
       <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
         <td><b>${sequencing.name}</b></td>
+        <td>${sequencing.description}</td>
         <td>${sequencing.version}</td>
         <td>${sequencing.manufacturer}</td>
         <td>${sequencing.partNumber}</td>
