@@ -69,6 +69,10 @@
           <td><form:input path="stockLevel"/></td>
         </tr>
         <tr>
+          <td class="h">Description:</td>
+          <td><form:input path="description"/></td>
+        </tr>
+        <tr>
           <c:choose>
             <c:when test="${kitDescriptor.kitDescriptorId == 0 or empty kitDescriptor.kitType}">
               <td>Kit Type:</td>
@@ -87,7 +91,9 @@
             <c:when test="${kitDescriptor.kitDescriptorId == 0 or empty kitDescriptor.platformType}">
               <td>Platform Type:</td>
               <td>
-                <form:select id="platformTypes" path="platformType" items="${platformTypes}"/>
+                <form:select id="platformTypes" path="platformType">
+                  <form:options items="${platformTypes}" itemValue="key" itemLabel="key"/>
+                </form:select>
               </td>
             </c:when>
             <c:otherwise>

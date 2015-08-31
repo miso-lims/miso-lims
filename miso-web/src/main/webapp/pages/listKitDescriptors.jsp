@@ -54,6 +54,7 @@
     <thead>
     <tr>
       <th>Name</th>
+      <th>Description</th>
       <th>Version</th>
       <th>Manufacturer</th>
       <th>Part Number</th>
@@ -70,6 +71,7 @@
         <td class="misoicon"
             onclick="window.location.href='<c:url value="/miso/kitdescriptor/${sequencing.kitDescriptorId}"/>'">
             <b>${sequencing.name}</b></td>
+        <td>${sequencing.description}</td>
         <td>${sequencing.version}</td>
         <td>${sequencing.manufacturer}</td>
         <td>${sequencing.partNumber}</td>

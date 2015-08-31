@@ -57,7 +57,7 @@
         Login
     </button>
     <script type="text/javascript">
-        Form.Element.focus('username');
+        document.getElementById('username').focus();
     </script>
     <div id="contentcolumn">
 
