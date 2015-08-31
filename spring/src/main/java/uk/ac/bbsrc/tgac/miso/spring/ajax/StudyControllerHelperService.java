@@ -106,12 +106,14 @@ public class StudyControllerHelperService {
       JSONObject j = new JSONObject();
       JSONArray jsonArray = new JSONArray();
       for (Study study : requestManager.listAllStudies()) {
-        jsonArray.add("['" + study.getName() + "','" +
-                      study.getAlias() + "','" +
+        jsonArray.add("['" + 
+                      TableHelper.hyperLinkify("/miso/study/" + study.getId(), 
+                                                study.getName(), true) + "','" +
+                      TableHelper.hyperLinkify("/miso/study/" + study.getId(), 
+                                                study.getAlias()) + "','" +
                       study.getDescription() + "','" +
-                      study.getStudyType() + "','" +
-                      "<a href=\"/miso/study/" + study.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
-
+                      study.getStudyType() + "','" + "']");
+                      //"<a href=\"/miso/study/" + study.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
       }
       j.put("array", jsonArray);
       return j;

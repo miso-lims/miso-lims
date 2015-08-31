@@ -843,24 +843,27 @@ public class ContainerControllerHelperService {
     try {
       JSONObject j = new JSONObject();
       JSONArray jsonArray = new JSONArray();
-      for (SequencerPartitionContainer<SequencerPoolPartition> sequencePartitionContainer : requestManager.listAllSequencerPartitionContainers()) {
+      for (SequencerPartitionContainer<SequencerPoolPartition> spc : requestManager.listAllSequencerPartitionContainers()) {
+        String id = "";
+        String platform = "";
         String run = "";
         String sequencer = "";
-        if (sequencePartitionContainer.getRun() != null) {
-          run = "<a href=\"/miso/run/" + sequencePartitionContainer.getRun().getId() + "\">" + sequencePartitionContainer.getRun().getAlias() + "</a>";
-          if (sequencePartitionContainer.getRun().getSequencerReference() != null) {
-            sequencer = "<a href=\"/miso/sequencer/" + sequencePartitionContainer.getRun().getSequencerReference().getId() + "\">"
-                        + sequencePartitionContainer.getRun().getSequencerReference().getPlatform().getNameAndModel() + "</a>";
+        String path = "/miso/";
+        if (spc.getRun() != null) {
+          run = TableHelper.hyperLinkify(path + "run/" + spc.getRun().getId(), spc.getRun().getAlias());
+          if (spc.getRun().getSequencerReference() != null) {
+            sequencer = TableHelper.hyperLinkify(path + "sequencer/" + spc.getRun().getSequencerReference().getId(), 
+                                     spc.getRun().getSequencerReference().getPlatform().getNameAndModel());
           }
         }
+        // If the barcode exists get it, else pass on the empty string
+        if (spc.getIdentificationBarcode() != null) 
+          id = TableHelper.hyperLinkify(path + "container/" + spc.getId(), spc.getIdentificationBarcode(), true);
+        // If the Platform exists get it, else pass on the empty string
+        if (spc.getPlatform() != null && spc.getPlatform().getPlatformType() != null)
+          platform = spc.getPlatform().getPlatformType().getKey();
 
-        jsonArray.add("['" +
-                      (sequencePartitionContainer.getIdentificationBarcode() != null ? sequencePartitionContainer.getIdentificationBarcode() : "") + "','" +
-                      (sequencePartitionContainer.getPlatform() != null && sequencePartitionContainer.getPlatform().getPlatformType() != null ? sequencePartitionContainer.getPlatform().getPlatformType().getKey() : "") + "','" +
-                      run + "','" +
-                      sequencer + "','" +
-                      "<a href=\"/miso/container/" + sequencePartitionContainer.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
-
+        jsonArray.add("['" + id + "','" +  platform + "','" + run + "','" + sequencer + "']");
       }
       j.put("array", jsonArray);
       return j;

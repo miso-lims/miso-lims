@@ -345,8 +345,8 @@ Pool.ui = {
             { "sTitle": "Date Created"},
             { "sTitle": "Information"},
             { "sTitle": "Average Insert Size"},
-            { "sTitle": "Concentration"},
-            { "sTitle": "Edit"}
+            { "sTitle": "Concentration"}
+            //{ "sTitle": "Edit"}
           ],
           "bJQueryUI": true,
           "iDisplayLength":  25,

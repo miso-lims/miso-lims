@@ -219,8 +219,8 @@ Run.ui = {
             { "sTitle": "Status"},
             { "sTitle": "Start Date"},
             { "sTitle": "End Date"},
-            { "sTitle": "Type"},
-            { "sTitle": "Edit"}
+            { "sTitle": "Type"}
+            //{ "sTitle": "Edit"}
           ],
           "bJQueryUI": true,
           "iDisplayLength": 25,

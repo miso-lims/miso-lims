@@ -1351,14 +1351,13 @@ public class RunControllerHelperService {
       JSONObject j = new JSONObject();
       JSONArray jsonArray = new JSONArray();
       for (Run run : requestManager.listAllRuns()) {
-        jsonArray.add("['" + run.getName() + "','" +
-                      run.getAlias() + "','" +
+        jsonArray.add("['" + 
+                      TableHelper.hyperLinkify("/miso/run/" + run.getId(), run.getName(), true) + "','" +
+                      TableHelper.hyperLinkify("/miso/run/" + run.getId(), run.getAlias()) + "','" +
                       (run.getStatus() != null && run.getStatus().getHealth() != null ? run.getStatus().getHealth().getKey() : "") + "','" +
                       (run.getStatus() != null && run.getStatus().getStartDate() != null ? LimsUtils.getDateAsString(run.getStatus().getStartDate()) : "") + "','" +
                       (run.getStatus() != null && run.getStatus().getCompletionDate() != null ? LimsUtils.getDateAsString(run.getStatus().getCompletionDate()) : "") + "','" +
-                      (run.getPlatformType() != null ? run.getPlatformType().getKey() : "") + "','" +
-                      "<a href=\"/miso/run/" + run.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
-
+                      (run.getPlatformType() != null ? run.getPlatformType().getKey() : "") + "']");
       }
       j.put("runsArray", jsonArray);
       return j;

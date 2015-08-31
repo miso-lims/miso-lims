@@ -327,13 +327,15 @@ public class ProjectControllerHelperService {
       JSONObject j = new JSONObject();
       JSONArray jsonArray = new JSONArray();
       for (Project project : requestManager.listAllProjects()) {
-        jsonArray.add("['" + project.getName() + "','" +
-                      project.getAlias() + "','" +
+        String path = "/miso/project/" + project.getId();
+        jsonArray.add("['" + 
+                      TableHelper.hyperLinkify(path, project.getName(), true) + "','" +
+                      TableHelper.hyperLinkify(path, project.getAlias()) + "','" +
                       project.getDescription() + "','" +
                       project.getProgress().getKey() + "','" +
 //                      checkOverviews(project.getProjectId()) + "','" +
-                      project.getProjectId() + "','" +
-                      "<a href=\"/miso/project/" + project.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
+                      project.getProjectId() + "']");
+                      //"<a href=\"/miso/project/" + project.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
 
       }
       j.put("projectsArray", jsonArray);

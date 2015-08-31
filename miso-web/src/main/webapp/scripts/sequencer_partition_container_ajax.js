@@ -207,8 +207,8 @@ Container.ui = {
             { "sTitle": "ID Barcode"},
             { "sTitle": "Platform"},
             { "sTitle": "Last Associated Run"},
-            { "sTitle": "Last Sequencer Used"},
-            { "sTitle": "Edit"}
+            { "sTitle": "Last Sequencer Used"}
+            //{ "sTitle": "Edit"}
           ],
           "bJQueryUI": true,
           "iDisplayLength": 25,

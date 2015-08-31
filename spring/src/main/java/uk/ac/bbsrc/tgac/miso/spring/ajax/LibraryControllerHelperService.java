@@ -1191,10 +1191,15 @@ public class LibraryControllerHelperService {
         if (library.getQcPassed() != null) {
           qcpassed = library.getQcPassed().toString();
         }
-        jsonArray.add("['" + library.getName() + "','" + library.getAlias() + "','" + library.getLibraryType().getDescription() + "','"
-            + library.getSample().getName() + "','" + qcpassed + "','" + "<a href=\"/miso/library/" + library.getId()
-            + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
-
+        jsonArray.add("['" + 
+                      TableHelper.hyperLinkify("/miso/library/" + library.getId(), 
+                                                library.getName(), true) + "','" +
+                      TableHelper.hyperLinkify("/miso/library/" + library.getId(), 
+                                                library.getAlias()) + "','" +
+                      library.getLibraryType().getDescription() + "','" +
+                      library.getSample().getName()+ "','" +
+                      qcpassed + "','" + "']");
+                      //"<a href=\"/miso/library/" + library.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
       }
       j.put("array", jsonArray);
       return j;
