@@ -181,6 +181,17 @@ Utils.ui = {
     if (confirm("Are you sure you wish to remove this item?")) {
       obj.remove();
     }
+  },
+
+  escape: function (obj, callback) {
+    return obj.each(function () {
+      jQuery(document).on("keydown", obj, function (e) {
+        var keycode = ((typeof e.keyCode != 'undefined' && e.keyCode) ? e.keyCode : e.which);
+        if (keycode === 27) {
+          callback.call(obj, e);
+        }
+      });
+    });
   }
 };
 

@@ -1,4 +1,3 @@
-USE lims;
 
 INSERT INTO TagBarcodes(name, sequence, platformName, strategyName)
 VALUES

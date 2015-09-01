@@ -1,4 +1,3 @@
-USE lims;
 
 CREATE TABLE `Submission_Partition_Dilution` (
   `submission_submissionId` bigint(20) NOT NULL,

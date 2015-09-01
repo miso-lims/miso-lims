@@ -1,4 +1,3 @@
-USE lims;
 
 CREATE TABLE `EntityGroup` (
   `entityGroupId` bigint(20) NOT NULL AUTO_INCREMENT,

@@ -211,6 +211,8 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                   if (!run.has("containerId") && runParamDoc.getElementsByTagName("Barcode").getLength() != 0) {
                     run.put("containerId", runParamDoc.getElementsByTagName("Barcode").item(0).getTextContent());
                   }
+
+                  run.put("kits", checkKits(runParamDoc));
                 }
                 else if (otherRunParameters.exists()) {
                   run.put("runparams", SubmissionUtils.transform(otherRunParameters));
@@ -220,6 +222,8 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                   if (!run.has("containerId") && runParamDoc.getElementsByTagName("Barcode").getLength() != 0) {
                     run.put("containerId", runParamDoc.getElementsByTagName("Barcode").item(0).getTextContent());
                   }
+
+                  run.put("kits", checkKits(runParamDoc));
                 }
                 else {
                   FileFilter fileFilter = new WildcardFileFilter("runParameters.xml*");
@@ -349,6 +353,8 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                   if (!run.has("containerId") && runParamDoc.getElementsByTagName("Barcode").getLength() != 0) {
                     run.put("containerId", runParamDoc.getElementsByTagName("Barcode").item(0).getTextContent());
                   }
+
+                  run.put("kits", checkKits(runParamDoc));
                 }
                 else {
                   FileFilter fileFilter = new WildcardFileFilter("runParameters.xml*");
@@ -455,6 +461,8 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                     if (!run.has("containerId") && runParamDoc.getElementsByTagName("Barcode").getLength() != 0) {
                       run.put("containerId", runParamDoc.getElementsByTagName("Barcode").item(0).getTextContent());
                     }
+
+                    run.put("kits", checkKits(runParamDoc));
                   }
                   else {
                     FileFilter fileFilter = new WildcardFileFilter("runParameters.xml*");
@@ -806,6 +814,23 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
       }
     }
     return failed;
+  }
+
+  private JSONArray checkKits(Document runParamDoc) {
+    Set<String> rlist = new HashSet<>();
+    NodeList reagents = runParamDoc.getElementsByTagName("ReagentKits");
+    if (reagents.getLength() > 0) {
+      Element rkit = (Element)reagents.item(0);
+      NodeList kits = rkit.getElementsByTagName("ID");
+      for (int i = 0; i < kits.getLength(); i++) {
+        Element e = (Element) kits.item(i);
+        String rs = e.getTextContent();
+        for (String r : rs.split("[,;]")) {
+          if (r != null && !"".equals(r)) rlist.add(r.trim());
+        }
+      }
+    }
+    return JSONArray.fromObject(rlist);
   }
 
   private JSONObject parseInterOp(File rootFile) throws IOException {

@@ -1,4 +1,3 @@
-USE lims;
 
 UPDATE SequencerPartitionContainer s SET s.platformType = 0;
 
@@ -12,4 +11,4 @@ LEFT JOIN SequencerPartitionContainer spc ON spc.containerId = rf.containers_con
 SET s.platformType = src.pId
 WHERE s.containerId=src.cId;
 
-ALTER TABLE lims.SequencerPartitionContainer CHANGE platformType platform BIGINT(20);
+ALTER TABLE SequencerPartitionContainer CHANGE platformType platform BIGINT(20);

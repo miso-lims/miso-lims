@@ -269,6 +269,15 @@ public class PacBioNotificationMessageConsumerMechanism implements NotificationM
 //                        else {
 //                          lf.setPlatformType(PlatformType.PACBIO);
 //                        }
+                        JSONArray cells = run.getJSONArray("cells");
+                        if (cells.size() > lf.getPartitions().size()) {
+                          int numNewcells = cells.size()-lf.getPartitions().size();
+                          lf.setPartitionLimit(cells.size());
+                          for (int i=0; i<numNewcells; i++){
+                            lf.addNewPartition();
+                          }
+                        }
+
                         r.addSequencerPartitionContainer(lf);
                       }
                       else {
@@ -296,7 +305,7 @@ public class PacBioNotificationMessageConsumerMechanism implements NotificationM
                         long flowId = requestManager.saveSequencerPartitionContainer(f);
                         f.setId(flowId);
                         r.addSequencerPartitionContainer(f);
-                        //TODO match up samples to libraries and pools?
+                        //TODO match up samples to libraries and pools? Or match up pool numbers
                         /*
                         for (JSONObject obj : (Iterable<JSONObject>)cells) {
                           int cellindex = obj.getInt("index");
@@ -326,6 +335,14 @@ public class PacBioNotificationMessageConsumerMechanism implements NotificationM
                     if (run.has("plateId") && !"".equals(run.getString("plateId"))) {
                       f.setIdentificationBarcode(run.getString("plateId"));
                       requestManager.saveSequencerPartitionContainer(f);
+                    }
+                  }
+                  JSONArray cells = run.getJSONArray("cells");
+                  if (cells.size() > f.getPartitions().size()) {
+                    int numNewcells = cells.size()-f.getPartitions().size();
+                    f.setPartitionLimit(cells.size());
+                    for (int i=0; i<numNewcells; i++){
+                      f.addNewPartition();
                     }
                   }
                 }

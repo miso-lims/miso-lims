@@ -547,7 +547,14 @@ public class SQLSampleDAO implements SampleStore {
       if (isCacheEnabled() && lookupCache(cacheManager) != null) {
         Element element;
         if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
-          return (Sample)element.getObjectValue();
+          log.info("Cache hit on map for sample " + id);
+          log.info("Cache hit on map for sample with element " + element);
+          Sample sample = (Sample)element.getObjectValue();
+          if (sample.getId() == 0){
+             DbUtils.updateCaches(lookupCache(cacheManager),id);
+          } else {
+            return (Sample) element.getObjectValue();
+          }
         }
       }
 

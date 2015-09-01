@@ -27,25 +27,18 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
-import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 /**
- * com.eaglegenomics.miso.web
- * <p/>
- * Info
+ * Controller for listing libraries
  *
  * @author Rob Davey
  * @since 0.0.2
@@ -55,23 +48,15 @@ public class ListLibrariesController {
   protected static final Logger log = LoggerFactory.getLogger(ListLibrariesController.class);
 
   @Autowired
-  private SecurityManager securityManager;
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
-
-  @Autowired
   private RequestManager requestManager;
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
   }
 
+  @Deprecated
   @RequestMapping(value = "/libraries/rest/", method = RequestMethod.GET)
-  public
-  @ResponseBody
-  Collection<Library> jsonRest() throws IOException {
+  public @ResponseBody Collection<Library> jsonRest() throws IOException {
     return requestManager.listAllLibraries();
   }
 

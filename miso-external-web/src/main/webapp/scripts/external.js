@@ -101,5 +101,5 @@ function ldapPasswordHash(password){
 }
 
 function jdbcPasswordHash(password){
-  return CryptoJS.SHA1(password);
+  return CryptoJS.SHA1(password).toString();
 }

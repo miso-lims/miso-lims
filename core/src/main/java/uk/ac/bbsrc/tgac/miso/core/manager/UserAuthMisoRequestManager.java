@@ -484,6 +484,13 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
+  public Project getProjectByAlias(String projectAlias) throws IOException {
+    Project o = super.getProjectByAlias(projectAlias);
+    if (readCheck(o)) return o;
+    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Project " + projectAlias);
+  }
+
+  @Override
   public ProjectOverview getProjectOverviewById(long overviewId) throws IOException {
     ProjectOverview o = super.getProjectOverviewById(overviewId);
     if (readCheck(o.getProject())) return o;

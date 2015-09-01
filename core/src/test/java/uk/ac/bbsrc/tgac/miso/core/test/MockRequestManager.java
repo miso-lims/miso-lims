@@ -357,6 +357,11 @@ public class MockRequestManager implements RequestManager {
   }
 
   @Override
+  public Project getProjectByAlias(String projectAlias) throws IOException {
+    return new ProjectImpl();
+  }
+
+  @Override
   public ProjectOverview getProjectOverviewById(long overviewId) throws IOException {
     return new ProjectOverview();
   }
