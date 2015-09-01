@@ -55,10 +55,10 @@
     <tr>
       <th>Name</th>
       <th>Description</th>
+      <th>Stock Level</th>
       <th>Version</th>
       <th>Manufacturer</th>
       <th>Part Number</th>
-      <th>Stock Level</th>
       <th>Type</th>
       <th>Platform</th>
       <%-- GLT-201: Comment to remove 'Edit Column' --%>
@@ -72,10 +72,10 @@
             onclick="window.location.href='<c:url value="/miso/kitdescriptor/${sequencing.kitDescriptorId}"/>'">
             <b>${sequencing.name}</b></td>
         <td>${sequencing.description}</td>
+        <td>${sequencing.stockLevel}</td>
         <td>${sequencing.version}</td>
         <td>${sequencing.manufacturer}</td>
         <td>${sequencing.partNumber}</td>
-        <td>${sequencing.stockLevel}</td>
         <td>${sequencing.kitType.key}</td>
         <td>${sequencing.platformType.key}</td>
         <%-- GLT-201: Comment to remove 'Edit Column' --%>
@@ -127,10 +127,11 @@
     <thead>
     <tr>
       <th>Name</th>
+      <th>Description</th>
+      <th>Stock Level</th>
       <th>Version</th>
       <th>Manufacturer</th>
       <th>Part Number</th>
-      <th>Stock Level</th>
       <th>Type</th>
       <th>Platform</th>
       <%-- GLT-201: Comment to remove 'Edit Column' --%>
@@ -143,10 +144,11 @@
         <td class="misoicon"
             onclick="window.location.href='<c:url value="/miso/kitdescriptor/${sequencing.kitDescriptorId}"/>'">
             <b>${empcr.name}</b></td> 
+        <td>${empcr.description}</td>
+        <td>${empcr.stockLevel}</td>
         <td>${empcr.version}</td>
         <td>${empcr.manufacturer}</td>
         <td>${empcr.partNumber}</td>
-        <td>${empcr.stockLevel}</td>
         <td>${empcr.kitType.key}</td>
         <td>${empcr.platformType.key}</td>
         <%-- GLT-201: Comment to remove 'Edit Column' --%>
@@ -199,10 +201,11 @@
     <thead>
     <tr>
       <th>Name</th>
+      <th>Description</th>
+      <th>Stock Level</th>
       <th>Version</th>
       <th>Manufacturer</th>
       <th>Part Number</th>
-      <th>Stock Level</th>
       <th>Type</th>
       <th>Platform</th>
       <%-- GLT-201: Comment to remove 'Edit Column' --%>
@@ -215,10 +218,11 @@
         <td class="misoicon"
             onclick="window.location.href='<c:url value="/miso/kitdescriptor/${library.kitDescriptorId}"/>'">
           <b>${library.name}</b></td>
+        <td>${library.description}</td>
+        <td>${library.stockLevel}</td>
         <td>${library.version}</td>
         <td>${library.manufacturer}</td>
         <td>${library.partNumber}</td>
-        <td>${library.stockLevel}</td>
         <td>${library.kitType.key}</td>
         <td>${library.platformType.key}</td>
         <%-- GLT-201: Comment to remove 'Edit Column' --%>
@@ -271,10 +275,11 @@
     <thead>
     <tr>
       <th>Name</th>
+      <th>Description</th>
+      <th>Stock Level</th>
       <th>Version</th>
       <th>Manufacturer</th>
       <th>Part Number</th>
-      <th>Stock Level</th>
       <th>Type</th>
       <th>Platform</th>
       <%-- GLT-201: Comment to remove 'Edit Column' --%>
@@ -287,10 +292,11 @@
         <td class="misoicon"
             onclick="window.location.href='<c:url value="/miso/kitdescriptor/${clustering.kitDescriptorId}"/>'">
           <b>${clustering.name}</b></td>
+        <td>${clustering.description}</td>
+        <td>${clustering.stockLevel}</td>
         <td>${clustering.version}</td>
         <td>${clustering.manufacturer}</td>
         <td>${clustering.partNumber}</td>
-        <td>${clustering.stockLevel}</td>
         <td>${clustering.kitType.key}</td>
         <td>${clustering.platformType.key}</td>
         <%-- GLT-201: Comment to remove 'Edit Column' --%>
@@ -342,10 +348,11 @@
     <thead>
     <tr>
       <th>Name</th>
+      <th>Description</th>
+      <th>Stock Level</th>
       <th>Version</th>
       <th>Manufacturer</th>
       <th>Part Number</th>
-      <th>Stock Level</th>
       <th>Type</th>
       <th>Platform</th>
       <%-- GLT-201: Comment to remove 'Edit Column' --%>
@@ -358,10 +365,11 @@
         <td class="misoicon"
             onclick="window.location.href='<c:url value="/miso/kitdescriptor/${multiplexing.kitDescriptorId}"/>'">
           <b>${multiplexing.name}</b></td>
+        <td>${multiplexing.description}</td>
+        <td>${multiplexing.stockLevel}</td>
         <td>${multiplexing.version}</td>
         <td>${multiplexing.manufacturer}</td>
         <td>${multiplexing.partNumber}</td>
-        <td>${multiplexing.stockLevel}</td>
         <td>${multiplexing.kitType.key}</td>
         <td>${multiplexing.platformType.key}</td>
         <%-- GLT-201: Comment to remove 'Edit Column' --%>
@@ -399,11 +407,21 @@
     });
 
     function writeTotalNo() {
-      jQuery('#SequencingtotalCount').html(jQuery('#table1>tbody>tr:visible').length.toString() + " Sequencing Kit");
-      jQuery('#EMPCRtotalCount').html(jQuery('#table2>tbody>tr:visible').length.toString() + " EMPCR Kit");
-      jQuery('#LibrarytotalCount').html(jQuery('#table3>tbody>tr:visible').length.toString() + " Library Kit");
-      jQuery('#ClusteringtotalCount').html(jQuery('#table4>tbody>tr:visible').length.toString() + " Clustering Kit");
-      jQuery('#MultiplexingtotalCount').html(jQuery('#table5>tbody>tr:visible').length.toString() + " Multiplexing Kit");
+      var seqNum = jQuery('#table1>tbody>tr').length;
+      var empcrNum = jQuery('#table2>tbody>tr').length;
+      var libNum = jQuery('#table3>tbody>tr').length;
+      var clusNum = jQuery('#table4>tbody>tr').length;
+      var multiNum = jQuery('#table5>tbody>tr').length;
+      
+      var pluralize = function(number) {
+        return (number == 1) ? "" : "s";
+      }
+      
+      jQuery('#SequencingtotalCount').html(seqNum.toString() + " Sequencing Kit" + pluralize(seqNum));
+      jQuery('#EMPCRtotalCount').html(empcrNum.toString() + " EMPCR Kit" + pluralize(empcrNum));
+      jQuery('#LibrarytotalCount').html(libNum.toString() + " Library Kit" + pluralize(libNum));
+      jQuery('#ClusteringtotalCount').html(clusNum.toString() + " Clustering Kit" + pluralize(clusNum));
+      jQuery('#MultiplexingtotalCount').html(multiNum.toString() + " Multiplexing Kit" + pluralize(multiNum));
     }
   </script>
 </div>
