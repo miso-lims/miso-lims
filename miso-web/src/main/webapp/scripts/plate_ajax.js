@@ -327,7 +327,7 @@ createPlateElementsTable: function (plateId) {
           { "sTitle": "Alias"},
           { "sTitle": "Barcode Kit"},
           { "sTitle": "Barcode Sequence"}
-          //{ "sTitle": "Edit"}
+          //{ "sTitle": "Edit"} // TODO: GLT-201
         ],
           "bJQueryUI": true,
           "iDisplayLength": 25,
