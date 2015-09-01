@@ -32,7 +32,7 @@
           </span>
        </div>
     </nav>
-    <form id="filter-form">Filter: <input name="filter" id="filter" value="" maxlength="30" size="30" type="text">
+    <form id="filter-form">Filter: <input name="filter" id="filter" value="" maxlength="30" size="30" type="text" class="form-control">
     </form>
     <br/>
     <a href="<c:url value="/miso/submission/new"/>" class="add">Create Submission</a>

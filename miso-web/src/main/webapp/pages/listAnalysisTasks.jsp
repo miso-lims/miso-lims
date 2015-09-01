@@ -34,13 +34,14 @@
   <div id="tab-1">
     <i>This page needs to be refreshed manually</i>
 
-    <nav class="navbar navbar-default" role="navigation">
-       <div class="navbar-header">
-          <span class="navbar-brand navbar-center">
-            Running Jobs
-          </span>
-       </div>
-    </nav>
+    <div id="runningDiv" class="panel panel-default padded-panel">
+      <nav class="navbar navbar-default" role="navigation">
+         <div class="navbar-header">
+            <span class="navbar-brand navbar-center">
+              Running Jobs
+            </span>
+         </div>
+      </nav>
 
       <table id="runningTasks" class="table table-bordered table-striped">
         <thead>
@@ -57,14 +58,14 @@
       </table>
     </div>
 
-    <nav class="navbar navbar-default" role="navigation">
-       <div class="navbar-header">
-          <span class="navbar-brand navbar-center">
-            Pending Jobs
-          </span>
-       </div>
-    </nav>
-
+    <div id="pendingDiv" class="panel panel-default padded-panel">
+      <nav class="navbar navbar-default" role="navigation">
+         <div class="navbar-header">
+            <span class="navbar-brand navbar-center">
+              Pending Jobs
+            </span>
+         </div>
+      </nav>
 
       <table id="pendingTasks" class="table table-bordered table-striped">
         <thead>
@@ -80,14 +81,14 @@
       </table>
     </div>
 
-    <nav class="navbar navbar-default" role="navigation">
-       <div class="navbar-header">
-          <span class="navbar-brand navbar-center">
-            Completed Jobs
-          </span>
-       </div>
-    </nav>
-
+    <div id="completedDiv" class="panel panel-default padded-panel">
+      <nav class="navbar navbar-default" role="navigation">
+         <div class="navbar-header">
+            <span class="navbar-brand navbar-center">
+              Completed Jobs
+            </span>
+         </div>
+      </nav>
 
       <table id="completedTasks" class="table table-bordered table-striped">
         <thead>
@@ -105,14 +106,14 @@
       </table>
     </div>
 
-    <nav class="navbar navbar-default" role="navigation">
-       <div class="navbar-header">
-          <span class="navbar-brand navbar-center">
-            Failed Jobs
-          </span>
-       </div>
-    </nav>
-
+    <div id="failedDiv" class="panel panel-default padded-panel">
+      <nav class="navbar navbar-default" role="navigation">
+         <div class="navbar-header">
+            <span class="navbar-brand navbar-center">
+              Failed Jobs
+            </span>
+         </div>
+      </nav>
 
       <table id="failedTasks" class="table table-bordered table-striped">
         <thead>
@@ -130,60 +131,23 @@
   </div>
 
   <div id="tab-2">
-    <nav class="navbar navbar-default" role="navigation">
-       <div class="navbar-header">
-          <span class="navbar-brand navbar-center">
-            Available Pipelines
-          </span>
-       </div>
-    </nav>
+    <div id="pipelineDiv" class="panel panel-default padded-panel">
+      <nav class="navbar navbar-default" role="navigation">
+         <div class="navbar-header">
+            <span class="navbar-brand navbar-center">
+              Available Pipelines
+            </span>
+         </div>
+      </nav>
 
-    <table id="pipelines" class="list">
-      <thead>
-      <tr>
-        <th>Pipeline Name</th>
-        <th>Processes</th>
-      </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
-
-  <%--
-      <h1>Running Jobs</h1>
-      <table class="list">
-        <c:forEach items="${running}" var="task">
-          <tr>
-            <td>
-              <b>${task.name}</b>
-            </td>
-            <td class="fit"><a href='<c:url value="/miso/task/${task.taskId}"/>'>View</a></td>
-          </tr>
-        </c:forEach>
-      </table>
-
-      <h1>Pending Jobs</h1>
-      <table class="list">
-        <c:forEach items="${pending}" var="task">
-          <tr>
-            <td>
-              <b>${task.name}</b>
-            </td>
-            <td class="fit"><a href='<c:url value="/miso/task/${task.taskId}"/>'>View</a></td>
-          </tr>
-        </c:forEach>
-      </table>
-
-      <h1>Completed Jobs</h1>
-      <table class="list">
-        <c:forEach items="${complete}" var="task">
-          <tr>
-            <td>
-              <b>${task.name}</b>
-            </td>
-            <td class="fit"><a href='<c:url value="/miso/task/${task.taskId}"/>'>View</a></td>
-          </tr>
-        </c:forEach>
+      <table id="pipelines" class="table table-bordered table-striped">
+        <thead>
+        <tr>
+          <th>Pipeline Name</th>
+          <th>Processes</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
       </table>
     </div>
   </div>

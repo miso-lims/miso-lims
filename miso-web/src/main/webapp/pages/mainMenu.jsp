@@ -27,20 +27,23 @@
 <link href="<c:url value='/scripts/jquery/dateslider/iThing.css'/>" rel="stylesheet" type="text/css">
 
 <div id="maincontent">
-    <div id="contentcolumn">
-      <nav class="navbar navbar-default" role="navigation">
-         <div class="navbar-header">
-            <span class="navbar-brand navbar-center">
-              Dashboard
-            </span>
-         </div>
-      </nav>
-        <%--
-          <div id="alertbox">
-            <fieldset class="alertwidget">
-              <legend>Alerts</legend>
-             <div id="alertList" class="elementList"><i style="color: gray">No unread alerts</i></div>
-            </fieldset>
+  <div id="contentcolumn">
+    <div class="row-fluid">
+      <div class="col-sm-12 col-md-6 small-pad"> <!-- left hand side -->
+        <div class="row-fluid">
+          <h3 class="page-header header-margin">Project Management
+            <i class="fa fa-sitemap fa-2x header-icon pull-left"></i>
+          </h3>
+          <div class="col-sm-6 col-md-6 col-lg-6 small-pad"> <!-- left hand side -->
+            <div class="panel panel-primary panel-dashboard">
+              <div class="panel-heading">
+                <h3 class="panel-title float-left">Projects</h3>
+                <input type="text" size="20" id="searchProject" name="searchProject" class="form-control float-right"/>
+              </div>
+              <div class="panel-body">
+                <div id="searchProjectresult" class="list-group"></div>
+              </div>
+            </div>
           </div>
 
           <div class="col-sm-6 col-md-6 col-lg-6 small-pad"> <!-- right hand side -->

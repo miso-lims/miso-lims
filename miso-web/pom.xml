@@ -95,7 +95,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-war-plugin</artifactId>
-            <version>2.3</version>
+            <version>${war-plugin-version}</version>
             <configuration>
               <webResources>
                 <resource>
@@ -149,7 +149,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-war-plugin</artifactId>
-            <version>2.3</version>
+            <version>${war-plugin-version}</version>
             <configuration>
               <webResources>
                 <resource>
@@ -202,7 +202,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-war-plugin</artifactId>
-            <version>2.3</version>
+            <version>${war-plugin-version}</version>
             <configuration>
               <webResources>
                 <resource>
@@ -550,6 +550,7 @@
 
   </dependencies>
   <properties>
+    <war-plugin-version>2.4</war-plugin-version>
     <jdom-version>1.1</jdom-version>
     <jstl-version>1.2</jstl-version>
     <javassist-version>3.8.0.GA</javassist-version>

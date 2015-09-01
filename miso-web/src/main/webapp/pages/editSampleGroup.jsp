@@ -98,7 +98,7 @@
           <td>
             <form:select path="parent">
               <form:option value="0" label="Select..."/>
-              <form:options items="${workflows}" itemLabel="definition.name" itemValue="id"/>
+              <form:options items="${workflows}" itemLabel="workflowDefinition.name" itemValue="id"/>
             </form:select>
           </td>
         </tr>

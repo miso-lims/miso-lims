@@ -477,7 +477,7 @@ Run.container = {
 
   populatePartition: function (t, containerNum, partitionNum) {
     var a = jQuery(t);
-    a.html("<input type='text' style='width:90%' id='poolBarcode" + partitionNum + "' name='poolBarcode" + partitionNum + "' partition='" + partitionNum + "' class='form-control'/><button onclick='Run.container.clearPartition("+partitionNum+")' type='button' class='fg-button ui-state-default ui-corner-all'>Cancel</button><br/><span id='msg" + partitionNum + "'/>");
+    a.html("<input type='text' style='width:90%' id='poolBarcode" + partitionNum + "' name='poolBarcode" + partitionNum + "' partition='" + partitionNum + "' class='form-control'/><button type='button' class='btn btn-default' onclick='Run.container.clearPartition("+partitionNum+");'>Cancel</button><br/><span id='msg" + partitionNum + "'/>");
 
     Utils.ui.escape(jQuery("#poolBarcode" + partitionNum), function () {
       a.html("");

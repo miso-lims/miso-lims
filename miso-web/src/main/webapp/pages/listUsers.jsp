@@ -34,7 +34,7 @@
          </div>
       </nav>
 
-      <table class="list">
+      <table class="table table-bordered table-striped">
         <thead>
         <tr>
           <th>Username</th>
@@ -57,20 +57,26 @@
     </sec:authorize>
 
     <nav class="navbar navbar-default" role="navigation">
-       <div class="navbar-header">
-          <span class="navbar-brand navbar-center">
-            <div id="totalCount"> Users</div>
-          </span>
-       </div>
+      <div class="navbar-header">
+        <span class="navbar-brand navbar-center">
+          <div>${fn:length(users)} Users</div>
+        </span>
+      </div>
+      <div class="collapse navbar-collapse bs-example-js-navbar-collapse">
+        <ul class="nav navbar-nav navbar-right">
+          <li id="pro-menu" class="dropdown">
+            <a id="pro-drop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Options <b class="caret"></b></a>
+            <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="pro-drop1">
+              <sec:authorize access="hasRole('ROLE_ADMIN')">
+              <li role="presentation"><a href="<c:url value="/miso/admin/user/new"/>">Add User</a></li>
+              </sec:authorize>
+            </ul>
+          </li>
+        </ul>
+      </div>
     </nav>
-    <form id="filter-form">Filter: <input name="filter" id="filter" value="" maxlength="30" size="30" type="text">
-    </form>
-    <br/>
-    <sec:authorize access="hasRole('ROLE_ADMIN')">
-      <a href="<c:url value="/miso/admin/user/new"/>" class="add">Add User</a>
-    </sec:authorize>
-    <br/>
-    <table class="list" id="table">
+
+    <table class="table table-bordered table-striped display" id="table">
       <thead>
       <tr>
         <th class="fit">User ID</th>

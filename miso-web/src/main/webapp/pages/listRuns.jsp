@@ -40,7 +40,7 @@
           </span>
        </div>
     </nav>
-    <table cellpadding="0" cellspacing="0" border="0" class="display" id="listingRunsTable">
+    <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered display" id="listingRunsTable">
     </table>
     <script type="text/javascript">
       jQuery(document).ready(function () {

@@ -53,7 +53,7 @@
          </div>
       </nav>
 
-      <form id="filter-form">Filter: <input name="filter" id="filter" value="" maxlength="30" size="30" type="text">
+      <form id="filter-form">Filter: <input name="filter" id="filter" value="" maxlength="30" size="30" type="text" class="form-control">
       </form>
       <br/>
 
@@ -132,7 +132,7 @@
            </div>
         </nav>
 
-        <table class="list" id="runStatusTable">
+        <table class="table table-bordered table-striped" id="runStatusTable">
           <thead>
           <tr>
             <th>Run Name</th>

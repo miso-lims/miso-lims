@@ -46,6 +46,7 @@
         <th>Creation Date</th>
         <th>Size</th>
         <th>Material Type</th>
+        <th>Tag Barcode</th>
         <th class="fit">Edit</th>
       </tr>
       </thead>
@@ -57,6 +58,7 @@
           <td>${plate.creationDate}</td>
           <td>${plate.size}</td>
           <td>${plate.plateMaterialType}</td>
+          <td>${plate.tagBarcode.sequence}</td>
           <td class="misoicon"
               onclick="window.location.href='<c:url value="/miso/plate/${plate.id}"/>'"><span
               class="fa fa-pencil-square-o fa-lg"/></td>

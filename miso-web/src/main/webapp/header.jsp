@@ -45,29 +45,52 @@
   <jsp:useBean id="timestamp" class="java.util.Date" scope="request"/>
 
   <!-- jQuery -->
-  <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery-1.8.3.min.js'/>"></script>
-  <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery-ui-1.9.2.custom.min.js'/>"></script>
-  <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.simplyCountable.js'/>"></script>
-  <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.tinysort.min.js'/>"></script>
-  <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.typewatch.js'/>"></script>
-  <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.uitablefilter.js'/>"></script>
-  <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.validate.min.js'/>"></script>
-  <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.tablesorter.min.js'/>"></script>
-  <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.metadata.js'/>"></script>
+  <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery-1.11.1.min.js'/>"></script>
+  <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery-migrate-1.2.1-min.js'/>"></script>
+  <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery-ui-1.9.2.custom.min.js?ts=${timestamp.time}'/>"></script>
+
+  <!-- bootstrap -->
+  <script src="<c:url value='/scripts/bootstrap/bootstrap.min.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
+  <link href="<c:url value='/scripts/bootstrap/css/bootstrap.min.css'/>" rel="stylesheet" type="text/css">
+
+  <!-- fonts awesome icons -->
+  <link href="<c:url value='/styles/font-awesome/css/font-awesome.css'/>" rel="stylesheet">
+  <link href="<c:url value='/styles/css/plugins/timeline/timeline.css'/>" rel="stylesheet">
+  <link href="<c:url value='/styles/css/sb-admin.css'/>" rel="stylesheet">
+
+  <!-- datatables -->
+  <script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
+  <link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>">
+  <script src="<c:url value='/scripts/jquery/datatables/js/datatables.bootstrap.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
+  <link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/datatables.bootstrap.css'/>">
+  <script src="<c:url value='/scripts/datatables_utils.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
+  <script src="<c:url value='/scripts/natural_sort.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
+  <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.mini.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
+  <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.datepicker.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
+  <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.checkbox.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
+  <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.radio.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
+
+  <!-- jquery UI TOTDO remove all this eventually for bootstrap -->
+  <link rel="stylesheet" href="<c:url value='/scripts/jquery/css/smoothness/jquery-ui-1.9.2.custom.min.css'/>" type="text/css">
+  <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.simplyCountable.js?ts=${timestamp.time}'/>"></script>
+  <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.tinysort.min.js?ts=${timestamp.time}'/>"></script>
+  <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.typewatch.js?ts=${timestamp.time}'/>"></script>
+  <%-- <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.uitablefilter.js?ts=${timestamp.time}'/>"></script> --%>
+  <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.validate.min.js?ts=${timestamp.time}'/>"></script>
+  <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.tablesorter.min.js?ts=${timestamp.time}'/>"></script>
+  <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.metadata.js?ts=${timestamp.time}'/>"></script>
 
   <!-- colourbox overlay support -->
   <script type="text/javascript" src="<c:url value='/scripts/jquery/colorbox/jquery.colorbox-min-1.4.16.js'/>"></script>
-  <link rel="stylesheet" href="<c:url value='/scripts/jquery/css/smoothness/jquery-ui-1.9.2.custom.min.css'/>" type="text/css">
   <link rel="stylesheet" href="<c:url value='/scripts/jquery/colorbox/colorbox-1.4.16.css'/>" type="text/css">
 
-  <!-- bootstrap -->
-  <script src="<c:url value='/scripts/bootstrap/bootstrap.min.js'/>" type="text/javascript"></script>
-  <link href="<c:url value='/scripts/bootstrap/css/bootstrap.min.css'/>" rel="stylesheet" type="text/css">
-  <link href="<c:url value='/styles/style.css?ts=${timestamp.time}'/>" rel="stylesheet" type="text/css">
-  <link href="<c:url value='/styles/miso-bootstrap-compat.css'/>" rel="stylesheet" type="text/css">
+  <!-- select2 -->
+  <script src="<c:url value='/scripts/select2/select2.min.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
+  <link href="<c:url value='/scripts/select2/select2.css'/>" rel="stylesheet" type="text/css">
+  <link href="<c:url value='/scripts/select2/select2-bootstrap.css'/>" rel="stylesheet" type="text/css">
 
   <!-- fluxion AJAX library for Spring bean calls -->
-  <script type="text/javascript" src="<c:url value='/scripts/scriptaculous/prototype.js'/>"></script>
+  <script type="text/javascript" src="<c:url value='/scripts/scriptaculous/prototype.js?ts=${timestamp.time}'/>"></script>
   <script type="text/javascript" src="<c:url value='/scripts/fluxion-ajax/fluxion-ajax.js?ts=${timestamp.time}'/>"></script>
 
   <!-- D3.js for Graphics -->
@@ -90,6 +113,7 @@
   <script type="text/javascript" src="<c:url value='/scripts/project_ajax.js?ts=${timestamp.time}'/>"></script>
   <script type="text/javascript" src="<c:url value='/scripts/reporting_ajax.js?ts=${timestamp.time}'/>"></script>
   <script type="text/javascript" src="<c:url value='/scripts/run_ajax.js?ts=${timestamp.time}'/>"></script>
+  <script type="text/javascript" src="<c:url value='/scripts/sample_ajax.js?ts=${timestamp.time}'/>"></script>
   <script type="text/javascript" src="<c:url value='/scripts/sequencer_partition_container_ajax.js?ts=${timestamp.time}'/>"></script>
   <script type="text/javascript" src="<c:url value='/scripts/sequencer_reference_ajax.js?ts=${timestamp.time}'/>"></script>
   <script type="text/javascript" src="<c:url value='/scripts/study_ajax.js?ts=${timestamp.time}'/>"></script>
@@ -101,7 +125,7 @@
   <script type="text/javascript" src="<c:url value='/scripts/library_validation.js?ts=${timestamp.time}'/>"></script>
   <script type="text/javascript" src="<c:url value='/scripts/pool_validation.js?ts=${timestamp.time}'/>"></script>
   <script type="text/javascript" src="<c:url value='/scripts/project_validation.js?ts=${timestamp.time}'/>"></script>
-    <script type="text/javascript" src="<c:url value='/scripts/plate_validation.js?ts=${timestamp.time}'/>"></script>
+  <script type="text/javascript" src="<c:url value='/scripts/plate_validation.js?ts=${timestamp.time}'/>"></script>
   <script type="text/javascript" src="<c:url value='/scripts/run_validation.js?ts=${timestamp.time}'/>"></script>
   <script type="text/javascript" src="<c:url value='/scripts/sample_validation.js?ts=${timestamp.time}'/>"></script>
   <script type="text/javascript" src="<c:url value='/scripts/sequencer_partition_container_validation.js?ts=${timestamp.time}'/>"></script>
@@ -119,6 +143,10 @@
 
   <link rel="shortcut icon" href="<c:url value='/styles/images/favicon.ico'/>" type="image/x-icon"/>
 
+  <!-- miso stylez -->
+  <link href="<c:url value='/styles/style.css?ts=${timestamp.time}'/>" rel="stylesheet" type="text/css">
+  <link href="<c:url value='/styles/miso-bootstrap-compat.css'/>" rel="stylesheet" type="text/css">
+
   <!--IE check-->
   <script type="text/javascript">
     jQuery(document).ready(function () {
@@ -127,44 +155,6 @@
       }
     });
   </script>
-
-  <title>MISO LIMS <c:if test="${not empty title}">- ${title}</c:if></title>
-</head>
-
-<body>
-<table border="0" width="100%">
-  <tr>
-    <td class="headertable" align="left" onclick="window.location.href='<c:url value='/'/>'">
-      <img src="<c:url value='/styles/images/miso_bowl1_logo-tm.png'/>" alt="MISO Logo" name="logo"
-           border="0" id="misologo"/>
-    </td>
-    <td class="headertable" align="right" onclick="window.location.href='<c:url value='/'/>'">
-      <img src="<c:url value='/styles/images/brand_logo.png'/>" alt="Brand Logo" name="logo"
-           border="0" id="brandlogo"/>
-    </td>
-  </tr>
-</table>
-
-<div id="navtabs">
-  <sec:authorize access="isAuthenticated()">
-  <ul>
-    <li><a href="<c:url value="/miso/mainMenu"/>"><span>Home</span></a></li>
-    <li>
-      <a id="myAccountLink" href="<c:url value="/miso/myAccount"/>"><span id="myAccountSpan">My Account</span></a>
-    </li>
-    <li><a href="<c:url value="/miso/projects"/>"><span>My Projects</span></a></li>
-
-    <sec:authorize access="hasRole('ROLE_INTERNAL')">
-    <li><a href="<c:url value="/miso/analysis"/>"><span>Analysis</span></a></li>
-    <li><a href="<c:url value="/miso/flexreports"/>"><span>Reports</span></a></li>
-    </sec:authorize>
-
-    <li>
-      <a href="<c:url value="https://documentation.tgac.ac.uk/display/MISO/"/>"><span>Help</span></a>
-    </li>
-  </ul>
-  </sec:authorize>
-</div>
 
   <title>MISO LIMS <c:if test="${not empty title}">- ${title}</c:if></title>
 </head>
@@ -184,8 +174,40 @@
 </div>
 <!-- /.navbar-header -->
 <sec:authorize access="isAuthenticated()">
-  <div id="loggedInBanner">Logged in as:
-    <b id="currentUser"><sec:authentication property="principal.username"/></b> | <a href="<c:url value="/j_spring_security_logout"/>">Logout</a></div>
+   <ul class="nav navbar-top-links navbar-right">
+     <li class="dropdown">
+      <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+        <i class="fa fa-tasks fa-fw"></i> <i class="fa fa-caret-down"></i>
+      </a>
+      <ul class="dropdown-menu dropdown-tasks">
+        <li role="presentation" class="dropdown-header">Management</li>
+        <li role="presentation"><a href="<c:url value="/miso/analysis"/>"><i class="fa fa-gears fa-fw"></i> Analysis</a></li>
+        <li role="presentation"><a href="<c:url value="/miso/flexreports"/>"><i class="fa fa-sliders fa-fw"></i> Reports</a></li>
+      </ul>
+    </li>
+    <li class="dropdown">
+      <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+        <i class="fa fa-bell fa-fw"></i> <i class="fa fa-caret-down"></i>
+        <span id="alertMenuDropdown"></span>
+      </a>
+      <ul class="dropdown-menu dropdown-alerts" id="alertList"></ul>
+    </li>
+
+    <li class="dropdown">
+      <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+        <i class="fa fa-user fa-fw"></i>  <i class="fa fa-caret-down"></i>
+      </a>
+      <ul class="dropdown-menu dropdown-user">
+        <sec:authorize access="isAuthenticated()">
+          <li id="currentUser" role="presentation" class="dropdown-header"><sec:authentication property="principal.username"/></li>
+          <li><a href="<c:url value="/miso/myAccount"/>"><i class="fa fa-gear fa-fw"></i> My Account</a></li>
+          <li><a target="_blank" href="https://documentation.tgac.ac.uk/display/MISO/MISO+0.2.0+User+Manual"><i class="fa fa-question fa-fw"></i> Help</a></li>
+          <li class="divider"></li>
+          <li><a href="<c:url value="/j_spring_security_logout"/>"><i class="fa fa-sign-out fa-fw"></i> Logout</a></li>
+        </sec:authorize>
+      </ul>
+    </li>
+  </ul>
 </sec:authorize>
 </nav>
 
