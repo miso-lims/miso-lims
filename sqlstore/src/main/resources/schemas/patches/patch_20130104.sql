@@ -1,4 +1,3 @@
-USE lims;
 
 DROP TABLE IF EXISTS `Pool_Elements`;
 

@@ -456,10 +456,19 @@ Run.container = {
 
   populatePartition: function (t, containerNum, partitionNum) {
     var a = jQuery(t);
-    a.html("<input type='text' id='poolBarcode" + partitionNum + "' name='poolBarcode" + partitionNum + "' partition='" + partitionNum + "'/><br/><span id='msg" + partitionNum + "'/>");
+    a.html("<input type='text' style='width:90%' id='poolBarcode" + partitionNum + "' name='poolBarcode" + partitionNum + "' partition='" + partitionNum + "'/><button onclick='Run.container.clearPartition("+partitionNum+")' type='button' class='fg-button ui-state-default ui-corner-all'>Cancel</button><br/><span id='msg" + partitionNum + "'/>");
+
+    Utils.ui.escape(jQuery("#poolBarcode" + partitionNum), function () {
+      a.html("");
+    });
+
     Utils.timer.typewatchFunc(jQuery("#poolBarcode" + partitionNum), function () {
       Run.pool.getPool(jQuery("#poolBarcode" + partitionNum), containerNum)
     }, 300, 2);
+  },
+
+  clearPartition: function (partitionNum) {
+    jQuery("#poolBarcode" + partitionNum).parent().html("");
   },
 
   insertPoolNextAvailable: function (poolLi) {

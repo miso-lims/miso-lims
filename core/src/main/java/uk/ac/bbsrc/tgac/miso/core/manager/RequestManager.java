@@ -110,6 +110,7 @@ public interface RequestManager {
   public Note getNoteById(long noteId) throws IOException;
   public Platform getPlatformById(long platformId) throws IOException;
   public Project getProjectById(long projectId) throws IOException;
+  public Project getProjectByAlias(String projectAlias) throws IOException;
   public ProjectOverview getProjectOverviewById(long overviewId) throws IOException;
   public Run getRunById(long runId) throws IOException;
   public Run getRunByAlias(String alias) throws IOException;

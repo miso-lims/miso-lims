@@ -164,7 +164,7 @@ public interface Sample extends SecurableByProfile, Submittable<Document>, Barco
    *
    * @return Project project.
    */
-  @JsonBackReference(value="project")
+  //@JsonBackReference(value="project")
   public Project getProject();
 
   /**

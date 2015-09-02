@@ -80,6 +80,9 @@ public class SQLProjectDAO implements ProjectStore {
   public static final String PROJECT_SELECT_BY_ID =
           PROJECTS_SELECT + " WHERE projectId = ?";
 
+  public static final String PROJECT_SELECT_BY_ALIAS =
+          PROJECTS_SELECT + " WHERE alias = ?";
+
   public static final String PROJECTS_SELECT_BY_SEARCH =
           PROJECTS_SELECT + " WHERE " +
           "name LIKE ? OR " +
@@ -585,6 +588,12 @@ public class SQLProjectDAO implements ProjectStore {
   public List<Project> listBySearch(String query) {
     String mySQLQuery = "%" + query.replaceAll("_", Matcher.quoteReplacement("\\_")) + "%";
     return template.query(PROJECTS_SELECT_BY_SEARCH, new Object[]{mySQLQuery,mySQLQuery,mySQLQuery}, new ProjectMapper(true));
+  }
+
+  @Override
+  public Project getByAlias(String alias) throws IOException {
+    List<Project> eResults = template.query(PROJECT_SELECT_BY_ALIAS, new Object[]{alias}, new ProjectMapper());
+    return eResults.size() > 0 ? eResults.get(0) : null;
   }
 
   public Project getByStudyId(long studyId) throws IOException {
