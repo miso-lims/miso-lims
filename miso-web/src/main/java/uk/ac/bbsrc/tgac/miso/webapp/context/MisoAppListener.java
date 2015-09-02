@@ -321,6 +321,9 @@ public class MisoAppListener implements ServletContextListener {
       }
     }
 
+    String analysisServerEnabled = misoProperties.get("miso.analysis.server.enabled");
+    context.getServletContext().setAttribute("analysisServerEnabled", Boolean.parseBoolean(analysisServerEnabled));
+
     if ("true".equals(misoProperties.get("miso.statsdb.enabled"))) {
       try {
         JndiObjectFactoryBean jndiBean = new JndiObjectFactoryBean();

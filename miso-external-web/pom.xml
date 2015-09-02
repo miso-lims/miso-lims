@@ -40,9 +40,9 @@
             <configuration>
               <artifactItems>
                 <artifactItem>
-                  <groupId>net.sourceforge.fluxion.ajax</groupId>
+                  <groupId>uk.ac.tgac.fluxion.ajax</groupId>
                   <artifactId>fluxion-ajax-js</artifactId>
-                  <version>1.0-alpha-12</version>
+                  <version>1.0</version>
                   <type>jar</type>
                   <overWrite>true</overWrite>
                 </artifactItem>
@@ -143,19 +143,19 @@
     </dependency>
 
     <dependency>
-      <groupId>net.sourceforge.fluxion.ajax</groupId>
+      <groupId>uk.ac.tgac.fluxion.ajax</groupId>
       <artifactId>fluxion-ajax-3</artifactId>
-      <version>1.0-alpha-4</version>
+      <version>1.0</version>
     </dependency>
     <dependency>
-      <groupId>net.sourceforge.fluxion.ajax</groupId>
+      <groupId>uk.ac.tgac.fluxion.ajax</groupId>
       <artifactId>fluxion-ajax-js</artifactId>
-      <version>1.0-alpha-12</version>
+      <version>1.0</version>
     </dependency>
     <dependency>
-      <groupId>net.sourceforge.fluxion.ajax.beans</groupId>
+      <groupId>uk.ac.tgac.fluxion.ajax.beans</groupId>
       <artifactId>fluxion-ajax-beans</artifactId>
-      <version>1.0-alpha-3</version>
+      <version>1.0</version>
     </dependency>
 
     <dependency>

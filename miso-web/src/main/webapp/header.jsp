@@ -181,7 +181,9 @@
       </a>
       <ul class="dropdown-menu dropdown-tasks">
         <li role="presentation" class="dropdown-header">Management</li>
-        <li role="presentation"><a href="<c:url value="/miso/analysis"/>"><i class="fa fa-gears fa-fw"></i> Analysis</a></li>
+        <c:if test="${sessionScope.analysisServerEnabled}">
+          <li role="presentation"><a href="<c:url value="/miso/analysis"/>"><i class="fa fa-gears fa-fw"></i> Analysis</a></li>
+        </c:if>
         <li role="presentation"><a href="<c:url value="/miso/flexreports"/>"><i class="fa fa-sliders fa-fw"></i> Reports</a></li>
       </ul>
     </li>

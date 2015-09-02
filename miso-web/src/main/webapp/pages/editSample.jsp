@@ -241,8 +241,8 @@
       <td><form:input path="scientificName" class="form-control"/>
         <c:if test="${sessionScope.taxonLookupEnabled}">
         <script>Utils.timer.typewatchFunc(jQuery('#scientificName'), validate_ncbi_taxon, 1000, 2);</script>
+        </c:if>
       </td>
-      </c:if>
         <%--<td><a href="void(0);" onclick="popup('help/sampleScientificName.html');">Help</a></td>--%>
     </tr>
     <c:if test="${not empty sample.accession}">
