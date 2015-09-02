@@ -123,7 +123,7 @@
             <a onmouseover="mopen('locationBarcodeMenu')" onmouseout="mclosetime()">
               <span style="float:right; margin-top:6px;" class="ui-icon ui-icon-triangle-1-s"></span>
               <span id="locationBarcode" style="float:right; margin-top:6px; padding-bottom: 11px;">
-                  ${sample.locationBarcode}
+                  ${library.locationBarcode}
               </span>
             </a>
 
