@@ -326,7 +326,7 @@ createPlateElementsTable: function (plateId) {
           { "sTitle": "Name", "sType": "no-pla"},
           { "sTitle": "Alias"},
           { "sTitle": "Barcode Kit"},
-          { "sTitle": "Barcode Sequence"}
+          { "sTitle": "Barcode Sequence"},
           { "sTitle": "Edit"} // TODO: GLT-201
         ],
           "bJQueryUI": true,
@@ -424,4 +424,4 @@ exportSampleForm: function (){
   Utils.ui.reenableButton("exportSampleForm", "Export Excel");
 }
 
-};};
+};
