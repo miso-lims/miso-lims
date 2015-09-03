@@ -398,7 +398,10 @@ public class SQLLibraryDAO implements LibraryStore {
         if (libraryNamingScheme.validateField("name", library.getName()) && libraryNamingScheme.validateField("alias", library.getAlias())) {
           params.addValue("libraryId", library.getId())
                 .addValue("name", library.getName())
-                .addValue("identificationBarcode", library.getName() + "::" + library.getAlias());
+                .addValue("alias", library.getAlias())
+                .addValue("description", library.getDescription())
+                .addValue("identificationBarcode", library.getName() + "::" + library.getAlias())
+                .addValue("locationBarcode", library.getLocationBarcode());
           NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
           namedTemplate.update(LIBRARY_UPDATE, params);
         }
