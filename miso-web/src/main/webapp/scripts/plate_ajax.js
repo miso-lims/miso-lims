@@ -119,7 +119,7 @@ showPlateLocationChangeDialog: function (plateId) {
   .html("<form>" +
     "<fieldset class='dialog'>" +
     "<label for='notetext'>New Location:</label>" +
-    "<input type='text' name='locationBarcode' id='locationBarcode' class='text ui-widget-content ui-corner-all'/>" +
+    "<input type='text' name='locationBarcodeInput' id='locationBarcodeInput' class='text ui-widget-content ui-corner-all'/>" +
     "</fieldset></form>");
 
   jQuery(function() {
@@ -130,7 +130,7 @@ showPlateLocationChangeDialog: function (plateId) {
       resizable: false,
       buttons: {
         "Save": function() {
-          self.changePlateLocation(plateId, jQuery('#locationBarcode').val());
+          self.changePlateLocation(plateId, jQuery('#locationBarcodeInput').val());
           jQuery(this).dialog('close');
         },
         "Cancel": function() {
@@ -424,4 +424,4 @@ exportSampleForm: function (){
   Utils.ui.reenableButton("exportSampleForm", "Export Excel");
 }
 
-};
+};};

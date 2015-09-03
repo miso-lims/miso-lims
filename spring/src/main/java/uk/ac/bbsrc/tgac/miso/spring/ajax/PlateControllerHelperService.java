@@ -187,11 +187,14 @@ public class PlateControllerHelperService {
 
     try {
       String newLocation = LimsUtils.lookupLocation(locationBarcode);
-      if (newLocation != null) {
+      if (newLocation != "") {
         User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
         //Plate<LinkedList<Plateable>, Plateable> plate = requestManager.<LinkedList<Plateable>, Plateable> getPlateById(plateId);
         Plate<? extends List<? extends Plateable>, ? extends Plateable> plate = requestManager.getPlateById(plateId);
-        plate.setLocationBarcode(locationBarcode);
+        String oldLocation = plate.getLocationBarcode();
+        log.debug("Location changing from " + oldLocation + " to " + newLocation);
+        plate.setLocationBarcode(newLocation);
+        log.debug("Changed location to "+ plate.getLocationBarcode());
         /*
         Note note = new Note();
         note.setInternalOnly(true);

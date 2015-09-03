@@ -165,11 +165,15 @@
         </c:otherwise>
       </c:choose>
     </tr>
-    <tr>
-      <td id="plateBarcodeSelect">
-        <i>Please choose a material type above...</i>
-      </td>
-    </tr>
+    <c:choose>
+      <c:when test="${empty plate.plateMaterialType}">
+        <tr>
+          <td id="plateBarcodeSelect">
+            <i>Please choose a material type above...</i>
+          </td>
+        </tr>
+      </c:when>
+    </c:choose>
       <%--
         <tr>
             <c:choose>

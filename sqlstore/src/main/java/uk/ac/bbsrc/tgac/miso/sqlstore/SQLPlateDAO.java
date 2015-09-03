@@ -218,6 +218,7 @@ public class SQLPlateDAO implements PlateStore {
     return eResults.size() > 0 ? eResults.get(0) : null;
   }
 
+  @Override
   public Plate<? extends List<? extends Plateable>, ? extends Plateable> getPlateByIdentificationBarcode(String barcode) throws IOException {
     List<Plate<? extends List<? extends Plateable>, ? extends Plateable>> eResults = template.query(PLATE_SELECT_BY_ID_BARCODE, new Object[]{barcode}, new PlateMapper());
     return eResults.size() > 0 ? eResults.get(0) : null;
@@ -228,6 +229,7 @@ public class SQLPlateDAO implements PlateStore {
     return template.query(PLATE_SELECT, new PlateMapper());
   }
 
+  @Override
   public List<Plate<? extends List<? extends Plateable>, ? extends Plateable>> listByProjectId(long projectId) throws IOException {
     List<Plate<? extends List<? extends Plateable>, ? extends Plateable>> plates = template.query(PLATES_SELECT_BY_PROJECT_ID, new Object[]{projectId}, new PlateMapper(true));
     Collections.sort(plates);
@@ -277,7 +279,7 @@ public class SQLPlateDAO implements PlateStore {
 
     if (plate.getTagBarcode() != null) {
       params.addValue("tagBarcodeId", plate.getTagBarcode().getId());
-    }
+    } 
 
     if (plate.getId() == AbstractPlate.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
@@ -326,6 +328,11 @@ public class SQLPlateDAO implements PlateStore {
       */
     }
     else {
+      if (plate.getTagBarcode() != null) {
+        params.addValue("tagBarcodeId", plate.getTagBarcode().getId());
+      } else {
+        params.addValue("tagBarcodeId", null);
+      }
       try {
         String plateBarcode = "";
         if (plate.getTagBarcode() != null) {
@@ -338,7 +345,9 @@ public class SQLPlateDAO implements PlateStore {
         if (namingScheme.validateField("name", plate.getName())) {
           params.addValue("plateId", plate.getId())
                 .addValue("name", plate.getName())
-                .addValue("identificationBarcode", plateBarcode);
+                .addValue("description", plate.getDescription())
+                .addValue("identificationBarcode", plateBarcode)
+                .addValue("locationBarcode", plate.getLocationBarcode());
           NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
           namedTemplate.update(PLATE_UPDATE, params);
         }
