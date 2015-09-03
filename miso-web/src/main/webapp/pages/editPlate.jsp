@@ -252,9 +252,12 @@
            onmouseover="mcancelclosetime()"
            onmouseout="mclosetime()">
         <c:if test="${plate.id == 0}">
-          <a href="javascript:void(0);" onclick="Plate.ui.downloadPlateInputForm();">Get Plate Input Form</a>
+          <a href="javascript:void(0);" onclick="Plate.ui.downloadPlateInputForm('xlsx');">Get Plate Input Form</a>
           <a href="javascript:void(0);" class="add" onclick="Plate.ui.uploadPlateInputForm();">Import Plate Input
             Form</a>
+        </c:if>
+        <c:if test="${plate.id != 0}">
+          <a href="javascript:void(0);">No options to display</a>
         </c:if>
       </div>
     </li>
