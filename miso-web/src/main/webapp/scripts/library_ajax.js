@@ -504,24 +504,21 @@ Library.barcode = {
             "<input type='text' name='locationBarcodeInput' id='locationBarcodeInput' class='text ui-widget-content ui-corner-all'/>" +
             "</fieldset></form>");
 
-    jQuery(function () {
-      jQuery('#changeLibraryLocationDialog').dialog({
-        autoOpen: false,
-        width: 400,
-        modal: true,
-        resizable: false,
-        buttons: {
-          "Save": function () {
-            self.changeLibraryLocation(libraryId, jQuery('#locationBarcodeInput').val());
-            jQuery(this).dialog('close');
-          },
-          "Cancel": function () {
-            jQuery(this).dialog('close');
-          }
+    jQuery('#changeLibraryLocationDialog').dialog({
+      autoOpen: false,
+      width: 400,
+      modal: true,
+      resizable: false,
+      buttons: {
+        "Save": function () {
+          self.changeLibraryLocation(libraryId, jQuery('#locationBarcodeInput').val());
+          jQuery(this).dialog('close');
+        },
+        "Cancel": function () {
+          jQuery(this).dialog('close');
         }
-      });
-    });
-    jQuery('#changeLibraryLocationDialog').dialog('open');
+      }
+    }).dialog('open');
   },
 
   changeLibraryLocation: function (libraryId, barcode) {
