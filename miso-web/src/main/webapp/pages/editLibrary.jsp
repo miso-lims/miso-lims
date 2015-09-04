@@ -689,6 +689,14 @@
                       or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
             <th align="center">Edit</th>
           </c:if>
+          <c:choose>
+            <c:when test="${library.platformName ne 'Illumina'}">
+              <th>Add EmPCR</th>
+            </c:when>
+            <c:otherwise>
+              <th>Construct Pool</th>
+            </c:otherwise>
+          </c:choose>
         </tr>
         </thead>
         <tbody>
@@ -741,14 +749,17 @@
               </c:if>
               <c:choose>
                 <c:when test="${library.platformName ne 'Illumina'}">
-                  <td>
+                  <td id="empcr${dil.id}" align="center">
               <c:if test="${library.platformName eq 'LS454' or library.platformName eq 'Solid'}">
-                    <a href="javascript:void(0);" onclick="Library.empcr.insertEmPcrRow(${dil.id});">Add emPCR</a>
+                      <span class="fa fa-flask fa-lg"></span>
+                    </a>
                   </td>
                 </c:when>
                 <c:otherwise>
-                  <td>
-                    <a href="<c:url value="/miso/poolwizard/new/${library.sample.project.id}"/>">Construct New Pool</a>
+                  <td id="pool${dil.id}" align="center">
+                    <a href="<c:url value="/miso/poolwizard/new/${library.sample.project.id}"/>">
+                      <span class="fa fa-flask fa-lg"></span>
+                    </a>
                   </td>
                 </c:otherwise>
               </c:choose>
@@ -779,6 +790,7 @@
         <th>PCRed By</th>
         <th>PCR Date</th>
         <th>Results (${emPCRUnits})</th>
+        <th>Add Dilution</th>
       </tr>
       </thead>
       <tbody>
@@ -789,8 +801,10 @@
             <td>${empcr.pcrCreator}</td>
             <td><fmt:formatDate value="${empcr.creationDate}"/></td>
             <td>${empcr.concentration} ${emPCRUnits}</td>
-            <td>
-              <a href="javascript:void(0);" onclick="Library.empcr.insertEmPcrDilutionRow(${empcr.id});">Add emPCR Dilution</a>
+            <td id="empcrdil${dil.id}" align="center">
+              <a href="javascript:void(0);" onclick="Library.empcr.insertEmPcrDilutionRow(${empcr.id});">
+                <span class="fa fa-flask fa-lg"></span>
+              </a>
             </td>
           </tr>
         </c:forEach>
@@ -827,8 +841,10 @@
             <td>${dil.dilutionCreator}</td>
             <td><fmt:formatDate value="${dil.creationDate}"/></td>
             <td>${dil.concentration} ${emPCRDilutionUnits}</td>
-            <td>
-              <a href="<c:url value="/miso/poolwizard/new/${library.sample.project.id}"/>">Construct New Pool</a>
+            <td id="pool${dil.id}" align="center">
+              <a href="<c:url value="/miso/poolwizard/new/${library.sample.project.id}"/>">
+                <span class="fa fa-flask fa-lg"></span>
+              </a>
             </td>
           </tr>
         </c:forEach>
