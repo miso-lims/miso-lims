@@ -46,14 +46,14 @@
         </li>
       </ul>
     </div>
-    <br/><br/>
+    <br/>
 
     <div id="studyTriggerDiv">
       <input id="newStudyTrigger" type="radio" onchange="jQuery('#newStudyForm').slideToggle();"/> Create a new Study
     </div>
     <div id="newStudyForm" style="display:none;">
-      <button onClick="addStudy('newStudy');"
-              class="fg-button ui-state-default ui-corner-all">Save Study
+      <button type="button" onClick="addStudy('newStudy');"
+              class="btn btn-default navbar-btn float-right">Save Study
       </button>
       <form id="newStudy" method="POST" autocomplete="off">
         <table>
@@ -92,13 +92,13 @@
       <tr>
         <td>Pool Alias:</td>
         <td>
-          <input type="text" id="alias" name="alias" class="form-control"/><br/>
+          <input type="text" id="alias" name="alias" class="form-control"/>
         </td>
       </tr>
       <tr>
         <td>Concentration:</td>
         <td>
-          <input type="text" id="concentration" name="concentration" class="form-control"/><br/>
+          <input type="text" id="concentration" name="concentration" class="form-control"/>
         </td>
       </tr>
       <tr>
@@ -171,43 +171,52 @@
         });
       </script>
     </span>
-
-    <table width="100%">
+    <table style="width:100%;">
       <tbody>
       <tr>
-        <td width="50%" valign="top">
-          <div class="simplebox ui-corner-all">
-            <h2>Available Poolables</h2>
-            <button id="selectallbutton" onClick="selectallrows();"
-                    class="ui-state-default ui-corner-all">Select All
-            </button>
-            <button id="selectnonebutton" onClick="selectnorow();"
-                    class=" ui-state-default ui-corner-all">Select None
-            </button>
+        <td style="width:50%; vertical-align: top; padding-right:3px;">
+          <div id="available-panel" class="panel panel-default panel-primary">
+            <div class="panel-heading">
+              <h3 class="panel-title">Available Poolables</h3>
+            </div>
+            <div class="panel-body padded-panel">
+              <div id="poolables">
+                <button id="selectallbutton" onClick="selectallrows();"
+                        class="ui-state-default ui-corner-all">Select All
+                </button>
+                <button id="selectnonebutton" onClick="selectnorow();"
+                        class=" ui-state-default ui-corner-all">Select None
+                </button>
 
-            <button id="createPoolButton" onClick="createNewPool();"
-                    class="fg-button ui-state-default ui-corner-all">Create New Pool
-            </button>
-            <table id="dlTable" class="table table-striped table-bordered display">
-              <thead>
-              <tr>
-                <th>Dilution ID
-                </th>
-                <th>Dilution Name</th>
-                <th>Parent Library</th>
-                <th>Description</th>
-                <th>Parent Library Barcode</th>
-              </tr>
-              </thead>
-              <tbody id="dilutions">
-              </tbody>
-            </table>
+                <button id="createPoolButton" type="button" onClick="createNewPool();"
+                        class="btn btn-default navbar-btn float-right">Create New Pool</button>
+
+                <table id="dlTable" class="table table-striped table-bordered display">
+                  <thead>
+                  <tr>
+                    <th>Dilution ID
+                    </th>
+                    <th>Dilution Name</th>
+                    <th>Parent Library</th>
+                    <th>Description</th>
+                    <th>Parent Library Barcode</th>
+                  </tr>
+                  </thead>
+                  <tbody id="dilutions">
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </td>
-        <td width="50%" valign="top">
-          <div class="simplebox ui-corner-all">
-            <h2>Created Pools</h2>
-            <div id="poolResult"></div>
+        <td style="width:50%; vertical-align: top; padding-right:3px;">
+          <div id="pool-panel" class="panel panel-default panel-primary">
+            <div class="panel-heading">
+              <h3 class="panel-title">Created Pools</h3>
+            </div>
+            <div class="panel-body padded-panel">
+              <div id="poolResult"></div>
+            </div>
           </div>
         </td>
       </tr>
