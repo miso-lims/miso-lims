@@ -164,9 +164,9 @@
     </dependency>
 
     <dependency>
-      <groupId>net.sourceforge.fluxion</groupId>
+      <groupId>uk.ac.tgac.fluxion</groupId>
       <artifactId>fluxion-spi</artifactId>
-      <version>1.0-alpha-3</version>
+      <version>1.0</version>
     </dependency>
 
     <dependency>
