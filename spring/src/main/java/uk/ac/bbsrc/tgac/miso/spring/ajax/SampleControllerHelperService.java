@@ -642,7 +642,7 @@ public class SampleControllerHelperService {
 
     try {
       String newLocation = LimsUtils.lookupLocation(locationBarcode);
-      if (newLocation != null) {
+      if (!"".equals(newLocation)) {
         User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
         Sample sample = requestManager.getSampleById(sampleId);
         String oldLocation = sample.getLocationBarcode();

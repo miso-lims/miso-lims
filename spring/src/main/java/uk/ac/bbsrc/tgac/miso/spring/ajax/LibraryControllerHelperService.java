@@ -338,7 +338,7 @@ public class LibraryControllerHelperService {
 
     try {
       String newLocation = LimsUtils.lookupLocation(locationBarcode);
-      if (newLocation != "") {
+      if (!"".equals(newLocation)) {
         User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
         Library library = requestManager.getLibraryById(libraryId);
         String oldLocation = library.getLocationBarcode();
