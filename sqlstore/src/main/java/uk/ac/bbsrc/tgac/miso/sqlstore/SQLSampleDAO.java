@@ -23,38 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
-import com.eaglegenomics.simlims.core.Note;
-import com.googlecode.ehcache.annotations.*;
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
-import uk.ac.bbsrc.tgac.miso.core.data.Project;
-import com.eaglegenomics.simlims.core.SecurityProfile;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.transaction.annotation.Transactional;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
-import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
-import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.store.*;
-import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
-import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
-import uk.ac.bbsrc.tgac.miso.core.data.*;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleQcException;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
-
-import javax.persistence.CascadeType;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -64,93 +32,123 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 
+import javax.persistence.CascadeType;
+
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
+import org.springframework.transaction.annotation.Transactional;
+
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
+import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
+import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
+import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleQcException;
+import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
+import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
+import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
+import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
+import uk.ac.bbsrc.tgac.miso.core.store.SampleQcStore;
+import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
+import uk.ac.bbsrc.tgac.miso.core.store.Store;
+import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
+import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
+
+import com.eaglegenomics.simlims.core.Note;
+import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.googlecode.ehcache.annotations.Cacheable;
+import com.googlecode.ehcache.annotations.KeyGenerator;
+import com.googlecode.ehcache.annotations.Property;
+import com.googlecode.ehcache.annotations.TriggersRemove;
+
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public class SQLSampleDAO implements SampleStore {
   private static final String TABLE_NAME = "Sample";
 
-  public static final String SAMPLES_SELECT =
-        "SELECT sampleId, name, description, scientificName, taxonIdentifier, alias, accession, securityProfile_profileId, identificationBarcode, locationBarcode, " +
-        "sampleType, receivedDate, qcPassed, project_projectId " +
-        "FROM "+TABLE_NAME;
+  public static final String SAMPLES_SELECT = "SELECT sampleId, name, description, scientificName, taxonIdentifier, alias, accession, securityProfile_profileId, identificationBarcode, locationBarcode, "
+      + "sampleType, receivedDate, qcPassed, project_projectId " + "FROM " + TABLE_NAME;
 
-  public static final String SAMPLES_SELECT_LIMIT =
-          SAMPLES_SELECT + " ORDER BY sampleId DESC LIMIT ?";
+  public static final String SAMPLES_SELECT_LIMIT = SAMPLES_SELECT + " ORDER BY sampleId DESC LIMIT ?";
 
-  public static final String SAMPLES_SELECT_RECEIVED_DATE =
-      SAMPLES_SELECT + " group by receivedDate,project_projectId ORDER BY DATE(receivedDate) DESC LIMIT ?";
+  public static final String SAMPLES_SELECT_RECEIVED_DATE = SAMPLES_SELECT
+      + " group by receivedDate,project_projectId ORDER BY DATE(receivedDate) DESC LIMIT ?";
 
-  public static final String SAMPLE_SELECT_BY_ID =
-          SAMPLES_SELECT + " " + "WHERE sampleId = ?";
+  public static final String SAMPLE_SELECT_BY_ID = SAMPLES_SELECT + " " + "WHERE sampleId = ?";
 
-  public static final String SAMPLE_SELECT_BY_ALIAS =
-          SAMPLES_SELECT + " " + "WHERE alias = ?";
+  public static final String SAMPLE_SELECT_BY_ALIAS = SAMPLES_SELECT + " " + "WHERE alias = ?";
 
-  public static final String SAMPLE_SELECT_BY_IDENTIFICATION_BARCODE =
-          SAMPLES_SELECT + " " + "WHERE identificationBarcode = ?";
+  public static final String SAMPLE_SELECT_BY_IDENTIFICATION_BARCODE = SAMPLES_SELECT + " " + "WHERE identificationBarcode = ?";
 
-  public static final String SAMPLES_SELECT_BY_SEARCH =
-          SAMPLES_SELECT + " WHERE " +
-          "identificationBarcode LIKE ? OR " +
-          "name LIKE ? OR " +
-          "alias LIKE ? OR " +
-          "description LIKE ? OR " +
-          "scientificName LIKE ? ";
+  public static final String SAMPLES_SELECT_BY_SEARCH = SAMPLES_SELECT + " WHERE " + "identificationBarcode LIKE ? OR " + "name LIKE ? OR "
+      + "alias LIKE ? OR " + "description LIKE ? OR " + "scientificName LIKE ? ";
 
-  public static final String SAMPLE_UPDATE =
-          "UPDATE "+TABLE_NAME+" " +
-          "SET name=:name, description=:description, scientificName=:scientificName, taxonIdentifier=:taxonIdentifier, alias=:alias, accession=:accession, securityProfile_profileId=:securityProfile_profileId, " +
-          "identificationBarcode=:identificationBarcode, locationBarcode=:locationBarcode, sampleType=:sampleType, receivedDate=:receivedDate, " +
-          "qcPassed=:qcPassed, project_projectId=:project_projectId " +
-          "WHERE sampleId=:sampleId";    
+  public static final String SAMPLE_UPDATE = "UPDATE "
+      + TABLE_NAME
+      + " "
+      + "SET name=:name, description=:description, scientificName=:scientificName, taxonIdentifier=:taxonIdentifier, alias=:alias, accession=:accession, securityProfile_profileId=:securityProfile_profileId, "
+      + "identificationBarcode=:identificationBarcode, locationBarcode=:locationBarcode, sampleType=:sampleType, receivedDate=:receivedDate, "
+      + "qcPassed=:qcPassed, project_projectId=:project_projectId " + "WHERE sampleId=:sampleId";
 
-  public static final String SAMPLE_DELETE =
-          "DELETE FROM "+TABLE_NAME+" WHERE sampleId=:sampleId";
+  public static final String SAMPLE_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE sampleId=:sampleId";
 
   public static String SAMPLES_SELECT_BY_PROJECT_ID =
-/*          "SELECT sa.* " +
-          "FROM Project p " +
-          "LEFT JOIN Study st ON st.project_projectId = p.projectId " +
-          "LEFT JOIN Experiment ex ON st.studyId = ex.study_studyId " +
-          "INNER JOIN Experiment_Sample exsa ON ex.experimentId = exsa.experiment_experimentId " +
-          "LEFT JOIN Sample sa ON exsa.samples_sampleId = sa.sampleId " +
-          "WHERE p.projectId=?";*/
-          SAMPLES_SELECT + " " + "WHERE project_projectId = ?";
+  /*
+   * "SELECT sa.* " + "FROM Project p " + "LEFT JOIN Study st ON st.project_projectId = p.projectId " +
+   * "LEFT JOIN Experiment ex ON st.studyId = ex.study_studyId " +
+   * "INNER JOIN Experiment_Sample exsa ON ex.experimentId = exsa.experiment_experimentId " +
+   * "LEFT JOIN Sample sa ON exsa.samples_sampleId = sa.sampleId " + "WHERE p.projectId=?";
+   */
+  SAMPLES_SELECT + " " + "WHERE project_projectId = ?";
 
-  public static final String SAMPLES_SELECT_BY_EXPERIMENT_ID =
-          "SELECT s.sampleId, s.name, s.description, s.scientificName, s.taxonIdentifier, s.alias, s.accession, s.securityProfile_profileId, s.identificationBarcode, s.locationBarcode, " +
-          "s.sampleType, s.receivedDate, s.qcPassed, s.project_projectId " +
-          "FROM "+TABLE_NAME+" s, Experiment_Sample es " +
-          "WHERE es.samples_sampleId=s.sampleId " +
-          "AND es.Experiment_experimentId=?";
+  public static final String SAMPLES_SELECT_BY_EXPERIMENT_ID = "SELECT s.sampleId, s.name, s.description, s.scientificName, s.taxonIdentifier, s.alias, s.accession, s.securityProfile_profileId, s.identificationBarcode, s.locationBarcode, "
+      + "s.sampleType, s.receivedDate, s.qcPassed, s.project_projectId "
+      + "FROM "
+      + TABLE_NAME
+      + " s, Experiment_Sample es "
+      + "WHERE es.samples_sampleId=s.sampleId " + "AND es.Experiment_experimentId=?";
 
-  public static final String SAMPLE_SELECT_BY_LIBRARY_ID =
-          "SELECT s.sampleId, s.name, s.description, s.scientificName, s.taxonIdentifier, s.alias, s.accession, s.securityProfile_profileId, s.identificationBarcode, s.locationBarcode, " +
-          "s.sampleType, s.receivedDate, s.qcPassed, s.project_projectId " +
-          "FROM "+TABLE_NAME+" s, Library l " +
-          "WHERE s.sampleId=l.sample_sampleId " +
-          "AND l.libraryId=?";
+  public static final String SAMPLE_SELECT_BY_LIBRARY_ID = "SELECT s.sampleId, s.name, s.description, s.scientificName, s.taxonIdentifier, s.alias, s.accession, s.securityProfile_profileId, s.identificationBarcode, s.locationBarcode, "
+      + "s.sampleType, s.receivedDate, s.qcPassed, s.project_projectId "
+      + "FROM "
+      + TABLE_NAME
+      + " s, Library l "
+      + "WHERE s.sampleId=l.sample_sampleId " + "AND l.libraryId=?";
 
-  public static final String EXPERIMENT_SAMPLE_DELETE_BY_SAMPLE_ID =
-          "DELETE FROM Experiment_Sample " +
-          "WHERE samples_sampleId=:samples_sampleId";
+  public static final String EXPERIMENT_SAMPLE_DELETE_BY_SAMPLE_ID = "DELETE FROM Experiment_Sample "
+      + "WHERE samples_sampleId=:samples_sampleId";
 
-  public static final String SAMPLES_BY_RELATED_SUBMISSION =
-          "SELECT s.sampleId, s.name, s.description, s.scientificName, s.taxonIdentifier, s.alias, s.accession, s.securityProfile_profileId, s.identificationBarcode, s.locationBarcode, " +
-          "s.sampleType, s.receivedDate, s.qcPassed, project_projectId " +
-          "FROM "+TABLE_NAME+" s, Submission_Sample ss " +
-          "WHERE s.sampleId=ss.samples_sampleId " +
-          "AND ss.submission_submissionId=?";
+  public static final String SAMPLES_BY_RELATED_SUBMISSION = "SELECT s.sampleId, s.name, s.description, s.scientificName, s.taxonIdentifier, s.alias, s.accession, s.securityProfile_profileId, s.identificationBarcode, s.locationBarcode, "
+      + "s.sampleType, s.receivedDate, s.qcPassed, project_projectId "
+      + "FROM "
+      + TABLE_NAME
+      + " s, Submission_Sample ss "
+      + "WHERE s.sampleId=ss.samples_sampleId " + "AND ss.submission_submissionId=?";
 
-  public static final String SAMPLE_TYPES_SELECT =
-          "SELECT name " +
-          "FROM SampleType";  
+  public static final String SAMPLE_TYPES_SELECT = "SELECT name FROM SampleType";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLSampleDAO.class);
 
@@ -198,11 +196,11 @@ public class SQLSampleDAO implements SampleStore {
 
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
-  }  
+  }
 
   public void setProjectDAO(ProjectStore projectDAO) {
     this.projectDAO = projectDAO;
-  }  
+  }
 
   public void setNoteDAO(NoteStore noteDAO) {
     this.noteDAO = noteDAO;
@@ -232,6 +230,7 @@ public class SQLSampleDAO implements SampleStore {
     this.template = template;
   }
 
+  @Override
   public void setCascadeType(CascadeType cascadeType) {
     this.cascadeType = cascadeType;
   }
@@ -249,90 +248,71 @@ public class SQLSampleDAO implements SampleStore {
     purgeListCache(s, true);
   }
 
-  //TODO finish this
+  // TODO finish this
   public int[] batchSave(final Collection<Sample> samples) throws IOException {
     List<SqlParameterSource> batch = new ArrayList<SqlParameterSource>();
     try {
       for (Sample sample : samples) {
         Long securityProfileId = sample.getSecurityProfile().getProfileId();
-        if (this.cascadeType != null){// && this.cascadeType.equals(CascadeType.PERSIST) || this.cascadeType.equals(CascadeType.REMOVE)) {
+        if (this.cascadeType != null) {// && this.cascadeType.equals(CascadeType.PERSIST) ||
+                                       // this.cascadeType.equals(CascadeType.REMOVE)) {
           securityProfileId = securityProfileDAO.save(sample.getSecurityProfile());
         }
 
         MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("alias", sample.getAlias())
-              .addValue("accession", sample.getAccession())
-              .addValue("description", sample.getDescription())
-              .addValue("scientificName", sample.getScientificName())
-              .addValue("taxonIdentifier", sample.getTaxonIdentifier())
-              //.addValue("identificationBarcode", sample.getIdentificationBarcode())
-              .addValue("locationBarcode", sample.getLocationBarcode())
-              .addValue("sampleType", sample.getSampleType())
-              .addValue("receivedDate", sample.getReceivedDate())
-              .addValue("qcPassed", sample.getQcPassed().toString())
-              .addValue("project_projectId", sample.getProject().getProjectId())
-              .addValue("securityProfile_profileId", securityProfileId);
+        params.addValue("alias", sample.getAlias()).addValue("accession", sample.getAccession())
+            .addValue("description", sample.getDescription())
+            .addValue("scientificName", sample.getScientificName())
+            .addValue("taxonIdentifier", sample.getTaxonIdentifier())
+            // .addValue("identificationBarcode", sample.getIdentificationBarcode())
+            .addValue("locationBarcode", sample.getLocationBarcode()).addValue("sampleType", sample.getSampleType())
+            .addValue("receivedDate", sample.getReceivedDate()).addValue("qcPassed", sample.getQcPassed().toString())
+            .addValue("project_projectId", sample.getProject().getProjectId()).addValue("securityProfile_profileId", securityProfileId);
 
         if (sampleNamingScheme.validateField("name", sample.getName()) && sampleNamingScheme.validateField("alias", sample.getAlias())) {
           batch.add(params);
           purgeCache(sample);
-        }
-        else {
+        } else {
           throw new IOException("Cannot save sample - invalid field:" + sample.toString());
         }
       }
       SimpleJdbcTemplate sTemplate = new SimpleJdbcTemplate(template);
       return sTemplate.batchUpdate(SAMPLE_UPDATE, batch.toArray(new SqlParameterSource[samples.size()]));
-    }
-    catch (MisoNamingException e) {
+    } catch (MisoNamingException e) {
       throw new IOException("Cannot save sample - issue with naming scheme", e);
     }
   }
 
   @Transactional(readOnly = false, rollbackFor = IOException.class)
-  @TriggersRemove(cacheName={"sampleCache", "lazySampleCache"},
-        keyGenerator = @KeyGenerator(
-              name = "HashCodeCacheKeyGenerator",
-              properties = {
-                      @Property(name="includeMethod", value="false"),
-                      @Property(name="includeParameterTypes", value="false")
-              }
-        )
-  )
+  @TriggersRemove(cacheName = { "sampleCache", "lazySampleCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
+      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public long save(Sample sample) throws IOException {
     Long securityProfileId = sample.getSecurityProfile().getProfileId();
-    if (this.cascadeType != null){// && this.cascadeType.equals(CascadeType.PERSIST) || this.cascadeType.equals(CascadeType.REMOVE)) {
+    if (this.cascadeType != null) {// && this.cascadeType.equals(CascadeType.PERSIST) || this.cascadeType.equals(CascadeType.REMOVE)) {
       securityProfileId = securityProfileDAO.save(sample.getSecurityProfile());
     }
     MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("alias", sample.getAlias())
-            .addValue("accession", sample.getAccession())
-            .addValue("description", sample.getDescription())
-            .addValue("scientificName", sample.getScientificName())
-            .addValue("taxonIdentifier", sample.getTaxonIdentifier())
-            //.addValue("identificationBarcode", sample.getIdentificationBarcode())
-            .addValue("locationBarcode", sample.getLocationBarcode())
-            .addValue("sampleType", sample.getSampleType())
-            .addValue("receivedDate", sample.getReceivedDate())
-            .addValue("project_projectId", sample.getProject().getProjectId())
-            .addValue("securityProfile_profileId", securityProfileId);
+    params.addValue("alias", sample.getAlias()).addValue("accession", sample.getAccession())
+        .addValue("description", sample.getDescription())
+        .addValue("scientificName", sample.getScientificName())
+        .addValue("taxonIdentifier", sample.getTaxonIdentifier())
+        // .addValue("identificationBarcode", sample.getIdentificationBarcode())
+        .addValue("locationBarcode", sample.getLocationBarcode()).addValue("sampleType", sample.getSampleType())
+        .addValue("receivedDate", sample.getReceivedDate()).addValue("project_projectId", sample.getProject().getProjectId())
+        .addValue("securityProfile_profileId", securityProfileId);
 
     if (sample.getQcPassed() != null) {
       params.addValue("qcPassed", sample.getQcPassed().toString());
-    }
-    else {
+    } else {
       params.addValue("qcPassed", sample.getQcPassed());
     }
 
     if (sample.getId() == AbstractSample.UNSAVED_ID) {
-      //if the sample naming scheme doesn't allow duplicates, and a sample alias already exists
+      // if the sample naming scheme doesn't allow duplicates, and a sample alias already exists
       if (!sampleNamingScheme.allowDuplicateEntityNameFor("alias") && !listByAlias(sample.getAlias()).isEmpty()) {
         throw new IOException("NEW: A sample with this alias already exists in the database");
-      }
-      else {
-        SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-                                .withTableName(TABLE_NAME)
-                                .usingGeneratedKeyColumns("sampleId");
+      } else {
+        SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("sampleId");
         try {
           sample.setId(DbUtils.getAutoIncrement(template, TABLE_NAME));
 
@@ -348,38 +328,32 @@ public class SQLSampleDAO implements SampleStore {
             Number newId = insert.executeAndReturnKey(params);
             if (newId.longValue() != sample.getId()) {
               log.error("Expected Sample ID doesn't match returned value from database insert: rolling back...");
-              new NamedParameterJdbcTemplate(template).update(SAMPLE_DELETE, new MapSqlParameterSource().addValue("sampleId", newId.longValue()));
+              new NamedParameterJdbcTemplate(template).update(SAMPLE_DELETE,
+                  new MapSqlParameterSource().addValue("sampleId", newId.longValue()));
               throw new IOException("Something bad happened. Expected Sample ID doesn't match returned value from DB insert");
             }
-          }
-          else {
+          } else {
             throw new IOException("Cannot save sample - invalid field:" + sample.toString());
           }
-        }
-        catch (MisoNamingException e) {
+        } catch (MisoNamingException e) {
           throw new IOException("Cannot save sample - issue with naming scheme", e);
         }
       }
-    }
-    else {
-      SqlRowSet ss = template.queryForRowSet(SAMPLE_SELECT_BY_ALIAS, new Object[]{sample.getAlias()});
+    } else {
+      SqlRowSet ss = template.queryForRowSet(SAMPLE_SELECT_BY_ALIAS, new Object[] { sample.getAlias() });
       if (!sampleNamingScheme.allowDuplicateEntityNameFor("alias") && ss.next() && ss.getLong("sampleId") != sample.getId()) {
         throw new IOException("UPD: A sample with this alias already exists in the database");
-      }
-      else {
+      } else {
         try {
           if (sampleNamingScheme.validateField("name", sample.getName()) && sampleNamingScheme.validateField("alias", sample.getAlias())) {
-            params.addValue("sampleId", sample.getId())
-                  .addValue("name", sample.getName())
-                  .addValue("identificationBarcode", sample.getName() + "::" + sample.getAlias());
+            params.addValue("sampleId", sample.getId()).addValue("name", sample.getName())
+                .addValue("identificationBarcode", sample.getName() + "::" + sample.getAlias());
             NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
             namedTemplate.update(SAMPLE_UPDATE, params);
-          }
-          else {
+          } else {
             throw new IOException("Cannot save sample - invalid field value: " + sample.toString());
           }
-        }
-        catch (MisoNamingException e) {
+        } catch (MisoNamingException e) {
           throw new IOException("Cannot save sample - issue with naming scheme", e);
         }
       }
@@ -388,16 +362,15 @@ public class SQLSampleDAO implements SampleStore {
     if (this.cascadeType != null) {
       Project p = sample.getProject();
       if (this.cascadeType.equals(CascadeType.PERSIST)) {
-        if (p!=null) {
-          //set project progress to ACTIVE if in a prior waiting state (APPROVED)
+        if (p != null) {
+          // set project progress to ACTIVE if in a prior waiting state (APPROVED)
           if (sample.getReceivedDate() != null && p.getProgress().equals(ProgressType.APPROVED)) {
             p.setProgress(ProgressType.ACTIVE);
           }
 
           projectDAO.save(p);
         }
-      }
-      else if (this.cascadeType.equals(CascadeType.REMOVE)) {
+      } else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (p != null) {
           DbUtils.updateCaches(cacheManager, p, Project.class);
           for (ProjectOverview po : p.getOverviews()) {
@@ -418,58 +391,46 @@ public class SQLSampleDAO implements SampleStore {
     return sample.getId();
   }
 
-  @Cacheable(cacheName="sampleListCache",
-      keyGenerator = @KeyGenerator(
-              name = "HashCodeCacheKeyGenerator",
-              properties = {
-                      @Property(name="includeMethod", value="false"),
-                      @Property(name="includeParameterTypes", value="false")
-              }
-      )
-  )
+  @Cacheable(cacheName = "sampleListCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
+      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public List<Sample> listAll() {
     return template.query(SAMPLES_SELECT, new SampleMapper(true));
   }
 
+  @Override
   public List<Sample> listAllWithLimit(long limit) throws IOException {
-    return template.query(SAMPLES_SELECT_LIMIT, new Object[]{limit}, new SampleMapper(true));
+    return template.query(SAMPLES_SELECT_LIMIT, new Object[] { limit }, new SampleMapper(true));
   }
 
+  @Override
   public List<Sample> listAllByReceivedDate(long limit) throws IOException {
-    return template.query(SAMPLES_SELECT_RECEIVED_DATE, new Object[]{limit}, new SampleMapper(true));
+    return template.query(SAMPLES_SELECT_RECEIVED_DATE, new Object[] { limit }, new SampleMapper(true));
   }
 
   @Override
   public int count() throws IOException {
-    return template.queryForInt("SELECT count(*) FROM "+TABLE_NAME);
+    return template.queryForInt("SELECT count(*) FROM " + TABLE_NAME);
   }
 
+  @Override
   public List<Sample> listBySearch(String query) {
     String mySQLQuery = "%" + query.replaceAll("_", Matcher.quoteReplacement("\\_")) + "%";
-    return template.query(SAMPLES_SELECT_BY_SEARCH, new String[]{mySQLQuery,mySQLQuery,mySQLQuery,mySQLQuery,mySQLQuery}, new SampleMapper(true));
+    return template.query(SAMPLES_SELECT_BY_SEARCH, new String[] { mySQLQuery, mySQLQuery, mySQLQuery, mySQLQuery, mySQLQuery },
+        new SampleMapper(true));
   }
 
+  @Override
   @Transactional(readOnly = false, rollbackFor = IOException.class)
-  @TriggersRemove(
-          cacheName={"sampleCache", "lazySampleCache"},
-          keyGenerator = @KeyGenerator (
-              name = "HashCodeCacheKeyGenerator",
-              properties = {
-                      @Property(name="includeMethod", value="false"),
-                      @Property(name="includeParameterTypes", value="false")
-              }
-          )
-  )
+  @TriggersRemove(cacheName = { "sampleCache", "lazySampleCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
+      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public boolean remove(Sample sample) throws IOException {
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-    if (sample.isDeletable() &&
-           (namedTemplate.update(SAMPLE_DELETE,
-                                 new MapSqlParameterSource().addValue("sampleId", sample.getId())) == 1)) {
+    if (sample.isDeletable()
+        && (namedTemplate.update(SAMPLE_DELETE, new MapSqlParameterSource().addValue("sampleId", sample.getId())) == 1)) {
       Project p = sample.getProject();
       if (this.cascadeType.equals(CascadeType.PERSIST)) {
-        if (p!=null) projectDAO.save(p);
-      }
-      else if (this.cascadeType.equals(CascadeType.REMOVE)) {
+        if (p != null) projectDAO.save(p);
+      } else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (p != null) {
           DbUtils.updateCaches(cacheManager, p, Project.class);
         }
@@ -482,53 +443,54 @@ public class SQLSampleDAO implements SampleStore {
     return false;
   }
 
-  @Cacheable(cacheName="sampleCache",
-      keyGenerator = @KeyGenerator(
-              name = "HashCodeCacheKeyGenerator",
-              properties = {
-                      @Property(name="includeMethod", value="false"),
-                      @Property(name="includeParameterTypes", value="false")
-              }
-      )
-  )
+  @Override
+  @Cacheable(cacheName = "sampleCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
+      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public Sample get(long sampleId) throws IOException {
-    List eResults = template.query(SAMPLE_SELECT_BY_ID, new Object[]{sampleId}, new SampleMapper());
+    List eResults = template.query(SAMPLE_SELECT_BY_ID, new Object[] { sampleId }, new SampleMapper());
     Sample e = eResults.size() > 0 ? (Sample) eResults.get(0) : null;
     return e;
   }
 
+  @Override
   public Sample lazyGet(long sampleId) throws IOException {
-    List eResults = template.query(SAMPLE_SELECT_BY_ID, new Object[]{sampleId}, new SampleMapper(true));
+    List eResults = template.query(SAMPLE_SELECT_BY_ID, new Object[] { sampleId }, new SampleMapper(true));
     Sample e = eResults.size() > 0 ? (Sample) eResults.get(0) : null;
     return e;
   }
 
+  @Override
   public Sample getByBarcode(String barcode) throws IOException {
-    List eResults = template.query(SAMPLE_SELECT_BY_IDENTIFICATION_BARCODE, new Object[]{barcode}, new SampleMapper(true));
+    List eResults = template.query(SAMPLE_SELECT_BY_IDENTIFICATION_BARCODE, new Object[] { barcode }, new SampleMapper(true));
     Sample e = eResults.size() > 0 ? (Sample) eResults.get(0) : null;
     return e;
   }
 
+  @Override
   public List<Sample> listByProjectId(long projectId) throws IOException {
-    List<Sample> samples = template.query(SAMPLES_SELECT_BY_PROJECT_ID, new Object[]{projectId}, new SampleMapper(true));
+    List<Sample> samples = template.query(SAMPLES_SELECT_BY_PROJECT_ID, new Object[] { projectId }, new SampleMapper(true));
     Collections.sort(samples);
     return samples;
   }
 
+  @Override
   public List<Sample> listByExperimentId(long experimentId) throws IOException {
-    return template.query(SAMPLES_SELECT_BY_EXPERIMENT_ID, new Object[]{experimentId}, new SampleMapper(true));
+    return template.query(SAMPLES_SELECT_BY_EXPERIMENT_ID, new Object[] { experimentId }, new SampleMapper(true));
   }
 
+  @Override
   public Collection<Sample> listByAlias(String alias) throws IOException {
-    return template.query(SAMPLE_SELECT_BY_ALIAS, new Object[]{alias}, new SampleMapper(true));
+    return template.query(SAMPLE_SELECT_BY_ALIAS, new Object[] { alias }, new SampleMapper(true));
   }
 
+  @Override
   public List<String> listAllSampleTypes() throws IOException {
     return template.queryForList(SAMPLE_TYPES_SELECT, String.class);
   }
 
+  @Override
   public List<Sample> listBySubmissionId(long submissionId) throws IOException {
-    return template.query(SAMPLES_BY_RELATED_SUBMISSION, new Object[]{submissionId}, new SampleMapper());  
+    return template.query(SAMPLES_BY_RELATED_SUBMISSION, new Object[] { submissionId }, new SampleMapper());
   }
 
   public class SampleMapper extends CacheAwareRowMapper<Sample> {
@@ -549,9 +511,9 @@ public class SQLSampleDAO implements SampleStore {
         if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
           log.info("Cache hit on map for sample " + id);
           log.info("Cache hit on map for sample with element " + element);
-          Sample sample = (Sample)element.getObjectValue();
-          if (sample.getId() == 0){
-             DbUtils.updateCaches(lookupCache(cacheManager),id);
+          Sample sample = (Sample) element.getObjectValue();
+          if (sample.getId() == 0) {
+            DbUtils.updateCaches(lookupCache(cacheManager), id);
           } else {
             return (Sample) element.getObjectValue();
           }
@@ -572,12 +534,11 @@ public class SQLSampleDAO implements SampleStore {
       s.setReceivedDate(rs.getDate("receivedDate"));
       if (rs.getString("qcPassed") != null) {
         s.setQcPassed(Boolean.parseBoolean(rs.getString("qcPassed")));
-      }
-      else {
+      } else {
         s.setQcPassed(null);
       }
 
-      //s.setLastUpdated(rs.getTimestamp("lastUpdated"));
+      // s.setLastUpdated(rs.getTimestamp("lastUpdated"));
 
       try {
         s.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
@@ -593,23 +554,19 @@ public class SQLSampleDAO implements SampleStore {
           }
 
           s.setNotes(noteDAO.listBySample(id));
-        }
-        else {
+        } else {
           s.setProject(projectDAO.lazyGet(rs.getLong("project_projectId")));
         }
-      }
-      catch (IOException e1) {
+      } catch (IOException e1) {
         e1.printStackTrace();
-      }
-      catch (MalformedLibraryException e) {
+      } catch (MalformedLibraryException e) {
         e.printStackTrace();
-      }
-      catch (MalformedSampleQcException e) {
+      } catch (MalformedSampleQcException e) {
         e.printStackTrace();
       }
 
       if (isCacheEnabled() && lookupCache(cacheManager) != null) {
-        lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id) ,s));
+        lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id), s));
       }
 
       return s;

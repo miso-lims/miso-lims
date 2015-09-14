@@ -23,27 +23,52 @@
 
 package uk.ac.bbsrc.tgac.miso.sqlstore.util;
 
+import java.sql.SQLException;
+
+import javax.persistence.CascadeType;
+
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.lob.DefaultLobHandler;
+
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoRequestManager;
-import com.eaglegenomics.simlims.core.manager.LocalSecurityManager;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.lob.DefaultLobHandler;
-import uk.ac.bbsrc.tgac.miso.sqlstore.*;
+import uk.ac.bbsrc.tgac.miso.sqlstore.SQLEmPCRDAO;
+import uk.ac.bbsrc.tgac.miso.sqlstore.SQLEmPCRDilutionDAO;
+import uk.ac.bbsrc.tgac.miso.sqlstore.SQLExperimentDAO;
+import uk.ac.bbsrc.tgac.miso.sqlstore.SQLKitDAO;
+import uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryDAO;
+import uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryDilutionDAO;
+import uk.ac.bbsrc.tgac.miso.sqlstore.SQLLibraryQCDAO;
+import uk.ac.bbsrc.tgac.miso.sqlstore.SQLNoteDAO;
+import uk.ac.bbsrc.tgac.miso.sqlstore.SQLPlatformDAO;
+import uk.ac.bbsrc.tgac.miso.sqlstore.SQLPoolDAO;
+import uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO;
+import uk.ac.bbsrc.tgac.miso.sqlstore.SQLRunDAO;
+import uk.ac.bbsrc.tgac.miso.sqlstore.SQLSampleDAO;
+import uk.ac.bbsrc.tgac.miso.sqlstore.SQLSampleQCDAO;
+import uk.ac.bbsrc.tgac.miso.sqlstore.SQLSecurityDAO;
+import uk.ac.bbsrc.tgac.miso.sqlstore.SQLSecurityProfileDAO;
+import uk.ac.bbsrc.tgac.miso.sqlstore.SQLSequencerPartitionContainerDAO;
+import uk.ac.bbsrc.tgac.miso.sqlstore.SQLSequencerPoolPartitionDAO;
+import uk.ac.bbsrc.tgac.miso.sqlstore.SQLSequencerReferenceDAO;
+import uk.ac.bbsrc.tgac.miso.sqlstore.SQLStatusDAO;
+import uk.ac.bbsrc.tgac.miso.sqlstore.SQLStudyDAO;
+import uk.ac.bbsrc.tgac.miso.sqlstore.SQLTgacSubmissionDAO;
 
-import javax.persistence.CascadeType;
-import java.sql.SQLException;
+import com.eaglegenomics.simlims.core.manager.LocalSecurityManager;
 
 /**
  * Nasty class to manually wire up a MisoRequestManager.
  * <p/>
  * SHOULD ONLY BE USED FOR TESTING PURPOSES!
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public class DaoUtils {
-  public static <T extends LocalSecurityManager> void wireMisoRequestManager(MisoRequestManager requestManager, T lsm, JdbcTemplate jt) throws SQLException {
+  public static <T extends LocalSecurityManager> void wireMisoRequestManager(MisoRequestManager requestManager, T lsm, JdbcTemplate jt)
+      throws SQLException {
     SQLEmPCRDilutionDAO emPCRDilutionDAO;
     SQLLibraryDilutionDAO libraryDilutionDAO;
     SQLEmPCRDAO emPCRDAO;
@@ -184,7 +209,7 @@ public class DaoUtils {
 
     runDAO.setJdbcTemplate(jt);
     runDAO.setSecurityProfileDAO(securityProfileDAO);
-    //runDAO.setFlowcellDAO(flowcellDAO);
+    // runDAO.setFlowcellDAO(flowcellDAO);
     runDAO.setSequencerPartitionContainerDAO(sequencerPartitionContainerDAO);
     runDAO.setSequencerReferenceDAO(sequencerReferenceDAO);
     runDAO.setStatusDAO(statusDAO);
@@ -249,7 +274,7 @@ public class DaoUtils {
     requestManager.setSecurityProfileStore(securityProfileDAO);
     requestManager.setStatusStore(statusDAO);
     requestManager.setStudyStore(studyDAO);
-    //requestManager.setSubmissionStore(submissionDAO);
+    // requestManager.setSubmissionStore(submissionDAO);
   }
 
   public static <T extends LocalSecurityManager> void wireLocalSecurityManager(T securityManager, JdbcTemplate jt) throws SQLException {
