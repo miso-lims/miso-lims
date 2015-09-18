@@ -20,7 +20,7 @@ import java.util.Set;
  * @date 18/08/14
  * @since 0.2.1-SNAPSHOT
  */
-public class ImmutableWorkflowProcessImpl implements WorkflowProcess {
+public final class ImmutableWorkflowProcessImpl implements WorkflowProcess {
   WorkflowProcess process;
 
   public ImmutableWorkflowProcessImpl(WorkflowProcess workflowProcess) {
@@ -118,6 +118,10 @@ public class ImmutableWorkflowProcessImpl implements WorkflowProcess {
   @Override
   public final String getAssignableIdentifier() {
     return process.getAssignableIdentifier();
+  }
+
+  @Override
+  public void detach(Nameable obj) {
   }
 
   @Override

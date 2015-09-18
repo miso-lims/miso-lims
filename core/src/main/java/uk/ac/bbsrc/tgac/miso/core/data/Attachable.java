@@ -19,6 +19,7 @@ import java.util.Set;
  * @since 0.2.1-SNAPSHOT
  */
 public interface Attachable<T> extends Nameable {
+  public void detach(T obj);
   public void attach(T obj);
   public Set<T> getAttached();
   public void notifyAttached(AttachmentNotificationCallback<T> anc) throws AttachmentException;

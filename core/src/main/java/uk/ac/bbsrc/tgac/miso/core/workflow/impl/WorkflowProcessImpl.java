@@ -150,6 +150,9 @@ public class WorkflowProcessImpl implements WorkflowProcess {
   }
 
   @Override
+  public void detach(Nameable obj) { attachedEntities.remove(obj); }
+
+  @Override
   public void attach(Nameable obj) {
     attachedEntities.add(obj);
   }
