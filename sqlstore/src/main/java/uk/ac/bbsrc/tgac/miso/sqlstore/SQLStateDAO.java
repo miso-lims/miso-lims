@@ -57,7 +57,7 @@ public class SQLStateDAO implements StateStore {
       "UPDATE FROM "+VALUE_TABLE_NAME+" as sv SET sv.value =:value " +
       "WHERE sv.id = ?";
 
-  protected static final Logger log = LoggerFactory.getLogger(SQLWorkflowDAO.class);
+  protected static final Logger log = LoggerFactory.getLogger(SQLStateDAO.class);
 
   @Autowired
   private CacheManager cacheManager;

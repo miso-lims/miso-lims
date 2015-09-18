@@ -243,6 +243,7 @@ public class WorkflowImpl implements Workflow {
     if (peekPreviousProcess() != null && !isPaused()) {
       processOrdinal--;
       getState().put("currentProcess", processOrdinal);
+      //TODO retraction object should be an array of reasons w/ users, the actual reason, timestamp, etc
       getState().put("retraction", reason);
       return workflowProcesses.get(processOrdinal);
     }
@@ -294,6 +295,11 @@ public class WorkflowImpl implements Workflow {
       .append(this.getState().toString())
       .append("]");
     return sb.toString();
+  }
+
+  @Override
+  public void detach(Nameable obj) {
+    attachedEntities.remove(obj);
   }
 
   @Override
