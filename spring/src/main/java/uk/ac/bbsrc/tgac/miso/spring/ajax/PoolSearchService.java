@@ -38,10 +38,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * uk.ac.bbsrc.tgac.miso.miso.spring.ajax
@@ -91,7 +88,9 @@ public class PoolSearchService {
           }
         }
         if (pools.size() > 0) {
-          for (Pool<? extends Poolable> pool : pools) {
+          List<Pool<? extends Poolable>> rPools = new ArrayList<>(pools);
+          Collections.reverse(rPools);
+          for (Pool<? extends Poolable> pool : rPools) {
             b.append(poolHtml(pool));
           }
         }
@@ -118,9 +117,8 @@ public class PoolSearchService {
           searchStr = new String(Base64.decodeBase64(searchStr));
         }
 
-        //String str = searchStr.toLowerCase();
         StringBuilder b = new StringBuilder();
-        List<? extends Dilution> dilutions = new ArrayList<Dilution>(requestManager.listDilutionsBySearch(searchStr, PlatformType.valueOf(platformType)));
+        List<? extends Dilution> dilutions = new ArrayList<>(requestManager.listDilutionsBySearch(searchStr, PlatformType.valueOf(platformType)));
         int numMatches = 0;
         for (Dilution d : dilutions) {
           //have to use onmousedown because of blur firing before onclick and hiding the div before it can be added
@@ -179,13 +177,18 @@ public class PoolSearchService {
 
   private String poolHtml(Pool<? extends Poolable> p) {
     StringBuilder b = new StringBuilder();
-    b.append("<div style='position:relative' onMouseOver='this.className=\"dashboardhighlight\"' onMouseOut='this.className=\"dashboard\"' class='dashboard'>");
-    b.append("<div style=\"float:left\"><b>" + p.getName() + " (" + p.getCreationDate() + ")</b><br/>");
+    b.append("<a class='list-group-item' href='javascript:void(0)'");
+    if (LimsUtils.isStringEmptyOrNull(p.getAlias())) {
+      b.append("<div><b>" + p.getName() + " : "+p.getCreationDate()+"</b><br/>");
+    }
+    else {
+      b.append("<div><b>" + p.getName() + " (" + p.getAlias() + ") : "+p.getCreationDate()+"</b><br/>");
+    }
 
     Collection<? extends Poolable> ds = p.getPoolableElements();
     for (Poolable d : ds) {
       if (d instanceof Dilution) {
-        b.append("<span>" + d.getName() + " (" + ((Dilution)d).getLibrary().getSample().getProject().getAlias() + ")</span><br/>");
+        b.append("<span>" + d.getName() + " (" + ((Dilution)d).getLibrary().getSample().getProject().getAlias() + ") : "+((Dilution) d).getConcentration()+" "+((Dilution) d).getUnits()+"</span><br/>");
       }
       else if (d instanceof Plate) {
         Plate<LinkedList<Plateable>, Plateable> plate = (Plate<LinkedList<Plateable>, Plateable>)d;
@@ -196,10 +199,12 @@ public class PoolSearchService {
             b.append("<span>" + d.getName() + " ["+plate.getSize()+"-well] (" + l.getSample().getProject().getAlias() + ")</span><br/>");
           }
           else if (element instanceof Dilution) {
-
+            Dilution dl = (Dilution)element;
+            b.append("<span>" + dl.getName() + " ["+plate.getSize()+"-well] (" + dl.getLibrary().getSample().getProject().getAlias() + ")</span><br/>");
           }
           else if (element instanceof Sample) {
-
+            Sample s = (Sample)element;
+            b.append("<span>" + s.getName() + " ["+plate.getSize()+"-well] (" + s.getProject().getAlias() + ")</span><br/>");
           }
         }
       }
@@ -217,7 +222,7 @@ public class PoolSearchService {
 
     b.append("<input type='hidden' id='pId" + p.getId() + "' value='" + p.getId() + "'/></div>");
     b.append("<div style='position: absolute; bottom: 0; right: 0; font-size: 24px; font-weight: bold; color:#BBBBBB'>" + p.getPlatformType().getKey() + "</div>");
-    b.append("</div>");
+    b.append("</a>");
     return b.toString();
   }
 

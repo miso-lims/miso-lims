@@ -75,15 +75,18 @@ public class RunImpl extends AbstractRun implements Serializable {
     }
   }
 
+  @Override
   public List<SequencerPartitionContainer<SequencerPoolPartition>> getSequencerPartitionContainers() {
     if (this.containers != null) Collections.sort(this.containers);
-    return this.containers;
+    return containers;
   }
 
+  @Override
   public void setSequencerPartitionContainers(List<SequencerPartitionContainer<SequencerPoolPartition>> containers) {
     this.containers = containers;
   }
 
+  @Override
   public void addSequencerPartitionContainer(SequencerPartitionContainer<SequencerPoolPartition> f) {
     f.setSecurityProfile(getSecurityProfile());
     if (f.getId() == 0L && f.getIdentificationBarcode() == null) {
@@ -99,7 +102,6 @@ public class RunImpl extends AbstractRun implements Serializable {
 
   public void buildSubmission() {
   }
-
 
   /**
    * Method buildReport ...

@@ -38,6 +38,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
  * @author Rob Davey
  * @since 0.0.2
  */
+@Deprecated
 public class IlluminaPool extends PoolImpl<LibraryDilution> {
   public static final String PREFIX = "IPO";
   private final String units = "nM";

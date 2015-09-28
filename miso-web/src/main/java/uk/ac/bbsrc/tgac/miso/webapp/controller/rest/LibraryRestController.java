@@ -23,22 +23,27 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
+import com.eaglegenomics.simlims.core.User;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.core.util.jackson.ProjectSampleRecursionAvoidanceMixin;
 import uk.ac.bbsrc.tgac.miso.core.util.jackson.SampleRecursionAvoidanceMixin;
+import uk.ac.bbsrc.tgac.miso.core.util.jackson.UserInfoMixin;
+import uk.ac.bbsrc.tgac.miso.webapp.util.RestUtils;
 
 import java.io.IOException;
+import java.util.Collection;
 
 /**
  * A controller to handle all REST requests for Libraries
- * <p/>
- * Info
  *
  * @author Rob Davey
  * @date 16-Aug-2011
@@ -58,9 +63,30 @@ public class LibraryRestController {
   }
 
   @RequestMapping(value = "{libraryId}", method = RequestMethod.GET)
-  public @ResponseBody String jsonRest(@PathVariable Long libraryId) throws IOException {
+  public @ResponseBody String getLibraryById(@PathVariable Long libraryId) throws IOException {
     ObjectMapper mapper = new ObjectMapper();
+    try {
+      Library l = requestManager.getLibraryById(libraryId);
+      if (l != null) {
+        mapper.getSerializationConfig().addMixInAnnotations(Project.class, ProjectSampleRecursionAvoidanceMixin.class);
+        mapper.getSerializationConfig().addMixInAnnotations(Sample.class, SampleRecursionAvoidanceMixin.class);
+        mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
+        return mapper.writeValueAsString(l);
+      }
+      return mapper.writeValueAsString(RestUtils.error("No such library with that ID.", "libraryId", libraryId.toString()));
+    }
+    catch (IOException ioe) {
+      return mapper.writeValueAsString(RestUtils.error("Cannot retrieve library: " + ioe.getMessage(), "libraryId", libraryId.toString()));
+    }
+  }
+
+  @RequestMapping(method = RequestMethod.GET)
+  public @ResponseBody String listAllLibraries() throws IOException {
+    Collection<Library> libraries = requestManager.listAllLibraries();
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.getSerializationConfig().addMixInAnnotations(Project.class, ProjectSampleRecursionAvoidanceMixin.class);
     mapper.getSerializationConfig().addMixInAnnotations(Sample.class, SampleRecursionAvoidanceMixin.class);
-    return mapper.writeValueAsString(requestManager.getLibraryById(libraryId));
+    mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
+    return mapper.writeValueAsString(libraries);
   }
 }

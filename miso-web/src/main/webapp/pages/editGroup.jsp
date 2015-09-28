@@ -26,36 +26,51 @@
 
 <div id="maincontent">
   <div id="contentcolumn">
-    <form:form action="/miso/admin/group" method="POST" commandName="group" autocomplete="off">
+    <form:form method="POST" commandName="group" autocomplete="off">
 
       <sessionConversation:insertSessionConversationId attributeName="group"/>
-
-      <h1><c:choose><c:when
-          test="${not empty group.groupId}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose>
-        Group
-        <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
-      </h1>
+      <nav class="navbar navbar-default" role="navigation">
+         <div class="navbar-header">
+            <span class="navbar-brand navbar-center">
+              <c:choose>
+                <c:when test="${not empty group.groupId}">Edit</c:when>
+                <c:otherwise>Create</c:otherwise>
+              </c:choose> Group
+            </span>
+         </div>
+         <div class="navbar-right container-fluid">
+            <button type="button" type="submit" class="btn btn-default navbar-btn">Save</button>
+         </div>
+      </nav>
       <table class="in">
         <tr>
           <td class="h">Group ID:</td>
-          <td>${group.groupId}</td>
+          <c:choose>
+            <c:when test="${not empty group.groupId}">
+              <td>${group.groupId}</td>
+            </c:when>
+            <c:otherwise>
+              <td><i>Unsaved</i></td>
+            </c:otherwise>
+          </c:choose>
         </tr>
         <tr>
           <td class="h">Name:</td>
-          <td><form:input path="name"/></td>
+          <td><form:input path="name" class="form-control"/></td>
         </tr>
         <tr>
           <td class="h">Description:</td>
-          <td><form:input path="description"/></td>
+          <td><form:input path="description" class="form-control"/></td>
         </tr>
         <tr>
           <td class="h">Users:</td>
             <%--<td><c:forEach items="${group.users}" var="user">${user.loginName}</c:forEach></td>--%>
           <td>
-            <div id="users" class="checklist">
+            <div id="users" class="checklist panel panel-default">
               <form:checkboxes items="${users}" path="users"
                                itemLabel="fullName"
-                               itemValue="userId"/>
+                               itemValue="userId"
+                               element="div class='checkbox'"/>
             </div>
           </td>
         </tr>

@@ -42,6 +42,7 @@ import java.util.Collection;
  * @author Rob Davey
  * @since 0.0.2
  */
+@Deprecated
 public class HibernatePlatformStore  extends HibernateDaoSupport implements Store<Platform> {
   @Transactional(readOnly = false)
   public long save(Platform platform) throws IOException {
@@ -52,6 +53,11 @@ public class HibernatePlatformStore  extends HibernateDaoSupport implements Stor
   @Transactional(readOnly = true)
   public Platform get(long platformId) throws IOException {
     return (Platform) getHibernateTemplate().load(PlatformImpl.class, platformId);
+  }
+
+  @Override
+  public Platform lazyGet(long id) throws IOException {
+    return get(id);
   }
 
   @Transactional(readOnly = true)

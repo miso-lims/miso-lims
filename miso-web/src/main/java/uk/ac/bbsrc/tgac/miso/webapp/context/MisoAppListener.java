@@ -28,6 +28,7 @@ import org.apache.log4j.PropertyConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.http.HttpRequest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.support.nativejdbc.CommonsDbcpNativeJdbcExtractor;
@@ -39,6 +40,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.RequestContextListener;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.context.support.XmlWebApplicationContext;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.PoolAlertManager;
@@ -71,10 +75,13 @@ import javax.naming.NamingException;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.*;
 
 /**
@@ -103,7 +110,9 @@ public class MisoAppListener implements ServletContextListener {
     //resolve property file configuration placeholders
     MisoPropertyExporter exporter = (MisoPropertyExporter) context.getBean("propertyConfigurer");
     Map<String, String> misoProperties = exporter.getResolvedProperties();
-            
+
+    context.getServletContext().setAttribute("security.method", misoProperties.get("security.method"));
+
     log.info("Checking MISO storage paths...");
     String baseStoragePath = misoProperties.get("miso.baseDirectory");
     context.getServletContext().setAttribute("miso.baseDirectory", baseStoragePath);
@@ -167,6 +176,11 @@ public class MisoAppListener implements ServletContextListener {
             log.error("Cannot set new validation regex for field '"+prop+"'. Reverting to default: " + e);
             e.printStackTrace();
           }
+        }
+
+        if (key.startsWith("miso.naming.duplicates."+classname)) {
+          String prop = key.substring(key.lastIndexOf(".")+1);
+          mns.setAllowDuplicateEntityName(prop, Boolean.parseBoolean(misoProperties.get("miso.naming.duplicates."+classname+"."+prop)));
         }
       }
     }
@@ -246,17 +260,23 @@ public class MisoAppListener implements ServletContextListener {
 
         log.info("\\_ projects...");
         log.info("" + rm.listAllProjects().size());
+        log.info("\\_ studies...");
+        log.info("" + rm.listAllStudies().size());
+        log.info("\\_ experiments...");
+        log.info("" + rm.listAllExperiments().size());
         log.info("\\_ samples...");
         log.info("" + rm.listAllSamples().size());
         log.info("\\_ libraries...");
         log.info("" + rm.listAllLibraries().size());
         log.info("\\_ dilutions...");
         log.info("" + rm.listAllLibraryDilutions().size());
-        log.info("" + rm.listAllEmPcrDilutions().size());
+        log.info("" + rm.listAllEmPCRDilutions().size());
         log.info("\\_ pools...");
         log.info("" + rm.listAllPools().size());
         log.info("\\_ plates...");
         log.info("" + rm.listAllPlates().size());
+        log.info("\\_ sequencer partition containers...");
+        log.info("" + rm.listAllSequencerPartitionContainers().size());
         log.info("\\_ runs...");
         log.info("" + rm.listAllRuns().size());
       }
@@ -301,6 +321,9 @@ public class MisoAppListener implements ServletContextListener {
       }
     }
 
+    String analysisServerEnabled = misoProperties.get("miso.analysis.server.enabled");
+    context.getServletContext().setAttribute("analysisServerEnabled", Boolean.parseBoolean(analysisServerEnabled));
+
     if ("true".equals(misoProperties.get("miso.statsdb.enabled"))) {
       try {
         JndiObjectFactoryBean jndiBean = new JndiObjectFactoryBean();
@@ -323,6 +346,8 @@ public class MisoAppListener implements ServletContextListener {
 
         RunStatsManager rsm = new RunStatsManager(template);
         context.getBeanFactory().registerSingleton("runStatsManager", rsm);
+
+        log.info("StatsDB linkup initialised.");
       }
       catch (NamingException e) {
         log.error("Cannot initiate statsdb connection: " + e.getMessage());

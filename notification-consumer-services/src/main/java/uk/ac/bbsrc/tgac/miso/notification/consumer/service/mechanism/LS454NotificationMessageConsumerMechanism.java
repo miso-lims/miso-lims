@@ -177,7 +177,7 @@ public class LS454NotificationMessageConsumerMechanism implements NotificationMe
                     is.setCompletionDate(gsLogDateFormat.parse(run.getString("completionDate")));
                   }
                   catch (ParseException e) {
-                    log.error(e.getMessage());
+                    log.error("Cannot parse "+runName+" completion date: " +e.getMessage());
                     e.printStackTrace();
                   }
                 }
@@ -193,8 +193,9 @@ public class LS454NotificationMessageConsumerMechanism implements NotificationMe
               else {
                 log.debug("\\_ Updating existing run and status: " + is.getRunName());
 
-                r.setPlatformType(PlatformType.LS454);
+                r.setAlias(runName);
 
+                r.setPlatformType(PlatformType.LS454);
                 r.setDescription(m.group(3));
                 //TODO check this properly
                 r.setPairedEnd(false);
@@ -283,29 +284,29 @@ public class LS454NotificationMessageConsumerMechanism implements NotificationMe
                       if (ptp.getElementsByTagName("padLayout").getLength() > 0 && ptp.getElementsByTagName("padLayout").item(0) != null) {
                         int numPartitions = Integer.parseInt(ptp.getElementsByTagName("padLayout").item(0).getTextContent().split("_")[0]);
                         SequencerPartitionContainer f = new SequencerPartitionContainerImpl();
-                        if (f.getPlatformType() == null && r.getPlatformType() != null) {
-                          f.setPlatformType(r.getPlatformType());
+                        if (f.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
+                          f.setPlatform(r.getSequencerReference().getPlatform());
                         }
-                        else {
-                          f.setPlatformType(PlatformType.LS454);
-                        }
+//                        else {
+//                          f.setPlatformType(PlatformType.LS454);
+//                        }
                         f.setPartitionLimit(numPartitions);
                         f.initEmptyPartitions();
                         f.setIdentificationBarcode(ptpId);
 
                         log.debug("\\_ Created new SequencerPartitionContainer with "+f.getPartitions().size()+" partitions");
-                        ((RunImpl)r).addSequencerPartitionContainer(f);
+                        r.addSequencerPartitionContainer(f);
                       }
                     }
                     else {
                       SequencerPartitionContainer f = fs.iterator().next();
                       log.debug("\\_ Got SequencerPartitionContainer " + f.getId());
-                      if (f.getPlatformType() == null && r.getPlatformType() != null) {
-                        f.setPlatformType(r.getPlatformType());
+                      if (f.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
+                        f.setPlatform(r.getSequencerReference().getPlatform());
                       }
-                      else {
-                        f.setPlatformType(PlatformType.LS454);
-                      }
+//                      else {
+//                        f.setPlatformType(PlatformType.LS454);
+//                      }
                       if (f.getIdentificationBarcode() == null || "".equals(f.getIdentificationBarcode())) {
                         f.setIdentificationBarcode(ptpId);
                         long flowId = requestManager.saveSequencerPartitionContainer(f);
@@ -351,6 +352,9 @@ public class LS454NotificationMessageConsumerMechanism implements NotificationMe
             log.error(e.getMessage());
             e.printStackTrace();
           }
+        }
+        else {
+          log.error("Error consuming run "+runName+". Please check the gsRunProcessor.log file for this run.");
         }
       }
     }

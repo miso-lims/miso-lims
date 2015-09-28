@@ -51,4 +51,6 @@ public interface MisoListener extends EventListener {
   public Collection<? extends ResponderService> getResponderServices();
 
   public void setResponderServices(Collection<? extends ResponderService> responderServices);
+
+  public void setBaseURL(String baseURL);
 }

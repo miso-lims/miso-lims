@@ -75,6 +75,9 @@ public class SQLSequencerPoolPartitionDAO implements PartitionStore {
   public static final String PARTITION_SELECT_BY_ID =
           PARTITIONS_SELECT + " " + "WHERE partitionId = ?";
 
+  public static final String PARTITION_DELETE =
+      "DELETE FROM "+TABLE_NAME+" WHERE partitionId=:partitionId";
+
   public static final String PARTITION_UPDATE =
           "UPDATE "+TABLE_NAME+" " +
           "SET partitionNumber=:partitionNumber, pool_poolId=:pool_poolId, securityProfile_profileId=:securityProfile_profileId " +
@@ -327,5 +330,26 @@ public class SQLSequencerPoolPartitionDAO implements PartitionStore {
 
       return l;
     }
+  }
+
+  @Transactional(readOnly = false, rollbackFor = IOException.class)
+  @TriggersRemove(
+      cacheName = {"sequencerPoolPartitionCache", "lazySequencerPoolPartitionCache"},
+      keyGenerator = @KeyGenerator (
+          name = "HashCodeCacheKeyGenerator",
+          properties = {
+              @Property(name="includeMethod", value="false"),
+              @Property(name="includeParameterTypes", value="false")
+          }
+      )
+  )
+  public boolean remove(SequencerPoolPartition partition) throws IOException {
+    NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+    if (partition.isDeletable() && (namedTemplate.update(PARTITION_DELETE,
+                                                         new MapSqlParameterSource().addValue("partitionId", partition.getId())) == 1)) {
+      purgeListCache(partition, false);
+      return true;
+    }
+    return false;
   }
 }

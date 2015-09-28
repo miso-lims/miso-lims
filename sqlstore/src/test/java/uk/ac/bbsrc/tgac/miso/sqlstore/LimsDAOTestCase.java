@@ -39,6 +39,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.support.lob.DefaultLobHandler;
 import org.springframework.jdbc.support.lob.LobHandler;
+import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.BarcodePrintManager;
@@ -77,81 +78,84 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
   private static final String PASSWORD = "";
 
   private static final String[] tables =
-          {
-                  "Alert",
-                  "Experiment",
-                  "Experiment_Kit",
-                  "Kit",
-                  "KitDescriptor",
-                  "Kit_Note",
-                  "Library",
-                  "LibraryDilution",
-                  "LibraryQC",
-                  "LibrarySelectionType",
-                  "LibraryStrategyType",
-                  "LibraryType",
-                  "Library_Note",
-                  "Library_TagBarcode",
-                  "Note",
-                  "_Partition",
-                  "Plate",
-                  "Plate_Elements",
-                  "Platform",
-                  "Pool",
-                  "PoolQC",
-                  "Pool_Elements",
-                  "Pool_Experiment",
-                  "PrintJob",
-                  "PrintService",
-                  "Project",
-                  "ProjectOverview",
-                  "ProjectOverview_Note",
-                  "Project_Issues",
-                  "Project_Note",
-                  "Project_ProjectOverview",
-                  "Project_Request",
-                  "Project_Study",
-                  "QCType",
-                  "Request",
-                  "Request_Note",
-                  "Run",
-                  "RunQC",
-                  "RunQC_Partition",
-                  "Run_Note",
-                  "Sample",
-                  "SampleQC",
-                  "SampleType",
-                  "Sample_Note",
-                  "SecurityProfile",
-                  "SecurityProfile_ReadGroup",
-                  "SecurityProfile_ReadUser",
-                  "SecurityProfile_WriteGroup",
-                  "SecurityProfile_WriteUser",
-                  "SequencerPartitionContainer",
-                  "SequencerPartitionContainer_Partition",
-                  "SequencerReference",
-                  "Status",
-                  "Study",
-                  "StudyType",
-                  "Study_Experiment",
-                  "Submission",
-                  "Submission_Experiment",
-                  "Submission_Partition_Dilution",
-                  "Submission_Sample",
-                  "Submission_Study",
-                  "TagBarcodes",
-                  "User",
-                  "User_Group",
-                  "Watcher",
-                  "_Group",
-                  "emPCR",
-                  "emPCRDilution",
-          };
+  {
+    "Alert",
+    "EntityGroup",
+    "EntityGroup_Elements",
+    "Experiment",
+    "Experiment_Kit",
+    "Kit",
+    "KitDescriptor",
+    "Kit_Note",
+    "Library",
+    "LibraryDilution",
+    "LibraryQC",
+    "LibrarySelectionType",
+    "LibraryStrategyType",
+    "LibraryType",
+    "Library_Note",
+    "Library_TagBarcode",
+    "Note",
+    "_Partition",
+    "Plate",
+    "Plate_Elements",
+    "Platform",
+    "Pool",
+    "PoolQC",
+    "Pool_Elements",
+    "Pool_Experiment",
+    "PrintJob",
+    "PrintService",
+    "Project",
+    "ProjectOverview",
+    "ProjectOverview_Note",
+    "Project_Issues",
+    "Project_Note",
+    "Project_ProjectOverview",
+    "Project_Request",
+    "Project_Study",
+    "QCType",
+    "Request",
+    "Request_Note",
+    "Run",
+    "RunQC",
+    "RunQC_Partition",
+    "Run_Note",
+    "Sample",
+    "SampleQC",
+    "SampleType",
+    "Sample_Note",
+    "SecurityProfile",
+    "SecurityProfile_ReadGroup",
+    "SecurityProfile_ReadUser",
+    "SecurityProfile_WriteGroup",
+    "SecurityProfile_WriteUser",
+    "SequencerPartitionContainer",
+    "SequencerPartitionContainer_Partition",
+    "SequencerReference",
+    "Status",
+    "Study",
+    "StudyType",
+    "Study_Experiment",
+    "Submission",
+    "Submission_Experiment",
+    "Submission_Partition_Dilution",
+    "Submission_Sample",
+    "Submission_Study",
+    "TagBarcodes",
+    "User",
+    "User_Group",
+    "Watcher",
+    "_Group",
+    "emPCR",
+    "emPCRDilution",
+  };
 
   private DataSource datasource;
 
   private SQLAlertDAO alertDAO;
   private SQLLibraryDilutionDAO libraryDilutionDAO;
+  private SQLEntityGroupDAO entityGroupDAO;
   private SQLEmPCRDAO emPCRDAO;
   private SQLEmPCRDilutionDAO emPCRDilutionDAO;
   private SQLExperimentDAO experimentDAO;
@@ -217,6 +221,16 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
       return null;
     }
   }
+
+  public SQLEntityGroupDAO getEntityGroupDAO() {
+    if (entityGroupDAO != null) {
+      return entityGroupDAO;
+    }
+    else {
+      return null;
+    }
+  }
+
 
   public SQLEmPCRDAO getEmPCRDAO() {
     if (emPCRDAO != null) {
@@ -511,6 +525,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
     securityProfileDAO = new SQLSecurityProfileDAO();
     alertDAO = new SQLAlertDAO();
     libraryDilutionDAO = new SQLLibraryDilutionDAO();
+    entityGroupDAO = new SQLEntityGroupDAO();
     emPCRDAO = new SQLEmPCRDAO();
     emPCRDilutionDAO = new SQLEmPCRDilutionDAO();
     experimentDAO = new SQLExperimentDAO();
@@ -557,6 +572,10 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
     libraryDilutionDAO.setCascadeType(CascadeType.PERSIST);
     libraryDilutionDAO.setDataObjectFactory(dataObjectFactory);
     daos.put(uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution.class, libraryDilutionDAO);
+
+    entityGroupDAO.setJdbcTemplate(template);
+    entityGroupDAO.setCascadeType(CascadeType.PERSIST);
+    daos.put(uk.ac.bbsrc.tgac.miso.core.data.EntityGroup.class, entityGroupDAO);
 
     emPCRDAO.setJdbcTemplate(template);
     emPCRDAO.setSecurityProfileDAO(securityProfileDAO);
@@ -655,6 +674,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
     daos.put(MisoPrintService.class, printServiceDAO);
 
     projectDAO.setJdbcTemplate(template);
+    projectDAO.setEntityGroupDAO(entityGroupDAO);
     projectDAO.setSecurityProfileDAO(securityProfileDAO);
     projectDAO.setStudyDAO(studyDAO);
     projectDAO.setSampleDAO(sampleDAO);
@@ -702,6 +722,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
     sequencerPartitionContainerDAO.setJdbcTemplate(template);
     sequencerPartitionContainerDAO.setSecurityProfileDAO(securityProfileDAO);
     sequencerPartitionContainerDAO.setPartitionDAO(partitionDAO);
+    sequencerPartitionContainerDAO.setPlatformDAO(platformDAO);
     sequencerPartitionContainerDAO.setRunDAO(runDAO);
     sequencerPartitionContainerDAO.setCascadeType(CascadeType.PERSIST);
     sequencerPartitionContainerDAO.setDataObjectFactory(dataObjectFactory);
@@ -742,6 +763,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
 
     poolDAO.setDaoLookup(daoLookup);
     plateDAO.setDaoLookup(daoLookup);
+    entityGroupDAO.setDaoLookup(daoLookup);
   }
 
   @After
@@ -764,6 +786,22 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
                  "isRead BIT NOT NULL," +
                  "level VARCHAR(8) NOT NULL," +
                  "PRIMARY KEY (alertId)" +
+                 ");");
+
+    runStatement(conn,
+                 "CREATE TABLE EntityGroup (" +
+                 "entityGroupId BIGINT NOT NULL, " +
+                 "parentId BIGINT NOT NULL, " +
+                 "parentType VARCHAR(255) NOT NULL," +
+                 "PRIMARY KEY  (entityGroupId, parentId)" +
+                 ");");
+
+    runStatement(conn,
+                 "CREATE TABLE EntityGroup_Elements (" +
+                 "entityGroup_entityGroupId BIGINT NOT NULL, " +
+                 "entityId BIGINT NOT NULL, " +
+                 "entityType VARCHAR(255) NOT NULL," +
+                 "PRIMARY KEY  (entityGroup_entityGroupId,entityId)" +
                  ");");
 
     runStatement(conn,
@@ -1235,7 +1273,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
     runStatement(conn,
                  "CREATE TABLE SequencerPartitionContainer (" +
                  "containerId BIGINT NOT NULL," +
-                 "platformType VARCHAR(50) DEFAULT NULL," +
+                 "platform BIGINT DEFAULT NULL," +
                  "securityProfile_profileId BIGINT default NULL," +
                  "identificationBarcode VARCHAR(255) default NULL," +
                  "locationBarcode VARCHAR(255) default NULL," +

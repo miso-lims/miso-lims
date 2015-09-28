@@ -135,6 +135,7 @@ public class EditSequencerPartitionContainerController {
       if (!container.userCanWrite(user)) {
         throw new SecurityException("Permission denied.");
       }
+
       long containerId = requestManager.saveSequencerPartitionContainer(container);
       session.setComplete();
       model.clear();

@@ -41,6 +41,7 @@ import java.util.HashSet;
  * @date 20/10/11
  * @since 0.1.2
  */
+@Deprecated
 public class DefaultRunListener implements MisoListener {
   protected static final Logger log = LoggerFactory.getLogger(DefaultRunListener.class);
   private Collection<? extends ResponderService> responderServices = new HashSet<ResponderService>();
@@ -52,6 +53,10 @@ public class DefaultRunListener implements MisoListener {
 
   public void setResponderServices(Collection<? extends ResponderService> responderServices) {
     this.responderServices = responderServices;
+  }
+
+  @Override
+  public void setBaseURL(String baseURL) {
   }
 
   @Override

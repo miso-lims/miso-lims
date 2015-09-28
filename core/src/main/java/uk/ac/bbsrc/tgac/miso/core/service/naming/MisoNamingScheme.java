@@ -22,4 +22,6 @@ public interface MisoNamingScheme<T> {
   boolean validateField(String fieldName, String entityName) throws MisoNamingException;
   void registerCustomNameGenerator(String fieldName, NameGenerator<T> nameGenerator);
   void unregisterCustomNameGenerator(String fieldName);
+  boolean allowDuplicateEntityNameFor(String fieldName);
+  void setAllowDuplicateEntityName(String fieldName, boolean allow);
 }

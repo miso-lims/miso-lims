@@ -41,17 +41,17 @@
 
   <!--
   <pipeline name="demo 2" creator="davey">
-    <processes>
+     <processes>
       <process name="demo process 2"/>
       <process name="demo process 2 (5 parameters)"/>
-    </processes>
-  </pipeline>
+     </processes>
+   </pipeline>
 
   <pipeline name="daemon demo" creator="davey" daemonized="true">
-    <processes>
+     <processes>
       <process name="daemon demo process"/>
-    </processes>
-  </pipeline>
+     </processes>
+   </pipeline>
   -->
 
 </conan-pipelines>

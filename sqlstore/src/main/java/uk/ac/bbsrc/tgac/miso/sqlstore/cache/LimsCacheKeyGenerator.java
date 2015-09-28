@@ -28,9 +28,6 @@ import com.googlecode.ehcache.annotations.key.AbstractCacheKeyGenerator;
 import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaPool;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ls454.LS454Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.solid.SolidPool;
 
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore.cache
@@ -71,15 +68,6 @@ public class LimsCacheKeyGenerator extends AbstractCacheKeyGenerator<Long> {
       else if (a instanceof Study) {
         code = ((Study)a).getId();
       }      
-      else if (a instanceof IlluminaPool) {
-        code = ((IlluminaPool)a).getId();
-      }
-      else if (a instanceof LS454Pool) {
-        code = ((LS454Pool)a).getId();
-      }
-      else if (a instanceof SolidPool) {
-        code = ((SolidPool)a).getId();
-      }
     }
     return code;
   }

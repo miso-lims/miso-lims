@@ -40,6 +40,16 @@ import org.springframework.context.ApplicationContextAware;
 public class ApplicationContextProvider implements ApplicationContextAware {
   private static ApplicationContext ctx = null;
 
+  private String baseUrl = "";
+
+  public String getBaseUrl() {
+    return baseUrl;
+  }
+
+  public void setBaseUrl(String baseUrl) {
+    this.baseUrl = baseUrl;
+  }
+
   public static ApplicationContext getApplicationContext() {
     return ctx;
   }

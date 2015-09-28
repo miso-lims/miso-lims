@@ -52,7 +52,6 @@ import java.util.Collection;
  * @since 0.1.3
  */
 public class SQLWatcherDAO implements WatcherStore {
-
   private static final String WATCHER_SELECT =
           "SELECT entityName, userId " +
           "FROM Watcher";
@@ -98,11 +97,7 @@ public class SQLWatcherDAO implements WatcherStore {
     return template.query(WATCHERS_SELECT_BY_ENTITY_NAME, new Object[]{entityName}, new WatcherMapper());
   }
 
-//  @Override
-//  public Collection<Watchable> getWatchedEntitiesByUserId(Long userId) throws IOException {
-//    return template.query(WATCHED_ENTITIES_BY_USER, new Object[]{userId}, new WatchedEntityMapper());
-//  }
-
+  @Override
   public boolean removeWatchedEntity(Watchable watchable) throws IOException {
     MapSqlParameterSource eParams = new MapSqlParameterSource();
     eParams.addValue("entityName", watchable.getWatchableIdentifier());
@@ -110,6 +105,7 @@ public class SQLWatcherDAO implements WatcherStore {
     return eNamedTemplate.update(WATCHER_DELETE, eParams) == 1;
   }
 
+  @Override
   public boolean removeWatchedEntityByUser(Watchable watchable, User user) throws IOException {
     if (user != null) {
       MapSqlParameterSource eParams = new MapSqlParameterSource();

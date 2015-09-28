@@ -38,6 +38,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.ldap.userdetails.InetOrgPerson;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.event.Alert;
 import uk.ac.bbsrc.tgac.miso.core.event.type.AlertLevel;
@@ -143,17 +144,17 @@ public class DashboardHelperService {
       List<Project> projects;
       StringBuilder b = new StringBuilder();
       if (!"".equals(searchStr)) {
-        projects = new ArrayList<Project>(requestManager.listAllProjectsBySearch(searchStr));
+        projects = new ArrayList<>(requestManager.listAllProjectsBySearch(searchStr));
       }
       else {
-        projects = new ArrayList<Project>(requestManager.listAllProjectsWithLimit(50));
+        projects = new ArrayList<>(requestManager.listAllProjectsWithLimit(50));
       }
 
       if (projects.size() > 0) {
         Collections.sort(projects);
         Collections.reverse(projects);
         for (Project p : projects) {
-          b.append("<a class=\"dashboardresult\" href=\"/miso/project/" + p.getProjectId() + "\"><div onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
+          b.append("<a class=\"list-group-item\" href=\"/miso/project/" + p.getProjectId() + "\"><div>");
           b.append("Name: <b>" + p.getName() + "</b><br/>");
           b.append("Alias: <b>" + p.getAlias() + "</b><br/>");
           b.append("</div></a>");
@@ -177,17 +178,17 @@ public class DashboardHelperService {
       List<Study> studies;
       StringBuilder b = new StringBuilder();
       if (!"".equals(searchStr)) {
-        studies = new ArrayList<Study>(requestManager.listAllStudiesBySearch(searchStr));
+        studies = new ArrayList<>(requestManager.listAllStudiesBySearch(searchStr));
       }
       else {
-        studies = new ArrayList<Study>(requestManager.listAllStudiesWithLimit(50));
+        studies = new ArrayList<>(requestManager.listAllStudiesWithLimit(50));
       }
 
       if (studies.size() > 0) {
         Collections.sort(studies);
         Collections.reverse(studies);
         for (Study s : studies) {
-          b.append("<a class=\"dashboardresult\" href=\"/miso/study/" + s.getId() + "\"><div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
+          b.append("<a class=\"list-group-item\" href=\"/miso/study/" + s.getId() + "\"><div>");
           b.append("Name: <b>" + s.getName() + "</b><br/>");
           b.append("Alias: <b>" + s.getAlias() + "</b><br/>");
           b.append("</div></a>");
@@ -210,17 +211,17 @@ public class DashboardHelperService {
       List<Experiment> experiments;
       StringBuilder b = new StringBuilder();
       if (!"".equals(searchStr)) {
-        experiments = new ArrayList<Experiment>(requestManager.listAllExperimentsBySearch(searchStr));
+        experiments = new ArrayList<>(requestManager.listAllExperimentsBySearch(searchStr));
       }
       else {
-        experiments = new ArrayList<Experiment>(requestManager.listAllExperimentsWithLimit(50));
+        experiments = new ArrayList<>(requestManager.listAllExperimentsWithLimit(50));
       }
 
       if (experiments.size() > 0) {
         Collections.sort(experiments);
         Collections.reverse(experiments);
         for (Experiment e : experiments) {
-          b.append("<a class=\"dashboardresult\" href=\"/miso/experiment/" + e.getId() + "\"><div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
+          b.append("<a class=\"list-group-item\" href=\"/miso/experiment/" + e.getId() + "\"><div>");
           b.append("Name: <b>" + e.getName() + "</b><br/>");
           b.append("Alias: <b>" + e.getAlias() + "</b><br/>");
           b.append("</div></a>");
@@ -243,20 +244,58 @@ public class DashboardHelperService {
       List<Run> runs;
       StringBuilder b = new StringBuilder();
       if (!"".equals(searchStr)) {
-        runs = new ArrayList<Run>(requestManager.listAllRunsBySearch(searchStr));
+        runs = new ArrayList<>(requestManager.listAllRunsBySearch(searchStr));
       }
       else {
-        runs = new ArrayList<Run>(requestManager.listAllRunsWithLimit(50));
+        runs = new ArrayList<>(requestManager.listAllRunsWithLimit(50));
       }
 
       if (runs.size() > 0) {
         Collections.sort(runs);
         Collections.reverse(runs);
         for (Run r : runs) {
-          b.append("<a class=\"dashboardresult\" href=\"/miso/run/" + r.getId() + "\"><div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
+          b.append("<a class=\"list-group-item\" href=\"/miso/run/" + r.getId() + "\"><div>");
           b.append("Name: <b>" + r.getName() + "</b><br/>");
           b.append("Alias: <b>" + r.getAlias() + "</b><br/>");
           b.append("</div></a>");
+        }
+      }
+      else {
+        b.append("No matches");
+      }
+      return JSONUtils.JSONObjectResponse("html", b.toString());
+    }
+    catch (IOException e) {
+      log.debug("Failed", e);
+      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
+    }
+  }
+
+  public JSONObject searchLibraryDilution(HttpSession session, JSONObject json) {
+    String searchStr = json.getString("str");
+    try {
+      List<LibraryDilution> libraryDilutions;
+      StringBuilder b = new StringBuilder();
+      if (!"".equals(searchStr)) {
+        libraryDilutions = new ArrayList<>(requestManager.listAllLibraryDilutionsBySearchOnly(searchStr));
+      }
+      else {
+        libraryDilutions = new ArrayList<>(requestManager.listAllLibraryDilutionsWithLimit(50));
+      }
+
+      if (libraryDilutions.size() > 0) {
+        Collections.sort(libraryDilutions);
+        Collections.reverse(libraryDilutions);
+        for (LibraryDilution ld : libraryDilutions) {
+          if (ld != null) {
+            if (ld.getLibrary() != null) {
+              b.append("<a class=\"list-group-item\" href=\"/miso/library/" + ld.getLibrary().getId() + "\"><div>");
+              b.append("Name: <b>" + ld.getName() + "</b><br/>");
+              b.append("From Library: <b>" + ld.getLibrary().getAlias() + "(" + ld.getLibrary().getName() + ")</b><br/>");
+//              b.append("From Sample: <b>" + ld.getLibrary().getSample().getAlias() + "(" + ld.getLibrary().getSample().getName() + ")</b><br/>");
+              b.append("</div></a>");
+            }
+          }
         }
       }
       else {
@@ -280,17 +319,17 @@ public class DashboardHelperService {
           //Base64-encoded string, most likely a barcode image beeped in. decode and search
           searchStr = new String(Base64.decodeBase64(searchStr));
         }
-        libraries = new ArrayList<Library>(requestManager.listAllLibrariesBySearch(searchStr));
+        libraries = new ArrayList<>(requestManager.listAllLibrariesBySearch(searchStr));
       }
       else {
-        libraries = new ArrayList<Library>(requestManager.listAllLibrariesWithLimit(50));
+        libraries = new ArrayList<>(requestManager.listAllLibrariesWithLimit(50));
       }
 
       if (libraries.size() > 0) {
         Collections.sort(libraries);
         Collections.reverse(libraries);
         for (Library l : libraries) {
-          b.append("<a class=\"dashboardresult\" href=\"/miso/library/" + l.getId() + "\"><div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
+          b.append("<a class=\"list-group-item\" href=\"/miso/library/" + l.getId() + "\"><div>");
           b.append("Name: <b>" + l.getName() + "</b><br/>");
           b.append("Alias: <b>" + l.getAlias() + "</b><br/>");
           b.append("</div></a>");
@@ -317,17 +356,17 @@ public class DashboardHelperService {
           //Base64-encoded string, most likely a barcode image beeped in. decode and search
           searchStr = new String(Base64.decodeBase64(searchStr));
         }
-        samples = new ArrayList<Sample>(requestManager.listAllSamplesBySearch(searchStr));
+        samples = new ArrayList<>(requestManager.listAllSamplesBySearch(searchStr));
       }
       else {
-        samples = new ArrayList<Sample>(requestManager.listAllSamplesWithLimit(50));
+        samples = new ArrayList<>(requestManager.listAllSamplesWithLimit(50));
       }
 
       if (samples.size() > 0) {
         Collections.sort(samples);
         Collections.reverse(samples);
         for (Sample s : samples) {
-          b.append("<a class=\"dashboardresult\" href=\"/miso/sample/" + s.getId() + "\"><div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
+          b.append("<a class=\"list-group-item\" href=\"/miso/sample/" + s.getId() + "\"><div>");
           b.append("Name: <b>" + s.getName() + "</b><br/>");
           b.append("Alias: <b>" + s.getAlias() + "</b><br/>");
           b.append("</div></a>");
@@ -348,8 +387,9 @@ public class DashboardHelperService {
     JSONObject response = new JSONObject();
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      if (!requestManager.listUnreadAlertsByUserId(user.getUserId()).isEmpty()) {
-        response.put("newAlerts", true);
+      Collection<Alert> alerts = requestManager.listUnreadAlertsByUserId(user.getUserId());
+      if (!alerts.isEmpty()) {
+        response.put("newAlerts", alerts.size());
       }
     }
     catch (IOException e) {
@@ -366,27 +406,28 @@ public class DashboardHelperService {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       List<Alert> alerts;
       if (json.has("showReadAlerts") && json.getBoolean("showReadAlerts")) {
-        alerts = new ArrayList<Alert>(requestManager.listAlertsByUserId(user.getUserId()));
+        alerts = new ArrayList<>(requestManager.listAlertsByUserId(user.getUserId()));
       }
       else {
-        alerts = new ArrayList<Alert>(requestManager.listUnreadAlertsByUserId(user.getUserId()));
+        alerts = new ArrayList<>(requestManager.listUnreadAlertsByUserId(user.getUserId()));
       }
       Collections.sort(alerts);
       for (Alert a : alerts) {
         if (a.getAlertLevel().equals(AlertLevel.CRITICAL) || a.getAlertLevel().equals(AlertLevel.HIGH)) {
-          b.append("<div alertId='" + a.getAlertId() + "' class=\"dashboard error\">");
+          b.append("<li alertId='" + a.getAlertId() + "' class=\"dashboard error\">");
         }
         else {
-          b.append("<div alertId='" + a.getAlertId() + "' class=\"dashboard\">");
+          b.append("<li alertId='" + a.getAlertId() + "' class=\"dashboard\">");
         }
 
         b.append(a.getAlertDate() + " <b>" + a.getAlertTitle() + "</b><br/>");
         b.append(a.getAlertText() + "<br/>");
         if (!a.getAlertRead()) {
-          b.append("<span onclick='Utils.alert.confirmAlertRead(this);' class='float-right ui-icon ui-icon-circle-close'></span>");
+          b.append("<span onclick='Utils.alert.confirmAlertRead(this);' class='fa fa-fw fa-2x fa-times-circle-o pull-right'></span>");
         }
-        b.append("</div>");
+        b.append("</li>");
       }
+      b.append("<li class='divider'></li><li><a class='text-center' href='#'><strong>See All Alerts</strong><i class='fa fa-angle-right fa-fw'></i></a></li>");
     }
     catch (IOException e) {
       e.printStackTrace();
@@ -473,6 +514,33 @@ public class DashboardHelperService {
       JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
     return JSONUtils.SimpleJSONResponse("ok");
+  }
+
+  public JSONObject showLatestReceivedSamples(HttpSession session, JSONObject json) {
+    try {
+      StringBuilder b = new StringBuilder();
+      Collection<Sample> samples = requestManager.listAllSamplesByReceivedDate(100);
+
+      if (samples.size() > 0) {
+        for (Sample s : samples) {
+          if (s.getReceivedDate() != null) {
+            b.append("<a class=\"list-group-item\" href=\"/miso/project/" + s.getProject().getId() + "\"><div>");
+            b.append("Name: <b>" + s.getProject().getName() + "</b><br/>");
+            b.append("Alias: <b>" + s.getProject().getAlias() + "</b><br/>");
+            b.append("Last Received: <b>" + LimsUtils.getDateAsString(s.getReceivedDate()) + "</b><br/>");
+            b.append("</div>");
+          }
+        }
+      }
+      else {
+        b.append("No matches");
+      }
+      return JSONUtils.JSONObjectResponse("html", b.toString());
+    }
+    catch (IOException e) {
+      log.debug("Failed", e);
+      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
+    }
   }
 
   public void setSecurityManager(SecurityManager securityManager) {

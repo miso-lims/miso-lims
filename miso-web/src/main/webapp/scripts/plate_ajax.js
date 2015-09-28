@@ -21,6 +21,8 @@
  * *********************************************************************
  */
 
+var projectColorMap = JSON.parse('{}');
+
 var Plate = Plate || {
   deletePlate: function (plateId, successfunc) {
     if (confirm("Are you sure you really want to delete plate " + plateId + "? This operation is permanent!")) {
@@ -41,24 +43,24 @@ Plate.barcode = {
   printPlateBarcodes: function () {
     var plates = [];
     for (var i = 0; i < arguments.length; i++) {
-      plates[i] = {'plateId': plates[i]};
+      plates[i] = {'plateId': arguments[i]};
     }
 
     Fluxion.doAjax(
-      'printerControllerHelperService',
-      'listAvailableServices',
-      {
-        'serviceClass':'uk.ac.bbsrc.tgac.miso.core.data.Plate',
-        'url':ajaxurl
-      },
-      {
-        'doOnSuccess':function (json) {
-          jQuery('#printServiceSelectDialog')
-            .html("<form>" +
-                  "<fieldset class='dialog'>" +
-                  "<select name='serviceSelect' id='serviceSelect' class='ui-widget-content ui-corner-all'>" +
-                  json.services +
-                  "</select></fieldset></form>");
+            'printerControllerHelperService',
+            'listAvailableServices',
+            {
+              'serviceClass': 'uk.ac.bbsrc.tgac.miso.core.data.Plate',
+              'url': ajaxurl
+            },
+            {
+              'doOnSuccess': function (json) {
+                jQuery('#printServiceSelectDialog')
+                        .html("<form>" +
+                              "<fieldset class='dialog'>" +
+                              "<select name='serviceSelect' id='serviceSelect' class='ui-widget-content ui-corner-all'>" +
+                              json.services +
+                              "</select></fieldset></form>");
 
                 jQuery(function () {
                   jQuery('#printServiceSelectDialog').dialog({
@@ -119,25 +121,25 @@ Plate.barcode = {
       .html("<form>" +
             "<fieldset class='dialog'>" +
             "<label for='notetext'>New Location:</label>" +
-            "<input type='text' name='locationBarcode' id='locationBarcode' class='text ui-widget-content ui-corner-all'/>" +
+            "<input type='text' name='locationBarcode' id='locationBarcode' class='form-control'/>" +
             "</fieldset></form>");
 
-    jQuery(function() {
+    jQuery(function () {
       jQuery('#changePlateLocationDialog').dialog({
-        autoOpen: false,
-        width: 400,
-        modal: true,
-        resizable: false,
-        buttons: {
-          "Save": function() {
-            self.changePlateLocation(plateId, jQuery('#locationBarcode').val());
-            jQuery(this).dialog('close');
-          },
-          "Cancel": function() {
-            jQuery(this).dialog('close');
-          }
-        }
-      });
+                                                    autoOpen: false,
+                                                    width: 400,
+                                                    modal: true,
+                                                    resizable: false,
+                                                    buttons: {
+                                                      "Save": function () {
+                                                        self.changePlateLocation(plateId, jQuery('#locationBarcode').val());
+                                                        jQuery(this).dialog('close');
+                                                      },
+                                                      "Cancel": function () {
+                                                        jQuery(this).dialog('close');
+                                                      }
+                                                    }
+                                                  });
     });
     jQuery('#changePlateLocationDialog').dialog('open');
   },
@@ -205,9 +207,9 @@ Plate.ui = {
     var iframe = document.getElementById(frameId);
     var iframedoc = iframe.document;
     if (iframe.contentDocument)
-        iframedoc = iframe.contentDocument;
+      iframedoc = iframe.contentDocument;
     else if (iframe.contentWindow)
-        iframedoc = iframe.contentWindow.document;
+      iframedoc = iframe.contentWindow.document;
     var response = jQuery(iframedoc).contents().find('body:first').find('#uploadresponsebody').val();
     if (!Utils.validation.isNullCheck(response)) {
       var json = jQuery.parseJSON(response);
@@ -259,9 +261,9 @@ Plate.ui = {
     var iframe = document.getElementById(frameId);
     var iframedoc = iframe.document;
     if (iframe.contentDocument)
-        iframedoc = iframe.contentDocument;
+      iframedoc = iframe.contentDocument;
     else if (iframe.contentWindow)
-        iframedoc = iframe.contentWindow.document;
+      iframedoc = iframe.contentWindow.document;
     var response = jQuery(iframedoc).contents().find('body:first').find('#uploadresponsebody').val();
     if (!Utils.validation.isNullCheck(response)) {
       var json = jQuery.parseJSON(response);
@@ -312,51 +314,51 @@ Plate.ui = {
       return ((a < b) ? 1 : ((a > b) ? -1 : 0));
     };
     Fluxion.doAjax(
-            'plateControllerHelperService',
-            'plateElementsDataTable',
-            {
-              'url': ajaxurl,
-              'plateId': plateId
-            },
-            {'doOnSuccess': function (json) {
-              jQuery('#plateElementsTable').html('');
-              jQuery('#plateElementsTable').dataTable({
-                                                        "aaData": json.elementsArray,
-                                                        "aoColumns": [
-                                                          { "sTitle": "Name", "sType": "no-pla"},
-                                                          { "sTitle": "Alias"},
-                                                          { "sTitle": "Barcode Kit"},
-                                                          { "sTitle": "Barcode Sequence"},
-                                                          { "sTitle": "Edit"}
-                                                        ],
-                                                        "bJQueryUI": true,
-                                                        "iDisplayLength": 25,
-                                                        "aaSorting": [
-                                                          [0, "desc"]
-                                                        ],
-                                                        "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>'
-                                                        /*
-                                                         ,
+      'plateControllerHelperService',
+      'plateElementsDataTable',
+      {
+        'url': ajaxurl,
+        'plateId': plateId
+      },
+      {'doOnSuccess': function (json) {
+        jQuery('#plateElementsTable').html('');
+        jQuery('#plateElementsTable').dataTable({
+          "aaData": json.elementsArray,
+          "aoColumns": [
+            { "sTitle": "Name", "sType": "no-pla"},
+            { "sTitle": "Alias"},
+            { "sTitle": "Barcode Kit"},
+            { "sTitle": "Barcode Sequence"},
+            { "sTitle": "Edit"}
+          ],
+          "bJQueryUI": false,
+          "iDisplayLength": 25,
+          "aaSorting": [
+            [0, "desc"]
+          ]
+          /*
+           ,
 
-                                                         "fnRowCallback": function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-                                                         Fluxion.doAjax(
-                                                         'projectControllerHelperService',
-                                                         'checkOverviewByProjectId',
-                                                         {
-                                                         'projectId':aData[4],
-                                                         'url':ajaxurl
-                                                         },
-                                                         {'doOnSuccess': function(json) {
-                                                         jQuery('td:eq(4)', nRow).html(json.response);
-                                                         }
-                                                         }
-                                                         );
-                                                         }
-                                                         */
-                                                      });
-              jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
-            }
-            }
+           "fnRowCallback": function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+           Fluxion.doAjax(
+           'projectControllerHelperService',
+           'checkOverviewByProjectId',
+           {
+           'projectId':aData[4],
+           'url':ajaxurl
+           },
+           {'doOnSuccess': function(json) {
+           jQuery('td:eq(4)', nRow).html(json.response);
+           }
+           }
+           );
+           }
+           */
+        });
+        jQuery("#plateElementsTable_wrapper").prepend("<div class='float-right toolbar'></div>");
+        //jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
+      }
+      }
     );
   },
   searchSamples: function (text) {
@@ -384,47 +386,192 @@ Plate.ui = {
     var div = "<div onMouseOver='this.className=\"dashboardhighlight\"' onMouseOut='this.className=\"dashboard\"' class='dashboard'>";
     div += "<span class='float-left' id='element" + elementId + "'><input type='hidden' id='poolableElements" + elementId + "' value='" + elementName + "' name='poolableElements'/>";
     div += "<b>Element: " + elementName + "</b></span>";
-    div += "<span onclick='Utils.ui.confirmRemove(jQuery(this).parent());' class='float-right ui-icon ui-icon-circle-close'></span></div>";
+    div += "<span onclick='Utils.ui.confirmRemove(jQuery(this).parent());' class='fa fa-fw fa-2x fa-times-circle-o pull-right'></span></div>";
     jQuery('#dillist').append(div);
     jQuery('#searchElementsResult').css('visibility', 'hidden');
   },
 
 
-  insertSampleNextAvailable: function (sampleDiv) {
-    var sample = jQuery(sampleDiv);
-    var sampleId = sample.find('input').attr("id");
-    var sampleName = sample.find('input').attr("name");
-    var projectName = sample.find('input').attr("projectName");
-    var sampleAlias = sample.find('input').attr("sampleAlias");
+  insertSampleNextAvailable: function (sampleName,projectName) {
+    var bgcolor;
+    if (projectColorMap[projectName]!=null) {
+      bgcolor= projectColorMap[projectName];
+    } else{
+      bgcolor= Plate.ui.get_random_color();
+      projectColorMap[projectName]=bgcolor;
+    }
+
     jQuery('.plateWell:empty:first').each(function () {
       var wellId = jQuery(this).attr("id");
-      jQuery(this).append("<input type=\"hidden\" value=\"" + sampleId + ":" + wellId+ ":" +sampleAlias+ ":" +projectName + "\" name=\"sampleinwell\"/> " + sampleName);
-      jQuery(this).append(" <span onclick='Plate.ui.confirmSampleRemove(this);' class='ui-icon ui-icon-circle-close'></span>");
+      var sampleNameStr = sampleName.toString();
+      jQuery(this).append('<div class="plateElement" data-toggle="popover" data-original-title="Edit Element" data-placement="bottom" data-trigger="focus" title="Sample: '
+                                  + sampleNameStr + ' Project: '+ projectName + '" data-content="Sample: '
+                                  + sampleNameStr + ' Project: '+ projectName + '"> <i onclick="Plate.ui.confirmRemove(jQuery(this));" class="fa fa-fw fa-1 fa-times-circle-o move-right"></i><input type="hidden" value="'
+                                  + sampleName + ':' + wellId + ':' + projectName + '" name="sampleinwell"/></div>');
+      jQuery(this).droppable("option", "disabled", true);
     });
+
+    Plate.ui.makeElementDraggable();
+
   },
 
-  confirmSampleRemove: function (t) {
-    if (confirm("Remove this sample?")) {
-      jQuery(t).parent().html('');
+  get_random_color: function () {
+    var letters = '0123456789ABCDEF'.split('');
+    var color = '#';
+    for (var i = 0; i < 6; i++ ) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return '#'+color;
+  },
+
+  confirmRemove: function (obj) {
+    if (confirm("Are you sure you wish to remove this item?")) {
+      obj.parent().parent().droppable("option", "disabled", false);
+      obj.parent().parent().html('');
     }
   },
 
-  exportSampleForm: function (){
+  makeElementDraggable: function () {
+
+  jQuery( ".plateElement" ).draggable({
+    containment:'#formbox',
+    cursor:'pointer',
+    stack: '#formbox div',
+    revert: true
+  });
+  },
+
+  exportSampleForm: function () {
     Utils.ui.disableButton("exportSampleForm");
     Fluxion.doAjax(
             'plateControllerHelperService',
             'exportSampleForm',
             {
-              'form':jQuery('#plateExportForm').serializeArray(),
-             // 'documentFormat':documentFormat,
-              'url':ajaxurl
+              'form': jQuery('#plateExportForm').serializeArray(),
+              // 'documentFormat':documentFormat,
+              'url': ajaxurl
             },
-            {'doOnSuccess':function (json) {
-              Utils.page.pageRedirect('/miso/download/plate/forms/' + json.response );
+            {'doOnSuccess': function (json) {
+              Utils.page.pageRedirect('/miso/download/plate/forms/' + json.response);
             }
             }
     );
     Utils.ui.reenableButton("exportSampleForm", "Export Excel");
+  },
+
+  saveElements: function (plateId) {
+
+    Utils.ui.disableButton("saveElements");
+    Fluxion.doAjax(
+            'plateControllerHelperService',
+            'saveElements',
+            {
+              plateId: plateId,
+              'form': jQuery('#elementsForm').serializeArray(),
+              'url': ajaxurl
+            },
+            {'doOnSuccess': function (json) {
+              Utils.ui.reenableButton("saveElements", "Saved");
+            }
+            }
+    );
+  },
+
+  createPlateElementsUI: function (plateId, size) {
+    if (size == '96'){
+       jQuery('#elementsForm').html(jQuery('#plate96structure').html());
+    } else if (size == '384'){
+      jQuery('#elementsForm').html(jQuery('#plate384structure').html());
+    } else {
+      jQuery('#elementsForm').html('<b>Not supported plate size</b>');
+    }
+
+    jQuery('#plateElementsTable').html("<img src='../../styles/images/ajax-loader.gif'/>");
+    Fluxion.doAjax(
+            'plateControllerHelperService',
+            'createPlateElementsUI',
+            {
+              'url': ajaxurl,
+              'plateId': plateId
+            },
+            {'doOnSuccess': function (json) {
+              var elementsArray = JSON.parse(json[elementsArray]);
+
+              for (var element in elementsArray) {
+                jQuery('#' + element[0]).html('<input type="hidden" value="SAM' + element[1] + ':' + element[0] + '" name="sampleinwell"> SAM' + element[1]
+                                                      + '<span onclick="ImportExport.confirmSampleRemove(this);" class="ui-icon ui-icon-circle-close"></span>');
+              }
+            }
+            }
+    );
+  },
+
+
+  createSampleSelectionTable: function () {
+    jQuery('#sampleSelectionTable').html("<img src='/styles/images/ajax-loader.gif'/>");
+    jQuery.fn.dataTableExt.oSort['no-sam-asc'] = function (x, y) {
+      var a = parseInt(x.replace(/^SAM/i, ""));
+      var b = parseInt(y.replace(/^SAM/i, ""));
+      return ((a < b) ? -1 : ((a > b) ? 1 : 0));
+    };
+    jQuery.fn.dataTableExt.oSort['no-sam-desc'] = function (x, y) {
+      var a = parseInt(x.replace(/^SAM/i, ""));
+      var b = parseInt(y.replace(/^SAM/i, ""));
+      return ((a < b) ? 1 : ((a > b) ? -1 : 0));
+    };
+    Fluxion.doAjax(
+            'plateControllerHelperService',
+            'listSampleSelectionTable',
+            {
+              'url': ajaxurl
+            },
+            {'doOnSuccess': function (json) {
+              jQuery('#sampleSelectionTable').html('');
+              var oTable = jQuery('#sampleSelectionTable').dataTable({
+                                                         "aaData": json.array,
+                                                         "aoColumns": [
+                                                           { "sTitle": "Project Name", "sType": "natrual"},
+                                                           { "sTitle": "Project Alias"},
+                                                           { "sTitle": "Sample Name", "sType": "no-sam"},
+                                                           { "sTitle": "Sample Alias"},
+                                                           { "sTitle": "Add"}
+                                                         ],
+                                                         "bJQueryUI": false,
+                                                         "iDisplayLength": 96,
+                                                         "dom": 'f<"toolbar">rtip',
+                                                          "fnRowCallback": function (nRow, aData, iDisplayIndex) {
+                                                            if (jQuery.inArray([(aData[2]),(aData[0])], selected) != -1) {
+                                                              jQuery(nRow).addClass('row_selected');
+                                                            }
+                                                            return nRow;
+                                                          },
+                                                         "aaSorting": [
+                                                           [3, "asc"]
+                                                         ]
+                                                       });
+
+
+              /* Click event handler */
+              jQuery('#sampleSelectionTable tbody tr').live('click', function () {
+                var aData = oTable.fnGetData(this);
+                var iId = [(aData[2]),(aData[0])];
+
+                if (jQuery.inArray(iId, selected) == -1) {
+                  selected[selected.length++] = iId;
+                }
+                else {
+                  selected = jQuery.grep(selected, function (value) {
+                    return value != iId;
+                  });
+                }
+                jQuery(this).toggleClass('row_selected');
+              });
+
+              jQuery("div.toolbar").html("<button type=\"button\" id=\"createPoolButton\" onClick=\"addBulkSamples();\" class=\"btn btn-default\">Add Selected Samples</button>");
+              jQuery("div.toolbar").removeClass("toolbar");
+            }
+            }
+    );
   }
 
 };

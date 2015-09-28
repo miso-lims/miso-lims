@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.security.PasswordCodecService;
 
 import java.io.IOException;
 
@@ -55,6 +56,13 @@ public class UserRegistrationController {
     this.securityManager = securityManager;
   }
 
+  @Autowired
+  private PasswordCodecService passwordCodecService;
+
+  public void setPasswordCodecService(PasswordCodecService passwordCodecService) {
+    this.passwordCodecService = passwordCodecService;
+  }
+
   @RequestMapping(method = RequestMethod.GET)
   public ModelAndView setupForm(ModelMap model) throws IOException {
     model.put("user", new UserImpl());
@@ -65,6 +73,14 @@ public class UserRegistrationController {
   public String processSubmit(@ModelAttribute("user") User user,
                               ModelMap model, SessionStatus session) throws IOException {
     try {
+      //encode the password as set by the passwordCodecService
+      if (passwordCodecService != null) {
+        user.setPassword(passwordCodecService.getEncoder().encodePassword(user.getPassword(), null));
+      }
+      else {
+        log.warn("No passwordCodecService set! Passwords will be stored in plaintext!");
+      }
+
       securityManager.saveUser(user);
       session.setComplete();
       model.clear();

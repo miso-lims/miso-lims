@@ -29,6 +29,7 @@ package uk.ac.bbsrc.tgac.miso.notification.manager;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import net.sf.json.util.JSONUtils;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -84,10 +85,35 @@ public class NotificationRequestManager {
     this.dataPaths = dataPaths;
   }
 
-  public String queryRunStatus(JSONObject request) {
+  public String queryRunProgress(JSONObject request) throws IllegalStateException, IllegalArgumentException {
     File folder = lookupRunAliasPath(request);
     if (folder != null) {
-      String platformType = request.getString("platform");
+      String platformType = request.getString("platform").toLowerCase();
+      Map<String, String> status = parseRunFolder(platformType, folder);
+      if (status.isEmpty()) {
+        return "{'response':'No runs found with alias "+request.getString("run")+"'}";
+      }
+
+      for (String s : status.keySet()) {
+        if (!"".equals(status.get(s))) {
+          JSONArray runs = JSONArray.fromObject(status.get(s));
+          if (!runs.isEmpty()) {
+            return "{'progress':'"+s+"'}";
+          }
+        }
+        else {
+          return "{'response':'No runs found with status "+s+" with alias "+request.getString("run")+"'}";
+        }
+      }
+    }
+
+    return "";
+  }
+
+  public String queryRunStatus(JSONObject request) throws IllegalStateException, IllegalArgumentException {
+    File folder = lookupRunAliasPath(request);
+    if (folder != null) {
+      String platformType = request.getString("platform").toLowerCase();
       Map<String, String> status = parseRunFolder(platformType, folder);
       for (String s : status.keySet()) {
         if (!"".equals(status.get(s))) {
@@ -106,10 +132,10 @@ public class NotificationRequestManager {
     return "";
   }
 
-  public String queryRunInfo(JSONObject request) {
+  public String queryRunInfo(JSONObject request) throws IllegalStateException, IllegalArgumentException {
     File folder = lookupRunAliasPath(request);
     if (folder != null) {
-      String platformType = request.getString("platform");
+      String platformType = request.getString("platform").toLowerCase();
       Map<String, String> status = parseRunFolder(platformType, folder);
       for (String s : status.keySet()) {
         if (!"".equals(status.get(s))) {
@@ -128,10 +154,10 @@ public class NotificationRequestManager {
     return "";
   }
 
-  public String queryRunParameters(JSONObject request) {
+  public String queryRunParameters(JSONObject request) throws IllegalStateException, IllegalArgumentException {
     File folder = lookupRunAliasPath(request);
     if (folder != null) {
-      String platformType = request.getString("platform");
+      String platformType = request.getString("platform").toLowerCase();
       Map<String, String> status = parseRunFolder(platformType, folder);
       for (String s : status.keySet()) {
         if (!"".equals(status.get(s))) {
@@ -150,9 +176,30 @@ public class NotificationRequestManager {
     return "";
   }
 
+  public String queryInterOpMetrics(JSONObject request) throws IllegalStateException, IllegalArgumentException {
+    File folder = lookupRunAliasPath(request);
+    if (folder != null) {
+      JSONArray runs = parseIlluminaInterOpFolder(folder);
+      if (!runs.isEmpty()) {
+        JSONObject run = runs.getJSONObject(0);
+        if (run.has("error")) {
+          return run.getString("error");
+        }
+
+        if (run.has("metrix")) {
+          return run.getString("metrix");
+        }
+      }
+    }
+    else {
+      return "{\"error\":\"Cannot find run folder "+request.getString("run").replaceAll("('|\")", "\\\\$1")+"\"}";
+    }
+    return "";
+  }
+
   private File lookupRunAliasPath(JSONObject request) {
     if (context != null && dataPaths != null) {
-      String platformType = request.getString("platform");
+      String platformType = request.getString("platform").toLowerCase();
       if (!"".equals(platformType) && platformType != null) {
         String runAlias = request.getString("run");
         if (!"".equals(runAlias) && runAlias != null) {
@@ -175,16 +222,33 @@ public class NotificationRequestManager {
     }
   }
 
-  private Map<String, String> parseRunFolder(String platformType, File path) {
+  private Map<String, String> parseRunFolder(String platformType, File path) throws IllegalStateException, IllegalArgumentException {
     if (context != null && dataPaths != null) {
       if (!"".equals(platformType) && platformType != null) {
         FileSetTransformer<String, String, File> fst = (FileSetTransformer<String, String, File>)context.getBean(platformType+"Transformer");
-        Set<File> fs = new HashSet<File>();
+        Set<File> fs = new HashSet<>();
         fs.add(path);
         return fst.transform(fs);
       }
       else {
         throw new IllegalArgumentException("No platformType set. Cannot parse run folder.");
+      }
+    }
+    else {
+      throw new IllegalStateException("ApplicationContext and/or datapaths not set. Cannot action requests on notification system.");
+    }
+  }
+
+  private JSONArray parseIlluminaInterOpFolder(File path) throws IllegalStateException {
+    if (context != null && dataPaths != null) {
+      IlluminaTransformer fst = (IlluminaTransformer)context.getBean("illuminaTransformer");
+      if (fst != null) {
+        Set<File> fs = new HashSet<>();
+        fs.add(path);
+        return fst.transformInterOpOnly(fs);
+      }
+      else {
+        throw new IllegalStateException("No IlluminaTransformer available");
       }
     }
     else {

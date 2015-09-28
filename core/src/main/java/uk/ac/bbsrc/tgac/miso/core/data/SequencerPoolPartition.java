@@ -42,7 +42,7 @@ import org.w3c.dom.Document;
 //@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
 @JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
 @JsonIgnoreProperties({"securityProfile"})
-public interface SequencerPoolPartition extends Partition, Submittable<Document> {
+public interface SequencerPoolPartition extends Partition, Deletable, Submittable<Document> {
   /**
    * Returns the pool of this SequencerPoolPartition object.
    *

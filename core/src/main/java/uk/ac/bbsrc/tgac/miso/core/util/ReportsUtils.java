@@ -330,7 +330,7 @@ public class ReportsUtils {
           for (SampleQC sampleQC : sample.getSampleQCs()) {
             sb.append("<tr>\n" +
                       "                    <td>" + sampleQC.getQcCreator() + "</td>\n" +
-                      "                    <td>" + sampleQC.getQcDate().toString() + "</td>\n" +
+                      "                    <td>" + LimsUtils.getDateAsString(sampleQC.getQcDate()) + "</td>\n" +
                       "                    <td>" + sampleQC.getQcType().getName() + "</td>\n" +
                       "                    <td>" + sampleQC.getResults().toString() + "ng/&#181;l</td>\n" +
                       "                </tr>");
@@ -389,7 +389,7 @@ public class ReportsUtils {
               for (SampleQC sampleQC : sample.getSampleQCs()) {
                 sb.append("<li>\n" +
                           "                    QCed By: " + sampleQC.getQcCreator() + "<br/>\n" +
-                          "                    QC Date: " + sampleQC.getQcDate().toString() + "<br/>\n" +
+                          "                    QC Date: " + LimsUtils.getDateAsString(sampleQC.getQcDate()) + "<br/>\n" +
                           "                    Method: " + sampleQC.getQcType().getName() + "<br/>\n" +
                           "                    Results: " + sampleQC.getResults().toString() + "ng/&#181;l</li>");
               }

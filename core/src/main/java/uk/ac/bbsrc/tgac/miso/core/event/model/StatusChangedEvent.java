@@ -23,6 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.event.model;
 
+import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.event.Event;
 import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
@@ -39,6 +40,7 @@ import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
 public class StatusChangedEvent<T> implements Event {
   private T o;
   private Status currentStatus;
+  private JSONObject eventContext = new JSONObject();
 
   public StatusChangedEvent(T o, Status s) {
     this.o = o;
@@ -61,5 +63,14 @@ public class StatusChangedEvent<T> implements Event {
   @Override
   public MisoEventType getEventType() {
     return MisoEventType.STATUS_CHANGED_EVENT;
+  }
+
+  @Override
+  public JSONObject getEventContext() {
+    return eventContext;
+  }
+
+  public void setEventContext(JSONObject eventContext) {
+    this.eventContext = eventContext;
   }
 }

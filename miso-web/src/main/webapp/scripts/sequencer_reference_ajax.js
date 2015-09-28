@@ -40,17 +40,17 @@ Sequencer.ui = {
     var column1 = $('sequencerReferenceTable').rows[1].insertCell(-1);
     column1.innerHTML = "<i>Unsaved</i>";
     var column2 = $('sequencerReferenceTable').rows[1].insertCell(-1);
-    column2.innerHTML = "<input id='sequencername' name='sequencername' type='text'/>";
+    column2.innerHTML = "<input id='sequencername' name='sequencername' type='text' class='form-control'/>";
     var column3 = $('sequencerReferenceTable').rows[1].insertCell(-1);
   //  column3.innerHTML = "<input id='platform' name='platform' type='text'/>";
     column3.innerHTML = "<select id='platforms' name='platform'>" +json.platforms+ "</select>";
     var column4 = $('sequencerReferenceTable').rows[1].insertCell(-1);
-    column4.innerHTML = "<input id='server' name='server' type='text' onkeyup='Sequencer.ui.validateServer(this)'/>";
+    column4.innerHTML = "<input id='server' name='server' type='text' onkeyup='Sequencer.ui.validateServer(this)' class='form-control'/>";
     var column5 = $('sequencerReferenceTable').rows[1].insertCell(-1);
     column5.innerHTML = "<div id='available'></div>";
     var column6 = $('sequencerReferenceTable').rows[1].insertCell(-1);
     column6.id = "addTd";
-    column6.innerHTML = "Add";
+    column6.innerHTML = "<i>Add server address...</i>";
   },
 
   validateServer : function(t) {
@@ -68,7 +68,7 @@ Sequencer.ui = {
             $('available').innerHTML = json.html;
             if (json.html == "OK") {
               $('available').setAttribute("style", "background-color:green");
-              $('addTd').innerHTML = "<a href='javascript:void(0);' onclick='Sequencer.ui.addSequencerReference();'/>Add</a>";
+              $('addTd').innerHTML = "<div style='text-align:center;'><a href='javascript:void(0);' onclick='Sequencer.ui.addSequencerReference();'/><span class='fa fa-fw fa-lg fa-plus-square-o'></span></a></div>";
             }
             else {
               $('available').setAttribute("style", "background-color:red");

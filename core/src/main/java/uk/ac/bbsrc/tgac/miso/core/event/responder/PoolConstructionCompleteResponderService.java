@@ -80,11 +80,15 @@ public class PoolConstructionCompleteResponderService implements ResponderServic
       ProjectOverview po = re.getEventObject();
 
       for (User user : po.getWatchers()) {
-        log.info("Responding to " + user.getLoginName());
-
         Alert a = new DefaultAlert(user);
         a.setAlertTitle("Pool construction complete for project " + po.getProject().getAlias() + "(" + po.getProject().getName() + ")");
-        a.setAlertText("The following Project's Pools have been prepared and are ready to run: "+po.getProject().getAlias()+" ("+event.getEventMessage()+"). Please view Project " +po.getProject().getProjectId() + " in MISO for more information");
+
+        StringBuilder at = new StringBuilder();
+        at.append("The following Project's Pools have been prepared and are ready to run: "+po.getProject().getAlias()+" ("+event.getEventMessage()+"). Please view Project " +po.getProject().getId() + " in MISO for more information");
+        if (event.getEventContext().has("baseURL")) {
+          at.append(":\n\n" + event.getEventContext().getString("baseURL")+"/project/"+po.getProject().getId());
+        }
+        a.setAlertText(at.toString());
 
         for (AlerterService as : alerterServices) {
           try {

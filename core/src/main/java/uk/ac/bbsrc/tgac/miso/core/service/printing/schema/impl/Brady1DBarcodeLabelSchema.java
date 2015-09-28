@@ -55,7 +55,7 @@ public class Brady1DBarcodeLabelSchema implements BarcodableSchema<File, JSONObj
       sb.append("m m").append("\n");
       sb.append("J").append("\n");
       sb.append("S l1;0,0,6,9,50").append("\n");
-      sb.append("B 2,0,0,CODE128,5,0.25;").append(field1).append("\n");
+      sb.append("B 1,0,0,CODE128,5,0.25;").append(field1).append("\n");
       sb.append("A ").append(count).append("\n");
     }
     catch (Exception e) {

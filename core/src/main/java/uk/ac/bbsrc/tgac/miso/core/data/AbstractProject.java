@@ -210,6 +210,9 @@ public abstract class AbstractProject implements Project {
 
   public void setOverviews(Collection<ProjectOverview> overviews) {
     this.overviews = overviews;
+    for (ProjectOverview po : overviews) {
+      po.setProject(this);
+    }
   }
 
   public ProgressType getProgress() {

@@ -28,7 +28,13 @@
     jQuery("#tabs").tabs();
   });
 </script>
-<h1>Consumables</h1>
+<nav class="navbar navbar-default" role="navigation">
+   <div class="navbar-header">
+      <span class="navbar-brand navbar-center">
+        Consumables
+      </span>
+   </div>
+</nav>
 
 <div id="tabs">
 <ul>
@@ -41,16 +47,17 @@
 </ul>
 
 <div id="tab-1">
-  <h1>
-    <div id="SequencingtotalCount">
+  <nav class="navbar navbar-default" role="navigation">
+    <div class="navbar-header">
+      <span class="navbar-brand navbar-center" id="SequencingtotalCount"></span>
     </div>
-  </h1>
+  </nav>
   <a href="<c:url value="/miso/kitdescriptor/new"/>" class="add">Create Kit Descriptor</a>
 
-  <form id="filter-form1">Filter: <input name="filter" id="filter1" value="" maxlength="30" size="30" type="text">
+  <form id="filter-form1">Filter: <input name="filter" id="filter1" value="" maxlength="30" size="30" type="text" class="form-control">
   </form>
   <br/>
-  <table class="list" id="table1">
+  <table class="table table-bordered table-striped" id="table1">
     <thead>
     <tr>
       <th>Name</th>
@@ -75,7 +82,7 @@
         <td>${sequencing.platformType.key}</td>
         <td class="misoicon"
             onclick="window.location.href='<c:url value="/miso/kitdescriptor/${sequencing.kitDescriptorId}"/>'"><span
-            class="ui-icon ui-icon-pencil"/></td>
+            class="fa fa-pencil-square-o fa-lg"/></td>
       </tr>
     </c:forEach>
     </tbody>
@@ -108,16 +115,17 @@
 </div>
 
 <div id="tab-2">
-  <h1>
-    <div id="EMPCRtotalCount">
+  <nav class="navbar navbar-default" role="navigation">
+    <div class="navbar-header">
+      <span class="navbar-brand navbar-center" id="EMPCRtotalCount"></span>
     </div>
-  </h1>
+  </nav>
   <a href="<c:url value="/miso/kitdescriptor/new"/>" class="add">Create Kit Descriptor</a>
 
-  <form id="filter-form2">Filter: <input name="filter" id="filter2" value="" maxlength="30" size="30" type="text">
+  <form id="filter-form2">Filter: <input name="filter" id="filter2" value="" maxlength="30" size="30" type="text" class="form-control">
   </form>
   <br/>
-  <table class="list" id="table2">
+  <table class="table table-bordered table-striped" id="table2">
     <thead>
     <tr>
       <th>Name</th>
@@ -142,7 +150,7 @@
         <td>${empcr.platformType.key}</td>
         <td class="misoicon"
             onclick="window.location.href='<c:url value="/miso/kitdescriptor/${empcr.kitDescriptorId}"/>'"><span
-            class="ui-icon ui-icon-pencil"/></td>
+            class="fa fa-pencil-square-o fa-lg"/></td>
       </tr>
     </c:forEach>
     </tbody>
@@ -176,16 +184,17 @@
 </div>
 
 <div id="tab-3">
-  <h1>
-    <div id="LibrarytotalCount">
+  <nav class="navbar navbar-default" role="navigation">
+    <div class="navbar-header">
+      <span class="navbar-brand navbar-center" id="LibrarytotalCount"></span>
     </div>
-  </h1>
+  </nav>
   <a href="<c:url value="/miso/kitdescriptor/new"/>" class="add">Create Kit Descriptor</a>
 
-  <form id="filter-form3">Filter: <input name="filter" id="filter3" value="" maxlength="30" size="30" type="text">
+  <form id="filter-form3">Filter: <input name="filter" id="filter3" value="" maxlength="30" size="30" type="text" class="form-control">
   </form>
   <br/>
-  <table class="list" id="table3">
+  <table class="table table-bordered table-striped" id="table3">
     <thead>
     <tr>
       <th>Name</th>
@@ -210,7 +219,7 @@
         <td>${library.platformType.key}</td>
         <td class="misoicon"
             onclick="window.location.href='<c:url value="/miso/kitdescriptor/${library.kitDescriptorId}"/>'"><span
-            class="ui-icon ui-icon-pencil"/></td>
+            class="fa fa-pencil-square-o fa-lg"/></td>
       </tr>
     </c:forEach>
     </tbody>
@@ -244,16 +253,17 @@
 </div>
 
 <div id="tab-4">
-  <h1>
-    <div id="ClusteringtotalCount">
+  <nav class="navbar navbar-default" role="navigation">
+    <div class="navbar-header">
+      <span class="navbar-brand navbar-center" id="ClusteringtotalCount"></span>
     </div>
-  </h1>
+  </nav>
   <a href="<c:url value="/miso/kitdescriptor/new"/>" class="add">Create Kit Descriptor</a>
 
-  <form id="filter-form4">Filter: <input name="filter" id="filter4" value="" maxlength="30" size="30" type="text">
+  <form id="filter-form4">Filter: <input name="filter" id="filter4" value="" maxlength="30" size="30" type="text" class="form-control">
   </form>
   <br/>
-  <table class="list" id="table4">
+  <table class="table table-bordered table-striped" id="table4">
     <thead>
     <tr>
       <th>Name</th>
@@ -278,7 +288,7 @@
         <td>${clustering.platformType.key}</td>
         <td class="misoicon"
             onclick="window.location.href='<c:url value="/miso/kitdescriptor/${clustering.kitDescriptorId}"/>'"><span
-            class="ui-icon ui-icon-pencil"/></td>
+            class="fa fa-pencil-square-o fa-lg"/></td>
       </tr>
     </c:forEach>
     </tbody>
@@ -311,16 +321,17 @@
 </div>
 
 <div id="tab-5">
-  <h1>
-    <div id="MultiplexingtotalCount">
+  <nav class="navbar navbar-default" role="navigation">
+    <div class="navbar-header">
+      <span class="navbar-brand navbar-center" id="MultiplexingtotalCount"></span>
     </div>
-  </h1>
+  </nav>
   <a href="<c:url value="/miso/kitdescriptor/new"/>" class="add">Create Kit Descriptor</a>
 
-  <form id="filter-form5">Filter: <input name="filter" id="filter5" value="" maxlength="30" size="30" type="text">
+  <form id="filter-form5">Filter: <input name="filter" id="filter5" value="" maxlength="30" size="30" type="text" class="form-control">
   </form>
   <br/>
-  <table class="list" id="table5">
+  <table class="table table-bordered table-striped" id="table5">
     <thead>
     <tr>
       <th>Name</th>
@@ -345,7 +356,7 @@
         <td>${multiplexing.platformType.key}</td>
         <td class="misoicon"
             onclick="window.location.href='<c:url value="/miso/kitdescriptor/${multiplexing.kitDescriptorId}"/>'"><span
-            class="ui-icon ui-icon-pencil"/></td>
+            class="fa fa-pencil-square-o fa-lg"/></td>
       </tr>
     </c:forEach>
     </tbody>

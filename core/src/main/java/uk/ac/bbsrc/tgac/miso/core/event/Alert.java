@@ -37,9 +37,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 import java.util.Date;
 
 /**
- * uk.ac.bbsrc.tgac.miso.core.alert
- * <p/>
- * Info
+ * Interface describing an alert that can be raised, usually as a result of an {@link Event}
  *
  * @author Rob Davey
  * @date 22-Sep-2011

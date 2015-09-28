@@ -73,7 +73,7 @@ public class FormUtilsTests {
   @Test
   public void testCreateSampleDeliveryForm() {
     try {
-      uk.ac.bbsrc.tgac.miso.core.util.FormUtils.createSampleDeliveryForm(generateSamples(), testSampleDeliveryFile);
+      uk.ac.bbsrc.tgac.miso.core.util.FormUtils.createSampleDeliveryForm(generateSamples(), testSampleDeliveryFile, true);
     }
     catch (Exception e) {
       e.printStackTrace();
@@ -84,7 +84,7 @@ public class FormUtilsTests {
   @Test
   public void testConvertToPdf() {
     try {
-      OdfTextDocument oDoc = uk.ac.bbsrc.tgac.miso.core.util.FormUtils.createSampleDeliveryForm(generateSamples(), testSampleDeliveryFile);
+      OdfTextDocument oDoc = uk.ac.bbsrc.tgac.miso.core.util.FormUtils.createSampleDeliveryForm(generateSamples(), testSampleDeliveryFile, false);
       uk.ac.bbsrc.tgac.miso.core.util.FormUtils.convertToPDF(oDoc);
     }
     catch (Exception e) {

@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import com.google.json.JsonSanitizer;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
@@ -106,11 +107,11 @@ public class StudyControllerHelperService {
       JSONObject j = new JSONObject();
       JSONArray jsonArray = new JSONArray();
       for (Study study : requestManager.listAllStudies()) {
-        jsonArray.add("['" + study.getName() + "','" +
-                      study.getAlias() + "','" +
-                      study.getDescription() + "','" +
-                      study.getStudyType() + "','" +
-                      "<a href=\"/miso/study/" + study.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
+        jsonArray.add(JsonSanitizer.sanitize("[\"" + study.getName() + "\",\"" +
+                     study.getAlias() + "\",\"" +
+                     study.getDescription() + "\",\"" +
+                     study.getStudyType() + "\",\"" +
+                     "<a href=\"/miso/study/" + study.getId() + "\"><span class=\"fa fa-pencil-square-o fa-lg\"></span></a>" + "\"]"));
 
       }
       j.put("array", jsonArray);

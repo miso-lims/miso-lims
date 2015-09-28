@@ -40,7 +40,9 @@ import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.eaglegenomics.simlims.core.User;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
+import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
@@ -49,6 +51,8 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
+import uk.ac.bbsrc.tgac.miso.webapp.context.ApplicationContextProvider;
+import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
 
 @Controller
 @RequestMapping("/sample")
@@ -61,6 +65,9 @@ public class EditSampleController {
 
   @Autowired
   private RequestManager requestManager;
+
+  @Autowired
+  private FilesManager filesManager;
 
   @Autowired
   private DataObjectFactory dataObjectFactory;
@@ -80,8 +87,104 @@ public class EditSampleController {
     this.requestManager = requestManager;
   }
 
+  public void setFilesManager(FilesManager filesManager) {
+    this.filesManager = filesManager;
+  }
+
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
+  }
+
+  @Autowired
+  private ApplicationContextProvider applicationContextProvider;
+
+  public void setApplicationContextProvider(ApplicationContextProvider applicationContextProvider) {
+    this.applicationContextProvider = applicationContextProvider;
+  }
+
+  @ModelAttribute("metrixEnabled")
+  public Boolean isMetrixEnabled() {
+    MisoPropertyExporter exporter = (MisoPropertyExporter)applicationContextProvider.getApplicationContext().getBean("propertyConfigurer");
+    Map<String, String> misoProperties = exporter.getResolvedProperties();
+    return misoProperties.containsKey("miso.notification.interop.enabled") && Boolean.parseBoolean(misoProperties.get("miso.notification.interop.enabled"));
+  }
+
+  public Map<String, Sample> getAdjacentSamplesInGroup(Sample s, @RequestParam(value = "entityGroupId", required = true) Long entityGroupId) throws IOException {
+    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    Project p = s.getProject();
+    HierarchicalEntityGroup<? extends Nameable, Sample> sgroup = (HierarchicalEntityGroup<? extends Nameable, Sample>) requestManager.getEntityGroupById(entityGroupId);
+
+    Sample prevS = null;
+    Sample nextS = null;
+
+    if (p != null) {
+      if (!sgroup.getEntities().isEmpty()) {
+        Map<String, Sample> ret = new HashMap<>();
+        List<Sample> ss = new ArrayList<>(sgroup.getEntities());
+        Collections.sort(ss);
+        for (int i = 0; i < ss.size(); i++) {
+          if (ss.get(i).equals(s)) {
+            if (i != 0 && ss.get(i-1) != null) {
+              prevS = ss.get(i-1);
+            }
+
+            if (i != ss.size()-1 && ss.get(i+1) != null) {
+              nextS = ss.get(i+1);
+            }
+            break;
+          }
+        }
+        ret.put("previousSample", prevS);
+        ret.put("nextSample", nextS);
+        return ret;
+      }
+    }
+    return Collections.emptyMap();
+  }
+
+  public Map<String, Sample> getAdjacentSamplesInProject(Sample s, @RequestParam(value = "projectId", required = false) Long projectId) throws IOException {
+    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    Project p = s.getProject();
+    Sample prevS = null;
+    Sample nextS = null;
+
+    if (p != null && p.getId() == projectId) {
+      if (!p.getSamples().isEmpty()) {
+        Map<String, Sample> ret = new HashMap<>();
+        List<Sample> ss = new ArrayList<>(p.getSamples());
+        Collections.sort(ss);
+        for (int i = 0; i < ss.size(); i++) {
+          if (ss.get(i).equals(s)) {
+            if (i != 0 && ss.get(i-1) != null) {
+              prevS = ss.get(i-1);
+            }
+
+            if (i != ss.size()-1 && ss.get(i+1) != null) {
+              nextS = ss.get(i+1);
+            }
+            break;
+          }
+        }
+        ret.put("previousSample", prevS);
+        ret.put("nextSample", nextS);
+        return ret;
+      }
+    }
+    return Collections.emptyMap();
+  }
+
+  public Map<Integer, String> populateSampleFiles(Long sampleId) throws IOException {
+    if (sampleId != AbstractSample.UNSAVED_ID) {
+      Sample s = requestManager.getSampleById(sampleId);
+      if (s != null) {
+        Map<Integer, String> fileMap = new HashMap<Integer, String>();
+        for (String f : filesManager.getFileNames(Sample.class, sampleId.toString())) {
+          fileMap.put(f.hashCode(), f);
+        }
+        return fileMap;
+      }
+    }
+    return Collections.emptyMap();
   }
 
   public Collection<Project> populateProjects(@RequestParam(value = "projectId", required = false) Long projectId) throws IOException {
@@ -121,6 +224,30 @@ public class EditSampleController {
       }
       throw ex;
     }
+  }
+
+  private Set<Pool<? extends Poolable>> getPoolsBySample(Sample s) throws IOException {
+    if (!s.getLibraries().isEmpty()) {
+      Set<Pool<? extends Poolable>> pools = new TreeSet<>();
+      for (Library l : s.getLibraries()) {
+        List<Pool<? extends Poolable>> prs = new ArrayList<>(requestManager.listPoolsByLibraryId(l.getId()));
+        pools.addAll(prs);
+      }
+      return pools;
+    }
+    return Collections.emptySet();
+  }
+
+  private Set<Run> getRunsBySamplePools(Set<Pool<? extends Poolable>> pools) throws IOException {
+    if (!pools.isEmpty()) {
+      Set<Run> runs = new TreeSet<>();
+      for (Pool<? extends Poolable> pool : pools) {
+        Collection<Run> prs = requestManager.listRunsByPoolId(pool.getId());
+        runs.addAll(prs);
+      }
+      return runs;
+    }
+    return Collections.emptySet();
   }
 
   @ModelAttribute("maxLengths")
@@ -199,6 +326,22 @@ public class EditSampleController {
       model.put("sample", sample);
       model.put("sampleTypes", requestManager.listAllSampleTypes());
       model.put("accessibleProjects", populateProjects(null));
+      Map<String, Sample> adjacentSamples = getAdjacentSamplesInProject(sample, sample.getProject().getProjectId());
+      if (!adjacentSamples.isEmpty()) {
+        model.put("previousSample", adjacentSamples.get("previousSample"));
+        model.put("nextSample", adjacentSamples.get("nextSample"));
+      }
+
+      Set<Pool<? extends Poolable>> pools = getPoolsBySample(sample);
+      Map<Long, Sample> poolSampleMap = new HashMap<>();
+      for (Pool pool : pools) {
+        poolSampleMap.put(pool.getId(), sample);
+      }
+      model.put("poolSampleMap", poolSampleMap);
+      model.put("samplePools", pools);
+      model.put("sampleRuns", getRunsBySamplePools(pools));
+      model.put("sampleFiles", populateSampleFiles(sampleId));
+
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, sample, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, sample, securityManager.listAllUsers()));
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, sample, securityManager.listAllGroups()));
@@ -232,6 +375,7 @@ public class EditSampleController {
           if (Arrays.asList(user.getRoles()).contains("ROLE_TECH")) {
             SecurityProfile sp = new SecurityProfile(user);
             LimsUtils.inheritUsersAndGroups(sample, project.getSecurityProfile());
+            sp.setOwner(user);
             sample.setSecurityProfile(sp);
           }
           else {
@@ -251,6 +395,12 @@ public class EditSampleController {
           model.addAttribute("project", project);
           sample.setProject(project);
           sample.inheritPermissions(project);
+
+          Map<String, Sample> adjacentSamples = getAdjacentSamplesInProject(sample, sample.getProject().getProjectId());
+          if (!adjacentSamples.isEmpty()) {
+            model.put("previousSample", adjacentSamples.get("previousSample"));
+            model.put("nextSample", adjacentSamples.get("nextSample"));
+          }
         }
         else {
           model.put("accessibleProjects", populateProjects(null));
@@ -264,6 +414,17 @@ public class EditSampleController {
       model.put("formObj", sample);
       model.put("sample", sample);
       model.put("sampleTypes", requestManager.listAllSampleTypes());
+
+      Set<Pool<? extends Poolable>> pools = getPoolsBySample(sample);
+      Map<Long, Sample> poolSampleMap = new HashMap<>();
+      for (Pool pool : pools) {
+        poolSampleMap.put(pool.getId(), sample);
+      }
+      model.put("poolSampleMap", poolSampleMap);
+      model.put("samplePools", pools);
+      model.put("sampleRuns", getRunsBySamplePools(pools));
+      model.put("sampleFiles", populateSampleFiles(sampleId));
+
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, sample, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, sample, securityManager.listAllUsers()));
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, sample, securityManager.listAllGroups()));

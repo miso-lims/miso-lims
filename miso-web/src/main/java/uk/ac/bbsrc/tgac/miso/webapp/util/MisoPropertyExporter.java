@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.InvalidPropertyException;
 import org.springframework.beans.factory.BeanInitializationException;
@@ -48,6 +50,8 @@ import java.util.*;
  * @since 0.0.2
  */
 public class MisoPropertyExporter extends PropertyPlaceholderConfigurer {
+  protected static final Logger log = LoggerFactory.getLogger(MisoPropertyExporter.class);
+
   private Map<String, String> resolvedProperties;
   
   @Override
@@ -72,7 +76,7 @@ public class MisoPropertyExporter extends PropertyPlaceholderConfigurer {
 
       List<String> propertiesList = Arrays.asList(new File(baseStoragePath).list(new PropertiesFilenameFilter()));
       for (String propPath : propertiesList) {
-        System.out.println("Attempting to load " + baseStoragePath+propPath);
+        log.debug("Attempting to load " + baseStoragePath+propPath);
         Properties tempProps;
 
         try {
@@ -80,7 +84,7 @@ public class MisoPropertyExporter extends PropertyPlaceholderConfigurer {
           tempProps = new Properties();
           try {
             tempProps.load(in);
-            System.out.println("Loaded " + tempProps.keySet() + " from " + propPath);
+            log.debug("Loaded " + tempProps.keySet() + " from " + propPath);
             CollectionUtils.mergePropertiesIntoMap(tempProps, misoProps);
           }
           catch (IOException e) {
@@ -90,6 +94,12 @@ public class MisoPropertyExporter extends PropertyPlaceholderConfigurer {
         catch (FileNotFoundException e) {
           throw new InvalidPropertyException(MisoPropertyExporter.class, "All", "Cannot load " + baseStoragePath+propPath + " properties. File does not exist!");
         }
+      }
+
+      //override any config file security.method property with that from the system env
+      if (System.getenv("security.method") != null) {
+        misoProps.put("security.method", System.getenv("security.method"));
+        log.debug("Set security.method to " + misoProps.get("security.method"));
       }
 
       super.processProperties(beanFactoryToProcess, misoProps);
@@ -104,9 +114,9 @@ public class MisoPropertyExporter extends PropertyPlaceholderConfigurer {
     }
     else {
       throw new InvalidPropertyException(MisoPropertyExporter.class,
-                                         "miso.baseDirectory", 
-                                         "Cannot resolve miso.baseDirectory. This should be specified in the " +
-                                         "miso.properties file which should be made available on the classpath.");
+        "miso.baseDirectory",
+        "Cannot resolve miso.baseDirectory. This should be specified in the " +
+        "miso.properties file which should be made available on the classpath.");
     }
   }
 

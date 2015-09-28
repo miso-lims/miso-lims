@@ -25,7 +25,9 @@ package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.google.json.JsonSanitizer;
 import com.opensymphony.util.FileUtils;
+import net.sf.ehcache.Cache;
 import net.sf.json.JSONArray;
 import org.apache.commons.codec.binary.Base64;
 import org.krysalis.barcode4j.BarcodeDimension;
@@ -51,6 +53,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
+import uk.ac.bbsrc.tgac.miso.core.util.DateComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeFactory;
@@ -58,6 +61,7 @@ import uk.ac.bbsrc.tgac.miso.core.factory.barcode.MisoJscriptFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.PrintManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.TaxonomyUtils;
+import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpSession;
@@ -94,6 +98,40 @@ public class SampleControllerHelperService {
   private PrintManager<MisoPrintService, Queue<?>> printManager;
   @Autowired
   private MisoNamingScheme<Sample> sampleNamingScheme;
+  @Autowired
+  private CacheHelperService cacheHelperService;
+
+  public void setSecurityManager(SecurityManager securityManager) {
+    this.securityManager = securityManager;
+  }
+
+  public void setRequestManager(RequestManager requestManager) {
+    this.requestManager = requestManager;
+  }
+
+  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
+    this.dataObjectFactory = dataObjectFactory;
+  }
+
+  public void setBarcodeFactory(BarcodeFactory barcodeFactory) {
+    this.barcodeFactory = barcodeFactory;
+  }
+
+  public void setMisoFileManager(MisoFilesManager misoFileManager) {
+    this.misoFileManager = misoFileManager;
+  }
+
+  public void setPrintManager(PrintManager<MisoPrintService, Queue<?>> printManager) {
+    this.printManager = printManager;
+  }
+
+  public void setSampleNamingScheme(MisoNamingScheme<Sample> sampleNamingScheme) {
+    this.sampleNamingScheme = sampleNamingScheme;
+  }
+
+  public void setCacheHelperService(CacheHelperService cacheHelperService) {
+    this.cacheHelperService = cacheHelperService;
+  }
 
   public JSONObject validateSampleAlias(HttpSession session, JSONObject json) {
     if (json.has("alias")) {
@@ -257,7 +295,9 @@ public class SampleControllerHelperService {
         Project p = sample.getProject();
         if (p.userCanRead(user)) {
           for (ProjectOverview po : p.getOverviews()) {
-            users.add(po.getPrincipalInvestigator());
+            if (po.getSampleGroup() != null && po.getSampleGroup().getEntities().contains(sample)) {
+              users.add(po.getPrincipalInvestigator());
+            }
           }
         }
       }
@@ -348,7 +388,7 @@ public class SampleControllerHelperService {
       JSONObject response = new JSONObject();
       Long qcId = Long.parseLong(json.getString("qcId"));
       SampleQC sampleQc = requestManager.getSampleQCById(qcId);
-      response.put("results", "<input type='text' id='" + qcId + "' value='" + sampleQc.getResults() + "'/>");
+      response.put("results", "<input type='text' id='" + qcId + "' value='" + sampleQc.getResults() + "' class='form-control'/>");
       response.put("edit", "<a href='javascript:void(0);' onclick='Sample.qc.editSampleQC(\"" + qcId + "\");'>Save</a>");
       return response;
     }
@@ -452,6 +492,29 @@ public class SampleControllerHelperService {
     }
 
     return JSONUtils.SimpleJSONResponse("Note saved successfully");
+  }
+
+  public JSONObject deleteSampleNote(HttpSession session, JSONObject json) {
+    Long sampleId = json.getLong("sampleId");
+    Long noteId = json.getLong("noteId");
+
+    try {
+      Sample sample = requestManager.getSampleById(sampleId);
+      Note note = requestManager.getNoteById(noteId);
+      if (sample.getNotes().contains(note)) {
+        sample.getNotes().remove(note);
+        requestManager.deleteNote(note);
+        requestManager.saveSample(sample);
+        return JSONUtils.SimpleJSONResponse("OK");
+      }
+      else {
+        return JSONUtils.SimpleJSONError("Sample does not have note " + noteId + ". Cannot remove");
+      }
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+      return JSONUtils.SimpleJSONError("Cannot remove note: " + e.getMessage());
+    }
   }
 
   public JSONObject getSampleByBarcode(HttpSession session, JSONObject json) {
@@ -681,17 +744,64 @@ public class SampleControllerHelperService {
     }
   }
 
+  public JSONObject removeSampleFromGroup(HttpSession session, JSONObject json) {
+    User user;
+    try {
+      user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+      return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
+    }
+
+    if (user != null) {
+      if (json.has("sampleId") && json.has("sampleGroupId")) {
+        Long sampleId = json.getLong("sampleId");
+        Long sampleGroupId = json.getLong("sampleGroupId");
+        try {
+          Sample s = requestManager.getSampleById(sampleId);
+          HierarchicalEntityGroup<? extends Nameable, ? extends Nameable> osg = requestManager.getEntityGroupById(sampleGroupId);
+          if (osg.getEntities().contains(s)) {
+            if (osg.getEntities().remove(s)) {
+              requestManager.saveEntityGroup(osg);
+
+              cacheHelperService.evictObjectFromCache(s.getProject(), Project.class);
+              return JSONUtils.SimpleJSONResponse("Sample removed from group");
+            }
+            else {
+              return JSONUtils.SimpleJSONError("Error removing sample from sample group.");
+            }
+          }
+          else {
+            return JSONUtils.SimpleJSONResponse("Sample not in this sample group!");
+          }
+        }
+        catch (IOException e) {
+          e.printStackTrace();
+          return JSONUtils.SimpleJSONError("Cannot remove sample from group: " + e.getMessage());
+        }
+      }
+      else {
+        return JSONUtils.SimpleJSONError("No sample or sample group specified to remove.");
+      }
+    }
+    else {
+      return JSONUtils.SimpleJSONError("Only logged-in users can remove objects.");
+    }
+  }
+
   public JSONObject listSamplesDataTable(HttpSession session, JSONObject json) {
     try {
       JSONObject j = new JSONObject();
       JSONArray jsonArray = new JSONArray();
       for (Sample sample : requestManager.listAllSamples()) {
-        jsonArray.add("['" + sample.getName() + "','" +
-                      sample.getAlias() + "','" +
-                      sample.getSampleType() + "','" +
-                      (sample.getQcPassed() != null ? sample.getQcPassed().toString() : "") + "','" +
-                      "<a href=\"/miso/sample/" + sample.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
 
+        jsonArray.add(JsonSanitizer.sanitize("[\"" + sample.getName() + "\",\"" +
+                     sample.getAlias() + "\",\"" +
+                     sample.getSampleType() + "\",\"" +
+                     (sample.getQcPassed() != null ? sample.getQcPassed().toString() : "") + "\",\"" +
+                     getSampleLastQC(sample.getId()) + "\",\"" +
+                     "<a href=\"/miso/sample/" + sample.getId() + "\"><span class=\"fa fa-pencil-square-o fa-lg\"></span></a>" + "\"]"));
       }
       j.put("array", jsonArray);
       return j;
@@ -702,31 +812,53 @@ public class SampleControllerHelperService {
     }
   }
 
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
+  public JSONObject getSampleLastQCRequest(HttpSession session, JSONObject json) {
+    Long sampleId = json.getLong("sampleId");
+    return JSONUtils.SimpleJSONResponse(getSampleLastQC(sampleId));
   }
 
-  public void setRequestManager(RequestManager requestManager) {
-    this.requestManager = requestManager;
+  public String getSampleLastQC(Long sampleId){
+    try {
+     String sampleQCValue = "NA";
+     Collection<SampleQC> sampleQCs =  requestManager.listAllSampleQCsBySampleId(sampleId);
+      if (sampleQCs.size()>0){
+        List<SampleQC> list = new ArrayList(sampleQCs);
+        try {
+          Collections.sort(list, new DateComparator(SampleQC.class, "getQcDate", true));
+        }
+        catch (NoSuchMethodException e) {
+          e.printStackTrace();
+          log.error("Cannot sort SampleQCs by date: " + e.getMessage());
+        }
+        SampleQC sampleQC = list.get(list.size()-1);
+        sampleQCValue = sampleQC.getResults().toString();
+      }
+      return sampleQCValue;
+    }
+    catch (IOException e) {
+      log.debug("Failed", e);
+      return "Failed: " + e.getMessage();
+    }
   }
 
-  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-    this.dataObjectFactory = dataObjectFactory;
-  }
-
-  public void setBarcodeFactory(BarcodeFactory barcodeFactory) {
-    this.barcodeFactory = barcodeFactory;
-  }
-
-  public void setMisoFileManager(MisoFilesManager misoFileManager) {
-    this.misoFileManager = misoFileManager;
-  }
-
-  public void setPrintManager(PrintManager<MisoPrintService, Queue<?>> printManager) {
-    this.printManager = printManager;
-  }
-
-  public void setSampleNamingScheme(MisoNamingScheme<Sample> sampleNamingScheme) {
-    this.sampleNamingScheme = sampleNamingScheme;
+  public JSONObject deleteSampleFile(HttpSession session, JSONObject json) {
+    Long sampleId = json.getLong("sampleId");
+    String fileName = json.getString("fileName");
+    try {
+      Sample sample = requestManager.getSampleById(sampleId);
+      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+      if (user.isAdmin() || (sample.getSecurityProfile().getOwner() != null && sample.getSecurityProfile().getOwner().equals(user))) {
+        File f = misoFileManager.getFile(Sample.class, sampleId.toString(), fileName);
+        if (f.exists() && f.delete()) {
+          return JSONUtils.SimpleJSONResponse("OK");
+        }
+        return JSONUtils.SimpleJSONError("File does not exist or is not deletable");
+      }
+      return JSONUtils.SimpleJSONError("Only an admin or sample owner can delete this sample's files.");
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+      return JSONUtils.SimpleJSONError("Unable to delete file: " + e.getMessage());
+    }
   }
 }

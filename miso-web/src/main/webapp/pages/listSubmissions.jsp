@@ -25,15 +25,18 @@
 
 <div id="maincontent">
   <div id="contentcolumn">
-    <h1>
-      <div id="totalCount">
-      </div>
-    </h1>
-    <form id="filter-form">Filter: <input name="filter" id="filter" value="" maxlength="30" size="30" type="text">
+    <nav class="navbar navbar-default" role="navigation">
+       <div class="navbar-header">
+          <span class="navbar-brand navbar-center">
+            <div id="totalCount"> Submissions</div>
+          </span>
+       </div>
+    </nav>
+    <form id="filter-form">Filter: <input name="filter" id="filter" value="" maxlength="30" size="30" type="text" class="form-control">
     </form>
     <br/>
     <a href="<c:url value="/miso/submission/new"/>" class="add">Create Submission</a>
-    <table class="list" id="table">
+    <table class="table table-bordered table-striped" id="table">
       <thead>
       <tr>
         <th class="fit">Submission ID</th>
@@ -82,7 +85,7 @@
           </td>
           <td class="misoicon"
               onclick="window.location.href='<c:url value="/miso/submission/${submission.id}"/>'"><span
-              class="ui-icon ui-icon-pencil"/></td>
+              class="fa fa-pencil-square-o fa-lg"/></td>
         </tr>
       </c:forEach>
       </tbody>

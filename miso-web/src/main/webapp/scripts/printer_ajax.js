@@ -35,17 +35,29 @@ Print.ui = {
       {'doOnSuccess':function(json) {
         jQuery('#host-' + printService).html(json.hostname);
         jQuery('#edit-' + printService).html(json.edit);
+        if(jQuery('#schema-' + printService).is(':empty')){
+          jQuery('#schema-' + printService).html(json.barcodableSchemas);
+        }else{
+          var selectedschema =  jQuery('#schema-' + printService).val();
+          jQuery('#schema-' + printService).html(json.barcodableSchemas);
+          jQuery('#schema-' + printService+' select').val(selectedschema);
+        }
       }
     });
   },
 
   editPrinterService : function(serviceName) {
+    var schema='';
+    if(!jQuery('#newschema-' + serviceName).length == 0) {
+      schema =  jQuery('#newschema-' + serviceName+' option:selected').val();
+    }
     Fluxion.doAjax(
       'printerControllerHelperService',
       'editPrinterService',
       {
         'serviceName':serviceName,
         'host':jQuery('#newhost-' + serviceName).val(),
+        'schema':schema,
         'url':ajaxurl
       },
       {'doOnSuccess':Utils.page.pageReload
@@ -79,7 +91,7 @@ Print.ui = {
       $('printerTable').insertRow(1);
 
       var column1 = $('printerTable').rows[1].insertCell(-1);
-      column1.innerHTML = "<input id='serviceName' name='serviceName' type='text'/>";
+      column1.innerHTML = "<input id='serviceName' name='serviceName' type='text' class='form-control'/>";
       var column2 = $('printerTable').rows[1].insertCell(-1);
       column2.innerHTML = "<i>Set in context fields</i>";
       var column3 = $('printerTable').rows[1].insertCell(-1);
@@ -92,7 +104,7 @@ Print.ui = {
       column6.innerHTML = "<div id='available'></div>";
       var column7 = $('printerTable').rows[1].insertCell(-1);
       column7.id = "addTd";
-      column7.innerHTML = "Add";
+      column7.innerHTML = "<i>Add printer address...</i>";
     }
     else {
       alert("Cannot add another printer service when one is already in progress.")
@@ -115,7 +127,7 @@ Print.ui = {
     var fields = json.contextFields;
     for (var key in fields) {
       if (fields.hasOwnProperty(key)) {
-        jQuery('#contextFields').append(key +": <input id='contextField-"+key+"' field='"+key+"' type='text' value='"+fields[key]+"'/><br/>");
+        jQuery('#contextFields').append(key +": <input id='contextField-"+key+"' field='"+key+"' type='text' value='"+fields[key]+"' class='form-control'/><br/>");
       }
     }
     jQuery('#contextField-host').keyup(function() { Print.service.validatePrinter(this) });
@@ -138,7 +150,7 @@ Print.service = {
             $('available').innerHTML = json.html;
             if (json.html == "OK") {
               $('available').setAttribute("style", "background-color:green");
-              $('addTd').innerHTML = "<a href='javascript:void(0);' onclick='Print.service.addPrinterService();'/>Add</a>";
+              $('addTd').innerHTML = "<div style='text-align:center;'><a href='javascript:void(0);' onclick='Print.service.addPrinterService();'/><span class='fa fa-fw fa-lg fa-plus-square-o'></span></a></div>";
             }
             else {
               $('available').setAttribute("style", "background-color:red");
@@ -343,6 +355,71 @@ Print.service = {
           alert(json.error);
         }
       }
+    );
+  } ,
+
+  printCustom1DBarcodesBulk: function (codes) {
+
+    if (codes === "") {
+      alert("Please input at least one barcode...");
+    }
+    var samples = [];
+    for (var i = 0; i < arguments.length; i++) {
+      samples[i] = {'sampleId': arguments[i]};
+    }
+
+    Fluxion.doAjax(
+            'printerControllerHelperService',
+            'listAvailableServices',
+            {
+              'serviceClass': 'net.sf.json.JSONObject',
+              'url': ajaxurl
+            },
+            {
+              'doOnSuccess': function (json) {
+                jQuery('#printServiceSelectDialog')
+                        .html("<form>" +
+                              "<fieldset class='dialog'>" +
+                              "<select name='serviceSelect' id='serviceSelect' class='ui-widget-content ui-corner-all'>" +
+                              json.services +
+                              "</select></fieldset></form>");
+
+                jQuery(function () {
+                  jQuery('#printServiceSelectDialog').dialog({
+                                                               autoOpen: false,
+                                                               width: 400,
+                                                               modal: true,
+                                                               resizable: false,
+                                                               buttons: {
+                                                                 "Print": function () {
+                                                                   Fluxion.doAjax(
+                                                                           'printerControllerHelperService',
+                                                                           'printCustom1DBarcodeBulk',
+                                                                           {
+                                                                             'serviceName': jQuery('#serviceSelect').val(),
+                                                                             'barcodes': codes,
+                                                                             'url': ajaxurl
+                                                                           },
+                                                                           {
+                                                                             'doOnSuccess': function (json) {
+                                                                               alert(json.response);
+                                                                             }
+                                                                           }
+                                                                   );
+                                                                   jQuery(this).dialog('close');
+                                                                 },
+                                                                 "Cancel": function () {
+                                                                   jQuery(this).dialog('close');
+                                                                 }
+                                                               }
+                                                             });
+                });
+                jQuery('#printServiceSelectDialog').dialog('open');
+              },
+              'doOnError': function (json) {
+                alert(json.error);
+              }
+            }
     );
   }
 };

@@ -48,6 +48,9 @@ function validate_container(form) {
   if (!ok) {
     alert(error);
   }
+  else {
+    form.submit();
+  }
 
   return ok;
 }

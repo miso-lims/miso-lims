@@ -31,7 +31,6 @@ import org.springframework.integration.Message;
 import org.springframework.util.Assert;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaRun;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaStatus;
@@ -40,6 +39,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.mechanism.NotificationMessageConsumerMechanism;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.tools.run.RunFolderConstants;
 
 import java.io.IOException;
@@ -79,7 +79,7 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
     RequestManager requestManager = message.getHeaders().get("handler", RequestManager.class);
     Assert.notNull(requestManager, "Cannot consume MISO notification messages without a RequestManager.");
     Map<String, List<String>> statuses = message.getPayload();
-    Set<Run> output = new HashSet<Run>();
+    Set<Run> output = new HashSet<>();
     for (String key : statuses.keySet()) {
       HealthType ht = HealthType.valueOf(key);
       JSONArray runs = (JSONArray) JSONArray.fromObject(statuses.get(key)).get(0);
@@ -92,8 +92,8 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
   }
 
   private Map<String, Run> processRunJSON(HealthType ht, JSONArray runs, RequestManager requestManager) {
-    Map<String, Run> updatedRuns = new HashMap<String, Run>();
-    List<Run> runsToSave = new ArrayList<Run>();
+    Map<String, Run> updatedRuns = new HashMap<>();
+    List<Run> runsToSave = new ArrayList<>();
     StringBuilder sb = new StringBuilder();
 
     for (JSONObject run : (Iterable<JSONObject>) runs) {
@@ -194,16 +194,28 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
             }
           }
           else {
-            log.info("Updating existing run and status: " + runName);
+            log.debug("Updating existing run and status: " + runName);
 
+            //always overwrite any previous alias with the correct run alias
+            r.setAlias(runName);
             r.setPlatformType(PlatformType.ILLUMINA);
-            r.setDescription(m.group(3));
 
-            if (r.getStatus() != null && run.has("status")) {
+            //update description if empty
+            if (LimsUtils.isStringEmptyOrNull(r.getDescription())) {
+              r.setDescription(m.group(3));
+            }
+
+            if (r.getStatus() != null) {
               if (!r.getStatus().getHealth().equals(HealthType.Failed) && !r.getStatus().getHealth().equals(HealthType.Completed)) {
                 r.getStatus().setHealth(ht);
               }
-              r.getStatus().setXml(run.getString("status"));
+
+              if (run.has("status")) {
+                r.getStatus().setXml(run.getString("status"));
+              }
+              else {
+                log.debug("No new status XML information coming through from notification system...");
+              }
             }
             else {
               if (run.has("status")) {
@@ -213,6 +225,8 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
               is.setHealth(ht);
               r.setStatus(is);
             }
+
+            log.debug(runName + " New status: " + r.getStatus().getHealth().toString() + " -> " + ht.toString());
 
             if (run.has("numCycles")) {
               r.setCycles(Integer.parseInt(run.getString("numCycles")));
@@ -284,7 +298,7 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
           }
 
           if (r.getSequencerReference() != null) {
-            Collection<SequencerPartitionContainer<SequencerPoolPartition>> fs = ((RunImpl)r).getSequencerPartitionContainers();
+            Collection<SequencerPartitionContainer<SequencerPoolPartition>> fs = r.getSequencerPartitionContainers();
             if (fs.isEmpty()) {
               if (run.has("containerId") && !"".equals(run.getString("containerId"))) {
                 Collection<SequencerPartitionContainer<SequencerPoolPartition>> pfs = requestManager.listSequencerPartitionContainersByBarcode(run.getString("containerId"));
@@ -294,11 +308,8 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
                     if (lf.getSecurityProfile() != null && r.getSecurityProfile() == null) {
                       r.setSecurityProfile(lf.getSecurityProfile());
                     }
-                    if (lf.getPlatformType() == null && r.getPlatformType() != null) {
-                      lf.setPlatformType(r.getPlatformType());
-                    }
-                    else {
-                      lf.setPlatformType(PlatformType.ILLUMINA);
+                    if (lf.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
+                      lf.setPlatform(r.getSequencerReference().getPlatform());
                     }
 
                     if (run.has("laneCount") && run.getInt("laneCount") != lf.getPartitions().size()) {
@@ -306,7 +317,7 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
                       lf.setPartitionLimit(run.getInt("laneCount"));
                     }
 
-                    ((RunImpl)r).addSequencerPartitionContainer(lf);
+                    r.addSequencerPartitionContainer(lf);
                   }
                   else {
                     //more than one flowcell hit to this barcode
@@ -316,12 +327,10 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
                 else {
                   SequencerPartitionContainer<SequencerPoolPartition> f = new SequencerPartitionContainerImpl();
                   f.setSecurityProfile(r.getSecurityProfile());
-                  if (f.getPlatformType() == null && r.getPlatformType() != null) {
-                    f.setPlatformType(r.getPlatformType());
+                  if (f.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
+                    f.setPlatform(r.getSequencerReference().getPlatform());
                   }
-                  else {
-                    f.setPlatformType(PlatformType.ILLUMINA);
-                  }
+
                   if (run.has("laneCount")) {
                     f.setPartitionLimit(run.getInt("laneCount"));
                   }
@@ -333,27 +342,24 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
 
                   f.initEmptyPartitions();
                   f.setIdentificationBarcode(run.getString("containerId"));
-                  ((RunImpl)r).addSequencerPartitionContainer(f);
+                  r.addSequencerPartitionContainer(f);
                 }
               }
             }
             else {
               SequencerPartitionContainer<SequencerPoolPartition> f = fs.iterator().next();
               f.setSecurityProfile(r.getSecurityProfile());
-              if (f.getPlatformType() == null && r.getPlatformType() != null) {
-                f.setPlatformType(r.getPlatformType());
-              }
-              else {
-                f.setPlatformType(PlatformType.ILLUMINA);
+              if (f.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
+                f.setPlatform(r.getSequencerReference().getPlatform());
               }
 
               if (f.getPartitions().isEmpty()) {
-                //log.info("No partitions found for run " + r.getName() + " (container "+f.getContainerId()+")");
                 if (run.has("laneCount")) {
                   f.setPartitionLimit(run.getInt("laneCount"));
                 }
                 else {
-                  if (r.getSequencerReference().getPlatform().getInstrumentModel().contains("MiSeq")) {
+                  String instrumentModel = r.getSequencerReference().getPlatform().getInstrumentModel();
+                  if (instrumentModel.contains("MiSeq") || instrumentModel.contains("NextSeq")) {
                     f.setPartitionLimit(1);
                   }
                 }
@@ -363,7 +369,7 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
                 //log.info("Got "+f.getPartitions().size()+" partitions for run " + r.getName() + " (container "+f.getContainerId()+")");
                 if (r.getSequencerReference().getPlatform().getInstrumentModel().contains("MiSeq")) {
                   if (f.getPartitions().size() != 1) {
-                    log.warn(f.getName()+":: WARNING - number of partitions found ("+f.getPartitions().size()+") doesn't match usual number of MiSeq partitions (1)");
+                    log.warn(f.getName()+":: WARNING - number of partitions found ("+f.getPartitions().size()+") doesn't match usual number of MiSeq/NextSeq partitions (1)");
                   }
                 }
                 else if (r.getSequencerReference().getPlatform().getInstrumentModel().contains("2500")) {
@@ -414,6 +420,20 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
                 }
               }
             }
+
+            // manage kits
+            // prepare for kit merge
+            /*
+            if (run.has("kits")) {
+              JSONArray kits = run.getJSONArray("kits");
+              for (String kitBarcode : (Iterable<String>) kits) {
+                if (!"".equals(kitBarcode)) {
+                  //lookup barcode
+                  //Kit k = requestManager.getKitByIdentificationBarcode(kitBarcode);
+                }
+              }
+            }
+            */
 
             updatedRuns.put(r.getAlias(), r);
             runsToSave.add(r);

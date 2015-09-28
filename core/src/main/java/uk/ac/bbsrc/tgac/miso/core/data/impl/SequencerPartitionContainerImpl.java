@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.AutoPopulatingList;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 import java.io.Serializable;
 import java.util.List;
@@ -92,6 +93,7 @@ public class SequencerPartitionContainerImpl extends AbstractSequencerPartitionC
     }
   }
 
+  @Override
   public void addNewPartition() {
     if (getPartitions().size() < partitionLimit) {
       PartitionImpl partition = new PartitionImpl();
@@ -120,5 +122,21 @@ public class SequencerPartitionContainerImpl extends AbstractSequencerPartitionC
     else {
       log.warn("This partition container is limited to "+partitionLimit+" partitions");
     }
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append(super.toString());
+    if (getPartitions() != null) {
+      sb.append(" : [");
+      sb.append(LimsUtils.join(getPartitions(), ","));
+      sb.append("]");
+    }
+    else {
+      sb.append(" : ");
+      sb.append("!!!!! NULL PARTITIONS !!!!!");
+    }
+    return sb.toString();
   }
 }

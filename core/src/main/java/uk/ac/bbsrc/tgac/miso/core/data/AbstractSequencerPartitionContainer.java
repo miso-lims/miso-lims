@@ -25,7 +25,6 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 import javax.persistence.*;
@@ -52,7 +51,7 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
 
   @OneToOne(cascade = CascadeType.ALL)
   private SecurityProfile securityProfile;
-  private PlatformType platformType;
+  private Platform platform;
   private String validationBarcode;
 
   @Deprecated
@@ -99,7 +98,11 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
   }
 
   public String getLabelText() {
-    return getPlatformType().name()+" " + getValidationBarcode();
+    return getPlatform().getPlatformType().name()+" " + getValidationBarcode();
+  }
+
+  public boolean isDeletable() {
+    return getId() != AbstractSequencerPartitionContainer.UNSAVED_ID;
   }
 
   public String getValidationBarcode() {
@@ -132,22 +135,14 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
     this.run = run;
   }
 
-  /**
-   * Returns the platformType of this Run object.
-   *
-   * @return PlatformType platformType.
-   */
-  public PlatformType getPlatformType() {
-    return platformType;
+  @Override
+  public Platform getPlatform() {
+    return platform;
   }
 
-  /**
-   * Sets the platformType of this Run object.
-   *
-   * @param platformType PlatformType.
-   */
-  public void setPlatformType(PlatformType platformType) {
-    this.platformType = platformType;
+  @Override
+  public void setPlatform(Platform platform) {
+    this.platform = platform;
   }
 
   public boolean userCanRead(User user) {

@@ -189,6 +189,11 @@ public class SQLStatusDAO implements StatusStore {
     return e;
   }
 
+  @Override
+  public Status lazyGet(long id) throws IOException {
+    return get(id);
+  }
+
   public Status getByRunName(String runName) throws IOException {
     List eResults = template.query(STATUS_SELECT_BY_RUN_NAME, new Object[]{runName}, new StatusMapper());
     Status e = eResults.size() > 0 ? (Status) eResults.get(0) : null;

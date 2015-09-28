@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import com.google.json.JsonSanitizer;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
@@ -476,11 +477,11 @@ public class ExperimentControllerHelperService {
       JSONObject j = new JSONObject();
       JSONArray jsonArray = new JSONArray();
       for (Experiment experiment : requestManager.listAllExperiments()) {
-        jsonArray.add("['" + experiment.getName() + "','" +
-                      experiment.getAlias() + "','" +
-                      experiment.getDescription() + "','" +
-                      experiment.getPlatform().getPlatformType().getKey() + " "+ experiment.getPlatform().getInstrumentModel()+ "','" +
-                      "<a href=\"/miso/experiment/" + experiment.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
+        jsonArray.add(JsonSanitizer.sanitize("[\"" + experiment.getName() + "\",\"" +
+                      experiment.getAlias() + "\",\"" +
+                      experiment.getDescription() + "\",\"" +
+                      experiment.getPlatform().getPlatformType().getKey() + " "+ experiment.getPlatform().getInstrumentModel()+ "\",\"" +
+                      "<a href=\"/miso/experiment/" + experiment.getId() + "\"><span class=\"fa fa-pencil-square-o fa-lg\"></span></a>" + "\"]"));
 
       }
       j.put("experimentsArray", jsonArray);

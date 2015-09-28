@@ -272,8 +272,9 @@ public class PrinterControllerHelperService {
 
       MisoPrintService bps = printManager.getPrintService(serviceName);
 
-      response.put("hostname", "<input type='text' id='newhost-" + serviceName + "' value='" + bps.getPrintContext().getHost() + "'/>");
+      response.put("hostname", "<input type='text' id='newhost-" + serviceName + "' value='" + bps.getPrintContext().getHost() + "' class='form-control'/>");
       response.put("edit", "<a href='javascript:void(0);' onclick='Print.ui.editPrinterService(\"" + serviceName + "\");'>Save</a>");
+      response.put("barcodableSchemas", "<select id='newschema-" + serviceName + "' name='printSchema'>" + listBarcodableSchemas(session, json).getString("barcodableSchemas") + "</select>");
       return response;
     }
     catch (Exception e) {
@@ -292,6 +293,10 @@ public class PrinterControllerHelperService {
           contextFields.put("host", json.getString("host"));
           PrintServiceUtils.mapJSONToContextFields(contextFields, pc);
           bps.setPrintContext(pc);
+          if (json.has("schema") && !json.get("schema").equals("")) {
+            BarcodableSchema barcodableSchema = printManager.getBarcodableSchema(json.getString("schema"));
+            bps.setBarcodableSchema(barcodableSchema);
+          }
           printManager.storePrintService(bps);
           return JSONUtils.SimpleJSONResponse("done");
         }
@@ -403,6 +408,52 @@ public class PrinterControllerHelperService {
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
     }
   }
+
+  public JSONObject printCustom1DBarcodeBulk(HttpSession session, JSONObject json) {
+    try {
+
+      if (json.has("barcodes")) {
+        String response = "";
+        String barcodes = json.getString("barcodes");
+        String[] codes = barcodes.split("\n");
+        User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+
+        for (String code : codes) {
+          String serviceName = json.getString("serviceName");
+
+          MisoPrintService<File, JSONObject, PrintContext<File>> mps = null;
+          mps = printManager.getPrintService(serviceName);
+
+          Queue<File> thingsToPrint = new LinkedList<File>();
+
+          JSONObject jsonObject = new JSONObject();
+
+          jsonObject.put("field1", code);
+          jsonObject.put("field2", "1");
+
+
+          File f = mps.getLabelFor(jsonObject);
+          if (f != null) thingsToPrint.add(f);
+
+          PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
+          response  += "Job " + pj.getJobId() + " : Barcodes printed.\n";
+        }
+        return JSONUtils.SimpleJSONResponse(response);
+      }
+      else {
+        return JSONUtils.SimpleJSONResponse("No barcode.");
+      }
+    }
+    catch (MisoPrintException e) {
+      e.printStackTrace();
+      return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+      return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
+    }
+  }
+
 
   public void setSecurityManager(com.eaglegenomics.simlims.core.manager.SecurityManager securityManager) {
     this.securityManager = securityManager;

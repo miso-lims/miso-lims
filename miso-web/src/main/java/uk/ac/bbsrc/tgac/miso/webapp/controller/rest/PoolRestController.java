@@ -27,41 +27,39 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import com.eaglegenomics.simlims.core.User;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.jackson.UserInfoMixin;
+import uk.ac.bbsrc.tgac.miso.webapp.util.RestUtils;
 
 import java.util.Collections;
 import java.util.List;
 
 /**
+ * A controller to handle all REST requests for Pools
+ *
  * Created by IntelliJ IDEA.
  * User: bianx
  * Date: 17-Aug-2011
  * Time: 11:34:04
- * To change this template use File | Settings | File Templates.
  */
 @Controller
-@RequestMapping("/rest/poolwizard")
-@SessionAttributes("poolwizard")
+@RequestMapping("/rest/pool")
+@SessionAttributes("pool")
 public class PoolRestController {
   protected static final Logger log = LoggerFactory.getLogger(LibraryRestController.class);
-
-  @Autowired
-  private SecurityManager securityManager;
-
-  public void setSecurityManager(SecurityManager securityManager) {
-    this.securityManager = securityManager;
-  }
 
   @Autowired
   private RequestManager requestManager;
@@ -70,10 +68,24 @@ public class PoolRestController {
     this.requestManager = requestManager;
   }
 
-  @RequestMapping(value = "/librarydilutions", method = RequestMethod.GET)
-  public
-  @ResponseBody
-  JSONObject ldRest() throws IOException {
+  @RequestMapping(value = "{poolId}", method = RequestMethod.GET)
+  public @ResponseBody String getPoolById(@PathVariable Long poolId) throws IOException {
+    ObjectMapper mapper = new ObjectMapper();
+    try {
+      Pool p = requestManager.getPoolById(poolId);
+      if (p != null) {
+        mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
+        return mapper.writeValueAsString(p);
+      }
+      return mapper.writeValueAsString(RestUtils.error("No such pool with that ID.", "poolId", poolId.toString()));
+    }
+    catch (IOException ioe) {
+      return mapper.writeValueAsString(RestUtils.error("Cannot retrieve pool: " + ioe.getMessage(), "poolId", poolId.toString()));
+    }
+  }
+
+  @RequestMapping(value = "/wizard/librarydilutions", method = RequestMethod.GET)
+  public @ResponseBody JSONObject ldRest() throws IOException {
     Collection<LibraryDilution> lds = requestManager.listAllLibraryDilutions();
 
     List<String> types = new ArrayList<String>(requestManager.listDistinctPlatformNames());
@@ -98,14 +110,11 @@ public class PoolRestController {
     return ldJSON;
   }
 
-  @RequestMapping(value = "/platformtypes", method = RequestMethod.GET)
-  public
-  @ResponseBody
-  String platformTypesRest() throws IOException {
+  @RequestMapping(value = "/wizard/platformtypes", method = RequestMethod.GET)
+  public @ResponseBody String platformTypesRest() throws IOException {
     List<String> names = new ArrayList<String>();
     List<String> types = new ArrayList<String>(requestManager.listDistinctPlatformNames());
     for (String name : types) {
-     // names.add("\"" + name + "\"" + ":" + "\"" + name + "\"");
       names.add("\"" + name + "\"");
     }
     return "{"+LimsUtils.join(names, ",")+"}";

@@ -144,12 +144,7 @@ public class EraRunDecorator extends AbstractSubmittableDecorator<Document> {
           dataBlock.appendChild(files);
           run.appendChild(dataBlock);
 
-          if (submission.getElementsByTagName("RUN_SET").item(0) != null) {
-            submission.getElementsByTagName("RUN_SET").item(0).appendChild(run);
-          }
-          else {
-            submission.appendChild(run);
-          }
+          submission.getElementsByTagName("RUN_SET").item(0).appendChild(run);
         }
       }
     }

@@ -97,8 +97,21 @@ public class DownloadController {
   protected void downloadPlateExportFile(@PathVariable Integer hashcode,
                                      HttpServletResponse response)
       throws Exception {
-    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       lookupAndRetrieveFile(Plate.class,  "forms", hashcode, response);
+  }
+
+  @RequestMapping(value = "/sample/forms/{hashcode}", method = RequestMethod.GET)
+  protected void downloadSampleExportFile(@PathVariable Integer hashcode,
+                                         HttpServletResponse response)
+      throws Exception {
+    lookupAndRetrieveFile(Sample.class,  "forms", hashcode, response);
+  }
+
+  @RequestMapping(value = "/library/forms/{hashcode}", method = RequestMethod.GET)
+  protected void downloadLibraryExportFile(@PathVariable Integer hashcode,
+                                          HttpServletResponse response)
+      throws Exception {
+    lookupAndRetrieveFile(Library.class,  "forms", hashcode, response);
   }
 
   @RequestMapping(value = "/submission/{id}/{hashcode}", method = RequestMethod.GET)
@@ -116,42 +129,42 @@ public class DownloadController {
     }
   }
 
-  /*
-  @RequestMapping(value = "/{type}/{id}/{hashcode}", method = RequestMethod.GET)
-  protected void downloadFile(@PathVariable String type,
-                              @PathVariable String id,
-                              @PathVariable Integer hashcode,
-                              HttpServletResponse response)
-          throws Exception {
-    //User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    lookupAndRetrieveFile(Class.forName(LimsUtils.capitalise(type)), id, hashcode, response);
-  }
-  */
-
-  @RequestMapping(value = "/libraryqc/{id}/{hashcode}", method = RequestMethod.GET)
-  protected void downloadLibraryQcFile(@PathVariable Long id,
-                                     @PathVariable Integer hashcode,
-                                     HttpServletResponse response)
-          throws Exception {
+  @RequestMapping(value = "/sample/{id}/{hashcode}", method = RequestMethod.GET)
+  protected void downloadSampleFile(@PathVariable Long id,
+                                    @PathVariable Integer hashcode,
+                                    HttpServletResponse response) throws Exception {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    Library library = requestManager.getLibraryById(id);
-    if (library.userCanRead(user)) {
-      lookupAndRetrieveFile(LibraryQC.class, id.toString(), hashcode, response);
+    Sample s = requestManager.getSampleById(id);
+    if (s.userCanRead(user)) {
+      lookupAndRetrieveFile(Sample.class, id.toString(), hashcode, response);
     }
     else {
       throw new SecurityException("Access denied");
     }
   }
 
-  @RequestMapping(value = "/sampleqc/{id}/{hashcode}", method = RequestMethod.GET)
-  protected void downloadSampleQcFile(@PathVariable Long id,
+  @RequestMapping(value = "/library/{id}/{hashcode}", method = RequestMethod.GET)
+  protected void downloadLibraryFile(@PathVariable Long id,
                                      @PathVariable Integer hashcode,
-                                     HttpServletResponse response)
-          throws Exception {
+                                     HttpServletResponse response) throws Exception {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    SampleQC qc = requestManager.getSampleQCById(id);
-    if (qc.userCanRead(user)) {
-      lookupAndRetrieveFile(SampleQC.class, id.toString(), hashcode, response);
+    Library library = requestManager.getLibraryById(id);
+    if (library.userCanRead(user)) {
+      lookupAndRetrieveFile(Library.class, id.toString(), hashcode, response);
+    }
+    else {
+      throw new SecurityException("Access denied");
+    }
+  }
+
+  @RequestMapping(value = "/run/{id}/{hashcode}", method = RequestMethod.GET)
+  protected void downloadRunFile(@PathVariable Long id,
+                                 @PathVariable Integer hashcode,
+                                 HttpServletResponse response) throws Exception {
+    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    Run run = requestManager.getRunById(id);
+    if (run.userCanRead(user)) {
+      lookupAndRetrieveFile(Run.class, id.toString(), hashcode, response);
     }
     else {
       throw new SecurityException("Access denied");

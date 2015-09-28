@@ -24,9 +24,8 @@
 package uk.ac.bbsrc.tgac.miso.core.event;
 
 /**
- * uk.ac.bbsrc.tgac.miso.core.event
- * <p/>
- * Info
+ * AOP aspect interface that reacts to an update to an object, typically thus firing an {@link Event} and raising an {@link Alert}.
+ * Any registered watchers (of type {@link com.eaglegenomics.simlims.core.User}) can also be alerted.
  *
  * @author Rob Davey
  * @date 14/11/11

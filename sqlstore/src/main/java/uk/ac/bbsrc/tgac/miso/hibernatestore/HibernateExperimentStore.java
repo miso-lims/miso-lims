@@ -43,6 +43,7 @@ import java.lang.Object;import java.lang.SuppressWarnings;import java.util.Colle
  * @author Rob Davey
  * @since 0.0.2
  */
+@Deprecated
 public class HibernateExperimentStore extends HibernateDaoSupport implements Store<Experiment> {
   @Transactional(readOnly = false)
   public long save(Experiment experiment) throws IOException {
@@ -53,6 +54,11 @@ public class HibernateExperimentStore extends HibernateDaoSupport implements Sto
   @Transactional(readOnly = true)
   public Experiment get(long experimentId) throws IOException {
     return (Experiment) getHibernateTemplate().get(AbstractExperiment.class, experimentId);
+  }
+
+  @Override
+  public Experiment lazyGet(long id) throws IOException {
+    return get(id);
   }
 
   @Transactional(readOnly = true)

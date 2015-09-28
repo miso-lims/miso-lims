@@ -37,6 +37,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
  * @author Rob Davey
  * @since 0.1.6
  */
+@Deprecated
 public class PacBioPool extends PoolImpl<LibraryDilution> {
   public static final String PREFIX = "PPO";
   private final String units = "nM";

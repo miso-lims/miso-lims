@@ -62,6 +62,11 @@ public class SQLRunstatsDAO implements RunstatsStore {
   }
 
   @Override
+  public Object lazyGet(long id) throws IOException {
+    return null;
+  }
+
+  @Override
   public Collection listAll() throws IOException {
     return null;
   }

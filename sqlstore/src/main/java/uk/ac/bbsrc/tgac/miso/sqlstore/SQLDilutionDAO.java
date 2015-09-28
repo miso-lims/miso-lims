@@ -72,6 +72,7 @@ import java.util.List;
  * @author Rob Davey
  * @since 0.0.2
  */
+@Deprecated
 public class SQLDilutionDAO implements DilutionStore {
   public static String DILUTION_SELECT_BY_ID_AND_LIBRARY_PLATFORM =
           "SELECT DISTINCT * " +
@@ -673,6 +674,11 @@ public class SQLDilutionDAO implements DilutionStore {
 
   public Dilution get(long id) throws IOException {
     throw new UnsupportedOperationException("Simple get not available for dilutions");
+  }
+
+  @Override
+  public Dilution lazyGet(long id) throws IOException {
+    return get(id);
   }
 
   public Collection<Dilution> listAll() throws IOException {

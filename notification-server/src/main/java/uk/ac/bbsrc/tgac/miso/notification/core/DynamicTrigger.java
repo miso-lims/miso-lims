@@ -95,17 +95,23 @@ public class DynamicTrigger implements Trigger {
    * Returns the time after which a task should run again.
    */
   public Date nextExecutionTime(TriggerContext triggerContext) {
-    log.debug("lastScheduledExecutionTime::" + triggerContext.lastScheduledExecutionTime());
-    if (triggerContext.lastScheduledExecutionTime() == null) {
-      log.debug("nextExecutionTime::" + new Date(System.currentTimeMillis() + this.initialDelay));
-      return new Date(System.currentTimeMillis() + this.initialDelay);
+    if (this.period == 0L) {
+      //don't trigger any more
+      return null;
     }
-    else if (this.fixedRate) {
-      log.debug("nextExecutionTime::" + new Date(triggerContext.lastScheduledExecutionTime().getTime() + this.period));
-      return new Date(triggerContext.lastScheduledExecutionTime().getTime() + this.period);
+    else {
+      log.debug("lastScheduledExecutionTime::" + triggerContext.lastScheduledExecutionTime());
+      if (triggerContext.lastScheduledExecutionTime() == null) {
+        log.debug("nextExecutionTime::" + new Date(System.currentTimeMillis() + this.initialDelay));
+        return new Date(System.currentTimeMillis() + this.initialDelay);
+      }
+      else if (this.fixedRate) {
+        log.debug("nextExecutionTime::" + new Date(triggerContext.lastScheduledExecutionTime().getTime() + this.period));
+        return new Date(triggerContext.lastScheduledExecutionTime().getTime() + this.period);
+      }
+      log.debug("nextExecutionTime::" + new Date(triggerContext.lastCompletionTime().getTime() + this.period));
+      return new Date(triggerContext.lastCompletionTime().getTime() + this.period);
     }
-    log.debug("nextExecutionTime::" + new Date(triggerContext.lastCompletionTime().getTime() + this.period));
-    return new Date(triggerContext.lastCompletionTime().getTime() + this.period);
   }
 
   @Override

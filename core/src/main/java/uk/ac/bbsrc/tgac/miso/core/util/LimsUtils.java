@@ -111,6 +111,10 @@ public class LimsUtils {
     return false;
   }
 
+  public static boolean isStringEmptyOrNull(String s) {
+    return "".equals(s) || s == null;
+  }
+
   /**
    * Join a collection, akin to Perl's join(), using a given delimiter to produce a single String 
    *
@@ -278,15 +282,20 @@ public class LimsUtils {
   }
 
   public static String findHyperlinks(String text) {
-    Pattern p = Pattern.compile("(?i)\\b((?:[a-z][\\w-]+:(?:/{1,3}|[a-z0-9%])|www\\d{0,3}[.]|[a-z0-9.\\-]+[.][a-z]{2,4}/)(?:[^\\s()<>]+|\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\))+(?:\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\)|[^\\s`!()\\[\\]{};:'\".,<>?«»“”‘’]))");
-    Matcher m = p.matcher(text);
+    if (!LimsUtils.isStringEmptyOrNull(text)) {
+      Pattern p = Pattern.compile("(?i)\\b((?:[a-z][\\w-]+:(?:/{1,3}|[a-z0-9%])|www\\d{0,3}[.]|[a-z0-9.\\-]+[.][a-z]{2,4}/)(?:[^\\s()<>]+|\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\))+(?:\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\)|[^\\s`!()\\[\\]{};:'\".,<>?«»“”‘’]))");
+      Matcher m = p.matcher(text);
 
-    StringBuffer sb = new StringBuffer();
-    while (m.find()) {
-      m.appendReplacement(sb, "<a href='$0'>$0</a>");
+      StringBuffer sb = new StringBuffer();
+      while (m.find()) {
+        m.appendReplacement(sb, "<a href='$0'>$0</a>");
+      }
+      m.appendTail(sb);
+      return sb.toString();
     }
-    m.appendTail(sb);
-    return sb.toString();
+    else {
+      return "";
+    }
   }
 
   public static String lookupLocation(String locationBarcode) {
@@ -432,7 +441,7 @@ public class LimsUtils {
         sb.append(" or is not creatable");
       }
       sb.append(". Please create this directory and ensure that it is writable.");
-      throw new IOException(sb.toString()); 
+      throw new IOException(sb.toString());
     }
     else {
       if (attemptMkdir) {
@@ -533,6 +542,13 @@ public class LimsUtils {
     return sb.toString();
   }
 
+  public static File stringToFile(String s, File f) throws IOException {
+    PrintWriter p = new PrintWriter(f);
+    p.println(s);
+    safeClose(p);
+    return f;
+  }
+
   /**
    * Reads the contents of an InputStream into a byte[]
    *
@@ -578,7 +594,12 @@ public class LimsUtils {
   }
 
   public static String getCurrentDateAsString() {
-    return getCurrentDateAsString(new SimpleDateFormat("yyyyMMdd"));
+    return getCurrentDateAsString(new SimpleDateFormat("yyyy-MM-dd"));
+  }
+
+  public static String getDateAsString(Date date) {
+    DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+    return df.format(date);
   }
 
   public static final Pattern linePattern = Pattern.compile(".*\r?\n");
@@ -737,5 +758,10 @@ public class LimsUtils {
     childProfile.setWriteGroups(parentProfile.getWriteGroups());
     childProfile.setReadUsers(parentProfile.getReadUsers());
     childProfile.setWriteUsers(parentProfile.getWriteUsers());
+  }
+
+  public static String getSimpleCurrentDate() {
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+   	return sdf.format(new Date());
   }
 }

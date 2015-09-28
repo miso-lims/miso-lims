@@ -70,7 +70,7 @@ public abstract class AbstractPool<P extends Poolable> implements Pool<P> {
   private String identificationBarcode;
   private boolean readyToRun = false;
 
-  private Collection<PoolQC> poolQCs = new HashSet<PoolQC>();
+  private Collection<PoolQC> poolQCs = new TreeSet<PoolQC>();
   private Boolean qcPassed;
 
   private Date lastUpdated;
@@ -338,6 +338,7 @@ public abstract class AbstractPool<P extends Poolable> implements Pool<P> {
     return getName();
   }
 
+  /*
   public static String lookupPrefix(PlatformType type) {
     if (type.equals(PlatformType.ILLUMINA)) {
       return "IPO";
@@ -357,6 +358,7 @@ public abstract class AbstractPool<P extends Poolable> implements Pool<P> {
     //must be a universal Pool
     return "UPO";
   }
+*/
 
   public boolean isDeletable() {
     return getId() != AbstractPool.UNSAVED_ID &&

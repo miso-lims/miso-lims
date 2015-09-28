@@ -278,6 +278,11 @@ public class SQLEmPCRDilutionDAO implements EmPCRDilutionStore {
     return e;
   }
 
+  @Override
+  public emPCRDilution lazyGet(long id) throws IOException {
+    return get(id);
+  }
+
   public emPCRDilution getEmPcrDilutionByBarcode(String barcode) throws IOException {
     List eResults = template.query(EMPCR_DILUTION_SELECT_BY_IDENTIFICATION_BARCODE, new Object[]{barcode}, new EmPCRDilutionMapper(true));
     emPCRDilution e = eResults.size() > 0 ? (emPCRDilution) eResults.get(0) : null;

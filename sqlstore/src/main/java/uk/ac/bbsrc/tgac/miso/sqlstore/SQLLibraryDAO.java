@@ -350,7 +350,7 @@ public class SQLLibraryDAO implements LibraryStore {
     }
 
     if (library.getId() == AbstractLibrary.UNSAVED_ID) {
-      if (getByAlias(library.getAlias()) != null) {
+      if (!libraryNamingScheme.allowDuplicateEntityNameFor("alias") && getByAlias(library.getAlias()) != null) {
         throw new IOException("NEW: A library with this alias already exists in the database");
       }
       else {
@@ -596,6 +596,11 @@ public class SQLLibraryDAO implements LibraryStore {
           //sampleCache.remove(DbUtils.hashCodeCacheKeyFor(library.getSample().getId()));
           DbUtils.updateCaches(cacheManager, library.getSample(), Sample.class);
         }
+      }
+
+      //remove any child library QCs
+      for (LibraryQC lqc : library.getLibraryQCs()) {
+        libraryQcDAO.remove(lqc);
       }
 
       purgeListCache(library, false);

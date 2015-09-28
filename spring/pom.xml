@@ -29,7 +29,7 @@
   <parent>
     <artifactId>miso</artifactId>
     <groupId>uk.ac.bbsrc.tgac.miso</groupId>
-    <version>0.2.0</version>
+    <version>0.2.1-SNAPSHOT</version>
   </parent>
 
   <groupId>${parent.groupId}</groupId>
@@ -46,8 +46,8 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
+          <source>1.7</source>
+          <target>1.7</target>
           <encoding>${project.build.sourceEncoding}</encoding>
         </configuration>
       </plugin>
@@ -101,15 +101,14 @@
     </dependency>
 
     <dependency>
-      <groupId>net.sourceforge.fluxion.ajax</groupId>
+      <groupId>uk.ac.tgac.fluxion.ajax</groupId>
       <artifactId>fluxion-ajax-3</artifactId>
-      <version>1.0-alpha-4</version>
+      <version>1.0</version>
     </dependency>
-
     <dependency>
-      <groupId>net.sourceforge.fluxion.ajax.beans</groupId>
+      <groupId>uk.ac.tgac.fluxion.ajax.beans</groupId>
       <artifactId>fluxion-ajax-beans</artifactId>
-      <version>1.0-alpha-3</version>
+      <version>1.0</version>
     </dependency>
 
     <dependency>
@@ -117,6 +116,12 @@
       <artifactId>json-lib</artifactId>
       <version>2.4</version>
       <classifier>jdk15</classifier>
+    </dependency>
+
+    <dependency>
+      <groupId>com.mikesamuel</groupId>
+      <artifactId>json-sanitizer</artifactId>
+      <version>1.0</version>
     </dependency>
   </dependencies>
   <properties>

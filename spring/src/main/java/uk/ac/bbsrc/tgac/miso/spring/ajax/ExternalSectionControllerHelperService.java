@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
 import com.eaglegenomics.simlims.core.manager.*;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import com.google.json.JsonSanitizer;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
@@ -36,6 +37,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.manager.*;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
@@ -321,12 +323,12 @@ public class ExternalSectionControllerHelperService {
           SampleQC lastQc = sampleQcList.get(sampleQcList.size() - 1);
           sampleQubit = (lastQc.getResults() != null ? lastQc.getResults().toString() + " ng/µl" : "not available");
         }
-        jsonArray.add("['" +
-                      (sample.getAlias() != null ? sample.getAlias() : "") + "','" +
-                      (sample.getSampleType() != null ? sample.getSampleType() : "") + "','" +
-                      (sample.getQcPassed() != null ? sample.getQcPassed().toString() : "") + "','" +
-                      sampleQubit + "','" +
-                      (sample.getReceivedDate() != null ? sample.getReceivedDate().toString() : "not available") + "']");
+        jsonArray.add(JsonSanitizer.sanitize("[\"" +
+                      (sample.getAlias() != null ? sample.getAlias() : "") + "\",\"" +
+                      (sample.getSampleType() != null ? sample.getSampleType() : "") + "\",\"" +
+                      (sample.getQcPassed() != null ? sample.getQcPassed().toString() : "") + "\",\"" +
+                      sampleQubit + "\",\"" +
+                      (sample.getReceivedDate() != null ? sample.getReceivedDate().toString() : "not available") + "\"]"));
 
       }
       j.put("array", jsonArray);
@@ -371,13 +373,13 @@ public class ExternalSectionControllerHelperService {
             }
             sb.append("</ul>");
           }
-          jsonArray.add("['" +
-                        run.getName() + "','" +
-                        (run.getStatus() != null && run.getStatus().getHealth() != null ? run.getStatus().getHealth().getKey() : "") + "','" +
-                        (run.getStatus() != null && run.getStatus().getStartDate() != null ? run.getStatus().getStartDate().toString() : "") + "','" +
-                        (run.getStatus() != null && run.getStatus().getCompletionDate() != null ? run.getStatus().getCompletionDate().toString() : "") + "','" +
-                        (run.getPlatformType() != null ? run.getPlatformType().getKey() : "") + "','" +
-                        sb.toString() + "']");
+          jsonArray.add(JsonSanitizer.sanitize("[\"" +
+                                               run.getName() + "\",\"" +
+                                               (run.getStatus() != null && run.getStatus().getHealth() != null ? run.getStatus().getHealth().getKey() : "") + "\",\"" +
+                                               (run.getStatus() != null && run.getStatus().getStartDate() != null ? LimsUtils.getDateAsString(run.getStatus().getStartDate()) : "") + "\",\"" +
+                                               (run.getStatus() != null && run.getStatus().getCompletionDate() != null ? LimsUtils.getDateAsString(run.getStatus().getCompletionDate()) : "") + "\",\"" +
+                                               (run.getPlatformType() != null ? run.getPlatformType().getKey() : "") + "\",\"" +
+                                               sb.toString() + "\"]"));
 
         }
       }

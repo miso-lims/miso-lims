@@ -7,7 +7,7 @@
 // Create a custom input type for radiobuttons
 jQuery.editable.addInputType('qcradio', {
 	element : function(settings, original) {
-      var f = "<label for='qcPassedU'>Unknown</label><input type='radio' name='qcPassed' id='qcPassedU' checked='checked' class='text ui-widget-content ui-corner-all' value=''/><br/>"+
+      var f = "<label for='qcPassedU'>Unknown</label><input type='radio' name='qcPassed' id='qcPassedU' class='text ui-widget-content ui-corner-all' value='unknown'/><br/>"+
               "<label for='qcPassedT'>True</label><input type='radio' name='qcPassed' id='qcPassedT' class='text ui-widget-content ui-corner-all' value='true'/><br/>"+
               "<label for='qcPassedF'>False</label><input type='radio' name='qcPassed' id='qcPassedF' class='text ui-widget-content ui-corner-all' value='false'/>";
       var input = jQuery(f);

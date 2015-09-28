@@ -65,18 +65,17 @@ Run.qc = {
       var column2 = $('runQcTable').rows[1].insertCell(-1);
       column2.innerHTML = "<select id='runQcUser' name='runQcUser'>" + json.qcUserOptions + "</select>";
       var column3 = $('runQcTable').rows[1].insertCell(-1);
-      column3.innerHTML = "<input id='runQcDate' name='runQcDate' type='text'/>";
+      column3.innerHTML = "<input id='runQcDate' name='runQcDate' type='text' class='form-control'/>";
       var column4 = $('runQcTable').rows[1].insertCell(-1);
       column4.innerHTML = "<select id='runQcType' name='runQcType'/>";
       var column5 = $('runQcTable').rows[1].insertCell(-1);
       column5.innerHTML = "<div id='runQcProcessSelection' name='runQcProcessSelection'/>";
       var column6 = $('runQcTable').rows[1].insertCell(-1);
-      column6.innerHTML = "<input id='runQcInformation' name='runQcInformation' type='text'/>";
+      column6.innerHTML = "<input id='runQcInformation' name='runQcInformation' type='text' class='form-control'/>";
       var column7 = $('runQcTable').rows[1].insertCell(-1);
       column7.innerHTML = "<input id='runQcDoNotProcess' name='runQcDoNotProcess' type='checkbox'/>";
       var column8 = $('runQcTable').rows[1].insertCell(-1);
-      //column8.innerHTML = "<a href='javascript:void(0);' onclick='Run.qc.addRunQC(\"runQcTable\");'/>Add</a>";
-      column8.innerHTML = "<a href='javascript:void(0);' onclick='Run.qc.addRunQC(this);'/>Add</a>";
+      column8.innerHTML = "<div style='text-align:center;'><a href='javascript:void(0);' onclick='Run.qc.addRunQC(this);'/><span class='fa fa-fw fa-lg fa-plus-square-o'></span></a></div>";
 
       Utils.ui.addMaxDatePicker("runQcDate", 0);
 
@@ -155,13 +154,19 @@ Run.qc = {
 Run.ui = {
   editContainerIdBarcode: function (span, fc) {
     var s = jQuery(span);
-    s.html("<input type='text' id='sequencerPartitionContainers[" + fc + "].identificationBarcode' name='sequencerPartitionContainers[" + fc + "].identificationBarcode' value='" + s.html() + "'/>" +
-           "<button onclick='Run.container.lookupContainer(this, " + fc + ");' type='button' class='fg-button ui-state-default ui-corner-all'>Lookup</button>");
+    if (!s.prop("edit")) {
+      s.prop("edit", "true");
+      s.html("<input type='text' id='sequencerPartitionContainers[" + fc + "].identificationBarcode' name='sequencerPartitionContainers[" + fc + "].identificationBarcode' value='" + s.html() + "' class='form-control'/>");// +
+           //"<button onclick='Run.container.lookupContainer(this, " + fc + ");' type='button' class='fg-button ui-state-default ui-corner-all'>Lookup</button>");
+    }
   },
 
   editContainerLocationBarcode: function (span, fc) {
     var s = jQuery(span);
-    s.html("<input type='text' id='sequencerPartitionContainers[" + fc + "].locationBarcode' name='sequencerPartitionContainers[" + fc + "].locationBarcode' value='" + s.html() + "'/>");
+    if (!s.prop("edit")) {
+      s.prop("edit", "true");
+      s.html("<input type='text' id='sequencerPartitionContainers[" + fc + "].locationBarcode' name='sequencerPartitionContainers[" + fc + "].locationBarcode' value='" + s.html() + "' class='form-control'/>");
+    }
   },
 
   changePlatformType: function (form, runId) {
@@ -222,7 +227,7 @@ Run.ui = {
             { "sTitle": "Type"},
             { "sTitle": "Edit"}
           ],
-          "bJQueryUI": true,
+          "bJQueryUI": false,
           "iDisplayLength": 25,
           "aaSorting": [
             [0, "desc"]
@@ -270,10 +275,10 @@ Run.ui = {
       .html("<form>" +
             "<fieldset class='dialog'>" +
             "<label for='internalOnly'>Internal Only?</label>" +
-            "<input type='checkbox' checked='checked' name='internalOnly' id='internalOnly' class='text ui-widget-content ui-corner-all' />" +
+            "<input type='checkbox' checked='checked' name='internalOnly' id='internalOnly'/>" +
             "<br/>" +
             "<label for='notetext'>Text</label>" +
-            "<input type='text' name='notetext' id='notetext' class='text ui-widget-content ui-corner-all' />" +
+            "<input type='text' name='notetext' id='notetext' class='form-control' />" +
             "</fieldset></form>");
 
     jQuery(function () {
@@ -308,6 +313,33 @@ Run.ui = {
       },
       {
         'doOnSuccess': Utils.page.pageReload
+      }
+    );
+  },
+
+  deleteRunNote: function (runId, noteId) {
+    if (confirm("Are you sure you want to delete this note?")) {
+      Fluxion.doAjax(
+        'runControllerHelperService',
+        'deleteRunNote',
+        {'runId': runId, 'noteId': noteId, 'url': ajaxurl},
+        {'doOnSuccess': Utils.page.pageReload}
+      );
+    }
+  },
+
+  deleteRunFile: function(runId, fileName, fileKey) {
+    Fluxion.doAjax(
+      'runControllerHelperService',
+      'deleteRunFile',
+      {
+        'runId': runId,
+        'fileName': fileName,
+        'url': ajaxurl
+      },
+      {'doOnSuccess': function (json) {
+        jQuery('#file'+fileKey).remove();
+      }
       }
     );
   }
@@ -366,7 +398,7 @@ Run.pool = {
     {
       "doOnSuccess": function (json) {
         jQuery('#poolList').html(json.html);
-        jQuery('#poolList .dashboard').each(function() {
+        jQuery('#poolList .list-group-item').each(function() {
           var inp = jQuery(this);
           inp.dblclick(function() {
             Run.container.insertPoolNextAvailable(inp);
@@ -445,10 +477,19 @@ Run.container = {
 
   populatePartition: function (t, containerNum, partitionNum) {
     var a = jQuery(t);
-    a.html("<input type='text' id='poolBarcode" + partitionNum + "' name='poolBarcode" + partitionNum + "' partition='" + partitionNum + "'/><br/><span id='msg" + partitionNum + "'/>");
+    a.html("<input type='text' style='width:90%' id='poolBarcode" + partitionNum + "' name='poolBarcode" + partitionNum + "' partition='" + partitionNum + "' class='form-control'/><button type='button' class='btn btn-default' onclick='Run.container.clearPartition("+partitionNum+");'>Cancel</button><br/><span id='msg" + partitionNum + "'/>");
+
+    Utils.ui.escape(jQuery("#poolBarcode" + partitionNum), function () {
+      a.html("");
+    });
+
     Utils.timer.typewatchFunc(jQuery("#poolBarcode" + partitionNum), function () {
       Run.pool.getPool(jQuery("#poolBarcode" + partitionNum), containerNum)
     }, 300, 2);
+  },
+
+  clearPartition: function (partitionNum) {
+    jQuery("#poolBarcode" + partitionNum).parent().html("");
   },
 
   insertPoolNextAvailable: function (poolLi) {
@@ -459,12 +500,12 @@ Run.container = {
       newpool.find('input').attr("name", jQuery(this).attr("bind"));
 
       Fluxion.doAjax(
-        'poolControllerHelperService',
+        'runControllerHelperService',
         'checkPoolExperiment',
         {'poolId': newpool.find('input').val(), 'partition': jQuery(this).attr("partition"), 'url': ajaxurl},
         {'doOnSuccess': function (json) {
           newpool.append(json.html);
-          newpool.append("<span style='position: absolute; top: 0; right: 0;' onclick='Run.pool.confirmPoolRemove(this);' class='float-right ui-icon ui-icon-circle-close'></span>");
+          newpool.append("<span style='position: absolute; top: 0; right: 0;' onclick='Run.pool.confirmPoolRemove(this);' class='fa fa-fw fa-2x fa-times-circle-o pull-right'></span>");
         },
           'doOnError': function (json) {
             newpool.remove();
@@ -473,6 +514,21 @@ Run.container = {
         }
       );
     });
+  },
+
+  checkPoolExperiment: function(t, poolId, partitionNum) {
+    Fluxion.doAjax(
+      'runControllerHelperService',
+      'checkPoolExperiment',
+      {'poolId': poolId, 'partition': partitionNum, 'url': ajaxurl},
+      {'doOnSuccess': function (json) {
+        jQuery(t).append(json.html);
+      },
+        'doOnError': function (json) {
+          alert("Error populating partition: " + json.error);
+        }
+      }
+    );
   },
 
   selectStudy: function (partition, poolId, projectId) {

@@ -23,6 +23,10 @@
 
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
+import com.googlecode.ehcache.annotations.Cacheable;
+import com.googlecode.ehcache.annotations.KeyGenerator;
+import com.googlecode.ehcache.annotations.Property;
+import com.googlecode.ehcache.annotations.TriggersRemove;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
@@ -132,6 +136,15 @@ public class SQLSampleQCDAO implements SampleQcStore {
   }
 
   @Transactional(readOnly = false, rollbackFor = IOException.class)
+  @TriggersRemove(cacheName={"sampleQCCache", "lazySampleQCCache"},
+        keyGenerator = @KeyGenerator(
+              name = "HashCodeCacheKeyGenerator",
+              properties = {
+                      @Property(name="includeMethod", value="false"),
+                      @Property(name="includeParameterTypes", value="false")
+              }
+        )
+  )
   public long save(SampleQC sampleQC) throws IOException {
     MapSqlParameterSource params = new MapSqlParameterSource();
     params.addValue("sample_sampleId", sampleQC.getSample().getId())
@@ -177,6 +190,15 @@ public class SQLSampleQCDAO implements SampleQcStore {
     return sampleQC.getId();
   }
 
+  @Cacheable(cacheName="sampleQCCache",
+      keyGenerator = @KeyGenerator(
+              name = "HashCodeCacheKeyGenerator",
+              properties = {
+                      @Property(name="includeMethod", value="false"),
+                      @Property(name="includeParameterTypes", value="false")
+              }
+      )
+  )
   public SampleQC get(long qcId) throws IOException {
     List eResults = template.query(SAMPLE_QC_SELECT_BY_ID, new Object[]{qcId}, new SampleQcMapper());
     SampleQC e = eResults.size() > 0 ? (SampleQC) eResults.get(0) : null;
@@ -202,6 +224,16 @@ public class SQLSampleQCDAO implements SampleQcStore {
     return template.queryForInt("SELECT count(*) FROM "+TABLE_NAME);
   }
 
+  @TriggersRemove(
+          cacheName={"sampleQCCache", "lazySampleQCCache"},
+          keyGenerator = @KeyGenerator (
+              name = "HashCodeCacheKeyGenerator",
+              properties = {
+                      @Property(name="includeMethod", value="false"),
+                      @Property(name="includeParameterTypes", value="false")
+              }
+          )
+  )
   public boolean remove(SampleQC qc) throws IOException {
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
     if (qc.isDeletable() &&
@@ -213,8 +245,6 @@ public class SQLSampleQCDAO implements SampleQcStore {
       }
       else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (s != null) {
-          //Cache pc = cacheManager.getCache("sampleCache");
-          //pc.remove(DbUtils.hashCodeCacheKeyFor(s.getId()));
           DbUtils.updateCaches(cacheManager, s, Sample.class);
         }
       }
@@ -225,13 +255,11 @@ public class SQLSampleQCDAO implements SampleQcStore {
 
   public class SampleQcMapper extends CacheAwareRowMapper<SampleQC> {
     public SampleQcMapper() {
-      //sample qcs aren't cached at present
-      super(SampleQC.class, false, false);
+      super(SampleQC.class);
     }
 
     public SampleQcMapper(boolean lazy) {
-      //sample qcs aren't cached at present
-      super(SampleQC.class, lazy, false);
+      super(SampleQC.class, lazy);
     }
 
     public SampleQC mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -240,7 +268,6 @@ public class SQLSampleQCDAO implements SampleQcStore {
       if (isCacheEnabled() && lookupCache(cacheManager) != null) {
         Element element;
         if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
-          log.debug("Cache hit on map for SampleQC " + id);
           return (SampleQC)element.getObjectValue();
         }
       }

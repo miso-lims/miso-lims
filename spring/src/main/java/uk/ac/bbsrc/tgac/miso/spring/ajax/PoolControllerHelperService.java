@@ -194,7 +194,7 @@ public class PoolControllerHelperService {
       JSONObject response = new JSONObject();
       Long qcId = Long.parseLong(json.getString("qcId"));
       PoolQC poolQc = requestManager.getPoolQCById(qcId);
-      response.put("results", "<input type='text' id='" + qcId + "' value='" + poolQc.getResults() + "'/>");
+      response.put("results", "<input type='text' id='" + qcId + "' value='" + poolQc.getResults() + "' class='form-control'/>");
       response.put("edit", "<a href='javascript:void(0);' onclick='Pool.qc.editPoolQC(\"" + qcId + "\");'>Save</a>");
       return response;
     }
@@ -244,84 +244,6 @@ public class PoolControllerHelperService {
     return sb.toString();
   }
 
-  @Deprecated
-  private String processLibraryDilutions(Set<String> codes) throws IOException {
-    StringBuilder sb = new StringBuilder();
-    sb.append("<div id='dilslist' class='checklist' style='width: 100%;'>");
-    for (String s : codes) {
-      if (LimsUtils.isBase64String(s)) {
-        //Base64-encoded string, most likely a barcode image beeped in. decode and search
-        s = new String(Base64.decodeBase64(s));
-      }
-      LibraryDilution ed = requestManager.getLibraryDilutionByBarcode(s);
-      if (ed != null) {
-        sb.append("<span>");
-        sb.append("<input type='checkbox' value='" + s + "' name='importdilslist' id='importdilslist_" + ed.getName() + "'/>");
-        sb.append("<label for='importdilslist_" + ed.getName() + "'>" + ed.getName() + " (" + s + ")</label>");
-        sb.append("</span>");
-      }
-    }
-    sb.append("</div>");
-    sb.append("<a onclick='Utils.ui.checkAll(\"importdilslist\"); return false;' href='javascript:void(0);'>All</a> " +
-              "/ <a onclick='Utils.ui.uncheckAll(\"importdilslist\"); return false;' href='javascript:void(0);'>None</a>");
-    sb.append("<br/><button type='submit' class='br-button ui-state-default ui-corner-all'>Use</button>");
-    return sb.toString();
-  }
-
-  @Deprecated
-  private String processEmPcrDilutions(Set<String> codes) throws IOException {
-    StringBuilder sb = new StringBuilder();
-    sb.append("<div id='dilslist' class='checklist' style='width: 100%;'>");
-    for (String s : codes) {
-      if (LimsUtils.isBase64String(s)) {
-        //Base64-encoded string, most likely a barcode image beeped in. decode and search
-        s = new String(Base64.decodeBase64(s));
-      }
-      emPCRDilution ed = requestManager.getEmPcrDilutionByBarcode(s);
-      if (ed != null) {
-        sb.append("<span>");
-        sb.append("<input type='checkbox' value='" + s + "' name='importdilslist' id='importdilslist_" + ed.getName() + "'/>");
-        sb.append("<label for='importdilslist_" + ed.getName() + "'>" + ed.getName() + " (" + s + ")</label>");
-        sb.append("</span>");
-      }
-    }
-    sb.append("</div>");
-    sb.append("<a onclick='Utils.ui.checkAll(\"importdilslist\"); return false;' href='javascript:void(0);'>All</a> " +
-              "/ <a onclick='Utils.ui.uncheckAll(\"importdilslist\"); return false;' href='javascript:void(0);'>None</a>");
-    sb.append("<br/><button type='submit' class='br-button ui-state-default ui-corner-all'>Use</button>");
-    return sb.toString();
-  }
-
-  @Deprecated
-  public JSONObject selectLibraryDilutionsByBarcodeList(HttpSession session, JSONObject json) {
-    try {
-      if (json.has("barcodes")) {
-        String barcodes = json.getString("barcodes");
-        String[] codes = barcodes.split("\n");
-
-        // make sure there are no duplicates and order the strings
-        // by putitng the codes in a treeset
-        TreeSet<String> hcodes = new TreeSet<String>();
-        hcodes.addAll(Arrays.asList(codes));
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("<form action='/miso/pool/illumina/import' method='post'>");
-        sb.append("<div style='width: 100%;'>");
-        sb.append(processLibraryDilutions(hcodes));
-        sb.append("</form>");
-        sb.append("</div>");
-        session.removeAttribute("barcodes");
-
-        return JSONUtils.SimpleJSONResponse(sb.toString());
-      }
-    }
-    catch (Exception e) {
-      log.debug("Failed to generate barcode selection: ", e);
-      return JSONUtils.SimpleJSONError("Failed to generate barcode selection");
-    }
-    return JSONUtils.SimpleJSONError("Cannot select barcodes");
-  }
-
   public JSONObject selectDilutionsByBarcodeFile(HttpSession session, JSONObject json) {
     try {
       JSONObject barcodes = (JSONObject) session.getAttribute("barcodes");
@@ -369,163 +291,6 @@ public class PoolControllerHelperService {
         sb.append(processDilutions(hcodes));
         sb.append("</form>");
         sb.append("</div>");
-        session.removeAttribute("barcodes");
-
-        return JSONUtils.SimpleJSONResponse(sb.toString());
-      }
-    }
-    catch (Exception e) {
-      log.debug("Failed to generate barcode selection: ", e);
-      return JSONUtils.SimpleJSONError("Failed to generate barcode selection");
-    }
-    return JSONUtils.SimpleJSONError("Cannot select barcodes");
-  }
-
-  @Deprecated
-  public JSONObject selectLibraryDilutionsByBarcodeFile(HttpSession session, JSONObject json) {
-    try {
-      JSONObject barcodes = (JSONObject) session.getAttribute("barcodes");
-      log.debug(barcodes.toString());
-      if (barcodes.has("barcodes")) {
-        JSONArray a = barcodes.getJSONArray("barcodes");
-
-        // make sure there are no duplicates and order the strings
-        // by putitng the codes in a treeset
-        TreeSet<String> hcodes = new TreeSet<String>();
-        hcodes.addAll(Arrays.asList((String[]) a.toArray(new String[0])));
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("<form action='/miso/pool/import' method='post'>");
-        sb.append("<div style='width: 100%;'>");
-        sb.append(processLibraryDilutions(hcodes));
-        sb.append("</form>");
-        sb.append("</div>");
-        session.removeAttribute("barcodes");
-
-        return JSONUtils.SimpleJSONResponse(sb.toString());
-      }
-    }
-    catch (Exception e) {
-      log.debug("Failed to generate barcode selection: ", e);
-      return JSONUtils.SimpleJSONError("Failed to generate barcode selection");
-    }
-    return JSONUtils.SimpleJSONError("Cannot select barcodes");
-  }
-
-  @Deprecated
-  public JSONObject select454EmPCRDilutionsByBarcodeList(HttpSession session, JSONObject json) {
-    try {
-      if (json.has("barcodes")) {
-        String barcodes = json.getString("barcodes");
-        String[] codes = barcodes.split("\n");
-
-        // make sure there are no duplicates and order the strings
-        // by putitng the codes in a treeset
-        TreeSet<String> hcodes = new TreeSet<String>();
-        hcodes.addAll(Arrays.asList(codes));
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("<div style='width: 100%;'>");
-        sb.append("<form action='/miso/pool/ls454/import' method='post'>");
-        sb.append(processEmPcrDilutions(hcodes));
-        sb.append("</form>");
-        sb.append("</div>");
-
-        session.removeAttribute("barcodes");
-
-        return JSONUtils.SimpleJSONResponse(sb.toString());
-      }
-    }
-    catch (Exception e) {
-      log.debug("Failed to generate barcode selection: ", e);
-      return JSONUtils.SimpleJSONError("Failed to generate barcode selection");
-    }
-    return JSONUtils.SimpleJSONError("Cannot select barcodes");
-  }
-
-  @Deprecated
-  public JSONObject select454EmPCRDilutionsByBarcodeFile(HttpSession session, JSONObject json) {
-    try {
-      JSONObject barcodes = (JSONObject) session.getAttribute("barcodes");
-      log.debug(barcodes.toString());
-      if (barcodes.has("barcodes")) {
-        JSONArray a = barcodes.getJSONArray("barcodes");
-
-        // make sure there are no duplicates and order the strings
-        // by putitng the codes in a treeset
-        TreeSet<String> hcodes = new TreeSet<String>();
-        hcodes.addAll(Arrays.asList((String[]) a.toArray(new String[0])));
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("<div style='width: 100%;'>");
-        sb.append("<form action='/miso/pool/ls454/import' method='post'>");
-        sb.append(processEmPcrDilutions(hcodes));
-        sb.append("</form>");
-        sb.append("</div>");
-
-        session.removeAttribute("barcodes");
-
-        return JSONUtils.SimpleJSONResponse(sb.toString());
-      }
-    }
-    catch (Exception e) {
-      log.debug("Failed to generate barcode selection: ", e);
-      return JSONUtils.SimpleJSONError("Failed to generate barcode selection");
-    }
-    return JSONUtils.SimpleJSONError("Cannot select barcodes");
-  }
-
-  @Deprecated
-  public JSONObject selectSolidEmPCRDilutionsByBarcodeList(HttpSession session, JSONObject json) {
-    try {
-      if (json.has("barcodes")) {
-        String barcodes = json.getString("barcodes");
-        String[] codes = barcodes.split("\n");
-
-        // make sure there are no duplicates and order the strings
-        // by putitng the codes in a treeset
-        TreeSet<String> hcodes = new TreeSet<String>();
-        hcodes.addAll(Arrays.asList(codes));
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("<div style='width: 100%;'>");
-        sb.append("<form action='/miso/pool/solid/import' method='post'>");
-        sb.append(processEmPcrDilutions(hcodes));
-        sb.append("</form>");
-        sb.append("</div>");
-
-        session.removeAttribute("barcodes");
-
-        return JSONUtils.SimpleJSONResponse(sb.toString());
-      }
-    }
-    catch (Exception e) {
-      log.debug("Failed to generate barcode selection: ", e);
-      return JSONUtils.SimpleJSONError("Failed to generate barcode selection");
-    }
-    return JSONUtils.SimpleJSONError("Cannot select barcodes");
-  }
-
-  @Deprecated
-  public JSONObject selectSolidEmPCRDilutionsByBarcodeFile(HttpSession session, JSONObject json) {
-    try {
-      JSONObject barcodes = (JSONObject) session.getAttribute("barcodes");
-      log.debug(barcodes.toString());
-      if (barcodes.has("barcodes")) {
-        JSONArray a = barcodes.getJSONArray("barcodes");
-
-        // make sure there are no duplicates and order the strings
-        // by putitng the codes in a treeset
-        TreeSet<String> hcodes = new TreeSet<String>();
-        hcodes.addAll(Arrays.asList((String[]) a.toArray(new String[0])));
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("<div style='width: 100%;'>");
-        sb.append("<form action='/miso/pool/solid/import' method='post'>");
-        sb.append(processEmPcrDilutions(hcodes));
-        sb.append("</form>");
-        sb.append("</div>");
-
         session.removeAttribute("barcodes");
 
         return JSONUtils.SimpleJSONResponse(sb.toString());
@@ -677,198 +442,6 @@ public class PoolControllerHelperService {
     }
   }
 
-  @Deprecated
-  public JSONObject poolSearchDilution(HttpSession session, JSONObject json) {
-    String searchStr = json.getString("str");
-    String platformType = json.getString("platform").toUpperCase();
-    try {
-      if (searchStr.length() > 1) {
-        if (LimsUtils.isBase64String(searchStr)) {
-          //Base64-encoded string, most likely a barcode image beeped in. decode and search
-          searchStr = new String(Base64.decodeBase64(searchStr));
-        }
-
-        //String str = searchStr.toLowerCase();
-        StringBuilder b = new StringBuilder();
-        List<? extends Dilution> dilutions = new ArrayList<Dilution>(requestManager.listDilutionsBySearch(searchStr, PlatformType.valueOf(platformType)));
-        int numMatches = 0;
-        for (Dilution d : dilutions) {
-          b.append("<div onmouseover=\"this.className='autocompleteboxhighlight'\" onmouseout=\"this.className='autocompletebox'\" class=\"autocompletebox\"" +
-                   " onclick=\"Pool.search.poolSearchSelectDilution('" + d.getId() + "', '" + d.getName() + "')\">" +
-                   "<b>Dilution: " + d.getName() + "</b><br/>" +
-                   "<b>Library: " + d.getLibrary().getAlias() + "</b><br/>" +
-                   "<b>Sample: " + d.getLibrary().getSample().getAlias() + "</b><br/>" +
-                   "</div>");
-          numMatches++;
-        }
-        if (numMatches == 0) {
-          return JSONUtils.JSONObjectResponse("html", "No matches");
-        }
-        else {
-          return JSONUtils.JSONObjectResponse("html", "<div class=\"autocomplete\"><ul>" + b.toString() + "</ul></div>");
-        }
-      }
-      else {
-        return JSONUtils.JSONObjectResponse("html", "Need a longer search pattern ...");
-      }
-    }
-    catch (Exception e) {
-      e.printStackTrace();
-      return JSONUtils.SimpleJSONError(e.getMessage());
-    }
-  }
-
-  @Deprecated
-  public JSONObject poolSearchLibraryDilution(HttpSession session, JSONObject json) {
-    String searchStr = json.getString("str");
-    String platformType = json.getString("platform").toUpperCase();
-    try {
-      if (searchStr.length() > 1) {
-        if (LimsUtils.isBase64String(searchStr)) {
-          //Base64-encoded string, most likely a barcode image beeped in. decode and search
-          searchStr = new String(Base64.decodeBase64(searchStr));
-        }
-
-        //String str = searchStr.toLowerCase();
-        StringBuilder b = new StringBuilder();
-        List<LibraryDilution> dilutions = new ArrayList<LibraryDilution>(requestManager.listAllLibraryDilutionsBySearch(searchStr, PlatformType.valueOf(platformType)));
-        int numMatches = 0;
-        for (LibraryDilution d : dilutions) {
-          /*
-          String dilName = d.getName() == null ? null : d.getName();
-          if (dilName != null &&
-              (dilName.toLowerCase().equals(str) || dilName.toLowerCase().contains(str)) ||
-              (d.getLibrary().getAlias().toLowerCase().contains(str) || d.getLibrary().getName().toLowerCase().contains(str)) ||
-              (d.getLibrary().getSample().getAlias().toLowerCase().contains(str) || d.getLibrary().getSample().getName().toLowerCase().contains(str))) {
-          */
-          b.append("<div onmouseover=\"this.className='autocompleteboxhighlight'\" onmouseout=\"this.className='autocompletebox'\" class=\"autocompletebox\"" +
-                   " onclick=\"Pool.search.poolSearchSelectDilution('" + d.getId() + "', '" + d.getName() + "')\">" +
-                   "<b>Dilution: " + d.getName() + "</b><br/>" +
-                   "<b>Library: " + d.getLibrary().getAlias() + "</b><br/>" +
-                   "<b>Sample: " + d.getLibrary().getSample().getAlias() + "</b><br/>" +
-                   "</div>");
-          numMatches++;
-          //}
-        }
-        if (numMatches == 0) {
-          return JSONUtils.JSONObjectResponse("html", "No matches");
-        }
-        else {
-          return JSONUtils.JSONObjectResponse("html", "<div class=\"autocomplete\"><ul>" + b.toString() + "</ul></div>");
-        }
-      }
-      else {
-        return JSONUtils.JSONObjectResponse("html", "Need a longer search pattern ...");
-      }
-    }
-    catch (Exception e) {
-      e.printStackTrace();
-      return JSONUtils.SimpleJSONError(e.getMessage());
-    }
-  }
-
-  @Deprecated
-  public JSONObject poolSearchEmPcrDilution(HttpSession session, JSONObject json) {
-    String searchStr = json.getString("str");
-    String platformType = json.getString("platform").toUpperCase();
-    try {
-      if (searchStr.length() > 1) {
-        if (LimsUtils.isBase64String(searchStr)) {
-          //Base64-encoded string, most likely a barcode image beeped in. decode and search
-          searchStr = new String(Base64.decodeBase64(searchStr));
-        }
-        //String str = searchStr.toLowerCase();
-        StringBuilder b = new StringBuilder();
-        List<emPCRDilution> dilutions = new ArrayList<emPCRDilution>(requestManager.listAllEmPcrDilutionsBySearch(searchStr, PlatformType.valueOf(platformType)));
-        int numMatches = 0;
-        for (emPCRDilution d : dilutions) {
-          /*
-          String dilName = d.getName() == null ? null : d.getName();
-          if (dilName != null &&
-              (dilName.toLowerCase().equals(str) || dilName.toLowerCase().contains(str)) ||
-              (d.getLibrary().getAlias().toLowerCase().contains(str) || d.getLibrary().getName().toLowerCase().contains(str)) ||
-              (d.getLibrary().getSample().getAlias().toLowerCase().contains(str) || d.getLibrary().getSample().getName().toLowerCase().contains(str))) {
-          */
-          b.append("<div onmouseover=\"this.className='autocompleteboxhighlight'\" onmouseout=\"this.className='autocompletebox'\" class=\"autocompletebox\"" +
-                   " onclick=\"Pool.search.poolSearchSelectDilution('" + d.getId() + "', '" + d.getName() + "')\">" +
-                   "<b>Dilution: " + d.getName() + "</b><br/>" +
-                   "<b>Library: " + d.getLibrary().getAlias() + "</b><br/>" +
-                   "<b>Sample: " + d.getLibrary().getSample().getAlias() + "</b><br/>" +
-                   "</div>");
-          numMatches++;
-          //}
-        }
-        if (numMatches == 0) {
-          return JSONUtils.JSONObjectResponse("html", "No matches");
-        }
-        else {
-          return JSONUtils.JSONObjectResponse("html", "<div class=\"autocomplete\"><ul>" + b.toString() + "</ul></div>");
-        }
-      }
-      else {
-        return JSONUtils.JSONObjectResponse("html", "Need a longer search pattern ...");
-      }
-    }
-    catch (Exception e) {
-      e.printStackTrace();
-      return JSONUtils.SimpleJSONError(e.getMessage());
-    }
-  }
-
-  public JSONObject checkPoolExperiment(HttpSession session, JSONObject json) {
-    try {
-      String partition = json.getString("partition");
-      Long poolId = json.getLong("poolId");
-      Pool<? extends Poolable> p = requestManager.getPoolById(poolId);
-      StringBuilder sb = new StringBuilder();
-
-      if (p.getExperiments().size() == 0) {
-        Set<Project> pooledProjects = new HashSet<Project>();
-        Collection<? extends Poolable> ds = p.getPoolableElements();
-        for (Poolable d : ds) {
-          if (d instanceof Dilution) {
-            pooledProjects.add(((Dilution)d).getLibrary().getSample().getProject());
-          }
-          else if (d instanceof Plate) {
-            Plate plate = (Plate)d;
-            if (!plate.getElements().isEmpty()) {
-              if (plate.getElementType().equals(Library.class)) {
-                Library l = (Library)plate.getElements().get(0);
-                pooledProjects.add(l.getSample().getProject());
-              }
-            }
-          }
-        }
-
-        sb.append("<div style='float:left; clear:both'>");
-        for (Project project : pooledProjects) {
-          sb.append("<div id='studySelectDiv" + partition + "_" + project.getProjectId() + "'>");
-          sb.append(project.getAlias() + ": <select name='poolStudies" + partition + "_" + project.getProjectId() + "' id='poolStudies" + partition + "_" + project.getProjectId() + "'>");
-          Collection<Study> studies = requestManager.listAllStudiesByProjectId(project.getProjectId());
-          if (studies.isEmpty()) {
-            //throw new Exception("No studies available on project " + project.getName() + ". At least one study must be available for each project associated with this Pool.");
-            return JSONUtils.SimpleJSONError("No studies available on project " + project.getName() + ". At least one study must be available for each project associated with this Pool.");
-          }
-          else {
-            for (Study s : studies) {
-              sb.append("<option value='" + s.getId() + "'>" + s.getAlias() + " (" + s.getName() + " - " + s.getStudyType() + ")</option>");
-            }
-          }
-          sb.append("</select>");
-          sb.append("<input id='studySelectButton-" + partition + "_" + p.getId() + "' type='button' onclick=\"Run.container.selectStudy('" + partition + "', " + p.getId() + "," + project.getProjectId() + ");\" class=\"ui-state-default ui-corner-all\" value='Select Study'/>");
-          sb.append("</div><br/>");
-        }
-        sb.append("</div>");
-      }
-
-      return JSONUtils.JSONObjectResponse("html", sb.toString());
-    }
-    catch (Exception e) {
-      e.printStackTrace();
-      return JSONUtils.SimpleJSONError(e.getMessage());
-    }
-  }
-
   public JSONObject selectStudyForPool(HttpSession session, JSONObject json) {
     try {
       Long poolId = json.getLong("poolId");
@@ -990,22 +563,19 @@ public class PoolControllerHelperService {
   }
 
   public JSONObject checkConcentrationByPoolId(HttpSession session, JSONObject json) {
-   try {
-     JSONObject j = new JSONObject();
-     Long poolId = json.getLong("poolId");
-     Pool pool = requestManager.getPoolById(poolId);
-     double concentration = pool.getConcentration();
-     j.put("response", concentration);
-     return j;
-   }
-   catch (IOException e) {
-     log.debug("Failed", e);
-     return JSONUtils.SimpleJSONError(e.getMessage());
-   }
- }
-
-
-
+    try {
+      JSONObject j = new JSONObject();
+      Long poolId = json.getLong("poolId");
+      Pool pool = requestManager.getPoolById(poolId);
+      double concentration = pool.getConcentration();
+      j.put("response", concentration);
+      return j;
+    }
+    catch (IOException e) {
+      log.debug("Failed", e);
+      return JSONUtils.SimpleJSONError(e.getMessage());
+    }
+  }
 
   public JSONObject checkInfoByPoolId(HttpSession session, JSONObject json) {
     try {
@@ -1018,9 +588,9 @@ public class PoolControllerHelperService {
         Collection<? extends Dilution> dls = pool.getDilutions();
         for (Dilution dilution : dls) {
           info.append("<li><b>" + dilution.getName() + "</b>");
-          info.append("<br/><small><u>" + dilution.getLibrary().getSample().getProject().getAlias() + "</u>");
-          info.append("<br/>" + dilution.getLibrary().getAlias() + " (" + dilution.getLibrary().getName() + ")");
-          info.append("<br/>" + dilution.getLibrary().getDescription() + " (" + dilution.getLibrary().getSample().getName() + ")</small>");
+          info.append("<br/><small><u><a href='/miso/project/"+dilution.getLibrary().getSample().getProject().getId()+"'>" + dilution.getLibrary().getSample().getProject().getAlias() + "</a></u>");
+          info.append("<br/><a href='/miso/library/"+dilution.getLibrary().getId()+"'>" + dilution.getLibrary().getAlias() + " (" + dilution.getLibrary().getName() + ")</a>");
+          info.append("<br/><a href='/miso/sample/"+dilution.getLibrary().getSample().getId()+"'>" + dilution.getLibrary().getSample().getDescription() + " (" + dilution.getLibrary().getSample().getName() + ")</a></small>");
           info.append("</li>");
         }
         info.append("</ul>");
@@ -1032,20 +602,20 @@ public class PoolControllerHelperService {
           if (p instanceof Dilution) {
             Dilution dilution = (Dilution)p;
             info.append("<li><b>" + dilution.getName() + "</b>");
-            info.append("<br/><small><u>" + dilution.getLibrary().getSample().getProject().getAlias() + "</u>");
-            info.append("<br/>" + dilution.getLibrary().getAlias() + " (" + dilution.getLibrary().getName() + ")");
-            info.append("<br/>" + dilution.getLibrary().getDescription() + " (" + dilution.getLibrary().getSample().getName() + ")</small>");
+            info.append("<br/><small><u><a href='/miso/project/"+dilution.getLibrary().getSample().getProject().getId()+"'>" + dilution.getLibrary().getSample().getProject().getAlias() + "</a></u>");
+            info.append("<br/><a href='/miso/library/"+dilution.getLibrary().getId()+"'>" + dilution.getLibrary().getAlias() + " (" + dilution.getLibrary().getName() + ")</a>");
+            info.append("<br/><a href='/miso/sample/"+dilution.getLibrary().getSample().getId()+"'>" + dilution.getLibrary().getSample().getDescription() + " (" + dilution.getLibrary().getSample().getName() + ")</a></small>");
             info.append("</li>");
           }
           else if (p instanceof Plate) {
             Plate<LinkedList<Plateable>, Plateable> plate = (Plate<LinkedList<Plateable>, Plateable>)p;
-            info.append("<li><b>" + plate.getName() + "</b> ["+plate.getSize()+"-well]");
+            info.append("<li><b><a href='/miso/plate/"+plate.getId()+"'>" + plate.getName() + "</b> ["+plate.getSize()+"-well]</a>");
             if (!plate.getElements().isEmpty()) {
               info.append("<br/><small><u>"+plate.getSize()+"-well "+plate.getElementType().getSimpleName()+" plate</u>");
               Plateable element = plate.getElements().getFirst();
               if (element instanceof Library) {
                 Library l = (Library)element;
-                info.append("<br/><small><u>" + l.getSample().getProject().getAlias() + " ("+l.getSample().getProject().getName()+")</u>");
+                info.append("<br/><small><u><a href='/miso/project/"+l.getSample().getProject().getId()+"'>" + l.getSample().getProject().getAlias() + " ("+l.getSample().getProject().getName()+")</a></u>");
                 info.append("<br/>Platform: " + l.getPlatformName());
                 info.append("<br/>Type: " + l.getLibraryType().getDescription());
                 info.append("<br/>Selection: " + l.getLibrarySelectionType().getName());
@@ -1053,7 +623,7 @@ public class PoolControllerHelperService {
               }
               else if (element instanceof Dilution) {
                 Dilution l = (Dilution)element;
-                info.append("<br/><small><u>" + l.getLibrary().getSample().getProject().getAlias() + " ("+l.getLibrary().getSample().getProject().getName()+")</u>");
+                info.append("<br/><small><u><a href='/miso/project/"+l.getLibrary().getSample().getProject().getId()+"'>" + l.getLibrary().getSample().getProject().getAlias() + " ("+l.getLibrary().getSample().getProject().getName()+")</a></u>");
                 info.append("<br/>Platform: " + l.getLibrary().getPlatformName());
                 info.append("<br/>Type: " + l.getLibrary().getLibraryType().getDescription());
                 info.append("<br/>Selection: " + l.getLibrary().getLibrarySelectionType().getName());
@@ -1061,7 +631,7 @@ public class PoolControllerHelperService {
               }
               else if (element instanceof Sample) {
                 Sample l = (Sample)element;
-                info.append("<br/><small><u>" + l.getProject().getAlias() + " ("+l.getProject().getName()+")</u>");
+                info.append("<br/><small><u><a href='/miso/project/"+l.getProject().getId()+"'>" + l.getProject().getAlias() + " ("+l.getProject().getName()+")</a></u>");
               }
             }
             info.append("</li>");
@@ -1116,6 +686,43 @@ public class PoolControllerHelperService {
   }
 
   public JSONObject listPoolsDataTable(HttpSession session, JSONObject json) {
+    Map<String, Set<Pool>> poolMap = new HashMap<>();
+    for (PlatformType pt : PlatformType.values()) {
+      poolMap.put(pt.getKey(), new HashSet<Pool>());
+    }
+
+    JSONObject j = new JSONObject();
+
+    try {
+      for (Pool pool : requestManager.listAllPools()) {
+        poolMap.get(pool.getPlatformType().getKey()).add(pool);
+      }
+
+      for (String poolType : poolMap.keySet()) {
+        JSONArray arr = new JSONArray();
+
+        for (Pool pool : poolMap.get(poolType)) {
+          JSONArray pout = new JSONArray();
+          pout.add(pool.getName());
+          pout.add(pool.getAlias() != null ? pool.getAlias() : "");
+          pout.add(pool.getCreationDate() != null ? pool.getCreationDate().toString() : "");
+          pout.add(pool.getId());
+          pout.add(pool.getId());
+          pout.add(pool.getId());
+          pout.add("<a href=\"/miso/pool/" + pool.getId() + "\"><span class=\"fa fa-pencil-square-o fa-lg\"></span></a>");
+          arr.add(pout);
+        }
+
+        j.put(poolType, arr);
+      }
+
+      return j;
+    }
+    catch (IOException e) {
+      log.debug("Failed", e);
+      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
+    }
+/*
     if (json.has("platform") && !"".equals(json.getString("platform"))) {
       try {
         String platform = json.getString("platform");
@@ -1129,7 +736,7 @@ public class PoolControllerHelperService {
           pout.add(pool.getId());
           pout.add(pool.getId());
           pout.add(pool.getId());
-          pout.add("<a href=\"/miso/pool/" + pool.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>");
+          pout.add("<a href=\"/miso/pool/" + pool.getId() + "\"><span class=\"fa fa-pencil-square-o fa-lg\"></span></a>");
           arr.add(pout);
         }
         j.put("pools", arr);
@@ -1143,10 +750,12 @@ public class PoolControllerHelperService {
     else {
       return JSONUtils.SimpleJSONError("No platform specified");
     }
+    */
   }
 
   public JSONObject getPoolableElementInfo(HttpSession session, JSONObject json) {
     if (json.has("poolId") && json.has("elementId")) {
+      JSONObject response = new JSONObject();
       try {
         Long poolId = json.getLong("poolId");
         Long elementId = json.getLong("elementId");
@@ -1176,11 +785,22 @@ public class PoolControllerHelperService {
               if (pool.getPoolableElements().size() > 1) {
                 Map<Integer, TagBarcode> barcodes = dilution.getLibrary().getTagBarcodes();
                 if (!barcodes.isEmpty()) {
-                  info.append("<b>Barcodes:</b></br>");
-                  for (Integer key : dilution.getLibrary().getTagBarcodes().keySet()) {
-                    info.append(key+":"+barcodes.get(key).getName()+ " ("+barcodes.get(key).getSequence()+")<br/>");
+                  String out = "<b>Barcodes:</b></br>";
+                  for (Integer key : barcodes.keySet()) {
+                    TagBarcode tb = barcodes.get(key);
+                    if (tb != null) {
+                      out += key + ":" + tb.getName() + " (" + tb.getSequence() + ")<br/>";
+                      out += "<span class='counter'><img src='/styles/images/status/green.png' border='0'></span>";
+                    }
+                    else {
+                      out += "Error retrieving barcode ["+key+"] for library "+dilution.getLibrary().getName()+". Please check libraries for this pool.";
+                      out += "<span class='counter'><img src='/styles/images/status/red.png' border='0'></span>";
+                      break;
+                    }
                   }
-                  info.append("<span class='counter'><img src='/styles/images/status/green.png' border='0'></span>");
+                  response.put("ok", "ok");
+                  //info.append("<span class='counter'><img src='/styles/images/status/green.png' border='0'></span>");
+                  info.append(out);
                 }
                 else {
                   info.append("<b>Barcode:</b>");
@@ -1195,7 +815,9 @@ public class PoolControllerHelperService {
             break;
           }
         }
-        return JSONUtils.JSONObjectResponse("info", info.toString());
+        response.put("info", info.toString());
+        return response;
+        //return JSONUtils.JSONObjectResponse("info", info.toString());
       }
       catch (IOException e) {
         log.debug("Failed", e);
@@ -1204,6 +826,35 @@ public class PoolControllerHelperService {
     }
     else {
       return JSONUtils.SimpleJSONError("No pool or element ID specified");
+    }
+  }
+
+  public JSONObject createElementSelectDataTable(HttpSession session, JSONObject json) {
+    if (json.has("platform") && !"".equals(json.getString("platform"))) {
+      try {
+        String platform = json.getString("platform");
+        JSONObject j = new JSONObject();
+        JSONArray arr = new JSONArray();
+        for (LibraryDilution libraryDilution : requestManager.listAllLibraryDilutionsByPlatform((PlatformType.get(platform)))) {
+          JSONArray pout = new JSONArray();
+          pout.add(libraryDilution.getName());
+          pout.add(libraryDilution.getLibrary().getName() + "-" + libraryDilution.getLibrary().getAlias());
+          pout.add(libraryDilution.getLibrary().getSample().getName() + "-" + libraryDilution.getLibrary().getSample().getAlias());
+          pout.add(libraryDilution.getLibrary().getSample().getProject().getName() + "-" + libraryDilution.getLibrary().getSample().getProject().getAlias());
+          pout.add("<div style='cursor:pointer; text-align:center;' onmousedown=\"Pool.search.poolSearchSelectElement('" + libraryDilution.getId() + "', '"
+                   + libraryDilution.getName() + "')\"><span class=\"fa fa-fw fa-lg fa-plus-square-o\"></span></div>");
+          arr.add(pout);
+        }
+        j.put("poolelements", arr);
+        return j;
+      }
+      catch (IOException e) {
+        log.debug("Failed", e);
+        return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
+      }
+    }
+    else {
+      return JSONUtils.SimpleJSONError("No platform specified");
     }
   }
 

@@ -210,10 +210,8 @@ public class SQLLibraryQCDAO implements LibraryQcStore {
       if (this.cascadeType.equals(CascadeType.PERSIST)) {
         if (l != null) libraryDAO.save(l);
       }
-      else if (this.cascadeType.equals(CascadeType.REMOVE)) {
+      else if (this.cascadeType.equals(CascadeType.REMOVE) || this.cascadeType.equals(CascadeType.ALL)) {
         if (l != null) {
-          //Cache pc = cacheManager.getCache("libraryCache");
-          //pc.remove(DbUtils.hashCodeCacheKeyFor(l.getId()));
           DbUtils.updateCaches(cacheManager, l, Library.class);
         }
       }

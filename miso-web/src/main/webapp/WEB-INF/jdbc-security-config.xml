@@ -103,7 +103,7 @@
 
   <bean id="passwordEncoder" class="org.springframework.security.authentication.encoding.ShaPasswordEncoder"/>
 
-  <bean id="passwordCodecService" class="uk.ac.bbsrc.tgac.miso.core.security.PasswordCodecService">
+  <bean id="passwordCodecService" class="uk.ac.bbsrc.tgac.miso.core.security.ShaPasswordCodecService">
     <property name="encoder" ref="passwordEncoder"/>
   </bean>
 
@@ -141,4 +141,8 @@
     <property name="securityManager" ref="securityManager"/>
   </bean>
 
+  <bean id="exposeRequestUrlFilter" class="uk.ac.bbsrc.tgac.miso.webapp.context.ExposeRequestUrlFilter">
+    <constructor-arg ref="httpSessionSecurityContextRepository"/>
+    <property name="applicationContextProvider" ref="applicationContextProvider"/>
+  </bean>
 </beans>

@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 public class DefaultLibraryNamingScheme implements RequestManagerAwareNamingScheme<Library> {
   protected static final Logger log = LoggerFactory.getLogger(DefaultLibraryNamingScheme.class);
 
+  private Map<String, Boolean> allowDuplicateMap = new HashMap<String, Boolean>();
   private Map<String, Pattern> validationMap = new HashMap<String, Pattern>();
   private Map<String, NameGenerator<Library>> customNameGeneratorMap = new HashMap<String, NameGenerator<Library>>();
   private RequestManager requestManager;
@@ -36,6 +37,8 @@ public class DefaultLibraryNamingScheme implements RequestManagerAwareNamingSche
   public static final String DEFAULT_ALIAS_REGEX = "([A-z0-9]+)_L([A-z0-9]+)-([A-Z0-9]+)_(.*)";
 
   public DefaultLibraryNamingScheme() {
+    allowDuplicateMap.put("name", false);
+    allowDuplicateMap.put("alias", false);
     validationMap.put("name", Pattern.compile(DEFAULT_NAME_REGEX));
     validationMap.put("alias", Pattern.compile(DEFAULT_ALIAS_REGEX));
   }
@@ -154,6 +157,18 @@ public class DefaultLibraryNamingScheme implements RequestManagerAwareNamingSche
   @Override
   public void unregisterCustomNameGenerator(String fieldName) {
     this.customNameGeneratorMap.remove(fieldName);
+  }
+
+  @Override
+  public boolean allowDuplicateEntityNameFor(String fieldName) {
+    return fieldCheck(fieldName) != null && allowDuplicateMap.get(fieldName);
+  }
+
+  @Override
+  public void setAllowDuplicateEntityName(String fieldName, boolean allow) {
+    if (allowDuplicateMap.containsKey(fieldName) && fieldCheck(fieldName) != null) {
+      allowDuplicateMap.put(fieldName, allow);
+    }
   }
 
   private Method fieldCheck(String fieldName) {

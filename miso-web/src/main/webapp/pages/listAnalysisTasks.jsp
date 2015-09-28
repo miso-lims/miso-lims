@@ -23,8 +23,8 @@
   ~ **********************************************************************
   --%>
 
-<script type="text/javascript" src="<c:url value='/scripts/task_ajax.js?ts=${timestamp.time}'/>"></script>
-
+<div id="maincontent">
+<div id="contentcolumn">
 <div id="tabs">
   <ul>
     <li><a href="#tab-1"><span>Tasks</span></a></li>
@@ -32,12 +32,18 @@
   </ul>
 
   <div id="tab-1">
-    <i>This page refreshes every 30 seconds</i>
+    <i>This page needs to be refreshed manually</i>
 
-    <h1>Running Jobs</h1>
+    <div id="runningDiv" class="panel panel-default padded-panel">
+      <nav class="navbar navbar-default" role="navigation">
+         <div class="navbar-header">
+            <span class="navbar-brand navbar-center">
+              Running Jobs
+            </span>
+         </div>
+      </nav>
 
-    <div id="runningDiv">
-      <table id="runningTasks" class="list">
+      <table id="runningTasks" class="table table-bordered table-striped">
         <thead>
         <tr>
           <th>Job ID</th>
@@ -52,10 +58,16 @@
       </table>
     </div>
 
-    <h1>Pending Jobs</h1>
+    <div id="pendingDiv" class="panel panel-default padded-panel">
+      <nav class="navbar navbar-default" role="navigation">
+         <div class="navbar-header">
+            <span class="navbar-brand navbar-center">
+              Pending Jobs
+            </span>
+         </div>
+      </nav>
 
-    <div id="pendingDiv">
-      <table id="pendingTasks" class="list">
+      <table id="pendingTasks" class="table table-bordered table-striped">
         <thead>
         <tr>
           <th>Job ID</th>
@@ -69,10 +81,16 @@
       </table>
     </div>
 
-    <h1>Completed Jobs</h1>
+    <div id="completedDiv" class="panel panel-default padded-panel">
+      <nav class="navbar navbar-default" role="navigation">
+         <div class="navbar-header">
+            <span class="navbar-brand navbar-center">
+              Completed Jobs
+            </span>
+         </div>
+      </nav>
 
-    <div id="completedDiv">
-      <table id="completedTasks" class="list">
+      <table id="completedTasks" class="table table-bordered table-striped">
         <thead>
         <tr>
           <th>Job ID</th>
@@ -88,10 +106,16 @@
       </table>
     </div>
 
-    <h1>Failed Jobs</h1>
+    <div id="failedDiv" class="panel panel-default padded-panel">
+      <nav class="navbar navbar-default" role="navigation">
+         <div class="navbar-header">
+            <span class="navbar-brand navbar-center">
+              Failed Jobs
+            </span>
+         </div>
+      </nav>
 
-    <div id="failedDiv">
-      <table id="failedTasks" class="list">
+      <table id="failedTasks" class="table table-bordered table-striped">
         <thead>
         <tr>
           <th>Job ID</th>
@@ -104,73 +128,29 @@
         <tbody></tbody>
       </table>
     </div>
-
   </div>
 
   <div id="tab-2">
-    <h1>Available Pipelines</h1>
-    <table id="pipelines" class="list">
-      <thead>
-      <tr>
-        <th>Pipeline Name</th>
-        <th>Processes</th>
-      </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
+    <div id="pipelineDiv" class="panel panel-default padded-panel">
+      <nav class="navbar navbar-default" role="navigation">
+         <div class="navbar-header">
+            <span class="navbar-brand navbar-center">
+              Available Pipelines
+            </span>
+         </div>
+      </nav>
 
-  <%--
-      <h1>Running Jobs</h1>
-      <table class="list">
-        <c:forEach items="${running}" var="task">
-          <tr>
-            <td>
-              <b>${task.name}</b>
-            </td>
-            <td class="fit"><a href='<c:url value="/miso/task/${task.taskId}"/>'>View</a></td>
-          </tr>
-        </c:forEach>
-      </table>
-
-      <h1>Pending Jobs</h1>
-      <table class="list">
-        <c:forEach items="${pending}" var="task">
-          <tr>
-            <td>
-              <b>${task.name}</b>
-            </td>
-            <td class="fit"><a href='<c:url value="/miso/task/${task.taskId}"/>'>View</a></td>
-          </tr>
-        </c:forEach>
-      </table>
-
-      <h1>Completed Jobs</h1>
-      <table class="list">
-        <c:forEach items="${complete}" var="task">
-          <tr>
-            <td>
-              <b>${task.name}</b>
-            </td>
-            <td class="fit"><a href='<c:url value="/miso/task/${task.taskId}"/>'>View</a></td>
-          </tr>
-        </c:forEach>
+      <table id="pipelines" class="table table-bordered table-striped">
+        <thead>
+        <tr>
+          <th>Pipeline Name</th>
+          <th>Processes</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
       </table>
     </div>
-
-    <div id="tab-2">
-      <h1>Available Pipelines</h1>
-      <table class="list">
-        <c:forEach items="${pipelines}" var="pipeline">
-          <tr>
-            <td>
-              <b>${pipeline.name}</b>
-            </td>
-            <td class="fit"><a href='<c:url value="/miso/pipeline/${pipeline.taskId}"/>'>View</a></td>
-          </tr>
-        </c:forEach>
-      </table>
-      --%>
+  </div>
 
   <script type="text/javascript">
     jQuery(document).ready(function () {
@@ -184,12 +164,15 @@
       Tasks.ui.populateCompletedTasks();
 
       // update every 30 secs
-      window.setInterval(function () {
-        Tasks.ui.populateRunningTasks();
-        Tasks.ui.populatePendingTasks();
-        Tasks.ui.populateCompletedTasks();
-        Tasks.ui.populateFailedTasks();
-      }, 30000);
+//      window.setInterval(function () {
+//        Tasks.ui.populateRunningTasks();
+//        Tasks.ui.populatePendingTasks();
+//        Tasks.ui.populateCompletedTasks();
+//        Tasks.ui.populateFailedTasks();
+//      }, 30000);
     });
   </script>
+</div>
+</div>
+<%@ include file="adminsub.jsp" %>
 <%@ include file="../footer.jsp" %>

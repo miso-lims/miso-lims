@@ -27,7 +27,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
@@ -36,6 +38,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryQcException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleQcException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -71,7 +74,7 @@ public class ExternalRestController {
     int pi = 0;
     for (Project p : lp) {
       pi++;
-      sb.append(jsonRestProject(p.getProjectId()));
+      sb.append(jsonRestProjectList(p.getProjectId()));
       if (pi < lp.size()) {
         sb.append(",");
       }
@@ -79,11 +82,30 @@ public class ExternalRestController {
     return "[" + sb.toString() + "]";
   }
 
-
-  public String jsonRestProject(Long projectId) throws IOException {
+  public String jsonRestProjectList(Long projectId) throws IOException {
     StringBuilder sb = new StringBuilder();
 
     Project p = requestManager.getProjectById(projectId);
+    sb.append("'id':'" + projectId + "'");
+    sb.append(",");
+    sb.append("'name':'" + p.getName() + "'");
+    sb.append(",");
+    sb.append("'alias':'" + p.getAlias() + "'");
+
+    return "{" + sb.toString() + "}";
+  }
+
+
+  @RequestMapping(value = "project/{projectId}", method = RequestMethod.GET)
+  public
+  @ResponseBody
+  String jsonRestProject(@PathVariable Long projectId,
+                         ModelMap model) throws IOException {
+    StringBuilder sb = new StringBuilder();
+
+    Project p = requestManager.getProjectById(projectId);
+    sb.append("'id':'" + projectId + "'");
+    sb.append(",");
     sb.append("'name':'" + p.getName() + "'");
     sb.append(",");
     sb.append("'alias':'" + p.getAlias() + "'");
@@ -120,9 +142,10 @@ public class ExternalRestController {
     sb.append(",");
 
     sb.append("'samples':[");
-    if (requestManager.listAllSamplesByProjectId(projectId).size() > 0) {
+    Collection<Sample> samples = requestManager.listAllSamplesByProjectId(projectId);
+    if (samples.size() > 0) {
       int si = 0;
-      for (Sample sample : requestManager.listAllSamplesByProjectId(projectId)) {
+      for (Sample sample : samples) {
         si++;
         String sampleQubit = "not available";
         if (requestManager.listAllSampleQCsBySampleId(sample.getId()).size() > 0) {
@@ -136,14 +159,14 @@ public class ExternalRestController {
         sb.append("'qcPassed':'" + (sample.getQcPassed() != null ? sample.getQcPassed().toString() : "") + "'");
         sb.append(",");
 
-        sb.append("'receivedDate':'" + (sample.getReceivedDate() != null ? sample.getReceivedDate().toString() : "not available") + "'");
+        sb.append("'receivedDate':'" + (sample.getReceivedDate() != null ? LimsUtils.getDateAsString(sample.getReceivedDate()) : "not available") + "'");
         sb.append(",");
         sb.append("'sampleType':'" + (sample.getSampleType() != null ? sample.getSampleType() : "") + "'");
         sb.append(",");
         sb.append("'sampleQubit':'" + sampleQubit + "'");
         sb.append("}");
 
-        if (si < requestManager.listAllSamplesByProjectId(projectId).size()) {
+        if (si < samples.size()) {
           sb.append(",");
         }
 
@@ -153,9 +176,10 @@ public class ExternalRestController {
     sb.append(",");
 
     sb.append("'runs':[");
-    if (requestManager.listAllRunsByProjectId(projectId).size() > 0) {
+    Collection<Run> runs = requestManager.listAllRunsByProjectId(projectId);
+    if (runs.size() > 0) {
       int ri = 0;
-      for (Run run : requestManager.listAllRunsByProjectId(projectId)) {
+      for (Run run : runs) {
         ri++;
         if (!run.getStatus().getHealth().getKey().equals("Failed")) {
           ArrayList<String> runSamples = new ArrayList();
@@ -169,7 +193,7 @@ public class ExternalRestController {
                     if (spp.getPool().getDilutions().size() > 0) {
                       for (Dilution dilution : spp.getPool().getDilutions()) {
                         Sample sample = dilution.getLibrary().getSample();
-                        if (sample.getProject().equals(requestManager.getProjectById(projectId))) {
+                        if (sample.getProject().equals(p)) {
                           runSamples.add(sample.getAlias());
                         }
                       }
@@ -206,7 +230,7 @@ public class ExternalRestController {
           }
           sb.append("]");
           sb.append("}");
-          if (ri < requestManager.listAllRunsByProjectId(projectId).size()) {
+          if (ri < runs.size()) {
             sb.append(",");
           }
         }

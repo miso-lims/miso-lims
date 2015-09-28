@@ -117,6 +117,17 @@ public class AllowAnythingEntityNamingScheme<T extends Nameable> implements Miso
     this.customNameGeneratorMap.remove(fieldName);
   }
 
+  @Override
+  public boolean allowDuplicateEntityNameFor(String fieldName) {
+    //if the field exists, then duplicates are allowed
+    return fieldCheck(fieldName);
+  }
+
+  @Override
+  public void setAllowDuplicateEntityName(String fieldName, boolean allow) {
+    log.error("All duplicate names are allowed for all fields in this scheme.");
+  }
+
   private boolean fieldCheck(String fieldName) {
     try {
       Method m = namingSchemeFor().getMethod("get" + LimsUtils.capitalise(fieldName));

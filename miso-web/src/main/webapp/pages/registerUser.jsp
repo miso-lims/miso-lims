@@ -30,19 +30,19 @@
     <table>
       <tr>
         <td>Login name:</td>
-        <td><form:input path="loginName"/></td>
+        <td><form:input path="loginName" class="form-control"/></td>
       </tr>
       <tr>
         <td>Full name:</td>
-        <td><form:input path="fullName"/></td>
+        <td><form:input path="fullName" class="form-control"/></td>
       </tr>
       <tr>
         <td>Email:</td>
-        <td><form:input path="email"/></td>
+        <td><form:input path="email" class="form-control"/></td>
       </tr>
       <tr>
         <td>Password:</td>
-        <td><form:password path="password" showPassword="true"/></td>
+        <td><form:password path="password" showPassword="true" class="form-control"/></td>
       </tr>
       <tr>
         <td></td>

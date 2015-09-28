@@ -27,6 +27,7 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 //import com.fasterxml.jackson.core.type.TypeReference;
 //import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.json.JsonSanitizer;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
@@ -42,6 +43,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatePool;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlateMaterialType;
+import uk.ac.bbsrc.tgac.miso.core.data.type._96WellPlatePosition;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoPrintException;
 import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
@@ -59,6 +61,8 @@ import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
@@ -215,26 +219,6 @@ public class PlateControllerHelperService {
     return JSONUtils.SimpleJSONResponse("Plate saved successfully");
   }
 
-  public JSONObject getTagBarcodesForMaterialType(HttpSession session, JSONObject json) {
-    Map<String, Object> responseMap = new HashMap<String, Object>();
-    if (json.has("materialType") && !"".equals(json.getString("materialType"))) {
-      String materialType = json.getString("materialType");
-      StringBuilder srb = new StringBuilder();
-      srb.append("<select name='tagBarcode' id='tagBarcodes'>");
-      srb.append("<option value='0' selected='selected'>No barcode</option>");
-//      for (TagBarcode tb : requestManager.listPlateBarcodesByMaterialType(PlateMaterialType.get(materialType))) {
-//        srb.append("<option value='" + tb.getTagBarcodeId() + "'>" + tb.getName() + " ("+ tb.getSequence()+")</option>");
-//      }
-      srb.append("</select>");
-
-      responseMap.put("plateBarcodes", srb.toString());
-    }
-    else {
-      return JSONUtils.SimpleJSONError("Unrecognised MaterialType");
-    }
-    return JSONUtils.JSONObjectResponse(responseMap);
-  }
-
   public JSONObject downloadPlateInputForm(HttpSession session, JSONObject json) {
     if (json.has("documentFormat")) {
       String documentFormat = json.getString("documentFormat");
@@ -284,11 +268,6 @@ public class PlateControllerHelperService {
 
             for (Plate<LinkedList<Library>, Library> plate : platePool.getPoolableElements()) {
               JSONObject j = new JSONObject();
-
-//              if (json.has("tagBarcode")) {
-//                String tagBarcode = json.getString("tagBarcode");
-//                plate.setTagBarcode(requestManager.listAllTagBarcodesByStrategyName());
-//              }
 
               if (plate.getDescription() == null) {
                 plate.setDescription(description);
@@ -370,28 +349,13 @@ public class PlateControllerHelperService {
               String strategyName = "No barcode";
 
               StringBuilder seqbuilder = new StringBuilder();
-              if (!l.getTagBarcodes().isEmpty()) {
-                int count = 1;
-                Collection<TagBarcode> barcodes = l.getTagBarcodes().values();
-                for (TagBarcode tb : barcodes) {
-                  strategyName = tb.getStrategyName();
-                  seqbuilder.append(tb.getSequence());
-                  if (l.getTagBarcodes().values().size() > 1 && count < l.getTagBarcodes().values().size()) {
-                    seqbuilder.append("-");
-                  }
-                  count++;
-                }
-              }
-              else {
-                log.info("No tag barcodes!");
-              }
 
-              jsonArray.add("['" +
-                            l.getName() + "','" +
-                            l.getAlias() + "','" +
-                            strategyName + "','" +
-                            seqbuilder.toString() + "','" +
-                            "<a href=\"/miso/library/" + l.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
+              jsonArray.add(JsonSanitizer.sanitize("[\"" +
+                           l.getName() + "\",\"" +
+                           l.getAlias() + "\",\"" +
+                           strategyName + "\",\"" +
+                           seqbuilder.toString() + "\",\"" +
+                           "<a href=\"/miso/library/" + l.getId() + "\"><span class=\"fa fa-pencil-square-o fa-lg\"></span></a>" + "\"]"));
             }
           }
         }
@@ -456,11 +420,13 @@ public class PlateControllerHelperService {
         Collections.sort(samples);
         Collections.reverse(samples);
         for (Sample s : samples) {
-          b.append("<div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" "
+          b.append("<div id=\"sample" + s.getId() + "\" onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" "
                    + " " + "class=\"dashboard\">");
           b.append("<input type=\"hidden\" id=\"" + s.getId() + "\" name=\"" + s.getName() + "\" projectname=\"" + s.getProject().getName() + "\" samplealias=\"" + s.getAlias() + "\"/>");
           b.append("Name: <b>" + s.getName() + "</b><br/>");
           b.append("Alias: <b>" + s.getAlias() + "</b><br/>");
+          b.append("From Project: <b>" + s.getProject().getName() + "</b><br/>");
+          b.append("<button type=\"button\" class=\"fg-button ui-state-default ui-corner-all\" onclick=\"Plate.ui.insertSampleNextAvailable(jQuery('#sample" + s.getId() + "'));\">Add</button>");
           b.append("</div>");
         }
       }
@@ -475,25 +441,121 @@ public class PlateControllerHelperService {
     }
   }
 
+  public JSONObject listSampleSelectionTable(HttpSession session, JSONObject json) {
+    try {
+      List<Sample> samples;
+      JSONObject j = new JSONObject();
+      JSONArray jsonArray = new JSONArray();
+      samples = new ArrayList<Sample>(requestManager.listAllSamples());
+
+      if (samples.size() > 0) {
+        Collections.sort(samples);
+        for (Sample sample : samples) {
+
+          jsonArray.add("['" + sample.getProject().getName() + "','" +
+                        sample.getProject().getAlias() + "','" +
+                        sample.getName() + "','" +
+                        sample.getAlias() + "','" +
+                        "<span class=\"fa fa-plus-square-o fa-lg\" onclick=\"Plate.ui.insertSampleNextAvailable(\\\'"+sample.getName()+"\\\',\\\'"+sample.getProject().getName()+"\\\');\"></span>"
+                        + "']");
+        }
+      }
+      j.put("array", jsonArray);
+      return j;
+    }
+    catch (IOException e) {
+      log.debug("Failed", e);
+      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
+    }
+  }
+
   public JSONObject exportSampleForm(HttpSession session, JSONObject json) {
 //    if (json.has("projectId") && json.has("documentFormat")) {
-      try {
-        JSONArray a = JSONArray.fromObject(json.getString("form"));
-        File f = misoFileManager.getNewFile(
-            Plate.class,
-            "forms",
-            "PlateInputForm-" + LimsUtils.getCurrentDateAsString() + ".xlsx");
-        FormUtils.createPlateExportForm(f, a);
-        return JSONUtils.SimpleJSONResponse("" + f.getName().hashCode());
-      }
-      catch (Exception e) {
-        e.printStackTrace();
-        return JSONUtils.SimpleJSONError("Failed to get plate input form: " + e.getMessage());
-      }
+    try {
+      JSONArray a = JSONArray.fromObject(json.getString("form"));
+      File f = misoFileManager.getNewFile(
+          Plate.class,
+          "forms",
+          "PlateInputForm-" + LimsUtils.getCurrentDateAsString() + ".xlsx");
+      FormUtils.createPlateExportForm(f, a);
+      return JSONUtils.SimpleJSONResponse("" + f.getName().hashCode());
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+      return JSONUtils.SimpleJSONError("Failed to get plate input form: " + e.getMessage());
+    }
 //    }
 //    else {
 //      return JSONUtils.SimpleJSONError("Missing project ID or document format supplied.");
 //    }
+  }
+
+  public JSONObject saveElements(HttpSession session, JSONObject json) {
+    try {
+      JSONArray jsonArray = JSONArray.fromObject(json.getString("form"));
+      Long plateId = json.getLong("plateId");
+      Plate plate = requestManager.getPlateById(plateId);
+      LinkedList<Sample> elements = new LinkedList<>();
+
+      for (JSONObject jsonObject : (Iterable<JSONObject>) jsonArray) {
+        if ("sampleinwell".equals(jsonObject.getString("name"))) {
+          String sampleinwell = jsonObject.getString("value");
+          //"samplename:wellid
+          String sampleName = sampleinwell.split(":")[0];
+          String wellId = sampleinwell.split(":")[1];
+          String sampleRegEx = "SAM([0-9]+)";
+          Matcher m = Pattern.compile(sampleRegEx).matcher(sampleName);
+          if (m.matches()) {
+            Long sampleId = Long.parseLong(m.group(1));
+            _96WellPlatePosition pp = _96WellPlatePosition.valueOf(wellId);
+            if (pp != null) {
+              elements.set(_96WellPlatePosition.getPositionMap().get(pp), requestManager.getSampleById(sampleId));
+            }
+          }
+        }
+      }
+      plate.setElements(elements);
+      requestManager.savePlate(plate);
+
+      return JSONUtils.SimpleJSONResponse("ok");
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+      return JSONUtils.SimpleJSONError(e.getMessage());
+    }
+
+  }
+
+  public JSONObject createPlateElementsUI(HttpSession session, JSONObject json) {
+    if (json.has("plateId")) {
+      try {
+        JSONObject j = new JSONObject();
+        JSONArray jsonArray = new JSONArray();
+        long plateId = json.getLong("plateId");
+
+        Plate<? extends List<? extends Plateable>, ? extends Plateable> plate = requestManager.getPlateById(plateId);
+        if (plate != null) {
+          for (Plateable p : plate.getElements()) {
+            if (p instanceof Sample) {
+              Sample sample = (Sample) p;
+              jsonArray.add("['" +
+                            //todo get position
+                            //  p.getElementPosition() + "','" +
+                            sample.getName() + "']");
+            }
+          }
+        }
+        j.put("elementsArray", jsonArray);
+        return j;
+      }
+      catch (IOException e) {
+        log.debug("Failed", e);
+        return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
+      }
+    }
+    else {
+      return JSONUtils.SimpleJSONError("No plates to show");
+    }
   }
 
   public void setSecurityManager(SecurityManager securityManager) {

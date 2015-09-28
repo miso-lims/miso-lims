@@ -43,6 +43,7 @@ import java.util.Collection;
  * @author Rob Davey
  * @since 0.0.2
  */
+@Deprecated
 public class HibernateSampleStore extends HibernateDaoSupport implements Store<Sample> {
   @Transactional(readOnly = false)
   public long save(Sample sample) throws IOException {
@@ -53,6 +54,11 @@ public class HibernateSampleStore extends HibernateDaoSupport implements Store<S
   @Transactional(readOnly = true)
   public Sample get(long sampleId) throws IOException {
     return (Sample) getHibernateTemplate().get(AbstractSample.class, sampleId);
+  }
+
+  @Override
+  public Sample lazyGet(long id) throws IOException {
+    return get(id);
   }
 
   @Transactional(readOnly = true)

@@ -42,6 +42,7 @@ import java.lang.String;import java.lang.SuppressWarnings;import java.util.Colle
  * @author Rob Davey
  * @since 0.0.2
  */
+@Deprecated
 public class HibernateStatusStore  extends HibernateDaoSupport implements Store<Status> {
   @Transactional(readOnly = false)
   public long save(Status status) throws IOException {
@@ -54,6 +55,11 @@ public class HibernateStatusStore  extends HibernateDaoSupport implements Store<
   public Status get(long statusId) throws IOException {
     //may have to check for null before the cast
     return (Status) getHibernateTemplate().get(StatusImpl.class, statusId);
+  }
+
+  @Override
+  public Status lazyGet(long id) throws IOException {
+    return get(id);
   }
 
   @Transactional(readOnly = true)

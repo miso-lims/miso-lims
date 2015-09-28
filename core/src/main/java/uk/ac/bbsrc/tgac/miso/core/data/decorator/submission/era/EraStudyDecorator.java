@@ -81,14 +81,7 @@ public class EraStudyDecorator extends AbstractSubmittableDecorator<Document> {
 
       study.appendChild(studyDescriptor);
 
-      if (submission.getElementsByTagName("STUDY_SET").item(0) != null) {
-        submission.getElementsByTagName("STUDY_SET").item(0).appendChild(study);
-      }
-      else {
-          Element studySet = submission.createElementNS(null, "STUDY_SET");
-            submission.appendChild(studySet);
-            studySet.appendChild(study);
-      }
+      submission.getElementsByTagName("STUDY_SET").item(0).appendChild(study);
     }
   }
 }

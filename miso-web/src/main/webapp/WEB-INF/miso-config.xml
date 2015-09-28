@@ -47,8 +47,8 @@
   <bean name="multipartUploadListener" class="net.sourceforge.fluxion.ajax.beans.util.FileUploadListener"/>
 
   <bean id="multipartResolver" class="uk.ac.bbsrc.tgac.miso.spring.ajax.multipart.AjaxMultipartResolver">
-    <property name="maxUploadSize" value="1000000"/>
-    <property name="fileUploadListener" ref="multipartUploadListener"/>
+    <property name="maxUploadSize" value="10000000"/>
+    <!--<property name="fileUploadListener" ref="multipartUploadListener"/>-->
   </bean>
 
   <bean id="fileUploadController" class="uk.ac.bbsrc.tgac.miso.webapp.controller.UploadController">

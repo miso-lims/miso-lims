@@ -117,6 +117,8 @@ public interface Dilution extends SecurableByProfile, Barcodable, Comparable, De
    */
   public void setConcentration(Double concentration);
 
+  public String getUnits();
+
   /**
    * Returns the Library of this Dilution object.
    *

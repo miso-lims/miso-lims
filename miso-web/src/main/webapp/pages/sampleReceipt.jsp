@@ -30,39 +30,33 @@
 <%@ include file="../header.jsp" %>
 <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.breadcrumbs.popup.js'/>"></script>
 
-<script src="<c:url value='/scripts/datatables_utils.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
-<script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
-<script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.mini.js'/>" type="text/javascript"></script>
-<script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.datepicker.js'/>" type="text/javascript"></script>
-<script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.checkbox.js'/>" type="text/javascript"></script>
-<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" type="text/css">
-
 <div id="maincontent">
   <div id="contentcolumn">
-    <h1>
-      Receive Samples
-      <button type="submit" class="fg-button ui-state-default ui-corner-all"
-              onclick="Sample.ui.setSampleReceiveDate('#sample_pan');">
-        Save
-      </button>
-    </h1>
+    <nav class="navbar navbar-default" role="navigation">
+      <div class="navbar-header">
+        <span class="navbar-brand navbar-center">
+          Receive Samples
+        </span>
+      </div>
+      <div class="navbar-right container-fluid">
+        <button class="btn btn-default navbar-btn" href='javascript:void(0);' onclick="Sample.ui.setSampleReceiveDate('#sample_pan');">Save</button>
+      </div>
+    </nav>
 
     <form id="samples" commandName="sample" autocomplete="off" onsubmit="">
-      <div>
-        Barcode:<input type="text"
-                       size="40"
-                       id="searchSampleByBarcode"
-                       name="searchSampleByBarcode">
-
-        <span id="msgspan"></span>
-
-        <h2>Sample Information</h2>
-
-        <div id="sample_pan"></div>
-        <br/>
-        <br/>
+      <div class="col-sm-12 col-md-12 col-ld-12 small-pad">
+        <div class="panel panel-primary panel-dashboard">
+          <div class="panel-heading">
+            <h3 class="panel-title pull-left">Enter Barcode</h3>
+            <input type="text" size="40" id="searchSampleByBarcode" name="searchSampleByBarcode" class="form-control pull-right"/>
+          </div>
+          <div class="panel-body">
+            <span id="msgspan"></span>
+            <div id="sample_pan"></div>
+            <div id="pager"></div>
+          </div>
+        </div>
       </div>
-      <div id="pager"></div>
     </form>
   </div>
 </div>

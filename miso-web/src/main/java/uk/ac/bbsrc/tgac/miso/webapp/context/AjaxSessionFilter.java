@@ -94,7 +94,7 @@ public class AjaxSessionFilter extends SessionManagementFilter {
     if (!securityContextRepository.containsContext(request)) {
       //if a session has been created for this user instance, and that session is no longer valid, then do this filter
       if (request.getRequestedSessionId() != null && !request.isRequestedSessionIdValid()) {
-        log.info("Session expired - informing client.");
+        log.debug("Session expired - informing client.");
         request.getSession();
         JSONObject jsonObject = JSONObject.fromObject("{'sessiontimeout':'sessiontimeout'}");
         jsonObject.write(res.getWriter());

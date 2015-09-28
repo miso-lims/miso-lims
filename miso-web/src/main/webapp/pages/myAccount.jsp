@@ -25,12 +25,18 @@
 
 <div id="maincontent">
   <div id="contentcolumn">
-    <h1>My Account</h1>
+    <nav class="navbar navbar-default" role="navigation">
+       <div class="navbar-header">
+          <span class="navbar-brand navbar-center">
+            My Account
+          </span>
+       </div>
+    </nav>
 
     <div class="portlet">
       <div class="portlet-header">My Account</div>
       <div class="portlet-content">
-        User: ${userRealName}<br/>
+        User: ${userRealName} <a href="<c:url value='/miso/user/${userId}'/>">Edit</a><br/>
         Groups: ${userGroups}<br/><br/>
         API Key: ${apiKey}
       </div>
@@ -166,7 +172,7 @@
     -moz-background-clip: border;
     -moz-background-inline-policy: continuous;
     -moz-background-origin: padding;
-    background: #CCDDFF none repeat scroll 0 0;
+    background: #F0F0FF none repeat scroll 0 0;
     border: 1px solid #AAAAAA;
     color: #666666;
     font-weight: bold;

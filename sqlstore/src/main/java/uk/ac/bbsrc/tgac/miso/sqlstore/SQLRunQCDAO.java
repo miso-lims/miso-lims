@@ -42,6 +42,7 @@ import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.store.RunQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
@@ -144,7 +145,7 @@ public class SQLRunQCDAO implements RunQcStore {
             .addValue("qcUserName", runQC.getQcCreator())
             .addValue("qcDate", runQC.getQcDate())
             .addValue("qcMethod", runQC.getQcType().getQcTypeId())
-            .addValue("information", runQC.getInformation())
+            .addValue("information", LimsUtils.findHyperlinks(runQC.getInformation()))
             .addValue("doNotProcess", runQC.getDoNotProcess());
 
     if (runQC.getId() == AbstractQC.UNSAVED_ID) {

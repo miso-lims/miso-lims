@@ -42,6 +42,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.transaction.annotation.Transactional;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
@@ -81,6 +82,9 @@ public class SQLSampleDAO implements SampleStore {
 
   public static final String SAMPLES_SELECT_LIMIT =
           SAMPLES_SELECT + " ORDER BY sampleId DESC LIMIT ?";
+
+  public static final String SAMPLES_SELECT_RECEIVED_DATE =
+      SAMPLES_SELECT + " group by receivedDate,project_projectId ORDER BY DATE(receivedDate) DESC LIMIT ?";
 
   public static final String SAMPLE_SELECT_BY_ID =
           SAMPLES_SELECT + " " + "WHERE sampleId = ?";
@@ -321,7 +325,8 @@ public class SQLSampleDAO implements SampleStore {
     }
 
     if (sample.getId() == AbstractSample.UNSAVED_ID) {
-      if (!listByAlias(sample.getAlias()).isEmpty()) {
+      //if the sample naming scheme doesn't allow duplicates, and a sample alias already exists
+      if (!sampleNamingScheme.allowDuplicateEntityNameFor("alias") && !listByAlias(sample.getAlias()).isEmpty()) {
         throw new IOException("NEW: A sample with this alias already exists in the database");
       }
       else {
@@ -358,7 +363,7 @@ public class SQLSampleDAO implements SampleStore {
     }
     else {
       SqlRowSet ss = template.queryForRowSet(SAMPLE_SELECT_BY_ALIAS, new Object[]{sample.getAlias()});
-      if (ss.next() && ss.getLong("sampleId") != sample.getId()) {
+      if (!sampleNamingScheme.allowDuplicateEntityNameFor("alias") && ss.next() && ss.getLong("sampleId") != sample.getId()) {
         throw new IOException("UPD: A sample with this alias already exists in the database");
       }
       else {
@@ -384,7 +389,6 @@ public class SQLSampleDAO implements SampleStore {
       Project p = sample.getProject();
       if (this.cascadeType.equals(CascadeType.PERSIST)) {
         if (p!=null) {
-
           //set project progress to ACTIVE if in a prior waiting state (APPROVED)
           if (sample.getReceivedDate() != null && p.getProgress().equals(ProgressType.APPROVED)) {
             p.setProgress(ProgressType.ACTIVE);
@@ -396,6 +400,9 @@ public class SQLSampleDAO implements SampleStore {
       else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (p != null) {
           DbUtils.updateCaches(cacheManager, p, Project.class);
+          for (ProjectOverview po : p.getOverviews()) {
+            DbUtils.updateCaches(cacheManager, po, ProjectOverview.class);
+          }
         }
       }
 
@@ -426,6 +433,10 @@ public class SQLSampleDAO implements SampleStore {
 
   public List<Sample> listAllWithLimit(long limit) throws IOException {
     return template.query(SAMPLES_SELECT_LIMIT, new Object[]{limit}, new SampleMapper(true));
+  }
+
+  public List<Sample> listAllByReceivedDate(long limit) throws IOException {
+    return template.query(SAMPLES_SELECT_RECEIVED_DATE, new Object[]{limit}, new SampleMapper(true));
   }
 
   @Override
@@ -460,8 +471,6 @@ public class SQLSampleDAO implements SampleStore {
       }
       else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (p != null) {
-          //Cache pc = cacheManager.getCache("projectCache");
-          //pc.remove(DbUtils.hashCodeCacheKeyFor(p.getProjectId()));
           DbUtils.updateCaches(cacheManager, p, Project.class);
         }
       }
@@ -538,7 +547,14 @@ public class SQLSampleDAO implements SampleStore {
       if (isCacheEnabled() && lookupCache(cacheManager) != null) {
         Element element;
         if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
-          return (Sample)element.getObjectValue();
+          log.info("Cache hit on map for sample " + id);
+          log.info("Cache hit on map for sample with element " + element);
+          Sample sample = (Sample)element.getObjectValue();
+          if (sample.getId() == 0){
+             DbUtils.updateCaches(lookupCache(cacheManager),id);
+          } else {
+            return (Sample) element.getObjectValue();
+          }
         }
       }
 
@@ -594,24 +610,6 @@ public class SQLSampleDAO implements SampleStore {
 
       if (isCacheEnabled() && lookupCache(cacheManager) != null) {
         lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id) ,s));
-        /*
-        Cache c = lookupCache(cacheManager);
-        Sample cached = (Sample)c.get(DbUtils.hashCodeCacheKeyFor(id));
-        if (cached != null) {
-          log.info("Cached date: " + cached.getReceivedDate());
-          log.info("Current date: " + s.getReceivedDate());
-
-          log.info("Replacing sample "+id+" in " + c.getName());
-          c.put(new Element(DbUtils.hashCodeCacheKeyFor(id) ,s));
-          Sample after = (Sample)c.get(DbUtils.hashCodeCacheKeyFor(id));
-          log.info("Replaced date: " + after.getReceivedDate());
-        }
-        else {
-          log.info("Putting sample "+id+" in " + c.getName());
-          log.info("Current date: " + s.getReceivedDate());
-          c.put(new Element(DbUtils.hashCodeCacheKeyFor(id) ,s));
-        }
-        */
       }
 
       return s;

@@ -193,6 +193,8 @@ public class PacBioNotificationMessageConsumerMechanism implements NotificationM
               else {
                 log.info("\\_ Updating existing run and status: " + is.getRunName());
 
+                r.setAlias(runName);
+
                 r.setPlatformType(PlatformType.PACBIO);
                 r.setDescription(m.group(2));
                 r.setPairedEnd(false);
@@ -261,13 +263,22 @@ public class PacBioNotificationMessageConsumerMechanism implements NotificationM
                         if (lf.getSecurityProfile() != null && r.getSecurityProfile() == null) {
                           r.setSecurityProfile(lf.getSecurityProfile());
                         }
-                        if (lf.getPlatformType() == null && r.getPlatformType() != null) {
-                          lf.setPlatformType(r.getPlatformType());
+                        if (lf.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
+                          lf.setPlatform(r.getSequencerReference().getPlatform());
                         }
-                        else {
-                          lf.setPlatformType(PlatformType.PACBIO);
+//                        else {
+//                          lf.setPlatformType(PlatformType.PACBIO);
+//                        }
+                        JSONArray cells = run.getJSONArray("cells");
+                        if (cells.size() > lf.getPartitions().size()) {
+                          int numNewcells = cells.size()-lf.getPartitions().size();
+                          lf.setPartitionLimit(cells.size());
+                          for (int i=0; i<numNewcells; i++){
+                            lf.addNewPartition();
+                          }
                         }
-                        ((RunImpl)r).addSequencerPartitionContainer(lf);
+
+                        r.addSequencerPartitionContainer(lf);
                       }
                       else {
                         //more than one flowcell hit to this barcode
@@ -283,18 +294,18 @@ public class PacBioNotificationMessageConsumerMechanism implements NotificationM
                         if (run.has("plateId") && !"".equals(run.getString("plateId"))) {
                           f.setIdentificationBarcode(run.getString("plateId"));
                         }
-                        if (f.getPlatformType() == null && r.getPlatformType() != null) {
-                          f.setPlatformType(r.getPlatformType());
+                        if (f.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
+                          f.setPlatform(r.getSequencerReference().getPlatform());
                         }
-                        else {
-                          f.setPlatformType(PlatformType.PACBIO);
-                        }
+//                        else {
+//                          f.setPlatformType(PlatformType.PACBIO);
+//                        }
                         f.setRun(r);
                         log.info("\\_ Created new container with "+f.getPartitions().size()+" partitions");
                         long flowId = requestManager.saveSequencerPartitionContainer(f);
                         f.setId(flowId);
-                        ((RunImpl)r).addSequencerPartitionContainer(f);
-                        //TODO match up samples to libraries and pools?
+                        r.addSequencerPartitionContainer(f);
+                        //TODO match up samples to libraries and pools? Or match up pool numbers
                         /*
                         for (JSONObject obj : (Iterable<JSONObject>)cells) {
                           int cellindex = obj.getInt("index");
@@ -314,16 +325,24 @@ public class PacBioNotificationMessageConsumerMechanism implements NotificationM
                 else {
                   SequencerPartitionContainer f = fs.iterator().next();
                   f.setSecurityProfile(r.getSecurityProfile());
-                  if (f.getPlatformType() == null && r.getPlatformType() != null) {
-                    f.setPlatformType(r.getPlatformType());
+                  if (f.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
+                    f.setPlatform(r.getSequencerReference().getPlatform());
                   }
-                  else {
-                    f.setPlatformType(PlatformType.PACBIO);
-                  }
+//                  else {
+//                    f.setPlatformType(PlatformType.PACBIO);
+//                  }
                   if (f.getIdentificationBarcode() == null || "".equals(f.getIdentificationBarcode())) {
                     if (run.has("plateId") && !"".equals(run.getString("plateId"))) {
                       f.setIdentificationBarcode(run.getString("plateId"));
                       requestManager.saveSequencerPartitionContainer(f);
+                    }
+                  }
+                  JSONArray cells = run.getJSONArray("cells");
+                  if (cells.size() > f.getPartitions().size()) {
+                    int numNewcells = cells.size()-f.getPartitions().size();
+                    f.setPartitionLimit(cells.size());
+                    for (int i=0; i<numNewcells; i++){
+                      f.addNewPartition();
                     }
                   }
                 }

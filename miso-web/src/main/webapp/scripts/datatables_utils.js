@@ -31,20 +31,22 @@ var DatatableUtils = DatatableUtils || {};
 
 DatatableUtils = {
   collapseInputs: function (tableselector) {
+
     var tableObj = jQuery(tableselector);
     var table = tableObj.dataTable();
     tableObj.find("input,select").each(function () {
+      var cell = jQuery(this).closest('td');
+      var cellIndex = cell[0].cellIndex;
+
       var tr = jQuery(this).parent().parent().parent();
-      var td = jQuery(this).parent().parent();
       var row = tr.parent().children().index(tr);
-      var col = tr.children().index(td);
 
       var inval = jQuery(this).val();
       if (Utils.validation.isNullCheck(inval)) {
-        table.fnUpdate("", row, col, false);
+        table.fnUpdate("", row, cellIndex, false);
       }
       else {
-        table.fnUpdate(inval, row, col, false);
+        table.fnUpdate(inval, row, cellIndex, false);
       }
       jQuery(this).blur();
     });

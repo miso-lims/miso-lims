@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.core.service.printing;
 
 import net.sourceforge.fluxion.spi.Spi;
+import uk.ac.bbsrc.tgac.miso.core.exception.MisoPrintException;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.schema.BarcodableSchema;
 
@@ -51,7 +52,7 @@ public interface MisoPrintService<T, S, C extends PrintContext<T>> {
   boolean print(T content) throws IOException;
   void setPrintServiceFor(Class<? extends S> c);
   Class<? extends S> getPrintServiceFor();
-  public T getLabelFor(S b);
+  public T getLabelFor(S b) throws MisoPrintException;
   void setBarcodableSchema(BarcodableSchema<T, S> barcodableSchema);
   BarcodableSchema getBarcodableSchema();
 }

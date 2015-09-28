@@ -24,22 +24,22 @@
 package uk.ac.bbsrc.tgac.miso.core.manager;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import com.eaglegenomics.simlims.core.Note;
+import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 
 import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.*;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaPool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ls454.LS454Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.solid.SolidPool;
 import uk.ac.bbsrc.tgac.miso.core.data.type.*;
 import uk.ac.bbsrc.tgac.miso.core.event.Alert;
+import uk.ac.bbsrc.tgac.miso.core.workflow.Workflow;
+import uk.ac.bbsrc.tgac.miso.core.workflow.WorkflowDefinition;
+import uk.ac.bbsrc.tgac.miso.core.workflow.WorkflowProcess;
+import uk.ac.bbsrc.tgac.miso.core.workflow.WorkflowProcessDefinition;
 
 public interface RequestManager {
 
@@ -77,6 +77,7 @@ public interface RequestManager {
   public long saveKitDescriptor(KitDescriptor kitDescriptor) throws IOException;
   public <T extends List<S>, S extends Plateable> long savePlate(Plate<T, S> plate) throws IOException;
   public long saveAlert(Alert alert) throws IOException;
+  public long saveEntityGroup(HierarchicalEntityGroup<? extends Nameable, ? extends Nameable> entityGroup) throws IOException;
 
   //GETS
   public SequencerPoolPartition getSequencerPoolPartitionById(long partitionId) throws IOException;
@@ -105,13 +106,14 @@ public interface RequestManager {
   public LibraryStrategyType getLibraryStrategyTypeById(long libraryStrategyTypeId) throws IOException;
   public LibraryStrategyType getLibraryStrategyTypeByName(String name) throws IOException;
   public TagBarcode getTagBarcodeById(long tagBarcodeId) throws IOException;
-  public emPCR getEmPcrById(long pcrId) throws IOException;
-  public emPCRDilution getEmPcrDilutionByBarcodeAndPlatform(String barcode, PlatformType platformType) throws IOException;
-  public emPCRDilution getEmPcrDilutionById(long dilutionId) throws IOException;
-  public emPCRDilution getEmPcrDilutionByBarcode(String barcode) throws IOException;
+  public emPCR getEmPCRById(long pcrId) throws IOException;
+  public emPCRDilution getEmPCRDilutionByBarcodeAndPlatform(String barcode, PlatformType platformType) throws IOException;
+  public emPCRDilution getEmPCRDilutionById(long dilutionId) throws IOException;
+  public emPCRDilution getEmPCRDilutionByBarcode(String barcode) throws IOException;
   public Note getNoteById(long noteId) throws IOException;
   public Platform getPlatformById(long platformId) throws IOException;
   public Project getProjectById(long projectId) throws IOException;
+  public Project getProjectByAlias(String projectAlias) throws IOException;
   public ProjectOverview getProjectOverviewById(long overviewId) throws IOException;
   public Run getRunById(long runId) throws IOException;
   public Run getRunByAlias(String alias) throws IOException;
@@ -145,6 +147,7 @@ public interface RequestManager {
   public Plate<? extends List<? extends Plateable>, ? extends Plateable> getPlateById(long plateId) throws IOException;
   public <T extends List<S>, S extends Plateable> Plate<T, S> getPlateByBarcode(String barcode) throws IOException;
   public Alert getAlertById(long alertId) throws IOException;
+  public HierarchicalEntityGroup<? extends Nameable, ? extends Nameable> getEntityGroupById(long entityGroupId) throws IOException;
 
 
 //LISTS
@@ -160,6 +163,7 @@ public interface RequestManager {
   public Collection<Study> listAllStudies() throws IOException;
   public Collection<Study> listAllStudiesWithLimit(long limit) throws IOException;
   public Collection<Study> listAllStudiesBySearch(String query) throws IOException;
+  public Collection<Study> listAllStudiesByLibraryId(long libraryId) throws IOException;
 
   public Collection<Experiment> listAllExperiments() throws IOException;
   public Collection<Experiment> listAllExperimentsWithLimit(long limit) throws IOException;
@@ -191,6 +195,7 @@ public interface RequestManager {
 
   public Collection<Sample> listAllSamples() throws IOException;
   public Collection<Sample> listAllSamplesWithLimit(long limit) throws IOException;
+  public Collection<Sample> listAllSamplesByReceivedDate(long limit) throws IOException;
   public Collection<Sample> listAllSamplesBySearch(String query) throws IOException;
   public Collection<Sample> listAllSamplesByProjectId(long projectId) throws IOException;
   public Collection<Sample> listAllSamplesByExperimentId(long experimentId) throws IOException;
@@ -218,20 +223,22 @@ public interface RequestManager {
   public Collection<Dilution> listAllDilutionsByProjectAndPlatform(long projectId, PlatformType platformType) throws IOException;
 
   public Collection<LibraryDilution> listAllLibraryDilutions() throws IOException;
+  public Collection<LibraryDilution> listAllLibraryDilutionsWithLimit(long limit) throws IOException;
   public Collection<LibraryDilution> listAllLibraryDilutionsByLibraryId(long libraryId) throws IOException;
   public Collection<LibraryDilution> listAllLibraryDilutionsByPlatform(PlatformType platformType) throws IOException;
   public Collection<LibraryDilution> listAllLibraryDilutionsByProjectId(long projectId) throws IOException;
   public Collection<LibraryDilution> listAllLibraryDilutionsBySearch(String query, PlatformType platformType) throws IOException;
+  public Collection<LibraryDilution> listAllLibraryDilutionsBySearchOnly(String query) throws IOException;
   public Collection<LibraryDilution> listAllLibraryDilutionsByProjectAndPlatform(long projectId, PlatformType platformType) throws IOException;
   public Collection<LibraryDilution> listAllLibraryDilutionsByPoolAndPlatform(long poolId, PlatformType platformType) throws IOException;
 
-  public Collection<emPCRDilution> listAllEmPcrDilutions() throws IOException;
-  public Collection<emPCRDilution> listAllEmPcrDilutionsByEmPcrId(long pcrId) throws IOException;
-  public Collection<emPCRDilution> listAllEmPcrDilutionsByPlatform(PlatformType platformType) throws IOException;
-  public Collection<emPCRDilution> listAllEmPcrDilutionsByProjectId(long projectId) throws IOException;
-  public Collection<emPCRDilution> listAllEmPcrDilutionsBySearch(String query, PlatformType platformType) throws IOException;
-  public Collection<emPCRDilution> listAllEmPcrDilutionsByProjectAndPlatform(long projectId, PlatformType platformType) throws IOException;
-  public Collection<emPCRDilution> listAllEmPcrDilutionsByPoolAndPlatform(long poolId, PlatformType platformType) throws IOException;
+  public Collection<emPCRDilution> listAllEmPCRDilutions() throws IOException;
+  public Collection<emPCRDilution> listAllEmPCRDilutionsByEmPcrId(long pcrId) throws IOException;
+  public Collection<emPCRDilution> listAllEmPCRDilutionsByPlatform(PlatformType platformType) throws IOException;
+  public Collection<emPCRDilution> listAllEmPCRDilutionsByProjectId(long projectId) throws IOException;
+  public Collection<emPCRDilution> listAllEmPCRDilutionsBySearch(String query, PlatformType platformType) throws IOException;
+  public Collection<emPCRDilution> listAllEmPCRDilutionsByProjectAndPlatform(long projectId, PlatformType platformType) throws IOException;
+  public Collection<emPCRDilution> listAllEmPCRDilutionsByPoolAndPlatform(long poolId, PlatformType platformType) throws IOException;
 
   public Collection<emPCR> listAllEmPCRs() throws IOException;
   public Collection<emPCR> listAllEmPCRsByDilutionId(long dilutionId) throws IOException;
@@ -244,6 +251,7 @@ public interface RequestManager {
   public Collection<Pool<? extends Poolable>> listReadyPoolsByPlatformAndSearch(PlatformType platformType, String query) throws IOException;
   public Collection<Pool<? extends Poolable>> listPoolsByProjectId(long projectId) throws IOException;
   public Collection<Pool<? extends Poolable>> listPoolsByLibraryId(long libraryId) throws IOException;
+  public Collection<Pool<? extends Poolable>> listPoolsBySampleId(long sampleId) throws IOException;
   public Collection<PoolQC> listAllPoolQCsByPoolId(long poolId) throws IOException;
 
   /**
@@ -300,6 +308,42 @@ public interface RequestManager {
   public Collection<Alert> listAlertsByUserId(long userId) throws IOException;
   public Collection<Alert> listAlertsByUserId(long userId, long limit) throws IOException;
 
+  public <T extends Nameable, S extends Nameable> Collection<HierarchicalEntityGroup<T, S>> listAllEntityGroupsByEntityType(Class<T> parentType, Class<S> entityType) throws IOException;
+
+  //WORKFLOWS
+  public Workflow getWorkflowById(long workflowId) throws IOException;
+  public WorkflowProcess getWorkflowProcessById(long workflowProcessId) throws IOException;
+  public WorkflowDefinition getWorkflowDefinitionById(long workflowDefinitionId) throws IOException;
+  public WorkflowProcessDefinition getWorkflowProcessDefinitionById(long workflowProcessDefinitionId) throws IOException;
+
+  public Collection<Workflow> listAllWorkflows() throws IOException;
+  public Collection<Workflow> listWorkflowsByAssignee(long userId) throws IOException;
+  public Collection<Workflow> listIncompleteWorkflows() throws IOException;
+  public Collection<Workflow> listWorkflowsByStatus(HealthType healthType) throws IOException;
+  public Collection<WorkflowDefinition> listAllWorkflowDefinitions() throws IOException;
+  public Collection<WorkflowDefinition> listWorkflowDefinitionsBySearch(String searchStr) throws IOException;
+  public Collection<WorkflowProcessDefinition> listAllWorkflowProcessDefinitions() throws IOException;
+  public Collection<WorkflowProcessDefinition> listWorkflowProcessDefinitionsBySearch(String searchStr) throws IOException;
+
+  public long saveWorkflow(Workflow workflow) throws IOException;
+  public long saveWorkflowProcess(WorkflowProcess workflowProcess) throws IOException;
+  public long saveWorkflowDefinition(WorkflowDefinition workflowDefinition) throws IOException;
+  public long saveWorkflowProcessDefinition(WorkflowProcessDefinition workflowProcessDefinition) throws IOException;
+
+  //STATE
+  public Set<String> listAllStateKeys() throws IOException;
+  public Map<Long, String> listStateKeysBySearch(String str) throws IOException;
+
+  public boolean validateStateKeys(Set<String> keys) throws IOException;
+  public long getIdForStateKey(String key) throws IOException;
+
+  public String getStateKey(long keyId) throws IOException;
+  public String getStateValue(long valueId) throws IOException;
+
+  public long saveStateKey(String key) throws IOException;
+  public long saveStateValue(String value) throws IOException;
+  public List<Map<Long, Long>> saveState(JSONObject jsonObject) throws IOException;
+
   // DELETES
   public void deleteProject(Project project) throws IOException;
   public void deleteStudy(Study study) throws IOException;
@@ -313,8 +357,12 @@ public interface RequestManager {
   public void deleteLibraryQC(LibraryQC libraryQc) throws IOException;
   public void deletePoolQC(PoolQC poolQc) throws IOException;
   public void deleteLibraryDilution(LibraryDilution dilution) throws IOException;
-  public void deleteEmPcrDilution(emPCRDilution dilution) throws IOException;
+  public void deleteEmPCRDilution(emPCRDilution dilution) throws IOException;
   public void deleteSequencerReference(SequencerReference sequencerReference) throws IOException;
   public void deletePool(Pool pool) throws IOException;
   public void deletePlate(Plate plate) throws IOException;
+  public void deleteEntityGroup(HierarchicalEntityGroup<? extends Nameable, ? extends Nameable> entityGroup) throws IOException;
+  public void deletePartition(SequencerPoolPartition partition) throws IOException;
+  public void deleteContainer(SequencerPartitionContainer container) throws IOException;
+  public void deleteNote(Note note) throws IOException;
 }

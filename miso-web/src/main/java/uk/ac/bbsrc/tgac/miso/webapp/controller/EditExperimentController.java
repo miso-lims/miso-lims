@@ -39,15 +39,10 @@ import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.eaglegenomics.simlims.core.User;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.LibraryKit;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaPool;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ls454.LS454Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.solid.SolidPool;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
@@ -190,6 +185,7 @@ public class EditExperimentController {
         if (Arrays.asList(user.getRoles()).contains("ROLE_TECH")) {
           SecurityProfile sp = new SecurityProfile(user);
           LimsUtils.inheritUsersAndGroups(experiment, study.getSecurityProfile());
+          sp.setOwner(user);
           experiment.setSecurityProfile(sp);
         }
         else {

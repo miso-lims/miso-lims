@@ -293,7 +293,7 @@ public class ProjectAlertManager {
   public void updateGroupWatcher(Long userId) throws IOException {
     User user = securityManager.getUserById(userId);
     for (Project p : projects.values()) {
-      if (user.getGroups().contains(securityManager.getGroupByName("ProjectWatchers"))) {
+      if (user.getGroups() != null && user.getGroups().contains(securityManager.getGroupByName("ProjectWatchers"))) {
         addWatcher(p, userId);
       }
       else {

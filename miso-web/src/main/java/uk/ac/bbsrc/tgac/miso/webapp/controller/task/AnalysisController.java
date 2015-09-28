@@ -107,43 +107,53 @@ public class AnalysisController {
 //      map.put("makefile-path", run.getFilePath()+"/Data/Intensities/BaseCalls/PAP/Makefile");
 //      map.put("sample-sheet-path", run.getFilePath()+"/Data/Intensities/BaseCalls/SampleSheet-pap.csv");
 
-      map.put("fastq-path", "/net/tgac-ngs-qc/vol/qc/"+run.getAlias()+"/PAP");
-      map.put("makefile-path", "/net/tgac-ngs-qc/vol/qc/"+run.getAlias()+"/PAP/Makefile");
-      map.put("sample-sheet-path", "/net/tgac-ngs-qc/vol/qc/"+run.getAlias()+"/SampleSheet-PAP.csv");
+      map.put("fastq-path", "/net/tgac-labdata-nfs/ifs/TGAC/NGS_data/qc/"+run.getAlias()+"/PAP");
+      map.put("makefile-path", "/net/tgac-labdata-nfs/ifs/TGAC/NGS_data/qc/"+run.getAlias()+"/PAP/Makefile");
+      map.put("sample-sheet-path", "/net/tgac-labdata-nfs/ifs/TGAC/NGS_data/qc/"+run.getAlias()+"/SampleSheet-PAP.csv");
 
       map.put("instrument-id", run.getSequencerReference().getName());
 
-      if ("Illumina MiSeq".equals(run.getSequencerReference().getPlatform().getInstrumentModel())) {
-        //append the base mask property for miseq runs
-        String basesMask = "y"+run.getCycles()+",i6";
-        if (run.getPairedEnd()) {
-          basesMask += ",y"+run.getCycles();
-        }
-        map.put("use-bases-mask", basesMask);
-      }
-
-      SequencerPartitionContainer<SequencerPoolPartition> f = ((RunImpl) run).getSequencerPartitionContainers().get(0);
+      SequencerPartitionContainer<SequencerPoolPartition> f = run.getSequencerPartitionContainers().get(0);
       String laneValue = "8";
       String naType = "dna";
+      String indexValue = "6";
 
       if (f != null && f.getPartitions().size() != 0) {
         laneValue = String.valueOf(f.getPartitions().size());
         Pool<? extends Poolable> p = f.getPartitionAt(1).getPool();
         if (p != null) {
-          for (Dilution d : p.getDilutions()) {
-            if ("RNA-Seq".equals(d.getLibrary().getLibraryStrategyType().getName())) naType = "rna";
+          if (!p.getPoolableElements().isEmpty()) {
+            Poolable pable = p.getPoolableElements().iterator().next();
+            if (pable instanceof Dilution) {
+              Library l = ((Dilution) pable).getLibrary();
+              if ("RNA-Seq".equals(l.getLibraryStrategyType().getName())) naType = "rna";
+              for (TagBarcode tb : l.getTagBarcodes().values()) {
+                indexValue = Integer.toString(tb.getSequence().length());
+              }
+            }
           }
         }
         else {
           throw new IntegrationException("Cannot start analysis pipelines on a run with no pools on any lanes.");
         }
       }
+
+      String instrumentModel = run.getSequencerReference().getPlatform().getInstrumentModel();
+      if ("Illumina MiSeq".equals(instrumentModel) || "Illumina NextSeq 500".equals(instrumentModel)) {
+        //append the base mask property for miseq runs
+        String basesMask = "y"+run.getCycles()+",i"+indexValue;
+        if (run.getPairedEnd()) {
+          basesMask += ",y"+run.getCycles();
+        }
+        map.put("use-bases-mask", basesMask);
+      }
+
       map.put("lane-value", laneValue);
       map.put("nucleic-acid-type", naType);
 
       map.put("sample-sheet-string", RunProcessingUtils.buildIlluminaDemultiplexCSV(run, f, "1.8.2", user.getFullName()).replaceAll("\n", "\\\n"));
 
-      map.put("contaminant-list", "phix_174,ecoli,xanthomonas_campestris");
+      map.put("contaminant-list", "ecoli,phix_174,human_chr17,arabidopsis_chloroplast,vectors");
 
       map.put("username", user.getLoginName());
 

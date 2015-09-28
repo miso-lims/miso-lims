@@ -252,4 +252,23 @@ public abstract class AbstractStudy implements Study {
     if (getId() > t.getId()) return 1;
     return 0;
   }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append(getName());
+    sb.append(" : ");
+    sb.append(getAlias());
+    sb.append(" : ");
+    sb.append(getDescription());
+    sb.append(" : ");
+    sb.append(getStudyType());
+    sb.append(" : ");
+
+    if (getProject() != null) {
+      sb.append(getProject().getAlias());
+      sb.append("("+getProject().getName()+")");
+    }
+    return sb.toString();
+  }
 }

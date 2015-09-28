@@ -31,10 +31,12 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.runstats.client.RunStatsException;
-import uk.ac.bbsrc.tgac.qc.run.ReportTable;
-import uk.ac.bbsrc.tgac.qc.run.Reports;
-import uk.ac.bbsrc.tgac.qc.run.ReportsDecorator;
-import uk.ac.bbsrc.tgac.qc.run.RunProperty;
+import uk.ac.tgac.statsdb.exception.ConsumerException;
+import uk.ac.tgac.statsdb.run.ReportTable;
+import uk.ac.tgac.statsdb.run.Reports;
+import uk.ac.tgac.statsdb.run.ReportsDecorator;
+import uk.ac.tgac.statsdb.run.RunProperty;
+import uk.ac.tgac.statsdb.run.consumer.D3PlotConsumer;
 
 import javax.sql.DataSource;
 import java.io.IOException;
@@ -92,6 +94,7 @@ public class RunStatsManager {
       return rt != null && !rt.isEmpty();
     }
     catch (SQLException e) {
+      log.error("Cannot get StatsDB stats for run " + run.getAlias() + ": " + e.getMessage());
       e.printStackTrace();
       return false;
     }
@@ -111,15 +114,17 @@ public class RunStatsManager {
       report.put("runSummary", JSONArray.fromObject(rt.toJSON()));
     }
     catch (SQLException e) {
+      log.error("Cannot get StatsDB stats for run " + run.getAlias() + ": " + e.getMessage());
       e.printStackTrace();
     }
     catch (IOException e) {
+      log.error("Cannot get StatsDB stats for run " + run.getAlias() + ": " + e.getMessage());
       e.printStackTrace();
     }
 
-    if (!((RunImpl) run).getSequencerPartitionContainers().isEmpty()) {
+    if (!run.getSequencerPartitionContainers().isEmpty()) {
       JSONObject containers = new JSONObject();
-      for (SequencerPartitionContainer<SequencerPoolPartition> container : ((RunImpl) run).getSequencerPartitionContainers()) {
+      for (SequencerPartitionContainer<SequencerPoolPartition> container : run.getSequencerPartitionContainers()) {
         JSONObject f = new JSONObject();
         f.put("idBarcode", container.getIdentificationBarcode());
 
@@ -136,9 +141,11 @@ public class RunStatsManager {
             }
           }
           catch (SQLException e) {
+            log.error("Cannot get StatsDB stats for run " + run.getAlias() + ": " + e.getMessage());
             e.printStackTrace();
           }
           catch (IOException e) {
+            log.error("Cannot get StatsDB stats for run " + run.getAlias() + ": " + e.getMessage());
             e.printStackTrace();
           }
 
@@ -159,9 +166,11 @@ public class RunStatsManager {
                     }
                   }
                   catch (SQLException e) {
+                    log.error("Cannot get StatsDB stats for run " + run.getAlias() + ": " + e.getMessage());
                     e.printStackTrace();
                   }
                   catch (IOException e) {
+                    log.error("Cannot get StatsDB stats for run " + run.getAlias() + ": " + e.getMessage());
                     e.printStackTrace();
                   }
                 }
@@ -193,16 +202,18 @@ public class RunStatsManager {
       }
     }
     catch (SQLException e) {
+      log.error("Cannot get StatsDB stats for run " + run.getAlias() + ": " + e.getMessage());
       e.printStackTrace();
     }
     catch (IOException e) {
+      log.error("Cannot get StatsDB stats for run " + run.getAlias() + ": " + e.getMessage());
       e.printStackTrace();
     }
 
     //clear any previous barcode query
     map.remove(RunProperty.barcode);
-    if (!((RunImpl) run).getSequencerPartitionContainers().isEmpty()) {
-      for (SequencerPartitionContainer<SequencerPoolPartition> container : ((RunImpl) run).getSequencerPartitionContainers()) {
+    if (!run.getSequencerPartitionContainers().isEmpty()) {
+      for (SequencerPartitionContainer<SequencerPoolPartition> container : run.getSequencerPartitionContainers()) {
         SequencerPoolPartition part = container.getPartitionAt(laneNumber);
         if (part.getPartitionNumber() == laneNumber) {
           if (part.getPool() != null) {
@@ -220,9 +231,11 @@ public class RunStatsManager {
                     }
                   }
                   catch (SQLException e) {
+                    log.error("Cannot get StatsDB stats for run " + run.getAlias() + ": " + e.getMessage());
                     e.printStackTrace();
                   }
                   catch (IOException e) {
+                    log.error("Cannot get StatsDB stats for run " + run.getAlias() + ": " + e.getMessage());
                     e.printStackTrace();
                   }
                 }
@@ -242,108 +255,22 @@ public class RunStatsManager {
   }
 
   public JSONObject getPerPositionBaseSequenceQualityForLane(Run run, int laneNumber) throws RunStatsException {
-    Map<RunProperty, String> map = new HashMap<RunProperty, String>();
-    map.put(RunProperty.run, run.getAlias());
-    map.put(RunProperty.lane, String.valueOf(laneNumber));
-    String pair;
-    if (run.getPairedEnd()) {
-      pair = "1";
-    }
-    else {
-      pair = "2";
-    }
-    map.put(RunProperty.pair, pair);
-
-    JSONObject laneQuality = new JSONObject();
+    D3PlotConsumer d3p = new D3PlotConsumer(reportsDecorator);
     try {
-        Map<String, ReportTable> resultMap = reportsDecorator.getPerPositionBaseSequenceQuality(map);
-
-//      for (Map.Entry<String, ReportTable> entry : resultMap.entrySet()) {
-//        System.out.println("Key : " + entry.getKey()
-//                           + " Value : " + entry.getValue().toCSV() + "\n");
-//      }
-
-//      JSONArray quality_lower_quartile = JSONArray.fromObject(resultMap.get("quality_lower_quartile").toJSON());
-//      JSONArray quality_10th_percentile = JSONArray.fromObject(resultMap.get("quality_10th_percentile").toJSON());
-//      JSONArray quality_90th_percentile = JSONArray.fromObject(resultMap.get("quality_90th_percentile").toJSON());
-//      JSONArray quality_mean = JSONArray.fromObject(resultMap.get("quality_mean").toJSON());
-//      JSONArray quality_median = JSONArray.fromObject(resultMap.get("quality_median").toJSON());
-//      JSONArray quality_upper_quartile = JSONArray.fromObject(resultMap.get("quality_upper_quartile").toJSON());
-
-      ArrayList<String> quality_lower_quartile = new ArrayList<String>(Arrays.asList(resultMap.get("quality_lower_quartile").toCSV().split("\n")));
-      ArrayList<String> quality_10th_percentile = new ArrayList<String>(Arrays.asList(resultMap.get("quality_10th_percentile").toCSV().split("\n")));
-      ArrayList<String> quality_90th_percentile = new ArrayList<String>(Arrays.asList(resultMap.get("quality_90th_percentile").toCSV().split("\n")));
-      ArrayList<String> quality_mean = new ArrayList<String>(Arrays.asList(resultMap.get("quality_mean").toCSV().split("\n")));
-      ArrayList<String> quality_median = new ArrayList<String>(Arrays.asList(resultMap.get("quality_median").toCSV().split("\n")));
-      ArrayList<String> quality_upper_quartile = new ArrayList<String>(Arrays.asList(resultMap.get("quality_upper_quartile").toCSV().split("\n")));
-
-      if (quality_lower_quartile.size() > 1) {
-        JSONArray jsonArray = new JSONArray();
-        for (int index = 1; index < quality_lower_quartile.size(); index++) {
-          JSONObject eachBase = new JSONObject();
-          eachBase.put("base", quality_lower_quartile.get(index).split(",")[0]);
-          eachBase.put("mean", quality_mean.get(index).split(",")[2]);
-          eachBase.put("median", quality_median.get(index).split(",")[2]);
-          eachBase.put("lowerquartile", quality_lower_quartile.get(index).split(",")[2]);
-          eachBase.put("upperquartile", quality_upper_quartile.get(index).split(",")[2]);
-          eachBase.put("tenthpercentile", quality_10th_percentile.get(index).split(",")[2]);
-          eachBase.put("ninetiethpercentile", quality_90th_percentile.get(index).split(",")[2]);
-          jsonArray.add(eachBase);
-        }
-        laneQuality.put("stats", jsonArray);
-      }
-      else {
-        laneQuality.put("stats", JSONArray.fromObject("[]"));
-      }
+      return d3p.getPerPositionBaseSequenceQualityForLane(run.getAlias(), run.getPairedEnd(), laneNumber);
     }
-    catch (Exception e) {
-      e.printStackTrace();
+    catch (ConsumerException e) {
+      throw new RunStatsException("Cannot generate D3 plot JSON for run " + run.getAlias() + ": " + e.getMessage());
     }
-    return laneQuality;
   }
 
   public JSONObject getPerPositionBaseContentForLane(Run run, int laneNumber) throws RunStatsException {
-    Map<RunProperty, String> map = new HashMap<RunProperty, String>();
-    map.put(RunProperty.run, run.getAlias());
-    map.put(RunProperty.lane, String.valueOf(laneNumber));
-    String pair;
-    if (run.getPairedEnd()) {
-      pair = "1";
-    }
-    else {
-      pair = "2";
-    }
-    map.put(RunProperty.pair, pair);
-
-    JSONObject laneQuality = new JSONObject();
+    D3PlotConsumer d3p = new D3PlotConsumer(reportsDecorator);
     try {
-      Map<String, ReportTable> resultMap = reportsDecorator.getPerPositionBaseContent(map);
-
-      ArrayList<String> base_content_a = new ArrayList<String>(Arrays.asList(resultMap.get("base_content_a").toCSV().split("\n")));
-      ArrayList<String> base_content_c = new ArrayList<String>(Arrays.asList(resultMap.get("base_content_c").toCSV().split("\n")));
-      ArrayList<String> base_content_g = new ArrayList<String>(Arrays.asList(resultMap.get("base_content_g").toCSV().split("\n")));
-      ArrayList<String> base_content_t = new ArrayList<String>(Arrays.asList(resultMap.get("base_content_t").toCSV().split("\n")));
-
-      if (base_content_a.size() > 1) {
-        JSONArray jsonArray = new JSONArray();
-        for (int index = 1; index < base_content_a.size(); index++) {
-          JSONObject eachBase = new JSONObject();
-          eachBase.put("base", base_content_a.get(index).split(",")[0]);
-          eachBase.put("G", base_content_g.get(index).split(",")[2]);
-          eachBase.put("A", base_content_a.get(index).split(",")[2]);
-          eachBase.put("T", base_content_t.get(index).split(",")[2]);
-          eachBase.put("C", base_content_c.get(index).split(",")[2]);
-          jsonArray.add(eachBase);
-        }
-        laneQuality.put("stats", jsonArray);
-      }
-      else {
-        laneQuality.put("stats", JSONArray.fromObject("[]"));
-      }
+      return d3p.getPerPositionBaseContentForLane(run.getAlias(), run.getPairedEnd(), laneNumber);
     }
-    catch (Exception e) {
-      e.printStackTrace();
+    catch (ConsumerException e) {
+      throw new RunStatsException("Cannot generate D3 plot JSON for run " + run.getAlias() + ": " + e.getMessage());
     }
-    return laneQuality;
   }
 }

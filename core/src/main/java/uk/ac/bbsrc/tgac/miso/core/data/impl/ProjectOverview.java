@@ -42,6 +42,7 @@ import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.ProjectOverviewListener;
 import uk.ac.bbsrc.tgac.miso.core.event.model.ProjectOverviewEvent;
 import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -62,7 +63,7 @@ import java.util.*;
 //@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
 @JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
 @JsonIgnoreProperties({"project","samples","libraries","runs","qcPassedSamples"})
-public class ProjectOverview implements Watchable, Alertable, Serializable {
+public class ProjectOverview implements Watchable, Alertable, Nameable, Serializable {
   protected static final Logger log = LoggerFactory.getLogger(ProjectOverview.class);
 
   public static final Long UNSAVED_ID = 0L;
@@ -74,10 +75,15 @@ public class ProjectOverview implements Watchable, Alertable, Serializable {
   private Project project;
 
   private String principalInvestigator;
-  private Collection<Sample> samples = new HashSet<Sample>();
-  private Collection<Library> libraries = new HashSet<Library>();
-  private Collection<Run> runs = new HashSet<Run>();
-  private Collection<Note> notes = new HashSet<Note>();
+
+  @Deprecated
+  private Collection<Sample> samples = new HashSet<>();
+
+  private HierarchicalEntityGroup<ProjectOverview, Sample> sampleGroup;
+
+  private Collection<Library> libraries = new HashSet<>();
+  private Collection<Run> runs = new HashSet<>();
+  private Collection<Note> notes = new HashSet<>();
   private Date startDate;
   private Date endDate;
   private Integer numProposedSamples;
@@ -88,14 +94,30 @@ public class ProjectOverview implements Watchable, Alertable, Serializable {
   private boolean allPoolsConstructed;
   private boolean allRunsCompleted;
   private boolean primaryAnalysisCompleted;
-  private Set<MisoListener> listeners = new HashSet<MisoListener>();
-  private Set<User> watchers = new HashSet<User>();
+  private Set<MisoListener> listeners = new HashSet<>();
+  private Set<User> watchers = new HashSet<>();
   private Date lastUpdated;
 
+  @Override
+  public String getName() {
+    return "POV"+getId();
+  }
+
+  @Override
+  public long getId() {
+    return overviewId;
+  }
+
+  public void setId(Long overviewId) {
+    this.overviewId = overviewId;
+  }
+
+  @Deprecated
   public Long getOverviewId() {
     return overviewId;
   }
 
+  @Deprecated
   public void setOverviewId(Long overviewId) {
     this.overviewId = overviewId;
   }
@@ -148,19 +170,37 @@ public class ProjectOverview implements Watchable, Alertable, Serializable {
     this.locked = locked;
   }
 
-  public Collection<Sample> getSamples() {
-    return samples;
+  public HierarchicalEntityGroup<ProjectOverview, Sample> getSampleGroup() {
+    return sampleGroup;
   }
 
-  public void setSamples(Collection<Sample> samples) {
-    this.samples = samples;
+  public void setSampleGroup(HierarchicalEntityGroup<ProjectOverview, Sample> sampleGroup) {
+    this.sampleGroup = sampleGroup;
+  }
+
+  public Set<Sample> getSamples() {
+    return sampleGroup.getEntities();
+  }
+
+  @Deprecated
+  public void setSamples(Set<Sample> samples) {
+    getSampleGroup().setEntities(samples);
   }
 
   public Collection<Sample> getQcPassedSamples() {
-    List<Sample> qcSamples = new ArrayList<Sample>();
-    for (Sample s : samples) {
-      if (s != null && s.getQcPassed() != null && s.getQcPassed()) {
-        qcSamples.add(s);
+    List<Sample> qcSamples = new ArrayList<>();
+    if (getSampleGroup() != null) {
+      for (Sample s : getSampleGroup().getEntities()) {
+        if (s != null && s.getQcPassed() != null && s.getQcPassed()) {
+          qcSamples.add(s);
+        }
+      }
+    }
+    else {
+      for (Sample s : getProject().getSamples()) {
+        if (s != null && s.getQcPassed() != null && s.getQcPassed()) {
+          qcSamples.add(s);
+        }
       }
     }
     return qcSamples;
@@ -298,7 +338,7 @@ public class ProjectOverview implements Watchable, Alertable, Serializable {
   }
 
   protected void fireSampleQcPassedEvent() {
-    if (this.getOverviewId() != null) {
+    if (this.getId() != 0L) {
       ProjectOverviewEvent poe = new ProjectOverviewEvent(this, MisoEventType.ALL_SAMPLES_QC_PASSED, this.getProject().getAlias() + " : all project samples have passed QC.");
       for (MisoListener listener : getListeners()) {
         listener.stateChanged(poe);
@@ -307,7 +347,7 @@ public class ProjectOverview implements Watchable, Alertable, Serializable {
   }
 
   protected void fireLibraryPreparationCompleteEvent() {
-    if (this.getOverviewId() != null) {
+    if (this.getId() != 0L) {
       ProjectOverviewEvent poe = new ProjectOverviewEvent(this, MisoEventType.LIBRARY_PREPARATION_COMPLETED, this.getProject().getAlias() + " : all libraries have been constructed.");
       for (MisoListener listener : getListeners()) {
         listener.stateChanged(poe);
@@ -316,7 +356,7 @@ public class ProjectOverview implements Watchable, Alertable, Serializable {
   }
 
   protected void fireLibraryQcPassedEvent() {
-    if (this.getOverviewId() != null) {
+    if (this.getId() != 0L) {
       ProjectOverviewEvent poe = new ProjectOverviewEvent(this, MisoEventType.ALL_LIBRARIES_QC_PASSED, this.getProject().getAlias() + " : all project libraries have passed QC.");
       for (MisoListener listener : getListeners()) {
         listener.stateChanged(poe);
@@ -325,7 +365,7 @@ public class ProjectOverview implements Watchable, Alertable, Serializable {
   }
 
   protected void firePoolsConstructedEvent() {
-    if (this.getOverviewId() != null) {
+    if (this.getId() != 0L) {
       ProjectOverviewEvent poe = new ProjectOverviewEvent(this, MisoEventType.POOL_CONSTRUCTION_COMPLETE, this.getProject().getAlias() + " : all project samples have now been pooled.");
       for (MisoListener listener : getListeners()) {
         listener.stateChanged(poe);
@@ -334,7 +374,7 @@ public class ProjectOverview implements Watchable, Alertable, Serializable {
   }
 
   protected void fireRunsCompletedEvent () {
-    if (this.getOverviewId() != null) {
+    if (this.getId() != 0L) {
       ProjectOverviewEvent poe = new ProjectOverviewEvent(this, MisoEventType.ALL_RUNS_COMPLETED, this.getProject().getAlias() + " : all project runs have now completed.");
       for (MisoListener listener : getListeners()) {
         listener.stateChanged(poe);
@@ -343,7 +383,7 @@ public class ProjectOverview implements Watchable, Alertable, Serializable {
   }
 
   protected void firePrimaryAnalysisCompletedEvent() {
-    if (this.getOverviewId() != null) {
+    if (this.getId() != 0L) {
       ProjectOverviewEvent poe = new ProjectOverviewEvent(this, MisoEventType.PRIMARY_ANALYSIS_COMPLETED, this.getProject().getAlias() + " : primary analysis has completed.");
       for (MisoListener listener : getListeners()) {
         listener.stateChanged(poe);
@@ -373,17 +413,17 @@ public class ProjectOverview implements Watchable, Alertable, Serializable {
 
   @Override
   public String getWatchableIdentifier() {
-    return "POV"+this.getOverviewId();
+    return getName();
   }
 
   public boolean isDeletable() {
-    return getOverviewId() != ProjectOverview.UNSAVED_ID;
+    return getId() != ProjectOverview.UNSAVED_ID;
   }
 
   @Override
   public int hashCode() {
-    if (this.getOverviewId() != ProjectOverview.UNSAVED_ID) {
-      return this.getOverviewId().intValue();
+    if (this.getId() != ProjectOverview.UNSAVED_ID) {
+      return (int)this.getId();
     }
     else {
       int hashcode = this.getPrincipalInvestigator().hashCode();
@@ -395,11 +435,18 @@ public class ProjectOverview implements Watchable, Alertable, Serializable {
     }
   }
 
-//  public String toString() {
-//    StringBuffer sb = new StringBuffer();
-//    for (Field f : this.getClass().getDeclaredFields()) {
-//      sb.append(f.toString() + ":");
-//    }
-//    return sb.toString();
-//  }
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append(getId());
+    sb.append(" : ");
+    sb.append(getName());
+    sb.append(" : ");
+    if (getSampleGroup() != null && !getSampleGroup().getEntities().isEmpty()) {
+      sb.append(" [ ");
+      sb.append(LimsUtils.join(getSampleGroup().getEntities(), ","));
+      sb.append(" ] ");
+    }
+    return sb.toString();
+  }
 }

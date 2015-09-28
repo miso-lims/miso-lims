@@ -97,6 +97,9 @@ public interface LibraryDilutionStore extends Store<LibraryDilution>, Remover<Li
    */
   Collection<LibraryDilution> listAllLibraryDilutionsBySearch(String query, PlatformType platformType) throws IOException;
 
+
+  Collection<LibraryDilution> listAllLibraryDilutionsBySearchOnly(String query) throws IOException;
+
   /**
    * List all emPCRDilutions prepared for a given PlatformType within a given Project
    *
@@ -143,5 +146,7 @@ public interface LibraryDilutionStore extends Store<LibraryDilution>, Remover<Li
    * @return LibraryDilution
    * @throws IOException when
    */
-  LibraryDilution getLibraryDilutionByBarcode(String barcode) throws IOException;  
+  LibraryDilution getLibraryDilutionByBarcode(String barcode) throws IOException;
+
+  Collection<LibraryDilution> listAllWithLimit(long limit) throws IOException;
 }

@@ -31,9 +31,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolderStrategy;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.*;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaPool;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ls454.LS454Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.solid.SolidPool;
 import uk.ac.bbsrc.tgac.miso.core.data.type.*;
 import uk.ac.bbsrc.tgac.miso.core.event.Alert;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
@@ -319,6 +316,12 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
+  public long saveEntityGroup(HierarchicalEntityGroup<? extends Nameable, ? extends Nameable> entityGroup) throws IOException {
+    return super.saveEntityGroup(entityGroup);
+  }
+
+//gets
+  @Override
   public SequencerPoolPartition getSequencerPoolPartitionById(long partitionId) throws IOException {
     SequencerPoolPartition o = super.getSequencerPoolPartitionById(partitionId);
     if (readCheck(o)) return o;
@@ -431,36 +434,36 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
-  public emPCR getEmPcrById(long pcrId) throws IOException {
-    emPCR o = super.getEmPcrById(pcrId);
+  public emPCR getEmPCRById(long pcrId) throws IOException {
+    emPCR o = super.getEmPCRById(pcrId);
     if (readCheck(o)) return o;
     else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read emPCR " + pcrId);
   }
 
   @Override
-  public emPCRDilution getEmPcrDilutionById(long dilutionId) throws IOException {
-    emPCRDilution o = super.getEmPcrDilutionById(dilutionId);
+  public emPCRDilution getEmPCRDilutionById(long dilutionId) throws IOException {
+    emPCRDilution o = super.getEmPCRDilutionById(dilutionId);
     if (readCheck(o)) return o;
     else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read emPCRDilution " + dilutionId);
   }
 
   @Override
-  public emPCRDilution getEmPcrDilutionByBarcode(String barcode) throws IOException {
-    emPCRDilution o = super.getEmPcrDilutionByBarcode(barcode);
+  public emPCRDilution getEmPCRDilutionByBarcode(String barcode) throws IOException {
+    emPCRDilution o = super.getEmPCRDilutionByBarcode(barcode);
     if (readCheck(o)) return o;
     else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read emPCRDilution " + o.getId());
   }
 
   @Override
-  public emPCRDilution getEmPcrDilutionByBarcodeAndPlatform(String barcode, PlatformType platformType) throws IOException {
-    emPCRDilution o = super.getEmPcrDilutionByBarcodeAndPlatform(barcode, platformType);
+  public emPCRDilution getEmPCRDilutionByBarcodeAndPlatform(String barcode, PlatformType platformType) throws IOException {
+    emPCRDilution o = super.getEmPCRDilutionByBarcodeAndPlatform(barcode, platformType);
     if (readCheck(o)) return o;
     else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read emPCRDilution " + o.getId());
   }
 
   @Override
   public SequencerPartitionContainer<SequencerPoolPartition> getSequencerPartitionContainerById(long containerId) throws IOException {
-    SequencerPartitionContainer o = super.getSequencerPartitionContainerById(containerId);
+    SequencerPartitionContainer<SequencerPoolPartition> o = super.getSequencerPartitionContainerById(containerId);
     if (readCheck(o)) return o;
     else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read SequencerPartitionContainer " + containerId);
   }
@@ -469,7 +472,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   public Note getNoteById(long noteId) throws IOException {
     Note o = super.getNoteById(noteId);
     User user = getCurrentUser();
-    if (o.getOwner().equals(user) || (o.isInternalOnly() && user.isInternal())) return o;
+    if (o.getOwner().equals(user) || user.isAdmin() || (o.isInternalOnly() && user.isInternal())) return o;
     else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Note " + o.getNoteId());
   }
 
@@ -478,6 +481,13 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
     Project o = super.getProjectById(projectId);
     if (readCheck(o)) return o;
     else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Project " + projectId);
+  }
+
+  @Override
+  public Project getProjectByAlias(String projectAlias) throws IOException {
+    Project o = super.getProjectByAlias(projectAlias);
+    if (readCheck(o)) return o;
+    else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Project " + projectAlias);
   }
 
   @Override
@@ -564,12 +574,17 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
     else throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Plate " + p.getId());
   }
 
+  @Override
+  public HierarchicalEntityGroup<? extends Nameable, ? extends Nameable> getEntityGroupById(long entityGroupId) throws IOException {
+    return super.getEntityGroupById(entityGroupId);
+  }
+
   /* lists */
 
   @Override
   public Collection<Project> listAllProjects() throws IOException {
     User user = getCurrentUser();
-    Collection<Project> accessibles = new HashSet<Project>();
+    Collection<Project> accessibles = new HashSet<>();
     for (Project project : super.listAllProjects()) {
       if (project.userCanRead(user)) {
         accessibles.add(project);
@@ -581,7 +596,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<Project> listAllProjectsWithLimit(long limit) throws IOException {
     User user = getCurrentUser();
-    Collection<Project> accessibles = new HashSet<Project>();
+    Collection<Project> accessibles = new HashSet<>();
     for (Project project : super.listAllProjectsWithLimit(limit)) {
       if (project.userCanRead(user)) {
         accessibles.add(project);
@@ -593,7 +608,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<Project> listAllProjectsBySearch(String query) throws IOException {
     User user = getCurrentUser();
-    Collection<Project> accessibles = new HashSet<Project>();
+    Collection<Project> accessibles = new HashSet<>();
     for (Project project : super.listAllProjectsBySearch(query)) {
       if (project.userCanRead(user)) {
         accessibles.add(project);
@@ -605,7 +620,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<ProjectOverview> listAllOverviewsByProjectId(long projectId) throws IOException {
     User user = getCurrentUser();
-    Collection<ProjectOverview> accessibles = new HashSet<ProjectOverview>();
+    Collection<ProjectOverview> accessibles = new HashSet<>();
     for (ProjectOverview projectOverview : super.listAllOverviewsByProjectId(projectId)) {
       if (projectOverview.getProject().userCanRead(user)) {
         accessibles.add(projectOverview);
@@ -617,7 +632,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<Run> listAllRuns() throws IOException {
     User user = getCurrentUser();
-    Collection<Run> accessibles = new HashSet<Run>();
+    Collection<Run> accessibles = new HashSet<>();
     Collection<Run> runs = super.listAllRuns();
     if (runs != null) {
       for (Run run : super.listAllRuns()) {
@@ -640,7 +655,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<Run> listAllRunsWithLimit(long limit) throws IOException {
     User user = getCurrentUser();
-    Collection<Run> accessibles = new HashSet<Run>();
+    Collection<Run> accessibles = new HashSet<>();
     Collection<Run> runs = super.listAllRunsWithLimit(limit);
     if (runs != null) {
       for (Run run : super.listAllRunsWithLimit(limit)) {
@@ -663,7 +678,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<Run> listAllRunsBySearch(String query) throws IOException {
     User user = getCurrentUser();
-    Collection<Run> accessibles = new HashSet<Run>();
+    Collection<Run> accessibles = new HashSet<>();
     for (Run run : super.listAllRunsBySearch(query)) {
       if (run.userCanRead(user)) {
         accessibles.add(run);
@@ -675,7 +690,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<Run> listAllRunsByProjectId(long projectId) throws IOException {
     User user = getCurrentUser();
-    Collection<Run> accessibles = new HashSet<Run>();
+    Collection<Run> accessibles = new HashSet<>();
     for (Run run : super.listAllRunsByProjectId(projectId)) {
       if (run.userCanRead(user)) {
         accessibles.add(run);
@@ -687,7 +702,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<Run> listRunsByPoolId(long poolId) throws IOException {
     User user = getCurrentUser();
-    Collection<Run> accessibles = new HashSet<Run>();
+    Collection<Run> accessibles = new HashSet<>();
     for (Run run : super.listRunsByPoolId(poolId)) {
       if (run.userCanRead(user)) {
         accessibles.add(run);
@@ -699,7 +714,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<Run> listRunsBySequencerPartitionContainerId(long containerId) throws IOException {
     User user = getCurrentUser();
-    Collection<Run> accessibles = new HashSet<Run>();
+    Collection<Run> accessibles = new HashSet<>();
     for (Run run : super.listRunsBySequencerPartitionContainerId(containerId)) {
       if (run.userCanRead(user)) {
         accessibles.add(run);
@@ -711,7 +726,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<Run> listAllLS454Runs() throws IOException {
     User user = getCurrentUser();
-    Collection<Run> accessibles = new HashSet<Run>();
+    Collection<Run> accessibles = new HashSet<>();
     for (Run run : super.listAllLS454Runs()) {
       if (run.userCanRead(user)) {
         accessibles.add(run);
@@ -723,7 +738,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<Run> listAllIlluminaRuns() throws IOException {
     User user = getCurrentUser();
-    Collection<Run> accessibles = new HashSet<Run>();
+    Collection<Run> accessibles = new HashSet<>();
     for (Run run : super.listAllIlluminaRuns()) {
       if (run.userCanRead(user)) {
         accessibles.add(run);
@@ -735,7 +750,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<Run> listAllSolidRuns() throws IOException {
     User user = getCurrentUser();
-    Collection<Run> accessibles = new HashSet<Run>();
+    Collection<Run> accessibles = new HashSet<>();
     for (Run run : super.listAllSolidRuns()) {
       if (run.userCanRead(user)) {
         accessibles.add(run);
@@ -747,7 +762,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<RunQC> listAllRunQCsByRunId(long runId) throws IOException {
     User user = getCurrentUser();
-    Collection<RunQC> accessibles = new HashSet<RunQC>();
+    Collection<RunQC> accessibles = new HashSet<>();
     for (RunQC runQC : super.listAllRunQCsByRunId(runId)) {
       if (runQC.userCanRead(user)) {
         accessibles.add(runQC);
@@ -759,7 +774,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<SequencerPartitionContainer<SequencerPoolPartition>> listSequencerPartitionContainersByRunId(long runId) throws IOException {
     User user = getCurrentUser();
-    Collection<SequencerPartitionContainer<SequencerPoolPartition>> accessibles = new HashSet<SequencerPartitionContainer<SequencerPoolPartition>>();
+    Collection<SequencerPartitionContainer<SequencerPoolPartition>> accessibles = new HashSet<>();
     for (SequencerPartitionContainer<SequencerPoolPartition> container : super.listSequencerPartitionContainersByRunId(runId)) {
       if (container.userCanRead(user)) {
         accessibles.add(container);
@@ -771,7 +786,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<SequencerPartitionContainer<SequencerPoolPartition>> listSequencerPartitionContainersByBarcode(String barcode) throws IOException {
     User user = getCurrentUser();
-    Collection<SequencerPartitionContainer<SequencerPoolPartition>> accessibles = new HashSet<SequencerPartitionContainer<SequencerPoolPartition>>();
+    Collection<SequencerPartitionContainer<SequencerPoolPartition>> accessibles = new HashSet<>();
     for (SequencerPartitionContainer<SequencerPoolPartition> container : super.listSequencerPartitionContainersByBarcode(barcode)) {
       if (container.userCanRead(user)) {
         accessibles.add(container);
@@ -783,7 +798,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<Sample> listAllSamples() throws IOException {
     User user = getCurrentUser();
-    Collection<Sample> accessibles = new HashSet<Sample>();
+    Collection<Sample> accessibles = new HashSet<>();
     for (Sample sample : super.listAllSamples()) {
       if (sample.userCanRead(user)) {
         accessibles.add(sample);
@@ -795,7 +810,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<Sample> listAllSamplesWithLimit(long limit) throws IOException {
     User user = getCurrentUser();
-    Collection<Sample> accessibles = new HashSet<Sample>();
+    Collection<Sample> accessibles = new HashSet<>();
     for (Sample sample : super.listAllSamplesWithLimit(limit)) {
       if (sample.userCanRead(user)) {
         accessibles.add(sample);
@@ -805,9 +820,22 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
+  public Collection<Sample> listAllSamplesByReceivedDate(long limit) throws IOException {
+    User user = getCurrentUser();
+    List<Sample> samples = new ArrayList<>(super.listAllSamplesByReceivedDate(limit));
+
+    for (int i = 0; i < samples.size(); i++) {
+      if (!samples.get(i).userCanRead(user)) {
+        samples.remove(i);
+      }
+    }
+    return samples;
+  }
+
+  @Override
   public Collection<Sample> listAllSamplesBySearch(String query) throws IOException {
     User user = getCurrentUser();
-    Collection<Sample> accessibles = new HashSet<Sample>();
+    Collection<Sample> accessibles = new HashSet<>();
     for (Sample sample : super.listAllSamplesBySearch(query)) {
       if (sample.userCanRead(user)) {
         accessibles.add(sample);
@@ -819,7 +847,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<Sample> listAllSamplesByProjectId(long projectId) throws IOException {
     User user = getCurrentUser();
-    Collection<Sample> accessibles = new HashSet<Sample>();
+    Collection<Sample> accessibles = new HashSet<>();
     for (Sample sample : super.listAllSamplesByProjectId(projectId)) {
       if (sample.userCanRead(user)) {
         accessibles.add(sample);
@@ -831,7 +859,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<Sample> listAllSamplesByExperimentId(long experimentId) throws IOException {
     User user = getCurrentUser();
-    Collection<Sample> accessibles = new HashSet<Sample>();
+    Collection<Sample> accessibles = new HashSet<>();
     for (Sample sample : super.listAllSamplesByExperimentId(experimentId)) {
       if (sample.userCanRead(user)) {
         accessibles.add(sample);
@@ -843,7 +871,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<Sample> listSamplesByAlias(String alias) throws IOException {
     User user = getCurrentUser();
-    Collection<Sample> accessibles = new HashSet<Sample>();
+    Collection<Sample> accessibles = new HashSet<>();
     for (Sample sample : super.listSamplesByAlias(alias)) {
       if (sample.userCanRead(user)) {
         accessibles.add(sample);
@@ -855,7 +883,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<SampleQC> listAllSampleQCsBySampleId(long sampleId) throws IOException {
     User user = getCurrentUser();
-    Collection<SampleQC> accessibles = new HashSet<SampleQC>();
+    Collection<SampleQC> accessibles = new HashSet<>();
     for (SampleQC sampleQc : super.listAllSampleQCsBySampleId(sampleId)) {
       if (sampleQc.userCanRead(user)) {
         accessibles.add(sampleQc);
@@ -867,7 +895,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<Library> listAllLibraries() throws IOException {
     User user = getCurrentUser();
-    Collection<Library> accessibles = new HashSet<Library>();
+    Collection<Library> accessibles = new HashSet<>();
     for (Library library : super.listAllLibraries()) {
       if (library.userCanRead(user)) {
         accessibles.add(library);
@@ -879,7 +907,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<Library> listAllLibrariesWithLimit(long limit) throws IOException {
     User user = getCurrentUser();
-    Collection<Library> accessibles = new HashSet<Library>();
+    Collection<Library> accessibles = new HashSet<>();
     for (Library library : super.listAllLibrariesWithLimit(limit)) {
       if (library.userCanRead(user)) {
         accessibles.add(library);
@@ -891,7 +919,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<Library> listAllLibrariesBySearch(String query) throws IOException {
     User user = getCurrentUser();
-    Collection<Library> accessibles = new HashSet<Library>();
+    Collection<Library> accessibles = new HashSet<>();
     for (Library library : super.listAllLibrariesBySearch(query)) {
       if (library.userCanRead(user)) {
         accessibles.add(library);
@@ -903,7 +931,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<Library> listAllLibrariesByProjectId(long projectId) throws IOException {
     User user = getCurrentUser();
-    Collection<Library> accessibles = new HashSet<Library>();
+    Collection<Library> accessibles = new HashSet<>();
     for (Library library : super.listAllLibrariesByProjectId(projectId)) {
       if (library.userCanRead(user)) {
         accessibles.add(library);
@@ -915,7 +943,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<Library> listAllLibrariesBySampleId(long sampleId) throws IOException {
     User user = getCurrentUser();
-    Collection<Library> accessibles = new HashSet<Library>();
+    Collection<Library> accessibles = new HashSet<>();
     for (Library library : super.listAllLibrariesBySampleId(sampleId)) {
       if (library.userCanRead(user)) {
         accessibles.add(library);
@@ -927,7 +955,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<LibraryQC> listAllLibraryQCsByLibraryId(long libraryId) throws IOException {
     User user = getCurrentUser();
-    Collection<LibraryQC> accessibles = new HashSet<LibraryQC>();
+    Collection<LibraryQC> accessibles = new HashSet<>();
     for (LibraryQC libraryQc : super.listAllLibraryQCsByLibraryId(libraryId)) {
       if (libraryQc.userCanRead(user)) {
         accessibles.add(libraryQc);
@@ -939,7 +967,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<Dilution> listDilutionsBySearch(String query, PlatformType platformType) throws IOException {
     User user = getCurrentUser();
-    Collection<Dilution> accessibles = new HashSet<Dilution>();
+    Collection<Dilution> accessibles = new HashSet<>();
     for (Dilution dilution : super.listDilutionsBySearch(query, platformType)) {
       if (dilution.userCanRead(user)) {
         accessibles.add(dilution);
@@ -951,7 +979,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<Dilution> listAllDilutionsByProjectAndPlatform(long projectId, PlatformType platformType) throws IOException {
     User user = getCurrentUser();
-    Collection<Dilution> accessibles = new HashSet<Dilution>();
+    Collection<Dilution> accessibles = new HashSet<>();
     for (Dilution dilution : super.listAllDilutionsByProjectAndPlatform(projectId, platformType)) {
       if (dilution.userCanRead(user)) {
         accessibles.add(dilution);
@@ -963,8 +991,20 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<LibraryDilution> listAllLibraryDilutions() throws IOException {
     User user = getCurrentUser();
-    Collection<LibraryDilution> accessibles = new HashSet<LibraryDilution>();
+    Collection<LibraryDilution> accessibles = new HashSet<>();
     for (LibraryDilution dilution : super.listAllLibraryDilutions()) {
+      if (dilution.userCanRead(user)) {
+        accessibles.add(dilution);
+      }
+    }
+    return accessibles;
+  }
+
+  @Override
+  public Collection<LibraryDilution> listAllLibraryDilutionsWithLimit(long limit) throws IOException {
+    User user = getCurrentUser();
+    Collection<LibraryDilution> accessibles = new HashSet<>();
+    for (LibraryDilution dilution : super.listAllLibraryDilutionsWithLimit(limit)) {
       if (dilution.userCanRead(user)) {
         accessibles.add(dilution);
       }
@@ -975,7 +1015,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<LibraryDilution> listAllLibraryDilutionsByLibraryId(long libraryId) throws IOException {
     User user = getCurrentUser();
-    Collection<LibraryDilution> accessibles = new HashSet<LibraryDilution>();
+    Collection<LibraryDilution> accessibles = new HashSet<>();
     for (LibraryDilution dilution : super.listAllLibraryDilutionsByLibraryId(libraryId)) {
       if (dilution.userCanRead(user)) {
         accessibles.add(dilution);
@@ -987,7 +1027,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<LibraryDilution> listAllLibraryDilutionsByPlatform(PlatformType platformType) throws IOException {
     User user = getCurrentUser();
-    Collection<LibraryDilution> accessibles = new HashSet<LibraryDilution>();
+    Collection<LibraryDilution> accessibles = new HashSet<>();
     for (LibraryDilution dilution : super.listAllLibraryDilutionsByPlatform(platformType)) {
       if (dilution.userCanRead(user)) {
         accessibles.add(dilution);
@@ -999,7 +1039,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<LibraryDilution> listAllLibraryDilutionsByProjectId(long projectId) throws IOException {
     User user = getCurrentUser();
-    Collection<LibraryDilution> accessibles = new HashSet<LibraryDilution>();
+    Collection<LibraryDilution> accessibles = new HashSet<>();
     for (LibraryDilution dilution : super.listAllLibraryDilutionsByProjectId(projectId)) {
       if (dilution.userCanRead(user)) {
         accessibles.add(dilution);
@@ -1011,8 +1051,20 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<LibraryDilution> listAllLibraryDilutionsBySearch(String query, PlatformType platformType) throws IOException {
     User user = getCurrentUser();
-    Collection<LibraryDilution> accessibles = new HashSet<LibraryDilution>();
+    Collection<LibraryDilution> accessibles = new HashSet<>();
     for (LibraryDilution dilution : super.listAllLibraryDilutionsBySearch(query, platformType)) {
+      if (dilution.userCanRead(user)) {
+        accessibles.add(dilution);
+      }
+    }
+    return accessibles;
+  }
+
+  @Override
+  public Collection<LibraryDilution> listAllLibraryDilutionsBySearchOnly(String query) throws IOException {
+    User user = getCurrentUser();
+    Collection<LibraryDilution> accessibles = new HashSet<>();
+    for (LibraryDilution dilution : super.listAllLibraryDilutionsBySearchOnly(query)) {
       if (dilution.userCanRead(user)) {
         accessibles.add(dilution);
       }
@@ -1023,7 +1075,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<LibraryDilution> listAllLibraryDilutionsByProjectAndPlatform(long projectId, PlatformType platformType) throws IOException {
     User user = getCurrentUser();
-    Collection<LibraryDilution> accessibles = new HashSet<LibraryDilution>();
+    Collection<LibraryDilution> accessibles = new HashSet<>();
     for (LibraryDilution dilution : super.listAllLibraryDilutionsByProjectAndPlatform(projectId, platformType)) {
       if (dilution.userCanRead(user)) {
         accessibles.add(dilution);
@@ -1035,7 +1087,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<LibraryDilution> listAllLibraryDilutionsByPoolAndPlatform(long poolId, PlatformType platformType) throws IOException {
     User user = getCurrentUser();
-    Collection<LibraryDilution> accessibles = new HashSet<LibraryDilution>();
+    Collection<LibraryDilution> accessibles = new HashSet<>();
     for (LibraryDilution dilution : super.listAllLibraryDilutionsByPoolAndPlatform(poolId, platformType)) {
       if (dilution.userCanRead(user)) {
         accessibles.add(dilution);
@@ -1045,10 +1097,10 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
-  public Collection<emPCRDilution> listAllEmPcrDilutions() throws IOException {
+  public Collection<emPCRDilution> listAllEmPCRDilutions() throws IOException {
     User user = getCurrentUser();
-    Collection<emPCRDilution> accessibles = new HashSet<emPCRDilution>();
-    for (emPCRDilution dilution : super.listAllEmPcrDilutions()) {
+    Collection<emPCRDilution> accessibles = new HashSet<>();
+    for (emPCRDilution dilution : super.listAllEmPCRDilutions()) {
       if (dilution.userCanRead(user)) {
         accessibles.add(dilution);
       }
@@ -1057,10 +1109,10 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
-  public Collection<emPCRDilution> listAllEmPcrDilutionsByEmPcrId(long pcrId) throws IOException {
+  public Collection<emPCRDilution> listAllEmPCRDilutionsByEmPcrId(long pcrId) throws IOException {
     User user = getCurrentUser();
-    Collection<emPCRDilution> accessibles = new HashSet<emPCRDilution>();
-    for (emPCRDilution dilution : super.listAllEmPcrDilutionsByEmPcrId(pcrId)) {
+    Collection<emPCRDilution> accessibles = new HashSet<>();
+    for (emPCRDilution dilution : super.listAllEmPCRDilutionsByEmPcrId(pcrId)) {
       if (dilution.userCanRead(user)) {
         accessibles.add(dilution);
       }
@@ -1069,10 +1121,10 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
-  public Collection<emPCRDilution> listAllEmPcrDilutionsByPlatform(PlatformType platformType) throws IOException {
+  public Collection<emPCRDilution> listAllEmPCRDilutionsByPlatform(PlatformType platformType) throws IOException {
     User user = getCurrentUser();
-    Collection<emPCRDilution> accessibles = new HashSet<emPCRDilution>();
-    for (emPCRDilution dilution : super.listAllEmPcrDilutionsByPlatform(platformType)) {
+    Collection<emPCRDilution> accessibles = new HashSet<>();
+    for (emPCRDilution dilution : super.listAllEmPCRDilutionsByPlatform(platformType)) {
       if (dilution.userCanRead(user)) {
         accessibles.add(dilution);
       }
@@ -1081,10 +1133,10 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
-  public Collection<emPCRDilution> listAllEmPcrDilutionsByProjectId(long projectId) throws IOException {
+  public Collection<emPCRDilution> listAllEmPCRDilutionsByProjectId(long projectId) throws IOException {
     User user = getCurrentUser();
-    Collection<emPCRDilution> accessibles = new HashSet<emPCRDilution>();
-    for (emPCRDilution dilution : super.listAllEmPcrDilutionsByProjectId(projectId)) {
+    Collection<emPCRDilution> accessibles = new HashSet<>();
+    for (emPCRDilution dilution : super.listAllEmPCRDilutionsByProjectId(projectId)) {
       if (dilution.userCanRead(user)) {
         accessibles.add(dilution);
       }
@@ -1093,10 +1145,10 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
-  public Collection<emPCRDilution> listAllEmPcrDilutionsBySearch(String query, PlatformType platformType) throws IOException {
+  public Collection<emPCRDilution> listAllEmPCRDilutionsBySearch(String query, PlatformType platformType) throws IOException {
     User user = getCurrentUser();
-    Collection<emPCRDilution> accessibles = new HashSet<emPCRDilution>();
-    for (emPCRDilution dilution : super.listAllEmPcrDilutionsBySearch(query, platformType)) {
+    Collection<emPCRDilution> accessibles = new HashSet<>();
+    for (emPCRDilution dilution : super.listAllEmPCRDilutionsBySearch(query, platformType)) {
       if (dilution.userCanRead(user)) {
         accessibles.add(dilution);
       }
@@ -1105,10 +1157,10 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
-  public Collection<emPCRDilution> listAllEmPcrDilutionsByProjectAndPlatform(long projectId, PlatformType platformType) throws IOException {
+  public Collection<emPCRDilution> listAllEmPCRDilutionsByProjectAndPlatform(long projectId, PlatformType platformType) throws IOException {
     User user = getCurrentUser();
-    Collection<emPCRDilution> accessibles = new HashSet<emPCRDilution>();
-    for (emPCRDilution dilution : super.listAllEmPcrDilutionsByProjectAndPlatform(projectId, platformType)) {
+    Collection<emPCRDilution> accessibles = new HashSet<>();
+    for (emPCRDilution dilution : super.listAllEmPCRDilutionsByProjectAndPlatform(projectId, platformType)) {
       if (dilution.userCanRead(user)) {
         accessibles.add(dilution);
       }
@@ -1117,10 +1169,10 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
-  public Collection<emPCRDilution> listAllEmPcrDilutionsByPoolAndPlatform(long poolId, PlatformType platformType) throws IOException {
+  public Collection<emPCRDilution> listAllEmPCRDilutionsByPoolAndPlatform(long poolId, PlatformType platformType) throws IOException {
     User user = getCurrentUser();
-    Collection<emPCRDilution> accessibles = new HashSet<emPCRDilution>();
-    for (emPCRDilution dilution : super.listAllEmPcrDilutionsByPoolAndPlatform(poolId, platformType)) {
+    Collection<emPCRDilution> accessibles = new HashSet<>();
+    for (emPCRDilution dilution : super.listAllEmPCRDilutionsByPoolAndPlatform(poolId, platformType)) {
       if (dilution.userCanRead(user)) {
         accessibles.add(dilution);
       }
@@ -1131,7 +1183,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<emPCR> listAllEmPCRs() throws IOException {
     User user = getCurrentUser();
-    Collection<emPCR> accessibles = new HashSet<emPCR>();
+    Collection<emPCR> accessibles = new HashSet<>();
     for (emPCR pcr : super.listAllEmPCRs()) {
       if (pcr.userCanRead(user)) {
         accessibles.add(pcr);
@@ -1143,7 +1195,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<emPCR> listAllEmPCRsByDilutionId(long dilutionId) throws IOException {
     User user = getCurrentUser();
-    Collection<emPCR> accessibles = new HashSet<emPCR>();
+    Collection<emPCR> accessibles = new HashSet<>();
     for (emPCR pcr : super.listAllEmPCRsByDilutionId(dilutionId)) {
       if (pcr.userCanRead(user)) {
         accessibles.add(pcr);
@@ -1155,7 +1207,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<Pool<? extends Poolable>> listAllPools() throws IOException {
     User user = getCurrentUser();
-    ArrayList<Pool<? extends Poolable>> accessibles = new ArrayList<Pool<? extends Poolable>>();
+    ArrayList<Pool<? extends Poolable>> accessibles = new ArrayList<>();
     for (Pool<? extends Poolable> pool : super.listAllPools()) {
       if (pool.userCanRead(user)) {
         accessibles.add(pool);
@@ -1168,7 +1220,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<Pool<? extends Poolable>> listAllPoolsByPlatform(PlatformType platformType) throws IOException {
     User user = getCurrentUser();
-    ArrayList<Pool<? extends Poolable>> accessibles = new ArrayList<Pool<? extends Poolable>>();
+    ArrayList<Pool<? extends Poolable>> accessibles = new ArrayList<>();
     for (Pool<? extends Poolable> pool : super.listAllPoolsByPlatform(platformType)) {
       if (pool.userCanRead(user)) {
         accessibles.add(pool);
@@ -1181,7 +1233,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<Pool<? extends Poolable>> listAllPoolsByPlatformAndSearch(PlatformType platformType, String query) throws IOException {
     User user = getCurrentUser();
-    ArrayList<Pool<? extends Poolable>> accessibles = new ArrayList<Pool<? extends Poolable>>();
+    ArrayList<Pool<? extends Poolable>> accessibles = new ArrayList<>();
     for (Pool<? extends Poolable> pool : super.listAllPoolsByPlatformAndSearch(platformType, query)) {
       if (pool.userCanRead(user)) {
         accessibles.add(pool);
@@ -1194,7 +1246,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<Pool<? extends Poolable>> listReadyPoolsByPlatform(PlatformType platformType) throws IOException {
     User user = getCurrentUser();
-    ArrayList<Pool<? extends Poolable>> accessibles = new ArrayList<Pool<? extends Poolable>>();
+    ArrayList<Pool<? extends Poolable>> accessibles = new ArrayList<>();
     for (Pool<? extends Poolable> pool : super.listReadyPoolsByPlatform(platformType)) {
       if (pool.userCanRead(user)) {
         accessibles.add(pool);
@@ -1207,7 +1259,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<Pool<? extends Poolable>> listReadyPoolsByPlatformAndSearch(PlatformType platformType, String query) throws IOException {
     User user = getCurrentUser();
-    ArrayList<Pool<? extends Poolable>> accessibles = new ArrayList<Pool<? extends Poolable>>();
+    ArrayList<Pool<? extends Poolable>> accessibles = new ArrayList<>();
     for (Pool<? extends Poolable> pool : super.listReadyPoolsByPlatformAndSearch(platformType, query)) {
       if (pool.userCanRead(user)) {
         accessibles.add(pool);
@@ -1220,8 +1272,21 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public List<Pool<? extends Poolable>> listPoolsByLibraryId(long libraryId) throws IOException {
     User user = getCurrentUser();
-    ArrayList<Pool<? extends Poolable>> accessibles = new ArrayList<Pool<? extends Poolable>>();
+    ArrayList<Pool<? extends Poolable>> accessibles = new ArrayList<>();
     for (Pool<? extends Poolable> pool : super.listPoolsByLibraryId(libraryId)) {
+      if (pool.userCanRead(user)) {
+        accessibles.add(pool);
+      }
+    }
+    Collections.sort(accessibles);
+    return accessibles;
+  }
+
+  @Override
+  public List<Pool<? extends Poolable>> listPoolsBySampleId(long sampleId) throws IOException {
+    User user = getCurrentUser();
+    ArrayList<Pool<? extends Poolable>> accessibles = new ArrayList<>();
+    for (Pool<? extends Poolable> pool : super.listPoolsBySampleId(sampleId)) {
       if (pool.userCanRead(user)) {
         accessibles.add(pool);
       }
@@ -1233,7 +1298,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public List<PoolQC> listAllPoolQCsByPoolId(long poolId) throws IOException {
     User user = getCurrentUser();
-    ArrayList<PoolQC> accessibles = new ArrayList<PoolQC>();
+    ArrayList<PoolQC> accessibles = new ArrayList<>();
     for (PoolQC qc : super.listAllPoolQCsByPoolId(poolId)) {
       if (qc.userCanRead(user)) {
         accessibles.add(qc);
@@ -1246,7 +1311,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<Experiment> listAllExperiments() throws IOException {
     User user = getCurrentUser();
-    Collection<Experiment> accessibles = new HashSet<Experiment>();
+    Collection<Experiment> accessibles = new HashSet<>();
     for (Experiment experiment : super.listAllExperiments()) {
       if (experiment.userCanRead(user)) {
         accessibles.add(experiment);
@@ -1258,7 +1323,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<Experiment> listAllExperimentsWithLimit(long limit) throws IOException {
     User user = getCurrentUser();
-    Collection<Experiment> accessibles = new HashSet<Experiment>();
+    Collection<Experiment> accessibles = new HashSet<>();
     for (Experiment experiment : super.listAllExperimentsWithLimit(limit)) {
       if (experiment.userCanRead(user)) {
         accessibles.add(experiment);
@@ -1270,7 +1335,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<Experiment> listAllExperimentsBySearch(String query) throws IOException {
     User user = getCurrentUser();
-    Collection<Experiment> accessibles = new HashSet<Experiment>();
+    Collection<Experiment> accessibles = new HashSet<>();
     for (Experiment experiment : super.listAllExperimentsBySearch(query)) {
       if (experiment.userCanRead(user)) {
         accessibles.add(experiment);
@@ -1282,7 +1347,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<Experiment> listAllExperimentsByStudyId(long studyId) throws IOException {
     User user = getCurrentUser();
-    Collection<Experiment> accessibles = new HashSet<Experiment>();
+    Collection<Experiment> accessibles = new HashSet<>();
     for (Experiment experiment : super.listAllExperimentsByStudyId(studyId)) {
       if (experiment.userCanRead(user)) {
         accessibles.add(experiment);
@@ -1294,7 +1359,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<Study> listAllStudies() throws IOException {
     User user = getCurrentUser();
-    Collection<Study> accessibles = new HashSet<Study>();
+    Collection<Study> accessibles = new HashSet<>();
     for (Study study : super.listAllStudies()) {
       if (study.userCanRead(user)) {
         accessibles.add(study);
@@ -1306,7 +1371,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<Study> listAllStudiesWithLimit(long limit) throws IOException {
     User user = getCurrentUser();
-    Collection<Study> accessibles = new HashSet<Study>();
+    Collection<Study> accessibles = new HashSet<>();
     for (Study study : super.listAllStudiesWithLimit(limit)) {
       if (study.userCanRead(user)) {
         accessibles.add(study);
@@ -1318,7 +1383,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<Study> listAllStudiesBySearch(String query) throws IOException {
     User user = getCurrentUser();
-    Collection<Study> accessibles = new HashSet<Study>();
+    Collection<Study> accessibles = new HashSet<>();
     for (Study study : super.listAllStudiesBySearch(query)) {
       if (study.userCanRead(user)) {
         accessibles.add(study);
@@ -1330,8 +1395,20 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<Study> listAllStudiesByProjectId(long projectId) throws IOException {
     User user = getCurrentUser();
-    Collection<Study> accessibles = new HashSet<Study>();
+    Collection<Study> accessibles = new HashSet<>();
     for (Study study : super.listAllStudiesByProjectId(projectId)) {
+      if (study.userCanRead(user)) {
+        accessibles.add(study);
+      }
+    }
+    return accessibles;
+  }
+
+  @Override
+  public Collection<Study> listAllStudiesByLibraryId(long libraryId) throws IOException {
+    User user = getCurrentUser();
+    Collection<Study> accessibles = new HashSet<>();
+    for (Study study : super.listAllStudiesByLibraryId(libraryId)) {
       if (study.userCanRead(user)) {
         accessibles.add(study);
       }
@@ -1342,7 +1419,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<SequencerPoolPartition> listAllSequencerPoolPartitions() throws IOException {
     User user = getCurrentUser();
-    Collection<SequencerPoolPartition> accessibles = new HashSet<SequencerPoolPartition>();
+    Collection<SequencerPoolPartition> accessibles = new HashSet<>();
     for (SequencerPoolPartition partition : super.listAllSequencerPoolPartitions()) {
       if (partition.userCanRead(user)) {
         accessibles.add(partition);
@@ -1354,7 +1431,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<? extends SequencerPoolPartition> listPartitionsBySequencerPartitionContainerId(long containerId) throws IOException {
     User user = getCurrentUser();
-    Collection<SequencerPoolPartition> accessibles = new HashSet<SequencerPoolPartition>();
+    Collection<SequencerPoolPartition> accessibles = new HashSet<>();
     for (SequencerPoolPartition p : super.listPartitionsBySequencerPartitionContainerId(containerId)) {
       if (p.userCanRead(user)) {
         accessibles.add(p);
@@ -1366,7 +1443,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<SequencerPartitionContainer<SequencerPoolPartition>> listAllSequencerPartitionContainers() throws IOException {
     User user = getCurrentUser();
-    Collection<SequencerPartitionContainer<SequencerPoolPartition>> accessibles = new HashSet<SequencerPartitionContainer<SequencerPoolPartition>>();
+    Collection<SequencerPartitionContainer<SequencerPoolPartition>> accessibles = new HashSet<>();
     for (SequencerPartitionContainer<SequencerPoolPartition> container : super.listAllSequencerPartitionContainers()) {
       if (container.userCanRead(user)) {
         accessibles.add(container);
@@ -1378,7 +1455,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<Submission> listAllSubmissions() throws IOException {
     User user = getCurrentUser();
-    Collection<Submission> accessibles = new HashSet<Submission>();
+    Collection<Submission> accessibles = new HashSet<>();
     for (Submission submission : super.listAllSubmissions()) {
       if (submission.userCanRead(user)) {
         accessibles.add(submission);
@@ -1388,9 +1465,10 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
+  @Deprecated
   public Collection<Run> listRunsByExperimentId(Long experimentId) throws IOException {
     User user = getCurrentUser();
-    Collection<Run> accessibles = new HashSet<Run>();
+    Collection<Run> accessibles = new HashSet<>();
     for (Run run : super.listRunsByExperimentId(experimentId)) {
       if (run.userCanRead(user)) {
         accessibles.add(run);
@@ -1402,7 +1480,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> listAllPlates() throws IOException {
     User user = getCurrentUser();
-    Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> accessibles = new HashSet<Plate<? extends List<? extends Plateable>, ? extends Plateable>>();
+    Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> accessibles = new HashSet<>();
     for (Plate<? extends List<? extends Plateable>, ? extends Plateable> plate : super.listAllPlates()) {
       if (plate.userCanRead(user)) {
         accessibles.add(plate);
@@ -1414,7 +1492,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> listAllPlatesByProjectId(long projectId) throws IOException {
     User user = getCurrentUser();
-    Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> accessibles = new HashSet<Plate<? extends List<? extends Plateable>, ? extends Plateable>>();
+    Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> accessibles = new HashSet<>();
     for (Plate<? extends List<? extends Plateable>, ? extends Plateable> plate : super.listAllPlatesByProjectId(projectId)) {
       if (plate.userCanRead(user)) {
         accessibles.add(plate);
@@ -1426,10 +1504,23 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> listAllPlatesBySearch(String str) throws IOException {
     User user = getCurrentUser();
-    Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> accessibles = new HashSet<Plate<? extends List<? extends Plateable>, ? extends Plateable>>();
+    Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> accessibles = new HashSet<>();
     for (Plate<? extends List<? extends Plateable>, ? extends Plateable> plate : super.listAllPlatesBySearch(str)) {
       if (plate.userCanRead(user)) {
         accessibles.add(plate);
+      }
+    }
+    return accessibles;
+  }
+
+  @Override
+  public <T extends Nameable, S extends Nameable> Collection<HierarchicalEntityGroup<T, S>> listAllEntityGroupsByEntityType(Class<T> parentType, Class<S> entityType) throws IOException {
+    User user = getCurrentUser();
+
+    Collection<HierarchicalEntityGroup<T, S>> accessibles = new HashSet<>();
+    for (HierarchicalEntityGroup<T, S> group : super.listAllEntityGroupsByEntityType(parentType, entityType)) {
+      if (user.isAdmin() || user.equals(group.getCreator()) || user.equals(group.getAssignee())) {
+        accessibles.add(group);
       }
     }
     return accessibles;
@@ -1514,9 +1605,9 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
-  public void deleteEmPcrDilution(emPCRDilution dilution) throws IOException {
+  public void deleteEmPCRDilution(emPCRDilution dilution) throws IOException {
     if (getCurrentUser().isAdmin()) {
-      super.deleteEmPcrDilution(dilution);
+      super.deleteEmPCRDilution(dilution);
     }
   }
 
@@ -1545,6 +1636,32 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   public void deletePlate(Plate plate) throws IOException {
     if (getCurrentUser().isAdmin()) {
       super.deletePlate(plate);
+    }
+  }
+
+  @Override
+  public void deleteEntityGroup(HierarchicalEntityGroup<? extends Nameable, ? extends Nameable> entityGroup) throws IOException {
+    super.deleteEntityGroup(entityGroup);
+  }
+
+  @Override
+  public void deleteContainer(SequencerPartitionContainer container) throws IOException {
+    if (getCurrentUser().isAdmin()) {
+      super.deleteContainer(container);
+    }
+  }
+
+  @Override
+  public void deletePartition(SequencerPoolPartition partition) throws IOException {
+    if (getCurrentUser().isAdmin()) {
+      super.deletePartition(partition);
+    }
+  }
+
+  @Override
+  public void deleteNote(Note note) throws IOException {
+    if (getCurrentUser().isAdmin() || getCurrentUser().equals(note.getOwner())) {
+      super.deleteNote(note);
     }
   }
 }

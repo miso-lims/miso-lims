@@ -39,7 +39,8 @@ public enum PlatformType {
   LS454("LS454"),
   SOLID("Solid"),
   IONTORRENT("IonTorrent"),
-  PACBIO("PacBio");
+  PACBIO("PacBio"),
+  OXFORD_NANOPORE("OxfordNanopore");
 
   /**
    * Field key

@@ -46,7 +46,7 @@ public interface ExperimentStore extends Store<Experiment>, Cascadable, Remover<
    * @return Experiment
    * @throws IOException when
    */
-  Experiment lazyGet(long experimentId) throws IOException;
+  //Experiment lazyGet(long experimentId) throws IOException;
 
   /**
    * List all Experiments that match a search criteria

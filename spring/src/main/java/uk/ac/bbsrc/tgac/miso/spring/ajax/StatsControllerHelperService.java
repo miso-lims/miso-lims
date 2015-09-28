@@ -31,7 +31,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.integration.NotificationQueryService;
+import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationException;
 import uk.ac.bbsrc.tgac.miso.runstats.client.RunStatsException;
 import uk.ac.bbsrc.tgac.miso.runstats.client.manager.RunStatsManager;
 
@@ -56,6 +59,9 @@ public class StatsControllerHelperService {
 
   private RunStatsManager runStatsManager;
 
+  @Autowired
+  private NotificationQueryService notificationQueryService;
+
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
   }
@@ -66,6 +72,10 @@ public class StatsControllerHelperService {
 
   public void setRunStatsManager(RunStatsManager runStatsManager) {
     this.runStatsManager = runStatsManager;
+  }
+
+  public void setNotificationQueryService(NotificationQueryService notificationQueryService) {
+    this.notificationQueryService = notificationQueryService;
   }
 
   public JSONObject getRunStats(HttpSession session, JSONObject json) {
@@ -111,11 +121,9 @@ public class StatsControllerHelperService {
     }
   }
 
-
   public JSONObject getSummaryRunstatsDiagram(HttpSession session, JSONObject json) {
     Long runId = json.getLong("runId");
     Integer lane = json.getInt("lane");
-    StringBuilder b = new StringBuilder();
     try {
       Run run = requestManager.getRunById(runId);
       JSONObject resultJson = runStatsManager.getPerPositionBaseSequenceQualityForLane(run, lane);
@@ -131,23 +139,62 @@ public class StatsControllerHelperService {
     }
   }
 
-
-  public JSONObject getPerPositionBaseContentDiagram(HttpSession session, JSONObject json) {
-    Long runId = json.getLong("runId");
-    Integer lane = json.getInt("lane");
-    StringBuilder b = new StringBuilder();
+  public JSONObject getInterOpMetrics(HttpSession session, JSONObject json) {
+    String runAlias = json.getString("runAlias");
+    String platformType = json.getString("platformType").toLowerCase();
     try {
-      Run run = requestManager.getRunById(runId);
-      JSONObject resultJson = runStatsManager.getPerPositionBaseContentForLane(run, lane);
-      return resultJson;
+      return notificationQueryService.getInterOpMetrics(runAlias, platformType);
+    }
+    catch (IntegrationException e) {
+      e.printStackTrace();
+      log.debug("Failed", e);
+      return JSONUtils.SimpleJSONError("Failed to retrieve InterOp metrics: " + e.getMessage());
+    }
+  }
+
+  public JSONObject getInterOpMetricsForLane(HttpSession session, JSONObject json) {
+    String runAlias = json.getString("runAlias");
+    String platformType = json.getString("platformType").toLowerCase();
+    int laneNum = json.getInt("lane");
+    try {
+      return notificationQueryService.getInterOpMetricsForLane(runAlias, platformType, laneNum);
+    }
+    catch (IntegrationException e) {
+      e.printStackTrace();
+      log.debug("Failed", e);
+      return JSONUtils.SimpleJSONError("Failed to retrieve InterOp metrics: " + e.getMessage());
+    }
+  }
+
+  public JSONObject updateRunProgress(HttpSession session, JSONObject json) {
+    String runAlias = json.getString("runAlias");
+    try {
+      Run run = requestManager.getRunByAlias(runAlias);
+      if (run != null && run.getStatus() != null && run.getStatus().getHealth().equals(HealthType.Unknown)) {
+        String platformType = json.getString("platformType").toLowerCase();
+        JSONObject response = notificationQueryService.getRunProgress(runAlias, platformType);
+        if (response.has("progress")) {
+          String progress = response.getString("progress");
+          if (!run.getStatus().getHealth().equals(HealthType.valueOf(progress))) {
+            run.getStatus().setHealth(HealthType.valueOf(progress));
+            requestManager.saveRun(run);
+            return response;
+          }
+          return JSONUtils.SimpleJSONResponse("No run progress change necessary for run " + runAlias);
+        }
+        return JSONUtils.SimpleJSONResponse("No run progress available for run " + runAlias);
+      }
+      return JSONUtils.SimpleJSONResponse("Run already set to non-Unknown: " + runAlias);
+    }
+    catch (IntegrationException e) {
+      e.printStackTrace();
+      log.debug("Failed", e);
+      return JSONUtils.SimpleJSONError("Failed to retrieve run progress: " + e.getMessage());
     }
     catch (IOException e) {
+      e.printStackTrace();
       log.debug("Failed", e);
-      return JSONUtils.SimpleJSONError("Failed");
-    }
-    catch (RunStatsException e) {
-      log.debug("Failed", e);
-      return JSONUtils.SimpleJSONError("Failed");
+      return JSONUtils.SimpleJSONError("Failed to retrieve run progress: " + e.getMessage());
     }
   }
 }

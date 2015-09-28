@@ -138,7 +138,7 @@ public class SQLSecurityProfileDAO implements Store<SecurityProfile> {
 
       List<SecurityProfile> results = template.query(PROFILE_SELECT_BY_ID, new Object[]{securityProfile.getProfileId()}, new SecurityProfileMapper());
       if (results.size() > 0) {
-        log.error("SecurityProfile deletion failed!");
+        log.error("SecurityProfile users/group relationships deletion failed!");
       }
       else {
         params.addValue("profileId", securityProfile.getProfileId());
@@ -206,7 +206,6 @@ public class SQLSecurityProfileDAO implements Store<SecurityProfile> {
     return securityProfile.getProfileId();
   }
 
-  //@Cacheable(cacheName="securityProfileCache", keyGeneratorName="limsHashKeyGenerator")
   public Collection<SecurityProfile> listAll() throws IOException {
     return template.query(PROFILES_SELECT, new SecurityProfileMapper());
   }
@@ -239,7 +238,11 @@ public class SQLSecurityProfileDAO implements Store<SecurityProfile> {
     return sp;
   }
 
-  //@Cacheable(cacheName="securityProfileCache", keyGeneratorName="limsHashKeyGenerator")
+  @Override
+  public SecurityProfile lazyGet(long id) throws IOException {
+    return get(id);
+  }
+
   private void fillOutSecurityProfile(SecurityProfile sp) throws IOException {
     List<Map<String, Object>> results = template.queryForList(USERS_GROUPS_SELECT_BY_PROFILE_ID, sp.getProfileId());
     Set<Long> ruIds = new HashSet<Long>();
@@ -254,22 +257,18 @@ public class SQLSecurityProfileDAO implements Store<SecurityProfile> {
       Long gw = (Long) row.get("writeGroup_groupId");
 
       if (ur!=null) {
-        //sp.getReadUsers().add(securityManager.getUserById(ur));
         ruIds.add(ur);
       }
 
       if (uw!=null) {
-        //sp.getWriteUsers().add(securityManager.getUserById(uw));
         wuIds.add(uw);
       }
 
       if (gr!=null) {
-        //sp.getReadGroups().add(securityManager.getGroupById(gr));
         rgIds.add(gr);
       }
 
       if (gw!=null) {
-        //sp.getWriteGroups().add(securityManager.getGroupById(gw));
         wgIds.add(gw);
       }
     }

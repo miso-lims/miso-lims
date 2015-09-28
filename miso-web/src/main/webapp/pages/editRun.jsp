@@ -29,12 +29,18 @@
 
 --%>
 <%@ include file="../header.jsp" %>
+<!-- fileupload -->
+<script src="<c:url value='/scripts/jquery/fileupload/js/jquery.fileupload.js'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/jquery/fileupload/js/jquery.fileupload-process.js'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/jquery/fileupload/js/jquery.fileupload-jquery-ui.js'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/jquery/fileupload/js/jquery.iframe-transport.js'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/jquery/fileupload/js/vendor/jquery.ui.widget.js'/>" type="text/javascript"></script>
+<link href="<c:url value='/scripts/jquery/fileupload/css/jquery.fileupload.css'/>" rel="stylesheet" type="text/css">
+<link href="<c:url value='/scripts/jquery/fileupload/css/jquery.fileupload-ui.css'/>" rel="stylesheet" type="text/css">
 
 <script src="<c:url value='/scripts/statsdb.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/statsdbperbasecontent.js'/>" type="text/javascript"></script>
 
-<script type="text/javascript" src="<c:url value='/scripts/run_ajax.js?ts=${timestamp.time}'/>"></script>
-<script type="text/javascript" src="<c:url value='/scripts/run_validation.js?ts=${timestamp.time}'/>"></script>
 <script type="text/javascript" src="<c:url value='/scripts/stats_ajax.js?ts=${timestamp.time}'/>"></script>
 
 <c:choose>
@@ -42,18 +48,21 @@
   <c:otherwise><div id="maincontent"></c:otherwise>
 </c:choose>
 <div id="contentcolumn">
-<form:form action="/miso/run" method="POST" modelAttribute="run" autocomplete="off"
-           onsubmit="return validate_run(this);">
-
+<form:form action="/miso/run" method="POST" modelAttribute="run" autocomplete="off">
 <sessionConversation:insertSessionConversationId attributeName="run"/>
-
-<h1>
-  <c:choose>
-    <c:when test="${run.id != 0}">Edit</c:when>
-    <c:otherwise>Create</c:otherwise>
-  </c:choose> Run
-  <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
-</h1>
+<nav class="navbar navbar-default" role="navigation">
+   <div class="navbar-header">
+      <span class="navbar-brand navbar-center">
+        <c:choose>
+          <c:when test="${run.id != 0}">Edit</c:when>
+          <c:otherwise>Create</c:otherwise>
+        </c:choose> Run
+      </span>
+   </div>
+   <div class="navbar-right container-fluid">
+      <button type="button" class="btn btn-default navbar-btn" onclick="return validate_run(this.form);">Save</button>
+   </div>
+</nav>
 
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
   <div id="note_arrowclick" class="toggleLeft"></div>
@@ -63,6 +72,7 @@
   if required.
 </div>
 <h2>Run Information</h2>
+<%--
 <ul class="sddm" style="margin: 0px 8px 0 0;">
   <li>
     <a onmouseover="mopen('runMenu')" onmouseout="mclosetime()">Options
@@ -82,7 +92,7 @@
       </c:choose>
     </div>
   </li>
-</ul>
+</ul> --%>
 <table class="in">
   <tr>
     <td class="h">Run ID:</td>
@@ -148,32 +158,32 @@
         <c:otherwise><i>Unsaved</i></c:otherwise>
       </c:choose>
     </td>
-      <%--<td><a href="void(0);" onclick="popup('help/runName.html');">Help</a></td>--%>
   </tr>
   <tr>
     <td class="h">Alias:</td>
-    <td><form:input path="alias" class="validateable"/><span id="aliascounter" class="counter"></span>
+    <td>
+      <div class="input-group"><form:input path="alias" class="validateable form-control"/><span class="input-group-addon" id="aliascounter"></span></div></span>
     </td>
-      <%--<td><a href="void(0);" onclick="popup('help/runAlias.html');">Help</a></td>--%>
   </tr>
   <tr>
     <td>Description:</td>
     <td>
+      <div class="input-group">
       <c:choose>
         <c:when test="${not empty run.status and run.status.health.key ne 'Unknown'}"><form:input
-            path="description" disabled="disabled" class="validateable"/></c:when>
-        <c:otherwise><form:input path="description" class="validateable"/></c:otherwise>
+            path="description" disabled="disabled" class="validateable form-control"/></c:when>
+        <c:otherwise><form:input path="description" class="validateable form-control"/></c:otherwise>
       </c:choose>
-      <span id="descriptioncounter" class="counter"></span>
+      <span id="descriptioncounter" class="input-group-addon"></span>
+      </div>
     </td>
-      <%--<td><a href="void(0);" onclick="popup('help/runDescription.html');">Help</a></td>--%>
   </tr>
   <tr>
     <td>Run Path:</td>
     <td>
       <c:choose>
         <c:when test="${not empty run.filePath}">${run.filePath}</c:when>
-        <c:otherwise><form:input path="filePath"/></c:otherwise>
+        <c:otherwise><form:input path="filePath" class="form-control"/></c:otherwise>
       </c:choose>
     </td>
   </tr>
@@ -191,8 +201,18 @@
   <tr>
     <td valign="top">Status:</td>
     <td>
+      <div id="health-radio" class="btn-group" data-toggle="buttons">
       <form:radiobuttons id="status.health" path="status.health" items="${healthTypes}"
-                         onchange="checkForCompletionDate();"/><br/>
+                         onchange="checkForCompletionDate();" element="label class='btn btn-default'"/>
+      </div>
+      <script>
+        var c = jQuery('#health-radio :input:checked');
+        c.parent('.btn').addClass('active');
+        var inpv = c.val();
+        if (inpv === "Completed") { c.parent('.btn').removeClass('btn-default').addClass("btn-success"); }
+        if (inpv === "Failed") { c.parent('.btn').removeClass('btn-default').addClass("btn-danger"); }
+      </script>
+
       <table class="list" id="runStatusTable">
         <thead>
         <tr>
@@ -208,7 +228,7 @@
             <c:when test="${(run.status.health.key eq 'Completed' and empty run.status.completionDate)
                     or run.status.health.key eq 'Failed'
                     or run.status.health.key eq 'Stopped'}">
-              <td><form:input path="status.completionDate"/></td>
+              <td><form:input path="status.completionDate" class="form-control"/></td>
               <script type="text/javascript">
                 Utils.ui.addDatePicker("status\\.completionDate");
               </script>
@@ -234,75 +254,189 @@
 
 </table>
 <%@ include file="permissions.jsp" %>
+
 <c:if test="${run.id != 0}">
+  <div id="simplebox">
+    <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#upload_arrowclick'), 'uploaddiv');">
+      Run Files
+      <div id="upload_arrowclick" class="toggleLeft"></div>
+    </div>
+    <div id="uploaddiv" class="panel panel-default padded-panel" style="display:none;">
+      <table class="in">
+        <tr>
+          <td>
+            <span id="upload-area">
+              <div class="fileupload-buttonbar">
+                <div class="fileupload-buttonbar">
+                  <div>
+                    <span class="btn btn-success fileinput-button">
+                      <i class="glyphicon glyphicon-plus"></i>
+                      <span>Add files...</span>
+                      <input id="ajax_upload_form" type="file" name="files[]" data-url="<c:url value="/miso/upload/run"/>" multiple/>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div id="progress" class="progress">
+                <div class="progress-bar progress-bar-success"></div>
+              </div>
+
+              <div id="selectedFiles" class="files"></div>
+            </span>
+
+            <script>
+              jQuery('#ajax_upload_form').fileupload({
+                formData: {'runId': '${run.id}'},
+                dataType: 'json',
+                done: function (e, data) {
+                  jQuery.each(data.result.files, function (index, file) {
+                    var r = "<a href='"+file.url+"'><a class='listbox' href='"+file.url+"'><div onMouseOver='this.className=\"boxlistboxhighlight\"' onMouseOut='this.className=\"boxlistbox\"' class='boxlistbox'>"+file.name+"</div></a></a>";
+                    jQuery(r).prependTo('#runfiles');
+                  });
+
+                  //reset progress
+                  jQuery('#progress .progress-bar').css('width', '0%');
+                },
+                progress: function (e, data) {
+                  var progress = parseInt(data.loaded / data.total * 100, 10);
+                  jQuery('#progress .progress-bar').css('width', progress + '%');
+                }
+              }).prop('disabled', !jQuery.support.fileInput)
+                .parent().addClass(jQuery.support.fileInput ? undefined : 'disabled');
+            </script>
+          </td>
+        </tr>
+      </table>
+
+      <div id="runfiles">
+        <c:forEach items="${runFiles}" var="file">
+          <div id="file${file.key}">
+            <div onMouseOver="this.className='boxlistboxhighlight'" onMouseOut="this.className='boxlistbox'" class="boxlistbox">
+              <a href="<c:url value='/miso/download/run/${run.id}/${file.key}'/>">${file.value}</a>
+              <c:if test="${(library.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
+                              or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+              <a href='#' onclick="Run.ui.deleteRunFile('${run.id}', '${file.value}', '${file.key}');">
+                <i class="fa fa-trash-o fa-lg fa-fw pull-right" style="padding-top:4px"></i>
+              </a>
+              </c:if>
+            </div>
+          </div>
+        </c:forEach>
+      </div>
+    </div>
+  </div>
+
   <c:if test="${statsAvailable}">
     <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#stats_arrowclick'), 'stats');">Statistics
-      <div id="stats_arrowclick" class="toggleLeftDown"></div>
+      <div id="stats_arrowclick" class="toggleLeft"></div>
     </div>
     <div id="stats">
-      <h1>Statistics</h1>
+      <nav id="navbar-stats" class="navbar navbar-default navbar-static" role="navigation">
+        <div class="navbar-header">
+          <span class="navbar-brand navbar-center">Stats</span>
+        </div>
+      </nav>
 
       <div id="summarydiv"></div>
     </div>
   </c:if>
 
-  <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#notes_arrowclick'), 'notes');">Notes
-    <div id="notes_arrowclick" class="toggleLeftDown"></div>
+  <c:if test="${run.status.health.key ne 'Failed' and run.status.health.key ne 'Stopped' and metrixEnabled and run.platformType.key eq 'Illumina'}">
+  <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#metrix_arrowclick'), 'metrix');">InterOp Metrics
+    <div id="metrix_arrowclick" class="toggleLeft"></div>
   </div>
-  <div id="notes">
-    <h1>Notes</h1>
-    <ul class="sddm">
-      <li>
-        <a onmouseover="mopen('notesmenu')" onmouseout="mclosetime()">Options
-          <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
-        </a>
+  <div id="metrix">
+    <nav id="navbar-metrix" class="navbar navbar-default navbar-static" role="navigation">
+      <div class="navbar-header">
+        <span class="navbar-brand navbar-center">InterOp Metrics</span>
+      </div>
+    </nav>
 
-        <div id="notesmenu"
-             onmouseover="mcancelclosetime()"
-             onmouseout="mclosetime()">
-          <a onclick="Run.ui.showRunNoteDialog(${run.id});" href="javascript:void(0);" class="add">Add
-            Note</a>
-        </div>
-      </li>
-    </ul>
+    <div id="metrixdiv"></div>
+  </div>
+  <script type="text/javascript">
+    jQuery(document).ready(function () {
+      Stats.getInterOpMetrics('${run.alias}', '${run.platformType.key}');
+    });
+  </script>
+  </c:if>
+
+  <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#notes_arrowclick'), 'notes');">Notes
+    <c:choose>
+      <c:when test="${fn:length(sample.notes) > 0}">
+        <div id="notes_arrowclick" class="toggleLeftDown"></div>
+      </div>
+      <div id="notes" class="panel panel-default padded-panel">
+      </c:when>
+      <c:otherwise>
+        <div id="notes_arrowclick" class="toggleLeft"></div>
+      </div>
+      <div id="notes" class="panel panel-default padded-panel" style="display:none">
+      </c:otherwise>
+    </c:choose>
+
+    <nav id="navbar-notes" class="navbar navbar-default navbar-static" role="navigation">
+      <div class="navbar-header">
+        <span class="navbar-brand navbar-center">Notes</span>
+      </div>
+      <div class="collapse navbar-collapse">
+        <ul class="nav navbar-nav navbar-right">
+          <%--<li><a href="#">Link</a></li>--%>
+          <li id="notes-menu" class="dropdown">
+            <a id="notedrop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Options <b class="caret"></b></a>
+            <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="notedrop1">
+              <li role="presentation">
+                <a role="menuitem" onclick="Run.ui.showRunNoteDialog(${run.id});" href="javascript:void(0);">Add Note</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </nav>
     <c:if test="${fn:length(run.notes) > 0}">
       <div id="notelist" class="note" style="clear:both">
         <c:forEach items="${run.notes}" var="note" varStatus="n">
           <div class="exppreview" id="run-notes-${n.count}">
             <b>${note.creationDate}</b>: ${note.text}
-          <span class="float-right"
-                style="font-weight:bold; color:#C0C0C0;">${note.owner.loginName}</span>
+          <span class="float-right" style="font-weight:bold; color:#C0C0C0;">${note.owner.loginName}
+            <c:if test="${(project.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
+                            or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+            <span style="color:#000000"><a href='#' onclick="Run.ui.deleteRunNote('${run.runId}', '${note.noteId}');">
+              <i class="fa fa-trash-o fa-fw"></i></a></span>
+            </c:if>
+          </span>
           </div>
         </c:forEach>
       </div>
     </c:if>
     <div id="addRunNoteDialog" title="Create new Note"></div>
   </div>
-  <br/>
 </c:if>
 
 <c:if test="${not empty run.status and run.status.health.key eq 'Completed'}">
-  <h1>Run QC</h1>
-  <ul class="sddm">
-    <li>
-      <a onmouseover="mopen('qcmenu')" onmouseout="mclosetime()">Options
-        <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
-      </a>
-
-      <div id="qcmenu"
-           onmouseover="mcancelclosetime()"
-           onmouseout="mclosetime()">
-        <a href='javascript:void(0);' class="add"
-           onclick="Run.qc.generateRunQCRow(${run.id}); return false;">Add Run QC</a>
-        <c:if test="${operationsQcPassed}">
-          <a href='<c:url value="/miso/analysis/new/run/${run.id}"/>' class="add">Initiate Analysis</a>
-        </c:if>
-      </div>
-    </li>
-  </ul>
+  <nav id="navbar-runqc" class="navbar navbar-default navbar-static" role="navigation">
+    <div class="navbar-header">
+      <span id="qcsTotalCount" class="navbar-brand navbar-center">Run QCs</span>
+    </div>
+    <div class="collapse navbar-collapse bs-example-js-navbar-collapse">
+      <ul class="nav navbar-nav navbar-right">
+        <li id="runqc-menu" class="dropdown">
+          <a id="runqcdrop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Options <b class="caret"></b></a>
+          <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="runqcdrop1">
+            <li role="presentation">
+              <a onclick="Run.qc.generateRunQCRow(${run.id});" href='javascript:void(0);'>Add Run QC</a>
+            </li>
+            <c:if test="${operationsQcPassed}">
+              <li role="presentation"><a href='<c:url value="/miso/analysis/new/run/${run.id}"/>'>Initiate Analysis</a></li>
+            </c:if>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </nav>
 <span style="clear:both">
   <div id="addRunQC"></div>
-  <table class="list in" id="runQcTable">
+  <table class="table table-bordered table-striped in" id="runQcTable">
     <thead>
     <tr>
       <th>QCed By</th>
@@ -353,245 +487,251 @@
 </c:if>
 
 <div id="runinfo">
-<table width="100%">
+<table style="width:100%;">
 <tbody>
 <tr>
-<td width="50%" valign="top">
-<h2>Run Parameters</h2>
-
-<div id="runPartitions">
-<c:choose>
-<c:when test="${empty run.sequencerPartitionContainers}">
-  Container:
+<td style="width:50%; vertical-align: top; padding-right:3px;">
+<div id="container-panel" class="panel panel-default panel-primary">
+  <div class="panel-heading">
+    <h3 class="panel-title">Container Parameters</h3>
+  </div>
+  <div class="panel-body padded-panel">
   <c:choose>
-    <c:when test="${not empty run.sequencerReference}">
-      <c:forEach var="platformContainerCount" begin="1"
-                 end="${run.sequencerReference.platform.numContainers}" step="1"
-                 varStatus="platformContainer">
-        <input id='container${platformContainerCount}select' name='containerselect'
-               onchange="Run.container.changeContainer(this.value, '${run.platformType.key}', ${run.sequencerReference.id});"
-               type='radio'
-               value='${platformContainerCount}'/>${platformContainerCount}
-      </c:forEach>
+    <c:when test="${empty run.sequencerPartitionContainers}">
+      <div id="runPartitions">
+        Container:
+        <c:choose>
+          <c:when test="${not empty run.sequencerReference}">
+            <c:forEach var="platformContainerCount" begin="1"
+                       end="${run.sequencerReference.platform.numContainers}" step="1"
+                       varStatus="platformContainer">
+              <input id='container${platformContainerCount}select' name='containerselect'
+                     onchange="Run.container.changeContainer(this.value, '${run.platformType.key}', ${run.sequencerReference.id});"
+                     type='radio'
+                     value='${platformContainerCount}'/>${platformContainerCount}
+            </c:forEach>
+          </c:when>
+          <c:otherwise>
+            <input id='container1select' name='containerselect'
+                   onchange="Run.container.changeContainer(this.value, '${run.platformType.key}', ${run.sequencerReference.id});"
+                   type='radio' value='1'/>1
+          </c:otherwise>
+        </c:choose>
+
+        <div id='containerdiv' class="note ui-corner-all"></div>
+      </div>
     </c:when>
     <c:otherwise>
-      <input id='container1select' name='containerselect'
-             onchange="Run.container.changeContainer(this.value, '${run.platformType.key}', ${run.sequencerReference.id});"
-             type='radio' value='1'/>1
-    </c:otherwise>
-  </c:choose>
-  <br/>
-
-  <div id='containerdiv' class="note ui-corner-all"></div>
-</c:when>
-<c:otherwise>
-  <c:forEach items="${run.sequencerPartitionContainers}" var="container" varStatus="containerCount">
-    <div class="note ui-corner-all">
-      <h2>Container ${containerCount.count}</h2>
-      <c:if test="${not empty container.identificationBarcode}">
-        <ul class="sddm">
-          <li>
-            <a onmouseover="mopen('containermenu')" onmouseout="mclosetime()">Options
-              <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
-            </a>
-
-            <div class="run" id="containermenu"
-                 onmouseover="mcancelclosetime()"
-                 onmouseout="mclosetime()">
-              <c:if test="${run.platformType.key eq 'Illumina'}">
-                <a href="javascript:void(0);"
-                   onclick="Run.container.generateCasava17DemultiplexCSV(${run.id}, ${container.id});">Demultiplex
-                  CSV (pre-1.8)</a>
-                <a href="javascript:void(0);"
-                   onclick="Run.container.generateCasava18DemultiplexCSV(${run.id}, ${container.id});">Demultiplex
-                  CSV (1.8+)</a>
+      <div id="containerPartitions">
+        <c:forEach items="${run.sequencerPartitionContainers}" var="container" varStatus="containerCount">
+          <div class="panel panel-default">
+            <nav id="navbar-cont-${containerCount.count}" class="navbar navbar-default navbar-static" role="navigation">
+              <div class="navbar-header">
+                <span class="navbar-brand navbar-center">Container ${containerCount.count}</span>
+              </div>
+              <c:if test="${not empty container.identificationBarcode}">
+              <div class="collapse navbar-collapse bs-example-js-navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                  <li id="cont-${containerCount.count}-menu" class="dropdown">
+                    <a id="cont-${containerCount.count}-drop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Options <b class="caret"></b></a>
+                    <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="cont-${containerCount.count}-drop1">
+                      <li role="presentation"><a href="javascript:void(0);" onclick="Run.container.generateCasava18DemultiplexCSV(${run.id}, ${container.id});">Demultiplex CSV (1.8+)</a></li>
+                      <li role="presentation"><a href="javascript:void(0);" onclick="Run.container.generateCasava17DemultiplexCSV(${run.id}, ${container.id});">Demultiplex CSV (pre-1.8)</a></li>
+                    </ul>
+                  </li>
+                </ul>
+              </div>
               </c:if>
-            </div>
-          </li>
-        </ul>
-      </c:if>
-      <div style="clear:both"></div>
-      <table class="in">
-        <tr>
-          <c:choose>
-            <c:when test="${empty container.identificationBarcode}">
-              <td>ID:</td>
-              <td>
-                <button onclick='Run.container.lookupContainer(this, ${containerCount.index});'
-                        type='button' class='right-button ui-state-default ui-corner-all'>
-                  Lookup
-                </button>
-                <div style='overflow:hidden'>
-                  <form:input
-                      path="sequencerPartitionContainers[${containerCount.index}].identificationBarcode"/>
-                </div>
-              </td>
-            </c:when>
-            <c:otherwise>
-              <td>ID:</td>
-              <td>
-                <span id="idBarcode">${container.identificationBarcode}</span>
-                <c:if test="${(container.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
-                                                    or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-                  <a href="javascript:void(0);"
-                     onclick="Run.ui.editContainerIdBarcode(jQuery('#idBarcode'), ${containerCount.index})">
-                    <span class="fg-button ui-icon ui-icon-pencil"></span>
-                  </a>
-                </c:if>
-              </td>
-            </c:otherwise>
-          </c:choose>
-        </tr>
-        <tr>
-          <c:choose>
-            <c:when test="${empty container.locationBarcode}">
-              <td>Location:</td>
-              <td><form:input
-                  path="sequencerPartitionContainers[${containerCount.index}].locationBarcode"/></td>
-            </c:when>
-            <c:otherwise>
-              <td>Location:</td>
-              <td>
-                <span id="locationBarcode">${container.locationBarcode}</span>
-                <c:if test="${(container.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
-                                                    or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-                  <a href="javascript:void(0);"
-                     onclick="Run.ui.editContainerLocationBarcode(jQuery('#locationBarcode'), ${containerCount.index})">
-                    <span class="fg-button ui-icon ui-icon-pencil"></span>
-                  </a>
-                </c:if>
-              </td>
-            </c:otherwise>
-          </c:choose>
-        </tr>
-        <tr>
-          <c:choose>
-            <c:when test="${empty container.validationBarcode}">
-              <td>Validation:</td>
-              <td><form:input
-                  path="sequencerPartitionContainers[${containerCount.index}].validationBarcode"/></td>
-            </c:when>
-            <c:otherwise>
-              <td>Validation:</td>
-              <td>
-                <span id="validationBarcode">${container.validationBarcode}</span>
-                <c:if test="${(container.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
-                                                    or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-                  <a href="javascript:void(0);"
-                     onclick="editContainerValidationBarcode(jQuery('#validationBarcode'), 0)">
-                    <span class="fg-button ui-icon ui-icon-pencil"></span>
-                  </a>
-                </c:if>
-              </td>
-            </c:otherwise>
-          </c:choose>
-        </tr>
-          <%--
-          <tr>
-              <td>Paired: ${container.paired}</td>
-          </tr>
-          --%>
-      </table>
-      <div id='partitionErrorDiv'></div>
-      <div id="partitionDiv">
-        <i class="italicInfo">Click in a partition box to beep/type in barcodes, or double click a
-          pool on the right to sequentially add pools to the container</i>
-        <table class="in">
-          <th>Partition No.</th>
-          <th>Pool</th>
-          <c:if test="${statsAvailable}">
-            <th>Stats</th>
-          </c:if>
-          <c:forEach items="${container.partitions}" var="partition" varStatus="partitionCount">
-            <tr>
-              <td>${partition.partitionNumber}</td>
-              <td width="90%">
+            </nav>
+
+            <table class="in">
+              <tr>
                 <c:choose>
-                  <c:when test="${not empty partition.pool}">
-                    <div class="dashboard">
-                        <%-- <a href='<c:url value="/miso/pool/${fn:toLowerCase(run.platformType.key)}/${partition.pool.id}"/>'> --%>
-                      <a href='<c:url value="/miso/pool/${partition.pool.id}"/>'>
-                          ${partition.pool.name}
-                        (${partition.pool.creationDate})
-                      </a><br/>
-                      <span style="font-size:8pt">
-                        <c:choose>
-                          <c:when test="${not empty partition.pool.experiments}">
-                            <i><c:forEach items="${partition.pool.experiments}"
-                                          var="experiment">
-                              ${experiment.study.project.alias} (${experiment.name}: ${fn:length(partition.pool.dilutions)} dilutions)<br/>
-                            </c:forEach>
-                            </i>
-                            <input type="hidden"
-                                   name="sequencerPartitionContainers[${containerCount.index}].partitions[${partitionCount.index}].pool"
-                                   id="pId${partitionCount.index}"
-                                   value="${partition.pool.id}"/>
-                          </c:when>
-                          <c:otherwise>
-                            <i>No experiment linked to this pool</i>
-                          </c:otherwise>
-                        </c:choose>
-                      </span>
-                    </div>
+                  <c:when test="${empty container.identificationBarcode}">
+                    <td>ID:</td>
+                    <td>
+                      <form:input path="sequencerPartitionContainers[${containerCount.index}].identificationBarcode" class="form-control"/>
+                    </td>
+                    <td>
+                      <button onclick='Run.container.lookupContainer(this, ${containerCount.index});'
+                              type='button' class='btn btn-default pull-right'>Lookup
+                      </button>
+                    </td>
                   </c:when>
                   <c:otherwise>
-                    <div id="p_div_${partitionCount.index}"
-                         class="elementListDroppableDiv">
-                      <div class="runPartitionDroppable"
-                           bind="sequencerPartitionContainers[${containerCount.index}].partitions[${partitionCount.index}].pool"
-                           partition="${containerCount.index}_${partitionCount.index}"
-                           ondblclick='Run.container.populatePartition(this, ${containerCount.index}, ${partitionCount.index});'></div>
-                    </div>
+                    <td>ID:</td>
+                    <td>
+                      <span id="idBarcode">${container.identificationBarcode}</span>
+                    </td>
+                    <td>
+                      <a href="javascript:void(0);"
+                         onclick="Run.ui.editContainerIdBarcode(jQuery('#idBarcode'), ${containerCount.index})">
+                        <span class="fa fa-pencil-square-o fa-lg"></span>
+                      </a>
+                    </td>
                   </c:otherwise>
                 </c:choose>
-              </td>
-              <c:if test="${statsAvailable}">
-                <td><img id="charttrigger" src="<c:url value='/styles/images/chart-bar-icon.png'/>"
-                         border="0"
-                         onclick="Stats.getPartitionStats(${run.id}, ${partition.partitionNumber}); checkstats(${run.id}, ${partition.partitionNumber}); ">
-                </td>
-              </c:if>
-            </tr>
-          </c:forEach>
-        </table>
+              </tr>
+              <tr>
+                <c:choose>
+                  <c:when test="${empty container.locationBarcode}">
+                    <td>Location:</td>
+                    <td><form:input
+                        path="sequencerPartitionContainers[${containerCount.index}].locationBarcode" class="form-control"/></td>
+                  </c:when>
+                  <c:otherwise>
+                    <td>Location:</td>
+                    <td>
+                      <span id="locationBarcode">${container.locationBarcode}</span>
+                      <c:if test="${(container.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
+                                                          or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+                        <a href="javascript:void(0);"
+                           onclick="Run.ui.editContainerLocationBarcode(jQuery('#locationBarcode'), ${containerCount.index})">
+                          <span class="fa fa-pencil-square-o fa-lg"></span>
+                        </a>
+                      </c:if>
+                    </td>
+                  </c:otherwise>
+                </c:choose>
+              </tr>
+              <tr>
+                <c:choose>
+                  <c:when test="${empty container.validationBarcode}">
+                    <td>Validation:</td>
+                    <td><form:input
+                        path="sequencerPartitionContainers[${containerCount.index}].validationBarcode" class="form-control"/></td>
+                  </c:when>
+                  <c:otherwise>
+                    <td>Validation:</td>
+                    <td>
+                      <span id="validationBarcode">${container.validationBarcode}</span>
+                      <c:if test="${(container.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
+                                                          or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+                        <a href="javascript:void(0);"
+                           onclick="editContainerValidationBarcode(jQuery('#validationBarcode'), 0)">
+                          <span class="fa fa-pencil-square-o fa-lg"></span>
+                        </a>
+                      </c:if>
+                    </td>
+                  </c:otherwise>
+                </c:choose>
+              </tr>
+            </table>
+            <div id='partitionErrorDiv'></div>
+            <div id="partitionDiv">
+              <i class="italicInfo">Click in a partition box to beep/type in barcodes, or double click a
+                pool on the right to sequentially add pools to the container</i>
+              <table class="in">
+                <c:forEach items="${container.partitions}" var="partition" varStatus="partitionCount">
+                  <tr>
+                    <td class="partition-number">${partition.partitionNumber}</td>
+                    <td>
+                      <c:choose>
+                        <c:when test="${not empty partition.pool}">
+                          <div class="dashboard">
+                              <%-- <a href='<c:url value="/miso/pool/${fn:toLowerCase(run.platformType.key)}/${partition.pool.id}"/>'> --%>
+                            <a href='<c:url value="/miso/pool/${partition.pool.id}"/>'>
+                                ${partition.pool.name}
+                              (${partition.pool.creationDate})
+                            </a><br/>
+                            <span style="font-size:8pt" id='partition_span_${partitionCount.index}'>
+                              <c:choose>
+                                <c:when test="${not empty partition.pool.experiments}">
+                                  <i><c:forEach items="${partition.pool.experiments}" var="experiment">
+                                    ${experiment.study.project.alias} (${experiment.name}: ${fn:length(partition.pool.dilutions)} dilutions)<br/>
+                                  </c:forEach>
+                                  </i>
+                                  <script>
+                                    jQuery(document).ready(function () {
+                                      Run.container.checkPoolExperiment('#partition_span_${partitionCount.index}', ${partition.pool.id}, ${partitionCount.index});
+                                    });
+                                  </script>
+                                  <input type="hidden"
+                                         name="sequencerPartitionContainers[${containerCount.index}].partitions[${partitionCount.index}].pool"
+                                         id="pId${partitionCount.index}"
+                                         value="${partition.pool.id}"/>
+                                </c:when>
+                                <c:otherwise>
+                                  <i>No experiment linked to this pool</i>
+                                </c:otherwise>
+                              </c:choose>
+                            </span>
+                          </div>
+                        </c:when>
+                        <c:otherwise>
+                          <div id="p_div_${partitionCount.index}"
+                               class="elementListDroppableDiv">
+                            <div class="runPartitionDroppable"
+                                 bind="sequencerPartitionContainers[${containerCount.index}].partitions[${partitionCount.index}].pool"
+                                 partition="${containerCount.index}_${partitionCount.index}"
+                                 ondblclick='Run.container.populatePartition(this, ${containerCount.index}, ${partitionCount.index});'></div>
+                          </div>
+                        </c:otherwise>
+                      </c:choose>
+                    </td>
+                    <c:if test="${statsAvailable}">
+                      <td><img id="charttrigger" src="<c:url value='/styles/images/chart-bar-icon.png'/>"
+                               border="0"
+                               onclick="Stats.getPartitionStats(${run.id}, ${partition.partitionNumber}); checkstats(${run.id}, ${partition.partitionNumber}); ">
+                      </td>
+                    </c:if>
+                  </tr>
+                </c:forEach>
+              </table>
+            </div>
+            <input type="hidden" value="${container.id}"
+                   id="sequencerPartitionContainers${containerCount.count-1}"
+                   name="sequencerPartitionContainers"/>
+          </div>
+        </c:forEach>
       </div>
-      <input type="hidden" value="${container.id}"
-             id="sequencerPartitionContainers${containerCount.count-1}"
-             name="sequencerPartitionContainers"/>
-    </div>
-  </c:forEach>
-</c:otherwise>
-</c:choose>
-  <%-- <form:hidden path="sequencerPartitionContainers"/> --%>
+    </c:otherwise>
+  </c:choose>
+  </div>
 </div>
 </td>
 <td width="50%" valign="top">
-  <h2>Available Pools</h2>
-  <c:choose>
-    <c:when test="${not empty run.platformType}">
-      <input id="showOnlyReady" type="checkbox" checked="true"
-             onclick="Run.pool.toggleReadyToRunCheck(this, '${run.platformType.key}');"/>Only Ready to Run pools?
-      <div align="right" style="margin-top: -23px; margin-bottom:3px">Filter:
-        <input type="text" size="8" id="searchPools" name="searchPools"/></div>
-      <script type="text/javascript">
-        Utils.timer.typewatchFunc(jQuery('#searchPools'), function () {
-          Run.pool.poolSearch(jQuery('#searchPools').val(), '${run.platformType.key}');
-        }, 300, 2);
-      </script>
-    </c:when>
-    <c:otherwise>
-      <input id="showOnlyReady" type="checkbox" checked="true"
-             onclick="Run.pool.toggleReadyToRunCheck(this, jQuery('input[name=platformType]:checked').val());"/>Only Ready to Run pools?
-      <div align="right" style="margin-top: -23px; margin-bottom:3px">Filter:
-        <input type="text" size="8" id="searchPools" name="searchPools"/></div>
-      <script type="text/javascript">
-        Utils.timer.typewatchFunc(jQuery('#searchPools'), function () {
-          Run.pool.poolSearch(jQuery('#searchPools').val(), jQuery('input[name=platformType]:checked').val());
-        }, 300, 2);
-      </script>
-    </c:otherwise>
-  </c:choose>
-  <div id='poolList' class="elementList ui-corner-all" style="height:500px">
+  <div id="pools-panel" class="panel panel-default panel-primary">
+    <div class="panel-heading">
+      <h3 class="panel-title">Available Pools</h3>
+      <div class="float-right" style="margin-top: -20px;">
+        <c:choose>
+          <c:when test="${not empty run.platformType}">
+          <div class="float-left" style="padding-right: 10px;">
+            <input id="showOnlyReady" type="checkbox" checked="true"
+                   onclick="Run.pool.toggleReadyToRunCheck(this, '${run.platformType.key}');"/>Only Ready to Run pools?
+          </div>
+          <div style="margin-top: -3px; margin-bottom:3px; float:right; width: 165px;">
+            <label for="searchPools" style="margin-top:5px; float:left">Filter:</label>
+            <input type="text" size="8" id="searchPools" name="searchPools" class="form-control float-right" style="width:120px">
+          </div>
+          <script type="text/javascript">
+            Utils.timer.typewatchFunc(jQuery('#searchPools'), function () {
+              Run.pool.poolSearch(jQuery('#searchPools').val(), '${run.platformType.key}');
+            }, 300, 2);
+          </script>
+        </c:when>
+        <c:otherwise>
+          <div class="float-left" style="padding-right: 10px;">
+            <input id="showOnlyReady" type="checkbox" checked="true"
+                   onclick="Run.pool.toggleReadyToRunCheck(this, jQuery('input[name=platformType]:checked').val());"/>Only Ready to Run pools?
+          </div>
+          <div style="margin-top: -3px; margin-bottom:3px; float:right; width: 165px;">
+            <label for="searchPools" style="margin-top:5px; float:left">Filter:</label>
+            <input type="text" size="8" id="searchPools" name="searchPools" class="form-control float-right" style="width:120px">
+          </div>
+          <script type="text/javascript">
+            Utils.timer.typewatchFunc(jQuery('#searchPools'), function () {
+              Run.pool.poolSearch(jQuery('#searchPools').val(), jQuery('input[name=platformType]:checked').val());
+            }, 300, 2);
+          </script>
+        </c:otherwise>
+      </c:choose>
+      </div>
+    </div>
+    <div class="panel-body padded-panel">
+      <div id='poolList' class="list-group" style="height:500px"></div>
+    </div>
   </div>
 </td>
 </tr>
@@ -632,17 +772,21 @@
       maxCount: ${maxLengths['description']},
       countDirection: 'down'
     });
+
     <c:choose>
     <c:when test="${not empty run.platformType}">
-    Run.pool.poolSearch("", '${run.platformType.key}');
+      Run.pool.poolSearch("", '${run.platformType.key}');
+      <c:if test="${run.id != 0}">
+        Stats.checkRunProgress('${run.alias}', '${run.platformType.key}');
+      </c:if>
     </c:when>
     <c:otherwise>
-    Run.pool.poolSearch("", jQuery('input[name=platformType]:checked').val());
+      Run.pool.poolSearch("", jQuery('input[name=platformType]:checked').val());
     </c:otherwise>
     </c:choose>
 
     <c:if test="${statsAvailable}">
-    Stats.getRunStats(${run.id});
+      Stats.getRunStats(${run.id});
     </c:if>
   });
 

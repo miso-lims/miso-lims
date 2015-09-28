@@ -25,21 +25,24 @@ package uk.ac.bbsrc.tgac.miso.core.manager;
 
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
+import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.*;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaPool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ls454.LS454Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.solid.SolidPool;
 import uk.ac.bbsrc.tgac.miso.core.data.type.*;
 import uk.ac.bbsrc.tgac.miso.core.event.Alert;
 import uk.ac.bbsrc.tgac.miso.core.store.*;
+import uk.ac.bbsrc.tgac.miso.core.workflow.Workflow;
+import uk.ac.bbsrc.tgac.miso.core.workflow.WorkflowDefinition;
+import uk.ac.bbsrc.tgac.miso.core.workflow.WorkflowProcess;
+import uk.ac.bbsrc.tgac.miso.core.workflow.WorkflowProcessDefinition;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.*;
 
 /**
@@ -61,6 +64,8 @@ public class MisoRequestManager implements RequestManager {
   private EmPCRStore emPCRStore;
   @Autowired
   private ExperimentStore experimentStore;
+  @Autowired
+  private EntityGroupStore entityGroupStore;
   @Autowired
   private KitStore kitStore;
   @Autowired
@@ -101,6 +106,16 @@ public class MisoRequestManager implements RequestManager {
   private StudyStore studyStore;
   @Autowired
   private Store<Submission> submissionStore;
+  @Autowired
+  private WorkflowStore workflowStore;
+  @Autowired
+  private WorkflowProcessStore workflowProcessStore;
+  @Autowired
+  private WorkflowDefinitionStore workflowDefinitionStore;
+  @Autowired
+  private WorkflowProcessDefinitionStore workflowProcessDefinitionStore;
+  @Autowired
+  private StateStore stateStore;
 
   public void setAlertStore(AlertStore alertStore) {
     this.alertStore = alertStore;
@@ -120,6 +135,10 @@ public class MisoRequestManager implements RequestManager {
 
   public void setExperimentStore(ExperimentStore experimentStore) {
     this.experimentStore = experimentStore;
+  }
+
+  public void setEntityGroupStore(EntityGroupStore entityGroupStore) {
+    this.entityGroupStore = entityGroupStore;
   }
 
   public void setKitStore(KitStore kitStore) {
@@ -200,6 +219,26 @@ public class MisoRequestManager implements RequestManager {
 
   public void setSubmissionStore(Store<Submission> submissionStore) {
     this.submissionStore = submissionStore;
+  }
+
+  public void setWorkflowStore(WorkflowStore workflowStore) {
+    this.workflowStore = workflowStore;
+  }
+
+  public void setWorkflowProcessStore(WorkflowProcessStore workflowProcessStore) {
+    this.workflowProcessStore = workflowProcessStore;
+  }
+
+  public void setWorkflowDefinitionStore(WorkflowDefinitionStore workflowDefinitionStore) {
+    this.workflowDefinitionStore = workflowDefinitionStore;
+  }
+
+  public void setWorkflowProcessDefinitionStore(WorkflowProcessDefinitionStore workflowProcessDefinitionStore) {
+    this.workflowProcessDefinitionStore = workflowProcessDefinitionStore;
+  }
+
+  public void setStateStore(StateStore stateStore) {
+    this.stateStore = stateStore;
   }
 
   @Override
@@ -374,6 +413,16 @@ public class MisoRequestManager implements RequestManager {
   public Collection<Sample> listAllSamplesWithLimit(long limit) throws IOException {
     if (sampleStore != null) {
       return sampleStore.listAllWithLimit(limit);
+    }
+    else {
+      throw new IOException("No sampleStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public Collection<Sample> listAllSamplesByReceivedDate(long limit) throws IOException {
+    if (sampleStore != null) {
+      return sampleStore.listAllByReceivedDate(limit);
     }
     else {
       throw new IOException("No sampleStore available. Check that it has been declared in the Spring config.");
@@ -571,6 +620,16 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
+  public Collection<Pool<? extends Poolable>> listPoolsBySampleId(long sampleId) throws IOException {
+    if (poolStore != null) {
+      return poolStore.listBySampleId(sampleId);
+    }
+    else {
+      throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
   public Collection<PoolQC> listAllPoolQCsByPoolId(long poolId) throws IOException {
     if (poolQcStore != null) {
       return poolQcStore.listByPoolId(poolId);
@@ -687,6 +746,16 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
+  public Collection<LibraryDilution> listAllLibraryDilutionsWithLimit(long limit) throws IOException {
+    if (libraryDilutionStore != null) {
+      return libraryDilutionStore.listAllWithLimit(limit);
+    }
+    else {
+      throw new IOException("No libraryDilutionStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
   public Collection<LibraryDilution> listAllLibraryDilutionsByLibraryId(long libraryId) throws IOException {
     if (libraryDilutionStore != null) {
       return libraryDilutionStore.listByLibraryId(libraryId);
@@ -727,6 +796,16 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
+  public Collection<LibraryDilution> listAllLibraryDilutionsBySearchOnly(String query) throws IOException {
+    if (libraryDilutionStore != null) {
+      return libraryDilutionStore.listAllLibraryDilutionsBySearchOnly(query);
+    }
+    else {
+      throw new IOException("No libraryDilutionStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
   public Collection<LibraryDilution> listAllLibraryDilutionsByProjectAndPlatform(long projectId, PlatformType platformType) throws IOException {
     if (libraryDilutionStore != null) {
       return libraryDilutionStore.listAllLibraryDilutionsByProjectAndPlatform(projectId, platformType);
@@ -748,7 +827,7 @@ public class MisoRequestManager implements RequestManager {
 
 
   @Override
-  public Collection<emPCRDilution> listAllEmPcrDilutions() throws IOException {
+  public Collection<emPCRDilution> listAllEmPCRDilutions() throws IOException {
     if (emPCRDilutionStore != null) {
       return emPCRDilutionStore.listAll();
     }
@@ -758,7 +837,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<emPCRDilution> listAllEmPcrDilutionsByPlatform(PlatformType platformType) throws IOException {
+  public Collection<emPCRDilution> listAllEmPCRDilutionsByPlatform(PlatformType platformType) throws IOException {
     if (emPCRDilutionStore != null) {
       return emPCRDilutionStore.listAllEmPcrDilutionsByPlatform(platformType);
     }
@@ -768,7 +847,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<emPCRDilution> listAllEmPcrDilutionsByPoolAndPlatform(long poolId, PlatformType platformType) throws IOException {
+  public Collection<emPCRDilution> listAllEmPCRDilutionsByPoolAndPlatform(long poolId, PlatformType platformType) throws IOException {
     if (emPCRDilutionStore != null) {
       return emPCRDilutionStore.listAllEmPcrDilutionsByPoolAndPlatform(poolId, platformType);
     }
@@ -808,7 +887,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<emPCRDilution> listAllEmPcrDilutionsByEmPcrId(long pcrId) throws IOException {
+  public Collection<emPCRDilution> listAllEmPCRDilutionsByEmPcrId(long pcrId) throws IOException {
     if (emPCRDilutionStore != null) {
       return emPCRDilutionStore.listAllByEmPCRId(pcrId);
     }
@@ -818,7 +897,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<emPCRDilution> listAllEmPcrDilutionsByProjectId(long projectId) throws IOException {
+  public Collection<emPCRDilution> listAllEmPCRDilutionsByProjectId(long projectId) throws IOException {
     if (emPCRDilutionStore != null) {
       return emPCRDilutionStore.listAllEmPcrDilutionsByProjectId(projectId);
     }
@@ -828,7 +907,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<emPCRDilution> listAllEmPcrDilutionsBySearch(String query, PlatformType platformType) throws IOException {
+  public Collection<emPCRDilution> listAllEmPCRDilutionsBySearch(String query, PlatformType platformType) throws IOException {
     if (emPCRDilutionStore != null) {
       return emPCRDilutionStore.listAllEmPcrDilutionsBySearch(query, platformType);
     }
@@ -838,7 +917,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<emPCRDilution> listAllEmPcrDilutionsByProjectAndPlatform(long projectId, PlatformType platformType) throws IOException {
+  public Collection<emPCRDilution> listAllEmPCRDilutionsByProjectAndPlatform(long projectId, PlatformType platformType) throws IOException {
     if (emPCRDilutionStore != null) {
       return emPCRDilutionStore.listAllEmPcrDilutionsByProjectAndPlatform(projectId, platformType);
     }
@@ -911,6 +990,16 @@ public class MisoRequestManager implements RequestManager {
   public Collection<Study> listAllStudiesBySearch(String query) throws IOException {
     if (studyStore != null) {
       return studyStore.listBySearch(query);
+    }
+    else {
+      throw new IOException("No studyStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public Collection<Study> listAllStudiesByLibraryId(long libraryId) throws IOException {
+    if (studyStore != null) {
+      return studyStore.listByLibraryId(libraryId);
     }
     else {
       throw new IOException("No studyStore available. Check that it has been declared in the Spring config.");
@@ -1264,6 +1353,267 @@ public class MisoRequestManager implements RequestManager {
     }
   }
 
+  @Override
+  public <T extends Nameable, S extends Nameable> Collection<HierarchicalEntityGroup<T, S>> listAllEntityGroupsByEntityType(Class<T> parentType, Class<S> entityType) throws IOException {
+    if (entityGroupStore != null) {
+      return entityGroupStore.listByEntityType(parentType, entityType);
+    }
+    else {
+      throw new IOException("No entityGroupStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+//WORKFLOW
+  @Override
+  public Workflow getWorkflowById(long workflowId) throws IOException {
+    if (workflowStore != null) {
+      return workflowStore.get(workflowId);
+    }
+    else {
+      throw new IOException("No workflowStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public WorkflowProcess getWorkflowProcessById(long workflowProcessId) throws IOException {
+    if (workflowProcessStore != null) {
+      return workflowProcessStore.get(workflowProcessId);
+    }
+    else {
+      throw new IOException("No workflowProcessStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public WorkflowDefinition getWorkflowDefinitionById(long workflowDefinitionId) throws IOException {
+    if (workflowDefinitionStore != null) {
+      return workflowDefinitionStore.get(workflowDefinitionId);
+    }
+    else {
+      throw new IOException("No workflowDefinitionStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public WorkflowProcessDefinition getWorkflowProcessDefinitionById(long workflowProcessDefinitionId) throws IOException {
+    if (workflowProcessDefinitionStore != null) {
+      return workflowProcessDefinitionStore.get(workflowProcessDefinitionId);
+    }
+    else {
+      throw new IOException("No workflowProcessDefinitionStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public Collection<Workflow> listAllWorkflows() throws IOException {
+    if (workflowStore != null) {
+      return workflowStore.listAll();
+    }
+    else {
+      throw new IOException("No workflowStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public Collection<Workflow> listWorkflowsByAssignee(long userId) throws IOException {
+    if (workflowStore != null) {
+      return workflowStore.listAllByAssignee(userId);
+    }
+    else {
+      throw new IOException("No workflowStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public Collection<Workflow> listIncompleteWorkflows() throws IOException {
+    if (workflowStore != null) {
+      return workflowStore.listAllIncomplete();
+    }
+    else {
+      throw new IOException("No workflowStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public Collection<Workflow> listWorkflowsByStatus(HealthType healthType) throws IOException {
+    if (workflowStore != null) {
+      return workflowStore.listAllByStatus(healthType);
+    }
+    else {
+      throw new IOException("No workflowStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public Collection<WorkflowDefinition> listAllWorkflowDefinitions() throws IOException {
+    if (workflowDefinitionStore != null) {
+      return workflowDefinitionStore.listAll();
+    }
+    else {
+      throw new IOException("No workflowDefinitionStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public Collection<WorkflowDefinition> listWorkflowDefinitionsBySearch(String searchStr) throws IOException {
+    if (workflowDefinitionStore != null) {
+      return workflowDefinitionStore.listBySearch(searchStr);
+    }
+    else {
+      throw new IOException("No workflowDefinitionStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public Collection<WorkflowProcessDefinition> listAllWorkflowProcessDefinitions() throws IOException {
+    if (workflowProcessDefinitionStore != null) {
+      return workflowProcessDefinitionStore.listAll();
+    }
+    else {
+      throw new IOException("No workflowProcessDefinitionStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public Collection<WorkflowProcessDefinition> listWorkflowProcessDefinitionsBySearch(String searchStr) throws IOException {
+    if (workflowProcessDefinitionStore != null) {
+      return workflowProcessDefinitionStore.listBySearch(searchStr);
+    }
+    else {
+      throw new IOException("No workflowDefinitionStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public long saveWorkflow(Workflow workflow) throws IOException {
+    if (workflowStore != null) {
+      return workflowStore.save(workflow);
+    }
+    else {
+      throw new IOException("No workflowStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public long saveWorkflowProcess(WorkflowProcess workflowProcess) throws IOException {
+    if (workflowProcessStore != null) {
+      return workflowProcessStore.save(workflowProcess);
+    }
+    else {
+      throw new IOException("No workflowProcessStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public long saveWorkflowDefinition(WorkflowDefinition workflowDefinition) throws IOException {
+    if (workflowDefinitionStore != null) {
+      return workflowDefinitionStore.save(workflowDefinition);
+    }
+    else {
+      throw new IOException("No workflowDefinitionStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public long saveWorkflowProcessDefinition(WorkflowProcessDefinition workflowProcessDefinition) throws IOException {
+    if (workflowProcessDefinitionStore != null) {
+      return workflowProcessDefinitionStore.save(workflowProcessDefinition);
+    }
+    else {
+      throw new IOException("No workflowProcessDefinitionStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public Set<String> listAllStateKeys() throws IOException {
+    if (stateStore != null) {
+      return stateStore.listAllKeys();
+    }
+    else {
+      throw new IOException("No stateStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public Map<Long, String> listStateKeysBySearch(String str) throws IOException {
+    if (stateStore != null) {
+      return stateStore.listStateKeysBySearch(str);
+    }
+    else {
+      throw new IOException("No stateStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public boolean validateStateKeys(Set<String> keys) throws IOException {
+    if (stateStore != null) {
+      return stateStore.validateKeys(keys);
+    }
+    else {
+      throw new IOException("No stateStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public long getIdForStateKey(String key) throws IOException {
+    if (stateStore != null) {
+      return stateStore.getIdForKey(key);
+    }
+    else {
+      throw new IOException("No stateStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public String getStateKey(long keyId) throws IOException {
+    if (stateStore != null) {
+      return stateStore.getKey(keyId);
+    }
+    else {
+      throw new IOException("No stateStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public String getStateValue(long valueId) throws IOException {
+    if (stateStore != null) {
+      return stateStore.getValue(valueId);
+    }
+    else {
+      throw new IOException("No stateStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public long saveStateKey(String key) throws IOException {
+    if (stateStore != null) {
+      return stateStore.saveKey(key);
+    }
+    else {
+      throw new IOException("No stateStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public long saveStateValue(String value) throws IOException {
+    if (stateStore != null) {
+      return stateStore.saveValue(value);
+    }
+    else {
+      throw new IOException("No stateStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public List<Map<Long, Long>> saveState(JSONObject jsonObject) throws IOException {
+    if (stateStore != null) {
+      return stateStore.saveAll(jsonObject);
+    }
+    else {
+      throw new IOException("No stateStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
   // DELETES
   @Override
   public void deleteProject(Project project) throws IOException {
@@ -1410,7 +1760,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public void deleteEmPcrDilution(emPCRDilution dilution) throws IOException {
+  public void deleteEmPCRDilution(emPCRDilution dilution) throws IOException {
     if (emPCRDilutionStore != null) {
       if (!emPCRDilutionStore.remove(dilution)) {
         throw new IOException("Unable to delete emPCRDilution.");
@@ -1450,6 +1800,54 @@ public class MisoRequestManager implements RequestManager {
     if (plateStore != null) {
       if (!plateStore.remove(plate)) {
         throw new IOException("Unable to delete Plate.");
+      }
+    }
+    else {
+      throw new IOException("No plateStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public void deleteEntityGroup(HierarchicalEntityGroup<? extends Nameable, ? extends Nameable> entityGroup) throws IOException {
+    if (entityGroupStore != null) {
+      if (!entityGroupStore.remove(entityGroup)) {
+        throw new IOException("Unable to delete EntityGroup.");
+      }
+    }
+    else {
+      throw new IOException("No entityGroupStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public void deleteContainer(SequencerPartitionContainer container) throws IOException {
+    if (sequencerPartitionContainerStore != null) {
+      if (!sequencerPartitionContainerStore.remove(container)) {
+        throw new IOException("Unable to delete container.");
+      }
+    }
+    else {
+      throw new IOException("No plateStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public void deleteNote(Note note) throws IOException {
+    if (noteStore != null) {
+      if (!noteStore.remove(note)) {
+        throw new IOException("Unable to delete note.");
+      }
+    }
+    else {
+      throw new IOException("No noteStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public void deletePartition(SequencerPoolPartition partition) throws IOException {
+    if (partitionStore != null) {
+      if (!partitionStore.remove(partition)) {
+        throw new IOException("Unable to delete partition.");
       }
     }
     else {
@@ -1779,11 +2177,31 @@ public class MisoRequestManager implements RequestManager {
     }
   }
 
+  @Override
+  public long saveEntityGroup(HierarchicalEntityGroup<? extends Nameable, ? extends Nameable> entityGroup) throws IOException {
+    if (entityGroupStore != null) {
+      return entityGroupStore.save(entityGroup);
+    }
+    else {
+      throw new IOException("No entityGroupStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
   //GETS
   @Override
   public Project getProjectById(long projectId) throws IOException {
     if (projectStore != null) {
       return projectStore.get(projectId);
+    }
+    else {
+      throw new IOException("No projectStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public Project getProjectByAlias(String projectAlias) throws IOException {
+    if (projectStore != null) {
+      return projectStore.getByAlias(projectAlias);
     }
     else {
       throw new IOException("No projectStore available. Check that it has been declared in the Spring config.");
@@ -1967,7 +2385,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public emPCRDilution getEmPcrDilutionByBarcodeAndPlatform(String barcode, PlatformType platformType) throws IOException {
+  public emPCRDilution getEmPCRDilutionByBarcodeAndPlatform(String barcode, PlatformType platformType) throws IOException {
     if (emPCRDilutionStore != null) {
       return emPCRDilutionStore.getEmPcrDilutionByBarcodeAndPlatform(barcode, platformType);
     }
@@ -2087,7 +2505,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public emPCR getEmPcrById(long pcrId) throws IOException {
+  public emPCR getEmPCRById(long pcrId) throws IOException {
     if (emPCRStore != null) {
       return emPCRStore.get(pcrId);
     }
@@ -2097,7 +2515,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public emPCRDilution getEmPcrDilutionById(long dilutionId) throws IOException {
+  public emPCRDilution getEmPCRDilutionById(long dilutionId) throws IOException {
     if (emPCRDilutionStore != null) {
       return emPCRDilutionStore.get(dilutionId);
     }
@@ -2107,7 +2525,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public emPCRDilution getEmPcrDilutionByBarcode(String barcode) throws IOException {
+  public emPCRDilution getEmPCRDilutionByBarcode(String barcode) throws IOException {
     if (emPCRDilutionStore != null) {
       return emPCRDilutionStore.getEmPcrDilutionByBarcode(barcode);
     }
@@ -2462,6 +2880,16 @@ public class MisoRequestManager implements RequestManager {
     }
     else {
       throw new IOException("No alertStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+
+  @Override
+  public HierarchicalEntityGroup<? extends Nameable, ? extends Nameable> getEntityGroupById(long entityGroupId) throws IOException {
+    if (entityGroupStore != null) {
+      return entityGroupStore.get(entityGroupId);
+    }
+    else {
+      throw new IOException("No entityGroupStore available. Check that it has been declared in the Spring config.");
     }
   }
 }

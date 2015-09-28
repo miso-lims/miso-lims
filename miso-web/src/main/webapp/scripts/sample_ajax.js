@@ -31,7 +31,20 @@ var Sample = Sample || {
         {'doOnSuccess': function (json) {
           successfunc();
         }
-        });
+      });
+    }
+  },
+
+  removeSampleFromGroup: function(sampleId, sampleGroupId, successfunc) {
+    if (confirm("Are you sure you really want to remove SAM" + sampleId + " from Sample group "+sampleGroupId+"?")) {
+      Fluxion.doAjax(
+        'sampleControllerHelperService',
+        'removeSampleFromGroup',
+        {'sampleId': sampleId, 'sampleGroupId':sampleGroupId, 'url': ajaxurl},
+        {'doOnSuccess': function (json) {
+          successfunc();
+        }
+      });
     }
   }
 };
@@ -65,13 +78,13 @@ Sample.qc = {
       var column2 = $('sampleQcTable').rows[1].insertCell(-1);
       column2.innerHTML = "<select id='sampleQcUser' name='sampleQcUser'>" + json.qcUserOptions + "</select>";
       var column3 = $('sampleQcTable').rows[1].insertCell(-1);
-      column3.innerHTML = "<input id='sampleQcDate' name='sampleQcDate' type='text'/>";
+      column3.innerHTML = "<input id='sampleQcDate' name='sampleQcDate' type='text' class='form-control'/>";
       var column4 = $('sampleQcTable').rows[1].insertCell(-1);
       column4.innerHTML = "<select id='sampleQcType' name='sampleQcType' onchange='Sample.qc.changeSampleQcUnits(this);'/>";
       var column5 = $('sampleQcTable').rows[1].insertCell(-1);
-      column5.innerHTML = "<input id='sampleQcResults' name='sampleQcResults' type='text'/><span id='units'/>";
+      column5.innerHTML = "<div class='input-group'><input id='sampleQcResults' name='sampleQcResults' type='text' class='form-control'/><span class='input-group-addon' id='units'/></div>";
       var column6 = $('sampleQcTable').rows[1].insertCell(-1);
-      column6.innerHTML = "<a href='javascript:void(0);' onclick='Sample.qc.addSampleQC();'/>Add</a>";
+      column6.innerHTML = "<div style='text-align:center;'><a href='javascript:void(0);' onclick='Sample.qc.addSampleQC();'/><span class='fa fa-fw fa-lg fa-plus-square-o'></span></a></div>";
 
       Utils.ui.addMaxDatePicker("sampleQcDate", 0);
 
@@ -147,11 +160,12 @@ Sample.qc = {
     );
   },
 
-  saveBulkLibraryQc: function () {
+  saveBulkLibraryQc: function (tableName) {
+    var lTable = jQuery(tableName);
     Utils.ui.disableButton('bulkLibraryQcButton');
-    DatatableUtils.collapseInputs('#library_table');
+    DatatableUtils.collapseInputs(tableName);
 
-    var table = jQuery('#library_table').dataTable();
+    var table = lTable.dataTable();
     var aReturn = [];
 
     var nodes = DatatableUtils.fnGetSelected(table);
@@ -175,7 +189,9 @@ Sample.qc = {
             'qcs': aReturn,
             'url': ajaxurl
           },
-          {'doOnSuccess': Sample.library.processBulkLibraryQcTable}
+          {'doOnSuccess': function(json) {
+            Sample.library.processBulkLibraryQcTable(tableName, json);
+          }}
         );
       }
       else {
@@ -191,12 +207,12 @@ Sample.qc = {
 };
 
 Sample.library = {
-  processBulkLibraryQcTable: function (json) {
+  processBulkLibraryQcTable: function (tableName, json) {
     Utils.ui.reenableButton('bulkLibraryQcButton', "Save QCs");
 
     var a = json.saved;
     for (var i = 0; i < a.length; i++) {
-      jQuery('#library_table').find("tr:gt(0)").each(function () {
+      jQuery(tableName).find("tr:gt(0)").each(function () {
         if (jQuery(this).attr("libraryId") === a[i].libraryId) {
           jQuery(this).removeClass('row_selected');
           jQuery(this).addClass('row_saved');
@@ -216,7 +232,7 @@ Sample.library = {
       var errorStr = "";
       for (var i = 0; i < errors.length; i++) {
         errorStr += errors[i].error + "\n";
-        jQuery('#library_table').find("tr:gt(0)").each(function () {
+        jQuery(tableName).find("tr:gt(0)").each(function () {
           if (jQuery(this).attr("libraryId") === errors[i].libraryId) {
             jQuery(this).find("td").each(function () {
               jQuery(this).css('background', '#EE9966');
@@ -231,12 +247,12 @@ Sample.library = {
     }
   },
 
-  saveBulkLibraryDilutions: function () {
+  saveBulkLibraryDilutions: function (tableName) {
     var self = this;
     Utils.ui.disableButton('bulkLibraryDilutionButton');
-    DatatableUtils.collapseInputs('#library_table');
+    DatatableUtils.collapseInputs(tableName);
 
-    var table = jQuery('#library_table').dataTable();
+    var table = jQuery(tableName).dataTable();
     var aReturn = [];
     var aTrs = table.fnGetNodes();
     for (var i = 0; i < aTrs.length; i++) {
@@ -261,7 +277,9 @@ Sample.library = {
             'dilutions': aReturn,
             'url': ajaxurl
           },
-          {'doOnSuccess': self.processBulkLibraryDilutionTable}
+          {'doOnSuccess': function(json) {
+            self.processBulkLibraryDilutionTable(tableName, json);
+          }}
         );
       }
       else {
@@ -275,12 +293,12 @@ Sample.library = {
     }
   },
 
-  processBulkLibraryDilutionTable: function (json) {
+  processBulkLibraryDilutionTable: function (tableName, json) {
     Utils.ui.reenableButton('bulkLibraryDilutionButton', "Save Dilutions");
 
     var a = json.saved;
     for (var i = 0; i < a.length; i++) {
-      jQuery('#library_table').find("tr:gt(0)").each(function () {
+      jQuery(tableName).find("tr:gt(0)").each(function () {
         if (jQuery(this).attr("libraryId") == a[i].libraryId) {
           jQuery(this).removeClass('row_selected');
           jQuery(this).addClass('row_saved');
@@ -300,7 +318,7 @@ Sample.library = {
       var errorStr = "";
       for (var i = 0; i < errors.length; i++) {
         errorStr += errors[i].error + "\n";
-        jQuery('#library_table').find("tr:gt(0)").each(function () {
+        jQuery(tableName).find("tr:gt(0)").each(function () {
           if (jQuery(this).attr("libraryId") === errors[i].libraryId) {
             jQuery(this).find("td").each(function () {
               jQuery(this).css('background', '#EE9966');
@@ -395,13 +413,13 @@ Sample.ui = {
 
     var v = span.find('a').text();
     if (v && v !== "") {
-      span.html("<input type='text' value='" + v + "' name='identificationBarcode' id='identificationBarcode'>");
+      span.html("<input type='text' value='" + v + "' name='identificationBarcode' id='identificationBarcode' class='form-control'>");
     }
   },
 
   editSampleLocationBarcode: function (span) {
     var v = span.find('a').text();
-    span.html("<input type='text' value='" + v + "' name='locationBarcode' id='locationBarcode'>");
+    span.html("<input type='text' value='" + v + "' name='locationBarcode' id='locationBarcode' class='form-control'>");
   },
 
   showSampleLocationChangeDialog: function (sampleId) {
@@ -410,7 +428,7 @@ Sample.ui = {
       .html("<form>" +
             "<fieldset class='dialog'>" +
             "<label for='notetext'>New Location:</label>" +
-            "<input type='text' name='locationBarcodeInput' id='locationBarcodeInput' class='text ui-widget-content ui-corner-all'/>" +
+            "<input type='text' name='locationBarcodeInput' id='locationBarcodeInput' class='form-control'/>" +
             "</fieldset></form>");
 
     jQuery(function () {
@@ -454,10 +472,10 @@ Sample.ui = {
       .html("<form>" +
             "<fieldset class='dialog'>" +
             "<label for='internalOnly'>Internal Only?</label>" +
-            "<input type='checkbox' checked='checked' name='internalOnly' id='internalOnly' class='text ui-widget-content ui-corner-all' />" +
+            "<input type='checkbox' checked='checked' name='internalOnly' id='internalOnly'/>" +
             "<br/>" +
             "<label for='notetext'>Text</label>" +
-            "<input type='text' name='notetext' id='notetext' class='text ui-widget-content ui-corner-all' />" +
+            "<input type='text' name='notetext' id='notetext' class='form-control'/>" +
             "</fieldset></form>");
 
     jQuery(function () {
@@ -496,6 +514,33 @@ Sample.ui = {
     );
   },
 
+  deleteSampleNote: function (sampleId, noteId) {
+    if (confirm("Are you sure you want to delete this note?")) {
+      Fluxion.doAjax(
+        'sampleControllerHelperService',
+        'deleteSampleNote',
+        {'sampleId': sampleId, 'noteId': noteId, 'url': ajaxurl},
+        {'doOnSuccess': Utils.page.pageReload}
+      );
+    }
+  },
+
+  deleteSampleFile: function(sampleId, fileName, fileKey) {
+    Fluxion.doAjax(
+      'sampleControllerHelperService',
+      'deleteRunFile',
+      {
+        'sampleId': sampleId,
+        'fileName': fileName,
+        'url': ajaxurl
+      },
+      {'doOnSuccess': function (json) {
+        jQuery('#file'+fileKey).remove();
+      }
+      }
+    );
+  },
+
   receiveSample: function (input) {
     var barcode = jQuery(input).val();
     if (!Utils.validation.isNullCheck(barcode)) {
@@ -507,7 +552,7 @@ Sample.ui = {
         'getSampleByBarcode',
         {'barcode': barcode, 'url': ajaxurl},
         {'doOnSuccess': function (json) {
-          var sample_desc = "<div id='" + json.id + "' class='dashboard'><table width=100%><tr><td>Sample Name: " + json.name + "<br> Sample ID: " + json.id + "<br>Desc: " + json.desc + "<br>Sample Type:" + json.type + "</td><td style='position: absolute;' align='right'><span class='float-right ui-icon ui-icon-circle-close' onclick='Sample.ui.removeSample(" + json.id + ");' style='position: absolute; top: 0; right: 0;'></span></td></tr></table> </div>";
+          var sample_desc = "<div id='" + json.id + "' class='dashboard'><table width=100%><tr><td>Sample Name: " + json.name + "<br> Sample ID: " + json.id + "<br>Desc: " + json.desc + "<br>Sample Type:" + json.type + "</td><td style='position: absolute;' align='right'><span class='fa fa-fw fa-2x fa-times-circle-o pull-right' onclick='Sample.ui.removeSample(" + json.id + ");' style='position: absolute; top: 0; right: 0;'></span></td></tr></table> </div>";
           if (jQuery("#" + json.id).length == 0) {
             jQuery("#sample_pan").append(sample_desc);
             jQuery('#msgspan').html("");
@@ -515,20 +560,10 @@ Sample.ui = {
           else {
             jQuery('#msgspan').html("<i>This sample has already been scanned</i>");
           }
-
-          //unbind to stop change error happening every time
-          //jQuery(input).unbind('keyup');
-
           //clear and focus
           jQuery(input).val("");
           jQuery(input).focus();
-
-          //rebind after setting focus
-          // Fixed for MISO-353 commented
-          // Utils.timer.typewatchFunc(jQuery('#searchSampleByBarcode'), function() {
-          // Sample.ui.receiveSample(jQuery('#searchSampleByBarcode'));
-          // }, 100, 4);
-        },
+          },
           'doOnError': function (json) {
             jQuery('#msgspan').html("<i>" + json.error + "</i>");
           }
@@ -559,7 +594,7 @@ Sample.ui = {
         {'doOnSuccess': function (json) {
           alert(json.result);
         }
-        });
+      });
     }
     else {
       alert("No samples scanned");
@@ -593,15 +628,16 @@ Sample.ui = {
             { "sTitle": "Alias"},
             { "sTitle": "Type"},
             { "sTitle": "QC Passed"},
+            { "sTitle": "QC Result"},
             { "sTitle": "Edit"}
           ],
-          "bJQueryUI": true,
+          "bJQueryUI": false,
           "iDisplayLength": 25,
-          "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
           "aaSorting": [
             [0, "desc"]
           ]
         });
+        jQuery("#listingSamplesTable_wrapper").prepend("<div class='float-right toolbar'></div>");
         jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
         jQuery("#toolbar").append("<button style=\"margin-left:5px;\" onclick=\"window.location.href='/miso/sample/new';\" class=\"fg-button ui-state-default ui-corner-all\">Add Sample</button>");
       }

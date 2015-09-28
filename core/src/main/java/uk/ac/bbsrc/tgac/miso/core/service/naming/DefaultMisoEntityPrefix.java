@@ -1,5 +1,12 @@
 package uk.ac.bbsrc.tgac.miso.core.service.naming;
 
+import org.springframework.util.NumberUtils;
+import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
+import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -15,7 +22,7 @@ import java.util.Map;
 public enum DefaultMisoEntityPrefix {
    EMP("emPCR"),
    EDI("emPCRDilution"),
-   EPO("emPCRPool"),
+   EPO("Pool"),
    EXP("Experiment"),
    LIB("Library"),
    LDI("LibraryDilution"),
@@ -26,12 +33,10 @@ public enum DefaultMisoEntityPrefix {
    SAM("Sample"),
    SPC("SequencerPartitionContainer"),
    STU("Study"),
-   IPO("IlluminaPool"),
-   SPO("SolidPool"),
-   LPO("LS454Pool"),
-   PPO("PacBioPool"),
-   TPO("TorrentPool"),
-   SUB("Submission");
+   IPO("Pool"),
+   SUB("Submission"),
+   WKF("Workflow"),
+   WKP("WorkflowProcess");
 
   /**
    * Field key
@@ -93,5 +98,30 @@ public enum DefaultMisoEntityPrefix {
       keys.add(h.getKey());
     }
     return keys;
+  }
+
+  public static <T> T getMisoObjectByName(RequestManager requestManager, String entityName, Long id) throws MisoNamingException {
+    String prefix = (entityName).substring(0, 3);
+    String ident = (entityName).substring(3);
+    long parsedId = NumberUtils.parseNumber(ident, Long.class);
+    DefaultMisoEntityPrefix p = DefaultMisoEntityPrefix.getByName(prefix);
+    try {
+      if (p != null && parsedId == id) {
+        Method m = RequestManager.class.getDeclaredMethod("get"+ LimsUtils.capitalise(p.getKey())+"ById", Long.TYPE);
+        return id != null ? (T)m.invoke(requestManager, id) : null;
+      }
+      else {
+        throw new MisoNamingException("Failed to resolve entity group element with identifier: " + prefix+ident);
+      }
+    }
+    catch (NoSuchMethodException e) {
+      throw new MisoNamingException("Failed to find method get"+p.getKey()+"ById on entity group element " + prefix+ident, e);
+    }
+    catch (InvocationTargetException e) {
+      throw new MisoNamingException("Failed to call method get"+p.getKey()+"ById on entity group element " + prefix+ident, e);
+    }
+    catch (IllegalAccessException e) {
+      throw new MisoNamingException("Failed to resolve entity group element " + prefix+ident, e);
+    }
   }
 }

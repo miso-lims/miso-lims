@@ -37,6 +37,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 /**
  * A Run represents a sequencing run on a single sequencing instrument, referenced by a {@link SequencerReference},
@@ -87,6 +88,12 @@ public interface Run extends SecurableByProfile, Submittable<Document>, Comparab
    * @param sequencerReference SequencerReference.
    */
   public void setSequencerReference(SequencerReference sequencerReference);
+
+  public List<SequencerPartitionContainer<SequencerPoolPartition>> getSequencerPartitionContainers();
+
+  public void setSequencerPartitionContainers(List<SequencerPartitionContainer<SequencerPoolPartition>> containers);
+
+  public void addSequencerPartitionContainer(SequencerPartitionContainer<SequencerPoolPartition> sequencerPartitionContainer);
 
   /**
    * Returns the platformType of this Run object.

@@ -41,6 +41,7 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.*;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.RunAlertManager;
+import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
@@ -53,6 +54,8 @@ import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.runstats.client.RunStatsException;
 import uk.ac.bbsrc.tgac.miso.runstats.client.manager.RunStatsManager;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
+import uk.ac.bbsrc.tgac.miso.webapp.context.ApplicationContextProvider;
+import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 import javax.xml.transform.TransformerException;
@@ -70,6 +73,9 @@ public class EditRunController {
   private RequestManager requestManager;
 
   @Autowired
+  private FilesManager filesManager;
+
+  @Autowired
   private DataObjectFactory dataObjectFactory;
 
   @Autowired
@@ -79,6 +85,13 @@ public class EditRunController {
   private RunAlertManager runAlertManager;
 
   private RunStatsManager runStatsManager;
+
+  @Autowired
+  private ApplicationContextProvider applicationContextProvider;
+
+  public void setApplicationContextProvider(ApplicationContextProvider applicationContextProvider) {
+    this.applicationContextProvider = applicationContextProvider;
+  }
 
   public void setInterfaceTemplate(JdbcTemplate interfaceTemplate) {
     this.interfaceTemplate = interfaceTemplate;
@@ -90,6 +103,10 @@ public class EditRunController {
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
+  }
+
+  public void setFilesManager(FilesManager filesManager) {
+    this.filesManager = filesManager;
   }
 
   public void setSecurityManager(SecurityManager securityManager) {
@@ -124,10 +141,9 @@ public class EditRunController {
     return requestManager.listAllPlatforms();
   }
 
-  public Boolean isMultiplexed(@PathVariable Long runId) throws IOException {
-    Run run = requestManager.getRunById(runId);
+  public Boolean isMultiplexed(Run run) throws IOException {
     if (run != null && run.getId() != AbstractRun.UNSAVED_ID) {
-      for (SequencerPartitionContainer<SequencerPoolPartition> f : requestManager.listSequencerPartitionContainersByRunId(run.getId())) {
+      for (SequencerPartitionContainer<SequencerPoolPartition> f : run.getSequencerPartitionContainers()) {
         for (SequencerPoolPartition p : f.getPartitions()) {
           if (p.getPool() != null && p.getPool().getDilutions().size() > 1) {
             return true;
@@ -138,8 +154,15 @@ public class EditRunController {
     return false;
   }
 
-  public Boolean hasOperationsQcPassed(@PathVariable Long runId) throws IOException {
-    Run run = requestManager.getRunById(runId);
+  @ModelAttribute("metrixEnabled")
+  public Boolean isMetrixEnabled() {
+    MisoPropertyExporter exporter = (MisoPropertyExporter)applicationContextProvider.getApplicationContext().getBean("propertyConfigurer");
+    Map<String, String> misoProperties = exporter.getResolvedProperties();
+    return misoProperties.containsKey("miso.notification.interop.enabled") && Boolean.parseBoolean(misoProperties.get("miso.notification.interop.enabled"));
+  }
+
+
+  public Boolean hasOperationsQcPassed(Run run) throws IOException {
     if (run != null && run.getId() != AbstractRun.UNSAVED_ID) {
       for (RunQC qc : run.getRunQCs()) {
         if ("SeqOps QC".equals(qc.getQcType().getName()) && !qc.getDoNotProcess()) {
@@ -150,8 +173,7 @@ public class EditRunController {
     return false;
   }
 
-  public Boolean hasInformaticsQcPassed(@PathVariable Long runId) throws IOException {
-    Run run = requestManager.getRunById(runId);
+  public Boolean hasInformaticsQcPassed(Run run) throws IOException {
     if (run != null && run.getId() != AbstractRun.UNSAVED_ID) {
       for (RunQC qc : run.getRunQCs()) {
         if ("SeqInfo QC".equals(qc.getQcType().getName()) && !qc.getDoNotProcess()) {
@@ -160,6 +182,20 @@ public class EditRunController {
       }
     }
     return false;
+  }
+
+  public Map<Integer, String> populateRunFiles(Long runId) throws IOException {
+    if (runId != AbstractRun.UNSAVED_ID) {
+      Run s = requestManager.getRunById(runId);
+      if (s != null) {
+        Map<Integer, String> fileMap = new HashMap<Integer, String>();
+        for (String f : filesManager.getFileNames(Run.class, runId.toString())) {
+          fileMap.put(f.hashCode(), f);
+        }
+        return fileMap;
+      }
+    }
+    return Collections.emptyMap();
   }
 
   public Collection<Pool<? extends Poolable>> populateAvailablePools(User user) throws IOException {
@@ -194,46 +230,6 @@ public class EditRunController {
     return setupForm(AbstractRun.UNSAVED_ID, model);
   }
 
-/*  @RequestMapping(value = "/new/experiment/{experimentId}", method = RequestMethod.GET)
-  public ModelAndView newAssignedRun(@PathVariable Long experimentId,
-                                     ModelMap model) throws IOException {
-    //clear any existing run in the model
-    model.addAttribute("run", null);
-    return setupForm(AbstractRun.UNSAVED_ID, experimentId, model);
-  }*/
-
-/*  @RequestMapping(value = "/{runId}", method = RequestMethod.GET)
-  public ModelAndView setupForm(@PathVariable Long runId,
-                                ModelMap model) throws IOException {
-
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Run run = requestManager.getRunById(runId);
-      if (run != null) {
-        if (!run.userCanRead(user)) {
-          throw new SecurityException("Permission denied.");
-        }
-
-        model.put("formObj", run);
-        model.put("run", run);
-        model.put("owners", LimsSecurityUtils.getPotentialOwners(user, run, securityManager.listAllUsers()));
-        model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, run, securityManager.listAllUsers()));
-        model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, run, securityManager.listAllGroups()));
-      }
-      else {
-        throw new SecurityException("No such Run");
-      }
-      return new ModelAndView("/pages/editRun.jsp", model);
-    }
-    catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to show experiment", ex);
-      }
-      throw ex;
-    }
-  } */
-
-
   @RequestMapping(value = "/rest/{runId}", method = RequestMethod.GET)
   public
   @ResponseBody
@@ -261,20 +257,21 @@ public class EditRunController {
         }
         else {
           model.put("title", "Run " + runId);
-          //model.put("availablePools", populateAvailablePools(run.getPlatformType(), user));
-          model.put("multiplexed", isMultiplexed(runId));
+          model.put("multiplexed", isMultiplexed(run));
           try {
             if (runStatsManager != null) {
               model.put("statsAvailable", runStatsManager.hasStatsForRun(run));
             }
-            model.put("operationsQcPassed", hasOperationsQcPassed(runId));
-            model.put("informaticsQcPassed", hasInformaticsQcPassed(runId));
+            else {
+              log.warn("No runStatsManager available. No stats will be parsed.");
+            }
+            model.put("operationsQcPassed", hasOperationsQcPassed(run));
+            model.put("informaticsQcPassed", hasInformaticsQcPassed(run));
           }
           catch (RunStatsException e) {
+            model.put("error", MisoWebUtils.generateErrorDivMessage("Cannot retrieve generate run stats: " + run.getAlias(), e.getMessage()));
             e.printStackTrace();
           }
-
-          //runAlertManager.push(run);
         }
       }
 
@@ -301,6 +298,8 @@ public class EditRunController {
 
       model.put("formObj", run);
       model.put("run", run);
+      model.put("runFiles", populateRunFiles(runId));
+
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, run, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, run, securityManager.listAllUsers()));
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, run, securityManager.listAllGroups()));
@@ -324,7 +323,6 @@ public class EditRunController {
   @RequestMapping(method = RequestMethod.POST)
   public String processSubmit(@ModelAttribute("run") Run run,
                               ModelMap model, SessionStatus session) throws IOException, MalformedRunException {
-    log.info("POSTING " + run.getName() + ":" + run.getStatus().getHealth().name());
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       if (!run.userCanWrite(user)) {

@@ -38,6 +38,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
  * @author Rob Davey
  * @since 0.0.2
  */
+@Deprecated
 public class SolidPool extends PoolImpl<emPCRDilution> {
   public static final String PREFIX = "SPO";
 

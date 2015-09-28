@@ -184,6 +184,7 @@ public class SolidNotificationMessageConsumerMechanism implements NotificationMe
             else {
               log.debug("Updating existing run and status: " + is.getRunName());
 
+              r.setAlias(runName);
               r.setPlatformType(PlatformType.SOLID);
 
               if (r.getSequencerReference() == null) {
@@ -265,13 +266,13 @@ public class SolidNotificationMessageConsumerMechanism implements NotificationMe
                       if (lf.getSecurityProfile() != null && r.getSecurityProfile() == null) {
                         r.setSecurityProfile(lf.getSecurityProfile());
                       }
-                      if (lf.getPlatformType() == null && r.getPlatformType() != null) {
-                        lf.setPlatformType(r.getPlatformType());
+                      if (lf.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
+                        lf.setPlatform(r.getSequencerReference().getPlatform());
                       }
-                      else {
-                        lf.setPlatformType(PlatformType.SOLID);
-                      }
-                      ((RunImpl)r).addSequencerPartitionContainer(lf);
+//                      else {
+//                        lf.setPlatformType(PlatformType.SOLID);
+//                      }
+                      r.addSequencerPartitionContainer(lf);
                     }
                   }
                   else {
@@ -280,14 +281,14 @@ public class SolidNotificationMessageConsumerMechanism implements NotificationMe
                     f.setSecurityProfile(r.getSecurityProfile());
                     f.initEmptyPartitions();
                     f.setIdentificationBarcode(run.getString("containerNum"));
-                    if (f.getPlatformType() == null && r.getPlatformType() != null) {
-                      f.setPlatformType(r.getPlatformType());
+                    if (f.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
+                      f.setPlatform(r.getSequencerReference().getPlatform());
                     }
-                    else {
-                      f.setPlatformType(PlatformType.SOLID);
-                    }
+//                    else {
+//                      f.setPlatformType(PlatformType.SOLID);
+//                    }
                     //f.setPaired(r.getPairedEnd());
-                    ((RunImpl)r).addSequencerPartitionContainer(f);
+                    r.addSequencerPartitionContainer(f);
                   }
                 }
               }
@@ -299,12 +300,12 @@ public class SolidNotificationMessageConsumerMechanism implements NotificationMe
                   f.setSecurityProfile(r.getSecurityProfile());
                 }
 
-                if (f.getPlatformType() == null && r.getPlatformType() != null) {
-                  f.setPlatformType(r.getPlatformType());
+                if (f.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
+                  f.setPlatform(r.getSequencerReference().getPlatform());
                 }
-                else {
-                  f.setPlatformType(PlatformType.SOLID);
-                }
+//                else {
+//                  f.setPlatformType(PlatformType.SOLID);
+//                }
 
                 if (run.has("containerId") && !"".equals(run.getString("containerId"))) {
                   f.setIdentificationBarcode(run.getString("containerId"));

@@ -30,6 +30,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.decorator.submission.era.EraStudyDecorator;
@@ -75,6 +76,8 @@ public class EraSubmissionTests {
       try {
           DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
           submissionDocument = docBuilder.newDocument();
+          Element set = submissionDocument.createElementNS(null, "STUDY_SET");
+          submissionDocument.appendChild(set);
       } catch (Exception e) {
           log.debug("Error while attempting to build document");
       }

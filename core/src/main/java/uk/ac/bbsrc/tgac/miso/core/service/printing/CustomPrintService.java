@@ -27,6 +27,7 @@ import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.spi.ServiceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.ac.bbsrc.tgac.miso.core.exception.MisoPrintException;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.schema.BarcodableSchema;
 
@@ -132,8 +133,16 @@ public class CustomPrintService implements MisoPrintService<File, JSONObject, Pr
     return printServiceFor;
   }
 
-  public File getLabelFor(JSONObject b) {
-    return getBarcodableSchema().getPrintableLabel(b);
+  @Override
+  public File getLabelFor(JSONObject b) throws MisoPrintException {
+    BarcodableSchema<File, JSONObject> bs = getBarcodableSchema();
+    if (bs != null) {
+      return bs.getPrintableLabel(b);
+    }
+    else {
+      throw new MisoPrintException("No barcodable schema set for '"+getName()+"' service. Make sure a schema is set in the " +
+                                   "printer administration page");
+    }
   }
 
   @Override

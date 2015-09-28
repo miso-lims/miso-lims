@@ -88,12 +88,12 @@ Project.ui = {
             { "sTitle": "Overview"},
             { "sTitle": "Edit"}
           ],
-          "bJQueryUI": true,
+          "bJQueryUI": false,
           "iDisplayLength": 25,
           "aaSorting": [
             [0, "desc"]
           ],
-          "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
+          //"sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
           "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
             Fluxion.doAjax(
               'projectControllerHelperService',
@@ -109,15 +109,15 @@ Project.ui = {
             );
           }
         });
-        jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
-        jQuery("#toolbar").append("<button style=\"margin-left:5px;\" onclick=\"window.location.href='/miso/project/new';\" class=\"fg-button ui-state-default ui-corner-all\">Add Project</button>");
+        //jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
+        //jQuery("#toolbar").append("<button style=\"margin-left:5px;\" onclick=\"window.location.href='/miso/project/new';\" class=\"fg-button ui-state-default ui-corner-all\">Add Project</button>");
       }
       }
     );
   },
 
-  processSampleDeliveryForm: function (projectId) {
-    var table = jQuery('#sample_table').dataTable();
+  processSampleDeliveryForm: function (tableName, projectId) {
+    var table = jQuery(tableName).dataTable();
     var aReturn = [];
     var aTrs = DatatableUtils.fnGetSelected(table);
     for (var i = 0; i < aTrs.length; i++) {
@@ -130,6 +130,7 @@ Project.ui = {
       'projectControllerHelperService',
       'generateSampleDeliveryForm',
       {
+        'plate':jQuery('input:radio[name=plateinformationform]:checked').val(),
         'projectId': projectId,
         'samples': aReturn,
         'url': ajaxurl
@@ -141,16 +142,36 @@ Project.ui = {
     );
   },
 
+  projectFileUploadSuccess: function () {
+    jQuery('#statusdiv').html("Upload complete. Refresh to see the file.");
+  },
+
   deliveryFormUploadSuccess: function () {
     jQuery('#deliveryform_statusdiv').html("Samples imported.");
   },
 
-  uploadSampleDeliveryForm: function (projectId) {
+  uploadSampleDeliveryForm: function () {
     jQuery('#deliveryformdiv').css("display", "block");
   },
 
   cancelSampleDeliveryFormUpload: function () {
     jQuery('#deliveryformdiv').css("display", "none");
+  },
+
+  deleteProjectFile: function(projectId, fileName, fileKey) {
+    Fluxion.doAjax(
+      'projectControllerHelperService',
+      'deleteProjectFile',
+      {
+        'projectId': projectId,
+        'fileName': fileName,
+        'url': ajaxurl
+      },
+      {'doOnSuccess': function (json) {
+        jQuery('#file'+fileKey).remove();
+      }
+      }
+    );
   },
 
   downloadBulkSampleInputForm: function (projectId, documentFormat) {
@@ -179,7 +200,7 @@ Project.ui = {
     );
   },
 
-  uploadBulkSampleInputForm: function (projectId) {
+  uploadBulkSampleInputForm: function () {
     jQuery('#inputformdiv').css("display", "block");
   },
 
@@ -316,12 +337,12 @@ Project.ui = {
             { "sTitle": "Description"},
             { "sTitle": "Edit"}
           ],
-          "bJQueryUI": true,
+          "bJQueryUI": false,
           "iDisplayLength": 25,
           "aaSorting": [
             [0, "desc"]
-          ],
-          "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>'
+          ]
+          //"sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>'
           /*
            ,
 
@@ -342,8 +363,9 @@ Project.ui = {
            }
            */
         });
-        jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
+        //jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
         //jQuery("#toolbar").append("<button style=\"margin-left:5px;\" onclick=\"window.location.href='/miso/project/new';\" class=\"fg-button ui-state-default ui-corner-all\">Add Project</button>");
+        jQuery("#plateElementsTable_wrapper").prepend("<div class='float-right toolbar'></div>");
       }
       }
     );
@@ -353,12 +375,12 @@ Project.ui = {
     alert("This function is not available at present");
   },
 
-  saveBulkSampleQc: function () {
+  saveBulkSampleQc: function (tableName) {
     var self = this;
     Utils.ui.disableButton('bulkSampleQcButton');
-    DatatableUtils.collapseInputs('#sample_table');
+    DatatableUtils.collapseInputs(tableName);
 
-    var table = jQuery('#sample_table').dataTable();
+    var table = jQuery(tableName).dataTable();
     var aReturn = [];
 
     var aTrs = DatatableUtils.fnGetSelected(table);
@@ -383,7 +405,9 @@ Project.ui = {
             'url': ajaxurl
           },
           {
-            'doOnSuccess': self.processBulkSampleQcTable
+            'doOnSuccess': function(json) {
+              self.processBulkSampleQcTable(tableName, json);
+            }
           }
         );
       }
@@ -398,12 +422,12 @@ Project.ui = {
     }
   },
 
-  processBulkSampleQcTable: function (json) {
+  processBulkSampleQcTable: function (tableName, json) {
     Utils.ui.reenableButton('bulkSampleQcButton', "Save QCs");
 
     var a = json.saved;
     for (var i = 0; i < a.length; i++) {
-      jQuery('#sample_table').find("tr:gt(0)").each(function () {
+      jQuery(tableName).find("tr:gt(0)").each(function () {
         if (jQuery(this).attr("sampleId") === a[i].sampleId) {
           jQuery(this).removeClass('row_selected');
           jQuery(this).addClass('row_saved');
@@ -423,7 +447,7 @@ Project.ui = {
       var errorStr = "";
       for (var i = 0; i < errors.length; i++) {
         errorStr += errors[i].error + "\n";
-        jQuery('#sample_table').find("tr:gt(0)").each(function () {
+        jQuery(tableName).find("tr:gt(0)").each(function () {
           if (jQuery(this).attr("sampleId") === errors[i].sampleId) {
             jQuery(this).find("td").each(function () {
               jQuery(this).css('background', '#EE9966');
@@ -602,6 +626,92 @@ Project.ui = {
     else {
       Utils.timer.timedFunc(Utils.page.pageReload(), 1000);
     }
+  },
+
+  receiveSamples: function (tableId) {
+    if (!jQuery(tableId).hasClass("display")) {
+      jQuery(tableId).dataTable().fnDestroy();
+      jQuery(tableId).addClass("display");
+
+      jQuery(tableId + ' tbody').find("tr").each(function () {
+          // remove received samples
+          if (jQuery(this).find("td:eq(4)").html() == "") {
+            jQuery(this).removeAttr("onmouseover").removeAttr("onmouseout");
+            jQuery(this).find("td:eq(4)").remove();
+          }
+          else {
+            jQuery(this).remove();
+          }
+      });
+
+      jQuery(tableId).find('tr:first th:eq(4)').remove();
+
+      var headers = ['rowsel',
+                     'name',
+                     'alias',
+                     'description',
+                     'type',
+                     'qcPassed'];
+
+
+      var oTable = jQuery(tableId).dataTable({
+        "aoColumnDefs": [
+          {
+            "bUseRendered": false,
+            "aTargets": [ 0 ]
+          }
+        ],
+        "bPaginate": false,
+        "bInfo": false,
+        "bJQueryUI": false,
+        "bAutoWidth": true,
+        "bSort": false,
+        "bFilter": false
+      });
+
+      jQuery(tableId).find("tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"" + tableId + "\", this);'></span></th>");
+      jQuery(tableId).find("tr:gt(0)").prepend("<td class='rowSelect'></td>");
+
+      jQuery(tableId).find('.rowSelect').click(function () {
+        if (jQuery(this).parent().hasClass('row_selected')) {
+          jQuery(this).parent().removeClass('row_selected');
+        }
+        else {
+          jQuery(this).parent().addClass('row_selected');
+        }
+      });
+
+      jQuery(tableId+"_wrapper").prepend("<div class='float-right toolbar'></div>");
+      jQuery("div.toolbar").html("<input type='button' value='Receive Selected' onclick=\"Project.ui.receiveSelectedSamples('" + tableId + "');\" class=\"fg-button ui-state-default ui-corner-all\"/>");
+      jQuery("div.toolbar").append("<input type='button' value='Cancel' onclick=\"Utils.page.pageReload();\" class=\"fg-button ui-state-default ui-corner-all\"/>");
+      jQuery("div.toolbar").removeClass("toolbar");
+    }
+  },
+
+  receiveSelectedSamples: function (tableId) {
+    if (confirm("Are you sure you want to receive selected samples?")) {
+      var samples = [];
+      var table = jQuery(tableId).dataTable();
+      var nodes = DatatableUtils.fnGetSelected(table);
+      for (var i = 0; i < nodes.length; i++) {
+        samples[i] = {'sampleId': jQuery(nodes[i]).attr("sampleId")};
+      }
+
+      if (samples.length > 0) {
+        Fluxion.doAjax(
+          'sampleControllerHelperService',
+          'setSampleReceivedDateByBarcode',
+          {'samples': samples, 'url': ajaxurl},
+          {'doOnSuccess': function (json) {
+            alert(json.result);
+            Utils.page.pageReload();
+          }
+        });
+      }
+      else {
+        alert("No samples selected");
+      }
+    }
   }
 };
 
@@ -611,9 +721,9 @@ Project.overview = {
     jQuery('#addProjectOverviewDialog')
         .html("<form>" +
               "<fieldset class='dialog'><label for='principalInvestigator'>Principal Investigator</label>" +
-              "<input type='text' name='principalInvestigator' id='principalInvestigator' class='text ui-widget-content ui-corner-all' />" +
+              "<input type='text' name='principalInvestigator' id='principalInvestigator' class='form-control'/>" +
               "<label for='numProposedSamples'>No. Proposed Samples</label>" +
-              "<input type='text' name='numProposedSamples' id='numProposedSamples' class='text ui-widget-content ui-corner-all' />" +
+              "<input type='text' name='numProposedSamples' id='numProposedSamples' class='form-control'/>" +
               "</fieldset></form>");
 
     jQuery(function () {
@@ -658,10 +768,10 @@ Project.overview = {
       .html("<form>" +
             "<fieldset class='dialog'>" +
             "<label for='internalOnly'>Internal Only?</label>" +
-            "<input type='checkbox' checked='checked' name='internalOnly' id='internalOnly' class='text ui-widget-content ui-corner-all' />" +
+            "<input type='checkbox' checked='checked' name='internalOnly' id='internalOnly'/>" +
             "<br/>" +
             "<label for='notetext'>Text</label>" +
-            "<input type='text' name='notetext' id='notetext' class='text ui-widget-content ui-corner-all' />" +
+            "<input type='text' name='notetext' id='notetext' class='form-control'/>" +
             "</fieldset></form>");
 
     jQuery(function () {
@@ -692,6 +802,194 @@ Project.overview = {
         'overviewId': overviewId,
         'internalOnly': internalOnly,
         'text': text,
+        'url': ajaxurl
+      },
+      {
+        'doOnSuccess': Utils.page.pageReload
+      }
+    );
+  },
+
+  deleteProjectOverviewNote: function (overviewId, noteId) {
+    if (confirm("Are you sure you want to delete this note?")) {
+      Fluxion.doAjax(
+        'projectControllerHelperService',
+        'deleteProjectOverviewNote',
+        {'overviewId': overviewId, 'noteId': noteId, 'url': ajaxurl},
+        {'doOnSuccess': Utils.page.pageReload}
+      );
+    }
+  },
+
+  addSampleGroupTable: function (projectId, overviewId) {
+    var tableDiv = "#sampleGroupTableDiv"+overviewId;
+    var tableId = "#sampleGroupTable"+overviewId;
+
+    jQuery(tableDiv).html("<table class='table table-striped table-bordered display' id='sampleGroupTable"+overviewId+"'><thead><tr><th>Sample Name</th><th>Alias</th><th>Type</th><th>Description</th></tr></thead><tbody></tbody></table>");
+
+    Fluxion.doAjax(
+      'projectControllerHelperService',
+      'listSamplesByProject',
+      {
+        'projectId': projectId,
+        'url': ajaxurl
+      },
+      {'doOnSuccess': function (json) {
+        jQuery(tableId).html('');
+
+        var oTable = jQuery(tableId).dataTable({
+          "aaData": json.array,
+          "aoColumns": [
+            { "mData":"id", "bVisible":"false"},
+            { "sTitle": "Sample Name", "mData":"name"},
+            { "sTitle": "Alias", "mData":"alias", "sType": "natural"},
+            { "sTitle": "Type", "mData":"type"},
+            { "sTitle": "Description", "mData":"description"}
+          ],
+          "aoColumnDefs": [
+            {
+              "bUseRendered": false,
+              "aTargets": [ 0 ]
+            }
+          ],
+          "aaSorting": [
+            [1, 'asc']
+          ],
+          "bPaginate": false,
+          "bInfo": false,
+          "bJQueryUI": false,
+          "bAutoWidth": true,
+          "bFilter": false
+        });
+
+        jQuery(tableId).find("tr").each(function () {
+          jQuery(this).removeAttr("onmouseover").removeAttr("onmouseout");
+        });
+
+        jQuery(tableId).find("tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"" + tableId + "\", this);'></span></th>");
+        jQuery(tableId).find("tr:gt(0)").prepend("<td class='rowSelect'></td>");
+
+        jQuery(tableId).find('.rowSelect').click(function () {
+          if (jQuery(this).parent().hasClass('row_selected')) {
+            jQuery(this).parent().removeClass('row_selected');
+          }
+          else {
+            jQuery(this).parent().addClass('row_selected');
+          }
+        });
+
+        jQuery(tableId+"_wrapper").prepend("<div class='float-right toolbar'></div>");
+        jQuery("div.toolbar").html("<input type='button' value='Group Selected' onclick=\"Project.overview.addSampleGroup('"+overviewId+"', '" + tableId + "');\" class=\"fg-button ui-state-default ui-corner-all\"/>");
+        jQuery("div.toolbar").append("<input type='button' value='Cancel' onclick=\"Utils.page.pageReload();\" class=\"fg-button ui-state-default ui-corner-all\"/>");
+        jQuery("div.toolbar").removeClass("toolbar");
+      }
+    });
+  },
+
+  addSampleGroup: function (overviewId, tableId) {
+    var samples = [];
+    var table = jQuery(tableId).dataTable();
+    var nodes = DatatableUtils.fnGetSelected(table);
+    for (var i = 0; i < nodes.length; i++) {
+      var anSelectedData = table.fnGetData(nodes[i].cells[0]);
+      samples[i] = {'sampleId': anSelectedData};
+    }
+
+    Fluxion.doAjax(
+      'projectControllerHelperService',
+      'addSampleGroup',
+      {
+        'overviewId': overviewId,
+        'samples': samples,
+        'url': ajaxurl
+      },
+      {
+        'doOnSuccess': Utils.page.pageReload
+      }
+    );
+  },
+
+  addSamplesToGroupTable: function (projectId, overviewId, groupId) {
+    var tableDiv = "#sampleGroupTableDiv"+overviewId;
+    var tableId = "#sampleGroupTable"+overviewId;
+
+    jQuery(tableDiv).html("<table class='table table-striped table-bordered display' id='sampleGroupTable"+overviewId+"'><thead><tr><th>Sample Name</th><th>Alias</th><th>Type</th><th>Description</th></tr></thead><tbody></tbody></table>");
+
+    Fluxion.doAjax(
+      'projectControllerHelperService',
+      'listSamplesByProject',
+      {
+        'projectId': projectId,
+        'url': ajaxurl
+      },
+      {'doOnSuccess': function (json) {
+        jQuery(tableId).html('');
+
+        var oTable = jQuery(tableId).dataTable({
+          "aaData": json.array,
+          "aoColumns": [
+            { "mData":"id", "bVisible":"false"},
+            { "sTitle": "Sample Name", "mData":"name"},
+            { "sTitle": "Alias", "mData":"alias", "sType": "natural"},
+            { "sTitle": "Type", "mData":"type"},
+            { "sTitle": "Description", "mData":"description"}
+          ],
+          "aoColumnDefs": [
+            {
+              "bUseRendered": false,
+              "aTargets": [ 0 ]
+            }
+          ],
+          "aaSorting": [
+            [1, 'asc']
+          ],
+          "bPaginate": false,
+          "bInfo": false,
+          "bJQueryUI": false,
+          "bAutoWidth": true,
+          "bFilter": false
+        });
+
+        jQuery(tableId).find("tr").each(function () {
+          jQuery(this).removeAttr("onmouseover").removeAttr("onmouseout");
+        });
+
+        jQuery(tableId).find("tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"" + tableId + "\", this);'></span></th>");
+        jQuery(tableId).find("tr:gt(0)").prepend("<td class='rowSelect'></td>");
+
+        jQuery(tableId).find('.rowSelect').click(function () {
+          if (jQuery(this).parent().hasClass('row_selected')) {
+            jQuery(this).parent().removeClass('row_selected');
+          }
+          else {
+            jQuery(this).parent().addClass('row_selected');
+          }
+        });
+
+        jQuery(tableId+"_wrapper").prepend("<div class='float-right toolbar'></div>");
+        jQuery("div.toolbar").html("<input type='button' value='Add Selected' onclick=\"Project.overview.addSamplesToGroup('"+overviewId+"', '" + tableId + "', '"+groupId+"');\" class=\"fg-button ui-state-default ui-corner-all\">Add Selected</input>");
+        jQuery("div.toolbar").append("<input type='button' value='Cancel' onclick=\"Utils.page.pageReload();\" class=\"fg-button ui-state-default ui-corner-all\">Cancel</input>");
+        jQuery("div.toolbar").removeClass("toolbar");
+      }
+    });
+  },
+
+  addSamplesToGroup: function (overviewId, tableId, groupId) {
+    var samples = [];
+    var table = jQuery(tableId).dataTable();
+    var nodes = DatatableUtils.fnGetSelected(table);
+    for (var i = 0; i < nodes.length; i++) {
+      var anSelectedData = table.fnGetData(nodes[i].cells[0]);
+      samples[i] = {'sampleId': anSelectedData};
+    }
+
+    Fluxion.doAjax(
+      'projectControllerHelperService',
+      'addSamplesToGroup',
+      {
+        'overviewId': overviewId,
+        'groupId': groupId,
+        'samples': samples,
         'url': ajaxurl
       },
       {
@@ -967,25 +1265,17 @@ Project.barcode = {
 
   selectSampleBarcodesToPrint: function (tableId) {
     if (!jQuery(tableId).hasClass("display")) {
-      //destroy current table and recreate
       jQuery(tableId).dataTable().fnDestroy();
-      //bug fix to reset table width
-      jQuery(tableId).removeAttr("style");
-
       jQuery(tableId).addClass("display");
 
-      jQuery(tableId).find('tr:first th:eq(5)').remove();
+      jQuery(tableId).find('tr:first th:gt(6)').remove();
       jQuery(tableId).find("tr").each(function () {
         jQuery(this).removeAttr("onmouseover").removeAttr("onmouseout");
-        jQuery(this).find("td:eq(5)").remove();
+        jQuery(this).find("td:gt(6)").remove();
       });
-      //Sample Name 	Sample Alias 	Sample Description 	Type 	QC Passed
-      var headers = ['rowsel',
-                     'name',
-                     'alias',
-                     'description',
-                     'type',
-                     'qcPassed'];
+
+      jQuery(tableId).find("tr:first").prepend("<th width='5%'>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"" + tableId + "\", this);'></span></th>");
+      jQuery(tableId).find("tr:gt(0)").prepend("<td width='5%' class='rowSelect'></td>");
 
       var oTable = jQuery(tableId).dataTable({
         "aoColumnDefs": [
@@ -994,17 +1284,25 @@ Project.barcode = {
             "aTargets": [ 0 ]
           }
         ],
+        "aaSorting": [
+          [2, 'asc']
+        ],
         "bPaginate": false,
         "bInfo": false,
-        "bJQueryUI": true,
+        "bJQueryUI": false,
         "bAutoWidth": true,
-        "bSort": false,
-        "bFilter": false,
-        "sDom": '<<"toolbar">f>r<t>ip>'
+        "aoColumns": [
+          {"bSortable": false},
+          { "sType": 'natural' },
+          { "sType": 'natural' },
+          null,
+          null,
+          null,
+          null,
+          null
+      ],
+        "bFilter": false
       });
-
-      jQuery(tableId).find("tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"" + tableId + "\", this);'></span></th>");
-      jQuery(tableId).find("tr:gt(0)").prepend("<td class='rowSelect'></td>");
 
       jQuery(tableId).find('.rowSelect').click(function () {
         if (jQuery(this).parent().hasClass('row_selected')) {
@@ -1015,8 +1313,9 @@ Project.barcode = {
         }
       });
 
-      jQuery("div.toolbar").html("<button onclick=\"Project.barcode.printSelectedSampleBarcodes('" + tableId + "');\" class=\"fg-button ui-state-default ui-corner-all\">Print Selected</button>");
-      jQuery("div.toolbar").append("<button onclick=\"Utils.page.pageReload();\" class=\"fg-button ui-state-default ui-corner-all\">Cancel</button>");
+      jQuery(tableId+"_wrapper").prepend("<div class='float-right toolbar'></div>");
+      jQuery("div.toolbar").html("<input type='button' value='Print Selected' type='button' onclick=\"Project.barcode.printSelectedSampleBarcodes('" + tableId + "');\" class=\"fg-button ui-state-default ui-corner-all\"/>");
+      jQuery("div.toolbar").append("<input type='button' value='Cancel' onclick=\"Utils.page.pageReload();\" class=\"fg-button ui-state-default ui-corner-all\"/>");
       jQuery("div.toolbar").removeClass("toolbar");
     }
   },
@@ -1085,27 +1384,17 @@ Project.barcode = {
 
   selectLibraryBarcodesToPrint: function (tableId) {
     if (!jQuery(tableId).hasClass("display")) {
-      //destroy current table and recreate
       jQuery(tableId).dataTable().fnDestroy();
-      //bug fix to reset table width
-      jQuery(tableId).removeAttr("style");
-
       jQuery(tableId).addClass("display");
 
-      jQuery(tableId).find('tr:first th:eq(7)').remove();
+      jQuery(tableId).find('tr:first th:gt(8)').remove();
       jQuery(tableId).find("tr").each(function () {
         jQuery(this).removeAttr("onmouseover").removeAttr("onmouseout");
-        jQuery(this).find("td:eq(7)").remove();
+        jQuery(this).find("td:gt(8)").remove();
       });
-      //Library Name 	Library Alias 	Library Description 	Library Type 	Library Platform 	Tag Barcode 	Insert Size
-      var headers = ['rowsel',
-                     'name',
-                     'alias',
-                     'description',
-                     'libraryType',
-                     'platform',
-                     'tagBarcode',
-                     'insertSize'];
+
+      jQuery(tableId).find("tr:first").prepend("<th width='5%'>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"" + tableId + "\", this);'></span></th>");
+      jQuery(tableId).find("tr:gt(0)").prepend("<td width='5%' class='rowSelect'></td>");
 
       var oTable = jQuery(tableId).dataTable({
         "aoColumnDefs": [
@@ -1114,17 +1403,28 @@ Project.barcode = {
             "aTargets": [ 0 ]
           }
         ],
+        "aaSorting": [
+          [2, 'asc']
+        ],
         "bPaginate": false,
         "bInfo": false,
-        "bJQueryUI": true,
+        "bJQueryUI": false,
         "bAutoWidth": true,
-        "bSort": false,
-        "bFilter": false,
-        "sDom": '<<"toolbar">f>r<t>ip>'
-      });
 
-      jQuery(tableId).find("tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"" + tableId + "\", this);'></span></th>");
-      jQuery(tableId).find("tr:gt(0)").prepend("<td class='rowSelect'></td>");
+         "aoColumns": [
+           {"bSortable": false},
+           { "sType": 'natural' },
+           { "sType": 'natural' },
+           { "sType": 'natural' },
+           null,
+           null,
+           null,
+           null,
+           null,
+           null
+         ],
+        "bFilter": false
+      });
 
       jQuery(tableId).find('.rowSelect').click(function () {
         if (jQuery(this).parent().hasClass('row_selected')) {
@@ -1135,8 +1435,9 @@ Project.barcode = {
         }
       });
 
-      jQuery("div.toolbar").html("<button onclick=\"Project.barcode.printSelectedLibraryBarcodes('" + tableId + "');\" class=\"fg-button ui-state-default ui-corner-all\">Print Selected</button>");
-      jQuery("div.toolbar").append("<button onclick=\"Utils.page.pageReload();\" class=\"fg-button ui-state-default ui-corner-all\">Cancel</button>");
+      jQuery(tableId+"_wrapper").prepend("<div class='float-right toolbar'></div>");
+      jQuery("div.toolbar").html("<input type='button' value='Print Selected' onclick=\"Project.barcode.printSelectedLibraryBarcodes('" + tableId + "');\" class=\"fg-button ui-state-default ui-corner-all\"/>");
+      jQuery("div.toolbar").append("<input type='button' value='Cancel' onclick=\"Utils.page.pageReload();\" class=\"fg-button ui-state-default ui-corner-all\"/>");
       jQuery("div.toolbar").removeClass("toolbar");
     }
   },
@@ -1206,18 +1507,17 @@ Project.barcode = {
 
   selectLibraryDilutionBarcodesToPrint: function (tableId) {
     if (!jQuery(tableId).hasClass("display")) {
-      //destroy current table and recreate
       jQuery(tableId).dataTable().fnDestroy();
-      //bug fix to reset table width
-      jQuery(tableId).removeAttr("style");
-
       jQuery(tableId).addClass("display");
 
-      jQuery(tableId).find('tr:first th:eq(5)').remove();
+      jQuery(tableId).find('tr:first th:gt(5)').remove();
       jQuery(tableId).find("tr").each(function () {
         jQuery(this).removeAttr("onmouseover").removeAttr("onmouseout");
-        jQuery(this).find("td:eq(5)").remove();
+        jQuery(this).find("td:gt(5)").remove();
       });
+
+      jQuery(tableId).find("tr:first").prepend("<th width='5%'>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"" + tableId + "\", this);'></span></th>");
+      jQuery(tableId).find("tr:gt(0)").prepend("<td width='5%' class='rowSelect'></td>");
       //Dilution Name 	Dilution Creator 	Dilution Creation Date 	Dilution Platform 	Dilution Concentration
       var headers = ['rowsel',
                      'name',
@@ -1233,17 +1533,24 @@ Project.barcode = {
             "aTargets": [ 0 ]
           }
         ],
+        "aaSorting": [
+           [2, 'asc']
+        ],
         "bPaginate": false,
         "bInfo": false,
-        "bJQueryUI": true,
+        "bJQueryUI": false,
         "bAutoWidth": true,
-        "bSort": false,
-        "bFilter": false,
-        "sDom": '<<"toolbar">f>r<t>ip>'
+        "aoColumns": [
+          {"bSortable": false},
+          { "sType": 'natural' },
+          { "sType": 'natural' },
+          null,
+          null,
+          null,
+          null
+        ],
+        "bFilter": false
       });
-
-      jQuery(tableId).find("tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"" + tableId + "\", this);'></span></th>");
-      jQuery(tableId).find("tr:gt(0)").prepend("<td class='rowSelect'></td>");
 
       jQuery(tableId).find('.rowSelect').click(function () {
         if (jQuery(this).parent().hasClass('row_selected')) {
@@ -1254,8 +1561,9 @@ Project.barcode = {
         }
       });
 
-      jQuery("div.toolbar").html("<button onclick=\"Project.barcode.printSelectedLibraryDilutionBarcodes('" + tableId + "');\" class=\"fg-button ui-state-default ui-corner-all\">Print Selected</button>");
-      jQuery("div.toolbar").append("<button onclick=\"Utils.page.pageReload();\" class=\"fg-button ui-state-default ui-corner-all\">Cancel</button>");
+      jQuery(tableId+"_wrapper").prepend("<div class='float-right toolbar'></div>");
+      jQuery("div.toolbar").html("<input type='button' value='Print Selected' onclick=\"Project.barcode.printSelectedLibraryDilutionBarcodes('" + tableId + "');\" class=\"fg-button ui-state-default ui-corner-all\"/>");
+      jQuery("div.toolbar").append("<input type='button' value='Cancel' onclick=\"Utils.page.pageReload();\" class=\"fg-button ui-state-default ui-corner-all\"/>");
       jQuery("div.toolbar").removeClass("toolbar");
     }
   },

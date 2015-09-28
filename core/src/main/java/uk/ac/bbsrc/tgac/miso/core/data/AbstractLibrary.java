@@ -66,7 +66,7 @@ public abstract class AbstractLibrary implements Library {
 
   private Boolean paired;
 
-  private Collection<LibraryQC> libraryQCs = new HashSet<LibraryQC>();
+  private Collection<LibraryQC> libraryQCs = new TreeSet<LibraryQC>();
   private Collection<LibraryDilution> libraryDilutions = new HashSet<LibraryDilution>();
   private Set<Plate<? extends LinkedList<Library>, Library>> plates = new HashSet<Plate<? extends LinkedList<Library>, Library>>();
 
@@ -308,8 +308,8 @@ public abstract class AbstractLibrary implements Library {
 
   public boolean isDeletable() {
     return getId() != AbstractLibrary.UNSAVED_ID &&
-           getLibraryDilutions().isEmpty() &&
-           getLibraryQCs().isEmpty();    
+           getLibraryDilutions().isEmpty();
+           //&& getLibraryQCs().isEmpty();
   }
 
   public boolean userCanRead(User user) {

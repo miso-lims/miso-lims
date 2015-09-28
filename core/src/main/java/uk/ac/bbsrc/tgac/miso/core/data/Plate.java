@@ -39,7 +39,7 @@ import java.util.List;
 
 /**
  * A Plate represents a collection of sequenceable material, typed by that material object, usually a List of {@link Library}
- * elements of a given size. Plates can be described further by a {@link PlateMaterialType} and a plate-specific {@link TagBarcode}
+ * elements of a given size. Plates can be described further by a {@link PlateMaterialType}
  *
  * @author Rob Davey
  * @date 25-Jul-2011
@@ -123,20 +123,6 @@ public interface Plate<T extends List<S>, S> extends SecurableByProfile, Barcoda
    * @param plateMaterialType PlateMaterialType.
    */
   public void setPlateMaterialType(PlateMaterialType plateMaterialType);
-
-  /**
-   * Returns the TagBarcode of this Plate object
-   *
-   * @return TagBarcode tagBarcode.
-   */
-  public TagBarcode getTagBarcode();
-
-  /**
-   * Sets the TagBarcode of this Plate object.
-   *
-   * @param tagBarcode TagBarcode.
-   */
-  public void setTagBarcode(TagBarcode tagBarcode);
 
   /**
    * Returns the Plate size

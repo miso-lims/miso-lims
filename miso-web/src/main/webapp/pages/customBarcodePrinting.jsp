@@ -32,7 +32,13 @@
 
 <div id="maincontent">
   <div id="contentcolumn">
-    <h1>Custom Barcode Printing</h1>
+    <nav class="navbar navbar-default" role="navigation">
+      <div class="navbar-header">
+        <span class="navbar-brand navbar-center">
+          Custom Barcode Printing
+        </span>
+      </div>
+    </nav>
 
     <div class="portlet">
       <div class="portlet-header">Custom 2D Barcode</div>
@@ -42,22 +48,31 @@
           <table border="0">
             <tr>
               <td>Line 1:</td>
-              <td><input type="text" id="customPrintLine1" size="30" maxlength="17"/></td>
-              <td><span id="line1counter"
-                        class="counter"></span></td>
+              <td>
+                <div class="input-group">
+                  <input type="text" id="customPrintLine1" size="30" maxlength="17" class="form-control"/>
+                  <span id="line1counter" class="input-group-addon"></span>
+                </div>
+              </td>
               <td>Generate barcode for this line?<input id="barcodeit" type="checkbox"/></td>
             </tr>
             <tr>
               <td>Line 2:</td>
-              <td><input type="text" id="customPrintLine2" size="30" maxlength="15"/></td>
-              <td> <span id="line2counter"
-                         class="counter"></span></td>
+              <td>
+                <div class="input-group">
+                  <input type="text" id="customPrintLine2" size="30" maxlength="15" class="form-control"/>
+                  <span id="line2counter" class="input-group-addon"></span>
+                </div>
+              </td>
             </tr>
             <tr>
               <td>Line 3:</td>
-              <td><input type="text" id="customPrintLine3" size="30" maxlength="17"/></td>
-              <td><span id="line3counter"
-                        class="counter"></span></td>
+              <td>
+                <div class="input-group">
+                  <input type="text" id="customPrintLine3" size="30" maxlength="17" class="form-control"/>
+                  <span id="line3counter" class="input-group-addon"></span>
+                </div>
+              </td>
             </tr>
           </table>
           <button onclick="Print.service.printCustomBarcodes();">Print</button>
@@ -65,27 +80,50 @@
       </div>
     </div>
 
-    <div class="portlet">
-      <div class="portlet-header">Custom 1D Barcode</div>
-      <div class="portlet-content">
+      <div class="portlet">
+          <div class="portlet-header">Custom 1D Barcode</div>
+          <div class="portlet-content">
 
-        <div id="form2" style="margin-top:20px;margin-let:20px;">
-          <table border="0">
-            <tr>
-              <td>Text:</td>
-              <td><input type="text" id="custom1DPrintLine1" size="30" maxlength="10"/></td>
-              <td><span id="counter1D"
-                        class="counter"></span></td>
-            </tr>
-            <tr>
-              <td>How Many?:</td>
-              <td><input type="text" id="custom1DPrintLine2" size="5" maxlength="2" value="1"/></td>
-            </tr>
-          </table>
-          <button onclick="Print.service.printCustom1DBarcodes();">Print</button>
-        </div>
+              <div id="form2" style="margin-top:20px;margin-let:20px;">
+                  <table border="0">
+                      <tr>
+                          <td>Text:</td>
+                          <td>
+                            <div class="input-group">
+                              <input type="text" id="custom1DPrintLine1" size="30" maxlength="15" class="form-control"/>
+                              <span id="counter1D" class="input-group-addon"></span>
+                            </div>
+                          </td>
+                      </tr>
+                      <tr>
+                          <td>How Many?:</td>
+                          <td><input type="text" id="custom1DPrintLine2" size="5" maxlength="2" value="1" class="form-control"/></td>
+                      </tr>
+                  </table>
+                  <button onclick="Print.service.printCustom1DBarcodes();">Print</button>
+              </div>
+          </div>
       </div>
-    </div>
+
+      <div class="portlet">
+          <div class="portlet-header">Custom 1D Barcode (Bulk)</div>
+          <div class="portlet-content">
+
+              <div id="form3" style="margin-top:20px;margin-let:20px;">
+                  <table border="0">
+                      <tr>
+                          <td></td>
+                          <td>One barcode per line, max 15 characters each barcode.</td>
+                      </tr>
+                      <tr>
+                          <td>Text:</td>
+                          <td><textarea id="custom1DTextArea" rows="10" cols="40"></textarea></td>
+                      </tr>
+                  </table>
+                  <button onclick="Print.service.printCustom1DBarcodesBulk(jQuery('#custom1DTextArea').val());">Print</button>
+              </div>
+          </div>
+      </div>
     <div id="printServiceSelectDialog" title="Select a Printer"></div>
   </div>
 </div>
@@ -130,7 +168,7 @@
     -moz-background-clip: border;
     -moz-background-inline-policy: continuous;
     -moz-background-origin: padding;
-    background: #CCDDFF none repeat scroll 0 0;
+    background: #F0F0FF none repeat scroll 0 0;
     border: 1px solid #AAAAAA;
     color: #666666;
     font-weight: bold;
@@ -166,7 +204,7 @@
     jQuery('#custom1DPrintLine1').simplyCountable({
       counter: '#counter1D',
       countType: 'characters',
-      maxCount: 10,
+      maxCount: 15,
       countDirection: 'down'
     });
 
@@ -187,4 +225,3 @@
 <%@ include file="adminsub.jsp" %>
 
 <%@ include file="../footer.jsp" %>
-

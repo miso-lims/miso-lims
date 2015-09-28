@@ -76,15 +76,8 @@ Tasks.ui = {
           }
         }
       }
-      /*
-      jQuery("#runningTasks").tablesorter({
-        sortInitialOrder: 'desc',
-        headers: {
-          4: { sorter: false },
-          6: { sorter: false }
-        }
-      });
-      */
+
+      jQuery('#runningTasks').dataTable();
     }
   },
 
@@ -113,14 +106,8 @@ Tasks.ui = {
             .append(rowtext)
         );
       }
-      /*
-      jQuery("#pendingTasks").tablesorter({
-        sortInitialOrder: 'desc',
-        headers: {
-          4: { sorter: false }
-        }
-      });
-      */
+
+      jQuery('#pendingTasks').dataTable();
     }
   },
 
@@ -149,14 +136,8 @@ Tasks.ui = {
             .append(rowtext)
         );
       }
-      /*
-      jQuery("#pendingTasks").tablesorter({
-        sortInitialOrder: 'desc',
-        headers: {
-          4: { sorter: false }
-        }
-      });
-      */
+
+      jQuery('#failedTasks').dataTable();
     }
   },
 
@@ -185,14 +166,8 @@ Tasks.ui = {
             .append(rowtext)
         );
       }
-      /*
-      jQuery("#completedTasks").tablesorter({
-        sortInitialOrder: 'desc',
-        headers: {
-          4: { sorter: false }
-        }
-      });
-      */
+
+      jQuery('#completedTasks').dataTable();
     }
   },
 
@@ -209,11 +184,31 @@ Tasks.ui = {
   processPipelines : function(json) {
     for (var i = 0; i < json.pipelines.length; i++) {
       var pipeline = json.pipelines[i];
-      var rowtext = "<td>"+pipeline.name+"</td><td>"+JSON.stringify(pipeline.processes)+"</td>";
-      jQuery('#pipelines > tbody:last')
-        .append(jQuery('<tr>')
-          .append(rowtext)
-      );
+
+      jQuery('#pipelines > tbody:last').append(jQuery('<tr>').append('<td>'+pipeline.name+'</td><td id="'+pipeline.name+'Details"></td>'));
+
+      var rowtext = jQuery('#'+pipeline.name+'Details');
+
+      rowtext.append("<h2>"+pipeline.name+"</h2>");
+      rowtext.append("<i>Required parameters are marked (<span style='color: red'>*</span>).</i>");
+
+      for (var j = 0; j < pipeline.processes.length; j++) {
+        var process = pipeline.processes[j];
+
+        rowtext.append("<h4>"+process.name+"</h4>");
+
+        rowtext.append("<table class='list' id='"+process.name+"-reqParams'><thead><tr><th>Name</th><th>Properties</th></tr></thead><tbody></tbody></table>");
+
+        for (var k = 0; k < process.parameters.length; k++) {
+          var parameter = process.parameters[k];
+
+          jQuery('#'+process.name+'-reqParams > tbody:last').append(jQuery('<tr>').append("<td>"+parameter.name+"</td><td>"+
+                       "Required: " + !parameter.optional + "<br/>" +
+                       "Boolean: " + parameter.boolean + "<br/>" +
+                       "Transient: " + parameter.transient + "</td>"
+          ));
+        }
+      }
     }
   },
 
@@ -266,13 +261,13 @@ Tasks.ui = {
               if (parameter.optional) {
                 jQuery('#'+pipeline.name+'-reqParams > tbody:last')
                   .append(jQuery('<tr>')
-                  .append("<td>"+parameter.name+"</td><td><input optional='true' style='width:98%' type='text' id='"+parameter.name+"' name='"+parameter.name+"' value=''/>")
+                  .append("<td>"+parameter.name+"</td><td><input optional='true' style='width:98%' type='text' id='"+parameter.name+"' name='"+parameter.name+"' value='' class='form-control'/>")
                 );
               }
               else {
                 jQuery('#'+pipeline.name+'-reqParams > tbody:last')
                   .append(jQuery('<tr>')
-                  .append("<td>"+parameter.name+" <span style='color: red'>*</span></td><td><input style='width:98%' required='true' type='text' id='"+parameter.name+"' name='"+parameter.name+"' value=''/>")
+                  .append("<td>"+parameter.name+" <span style='color: red'>*</span></td><td><input style='width:98%' required='true' type='text' id='"+parameter.name+"' name='"+parameter.name+"' value='' class='form-control'/>")
                 );
               }
             }
@@ -286,7 +281,7 @@ Tasks.ui = {
           if (jQuery('input[name="'+process.parameters[k].name+'"]').length == 0) {
             jQuery('#'+pipeline.name+'-reqParams > tbody:last')
               .append(jQuery('<tr>')
-              .append("<td>"+process.parameters[k].name+"</td><td><input style='width:98%' optional='true' type='text' id='"+process.parameters[k].name+"' name='"+process.parameters[k].name+"' value=''/>")
+              .append("<td>"+process.parameters[k].name+"</td><td><input style='width:98%' optional='true' type='text' id='"+process.parameters[k].name+"' name='"+process.parameters[k].name+"' value='' class='form-control'/>")
             );
           }
         }

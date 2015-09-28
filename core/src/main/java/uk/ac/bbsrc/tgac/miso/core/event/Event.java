@@ -23,12 +23,12 @@
 
 package uk.ac.bbsrc.tgac.miso.core.event;
 
+import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
 
 /**
- * uk.ac.bbsrc.tgac.miso.core.alert
- * <p/>
- * Info
+ * Interface describing any propagatable event, comprising a message, a type, the object to which the event is related
+ * and a freeform key-value context that represents any extra information about the event-space
  *
  * @author Rob Davey
  * @date 23-Sep-2011
@@ -38,4 +38,5 @@ public interface Event<T> {
   String getEventMessage();
   MisoEventType getEventType();
   T getEventObject();
+  JSONObject getEventContext();
 }

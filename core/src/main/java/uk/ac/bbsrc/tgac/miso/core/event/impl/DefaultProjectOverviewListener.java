@@ -44,6 +44,7 @@ import java.util.Set;
  * @date 16/11/11
  * @since 0.1.3
  */
+@Deprecated
 public class DefaultProjectOverviewListener implements MisoListener {
   protected static final Logger log = LoggerFactory.getLogger(DefaultProjectOverviewListener.class);
   private Collection<? extends ResponderService> responderServices = new HashSet<ResponderService>();
@@ -55,6 +56,10 @@ public class DefaultProjectOverviewListener implements MisoListener {
 
   public void setResponderServices(Collection<? extends ResponderService> responderServices) {
     this.responderServices = responderServices;
+  }
+
+  @Override
+  public void setBaseURL(String baseURL) {
   }
 
   @Override

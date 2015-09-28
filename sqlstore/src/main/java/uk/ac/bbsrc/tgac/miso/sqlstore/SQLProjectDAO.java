@@ -33,7 +33,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -77,6 +76,9 @@ public class SQLProjectDAO implements ProjectStore {
 
   public static final String PROJECT_SELECT_BY_ID =
           PROJECTS_SELECT + " WHERE projectId = ?";
+
+  public static final String PROJECT_SELECT_BY_ALIAS =
+          PROJECTS_SELECT + " WHERE alias = ?";
 
   public static final String PROJECTS_SELECT_BY_SEARCH =
           PROJECTS_SELECT + " WHERE " +
@@ -191,6 +193,7 @@ public class SQLProjectDAO implements ProjectStore {
   private Store<SecurityProfile> securityProfileDAO;
   private CascadeType cascadeType;
   private SampleStore sampleDAO;
+  private EntityGroupStore entityGroupDAO;
   private LibraryStore libraryDAO;
   private RunStore runDAO;
   private NoteStore noteDAO;
@@ -251,6 +254,10 @@ public class SQLProjectDAO implements ProjectStore {
 
   public void setSampleDAO(SampleStore sampleDAO) {
     this.sampleDAO = sampleDAO;
+  }
+
+  public void setEntityGroupDAO(EntityGroupStore entityGroupDAO) {
+    this.entityGroupDAO = entityGroupDAO;
   }
 
   public void setLibraryDAO(LibraryStore libraryDAO) {
@@ -432,12 +439,12 @@ public class SQLProjectDAO implements ProjectStore {
             .addValue("allRunsCompleted", overview.getAllRunsCompleted())
             .addValue("primaryAnalysisCompleted", overview.getPrimaryAnalysisCompleted());
 
-    if (overview.getOverviewId() == ProjectOverview.UNSAVED_ID) {
+    if (overview.getId() == ProjectOverview.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
               .withTableName("ProjectOverview")
               .usingGeneratedKeyColumns("overviewId");
       Number newId = insert.executeAndReturnKey(params);
-      overview.setOverviewId(newId.longValue());
+      overview.setId(newId.longValue());
 
       Project p = overview.getProject();
 
@@ -446,7 +453,7 @@ public class SQLProjectDAO implements ProjectStore {
 
       MapSqlParameterSource poParams = new MapSqlParameterSource();
       poParams.addValue("project_projectId", p.getProjectId())
-              .addValue("overviews_overviewId", overview.getOverviewId());
+              .addValue("overviews_overviewId", overview.getId());
 
       try {
         pInsert.execute(poParams);
@@ -456,7 +463,7 @@ public class SQLProjectDAO implements ProjectStore {
       }
     }
     else {
-      params.addValue("overviewId", overview.getOverviewId());
+      params.addValue("overviewId", overview.getId());
       NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
       namedTemplate.update(OVERVIEW_UPDATE, params);
     }
@@ -469,13 +476,20 @@ public class SQLProjectDAO implements ProjectStore {
       }
     }
 
+    if (overview.getSampleGroup() != null && !overview.getSampleGroup().getEntities().isEmpty()) {
+      entityGroupDAO.save(overview.getSampleGroup());
+    }
+
     watcherDAO.removeWatchedEntityByUser(overview, user);
 
     for (User u : overview.getWatchers()) {
       watcherDAO.saveWatchedEntityUser(overview, u);
     }
 
-    return overview.getOverviewId();
+    DbUtils.updateCaches(cacheManager, overview.getProject(), Project.class);
+    DbUtils.updateCaches(cacheManager, overview, ProjectOverview.class);
+
+    return overview.getId();
   }
 
   @Cacheable(cacheName="projectListCache",
@@ -546,7 +560,7 @@ public class SQLProjectDAO implements ProjectStore {
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
     return (overview.isDeletable() &&
            (namedTemplate.update(OVERVIEW_DELETE,
-                                 new MapSqlParameterSource().addValue("overviewId", overview.getOverviewId())) == 1));
+                                 new MapSqlParameterSource().addValue("overviewId", overview.getId())) == 1));
   }
 
   @Cacheable(cacheName = "projectCache",
@@ -559,15 +573,13 @@ public class SQLProjectDAO implements ProjectStore {
              )
   )
   public Project get(long projectId) throws IOException {
-    List eResults = template.query(PROJECT_SELECT_BY_ID, new Object[]{projectId}, new ProjectMapper());
-    Project e = eResults.size() > 0 ? (Project) eResults.get(0) : null;
-    return e;
+    List<Project> eResults = template.query(PROJECT_SELECT_BY_ID, new Object[]{projectId}, new ProjectMapper());
+    return eResults.size() > 0 ? eResults.get(0) : null;
   }
 
   public Project lazyGet(long projectId) throws IOException {
-    List eResults = template.query(PROJECT_SELECT_BY_ID, new Object[]{projectId}, new ProjectMapper(true));
-    Project e = eResults.size() > 0 ? (Project) eResults.get(0) : null;
-    return e;
+    List<Project> eResults = template.query(PROJECT_SELECT_BY_ID, new Object[]{projectId}, new ProjectMapper(true));
+    return eResults.size() > 0 ? eResults.get(0) : null;
   }
 
   public List<Project> listBySearch(String query) {
@@ -575,22 +587,25 @@ public class SQLProjectDAO implements ProjectStore {
     return template.query(PROJECTS_SELECT_BY_SEARCH, new Object[]{mySQLQuery,mySQLQuery,mySQLQuery}, new ProjectMapper(true));
   }
 
+  @Override
+  public Project getByAlias(String alias) throws IOException {
+    List<Project> eResults = template.query(PROJECT_SELECT_BY_ALIAS, new Object[]{alias}, new ProjectMapper());
+    return eResults.size() > 0 ? eResults.get(0) : null;
+  }
+
   public Project getByStudyId(long studyId) throws IOException {
-    List eResults = template.query(PROJECT_SELECT_BY_STUDY_ID, new Object[]{studyId}, new ProjectMapper());
-    Project e = eResults.size() > 0 ? (Project) eResults.get(0) : null;
-    return e;
+    List<Project> eResults = template.query(PROJECT_SELECT_BY_STUDY_ID, new Object[]{studyId}, new ProjectMapper());
+    return eResults.size() > 0 ? eResults.get(0) : null;
   }
 
   public ProjectOverview getProjectOverviewById(long overviewId) throws IOException {
-    List eResults = template.query(OVERVIEW_SELECT_BY_ID, new Object[]{overviewId}, new ProjectOverviewMapper());
-    ProjectOverview e = eResults.size() > 0 ? (ProjectOverview) eResults.get(0) : null;
-    return e;
+    List<ProjectOverview> eResults = template.query(OVERVIEW_SELECT_BY_ID, new Object[]{overviewId}, new ProjectOverviewMapper());
+    return eResults.size() > 0 ? eResults.get(0) : null;
   }
 
   public ProjectOverview lazyGetProjectOverviewById(long overviewId) throws IOException {
-    List eResults = template.query(OVERVIEW_SELECT_BY_ID, new Object[]{overviewId}, new ProjectOverviewMapper(true));
-    ProjectOverview e = eResults.size() > 0 ? (ProjectOverview) eResults.get(0) : null;
-    return e;
+    List<ProjectOverview> eResults = template.query(OVERVIEW_SELECT_BY_ID, new Object[]{overviewId}, new ProjectOverviewMapper(true));
+    return eResults.size() > 0 ? eResults.get(0) : null;
   }
 
   public List<ProjectOverview> listOverviewsByProjectId(long projectId) throws IOException {
@@ -636,7 +651,7 @@ public class SQLProjectDAO implements ProjectStore {
         try {
           project.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
           project.setIssueKeys(listIssueKeysByProjectId(id));
-          project.setWatchers(new HashSet<User>(watcherDAO.getWatchersByEntityName(project.getWatchableIdentifier())));
+          project.setWatchers(new HashSet<>(watcherDAO.getWatchersByEntityName(project.getWatchableIdentifier())));
           if (project.getSecurityProfile() != null &&
               project.getSecurityProfile().getOwner() != null)
             project.addWatcher(project.getSecurityProfile().getOwner());
@@ -645,13 +660,11 @@ public class SQLProjectDAO implements ProjectStore {
           }
 
           if (!isLazy()) {
-            Collection<ProjectOverview> overviews = listOverviewsByProjectId(id);
-//            for (ProjectOverview po : overviews) {
-//              po.setProject(project);
-//            }
-            project.setOverviews(overviews);
             project.setSamples(sampleDAO.listByProjectId(id));
             project.setStudies(studyDAO.listByProjectId(id));
+
+            Collection<ProjectOverview> overviews = listOverviewsByProjectId(id);
+            project.setOverviews(overviews);
           }
         }
         catch (IOException e1) {
@@ -703,7 +716,7 @@ public class SQLProjectDAO implements ProjectStore {
         Project p = lazyGet(rs.getLong("project_projectId"));
         overview.setProject(p);
 
-        overview.setOverviewId(id);
+        overview.setId(id);
         overview.setPrincipalInvestigator(rs.getString("principalInvestigator"));
         overview.setStartDate(rs.getDate("startDate"));
         overview.setEndDate(rs.getDate("endDate"));
@@ -717,12 +730,17 @@ public class SQLProjectDAO implements ProjectStore {
         overview.setPrimaryAnalysisCompleted(rs.getBoolean("primaryAnalysisCompleted"));
         overview.setLastUpdated(rs.getTimestamp("lastUpdated"));
 
-        overview.setSamples(p.getSamples());
+        HierarchicalEntityGroup<ProjectOverview, Sample> osg = entityGroupDAO.getEntityGroupByParent(overview, overview.getClass());
+        if (osg != null) {
+          osg.setParent(overview);
+          overview.setSampleGroup(osg);
+        }
+
         overview.setLibraries(libraryDAO.listByProjectId(rs.getLong("project_projectId")));
         overview.setRuns(runDAO.listByProjectId(rs.getLong("project_projectId")));
         overview.setNotes(noteDAO.listByProjectOverview(id));
 
-        overview.setWatchers(new HashSet<User>(watcherDAO.getWatchersByEntityName(overview.getWatchableIdentifier())));
+        overview.setWatchers(new HashSet<>(watcherDAO.getWatchersByEntityName(overview.getWatchableIdentifier())));
         if (overview.getProject().getSecurityProfile() != null &&
             overview.getProject().getSecurityProfile().getOwner() != null)
           overview.addWatcher(overview.getProject().getSecurityProfile().getOwner());

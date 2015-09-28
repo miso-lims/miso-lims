@@ -26,8 +26,15 @@
 <div id="maincontent">
   <div id="contentcolumn">
     <sec:authorize access="hasRole('ROLE_ADMIN')">
-      <h1>${total} Logged-in Users</h1>
-      <table class="list">
+      <nav class="navbar navbar-default" role="navigation">
+         <div class="navbar-header">
+            <span class="navbar-brand navbar-center">
+              ${total} Logged-in Users
+            </span>
+         </div>
+      </nav>
+
+      <table class="table table-bordered table-striped">
         <thead>
         <tr>
           <th>Username</th>
@@ -49,18 +56,27 @@
       </table>
     </sec:authorize>
 
-    <h1>
-      <div id="totalCount">
+    <nav class="navbar navbar-default" role="navigation">
+      <div class="navbar-header">
+        <span class="navbar-brand navbar-center">
+          <div>${fn:length(users)} Users</div>
+        </span>
       </div>
-    </h1>
-    <form id="filter-form">Filter: <input name="filter" id="filter" value="" maxlength="30" size="30" type="text">
-    </form>
-    <br/>
-    <sec:authorize access="hasRole('ROLE_ADMIN')">
-      <a href="<c:url value="/miso/admin/user/new"/>" class="add">Add User</a>
-    </sec:authorize>
-    <br/>
-    <table class="list" id="table">
+      <div class="collapse navbar-collapse bs-example-js-navbar-collapse">
+        <ul class="nav navbar-nav navbar-right">
+          <li id="pro-menu" class="dropdown">
+            <a id="pro-drop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Options <b class="caret"></b></a>
+            <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="pro-drop1">
+              <sec:authorize access="hasRole('ROLE_ADMIN')">
+              <li role="presentation"><a href="<c:url value="/miso/admin/user/new"/>">Add User</a></li>
+              </sec:authorize>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <table class="table table-bordered table-striped display" id="table">
       <thead>
       <tr>
         <th class="fit">User ID</th>
@@ -79,11 +95,11 @@
           </td>
           <td class="fit">
             <sec:authorize access="hasRole('ROLE_TECH')">
-            <a href='<c:url value="/miso/tech/user/${user.userId}"/>'>Edit</a></td>
+            <a href='<c:url value="/miso/tech/user/${user.userId}"/>'><span class="fa fa-pencil-square-o fa-lg"></span></a></td>
           </sec:authorize>
 
           <sec:authorize access="hasRole('ROLE_ADMIN')">
-            <a href='<c:url value="/miso/admin/user/${user.userId}"/>'>Edit</a></td>
+            <a href='<c:url value="/miso/admin/user/${user.userId}"/>'><span class="fa fa-pencil-square-o fa-lg"></span></a></td>
           </sec:authorize>
         </tr>
       </c:forEach>
@@ -91,33 +107,8 @@
     </table>
     <script type="text/javascript">
       jQuery(document).ready(function () {
-        writeTotalNo();
-        jQuery("#table").tablesorter({
-          headers: {
-            2: {
-              sorter: false
-            }
-          }
-        });
+        jQuery("#table").dataTable();
       });
-
-      jQuery(function () {
-        var theTable = jQuery("#table");
-
-        jQuery("#filter").keyup(function () {
-          jQuery.uiTableFilter(theTable, this.value);
-          writeTotalNo();
-        });
-
-        jQuery('#filter-form').submit(function () {
-          theTable.find("tbody > tr:visible > td:eq(1)").mousedown();
-          return false;
-        }).focus(); //Give focus to input field
-      });
-
-      function writeTotalNo() {
-        jQuery('#totalCount').html(jQuery('#table>tbody>tr:visible').length.toString() + " Users");
-      }
     </script>
   </div>
 </div>

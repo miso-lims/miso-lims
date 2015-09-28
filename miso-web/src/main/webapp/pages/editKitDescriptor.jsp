@@ -26,12 +26,19 @@
     <form:form action="/miso/kitdescriptor" method="POST" commandName="kitDescriptor" autocomplete="off">
 
       <sessionConversation:insertSessionConversationId attributeName="kitDescriptor"/>
-
-      <h1><c:choose><c:when
-          test="${kitDescriptor.kitDescriptorId != 0}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose>
-        Kit Descriptor
-        <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
-      </h1>
+      <nav class="navbar navbar-default" role="navigation">
+         <div class="navbar-header">
+            <span class="navbar-brand navbar-center">
+              <c:choose>
+                <c:when test="${kitDescriptor.kitDescriptorId != 0}">Edit</c:when>
+                <c:otherwise>Create</c:otherwise>
+              </c:choose> Kit Descriptor
+            </span>
+         </div>
+         <div class="navbar-right container-fluid">
+            <button type="submit" class="btn btn-default navbar-btn">Save</button>
+         </div>
+      </nav>
       <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
         <div id="note_arrowclick" class="toggleLeft"></div>
       </div>
@@ -50,23 +57,23 @@
         </tr>
         <tr>
           <td class="h">Name:</td>
-          <td><form:input path="name"/></td>
+          <td><form:input path="name" class="form-control"/></td>
         </tr>
         <tr>
           <td class="h">Version:</td>
-          <td><form:input path="version"/></td>
+          <td><form:input path="version" class="form-control"/></td>
         </tr>
         <tr>
           <td class="h">Manufacturer:</td>
-          <td><form:input path="manufacturer"/></td>
+          <td><form:input path="manufacturer" class="form-control"/></td>
         </tr>
         <tr>
           <td class="h">Part Number:</td>
-          <td><form:input path="partNumber"/></td>
+          <td><form:input path="partNumber" class="form-control"/></td>
         </tr>
         <tr>
           <td class="h">Stock Level:</td>
-          <td><form:input path="stockLevel"/></td>
+          <td><form:input path="stockLevel" class="form-control"/></td>
         </tr>
         <tr>
           <c:choose>

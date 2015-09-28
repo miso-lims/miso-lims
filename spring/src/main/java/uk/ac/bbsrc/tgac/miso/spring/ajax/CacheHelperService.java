@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
@@ -116,6 +117,17 @@ public class CacheHelperService {
     return JSONUtils.SimpleJSONError("No cache specified to flush");
   }
 
+  public <T extends Nameable> void evictObjectFromCache(T n, Class<T> entityType) {
+    Cache lazyCache = DbUtils.lookupCache(cacheManager, entityType, true);
+    Cache cache = DbUtils.lookupCache(cacheManager, entityType, false);
+    if (lazyCache != null) {
+      DbUtils.updateCaches(lazyCache, n.getId());
+    }
+    if (cache != null) {
+      DbUtils.updateCaches(cache, n.getId());
+    }
+  }
+
   public JSONObject viewCacheStats(HttpSession session, JSONObject json) {
     Map<String, Object> response = new HashMap<String, Object>();
     List<String> cacheNames = Arrays.asList(cacheManager.getCacheNames());
@@ -148,7 +160,7 @@ public class CacheHelperService {
         }
       }
 
-      for (emPCRDilution ed : requestManager.listAllEmPcrDilutions()) {
+      for (emPCRDilution ed : requestManager.listAllEmPCRDilutions()) {
         if (ed.getIdentificationBarcode() == null || "".equals(ed.getIdentificationBarcode())) {
           requestManager.saveEmPCRDilution(ed);
         }

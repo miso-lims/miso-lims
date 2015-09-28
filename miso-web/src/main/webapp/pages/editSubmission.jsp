@@ -35,23 +35,26 @@
 
 <div id="maincontent">
 <div id="contentcolumn">
-<form:form action="/miso/submission" method="POST" commandName="submission" autocomplete="off"
-           onsubmit="return validate_submission(this);">
+<form:form action="/miso/submission" method="POST" commandName="submission" autocomplete="off">
   <sessionConversation:insertSessionConversationId attributeName="submission"/>
-  <h1>
-    <c:choose>
-      <c:when test="${submission.id != 0}">Edit</c:when>
-      <c:otherwise>Create</c:otherwise>
-    </c:choose> Submission
-    <c:if test="${submission.id != 0}">
-      <input type="button" value="Save" class="fg-button ui-state-default ui-corner-all"
-             onclick="Submission.saveSubmission(${submission.id},jQuery(form))"/>
-    </c:if>
-    <c:if test="${submission.id == 0}">
-      <input type="button" value="Save" class="fg-button ui-state-default ui-corner-all"
-             onclick="Submission.saveSubmission(-1,jQuery(form))"/>
-    </c:if>
-  </h1>
+  <nav class="navbar navbar-default" role="navigation">
+     <div class="navbar-header">
+        <span class="navbar-brand navbar-center">
+          <c:choose>
+            <c:when test="${submission.id != 0}">Edit</c:when>
+            <c:otherwise>Create</c:otherwise>
+          </c:choose> Submission
+        </span>
+     </div>
+     <div class="navbar-right container-fluid">
+       <c:if test="${submission.id != 0}">
+        <button value="Save" class="btn btn-default navbar-btn" onclick="Submission.saveSubmission(${submission.id},jQuery(form))">Save</button>
+       </c:if>
+       <c:if test="${submission.id == 0}">
+         <button value="Save" class="btn btn-default navbar-btn" onclick="Submission.saveSubmission(-1,jQuery(form))">Save</button>
+       </c:if>
+     </div>
+  </nav>
 
   <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
     <div id="note_arrowclick" class="toggleLeft"></div>
@@ -80,26 +83,33 @@
     </tr>
     <tr>
       <td class="h">Title:</td>
-      <td><form:input path="title"/><span id="titlecounter" class="counter"></span></td>
-        <%--<td><a href="void(0);" onclick="popup('help/submissionTitle.html');">Help</a></td>--%>
+      <td>
+        <div class="input-group">
+          <form:input path="title" class="form-control"/><span id="titlecounter" class="input-group-addon"></span>
+        </div>
+      </td>
     </tr>
     <tr>
       <td class="h">Alias:</td>
-      <td><form:input path="alias"/><span id="aliascounter" class="counter"></span></td>
-        <%--<td><a href="void(0);" onclick="popup('help/submissionAlias.html');">Help</a></td>--%>
+      <td>
+        <div class="input-group">
+          <form:input path="alias" class="form-control"/><span id="aliascounter" class="input-group-addon"></span>
+        </div>
+      </td>
     </tr>
     <tr>
       <td class="h">Description:</td>
-      <td><form:input path="description"/><span id="descriptioncounter" class="counter"></span></td>
-        <%--<td><a href="void(0);" onclick="popup('help/submissionDescription.html');">Help</a></td>--%>
+      <td>
+        <div class="input-group">
+          <form:input path="description" class="form-control"/><span id="descriptioncounter" class="input-group-addon"></span>
+        </div>
+      </td>
     </tr>
     <c:if test="${not empty submission.accession}">
       <tr>
         <td class="h">Accession:</td>
-        <td><a href="http://www.ebi.ac.uk/ena/data/view/${submission.accession}"
-               target="_blank">${submission.accession}</a>
+        <td><a href="http://www.ebi.ac.uk/ena/data/view/${submission.accession}" target="_blank">${submission.accession}</a>
         </td>
-          <%--<td><a href="void(0);" onclick="popup('help/submissionAccession.html');">Help</a></td>--%>
       </tr>
     </c:if>
     <tr>

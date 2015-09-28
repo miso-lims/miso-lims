@@ -65,6 +65,9 @@ public class NotificationRequestService {
   public String processRequest(Object request) {
     if (request instanceof JSONObject) {
       JSONObject j = (JSONObject)request;
+      if (j.getString("query").toLowerCase().contains("progress")) {
+        return queryRunProgress(j);
+      }
       if (j.getString("query").toLowerCase().contains("status")) {
         return queryRunStatus(j);
       }
@@ -74,6 +77,9 @@ public class NotificationRequestService {
       else if (j.getString("query").toLowerCase().contains("parameters")) {
         return queryRunParameters(j);
       }
+      else if (j.getString("query").toLowerCase().contains("interop")) {
+        return queryInterOpMetrics(j);
+      }
       else {
         return testService(j);
       }
@@ -81,19 +87,53 @@ public class NotificationRequestService {
     return "{'error':'Unsupported operation'}";
   }
 
+  private String queryRunProgress(JSONObject request) {
+    try {
+      return notificationRequestManager.queryRunProgress(request);
+    }
+    catch(Exception ise) {
+      return "{\"error\":\"Cannot retrieve run status: "+ise.getMessage()+"\"}";
+    }
+  }
+
   private String queryRunStatus(JSONObject request) {
-    return notificationRequestManager.queryRunStatus(request);
+    try {
+      return notificationRequestManager.queryRunStatus(request);
+    }
+    catch(Exception ise) {
+      return "{\"error\":\"Cannot retrieve run status: "+ise.getMessage()+"\"}";
+    }
   }
 
   private String queryRunInfo(JSONObject request) {
-    return notificationRequestManager.queryRunInfo(request);
+    try {
+      return notificationRequestManager.queryRunInfo(request);
+    }
+    catch(Exception ise) {
+      return "{\"error\":\"Cannot retrieve run information: "+ise.getMessage()+"\"}";
+    }
   }
 
   private String queryRunParameters(JSONObject request) {
-    return notificationRequestManager.queryRunParameters(request);
+    try {
+      return notificationRequestManager.queryRunParameters(request);
+    }
+    catch(Exception ise) {
+      return "{\"error\":\"Cannot retrieve run parameters: "+ise.getMessage()+"\"}";
+    }
+  }
+
+  private String queryInterOpMetrics(JSONObject request) {
+    try {
+      return notificationRequestManager.queryInterOpMetrics(request);
+    }
+    catch(Exception ise) {
+      return "{\"error\":\"Cannot retrieve InterOp metrics: "+ise.getMessage()+"\"}";
+    }
   }
 
   private String testService(JSONObject request) {
+    log.warn("Cannot find service action for " + request.getString("query") + ". Has a service method been defined?");
     return "{'TEST':'"+request.getString("query")+"'}";
   }
 

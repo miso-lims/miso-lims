@@ -32,6 +32,7 @@
 
 <div id="login-form">
   <form action="j_spring_security_check" method="POST">
+    <%--
     <div style="margin:0;padding:0;display:inline">
       <table>
         <tr>
@@ -59,9 +60,26 @@
         </tr>
       </table>
     </div>
-    <script type="text/javascript">
-      Form.Element.focus('j_username');
-    </script>
+    --%>
+      <div class="panel panel-primary panel-login span7">
+        <div class="panel-heading">
+          <h3 class="panel-title">Login</h3>
+        </div>
+        <div class="panel-body">
+          <ul class="list-group">
+            <li class="list-group-item" style="border:0;height:45px;"><div class="input-group"><span class="input-group-addon fa fa-user fa-fw login-addon"></span>
+              <%--<label for="j_username" class="float-left" style="margin-top:5px;">Username</label>--%><input type="text" name="j_username" id="j_username" class="form-control" placeholder="Username"/></div>
+            </li>
+            <li class="list-group-item" style="border:0;height:45px;"><div class="input-group"><span class="input-group-addon fa fa-key fa-fw login-addon"></span>
+              <%--<label for="j_password" class="float-left" style="margin-top:5px;">Password</label>--%><input type="password" name="j_password" id="j_password" class="form-control" placeholder="Password"/></div>
+            </li>
+            <li class="list-group-item" style="border:0;height:45px;"><small><span style="width:100px" class="float-left"><input type='checkbox' name='_spring_security_remember_me'/> Stay logged in</span></small><input type="submit" name="login" value="Login &#187;" tabindex="5" class="float-right"/></li>
+          </ul>
+        </div>
+      </div>
+      <script type="text/javascript">
+        Form.Element.focus('j_username');
+      </script>
   </form>
 </div>
 <script type="text/javascript">

@@ -69,6 +69,7 @@
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution" value-ref="emPCRDilutionStore"/>
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution" value-ref="libraryDilutionStore"/>
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.Experiment" value-ref="experimentStore"/>
+        <entry key="uk.ac.bbsrc.tgac.miso.core.data.EntityGroup" value-ref="entityGroupStore"/>
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.Kit" value-ref="kitStore"/>
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.Library" value-ref="libraryStore"/>
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.LibraryQC" value-ref="libraryQcStore"/>
@@ -81,6 +82,7 @@
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.PrintJob" value-ref="printJobStore"/>
         <entry key="uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService" value-ref="printServiceStore"/>
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.Project" value-ref="projectStore"/>
+        <entry key="uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview" value-ref="projectStore"/>
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.Run" value-ref="runStore"/>
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.RunQC" value-ref="runQcStore"/>
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.Sample" value-ref="sampleStore"/>
@@ -90,6 +92,10 @@
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.Status" value-ref="statusStore"/>
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.Study" value-ref="studyStore"/>
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.Submission" value-ref="submissionStore"/>
+        <entry key="uk.ac.bbsrc.tgac.miso.core.workflow.Workflow" value-ref="workflowStore"/>
+        <entry key="uk.ac.bbsrc.tgac.miso.core.workflow.WorkflowDefinition" value-ref="workflowDefinitionStore"/>
+        <entry key="uk.ac.bbsrc.tgac.miso.core.workflow.WorkflowProcess" value-ref="workflowProcessStore"/>
+        <entry key="uk.ac.bbsrc.tgac.miso.core.workflow.WorkflowProcessDefinition" value-ref="workflowProcessDefinitionStore"/>
       </map>
     </property>
   </bean>
@@ -101,6 +107,7 @@
     <property name="securityManager" ref="securityManager"/>
     <property name="studyDAO" ref="sqlStudyDAO"/>
     <property name="sampleDAO" ref="sqlSampleDAO"/>
+    <property name="entityGroupDAO" ref="sqlEntityGroupDAO"/>
     <property name="libraryDAO" ref="sqlLibraryDAO"/>
     <property name="runDAO" ref="sqlRunDAO"/>
     <property name="noteDAO" ref="sqlNoteDAO"/>
@@ -150,6 +157,14 @@
     <property name="securityProfileDAO" ref="sqlSecurityProfileDAO"/>
     <property name="libraryDilutionDAO" ref="sqlLibraryDilutionDAO"/>
     <property name="emPCRDilutionDAO" ref="sqlEmPCRDilutionDAO"/>
+    <property name="jdbcTemplate" ref="interfaceTemplate"/>
+  </bean>
+
+  <bean id="sqlEntityGroupDAO"
+        class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLEntityGroupDAO">
+    <property name="cascadeType">
+      <value type="javax.persistence.CascadeType">REMOVE</value>
+    </property>
     <property name="jdbcTemplate" ref="interfaceTemplate"/>
   </bean>
 
@@ -232,6 +247,7 @@
     </property>
     <property name="partitionDAO" ref="sqlPartitionDAO"/>
     <property name="runDAO" ref="sqlRunDAO"/>
+    <property name="platformDAO" ref="sqlPlatformDAO"/>
     <property name="securityProfileDAO" ref="sqlSecurityProfileDAO"/>
     <property name="jdbcTemplate" ref="interfaceTemplate"/>
   </bean>
@@ -378,6 +394,60 @@
     <property name="jdbcTemplate" ref="interfaceTemplate"/>
   </bean>
 
+  <bean id="sqlAssigneeDAO"
+        class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLAssigneeDAO">
+    <property name="securityManager" ref="securityManager"/>
+    <property name="jdbcTemplate" ref="interfaceTemplate"/>
+  </bean>
+
+  <bean id="sqlWorkflowDAO"
+        class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLWorkflowDAO">
+    <property name="securityManager" ref="securityManager"/>
+    <property name="jdbcTemplate" ref="interfaceTemplate"/>
+    <property name="workflowDefinitionDAO" ref="sqlWorkflowDefinitionDAO"/>
+    <property name="workflowProcessDAO" ref="sqlWorkflowProcessDAO"/>
+    <property name="assigneeDAO" ref="sqlAssigneeDAO"/>
+    <property name="attachableDAO" ref="sqlAttachableDAO"/>
+    <property name="stateDAO" ref="sqlStateDAO"/>
+  </bean>
+
+  <bean id="sqlWorkflowProcessDAO"
+        class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLWorkflowProcessDAO">
+    <property name="securityManager" ref="securityManager"/>
+    <property name="jdbcTemplate" ref="interfaceTemplate"/>
+    <property name="workflowProcessDefinitionDAO" ref="sqlWorkflowProcessDefinitionDAO"/>
+    <property name="assigneeDAO" ref="sqlAssigneeDAO"/>
+    <property name="attachableDAO" ref="sqlAttachableDAO"/>
+    <property name="stateDAO" ref="sqlStateDAO"/>
+  </bean>
+
+  <bean id="sqlWorkflowDefinitionDAO"
+        class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLWorkflowDefinitionDAO">
+    <property name="securityManager" ref="securityManager"/>
+    <property name="jdbcTemplate" ref="interfaceTemplate"/>
+    <property name="workflowProcessDefinitionDAO" ref="sqlWorkflowProcessDefinitionDAO"/>
+    <property name="stateDAO" ref="sqlStateDAO"/>
+  </bean>
+
+  <bean id="sqlWorkflowProcessDefinitionDAO"
+        class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLWorkflowProcessDefinitionDAO">
+    <property name="securityManager" ref="securityManager"/>
+    <property name="jdbcTemplate" ref="interfaceTemplate"/>
+    <property name="stateDAO" ref="sqlStateDAO"/>
+  </bean>
+
+  <bean id="sqlStateDAO"
+        class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLStateDAO">
+    <property name="securityManager" ref="securityManager"/>
+    <property name="jdbcTemplate" ref="interfaceTemplate"/>
+  </bean>
+
+  <bean id="sqlAttachableDAO"
+        class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLAttachableDAO">
+    <property name="jdbcTemplate" ref="interfaceTemplate"/>
+
+  </bean>
+
   <bean name="projectStore" class="org.springframework.aop.framework.ProxyFactoryBean">
     <property name="proxyInterfaces">
       <value>uk.ac.bbsrc.tgac.miso.core.store.ProjectStore</value>
@@ -407,6 +477,17 @@
     <property name="interceptorNames">
       <list>
         <value>sqlEmPCRDilutionDAO</value>
+      </list>
+    </property>
+  </bean>
+
+  <bean name="entityGroupStore" class="org.springframework.aop.framework.ProxyFactoryBean">
+    <property name="proxyInterfaces">
+      <value>uk.ac.bbsrc.tgac.miso.core.store.EntityGroupStore</value>
+    </property>
+    <property name="interceptorNames">
+      <list>
+        <value>sqlEntityGroupDAO</value>
       </list>
     </property>
   </bean>
@@ -693,6 +774,83 @@
     <property name="interceptorNames">
       <list>
         <value>sqlWatcherDAO</value>
+      </list>
+    </property>
+  </bean>
+
+  <bean name="assigneeStore" class="org.springframework.aop.framework.ProxyFactoryBean">
+    <property name="proxyInterfaces">
+      <value>uk.ac.bbsrc.tgac.miso.core.store.AssigneeStore</value>
+    </property>
+    <property name="interceptorNames">
+      <list>
+        <value>sqlAssigneeDAO</value>
+      </list>
+    </property>
+  </bean>
+
+  <bean name="workflowStore" class="org.springframework.aop.framework.ProxyFactoryBean">
+    <property name="proxyInterfaces">
+      <value>uk.ac.bbsrc.tgac.miso.core.store.WorkflowStore</value>
+    </property>
+    <property name="interceptorNames">
+      <list>
+        <value>sqlWorkflowDAO</value>
+      </list>
+    </property>
+  </bean>
+
+  <bean name="workflowProcessStore" class="org.springframework.aop.framework.ProxyFactoryBean">
+    <property name="proxyInterfaces">
+      <value>uk.ac.bbsrc.tgac.miso.core.store.WorkflowProcessStore</value>
+    </property>
+    <property name="interceptorNames">
+      <list>
+        <value>sqlWorkflowProcessDAO</value>
+      </list>
+    </property>
+  </bean>
+
+  <bean name="workflowDefinitionStore" class="org.springframework.aop.framework.ProxyFactoryBean">
+    <property name="proxyInterfaces">
+      <value>uk.ac.bbsrc.tgac.miso.core.store.WorkflowDefinitionStore</value>
+    </property>
+    <property name="interceptorNames">
+      <list>
+        <value>sqlWorkflowDefinitionDAO</value>
+      </list>
+    </property>
+  </bean>
+
+  <bean name="workflowProcessDefinitionStore" class="org.springframework.aop.framework.ProxyFactoryBean">
+    <property name="proxyInterfaces">
+      <value>uk.ac.bbsrc.tgac.miso.core.store.WorkflowProcessDefinitionStore</value>
+    </property>
+    <property name="interceptorNames">
+      <list>
+        <value>sqlWorkflowProcessDefinitionDAO</value>
+      </list>
+    </property>
+  </bean>
+
+  <bean name="stateStore" class="org.springframework.aop.framework.ProxyFactoryBean">
+    <property name="proxyInterfaces">
+      <value>uk.ac.bbsrc.tgac.miso.core.store.StateStore</value>
+    </property>
+    <property name="interceptorNames">
+      <list>
+        <value>sqlStateDAO</value>
+      </list>
+    </property>
+  </bean>
+
+  <bean name="attachableStore" class="org.springframework.aop.framework.ProxyFactoryBean">
+    <property name="proxyInterfaces">
+      <value>uk.ac.bbsrc.tgac.miso.core.store.AttachableStore</value>
+    </property>
+    <property name="interceptorNames">
+      <list>
+        <value>sqlAttachableDAO</value>
       </list>
     </property>
   </bean>

@@ -41,15 +41,16 @@ import org.springframework.web.context.request.WebRequest;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.*;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaPool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ls454.LS454Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.solid.SolidPool;
 import uk.ac.bbsrc.tgac.miso.core.data.type.*;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.DefaultMisoEntityPrefix;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 import java.beans.PropertyEditorSupport;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
@@ -167,6 +168,13 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
     
 //TGAC Classes
     binder.registerCustomEditor(com.eaglegenomics.simlims.core.User.class, new PropertyEditorSupport() {
+     @Override
+      public void setAsText(String element) throws IllegalArgumentException {
+        setValue(resolveUser(element));
+      }
+    });
+
+    binder.registerCustomEditor(com.eaglegenomics.simlims.core.User.class, "securityProfile.owner", new PropertyEditorSupport() {
      @Override
       public void setAsText(String element) throws IllegalArgumentException {
         setValue(resolveUser(element));
@@ -505,6 +513,13 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
         return resolvePoolable(element);
       }
     });
+
+    binder.registerCustomEditor(Set.class, "entities", new CustomCollectionEditor(Set.class) {
+      @Override
+      protected Object convertElement(Object element) {
+        return resolveEntityGroupEntity(element);
+      }
+    });
   }
 
   /**
@@ -643,7 +658,6 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
     if (element instanceof String)
       id = NumberUtils.parseNumber((String) element, Long.class).longValue();
     try {
-      log.info("Resolved project overview");
       return id != null ? requestManager.getProjectOverviewById(id) : null;
     }
     catch (IOException e) {
@@ -736,15 +750,8 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
    */
   private Experiment resolveExperiment(Object element) throws IllegalArgumentException {
     Long id = null;
-    log.info("Resolving experiment: " + element.toString());
     if (element instanceof String) {
-//      if (((String)element).startsWith(Experiment.PREFIX)) {
-//        String ident = ((String)element).substring(Experiment.PREFIX.length());
-//        id = NumberUtils.parseNumber(ident, Long.class).longValue();
-//      }
-//      else {
-        id = NumberUtils.parseNumber((String) element, Long.class).longValue();
-//      }
+      id = NumberUtils.parseNumber((String) element, Long.class).longValue();
     }
     try {
       return id != null ? requestManager.getExperimentById(id) : null;
@@ -940,12 +947,10 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
       try {
         if ("LDI".equals(prefix)) {
-          log.debug(prefix + ":" + ident + " -> Dilution");
           return id != null ? requestManager.getLibraryDilutionById(id) : null;
         }
         else if ("EDI".equals(prefix)) {
-          log.debug(prefix + ":" + ident + " -> Dilution");
-          return id != null ? requestManager.getEmPcrDilutionById(id) : null;
+          return id != null ? requestManager.getEmPCRDilutionById(id) : null;
         }
         else {
           log.debug("Failed to resolve dilution with identifier: " + prefix+ident);
@@ -995,7 +1000,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
     if (element instanceof String)
       id = NumberUtils.parseNumber((String) element, Long.class).longValue();
     try {
-      return id != null ? requestManager.getEmPcrDilutionById(id) : null;
+      return id != null ? requestManager.getEmPCRDilutionById(id) : null;
     }
     catch (IOException e) {
       if (log.isDebugEnabled()) {
@@ -1087,19 +1092,15 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
       try {
         if (Study.PREFIX.equals(prefix)) {
-          log.info(prefix + ":" + ident + " -> Study");
           return id != null ? requestManager.getStudyById(id) : null;
         }
         else if (Sample.PREFIX.equals(prefix)) {
-          log.info(prefix + ":" + ident + " -> Sample");
           return id != null ? requestManager.getSampleById(id) : null;
         }
         else if (Experiment.PREFIX.equals(prefix)) {
-          log.info(prefix + ":" + ident + " -> Experiment");
           return id != null ? requestManager.getExperimentById(id) : null;
         }
         else if ("PAR".equals(prefix)) {
-          log.info(prefix + ":" + ident + " -> Partition");
           return id != null ? requestManager.getSequencerPoolPartitionById(id) : null;
         }
         else {
@@ -1260,19 +1261,19 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
     if (element instanceof String) {
       String prefix = ((String)element).substring(0, 3);
       String ident = ((String)element).substring(3);
-      id = NumberUtils.parseNumber(ident, Long.class).longValue();
+      id = NumberUtils.parseNumber(ident, Long.class);
 
+      return callGetMethodByPrefix(prefix, ident, id);
+      /*
       try {
+
         if ("LDI".equals(prefix)) {
-          log.info(prefix + ":" + ident + " -> LibraryDilution");
           return id != null ? requestManager.getLibraryDilutionById(id) : null;
         }
         else if ("EDI".equals(prefix)) {
-          log.info(prefix + ":" + ident + " -> EmPCRDilution");
           return id != null ? requestManager.getEmPcrDilutionById(id) : null;
         }
         else if ("PLA".equals(prefix)) {
-          log.info(prefix + ":" + ident + " -> Plate");
           return id != null ? requestManager.getPlateById(id) : null;
         }
         else {
@@ -1285,6 +1286,53 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
         }
         throw new IllegalArgumentException(e);
       }
+      */
+    }
+    return null;
+  }
+
+  /**
+   * Resolve an EntityGroup entity object from a PREFIX
+   *
+   * @param element of type Object
+   * @return Nameable
+   * @throws IllegalArgumentException when
+   */
+  private Nameable resolveEntityGroupEntity(Object element) throws IllegalArgumentException {
+    Long id = null;
+    if (element instanceof String) {
+      String prefix = ((String)element).substring(0, 3);
+      String ident = ((String)element).substring(3);
+      id = NumberUtils.parseNumber(ident, Long.class);
+      log.info("Got entity group entity: " + prefix + " " + ident + " " + id);
+      return callGetMethodByPrefix(prefix, ident, id);
+    }
+    return null;
+  }
+
+  private <T> T callGetMethodByPrefix(String prefix, String ident, Long id) {
+    DefaultMisoEntityPrefix p = DefaultMisoEntityPrefix.getByName(prefix);
+    try {
+      if (p != null) {
+        Method m = RequestManager.class.getDeclaredMethod("get"+ LimsUtils.capitalise(p.getKey())+"ById", Long.TYPE);
+        log.info("Calling " + m.toString());
+        return id != null ? (T)m.invoke(requestManager, id) : null;
+      }
+      else {
+        log.error("Failed to resolve entity group element with identifier: " + prefix+ident);
+      }
+    }
+    catch (NoSuchMethodException e) {
+      log.error("Failed to find method get"+p.getKey()+"ById on entity group element " + prefix+ident, e);
+      throw new IllegalArgumentException(e);
+    }
+    catch (InvocationTargetException e) {
+      log.error("Failed to call method get"+p.getKey()+"ById on entity group element " + prefix+ident, e);
+      throw new IllegalArgumentException(e);
+    }
+    catch (IllegalAccessException e) {
+      log.error("Failed to resolve entity group element " + prefix+ident, e);
+      throw new IllegalArgumentException(e);
     }
     return null;
   }

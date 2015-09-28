@@ -35,7 +35,7 @@ import java.util.Collection;
  * @author Rob Davey
  * @since 0.0.2
  */
-public interface PartitionStore extends Store<SequencerPoolPartition>, Cascadable {
+public interface PartitionStore extends Store<SequencerPoolPartition>, Cascadable, Remover<SequencerPoolPartition> {
   /**
    * Retrieve a Partition from an underlying data store given a Partition ID
    * <p/>
@@ -46,7 +46,7 @@ public interface PartitionStore extends Store<SequencerPoolPartition>, Cascadabl
    * @return Partition
    * @throws java.io.IOException when
    */
-  SequencerPoolPartition lazyGet(long partitionId) throws IOException;
+  //SequencerPoolPartition lazyGet(long partitionId) throws IOException;
 
   /**
    * List all Partitions that are part of a Run given a Run ID

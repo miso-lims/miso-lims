@@ -36,6 +36,9 @@ function validate_study(form) {
   if (!ok) {
     alert(error);
   }
+  else {
+    form.submit();
+  }
 
   return ok;
 }

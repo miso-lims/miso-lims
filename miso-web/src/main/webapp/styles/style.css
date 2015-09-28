@@ -8,10 +8,10 @@ body {
     /*width: 90%;*/
     text-align: left;
     color: #333;
-    /*margin: 2em auto;*/
+    margin: 0px ! important;
     background: #FFF;
-    padding: 1.3em;
-    border: 0.3em solid #EAEAEA;
+    padding: 5px;
+    /*border: 1px solid #EAEAEA;*/
 }
 
 h1 {
@@ -20,7 +20,7 @@ h1 {
     margin: 0 0 0 -2px;
     color: #666666;
     text-align: center;
-    background-color: #CCDDFF;
+    background-color: #F0F0FF;
     border-bottom: 1px solid darkgray;
     border-right: 1px solid darkgray;
 }
@@ -47,7 +47,7 @@ p {
 pre.wrap {
     white-space: pre-wrap; /* CSS2.1 compliant */
     white-space: -moz-pre-wrap; /* Mozilla-based browsers */
-    white-space: o-pre-wrap; /* Opera 7+ */
+    white-space: -o-pre-wrap; /* Opera 7+ */
     font: 8pt Verdana, arial, sans-serif;
 }
 
@@ -69,9 +69,13 @@ a {
 }
 
 .misoicon {
-    text-align: center !important;
-    cursor: pointer;
-    margin: -1px !important;
+  text-align: center !important;
+  cursor: pointer;
+  margin: -1px !important;
+}
+
+.fa {
+  color: #29B;
 }
 
 .misoicon-hover {
@@ -90,11 +94,12 @@ a {
 
 #navtabs {
     float: left;
-    width: 100%;
+    width: 98%;
     font-size: 93%;
     line-height: normal;
-    border-bottom: 1px solid #666;
+    border-bottom: 1px solid #d3d3d3;
     margin-bottom: 0em; /*margin between menu and rest of page*/
+    margin-left: 32px;
     overflow: hidden;
 }
 
@@ -102,7 +107,6 @@ a {
     margin: 0;
     padding: 10px 10px 0 0px;
     list-style: none;
-
 }
 
 #navtabs li {
@@ -178,10 +182,18 @@ ul.shorterbullets li {
     list-style: none;
 }
 
+.green-left-border {
+  border-left:6px solid #66DD00 !important;
+}
+
+.red-left-border {
+  border-left:6px solid #CC0000 !important;
+}
+
 table.list {
     background-color: #CDCDCD;
     margin: 10px 0pt 15px;
-    font-size: 8pt;
+    font-size: 9pt;
     width: 100%;
     text-align: left;
 }
@@ -189,7 +201,7 @@ table.list {
 table.list thead tr th, table.list tfoot tr th {
     background-color: #E5E9E4;
     border: 1px solid #FFF;
-    font-size: 8pt;
+    font-size: 9pt;
     padding: 4px;
 }
 
@@ -263,6 +275,10 @@ table.traf {
     text-align: center;
 }
 
+table.traf thead th {
+    text-align: center;
+}
+
 table.traf tbody td {
     color: black;
     height: 20px;
@@ -288,7 +304,7 @@ table.in {
 }
 
 table.in td.h {
-    width: 20%;
+    width: 15%;
 }
 
 table.in td {
@@ -300,7 +316,7 @@ table.in input[type="text"] {
     background-color: #EEEEFF;
     border-left: 1px solid #666699;
     border-top: 1px solid #666666;
-    width: 94%;
+    /*width: 94%;*/
 }
 
 table.in select[multiple="multiple"] {
@@ -331,6 +347,8 @@ table.containerSummary {
     border: 0;
     padding: 0;
     width: auto;
+    border-spacing: 2px;
+    border-collapse: separate;
 }
 
 table.containerSummary td.smallbox {
@@ -338,10 +356,12 @@ table.containerSummary td.smallbox {
     width: 10px;
     height: 10px;
     text-align: center;
+    font-size: 10pt;
 }
 
 table.containerSummary td.partitionOccupied {
     background-color: #ccff99 !important;
+    cursor: pointer;
 }
 
 .ok {
@@ -383,14 +403,14 @@ table.containerSummary td.partitionOccupied {
 }
 
 #contentcolumn {
-    margin-left: 215px;
+    margin-left: 30px;
 }
 
 #subcontent {
     /*width: 220px;
     background: url(images/green_vr.gif) repeat-y right;
     */
-    background-color: #CCDDFF;
+    background-color: #F0F0FF;
     border-bottom: 1px solid darkgray;
     border-left: 1px solid lightgray;
     border-right: 1px solid darkgray;
@@ -476,10 +496,11 @@ h1.h_Running {
 }
 
 div.simplebox {
-    font: 10px Verdana, arial, sans-serif;
+    /*font: 10px Verdana, arial, sans-serif;*/
     border: 1px solid lightgray;
     margin: 5px;
-    padding: 5px;
+    padding: 1px;
+    border-radius: 5px;
 }
 
 .backwhite {
@@ -492,21 +513,17 @@ a.listbox {
 }
 
 .boxlistbox {
-    font: 10px Verdana, arial, sans-serif;
     border: 1px solid lightgray;
     margin: 5px;
     padding: 5px;
-    cursor: pointer;
 }
 
 .boxlistboxhighlight {
-    font: 10px Verdana, arial, sans-serif;
     border: 1px solid lightgray;
     margin: 5px;
     padding: 5px;
     background-color: #F0F0F6;
     color: #111;
-    cursor: pointer;
 }
 
 a.dashboardresult {
@@ -539,6 +556,11 @@ a.dashboardresult {
     text-overflow: ellipsis;
     -o-text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.dashboard_widget{
+    margin:20px 0 0 20px;
+    float:left;
 }
 
 .autocompletebox {
@@ -586,6 +608,7 @@ div.checklist {
     overflow: auto;
     padding: 0;
     width: 50%;
+    background-color: #FFFFFF;
 }
 
 .checklist span {
@@ -596,14 +619,14 @@ div.checklist {
 }
 
 .checklist label {
-    background-color: #EEEEFF;
+    /*background-color: #EEEEFF;*/
     margin: 0;
     padding: 0;
     width: 100%;
 }
 
 .checklist label:hover {
-    background-color: Highlight;
+    background-color: #F3F3F3;
     color: HighlightText;
 }
 
@@ -616,7 +639,7 @@ div.checklist {
 }
 
 .widget_title {
-    background-color: #CCDDFF;
+    background-color: #F0F0FF;
     border: 1px solid lightgray;
     border-bottom: 0px;
     padding-top: 5px;
@@ -627,7 +650,7 @@ div.checklist {
     margin-left: 5px;
     margin-right: 5px;
     margin-bottom: 0px;
-    width: 380px;
+    width: 320px;
     height: 30px;
     text-align: center;
     color: #666666;
@@ -650,7 +673,7 @@ div.checklist {
     margin-left: 5px;
     margin-right: 5px;
     margin-bottom: 5px;
-    width: 380px;
+    width: 320px;
     height: 280px;
     overflow: auto;
 }
@@ -685,9 +708,13 @@ div.checklist {
     float: right;
 }
 
+.barcodes .barcodeArea input {
+    width: 100px;
+}
+
 .note {
     background-color: #FFFFCC;
-    border: 1px solid #333333;
+    border: 1px solid #d3d3d3;
     margin-top: 5px;
     margin-bottom: 5px;
     padding: 5px;
@@ -804,7 +831,7 @@ div.sectionDivider {
     text-align: right;
     border-bottom: 1px solid #999;
     margin-bottom: 5px;
-    padding-top: 12px;
+    padding-top: 10px;
     background: #FFF;
     font-weight: bold;
     color: #666666;
@@ -978,7 +1005,7 @@ fieldset.dialog input.text {
     margin-left: auto;
     margin-right: auto;
     border: 1px solid darkgray;
-    background-color: #CCDDFF;
+    background-color: #F0F0FF;
     color: #666666;
 }
 
@@ -991,7 +1018,7 @@ fieldset.dialog input.text {
 }
 
 #login-form input#j_username, #login-form input#j_password {
-    width: 300px;
+    width: 348px;
 }
 
 div.flasherror {
@@ -1055,6 +1082,7 @@ ul.popup-bullets li {
 
 .breadcrumbs {
     background: #ffffff;
+    margin-bottom: 30px;
 }
 
 .breadcrumbs ul {
@@ -1073,6 +1101,26 @@ ul.popup-bullets li {
     float: left;
     padding-left: 10px;
     font-weight: bold;
+}
+
+.breadcrumbs span a.arrowright {
+    display: block;
+    background-image: url(images/bc_separator.png);
+    background-repeat: no-repeat;
+    background-position: right;
+    padding-right: 15px;
+    color: #454545;
+    height: 16px !important;
+}
+
+.breadcrumbs span a.arrowleft {
+    display: block;
+    background-image: url(images/bc_separator-left.png);
+    background-repeat: no-repeat;
+    background-position: left;
+    padding-left: 15px;
+    color: #454545;
+    height: 16px !important;
 }
 
 .breadcrumbs a {
@@ -1129,9 +1177,9 @@ span.counter {
 #traftrigger {
     background-color: #F8F8F8;
     border: 1px solid lightgray;
-    padding: 10px;
+    padding: 5px;
     float: right;
-    margin: 10px 10px 0px 0;
+    margin: -28px 10px 0px 0;
     cursor: pointer;
     color: #06c;
 }
@@ -1317,7 +1365,7 @@ div.experimentwizard li {
     stroke-width: 1.5px;
 }
 
-/
+
 /* new CSS for dynamic D3 */
 
 circle.node {
@@ -1515,6 +1563,7 @@ table.fields {
 .italicInfo {
     font-style: italic;
     color: #AAAAAA;
+    font-size: 10pt;
 }
 
 .slice text {
@@ -1534,62 +1583,79 @@ table.overviewSummary {
     border: 0;
     padding: 0;
     width: auto;
-    font-size: 4pt;
+    /*font-size: 6pt;*/
+    border-spacing: 2px;
+    border-collapse: separate;
 }
 
 table.overviewSummary td.smallbox {
     border: 1px solid #CDCDCD;
-    width: 5px;
-    height: 5px;
+    width: 10px;
+    height: 10px;
     text-align: center;
+    font-size: 10pt;
 }
 
 table.overviewSummary td.partitionOccupied {
     background-color: #ccff99 !important;
+    cursor: pointer;
 }
 
 /*statsdb*/
-.box { font: 10px sans-serif; }
-.box { stroke-width: 0.5px;  }
-.box .center { stroke-dasharray: 3 3; }
-.box .outlier { stroke: #ccc; fill: none; }
-
-.whisker {
- stroke: black; stroke-width: 0.5px;
+.box {
+    font: 10px sans-serif;
 }
 
+.box {
+    stroke-width: 0.5px;
+}
+
+.box .center {
+    stroke-dasharray: 3 3;
+}
+
+.box .outlier {
+    stroke: #ccc;
+    fill: none;
+}
+
+.whisker {
+    stroke: black;
+    stroke-width: 0.5px;
+}
 
 .basebox:hover {
-  fill: lightgray;
+    fill: lightgray;
     opacity: 0.5;
 
 }
 
-.label{
-font: 10px sans-serif;
+.label {
+    font: 10px sans-serif;
 }
 
 .path {
-stroke: red; stroke-width: 2px;
-fill: transparent;
+    stroke: red;
+    stroke-width: 2px;
+    fill: transparent;
 }
 
 .scoreboxgreen {
-fill: green;
-opacity: 0.3;
+    fill: green;
+    opacity: 0.3;
 }
 
 .scoreboxyellow {
-fill: yellow;
-opacity: 0.3;
+    fill: yellow;
+    opacity: 0.3;
 }
 
 .scoreboxred {
-fill: red;
-opacity: 0.3;
+    fill: red;
+    opacity: 0.3;
 }
 
-#statschartmessage{
+#statschartmessage {
     position: absolute;
     background: white;
     border: 2px solid #000000;
@@ -1597,89 +1663,97 @@ opacity: 0.3;
     text-align: left;
 }
 
-#statsresultgraph{
+#statsresultgraph {
     text-align: center;
 }
 
 /*stats db perbasecontent*/
 
-
-.line{
-stroke-width: 2px;
+.line {
+    stroke-width: 2px;
 }
 
-.circle{
-stroke-width: 2px;}
-
-.labelG{
-	stroke: blue;
-
+.circle {
+    stroke-width: 2px;
 }
 
-.labelA{
-	stroke: red;
-}
-
-
-.labelT{
-	stroke: green;
+.labelG {
+    stroke: blue;
 
 }
 
-.labelC{
-	stroke: black;
+.labelA {
+    stroke: red;
+}
+
+.labelT {
+    stroke: green;
 
 }
 
-.circleG{
-	stroke: blue;
-	fill: white;
+.labelC {
+    stroke: black;
 
 }
 
-.circleA{
-	stroke: red;
-	fill: white;
+.circleG {
+    stroke: blue;
+    fill: white;
 
 }
 
-
-.circleT{
-	stroke: green;
-	fill: white;
-
-}
-
-
-.circleC{
-	stroke: black;
-	fill: white;
+.circleA {
+    stroke: red;
+    fill: white;
 
 }
 
-.lineG{
-	stroke: blue;
+.circleT {
+    stroke: green;
+    fill: white;
 
 }
 
-.lineA{
-	stroke: red;
+.circleC {
+    stroke: black;
+    fill: white;
 
 }
 
+.lineG {
+    stroke: blue;
 
-.lineT{
-	stroke: green;
+}
+
+.lineA {
+    stroke: red;
 
 }
 
-
-.lineC{
-	stroke: black;
+.lineT {
+    stroke: green;
 
 }
-a.DTTT_button{
-    margin-left:10px ! important;
+
+.lineC {
+    stroke: black;
+
+}
+
+a.DTTT_button {
+    margin-left: 10px ! important;
 }
 
 /*statsdb ends*/
+
+.exportcolumn {
+    border-right: 1px solid lightgray;
+    float: left;
+    margin-left: 20px;
+}
+
+div.platewell {
+    height:40px;
+    width:40px;
+    background: url(/styles/images/plate/circle.png) no-repeat right top ! important;
+}

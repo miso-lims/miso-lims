@@ -23,13 +23,9 @@
 
 package uk.ac.bbsrc.tgac.miso.core.store;
 
-import net.sourceforge.fluxion.spi.Spi;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaPool;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ls454.LS454Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.solid.SolidPool;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
 
@@ -55,11 +51,21 @@ public interface PoolStore extends Store<Pool<? extends Poolable>>, Remover<Pool
   Pool<? extends Poolable> getPoolByBarcode(String barcode, PlatformType platformType) throws IOException;
 
   /**
+   * List all Pools that are related to a given {@link uk.ac.bbsrc.tgac.miso.core.data.Sample} by means of that
+   * Sample's {@link uk.ac.bbsrc.tgac.miso.core.data.Library} objects
+   *
+   * @param sampleId of type long
+   * @return List<Pool<? extends Poolable>
+   * @throws IOException when
+   */
+  Collection<Pool<? extends Poolable>> listBySampleId(long sampleId) throws IOException;
+
+  /**
    * List all Pools that are related to a given {@link uk.ac.bbsrc.tgac.miso.core.data.Library} by means of that
    * Library's {@link uk.ac.bbsrc.tgac.miso.core.data.Dilution} objects
    *
    * @param libraryId of type long
-   * @return List<IlluminaPool>
+   * @return List<Pool<? extends Poolable>
    * @throws IOException when
    */
   Collection<Pool<? extends Poolable>> listByLibraryId(long libraryId) throws IOException;

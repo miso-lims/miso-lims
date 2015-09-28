@@ -237,7 +237,7 @@ public class PoolAlertManager {
       poolWatchers.addAll(securityManager.listUsersByGroupName("PoolWatchers"));
 
       for (Pool p : pools.values()) {
-        if (user.getGroups().contains(securityManager.getGroupByName("PoolWatchers"))) {
+        if (user.getGroups() != null && user.getGroups().contains(securityManager.getGroupByName("PoolWatchers"))) {
           addWatcher(p, userId);
         }
         else {
