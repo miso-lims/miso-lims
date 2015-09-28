@@ -145,7 +145,6 @@
                     <td>ID Barcode:</td>
                     <td>
                       <span id="idBarcode">${container.identificationBarcode}</span>
-                      <form:hidden path="identificationBarcode"/>
                       <a href="javascript:void(0);"
                          onclick="Container.ui.editContainerIdBarcode(jQuery('#idBarcode'))">
                         <span class="fg-button ui-icon ui-icon-pencil"></span>
@@ -164,7 +163,6 @@
                     <td>Location:</td>
                     <td>
                       <span id="locationBarcode">${container.locationBarcode}</span>
-                      <form:hidden path="locationBarcode"/>
                       <c:if test="${(container.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                                                     or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
                         <a href="javascript:void(0);"
@@ -186,7 +184,6 @@
                     <td>Validation:</td>
                     <td>
                       <span id="validationBarcode">${container.validationBarcode}</span>
-                      <form:hidden path="validationBarcode"/>
                       <c:if test="${(container.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                                                     or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
                         <a href="javascript:void(0);"
