@@ -1,46 +1,8 @@
-# ************************************************************
-# Sequel Pro SQL dump
-# Version 4096
-#
-# http://www.sequelpro.com/
-# http://code.google.com/p/sequel-pro/
-#
-# Host: localhost (MySQL 5.6.26)
-# Database: lims
-# Generation Time: 2015-07-29 19:46:05 +0000
-# ************************************************************
-
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-
-
-# Dump of table _Group
-# ------------------------------------------------------------
-
-LOCK TABLES `_Group` WRITE;
-/*!40000 ALTER TABLE `_Group` DISABLE KEYS */;
-
 INSERT INTO `_Group` (`groupId`, `description`, `name`)
 VALUES
 	(2,'Watches for all events on all projects and related overviews','ProjectWatchers'),
 	(1,'Watches for all events on all runs','RunWatchers'),
 	(3,'Watches for all events on all pools','PoolWatchers');
-
-/*!40000 ALTER TABLE `_Group` ENABLE KEYS */;
-UNLOCK TABLES;
-
-
-# Dump of table KitDescriptor
-# ------------------------------------------------------------
-
-LOCK TABLES `KitDescriptor` WRITE;
-/*!40000 ALTER TABLE `KitDescriptor` DISABLE KEYS */;
 
 INSERT INTO `KitDescriptor` (`kitDescriptorId`, `name`, `version`, `manufacturer`, `partNumber`, `stockLevel`, `kitType`, `platformType`)
 VALUES
@@ -166,16 +128,6 @@ VALUES
 	(120,'EZ Bead Enricher Accessories Kit ',NULL,'ABI','4453073',0,'EmPCR','Solid'),
 	(121,'Test',1,'Test','123123123',0,'Sequencing','Illumina');
 
-/*!40000 ALTER TABLE `KitDescriptor` ENABLE KEYS */;
-UNLOCK TABLES;
-
-
-# Dump of table LibrarySelectionType
-# ------------------------------------------------------------
-
-LOCK TABLES `LibrarySelectionType` WRITE;
-/*!40000 ALTER TABLE `LibrarySelectionType` DISABLE KEYS */;
-
 INSERT INTO `LibrarySelectionType` (`librarySelectionTypeId`, `name`, `description`)
 VALUES
 	(1,'RT-PCR','Source material was selected by reverse transcription PCR'),
@@ -204,16 +156,6 @@ VALUES
 	(24,'5-methylcytidine antibody','Selection of methylated DNA fragments using an antibody raised against 5-methylcytosine or 5-methylcytidine (m5C)'),
 	(25,'Restriction Digest','DNA fractionation using restriction enzymes');
 
-/*!40000 ALTER TABLE `LibrarySelectionType` ENABLE KEYS */;
-UNLOCK TABLES;
-
-
-# Dump of table LibraryStrategyType
-# ------------------------------------------------------------
-
-LOCK TABLES `LibraryStrategyType` WRITE;
-/*!40000 ALTER TABLE `LibraryStrategyType` DISABLE KEYS */;
-
 INSERT INTO `LibraryStrategyType` (`libraryStrategyTypeId`, `name`, `description`)
 VALUES
 	(6,'CLONEEND','Clone end (5\', 3\', or both) sequencing'),
@@ -237,16 +179,6 @@ VALUES
 	(19,'RNA-Seq','Random sequencing of whole transcriptome'),
 	(20,'WXS','Random sequencing of exonic regions selected from the genome');
 
-/*!40000 ALTER TABLE `LibraryStrategyType` ENABLE KEYS */;
-UNLOCK TABLES;
-
-
-# Dump of table LibraryType
-# ------------------------------------------------------------
-
-LOCK TABLES `LibraryType` WRITE;
-/*!40000 ALTER TABLE `LibraryType` DISABLE KEYS */;
-
 INSERT INTO `LibraryType` (`libraryTypeId`, `description`, `platformType`)
 VALUES
 	(16,'Small RNA','Solid'),
@@ -266,16 +198,6 @@ VALUES
 	(5,'Rapid Shotgun','LS454'),
 	(4,'Small RNA','Illumina'),
 	(17,'Single End','Illumina');
-
-/*!40000 ALTER TABLE `LibraryType` ENABLE KEYS */;
-UNLOCK TABLES;
-
-
-# Dump of table Platform
-# ------------------------------------------------------------
-
-LOCK TABLES `Platform` WRITE;
-/*!40000 ALTER TABLE `Platform` DISABLE KEYS */;
 
 INSERT INTO `Platform` (`platformId`, `name`, `instrumentModel`, `description`, `numContainers`)
 VALUES
@@ -305,16 +227,6 @@ VALUES
 	(24,'Illumina','Illumina MiSeq','',1),
 	(25,'Illumina','Illumina HiSeq 1000','',1);
 
-/*!40000 ALTER TABLE `Platform` ENABLE KEYS */;
-UNLOCK TABLES;
-
-
-# Dump of table QCType
-# ------------------------------------------------------------
-
-LOCK TABLES `QCType` WRITE;
-/*!40000 ALTER TABLE `QCType` DISABLE KEYS */;
-
 INSERT INTO `QCType` (`qcTypeId`, `name`, `description`, `qcTarget`, `units`)
 VALUES
 	(2,'Bioanalyzer','Chip-based capillary electrophoresis machine to analyse RNA, DNA, and protein, manufactured by Agilent','Library','nM'),
@@ -324,16 +236,6 @@ VALUES
 	(6,'SeqInfo QC','Post-run completion run QC step, undertaken by the SeqInfo team, as part of the primary analysis stage.','Run',''),
 	(5,'SeqOps QC','Post-run completion run QC step, undertaken by the SeqOps team, to move a run through to the primary analysis stage.','Run',''),
 	(7,'qPCR','Quantitative PCR','Library','mol/&#181;l');
-
-/*!40000 ALTER TABLE `QCType` ENABLE KEYS */;
-UNLOCK TABLES;
-
-
-# Dump of table SampleType
-# ------------------------------------------------------------
-
-LOCK TABLES `SampleType` WRITE;
-/*!40000 ALTER TABLE `SampleType` DISABLE KEYS */;
 
 INSERT INTO `SampleType` (`typeId`, `name`)
 VALUES
@@ -345,16 +247,6 @@ VALUES
 	(6,'TRANSCRIPTOMIC'),
 	(7,'METAGENOMIC'),
 	(8,'METATRANSCRIPTOMIC');
-
-/*!40000 ALTER TABLE `SampleType` ENABLE KEYS */;
-UNLOCK TABLES;
-
-
-# Dump of table StudyType
-# ------------------------------------------------------------
-
-LOCK TABLES `StudyType` WRITE;
-/*!40000 ALTER TABLE `StudyType` DISABLE KEYS */;
 
 INSERT INTO `StudyType` (`typeId`, `name`)
 VALUES
@@ -370,16 +262,6 @@ VALUES
 	(4,'Transcriptome Analysis'),
 	(3,'Metagenomics'),
 	(2,'Whole Genome Sequencing');
-
-/*!40000 ALTER TABLE `StudyType` ENABLE KEYS */;
-UNLOCK TABLES;
-
-
-# Dump of table TagBarcodes
-# ------------------------------------------------------------
-
-LOCK TABLES `TagBarcodes` WRITE;
-/*!40000 ALTER TABLE `TagBarcodes` DISABLE KEYS */;
 
 INSERT INTO `TagBarcodes` (`tagId`, `name`, `sequence`, `platformName`, `strategyName`)
 VALUES
@@ -464,28 +346,6 @@ VALUES
 	(62,'N702','CGTACTAG','Illumina','Nextera Dual Index'),
 	(61,'N701','TAAGGCGA','Illumina','Nextera Dual Index');
 
-/*!40000 ALTER TABLE `TagBarcodes` ENABLE KEYS */;
-UNLOCK TABLES;
-
-
-# Dump of table User
-# ------------------------------------------------------------
-
-LOCK TABLES `User` WRITE;
-/*!40000 ALTER TABLE `User` DISABLE KEYS */;
-
 INSERT INTO `User` (`userId`, `active`, `admin`, `external`, `fullName`, `internal`, `loginName`, `roles`, `password`, `email`)
 VALUES
 	(1,00000001,00000001,00000000,'admin',00000001,'admin','ROLE_ADMIN,ROLE_INTERNAL','d033e22ae348aeb5660fc2140aec35850c4da997','admin@admin');
-
-/*!40000 ALTER TABLE `User` ENABLE KEYS */;
-UNLOCK TABLES;
-
-
-
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
