@@ -665,18 +665,13 @@
                 </a>
               </td>
             </c:if>
-            <c:choose>
-              <c:when test="${library.platformName ne 'Illumina'}">
-                <td>
-                  <a href="javascript:void(0);" onclick="Library.empcr.insertEmPcrRow(${dil.id});">Add emPCR</a>
-                </td>
-              </c:when>
-              <c:otherwise>
-                <td>
-                  <a href="<c:url value="/miso/poolwizard/new/${library.sample.project.id}"/>">Construct New Pool</a>
-                </td>
-              </c:otherwise>
-            </c:choose>
+            <td>
+              <c:if test="${library.platformName eq 'LS454' or library.platformName eq 'Solid'}">
+                <a href="javascript:void(0);" onclick="Library.empcr.insertEmPcrRow(${dil.id});">Add emPCR</a> 
+                <br />           
+              </c:if>
+              <a href="<c:url value="/miso/poolwizard/new/${library.sample.project.id}"/>">Construct New Pool</a>
+            </td>
           </tr>
         </c:forEach>
       </c:if>
