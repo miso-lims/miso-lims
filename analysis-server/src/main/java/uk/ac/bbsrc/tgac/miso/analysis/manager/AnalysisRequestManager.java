@@ -121,7 +121,7 @@ public class AnalysisRequestManager {
     try {
       Method m = getConanTaskService().getClass().getMethod(queryMethod);
       if ("getTask".equals(queryMethod)) {
-        ConanTask<? extends ConanPipeline> task = (ConanTask<? extends ConanPipeline>)m.invoke(getConanTaskService(), null);
+        ConanTask<? extends ConanPipeline> task = (ConanTask<? extends ConanPipeline>)m.invoke(getConanTaskService());
         return mapper.writeValueAsString(task);
       }
       else {
@@ -129,7 +129,7 @@ public class AnalysisRequestManager {
           throw new UnsupportedOperationException("Cannot call " +queryMethod+ ".");
         }
         else {
-          List<ConanTask<? extends ConanPipeline>> tasks = (List<ConanTask<? extends ConanPipeline>>)m.invoke(getConanTaskService(), null);
+          List<ConanTask<? extends ConanPipeline>> tasks = (List<ConanTask<? extends ConanPipeline>>)m.invoke(getConanTaskService());
           return mapper.writeValueAsString(tasks);
         }
       }
