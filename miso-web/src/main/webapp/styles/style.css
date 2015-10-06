@@ -367,6 +367,14 @@ table.containerSummary td.partitionOccupied {
     float: right;
 }
 
+.delete {
+    width: 16px;
+    height: 16px;
+    background-image: url(images/trash.png);
+    background-repeat: no-repeat;
+    white-space:nowrap;
+}
+
 .miso-button {
     width: 18px !important;
     height: 18px !important;

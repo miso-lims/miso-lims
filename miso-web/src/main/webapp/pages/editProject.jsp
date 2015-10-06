@@ -521,13 +521,23 @@
 
   <div id="projectfiles">
     <c:forEach items="${projectFiles}" var="file">
-      <a href="<c:url value='/miso/download/project/${project.id}/${file.key}'/>">
-        <a class="listbox" href="<c:url value='/miso/download/project/${project.id}/${file.key}'/>">
-          <div onMouseOver="this.className='boxlistboxhighlight'" onMouseOut="this.className='boxlistbox'" class="boxlistbox">
-            ${file.value}
-          </div>
-        </a>
-      </a>
+      <div id='btnPanel' style='float: left; width: 32px;'>
+        <table>
+          <tr>
+            <sec:authorize access="hasRole('ROLE_ADMIN')">
+              <td class="misoicon" onclick="Project.ui.deleteFile(${project.id}, ${file.key});">
+                <span class="ui-icon ui-icon-trash" />
+              </td>
+            </sec:authorize>
+          </tr>
+        </table>
+    </div>
+    <a class="listbox" href="<c:url value='/miso/download/project/${project.id}/${file.key}'/>">
+
+      <div onMouseOver="this.className='boxlistboxhighlight'" onMouseOut="this.className='boxlistbox'" class="boxlistbox" style='margin-left: 32px;'>
+          ${file.value}
+      </div>
+    </a>
     </c:forEach>
   </div>
 </div>

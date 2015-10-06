@@ -23,11 +23,11 @@
 
 package uk.ac.bbsrc.tgac.miso.core.manager;
 
-import com.eaglegenomics.simlims.core.User;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.manager
@@ -44,4 +44,5 @@ public interface FilesManager {
   Collection<String> getFileNames(Class  type, String qualifier) throws IOException;
   File getFile(Class  type, String qualifier, String fileName) throws IOException;
   File storeFile(Class type, String qualifier, File file) throws IOException;
+  void deleteFile(Class<? extends Nameable> type, String qualifier, String fileName) throws IOException;
 }

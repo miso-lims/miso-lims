@@ -32,7 +32,7 @@
   <bean id="securityManager" name="securityManager"
         class="com.eaglegenomics.simlims.core.manager.LocalSecurityManager"/>
 
-  <security:global-method-security secured-annotations="enabled" jsr250-annotations="enabled"/>
+  <security:global-method-security secured-annotations="enabled"/>
 
  <!-- don't want to have a SS filter here as the userless REST auth should have taken care of that -->
   <security:http pattern="/miso/consumer/**" security="none"/>
