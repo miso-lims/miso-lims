@@ -161,7 +161,8 @@ public class SQLSampleDAO implements SampleStore {
   private SampleQcStore sampleQcDAO;
   private NoteStore noteDAO;
   private CascadeType cascadeType;
-
+  private boolean autoGenerateIdentificationBarcodes;
+  
   @Autowired
   private MisoNamingScheme<Sample> sampleNamingScheme;
 
@@ -234,6 +235,14 @@ public class SQLSampleDAO implements SampleStore {
 
   public void setCascadeType(CascadeType cascadeType) {
     this.cascadeType = cascadeType;
+  }
+  
+  public void setAutoGenerateIdentificationBarcodes(boolean autoGenerateIdentificationBarcodes) {
+    this.autoGenerateIdentificationBarcodes = autoGenerateIdentificationBarcodes;
+  }
+  
+  public boolean getAutoGenerateIdentificationBarcodes() {
+    return autoGenerateIdentificationBarcodes;
   }
 
   private void purgeCache(Sample sample) {
@@ -340,10 +349,13 @@ public class SQLSampleDAO implements SampleStore {
           sample.setName(name);
 
           if (sampleNamingScheme.validateField("name", sample.getName()) && sampleNamingScheme.validateField("alias", sample.getAlias())) {
-            String barcode = name + "::" + sample.getAlias();
+            if (autoGenerateIdentificationBarcodes) {
+              String barcode = sample.getName() + "::" + sample.getAlias();  
+              sample.setIdentificationBarcode(barcode); 
+            } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
+            
             params.addValue("name", name);
-
-            params.addValue("identificationBarcode", barcode);
+            params.addValue("identificationBarcode", sample.getIdentificationBarcode());
 
             Number newId = insert.executeAndReturnKey(params);
             if (newId.longValue() != sample.getId()) {
@@ -370,8 +382,14 @@ public class SQLSampleDAO implements SampleStore {
         try {
           if (sampleNamingScheme.validateField("name", sample.getName()) && sampleNamingScheme.validateField("alias", sample.getAlias())) {
             params.addValue("sampleId", sample.getId())
-                  .addValue("name", sample.getName())
-                  .addValue("identificationBarcode", sample.getName() + "::" + sample.getAlias());
+                  .addValue("name", sample.getName());
+            if (autoGenerateIdentificationBarcodes) {
+              String barcode = sample.getName() + "::" + sample.getAlias();  
+              sample.setIdentificationBarcode(barcode); 
+            } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is already set
+            
+            params.addValue("identificationBarcode", sample.getIdentificationBarcode());
+            //params.addValue("identificationBarcode", sample.getIdentificationBarcode());
             NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
             namedTemplate.update(SAMPLE_UPDATE, params);
           }
