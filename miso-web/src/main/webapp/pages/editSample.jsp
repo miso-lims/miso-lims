@@ -34,7 +34,7 @@
 <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.mini.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.datepicker.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.checkbox.js'/>" type="text/javascript"></script>
-<link href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" rel="stylesheet" type="text/css">
+<link href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" rel="stylesheet" type="text/css" />
 
 <script src="<c:url value='/scripts/datatables_utils.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/natural_sort.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
@@ -134,22 +134,26 @@
   </div>
   <div class="barcodeArea ui-corner-all">
     <span style="float: left; font-size: 24px; font-weight: bold; color:#BBBBBB">ID</span>
-    <c:if test="${not empty sample.identificationBarcode}">
-      <ul class="barcode-ddm">
-        <li>
-          <a onmouseover="mopen('idBarcodeMenu')" onmouseout="mclosetime()">
-            <span style="float:right; margin-top:6px;" class="ui-icon ui-icon-triangle-1-s"></span>
-            <span id="idBarcode" style="float:right"></span>
-          </a>
+    <ul class="barcode-ddm">
+      <li>
+        <a onmouseover="mopen('idBarcodeMenu')" onmouseout="mclosetime()">
+          <span style="float:right; margin-top:6px;" class="ui-icon ui-icon-triangle-1-s"></span>
+          <span id="idBarcode" style="float:right;"></span>
+        </a>
 
-          <div id="idBarcodeMenu"
-               onmouseover="mcancelclosetime()"
-               onmouseout="mclosetime()">
-            <a href="javascript:void(0);"
-               onclick="Sample.barcode.printSampleBarcodes(${sample.id});">Print</a>
-          </div>
-        </li>
-      </ul>
+        <div id="idBarcodeMenu"
+            onmouseover="mcancelclosetime()"
+            onmouseout="mclosetime()">
+
+          <a href="javascript:void(0);"
+             onclick="Sample.barcode.printSampleBarcodes(${sample.id});">Print</a>
+          <a href="javascript:void(0);"
+             onclick="Sample.ui.showSampleIdBarcodeChangeDialog(${sample.id}, '${sample.identificationBarcode}');">Assign New Barcode</a>
+        </div>
+      </li>
+    </ul> 
+    <div id="changeSampleIdBarcodeDialog" title="Assign New Barcode"></div>
+    <c:if test="${not empty sample.identificationBarcode}">
       <script type="text/javascript">
         jQuery(document).ready(function () {
           Fluxion.doAjax(
@@ -160,7 +164,7 @@
               'url': ajaxurl
             },
             {'doOnSuccess': function (json) {
-              jQuery('#idBarcode').html("<img style='height:30px; border:0;' src='<c:url value='/temp/'/>" + json.img + "'/>");
+              jQuery('#idBarcode').html("<img style='height:30px; border:0;' alt='${sample.identificationBarcode}' title='${sample.identificationBarcode}' src='<c:url value='/temp/'/>" + json.img + "'/>");
             }
           });
         });
@@ -234,8 +238,8 @@
       <td><form:input path="scientificName"/>
         <c:if test="${sessionScope.taxonLookupEnabled}">
         <script>Utils.timer.typewatchFunc(jQuery('#scientificName'), validate_ncbi_taxon, 1000, 2);</script>
+        </c:if>
       </td>
-      </c:if>
         <%--<td><a href="void(0);" onclick="popup('help/sampleScientificName.html');">Help</a></td>--%>
     </tr>
     <c:if test="${not empty sample.accession}">
@@ -342,7 +346,7 @@
     <span style="clear:both">
       <div id="addSampleQC"></div>
       <form id='addQcForm'>
-        <table class="list" id="sampleQcTable" class="in">
+        <table class="list in" id="sampleQcTable">
           <thead>
           <tr>
               <%--
