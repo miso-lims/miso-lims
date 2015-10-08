@@ -398,6 +398,27 @@ public class PoolControllerHelperService {
       return JSONUtils.SimpleJSONError("Cannot print barcodes: " + e.getMessage());
     }
   }
+  
+  public JSONObject changePoolIdBarcode(HttpSession session, JSONObject json) {
+    Long poolId = json.getLong("poolId");
+    String idBarcode = json.getString("identificationBarcode");
+    
+    try {
+      if (!"".equals(idBarcode)) {
+        Pool pool = requestManager.getPoolById(poolId);
+        pool.setIdentificationBarcode(idBarcode);
+        requestManager.savePool(pool);
+      } else {
+        return JSONUtils.SimpleJSONError("New identification barcode not recognized");
+      }
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+      return JSONUtils.SimpleJSONError(e.getMessage());
+    }
+    
+    return JSONUtils.SimpleJSONResponse("New identification barcode successfully assigned.");
+  }
 
   public JSONObject poolSearchExperiments(HttpSession session, JSONObject json) {
     String searchStr = json.getString("str");

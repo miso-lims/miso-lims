@@ -180,6 +180,27 @@ public class PlateControllerHelperService {
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
     }
   }
+  
+  public JSONObject changePlateIdBarcode(HttpSession session, JSONObject json) {
+    Long plateId = json.getLong("plateId");
+    String idBarcode = json.getString("identificationBarcode");
+    
+    try {
+      if (!"".equals(idBarcode)) {
+        Plate plate = requestManager.getPlateById(plateId);
+        plate.setIdentificationBarcode(idBarcode);
+        requestManager.savePlate(plate);
+      } else {
+        return JSONUtils.SimpleJSONError("New identification barcode not recognized");
+      }
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+      return JSONUtils.SimpleJSONError(e.getMessage());
+    }
+    
+    return JSONUtils.SimpleJSONResponse("New identification barcode successfully assigned.");
+  }
 
   public JSONObject changePlateLocation(HttpSession session, JSONObject json) {
     Long plateId = json.getLong("plateId");

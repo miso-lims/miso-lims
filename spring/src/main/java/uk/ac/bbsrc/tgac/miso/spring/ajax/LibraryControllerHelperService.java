@@ -364,6 +364,27 @@ public class LibraryControllerHelperService {
 
     return JSONUtils.SimpleJSONResponse("Note saved successfully");
   }
+  
+  public JSONObject changeLibraryIdBarcode(HttpSession session, JSONObject json) {
+    Long libraryId = json.getLong("libraryId");
+    String idBarcode = json.getString("identificationBarcode");
+    
+    try {
+      if (!"".equals(idBarcode)) {
+        Library library = requestManager.getLibraryById(libraryId);
+        library.setIdentificationBarcode(idBarcode);
+        requestManager.saveLibrary(library);
+      } else {
+        return JSONUtils.SimpleJSONError("New identification barcode not recognized");
+      }
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+      return JSONUtils.SimpleJSONError(e.getMessage());
+    }
+    
+    return JSONUtils.SimpleJSONResponse("New identification barcode successfully assigned.");
+  }
 
   public JSONObject getLibraryDilutionBarcode(HttpSession session, JSONObject json) {
     Long dilutionId = json.getLong("dilutionId");
@@ -445,6 +466,7 @@ public class LibraryControllerHelperService {
               String selectionType = j.getString("selectionType");
               String strategyType = j.getString("strategyType");
               String locationBarcode = j.getString("locationBarcode");
+              String identificationBarcode = j.getString("identificationBarcode");
 
               Library library = new LibraryImpl();
               library.setSample(sample);
@@ -461,6 +483,7 @@ public class LibraryControllerHelperService {
               library.setLibraryType(requestManager.getLibraryTypeByDescription(type));
               library.setLibrarySelectionType(requestManager.getLibrarySelectionTypeByName(selectionType));
               library.setLibraryStrategyType(requestManager.getLibraryStrategyTypeByName(strategyType));
+              library.setIdentificationBarcode(identificationBarcode);
 
               boolean paired = false;
               if (!"".equals(j.getString("paired"))) {
