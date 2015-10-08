@@ -442,6 +442,7 @@ public class PoolControllerHelperService {
     }
     catch (IOException e) {
       log.debug("Could not change Pool identificationBarcode: " + e.getMessage());
+      e.printStackTrace();
       return JSONUtils.SimpleJSONError(e.getMessage());
     }
     

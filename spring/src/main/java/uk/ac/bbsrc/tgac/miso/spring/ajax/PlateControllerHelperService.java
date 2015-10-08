@@ -214,6 +214,7 @@ public class PlateControllerHelperService {
     }
     catch (IOException e) {
       log.debug("Could not change Plate identificationBarcode: " + e.getMessage());
+      e.printStackTrace();
       return JSONUtils.SimpleJSONError(e.getMessage());
     }
     
