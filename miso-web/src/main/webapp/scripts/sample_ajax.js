@@ -417,6 +417,51 @@ Sample.ui = {
     }
   },
 
+  showSampleIdBarcodeChangeDialog: function (sampleId, sampleIdBarcode) {
+    var self = this;
+    jQuery('#changeSampleIdBarcodeDialog')
+      .html("<form>" +
+            "<fieldset class='dialog'>" +
+            "<strong><label>Current Barcode: </label></strong>" + sampleIdBarcode +
+            "<br /><strong><label for='notetext'>New Barcode:</label></strong>" +
+            "<input type='text' name='idBarcodeInput' id='idBarcodeInput' class='text ui-widget-content ui-corner-all' />" +
+            "</fieldset></form>");
+
+    jQuery(function () {
+      jQuery('#changeSampleIdBarcodeDialog').dialog({
+        autoOpen: false,
+        width: 400,
+        modal: true,
+        resizable: false,
+        buttons: {
+          "Save": function () {
+            self.changeSampleIdBarcode(sampleId, jQuery('#idBarcodeInput').val());
+            jQuery(this).dialog('close');
+          },
+          "Cancel": function () {
+            jQuery(this).dialog('close');
+          }
+        }
+      });
+    });
+    jQuery('#changeSampleIdBarcodeDialog').dialog('open');
+  },
+
+  changeSampleIdBarcode: function (sampleId, idBarcode) {
+    Fluxion.doAjax(
+      'sampleControllerHelperService',
+      'changeSampleIdBarcode',
+      {
+        'sampleId': sampleId,
+        'identificationBarcode': idBarcode,
+        'url': ajaxurl
+      },
+      {
+        'doOnSuccess': Utils.page.pageReload
+      }
+    );
+  },
+
   editSampleLocationBarcode: function (span) {
     var v = span.find('a').text();
     span.html("<input type='text' value='" + v + "' name='locationBarcode' id='locationBarcode'>");
