@@ -291,6 +291,7 @@ public class SQLPoolDAO implements PoolStore {
   private Store<SecurityProfile> securityProfileDAO;
   private WatcherStore watcherDAO;
   private CascadeType cascadeType;
+  private boolean autoGenerateIdentificationBarcodes;
 
   @Autowired
   private PoolAlertManager poolAlertManager;
@@ -371,6 +372,14 @@ public class SQLPoolDAO implements PoolStore {
   public void setCascadeType(CascadeType cascadeType) {
     this.cascadeType = cascadeType;
   }
+  
+  public void setAutoGenerateIdentificationBarcodes(boolean autoGenerateIdentificationBarcodes) {
+    this.autoGenerateIdentificationBarcodes = autoGenerateIdentificationBarcodes;
+  }
+  
+  public boolean getAutoGenerateIdentificationBarcodes() {
+    return autoGenerateIdentificationBarcodes;
+  }
 
   private void purgeListCache(Pool p, boolean replace) {
     Cache cache = cacheManager.getCache("poolListCache");
@@ -442,10 +451,14 @@ public class SQLPoolDAO implements PoolStore {
         pool.setName(name);
 
         if (namingScheme.validateField("name", pool.getName())) {
-          String barcode = name + "::" + pool.getPlatformType().getKey();
+          if (autoGenerateIdentificationBarcodes) {
+            String barcode = name + "::" + pool.getPlatformType().getKey();
+            pool.setIdentificationBarcode(barcode); 
+          } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
+
           params.addValue("name", name);
 
-          params.addValue("identificationBarcode", barcode);
+          params.addValue("identificationBarcode", pool.getIdentificationBarcode());
 
           Number newId = insert.executeAndReturnKey(params);
           if (newId.longValue() != pool.getId()) {
@@ -466,8 +479,13 @@ public class SQLPoolDAO implements PoolStore {
       try {
         if (namingScheme.validateField("name", pool.getName())) {
           params.addValue("poolId", pool.getId())
-              .addValue("name", pool.getName())
-              .addValue("identificationBarcode", pool.getName() + "::" + pool.getPlatformType().getKey());
+              .addValue("name", pool.getName());
+          
+          if (autoGenerateIdentificationBarcodes) {
+            String barcode = pool.getName() + "::" + pool.getPlatformType().getKey();
+            pool.setIdentificationBarcode(barcode); 
+          } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
+          params.addValue("identificationBarcode", pool.getIdentificationBarcode());
           NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
           namedTemplate.update(POOL_UPDATE, params);
         }

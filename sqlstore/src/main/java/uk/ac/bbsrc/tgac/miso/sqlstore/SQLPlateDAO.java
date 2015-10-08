@@ -132,6 +132,7 @@ public class SQLPlateDAO implements PlateStore {
   private SampleStore sampleDAO;
   private LibraryDilutionStore dilutionDAO;
   private Store<SecurityProfile> securityProfileDAO;
+  private boolean autoGenerateIdentificationBarcodes;
 
   @Autowired
   private DaoLookup daoLookup;
@@ -195,6 +196,14 @@ public class SQLPlateDAO implements PlateStore {
   @Override
   public void setCascadeType(CascadeType cascadeType) {
     this.cascadeType = cascadeType;
+  }
+  
+  public void setAutoGenerateIdentificationBarcodes(boolean autoGenerateIdentificationBarcodes) {
+    this.autoGenerateIdentificationBarcodes = autoGenerateIdentificationBarcodes;
+  }
+  
+  public boolean getAutoGenerateIdentificationBarcodes() {
+    return autoGenerateIdentificationBarcodes;
   }
 
   @Override
@@ -290,17 +299,21 @@ public class SQLPlateDAO implements PlateStore {
         plate.setName(name);
 
         if (namingScheme.validateField("name", plate.getName())) {
-          String barcode = "";
-          if (plate.getTagBarcode() != null) {
-            barcode = plate.getName() + "::" + plate.getTagBarcode();
-          }
-          else {
-            //TODO this should be alias
-            barcode = plate.getName() + "::" + plate.getDescription();
-          }          
+          if (autoGenerateIdentificationBarcodes) {
+            String barcode = "";
+            if (plate.getTagBarcode() != null) {
+              barcode = plate.getName() + "::" + plate.getTagBarcode();
+            }
+            else {
+              //TODO this should be alias
+              barcode = plate.getName() + "::" + plate.getDescription();
+            }    
+            plate.setIdentificationBarcode(barcode); 
+          } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
+               
           params.addValue("name", name);
 
-          params.addValue("identificationBarcode", barcode);
+          params.addValue("identificationBarcode", plate.getIdentificationBarcode());
 
           Number newId = insert.executeAndReturnKey(params);
           if (newId.longValue() != plate.getId()) {
@@ -327,18 +340,24 @@ public class SQLPlateDAO implements PlateStore {
     }
     else {
       try {
-        String plateBarcode = "";
-        if (plate.getTagBarcode() != null) {
-          plateBarcode = plate.getName() + "::" + plate.getTagBarcode();
-        }
-        else {
-          //TODO this should be alias
-          plateBarcode = plate.getName() + "::" + plate.getDescription();
-        }
+        if (autoGenerateIdentificationBarcodes) {
+          String barcode = "";
+          if (plate.getTagBarcode() != null) {
+            barcode = plate.getName() + "::" + plate.getTagBarcode();
+          }
+          else {
+            //TODO this should be alias
+            barcode = plate.getName() + "::" + plate.getDescription();
+          }    
+          plate.setIdentificationBarcode(barcode); 
+        } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
+
         if (namingScheme.validateField("name", plate.getName())) {
           params.addValue("plateId", plate.getId())
                 .addValue("name", plate.getName())
-                .addValue("identificationBarcode", plateBarcode);
+                .addValue("description", plate.getDescription())
+                .addValue("identificationBarcode", plate.getIdentificationBarcode())
+                .addValue("locationBarcode", plate.getLocationBarcode());
           NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
           namedTemplate.update(PLATE_UPDATE, params);
         }
