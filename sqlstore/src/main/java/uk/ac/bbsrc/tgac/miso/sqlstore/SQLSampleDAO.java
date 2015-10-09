@@ -244,6 +244,15 @@ public class SQLSampleDAO implements SampleStore {
   public boolean getAutoGenerateIdentificationBarcodes() {
     return autoGenerateIdentificationBarcodes;
   }
+  
+  /**
+   * Generates a unique barcode. Note that the barcode will change when the alias is changed.
+   * @param sample
+   */
+  public void autoGenerateIdBarcode(Sample sample) {
+    String barcode = sample.getName() + "::" + sample.getAlias();  
+    sample.setIdentificationBarcode(barcode); 
+  }
 
   private void purgeCache(Sample sample) {
     cacheManager.getCache("sampleCache").remove(sample);
@@ -350,8 +359,7 @@ public class SQLSampleDAO implements SampleStore {
 
           if (sampleNamingScheme.validateField("name", sample.getName()) && sampleNamingScheme.validateField("alias", sample.getAlias())) {
             if (autoGenerateIdentificationBarcodes) {
-              String barcode = sample.getName() + "::" + sample.getAlias();  
-              sample.setIdentificationBarcode(barcode); 
+              autoGenerateIdBarcode(sample);
             } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
             
             params.addValue("name", name);
@@ -383,13 +391,11 @@ public class SQLSampleDAO implements SampleStore {
           if (sampleNamingScheme.validateField("name", sample.getName()) && sampleNamingScheme.validateField("alias", sample.getAlias())) {
             params.addValue("sampleId", sample.getId())
                   .addValue("name", sample.getName());
-            if (autoGenerateIdentificationBarcodes) {
-              String barcode = sample.getName() + "::" + sample.getAlias();  
-              sample.setIdentificationBarcode(barcode); 
-            } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is already set
             
+            if (autoGenerateIdentificationBarcodes) {
+              autoGenerateIdBarcode(sample);
+            } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is already set
             params.addValue("identificationBarcode", sample.getIdentificationBarcode());
-            //params.addValue("identificationBarcode", sample.getIdentificationBarcode());
             NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
             namedTemplate.update(SAMPLE_UPDATE, params);
           }
