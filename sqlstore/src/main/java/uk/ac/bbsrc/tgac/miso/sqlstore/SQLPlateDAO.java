@@ -205,6 +205,22 @@ public class SQLPlateDAO implements PlateStore {
   public boolean getAutoGenerateIdentificationBarcodes() {
     return autoGenerateIdentificationBarcodes;
   }
+  
+  /**
+   * Generates a unique barcode. Note that the barcode will change when the plate's description is changed.
+   * @param plate
+   */
+  public void autoGenerateIdBarcode(Plate plate) {
+    String barcode = "";
+    if (plate.getTagBarcode() != null) {
+      barcode = plate.getName() + "::" + plate.getTagBarcode();
+    }
+    else {
+      //TODO this should be alias (however, Plate does not have an alias field)
+      barcode = plate.getName() + "::" + plate.getDescription();
+    }    
+    plate.setIdentificationBarcode(barcode); 
+  }
 
   @Override
   public Plate<? extends List<? extends Plateable>, ? extends Plateable> lazyGet(long plateId) throws IOException {
@@ -300,15 +316,7 @@ public class SQLPlateDAO implements PlateStore {
 
         if (namingScheme.validateField("name", plate.getName())) {
           if (autoGenerateIdentificationBarcodes) {
-            String barcode = "";
-            if (plate.getTagBarcode() != null) {
-              barcode = plate.getName() + "::" + plate.getTagBarcode();
-            }
-            else {
-              //TODO this should be alias
-              barcode = plate.getName() + "::" + plate.getDescription();
-            }    
-            plate.setIdentificationBarcode(barcode); 
+            autoGenerateIdBarcode(plate);
           } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
                
           params.addValue("name", name);
@@ -341,15 +349,7 @@ public class SQLPlateDAO implements PlateStore {
     else {
       try {
         if (autoGenerateIdentificationBarcodes) {
-          String barcode = "";
-          if (plate.getTagBarcode() != null) {
-            barcode = plate.getName() + "::" + plate.getTagBarcode();
-          }
-          else {
-            //TODO this should be alias
-            barcode = plate.getName() + "::" + plate.getDescription();
-          }    
-          plate.setIdentificationBarcode(barcode); 
+          autoGenerateIdBarcode(plate);
         } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
 
         if (namingScheme.validateField("name", plate.getName())) {

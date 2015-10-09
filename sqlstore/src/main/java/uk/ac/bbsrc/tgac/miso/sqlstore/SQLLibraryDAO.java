@@ -309,6 +309,15 @@ public class SQLLibraryDAO implements LibraryStore {
   public boolean getAutoGenerateIdentificationBarcodes() {
     return autoGenerateIdentificationBarcodes;
   }
+  
+  /**
+   * Generates a unique barcode. Note that the barcode will change when the alias is changed.
+   * @param library
+   */
+  public void autoGenerateIdBarcode(Library library) {
+    String barcode = library.getName() + "::" + library.getAlias();
+    library.setIdentificationBarcode(barcode); 
+  }
 
   private void purgeListCache(Library l, boolean replace) {
     Cache cache = cacheManager.getCache("libraryListCache");
@@ -381,9 +390,9 @@ public class SQLLibraryDAO implements LibraryStore {
           String name = libraryNamingScheme.generateNameFor("name", library);
           library.setName(name);
           if (libraryNamingScheme.validateField("name", library.getName()) && libraryNamingScheme.validateField("alias", library.getAlias())) {
+            
             if (autoGenerateIdentificationBarcodes) {
-              String barcode = name + "::" + library.getAlias();
-              library.setIdentificationBarcode(barcode); 
+              autoGenerateIdBarcode(library);
             } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
 
             params.addValue("name", name);
@@ -413,8 +422,7 @@ public class SQLLibraryDAO implements LibraryStore {
                 .addValue("alias", library.getAlias())
                 .addValue("description", library.getDescription());
           if (autoGenerateIdentificationBarcodes) {
-            String barcode = library.getName() + "::" + library.getAlias();
-            library.setIdentificationBarcode(barcode); 
+            autoGenerateIdBarcode(library);
           } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
           params.addValue("identificationBarcode", library.getIdentificationBarcode())
                 .addValue("locationBarcode", library.getLocationBarcode());

@@ -380,6 +380,15 @@ public class SQLPoolDAO implements PoolStore {
   public boolean getAutoGenerateIdentificationBarcodes() {
     return autoGenerateIdentificationBarcodes;
   }
+  
+  /**
+   * Generates a unique barcode. Note that the barcode will change if the Platform is changed.
+   * @param pool
+   */
+  public void autoGenerateIdBarcode(Pool pool) {
+    String barcode = pool.getName() + "::" + pool.getPlatformType().getKey();
+    pool.setIdentificationBarcode(barcode); 
+  }
 
   private void purgeListCache(Pool p, boolean replace) {
     Cache cache = cacheManager.getCache("poolListCache");
@@ -452,12 +461,10 @@ public class SQLPoolDAO implements PoolStore {
 
         if (namingScheme.validateField("name", pool.getName())) {
           if (autoGenerateIdentificationBarcodes) {
-            String barcode = name + "::" + pool.getPlatformType().getKey();
-            pool.setIdentificationBarcode(barcode); 
+            autoGenerateIdBarcode(pool);
           } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
 
           params.addValue("name", name);
-
           params.addValue("identificationBarcode", pool.getIdentificationBarcode());
 
           Number newId = insert.executeAndReturnKey(params);
@@ -482,8 +489,7 @@ public class SQLPoolDAO implements PoolStore {
               .addValue("name", pool.getName());
           
           if (autoGenerateIdentificationBarcodes) {
-            String barcode = pool.getName() + "::" + pool.getPlatformType().getKey();
-            pool.setIdentificationBarcode(barcode); 
+            autoGenerateIdBarcode(pool);
           } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
           params.addValue("identificationBarcode", pool.getIdentificationBarcode());
           NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
