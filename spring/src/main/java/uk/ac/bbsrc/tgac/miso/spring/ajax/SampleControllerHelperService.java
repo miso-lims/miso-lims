@@ -810,8 +810,9 @@ public class SampleControllerHelperService {
                       sample.getSampleType() + "','" +
                       (sample.getQcPassed() != null ? sample.getQcPassed().toString() : "") + "','" +
                       getSampleLastQC(sample.getId()) + "','" +
-                      "<a href=\"/miso/sample/" + sample.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
-
+                      "<a href=\"/miso/sample/" + sample.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "','" +
+                      (sample.getIdentificationBarcode() != null ? sample.getIdentificationBarcode() : "") + "','" +
+                      "']");
       }
       j.put("array", jsonArray);
       return j;
@@ -834,6 +835,7 @@ public class SampleControllerHelperService {
       if (sampleQCs.size()>0){
         List<SampleQC> list = new ArrayList(sampleQCs);
         Collections.sort(list, new Comparator<SampleQC>() {
+          @Override
           public int compare(SampleQC sqc1, SampleQC sqc2) {
             return (int) sqc1.getId() - (int) sqc2.getId();
           }
