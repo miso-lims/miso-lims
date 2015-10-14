@@ -23,51 +23,70 @@
 
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
-import com.eaglegenomics.simlims.core.Note;
-import com.eaglegenomics.simlims.core.SecurityProfile;
-import com.opensymphony.util.FileUtils;
-import net.sf.ehcache.Cache;
-import net.sf.json.JSONArray;
-import org.apache.commons.codec.binary.Base64;
-import org.krysalis.barcode4j.BarcodeDimension;
-import org.krysalis.barcode4j.BarcodeGenerator;
-import uk.ac.bbsrc.tgac.miso.core.data.*;
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-import net.sf.json.JSONObject;
-import net.sourceforge.fluxion.ajax.Ajaxified;
-import net.sourceforge.fluxion.ajax.util.JSONUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
-import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
-import uk.ac.bbsrc.tgac.miso.core.exception.MisoPrintException;
-import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
-import uk.ac.bbsrc.tgac.miso.core.util.*;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeFactory;
-import uk.ac.bbsrc.tgac.miso.core.factory.barcode.MisoJscriptFactory;
-import uk.ac.bbsrc.tgac.miso.core.manager.PrintManager;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
-
-import javax.imageio.ImageIO;
-import javax.servlet.http.HttpSession;
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
+
+import javax.imageio.ImageIO;
+import javax.servlet.http.HttpSession;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import net.sourceforge.fluxion.ajax.Ajaxified;
+import net.sourceforge.fluxion.ajax.util.JSONUtils;
+
+import org.apache.commons.codec.binary.Base64;
+import org.krysalis.barcode4j.BarcodeDimension;
+import org.krysalis.barcode4j.BarcodeGenerator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
+import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
+import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
+import uk.ac.bbsrc.tgac.miso.core.data.PrintJob;
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
+import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
+import uk.ac.bbsrc.tgac.miso.core.exception.MisoPrintException;
+import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
+import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeFactory;
+import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
+import uk.ac.bbsrc.tgac.miso.core.manager.PrintManager;
+import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
+import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
+import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.TaxonomyUtils;
+
+import com.eaglegenomics.simlims.core.Note;
+import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
@@ -767,8 +786,9 @@ public class SampleControllerHelperService {
                       sample.getSampleType() + "','" +
                       (sample.getQcPassed() != null ? sample.getQcPassed().toString() : "") + "','" +
                       getSampleLastQC(sample.getId()) + "','" +
-                      "<a href=\"/miso/sample/" + sample.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
-
+                      "<a href=\"/miso/sample/" + sample.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "','" +
+                      (sample.getIdentificationBarcode() != null ? sample.getIdentificationBarcode() : "") + "','" +
+                      "']");
       }
       j.put("array", jsonArray);
       return j;
@@ -791,6 +811,7 @@ public class SampleControllerHelperService {
       if (sampleQCs.size()>0){
         List<SampleQC> list = new ArrayList(sampleQCs);
         Collections.sort(list, new Comparator<SampleQC>() {
+          @Override
           public int compare(SampleQC sqc1, SampleQC sqc2) {
             return (int) sqc1.getId() - (int) sqc2.getId();
           }
