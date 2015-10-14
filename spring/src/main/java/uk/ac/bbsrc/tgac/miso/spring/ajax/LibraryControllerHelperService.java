@@ -23,6 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
+
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.awt.image.RenderedImage;
@@ -1288,8 +1289,9 @@ public class LibraryControllerHelperService {
                       library.getLibraryType().getDescription() + "','" +
                       library.getSample().getName()+ "','" +
                       qcpassed + "','" +
-                      "<a href=\"/miso/library/" + library.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
-
+                      "<a href=\"/miso/library/" + library.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "','" +
+                      (library.getIdentificationBarcode() != null ? library.getIdentificationBarcode() : "") +
+                      "']");
       }
       j.put("array", jsonArray);
       return j;
