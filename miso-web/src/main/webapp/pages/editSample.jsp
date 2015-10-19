@@ -147,8 +147,10 @@
 
           <a href="javascript:void(0);"
              onclick="Sample.barcode.printSampleBarcodes(${sample.id});">Print</a>
-          <a href="javascript:void(0);"
+          <c:if test="${not autoGenerateIdBarcodes}">
+            <a href="javascript:void(0);"
              onclick="Sample.ui.showSampleIdBarcodeChangeDialog(${sample.id}, '${sample.identificationBarcode}');">Assign New Barcode</a>
+          </c:if>
         </div>
       </li>
     </ul> 

@@ -150,8 +150,10 @@
         <div id="idBarcodeMenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
           <a href="javascript:void(0);" 
              onclick="Library.barcode.printLibraryBarcodes(${library.id});">Print</a>
-          <a href="javascript:void(0);"
+          <c:if test="${not autoGenerateIdBarcodes}">
+            <a href="javascript:void(0);"
              onclick="Library.barcode.showLibraryIdBarcodeChangeDialog(${library.id}, '${library.identificationBarcode}');">Assign New Barcode</a>
+          </c:if>
         </div>
       </li>
     </ul>
