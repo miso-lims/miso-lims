@@ -68,8 +68,10 @@
              onmouseout="mclosetime()">
           <a href="javascript:void(0);" 
              onclick="Pool.barcode.printPoolBarcodes(${pool.id});">Print</a>
-          <a href="javascript:void(0);"
+          <c:if test="${not autoGenerateIdBarcodes}">
+            <a href="javascript:void(0);"
              onclick="Pool.barcode.showPoolIdBarcodeChangeDialog(${pool.id}, '${pool.identificationBarcode}');">Assign New Barcode</a>
+          </c:if>
         </div>
       </li>
     </ul>

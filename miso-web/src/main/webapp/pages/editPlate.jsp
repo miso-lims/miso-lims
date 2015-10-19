@@ -89,8 +89,10 @@
              onmouseout="mclosetime()">
           <a href="javascript:void(0);" 
              onclick="Plate.barcode.printPlateBarcodes(${plate.id});">Print</a>
-          <a href="javascript:void(0);"
+          <c:if test="${not autoGenerateIdBarcodes}">
+            <a href="javascript:void(0);"
              onclick="Plate.ui.showPlateIdBarcodeChangeDialog(${plate.id}, '${plate.identificationBarcode}');">Assign New Barcode</a>
+          </c:if>
         </div>
       </li>
     </ul>

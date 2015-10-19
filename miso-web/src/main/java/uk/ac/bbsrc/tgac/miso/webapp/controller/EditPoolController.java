@@ -23,18 +23,37 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
-import uk.ac.bbsrc.tgac.miso.core.data.*;
+
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
+import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
+import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -42,13 +61,8 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedDilutionException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
-
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import uk.ac.bbsrc.tgac.miso.webapp.context.ApplicationContextProvider;
+import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller
@@ -88,6 +102,20 @@ public class EditPoolController {
   @ModelAttribute("platformTypes")
   public Collection<String> populatePlatformTypes() {
     return PlatformType.getKeys();
+  }
+  
+  @Autowired
+  private ApplicationContextProvider applicationContextProvider;
+
+  public void setApplicationContextProvider(ApplicationContextProvider applicationContextProvider) {
+    this.applicationContextProvider = applicationContextProvider;
+  }
+  
+  @ModelAttribute("autoGenerateIdBarcodes")
+  public Boolean autoGenerateIdentificationBarcodes() {
+    MisoPropertyExporter exporter = (MisoPropertyExporter)applicationContextProvider.getApplicationContext().getBean("propertyConfigurer");
+    Map<String, String> misoProperties = exporter.getResolvedProperties();
+    return misoProperties.containsKey("miso.autoGenerateIdentificationBarcodes") && Boolean.parseBoolean(misoProperties.get("miso.autoGenerateIdentificationBarcodes"));
   }
 
   private List<? extends Dilution> populateAvailableDilutions(Pool pool) throws IOException {
