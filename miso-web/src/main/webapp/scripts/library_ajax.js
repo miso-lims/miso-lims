@@ -403,24 +403,21 @@ Library.barcode = {
             "<input type='text' name='idBarcodeInput' id='idBarcodeInput' class='text ui-widget-content ui-corner-all' />" +
             "</fieldset></form>");
 
-    jQuery(function () {
-      jQuery('#changeLibraryIdBarcodeDialog').dialog({
-        autoOpen: false,
-        width: 400,
-        modal: true,
-        resizable: false,
-        buttons: {
-          "Save": function () {
-            self.changeLibraryIdBarcode(libraryId, jQuery('#idBarcodeInput').val());
-            jQuery(this).dialog('close');
-          },
-          "Cancel": function () {
-            jQuery(this).dialog('close');
-          }
+    jQuery('#changeLibraryIdBarcodeDialog').dialog({
+      autoOpen: false,
+      width: 400,
+      modal: true,
+      resizable: false,
+      buttons: {
+        "Save": function () {
+          self.changeLibraryIdBarcode(libraryId, jQuery('#idBarcodeInput').val());
+          jQuery(this).dialog('close');
+        },
+        "Cancel": function () {
+          jQuery(this).dialog('close');
         }
-      });
-    });
-    jQuery('#changeLibraryIdBarcodeDialog').dialog('open');
+      }
+    }).dialog('open');
   },
 
   changeLibraryIdBarcode: function (libraryId, idBarcode) {
