@@ -202,24 +202,21 @@ Plate.ui = {
             "<input type='text' name='idBarcodeInput' id='idBarcodeInput' class='text ui-widget-content ui-corner-all' />" +
             "</fieldset></form>");
 
-    jQuery(function () {
-      jQuery('#changePlateIdBarcodeDialog').dialog({
-        autoOpen: false,
-        width: 400,
-        modal: true,
-        resizable: false,
-        buttons: {
-          "Save": function () {
-            self.changePlateIdBarcode(plateId, jQuery('#idBarcodeInput').val());
-            jQuery(this).dialog('close');
-          },
-          "Cancel": function () {
-            jQuery(this).dialog('close');
-          }
+    jQuery('#changePlateIdBarcodeDialog').dialog({
+      autoOpen: false,
+      width: 400,
+      modal: true,
+      resizable: false,
+      buttons: {
+        "Save": function () {
+          self.changePlateIdBarcode(plateId, jQuery('#idBarcodeInput').val());
+          jQuery(this).dialog('close');
+        },
+        "Cancel": function () {
+          jQuery(this).dialog('close');
         }
-      });
-    });
-    jQuery('#changePlateIdBarcodeDialog').dialog('open');
+      }
+    }).dialog('open');
   },
 
   changePlateIdBarcode: function (plateId, idBarcode) {
