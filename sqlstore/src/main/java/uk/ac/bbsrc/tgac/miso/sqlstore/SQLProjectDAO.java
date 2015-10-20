@@ -590,7 +590,6 @@ public class SQLProjectDAO implements ProjectStore {
     return template.query(PROJECTS_SELECT_BY_SEARCH, new Object[]{mySQLQuery,mySQLQuery,mySQLQuery}, new ProjectMapper(true));
   }
 
-  @Override
   public Project getByAlias(String alias) throws IOException {
     List<Project> eResults = template.query(PROJECT_SELECT_BY_ALIAS, new Object[]{alias}, new ProjectMapper());
     return eResults.size() > 0 ? eResults.get(0) : null;
