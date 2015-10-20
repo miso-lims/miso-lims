@@ -54,6 +54,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ExperimentStore;
 import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PlatformStore;
@@ -66,6 +67,7 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.store.SecurityStore;
 import com.googlecode.ehcache.annotations.Cacheable;
 import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
@@ -137,6 +139,8 @@ public class SQLExperimentDAO implements ExperimentStore {
   private KitStore kitDAO;
   private Store<SecurityProfile> securityProfileDAO;
   private CascadeType cascadeType;
+  private ChangeLogStore changeLogDAO;
+  private SecurityStore securityDAO;
 
   @Autowired
   private MisoNamingScheme<Experiment> namingScheme;
@@ -451,6 +455,22 @@ public class SQLExperimentDAO implements ExperimentStore {
     return false;
   }
 
+  public ChangeLogStore getChangeLogDAO() {
+    return changeLogDAO;
+  }
+
+  public void setChangeLogDAO(ChangeLogStore changeLogDAO) {
+    this.changeLogDAO = changeLogDAO;
+  }
+
+  public SecurityStore getSecurityDAO() {
+    return securityDAO;
+  }
+
+  public void setSecurityDAO(SecurityStore securityDAO) {
+    this.securityDAO = securityDAO;
+  }
+
   public class ExperimentMapper extends CacheAwareRowMapper<Experiment> {
     public ExperimentMapper() {
       super(Experiment.class);
@@ -488,6 +508,7 @@ public class SQLExperimentDAO implements ExperimentStore {
           e.setPool(poolDAO.getPoolByExperiment(e));
           e.setKits(kitDAO.listByExperiment(rs.getLong("experimentId")));
         }
+        e.getChangeLog().addAll(getChangeLogDAO().listAllById(TABLE_NAME, id));
       } catch (IOException e1) {
         e1.printStackTrace();
       }

@@ -48,6 +48,7 @@ import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractExperiment;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
@@ -131,6 +132,12 @@ public class EditExperimentController {
   public @ResponseBody
   Experiment jsonRest(@PathVariable Long experimentId) throws IOException {
     return requestManager.getExperimentById(experimentId);
+  }
+
+  @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
+  public @ResponseBody
+  Collection<ChangeLog> jsonRestChanges() throws IOException {
+    return requestManager.listAllChanges("Experiment");
   }
 
   @RequestMapping(value = "/{experimentId}", method = RequestMethod.GET)

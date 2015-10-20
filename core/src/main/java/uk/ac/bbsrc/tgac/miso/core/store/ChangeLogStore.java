@@ -14,4 +14,6 @@ public interface ChangeLogStore {
    public Collection<ChangeLog> listAll(String type);
 
    public Collection<ChangeLog> listAllById(String type, long id);
+
+   public Collection<ChangeLog> listAllById(String type, String idName, long id);
 }

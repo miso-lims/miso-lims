@@ -25,7 +25,7 @@ public class SQLChangeLogDAO implements ChangeLogStore {
   }
 
   public static final String CHANGELOG_SELECT = "SELECT c.columnsChanged, c.message, c.changeTime FROM %sChangeLog c";
-  public static final String CHANGELOG_SELECT_WHERE = CHANGELOG_SELECT + " WHERE c.%sId = ?";
+  public static final String CHANGELOG_SELECT_WHERE = CHANGELOG_SELECT + " WHERE c.%sId = ? ORDER BY c.changeTime DESC";
 
   private JdbcTemplate template;
 
@@ -45,12 +45,15 @@ public class SQLChangeLogDAO implements ChangeLogStore {
   public Collection<ChangeLog> listAllById(String type, long id) {
     char lowerTypeName[] = type.toCharArray();
     lowerTypeName[0] = Character.toLowerCase(lowerTypeName[0]);
-    return template.query(String.format(CHANGELOG_SELECT_WHERE, type, new String(lowerTypeName)), new Object[] { id },
-        new ChangeLogMapper());
+    return listAllById(type, new String(lowerTypeName), id);
+  }
+
+  @Override
+  public Collection<ChangeLog> listAllById(String type, String idName, long id) {
+    return template.query(String.format(CHANGELOG_SELECT_WHERE, type, idName), new Object[] { id }, new ChangeLogMapper());
   }
 
   public void setJdbcTemplate(JdbcTemplate template) {
     this.template = template;
   }
-
 }

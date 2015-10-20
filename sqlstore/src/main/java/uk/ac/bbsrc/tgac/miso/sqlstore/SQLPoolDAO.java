@@ -61,6 +61,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolQcException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ExperimentStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
@@ -72,6 +73,7 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.store.SecurityStore;
 import com.googlecode.ehcache.annotations.Cacheable;
 import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
@@ -245,6 +247,16 @@ public class SQLPoolDAO implements PoolStore {
   private Store<SecurityProfile> securityProfileDAO;
   private WatcherStore watcherDAO;
   private CascadeType cascadeType;
+  private ChangeLogStore changeLogDAO;
+  private SecurityStore securityDAO;
+
+  public ChangeLogStore getChangeLogDAO() {
+    return changeLogDAO;
+  }
+
+  public void setChangeLogDAO(ChangeLogStore changeLogDAO) {
+    this.changeLogDAO = changeLogDAO;
+  }
 
   @Autowired
   private PoolAlertManager poolAlertManager;
@@ -680,6 +692,7 @@ public class SQLPoolDAO implements PoolStore {
             p.addQc(qc);
           }
         }
+        p.getChangeLog().addAll(changeLogDAO.listAllById(TABLE_NAME, id));
       } catch (IOException e1) {
         log.error("Cannot map from database to Pool: ", e1);
         e1.printStackTrace();

@@ -39,6 +39,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunQcException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 import com.eaglegenomics.simlims.core.Note;
+import com.eaglegenomics.simlims.core.User;
 
 /**
  * A Run represents a sequencing run on a single sequencing instrument, referenced by a {@link SequencerReference}, comprising one or more
@@ -285,4 +286,16 @@ public interface Run extends SecurableByProfile, Submittable<Document>, Comparab
   Date getLastUpdated();
 
   void setLastUpdated(Date lastUpdated);
+
+  public Collection<ChangeLog> getChangeLog();
+
+  /**
+   * Returns the user who last modified this item.
+   */
+  public User getLastModifier();
+
+  /**
+   * Sets the user who last modified this item. It should always be set to the current user on save.
+   */
+  public void setLastModifier(User user);
 }

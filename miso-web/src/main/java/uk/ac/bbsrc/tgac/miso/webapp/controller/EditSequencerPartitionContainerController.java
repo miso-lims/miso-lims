@@ -38,11 +38,13 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
@@ -87,6 +89,12 @@ public class EditSequencerPartitionContainerController {
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
+  }
+
+  @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
+  public @ResponseBody
+  Collection<ChangeLog> jsonRestChanges() throws IOException {
+    return requestManager.listAllChanges("SequencerPartitionContainer");
   }
 
   @ModelAttribute("maxLengths")

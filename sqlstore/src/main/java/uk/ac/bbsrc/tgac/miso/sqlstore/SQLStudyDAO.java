@@ -53,6 +53,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ExperimentStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
@@ -61,6 +62,7 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.store.SecurityStore;
 import com.googlecode.ehcache.annotations.Cacheable;
 import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
@@ -125,6 +127,8 @@ public class SQLStudyDAO implements StudyStore {
   private ExperimentStore experimentDAO;
   private Store<SecurityProfile> securityProfileDAO;
   private CascadeType cascadeType;
+  private ChangeLogStore changeLogDAO;
+  private SecurityStore securityDAO;
 
   @Autowired
   private MisoNamingScheme<Study> namingScheme;
@@ -364,6 +368,22 @@ public class SQLStudyDAO implements StudyStore {
     return template.queryForList(STUDY_TYPES_SELECT, String.class);
   }
 
+  public ChangeLogStore getChangeLogDAO() {
+    return changeLogDAO;
+  }
+
+  public void setChangeLogDAO(ChangeLogStore changeLogDAO) {
+    this.changeLogDAO = changeLogDAO;
+  }
+
+  public SecurityStore getSecurityDAO() {
+    return securityDAO;
+  }
+
+  public void setSecurityDAO(SecurityStore securityDAO) {
+    this.securityDAO = securityDAO;
+  }
+
   public class StudyMapper extends CacheAwareRowMapper<Study> {
     public StudyMapper() {
       super(Study.class);
@@ -402,6 +422,8 @@ public class SQLStudyDAO implements StudyStore {
         } else {
           s.setProject(projectDAO.lazyGet(rs.getLong("project_projectId")));
         }
+        s.setLastModifier(securityDAO.getUserById(rs.getLong("lastModifier")));
+        s.getChangeLog().addAll(changeLogDAO.listAllById(TABLE_NAME, id));
       } catch (IOException e1) {
         e1.printStackTrace();
       } catch (MalformedExperimentException e) {

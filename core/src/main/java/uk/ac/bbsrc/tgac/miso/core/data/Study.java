@@ -23,8 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-//import com.fasterxml.jackson.annotation.*;
-//import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.util.Collection;
 
 import org.codehaus.jackson.annotate.JsonBackReference;
@@ -35,6 +33,8 @@ import org.w3c.dom.Document;
 
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
+
+import com.eaglegenomics.simlims.core.User;
 
 /**
  * A Study is a subset of work carried out for a {@link Project}, comprising one or more {@link Experiment}s.
@@ -194,4 +194,16 @@ public interface Study extends SecurableByProfile, Submittable<Document>, Compar
    *          experiments.
    */
   public void setExperiments(Collection<Experiment> experiments);
+
+  public Collection<ChangeLog> getChangeLog();
+
+  /**
+   * Returns the user who last modified this item.
+   */
+  public User getLastModifier();
+
+  /**
+   * Sets the user who last modified this item. It should always be set to the current user on save.
+   */
+  public void setLastModifier(User user);
 }

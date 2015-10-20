@@ -54,6 +54,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PartitionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PlatformStore;
 import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
@@ -63,6 +64,7 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.store.SecurityStore;
 import com.googlecode.ehcache.annotations.Cacheable;
 import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
@@ -124,6 +126,8 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
   private CascadeType cascadeType;
 
   private PlatformStore platformDAO;
+  private ChangeLogStore changeLogDAO;
+  private SecurityStore securityDAO;
 
   @Autowired
   private MisoNamingScheme<SequencerPartitionContainer<SequencerPoolPartition>> namingScheme;
@@ -471,6 +475,8 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
         s.setLocationBarcode(rs.getString("locationBarcode"));
         s.setValidationBarcode(rs.getString("validationBarcode"));
         s.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
+        s.setLastModifier(securityDAO.getUserById(rs.getLong("lastModifier")));
+        s.getChangeLog().addAll(changeLogDAO.listAllById(TABLE_NAME, "container", id));
       } catch (IOException e1) {
         e1.printStackTrace();
       }
@@ -523,5 +529,21 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
       return true;
     }
     return false;
+  }
+
+  public ChangeLogStore getChangeLogDAO() {
+    return changeLogDAO;
+  }
+
+  public void setChangeLogDAO(ChangeLogStore changeLogDAO) {
+    this.changeLogDAO = changeLogDAO;
+  }
+
+  public SecurityStore getSecurityDAO() {
+    return securityDAO;
+  }
+
+  public void setSecurityDAO(SecurityStore securityDAO) {
+    this.securityDAO = securityDAO;
   }
 }

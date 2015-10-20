@@ -51,6 +51,7 @@ import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
@@ -253,6 +254,12 @@ public class EditRunController {
   public @ResponseBody
   Run jsonRest(@PathVariable Long runId) throws IOException {
     return requestManager.getRunById(runId);
+  }
+
+  @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
+  public @ResponseBody
+  Collection<ChangeLog> jsonRestChanges() throws IOException {
+    return requestManager.listAllChanges("Run");
   }
 
   @RequestMapping(value = "/{runId}", method = RequestMethod.GET)

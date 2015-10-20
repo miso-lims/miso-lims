@@ -63,6 +63,7 @@ import uk.ac.bbsrc.tgac.miso.core.event.manager.RunAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.RunQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
@@ -77,6 +78,7 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.store.SecurityStore;
 import com.googlecode.ehcache.annotations.Cacheable;
 import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
@@ -192,6 +194,8 @@ public class SQLRunDAO implements RunStore {
   private NoteStore noteDAO;
   private WatcherStore watcherDAO;
   private CascadeType cascadeType;
+  private ChangeLogStore changeLogDAO;
+  private SecurityStore securityDAO;
 
   @Autowired
   private RunAlertManager runAlertManager;
@@ -642,6 +646,22 @@ public class SQLRunDAO implements RunStore {
     return false;
   }
 
+  public ChangeLogStore getChangeLogDAO() {
+    return changeLogDAO;
+  }
+
+  public void setChangeLogDAO(ChangeLogStore changeLogDAO) {
+    this.changeLogDAO = changeLogDAO;
+  }
+
+  public SecurityStore getSecurityDAO() {
+    return securityDAO;
+  }
+
+  public void setSecurityDAO(SecurityStore securityDAO) {
+    this.securityDAO = securityDAO;
+  }
+
   public class RunMapper extends CacheAwareRowMapper<Run> {
     public RunMapper() {
       super(Run.class);
@@ -696,6 +716,8 @@ public class SQLRunDAO implements RunStore {
 
           r.setNotes(noteDAO.listByRun(id));
         }
+        r.setLastModifier(securityDAO.getUserById(rs.getLong("lastModifier")));
+        r.getChangeLog().addAll(changeLogDAO.listAllById(TABLE_NAME, id));
       } catch (IOException e1) {
         e1.printStackTrace();
       } catch (Exception e) {

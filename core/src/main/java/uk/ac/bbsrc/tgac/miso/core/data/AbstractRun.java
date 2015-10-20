@@ -23,6 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -110,6 +111,20 @@ public abstract class AbstractRun implements Run {
   // listeners
   private Set<MisoListener> listeners = new HashSet<MisoListener>();
   private Set<User> watchers = new HashSet<User>();
+
+  private User lastModifier;
+
+  @Override
+  public User getLastModifier() {
+    return lastModifier;
+  }
+
+  @Override
+  public void setLastModifier(User lastModifier) {
+    this.lastModifier = lastModifier;
+  }
+
+  private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
   @Deprecated
   public Long getRunId() {
@@ -466,5 +481,10 @@ public abstract class AbstractRun implements Run {
       sb.append("(" + getStatus().getStatusId() + ")");
     }
     return sb.toString();
+  }
+
+  @Override
+  public Collection<ChangeLog> getChangeLog() {
+    return changeLog;
   }
 }

@@ -28,7 +28,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,21 +35,28 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Project;
-import com.eaglegenomics.simlims.core.User;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractStudy;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
+import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
+
+import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 @Controller
 @RequestMapping("/study")
@@ -95,6 +101,12 @@ public class EditStudyController {
       }
       throw ex;
     }
+  }
+
+  @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
+  public @ResponseBody
+  Collection<ChangeLog> jsonRestChanges() throws IOException {
+    return requestManager.listAllChanges("Study");
   }
 
   @ModelAttribute("maxLengths")

@@ -29,6 +29,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,11 +41,13 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
@@ -92,6 +96,12 @@ public class EditPoolController {
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
+  }
+
+  @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
+  public @ResponseBody
+  Collection<ChangeLog> jsonRestChanges() throws IOException {
+    return requestManager.listAllChanges("Pool");
   }
 
   @ModelAttribute("platformTypes")

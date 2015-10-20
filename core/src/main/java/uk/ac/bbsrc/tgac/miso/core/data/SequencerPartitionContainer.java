@@ -23,13 +23,14 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-//import com.fasterxml.jackson.annotation.*;
-//import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import java.util.Collection;
 import java.util.List;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
+
+import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
@@ -159,4 +160,11 @@ public interface SequencerPartitionContainer<T extends Partition> extends Secura
    * 
    */
   public void addNewPartition();
+
+  public User getLastModifier();
+
+  public void setLastModifier(User lastModifier);
+
+  public Collection<ChangeLog> getChangeLog();
+
 }

@@ -301,6 +301,28 @@
 </table>
 </form:form>
 </div>
+<c:if test="${not empty container.changeLog}">
+  <br/>
+  <h1>Changes</h1>
+  <span style="clear:both">
+    <table class="list" id="changelog_table">
+      <thead>
+      <tr>
+        <th>Summary</th>
+        <th>Time</th>
+      </tr>
+      </thead>
+      <tbody>
+      <c:forEach items="${container.changeLog}" var="change">
+        <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
+          <td><b>${change.summary}</b></td>
+          <td>${change.time}</td>
+        </tr>
+      </c:forEach>
+      </tbody>
+    </table>
+  </span>
+</c:if>
 </div>
 
 <script type="text/javascript">

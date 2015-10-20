@@ -23,6 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -88,6 +89,25 @@ public abstract class AbstractStudy implements Study {
   @Column(name = "alias")
   private String alias;
 
+  private final Collection<ChangeLog> changeLog = new ArrayList<ChangeLog>();
+  private User lastModifier;
+
+  @Override
+  public User getLastModifier() {
+    return lastModifier;
+  }
+
+  @Override
+  public void setLastModifier(User lastModifier) {
+    this.lastModifier = lastModifier;
+  }
+
+  @Override
+  public Collection<ChangeLog> getChangeLog() {
+    return changeLog;
+  }
+
+  @Override
   public Project getProject() {
     return project;
   }

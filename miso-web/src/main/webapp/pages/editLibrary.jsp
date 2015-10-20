@@ -914,6 +914,29 @@
       });
     </script>
   </c:if>
+
+  <c:if test="${not empty library.changeLog}">
+    <br/>
+    <h1>Changes</h1>
+    <span style="clear:both">
+    <table class="list" id="changelog_table">
+      <thead>
+      <tr>
+      <th>Summary</th>
+      <th>Time</th>
+      </tr>
+      </thead>
+      <tbody>
+      <c:forEach items="${library.changeLog}" var="change">
+      <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
+        <td><b>${change.summary}</b></td>
+        <td>${change.time}</td>
+      </tr>
+      </c:forEach>
+      </tbody>
+    </table>
+    </span>
+  </c:if>
 </c:if>
 
 <c:if test="${library.id == 0}">
@@ -997,6 +1020,7 @@
     </tbody>
   </table>
   <div id="pager"></div>
+
 </div>
 </div>
 

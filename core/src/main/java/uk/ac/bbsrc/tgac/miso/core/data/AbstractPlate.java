@@ -23,6 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -70,6 +71,18 @@ public abstract class AbstractPlate<T extends List<S>, S extends Plateable> impl
   private String locationBarcode;
 
   private Date lastUpdated;
+  private final List<ChangeLog> changeLog = new ArrayList<ChangeLog>();
+  private User lastModifier;
+
+  @Override
+  public User getLastModifier() {
+    return lastModifier;
+  }
+
+  @Override
+  public void setLastModifier(User lastModifier) {
+    this.lastModifier = lastModifier;
+  }
 
   @Override
   @Deprecated
@@ -274,5 +287,10 @@ public abstract class AbstractPlate<T extends List<S>, S extends Plateable> impl
     sb.append(" : ");
     sb.append(getDescription());
     return sb.toString();
+  }
+
+  @Override
+  public Collection<ChangeLog> getChangeLog() {
+    return changeLog;
   }
 }

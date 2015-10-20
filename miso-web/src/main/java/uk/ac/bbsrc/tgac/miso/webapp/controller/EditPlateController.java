@@ -30,6 +30,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +49,7 @@ import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPlate;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Plate;
 import uk.ac.bbsrc.tgac.miso.core.data.Plateable;
 import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
@@ -122,6 +125,12 @@ public class EditPlateController {
   Plate<? extends List<? extends Plateable>, ? extends Plateable> jsonRest(@PathVariable Long plateId) throws IOException {
     // return requestManager.<LinkedList<Plateable>, Plateable> getPlateById(plateId);
     return requestManager.getPlateById(plateId);
+  }
+
+  @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
+  public @ResponseBody
+  Collection<ChangeLog> jsonRestChanges() throws IOException {
+    return requestManager.listAllChanges("Plate");
   }
 
   @RequestMapping(value = "/{plateId}", method = RequestMethod.GET)

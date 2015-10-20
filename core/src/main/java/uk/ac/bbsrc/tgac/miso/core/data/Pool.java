@@ -38,6 +38,8 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolQcException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
+import com.eaglegenomics.simlims.core.User;
+
 /**
  * A Pool represents a collection of one or more {@link Poolable} objects, which enables multiplexing to be modelled if necessary. Pools
  * provide the link between the {@link Sample} tree and the {@link Run} tree of the MISO data model, which means that multiple samples from
@@ -265,4 +267,16 @@ public interface Pool<P extends Poolable> extends SecurableByProfile, Comparable
   Date getLastUpdated();
 
   void setLastUpdated(Date lastUpdated);
+
+  public Collection<ChangeLog> getChangeLog();
+
+  /**
+   * Returns the user who last modified this item.
+   */
+  public User getLastModifier();
+
+  /**
+   * Sets the user who last modified this item. It should always be set to the current user on save.
+   */
+  public void setLastModifier(User user);
 }

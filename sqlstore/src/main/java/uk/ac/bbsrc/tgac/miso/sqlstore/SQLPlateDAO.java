@@ -58,6 +58,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlateMaterialType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PlateStore;
@@ -68,6 +69,7 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DaoLookup;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.store.SecurityStore;
 import com.googlecode.ehcache.annotations.Cacheable;
 import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
@@ -130,6 +132,8 @@ public class SQLPlateDAO implements PlateStore {
   private SampleStore sampleDAO;
   private LibraryDilutionStore dilutionDAO;
   private Store<SecurityProfile> securityProfileDAO;
+  private ChangeLogStore changeLogDAO;
+  private SecurityStore securityDAO;
 
   @Autowired
   private DaoLookup daoLookup;
@@ -421,6 +425,7 @@ public class SQLPlateDAO implements PlateStore {
         if (!isLazy()) {
           plate.setElements(resolvePlateElements(plate.getId()));
         }
+        plate.getChangeLog().addAll(changeLogDAO.listAllById(TABLE_NAME, id));
       } catch (IOException e1) {
         e1.printStackTrace();
       }
@@ -466,5 +471,21 @@ public class SQLPlateDAO implements PlateStore {
     } else {
       throw new IllegalArgumentException("Element type " + elementType.getName() + " is not a valid Plateable type");
     }
+  }
+
+  public ChangeLogStore getChangeLogDAO() {
+    return changeLogDAO;
+  }
+
+  public void setChangeLogDAO(ChangeLogStore changeLogStore) {
+    this.changeLogDAO = changeLogStore;
+  }
+
+  public SecurityStore getSecurityDAO() {
+    return securityDAO;
+  }
+
+  public void setSecurityDAO(SecurityStore securityDAO) {
+    this.securityDAO = securityDAO;
   }
 }

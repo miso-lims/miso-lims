@@ -515,13 +515,13 @@ public class SQLSampleDAO implements SampleStore {
     @Override
     public Sample mapRow(ResultSet rs, int rowNum) throws SQLException {
       long id = rs.getLong("sampleId");
-
       if (isCacheEnabled() && lookupCache(cacheManager) != null) {
         Element element;
         if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
           log.info("Cache hit on map for sample " + id);
           log.info("Cache hit on map for sample with element " + element);
           Sample sample = (Sample) element.getObjectValue();
+          if (sample == null) throw new NullPointerException("The cache is full of lies!!!");
           if (sample.getId() == 0) {
             DbUtils.updateCaches(lookupCache(cacheManager), id);
           } else {
@@ -578,7 +578,6 @@ public class SQLSampleDAO implements SampleStore {
       if (isCacheEnabled() && lookupCache(cacheManager) != null) {
         lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id), s));
       }
-
       return s;
     }
   }
