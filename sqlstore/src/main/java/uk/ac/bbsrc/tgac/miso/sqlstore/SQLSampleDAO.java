@@ -62,6 +62,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleQcException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
@@ -159,6 +160,7 @@ public class SQLSampleDAO implements SampleStore {
   private SampleQcStore sampleQcDAO;
   private NoteStore noteDAO;
   private CascadeType cascadeType;
+  private ChangeLogStore changeLogDAO;
 
   @Autowired
   private MisoNamingScheme<Sample> sampleNamingScheme;
@@ -493,6 +495,14 @@ public class SQLSampleDAO implements SampleStore {
     return template.query(SAMPLES_BY_RELATED_SUBMISSION, new Object[] { submissionId }, new SampleMapper());
   }
 
+  public ChangeLogStore getChangeLogDAO() {
+    return changeLogDAO;
+  }
+
+  public void setChangeLogDAO(ChangeLogStore changeLogDAO) {
+    this.changeLogDAO = changeLogDAO;
+  }
+
   public class SampleMapper extends CacheAwareRowMapper<Sample> {
     public SampleMapper() {
       super(Sample.class);
@@ -537,7 +547,6 @@ public class SQLSampleDAO implements SampleStore {
       } else {
         s.setQcPassed(null);
       }
-
       // s.setLastUpdated(rs.getTimestamp("lastUpdated"));
 
       try {
@@ -557,6 +566,7 @@ public class SQLSampleDAO implements SampleStore {
         } else {
           s.setProject(projectDAO.lazyGet(rs.getLong("project_projectId")));
         }
+        s.getChangeLog().addAll(changeLogDAO.listAllById(TABLE_NAME, id));
       } catch (IOException e1) {
         e1.printStackTrace();
       } catch (MalformedLibraryException e) {

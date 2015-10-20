@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
@@ -330,6 +331,8 @@ public interface RequestManager {
   public Collection<? extends SequencerPoolPartition> listPartitionsBySequencerPartitionContainerId(long containerId) throws IOException;
 
   public Collection<SequencerPartitionContainer<SequencerPoolPartition>> listAllSequencerPartitionContainers() throws IOException;
+
+  public Collection<ChangeLog> listAllChanges(String type) throws IOException;
 
   public Collection<Sample> listAllSamples() throws IOException;
 

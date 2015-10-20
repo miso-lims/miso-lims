@@ -36,8 +36,6 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleQcException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 import com.eaglegenomics.simlims.core.Note;
-//import com.fasterxml.jackson.annotation.*;
-//import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  * A Sample contains information about the original material upon which a sequencing experiment is to be based.
@@ -204,6 +202,13 @@ public interface Sample extends SecurableByProfile, Submittable<Document>, Barco
    * @return Collection<Note> notes.
    */
   public Collection<Note> getNotes();
+
+  /**
+   * Returns the notes of this Sample object.
+   * 
+   * @return Collection<Note> notes.
+   */
+  public Collection<ChangeLog> getChangeLog();
 
   /**
    * Adds a Library that has been prepared from this Sample

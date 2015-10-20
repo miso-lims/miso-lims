@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
@@ -72,6 +73,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.event.Alert;
 import uk.ac.bbsrc.tgac.miso.core.store.AlertStore;
+import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.EmPCRDilutionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.EmPCRStore;
 import uk.ac.bbsrc.tgac.miso.core.store.EntityGroupStore;
@@ -161,6 +163,8 @@ public class MisoRequestManager implements RequestManager {
   private StudyStore studyStore;
   @Autowired
   private Store<Submission> submissionStore;
+  @Autowired
+  private ChangeLogStore changeLogStore;
 
   public void setAlertStore(AlertStore alertStore) {
     this.alertStore = alertStore;
@@ -2415,5 +2419,18 @@ public class MisoRequestManager implements RequestManager {
     } else {
       throw new IOException("No entityGroupStore available. Check that it has been declared in the Spring config.");
     }
+  }
+
+  @Override
+  public Collection<ChangeLog> listAllChanges(String type) throws IOException {
+    return changeLogStore.listAll(type);
+  }
+
+  public ChangeLogStore getChangeLogStore() {
+    return changeLogStore;
+  }
+
+  public void setChangeLogStore(ChangeLogStore changeLogStore) {
+    this.changeLogStore = changeLogStore;
   }
 }
