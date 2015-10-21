@@ -91,6 +91,15 @@
         <artifactId>flyway-maven-plugin</artifactId>
         <version>3.2.1</version>
         <configuration>
+          <!--
+            Do not modify these placeholder database credentials and risk committing them to git. Instead create a "flyway.properties"
+            file in the same directory as this "pom.xml" file. The "flyway.properties" file is .gitignored and the values it contains
+            will take precedence over the values in this "pom.xml" file. Here is an example of the properties in the
+            "flyway.properties" file:
+            flyway.user=miso
+            flyway.password=secret
+            flyway.url=jdbc:mysql://localhost:3307/devmisodb
+           -->
           <user>tgaclims</user>
           <password>tgaclims</password>
           <driver>com.mysql.jdbc.Driver</driver>

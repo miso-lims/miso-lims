@@ -6,3 +6,6 @@
 
 # Maven build directory.
 target/
+
+# Flyway database migration credentials file.
+sqlstore/flyway.properties
