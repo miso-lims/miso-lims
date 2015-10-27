@@ -307,8 +307,9 @@ public class SQLEmPCRDilutionDAO implements EmPCRDilutionStore {
     } else {
       try {
         if (namingScheme.validateField("name", dilution.getName())) {
-          params.addValue("dilutionId", dilution.getId()).addValue("name", dilution.getName()).addValue("identificationBarcode",
-              dilution.getName() + "::" + dilution.getLibrary().getAlias());
+          params.addValue("dilutionId", dilution.getId());
+          params.addValue("name", dilution.getName());
+          params.addValue("identificationBarcode", dilution.getName() + "::" + dilution.getLibrary().getAlias());
           NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
           namedTemplate.update(EMPCR_DILUTION_UPDATE, params);
         } else {

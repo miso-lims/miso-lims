@@ -174,7 +174,8 @@ public class SQLSequencerPoolPartitionDAO implements PartitionStore {
     }
 
     MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("partitionNumber", partition.getPartitionNumber()).addValue("securityProfile_profileId", securityProfileId);
+    params.addValue("partitionNumber", partition.getPartitionNumber());
+    params.addValue("securityProfile_profileId", securityProfileId);
 
     if (partition.getPool() != null) {
       params.addValue("pool_poolId", partition.getPool().getId());

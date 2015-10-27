@@ -95,9 +95,11 @@ public class SQLStatusDAO implements StatusStore {
   @Override
   public long save(Status status) throws IOException {
     MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("runName", status.getRunName()).addValue("health", status.getHealth().getKey())
-        .addValue("startDate", status.getStartDate()).addValue("completionDate", status.getCompletionDate())
-        .addValue("instrumentName", status.getInstrumentName());
+    params.addValue("runName", status.getRunName());
+    params.addValue("health", status.getHealth().getKey());
+    params.addValue("startDate", status.getStartDate());
+    params.addValue("completionDate", status.getCompletionDate());
+    params.addValue("instrumentName", status.getInstrumentName());
 
     Blob xmlblob = null;
     try {

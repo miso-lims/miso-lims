@@ -281,14 +281,19 @@ public class SQLLibraryDAO implements LibraryStore {
     }
 
     MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("alias", library.getAlias()).addValue("accession", library.getAccession())
-        .addValue("description", library.getDescription()).addValue("locationBarcode", library.getLocationBarcode())
-        .addValue("paired", library.getPaired()).addValue("sample_sampleId", library.getSample().getId())
-        .addValue("securityProfile_profileId", securityProfileId).addValue("libraryType", library.getLibraryType().getLibraryTypeId())
-        .addValue("librarySelectionType", library.getLibrarySelectionType().getLibrarySelectionTypeId())
-        .addValue("libraryStrategyType", library.getLibraryStrategyType().getLibraryStrategyTypeId())
-        .addValue("platformName", library.getPlatformName()).addValue("concentration", library.getInitialConcentration())
-        .addValue("creationDate", library.getCreationDate());
+    params.addValue("alias", library.getAlias());
+    params.addValue("accession", library.getAccession());
+    params.addValue("description", library.getDescription());
+    params.addValue("locationBarcode", library.getLocationBarcode());
+    params.addValue("paired", library.getPaired());
+    params.addValue("sample_sampleId", library.getSample().getId());
+    params.addValue("securityProfile_profileId", securityProfileId);
+    params.addValue("libraryType", library.getLibraryType().getLibraryTypeId());
+    params.addValue("librarySelectionType", library.getLibrarySelectionType().getLibrarySelectionTypeId());
+    params.addValue("libraryStrategyType", library.getLibraryStrategyType().getLibraryStrategyTypeId());
+    params.addValue("platformName", library.getPlatformName());
+    params.addValue("concentration", library.getInitialConcentration());
+    params.addValue("creationDate", library.getCreationDate());
 
     if (library.getQcPassed() != null) {
       params.addValue("qcPassed", library.getQcPassed().toString());
@@ -334,8 +339,10 @@ public class SQLLibraryDAO implements LibraryStore {
       try {
         if (libraryNamingScheme.validateField("name", library.getName())
             && libraryNamingScheme.validateField("alias", library.getAlias())) {
-          params.addValue("libraryId", library.getId()).addValue("name", library.getName()).addValue("alias", library.getAlias())
-              .addValue("description", library.getDescription());
+          params.addValue("libraryId", library.getId());
+          params.addValue("name", library.getName());
+          params.addValue("alias", library.getAlias());
+          params.addValue("description", library.getDescription());
           if (autoGenerateIdentificationBarcodes) {
             autoGenerateIdBarcode(library);
           } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
@@ -361,7 +368,8 @@ public class SQLLibraryDAO implements LibraryStore {
 
       for (TagBarcode t : library.getTagBarcodes().values()) {
         MapSqlParameterSource ltParams = new MapSqlParameterSource();
-        ltParams.addValue("library_libraryId", library.getId()).addValue("barcode_barcodeId", t.getId());
+        ltParams.addValue("library_libraryId", library.getId());
+        ltParams.addValue("barcode_barcodeId", t.getId());
         eInsert.execute(ltParams);
       }
     }

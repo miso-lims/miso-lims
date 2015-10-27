@@ -121,9 +121,11 @@ public class SQLPoolQCDAO implements PoolQcStore {
   @Transactional(readOnly = false, rollbackFor = IOException.class)
   public long save(PoolQC poolQC) throws IOException {
     MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("pool_poolId", poolQC.getPool().getId()).addValue("qcUserName", poolQC.getQcCreator())
-        .addValue("qcDate", poolQC.getQcDate()).addValue("qcMethod", poolQC.getQcType().getQcTypeId())
-        .addValue("results", poolQC.getResults());
+    params.addValue("pool_poolId", poolQC.getPool().getId());
+    params.addValue("qcUserName", poolQC.getQcCreator());
+    params.addValue("qcDate", poolQC.getQcDate());
+    params.addValue("qcMethod", poolQC.getQcType().getQcTypeId());
+    params.addValue("results", poolQC.getResults());
 
     if (poolQC.getId() == AbstractQC.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("qcId");

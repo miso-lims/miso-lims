@@ -73,6 +73,8 @@ import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.store.WatcherStore;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
+import uk.ac.bbsrc.tgac.miso.core.data.*;
+import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
@@ -316,11 +318,17 @@ public class SQLRunDAO implements RunStore {
     }
 
     MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("accession", run.getAccession()).addValue("alias", run.getAlias()).addValue("description", run.getDescription())
-        .addValue("platformRunId", run.getPlatformRunId()).addValue("pairedEnd", run.getPairedEnd()).addValue("cycles", run.getCycles())
-        .addValue("filePath", run.getFilePath()).addValue("platformType", run.getPlatformType().getKey())
-        .addValue("securityProfile_profileId", securityProfileId).addValue("status_statusId", statusId)
-        .addValue("sequencerReference_sequencerReferenceId", run.getSequencerReference().getId());
+    params.addValue("accession", run.getAccession());
+    params.addValue("alias", run.getAlias());
+    params.addValue("description", run.getDescription());
+    params.addValue("platformRunId", run.getPlatformRunId());
+    params.addValue("pairedEnd", run.getPairedEnd());
+    params.addValue("cycles", run.getCycles());
+    params.addValue("filePath", run.getFilePath());
+    params.addValue("platformType", run.getPlatformType().getKey());
+    params.addValue("securityProfile_profileId", securityProfileId);
+    params.addValue("status_statusId", statusId);
+    params.addValue("sequencerReference_sequencerReferenceId", run.getSequencerReference().getId());
 
     if (run.getId() == AbstractRun.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("runId");
@@ -348,7 +356,8 @@ public class SQLRunDAO implements RunStore {
     } else {
       try {
         if (namingScheme.validateField("name", run.getName())) {
-          params.addValue("runId", run.getId()).addValue("name", run.getName());
+          params.addValue("runId", run.getId());
+          params.addValue("name", run.getName());
           NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
           namedTemplate.update(RUN_UPDATE, params);
         } else {
@@ -370,7 +379,8 @@ public class SQLRunDAO implements RunStore {
 
           SimpleJdbcInsert fInsert = new SimpleJdbcInsert(template).withTableName("Run_SequencerPartitionContainer");
           MapSqlParameterSource fcParams = new MapSqlParameterSource();
-          fcParams.addValue("Run_runId", run.getId()).addValue("containers_containerId", containerId);
+          fcParams.addValue("Run_runId", run.getId());
+          fcParams.addValue("containers_containerId", containerId);
 
           try {
             fInsert.execute(fcParams);
@@ -436,11 +446,17 @@ public class SQLRunDAO implements RunStore {
 
       try {
         MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("accession", run.getAccession()).addValue("alias", run.getAlias()).addValue("description", run.getDescription())
-            .addValue("platformRunId", run.getPlatformRunId()).addValue("pairedEnd", run.getPairedEnd()).addValue("cycles", run.getCycles())
-            .addValue("filePath", run.getFilePath()).addValue("platformType", run.getPlatformType().getKey())
-            .addValue("securityProfile_profileId", securityProfileId).addValue("status_statusId", statusId)
-            .addValue("sequencerReference_sequencerReferenceId", run.getSequencerReference().getId());
+        params.addValue("accession", run.getAccession());
+        params.addValue("alias", run.getAlias());
+        params.addValue("description", run.getDescription());
+        params.addValue("platformRunId", run.getPlatformRunId());
+        params.addValue("pairedEnd", run.getPairedEnd());
+        params.addValue("cycles", run.getCycles());
+        params.addValue("filePath", run.getFilePath());
+        params.addValue("platformType", run.getPlatformType().getKey());
+        params.addValue("securityProfile_profileId", securityProfileId);
+        params.addValue("status_statusId", statusId);
+        params.addValue("sequencerReference_sequencerReferenceId", run.getSequencerReference().getId());
 
         if (run.getId() == AbstractRun.UNSAVED_ID) {
           SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("runId");
@@ -471,7 +487,8 @@ public class SQLRunDAO implements RunStore {
         } else {
           try {
             if (namingScheme.validateField("name", run.getName())) {
-              params.addValue("runId", run.getId()).addValue("name", run.getName());
+              params.addValue("runId", run.getId());
+              params.addValue("name", run.getName());
               log.debug(run.getName() + ":: Updating as ID " + run.getId());
               batch.add(params);
             } else {
@@ -493,7 +510,8 @@ public class SQLRunDAO implements RunStore {
 
               SimpleJdbcInsert fInsert = new SimpleJdbcInsert(template).withTableName("Run_SequencerPartitionContainer");
               MapSqlParameterSource fcParams = new MapSqlParameterSource();
-              fcParams.addValue("Run_runId", run.getId()).addValue("containers_containerId", containerId);
+              fcParams.addValue("Run_runId", run.getId());
+              fcParams.addValue("containers_containerId", containerId);
 
               try {
                 fInsert.execute(fcParams);

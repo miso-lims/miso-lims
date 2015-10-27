@@ -109,7 +109,9 @@ public class SQLNoteDAO implements NoteStore {
     String newNoteText = LimsUtils.findHyperlinks(note.getText());
 
     MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("creationDate", note.getCreationDate()).addValue("internalOnly", note.isInternalOnly()).addValue("text", newNoteText);
+    params.addValue("creationDate", note.getCreationDate());
+    params.addValue("internalOnly", note.isInternalOnly());
+    params.addValue("text", newNoteText);
 
     if (note.getOwner() == null) {
       log.warn("Note has no owner - check parent permissions.");
@@ -131,7 +133,8 @@ public class SQLNoteDAO implements NoteStore {
     SimpleJdbcInsert pInsert = new SimpleJdbcInsert(template).withTableName("ProjectOverview_Note");
 
     MapSqlParameterSource poParams = new MapSqlParameterSource();
-    poParams.addValue("overview_overviewId", overview.getOverviewId()).addValue("notes_noteId", noteId);
+    poParams.addValue("overview_overviewId", overview.getOverviewId());
+    poParams.addValue("notes_noteId", noteId);
 
     try {
       pInsert.execute(poParams);
@@ -147,7 +150,8 @@ public class SQLNoteDAO implements NoteStore {
     SimpleJdbcInsert pInsert = new SimpleJdbcInsert(template).withTableName("Kit_Note");
 
     MapSqlParameterSource poParams = new MapSqlParameterSource();
-    poParams.addValue("kit_kitId", kit.getId()).addValue("notes_noteId", noteId);
+    poParams.addValue("kit_kitId", kit.getId());
+    poParams.addValue("notes_noteId", noteId);
     try {
       pInsert.execute(poParams);
     } catch (DuplicateKeyException se) {
@@ -162,7 +166,8 @@ public class SQLNoteDAO implements NoteStore {
     SimpleJdbcInsert pInsert = new SimpleJdbcInsert(template).withTableName("Sample_Note");
 
     MapSqlParameterSource poParams = new MapSqlParameterSource();
-    poParams.addValue("sample_sampleId", sample.getId()).addValue("notes_noteId", noteId);
+    poParams.addValue("sample_sampleId", sample.getId());
+    poParams.addValue("notes_noteId", noteId);
 
     try {
       pInsert.execute(poParams);
@@ -178,7 +183,8 @@ public class SQLNoteDAO implements NoteStore {
     SimpleJdbcInsert pInsert = new SimpleJdbcInsert(template).withTableName("Library_Note");
 
     MapSqlParameterSource poParams = new MapSqlParameterSource();
-    poParams.addValue("library_libraryId", library.getId()).addValue("notes_noteId", noteId);
+    poParams.addValue("library_libraryId", library.getId());
+    poParams.addValue("notes_noteId", noteId);
 
     try {
       pInsert.execute(poParams);
@@ -194,7 +200,8 @@ public class SQLNoteDAO implements NoteStore {
     SimpleJdbcInsert pInsert = new SimpleJdbcInsert(template).withTableName("Run_Note");
 
     MapSqlParameterSource poParams = new MapSqlParameterSource();
-    poParams.addValue("run_runId", run.getId()).addValue("notes_noteId", noteId);
+    poParams.addValue("run_runId", run.getId());
+    poParams.addValue("notes_noteId", noteId);
 
     try {
       pInsert.execute(poParams);

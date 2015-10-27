@@ -259,15 +259,17 @@ public class SQLPlateDAO implements PlateStore {
           @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
   public long save(Plate<? extends List<? extends Plateable>, ? extends Plateable> plate) throws IOException {
     Long securityProfileId = plate.getSecurityProfile().getProfileId();
-    if (securityProfileId == SecurityProfile.UNSAVED_ID || (this.cascadeType != null)) { // &&
-                                                                                         // this.cascadeType.equals(CascadeType.PERSIST))) {
+    if (securityProfileId == SecurityProfile.UNSAVED_ID || (this.cascadeType != null)) {
       securityProfileId = securityProfileDAO.save(plate.getSecurityProfile());
     }
 
     MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("description", plate.getDescription()).addValue("creationDate", plate.getCreationDate())
-        .addValue("plateMaterialType", plate.getPlateMaterialType().getKey()).addValue("locationBarcode", plate.getLocationBarcode())
-        .addValue("size", plate.getSize()).addValue("securityProfile_profileId", securityProfileId);
+    params.addValue("description", plate.getDescription());
+    params.addValue("creationDate", plate.getCreationDate());
+    params.addValue("plateMaterialType", plate.getPlateMaterialType().getKey());
+    params.addValue("locationBarcode", plate.getLocationBarcode());
+    params.addValue("size", plate.getSize());
+    params.addValue("securityProfile_profileId", securityProfileId);
 
     if (plate.getTagBarcode() != null) {
       params.addValue("tagBarcodeId", plate.getTagBarcode().getId());
@@ -310,8 +312,9 @@ public class SQLPlateDAO implements PlateStore {
         } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
 
         if (namingScheme.validateField("name", plate.getName())) {
-          params.addValue("plateId", plate.getId()).addValue("name", plate.getName()).addValue("description", plate.getDescription())
-              .addValue("identificationBarcode", plate.getIdentificationBarcode()).addValue("locationBarcode", plate.getLocationBarcode());
+          params.addValue("plateId", plate.getId());
+          params.addValue("name", plate.getName());
+          params.addValue("identificationBarcode", plate.getLocationBarcode());
           NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
           namedTemplate.update(PLATE_UPDATE, params);
         } else {
@@ -343,8 +346,10 @@ public class SQLPlateDAO implements PlateStore {
             }
           }
           MapSqlParameterSource ltParams = new MapSqlParameterSource();
-          ltParams.addValue("plate_plateId", plate.getId()).addValue("elementType", eType).addValue("elementPosition", pos)
-              .addValue("elementId", n.getId());
+          ltParams.addValue("plate_plateId", plate.getId());
+          ltParams.addValue("elementType", eType);
+          ltParams.addValue("elementPosition", pos);
+          ltParams.addValue("elementId", n.getId());
 
           eInsert.execute(ltParams);
           pos++;

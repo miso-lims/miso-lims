@@ -165,10 +165,14 @@ public class SQLTgacSubmissionDAO implements Store<Submission>, NamingSchemeAwar
     SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName("Submission");
 
     MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("alias", submission.getAlias()).addValue("accession", submission.getAccession())
-        .addValue("description", submission.getDescription()).addValue("title", submission.getTitle())
-        .addValue("creationDate", submission.getCreationDate()).addValue("submittedDate", submission.getSubmissionDate())
-        .addValue("verified", submission.isVerified()).addValue("completed", submission.isCompleted());
+    params.addValue("alias", submission.getAlias());
+    params.addValue("accession", submission.getAccession());
+    params.addValue("description", submission.getDescription());
+    params.addValue("title", submission.getTitle());
+    params.addValue("creationDate", submission.getCreationDate());
+    params.addValue("submittedDate", submission.getSubmissionDate());
+    params.addValue("verified", submission.isVerified());
+    params.addValue("completed", submission.isCompleted());
 
     // if a submission already exists then delete all the old rows first, and repopulate.
     // easier than trying to work out which rows need to be updated and which don't
@@ -181,7 +185,8 @@ public class SQLTgacSubmissionDAO implements Store<Submission>, NamingSchemeAwar
           log.debug("Deleting Submission elements for " + submission.getId());
           namedTemplate.update(SUBMISSION_ELEMENTS_DELETE, delparams);
 
-          params.addValue("submissionId", submission.getId()).addValue("name", submission.getName());
+          params.addValue("submissionId", submission.getId());
+          params.addValue("name", submission.getName());
           namedTemplate.update(SUBMISSION_UPDATE, params);
         } else {
           throw new IOException("Cannot save Submission - invalid field:" + submission.toString());
@@ -198,7 +203,8 @@ public class SQLTgacSubmissionDAO implements Store<Submission>, NamingSchemeAwar
         submission.setName(name);
 
         if (namingScheme.validateField("name", submission.getName())) {
-          params.addValue("name", name).addValue("creationDate", new Date());
+          params.addValue("name", name);
+          params.addValue("creationDate", new Date());
 
           Number newId = insert.executeAndReturnKey(params);
           if (newId.longValue() != submission.getId()) {
@@ -248,7 +254,8 @@ public class SQLTgacSubmissionDAO implements Store<Submission>, NamingSchemeAwar
               SimpleJdbcInsert pInsert = new SimpleJdbcInsert(template).withTableName("Submission_Experiment");
               try {
                 MapSqlParameterSource poParams = new MapSqlParameterSource();
-                poParams.addValue("submission_submissionId", submission.getId()).addValue("experiments_experimentId", experiment.getId());
+                poParams.addValue("submission_submissionId", submission.getId());
+                poParams.addValue("experiments_experimentId", experiment.getId());
                 pInsert.execute(poParams);
               } catch (DuplicateKeyException dke) {
                 log.warn("This Submission_Experiment combination already exists - not inserting: " + dke.getMessage());
@@ -258,7 +265,8 @@ public class SQLTgacSubmissionDAO implements Store<Submission>, NamingSchemeAwar
               SimpleJdbcInsert sInsert = new SimpleJdbcInsert(template).withTableName("Submission_Study");
               try {
                 MapSqlParameterSource poParams = new MapSqlParameterSource();
-                poParams.addValue("submission_submissionId", submission.getId()).addValue("studies_studyId", study.getId());
+                poParams.addValue("submission_submissionId", submission.getId());
+                poParams.addValue("studies_studyId", study.getId());
                 sInsert.execute(poParams);
               } catch (DuplicateKeyException dke) {
                 log.warn("This Submission_Study combination already exists - not inserting: " + dke.getMessage());
@@ -271,7 +279,8 @@ public class SQLTgacSubmissionDAO implements Store<Submission>, NamingSchemeAwar
               SimpleJdbcInsert sInsert = new SimpleJdbcInsert(template).withTableName("Submission_Sample");
               try {
                 MapSqlParameterSource poParams = new MapSqlParameterSource();
-                poParams.addValue("submission_submissionId", submission.getId()).addValue("samples_sampleId", sample.getId());
+                poParams.addValue("submission_submissionId", submission.getId());
+                poParams.addValue("samples_sampleId", sample.getId());
                 sInsert.execute(poParams);
               } catch (DuplicateKeyException dke) {
                 log.warn("This Submission_Sample combination already exists - not inserting: " + dke.getMessage());
@@ -282,8 +291,9 @@ public class SQLTgacSubmissionDAO implements Store<Submission>, NamingSchemeAwar
               sInsert = new SimpleJdbcInsert(template).withTableName("Submission_Partition_Dilution");
               try {
                 MapSqlParameterSource poParams = new MapSqlParameterSource();
-                poParams.addValue("submission_submissionId", submission.getId()).addValue("partition_partitionId", l.getId())
-                    .addValue("dilution_dilutionId", dil.getId());
+                poParams.addValue("submission_submissionId", submission.getId());
+                poParams.addValue("partition_partitionId", l.getId());
+                poParams.addValue("dilution_dilutionId", dil.getId());
                 sInsert.execute(poParams);
 
               } catch (DuplicateKeyException dke) {
@@ -298,7 +308,8 @@ public class SQLTgacSubmissionDAO implements Store<Submission>, NamingSchemeAwar
             SimpleJdbcInsert pInsert = new SimpleJdbcInsert(template).withTableName(tableName);
             try {
               MapSqlParameterSource poParams = new MapSqlParameterSource();
-              poParams.addValue("submission_submissionId", submission.getId()).addValue(priKey, priValue);
+              poParams.addValue("submission_submissionId", submission.getId());
+              poParams.addValue(priKey, priValue);
               pInsert.execute(poParams);
             } catch (DuplicateKeyException dke) {
               log.warn("This " + tableName + " combination already exists - not inserting: " + dke.getMessage());

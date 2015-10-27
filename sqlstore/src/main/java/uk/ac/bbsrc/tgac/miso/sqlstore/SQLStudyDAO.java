@@ -197,9 +197,12 @@ public class SQLStudyDAO implements StudyStore {
     }
 
     MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("alias", study.getAlias()).addValue("accession", study.getAccession()).addValue("description", study.getDescription())
-        .addValue("securityProfile_profileId", securityProfileId).addValue("project_projectId", study.getProject().getProjectId())
-        .addValue("studyType", study.getStudyType());
+    params.addValue("alias", study.getAlias());
+    params.addValue("accession", study.getAccession());
+    params.addValue("description", study.getDescription());
+    params.addValue("securityProfile_profileId", securityProfileId);
+    params.addValue("project_projectId", study.getProject().getProjectId());
+    params.addValue("studyType", study.getStudyType());
 
     if (study.getId() == AbstractStudy.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("studyId");
@@ -231,7 +234,8 @@ public class SQLStudyDAO implements StudyStore {
       SimpleJdbcInsert pInsert = new SimpleJdbcInsert(template).withTableName("Project_Study");
 
       MapSqlParameterSource poParams = new MapSqlParameterSource();
-      poParams.addValue("Project_projectId", p.getProjectId()).addValue("studies_studyId", study.getId());
+      poParams.addValue("Project_projectId", p.getProjectId());
+      poParams.addValue("studies_studyId", study.getId());
       try {
         pInsert.execute(poParams);
       } catch (DuplicateKeyException dke) {
@@ -240,7 +244,8 @@ public class SQLStudyDAO implements StudyStore {
     } else {
       try {
         if (namingScheme.validateField("name", study.getName())) {
-          params.addValue("studyId", study.getId()).addValue("name", study.getName());
+          params.addValue("studyId", study.getId());
+          params.addValue("name", study.getName());
           NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
           namedTemplate.update(STUDY_UPDATE, params);
         } else {

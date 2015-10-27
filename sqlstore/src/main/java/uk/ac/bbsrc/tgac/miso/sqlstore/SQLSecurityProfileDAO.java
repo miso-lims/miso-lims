@@ -141,7 +141,8 @@ public class SQLSecurityProfileDAO implements Store<SecurityProfile> {
 
       for (User u : securityProfile.getReadUsers()) {
         MapSqlParameterSource uParams = new MapSqlParameterSource();
-        uParams.addValue("SecurityProfile_profileId", securityProfile.getProfileId()).addValue("readUser_userId", u.getUserId());
+        uParams.addValue("SecurityProfile_profileId", securityProfile.getProfileId());
+        uParams.addValue("readUser_userId", u.getUserId());
         uInsert.execute(uParams);
       }
     }
@@ -152,7 +153,8 @@ public class SQLSecurityProfileDAO implements Store<SecurityProfile> {
 
       for (User u : securityProfile.getWriteUsers()) {
         MapSqlParameterSource uParams = new MapSqlParameterSource();
-        uParams.addValue("SecurityProfile_profileId", securityProfile.getProfileId()).addValue("writeUser_userId", u.getUserId());
+        uParams.addValue("SecurityProfile_profileId", securityProfile.getProfileId());
+        uParams.addValue("writeUser_userId", u.getUserId());
         uInsert.execute(uParams);
       }
     }
@@ -163,7 +165,8 @@ public class SQLSecurityProfileDAO implements Store<SecurityProfile> {
 
       for (Group g : securityProfile.getReadGroups()) {
         MapSqlParameterSource uParams = new MapSqlParameterSource();
-        uParams.addValue("SecurityProfile_profileId", securityProfile.getProfileId()).addValue("readGroup_groupId", g.getGroupId());
+        uParams.addValue("SecurityProfile_profileId", securityProfile.getProfileId());
+        uParams.addValue("readGroup_groupId", g.getGroupId());
         uInsert.execute(uParams);
       }
     }
@@ -174,7 +177,8 @@ public class SQLSecurityProfileDAO implements Store<SecurityProfile> {
 
       for (Group g : securityProfile.getWriteGroups()) {
         MapSqlParameterSource uParams = new MapSqlParameterSource();
-        uParams.addValue("SecurityProfile_profileId", securityProfile.getProfileId()).addValue("writeGroup_groupId", g.getGroupId());
+        uParams.addValue("SecurityProfile_profileId", securityProfile.getProfileId());
+        uParams.addValue("writeGroup_groupId", g.getGroupId());
         uInsert.execute(uParams);
       }
     }

@@ -238,10 +238,13 @@ public class SQLExperimentDAO implements ExperimentStore {
     }
 
     MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("alias", experiment.getAlias()).addValue("accession", experiment.getAccession())
-        .addValue("description", experiment.getDescription()).addValue("title", experiment.getTitle())
-        .addValue("platform_platformId", experiment.getPlatform().getPlatformId()).addValue("securityProfile_profileId", securityProfileId)
-        .addValue("study_studyId", experiment.getStudy().getId());
+    params.addValue("alias", experiment.getAlias());
+    params.addValue("accession", experiment.getAccession());
+    params.addValue("description", experiment.getDescription());
+    params.addValue("title", experiment.getTitle());
+    params.addValue("platform_platformId", experiment.getPlatform().getPlatformId());
+    params.addValue("securityProfile_profileId", securityProfileId);
+    params.addValue("study_studyId", experiment.getStudy().getId());
 
     if (experiment.getId() == AbstractExperiment.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("experimentId");
@@ -270,7 +273,8 @@ public class SQLExperimentDAO implements ExperimentStore {
     } else {
       try {
         if (namingScheme.validateField("name", experiment.getName())) {
-          params.addValue("experimentId", experiment.getId()).addValue("name", experiment.getName());
+          params.addValue("experimentId", experiment.getId());
+          params.addValue("name", experiment.getName());
           NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
           namedTemplate.update(EXPERIMENT_UPDATE, params);
         } else {

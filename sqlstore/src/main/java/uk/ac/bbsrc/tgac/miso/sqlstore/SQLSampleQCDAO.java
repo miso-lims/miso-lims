@@ -131,9 +131,11 @@ public class SQLSampleQCDAO implements SampleQcStore {
           @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
   public long save(SampleQC sampleQC) throws IOException {
     MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("sample_sampleId", sampleQC.getSample().getId()).addValue("qcUserName", sampleQC.getQcCreator())
-        .addValue("qcDate", sampleQC.getQcDate()).addValue("qcMethod", sampleQC.getQcType().getQcTypeId())
-        .addValue("results", sampleQC.getResults());
+    params.addValue("sample_sampleId", sampleQC.getSample().getId());
+    params.addValue("qcUserName", sampleQC.getQcCreator());
+    params.addValue("qcDate", sampleQC.getQcDate());
+    params.addValue("qcMethod", sampleQC.getQcType().getQcTypeId());
+    params.addValue("results", sampleQC.getResults());
 
     if (sampleQC.getId() == AbstractQC.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("qcId");

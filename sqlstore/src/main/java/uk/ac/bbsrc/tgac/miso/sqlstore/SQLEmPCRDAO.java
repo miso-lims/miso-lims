@@ -161,9 +161,11 @@ public class SQLEmPCRDAO implements EmPCRStore {
     }
 
     MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("concentration", pcr.getConcentration()).addValue("creationDate", pcr.getCreationDate())
-        .addValue("pcrUserName", pcr.getPcrCreator()).addValue("dilution_dilutionId", pcr.getLibraryDilution().getId())
-        .addValue("securityProfile_profileId", securityProfileId);
+    params.addValue("concentration", pcr.getConcentration());
+    params.addValue("creationDate", pcr.getCreationDate());
+    params.addValue("pcrUserName", pcr.getPcrCreator());
+    params.addValue("dilution_dilutionId", pcr.getLibraryDilution().getId());
+    params.addValue("securityProfile_profileId", securityProfileId);
 
     if (pcr.getId() == emPCR.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("pcrId");
@@ -191,7 +193,8 @@ public class SQLEmPCRDAO implements EmPCRStore {
     } else {
       try {
         if (namingScheme.validateField("name", pcr.getName())) {
-          params.addValue("pcrId", pcr.getId()).addValue("name", pcr.getName());
+          params.addValue("pcrId", pcr.getId());
+          params.addValue("name", pcr.getName());
           NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
           namedTemplate.update(EMPCR_UPDATE, params);
         } else {

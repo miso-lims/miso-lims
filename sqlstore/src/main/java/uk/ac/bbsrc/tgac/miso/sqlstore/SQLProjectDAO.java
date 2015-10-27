@@ -250,15 +250,16 @@ public class SQLProjectDAO implements ProjectStore {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
 
     Long securityProfileId = project.getSecurityProfile().getProfileId();
-    if (securityProfileId == SecurityProfile.UNSAVED_ID || (this.cascadeType != null)) { // &&
-                                                                                         // this.cascadeType.equals(CascadeType.PERSIST))) {
+    if (securityProfileId == SecurityProfile.UNSAVED_ID || (this.cascadeType != null)) {
       securityProfileId = securityProfileDAO.save(project.getSecurityProfile());
     }
 
     MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("alias", project.getAlias()).addValue("description", project.getDescription())
-        .addValue("creationDate", project.getCreationDate()).addValue("securityProfile_profileId", securityProfileId)
-        .addValue("progress", project.getProgress().getKey());
+    params.addValue("alias", project.getAlias());
+    params.addValue("description", project.getDescription());
+    params.addValue("creationDate", project.getCreationDate());
+    params.addValue("securityProfile_profileId", securityProfileId);
+    params.addValue("progress", project.getProgress().getKey());
 
     if (project.getId() == AbstractProject.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("projectId");
@@ -288,7 +289,8 @@ public class SQLProjectDAO implements ProjectStore {
     } else {
       try {
         if (namingScheme.validateField("name", project.getName())) {
-          params.addValue("projectId", project.getId()).addValue("name", project.getName());
+          params.addValue("projectId", project.getId());
+          params.addValue("name", project.getName());
           NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
           namedTemplate.update(PROJECT_UPDATE, params);
         } else {
@@ -310,7 +312,8 @@ public class SQLProjectDAO implements ProjectStore {
           for (String s : project.getIssueKeys()) {
             SimpleJdbcInsert fInsert = new SimpleJdbcInsert(template).withTableName("Project_Issues");
             MapSqlParameterSource fcParams = new MapSqlParameterSource();
-            fcParams.addValue("project_projectId", project.getProjectId()).addValue("issueKey", s);
+            fcParams.addValue("project_projectId", project.getProjectId());
+            fcParams.addValue("issueKey", s);
 
             try {
               fInsert.execute(fcParams);
@@ -343,13 +346,17 @@ public class SQLProjectDAO implements ProjectStore {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
 
     MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("principalInvestigator", overview.getPrincipalInvestigator()).addValue("startDate", overview.getStartDate())
-        .addValue("endDate", overview.getEndDate()).addValue("numProposedSamples", overview.getNumProposedSamples())
-        .addValue("locked", overview.getLocked()).addValue("allSampleQcPassed", overview.getAllSampleQcPassed())
-        .addValue("libraryPreparationComplete", overview.getLibraryPreparationComplete())
-        .addValue("allLibraryQcPassed", overview.getAllLibrariesQcPassed())
-        .addValue("allPoolsConstructed", overview.getAllPoolsConstructed()).addValue("allRunsCompleted", overview.getAllRunsCompleted())
-        .addValue("primaryAnalysisCompleted", overview.getPrimaryAnalysisCompleted());
+    params.addValue("principalInvestigator", overview.getPrincipalInvestigator());
+    params.addValue("startDate", overview.getStartDate());
+    params.addValue("endDate", overview.getEndDate());
+    params.addValue("numProposedSamples", overview.getNumProposedSamples());
+    params.addValue("locked", overview.getLocked());
+    params.addValue("allSampleQcPassed", overview.getAllSampleQcPassed());
+    params.addValue("libraryPreparationComplete", overview.getLibraryPreparationComplete());
+    params.addValue("allLibraryQcPassed", overview.getAllLibrariesQcPassed());
+    params.addValue("allPoolsConstructed", overview.getAllPoolsConstructed());
+    params.addValue("allRunsCompleted", overview.getAllRunsCompleted());
+    params.addValue("primaryAnalysisCompleted", overview.getPrimaryAnalysisCompleted());
 
     if (overview.getId() == ProjectOverview.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName("ProjectOverview").usingGeneratedKeyColumns("overviewId");
@@ -361,7 +368,8 @@ public class SQLProjectDAO implements ProjectStore {
       SimpleJdbcInsert pInsert = new SimpleJdbcInsert(template).withTableName("Project_ProjectOverview");
 
       MapSqlParameterSource poParams = new MapSqlParameterSource();
-      poParams.addValue("project_projectId", p.getProjectId()).addValue("overviews_overviewId", overview.getId());
+      poParams.addValue("project_projectId", p.getProjectId());
+      poParams.addValue("overviews_overviewId", overview.getId());
 
       try {
         pInsert.execute(poParams);
