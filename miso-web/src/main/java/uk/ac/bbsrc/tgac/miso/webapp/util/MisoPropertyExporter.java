@@ -106,7 +106,6 @@ public class MisoPropertyExporter extends PropertyPlaceholderConfigurer {
         String keyStr = key.toString();
 
         // doesn't seem to resolve properties properly - just end up null
-        // resolvedProperties.put(keyStr, resolvePlaceholder(props.getProperty(keyStr), props, SYSTEM_PROPERTIES_MODE_OVERRIDE));
         resolvedProperties.put(keyStr, misoProps.getProperty(keyStr));
       }
     } else {

@@ -42,20 +42,6 @@ import java.util.List;
 public interface SequencerPartitionContainerStore extends Store<SequencerPartitionContainer<SequencerPoolPartition>>,
     NamingSchemeAware<SequencerPartitionContainer<SequencerPoolPartition>>, Remover<SequencerPartitionContainer<SequencerPoolPartition>> {
   /**
-   * Retrieve a SequencerPartitionContainer from an underlying data store given a SequencerPartitionContainer ID
-   * <p/>
-   * This method intends to retrieve objects in an 'ignorant' fashion, i.e. will not populate parent or child objects that could lead to a
-   * circular dependency
-   * 
-   * @param sequencerPartitionContainerId
-   *          of type long
-   * @return SequencerPartitionContainer
-   * @throws java.io.IOException
-   *           when
-   */
-  // SequencerPartitionContainer<SequencerPoolPartition> lazyGet(long sequencerPartitionContainerId) throws IOException;
-
-  /**
    * Get the SequencerPartitionContainer that contains a given {@link SequencerPoolPartition}
    * 
    * @param partitionId

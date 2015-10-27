@@ -186,13 +186,11 @@ public class ReportingControllerHelperService {
         } else if (json.get("reportType").equals("Run")) {
           b.append("<br/><input type=\"checkbox\" name=\"incChart\" value=\"incChart\" checked=\"checked\"/>Include Charts &nbsp;&nbsp;&nbsp;");
           b.append("<input type=\"checkbox\" name=\"incAlias\" checked=\"checked\"/>Include Run Alias &nbsp;&nbsp;&nbsp;");
-          // b.append("<input type=\"checkbox\" name=\"incDescription\" checked=\"checked\"/>Include Run Description &nbsp;&nbsp;&nbsp;");
           b.append("<table class=\"list\" id=\"table\">");
           b.append("<thead>\n" + "    <tr>\n"
               + "        <th><input class=\"chkbox\" type=\"checkbox\" onClick=\"Utils.ui.checkAll(document.reportform.ids)\"/> All</th>\n"
               + "        <th>Run Name</th>\n" + "        <th>Run Alias</th>\n"
               +
-              // "        <th>Run Description</th>\n" +
               "        <th>Status</th>\n" + "    </tr>\n" + "    </thead>\n" + "    <tbody id=\"search" + json.get("reportType")
               + "result\">");
           b.append("</tbody>");
@@ -366,8 +364,6 @@ public class ReportingControllerHelperService {
               b.append("</td>");
               b.append("<td> " + run.getAlias());
               b.append("</td>");
-              // b.append("<td> " + run.getDescription());
-              // b.append("</td>");
               b.append("<td> " + run.getStatus().getHealth().getKey());
               b.append("</td>");
               b.append("</tr>");
@@ -391,8 +387,6 @@ public class ReportingControllerHelperService {
           b.append("</td>");
           b.append("<td> " + run.getAlias());
           b.append("</td>");
-          // b.append("<td> " + run.getDescription());
-          // b.append("</td>");
           b.append("<td> " + run.getStatus().getHealth().getKey());
           b.append("</td>");
           b.append("</tr>");

@@ -731,10 +731,8 @@ jQuery(document).ready(function () {
     "bSort": false,
     "sDom": '<<"toolbar">f>r<t>ip>'
   });
-  //jQuery("div.toolbar").html("<a onclick=\"fnClickAddRow();\" href=\"javascript:void(0);\">Add a new row</a>");
   jQuery("div.toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
   jQuery("div.toolbar").html("<button onclick=\"bulkCopySample();\" class=\"fg-button ui-state-default ui-corner-all\"><span class=\"add\">Bulk Copy</span></button> <button onclick=\"fnClickAddRow();\" class=\"fg-button ui-state-default ui-corner-all\"><span class=\"add\">Add Row</span></button>");
-  //setEditables(oTable);
 
   jQuery("#tabs").tabs();
   jQuery("#tabs").removeClass('ui-widget').removeClass('ui-widget-content');
@@ -844,8 +842,6 @@ function copyRow(row) {
 }
 
 function setEditables(datatable) {
-  //jQuery('td:not(:eq(8)):not(:eq(3)):not(:eq(4))', datatable.fnGetNodes()).editable(function(value, settings) {
-  //jQuery('td .defaultEditable', datatable.fnGetNodes()).editable(function(value, settings) {
   jQuery('.defaultEditable').editable(function (value, settings) {
     return value;
   },
@@ -1043,7 +1039,6 @@ function bulkLibraryQcTable() {
     jQuery(this).removeAttr("onmouseover").removeAttr("onmouseout");
     jQuery(this).find("td:eq(4)").remove();
     jQuery(this).find("td:eq(3)").remove();
-    //jQuery(this).find("td:eq(2)").addClass("passedCheck");
   });
 
   //headers
@@ -1203,7 +1198,6 @@ function bulkLibraryDilutionTable() {
       jQuery(this).removeAttr("onmouseover").removeAttr("onmouseout");
       jQuery(this).find("td:eq(4)").remove();
       jQuery(this).find("td:eq(3)").remove();
-      //jQuery(this).find("td:eq(2)").addClass("passedCheck");
     });
 
     //headers

@@ -373,7 +373,6 @@ public abstract class AbstractLibrary implements Library {
   @Override
   public boolean isDeletable() {
     return getId() != AbstractLibrary.UNSAVED_ID && getLibraryDilutions().isEmpty();
-    // && getLibraryQCs().isEmpty();
   }
 
   @CoverageIgnore
@@ -440,9 +439,6 @@ public abstract class AbstractLibrary implements Library {
       int hashcode = 1;
       if (getName() != null) hashcode = PRIME * hashcode + getName().hashCode();
       if (getAlias() != null) hashcode = PRIME * hashcode + getAlias().hashCode();
-      // if (getLibraryDilutions() != null && !getLibraryDilutions().isEmpty()) hashcode = PRIME * hashcode +
-      // getLibraryDilutions().hashCode();
-      // if (getLibraryQCs() != null && !getLibraryQCs().isEmpty()) hashcode = PRIME * hashcode + getLibraryQCs().hashCode();
       return hashcode;
     }
   }

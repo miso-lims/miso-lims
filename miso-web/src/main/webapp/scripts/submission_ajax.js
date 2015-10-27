@@ -162,10 +162,6 @@ Submission.ui = {
 
           var win = window.open('', 'windowName');
           win.document.open('text/xml');
-          //win.document.write("<?xml version='1.0' encoding='UTF-8'?>");
-          //var doc = json.metadata;
-          //doc = doc.replace("<","&lt");
-          //doc = doc.replace(">","&gt");
           win.document.write(json.metadata);
           win.document.close();
         }

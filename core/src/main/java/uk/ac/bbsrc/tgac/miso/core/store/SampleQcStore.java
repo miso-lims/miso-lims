@@ -37,20 +37,6 @@ import java.util.Collection;
  */
 public interface SampleQcStore extends Store<SampleQC>, Remover<SampleQC> {
   /**
-   * Retrieve a SampleQC from an underlying data store given a SampleQC ID
-   * <p/>
-   * This method intends to retrieve objects in an 'ignorant' fashion, i.e. will not populate parent or child objects that could lead to a
-   * circular dependency
-   * 
-   * @param qcId
-   *          of type long
-   * @return SampleQC
-   * @throws IOException
-   *           when
-   */
-  // SampleQC lazyGet(long qcId) throws IOException;
-
-  /**
    * List all SampleQCs performed on a Sample given a parent Sample ID
    * 
    * @param sampleId

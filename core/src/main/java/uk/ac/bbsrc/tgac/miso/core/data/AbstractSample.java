@@ -331,9 +331,6 @@ public abstract class AbstractSample implements Sample {
       final int PRIME = 37;
       int hashcode = 1;
       if (getName() != null) hashcode = PRIME * hashcode + getName().hashCode();
-      // if (getDescription() != null) hashcode = 37 * hashcode + getDescription().hashCode();
-      // if (getLibraries() != null && !getLibraries().isEmpty()) hashcode = 37 * hashcode + getLibraries().hashCode();
-      // if (getSampleQCs() != null && !getSampleQCs().isEmpty()) hashcode = 37 * hashcode + getSampleQCs().hashCode();
       if (getAlias() != null) hashcode = PRIME * hashcode + getAlias().hashCode();
       return hashcode;
     }

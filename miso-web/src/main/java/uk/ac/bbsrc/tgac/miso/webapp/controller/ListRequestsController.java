@@ -66,7 +66,6 @@ public class ListRequestsController {
       if (!project.userCanRead(user)) {
         throw new SecurityException("Permission denied.");
       }
-      // return new ModelAndView("/pages/listRequests.jsp", "requests", requestManager.listAllRequests(user, project));
       return null;
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {

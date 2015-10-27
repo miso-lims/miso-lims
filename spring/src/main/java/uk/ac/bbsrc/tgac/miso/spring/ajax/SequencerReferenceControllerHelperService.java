@@ -85,7 +85,6 @@ public class SequencerReferenceControllerHelperService {
         each_sequencer.put("name_model", s.getPlatform().getNameAndModel());
         each_sequencer.put("name", s.getName());
         sequencers_list.add(each_sequencer);
-        // sb.append("<option value="+s.getId()+">"+s.getPlatform().getNameAndModel()+" - "+s.getName()+"</option>");
       }
       sequencers.put("sequencers", sequencers_list);
       return sequencers;

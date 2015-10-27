@@ -94,12 +94,9 @@ public class SubmissionControllerHelperService {
           // sets the details of the new one to match the old.
           newSubmission.setId(oldSubmission.getId());
           newSubmission.setAccession(oldSubmission.getAccession());
-          // newSubmission.setAlias(oldSubmission.getAlias());
           newSubmission.setCreationDate(oldSubmission.getCreationDate());
-          // newSubmission.setDescription(oldSubmission.getDescription());
           newSubmission.setName(oldSubmission.getName());
           newSubmission.setSubmissionDate(oldSubmission.getSubmissionDate());
-          // newSubmission.setTitle(oldSubmission.getTitle());
           newSubmission.setVerified(oldSubmission.isVerified());
           newSubmission.setCompleted(oldSubmission.isCompleted());
         }
@@ -139,7 +136,6 @@ public class SubmissionControllerHelperService {
 
             for (SequencerPoolPartition nextPartition : newPartitions) {
               if (nextPartition.getId() == partitionId) {
-                // Dilution dilution = requestManager.getDilutionByIdAndPlatform(dilutionId, nextPartition.getPool().getPlatformType());
                 Dilution dilution = requestManager.getLibraryDilutionById(dilutionId);
                 Pool pool = nextPartition.getPool();
                 pool.addPoolableElement(dilution);

@@ -39,6 +39,5 @@ public class ReportableVisitor {
    *          of type Reportable
    */
   public void visit(Reportable r) {
-    // r.buildReport();
   }
 }

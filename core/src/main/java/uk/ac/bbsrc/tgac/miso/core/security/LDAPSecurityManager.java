@@ -167,8 +167,6 @@ public class LDAPSecurityManager extends LocalSecurityManager implements MisoSec
           if ("".equals(user.getPassword()) || user.getPassword() == null) {
             // infer that the password is going to be the same, not set to null
             user.setPassword(jdbcUser.getPassword());
-
-            // throw new IOException("Cannot save user with no password.");
           }
 
           return super.saveUser(user);

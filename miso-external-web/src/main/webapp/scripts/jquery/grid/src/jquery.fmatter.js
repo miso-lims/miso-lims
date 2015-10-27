@@ -18,8 +18,6 @@
 	//opts can be id:row id for the row, rowdata:the data for the row, colmodel:the column model for this column
 	//example {id:1234,}
 	$.fn.fmatter = function(formatType, cellval, opts, rwd, act) {
-		//debug(this);
-		//debug(cellval);
 		// build main options before element iteration
 		opts = $.extend({}, $.jgrid.formatter, opts);
 		return fireFormatter(formatType,cellval, opts, rwd, act); 

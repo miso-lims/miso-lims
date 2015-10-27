@@ -43,20 +43,6 @@ import java.util.List;
 public interface PlateStore extends Store<Plate<? extends List<? extends Plateable>, ? extends Plateable>>, Cascadable,
     Remover<Plate<? extends List<? extends Plateable>, ? extends Plateable>>,
     NamingSchemeAware<Plate<? extends List<? extends Plateable>, ? extends Plateable>> {
-  /**
-   * Retrieve a Plate from an underlying data store given a Plate ID
-   * <p/>
-   * This method intends to retrieve objects in an 'ignorant' fashion, i.e. will not populate parent or child objects that could lead to a
-   * circular dependency
-   * 
-   * @param plateId
-   *          of type long
-   * @return Plate
-   * @throws java.io.IOException
-   *           when
-   */
-  // <T extends List<S>, S extends Plateable> Plate<T, S> lazyGet(long plateId) throws IOException;
-
   @Override
   public Plate<? extends List<? extends Plateable>, ? extends Plateable> get(long id) throws IOException;
 

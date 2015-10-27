@@ -1281,10 +1281,8 @@ function setEditables(datatable) {
           var randomId = makeid();
           jQuery(nTr.cells[cell + 1]).html("<div id='" + randomId + "'></div>");
           for (var i = 0; i < json.numApplicableBarcodes; i++) {
-            //jQuery(nTr.cells[cell+1]).append("<span class='tagBarcodeSelectDiv' position='"+(i+1)+"' id='tagbarcodes"+(i+1)+"'>- <i>Select...</i></span>");
             jQuery('#' + randomId).append("<span class='tagBarcodeSelectDiv' position='" + (i + 1) + "' id='tagbarcodes" + (i + 1) + "'>- <i>Select...</i></span>");
             if (json.numApplicableBarcodes > 1 && i == 0) {
-              // jQuery(nTr.cells[cell+1]).append("|");
               jQuery('#' + randomId).append("|");
             }
           }

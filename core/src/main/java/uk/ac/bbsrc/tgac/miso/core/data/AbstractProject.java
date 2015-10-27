@@ -237,7 +237,6 @@ public abstract class AbstractProject implements Project {
 
   public void inheritPermissions(SecurableByProfile parent) throws SecurityException {
     // projects have no parents
-    // setSecurityProfile(parent.getSecurityProfile());
   }
 
   public boolean userCanRead(User user) {

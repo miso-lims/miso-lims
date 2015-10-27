@@ -43,24 +43,9 @@ public class PacBioStatus extends StatusImpl {
 
   public PacBioStatus(String metadata) {
     this.metadata = metadata;
-    // parseMetaData(metadata);
   }
 
   public void parseMetaData(String metadata) {
-    // System.out.println("PacBioStatus: parsing metadata -> "+metadata);
-    /*
-     * try {
-     * 
-     * String runStarted = statusDoc.getElementsByTagName("dateStarted").item(0).getTextContent(); setStartDate(new
-     * SimpleDateFormat("MM/dd/yyyy hh:mm aaa").parse(runStarted));
-     * setInstrumentName(statusDoc.getElementsByTagName("instrumentName").item(0).getTextContent());
-     * setRunName(statusDoc.getElementsByTagName("name").item(0).getTextContent());
-     * 
-     * setHealth(HealthType.Unknown); setXml(statusXml);
-     * 
-     * } catch (ParserConfigurationException e) { e.printStackTrace(); } catch (TransformerException e) { e.printStackTrace(); } catch
-     * (ParseException e) { e.printStackTrace(); }
-     */
   }
 
   @Override

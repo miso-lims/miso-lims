@@ -304,7 +304,6 @@ public class ExternalSectionControllerHelperService {
 
       // base64-encode the hmac
       result = Base64.encodeBase64URLSafeString(rawHmac);
-      // result = Base64.encodeBase64String(rawHmac);
     } catch (Exception e) {
       throw new SignatureException("Failed to generate HMAC : " + e.getMessage());
     }

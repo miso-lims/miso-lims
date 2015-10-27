@@ -107,7 +107,6 @@ public class EditPlateController {
   @RequestMapping(value = "/rest/{plateId}", method = RequestMethod.GET)
   public @ResponseBody
   Plate<? extends List<? extends Plateable>, ? extends Plateable> jsonRest(@PathVariable Long plateId) throws IOException {
-    // return requestManager.<LinkedList<Plateable>, Plateable> getPlateById(plateId);
     return requestManager.getPlateById(plateId);
   }
 
@@ -120,7 +119,6 @@ public class EditPlateController {
         plate = dataObjectFactory.getPlateOfSize(96, user);
         model.put("title", "New Plate");
       } else {
-        // plate = requestManager.<LinkedList<Plateable>, Plateable> getPlateById(plateId);
         plate = requestManager.getPlateById(plateId);
         model.put("title", "Plate " + plateId);
       }

@@ -102,9 +102,6 @@ public class AnalysisController {
       Map<String, String> map = new HashMap<String, String>();
       map.put("RunAccession", run.getAlias());
       map.put("basecall-path", run.getFilePath() + "/Data/Intensities/BaseCalls");
-      // map.put("fastq-path", run.getFilePath()+"/Data/Intensities/BaseCalls/PAP");
-      // map.put("makefile-path", run.getFilePath()+"/Data/Intensities/BaseCalls/PAP/Makefile");
-      // map.put("sample-sheet-path", run.getFilePath()+"/Data/Intensities/BaseCalls/SampleSheet-pap.csv");
 
       map.put("fastq-path", "/net/tgac-labdata-nfs/ifs/TGAC/NGS_data/qc/" + run.getAlias() + "/PAP");
       map.put("makefile-path", "/net/tgac-labdata-nfs/ifs/TGAC/NGS_data/qc/" + run.getAlias() + "/PAP/Makefile");

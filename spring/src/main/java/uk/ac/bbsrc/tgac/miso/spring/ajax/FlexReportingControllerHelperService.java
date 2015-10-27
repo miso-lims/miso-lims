@@ -459,15 +459,9 @@ public class FlexReportingControllerHelperService {
     try {
       JSONObject jsonObject = new JSONObject();
       StringBuilder a = new StringBuilder();
-      // Collection<Sample> samples = requestManager.listAllSamples();
-      // JSONArray jsonArray = new JSONArray();
-      // for (Sample sample : samples) {
-      // jsonArray.add(sampleFormRowBuilder(sample));
-      // }
       for (String sampleType : requestManager.listAllSampleTypes()) {
         a.append("<option value=\"" + sampleType + "\">" + sampleType + "</option>");
       }
-      // jsonObject.put("html", jsonArray);
       jsonObject.put("type", "<option value=\"all\">all</option>" + a.toString());
       return jsonObject;
     } catch (IOException e) {
@@ -630,26 +624,14 @@ public class FlexReportingControllerHelperService {
   // Starting Library
 
   public JSONObject initLibraries(HttpSession session, JSONObject json) {
-    // try {
     JSONObject jsonObject = new JSONObject();
-    // JSONArray jsonArray = new JSONArray();
     StringBuilder a = new StringBuilder();
-    // Collection<Library> libraries = requestManager.listAllLibraries();
-    // for (Library library : libraries) {
-    // jsonArray.add(libraryFormRowBuilder(library));
-    // }
 
     for (String platform : PlatformType.getKeys()) {
       a.append("<option value=\"" + platform + "\">" + platform + "</option>");
     }
-    // jsonObject.put("html", jsonArray);
     jsonObject.put("platform", "<option value=\"all\">all</option>" + a.toString());
     return jsonObject;
-    // }
-    // catch (IOException e) {
-    // log.debug("Failed", e);
-    // return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
-    // }
   }
 
   public String libraryFormRowBuilder(Library library) {
@@ -828,15 +810,9 @@ public class FlexReportingControllerHelperService {
   }
 
   public JSONObject initRuns(HttpSession session, JSONObject json) {
-    // try {
     JSONObject jsonObject = new JSONObject();
-    // JSONArray jsonArray = new JSONArray();
     StringBuilder a = new StringBuilder();
     StringBuilder c = new StringBuilder();
-    // Collection<Run> runs = requestManager.listAllRuns();
-    // for (Run run : runs) {
-    // jsonArray.add(runFormRowBuilder(run));
-    // }
 
     for (String platform : PlatformType.getKeys()) {
       a.append("<option value=\"" + platform + "\">" + platform + "</option>");
@@ -845,15 +821,9 @@ public class FlexReportingControllerHelperService {
     for (String healthString : HealthType.getKeys()) {
       c.append("<option value=\"" + healthString + "\">" + healthString + "</option>");
     }
-    // jsonObject.put("html", jsonArray);
     jsonObject.put("platform", "<option value=\"all\">all</option>" + a.toString());
     jsonObject.put("status", "<option value=\"all\">all</option>" + c.toString());
     return jsonObject;
-    // }
-    // catch (IOException e) {
-    // log.debug("Failed", e);
-    // return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
-    // }
   }
 
   public String runFormRowBuilder(Run run) {

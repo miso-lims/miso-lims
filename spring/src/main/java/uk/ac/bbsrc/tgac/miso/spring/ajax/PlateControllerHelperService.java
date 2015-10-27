@@ -25,8 +25,6 @@ package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
-//import com.fasterxml.jackson.core.type.TypeReference;
-//import com.fasterxml.jackson.databind.ObjectMapper;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
@@ -86,7 +84,6 @@ public class PlateControllerHelperService {
     Long plateId = json.getLong("plateId");
     File temploc = new File(session.getServletContext().getRealPath("/") + "temp/");
     try {
-      // Plate<LinkedList<Plateable>, Plateable> plate = requestManager.<LinkedList<Plateable>, Plateable> getPlateById(plateId);
       Plate<? extends List<? extends Plateable>, ? extends Plateable> plate = requestManager.getPlateById(plateId);
       barcodeFactory.setPointPixels(1.5f);
       barcodeFactory.setBitmapResolution(600);
@@ -149,7 +146,6 @@ public class PlateControllerHelperService {
       for (JSONObject s : (Iterable<JSONObject>) ss) {
         try {
           Long plateId = s.getLong("plateId");
-          // Plate<LinkedList<Plateable>, Plateable> plate = requestManager.<LinkedList<Plateable>, Plateable> getPlateById(plateId);
           Plate<? extends List<? extends Plateable>, ? extends Plateable> plate = requestManager.getPlateById(plateId);
           // autosave the barcode if none has been previously generated
           if (plate.getIdentificationBarcode() == null || "".equals(plate.getIdentificationBarcode())) {
@@ -181,14 +177,8 @@ public class PlateControllerHelperService {
       String newLocation = LimsUtils.lookupLocation(locationBarcode);
       if (newLocation != null) {
         User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-        // Plate<LinkedList<Plateable>, Plateable> plate = requestManager.<LinkedList<Plateable>, Plateable> getPlateById(plateId);
         Plate<? extends List<? extends Plateable>, ? extends Plateable> plate = requestManager.getPlateById(plateId);
         plate.setLocationBarcode(locationBarcode);
-        /*
-         * Note note = new Note(); note.setInternalOnly(true); note.setText("Location changed to " + newLocation + " by " +
-         * user.getLoginName() + " on " + new Date()); note.setOwner(user); note.setCreationDate(new Date()); plate.getNotes().add(note);
-         * requestManager.saveSampleNote(sample, note);
-         */
         requestManager.savePlate(plate);
       } else {
         return JSONUtils.SimpleJSONError("New location barcode not recognised");
@@ -208,9 +198,6 @@ public class PlateControllerHelperService {
       StringBuilder srb = new StringBuilder();
       srb.append("<select name='tagBarcode' id='tagBarcodes'>");
       srb.append("<option value='0' selected='selected'>No barcode</option>");
-      // for (TagBarcode tb : requestManager.listPlateBarcodesByMaterialType(PlateMaterialType.get(materialType))) {
-      // srb.append("<option value='" + tb.getTagBarcodeId() + "'>" + tb.getName() + " ("+ tb.getSequence()+")</option>");
-      // }
       srb.append("</select>");
 
       responseMap.put("plateBarcodes", srb.toString());
@@ -266,17 +253,8 @@ public class PlateControllerHelperService {
             for (Plate<LinkedList<Library>, Library> plate : platePool.getPoolableElements()) {
               JSONObject j = new JSONObject();
 
-              // if (json.has("tagBarcode")) {
-              // String tagBarcode = json.getString("tagBarcode");
-              // plate.setTagBarcode(requestManager.listAllTagBarcodesByStrategyName());
-              // }
-
               if (plate.getDescription() == null) {
                 plate.setDescription(description);
-              }
-
-              if (plate.getCreationDate() == null) {
-                // plate.setCreationDate(DateFormat.getInstance().parse(creationDate));
               }
 
               if (plate.getPlateMaterialType() == null && plateMaterialType != null) {
@@ -443,7 +421,6 @@ public class PlateControllerHelperService {
   }
 
   public JSONObject exportSampleForm(HttpSession session, JSONObject json) {
-    // if (json.has("projectId") && json.has("documentFormat")) {
     try {
       JSONArray a = JSONArray.fromObject(json.getString("form"));
       File f = misoFileManager.getNewFile(Plate.class, "forms", "PlateInputForm-" + LimsUtils.getCurrentDateAsString() + ".xlsx");
@@ -453,10 +430,6 @@ public class PlateControllerHelperService {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Failed to get plate input form: " + e.getMessage());
     }
-    // }
-    // else {
-    // return JSONUtils.SimpleJSONError("Missing project ID or document format supplied.");
-    // }
   }
 
   public void setSecurityManager(SecurityManager securityManager) {

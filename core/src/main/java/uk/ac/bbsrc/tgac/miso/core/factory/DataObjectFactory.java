@@ -44,8 +44,6 @@ import java.util.LinkedList;
  * @since 0.0.2
  */
 public abstract class DataObjectFactory {
-  // public static final int TGAC = 1;
-
   public abstract User getUser();
 
   public abstract Group getGroup();
@@ -106,8 +104,6 @@ public abstract class DataObjectFactory {
 
   public abstract emPCR getEmPCR(User user);
 
-  // public abstract <T extends List<S>, S extends Plateable> Plate<T, S> getPlateOfSize(int size);
-  // public abstract <T extends List<S>, S extends Plateable> Plate<T, S> getPlateOfSize(int size, User user);
   public abstract Plate<LinkedList<Plateable>, Plateable> getPlateOfSize(int size);
 
   public abstract Plate<LinkedList<Plateable>, Plateable> getPlateOfSize(int size, User user);

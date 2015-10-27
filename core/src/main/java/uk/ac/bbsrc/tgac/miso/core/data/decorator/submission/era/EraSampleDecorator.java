@@ -47,8 +47,6 @@ public class EraSampleDecorator extends AbstractSubmittableDecorator<Document> {
   }
 
   public void buildSubmission() {
-    // submittable.buildSubmission();
-
     Sample sample = (Sample) submittable;
     Element s = submission.createElementNS(null, "SAMPLE");
 

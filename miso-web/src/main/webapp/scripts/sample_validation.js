@@ -37,11 +37,6 @@ function process_validate_sample(form) {
   var ok = true;
   var error = "Please correct the following error(s):\n\n";
 
-//  if (!jQuery('#alias').val().match(/[A-z0-9]+_S[0-9]+_[\s\S]*/)) {
-//    ok = false;
-//    error += "Sample alias " + jQuery('#alias').val() + " doesn't conform to the <PI initials>_S<Sample Number>_<Species> naming convention.\n";
-//  }
-
   if (jQuery(':text.validateable').length > 0) {
     jQuery(':text.validateable').each(function() {
       var result = Utils.validation.validate_input_field(this, 'Sample', ok);

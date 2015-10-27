@@ -208,10 +208,6 @@ public class EditLS454PoolController {
       }
       throw ex;
     }
-    // catch (MalformedExperimentException e) {
-    // e.printStackTrace();
-    // throw new IOException(e);
-    // }
   }
 
   @RequestMapping(value = "/new/dilution/{dilutionId}", method = RequestMethod.GET)

@@ -59,9 +59,7 @@ public class LibraryQCImpl extends AbstractLibraryQC implements Serializable {
       } catch (MalformedLibraryException e) {
         e.printStackTrace();
       }
-      // setSecurityProfile(experiment.getSecurityProfile());
     } else {
-      // setSecurityProfile(new SecurityProfile(user));
     }
   }
 

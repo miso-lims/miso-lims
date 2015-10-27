@@ -76,9 +76,6 @@ public class RunTests {
     MockLogAlerterService logAlerter = new MockLogAlerterService();
     alerters.add(logAlerter);
 
-    // MockEmailAlerterService emailAlerter = new MockEmailAlerterService();
-    // alerters.add(emailAlerter);
-
     runResponder.setAlerterServices(alerters);
     statusResponder.setAlerterServices(alerters);
 

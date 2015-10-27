@@ -85,7 +85,6 @@ public class ExperimentWizardControllerHelperService {
   public JSONObject addStudyExperiment(HttpSession session, JSONObject json) {
     String studyType = null;
     Long projectId = null;
-    // String limitStr = null;
     String studyId = null;
     List<Long> ids = new ArrayList();
 
@@ -200,7 +199,6 @@ public class ExperimentWizardControllerHelperService {
         if (platform != null) {
           PlatformType pt = platform.getPlatformType();
           List<Pool<? extends Poolable>> pools = new ArrayList<Pool<? extends Poolable>>(requestManager.listAllPoolsByPlatform(pt));
-          // Collections.sort(pools, Collections.<Pool<? extends Poolable>>reverseOrder());
           Collections.sort(pools);
           for (Pool p : pools) {
             a.append("<div bind='"

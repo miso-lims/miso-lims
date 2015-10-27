@@ -85,10 +85,6 @@ public class MisoFormsService {
               }
             }
 
-            // if (ms.getReceivedDate() == null) {
-            // ms.setReceivedDate(new Date());
-            // }
-
             if (!s.getNotes().isEmpty()) {
               for (Note n : s.getNotes()) {
                 n.setOwner(ms.getSecurityProfile().getOwner());

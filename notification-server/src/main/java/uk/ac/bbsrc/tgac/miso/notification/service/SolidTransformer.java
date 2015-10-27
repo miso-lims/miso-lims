@@ -100,7 +100,6 @@ public class SolidTransformer implements FileSetTransformer<String, String, File
                 run.put("fullPath", rootFile.getAbsolutePath());
                 run.put("status", statusXml);
 
-                // run.put("sequencerName", statusDoc.getElementsByTagName("instrumentName").item(0).getTextContent());
                 run.put("sequencerName", machineName);
 
                 if (statusDoc.getElementsByTagName("flowcellNum").getLength() != 0
@@ -128,10 +127,8 @@ public class SolidTransformer implements FileSetTransformer<String, String, File
                   map.get("Unknown").add(run);
                 }
               } catch (ParserConfigurationException e) {
-                // e.printStackTrace();
                 log.error("Error configuring parser: " + e.getMessage());
               } catch (TransformerException e) {
-                // e.printStackTrace();
                 log.error("Error transforming XML: " + e.getMessage());
               }
             }

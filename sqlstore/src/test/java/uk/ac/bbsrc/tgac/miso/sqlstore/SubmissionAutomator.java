@@ -191,7 +191,6 @@ public class SubmissionAutomator extends LimsDAOTestCase {
       factory.setSchema(schemaFactory.newSchema(new Source[] { new StreamSource(schema) }));
 
       DocumentBuilder builder = factory.newDocumentBuilder();
-      // builder.setErrorHandler(new SimpleErrorHandler());
       File newFile = new File(xmlFile);
       builder.parse(newFile);
       log.info("Validation of " + xmlFile + " complete!");

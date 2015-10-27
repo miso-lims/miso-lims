@@ -346,8 +346,6 @@ public class ImportExcel {
           paired = true;
         }
 
-        // sp.setOwner(securityManager.getUserByName(user));
-
         List<Cell> list9 = sheetData.get(l + 9);
         Cell cell9b = list9.get(1);
         String runFilePath = getCellContents(cell9b);

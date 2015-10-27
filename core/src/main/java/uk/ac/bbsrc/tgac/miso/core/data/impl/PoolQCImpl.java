@@ -58,9 +58,6 @@ public class PoolQCImpl extends AbstractPoolQC implements Serializable {
       } catch (MalformedPoolException e) {
         e.printStackTrace();
       }
-      // setSecurityProfile(experiment.getSecurityProfile());
-    } else {
-      // setSecurityProfile(new SecurityProfile(user));
     }
   }
 

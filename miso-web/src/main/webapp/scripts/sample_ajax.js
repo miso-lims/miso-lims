@@ -546,17 +546,10 @@ Sample.ui = {
           }
 
           //unbind to stop change error happening every time
-          //jQuery(input).unbind('keyup');
 
           //clear and focus
           jQuery(input).val("");
           jQuery(input).focus();
-
-          //rebind after setting focus
-          // Fixed for MISO-353 commented
-          // Utils.timer.typewatchFunc(jQuery('#searchSampleByBarcode'), function() {
-          // Sample.ui.receiveSample(jQuery('#searchSampleByBarcode'));
-          // }, 100, 4);
           },
           'doOnError': function (json) {
             jQuery('#msgspan').html("<i>" + json.error + "</i>");

@@ -31,9 +31,6 @@ public interface EntityGroupStore extends Store<EntityGroup<? extends Nameable, 
    */
   Collection<EntityGroup<? extends Nameable, ? extends Nameable>> listAllWithLimit(long limit) throws IOException;
 
-  // <T extends Nameable, S extends Nameable> EntityGroup<? extends Nameable, ? extends Nameable> getEntityGroupByParentTypeAndId(Class<?
-  // extends Nameable> parentType, long parentId) throws IOException, SQLException;
-
   <T extends Nameable, S extends Nameable> EntityGroup<T, S> getEntityGroupByParentTypeAndId(Class<? extends T> parentType, long parentId)
       throws IOException, SQLException;
 

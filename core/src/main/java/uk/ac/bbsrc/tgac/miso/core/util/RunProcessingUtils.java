@@ -64,8 +64,6 @@ public class RunProcessingUtils {
           count++;
           sb.append(f.getIdentificationBarcode()).append(",").append(l.getPartitionNumber())
               .append(",")
-              // .append(ld.getLibrary().getSample().getName()).append(",")
-              // .append(ld.getLibrary().getSample().getAlias().replaceAll("\\s", "")).append(",");
               .append(f.getId()).append("_").append(ld.getLibrary().getName()).append("_").append(ld.getName()).append(",")
               .append(ld.getLibrary().getSample().getAlias().replaceAll("\\s", "")).append(",");
 
@@ -92,7 +90,6 @@ public class RunProcessingUtils {
           } else {
             sb.append("\n");
           }
-          // .append("00").append(String.valueOf(count)).append("\n");
         }
       }
     }

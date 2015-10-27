@@ -69,28 +69,17 @@ public class FTPTransferMethod implements TransferMethod {
         FTPClient ftpClient = TransmissionUtils.ftpConnect(endpoint.getDestination().getHost(), username, password);
 
         FTPUploadJob FTPUploadJob = new FTPUploadJob(f);
-        // Have left this code commented in case I need to use it to help sort out the upload progress indicator problem
-        // Antony 8/05/2012
-        // DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-        // get current date time with Date()
-        // Date date = new Date();
-        // System.out.println(dateFormat.format(date));
 
         boolean success = TransmissionUtils.ftpPutListen(ftpClient, "anon/", FTPUploadJob.getFile(), false, false,
             FTPUploadJob.getListener());
         if (success) {
           log.info("FTPTransferMethod: upload of " + f.getName() + " successful.");
-          // date = new Date();
-          // System.out.println(dateFormat.format(date));
         } else {
           log.info("FTPTransferMethod: upload of " + f.getName() + " failed.");
         }
 
         FTPUploadList.add(FTPUploadJob);
-        // System.out.println("Upload Job created for:" + FTPUploadJob.getFile() + " " + FTPUploadJob.getBytesTransferred() +
-        // " bytes, or " + FTPUploadJob.getPercentageTransferred()+"% transferred...");
       }
-      // boolean uploadSuccessful=TransmissionUtils.ftpPut(ftpClient, "anon/", fileList, true, false);
 
       FTPUploadReport report = new FTPUploadReport(FTPUploadList);
       report.setStatus("uploading");

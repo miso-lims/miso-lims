@@ -509,8 +509,6 @@ public class SQLSampleDAO implements SampleStore {
         s.setQcPassed(null);
       }
 
-      // s.setLastUpdated(rs.getTimestamp("lastUpdated"));
-
       try {
         s.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
         if (!isLazy()) {

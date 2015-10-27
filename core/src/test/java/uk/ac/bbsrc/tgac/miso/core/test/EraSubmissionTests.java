@@ -85,7 +85,6 @@ public class EraSubmissionTests {
     new EraStudyDecorator(s, new Properties(), submissionDocument).buildSubmission();
     try {
       SubmissionUtils.transform(submissionDocument, new File("/tmp/testSubmission.xml"));
-      // sb.append(SubmissionUtils.transform(submissionDocument, true));
     } catch (Exception e) {
       log.debug("Error while attempting to write document to file");
     }

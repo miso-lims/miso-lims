@@ -110,7 +110,6 @@ public final class ShaPasswordCodecService implements PasswordCodecService {
       byte[] rawHmac = mac.doFinal(plaintext.getBytes());
 
       // base64-encode the hmac
-      // result = new BASE64Encoder().encode(rawHmac);
       result = new Base64().encodeToString(rawHmac);
     } catch (Exception e) {
       throw new SignatureException("Failed to generate HMAC : " + e.getMessage());

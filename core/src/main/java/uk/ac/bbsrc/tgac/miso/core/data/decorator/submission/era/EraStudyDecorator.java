@@ -49,7 +49,6 @@ public class EraStudyDecorator extends AbstractSubmittableDecorator<Document> {
     Study s = (Study) submittable;
     if (submission != null) {
       Element study = submission.createElement("STUDY");
-      // study.setAttribute("accession", s.getAccession());
       study.setAttribute("alias", s.getAlias());
 
       Element studyDescriptor = submission.createElementNS(null, "DESCRIPTOR");
@@ -60,11 +59,6 @@ public class EraStudyDecorator extends AbstractSubmittableDecorator<Document> {
       Element studyType = submission.createElementNS(null, "STUDY_TYPE");
       studyType.setAttribute("existing_study_type", s.getStudyType());
       studyDescriptor.appendChild(studyType);
-
-      // DEPRECATED SRA 1.2
-      // Element centerName = doc.createElementNS(null, "CENTER_NAME");
-      // centerName.setTextContent(TgacSubmissionConstants.CENTRE_NAME.getKey());
-      // studyDescriptor.appendChild(centerName);
 
       Element centerProjectName = submission.createElementNS(null, "CENTER_PROJECT_NAME");
       centerProjectName.setTextContent(s.getProject().getAlias());

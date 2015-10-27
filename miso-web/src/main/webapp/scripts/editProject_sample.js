@@ -117,7 +117,6 @@ function bulkSampleQcTable(tableName) {
         jQuery(this).parent().addClass('row_selected');
     });
 
-    //jQuery("div.toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
     jQuery("div.toolbar").html("<input type='button' value='Save QCs' id=\"bulkSampleQcButton\" onclick=\"Project.ui.saveBulkSampleQc('"+tableName+"');\" class=\"fg-button ui-state-default ui-corner-all\"/>");
     jQuery("div.toolbar").append("<input type='button' value='Cancel' onclick=\"Utils.page.pageReload();\" class=\"fg-button ui-state-default ui-corner-all\"/>");
     jQuery("div.toolbar").removeClass("toolbar");

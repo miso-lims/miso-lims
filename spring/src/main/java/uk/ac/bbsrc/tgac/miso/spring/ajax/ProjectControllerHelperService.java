@@ -24,7 +24,6 @@
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
 import com.eaglegenomics.simlims.core.Note;
-//import com.fasterxml.jackson.databind.ObjectMapper;
 import net.sf.json.JSONArray;
 import org.codehaus.jackson.map.ObjectMapper;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
