@@ -27,7 +27,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolException;
 
 /**
  * Skeleton implementation of a PoolQC
- *
+ * 
  * @author Rob Davey
  * @since 0.1.9
  */
@@ -58,23 +58,16 @@ public abstract class AbstractPoolQC extends AbstractQC implements PoolQC {
    */
   @Override
   public boolean equals(Object obj) {
-    if (obj == null)
-      return false;
-    if (obj == this)
-      return true;
-    if (!(obj instanceof AbstractPoolQC))
-      return false;
+    if (obj == null) return false;
+    if (obj == this) return true;
+    if (!(obj instanceof AbstractPoolQC)) return false;
     PoolQC them = (PoolQC) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
-    if (this.getId() == AbstractPoolQC.UNSAVED_ID
-        || them.getId() == AbstractPoolQC.UNSAVED_ID) {
-      return this.getQcCreator().equals(them.getQcCreator())
-             && this.getQcDate().equals(them.getQcDate())
-             && this.getQcType().equals(them.getQcType())
-             && this.getResults().equals(them.getResults());
-    }
-    else {
+    if (this.getId() == AbstractPoolQC.UNSAVED_ID || them.getId() == AbstractPoolQC.UNSAVED_ID) {
+      return this.getQcCreator().equals(them.getQcCreator()) && this.getQcDate().equals(them.getQcDate())
+          && this.getQcType().equals(them.getQcType()) && this.getResults().equals(them.getResults());
+    } else {
       return this.getId() == them.getId();
     }
   }
@@ -82,9 +75,8 @@ public abstract class AbstractPoolQC extends AbstractQC implements PoolQC {
   @Override
   public int hashCode() {
     if (getId() != AbstractPoolQC.UNSAVED_ID) {
-      return (int)getId();
-    }
-    else {
+      return (int) getId();
+    } else {
       int hashcode = getQcCreator().hashCode();
       hashcode = 37 * hashcode + getQcDate().hashCode();
       hashcode = 37 * hashcode + getQcType().hashCode();

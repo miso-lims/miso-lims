@@ -55,7 +55,8 @@ import java.util.*;
 /**
  * Class that binds all the MISO model datatypes to the Spring form path types
  */
-public class LimsBindingInitializer extends org.springframework.web.bind.support.ConfigurableWebBindingInitializer implements WebBindingInitializer {
+public class LimsBindingInitializer extends org.springframework.web.bind.support.ConfigurableWebBindingInitializer implements
+    WebBindingInitializer {
   protected static final Logger log = LoggerFactory.getLogger(LimsBindingInitializer.class);
 
   @Autowired
@@ -69,8 +70,9 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   /**
    * Sets the requestManager of this LimsBindingInitializer object.
-   *
-   * @param requestManager requestManager.
+   * 
+   * @param requestManager
+   *          requestManager.
    */
   public void setRequestManager(RequestManager requestManager) {
     assert (requestManager != null);
@@ -79,8 +81,9 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   /**
    * Sets the protocolManager of this LimsBindingInitializer object.
-   *
-   * @param protocolManager protocolManager.
+   * 
+   * @param protocolManager
+   *          protocolManager.
    */
   public void setProtocolManager(ProtocolManager protocolManager) {
     assert (protocolManager != null);
@@ -89,8 +92,9 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   /**
    * Sets the securityManager of this LimsBindingInitializer object.
-   *
-   * @param securityManager securityManager.
+   * 
+   * @param securityManager
+   *          securityManager.
    */
   public void setSecurityManager(SecurityManager securityManager) {
     assert (securityManager != null);
@@ -99,17 +103,19 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   /**
    * Init this binder, registering all the custom editors to class types
-   *
-   * @param binder of type WebDataBinder
-   * @param req of type WebRequest
+   * 
+   * @param binder
+   *          of type WebDataBinder
+   * @param req
+   *          of type WebRequest
    */
   public void initBinder(WebDataBinder binder, WebRequest req) {
     binder.registerCustomEditor(Long.class, new CustomNumberEditor(Long.class, false));
 
-    binder.registerCustomEditor(Boolean.class, new CustomBooleanEditor(CustomBooleanEditor.VALUE_TRUE, CustomBooleanEditor.VALUE_FALSE, true));
+    binder.registerCustomEditor(Boolean.class, new CustomBooleanEditor(CustomBooleanEditor.VALUE_TRUE, CustomBooleanEditor.VALUE_FALSE,
+        true));
 
-    binder.registerCustomEditor(Date.class, new CustomDateEditor(
-            new SimpleDateFormat("dd/MM/yyyy"), true));
+    binder.registerCustomEditor(Date.class, new CustomDateEditor(new SimpleDateFormat("dd/MM/yyyy"), true));
 
     binder.registerCustomEditor(InetAddress.class, new PropertyEditorSupport() {
       @Override
@@ -118,7 +124,6 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
       }
     });
 
-
     binder.registerCustomEditor(Activity.class, new PropertyEditorSupport() {
       @Override
       public void setAsText(String element) throws IllegalArgumentException {
@@ -126,14 +131,11 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
       }
     });
 
-/*
-    binder.registerCustomEditor(Request.class, new PropertyEditorSupport() {
-      @Override
-      public void setAsText(String element) throws IllegalArgumentException {
-        setValue(resolveRequest(element));
-      }
-    });
-    */
+    /*
+     * binder.registerCustomEditor(Request.class, new PropertyEditorSupport() {
+     * 
+     * @Override public void setAsText(String element) throws IllegalArgumentException { setValue(resolveRequest(element)); } });
+     */
     binder.registerCustomEditor(Protocol.class, new PropertyEditorSupport() {
       @Override
       public void setAsText(String element) throws IllegalArgumentException {
@@ -161,17 +163,17 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
         return resolveGroup(element);
       }
     });
-    
-//TGAC Classes
+
+    // TGAC Classes
     binder.registerCustomEditor(com.eaglegenomics.simlims.core.User.class, new PropertyEditorSupport() {
-     @Override
+      @Override
       public void setAsText(String element) throws IllegalArgumentException {
         setValue(resolveUser(element));
       }
     });
 
     binder.registerCustomEditor(com.eaglegenomics.simlims.core.User.class, "securityProfile.owner", new PropertyEditorSupport() {
-     @Override
+      @Override
       public void setAsText(String element) throws IllegalArgumentException {
         setValue(resolveUser(element));
       }
@@ -185,21 +187,15 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
     });
 
     /*
-    binder.registerCustomEditor(ProjectOverview.class, new PropertyEditorSupport() {
-      @Override
-      public void setAsText(String element) throws IllegalArgumentException {
-        log.info("Overviews set found... resolving...");
-        setValue(resolveProjectOverview(element));
-      }
-    });
-
-    binder.registerCustomEditor(Set.class, "overviews", new CustomCollectionEditor(Set.class) {
-      @Override
-      public void setAsText(String element) throws IllegalArgumentException {
-        setValue(resolveProjectOverview(element));
-      }
-    });
-    */
+     * binder.registerCustomEditor(ProjectOverview.class, new PropertyEditorSupport() {
+     * 
+     * @Override public void setAsText(String element) throws IllegalArgumentException { log.info("Overviews set found... resolving...");
+     * setValue(resolveProjectOverview(element)); } });
+     * 
+     * binder.registerCustomEditor(Set.class, "overviews", new CustomCollectionEditor(Set.class) {
+     * 
+     * @Override public void setAsText(String element) throws IllegalArgumentException { setValue(resolveProjectOverview(element)); } });
+     */
 
     binder.registerCustomEditor(Set.class, "studies", new CustomCollectionEditor(Set.class) {
       @Override
@@ -237,13 +233,10 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
     });
 
     /*
-    binder.registerCustomEditor(Pool.class, "flowcells.lanes.pool", new PropertyEditorSupport() {
-      @Override
-      public void setAsText(String element) throws IllegalArgumentException {
-        setValue(resolvePool(element));
-      }
-    });
-    */
+     * binder.registerCustomEditor(Pool.class, "flowcells.lanes.pool", new PropertyEditorSupport() {
+     * 
+     * @Override public void setAsText(String element) throws IllegalArgumentException { setValue(resolvePool(element)); } });
+     */
 
     binder.registerCustomEditor(Set.class, "samples", new CustomCollectionEditor(Set.class) {
       @Override
@@ -412,7 +405,6 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
     binder.registerCustomEditor(HashMap.class, "tagBarcodes", new CustomMapEditor(HashMap.class) {
 
-
       @Override
       protected Object convertValue(Object element) {
         return resolveTagBarcode(element);
@@ -513,18 +505,19 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   /**
    * Resolve an InetAddress object from a String
-   *
-   * @param element of type Object
+   * 
+   * @param element
+   *          of type Object
    * @return InetAddress
-   * @throws IllegalArgumentException when
+   * @throws IllegalArgumentException
+   *           when
    */
   private InetAddress resolveInetAddress(Object element) throws IllegalArgumentException {
     InetAddress i = null;
     try {
-      if (element instanceof String) i = InetAddress.getByName((String)element);
+      if (element instanceof String) i = InetAddress.getByName((String) element);
       return i;
-    }
-    catch (UnknownHostException e) {
+    } catch (UnknownHostException e) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to resolve InetAddress " + element, e);
       }
@@ -534,19 +527,19 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   /**
    * Resolve a Group object from an ID String
-   *
-   * @param element of type Object
+   * 
+   * @param element
+   *          of type Object
    * @return Group
-   * @throws IllegalArgumentException when
+   * @throws IllegalArgumentException
+   *           when
    */
   private Group resolveGroup(Object element) throws IllegalArgumentException {
     Long id = null;
-    if (element instanceof String)
-      id = NumberUtils.parseNumber((String) element, Long.class).longValue();
+    if (element instanceof String) id = NumberUtils.parseNumber((String) element, Long.class).longValue();
     try {
       return id != null ? securityManager.getGroupById(id) : null;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to resolve group " + element, e);
       }
@@ -556,19 +549,19 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   /**
    * Resolve a User object from an ID String
-   *
-   * @param element of type Object
+   * 
+   * @param element
+   *          of type Object
    * @return User
-   * @throws IllegalArgumentException when
+   * @throws IllegalArgumentException
+   *           when
    */
   private User resolveUser(Object element) throws IllegalArgumentException {
     Long id = null;
-    if (element instanceof String && !"".equals(element))
-      id = NumberUtils.parseNumber((String) element, Long.class).longValue();
+    if (element instanceof String && !"".equals(element)) id = NumberUtils.parseNumber((String) element, Long.class).longValue();
     try {
       return id != null ? securityManager.getUserById(id) : null;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to resolve user " + element, e);
       }
@@ -578,63 +571,54 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   /**
    * Resolve a SecurityProfile object from an ID String
-   *
-   * @param element of type Object
+   * 
+   * @param element
+   *          of type Object
    * @return SecurityProfile
-   * @throws IllegalArgumentException when
+   * @throws IllegalArgumentException
+   *           when
    */
   private SecurityProfile resolveSecurityProfile(Object element) throws IllegalArgumentException {
     Long id = null;
-    if (element instanceof String)
-      id = NumberUtils.parseNumber((String) element, Long.class).longValue();
+    if (element instanceof String) id = NumberUtils.parseNumber((String) element, Long.class).longValue();
     try {
       return id != null ? securityManager.getSecurityProfileById(id) : null;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to resolve SecurityProfile " + element, e);
       }
       throw new IllegalArgumentException(e);
     }
   }
-/*
-  private Request resolveRequest(Object element) throws IllegalArgumentException {
-    Long id = null;
-    if (element instanceof String)
-      id = NumberUtils.parseNumber((String) element, Long.class).longValue();
-    try {
-      return id != null ? requestManager.getRequestById(id) : null;
-    }
-    catch (IOException e) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to resolve request " + element, e);
-      }
-      throw new IllegalArgumentException(e);
-    }
-  }
-*/
+
+  /*
+   * private Request resolveRequest(Object element) throws IllegalArgumentException { Long id = null; if (element instanceof String) id =
+   * NumberUtils.parseNumber((String) element, Long.class).longValue(); try { return id != null ? requestManager.getRequestById(id) : null;
+   * } catch (IOException e) { if (log.isDebugEnabled()) { log.debug("Failed to resolve request " + element, e); } throw new
+   * IllegalArgumentException(e); } }
+   */
   /**
    * Resolve a Project object from an ID or {@link uk.ac.bbsrc.tgac.miso.core.data.Project.PREFIX} String
-   *
-   * @param element of type Object
+   * 
+   * @param element
+   *          of type Object
    * @return Project
-   * @throws IllegalArgumentException when
+   * @throws IllegalArgumentException
+   *           when
    */
   private Project resolveProject(Object element) throws IllegalArgumentException {
     Long id = null;
     if (element instanceof String) {
-      if (((String)element).startsWith(Project.PREFIX)) {
-        String ident = ((String)element).substring(Project.PREFIX.length());
+      if (((String) element).startsWith(Project.PREFIX)) {
+        String ident = ((String) element).substring(Project.PREFIX.length());
         id = NumberUtils.parseNumber(ident, Long.class).longValue();
-      }
-      else {
+      } else {
         id = NumberUtils.parseNumber((String) element, Long.class).longValue();
       }
     }
     try {
       return id != null ? requestManager.getProjectById(id) : null;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to resolve project " + element, e);
       }
@@ -644,13 +628,11 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   private ProjectOverview resolveProjectOverview(Object element) throws IllegalArgumentException {
     Long id = null;
-    if (element instanceof String)
-      id = NumberUtils.parseNumber((String) element, Long.class).longValue();
+    if (element instanceof String) id = NumberUtils.parseNumber((String) element, Long.class).longValue();
     try {
       log.info("Resolved project overview");
       return id != null ? requestManager.getProjectOverviewById(id) : null;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to resolve project overview" + element, e);
       }
@@ -660,19 +642,19 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   /**
    * Resolve an Activity object from an ID String
-   *
-   * @param element of type Object
+   * 
+   * @param element
+   *          of type Object
    * @return Activity
-   * @throws IllegalArgumentException when
+   * @throws IllegalArgumentException
+   *           when
    */
   private Activity resolveActivity(Object element) throws IllegalArgumentException {
     String id = null;
-    if (element instanceof String)
-      id = element.toString();
+    if (element instanceof String) id = element.toString();
     try {
       return id != null ? protocolManager.getActivity(id) : null;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to resolve activity " + element, e);
       }
@@ -682,19 +664,19 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   /**
    * Resolve a Protocol object from an ID String
-   *
-   * @param element of type Object
+   * 
+   * @param element
+   *          of type Object
    * @return Protocol
-   * @throws IllegalArgumentException when
+   * @throws IllegalArgumentException
+   *           when
    */
   private Protocol resolveProtocol(Object element) throws IllegalArgumentException {
     String id = null;
-    if (element instanceof String)
-      id = element.toString();
+    if (element instanceof String) id = element.toString();
     try {
       return id != null ? protocolManager.getProtocol(id) : null;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to resolve protocol " + element, e);
       }
@@ -704,26 +686,26 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   /**
    * Resolve a Study object from an ID or {@link uk.ac.bbsrc.tgac.miso.core.data.Study.PREFIX} String
-   *
-   * @param element of type Object
+   * 
+   * @param element
+   *          of type Object
    * @return Study
-   * @throws IllegalArgumentException when
+   * @throws IllegalArgumentException
+   *           when
    */
   private Study resolveStudy(Object element) throws IllegalArgumentException {
     Long id = null;
     if (element instanceof String) {
-      if (((String)element).startsWith(Study.PREFIX)) {
-        String ident = ((String)element).substring(Study.PREFIX.length());
+      if (((String) element).startsWith(Study.PREFIX)) {
+        String ident = ((String) element).substring(Study.PREFIX.length());
         id = NumberUtils.parseNumber(ident, Long.class).longValue();
-      }
-      else {
+      } else {
         id = NumberUtils.parseNumber((String) element, Long.class).longValue();
       }
     }
     try {
       return id != null ? requestManager.getStudyById(id) : null;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to resolve study " + element, e);
       }
@@ -733,27 +715,21 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   /**
    * Resolve an Experiment object from an ID String
-   *
-   * @param element of type Object
+   * 
+   * @param element
+   *          of type Object
    * @return Experiment
-   * @throws IllegalArgumentException when
+   * @throws IllegalArgumentException
+   *           when
    */
   private Experiment resolveExperiment(Object element) throws IllegalArgumentException {
     Long id = null;
-    //log.info("Resolving experiment: " + element.toString());
     if (element instanceof String) {
-//      if (((String)element).startsWith(Experiment.PREFIX)) {
-//        String ident = ((String)element).substring(Experiment.PREFIX.length());
-//        id = NumberUtils.parseNumber(ident, Long.class).longValue();
-//      }
-//      else {
-        id = NumberUtils.parseNumber((String) element, Long.class).longValue();
-//      }
+      id = NumberUtils.parseNumber((String) element, Long.class).longValue();
     }
     try {
       return id != null ? requestManager.getExperimentById(id) : null;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to resolve experiment " + element, e);
       }
@@ -763,26 +739,26 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   /**
    * Resolve a Sample object from an ID or {@link uk.ac.bbsrc.tgac.miso.core.data.Sample.PREFIX} String
-   *
-   * @param element of type Object
+   * 
+   * @param element
+   *          of type Object
    * @return Sample
-   * @throws IllegalArgumentException when
+   * @throws IllegalArgumentException
+   *           when
    */
   private Sample resolveSample(Object element) throws IllegalArgumentException {
     Long id = null;
     if (element instanceof String) {
-      if (((String)element).startsWith(Sample.PREFIX)) {
-        String ident = ((String)element).substring(Sample.PREFIX.length());
+      if (((String) element).startsWith(Sample.PREFIX)) {
+        String ident = ((String) element).substring(Sample.PREFIX.length());
         id = NumberUtils.parseNumber(ident, Long.class).longValue();
-      }
-      else {
+      } else {
         id = NumberUtils.parseNumber((String) element, Long.class).longValue();
       }
     }
     try {
       return id != null ? requestManager.getSampleById(id) : null;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to resolve sample " + element, e);
       }
@@ -792,19 +768,19 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   /**
    * Resolve a Run object from an ID String
-   *
-   * @param element of type Object
+   * 
+   * @param element
+   *          of type Object
    * @return Run
-   * @throws IllegalArgumentException when
+   * @throws IllegalArgumentException
+   *           when
    */
   private Run resolveRun(Object element) throws IllegalArgumentException {
     Long id = null;
-    if (element instanceof String)
-      id = NumberUtils.parseNumber((String) element, Long.class).longValue();
+    if (element instanceof String) id = NumberUtils.parseNumber((String) element, Long.class).longValue();
     try {
       return id != null ? requestManager.getRunById(id) : null;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to resolve run " + element, e);
       }
@@ -814,38 +790,40 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   /**
    * Resolve a PlatformType enum from a given key String
-   *
-   * @param element of type Object
+   * 
+   * @param element
+   *          of type Object
    * @return PlatformType
-   * @throws IllegalArgumentException when
+   * @throws IllegalArgumentException
+   *           when
    */
   private PlatformType resolvePlatformType(Object element) throws IllegalArgumentException {
     if (element instanceof String) {
-      return PlatformType.get((String)element);
-    }
-    else {
+      return PlatformType.get((String) element);
+    } else {
       if (log.isDebugEnabled()) {
         log.debug("Failed to resolve PlatformType " + element);
       }
-      throw new IllegalArgumentException("Cannot resolve PlatformType from key: " + element + ". Accepted keys are: [" + PlatformType.getKeys() + "]");      
+      throw new IllegalArgumentException("Cannot resolve PlatformType from key: " + element + ". Accepted keys are: ["
+          + PlatformType.getKeys() + "]");
     }
   }
 
   /**
    * Resolve a Pool object from an ID or {@link uk.ac.bbsrc.tgac.miso.core.data.Pool} PREFIX String
-   *
-   * @param element of type Object
+   * 
+   * @param element
+   *          of type Object
    * @return Pool
-   * @throws IllegalArgumentException when
+   * @throws IllegalArgumentException
+   *           when
    */
   private Pool resolvePool(Object element) throws IllegalArgumentException {
     Long id = null;
-    if (element instanceof String)
-      id = NumberUtils.parseNumber((String) element, Long.class).longValue();
+    if (element instanceof String) id = NumberUtils.parseNumber((String) element, Long.class).longValue();
     try {
       return id != null ? requestManager.getPoolById(id) : null;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to resolve pool " + element, e);
       }
@@ -853,26 +831,26 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
     }
   }
 
-
   /**
    * Resolve a Partition object from an ID String
-   *
-   * @param element of type Object
+   * 
+   * @param element
+   *          of type Object
    * @return Partition
-   * @throws IllegalArgumentException when
+   * @throws IllegalArgumentException
+   *           when
    */
   private SequencerPoolPartition resolvePartition(Object element) throws IllegalArgumentException {
     Long id = null;
     if (element instanceof String) {
-      String s = (String)element;
+      String s = (String) element;
       if (!"".equals(s)) {
         id = NumberUtils.parseNumber((String) element, Long.class).longValue();
       }
     }
     try {
       return id != null ? requestManager.getSequencerPoolPartitionById(id) : null;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to resolve Partition " + element, e);
       }
@@ -882,23 +860,24 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   /**
    * Resolve a SequencerPartitionContainer object from an ID String
-   *
-   * @param element of type Object
+   * 
+   * @param element
+   *          of type Object
    * @return SequencerPartitionContainer
-   * @throws IllegalArgumentException when
+   * @throws IllegalArgumentException
+   *           when
    */
   private SequencerPartitionContainer resolveSequencerPartitionContainer(Object element) throws IllegalArgumentException {
     Long id = null;
     if (element instanceof String) {
-      String s = (String)element;
+      String s = (String) element;
       if (!"".equals(s)) {
         id = NumberUtils.parseNumber((String) element, Long.class).longValue();
       }
     }
     try {
       return id != null ? requestManager.getSequencerPartitionContainerById(id) : null;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to resolve SequencerPartitionContainer " + element, e);
       }
@@ -908,19 +887,19 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   /**
    * Resolve a Library object from an ID String
-   *
-   * @param element of type Object
+   * 
+   * @param element
+   *          of type Object
    * @return Library
-   * @throws IllegalArgumentException when
+   * @throws IllegalArgumentException
+   *           when
    */
   private Library resolveLibrary(Object element) throws IllegalArgumentException {
     Long id = null;
-    if (element instanceof String)
-      id = NumberUtils.parseNumber((String) element, Long.class).longValue();
+    if (element instanceof String) id = NumberUtils.parseNumber((String) element, Long.class).longValue();
     try {
       return id != null ? requestManager.getLibraryById(id) : null;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to resolve library " + element, e);
       }
@@ -930,32 +909,29 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   /**
    * Resolve a Dilution object from an ID String
-   *
-   * @param element of type Object
+   * 
+   * @param element
+   *          of type Object
    * @return Dilution
-   * @throws IllegalArgumentException when
+   * @throws IllegalArgumentException
+   *           when
    */
   private Dilution resolveDilution(Object element) throws IllegalArgumentException {
     Long id = null;
     if (element instanceof String) {
-      String prefix = ((String)element).substring(0, 3);
-      String ident = ((String)element).substring(3);
+      String prefix = ((String) element).substring(0, 3);
+      String ident = ((String) element).substring(3);
       id = NumberUtils.parseNumber(ident, Long.class).longValue();
 
       try {
         if ("LDI".equals(prefix)) {
-          //log.debug(prefix + ":" + ident + " -> Dilution");
           return id != null ? requestManager.getLibraryDilutionById(id) : null;
-        }
-        else if ("EDI".equals(prefix)) {
-          //log.debug(prefix + ":" + ident + " -> Dilution");
+        } else if ("EDI".equals(prefix)) {
           return id != null ? requestManager.getEmPcrDilutionById(id) : null;
+        } else {
+          log.debug("Failed to resolve dilution with identifier: " + prefix + ident);
         }
-        else {
-          log.debug("Failed to resolve dilution with identifier: " + prefix+ident);
-        }
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
         if (log.isDebugEnabled()) {
           log.debug("Failed to resolve dilution " + element, e);
         }
@@ -967,19 +943,19 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   /**
    * Resolve a LibraryDilution object from an ID String
-   *
-   * @param element of type Object
+   * 
+   * @param element
+   *          of type Object
    * @return LibraryDilution
-   * @throws IllegalArgumentException when
+   * @throws IllegalArgumentException
+   *           when
    */
   private LibraryDilution resolveLibraryDilution(Object element) throws IllegalArgumentException {
     Long id = null;
-    if (element instanceof String)
-      id = NumberUtils.parseNumber((String) element, Long.class).longValue();
+    if (element instanceof String) id = NumberUtils.parseNumber((String) element, Long.class).longValue();
     try {
       return id != null ? requestManager.getLibraryDilutionById(id) : null;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to resolve dilution " + element, e);
       }
@@ -989,19 +965,19 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   /**
    * Resolve an emPCRDilution object from an ID String
-   *
-   * @param element of type Object
+   * 
+   * @param element
+   *          of type Object
    * @return emPCRDilution
-   * @throws IllegalArgumentException when
+   * @throws IllegalArgumentException
+   *           when
    */
   private emPCRDilution resolveEmPcrDilution(Object element) throws IllegalArgumentException {
     Long id = null;
-    if (element instanceof String)
-      id = NumberUtils.parseNumber((String) element, Long.class).longValue();
+    if (element instanceof String) id = NumberUtils.parseNumber((String) element, Long.class).longValue();
     try {
       return id != null ? requestManager.getEmPcrDilutionById(id) : null;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to resolve dilution " + element, e);
       }
@@ -1011,19 +987,19 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   /**
    * Resolve a Platform object from an ID String
-   *
-   * @param element of type Object
+   * 
+   * @param element
+   *          of type Object
    * @return Platform
-   * @throws IllegalArgumentException when
+   * @throws IllegalArgumentException
+   *           when
    */
   private Platform resolvePlatform(Object element) throws IllegalArgumentException {
     Long id = null;
-    if (element instanceof String)
-      id = NumberUtils.parseNumber((String) element, Long.class).longValue();
+    if (element instanceof String) id = NumberUtils.parseNumber((String) element, Long.class).longValue();
     try {
       return id != null ? requestManager.getPlatformById(id) : null;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to resolve platform " + element, e);
       }
@@ -1033,19 +1009,19 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   /**
    * Resolve a SequencerReference object from an ID String
-   *
-   * @param element of type Object
+   * 
+   * @param element
+   *          of type Object
    * @return SequencerReference
-   * @throws IllegalArgumentException when
+   * @throws IllegalArgumentException
+   *           when
    */
   private SequencerReference resolveSequencerReference(Object element) throws IllegalArgumentException {
     Long id = null;
-    if (element instanceof String)
-      id = NumberUtils.parseNumber((String) element, Long.class).longValue();
+    if (element instanceof String) id = NumberUtils.parseNumber((String) element, Long.class).longValue();
     try {
       return id != null ? requestManager.getSequencerReferenceById(id) : null;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to resolve SequencerReference " + element, e);
       }
@@ -1055,19 +1031,19 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   /**
    * Resolve a Status object from an ID String
-   *
-   * @param element of type Object
+   * 
+   * @param element
+   *          of type Object
    * @return Status
-   * @throws IllegalArgumentException when
+   * @throws IllegalArgumentException
+   *           when
    */
   private Status resolveStatus(Object element) throws IllegalArgumentException {
     Long id = null;
-    if (element instanceof String)
-      id = NumberUtils.parseNumber((String) element, Long.class).longValue();
+    if (element instanceof String) id = NumberUtils.parseNumber((String) element, Long.class).longValue();
     try {
       return id != null ? requestManager.getStatusById(id) : null;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to resolve status " + element, e);
       }
@@ -1077,40 +1053,37 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   /**
    * Resolve a Submittable object from a PREFIX
-   *
-   * @param element of type Object
+   * 
+   * @param element
+   *          of type Object
    * @return Submittable
-   * @throws IllegalArgumentException when
+   * @throws IllegalArgumentException
+   *           when
    */
   private Submittable resolveSubmittable(Object element) throws IllegalArgumentException {
     Long id = null;
     if (element instanceof String) {
-      String prefix = ((String)element).substring(0, 3);
-      String ident = ((String)element).substring(3);
+      String prefix = ((String) element).substring(0, 3);
+      String ident = ((String) element).substring(3);
       id = NumberUtils.parseNumber(ident, Long.class).longValue();
 
       try {
         if (Study.PREFIX.equals(prefix)) {
           log.info(prefix + ":" + ident + " -> Study");
           return id != null ? requestManager.getStudyById(id) : null;
-        }
-        else if (Sample.PREFIX.equals(prefix)) {
+        } else if (Sample.PREFIX.equals(prefix)) {
           log.info(prefix + ":" + ident + " -> Sample");
           return id != null ? requestManager.getSampleById(id) : null;
-        }
-        else if (Experiment.PREFIX.equals(prefix)) {
+        } else if (Experiment.PREFIX.equals(prefix)) {
           log.info(prefix + ":" + ident + " -> Experiment");
           return id != null ? requestManager.getExperimentById(id) : null;
-        }
-        else if ("PAR".equals(prefix)) {
+        } else if ("PAR".equals(prefix)) {
           log.info(prefix + ":" + ident + " -> Partition");
           return id != null ? requestManager.getSequencerPoolPartitionById(id) : null;
+        } else {
+          log.debug("Failed to resolve submittable element with identifier: " + prefix + ident);
         }
-        else {
-          log.debug("Failed to resolve submittable element with identifier: " + prefix+ident);
-        }
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
         if (log.isDebugEnabled()) {
           log.debug("Failed to resolve submittable element " + element, e);
         }
@@ -1122,19 +1095,19 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   /**
    * Resolve a Kit object from an ID String
-   *
-   * @param element of type Object
+   * 
+   * @param element
+   *          of type Object
    * @return Kit
-   * @throws IllegalArgumentException when
+   * @throws IllegalArgumentException
+   *           when
    */
   private Kit resolveKit(Object element) throws IllegalArgumentException {
     Long id = null;
-    if (element instanceof String && !"".equals(element))
-      id = NumberUtils.parseNumber((String) element, Long.class).longValue();
+    if (element instanceof String && !"".equals(element)) id = NumberUtils.parseNumber((String) element, Long.class).longValue();
     try {
       return id != null ? requestManager.getKitById(id) : null;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to resolve kit " + element, e);
       }
@@ -1144,19 +1117,19 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   /**
    * Resolve a KitDescriptor object from an ID String
-   *
-   * @param element of type Object
+   * 
+   * @param element
+   *          of type Object
    * @return KitDescriptor
-   * @throws IllegalArgumentException when
+   * @throws IllegalArgumentException
+   *           when
    */
   private KitDescriptor resolveKitDescriptor(Object element) throws IllegalArgumentException {
     Long id = null;
-    if (element instanceof String)
-      id = NumberUtils.parseNumber((String) element, Long.class).longValue();
+    if (element instanceof String) id = NumberUtils.parseNumber((String) element, Long.class).longValue();
     try {
       return id != null ? requestManager.getKitDescriptorById(id) : null;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to resolve kit descriptor " + element, e);
       }
@@ -1166,19 +1139,19 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   /**
    * Resolve a LibraryType object from an ID String
-   *
-   * @param element of type Object
+   * 
+   * @param element
+   *          of type Object
    * @return LibraryType
-   * @throws IllegalArgumentException when
+   * @throws IllegalArgumentException
+   *           when
    */
   private LibraryType resolveLibraryType(Object element) throws IllegalArgumentException {
     Long id = null;
-    if (element instanceof String)
-      id = NumberUtils.parseNumber((String) element, Long.class).longValue();
+    if (element instanceof String) id = NumberUtils.parseNumber((String) element, Long.class).longValue();
     try {
       return id != null ? requestManager.getLibraryTypeById(id) : null;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to resolve LibraryType " + element, e);
       }
@@ -1188,19 +1161,19 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   /**
    * Resolve a LibrarySelectionType object from an ID String
-   *
-   * @param element of type Object
+   * 
+   * @param element
+   *          of type Object
    * @return LibrarySelectionType
-   * @throws IllegalArgumentException when
+   * @throws IllegalArgumentException
+   *           when
    */
   private LibrarySelectionType resolveLibrarySelectionType(Object element) throws IllegalArgumentException {
     Long id = null;
-    if (element instanceof String)
-      id = NumberUtils.parseNumber((String) element, Long.class).longValue();
+    if (element instanceof String) id = NumberUtils.parseNumber((String) element, Long.class).longValue();
     try {
       return id != null ? requestManager.getLibrarySelectionTypeById(id) : null;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to resolve LibrarySelectionType " + element, e);
       }
@@ -1210,19 +1183,19 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   /**
    * Resolve a LibraryStrategyType object from an ID String
-   *
-   * @param element of type Object
+   * 
+   * @param element
+   *          of type Object
    * @return LibraryStrategyType
-   * @throws IllegalArgumentException when
+   * @throws IllegalArgumentException
+   *           when
    */
   private LibraryStrategyType resolveLibraryStrategyType(Object element) throws IllegalArgumentException {
     Long id = null;
-    if (element instanceof String)
-      id = NumberUtils.parseNumber((String) element, Long.class).longValue();
+    if (element instanceof String) id = NumberUtils.parseNumber((String) element, Long.class).longValue();
     try {
       return id != null ? requestManager.getLibraryStrategyTypeById(id) : null;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to resolve LibrarySelectionType " + element, e);
       }
@@ -1232,19 +1205,19 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   /**
    * Resolve a TagBarcode object from an ID String
-   *
-   * @param element of type Object
+   * 
+   * @param element
+   *          of type Object
    * @return TagBarcode
-   * @throws IllegalArgumentException when
+   * @throws IllegalArgumentException
+   *           when
    */
   private TagBarcode resolveTagBarcode(Object element) throws IllegalArgumentException {
     Long id = null;
-    if (element instanceof String && !"".equals(element))
-      id = NumberUtils.parseNumber((String) element, Long.class).longValue();
+    if (element instanceof String && !"".equals(element)) id = NumberUtils.parseNumber((String) element, Long.class).longValue();
     try {
       return id != null ? requestManager.getTagBarcodeById(id) : null;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to resolve TagBarcode " + element, e);
       }
@@ -1254,36 +1227,34 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
 
   /**
    * Resolve a Poolable object from a PREFIX
-   *
-   * @param element of type Object
+   * 
+   * @param element
+   *          of type Object
    * @return Poolable
-   * @throws IllegalArgumentException when
+   * @throws IllegalArgumentException
+   *           when
    */
   private Poolable resolvePoolable(Object element) throws IllegalArgumentException {
     Long id = null;
     if (element instanceof String) {
-      String prefix = ((String)element).substring(0, 3);
-      String ident = ((String)element).substring(3);
+      String prefix = ((String) element).substring(0, 3);
+      String ident = ((String) element).substring(3);
       id = NumberUtils.parseNumber(ident, Long.class).longValue();
 
       try {
         if ("LDI".equals(prefix)) {
           log.info(prefix + ":" + ident + " -> LibraryDilution");
           return id != null ? requestManager.getLibraryDilutionById(id) : null;
-        }
-        else if ("EDI".equals(prefix)) {
+        } else if ("EDI".equals(prefix)) {
           log.info(prefix + ":" + ident + " -> EmPCRDilution");
           return id != null ? requestManager.getEmPcrDilutionById(id) : null;
-        }
-        else if ("PLA".equals(prefix)) {
+        } else if ("PLA".equals(prefix)) {
           log.info(prefix + ":" + ident + " -> Plate");
           return id != null ? requestManager.getPlateById(id) : null;
+        } else {
+          log.debug("Failed to resolve poolable element with identifier: " + prefix + ident);
         }
-        else {
-          log.debug("Failed to resolve poolable element with identifier: " + prefix+ident);
-        }
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
         if (log.isDebugEnabled()) {
           log.debug("Failed to resolve poolable element " + element, e);
         }

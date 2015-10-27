@@ -76,8 +76,7 @@ public class ListUsersController {
       model.addAttribute("total", nonExpiredUsers.size());
 
       return new ModelAndView("/pages/listUsers.jsp", "users", securityManager.listAllUsers());
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to list users", ex);
       }
@@ -89,8 +88,7 @@ public class ListUsersController {
   public ModelAndView techListUsers() throws IOException {
     try {
       return new ModelAndView("/pages/listUsers.jsp", "users", securityManager.listAllUsers());
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to list users", ex);
       }

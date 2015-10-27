@@ -24,9 +24,11 @@
 package uk.ac.bbsrc.tgac.miso.analysis.service;
 
 import net.sf.json.JSONObject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import uk.ac.bbsrc.tgac.miso.analysis.manager.AnalysisRequestManager;
 import uk.ac.bbsrc.tgac.miso.analysis.submission.PipelineRequest;
 import uk.ac.bbsrc.tgac.miso.analysis.submission.TaskSubmissionRequest;
@@ -36,7 +38,7 @@ import uk.ac.ebi.fgpt.conan.service.exception.SubmissionException;
  * uk.ac.bbsrc.tgac.miso.analysis.service
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 02/11/11
  * @since 0.1.3
@@ -53,17 +55,14 @@ public class AnalysisRequestService {
 
   public String processRequest(Object request) {
     if (request instanceof TaskSubmissionRequest) {
-      return submitAnalysisTask((TaskSubmissionRequest)request);
-    }
-    else if (request instanceof PipelineRequest) {
+      return submitAnalysisTask((TaskSubmissionRequest) request);
+    } else if (request instanceof PipelineRequest) {
       return submitAnalysisPipeline((PipelineRequest) request);
-    }
-    else if (request instanceof JSONObject) {
-      JSONObject j = (JSONObject)request;
+    } else if (request instanceof JSONObject) {
+      JSONObject j = (JSONObject) request;
       if (j.getString("query").toLowerCase().contains("task")) {
         return queryTasks(j);
-      }
-      else if (j.getString("query").toLowerCase().contains("pipeline")) {
+      } else if (j.getString("query").toLowerCase().contains("pipeline")) {
         return queryPipelines(j);
       }
     }
@@ -73,17 +72,16 @@ public class AnalysisRequestService {
   private String submitAnalysisTask(TaskSubmissionRequest request) {
     try {
       analysisRequestManager.generateAndSubmitTask(request);
-      return "{'response':'Task submitted: " + request.getPipelineName()+"'}";
-    }
-    catch (SubmissionException e) {
+      return "{'response':'Task submitted: " + request.getPipelineName() + "'}";
+    } catch (SubmissionException e) {
       e.printStackTrace();
-      return "{'error':'Task not submitted: " + e.getMessage()+"'}";
+      return "{'error':'Task not submitted: " + e.getMessage() + "'}";
     }
   }
 
   private String submitAnalysisPipeline(PipelineRequest request) {
     analysisRequestManager.generateAndAddPipeline(request);
-    return "{'response':'Pipeline  submitted: " + request.getName()+"'}";
+    return "{'response':'Pipeline  submitted: " + request.getName() + "'}";
   }
 
   private String queryTasks(JSONObject request) {

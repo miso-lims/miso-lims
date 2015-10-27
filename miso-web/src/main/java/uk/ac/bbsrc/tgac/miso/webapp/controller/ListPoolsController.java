@@ -43,7 +43,7 @@ import java.util.*;
  * uk.ac.bbsrc.tgac.miso.webapp.controller
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -88,8 +88,7 @@ public class ListPoolsController {
         for (Pool p : requestManager.listReadyPoolsByPlatform(pt)) {
           if (requestManager.listRunsByPoolId(p.getId()).isEmpty()) {
             pools.add(p);
-          }
-          else {
+          } else {
             poolsUsed.add(p);
           }
         }
@@ -104,8 +103,7 @@ public class ListPoolsController {
 
       model.addAttribute("ready", true);
       return new ModelAndView("/pages/readyPools.jsp", model);
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to list pools", ex);
       }

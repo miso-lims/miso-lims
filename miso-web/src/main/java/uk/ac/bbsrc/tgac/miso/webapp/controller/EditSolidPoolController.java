@@ -52,7 +52,7 @@ import java.util.*;
  * com.eaglegenomics.miso.web
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -86,7 +86,6 @@ public class EditSolidPoolController {
 
   private List<? extends Dilution> populateAvailableDilutions(User user, Pool pool) throws IOException {
     ArrayList<emPCRDilution> libs = new ArrayList<emPCRDilution>();
-    //for (Dilution l : requestManager.listAllDilutionsByPlatform(PlatformType.Solid)) {
     for (emPCRDilution l : requestManager.listAllEmPcrDilutions()) {
       if (l.getEmPCR().getLibraryDilution().getLibrary().getPlatformName().equals(PlatformType.SOLID.getKey())) {
         if (!pool.getDilutions().contains(l)) {
@@ -100,7 +99,8 @@ public class EditSolidPoolController {
     return libs;
   }
 
-  public Collection<Experiment> populateExperiments(@RequestParam(value = "experimentId", required = false) Long experimentId, Pool p) throws IOException {
+  public Collection<Experiment> populateExperiments(@RequestParam(value = "experimentId", required = false) Long experimentId, Pool p)
+      throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Collection<Experiment> es = new ArrayList<Experiment>();
@@ -110,15 +110,13 @@ public class EditSolidPoolController {
             if (e.getId() != experimentId) {
               es.add(e);
             }
-          }
-          else {
+          } else {
             es.add(e);
           }
         }
       }
       return es;
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to list experiments", ex);
       }
@@ -137,18 +135,16 @@ public class EditSolidPoolController {
   }
 
   @RequestMapping(value = "/{poolId}", method = RequestMethod.GET)
-  public ModelAndView setupForm(@PathVariable Long poolId,
-                                ModelMap model) throws IOException {
+  public ModelAndView setupForm(@PathVariable Long poolId, ModelMap model) throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Pool pool = null;
       if (poolId == AbstractPool.UNSAVED_ID) {
         pool = dataObjectFactory.getSolidPool(user);
         model.put("title", "New SOLiD Pool");
-      }
-      else {
+      } else {
         pool = requestManager.getPoolById(poolId);
-        model.put("title", "SOLiD Pool "+poolId);
+        model.put("title", "SOLiD Pool " + poolId);
       }
 
       if (pool == null) {
@@ -165,8 +161,7 @@ public class EditSolidPoolController {
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, pool, securityManager.listAllUsers()));
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, pool, securityManager.listAllGroups()));
       return new ModelAndView("/pages/editSolidPool.jsp", model);
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to show Solid pool", ex);
       }
@@ -174,21 +169,18 @@ public class EditSolidPoolController {
     }
   }
 
-
   @RequestMapping(value = "/{poolId}/experiment/{experimentId}", method = RequestMethod.GET)
-  public ModelAndView setupFormWithExperiment(@PathVariable Long poolId,
-                                @PathVariable Long experimentId,
-                                ModelMap model) throws IOException {
+  public ModelAndView setupFormWithExperiment(@PathVariable Long poolId, @PathVariable Long experimentId, ModelMap model)
+      throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Pool pool = null;
       if (poolId == AbstractPool.UNSAVED_ID) {
         pool = dataObjectFactory.getSolidPool(user);
         model.put("title", "New Solid Pool");
-      }
-      else {
+      } else {
         pool = requestManager.getPoolById(poolId);
-        model.put("title", "Solid Pool "+poolId);
+        model.put("title", "Solid Pool " + poolId);
       }
 
       if (pool == null) {
@@ -200,8 +192,7 @@ public class EditSolidPoolController {
 
       if (experimentId != null) {
         model.put("accessibleExperiments", populateExperiments(experimentId, pool));
-      }
-      else {
+      } else {
         model.put("accessibleExperiments", populateExperiments(null, pool));
       }
 
@@ -213,22 +204,16 @@ public class EditSolidPoolController {
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, pool, securityManager.listAllUsers()));
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, pool, securityManager.listAllGroups()));
       return new ModelAndView("/pages/editSolidPool.jsp", model);
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to show Solid pool", ex);
       }
       throw ex;
     }
-//      catch (MalformedExperimentException e) {
-//        e.printStackTrace();
-//        throw new IOException(e);
-//      }
   }
 
   @RequestMapping(value = "/new/dilution/{dilutionId}", method = RequestMethod.GET)
-  public ModelAndView setupFormWithDilution(@PathVariable Long dilutionId,
-                                ModelMap model) throws IOException {
+  public ModelAndView setupFormWithDilution(@PathVariable Long dilutionId, ModelMap model) throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       SolidPool pool = dataObjectFactory.getSolidPool(user);
@@ -239,7 +224,7 @@ public class EditSolidPoolController {
       }
 
       if (dilutionId != null) {
-          emPCRDilution ed = requestManager.getEmPcrDilutionById(dilutionId);
+        emPCRDilution ed = requestManager.getEmPcrDilutionById(dilutionId);
         if (ed != null) {
           pool.addPoolableElement(ed);
         }
@@ -253,14 +238,12 @@ public class EditSolidPoolController {
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, pool, securityManager.listAllUsers()));
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, pool, securityManager.listAllGroups()));
       return new ModelAndView("/pages/editSolidPool.jsp", model);
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to show Illumina pool", ex);
       }
       throw ex;
-    }
-    catch (MalformedDilutionException e) {
+    } catch (MalformedDilutionException e) {
       e.printStackTrace();
       throw new IOException(e);
     }
@@ -268,16 +251,15 @@ public class EditSolidPoolController {
 
   @RequestMapping(value = "/import", method = RequestMethod.POST)
   public String importEmPCRDilutionsToPool(HttpServletRequest request, ModelMap model) throws IOException {
-    SolidPool p = (SolidPool)model.get("pool");
+    SolidPool p = (SolidPool) model.get("pool");
     String[] dils = request.getParameterValues("importdilslist");
     for (String s : dils) {
       emPCRDilution ld = requestManager.getEmPcrDilutionByBarcode(s);
       if (ld != null) {
         try {
           p.addPoolableElement(ld);
-        }
-        catch (MalformedDilutionException e) {
-          log.debug("Cannot add emPCR dilution "+s+" to pool " + p.getName());
+        } catch (MalformedDilutionException e) {
+          log.debug("Cannot add emPCR dilution " + s + " to pool " + p.getName());
           e.printStackTrace();
         }
       }
@@ -288,9 +270,8 @@ public class EditSolidPoolController {
   }
 
   @RequestMapping(method = RequestMethod.POST)
-  public String processSubmit(@ModelAttribute("pool") Pool pool,
-                              ModelMap model,
-                              SessionStatus session) throws IOException, MalformedLibraryException {
+  public String processSubmit(@ModelAttribute("pool") Pool pool, ModelMap model, SessionStatus session) throws IOException,
+      MalformedLibraryException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       if (!pool.userCanWrite(user)) {
@@ -300,8 +281,7 @@ public class EditSolidPoolController {
       session.setComplete();
       model.clear();
       return "redirect:/miso/pool/solid/" + pool.getId();
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to save Solid pool", ex);
       }

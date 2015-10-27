@@ -23,16 +23,22 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
-import com.eaglegenomics.simlims.core.User;
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToOne;
+
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
-import javax.persistence.*;
-import java.util.List;
+import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.User;
 
 /**
  * Skeleton implementation of a SequencerPartitionContainer
- *
+ * 
  * @author Rob Davey
  * @since 0.1.6
  */
@@ -98,7 +104,7 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
   }
 
   public String getLabelText() {
-    return getPlatform().getPlatformType().name()+" " + getValidationBarcode();
+    return getPlatform().getPlatformType().name() + " " + getValidationBarcode();
   }
 
   public boolean isDeletable() {
@@ -164,27 +170,21 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
   public void inheritPermissions(SecurableByProfile parent) throws SecurityException {
     if (parent.getSecurityProfile().getOwner() != null) {
       setSecurityProfile(parent.getSecurityProfile());
-    }
-    else {
+    } else {
       throw new SecurityException("Cannot inherit permissions when parent object owner is not set!");
     }
-  }  
+  }
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null)
-      return false;
-    if (obj == this)
-      return true;
-    if (!(obj instanceof SequencerPartitionContainer))
-      return false;
+    if (obj == null) return false;
+    if (obj == this) return true;
+    if (!(obj instanceof SequencerPartitionContainer)) return false;
     SequencerPartitionContainer them = (SequencerPartitionContainer) obj;
     // If not saved, then compare resolved actual objects. Otherwise just compare IDs.
-    if (getId() == AbstractSequencerPartitionContainer.UNSAVED_ID
-        || them.getId() == AbstractSequencerPartitionContainer.UNSAVED_ID) {
+    if (getId() == AbstractSequencerPartitionContainer.UNSAVED_ID || them.getId() == AbstractSequencerPartitionContainer.UNSAVED_ID) {
       return getIdentificationBarcode().equals(them.getIdentificationBarcode());
-    }
-    else {
+    } else {
       return getId() == them.getId();
     }
   }
@@ -192,12 +192,11 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
   @Override
   public int hashCode() {
     if (getId() != AbstractSequencerPartitionContainer.UNSAVED_ID) {
-      return (int)getId();
-    }
-    else {
+      return (int) getId();
+    } else {
       int hashcode = -1;
       if (getIdentificationBarcode() != null) hashcode = 37 * hashcode + getIdentificationBarcode().hashCode();
-      return hashcode;      
+      return hashcode;
     }
   }
 
@@ -214,7 +213,7 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
 
   @Override
   public int compareTo(Object o) {
-    SequencerPartitionContainer t = (SequencerPartitionContainer)o;
+    SequencerPartitionContainer t = (SequencerPartitionContainer) o;
     if (getId() < t.getId()) return -1;
     if (getId() > t.getId()) return 1;
     return 0;

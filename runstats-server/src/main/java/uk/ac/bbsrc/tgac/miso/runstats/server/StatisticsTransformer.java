@@ -43,7 +43,7 @@ import java.util.regex.Pattern;
  * uk.ac.bbsrc.tgac.miso.tools.run
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 26/10/11
  * @since 0.1.2
@@ -74,16 +74,12 @@ public class StatisticsTransformer implements FileSetTransformer<String, Map<Str
             String runName = rm.group(1);
             byte[] b = LimsUtils.inputStreamToByteArray(new FileInputStream(f));
 
-            map.get("stats").put(runName+"-"+fileName, b);
+            map.get("stats").put(runName + "-" + fileName, b);
           }
         }
-      }
-      catch (FileNotFoundException e) {
-        //e.printStackTrace();
+      } catch (FileNotFoundException e) {
         log.error("Cannot process file: " + e.getMessage());
-      }
-      catch (IOException e) {
-        //e.printStackTrace();
+      } catch (IOException e) {
         log.error("Error with file IO: " + e.getMessage());
       }
     }

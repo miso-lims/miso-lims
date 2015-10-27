@@ -41,7 +41,7 @@ import java.io.IOException;
  * com.eaglegenomics.miso.web
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -69,9 +69,8 @@ public class ListDilutionsController {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       model.addAttribute("libDilutions", requestManager.listAllLibraryDilutions());
       model.addAttribute("pcrDilutions", requestManager.listAllEmPcrDilutions());
-      return new ModelAndView("/pages/listDilutions.jsp",model);
-    }
-    catch (IOException ex) {
+      return new ModelAndView("/pages/listDilutions.jsp", model);
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to list dilutions", ex);
       }

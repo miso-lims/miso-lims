@@ -27,36 +27,31 @@ import org.apache.commons.net.io.CopyStreamEvent;
 import org.apache.commons.net.io.CopyStreamListener;
 
 /**
- * Created by IntelliJ IDEA.
- * User: collesa
- * Date: 26/04/12
- * Time: 16:31
- * To change this template use File | Settings | File Templates.
+ * Created by IntelliJ IDEA. User: collesa Date: 26/04/12 Time: 16:31 To change this template use File | Settings | File Templates.
  */
 public class UploadListener implements CopyStreamListener {
-    private int calls;
-    private long streamSZ;
-    private long totalBT;
-    @Override
-    public void bytesTransferred(CopyStreamEvent event) {
-        bytesTransferred(event.getTotalBytesTransferred(), event.getBytesTransferred(),event.getStreamSize());
+  private int calls;
+  private long streamSZ;
+  private long totalBT;
 
-    }
+  @Override
+  public void bytesTransferred(CopyStreamEvent event) {
+    bytesTransferred(event.getTotalBytesTransferred(), event.getBytesTransferred(), event.getStreamSize());
 
-    @Override
-    public void bytesTransferred(long totalBytesTransferred, int bytesTransferred, long streamSize) {
-        streamSZ=streamSize;
-        totalBT=totalBytesTransferred;
-        //System.out.println("time" + System.currentTimeMillis()+  ". Listener total bytes transferred at call " + calls + ": " + totalBT);
-        calls++;
-    }
+  }
 
+  @Override
+  public void bytesTransferred(long totalBytesTransferred, int bytesTransferred, long streamSize) {
+    streamSZ = streamSize;
+    totalBT = totalBytesTransferred;
+    calls++;
+  }
 
-    public long getStreamSize(){
-        return(streamSZ);
-    }
+  public long getStreamSize() {
+    return (streamSZ);
+  }
 
-    public long getTotalBT(){
-        return(totalBT);
-    }
+  public long getTotalBT() {
+    return (totalBT);
+  }
 }

@@ -30,7 +30,7 @@ import java.util.Set;
 
 /**
  * A service interface to describe how to load {@link NotificationGateway} services into MISO
- *
+ * 
  * @author Rob Davey
  * @date 07/02/12
  * @since 0.1.5
@@ -38,6 +38,7 @@ import java.util.Set;
 public interface NotificationGatewayService {
   /**
    * For a given {@link PlatformType}, return a Set of {@link NotificationGateway} objects that are available
+   * 
    * @param pt
    * @return the Set of {@link NotificationGateway} objects that have been exposed by a given service loading mechanism
    */

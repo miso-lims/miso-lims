@@ -31,7 +31,7 @@ import org.springframework.context.ApplicationContextAware;
  * uk.ac.bbsrc.tgac.miso.webapp.context
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 05-Aug-2011
  * @since 0.0.3
@@ -58,4 +58,3 @@ public class ApplicationContextProvider implements ApplicationContextAware {
     this.ctx = ctx;
   }
 }
-

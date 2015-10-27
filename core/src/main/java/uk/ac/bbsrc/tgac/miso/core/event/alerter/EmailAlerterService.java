@@ -37,7 +37,7 @@ import java.util.Properties;
  * uk.ac.bbsrc.tgac.miso.core.event.service
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 29/09/11
  * @since 0.1.2
@@ -56,8 +56,7 @@ public class EmailAlerterService implements AlerterService {
     if (!mailProps.containsKey("mail.smtp.host")) {
       log.error("No SMTP host specified in the mail.properties configuration file. Cannot send email.");
       throw new AlertingException("No SMTP host specified in the mail.properties configuration file. Cannot send email.");
-    }
-    else {
+    } else {
       String from = mailProps.getProperty("mail.from");
       if (from == null || "".equals(from)) {
         from = "miso@your.miso.server";
@@ -65,12 +64,8 @@ public class EmailAlerterService implements AlerterService {
 
       String to = a.getAlertUser().getEmail();
       String subject = "MISO ALERT: " + a.getAlertTitle();
-      String text = "Hello " +
-                    a.getAlertUser().getFullName() +
-                    ",\n\nMISO would like to tell you about something:\n\n" +
-                    a.getAlertTitle() + " ("+a.getAlertDate()+")" +
-                    "\n\n" +
-                    a.getAlertText();
+      String text = "Hello " + a.getAlertUser().getFullName() + ",\n\nMISO would like to tell you about something:\n\n" + a.getAlertTitle()
+          + " (" + a.getAlertDate() + ")" + "\n\n" + a.getAlertText();
       try {
         EmailUtils.send(to, from, subject, text, mailProps);
       } catch (MessagingException e) {

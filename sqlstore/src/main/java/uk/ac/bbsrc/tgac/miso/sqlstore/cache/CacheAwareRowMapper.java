@@ -10,7 +10,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
  * uk.ac.bbsrc.tgac.miso.sqlstore.cache
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 14/02/13
  * @since 0.1.9
@@ -21,16 +21,15 @@ public abstract class CacheAwareRowMapper<T> implements RowMapper<T> {
   private String cacheName = null;
 
   public CacheAwareRowMapper(Class<T> clz) {
-    this.cacheName = LimsUtils.noddyCamelCaseify(clz.getSimpleName())+"Cache";
+    this.cacheName = LimsUtils.noddyCamelCaseify(clz.getSimpleName()) + "Cache";
   }
 
   public CacheAwareRowMapper(Class<T> clz, boolean lazy) {
     this.lazy = lazy;
     if (lazy) {
-      this.cacheName = "lazy"+LimsUtils.capitalise(clz.getSimpleName())+"Cache";
-    }
-    else {
-      this.cacheName = LimsUtils.noddyCamelCaseify(clz.getSimpleName())+"Cache";
+      this.cacheName = "lazy" + LimsUtils.capitalise(clz.getSimpleName()) + "Cache";
+    } else {
+      this.cacheName = LimsUtils.noddyCamelCaseify(clz.getSimpleName()) + "Cache";
     }
   }
 
@@ -40,10 +39,9 @@ public abstract class CacheAwareRowMapper<T> implements RowMapper<T> {
 
     if (cacheEnabled) {
       if (lazy && !cacheName.startsWith("lazy")) {
-        this.cacheName = "lazy"+LimsUtils.capitalise(clz.getSimpleName())+"Cache";
-      }
-      else {
-        this.cacheName = LimsUtils.noddyCamelCaseify(clz.getSimpleName())+"Cache";
+        this.cacheName = "lazy" + LimsUtils.capitalise(clz.getSimpleName()) + "Cache";
+      } else {
+        this.cacheName = LimsUtils.noddyCamelCaseify(clz.getSimpleName()) + "Cache";
       }
     }
   }
@@ -55,9 +53,8 @@ public abstract class CacheAwareRowMapper<T> implements RowMapper<T> {
   public CacheAwareRowMapper(String cacheName, boolean lazy) {
     this.lazy = lazy;
     if (lazy && !cacheName.startsWith("lazy")) {
-      this.cacheName = "lazy"+LimsUtils.capitalise(cacheName);
-    }
-    else {
+      this.cacheName = "lazy" + LimsUtils.capitalise(cacheName);
+    } else {
       this.cacheName = cacheName;
     }
   }
@@ -68,9 +65,8 @@ public abstract class CacheAwareRowMapper<T> implements RowMapper<T> {
 
     if (cacheEnabled) {
       if (lazy && !cacheName.startsWith("lazy")) {
-        this.cacheName = "lazy"+LimsUtils.capitalise(cacheName);
-      }
-      else {
+        this.cacheName = "lazy" + LimsUtils.capitalise(cacheName);
+      } else {
         this.cacheName = cacheName;
       }
     }
@@ -100,14 +96,11 @@ public abstract class CacheAwareRowMapper<T> implements RowMapper<T> {
           return c;
         }
         throw new CacheException("No such cache: " + getCacheName());
-      }
-      else {
+      } else {
         return null;
       }
-    }
-    else {
+    } else {
       throw new UnsupportedOperationException("Cannot lookup cache when mapping caches aren't enabled");
     }
   }
 }
-

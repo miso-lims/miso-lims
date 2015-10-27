@@ -36,7 +36,7 @@ import java.util.LinkedList;
  * uk.ac.bbsrc.tgac.miso.core.data.impl
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.1.4
  */

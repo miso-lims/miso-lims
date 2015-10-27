@@ -40,9 +40,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * A Spring filter that checks whether a session has expired when doing an AJAX request. Usually, the request would just fail, but
- * this class allows a proper response to be generated, and users can be informed/kicked back to the login page.
- *
+ * A Spring filter that checks whether a session has expired when doing an AJAX request. Usually, the request would just fail, but this
+ * class allows a proper response to be generated, and users can be informed/kicked back to the login page.
+ * 
  * @author Rob Davey
  * @date 27-Sep-2010
  * @since 0.0.2
@@ -62,8 +62,9 @@ public class AjaxSessionFilter extends SessionManagementFilter {
 
   /**
    * Creates a new AjaxSessionFilter instance with a defined SecurityContextRepository
-   *
-   * @param securityContextRepository of type SecurityContextRepository
+   * 
+   * @param securityContextRepository
+   *          of type SecurityContextRepository
    */
   public AjaxSessionFilter(SecurityContextRepository securityContextRepository) {
     super(securityContextRepository);
@@ -72,27 +73,34 @@ public class AjaxSessionFilter extends SessionManagementFilter {
 
   /**
    * Does the filtering at the given point in the filter chain.
-   *
-   * @param req of type ServletRequest
-   * @param res of type ServletResponse
-   * @param chain of type FilterChain
-   * @throws AuthenticationException when
-   * @throws IOException when
-   * @throws ServletException when
+   * 
+   * @param req
+   *          of type ServletRequest
+   * @param res
+   *          of type ServletResponse
+   * @param chain
+   *          of type FilterChain
+   * @throws AuthenticationException
+   *           when
+   * @throws IOException
+   *           when
+   * @throws ServletException
+   *           when
    */
   @Override
-  public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws AuthenticationException, IOException, ServletException {
+  public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws AuthenticationException, IOException,
+      ServletException {
     HttpServletRequest request = (HttpServletRequest) req;
     HttpServletResponse response = (HttpServletResponse) res;
     if (request.getAttribute(FILTER_APPLIED) != null) {
-        chain.doFilter(request, response);
-        return;
+      chain.doFilter(request, response);
+      return;
     }
 
     request.setAttribute(FILTER_APPLIED, Boolean.TRUE);
 
     if (!securityContextRepository.containsContext(request)) {
-      //if a session has been created for this user instance, and that session is no longer valid, then do this filter
+      // if a session has been created for this user instance, and that session is no longer valid, then do this filter
       if (request.getRequestedSessionId() != null && !request.isRequestedSessionIdValid()) {
         log.debug("Session expired - informing client.");
         request.getSession();
@@ -100,14 +108,14 @@ public class AjaxSessionFilter extends SessionManagementFilter {
         jsonObject.write(res.getWriter());
         return;
       }
-      //else just carry on with the filter chain as normal
+      // else just carry on with the filter chain as normal
       else {
         chain.doFilter(req, res);
         return;
       }
     }
 
-    chain.doFilter(req,res);
+    chain.doFilter(req, res);
     return;
   }
 }

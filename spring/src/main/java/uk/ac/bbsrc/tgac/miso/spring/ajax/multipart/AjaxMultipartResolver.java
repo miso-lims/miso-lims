@@ -44,7 +44,7 @@ import java.util.Map;
  * uk.ac.bbsrc.tgac.miso.spring.ajax.multipart
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -68,12 +68,11 @@ public class AjaxMultipartResolver extends CommonsMultipartResolver {
           multipartContentTypes.put(f.getName(), f.getContentType());
         }
       }
-      return new DefaultMultipartHttpServletRequest(request, parsingResult.getMultipartFiles(), parsingResult.getMultipartParameters(), multipartContentTypes);
-    }
-    catch (FileUploadBase.SizeLimitExceededException ex) {
+      return new DefaultMultipartHttpServletRequest(request, parsingResult.getMultipartFiles(), parsingResult.getMultipartParameters(),
+          multipartContentTypes);
+    } catch (FileUploadBase.SizeLimitExceededException ex) {
       throw new MaxUploadSizeExceededException(fileUpload.getSizeMax(), ex);
-    }
-    catch (FileUploadException ex) {
+    } catch (FileUploadException ex) {
       throw new MultipartException("Could not parse multipart servlet request", ex);
     }
   }
@@ -86,4 +85,3 @@ public class AjaxMultipartResolver extends CommonsMultipartResolver {
     this.fileUploadListener = fileUploadListener;
   }
 }
-

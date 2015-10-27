@@ -27,17 +27,15 @@ import java.util.ArrayList;
 
 /**
  * Enum holding submission constants. Do not use!
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public enum TgacSubmissionConstants {
-  CENTRE_NAME("TGAC"),
-  CENTRE_ACRONYM("TGAC"),
-  ACCOUNT_NUMBER("ERB000046"),
-  DROP_BOX("era-drop-46");
+  CENTRE_NAME("TGAC"), CENTRE_ACRONYM("TGAC"), ACCOUNT_NUMBER("ERB000046"), DROP_BOX("era-drop-46");
 
   private String key;
+
   TgacSubmissionConstants(String key) {
     this.key = key;
   }

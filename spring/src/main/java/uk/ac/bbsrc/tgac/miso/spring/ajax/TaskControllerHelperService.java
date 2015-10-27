@@ -39,7 +39,7 @@ import javax.servlet.http.HttpSession;
  * uk.ac.bbsrc.tgac.miso.spring.ajax
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 15/11/11
  * @since 0.1.3
@@ -67,8 +67,7 @@ public class TaskControllerHelperService {
         return j;
       }
       return JSONUtils.SimpleJSONError("No pipeline name specified");
-    }
-    catch (IntegrationException e) {
+    } catch (IntegrationException e) {
       return JSONUtils.SimpleJSONError("Cannot populate pipeline: " + e.getMessage());
     }
   }
@@ -78,8 +77,7 @@ public class TaskControllerHelperService {
       JSONObject j = new JSONObject();
       j.put("runningTasks", getAnalysisQueryService().getRunningTasks());
       return j;
-    }
-    catch (IntegrationException e) {
+    } catch (IntegrationException e) {
       return JSONUtils.SimpleJSONError("Cannot populate running tasks: " + e.getMessage());
     }
   }
@@ -89,8 +87,7 @@ public class TaskControllerHelperService {
       JSONObject j = new JSONObject();
       j.put("pendingTasks", getAnalysisQueryService().getPendingTasks());
       return j;
-    }
-    catch (IntegrationException e) {
+    } catch (IntegrationException e) {
       return JSONUtils.SimpleJSONError("Cannot populate pending tasks: " + e.getMessage());
     }
   }
@@ -100,8 +97,7 @@ public class TaskControllerHelperService {
       JSONObject j = new JSONObject();
       j.put("failedTasks", getAnalysisQueryService().getFailedTasks());
       return j;
-    }
-    catch (IntegrationException e) {
+    } catch (IntegrationException e) {
       return JSONUtils.SimpleJSONError("Cannot populate running tasks: " + e.getMessage());
     }
   }
@@ -111,8 +107,7 @@ public class TaskControllerHelperService {
       JSONObject j = new JSONObject();
       j.put("completedTasks", getAnalysisQueryService().getCompletedTasks());
       return j;
-    }
-    catch (IntegrationException e) {
+    } catch (IntegrationException e) {
       return JSONUtils.SimpleJSONError("Cannot populate completed tasks: " + e.getMessage());
     }
   }
@@ -122,8 +117,7 @@ public class TaskControllerHelperService {
       JSONObject j = new JSONObject();
       j.put("pipelines", getAnalysisQueryService().getPipelines());
       return j;
-    }
-    catch (IntegrationException e) {
+    } catch (IntegrationException e) {
       return JSONUtils.SimpleJSONError("Cannot populate pipelines: " + e.getMessage());
     }
   }
@@ -137,8 +131,7 @@ public class TaskControllerHelperService {
       }
       log.info("Submitting: " + out.toString());
       return getAnalysisQueryService().submitTask(out);
-    }
-    catch (IntegrationException e) {
+    } catch (IntegrationException e) {
       return JSONUtils.SimpleJSONError("Cannot populate pipelines: " + e.getMessage());
     }
   }

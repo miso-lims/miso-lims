@@ -34,18 +34,18 @@ import java.util.Map;
  * uk.ac.bbsrc.tgac.miso.webapp.util
  * <p/>
  * Utility class containing static methods for helping with tasks specific to the miso-web module
- *
+ * 
  * @author Rob Davey
  * @date 03-Sep-2010
  * @since 0.0.2
  */
 public class MisoWebUtils {
   public static String generateErrorDivMessage(String errorMessage) {
-    return "<div id='errordiv' class='flasherror'>"+errorMessage+"</div>";
+    return "<div id='errordiv' class='flasherror'>" + errorMessage + "</div>";
   }
 
   public static String generateErrorDivMessage(String errorMessage, String exceptionMessage) {
-    return "<div id='errordiv' class='flasherror'>"+errorMessage+"<br/><pre>"+exceptionMessage+"</pre></div>";
+    return "<div id='errordiv' class='flasherror'>" + errorMessage + "<br/><pre>" + exceptionMessage + "</pre></div>";
   }
 
   public static Map<String, String> checkStorageDirectories(String baseStoragePath) {
@@ -59,17 +59,15 @@ public class MisoWebUtils {
           LimsUtils.checkDirectory(new File(baseStoragePath, "log"), true);
           LimsUtils.checkDirectory(new File(baseStoragePath, "temp"), true);
           checks.put("ok", "All storage directories OK");
+        } else {
+          checks.put("error",
+              "MISO storage directory seems to exist, but some other IO error occurred. Please check that this directory is writable.");
         }
-        else {
-          checks.put("error", "MISO storage directory seems to exist, but some other IO error occurred. Please check that this directory is writable.");
-        }
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
         e.printStackTrace();
         checks.put("error", "Cannot access one of the MISO storage directories: " + e.getMessage());
       }
-    }
-    else {
+    } else {
       checks.put("error", "MISO storage directory is defined, but must end with a trailing slash!");
     }
     return checks;
@@ -84,8 +82,7 @@ public class MisoWebUtils {
         LimsUtils.checkFile(new File(baseStoragePath, "security.properties"));
         LimsUtils.checkFile(new File(baseStoragePath, "submission.properties"));
         checks.put("ok", "All core properties files OK");
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
         e.printStackTrace();
         checks.put("error", "Cannot access one of the MISO core properties files: " + e.getMessage());
       }

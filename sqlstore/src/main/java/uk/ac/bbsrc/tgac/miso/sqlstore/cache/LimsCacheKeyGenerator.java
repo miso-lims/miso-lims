@@ -33,7 +33,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Study;
  * uk.ac.bbsrc.tgac.miso.sqlstore.cache
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -42,7 +42,7 @@ public class LimsCacheKeyGenerator extends AbstractCacheKeyGenerator<Long> {
   }
 
   public LimsCacheKeyGenerator(boolean includeMethod, boolean includeParameterTypes) {
-      super(includeMethod, includeParameterTypes);
+    super(includeMethod, includeParameterTypes);
   }
 
   @Override
@@ -52,22 +52,19 @@ public class LimsCacheKeyGenerator extends AbstractCacheKeyGenerator<Long> {
 
   protected final Long deepIDCode(Object o[]) {
     Long code = 0L;
-    if (o == null)
-        return code;
+    if (o == null) return code;
 
     for (final Object a : o) {
       if (a instanceof Partition) {
-        code = ((Partition)a).getId();
+        code = ((Partition) a).getId();
       }
       if (a instanceof Project) {
-        code = ((Project)a).getId();
+        code = ((Project) a).getId();
+      } else if (a instanceof Experiment) {
+        code = ((Experiment) a).getId();
+      } else if (a instanceof Study) {
+        code = ((Study) a).getId();
       }
-      else if (a instanceof Experiment) {
-        code = ((Experiment)a).getId();
-      }
-      else if (a instanceof Study) {
-        code = ((Study)a).getId();
-      }      
     }
     return code;
   }

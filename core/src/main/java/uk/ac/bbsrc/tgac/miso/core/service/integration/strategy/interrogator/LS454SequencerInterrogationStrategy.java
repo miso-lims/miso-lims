@@ -60,10 +60,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * A concrete implementation of a SequencerInterrogationStrategy that can make queries and parse results, supported by a MisoPerlDaemonInterrogationMechanism, to a 454 sequencer.
+ * A concrete implementation of a SequencerInterrogationStrategy that can make queries and parse results, supported by a
+ * MisoPerlDaemonInterrogationMechanism, to a 454 sequencer.
  * <p/>
- * Methods in this class are not usually called explicitly, but via a {@link SequencerInterrogator} that has wrapped up this strategy to a SequencerReference.
- *
+ * Methods in this class are not usually called explicitly, but via a {@link SequencerInterrogator} that has wrapped up this strategy to a
+ * SequencerReference.
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -90,8 +92,7 @@ public class LS454SequencerInterrogationStrategy implements SequencerInterrogati
             StatusImpl status = new StatusImpl();
             if (j.has("complete") && j.getString("complete").equals("true")) {
               status.setHealth(HealthType.Completed);
-            }
-            else {
+            } else {
               status.setHealth(HealthType.Running);
             }
 
@@ -103,21 +104,18 @@ public class LS454SequencerInterrogationStrategy implements SequencerInterrogati
             Node n = statusDoc.getElementsByTagName("run").item(0);
             for (int i = 0; i < n.getChildNodes().getLength(); i++) {
               Node child = n.getChildNodes().item(i);
-              if(child instanceof Element && ((Element) child).getTagName().equals("id")) {
+              if (child instanceof Element && ((Element) child).getTagName().equals("id")) {
                 status.setRunName(child.getTextContent());
               }
             }
             s.add(status);
-          }
-          catch (ParserConfigurationException e) {
+          } catch (ParserConfigurationException e) {
             e.printStackTrace();
             throw new InterrogationException(e.getMessage());
-          }
-          catch (ParseException e) {
+          } catch (ParseException e) {
             e.printStackTrace();
             throw new InterrogationException(e.getMessage());
-          }
-          catch (TransformerException e) {
+          } catch (TransformerException e) {
             e.printStackTrace();
             throw new InterrogationException(e.getMessage());
           }
@@ -133,7 +131,8 @@ public class LS454SequencerInterrogationStrategy implements SequencerInterrogati
 
   @Override
   public List<String> listRunsByHealthType(SequencerReference sr, HealthType healthType) throws InterrogationException {
-    String response = doQuery(sr, new MisoPerlDaemonInterrogationMechanism(), new MisoPerlDaemonQuery("454", healthType.getKey().toLowerCase())).parseResult();
+    String response = doQuery(sr, new MisoPerlDaemonInterrogationMechanism(),
+        new MisoPerlDaemonQuery("454", healthType.getKey().toLowerCase())).parseResult();
     List<String> s = new ArrayList<String>();
     if (response != null) {
       String[] ss = response.split(",");
@@ -199,8 +198,7 @@ public class LS454SequencerInterrogationStrategy implements SequencerInterrogati
             StatusImpl status = new StatusImpl();
             if (j.has("complete") && j.getString("complete").equals("true")) {
               status.setHealth(HealthType.Completed);
-            }
-            else {
+            } else {
               status.setHealth(HealthType.Running);
             }
             Document statusDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
@@ -211,7 +209,7 @@ public class LS454SequencerInterrogationStrategy implements SequencerInterrogati
             Node n = statusDoc.getElementsByTagName("run").item(0);
             for (int i = 0; i < n.getChildNodes().getLength(); i++) {
               Node child = n.getChildNodes().item(i);
-              if(child instanceof Element && ((Element) child).getTagName().equals("id")) {
+              if (child instanceof Element && ((Element) child).getTagName().equals("id")) {
                 status.setRunName(child.getTextContent());
               }
             }
@@ -219,16 +217,13 @@ public class LS454SequencerInterrogationStrategy implements SequencerInterrogati
           }
         }
       }
-    }
-    catch (ParserConfigurationException e) {
+    } catch (ParserConfigurationException e) {
       e.printStackTrace();
       throw new InterrogationException(e.getMessage());
-    }
-    catch (ParseException e) {
+    } catch (ParseException e) {
       e.printStackTrace();
       throw new InterrogationException(e.getMessage());
-    }
-    catch (TransformerException e) {
+    } catch (TransformerException e) {
       e.printStackTrace();
       throw new InterrogationException(e.getMessage());
     }
@@ -251,26 +246,24 @@ public class LS454SequencerInterrogationStrategy implements SequencerInterrogati
             if (!info.isEmpty()) {
               if (info.isArray()) {
                 json.put("response", info);
-              }
-              else {
-                return (JSONObject)info;
+              } else {
+                return (JSONObject) info;
               }
             }
           }
         }
       }
-    }
-    catch (InterrogationException ie) {
+    } catch (InterrogationException ie) {
       ie.printStackTrace();
     }
     return json;
   }
 
-  private InterrogationResult<String> doQuery(SequencerReference sr, InterrogationMechanism mechanism, MisoPerlDaemonQuery query) throws InterrogationException {
+  private InterrogationResult<String> doQuery(SequencerReference sr, InterrogationMechanism mechanism, MisoPerlDaemonQuery query)
+      throws InterrogationException {
     log.info("Pushing query: " + query.generateQuery());
     InterrogationResult<String> result = mechanism.doQuery(sr, query);
     log.info("Consuming result: " + result.parseResult());
     return result;
   }
 }
-

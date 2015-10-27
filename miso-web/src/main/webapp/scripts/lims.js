@@ -198,7 +198,6 @@ Utils.ui = {
 Utils.fileUpload = {
   fileUploadProgress: function (formname, divname, successfunc) {
     var self = this;
-    //self.processingOverlay();
 
     Fluxion.doAjaxUpload(
       formname,
@@ -226,7 +225,6 @@ Utils.validation = {
   validate_input_field: function (field, name, okstatus) {
     var self = this;
     var errormsg = '';
-    //if (!jQuery(field).val().match(/^[a-zA-Z0-9_\^\-\.\s]+$/)) {
     if (!self._unicodeWord.test(jQuery(field).val())) {
       okstatus = false;
       errormsg = "In the " + name + " " + jQuery(field).attr("id") +

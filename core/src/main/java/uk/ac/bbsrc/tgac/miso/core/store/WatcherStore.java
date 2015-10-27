@@ -33,7 +33,7 @@ import java.util.Collection;
  * uk.ac.bbsrc.tgac.miso.core.store
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 05/12/11
  * @since 0.1.3
@@ -42,8 +42,9 @@ public interface WatcherStore {
   /**
    * Get the list of Users that are watching an entity given an entity name (defined by that entity's {@link Watchable}
    * getWatchableIdentifier method)
-   *
-   * @param entityName of type String
+   * 
+   * @param entityName
+   *          of type String
    * @return Collection<User>
    * @throws IOException
    */
@@ -51,8 +52,9 @@ public interface WatcherStore {
 
   /**
    * Get the list of Users that are in a given watcher group
-   *
-   * @param groupName of type String
+   * 
+   * @param groupName
+   *          of type String
    * @return Collection<User>
    * @throws IOException
    */
@@ -60,9 +62,11 @@ public interface WatcherStore {
 
   /**
    * Unregister a watched entity / user coupling
-   *
-   * @param watchable of type Watchable
-   * @param user of type User
+   * 
+   * @param watchable
+   *          of type Watchable
+   * @param user
+   *          of type User
    * @throws IOException
    * @return true if removal was successful
    */
@@ -70,8 +74,9 @@ public interface WatcherStore {
 
   /**
    * Unregister this watched entity
-   *
-   * @param watchable of type Watchable
+   * 
+   * @param watchable
+   *          of type Watchable
    * @return true if removal was successful
    * @throws IOException
    */
@@ -79,9 +84,11 @@ public interface WatcherStore {
 
   /**
    * Register a watched entity / user coupling
-   *
-   * @param watchable of type Watchable
-   * @param user of type User
+   * 
+   * @param watchable
+   *          of type Watchable
+   * @param user
+   *          of type User
    * @throws IOException
    */
   void saveWatchedEntityUser(Watchable watchable, User user) throws IOException;

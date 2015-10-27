@@ -42,7 +42,7 @@ import java.util.*;
 
 /**
  * Concrete implementation of a Submission that
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -79,8 +79,9 @@ public class SubmissionImpl implements Submission<Submittable, Document, Documen
 
   /**
    * Construct a new Submission with a SecurityProfile owned by the given User
-   *
-   * @param user of type User
+   * 
+   * @param user
+   *          of type User
    */
   public SubmissionImpl(User user) {
     setSecurityProfile(new SecurityProfile(user));
@@ -179,9 +180,8 @@ public class SubmissionImpl implements Submission<Submittable, Document, Documen
 
   public void addSubmissionElement(Submittable s) {
     if (!submittables.contains(s)) {
-        submittables.add(s);
-    }
-    else {
+      submittables.add(s);
+    } else {
       log.debug(s.getClass().getSimpleName() + " already exists in the Submission payload. Not adding.");
     }
   }
@@ -224,8 +224,7 @@ public class SubmissionImpl implements Submission<Submittable, Document, Documen
   public void inheritPermissions(SecurableByProfile parent) throws SecurityException {
     if (parent.getSecurityProfile().getOwner() != null) {
       setSecurityProfile(parent.getSecurityProfile());
-    }
-    else {
+    } else {
       throw new SecurityException("Cannot inherit permissions when parent object owner is not set!");
     }
   }
@@ -238,8 +237,6 @@ public class SubmissionImpl implements Submission<Submittable, Document, Documen
   @Override
   public boolean userCanWrite(User user) {
     return securityProfile.userCanWrite(user);
-      //return this.userCanWrite(user);
-
   }
 
   @Override
@@ -249,12 +246,12 @@ public class SubmissionImpl implements Submission<Submittable, Document, Documen
   @Override
   public Document submit(SubmissionManager manager) throws SubmissionException {
     submittables.add(this);
-    return (Document)manager.submit(submittables);
+    return (Document) manager.submit(submittables);
   }
 
   @Override
   public int compareTo(Object o) {
-    Submission t = (Submission)o;
+    Submission t = (Submission) o;
     if (getId() < t.getId()) return -1;
     if (getId() > t.getId()) return 1;
     return 0;

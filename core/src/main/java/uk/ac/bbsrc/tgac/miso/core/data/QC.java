@@ -29,10 +29,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import java.util.Date;
 
 /**
- * A QC represents a validation step carried out on a given model object,
- * e.g. a {@link Library} via a {@link LibraryQC}, a {@link Sample} via a {@link SampleQC}, or a  {@link Run} via a
- * {@link RunQC}
- *
+ * A QC represents a validation step carried out on a given model object, e.g. a {@link Library} via a {@link LibraryQC}, a {@link Sample}
+ * via a {@link SampleQC}, or a {@link Run} via a {@link RunQC}
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -43,7 +42,7 @@ public interface QC extends Securable, Comparable, Deletable {
 
   /**
    * Returns the qcId of this QC object.
-   *
+   * 
    * @return Long qcId.
    */
   @Deprecated
@@ -51,51 +50,55 @@ public interface QC extends Securable, Comparable, Deletable {
 
   /**
    * Sets the qcId of this QC object.
-   *
-   * @param qcId qcId.
+   * 
+   * @param qcId
+   *          qcId.
    */
   @Deprecated
   public void setQcId(Long qcId);
 
   /**
    * Returns the qcCreator of this QC object.
-   *
+   * 
    * @return String qcCreator.
    */
   public String getQcCreator();
 
   /**
    * Sets the qcCreator of this QC object.
-   *
-   * @param creator qcCreator.
+   * 
+   * @param creator
+   *          qcCreator.
    */
   public void setQcCreator(String creator);
 
   /**
    * Returns the qcMethod of this QC object.
-   *
+   * 
    * @return String qcMethod.
    */
   public QcType getQcType();
 
   /**
    * Sets the QcType of this QC object.
-   *
-   * @param type type.
+   * 
+   * @param type
+   *          type.
    */
   public void setQcType(QcType type);
 
   /**
    * Returns the qcDate of this QC object.
-   *
+   * 
    * @return Date qcDate.
    */
   public Date getQcDate();
 
   /**
    * Sets the qcDate of this QC object.
-   *
-   * @param date qcDate.
+   * 
+   * @param date
+   *          qcDate.
    */
   public void setQcDate(Date date);
 }

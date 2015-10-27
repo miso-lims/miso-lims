@@ -64,8 +64,7 @@ public class ListPlatesController {
       Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> lp = requestManager.listAllPlates();
       model.addAttribute("plates", lp);
       return new ModelAndView("/pages/listPlates.jsp", model);
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to list plates", ex);
       }

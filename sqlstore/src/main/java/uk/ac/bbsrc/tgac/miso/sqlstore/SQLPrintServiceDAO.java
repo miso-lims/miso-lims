@@ -23,9 +23,15 @@
 
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Collection;
+import java.util.List;
+
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +40,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.PrintManager;
@@ -45,17 +52,13 @@ import uk.ac.bbsrc.tgac.miso.core.service.printing.schema.BarcodableSchema;
 import uk.ac.bbsrc.tgac.miso.core.store.PrintServiceStore;
 import uk.ac.bbsrc.tgac.miso.core.util.PrintServiceUtils;
 
-import java.io.IOException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Collection;
-import java.util.List;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 16-Apr-2012
  * @since 0.1.6
@@ -63,26 +66,22 @@ import java.util.List;
 public class SQLPrintServiceDAO implements PrintServiceStore {
   private static final String TABLE_NAME = "PrintService";
 
-  public static final String PRINT_SERVICE_SELECT =
-      "SELECT serviceId, serviceName, contextName, contextFields, enabled, printServiceFor, printSchema " +
-      "FROM " + TABLE_NAME;
+  public static final String PRINT_SERVICE_SELECT = "SELECT serviceId, serviceName, contextName, contextFields, enabled, printServiceFor, printSchema "
+      + "FROM " + TABLE_NAME;
 
-  public static final String PRINT_SERVICE_SELECT_BY_SERVICE_ID =
-      PRINT_SERVICE_SELECT + " WHERE serviceId = ?";
+  public static final String PRINT_SERVICE_SELECT_BY_SERVICE_ID = PRINT_SERVICE_SELECT + " WHERE serviceId = ?";
 
-  public static final String PRINT_SERVICE_SELECT_BY_SERVICE_NAME =
-      PRINT_SERVICE_SELECT + " WHERE serviceName = ?";
+  public static final String PRINT_SERVICE_SELECT_BY_SERVICE_NAME = PRINT_SERVICE_SELECT + " WHERE serviceName = ?";
 
-  public static final String PRINT_SERVICES_SELECT_BY_CONTEXT_NAME =
-      PRINT_SERVICE_SELECT + " WHERE contextName = ?";
+  public static final String PRINT_SERVICES_SELECT_BY_CONTEXT_NAME = PRINT_SERVICE_SELECT + " WHERE contextName = ?";
 
-  public static final String PRINT_SERVICES_SELECT_BY_CLASS =
-      PRINT_SERVICE_SELECT + " WHERE printServiceFor = ?";
+  public static final String PRINT_SERVICES_SELECT_BY_CLASS = PRINT_SERVICE_SELECT + " WHERE printServiceFor = ?";
 
-  public static final String PRINT_SERVICE_UPDATE =
-      "UPDATE " + TABLE_NAME + " " +
-      "SET contextName=:contextName, contextFields=:contextFields, enabled=:enabled, printServiceFor=:printServiceFor, printSchema=:printSchema " +
-      "WHERE serviceName=:serviceName";
+  public static final String PRINT_SERVICE_UPDATE = "UPDATE "
+      + TABLE_NAME
+      + " "
+      + "SET contextName=:contextName, contextFields=:contextFields, enabled=:enabled, printServiceFor=:printServiceFor, printSchema=:printSchema "
+      + "WHERE serviceName=:serviceName";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLPrintServiceDAO.class);
   private JdbcTemplate template;
@@ -119,28 +118,24 @@ public class SQLPrintServiceDAO implements PrintServiceStore {
   @Override
   public long save(MisoPrintService printService) throws IOException {
     MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("serviceName", printService.getName())
-        .addValue("contextName", printService.getPrintContext().getName())
-        .addValue("enabled", printService.isEnabled())
-        .addValue("printServiceFor", printService.getPrintServiceFor().getName())
-        .addValue("printSchema", printService.getBarcodableSchema().getName());
+    params.addValue("serviceName", printService.getName());
+    params.addValue("contextName", printService.getPrintContext().getName());
+    params.addValue("enabled", printService.isEnabled());
+    params.addValue("printServiceFor", printService.getPrintServiceFor().getName());
+    params.addValue("printSchema", printService.getBarcodableSchema().getName());
     try {
       JSONObject contextFields = PrintServiceUtils.mapContextFieldsToJSON(printService.getPrintContext());
       String contextFieldJSON = contextFields.toString();
       params.addValue("contextFields", contextFieldJSON);
-    }
-    catch (IllegalAccessException e) {
+    } catch (IllegalAccessException e) {
       e.printStackTrace();
     }
 
     if (printService.getServiceId() == -1) {
-      SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-          .withTableName(TABLE_NAME)
-          .usingGeneratedKeyColumns("serviceId");
+      SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("serviceId");
       Number newId = insert.executeAndReturnKey(params);
       printService.setServiceId(newId.longValue());
-    }
-    else {
+    } else {
       params.addValue("serviceId", printService.getServiceId());
       NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
       namedTemplate.update(PRINT_SERVICE_UPDATE, params);
@@ -149,7 +144,7 @@ public class SQLPrintServiceDAO implements PrintServiceStore {
   }
 
   public MisoPrintService get(long serviceId) throws IOException {
-    List eResults = template.query(PRINT_SERVICE_SELECT_BY_SERVICE_ID, new Object[]{serviceId}, new MisoPrintServiceMapper());
+    List eResults = template.query(PRINT_SERVICE_SELECT_BY_SERVICE_ID, new Object[] { serviceId }, new MisoPrintServiceMapper());
     MisoPrintService e = eResults.size() > 0 ? (MisoPrintService) eResults.get(0) : null;
     return e;
   }
@@ -160,7 +155,7 @@ public class SQLPrintServiceDAO implements PrintServiceStore {
   }
 
   public MisoPrintService getByName(String serviceName) throws IOException {
-    List eResults = template.query(PRINT_SERVICE_SELECT_BY_SERVICE_NAME, new Object[]{serviceName}, new MisoPrintServiceMapper());
+    List eResults = template.query(PRINT_SERVICE_SELECT_BY_SERVICE_NAME, new Object[] { serviceName }, new MisoPrintServiceMapper());
     MisoPrintService e = eResults.size() > 0 ? (MisoPrintService) eResults.get(0) : null;
     return e;
   }
@@ -176,7 +171,7 @@ public class SQLPrintServiceDAO implements PrintServiceStore {
 
   @Override
   public List<MisoPrintService> listByContext(String contextName) throws IOException {
-    return template.query(PRINT_SERVICES_SELECT_BY_CONTEXT_NAME, new Object[]{contextName}, new MisoPrintServiceMapper());
+    return template.query(PRINT_SERVICES_SELECT_BY_CONTEXT_NAME, new Object[] { contextName }, new MisoPrintServiceMapper());
   }
 
   public class MisoPrintServiceMapper implements RowMapper<MisoPrintService> {
@@ -186,9 +181,9 @@ public class SQLPrintServiceDAO implements PrintServiceStore {
 
         PrintContext pc = printManager.getPrintContext(rs.getString("contextName"));
         BarcodableSchema barcodableSchema = printManager.getBarcodableSchema(rs.getString("printSchema"));
-        if (barcodableSchema !=null){
-        barcodableSchema.getBarcodeLabelFactory().setFilesManager(misoFilesManager);
-        barcodableSchema.getBarcodeLabelFactory().setSecurityManager(securityManager);
+        if (barcodableSchema != null) {
+          barcodableSchema.getBarcodeLabelFactory().setFilesManager(misoFilesManager);
+          barcodableSchema.getBarcodeLabelFactory().setSecurityManager(securityManager);
         }
 
         if ("net.sf.json.JSONObject".equals(rs.getString("printServiceFor"))) {
@@ -202,8 +197,7 @@ public class SQLPrintServiceDAO implements PrintServiceStore {
 
           JSONObject contextFields = JSONObject.fromObject(rs.getString("contextFields"));
           PrintServiceUtils.mapJSONToContextFields(contextFields, pc);
-        }
-        else {
+        } else {
           printService = new DefaultPrintService();
           printService.setBarcodableSchema(barcodableSchema);
 
@@ -219,17 +213,13 @@ public class SQLPrintServiceDAO implements PrintServiceStore {
         printService.setPrintContext(pc);
 
         return printService;
-      }
-      catch (ClassNotFoundException e) {
+      } catch (ClassNotFoundException e) {
         e.printStackTrace();
-      }
-      catch (IllegalAccessException e) {
+      } catch (IllegalAccessException e) {
         e.printStackTrace();
-      }
-      catch (JSONException e) {
+      } catch (JSONException e) {
         e.printStackTrace();
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
         e.printStackTrace();
       }
       return null;

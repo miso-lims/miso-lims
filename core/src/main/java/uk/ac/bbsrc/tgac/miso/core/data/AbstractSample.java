@@ -37,7 +37,7 @@ import java.util.*;
 
 /**
  * Skeleton implementation of a Sample
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -90,6 +90,7 @@ public abstract class AbstractSample implements Sample {
   public void setProject(Project project) {
     this.project = project;
   }
+
   @Deprecated
   public Long getSampleId() {
     return sampleId;
@@ -184,14 +185,13 @@ public abstract class AbstractSample implements Sample {
 
   public Collection<Library> getLibraries() {
     return libraries;
-  }  
+  }
 
   public void addQc(SampleQC sampleQc) throws MalformedSampleQcException {
     this.sampleQCs.add(sampleQc);
     try {
       sampleQc.setSample(this);
-    }
-    catch (MalformedSampleException e) {
+    } catch (MalformedSampleException e) {
       e.printStackTrace();
     }
   }
@@ -229,14 +229,10 @@ public abstract class AbstractSample implements Sample {
   }
 
   /*
-  public Document getSubmissionData() {
-    return submissionDocument;
-  }
-
-  public void accept(SubmittableVisitor v) {
-    v.visit(this);
-  }    
-*/
+   * public Document getSubmissionData() { return submissionDocument; }
+   * 
+   * public void accept(SubmittableVisitor v) { v.visit(this); }
+   */
 
   public Collection<Note> getNotes() {
     return notes;
@@ -244,11 +240,11 @@ public abstract class AbstractSample implements Sample {
 
   public void addNote(Note note) {
     this.notes.add(note);
-  }   
+  }
 
   public void setNotes(Collection<Note> notes) {
     this.notes = notes;
-  }  
+  }
 
   @Override
   public Set<Plate<? extends LinkedList<Sample>, Sample>> getPlates() {
@@ -272,10 +268,7 @@ public abstract class AbstractSample implements Sample {
   }
 
   public boolean isDeletable() {
-    return getId() != AbstractSample.UNSAVED_ID &&
-           getLibraries().isEmpty() &&
-           getNotes().isEmpty() &&
-           getSampleQCs().isEmpty();    
+    return getId() != AbstractSample.UNSAVED_ID && getLibraries().isEmpty() && getNotes().isEmpty() && getSampleQCs().isEmpty();
   }
 
   public SecurityProfile getSecurityProfile() {
@@ -289,11 +282,10 @@ public abstract class AbstractSample implements Sample {
   public void inheritPermissions(SecurableByProfile parent) throws SecurityException {
     if (parent.getSecurityProfile().getOwner() != null) {
       setSecurityProfile(parent.getSecurityProfile());
-    }
-    else {
+    } else {
       throw new SecurityException("Cannot inherit permissions when parent object owner is not set!");
     }
-  }  
+  }
 
   public boolean userCanRead(User user) {
     return securityProfile.userCanRead(user);
@@ -305,36 +297,28 @@ public abstract class AbstractSample implements Sample {
 
   public abstract void buildSubmission();
 
-
   public abstract void buildReport();
-  
 
   /**
    * Equivalency is based on getSampleId() if set, otherwise on name, otherwise on alias
    */
   @Override
   public boolean equals(Object obj) {
-    if (obj == null)
-      return false;
-    if (obj == this)
-      return true;
-    if (!(obj instanceof Sample))
-      return false;
+    if (obj == null) return false;
+    if (obj == this) return true;
+    if (!(obj instanceof Sample)) return false;
     Sample them = (Sample) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
     if (getId() == AbstractSample.UNSAVED_ID || them.getId() == AbstractSample.UNSAVED_ID) {
       if (getName() != null && them.getName() != null) {
         return getName().equals(them.getName());
-      }
-      else if (getAlias() != null && them.getAlias() != null) {
+      } else if (getAlias() != null && them.getAlias() != null) {
         return getAlias().equals(them.getAlias());
-      }
-      else {
+      } else {
         return false;
       }
-    }
-    else {
+    } else {
       return getId() == them.getId();
     }
   }
@@ -342,28 +326,23 @@ public abstract class AbstractSample implements Sample {
   @Override
   public int hashCode() {
     if (getId() != 0L && getId() != AbstractSample.UNSAVED_ID) {
-      return (int)getId();
-    }
-    else {
+      return (int) getId();
+    } else {
       final int PRIME = 37;
       int hashcode = 1;
       if (getName() != null) hashcode = PRIME * hashcode + getName().hashCode();
-//      if (getDescription() != null) hashcode = 37 * hashcode + getDescription().hashCode();
-//      if (getLibraries() != null && !getLibraries().isEmpty()) hashcode = 37 * hashcode + getLibraries().hashCode();
-//      if (getSampleQCs() != null && !getSampleQCs().isEmpty()) hashcode = 37 * hashcode + getSampleQCs().hashCode();
       if (getAlias() != null) hashcode = PRIME * hashcode + getAlias().hashCode();
       return hashcode;
     }
-  }  
+  }
 
   @Override
   public int compareTo(Object o) {
-    Sample s = (Sample)o;
+    Sample s = (Sample) o;
     if (getId() != 0L && s.getId() != 0L) {
       if (getId() < s.getId()) return -1;
       if (getId() > s.getId()) return 1;
-    }
-    else if (getAlias() != null && s.getAlias() != null) {
+    } else if (getAlias() != null && s.getAlias() != null) {
       return getAlias().compareTo(s.getAlias());
     }
     return 0;

@@ -34,7 +34,7 @@ import java.lang.reflect.Field;
  * uk.ac.bbsrc.tgac.miso.core.util
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 16/04/12
  * @since 0.1.6
@@ -44,13 +44,12 @@ public class PrintServiceUtils {
 
   public static JSONObject mapContextFieldsToJSON(PrintContext context) throws IllegalAccessException {
     JSONObject contextFields = new JSONObject();
-    //only get public fields
+    // only get public fields
     for (Field f : context.getClass().getFields()) {
       if (!f.getName().equals("name") && !f.getName().equals("description")) {
         if (f.get(context) == null) {
           contextFields.put(f.getName(), "");
-        }
-        else {
+        } else {
           contextFields.put(f.getName(), f.get(context));
         }
       }
@@ -62,7 +61,7 @@ public class PrintServiceUtils {
   public static void mapJSONToContextFields(JSONObject contextFields, PrintContext context) throws IllegalAccessException {
     for (Field f : context.getClass().getFields()) {
       if (contextFields.has(f.getName())) {
-        f.set(context,contextFields.get(f.getName()));
+        f.set(context, contextFields.get(f.getName()));
       }
     }
   }

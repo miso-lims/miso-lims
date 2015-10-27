@@ -42,7 +42,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 
 /**
  * Skeleton implementation of a Project
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -51,8 +51,7 @@ public abstract class AbstractProject implements Project {
   private static final long serialVersionUID = 1L;
 
   /**
-   * Use this ID to indicate that a project has not yet been saved, and
-   * therefore does not yet have a unique ID.
+   * Use this ID to indicate that a project has not yet been saved, and therefore does not yet have a unique ID.
    */
   public static final Long UNSAVED_ID = 0L;
 
@@ -172,8 +171,7 @@ public abstract class AbstractProject implements Project {
     this.samples = samples;
     try {
       Collections.sort(Arrays.asList(this.samples), new AliasComparator(Sample.class));
-    }
-    catch (NoSuchMethodException e) {
+    } catch (NoSuchMethodException e) {
       e.printStackTrace();
     }
   }
@@ -182,8 +180,7 @@ public abstract class AbstractProject implements Project {
     this.runs = runs;
     try {
       Collections.sort(Arrays.asList(this.runs), new AliasComparator(Run.class));
-    }
-    catch (NoSuchMethodException e) {
+    } catch (NoSuchMethodException e) {
       e.printStackTrace();
     }
   }
@@ -192,8 +189,7 @@ public abstract class AbstractProject implements Project {
     this.samples.add(sample);
     try {
       Collections.sort(Arrays.asList(this.samples), new AliasComparator(Sample.class));
-    }
-    catch (NoSuchMethodException e) {
+    } catch (NoSuchMethodException e) {
       e.printStackTrace();
     }
   }
@@ -202,8 +198,7 @@ public abstract class AbstractProject implements Project {
     this.studies = studies;
     try {
       Collections.sort(Arrays.asList(this.studies), new AliasComparator(Study.class));
-    }
-    catch (NoSuchMethodException e) {
+    } catch (NoSuchMethodException e) {
       e.printStackTrace();
     }
   }
@@ -229,9 +224,7 @@ public abstract class AbstractProject implements Project {
   }
 
   public boolean isDeletable() {
-    return getId() != AbstractProject.UNSAVED_ID &&
-           getSamples().isEmpty() &&
-           getStudies().isEmpty();
+    return getId() != AbstractProject.UNSAVED_ID && getSamples().isEmpty() && getStudies().isEmpty();
   }
 
   public SecurityProfile getSecurityProfile() {
@@ -243,8 +236,7 @@ public abstract class AbstractProject implements Project {
   }
 
   public void inheritPermissions(SecurableByProfile parent) throws SecurityException {
-    //projects have no parents
-    //setSecurityProfile(parent.getSecurityProfile());
+    // projects have no parents
   }
 
   public boolean userCanRead(User user) {
@@ -254,8 +246,7 @@ public abstract class AbstractProject implements Project {
         bool = true;
       }
       return bool;
-    }
-    catch (NullPointerException e) {
+    } catch (NullPointerException e) {
       return false;
     }
   }
@@ -277,13 +268,13 @@ public abstract class AbstractProject implements Project {
   }
 
   public void addStudy(Study s) {
-    //do study validation
+    // do study validation
     s.setProject(this);
 
-    //propagate security profiles down the hierarchy
+    // propagate security profiles down the hierarchy
     s.setSecurityProfile(this.securityProfile);
 
-    //add
+    // add
     this.studies.add(s);
   }
 
@@ -342,28 +333,22 @@ public abstract class AbstractProject implements Project {
   }
 
   /**
-   * Equivalency is based on getProjectId() if set, otherwise on name,
-   * description and creation date.
+   * Equivalency is based on getProjectId() if set, otherwise on name, description and creation date.
    */
   @Override
   public boolean equals(Object obj) {
-    if (obj == null)
-      return false;
-    if (obj == this)
-      return true;
-    if (!(obj instanceof AbstractProject))
-      return false;
+    if (obj == null) return false;
+    if (obj == this) return true;
+    if (!(obj instanceof AbstractProject)) return false;
     AbstractProject them = (AbstractProject) obj;
 
     if (getId() == AbstractProject.UNSAVED_ID || them.getId() == AbstractProject.UNSAVED_ID) {
       if (getName() != null && them.getName() != null) {
         return getName().equals(them.getName());
-      }
-      else {
+      } else {
         return getAlias().equals(them.getAlias());
       }
-    }
-    else {
+    } else {
       return this.getId() == them.getId();
     }
   }
@@ -371,9 +356,8 @@ public abstract class AbstractProject implements Project {
   @Override
   public int hashCode() {
     if (getId() != 0L && getId() != AbstractProject.UNSAVED_ID) {
-      return (int)getId();
-    }
-    else {
+      return (int) getId();
+    } else {
       final int PRIME = 37;
       int hashcode = 1;
       if (getName() != null) hashcode = PRIME * hashcode + getName().hashCode();
@@ -384,12 +368,11 @@ public abstract class AbstractProject implements Project {
 
   @Override
   public int compareTo(Object o) {
-    Project s = (Project)o;
+    Project s = (Project) o;
     if (getId() != 0L && s.getId() != 0L) {
       if (getId() < s.getId()) return -1;
       if (getId() > s.getId()) return 1;
-    }
-    else if (getAlias() != null && s.getAlias() != null) {
+    } else if (getAlias() != null && s.getAlias() != null) {
       return getAlias().compareTo(s.getAlias());
     }
     return 0;

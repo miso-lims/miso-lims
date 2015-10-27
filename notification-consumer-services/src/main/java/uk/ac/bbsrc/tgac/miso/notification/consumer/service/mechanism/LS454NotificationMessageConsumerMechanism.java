@@ -63,12 +63,13 @@ import java.util.regex.Pattern;
  * uk.ac.bbsrc.tgac.miso.core.service.integration.mechanism.impl
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 03/02/12
  * @since 0.1.5
  */
-public class LS454NotificationMessageConsumerMechanism implements NotificationMessageConsumerMechanism<Message<Map<String, List<String>>>, Set<Run>> {
+public class LS454NotificationMessageConsumerMechanism implements
+    NotificationMessageConsumerMechanism<Message<Map<String, List<String>>>, Set<Run>> {
   protected static final Logger log = LoggerFactory.getLogger(LS454NotificationMessageConsumerMechanism.class);
 
   public boolean attemptRunPopulation = true;
@@ -106,7 +107,7 @@ public class LS454NotificationMessageConsumerMechanism implements NotificationMe
 
     StringBuilder sb = new StringBuilder();
 
-    for (JSONObject run : (Iterable<JSONObject>)runs) {
+    for (JSONObject run : (Iterable<JSONObject>) runs) {
       String runName = run.getString("runName");
       sb.append("Processing " + runName + "\n");
       log.debug("Processing " + runName);
@@ -116,12 +117,10 @@ public class LS454NotificationMessageConsumerMechanism implements NotificationMe
         if (!"".equals(run.getString("status"))) {
           try {
             runLog = new String(IntegrationUtils.decompress(URLDecoder.decode(run.getString("status"), "UTF-8").getBytes()));
-          }
-          catch (UnsupportedEncodingException e) {
+          } catch (UnsupportedEncodingException e) {
             log.error("Cannot decode status runLog: " + e.getMessage());
             e.printStackTrace();
-          }
-          catch (IOException e) {
+          } catch (IOException e) {
             log.error("Cannot decompress and decode incoming status: " + e.getMessage());
             e.printStackTrace();
           }
@@ -138,8 +137,7 @@ public class LS454NotificationMessageConsumerMechanism implements NotificationMe
             try {
               is.setInstrumentName(m.group(2));
               r = requestManager.getRunByAlias(runName);
-            }
-            catch(IOException ioe) {
+            } catch (IOException ioe) {
               log.warn("Cannot find run by this alias. This usually means the run hasn't been previously imported. If attemptRunPopulation is false, processing will not take place for this run!");
             }
           }
@@ -151,7 +149,7 @@ public class LS454NotificationMessageConsumerMechanism implements NotificationMe
                 r = new LS454Run();
                 r.setAlias(run.getString("runName"));
                 r.setDescription(m.group(3));
-                //TODO check this properly
+                // TODO check this properly
                 r.setPairedEnd(false);
 
                 if (run.has("fullPath")) {
@@ -175,9 +173,8 @@ public class LS454NotificationMessageConsumerMechanism implements NotificationMe
                 if (run.has("completionDate")) {
                   try {
                     is.setCompletionDate(gsLogDateFormat.parse(run.getString("completionDate")));
-                  }
-                  catch (ParseException e) {
-                    log.error("Cannot parse "+runName+" completion date: " +e.getMessage());
+                  } catch (ParseException e) {
+                    log.error("Cannot parse " + runName + " completion date: " + e.getMessage());
                     e.printStackTrace();
                   }
                 }
@@ -185,27 +182,24 @@ public class LS454NotificationMessageConsumerMechanism implements NotificationMe
                 if (sr != null) {
                   r.setSequencerReference(sr);
                   runsToSave.add(r);
-                }
-                else {
+                } else {
                   log.error("\\_ Cannot save " + is.getRunName() + ": no sequencer reference available.");
                 }
-              }
-              else {
+              } else {
                 log.debug("\\_ Updating existing run and status: " + is.getRunName());
 
                 r.setAlias(runName);
 
                 r.setPlatformType(PlatformType.LS454);
                 r.setDescription(m.group(3));
-                //TODO check this properly
+                // TODO check this properly
                 r.setPairedEnd(false);
 
                 if (r.getStatus() != null && run.has("status")) {
                   if (!r.getStatus().getHealth().equals(HealthType.Failed) && !r.getStatus().getHealth().equals(HealthType.Completed)) {
                     r.getStatus().setHealth(ht);
                   }
-                }
-                else {
+                } else {
                   if (run.has("status")) {
                     r.setStatus(is);
                   }
@@ -233,14 +227,13 @@ public class LS454NotificationMessageConsumerMechanism implements NotificationMe
                 if (run.has("completionDate")) {
                   try {
                     r.getStatus().setCompletionDate(gsLogDateFormat.parse(run.getString("completionDate")));
-                  }
-                  catch (ParseException e) {
+                  } catch (ParseException e) {
                     log.error(e.getMessage());
                     e.printStackTrace();
                   }
                 }
 
-                //update path if changed
+                // update path if changed
                 if (run.has("fullPath") && !"".equals(run.getString("fullPath")) && r.getFilePath() != null && !"".equals(r.getFilePath())) {
                   if (!run.getString("fullPath").equals(r.getFilePath())) {
                     log.debug("Updating run file path:" + r.getFilePath() + " -> " + run.getString("fullPath"));
@@ -250,7 +243,8 @@ public class LS454NotificationMessageConsumerMechanism implements NotificationMe
 
                 // update status if run isn't completed or failed
                 if (!r.getStatus().getHealth().equals(HealthType.Completed) && !r.getStatus().getHealth().equals(HealthType.Failed)) {
-                  log.debug("Saving previously saved status: " + is.getRunName() + " (" + r.getStatus().getHealth().getKey() + " -> " + is.getHealth().getKey() + ")");
+                  log.debug("Saving previously saved status: " + is.getRunName() + " (" + r.getStatus().getHealth().getKey() + " -> "
+                      + is.getHealth().getKey() + ")");
                   r.setStatus(is);
                 }
               }
@@ -261,7 +255,7 @@ public class LS454NotificationMessageConsumerMechanism implements NotificationMe
                     Document paramsDoc = SubmissionUtils.emptyDocument();
                     SubmissionUtils.transform(new UnicodeReader(run.getString("runparams")), paramsDoc);
 
-                    Element runInfo = (Element)paramsDoc.getElementsByTagName("run").item(0);
+                    Element runInfo = (Element) paramsDoc.getElementsByTagName("run").item(0);
                     String runDesc = runInfo.getElementsByTagName("shortName").item(0).getTextContent();
                     r.setDescription(runDesc);
 
@@ -275,9 +269,9 @@ public class LS454NotificationMessageConsumerMechanism implements NotificationMe
                       requestManager.saveStatus(r.getStatus());
                     }
 
-                    List<SequencerPartitionContainer<SequencerPoolPartition>> fs = ((LS454Run)r).getSequencerPartitionContainers();
+                    List<SequencerPartitionContainer<SequencerPoolPartition>> fs = ((LS454Run) r).getSequencerPartitionContainers();
 
-                    Element ptp = (Element)paramsDoc.getElementsByTagName("ptp").item(0);
+                    Element ptp = (Element) paramsDoc.getElementsByTagName("ptp").item(0);
                     String ptpId = ptp.getElementsByTagName("id").item(0).getTextContent();
 
                     if (fs.isEmpty()) {
@@ -287,47 +281,36 @@ public class LS454NotificationMessageConsumerMechanism implements NotificationMe
                         if (f.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
                           f.setPlatform(r.getSequencerReference().getPlatform());
                         }
-//                        else {
-//                          f.setPlatformType(PlatformType.LS454);
-//                        }
                         f.setPartitionLimit(numPartitions);
                         f.initEmptyPartitions();
                         f.setIdentificationBarcode(ptpId);
 
-                        log.debug("\\_ Created new SequencerPartitionContainer with "+f.getPartitions().size()+" partitions");
-                        ((RunImpl)r).addSequencerPartitionContainer(f);
+                        log.debug("\\_ Created new SequencerPartitionContainer with " + f.getPartitions().size() + " partitions");
+                        ((RunImpl) r).addSequencerPartitionContainer(f);
                       }
-                    }
-                    else {
+                    } else {
                       SequencerPartitionContainer f = fs.iterator().next();
                       log.debug("\\_ Got SequencerPartitionContainer " + f.getId());
                       if (f.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
                         f.setPlatform(r.getSequencerReference().getPlatform());
                       }
-//                      else {
-//                        f.setPlatformType(PlatformType.LS454);
-//                      }
                       if (f.getIdentificationBarcode() == null || "".equals(f.getIdentificationBarcode())) {
                         f.setIdentificationBarcode(ptpId);
                         long flowId = requestManager.saveSequencerPartitionContainer(f);
                         f.setId(flowId);
                       }
                     }
-                  }
-                  catch (ParserConfigurationException e) {
+                  } catch (ParserConfigurationException e) {
+                    log.error(e.getMessage());
+                    e.printStackTrace();
+                  } catch (TransformerException e) {
+                    log.error(e.getMessage());
+                    e.printStackTrace();
+                  } catch (ParseException e) {
                     log.error(e.getMessage());
                     e.printStackTrace();
                   }
-                  catch (TransformerException e) {
-                    log.error(e.getMessage());
-                    e.printStackTrace();
-                  }
-                  catch (ParseException e) {
-                    log.error(e.getMessage());
-                    e.printStackTrace();
-                  }
-                }
-                else {
+                } else {
                   try {
                     String startDateStr = m.group(1);
                     DateFormat df = new SimpleDateFormat("yyyy'_'MM'_'dd'_'HH'_'mm'_'ss");
@@ -336,8 +319,7 @@ public class LS454NotificationMessageConsumerMechanism implements NotificationMe
                       r.getStatus().setStartDate(startDate);
                       requestManager.saveStatus(r.getStatus());
                     }
-                  }
-                  catch (ParseException e) {
+                  } catch (ParseException e) {
                     log.error(e.getMessage());
                     e.printStackTrace();
                   }
@@ -347,14 +329,12 @@ public class LS454NotificationMessageConsumerMechanism implements NotificationMe
                 runsToSave.add(r);
               }
             }
-          }
-          catch (IOException e) {
+          } catch (IOException e) {
             log.error(e.getMessage());
             e.printStackTrace();
           }
-        }
-        else {
-          log.error("Error consuming run "+runName+". Please check the gsRunProcessor.log file for this run.");
+        } else {
+          log.error("Error consuming run " + runName + ". Please check the gsRunProcessor.log file for this run.");
         }
       }
     }
@@ -362,10 +342,9 @@ public class LS454NotificationMessageConsumerMechanism implements NotificationMe
     try {
       if (runsToSave.size() > 0) {
         int[] saved = requestManager.saveRuns(runsToSave);
-        log.info("Batch saved " + saved.length + " / "+ runs.size() + " runs");
+        log.info("Batch saved " + saved.length + " / " + runs.size() + " runs");
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.error("Couldn't save run batch: " + e.getMessage());
       e.printStackTrace();
     }

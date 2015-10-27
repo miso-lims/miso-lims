@@ -27,19 +27,20 @@ import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
 
 /**
  * An interface to define how an integration strategy can consume an incoming parameter and produce an output
- *
+ * 
  * @author Rob Davey
  * @date 03/02/12
  * @since 0.1.5
  */
 public interface ConsumerMechanism<R, O> {
-    /**
+  /**
    * Consume a result R into an output O
-   *
-   * @param result of type R
+   * 
+   * @param result
+   *          of type R
    * @return output of type O
-   * @throws uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException when the incoming parameter cannot be
-   * consumed
+   * @throws uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException
+   *           when the incoming parameter cannot be consumed
    */
   O consume(R result) throws InterrogationException;
 }

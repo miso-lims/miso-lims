@@ -31,7 +31,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
  * uk.ac.bbsrc.tgac.miso.core.event.impl
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 05/03/12
  * @since 0.1.6

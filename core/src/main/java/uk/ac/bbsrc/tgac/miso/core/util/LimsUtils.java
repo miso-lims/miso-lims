@@ -52,7 +52,7 @@ import java.util.zip.ZipOutputStream;
 
 /**
  * Utility class to provde helpful functions to MISO
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -71,8 +71,7 @@ public class LimsUtils {
       if (Character.UnicodeBlock.of(c) != Character.UnicodeBlock.BASIC_LATIN) {
         int codePoint = Character.codePointAt(barcode, count);
         b.append("[U:$").append(String.format("%04x", codePoint).toUpperCase()).append("]");
-      }
-      else {
+      } else {
         b.append(c);
       }
       count++;
@@ -82,19 +81,18 @@ public class LimsUtils {
   }
 
   public static boolean isBase64String(String base64) {
-    //nasty 20-character length hack for base64 strings.
-    //just have to hope that people don't generally search for 4-mer 20+ length strings very often
+    // nasty 20-character length hack for base64 strings.
+    // just have to hope that people don't generally search for 4-mer 20+ length strings very often
     return base64.length() > 20 && p.matcher(base64).matches();
   }
 
   public static boolean isUrlValid(URL url) {
     try {
-      HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+      HttpURLConnection connection = (HttpURLConnection) url.openConnection();
       connection.setRequestMethod("HEAD");
       int responseCode = connection.getResponseCode();
       return (responseCode == 200);
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
     }
     return false;
@@ -104,8 +102,7 @@ public class LimsUtils {
     try {
       URL url = uri.toURL();
       return isUrlValid(url);
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       e.printStackTrace();
     }
     return false;
@@ -116,15 +113,19 @@ public class LimsUtils {
   }
 
   /**
-   * Join a collection, akin to Perl's join(), using a given delimiter to produce a single String 
-   *
-   * @param s of type Collection
-   * @param delimiter of type String
+   * Join a collection, akin to Perl's join(), using a given delimiter to produce a single String
+   * 
+   * @param s
+   *          of type Collection
+   * @param delimiter
+   *          of type String
    * @return String
    * @throws IllegalArgumentException
    */
   public static String join(Collection s, String delimiter) throws IllegalArgumentException {
-    if (s == null) { throw new IllegalArgumentException("Collection to join must not be null"); }
+    if (s == null) {
+      throw new IllegalArgumentException("Collection to join must not be null");
+    }
     StringBuffer buffer = new StringBuffer();
     Iterator iter = s.iterator();
     while (iter.hasNext()) {
@@ -138,16 +139,18 @@ public class LimsUtils {
 
   /**
    * Join an Array, akin to Perl's join(), using a given delimiter to produce a single String
-   *
-   * @param s of type Object[]
-   * @param delimiter of type String
+   * 
+   * @param s
+   *          of type Object[]
+   * @param delimiter
+   *          of type String
    * @return String
    */
   public static String join(Object[] s, String delimiter) {
     StringBuffer buffer = new StringBuffer();
     for (int i = 0; i < s.length; i++) {
       buffer.append(s[i]);
-      if (i<s.length-1) {
+      if (i < s.length - 1) {
         buffer.append(delimiter);
       }
     }
@@ -156,12 +159,8 @@ public class LimsUtils {
 
   public static <T> List<List<T>> partition(List<T> list, int size) {
 
-   if (list == null)
-      throw new NullPointerException(
-          "'list' must not be null");
-    if (!(size > 0))
-      throw new IllegalArgumentException(
-          "'size' must be greater than 0");
+    if (list == null) throw new NullPointerException("'list' must not be null");
+    if (!(size > 0)) throw new IllegalArgumentException("'size' must be greater than 0");
 
     return new Partition<T>(list, size);
   }
@@ -179,14 +178,9 @@ public class LimsUtils {
     @Override
     public List<T> get(int index) {
       int listSize = size();
-      if (listSize < 0)
-        throw new IllegalArgumentException("negative size: " + listSize);
-      if (index < 0)
-        throw new IndexOutOfBoundsException(
-            "index " + index + " must not be negative");
-      if (index >= listSize)
-        throw new IndexOutOfBoundsException(
-            "index " + index + " must be less than size " + listSize);
+      if (listSize < 0) throw new IllegalArgumentException("negative size: " + listSize);
+      if (index < 0) throw new IndexOutOfBoundsException("index " + index + " must not be negative");
+      if (index >= listSize) throw new IndexOutOfBoundsException("index " + index + " must be less than size " + listSize);
       int start = index * size;
       int end = Math.min(start + size, list.size());
       return list.subList(start, end);
@@ -205,55 +199,61 @@ public class LimsUtils {
 
   /**
    * Computes the relative complement of two sets, i.e. those elements that are in A but not in B
-   *
-   * @param needles of type Set
-   * @param haystack of type Set
+   * 
+   * @param needles
+   *          of type Set
+   * @param haystack
+   *          of type Set
    * @return Set
    */
   public static Set relativeComplement(Set needles, Set haystack) {
-    Set diff = (Set)((HashSet)needles).clone();
+    Set diff = (Set) ((HashSet) needles).clone();
     diff.removeAll(haystack);
     return diff;
   }
 
   /**
-   * SLOWLY computes the relative complement of two sets, i.e. those elements that are in A but not in B, based on an object's given accessor to a property.
+   * SLOWLY computes the relative complement of two sets, i.e. those elements that are in A but not in B, based on an object's given
+   * accessor to a property.
    * <p/>
-   * This is distinctly less efficient than {@link uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.relativeComplement()} (this method uses reflection) but
-   * can avoid comparing objects by hashcode. This is useful when trying to compare objects that have been persisted, and therefore have unique
-   * IDs and Names, to objects that haven't, and hence have no ID or Name.
+   * This is distinctly less efficient than {@link uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.relativeComplement()} (this method uses
+   * reflection) but can avoid comparing objects by hashcode. This is useful when trying to compare objects that have been persisted, and
+   * therefore have unique IDs and Names, to objects that haven't, and hence have no ID or Name.
    * <p/>
    * If an exception occurs, null is returned.
-   *
-   * @param c of type Class
-   * @param needles of type Set
-   * @param haystack of type Set
+   * 
+   * @param c
+   *          of type Class
+   * @param needles
+   *          of type Set
+   * @param haystack
+   *          of type Set
    * @return Set
    */
   public static Set relativeComplementByProperty(Class c, String methodName, Set needles, Set haystack) {
     try {
       Method m = c.getMethod(methodName);
-      Set diff = (Set)((HashSet)needles).clone();
+      Set diff = (Set) ((HashSet) needles).clone();
 
       if (diff.size() > haystack.size()) {
-        for (Iterator<?> i = haystack.iterator(); i.hasNext(); ) {
+        for (Iterator<?> i = haystack.iterator(); i.hasNext();) {
           Object h = i.next();
-          String hProp = (String)m.invoke(h);
-          for (Iterator<?> j = diff.iterator(); j.hasNext(); ) {
+          String hProp = (String) m.invoke(h);
+          for (Iterator<?> j = diff.iterator(); j.hasNext();) {
             Object n = j.next();
-            String nProp = (String)m.invoke(n);
+            String nProp = (String) m.invoke(n);
             if (nProp.equals(hProp)) {
               j.remove();
             }
           }
         }
       } else {
-        for (Iterator<?> i = diff.iterator(); i.hasNext(); ) {
+        for (Iterator<?> i = diff.iterator(); i.hasNext();) {
           Object n = i.next();
-          String nProp = (String)m.invoke(n);
-          for (Iterator<?> j = haystack.iterator(); j.hasNext(); ) {
+          String nProp = (String) m.invoke(n);
+          for (Iterator<?> j = haystack.iterator(); j.hasNext();) {
             Object h = j.next();
-            String hProp = (String)m.invoke(h);
+            String hProp = (String) m.invoke(h);
             if (nProp.equals(hProp)) {
               i.remove();
             }
@@ -261,29 +261,26 @@ public class LimsUtils {
         }
       }
       return diff;
-    }
-    catch (ConcurrentModificationException e) {
+    } catch (ConcurrentModificationException e) {
       e.printStackTrace();
       log.error("Backing set modification outside iterator.");
-    }
-    catch (NoSuchMethodException e) {
+    } catch (NoSuchMethodException e) {
       e.printStackTrace();
-      log.error("Class " + c.getName() + " doesn't declare a "+methodName+" method.");
-    }
-    catch (InvocationTargetException e) {
+      log.error("Class " + c.getName() + " doesn't declare a " + methodName + " method.");
+    } catch (InvocationTargetException e) {
       e.printStackTrace();
-      log.error("Cannot invoke "+methodName+" on class " + c.getName());
-    }
-    catch (IllegalAccessException e) {
+      log.error("Cannot invoke " + methodName + " on class " + c.getName());
+    } catch (IllegalAccessException e) {
       e.printStackTrace();
-      log.error("Cannot invoke "+methodName+" on class " + c.getName());
+      log.error("Cannot invoke " + methodName + " on class " + c.getName());
     }
     return null;
   }
 
   public static String findHyperlinks(String text) {
     if (!LimsUtils.isStringEmptyOrNull(text)) {
-      Pattern p = Pattern.compile("(?i)\\b((?:[a-z][\\w-]+:(?:/{1,3}|[a-z0-9%])|www\\d{0,3}[.]|[a-z0-9.\\-]+[.][a-z]{2,4}/)(?:[^\\s()<>]+|\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\))+(?:\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\)|[^\\s`!()\\[\\]{};:'\".,<>?«»“”‘’]))");
+      Pattern p = Pattern
+          .compile("(?i)\\b((?:[a-z][\\w-]+:(?:/{1,3}|[a-z0-9%])|www\\d{0,3}[.]|[a-z0-9.\\-]+[.][a-z]{2,4}/)(?:[^\\s()<>]+|\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\))+(?:\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\)|[^\\s`!()\\[\\]{};:'\".,<>?«»“”‘’]))");
       Matcher m = p.matcher(text);
 
       StringBuffer sb = new StringBuffer();
@@ -292,32 +289,26 @@ public class LimsUtils {
       }
       m.appendTail(sb);
       return sb.toString();
-    }
-    else {
+    } else {
       return "";
     }
   }
 
   public static String lookupLocation(String locationBarcode) {
-    //TODO - proper lookup!
+    // TODO - proper lookup!
     /*
-    if (locationBarcode is valid) {
-      retrieve text representation of location and return
-    }
-    else {
-      return null;
-    }
+     * if (locationBarcode is valid) { retrieve text representation of location and return } else { return null; }
      */
     return locationBarcode;
   }
-  
+
   public static void unzipFile(File source) {
     unzipFile(source, null);
   }
 
   public static boolean unzipFile(File source, File destination) {
     final int BUFFER = 2048;
-    
+
     try {
       BufferedOutputStream dest = null;
       FileInputStream fis = new FileInputStream(source);
@@ -328,16 +319,14 @@ public class LimsUtils {
 
         if (destination != null && destination.exists() && destination.isDirectory()) {
           outputFile = new File(destination, entry.getName());
-        }
-        else {
+        } else {
           outputFile = new File(entry.getName());
         }
 
         if (entry.isDirectory()) {
           System.out.println("Extracting directory: " + entry.getName());
           LimsUtils.checkDirectory(outputFile, true);
-        }
-        else {
+        } else {
           System.out.println("Extracting file: " + entry.getName());
           int count;
           byte data[] = new byte[BUFFER];
@@ -351,8 +340,7 @@ public class LimsUtils {
         }
       }
       zis.close();
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       e.printStackTrace();
       return false;
     }
@@ -375,7 +363,7 @@ public class LimsUtils {
       // Transfer bytes from the file to the ZIP file
       int len;
       while ((len = in.read(buf)) > 0) {
-          out.write(buf, 0, len);
+        out.write(buf, 0, len);
       }
 
       // Complete the entry
@@ -397,20 +385,17 @@ public class LimsUtils {
         while ((len = in.read(buf)) > 0) {
           out.write(buf, 0, len);
         }
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
         log.error("Could not write file: " + path.getAbsolutePath());
         e.printStackTrace();
-      }
-      finally {
+      } finally {
         try {
           in.close();
         } catch (IOException e) {
           // ignore
         }
       }
-    }
-    finally {
+    } finally {
       if (out != null) {
         out.close();
       }
@@ -418,36 +403,37 @@ public class LimsUtils {
   }
 
   /**
-   * Checks that a directory exists. This method will attempt to create the directory if it doesn't exist and if the attemptMkdir flag is true  
-   *
-   * @param path of type File
-   * @param attemptMkdir of type boolean
+   * Checks that a directory exists. This method will attempt to create the directory if it doesn't exist and if the attemptMkdir flag is
+   * true
+   * 
+   * @param path
+   *          of type File
+   * @param attemptMkdir
+   *          of type boolean
    * @return boolean true if the directory exists/was created, false if not
-   * @throws IOException when the directory exist check/creation could not be completed
+   * @throws IOException
+   *           when the directory exist check/creation could not be completed
    */
   public static boolean checkDirectory(File path, boolean attemptMkdir) throws IOException {
     boolean storageOk;
 
     if (attemptMkdir) {
       storageOk = path.exists() || path.mkdirs();
-    }
-    else {
+    } else {
       storageOk = path.exists();
     }
 
     if (!storageOk) {
-      StringBuilder sb = new StringBuilder("The directory ["+path.toString()+"] doesn't exist");
+      StringBuilder sb = new StringBuilder("The directory [" + path.toString() + "] doesn't exist");
       if (attemptMkdir) {
         sb.append(" or is not creatable");
       }
       sb.append(". Please create this directory and ensure that it is writable.");
-      throw new IOException(sb.toString()); 
-    }
-    else {
+      throw new IOException(sb.toString());
+    } else {
       if (attemptMkdir) {
         log.info("Directory (" + path + ") exists.");
-      }
-      else {
+      } else {
         log.info("Directory (" + path + ") OK.");
       }
     }
@@ -456,29 +442,32 @@ public class LimsUtils {
 
   /**
    * Similar to checkDirectory, but for single files.
-   *
-   * @param path of type File
+   * 
+   * @param path
+   *          of type File
    * @return boolean true if the file exists, false if not
-   * @throws IOException when the file doesn't exist
+   * @throws IOException
+   *           when the file doesn't exist
    */
   public static boolean checkFile(File path) throws IOException {
     boolean storageOk = path.exists();
     if (!storageOk) {
-      StringBuilder sb = new StringBuilder("The file ["+path.toString()+"] doesn't exist.");
+      StringBuilder sb = new StringBuilder("The file [" + path.toString() + "] doesn't exist.");
       throw new IOException(sb.toString());
-    }
-    else {
+    } else {
       log.info("File (" + path + ") OK.");
     }
     return storageOk;
-  }  
+  }
 
   /**
    * Helper method to parse and store output from a given process' stdout and stderr
-   *
-   * @param process of type Process
+   * 
+   * @param process
+   *          of type Process
    * @return Map<String, String>
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   public static Map<String, String> checkPipes(Process process) throws IOException {
     HashMap<String, String> r = new HashMap<String, String>();
@@ -487,8 +476,7 @@ public class LimsUtils {
       String out = LimsUtils.processStdOut(process);
       log.debug(out);
       r.put("ok", out);
-    }
-    else {
+    } else {
       log.error(error);
       r.put("error", error);
     }
@@ -510,10 +498,12 @@ public class LimsUtils {
 
   /**
    * Reads the contents of an InputStream into a String
-   *
-   * @param in of type InputStream
+   * 
+   * @param in
+   *          of type InputStream
    * @return String
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   public static String inputStreamToString(InputStream in) throws IOException {
     StringBuilder sb = new StringBuilder();
@@ -527,10 +517,12 @@ public class LimsUtils {
 
   /**
    * Reads the contents of an File into a String
-   *
-   * @param f of type File
+   * 
+   * @param f
+   *          of type File
    * @return String
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   public static String fileToString(File f) throws IOException {
     StringBuilder sb = new StringBuilder();
@@ -551,10 +543,12 @@ public class LimsUtils {
 
   /**
    * Reads the contents of an InputStream into a byte[]
-   *
-   * @param in of type InputStream
+   * 
+   * @param in
+   *          of type InputStream
    * @return byte[]
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   public static byte[] inputStreamToByteArray(InputStream in) throws IOException {
     ByteArrayOutputStream buffer = new ByteArrayOutputStream();
@@ -569,10 +563,12 @@ public class LimsUtils {
 
   /**
    * Process stdout from a given Process and concat it to a single String
-   *
-   * @param p of type Process
+   * 
+   * @param p
+   *          of type Process
    * @return String
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   private static String processStdOut(Process p) throws IOException {
     return inputStreamToString(p.getInputStream());
@@ -580,10 +576,12 @@ public class LimsUtils {
 
   /**
    * Process stderr from a given Process and concat it to a single String
-   *
-   * @param p of type Process
+   * 
+   * @param p
+   *          of type Process
    * @return String
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   private static String processStdErr(Process p) throws IOException {
     return inputStreamToString(p.getErrorStream());
@@ -605,10 +603,10 @@ public class LimsUtils {
   public static final Pattern linePattern = Pattern.compile(".*\r?\n");
 
   public static Matcher grep(CharBuffer cb, Pattern pattern) {
-    Matcher lm = linePattern.matcher(cb);  // Line matcher
-    Matcher pm = null;                     // Pattern matcher
+    Matcher lm = linePattern.matcher(cb); // Line matcher
+    Matcher pm = null; // Pattern matcher
     while (lm.find()) {
-      CharSequence cs = lm.group();      // The current line
+      CharSequence cs = lm.group(); // The current line
       if (pm == null)
         pm = pattern.matcher(cs);
       else
@@ -660,8 +658,7 @@ public class LimsUtils {
       for (i = sz - 1; i >= 0; i--) {
         if (bb.get((int) i) == '\n') {
           cnt++;
-          if (cnt == lines + 1)
-            break;
+          if (cnt == lines + 1) break;
         }
       }
 
@@ -680,11 +677,9 @@ public class LimsUtils {
 
       // Perform the search
       return grep(cb, p);
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       throw e;
-    }
-    finally {
+    } finally {
       // Close the channel and the stream
       safeClose(fc);
     }
@@ -697,7 +692,7 @@ public class LimsUtils {
       result.append("\n————————————\n");
       Class c = o.getClass();
       Field fieldList[] = c.getDeclaredFields();
-      for(Field entry: fieldList) {
+      for (Field entry : fieldList) {
         result.append(entry.getName());
         result.append(":");
         result.append(entry.get(o));
@@ -714,7 +709,7 @@ public class LimsUtils {
     try {
       c.close();
     } catch (Throwable t) {
-      // Resource close failed!  There's only one thing we can do:
+      // Resource close failed! There's only one thing we can do:
       // Log the exception using your favorite logging framework
       t.printStackTrace();
     }
@@ -740,7 +735,7 @@ public class LimsUtils {
           list.add(interfaces[i]);
         }
         List superInterfaces = getAllInterfaces(interfaces[i]);
-        for (Iterator it = superInterfaces.iterator(); it.hasNext(); ) {
+        for (Iterator it = superInterfaces.iterator(); it.hasNext();) {
           Class intface = (Class) it.next();
           if (!list.contains(intface)) {
             list.add(intface);
@@ -762,6 +757,6 @@ public class LimsUtils {
 
   public static String getSimpleCurrentDate() {
     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-   	return sdf.format(new Date());
+    return sdf.format(new Date());
   }
 }

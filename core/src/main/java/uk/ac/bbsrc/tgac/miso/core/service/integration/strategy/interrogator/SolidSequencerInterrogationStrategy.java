@@ -34,10 +34,12 @@ import uk.ac.bbsrc.tgac.miso.core.service.integration.strategy.SequencerInterrog
 import java.util.List;
 
 /**
- * A concrete implementation of a SequencerInterrogationStrategy that can make queries and parse results, supported by a MisoPerlDaemonInterrogationMechanism, to a SOLiD sequencer.
+ * A concrete implementation of a SequencerInterrogationStrategy that can make queries and parse results, supported by a
+ * MisoPerlDaemonInterrogationMechanism, to a SOLiD sequencer.
  * <p/>
- * Methods in this class are not usually called explicitly, but via a {@link SequencerInterrogator} that has wrapped up this strategy to a SequencerReference.
- *
+ * Methods in this class are not usually called explicitly, but via a {@link SequencerInterrogator} that has wrapped up this strategy to a
+ * SequencerReference.
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */

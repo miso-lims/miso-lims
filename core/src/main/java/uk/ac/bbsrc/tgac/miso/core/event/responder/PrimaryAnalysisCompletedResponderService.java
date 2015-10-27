@@ -44,7 +44,7 @@ import java.util.Set;
  * uk.ac.bbsrc.tgac.miso.core.event.responder
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 20/10/11
  * @since 0.1.2
@@ -54,7 +54,8 @@ public class PrimaryAnalysisCompletedResponderService extends AbstractResponderS
 
   private Set<AlerterService> alerterServices = new HashSet<AlerterService>();
 
-  public PrimaryAnalysisCompletedResponderService() {}
+  public PrimaryAnalysisCompletedResponderService() {
+  }
 
   public Set<AlerterService> getAlerterServices() {
     return alerterServices;
@@ -67,10 +68,10 @@ public class PrimaryAnalysisCompletedResponderService extends AbstractResponderS
   @Override
   public boolean respondsTo(Event event) {
     if (event instanceof ProjectOverviewEvent) {
-      ProjectOverviewEvent poe = (ProjectOverviewEvent)event;
+      ProjectOverviewEvent poe = (ProjectOverviewEvent) event;
       ProjectOverview po = poe.getEventObject();
       if (poe.getEventType().equals(MisoEventType.PRIMARY_ANALYSIS_COMPLETED) && po.getPrimaryAnalysisCompleted()) {
-        log.info("Project "+poe.getEventObject().getProject().getAlias() +": " + poe.getEventMessage());
+        log.info("Project " + poe.getEventObject().getProject().getAlias() + ": " + poe.getEventMessage());
         return true;
       }
     }
@@ -80,7 +81,7 @@ public class PrimaryAnalysisCompletedResponderService extends AbstractResponderS
   @Override
   public void generateResponse(Event event) {
     if (event instanceof ProjectOverviewEvent) {
-      ProjectOverviewEvent re = (ProjectOverviewEvent)event;
+      ProjectOverviewEvent re = (ProjectOverviewEvent) event;
       ProjectOverview po = re.getEventObject();
 
       for (User user : po.getWatchers()) {
@@ -88,17 +89,17 @@ public class PrimaryAnalysisCompletedResponderService extends AbstractResponderS
         a.setAlertTitle("Primary analysis for project " + po.getProject().getAlias() + "(" + po.getProject().getName() + ")");
 
         StringBuilder at = new StringBuilder();
-        at.append("The primary analysis related to this Project has completed: "+po.getProject().getAlias()+" ("+event.getEventMessage()+"). Please view Project " +po.getProject().getId() + " in MISO for more information");
+        at.append("The primary analysis related to this Project has completed: " + po.getProject().getAlias() + " ("
+            + event.getEventMessage() + "). Please view Project " + po.getProject().getId() + " in MISO for more information");
         if (event.getEventContext().has("baseURL")) {
-          at.append(":\n\n" + event.getEventContext().getString("baseURL")+"/project/"+po.getProject().getId());
+          at.append(":\n\n" + event.getEventContext().getString("baseURL") + "/project/" + po.getProject().getId());
         }
         a.setAlertText(at.toString());
 
         for (AlerterService as : alerterServices) {
           try {
             as.raiseAlert(a);
-          }
-          catch (AlertingException e) {
+          } catch (AlertingException e) {
             log.error("Cannot raise user-level alert:" + e.getMessage());
             e.printStackTrace();
           }

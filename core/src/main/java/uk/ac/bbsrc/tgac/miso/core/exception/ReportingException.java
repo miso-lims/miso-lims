@@ -27,7 +27,7 @@ package uk.ac.bbsrc.tgac.miso.core.exception;
  * uk.ac.bbsrc.tgac.miso.core.exception
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 12-Oct-2010
  * @since 0.0.2

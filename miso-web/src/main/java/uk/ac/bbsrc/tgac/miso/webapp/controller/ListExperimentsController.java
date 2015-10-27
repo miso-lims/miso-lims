@@ -49,7 +49,7 @@ import java.util.List;
  * com.eaglegenomics.miso.web
  * <p/>
  * TODO Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -72,10 +72,8 @@ public class ListExperimentsController {
   }
 
   @RequestMapping(value = "/experiments/rest/", method = RequestMethod.GET)
-  public
-  @ResponseBody
+  public @ResponseBody
   Collection<Experiment> jsonRest() throws IOException {
-    //User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     return requestManager.listAllExperiments();
   }
 

@@ -25,8 +25,6 @@ package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
-//import com.fasterxml.jackson.core.type.TypeReference;
-//import com.fasterxml.jackson.databind.ObjectMapper;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
@@ -64,7 +62,7 @@ import java.util.*;
  * uk.ac.bbsrc.tgac.miso.spring.ajax
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.1.2
  */
@@ -86,7 +84,6 @@ public class PlateControllerHelperService {
     Long plateId = json.getLong("plateId");
     File temploc = new File(session.getServletContext().getRealPath("/") + "temp/");
     try {
-      //Plate<LinkedList<Plateable>, Plateable> plate = requestManager.<LinkedList<Plateable>, Plateable> getPlateById(plateId);
       Plate<? extends List<? extends Plateable>, ? extends Plateable> plate = requestManager.getPlateById(plateId);
       barcodeFactory.setPointPixels(1.5f);
       barcodeFactory.setBitmapResolution(600);
@@ -100,12 +97,10 @@ public class PlateControllerHelperService {
         BarcodeGenerator bg = BarcodeFactory.lookupGenerator(json.getString("barcodeGenerator"));
         if (bg != null) {
           bi = barcodeFactory.generateBarcode(plate, bg, dim);
-        }
-        else {
+        } else {
           return JSONUtils.SimpleJSONError("'" + json.getString("barcodeGenerator") + "' is not a valid barcode generator type");
         }
-      }
-      else {
+      } else {
         bi = barcodeFactory.generateSquareDataMatrix(plate, 400);
       }
 
@@ -115,12 +110,10 @@ public class PlateControllerHelperService {
           return JSONUtils.JSONObjectResponse("img", tempimage.getName());
         }
         return JSONUtils.SimpleJSONError("Writing temp image file failed.");
-      }
-      else {
+      } else {
         return JSONUtils.SimpleJSONError("Plate has no parseable barcode");
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError(e.getMessage() + ": Cannot seem to access " + temploc.getAbsolutePath());
     }
@@ -140,12 +133,11 @@ public class PlateControllerHelperService {
         Collection<MisoPrintService> services = printManager.listPrintServicesByBarcodeableClass(Plate.class);
         if (services.size() == 1) {
           mps = services.iterator().next();
+        } else {
+          return JSONUtils
+              .SimpleJSONError("No serviceName specified, but more than one available service able to print this barcode type.");
         }
-        else {
-          return JSONUtils.SimpleJSONError("No serviceName specified, but more than one available service able to print this barcode type.");
-        }
-      }
-      else {
+      } else {
         mps = printManager.getPrintService(serviceName);
       }
 
@@ -154,28 +146,24 @@ public class PlateControllerHelperService {
       for (JSONObject s : (Iterable<JSONObject>) ss) {
         try {
           Long plateId = s.getLong("plateId");
-          //Plate<LinkedList<Plateable>, Plateable>  plate = requestManager.<LinkedList<Plateable>, Plateable> getPlateById(plateId);
           Plate<? extends List<? extends Plateable>, ? extends Plateable> plate = requestManager.getPlateById(plateId);
-          //autosave the barcode if none has been previously generated
+          // autosave the barcode if none has been previously generated
           if (plate.getIdentificationBarcode() == null || "".equals(plate.getIdentificationBarcode())) {
             requestManager.savePlate(plate);
           }
           File f = mps.getLabelFor(plate);
           if (f != null) thingsToPrint.add(f);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
           e.printStackTrace();
           return JSONUtils.SimpleJSONError("Error printing barcodes: " + e.getMessage());
         }
       }
       PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
       return JSONUtils.SimpleJSONResponse("Job " + pj.getJobId() + " : Barcodes printed.");
-    }
-    catch (MisoPrintException e) {
+    } catch (MisoPrintException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
     }
@@ -189,25 +177,13 @@ public class PlateControllerHelperService {
       String newLocation = LimsUtils.lookupLocation(locationBarcode);
       if (newLocation != null) {
         User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-        //Plate<LinkedList<Plateable>, Plateable> plate = requestManager.<LinkedList<Plateable>, Plateable> getPlateById(plateId);
         Plate<? extends List<? extends Plateable>, ? extends Plateable> plate = requestManager.getPlateById(plateId);
         plate.setLocationBarcode(locationBarcode);
-        /*
-        Note note = new Note();
-        note.setInternalOnly(true);
-        note.setText("Location changed to " + newLocation + " by " + user.getLoginName() + " on " + new Date());
-        note.setOwner(user);
-        note.setCreationDate(new Date());
-        plate.getNotes().add(note);
-        requestManager.saveSampleNote(sample, note);
-        */
         requestManager.savePlate(plate);
-      }
-      else {
+      } else {
         return JSONUtils.SimpleJSONError("New location barcode not recognised");
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError(e.getMessage());
     }
@@ -222,14 +198,10 @@ public class PlateControllerHelperService {
       StringBuilder srb = new StringBuilder();
       srb.append("<select name='tagBarcode' id='tagBarcodes'>");
       srb.append("<option value='0' selected='selected'>No barcode</option>");
-//      for (TagBarcode tb : requestManager.listPlateBarcodesByMaterialType(PlateMaterialType.get(materialType))) {
-//        srb.append("<option value='" + tb.getTagBarcodeId() + "'>" + tb.getName() + " ("+ tb.getSequence()+")</option>");
-//      }
       srb.append("</select>");
 
       responseMap.put("plateBarcodes", srb.toString());
-    }
-    else {
+    } else {
       return JSONUtils.SimpleJSONError("Unrecognised MaterialType");
     }
     return JSONUtils.JSONObjectResponse(responseMap);
@@ -239,19 +211,15 @@ public class PlateControllerHelperService {
     if (json.has("documentFormat")) {
       String documentFormat = json.getString("documentFormat");
       try {
-        File f = misoFileManager.getNewFile(
-            Plate.class,
-            "forms",
-            "PlateInputForm-" + LimsUtils.getCurrentDateAsString() + "." + documentFormat);
+        File f = misoFileManager.getNewFile(Plate.class, "forms", "PlateInputForm-" + LimsUtils.getCurrentDateAsString() + "."
+            + documentFormat);
         FormUtils.createPlateInputSpreadsheet(f);
         return JSONUtils.SimpleJSONResponse("" + f.getName().hashCode());
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
         e.printStackTrace();
         return JSONUtils.SimpleJSONError("Failed to get plate input form: " + e.getMessage());
       }
-    }
-    else {
+    } else {
       return JSONUtils.SimpleJSONError("Missing project ID or document format supplied.");
     }
   }
@@ -285,17 +253,8 @@ public class PlateControllerHelperService {
             for (Plate<LinkedList<Library>, Library> plate : platePool.getPoolableElements()) {
               JSONObject j = new JSONObject();
 
-//              if (json.has("tagBarcode")) {
-//                String tagBarcode = json.getString("tagBarcode");
-//                plate.setTagBarcode(requestManager.listAllTagBarcodesByStrategyName());
-//              }
-
               if (plate.getDescription() == null) {
                 plate.setDescription(description);
-              }
-
-              if (plate.getCreationDate() == null) {
-                //plate.setCreationDate(DateFormat.getInstance().parse(creationDate));
               }
 
               if (plate.getPlateMaterialType() == null && plateMaterialType != null) {
@@ -317,16 +276,14 @@ public class PlateControllerHelperService {
         JSONObject resp = new JSONObject();
         resp.put("plates", savedPlates);
         return resp;
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
         if (currentPool != null) {
           log.error("Error saving pool elements on new plate save. Deleting pool " + currentPool.toString());
-          //clear out child elements to make sure plate meets delete requirements
+          // clear out child elements to make sure plate meets delete requirements
           currentPool.getPoolableElements().clear();
           try {
             requestManager.deletePool(currentPool);
-          }
-          catch (IOException e1) {
+          } catch (IOException e1) {
             log.error("Cannot delete pool. Nothing left to do.");
             e1.printStackTrace();
           }
@@ -334,12 +291,11 @@ public class PlateControllerHelperService {
 
         if (currentPlate != null) {
           log.error("Error saving plate elements on new plate save. Deleting plate " + currentPlate.toString());
-          //clear out child elements to make sure plate meets delete requirements
+          // clear out child elements to make sure plate meets delete requirements
           currentPlate.getElements().clear();
           try {
             requestManager.deletePlate(currentPlate);
-          }
-          catch (IOException e1) {
+          } catch (IOException e1) {
             log.error("Cannot delete plate. Nothing left to do.");
             e1.printStackTrace();
           }
@@ -349,8 +305,7 @@ public class PlateControllerHelperService {
         e.printStackTrace();
         return JSONUtils.SimpleJSONError("Cannot save imported plate: " + e.getMessage());
       }
-    }
-    else {
+    } else {
       return JSONUtils.SimpleJSONError("No valid plates available to save");
     }
   }
@@ -381,29 +336,22 @@ public class PlateControllerHelperService {
                   }
                   count++;
                 }
-              }
-              else {
+              } else {
                 log.info("No tag barcodes!");
               }
 
-              jsonArray.add("['" +
-                            l.getName() + "','" +
-                            l.getAlias() + "','" +
-                            strategyName + "','" +
-                            seqbuilder.toString() + "','" +
-                            "<a href=\"/miso/library/" + l.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
+              jsonArray.add("['" + l.getName() + "','" + l.getAlias() + "','" + strategyName + "','" + seqbuilder.toString() + "','"
+                  + "<a href=\"/miso/library/" + l.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
             }
           }
         }
         j.put("elementsArray", jsonArray);
         return j;
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
         log.debug("Failed", e);
         return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
       }
-    }
-    else {
+    } else {
       return JSONUtils.SimpleJSONError("No plates to show");
     }
   }
@@ -412,8 +360,7 @@ public class PlateControllerHelperService {
     User user;
     try {
       user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
     }
@@ -424,21 +371,17 @@ public class PlateControllerHelperService {
         try {
           requestManager.deletePlate(requestManager.getPlateById(plateId));
           return JSONUtils.SimpleJSONResponse("Plate deleted");
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
           e.printStackTrace();
           return JSONUtils.SimpleJSONError("Cannot delete plate: " + e.getMessage());
         }
-      }
-      else {
+      } else {
         return JSONUtils.SimpleJSONError("No plate specified to delete.");
       }
-    }
-    else {
+    } else {
       return JSONUtils.SimpleJSONError("Only logged-in admins can delete objects.");
     }
   }
-
 
   public JSONObject searchSamples(HttpSession session, JSONObject json) {
     String searchStr = json.getString("str");
@@ -447,8 +390,7 @@ public class PlateControllerHelperService {
       StringBuilder b = new StringBuilder();
       if (!"".equals(searchStr)) {
         samples = new ArrayList<Sample>(requestManager.listAllSamplesBySearch(searchStr));
-      }
-      else {
+      } else {
         samples = new ArrayList<Sample>(requestManager.listAllSamplesWithLimit(250));
       }
 
@@ -456,46 +398,38 @@ public class PlateControllerHelperService {
         Collections.sort(samples);
         Collections.reverse(samples);
         for (Sample s : samples) {
-          b.append("<div id=\"sample"+s.getId()+"\" onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" "
-                   + " " + "class=\"dashboard\">");
-          b.append("<input type=\"hidden\" id=\"" + s.getId() + "\" name=\"" + s.getName() + "\" projectname=\"" + s.getProject().getName() + "\" samplealias=\"" + s.getAlias() + "\"/>");
+          b.append("<div id=\"sample" + s.getId()
+              + "\" onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" " + " "
+              + "class=\"dashboard\">");
+          b.append("<input type=\"hidden\" id=\"" + s.getId() + "\" name=\"" + s.getName() + "\" projectname=\"" + s.getProject().getName()
+              + "\" samplealias=\"" + s.getAlias() + "\"/>");
           b.append("Name: <b>" + s.getName() + "</b><br/>");
           b.append("Alias: <b>" + s.getAlias() + "</b><br/>");
           b.append("From Project: <b>" + s.getProject().getName() + "</b><br/>");
-          b.append("<button type=\"button\" class=\"fg-button ui-state-default ui-corner-all\" onclick=\"Plate.ui.insertSampleNextAvailable(jQuery('#sample"+s.getId()+"'));\">Add</button>");
+          b.append("<button type=\"button\" class=\"fg-button ui-state-default ui-corner-all\" onclick=\"Plate.ui.insertSampleNextAvailable(jQuery('#sample"
+              + s.getId() + "'));\">Add</button>");
           b.append("</div>");
         }
-      }
-      else {
+      } else {
         b.append("No matches");
       }
       return JSONUtils.JSONObjectResponse("html", b.toString());
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
   }
 
   public JSONObject exportSampleForm(HttpSession session, JSONObject json) {
-//    if (json.has("projectId") && json.has("documentFormat")) {
-      try {
-        JSONArray a = JSONArray.fromObject(json.getString("form"));
-        File f = misoFileManager.getNewFile(
-            Plate.class,
-            "forms",
-            "PlateInputForm-" + LimsUtils.getCurrentDateAsString() + ".xlsx");
-        FormUtils.createPlateExportForm(f, a);
-        return JSONUtils.SimpleJSONResponse("" + f.getName().hashCode());
-      }
-      catch (Exception e) {
-        e.printStackTrace();
-        return JSONUtils.SimpleJSONError("Failed to get plate input form: " + e.getMessage());
-      }
-//    }
-//    else {
-//      return JSONUtils.SimpleJSONError("Missing project ID or document format supplied.");
-//    }
+    try {
+      JSONArray a = JSONArray.fromObject(json.getString("form"));
+      File f = misoFileManager.getNewFile(Plate.class, "forms", "PlateInputForm-" + LimsUtils.getCurrentDateAsString() + ".xlsx");
+      FormUtils.createPlateExportForm(f, a);
+      return JSONUtils.SimpleJSONResponse("" + f.getName().hashCode());
+    } catch (Exception e) {
+      e.printStackTrace();
+      return JSONUtils.SimpleJSONError("Failed to get plate input form: " + e.getMessage());
+    }
   }
 
   public void setSecurityManager(SecurityManager securityManager) {

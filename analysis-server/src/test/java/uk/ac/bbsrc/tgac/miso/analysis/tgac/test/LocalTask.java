@@ -45,7 +45,7 @@ import java.util.Map;
  * uk.ac.bbsrc.tgac.miso.analysis.tgac
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 27/10/11
  * @since 0.1.2
@@ -57,8 +57,7 @@ public class LocalTask extends TestCase {
   static {
     try {
       testFile = File.createTempFile("sequence", ".txt");
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
     }
   }
@@ -68,8 +67,7 @@ public class LocalTask extends TestCase {
     try {
       InputStream in = LocalTask.class.getResourceAsStream("/sequence.txt");
       LimsUtils.writeFile(in, testFile);
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       fail();
     }
@@ -83,12 +81,10 @@ public class LocalTask extends TestCase {
 
     try {
       process.execute(processParams);
-    }
-    catch (ProcessExecutionException e) {
+    } catch (ProcessExecutionException e) {
       e.printStackTrace();
       fail();
-    }
-    catch (InterruptedException e) {
+    } catch (InterruptedException e) {
       e.printStackTrace();
       fail();
     }
@@ -96,7 +92,7 @@ public class LocalTask extends TestCase {
 
   @Test
   public void testGunzip() {
-    File file = new File(testFile.getAbsolutePath()+".gz");
+    File file = new File(testFile.getAbsolutePath() + ".gz");
 
     ConanProcess process = new LocalGunzipProcess();
     Map<ConanParameter, String> processParams = new HashMap<ConanParameter, String>();
@@ -106,12 +102,10 @@ public class LocalTask extends TestCase {
 
     try {
       process.execute(processParams);
-    }
-    catch (ProcessExecutionException e) {
+    } catch (ProcessExecutionException e) {
       e.printStackTrace();
       fail();
-    }
-    catch (InterruptedException e) {
+    } catch (InterruptedException e) {
       e.printStackTrace();
       fail();
     }

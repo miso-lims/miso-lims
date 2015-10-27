@@ -40,7 +40,7 @@ import java.util.Map;
  * uk.ac.bbsrc.tgac.miso.webapp.service.forms
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 08-Sep-2011
  * @since 0.1.1
@@ -62,7 +62,7 @@ public class MisoFormsService {
       for (Sample s : samples) {
         Sample ms = requestManager.getSampleByBarcode(s.getIdentificationBarcode());
         if (ms != null) {
-          //only process if there's a description
+          // only process if there's a description
           if (s.getDescription() != null && !"".equals(s.getDescription())) {
             ms.setDescription(s.getDescription());
             log.info(ms.getName() + " : Set description -> " + ms.getDescription());
@@ -74,8 +74,7 @@ public class MisoFormsService {
                 if (foundTaxons.containsKey(s.getScientificName())) {
                   ms.setTaxonIdentifier(foundTaxons.get(s.getScientificName()));
                   log.info(ms.getName() + " : Set previously found taxon -> " + ms.getScientificName());
-                }
-                else {
+                } else {
                   String taxon = TaxonomyUtils.checkScientificNameAtNCBI(s.getScientificName());
                   if (taxon != null) {
                     foundTaxons.put(s.getScientificName(), taxon);
@@ -86,10 +85,6 @@ public class MisoFormsService {
               }
             }
 
-            //if (ms.getReceivedDate() == null) {
-//              ms.setReceivedDate(new Date());
-//            }
-
             if (!s.getNotes().isEmpty()) {
               for (Note n : s.getNotes()) {
                 n.setOwner(ms.getSecurityProfile().getOwner());
@@ -99,13 +94,11 @@ public class MisoFormsService {
 
             requestManager.saveSample(ms);
           }
-        }
-        else {
-          throw new IOException("No such sample "+ s.getAlias() +" with barcode: " + s.getIdentificationBarcode());
+        } else {
+          throw new IOException("No such sample " + s.getAlias() + " with barcode: " + s.getIdentificationBarcode());
         }
       }
-    }
-    else {
+    } else {
       throw new IOException("Form not valid. Some samples have no description or scientific name");
     }
   }
@@ -113,11 +106,10 @@ public class MisoFormsService {
   public boolean importSampleDeliveryFormSamplesValidation(List<Sample> samples) {
     Boolean b = true;
     for (Sample s : samples) {
-      if (s.getDescription() != null && !"".equals(s.getDescription()) &&
-          s.getScientificName() != null && !"".equals(s.getScientificName())) {
+      if (s.getDescription() != null && !"".equals(s.getDescription()) && s.getScientificName() != null
+          && !"".equals(s.getScientificName())) {
         b = b & true;
-      }
-      else {
+      } else {
         log.warn(s.getIdentificationBarcode() + ": Sample not valid!");
         b = b & false;
       }

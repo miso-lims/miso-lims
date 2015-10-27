@@ -29,7 +29,7 @@ import java.util.Comparator;
  * uk.ac.bbsrc.tgac.miso.core.util
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 01/12/11
  * @since 0.1.3
@@ -66,8 +66,7 @@ public class AlphanumericComparator implements Comparator {
 
         if (index1 < lengthFirstStr) {
           ch1 = firstString.charAt(index1);
-        }
-        else {
+        } else {
           break;
         }
       } while (Character.isDigit(ch1) == Character.isDigit(space1[0]));
@@ -78,8 +77,7 @@ public class AlphanumericComparator implements Comparator {
 
         if (index2 < lengthSecondStr) {
           ch2 = secondString.charAt(index2);
-        }
-        else {
+        } else {
           break;
         }
       } while (Character.isDigit(ch2) == Character.isDigit(space2[0]));
@@ -93,8 +91,7 @@ public class AlphanumericComparator implements Comparator {
         Integer firstNumberToCompare = new Integer(str1.trim());
         Integer secondNumberToCompare = new Integer(str2.trim());
         result = firstNumberToCompare.compareTo(secondNumberToCompare);
-      }
-      else {
+      } else {
         result = str1.compareTo(str2);
       }
 

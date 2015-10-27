@@ -42,192 +42,84 @@ import com.eaglegenomics.simlims.core.manager.ProtocolManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import com.eaglegenomics.simlims.core.store.DataReferenceStore;
-//import com.eaglegenomics.simlims.spring.RequestControllerHelper;
 import uk.ac.bbsrc.tgac.miso.webapp.util.RequestControllerHelperLoader;
-
 
 @Controller
 @RequestMapping("/request")
-@SessionAttributes( { "request", "dataModel" })
+@SessionAttributes({ "request", "dataModel" })
 public class EditRequestController {
-	protected static final Logger log = LoggerFactory.getLogger(EditRequestController.class);
+  protected static final Logger log = LoggerFactory.getLogger(EditRequestController.class);
 
-	//@Autowired
-	private RequestControllerHelperLoader requestControllerHelperLoader;
+  private RequestControllerHelperLoader requestControllerHelperLoader;
 
-	//@Autowired
-	private SecurityManager securityManager;
+  private SecurityManager securityManager;
 
-	//@Autowired
-	private RequestManager requestManager;
+  private RequestManager requestManager;
 
-	//@Autowired
-	private ProtocolManager protocolManager;
+  private ProtocolManager protocolManager;
 
-	//@Autowired
-	private DataReferenceStore dataReferenceStore;
+  private DataReferenceStore dataReferenceStore;
 
-	public void setRequestHelperLoader(
-			RequestControllerHelperLoader requestControllerHelperLoader) {
-		this.requestControllerHelperLoader = requestControllerHelperLoader;
-	}
+  public void setRequestHelperLoader(RequestControllerHelperLoader requestControllerHelperLoader) {
+    this.requestControllerHelperLoader = requestControllerHelperLoader;
+  }
 
-	public void setDataReferenceStore(DataReferenceStore dataReferenceStore) {
-		this.dataReferenceStore = dataReferenceStore;
-	}
+  public void setDataReferenceStore(DataReferenceStore dataReferenceStore) {
+    this.dataReferenceStore = dataReferenceStore;
+  }
 
-	public void setProtocolManager(ProtocolManager protocolManager) {
-		this.protocolManager = protocolManager;
-	}
+  public void setProtocolManager(ProtocolManager protocolManager) {
+    this.protocolManager = protocolManager;
+  }
 
-	public void setRequestManager(RequestManager requestManager) {
-		this.requestManager = requestManager;
-	}
+  public void setRequestManager(RequestManager requestManager) {
+    this.requestManager = requestManager;
+  }
 
-	public void setSecurityManager(SecurityManager securityManager) {
-		this.securityManager = securityManager;
-	}
+  public void setSecurityManager(SecurityManager securityManager) {
+    this.securityManager = securityManager;
+  }
 
-	@ModelAttribute("protocols")
-	public Collection<Protocol> populateProtocols() throws IOException {
-		try {
-			User user = securityManager
-					.getUserByLoginName(SecurityContextHolder.getContext()
-							.getAuthentication().getName());
-			Collection<Protocol> protocols = new ArrayList<Protocol>();
-			for (Protocol protocol : protocolManager.listAllProtocols()) {
-				if (protocol.userCanWrite(user)) {
-					protocols.add(protocol);
-				}
-			}
-			return protocols;
-		} catch (IOException ex) {
-			if (log.isDebugEnabled()) {
-				log.debug("Failed to list protocols", ex);
-			}
-			throw ex;
-		}
-	}
+  @ModelAttribute("protocols")
+  public Collection<Protocol> populateProtocols() throws IOException {
+    try {
+      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+      Collection<Protocol> protocols = new ArrayList<Protocol>();
+      for (Protocol protocol : protocolManager.listAllProtocols()) {
+        if (protocol.userCanWrite(user)) {
+          protocols.add(protocol);
+        }
+      }
+      return protocols;
+    } catch (IOException ex) {
+      if (log.isDebugEnabled()) {
+        log.debug("Failed to list protocols", ex);
+      }
+      throw ex;
+    }
+  }
 
-	@ModelAttribute("users")
-	public Collection<User> populateUsers() throws IOException {
-		try {
-			return securityManager.listAllUsers();
-		} catch (IOException ex) {
-			if (log.isDebugEnabled()) {
-				log.debug("Failed to list users", ex);
-			}
-			throw ex;
-		}
-	}
+  @ModelAttribute("users")
+  public Collection<User> populateUsers() throws IOException {
+    try {
+      return securityManager.listAllUsers();
+    } catch (IOException ex) {
+      if (log.isDebugEnabled()) {
+        log.debug("Failed to list users", ex);
+      }
+      throw ex;
+    }
+  }
 
-	@ModelAttribute("groups")
-	public Collection<Group> populateGroups() throws IOException {
-		try {
-			return securityManager.listAllGroups();
-		} catch (IOException ex) {
-			if (log.isDebugEnabled()) {
-				log.debug("Failed to list groups", ex);
-			}
-			throw ex;
-		}
-	}
-/*
-	@RequestMapping(method = RequestMethod.GET)
-	public ModelAndView setupForm(
-			@RequestParam(value = "projectId", required = false) Long projectId,
-			@RequestParam(value = "requestId", required = false) Long requestId,
-			ModelMap model) throws IOException {
-		try {
-			User user = securityManager
-					.getUserByLoginName(SecurityContextHolder.getContext()
-							.getAuthentication().getName());
-			Request request;
-			if (projectId != AbstractProject.UNSAVED_ID) {
-				request = requestManager.getProjectById(projectId)
-						.createRequest(user);
-			} else {
-				request = requestManager.getRequestById(requestId);
-			}
-			if (!request.userCanWrite(user)) {
-				throw new SecurityException("Permission denied.");
-			}
-			model.put("request", request);
-			model.put("dataModel", "");
-			return new ModelAndView("/pages/editRequest.jsp", model);
-		} catch (IOException ex) {
-			if (log.isDebugEnabled()) {
-				log.debug("Failed to show request", ex);
-			}
-			throw ex;
-		}
-	}
-
-	@RequestMapping(method = RequestMethod.POST)
-	public ModelAndView processSubmit(
-			@ModelAttribute("request") Request request,
-			@ModelAttribute("dataModel") Object dataModel, ModelMap model,
-			SessionStatus session) throws IOException {
-		try {
-			User user = securityManager
-					.getUserByLoginName(SecurityContextHolder.getContext()
-							.getAuthentication().getName());
-			String view = "redirect:/miso/projects";
-			if (!request.userCanWrite(user)) {
-				throw new SecurityException("Permission denied.");
-			}
-			if (request.getRequestId() == Request.UNSAVED_ID) {
-				RequestControllerHelper helper = requestControllerHelperLoader
-						.getHelper(protocolManager.getProtocol(request
-								.getProtocolUniqueIdentifier()));
-				if ("".equals(dataModel)) {
-					model.put("dataModel", helper.createDataModel());
-					view = helper.getDataModelView();
-				} else {
-					requestManager.saveRequest(request);
-					queueData(request, helper
-							.convertDataModelToInputData(dataModel));
-					session.setComplete();
-					model.clear();
-				}
-			} else {
-				// Save the request.
-				requestManager.saveRequest(request);
-				session.setComplete();
-				model.clear();
-			}
-			return new ModelAndView(view, model);
-		} catch (IOException ex) {
-			if (log.isDebugEnabled()) {
-				log.debug("Failed to save request", ex);
-			}
-			throw ex;
-		}
-	}
-
-	private void queueData(Request request, Collection<?> data)
-			throws IOException {
-		Collection<ActivityData> inputData = new HashSet<ActivityData>();
-		Protocol protocol = protocolManager.getProtocol(request
-				.getProtocolUniqueIdentifier());
-		String startpoint = protocol.getStartpoint();
-		for (Object obj : data) {
-			DataReference ref = dataReferenceStore.create(obj);
-			ref.save();
-			ActivityData act = new BasicActivityData();
-			act.setActivityAlias(startpoint);
-			act.setDataReference(ref);
-			act.setActivity(protocol.getActivityAliasMap().get(startpoint));
-			Entry entry = act.createEntry();
-			entry.setRequest(request);
-			entry.setExecutionCount(request.getExecutionCount());
-			entry.setProtocol(protocolManager.getProtocol(request
-					.getProtocolUniqueIdentifier()));
-			act.getIndexedEntries().put(ActivityData.NO_INDEX, entry);
-			inputData.add(act);
-		}
-		protocolManager.setupInputData(request.getSecurityProfile().getOwner(),
-				inputData);
-	}
-	*/
+  @ModelAttribute("groups")
+  public Collection<Group> populateGroups() throws IOException {
+    try {
+      return securityManager.listAllGroups();
+    } catch (IOException ex) {
+      if (log.isDebugEnabled()) {
+        log.debug("Failed to list groups", ex);
+      }
+      throw ex;
+    }
+  }
 }

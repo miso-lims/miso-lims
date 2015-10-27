@@ -48,7 +48,7 @@ import java.util.*;
 
 /**
  * Skeleton implementation of a Run
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -215,17 +215,11 @@ public abstract class AbstractRun implements Run {
 
         if (status.getHealth().equals(HealthType.Started)) {
           fireRunStartedEvent();
-        }
-        else if (status.getHealth().equals(HealthType.Completed)) {
+        } else if (status.getHealth().equals(HealthType.Completed)) {
           fireRunCompletedEvent();
-        }
-        else if (status.getHealth().equals(HealthType.Failed)) {
-//          if (status.getCompletionDate() == null) {
-//            status.setCompletionDate(new Date());
-//          }
+        } else if (status.getHealth().equals(HealthType.Failed)) {
           fireRunFailedEvent();
-        }
-        else {
+        } else {
           fireStatusChangedEvent();
         }
       }
@@ -239,8 +233,7 @@ public abstract class AbstractRun implements Run {
     this.runQCs.add(runQC);
     try {
       runQC.setRun(this);
-    }
-    catch (MalformedRunException e) {
+    } catch (MalformedRunException e) {
       e.printStackTrace();
     }
   }
@@ -279,7 +272,7 @@ public abstract class AbstractRun implements Run {
 
   public void accept(SubmittableVisitor v) {
     v.visit(this);
-  }   
+  }
 
   public boolean userCanRead(User user) {
     return securityProfile.userCanRead(user);
@@ -300,11 +293,10 @@ public abstract class AbstractRun implements Run {
   public void inheritPermissions(SecurableByProfile parent) throws SecurityException {
     if (parent.getSecurityProfile().getOwner() != null) {
       setSecurityProfile(parent.getSecurityProfile());
-    }
-    else {
+    } else {
       throw new SecurityException("Cannot inherit permissions when parent object owner is not set!");
     }
-  }  
+  }
 
   public abstract void buildReport();
 
@@ -402,20 +394,15 @@ public abstract class AbstractRun implements Run {
    */
   @Override
   public boolean equals(Object obj) {
-    if (obj == null)
-      return false;
-    if (obj == this)
-      return true;
-    if (!(obj instanceof AbstractRun))
-      return false;
+    if (obj == null) return false;
+    if (obj == this) return true;
+    if (!(obj instanceof AbstractRun)) return false;
     Run them = (Run) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
-    if (getId() == AbstractRun.UNSAVED_ID
-        || them.getId() == AbstractRun.UNSAVED_ID) {
-      return getAlias().equals(them.getAlias()); //&& this.getDescription().equals(them.getDescription());
-    }
-    else {
+    if (getId() == AbstractRun.UNSAVED_ID || them.getId() == AbstractRun.UNSAVED_ID) {
+      return getAlias().equals(them.getAlias());
+    } else {
       return getId() == them.getId();
     }
   }
@@ -423,21 +410,18 @@ public abstract class AbstractRun implements Run {
   @Override
   public int hashCode() {
     if (getId() != AbstractRun.UNSAVED_ID) {
-      return (int)getId();
-    }
-    else {
+      return (int) getId();
+    } else {
       final int PRIME = 37;
       int hashcode = 1;
       if (getAlias() != null) hashcode = PRIME * hashcode + getAlias().hashCode();
-      //if (getDescription() != null) hashcode = PRIME * hashcode + getDescription().hashCode();
-      //if (getExperiment() != null) hashcode = 37 * hashcode + getExperiment().hashCode();
       return hashcode;
     }
   }
 
   @Override
   public int compareTo(Object o) {
-    Run t = (Run)o;
+    Run t = (Run) o;
     if (getId() < t.getId()) return -1;
     if (getId() > t.getId()) return 1;
     return 0;
@@ -459,7 +443,7 @@ public abstract class AbstractRun implements Run {
 
     if (getStatus() != null) {
       sb.append(getStatus().getHealth());
-      sb.append("("+getStatus().getStatusId()+")");
+      sb.append("(" + getStatus().getStatusId() + ")");
     }
     return sb.toString();
   }

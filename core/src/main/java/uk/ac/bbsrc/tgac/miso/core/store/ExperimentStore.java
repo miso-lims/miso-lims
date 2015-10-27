@@ -31,64 +31,61 @@ import java.util.Collection;
 
 /**
  * Defines a DAO interface for storing Experiments
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public interface ExperimentStore extends Store<Experiment>, Cascadable, Remover<Experiment>, NamingSchemeAware<Experiment> {
   /**
-   * Retrieve an Experiment from an underlying data store given an Experiment ID
-   * <p/>
-   * This method intends to retrieve objects in an 'ignorant' fashion, i.e.  will not populate
-   * parent or child objects that could lead to a circular dependency
-   *
-   * @param experimentId of type long
-   * @return Experiment
-   * @throws IOException when
-   */
-  //Experiment lazyGet(long experimentId) throws IOException;
-
-  /**
    * List all Experiments that match a search criteria
-   *
-   * @param query of type String
+   * 
+   * @param query
+   *          of type String
    * @return Collection<Experiment>
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   Collection<Experiment> listBySearch(String query) throws IOException;
 
   /**
    * List all Experiments that are part of a Study given a Study ID
-   *
-   * @param studyId of type long
+   * 
+   * @param studyId
+   *          of type long
    * @return Collection<Experiment>
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   Collection<Experiment> listByStudyId(long studyId) throws IOException;
 
   /**
    * List all Experiments that are part of a Submission given a Submission ID
-   *
-   * @param submissionId of type long
+   * 
+   * @param submissionId
+   *          of type long
    * @return Collection<Experiment>
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   Collection<Experiment> listBySubmissionId(long submissionId) throws IOException;
 
   /**
    * List all Experiments that are related to a given Pool given a Pool ID
-   *
-   * @param poolId of type long
+   * 
+   * @param poolId
+   *          of type long
    * @return Collection<Experiment>
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   Collection<Experiment> listByPoolId(long poolId) throws IOException;
 
   /**
    * List all persisted objects
-   *
+   * 
    * @return Collection<Experiment>
-   * @throws IOException when the objects cannot be retrieved
+   * @throws IOException
+   *           when the objects cannot be retrieved
    */
   Collection<Experiment> listAllWithLimit(long limit) throws IOException;
 }

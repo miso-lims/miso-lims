@@ -33,7 +33,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
  * uk.ac.bbsrc.tgac.miso.core.data.impl.pacbio
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.1.6
  */

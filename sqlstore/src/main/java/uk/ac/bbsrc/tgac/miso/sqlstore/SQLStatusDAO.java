@@ -51,36 +51,31 @@ import java.util.List;
  * uk.ac.bbsrc.tgac.miso.sqlstore
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public class SQLStatusDAO implements StatusStore {
   private static final String TABLE_NAME = "Status";
 
-  public static final String STATUSES_SELECT =
-          "SELECT statusId, health, startDate, completionDate, runName, instrumentName, xml, lastUpdated " +
-          "FROM "+TABLE_NAME;
+  public static final String STATUSES_SELECT = "SELECT statusId, health, startDate, completionDate, runName, instrumentName, xml, lastUpdated "
+      + "FROM " + TABLE_NAME;
 
-  public static final String STATUS_UPDATE =
-          "UPDATE "+TABLE_NAME+" " +
-          "SET health=:health, startDate=:startDate, completionDate=:completionDate, runName=:runName, instrumentName=:instrumentName, xml=:xml " +
-          "WHERE statusId=:statusId";
+  public static final String STATUS_UPDATE = "UPDATE "
+      + TABLE_NAME
+      + " "
+      + "SET health=:health, startDate=:startDate, completionDate=:completionDate, runName=:runName, instrumentName=:instrumentName, xml=:xml "
+      + "WHERE statusId=:statusId";
 
-  public static final String STATUS_SELECT_BY_ID =
-          STATUSES_SELECT + " " + "WHERE statusId = ?";
+  public static final String STATUS_SELECT_BY_ID = STATUSES_SELECT + " " + "WHERE statusId = ?";
 
-  public static final String STATUS_SELECT_BY_SEQUENCER_NAME =
-          STATUSES_SELECT + " " + "WHERE runName LIKE CONCAT('%', ? ,'%')";
+  public static final String STATUS_SELECT_BY_SEQUENCER_NAME = STATUSES_SELECT + " " + "WHERE runName LIKE CONCAT('%', ? ,'%')";
 
-  public static final String STATUS_SELECT_BY_INSTRUMENT_NAME =
-          STATUSES_SELECT + " " + "WHERE instrumentName = ?";  
-  
-  public static final String STATUS_SELECT_BY_RUN_NAME =
-          STATUSES_SELECT + " " + "WHERE runName = ?";  
+  public static final String STATUS_SELECT_BY_INSTRUMENT_NAME = STATUSES_SELECT + " " + "WHERE instrumentName = ?";
 
-  public static final String STATUS_SELECT_BY_HEALTH =
-          STATUSES_SELECT + " " + "WHERE health = ?";
+  public static final String STATUS_SELECT_BY_RUN_NAME = STATUSES_SELECT + " " + "WHERE runName = ?";
+
+  public static final String STATUS_SELECT_BY_HEALTH = STATUSES_SELECT + " " + "WHERE health = ?";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLStatusDAO.class);
   private JdbcTemplate template;
@@ -90,7 +85,7 @@ public class SQLStatusDAO implements StatusStore {
 
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
-  }    
+  }
 
   public JdbcTemplate getJdbcTemplate() {
     return template;
@@ -102,11 +97,11 @@ public class SQLStatusDAO implements StatusStore {
 
   public long save(Status status) throws IOException {
     MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("runName", status.getRunName())
-            .addValue("health", status.getHealth().getKey())
-            .addValue("startDate", status.getStartDate())
-            .addValue("completionDate", status.getCompletionDate())
-            .addValue("instrumentName", status.getInstrumentName());
+    params.addValue("runName", status.getRunName());
+    params.addValue("health", status.getHealth().getKey());
+    params.addValue("startDate", status.getStartDate());
+    params.addValue("completionDate", status.getCompletionDate());
+    params.addValue("instrumentName", status.getInstrumentName());
 
     Blob xmlblob = null;
     try {
@@ -114,41 +109,34 @@ public class SQLStatusDAO implements StatusStore {
         byte[] rbytes = status.getXml().getBytes();
         xmlblob = new SerialBlob(rbytes);
         params.addValue("xml", xmlblob);
-      }
-      else {
+      } else {
         params.addValue("xml", null);
       }
-    }
-    catch (SerialException e) {
+    } catch (SerialException e) {
       e.printStackTrace();
-    }
-    catch (SQLException e) {
+    } catch (SQLException e) {
       e.printStackTrace();
     }
 
     if (status.getStatusId() == 0L) {
       Status savedStatus = getByRunName(status.getRunName());
       if (savedStatus == null) {
-        SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-                .withTableName(TABLE_NAME)
-                .usingGeneratedKeyColumns("statusId");
+        SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("statusId");
 
         if (status.getHealth().equals(HealthType.Running) && status.getStartDate() == null) {
-          //run freshly started
+          // run freshly started
           params.addValue("startDate", new Date());
         }
 
         Number newId = insert.executeAndReturnKey(params);
         status.setStatusId(newId.longValue());
-      }
-      else {
+      } else {
         status.setStatusId(savedStatus.getStatusId());
         params.addValue("statusId", status.getStatusId());
         NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-        namedTemplate.update(STATUS_UPDATE, params);        
+        namedTemplate.update(STATUS_UPDATE, params);
       }
-    }
-    else {
+    } else {
       params.addValue("statusId", status.getStatusId());
       params.addValue("startDate", new SimpleDateFormat("yyyy-MM-dd").format(status.getStartDate()));
       NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
@@ -165,26 +153,26 @@ public class SQLStatusDAO implements StatusStore {
 
   @Override
   public int count() throws IOException {
-    return template.queryForInt("SELECT count(*) FROM "+TABLE_NAME);
+    return template.queryForInt("SELECT count(*) FROM " + TABLE_NAME);
   }
 
   public List<Status> listAllBySequencerName(String sequencerName) {
-    List results = template.query(STATUS_SELECT_BY_SEQUENCER_NAME, new Object[]{sequencerName}, new StatusMapper());
+    List results = template.query(STATUS_SELECT_BY_SEQUENCER_NAME, new Object[] { sequencerName }, new StatusMapper());
     return results;
   }
 
   public List<Status> listAllByInstrumentName(String instrumentName) {
-    List results = template.query(STATUS_SELECT_BY_INSTRUMENT_NAME, new Object[]{instrumentName}, new StatusMapper());
+    List results = template.query(STATUS_SELECT_BY_INSTRUMENT_NAME, new Object[] { instrumentName }, new StatusMapper());
     return results;
   }
 
   public List<Status> listByHealth(String health) {
-    List results = template.query(STATUS_SELECT_BY_HEALTH, new Object[]{health}, new StatusMapper());
+    List results = template.query(STATUS_SELECT_BY_HEALTH, new Object[] { health }, new StatusMapper());
     return results;
   }
 
   public Status get(long statusId) throws IOException {
-    List eResults = template.query(STATUS_SELECT_BY_ID, new Object[]{statusId}, new StatusMapper());
+    List eResults = template.query(STATUS_SELECT_BY_ID, new Object[] { statusId }, new StatusMapper());
     Status e = eResults.size() > 0 ? (Status) eResults.get(0) : null;
     return e;
   }
@@ -195,7 +183,7 @@ public class SQLStatusDAO implements StatusStore {
   }
 
   public Status getByRunName(String runName) throws IOException {
-    List eResults = template.query(STATUS_SELECT_BY_RUN_NAME, new Object[]{runName}, new StatusMapper());
+    List eResults = template.query(STATUS_SELECT_BY_RUN_NAME, new Object[] { runName }, new StatusMapper());
     Status e = eResults.size() > 0 ? (Status) eResults.get(0) : null;
     return e;
   }
@@ -210,11 +198,11 @@ public class SQLStatusDAO implements StatusStore {
       s.setRunName(rs.getString("runName"));
       s.setInstrumentName(rs.getString("instrumentName"));
       s.setLastUpdated(rs.getTimestamp("lastUpdated"));
-      
+
       Blob xmlblob = rs.getBlob("xml");
       if (xmlblob != null) {
         if (xmlblob.length() > 0) {
-          byte[] rbytes = xmlblob.getBytes(1, (int)xmlblob.length());
+          byte[] rbytes = xmlblob.getBytes(1, (int) xmlblob.length());
           s.setXml(new String(rbytes));
         }
       }

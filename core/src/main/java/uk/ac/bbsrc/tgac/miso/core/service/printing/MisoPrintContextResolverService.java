@@ -34,7 +34,7 @@ import java.util.*;
  * uk.ac.bbsrc.tgac.miso.core.service.integration
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 03/02/12
  * @since 0.1.5
@@ -49,12 +49,10 @@ public class MisoPrintContextResolverService implements PrintContextResolverServ
       if (context.getName().equals(contextName)) {
         try {
           return context.getClass().newInstance();
-        }
-        catch (InstantiationException e) {
+        } catch (InstantiationException e) {
           log.error("Cannot create a new instance of '" + contextName + "'", e);
           e.printStackTrace();
-        }
-        catch (IllegalAccessException e) {
+        } catch (IllegalAccessException e) {
           log.error("Cannot create a new instance of '" + contextName + "'", e);
           e.printStackTrace();
         }
@@ -66,7 +64,7 @@ public class MisoPrintContextResolverService implements PrintContextResolverServ
 
   @Override
   public Collection<PrintContext> getPrintContexts() {
-    //lazily load available contexts
+    // lazily load available contexts
     if (contextMap == null) {
       ServiceLoader<PrintContext> consumerLoader = ServiceLoader.load(PrintContext.class);
       Iterator<PrintContext> consumerIterator = consumerLoader.iterator();
@@ -77,11 +75,10 @@ public class MisoPrintContextResolverService implements PrintContextResolverServ
 
         if (!contextMap.containsKey(p.getName())) {
           contextMap.put(p.getName(), p);
-        }
-        else {
+        } else {
           if (contextMap.get(p.getName()) != p) {
-            String msg = "Multiple different PrintContexts with the same context name " +
-                         "('" + p.getName() + "') are present on the classpath. Context names must be unique.";
+            String msg = "Multiple different PrintContexts with the same context name " + "('" + p.getName()
+                + "') are present on the classpath. Context names must be unique.";
             log.error(msg);
             throw new ServiceConfigurationError(msg);
           }

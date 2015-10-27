@@ -29,7 +29,7 @@ import uk.ac.ebi.fgpt.conan.model.AbstractConanParameter;
  * uk.ac.bbsrc.tgac.miso.analysis.parameter
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 14/10/11
  * @since 0.1.2

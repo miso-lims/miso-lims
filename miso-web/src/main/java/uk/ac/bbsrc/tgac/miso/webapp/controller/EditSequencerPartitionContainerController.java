@@ -101,16 +101,14 @@ public class EditSequencerPartitionContainerController {
   }
 
   @RequestMapping(value = "/{containerId}", method = RequestMethod.GET)
-  public ModelAndView setupForm(@PathVariable Long containerId,
-                                ModelMap model) throws IOException {
+  public ModelAndView setupForm(@PathVariable Long containerId, ModelMap model) throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       SequencerPartitionContainer<SequencerPoolPartition> container = null;
       if (containerId == AbstractSequencerPartitionContainer.UNSAVED_ID) {
         container = dataObjectFactory.getSequencerPartitionContainer(user);
         model.put("title", "New Container");
-      }
-      else {
+      } else {
         container = requestManager.getSequencerPartitionContainerById(containerId);
         model.put("title", "Container " + containerId);
       }
@@ -118,8 +116,7 @@ public class EditSequencerPartitionContainerController {
       model.put("formObj", container);
       model.put("container", container);
       return new ModelAndView("/pages/editSequencerPartitionContainer.jsp", model);
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to show container", ex);
       }
@@ -128,8 +125,8 @@ public class EditSequencerPartitionContainerController {
   }
 
   @RequestMapping(method = RequestMethod.POST)
-  public String processSubmit(@ModelAttribute("container") SequencerPartitionContainer container,
-                              ModelMap model, SessionStatus session) throws IOException, MalformedRunException {
+  public String processSubmit(@ModelAttribute("container") SequencerPartitionContainer container, ModelMap model, SessionStatus session)
+      throws IOException, MalformedRunException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       if (!container.userCanWrite(user)) {
@@ -139,9 +136,8 @@ public class EditSequencerPartitionContainerController {
       long containerId = requestManager.saveSequencerPartitionContainer(container);
       session.setComplete();
       model.clear();
-      return "redirect:/miso/container/"+containerId;
-    }
-    catch (IOException ex) {
+      return "redirect:/miso/container/" + containerId;
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to save container", ex);
       }

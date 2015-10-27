@@ -33,17 +33,16 @@ import java.util.regex.Pattern;
  * uk.ac.bbsrc.tgac.miso.core.util.jira
  * <p/>
  * Converts issue tracker JSON into JSON suitable for display in the MISO interface
- *
+ * 
  * @author Rob Davey
  * @date 25-Jan-2011
  * @since 0.0.3
  */
 public class IssueJsonConverter {
   public static JSONObject jiraToMiso(JSONObject json) {
-    //convert all REST urls to relevant JIRA web interface URLs
+    // convert all REST urls to relevant JIRA web interface URLs
     Pattern issuePattern = Pattern.compile("(http://[A-z0-9\\.]+)/rest/api/2/issue/([0-9]+)");
     Pattern issuelinkPattern = Pattern.compile("(http://[A-z0-9\\.]+)/rest/api/2/issueLink/[0-9]+");
-    //Pattern votePattern = Pattern.compile("(http://[A-z0-9\\.]+)/rest/api/2.0.alpha1/issue/([A-Z]+-[\\d]+)/votes");
     Pattern userPattern = Pattern.compile("(http://[A-z0-9\\.]+)/rest/api/2/user\\?username\\=([A-z0-9]+)");
     Pattern projectPattern = Pattern.compile("(http://[A-z0-9\\.]+)/rest/api/2/project/([A-Z]+)");
     Pattern commentPattern = Pattern.compile("(http://[A-z0-9\\.]+)/rest/api/2/issue/([0-9]+)/comment/([0-9]+)");
@@ -59,14 +58,6 @@ public class IssueJsonConverter {
 
     JSONObject fields = json.getJSONObject("fields");
     if (fields != null) {
-      /*
-      JSONObject voteValue = fields.getJSONObject("votes").getJSONObject("value");
-      Matcher m = votePattern.matcher(voteValue.getString("self"));
-      if (m.matches()) {
-        json.put("url", m.group(1)+"/browse/"+m.group(2));
-      }
-      */
-
       JSONObject assigneeValue = fields.getJSONObject("assignee");
       Matcher m = userPattern.matcher(assigneeValue.getString("self"));
       if (m.matches()) {
@@ -90,13 +81,11 @@ public class IssueJsonConverter {
         m = issuelinkPattern.matcher(link.getString("self"));
         if (m.matches()) {
           String linkIssueKey;
-          if (link.get("inwardIssue") != null ) {
+          if (link.get("inwardIssue") != null) {
             linkIssueKey = (link.getJSONObject("inwardIssue")).getString("key");
-          }
-          else if (link.get("outwardIssue") != null ) {
+          } else if (link.get("outwardIssue") != null) {
             linkIssueKey = (link.getJSONObject("outwardIssue")).getString("key");
-          }
-          else {
+          } else {
             linkIssueKey = "";
           }
           link.put("url", m.group(1) + "/browse/" + linkIssueKey);
@@ -115,7 +104,8 @@ public class IssueJsonConverter {
       for (JSONObject comment : (Iterable<JSONObject>) comments) {
         m = commentPattern.matcher(comment.getString("self"));
         if (m.matches()) {
-          comment.put("url", m.group(1) + "/browse/" + issueKey + "?focusedCommentId=" + m.group(3) + "&page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel#comment-" + m.group(3));
+          comment.put("url", m.group(1) + "/browse/" + issueKey + "?focusedCommentId=" + m.group(3)
+              + "&page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel#comment-" + m.group(3));
         }
 
         JSONObject authorValue = comment.getJSONObject("author");

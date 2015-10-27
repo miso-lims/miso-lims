@@ -27,7 +27,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 
 /**
  * Skeleton implementation of a LibraryQC
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -60,30 +60,23 @@ public abstract class AbstractLibraryQC extends AbstractQC implements LibraryQC 
 
   public void setInsertSize(Integer insertSize) {
     this.insertSize = insertSize;
-  }  
+  }
 
   /**
    * Equivalency is based on getQcId() if set, otherwise on name
    */
   @Override
   public boolean equals(Object obj) {
-    if (obj == null)
-      return false;
-    if (obj == this)
-      return true;
-    if (!(obj instanceof AbstractLibraryQC))
-      return false;
+    if (obj == null) return false;
+    if (obj == this) return true;
+    if (!(obj instanceof AbstractLibraryQC)) return false;
     LibraryQC them = (LibraryQC) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
-    if (this.getId() == AbstractLibraryQC.UNSAVED_ID
-        || them.getId() == AbstractLibraryQC.UNSAVED_ID) {
-      return this.getQcCreator().equals(them.getQcCreator())
-             && this.getQcDate().equals(them.getQcDate())
-             && this.getQcType().equals(them.getQcType())
-             && this.getResults().equals(them.getResults());
-    }
-    else {
+    if (this.getId() == AbstractLibraryQC.UNSAVED_ID || them.getId() == AbstractLibraryQC.UNSAVED_ID) {
+      return this.getQcCreator().equals(them.getQcCreator()) && this.getQcDate().equals(them.getQcDate())
+          && this.getQcType().equals(them.getQcType()) && this.getResults().equals(them.getResults());
+    } else {
       return this.getId() == them.getId();
     }
   }
@@ -91,9 +84,8 @@ public abstract class AbstractLibraryQC extends AbstractQC implements LibraryQC 
   @Override
   public int hashCode() {
     if (getId() != AbstractLibraryQC.UNSAVED_ID) {
-      return (int)getId();
-    }
-    else {
+      return (int) getId();
+    } else {
       int hashcode = getQcCreator().hashCode();
       hashcode = 37 * hashcode + getQcDate().hashCode();
       hashcode = 37 * hashcode + getQcType().hashCode();

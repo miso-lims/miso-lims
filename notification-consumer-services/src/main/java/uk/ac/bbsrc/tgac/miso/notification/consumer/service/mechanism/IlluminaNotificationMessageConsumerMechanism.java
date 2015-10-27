@@ -54,12 +54,13 @@ import java.util.regex.Pattern;
  * uk.ac.bbsrc.tgac.miso.core.service.integration.mechanism.impl
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 03/02/12
  * @since 0.1.5
  */
-public class IlluminaNotificationMessageConsumerMechanism implements NotificationMessageConsumerMechanism<Message<Map<String, List<String>>>, Set<Run>> {
+public class IlluminaNotificationMessageConsumerMechanism implements
+    NotificationMessageConsumerMechanism<Message<Map<String, List<String>>>, Set<Run>> {
   protected static final Logger log = LoggerFactory.getLogger(IlluminaNotificationMessageConsumerMechanism.class);
 
   public boolean attemptRunPopulation = true;
@@ -108,9 +109,10 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
       if (m.matches()) {
         try {
           r = requestManager.getRunByAlias(runName);
-        }
-        catch(IOException ioe) {
-          log.warn("Cannot find run by the alias "+runName+". This usually means the run hasn't been previously imported. If attemptRunPopulation is false, processing will not take place for this run!");
+        } catch (IOException ioe) {
+          log.warn("Cannot find run by the alias "
+              + runName
+              + ". This usually means the run hasn't been previously imported. If attemptRunPopulation is false, processing will not take place for this run!");
         }
       }
 
@@ -119,7 +121,7 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
           if (r == null) {
             log.debug("Saving new run and status: " + runName);
             if (!run.has("status")) {
-              //probably MiSeq
+              // probably MiSeq
               r = new IlluminaRun();
               r.setPlatformRunId(Integer.parseInt(m.group(2)));
               r.setAlias(runName);
@@ -128,8 +130,7 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
               r.setPairedEnd(false);
               is.setHealth(ht);
               r.setStatus(is);
-            }
-            else {
+            } else {
               String xml = run.getString("status");
               is = new IlluminaStatus(xml);
               r = new IlluminaRun(xml);
@@ -162,8 +163,7 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
 
             if (r.getSequencerReference() == null) {
               log.error("Cannot save " + is.getRunName() + ": no sequencer reference available.");
-            }
-            else {
+            } else {
               log.debug("Setting sequencer reference: " + sr.getName());
 
               if (run.has("startDate")) {
@@ -172,8 +172,7 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
                     log.debug("Updating start date:" + run.getString("startDate"));
                     r.getStatus().setStartDate(illuminaRunFolderDateFormat.parse(run.getString("startDate")));
                   }
-                }
-                catch (ParseException e) {
+                } catch (ParseException e) {
                   log.error(e.getMessage());
                   e.printStackTrace();
                 }
@@ -181,26 +180,25 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
 
               if (run.has("completionDate")) {
                 try {
-                  if (run.get("completionDate") != null && !run.getString("completionDate").equals("null") && !"".equals(run.getString("completionDate"))) {
+                  if (run.get("completionDate") != null && !run.getString("completionDate").equals("null")
+                      && !"".equals(run.getString("completionDate"))) {
                     log.debug("Updating completion date:" + run.getString("completionDate"));
                     r.getStatus().setCompletionDate(logDateFormat.parse(run.getString("completionDate")));
                   }
-                }
-                catch (ParseException e) {
+                } catch (ParseException e) {
                   log.error(e.getMessage());
                   e.printStackTrace();
                 }
               }
             }
-          }
-          else {
+          } else {
             log.debug("Updating existing run and status: " + runName);
 
-            //always overwrite any previous alias with the correct run alias
+            // always overwrite any previous alias with the correct run alias
             r.setAlias(runName);
             r.setPlatformType(PlatformType.ILLUMINA);
 
-            //update description if empty
+            // update description if empty
             if (LimsUtils.isStringEmptyOrNull(r.getDescription())) {
               r.setDescription(m.group(3));
             }
@@ -212,12 +210,10 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
 
               if (run.has("status")) {
                 r.getStatus().setXml(run.getString("status"));
-              }
-              else {
+              } else {
                 log.debug("No new status XML information coming through from notification system...");
               }
-            }
-            else {
+            } else {
               if (run.has("status")) {
                 is.setXml(run.getString("status"));
               }
@@ -255,40 +251,36 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
                   log.debug("Updating start date:" + run.getString("startDate"));
                   r.getStatus().setStartDate(illuminaRunFolderDateFormat.parse(run.getString("startDate")));
                 }
-              }
-              catch (ParseException e) {
-                log.error(runName + ": "+ e.getMessage());
+              } catch (ParseException e) {
+                log.error(runName + ": " + e.getMessage());
                 e.printStackTrace();
               }
             }
 
             if (run.has("completionDate")) {
-              if (run.get("completionDate") != null && !run.getString("completionDate").equals("null") && !"".equals(run.getString("completionDate"))) {
+              if (run.get("completionDate") != null && !run.getString("completionDate").equals("null")
+                  && !"".equals(run.getString("completionDate"))) {
                 log.debug("Updating completion date:" + run.getString("completionDate"));
                 try {
                   r.getStatus().setCompletionDate(logDateFormat.parse(run.getString("completionDate")));
-                }
-                catch (ParseException e) {
-                  log.error(runName + ": "+ e.getMessage());
+                } catch (ParseException e) {
+                  log.error(runName + ": " + e.getMessage());
                   try {
                     r.getStatus().setCompletionDate(anotherLogDateFormat.parse(run.getString("completionDate")));
-                  }
-                  catch (ParseException e1) {
-                    log.error(runName + ": "+ e1.getMessage());
+                  } catch (ParseException e1) {
+                    log.error(runName + ": " + e1.getMessage());
                     e1.printStackTrace();
                   }
                 }
-              }
-              else {
-                if (!r.getStatus().getHealth().equals(HealthType.Completed) &&
-                    !r.getStatus().getHealth().equals(HealthType.Failed) &&
-                    !r.getStatus().getHealth().equals(HealthType.Stopped)) {
+              } else {
+                if (!r.getStatus().getHealth().equals(HealthType.Completed) && !r.getStatus().getHealth().equals(HealthType.Failed)
+                    && !r.getStatus().getHealth().equals(HealthType.Stopped)) {
                   r.getStatus().setCompletionDate(null);
                 }
               }
             }
 
-            //update path if changed
+            // update path if changed
             if (run.has("fullPath") && !"".equals(run.getString("fullPath")) && r.getFilePath() != null && !"".equals(r.getFilePath())) {
               if (!run.getString("fullPath").equals(r.getFilePath())) {
                 log.debug("Updating run file path:" + r.getFilePath() + " -> " + run.getString("fullPath"));
@@ -301,10 +293,12 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
             Collection<SequencerPartitionContainer<SequencerPoolPartition>> fs = r.getSequencerPartitionContainers();
             if (fs.isEmpty()) {
               if (run.has("containerId") && !"".equals(run.getString("containerId"))) {
-                Collection<SequencerPartitionContainer<SequencerPoolPartition>> pfs = requestManager.listSequencerPartitionContainersByBarcode(run.getString("containerId"));
+                Collection<SequencerPartitionContainer<SequencerPoolPartition>> pfs = requestManager
+                    .listSequencerPartitionContainersByBarcode(run.getString("containerId"));
                 if (!pfs.isEmpty()) {
                   if (pfs.size() == 1) {
-                    SequencerPartitionContainer<SequencerPoolPartition> lf = new ArrayList<SequencerPartitionContainer<SequencerPoolPartition>>(pfs).get(0);
+                    SequencerPartitionContainer<SequencerPoolPartition> lf = new ArrayList<SequencerPartitionContainer<SequencerPoolPartition>>(
+                        pfs).get(0);
                     if (lf.getSecurityProfile() != null && r.getSecurityProfile() == null) {
                       r.setSecurityProfile(lf.getSecurityProfile());
                     }
@@ -313,18 +307,18 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
                     }
 
                     if (run.has("laneCount") && run.getInt("laneCount") != lf.getPartitions().size()) {
-                      log.warn(r.getAlias() + ":: Previously saved flowcell lane count does not match notification-supplied value from RunInfo.xml. Setting new partitionLimit");
+                      log.warn(r.getAlias()
+                          + ":: Previously saved flowcell lane count does not match notification-supplied value from RunInfo.xml. Setting new partitionLimit");
                       lf.setPartitionLimit(run.getInt("laneCount"));
                     }
 
                     r.addSequencerPartitionContainer(lf);
+                  } else {
+                    // more than one flowcell hit to this barcode
+                    log.warn(r.getAlias()
+                        + ":: More than one partition container has this barcode. Cannot automatically link to a pre-existing barcode.");
                   }
-                  else {
-                    //more than one flowcell hit to this barcode
-                    log.warn(r.getAlias() + ":: More than one partition container has this barcode. Cannot automatically link to a pre-existing barcode.");
-                  }
-                }
-                else {
+                } else {
                   SequencerPartitionContainer<SequencerPoolPartition> f = new SequencerPartitionContainerImpl();
                   f.setSecurityProfile(r.getSecurityProfile());
                   if (f.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
@@ -333,8 +327,7 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
 
                   if (run.has("laneCount")) {
                     f.setPartitionLimit(run.getInt("laneCount"));
-                  }
-                  else {
+                  } else {
                     if (r.getSequencerReference().getPlatform().getInstrumentModel().contains("MiSeq")) {
                       f.setPartitionLimit(1);
                     }
@@ -345,8 +338,7 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
                   r.addSequencerPartitionContainer(f);
                 }
               }
-            }
-            else {
+            } else {
               SequencerPartitionContainer<SequencerPoolPartition> f = fs.iterator().next();
               f.setSecurityProfile(r.getSecurityProfile());
               if (f.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
@@ -356,30 +348,28 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
               if (f.getPartitions().isEmpty()) {
                 if (run.has("laneCount")) {
                   f.setPartitionLimit(run.getInt("laneCount"));
-                }
-                else {
+                } else {
                   String instrumentModel = r.getSequencerReference().getPlatform().getInstrumentModel();
                   if (instrumentModel.contains("MiSeq") || instrumentModel.contains("NextSeq")) {
                     f.setPartitionLimit(1);
                   }
                 }
                 f.initEmptyPartitions();
-              }
-              else {
-                //log.info("Got "+f.getPartitions().size()+" partitions for run " + r.getName() + " (container "+f.getContainerId()+")");
+              } else {
                 if (r.getSequencerReference().getPlatform().getInstrumentModel().contains("MiSeq")) {
                   if (f.getPartitions().size() != 1) {
-                    log.warn(f.getName()+":: WARNING - number of partitions found ("+f.getPartitions().size()+") doesn't match usual number of MiSeq/NextSeq partitions (1)");
+                    log.warn(f.getName() + ":: WARNING - number of partitions found (" + f.getPartitions().size()
+                        + ") doesn't match usual number of MiSeq/NextSeq partitions (1)");
                   }
-                }
-                else if (r.getSequencerReference().getPlatform().getInstrumentModel().contains("2500")) {
+                } else if (r.getSequencerReference().getPlatform().getInstrumentModel().contains("2500")) {
                   if (f.getPartitions().size() != 2 && f.getPartitions().size() != 8) {
-                    log.warn(f.getName()+":: WARNING - number of partitions found ("+f.getPartitions().size()+") doesn't match usual number of HiSeq 2500 partitions (2/8)");
+                    log.warn(f.getName() + ":: WARNING - number of partitions found (" + f.getPartitions().size()
+                        + ") doesn't match usual number of HiSeq 2500 partitions (2/8)");
                   }
-                }
-                else {
+                } else {
                   if (f.getPartitions().size() != 8) {
-                    log.warn(f.getName()+":: WARNING - number of partitions found ("+f.getPartitions().size()+") doesn't match usual number of GA/HiSeq partitions (8)");
+                    log.warn(f.getName() + ":: WARNING - number of partitions found (" + f.getPartitions().size()
+                        + ") doesn't match usual number of GA/HiSeq partitions (8)");
                     log.warn("Attempting fix...");
                     Map<Integer, Partition> parts = new HashMap<Integer, Partition>();
                     Partition notNullPart = f.getPartitions().get(0);
@@ -396,55 +386,37 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
 
                     for (Integer num : parts.keySet()) {
                       if (parts.get(num) == null) {
-                        long newId = (notNullPartID-notNullPartNum)+num;
-                        log.info("Inserting partition at "+num+" with ID "+ newId);
+                        long newId = (notNullPartID - notNullPartNum) + num;
+                        log.info("Inserting partition at " + num + " with ID " + newId);
                         SequencerPoolPartition p = new PartitionImpl();
                         p.setSequencerPartitionContainer(f);
                         p.setId(newId);
                         p.setPartitionNumber(num);
                         p.setSecurityProfile(f.getSecurityProfile());
-                        ((SequencerPartitionContainerImpl)f).addPartition(p);
+                        ((SequencerPartitionContainerImpl) f).addPartition(p);
                       }
                     }
 
-                    log.info(f.getName()+":: partitions now ("+f.getPartitions().size()+")");
+                    log.info(f.getName() + ":: partitions now (" + f.getPartitions().size() + ")");
                   }
                 }
               }
 
               if (f.getIdentificationBarcode() == null || "".equals(f.getIdentificationBarcode())) {
                 if (run.has("containerId") && !"".equals(run.getString("containerId"))) {
-                  //log.info("Updating container barcode for container "+f.getContainerId()+" (" + r.getName() + ")");
                   f.setIdentificationBarcode(run.getString("containerId"));
-                  //requestManager.saveSequencerPartitionContainer(f);
                 }
               }
             }
-
-            // manage kits
-            // prepare for kit merge
-            /*
-            if (run.has("kits")) {
-              JSONArray kits = run.getJSONArray("kits");
-              for (String kitBarcode : (Iterable<String>) kits) {
-                if (!"".equals(kitBarcode)) {
-                  //lookup barcode
-                  //Kit k = requestManager.getKitByIdentificationBarcode(kitBarcode);
-                }
-              }
-            }
-            */
 
             updatedRuns.put(r.getAlias(), r);
             runsToSave.add(r);
           }
-        }
-        else {
+        } else {
           log.warn("\\_ Run not saved. Saving status: " + is.getRunName());
           requestManager.saveStatus(is);
         }
-      }
-      catch(IOException ioe) {
+      } catch (IOException ioe) {
         log.error("Couldn't process run:" + ioe.getMessage());
         ioe.printStackTrace();
       }
@@ -452,10 +424,9 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
     try {
       if (runsToSave.size() > 0) {
         int[] saved = requestManager.saveRuns(runsToSave);
-        log.info("Batch saved " + saved.length + " / "+ runs.size() + " runs");
+        log.info("Batch saved " + saved.length + " / " + runs.size() + " runs");
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.error("Couldn't save run batch: " + e.getMessage());
       e.printStackTrace();
     }

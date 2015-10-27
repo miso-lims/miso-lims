@@ -49,10 +49,7 @@ import java.net.URLDecoder;
 import java.util.*;
 
 /**
- * Created by IntelliJ IDEA.
- * User: davey
- * Date: 25-May-2010
- * Time: 16:39:52
+ * Created by IntelliJ IDEA. User: davey Date: 25-May-2010 Time: 16:39:52
  */
 @Ajaxified
 public class ContainerControllerHelperService {
@@ -68,7 +65,8 @@ public class ContainerControllerHelperService {
     StringBuilder b = new StringBuilder();
     List<String> platformTypes = PlatformType.getKeys();
     for (String p : platformTypes) {
-      b.append("<input type='radio' name='platformTypes' id='platformTypes" + p + "' value='" + p + "' onchange='Container.ui.changeContainerPlatformType(this);'/>");
+      b.append("<input type='radio' name='platformTypes' id='platformTypes" + p + "' value='" + p
+          + "' onchange='Container.ui.changeContainerPlatformType(this);'/>");
       b.append("<label for='platformTypes" + p + "'>" + p + "</label>");
     }
     return JSONUtils.JSONObjectResponse("html", b.toString());
@@ -77,16 +75,10 @@ public class ContainerControllerHelperService {
   public JSONObject changePlatformType(HttpSession session, JSONObject json) {
     String newContainerType = json.getString("platformtype");
     PlatformType pt = PlatformType.get(newContainerType);
-    //String cId = json.getString("container_cId");
     try {
-      //User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
 
       Map<String, Object> responseMap = new HashMap<String, Object>();
       if (pt != null) {
-        // don't create a new container - one should already be available in the session, either presaved or not
-        //SequencerPartitionContainer<SequencerPoolPartition> lf = dataObjectFactory.getSequencerPartitionContainer(user);
-        //session.setAttribute("container_" + cId, lf);
-
         StringBuilder srb = new StringBuilder();
         srb.append("<select name='sequencer' id='sequencerReference' onchange='Container.ui.populateContainerOptions(this);'>");
         srb.append("<option value='0' selected='selected'>Please select...</option>");
@@ -96,13 +88,11 @@ public class ContainerControllerHelperService {
         srb.append("</select>");
 
         responseMap.put("sequencers", srb.toString());
-      }
-      else {
+      } else {
         return JSONUtils.SimpleJSONError("Unrecognised PlatformType");
       }
       return JSONUtils.JSONObjectResponse(responseMap);
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Failed to change PlatformType", e);
       return JSONUtils.SimpleJSONError("Failed to change PlatformType");
     }
@@ -111,33 +101,30 @@ public class ContainerControllerHelperService {
   public JSONObject populateContainerOptions(HttpSession session, JSONObject json) {
     Long sequencerReferenceId = json.getLong("sequencerReference");
     try {
-      SequencerPartitionContainer<SequencerPoolPartition> lf =
-          (SequencerPartitionContainer<SequencerPoolPartition>) session.getAttribute("container_" + json.getString("container_cId"));
+      SequencerPartitionContainer<SequencerPoolPartition> lf = (SequencerPartitionContainer<SequencerPoolPartition>) session
+          .getAttribute("container_" + json.getString("container_cId"));
 
       if (lf.getPlatform() == null) {
-        if(lf.getId() == AbstractSequencerPartitionContainer.UNSAVED_ID) {
+        if (lf.getId() == AbstractSequencerPartitionContainer.UNSAVED_ID) {
           SequencerReference sr = requestManager.getSequencerReferenceById(sequencerReferenceId);
           Map<String, Object> responseMap = new HashMap<>();
           responseMap.put("partitions", getContainerOptions(sr));
           responseMap.put("platformId", sr.getPlatform().getPlatformId());
           return JSONUtils.JSONObjectResponse(responseMap);
-        }
-        else {
+        } else {
           SequencerReference sr = requestManager.getSequencerReferenceById(sequencerReferenceId);
           lf.setPlatform(sr.getPlatform());
           Map<String, Object> responseMap = new HashMap<>();
           responseMap.put("platformId", sr.getPlatform().getPlatformId());
           return JSONUtils.JSONObjectResponse(responseMap);
         }
-      }
-      else {
+      } else {
         Map<String, Object> responseMap = new HashMap<>();
         SequencerReference sr = requestManager.getSequencerReferenceById(sequencerReferenceId);
         responseMap.put("platformId", sr.getPlatform().getPlatformId());
         return JSONUtils.JSONObjectResponse(responseMap);
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Failed to get Container options");
     }
@@ -148,7 +135,9 @@ public class ContainerControllerHelperService {
     b.append("<span id='containerspan'>Containers: ");
     PlatformType pt = sr.getPlatform().getPlatformType();
     for (int i = 0; i < sr.getPlatform().getNumContainers(); i++) {
-      b.append("<input id='container" + (i + 1) + "' name='containerselect' onchange='Container.ui.changeContainer(" + sr.getPlatform().getNumContainers() + ", \"" + pt.getKey() + "\", " + sr.getId() + ");' type='radio' value='" + (i + 1) + "'/>" + (i + 1));
+      b.append("<input id='container" + (i + 1) + "' name='containerselect' onchange='Container.ui.changeContainer("
+          + sr.getPlatform().getNumContainers() + ", \"" + pt.getKey() + "\", " + sr.getId() + ");' type='radio' value='" + (i + 1) + "'/>"
+          + (i + 1));
     }
     b.append("</span><br/>");
     b.append("<div id='containerdiv' class='note ui-corner-all'> </div>");
@@ -162,22 +151,13 @@ public class ContainerControllerHelperService {
       if (pt != null) {
         if (pt.equals(PlatformType.ILLUMINA)) {
           return changeIlluminaContainer(session, json);
-        }
-        else if (pt.equals(PlatformType.LS454)) {
+        } else if (pt.equals(PlatformType.LS454)) {
           return changeLS454Container(session, json);
-        }
-        else if (pt.equals(PlatformType.SOLID)) {
+        } else if (pt.equals(PlatformType.SOLID)) {
           return changeSolidContainer(session, json);
-        }
-        /*
-        else if (pt.equals(PlatformType.IONTORRENT)) {
-          return null;
-        }
-        */
-        else if (pt.equals(PlatformType.PACBIO)) {
+        } else if (pt.equals(PlatformType.PACBIO)) {
           return changePacBioContainer(session, json);
-        }
-        else {
+        } else {
           return JSONUtils.SimpleJSONError("Unsupported platform type: " + platform);
         }
       }
@@ -211,22 +191,20 @@ public class ContainerControllerHelperService {
         b.append("</table>");
         b.append("</div>");
 
-        SequencerPartitionContainer<SequencerPoolPartition> lf =
-            (SequencerPartitionContainer<SequencerPoolPartition>) session.getAttribute("container_" + json.getString("container_cId"));
+        SequencerPartitionContainer<SequencerPoolPartition> lf = (SequencerPartitionContainer<SequencerPoolPartition>) session
+            .getAttribute("container_" + json.getString("container_cId"));
         lf.setPlatform(sr.getPlatform());
         lf.setPartitionLimit(1);
         lf.initEmptyPartitions();
-      }
-      else if ("Illumina HiSeq 2500".equals(sr.getPlatform().getInstrumentModel())) {
-        SequencerPartitionContainer<SequencerPoolPartition> lf =
-            (SequencerPartitionContainer<SequencerPoolPartition>) session.getAttribute("container_" + json.getString("container_cId"));
+      } else if ("Illumina HiSeq 2500".equals(sr.getPlatform().getInstrumentModel())) {
+        SequencerPartitionContainer<SequencerPoolPartition> lf = (SequencerPartitionContainer<SequencerPoolPartition>) session
+            .getAttribute("container_" + json.getString("container_cId"));
         lf.setPlatform(sr.getPlatform());
 
         b.append("<input id='lane2' name='container0Select' onchange='Container.ui.changeContainerIlluminaLane(this, 0);' type='radio' value='2'/>2 ");
         b.append("<input id='lane8' name='container0Select' onchange='Container.ui.changeContainerIlluminaLane(this, 0);' type='radio' value='8'/>8 ");
         b.append("<div id='containerdiv0'> </div>");
-      }
-      else {
+      } else {
         b.append("<i class='italicInfo'>Click in a partition box to beep/type in barcodes, or double click a pool on the right to sequentially add pools to the container</i>");
         b.append("<table class='in'>");
         b.append("<th>Lane No.</th>");
@@ -243,8 +221,8 @@ public class ContainerControllerHelperService {
         b.append("</table>");
         b.append("</div>");
 
-        SequencerPartitionContainer<SequencerPoolPartition> lf =
-            (SequencerPartitionContainer<SequencerPoolPartition>) session.getAttribute("container_" + json.getString("container_cId"));
+        SequencerPartitionContainer<SequencerPoolPartition> lf = (SequencerPartitionContainer<SequencerPoolPartition>) session
+            .getAttribute("container_" + json.getString("container_cId"));
         lf.setPlatform(sr.getPlatform());
         lf.setPartitionLimit(8);
         lf.initEmptyPartitions();
@@ -252,8 +230,7 @@ public class ContainerControllerHelperService {
       b.append("<div id='containerdiv0'> </div>");
       b.append("</div>");
       return JSONUtils.SimpleJSONResponse(b.toString());
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("No sequencer reference defined");
     }
@@ -307,13 +284,12 @@ public class ContainerControllerHelperService {
         b.append("<tr><td>6 </td><td width='90%'><div id='p_div_0-5' class='barcodeEntryDiv'><ul class='runPartitionDroppable' bind='partitions[5].pool' partition='5' ondblclick='Container.partition.populatePartition(this);'></ul></div></td></tr>");
         b.append("</table>");
 
-        SequencerPartitionContainer<SequencerPoolPartition> lf =
-            (SequencerPartitionContainer<SequencerPoolPartition>) session.getAttribute("container_" + json.getString("container_cId"));
+        SequencerPartitionContainer<SequencerPoolPartition> lf = (SequencerPartitionContainer<SequencerPoolPartition>) session
+            .getAttribute("container_" + json.getString("container_cId"));
         lf.setPartitionLimit(6);
         lf.initEmptyPartitions();
         session.setAttribute("container_" + json.getString("container_cId"), lf);
-      }
-      else {
+      } else {
         b.append("<input id='chamber1' name='container0Select' onchange='Container.ui.changeContainerSolidChamber(this, 0);' type='radio' value='1'/>1 ");
         b.append("<input id='chamber4' name='container0Select' onchange='Container.ui.changeContainerSolidChamber(this, 0);' type='radio' value='4'/>4 ");
         b.append("<input id='chamber8' name='container0Select' onchange='Container.ui.changeContainerSolidChamber(this, 0);' type='radio' value='8'/>8 ");
@@ -322,8 +298,7 @@ public class ContainerControllerHelperService {
       b.append("<div id='containerdiv0'> </div>");
       b.append("</div>");
       return JSONUtils.SimpleJSONResponse(b.toString());
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("No sequencer reference defined");
     }
@@ -361,14 +336,11 @@ public class ContainerControllerHelperService {
       if (pt != null) {
         if (pt.equals(PlatformType.LS454)) {
           return changeLS454Chamber(session, json);
-        }
-        else if (pt.equals(PlatformType.SOLID)) {
+        } else if (pt.equals(PlatformType.SOLID)) {
           return changeSolidChamber(session, json);
-        }
-        else if (pt.equals(PlatformType.PACBIO)) {
+        } else if (pt.equals(PlatformType.PACBIO)) {
           return changePacBioChamber(session, json);
-        }
-        else {
+        } else {
           return JSONUtils.SimpleJSONError("Unrecognised platform type: " + platform);
         }
       }
@@ -385,15 +357,17 @@ public class ContainerControllerHelperService {
     b.append("<th>Lane No.</th>");
     b.append("<th>Pool</th>");
 
-    SequencerPartitionContainer<SequencerPoolPartition> lf =
-        (SequencerPartitionContainer<SequencerPoolPartition>) session.getAttribute("container_" + json.getString("container_cId"));
+    SequencerPartitionContainer<SequencerPoolPartition> lf = (SequencerPartitionContainer<SequencerPoolPartition>) session
+        .getAttribute("container_" + json.getString("container_cId"));
     lf.setPartitionLimit(numLanes);
     lf.initEmptyPartitions();
     session.setAttribute("container_" + json.getString("container_cId"), lf);
 
     for (int i = 0; i < numLanes; i++) {
       b.append("<tr><td>" + (i + 1) + "</td>");
-      b.append("<td width='90%'><div id='p_div_" + container + "-" + i + "' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='partitions[" + i + "].pool' partition='" + i + "' ondblclick='Container.partition.populatePartition(this);'>");
+      b.append("<td width='90%'><div id='p_div_" + container + "-" + i
+          + "' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='partitions[" + i + "].pool' partition='" + i
+          + "' ondblclick='Container.partition.populatePartition(this);'>");
       b.append("</ul></div></td>");
       b.append("</tr>");
     }
@@ -411,15 +385,17 @@ public class ContainerControllerHelperService {
     b.append("<th>Chamber No.</th>");
     b.append("<th>Pool</th>");
 
-    SequencerPartitionContainer<SequencerPoolPartition> lf =
-        (SequencerPartitionContainer<SequencerPoolPartition>) session.getAttribute("container_" + json.getString("container_cId"));
+    SequencerPartitionContainer<SequencerPoolPartition> lf = (SequencerPartitionContainer<SequencerPoolPartition>) session
+        .getAttribute("container_" + json.getString("container_cId"));
     lf.setPartitionLimit(numChambers);
     lf.initEmptyPartitions();
     session.setAttribute("container_" + json.getString("container_cId"), lf);
 
     for (int i = 0; i < numChambers; i++) {
       b.append("<tr><td>" + (i + 1) + "</td>");
-      b.append("<td width='90%'><div id='p_div_" + container + "-" + i + "' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='partitions[" + i + "].pool' partition='" + i + "' ondblclick='Container.partition.populatePartition(this);'>");
+      b.append("<td width='90%'><div id='p_div_" + container + "-" + i
+          + "' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='partitions[" + i + "].pool' partition='" + i
+          + "' ondblclick='Container.partition.populatePartition(this);'>");
       b.append("</ul></div></td>");
       b.append("</tr>");
     }
@@ -436,15 +412,17 @@ public class ContainerControllerHelperService {
     b.append("<th>Chamber No.</th>");
     b.append("<th>Pool</th>");
 
-    SequencerPartitionContainer<SequencerPoolPartition> lf =
-        (SequencerPartitionContainer<SequencerPoolPartition>) session.getAttribute("container_" + json.getString("container_cId"));
+    SequencerPartitionContainer<SequencerPoolPartition> lf = (SequencerPartitionContainer<SequencerPoolPartition>) session
+        .getAttribute("container_" + json.getString("container_cId"));
     lf.setPartitionLimit(numChambers);
     lf.initEmptyPartitions();
     session.setAttribute("container_" + json.getString("container_cId"), lf);
 
     for (int i = 0; i < numChambers; i++) {
       b.append("<tr><td>" + (i + 1) + "</td>");
-      b.append("<td width='90%'><div id='p_div_" + container + "-" + i + "' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='partitions[" + i + "].pool' partition='" + i + "' ondblclick='Container.partition.populatePartition(this);'>");
+      b.append("<td width='90%'><div id='p_div_" + container + "-" + i
+          + "' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='partitions[" + i + "].pool' partition='" + i
+          + "' ondblclick='Container.partition.populatePartition(this);'>");
       b.append("</ul></div></td>");
       b.append("</tr>");
     }
@@ -461,15 +439,17 @@ public class ContainerControllerHelperService {
     b.append("<th>Chamber No.</th>");
     b.append("<th>Pool</th>");
 
-    SequencerPartitionContainer<SequencerPoolPartition> lf =
-        (SequencerPartitionContainer<SequencerPoolPartition>) session.getAttribute("container_" + json.getString("container_cId"));
+    SequencerPartitionContainer<SequencerPoolPartition> lf = (SequencerPartitionContainer<SequencerPoolPartition>) session
+        .getAttribute("container_" + json.getString("container_cId"));
     lf.setPartitionLimit(numChambers);
     lf.initEmptyPartitions();
     session.setAttribute("container_" + json.getString("container_cId"), lf);
 
     for (int i = 0; i < numChambers; i++) {
       b.append("<tr><td>" + (i + 1) + "</td>");
-      b.append("<td width='90%'><div id='p_div_" + container + "-" + i + "' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='partitions[" + i + "].pool' partition='" + i + "' ondblclick='Container.partition.populatePartition(this);'>");
+      b.append("<td width='90%'><div id='p_div_" + container + "-" + i
+          + "' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='partitions[" + i + "].pool' partition='" + i
+          + "' ondblclick='Container.partition.populatePartition(this);'>");
       b.append("</tr>");
     }
     b.append("</table>");
@@ -483,23 +463,20 @@ public class ContainerControllerHelperService {
     try {
       if (barcode != null && !"".equals(barcode)) {
         if (LimsUtils.isBase64String(barcode)) {
-          //Base64-encoded string, most likely a barcode image beeped in. decode and search
+          // Base64-encoded string, most likely a barcode image beeped in. decode and search
           barcode = new String(Base64.decodeBase64(barcode));
         }
       }
 
       Pool p = requestManager.getPoolByBarcode(barcode);
-      SequencerPartitionContainer<SequencerPoolPartition> lf =
-          (SequencerPartitionContainer<SequencerPoolPartition>) session.getAttribute("container_" + json.getString("container_cId"));
-      //if (lf.getPlatformType().equals(p.getPlatformType())) {
+      SequencerPartitionContainer<SequencerPoolPartition> lf = (SequencerPartitionContainer<SequencerPoolPartition>) session
+          .getAttribute("container_" + json.getString("container_cId"));
       if (lf.getPlatform().getPlatformType().equals(p.getPlatformType())) {
         return JSONUtils.JSONObjectResponse("html", poolHtml(p, partition));
-      }
-      else {
+      } else {
         return JSONUtils.JSONObjectResponse("err", "Error: pool platform does not match container platform");
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.JSONObjectResponse("err", "Error: no such pool");
     }
@@ -515,30 +492,27 @@ public class ContainerControllerHelperService {
       Set<Project> pooledProjects = new HashSet<Project>();
 
       if (p.getExperiments().size() != 0) {
-        //check if each poolable has been in a study for this pool already
+        // check if each poolable has been in a study for this pool already
         Collection<? extends Poolable> ds = p.getPoolableElements();
         for (Poolable d : ds) {
           if (d instanceof Dilution) {
-            Collection<Study> studies = requestManager.listAllStudiesByLibraryId(((Dilution)d).getLibrary().getId());
+            Collection<Study> studies = requestManager.listAllStudiesByLibraryId(((Dilution) d).getLibrary().getId());
             if (studies.isEmpty()) {
-              pooledProjects.add(((Dilution)d).getLibrary().getSample().getProject());
-            }
-            else {
+              pooledProjects.add(((Dilution) d).getLibrary().getSample().getProject());
+            } else {
               for (Study stu : studies) {
                 pooledProjects.add(stu.getProject());
               }
             }
-          }
-          else if (d instanceof Plate) {
-            Plate plate = (Plate)d;
+          } else if (d instanceof Plate) {
+            Plate plate = (Plate) d;
             if (!plate.getElements().isEmpty()) {
               if (plate.getElementType().equals(Library.class)) {
-                Library l = (Library)plate.getElements().get(0);
+                Library l = (Library) plate.getElements().get(0);
                 Collection<Study> studies = requestManager.listAllStudiesByLibraryId(l.getId());
                 if (studies.isEmpty()) {
                   pooledProjects.add(l.getSample().getProject());
-                }
-                else {
+                } else {
                   for (Study stu : studies) {
                     pooledProjects.add(stu.getProject());
                   }
@@ -554,18 +528,16 @@ public class ContainerControllerHelperService {
             pooledProjects.remove(expProject);
           }
         }
-      }
-      else {
+      } else {
         Collection<? extends Poolable> ds = p.getPoolableElements();
         for (Poolable d : ds) {
           if (d instanceof Dilution) {
-            pooledProjects.add(((Dilution)d).getLibrary().getSample().getProject());
-          }
-          else if (d instanceof Plate) {
-            Plate plate = (Plate)d;
+            pooledProjects.add(((Dilution) d).getLibrary().getSample().getProject());
+          } else if (d instanceof Plate) {
+            Plate plate = (Plate) d;
             if (!plate.getElements().isEmpty()) {
               if (plate.getElementType().equals(Library.class)) {
-                Library l = (Library)plate.getElements().get(0);
+                Library l = (Library) plate.getElements().get(0);
                 pooledProjects.add(l.getSample().getProject());
               }
             }
@@ -575,27 +547,27 @@ public class ContainerControllerHelperService {
       sb.append("<div style='float:left; clear:both'>");
       for (Project project : pooledProjects) {
         sb.append("<div id='studySelectDiv" + partition + "_" + project.getProjectId() + "'>");
-        sb.append(project.getAlias() + ": <select name='poolStudies" + partition + "_" + project.getProjectId() + "' id='poolStudies" + partition + "_" + project.getProjectId() + "'>");
+        sb.append(project.getAlias() + ": <select name='poolStudies" + partition + "_" + project.getProjectId() + "' id='poolStudies"
+            + partition + "_" + project.getProjectId() + "'>");
         Collection<Study> studies = requestManager.listAllStudiesByProjectId(project.getProjectId());
         if (studies.isEmpty()) {
-          //throw new Exception("No studies available on project " + project.getName() + ". At least one study must be available for each project associated with this Pool.");
-          return JSONUtils.SimpleJSONError("No studies available on project " + project.getName() + ". At least one study must be available for each project associated with this Pool.");
-        }
-        else {
+          return JSONUtils.SimpleJSONError("No studies available on project " + project.getName()
+              + ". At least one study must be available for each project associated with this Pool.");
+        } else {
           for (Study s : studies) {
             sb.append("<option value='" + s.getId() + "'>" + s.getName() + " - " + s.getStudyType() + "</option>");
           }
         }
         sb.append("</select>");
-        sb.append("<input id='studySelectButton-" + partition + "_" + p.getId() + "' type='button' onclick=\"Container.partition.selectContainerStudy('" + partition + "', " + p.getId() + "," + project.getProjectId() + ");\" class=\"ui-state-default ui-corner-all\" value='Select Study'/>");
+        sb.append("<input id='studySelectButton-" + partition + "_" + p.getId()
+            + "' type='button' onclick=\"Container.partition.selectContainerStudy('" + partition + "', " + p.getId() + ","
+            + project.getProjectId() + ");\" class=\"ui-state-default ui-corner-all\" value='Select Study'/>");
         sb.append("</div><br/>");
       }
       sb.append("</div>");
-    //}
 
       return JSONUtils.JSONObjectResponse("html", sb.toString());
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError(e.getMessage());
     }
@@ -606,40 +578,38 @@ public class ContainerControllerHelperService {
     try {
       b.append("<div style='position:relative' onMouseOver='this.className=\"dashboardhighlight\"' onMouseOut='this.className=\"dashboard\"' class='dashboard'>");
       if (LimsUtils.isStringEmptyOrNull(p.getAlias())) {
-        b.append("<div style=\"float:left\"><b>" + p.getName() + " : "+p.getCreationDate()+"</b><br/>");
-      }
-      else {
-        b.append("<div style=\"float:left\"><b>" + p.getName() + " (" + p.getAlias() + ") : "+p.getCreationDate()+"</b><br/>");
+        b.append("<div style=\"float:left\"><b>" + p.getName() + " : " + p.getCreationDate() + "</b><br/>");
+      } else {
+        b.append("<div style=\"float:left\"><b>" + p.getName() + " (" + p.getAlias() + ") : " + p.getCreationDate() + "</b><br/>");
       }
 
       Collection<? extends Poolable> ds = p.getPoolableElements();
       Set<Project> pooledProjects = new HashSet<Project>();
       for (Poolable d : ds) {
         if (d instanceof Dilution) {
-          pooledProjects.add(((Dilution)d).getLibrary().getSample().getProject());
-          b.append("<span>" + d.getName() + " (" + ((Dilution)d).getLibrary().getSample().getProject().getAlias() + ") : "+((Dilution) d).getConcentration()+" "+((Dilution) d).getUnits()+"</span><br/>");
-        }
-        else if (d instanceof Plate) {
-          Plate<LinkedList<Plateable>, Plateable> plate = (Plate<LinkedList<Plateable>, Plateable>)d;
+          pooledProjects.add(((Dilution) d).getLibrary().getSample().getProject());
+          b.append("<span>" + d.getName() + " (" + ((Dilution) d).getLibrary().getSample().getProject().getAlias() + ") : "
+              + ((Dilution) d).getConcentration() + " " + ((Dilution) d).getUnits() + "</span><br/>");
+        } else if (d instanceof Plate) {
+          Plate<LinkedList<Plateable>, Plateable> plate = (Plate<LinkedList<Plateable>, Plateable>) d;
           if (!plate.getElements().isEmpty()) {
-            //TODO - should we look through all plate elements to get all projects?
+            // TODO - should we look through all plate elements to get all projects?
             Plateable element = plate.getElements().getFirst();
             if (element instanceof Library) {
-              Library l = (Library)element;
+              Library l = (Library) element;
               pooledProjects.add(l.getSample().getProject());
-              b.append("<span>" + d.getName() + " ["+plate.getSize()+"-well] (" + l.getSample().getProject().getAlias() + ")</span><br/>");
-            }
-            else if (element instanceof Dilution) {
-              Dilution dl = (Dilution)element;
-              b.append("<span>" + dl.getName() + " ["+plate.getSize()+"-well] (" + dl.getLibrary().getSample().getProject().getAlias() + ")</span><br/>");
-            }
-            else if (element instanceof Sample) {
-              Sample s = (Sample)element;
-              b.append("<span>" + s.getName() + " ["+plate.getSize()+"-well] (" + s.getProject().getAlias() + ")</span><br/>");
+              b.append("<span>" + d.getName() + " [" + plate.getSize() + "-well] (" + l.getSample().getProject().getAlias()
+                  + ")</span><br/>");
+            } else if (element instanceof Dilution) {
+              Dilution dl = (Dilution) element;
+              b.append("<span>" + dl.getName() + " [" + plate.getSize() + "-well] (" + dl.getLibrary().getSample().getProject().getAlias()
+                  + ")</span><br/>");
+            } else if (element instanceof Sample) {
+              Sample s = (Sample) element;
+              b.append("<span>" + s.getName() + " [" + plate.getSize() + "-well] (" + s.getProject().getAlias() + ")</span><br/>");
             }
           }
-        }
-        else {
+        } else {
           b.append("<span>" + d.getName() + "</span><br/>");
         }
       }
@@ -647,7 +617,8 @@ public class ContainerControllerHelperService {
       b.append("<br/><i>");
       Collection<Experiment> exprs = p.getExperiments();
       for (Experiment e : exprs) {
-        b.append("<span>" + e.getStudy().getProject().getAlias() + "(" + e.getName() + ": " + p.getDilutions().size() + " dilutions)</span><br/>");
+        b.append("<span>" + e.getStudy().getProject().getAlias() + "(" + e.getName() + ": " + p.getDilutions().size()
+            + " dilutions)</span><br/>");
       }
       b.append("</i>");
 
@@ -655,33 +626,35 @@ public class ContainerControllerHelperService {
         b.append("<div style='float:left; clear:both'>");
         for (Project project : pooledProjects) {
           b.append("<div id='studySelectDiv" + partition + "_" + project.getProjectId() + "'>");
-          b.append(project.getAlias() + ": <select name='poolStudies" + partition + "_" + project.getProjectId() + "' id='poolStudies" + partition + "_" + project.getProjectId() + "'>");
+          b.append(project.getAlias() + ": <select name='poolStudies" + partition + "_" + project.getProjectId() + "' id='poolStudies"
+              + partition + "_" + project.getProjectId() + "'>");
           Collection<Study> studies = requestManager.listAllStudiesByProjectId(project.getProjectId());
           if (studies.isEmpty()) {
-            throw new Exception("No studies available on project " + project.getName() + ". At least one study must be available for each project associated with this Pool.");
-          }
-          else {
+            throw new Exception("No studies available on project " + project.getName()
+                + ". At least one study must be available for each project associated with this Pool.");
+          } else {
             for (Study s : studies) {
               b.append("<option value='" + s.getId() + "'>" + s.getAlias() + " (" + s.getName() + " - " + s.getStudyType() + ")</option>");
             }
           }
           b.append("</select>");
-          b.append("<input id='studySelectButton-" + partition + "_" + p.getId() + "' type='button' onclick=\"Container.partition.selectContainerStudy('" + partition + "', " + p.getId() + "," + project.getProjectId() + ");\" class=\"ui-state-default ui-corner-all\" value='Select Study'/>");
+          b.append("<input id='studySelectButton-" + partition + "_" + p.getId()
+              + "' type='button' onclick=\"Container.partition.selectContainerStudy('" + partition + "', " + p.getId() + ","
+              + project.getProjectId() + ");\" class=\"ui-state-default ui-corner-all\" value='Select Study'/>");
           b.append("</div><br/>");
         }
         b.append("</div>");
       }
 
       b.append("<input type='hidden' name='partitions[" + partition + "].pool' id='pId" + p.getId() + "' value='" + p.getId() + "'/></div>");
-      b.append("<div style='position: absolute; bottom: 0; right: 0; font-size: 24px; font-weight: bold; color:#BBBBBB'>" + p.getPlatformType().getKey() + "</div>");
+      b.append("<div style='position: absolute; bottom: 0; right: 0; font-size: 24px; font-weight: bold; color:#BBBBBB'>"
+          + p.getPlatformType().getKey() + "</div>");
       b.append("<span style='position: absolute; top: 0; right: 0;' onclick='Container.pool.confirmPoolRemove(this);' class='float-right ui-icon ui-icon-circle-close'></span>");
       b.append("</div>");
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return "Cannot get studies for pool: " + e.getMessage();
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       e.printStackTrace();
       return "Cannot get studies for pool: " + e.getMessage();
     }
@@ -693,19 +666,22 @@ public class ContainerControllerHelperService {
     try {
       Long poolId = json.getLong("poolId");
       Pool p = requestManager.getPoolById(poolId);
-      if (p == null) { throw new Exception("Could not retrieve pool: " + poolId); };
+      if (p == null) {
+        throw new Exception("Could not retrieve pool: " + poolId);
+      }
 
       Long studyId = json.getLong("studyId");
       Study s = requestManager.getStudyById(studyId);
-      if (s == null) { throw new Exception("Could not retrieve study: " + studyId); };
-
-      //Long sequencerReferenceId = json.getLong("sequencerReferenceId");
-      //SequencerReference sr = requestManager.getSequencerReferenceById(sequencerReferenceId);
-      //if (sr == null) { throw new Exception("Could not retrieve sequencer: " + sequencerReferenceId); };
+      if (s == null) {
+        throw new Exception("Could not retrieve study: " + studyId);
+      }
 
       Long platformId = json.getLong("platformId");
       Platform platform = requestManager.getPlatformById(platformId);
-      if (platform == null) { throw new Exception("Could not retrieve Platform:" + platformId); };
+      if (platform == null) {
+        throw new Exception("Could not retrieve Platform:" + platformId);
+      }
+      ;
 
       StringBuilder sb = new StringBuilder();
 
@@ -720,8 +696,7 @@ public class ContainerControllerHelperService {
       try {
         p.addExperiment(e);
         requestManager.saveExperiment(e);
-      }
-      catch (MalformedExperimentException e1) {
+      } catch (MalformedExperimentException e1) {
         e1.printStackTrace();
         return JSONUtils.SimpleJSONError("Failed to save experiment: " + e1.getMessage());
       }
@@ -731,8 +706,7 @@ public class ContainerControllerHelperService {
       sb.append("</i>");
 
       return JSONUtils.JSONObjectResponse("html", sb.toString());
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Failed " + e.getMessage());
     }
@@ -742,34 +716,34 @@ public class ContainerControllerHelperService {
     if (json.has("barcode") && !"".equals(json.getString("barcode"))) {
       try {
         String barcode = json.getString("barcode");
-        Collection<SequencerPartitionContainer<SequencerPoolPartition>> fs = requestManager.listSequencerPartitionContainersByBarcode(barcode);
+        Collection<SequencerPartitionContainer<SequencerPoolPartition>> fs = requestManager
+            .listSequencerPartitionContainersByBarcode(barcode);
         if (!fs.isEmpty()) {
           JSONObject confirm = new JSONObject();
           StringBuilder sb = new StringBuilder();
           if (fs.size() == 1) {
-            //replace container div
+            // replace container div
             SequencerPartitionContainer<SequencerPoolPartition> f = new ArrayList<>(fs).get(0);
             sb.append("<table class='in'>");
             sb.append("<th>Partition No.</th>");
             sb.append("<th>Pool</th>");
 
             if (f.getPartitions().isEmpty()) {
-              //something went wrong previously. a saved container shouldn't have empty partitions - recreate
+              // something went wrong previously. a saved container shouldn't have empty partitions - recreate
               json.put("platform", f.getPlatform().getPlatformType().getKey());
 
               session.setAttribute("container_" + json.getString("container_cId"), f);
 
-              //reset container
+              // reset container
               changeContainer(session, json);
-            }
-            else if (f.getPartitions() == null) {
-              //something went wrong previously. a saved container shouldn't have null partition set - recreate
+            } else if (f.getPartitions() == null) {
+              // something went wrong previously. a saved container shouldn't have null partition set - recreate
               f.setPartitions(new AutoPopulatingList<SequencerPoolPartition>(PartitionImpl.class));
               json.put("platform", f.getPlatform().getPlatformType().getKey());
 
               session.setAttribute("container_" + json.getString("container_cId"), f);
 
-              //reset container
+              // reset container
               changeContainer(session, json);
             }
 
@@ -780,7 +754,8 @@ public class ContainerControllerHelperService {
               if (p.getPool() != null) {
                 confirm.put(p.getPartitionNumber(), p.getPool().getName());
 
-                sb.append("<ul partition='" + (p.getPartitionNumber() - 1) + "' bind='partitions[" + (p.getPartitionNumber() - 1) + "].pool' class='runPartitionDroppable'>");
+                sb.append("<ul partition='" + (p.getPartitionNumber() - 1) + "' bind='partitions[" + (p.getPartitionNumber() - 1)
+                    + "].pool' class='runPartitionDroppable'>");
                 sb.append("<div class='dashboard'>");
                 sb.append(p.getPool().getName());
                 sb.append("(" + p.getPool().getCreationDate() + ")<br/>");
@@ -788,23 +763,24 @@ public class ContainerControllerHelperService {
                 if (!p.getPool().getExperiments().isEmpty()) {
                   sb.append("<i>");
                   for (Experiment e : p.getPool().getExperiments()) {
-                    sb.append(e.getStudy().getProject().getAlias() + " (" + e.getName() + ": " + p.getPool().getDilutions().size() + " dilutions)<br/>");
+                    sb.append(e.getStudy().getProject().getAlias() + " (" + e.getName() + ": " + p.getPool().getDilutions().size()
+                        + " dilutions)<br/>");
                   }
                   sb.append("</i>");
-                  sb.append("<input type='hidden' name='partitions[" + (p.getPartitionNumber() - 1) + "].pool' id='pId" + (p.getPartitionNumber() - 1) + "' value='" + p.getPool().getId() + "'/>");
-                }
-                else {
+                  sb.append("<input type='hidden' name='partitions[" + (p.getPartitionNumber() - 1) + "].pool' id='pId"
+                      + (p.getPartitionNumber() - 1) + "' value='" + p.getPool().getId() + "'/>");
+                } else {
                   sb.append("<i>No experiment linked to this pool</i>");
                 }
                 sb.append("</span>");
                 sb.append("</div>");
                 sb.append("</ul>");
-              }
-              else {
+              } else {
                 confirm.put(p.getPartitionNumber(), "Empty");
 
                 sb.append("<div id='p_div-" + (p.getPartitionNumber() - 1) + "' class='elementListDroppableDiv'>");
-                sb.append("<ul class='runPartitionDroppable' bind='partitions[" + (p.getPartitionNumber() - 1) + "].pool' partition='" + (p.getPartitionNumber() - 1) + "' ondblclick='Container.partition.populatePartition(this);'></ul>");
+                sb.append("<ul class='runPartitionDroppable' bind='partitions[" + (p.getPartitionNumber() - 1) + "].pool' partition='"
+                    + (p.getPartitionNumber() - 1) + "' ondblclick='Container.partition.populatePartition(this);'></ul>");
                 sb.append("</div>");
               }
               sb.append("</td>");
@@ -818,23 +794,18 @@ public class ContainerControllerHelperService {
             responseMap.put("containerId", f.getId());
             responseMap.put("verify", confirm);
             return JSONUtils.JSONObjectResponse(responseMap);
-          }
-          else {
-            //choose container
-            //return JSONUtils.JSONObjectResponse("error", "Multiple containers found with barcode "+ barcode);
+          } else {
+            // choose container
             return JSONUtils.SimpleJSONError("Multiple containers found with barcode " + barcode);
           }
-        }
-        else {
+        } else {
           return JSONUtils.JSONObjectResponse("error", "No containers with this barcode.");
         }
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
         e.printStackTrace();
         return JSONUtils.JSONObjectResponse("error", "Unable to lookup barcode.");
       }
-    }
-    else {
+    } else {
       return JSONUtils.SimpleJSONError("Please supply a barcode to lookup.");
     }
   }
@@ -843,29 +814,33 @@ public class ContainerControllerHelperService {
     try {
       JSONObject j = new JSONObject();
       JSONArray jsonArray = new JSONArray();
-      for (SequencerPartitionContainer<SequencerPoolPartition> sequencePartitionContainer : requestManager.listAllSequencerPartitionContainers()) {
+      for (SequencerPartitionContainer<SequencerPoolPartition> sequencePartitionContainer : requestManager
+          .listAllSequencerPartitionContainers()) {
         String run = "";
         String sequencer = "";
         if (sequencePartitionContainer.getRun() != null) {
-          run = "<a href=\"/miso/run/" + sequencePartitionContainer.getRun().getId() + "\">" + sequencePartitionContainer.getRun().getAlias() + "</a>";
+          run = "<a href=\"/miso/run/" + sequencePartitionContainer.getRun().getId() + "\">"
+              + sequencePartitionContainer.getRun().getAlias() + "</a>";
           if (sequencePartitionContainer.getRun().getSequencerReference() != null) {
             sequencer = "<a href=\"/miso/sequencer/" + sequencePartitionContainer.getRun().getSequencerReference().getId() + "\">"
-                        + sequencePartitionContainer.getRun().getSequencerReference().getPlatform().getNameAndModel() + "</a>";
+                + sequencePartitionContainer.getRun().getSequencerReference().getPlatform().getNameAndModel() + "</a>";
           }
         }
 
-        jsonArray.add("['" +
-                      (sequencePartitionContainer.getIdentificationBarcode() != null ? sequencePartitionContainer.getIdentificationBarcode() : "") + "','" +
-                      (sequencePartitionContainer.getPlatform() != null && sequencePartitionContainer.getPlatform().getPlatformType() != null ? sequencePartitionContainer.getPlatform().getPlatformType().getKey() : "") + "','" +
-                      run + "','" +
-                      sequencer + "','" +
-                      "<a href=\"/miso/container/" + sequencePartitionContainer.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
+        jsonArray
+            .add("['"
+                + (sequencePartitionContainer.getIdentificationBarcode() != null ? sequencePartitionContainer.getIdentificationBarcode()
+                    : "")
+                + "','"
+                + (sequencePartitionContainer.getPlatform() != null && sequencePartitionContainer.getPlatform().getPlatformType() != null ? sequencePartitionContainer
+                    .getPlatform().getPlatformType().getKey()
+                    : "") + "','" + run + "','" + sequencer + "','" + "<a href=\"/miso/container/" + sequencePartitionContainer.getId()
+                + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
 
       }
       j.put("array", jsonArray);
       return j;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
@@ -875,15 +850,14 @@ public class ContainerControllerHelperService {
     if (json.has("container_cId") && json.has("partitionNum")) {
       Integer partitionNum = json.getInt("partitionNum");
 
-      SequencerPartitionContainer<SequencerPoolPartition> lf =
-          (SequencerPartitionContainer<SequencerPoolPartition>) session.getAttribute("container_" + json.getString("container_cId"));
+      SequencerPartitionContainer<SequencerPoolPartition> lf = (SequencerPartitionContainer<SequencerPoolPartition>) session
+          .getAttribute("container_" + json.getString("container_cId"));
       SequencerPoolPartition spp = lf.getPartitionAt(partitionNum);
       spp.setPool(null);
       session.setAttribute("container_" + json.getString("container_cId"), lf);
 
       return JSONUtils.SimpleJSONResponse("OK");
-    }
-    else {
+    } else {
       return JSONUtils.SimpleJSONError("No partitionId specified");
     }
   }
@@ -896,17 +870,14 @@ public class ContainerControllerHelperService {
 
         if (container.getRun() != null && "Completed".equals(container.getRun().getStatus().getHealth().getKey())) {
           return JSONUtils.SimpleJSONResponse("yes");
-        }
-        else {
+        } else {
           return JSONUtils.SimpleJSONResponse("no");
         }
 
-      }
-      else {
+      } else {
         return JSONUtils.SimpleJSONError("No Sequencer Partition Container specified");
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
     }
@@ -916,8 +887,7 @@ public class ContainerControllerHelperService {
     User user;
     try {
       user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
     }
@@ -929,17 +899,14 @@ public class ContainerControllerHelperService {
           SequencerPartitionContainer container = requestManager.getSequencerPartitionContainerById(containerId);
           requestManager.deleteContainer(container);
           return JSONUtils.SimpleJSONResponse("Sequencer Partition Container deleted");
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
           e.printStackTrace();
           return JSONUtils.SimpleJSONError("Cannot delete Sequencer Partition Container: " + e.getMessage());
         }
-      }
-      else {
+      } else {
         return JSONUtils.SimpleJSONError("No Sequencer Partition Container specified to delete.");
       }
-    }
-    else {
+    } else {
       return JSONUtils.SimpleJSONError("Only admins can delete objects.");
     }
   }

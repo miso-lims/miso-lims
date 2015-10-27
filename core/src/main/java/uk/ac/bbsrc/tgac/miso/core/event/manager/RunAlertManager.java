@@ -43,7 +43,7 @@ import java.util.*;
  * uk.ac.bbsrc.tgac.miso.core.event.manager
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 11/11/11
  * @since 0.1.3
@@ -99,8 +99,7 @@ public class RunAlertManager {
             if (clone.getStatus() != null) {
               log.debug("Not replacing Run " + clone.getId() + ": " + clone.getStatus().getHealth().name());
             }
-          }
-          else {
+          } else {
             runs.put(run.getId(), clone);
             if (clone.getStatus() != null) {
               log.debug("Queued Run " + clone.getId() + ": " + clone.getStatus().getHealth().name());
@@ -108,8 +107,7 @@ public class RunAlertManager {
           }
         }
       }
-    }
-    else {
+    } else {
       log.warn("Alerting system disabled.");
     }
   }
@@ -125,8 +123,7 @@ public class RunAlertManager {
           log.debug("Dequeued " + run.getId());
         }
       }
-    }
-    else {
+    } else {
       log.warn("Alerting system disabled.");
     }
   }
@@ -140,27 +137,25 @@ public class RunAlertManager {
       Run clone = runs.get(r.getId());
       if (clone == null) {
         log.debug("Update: no clone - pushing");
-        //new run - add all RunWatchers!
+        // new run - add all RunWatchers!
         for (User u : securityManager.listUsersByGroupName("RunWatchers")) {
           r.addWatcher(u);
         }
         push(r);
-      }
-      else {
+      } else {
         log.debug("Update: got clone of " + clone.getId());
         if (r.getStatus() != null) {
           clone.setStatus(r.getStatus());
         }
 
-        //run QC added
+        // run QC added
         if (r.getRunQCs().size() > clone.getRunQCs().size()) {
           Set<RunQC> clonedQCs = new HashSet<RunQC>(clone.getRunQCs());
           for (RunQC qc : r.getRunQCs()) {
             if (!clonedQCs.contains(qc)) {
               try {
                 clone.addQc(cloner.deepClone(qc));
-              }
-              catch (MalformedRunQcException e) {
+              } catch (MalformedRunQcException e) {
                 throw new IOException(e);
               }
             }
@@ -180,8 +175,7 @@ public class RunAlertManager {
       if (clone == null) {
         run.addWatcher(user);
         push(run);
-      }
-      else {
+      } else {
         clone.addWatcher(user);
       }
     }
@@ -194,8 +188,7 @@ public class RunAlertManager {
       if (clone == null) {
         run.removeWatcher(user);
         push(run);
-      }
-      else {
+      } else {
         clone.removeWatcher(user);
       }
     }
@@ -207,9 +200,9 @@ public class RunAlertManager {
       for (Run r : runs.values()) {
         if (user.getGroups() != null && user.getGroups().contains(securityManager.getGroupByName("RunWatchers"))) {
           addWatcher(r, userId);
-        }
-        else {
-          if (r.getSecurityProfile() != null && r.getSecurityProfile().getOwner() != null && !r.getSecurityProfile().getOwner().equals(user)) {
+        } else {
+          if (r.getSecurityProfile() != null && r.getSecurityProfile().getOwner() != null
+              && !r.getSecurityProfile().getOwner().equals(user)) {
             removeWatcher(r, userId);
           }
         }

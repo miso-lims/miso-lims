@@ -180,7 +180,6 @@ Utils.ui = {
 Utils.fileUpload = {
   fileUploadProgress : function(formname, divname, successfunc) {
     var self = this;
-    //self.processingOverlay();
 
     Fluxion.doAjaxUpload(
       formname,

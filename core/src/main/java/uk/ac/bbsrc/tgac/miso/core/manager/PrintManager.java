@@ -39,7 +39,7 @@ import java.util.Set;
  * uk.ac.bbsrc.tgac.miso.core.manager
  * <p/>
  * This interface describes a manager that can discover and print to javax.print PrintServices
- *
+ * 
  * @author Rob Davey
  * @date 04-May-2011
  * @since 0.0.3
@@ -48,27 +48,33 @@ public interface PrintManager<T, C> {
   public Set<Class<? extends Barcodable>> getBarcodableEntities();
 
   public Collection<PrintContext> getPrintContexts();
+
   public PrintContext getPrintContext(String contextName);
 
-  //public T discoverPrintService(String name) throws MisoPrintException;
-  //public Collection<T> discoverPrintServices();
-  //public List<PrintService> discoverPrintServices(DocFlavor d, PrintServiceAttributeSet classType);
-
   public long storePrintService(MisoPrintService service) throws IOException;
+
   public MisoPrintService getPrintService(long serviceId) throws IOException;
+
   public MisoPrintService getPrintService(String serviceName) throws IOException;
+
   public Collection<MisoPrintService> listAllPrintServices() throws IOException;
+
   public Collection<MisoPrintService> listPrintServicesByBarcodeableClass(Class barcodableClass) throws IOException;
 
   public PrintJob getPrintJob(long jobId) throws IOException;
+
   public long storePrintJob(PrintJob job) throws IOException;
+
   public Collection<? extends PrintJob> listAllPrintJobs() throws IOException;
+
   public Collection<? extends PrintJob> listPrintJobsByPrintService(T printService) throws IOException;
+
   public Collection<? extends PrintJob> listPrintJobsByUser(User user) throws IOException;
 
   public PrintJob print(C content, String printServiceName, User user) throws MisoPrintException;
 
   public Collection<BarcodableSchema> getBarcodableSchemas();
+
   public BarcodableSchema getBarcodableSchema(String barcodableStateName) throws IOException;
 
 }

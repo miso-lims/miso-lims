@@ -45,7 +45,7 @@ import java.util.Set;
  * uk.ac.bbsrc.tgac.miso.core.test
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 26/09/11
  * @since 0.1.2
@@ -61,7 +61,7 @@ public class RunTests {
 
   @Test
   public void testIlluminaRun() {
-    IlluminaRun r = (IlluminaRun)dataObjectFactory.getRunOfType(PlatformType.ILLUMINA);
+    IlluminaRun r = (IlluminaRun) dataObjectFactory.getRunOfType(PlatformType.ILLUMINA);
     r.setId(-1L);
 
     log.info("Registering listeners");
@@ -76,9 +76,6 @@ public class RunTests {
     MockLogAlerterService logAlerter = new MockLogAlerterService();
     alerters.add(logAlerter);
 
-    //MockEmailAlerterService emailAlerter = new MockEmailAlerterService();
-    //alerters.add(emailAlerter);
-
     runResponder.setAlerterServices(alerters);
     statusResponder.setAlerterServices(alerters);
 
@@ -88,27 +85,27 @@ public class RunTests {
     foo.setResponderServices(responders);
     r.addListener(foo);
 
-    log.info("Attempting to set status from "+r.getStatus().getHealth().getKey()+" to Unknown");
+    log.info("Attempting to set status from " + r.getStatus().getHealth().getKey() + " to Unknown");
     Status s = new StatusImpl();
     s.setHealth(HealthType.Unknown);
     r.setStatus(s);
 
-    log.info("Attempting to set status from "+r.getStatus().getHealth().getKey()+" to Started");
+    log.info("Attempting to set status from " + r.getStatus().getHealth().getKey() + " to Started");
     s = new StatusImpl();
     s.setHealth(HealthType.Started);
     r.setStatus(s);
 
-    log.info("Attempting to set status from "+r.getStatus().getHealth().getKey()+" to Stopped");
+    log.info("Attempting to set status from " + r.getStatus().getHealth().getKey() + " to Stopped");
     s = new StatusImpl();
     s.setHealth(HealthType.Stopped);
     r.setStatus(s);
 
-    log.info("Attempting to set status from "+r.getStatus().getHealth().getKey()+" to Failed");
+    log.info("Attempting to set status from " + r.getStatus().getHealth().getKey() + " to Failed");
     s = new StatusImpl();
     s.setHealth(HealthType.Failed);
     r.setStatus(s);
 
-    log.info("Attempting to set status from "+r.getStatus().getHealth().getKey()+" to Completed");
+    log.info("Attempting to set status from " + r.getStatus().getHealth().getKey() + " to Completed");
     s = new StatusImpl();
     s.setHealth(HealthType.Completed);
     r.setStatus(s);

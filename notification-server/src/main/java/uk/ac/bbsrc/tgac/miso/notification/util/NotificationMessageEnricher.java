@@ -37,7 +37,7 @@ import java.util.Map;
  * uk.ac.bbsrc.tgac.miso.notification.util
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 09/02/12
  * @since 0.1.6
@@ -48,8 +48,7 @@ public class NotificationMessageEnricher extends HeaderEnricher {
   private final Map<String, ? extends HeaderValueMessageProcessor<?>> newHeadersToAdd;
 
   public NotificationMessageEnricher(Map<String, ? extends HeaderValueMessageProcessor<?>> headersToAdd) {
-    this.newHeadersToAdd = (headersToAdd != null) ? headersToAdd
-                                               : new HashMap<String, HeaderValueMessageProcessor<Object>>();
+    this.newHeadersToAdd = (headersToAdd != null) ? headersToAdd : new HashMap<String, HeaderValueMessageProcessor<Object>>();
   }
 
   @Override
@@ -77,8 +76,7 @@ public class NotificationMessageEnricher extends HeaderEnricher {
       log.debug("NEW HEADERS: " + newMessage.getHeaders().toString());
 
       return super.transform(newMessage);
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       throw new MessagingException(message, "failed to transform message headers", e);
     }
   }

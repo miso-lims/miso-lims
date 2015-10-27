@@ -35,7 +35,7 @@ import java.util.Set;
  * uk.ac.bbsrc.tgac.miso.notification.util
  * <p/>
  * Takes a set of files and transforms them into a textual representation ready for passing to a Message receiving service
- *
+ * 
  * @author Rob Davey
  * @date 16-Feb-2011
  * @since 0.0.3

@@ -14,7 +14,7 @@ import java.util.Map;
  * uk.ac.bbsrc.tgac.miso.sqlstore
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 08/10/12
  * @since 0.1.9
@@ -32,8 +32,7 @@ public class MockSQLProjectDAO extends SQLProjectDAO {
           projectmap.put(projectId, u);
         }
         return u;
-      }
-      else {
+      } else {
         return projectmap.get(projectId);
       }
     }
@@ -48,8 +47,7 @@ public class MockSQLProjectDAO extends SQLProjectDAO {
           lazyprojectmap.put(projectId, u);
         }
         return u;
-      }
-      else {
+      } else {
         return lazyprojectmap.get(projectId);
       }
     }

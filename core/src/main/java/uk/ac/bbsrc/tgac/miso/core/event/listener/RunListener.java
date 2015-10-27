@@ -29,37 +29,41 @@ import uk.ac.bbsrc.tgac.miso.core.event.model.RunEvent;
  * uk.ac.bbsrc.tgac.miso.core.alert
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 23-Sep-2011
  * @since 0.1.2
  */
 public interface RunListener extends MisoListener {
-    /**
-     * Called whenever a new Run is started
-     *
-     * @param r Run that started
-     */
-    public void runStarted(RunEvent r);
+  /**
+   * Called whenever a new Run is started
+   * 
+   * @param r
+   *          Run that started
+   */
+  public void runStarted(RunEvent r);
 
-    /**
-     * Called whenever a Run is finished
-     *
-     * @param r Run that completed
-     */
-    public void runCompleted(RunEvent r);
+  /**
+   * Called whenever a Run is finished
+   * 
+   * @param r
+   *          Run that completed
+   */
+  public void runCompleted(RunEvent r);
 
-    /**
-     * Called whenever a Run fails
-     *
-     * @param r Run that failed
-     */
-    public void runFailed(RunEvent r);
+  /**
+   * Called whenever a Run fails
+   * 
+   * @param r
+   *          Run that failed
+   */
+  public void runFailed(RunEvent r);
 
-    /**
-     * Called whenever a Run QC is added
-     *
-     * @param r Run that has a QC added
-     */
-    public void runQcAdded(RunEvent r);
+  /**
+   * Called whenever a Run QC is added
+   * 
+   * @param r
+   *          Run that has a QC added
+   */
+  public void runQcAdded(RunEvent r);
 }

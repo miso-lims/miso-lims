@@ -30,17 +30,12 @@ import java.util.Map;
 
 /**
  * Enum representing the different platform types available
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public enum PlatformType {
-  ILLUMINA("Illumina"),
-  LS454("LS454"),
-  SOLID("Solid"),
-  IONTORRENT("IonTorrent"),
-  PACBIO("PacBio"),
-  OXFORD_NANOPORE("OxfordNanopore");
+  ILLUMINA("Illumina"), LS454("LS454"), SOLID("Solid"), IONTORRENT("IonTorrent"), PACBIO("PacBio"), OXFORD_NANOPORE("OxfordNanopore");
 
   /**
    * Field key
@@ -58,8 +53,9 @@ public enum PlatformType {
 
   /**
    * Constructs a PlatformType based on a given key
-   *
-   * @param key of type String
+   * 
+   * @param key
+   *          of type String
    */
   PlatformType(String key) {
     this.key = key;
@@ -67,8 +63,9 @@ public enum PlatformType {
 
   /**
    * Returns a PlatformType given an enum key
-   *
-   * @param key of type String
+   * 
+   * @param key
+   *          of type String
    * @return PlatformType
    */
   public static PlatformType get(String key) {
@@ -77,7 +74,7 @@ public enum PlatformType {
 
   /**
    * Returns the key of this PlatformType enum.
-   *
+   * 
    * @return String key.
    */
   public String getKey() {
@@ -86,7 +83,7 @@ public enum PlatformType {
 
   /**
    * Returns the keys of this PlatformType enum.
-   *
+   * 
    * @return ArrayList<String> keys.
    */
   public static ArrayList<String> getKeys() {

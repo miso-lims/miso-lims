@@ -52,11 +52,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
- * Created by IntelliJ IDEA.
- * User: bianx
- * Date: 18-Aug-2011
- * Time: 16:44:32
- * To change this template use File | Settings | File Templates.
+ * Created by IntelliJ IDEA. User: bianx Date: 18-Aug-2011 Time: 16:44:32 To change this template use File | Settings | File Templates.
  */
 @Ajaxified
 public class PoolWizardControllerHelperService {
@@ -90,12 +86,10 @@ public class PoolWizardControllerHelperService {
         s.setQcCreator(SecurityContextHolder.getContext().getAuthentication().getName());
         s.setQcDate(df.parse(q.getString("poolQcDate")));
         s.setQcType(requestManager.getPoolQcTypeById(q.getLong("poolQcType")));
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
         e.printStackTrace();
         return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
-      }
-      catch (ParseException e) {
+      } catch (ParseException e) {
         e.printStackTrace();
         return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
       }
@@ -130,12 +124,11 @@ public class PoolWizardControllerHelperService {
 
         if (!barcodeCollision) {
           Pool pool;
-          //TODO special type of pool for LibraryDilutions that will go on to be emPCRed as a whole
-          if (dils.get(0) instanceof LibraryDilution &&
-              (platformType.equals(PlatformType.SOLID) || platformType.equals(PlatformType.LS454))) {
+          // TODO special type of pool for LibraryDilutions that will go on to be emPCRed as a whole
+          if (dils.get(0) instanceof LibraryDilution
+              && (platformType.equals(PlatformType.SOLID) || platformType.equals(PlatformType.LS454))) {
             pool = dataObjectFactory.getEmPCRPool(platformType, user);
-          }
-          else {
+          } else {
             pool = dataObjectFactory.getPoolOfType(platformType, user);
           }
 
@@ -151,8 +144,7 @@ public class PoolWizardControllerHelperService {
           for (Dilution d : dils) {
             try {
               pool.addPoolableElement(d);
-            }
-            catch (MalformedDilutionException dle) {
+            } catch (MalformedDilutionException dle) {
               log.error("Failed", dle);
               return JSONUtils.SimpleJSONError("Failed: " + dle.getMessage());
             }
@@ -162,13 +154,11 @@ public class PoolWizardControllerHelperService {
             try {
               qc.setPool(pool);
               pool.addQc(qc);
-            }
-            catch (MalformedPoolException e) {
+            } catch (MalformedPoolException e) {
               e.printStackTrace();
               log.error("Failed", e);
               return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
-            }
-            catch (MalformedPoolQcException e) {
+            } catch (MalformedPoolQcException e) {
               e.printStackTrace();
               log.error("Failed", e);
               return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
@@ -177,37 +167,36 @@ public class PoolWizardControllerHelperService {
 
           requestManager.savePool(pool);
 
-          //sb.append("<a  class='dashboardresult' href='/miso/pool/"+pool.getPlatformType().getKey().toLowerCase()+"/" + pool.getId() + "' target='_blank'><div  onmouseover=\"this.className='dashboardhighlight ui-corner-all'\" onmouseout=\"this.className='dashboard ui-corner-all'\"  class='dashboard ui-corner-all' >");
-          sb.append("<a  class='dashboardresult' href='/miso/pool/" + pool.getId() + "' target='_blank'><div  onmouseover=\"this.className='dashboardhighlight ui-corner-all'\" onmouseout=\"this.className='dashboard ui-corner-all'\"  class='dashboard ui-corner-all' >");
+          sb.append("<a  class='dashboardresult' href='/miso/pool/"
+              + pool.getId()
+              + "' target='_blank'><div  onmouseover=\"this.className='dashboardhighlight ui-corner-all'\" onmouseout=\"this.className='dashboard ui-corner-all'\"  class='dashboard ui-corner-all' >");
           sb.append("Pool ID: <b>" + pool.getId() + "</b><br/>");
           sb.append("Pool Name: <b>" + pool.getName() + "</b><br/>");
           sb.append("Platform Type: <b>" + pool.getPlatformType().name() + "</b><br/>");
           sb.append("Dilutions: <ul class='bullets'>");
           for (Dilution dl : (Collection<? extends Dilution>) pool.getDilutions()) {
-            sb.append("<li>" + dl.getName() + " (<a href='/miso/library/" + dl.getLibrary().getId() + "'>" + dl.getLibrary().getAlias() + "</a>)</li>");
+            sb.append("<li>" + dl.getName() + " (<a href='/miso/library/" + dl.getLibrary().getId() + "'>" + dl.getLibrary().getAlias()
+                + "</a>)</li>");
           }
           sb.append("</ul>");
 
           sb.append("QCs: <ul class='bullets'>");
           for (PoolQC qc : (Collection<PoolQC>) pool.getPoolQCs()) {
-            sb.append("<li>")
-                .append(qc.getResults()).append(" ").append(qc.getQcType().getUnits())
-                .append(" (").append(qc.getQcType().getName()).append(")</li>");
+            sb.append("<li>").append(qc.getResults()).append(" ").append(qc.getQcType().getUnits()).append(" (")
+                .append(qc.getQcType().getName()).append(")</li>");
           }
           sb.append("</ul>");
 
           sb.append("</div></a>");
+        } else {
+          throw new IOException(
+              "Tag barcode collision. Two or more selection dilutions have the same tag barcode and therefore cannot be pooled together.");
         }
-        else {
-          throw new IOException("Tag barcode collision. Two or more selection dilutions have the same tag barcode and therefore cannot be pooled together.");
-        }
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
         log.error("Failed", e);
         return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
       }
-    }
-    else {
+    } else {
       sb.append("<br/>No dilution available to save.");
     }
 
@@ -227,8 +216,7 @@ public class PoolWizardControllerHelperService {
 
       if (j.getString("name").equals("studyDescription")) {
         studyDescription = j.getString("value");
-      }
-      else if (j.getString("name").equals("studyType")) {
+      } else if (j.getString("name").equals("studyType")) {
         studyType = j.getString("value");
       }
     }
@@ -243,13 +231,14 @@ public class PoolWizardControllerHelperService {
 
       requestManager.saveStudy(s);
 
-      sb.append("<a  class=\"dashboardresult\" href='/miso/study/" + s.getId() + "' target='_blank'><div onmouseover=\"this.className='dashboardhighlight ui-corner-all'\" onmouseout=\"this.className='dashboard ui-corner-all'\"  class='dashboard ui-corner-all' >New Study Added:<br/>");
+      sb.append("<a  class=\"dashboardresult\" href='/miso/study/"
+          + s.getId()
+          + "' target='_blank'><div onmouseover=\"this.className='dashboardhighlight ui-corner-all'\" onmouseout=\"this.className='dashboard ui-corner-all'\"  class='dashboard ui-corner-all' >New Study Added:<br/>");
       sb.append("Study ID: " + s.getId() + "<br/>");
       sb.append("Study Name: <b>" + s.getName() + "</b><br/>");
       sb.append("Study Alias: <b>" + s.getAlias() + "</b><br/>");
       sb.append("Study Description: <b>" + s.getDescription() + "</b></div></a><br/><hr/><br/>");
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
@@ -268,7 +257,6 @@ public class PoolWizardControllerHelperService {
       for (Dilution dl : dls) {
         if (dl.getLibrary().getQcPassed() != null) {
           if (dl.getLibrary().getQcPassed()) {
-            //b.append("<tr id='"+dl.getDilutionId()+"'><td class='rowSelect'><input class='chkbox' type='checkbox' name='ids' value='" + dl.getDilutionId() + "'/></td>");
             StringBuilder barcode = new StringBuilder();
             if (!dl.getLibrary().getTagBarcodes().isEmpty()) {
               int count = 0;
@@ -288,7 +276,9 @@ public class PoolWizardControllerHelperService {
             b.append("</td>");
             b.append("</tr>");
 
-            a.add(JSONObject.fromObject("{'id':" + dl.getId() + ",'name':'" + dl.getName() + "','description':'" + dl.getLibrary().getDescription() + "','library':'" + dl.getLibrary().getAlias() + "','libraryBarcode':'" + barcode.toString() + "'}"));
+            a.add(JSONObject.fromObject("{'id':" + dl.getId() + ",'name':'" + dl.getName() + "','description':'"
+                + dl.getLibrary().getDescription() + "','library':'" + dl.getLibrary().getAlias() + "','libraryBarcode':'"
+                + barcode.toString() + "'}"));
           }
         }
       }
@@ -297,8 +287,7 @@ public class PoolWizardControllerHelperService {
       j.put("dilutions", a);
       return JSONUtils.JSONObjectResponse(j);
 
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }

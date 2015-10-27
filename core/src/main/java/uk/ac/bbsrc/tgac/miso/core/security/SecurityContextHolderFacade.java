@@ -27,10 +27,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
- * Created by IntelliJ IDEA.
- * User: davey
- * Date: 04-Feb-2010
- * Time: 15:56:19
+ * Created by IntelliJ IDEA. User: davey Date: 04-Feb-2010 Time: 15:56:19
  */
 public class SecurityContextHolderFacade implements SecurityContextFacade {
   public SecurityContext getContext() {

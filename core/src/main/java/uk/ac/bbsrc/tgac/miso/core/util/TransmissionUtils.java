@@ -42,7 +42,7 @@ import static org.apache.commons.net.io.Util.*;
  * uk.ac.bbsrc.tgac.miso.core.util
  * <p/>
  * A simple class to provide methods to transmit files to and from services.
- *
+ * 
  * @author Rob Davey
  * @date 29-Jun-2011
  * @since 0.0.3
@@ -58,22 +58,19 @@ public class TransmissionUtils {
       log.debug("Trying " + host);
       log.debug(ftp.getReplyString());
       int reply = ftp.getReplyCode();
-      if(!FTPReply.isPositiveCompletion(reply)) {
+      if (!FTPReply.isPositiveCompletion(reply)) {
         ftp.disconnect();
         throw new IOException("FTP server refused connection: " + reply);
-      }
-      else {
+      } else {
         log.info("Connected");
       }
 
       ftp.login(username, password);
       ftp.setFileType(FTP.BINARY_FILE_TYPE);
       ftp.enterLocalPassiveMode();
-    }
-    catch (NoRouteToHostException e) {
+    } catch (NoRouteToHostException e) {
       throw new IOException("Couldn't connect to printer: " + e.getMessage(), e);
-    }
-    catch (UnknownHostException e) {
+    } catch (UnknownHostException e) {
       throw new IOException("Couldn't connect to printer: " + e.getMessage(), e);
     }
     return ftp;
@@ -86,24 +83,21 @@ public class TransmissionUtils {
       log.debug("Trying " + host + ":" + port);
       log.debug(ftp.getReplyString());
       int reply = ftp.getReplyCode();
-      if(!FTPReply.isPositiveCompletion(reply)) {
+      if (!FTPReply.isPositiveCompletion(reply)) {
         ftp.disconnect();
         throw new IOException("FTP server refused connection: " + reply);
-      }
-      else {
+      } else {
         log.debug("Connected");
       }
 
       ftp.login(username, password);
       ftp.setFileType(FTP.BINARY_FILE_TYPE);
       ftp.enterLocalPassiveMode();
-    }
-    catch (NoRouteToHostException e) {
+    } catch (NoRouteToHostException e) {
+      throw new IOException("Couldn't connect to printer: " + e.getMessage(), e);
+    } catch (UnknownHostException e) {
       throw new IOException("Couldn't connect to printer: " + e.getMessage(), e);
     }
-    catch (UnknownHostException e) {
-      throw new IOException("Couldn't connect to printer: " + e.getMessage(), e);
-    }    
     return ftp;
   }
 
@@ -135,7 +129,7 @@ public class TransmissionUtils {
         }
       }
 
-      log.info("All OK - transmitting "+files.size()+" file(s)");
+      log.info("All OK - transmitting " + files.size() + " file(s)");
 
       for (File f : files) {
         fis = new FileInputStream(f);
@@ -147,43 +141,38 @@ public class TransmissionUtils {
         boolean success = FTPReply.isPositiveCompletion(ftp.getReplyCode());
         if (!success) {
           error = true;
-          log.error("Error storing file: " + f.getName() + " (" +success+ ")");
+          log.error("Error storing file: " + f.getName() + " (" + success + ")");
         }
       }
 
       if (autoLogout) {
         ftp.logout();
       }
-    }
-    catch(IOException e) {
+    } catch (IOException e) {
       error = true;
       e.printStackTrace();
-    }
-    finally {
+    } finally {
       try {
         if (fis != null) {
           fis.close();
         }
 
         if (autoLogout) {
-          if(ftp != null && ftp.isConnected()) {
+          if (ftp != null && ftp.isConnected()) {
             ftp.disconnect();
           }
         }
-      }
-      catch(IOException ioe) {
+      } catch (IOException ioe) {
         ioe.printStackTrace();
       }
     }
 
-    //return inverse error boolean, just to make downstream conditionals easier
+    // return inverse error boolean, just to make downstream conditionals easier
     return !error;
   }
 
-
-
-
-    public static boolean ftpPutListen(FTPClient ftp, String path, File file, boolean autoLogout, boolean autoMkdir, CopyStreamListener listener) throws IOException {
+  public static boolean ftpPutListen(FTPClient ftp, String path, File file, boolean autoLogout, boolean autoMkdir,
+      CopyStreamListener listener) throws IOException {
     boolean error = false;
     FileInputStream fis = null;
 
@@ -201,73 +190,51 @@ public class TransmissionUtils {
             throw new IOException("Cannot create desired path on the server.");
           }
         }
-        log.info("Working dir =" +ftp.printWorkingDirectory());
+        log.info("Working dir =" + ftp.printWorkingDirectory());
         if (!ftp.changeWorkingDirectory(path)) {
           error = true;
           throw new IOException("Desired path does not exist on the server");
         }
       }
 
+      fis = new FileInputStream(file);
 
-        fis = new FileInputStream(file);
+      OutputStream ops = new BufferedOutputStream(ftp.storeFileStream(file.getName()), ftp.getBufferSize());
 
-        OutputStream ops=new BufferedOutputStream(ftp.storeFileStream(file.getName()),ftp.getBufferSize());
+      log.info("TransmissionUtils putListen: FTP server responded: " + ftp.getReplyString());
 
-        log.info("TransmissionUtils putListen: FTP server responded: " + ftp.getReplyString());
+      copyStream(fis, ops, ftp.getBufferSize(), file.length(), listener);
 
-
-         copyStream(fis, ops, ftp.getBufferSize(),
-                file.length(),
-                listener
-        );
-
-        //ftp.completePendingCommand();
-        ops.close();
-        //bis.close();
-        fis.close();
-        log.info("TransmissionUtils putListen: FTP server responded: " + ftp.getReplyString());
-
-       /* commented out as I think it's causing a false error by checking too soon- file upload will not have completed yet...
-        boolean success = FTPReply.isPositiveIntermediate(ftp.getReplyCode());
-        if (!success) {
-          error = true;
-          log.error("Error storing file: " + file.getName() + " (" +success+ ")");
-        }
-        */
-
+      ops.close();
+      fis.close();
+      log.info("TransmissionUtils putListen: FTP server responded: " + ftp.getReplyString());
 
       if (autoLogout) {
         ftp.logout();
       }
-       //return(true);
-    }
-    catch(IOException e) {
+    } catch (IOException e) {
       error = true;
       e.printStackTrace();
-       // return(false);
-    }
-    finally {
+    } finally {
       try {
-          log.info("TransmissionUtils putListen:finally: "+ftp.getReplyString());
+        log.info("TransmissionUtils putListen:finally: " + ftp.getReplyString());
         if (fis != null) {
           fis.close();
         }
 
         if (autoLogout) {
-          if(ftp != null && ftp.isConnected()) {
+          if (ftp != null && ftp.isConnected()) {
             ftp.disconnect();
           }
         }
-      }
-      catch(IOException ioe) {
+      } catch (IOException ioe) {
         ioe.printStackTrace();
       }
     }
 
-    //return inverse error boolean, just to make downstream conditionals easier
-    log.info("result of transmissionutils.putListen:",!error);
+    // return inverse error boolean, just to make downstream conditionals easier
+    log.info("result of transmissionutils.putListen:", !error);
     return !error;
 
   }
 }
-

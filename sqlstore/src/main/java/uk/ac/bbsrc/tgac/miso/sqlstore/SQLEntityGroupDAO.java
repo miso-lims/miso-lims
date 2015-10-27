@@ -1,39 +1,45 @@
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
+import java.io.IOException;
+import java.lang.reflect.ParameterizedType;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
+
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
+
 import org.codehaus.jackson.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import uk.ac.bbsrc.tgac.miso.core.data.*;
+
+import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
+import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.EntityGroupImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.store.EntityGroupStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DaoLookup;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
-
-import javax.persistence.CascadeType;
-import java.io.IOException;
-import java.lang.reflect.ParameterizedType;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.*;
 
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 23/10/13
  * @since 0.2.1-SNAPSHOT
@@ -41,29 +47,21 @@ import java.util.*;
 public class SQLEntityGroupDAO implements EntityGroupStore {
   private static final String TABLE_NAME = "EntityGroup";
 
-  public static final String ENTITYGROUP_SELECT =
-          "SELECT entityGroupId, parentId, parentType " +
-          "FROM "+TABLE_NAME;
+  public static final String ENTITYGROUP_SELECT = "SELECT entityGroupId, parentId, parentType " + "FROM " + TABLE_NAME;
 
-  public static final String ENTITYGROUP_SELECT_LIMIT =
-          ENTITYGROUP_SELECT + " ORDER BY entityGroupId DESC LIMIT ?";
+  public static final String ENTITYGROUP_SELECT_LIMIT = ENTITYGROUP_SELECT + " ORDER BY entityGroupId DESC LIMIT ?";
 
-  public static final String ENTITYGROUP_SELECT_BY_ID =
-          ENTITYGROUP_SELECT + " WHERE entityGroupId = ?";
+  public static final String ENTITYGROUP_SELECT_BY_ID = ENTITYGROUP_SELECT + " WHERE entityGroupId = ?";
 
-  public static final String ENTITYGROUP_SELECT_BY_PARENT_TYPE_AND_ID =
-          ENTITYGROUP_SELECT + " WHERE parentId = ? and parentType = ?";
+  public static final String ENTITYGROUP_SELECT_BY_PARENT_TYPE_AND_ID = ENTITYGROUP_SELECT + " WHERE parentId = ? and parentType = ?";
 
-  public static final String ENTITYGROUP_DELETE =
-            "DELETE FROM "+TABLE_NAME+" WHERE entityGroupId=:entityGroupId";
+  public static final String ENTITYGROUP_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE entityGroupId=:entityGroupId";
 
-  public static final String ENTITYGROUP_ELEMENT_SELECT =
-          "SELECT entityId, entityType FROM EntityGroup_Elements " +
-          "WHERE entityGroup_entityGroupId = ? ORDER BY entityId";
+  public static final String ENTITYGROUP_ELEMENT_SELECT = "SELECT entityId, entityType FROM EntityGroup_Elements "
+      + "WHERE entityGroup_entityGroupId = ? ORDER BY entityId";
 
-  public static final String ENTITYGROUP_ELEMENT_DELETE_BY_GROUP_ID =
-          "DELETE FROM EntityGroup_Elements " +
-          "WHERE entityGroup_entityGroupId=:entityGroup_entityGroupId";
+  public static final String ENTITYGROUP_ELEMENT_DELETE_BY_GROUP_ID = "DELETE FROM EntityGroup_Elements "
+      + "WHERE entityGroup_entityGroupId=:entityGroup_entityGroupId";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLEntityGroupDAO.class);
   private JdbcTemplate template;
@@ -97,7 +95,8 @@ public class SQLEntityGroupDAO implements EntityGroupStore {
 
   @Override
   public EntityGroup<? extends Nameable, ? extends Nameable> lazyGet(long groupId) throws IOException {
-    List<EntityGroup<? extends Nameable, ? extends Nameable>> eResults = template.query(ENTITYGROUP_SELECT_BY_ID, new Object[]{groupId}, new EntityGroupMapper(true));
+    List<EntityGroup<? extends Nameable, ? extends Nameable>> eResults = template.query(ENTITYGROUP_SELECT_BY_ID, new Object[] { groupId },
+        new EntityGroupMapper(true));
     return eResults.size() > 0 ? eResults.get(0) : null;
   }
 
@@ -107,7 +106,8 @@ public class SQLEntityGroupDAO implements EntityGroupStore {
   }
 
   @Override
-  public <T extends Nameable, S extends Nameable> EntityGroup<T, S> getEntityGroupByParentTypeAndId(Class<? extends T> parentType, long parentId) throws IOException, SQLException {
+  public <T extends Nameable, S extends Nameable> EntityGroup<T, S> getEntityGroupByParentTypeAndId(Class<? extends T> parentType,
+      long parentId) throws IOException, SQLException {
     List<Map<String, Object>> results = template.queryForList(ENTITYGROUP_SELECT_BY_PARENT_TYPE_AND_ID, parentId, parentType.getName());
     if (!results.isEmpty()) {
       EntityGroup osg = new EntityGroupImpl<T, S>();
@@ -118,15 +118,13 @@ public class SQLEntityGroupDAO implements EntityGroupStore {
         Store<? extends T> dao = daoLookup.lookup(parentType);
         if (dao != null) {
           if (parentType.equals(ProjectOverview.class)) {
-            osg.setParent(((ProjectStore)dao).getProjectOverviewById(parentId));
-          }
-          else {
+            osg.setParent(((ProjectStore) dao).getProjectOverviewById(parentId));
+          } else {
             osg.setParent(dao.get(parentId));
           }
 
           osg.setEntities(resolveEntityGroupElements(groupId));
-        }
-        else {
+        } else {
           throw new SQLException("No DAO found or more than one found.");
         }
       }
@@ -136,7 +134,8 @@ public class SQLEntityGroupDAO implements EntityGroupStore {
   }
 
   @Override
-  public <T extends Nameable, S extends Nameable> EntityGroup<T, S> getEntityGroupByParent(T parent, Class<? extends T> parentClz) throws IOException, SQLException {
+  public <T extends Nameable, S extends Nameable> EntityGroup<T, S> getEntityGroupByParent(T parent, Class<? extends T> parentClz)
+      throws IOException, SQLException {
     String parentType = parentClz.getName();
     long parentId = parent.getId();
 
@@ -156,17 +155,16 @@ public class SQLEntityGroupDAO implements EntityGroupStore {
 
   public boolean remove(EntityGroup<? extends Nameable, ? extends Nameable> entityGroup) throws IOException {
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-    if (entityGroup.isDeletable() &&
-           (namedTemplate.update(ENTITYGROUP_DELETE,
-                                 new MapSqlParameterSource().addValue("entityGroupId", entityGroup.getId())) == 1)) {
+    if (entityGroup.isDeletable()
+        && (namedTemplate.update(ENTITYGROUP_DELETE, new MapSqlParameterSource().addValue("entityGroupId", entityGroup.getId())) == 1)) {
       MapSqlParameterSource eparams = new MapSqlParameterSource();
       eparams.addValue("entityGroup_entityGroupId", entityGroup.getId());
       namedTemplate.update(ENTITYGROUP_ELEMENT_DELETE_BY_GROUP_ID, eparams);
       return true;
     }
 
-    //explicit call to parent cache cleaning routines. a little more long winded than usual due to type erased parent
-    //also can't call parentDao.save() as will probably end up in cyclical save operation
+    // explicit call to parent cache cleaning routines. a little more long winded than usual due to type erased parent
+    // also can't call parentDao.save() as will probably end up in cyclical save operation
     Cache lazyCache = DbUtils.lookupCache(cacheManager, entityGroup.getParent().getClass(), true);
     Cache cache = DbUtils.lookupCache(cacheManager, entityGroup.getParent().getClass(), false);
     if (lazyCache != null) {
@@ -181,21 +179,19 @@ public class SQLEntityGroupDAO implements EntityGroupStore {
 
   @Override
   public long save(EntityGroup<? extends Nameable, ? extends Nameable> entityGroup) throws IOException {
-    //save group
+    // save group
     MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("parentId", entityGroup.getParent().getId())
-          .addValue("parentType", entityGroup.getParent().getClass().getName());
+    params.addValue("parentId", entityGroup.getParent().getId());params.addValue("parentType", entityGroup.getParent().getClass().getName());
 
     if (entityGroup.getId() == EntityGroupImpl.UNSAVED_ID) {
-      SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-                            .withTableName(TABLE_NAME)
-                            .usingGeneratedKeyColumns("entityGroupId");
+      SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("entityGroupId");
       entityGroup.setId(DbUtils.getAutoIncrement(template, TABLE_NAME));
 
       Number newId = insert.executeAndReturnKey(params);
       if (newId.longValue() != entityGroup.getId()) {
         log.error("Expected EntityGroup ID doesn't match returned value from database insert: rolling back...");
-        new NamedParameterJdbcTemplate(template).update(ENTITYGROUP_DELETE, new MapSqlParameterSource().addValue("entityGroupId", newId.longValue()));
+        new NamedParameterJdbcTemplate(template).update(ENTITYGROUP_DELETE,
+            new MapSqlParameterSource().addValue("entityGroupId", newId.longValue()));
         throw new IOException("Something bad happened. Expected EntityGroup ID doesn't match returned value from DB insert");
       }
     }
@@ -212,8 +208,7 @@ public class SQLEntityGroupDAO implements EntityGroupStore {
           Store<? super Nameable> dao = daoLookup.lookup(n.getClass());
           if (dao != null) {
             dao.save(n);
-          }
-          else {
+          } else {
             log.error("No dao class found for " + n.getClass().getName());
           }
         }
@@ -225,16 +220,16 @@ public class SQLEntityGroupDAO implements EntityGroupStore {
         if (coreDatatype == null) {
           coreDatatype = n.getClass();
         }
-        ltParams.addValue("entityGroup_entityGroupId", entityGroup.getId())
-                .addValue("entityType", coreDatatype.getName())
-                .addValue("entityId", n.getId());
+        ltParams.addValue("entityGroup_entityGroupId", entityGroup.getId());
+        ltParams.addValue("entityType", coreDatatype.getName());
+        ltParams.addValue("entityId", n.getId());
 
         eInsert.execute(ltParams);
       }
     }
 
-    //explicit call to parent cache cleaning routines. a little more long winded than usual due to type erased parent
-    //also can't call parentDao.save() as will probably end up in cyclical save operation
+    // explicit call to parent cache cleaning routines. a little more long winded than usual due to type erased parent
+    // also can't call parentDao.save() as will probably end up in cyclical save operation
     Cache lazyCache = DbUtils.lookupCache(cacheManager, entityGroup.getParent().getClass(), true);
     Cache cache = DbUtils.lookupCache(cacheManager, entityGroup.getParent().getClass(), false);
     if (lazyCache != null) {
@@ -249,7 +244,8 @@ public class SQLEntityGroupDAO implements EntityGroupStore {
 
   @Override
   public EntityGroup<? extends Nameable, ? extends Nameable> get(long id) throws IOException {
-    List<EntityGroup<? extends Nameable, ? extends Nameable>> eResults = template.query(ENTITYGROUP_SELECT_BY_ID, new Object[]{id}, new EntityGroupMapper());
+    List<EntityGroup<? extends Nameable, ? extends Nameable>> eResults = template.query(ENTITYGROUP_SELECT_BY_ID, new Object[] { id },
+        new EntityGroupMapper());
     return eResults.size() > 0 ? eResults.get(0) : null;
   }
 
@@ -265,15 +261,19 @@ public class SQLEntityGroupDAO implements EntityGroupStore {
 
   public class EntityGroupMapper extends CacheAwareRowMapper<EntityGroup<? extends Nameable, ? extends Nameable>> {
     public EntityGroupMapper() {
-      super((Class<EntityGroup<? extends Nameable, ? extends Nameable>>)((ParameterizedType)new TypeReference<EntityGroup<? extends Nameable, ? extends Nameable>>(){}.getType()).getRawType());
+      super(
+          (Class<EntityGroup<? extends Nameable, ? extends Nameable>>) ((ParameterizedType) new TypeReference<EntityGroup<? extends Nameable, ? extends Nameable>>() {
+          }.getType()).getRawType());
     }
 
     public EntityGroupMapper(boolean lazy) {
-      super((Class<EntityGroup<? extends Nameable, ? extends Nameable>>)((ParameterizedType)new TypeReference<EntityGroup<? extends Nameable, ? extends Nameable>>(){}.getType()).getRawType(), lazy);
+      super(
+          (Class<EntityGroup<? extends Nameable, ? extends Nameable>>) ((ParameterizedType) new TypeReference<EntityGroup<? extends Nameable, ? extends Nameable>>() {
+          }.getType()).getRawType(), lazy);
     }
 
     public EntityGroup<? extends Nameable, ? extends Nameable> mapRow(ResultSet rs, int rowNum) throws SQLException {
-      //map parent
+      // map parent
       Long groupId = rs.getLong("entityGroupId");
       Long parentId = rs.getLong("parentId");
       String parentType = rs.getString("parentType");
@@ -285,16 +285,14 @@ public class SQLEntityGroupDAO implements EntityGroupStore {
         Class<? extends Nameable> clz = Class.forName(parentType).asSubclass(Nameable.class);
         Store<? extends Nameable> dao = daoLookup.lookup(clz);
         if (dao != null) {
-          //TODO this is horrific. split project overview stuff out of the project DAO
-          //get on project dao returns a project, not a projectoverview! ARGH
+          // TODO this is horrific. split project overview stuff out of the project DAO
+          // get on project dao returns a project, not a projectoverview! ARGH
           if (clz.equals(ProjectOverview.class)) {
-            eg.setParent(((ProjectStore)dao).getProjectOverviewById(parentId));
-          }
-          else {
+            eg.setParent(((ProjectStore) dao).getProjectOverviewById(parentId));
+          } else {
             eg.setParent(dao.get(parentId));
           }
-        }
-        else {
+        } else {
           throw new SQLException("No DAO found or more than one found.");
         }
 
@@ -303,12 +301,10 @@ public class SQLEntityGroupDAO implements EntityGroupStore {
         }
 
         return eg;
-      }
-      catch (ClassNotFoundException e) {
+      } catch (ClassNotFoundException e) {
         throw new SQLException("Cannot resolve EntityGroup parent type to a valid class", e);
-      }
-      catch (IOException e) {
-        throw new SQLException("Cannot retrieve EntityGroup ["+groupId+"] parent: [" + parentType + " ] " + parentId);
+      } catch (IOException e) {
+        throw new SQLException("Cannot retrieve EntityGroup [" + groupId + "] parent: [" + parentType + " ] " + parentId);
       }
     }
   }
@@ -318,18 +314,16 @@ public class SQLEntityGroupDAO implements EntityGroupStore {
       Set<Nameable> elements = new HashSet<Nameable>();
       List<Map<String, Object>> rows = template.queryForList(ENTITYGROUP_ELEMENT_SELECT, groupId);
       for (Map<String, Object> map : rows) {
-        Class<? extends Nameable> clz = Class.forName((String)map.get("entityType")).asSubclass(Nameable.class);
+        Class<? extends Nameable> clz = Class.forName((String) map.get("entityType")).asSubclass(Nameable.class);
         Store<? extends Nameable> dao = daoLookup.lookup(clz);
         if (dao != null) {
           elements.add(dao.lazyGet((Long) map.get("entityId")));
-        }
-        else {
+        } else {
           throw new SQLException("No DAO found or more than one found.");
         }
       }
       return elements;
-    }
-    catch (ClassNotFoundException e) {
+    } catch (ClassNotFoundException e) {
       throw new IOException(e);
     }
   }

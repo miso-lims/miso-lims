@@ -41,7 +41,7 @@ import java.util.Map;
  * uk.ac.bbsrc.tgac.miso.analysis.tgac
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 14/10/11
  * @since 0.1.2
@@ -64,7 +64,8 @@ public class LocalGunzipProcess implements ConanProcess {
   }
 
   @Override
-  public boolean execute(Map<ConanParameter, String> parameters) throws ProcessExecutionException, IllegalArgumentException, InterruptedException {
+  public boolean execute(Map<ConanParameter, String> parameters) throws ProcessExecutionException, IllegalArgumentException,
+      InterruptedException {
     getLog().info("Executing " + getName() + " with the following parameters: " + parameters.toString());
     String command = "gunzip " + parameters.get(fileParameter);
     try {
@@ -73,15 +74,12 @@ public class LocalGunzipProcess implements ConanProcess {
       runner.redirectStderr(true);
       String[] output = runner.runCommmand(command);
       if (output.length > 0) {
-          getLog().info("Response from command [" + command + "]: " +
-                                 output.length + " lines, first line was " + output[0]);
+        getLog().info("Response from command [" + command + "]: " + output.length + " lines, first line was " + output[0]);
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return false;
-    }
-    catch (CommandExecutionException e) {
+    } catch (CommandExecutionException e) {
       e.printStackTrace();
       return false;
     }

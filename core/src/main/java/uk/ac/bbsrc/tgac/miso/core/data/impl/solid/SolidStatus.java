@@ -44,7 +44,7 @@ import java.util.regex.Pattern;
  * uk.ac.bbsrc.tgac.miso.core.data.impl.solid
  * <p/>
  * TODO Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.3
  */
@@ -76,8 +76,7 @@ public class SolidStatus extends StatusImpl {
         }
         setRunName(runName);
         setHealth(HealthType.Unknown);
-      }
-      else {
+      } else {
         String runName = statusDoc.getElementsByTagName("name").item(3).getTextContent();
         String runStarted = statusDoc.getElementsByTagName("dateStarted").item(0).getTextContent();
         DateFormat logDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
@@ -91,15 +90,14 @@ public class SolidStatus extends StatusImpl {
 
         if (statusDoc.getElementsByTagName("name").getLength() != 0) {
           for (int i = 0; i < statusDoc.getElementsByTagName("name").getLength(); i++) {
-            Element e = (Element)statusDoc.getElementsByTagName("name").item(i);
+            Element e = (Element) statusDoc.getElementsByTagName("name").item(i);
             Matcher m = runRegex.matcher(e.getTextContent());
             if (m.matches()) {
               runName = e.getTextContent();
               setInstrumentName(m.group(1));
             }
           }
-        }
-        else {
+        } else {
           Matcher m = runRegex.matcher(runName);
           if (m.matches()) {
             setInstrumentName(m.group(1));
@@ -110,14 +108,11 @@ public class SolidStatus extends StatusImpl {
         setHealth(HealthType.Unknown);
       }
       setXml(statusXml);
-    }
-    catch (ParserConfigurationException e) {
+    } catch (ParserConfigurationException e) {
       e.printStackTrace();
-    }
-    catch (TransformerException e) {
+    } catch (TransformerException e) {
       e.printStackTrace();
-    }
-    catch (ParseException e) {
+    } catch (ParseException e) {
       e.printStackTrace();
     }
   }

@@ -23,22 +23,20 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-//import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonIgnore;
 
 /**
- * This interface simply describes an object that can be barcoded to denote its identity,
- * i.e. have an identification String that represents a scannable barcode. For physical
- * barcode printing purposes, Barcodable objects can be assigned names and label text fields
- * which can be made up of existing object fields to aid with barcode label generation.
- *
+ * This interface simply describes an object that can be barcoded to denote its identity, i.e. have an identification String that represents
+ * a scannable barcode. For physical barcode printing purposes, Barcodable objects can be assigned names and label text fields which can be
+ * made up of existing object fields to aid with barcode label generation.
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public interface Barcodable extends Nameable {
-   /**
+  /**
    * Returns the label text of this Barcodable object.
-   *
+   * 
    * @return String labelText.
    */
   @JsonIgnore
@@ -46,15 +44,16 @@ public interface Barcodable extends Nameable {
 
   /**
    * Returns the identificationBarcode of this Barcodable object.
-   *
+   * 
    * @return String identificationBarcode.
    */
   public String getIdentificationBarcode();
 
   /**
    * Sets the identificationBarcode of this Barcodable object.
-   *
-   * @param identificationBarcode identificationBarcode.
+   * 
+   * @param identificationBarcode
+   *          identificationBarcode.
    */
   public void setIdentificationBarcode(String identificationBarcode);
 }

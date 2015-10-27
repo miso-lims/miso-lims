@@ -24,10 +24,6 @@
 package uk.ac.bbsrc.tgac.miso.core.event;
 
 import com.eaglegenomics.simlims.core.User;
-//import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-//import com.fasterxml.jackson.annotation.JsonTypeInfo;
-//import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-//import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
@@ -38,26 +34,26 @@ import java.util.Date;
 
 /**
  * Interface describing an alert that can be raised, usually as a result of an {@link Event}
- *
+ * 
  * @author Rob Davey
  * @date 22-Sep-2011
  * @since 0.1.2
  */
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
-//@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public interface Alert extends Comparable, Deletable {
   /**
    * Returns the alertId of this Alert object.
-   *
+   * 
    * @return Long alertId.
    */
   public Long getAlertId();
 
   /**
    * Sets the alertId of this Alert object.
-   *
-   * @param alertId Long.
+   * 
+   * @param alertId
+   *          Long.
    */
   public void setAlertId(Long alertId);
 

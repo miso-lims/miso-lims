@@ -23,17 +23,17 @@
 
 package uk.ac.bbsrc.tgac.miso.analysis.process;
 
-import uk.ac.ebi.fgpt.conan.lsf.AbstractLSFProcess;
-import uk.ac.ebi.fgpt.conan.model.ConanParameter;
-
 import java.io.File;
 import java.util.Map;
+
+import uk.ac.ebi.fgpt.conan.lsf.AbstractLSFProcess;
+import uk.ac.ebi.fgpt.conan.model.ConanParameter;
 
 /**
  * uk.ac.bbsrc.tgac.miso.analysis.tgac
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 14/10/11
  * @since 0.1.6

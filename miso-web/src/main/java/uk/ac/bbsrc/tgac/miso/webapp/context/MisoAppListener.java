@@ -85,9 +85,9 @@ import java.net.UnknownHostException;
 import java.util.*;
 
 /**
- * The custom MISO context listener class. On webapp context init, we can do some startup checks, e.g. checking the existence of required directories/files
- * for sane app startup
- *
+ * The custom MISO context listener class. On webapp context init, we can do some startup checks, e.g. checking the existence of required
+ * directories/files for sane app startup
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -96,18 +96,19 @@ public class MisoAppListener implements ServletContextListener {
 
   /**
    * Called on webapp context init
-   *
-   * @param event of type ServletContextEvent
+   * 
+   * @param event
+   *          of type ServletContextEvent
    */
   public void contextInitialized(ServletContextEvent event) {
     ServletContext application = event.getServletContext();
 
-    //load logging system manually so that we get the placeholders ${} swapped out for real values
-    PropertyConfigurator.configure(application.getRealPath("/")+"/WEB-INF/log4j.miso.properties");
+    // load logging system manually so that we get the placeholders ${} swapped out for real values
+    PropertyConfigurator.configure(application.getRealPath("/") + "/WEB-INF/log4j.miso.properties");
 
-    XmlWebApplicationContext context = (XmlWebApplicationContext)WebApplicationContextUtils.getRequiredWebApplicationContext(application);
+    XmlWebApplicationContext context = (XmlWebApplicationContext) WebApplicationContextUtils.getRequiredWebApplicationContext(application);
 
-    //resolve property file configuration placeholders
+    // resolve property file configuration placeholders
     MisoPropertyExporter exporter = (MisoPropertyExporter) context.getBean("propertyConfigurer");
     Map<String, String> misoProperties = exporter.getResolvedProperties();
 
@@ -119,34 +120,37 @@ public class MisoAppListener implements ServletContextListener {
 
     String taxonLookupEnabled = misoProperties.get("miso.taxonLookup.enabled");
     context.getServletContext().setAttribute("taxonLookupEnabled", Boolean.parseBoolean(taxonLookupEnabled));
-    
+
     Map<String, String> dirchecks = MisoWebUtils.checkStorageDirectories(baseStoragePath);
     if (dirchecks.keySet().contains("error")) {
       log.error(dirchecks.get("error"));
-    }
-    else {
+    } else {
       log.info(dirchecks.get("ok"));
     }
 
-    //set headless property so JFreeChart doesn't try to use the X rendering system to generate images
+    // set headless property so JFreeChart doesn't try to use the X rendering system to generate images
     System.setProperty("java.awt.headless", "true");
 
-    //set up naming schemes
-    MisoEntityNamingSchemeResolverService entityNamingSchemeResolverService = (MisoEntityNamingSchemeResolverService)context.getBean("entityNamingSchemeResolverService");
+    // set up naming schemes
+    MisoEntityNamingSchemeResolverService entityNamingSchemeResolverService = (MisoEntityNamingSchemeResolverService) context
+        .getBean("entityNamingSchemeResolverService");
     Collection<MisoNamingScheme<?>> mnss = entityNamingSchemeResolverService.getNamingSchemes();
 
-    MisoNameGeneratorResolverService nameGeneratorResolverService = (MisoNameGeneratorResolverService)context.getBean("nameGeneratorResolverService");
+    MisoNameGeneratorResolverService nameGeneratorResolverService = (MisoNameGeneratorResolverService) context
+        .getBean("nameGeneratorResolverService");
     Collection<NameGenerator<?>> ngs = nameGeneratorResolverService.getNameGenerators();
 
     for (MisoNamingScheme<?> mns : mnss) {
       log.info("Got naming scheme: " + mns.getSchemeName());
       String classname = mns.namingSchemeFor().getSimpleName().toLowerCase();
 
-      if (misoProperties.containsKey("miso.naming.scheme."+classname) && misoProperties.get("miso.naming.scheme."+classname).equals(mns.getSchemeName())) {
+      if (misoProperties.containsKey("miso.naming.scheme." + classname)
+          && misoProperties.get("miso.naming.scheme." + classname).equals(mns.getSchemeName())) {
         for (String key : misoProperties.keySet()) {
-          if (key.startsWith("miso.naming.generator."+classname)) {
-            String genprop = key.substring(key.lastIndexOf(".")+1);
-            NameGenerator ng = nameGeneratorResolverService.getNameGenerator(misoProperties.get("miso.naming.generator."+classname+"."+genprop));
+          if (key.startsWith("miso.naming.generator." + classname)) {
+            String genprop = key.substring(key.lastIndexOf(".") + 1);
+            NameGenerator ng = nameGeneratorResolverService.getNameGenerator(misoProperties.get("miso.naming.generator." + classname + "."
+                + genprop));
             if (ng != null) {
               mns.registerCustomNameGenerator(genprop, ng);
             }
@@ -155,38 +159,37 @@ public class MisoAppListener implements ServletContextListener {
 
         if ("nameable".equals(classname)) {
           log.info("Replacing default global namingScheme with " + mns.getSchemeName());
-          ((DefaultListableBeanFactory)context.getBeanFactory()).removeBeanDefinition("namingScheme");
+          ((DefaultListableBeanFactory) context.getBeanFactory()).removeBeanDefinition("namingScheme");
           context.getBeanFactory().registerSingleton("namingScheme", mns);
-        }
-        else {
-          log.info("Replacing default "+classname+"NamingScheme with " + mns.getSchemeName());
-          ((DefaultListableBeanFactory)context.getBeanFactory()).removeBeanDefinition(classname+"NamingScheme");
-          context.getBeanFactory().registerSingleton(classname+"NamingScheme", mns);
+        } else {
+          log.info("Replacing default " + classname + "NamingScheme with " + mns.getSchemeName());
+          ((DefaultListableBeanFactory) context.getBeanFactory()).removeBeanDefinition(classname + "NamingScheme");
+          context.getBeanFactory().registerSingleton(classname + "NamingScheme", mns);
         }
       }
 
       for (String key : misoProperties.keySet()) {
-        if (key.startsWith("miso.naming.validation."+classname)) {
-          String prop = key.substring(key.lastIndexOf(".")+1);
+        if (key.startsWith("miso.naming.validation." + classname)) {
+          String prop = key.substring(key.lastIndexOf(".") + 1);
 
           try {
-            mns.setValidationRegex(prop, misoProperties.get("miso.naming.validation."+classname+"."+prop));
-          }
-          catch (MisoNamingException e) {
-            log.error("Cannot set new validation regex for field '"+prop+"'. Reverting to default: " + e);
+            mns.setValidationRegex(prop, misoProperties.get("miso.naming.validation." + classname + "." + prop));
+          } catch (MisoNamingException e) {
+            log.error("Cannot set new validation regex for field '" + prop + "'. Reverting to default: " + e);
             e.printStackTrace();
           }
         }
 
-        if (key.startsWith("miso.naming.duplicates."+classname)) {
-          String prop = key.substring(key.lastIndexOf(".")+1);
-          mns.setAllowDuplicateEntityName(prop, Boolean.parseBoolean(misoProperties.get("miso.naming.duplicates."+classname+"."+prop)));
+        if (key.startsWith("miso.naming.duplicates." + classname)) {
+          String prop = key.substring(key.lastIndexOf(".") + 1);
+          mns.setAllowDuplicateEntityName(prop,
+              Boolean.parseBoolean(misoProperties.get("miso.naming.duplicates." + classname + "." + prop)));
         }
       }
     }
 
-    //set up printers
-    PrintManager printManager = (PrintManager)context.getBean("printManager");
+    // set up printers
+    PrintManager printManager = (PrintManager) context.getBean("printManager");
     Collection<PrintContext> pcs = printManager.getPrintContexts();
     for (PrintContext pc : pcs) {
       log.info(pc.getName() + " : " + pc.getDescription());
@@ -197,55 +200,57 @@ public class MisoAppListener implements ServletContextListener {
       for (MisoPrintService mps : mpss) {
         log.info("Got print service: " + mps.toString());
       }
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       log.error("Could not list print services. This does not bode well for printing.", e);
       e.printStackTrace();
     }
 
-    //set up Tag Barcode strategies
-    TagBarcodeStrategyResolverService tagBarcodeService = (TagBarcodeStrategyResolverService)context.getBean("tagBarcodeStrategyResolverService");
+    // set up Tag Barcode strategies
+    TagBarcodeStrategyResolverService tagBarcodeService = (TagBarcodeStrategyResolverService) context
+        .getBean("tagBarcodeStrategyResolverService");
     Collection<TagBarcodeStrategy> tbss = tagBarcodeService.getTagBarcodeStrategies();
     for (TagBarcodeStrategy tbs : tbss) {
       log.info("Got Tag Barcode Index service: " + tbs.getName());
     }
 
-    //set up alerting
+    // set up alerting
     if ("true".equals(misoProperties.get("miso.alerting.enabled"))) {
-      //set up indexers and alerters
+      // set up indexers and alerters
       MisoRequestManager rm = new MisoRequestManager();
-      rm.setProjectStore((ProjectStore)context.getBean("projectStore"));
-      rm.setRunStore((RunStore)context.getBean("runStore"));
+      rm.setProjectStore((ProjectStore) context.getBean("projectStore"));
+      rm.setRunStore((RunStore) context.getBean("runStore"));
       rm.setRunQcStore((RunQcStore) context.getBean("runQcStore"));
-      rm.setPoolStore((PoolStore)context.getBean("poolStore"));
+      rm.setPoolStore((PoolStore) context.getBean("poolStore"));
 
-      SecurityManager sm = (com.eaglegenomics.simlims.core.manager.SecurityManager)context.getBean("securityManager");
+      SecurityManager sm = (com.eaglegenomics.simlims.core.manager.SecurityManager) context.getBean("securityManager");
 
-      RunAlertManager ram = (RunAlertManager)context.getBean("runAlertManager");
+      RunAlertManager ram = (RunAlertManager) context.getBean("runAlertManager");
       ram.setRequestManager(rm);
       ram.setSecurityManager(sm);
 
-      ProjectAlertManager pam = (ProjectAlertManager)context.getBean("projectAlertManager");
+      ProjectAlertManager pam = (ProjectAlertManager) context.getBean("projectAlertManager");
       pam.setRequestManager(rm);
       pam.setSecurityManager(sm);
 
-      PoolAlertManager poam = (PoolAlertManager)context.getBean("poolAlertManager");
+      PoolAlertManager poam = (PoolAlertManager) context.getBean("poolAlertManager");
       poam.setRequestManager(rm);
       poam.setSecurityManager(sm);
     }
 
     if (misoProperties.containsKey("miso.db.caching.mappers.enabled")) {
       boolean mapperCachingEnabled = Boolean.parseBoolean(misoProperties.get("miso.db.caching.mappers.enabled"));
-      //TODO do something with this - probably set caching throughout DAOs
+      // TODO do something with this - probably set caching throughout DAOs
     }
 
     if ("true".equals(misoProperties.get("miso.db.caching.precache.enabled"))) {
       log.info("Precaching. This may take a while.");
       try {
-        RequestManager rm = (RequestManager)context.getBean("requestManager");
+        RequestManager rm = (RequestManager) context.getBean("requestManager");
 
-        User userdetails = new User("precacher", "none", true, true, true, true, AuthorityUtils.createAuthorityList("ROLE_ADMIN,ROLE_INTERNAL"));
-        PreAuthenticatedAuthenticationToken newAuthentication = new PreAuthenticatedAuthenticationToken(userdetails, userdetails.getPassword(), userdetails.getAuthorities());
+        User userdetails = new User("precacher", "none", true, true, true, true,
+            AuthorityUtils.createAuthorityList("ROLE_ADMIN,ROLE_INTERNAL"));
+        PreAuthenticatedAuthenticationToken newAuthentication = new PreAuthenticatedAuthenticationToken(userdetails,
+            userdetails.getPassword(), userdetails.getAuthorities());
         newAuthentication.setAuthenticated(true);
         newAuthentication.setDetails(userdetails);
 
@@ -253,8 +258,7 @@ public class MisoAppListener implements ServletContextListener {
           SecurityContext sc = SecurityContextHolder.getContextHolderStrategy().getContext();
           sc.setAuthentication(newAuthentication);
           SecurityContextHolder.getContextHolderStrategy().setContext(sc);
-        }
-        catch (AuthenticationException a) {
+        } catch (AuthenticationException a) {
           a.printStackTrace();
         }
 
@@ -279,8 +283,7 @@ public class MisoAppListener implements ServletContextListener {
         log.info("" + rm.listAllSequencerPartitionContainers().size());
         log.info("\\_ runs...");
         log.info("" + rm.listAllRuns().size());
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
         e.printStackTrace();
       }
     }
@@ -292,29 +295,25 @@ public class MisoAppListener implements ServletContextListener {
           IssueTrackerManager manager = IssueTrackerFactory.newInstance().getTrackerManager(trackerType);
           if (manager != null) {
             for (String key : misoProperties.keySet()) {
-              if (key.startsWith("miso.issuetracker."+trackerType)) {
-                String prop = key.substring(key.lastIndexOf(".")+1);
-                String methodName = "set"+ LimsUtils.capitalise(prop); //prop.substring(0,1).toUpperCase() + prop.substring(1);
+              if (key.startsWith("miso.issuetracker." + trackerType)) {
+                String prop = key.substring(key.lastIndexOf(".") + 1);
+                String methodName = "set" + LimsUtils.capitalise(prop); // prop.substring(0,1).toUpperCase() + prop.substring(1);
                 Method m = manager.getClass().getDeclaredMethod(methodName, String.class);
                 m.invoke(manager, misoProperties.get(key));
               }
             }
-            ((DefaultListableBeanFactory)context.getBeanFactory()).removeBeanDefinition("issueTrackerManager");
+            ((DefaultListableBeanFactory) context.getBeanFactory()).removeBeanDefinition("issueTrackerManager");
             context.getBeanFactory().registerSingleton("issueTrackerManager", manager);
-          }
-          else {
+          } else {
             log.error("No such issue tracker available with given type: " + trackerType);
           }
-        }
-        catch (NoSuchMethodException e) {
+        } catch (NoSuchMethodException e) {
           log.error("Unable to start the defined issuetracker " + trackerType + ": " + e.getMessage());
           e.printStackTrace();
-        }
-        catch (InvocationTargetException e) {
+        } catch (InvocationTargetException e) {
           log.error("Unable to start the defined issuetracker " + trackerType + ": " + e.getMessage());
           e.printStackTrace();
-        }
-        catch (IllegalAccessException e) {
+        } catch (IllegalAccessException e) {
           log.error("Unable to start the defined issuetracker " + trackerType + ": " + e.getMessage());
           e.printStackTrace();
         }
@@ -330,7 +329,7 @@ public class MisoAppListener implements ServletContextListener {
         jndiBean.setExpectedType(javax.sql.DataSource.class);
         jndiBean.afterPropertiesSet();
 
-        DataSource datasource = (DataSource)jndiBean.getObject();
+        DataSource datasource = (DataSource) jndiBean.getObject();
 
         JdbcTemplate template = new JdbcTemplate();
         template.setDataSource(datasource);
@@ -343,8 +342,7 @@ public class MisoAppListener implements ServletContextListener {
 
         RunStatsManager rsm = new RunStatsManager(template);
         context.getBeanFactory().registerSingleton("runStatsManager", rsm);
-      }
-      catch (NamingException e) {
+      } catch (NamingException e) {
         log.error("Cannot initiate statsdb connection: " + e.getMessage());
         e.printStackTrace();
       }
@@ -353,8 +351,9 @@ public class MisoAppListener implements ServletContextListener {
 
   /**
    * Called on webapp destruction
-   *
-   * @param event of type ServletContextEvent
+   * 
+   * @param event
+   *          of type ServletContextEvent
    */
   public void contextDestroyed(ServletContextEvent event) {
     ServletContext application = event.getServletContext();

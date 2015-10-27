@@ -35,27 +35,14 @@ import java.util.List;
 
 /**
  * Defines a DAO interface for storing Plates
- *
+ * 
  * @author Rob Davey
  * @date 12-Sep-2011
  * @since 0.1.1
  */
-public interface PlateStore extends Store<Plate<? extends List<? extends Plateable>, ? extends Plateable>>,
-                                    Cascadable,
-                                    Remover<Plate<? extends List<? extends Plateable>, ? extends Plateable>>,
-                                    NamingSchemeAware<Plate<? extends List<? extends Plateable>, ? extends Plateable>> {
-  /**
-   * Retrieve a Plate from an underlying data store given a Plate ID
-   * <p/>
-   * This method intends to retrieve objects in an 'ignorant' fashion, i.e.  will not populate
-   * parent or child objects that could lead to a circular dependency
-   *
-   * @param plateId of type long
-   * @return Plate
-   * @throws java.io.IOException when
-   */
-  //<T extends List<S>, S extends Plateable> Plate<T, S> lazyGet(long plateId) throws IOException;
-
+public interface PlateStore extends Store<Plate<? extends List<? extends Plateable>, ? extends Plateable>>, Cascadable,
+    Remover<Plate<? extends List<? extends Plateable>, ? extends Plateable>>,
+    NamingSchemeAware<Plate<? extends List<? extends Plateable>, ? extends Plateable>> {
   @Override
   public Plate<? extends List<? extends Plateable>, ? extends Plateable> get(long id) throws IOException;
 
@@ -65,10 +52,12 @@ public interface PlateStore extends Store<Plate<? extends List<? extends Plateab
 
   /**
    * Retrieve a Plate from an underlying data store given an identification barcode
-   *
-   * @param barcode of type String
+   * 
+   * @param barcode
+   *          of type String
    * @return Plate
-   * @throws java.io.IOException when
+   * @throws java.io.IOException
+   *           when
    */
   <T extends List<S>, S extends Plateable> Plate<T, S> getPlateByIdentificationBarcode(String barcode) throws IOException;
 }

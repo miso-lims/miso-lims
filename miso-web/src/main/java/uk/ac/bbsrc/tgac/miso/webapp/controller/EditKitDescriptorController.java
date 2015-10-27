@@ -45,81 +45,78 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 @RequestMapping("/kitdescriptor")
 @SessionAttributes("kitDescriptor")
 public class EditKitDescriptorController {
-    protected static final Logger log = LoggerFactory.getLogger(EditKitDescriptorController.class);
+  protected static final Logger log = LoggerFactory.getLogger(EditKitDescriptorController.class);
 
-    @Autowired
-    private RequestManager requestManager;
+  @Autowired
+  private RequestManager requestManager;
 
-    @Autowired
-    private DataObjectFactory dataObjectFactory;
+  @Autowired
+  private DataObjectFactory dataObjectFactory;
 
-    @ModelAttribute("kitTypes")
-    public Collection<KitType> populateKitTypes() {
-        return Arrays.asList(KitType.values());
+  @ModelAttribute("kitTypes")
+  public Collection<KitType> populateKitTypes() {
+    return Arrays.asList(KitType.values());
+  }
+
+  @ModelAttribute("platformTypes")
+  public Collection<PlatformType> populatePlatformTypes() {
+    return Arrays.asList(PlatformType.values());
+  }
+
+  public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
+    this.dataObjectFactory = dataObjectFactory;
+  }
+
+  public void setRequestManager(RequestManager requestManager) {
+    this.requestManager = requestManager;
+  }
+
+  @RequestMapping(value = "/new", method = RequestMethod.GET)
+  public ModelAndView setupForm(ModelMap model) throws IOException {
+    model.addAttribute("kitDescriptor", null);
+    return setupForm(KitDescriptor.UNSAVED_ID, model);
+  }
+
+  @RequestMapping(value = "/{kitDescriptorId}", method = RequestMethod.GET)
+  public ModelAndView setupForm(@PathVariable Long kitDescriptorId, ModelMap model) throws IOException {
+    try {
+      KitDescriptor kitDescriptor = null;
+      if (kitDescriptorId == kitDescriptor.UNSAVED_ID) {
+        kitDescriptor = new KitDescriptor();
+        model.put("title", "New Kit Descriptor");
+      } else {
+        kitDescriptor = requestManager.getKitDescriptorById(kitDescriptorId);
+        model.put("title", "Kit Descriptor " + kitDescriptorId);
+      }
+
+      if (kitDescriptor == null) {
+        throw new SecurityException("No such Kit Descriptor");
+      }
+
+      model.put("formObj", kitDescriptor);
+      model.put("kitDescriptor", kitDescriptor);
+      return new ModelAndView("/pages/editKitDescriptor.jsp", model);
+    } catch (IOException ex) {
+      if (log.isDebugEnabled()) {
+        log.debug("Failed to show Kit Descriptor", ex);
+      }
+      throw ex;
     }
+  }
 
-    @ModelAttribute("platformTypes")
-    public Collection<PlatformType> populatePlatformTypes() {
-        return Arrays.asList(PlatformType.values());
+  @RequestMapping(method = RequestMethod.POST)
+  public String processSubmit(@ModelAttribute("kitDescriptor") KitDescriptor kitDescriptor, ModelMap model, SessionStatus session)
+      throws IOException {
+    try {
+      requestManager.saveKitDescriptor(kitDescriptor);
+      session.setComplete();
+      model.clear();
+      return "redirect:/miso/kitdescriptor/" + kitDescriptor.getKitDescriptorId();
+    } catch (IOException ex) {
+      if (log.isDebugEnabled()) {
+        log.debug("Failed to save Kit Descriptor", ex);
+      }
+      throw ex;
     }
-    
-    public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
-        this.dataObjectFactory = dataObjectFactory;
-    }
-
-    public void setRequestManager(RequestManager requestManager) {
-        this.requestManager = requestManager;
-    }
-
-    @RequestMapping(value = "/new", method = RequestMethod.GET)
-    public ModelAndView setupForm(ModelMap model) throws IOException {
-        model.addAttribute("kitDescriptor", null);
-        return setupForm(KitDescriptor.UNSAVED_ID, model);
-    }
-
-    @RequestMapping(value = "/{kitDescriptorId}", method = RequestMethod.GET)
-    public ModelAndView setupForm(@PathVariable Long kitDescriptorId,
-                                  ModelMap model) throws IOException {
-        try {
-            KitDescriptor kitDescriptor = null;
-            if (kitDescriptorId == kitDescriptor.UNSAVED_ID) {
-                kitDescriptor = new KitDescriptor();
-                model.put("title", "New Kit Descriptor");
-            } else {
-                kitDescriptor = requestManager.getKitDescriptorById(kitDescriptorId);
-                model.put("title", "Kit Descriptor " + kitDescriptorId);
-            }
-
-            if (kitDescriptor == null) {
-                throw new SecurityException("No such Kit Descriptor");
-            }
-
-            model.put("formObj", kitDescriptor);
-            model.put("kitDescriptor", kitDescriptor);
-            return new ModelAndView("/pages/editKitDescriptor.jsp", model);
-        }
-        catch (IOException ex) {
-            if (log.isDebugEnabled()) {
-                log.debug("Failed to show Kit Descriptor", ex);
-            }
-            throw ex;
-        }
-    }
-
-    @RequestMapping(method = RequestMethod.POST)
-    public String processSubmit(@ModelAttribute("kitDescriptor") KitDescriptor kitDescriptor,
-                                ModelMap model, SessionStatus session) throws IOException {
-        try {
-            requestManager.saveKitDescriptor(kitDescriptor);
-            session.setComplete();
-            model.clear();
-            return "redirect:/miso/kitdescriptor/" + kitDescriptor.getKitDescriptorId();
-        }
-        catch (IOException ex) {
-            if (log.isDebugEnabled()) {
-                log.debug("Failed to save Kit Descriptor", ex);
-            }
-            throw ex;
-        }
-    }
+  }
 }

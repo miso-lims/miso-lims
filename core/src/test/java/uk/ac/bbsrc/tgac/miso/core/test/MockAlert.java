@@ -33,7 +33,7 @@ import java.util.Date;
  * uk.ac.bbsrc.tgac.miso.core.test
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 29/09/11
  * @since 0.1.2
@@ -55,7 +55,7 @@ public class MockAlert implements Alert {
     this.user = user;
     this.alertDate = new Date();
     this.alertLevel = alertLevel;
-    this.alertText = "["+getAlertUser().getFullName()+"] Mock alert text";
+    this.alertText = "[" + getAlertUser().getFullName() + "] Mock alert text";
   }
 
   @Override
@@ -125,7 +125,7 @@ public class MockAlert implements Alert {
 
   @Override
   public int compareTo(Object o) {
-    Alert a = (Alert)o;
+    Alert a = (Alert) o;
     if (getAlertId() != null && a.getAlertId() != null) {
       if (getAlertId() < a.getAlertId()) return -1;
       if (getAlertId() > a.getAlertId()) return 1;

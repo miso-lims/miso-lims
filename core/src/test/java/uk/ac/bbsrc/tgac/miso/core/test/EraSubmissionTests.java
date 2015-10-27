@@ -47,7 +47,7 @@ import java.util.Properties;
  * uk.ac.bbsrc.tgac.miso.core.test
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 13-Sep-2011
  * @since 0.1.1
@@ -63,39 +63,37 @@ public class EraSubmissionTests {
 
   @Test
   public void testStudyXmlGeneration() {
-      Project p = dataObjectFactory.getProject();
-      p.setAlias("Submission Test Project");
-      //creates a Study object and sets parameters
-      Study s = dataObjectFactory.getStudy();
-      s.setProject(p);
-      s.setAlias("Submission Test Study");
-      s.setDescription("A test of the Submission XML generation process");
-      s.setSecurityProfile(new SecurityProfile());
+    Project p = dataObjectFactory.getProject();
+    p.setAlias("Submission Test Project");
+    // creates a Study object and sets parameters
+    Study s = dataObjectFactory.getStudy();
+    s.setProject(p);
+    s.setAlias("Submission Test Study");
+    s.setDescription("A test of the Submission XML generation process");
+    s.setSecurityProfile(new SecurityProfile());
 
-      Document submissionDocument = null;
-      try {
-          DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-          submissionDocument = docBuilder.newDocument();
-          Element set = submissionDocument.createElementNS(null, "STUDY_SET");
-          submissionDocument.appendChild(set);
-      } catch (Exception e) {
-          log.debug("Error while attempting to build document");
-      }
+    Document submissionDocument = null;
+    try {
+      DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+      submissionDocument = docBuilder.newDocument();
+      Element set = submissionDocument.createElementNS(null, "STUDY_SET");
+      submissionDocument.appendChild(set);
+    } catch (Exception e) {
+      log.debug("Error while attempting to build document");
+    }
 
-      new EraStudyDecorator(s, new Properties(), submissionDocument).buildSubmission();
-      try{
-      SubmissionUtils.transform(submissionDocument,
-              new File("/tmp/testSubmission.xml"));
-         //sb.append(SubmissionUtils.transform(submissionDocument, true));
-      } catch(Exception e){
-          log.debug("Error while attempting to write document to file");
-      }
+    new EraStudyDecorator(s, new Properties(), submissionDocument).buildSubmission();
+    try {
+      SubmissionUtils.transform(submissionDocument, new File("/tmp/testSubmission.xml"));
+    } catch (Exception e) {
+      log.debug("Error while attempting to write document to file");
+    }
 
-      log.info("Done testing Study XML generation");
+    log.info("Done testing Study XML generation");
   }
 
   @After
   public void tearDown() {
-    dataObjectFactory = null;  
+    dataObjectFactory = null;
   }
 }

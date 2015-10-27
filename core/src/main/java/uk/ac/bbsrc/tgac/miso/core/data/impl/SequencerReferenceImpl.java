@@ -31,17 +31,20 @@ import java.net.InetAddress;
 
 /**
  * Concrete implementation to encapsulate a reference to a physical machine attached to a sequencer
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public class SequencerReferenceImpl extends AbstractSequencerReference implements Serializable {
   /**
    * Constructor SequencerReferenceImpl creates a new SequencerReference instance
-   *
-   * @param name of type String
-   * @param ip of type InetAddress
-   * @param platform of type Platform
+   * 
+   * @param name
+   *          of type String
+   * @param ip
+   *          of type InetAddress
+   * @param platform
+   *          of type Platform
    */
   public SequencerReferenceImpl(String name, InetAddress ip, Platform platform) {
     setName(name);

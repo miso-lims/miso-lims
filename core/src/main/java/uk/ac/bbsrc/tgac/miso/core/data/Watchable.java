@@ -31,7 +31,7 @@ import java.util.Set;
 
 /**
  * A Watchable object can be assigned watchers that will receive alerts upon the occurence of defined events.
- *
+ * 
  * @author Rob Davey
  * @date 05/12/11
  * @since 0.1.3
@@ -39,6 +39,7 @@ import java.util.Set;
 public interface Watchable {
   /**
    * Returns the Set of {@link User}s watching this Watchable object
+   * 
    * @return the Set of watchers for this object
    */
   @JsonIgnore
@@ -46,25 +47,29 @@ public interface Watchable {
 
   /**
    * Sets the Set of {@link User}s watching this Watchable object
+   * 
    * @param watchers
    */
   void setWatchers(Set<User> watchers);
 
   /**
    * Adds a {@link User} to this Watchable object's watcher list
+   * 
    * @param user
    */
   void addWatcher(User user);
 
   /**
    * Removes a {@link User} from this Watchable object's watcher list
+   * 
    * @param user
    */
   void removeWatcher(User user);
 
   /**
-   * Returns the unique Watchable identifier for this Watchable object. This is usually a property from the object
-   * itself, such as a unique name or ID.
+   * Returns the unique Watchable identifier for this Watchable object. This is usually a property from the object itself, such as a unique
+   * name or ID.
+   * 
    * @return a String representing the watchable identifier for this object
    */
   @JsonIgnore

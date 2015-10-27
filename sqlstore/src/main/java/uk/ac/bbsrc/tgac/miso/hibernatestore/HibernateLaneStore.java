@@ -24,8 +24,6 @@
 package uk.ac.bbsrc.tgac.miso.hibernatestore;
 
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
-//import org.hibernate.HibernateException;
-//import org.hibernate.Session;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,12 +36,12 @@ import java.util.Collection;
  * com.eaglegenomics.miso.hibernatestore
  * <p/>
  * TODO Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 @Deprecated
-public class HibernateLaneStore  extends HibernateDaoSupport implements Store<Lane> {
+public class HibernateLaneStore extends HibernateDaoSupport implements Store<Lane> {
   @Transactional(readOnly = false)
   public long save(Lane lane) throws IOException {
     getHibernateTemplate().saveOrUpdate(lane);
@@ -63,14 +61,6 @@ public class HibernateLaneStore  extends HibernateDaoSupport implements Store<La
   @Transactional(readOnly = true)
   @SuppressWarnings("unchecked")
   public Collection<Lane> listAll() throws IOException {
-/*    return (Collection<Lane>) getHibernateTemplate().execute(
-            new HibernateCallback() {
-              public Object doInHibernate(Session session)
-                      throws HibernateException {
-                return session.createQuery("from Lane").list(); 
-              }
-            });
-            */
     return null;
   }
 

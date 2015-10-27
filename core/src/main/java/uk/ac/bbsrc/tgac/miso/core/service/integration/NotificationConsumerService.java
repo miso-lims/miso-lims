@@ -23,13 +23,13 @@
 
 package uk.ac.bbsrc.tgac.miso.core.service.integration;
 
-import uk.ac.bbsrc.tgac.miso.core.service.integration.strategy.NotificationConsumerStrategy;
-
 import java.util.Collection;
+
+import uk.ac.bbsrc.tgac.miso.core.service.integration.strategy.NotificationConsumerStrategy;
 
 /**
  * A service interface to describe how to load {@link NotificationConsumerStrategy} services into MISO
- *
+ * 
  * @author Rob Davey
  * @date 03/02/12
  * @since 0.1.5
@@ -37,7 +37,7 @@ import java.util.Collection;
 public interface NotificationConsumerService {
   /**
    * Get a {@link NotificationConsumerStrategy} by its name
-   *
+   * 
    * @param strategyName
    * @return the unique {@link NotificationConsumerStrategy} that has this name, or null if none exists
    */
@@ -45,6 +45,7 @@ public interface NotificationConsumerService {
 
   /**
    * List all {@link NotificationConsumerStrategy} objects
+   * 
    * @return
    */
   Collection<NotificationConsumerStrategy> getConsumerStrategies();

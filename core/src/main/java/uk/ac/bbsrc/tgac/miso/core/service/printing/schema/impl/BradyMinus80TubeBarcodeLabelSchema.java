@@ -12,25 +12,21 @@ import java.io.File;
 import java.io.UnsupportedEncodingException;
 
 /**
- * Created with IntelliJ IDEA.
- * User: bianx
- * Date: 09/05/2013
- * Time: 11:48
- * To change this template use File | Settings | File Templates.
+ * Created with IntelliJ IDEA. User: bianx Date: 09/05/2013 Time: 11:48 To change this template use File | Settings | File Templates.
  */
 @ServiceProvider
 public class BradyMinus80TubeBarcodeLabelSchema implements BarcodableSchema<File, Barcodable> {
   private BarcodeLabelFactory<File, Barcodable, BarcodableSchema<File, Barcodable>> barcodeLabelFactory = new FileGeneratingBarcodeLabelFactory<Barcodable>();
 
-  public String getName(){
-    return  "bradyMinus80TubeBarcodeLabelSchema";
+  public String getName() {
+    return "bradyMinus80TubeBarcodeLabelSchema";
   }
 
   private Barcodable barcodable;
 
   @Override
   public Class<Barcodable> isStateFor() {
-    return Barcodable.class;  //To change body of implemented methods use File | Settings | File Templates.
+    return Barcodable.class; // To change body of implemented methods use File | Settings | File Templates.
   }
 
   @Override
@@ -60,7 +56,7 @@ public class BradyMinus80TubeBarcodeLabelSchema implements BarcodableSchema<File
       sb.append("B 13,1,0,DATAMATRIX+RECT,0.25;").append(barcode).append("\n");
       sb.append("T 29,2,0,5,pt4;[DATE]").append("\n");
 
-      //shorten alias to fit on label if too long
+      // shorten alias to fit on label if too long
       if (alias.length() >= 20) {
         alias = alias.substring(0, 18) + "...";
       }
@@ -68,8 +64,7 @@ public class BradyMinus80TubeBarcodeLabelSchema implements BarcodableSchema<File
       sb.append("T 17,8,0,5,pt6;").append(LimsUtils.unicodeify(alias)).append("\n");
       sb.append("T 17,11,0,5,pt6;").append(LimsUtils.unicodeify(name)).append("\n");
       sb.append("A 1").append("\n");
-    }
-    catch (UnsupportedEncodingException e) {
+    } catch (UnsupportedEncodingException e) {
       e.printStackTrace();
     }
 

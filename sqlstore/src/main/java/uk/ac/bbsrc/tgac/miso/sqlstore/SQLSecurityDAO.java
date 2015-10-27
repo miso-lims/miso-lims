@@ -65,72 +65,46 @@ import java.util.*;
  * uk.ac.bbsrc.tgac.miso.sqlstore
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public class SQLSecurityDAO implements SecurityStore {
-  public static final String USERS_SELECT =
-          "SELECT userId, active, admin, external, fullName, internal, loginName, roles, password, email " +
-          "FROM User";
+  public static final String USERS_SELECT = "SELECT userId, active, admin, external, fullName, internal, loginName, roles, password, email "
+      + "FROM User";
 
-  public static final String USER_SELECT_BY_ID =
-          USERS_SELECT + " WHERE userId = ?";
+  public static final String USER_SELECT_BY_ID = USERS_SELECT + " WHERE userId = ?";
 
-  public static final String USER_SELECT_BY_IDS =
-          USERS_SELECT + " WHERE userId IN (:ids)";  
+  public static final String USER_SELECT_BY_IDS = USERS_SELECT + " WHERE userId IN (:ids)";
 
-  public static final String USER_SELECT_BY_LOGIN_NAME =
-          USERS_SELECT + " WHERE loginName = ?";
+  public static final String USER_SELECT_BY_LOGIN_NAME = USERS_SELECT + " WHERE loginName = ?";
 
-  public static final String USER_SELECT_BY_EMAIL =
-          USERS_SELECT + " WHERE email = ?";
+  public static final String USER_SELECT_BY_EMAIL = USERS_SELECT + " WHERE email = ?";
 
-  public static final String USERS_SELECT_BY_GROUP_ID =
-          "SELECT u.userId, u.active, u.admin, u.external, u.fullName, u.internal, u.loginName, u.roles, u.password, u.email " +
-          "FROM User u, User_Group ug " +
-          "WHERE u.userId=ug.users_userId " +
-          "AND ug.groups_groupId=?";
+  public static final String USERS_SELECT_BY_GROUP_ID = "SELECT u.userId, u.active, u.admin, u.external, u.fullName, u.internal, u.loginName, u.roles, u.password, u.email "
+      + "FROM User u, User_Group ug " + "WHERE u.userId=ug.users_userId " + "AND ug.groups_groupId=?";
 
-  public static final String USERS_SELECT_BY_GROUP_NAME =
-          "SELECT u.* FROM User u " +
-          "LEFT JOIN User_Group ug ON ug.users_userId = u.userId " +
-          "LEFT JOIN _Group g ON ug.groups_groupId = g.groupId " +
-          "WHERE g.name = ?";
+  public static final String USERS_SELECT_BY_GROUP_NAME = "SELECT u.* FROM User u "
+      + "LEFT JOIN User_Group ug ON ug.users_userId = u.userId " + "LEFT JOIN _Group g ON ug.groups_groupId = g.groupId "
+      + "WHERE g.name = ?";
 
-  public static final String USER_UPDATE =
-          "UPDATE User " +
-          "SET active=:active, admin=:admin, external=:external, fullName=:fullName, " +
-          "internal=:internal, loginName=:loginName, roles=:roles, password=:password, email=:email " +
-          "WHERE userId=:userId";
+  public static final String USER_UPDATE = "UPDATE User " + "SET active=:active, admin=:admin, external=:external, fullName=:fullName, "
+      + "internal=:internal, loginName=:loginName, roles=:roles, password=:password, email=:email " + "WHERE userId=:userId";
 
-  public static final String GROUPS_SELECT =
-          "SELECT groupId, description, name " +
-          "FROM _Group";
+  public static final String GROUPS_SELECT = "SELECT groupId, description, name " + "FROM _Group";
 
-  public static final String GROUP_SELECT_BY_ID =
-          GROUPS_SELECT + " WHERE groupId = ?";
+  public static final String GROUP_SELECT_BY_ID = GROUPS_SELECT + " WHERE groupId = ?";
 
-  public static final String GROUP_SELECT_BY_IDS =
-          GROUPS_SELECT + " WHERE groupId IN (:ids)";
+  public static final String GROUP_SELECT_BY_IDS = GROUPS_SELECT + " WHERE groupId IN (:ids)";
 
-  public static final String GROUP_SELECT_BY_NAME =
-          GROUPS_SELECT + " WHERE name = ?";
+  public static final String GROUP_SELECT_BY_NAME = GROUPS_SELECT + " WHERE name = ?";
 
-  public static final String GROUPS_SELECT_BY_USER_ID =
-          "SELECT g.groupId, g.name, g.description " +
-          "FROM _Group g, User_Group ug " +
-          "WHERE g.groupId=ug.groups_groupId " +
-          "AND ug.users_userId=?";
+  public static final String GROUPS_SELECT_BY_USER_ID = "SELECT g.groupId, g.name, g.description " + "FROM _Group g, User_Group ug "
+      + "WHERE g.groupId=ug.groups_groupId " + "AND ug.users_userId=?";
 
-  public static final String GROUP_UPDATE =
-          "UPDATE _Group " +
-          "SET name=:name, description=:description " +
-          "WHERE groupId=:groupId";
+  public static final String GROUP_UPDATE = "UPDATE _Group " + "SET name=:name, description=:description " + "WHERE groupId=:groupId";
 
-  public static final String USER_GROUP_DELETE_BY_USER_ID =
-          "DELETE FROM User_Group " +
-          "WHERE users_userId=:userId";
+  public static final String USER_GROUP_DELETE_BY_USER_ID = "DELETE FROM User_Group " + "WHERE users_userId=:userId";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLSecurityDAO.class);
 
@@ -179,15 +153,8 @@ public class SQLSecurityDAO implements SecurityStore {
 
   @Override
   @Transactional(readOnly = false, rollbackFor = IOException.class)
-  @TriggersRemove(cacheName = {"userCache", "lazyUserCache"},
-                  keyGenerator = @KeyGenerator(
-                          name = "HashCodeCacheKeyGenerator",
-                          properties = {
-                                  @Property(name = "includeMethod", value = "false"),
-                                  @Property(name = "includeParameterTypes", value = "false")
-                          }
-                  )
-  )
+  @TriggersRemove(cacheName = { "userCache", "lazyUserCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
+      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public long saveUser(User user) throws IOException {
     Blob roleBlob = null;
     if (user.getRoles() != null) {
@@ -202,24 +169,22 @@ public class SQLSecurityDAO implements SecurityStore {
           byte[] rbytes = LimsUtils.join(user.getRoles(), ",").getBytes();
           roleBlob = new SerialBlob(rbytes);
         }
-      }
-      catch (SerialException e) {
+      } catch (SerialException e) {
         e.printStackTrace();
-      }
-      catch (SQLException e) {
+      } catch (SQLException e) {
         e.printStackTrace();
       }
     }
 
     MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("active", user.isActive())
-            .addValue("admin", user.isAdmin())
-            .addValue("external", user.isExternal())
-            .addValue("fullName", user.getFullName())
-            .addValue("internal", user.isInternal())
-            .addValue("loginName", user.getLoginName())
-            .addValue("roles", roleBlob)
-            .addValue("email", user.getEmail());
+    params.addValue("active", user.isActive());
+    params.addValue("admin", user.isAdmin());
+    params.addValue("external", user.isExternal());
+    params.addValue("fullName", user.getFullName());
+    params.addValue("internal", user.isInternal());
+    params.addValue("loginName", user.getLoginName());
+    params.addValue("roles", roleBlob);
+    params.addValue("email", user.getEmail());
 
     if (user.getUserId() != UserImpl.UNSAVED_ID) {
       User existingUser = getUserById(user.getUserId());
@@ -231,70 +196,60 @@ public class SQLSecurityDAO implements SecurityStore {
             user.setPassword(existingUser.getPassword());
             params.addValue("password", user.getPassword());
           }
-        }
-        else {
-          //if the user already exists, check to see if the passwords match. if not, update.
+        } else {
+          // if the user already exists, check to see if the passwords match. if not, update.
           if (passwordCodecService != null) {
             if (!passwordCodecService.getEncoder().isPasswordValid(existingUser.getPassword(), user.getPassword(), null)) {
               params.addValue("password", passwordCodecService.encrypt(user.getPassword()));
-            }
-            else {
+            } else {
               params.addValue("password", user.getPassword());
             }
-          }
-          else {
-            log.warn("No PasswordCodecService has been wired to this SQLSecurityDAO. This means your passwords may be being " +
-                     "stored in plaintext, or being encrypted by a downstream encoder. Please specify a PasswordCodecService " +
-                     "in your Spring config and (auto)wire it to this DAO, if required.");
+          } else {
+            log.warn("No PasswordCodecService has been wired to this SQLSecurityDAO. This means your passwords may be being "
+                + "stored in plaintext, or being encrypted by a downstream encoder. Please specify a PasswordCodecService "
+                + "in your Spring config and (auto)wire it to this DAO, if required.");
             params.addValue("password", user.getPassword());
           }
         }
-      }
-      else {
+      } else {
         throw new IOException("Cannot find existing user with specified ID");
       }
-    }
-    else {
+    } else {
       // if the user doesn't exist, encrypt
       if (passwordCodecService != null) {
         params.addValue("password", passwordCodecService.encrypt(user.getPassword()));
-      }
-      else {
-        log.warn("No PasswordCodecService has been wired to this SQLSecurityDAO. This means your passwords may be being " +
-                 "stored in plaintext, or being encrypted by a downstream encoder. Please specify a PasswordCodecService " +
-                 "in your Spring config and (auto)wire it to this DAO, if required.");
+      } else {
+        log.warn("No PasswordCodecService has been wired to this SQLSecurityDAO. This means your passwords may be being "
+            + "stored in plaintext, or being encrypted by a downstream encoder. Please specify a PasswordCodecService "
+            + "in your Spring config and (auto)wire it to this DAO, if required.");
         params.addValue("password", user.getPassword());
       }
     }
 
     if (user.getUserId() == UserImpl.UNSAVED_ID) {
-      SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-                              .withTableName("User")
-                              .usingGeneratedKeyColumns("userId");
+      SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName("User").usingGeneratedKeyColumns("userId");
       Number newId = insert.executeAndReturnKey(params);
       user.setUserId(newId.longValue());
-    }
-    else {
+    } else {
       params.addValue("userId", user.getUserId());
       NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
       namedTemplate.update(USER_UPDATE, params);
     }
 
-    //sort User_Group
+    // sort User_Group
 
-    //delete existing joins
+    // delete existing joins
     MapSqlParameterSource delparams = new MapSqlParameterSource();
     delparams.addValue("userId", user.getUserId());
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
     namedTemplate.update(USER_GROUP_DELETE_BY_USER_ID, delparams);
 
-    if (user.getGroups()!= null && !user.getGroups().isEmpty()) {
-      SimpleJdbcInsert eInsert = new SimpleJdbcInsert(template)
-                            .withTableName("User_Group");
+    if (user.getGroups() != null && !user.getGroups().isEmpty()) {
+      SimpleJdbcInsert eInsert = new SimpleJdbcInsert(template).withTableName("User_Group");
       for (Group g : user.getGroups()) {
         MapSqlParameterSource ugParams = new MapSqlParameterSource();
-        ugParams.addValue("users_userId", user.getUserId())
-                .addValue("groups_groupId", g.getGroupId());
+        ugParams.addValue("users_userId", user.getUserId());
+        ugParams.addValue("groups_groupId", g.getGroupId());
 
         eInsert.execute(ugParams);
       }
@@ -305,29 +260,22 @@ public class SQLSecurityDAO implements SecurityStore {
     return user.getUserId();
   }
 
-  @Cacheable(cacheName="userCache",
-      keyGenerator = @KeyGenerator(
-              name = "HashCodeCacheKeyGenerator",
-              properties = {
-                      @Property(name="includeMethod", value="false"),
-                      @Property(name="includeParameterTypes", value="false")
-              }
-      )
-  )
+  @Cacheable(cacheName = "userCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
+      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public User getUserById(Long userId) throws IOException {
-    List results = template.query(USER_SELECT_BY_ID, new Object[]{userId}, new UserMapper());
+    List results = template.query(USER_SELECT_BY_ID, new Object[] { userId }, new UserMapper());
     User u = results.size() > 0 ? (User) results.get(0) : null;
     return u;
   }
 
   public User getUserByLoginName(String loginName) throws IOException {
-    List results = template.query(USER_SELECT_BY_LOGIN_NAME, new Object[]{loginName}, new UserMapper());
+    List results = template.query(USER_SELECT_BY_LOGIN_NAME, new Object[] { loginName }, new UserMapper());
     User u = results.size() > 0 ? (User) results.get(0) : null;
     return u;
   }
 
   public User getUserByEmail(String email) throws IOException {
-    List results = template.query(USER_SELECT_BY_EMAIL, new Object[]{email}, new UserMapper());
+    List results = template.query(USER_SELECT_BY_EMAIL, new Object[] { email }, new UserMapper());
     User u = results.size() > 0 ? (User) results.get(0) : null;
     return u;
   }
@@ -339,13 +287,6 @@ public class SQLSecurityDAO implements SecurityStore {
   public Collection<User> listUsersByIds(Collection<Long> userIds) throws IOException {
     if (userIds.size() > 0) {
       Set<User> results = new HashSet<User>();
-      /*
-      NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-      MapSqlParameterSource params = new MapSqlParameterSource();
-      params.addValue("ids", userIds);
-      List<User> results = namedTemplate.query(USER_SELECT_BY_IDS, params, new UserMapper());
-      return results;
-      */
       for (long userId : userIds) {
         User u = getUserById(userId);
         if (u != null) results.add(u);
@@ -356,44 +297,41 @@ public class SQLSecurityDAO implements SecurityStore {
   }
 
   public Collection<User> listUsersByGroupName(String name) throws IOException {
-    return template.query(USERS_SELECT_BY_GROUP_NAME, new Object[]{name}, new UserMapper(true));
+    return template.query(USERS_SELECT_BY_GROUP_NAME, new Object[] { name }, new UserMapper(true));
   }
 
   public long saveGroup(Group group) throws IOException {
     MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("name", group.getName())
-            .addValue("description", group.getDescription());
+    params.addValue("name", group.getName());
+    params.addValue("description", group.getDescription());
 
     if (group.getGroupId() == Group.UNSAVED_ID) {
-      SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-                              .withTableName("_Group")
-                              .usingGeneratedKeyColumns("groupId");
+      SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName("_Group").usingGeneratedKeyColumns("groupId");
       Number newId = insert.executeAndReturnKey(params);
       group.setGroupId(newId.longValue());
-    }
-    else {
+    } else {
       params.addValue("groupId", group.getGroupId());
       NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
       namedTemplate.update(GROUP_UPDATE, params);
     }
 
-    return group.getGroupId();    
+    return group.getGroupId();
   }
 
   public Group getGroupById(Long groupId) throws IOException {
-    List results = template.query(GROUP_SELECT_BY_ID, new Object[]{groupId}, new GroupMapper());
+    List results = template.query(GROUP_SELECT_BY_ID, new Object[] { groupId }, new GroupMapper());
     Group g = results.size() > 0 ? (Group) results.get(0) : null;
     return g;
   }
 
   public Group getGroupByName(String groupName) throws IOException {
-    List results = template.query(GROUP_SELECT_BY_NAME, new Object[]{groupName}, new GroupMapper());
+    List results = template.query(GROUP_SELECT_BY_NAME, new Object[] { groupName }, new GroupMapper());
     Group g = results.size() > 0 ? (Group) results.get(0) : null;
     return g;
   }
 
   public Collection<Group> listGroupsByUserId(Long userId) throws IOException {
-    return template.query(GROUPS_SELECT_BY_USER_ID, new Object[]{userId}, new GroupMapper());
+    return template.query(GROUPS_SELECT_BY_USER_ID, new Object[] { userId }, new GroupMapper());
   }
 
   public Collection<Group> listAllGroups() throws IOException {
@@ -430,7 +368,7 @@ public class SQLSecurityDAO implements SecurityStore {
         Element element;
         if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
           log.debug("Cache hit on map for User " + id);
-          return (User)element.getObjectValue();
+          return (User) element.getObjectValue();
         }
       }
 
@@ -449,7 +387,7 @@ public class SQLSecurityDAO implements SecurityStore {
         Blob roleblob = rs.getBlob("roles");
         if (roleblob != null) {
           if (roleblob.length() > 0) {
-            byte[] rbytes = roleblob.getBytes(1, (int)roleblob.length());
+            byte[] rbytes = roleblob.getBytes(1, (int) roleblob.length());
             String s1 = new String(rbytes);
             String[] roles = s1.split(",");
             user.setRoles(roles);
@@ -458,13 +396,12 @@ public class SQLSecurityDAO implements SecurityStore {
         if (!isLazy()) {
           user.setGroups(listGroupsByUserId(id));
         }
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
         e.printStackTrace();
       }
 
       if (isCacheEnabled() && lookupCache(cacheManager) != null) {
-        lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id) ,user));
+        lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id), user));
       }
 
       return user;
@@ -480,8 +417,7 @@ public class SQLSecurityDAO implements SecurityStore {
 
       try {
         g.setUsers(listUsersByGroupName(g.getName()));
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
         e.printStackTrace();
       }
 

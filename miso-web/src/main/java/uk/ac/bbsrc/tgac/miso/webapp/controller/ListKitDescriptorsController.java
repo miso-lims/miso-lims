@@ -62,13 +62,12 @@ public class ListKitDescriptorsController {
     try {
       model.addAttribute("sequencing", requestManager.listKitDescriptorsByType(KitType.SEQUENCING));
       model.addAttribute("empcr", requestManager.listKitDescriptorsByType(KitType.EMPCR));
-      model.addAttribute("library",requestManager.listKitDescriptorsByType(KitType.LIBRARY));
-      model.addAttribute("clustering",requestManager.listKitDescriptorsByType(KitType.CLUSTERING));
-      model.addAttribute("multiplexing",requestManager.listKitDescriptorsByType(KitType.MULTIPLEXING));
+      model.addAttribute("library", requestManager.listKitDescriptorsByType(KitType.LIBRARY));
+      model.addAttribute("clustering", requestManager.listKitDescriptorsByType(KitType.CLUSTERING));
+      model.addAttribute("multiplexing", requestManager.listKitDescriptorsByType(KitType.MULTIPLEXING));
 
       return new ModelAndView("/pages/listKitDescriptors.jsp", model);
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to list Kit Descriptors", ex);
       }

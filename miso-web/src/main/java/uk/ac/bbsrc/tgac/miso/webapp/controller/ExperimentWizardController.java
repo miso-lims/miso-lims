@@ -104,48 +104,12 @@ public class ExperimentWizardController {
         Collections.sort(pools);
       }
       return pools;
-      /*
-      if (experiment.getPlatform().getPlatformType().equals(PlatformType.ILLUMINA)) {
-        ArrayList<IlluminaPool> pools = new ArrayList<IlluminaPool>();
-        for (IlluminaPool p : requestManager.listAllIlluminaPools()) {
-          if (experiment.getPool() == null || !experiment.getPool().equals(p)) {
-            pools.add(p);
-          }
-          Collections.sort(pools);
-        }
-        return pools;
-      }
-      else if (experiment.getPlatform().getPlatformType().equals(PlatformType.LS454)) {
-        ArrayList<LS454Pool> pools = new ArrayList<LS454Pool>();
-        for (LS454Pool p : requestManager.listAll454Pools()) {
-          if (experiment.getPool() == null || !experiment.getPool().equals(p)) {
-            pools.add(p);
-          }
-          Collections.sort(pools);
-        }
-        return pools;
-      }
-      else if (experiment.getPlatform().getPlatformType().equals(PlatformType.SOLID)) {
-        ArrayList<SolidPool> pools = new ArrayList<SolidPool>();
-        for (SolidPool p : requestManager.listAllSolidPools()) {
-          if (experiment.getPool() == null || !experiment.getPool().equals(p)) {
-            pools.add(p);
-          }
-          Collections.sort(pools);
-        }
-        return pools;
-      }
-      else {
-        return Collections.emptyList();
-      }
-      */
     }
     return requestManager.listAllPools();
   }
 
   @RequestMapping(value = "/new/{projectId}", method = RequestMethod.GET)
-  public ModelAndView newAssignedProject(@PathVariable Long projectId,
-                                         ModelMap model) throws IOException {
+  public ModelAndView newAssignedProject(@PathVariable Long projectId, ModelMap model) throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
 
@@ -156,7 +120,6 @@ public class ExperimentWizardController {
         a.append("<option value=\"" + platform.getPlatformId() + "\">" + platform.getNameAndModel() + "</option>");
       }
 
-
       for (String st : requestManager.listAllStudyTypes()) {
         b.append("<option value=\"" + st + "\">" + st + "</option>");
       }
@@ -165,8 +128,7 @@ public class ExperimentWizardController {
       model.put("platforms", a.toString());
       model.put("studyTypes", b.toString());
       return new ModelAndView("/pages/experimentWizard.jsp", model);
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to show experiment wizard", ex);
       }

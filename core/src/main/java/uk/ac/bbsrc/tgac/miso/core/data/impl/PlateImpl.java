@@ -37,7 +37,7 @@ import java.util.*;
  * uk.ac.bbsrc.tgac.miso.core.data.impl
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 13-Sep-2011
  * @since 0.1.1

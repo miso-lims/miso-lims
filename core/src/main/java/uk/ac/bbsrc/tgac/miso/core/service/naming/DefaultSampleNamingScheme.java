@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
  * uk.ac.bbsrc.tgac.miso.core.service.naming
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 29/08/12
  * @since 0.1.7
@@ -43,13 +43,13 @@ public class DefaultSampleNamingScheme implements RequestManagerAwareNamingSchem
   public void setValidationRegex(String fieldName, String regex) throws MisoNamingException {
     if (fieldCheck(fieldName) != null) {
       if (validationMap.get(fieldName) != null) {
-        log.warn("Setting validation regex from '" +validationMap.get(fieldName).pattern()+ "' to '"+regex+"'. This usually doesn't happen at " +
-                 "runtime unless a custom regex is specified at MISO startup!");
+        log.warn("Setting validation regex from '" + validationMap.get(fieldName).pattern() + "' to '" + regex
+            + "'. This usually doesn't happen at " + "runtime unless a custom regex is specified at MISO startup!");
         validationMap.put(fieldName, Pattern.compile(regex));
       }
-    }
-    else {
-      throw new MisoNamingException("Cannot set validation regex for a field (via 'get"+ LimsUtils.capitalise(fieldName)+"') that doesn't exist in " + namingSchemeFor().getCanonicalName());
+    } else {
+      throw new MisoNamingException("Cannot set validation regex for a field (via 'get" + LimsUtils.capitalise(fieldName)
+          + "') that doesn't exist in " + namingSchemeFor().getCanonicalName());
     }
   }
 
@@ -70,28 +70,25 @@ public class DefaultSampleNamingScheme implements RequestManagerAwareNamingSchem
       String customName = sng.generateName(s);
       if (validateField(fieldName, customName)) {
         return customName;
+      } else {
+        throw new MisoNamingException("Custom naming generator '" + sng.getGeneratorName() + "' supplied for Sample field '" + fieldName
+            + "' generated an invalid name according to the validation scheme '" + validationMap.get(fieldName) + "'");
       }
-      else {
-        throw new MisoNamingException("Custom naming generator '"+sng.getGeneratorName()+"' supplied for Sample field '"+fieldName+"' generated an invalid name according to the validation scheme '"+validationMap.get(fieldName)+"'");
-      }
-    }
-    else {
+    } else {
       if ("alias".equals(fieldName)) {
         throw new MisoNamingException("Alias generation not available. Validation via validateName is available.");
-      }
-      else {
+      } else {
         if (validationMap.keySet().contains(fieldName)) {
           Method m = fieldCheck(fieldName);
           if (m != null) {
-            log.info("Generating name for '"+fieldName+"' :: " + DefaultMisoEntityPrefix.get(Sample.class.getSimpleName()).name() + s.getId());
+            log.info("Generating name for '" + fieldName + "' :: " + DefaultMisoEntityPrefix.get(Sample.class.getSimpleName()).name()
+                + s.getId());
             return DefaultMisoEntityPrefix.get(Sample.class.getSimpleName()).name() + s.getId();
-          }
-          else {
+          } else {
             throw new MisoNamingException("No such nameable field.");
           }
-        }
-        else {
-          throw new MisoNamingException("Generation of names on field '"+fieldName+"' not available.");
+        } else {
+          throw new MisoNamingException("Generation of names on field '" + fieldName + "' not available.");
         }
       }
     }
@@ -102,8 +99,7 @@ public class DefaultSampleNamingScheme implements RequestManagerAwareNamingSchem
     Pattern p = validationMap.get(fieldName);
     if (p != null) {
       return validationMap.get(fieldName).pattern();
-    }
-    else {
+    } else {
       throw new MisoNamingException("No such field registered for validation");
     }
   }
@@ -144,10 +140,9 @@ public class DefaultSampleNamingScheme implements RequestManagerAwareNamingSchem
 
   private Method fieldCheck(String fieldName) {
     try {
-      return namingSchemeFor().getMethod("get"+LimsUtils.capitalise(fieldName));
-    }
-    catch (NoSuchMethodException e) {
-      log.error("No such field '"+fieldName+"' on class " + namingSchemeFor().getCanonicalName());
+      return namingSchemeFor().getMethod("get" + LimsUtils.capitalise(fieldName));
+    } catch (NoSuchMethodException e) {
+      log.error("No such field '" + fieldName + "' on class " + namingSchemeFor().getCanonicalName());
       e.printStackTrace();
     }
     return null;

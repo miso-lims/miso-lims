@@ -27,15 +27,16 @@ import java.net.URI;
 
 /**
  * An interface that defines an EndPoint object that can recieve datafiles
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public interface EndPoint<T extends URI> {
   /**
    * Accepts sequence Datafiles
-   *
-   * @param destination  String
+   * 
+   * @param destination
+   *          String
    */
   public void setDestination(T destination);
 

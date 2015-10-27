@@ -96,15 +96,18 @@ public class EditSampleController {
 
   @ModelAttribute("metrixEnabled")
   public Boolean isMetrixEnabled() {
-    MisoPropertyExporter exporter = (MisoPropertyExporter)applicationContextProvider.getApplicationContext().getBean("propertyConfigurer");
+    MisoPropertyExporter exporter = (MisoPropertyExporter) applicationContextProvider.getApplicationContext().getBean("propertyConfigurer");
     Map<String, String> misoProperties = exporter.getResolvedProperties();
-    return misoProperties.containsKey("miso.notification.interop.enabled") && Boolean.parseBoolean(misoProperties.get("miso.notification.interop.enabled"));
+    return misoProperties.containsKey("miso.notification.interop.enabled")
+        && Boolean.parseBoolean(misoProperties.get("miso.notification.interop.enabled"));
   }
 
-  public Map<String, Sample> getAdjacentSamplesInGroup(Sample s, @RequestParam(value = "entityGroupId", required = true) Long entityGroupId) throws IOException {
+  public Map<String, Sample> getAdjacentSamplesInGroup(Sample s, @RequestParam(value = "entityGroupId", required = true) Long entityGroupId)
+      throws IOException {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     Project p = s.getProject();
-    EntityGroup<? extends Nameable, Sample> sgroup = (EntityGroup<? extends Nameable, Sample>) requestManager.getEntityGroupById(entityGroupId);
+    EntityGroup<? extends Nameable, Sample> sgroup = (EntityGroup<? extends Nameable, Sample>) requestManager
+        .getEntityGroupById(entityGroupId);
 
     Sample prevS = null;
     Sample nextS = null;
@@ -116,12 +119,12 @@ public class EditSampleController {
         Collections.sort(ss);
         for (int i = 0; i < ss.size(); i++) {
           if (ss.get(i).equals(s)) {
-            if (i != 0 && ss.get(i-1) != null) {
-              prevS = ss.get(i-1);
+            if (i != 0 && ss.get(i - 1) != null) {
+              prevS = ss.get(i - 1);
             }
 
-            if (i != ss.size()-1 && ss.get(i+1) != null) {
-              nextS = ss.get(i+1);
+            if (i != ss.size() - 1 && ss.get(i + 1) != null) {
+              nextS = ss.get(i + 1);
             }
             break;
           }
@@ -134,7 +137,8 @@ public class EditSampleController {
     return Collections.emptyMap();
   }
 
-  public Map<String, Sample> getAdjacentSamplesInProject(Sample s, @RequestParam(value = "projectId", required = false) Long projectId) throws IOException {
+  public Map<String, Sample> getAdjacentSamplesInProject(Sample s, @RequestParam(value = "projectId", required = false) Long projectId)
+      throws IOException {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     Project p = s.getProject();
     Sample prevS = null;
@@ -147,12 +151,12 @@ public class EditSampleController {
         Collections.sort(ss);
         for (int i = 0; i < ss.size(); i++) {
           if (ss.get(i).equals(s)) {
-            if (i != 0 && ss.get(i-1) != null) {
-              prevS = ss.get(i-1);
+            if (i != 0 && ss.get(i - 1) != null) {
+              prevS = ss.get(i - 1);
             }
 
-            if (i != ss.size()-1 && ss.get(i+1) != null) {
-              nextS = ss.get(i+1);
+            if (i != ss.size() - 1 && ss.get(i + 1) != null) {
+              nextS = ss.get(i + 1);
             }
             break;
           }
@@ -178,8 +182,7 @@ public class EditSampleController {
         return ps;
       }
       return requestManager.listAllProjects();
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to list projects", ex);
       }
@@ -191,12 +194,10 @@ public class EditSampleController {
     try {
       if (experimentId != null) {
         return requestManager.getExperimentById(experimentId);
-      }
-      else {
+      } else {
         return dataObjectFactory.getExperiment();
       }
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to get parent experiment", ex);
       }
@@ -266,29 +267,25 @@ public class EditSampleController {
   }
 
   @RequestMapping(value = "/new/{projectId}", method = RequestMethod.GET)
-  public ModelAndView newAssignedSample(@PathVariable Long projectId,
-                                        ModelMap model) throws IOException {
+  public ModelAndView newAssignedSample(@PathVariable Long projectId, ModelMap model) throws IOException {
     return setupForm(AbstractSample.UNSAVED_ID, projectId, model);
   }
 
   @RequestMapping(value = "/rest/{sampleId}", method = RequestMethod.GET)
-  public
-  @ResponseBody
+  public @ResponseBody
   Sample jsonRest(@PathVariable Long sampleId) throws IOException {
     return requestManager.getSampleById(sampleId);
   }
 
   @RequestMapping(value = "/{sampleId}", method = RequestMethod.GET)
-  public ModelAndView setupForm(@PathVariable Long sampleId,
-                                ModelMap model) throws IOException {
+  public ModelAndView setupForm(@PathVariable Long sampleId, ModelMap model) throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Sample sample = null;
       if (sampleId == AbstractSample.UNSAVED_ID) {
         sample = dataObjectFactory.getSample(user);
         model.put("title", "New Sample");
-      }
-      else {
+      } else {
         sample = requestManager.getSampleById(sampleId);
         model.put("title", "Sample " + sampleId);
       }
@@ -319,14 +316,12 @@ public class EditSampleController {
       model.put("samplePools", pools);
       model.put("sampleRuns", getRunsBySamplePools(pools));
 
-
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, sample, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, sample, securityManager.listAllUsers()));
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, sample, securityManager.listAllGroups()));
 
       return new ModelAndView("/pages/editSample.jsp", model);
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to show sample", ex);
       }
@@ -335,9 +330,7 @@ public class EditSampleController {
   }
 
   @RequestMapping(value = "/{sampleId}/project/{projectId}", method = RequestMethod.GET)
-  public ModelAndView setupForm(@PathVariable Long sampleId,
-                                @PathVariable Long projectId,
-                                ModelMap model) throws IOException {
+  public ModelAndView setupForm(@PathVariable Long sampleId, @PathVariable Long projectId, ModelMap model) throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Sample sample = null;
@@ -355,16 +348,13 @@ public class EditSampleController {
             LimsUtils.inheritUsersAndGroups(sample, project.getSecurityProfile());
             sp.setOwner(user);
             sample.setSecurityProfile(sp);
-          }
-          else {
+          } else {
             sample.inheritPermissions(project);
           }
-        }
-        else {
+        } else {
           model.put("accessibleProjects", populateProjects(null));
         }
-      }
-      else {
+      } else {
         sample = requestManager.getSampleById(sampleId);
         model.put("title", "Sample " + sampleId);
 
@@ -379,8 +369,7 @@ public class EditSampleController {
             model.put("previousSample", adjacentSamples.get("previousSample"));
             model.put("nextSample", adjacentSamples.get("nextSample"));
           }
-        }
-        else {
+        } else {
           model.put("accessibleProjects", populateProjects(null));
         }
       }
@@ -407,8 +396,7 @@ public class EditSampleController {
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, sample, securityManager.listAllGroups()));
 
       return new ModelAndView("/pages/editSample.jsp", model);
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to show sample", ex);
       }
@@ -422,9 +410,8 @@ public class EditSampleController {
   }
 
   @RequestMapping(method = RequestMethod.POST)
-  public String processSubmit(@ModelAttribute("sample") Sample sample,
-                              ModelMap model,
-                              SessionStatus session) throws IOException, MalformedSampleException {
+  public String processSubmit(@ModelAttribute("sample") Sample sample, ModelMap model, SessionStatus session) throws IOException,
+      MalformedSampleException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       if (!sample.userCanWrite(user)) {
@@ -435,8 +422,7 @@ public class EditSampleController {
       session.setComplete();
       model.clear();
       return "redirect:/miso/sample/" + sample.getId();
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to save sample", ex);
       }

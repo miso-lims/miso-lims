@@ -60,7 +60,7 @@ import java.util.regex.Pattern;
  * uk.ac.bbsrc.tgac.miso.spring.ajax
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.1.2
  */
@@ -85,8 +85,7 @@ public class ImportExportControllerHelperService {
       StringBuilder b = new StringBuilder();
       if (!"".equals(searchStr)) {
         samples = new ArrayList<Sample>(requestManager.listAllSamplesBySearch(searchStr));
-      }
-      else {
+      } else {
         samples = new ArrayList<Sample>(requestManager.listAllSamplesWithLimit(250));
       }
 
@@ -94,32 +93,30 @@ public class ImportExportControllerHelperService {
         Collections.sort(samples);
         for (Sample s : samples) {
           String dnaOrRNA = "O";
-          if ("GENOMIC".equals(s.getSampleType())
-              || "METAGENOMIC".equals(s.getSampleType())) {
+          if ("GENOMIC".equals(s.getSampleType()) || "METAGENOMIC".equals(s.getSampleType())) {
             dnaOrRNA = "D";
-          }
-          else if ("NON GENOMIC".equals(s.getSampleType())
-                   || "VIRAL RNA".equals(s.getSampleType())
-                   || "TRANSCRIPTOMIC".equals(s.getSampleType())
-                   || "METATRANSCRIPTOMIC".equals(s.getSampleType())) {
+          } else if ("NON GENOMIC".equals(s.getSampleType()) || "VIRAL RNA".equals(s.getSampleType())
+              || "TRANSCRIPTOMIC".equals(s.getSampleType()) || "METATRANSCRIPTOMIC".equals(s.getSampleType())) {
             dnaOrRNA = "R";
           }
-          b.append("<div id=\"sample" + s.getId() + "\" onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" "
-                   + " " + "class=\"dashboard\">");
-          b.append("<input type=\"hidden\" id=\"" + s.getId() + "\" name=\"" + s.getName() + "\" projectname=\"" + s.getProject().getName() + "\" projectalias=\"" + s.getProject().getAlias() + "\" samplealias=\"" + s.getAlias() + "\" dnaOrRNA=\"" + dnaOrRNA + "\"/>");
+          b.append("<div id=\"sample" + s.getId()
+              + "\" onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" " + " "
+              + "class=\"dashboard\">");
+          b.append("<input type=\"hidden\" id=\"" + s.getId() + "\" name=\"" + s.getName() + "\" projectname=\"" + s.getProject().getName()
+              + "\" projectalias=\"" + s.getProject().getAlias() + "\" samplealias=\"" + s.getAlias() + "\" dnaOrRNA=\"" + dnaOrRNA
+              + "\"/>");
           b.append("Name: <b>" + s.getName() + "</b><br/>");
           b.append("Alias: <b>" + s.getAlias() + "</b><br/>");
           b.append("From Project: <b>" + s.getProject().getName() + "</b><br/>");
-          b.append("<button type=\"button\" class=\"fg-button ui-state-default ui-corner-all\" onclick=\"ImportExport.insertSampleNextAvailable(jQuery('#sample" + s.getId() + "'));\">Add</button>");
+          b.append("<button type=\"button\" class=\"fg-button ui-state-default ui-corner-all\" onclick=\"ImportExport.insertSampleNextAvailable(jQuery('#sample"
+              + s.getId() + "'));\">Add</button>");
           b.append("</div>");
         }
-      }
-      else {
+      } else {
         b.append("No matches");
       }
       return JSONUtils.JSONObjectResponse("html", b.toString());
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
@@ -128,14 +125,11 @@ public class ImportExportControllerHelperService {
   public JSONObject exportSampleForm(HttpSession session, JSONObject json) {
     try {
       JSONArray a = JSONArray.fromObject(json.getString("form"));
-      File f = misoFileManager.getNewFile(
-          Sample.class,
-          "forms",
+      File f = misoFileManager.getNewFile(Sample.class, "forms",
           "SampleExportForm-" + LimsUtils.getCurrentDateAsString(new SimpleDateFormat("yyyyMMdd-hhmmss")) + ".xlsx");
       FormUtils.createSampleExportForm(f, a);
       return JSONUtils.SimpleJSONResponse("" + f.getName().hashCode());
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Failed to get plate input form: " + e.getMessage());
     }
@@ -144,14 +138,11 @@ public class ImportExportControllerHelperService {
   public JSONObject generateCSVBAC(HttpSession session, JSONObject json) {
     try {
       JSONArray a = JSONArray.fromObject(json.getString("form"));
-      File f = misoFileManager.getNewFile(
-          Plate.class,
-          "csv",
+      File f = misoFileManager.getNewFile(Plate.class, "csv",
           "Illumina-Nextera-6x-384-barcode-" + LimsUtils.getCurrentDateAsString(new SimpleDateFormat("yyyyMMdd-hhmmss")) + ".csv");
       FormUtils.generateCSVBAC(f, a);
       return JSONUtils.SimpleJSONResponse("" + f.getName().hashCode());
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Failed to get plate input form: " + e.getMessage());
     }
@@ -161,14 +152,11 @@ public class ImportExportControllerHelperService {
     try {
       String barcodekit = json.getString("barcodekit");
       JSONArray a = JSONArray.fromObject(json.getString("form"));
-      File f = misoFileManager.getNewFile(
-          Library.class,
-          "forms",
+      File f = misoFileManager.getNewFile(Library.class, "forms",
           "LibraryPoolExportForm-" + LimsUtils.getCurrentDateAsString(new SimpleDateFormat("yyyyMMdd-hhmmss")) + ".xlsx");
       FormUtils.createLibraryPoolExportFormFromWeb(f, a, barcodekit);
       return JSONUtils.SimpleJSONResponse("" + f.getName().hashCode());
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Failed to get plate input form: " + e.getMessage());
     }
@@ -187,23 +175,21 @@ public class ImportExportControllerHelperService {
           if (ss.size() == 1) {
             s = ss.iterator().next();
             log.info("Got sample: " + s.getAlias());
-          }
-          else {
+          } else {
             throw new InputFormException("Multiple samples retrieved with this alias: '" + salias + "'. Cannot process.");
           }
+        } else {
+          throw new InputFormException("No such sample '" + salias
+              + "'in database. Samples need to be created before using the form input functionality");
         }
-        else {
-          throw new InputFormException("No such sample '" + salias + "'in database. Samples need to be created before using the form input functionality");
-        }
-      }
-      else {
+      } else {
         log.info("Blank sample row found. Ending import.");
         break;
       }
 
       Date date = new Date();
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      //sample OK - good to go
+      // sample OK - good to go
 
       try {
         if (s != null) {
@@ -215,8 +201,7 @@ public class ImportExportControllerHelperService {
             sqc.setQcDate(date);
             if (requestManager.getSampleQcTypeByName("Picogreen") != null) {
               sqc.setQcType(requestManager.getSampleQcTypeByName("Picogreen"));
-            }
-            else {
+            } else {
               sqc.setQcType(requestManager.getSampleQcTypeByName("QuBit"));
             }
             if (!s.getSampleQCs().contains(sqc)) {
@@ -246,17 +231,10 @@ public class ImportExportControllerHelperService {
             }
           }
         }
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
         throw new Exception(e);
       }
     }
-    // create library & pool sheet
-//    File file = misoFileManager.getNewFile(
-//        Library.class,
-//        "forms",
-//        "LibraryPoolExportForm-" + LimsUtils.getCurrentDateAsString(new SimpleDateFormat("yyyyMMdd-hhmmss")) + ".xlsx");
-//    FormUtils.createLibraryPoolExportForm(file, jsonArray);
     return JSONUtils.SimpleJSONResponse("ok");
   }
 
@@ -267,7 +245,6 @@ public class ImportExportControllerHelperService {
     Map<String, Pool> pools = new HashMap<String, Pool>();
 
     Boolean paired = Boolean.parseBoolean(jsonObject.getString("paired"));
-
 
     PlatformType pt = null;
     if (jsonObject.getString("platform") != null) {
@@ -283,7 +260,6 @@ public class ImportExportControllerHelperService {
     if (jsonObject.getString("selection") != null) {
       ls = requestManager.getLibrarySelectionTypeByName(jsonObject.getString("selection"));
     }
-
 
     LibraryStrategyType lst = null;
     if (jsonObject.getString("strategy") != null) {
@@ -302,24 +278,21 @@ public class ImportExportControllerHelperService {
             if (ss.size() == 1) {
               s = ss.iterator().next();
               log.info("Got sample: " + s.getAlias());
-            }
-            else {
+            } else {
               throw new InputFormException("Multiple samples retrieved with this alias: '" + salias + "'. Cannot process.");
             }
+          } else {
+            throw new InputFormException("No such sample '" + salias
+                + "'in database. Samples need to be created before using the form input functionality");
           }
-          else {
-            throw new InputFormException("No such sample '" + salias + "'in database. Samples need to be created before using the form input functionality");
-          }
-        }
-        else {
+        } else {
           log.info("Blank sample row found. Ending import.");
           break;
         }
 
-
         try {
 
-          //sample OK - good to go
+          // sample OK - good to go
           if (s != null) {
             String proceedKey = jsonArrayElement.getString(14);
 
@@ -327,8 +300,7 @@ public class ImportExportControllerHelperService {
 
             if ("A".equals(proceedKey) || "L".equals(proceedKey)) {
               library.setAlias(jsonArrayElement.getString(3));
-            }
-            else if ("U".equals(proceedKey) || "P".equals(proceedKey)) {
+            } else if ("U".equals(proceedKey) || "P".equals(proceedKey)) {
               library = requestManager.getLibraryByAlias(jsonArrayElement.getString(3));
             }
 
@@ -350,13 +322,13 @@ public class ImportExportControllerHelperService {
                 Matcher m = digitPattern.matcher(bp);
                 if (m.matches()) {
                   insertSize = Integer.valueOf(m.group(1));
+                } else {
+                  throw new InputFormException("Supplied Library insert size for library '" + jsonArrayElement.getString(3) + "' ("
+                      + s.getAlias() + ") is invalid");
                 }
-                else {
-                  throw new InputFormException("Supplied Library insert size for library '" + jsonArrayElement.getString(3) + "' (" + s.getAlias() + ") is invalid");
-                }
-              }
-              catch (NumberFormatException nfe) {
-                throw new InputFormException("Supplied Library insert size for library '" + jsonArrayElement.getString(3) + "' (" + s.getAlias() + ") is invalid", nfe);
+              } catch (NumberFormatException nfe) {
+                throw new InputFormException("Supplied Library insert size for library '" + jsonArrayElement.getString(3) + "' ("
+                    + s.getAlias() + ") is invalid", nfe);
               }
 
               log.info("Added library: " + library.toString());
@@ -379,15 +351,14 @@ public class ImportExportControllerHelperService {
 
                   if (insertSize == 0 && lqc.getResults() == 0) {
                     library.setQcPassed(false);
-                  }
-                  else {
+                  } else {
                     if (jsonArrayElement.getString(8) != null && !"".equals(jsonArrayElement.getString(8))) {
                       library.setQcPassed(Boolean.parseBoolean(jsonArrayElement.getString(8)));
                     }
                   }
-                }
-                catch (NumberFormatException nfe) {
-                  throw new InputFormException("Supplied Library QC concentration for library '" + jsonArrayElement.getString(3) + "' (" + s.getAlias() + ") is invalid", nfe);
+                } catch (NumberFormatException nfe) {
+                  throw new InputFormException("Supplied Library QC concentration for library '" + jsonArrayElement.getString(3) + "' ("
+                      + s.getAlias() + ") is invalid", nfe);
                 }
               }
 
@@ -408,20 +379,19 @@ public class ImportExportControllerHelperService {
 
                   if (insertSize == 0 && lqc.getResults() == 0) {
                     library.setQcPassed(false);
-                  }
-                  else {
+                  } else {
                     if (jsonArrayElement.getString(8) != null && !"".equals(jsonArrayElement.getString(8))) {
                       library.setQcPassed(Boolean.parseBoolean(jsonArrayElement.getString(8)));
                     }
                   }
-                }
-                catch (NumberFormatException nfe) {
-                  throw new InputFormException("Supplied Library QC concentration for library '" + jsonArrayElement.getString(3) + "' (" + s.getAlias() + ") is invalid", nfe);
+                } catch (NumberFormatException nfe) {
+                  throw new InputFormException("Supplied Library QC concentration for library '" + jsonArrayElement.getString(3) + "' ("
+                      + s.getAlias() + ") is invalid", nfe);
                 }
               }
 
-
-              if (jsonArrayElement.getString(9) != null && !"".equals(jsonArrayElement.getString(9)) && (library.getQcPassed() || library.getQcPassed() == null) ) {
+              if (jsonArrayElement.getString(9) != null && !"".equals(jsonArrayElement.getString(9))
+                  && (library.getQcPassed() || library.getQcPassed() == null)) {
                 Collection<TagBarcode> bcs = requestManager.listAllTagBarcodesByStrategyName(jsonArrayElement.getString(9));
                 if (!bcs.isEmpty()) {
                   String tags = jsonArrayElement.getString(10);
@@ -433,17 +403,16 @@ public class ImportExportControllerHelperService {
                       for (String tag : splits) {
                         for (TagBarcode tb : bcs) {
                           if (tb.getName().equals(tag)) {
-                            //set tag barcodes
+                            // set tag barcodes
                             tbs.put(count, tb);
                             count++;
                           }
                         }
                       }
-                    }
-                    else {
+                    } else {
                       for (TagBarcode tb : bcs) {
                         if (tb.getName().equals(tags) || tb.getSequence().equals(tags)) {
-                          //set tag barcode
+                          // set tag barcode
                           tbs.put(1, tb);
                           log.info("Got tag barcode: " + tb.getName());
                           break;
@@ -452,13 +421,13 @@ public class ImportExportControllerHelperService {
                     }
 
                     library.setTagBarcodes(tbs);
+                  } else {
+                    throw new InputFormException("Barcode Kit specified but no tag barcodes entered for library '"
+                        + jsonArrayElement.getString(3) + "'.");
                   }
-                  else {
-                    throw new InputFormException("Barcode Kit specified but no tag barcodes entered for library '" + jsonArrayElement.getString(3) + "'.");
-                  }
-                }
-                else {
-                  throw new InputFormException("No tag barcodes associated with the kit definition '" + jsonArrayElement.getString(9) + "' library '" + jsonArrayElement.getString(3) + "'.");
+                } else {
+                  throw new InputFormException("No tag barcodes associated with the kit definition '" + jsonArrayElement.getString(9)
+                      + "' library '" + jsonArrayElement.getString(3) + "'.");
                 }
               }
 
@@ -467,8 +436,6 @@ public class ImportExportControllerHelperService {
             }
 
             if ((library.getQcPassed() || library.getQcPassed() == null) && ("A".equals(proceedKey) || "P".equals(proceedKey))) {
-
-
 
               LibraryDilution ldi = new LibraryDilution();
 
@@ -484,9 +451,9 @@ public class ImportExportControllerHelperService {
                     log.info("Added library dilution: " + ldi.toString());
                   }
                   requestManager.saveLibraryDilution(ldi);
-                }
-                catch (NumberFormatException nfe) {
-                  throw new InputFormException("Supplied LibraryDilution concentration for library '" + jsonArrayElement.getString(3) + "' (" + s.getAlias() + ") is invalid", nfe);
+                } catch (NumberFormatException nfe) {
+                  throw new InputFormException("Supplied LibraryDilution concentration for library '" + jsonArrayElement.getString(3)
+                      + "' (" + s.getAlias() + ") is invalid", nfe);
                 }
               }
 
@@ -508,8 +475,7 @@ public class ImportExportControllerHelperService {
                     existedPool.addPoolableElement(ldi);
                   }
                   requestManager.savePool(existedPool);
-                }
-                else {
+                } else {
                   Pool pool = new PoolImpl();
                   if (!pools.containsKey(poolName)) {
                     pool.setAlias(poolName);
@@ -518,8 +484,7 @@ public class ImportExportControllerHelperService {
                     pool.setCreationDate(new Date());
                     if (jsonArrayElement.getString(13) != null && !"".equals(jsonArrayElement.getString(13))) {
                       pool.setConcentration(Double.valueOf(jsonArrayElement.getString(13)));
-                    }
-                    else {
+                    } else {
                       pool.setConcentration(0.0);
                     }
                     pools.put(poolName, pool);
@@ -528,8 +493,7 @@ public class ImportExportControllerHelperService {
                       pool.addPoolableElement(ldi);
                     }
                     requestManager.savePool(pool);
-                  }
-                  else {
+                  } else {
                     pool = pools.get(poolName);
                     if (ldi != null) {
                       pool.addPoolableElement(ldi);
@@ -544,8 +508,7 @@ public class ImportExportControllerHelperService {
             }
           }
 
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
           throw new Exception(e);
         }
       }
@@ -561,8 +524,7 @@ public class ImportExportControllerHelperService {
         b.append("<option>" + name + "</option>");
       }
       return JSONUtils.JSONObjectResponse("html", b.toString());
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
@@ -617,7 +579,8 @@ public class ImportExportControllerHelperService {
         }
 
         StringBuilder tagsb = new StringBuilder();
-        List<TagBarcodeStrategy> strategies = new ArrayList<TagBarcodeStrategy>(tagBarcodeStrategyResolverService.getTagBarcodeStrategiesByPlatform(PlatformType.get(platform)));
+        List<TagBarcodeStrategy> strategies = new ArrayList<TagBarcodeStrategy>(
+            tagBarcodeStrategyResolverService.getTagBarcodeStrategiesByPlatform(PlatformType.get(platform)));
         tagsb.append("<option >No Barcode Strategy</option>");
         for (TagBarcodeStrategy tb : strategies) {
           tagsb.append("<option>" + tb.getName() + "</option>");
@@ -628,8 +591,7 @@ public class ImportExportControllerHelperService {
 
         return JSONUtils.JSONObjectResponse(map);
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       log.error("Failed to retrieve library types given platform type: ", e);
       return JSONUtils.SimpleJSONError("Failed to retrieve library types given platform type: " + e.getMessage());
@@ -652,6 +614,5 @@ public class ImportExportControllerHelperService {
   public void setTagBarcodeStrategyResolverService(TagBarcodeStrategyResolverService tagBarcodeStrategyResolverService) {
     this.tagBarcodeStrategyResolverService = tagBarcodeStrategyResolverService;
   }
-
 
 }

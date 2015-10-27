@@ -27,11 +27,12 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
 
-
 /**
- * <p>Java class for jobQueue complex type.
+ * <p>
+ * Java class for jobQueue complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="jobQueue">
@@ -51,97 +52,86 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "jobQueue", propOrder = {
-    "queueName",
-    "queuedJobs",
-    "runJobs",
-    "xml"
-})
+@XmlType(name = "jobQueue", propOrder = { "queueName", "queuedJobs", "runJobs", "xml" })
 public class JobQueue {
 
-    protected String queueName;
-    protected int queuedJobs;
-    protected int runJobs;
-    protected String xml;
+  protected String queueName;
+  protected int queuedJobs;
+  protected int runJobs;
+  protected String xml;
 
-    /**
-     * Gets the value of the queueName property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getQueueName() {
-        return queueName;
-    }
+  /**
+   * Gets the value of the queueName property.
+   * 
+   * @return possible object is {@link String }
+   * 
+   */
+  public String getQueueName() {
+    return queueName;
+  }
 
-    /**
-     * Sets the value of the queueName property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setQueueName(String value) {
-        this.queueName = value;
-    }
+  /**
+   * Sets the value of the queueName property.
+   * 
+   * @param value
+   *          allowed object is {@link String }
+   * 
+   */
+  public void setQueueName(String value) {
+    this.queueName = value;
+  }
 
-    /**
-     * Gets the value of the queuedJobs property.
-     * 
-     */
-    public int getQueuedJobs() {
-        return queuedJobs;
-    }
+  /**
+   * Gets the value of the queuedJobs property.
+   * 
+   */
+  public int getQueuedJobs() {
+    return queuedJobs;
+  }
 
-    /**
-     * Sets the value of the queuedJobs property.
-     * 
-     */
-    public void setQueuedJobs(int value) {
-        this.queuedJobs = value;
-    }
+  /**
+   * Sets the value of the queuedJobs property.
+   * 
+   */
+  public void setQueuedJobs(int value) {
+    this.queuedJobs = value;
+  }
 
-    /**
-     * Gets the value of the runJobs property.
-     * 
-     */
-    public int getRunJobs() {
-        return runJobs;
-    }
+  /**
+   * Gets the value of the runJobs property.
+   * 
+   */
+  public int getRunJobs() {
+    return runJobs;
+  }
 
-    /**
-     * Sets the value of the runJobs property.
-     * 
-     */
-    public void setRunJobs(int value) {
-        this.runJobs = value;
-    }
+  /**
+   * Sets the value of the runJobs property.
+   * 
+   */
+  public void setRunJobs(int value) {
+    this.runJobs = value;
+  }
 
-    /**
-     * Gets the value of the xml property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getXml() {
-        return xml;
-    }
+  /**
+   * Gets the value of the xml property.
+   * 
+   * @return possible object is {@link String }
+   * 
+   */
+  public String getXml() {
+    return xml;
+  }
 
-    /**
-     * Sets the value of the xml property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setXml(String value) {
-        this.xml = value;
-    }
+  /**
+   * Sets the value of the xml property.
+   * 
+   * @param value
+   *          allowed object is {@link String }
+   * 
+   */
+  public void setXml(String value) {
+    this.xml = value;
+  }
 
 }

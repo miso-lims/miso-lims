@@ -23,8 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-//import com.fasterxml.jackson.annotation.*;
-//import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonManagedReference;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
@@ -40,26 +38,24 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * A Run represents a sequencing run on a single sequencing instrument, referenced by a {@link SequencerReference},
- * comprising one or more {@link SequencerPartitionContainer} objects in which {@link Pool}s are placed on
- * {@link SequencerPoolPartition}s.
+ * A Run represents a sequencing run on a single sequencing instrument, referenced by a {@link SequencerReference}, comprising one or more
+ * {@link SequencerPartitionContainer} objects in which {@link Pool}s are placed on {@link SequencerPoolPartition}s.
  * <p/>
  * Runs can be QCed via {@link RunQC} objects, and are always associated with a given {@link PlatformType}
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
-//@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
-@JsonIgnoreProperties({"securityProfile","submissionDocument"})
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
+@JsonIgnoreProperties({ "securityProfile", "submissionDocument" })
 public interface Run extends SecurableByProfile, Submittable<Document>, Comparable, Reportable, Watchable, Deletable, Nameable, Alertable {
-  /** Field PREFIX  */
+  /** Field PREFIX */
   public static final String PREFIX = "RUN";
 
   /**
    * Returns the runId of this Run object.
-   *
+   * 
    * @return Long runId.
    */
   @Deprecated
@@ -67,8 +63,9 @@ public interface Run extends SecurableByProfile, Submittable<Document>, Comparab
 
   /**
    * Sets the runId of this Run object.
-   *
-   * @param runId runId.
+   * 
+   * @param runId
+   *          runId.
    */
   @Deprecated
   public void setRunId(Long runId);
@@ -77,15 +74,16 @@ public interface Run extends SecurableByProfile, Submittable<Document>, Comparab
 
   /**
    * Returns the sequencerReference of this Run object.
-   *
+   * 
    * @return SequencerReference sequencerReference.
    */
   public SequencerReference getSequencerReference();
 
   /**
    * Sets the platformType of this Run object.
-   *
-   * @param sequencerReference SequencerReference.
+   * 
+   * @param sequencerReference
+   *          SequencerReference.
    */
   public void setSequencerReference(SequencerReference sequencerReference);
 
@@ -97,171 +95,185 @@ public interface Run extends SecurableByProfile, Submittable<Document>, Comparab
 
   /**
    * Returns the platformType of this Run object.
-   *
+   * 
    * @return PlatformType platformType.
    */
   public PlatformType getPlatformType();
 
   /**
    * Sets the platformType of this Run object.
-   *
-   * @param platformType PlatformType.
+   * 
+   * @param platformType
+   *          PlatformType.
    */
   public void setPlatformType(PlatformType platformType);
 
   /**
    * Returns the accession of this Run object.
-   *
+   * 
    * @return String accession.
    */
   public String getAccession();
 
   /**
    * Sets the accession of this Run object.
-   *
-   * @param accession String.
+   * 
+   * @param accession
+   *          String.
    */
   public void setAccession(String accession);
 
   /**
    * Returns the alias of this Run object.
-   *
+   * 
    * @return String alias.
    */
   public String getAlias();
 
   /**
    * Sets the alias of this Run object.
-   *
-   * @param alias String.
+   * 
+   * @param alias
+   *          String.
    */
   public void setAlias(String alias);
 
   /**
    * Sets the name of this Run object.
-   *
-   * @param name name.
+   * 
+   * @param name
+   *          name.
    */
   public void setName(String name);
 
   /**
    * Returns the description of this Run object.
-   *
+   * 
    * @return String description.
    */
   public String getDescription();
 
   /**
    * Sets the description of this Run object.
-   *
-   * @param description description.
+   * 
+   * @param description
+   *          description.
    */
   public void setDescription(String description);
 
   /**
    * Returns the platformRunId of this Run object.
-   *
+   * 
    * @return Integer platformRunId.
    */
   public Integer getPlatformRunId();
 
   /**
    * Sets the platformRunId of this Run object.
-   *
-   * @param platformRunId the actual run number on the sequencing instrument.
+   * 
+   * @param platformRunId
+   *          the actual run number on the sequencing instrument.
    */
   public void setPlatformRunId(Integer platformRunId);
 
   /**
    * Returns the cycles of this Run object.
-   *
+   * 
    * @return Integer cycles.
    */
   public Integer getCycles();
 
   /**
    * Sets the cycles of this Run object.
-   *
-   * @param cycles cycles.
+   * 
+   * @param cycles
+   *          cycles.
    */
   public void setCycles(Integer cycles);
 
   /**
    * Returns the pairedEnd attribute of this Run object.
-   *
+   * 
    * @return Boolean pairedEnd.
    */
   public Boolean getPairedEnd();
 
   /**
    * Sets the pairedEnd attribute of this Run object.
-   *
-   * @param pairedEnd pairedEnd.
+   * 
+   * @param pairedEnd
+   *          pairedEnd.
    */
   public void setPairedEnd(Boolean pairedEnd);
 
   /**
    * Returns the filePath of this Run object.
-   *
+   * 
    * @return String filePath.
    */
   public String getFilePath();
 
   /**
    * Sets the filePath of this Run object.
-   *
-   * @param filePath filePath.
-   *
+   * 
+   * @param filePath
+   *          filePath.
+   * 
    */
   public void setFilePath(String filePath);
 
   /**
    * Returns the status of this Run object.
-   *
+   * 
    * @return Status status.
    */
   public Status getStatus();
 
   /**
    * Sets the status of this Run object.
-   *
-   * @param status status.
+   * 
+   * @param status
+   *          status.
    */
   public void setStatus(Status status);
 
   /**
    * Registers that a RunQC has been carried out on this Run
-   *
-   * @param runQC of type RunQC
-   * @throws MalformedRunQcException when the RunQC registered is not valid
+   * 
+   * @param runQC
+   *          of type RunQC
+   * @throws MalformedRunQcException
+   *           when the RunQC registered is not valid
    */
   public void addQc(RunQC runQC) throws MalformedRunQcException;
 
   /**
    * Returns the RunQC carried out on this Run object.
-   *
+   * 
    * @return Collection<RunQC> runQCs.
    */
-  //@JsonManagedReference(value="runqcs")
+  // @JsonManagedReference(value="runqcs")
   public Collection<RunQC> getRunQCs();
 
   /**
    * Sets the notes of this Sample object.
-   *
-   * @param notes notes.
+   * 
+   * @param notes
+   *          notes.
    */
   public void setNotes(Collection<Note> notes);
 
   /**
    * Adds a Note to the Set of notes of this Sample object.
-   *
-   * @param note Note.
+   * 
+   * @param note
+   *          Note.
    */
   public void addNote(Note note);
 
   /**
    * Returns the notes of this Sample object.
-   *
+   * 
    * @return Collection<Note> notes.
    */
   public Collection<Note> getNotes();

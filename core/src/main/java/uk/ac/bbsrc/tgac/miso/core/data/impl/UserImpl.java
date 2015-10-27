@@ -40,9 +40,9 @@ import java.util.List;
 
 /**
  * Concrete implementation of a User object, inheriting from the simlims core User
- *
+ * 
  * @author Rob Davey
- * @since 0.0.2  
+ * @since 0.0.2
  */
 @Entity
 public class UserImpl implements User, Serializable, Comparable {
@@ -51,8 +51,7 @@ public class UserImpl implements User, Serializable, Comparable {
   private static final long serialVersionUID = 1L;
 
   /**
-   * Use this ID to indicate that a user has not yet been saved, and therefore
-   * does not yet have a unique ID.
+   * Use this ID to indicate that a user has not yet been saved, and therefore does not yet have a unique ID.
    */
   public static final Long UNSAVED_ID = 0L;
 
@@ -197,17 +196,13 @@ public class UserImpl implements User, Serializable, Comparable {
    */
   @Override
   public boolean equals(Object obj) {
-    if (obj == null)
-      return false;
-    if (obj == this)
-      return true;
-    if (!(obj instanceof UserImpl))
-      return false;
+    if (obj == null) return false;
+    if (obj == this) return true;
+    if (!(obj instanceof UserImpl)) return false;
     UserImpl them = (UserImpl) obj;
     if (getId() == UserImpl.UNSAVED_ID || them.getId() == UserImpl.UNSAVED_ID) {
       return this.getLoginName().equals(them.getLoginName());
-    }
-    else {
+    } else {
       return this.getId() == them.getId();
     }
   }
@@ -215,11 +210,10 @@ public class UserImpl implements User, Serializable, Comparable {
   @Override
   public int hashCode() {
     if (getId() != UserImpl.UNSAVED_ID) {
-      return (int)getId();
-    }
-    else {
+      return (int) getId();
+    } else {
       int hashcode = 1;
-      if (getLoginName() != null) hashcode = 37* hashcode + getLoginName().hashCode();
+      if (getLoginName() != null) hashcode = 37 * hashcode + getLoginName().hashCode();
       if (getEmail() != null) hashcode = 37 * hashcode + getEmail().hashCode();
       return hashcode;
     }
@@ -243,7 +237,7 @@ public class UserImpl implements User, Serializable, Comparable {
   }
 
   public int compareTo(Object o) {
-    User t = (User)o;
+    User t = (User) o;
     if (getId() < t.getUserId()) return -1;
     if (getId() > t.getUserId()) return 1;
     return 0;

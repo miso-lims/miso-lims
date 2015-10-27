@@ -36,15 +36,15 @@ import java.util.Set;
  * uk.ac.bbsrc.tgac.miso.webapp.service
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 03-Dec-2010
  * @since 0.0.2
  */
 public interface IlluminaStatusGateway {
-    @Gateway(requestChannel = "illuminaStatusChannel")
-    void consumeMultiMap(Message<MultiValueMap<String, String>> message);
+  @Gateway(requestChannel = "illuminaStatusChannel")
+  void consumeMultiMap(Message<MultiValueMap<String, String>> message);
 
-    @Gateway(requestChannel = "illuminaStatusChannel")
-    void consumeJSON(Message<String> message);
+  @Gateway(requestChannel = "illuminaStatusChannel")
+  void consumeJSON(Message<String> message);
 }

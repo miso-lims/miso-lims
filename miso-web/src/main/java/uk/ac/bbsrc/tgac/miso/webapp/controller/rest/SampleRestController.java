@@ -43,7 +43,7 @@ import java.io.IOException;
 
 /**
  * A controller to handle all REST requests for Samples
- *
+ * 
  * @author Rob Davey
  * @date 19-Aug-2015
  * @since 0.2.1-SNAPSHOT
@@ -62,7 +62,8 @@ public class SampleRestController {
   }
 
   @RequestMapping(value = "{sampleId}", method = RequestMethod.GET)
-  public @ResponseBody String getSampleById(@PathVariable Long sampleId) throws IOException {
+  public @ResponseBody
+  String getSampleById(@PathVariable Long sampleId) throws IOException {
     ObjectMapper mapper = new ObjectMapper();
     mapper.getSerializationConfig().addMixInAnnotations(Project.class, ProjectSampleRecursionAvoidanceMixin.class);
     mapper.getSerializationConfig().addMixInAnnotations(Library.class, LibraryRecursionAvoidanceMixin.class);
@@ -73,8 +74,7 @@ public class SampleRestController {
         return mapper.writeValueAsString(s);
       }
       return mapper.writeValueAsString(RestUtils.error("No such sample with that ID.", "sampleId", sampleId.toString()));
-    }
-    catch (IOException ioe) {
+    } catch (IOException ioe) {
       return mapper.writeValueAsString(RestUtils.error("Cannot retrieve sample: " + ioe.getMessage(), "sampleId", sampleId.toString()));
     }
   }

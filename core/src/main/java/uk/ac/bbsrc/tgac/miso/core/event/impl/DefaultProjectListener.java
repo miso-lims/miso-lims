@@ -39,7 +39,7 @@ import java.util.Set;
  * uk.ac.bbsrc.tgac.miso.core.event.impl
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 15/11/11
  * @since 0.1.3

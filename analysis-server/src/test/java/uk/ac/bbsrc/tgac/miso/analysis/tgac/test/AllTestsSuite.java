@@ -31,14 +31,12 @@ import org.junit.runners.Suite;
  * <p/>
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 27/10/11
  * @since version
  */
 @RunWith(Suite.class)
-@Suite.SuiteClasses({
-  LocalTask.class
-})
+@Suite.SuiteClasses({ LocalTask.class })
 public class AllTestsSuite {
 }

@@ -23,28 +23,30 @@
 
 package uk.ac.bbsrc.tgac.miso.core.test;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.Plate;
-import uk.ac.bbsrc.tgac.miso.core.data.Project;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.*;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl._384WellPlate;
+import uk.ac.bbsrc.tgac.miso.core.data.impl._96WellPlate;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.plate.Default384WellPlateConversionStrategy;
 import uk.ac.bbsrc.tgac.miso.core.service.plate.PlateConversionStrategy;
 
-import java.util.LinkedList;
-import java.util.List;
-
 /**
  * uk.ac.bbsrc.tgac.miso.core.test
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 13-Sep-2011
  * @since 0.1.1
@@ -73,7 +75,7 @@ public class PlateTests {
 
       for (int i = 1; i < 97; i++) {
         Library l = new LibraryImpl();
-        l.setAlias("P"+p+"_L"+i+"_TestLib");
+        l.setAlias("P" + p + "_L" + i + "_TestLib");
         plate.addElement(l);
       }
       plates.add(plate);
@@ -93,6 +95,6 @@ public class PlateTests {
 
   @After
   public void tearDown() {
-    dataObjectFactory = null;  
+    dataObjectFactory = null;
   }
 }

@@ -32,14 +32,14 @@ import java.io.Serializable;
 /**
  * A KitDescriptor handles information about a consumable element that is generally typed by a name, manufacturer and part number. Kits use
  * KitDescriptors, coupled with a lot number, to represent a real-world manifestation of a consumable kit.
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 @Entity
 public class KitDescriptor implements Serializable {
 
-  /** Field UNSAVED_ID  */
+  /** Field UNSAVED_ID */
   public static final Long UNSAVED_ID = 0L;
 
   @Id
@@ -53,13 +53,13 @@ public class KitDescriptor implements Serializable {
 
   @Enumerated(EnumType.STRING)
   private KitType kitType;
-  
+
   @Enumerated(EnumType.STRING)
   private PlatformType platformType;
 
   /**
    * Returns the kitDescriptorId of this KitDescriptor object.
-   *
+   * 
    * @return Long kitDescriptorId.
    */
   public Long getKitDescriptorId() {
@@ -68,8 +68,9 @@ public class KitDescriptor implements Serializable {
 
   /**
    * Sets the kitDescriptorId of this KitDescriptor object.
-   *
-   * @param kitDescriptorId kitDescriptorId.
+   * 
+   * @param kitDescriptorId
+   *          kitDescriptorId.
    */
   public void setKitDescriptorId(Long kitDescriptorId) {
     this.kitDescriptorId = kitDescriptorId;
@@ -77,7 +78,7 @@ public class KitDescriptor implements Serializable {
 
   /**
    * Returns the name of this KitDescriptor object.
-   *
+   * 
    * @return String name.
    */
   public String getName() {
@@ -86,8 +87,9 @@ public class KitDescriptor implements Serializable {
 
   /**
    * Sets the name of this KitDescriptor object.
-   *
-   * @param name name.
+   * 
+   * @param name
+   *          name.
    */
   public void setName(String name) {
     this.name = name;
@@ -95,7 +97,7 @@ public class KitDescriptor implements Serializable {
 
   /**
    * Returns the version of this KitDescriptor object.
-   *
+   * 
    * @return Double version.
    */
   public Double getVersion() {
@@ -104,8 +106,9 @@ public class KitDescriptor implements Serializable {
 
   /**
    * Sets the version of this KitDescriptor object.
-   *
-   * @param version version.
+   * 
+   * @param version
+   *          version.
    */
   public void setVersion(Double version) {
     this.version = version;
@@ -113,7 +116,7 @@ public class KitDescriptor implements Serializable {
 
   /**
    * Returns the manufacturer of this KitDescriptor object.
-   *
+   * 
    * @return String manufacturer.
    */
   public String getManufacturer() {
@@ -122,8 +125,9 @@ public class KitDescriptor implements Serializable {
 
   /**
    * Sets the manufacturer of this KitDescriptor object.
-   *
-   * @param manufacturer manufacturer.
+   * 
+   * @param manufacturer
+   *          manufacturer.
    */
   public void setManufacturer(String manufacturer) {
     this.manufacturer = manufacturer;
@@ -131,7 +135,7 @@ public class KitDescriptor implements Serializable {
 
   /**
    * Returns the partNumber of this KitDescriptor object.
-   *
+   * 
    * @return String partNumber.
    */
   public String getPartNumber() {
@@ -140,8 +144,9 @@ public class KitDescriptor implements Serializable {
 
   /**
    * Sets the partNumber of this KitDescriptor object.
-   *
-   * @param partNumber partNumber.
+   * 
+   * @param partNumber
+   *          partNumber.
    */
   public void setPartNumber(String partNumber) {
     this.partNumber = partNumber;
@@ -149,7 +154,7 @@ public class KitDescriptor implements Serializable {
 
   /**
    * Returns the stockLevel of this KitDescriptor object.
-   *
+   * 
    * @return Integer stockLevel.
    */
   public Integer getStockLevel() {
@@ -158,8 +163,9 @@ public class KitDescriptor implements Serializable {
 
   /**
    * Sets the stockLevel of this KitDescriptor object.
-   *
-   * @param stockLevel stockLevel.
+   * 
+   * @param stockLevel
+   *          stockLevel.
    */
   public void setStockLevel(Integer stockLevel) {
     this.stockLevel = stockLevel;
@@ -167,7 +173,7 @@ public class KitDescriptor implements Serializable {
 
   /**
    * Returns the kitType of this KitDescriptor object.
-   *
+   * 
    * @return KitType kitType.
    */
   public KitType getKitType() {
@@ -176,9 +182,10 @@ public class KitDescriptor implements Serializable {
 
   /**
    * Sets the kitType of this KitDescriptor object.
-   *
-   * @param kitType kitType.
-   *
+   * 
+   * @param kitType
+   *          kitType.
+   * 
    */
   public void setKitType(KitType kitType) {
     this.kitType = kitType;
@@ -186,7 +193,7 @@ public class KitDescriptor implements Serializable {
 
   /**
    * Returns the platformType of this KitDescriptor object.
-   *
+   * 
    * @return PlatformType platformType.
    */
   public PlatformType getPlatformType() {
@@ -195,8 +202,9 @@ public class KitDescriptor implements Serializable {
 
   /**
    * Sets the platformType of this KitDescriptor object.
-   *
-   * @param platformType platformType.
+   * 
+   * @param platformType
+   *          platformType.
    */
   public void setPlatformType(PlatformType platformType) {
     this.platformType = platformType;
@@ -204,6 +212,7 @@ public class KitDescriptor implements Serializable {
 
   /**
    * Method toString ...
+   * 
    * @return String
    */
   @Override
@@ -217,9 +226,9 @@ public class KitDescriptor implements Serializable {
     sb.append(" : ");
     sb.append(getKitType());
     sb.append(" : ");
-    sb.append(getPlatformType());    
+    sb.append(getPlatformType());
     sb.append(" : ");
-    sb.append(getStockLevel());    
+    sb.append(getStockLevel());
     return sb.toString();
   }
 }

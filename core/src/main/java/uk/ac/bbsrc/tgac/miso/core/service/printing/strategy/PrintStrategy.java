@@ -32,7 +32,7 @@ import java.io.IOException;
  * uk.ac.bbsrc.tgac.miso.core.service.printing.strategy
  * <p/>
  * Defines printing some content T using a print mechanism
- *
+ * 
  * @author Rob Davey
  * @date 30-Jun-2011
  * @since 0.0.3

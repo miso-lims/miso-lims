@@ -18,7 +18,7 @@ import java.util.*;
  * uk.ac.bbsrc.tgac.miso.core.util.jackson
  * <p/>
  * Deserializer class to help with processing pooled elements
- *
+ * 
  * @author Rob Davey
  * @date 08/01/13
  * @since 0.1.9
@@ -26,7 +26,8 @@ import java.util.*;
 public class PooledElementDeserializer extends JsonDeserializer<Collection<Poolable>> {
   protected static final Logger log = LoggerFactory.getLogger(PooledElementDeserializer.class);
 
-  static final TypeReference<Poolable> type = new TypeReference<Poolable>() {};
+  static final TypeReference<Poolable> type = new TypeReference<Poolable>() {
+  };
 
   @Override
   public Collection<Poolable> deserialize(JsonParser jp, DeserializationContext arg1) throws IOException, JsonProcessingException {
@@ -34,7 +35,7 @@ public class PooledElementDeserializer extends JsonDeserializer<Collection<Poola
     JsonNode node = jp.readValueAsTree();
     ObjectMapper o = new ObjectMapper();
     for (JsonNode element : node) {
-      //this should be the poolable, i.e. plate, library or dilution
+      // this should be the poolable, i.e. plate, library or dilution
       log.debug("Element: " + element.toString());
       Poolable p = o.readValue(element, type);
       poolables.add(p);

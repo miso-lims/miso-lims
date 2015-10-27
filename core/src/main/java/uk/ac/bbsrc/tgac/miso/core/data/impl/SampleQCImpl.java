@@ -34,7 +34,7 @@ import java.io.Serializable;
  * uk.ac.bbsrc.tgac.miso.core.data.impl
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -48,22 +48,20 @@ public class SampleQCImpl extends AbstractSampleQC implements Serializable {
 
   /**
    * Construct a new SampleQC from a parent Sample, checking that the given User can read that Sample
-   *
-   * @param sample of type Sample
-   * @param user of type User
+   * 
+   * @param sample
+   *          of type Sample
+   * @param user
+   *          of type User
    */
   public SampleQCImpl(Sample sample, User user) {
     if (sample.userCanRead(user)) {
       try {
         setSample(sample);
-      }
-      catch (MalformedSampleException e) {
+      } catch (MalformedSampleException e) {
         e.printStackTrace();
       }
-      //setSecurityProfile(experiment.getSecurityProfile());
-    }
-    else {
-      //setSecurityProfile(new SecurityProfile(user));
+    } else {
     }
   }
 

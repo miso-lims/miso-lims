@@ -43,7 +43,7 @@ import java.util.Set;
  * uk.ac.bbsrc.tgac.miso.core.event.impl
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 05/03/12
  * @since 0.1.6
@@ -60,7 +60,7 @@ public abstract class AbstractResponderService implements ResponderService {
 
   public boolean getSaveSystemAlert() {
     return saveSystemAlert;
-  }  
+  }
 
   public Set<AlerterService> getAlerterServices() {
     return alerterServices;
@@ -76,8 +76,8 @@ public abstract class AbstractResponderService implements ResponderService {
     raiseSystemAlert(event, DaoAlerterService.class);
   }
 
-  protected void raiseSystemAlert(Event event, Class<? extends AlerterService> ... servicesToAlert) {
-    Watchable o = (Watchable)event.getEventObject();
+  protected void raiseSystemAlert(Event event, Class<? extends AlerterService>... servicesToAlert) {
+    Watchable o = (Watchable) event.getEventObject();
 
     Alert a = new SystemAlert();
     a.setAlertTitle("[" + o.getWatchableIdentifier() + "] " + event.getEventType().name());
@@ -109,8 +109,7 @@ public abstract class AbstractResponderService implements ResponderService {
       for (AlerterService as : alerterServices) {
         try {
           as.raiseAlert(a);
-        }
-        catch (AlertingException e) {
+        } catch (AlertingException e) {
           log.error("Cannot raise user-level alert:" + e.getMessage());
           e.printStackTrace();
         }

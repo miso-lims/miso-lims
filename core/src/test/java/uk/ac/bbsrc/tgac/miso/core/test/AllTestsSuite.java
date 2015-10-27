@@ -30,20 +30,13 @@ import org.junit.runners.Suite;
  * uk.ac.bbsrc.tgac.miso.sqlstore
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 12-Jul-2011
  * @since 0.1.1
  */
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses({
-  NamingTests.class,
-  EraSubmissionTests.class,
-  FormUtilsTests.class,
-  PlateTests.class,
-  RunTests.class
-})
-
+@Suite.SuiteClasses({ NamingTests.class, EraSubmissionTests.class, FormUtilsTests.class, PlateTests.class, RunTests.class })
 public class AllTestsSuite {
 }

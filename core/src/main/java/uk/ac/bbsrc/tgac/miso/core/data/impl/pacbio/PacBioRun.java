@@ -40,7 +40,7 @@ import javax.xml.parsers.ParserConfigurationException;
  * uk.ac.bbsrc.tgac.miso.core.data.impl.ls454
  * <p/>
  * TODO Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -71,15 +71,10 @@ public class PacBioRun extends RunImpl {
 
   public void buildSubmission() {
     /*
-    try {
-      DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-      submissionDocument = docBuilder.newDocument();
-    }
-    catch (ParserConfigurationException e) {
-      e.printStackTrace();
-    }
-    ERASubmissionFactory.generateFullRunSubmissionXML(submissionDocument, this);
-    */
+     * try { DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder(); submissionDocument =
+     * docBuilder.newDocument(); } catch (ParserConfigurationException e) { e.printStackTrace(); }
+     * ERASubmissionFactory.generateFullRunSubmissionXML(submissionDocument, this);
+     */
   }
 
   /**

@@ -98,29 +98,25 @@ public class FlexReportsController {
     this.interfaceTemplate = interfaceTemplate;
   }
 
-
   @RequestMapping(method = RequestMethod.GET)
   public ModelAndView query(ModelMap modelMap) {
     try {
       modelMap.put("tables", DbUtils.getTables(interfaceTemplate));
-    }
-    catch (MetaDataAccessException e) {
+    } catch (MetaDataAccessException e) {
       e.printStackTrace();
-    }
-    catch (SQLException e) {
+    } catch (SQLException e) {
       e.printStackTrace();
     }
     return new ModelAndView("/pages/flexreport.jsp", modelMap);
   }
 
-    @RequestMapping(method = RequestMethod.POST)
+  @RequestMapping(method = RequestMethod.POST)
   public void postReport(ModelMap modelMap, HttpServletRequest request, HttpServletResponse response) {
     try {
       String j = ServletRequestUtils.getRequiredStringParameter(request, "json");
       JSONObject json = JSONObject.fromObject(j);
       log.info(json.toString());
-    }
-    catch (ServletRequestBindingException e) {
+    } catch (ServletRequestBindingException e) {
       e.printStackTrace();
     }
   }

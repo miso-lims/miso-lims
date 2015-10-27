@@ -41,7 +41,7 @@ import java.io.IOException;
  * uk.ac.bbsrc.tgac.miso.core.service.printing
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 30-Jun-2011
  * @since 0.0.3
@@ -100,12 +100,12 @@ public class DefaultPrintService implements MisoPrintService<File, Barcodable, P
   }
 
   @Override
-  public BarcodableSchema<File, Barcodable> getBarcodableSchema(){
+  public BarcodableSchema<File, Barcodable> getBarcodableSchema() {
     return barcodableSchema;
   }
 
   @Override
-  public void setBarcodableSchema(BarcodableSchema<File, Barcodable> barcodableSchema){
+  public void setBarcodableSchema(BarcodableSchema<File, Barcodable> barcodableSchema) {
     this.barcodableSchema = barcodableSchema;
   }
 
@@ -114,12 +114,10 @@ public class DefaultPrintService implements MisoPrintService<File, Barcodable, P
     if (pc != null) {
       if (isEnabled()) {
         return pc.print(content);
-      }
-      else {
+      } else {
         throw new IOException("Printer " + getName() + " is not enabled.");
       }
-    }
-    else {
+    } else {
       throw new IOException("No PrintContext specified");
     }
   }
@@ -140,10 +138,9 @@ public class DefaultPrintService implements MisoPrintService<File, Barcodable, P
       BarcodableSchema<File, Barcodable> bs = getBarcodableSchema();
       if (bs != null) {
         return bs.getPrintableLabel(b);
-      }
-      else {
-        throw new MisoPrintException("No barcodable schema set for '"+getName()+"' service. Make sure a schema is set in the " +
-                                     "printer administration page");
+      } else {
+        throw new MisoPrintException("No barcodable schema set for '" + getName() + "' service. Make sure a schema is set in the "
+            + "printer administration page");
       }
     }
     return null;

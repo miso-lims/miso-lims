@@ -31,7 +31,7 @@ import java.util.Properties;
  * uk.ac.bbsrc.tgac.miso.core.data.decorator
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */

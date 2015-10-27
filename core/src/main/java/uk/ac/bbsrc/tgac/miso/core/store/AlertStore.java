@@ -31,7 +31,7 @@ import java.util.Collection;
 
 /**
  * A Store interface that describes how to retrieve and persist {@link Alert} objects
- *
+ * 
  * @author Rob Davey
  * @date 22-Sep-2011
  * @since 0.1.2
@@ -39,49 +39,59 @@ import java.util.Collection;
 public interface AlertStore extends Store<Alert>, Remover<Alert> {
   /**
    * List all Alerts that have been raised to a specific {@link com.eaglegenomics.simlims.core.User}, by a given user ID
-   *
-   * @param userId of type long
+   * 
+   * @param userId
+   *          of type long
    * @return Collection<Alert>
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   Collection<Alert> listByUserId(long userId) throws IOException;
 
   /**
-   * List the most recent n Alerts that have been raised to a specific {@link com.eaglegenomics.simlims.core.User}, by
-   * a given user ID, limited by the limit parameter
-   *
-   * @param userId of type long
-   * @param limit of type long
+   * List the most recent n Alerts that have been raised to a specific {@link com.eaglegenomics.simlims.core.User}, by a given user ID,
+   * limited by the limit parameter
+   * 
+   * @param userId
+   *          of type long
+   * @param limit
+   *          of type long
    * @return Collection<Alert>
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   Collection<Alert> listByUserId(long userId, long limit) throws IOException;
 
   /**
    * List all Alerts that have been raised at a specific {@link AlertLevel}
-   *
-   * @param alertLevel of type AlertLevel
+   * 
+   * @param alertLevel
+   *          of type AlertLevel
    * @return Collection<Alert>
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   Collection<Alert> listByAlertLevel(AlertLevel alertLevel) throws IOException;
 
   /**
-   * List all unread Alerts that have been raised to a specific {@link com.eaglegenomics.simlims.core.User},
-   * by a given user ID
-   *
-   * @param userId of type long
+   * List all unread Alerts that have been raised to a specific {@link com.eaglegenomics.simlims.core.User}, by a given user ID
+   * 
+   * @param userId
+   *          of type long
    * @return Collection<Alert>
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   Collection<Alert> listUnreadByUserId(long userId) throws IOException;
 
   /**
    * List all unread Alerts that have been raised at a specific {@link AlertLevel}
-   *
-   * @param alertLevel of type AlertLevel
+   * 
+   * @param alertLevel
+   *          of type AlertLevel
    * @return Collection<Alert>
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   Collection<Alert> listUnreadByAlertLevel(AlertLevel alertLevel) throws IOException;
 }

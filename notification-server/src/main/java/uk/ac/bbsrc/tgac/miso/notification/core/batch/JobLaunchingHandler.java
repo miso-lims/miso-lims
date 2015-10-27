@@ -38,7 +38,7 @@ import org.springframework.batch.core.repository.JobRestartException;
  * uk.ac.bbsrc.tgac.miso.notification.handler
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 08-Dec-2010
  * @since 0.0.2
@@ -54,10 +54,8 @@ public class JobLaunchingHandler {
     this.jobLauncher = jobLauncher;
   }
 
-  public JobExecution launch(JobLaunchRequest request)
-          throws JobExecutionAlreadyRunningException, JobRestartException,
-                 JobInstanceAlreadyCompleteException, JobParametersInvalidException,
-                 NoSuchJobException {
+  public JobExecution launch(JobLaunchRequest request) throws JobExecutionAlreadyRunningException, JobRestartException,
+      JobInstanceAlreadyCompleteException, JobParametersInvalidException, NoSuchJobException {
     Job job = new SimpleJob(request.getJobName());
     JobParametersBuilder builder = new JobParametersBuilder();
     for (Map.Entry<String, String> entry : request.getJobParameters().entrySet()) {

@@ -23,8 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-//import com.fasterxml.jackson.annotation.*;
-//import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
@@ -32,89 +30,93 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 /**
  * A Platform describes metadata about potentially any hardware item, but is usully linked to a sequencer implementation.
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
-//@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public interface Platform extends Comparable {
   /**
    * Returns the platformId of this Platform object.
-   *
+   * 
    * @return Long platformId.
    */
   public Long getPlatformId();
 
   /**
    * Sets the platformId of this Platform object.
-   *
-   * @param platformId platformId.
+   * 
+   * @param platformId
+   *          platformId.
    */
   public void setPlatformId(Long platformId);
 
   /**
    * Returns the platformType of this Platform object.
-   *
+   * 
    * @return PlatformType platformType.
    */
   public PlatformType getPlatformType();
 
   /**
    * Sets the platformType of this Platform object.
-   *
-   * @param name platformType.
+   * 
+   * @param name
+   *          platformType.
    */
   public void setPlatformType(PlatformType name);
 
   /**
    * Returns the description of this Platform object.
-   *
+   * 
    * @return String description.
    */
   public String getDescription();
 
   /**
    * Sets the description of this Platform object.
-   *
-   * @param description description.
+   * 
+   * @param description
+   *          description.
    */
   public void setDescription(String description);
 
   /**
    * Returns the instrumentModel of this Platform object.
-   *
+   * 
    * @return String instrumentModel.
    */
   public String getInstrumentModel();
 
   /**
    * Sets the instrumentModel of this Platform object.
-   *
-   * @param instrumentModel instrumentModel.
+   * 
+   * @param instrumentModel
+   *          instrumentModel.
    */
   public void setInstrumentModel(String instrumentModel);
 
   /**
    * Returns the concatenation of the name and instrument model of this Platform object.
-   *
+   * 
    * @return String nameAndModel.
    */
   public String getNameAndModel();
 
   /**
    * Returns the number of sequencer partition containers of this Platform object.
-   *
+   * 
    * @return Integer numContainers.
    */
   public Integer getNumContainers();
 
   /**
    * Sets the number of sequencer partition containers of this Platform object.
-   *
-   * @param numContainers numContainers.
-   *
+   * 
+   * @param numContainers
+   *          numContainers.
+   * 
    */
   public void setNumContainers(Integer numContainers);
 }

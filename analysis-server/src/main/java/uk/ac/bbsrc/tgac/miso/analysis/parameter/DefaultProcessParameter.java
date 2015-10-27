@@ -29,7 +29,7 @@ import uk.ac.ebi.fgpt.conan.model.AbstractConanParameter;
  * uk.ac.bbsrc.tgac.miso.task.util
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 27-Jun-2011
  * @since 0.0.3
@@ -39,7 +39,7 @@ public class DefaultProcessParameter extends AbstractConanParameter implements O
   private boolean t = false;
 
   public DefaultProcessParameter(String name) {
-      super(name);
+    super(name);
   }
 
   @Override

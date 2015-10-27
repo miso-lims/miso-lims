@@ -9,7 +9,7 @@ import java.util.Collection;
 
 /**
  * Jackson Mixin class to filter sensitive user info
- *
+ * 
  * @author Rob Davey
  * @date 18/08/15
  * @since 0.2.1-SNAPSHOT
