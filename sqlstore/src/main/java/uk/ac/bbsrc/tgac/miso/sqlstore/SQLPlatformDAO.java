@@ -86,8 +86,10 @@ public class SQLPlatformDAO implements PlatformStore {
   public long save(Platform platform) throws IOException {
     // execute this procedure...
     MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("name", platform.getPlatformType().getKey()).addValue("instrumentModel", platform.getInstrumentModel())
-        .addValue("description", platform.getDescription()).addValue("numContainers", platform.getNumContainers());
+    params.addValue("name", platform.getPlatformType().getKey());
+    params.addValue("instrumentModel", platform.getInstrumentModel());
+    params.addValue("description", platform.getDescription());
+    params.addValue("numContainers", platform.getNumContainers());
 
     if (platform.getPlatformId() == null) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("platformId");

@@ -354,9 +354,12 @@ public class SQLPoolDAO implements PoolStore {
     }
 
     MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("concentration", pool.getConcentration()).addValue("alias", pool.getAlias())
-        .addValue("creationDate", pool.getCreationDate()).addValue("securityProfile_profileId", securityProfileId)
-        .addValue("platformType", pool.getPlatformType().getKey()).addValue("ready", pool.getReadyToRun());
+    params.addValue("concentration", pool.getConcentration());
+    params.addValue("alias", pool.getAlias());
+    params.addValue("creationDate", pool.getCreationDate());
+    params.addValue("securityProfile_profileId", securityProfileId);
+    params.addValue("platformType", pool.getPlatformType().getKey());
+    params.addValue("ready", pool.getReadyToRun());
 
     if (pool.getQcPassed() != null) {
       params.addValue("qcPassed", pool.getQcPassed().toString());
@@ -393,8 +396,9 @@ public class SQLPoolDAO implements PoolStore {
     } else {
       try {
         if (namingScheme.validateField("name", pool.getName())) {
-          params.addValue("poolId", pool.getId()).addValue("name", pool.getName())
-              .addValue("identificationBarcode", pool.getName() + "::" + pool.getPlatformType().getKey());
+          params.addValue("poolId", pool.getId());
+          params.addValue("name", pool.getName());
+          params.addValue("identificationBarcode", pool.getName() + "::" + pool.getPlatformType().getKey());
           NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
           namedTemplate.update(POOL_UPDATE, params);
         } else {
@@ -421,7 +425,9 @@ public class SQLPoolDAO implements PoolStore {
 
       for (Poolable d : pool.getPoolableElements()) {
         MapSqlParameterSource esParams = new MapSqlParameterSource();
-        esParams.addValue("elementId", d.getId()).addValue("pool_poolId", pool.getId()).addValue("elementType", d.getClass().getName());
+        esParams.addValue("elementId", d.getId());
+        esParams.addValue("pool_poolId", pool.getId());
+        esParams.addValue("elementType", d.getClass().getName());
 
         eInsert.execute(esParams);
 
@@ -453,7 +459,8 @@ public class SQLPoolDAO implements PoolStore {
 
       for (Experiment e : pool.getExperiments()) {
         MapSqlParameterSource esParams = new MapSqlParameterSource();
-        esParams.addValue("experiments_experimentId", e.getId()).addValue("pool_poolId", pool.getId());
+        esParams.addValue("experiments_experimentId", e.getId());
+        esParams.addValue("pool_poolId", pool.getId());
 
         eInsert.execute(esParams);
 

@@ -105,8 +105,10 @@ public class SQLSequencerReferenceDAO implements SequencerReferenceStore {
       e.printStackTrace();
     }
 
-    params.addValue("name", sequencerReference.getName()).addValue("ipAddress", ipBlob)
-        .addValue("platformId", sequencerReference.getPlatform().getPlatformId()).addValue("available", sequencerReference.getAvailable());
+    params.addValue("name", sequencerReference.getName());
+    params.addValue("ipAddress", ipBlob);
+    params.addValue("platformId", sequencerReference.getPlatform().getPlatformId());
+    params.addValue("available", sequencerReference.getAvailable());
 
     if (sequencerReference.getId() == AbstractSequencerReference.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("referenceId");

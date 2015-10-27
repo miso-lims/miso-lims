@@ -129,8 +129,11 @@ public class SQLAlertDAO implements AlertStore {
       @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public long save(Alert alert) throws IOException {
     MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("title", alert.getAlertTitle()).addValue("text", alert.getAlertText()).addValue("date", alert.getAlertDate())
-        .addValue("isRead", alert.getAlertRead()).addValue("level", alert.getAlertLevel().getKey());
+    params.addValue("title", alert.getAlertTitle());
+    params.addValue("text", alert.getAlertText());
+    params.addValue("date", alert.getAlertDate());
+    params.addValue("isRead", alert.getAlertRead());
+    params.addValue("level", alert.getAlertLevel().getKey());
 
     if (alert.getAlertUser() != null) {
       params.addValue("userId", alert.getAlertUser().getUserId());

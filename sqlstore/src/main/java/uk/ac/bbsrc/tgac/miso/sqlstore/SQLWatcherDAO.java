@@ -117,7 +117,8 @@ public class SQLWatcherDAO implements WatcherStore {
     if (user != null) {
       SimpleJdbcInsert fInsert = new SimpleJdbcInsert(template).withTableName("Watcher");
       MapSqlParameterSource fcParams = new MapSqlParameterSource();
-      fcParams.addValue("entityName", watchable.getWatchableIdentifier()).addValue("userId", user.getUserId());
+      fcParams.addValue("entityName", watchable.getWatchableIdentifier());
+      fcParams.addValue("userId", user.getUserId());
       try {
         fInsert.execute(fcParams);
         log.debug("DAO insert of " + user.getUserId() + " on " + watchable.getWatchableIdentifier());

@@ -266,9 +266,11 @@ public class SQLEmPCRDilutionDAO implements EmPCRDilutionStore {
     }
 
     MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("concentration", dilution.getConcentration()).addValue("emPCR_pcrId", dilution.getEmPCR().getId())
-        .addValue("creationDate", dilution.getCreationDate()).addValue("dilutionUserName", dilution.getDilutionCreator())
-        .addValue("securityProfile_profileId", securityProfileId);
+    params.addValue("concentration", dilution.getConcentration());
+    params.addValue("emPCR_pcrId", dilution.getEmPCR().getId());
+    params.addValue("creationDate", dilution.getCreationDate());
+    params.addValue("dilutionUserName", dilution.getDilutionCreator());
+    params.addValue("securityProfile_profileId", securityProfileId);
 
     if (dilution.getId() == AbstractDilution.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName("emPCRDilution").usingGeneratedKeyColumns("dilutionId");
@@ -300,8 +302,9 @@ public class SQLEmPCRDilutionDAO implements EmPCRDilutionStore {
     } else {
       try {
         if (namingScheme.validateField("name", dilution.getName())) {
-          params.addValue("dilutionId", dilution.getId()).addValue("name", dilution.getName())
-              .addValue("identificationBarcode", dilution.getName() + "::" + dilution.getLibrary().getAlias());
+          params.addValue("dilutionId", dilution.getId());
+          params.addValue("name", dilution.getName());
+          params.addValue("identificationBarcode", dilution.getName() + "::" + dilution.getLibrary().getAlias());
           NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
           namedTemplate.update(EMPCR_DILUTION_UPDATE, params);
         } else {

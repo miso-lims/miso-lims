@@ -106,8 +106,10 @@ public class SQLPrintJobDAO implements PrintJobStore {
 
   public long save(PrintJob printJob) throws IOException {
     MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("printServiceName", printJob.getPrintService().getName()).addValue("printDate", printJob.getPrintDate())
-        .addValue("jobCreator_userId", printJob.getPrintUser().getUserId()).addValue("status", printJob.getStatus());
+    params.addValue("printServiceName", printJob.getPrintService().getName());
+    params.addValue("printDate", printJob.getPrintDate());
+    params.addValue("jobCreator_userId", printJob.getPrintUser().getUserId());
+    params.addValue("status", printJob.getStatus());
 
     Blob barcodeBlob = null;
     try {

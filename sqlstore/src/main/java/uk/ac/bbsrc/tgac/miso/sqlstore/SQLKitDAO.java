@@ -191,9 +191,11 @@ public class SQLKitDAO implements KitStore {
 
   public long save(Kit kit) throws IOException {
     MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("identificationBarcode", kit.getIdentificationBarcode()).addValue("locationBarcode", kit.getLocationBarcode())
-        .addValue("lotNumber", kit.getLotNumber()).addValue("kitDate", kit.getKitDate())
-        .addValue("kitDescriptorId", kit.getKitDescriptor().getKitDescriptorId());
+    params.addValue("identificationBarcode", kit.getIdentificationBarcode());
+    params.addValue("locationBarcode", kit.getLocationBarcode());
+    params.addValue("lotNumber", kit.getLotNumber());
+    params.addValue("kitDate", kit.getKitDate());
+    params.addValue("kitDescriptorId", kit.getKitDescriptor().getKitDescriptorId());
 
     if (kit.getId() == AbstractKit.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("kitId");
@@ -293,9 +295,13 @@ public class SQLKitDAO implements KitStore {
   public long saveKitDescriptor(KitDescriptor kd) throws IOException {
     MapSqlParameterSource params = new MapSqlParameterSource();
 
-    params.addValue("name", kd.getName()).addValue("version", kd.getVersion()).addValue("manufacturer", kd.getManufacturer())
-        .addValue("partNumber", kd.getPartNumber()).addValue("stockLevel", kd.getStockLevel())
-        .addValue("kitType", kd.getKitType().getKey()).addValue("platformType", kd.getPlatformType().getKey());
+    params.addValue("name", kd.getName());
+    params.addValue("version", kd.getVersion());
+    params.addValue("manufacturer", kd.getManufacturer());
+    params.addValue("partNumber", kd.getPartNumber());
+    params.addValue("stockLevel", kd.getStockLevel());
+    params.addValue("kitType", kd.getKitType().getKey());
+    params.addValue("platformType", kd.getPlatformType().getKey());
 
     if (kd.getKitDescriptorId() == KitDescriptor.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName("KitDescriptor").usingGeneratedKeyColumns("kitDescriptorId");

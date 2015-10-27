@@ -118,9 +118,11 @@ public class SQLPrintServiceDAO implements PrintServiceStore {
   @Override
   public long save(MisoPrintService printService) throws IOException {
     MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("serviceName", printService.getName()).addValue("contextName", printService.getPrintContext().getName())
-        .addValue("enabled", printService.isEnabled()).addValue("printServiceFor", printService.getPrintServiceFor().getName())
-        .addValue("printSchema", printService.getBarcodableSchema().getName());
+    params.addValue("serviceName", printService.getName());
+    params.addValue("contextName", printService.getPrintContext().getName());
+    params.addValue("enabled", printService.isEnabled());
+    params.addValue("printServiceFor", printService.getPrintServiceFor().getName());
+    params.addValue("printSchema", printService.getBarcodableSchema().getName());
     try {
       JSONObject contextFields = PrintServiceUtils.mapContextFieldsToJSON(printService.getPrintContext());
       String contextFieldJSON = contextFields.toString();

@@ -237,12 +237,17 @@ public class SQLSampleDAO implements SampleStore {
         }
 
         MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("alias", sample.getAlias()).addValue("accession", sample.getAccession())
-            .addValue("description", sample.getDescription()).addValue("scientificName", sample.getScientificName())
-            .addValue("taxonIdentifier", sample.getTaxonIdentifier()).addValue("locationBarcode", sample.getLocationBarcode())
-            .addValue("sampleType", sample.getSampleType()).addValue("receivedDate", sample.getReceivedDate())
-            .addValue("qcPassed", sample.getQcPassed().toString()).addValue("project_projectId", sample.getProject().getProjectId())
-            .addValue("securityProfile_profileId", securityProfileId);
+        params.addValue("alias", sample.getAlias());
+        params.addValue("accession", sample.getAccession());
+        params.addValue("description", sample.getDescription());
+        params.addValue("scientificName", sample.getScientificName());
+        params.addValue("taxonIdentifier", sample.getTaxonIdentifier());
+        params.addValue("locationBarcode", sample.getLocationBarcode());
+        params.addValue("sampleType", sample.getSampleType());
+        params.addValue("receivedDate", sample.getReceivedDate());
+        params.addValue("qcPassed", sample.getQcPassed().toString());
+        params.addValue("project_projectId", sample.getProject().getProjectId());
+        params.addValue("securityProfile_profileId", securityProfileId);
 
         if (sampleNamingScheme.validateField("name", sample.getName()) && sampleNamingScheme.validateField("alias", sample.getAlias())) {
           batch.add(params);
@@ -267,11 +272,16 @@ public class SQLSampleDAO implements SampleStore {
       securityProfileId = securityProfileDAO.save(sample.getSecurityProfile());
     }
     MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("alias", sample.getAlias()).addValue("accession", sample.getAccession())
-        .addValue("description", sample.getDescription()).addValue("scientificName", sample.getScientificName())
-        .addValue("taxonIdentifier", sample.getTaxonIdentifier()).addValue("locationBarcode", sample.getLocationBarcode())
-        .addValue("sampleType", sample.getSampleType()).addValue("receivedDate", sample.getReceivedDate())
-        .addValue("project_projectId", sample.getProject().getProjectId()).addValue("securityProfile_profileId", securityProfileId);
+    params.addValue("alias", sample.getAlias());
+    params.addValue("accession", sample.getAccession());
+    params.addValue("description", sample.getDescription());
+    params.addValue("scientificName", sample.getScientificName());
+    params.addValue("taxonIdentifier", sample.getTaxonIdentifier());
+    params.addValue("locationBarcode", sample.getLocationBarcode());
+    params.addValue("sampleType", sample.getSampleType());
+    params.addValue("receivedDate", sample.getReceivedDate());
+    params.addValue("project_projectId", sample.getProject().getProjectId());
+    params.addValue("securityProfile_profileId", securityProfileId);
 
     if (sample.getQcPassed() != null) {
       params.addValue("qcPassed", sample.getQcPassed().toString());
@@ -318,8 +328,9 @@ public class SQLSampleDAO implements SampleStore {
       } else {
         try {
           if (sampleNamingScheme.validateField("name", sample.getName()) && sampleNamingScheme.validateField("alias", sample.getAlias())) {
-            params.addValue("sampleId", sample.getId()).addValue("name", sample.getName())
-                .addValue("identificationBarcode", sample.getName() + "::" + sample.getAlias());
+            params.addValue("sampleId", sample.getId());
+            params.addValue("name", sample.getName());
+            params.addValue("identificationBarcode", sample.getName() + "::" + sample.getAlias());
             NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
             namedTemplate.update(SAMPLE_UPDATE, params);
           } else {

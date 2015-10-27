@@ -177,9 +177,14 @@ public class SQLSecurityDAO implements SecurityStore {
     }
 
     MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("active", user.isActive()).addValue("admin", user.isAdmin()).addValue("external", user.isExternal())
-        .addValue("fullName", user.getFullName()).addValue("internal", user.isInternal()).addValue("loginName", user.getLoginName())
-        .addValue("roles", roleBlob).addValue("email", user.getEmail());
+    params.addValue("active", user.isActive());
+    params.addValue("admin", user.isAdmin());
+    params.addValue("external", user.isExternal());
+    params.addValue("fullName", user.getFullName());
+    params.addValue("internal", user.isInternal());
+    params.addValue("loginName", user.getLoginName());
+    params.addValue("roles", roleBlob);
+    params.addValue("email", user.getEmail());
 
     if (user.getUserId() != UserImpl.UNSAVED_ID) {
       User existingUser = getUserById(user.getUserId());
@@ -243,7 +248,8 @@ public class SQLSecurityDAO implements SecurityStore {
       SimpleJdbcInsert eInsert = new SimpleJdbcInsert(template).withTableName("User_Group");
       for (Group g : user.getGroups()) {
         MapSqlParameterSource ugParams = new MapSqlParameterSource();
-        ugParams.addValue("users_userId", user.getUserId()).addValue("groups_groupId", g.getGroupId());
+        ugParams.addValue("users_userId", user.getUserId());
+        ugParams.addValue("groups_groupId", g.getGroupId());
 
         eInsert.execute(ugParams);
       }
@@ -296,7 +302,8 @@ public class SQLSecurityDAO implements SecurityStore {
 
   public long saveGroup(Group group) throws IOException {
     MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("name", group.getName()).addValue("description", group.getDescription());
+    params.addValue("name", group.getName());
+    params.addValue("description", group.getDescription());
 
     if (group.getGroupId() == Group.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName("_Group").usingGeneratedKeyColumns("groupId");

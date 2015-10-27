@@ -132,9 +132,12 @@ public class SQLRunQCDAO implements RunQcStore {
   @Transactional(readOnly = false, rollbackFor = IOException.class)
   public long save(RunQC runQC) throws IOException {
     MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("run_runId", runQC.getRun().getId()).addValue("qcUserName", runQC.getQcCreator()).addValue("qcDate", runQC.getQcDate())
-        .addValue("qcMethod", runQC.getQcType().getQcTypeId()).addValue("information", LimsUtils.findHyperlinks(runQC.getInformation()))
-        .addValue("doNotProcess", runQC.getDoNotProcess());
+    params.addValue("run_runId", runQC.getRun().getId());
+    params.addValue("qcUserName", runQC.getQcCreator());
+    params.addValue("qcDate", runQC.getQcDate());
+    params.addValue("qcMethod", runQC.getQcType().getQcTypeId());
+    params.addValue("information", LimsUtils.findHyperlinks(runQC.getInformation()));
+    params.addValue("doNotProcess", runQC.getDoNotProcess());
 
     if (runQC.getId() == AbstractQC.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("qcId");
@@ -150,8 +153,9 @@ public class SQLRunQCDAO implements RunQcStore {
       SimpleJdbcInsert pInsert = new SimpleJdbcInsert(template).withTableName("RunQC_Partition");
 
       MapSqlParameterSource poParams = new MapSqlParameterSource();
-      poParams.addValue("runQc_runQcId", runQC.getId()).addValue("containers_containerId", p.getSequencerPartitionContainer().getId())
-          .addValue("partitionNumber", p.getPartitionNumber());
+      poParams.addValue("runQc_runQcId", runQC.getId());
+      poParams.addValue("containers_containerId", p.getSequencerPartitionContainer().getId());
+      poParams.addValue("partitionNumber", p.getPartitionNumber());
       try {
         pInsert.execute(poParams);
       } catch (DuplicateKeyException se) {
