@@ -287,10 +287,6 @@ public class SQLProjectDAO implements ProjectStore {
       } catch (MisoNamingException e) {
         throw new IOException("Cannot save Project - issue with naming scheme", e);
       }
-      /*
-       * String name = "PRO" + DbUtils.getAutoIncrement(template, TABLE_NAME); params.addValue("name", name); Number newId =
-       * insert.executeAndReturnKey(params); project.setProjectId(newId.longValue()); project.setName(name);
-       */
     } else {
       try {
         if (namingScheme.validateField("name", project.getName())) {
@@ -303,10 +299,6 @@ public class SQLProjectDAO implements ProjectStore {
       } catch (MisoNamingException e) {
         throw new IOException("Cannot save Project - issue with naming scheme", e);
       }
-      /*
-       * params.addValue("projectId", project.getProjectId()); params.addValue("name", project.getName()); NamedParameterJdbcTemplate
-       * namedTemplate = new NamedParameterJdbcTemplate(template); namedTemplate.update(PROJECT_UPDATE, params);
-       */
     }
 
     if (this.cascadeType != null) {

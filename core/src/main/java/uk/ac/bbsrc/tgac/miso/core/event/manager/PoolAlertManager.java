@@ -163,16 +163,6 @@ public class PoolAlertManager {
           }
         } else {
           log.debug("Updating Pool " + clone.getId() + " ...");
-
-          // find any watchable setters on the clone and call the respective getter from the clone parent
-          // i.e. clone.setFoo(parent.getFoo()); where @WatchableSetter Class.setFoo(T t);
-          /*
-           * for (Method setter : clone.getClass().getMethods()) { if (setter.getAnnotation(WatchableSetter.class)) { try { Method getter =
-           * clone.getClass().getMethod(setter.getName().replaceFirst("set", "get")); setter.invoke(clone, getter.invoke(p)); } catch
-           * (NoSuchMethodException e) { e.printStackTrace(); } catch (InvocationTargetException e) { e.printStackTrace(); } catch
-           * (IllegalAccessException e) { e.printStackTrace(); } } }
-           */
-          // TODO the above will get rid of this necessity to call each method explicitly
           clone.setReadyToRun(p.getReadyToRun());
         }
 

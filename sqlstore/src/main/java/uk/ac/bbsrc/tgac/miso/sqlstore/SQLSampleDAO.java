@@ -101,14 +101,7 @@ public class SQLSampleDAO implements SampleStore {
 
   public static final String SAMPLE_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE sampleId=:sampleId";
 
-  public static String SAMPLES_SELECT_BY_PROJECT_ID =
-  /*
-   * "SELECT sa.* " + "FROM Project p " + "LEFT JOIN Study st ON st.project_projectId = p.projectId " +
-   * "LEFT JOIN Experiment ex ON st.studyId = ex.study_studyId " +
-   * "INNER JOIN Experiment_Sample exsa ON ex.experimentId = exsa.experiment_experimentId " +
-   * "LEFT JOIN Sample sa ON exsa.samples_sampleId = sa.sampleId " + "WHERE p.projectId=?";
-   */
-  SAMPLES_SELECT + " " + "WHERE project_projectId = ?";
+  public static String SAMPLES_SELECT_BY_PROJECT_ID = SAMPLES_SELECT + " WHERE project_projectId = ?";
 
   public static final String SAMPLES_SELECT_BY_EXPERIMENT_ID = "SELECT s.sampleId, s.name, s.description, s.scientificName, s.taxonIdentifier, s.alias, s.accession, s.securityProfile_profileId, s.identificationBarcode, s.locationBarcode, "
       + "s.sampleType, s.receivedDate, s.qcPassed, s.project_projectId "
@@ -239,19 +232,17 @@ public class SQLSampleDAO implements SampleStore {
     try {
       for (Sample sample : samples) {
         Long securityProfileId = sample.getSecurityProfile().getProfileId();
-        if (this.cascadeType != null) {// && this.cascadeType.equals(CascadeType.PERSIST) || this.cascadeType.equals(CascadeType.REMOVE)) {
+        if (this.cascadeType != null) {
           securityProfileId = securityProfileDAO.save(sample.getSecurityProfile());
         }
 
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("alias", sample.getAlias()).addValue("accession", sample.getAccession())
-            .addValue("description", sample.getDescription())
-            .addValue("scientificName", sample.getScientificName())
-            .addValue("taxonIdentifier", sample.getTaxonIdentifier())
-            // .addValue("identificationBarcode", sample.getIdentificationBarcode())
-            .addValue("locationBarcode", sample.getLocationBarcode()).addValue("sampleType", sample.getSampleType())
-            .addValue("receivedDate", sample.getReceivedDate()).addValue("qcPassed", sample.getQcPassed().toString())
-            .addValue("project_projectId", sample.getProject().getProjectId()).addValue("securityProfile_profileId", securityProfileId);
+            .addValue("description", sample.getDescription()).addValue("scientificName", sample.getScientificName())
+            .addValue("taxonIdentifier", sample.getTaxonIdentifier()).addValue("locationBarcode", sample.getLocationBarcode())
+            .addValue("sampleType", sample.getSampleType()).addValue("receivedDate", sample.getReceivedDate())
+            .addValue("qcPassed", sample.getQcPassed().toString()).addValue("project_projectId", sample.getProject().getProjectId())
+            .addValue("securityProfile_profileId", securityProfileId);
 
         if (sampleNamingScheme.validateField("name", sample.getName()) && sampleNamingScheme.validateField("alias", sample.getAlias())) {
           batch.add(params);
@@ -272,18 +263,15 @@ public class SQLSampleDAO implements SampleStore {
       @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public long save(Sample sample) throws IOException {
     Long securityProfileId = sample.getSecurityProfile().getProfileId();
-    if (this.cascadeType != null) {// && this.cascadeType.equals(CascadeType.PERSIST) || this.cascadeType.equals(CascadeType.REMOVE)) {
+    if (this.cascadeType != null) {
       securityProfileId = securityProfileDAO.save(sample.getSecurityProfile());
     }
     MapSqlParameterSource params = new MapSqlParameterSource();
     params.addValue("alias", sample.getAlias()).addValue("accession", sample.getAccession())
-        .addValue("description", sample.getDescription())
-        .addValue("scientificName", sample.getScientificName())
-        .addValue("taxonIdentifier", sample.getTaxonIdentifier())
-        // .addValue("identificationBarcode", sample.getIdentificationBarcode())
-        .addValue("locationBarcode", sample.getLocationBarcode()).addValue("sampleType", sample.getSampleType())
-        .addValue("receivedDate", sample.getReceivedDate()).addValue("project_projectId", sample.getProject().getProjectId())
-        .addValue("securityProfile_profileId", securityProfileId);
+        .addValue("description", sample.getDescription()).addValue("scientificName", sample.getScientificName())
+        .addValue("taxonIdentifier", sample.getTaxonIdentifier()).addValue("locationBarcode", sample.getLocationBarcode())
+        .addValue("sampleType", sample.getSampleType()).addValue("receivedDate", sample.getReceivedDate())
+        .addValue("project_projectId", sample.getProject().getProjectId()).addValue("securityProfile_profileId", securityProfileId);
 
     if (sample.getQcPassed() != null) {
       params.addValue("qcPassed", sample.getQcPassed().toString());

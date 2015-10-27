@@ -102,12 +102,6 @@ public abstract class AbstractPlatform implements Platform {
     this.numContainers = numContainers;
   }
 
-  /*
-   * public Integer getSequenceLength() { return sequenceLength; }
-   * 
-   * public void setSequenceLength(Integer sequenceLength) { this.sequenceLength = sequenceLength; }
-   */
-
   /**
    * Equivalency is based on getProjectId() if set, otherwise on name, description and creation date.
    */

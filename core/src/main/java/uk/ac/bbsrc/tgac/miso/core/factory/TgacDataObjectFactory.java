@@ -140,7 +140,6 @@ public class TgacDataObjectFactory extends DataObjectFactory {
   }
 
   @Override
-  // public <T extends List<S>, S extends Plateable> Plate<T, S> getPlateOfSize(int size) {
   public Plate<LinkedList<Plateable>, Plateable> getPlateOfSize(int size) {
     return new PlateImpl<Plateable>(size);
   }
@@ -379,12 +378,6 @@ public class TgacDataObjectFactory extends DataObjectFactory {
       Pool<? extends Poolable> p = getPool(user);
       p.setPlatformType(platformtype);
       return p;
-      /*
-       * if (platformtype.equals(PlatformType.ILLUMINA)) { return getIlluminaPool(user); } else if (platformtype.equals(PlatformType.LS454))
-       * { return getLS454Pool(user); } else if (platformtype.equals(PlatformType.SOLID)) { return getSolidPool(user); } else if
-       * (platformtype.equals(PlatformType.PACBIO)) { return getPacBioPool(user); } else { throw new
-       * IllegalArgumentException("Unrecognised PlatformType"); }
-       */
     } else {
       throw new IllegalArgumentException("Null PlatformType supplied");
     }

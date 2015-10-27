@@ -283,11 +283,6 @@ public class SQLPlateDAO implements PlateStore {
       } catch (MisoNamingException e) {
         throw new IOException("Cannot save Plate - issue with naming scheme", e);
       }
-      /*
-       * String name = "PLA"+ DbUtils.getAutoIncrement(template, TABLE_NAME); params.addValue("name", name);
-       * params.addValue("identificationBarcode", name + "::" + plate.getTagBarcode()); Number newId = insert.executeAndReturnKey(params);
-       * plate.setPlateId(newId.longValue()); plate.setName(name);
-       */
     } else {
       try {
         String plateBarcode = "";
@@ -307,11 +302,6 @@ public class SQLPlateDAO implements PlateStore {
       } catch (MisoNamingException e) {
         throw new IOException("Cannot save Plate - issue with naming scheme", e);
       }
-      /*
-       * params.addValue("plateId", plate.getPlateId()); params.addValue("name", plate.getName()); params.addValue("identificationBarcode",
-       * plate.getName() + "::" + plate.getTagBarcode()); NamedParameterJdbcTemplate namedTemplate = new
-       * NamedParameterJdbcTemplate(template); namedTemplate.update(PLATE_UPDATE, params);
-       */
     }
 
     if (this.cascadeType != null && this.cascadeType.equals(CascadeType.PERSIST)) {
@@ -388,8 +378,6 @@ public class SQLPlateDAO implements PlateStore {
 
       int plateSize = rs.getInt("size");
 
-      // Plate<LinkedList<Plateable>, ? extends Plateable> plate = dataObjectFactory.<LinkedList<Plateable>, Plateable>
-      // getPlateOfSize(plateSize);
       Plate<LinkedList<Plateable>, Plateable> plate = dataObjectFactory.getPlateOfSize(plateSize);
       plate.setId(id);
       plate.setName(rs.getString("name"));
@@ -397,8 +385,6 @@ public class SQLPlateDAO implements PlateStore {
       plate.setDescription(rs.getString("description"));
       plate.setIdentificationBarcode(rs.getString("identificationBarcode"));
       plate.setLocationBarcode(rs.getString("locationBarcode"));
-
-      // plate.setLastUpdated(rs.getTimestamp("lastUpdated"));
 
       try {
         plate.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));

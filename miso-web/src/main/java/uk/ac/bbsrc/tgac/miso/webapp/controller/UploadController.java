@@ -25,8 +25,6 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
-//import com.fasterxml.jackson.core.type.TypeReference;
-//import com.fasterxml.jackson.databind.ObjectMapper;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
@@ -176,10 +174,6 @@ public class UploadController {
       }
     } catch (Exception e) {
       log.error("SAMPLE IMPORT FAIL:" + e.getMessage());
-      // JSONObject o = new JSONObject();
-      // o.put("bulkerror", "Cannot import bulk spreadsheet: " + e.getMessage());
-      // log.error(o.toString());
-      // request.getSession(false).setAttribute("bulkerror", o);
     }
   }
 
@@ -195,8 +189,6 @@ public class UploadController {
         uploadFile(Project.class, projectId, fileItem);
         File f = filesManager.getFile(Project.class, projectId, fileItem.getOriginalFilename().replaceAll("\\s+", "_"));
         User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-        // Map<String, Pool<Plate<LinkedList<Library>, Library>>> pooledPlates = FormUtils.importPlateInputSpreadsheet(f, user,
-        // requestManager, libraryNamingScheme);
         Map<String, PlatePool> pooledPlates = FormUtils.importPlateInputSpreadsheet(f, user, requestManager, libraryNamingScheme);
 
         ObjectMapper mapper = new ObjectMapper();
@@ -228,8 +220,6 @@ public class UploadController {
         uploadFile(Plate.class, "forms", fileItem);
         File f = filesManager.getFile(Plate.class, "forms", fileItem.getOriginalFilename().replaceAll("\\s+", "_"));
         User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-        // Map<String, Pool<Plate<LinkedList<Library>, Library>>> pooledPlates = FormUtils.importPlateInputSpreadsheet(f, user,
-        // requestManager, libraryNamingScheme);
         Map<String, PlatePool> pooledPlates = FormUtils.importPlateInputSpreadsheet(f, user, requestManager, libraryNamingScheme);
 
         ObjectMapper mapper = new ObjectMapper();
@@ -326,7 +316,6 @@ public class UploadController {
       request.getSession(false).setAttribute("barcodes", o);
     } catch (Exception e) {
       log.debug("UPLOAD FAIL:", e);
-      // return JSONUtils.SimpleJSONError("Upload failed: "+e.getMessage());
     }
   }
 

@@ -115,16 +115,6 @@ public class MisoJscriptFactory {
 
   public static String plateBarcodeLabel(String name, String tagBarcode, String barcode) {
     StringBuilder sb = new StringBuilder();
-    /*
-     * sb.append("m m").append("\n"); sb.append("J").append("\n"); sb.append("S l1;0,0,12,15,38").append("\n");
-     * sb.append("B 3,2,0,DATAMATRIX,0.2;").append(barcode).append("\n");
-     * sb.append("B 17,1,0,DATAMATRIX+RECT,0.25;").append(barcode).append("\n"); sb.append("T 29,2,0,5,pt4;[DATE]").append("\n");
-     * 
-     * //shorten alias to fit on label if too long if (tagBarcode.length() >= 17) { tagBarcode = tagBarcode.substring(0, 15) + "..."; }
-     * 
-     * sb.append("T 17,8,0,5,pt6;").append(tagBarcode).append("\n"); sb.append("T 17,11,0,5,pt6;").append(name).append("\n");
-     * sb.append("A 1").append("\n");
-     */
     return sb.toString();
   }
 }

@@ -78,10 +78,5 @@ public class StudyImpl extends AbstractStudy implements Serializable {
   }
 
   public void buildSubmission() {
-    /*
-     * try { DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder(); submissionDocument =
-     * docBuilder.newDocument(); } catch (ParserConfigurationException e) { e.printStackTrace(); }
-     * ERASubmissionFactory.generateStudySubmissionXML(submissionDocument, this);
-     */
   }
 }

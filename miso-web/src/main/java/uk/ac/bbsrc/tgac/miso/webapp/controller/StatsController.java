@@ -399,7 +399,6 @@ public class StatsController {
             + " sequencer reference with a PacBio strategy");
       }
 
-      // try {
       Status status = requestManager.getStatusByRunName(runName);
       if (status != null) {
         model.put("referenceName", sr.getName());
@@ -408,25 +407,9 @@ public class StatsController {
         model.put("runName", runName);
         model.put("runStatus", status);
 
-        /*
-         * InputStream in = StatsController.class.getResourceAsStream("/status/xsl/illumina/statusXml.xsl"); if (in != null) { String xsl =
-         * LimsUtils.inputStreamToString(in); model.put("statusXml", (SubmissionUtils.xslTransform(status.getXml(), xsl))); }
-         */
       } else {
         model.put("error", MisoWebUtils.generateErrorDivMessage("Cannot consume the xml file for the given run name: " + runName));
       }
-      // }
-      // catch (TransformerException e) {
-      // model.put("error", MisoWebUtils.generateErrorDivMessage("Cannot retrieve status XML for the given run: " + runName,
-      // e.getMessage()));
-      // e.printStackTrace();
-      // }
-      // catch (InterrogationException e) {
-      // model.put("error", MisoWebUtils.generateErrorDivMessage("Cannot retrieve status information for the given sequencer reference: " +
-      // sr.getName(), e.getMessage()));
-      // log.info(e.getMessage());
-      // e.printStackTrace();
-      // }
     } else {
       model.put("error", "Cannot retrieve the given sequencer reference: " + referenceId);
     }

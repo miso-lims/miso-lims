@@ -2831,7 +2831,6 @@ public class FormUtils {
         } else if ("sampleinwell".equals(jsonObject.getString("name"))) {
           String sampleinwell = jsonObject.getString("value");
           // "sampleid:wellid:samplealias:projectname"
-          // String sampleId = sampleinwell.split(":")[0];
           String wellId = sampleinwell.split(":")[1];
           String sampleAlias = sampleinwell.split(":")[2];
           String projectName = sampleinwell.split(":")[3];
@@ -2853,8 +2852,6 @@ public class FormUtils {
 
   }
 
-  // private static Map<String, Pool<Plate<LinkedList<Library>, Library>>> process384PlateInputODS(OdfSpreadsheetDocument oDoc, User u,
-  // RequestManager manager, MisoNamingScheme<Library> libraryNamingScheme) throws Exception {
   private static Map<String, PlatePool> process384PlateInputODS(OdfSpreadsheetDocument oDoc, User u, RequestManager manager,
       MisoNamingScheme<Library> libraryNamingScheme) throws Exception {
     ((RequestManagerAwareNamingScheme) libraryNamingScheme).setRequestManager(manager);
@@ -2935,7 +2932,6 @@ public class FormUtils {
 
     // process entries
     Simple384WellPlate libraryPlate = null;
-    // Map<String, Pool<Plate<LinkedList<Library>, Library>>> pools = new HashMap<String, Pool<Plate<LinkedList<Library>, Library>>>();
     Map<String, PlatePool> pools = new HashMap<String, PlatePool>();
     for (OdfTableRow row : oTable.getRowList()) {
       int ri = row.getRowIndex();
@@ -2977,22 +2973,14 @@ public class FormUtils {
           OdfTableCell entityIDCell = oTable.getCellByPosition(2, ri);
           OdfTableCell poolNumberCell = oTable.getCellByPosition(3, ri);
           OdfTableCell sampleQcCell = oTable.getCellByPosition(4, ri);
-          // OdfTableCell sampleAmountCell = oTable.getCellByPosition(5, ri);
-          // OdfTableCell sampleWaterAmountCell = oTable.getCellByPosition(6, ri);
           OdfTableCell barcodeKitCell = oTable.getCellByPosition(7, ri);
           OdfTableCell barcodeTagsCell = oTable.getCellByPosition(8, ri);
           OdfTableCell libraryQcCell = oTable.getCellByPosition(9, ri);
           OdfTableCell libraryQcInsertSizeCell = oTable.getCellByPosition(10, ri);
           OdfTableCell libraryQcMolarityCell = oTable.getCellByPosition(11, ri);
           OdfTableCell libraryQcPassFailCell = oTable.getCellByPosition(12, ri);
-          // OdfTableCell libraryAmountCell = oTable.getCellByPosition(13, ri);
-          // OdfTableCell libraryWaterAmountCell = oTable.getCellByPosition(14, ri);
-          // OdfTableCell dilutionQcCell = oTable.getCellByPosition(15, ri);
           OdfTableCell dilutionMolarityCell = oTable.getCellByPosition(16, ri);
-          // OdfTableCell dilutionAmountCell = oTable.getCellByPosition(17, ri);
-          // OdfTableCell dilutionWaterAmountCell = oTable.getCellByPosition(18, ri);
           OdfTableCell poolQcCell = oTable.getCellByPosition(19, ri);
-          // OdfTableCell poolAverageInsertSizeCell = oTable.getCellByPosition(20, ri);
           OdfTableCell poolConvertedMolarityCell = oTable.getCellByPosition(21, ri);
 
           // add pool, if any
@@ -3037,8 +3025,6 @@ public class FormUtils {
             if (mat.matches()) {
               String libAlias = plateBarcode + "_" + "L" + mat.group(2) + "-" + platePosCell.getStringValue() + "_"
                   + entityIDCell.getStringValue();
-              // String libAlias = libraryNamingScheme.generateNameFor("alias", library);
-              // library.setAlias(libAlias);
 
               library.setAlias(libAlias);
               library.setSecurityProfile(s.getSecurityProfile());
@@ -3129,20 +3115,6 @@ public class FormUtils {
                 }
               }
 
-              /*
-               * if (!"".equals(dilutionMolarityCell.getStringValue())) { try { LibraryDilution ldi = new LibraryDilution();
-               * ldi.setLibrary(library); ldi.setSecurityProfile(library.getSecurityProfile());
-               * ldi.setConcentration(Double.valueOf(dilutionMolarityCell.getStringValue())); ldi.setCreationDate(new Date());
-               * ldi.setDilutionCreator(u.getLoginName()); if (!library.getLibraryDilutions().contains(ldi)) { library.addDilution(ldi);
-               * log.info("Added library dilution: " + ldi.toString()); }
-               * 
-               * Pool<Plate<LinkedList<Library>, Library>> p = pools.get(poolNumberCell.getStringValue()); if (p != null) {
-               * p.addPoolableElement(ldi); log.info("Added library dilution to pool: " + p.toString()); } } catch (NumberFormatException
-               * nfe) { throw new
-               * InputFormException("Supplied LibraryDilution concentration for library '"+libAlias+"' ("+s.getAlias()+") is invalid", nfe);
-               * } }
-               */
-
               if (!"".equals(poolConvertedMolarityCell.getStringValue())) {
                 Pool<Plate<LinkedList<Library>, Library>> p = pools.get(poolNumberCell.getStringValue());
                 if (p != null) {
@@ -3160,7 +3132,6 @@ public class FormUtils {
               log.info("Added library: " + library.toString());
 
               if (!"".equals(platePosCell.getStringValue()) && libraryPlate != null) {
-                // libraryPlate.setElement(platePosCell.getStringValue(), library);
                 libraryPlate.addElement(library);
                 log.info("Added library " + library.getAlias() + " to " + platePosCell.getStringValue());
               }
@@ -3781,8 +3752,6 @@ public class FormUtils {
             Matcher mat = samplePattern.matcher(s.getAlias());
             if (mat.matches()) {
               String libAlias = mat.group(1) + "_" + "L" + mat.group(2) + "-" + platePos + "_" + mat.group(3);
-              // String libAlias = libraryNamingScheme.generateNameFor("alias", library);
-              // library.setAlias(libAlias);
 
               library.setAlias(libAlias);
               library.setSecurityProfile(s.getSecurityProfile());
@@ -3995,8 +3964,6 @@ public class FormUtils {
     }
   }
 
-  // private static Map<String, Pool<Plate<LinkedList<Library>, Library>>> process384PlateInputXLSX(XSSFWorkbook wb, User u, RequestManager
-  // manager, MisoNamingScheme<Library> libraryNamingScheme) throws Exception {
   private static Map<String, PlatePool> process384PlateInputXLSX(XSSFWorkbook wb, User u, RequestManager manager,
       MisoNamingScheme<Library> libraryNamingScheme) throws Exception {
     ((RequestManagerAwareNamingScheme) libraryNamingScheme).setRequestManager(manager);
@@ -4077,7 +4044,6 @@ public class FormUtils {
 
     // process entries
     Simple384WellPlate libraryPlate = null;
-    // Map<String, Pool<Plate<LinkedList<Library>, Library>>> pools = new HashMap<String, Pool<Plate<LinkedList<Library>, Library>>>();
     Map<String, PlatePool> pools = new HashMap<String, PlatePool>();
     for (int ri = 4; ri < rows; ri++) {
       XSSFRow row = sheet.getRow(ri);
@@ -4120,8 +4086,6 @@ public class FormUtils {
         XSSFCell entityIDCell = row.getCell(2);
         XSSFCell poolNumberCell = row.getCell(3);
         XSSFCell sampleQcCell = row.getCell(4);
-        // XSSFCell sampleAmountCell = row.getCell(5);
-        // XSSFCell sampleWaterAmountCell = row.getCell(6);
         XSSFCell libraryDescriptionCell = row.getCell(7);
         XSSFCell barcodeKitCell = row.getCell(8);
         XSSFCell barcodeTagsCell = row.getCell(9);
@@ -4129,14 +4093,8 @@ public class FormUtils {
         XSSFCell libraryQcInsertSizeCell = row.getCell(11);
         XSSFCell libraryQcMolarityCell = row.getCell(12);
         XSSFCell libraryQcPassFailCell = row.getCell(13);
-        // XSSFCell libraryAmountCell = row.getCell(14);
-        // XSSFCell libraryWaterAmountCell = row.getCell(15);
-        // XSSFCell dilutionQcCell = row.getCell(16);
         XSSFCell dilutionMolarityCell = row.getCell(17);
-        // XSSFCell dilutionAmountCell = row.getCell(18);
-        // XSSFCell dilutionWaterAmountCell = row.getCell(19);
         XSSFCell poolQcCell = row.getCell(20);
-        // XSSFCell poolAverageInsertSizeCell = row.getCell(21);
         XSSFCell poolConvertedMolarityCell = row.getCell(22);
 
         // add pool, if any
@@ -4184,8 +4142,6 @@ public class FormUtils {
           }
         }
 
-        // if (getCellValueAsString(libraryQcCell) != null) {
-
         if (getCellValueAsString(barcodeKitCell) != null && getCellValueAsString(barcodeTagsCell) != null) {
           // create library
           Library library = new LibraryImpl();
@@ -4194,8 +4150,6 @@ public class FormUtils {
           Matcher mat = samplePattern.matcher(s.getAlias());
           if (mat.matches()) {
             String libAlias = plateBarcode + "_" + "L" + mat.group(2) + "-" + platePos + "_" + getCellValueAsString(entityIDCell);
-            // String libAlias = libraryNamingScheme.generateNameFor("alias", library);
-            // library.setAlias(libAlias);
 
             library.setAlias(libAlias);
             library.setSecurityProfile(s.getSecurityProfile());
@@ -4288,21 +4242,6 @@ public class FormUtils {
               }
             }
 
-            /*
-             * if (getCellValueAsString(dilutionMolarityCell) != null) { try { LibraryDilution ldi = new LibraryDilution();
-             * ldi.setLibrary(library); ldi.setSecurityProfile(library.getSecurityProfile());
-             * ldi.setConcentration(Double.valueOf(getCellValueAsString(dilutionMolarityCell))); ldi.setCreationDate(new Date());
-             * ldi.setDilutionCreator(u.getLoginName()); if (!library.getLibraryDilutions().contains(ldi)) { library.addDilution(ldi);
-             * log.info("Added library dilution: " + ldi.toString()); }
-             * 
-             * if (getCellValueAsString(poolNumberCell) != null) { String poolNum = String.valueOf(new
-             * Double(getCellValueAsString(poolNumberCell)).intValue()); Pool<Plate<LinkedList<Library>, Library>> p = pools.get(poolNum);
-             * if (p != null) { p.addPoolableElement(ldi); log.info("Added library dilution to pool: " + p.toString()); } } } catch
-             * (NumberFormatException nfe) { throw new
-             * InputFormException("Supplied LibraryDilution concentration for library '"+libAlias+"' ("+s.getAlias()+") is invalid", nfe); }
-             * }
-             */
-
             if (getCellValueAsString(poolConvertedMolarityCell) != null) {
               String poolNum = getCellValueAsString(poolNumberCell);
               Pool<Plate<LinkedList<Library>, Library>> p = pools.get(poolNum);
@@ -4320,7 +4259,6 @@ public class FormUtils {
             manager.saveLibrary(library);
 
             if (getCellValueAsString(platePosCell) != null && libraryPlate != null) {
-              // libraryPlate.setElement(getCellValueAsString(platePosCell), library);
               libraryPlate.addElement(library);
               log.info("Added library " + library.getAlias() + " to " + getCellValueAsString(platePosCell));
             }
@@ -4342,8 +4280,6 @@ public class FormUtils {
     return pools;
   }
 
-  // public static Map<String, Pool<Plate<LinkedList<Library>, Library>>> importPlateInputSpreadsheet(File inPath, User u, RequestManager
-  // manager, MisoNamingScheme<Library> libraryNamingScheme) throws Exception {
   public static Map<String, PlatePool> importPlateInputSpreadsheet(File inPath, User u, RequestManager manager,
       MisoNamingScheme<Library> libraryNamingScheme) throws Exception {
     if (inPath.getName().endsWith(".xlsx")) {
@@ -4467,8 +4403,6 @@ public class FormUtils {
           String projectAliasCell = oTable.getCellByPosition(1, ri).getStringValue();
           String poolNumberCell = oTable.getCellByPosition(3, ri).getStringValue();
           String sampleQcCell = oTable.getCellByPosition(4, ri).getStringValue();
-          // String sampleAmountCell = oTable.getCellByPosition(5, ri).getStringValue();
-          // String sampleWaterAmountCell = oTable.getCellByPosition(6, ri).getStringValue();
           String libraryDescriptionCell = oTable.getCellByPosition(7, ri).getStringValue();
           String barcodeKitCell = oTable.getCellByPosition(8, ri).getStringValue();
           String barcodeTagsCell = oTable.getCellByPosition(9, ri).getStringValue();
@@ -4476,14 +4410,8 @@ public class FormUtils {
           String libraryQcInsertSizeCell = oTable.getCellByPosition(11, ri).getStringValue();
           String libraryQcMolarityCell = oTable.getCellByPosition(12, ri).getStringValue();
           String libraryQcPassFailCell = oTable.getCellByPosition(13, ri).getStringValue();
-          // String libraryAmountCell = oTable.getCellByPosition(14, ri).getStringValue();
-          // String libraryWaterAmountCell = oTable.getCellByPosition(15, ri).getStringValue();
-          // String dilutionQcCell = oTable.getCellByPosition(16, ri).getStringValue();
           String dilutionMolarityCell = oTable.getCellByPosition(17, ri).getStringValue();
-          // String dilutionAmountCell = oTable.getCellByPosition(18, ri).getStringValue();
-          // String dilutionWaterAmountCell = oTable.getCellByPosition(19, ri).getStringValue();
           String poolQcCell = oTable.getCellByPosition(20, ri).getStringValue();
-          // String poolAverageInsertSizeCell = oTable.getCellByPosition(21, ri).getStringValue().getStringValue();
           String poolConvertedMolarityCell = oTable.getCellByPosition(22, ri).getStringValue();
 
           // add pool, if any
@@ -4621,8 +4549,6 @@ public class FormUtils {
         String projectAliasCell = getCellValueAsString(row.getCell(1));
         String poolNumberCell = getCellValueAsString(row.getCell(3));
         String sampleQcCell = getCellValueAsString(row.getCell(4));
-        // String sampleAmountCell = getCellValueAsString(row.getCell(5));
-        // String sampleWaterAmountCell = getCellValueAsString(row.getCell(6));
         String libraryDescriptionCell = getCellValueAsString(row.getCell(7));
         String barcodeKitCell = getCellValueAsString(row.getCell(8));
         String barcodeTagsCell = getCellValueAsString(row.getCell(9));
@@ -4630,14 +4556,8 @@ public class FormUtils {
         String libraryQcInsertSizeCell = getCellValueAsString(row.getCell(11));
         String libraryQcMolarityCell = getCellValueAsString(row.getCell(12));
         String libraryQcPassFailCell = getCellValueAsString(row.getCell(13));
-        // String libraryAmountCell = getCellValueAsString(row.getCell(14));
-        // String libraryWaterAmountCell = getCellValueAsString(row.getCell(15));
-        // String dilutionQcCell = getCellValueAsString(row.getCell(16));
         String dilutionMolarityCell = getCellValueAsString(row.getCell(17));
-        // String dilutionAmountCell = getCellValueAsString(row.getCell(18));
-        // String dilutionWaterAmountCell = getCellValueAsString(row.getCell(19));
         String poolQcCell = getCellValueAsString(row.getCell(20));
-        // String poolAverageInsertSizeCell = getCellValueAsString(row.getCell(21));
         String poolConvertedMolarityCell = getCellValueAsString(row.getCell(22));
 
         // add pool, if any
@@ -4835,8 +4755,6 @@ public class FormUtils {
           library.addDilution(ldi);
           log.info("Added library dilution: " + ldi.toString());
         }
-
-        // Pool<Dilution> p = pools.get(poolNumberCell.getStringValue());
         if (p != null) {
           p.addPoolableElement(ldi);
           log.info("Added library dilution to pool: " + p.toString());
@@ -4891,21 +4809,6 @@ public class FormUtils {
     if (in != null) {
       OdfTextDocument oDoc = OdfTextDocument.loadDocument(in);
       OdfContentDom contentDom = oDoc.getContentDom();
-
-      /*
-       * OfficeTextElement contentRoot = oDoc.getContentRoot(); NodeList nl = contentRoot.getElementsByTagName("TABLE"); for (int i = 0; i <
-       * nl.getLength(); i++) { Element e = (Element)nl.item(i); System.out.println(e.getTagName() + " :: " + e.toString()); }
-       * 
-       * List<OdfTable> cTables = contentDom.getTableList(); for (OdfTable c : cTables) { System.out.println(c.getTableName() + " :: " +
-       * c.getRowCount() + " :: " + c.getColumnCount()); }
-       */
-      /*
-       * OdfTable cTable = cTables.get(1); for (OdfTableRow ctr : cTable.getRowList()) { if (ctr.getRowIndex() == 0) { OdfTableCell ctc0 =
-       * ctr.getCellByIndex(1); OdfTextParagraph ctcp0 = new OdfTextParagraph(contentDom); User u =
-       * samples.get(0).getProject().getSecurityProfile().getOwner(); ctcp0.setTextContent(u.getFullName() + " " + u.getEmail());
-       * ctcp0.setProperty(StyleTextPropertiesElement.FontSize, "12pt"); ctc0.getOdfElement().appendChild(ctcp0); } }
-       */
-
       OdfTable oTable = oDoc.getTableByName("SamplesTable");
 
       int rowCount = 1;
@@ -5031,11 +4934,6 @@ public class FormUtils {
           if (n4.getFirstChild() != null) {
             s.setIdentificationBarcode(n4.getFirstChild().getTextContent());
           }
-
-          /*
-           * OdfTableCell cell3 = row.getCellByIndex(3); if (cell3.getStringValue() != null) {
-           * s.setSampleType(cell3.getStringValue().toUpperCase()); } else { s.setSampleType("OTHER"); }
-           */
 
           Node n5 = ttre.getChildNodes().item(5);
           if (n5.getFirstChild() != null) {

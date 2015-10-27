@@ -150,15 +150,11 @@ public class SQLSampleQCDAO implements SampleQcStore {
         if (s != null) sampleDAO.save(s);
       } else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (s != null) {
-          // Cache pc = cacheManager.getCache("sampleCache");
-          // pc.remove(DbUtils.hashCodeCacheKeyFor(s.getId()));
           DbUtils.updateCaches(cacheManager, s, Sample.class);
         }
       } else if (this.cascadeType.equals(CascadeType.ALL)) {
         if (s != null) {
           sampleDAO.save(s);
-          // Cache pc = cacheManager.getCache("sampleCache");
-          // pc.remove(DbUtils.hashCodeCacheKeyFor(s.getId()));
           DbUtils.updateCaches(cacheManager, s, Sample.class);
         }
       }

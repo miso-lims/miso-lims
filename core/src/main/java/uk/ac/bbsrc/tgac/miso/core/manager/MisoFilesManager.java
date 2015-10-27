@@ -54,18 +54,6 @@ public class MisoFilesManager implements FilesManager {
     return this.fileStorageDirectory;
   }
 
-  /*
-   * public File createFile(Class type, String qualifier, String name) throws IOException { File dir = new
-   * File(fileStorageDirectory+"/"+type.getSimpleName().toLowerCase()+"/"+qualifier); if (LimsUtils.checkDirectory(dir, true)) { File
-   * newFile = new File(dir, name); log.info("Attempting to store " + newFile.getAbsolutePath()); if ((newFile.exists() && newFile.length()
-   * != file.length()) || !newFile.exists()) { FileOutputStream fout = null; try { byte[] fileData = new byte[(int)file.length()];
-   * FileInputStream fis = null;
-   * 
-   * try { fis = new FileInputStream(file); fis.read(fileData); } catch (IOException e) { fileData = null; } finally { if (fis != null) {
-   * try { fis.close(); } catch (IOException e) { // ignore } } } fout = new FileOutputStream(newFile); fout.write(fileData); } finally { if
-   * (fout != null) { fout.close(); } } return newFile; } else { log.info("File already exists - not overwriting."); return newFile; } }
-   * return null; }
-   */
   public File storeFile(Class type, String qualifier, File file) throws IOException {
     File dir = new File(fileStorageDirectory + "/" + type.getSimpleName().toLowerCase() + "/" + qualifier);
     if (LimsUtils.checkDirectory(dir, true)) {
@@ -143,9 +131,7 @@ public class MisoFilesManager implements FilesManager {
   }
 
   public Collection<File> getFiles(Class type, String qualifier) throws IOException {
-    // log.debug("getFiles called for qualifier:..." + qualifier);
     File path = new File(fileStorageDirectory + "/" + type.getSimpleName().toLowerCase() + "/" + qualifier + "/");
-    // log.debug("filepath:..." + path.getAbsolutePath());
 
     if (path.exists()) {
       if (path.canRead()) {
@@ -164,8 +150,6 @@ public class MisoFilesManager implements FilesManager {
     File path = new File(fileStorageDirectory + "/" + type.getSimpleName().toLowerCase() + "/" + qualifier + "/");
     if (path.exists()) {
       if (path.canRead()) {
-        // SecurityProfile profile = type.getSecurityProfile();
-        // if (profile.userCanRead(user)) {
         File[] files = path.listFiles();
         if (files != null) {
           List<String> names = new ArrayList<String>();
@@ -196,14 +180,12 @@ public class MisoFilesManager implements FilesManager {
   }
 
   protected File getFile(Class type, String qualifier, String fileName, boolean createIfNotExist) throws IOException {
-    // SecurityProfile profile = type.getSecurityProfile();
     File path = new File(fileStorageDirectory + "/" + type.getSimpleName().toLowerCase() + "/" + qualifier + "/");
     File file = new File(path, fileName);
     log.info("Looking up " + file);
     if (path.exists()) {
       if (file.exists()) {
         if (file.canRead()) {
-          // if (profile.userCanRead(user)) {
           log.info("OK");
           return file;
         } else {

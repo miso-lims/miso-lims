@@ -80,10 +80,5 @@ public class ExperimentImpl extends AbstractExperiment implements Serializable {
   }
 
   public void buildSubmission() {
-    /*
-     * try { DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder(); submissionDocument =
-     * docBuilder.newDocument(); } catch (ParserConfigurationException e) { e.printStackTrace(); }
-     * ERASubmissionFactory.generateExperimentSubmissionXML(submissionDocument, this);
-     */
   }
 }

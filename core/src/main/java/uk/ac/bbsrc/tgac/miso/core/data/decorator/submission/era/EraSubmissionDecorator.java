@@ -128,21 +128,6 @@ public class EraSubmissionDecorator extends AbstractSubmittableDecorator<Documen
       }
       s.appendChild(actions);
 
-      /*
-       * FILES element deprecated in SRA 1.5
-       * 
-       * Element files = submission.createElementNS(null, "FILES");
-       * 
-       * FilePathGenerator fpg = new TGACIlluminaFilepathGenerator(); String basePath =
-       * submissionProperties.getProperty("submission.baseReadPath"); if (basePath != null) { fpg = new
-       * TGACIlluminaFilepathGenerator(basePath); }
-       * 
-       * for(SequencerPoolPartition part : dataFilePoolables.keySet()) { for (Dilution po : part.getPool().getDilutions()) { try { for (File
-       * f : fpg.generateFilePath(part,po)) { String fileName = f.getName(); Element file = submission.createElementNS(null,"FILE");
-       * file.setAttribute("filename", fileName); file.setAttribute("checksum_method", "MD5"); file.setAttribute("checksum", "");
-       * files.appendChild(file); } } catch (Exception e) { e.printStackTrace(); } } } s.appendChild(files);
-       */
-
       if (submission.getElementsByTagName("SUBMISSION_SET").item(0) != null) {
         submission.getElementsByTagName("SUBMISSION_SET").item(0).appendChild(s);
       } else {

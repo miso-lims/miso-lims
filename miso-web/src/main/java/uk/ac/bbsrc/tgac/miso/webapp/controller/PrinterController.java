@@ -106,11 +106,4 @@ public class PrinterController {
     }
     return new ModelAndView("/pages/viewPrinters.jsp", model);
   }
-
-  /*
-   * @RequestMapping(value = "/barcode/{printerId}", method = RequestMethod.POST) public String processSubmit(@ModelAttribute("printer")
-   * PrinterReference pr, ModelMap model, SessionStatus session) throws IOException { try { requestManager.savePrinterReference(pr);
-   * session.setComplete(); model.clear(); return "redirect:/miso/admin/configuration/printers"; } catch (IOException ex) { if
-   * (log.isDebugEnabled()) { log.debug("Failed to save Barcode Printer", ex); } throw ex; } }
-   */
 }

@@ -165,15 +165,11 @@ public class SQLRunQCDAO implements RunQcStore {
         if (r != null) runDAO.save(r);
       } else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (r != null) {
-          // Cache pc = cacheManager.getCache("runCache");
-          // pc.remove(DbUtils.hashCodeCacheKeyFor(r.getId()));
           DbUtils.updateCaches(cacheManager, r, Run.class);
         }
       } else if (this.cascadeType.equals(CascadeType.ALL)) {
         if (r != null) {
           runDAO.save(r);
-          // Cache pc = cacheManager.getCache("runCache");
-          // pc.remove(DbUtils.hashCodeCacheKeyFor(r.getId()));
           DbUtils.updateCaches(cacheManager, r, Run.class);
         }
       }
@@ -218,8 +214,6 @@ public class SQLRunQCDAO implements RunQcStore {
         if (r != null) runDAO.save(r);
       } else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (r != null) {
-          // Cache pc = cacheManager.getCache("runCache");
-          // pc.remove(DbUtils.hashCodeCacheKeyFor(r.getId()));
           DbUtils.updateCaches(cacheManager, r, Run.class);
         }
       }

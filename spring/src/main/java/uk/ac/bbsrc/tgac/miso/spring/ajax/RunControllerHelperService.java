@@ -732,124 +732,6 @@ public class RunControllerHelperService {
     return JSONUtils.SimpleJSONError("Cannot add RunQC");
   }
 
-  // TODO - FIX THIS!
-  /*
-   * public JSONObject previewRunImport(HttpSession session, JSONObject json) { StringBuffer sb = new StringBuffer();
-   * 
-   * String runPath = json.getString("runPath"); String platformType = json.getString("platformType"); String experimentId =
-   * json.getString("experimentId");
-   * 
-   * try { User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName()); Experiment
-   * experiment = requestManager.getExperimentById(Long.parseLong(experimentId)); PlatformType rt = PlatformType.get(platformType);
-   * 
-   * if (rt.equals(PlatformType.ILLUMINA)) { //Run run = ((TgacDataObjectFactory)
-   * DataObjectFactory.getDataObjectFactory(DataObjectFactory.TGAC)).getRunOfType(rt, experiment, user); Run run =
-   * dataObjectFactory.getRunOfType(rt, user); run.setPlatformType(rt); //match something like 100216_N73018_0002_desc String regex =
-   * "([\\d]+)_(N[0-9]{5})_([\\d]{4})_(.*)"; Pattern p = Pattern.compile(regex); Matcher m = p.matcher(runPath); // get a matcher object
-   * 
-   * if (m.matches()) { Map<String, String> s = RunInfoUtils.checkIlluminaStatus(runPath); if (s.get("error") == null) { try { StatusImpl
-   * status = new StatusImpl(s.get("ok")); Map<String, String> complete = RunInfoUtils.checkIlluminaCompleted(runPath); if
-   * (complete.get("error") == null) { status.setHealth(HealthType.Completed); }
-   * 
-   * Document statusDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new
-   * StringReader(status.parseStatusFile()))); String runName = statusDoc.getElementsByTagName("RunName").item(0).getTextContent(); String
-   * per = statusDoc.getElementsByTagName("IsPairedEndRun").item(0).getTextContent(); String cyc =
-   * statusDoc.getElementsByTagName("NumCycles").item(0).getTextContent();
-   * 
-   * run.setName(runName); run.setPairedEnd(Boolean.parseBoolean(per)); run.setCycles(Integer.parseInt(cyc));
-   * 
-   * run.setPlatformRunId(Integer.parseInt(m.group(3))); run.setDescription(m.group(4)); run.setFilePath(runPath);
-   * 
-   * run.setStatus(status);
-   * 
-   * boolean stored = false; for (Run r : requestManager.listAllRuns()) { if (r.equals(run)) { stored = true; run.setRunId(r.getRunId()); }
-   * }
-   * 
-   * session.setAttribute("experiment", experiment); session.setAttribute("run", run);
-   * 
-   * StringBuilder b = new StringBuilder(); String health = run.getStatus().getHealth().getKey(); b.append("<div id='runpreview' class='" +
-   * health + "'>");
-   * 
-   * b.append("<h1 class='h_" + health + "'>" + run.getStatus().getHealth().getKey() + "</h1><br/>(" + run.getStatus().getPath() +
-   * ")<br/>"); b.append("Name: <b>" + run.getName() + "</b><br/>"); b.append("Description: <b>" + run.getDescription() + "</b><br/>");
-   * b.append("Paired End: <b>" + run.getPairedEnd() + "</b><br/>"); b.append("Cycles: <b>" + run.getCycles() + "</b><br/><br/>");
-   * 
-   * if (stored) { b.append("<br/>This run has already been added to the system: <a href='/miso/run/" + run.getRunId() + "/experiment/" +
-   * experimentId + "'>" + run.getName() + "</a>"); } else { b.append("<form method='POST'>");
-   * b.append("<input type='hidden' name='experiment' id='experiment' value='" + experimentId + "'");
-   * b.append("<input type='submit' value='Import'/>"); b.append("</form>"); }
-   * 
-   * b.append("</div>"); return JSONUtils.SimpleJSONResponse(b.toString()); } catch (ParserConfigurationException e) { //throw new
-   * MalformedRunException("Could not set up status parser", e); return JSONUtils.SimpleJSONError("Could not set up status parser: " +
-   * e.getMessage()); } catch (SAXException e) { //throw new MalformedRunException("Could not parse status document", e); return
-   * JSONUtils.SimpleJSONError("Could not parse status document: " + e.getMessage()); } catch (StatusException e) { //throw new
-   * MalformedRunException("Could not populate Status object", e); return JSONUtils.SimpleJSONError("Could not populate Status object: " +
-   * e.getMessage()); } } else { //throw new MalformedRunException("Run directory \"" + runPath + "\" could not be found."); return
-   * JSONUtils.SimpleJSONError("Run directory \"" + runPath + "\" could not be found."); } } else { //throw new
-   * MalformedRunException("Run directory \"" + runPath + "\" does not look right."); return JSONUtils.SimpleJSONError("Run directory \"" +
-   * runPath + "\" does not look right."); } } else if (rt.equals(PlatformType.LS454)) { //Run run = ((TgacDataObjectFactory)
-   * DataObjectFactory.getDataObjectFactory(DataObjectFactory.TGAC)).getRunOfType(rt, experiment, user); Run run =
-   * dataObjectFactory.getRunOfType(rt, user); run.setPlatformType(rt); //match something like
-   * R_2009_11_20_08_52_18_FLX02090498_Administrator_JR1JR2JR3JR4 String regex =
-   * "R_(\\d{4}_\\d{2}_\\d{2}_\\d{2}_\\d{2}_\\d{2})_([A-Z0-9]+)_([A-Za-z]+)_(.*)"; Pattern p = Pattern.compile(regex); Matcher m =
-   * p.matcher(runPath); // get a matcher object
-   * 
-   * if (m.matches()) { Map<String, String> s = RunInfoUtils.check454Status(runPath); if (s.get("error") == null) { try { StatusImpl status
-   * = new StatusImpl(s.get("ok")); Map<String, String> complete = RunInfoUtils.check454Completed(runPath); if (complete.get("error") ==
-   * null) { status.setHealth(HealthType.Completed); }
-   * 
-   * Document statusDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new
-   * StringReader(status.parseStatusFile())));
-   * 
-   * //String per = statusDoc.getElementsByTagName("IsPairedEndRun").item(0).getTextContent();
-   * //run.setPairedEnd(Boolean.parseBoolean(per));
-   * 
-   * NodeList nodes = statusDoc.getElementsByTagName("id"); for (int i = 0; i < nodes.getLength(); i++) { Node n = nodes.item(i); if
-   * (n.getParentNode() != null) { if (n.getParentNode().getNodeName().equals("run")) { run.setName(n.getTextContent()); } else if
-   * (n.getParentNode().getNodeName().equals("ptp")) { run.setPlatformRunId(Integer.parseInt(n.getTextContent())); } } }
-   * 
-   * run.setPairedEnd(false);
-   * 
-   * String cyc = statusDoc.getElementsByTagName("numCycles").item(0).getTextContent(); run.setCycles(Integer.parseInt(cyc));
-   * 
-   * String desc = statusDoc.getElementsByTagName("shortName").item(0).getTextContent(); run.setDescription(desc);
-   * 
-   * run.setFilePath(runPath);
-   * 
-   * run.setStatus(status);
-   * 
-   * boolean stored = false; for (Run r : requestManager.listAllRuns()) { if (r.equals(run)) { stored = true; run.setRunId(r.getRunId()); }
-   * }
-   * 
-   * session.setAttribute("experiment", experiment); session.setAttribute("run", run);
-   * 
-   * StringBuilder b = new StringBuilder(); String health = run.getStatus().getHealth().getKey(); b.append("<div id='runpreview' class='" +
-   * health + "'");
-   * 
-   * b.append("<h1 class='h_" + health + "'>" + health + "</h1><br/>(" + run.getStatus().getPath() + ")<br/>"); b.append("Name: <b>" +
-   * run.getName() + "</b><br/>"); b.append("Description: <b>" + run.getDescription() + "</b><br/>"); //b.append("Paired End: <b>" +
-   * run.getPairedEnd() + "</b><br/>"); b.append("Cycles: <b>" + run.getCycles() + "</b><br/><br/>");
-   * 
-   * if (stored) { b.append("<br/>This run has already been added to the system: <a href='/miso/run/" + run.getRunId() + "/experiment/" +
-   * experimentId + "'>" + run.getName() + "</a>"); } else { b.append("<form method='POST'>");
-   * b.append("<input type='hidden' name='experiment' id='experiment' value='" + experimentId + "'");
-   * b.append("<input type='submit' value='Import'/>"); b.append("</form>"); }
-   * 
-   * b.append("</div>"); return JSONUtils.SimpleJSONResponse(b.toString()); } catch (ParserConfigurationException e) { //throw new
-   * MalformedRunException("Could not set up status parser", e); return JSONUtils.SimpleJSONError("Could not set up status parser: " +
-   * e.getMessage()); } catch (SAXException e) { //throw new MalformedRunException("Could not parse status document", e); return
-   * JSONUtils.SimpleJSONError("Could not parse status document: " + e.getMessage()); } catch (StatusException e) { //throw new
-   * MalformedRunException("Could not populate Status object", e); return JSONUtils.SimpleJSONError("Could not populate Status object: " +
-   * e.getMessage()); } } else { //throw new MalformedRunException("Run directory \"" + runPath + "\" could not be found."); return
-   * JSONUtils.SimpleJSONError("Run directory \"" + runPath + "\" could not be found."); } } else { //throw new
-   * MalformedRunException("Run directory \"" + runPath + "\" does not look right."); return JSONUtils.SimpleJSONError("Run directory \"" +
-   * runPath + "\" does not look right."); }
-   * 
-   * } else if (rt.equals(PlatformType.SOLID)) { return JSONUtils.SimpleJSONError("Unsupported import type at present."); } else { return
-   * JSONUtils.SimpleJSONError("Unrecognised run type."); } } catch (IOException e) { e.printStackTrace(); return
-   * JSONUtils.SimpleJSONError("Could not retrieve essential objects for run import."); } }
-   */
-
   private String getPlatformRunOptions(Run run) throws IOException {
     StringBuilder b = new StringBuilder();
     b.append("<span id='containerspan'>Containers: ");
@@ -1019,7 +901,6 @@ public class RunControllerHelperService {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Run run = requestManager.getRunById(runId);
       if (!run.getWatchers().contains(user)) {
-        // run.addWatcher(user);
         watchManager.watch(run, user);
         requestManager.saveRun(run);
       }
@@ -1036,7 +917,6 @@ public class RunControllerHelperService {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Run run = requestManager.getRunById(runId);
       if (run.getWatchers().contains(user)) {
-        // run.removeWatcher(user);
         watchManager.unwatch(run, user);
         requestManager.saveRun(run);
       }
@@ -1081,7 +961,6 @@ public class RunControllerHelperService {
       List<SequencerPartitionContainer> fs = new ArrayList<SequencerPartitionContainer>(r.getSequencerPartitionContainers());
       if (!fs.isEmpty()) {
         SequencerPartitionContainer f = fs.get(container);
-        // if (f.getPlatformType().equals(p.getPlatformType())) {
         if (f.getPlatform().getPlatformType().equals(p.getPlatformType())) {
           return JSONUtils.JSONObjectResponse("html", poolHtml(p, container, partition));
         } else {
@@ -1164,8 +1043,6 @@ public class RunControllerHelperService {
             + partition + "_" + project.getProjectId() + "'>");
         Collection<Study> studies = requestManager.listAllStudiesByProjectId(project.getProjectId());
         if (studies.isEmpty()) {
-          // throw new Exception("No studies available on project " + project.getName() +
-          // ". At least one study must be available for each project associated with this Pool.");
           return JSONUtils.SimpleJSONError("No studies available on project " + project.getName()
               + ". At least one study must be available for each project associated with this Pool.");
         } else {
@@ -1180,7 +1057,6 @@ public class RunControllerHelperService {
         sb.append("</div><br/>");
       }
       sb.append("</div>");
-      // }
 
       return JSONUtils.JSONObjectResponse("html", sb.toString());
     } catch (Exception e) {

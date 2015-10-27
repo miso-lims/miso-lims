@@ -406,17 +406,10 @@ public class LibraryControllerHelperService {
                 sp = s.getSecurityProfile();
                 sample = s;
                 break;
-                /*
-                 * if (sampleNamingScheme.validateField("alias", s.getAlias())) { Pattern pat =
-                 * Pattern.compile(sampleNamingScheme.getValidationRegex("alias")); Matcher mat = pat.matcher(s.getAlias()); //convert the
-                 * sample alias automatically to a library alias int numLibs = requestManager.listAllLibrariesBySampleId(s.getId()).size();
-                 * String la = mat.group(1) + "_" + "L" + mat.group(2) + "-"+(numLibs+1)+"_" + mat.group(3); if
-                 * (libraryNamingScheme.validateField("alias", la)) { libAlias = la; } }
-                 */
               }
             }
 
-            if (sample != null) { // && libAlias != null) {
+            if (sample != null) {
               String descr = j.getString("description");
               String platform = j.getString("platform");
               String type = j.getString("libraryType");
@@ -481,10 +474,6 @@ public class LibraryControllerHelperService {
           }
         }
 
-        /*
-         * Set<Library> complement = LimsUtils.relativeComplementByProperty( Library.class, "getAlias", saveSet, new
-         * HashSet(requestManager.listAllLibrariesByProjectId(json.getLong("projectId"))));
-         */
         List<Library> sortedList = new ArrayList<Library>(saveSet);
         Collections.sort(sortedList, new AliasComparator(Library.class));
         for (Library library : sortedList) {
@@ -605,11 +594,9 @@ public class LibraryControllerHelperService {
         requestManager.saveLibraryQC(newQc);
 
         StringBuilder sb = new StringBuilder();
-        // sb.append("<tr><th>ID</th><th>QCed By</th><th>QC Date</th><th>Method</th><th>Results</th><th>Insert Size</th></tr>");
         sb.append("<tr><th>QCed By</th><th>QC Date</th><th>Method</th><th>Results</th><th>Insert Size</th></tr>");
         for (LibraryQC qc : library.getLibraryQCs()) {
           sb.append("<tr>");
-          // sb.append("<td>"+qc.getQcId()+"</td>");
           sb.append("<td>" + qc.getQcCreator() + "</td>");
           sb.append("<td>" + qc.getQcDate() + "</td>");
           sb.append("<td>" + qc.getQcType().getName() + "</td>");
@@ -639,7 +626,6 @@ public class LibraryControllerHelperService {
         String qcDate = qc.getString("qcDate");
         String insertSize = qc.getString("insertSize");
 
-        // if (qcPassed == null || qcPassed.equals("") ||
         if (qcType == null || qcType.equals("") || results == null || results.equals("") || qcCreator == null || qcCreator.equals("")
             || qcDate == null || qcDate.equals("") || insertSize == null || insertSize.equals("")) {
           ok = false;
@@ -691,14 +677,12 @@ public class LibraryControllerHelperService {
         newDilution.setSecurityProfile(library.getSecurityProfile());
         newDilution.setDilutionCreator(json.getString("dilutionCreator"));
         newDilution.setCreationDate(new SimpleDateFormat("dd/MM/yyyy").parse(json.getString("dilutionDate")));
-        // newDilution.setLocationBarcode(json.getString("locationBarcode"));
         newDilution.setConcentration(Double.parseDouble(json.getString("results")));
         library.addDilution(newDilution);
         requestManager.saveLibraryDilution(newDilution);
 
         StringBuilder sb = new StringBuilder();
         sb.append("<tr>");
-        // sb.append("<th>ID</th><th>Done By</th><th>Date</th><th>Barcode</th><th>Results</th>");
         sb.append("<th>LD Name</th><th>Done By</th><th>Date</th><th>Results</th><th>ID barcode</th>");
         if (!library.getPlatformName().equals("Illumina")) {
           sb.append("<th>Add emPCR</th>");
@@ -732,7 +716,6 @@ public class LibraryControllerHelperService {
           if (!library.getPlatformName().equals("Illumina")) {
             sb.append("<td><a href='javascript:void(0);' onclick='Library.empcr.insertEmPcrRow(" + dil.getId() + ");'>Add emPCR</a></td>");
           } else {
-            // sb.append("<td><a href='/miso/poolwizard/new/"+library.getPlatformName().toLowerCase()+"/new/'>Construct New Pool</a></td>");
             sb.append("<td><a href='/miso/poolwizard/new/" + library.getSample().getProject().getProjectId()
                 + "'>Construct New Pool</a></td>");
           }
@@ -891,7 +874,6 @@ public class LibraryControllerHelperService {
 
         StringBuilder sb = new StringBuilder();
         sb.append("<tr>");
-        // sb.append("<th>ID</th><th>Done By</th><th>Date</th><th>Barcode</th><th>Results</th>");
         sb.append("<th>ID</th><th>Done By</th><th>Date</th><th>Results</th><th>ID Barcode</th>");
         sb.append("</tr>");
 
@@ -919,7 +901,6 @@ public class LibraryControllerHelperService {
           }
           sb.append("</td>");
 
-          // sb.append("<td><a href='/miso/pool/"+pcr.getLibraryDilution().getLibrary().getPlatformName().toLowerCase()+"/new/'>Construct New Pool</a></td>");
           sb.append("<td><a href='/miso/poolwizard/new/" + pcr.getLibraryDilution().getLibrary().getSample().getProject().getProjectId()
               + "'>Construct New Pool</a></td>");
           sb.append("</tr>");

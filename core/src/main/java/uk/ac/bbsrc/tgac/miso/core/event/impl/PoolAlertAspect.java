@@ -71,11 +71,6 @@ public class PoolAlertAspect {
     }
   }
 
-  /*
-   * public void update(Long poolId) { try { log.info("Update with poolId: " + poolId); poolAlertManager.update(poolId); } catch
-   * (IOException e) { e.printStackTrace(); } }
-   */
-
   public void update(Pool pool) {
     try {
       poolAlertManager.update(pool.getId());

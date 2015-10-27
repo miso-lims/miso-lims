@@ -299,67 +299,29 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
     params.addValue("locationBarcode", sequencerPartitionContainer.getLocationBarcode());
     params.addValue("validationBarcode", sequencerPartitionContainer.getValidationBarcode());
 
-    // if (sequencerPartitionContainer.getPlatformType() != null) {
-    // params.addValue("platformType", sequencerPartitionContainer.getPlatformType().getKey());
-    // }
-
     if (sequencerPartitionContainer.getPlatform() != null) {
       params.addValue("platform", sequencerPartitionContainer.getPlatform().getPlatformId());
     }
 
     if (sequencerPartitionContainer.getId() == AbstractSequencerPartitionContainer.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("containerId");
-      // try {
       sequencerPartitionContainer.setId(DbUtils.getAutoIncrement(template, TABLE_NAME));
-
-      /*
-       * String name = namingScheme.generateNameFor("name", sequencerPartitionContainer); sequencerPartitionContainer.setName(name);
-       * 
-       * if (namingScheme.validateField("name", sequencerPartitionContainer.getName())) { params.addValue("name", name);
-       * 
-       * Number newId = insert.executeAndReturnKey(params); if (newId.longValue() != sequencerPartitionContainer.getId()) {
-       * log.error("Expected SequencerPartitionContainer ID doesn't match returned value from database insert: rolling back..."); new
-       * NamedParameterJdbcTemplate(template).update(SEQUENCER_PARTITION_CONTAINER_DELETE, new
-       * MapSqlParameterSource().addValue("containerId", newId.longValue())); throw new
-       * IOException("Something bad happened. Expected SequencerPartitionContainer ID doesn't match returned value from DB insert"); } }
-       * else { throw new IOException("Cannot save SequencerPartitionContainer - invalid field:" + sequencerPartitionContainer.toString());
-       * }
-       * 
-       * } catch (MisoNamingException e) { throw new IOException("Cannot save SequencerPartitionContainer - issue with naming scheme", e); }
-       */
       Number newId = insert.executeAndReturnKey(params);
       sequencerPartitionContainer.setId(newId.longValue());
     } else {
-      /*
-       * try { if (namingScheme.validateField("name", sequencerPartitionContainer.getName())) { params.addValue("containerId",
-       * sequencerPartitionContainer.getId()) .addValue("name", sequencerPartitionContainer.getName()); NamedParameterJdbcTemplate
-       * namedTemplate = new NamedParameterJdbcTemplate(template); namedTemplate.update(SEQUENCER_PARTITION_CONTAINER_UPDATE, params); }
-       * else { throw new IOException("Cannot save SequencerPartitionContainer - invalid field:" + sequencerPartitionContainer.toString());
-       * } } catch (MisoNamingException e) { throw new IOException("Cannot save SequencerPartitionContainer - issue with naming scheme", e);
-       * }
-       */
 
       params.addValue("containerId", sequencerPartitionContainer.getId());
       NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
       namedTemplate.update(SEQUENCER_PARTITION_CONTAINER_UPDATE, params);
     }
 
-    // MapSqlParameterSource delparams = new MapSqlParameterSource();
-    // delparams.addValue("container_containerId", sequencerPartitionContainer.getContainerId());
-    // NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-    // namedTemplate.update(SEQUENCER_PARTITION_CONTAINER_PARTITION_DELETE_BY_SEQUENCER_PARTITION_CONTAINER_ID, delparams);
-
     if (sequencerPartitionContainer.getPartitions() != null && !sequencerPartitionContainer.getPartitions().isEmpty()) {
-      // log.info(sequencerPartitionContainer.getName()+":: Saving " + sequencerPartitionContainer.getPartitions().size() +
-      // " partitions...");
 
       SimpleJdbcInsert eInsert = new SimpleJdbcInsert(template).withTableName("SequencerPartitionContainer_Partition");
 
       for (SequencerPoolPartition l : sequencerPartitionContainer.getPartitions()) {
         l.setSecurityProfile(sequencerPartitionContainer.getSecurityProfile());
         long partitionId = partitionDAO.save(l);
-
-        // log.info(sequencerPartitionContainer.getName()+":: Saved partition " + l.getPartitionNumber() + " ("+partitionId+")");
 
         MapSqlParameterSource flParams = new MapSqlParameterSource();
         flParams.addValue("container_containerId", sequencerPartitionContainer.getId()).addValue("partitions_partitionId", partitionId);
@@ -377,43 +339,6 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
 
     return sequencerPartitionContainer.getId();
   }
-
-  /*
-   * public class SequencerPartitionContainerMapper<T extends SequencerPartitionContainer<SequencerPoolPartition>> extends
-   * CacheAwareRowMapper<T> { public SequencerPartitionContainerMapper() { super((Class<T>)((ParameterizedType)new
-   * TypeReference<T>(){}.getType()).getRawType());
-   * 
-   * }
-   * 
-   * public SequencerPartitionContainerMapper(boolean lazy) { super((Class<T>)((ParameterizedType)new
-   * TypeReference<T>(){}.getType()).getRawType(), lazy);
-   * 
-   * }
-   * 
-   * @Override public T mapRow(ResultSet rs, int rowNum) throws SQLException { long id = rs.getLong("containerId");
-   * 
-   * if (isCacheEnabled() && lookupCache(cacheManager) != null) { Element element; if ((element =
-   * lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
-   * log.debug("Cache hit on map for SequencerPartitionContainer " + id); return (T)element.getObjectValue(); } }
-   * 
-   * SequencerPartitionContainer<SequencerPoolPartition> s = null; try { s = dataObjectFactory.getSequencerPartitionContainer();
-   * s.setId(id); List<SequencerPoolPartition> partitions = new
-   * ArrayList<SequencerPoolPartition>(partitionDAO.listBySequencerPartitionContainerId(id)); for (SequencerPoolPartition part : partitions)
-   * { part.setSequencerPartitionContainer(s); } s.setPartitions(partitions);
-   * 
-   * if ((rs.getString("platformType") == null || "".equals(rs.getString("platformType"))) && s.getRun() != null) {
-   * s.setPlatformType(s.getRun().getPlatformType()); } else { s.setPlatformType(PlatformType.get(rs.getString("platformType"))); }
-   * 
-   * s.setIdentificationBarcode(rs.getString("identificationBarcode")); s.setLocationBarcode(rs.getString("locationBarcode"));
-   * s.setValidationBarcode(rs.getString("validationBarcode"));
-   * s.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId"))); } catch (IOException e1) { e1.printStackTrace();
-   * }
-   * 
-   * if (isCacheEnabled() && lookupCache(cacheManager) != null) { lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id)
-   * ,s)); }
-   * 
-   * return (T)s; } }
-   */
 
   public class SequencerPartitionContainerMapper extends CacheAwareRowMapper<SequencerPartitionContainer<SequencerPoolPartition>> {
     public SequencerPartitionContainerMapper() {
@@ -451,21 +376,9 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
         }
         s.setPartitions(partitions);
 
-        // if ((rs.getString("platformType") == null || "".equals(rs.getString("platformType"))) && s.getRun() != null) {
-        // s.setPlatformType(s.getRun().getPlatformType());
-        // }
-        // else {
-        // s.setPlatformType(PlatformType.get(rs.getString("platformType")));
-        // }
-
-        // if () {
-        // s.setPlatform(s.getRun().getSequencerReference().getPlatform());
-        // }
-        // else {
         if (rs.getLong("platform") != 0) {
           s.setPlatform(platformDAO.get(rs.getLong("platform")));
         }
-        // }
 
         s.setIdentificationBarcode(rs.getString("identificationBarcode"));
         s.setLocationBarcode(rs.getString("locationBarcode"));

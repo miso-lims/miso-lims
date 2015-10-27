@@ -136,18 +136,13 @@ public class ReportsController {
 
   @RequestMapping(value = "/projects", method = RequestMethod.GET)
   public void fireGetProjectsReport(ModelMap modelMap, HttpServletResponse response) {
-    // User user = null;
     String format = PDF;
     try {
-      // user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       try {
         if (format.equals(PDF)) {
           ByteArrayOutputStream baos = new ByteArrayOutputStream();
           List<Project> projects = new ArrayList<Project>(requestManager.listAllProjects());
           Document document = new Document();
-          // for (Project project : projects) {
-          // new ITextProjectDecorator(project, document, baos).buildReport();
-          // }
           new ITextProjectDecorator(projects, document, baos).buildReport();
           response.setHeader("Expires", "0");
           response.setHeader("Cache-Control", "must-revalidate, post-check=0, pre-check=0");

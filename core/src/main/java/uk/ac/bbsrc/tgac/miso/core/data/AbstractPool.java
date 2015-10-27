@@ -300,7 +300,6 @@ public abstract class AbstractPool<P extends Poolable> implements Pool<P> {
 
   protected void firePoolReadyEvent() {
     if (this.getId() != 0L) {
-      // PoolEvent pe = new PoolEvent(this, MisoEventType.POOL_READY, "Pool "+getName()+" ("+getAlias()+") ready to run");
       PoolEvent pe = new PoolEvent(this, MisoEventType.POOL_READY, "Pool " + getName() + " ready to run");
       for (MisoListener listener : getListeners()) {
         listener.stateChanged(pe);
@@ -333,13 +332,6 @@ public abstract class AbstractPool<P extends Poolable> implements Pool<P> {
     return getName();
   }
 
-  /*
-   * public static String lookupPrefix(PlatformType type) { if (type.equals(PlatformType.ILLUMINA)) { return "IPO"; } else if
-   * (type.equals(PlatformType.SOLID)) { return "SPO"; } else if (type.equals(PlatformType.LS454)) { return "LPO"; } else if
-   * (type.equals(PlatformType.PACBIO)) { return "PPO"; } else if (type.equals(PlatformType.IONTORRENT)) { return "TPO"; } //must be a
-   * universal Pool return "UPO"; }
-   */
-
   public boolean isDeletable() {
     return getId() != AbstractPool.UNSAVED_ID && getPoolableElements().isEmpty();
   }
@@ -368,8 +360,6 @@ public abstract class AbstractPool<P extends Poolable> implements Pool<P> {
       int hashcode = -1;
       if (getPlatformType() != null) hashcode = PRIME * hashcode + getPlatformType().hashCode();
       if (getCreationDate() != null) hashcode = PRIME * hashcode + getCreationDate().hashCode();
-      // if (getIdentificationBarcode() != null) hashcode = PRIME * hashcode + getIdentificationBarcode().hashCode();
-      // if (getDilutions() != null && !getDilutions().isEmpty()) hashcode = PRIME * hashcode + getDilutions().hashCode();
       return hashcode;
     }
   }

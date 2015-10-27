@@ -70,41 +70,6 @@ public class PacBioTransformer implements FileSetTransformer<String, String, Fil
     return transform(message.getPayload());
   }
 
-  /*
-   * 
-   * <?xml version="1.0" encoding="utf-8"?> <Metadata xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   * xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://pacificbiosciences.com/PAP/Metadata.xsd">
-   * <InstCtrlVer>1.3.0.0.103161</InstCtrlVer> <SigProcVer>NRT@172.31.128.10:8082, SwVer=1300.103161, HwVer=1.0</SigProcVer> <Run>
-   * <RunId>r000056_42165_120321</RunId> <Name>2012_03_21_Streptomyces_10kb_C2</Name> <WhenCreated>2012-03-21T13:09:38</WhenCreated>
-   * <WhenStarted>2012-03-21T06:46:09</WhenStarted> </Run> <Movie> <WhenStarted>2012-03-21T10:54:25.802952+00:00</WhenStarted>
-   * <DurationInSec>5400</DurationInSec> <Number>0</Number> </Movie> <Sample> <Name>S.bottropensis_10kb_C2</Name>
-   * <PlateId>2012_03_21_Streptomyces_10kb_C2</PlateId> <WellName>A04</WellName> <Concentration>0</Concentration>
-   * <SampleReuseEnabled>false</SampleReuseEnabled> <UseCount>1</UseCount> </Sample> <InstrumentId>1</InstrumentId>
-   * <InstrumentName>42165</InstrumentName> <CollectionProtocol>Standard Seq v2</CollectionProtocol> <CollectionNumber>2</CollectionNumber>
-   * <CellIndex>1</CellIndex> <SetNumber>1</SetNumber> <EightPac> <PartNumber>0015</PartNumber> <LotNumber>230088</LotNumber>
-   * <Barcode>10030156255000000152300880723124</Barcode> <ExpirationDate>2012-07-23</ExpirationDate> </EightPac> <TemplatePrep> <Name>DNA
-   * Template Prep Kit 2.0 (3Kb - 10Kb)</Name> <PartNumber>001540835</PartNumber> <LotNumber>110170</LotNumber>
-   * <Barcode>110170001540835072512</Barcode> <ExpirationDate>2012-07-25</ExpirationDate>
-   * <AdapterSequence>ATCTCTCTCttttcctcctcctccgttgttgttgttGAGAGAGAT</AdapterSequence> <InsertSize>10000</InsertSize> </TemplatePrep>
-   * <BindingKit> <Name>DNA/Polymerase Binding Kit 2.0 (24 Rxn)</Name> <PartNumber>001672551</PartNumber> <LotNumber>120126</LotNumber>
-   * <Barcode>120126001672551071712</Barcode> <ExpirationDate>2012-07-17</ExpirationDate> <Control>Strobe_v1</Control>
-   * <IsControlUsed>false</IsControlUsed> </BindingKit> <SequencingKit> <Name>ReagentPlate0</Name> <PartNumber>001558034</PartNumber>
-   * <LotNumber>111220</LotNumber> <Barcode>111220574001558034072012</Barcode> <ExpirationDate>2012-07-20</ExpirationDate>
-   * <Protocol>C2ReagentMixingProtocol_DWP</Protocol> </SequencingKit> <ReagentTube0> <Name>ReagentTube0-0</Name>
-   * <PartNumber>001028310</PartNumber> <LotNumber>111219</LotNumber> <Barcode>111219871001028310120112</Barcode>
-   * <ExpirationDate>2012-12-01</ExpirationDate> </ReagentTube0> <Primary> <Protocol>BasecallerV1</Protocol>
-   * <ConfigFileName>1-3-0_Standard_C2.xml</ConfigFileName> <ResultsFolder>Analysis_Results</ResultsFolder>
-   * <CollectionPathUri>rsy://pacbio-1/sequencer_output/2012_03_21_Streptomyces_10kb_C2_56/A04_2/</CollectionPathUri>
-   * <CollectionFileCopy>Fasta</CollectionFileCopy> <CollectionFileCopy>Fastq</CollectionFileCopy> </Primary> <Secondary> <ProtocolName />
-   * <CellCountInJob>0</CellCountInJob> </Secondary> <Custom> <KeyValue
-   * key="svc:/CentralDataSvc/#Display.Sample_Metadata.User_Defined_Field_1" /> <KeyValue
-   * key="svc:/CentralDataSvc/#Display.Sample_Metadata.User_Defined_Field_2" /> <KeyValue
-   * key="svc:/CentralDataSvc/#Display.Sample_Metadata.User_Defined_Field_3" /> <KeyValue
-   * key="svc:/CentralDataSvc/#Display.Sample_Metadata.User_Defined_Field_4" /> <KeyValue
-   * key="svc:/CentralDataSvc/#Display.Sample_Metadata.User_Defined_Field_5" /> <KeyValue
-   * key="svc:/CentralDataSvc/#Display.Sample_Metadata.User_Defined_Field_6" /> </Custom> </Metadata>
-   */
-
   public Map<String, String> transform(Set<File> files) {
     log.info("Processing " + files.size() + " PacBio run directories...");
 

@@ -192,7 +192,7 @@ public class SQLStudyDAO implements StudyStore {
       @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public long save(Study study) throws IOException {
     Long securityProfileId = study.getSecurityProfile().getProfileId();
-    if (this.cascadeType != null) {// && this.cascadeType.equals(CascadeType.PERSIST)) {
+    if (this.cascadeType != null) {
       securityProfileId = securityProfileDAO.save(study.getSecurityProfile());
     }
 
@@ -225,10 +225,6 @@ public class SQLStudyDAO implements StudyStore {
       } catch (MisoNamingException e) {
         throw new IOException("Cannot save Study - issue with naming scheme", e);
       }
-      /*
-       * String name = "STU"+ DbUtils.getAutoIncrement(template, TABLE_NAME); params.addValue("name", name); Number newId =
-       * insert.executeAndReturnKey(params); study.setStudyId(newId.longValue()); study.setName(name);
-       */
 
       Project p = study.getProject();
 
@@ -253,10 +249,6 @@ public class SQLStudyDAO implements StudyStore {
       } catch (MisoNamingException e) {
         throw new IOException("Cannot save Study - issue with naming scheme", e);
       }
-      /*
-       * params.addValue("studyId", study.getStudyId()) .addValue("name", study.getName()); NamedParameterJdbcTemplate namedTemplate = new
-       * NamedParameterJdbcTemplate(template); namedTemplate.update(STUDY_UPDATE, params);
-       */
     }
 
     if (this.cascadeType != null) {
@@ -265,8 +257,6 @@ public class SQLStudyDAO implements StudyStore {
         if (p != null) projectDAO.save(p);
       } else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (p != null) {
-          // Cache pc = cacheManager.getCache("projectCache");
-          // pc.remove(DbUtils.hashCodeCacheKeyFor(p.getProjectId()));
           DbUtils.updateCaches(cacheManager, p, Project.class);
         }
       }
@@ -308,8 +298,6 @@ public class SQLStudyDAO implements StudyStore {
         if (p != null) projectDAO.save(p);
       } else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (p != null) {
-          // Cache pc = cacheManager.getCache("projectCache");
-          // pc.remove(DbUtils.hashCodeCacheKeyFor(p.getProjectId()));
           DbUtils.updateCaches(cacheManager, p, Project.class);
         }
       }

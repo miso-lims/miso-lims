@@ -91,11 +91,6 @@ public class SQLWatcherDAO implements WatcherStore {
     return template.query(WATCHERS_SELECT_BY_ENTITY_NAME, new Object[] { entityName }, new WatcherMapper());
   }
 
-  // @Override
-  // public Collection<Watchable> getWatchedEntitiesByUserId(Long userId) throws IOException {
-  // return template.query(WATCHED_ENTITIES_BY_USER, new Object[]{userId}, new WatchedEntityMapper());
-  // }
-
   public boolean removeWatchedEntity(Watchable watchable) throws IOException {
     MapSqlParameterSource eParams = new MapSqlParameterSource();
     eParams.addValue("entityName", watchable.getWatchableIdentifier());

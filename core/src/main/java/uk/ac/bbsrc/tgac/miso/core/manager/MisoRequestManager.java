@@ -1075,12 +1075,6 @@ public class MisoRequestManager implements RequestManager {
     }
   }
 
-  /*
-   * public Collection<KitType> listAllKitTypes() throws IOException { if (kitStore != null) { return ((KitStore)
-   * kitStore).listAllKitTypes(); } else { throw new
-   * IOException("No kitStore available. Check that it has been declared in the Spring config."); } }
-   */
-
   @Override
   public Collection<KitDescriptor> listAllKitDescriptors() throws IOException {
     if (kitStore != null) {
@@ -2309,8 +2303,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  // public <T extends List<S>, S extends Plateable> Plate<T, S> getPlateById(long plateId) throws IOException {
-  // public <T extends List<S>, S extends Plateable> Plate<T, S> getPlateById(long plateId) throws IOException {
   public Plate<? extends List<? extends Plateable>, ? extends Plateable> getPlateById(long plateId) throws IOException {
     if (plateStore != null) {
       return plateStore.get(plateId);
@@ -2327,16 +2319,6 @@ public class MisoRequestManager implements RequestManager {
       throw new IOException("No plateStore available. Check that it has been declared in the Spring config.");
     }
   }
-
-  /*
-   * @Override public <T extends List<S>, S extends Plateable> Plate<T, S> getPlateById(long plateId) throws IOException { if (plateStore !=
-   * null) { return plateStore.get(plateId); } else { throw new
-   * IOException("No plateStore available. Check that it has been declared in the Spring config."); } }
-   * 
-   * @Override public <T extends List<S>, S extends Plateable> Plate<T, S> getPlateByBarcode(String barcode) throws IOException { if
-   * (plateStore != null) { return plateStore.getPlateByIdentificationBarcode(barcode); } else { throw new
-   * IOException("No plateStore available. Check that it has been declared in the Spring config."); } }
-   */
 
   @Override
   public Alert getAlertById(long alertId) throws IOException {

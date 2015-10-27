@@ -145,11 +145,6 @@ public class SQLSequencerReferenceDAO implements SequencerReferenceStore {
     return e;
   }
 
-  /*
-   * public SequencerReference getByExperimentId(long experimentId) throws IOException { List eResults =
-   * template.query(SEQUENCER_REFERENCE_SELECT_BY_RELATED_EXPERIMENT, new Object[]{experimentId}, new SequencerReferenceMapper());
-   * SequencerReference e = eResults.size() > 0 ? (SequencerReference) eResults.get(0) : null; return e; }
-   */
   public Collection<SequencerReference> listAll() throws IOException {
     return template.query(SEQUENCER_REFERENCE_SELECT, new SequencerReferenceMapper());
   }

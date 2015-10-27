@@ -24,8 +24,6 @@
 package uk.ac.bbsrc.tgac.miso.hibernatestore;
 
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
-//import org.hibernate.HibernateException;
-//import org.hibernate.Session;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.transaction.annotation.Transactional;
@@ -66,10 +64,6 @@ public class HibernateExperimentStore extends HibernateDaoSupport implements Sto
   @Transactional(readOnly = true)
   @SuppressWarnings("unchecked")
   public Collection<Experiment> listAll() throws IOException {
-    /*
-     * return (Collection<Experiment>) getHibernateTemplate().execute( new HibernateCallback() { public Object doInHibernate(Session
-     * session) throws HibernateException { return session.createQuery("from AbstractExperiment").list(); } });
-     */
     return null;
   }
 

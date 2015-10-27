@@ -191,14 +191,6 @@ public class CacheHelperService {
 
   @Deprecated
   public JSONObject reindexAlertManagers(HttpSession session, JSONObject json) {
-    /*
-     * try { log.info("Alert managers reindexing..."); if (projectAlertManager != null) projectAlertManager.indexify(); if (runAlertManager
-     * != null) runAlertManager.indexify(); if (poolAlertManager != null) poolAlertManager.indexify(); } catch (IOException e) {
-     * e.printStackTrace(); return JSONUtils.JSONObjectResponse("html", jQueryDialogFactory.okDialog("Cache Administration",
-     * "Unable to reindex alert managers: " + e.getMessage())); }
-     * 
-     * return JSONUtils.JSONObjectResponse("html", jQueryDialogFactory.okDialog("Cache Administration", "Alert Managers reindexing!"));
-     */
     return JSONUtils.JSONObjectResponse("html",
         jQueryDialogFactory.okDialog("Cache Administration", "Deprecated function. Not reindexing."));
   }

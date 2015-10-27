@@ -98,9 +98,8 @@ public class SQLTgacSubmissionDAO implements Store<Submission>, NamingSchemeAwar
       + "LEFT JOIN Submission_Partition_Dilution AS ssla ON s.submissionId = ssla.submission_submissionId "
       + "WHERE s.submissionId=:submissionId";
 
-  public static final String SUBMISSION_DILUTION_SELECT = "SELECT dilution_dilutionId " + "FROM Submission_Partition_Dilution " +
-  // "WHERE submission_submissionId = :submissionId AND partition_partitionId = :partitionId";
-      "WHERE submission_submissionId = ? AND partition_partitionId = ?";
+  public static final String SUBMISSION_DILUTION_SELECT = "SELECT dilution_dilutionId " + "FROM Submission_Partition_Dilution "
+      + "WHERE submission_submissionId = ? AND partition_partitionId = ?";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLTgacSubmissionDAO.class);
 
@@ -193,10 +192,6 @@ public class SQLTgacSubmissionDAO implements Store<Submission>, NamingSchemeAwar
       } catch (MisoNamingException e) {
         throw new IOException("Cannot save Submission - issue with naming scheme", e);
       }
-      /*
-       * params.addValue("submissionId", submission.getSubmissionId()) .addValue("name", submission.getName());
-       * namedTemplate.update(SUBMISSION_UPDATE, params);
-       */
     } else {
       insert.usingGeneratedKeyColumns("submissionId");
       try {
@@ -221,11 +216,6 @@ public class SQLTgacSubmissionDAO implements Store<Submission>, NamingSchemeAwar
       } catch (MisoNamingException e) {
         throw new IOException("Cannot save Submission - issue with naming scheme", e);
       }
-      /*
-       * String name = "SUB" + DbUtils.getAutoIncrement(template, TABLE_NAME); params.addValue("creationDate", new Date());
-       * params.addValue("name", name); Number newId = insert.executeAndReturnKey(params); submission.setSubmissionId(newId.longValue());
-       * submission.setName(name);
-       */
     }
 
     if (submission.getSubmissionElements() != null) {

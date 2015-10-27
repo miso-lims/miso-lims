@@ -291,7 +291,6 @@ public class SQLKitDAO implements KitStore {
   }
 
   public long saveKitDescriptor(KitDescriptor kd) throws IOException {
-    // log.info("Saving " + kd.toString() + " : " + kd.getKitType() + " : " + kd.getPlatformType());
     MapSqlParameterSource params = new MapSqlParameterSource();
 
     params.addValue("name", kd.getName()).addValue("version", kd.getVersion()).addValue("manufacturer", kd.getManufacturer())
@@ -320,14 +319,9 @@ public class SQLKitDAO implements KitStore {
       kd.setManufacturer(rs.getString("manufacturer"));
       kd.setPartNumber(rs.getString("partNumber"));
       kd.setStockLevel(rs.getInt("stockLevel"));
-
       kd.setKitType(KitType.get(rs.getString("kitType")));
-
-      // log.info("Set kit type for descriptor " + kd.getKitDescriptorId() + " to " + kd.getKitType());
-
       kd.setPlatformType(PlatformType.get(rs.getString("platformType")));
 
-      // log.info("Set platform type for descriptor " + kd.getKitDescriptorId() + " to " + kd.getPlatformType());
       return kd;
     }
   }
