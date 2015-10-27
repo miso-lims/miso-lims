@@ -61,14 +61,13 @@ import java.util.List;
  * uk.ac.bbsrc.tgac.miso.sqlstore
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public class SQLEmPCRDilutionDAO implements EmPCRDilutionStore {
-  public static String DILUTION_SELECT_BY_ID_AND_LIBRARY_PLATFORM = "SELECT DISTINCT * " + "FROM Library l " +
-      // "INNER JOIN LibraryDilution ld ON ld.library_libraryId = l.libraryId " +
-      "INNER JOIN emPCRDilution ed ON ed.library_libraryId = l.libraryId " + "WHERE ld.dilutionId = ? OR ed.dilutionId = ? "
+  public static String DILUTION_SELECT_BY_ID_AND_LIBRARY_PLATFORM = "SELECT DISTINCT * " + "FROM Library l "
+      + "INNER JOIN emPCRDilution ed ON ed.library_libraryId = l.libraryId " + "WHERE ld.dilutionId = ? OR ed.dilutionId = ? "
       + "AND l.platformName = ?";
 
   public static String EMPCR_DILUTION_SELECT = "SELECT dilutionId, name, concentration, emPCR_pcrId, identificationBarcode, creationDate, dilutionUserName, securityProfile_profileId "
@@ -112,9 +111,8 @@ public class SQLEmPCRDilutionDAO implements EmPCRDilutionStore {
 
   public static final String EMPCR_DILUTION_SELECT_BY_SEARCH = "SELECT ed.dilutionId, ed.name, ed.concentration, ed.emPCR_pcrId, ed.identificationBarcode, ed.creationDate, ed.dilutionUserName, ed.securityProfile_profileId, e.dilution_dilutionId "
       + "FROM emPCRDilution ed, emPCR e, LibraryDilution ld " + "WHERE ed.emPCR_pcrId = e.pcrId "
-      + "AND ld.dilutionId = e.dilution_dilutionId " +
-      // "AND l.platformName = :platformName " +
-      "AND (ed.name LIKE :search OR ld.name LIKE :search OR ed.identificationBarcode LIKE :search)";
+      + "AND ld.dilutionId = e.dilution_dilutionId "
+      + "AND (ed.name LIKE :search OR ld.name LIKE :search OR ed.identificationBarcode LIKE :search)";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLEmPCRDilutionDAO.class);
 
@@ -212,7 +210,6 @@ public class SQLEmPCRDilutionDAO implements EmPCRDilutionStore {
     String squery = "%" + query + "%";
     MapSqlParameterSource params = new MapSqlParameterSource();
     params.addValue("search", squery);
-    // .addValue("platformName", platformType.getKey());
 
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
     return namedTemplate.query(EMPCR_DILUTION_SELECT_BY_SEARCH, params, new EmPCRDilutionMapper(true));
@@ -307,11 +304,6 @@ public class SQLEmPCRDilutionDAO implements EmPCRDilutionStore {
       } catch (MisoNamingException e) {
         throw new IOException("Cannot save emPCRDilution - issue with naming scheme", e);
       }
-      /*
-       * String name = "EDI"+DbUtils.getAutoIncrement(template, "emPCRDilution"); params.addValue("name", name);
-       * params.addValue("identificationBarcode", name + "::" + dilution.getEmPCR().getName()); Number newId =
-       * insert.executeAndReturnKey(params); dilution.setDilutionId(newId.longValue()); dilution.setName(name);
-       */
     } else {
       try {
         if (namingScheme.validateField("name", dilution.getName())) {
@@ -325,11 +317,6 @@ public class SQLEmPCRDilutionDAO implements EmPCRDilutionStore {
       } catch (MisoNamingException e) {
         throw new IOException("Cannot save emPCRDilution - issue with naming scheme", e);
       }
-      /*
-       * params.addValue("dilutionId", dilution.getDilutionId()) .addValue("name", dilution.getName()) .addValue("identificationBarcode",
-       * dilution.getName() + "::" + dilution.getEmPCR().getName()); NamedParameterJdbcTemplate namedTemplate = new
-       * NamedParameterJdbcTemplate(template); namedTemplate.update(EMPCR_DILUTION_UPDATE, params);
-       */
     }
 
     if (this.cascadeType != null) {
@@ -338,8 +325,6 @@ public class SQLEmPCRDilutionDAO implements EmPCRDilutionStore {
         if (e != null) emPcrDAO.save(e);
       } else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (e != null) {
-          // Cache pc = cacheManager.getCache("emPCRCache");
-          // pc.remove(DbUtils.hashCodeCacheKeyFor(e.getId()));
           DbUtils.updateCaches(cacheManager, e, emPCR.class);
         }
       }
@@ -367,8 +352,6 @@ public class SQLEmPCRDilutionDAO implements EmPCRDilutionStore {
         if (e != null) emPcrDAO.save(e);
       } else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (e != null) {
-          // Cache pc = cacheManager.getCache("emPCRCache");
-          // pc.remove(DbUtils.hashCodeCacheKeyFor(e.getId()));
           DbUtils.updateCaches(cacheManager, e, emPCR.class);
         }
       }
@@ -405,8 +388,6 @@ public class SQLEmPCRDilutionDAO implements EmPCRDilutionStore {
       pcrDilution.setIdentificationBarcode(rs.getString("identificationBarcode"));
       pcrDilution.setCreationDate(rs.getDate("creationDate"));
       pcrDilution.setDilutionCreator(rs.getString("dilutionUserName"));
-
-      // pcrDilution.setLastUpdated(rs.getTimestamp("lastUpdated"));
 
       try {
         pcrDilution.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));

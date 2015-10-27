@@ -26,7 +26,6 @@ package uk.ac.bbsrc.tgac.miso.sqlstore;
 import com.eaglegenomics.simlims.core.User;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
 import org.junit.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,11 +111,6 @@ public class LimsDAO extends LimsDAOTestCase {
       int actualE = getLibraryDilutionDAO().count();
       Assert.assertEquals("Wrong number of dilutions", expected, (actualL + actualE));
       System.out.println("Expected number of dilutions: " + expected + ", actual: " + (actualL + actualE));
-
-      // for (Dilution d : random(getDilutionDAO(), actual, 5)) {
-      // TestCase.assertNotNull(d);
-      // TestCase.assertNotNull(d.getDilutionId());
-      // }
 
       ((MockSQLSecurityDAO) getSecurityDAO()).clearCaches();
     } catch (Exception e) {
@@ -527,19 +521,4 @@ public class LimsDAO extends LimsDAOTestCase {
       Assert.fail();
     }
   }
-
-  /*
-   * @Test public void testSubmissions() { try { // get row count of experiments in the dataset int expected =
-   * getDataSet().getTable("Submission").getRowCount();
-   * 
-   * // get number of experiments from the DAO int actual = getSubmissionDAO().count();
-   * 
-   * // test data contains 2 experiments, check size of returned list TestCase.assertEquals("Wrong number of submissions", expected,
-   * actual);
-   * 
-   * System.out.println( "Expected number of submissions: " + expected + ", actual: " + actual);
-   * 
-   * for (Submission d : random(getSubmissionDAO(), actual, 1)) { TestCase.assertNotNull(d); TestCase.assertNotNull(d.getId()); } } catch
-   * (Exception e) { e.printStackTrace(); TestCase.fail(); } }
-   */
 }

@@ -135,7 +135,6 @@ public class EditRunController {
 
   public Boolean isMultiplexed(Run run) throws IOException {
     if (run != null && run.getId() != AbstractRun.UNSAVED_ID) {
-      // for (SequencerPartitionContainer<SequencerPoolPartition> f : requestManager.listSequencerPartitionContainersByRunId(run.getId())) {
       for (SequencerPartitionContainer<SequencerPoolPartition> f : run.getSequencerPartitionContainers()) {
         for (SequencerPoolPartition p : f.getPartitions()) {
           if (p.getPool() != null && p.getPool().getDilutions().size() > 1) {
@@ -209,26 +208,6 @@ public class EditRunController {
     return setupForm(AbstractRun.UNSAVED_ID, model);
   }
 
-  /*
-   * @RequestMapping(value = "/new/experiment/{experimentId}", method = RequestMethod.GET) public ModelAndView newAssignedRun(@PathVariable
-   * Long experimentId, ModelMap model) throws IOException { //clear any existing run in the model model.addAttribute("run", null); return
-   * setupForm(AbstractRun.UNSAVED_ID, experimentId, model); }
-   */
-
-  /*
-   * @RequestMapping(value = "/{runId}", method = RequestMethod.GET) public ModelAndView setupForm(@PathVariable Long runId, ModelMap model)
-   * throws IOException {
-   * 
-   * try { User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName()); Run run =
-   * requestManager.getRunById(runId); if (run != null) { if (!run.userCanRead(user)) { throw new SecurityException("Permission denied."); }
-   * 
-   * model.put("formObj", run); model.put("run", run); model.put("owners", LimsSecurityUtils.getPotentialOwners(user, run,
-   * securityManager.listAllUsers())); model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, run,
-   * securityManager.listAllUsers())); model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, run,
-   * securityManager.listAllGroups())); } else { throw new SecurityException("No such Run"); } return new ModelAndView("/pages/editRun.jsp",
-   * model); } catch (IOException ex) { if (log.isDebugEnabled()) { log.debug("Failed to show experiment", ex); } throw ex; } }
-   */
-
   @RequestMapping(value = "/rest/{runId}", method = RequestMethod.GET)
   public @ResponseBody Run jsonRest(@PathVariable Long runId) throws IOException {
     return requestManager.getRunById(runId);
@@ -251,7 +230,6 @@ public class EditRunController {
           throw new SecurityException("No such Run.");
         } else {
           model.put("title", "Run " + runId);
-          // model.put("availablePools", populateAvailablePools(run.getPlatformType(), user));
           model.put("multiplexed", isMultiplexed(run));
           try {
             if (runStatsManager != null) {
@@ -262,8 +240,6 @@ public class EditRunController {
           } catch (RunStatsException e) {
             e.printStackTrace();
           }
-
-          // runAlertManager.push(run);
         }
       }
 

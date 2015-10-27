@@ -156,7 +156,7 @@ public class SQLEmPCRDAO implements EmPCRStore {
           @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
   public long save(emPCR pcr) throws IOException {
     Long securityProfileId = pcr.getSecurityProfile().getProfileId();
-    if (securityProfileId == null || (this.cascadeType != null)) { // && this.cascadeType.equals(CascadeType.PERSIST))) {
+    if (securityProfileId == null || (this.cascadeType != null)) {
       securityProfileId = securityProfileDAO.save(pcr.getSecurityProfile());
     }
 
@@ -188,10 +188,6 @@ public class SQLEmPCRDAO implements EmPCRStore {
       } catch (MisoNamingException e) {
         throw new IOException("Cannot save emPCR - issue with naming scheme", e);
       }
-      /*
-       * String name = "EMP"+ DbUtils.getAutoIncrement(template, TABLE_NAME); params.addValue("name", name); Number newId =
-       * insert.executeAndReturnKey(params); pcr.setPcrId(newId.longValue()); pcr.setName(name);
-       */
     } else {
       try {
         if (namingScheme.validateField("name", pcr.getName())) {
@@ -204,10 +200,6 @@ public class SQLEmPCRDAO implements EmPCRStore {
       } catch (MisoNamingException e) {
         throw new IOException("Cannot save emPCR - issue with naming scheme", e);
       }
-      /*
-       * params.addValue("pcrId", pcr.getPcrId()) .addValue("name", pcr.getName()); NamedParameterJdbcTemplate namedTemplate = new
-       * NamedParameterJdbcTemplate(template); namedTemplate.update(EMPCR_UPDATE, params);
-       */
     }
 
     if (this.cascadeType != null) {
@@ -216,8 +208,6 @@ public class SQLEmPCRDAO implements EmPCRStore {
         if (ld != null) libraryDilutionDAO.save(ld);
       } else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (ld != null) {
-          // Cache pc = cacheManager.getCache("libraryDilutionCache");
-          // pc.remove(DbUtils.hashCodeCacheKeyFor(ld.getId()));
           DbUtils.updateCaches(cacheManager, ld, LibraryDilution.class);
         }
       }
@@ -275,8 +265,6 @@ public class SQLEmPCRDAO implements EmPCRStore {
         if (ld != null) libraryDilutionDAO.save(ld);
       } else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (ld != null) {
-          // Cache pc = cacheManager.getCache("emPCRDilutionCache");
-          // pc.remove(DbUtils.hashCodeCacheKeyFor(ld.getId()));
           DbUtils.updateCaches(cacheManager, ld, LibraryDilution.class);
         }
       }

@@ -37,7 +37,6 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.transaction.annotation.Transactional;
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
@@ -124,11 +123,9 @@ public class SQLLibraryQCDAO implements LibraryQcStore {
   @Transactional(readOnly = false, rollbackFor = IOException.class)
   public long save(LibraryQC libraryQC) throws IOException {
     MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("library_libraryId", libraryQC.getLibrary().getId())
-        // .addValue("qcUserName", SecurityContextHolder.getContext().getAuthentication().getName())
-        .addValue("qcUserName", libraryQC.getQcCreator()).addValue("qcDate", libraryQC.getQcDate())
-        .addValue("qcMethod", libraryQC.getQcType().getQcTypeId()).addValue("results", libraryQC.getResults())
-        .addValue("insertSize", libraryQC.getInsertSize());
+    params.addValue("library_libraryId", libraryQC.getLibrary().getId()).addValue("qcUserName", libraryQC.getQcCreator())
+        .addValue("qcDate", libraryQC.getQcDate()).addValue("qcMethod", libraryQC.getQcType().getQcTypeId())
+        .addValue("results", libraryQC.getResults()).addValue("insertSize", libraryQC.getInsertSize());
 
     if (libraryQC.getId() == AbstractQC.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("qcId");
@@ -146,15 +143,11 @@ public class SQLLibraryQCDAO implements LibraryQcStore {
         if (l != null) libraryDAO.save(l);
       } else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (l != null) {
-          // Cache pc = cacheManager.getCache("libraryCache");
-          // pc.remove(DbUtils.hashCodeCacheKeyFor(l.getId()));
           DbUtils.updateCaches(cacheManager, l, Library.class);
         }
       } else if (this.cascadeType.equals(CascadeType.ALL)) {
         if (l != null) {
           libraryDAO.save(l);
-          // Cache pc = cacheManager.getCache("libraryCache");
-          // pc.remove(DbUtils.hashCodeCacheKeyFor(l.getId()));
           DbUtils.updateCaches(cacheManager, l, Library.class);
         }
       }

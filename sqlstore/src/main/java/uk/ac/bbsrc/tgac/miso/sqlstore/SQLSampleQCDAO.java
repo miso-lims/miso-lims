@@ -43,7 +43,6 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.transaction.annotation.Transactional;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractQC;
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractSampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
@@ -152,15 +151,11 @@ public class SQLSampleQCDAO implements SampleQcStore {
         if (s != null) sampleDAO.save(s);
       } else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (s != null) {
-          // Cache pc = cacheManager.getCache("sampleCache");
-          // pc.remove(DbUtils.hashCodeCacheKeyFor(s.getId()));
           DbUtils.updateCaches(cacheManager, s, Sample.class);
         }
       } else if (this.cascadeType.equals(CascadeType.ALL)) {
         if (s != null) {
           sampleDAO.save(s);
-          // Cache pc = cacheManager.getCache("sampleCache");
-          // pc.remove(DbUtils.hashCodeCacheKeyFor(s.getId()));
           DbUtils.updateCaches(cacheManager, s, Sample.class);
         }
       }

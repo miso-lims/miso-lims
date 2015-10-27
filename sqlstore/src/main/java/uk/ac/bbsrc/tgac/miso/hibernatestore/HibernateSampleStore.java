@@ -64,10 +64,6 @@ public class HibernateSampleStore extends HibernateDaoSupport implements Store<S
   @Transactional(readOnly = true)
   @SuppressWarnings("unchecked")
   public Collection<Sample> listAll() throws IOException {
-    /*
-     * return (Collection<Sample>) getHibernateTemplate().execute( new HibernateCallback() { public Object doInHibernate(Session session)
-     * throws HibernateException { return session.createQuery("from AbstractSample").list(); } });
-     */
     return null;
   }
 

@@ -25,8 +25,6 @@ package uk.ac.bbsrc.tgac.miso.hibernatestore;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
-//import org.hibernate.HibernateException;
-//import org.hibernate.Session;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
@@ -50,7 +48,6 @@ public class HibernateStatusStore extends HibernateDaoSupport implements Store<S
   @Transactional(readOnly = false)
   public long save(Status status) throws IOException {
     getHibernateTemplate().saveOrUpdate(status);
-    // getHibernateTemplate().merge(status);
     return status.getStatusId();
   }
 
@@ -76,10 +73,6 @@ public class HibernateStatusStore extends HibernateDaoSupport implements Store<S
   @Transactional(readOnly = true)
   @SuppressWarnings("unchecked")
   public Collection<Status> listAll() throws IOException {
-    /*
-     * return (Collection<Status>) getHibernateTemplate().execute( new HibernateCallback() { public Object doInHibernate(Session session)
-     * throws HibernateException { return session.createQuery("from StatusImpl").list(); } });
-     */
     return null;
   }
 

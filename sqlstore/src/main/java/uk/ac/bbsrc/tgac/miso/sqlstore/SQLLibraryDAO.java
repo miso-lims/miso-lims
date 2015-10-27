@@ -103,15 +103,8 @@ public class SQLLibraryDAO implements LibraryStore {
       + "l.paired, l.libraryType, l.librarySelectionType, l.libraryStrategyType, l.platformName, l.concentration, l.creationDate, l.qcPassed "
       + "FROM " + TABLE_NAME + " l, Sample s " + "WHERE l.sample_sampleId=s.sampleId " + "AND s.sampleId=?";
 
-  public static String LIBRARIES_SELECT_BY_PROJECT_ID =
-  /*
-   * "SELECT li.* " + "FROM Project p " + "LEFT JOIN Study st ON st.project_projectId = p.projectId " +
-   * "LEFT JOIN Experiment ex ON st.studyId = ex.study_studyId " +
-   * "INNER JOIN Experiment_Sample exsa ON ex.experimentId = exsa.experiment_experimentId " +
-   * "LEFT JOIN Sample sa ON exsa.samples_sampleId = sa.sampleId " + "INNER JOIN Library li ON li.sample_sampleId = sa.sampleId " +
-   * "WHERE p.projectId=?";
-   */
-  "SELECT li.* FROM Project p " + "INNER JOIN Sample sa ON sa.project_projectId = p.projectId " + "INNER JOIN " + TABLE_NAME
+  public static String LIBRARIES_SELECT_BY_PROJECT_ID = "SELECT li.* FROM Project p "
+      + "INNER JOIN Sample sa ON sa.project_projectId = p.projectId " + "INNER JOIN " + TABLE_NAME
       + " li ON li.sample_sampleId = sa.sampleId " + "WHERE p.projectId=?";
 
   public static final String LIBRARY_TYPES_SELECT = "SELECT libraryTypeId, description, platformType " + "FROM LibraryType";
@@ -283,7 +276,7 @@ public class SQLLibraryDAO implements LibraryStore {
           @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
   public long save(Library library) throws IOException {
     Long securityProfileId = library.getSecurityProfile().getProfileId();
-    if (this.cascadeType != null) { // && this.cascadeType.equals(CascadeType.PERSIST)) {
+    if (this.cascadeType != null) {
       securityProfileId = securityProfileDAO.save(library.getSecurityProfile());
     }
 
@@ -296,7 +289,6 @@ public class SQLLibraryDAO implements LibraryStore {
         .addValue("libraryStrategyType", library.getLibraryStrategyType().getLibraryStrategyTypeId())
         .addValue("platformName", library.getPlatformName()).addValue("concentration", library.getInitialConcentration())
         .addValue("creationDate", library.getCreationDate());
-    // .addValue("qcPassed", library.getQcPassed());
 
     if (library.getQcPassed() != null) {
       params.addValue("qcPassed", library.getQcPassed().toString());
@@ -309,12 +301,6 @@ public class SQLLibraryDAO implements LibraryStore {
         throw new IOException("NEW: A library with this alias already exists in the database");
       } else {
         SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("libraryId");
-        /*
-         * String name = Library.PREFIX + DbUtils.getAutoIncrement(template, TABLE_NAME); params.addValue("name", name);
-         * params.addValue("identificationBarcode", name + "::" + library.getAlias()); Number newId = insert.executeAndReturnKey(params);
-         * library.setLibraryId(newId.longValue()); library.setName(name);
-         */
-
         try {
           library.setId(DbUtils.getAutoIncrement(template, TABLE_NAME));
 
@@ -370,16 +356,6 @@ public class SQLLibraryDAO implements LibraryStore {
     NamedParameterJdbcTemplate libNamedTemplate = new NamedParameterJdbcTemplate(template);
     libNamedTemplate.update(LIBRARY_TAGBARCODE_DELETE_BY_LIBRARY_ID, libparams);
 
-    /*
-     * if (library.getTagBarcode() != null) { SimpleJdbcInsert eInsert = new SimpleJdbcInsert(template)
-     * .withTableName("Library_TagBarcode");
-     * 
-     * MapSqlParameterSource ltParams = new MapSqlParameterSource(); ltParams.addValue("library_libraryId", library.getLibraryId())
-     * .addValue("barcode_barcodeId", library.getTagBarcode().getTagBarcodeId());
-     * 
-     * eInsert.execute(ltParams); }
-     */
-
     if (library.getTagBarcodes() != null && !library.getTagBarcodes().isEmpty()) {
       SimpleJdbcInsert eInsert = new SimpleJdbcInsert(template).withTableName("Library_TagBarcode");
 
@@ -393,25 +369,17 @@ public class SQLLibraryDAO implements LibraryStore {
     if (this.cascadeType != null) {
       if (this.cascadeType.equals(CascadeType.PERSIST)) {
         // total fudge to clear out the pool cache if this library is used in any pool by way of a dilution
-        // if (!poolDAO.listByLibraryId(library.getId()).isEmpty()) {
-        // DbUtils.flushCache(cacheManager, "poolCache");
-        // }
         for (Pool p : poolDAO.listByLibraryId(library.getId())) {
-          // poolCache.remove(DbUtils.hashCodeCacheKeyFor(p.getId()));
           DbUtils.updateCaches(cacheManager, p, Pool.class);
         }
 
         sampleDAO.save(library.getSample());
       } else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-        // Cache poolCache = cacheManager.getCache("poolCache");
         for (Pool p : poolDAO.listByLibraryId(library.getId())) {
-          // poolCache.remove(DbUtils.hashCodeCacheKeyFor(p.getId()));
           DbUtils.updateCaches(cacheManager, p, Pool.class);
         }
 
-        // Cache sampleCache = cacheManager.getCache("sampleCache");
         if (library.getSample() != null) {
-          // sampleCache.remove(DbUtils.hashCodeCacheKeyFor(library.getSample().getId()));
           DbUtils.updateCaches(cacheManager, library.getSample(), Sample.class);
         }
       }
@@ -513,24 +481,16 @@ public class SQLLibraryDAO implements LibraryStore {
     if (library.isDeletable()
         && (namedTemplate.update(LIBRARY_DELETE, new MapSqlParameterSource().addValue("libraryId", library.getId())) == 1)) {
       if (this.cascadeType.equals(CascadeType.PERSIST)) {
-        // if (!poolDAO.listByLibraryId(library.getId()).isEmpty()) {
-        // DbUtils.flushCache(cacheManager, "poolCache");
-        // }
         for (Pool p : poolDAO.listByLibraryId(library.getId())) {
-          // poolCache.remove(DbUtils.hashCodeCacheKeyFor(p.getId()));
           DbUtils.updateCaches(cacheManager, p, Pool.class);
         }
         sampleDAO.save(library.getSample());
       } else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-        // Cache poolCache = cacheManager.getCache("poolCache");
         for (Pool p : poolDAO.listByLibraryId(library.getId())) {
-          // poolCache.remove(DbUtils.hashCodeCacheKeyFor(p.getId()));
           DbUtils.updateCaches(cacheManager, p, Pool.class);
         }
 
-        // Cache sampleCache = cacheManager.getCache("sampleCache");
         if (library.getSample() != null) {
-          // sampleCache.remove(DbUtils.hashCodeCacheKeyFor(library.getSample().getId()));
           DbUtils.updateCaches(cacheManager, library.getSample(), Sample.class);
         }
       }
@@ -700,14 +660,11 @@ public class SQLLibraryDAO implements LibraryStore {
       library.setPaired(rs.getBoolean("paired"));
       library.setInitialConcentration(rs.getDouble("concentration"));
       library.setPlatformName(rs.getString("platformName"));
-      // library.setQcPassed(rs.getBoolean("qcPassed"));
       if (rs.getString("qcPassed") != null) {
         library.setQcPassed(Boolean.parseBoolean(rs.getString("qcPassed")));
       } else {
         library.setQcPassed(null);
       }
-
-      // library.setLastUpdated(rs.getTimestamp("lastUpdated"));
 
       try {
         library.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));

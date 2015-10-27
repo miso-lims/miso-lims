@@ -63,11 +63,7 @@ public class ImportExcel {
     List<List<Cell>> ga2Data = new ArrayList<List<Cell>>();
     List<List<Cell>> hiSeqData = new ArrayList<List<Cell>>();
 
-    // DaoUtils.wireMisoRequestManager(misoManager);
-    // DaoUtils.wireLocalSecurityManager(securityManager);
-
     sp.setAllowAllInternal(true);
-    // sp.setWriteGroups(["Administrator", "Technician"]);
     sp.setOwner(securityManager.getUserById(1L));
 
     InputStream fis2 = null;
@@ -113,8 +109,6 @@ public class ImportExcel {
     for (int l = 2; l < sheetData.size(); l++) {
       List list = (List) sheetData.get(l);
       // different columns for different processing
-      // Run
-      // XSSFCell cella = (XSSFCell) list.get(0);
       // RunName
       XSSFCell cellb = (XSSFCell) list.get(2);
       // Region
@@ -321,12 +315,6 @@ public class ImportExcel {
           if (runDescription.equals(runD)) {
             run = r;
             System.out.println("Run [using existing run]: " + run);
-            /*
-             * List<ChamberFlowcell> fclist = new ArrayList<ChamberFlowcell>(misoManager.listChamberFlowcellsByRunId(r.getRunId()));
-             * ChamberFlowcell fc = fclist.get(0); Chamber cb = new Chamber(); cb.setPool(pool); cb.setPartitionNumber(chamber);
-             * cb.setSecurityProfile(sp); misoManager.saveChamber(cb); fc.addChamber(cb); misoManager.saveFlowcell(fc); System.out.println(
-             * "Chamber [added to existing flowcell]:" + cb); break;
-             */
           }
         }
       } else {
@@ -334,22 +322,9 @@ public class ImportExcel {
         run.setPairedEnd(false);
         run.setPlatformType(PlatformType.LS454);
         run.setSecurityProfile(sp);
-        // run.setName(name);
         misoManager.saveRun(run);
         System.out.println("Run [new run created]: " + run);
-        /*
-         * Chamber cb = new Chamber(); cb.setPool(pool); cb.setPartitionNumber(chamber); cb.setSecurityProfile(sp);
-         * misoManager.saveChamber(cb); ChamberFlowcell fc = new ChamberFlowcell(); //fc.setRun(run); fc.addChamber(cb);
-         * fc.setSecurityProfile(sp); misoManager.saveFlowcell(fc); System.out.println("Chamber [added to new flowcell]: " + cb);
-         */
       }
-
-      /*
-       * // ignored cells from excel //Machine XSSFCell cellf = (XSSFCell) list.get(5); //Library Type XSSFCell cellg = (XSSFCell)
-       * list.get(6); //Sequence Generated XSSFCell celli = (XSSFCell) list.get(8); //Raw Wells XSSFCell cellj = (XSSFCell) list.get(9);
-       * //Pass Filter XSSFCell cellk = (XSSFCell) list.get(10); //% Pass Filter XSSFCell celll = (XSSFCell) list.get(11); //Average Length
-       * XSSFCell cellm = (XSSFCell) list.get(12); //Average Quality XSSFCell celln = (XSSFCell) list.get(13);
-       */
     }
 
   }
@@ -409,75 +384,9 @@ public class ImportExcel {
               }
 
               run.getStatus().setInstrumentName(machine);
-
-              /*
-               * LaneFlowcell fc = new LaneFlowcell(); System.out.println("Processing " + run.getAlias());
-               * 
-               * String prevSampleDesc = ""; int prevSampleNum = 0; for (int cellpos = 1; cellpos < 9; cellpos++) { List<Cell> list6 =
-               * sheetData.get(l + 6); Cell cell = list6.get(cellpos);
-               * 
-               * List<Cell> list7 = sheetData.get(l + 7); Cell cell7b = list7.get(cellpos); String sampleDesc = getCellContents(cell7b); if
-               * (!sampleDesc.equals("")) { System.out.println("\t \\_ " + sampleDesc);
-               * 
-               * // skip multiplexed if (sampleDesc.toLowerCase().equals("multi")) { continue; }
-               * 
-               * if (sampleDesc.equals(prevSampleDesc)) { prevSampleNum++; } else { prevSampleNum = 1; }
-               * 
-               * String lane1Project = getCellContents(cell); Project project = processProject(lane1Project); Experiment experiment =
-               * processExperiment(project);
-               * 
-               * String sampleAlias = "XX_S"+prevSampleNum+"_F.bar"; Sample sample = processSample(sampleDesc, sampleAlias, date, project);
-               * prevSampleDesc = sampleDesc;
-               * 
-               * List<Cell> list10 = sheetData.get(l + 10); Cell cell10b = list10.get(cellpos); String libDesc = getCellContents(cell10b);
-               * 
-               * List<Cell> list11 = sheetData.get(l + 11); Cell cell11b = list11.get(cellpos); String libType = getCellContents(cell11b);
-               * 
-               * List<Cell> list12 = sheetData.get(l + 12); Cell cell12b = list12.get(cellpos); String libConc = getCellContents(cell12b);
-               * 
-               * List<Cell> list13 = sheetData.get(l + 13); Cell cell13b = list13.get(cellpos); String readLength =
-               * getCellContents(cell13b); Library library = processLibrary(PlatformType.ILLUMINA, sample, libDesc, libConc, libType,
-               * readLength, paired, date); sample.addLibrary(library);
-               * 
-               * LibraryDilution d = new LibraryDilution(); d.setLibrary(library); //d.setIdentificationBarcode("0");
-               * d.setConcentration(0.0); d.setCreationDate(date); d.setDilutionCreator(user); d.setSecurityProfile(sp);
-               * misoManager.saveLibraryDilution(d);
-               * 
-               * IlluminaPool illup = new IlluminaPool(); illup.setConcentration(0.0); illup.setCreationDate(date);
-               * //illup.setIdentificationBarcode("0"); illup.addExperiment(experiment); illup.addPoolableElement(d);
-               * illup.setSecurityProfile(sp); misoManager.saveIlluminaPool(illup);
-               * 
-               * //Lane lane = new Lane(); //lane.setPartitionNumber(cellpos); //lane.setPool(illup); //lane.setSecurityProfile(sp);
-               * //misoManager.saveLane(lane); //fc.addLane(lane); } else { System.out.println("\t \\_ No valid sample name. Skipping...");
-               * } }
-               * 
-               * fc.setSecurityProfile(sp); ((RunImpl)run).addFlowcell(fc);
-               */
               long runId = misoManager.saveRun(run);
               run.setRunId(runId);
               System.out.println("Run [new illumina run created]: " + run);
-
-              // fc.setRun(run);
-              // fc.setSecurityProfile(sp);
-              // misoManager.saveFlowcell(fc);
-
-              // System.out.println("8 Lanes [added to new flowcell]: " + fc);
-            } else {
-              /*
-               * List<LaneFlowcell> flowcells = new ArrayList<LaneFlowcell>(misoManager.listLaneFlowcellsByRunId(run.getRunId()));
-               * LaneFlowcell fc = flowcells.get(0);
-               * 
-               * System.out.println("Checking " + run.getAlias());
-               * 
-               * for (int cellpos = 1; cellpos < 9; cellpos++) { Lane lane = null; for (Partition ls : fc.getPartitions()) { if
-               * (ls.getPartitionNumber() == cellpos) { lane = (Lane)ls; } }
-               * 
-               * if (lane != null) { IlluminaPool ip = (IlluminaPool)lane.getPool(); if (ip != null) { for (Dilution ld : ip.getDilutions())
-               * { if (ld != null) { Library library = ld.getLibrary(); if (library != null) { Sample sample = library.getSample(); if
-               * (sample != null) { Project project = sample.getProject(); if (project != null) { System.out.println("Already stored (" +
-               * project.getName() + "," + sample.getName() + "," + library.getName() + "," + ld.getName() + "," + ip.getName() +
-               * " on Lane " + lane.getPartitionNumber() + ")"); } } } } } } } }
-               */
             }
           }
         }

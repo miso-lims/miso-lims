@@ -26,7 +26,6 @@ package uk.ac.bbsrc.tgac.miso.core.test;
 import com.eaglegenomics.simlims.core.User;
 
 import junit.framework.Assert;
-import junit.framework.TestCase;
 import org.junit.Test;
 import org.odftoolkit.odfdom.doc.OdfTextDocument;
 import org.slf4j.Logger;

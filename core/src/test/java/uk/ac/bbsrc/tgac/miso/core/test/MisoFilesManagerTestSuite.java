@@ -14,28 +14,27 @@ import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 
 public class MisoFilesManagerTestSuite {
 
-   MisoFilesManager filesManager;
-   @Before
-   public void setUp() throws Exception {
-      filesManager = new MisoFilesManager();
-   }
+  MisoFilesManager filesManager;
 
-   @Test(expected=java.io.IOException.class)
-   public final void testDeleteFile() throws IOException {
-      final String fileName = "test_file.txt";
-      final String fileContent = "the content of my file.";
-      final PrintWriter writer = new PrintWriter(fileName);
-      writer.write(fileContent);
-      writer.close();
+  @Before
+  public void setUp() throws Exception {
+    filesManager = new MisoFilesManager();
+  }
 
-      final File file = new File(fileName);
-      filesManager.storeFile(Run.class, "stats", file);
+  @Test(expected = java.io.IOException.class)
+  public final void testDeleteFile() throws IOException {
+    final String fileName = "test_file.txt";
+    final String fileContent = "the content of my file.";
+    final PrintWriter writer = new PrintWriter(fileName);
+    writer.write(fileContent);
+    writer.close();
 
-      assertTrue(file.exists());
-      filesManager.deleteFile(Run.class, "stats", fileName);
+    final File file = new File(fileName);
+    filesManager.storeFile(Run.class, "stats", file);
 
-      filesManager.getFile(Run.class, "stats", fileName);
-   }
+    assertTrue(file.exists());
+    filesManager.deleteFile(Run.class, "stats", fileName);
+
+    filesManager.getFile(Run.class, "stats", fileName);
+  }
 }
-
-

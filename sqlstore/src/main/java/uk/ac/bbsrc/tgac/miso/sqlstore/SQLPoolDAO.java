@@ -97,18 +97,6 @@ public class SQLPoolDAO implements PoolStore {
 
   public static final String POOL_EXPERIMENT_DELETE_BY_POOL_ID = "DELETE FROM Pool_Experiment " + "WHERE pool_poolId=:pool_poolId";
 
-  /*
-   * public static final String POOL_SELECT_BY_RELATED_PROJECT = "SELECT DISTINCT pool.* " + "FROM Project p " +
-   * "INNER JOIN Sample sa ON sa.project_projectId = p.projectId " + "INNER JOIN Library li ON li.sample_sampleId = sa.sampleId " +
-   * "INNER JOIN LibraryDilution ld ON ld.library_libraryId = li.libraryId " +
-   * 
-   * "LEFT JOIN emPCR e ON e.dilution_dilutionId = ld.dilutionId " + "LEFT JOIN emPCRDilution ed ON ed.emPCR_pcrId = e.pcrId " +
-   * 
-   * "LEFT JOIN Pool_Elements pld ON pld.elementId = ld.dilutionId " + "LEFT JOIN Pool_Elements ple ON ple.elementId = ed.dilutionId " +
-   * 
-   * "INNER JOIN " + TABLE_NAME + " pool ON pool.poolId = pld.pool_poolId " + "OR pool.poolId = ple.pool_poolId " + "WHERE p.projectId=?";
-   */
-
   public static final String EMPCR_POOL_SELECT_BY_RELATED_PROJECT = "SELECT DISTINCT pool.* " + "FROM Project p "
       + "INNER JOIN Sample sa ON sa.project_projectId = p.projectId " + "INNER JOIN Library li ON li.sample_sampleId = sa.sampleId "
       + "INNER JOIN LibraryDilution ld ON ld.library_libraryId = li.libraryId " +
@@ -354,7 +342,7 @@ public class SQLPoolDAO implements PoolStore {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
 
     Long securityProfileId = pool.getSecurityProfile().getProfileId();
-    if (securityProfileId == null || (this.cascadeType != null)) { // && this.cascadeType.equals(CascadeType.PERSIST))) {
+    if (securityProfileId == null || (this.cascadeType != null)) {
       securityProfileId = securityProfileDAO.save(pool.getSecurityProfile());
     }
 

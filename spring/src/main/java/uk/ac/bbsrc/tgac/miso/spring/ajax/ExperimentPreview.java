@@ -73,12 +73,6 @@ public class ExperimentPreview {
           Sample s = dil.getLibrary().getSample();
           sb.append("<li><a href='/miso/sample/").append(s.getId()).append("'>").append(s.getName()).append("</a></li>");
         }
-
-        /*
-         * if (e.getPlatform().getPlatformType().equals(PlatformType.ILLUMINA)) { } else { for (Object dil : e.getPool().getDilutions()) {
-         * Sample s = ((emPCRDilution) dil).getEmPCR().getLibraryDilution().getLibrary().getSample(); sb.append("<li><a href='/miso/sample/"
-         * ).append(s.getSampleId()).append("'>").append(s.getName()).append("</a></li>"); } }
-         */
       }
 
       StringBuilder b = new StringBuilder();

@@ -63,10 +63,6 @@ public class HibernateLaneStore extends HibernateDaoSupport implements Store<Lan
   @Transactional(readOnly = true)
   @SuppressWarnings("unchecked")
   public Collection<Lane> listAll() throws IOException {
-    /*
-     * return (Collection<Lane>) getHibernateTemplate().execute( new HibernateCallback() { public Object doInHibernate(Session session)
-     * throws HibernateException { return session.createQuery("from Lane").list(); } });
-     */
     return null;
   }
 

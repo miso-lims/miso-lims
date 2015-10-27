@@ -40,8 +40,6 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryQcException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 import com.eaglegenomics.simlims.core.Note;
-//import com.fasterxml.jackson.annotation.*;
-//import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  * A Library is the first step in constructing sequenceable material from an initial {@link Sample}. A Library is then diluted down to a
@@ -55,8 +53,6 @@ import com.eaglegenomics.simlims.core.Note;
  * @since 0.0.2
  */
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
-// , using = LibrarySerializer.class)
-// @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @JsonIgnoreProperties({ "securityProfile" })
 @PrintableBarcode
@@ -142,7 +138,6 @@ public interface Library extends SecurableByProfile, Comparable, Barcodable, Loc
    * 
    * @return Sample sample.
    */
-  // @JsonBackReference
   public Sample getSample();
 
   /**
@@ -183,7 +178,6 @@ public interface Library extends SecurableByProfile, Comparable, Barcodable, Loc
    * 
    * @return Collection<LibraryQC> libraryQCs.
    */
-  // @JsonManagedReference(value = "libraryqcs")
   public Collection<LibraryQC> getLibraryQCs();
 
   /**
@@ -201,7 +195,6 @@ public interface Library extends SecurableByProfile, Comparable, Barcodable, Loc
    * 
    * @return Collection<LibraryDilution> libraryDilutions.
    */
-  // @JsonManagedReference(value = "librarydilutions")
   public Collection<LibraryDilution> getLibraryDilutions();
 
   /**

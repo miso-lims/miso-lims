@@ -93,18 +93,6 @@ public class NoUseTestSubmissionClasses extends LimsDAOTestCase {
     System.out.println("Child setup");
   }
 
-  // @Test
-
-  /*
-   * temporary method for listing all platforms public void lll() throws Exception { List<Platform> lsts=getPlatformDAO().listAll();
-   * for(Platform l:lsts){ System.out.println(l.getPlatformType()+" "+l.getNameAndModel()+" "+l.getDescription()); } }
-   */
-  /*
-   * temporary method for listing all libraryStrategyTypes public void lll() throws Exception { List<LibraryStrategyType>
-   * lsts=getLibraryDAO().listAllLibraryStrategyTypes(); for(LibraryStrategyType l:lsts){ System.out.println(l.getLibraryStrategyTypeId()+
-   * " "+l.getName()+" "+l.getDescription()); } }
-   */
-
   public void test() {
     try {
       project = getProjectDAO().get(99);
@@ -232,35 +220,6 @@ public class NoUseTestSubmissionClasses extends LimsDAOTestCase {
       // loops recursively through MISO runs and the chambers within them, adding each to the run xml.
       submissionDocument = docBuilder.newDocument();
 
-      /*
-       * for (Run run : runs) { flowcells = getFlowcellDAO().listAllFlowcellsByRunId(run.getRunId());
-       * 
-       * PlatformType platform = run.getPlatformType(); System.out.println("Platform:" + platform); System.out.println(
-       * "Number of flowcells:" + flowcells.size());
-       * 
-       * if (platform.equals(PlatformType.ILLUMINA)) { for (Flowcell flowcell : flowcells) { Collection<Lane> lanes =
-       * getLaneDAO().listByFlowcellId(flowcell.getFlowcellId()); //System.out.println("fstudylowcell: "+flowcell.getFlowcellId());
-       * //System.out.println("Number of partitions:"+lanes.size()); for (Lane lane : lanes) { if (lane.getPool() != null) {
-       * System.out.println("Adding " + lane.getId() + " to run.xml"); new EraRunDecorator(lane, submissionDocument).buildSubmission();
-       * submission.addSubmissionElement(lane); } } } } else { for (Flowcell flowcell : flowcells) { Collection<Chamber> chambers =
-       * getChamberDAO().listByFlowcellId(flowcell.getFlowcellId()); //System.out.println("Number of partitions:"+chambers.size()); for
-       * (Chamber chamber : chambers) { if (chamber.getPool() != null) { System.out.println("Adding " + chamber.getId() + " to run.xml");
-       * new EraRunDecorator(chamber, submissionDocument).buildSubmission(); submission.addSubmissionElement(chamber); } } } } }
-       * 
-       * String chamberFileName = xmlPath + project.getProjectId() + "run.xml"; SubmissionUtils.transform(submissionDocument, new
-       * File(chamberFileName)); validateXML(chamberFileName, xsdPath + "SRA.run.xsd"); System.out.println("completed validation of " +
-       * chamberFileName); file = upload.createElement("FILE"); fis = new FileInputStream(new File(sampleFileName)); md5 =
-       * org.apache.commons.codec.digest.DigestUtils.md5Hex(fis); file.setAttribute("md5", md5);
-       * 
-       * file.setAttribute("localPath", sampleFileName); metaData.appendChild(file); submissionDocument = null;
-       * 
-       * System.out.println("Validating XML for submission: " + submission.getName()); submissionDocument = docBuilder.newDocument(); new
-       * EraSubmissionDecorator(submission, submissionDocument).buildSubmission(); String submissionFileName = xmlPath +
-       * submission.getName() + ".xml"; SubmissionUtils.transform(submissionDocument, new File(submissionFileName));
-       * validateXML(submissionFileName, xsdPath + "SRA.submission.xsd"); file = upload.createElement("FILE");
-       * file.setAttribute("localPath", submissionFileName); fis = new FileInputStream(new File(submissionFileName)); md5 =
-       * org.apache.commons.codec.digest.DigestUtils.md5Hex(fis); file.setAttribute("md5", md5); metaData.appendChild(file);
-       */
       submissionDocument = null;
 
       SubmissionUtils.transform(upload, new File(xmlPath + project.getProjectId() + "upload.xml"));
@@ -283,7 +242,6 @@ public class NoUseTestSubmissionClasses extends LimsDAOTestCase {
       factory.setSchema(schemaFactory.newSchema(new Source[] { new StreamSource(schema) }));
 
       DocumentBuilder builder = factory.newDocumentBuilder();
-      // builder.setErrorHandler(new SimpleErrorHandler());
       File newFile = new File(xmlFile);
       builder.parse(newFile);
       System.out.println("Validation of " + xmlFile + " complete!");

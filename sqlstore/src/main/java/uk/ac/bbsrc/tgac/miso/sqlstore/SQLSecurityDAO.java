@@ -285,11 +285,6 @@ public class SQLSecurityDAO implements SecurityStore {
   public Collection<User> listUsersByIds(Collection<Long> userIds) throws IOException {
     if (userIds.size() > 0) {
       Set<User> results = new HashSet<User>();
-      /*
-       * NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template); MapSqlParameterSource params = new
-       * MapSqlParameterSource(); params.addValue("ids", userIds); List<User> results = namedTemplate.query(USER_SELECT_BY_IDS, params, new
-       * UserMapper()); return results;
-       */
       for (long userId : userIds) {
         User u = getUserById(userId);
         if (u != null) results.add(u);

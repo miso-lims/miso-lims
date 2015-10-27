@@ -74,10 +74,6 @@ public class HibernateRunStore extends HibernateDaoSupport implements Store<Run>
   @Transactional(readOnly = true)
   @SuppressWarnings("unchecked")
   public Collection<Run> listAll() throws IOException {
-    /*
-     * return (Collection<Run>) getHibernateTemplate().execute( new HibernateCallback() { public Object doInHibernate(Session session)
-     * throws HibernateException { return session.createQuery("from AbstractRun").list(); } });
-     */
     return null;
   }
 

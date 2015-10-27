@@ -87,11 +87,6 @@ public class SQLExperimentDAO implements ExperimentStore {
   public static final String EXPERIMENTS_BY_RELATED_STUDY = "SELECT e.experimentId, e.name, e.description, e.alias, e.accession, e.title, e.platform_platformId, e.securityProfile_profileId, e.study_studyId "
       + "FROM " + TABLE_NAME + " e, Study s " + "WHERE e.study_studyId=s.studyId " + "AND s.studyId=?";
 
-  /*
-   * public static final String EXPERIMENTS_BY_RELATED_SAMPLE =
-   * "SELECT e.experimentId, e.name, e.description, e.alias, e.accession, e.title, e.platform_platformId, e.securityProfile_profileId, e.study_studyId, es.samples_sampleId "
-   * + "FROM Experiment e, Experiment_Sample es " + "WHERE es.Experiment_experimentId=e.experimentId " + "AND es.samples_sampleId=?";
-   */
   public static final String EXPERIMENTS_BY_RELATED_POOL = "SELECT e.experimentId, e.name, e.description, e.alias, e.accession, e.title, e.platform_platformId, e.securityProfile_profileId, e.study_studyId, pe.experiments_experimentId "
       + "FROM " + TABLE_NAME + " e, Pool_Experiment pe " + "WHERE pe.experiments_experimentId=e.experimentId " + "AND pe.pool_poolId=?";
 
@@ -104,8 +99,6 @@ public class SQLExperimentDAO implements ExperimentStore {
 
   public static final String POOL_EXPERIMENT_DELETE_BY_EXPERIMENT_ID = "DELETE FROM Pool_Experiment "
       + "WHERE experiments_experimentId=:experiments_experimentId";
-  // "WHERE experiments_experimentId=:experiments_experimentId " +
-  // "AND pool_poolId=:pool_poolId";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLExperimentDAO.class);
 
@@ -274,10 +267,6 @@ public class SQLExperimentDAO implements ExperimentStore {
       } catch (MisoNamingException e) {
         throw new IOException("Cannot save Experiment - issue with naming scheme", e);
       }
-      /*
-       * String name = Experiment.PREFIX + DbUtils.getAutoIncrement(template, TABLE_NAME); params.addValue("name", name); Number newId =
-       * insert.executeAndReturnKey(params); experiment.setExperimentId(newId.longValue()); experiment.setName(name);
-       */
     } else {
       try {
         if (namingScheme.validateField("name", experiment.getName())) {
@@ -290,10 +279,6 @@ public class SQLExperimentDAO implements ExperimentStore {
       } catch (MisoNamingException e) {
         throw new IOException("Cannot save Experiment - issue with naming scheme", e);
       }
-      /*
-       * params.addValue("experimentId", experiment.getExperimentId()) .addValue("name", experiment.getName()); NamedParameterJdbcTemplate
-       * namedTemplate = new NamedParameterJdbcTemplate(template); namedTemplate.update(EXPERIMENT_UPDATE, params);
-       */
     }
 
     if (this.cascadeType != null) {
@@ -312,8 +297,6 @@ public class SQLExperimentDAO implements ExperimentStore {
         if (this.cascadeType.equals(CascadeType.PERSIST)) {
           DbUtils.flushCache(cacheManager, "poolCache");
         } else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-          // Cache pc = cacheManager.getCache("poolCache");
-          // pc.remove(DbUtils.hashCodeCacheKeyFor(experiment.getPool().getId()));
           DbUtils.updateCaches(cacheManager, experiment.getPool(), Pool.class);
         }
       }
@@ -323,8 +306,6 @@ public class SQLExperimentDAO implements ExperimentStore {
         if (s != null) studyDAO.save(s);
       } else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (s != null) {
-          // Cache pc = cacheManager.getCache("studyCache");
-          // pc.remove(DbUtils.hashCodeCacheKeyFor(s.getId()));
           DbUtils.updateCaches(cacheManager, s, Study.class);
         }
       }
@@ -420,18 +401,13 @@ public class SQLExperimentDAO implements ExperimentStore {
       if (this.cascadeType.equals(CascadeType.PERSIST)) {
         if (s != null) studyDAO.save(s);
         if (experiment.getPool() != null) {
-          // DbUtils.flushCache(cacheManager, "poolCache");
           DbUtils.updateCaches(cacheManager, experiment.getPool(), Pool.class);
         }
       } else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (s != null) {
-          // Cache sc = cacheManager.getCache("studyCache");
-          // sc.remove(DbUtils.hashCodeCacheKeyFor(s.getId()));
           DbUtils.updateCaches(cacheManager, s, Study.class);
 
           if (experiment.getPool() != null) {
-            // Cache pc = cacheManager.getCache("poolCache");
-            // pc.remove(DbUtils.hashCodeCacheKeyFor(experiment.getPool().getId()));
             DbUtils.updateCaches(cacheManager, experiment.getPool(), Pool.class);
           }
         }

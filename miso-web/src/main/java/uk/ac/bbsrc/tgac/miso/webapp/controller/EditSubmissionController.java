@@ -118,47 +118,28 @@ public class EditSubmissionController {
 
   @ModelAttribute("projects")
   public Collection<Project> populateProjects() throws IOException {
-    // User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     List<Project> projects = new ArrayList<Project>(requestManager.listAllProjects());
-    /*
-     * for (Project p : projects) { Collection<Run> runs = requestManager.listAllRunsByProjectId(p.getProjectId()); for (Run r : runs) { if
-     * (r instanceof IlluminaRun) { IlluminaRun ir = (IlluminaRun)r;
-     * ir.setFlowcells(requestManager.listLaneFlowcellsByRunId(ir.getRunId())); } else if (r instanceof SolidRun) { SolidRun sr =
-     * (SolidRun)r; sr.setFlowcells(requestManager.listChamberFlowcellsByRunId(sr.getRunId())); } else if (r instanceof LS454Run) { LS454Run
-     * lr = (LS454Run)r; lr.setFlowcells(requestManager.listChamberFlowcellsByRunId(lr.getRunId())); } }
-     */
-
-    /*
-     * Collection<Study> studies = requestManager.listAllStudiesByProjectId(p.getProjectId()); p.setStudies(studies); for (Study s :
-     * studies) { Collection<Experiment> experiments = requestManager.listAllExperimentsByStudyId(s.getStudyId());
-     * s.setExperiments(experiments); }
-     */
-    // }
     Collections.sort(projects);
     return projects;
   }
 
   @ModelAttribute("studies")
   public Collection<Study> populateStudies() throws IOException {
-    // User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     return requestManager.listAllStudies();
   }
 
   @ModelAttribute("samples")
   public Collection<Sample> populateSamples() throws IOException {
-    // User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     return requestManager.listAllSamples();
   }
 
   @ModelAttribute("runs")
   public Collection<Run> populateRuns() throws IOException {
-    // User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     return requestManager.listAllRuns();
   }
 
   @ModelAttribute("experiments")
   public Collection<Experiment> populateExperiments() throws IOException {
-    // User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     return requestManager.listAllExperiments();
   }
 

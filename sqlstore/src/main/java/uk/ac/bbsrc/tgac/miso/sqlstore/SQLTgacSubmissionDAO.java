@@ -23,6 +23,14 @@
 
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
+import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,22 +42,28 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
+import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
+import uk.ac.bbsrc.tgac.miso.core.data.Study;
+import uk.ac.bbsrc.tgac.miso.core.data.Submission;
+import uk.ac.bbsrc.tgac.miso.core.data.Submittable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PartitionImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubmissionImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
+import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
 import uk.ac.bbsrc.tgac.miso.core.store.*;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
+import uk.ac.bbsrc.tgac.miso.core.store.StudyStore;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
-import uk.ac.bbsrc.tgac.miso.core.data.*;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
-
-import java.io.IOException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.*;
 
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore
@@ -80,9 +94,8 @@ public class SQLTgacSubmissionDAO implements Store<Submission>, NamingSchemeAwar
       + "LEFT JOIN Submission_Partition_Dilution AS ssla ON s.submissionId = ssla.submission_submissionId "
       + "WHERE s.submissionId=:submissionId";
 
-  public static final String SUBMISSION_DILUTION_SELECT = "SELECT dilution_dilutionId " + "FROM Submission_Partition_Dilution " +
-      // "WHERE submission_submissionId = :submissionId AND partition_partitionId = :partitionId";
-      "WHERE submission_submissionId = ? AND partition_partitionId = ?";
+  public static final String SUBMISSION_DILUTION_SELECT = "SELECT dilution_dilutionId " + "FROM Submission_Partition_Dilution "
+      + "WHERE submission_submissionId = ? AND partition_partitionId = ?";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLTgacSubmissionDAO.class);
 
@@ -176,10 +189,6 @@ public class SQLTgacSubmissionDAO implements Store<Submission>, NamingSchemeAwar
       } catch (MisoNamingException e) {
         throw new IOException("Cannot save Submission - issue with naming scheme", e);
       }
-      /*
-       * params.addValue("submissionId", submission.getSubmissionId()) .addValue("name", submission.getName());
-       * namedTemplate.update(SUBMISSION_UPDATE, params);
-       */
     } else {
       insert.usingGeneratedKeyColumns("submissionId");
       try {
@@ -204,11 +213,6 @@ public class SQLTgacSubmissionDAO implements Store<Submission>, NamingSchemeAwar
       } catch (MisoNamingException e) {
         throw new IOException("Cannot save Submission - issue with naming scheme", e);
       }
-      /*
-       * String name = "SUB" + DbUtils.getAutoIncrement(template, TABLE_NAME); params.addValue("creationDate", new Date());
-       * params.addValue("name", name); Number newId = insert.executeAndReturnKey(params); submission.setSubmissionId(newId.longValue());
-       * submission.setName(name);
-       */
     }
 
     if (submission.getSubmissionElements() != null) {

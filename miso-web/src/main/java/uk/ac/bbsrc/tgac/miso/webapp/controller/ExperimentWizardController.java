@@ -104,17 +104,6 @@ public class ExperimentWizardController {
         Collections.sort(pools);
       }
       return pools;
-      /*
-       * if (experiment.getPlatform().getPlatformType().equals(PlatformType.ILLUMINA)) { ArrayList<IlluminaPool> pools = new
-       * ArrayList<IlluminaPool>(); for (IlluminaPool p : requestManager.listAllIlluminaPools()) { if (experiment.getPool() == null ||
-       * !experiment.getPool().equals(p)) { pools.add(p); } Collections.sort(pools); } return pools; } else if
-       * (experiment.getPlatform().getPlatformType().equals(PlatformType.LS454)) { ArrayList<LS454Pool> pools = new ArrayList<LS454Pool>();
-       * for (LS454Pool p : requestManager.listAll454Pools()) { if (experiment.getPool() == null || !experiment.getPool().equals(p)) {
-       * pools.add(p); } Collections.sort(pools); } return pools; } else if
-       * (experiment.getPlatform().getPlatformType().equals(PlatformType.SOLID)) { ArrayList<SolidPool> pools = new ArrayList<SolidPool>();
-       * for (SolidPool p : requestManager.listAllSolidPools()) { if (experiment.getPool() == null || !experiment.getPool().equals(p)) {
-       * pools.add(p); } Collections.sort(pools); } return pools; } else { return Collections.emptyList(); }
-       */
     }
     return requestManager.listAllPools();
   }

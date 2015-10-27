@@ -29,14 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-//import com.eaglegenomics.simlims.spring.RequestControllerHelper;
-
 public class RequestControllerHelperLoader implements InitializingBean, ApplicationContextAware {
-  /*
-   * protected static final Logger log = LoggerFactory.getLogger(RequestControllerHelperLoader.class);
-   * 
-   * private transient Map<Protocol, RequestControllerHelper> requestHelpers = new HashMap<Protocol, RequestControllerHelper>();
-   */
   @Autowired
   private ApplicationContext context;
 
@@ -45,14 +38,7 @@ public class RequestControllerHelperLoader implements InitializingBean, Applicat
     this.context = context;
   }
 
-  /*
-   * public RequestControllerHelper getHelper(Protocol key) { return requestHelpers.get(key); }
-   */
   @Override
   public void afterPropertiesSet() throws Exception {
-    /*
-     * for (RequestControllerHelper entry : context.getBeansOfType( RequestControllerHelper.class).values()) { if (log.isInfoEnabled()) {
-     * log.info("Loaded helper for " + entry.getProtocol().getUniqueIdentifier()); } requestHelpers.put(entry.getProtocol(), entry); }
-     */
   }
 }

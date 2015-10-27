@@ -572,7 +572,6 @@ public class SQLRunDAO implements RunStore {
   @Override
   @Deprecated
   public List<Run> listByExperimentId(long experimentId) throws IOException {
-    // return template.query(RUNS_SELECT_BY_RELATED_EXPERIMENT, new Object[]{experimentId, experimentId}, new RunMapper());
     return Collections.emptyList();
   }
 

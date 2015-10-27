@@ -113,9 +113,7 @@ public class SQLDilutionDAO implements DilutionStore {
   public static final String LIBRARY_DILUTION_DELETE = "DELETE FROM LibraryDilution WHERE dilutionId=:dilutionId";
 
   public static String LIBRARY_DILUTION_SELECT_BY_SEARCH = "SELECT ld.dilutionId, ld.name, ld.concentration, ld.library_libraryId, ld.identificationBarcode, ld.creationDate, ld.dilutionUserName, ld.securityProfile_profileId "
-      + "FROM LibraryDilution ld " +
-      // "WHERE l.platformName = :platformName " +
-      "WHERE ld.name LIKE :search OR ld.identificationBarcode LIKE :search";
+      + "FROM LibraryDilution ld WHERE ld.name LIKE :search OR ld.identificationBarcode LIKE :search";
 
   public static String EMPCR_DILUTION_SELECT = "SELECT dilutionId, name, concentration, emPCR_pcrId, identificationBarcode, creationDate, dilutionUserName, securityProfile_profileId "
       + "FROM emPCRDilution";
@@ -160,9 +158,8 @@ public class SQLDilutionDAO implements DilutionStore {
 
   public static final String EMPCR_DILUTION_SELECT_BY_SEARCH = "SELECT ed.dilutionId, ed.name, ed.concentration, ed.emPCR_pcrId, ed.identificationBarcode, ed.creationDate, ed.dilutionUserName, ed.securityProfile_profileId, e.dilution_dilutionId "
       + "FROM emPCRDilution ed, emPCR e, LibraryDilution ld " + "WHERE ed.emPCR_pcrId = e.pcrId "
-      + "AND ld.dilutionId = e.dilution_dilutionId " +
-      // "AND l.platformName = :platformName " +
-      "AND (ed.name LIKE :search OR ld.name LIKE :search OR ed.identificationBarcode LIKE :search)";
+      + "AND ld.dilutionId = e.dilution_dilutionId "
+      + "AND (ed.name LIKE :search OR ld.name LIKE :search OR ed.identificationBarcode LIKE :search)";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLDilutionDAO.class);
 
@@ -232,7 +229,6 @@ public class SQLDilutionDAO implements DilutionStore {
     String squery = "%" + query + "%";
     MapSqlParameterSource params = new MapSqlParameterSource();
     params.addValue("search", squery);
-    // .addValue("platformName", platformType.getKey());
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
     return namedTemplate.query(LIBRARY_DILUTION_SELECT_BY_SEARCH, params, new LazyLibraryDilutionMapper());
   }
@@ -316,7 +312,6 @@ public class SQLDilutionDAO implements DilutionStore {
     String squery = "%" + query + "%";
     MapSqlParameterSource params = new MapSqlParameterSource();
     params.addValue("search", squery);
-    // .addValue("platformName", platformType.getKey());
 
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
     return namedTemplate.query(EMPCR_DILUTION_SELECT_BY_SEARCH, params, new LazyEmPCRDilutionMapper());
@@ -430,12 +425,6 @@ public class SQLDilutionDAO implements DilutionStore {
       } catch (MisoNamingException e) {
         throw new IOException("Cannot save LibraryDilution - issue with naming scheme", e);
       }
-
-      /*
-       * String name = "LDI"+ DbUtils.getAutoIncrement(template, "LibraryDilution"); params.addValue("name", name);
-       * params.addValue("identificationBarcode", name + "::" + dilution.getLibrary().getAlias()); Number newId =
-       * insert.executeAndReturnKey(params); dilution.setDilutionId(newId.longValue()); dilution.setName(name);
-       */
     } else {
       try {
         if (namingScheme.validateField("name", dilution.getName())) {
@@ -449,11 +438,6 @@ public class SQLDilutionDAO implements DilutionStore {
       } catch (MisoNamingException e) {
         throw new IOException("Cannot save LibraryDilution - issue with naming scheme", e);
       }
-      /*
-       * params.addValue("dilutionId", dilution.getDilutionId()) .addValue("name", dilution.getName()) .addValue("identificationBarcode",
-       * dilution.getName() + "::" + dilution.getLibrary().getAlias()); NamedParameterJdbcTemplate namedTemplate = new
-       * NamedParameterJdbcTemplate(template); namedTemplate.update(LIBRARY_DILUTION_UPDATE, params);
-       */
     }
 
     if (this.cascadeType != null) {
@@ -530,11 +514,6 @@ public class SQLDilutionDAO implements DilutionStore {
       } catch (MisoNamingException e) {
         throw new IOException("Cannot save emPCRDilution - issue with naming scheme", e);
       }
-      /*
-       * String name = "EDI"+DbUtils.getAutoIncrement(template, "emPCRDilution"); params.addValue("name", name);
-       * params.addValue("identificationBarcode", name + "::" + dilution.getEmPCR().getName()); Number newId =
-       * insert.executeAndReturnKey(params); dilution.setDilutionId(newId.longValue()); dilution.setName(name);
-       */
     } else {
       try {
         if (namingScheme.validateField("name", dilution.getName())) {
@@ -548,11 +527,6 @@ public class SQLDilutionDAO implements DilutionStore {
       } catch (MisoNamingException e) {
         throw new IOException("Cannot save emPCRDilution - issue with naming scheme", e);
       }
-      /*
-       * params.addValue("dilutionId", dilution.getDilutionId()) .addValue("name", dilution.getName()) .addValue("identificationBarcode",
-       * dilution.getName() + "::" + dilution.getEmPCR().getName()); NamedParameterJdbcTemplate namedTemplate = new
-       * NamedParameterJdbcTemplate(template); namedTemplate.update(EMPCR_DILUTION_UPDATE, params);
-       */
     }
 
     if (this.cascadeType != null) {
@@ -670,8 +644,6 @@ public class SQLDilutionDAO implements DilutionStore {
       libraryDilution.setCreationDate(rs.getDate("creationDate"));
       libraryDilution.setDilutionCreator(rs.getString("dilutionUserName"));
 
-      // libraryDilution.setLastUpdated(rs.getTimestamp("lastUpdated"));
-
       try {
         libraryDilution.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
         libraryDilution.setLibrary(libraryDAO.lazyGet(rs.getLong("library_libraryId")));
@@ -695,8 +667,6 @@ public class SQLDilutionDAO implements DilutionStore {
       libraryDilution.setCreationDate(rs.getDate("creationDate"));
       libraryDilution.setDilutionCreator(rs.getString("dilutionUserName"));
 
-      // libraryDilution.setLastUpdated(rs.getTimestamp("lastUpdated"));
-
       try {
         libraryDilution.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
         Library library = libraryDAO.get(rs.getLong("library_libraryId"));
@@ -719,8 +689,6 @@ public class SQLDilutionDAO implements DilutionStore {
       pcrDilution.setCreationDate(rs.getDate("creationDate"));
       pcrDilution.setDilutionCreator(rs.getString("dilutionUserName"));
 
-      // pcrDilution.setLastUpdated(rs.getTimestamp("lastUpdated"));
-
       try {
         pcrDilution.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
         pcrDilution.setEmPCR(emPcrDAO.lazyGet(rs.getLong("emPCR_pcrId")));
@@ -742,8 +710,6 @@ public class SQLDilutionDAO implements DilutionStore {
       pcrDilution.setIdentificationBarcode(rs.getString("identificationBarcode"));
       pcrDilution.setCreationDate(rs.getDate("creationDate"));
       pcrDilution.setDilutionCreator(rs.getString("dilutionUserName"));
-
-      // pcrDilution.setLastUpdated(rs.getTimestamp("lastUpdated"));
 
       try {
         pcrDilution.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));

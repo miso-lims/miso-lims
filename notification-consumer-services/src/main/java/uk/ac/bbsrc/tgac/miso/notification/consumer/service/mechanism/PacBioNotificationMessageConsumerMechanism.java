@@ -124,7 +124,6 @@ public class PacBioNotificationMessageConsumerMechanism
 
       if (!"".equals(status)) {
         try {
-          // String runLog = run.getString("status");
           if (!status.startsWith("ERROR")) {
             Status is = new PacBioStatus(status);
             is.setHealth(ht);
@@ -238,10 +237,7 @@ public class PacBioNotificationMessageConsumerMechanism
                   if (!r.getStatus().getHealth().equals(HealthType.Completed) && !r.getStatus().getHealth().equals(HealthType.Failed)) {
                     log.info("Saving previously saved status: " + is.getRunName() + " (" + r.getStatus().getHealth().getKey() + " -> "
                         + is.getHealth().getKey() + ")");
-                    // if (!r.getStatus().getHealth().equals(is.getHealth())) {
                     r.setStatus(is);
-                    // }
-                    // requestManager.saveStatus(is);
                   }
                 }
               }
@@ -292,23 +288,12 @@ public class PacBioNotificationMessageConsumerMechanism
                         if (f.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
                           f.setPlatform(r.getSequencerReference().getPlatform());
                         }
-                        // else {
-                        // f.setPlatformType(PlatformType.PACBIO);
-                        // }
                         f.setRun(r);
                         log.info("\\_ Created new container with " + f.getPartitions().size() + " partitions");
                         long flowId = requestManager.saveSequencerPartitionContainer(f);
                         f.setId(flowId);
                         ((RunImpl) r).addSequencerPartitionContainer(f);
                         // TODO match up samples to libraries and pools? Or match up pool numbers
-                        /*
-                         * for (JSONObject obj : (Iterable<JSONObject>)cells) { int cellindex = obj.getInt("index"); String sample =
-                         * obj.getString("sample");
-                         * 
-                         * SequencerPoolPartition p = f.getPartitionAt(cellindex); if (p.getPool() == null) { Pool pool = new PoolImpl();
-                         * 
-                         * } }
-                         */
                       }
                     }
                   }
@@ -318,9 +303,6 @@ public class PacBioNotificationMessageConsumerMechanism
                   if (f.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
                     f.setPlatform(r.getSequencerReference().getPlatform());
                   }
-                  // else {
-                  // f.setPlatformType(PlatformType.PACBIO);
-                  // }
                   if (f.getIdentificationBarcode() == null || "".equals(f.getIdentificationBarcode())) {
                     if (run.has("plateId") && !"".equals(run.getString("plateId"))) {
                       f.setIdentificationBarcode(run.getString("plateId"));

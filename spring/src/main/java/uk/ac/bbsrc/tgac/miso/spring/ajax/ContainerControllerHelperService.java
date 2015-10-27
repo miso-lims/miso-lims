@@ -74,16 +74,10 @@ public class ContainerControllerHelperService {
   public JSONObject changePlatformType(HttpSession session, JSONObject json) {
     String newContainerType = json.getString("platformtype");
     PlatformType pt = PlatformType.get(newContainerType);
-    // String cId = json.getString("container_cId");
     try {
-      // User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
 
       Map<String, Object> responseMap = new HashMap<String, Object>();
       if (pt != null) {
-        // don't create a new container - one should already be available in the session, either presaved or not
-        // SequencerPartitionContainer<SequencerPoolPartition> lf = dataObjectFactory.getSequencerPartitionContainer(user);
-        // session.setAttribute("container_" + cId, lf);
-
         StringBuilder srb = new StringBuilder();
         srb.append("<select name='sequencer' id='sequencerReference' onchange='Container.ui.populateContainerOptions(this);'>");
         srb.append("<option value='0' selected='selected'>Please select...</option>");
@@ -160,11 +154,7 @@ public class ContainerControllerHelperService {
           return changeLS454Container(session, json);
         } else if (pt.equals(PlatformType.SOLID)) {
           return changeSolidContainer(session, json);
-        }
-        /*
-         * else if (pt.equals(PlatformType.IONTORRENT)) { return null; }
-         */
-        else if (pt.equals(PlatformType.PACBIO)) {
+        } else if (pt.equals(PlatformType.PACBIO)) {
           return changePacBioContainer(session, json);
         } else {
           return JSONUtils.SimpleJSONError("Unsupported platform type: " + platform);
@@ -536,7 +526,6 @@ public class ContainerControllerHelperService {
       Pool p = requestManager.getPoolByBarcode(barcode);
       SequencerPartitionContainer<SequencerPoolPartition> lf = (SequencerPartitionContainer<SequencerPoolPartition>) session
           .getAttribute("container_" + json.getString("container_cId"));
-      // if (lf.getPlatformType().equals(p.getPlatformType())) {
       if (lf.getPlatform().getPlatformType().equals(p.getPlatformType())) {
         return JSONUtils.JSONObjectResponse("html", poolHtml(p, partition));
       } else {
@@ -617,8 +606,6 @@ public class ContainerControllerHelperService {
             + partition + "_" + project.getProjectId() + "'>");
         Collection<Study> studies = requestManager.listAllStudiesByProjectId(project.getProjectId());
         if (studies.isEmpty()) {
-          // throw new Exception("No studies available on project " + project.getName() +
-          // ". At least one study must be available for each project associated with this Pool.");
           return JSONUtils.SimpleJSONError("No studies available on project " + project.getName()
               + ". At least one study must be available for each project associated with this Pool.");
         } else {
@@ -633,7 +620,6 @@ public class ContainerControllerHelperService {
         sb.append("</div><br/>");
       }
       sb.append("</div>");
-      // }
 
       return JSONUtils.JSONObjectResponse("html", sb.toString());
     } catch (Exception e) {
@@ -741,18 +727,12 @@ public class ContainerControllerHelperService {
       if (p == null) {
         throw new Exception("Could not retrieve pool: " + poolId);
       }
-      ;
 
       Long studyId = json.getLong("studyId");
       Study s = requestManager.getStudyById(studyId);
       if (s == null) {
         throw new Exception("Could not retrieve study: " + studyId);
       }
-      ;
-
-      // Long sequencerReferenceId = json.getLong("sequencerReferenceId");
-      // SequencerReference sr = requestManager.getSequencerReferenceById(sequencerReferenceId);
-      // if (sr == null) { throw new Exception("Could not retrieve sequencer: " + sequencerReferenceId); };
 
       Long platformId = json.getLong("platformId");
       Platform platform = requestManager.getPlatformById(platformId);
@@ -874,7 +854,6 @@ public class ContainerControllerHelperService {
             return JSONUtils.JSONObjectResponse(responseMap);
           } else {
             // choose container
-            // return JSONUtils.JSONObjectResponse("error", "Multiple containers found with barcode "+ barcode);
             return JSONUtils.SimpleJSONError("Multiple containers found with barcode " + barcode);
           }
         } else {
