@@ -264,20 +264,6 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
   Collection<Library> listByLibraryDilutionId(long dilutionId) throws IOException;
 
   /**
-   * Retrieve a Library from an underlying data store given a Library ID
-   * <p/>
-   * This method intends to retrieve objects in an 'ignorant' fashion, i.e. will not populate parent or child objects that could lead to a
-   * circular dependency
-   * 
-   * @param libraryId
-   *          of type long
-   * @return Library
-   * @throws IOException
-   *           when
-   */
-  // Library lazyGet(long libraryId) throws IOException;
-
-  /**
    * List all persisted objects
    * 
    * @return Collection<Library>

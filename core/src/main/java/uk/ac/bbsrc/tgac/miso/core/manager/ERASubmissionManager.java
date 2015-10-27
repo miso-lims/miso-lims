@@ -99,9 +99,6 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
   private String accountName;
   private String dropBox;
   private String authKey;
-  // private String proxyHost;
-  // private String proxyUser;
-  // private String proxyPass;
   private URL submissionEndPoint;
   private String submissionStoragePath;
   private Map<Long, UploadReport> uploadReports = new HashMap<Long, UploadReport>();
@@ -149,36 +146,6 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
   }
 
   /**
-   * Sets the proxyHost of this ERASubmissionManager object if a proxy needs to be traversed
-   * 
-   * @param proxyHost
-   *          proxyHost.
-   */
-  // public void setProxyHost(String proxyHost) {
-  // this.proxyHost = proxyHost;
-  // }
-
-  /**
-   * Sets the proxyUser of this ERASubmissionManager object if a proxy needs to be traversed
-   * 
-   * @param proxyUser
-   *          proxyUser.
-   */
-  // public void setProxyUser(String proxyUser) {
-  // this.proxyUser = proxyUser;
-  // }
-
-  /**
-   * Sets the proxyPass of this ERASubmissionManager object if a proxy needs to be traversed
-   * 
-   * @param proxyPass
-   *          proxyPass.
-   */
-  // public void setProxyPass(String proxyPass) {
-  // this.proxyPass = proxyPass;
-  // }
-
-  /**
    * Sets the submissionEndPoint of this ERASubmissionManager object.
    * 
    * @param submissionEndPoint
@@ -223,10 +190,8 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
   @Override
   public String generateSubmissionMetadata(Submission submission) throws SubmissionException {
     File subPath = new File(misoFileManager.getFileStorageDirectory() + "/submission/" + submission.getName());
-    // File subPath = null;
     StringBuilder sb = new StringBuilder();
     try {
-      // subPath = misoFileManager.storeFile(submission.getClass(),submission.getName());
       DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 
       String d = df.format(new Date());
@@ -360,7 +325,6 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
 
         for (Submittable<Document> s : submissionData) {
           if (s instanceof Submission) {
-            // s.buildSubmission();
             ERASubmissionFactory.generateParentSubmissionXML(submissionXml, (Submission) s, submissionProperties);
             subName = ((Submission) s).getName();
           } else if (s instanceof Study) {
@@ -462,14 +426,10 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
   public String submitSequenceData(Submission s) {
     Set<File> dataFiles = new HashSet<File>();
     FilePathGenerator FPG = new TGACIlluminaFilepathGenerator();
-    // FilePathGenerator FPG = new FakeFilepathGenerator();
 
     for (Object o : s.getSubmissionElements()) {
       if (o instanceof SequencerPoolPartition) {
         SequencerPoolPartition l = (SequencerPoolPartition) o;
-        // if( l.getPool()!=null){
-        // Collection<LibraryDilution> ld=l.getPool().getDilutions();
-        // LibraryDilution libd=ld.iterator().next();
         try {
           dataFiles = FPG.generateFilePaths(l);
         } catch (SubmissionException submissionException) {

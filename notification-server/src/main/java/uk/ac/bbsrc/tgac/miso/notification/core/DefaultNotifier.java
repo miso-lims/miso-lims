@@ -291,14 +291,12 @@ public class DefaultNotifier {
       log.error("Cannot find a notification.properties file in the same directory as the notification jar. Please add one");
     } catch (IOException e) {
       log.error("Cannot read notification.properties. Please check permissions/availability");
-      // e.printStackTrace();
     } catch (Exception e) {
       log.error("Something else went wrong:" + e.getMessage());
     }
   }
 
   static class SignedHeaderValueMessageProcessor<T> implements HeaderEnricher.HeaderValueMessageProcessor<T> {
-    // null indicates no explicit setting; use header-enricher's 'default-overwrite' value
     private volatile Boolean overwrite = null;
     private final T value;
 

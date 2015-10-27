@@ -51,10 +51,6 @@ public interface PrintManager<T, C> {
 
   public PrintContext getPrintContext(String contextName);
 
-  // public T discoverPrintService(String name) throws MisoPrintException;
-  // public Collection<T> discoverPrintServices();
-  // public List<PrintService> discoverPrintServices(DocFlavor d, PrintServiceAttributeSet classType);
-
   public long storePrintService(MisoPrintService service) throws IOException;
 
   public MisoPrintService getPrintService(long serviceId) throws IOException;

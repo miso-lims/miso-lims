@@ -227,9 +227,6 @@ public interface RequestManager {
 
   public QcType getPoolQcTypeByName(String qcName) throws IOException;
 
-  // public <T extends LinkedList<S>, S extends Plateable> Plate<T, S> getPlateById(long plateId) throws IOException;
-  // public <T extends LinkedList<S>, S extends Plateable> Plate<T, S> getPlateByBarcode(String barcode) throws IOException;
-  // public <T extends List<S>, S extends Plateable> Plate<T, S> getPlateById(long plateId) throws IOException;
   public Plate<? extends List<? extends Plateable>, ? extends Plateable> getPlateById(long plateId) throws IOException;
 
   public <T extends List<S>, S extends Plateable> Plate<T, S> getPlateByBarcode(String barcode) throws IOException;
@@ -264,10 +261,6 @@ public interface RequestManager {
 
   public Collection<Experiment> listAllExperimentsBySearch(String query) throws IOException;
 
-  /**
-   * Obtain a list of all the requests the user has access to within this project. Access is defined as either read or write access.
-   */
-  // public Collection<Request> listAllRequests(User user, Project project) throws IOException;
   public Collection<Run> listAllRuns() throws IOException;
 
   public Collection<Run> listAllRunsWithLimit(long limit) throws IOException;
@@ -424,8 +417,6 @@ public interface RequestManager {
 
   public Collection<String> listDistinctPlatformNames() throws IOException;
 
-  // public Collection<PlatformType> listAllPlatformTypes() throws IOException;
-
   /**
    * Obtain a list of all the StudyTypes
    */
@@ -441,7 +432,6 @@ public interface RequestManager {
 
   public Collection<Kit> listAllKits() throws IOException;
 
-  // public Collection<KitType> listAllKitTypes() throws IOException;
   public Collection<Kit> listKitsByExperimentId(long experimentId) throws IOException;
 
   public Collection<Kit> listKitsByManufacturer(String manufacturer) throws IOException;

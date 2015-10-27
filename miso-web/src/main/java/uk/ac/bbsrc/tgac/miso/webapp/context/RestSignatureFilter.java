@@ -125,8 +125,6 @@ public class RestSignatureFilter extends OncePerRequestFilter {
       }
     }
 
-    // String url = request.getHeader(SignatureHelper.URL_X_HEADER);
-
     String signature = request.getHeader(SignatureHelper.SIGNATURE_HEADER);
     if (signature == null) {
       throw new BadCredentialsException("Cannot enact RESTful request without a signature!");

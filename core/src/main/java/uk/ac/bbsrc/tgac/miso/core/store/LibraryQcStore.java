@@ -37,20 +37,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
  */
 public interface LibraryQcStore extends Store<LibraryQC>, Remover<LibraryQC> {
   /**
-   * Retrieve a LibraryQC from an underlying data store given a LibraryQC ID
-   * <p/>
-   * This method intends to retrieve objects in an 'ignorant' fashion, i.e. will not populate parent or child objects that could lead to a
-   * circular dependency
-   * 
-   * @param qcId
-   *          of type long
-   * @return LibraryQC
-   * @throws IOException
-   *           when
-   */
-  // LibraryQC lazyGet(long qcId) throws IOException;
-
-  /**
    * List all LibraryQCs performed on a Library given a parent Library ID
    * 
    * @param libraryId

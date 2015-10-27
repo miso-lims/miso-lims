@@ -42,7 +42,6 @@ Sequencer.ui = {
     var column2 = $('sequencerReferenceTable').rows[1].insertCell(-1);
     column2.innerHTML = "<input id='sequencername' name='sequencername' type='text'/>";
     var column3 = $('sequencerReferenceTable').rows[1].insertCell(-1);
-  //  column3.innerHTML = "<input id='platform' name='platform' type='text'/>";
     column3.innerHTML = "<select id='platforms' name='platform'>" +json.platforms+ "</select>";
     var column4 = $('sequencerReferenceTable').rows[1].insertCell(-1);
     column4.innerHTML = "<input id='server' name='server' type='text' onkeyup='Sequencer.ui.validateServer(this)'/>";

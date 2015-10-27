@@ -308,7 +308,6 @@ public class LibraryControllerHelperService {
       for (JSONObject l : (Iterable<JSONObject>) ls) {
         try {
           Long dilutionId = l.getLong("dilutionId");
-          // String platform = l.getString("platform");
           LibraryDilution dilution = requestManager.getLibraryDilutionById(dilutionId);
           // autosave the barcode if none has been previously generated
           if (dilution.getIdentificationBarcode() == null || "".equals(dilution.getIdentificationBarcode())) {
@@ -432,7 +431,6 @@ public class LibraryControllerHelperService {
           try {
             SecurityProfile sp = null;
             Sample sample = null;
-            // String libAlias = null;
             String sampleAlias = j.getString("parentSample");
 
             for (Sample s : p.getSamples()) {

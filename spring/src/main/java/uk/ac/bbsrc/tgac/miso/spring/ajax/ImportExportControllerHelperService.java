@@ -236,12 +236,6 @@ public class ImportExportControllerHelperService {
         throw new Exception(e);
       }
     }
-    // create library & pool sheet
-    // File file = misoFileManager.getNewFile(
-    // Library.class,
-    // "forms",
-    // "LibraryPoolExportForm-" + LimsUtils.getCurrentDateAsString(new SimpleDateFormat("yyyyMMdd-hhmmss")) + ".xlsx");
-    // FormUtils.createLibraryPoolExportForm(file, jsonArray);
     return JSONUtils.SimpleJSONResponse("ok");
   }
 

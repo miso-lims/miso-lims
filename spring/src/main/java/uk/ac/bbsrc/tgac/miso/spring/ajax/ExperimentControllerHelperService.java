@@ -98,7 +98,6 @@ public class ExperimentControllerHelperService {
     try {
       if (json.has("lotNumber")) {
         String lotNumber = json.getString("lotNumber");
-        // String platform = json.getString("platform");
         Kit kit = requestManager.getKitByLotNumber(lotNumber);
         if (kit != null) {
           return JSONUtils.SimpleJSONResponse(kit.toString());
@@ -135,7 +134,6 @@ public class ExperimentControllerHelperService {
     try {
       if (json.has("partNumber")) {
         String partNumber = json.getString("partNumber");
-        // String platform = json.getString("platform");
 
         Pattern fullLs454KitPattern = Pattern.compile("([\\d]{11})([\\d]{8})([\\d]{6})"); // 05365473001 93765920 102010
         Matcher fullLs454Matcher = fullLs454KitPattern.matcher(partNumber);
@@ -218,7 +216,6 @@ public class ExperimentControllerHelperService {
           mkits.append("]");
         }
 
-        // return JSONUtils.JSONObjectResponse("{'experimentId':'"+experimentId+"', 'multiplexed':'"+multiplexed+"', "+sb.toString()+"}");
         Map<String, Object> m = new HashMap<String, Object>();
         m.put("experimentId", experimentId);
         m.put("multiplexed", multiplexed);
@@ -284,7 +281,6 @@ public class ExperimentControllerHelperService {
         }
         sb.append("]");
 
-        // return JSONUtils.JSONObjectResponse("{'experimentId':'"+experimentId+"', "+sb.toString()+"}");
         Map<String, Object> m = new HashMap<String, Object>();
         m.put("experimentId", experimentId);
         m.put("emPcrKitDescriptors", JSONArray.fromObject(sb.toString()));
@@ -346,7 +342,6 @@ public class ExperimentControllerHelperService {
         }
         sb.append("]");
 
-        // return JSONUtils.JSONObjectResponse("{'experimentId':'"+experimentId+"', "+sb.toString()+"}");
         Map<String, Object> m = new HashMap<String, Object>();
         m.put("experimentId", experimentId);
         m.put("clusteringKitDescriptors", JSONArray.fromObject(sb.toString()));
@@ -408,7 +403,6 @@ public class ExperimentControllerHelperService {
         }
         sb.append("]");
 
-        // return JSONUtils.JSONObjectResponse("{'experimentId':'"+experimentId+"', "+sb.toString()+"}");
         Map<String, Object> m = new HashMap<String, Object>();
         m.put("experimentId", experimentId);
         m.put("sequencingKitDescriptors", JSONArray.fromObject(sb.toString()));

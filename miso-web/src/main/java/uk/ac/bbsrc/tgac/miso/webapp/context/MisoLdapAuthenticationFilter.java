@@ -130,14 +130,6 @@ public class MisoLdapAuthenticationFilter extends UsernamePasswordAuthentication
       successfulAuthentication(request, response, chain, authResult);
 
       // this will verify that the LDAP user is mirrored into the LIMS DB
-      // Object p = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-      // if (p instanceof InetOrgPerson) {
-      // User u = LimsSecurityUtils.fromLdapUser((InetOrgPerson) p);
-      // User dbu = securityManager.getUserByLoginName(u.getLoginName());
-      // if (dbu != null && !dbu.equals(u)) {
-      // long userId = securityManager.saveUser(u);
-      // }
-      // }
       Object p = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
       if (p instanceof InetOrgPerson) {
         // map the LDAP user details to a MISO User

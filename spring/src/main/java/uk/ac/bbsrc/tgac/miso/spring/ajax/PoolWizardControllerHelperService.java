@@ -166,10 +166,7 @@ public class PoolWizardControllerHelperService {
 
           requestManager.savePool(pool);
 
-          // sb.append("<a class='dashboardresult' href='/miso/pool/"+pool.getPlatformType().getKey().toLowerCase()+"/" + pool.getId() +
-          // "' target='_blank'><div onmouseover=\"this.className='dashboardhighlight ui-corner-all'\"
-          // onmouseout=\"this.className='dashboard ui-corner-all'\" class='dashboard ui-corner-all' >");
-          sb.append("<a  class='dashboardresult' href='/miso/pool/" + pool.getId()
+          sb.append("<a class='dashboardresult' href='/miso/pool/" + pool.getId()
               + "' target='_blank'><div  onmouseover=\"this.className='dashboardhighlight ui-corner-all'\" onmouseout=\"this.className='dashboard ui-corner-all'\"  class='dashboard ui-corner-all' >");
           sb.append("Pool ID: <b>" + pool.getId() + "</b><br/>");
           sb.append("Pool Name: <b>" + pool.getName() + "</b><br/>");
@@ -257,8 +254,6 @@ public class PoolWizardControllerHelperService {
       for (Dilution dl : dls) {
         if (dl.getLibrary().getQcPassed() != null) {
           if (dl.getLibrary().getQcPassed()) {
-            // b.append("<tr id='"+dl.getDilutionId()+"'><td class='rowSelect'><input class='chkbox' type='checkbox' name='ids' value='" +
-            // dl.getDilutionId() + "'/></td>");
             StringBuilder barcode = new StringBuilder();
             if (!dl.getLibrary().getTagBarcodes().isEmpty()) {
               int count = 0;

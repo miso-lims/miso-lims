@@ -23,10 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.notification.manager;
 
-//import com.fasterxml.jackson.core.JsonGenerationException;
-//import com.fasterxml.jackson.databind.JsonMappingException;
-//import com.fasterxml.jackson.databind.ObjectMapper;
-
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.codehaus.jackson.map.ObjectMapper;

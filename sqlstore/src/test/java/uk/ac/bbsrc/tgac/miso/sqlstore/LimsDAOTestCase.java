@@ -424,7 +424,6 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
     LobHandler lh = new DefaultLobHandler();
     JdbcTemplate template = new JdbcTemplate(datasource);
 
-    // securityDAO = new SQLSecurityDAO();
     securityDAO = new MockSQLSecurityDAO();
     securityDAO.setLobHandler(lh);
     securityDAO.setJdbcTemplate(template);

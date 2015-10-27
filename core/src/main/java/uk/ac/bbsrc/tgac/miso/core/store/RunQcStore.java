@@ -37,20 +37,6 @@ import java.util.Collection;
  */
 public interface RunQcStore extends Store<RunQC>, Remover<RunQC> {
   /**
-   * Retrieve a RunQC from an underlying data store given a RunQC ID
-   * <p/>
-   * This method intends to retrieve objects in an 'ignorant' fashion, i.e. will not populate parent or child objects that could lead to a
-   * circular dependency
-   * 
-   * @param qcId
-   *          of type long
-   * @return RunQC
-   * @throws java.io.IOException
-   *           when
-   */
-  // RunQC lazyGet(long qcId) throws IOException;
-
-  /**
    * List all RunQCs performed on a Run given a parent Run ID
    * 
    * @param runId

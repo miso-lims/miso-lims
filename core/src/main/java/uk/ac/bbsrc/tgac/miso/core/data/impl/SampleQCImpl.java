@@ -61,9 +61,7 @@ public class SampleQCImpl extends AbstractSampleQC implements Serializable {
       } catch (MalformedSampleException e) {
         e.printStackTrace();
       }
-      // setSecurityProfile(experiment.getSecurityProfile());
     } else {
-      // setSecurityProfile(new SecurityProfile(user));
     }
   }
 

@@ -36,20 +36,6 @@ import java.util.Collection;
  */
 public interface PartitionStore extends Store<SequencerPoolPartition>, Cascadable, Remover<SequencerPoolPartition> {
   /**
-   * Retrieve a Partition from an underlying data store given a Partition ID
-   * <p/>
-   * This method intends to retrieve objects in an 'ignorant' fashion, i.e. will not populate parent or child objects that could lead to a
-   * circular dependency
-   * 
-   * @param partitionId
-   *          of type long
-   * @return Partition
-   * @throws java.io.IOException
-   *           when
-   */
-  // SequencerPoolPartition lazyGet(long partitionId) throws IOException;
-
-  /**
    * List all Partitions that are part of a Run given a Run ID
    * 
    * @param runId

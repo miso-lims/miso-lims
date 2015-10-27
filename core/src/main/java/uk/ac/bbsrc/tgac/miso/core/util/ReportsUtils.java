@@ -530,41 +530,6 @@ public class ReportsUtils {
         if (chartbool) {
           sb.append("<br/><img src='/styles/images/runsstatuschart" + r + ".png'/>");
         }
-
-        // Integer illumina = platformMap.containsKey("Illumina") ? platformMap.get("Illumina") : 0;
-        // Integer ls454 = platformMap.containsKey("LS454") ? platformMap.get("LS454") : 0;
-        // Integer solid = platformMap.containsKey("Solid") ? platformMap.get("Solid") : 0;
-
-        // jfreechart for platform
-        // final DefaultPieDataset platformdata = new DefaultPieDataset();
-        // platformdata.setValue("Illumina "+illumina, illumina);
-        // platformdata.setValue("LS454 "+ls454, ls454);
-        // platformdata.setValue("Solid "+solid, solid);
-        //
-        // final JFreeChart platformchart = ChartFactory.createPieChart(
-        // "Run Platform Information", // chart title
-        // platformdata, // data
-        // false, // include legend
-        // true,
-        // false
-        // );
-        //
-        // final PiePlot platformplot = (PiePlot) platformchart.getPlot();
-        // platformplot.setStartAngle(290);
-        // platformplot.setDirection(Rotation.CLOCKWISE);
-        // platformplot.setBackgroundPaint(Color.white);
-        // platformplot.setForegroundAlpha(0.5f);
-        // platformplot.setNoDataMessage("No data to display");
-        // File runplatformchart = new File("../webapps/ROOT/styles/images/runsplatformchart" + r + ".png");
-        // try {
-        // ChartUtilities.saveChartAsPNG(runplatformchart, platformchart, 500, 300);
-        // }
-        // catch (IOException e) {
-        // e.printStackTrace();
-        // }
-        // if (chartbool) {
-        // sb.append(" <img src='/styles/images/runsplatformchart" + r + ".png'/>");
-        // }
       } else {
         sb.append("<h1>Run Information</h1><br/><div class='report'>Nothing to Report.");
       }

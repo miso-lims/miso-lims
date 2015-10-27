@@ -234,10 +234,6 @@ public class EditPoolController {
       }
       throw ex;
     }
-    // catch (MalformedExperimentException e) {
-    // e.printStackTrace();
-    // throw new IOException(e);
-    // }
   }
 
   @Deprecated
@@ -302,7 +298,6 @@ public class EditPoolController {
     return "redirect:/miso/pool/" + p.getId();
   }
 
-  // @RequestMapping(value = {"/{poolId}", ""}, method = RequestMethod.POST)
   @RequestMapping(value = { "/new", "/{poolId}" }, method = RequestMethod.POST)
   public String processSubmit(@ModelAttribute("pool") Pool<? extends Poolable> pool, ModelMap model, SessionStatus session)
       throws IOException {

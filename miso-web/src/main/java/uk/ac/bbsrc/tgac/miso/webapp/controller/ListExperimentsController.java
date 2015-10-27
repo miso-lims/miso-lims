@@ -65,7 +65,6 @@ public class ListExperimentsController {
 
   @RequestMapping(value = "/experiments/rest/", method = RequestMethod.GET)
   public @ResponseBody Collection<Experiment> jsonRest() throws IOException {
-    // User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     return requestManager.listAllExperiments();
   }
 

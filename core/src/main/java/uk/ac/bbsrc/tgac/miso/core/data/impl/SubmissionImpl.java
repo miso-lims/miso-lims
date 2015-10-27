@@ -264,8 +264,6 @@ public class SubmissionImpl implements Submission<Submittable, Document, Documen
   @Override
   public boolean userCanWrite(User user) {
     return securityProfile.userCanWrite(user);
-    // return this.userCanWrite(user);
-
   }
 
   @Override

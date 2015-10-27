@@ -86,7 +86,6 @@ public class EditSolidPoolController {
 
   private List<? extends Dilution> populateAvailableDilutions(User user, Pool pool) throws IOException {
     ArrayList<emPCRDilution> libs = new ArrayList<emPCRDilution>();
-    // for (Dilution l : requestManager.listAllDilutionsByPlatform(PlatformType.Solid)) {
     for (emPCRDilution l : requestManager.listAllEmPcrDilutions()) {
       if (l.getEmPCR().getLibraryDilution().getLibrary().getPlatformName().equals(PlatformType.SOLID.getKey())) {
         if (!pool.getDilutions().contains(l)) {
@@ -211,10 +210,6 @@ public class EditSolidPoolController {
       }
       throw ex;
     }
-    // catch (MalformedExperimentException e) {
-    // e.printStackTrace();
-    // throw new IOException(e);
-    // }
   }
 
   @RequestMapping(value = "/new/dilution/{dilutionId}", method = RequestMethod.GET)

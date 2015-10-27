@@ -241,9 +241,6 @@ public abstract class AbstractRun implements Run {
         } else if (status.getHealth().equals(HealthType.Completed)) {
           fireRunCompletedEvent();
         } else if (status.getHealth().equals(HealthType.Failed)) {
-          // if (status.getCompletionDate() == null) {
-          // status.setCompletionDate(new Date());
-          // }
           fireRunFailedEvent();
         } else {
           fireStatusChangedEvent();
@@ -441,7 +438,7 @@ public abstract class AbstractRun implements Run {
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
     if (getId() == AbstractRun.UNSAVED_ID || them.getId() == AbstractRun.UNSAVED_ID) {
-      return getAlias().equals(them.getAlias()); // && this.getDescription().equals(them.getDescription());
+      return getAlias().equals(them.getAlias());
     } else {
       return getId() == them.getId();
     }
@@ -455,8 +452,6 @@ public abstract class AbstractRun implements Run {
       final int PRIME = 37;
       int hashcode = 1;
       if (getAlias() != null) hashcode = PRIME * hashcode + getAlias().hashCode();
-      // if (getDescription() != null) hashcode = PRIME * hashcode + getDescription().hashCode();
-      // if (getExperiment() != null) hashcode = 37 * hashcode + getExperiment().hashCode();
       return hashcode;
     }
   }

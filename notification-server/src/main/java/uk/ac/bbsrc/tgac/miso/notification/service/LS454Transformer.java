@@ -139,8 +139,6 @@ public class LS454Transformer implements FileSetTransformer<String, String, File
                 String compstat = URLEncoder.encode(new String(IntegrationUtils.compress(runLog.getBytes())), "UTF-8");
                 run.put("status", compstat);
 
-                // Matcher completeMatcher =
-                // Pattern.compile("^\\[([A-z]{3} [A-z]{3} \\d{2} \\d{2}:\\d{2}:\\d{2} \\d{4})\\].*Job complete\\.$").matcher(runLog);
                 Matcher completeMatcher = runCompleteLogPattern.matcher(runLog);
                 if (completeMatcher.find()) {
                   log.debug(runName + " :: Completed");

@@ -264,7 +264,6 @@ public abstract class AbstractProject implements Project {
   @Override
   public void inheritPermissions(SecurableByProfile parent) throws SecurityException {
     // projects have no parents
-    // setSecurityProfile(parent.getSecurityProfile());
   }
 
   @Override

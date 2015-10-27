@@ -62,7 +62,6 @@ public class NamingTests {
 
   @Test
   public void testSampleNaming() throws MisoNamingException {
-    // DefaultEntityNamingScheme<Sample> entityNameValidationScheme = new DefaultEntityNamingScheme(Sample.class);
     Sample s = dataObjectFactory.getSample();
     s.setId(1L);
     String name = sampleNamingScheme.generateNameFor("name", s);
@@ -77,7 +76,6 @@ public class NamingTests {
 
   @Test
   public void testLibraryNaming() throws MisoNamingException {
-    // DefaultEntityNamingScheme<Library> entityNameValidationScheme = new DefaultEntityNamingScheme(Library.class);
     Library l = dataObjectFactory.getLibrary();
     l.setId(1L);
     String name = libraryNamingScheme.generateNameFor("name", l);

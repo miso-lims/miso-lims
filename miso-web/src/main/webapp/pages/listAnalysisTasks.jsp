@@ -182,14 +182,6 @@
       Tasks.ui.populatePendingTasks();
       Tasks.ui.populateFailedTasks();
       Tasks.ui.populateCompletedTasks();
-
-      // update every 30 secs
-//      window.setInterval(function () {
-//        Tasks.ui.populateRunningTasks();
-//        Tasks.ui.populatePendingTasks();
-//        Tasks.ui.populateCompletedTasks();
-//        Tasks.ui.populateFailedTasks();
-//      }, 30000);
     });
   </script>
 <%@ include file="../footer.jsp" %>

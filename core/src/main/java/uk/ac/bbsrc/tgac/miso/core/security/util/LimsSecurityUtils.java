@@ -104,8 +104,6 @@ public class LimsSecurityUtils {
     p.setAccountNonLocked(user.isActive());
 
     final Collection<GrantedAuthority> auths = user.getPermissionsAsAuthorities();
-    // TODO we don't currently store LIMS activity roles in LDAP
-    // auths.addAll(getRolesAsAuthorities());
     p.setAuthorities(auths);
 
     p.setDisplayName(user.getFullName());

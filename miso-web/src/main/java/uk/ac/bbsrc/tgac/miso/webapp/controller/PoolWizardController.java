@@ -107,7 +107,6 @@ public class PoolWizardController {
 
       model.put("project", p);
       model.put("platforms", a.toString());
-      // model.put("existingStudies", requestManager.listAllStudiesByProjectId(projectId));
       model.put("studyTypes", b.toString());
       return new ModelAndView("/pages/poolWizard.jsp", model);
     } catch (IOException ex) {

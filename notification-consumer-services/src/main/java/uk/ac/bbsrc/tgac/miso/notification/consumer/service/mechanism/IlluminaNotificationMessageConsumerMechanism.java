@@ -356,7 +356,6 @@ public class IlluminaNotificationMessageConsumerMechanism
                 }
                 f.initEmptyPartitions();
               } else {
-                // log.info("Got "+f.getPartitions().size()+" partitions for run " + r.getName() + " (container "+f.getContainerId()+")");
                 if (r.getSequencerReference().getPlatform().getInstrumentModel().contains("MiSeq")) {
                   if (f.getPartitions().size() != 1) {
                     log.warn(f.getName() + ":: WARNING - number of partitions found (" + f.getPartitions().size()
@@ -405,19 +404,10 @@ public class IlluminaNotificationMessageConsumerMechanism
 
               if (f.getIdentificationBarcode() == null || "".equals(f.getIdentificationBarcode())) {
                 if (run.has("containerId") && !"".equals(run.getString("containerId"))) {
-                  // log.info("Updating container barcode for container "+f.getContainerId()+" (" + r.getName() + ")");
                   f.setIdentificationBarcode(run.getString("containerId"));
-                  // requestManager.saveSequencerPartitionContainer(f);
                 }
               }
             }
-
-            // manage kits
-            // prepare for kit merge
-            /*
-             * if (run.has("kits")) { JSONArray kits = run.getJSONArray("kits"); for (String kitBarcode : (Iterable<String>) kits) { if
-             * (!"".equals(kitBarcode)) { //lookup barcode //Kit k = requestManager.getKitByIdentificationBarcode(kitBarcode); } } }
-             */
 
             updatedRuns.put(r.getAlias(), r);
             runsToSave.add(r);

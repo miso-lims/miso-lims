@@ -44,7 +44,6 @@ public class UploadListener implements CopyStreamListener {
   public void bytesTransferred(long totalBytesTransferred, int bytesTransferred, long streamSize) {
     streamSZ = streamSize;
     totalBT = totalBytesTransferred;
-    // System.out.println("time" + System.currentTimeMillis()+ ". Listener total bytes transferred at call " + calls + ": " + totalBT);
     calls++;
   }
 

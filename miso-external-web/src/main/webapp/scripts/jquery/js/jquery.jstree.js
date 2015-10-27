@@ -127,9 +127,6 @@
 				settings.plugins = $.isArray(settings.plugins) ? settings.plugins : $.jstree.defaults.plugins;
 				if($.inArray("core", settings.plugins) === -1) { settings.plugins.unshift("core"); }
 				
-				// only unique plugins (NOT WORKING)
-				// settings.plugins = settings.plugins.sort().join(",,").replace(/(,|^)([^,]+)(,,\2)+(,|$)/g,"$1$2$4").replace(/,,+/g,",").replace(/,$/,"").split(",");
-
 				// extend defaults with passed data
 				s = $.extend(true, {}, $.jstree.defaults, settings);
 				s.plugins = settings.plugins;
@@ -913,7 +910,6 @@
 			hover_node : function (obj) {
 				obj = this._get_node(obj);
 				if(!obj.length) { return false; }
-				//if(this.data.ui.hovered && obj.get(0) === this.data.ui.hovered.get(0)) { return; }
 				if(!obj.hasClass("jstree-hovered")) { this.dehover_node(); }
 				this.data.ui.hovered = obj.children("a").addClass("jstree-hovered").parent();
 				this.__callback({ "obj" : obj });
@@ -1180,7 +1176,6 @@
 						var s = this._get_settings().themes;
 						this.data.themes.dots = s.dots; 
 						this.data.themes.icons = s.icons; 
-						//alert(s.dots);
 						this.set_theme(s.theme, s.url);
 					}, this))
 				.bind("loaded.jstree", $.proxy(function () {

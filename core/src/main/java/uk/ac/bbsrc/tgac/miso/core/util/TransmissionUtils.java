@@ -204,26 +204,16 @@ public class TransmissionUtils {
 
       copyStream(fis, ops, ftp.getBufferSize(), file.length(), listener);
 
-      // ftp.completePendingCommand();
       ops.close();
-      // bis.close();
       fis.close();
       log.info("TransmissionUtils putListen: FTP server responded: " + ftp.getReplyString());
-
-      /*
-       * commented out as I think it's causing a false error by checking too soon- file upload will not have completed yet... boolean
-       * success = FTPReply.isPositiveIntermediate(ftp.getReplyCode()); if (!success) { error = true; log.error("Error storing file: " +
-       * file.getName() + " (" +success+ ")"); }
-       */
 
       if (autoLogout) {
         ftp.logout();
       }
-      // return(true);
     } catch (IOException e) {
       error = true;
       e.printStackTrace();
-      // return(false);
     } finally {
       try {
         log.info("TransmissionUtils putListen:finally: " + ftp.getReplyString());

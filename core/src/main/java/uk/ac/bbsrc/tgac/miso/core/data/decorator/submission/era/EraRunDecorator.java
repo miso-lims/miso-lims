@@ -100,12 +100,6 @@ public class EraRunDecorator extends AbstractSubmittableDecorator<Document> {
 
           Element files = submission.createElementNS(null, "FILES");
 
-          // FilePathGenerator fpg = new TGACIlluminaFilepathGenerator();
-          // String basePath = submissionProperties.getProperty("submission.baseReadPath");
-          // if (basePath != null) {
-          // fpg = new TGACIlluminaFilepathGenerator(basePath);
-          // }
-
           try {
             Element file = submission.createElementNS(null, "FILE");
             file.setAttribute("filename", r.getAlias() + "/" + "00" + p.getPartitionNumber() + "/" + poolable.getName() + "_R1.fastq.gz");

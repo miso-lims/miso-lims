@@ -141,15 +141,6 @@ public class ProjectD3GraphController {
           libraryJSON.put("name", "Libraries");
 
           for (Library library : libraries) {
-            // Collection<LibraryDilution> lds = requestManager.listAllLibraryDilutionsByLibraryId(library.getLibraryId());
-            // if (lds.size() > 0) {
-            // JSONObject dilutionsJSON = new JSONObject();
-            // for (LibraryDilution ld : lds) {
-            // dilutionsJSON.put(ld.getName(), "2");
-            // }
-            // librariesJSON.put(library.getName(), dilutionsJSON);
-            // }
-            // else {
             if (library.getLibraryQCs().size() > 0) {
               librariesArray.add(
                   JSONObject.fromObject("{'name': '" + library.getName() + "','description':'" + library.getAlias() + "','color': '1'}"));
@@ -157,7 +148,6 @@ public class ProjectD3GraphController {
               librariesArray.add(
                   JSONObject.fromObject("{'name': '" + library.getName() + "','description':'" + library.getAlias() + "','color': '0'}"));
             }
-            // }
           }
           libraryJSON.put("children", librariesArray);
 
@@ -184,7 +174,6 @@ public class ProjectD3GraphController {
   @RequestMapping(method = RequestMethod.GET)
   public @ResponseBody JSONObject graphd3Rest() throws IOException {
     try {
-      // User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Collection<Project> projects = requestManager.listAllProjects();
 
       JSONObject miso = new JSONObject();
@@ -207,102 +196,5 @@ public class ProjectD3GraphController {
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
   }
-
-  // Old Protovis Code, not being used
-
-  //
-  // @RequestMapping(value = "/projects/graph", method = RequestMethod.GET)
-  // public
-  // @ResponseBody
-  // JSONObject graphRest() throws IOException {
-  // //User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-  // Collection<Project> projects = requestManager.listAllProjects();
-  // JSONObject pj = new JSONObject();
-  // try {
-  // for (Project p : projects) {
-  // JSONObject j = new JSONObject();
-  // Collection<Sample> samples = requestManager.listAllSamplesByProjectId(p.getProjectId());
-  // Collection<Run> runs = requestManager.listAllRunsByProjectId(p.getProjectId());
-  // Collection<Study> studies = requestManager.listAllStudiesByProjectId(p.getProjectId());
-  //
-  // JSONObject runsJSON = new JSONObject();
-  // JSONObject studiesJSON = new JSONObject();
-  // JSONObject samplesJSON = new JSONObject();
-  //
-  // for (Run run : runs) {
-  // if (run.getStatus() != null
-  // && run.getStatus().getHealth() != null
-  // && run.getStatus().getHealth().getKey().equals("Completed")) {
-  // runsJSON.put(run.getName(), "1");
-  // }
-  // else {
-  // runsJSON.put(run.getName(), "0");
-  // }
-  // }
-  //
-  // for (Study study : studies) {
-  // Collection<Experiment> experiments = requestManager.listAllExperimentsByStudyId(study.getStudyId());
-  // if (experiments.size() > 0) {
-  // JSONObject experimentsJSON = new JSONObject();
-  // for (Experiment e : experiments) {
-  // experimentsJSON.put(e.getName(), "2");
-  // }
-  // studiesJSON.put(study.getName(), experimentsJSON);
-  // }
-  // }
-  //
-  // for (Sample sample : samples) {
-  // Collection<Library> libraries = requestManager.listAllLibrariesBySampleId(sample.getSampleId());
-  // if (libraries.size() == 0) {
-  // if (sample.getQcPassed()) {
-  // samplesJSON.put(sample.getName(), "1");
-  // }
-  // else {
-  // samplesJSON.put(sample.getName(), "0");
-  // }
-  // }
-  // else {
-  // JSONObject librariesJSON = new JSONObject();
-  // for (Library library : libraries) {
-  // Collection<LibraryDilution> lds = requestManager.listAllLibraryDilutionsByLibraryId(library.getLibraryId());
-  // if (lds.size() > 0) {
-  // JSONObject dilutionsJSON = new JSONObject();
-  // for (LibraryDilution ld : lds) {
-  // dilutionsJSON.put(ld.getName(), "2");
-  // }
-  // librariesJSON.put(library.getName(), dilutionsJSON);
-  // }
-  // else {
-  // if (library.getLibraryQCs().size() > 0) {
-  // librariesJSON.put(library.getName(), "1");
-  // }
-  // else {
-  // librariesJSON.put(library.getName(), "0");
-  // }
-  // }
-  // }
-  // samplesJSON.put(sample.getName(), librariesJSON);
-  // }
-  // }
-  // if (runs.size() > 0) {
-  // j.put("Runs", runsJSON);
-  // }
-  // if (studies.size() > 0) {
-  // j.put("Studies", studiesJSON);
-  // }
-  // if (samples.size() > 0) {
-  // j.put("Samples", samplesJSON);
-  // }
-  // if (runs.size() > 0 || studies.size() > 0 || samples.size() > 0) {
-  // pj.put(p.getName(), j);
-  // }
-  // }
-  // return pj;
-  // }
-  // catch (IOException e) {
-  // log.debug("Failed", e);
-  // return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
-  // }
-  // }
 
 }

@@ -37,20 +37,6 @@ import java.util.Collection;
  */
 public interface PoolQcStore extends Store<PoolQC>, Remover<PoolQC> {
   /**
-   * Retrieve a PoolQC from an underlying data store given a PoolQC ID
-   * <p/>
-   * This method intends to retrieve objects in an 'ignorant' fashion, i.e. will not populate parent or child objects that could lead to a
-   * circular dependency
-   * 
-   * @param qcId
-   *          of type long
-   * @return PoolQC
-   * @throws java.io.IOException
-   *           when
-   */
-  // PoolQC lazyGet(long qcId) throws IOException;
-
-  /**
    * List all PoolQCs performed on a Pool given a parent Pool ID
    * 
    * @param poolId

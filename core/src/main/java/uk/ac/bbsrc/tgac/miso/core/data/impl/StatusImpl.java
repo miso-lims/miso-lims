@@ -124,9 +124,6 @@ public class StatusImpl implements Status, Serializable {
 
   @Override
   public void setHealth(HealthType health) {
-    // if (this.health != null && !this.health.equals(health) && health.equals(HealthType.Completed)) {
-    // setCompletionDate(new Date());
-    // }
     this.health = health;
   }
 

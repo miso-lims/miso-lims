@@ -21,10 +21,10 @@
  * *********************************************************************
  */
 
-var width;// = 0.8 * getWindowWidth();
+var width;
 var date = new Date;
 //Default Selection
-var cellwidth;// = width / 31;
+var cellwidth;
 var tempcolour = ["#1f77b4", "#aec7e8", "#ff7f0e", "#ffbb78", "#2ca02c", "#98df8a", "#d62728", "#ff9896", "#9467bd", "#c5b0d5", "#8c564b", "#c49c94", "#e377c2", "#f7b6d2", "#7f7f7f", "#c7c7c7", "#bcbd22", "#dbdb8d", "#17becf", "#9edae5" ];
 var day = d3.time.format("%w"), week = d3.time.format("%U"), percent = d3.format(".1%"), format = d3.time.format("%Y-%m-%d");
 
@@ -38,7 +38,7 @@ var range_start;
 var range_stop;
 var readFile;
 var noofmachine;
-var m, w, h, z;// = cellwidth; // cell size
+var m, w, h, z;
 
 pw = 50;
 n = 17;
@@ -436,28 +436,6 @@ function drawCalendar(selectedYear, machine, numberofmachine) {
             .attr("d", monthPath);
 
     function monthoutline() {
-
-//
-//    var rect1 = vis.selectAll("rect.day")
-//            .data(function(d) { return d3.time.days(new Date(d, 0, 1), new Date(d + 1, 0, 1)); })
-//            .enter().append("svg:rect")
-//            .style("fill", "transparent")
-//            .style("stroke", "#ccc")
-//            .attr("opacity", 0.5)
-//            .attr("width", z)
-//            .attr("height", z)
-//            .attr("x", function(d) {
-//
-//                    return(d.getDate() * z);
-//                  })
-//            .attr("y", function(d) {
-//                    return((d.getMonth()) * z);
-//                  })
-//            .on("click", over)
-//            .append("svg:title")
-//            .text(function(d) {
-//                    return (d = format(d));
-//                  });
     }
 
     monthoutline();
@@ -705,12 +683,6 @@ function over(g) {
                     width: "90%",
                     html: list + "</ul>"});
 
-
-//  jQuery("#messageD3Calendar").css('top', jQuery("#chartD3Calendar").height() - 50);
-//  document.getElementById("messageD3Calendar").innerHTML = "";
-//  var list = "<ul class=\"bullets\">";
-//  list += "<li><a href='run/" + g.ID + "'>" + g.Name + "</a>  started on the Date:" + g.Start + " and was " + g.Health + " on " + g.Stop + " on the machine " + g.InstrumentName + "</li>";
-//  document.getElementById("messageD3Calendar").innerHTML = list + "</ul>";
   return;
 }
 
@@ -757,67 +729,3 @@ function editRestrictedDatePicker(id) {
 
 
 }
-
-
-//function over(g) {
-//  jQuery("#messageD3Calendar").css('top', jQuery("#chartD3Calendar").height() - 50);
-//  document.getElementById("messageD3Calendar").innerHTML = "";
-//  var list = "<ul class=\"bullets\">";
-//  var messaged3 = d3.select("#messageD3Calendar");
-//  messaged3.selectAll("svg.text")
-//          .data(data.filter(function(d) {
-//    if (noofmachine == 1) {
-//      return (d.Instrument == instrument);
-//    }
-//    else {
-//      return d;
-//    }
-//  }))
-//          .enter().append("svg:text")
-//          .attr("class", "year")
-//          .text(function(d) {
-//
-//                  //same year
-//                  if (range_start == getyear(d.Start) && range_start == getyear(d.Stop)) {
-//                    //g is the square
-//                    if (g.getMonth() + 1 > getmonth(d.Start) && g.getMonth() + 1 < getmonth(d.Stop)) {
-//                      list += "<li><a href='run/" + d.ID + "'>" + d.Name + "</a>  started on the Date:" + d.Start + " and was " + d.Health + " on " + d.Stop + " on the machine " + d.InstrumentName + "</li>";
-//                    }
-//                    else if ((g.getMonth() + 1 == getmonth(d.Start) && g.getDate() >= getdate(d.Start)) && (g.getMonth() + 1 == getmonth(d.Stop) && g.getDate() <= getdate(d.Stop))) {
-//                      list += "<li><a href='run/" + d.ID + "'>" + d.Name + "</a>  started on the Date:" + d.Start + " and was " + d.Health + " on " + d.Stop + " on the machine " + d.InstrumentName + "</li>";
-//                    }
-//                    else if (g.getMonth() + 1 == getmonth(d.Start) && g.getDate() >= getdate(d.Start) && getmonth(d.Start) != getmonth(d.Stop)) {
-//                      list += "<li><a href='run/" + d.ID + "'>" + d.Name + "</a>  started on the Date:" + d.Start + " and was " + d.Health + " on " + d.Stop + " on the machine " + d.InstrumentName + "</li>";
-//                    }
-//                    else if (g.getMonth() + 1 == getmonth(d.Stop) && g.getDate() <= getdate(d.Stop) && getmonth(d.Start) != getmonth(d.Stop)) {
-//                      list += "<li><a href='run/" + d.ID + "'>" + d.Name + "</a>  started on the Date:" + d.Start + " and was " + d.Health + " on " + d.Stop + " on the machine " + d.InstrumentName +  "</li>";
-//                    }
-//                  }
-//                  //next year
-//                  else if (range_start == getyear(d.Start) && range_start < getyear(d.Stop)) {
-//                    //g is the square
-//                    if (g.getMonth() + 1 > getmonth(d.Start)) {                               /**/
-//                      list += "<li><a href='run/" + d.ID + "'>" + d.Name + "</a>  started on the Date:" + d.Start + " and was " + d.Health + " on " + d.Stop + " on the machine " + d.InstrumentName +  "</li>";
-//                    }
-//                    else if (g.getMonth() + 1 == getmonth(d.Start) && g.getDate() >= getdate(d.Start)) {
-//                      list += "<li><a href='run/" + d.ID + "'>" + d.Name + "</a>  started on the Date:" + d.Start + " and was " + d.Health + " on " + d.Stop + " on the machine " + d.InstrumentName +  "</li>";
-//                    }
-//                  }
-//                  //previous year
-//                  else if (range_start > getyear(d.Start) && range_start == getyear(d.Stop)) {
-//                    //g is the square
-//                    if (g.getMonth() + 1 < getmonth(d.Stop)) {
-//                      list += "<li><a href='run/" + d.ID + "'>" + d.Name + "</a>  started on the Date:" + d.Start + " and was " + d.Health + " on " + d.Stop + " on the machine " + d.InstrumentName +  "</li>";
-//                    }
-//                    else if (g.getMonth() + 1 == getmonth(d.Stop) && g.getDate() <= getdate(d.Stop)) {
-//                      list += "<li><a href='run/" + d.ID + "'>" + d.Name + "</a>  started on the Date:" + d.Start + " and was " + d.Health + " on " + d.Stop + " on the machine " + d.InstrumentName +  "</li>";
-//                    }
-//                  }
-//                  return list;
-//
-//                });
-//
-//  document.getElementById("messageD3Calendar").innerHTML = list + "</ul>";
-//
-//  return;
-//}/**/

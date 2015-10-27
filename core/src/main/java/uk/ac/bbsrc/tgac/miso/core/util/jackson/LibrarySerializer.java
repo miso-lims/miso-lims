@@ -20,8 +20,6 @@ public class LibrarySerializer extends JsonSerializer<Library> {
   @Override
   public void serialize(Library library, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
     jsonGenerator.writeStartObject();
-    // jsonGenerator.writeStringField("username", user.getUsername());
-
     jsonGenerator.writeEndObject();
   }
 }

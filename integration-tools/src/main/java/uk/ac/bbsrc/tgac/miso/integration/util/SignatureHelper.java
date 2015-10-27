@@ -120,12 +120,6 @@ public class SignatureHelper {
       }
     }
 
-    /*
-     * TODO - put parameters back in - sign SI message payload? // load parameters for (Object key : request.getParameterMap().keySet()) {
-     * log.debug("FOUND PARAMETER: " + (String)key); String[] o = (String[]) request.getParameterMap().get(key);
-     * headersAndParams.put((String) key, o[0]); }
-     */
-
     return createSortedUrl(request.getContextPath() + request.getServletPath() + request.getPathInfo(), headersAndParams);
   }
 
@@ -144,7 +138,6 @@ public class SignatureHelper {
 
       // base64-encode the hmac
       result = Base64.encodeBase64URLSafeString(rawHmac);
-      // result = Base64.encodeBase64String(rawHmac);
     } catch (Exception e) {
       throw new SignatureException("Failed to generate HMAC : " + e.getMessage());
     }
@@ -155,7 +148,6 @@ public class SignatureHelper {
   private static PublicKey decodePublicKey(String publicKey) throws Exception {
     KeyFactory keyFactory = KeyFactory.getInstance(DSA_ALGORITHM);
     byte[] publicKeyBytes = Base64.decodeBase64(publicKey);
-    // EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(publicKeyBytes);
     EncodedKeySpec publicKeySpec = new PKCS8EncodedKeySpec(publicKeyBytes);
     return keyFactory.generatePublic(publicKeySpec);
   }

@@ -759,8 +759,6 @@ Reports.ui = {
     }
 
     if (jQuery('#datepicking').val() == "custom") {
-//            jQuery("#calendarfrom").val("");
-//            jQuery("#calendarto").val("");
       jQuery("#custom").show();
     }
     else {

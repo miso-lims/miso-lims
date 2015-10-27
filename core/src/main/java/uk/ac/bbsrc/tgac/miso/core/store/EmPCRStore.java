@@ -37,20 +37,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
  */
 public interface EmPCRStore extends Store<emPCR>, Remover<emPCR>, NamingSchemeAware<emPCR> {
   /**
-   * Retrieve an EmPCR from an underlying data store given an EmPCR ID
-   * <p/>
-   * This method intends to retrieve objects in an 'ignorant' fashion, i.e. will not populate parent or child objects that could lead to a
-   * circular dependency
-   * 
-   * @param emPcrId
-   *          of type long
-   * @return emPCR
-   * @throws IOException
-   *           when
-   */
-  // emPCR lazyGet(long emPcrId) throws IOException;
-
-  /**
    * List all EmPCRs by a parent {@link uk.ac.bbsrc.tgac.miso.core.data.Dilution} ID
    * 
    * @param dilutionId

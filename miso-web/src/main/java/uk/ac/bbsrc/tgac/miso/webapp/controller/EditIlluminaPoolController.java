@@ -206,10 +206,6 @@ public class EditIlluminaPoolController {
       }
       throw ex;
     }
-    // catch (MalformedExperimentException e) {
-    // e.printStackTrace();
-    // throw new IOException(e);
-    // }
   }
 
   @RequestMapping(value = "/new/dilution/{dilutionId}", method = RequestMethod.GET)

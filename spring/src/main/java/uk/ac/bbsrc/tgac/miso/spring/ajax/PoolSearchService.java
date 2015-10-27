@@ -112,7 +112,6 @@ public class PoolSearchService {
           searchStr = new String(Base64.decodeBase64(searchStr));
         }
 
-        // String str = searchStr.toLowerCase();
         StringBuilder b = new StringBuilder();
         List<? extends Dilution> dilutions = new ArrayList<Dilution>(
             requestManager.listDilutionsBySearch(searchStr, PlatformType.valueOf(platformType)));

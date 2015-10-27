@@ -57,10 +57,8 @@ public class SequencerInterrogatorFactory {
     } else if (sr.getPlatform().getPlatformType().equals(PlatformType.SOLID)) {
       return new SequencerInterrogator(new SolidSequencerInterrogationStrategy(), sr);
     } else if (sr.getPlatform().getPlatformType().equals(PlatformType.IONTORRENT)) {
-      // return new SequencerInterrogator(new SolidSequencerInterrogationStrategy(), sr);
       throw new InterrogationException("Unsupported PlatformType");
     } else if (sr.getPlatform().getPlatformType().equals(PlatformType.PACBIO)) {
-      // return new SequencerInterrogator(new SolidSequencerInterrogationStrategy(), sr);
       throw new InterrogationException("Unsupported PlatformType");
     } else {
       throw new InterrogationException("Unrecognised PlatformType");

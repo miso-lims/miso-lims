@@ -264,9 +264,6 @@ public class SolidNotificationMessageConsumerMechanism
                       if (lf.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
                         lf.setPlatform(r.getSequencerReference().getPlatform());
                       }
-                      // else {
-                      // lf.setPlatformType(PlatformType.SOLID);
-                      // }
                       ((RunImpl) r).addSequencerPartitionContainer(lf);
                     }
                   } else {
@@ -278,10 +275,6 @@ public class SolidNotificationMessageConsumerMechanism
                     if (f.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
                       f.setPlatform(r.getSequencerReference().getPlatform());
                     }
-                    // else {
-                    // f.setPlatformType(PlatformType.SOLID);
-                    // }
-                    // f.setPaired(r.getPairedEnd());
                     ((RunImpl) r).addSequencerPartitionContainer(f);
                   }
                 }
@@ -296,9 +289,6 @@ public class SolidNotificationMessageConsumerMechanism
                 if (f.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
                   f.setPlatform(r.getSequencerReference().getPlatform());
                 }
-                // else {
-                // f.setPlatformType(PlatformType.SOLID);
-                // }
 
                 if (run.has("containerId") && !"".equals(run.getString("containerId"))) {
                   f.setIdentificationBarcode(run.getString("containerId"));

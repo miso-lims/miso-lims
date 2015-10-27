@@ -32,24 +32,8 @@ package uk.ac.bbsrc.tgac.miso.core.data;
  * @since 0.0.2
  */
 public interface Submittable<T> {
-
-  /**
-   * Returns the submissionData of this Submittable object.
-   * 
-   * @return T submissionData.
-   */
-  // public T getSubmissionData();
-
   /**
    * Generate submission data based on this object
    */
   public void buildSubmission();
-
-  /**
-   * Accept a SubmittableVisitor that visits this object to generate submission data
-   * 
-   * @param v
-   *          of type SubmittableVisitor
-   */
-  // public void accept(SubmittableVisitor v);
 }

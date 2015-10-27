@@ -23,8 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-//import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
 
 import java.util.Collection;

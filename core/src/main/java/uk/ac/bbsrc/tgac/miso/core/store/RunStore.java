@@ -38,20 +38,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
  */
 public interface RunStore extends Store<Run>, Cascadable, Remover<Run>, NamingSchemeAware<Run> {
   /**
-   * Retrieve a Run from an underlying data store given a Run ID
-   * <p/>
-   * This method intends to retrieve objects in an 'ignorant' fashion, i.e. will not populate parent or child objects that could lead to a
-   * circular dependency
-   *
-   * @param runId
-   *          of type long
-   * @return Run
-   * @throws IOException
-   *           when
-   */
-  // Run lazyGet(long runId) throws IOException;
-
-  /**
    * Gets the latest Run, by start date, that is associated with the given container
    *
    * @param containerId
@@ -78,7 +64,7 @@ public interface RunStore extends Store<Run>, Cascadable, Remover<Run>, NamingSc
    *          String to search for
    * @return Collection<Run>
    * @throws IOException
-   * @throws NullPOinterException
+   * @throws NullPointerException
    *           if query is null
    */
   Collection<Run> listBySearch(String query) throws IOException;

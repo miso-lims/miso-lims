@@ -61,9 +61,6 @@ public class RunQCImpl extends AbstractRunQC implements Serializable {
       } catch (MalformedRunException e) {
         e.printStackTrace();
       }
-      // setSecurityProfile(experiment.getSecurityProfile());
-    } else {
-      // setSecurityProfile(new SecurityProfile(user));
     }
   }
 

@@ -47,7 +47,6 @@ public class HibernateRunStore extends HibernateDaoSupport implements Store<Run>
   @Override
   @Transactional(readOnly = false)
   public long save(Run run) throws IOException {
-    // getHibernateTemplate().saveOrUpdate(run);
     getHibernateTemplate().merge(run);
     return run.getRunId();
   }

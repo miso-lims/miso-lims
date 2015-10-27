@@ -43,8 +43,6 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.*;
 
-//import com.fasterxml.jackson.databind.ObjectMapper;
-
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
  * <p/>
@@ -104,7 +102,6 @@ public class ProjectTreeControllerHelperService {
       JSONObject miso = new JSONObject();
       JSONArray projectsArray = new JSONArray();
       for (Project p : projects) {
-        // Project pro = requestManager.getProjectById(p.getProjectId());
         JSONObject projectJSON = new JSONObject();
         projectJSON.put("name", p.getName());
         projectJSON.put("show", "PROJECT");

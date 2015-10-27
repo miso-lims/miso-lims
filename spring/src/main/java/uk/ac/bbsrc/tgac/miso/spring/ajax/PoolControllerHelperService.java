@@ -525,8 +525,6 @@ public class PoolControllerHelperService {
           for (Dilution ld : dls) {
             List<LibraryQC> libraryQCs = new ArrayList<LibraryQC>(requestManager.listAllLibraryQCsByLibraryId(ld.getLibrary().getId()));
             if (libraryQCs.size() > 0) {
-              // List<LibraryQC> libraryQCsList = new ArrayList<LibraryQC>(libraryQCs);
-              // Collections.sort(libraryQCsList);
               LibraryQC libraryQC = libraryQCs.get(libraryQCs.size() - 1);
               sum += libraryQC.getInsertSize();
               count++;

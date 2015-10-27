@@ -282,9 +282,6 @@ public class LS454NotificationMessageConsumerMechanism
                         if (f.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
                           f.setPlatform(r.getSequencerReference().getPlatform());
                         }
-                        // else {
-                        // f.setPlatformType(PlatformType.LS454);
-                        // }
                         f.setPartitionLimit(numPartitions);
                         f.initEmptyPartitions();
                         f.setIdentificationBarcode(ptpId);
@@ -298,9 +295,6 @@ public class LS454NotificationMessageConsumerMechanism
                       if (f.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
                         f.setPlatform(r.getSequencerReference().getPlatform());
                       }
-                      // else {
-                      // f.setPlatformType(PlatformType.LS454);
-                      // }
                       if (f.getIdentificationBarcode() == null || "".equals(f.getIdentificationBarcode())) {
                         f.setIdentificationBarcode(ptpId);
                         long flowId = requestManager.saveSequencerPartitionContainer(f);

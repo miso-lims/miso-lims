@@ -143,7 +143,6 @@ public class EditProjectController {
     if (projectId != AbstractProject.UNSAVED_ID) {
       Project p = requestManager.getProjectById(projectId);
       if (p != null) {
-        // User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
         Map<Integer, String> fileMap = new HashMap<Integer, String>();
         for (String s : filesManager.getFileNames(Project.class, projectId.toString())) {
           fileMap.put(s.hashCode(), s);
@@ -430,7 +429,6 @@ public class EditProjectController {
       model.put("formObj", project);
       model.put("project", project);
       model.put("projectFiles", populateProjectFiles(projectId));
-      // model.put("projectRuns", requestManager.listAllRunsByProjectId(projectId));
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, project, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, project, securityManager.listAllUsers()));
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, project, securityManager.listAllGroups()));
@@ -438,7 +436,6 @@ public class EditProjectController {
 
       Map<Long, String> overviewMap = new HashMap<Long, String>();
       for (ProjectOverview po : project.getOverviews()) {
-        // log.debug(po.getWatchers().toString());
         if (po.getWatchers().contains(user)) {
           overviewMap.put(po.getId(), user.getLoginName());
         }

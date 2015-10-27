@@ -45,8 +45,6 @@ public class FTPUploadReport implements UploadReport {
   public FTPUploadReport(List<FTPUploadJob> FTPUploadJobs) {
     log.debug("FTPUploadReport has been created for submission:");
 
-    // this.uploadJobs = FTPUploadJobs;
-
     for (FTPUploadJob up : FTPUploadJobs) {
       log.debug("UploadJob: " + up.getFile() + " " + up.getPercentageTransferred() + "% complete");
 

@@ -37,20 +37,6 @@ import java.util.Collection;
  */
 public interface StudyStore extends Store<Study>, Cascadable, Remover<Study>, NamingSchemeAware<Study> {
   /**
-   * Retrieve a Study from an underlying data store given a Study ID
-   * <p/>
-   * This method intends to retrieve objects in an 'ignorant' fashion, i.e. will not populate parent or child objects that could lead to a
-   * circular dependency
-   * 
-   * @param studyId
-   *          of type long
-   * @return Study
-   * @throws IOException
-   *           when
-   */
-  // Study lazyGet(long studyId) throws IOException;
-
-  /**
    * List all Studies that match a search criteria
    * 
    * @param query

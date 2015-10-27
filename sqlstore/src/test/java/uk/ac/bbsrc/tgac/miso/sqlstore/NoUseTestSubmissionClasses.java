@@ -69,7 +69,6 @@ public class NoUseTestSubmissionClasses extends LimsDAOTestCase {
   Collection<Sample> samples;
   Collection<Experiment> experiments;
   List<Run> runs;
-  // List<Flowcell> flowcells;
 
   Project project;
   Submission submission;

@@ -258,9 +258,6 @@ public class PacBioNotificationMessageConsumerMechanism
                         if (lf.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
                           lf.setPlatform(r.getSequencerReference().getPlatform());
                         }
-                        // else {
-                        // lf.setPlatformType(PlatformType.PACBIO);
-                        // }
                         JSONArray cells = run.getJSONArray("cells");
                         if (cells.size() > lf.getPartitions().size()) {
                           int numNewcells = cells.size() - lf.getPartitions().size();

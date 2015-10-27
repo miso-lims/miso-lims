@@ -67,7 +67,6 @@ public class PoolConstructionCompleteResponderService implements ResponderServic
       ProjectOverviewEvent poe = (ProjectOverviewEvent) event;
       ProjectOverview po = poe.getEventObject();
       if (poe.getEventType().equals(MisoEventType.POOL_CONSTRUCTION_COMPLETE) && po.getAllPoolsConstructed()) {
-        // log.info("Project "+poe.getEventObject().getProject().getAlias() +": " + poe.getEventMessage());
         return true;
       }
     }

@@ -182,16 +182,6 @@ public class ExternalSectionControllerHelperService {
       Collection<Sample> samples = requestManager.listAllSamplesByProjectId(projectId);
       if (samples.size() > 0) {
         int sampleQCPassed = 0;
-        // sb.append("<table class=\"list\">\n" +
-        // " <thead>\n" +
-        // " <tr>\n" +
-        // " <th>Sample Name</th>\n" +
-        // " <th>Sample Alias</th>\n" +
-        // " <th>Type</th>\n" +
-        // " <th>QC Passed</th>\n" +
-        // " </tr>\n" +
-        // " </thead>\n" +
-        // " <tbody>");
         for (Sample sample : samples) {
           Boolean passed = sample.getQcPassed();
           String passStr;
@@ -203,62 +193,10 @@ public class ExternalSectionControllerHelperService {
           } else {
             passStr = passed.toString();
           }
-          // sb.append("<tr>\n" +
-          // " <td><b>" + sample.getName() + "</b></td>\n" +
-          // " <td>" + sample.getAlias() + "</td>\n" +
-          // " <td>" + sample.getSampleType() + "</td>\n" +
-          // " <td>" + passStr + "</td>\n" +
-          // " </tr>");
         }
         // sb.append("</tbody></table>");
         sampleQcSb.append("Sample QC Passed: " + sampleQCPassed + " out of " + samples.size() + ".<br/><br/>");
       }
-
-      else {
-        // sb.append("<b>Sample:</b> None.<br/><br/>");
-      }
-
-      // Collection<Library> libraries = requestManager.listAllLibrariesByProjectId(projectId);
-      // if (libraries.size() > 0) {
-      // int libraryQCPassed = 0;
-      // sb.append("<table class=\"list\">\n" +
-      // " <thead>\n" +
-      // " <tr>\n" +
-      // " <th>Library Name</th>\n" +
-      // " <th>Library Alias</th>\n" +
-      // " <th>Type</th>\n" +
-      // " <th>QC</th>\n" +
-      // " </tr>\n" +
-      // " </thead>\n" +
-      // " <tbody>");
-      // for (Library library : libraries) {
-      // Boolean passed = library.getQcPassed();
-      // String passStr;
-      // if (passed == null) {
-      // passStr = "Unknown";
-      // }
-      // else if (passed) {
-      // passStr = passed.toString();
-      // libraryQCPassed++;
-      // }
-      // else {
-      // passStr = passed.toString();
-      // }
-      // sb.append("<tr>\n" +
-      // " <td><b>" + library.getName() + "</b></td>\n" +
-      // " <td>" + library.getAlias() + "</td>\n" +
-      // " <td>" + library.getLibraryType() + "</td>\n" +
-      // " <td>" + passStr + "</td>\n" +
-      // " </tr>");
-      // }
-      // sb.append("</tbody>\n" +
-      // " </table>");
-      // sb.append("Library QC Passed: " + libraryQCPassed + " out of " + libraries.size() + ".<br/><br/>");
-      // }
-      //
-      // else {
-      // sb.append("<b>Library:</b> None.<br/><br/>");
-      // }
 
       jsonObject.put("projectJson", projectSb.toString());
       jsonObject.put("sampleQcJson", sampleQcSb.toString());

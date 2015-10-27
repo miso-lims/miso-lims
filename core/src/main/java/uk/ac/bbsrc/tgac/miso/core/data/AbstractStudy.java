@@ -256,7 +256,6 @@ public abstract class AbstractStudy implements Study {
       int hashcode = 1;
       if (getName() != null) hashcode = PRIME * hashcode + getName().hashCode();
       if (getAlias() != null) hashcode = PRIME * hashcode + getAlias().hashCode();
-      // if (getDescription() != null) hashcode = 37 * hashcode + getDescription().hashCode();
       return hashcode;
     }
   }

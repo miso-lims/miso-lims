@@ -37,20 +37,6 @@ import java.util.Collection;
  */
 public interface ExperimentStore extends Store<Experiment>, Cascadable, Remover<Experiment>, NamingSchemeAware<Experiment> {
   /**
-   * Retrieve an Experiment from an underlying data store given an Experiment ID
-   * <p/>
-   * This method intends to retrieve objects in an 'ignorant' fashion, i.e. will not populate parent or child objects that could lead to a
-   * circular dependency
-   * 
-   * @param experimentId
-   *          of type long
-   * @return Experiment
-   * @throws IOException
-   *           when
-   */
-  // Experiment lazyGet(long experimentId) throws IOException;
-
-  /**
    * List all Experiments that match a search criteria
    * 
    * @param query

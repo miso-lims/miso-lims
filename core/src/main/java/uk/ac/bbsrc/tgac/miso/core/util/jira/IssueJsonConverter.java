@@ -43,7 +43,6 @@ public class IssueJsonConverter {
     // convert all REST urls to relevant JIRA web interface URLs
     Pattern issuePattern = Pattern.compile("(http://[A-z0-9\\.]+)/rest/api/2/issue/([0-9]+)");
     Pattern issuelinkPattern = Pattern.compile("(http://[A-z0-9\\.]+)/rest/api/2/issueLink/[0-9]+");
-    // Pattern votePattern = Pattern.compile("(http://[A-z0-9\\.]+)/rest/api/2.0.alpha1/issue/([A-Z]+-[\\d]+)/votes");
     Pattern userPattern = Pattern.compile("(http://[A-z0-9\\.]+)/rest/api/2/user\\?username\\=([A-z0-9]+)");
     Pattern projectPattern = Pattern.compile("(http://[A-z0-9\\.]+)/rest/api/2/project/([A-Z]+)");
     Pattern commentPattern = Pattern.compile("(http://[A-z0-9\\.]+)/rest/api/2/issue/([0-9]+)/comment/([0-9]+)");
@@ -59,11 +58,6 @@ public class IssueJsonConverter {
 
     JSONObject fields = json.getJSONObject("fields");
     if (fields != null) {
-      /*
-       * JSONObject voteValue = fields.getJSONObject("votes").getJSONObject("value"); Matcher m =
-       * votePattern.matcher(voteValue.getString("self")); if (m.matches()) { json.put("url", m.group(1)+"/browse/"+m.group(2)); }
-       */
-
       JSONObject assigneeValue = fields.getJSONObject("assignee");
       Matcher m = userPattern.matcher(assigneeValue.getString("self"));
       if (m.matches()) {

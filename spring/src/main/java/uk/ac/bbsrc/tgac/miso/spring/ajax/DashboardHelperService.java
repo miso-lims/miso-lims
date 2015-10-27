@@ -279,8 +279,6 @@ public class DashboardHelperService {
                   + "\"><div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
               b.append("Name: <b>" + ld.getName() + "</b><br/>");
               b.append("From Library: <b>" + ld.getLibrary().getAlias() + "(" + ld.getLibrary().getName() + ")</b><br/>");
-              // b.append("From Sample: <b>" + ld.getLibrary().getSample().getAlias() + "(" + ld.getLibrary().getSample().getName() +
-              // ")</b><br/>");
               b.append("</div></a>");
             }
           }

@@ -24,11 +24,6 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import com.eaglegenomics.simlims.core.User;
-//import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-//import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-//import com.fasterxml.jackson.annotation.JsonTypeInfo;
-//import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-//import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.type._384WellPlatePosition;
@@ -63,7 +58,6 @@ public class Simple384WellPlate extends PlateImpl<Library> implements Serializab
   }
 
   @Override
-  // @JsonManagedReference
   public LinkedList<Library> getElements() {
     return elements;
   }
