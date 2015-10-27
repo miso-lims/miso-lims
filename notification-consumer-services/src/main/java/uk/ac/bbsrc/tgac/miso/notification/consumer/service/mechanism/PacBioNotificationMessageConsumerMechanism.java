@@ -56,12 +56,13 @@ import java.util.regex.Pattern;
  * uk.ac.bbsrc.tgac.miso.core.service.integration.mechanism.impl
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 03/02/12
  * @since 0.1.5
  */
-public class PacBioNotificationMessageConsumerMechanism implements NotificationMessageConsumerMechanism<Message<Map<String, List<String>>>, Set<Run>> {
+public class PacBioNotificationMessageConsumerMechanism implements
+    NotificationMessageConsumerMechanism<Message<Map<String, List<String>>>, Set<Run>> {
   protected static final Logger log = LoggerFactory.getLogger(PacBioNotificationMessageConsumerMechanism.class);
 
   public boolean attemptRunPopulation = true;
@@ -97,7 +98,7 @@ public class PacBioNotificationMessageConsumerMechanism implements NotificationM
     DateFormat gsLogDateFormat = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy");
     DateFormat startDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
-    for (JSONObject run : (Iterable<JSONObject>)runs) {
+    for (JSONObject run : (Iterable<JSONObject>) runs) {
       String runName = run.getString("runName");
       log.info("Processing " + runName);
 
@@ -105,17 +106,15 @@ public class PacBioNotificationMessageConsumerMechanism implements NotificationM
 
       if (run.has("cells")) {
         JSONArray cells = run.getJSONArray("cells");
-        for (JSONObject cell : (Iterable<JSONObject>)cells) {
+        for (JSONObject cell : (Iterable<JSONObject>) cells) {
           if (cell.has("cellStatus")) {
             try {
               String s = new String(IntegrationUtils.decompress(URLDecoder.decode(cell.getString("cellStatus"), "UTF-8").getBytes()));
               status += s + "\n\n";
-            }
-            catch (UnsupportedEncodingException e) {
+            } catch (UnsupportedEncodingException e) {
               log.error("Cannot decode status xml: " + e.getMessage());
               e.printStackTrace();
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
               log.error("Cannot decompress and decode incoming status: " + e.getMessage());
               e.printStackTrace();
             }
@@ -125,7 +124,7 @@ public class PacBioNotificationMessageConsumerMechanism implements NotificationM
 
       if (!"".equals(status)) {
         try {
-          //String runLog = run.getString("status");
+          // String runLog = run.getString("status");
           if (!status.startsWith("ERROR")) {
             Status is = new PacBioStatus(status);
             is.setHealth(ht);
@@ -137,8 +136,7 @@ public class PacBioNotificationMessageConsumerMechanism implements NotificationM
             if (m.matches()) {
               try {
                 r = requestManager.getRunByAlias(runName);
-              }
-              catch(IOException ioe) {
+              } catch (IOException ioe) {
                 log.warn("Cannot find run by this alias. This usually means the run hasn't been previously imported. If attemptRunPopulation is false, processing will not take place for this run!");
               }
             }
@@ -164,8 +162,7 @@ public class PacBioNotificationMessageConsumerMechanism implements NotificationM
                   if (run.has("startDate") && !"".equals(run.getString("startDate"))) {
                     try {
                       r.getStatus().setStartDate(startDateFormat.parse(run.getString("startDate")));
-                    }
-                    catch (ParseException e) {
+                    } catch (ParseException e) {
                       log.error(e.getMessage());
                       e.printStackTrace();
                     }
@@ -174,8 +171,7 @@ public class PacBioNotificationMessageConsumerMechanism implements NotificationM
                   if (run.has("completionDate") && !"".equals(run.getString("completionDate"))) {
                     try {
                       r.getStatus().setCompletionDate(startDateFormat.parse(run.getString("completionDate")));
-                    }
-                    catch (ParseException e) {
+                    } catch (ParseException e) {
                       log.error(e.getMessage());
                       e.printStackTrace();
                     }
@@ -185,12 +181,10 @@ public class PacBioNotificationMessageConsumerMechanism implements NotificationM
                   r.setStatus(is);
 
                   r.setSequencerReference(sr);
-                }
-                else {
+                } else {
                   log.error("\\_ Cannot save " + is.getRunName() + ": no sequencer reference available.");
                 }
-              }
-              else {
+              } else {
                 log.info("\\_ Updating existing run and status: " + is.getRunName());
 
                 r.setAlias(runName);
@@ -215,8 +209,7 @@ public class PacBioNotificationMessageConsumerMechanism implements NotificationM
                   if (run.has("startDate") && !"".equals(run.getString("startDate"))) {
                     try {
                       r.getStatus().setStartDate(startDateFormat.parse(run.getString("startDate")));
-                    }
-                    catch (ParseException e) {
+                    } catch (ParseException e) {
                       log.error(e.getMessage());
                       e.printStackTrace();
                     }
@@ -225,15 +218,15 @@ public class PacBioNotificationMessageConsumerMechanism implements NotificationM
                   if (run.has("completionDate") && !"".equals(run.getString("completionDate"))) {
                     try {
                       r.getStatus().setCompletionDate(startDateFormat.parse(run.getString("completionDate")));
-                    }
-                    catch (ParseException e) {
+                    } catch (ParseException e) {
                       log.error(e.getMessage());
                       e.printStackTrace();
                     }
                   }
 
-                  //update path if changed
-                  if (run.has("fullPath") && !"".equals(run.getString("fullPath")) && r.getFilePath() != null && !"".equals(r.getFilePath())) {
+                  // update path if changed
+                  if (run.has("fullPath") && !"".equals(run.getString("fullPath")) && r.getFilePath() != null
+                      && !"".equals(r.getFilePath())) {
                     if (!run.getString("fullPath").equals(r.getFilePath())) {
                       log.info("Updating run file path:" + r.getFilePath() + " -> " + run.getString("fullPath"));
                       r.setFilePath(run.getString("fullPath"));
@@ -242,50 +235,51 @@ public class PacBioNotificationMessageConsumerMechanism implements NotificationM
 
                   // update status if run isn't completed or failed
                   if (!r.getStatus().getHealth().equals(HealthType.Completed) && !r.getStatus().getHealth().equals(HealthType.Failed)) {
-                    log.info("Saving previously saved status: " + is.getRunName() + " (" + r.getStatus().getHealth().getKey() + " -> " + is.getHealth().getKey() + ")");
-                    //if (!r.getStatus().getHealth().equals(is.getHealth())) {
+                    log.info("Saving previously saved status: " + is.getRunName() + " (" + r.getStatus().getHealth().getKey() + " -> "
+                        + is.getHealth().getKey() + ")");
+                    // if (!r.getStatus().getHealth().equals(is.getHealth())) {
                     r.setStatus(is);
-                    //}
-                    //requestManager.saveStatus(is);
+                    // }
+                    // requestManager.saveStatus(is);
                   }
                 }
               }
 
               if (r.getSequencerReference() != null) {
-                List<SequencerPartitionContainer<SequencerPoolPartition>> fs = ((PacBioRun)r).getSequencerPartitionContainers();
+                List<SequencerPartitionContainer<SequencerPoolPartition>> fs = ((PacBioRun) r).getSequencerPartitionContainers();
                 if (fs.isEmpty()) {
                   if (run.has("plateId") && !"".equals(run.getString("plateId"))) {
-                    Collection<SequencerPartitionContainer<SequencerPoolPartition>> pfs =
-                            requestManager.listSequencerPartitionContainersByBarcode(run.getString("plateId"));
+                    Collection<SequencerPartitionContainer<SequencerPoolPartition>> pfs = requestManager
+                        .listSequencerPartitionContainersByBarcode(run.getString("plateId"));
                     if (!pfs.isEmpty()) {
                       if (pfs.size() == 1) {
-                        SequencerPartitionContainer<SequencerPoolPartition> lf = new ArrayList<SequencerPartitionContainer<SequencerPoolPartition>>(pfs).get(0);
+                        SequencerPartitionContainer<SequencerPoolPartition> lf = new ArrayList<SequencerPartitionContainer<SequencerPoolPartition>>(
+                            pfs).get(0);
                         if (lf.getSecurityProfile() != null && r.getSecurityProfile() == null) {
                           r.setSecurityProfile(lf.getSecurityProfile());
                         }
                         if (lf.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
                           lf.setPlatform(r.getSequencerReference().getPlatform());
                         }
-//                        else {
-//                          lf.setPlatformType(PlatformType.PACBIO);
-//                        }
+                        // else {
+                        // lf.setPlatformType(PlatformType.PACBIO);
+                        // }
                         JSONArray cells = run.getJSONArray("cells");
                         if (cells.size() > lf.getPartitions().size()) {
-                          int numNewcells = cells.size()-lf.getPartitions().size();
+                          int numNewcells = cells.size() - lf.getPartitions().size();
                           lf.setPartitionLimit(cells.size());
-                          for (int i=0; i<numNewcells; i++){
+                          for (int i = 0; i < numNewcells; i++) {
                             lf.addNewPartition();
                           }
                         }
 
-                        ((RunImpl)r).addSequencerPartitionContainer(lf);
+                        ((RunImpl) r).addSequencerPartitionContainer(lf);
+                      } else {
+                        // more than one flowcell hit to this barcode
+                        log.warn(r.getAlias()
+                            + ":: More than one container has this barcode. Cannot automatically link to a pre-existing barcode.");
                       }
-                      else {
-                        //more than one flowcell hit to this barcode
-                        log.warn(r.getAlias() + ":: More than one container has this barcode. Cannot automatically link to a pre-existing barcode.");
-                      }
-                    }
-                    else {
+                    } else {
                       if (run.has("cells")) {
                         JSONArray cells = run.getJSONArray("cells");
                         SequencerPartitionContainer f = new SequencerPartitionContainerImpl();
@@ -297,40 +291,35 @@ public class PacBioNotificationMessageConsumerMechanism implements NotificationM
                         if (f.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
                           f.setPlatform(r.getSequencerReference().getPlatform());
                         }
-//                        else {
-//                          f.setPlatformType(PlatformType.PACBIO);
-//                        }
+                        // else {
+                        // f.setPlatformType(PlatformType.PACBIO);
+                        // }
                         f.setRun(r);
-                        log.info("\\_ Created new container with "+f.getPartitions().size()+" partitions");
+                        log.info("\\_ Created new container with " + f.getPartitions().size() + " partitions");
                         long flowId = requestManager.saveSequencerPartitionContainer(f);
                         f.setId(flowId);
-                        ((RunImpl)r).addSequencerPartitionContainer(f);
-                        //TODO match up samples to libraries and pools? Or match up pool numbers
+                        ((RunImpl) r).addSequencerPartitionContainer(f);
+                        // TODO match up samples to libraries and pools? Or match up pool numbers
                         /*
-                        for (JSONObject obj : (Iterable<JSONObject>)cells) {
-                          int cellindex = obj.getInt("index");
-                          String sample = obj.getString("sample");
-
-                          SequencerPoolPartition p = f.getPartitionAt(cellindex);
-                          if (p.getPool() == null) {
-                            Pool pool = new PoolImpl();
-
-                          }
-                        }
-                        */
+                         * for (JSONObject obj : (Iterable<JSONObject>)cells) { int cellindex = obj.getInt("index"); String sample =
+                         * obj.getString("sample");
+                         * 
+                         * SequencerPoolPartition p = f.getPartitionAt(cellindex); if (p.getPool() == null) { Pool pool = new PoolImpl();
+                         * 
+                         * } }
+                         */
                       }
                     }
                   }
-                }
-                else {
+                } else {
                   SequencerPartitionContainer f = fs.iterator().next();
                   f.setSecurityProfile(r.getSecurityProfile());
                   if (f.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
                     f.setPlatform(r.getSequencerReference().getPlatform());
                   }
-//                  else {
-//                    f.setPlatformType(PlatformType.PACBIO);
-//                  }
+                  // else {
+                  // f.setPlatformType(PlatformType.PACBIO);
+                  // }
                   if (f.getIdentificationBarcode() == null || "".equals(f.getIdentificationBarcode())) {
                     if (run.has("plateId") && !"".equals(run.getString("plateId"))) {
                       f.setIdentificationBarcode(run.getString("plateId"));
@@ -339,9 +328,9 @@ public class PacBioNotificationMessageConsumerMechanism implements NotificationM
                   }
                   JSONArray cells = run.getJSONArray("cells");
                   if (cells.size() > f.getPartitions().size()) {
-                    int numNewcells = cells.size()-f.getPartitions().size();
+                    int numNewcells = cells.size() - f.getPartitions().size();
                     f.setPartitionLimit(cells.size());
-                    for (int i=0; i<numNewcells; i++){
+                    for (int i = 0; i < numNewcells; i++) {
                       f.addNewPartition();
                     }
                   }
@@ -350,19 +339,16 @@ public class PacBioNotificationMessageConsumerMechanism implements NotificationM
                 updatedRuns.put(r.getAlias(), r);
                 runsToSave.add(r);
               }
-            }
-            else {
+            } else {
               log.warn("\\_ Run not saved. Saving status: " + is.getRunName());
               requestManager.saveStatus(is);
             }
           }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
           log.error(e.getMessage());
           e.printStackTrace();
         }
-      }
-      else {
+      } else {
         log.error("No notification status available for " + runName);
       }
     }
@@ -370,10 +356,9 @@ public class PacBioNotificationMessageConsumerMechanism implements NotificationM
     try {
       if (runsToSave.size() > 0) {
         int[] saved = requestManager.saveRuns(runsToSave);
-        log.info("Batch saved " + saved.length + " / "+ runs.size() + " runs");
+        log.info("Batch saved " + saved.length + " / " + runs.size() + " runs");
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.error("Couldn't save run batch: " + e.getMessage());
       e.printStackTrace();
     }

@@ -30,9 +30,9 @@ import uk.ac.bbsrc.tgac.miso.core.service.integration.strategy.NotificationConsu
 import java.util.*;
 
 /**
- * A concrete implementation of a {@link NotificationConsumerService} that loads and exposes {@link NotificationConsumerStrategy}
- * objects at runtime via the SPI {@link ServiceLoader} mechanism.
- *
+ * A concrete implementation of a {@link NotificationConsumerService} that loads and exposes {@link NotificationConsumerStrategy} objects at
+ * runtime via the SPI {@link ServiceLoader} mechanism.
+ * 
  * @author Rob Davey
  * @date 03/02/12
  * @since 0.1.5
@@ -55,7 +55,7 @@ public class MisoNotificationConsumerService implements NotificationConsumerServ
 
   @Override
   public Collection<NotificationConsumerStrategy> getConsumerStrategies() {
-    //lazily load available strategies
+    // lazily load available strategies
     log.debug("Grabbing strategies...");
     if (strategyMap == null) {
       ServiceLoader<NotificationConsumerStrategy> consumerLoader = ServiceLoader.load(NotificationConsumerStrategy.class);
@@ -67,11 +67,10 @@ public class MisoNotificationConsumerService implements NotificationConsumerServ
 
         if (!strategyMap.containsKey(p.getName())) {
           strategyMap.put(p.getName(), p);
-        }
-        else {
+        } else {
           if (strategyMap.get(p.getName()) != p) {
-            String msg = "Multiple different NotificationConsumerStrategies with the same strategy name " +
-                         "('" + p.getName() + "') are present on the classpath. Strategy names must be unique.";
+            String msg = "Multiple different NotificationConsumerStrategies with the same strategy name " + "('" + p.getName()
+                + "') are present on the classpath. Strategy names must be unique.";
             log.error(msg);
             throw new ServiceConfigurationError(msg);
           }

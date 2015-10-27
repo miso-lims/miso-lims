@@ -44,11 +44,8 @@ import java.io.IOException;
 import java.util.Collection;
 
 /**
- * Created by IntelliJ IDEA.
- * User: bian
- * Date: 10-Mar-2010
- * Time: 13:10:10
- *
+ * Created by IntelliJ IDEA. User: bian Date: 10-Mar-2010 Time: 13:10:10
+ * 
  */
 @Ajaxified
 public class ExperimentPreview {
@@ -81,21 +78,16 @@ public class ExperimentPreview {
         }
 
         /*
-        if (e.getPlatform().getPlatformType().equals(PlatformType.ILLUMINA)) {
-        }
-        else {
-          for (Object dil : e.getPool().getDilutions()) {
-            Sample s = ((emPCRDilution) dil).getEmPCR().getLibraryDilution().getLibrary().getSample();
-            sb.append("<li><a href='/miso/sample/").append(s.getSampleId()).append("'>").append(s.getName()).append("</a></li>");
-          }
-        }
-        */
+         * if (e.getPlatform().getPlatformType().equals(PlatformType.ILLUMINA)) { } else { for (Object dil : e.getPool().getDilutions()) {
+         * Sample s = ((emPCRDilution) dil).getEmPCR().getLibraryDilution().getLibrary().getSample();
+         * sb.append("<li><a href='/miso/sample/").append(s.getSampleId()).append("'>").append(s.getName()).append("</a></li>"); } }
+         */
       }
 
       StringBuilder b = new StringBuilder();
-      b.append("<div onclick=\"Effect.toggle('preview"+experimentId+"','blind'); return false;\">" +
-              "<img src=\"/styles/images/moreinfo.png\" class=\"previewimage\"/></div>");
-      b.append("<br/><div id=\"preview"+experimentId+"\" class='exppreview'>");
+      b.append("<div onclick=\"Effect.toggle('preview" + experimentId + "','blind'); return false;\">"
+          + "<img src=\"/styles/images/moreinfo.png\" class=\"previewimage\"/></div>");
+      b.append("<br/><div id=\"preview" + experimentId + "\" class='exppreview'>");
       b.append("Title: <b>").append(e.getTitle()).append("</b><br/>");
       b.append("Description: <b>").append(e.getDescription()).append("</b><br/>");
       b.append("Samples: <ul class=\"bullets\">").append(sb.toString()).append("</ul>");
@@ -103,8 +95,7 @@ public class ExperimentPreview {
       b.append("</div>");
       return JSONUtils.SimpleJSONResponse(b.toString());
 
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed");
     }

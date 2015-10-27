@@ -49,7 +49,7 @@ import java.util.Map;
  * uk.ac.bbsrc.tgac.miso.util
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -63,20 +63,21 @@ public class DbUtils {
     Object ai = rs.get("Auto_increment");
     if (ai != null) {
       return new Long(ai.toString());
-    }
-    else {
+    } else {
       throw new IOException("Cannot resolve Auto_increment value from DBMS metadata tables");
     }
   }
 
   public static ArrayList<String> getTables(JdbcTemplate template) throws MetaDataAccessException, SQLException {
-    Object o = JdbcUtils.extractDatabaseMetaData(template.getDataSource(), new GetTableNames(template.getDataSource().getConnection().getCatalog()));
-    return (ArrayList<String>)o;
+    Object o = JdbcUtils.extractDatabaseMetaData(template.getDataSource(), new GetTableNames(template.getDataSource().getConnection()
+        .getCatalog()));
+    return (ArrayList<String>) o;
   }
 
   public static ArrayList<String> getColumns(JdbcTemplate template, String table) throws MetaDataAccessException, SQLException {
-    Object o = JdbcUtils.extractDatabaseMetaData(template.getDataSource(), new GetColumnNames(template.getDataSource().getConnection().getCatalog(), table));
-    return (ArrayList<String>)o;
+    Object o = JdbcUtils.extractDatabaseMetaData(template.getDataSource(), new GetColumnNames(template.getDataSource().getConnection()
+        .getCatalog(), table));
+    return (ArrayList<String>) o;
   }
 
   public static Map<String, Integer> getColumnSizes(JdbcTemplate template, String table) {
@@ -84,22 +85,18 @@ public class DbUtils {
     try {
       connection = template.getDataSource().getConnection();
       Object o = JdbcUtils.extractDatabaseMetaData(template.getDataSource(), new GetColumnSizes(connection.getCatalog(), table));
-      return (HashMap<String, Integer>)o;
-    }
-    catch (MetaDataAccessException e) {
+      return (HashMap<String, Integer>) o;
+    } catch (MetaDataAccessException e) {
       e.printStackTrace();
-      log.warn("Could not retrieve table "+table+" field lengths: " + e.getMessage());
-    }
-    catch (SQLException e) {
+      log.warn("Could not retrieve table " + table + " field lengths: " + e.getMessage());
+    } catch (SQLException e) {
       e.printStackTrace();
-      log.warn("Could not retrieve table "+table+" field lengths: " + e.getMessage());
-    }
-    finally {
+      log.warn("Could not retrieve table " + table + " field lengths: " + e.getMessage());
+    } finally {
       if (connection != null) {
         try {
           connection.close();
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
           e.printStackTrace();
           log.error("Badness! Could not close connection!");
         }
@@ -113,22 +110,18 @@ public class DbUtils {
     try {
       connection = template.getDataSource().getConnection();
       Object o = JdbcUtils.extractDatabaseMetaData(template.getDataSource(), new GetColumnSizes(connection.getCatalog(), table));
-      return ((HashMap<String, Integer>)o).get(column);
-    }
-    catch (MetaDataAccessException e) {
+      return ((HashMap<String, Integer>) o).get(column);
+    } catch (MetaDataAccessException e) {
       e.printStackTrace();
-      log.warn("Could not retrieve field "+column+" max length: " + e.getMessage());
-    }
-    catch (SQLException e) {
+      log.warn("Could not retrieve field " + column + " max length: " + e.getMessage());
+    } catch (SQLException e) {
       e.printStackTrace();
-      log.warn("Could not retrieve field "+column+" max length: " + e.getMessage());
-    }
-    finally {
+      log.warn("Could not retrieve field " + column + " max length: " + e.getMessage());
+    } finally {
       if (connection != null) {
         try {
           connection.close();
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
           e.printStackTrace();
           log.error("Badness! Could not close connection!");
         }
@@ -142,8 +135,7 @@ public class DbUtils {
       for (String s : cacheManager.getCacheNames()) {
         flushCache(cacheManager, s);
       }
-    }
-    else {
+    } else {
       throw new CacheException("No cacheManager declared. Please check your Spring config, or supply a non-null manager");
     }
   }
@@ -154,22 +146,19 @@ public class DbUtils {
       if (c != null) {
         log.info("Removing " + c.getSize() + " elements from " + cacheName);
         c.removeAll();
-      }
-      else {
+      } else {
         log.warn("No such cache: " + cacheName);
       }
-    }
-    else {
+    } else {
       throw new CacheException("No cacheManager declared. Please check your Spring config, or supply a non-null manager");
     }
   }
 
   public static <T> Cache lookupCache(CacheManager cacheManager, Class<T> cacheClass, boolean lazy) {
     if (lazy) {
-      return cacheManager.getCache("lazy"+ LimsUtils.capitalise(cacheClass.getSimpleName())+"Cache");
-    }
-    else {
-      return cacheManager.getCache(LimsUtils.noddyCamelCaseify(cacheClass.getSimpleName())+"Cache");
+      return cacheManager.getCache("lazy" + LimsUtils.capitalise(cacheClass.getSimpleName()) + "Cache");
+    } else {
+      return cacheManager.getCache(LimsUtils.noddyCamelCaseify(cacheClass.getSimpleName()) + "Cache");
     }
   }
 
@@ -201,34 +190,34 @@ public class DbUtils {
     if (cache != null && cache.getKeys().size() > 0) {
       BlockingCache c = new BlockingCache(cache);
       Object cachekey = c.getKeys().get(0);
-      List<T> e = (List<T>)c.get(cachekey).getObjectValue();
+      List<T> e = (List<T>) c.get(cachekey).getObjectValue();
       if (e.remove(obj)) {
         if (replace) {
           e.add(obj);
         }
-      }
-      else {
+      } else {
         e.add(obj);
       }
       c.put(new Element(cachekey, e));
     }
   }
 
-  public static Long hashCodeCacheKeyFor(Object ... datas) {
+  public static Long hashCodeCacheKeyFor(Object... datas) {
     return hashCodeCacheKeyGenerator.generateKey(datas);
   }
 
   static class GetTableNames implements DatabaseMetaDataCallback {
     String catalog = "";
 
-    public GetTableNames() { }    
+    public GetTableNames() {
+    }
 
     public GetTableNames(String catalog) {
       this.catalog = catalog;
     }
 
     public Object processMetaData(DatabaseMetaData dbmd) throws SQLException {
-      ResultSet rs = dbmd.getTables(catalog, null, null, new String[]{"TABLE"});
+      ResultSet rs = dbmd.getTables(catalog, null, null, new String[] { "TABLE" });
       ArrayList l = new ArrayList();
       while (rs.next()) {
         l.add(rs.getString(3));
@@ -241,7 +230,8 @@ public class DbUtils {
     String catalog = "";
     String table = "";
 
-    public GetColumnNames() { }
+    public GetColumnNames() {
+    }
 
     public GetColumnNames(String catalog, String table) {
       this.catalog = catalog;
@@ -262,7 +252,8 @@ public class DbUtils {
     String catalog = "";
     String table = "";
 
-    public GetColumnSizes() { }
+    public GetColumnSizes() {
+    }
 
     public GetColumnSizes(String catalog, String table) {
       this.catalog = catalog;

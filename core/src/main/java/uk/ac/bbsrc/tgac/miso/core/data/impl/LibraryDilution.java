@@ -39,7 +39,7 @@ import java.util.Set;
  * uk.ac.bbsrc.tgac.miso.core.data.impl
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -56,8 +56,9 @@ public class LibraryDilution extends AbstractDilution implements Serializable {
 
   /**
    * Construct a new LibraryDilution with a SecurityProfile owned by the given User
-   *
-   * @param user of type User
+   * 
+   * @param user
+   *          of type User
    */
   public LibraryDilution(User user) {
     setSecurityProfile(new SecurityProfile(user));

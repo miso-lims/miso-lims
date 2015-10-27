@@ -23,17 +23,16 @@
 
 package uk.ac.bbsrc.tgac.miso.core.service.integration.mechanism;
 
-import org.springframework.integration.Message;
-import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-
 import java.util.Set;
 
+import org.springframework.integration.Message;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
+
 /**
- * Sub-interface of ConsumerMechanism which specifically deals with a Spring Integration {@link Message} as the
- * parameter, and produces a list of {@link Run} objects that were consumed
- *
+ * Sub-interface of ConsumerMechanism which specifically deals with a Spring Integration {@link Message} as the parameter, and produces a
+ * list of {@link Run} objects that were consumed
+ * 
  * @author Rob Davey
  * @date 03/02/12
  * @since 0.1.5

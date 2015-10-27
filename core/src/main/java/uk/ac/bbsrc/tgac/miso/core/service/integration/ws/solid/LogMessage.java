@@ -29,11 +29,12 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-
 /**
- * <p>Java class for logMessage complex type.
+ * <p>
+ * Java class for logMessage complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="logMessage">
@@ -55,166 +56,141 @@ import javax.xml.datatype.XMLGregorianCalendar;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "logMessage", propOrder = {
-    "component",
-    "dateCreated",
-    "details",
-    "message",
-    "severity",
-    "xml"
-})
+@XmlType(name = "logMessage", propOrder = { "component", "dateCreated", "details", "message", "severity", "xml" })
 public class LogMessage {
 
-    protected String component;
-    @XmlSchemaType(name = "dateTime")
-    protected XMLGregorianCalendar dateCreated;
-    protected String details;
-    protected String message;
-    protected String severity;
-    protected String xml;
+  protected String component;
+  @XmlSchemaType(name = "dateTime")
+  protected XMLGregorianCalendar dateCreated;
+  protected String details;
+  protected String message;
+  protected String severity;
+  protected String xml;
 
-    /**
-     * Gets the value of the component property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getComponent() {
-        return component;
-    }
+  /**
+   * Gets the value of the component property.
+   * 
+   * @return possible object is {@link String }
+   * 
+   */
+  public String getComponent() {
+    return component;
+  }
 
-    /**
-     * Sets the value of the component property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setComponent(String value) {
-        this.component = value;
-    }
+  /**
+   * Sets the value of the component property.
+   * 
+   * @param value
+   *          allowed object is {@link String }
+   * 
+   */
+  public void setComponent(String value) {
+    this.component = value;
+  }
 
-    /**
-     * Gets the value of the dateCreated property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link XMLGregorianCalendar }
-     *     
-     */
-    public XMLGregorianCalendar getDateCreated() {
-        return dateCreated;
-    }
+  /**
+   * Gets the value of the dateCreated property.
+   * 
+   * @return possible object is {@link XMLGregorianCalendar }
+   * 
+   */
+  public XMLGregorianCalendar getDateCreated() {
+    return dateCreated;
+  }
 
-    /**
-     * Sets the value of the dateCreated property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link XMLGregorianCalendar }
-     *     
-     */
-    public void setDateCreated(XMLGregorianCalendar value) {
-        this.dateCreated = value;
-    }
+  /**
+   * Sets the value of the dateCreated property.
+   * 
+   * @param value
+   *          allowed object is {@link XMLGregorianCalendar }
+   * 
+   */
+  public void setDateCreated(XMLGregorianCalendar value) {
+    this.dateCreated = value;
+  }
 
-    /**
-     * Gets the value of the details property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getDetails() {
-        return details;
-    }
+  /**
+   * Gets the value of the details property.
+   * 
+   * @return possible object is {@link String }
+   * 
+   */
+  public String getDetails() {
+    return details;
+  }
 
-    /**
-     * Sets the value of the details property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setDetails(String value) {
-        this.details = value;
-    }
+  /**
+   * Sets the value of the details property.
+   * 
+   * @param value
+   *          allowed object is {@link String }
+   * 
+   */
+  public void setDetails(String value) {
+    this.details = value;
+  }
 
-    /**
-     * Gets the value of the message property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getMessage() {
-        return message;
-    }
+  /**
+   * Gets the value of the message property.
+   * 
+   * @return possible object is {@link String }
+   * 
+   */
+  public String getMessage() {
+    return message;
+  }
 
-    /**
-     * Sets the value of the message property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setMessage(String value) {
-        this.message = value;
-    }
+  /**
+   * Sets the value of the message property.
+   * 
+   * @param value
+   *          allowed object is {@link String }
+   * 
+   */
+  public void setMessage(String value) {
+    this.message = value;
+  }
 
-    /**
-     * Gets the value of the severity property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getSeverity() {
-        return severity;
-    }
+  /**
+   * Gets the value of the severity property.
+   * 
+   * @return possible object is {@link String }
+   * 
+   */
+  public String getSeverity() {
+    return severity;
+  }
 
-    /**
-     * Sets the value of the severity property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setSeverity(String value) {
-        this.severity = value;
-    }
+  /**
+   * Sets the value of the severity property.
+   * 
+   * @param value
+   *          allowed object is {@link String }
+   * 
+   */
+  public void setSeverity(String value) {
+    this.severity = value;
+  }
 
-    /**
-     * Gets the value of the xml property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getXml() {
-        return xml;
-    }
+  /**
+   * Gets the value of the xml property.
+   * 
+   * @return possible object is {@link String }
+   * 
+   */
+  public String getXml() {
+    return xml;
+  }
 
-    /**
-     * Sets the value of the xml property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setXml(String value) {
-        this.xml = value;
-    }
+  /**
+   * Sets the value of the xml property.
+   * 
+   * @param value
+   *          allowed object is {@link String }
+   * 
+   */
+  public void setXml(String value) {
+    this.xml = value;
+  }
 
 }

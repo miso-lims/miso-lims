@@ -30,11 +30,12 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
-
 /**
- * <p>Java class for qualityMetrics complex type.
+ * <p>
+ * Java class for qualityMetrics complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="qualityMetrics">
@@ -60,251 +61,221 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "qualityMetrics", propOrder = {
-    "cycle",
-    "filePath",
-    "name",
-    "primer",
-    "primerSet",
-    "qualityMetricsDetails",
-    "sample",
-    "timeStamp",
-    "version",
-    "xml"
-})
+@XmlType(name = "qualityMetrics", propOrder = { "cycle", "filePath", "name", "primer", "primerSet", "qualityMetricsDetails", "sample",
+    "timeStamp", "version", "xml" })
 public class QualityMetrics {
 
-    protected int cycle;
-    protected String filePath;
-    protected String name;
-    protected int primer;
-    protected String primerSet;
-    @XmlElement(nillable = true)
-    protected List<QualityMetricsDetails> qualityMetricsDetails;
-    protected String sample;
-    protected String timeStamp;
-    protected int version;
-    protected String xml;
+  protected int cycle;
+  protected String filePath;
+  protected String name;
+  protected int primer;
+  protected String primerSet;
+  @XmlElement(nillable = true)
+  protected List<QualityMetricsDetails> qualityMetricsDetails;
+  protected String sample;
+  protected String timeStamp;
+  protected int version;
+  protected String xml;
 
-    /**
-     * Gets the value of the cycle property.
-     * 
-     */
-    public int getCycle() {
-        return cycle;
-    }
+  /**
+   * Gets the value of the cycle property.
+   * 
+   */
+  public int getCycle() {
+    return cycle;
+  }
 
-    /**
-     * Sets the value of the cycle property.
-     * 
-     */
-    public void setCycle(int value) {
-        this.cycle = value;
-    }
+  /**
+   * Sets the value of the cycle property.
+   * 
+   */
+  public void setCycle(int value) {
+    this.cycle = value;
+  }
 
-    /**
-     * Gets the value of the filePath property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getFilePath() {
-        return filePath;
-    }
+  /**
+   * Gets the value of the filePath property.
+   * 
+   * @return possible object is {@link String }
+   * 
+   */
+  public String getFilePath() {
+    return filePath;
+  }
 
-    /**
-     * Sets the value of the filePath property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setFilePath(String value) {
-        this.filePath = value;
-    }
+  /**
+   * Sets the value of the filePath property.
+   * 
+   * @param value
+   *          allowed object is {@link String }
+   * 
+   */
+  public void setFilePath(String value) {
+    this.filePath = value;
+  }
 
-    /**
-     * Gets the value of the name property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getName() {
-        return name;
-    }
+  /**
+   * Gets the value of the name property.
+   * 
+   * @return possible object is {@link String }
+   * 
+   */
+  public String getName() {
+    return name;
+  }
 
-    /**
-     * Sets the value of the name property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setName(String value) {
-        this.name = value;
-    }
+  /**
+   * Sets the value of the name property.
+   * 
+   * @param value
+   *          allowed object is {@link String }
+   * 
+   */
+  public void setName(String value) {
+    this.name = value;
+  }
 
-    /**
-     * Gets the value of the primer property.
-     * 
-     */
-    public int getPrimer() {
-        return primer;
-    }
+  /**
+   * Gets the value of the primer property.
+   * 
+   */
+  public int getPrimer() {
+    return primer;
+  }
 
-    /**
-     * Sets the value of the primer property.
-     * 
-     */
-    public void setPrimer(int value) {
-        this.primer = value;
-    }
+  /**
+   * Sets the value of the primer property.
+   * 
+   */
+  public void setPrimer(int value) {
+    this.primer = value;
+  }
 
-    /**
-     * Gets the value of the primerSet property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getPrimerSet() {
-        return primerSet;
-    }
+  /**
+   * Gets the value of the primerSet property.
+   * 
+   * @return possible object is {@link String }
+   * 
+   */
+  public String getPrimerSet() {
+    return primerSet;
+  }
 
-    /**
-     * Sets the value of the primerSet property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setPrimerSet(String value) {
-        this.primerSet = value;
-    }
+  /**
+   * Sets the value of the primerSet property.
+   * 
+   * @param value
+   *          allowed object is {@link String }
+   * 
+   */
+  public void setPrimerSet(String value) {
+    this.primerSet = value;
+  }
 
-    /**
-     * Gets the value of the qualityMetricsDetails property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the qualityMetricsDetails property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getQualityMetricsDetails().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link QualityMetricsDetails }
-     * 
-     * 
-     */
-    public List<QualityMetricsDetails> getQualityMetricsDetails() {
-        if (qualityMetricsDetails == null) {
-            qualityMetricsDetails = new ArrayList<QualityMetricsDetails>();
-        }
-        return this.qualityMetricsDetails;
+  /**
+   * Gets the value of the qualityMetricsDetails property.
+   * 
+   * <p>
+   * This accessor method returns a reference to the live list, not a snapshot. Therefore any modification you make to the returned list
+   * will be present inside the JAXB object. This is why there is not a <CODE>set</CODE> method for the qualityMetricsDetails property.
+   * 
+   * <p>
+   * For example, to add a new item, do as follows:
+   * 
+   * <pre>
+   * getQualityMetricsDetails().add(newItem);
+   * </pre>
+   * 
+   * 
+   * <p>
+   * Objects of the following type(s) are allowed in the list {@link QualityMetricsDetails }
+   * 
+   * 
+   */
+  public List<QualityMetricsDetails> getQualityMetricsDetails() {
+    if (qualityMetricsDetails == null) {
+      qualityMetricsDetails = new ArrayList<QualityMetricsDetails>();
     }
+    return this.qualityMetricsDetails;
+  }
 
-    /**
-     * Gets the value of the sample property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getSample() {
-        return sample;
-    }
+  /**
+   * Gets the value of the sample property.
+   * 
+   * @return possible object is {@link String }
+   * 
+   */
+  public String getSample() {
+    return sample;
+  }
 
-    /**
-     * Sets the value of the sample property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setSample(String value) {
-        this.sample = value;
-    }
+  /**
+   * Sets the value of the sample property.
+   * 
+   * @param value
+   *          allowed object is {@link String }
+   * 
+   */
+  public void setSample(String value) {
+    this.sample = value;
+  }
 
-    /**
-     * Gets the value of the timeStamp property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getTimeStamp() {
-        return timeStamp;
-    }
+  /**
+   * Gets the value of the timeStamp property.
+   * 
+   * @return possible object is {@link String }
+   * 
+   */
+  public String getTimeStamp() {
+    return timeStamp;
+  }
 
-    /**
-     * Sets the value of the timeStamp property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setTimeStamp(String value) {
-        this.timeStamp = value;
-    }
+  /**
+   * Sets the value of the timeStamp property.
+   * 
+   * @param value
+   *          allowed object is {@link String }
+   * 
+   */
+  public void setTimeStamp(String value) {
+    this.timeStamp = value;
+  }
 
-    /**
-     * Gets the value of the version property.
-     * 
-     */
-    public int getVersion() {
-        return version;
-    }
+  /**
+   * Gets the value of the version property.
+   * 
+   */
+  public int getVersion() {
+    return version;
+  }
 
-    /**
-     * Sets the value of the version property.
-     * 
-     */
-    public void setVersion(int value) {
-        this.version = value;
-    }
+  /**
+   * Sets the value of the version property.
+   * 
+   */
+  public void setVersion(int value) {
+    this.version = value;
+  }
 
-    /**
-     * Gets the value of the xml property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getXml() {
-        return xml;
-    }
+  /**
+   * Gets the value of the xml property.
+   * 
+   * @return possible object is {@link String }
+   * 
+   */
+  public String getXml() {
+    return xml;
+  }
 
-    /**
-     * Sets the value of the xml property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setXml(String value) {
-        this.xml = value;
-    }
+  /**
+   * Sets the value of the xml property.
+   * 
+   * @param value
+   *          allowed object is {@link String }
+   * 
+   */
+  public void setXml(String value) {
+    this.xml = value;
+  }
 
 }

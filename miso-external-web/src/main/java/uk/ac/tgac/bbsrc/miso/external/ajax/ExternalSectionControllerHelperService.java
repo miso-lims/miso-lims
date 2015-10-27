@@ -43,15 +43,11 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
 
-
 /**
- * Created by IntelliJ IDEA.
- * User: bianx
- * To change this template use File | Settings | File Templates.
+ * Created by IntelliJ IDEA. User: bianx To change this template use File | Settings | File Templates.
  */
 @Ajaxified
 public class ExternalSectionControllerHelperService {
-
 
   public JSONObject loginDisplayProjects(HttpSession session, JSONObject json) {
     JSONObject response = new JSONObject();
@@ -86,7 +82,9 @@ public class ExternalSectionControllerHelperService {
 
       for (JSONObject jproject : (Iterable<JSONObject>) jarray) {
 
-        b.append("<a class=\"dashboardresult\" onclick=\"showProjectStatus('" + jproject.getString("id") + "');\" href=\"javascript:void(0);\"><div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
+        b.append("<a class=\"dashboardresult\" onclick=\"showProjectStatus('"
+            + jproject.getString("id")
+            + "');\" href=\"javascript:void(0);\"><div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
         b.append("Name: <b>" + jproject.getString("name") + "</b><br/>");
         b.append("Alias: <b>" + jproject.getString("alias") + "</b><br/>");
         b.append("</div></a>");
@@ -94,14 +92,12 @@ public class ExternalSectionControllerHelperService {
 
       response.put("html", b.toString());
       return response;
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       System.out.println(e.getMessage());
       return JSONUtils.SimpleJSONError("Failed: Problem with Login.");
 
     }
   }
-
 
   public JSONObject projectStatus(HttpSession session, JSONObject json) {
     JSONObject jsonObject = new JSONObject();
@@ -117,11 +113,11 @@ public class ExternalSectionControllerHelperService {
       String shapassword = json.getString("shapassword");
       String apiKey = null;
 
-      //request step 2
-
+      // request step 2
 
       apiKey = generatePrivateUserKey((username + "::" + shapassword).getBytes("UTF-8"));
-      String signature = calculateHMAC("/miso/rest/external/project/" + projectId + "?x-url=/miso/rest/external/project/" + projectId + "@x-user=" + username, apiKey);
+      String signature = calculateHMAC("/miso/rest/external/project/" + projectId + "?x-url=/miso/rest/external/project/" + projectId
+          + "@x-user=" + username, apiKey);
       HttpClient client = new DefaultHttpClient();
       String getURL = "http://hostname-here/miso/rest/external/project/" + projectId;
       HttpGet get = new HttpGet(getURL);
@@ -153,101 +149,71 @@ public class ExternalSectionControllerHelperService {
 
         if (j.getJSONArray("overviews").size() > 0) {
           for (JSONObject joverview : (Iterable<JSONObject>) j.getJSONArray("overviews")) {
-            projectSb.append("<div><ol id=\"progress\">\n" +
-                             "            <li class=\"sample-qc-step\">\n");
+            projectSb.append("<div><ol id=\"progress\">\n" + "            <li class=\"sample-qc-step\">\n");
             projectSb.append("<div class=\"");
             if (joverview.getBoolean("allSampleQcPassed") && joverview.getBoolean("libraryPreparationComplete")) {
               projectSb.append("left mid-progress-done");
-            }
-            else if (joverview.getBoolean("allSampleQcPassed")) {
+            } else if (joverview.getBoolean("allSampleQcPassed")) {
               projectSb.append("left-progress-done");
-            }
-            else {
+            } else {
               projectSb.append("left");
             }
             projectSb.append("\">\n");
-            projectSb.append("                <span>Sample QCs</span>\n" +
-                             "              </div>\n" +
-                             "            </li>\n" +
-                             "\n" +
-                             "            <li class=\"lib-prep-step\">\n");
+            projectSb.append("                <span>Sample QCs</span>\n" + "              </div>\n" + "            </li>\n" + "\n"
+                + "            <li class=\"lib-prep-step\">\n");
             projectSb.append("<div class=\"");
             if (joverview.getBoolean("libraryPreparationComplete") && joverview.getBoolean("allLibrariesQcPassed")) {
               projectSb.append("mid-progress-done");
-            }
-            else if (joverview.getBoolean("libraryPreparationComplete")) {
+            } else if (joverview.getBoolean("libraryPreparationComplete")) {
               projectSb.append("left-progress-done");
-            }
-            else {
+            } else {
               projectSb.append("");
             }
             projectSb.append("\">\n");
-            projectSb.append("                <span>Libraries prepared</span>\n" +
-                             "              </div>\n" +
-                             "            </li>\n" +
-                             "\n" +
-                             "            <li class=\"lib-qc-step\">\n");
+            projectSb.append("                <span>Libraries prepared</span>\n" + "              </div>\n" + "            </li>\n" + "\n"
+                + "            <li class=\"lib-qc-step\">\n");
             projectSb.append("<div class=\"");
             if (joverview.getBoolean("allLibrariesQcPassed") && joverview.getBoolean("allPoolsConstructed")) {
               projectSb.append("mid-progress-done");
-            }
-            else if (joverview.getBoolean("allLibrariesQcPassed")) {
+            } else if (joverview.getBoolean("allLibrariesQcPassed")) {
               projectSb.append("left-progress-done");
-            }
-            else {
+            } else {
               projectSb.append("");
             }
             projectSb.append("\">\n");
-            projectSb.append("                <span>Library QCs</span>\n" +
-                             "              </div>\n" +
-                             "            </li>\n" +
-                             "\n" +
-                             "            <li class=\"pools-step\">\n");
+            projectSb.append("                <span>Library QCs</span>\n" + "              </div>\n" + "            </li>\n" + "\n"
+                + "            <li class=\"pools-step\">\n");
             projectSb.append("<div class=\"");
             if (joverview.getBoolean("allPoolsConstructed") && joverview.getBoolean("allRunsCompleted")) {
               projectSb.append("mid-progress-done");
-            }
-            else if (joverview.getBoolean("allPoolsConstructed")) {
+            } else if (joverview.getBoolean("allPoolsConstructed")) {
               projectSb.append("left-progress-done");
-            }
-            else {
+            } else {
               projectSb.append("");
             }
             projectSb.append("\">\n");
-            projectSb.append("                <span>Pools Constructed</span>\n" +
-                             "              </div>\n" +
-                             "            </li>\n" +
-                             "\n" +
-                             "            <li class=\"runs-step\">\n");
+            projectSb.append("                <span>Pools Constructed</span>\n" + "              </div>\n" + "            </li>\n" + "\n"
+                + "            <li class=\"runs-step\">\n");
             projectSb.append("<div class=\"");
             if (joverview.getBoolean("allRunsCompleted") && joverview.getBoolean("primaryAnalysisCompleted")) {
               projectSb.append("mid-progress-done");
-            }
-            else if (joverview.getBoolean("allRunsCompleted")) {
+            } else if (joverview.getBoolean("allRunsCompleted")) {
               projectSb.append("left-progress-done");
-            }
-            else {
+            } else {
               projectSb.append("");
             }
             projectSb.append("\">\n");
-            projectSb.append("                <span>Runs Completed</span>\n" +
-                             "              </div>\n" +
-                             "            </li>\n" +
-                             "\n" +
-                             "            <li class=\"primary-analysis-step\">\n");
+            projectSb.append("                <span>Runs Completed</span>\n" + "              </div>\n" + "            </li>\n" + "\n"
+                + "            <li class=\"primary-analysis-step\">\n");
             projectSb.append("<div class=\"");
             if (joverview.getBoolean("primaryAnalysisCompleted")) {
               projectSb.append("right mid-progress-done");
-            }
-            else {
+            } else {
               projectSb.append("right");
             }
             projectSb.append("\">\n");
-            projectSb.append("                <span>Primary Analysis</span>\n" +
-                             "              </div>\n" +
-                             "            </li>\n" +
-                             "          </ol></div>\n" +
-                             "          <p style=\"clear:both\"/>");
+            projectSb.append("                <span>Primary Analysis</span>\n" + "              </div>\n" + "            </li>\n"
+                + "          </ol></div>\n" + "          <p style=\"clear:both\"/>");
           }
         }
 
@@ -267,15 +233,13 @@ public class ExternalSectionControllerHelperService {
         }
       }
 
-
       jsonObject.put("projectJson", projectSb.toString());
       jsonObject.put("sampleQcJson", sampleQcSb.toString());
       jsonObject.put("samplesArray", sampleArray);
       jsonObject.put("runsArray", runsArray);
 
       return jsonObject;
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
   }
@@ -285,16 +249,11 @@ public class ExternalSectionControllerHelperService {
       JSONArray jsonArray = new JSONArray();
       for (JSONObject jsample : (Iterable<JSONObject>) array) {
 
-        jsonArray.add("['" +
-                      jsample.getString("alias") + "','" +
-                      jsample.getString("sampleType") + "','" +
-                      jsample.getString("qcPassed") + "','" +
-                      jsample.getString("sampleQubit") + " ng/&#956;l" + "','" +
-                      jsample.getString("receivedDate") + "']");
+        jsonArray.add("['" + jsample.getString("alias") + "','" + jsample.getString("sampleType") + "','" + jsample.getString("qcPassed")
+            + "','" + jsample.getString("sampleQubit") + " ng/&#956;l" + "','" + jsample.getString("receivedDate") + "']");
       }
       return jsonArray;
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       JSONArray jsonArray = new JSONArray();
       return jsonArray;
     }
@@ -314,19 +273,12 @@ public class ExternalSectionControllerHelperService {
           }
         }
         runsamples.append("</ul></div>");
-        jsonArray.add("['" +
-                      jrun.getString("name") + "','" +
-                      jrun.getString("status") + "','" +
-                      jrun.getString("startDate") + "','" +
-                      jrun.getString("completionDate") + "','" +
-                      jrun.getString("platformType") + "','" +
-                      runsamples.toString() +
-                      "']");
+        jsonArray.add("['" + jrun.getString("name") + "','" + jrun.getString("status") + "','" + jrun.getString("startDate") + "','"
+            + jrun.getString("completionDate") + "','" + jrun.getString("platformType") + "','" + runsamples.toString() + "']");
 
       }
       return jsonArray;
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       JSONArray jsonArray = new JSONArray();
       return jsonArray;
     }
@@ -340,7 +292,7 @@ public class ExternalSectionControllerHelperService {
   public static String calculateHMAC(String data, String key) throws java.security.SignatureException {
     String result;
     try {
-      //get an hmac_sha1 key from the raw key bytes
+      // get an hmac_sha1 key from the raw key bytes
       SecretKeySpec signingKey = new SecretKeySpec(key.getBytes(), "HmacSHA1");
 
       // get an hmac_sha1 Mac instance and initialize with the signing key
@@ -352,9 +304,8 @@ public class ExternalSectionControllerHelperService {
 
       // base64-encode the hmac
       result = Base64.encodeBase64URLSafeString(rawHmac);
-      //result = Base64.encodeBase64String(rawHmac);
-    }
-    catch (Exception e) {
+      // result = Base64.encodeBase64String(rawHmac);
+    } catch (Exception e) {
       throw new SignatureException("Failed to generate HMAC : " + e.getMessage());
     }
     return result;

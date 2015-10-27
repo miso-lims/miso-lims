@@ -36,7 +36,7 @@ import java.util.Collection;
 
 /**
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */

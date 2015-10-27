@@ -30,12 +30,12 @@ import org.springframework.integration.annotation.Gateway;
  * uk.ac.bbsrc.tgac.miso.webapp.service
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 03-Dec-2010
  * @since 0.0.2
  */
 public interface SimpleStringGateway {
-    @Gateway(requestChannel = "testChannel")
-    void consumeString(Message<String> string);
+  @Gateway(requestChannel = "testChannel")
+  void consumeString(Message<String> string);
 }

@@ -107,12 +107,12 @@ public class UploadController {
   }
 
   public void uploadFile(Class type, String qualifier, MultipartFile fileItem) throws IOException {
-    File dir = new File(filesManager.getFileStorageDirectory() + File.separator + type.getSimpleName().toLowerCase() + File.separator + qualifier);
+    File dir = new File(filesManager.getFileStorageDirectory() + File.separator + type.getSimpleName().toLowerCase() + File.separator
+        + qualifier);
     if (LimsUtils.checkDirectory(dir, true)) {
       log.info("Attempting to store " + dir.toString() + File.separator + fileItem.getOriginalFilename());
       fileItem.transferTo(new File(dir + File.separator + fileItem.getOriginalFilename().replaceAll("\\s", "_")));
-    }
-    else {
+    } else {
       throw new IOException("Cannot upload file - check that the directory specified in miso.properties exists and is writable");
     }
   }
@@ -120,7 +120,6 @@ public class UploadController {
   public void uploadFile(Object type, String qualifier, MultipartFile fileItem) throws IOException {
     uploadFile(type.getClass(), qualifier, fileItem);
   }
-
 
   @RequestMapping(value = "/project", method = RequestMethod.POST)
   public void uploadProjectDocument(MultipartHttpServletRequest request) throws IOException {
@@ -146,8 +145,7 @@ public class UploadController {
         misoFormsService.importSampleDeliveryFormSamples(samples, taxonCheck);
       }
       return "redirect:/miso/project/" + projectId;
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       log.error("SAMPLE IMPORT FAIL:", e);
       throw new IOException(e);
     }
@@ -176,13 +174,12 @@ public class UploadController {
 
         request.getSession(false).setAttribute("bulksamples", o);
       }
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       log.error("SAMPLE IMPORT FAIL:" + e.getMessage());
-      //JSONObject o = new JSONObject();
-      //o.put("bulkerror", "Cannot import bulk spreadsheet: " + e.getMessage());
-      //log.error(o.toString());
-      //request.getSession(false).setAttribute("bulkerror", o);
+      // JSONObject o = new JSONObject();
+      // o.put("bulkerror", "Cannot import bulk spreadsheet: " + e.getMessage());
+      // log.error(o.toString());
+      // request.getSession(false).setAttribute("bulkerror", o);
     }
   }
 
@@ -198,15 +195,15 @@ public class UploadController {
         uploadFile(Project.class, projectId, fileItem);
         File f = filesManager.getFile(Project.class, projectId, fileItem.getOriginalFilename().replaceAll("\\s+", "_"));
         User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-        //Map<String, Pool<Plate<LinkedList<Library>, Library>>> pooledPlates = FormUtils.importPlateInputSpreadsheet(f, user, requestManager, libraryNamingScheme);
+        // Map<String, Pool<Plate<LinkedList<Library>, Library>>> pooledPlates = FormUtils.importPlateInputSpreadsheet(f, user,
+        // requestManager, libraryNamingScheme);
         Map<String, PlatePool> pooledPlates = FormUtils.importPlateInputSpreadsheet(f, user, requestManager, libraryNamingScheme);
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.getSerializationConfig().addMixInAnnotations(Sample.class, SampleRecursionAvoidanceMixin.class);
 
         String s = mapper.writerWithType(new TypeReference<Collection<PlatePool>>() {
-        })
-            .writeValueAsString(pooledPlates.values());
+        }).writeValueAsString(pooledPlates.values());
         a.add(JSONArray.fromObject(s));
       }
       o.put("pools", a);
@@ -216,8 +213,7 @@ public class UploadController {
 
       PrintWriter out = response.getWriter();
       out.println("<input type='hidden' id='uploadresponsebody' value='" + o.toString() + "'/>");
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       e.printStackTrace();
     }
   }
@@ -232,15 +228,15 @@ public class UploadController {
         uploadFile(Plate.class, "forms", fileItem);
         File f = filesManager.getFile(Plate.class, "forms", fileItem.getOriginalFilename().replaceAll("\\s+", "_"));
         User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-        //Map<String, Pool<Plate<LinkedList<Library>, Library>>> pooledPlates = FormUtils.importPlateInputSpreadsheet(f, user, requestManager, libraryNamingScheme);
+        // Map<String, Pool<Plate<LinkedList<Library>, Library>>> pooledPlates = FormUtils.importPlateInputSpreadsheet(f, user,
+        // requestManager, libraryNamingScheme);
         Map<String, PlatePool> pooledPlates = FormUtils.importPlateInputSpreadsheet(f, user, requestManager, libraryNamingScheme);
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.getSerializationConfig().addMixInAnnotations(Sample.class, SampleRecursionAvoidanceMixin.class);
 
         String s = mapper.writerWithType(new TypeReference<Collection<PlatePool>>() {
-        })
-            .writeValueAsString(pooledPlates.values());
+        }).writeValueAsString(pooledPlates.values());
         a.add(JSONArray.fromObject(s));
       }
       o.put("pools", a);
@@ -250,8 +246,7 @@ public class UploadController {
 
       PrintWriter out = response.getWriter();
       out.println("<input type='hidden' id='uploadresponsebody' value='" + o.toString() + "'/>");
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       e.printStackTrace();
     }
   }
@@ -269,8 +264,7 @@ public class UploadController {
       response.setContentType("text/html");
       PrintWriter out = response.getWriter();
       out.println("<input type='hidden' id='uploadresponsebody' value='" + jsonArray + "'/>");
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       e.printStackTrace();
     }
   }
@@ -330,10 +324,9 @@ public class UploadController {
       log.debug(o.toString());
 
       request.getSession(false).setAttribute("barcodes", o);
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       log.debug("UPLOAD FAIL:", e);
-      //return JSONUtils.SimpleJSONError("Upload failed: "+e.getMessage());
+      // return JSONUtils.SimpleJSONError("Upload failed: "+e.getMessage());
     }
   }
 

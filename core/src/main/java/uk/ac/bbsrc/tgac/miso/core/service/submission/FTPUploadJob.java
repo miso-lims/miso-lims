@@ -26,52 +26,50 @@ package uk.ac.bbsrc.tgac.miso.core.service.submission;
 import java.io.File;
 
 /**
- * Created by IntelliJ IDEA.
- * User: collesa
- * Date: 26/04/12
- * Time: 18:11
- * To change this template use File | Settings | File Templates.
+ * Created by IntelliJ IDEA. User: collesa Date: 26/04/12 Time: 18:11 To change this template use File | Settings | File Templates.
  */
 public class FTPUploadJob implements UploadJob {
 
-    private File file;
-    private UploadListener uploadListener = new UploadListener();
+  private File file;
+  private UploadListener uploadListener = new UploadListener();
 
+  public FTPUploadJob(File file) {
+    this.file = file;
 
-    public FTPUploadJob(File file) {
-        this.file = file;
+  }
 
-    }
+  @Override
+  public void setFile(File file) {
+    this.file = file;
+  }
 
-    @Override
-    public void setFile(File file) {
-        this.file=file;    }
+  @Override
+  public File getFile() {
+    return file; // To change body of implemented methods use File | Settings | File Templates.
+  }
 
-    @Override
-    public File getFile() {
-        return file;  //To change body of implemented methods use File | Settings | File Templates.
-    }
+  @Override
+  public long getBytesTransferred() {
+    return uploadListener.getTotalBT(); // To change body of implemented methods use File | Settings | File Templates.
+  }
 
-    @Override
-    public long getBytesTransferred() {
-        return uploadListener.getTotalBT();  //To change body of implemented methods use File | Settings | File Templates.
-    }
+  @Override
+  public int getPercentageTransferred() {
+    if (file != null) {
+      return 100 * (int) (uploadListener.getTotalBT() / uploadListener.getStreamSize());
+    } else
+      return 0; // To change body of implemented methods use File | Settings | File Templates.
+  }
 
-    @Override
-    public int getPercentageTransferred() {
-        if(file!=null){
-            return 100*(int)(uploadListener.getTotalBT()/uploadListener.getStreamSize());
-        }
-        else return 0;  //To change body of implemented methods use File | Settings | File Templates.
-    }
+  @Override
+  public boolean isComplete() {
+    if (getPercentageTransferred() == 100)
+      return true;
+    else
+      return false; // To change body of implemented methods use File | Settings | File Templates.
+  }
 
-    @Override
-    public boolean isComplete() {
-        if (getPercentageTransferred()==100) return true;
-        else return false;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    public UploadListener getListener(){
-        return this.uploadListener;
-    }
+  public UploadListener getListener() {
+    return this.uploadListener;
+  }
 }

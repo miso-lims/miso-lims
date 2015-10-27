@@ -42,7 +42,7 @@ import java.util.List;
  * com.eaglegenomics.miso.web
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -70,8 +70,7 @@ public class ListSubmissionsController {
       List<Submission> subs = new ArrayList<Submission>(requestManager.listAllSubmissions());
       Collections.sort(subs);
       return new ModelAndView("/pages/listSubmissions.jsp", "submissions", subs);
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to list submissions", ex);
       }

@@ -33,15 +33,20 @@ import java.util.Collection;
  * uk.ac.bbsrc.tgac.miso.core.manager
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public interface FilesManager {
   File generateTemporaryFile(String prefix, String suffix, File baseDir) throws IOException;
+
   String getFileStorageDirectory();
-  Collection<File> getFiles(Class  type, String qualifier) throws IOException;
-  Collection<String> getFileNames(Class  type, String qualifier) throws IOException;
-  File getFile(Class  type, String qualifier, String fileName) throws IOException;
+
+  Collection<File> getFiles(Class type, String qualifier) throws IOException;
+
+  Collection<String> getFileNames(Class type, String qualifier) throws IOException;
+
+  File getFile(Class type, String qualifier, String fileName) throws IOException;
+
   File storeFile(Class type, String qualifier, File file) throws IOException;
 }

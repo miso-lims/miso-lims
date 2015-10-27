@@ -29,29 +29,29 @@ import javax.persistence.Id;
 import java.io.Serializable;
 
 /**
- * Provides model access to the underlying MISO LibraryType lookup table. These types should match the SRA submission schema for
- * Library types.
+ * Provides model access to the underlying MISO LibraryType lookup table. These types should match the SRA submission schema for Library
+ * types.
  * <p/>
  * See:
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public class LibraryType implements Comparable, Serializable {
   public static final Long UNSAVED_ID = 0L;
 
-  /** Field libraryTypeId  */
+  /** Field libraryTypeId */
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long libraryTypeId = LibraryType.UNSAVED_ID;
-  /** Field description  */
+  /** Field description */
   private String description;
-  /** Field platformType  */
+  /** Field platformType */
   private String platformType;
 
   /**
    * Returns the libraryTypeId of this LibraryType object.
-   *
+   * 
    * @return Long libraryTypeId.
    */
   public Long getLibraryTypeId() {
@@ -60,8 +60,9 @@ public class LibraryType implements Comparable, Serializable {
 
   /**
    * Sets the libraryTypeId of this LibraryType object.
-   *
-   * @param libraryTypeId libraryTypeId.
+   * 
+   * @param libraryTypeId
+   *          libraryTypeId.
    */
   public void setLibraryTypeId(Long libraryTypeId) {
     this.libraryTypeId = libraryTypeId;
@@ -69,7 +70,7 @@ public class LibraryType implements Comparable, Serializable {
 
   /**
    * Returns the description of this LibraryType object.
-   *
+   * 
    * @return String description.
    */
   public String getDescription() {
@@ -78,8 +79,9 @@ public class LibraryType implements Comparable, Serializable {
 
   /**
    * Sets the description of this LibraryType object.
-   *
-   * @param description description.
+   * 
+   * @param description
+   *          description.
    */
   public void setDescription(String description) {
     this.description = description;
@@ -87,7 +89,7 @@ public class LibraryType implements Comparable, Serializable {
 
   /**
    * Returns the platformType of this LibraryType object.
-   *
+   * 
    * @return String platformType.
    */
   public String getPlatformType() {
@@ -96,8 +98,9 @@ public class LibraryType implements Comparable, Serializable {
 
   /**
    * Sets the platformType of this LibraryType object.
-   *
-   * @param platformType platformType.
+   * 
+   * @param platformType
+   *          platformType.
    */
   public void setPlatformType(String platformType) {
     this.platformType = platformType;
@@ -105,12 +108,9 @@ public class LibraryType implements Comparable, Serializable {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null)
-      return false;
-    if (obj == this)
-      return true;
-    if (!(obj instanceof LibraryType))
-      return false;
+    if (obj == null) return false;
+    if (obj == this) return true;
+    if (!(obj instanceof LibraryType)) return false;
     LibraryType them = (LibraryType) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
@@ -121,8 +121,7 @@ public class LibraryType implements Comparable, Serializable {
   public int hashCode() {
     if (getLibraryTypeId() != UNSAVED_ID) {
       return getLibraryTypeId().intValue();
-    }
-    else {
+    } else {
       int hashcode = -1;
       if (getDescription() != null) hashcode = 37 * hashcode + getDescription().hashCode();
       if (getPlatformType() != null) hashcode = 37 * hashcode + getPlatformType().hashCode();
@@ -132,7 +131,7 @@ public class LibraryType implements Comparable, Serializable {
 
   @Override
   public int compareTo(Object o) {
-    LibraryType t = (LibraryType)o;
+    LibraryType t = (LibraryType) o;
     return getDescription().compareTo(t.getDescription());
   }
 }

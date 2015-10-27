@@ -32,27 +32,27 @@ import java.io.Serializable;
  * Provides model access to the underlying MISO LibrarySelectionType lookup table. These types should match the SRA submission schema for
  * Library selection types.
  * <p/>
- * See: 
- *
+ * See:
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public class LibrarySelectionType implements Comparable, Serializable {
-  /** Field UNSAVED_ID  */
+  /** Field UNSAVED_ID */
   public static final Long UNSAVED_ID = 0L;
 
-  /** Field librarySelectionTypeId  */
+  /** Field librarySelectionTypeId */
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long librarySelectionTypeId = LibrarySelectionType.UNSAVED_ID;
-  /** Field name  */
+  /** Field name */
   private String name;
-  /** Field description  */
+  /** Field description */
   private String description;
 
   /**
    * Returns the librarySelectionTypeId of this LibrarySelectionType object.
-   *
+   * 
    * @return Long librarySelectionTypeId.
    */
   public Long getLibrarySelectionTypeId() {
@@ -61,9 +61,10 @@ public class LibrarySelectionType implements Comparable, Serializable {
 
   /**
    * Sets the librarySelectionTypeId of this LibrarySelectionType object.
-   *
-   * @param librarySelectionTypeId librarySelectionTypeId.
-   *
+   * 
+   * @param librarySelectionTypeId
+   *          librarySelectionTypeId.
+   * 
    */
   public void setLibrarySelectionTypeId(Long librarySelectionTypeId) {
     this.librarySelectionTypeId = librarySelectionTypeId;
@@ -71,7 +72,7 @@ public class LibrarySelectionType implements Comparable, Serializable {
 
   /**
    * Returns the name of this LibrarySelectionType object.
-   *
+   * 
    * @return String name.
    */
   public String getName() {
@@ -80,8 +81,9 @@ public class LibrarySelectionType implements Comparable, Serializable {
 
   /**
    * Sets the name of this LibrarySelectionType object.
-   *
-   * @param name name.
+   * 
+   * @param name
+   *          name.
    */
   public void setName(String name) {
     this.name = name;
@@ -89,7 +91,7 @@ public class LibrarySelectionType implements Comparable, Serializable {
 
   /**
    * Returns the description of this LibrarySelectionType object.
-   *
+   * 
    * @return String description.
    */
   public String getDescription() {
@@ -98,8 +100,9 @@ public class LibrarySelectionType implements Comparable, Serializable {
 
   /**
    * Sets the description of this LibrarySelectionType object.
-   *
-   * @param description description.
+   * 
+   * @param description
+   *          description.
    */
   public void setDescription(String description) {
     this.description = description;
@@ -107,12 +110,9 @@ public class LibrarySelectionType implements Comparable, Serializable {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null)
-      return false;
-    if (obj == this)
-      return true;
-    if (!(obj instanceof LibrarySelectionType))
-      return false;
+    if (obj == null) return false;
+    if (obj == this) return true;
+    if (!(obj instanceof LibrarySelectionType)) return false;
     LibrarySelectionType them = (LibrarySelectionType) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
@@ -123,8 +123,7 @@ public class LibrarySelectionType implements Comparable, Serializable {
   public int hashCode() {
     if (getLibrarySelectionTypeId() != UNSAVED_ID) {
       return getLibrarySelectionTypeId().intValue();
-    }
-    else {
+    } else {
       int hashcode = -1;
       if (getName() != null) hashcode = 37 * hashcode + getName().hashCode();
       if (getDescription() != null) hashcode = 37 * hashcode + getDescription().hashCode();
@@ -133,7 +132,7 @@ public class LibrarySelectionType implements Comparable, Serializable {
   }
 
   public int compareTo(Object o) {
-    LibrarySelectionType t = (LibrarySelectionType)o;
+    LibrarySelectionType t = (LibrarySelectionType) o;
 
     int name = getName().compareTo(t.getName());
     if (name != 0) return name;

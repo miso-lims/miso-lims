@@ -47,7 +47,7 @@ import java.util.*;
  * uk.ac.bbsrc.tgac.miso.core.manager
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 04-May-2011
  * @since 0.0.3
@@ -112,11 +112,10 @@ public abstract class AbstractPrintManager<C> implements PrintManager<MisoPrintS
       for (Class c : subTypes) {
         if (!barcodableMap.containsKey(c.getSimpleName())) {
           barcodableMap.put(c.getSimpleName(), c);
-        }
-        else {
+        } else {
           if (barcodableMap.get(c.getSimpleName()) != c) {
-            String msg = "Multiple different Barcodables with the same name " +
-                         "('" + c.getName() + "') are present on the classpath. Barcodable names must be unique.";
+            String msg = "Multiple different Barcodables with the same name " + "('" + c.getName()
+                + "') are present on the classpath. Barcodable names must be unique.";
             throw new ServiceConfigurationError(msg);
           }
         }
@@ -129,8 +128,7 @@ public abstract class AbstractPrintManager<C> implements PrintManager<MisoPrintS
   public long storePrintService(MisoPrintService service) throws IOException {
     if (printServiceStore != null) {
       return printServiceStore.save(service);
-    }
-    else {
+    } else {
       throw new IOException("No printServiceStore defined. Ensure one is declared in the Spring XML, or set manually");
     }
   }
@@ -139,8 +137,7 @@ public abstract class AbstractPrintManager<C> implements PrintManager<MisoPrintS
   public MisoPrintService getPrintService(long serviceId) throws IOException {
     if (printServiceStore != null) {
       return printServiceStore.get(serviceId);
-    }
-    else {
+    } else {
       throw new IOException("No printServiceStore defined. Ensure one is declared in the Spring XML, or set manually");
     }
   }
@@ -149,8 +146,7 @@ public abstract class AbstractPrintManager<C> implements PrintManager<MisoPrintS
   public MisoPrintService getPrintService(String serviceName) throws IOException {
     if (printServiceStore != null) {
       return printServiceStore.getByName(serviceName);
-    }
-    else {
+    } else {
       throw new IOException("No printServiceStore defined. Ensure one is declared in the Spring XML, or set manually");
     }
   }
@@ -159,8 +155,7 @@ public abstract class AbstractPrintManager<C> implements PrintManager<MisoPrintS
   public Collection<MisoPrintService> listAllPrintServices() throws IOException {
     if (printServiceStore != null) {
       return printServiceStore.listAll();
-    }
-    else {
+    } else {
       throw new IOException("No printServiceStore defined. Ensure one is declared in the Spring XML, or set manually");
     }
   }
@@ -172,13 +167,13 @@ public abstract class AbstractPrintManager<C> implements PrintManager<MisoPrintS
       Set<MisoPrintService> matchedServices = new HashSet<MisoPrintService>();
       for (MisoPrintService mps : services) {
         if (mps.getPrintServiceFor().equals(barcodableClass)) {
-          log.info("Matched service for " + barcodableClass.getName() + ": " + mps.getName() + " (" + mps.getPrintServiceFor().getName()+")");
+          log.info("Matched service for " + barcodableClass.getName() + ": " + mps.getName() + " (" + mps.getPrintServiceFor().getName()
+              + ")");
           matchedServices.add(mps);
         }
       }
       return matchedServices;
-    }
-    else {
+    } else {
       throw new IOException("No printServiceStore defined. Ensure one is declared in the Spring XML, or set manually");
     }
   }
@@ -187,8 +182,7 @@ public abstract class AbstractPrintManager<C> implements PrintManager<MisoPrintS
   public long storePrintJob(PrintJob job) throws IOException {
     if (printJobStore != null) {
       return printJobStore.save(job);
-    }
-    else {
+    } else {
       throw new IOException("No printJobStore defined. Ensure one is declared in the Spring XML, or set manually");
     }
   }
@@ -197,8 +191,7 @@ public abstract class AbstractPrintManager<C> implements PrintManager<MisoPrintS
   public PrintJob getPrintJob(long jobId) throws IOException {
     if (printJobStore != null) {
       return printJobStore.get(jobId);
-    }
-    else {
+    } else {
       throw new IOException("No printJobStore defined. Ensure one is declared in the Spring XML, or set manually");
     }
   }
@@ -207,8 +200,7 @@ public abstract class AbstractPrintManager<C> implements PrintManager<MisoPrintS
   public Collection<PrintJob> listAllPrintJobs() throws IOException {
     if (printJobStore != null) {
       return printJobStore.listAll();
-        }
-    else {
+    } else {
       throw new IOException("No printJobStore defined. Ensure one is declared in the Spring XML, or set manually");
     }
   }
@@ -217,8 +209,7 @@ public abstract class AbstractPrintManager<C> implements PrintManager<MisoPrintS
   public Collection<PrintJob> listPrintJobsByUser(User user) throws IOException {
     if (printJobStore != null) {
       return printJobStore.listByUser(user);
-    }
-    else {
+    } else {
       throw new IOException("No printJobStore defined. Ensure one is declared in the Spring XML, or set manually");
     }
   }
@@ -227,8 +218,7 @@ public abstract class AbstractPrintManager<C> implements PrintManager<MisoPrintS
   public Collection<PrintJob> listPrintJobsByPrintService(MisoPrintService printService) throws IOException {
     if (printJobStore != null) {
       return printJobStore.listByPrintService(printService);
-    }
-    else {
+    } else {
       throw new IOException("No printJobStore defined. Ensure one is declared in the Spring XML, or set manually");
     }
   }

@@ -23,22 +23,23 @@
 
 package uk.ac.bbsrc.tgac.miso.core.service.submission;
 
-import uk.ac.bbsrc.tgac.miso.core.exception.SubmissionException;
-
 import java.io.File;
 import java.util.Set;
 
+import uk.ac.bbsrc.tgac.miso.core.exception.SubmissionException;
+
 /**
  * An interface that defines a TransferMethod object that can submit data files to a service defined by an endpoint
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public interface TransferMethod {
   /**
    * Uploads sequence Datafiles
-   *
-   * @param dataFiles  set of datafiles
+   * 
+   * @param dataFiles
+   *          set of datafiles
    * @return UploadReport response
    */
   public UploadReport uploadSequenceData(Set<File> dataFiles, EndPoint endpoint) throws SubmissionException;

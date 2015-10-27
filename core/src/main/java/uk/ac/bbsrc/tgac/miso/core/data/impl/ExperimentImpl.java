@@ -38,7 +38,7 @@ import java.io.Serializable;
 
 /**
  * Concrete implementation of an Experiment
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -53,40 +53,37 @@ public class ExperimentImpl extends AbstractExperiment implements Serializable {
 
   /**
    * Construct a new Experiment with a SecurityProfile owned by the given User
-   *
-   * @param user of type User
+   * 
+   * @param user
+   *          of type User
    */
   public ExperimentImpl(User user) {
     setSecurityProfile(new SecurityProfile(user));
   }
 
   /**
-   * If the given User can read the parent Study, construct a new Experiment with a SecurityProfile inherited from the parent Study.
-   * If not, construct a new Experiment with a SecurityProfile owned by the given User
-   *
-   * @param study of type Study
-   * @param user of type User
+   * If the given User can read the parent Study, construct a new Experiment with a SecurityProfile inherited from the parent Study. If not,
+   * construct a new Experiment with a SecurityProfile owned by the given User
+   * 
+   * @param study
+   *          of type Study
+   * @param user
+   *          of type User
    */
   public ExperimentImpl(Study study, User user) {
     if (study.userCanRead(user)) {
       setStudy(study);
       setSecurityProfile(study.getSecurityProfile());
-    }
-    else {
+    } else {
       setSecurityProfile(new SecurityProfile(user));
     }
   }
 
   public void buildSubmission() {
     /*
-    try {
-      DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-      submissionDocument = docBuilder.newDocument();
-    }
-    catch (ParserConfigurationException e) {
-      e.printStackTrace();
-    }
-    ERASubmissionFactory.generateExperimentSubmissionXML(submissionDocument, this);
-    */
+     * try { DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder(); submissionDocument =
+     * docBuilder.newDocument(); } catch (ParserConfigurationException e) { e.printStackTrace(); }
+     * ERASubmissionFactory.generateExperimentSubmissionXML(submissionDocument, this);
+     */
   }
 }

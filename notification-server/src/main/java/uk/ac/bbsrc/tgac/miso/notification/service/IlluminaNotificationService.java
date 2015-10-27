@@ -42,7 +42,7 @@ import java.util.regex.Pattern;
  * uk.ac.bbsrc.tgac.miso.notification.handler
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 07-Dec-2010
  * @since version
@@ -53,13 +53,13 @@ public class IlluminaNotificationService {
     Map<String, String> params = new HashMap<String, String>();
     String regex = ".*/([\\d]+_[A-z0-9]+_[\\d]+_[A-z0-9_]*)/.*";
     Pattern p = Pattern.compile(regex);
-    for (File f :files) {
+    for (File f : files) {
       Matcher m = p.matcher(f.getAbsolutePath());
       if (m.matches()) {
         params.put(m.group(1), f.getAbsolutePath());
-      }        
+      }
     }
-    return new JobLaunchRequest("job"+files.hashCode(), params);
+    return new JobLaunchRequest("job" + files.hashCode(), params);
   }
 
   public Set<Resource> filesToResources(Set<File> files) throws DuplicateJobException {
@@ -83,11 +83,9 @@ public class IlluminaNotificationService {
       }
       br.close();
       hm.put("statusXml", sb.toString());
-    }
-    catch (FileNotFoundException e) {
+    } catch (FileNotFoundException e) {
       e.printStackTrace();
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
     }
     return NotificationUtils.buildSimplePostMessage(hm);

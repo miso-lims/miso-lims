@@ -29,7 +29,7 @@ import java.lang.reflect.Method;
  * uk.ac.bbsrc.tgac.miso.core.util
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 01/12/11
  * @since 0.1.3
@@ -38,7 +38,7 @@ public class AliasComparator extends AlphanumericComparator {
   private Method method;
   private boolean isAscending = true;
   private boolean isNullsLast = true;
-  private static final Object[] EMPTY_OBJECT_ARRAY = new Object[]{};
+  private static final Object[] EMPTY_OBJECT_ARRAY = new Object[] {};
 
   public AliasComparator(Class c) throws NoSuchMethodException, IllegalArgumentException {
     method = c.getMethod("getAlias");
@@ -55,10 +55,9 @@ public class AliasComparator extends AlphanumericComparator {
     String alias2 = null;
 
     try {
-      alias1 = (String)method.invoke(object1, EMPTY_OBJECT_ARRAY);
-      alias2 = (String)method.invoke(object2, EMPTY_OBJECT_ARRAY);
-    }
-    catch (Exception e) {
+      alias1 = (String) method.invoke(object1, EMPTY_OBJECT_ARRAY);
+      alias2 = (String) method.invoke(object2, EMPTY_OBJECT_ARRAY);
+    } catch (Exception e) {
       throw new RuntimeException(e);
     }
 
@@ -76,15 +75,14 @@ public class AliasComparator extends AlphanumericComparator {
     if (alias1 == null) return isNullsLast ? 1 : -1;
     if (alias2 == null) return isNullsLast ? -1 : 1;
 
-    //  Compare objects
+    // Compare objects
     String c1;
     String c2;
 
     if (isAscending) {
       c1 = alias1;
       c2 = alias2;
-    }
-    else {
+    } else {
       c1 = alias2;
       c2 = alias1;
     }

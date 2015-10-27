@@ -4,7 +4,7 @@ import net.sf.json.JSONObject;
 
 /**
  * Class for producing simple non-URL-encoded error messages for REST APIs
- *
+ * 
  * @author Rob Davey
  * @date 19/08/15
  * @since 0.2.1-SNAPSHOT

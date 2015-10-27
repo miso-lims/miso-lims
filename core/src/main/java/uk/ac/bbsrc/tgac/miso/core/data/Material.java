@@ -32,10 +32,10 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
  * Unused placeholder interface for representing actual matter supplied to the TGAC lab that will eventually become Sample(s).
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public interface Material extends SecurableByProfile {
 }

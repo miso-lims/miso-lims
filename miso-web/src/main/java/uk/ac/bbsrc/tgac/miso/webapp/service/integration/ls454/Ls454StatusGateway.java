@@ -31,12 +31,12 @@ import org.springframework.util.MultiValueMap;
  * uk.ac.bbsrc.tgac.miso.webapp.service
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 16-Dec-2011
  * @since 0.1.4
  */
 public interface Ls454StatusGateway {
-    @Gateway(requestChannel = "ls454StatusChannel")
-    void consume(Message<MultiValueMap<String, String>> message);  
+  @Gateway(requestChannel = "ls454StatusChannel")
+  void consume(Message<MultiValueMap<String, String>> message);
 }

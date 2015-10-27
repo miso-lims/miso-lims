@@ -39,7 +39,7 @@ import java.util.*;
 
 /**
  * Decorates a Submission so that an ERA Submission submission XML document can be built from it
- *
+ * 
  * @author Rob Davey
  * @date 12-Oct-2010
  * @since 0.0.2
@@ -52,7 +52,7 @@ public class EraSubmissionDecorator extends AbstractSubmittableDecorator<Documen
   }
 
   public void buildSubmission() {
-    Submission sub = (Submission)submittable;
+    Submission sub = (Submission) submittable;
 
     if (submission != null) {
       Element s = submission.createElementNS(null, "SUBMISSION");
@@ -81,24 +81,20 @@ public class EraSubmissionDecorator extends AbstractSubmittableDecorator<Documen
       map.put("experiment", new ArrayList<Submittable<Document>>());
       map.put("run", new ArrayList<Submittable<Document>>());
 
-      Map<SequencerPoolPartition, Collection<? extends Poolable>> dataFilePoolables =
-              new HashMap<SequencerPoolPartition, Collection<? extends Poolable>>();
+      Map<SequencerPoolPartition, Collection<? extends Poolable>> dataFilePoolables = new HashMap<SequencerPoolPartition, Collection<? extends Poolable>>();
 
       Set<Submittable<Document>> subs = sub.getSubmissionElements();
       for (Submittable<Document> subtype : subs) {
         if (subtype instanceof Study) {
           map.get("study").add(subtype);
-        }
-        else if (subtype instanceof Sample) {
+        } else if (subtype instanceof Sample) {
           map.get("sample").add(subtype);
-        }
-        else if (subtype instanceof Experiment) {
+        } else if (subtype instanceof Experiment) {
           map.get("experiment").add(subtype);
-        }
-        else if (subtype instanceof SequencerPoolPartition) {
+        } else if (subtype instanceof SequencerPoolPartition) {
           map.get("run").add(subtype);
 
-          SequencerPoolPartition p = (SequencerPoolPartition)subtype;
+          SequencerPoolPartition p = (SequencerPoolPartition) subtype;
           if (p.getPool() != null) {
             dataFilePoolables.put(p, p.getPool().getPoolableElements());
           }
@@ -115,17 +111,16 @@ public class EraSubmissionDecorator extends AbstractSubmittableDecorator<Documen
             if (sat.equals(SubmissionActionType.VALIDATE)) {
               Element validate = submission.createElementNS(null, "VALIDATE");
               validate.setAttribute("schema", key);
-              validate.setAttribute("source", sub.getName()+"_"+key+"_"+submissionProperties.getProperty("submissionDate")+".xml");
+              validate
+                  .setAttribute("source", sub.getName() + "_" + key + "_" + submissionProperties.getProperty("submissionDate") + ".xml");
               action.appendChild(validate);
-            }
-            else if (sat.equals(SubmissionActionType.ADD)) {
+            } else if (sat.equals(SubmissionActionType.ADD)) {
               Element add = submission.createElementNS(null, "ADD");
               add.setAttribute("schema", key);
-              add.setAttribute("source", sub.getName()+"_"+key+"_"+submissionProperties.getProperty("submissionDate")+".xml");
+              add.setAttribute("source", sub.getName() + "_" + key + "_" + submissionProperties.getProperty("submissionDate") + ".xml");
               action.appendChild(add);
             }
-          }
-          else {
+          } else {
 
           }
           actions.appendChild(action);
@@ -134,41 +129,24 @@ public class EraSubmissionDecorator extends AbstractSubmittableDecorator<Documen
       s.appendChild(actions);
 
       /*
-      * FILES element deprecated in SRA 1.5
-      *
-      Element files = submission.createElementNS(null, "FILES");
-
-      FilePathGenerator fpg = new TGACIlluminaFilepathGenerator();
-      String basePath = submissionProperties.getProperty("submission.baseReadPath");
-      if (basePath != null) {
-        fpg = new TGACIlluminaFilepathGenerator(basePath);
-      }
-
-      for(SequencerPoolPartition part : dataFilePoolables.keySet()) {
-        for (Dilution po : part.getPool().getDilutions()) {
-          try {
-            for (File f : fpg.generateFilePath(part,po)) {
-              String fileName = f.getName();
-              Element file = submission.createElementNS(null,"FILE");
-              file.setAttribute("filename", fileName);
-              file.setAttribute("checksum_method", "MD5");
-              file.setAttribute("checksum", "");
-              files.appendChild(file);
-            }
-          }
-          catch (Exception e) {
-            e.printStackTrace();
-          }
-        }
-      }
-      s.appendChild(files);
-      */
+       * FILES element deprecated in SRA 1.5
+       * 
+       * Element files = submission.createElementNS(null, "FILES");
+       * 
+       * FilePathGenerator fpg = new TGACIlluminaFilepathGenerator(); String basePath =
+       * submissionProperties.getProperty("submission.baseReadPath"); if (basePath != null) { fpg = new
+       * TGACIlluminaFilepathGenerator(basePath); }
+       * 
+       * for(SequencerPoolPartition part : dataFilePoolables.keySet()) { for (Dilution po : part.getPool().getDilutions()) { try { for (File
+       * f : fpg.generateFilePath(part,po)) { String fileName = f.getName(); Element file = submission.createElementNS(null,"FILE");
+       * file.setAttribute("filename", fileName); file.setAttribute("checksum_method", "MD5"); file.setAttribute("checksum", "");
+       * files.appendChild(file); } } catch (Exception e) { e.printStackTrace(); } } } s.appendChild(files);
+       */
 
       if (submission.getElementsByTagName("SUBMISSION_SET").item(0) != null) {
         submission.getElementsByTagName("SUBMISSION_SET").item(0).appendChild(s);
-      }
-      else {
-        Element submissionSet=submission.createElementNS(null,"SUBMISSION_SET");
+      } else {
+        Element submissionSet = submission.createElementNS(null, "SUBMISSION_SET");
         submission.appendChild(submissionSet);
         submissionSet.appendChild(s);
       }

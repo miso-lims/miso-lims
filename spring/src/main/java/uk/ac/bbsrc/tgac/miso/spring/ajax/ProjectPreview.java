@@ -40,11 +40,8 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 /**
- * Created by IntelliJ IDEA.
- * User: bian
- * Date: 16-Mar-2010
- * Time: 14:11:37
- *
+ * Created by IntelliJ IDEA. User: bian Date: 16-Mar-2010 Time: 14:11:37
+ * 
  */
 @Ajaxified
 public class ProjectPreview {
@@ -54,7 +51,7 @@ public class ProjectPreview {
   @Autowired
   private RequestManager requestManager;
 
- public JSONObject previewProject(HttpSession session, JSONObject json) {
+  public JSONObject previewProject(HttpSession session, JSONObject json) {
     StringBuffer sb = new StringBuffer();
     String projectId = (String) json.get("projectId");
 
@@ -66,24 +63,23 @@ public class ProjectPreview {
 
       String studyHTML = "";
       for (Study r : project.getStudies()) {
-         studyHTML+="<li><a href='/miso/study/"+r.getId()+"/project/"+project.getId()+"'>"+r.getName()+"</a></li>";
+        studyHTML += "<li><a href='/miso/study/" + r.getId() + "/project/" + project.getId() + "'>" + r.getName() + "</a></li>";
       }
       StringBuilder b = new StringBuilder();
-      b.append("<div onclick=\"Effect.toggle('preview"+projectId+"','blind'); return false;\">" +
-              "<img src=\"/styles/images/moreinfo.png\" class=\"previewimage\"/></div>");
-      b.append("<br/><div id=\"preview"+projectId+"\" class='exppreview'>");
+      b.append("<div onclick=\"Effect.toggle('preview" + projectId + "','blind'); return false;\">"
+          + "<img src=\"/styles/images/moreinfo.png\" class=\"previewimage\"/></div>");
+      b.append("<br/><div id=\"preview" + projectId + "\" class='exppreview'>");
       b.append("Description: <b>" + project.getDescription() + "</b><br/>");
       b.append("Owner: <b>" + project.getSecurityProfile().getOwner().getFullName() + "</b><br/>");
-      b.append("studies: <ul class=\"bullets\">"+studyHTML+"</ul>");
+      b.append("studies: <ul class=\"bullets\">" + studyHTML + "</ul>");
       b.append("</div>");
       return JSONUtils.SimpleJSONResponse(b.toString());
 
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed");
     }
- }
+  }
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;

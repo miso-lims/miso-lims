@@ -46,13 +46,8 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 /**
- * Created by IntelliJ IDEA.
- * User: bian
- * Date: 10-Jun-2010
- * Time: 10:14:21
- * read excel 2007+ file
+ * Created by IntelliJ IDEA. User: bian Date: 10-Jun-2010 Time: 10:14:21 read excel 2007+ file
  */
 public class ImportExcel {
 
@@ -65,11 +60,11 @@ public class ImportExcel {
     List sheetData = new ArrayList();
     List sheetData1 = new ArrayList();
 
-    List<List<Cell>> ga2Data= new ArrayList<List<Cell>>();
+    List<List<Cell>> ga2Data = new ArrayList<List<Cell>>();
     List<List<Cell>> hiSeqData = new ArrayList<List<Cell>>();
 
-    //DaoUtils.wireMisoRequestManager(misoManager);
-    //DaoUtils.wireLocalSecurityManager(securityManager);
+    // DaoUtils.wireMisoRequestManager(misoManager);
+    // DaoUtils.wireLocalSecurityManager(securityManager);
 
     sp.setAllowAllInternal(true);
     // sp.setWriteGroups(["Administrator", "Technician"]);
@@ -103,11 +98,9 @@ public class ImportExcel {
         }
         processIlluminaData(misoManager.getPlatformById(15), hiSeqData);
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
-    }
-    finally {
+    } finally {
       if (fis2 != null) {
         fis2.close();
       }
@@ -119,12 +112,12 @@ public class ImportExcel {
     // start from the third line of the data.
     for (int l = 2; l < sheetData.size(); l++) {
       List list = (List) sheetData.get(l);
-      //different columns for different processing
-      //Run
-      //XSSFCell cella = (XSSFCell) list.get(0);
-      //RunName
+      // different columns for different processing
+      // Run
+      // XSSFCell cella = (XSSFCell) list.get(0);
+      // RunName
       XSSFCell cellb = (XSSFCell) list.get(2);
-      //Region
+      // Region
       XSSFCell cellh = (XSSFCell) list.get(7);
       int chamber = new Double(cellh.getNumericCellValue()).intValue();
       String chamberStr = String.valueOf(chamber);
@@ -133,11 +126,10 @@ public class ImportExcel {
         List list1 = (List) sheetData.get(l - (chamber - 1));
         XSSFCell cellb1 = (XSSFCell) list1.get(2);
         runD = cellb1.getRichStringCellValue().getString();
-      }
-      else {
+      } else {
         runD = cellb.getRichStringCellValue().getString();
       }
-      //Date
+      // Date
       XSSFCell cellc = (XSSFCell) list.get(1);
       Date date = null;
       DateFormat df = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
@@ -145,8 +137,7 @@ public class ImportExcel {
         List list1 = (List) sheetData.get(l - (chamber - 1));
         XSSFCell cellc1 = (XSSFCell) list1.get(1);
         date = df.parse(cellc1.getDateCellValue().toString());
-      }
-      else {
+      } else {
         date = df.parse(cellc.getDateCellValue().toString());
       }
 
@@ -156,11 +147,10 @@ public class ImportExcel {
       String cd = null;
       if (celld.getCellType() == Cell.CELL_TYPE_NUMERIC) {
         cd = String.valueOf(celld.getNumericCellValue());
-      }
-      else {
+      } else {
         cd = celld.getRichStringCellValue().getString();
       }
-      //Project
+      // Project
       XSSFCell celle = (XSSFCell) list.get(4);
       String ce = celle.getRichStringCellValue().getString();
 
@@ -332,63 +322,34 @@ public class ImportExcel {
             run = r;
             System.out.println("Run [using existing run]: " + run);
             /*
-            List<ChamberFlowcell> fclist = new ArrayList<ChamberFlowcell>(misoManager.listChamberFlowcellsByRunId(r.getRunId()));
-            ChamberFlowcell fc = fclist.get(0);
-            Chamber cb = new Chamber();
-            cb.setPool(pool);
-            cb.setPartitionNumber(chamber);
-            cb.setSecurityProfile(sp);
-            misoManager.saveChamber(cb);
-            fc.addChamber(cb);
-            misoManager.saveFlowcell(fc);
-            System.out.println("Chamber [added to existing flowcell]:" + cb);
-            break;
-            */
+             * List<ChamberFlowcell> fclist = new ArrayList<ChamberFlowcell>(misoManager.listChamberFlowcellsByRunId(r.getRunId()));
+             * ChamberFlowcell fc = fclist.get(0); Chamber cb = new Chamber(); cb.setPool(pool); cb.setPartitionNumber(chamber);
+             * cb.setSecurityProfile(sp); misoManager.saveChamber(cb); fc.addChamber(cb); misoManager.saveFlowcell(fc);
+             * System.out.println("Chamber [added to existing flowcell]:" + cb); break;
+             */
           }
         }
-      }
-      else {
+      } else {
         run.setDescription(runD);
         run.setPairedEnd(false);
         run.setPlatformType(PlatformType.LS454);
         run.setSecurityProfile(sp);
-        //run.setName(name);
+        // run.setName(name);
         misoManager.saveRun(run);
         System.out.println("Run [new run created]: " + run);
         /*
-        Chamber cb = new Chamber();
-        cb.setPool(pool);
-        cb.setPartitionNumber(chamber);
-        cb.setSecurityProfile(sp);
-        misoManager.saveChamber(cb);
-        ChamberFlowcell fc = new ChamberFlowcell();
-        //fc.setRun(run);
-        fc.addChamber(cb);
-        fc.setSecurityProfile(sp);
-        misoManager.saveFlowcell(fc);
-        System.out.println("Chamber [added to new flowcell]: " + cb);
-        */
+         * Chamber cb = new Chamber(); cb.setPool(pool); cb.setPartitionNumber(chamber); cb.setSecurityProfile(sp);
+         * misoManager.saveChamber(cb); ChamberFlowcell fc = new ChamberFlowcell(); //fc.setRun(run); fc.addChamber(cb);
+         * fc.setSecurityProfile(sp); misoManager.saveFlowcell(fc); System.out.println("Chamber [added to new flowcell]: " + cb);
+         */
       }
 
-
-      /*     // ignored cells from excel
-   //Machine
-   XSSFCell cellf = (XSSFCell) list.get(5);
-   //Library Type
-   XSSFCell cellg = (XSSFCell) list.get(6);
-   //Sequence Generated
-   XSSFCell celli = (XSSFCell) list.get(8);
-   //Raw Wells
-   XSSFCell cellj = (XSSFCell) list.get(9);
-   //Pass Filter
-   XSSFCell cellk = (XSSFCell) list.get(10);
-   //% Pass Filter
-   XSSFCell celll = (XSSFCell) list.get(11);
-   //Average Length
-   XSSFCell cellm = (XSSFCell) list.get(12);
-   //Average Quality
-   XSSFCell celln = (XSSFCell) list.get(13);
-      */
+      /*
+       * // ignored cells from excel //Machine XSSFCell cellf = (XSSFCell) list.get(5); //Library Type XSSFCell cellg = (XSSFCell)
+       * list.get(6); //Sequence Generated XSSFCell celli = (XSSFCell) list.get(8); //Raw Wells XSSFCell cellj = (XSSFCell) list.get(9);
+       * //Pass Filter XSSFCell cellk = (XSSFCell) list.get(10); //% Pass Filter XSSFCell celll = (XSSFCell) list.get(11); //Average Length
+       * XSSFCell cellm = (XSSFCell) list.get(12); //Average Quality XSSFCell celln = (XSSFCell) list.get(13);
+       */
     }
 
   }
@@ -399,19 +360,18 @@ public class ImportExcel {
       Cell cell0a = list.get(0);
       String cell0astr = getCellContents(cell0a);
       if (cell0astr.equals("ILLUMINA") || cell0astr.contains("ILLUMINA")) {
-        String cell0astr2 = cell0astr.substring(cell0astr.indexOf(":")+1).trim();
+        String cell0astr2 = cell0astr.substring(cell0astr.indexOf(":") + 1).trim();
         DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
         Date date = df.parse(cell0astr2);
 
-        String user = getCellContents(sheetData.get(l+1).get(0));
+        String user = getCellContents(sheetData.get(l + 1).get(0));
 
         boolean paired = false;
-        if (sheetData.get(l+4).get(3) != null &&
-            getCellContents(sheetData.get(l+4).get(3)).equals("P")) {
+        if (sheetData.get(l + 4).get(3) != null && getCellContents(sheetData.get(l + 4).get(3)).equals("P")) {
           paired = true;
         }
 
-        //sp.setOwner(securityManager.getUserByName(user));
+        // sp.setOwner(securityManager.getUserByName(user));
 
         List<Cell> list9 = sheetData.get(l + 9);
         Cell cell9b = list9.get(1);
@@ -430,17 +390,15 @@ public class ImportExcel {
               run.setPlatformType(PlatformType.ILLUMINA);
               run.setSecurityProfile(sp);
               run.setFilePath(runFilePath);
-              
+
               String machine = run.getAlias().split("_")[1];
               SequencerReference sr = misoManager.getSequencerReferenceByName(machine);
               if (sr != null) {
                 run.setSequencerReference(sr);
-              }
-              else {
+              } else {
                 if (machine.equals("SN319")) {
                   machine = "N78135";
-                }
-                else if (machine.equals("SN790")) {
+                } else if (machine.equals("SN790")) {
                   machine = "N78428";
                 }
                 sr = new SequencerReferenceImpl(machine, InetAddress.getByName(machine), platform);
@@ -453,144 +411,73 @@ public class ImportExcel {
               run.getStatus().setInstrumentName(machine);
 
               /*
-              LaneFlowcell fc = new LaneFlowcell();
-              System.out.println("Processing " + run.getAlias());
-
-              String prevSampleDesc = "";
-              int prevSampleNum = 0;
-              for (int cellpos = 1; cellpos < 9; cellpos++) {
-                List<Cell> list6 = sheetData.get(l + 6);
-                Cell cell = list6.get(cellpos);
-
-                List<Cell> list7 = sheetData.get(l + 7);
-                Cell cell7b = list7.get(cellpos);
-                String sampleDesc = getCellContents(cell7b);
-                if (!sampleDesc.equals("")) {
-                  System.out.println("\t \\_ " + sampleDesc);
-
-                  // skip multiplexed
-                  if (sampleDesc.toLowerCase().equals("multi")) {
-                    continue;
-                  }
-
-                  if (sampleDesc.equals(prevSampleDesc)) {
-                    prevSampleNum++;
-                  }
-                  else {
-                    prevSampleNum = 1;
-                  }
-
-                  String lane1Project = getCellContents(cell);
-                  Project project = processProject(lane1Project);
-                  Experiment experiment = processExperiment(project);
-
-                  String sampleAlias = "XX_S"+prevSampleNum+"_F.bar";
-                  Sample sample = processSample(sampleDesc, sampleAlias, date, project);
-                  prevSampleDesc = sampleDesc;
-
-                  List<Cell> list10 = sheetData.get(l + 10);
-                  Cell cell10b = list10.get(cellpos);
-                  String libDesc = getCellContents(cell10b);
-
-                  List<Cell> list11 = sheetData.get(l + 11);
-                  Cell cell11b = list11.get(cellpos);
-                  String libType = getCellContents(cell11b);
-
-                  List<Cell> list12 = sheetData.get(l + 12);
-                  Cell cell12b = list12.get(cellpos);
-                  String libConc = getCellContents(cell12b);
-
-                  List<Cell> list13 = sheetData.get(l + 13);
-                  Cell cell13b = list13.get(cellpos);
-                  String readLength = getCellContents(cell13b);
-                  Library library = processLibrary(PlatformType.ILLUMINA, sample, libDesc, libConc, libType, readLength, paired, date);
-                  sample.addLibrary(library);
-
-                  LibraryDilution d = new LibraryDilution();
-                  d.setLibrary(library);
-                  //d.setIdentificationBarcode("0");
-                  d.setConcentration(0.0);
-                  d.setCreationDate(date);
-                  d.setDilutionCreator(user);
-                  d.setSecurityProfile(sp);
-                  misoManager.saveLibraryDilution(d);
-
-                  IlluminaPool illup = new IlluminaPool();
-                  illup.setConcentration(0.0);
-                  illup.setCreationDate(date);
-                  //illup.setIdentificationBarcode("0");
-                  illup.addExperiment(experiment);
-                  illup.addPoolableElement(d);
-                  illup.setSecurityProfile(sp);
-                  misoManager.saveIlluminaPool(illup);
-
-                  //Lane lane = new Lane();
-                  //lane.setPartitionNumber(cellpos);
-                  //lane.setPool(illup);
-                  //lane.setSecurityProfile(sp);
-                  //misoManager.saveLane(lane);
-                  //fc.addLane(lane);
-                }
-                else {
-                  System.out.println("\t \\_ No valid sample name. Skipping...");
-                }
-              }
-
-              fc.setSecurityProfile(sp);
-              ((RunImpl)run).addFlowcell(fc);
-              */
+               * LaneFlowcell fc = new LaneFlowcell(); System.out.println("Processing " + run.getAlias());
+               * 
+               * String prevSampleDesc = ""; int prevSampleNum = 0; for (int cellpos = 1; cellpos < 9; cellpos++) { List<Cell> list6 =
+               * sheetData.get(l + 6); Cell cell = list6.get(cellpos);
+               * 
+               * List<Cell> list7 = sheetData.get(l + 7); Cell cell7b = list7.get(cellpos); String sampleDesc = getCellContents(cell7b); if
+               * (!sampleDesc.equals("")) { System.out.println("\t \\_ " + sampleDesc);
+               * 
+               * // skip multiplexed if (sampleDesc.toLowerCase().equals("multi")) { continue; }
+               * 
+               * if (sampleDesc.equals(prevSampleDesc)) { prevSampleNum++; } else { prevSampleNum = 1; }
+               * 
+               * String lane1Project = getCellContents(cell); Project project = processProject(lane1Project); Experiment experiment =
+               * processExperiment(project);
+               * 
+               * String sampleAlias = "XX_S"+prevSampleNum+"_F.bar"; Sample sample = processSample(sampleDesc, sampleAlias, date, project);
+               * prevSampleDesc = sampleDesc;
+               * 
+               * List<Cell> list10 = sheetData.get(l + 10); Cell cell10b = list10.get(cellpos); String libDesc = getCellContents(cell10b);
+               * 
+               * List<Cell> list11 = sheetData.get(l + 11); Cell cell11b = list11.get(cellpos); String libType = getCellContents(cell11b);
+               * 
+               * List<Cell> list12 = sheetData.get(l + 12); Cell cell12b = list12.get(cellpos); String libConc = getCellContents(cell12b);
+               * 
+               * List<Cell> list13 = sheetData.get(l + 13); Cell cell13b = list13.get(cellpos); String readLength =
+               * getCellContents(cell13b); Library library = processLibrary(PlatformType.ILLUMINA, sample, libDesc, libConc, libType,
+               * readLength, paired, date); sample.addLibrary(library);
+               * 
+               * LibraryDilution d = new LibraryDilution(); d.setLibrary(library); //d.setIdentificationBarcode("0");
+               * d.setConcentration(0.0); d.setCreationDate(date); d.setDilutionCreator(user); d.setSecurityProfile(sp);
+               * misoManager.saveLibraryDilution(d);
+               * 
+               * IlluminaPool illup = new IlluminaPool(); illup.setConcentration(0.0); illup.setCreationDate(date);
+               * //illup.setIdentificationBarcode("0"); illup.addExperiment(experiment); illup.addPoolableElement(d);
+               * illup.setSecurityProfile(sp); misoManager.saveIlluminaPool(illup);
+               * 
+               * //Lane lane = new Lane(); //lane.setPartitionNumber(cellpos); //lane.setPool(illup); //lane.setSecurityProfile(sp);
+               * //misoManager.saveLane(lane); //fc.addLane(lane); } else { System.out.println("\t \\_ No valid sample name. Skipping...");
+               * } }
+               * 
+               * fc.setSecurityProfile(sp); ((RunImpl)run).addFlowcell(fc);
+               */
               long runId = misoManager.saveRun(run);
               run.setRunId(runId);
               System.out.println("Run [new illumina run created]: " + run);
 
-              //fc.setRun(run);
-              //fc.setSecurityProfile(sp);
-              //misoManager.saveFlowcell(fc);
+              // fc.setRun(run);
+              // fc.setSecurityProfile(sp);
+              // misoManager.saveFlowcell(fc);
 
-              //System.out.println("8 Lanes [added to new flowcell]: " + fc);
-            }
-            else {
+              // System.out.println("8 Lanes [added to new flowcell]: " + fc);
+            } else {
               /*
-              List<LaneFlowcell> flowcells = new ArrayList<LaneFlowcell>(misoManager.listLaneFlowcellsByRunId(run.getRunId()));
-              LaneFlowcell fc = flowcells.get(0);
-
-              System.out.println("Checking " + run.getAlias());
-
-              for (int cellpos = 1; cellpos < 9; cellpos++) {
-                Lane lane = null;
-                for (Partition ls : fc.getPartitions()) {
-                  if (ls.getPartitionNumber() == cellpos) {
-                    lane = (Lane)ls;
-                  }
-                }
-
-                if (lane != null) {
-                  IlluminaPool ip = (IlluminaPool)lane.getPool();
-                  if (ip != null) {
-                    for (Dilution ld : ip.getDilutions()) {
-                      if (ld != null) {
-                        Library library = ld.getLibrary();
-                        if (library != null) {
-                          Sample sample = library.getSample();
-                          if (sample != null) {
-                            Project project = sample.getProject();
-                            if (project != null) {
-                              System.out.println("Already stored (" + project.getName() + ","
-                                                                    + sample.getName() + ","
-                                                                    + library.getName() + ","
-                                                                    + ld.getName() + ","
-                                                                    + ip.getName() + " on Lane "
-                                                                    + lane.getPartitionNumber()
-                                                 + ")");
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-              */
+               * List<LaneFlowcell> flowcells = new ArrayList<LaneFlowcell>(misoManager.listLaneFlowcellsByRunId(run.getRunId()));
+               * LaneFlowcell fc = flowcells.get(0);
+               * 
+               * System.out.println("Checking " + run.getAlias());
+               * 
+               * for (int cellpos = 1; cellpos < 9; cellpos++) { Lane lane = null; for (Partition ls : fc.getPartitions()) { if
+               * (ls.getPartitionNumber() == cellpos) { lane = (Lane)ls; } }
+               * 
+               * if (lane != null) { IlluminaPool ip = (IlluminaPool)lane.getPool(); if (ip != null) { for (Dilution ld : ip.getDilutions())
+               * { if (ld != null) { Library library = ld.getLibrary(); if (library != null) { Sample sample = library.getSample(); if
+               * (sample != null) { Project project = sample.getProject(); if (project != null) { System.out.println("Already stored (" +
+               * project.getName() + "," + sample.getName() + "," + library.getName() + "," + ld.getName() + "," + ip.getName() +
+               * " on Lane " + lane.getPartitionNumber() + ")"); } } } } } } } }
+               */
             }
           }
         }
@@ -621,7 +508,7 @@ public class ImportExcel {
 
   private static Experiment processExperiment(Project project) throws Exception {
     String projectDescr = project.getDescription();
-    
+
     Study s = new StudyImpl();
     s.setProject(project);
     s.setAlias(projectDescr);
@@ -676,9 +563,10 @@ public class ImportExcel {
     return sample;
   }
 
-  private static Library processLibrary(PlatformType pt, Sample sample, String libDesc, String libConc, String libType, String readLength, boolean paired, Date date) throws Exception {
+  private static Library processLibrary(PlatformType pt, Sample sample, String libDesc, String libConc, String libType, String readLength,
+      boolean paired, Date date) throws Exception {
     String sNum = sample.getAlias().substring(3, sample.getAlias().lastIndexOf("_"));
-    String libAlias = "XX_L"+sNum+"."+(sample.getLibraries().size()+1)+"_F.bar";
+    String libAlias = "XX_L" + sNum + "." + (sample.getLibraries().size() + 1) + "_F.bar";
 
     if (libConc.contains("pmol")) {
       libConc = libConc.replace("pmol", "");
@@ -703,18 +591,14 @@ public class ImportExcel {
         if (libType.toLowerCase().equals("shotgun")) {
           if (paired) {
             li.setLibraryType(misoManager.getLibraryTypeById(1));
-          }
-          else {
+          } else {
             li.setLibraryType(misoManager.getLibraryTypeById(1));
           }
-        }
-        else if (libType.toLowerCase().equals("matepair")) {
+        } else if (libType.toLowerCase().equals("matepair")) {
           li.setLibraryType(misoManager.getLibraryTypeById(2));
-        }
-        else if (libType.toLowerCase().equals("rna-seq")) {
+        } else if (libType.toLowerCase().equals("rna-seq")) {
           li.setLibraryType(misoManager.getLibraryTypeById(3));
-        }
-        else {
+        } else {
           li.setLibraryType(misoManager.getLibraryTypeById(23));
         }
       }
@@ -736,7 +620,7 @@ public class ImportExcel {
       readLength = "0";
     }
 
-    libQC.setInsertSize((int)Double.parseDouble(readLength));
+    libQC.setInsertSize((int) Double.parseDouble(readLength));
     libQC.setQcDate(date);
     libQC.setResults(0.0);
     libQC.setQcType(misoManager.getLibraryQcTypeById(2L));
@@ -751,17 +635,13 @@ public class ImportExcel {
   private static String getCellContents(Cell c) {
     if (c.getCellType() == Cell.CELL_TYPE_NUMERIC) {
       return String.valueOf(c.getNumericCellValue());
-    }
-    else if (c.getCellType() == Cell.CELL_TYPE_BOOLEAN) {
+    } else if (c.getCellType() == Cell.CELL_TYPE_BOOLEAN) {
       return String.valueOf(c.getBooleanCellValue());
-    }
-    else if (c.getCellType() == Cell.CELL_TYPE_STRING) {
+    } else if (c.getCellType() == Cell.CELL_TYPE_STRING) {
       return c.getRichStringCellValue().toString();
-    }
-    else if (c.getCellType() == Cell.CELL_TYPE_FORMULA) {
+    } else if (c.getCellType() == Cell.CELL_TYPE_FORMULA) {
       return c.getCellFormula();
-    }
-    else {
+    } else {
       return "";
     }
   }

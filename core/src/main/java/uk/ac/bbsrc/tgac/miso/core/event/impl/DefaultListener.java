@@ -37,7 +37,7 @@ import java.util.HashSet;
  * uk.ac.bbsrc.tgac.miso.core.event.listener
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 20/10/11
  * @since 0.1.2
@@ -67,7 +67,7 @@ public class DefaultListener implements MisoListener {
       event.getEventContext().put("baseURL", baseURL);
     }
 
-    log.info("State change detected: " + event.getEventType() + ". Checking "+getResponderServices().size()+" responders");
+    log.info("State change detected: " + event.getEventType() + ". Checking " + getResponderServices().size() + " responders");
     for (ResponderService responder : getResponderServices()) {
       if (responder.respondsTo(event)) {
         log.info("Responding via " + responder.toString());

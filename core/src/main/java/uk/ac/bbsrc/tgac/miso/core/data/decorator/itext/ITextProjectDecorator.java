@@ -23,24 +23,30 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.decorator.itext;
 
+import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
 
-import com.lowagie.text.*;
-import com.lowagie.text.pdf.PdfContentByte;
-import com.lowagie.text.pdf.PdfPTable;
-import com.lowagie.text.pdf.PdfWriter;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Reportable;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.decorator.AbstractReportDecorator;
 import uk.ac.bbsrc.tgac.miso.core.exception.ReportingException;
 
-import java.io.OutputStream;
-import java.util.ArrayList;
+import com.lowagie.text.Document;
+import com.lowagie.text.DocumentException;
+import com.lowagie.text.Element;
+import com.lowagie.text.Font;
+import com.lowagie.text.FontFactory;
+import com.lowagie.text.Image;
+import com.lowagie.text.Paragraph;
+import com.lowagie.text.pdf.PdfContentByte;
+import com.lowagie.text.pdf.PdfPTable;
+import com.lowagie.text.pdf.PdfWriter;
 
 /**
  * Decorates a Project so that an iText report can be built from it
- *
+ * 
  * @author Rob Davey
  * @date 12-Oct-2010
  * @since 0.0.2
@@ -67,7 +73,7 @@ public class ITextProjectDecorator extends AbstractReportDecorator<Document> {
         report.open();
         report.add(new Paragraph("Project Summary"));
         PdfContentByte cb = writer.getDirectContent();
-        cb.setLineWidth(2.0f);     // Make a bit thicker than 1.0 default
+        cb.setLineWidth(2.0f); // Make a bit thicker than 1.0 default
         cb.setGrayStroke(0.9f); // 1 = black, 0 = white
         float x = 72f;
         float y = 200f;
@@ -109,15 +115,12 @@ public class ITextProjectDecorator extends AbstractReportDecorator<Document> {
         }
 
         report.close();
-      }
-      catch (DocumentException e) {
+      } catch (DocumentException e) {
         e.printStackTrace();
         throw new ReportingException(e.getMessage());
       }
-    }
-    else if (reportables.size() > 1) {
-    }
-    else {
+    } else if (reportables.size() > 1) {
+    } else {
 
     }
   }

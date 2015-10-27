@@ -26,11 +26,7 @@ package uk.ac.bbsrc.tgac.miso.core.service.submission;
 import java.net.URI;
 
 /**
- * Created by IntelliJ IDEA.
- * User: collesa
- * Date: 26/03/12
- * Time: 13:23
- * To change this template use File | Settings | File Templates.
+ * Created by IntelliJ IDEA. User: collesa Date: 26/03/12 Time: 13:23 To change this template use File | Settings | File Templates.
  */
 public class ERAEndpoint implements EndPoint {
   private URI destination;

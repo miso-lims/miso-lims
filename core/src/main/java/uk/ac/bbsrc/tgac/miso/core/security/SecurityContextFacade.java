@@ -26,12 +26,10 @@ package uk.ac.bbsrc.tgac.miso.core.security;
 import org.springframework.security.core.context.SecurityContext;
 
 /**
- * Created by IntelliJ IDEA.
- * User: davey
- * Date: 04-Feb-2010
- * Time: 15:55:05
+ * Created by IntelliJ IDEA. User: davey Date: 04-Feb-2010 Time: 15:55:05
  */
 public interface SecurityContextFacade {
   SecurityContext getContext();
+
   void setContext(SecurityContext securityContext);
 }

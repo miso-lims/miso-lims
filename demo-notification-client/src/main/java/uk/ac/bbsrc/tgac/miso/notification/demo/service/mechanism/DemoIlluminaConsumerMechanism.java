@@ -42,7 +42,7 @@ import java.util.*;
  * uk.ac.bbsrc.tgac.miso.core.service.integration.mechanism.impl
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 03/02/12
  * @since 0.1.5

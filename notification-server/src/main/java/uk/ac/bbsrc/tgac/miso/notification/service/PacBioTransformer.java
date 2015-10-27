@@ -53,7 +53,7 @@ import java.util.regex.Pattern;
  * uk.ac.bbsrc.tgac.miso.notification.util
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 10/04/12
  * @since 0.1.6
@@ -61,9 +61,7 @@ import java.util.regex.Pattern;
 public class PacBioTransformer implements FileSetTransformer<String, String, File> {
   protected static final Logger log = LoggerFactory.getLogger(PacBioTransformer.class);
 
-  private final Pattern cellDirPattern = Pattern.compile(
-          "[A-Z]{1}[0-9]{2}_[0-9]{1}"
-  );
+  private final Pattern cellDirPattern = Pattern.compile("[A-Z]{1}[0-9]{2}_[0-9]{1}");
 
   private final DateFormat startDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
   private final Calendar cal = Calendar.getInstance();
@@ -73,97 +71,38 @@ public class PacBioTransformer implements FileSetTransformer<String, String, Fil
   }
 
   /*
-
-<?xml version="1.0" encoding="utf-8"?>
-<Metadata xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://pacificbiosciences.com/PAP/Metadata.xsd">
-<InstCtrlVer>1.3.0.0.103161</InstCtrlVer>
-<SigProcVer>NRT@172.31.128.10:8082, SwVer=1300.103161, HwVer=1.0</SigProcVer>
-<Run>
-<RunId>r000056_42165_120321</RunId>
-<Name>2012_03_21_Streptomyces_10kb_C2</Name>
-<WhenCreated>2012-03-21T13:09:38</WhenCreated>
-<WhenStarted>2012-03-21T06:46:09</WhenStarted>
-</Run>
-<Movie>
-<WhenStarted>2012-03-21T10:54:25.802952+00:00</WhenStarted>
-<DurationInSec>5400</DurationInSec>
-<Number>0</Number>
-</Movie>
-<Sample>
-<Name>S.bottropensis_10kb_C2</Name>
-<PlateId>2012_03_21_Streptomyces_10kb_C2</PlateId>
-<WellName>A04</WellName>
-<Concentration>0</Concentration>
-<SampleReuseEnabled>false</SampleReuseEnabled>
-<UseCount>1</UseCount>
-</Sample>
-<InstrumentId>1</InstrumentId>
-<InstrumentName>42165</InstrumentName>
-<CollectionProtocol>Standard Seq v2</CollectionProtocol>
-<CollectionNumber>2</CollectionNumber>
-<CellIndex>1</CellIndex>
-<SetNumber>1</SetNumber>
-<EightPac>
-<PartNumber>0015</PartNumber>
-<LotNumber>230088</LotNumber>
-<Barcode>10030156255000000152300880723124</Barcode>
-<ExpirationDate>2012-07-23</ExpirationDate>
-</EightPac>
-<TemplatePrep>
-<Name>DNA Template Prep Kit 2.0 (3Kb - 10Kb)</Name>
-<PartNumber>001540835</PartNumber>
-<LotNumber>110170</LotNumber>
-<Barcode>110170001540835072512</Barcode>
-<ExpirationDate>2012-07-25</ExpirationDate>
-<AdapterSequence>ATCTCTCTCttttcctcctcctccgttgttgttgttGAGAGAGAT</AdapterSequence>
-<InsertSize>10000</InsertSize>
-</TemplatePrep>
-<BindingKit>
-<Name>DNA/Polymerase Binding Kit 2.0 (24 Rxn)</Name>
-<PartNumber>001672551</PartNumber>
-<LotNumber>120126</LotNumber>
-<Barcode>120126001672551071712</Barcode>
-<ExpirationDate>2012-07-17</ExpirationDate>
-<Control>Strobe_v1</Control>
-<IsControlUsed>false</IsControlUsed>
-</BindingKit>
-<SequencingKit>
-<Name>ReagentPlate0</Name>
-<PartNumber>001558034</PartNumber>
-<LotNumber>111220</LotNumber>
-<Barcode>111220574001558034072012</Barcode>
-<ExpirationDate>2012-07-20</ExpirationDate>
-<Protocol>C2ReagentMixingProtocol_DWP</Protocol>
-</SequencingKit>
-<ReagentTube0>
-<Name>ReagentTube0-0</Name>
-<PartNumber>001028310</PartNumber>
-<LotNumber>111219</LotNumber>
-<Barcode>111219871001028310120112</Barcode>
-<ExpirationDate>2012-12-01</ExpirationDate>
-</ReagentTube0>
-<Primary>
-<Protocol>BasecallerV1</Protocol>
-<ConfigFileName>1-3-0_Standard_C2.xml</ConfigFileName>
-<ResultsFolder>Analysis_Results</ResultsFolder>
-<CollectionPathUri>rsy://pacbio-1/sequencer_output/2012_03_21_Streptomyces_10kb_C2_56/A04_2/</CollectionPathUri>
-<CollectionFileCopy>Fasta</CollectionFileCopy>
-<CollectionFileCopy>Fastq</CollectionFileCopy>
-</Primary>
-<Secondary>
-<ProtocolName />
-<CellCountInJob>0</CellCountInJob>
-</Secondary>
-<Custom>
-<KeyValue key="svc:/CentralDataSvc/#Display.Sample_Metadata.User_Defined_Field_1" />
-<KeyValue key="svc:/CentralDataSvc/#Display.Sample_Metadata.User_Defined_Field_2" />
-<KeyValue key="svc:/CentralDataSvc/#Display.Sample_Metadata.User_Defined_Field_3" />
-<KeyValue key="svc:/CentralDataSvc/#Display.Sample_Metadata.User_Defined_Field_4" />
-<KeyValue key="svc:/CentralDataSvc/#Display.Sample_Metadata.User_Defined_Field_5" />
-<KeyValue key="svc:/CentralDataSvc/#Display.Sample_Metadata.User_Defined_Field_6" />
-</Custom>
-</Metadata>
-
+   * 
+   * <?xml version="1.0" encoding="utf-8"?> <Metadata xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   * xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://pacificbiosciences.com/PAP/Metadata.xsd">
+   * <InstCtrlVer>1.3.0.0.103161</InstCtrlVer> <SigProcVer>NRT@172.31.128.10:8082, SwVer=1300.103161, HwVer=1.0</SigProcVer> <Run>
+   * <RunId>r000056_42165_120321</RunId> <Name>2012_03_21_Streptomyces_10kb_C2</Name> <WhenCreated>2012-03-21T13:09:38</WhenCreated>
+   * <WhenStarted>2012-03-21T06:46:09</WhenStarted> </Run> <Movie> <WhenStarted>2012-03-21T10:54:25.802952+00:00</WhenStarted>
+   * <DurationInSec>5400</DurationInSec> <Number>0</Number> </Movie> <Sample> <Name>S.bottropensis_10kb_C2</Name>
+   * <PlateId>2012_03_21_Streptomyces_10kb_C2</PlateId> <WellName>A04</WellName> <Concentration>0</Concentration>
+   * <SampleReuseEnabled>false</SampleReuseEnabled> <UseCount>1</UseCount> </Sample> <InstrumentId>1</InstrumentId>
+   * <InstrumentName>42165</InstrumentName> <CollectionProtocol>Standard Seq v2</CollectionProtocol> <CollectionNumber>2</CollectionNumber>
+   * <CellIndex>1</CellIndex> <SetNumber>1</SetNumber> <EightPac> <PartNumber>0015</PartNumber> <LotNumber>230088</LotNumber>
+   * <Barcode>10030156255000000152300880723124</Barcode> <ExpirationDate>2012-07-23</ExpirationDate> </EightPac> <TemplatePrep> <Name>DNA
+   * Template Prep Kit 2.0 (3Kb - 10Kb)</Name> <PartNumber>001540835</PartNumber> <LotNumber>110170</LotNumber>
+   * <Barcode>110170001540835072512</Barcode> <ExpirationDate>2012-07-25</ExpirationDate>
+   * <AdapterSequence>ATCTCTCTCttttcctcctcctccgttgttgttgttGAGAGAGAT</AdapterSequence> <InsertSize>10000</InsertSize> </TemplatePrep>
+   * <BindingKit> <Name>DNA/Polymerase Binding Kit 2.0 (24 Rxn)</Name> <PartNumber>001672551</PartNumber> <LotNumber>120126</LotNumber>
+   * <Barcode>120126001672551071712</Barcode> <ExpirationDate>2012-07-17</ExpirationDate> <Control>Strobe_v1</Control>
+   * <IsControlUsed>false</IsControlUsed> </BindingKit> <SequencingKit> <Name>ReagentPlate0</Name> <PartNumber>001558034</PartNumber>
+   * <LotNumber>111220</LotNumber> <Barcode>111220574001558034072012</Barcode> <ExpirationDate>2012-07-20</ExpirationDate>
+   * <Protocol>C2ReagentMixingProtocol_DWP</Protocol> </SequencingKit> <ReagentTube0> <Name>ReagentTube0-0</Name>
+   * <PartNumber>001028310</PartNumber> <LotNumber>111219</LotNumber> <Barcode>111219871001028310120112</Barcode>
+   * <ExpirationDate>2012-12-01</ExpirationDate> </ReagentTube0> <Primary> <Protocol>BasecallerV1</Protocol>
+   * <ConfigFileName>1-3-0_Standard_C2.xml</ConfigFileName> <ResultsFolder>Analysis_Results</ResultsFolder>
+   * <CollectionPathUri>rsy://pacbio-1/sequencer_output/2012_03_21_Streptomyces_10kb_C2_56/A04_2/</CollectionPathUri>
+   * <CollectionFileCopy>Fasta</CollectionFileCopy> <CollectionFileCopy>Fastq</CollectionFileCopy> </Primary> <Secondary> <ProtocolName />
+   * <CellCountInJob>0</CellCountInJob> </Secondary> <Custom> <KeyValue
+   * key="svc:/CentralDataSvc/#Display.Sample_Metadata.User_Defined_Field_1" /> <KeyValue
+   * key="svc:/CentralDataSvc/#Display.Sample_Metadata.User_Defined_Field_2" /> <KeyValue
+   * key="svc:/CentralDataSvc/#Display.Sample_Metadata.User_Defined_Field_3" /> <KeyValue
+   * key="svc:/CentralDataSvc/#Display.Sample_Metadata.User_Defined_Field_4" /> <KeyValue
+   * key="svc:/CentralDataSvc/#Display.Sample_Metadata.User_Defined_Field_5" /> <KeyValue
+   * key="svc:/CentralDataSvc/#Display.Sample_Metadata.User_Defined_Field_6" /> </Custom> </Metadata>
    */
 
   public Map<String, String> transform(Set<File> files) {
@@ -186,7 +125,7 @@ public class PacBioTransformer implements FileSetTransformer<String, String, Fil
 
           run.put("cells", new JSONArray());
 
-          //get cell directories
+          // get cell directories
           for (File cell : rootFile.listFiles(new CellDirFilter())) {
             for (File metadata : cell.listFiles(new MetadataFilenameFilter())) {
               try {
@@ -220,27 +159,24 @@ public class PacBioTransformer implements FileSetTransformer<String, String, Fil
 
                     run.put("completionDate", startDateFormat.format(cal.getTime()));
                     log.debug("Got completion date");
-                  }
-                  catch (ParseException e) {
+                  } catch (ParseException e) {
                     log.warn("Cannot parse detected start date!");
                   }
                 }
 
                 cellObj.put("well", statusDoc.getElementsByTagName("WellName").item(0).getTextContent());
                 cellObj.put("index", statusDoc.getElementsByTagName("CellIndex").item(0).getTextContent());
-                cellObj.put("sample", ((Element) statusDoc.getElementsByTagName("Sample").item(0)).getElementsByTagName("Name").item(0).getTextContent());
+                cellObj.put("sample", ((Element) statusDoc.getElementsByTagName("Sample").item(0)).getElementsByTagName("Name").item(0)
+                    .getTextContent());
                 String comp = URLEncoder.encode(new String(IntegrationUtils.compress(cellXml.getBytes())), "UTF-8");
                 cellObj.put("cellStatus", comp);
 
                 run.getJSONArray("cells").add(cellObj);
-              }
-              catch (ParserConfigurationException e) {
+              } catch (ParserConfigurationException e) {
                 e.printStackTrace();
-              }
-              catch (TransformerException e) {
+              } catch (TransformerException e) {
                 e.printStackTrace();
-              }
-              catch (IOException e) {
+              } catch (IOException e) {
                 log.error(runName + ":: Unable to process run: " + e.getMessage());
                 e.printStackTrace();
               }
@@ -248,7 +184,8 @@ public class PacBioTransformer implements FileSetTransformer<String, String, Fil
           }
 
           try {
-            PacBioServiceWrapper pacbioServiceWrapper = ApplicationContextProvider.getApplicationContext().getBean(run.getString("sequencerName"), PacBioServiceWrapper.class);
+            PacBioServiceWrapper pacbioServiceWrapper = ApplicationContextProvider.getApplicationContext().getBean(
+                run.getString("sequencerName"), PacBioServiceWrapper.class);
             PacBioService pacbioService = pacbioServiceWrapper.getPacBioService();
 
             String plateStatus = pacbioService.getPlateStatus(URLEncoder.encode(run.getString("plateId"), "UTF-8"));
@@ -258,30 +195,24 @@ public class PacBioTransformer implements FileSetTransformer<String, String, Fil
                 run.put("completionDate", "");
               }
               map.get("Completed").add(run);
-            }
-            else if ("Running".equals(plateStatus) || "Failed".equals(plateStatus)) {
-              log.debug(runName + " :: "+plateStatus);
+            } else if ("Running".equals(plateStatus) || "Failed".equals(plateStatus)) {
+              log.debug(runName + " :: " + plateStatus);
               map.get(plateStatus).add(run);
-            }
-            else {
+            } else {
               if ("Aborted".equals(plateStatus)) {
                 log.debug(runName + " :: Aborted");
                 map.get("Failed").add(run);
-              }
-              else if ("Ready".equals(plateStatus)) {
+              } else if ("Ready".equals(plateStatus)) {
                 log.debug(runName + " :: Unknown");
                 map.get("Unknown").add(run);
               }
             }
-          }
-          catch (InterrogationException e) {
+          } catch (InterrogationException e) {
             log.warn(e.getMessage() + ". Attempting fall-back date resolution...");
-          }
-          catch (UnsupportedEncodingException e) {
+          } catch (UnsupportedEncodingException e) {
             log.warn(e.getMessage() + ". Cannot encode plateId to be URL friendly.");
           }
-        }
-        else {
+        } else {
           log.error(rootFile.getName() + " :: Permission denied");
         }
       }

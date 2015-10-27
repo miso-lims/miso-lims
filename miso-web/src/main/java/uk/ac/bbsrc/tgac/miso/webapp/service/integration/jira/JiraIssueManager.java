@@ -44,10 +44,9 @@ import java.net.*;
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.service.integration.jira
  * <p/>
- * Class to grab issues from a JIRA server via the JIRA REST API.
- * Supports only HTTP basic authentication at present. OAuth is
- * available but untested and most likely not working.
- *
+ * Class to grab issues from a JIRA server via the JIRA REST API. Supports only HTTP basic authentication at present. OAuth is available but
+ * untested and most likely not working.
+ * 
  * @author Rob Davey
  * @date 20-Jan-2011
  * @since 0.0.3
@@ -57,7 +56,7 @@ public class JiraIssueManager implements IssueTrackerManager {
   private String oAuthConsumerKey;
   private String oAuthConsumerSecret;
   private String oAuthSignatureMethod;
-  
+
   private String httpBasicAuthUsername;
   private String httpBasicAuthPassword;
 
@@ -65,7 +64,7 @@ public class JiraIssueManager implements IssueTrackerManager {
   private final String restApiUrl = "/rest/api/";
   public String jiraRestApiVersion = "2";
 
-  public final String jiraIssueSuffix = restApiUrl+jiraRestApiVersion+"/issue/";
+  public final String jiraIssueSuffix = restApiUrl + jiraRestApiVersion + "/issue/";
 
   public Client client;
 
@@ -106,20 +105,18 @@ public class JiraIssueManager implements IssueTrackerManager {
   }
 
   public JSONObject getIssue(String issueKey) throws IOException {
-    WebResource webResource = prepareWebResource(URI.create(baseTrackerUrl+jiraIssueSuffix+issueKey));
+    WebResource webResource = prepareWebResource(URI.create(baseTrackerUrl + jiraIssueSuffix + issueKey));
     if (webResource != null) {
       try {
         String json = webResource.get(String.class);
         if (json != null) {
           return IssueJsonConverter.jiraToMiso(JSONObject.fromObject(json));
         }
-      }
-      catch(Exception e) {
-        throw new IOException("Unable to get resource: " + issueKey , e);
+      } catch (Exception e) {
+        throw new IOException("Unable to get resource: " + issueKey, e);
       }
       return null;
-    }
-    else {
+    } else {
       throw new IOException("No viable resource to query for issue. Please check your IssueTrackerManager configuration.");
     }
   }
@@ -135,27 +132,20 @@ public class JiraIssueManager implements IssueTrackerManager {
         ApacheHttpClient ahc = new ApacheHttpClient(ahcHandler);
         setClient(ahc);
         wr = ahc.resource(uri);
-      }
-      else {
+      } else {
         wr = this.client.resource(uri);
       }
-    }
-    else if (oAuthConsumerKey != null && oAuthConsumerSecret != null && oAuthSignatureMethod != null) {
+    } else if (oAuthConsumerKey != null && oAuthConsumerSecret != null && oAuthSignatureMethod != null) {
       if (this.client == null) {
         Client c = new Client();
-        OAuthParameters params = new OAuthParameters()
-          .signatureMethod(oAuthSignatureMethod)
-          .consumerKey(oAuthConsumerKey)
-          .version("1.1");
+        OAuthParameters params = new OAuthParameters().signatureMethod(oAuthSignatureMethod).consumerKey(oAuthConsumerKey).version("1.1");
 
-        OAuthSecrets secrets = new OAuthSecrets()
-          .consumerSecret(oAuthConsumerSecret);
+        OAuthSecrets secrets = new OAuthSecrets().consumerSecret(oAuthConsumerSecret);
         OAuthClientFilter filter = new OAuthClientFilter(c.getProviders(), params, secrets);
         setClient(c);
         wr = c.resource(uri);
         wr.addFilter(filter);
-      }
-      else {
+      } else {
         wr = this.client.resource(uri);
       }
     }

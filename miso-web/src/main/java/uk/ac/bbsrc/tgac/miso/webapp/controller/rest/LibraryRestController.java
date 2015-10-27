@@ -44,7 +44,7 @@ import java.util.Collection;
 
 /**
  * A controller to handle all REST requests for Libraries
- *
+ * 
  * @author Rob Davey
  * @date 16-Aug-2011
  * @since 0.1.0
@@ -63,7 +63,8 @@ public class LibraryRestController {
   }
 
   @RequestMapping(value = "{libraryId}", method = RequestMethod.GET)
-  public @ResponseBody String getLibraryById(@PathVariable Long libraryId) throws IOException {
+  public @ResponseBody
+  String getLibraryById(@PathVariable Long libraryId) throws IOException {
     ObjectMapper mapper = new ObjectMapper();
     try {
       Library l = requestManager.getLibraryById(libraryId);
@@ -74,14 +75,14 @@ public class LibraryRestController {
         return mapper.writeValueAsString(l);
       }
       return mapper.writeValueAsString(RestUtils.error("No such library with that ID.", "libraryId", libraryId.toString()));
-    }
-    catch (IOException ioe) {
+    } catch (IOException ioe) {
       return mapper.writeValueAsString(RestUtils.error("Cannot retrieve library: " + ioe.getMessage(), "libraryId", libraryId.toString()));
     }
   }
 
   @RequestMapping(method = RequestMethod.GET)
-  public @ResponseBody String listAllLibraries() throws IOException {
+  public @ResponseBody
+  String listAllLibraries() throws IOException {
     Collection<Library> libraries = requestManager.listAllLibraries();
     ObjectMapper mapper = new ObjectMapper();
     mapper.getSerializationConfig().addMixInAnnotations(Project.class, ProjectSampleRecursionAvoidanceMixin.class);

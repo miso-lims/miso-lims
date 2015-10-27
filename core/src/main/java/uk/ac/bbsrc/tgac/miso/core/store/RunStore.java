@@ -23,16 +23,16 @@
 
 package uk.ac.bbsrc.tgac.miso.core.store;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
-
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
+
 /**
  * Defines a DAO interface for storing Runs
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -40,19 +40,22 @@ public interface RunStore extends Store<Run>, Cascadable, Remover<Run>, NamingSc
   /**
    * Retrieve a Run from an underlying data store given a Run ID
    * <p/>
-   * This method intends to retrieve objects in an 'ignorant' fashion, i.e.  will not populate
-   * parent or child objects that could lead to a circular dependency
-   *
-   * @param runId of type long
+   * This method intends to retrieve objects in an 'ignorant' fashion, i.e. will not populate parent or child objects that could lead to a
+   * circular dependency
+   * 
+   * @param runId
+   *          of type long
    * @return Run
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
-  //Run lazyGet(long runId) throws IOException;
+  // Run lazyGet(long runId) throws IOException;
 
   /**
    * Gets the latest Run, by start date, that is associated with the given container
-   *
-   * @param containerId long
+   * 
+   * @param containerId
+   *          long
    * @return Run
    * @throws IOException
    */
@@ -60,8 +63,9 @@ public interface RunStore extends Store<Run>, Cascadable, Remover<Run>, NamingSc
 
   /**
    * Gets the latest Run, by run ID, that is associated with the given container
-   *
-   * @param containerId long
+   * 
+   * @param containerId
+   *          long
    * @return Run
    * @throws IOException
    */
@@ -69,82 +73,99 @@ public interface RunStore extends Store<Run>, Cascadable, Remover<Run>, NamingSc
 
   /**
    * List all Runs that match a search criteria
-   *
-   * @param query of type String
+   * 
+   * @param query
+   *          of type String
    * @return Collection<Run>
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   Collection<Run> listBySearch(String query) throws IOException;
 
   /**
    * Retrieve a Run from an underlying data store given a Run alias
-   *
-   * @param alias of type String
+   * 
+   * @param alias
+   *          of type String
    * @return Run
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   Run getByAlias(String alias) throws IOException;
 
   /**
    * List all Runs related to an Experiment given an Experiment ID
-   *
-   * @param experimentId of type long
+   * 
+   * @param experimentId
+   *          of type long
    * @return List<Run>
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   @Deprecated
   List<Run> listByExperimentId(long experimentId) throws IOException;
 
   /**
    * List all Runs using a Pool given a Pool ID
-   *
-   * @param poolId of type long
+   * 
+   * @param poolId
+   *          of type long
    * @return List<Run>
-   * @throws IOException when
-   */  
+   * @throws IOException
+   *           when
+   */
   List<Run> listByPoolId(long poolId) throws IOException;
 
   /**
    * List all Runs using a Container given a Container ID
-   *
-   * @param containerId of type long
+   * 
+   * @param containerId
+   *          of type long
    * @return List<Run>
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   List<Run> listBySequencerPartitionContainerId(long containerId) throws IOException;
 
   /**
    * List all Runs related to a Project given a Project ID
-   *
-   * @param projectId of type long
+   * 
+   * @param projectId
+   *          of type long
    * @return List<Run>
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   List<Run> listByProjectId(long projectId) throws IOException;
 
   /**
-   * List all Runs carried out on a Platform given a Platform ID 
-   *
-   * @param platformId of type long
+   * List all Runs carried out on a Platform given a Platform ID
+   * 
+   * @param platformId
+   *          of type long
    * @return List<Run>
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   List<Run> listByPlatformId(long platformId) throws IOException;
-  
+
   /**
-   * List all Runs by their health given a HealthType 
-   *
-   * @param health of type String
+   * List all Runs by their health given a HealthType
+   * 
+   * @param health
+   *          of type String
    * @return List<Run>
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   List<Run> listByStatus(String health) throws IOException;
 
   /**
    * List all persisted objects
-   *
+   * 
    * @return Collection<Run>
-   * @throws IOException when the objects cannot be retrieved
+   * @throws IOException
+   *           when the objects cannot be retrieved
    */
   Collection<Run> listAllWithLimit(long limit) throws IOException;
 

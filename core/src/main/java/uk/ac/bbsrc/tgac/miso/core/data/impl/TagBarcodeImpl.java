@@ -35,7 +35,7 @@ import java.io.Serializable;
  * uk.ac.bbsrc.tgac.miso.core.data.impl
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 10-May-2011
  * @since 0.0.3
@@ -116,28 +116,20 @@ public class TagBarcodeImpl implements TagBarcode, Serializable {
   }
 
   /**
-   * Equivalency is based on getProjectId() if set, otherwise on name,
-   * description and creation date.
+   * Equivalency is based on getProjectId() if set, otherwise on name, description and creation date.
    */
   @Override
   public boolean equals(Object obj) {
-    if (obj == null)
-      return false;
-    if (obj == this)
-      return true;
-    if (!(obj instanceof TagBarcode))
-      return false;
+    if (obj == null) return false;
+    if (obj == this) return true;
+    if (!(obj instanceof TagBarcode)) return false;
     TagBarcode them = (TagBarcode) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
-    if (getId() == UNSAVED_ID
-        || them.getId() == UNSAVED_ID) {
-      return getName().equals(them.getName()) &&
-             getSequence().equals(them.getSequence()) &&
-             getPlatformType().equals(them.getPlatformType()) &&
-             getStrategyName().equals(them.getStrategyName());
-    }
-    else {
+    if (getId() == UNSAVED_ID || them.getId() == UNSAVED_ID) {
+      return getName().equals(them.getName()) && getSequence().equals(them.getSequence())
+          && getPlatformType().equals(them.getPlatformType()) && getStrategyName().equals(them.getStrategyName());
+    } else {
       return getId() == them.getId();
     }
   }
@@ -145,9 +137,8 @@ public class TagBarcodeImpl implements TagBarcode, Serializable {
   @Override
   public int hashCode() {
     if (getId() != UNSAVED_ID) {
-      return (int)getId();
-    }
-    else {
+      return (int) getId();
+    } else {
       int hashcode = -1;
       if (getName() != null) hashcode = 37 * hashcode + getName().hashCode();
       if (getSequence() != null) hashcode = 37 * hashcode + getSequence().hashCode();
@@ -158,7 +149,7 @@ public class TagBarcodeImpl implements TagBarcode, Serializable {
   }
 
   public int compareTo(Object o) {
-    TagBarcode t = (TagBarcode)o;
+    TagBarcode t = (TagBarcode) o;
     if (getId() < t.getId()) return -1;
     if (getId() > t.getId()) return 1;
     return 0;

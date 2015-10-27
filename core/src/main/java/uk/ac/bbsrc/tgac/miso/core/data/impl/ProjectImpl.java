@@ -52,8 +52,9 @@ public class ProjectImpl extends AbstractProject implements Serializable {
 
   /**
    * Construct a new Project with a SecurityProfile owned by the given User
-   *
-   * @param user of type User
+   * 
+   * @param user
+   *          of type User
    */
   public ProjectImpl(User user) {
     setSecurityProfile(new SecurityProfile(user));
@@ -61,15 +62,10 @@ public class ProjectImpl extends AbstractProject implements Serializable {
 
   public void buildSubmission() {
     /*
-    try {
-      DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-      submissionDocument = docBuilder.newDocument();
-    }
-    catch (ParserConfigurationException e) {
-      e.printStackTrace();
-    }
-    ERASubmissionFactory.generateProjectSubmissionXML(submissionDocument, this);
-    */
+     * try { DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder(); submissionDocument =
+     * docBuilder.newDocument(); } catch (ParserConfigurationException e) { e.printStackTrace(); }
+     * ERASubmissionFactory.generateProjectSubmissionXML(submissionDocument, this);
+     */
   }
 
   /**

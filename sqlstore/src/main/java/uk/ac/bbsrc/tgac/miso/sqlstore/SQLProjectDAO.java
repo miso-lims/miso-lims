@@ -63,132 +63,77 @@ import java.util.regex.Matcher;
  * uk.ac.bbsrc.tgac.miso.sqlstore
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public class SQLProjectDAO implements ProjectStore {
   private static final String TABLE_NAME = "Project";
 
-  public static final String PROJECTS_SELECT =
-          "SELECT projectId, name, alias, description, creationDate, securityProfile_profileId, progress, lastUpdated " +
-          "FROM "+TABLE_NAME;
+  public static final String PROJECTS_SELECT = "SELECT projectId, name, alias, description, creationDate, securityProfile_profileId, progress, lastUpdated "
+      + "FROM " + TABLE_NAME;
 
-  public static final String PROJECTS_SELECT_LIMIT =
-          PROJECTS_SELECT + " ORDER BY projectId DESC LIMIT ?";
+  public static final String PROJECTS_SELECT_LIMIT = PROJECTS_SELECT + " ORDER BY projectId DESC LIMIT ?";
 
-  public static final String PROJECT_SELECT_BY_ID =
-          PROJECTS_SELECT + " WHERE projectId = ?";
+  public static final String PROJECT_SELECT_BY_ID = PROJECTS_SELECT + " WHERE projectId = ?";
 
-  public static final String PROJECT_SELECT_BY_ALIAS =
-          PROJECTS_SELECT + " WHERE alias = ?";
+  public static final String PROJECT_SELECT_BY_ALIAS = PROJECTS_SELECT + " WHERE alias = ?";
 
-  public static final String PROJECTS_SELECT_BY_SEARCH =
-          PROJECTS_SELECT + " WHERE " +
-          "name LIKE ? OR " +
-          "alias LIKE ? OR " +
-          "description LIKE ? ";
+  public static final String PROJECTS_SELECT_BY_SEARCH = PROJECTS_SELECT + " WHERE " + "name LIKE ? OR " + "alias LIKE ? OR "
+      + "description LIKE ? ";
 
-  public static final String PROJECT_UPDATE =
-          "UPDATE "+TABLE_NAME+" " +
-          "SET name=:name, alias=:alias, description=:description, creationDate=:creationDate, securityProfile_profileId=:securityProfile_profileId, progress=:progress " +
-          "WHERE projectId=:projectId";
+  public static final String PROJECT_UPDATE = "UPDATE "
+      + TABLE_NAME
+      + " "
+      + "SET name=:name, alias=:alias, description=:description, creationDate=:creationDate, securityProfile_profileId=:securityProfile_profileId, progress=:progress "
+      + "WHERE projectId=:projectId";
 
-  public static final String PROJECT_DELETE =
-          "DELETE FROM "+TABLE_NAME+" WHERE projectId=:projectId";
+  public static final String PROJECT_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE projectId=:projectId";
 
-  public static final String PROJECT_SELECT_BY_STUDY_ID =
-          "SELECT p.projectId, p.name, p.alias, p.description, p.creationDate, p.securityProfile_profileId, p.progress " +
-          "FROM "+TABLE_NAME+" p, Study s " +
-          "WHERE p.projectId=s.project_projectId " +
-          "AND s.studyId=?";
+  public static final String PROJECT_SELECT_BY_STUDY_ID = "SELECT p.projectId, p.name, p.alias, p.description, p.creationDate, p.securityProfile_profileId, p.progress "
+      + "FROM " + TABLE_NAME + " p, Study s " + "WHERE p.projectId=s.project_projectId " + "AND s.studyId=?";
 
-  //OVERVIEWS
-  public static final String OVERVIEWS_SELECT =
-          "SELECT p.project_projectId, " +
-          "po.overviewId, " +
-          "po.principalInvestigator, " +
-          "po.startDate, " +
-          "po.endDate, " +
-          "po.numProposedSamples, " +
-          "po.locked, " +
-          "po.lastUpdated, " +
-          "po.allSampleQcPassed, " +
-          "po.libraryPreparationComplete, " +
-          "po.allLibraryQcPassed, " +
-          "po.allPoolsConstructed, " +
-          "po.allRunsCompleted, " +
-          "po.primaryAnalysisCompleted " +
-          "FROM ProjectOverview po, Project_ProjectOverview p " +
-          "WHERE po.overviewId=p.overviews_overviewId";
+  // OVERVIEWS
+  public static final String OVERVIEWS_SELECT = "SELECT p.project_projectId, " + "po.overviewId, " + "po.principalInvestigator, "
+      + "po.startDate, " + "po.endDate, " + "po.numProposedSamples, " + "po.locked, " + "po.lastUpdated, " + "po.allSampleQcPassed, "
+      + "po.libraryPreparationComplete, " + "po.allLibraryQcPassed, " + "po.allPoolsConstructed, " + "po.allRunsCompleted, "
+      + "po.primaryAnalysisCompleted " + "FROM ProjectOverview po, Project_ProjectOverview p "
+      + "WHERE po.overviewId=p.overviews_overviewId";
 
-  public static final String OVERVIEW_SELECT_BY_ID =
-          OVERVIEWS_SELECT + " AND po.overviewId=?";
+  public static final String OVERVIEW_SELECT_BY_ID = OVERVIEWS_SELECT + " AND po.overviewId=?";
 
-  public static final String OVERVIEW_SELECT_BY_RELATED_PROJECT =
-          OVERVIEWS_SELECT + " AND p.project_projectId=?";
+  public static final String OVERVIEW_SELECT_BY_RELATED_PROJECT = OVERVIEWS_SELECT + " AND p.project_projectId=?";
 
-  public static final String OVERVIEW_UPDATE =
-          "UPDATE ProjectOverview " +
-          "SET principalInvestigator=:principalInvestigator, " +
-          "startDate=:startDate, " +
-          "endDate=:endDate, " +
-          "numProposedSamples=:numProposedSamples, " +
-          "locked=:locked, " +
-          "allSampleQcPassed=:allSampleQcPassed, " +
-          "libraryPreparationComplete=:libraryPreparationComplete, " +
-          "allLibraryQcPassed=:allLibraryQcPassed, " +
-          "allPoolsConstructed=:allPoolsConstructed, " +
-          "allRunsCompleted=:allRunsCompleted, " +
-          "primaryAnalysisCompleted=:primaryAnalysisCompleted " +
-          "WHERE overviewId=:overviewId";
+  public static final String OVERVIEW_UPDATE = "UPDATE ProjectOverview " + "SET principalInvestigator=:principalInvestigator, "
+      + "startDate=:startDate, " + "endDate=:endDate, " + "numProposedSamples=:numProposedSamples, " + "locked=:locked, "
+      + "allSampleQcPassed=:allSampleQcPassed, " + "libraryPreparationComplete=:libraryPreparationComplete, "
+      + "allLibraryQcPassed=:allLibraryQcPassed, " + "allPoolsConstructed=:allPoolsConstructed, " + "allRunsCompleted=:allRunsCompleted, "
+      + "primaryAnalysisCompleted=:primaryAnalysisCompleted " + "WHERE overviewId=:overviewId";
 
-  public static final String OVERVIEW_DELETE =
-          "DELETE FROM ProjectOverview WHERE overviewId=:overviewId";
+  public static final String OVERVIEW_DELETE = "DELETE FROM ProjectOverview WHERE overviewId=:overviewId";
 
-  public static final String OVERVIEWS_DELETE_BY_PROJECT_ID =
-          "DELETE FROM ProjectOverview WHERE project_projectId=:project_projectId";
+  public static final String OVERVIEWS_DELETE_BY_PROJECT_ID = "DELETE FROM ProjectOverview WHERE project_projectId=:project_projectId";
 
-  public static String SAMPLES_BY_PROJECT_ID =
-          "SELECT sa.* " +
-          "FROM "+TABLE_NAME+" p " +
-          "LEFT JOIN Study st ON st.project_projectId = p.projectId " +
-          "LEFT JOIN Experiment ex ON st.studyId = ex.study_studyId " +
-          "INNER JOIN Experiment_Sample exsa ON ex.experimentId = exsa.experiment_experimentId " +
-          "LEFT JOIN Sample sa ON exsa.samples_sampleId = sa.sampleId " +
-          "WHERE p.projectId=?";
+  public static String SAMPLES_BY_PROJECT_ID = "SELECT sa.* " + "FROM " + TABLE_NAME + " p "
+      + "LEFT JOIN Study st ON st.project_projectId = p.projectId " + "LEFT JOIN Experiment ex ON st.studyId = ex.study_studyId "
+      + "INNER JOIN Experiment_Sample exsa ON ex.experimentId = exsa.experiment_experimentId "
+      + "LEFT JOIN Sample sa ON exsa.samples_sampleId = sa.sampleId " + "WHERE p.projectId=?";
 
   @Deprecated
-  public static final String OVERVIEW_RELATED_INFORMATION_BY_PROJECT_ID =
-          "SELECT " +
-          "p.projectId, " +
-          "st.studyId, " +
-          "ex.experimentId, " +
-          "sa.sampleId, " +
-          "sa.receivedDate, " +
-          "li.libraryId, " +
-          "li.creationDate, " +
-          "r.runId, " +
-          "r.platformType, " +
-          "pl.platformId " +
-          "pl.instrumentModel " +
-          "FROM "+TABLE_NAME+" p " +
-          "LEFT JOIN Study st ON st.project_projectId = p.projectId " +
-          "LEFT JOIN Experiment ex ON st.studyId = ex.study_studyId " +
-          "INNER JOIN Experiment_Sample exsa ON ex.experimentId = exsa.experiment_experimentId " +
-          "LEFT JOIN Sample sa ON exsa.samples_sampleId = sa.sampleId " +
-          "LEFT JOIN Library li ON li.sample_sampleId = sa.sampleId " +
-          "INNER JOIN Experiment_Run exru ON ex.experimentId = exru.experiment_experimentId " +
-          "LEFT JOIN Run r ON r.runId = exru.runs_runId " +
-          "LEFT JOIN Platform pl ON r.platform_platformId = pl.platformId " +
-          "WHERE p.projectId=?";
+  public static final String OVERVIEW_RELATED_INFORMATION_BY_PROJECT_ID = "SELECT " + "p.projectId, " + "st.studyId, "
+      + "ex.experimentId, " + "sa.sampleId, " + "sa.receivedDate, " + "li.libraryId, " + "li.creationDate, " + "r.runId, "
+      + "r.platformType, " + "pl.platformId " + "pl.instrumentModel " + "FROM " + TABLE_NAME + " p "
+      + "LEFT JOIN Study st ON st.project_projectId = p.projectId " + "LEFT JOIN Experiment ex ON st.studyId = ex.study_studyId "
+      + "INNER JOIN Experiment_Sample exsa ON ex.experimentId = exsa.experiment_experimentId "
+      + "LEFT JOIN Sample sa ON exsa.samples_sampleId = sa.sampleId " + "LEFT JOIN Library li ON li.sample_sampleId = sa.sampleId "
+      + "INNER JOIN Experiment_Run exru ON ex.experimentId = exru.experiment_experimentId "
+      + "LEFT JOIN Run r ON r.runId = exru.runs_runId " + "LEFT JOIN Platform pl ON r.platform_platformId = pl.platformId "
+      + "WHERE p.projectId=?";
 
-  public static final String ISSUE_KEYS_SELECT_BY_PROJECT_ID =
-          "SELECT issueKey FROM Project_Issues WHERE project_projectId=?";
+  public static final String ISSUE_KEYS_SELECT_BY_PROJECT_ID = "SELECT issueKey FROM Project_Issues WHERE project_projectId=?";
 
-  public static final String PROJECT_ISSUES_DELETE_BY_PROJECT_ID =
-          "DELETE FROM Project_Issues " +
-          "WHERE project_projectId=:project_projectId";
+  public static final String PROJECT_ISSUES_DELETE_BY_PROJECT_ID = "DELETE FROM Project_Issues "
+      + "WHERE project_projectId=:project_projectId";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLProjectDAO.class);
   private JdbcTemplate template;
@@ -301,36 +246,24 @@ public class SQLProjectDAO implements ProjectStore {
   }
 
   @Transactional(readOnly = false, rollbackFor = Exception.class)
-  @TriggersRemove(
-          cacheName = {"projectCache", "lazyProjectCache"},
-          keyGenerator = @KeyGenerator(
-                  name = "HashCodeCacheKeyGenerator",
-                  properties = {
-                          @Property(name = "includeMethod", value = "false"),
-                          @Property(name = "includeParameterTypes", value = "false")
-                  }
-          )
-  )
+  @TriggersRemove(cacheName = { "projectCache", "lazyProjectCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
+      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public long save(Project project) throws IOException {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
 
     Long securityProfileId = project.getSecurityProfile().getProfileId();
-    if (securityProfileId == SecurityProfile.UNSAVED_ID ||
-        (this.cascadeType != null)) { // && this.cascadeType.equals(CascadeType.PERSIST))) {
+    if (securityProfileId == SecurityProfile.UNSAVED_ID || (this.cascadeType != null)) { // &&
+                                                                                         // this.cascadeType.equals(CascadeType.PERSIST))) {
       securityProfileId = securityProfileDAO.save(project.getSecurityProfile());
     }
 
     MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("alias", project.getAlias())
-            .addValue("description", project.getDescription())
-            .addValue("creationDate", project.getCreationDate())
-            .addValue("securityProfile_profileId", securityProfileId)
-            .addValue("progress", project.getProgress().getKey());
+    params.addValue("alias", project.getAlias()).addValue("description", project.getDescription())
+        .addValue("creationDate", project.getCreationDate()).addValue("securityProfile_profileId", securityProfileId)
+        .addValue("progress", project.getProgress().getKey());
 
     if (project.getId() == AbstractProject.UNSAVED_ID) {
-      SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-              .withTableName(TABLE_NAME)
-              .usingGeneratedKeyColumns("projectId");
+      SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("projectId");
       try {
         project.setId(DbUtils.getAutoIncrement(template, TABLE_NAME));
 
@@ -342,47 +275,38 @@ public class SQLProjectDAO implements ProjectStore {
 
           Number newId = insert.executeAndReturnKey(params);
           if (newId.longValue() != project.getId()) {
-            log.error("Expected Project ID ('"+project.getId()+"') doesn't match returned value ('"+newId.longValue()+"') from database insert: rolling back...");
-            new NamedParameterJdbcTemplate(template).update(PROJECT_DELETE, new MapSqlParameterSource().addValue("projectId", newId.longValue()));
+            log.error("Expected Project ID ('" + project.getId() + "') doesn't match returned value ('" + newId.longValue()
+                + "') from database insert: rolling back...");
+            new NamedParameterJdbcTemplate(template).update(PROJECT_DELETE,
+                new MapSqlParameterSource().addValue("projectId", newId.longValue()));
             throw new IOException("Something bad happened. Expected Project ID doesn't match returned value from DB insert");
           }
-        }
-        else {
+        } else {
           throw new IOException("Cannot save Project - invalid field:" + project.toString());
         }
-      }
-      catch (MisoNamingException e) {
+      } catch (MisoNamingException e) {
         throw new IOException("Cannot save Project - issue with naming scheme", e);
       }
       /*
-      String name = "PRO" + DbUtils.getAutoIncrement(template, TABLE_NAME);
-      params.addValue("name", name);
-      Number newId = insert.executeAndReturnKey(params);
-      project.setProjectId(newId.longValue());
-      project.setName(name);
-      */
-    }
-    else {
+       * String name = "PRO" + DbUtils.getAutoIncrement(template, TABLE_NAME); params.addValue("name", name); Number newId =
+       * insert.executeAndReturnKey(params); project.setProjectId(newId.longValue()); project.setName(name);
+       */
+    } else {
       try {
         if (namingScheme.validateField("name", project.getName())) {
-          params.addValue("projectId", project.getId())
-                .addValue("name", project.getName());
+          params.addValue("projectId", project.getId()).addValue("name", project.getName());
           NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
           namedTemplate.update(PROJECT_UPDATE, params);
-        }
-        else {
+        } else {
           throw new IOException("Cannot save Project - invalid field:" + project.toString());
         }
-      }
-      catch (MisoNamingException e) {
+      } catch (MisoNamingException e) {
         throw new IOException("Cannot save Project - issue with naming scheme", e);
       }
       /*
-      params.addValue("projectId", project.getProjectId());
-      params.addValue("name", project.getName());
-      NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-      namedTemplate.update(PROJECT_UPDATE, params);
-      */
+       * params.addValue("projectId", project.getProjectId()); params.addValue("name", project.getName()); NamedParameterJdbcTemplate
+       * namedTemplate = new NamedParameterJdbcTemplate(template); namedTemplate.update(PROJECT_UPDATE, params);
+       */
     }
 
     if (this.cascadeType != null) {
@@ -396,13 +320,11 @@ public class SQLProjectDAO implements ProjectStore {
           for (String s : project.getIssueKeys()) {
             SimpleJdbcInsert fInsert = new SimpleJdbcInsert(template).withTableName("Project_Issues");
             MapSqlParameterSource fcParams = new MapSqlParameterSource();
-            fcParams.addValue("project_projectId", project.getProjectId())
-                    .addValue("issueKey", s);
+            fcParams.addValue("project_projectId", project.getProjectId()).addValue("issueKey", s);
 
             try {
               fInsert.execute(fcParams);
-            }
-            catch (DuplicateKeyException dke) {
+            } catch (DuplicateKeyException dke) {
               log.warn("This Project/Issue Key combination already exists - not inserting: " + dke.getMessage());
             }
           }
@@ -430,42 +352,32 @@ public class SQLProjectDAO implements ProjectStore {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
 
     MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("principalInvestigator", overview.getPrincipalInvestigator())
-            .addValue("startDate", overview.getStartDate())
-            .addValue("endDate", overview.getEndDate())
-            .addValue("numProposedSamples", overview.getNumProposedSamples())
-            .addValue("locked", overview.getLocked())
-            .addValue("allSampleQcPassed", overview.getAllSampleQcPassed())
-            .addValue("libraryPreparationComplete", overview.getLibraryPreparationComplete())
-            .addValue("allLibraryQcPassed", overview.getAllLibrariesQcPassed())
-            .addValue("allPoolsConstructed", overview.getAllPoolsConstructed())
-            .addValue("allRunsCompleted", overview.getAllRunsCompleted())
-            .addValue("primaryAnalysisCompleted", overview.getPrimaryAnalysisCompleted());
+    params.addValue("principalInvestigator", overview.getPrincipalInvestigator()).addValue("startDate", overview.getStartDate())
+        .addValue("endDate", overview.getEndDate()).addValue("numProposedSamples", overview.getNumProposedSamples())
+        .addValue("locked", overview.getLocked()).addValue("allSampleQcPassed", overview.getAllSampleQcPassed())
+        .addValue("libraryPreparationComplete", overview.getLibraryPreparationComplete())
+        .addValue("allLibraryQcPassed", overview.getAllLibrariesQcPassed())
+        .addValue("allPoolsConstructed", overview.getAllPoolsConstructed()).addValue("allRunsCompleted", overview.getAllRunsCompleted())
+        .addValue("primaryAnalysisCompleted", overview.getPrimaryAnalysisCompleted());
 
     if (overview.getId() == ProjectOverview.UNSAVED_ID) {
-      SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-              .withTableName("ProjectOverview")
-              .usingGeneratedKeyColumns("overviewId");
+      SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName("ProjectOverview").usingGeneratedKeyColumns("overviewId");
       Number newId = insert.executeAndReturnKey(params);
       overview.setId(newId.longValue());
 
       Project p = overview.getProject();
 
-      SimpleJdbcInsert pInsert = new SimpleJdbcInsert(template)
-              .withTableName("Project_ProjectOverview");
+      SimpleJdbcInsert pInsert = new SimpleJdbcInsert(template).withTableName("Project_ProjectOverview");
 
       MapSqlParameterSource poParams = new MapSqlParameterSource();
-      poParams.addValue("project_projectId", p.getProjectId())
-              .addValue("overviews_overviewId", overview.getId());
+      poParams.addValue("project_projectId", p.getProjectId()).addValue("overviews_overviewId", overview.getId());
 
       try {
         pInsert.execute(poParams);
-      }
-      catch (DuplicateKeyException dke) {
+      } catch (DuplicateKeyException dke) {
         log.warn("This Project/Overview combination already exists - not inserting: " + dke.getMessage());
       }
-    }
-    else {
+    } else {
       params.addValue("overviewId", overview.getId());
       NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
       namedTemplate.update(OVERVIEW_UPDATE, params);
@@ -495,45 +407,29 @@ public class SQLProjectDAO implements ProjectStore {
     return overview.getId();
   }
 
-  @Cacheable(cacheName="projectListCache",
-      keyGenerator = @KeyGenerator(
-              name = "HashCodeCacheKeyGenerator",
-              properties = {
-                      @Property(name="includeMethod", value="false"),
-                      @Property(name="includeParameterTypes", value="false")
-              }
-      )
-  )
+  @Cacheable(cacheName = "projectListCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
+      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public List<Project> listAll() {
     return template.query(PROJECTS_SELECT, new ProjectMapper(true));
   }
 
   public List<Project> listAllWithLimit(long limit) throws IOException {
-    return template.query(PROJECTS_SELECT_LIMIT, new Object[]{limit}, new ProjectMapper(true));
+    return template.query(PROJECTS_SELECT_LIMIT, new Object[] { limit }, new ProjectMapper(true));
   }
 
   @Override
   public int count() throws IOException {
-    return template.queryForInt("SELECT count(*) FROM "+TABLE_NAME);
+    return template.queryForInt("SELECT count(*) FROM " + TABLE_NAME);
   }
 
   @Transactional(readOnly = false, rollbackFor = IOException.class)
-  @TriggersRemove(
-          cacheName = {"projectCache", "lazyProjectCache"},
-          keyGenerator = @KeyGenerator(
-                  name = "HashCodeCacheKeyGenerator",
-                  properties = {
-                          @Property(name = "includeMethod", value = "false"),
-                          @Property(name = "includeParameterTypes", value = "false")
-                  }
-          )
-  )
+  @TriggersRemove(cacheName = { "projectCache", "lazyProjectCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
+      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public boolean remove(Project project) throws IOException {
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
     boolean ok = true;
-    if (project.isDeletable() &&
-        (namedTemplate.update(PROJECT_DELETE,
-                              new MapSqlParameterSource().addValue("projectId", project.getProjectId())) == 1)) {
+    if (project.isDeletable()
+        && (namedTemplate.update(PROJECT_DELETE, new MapSqlParameterSource().addValue("projectId", project.getProjectId())) == 1)) {
       if (!project.getSamples().isEmpty()) {
         for (Sample s : project.getSamples()) {
           ok = sampleDAO.remove(s);
@@ -561,61 +457,53 @@ public class SQLProjectDAO implements ProjectStore {
 
   public boolean removeOverview(ProjectOverview overview) throws IOException {
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-    return (overview.isDeletable() &&
-           (namedTemplate.update(OVERVIEW_DELETE,
-                                 new MapSqlParameterSource().addValue("overviewId", overview.getId())) == 1));
+    return (overview.isDeletable() && (namedTemplate.update(OVERVIEW_DELETE,
+        new MapSqlParameterSource().addValue("overviewId", overview.getId())) == 1));
   }
 
-  @Cacheable(cacheName = "projectCache",
-             keyGenerator = @KeyGenerator(
-                     name = "HashCodeCacheKeyGenerator",
-                     properties = {
-                             @Property(name = "includeMethod", value = "false"),
-                             @Property(name = "includeParameterTypes", value = "false")
-                     }
-             )
-  )
+  @Cacheable(cacheName = "projectCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
+      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public Project get(long projectId) throws IOException {
-    List<Project> eResults = template.query(PROJECT_SELECT_BY_ID, new Object[]{projectId}, new ProjectMapper());
+    List<Project> eResults = template.query(PROJECT_SELECT_BY_ID, new Object[] { projectId }, new ProjectMapper());
     return eResults.size() > 0 ? eResults.get(0) : null;
   }
 
   public Project lazyGet(long projectId) throws IOException {
-    List<Project> eResults = template.query(PROJECT_SELECT_BY_ID, new Object[]{projectId}, new ProjectMapper(true));
+    List<Project> eResults = template.query(PROJECT_SELECT_BY_ID, new Object[] { projectId }, new ProjectMapper(true));
     return eResults.size() > 0 ? eResults.get(0) : null;
   }
 
   public List<Project> listBySearch(String query) {
     String mySQLQuery = "%" + query.replaceAll("_", Matcher.quoteReplacement("\\_")) + "%";
-    return template.query(PROJECTS_SELECT_BY_SEARCH, new Object[]{mySQLQuery,mySQLQuery,mySQLQuery}, new ProjectMapper(true));
+    return template.query(PROJECTS_SELECT_BY_SEARCH, new Object[] { mySQLQuery, mySQLQuery, mySQLQuery }, new ProjectMapper(true));
   }
 
   public Project getByAlias(String alias) throws IOException {
-    List<Project> eResults = template.query(PROJECT_SELECT_BY_ALIAS, new Object[]{alias}, new ProjectMapper());
+    List<Project> eResults = template.query(PROJECT_SELECT_BY_ALIAS, new Object[] { alias }, new ProjectMapper());
     return eResults.size() > 0 ? eResults.get(0) : null;
   }
 
   public Project getByStudyId(long studyId) throws IOException {
-    List<Project> eResults = template.query(PROJECT_SELECT_BY_STUDY_ID, new Object[]{studyId}, new ProjectMapper());
+    List<Project> eResults = template.query(PROJECT_SELECT_BY_STUDY_ID, new Object[] { studyId }, new ProjectMapper());
     return eResults.size() > 0 ? eResults.get(0) : null;
   }
 
   public ProjectOverview getProjectOverviewById(long overviewId) throws IOException {
-    List<ProjectOverview> eResults = template.query(OVERVIEW_SELECT_BY_ID, new Object[]{overviewId}, new ProjectOverviewMapper());
+    List<ProjectOverview> eResults = template.query(OVERVIEW_SELECT_BY_ID, new Object[] { overviewId }, new ProjectOverviewMapper());
     return eResults.size() > 0 ? eResults.get(0) : null;
   }
 
   public ProjectOverview lazyGetProjectOverviewById(long overviewId) throws IOException {
-    List<ProjectOverview> eResults = template.query(OVERVIEW_SELECT_BY_ID, new Object[]{overviewId}, new ProjectOverviewMapper(true));
+    List<ProjectOverview> eResults = template.query(OVERVIEW_SELECT_BY_ID, new Object[] { overviewId }, new ProjectOverviewMapper(true));
     return eResults.size() > 0 ? eResults.get(0) : null;
   }
 
   public List<ProjectOverview> listOverviewsByProjectId(long projectId) throws IOException {
-    return template.query(OVERVIEW_SELECT_BY_RELATED_PROJECT, new Object[]{projectId}, new ProjectOverviewMapper(true));
+    return template.query(OVERVIEW_SELECT_BY_RELATED_PROJECT, new Object[] { projectId }, new ProjectOverviewMapper(true));
   }
 
   public List<String> listIssueKeysByProjectId(long projectId) throws IOException {
-    return template.queryForList(ISSUE_KEYS_SELECT_BY_PROJECT_ID, new Object[]{projectId}, String.class);
+    return template.queryForList(ISSUE_KEYS_SELECT_BY_PROJECT_ID, new Object[] { projectId }, String.class);
   }
 
   public class ProjectMapper extends CacheAwareRowMapper<Project> {
@@ -637,7 +525,7 @@ public class SQLProjectDAO implements ProjectStore {
           Element element;
           if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
             log.debug("Cache hit on map for Project " + id);
-            return (Project)element.getObjectValue();
+            return (Project) element.getObjectValue();
           }
         }
 
@@ -654,8 +542,7 @@ public class SQLProjectDAO implements ProjectStore {
           project.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
           project.setIssueKeys(listIssueKeysByProjectId(id));
           project.setWatchers(new HashSet<User>(watcherDAO.getWatchersByEntityName(project.getWatchableIdentifier())));
-          if (project.getSecurityProfile() != null &&
-              project.getSecurityProfile().getOwner() != null)
+          if (project.getSecurityProfile() != null && project.getSecurityProfile().getOwner() != null)
             project.addWatcher(project.getSecurityProfile().getOwner());
           for (User u : watcherDAO.getWatchersByWatcherGroup("ProjectWatchers")) {
             project.addWatcher(u);
@@ -667,8 +554,7 @@ public class SQLProjectDAO implements ProjectStore {
             project.setSamples(sampleDAO.listByProjectId(id));
             project.setStudies(studyDAO.listByProjectId(id));
           }
-        }
-        catch (IOException e1) {
+        } catch (IOException e1) {
           e1.printStackTrace();
         }
 
@@ -677,14 +563,12 @@ public class SQLProjectDAO implements ProjectStore {
         }
 
         if (isCacheEnabled() && lookupCache(cacheManager) != null) {
-          lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id) ,project));
+          lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id), project));
           log.debug("Cache put for Project " + id);
         }
-      }
-      catch(net.sf.ehcache.CacheException ce) {
+      } catch (net.sf.ehcache.CacheException ce) {
         ce.printStackTrace();
-      }
-      catch(UnsupportedOperationException uoe) {
+      } catch (UnsupportedOperationException uoe) {
         uoe.printStackTrace();
       }
       return project;
@@ -708,7 +592,7 @@ public class SQLProjectDAO implements ProjectStore {
         Element element;
         if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
           log.debug("Cache hit on map for ProjectOverview " + id);
-          return (ProjectOverview)element.getObjectValue();
+          return (ProjectOverview) element.getObjectValue();
         }
       }
       ProjectOverview overview = new ProjectOverview();
@@ -742,19 +626,17 @@ public class SQLProjectDAO implements ProjectStore {
         overview.setNotes(noteDAO.listByProjectOverview(id));
 
         overview.setWatchers(new HashSet<User>(watcherDAO.getWatchersByEntityName(overview.getWatchableIdentifier())));
-        if (overview.getProject().getSecurityProfile() != null &&
-            overview.getProject().getSecurityProfile().getOwner() != null)
+        if (overview.getProject().getSecurityProfile() != null && overview.getProject().getSecurityProfile().getOwner() != null)
           overview.addWatcher(overview.getProject().getSecurityProfile().getOwner());
         for (User u : watcherDAO.getWatchersByWatcherGroup("ProjectWatchers")) {
           overview.addWatcher(u);
         }
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
         e.printStackTrace();
       }
 
       if (isCacheEnabled() && lookupCache(cacheManager) != null) {
-        lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id) ,overview));
+        lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id), overview));
         log.debug("Cache put for overview " + id);
       }
 

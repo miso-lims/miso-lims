@@ -25,7 +25,7 @@ package uk.ac.bbsrc.tgac.miso.core.service.integration.contract;
 
 /**
  * A simple interface to describe classes that can represent interrogation queries
- *
+ * 
  * @author Rob Davey
  * @date 07-Oct-2010
  * @since 0.0.2
@@ -33,6 +33,7 @@ package uk.ac.bbsrc.tgac.miso.core.service.integration.contract;
 public interface InterrogationQuery<O> {
   /**
    * Generate a typed interrogation query
+   * 
    * @return O
    */
   O generateQuery();

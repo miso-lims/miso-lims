@@ -34,7 +34,7 @@ import java.util.Set;
 
 /**
  * A concrete Plate implementation representing a 96-well plate, comprising 96 {@link Library} elements.
- *
+ * 
  * @author Rob Davey
  * @date 05-Sep-2011
  * @since 0.1.1
@@ -64,8 +64,7 @@ public class _96WellPlate extends PlateImpl<Library> implements Plateable, Seria
   public void addElement(Library library) throws IllegalStateException {
     if (elements.size() < MAX_ELEMENTS) {
       elements.add(library);
-    }
-    else {
+    } else {
       throw new IllegalStateException("This 96 well plate already has 96 libraries");
     }
   }

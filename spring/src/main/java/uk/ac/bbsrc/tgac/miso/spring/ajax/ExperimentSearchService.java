@@ -39,10 +39,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 /**
- * Created by IntelliJ IDEA.
- * User: davey
- * Date: 25-May-2010
- * Time: 16:39:52
+ * Created by IntelliJ IDEA. User: davey Date: 25-May-2010 Time: 16:39:52
  */
 @Ajaxified
 public class ExperimentSearchService {
@@ -70,22 +67,20 @@ public class ExperimentSearchService {
           long experimentId = exp.getId();
 
           if (experimentName != null && (experimentName.equals(str) || experimentName.contains(str))) {
-            b.append("<li onclick=\"Search.insertResult(&#39;" + resultId + "&#39;,&#39;" + experimentId + "&#39;)\">" + exp.getName() + "(" + exp.getAlias() + ")</li>");
+            b.append("<li onclick=\"Search.insertResult(&#39;" + resultId + "&#39;,&#39;" + experimentId + "&#39;)\">" + exp.getName()
+                + "(" + exp.getAlias() + ")</li>");
             numMatches++;
           }
         }
         if (numMatches == 0) {
           return JSONUtils.JSONObjectResponse("html", "No matches");
-        }
-        else {
+        } else {
           return JSONUtils.JSONObjectResponse("html", "<div class=\"autocomplete\"><ul>" + b.toString() + "</ul></div>");
         }
-      }
-      else {
+      } else {
         return JSONUtils.JSONObjectResponse("html", "Need a longer search pattern ...");
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed");
     }
@@ -97,5 +92,5 @@ public class ExperimentSearchService {
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
-  }  
+  }
 }

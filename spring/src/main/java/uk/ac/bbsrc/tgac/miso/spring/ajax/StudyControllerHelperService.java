@@ -44,7 +44,7 @@ import java.io.IOException;
  * uk.ac.bbsrc.tgac.miso.spring.ajax
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -74,8 +74,7 @@ public class StudyControllerHelperService {
     User user;
     try {
       user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
     }
@@ -86,17 +85,14 @@ public class StudyControllerHelperService {
         try {
           requestManager.deleteStudy(requestManager.getStudyById(studyId));
           return JSONUtils.SimpleJSONResponse("Study deleted");
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
           e.printStackTrace();
           return JSONUtils.SimpleJSONError("Cannot delete study: " + e.getMessage());
         }
-      }
-      else {
+      } else {
         return JSONUtils.SimpleJSONError("No study specified to delete.");
       }
-    }
-    else {
+    } else {
       return JSONUtils.SimpleJSONError("Only admins can delete objects.");
     }
   }
@@ -106,17 +102,13 @@ public class StudyControllerHelperService {
       JSONObject j = new JSONObject();
       JSONArray jsonArray = new JSONArray();
       for (Study study : requestManager.listAllStudies()) {
-        jsonArray.add("['" + study.getName() + "','" +
-                      study.getAlias() + "','" +
-                      study.getDescription() + "','" +
-                      study.getStudyType() + "','" +
-                      "<a href=\"/miso/study/" + study.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
+        jsonArray.add("['" + study.getName() + "','" + study.getAlias() + "','" + study.getDescription() + "','" + study.getStudyType()
+            + "','" + "<a href=\"/miso/study/" + study.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
 
       }
       j.put("array", jsonArray);
       return j;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }

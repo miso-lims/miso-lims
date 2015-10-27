@@ -23,23 +23,30 @@
 
 package uk.ac.bbsrc.tgac.tagbarcode;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+
 import net.sourceforge.fluxion.spi.ServiceProvider;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.RequestManagerAware;
 import uk.ac.bbsrc.tgac.miso.core.service.tagbarcode.TagBarcodeStrategy;
 
-import java.io.IOException;
-import java.util.*;
-
 /**
  * uk.ac.bbsrc.tgac.tagbarcode
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 28/06/12
  * @since 0.1.6
@@ -86,15 +93,12 @@ public class SureSelectXT2TagBarcodeStrategy implements TagBarcodeStrategy, Requ
         try {
           List<TagBarcode> barcodes = new ArrayList<TagBarcode>(requestManager.listAllTagBarcodesByPlatform(PlatformType.ILLUMINA.getKey()));
           for (TagBarcode t : barcodes) {
-            if (getName().equals(t.getStrategyName()) &&
-                t.getName() != null &&
-                t.getName().startsWith("Index ")) {
+            if (getName().equals(t.getStrategyName()) && t.getName() != null && t.getName().startsWith("Index ")) {
               log.debug("Registering tag barcode: " + t.getName());
               tagBarcodeMap.get(1).add(t);
             }
           }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
           e.printStackTrace();
         }
       }

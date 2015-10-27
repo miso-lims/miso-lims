@@ -34,7 +34,7 @@ import java.util.Properties;
 
 /**
  * Decorates a Sample so that an ERA submission XML document can be built from it
- *
+ * 
  * @author Rob Davey
  * @date 12-Oct-2010
  * @since 0.0.2
@@ -47,9 +47,9 @@ public class EraSampleDecorator extends AbstractSubmittableDecorator<Document> {
   }
 
   public void buildSubmission() {
-    //submittable.buildSubmission();
+    // submittable.buildSubmission();
 
-    Sample sample = (Sample)submittable;
+    Sample sample = (Sample) submittable;
     Element s = submission.createElementNS(null, "SAMPLE");
 
     s.setAttribute("alias", sample.getAlias());
@@ -65,15 +65,11 @@ public class EraSampleDecorator extends AbstractSubmittableDecorator<Document> {
     sampleScientificName.setTextContent(sample.getScientificName());
     sampleName.appendChild(sampleScientificName);
 
-
-    //2/11/2011 Antony Colles moved IF !=null statement, to help produce valid submission XML.
+    // 2/11/2011 Antony Colles moved IF !=null statement, to help produce valid submission XML.
     Element sampleTaxonIdentifier = submission.createElementNS(null, "TAXON_ID");
-    if (sample.getTaxonIdentifier() != null && !sample.getTaxonIdentifier().equals(""))
-    {
+    if (sample.getTaxonIdentifier() != null && !sample.getTaxonIdentifier().equals("")) {
       sampleTaxonIdentifier.setTextContent(sample.getTaxonIdentifier());
-    }
-    else
-    {
+    } else {
       sampleTaxonIdentifier.setTextContent("000001");
     }
     sampleName.appendChild(sampleTaxonIdentifier);

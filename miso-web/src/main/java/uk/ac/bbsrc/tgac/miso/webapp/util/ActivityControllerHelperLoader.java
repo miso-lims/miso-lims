@@ -35,35 +35,29 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 import com.eaglegenomics.simlims.core.Activity;
+
 //import com.eaglegenomics.simlims.spring.ActivityControllerHelper;
 
-public class ActivityControllerHelperLoader implements InitializingBean,
-		ApplicationContextAware {
-//	protected static final Logger log = LoggerFactory.getLogger(ActivityControllerHelperLoader.class);
+public class ActivityControllerHelperLoader implements InitializingBean, ApplicationContextAware {
+  // protected static final Logger log = LoggerFactory.getLogger(ActivityControllerHelperLoader.class);
 
-	//private transient Map<Activity, ActivityControllerHelper> activityHelpers = new HashMap<Activity, ActivityControllerHelper>();
+  // private transient Map<Activity, ActivityControllerHelper> activityHelpers = new HashMap<Activity, ActivityControllerHelper>();
 
-	@Autowired
-	private ApplicationContext context;
+  @Autowired
+  private ApplicationContext context;
 
-	public void setApplicationContext(ApplicationContext context)
-			throws BeansException {
-		this.context = context;
-	}
+  public void setApplicationContext(ApplicationContext context) throws BeansException {
+    this.context = context;
+  }
 
-/*	public ActivityControllerHelper getHelper(Activity key) {
-		return activityHelpers.get(key);
-	}
-*/
-	public void afterPropertiesSet() throws Exception {
-/*		for (ActivityControllerHelper entry : context.getBeansOfType(
-				ActivityControllerHelper.class).values()) {
-			if (log.isInfoEnabled()) {
-				log.info("Loaded activity helper for "
-						+ entry.getActivity().getUniqueIdentifier());
-			}
-			activityHelpers.put(entry.getActivity(), entry);
-		}
-		*/
-	}
+  /*
+   * public ActivityControllerHelper getHelper(Activity key) { return activityHelpers.get(key); }
+   */
+  public void afterPropertiesSet() throws Exception {
+    /*
+     * for (ActivityControllerHelper entry : context.getBeansOfType( ActivityControllerHelper.class).values()) { if (log.isInfoEnabled()) {
+     * log.info("Loaded activity helper for " + entry.getActivity().getUniqueIdentifier()); } activityHelpers.put(entry.getActivity(),
+     * entry); }
+     */
+  }
 }

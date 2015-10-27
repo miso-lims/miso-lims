@@ -38,7 +38,7 @@ import java.util.regex.Pattern;
  * uk.ac.bbsrc.tgac.miso.tools.run
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 26/10/11
  * @since 0.1.2
@@ -61,8 +61,7 @@ public class RunFolderScanner extends DefaultDirectoryScanner {
         Matcher rm = runDirPattern.matcher(rootFile.getAbsolutePath());
         if (rm.matches()) {
           files.add(rootFile);
-        }
-        else {
+        } else {
           if (rm.find()) {
             files.addAll(Arrays.asList(listEligibleFiles(rootFile)));
           }

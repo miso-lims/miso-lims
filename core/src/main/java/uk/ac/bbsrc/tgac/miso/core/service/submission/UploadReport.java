@@ -32,7 +32,7 @@ import java.util.Set;
 
 /**
  * An interface that defines datafile upload progress report
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -40,13 +40,20 @@ public interface UploadReport {
   /**
    *
    */
-    public void setStatus(String status);
-    public void setMessage(String message);
-    public String getStatus();
-    public String getMessage();
-    public Map<String,Object> getUploadReport();
-    public List<UploadJob> getUploadJobs();
-    public UploadJob getUploadJobByFile();
-    public UploadJob getUploadJobByIndex();
+  public void setStatus(String status);
+
+  public void setMessage(String message);
+
+  public String getStatus();
+
+  public String getMessage();
+
+  public Map<String, Object> getUploadReport();
+
+  public List<UploadJob> getUploadJobs();
+
+  public UploadJob getUploadJobByFile();
+
+  public UploadJob getUploadJobByIndex();
 
 }

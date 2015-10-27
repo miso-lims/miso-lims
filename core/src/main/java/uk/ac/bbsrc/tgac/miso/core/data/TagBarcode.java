@@ -31,19 +31,19 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 /**
- * TagBarcodes represent adapter sequences that can be prepended to sequencable material in order to facilitate
- * multiplexing.
- *
+ * TagBarcodes represent adapter sequences that can be prepended to sequencable material in order to facilitate multiplexing.
+ * 
  * @author Rob Davey
  * @date 10-May-2011
  * @since 0.0.3
  */
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
-//@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
+// @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public interface TagBarcode extends Comparable, Nameable {
   /**
    * Returns the tagId of this TagBarcode object.
+   * 
    * @return Long tagId
    */
   @Deprecated
@@ -51,56 +51,68 @@ public interface TagBarcode extends Comparable, Nameable {
 
   /**
    * Sets the tagBarcodeId of this TagBarcode object.
-   * @param tagId Long
+   * 
+   * @param tagId
+   *          Long
    */
   @Deprecated
   public void setTagBarcodeId(Long tagId);
 
   /**
    * Sets the ID of this TagBarcode object.
-   * @param id long
+   * 
+   * @param id
+   *          long
    */
   public void setId(long id);
 
   /**
    * Sets the name of this TagBarcode object.
+   * 
    * @param name
    */
   public void setName(String name);
 
   /**
    * Returns the DNA sequence of this TagBarcode object.
+   * 
    * @return
    */
   public String getSequence();
 
   /**
    * Sets the DNA sequence of this TagBarcode object.
+   * 
    * @param sequence
    */
   public void setSequence(String sequence);
 
   /**
    * Returns the {@link PlatformType} of this TagBarcode object.
+   * 
    * @return
    */
   public PlatformType getPlatformType();
 
   /**
    * Sets the {@link PlatformType} of this TagBarcode object.
+   * 
    * @param platformType
    */
   public void setPlatformType(PlatformType platformType);
 
   /**
    * Returns the strategy name to which this TagBarcode belongs.
+   * 
    * @return String strategyName
    */
   public String getStrategyName();
 
   /**
    * Sets the strategy name to which this TagBarcode belongs.
-   * @param strategyName String
+   * 
+   * @param strategyName
+   *          String
    */
   public void setStrategyName(String strategyName);
 }

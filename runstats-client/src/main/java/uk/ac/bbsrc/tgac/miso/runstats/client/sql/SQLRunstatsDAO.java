@@ -34,7 +34,7 @@ import java.util.Collection;
  * uk.ac.bbsrc.tgac.miso.runstats.client.sql
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 27/10/11
  * @since 0.1.2

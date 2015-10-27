@@ -36,7 +36,7 @@ import java.util.HashSet;
  * uk.ac.bbsrc.tgac.miso.core.event.listener
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 20/10/11
  * @since 0.1.2

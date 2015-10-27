@@ -33,7 +33,7 @@ import java.util.Collection;
  * uk.ac.bbsrc.tgac.miso.core.store
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 22-Sep-2011
  * @since 0.1.2

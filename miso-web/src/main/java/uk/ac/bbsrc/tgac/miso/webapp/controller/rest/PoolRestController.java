@@ -49,11 +49,8 @@ import java.util.List;
 
 /**
  * A controller to handle all REST requests for Pools
- *
- * Created by IntelliJ IDEA.
- * User: bianx
- * Date: 17-Aug-2011
- * Time: 11:34:04
+ * 
+ * Created by IntelliJ IDEA. User: bianx Date: 17-Aug-2011 Time: 11:34:04
  */
 @Controller
 @RequestMapping("/rest/pool")
@@ -69,7 +66,8 @@ public class PoolRestController {
   }
 
   @RequestMapping(value = "{poolId}", method = RequestMethod.GET)
-  public @ResponseBody String getPoolById(@PathVariable Long poolId) throws IOException {
+  public @ResponseBody
+  String getPoolById(@PathVariable Long poolId) throws IOException {
     ObjectMapper mapper = new ObjectMapper();
     try {
       Pool p = requestManager.getPoolById(poolId);
@@ -78,14 +76,14 @@ public class PoolRestController {
         return mapper.writeValueAsString(p);
       }
       return mapper.writeValueAsString(RestUtils.error("No such pool with that ID.", "poolId", poolId.toString()));
-    }
-    catch (IOException ioe) {
+    } catch (IOException ioe) {
       return mapper.writeValueAsString(RestUtils.error("Cannot retrieve pool: " + ioe.getMessage(), "poolId", poolId.toString()));
     }
   }
 
   @RequestMapping(value = "/wizard/librarydilutions", method = RequestMethod.GET)
-  public @ResponseBody JSONObject ldRest() throws IOException {
+  public @ResponseBody
+  JSONObject ldRest() throws IOException {
     Collection<LibraryDilution> lds = requestManager.listAllLibraryDilutions();
 
     List<String> types = new ArrayList<String>(requestManager.listDistinctPlatformNames());
@@ -111,12 +109,13 @@ public class PoolRestController {
   }
 
   @RequestMapping(value = "/wizard/platformtypes", method = RequestMethod.GET)
-  public @ResponseBody String platformTypesRest() throws IOException {
+  public @ResponseBody
+  String platformTypesRest() throws IOException {
     List<String> names = new ArrayList<String>();
     List<String> types = new ArrayList<String>(requestManager.listDistinctPlatformNames());
     for (String name : types) {
       names.add("\"" + name + "\"");
     }
-    return "{"+LimsUtils.join(names, ",")+"}";
+    return "{" + LimsUtils.join(names, ",") + "}";
   }
 }

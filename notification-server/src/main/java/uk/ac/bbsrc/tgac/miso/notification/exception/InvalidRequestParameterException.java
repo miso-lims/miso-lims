@@ -27,7 +27,7 @@ package uk.ac.bbsrc.tgac.miso.notification.exception;
  * uk.ac.bbsrc.tgac.miso.notification.exception
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 15/04/13
  * @since 0.2.0
@@ -40,7 +40,7 @@ public class InvalidRequestParameterException extends Exception {
   public InvalidRequestParameterException(String s, Throwable cause) {
     super(s);
     if (cause != null) {
-        initCause(cause);
+      initCause(cause);
     }
   }
 }

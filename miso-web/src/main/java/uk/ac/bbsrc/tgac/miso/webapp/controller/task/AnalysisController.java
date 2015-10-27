@@ -50,12 +50,12 @@ import java.util.*;
  * uk.ac.bbsrc.tgac.miso.webapp.controller
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.3
  */
 @Controller
-//@SessionAttributes("tasks")
+// @SessionAttributes("tasks")
 public class AnalysisController {
   protected static final Logger log = LoggerFactory.getLogger(AnalysisController.class);
 
@@ -94,22 +94,21 @@ public class AnalysisController {
     Run run = requestManager.getRunById(runId);
     if (run == null) {
       throw new SecurityException("No such Run.");
-    }
-    else {
+    } else {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
 
       model.put("run", run);
 
-      Map<String, String> map = new HashMap<String,String>();
+      Map<String, String> map = new HashMap<String, String>();
       map.put("RunAccession", run.getAlias());
-      map.put("basecall-path", run.getFilePath()+"/Data/Intensities/BaseCalls");
-//      map.put("fastq-path", run.getFilePath()+"/Data/Intensities/BaseCalls/PAP");
-//      map.put("makefile-path", run.getFilePath()+"/Data/Intensities/BaseCalls/PAP/Makefile");
-//      map.put("sample-sheet-path", run.getFilePath()+"/Data/Intensities/BaseCalls/SampleSheet-pap.csv");
+      map.put("basecall-path", run.getFilePath() + "/Data/Intensities/BaseCalls");
+      // map.put("fastq-path", run.getFilePath()+"/Data/Intensities/BaseCalls/PAP");
+      // map.put("makefile-path", run.getFilePath()+"/Data/Intensities/BaseCalls/PAP/Makefile");
+      // map.put("sample-sheet-path", run.getFilePath()+"/Data/Intensities/BaseCalls/SampleSheet-pap.csv");
 
-      map.put("fastq-path", "/net/tgac-labdata-nfs/ifs/TGAC/NGS_data/qc/"+run.getAlias()+"/PAP");
-      map.put("makefile-path", "/net/tgac-labdata-nfs/ifs/TGAC/NGS_data/qc/"+run.getAlias()+"/PAP/Makefile");
-      map.put("sample-sheet-path", "/net/tgac-labdata-nfs/ifs/TGAC/NGS_data/qc/"+run.getAlias()+"/SampleSheet-PAP.csv");
+      map.put("fastq-path", "/net/tgac-labdata-nfs/ifs/TGAC/NGS_data/qc/" + run.getAlias() + "/PAP");
+      map.put("makefile-path", "/net/tgac-labdata-nfs/ifs/TGAC/NGS_data/qc/" + run.getAlias() + "/PAP/Makefile");
+      map.put("sample-sheet-path", "/net/tgac-labdata-nfs/ifs/TGAC/NGS_data/qc/" + run.getAlias() + "/SampleSheet-PAP.csv");
 
       map.put("instrument-id", run.getSequencerReference().getName());
 
@@ -132,18 +131,17 @@ public class AnalysisController {
               }
             }
           }
-        }
-        else {
+        } else {
           throw new IntegrationException("Cannot start analysis pipelines on a run with no pools on any lanes.");
         }
       }
 
       String instrumentModel = run.getSequencerReference().getPlatform().getInstrumentModel();
       if ("Illumina MiSeq".equals(instrumentModel) || "Illumina NextSeq 500".equals(instrumentModel)) {
-        //append the base mask property for miseq runs
-        String basesMask = "y"+run.getCycles()+",i"+indexValue;
+        // append the base mask property for miseq runs
+        String basesMask = "y" + run.getCycles() + ",i" + indexValue;
         if (run.getPairedEnd()) {
-          basesMask += ",y"+run.getCycles();
+          basesMask += ",y" + run.getCycles();
         }
         map.put("use-bases-mask", basesMask);
       }
@@ -151,7 +149,8 @@ public class AnalysisController {
       map.put("lane-value", laneValue);
       map.put("nucleic-acid-type", naType);
 
-      map.put("sample-sheet-string", RunProcessingUtils.buildIlluminaDemultiplexCSV(run, f, "1.8.2", user.getFullName()).replaceAll("\n", "\\\n"));
+      map.put("sample-sheet-string",
+          RunProcessingUtils.buildIlluminaDemultiplexCSV(run, f, "1.8.2", user.getFullName()).replaceAll("\n", "\\\n"));
 
       map.put("contaminant-list", "ecoli,phix_174,human_chr17,arabidopsis_chloroplast,vectors");
 
@@ -168,7 +167,7 @@ public class AnalysisController {
       model.put("defaultRunValues", map);
 
       List<String> pipelineNames = new ArrayList<String>();
-      for (JSONObject pipeline : (Iterable<JSONObject>)queryService.getPipelines()) {
+      for (JSONObject pipeline : (Iterable<JSONObject>) queryService.getPipelines()) {
         pipelineNames.add(pipeline.getString("name"));
       }
       Collections.sort(pipelineNames);
@@ -180,149 +179,113 @@ public class AnalysisController {
 
   /**
    * Gets the {@link uk.ac.ebi.fgpt.conan.model.ConanTask} with the given ID.
-   *
-   * @param taskID the ID of the task to retrieve
+   * 
+   * @param taskID
+   *          the ID of the task to retrieve
    * @return the task assigned this ID
    */
   @RequestMapping(value = "/analysis/task/{taskID}", method = RequestMethod.GET)
-  public @ResponseBody ConanTask<? extends ConanPipeline> getTask(@PathVariable String taskID) {
+  public @ResponseBody
+  ConanTask<? extends ConanPipeline> getTask(@PathVariable String taskID) {
     /*
-    try {
-      return getQueryService().getTask(taskID);
-    }
-    catch (InterrogationException e) {
-      e.printStackTrace();
-      return null;
-    }
-    */
+     * try { return getQueryService().getTask(taskID); } catch (InterrogationException e) { e.printStackTrace(); return null; }
+     */
     return null;
   }
 
   /**
-   * Returns a list of all submitted tasks, in submission order. This includes all pending, running and completed
-   * tasks - basically a history of everything that has ever been submitted.
-   *
+   * Returns a list of all submitted tasks, in submission order. This includes all pending, running and completed tasks - basically a
+   * history of everything that has ever been submitted.
+   * 
    * @return the list of all submitted tasks
    */
   @RequestMapping(value = "/analysis/tasks", method = RequestMethod.GET)
-  public @ResponseBody List<ConanTask<? extends ConanPipeline>> getTasks() {
-/*    try {
-      return getQueryService().getTasks();
-    }
-    catch (InterrogationException e) {
-      e.printStackTrace();
-      return null;
-    }*/
+  public @ResponseBody
+  List<ConanTask<? extends ConanPipeline>> getTasks() {
+    /*
+     * try { return getQueryService().getTasks(); } catch (InterrogationException e) { e.printStackTrace(); return null; }
+     */
     return null;
   }
 
   /**
-   * Returns a list of all tasks that have been submitted but are pending execution.  Tasks in this list may have been
-   * executed but failed: tasks that fail should highlight their failure to the submitter, and flag the task as
-   * pending.
-   *
+   * Returns a list of all tasks that have been submitted but are pending execution. Tasks in this list may have been executed but failed:
+   * tasks that fail should highlight their failure to the submitter, and flag the task as pending.
+   * 
    * @return a list of all tasks pending execution
    */
   @RequestMapping(value = "/analysis/tasks", method = RequestMethod.GET, params = "pending")
-  public @ResponseBody List<ConanTask<? extends ConanPipeline>> getPendingTasks() {
-/*    try {
-      return getQueryService().getPendingTasks();
-    }
-    catch (InterrogationException e) {
-      e.printStackTrace();
-      return null;
-    }*/
+  public @ResponseBody
+  List<ConanTask<? extends ConanPipeline>> getPendingTasks() {
+    /*
+     * try { return getQueryService().getPendingTasks(); } catch (InterrogationException e) { e.printStackTrace(); return null; }
+     */
     return null;
   }
 
   /**
    * Returns a list of all tasks that are currently being executed.
-   *
+   * 
    * @return the currently executing tasks
    */
   @RequestMapping(value = "/analysis/tasks", method = RequestMethod.GET, params = "running")
-  public @ResponseBody List<ConanTask<? extends ConanPipeline>> getRunningTasks() {
-/*    try {
-      return getQueryService().getRunningTasks();
-    }
-    catch (InterrogationException e) {
-      e.printStackTrace();
-      return null;
-    }*/
+  public @ResponseBody
+  List<ConanTask<? extends ConanPipeline>> getRunningTasks() {
+    /*
+     * try { return getQueryService().getRunningTasks(); } catch (InterrogationException e) { e.printStackTrace(); return null; }
+     */
     return null;
   }
 
   /**
-   * Returns a list of all tasks that have been executed and completed.  This includes tasks that completed
-   * successfully, and those that completed because a process failed and was subsequently marked as complete by the
-   * submitter.
-   *
+   * Returns a list of all tasks that have been executed and completed. This includes tasks that completed successfully, and those that
+   * completed because a process failed and was subsequently marked as complete by the submitter.
+   * 
    * @return the tasks that have completed
    */
   @RequestMapping(value = "/analysis/tasks", method = RequestMethod.GET, params = "complete")
-  public @ResponseBody List<ConanTask<? extends ConanPipeline>> getCompletedTasks() {
-/*    try {
-      return getQueryService().getCompletedTasks();
-    }
-    catch (InterrogationException e) {
-      e.printStackTrace();
-      return null;
-    }*/
+  public @ResponseBody
+  List<ConanTask<? extends ConanPipeline>> getCompletedTasks() {
+    /*
+     * try { return getQueryService().getCompletedTasks(); } catch (InterrogationException e) { e.printStackTrace(); return null; }
+     */
     return null;
   }
 
   /**
-   * Returns a list of all submitted tasks, in submission order. This includes all pending, running and completed
-   * tasks - basically a history of everything that has ever been submitted.
-   *
+   * Returns a list of all submitted tasks, in submission order. This includes all pending, running and completed tasks - basically a
+   * history of everything that has ever been submitted.
+   * 
    * @return the list of all submitted tasks
    */
   @RequestMapping(value = "/analysis/pipeline/{pipelineName}", method = RequestMethod.GET)
-  public @ResponseBody ConanPipeline getPipeline(@PathVariable String pipelineName) {
-/*    try {
-      return getQueryService().getPipeline(pipelineName);
-    }
-    catch (InterrogationException e) {
-      e.printStackTrace();
-      return null;
-    }*/
+  public @ResponseBody
+  ConanPipeline getPipeline(@PathVariable String pipelineName) {
+    /*
+     * try { return getQueryService().getPipeline(pipelineName); } catch (InterrogationException e) { e.printStackTrace(); return null; }
+     */
     return null;
   }
 
   /**
-   * Returns a list of all tasks that have been executed and completed.  This includes tasks that completed
-   * successfully, and those that completed because a process failed and was subsequently marked as complete by the
-   * submitter.
-   *
+   * Returns a list of all tasks that have been executed and completed. This includes tasks that completed successfully, and those that
+   * completed because a process failed and was subsequently marked as complete by the submitter.
+   * 
    * @return the tasks that have completed
    */
   @RequestMapping(value = "/analysis/pipelines", method = RequestMethod.GET)
-  public @ResponseBody List<ConanPipeline> getPipelines() {
-/*    try {
-      return getQueryService().getPipelines();
-    }
-    catch (InterrogationException e) {
-      e.printStackTrace();
-      return null;
-    }*/
+  public @ResponseBody
+  List<ConanPipeline> getPipelines() {
+    /*
+     * try { return getQueryService().getPipelines(); } catch (InterrogationException e) { e.printStackTrace(); return null; }
+     */
     return null;
   }
 
-/*
-  @RequestMapping(value = "/task/{taskId}", method = RequestMethod.POST)
-  public String processSubmit(@ModelAttribute("task") ConanTask<? extends ConanPipeline> t,
-                              ModelMap model, SessionStatus session) throws IOException {
-    try {
-      session.setComplete();
-      model.clear();
-      return "redirect:/miso/analysis";
-    }
-    catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to do stuff", ex);
-      }
-      throw ex;
-    }
-  }
-  */
+  /*
+   * @RequestMapping(value = "/task/{taskId}", method = RequestMethod.POST) public String processSubmit(@ModelAttribute("task") ConanTask<?
+   * extends ConanPipeline> t, ModelMap model, SessionStatus session) throws IOException { try { session.setComplete(); model.clear();
+   * return "redirect:/miso/analysis"; } catch (IOException ex) { if (log.isDebugEnabled()) { log.debug("Failed to do stuff", ex); } throw
+   * ex; } }
+   */
 }

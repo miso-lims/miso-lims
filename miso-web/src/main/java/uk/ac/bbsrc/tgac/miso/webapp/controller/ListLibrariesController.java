@@ -39,7 +39,7 @@ import java.util.Collection;
 
 /**
  * Controller for listing libraries
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -56,7 +56,8 @@ public class ListLibrariesController {
 
   @Deprecated
   @RequestMapping(value = "/libraries/rest/", method = RequestMethod.GET)
-  public @ResponseBody Collection<Library> jsonRest() throws IOException {
+  public @ResponseBody
+  Collection<Library> jsonRest() throws IOException {
     return requestManager.listAllLibraries();
   }
 

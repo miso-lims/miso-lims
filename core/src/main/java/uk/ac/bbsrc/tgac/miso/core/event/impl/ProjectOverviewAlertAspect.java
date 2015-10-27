@@ -36,7 +36,7 @@ import java.io.IOException;
  * uk.ac.bbsrc.tgac.miso.core.event
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 11/11/11
  * @since 0.1.3
@@ -56,8 +56,7 @@ public class ProjectOverviewAlertAspect {
       if (user != null) {
         projectAlertManager.removeWatcher(overview, user.getUserId());
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
     }
   }
@@ -67,8 +66,7 @@ public class ProjectOverviewAlertAspect {
       if (user != null) {
         projectAlertManager.addWatcher(overview, user.getUserId());
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
     }
   }

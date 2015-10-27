@@ -27,7 +27,7 @@ package uk.ac.bbsrc.tgac.miso.tools.run.util;
  * uk.ac.bbsrc.tgac.miso.notification.demo.client
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 13/12/11
  * @since 0.1.4

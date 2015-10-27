@@ -57,7 +57,7 @@ import java.util.Set;
  * uk.ac.bbsrc.tgac.miso.notification.manager
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 15/04/13
  * @since 0.2.0
@@ -91,18 +91,17 @@ public class NotificationRequestManager {
       String platformType = request.getString("platform").toLowerCase();
       Map<String, String> status = parseRunFolder(platformType, folder);
       if (status.isEmpty()) {
-        return "{'response':'No runs found with alias "+request.getString("run")+"'}";
+        return "{'response':'No runs found with alias " + request.getString("run") + "'}";
       }
 
       for (String s : status.keySet()) {
         if (!"".equals(status.get(s))) {
           JSONArray runs = JSONArray.fromObject(status.get(s));
           if (!runs.isEmpty()) {
-            return "{'progress':'"+s+"'}";
+            return "{'progress':'" + s + "'}";
           }
-        }
-        else {
-          return "{'response':'No runs found with status "+s+" with alias "+request.getString("run")+"'}";
+        } else {
+          return "{'response':'No runs found with status " + s + " with alias " + request.getString("run") + "'}";
         }
       }
     }
@@ -190,9 +189,8 @@ public class NotificationRequestManager {
           return run.getString("metrix");
         }
       }
-    }
-    else {
-      return "{\"error\":\"Cannot find run folder "+request.getString("run").replaceAll("('|\")", "\\\\$1")+"\"}";
+    } else {
+      return "{\"error\":\"Cannot find run folder " + request.getString("run").replaceAll("('|\")", "\\\\$1") + "\"}";
     }
     return "";
   }
@@ -216,8 +214,7 @@ public class NotificationRequestManager {
         }
       }
       return null;
-    }
-    else {
+    } else {
       throw new IllegalStateException("ApplicationContext and/or datapaths not set. Cannot action requests on notification system.");
     }
   }
@@ -225,36 +222,31 @@ public class NotificationRequestManager {
   private Map<String, String> parseRunFolder(String platformType, File path) throws IllegalStateException, IllegalArgumentException {
     if (context != null && dataPaths != null) {
       if (!"".equals(platformType) && platformType != null) {
-        FileSetTransformer<String, String, File> fst = (FileSetTransformer<String, String, File>)context.getBean(platformType+"Transformer");
+        FileSetTransformer<String, String, File> fst = (FileSetTransformer<String, String, File>) context.getBean(platformType
+            + "Transformer");
         Set<File> fs = new HashSet<>();
         fs.add(path);
         return fst.transform(fs);
-      }
-      else {
+      } else {
         throw new IllegalArgumentException("No platformType set. Cannot parse run folder.");
       }
-    }
-    else {
+    } else {
       throw new IllegalStateException("ApplicationContext and/or datapaths not set. Cannot action requests on notification system.");
     }
   }
 
   private JSONArray parseIlluminaInterOpFolder(File path) throws IllegalStateException {
     if (context != null && dataPaths != null) {
-      IlluminaTransformer fst = (IlluminaTransformer)context.getBean("illuminaTransformer");
+      IlluminaTransformer fst = (IlluminaTransformer) context.getBean("illuminaTransformer");
       if (fst != null) {
         Set<File> fs = new HashSet<>();
         fs.add(path);
         return fst.transformInterOpOnly(fs);
-      }
-      else {
+      } else {
         throw new IllegalStateException("No IlluminaTransformer available");
       }
-    }
-    else {
+    } else {
       throw new IllegalStateException("ApplicationContext and/or datapaths not set. Cannot action requests on notification system.");
     }
   }
 }
-
-

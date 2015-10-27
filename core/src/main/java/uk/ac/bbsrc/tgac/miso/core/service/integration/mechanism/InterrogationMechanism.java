@@ -29,7 +29,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.integration.contract.InterrogationResu
 
 /**
  * A simple interface to describe objects that can query an object O with an IntererogationQuery Q, and return an InterrogationResult R
- *
+ * 
  * @author Rob Davey
  * @date 07-Oct-2010
  * @since 0.0.2
@@ -37,11 +37,14 @@ import uk.ac.bbsrc.tgac.miso.core.service.integration.contract.InterrogationResu
 public interface InterrogationMechanism<Q extends InterrogationQuery, O, R extends InterrogationResult> {
   /**
    * Push a query to a queryable object and return a result
-   *
-   * @param queryable of type O
-   * @param query of type Q
+   * 
+   * @param queryable
+   *          of type O
+   * @param query
+   *          of type Q
    * @return R
-   * @throws InterrogationException when
+   * @throws InterrogationException
+   *           when
    */
   R doQuery(O queryable, Q query) throws InterrogationException;
 }

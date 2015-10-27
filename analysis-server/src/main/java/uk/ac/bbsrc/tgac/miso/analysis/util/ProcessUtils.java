@@ -37,23 +37,19 @@ import java.util.Map;
  * <p/>
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 27/10/11
  * @since version
  */
 public class ProcessUtils {
-  public static void extractConanParameters(Map<ConanParameter, String> parameters,
-                                            Map<String, String> inputValues,
-                                            ConanProcess process) {
+  public static void extractConanParameters(Map<ConanParameter, String> parameters, Map<String, String> inputValues, ConanProcess process) {
     for (ConanParameter param : process.getParameters()) {
       // validate our request by checking we have this param value supplied
       if (inputValues.get(param.getName()) == null) {
-        throw new MissingRequiredParameterException(
-                "Required parameter '" + param.getName() + "' not supplied, " +
-                "required for process '" + process.getName() + "'");
-      }
-      else {
+        throw new MissingRequiredParameterException("Required parameter '" + param.getName() + "' not supplied, "
+            + "required for process '" + process.getName() + "'");
+      } else {
         if (!parameters.containsKey(param)) {
           parameters.put(param, inputValues.get(param.getName()));
         }

@@ -60,75 +60,54 @@ import java.util.Map;
  * uk.ac.bbsrc.tgac.miso.sqlstore
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public class SQLKitDAO implements KitStore {
   private static final String TABLE_NAME = "Kit";
 
-  public static final String KITS_SELECT =
-          "SELECT kitId, identificationBarcode, locationBarcode, lotNumber, kitDate, kitDescriptorId " +
-          "FROM "+TABLE_NAME;
+  public static final String KITS_SELECT = "SELECT kitId, identificationBarcode, locationBarcode, lotNumber, kitDate, kitDescriptorId "
+      + "FROM " + TABLE_NAME;
 
-  public static final String KIT_SELECT_BY_ID =
-          KITS_SELECT + " WHERE kitId = ?";
+  public static final String KIT_SELECT_BY_ID = KITS_SELECT + " WHERE kitId = ?";
 
-  public static final String KIT_SELECT_BY_BARCODE =
-          KITS_SELECT + " WHERE identificationBarcode = ?";
+  public static final String KIT_SELECT_BY_BARCODE = KITS_SELECT + " WHERE identificationBarcode = ?";
 
-  public static final String KIT_SELECT_BY_LOT_NUMBER =
-          KITS_SELECT + " WHERE lotNumber = ?";  
+  public static final String KIT_SELECT_BY_LOT_NUMBER = KITS_SELECT + " WHERE lotNumber = ?";
 
-  public static final String KITS_SELECT_BY_TYPE =
-          "SELECT k.kitId, k.identificationBarcode, k.locationBarcode, k.lotNumber, k.kitDate, k.kitDescriptorId, ek.experiments_experimentId " +
-          "FROM "+TABLE_NAME+" k, Experiment_Kit ek " +
-          "WHERE ek.kits_kitId=k.kitId " +
-          "AND ek.experiments_experimentId=?";
+  public static final String KITS_SELECT_BY_TYPE = "SELECT k.kitId, k.identificationBarcode, k.locationBarcode, k.lotNumber, k.kitDate, k.kitDescriptorId, ek.experiments_experimentId "
+      + "FROM " + TABLE_NAME + " k, Experiment_Kit ek " + "WHERE ek.kits_kitId=k.kitId " + "AND ek.experiments_experimentId=?";
 
-  public static final String KITS_SELECT_BY_MANUFACTURER =
-          "SELECT k.kitId, k.identificationBarcode, k.locationBarcode, k.lotNumber, k.kitDate, k.kitDescriptorId, ek.experiments_experimentId " +
-          "FROM "+TABLE_NAME+" k, Experiment_Kit ek " +
-          "WHERE ek.kits_kitId=k.kitId " +
-          "AND ek.experiments_experimentId=?";
+  public static final String KITS_SELECT_BY_MANUFACTURER = "SELECT k.kitId, k.identificationBarcode, k.locationBarcode, k.lotNumber, k.kitDate, k.kitDescriptorId, ek.experiments_experimentId "
+      + "FROM " + TABLE_NAME + " k, Experiment_Kit ek " + "WHERE ek.kits_kitId=k.kitId " + "AND ek.experiments_experimentId=?";
 
-  public static final String KITS_SELECT_BY_RELATED_EXPERIMENT =
-          "SELECT k.kitId, k.identificationBarcode, k.locationBarcode, k.lotNumber, k.kitDate, k.kitDescriptorId, ek.experiments_experimentId " +
-          "FROM "+TABLE_NAME+" k, Experiment_Kit ek " +
-          "WHERE ek.kits_kitId=k.kitId " +
-          "AND ek.experiments_experimentId=?";
+  public static final String KITS_SELECT_BY_RELATED_EXPERIMENT = "SELECT k.kitId, k.identificationBarcode, k.locationBarcode, k.lotNumber, k.kitDate, k.kitDescriptorId, ek.experiments_experimentId "
+      + "FROM " + TABLE_NAME + " k, Experiment_Kit ek " + "WHERE ek.kits_kitId=k.kitId " + "AND ek.experiments_experimentId=?";
 
-  public static final String KITS_SELECT_BY_RELATED_LIBRARY =
-          "SELECT k.kitId, k.identificationBarcode, k.locationBarcode, k.lotNumber, k.kitDate, k.kitDescriptorId, ek.experiments_experimentId " +
-          "FROM "+TABLE_NAME+" k, Library_Kit lk " +
-          "WHERE lk.kits_kitId=k.kitId " +
-          "AND lk.libraries_libraryId=?";
+  public static final String KITS_SELECT_BY_RELATED_LIBRARY = "SELECT k.kitId, k.identificationBarcode, k.locationBarcode, k.lotNumber, k.kitDate, k.kitDescriptorId, ek.experiments_experimentId "
+      + "FROM " + TABLE_NAME + " k, Library_Kit lk " + "WHERE lk.kits_kitId=k.kitId " + "AND lk.libraries_libraryId=?";
 
-  public static final String KIT_UPDATE =
-          "UPDATE "+TABLE_NAME+" " +
-          "SET identificationBarcode=:identificationBarcode, locationBarcode=:locationBarcode, lotNumber=:lotNumber, kitDate=:kitDate, kitDescriptorId=:kitDescriptorId " +
-          "WHERE kitId=:kitId";
+  public static final String KIT_UPDATE = "UPDATE "
+      + TABLE_NAME
+      + " "
+      + "SET identificationBarcode=:identificationBarcode, locationBarcode=:locationBarcode, lotNumber=:lotNumber, kitDate=:kitDate, kitDescriptorId=:kitDescriptorId "
+      + "WHERE kitId=:kitId";
 
-  public static final String KIT_DESCRIPTORS_SELECT =
-          "SELECT kitDescriptorId, name, version, manufacturer, partNumber, stockLevel, kitType, platformType " +
-          "FROM KitDescriptor";
+  public static final String KIT_DESCRIPTORS_SELECT = "SELECT kitDescriptorId, name, version, manufacturer, partNumber, stockLevel, kitType, platformType "
+      + "FROM KitDescriptor";
 
-  public static final String KIT_DESCRIPTOR_SELECT_BY_ID =
-          KIT_DESCRIPTORS_SELECT + " WHERE kitDescriptorId=?";
+  public static final String KIT_DESCRIPTOR_SELECT_BY_ID = KIT_DESCRIPTORS_SELECT + " WHERE kitDescriptorId=?";
 
-  public static final String KIT_DESCRIPTOR_SELECT_BY_PART_NUMBER =
-          KIT_DESCRIPTORS_SELECT + " WHERE partNumber=?";  
+  public static final String KIT_DESCRIPTOR_SELECT_BY_PART_NUMBER = KIT_DESCRIPTORS_SELECT + " WHERE partNumber=?";
 
-  public static final String KIT_DESCRIPTORS_SELECT_BY_TYPE =
-          KIT_DESCRIPTORS_SELECT + " WHERE kitType = ?";
+  public static final String KIT_DESCRIPTORS_SELECT_BY_TYPE = KIT_DESCRIPTORS_SELECT + " WHERE kitType = ?";
 
-  public static final String KIT_DESCRIPTORS_SELECT_BY_PLATFORM =
-          KIT_DESCRIPTORS_SELECT + " WHERE platformType = ?";
+  public static final String KIT_DESCRIPTORS_SELECT_BY_PLATFORM = KIT_DESCRIPTORS_SELECT + " WHERE platformType = ?";
 
-  public static final String KIT_DESCRIPTOR_UPDATE =
-          "UPDATE KitDescriptor " +
-          "SET name=:name, version=:version, manufacturer=:manufacturer, partNumber=:partNumber, stockLevel=:stockLevel, kitType=:kitType, platformType=:platformType " +
-          "WHERE kitDescriptorId=:kitDescriptorId";  
+  public static final String KIT_DESCRIPTOR_UPDATE = "UPDATE KitDescriptor "
+      + "SET name=:name, version=:version, manufacturer=:manufacturer, partNumber=:partNumber, stockLevel=:stockLevel, kitType=:kitType, platformType=:platformType "
+      + "WHERE kitDescriptorId=:kitDescriptorId";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLKitDAO.class);
   private JdbcTemplate template;
@@ -166,7 +145,7 @@ public class SQLKitDAO implements KitStore {
   }
 
   public Kit get(long id) throws IOException {
-    List eResults = template.query(KIT_SELECT_BY_ID, new Object[]{id}, new KitMapper());
+    List eResults = template.query(KIT_SELECT_BY_ID, new Object[] { id }, new KitMapper());
     return eResults.size() > 0 ? (Kit) eResults.get(0) : null;
   }
 
@@ -176,12 +155,12 @@ public class SQLKitDAO implements KitStore {
   }
 
   public Kit getKitByIdentificationBarcode(String barcode) throws IOException {
-    List eResults = template.query(KIT_SELECT_BY_BARCODE, new Object[]{barcode}, new KitMapper());
+    List eResults = template.query(KIT_SELECT_BY_BARCODE, new Object[] { barcode }, new KitMapper());
     return eResults.size() > 0 ? (Kit) eResults.get(0) : null;
   }
 
   public Kit getKitByLotNumber(String lotNumber) throws IOException {
-    List eResults = template.query(KIT_SELECT_BY_LOT_NUMBER, new Object[]{lotNumber}, new KitMapper());
+    List eResults = template.query(KIT_SELECT_BY_LOT_NUMBER, new Object[] { lotNumber }, new KitMapper());
     return eResults.size() > 0 ? (Kit) eResults.get(0) : null;
   }
 
@@ -191,41 +170,36 @@ public class SQLKitDAO implements KitStore {
 
   @Override
   public int count() throws IOException {
-    return template.queryForInt("SELECT count(*) FROM "+TABLE_NAME);
+    return template.queryForInt("SELECT count(*) FROM " + TABLE_NAME);
   }
 
   public List<Kit> listByExperiment(long experimentId) throws IOException {
-    return template.query(KITS_SELECT_BY_RELATED_EXPERIMENT, new Object[]{experimentId}, new KitMapper());
+    return template.query(KITS_SELECT_BY_RELATED_EXPERIMENT, new Object[] { experimentId }, new KitMapper());
   }
 
   public List<Kit> listByLibrary(long libraryId) throws IOException {
-    return template.query(KITS_SELECT_BY_RELATED_LIBRARY, new Object[]{libraryId}, new KitMapper());
+    return template.query(KITS_SELECT_BY_RELATED_LIBRARY, new Object[] { libraryId }, new KitMapper());
   }
 
   public List<Kit> listByManufacturer(String manufacturerName) throws IOException {
-    return template.query(KITS_SELECT_BY_MANUFACTURER, new Object[]{manufacturerName}, new KitMapper());
+    return template.query(KITS_SELECT_BY_MANUFACTURER, new Object[] { manufacturerName }, new KitMapper());
   }
 
   public List<Kit> listKitsByType(KitType kitType) throws IOException {
-    return template.query(KITS_SELECT_BY_TYPE, new Object[]{kitType.getKey()}, new KitMapper());
+    return template.query(KITS_SELECT_BY_TYPE, new Object[] { kitType.getKey() }, new KitMapper());
   }
 
   public long save(Kit kit) throws IOException {
     MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("identificationBarcode", kit.getIdentificationBarcode())
-            .addValue("locationBarcode", kit.getLocationBarcode())
-            .addValue("lotNumber", kit.getLotNumber())
-            .addValue("kitDate", kit.getKitDate())
-            .addValue("kitDescriptorId", kit.getKitDescriptor().getKitDescriptorId());
+    params.addValue("identificationBarcode", kit.getIdentificationBarcode()).addValue("locationBarcode", kit.getLocationBarcode())
+        .addValue("lotNumber", kit.getLotNumber()).addValue("kitDate", kit.getKitDate())
+        .addValue("kitDescriptorId", kit.getKitDescriptor().getKitDescriptorId());
 
     if (kit.getId() == AbstractKit.UNSAVED_ID) {
-      SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-                            .withTableName(TABLE_NAME)
-                            .usingGeneratedKeyColumns("kitId");
+      SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("kitId");
       Number newId = insert.executeAndReturnKey(params);
       kit.setId(newId.longValue());
-    }
-    else {
+    } else {
       params.addValue("kitId", kit.getId());
       NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
       namedTemplate.update(KIT_UPDATE, params);
@@ -257,7 +231,7 @@ public class SQLKitDAO implements KitStore {
         Element element;
         if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
           log.debug("Cache hit on map for Kit " + id);
-          return (Kit)element.getObjectValue();
+          return (Kit) element.getObjectValue();
         }
       }
       Kit kit = null;
@@ -268,21 +242,16 @@ public class SQLKitDAO implements KitStore {
 
         if (kitType.equals(KitType.CLUSTERING)) {
           kit = new ClusterKit();
-        }
-        else if (kitType.equals(KitType.EMPCR)) {
+        } else if (kitType.equals(KitType.EMPCR)) {
           kit = new EmPcrKit();
-        }
-        else if (kitType.equals(KitType.LIBRARY)) {
+        } else if (kitType.equals(KitType.LIBRARY)) {
           kit = new LibraryKit();
-        }
-        else if (kitType.equals(KitType.MULTIPLEXING)) {
+        } else if (kitType.equals(KitType.MULTIPLEXING)) {
           kit = new MultiplexingKit();
-        }
-        else if (kitType.equals(KitType.SEQUENCING)) {
+        } else if (kitType.equals(KitType.SEQUENCING)) {
           kit = new SequencingKit();
-        }
-        else {
-          throw new SQLException("Unsupported KitType: "+kitType.getKey());
+        } else {
+          throw new SQLException("Unsupported KitType: " + kitType.getKey());
         }
 
         kit.setId(id);
@@ -292,8 +261,7 @@ public class SQLKitDAO implements KitStore {
         kit.setKitDate(rs.getDate("kitDate"));
         kit.setKitDescriptor(kd);
         kit.setNotes(noteDAO.listByKit(rs.getLong("kitId")));
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
         e.printStackTrace();
       }
       return kit;
@@ -301,47 +269,40 @@ public class SQLKitDAO implements KitStore {
   }
 
   public KitDescriptor getKitDescriptorById(long id) throws IOException {
-    List eResults = template.query(KIT_DESCRIPTOR_SELECT_BY_ID, new Object[]{id}, new KitDescriptorMapper());
+    List eResults = template.query(KIT_DESCRIPTOR_SELECT_BY_ID, new Object[] { id }, new KitDescriptorMapper());
     return eResults.size() > 0 ? (KitDescriptor) eResults.get(0) : null;
   }
 
   public KitDescriptor getKitDescriptorByPartNumber(String partNumber) throws IOException {
-    List eResults = template.query(KIT_DESCRIPTOR_SELECT_BY_PART_NUMBER, new Object[]{partNumber}, new KitDescriptorMapper());
+    List eResults = template.query(KIT_DESCRIPTOR_SELECT_BY_PART_NUMBER, new Object[] { partNumber }, new KitDescriptorMapper());
     return eResults.size() > 0 ? (KitDescriptor) eResults.get(0) : null;
   }
 
   public List<KitDescriptor> listAllKitDescriptors() throws IOException {
     return template.query(KIT_DESCRIPTORS_SELECT, new KitDescriptorMapper());
   }
-  
+
   public List<KitDescriptor> listKitDescriptorsByType(KitType kitType) throws IOException {
-    return template.query(KIT_DESCRIPTORS_SELECT_BY_TYPE, new Object[]{kitType.getKey()}, new KitDescriptorMapper());
+    return template.query(KIT_DESCRIPTORS_SELECT_BY_TYPE, new Object[] { kitType.getKey() }, new KitDescriptorMapper());
   }
 
   public List<KitDescriptor> listKitDescriptorsByPlatform(PlatformType platformType) throws IOException {
-    return template.query(KIT_DESCRIPTORS_SELECT_BY_PLATFORM, new Object[]{platformType}, new KitDescriptorMapper());
+    return template.query(KIT_DESCRIPTORS_SELECT_BY_PLATFORM, new Object[] { platformType }, new KitDescriptorMapper());
   }
-  
+
   public long saveKitDescriptor(KitDescriptor kd) throws IOException {
-    //log.info("Saving " + kd.toString() + " : " + kd.getKitType() + " : " + kd.getPlatformType());
+    // log.info("Saving " + kd.toString() + " : " + kd.getKitType() + " : " + kd.getPlatformType());
     MapSqlParameterSource params = new MapSqlParameterSource();
 
-    params.addValue("name", kd.getName())
-            .addValue("version", kd.getVersion())
-            .addValue("manufacturer", kd.getManufacturer())
-            .addValue("partNumber", kd.getPartNumber())
-            .addValue("stockLevel", kd.getStockLevel())
-            .addValue("kitType", kd.getKitType().getKey())
-            .addValue("platformType", kd.getPlatformType().getKey());
+    params.addValue("name", kd.getName()).addValue("version", kd.getVersion()).addValue("manufacturer", kd.getManufacturer())
+        .addValue("partNumber", kd.getPartNumber()).addValue("stockLevel", kd.getStockLevel())
+        .addValue("kitType", kd.getKitType().getKey()).addValue("platformType", kd.getPlatformType().getKey());
 
     if (kd.getKitDescriptorId() == KitDescriptor.UNSAVED_ID) {
-      SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-                            .withTableName("KitDescriptor")
-                            .usingGeneratedKeyColumns("kitDescriptorId");
+      SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName("KitDescriptor").usingGeneratedKeyColumns("kitDescriptorId");
       Number newId = insert.executeAndReturnKey(params);
       kd.setKitDescriptorId(newId.longValue());
-    }
-    else {
+    } else {
       params.addValue("kitDescriptorId", kd.getKitDescriptorId());
       NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
       namedTemplate.update(KIT_DESCRIPTOR_UPDATE, params);
@@ -359,14 +320,14 @@ public class SQLKitDAO implements KitStore {
       kd.setManufacturer(rs.getString("manufacturer"));
       kd.setPartNumber(rs.getString("partNumber"));
       kd.setStockLevel(rs.getInt("stockLevel"));
-      
+
       kd.setKitType(KitType.get(rs.getString("kitType")));
 
-      //log.info("Set kit type for descriptor " + kd.getKitDescriptorId() + " to " + kd.getKitType());
+      // log.info("Set kit type for descriptor " + kd.getKitDescriptorId() + " to " + kd.getKitType());
 
       kd.setPlatformType(PlatformType.get(rs.getString("platformType")));
-      
-      //log.info("Set platform type for descriptor " + kd.getKitDescriptorId() + " to " + kd.getPlatformType());
+
+      // log.info("Set platform type for descriptor " + kd.getKitDescriptorId() + " to " + kd.getPlatformType());
       return kd;
     }
   }

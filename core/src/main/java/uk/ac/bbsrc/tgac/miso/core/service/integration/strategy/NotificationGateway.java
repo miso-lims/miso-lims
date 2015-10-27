@@ -27,9 +27,9 @@ import org.springframework.integration.Message;
 import org.springframework.integration.annotation.Gateway;
 
 /**
- * An interface that defines how a Spring Integration {@link Message} can be consumed with parameters mapped via
- * a {@link Gateway}, with the Message payload T being typed by implementations of this class.
- *
+ * An interface that defines how a Spring Integration {@link Message} can be consumed with parameters mapped via a {@link Gateway}, with the
+ * Message payload T being typed by implementations of this class.
+ * 
  * @author Rob Davey
  * @date 03-Feb-2012
  * @since 0.1.5
@@ -37,6 +37,7 @@ import org.springframework.integration.annotation.Gateway;
 public interface NotificationGateway<T> {
   /**
    * Consume the given {@link Message} and have the parameters mapped via the {@link Gateway}
+   * 
    * @param m
    */
   @Gateway

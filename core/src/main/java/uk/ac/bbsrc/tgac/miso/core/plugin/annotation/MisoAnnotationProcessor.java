@@ -40,69 +40,54 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * A processor for MISO annotations.  You should use this processor
- * when compiling MISO tools, as it extracts metadata encapsulated in
- * annotations to tool configuration files which can then be read by consumers
- * of these tools.
- *
+ * A processor for MISO annotations. You should use this processor when compiling MISO tools, as it extracts metadata encapsulated in
+ * annotations to tool configuration files which can then be read by consumers of these tools.
+ * 
  * @author Tony Burdett
  * @author Rob Davey
  * @date 20-Jul-2010
  * @since 0.0.2
  */
 public class MisoAnnotationProcessor extends AbstractProcessor {
-  public boolean process(Set<? extends TypeElement> typeElements,
-                         RoundEnvironment roundEnv) {
+  public boolean process(Set<? extends TypeElement> typeElements, RoundEnvironment roundEnv) {
     PrintWriter writer = null;
     try {
       // collection of captured classes
-      final Set<TypeElement> misoElements =
-          new HashSet<TypeElement>();
+      final Set<TypeElement> misoElements = new HashSet<TypeElement>();
 
       // check everything annotated with @MisoParameter annotations -
       // we can only really apply this to String params
-      for (Element element : roundEnv.getElementsAnnotatedWith(
-          MisoParameter.class)) {
+      for (Element element : roundEnv.getElementsAnnotatedWith(MisoParameter.class)) {
         if (!(element.asType().toString().equals(String.class.getName()))) {
           processingEnv.getMessager().printMessage(
               Diagnostic.Kind.ERROR,
-              "@MisoParameter annotations can only be applied to " +
-                  String.class.getName() + " arguments (not " +
-                  element.asType().toString() + " '" +
-                  element.getSimpleName() + "')",
-              element);
+              "@MisoParameter annotations can only be applied to " + String.class.getName() + " arguments (not "
+                  + element.asType().toString() + " '" + element.getSimpleName() + "')", element);
         }
       }
 
       // check all elements annotated with @MisoPlugin
-      for (Element element : roundEnv
-          .getElementsAnnotatedWith(MisoPlugin.class)) {
-        ElementVisitor<Void, Void> visitor =
-            new SimpleElementVisitor6<Void, Void>() {
-              public Void visitType(TypeElement element, Void aVoid) {
-                // check this type is a class
-                if (element.getKind().isClass()) {
-                  // this class is annotated with @MisoPlugin, write out an entry
-                  misoElements.add(element);
-                }
+      for (Element element : roundEnv.getElementsAnnotatedWith(MisoPlugin.class)) {
+        ElementVisitor<Void, Void> visitor = new SimpleElementVisitor6<Void, Void>() {
+          public Void visitType(TypeElement element, Void aVoid) {
+            // check this type is a class
+            if (element.getKind().isClass()) {
+              // this class is annotated with @MisoPlugin, write out an entry
+              misoElements.add(element);
+            }
 
-                return super.visitType(element, aVoid);
-              }
-            };
+            return super.visitType(element, aVoid);
+          }
+        };
         element.accept(visitor, null);
       }
 
       // now, iterate over all classes annotated with @MisoPlugin, and write to file
       if (misoElements.size() > 0) {
         // printwriter for writing list of MISO plugins
-        processingEnv.getMessager().printMessage(
-            Diagnostic.Kind.NOTE,
-            "Generating services for MISO plugins");
+        processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "Generating services for MISO plugins");
 
-        FileObject fo = processingEnv.getFiler().createResource(
-            StandardLocation.CLASS_OUTPUT,
-            "",
-            "META-INF/miso/plugins");
+        FileObject fo = processingEnv.getFiler().createResource(StandardLocation.CLASS_OUTPUT, "", "META-INF/miso/plugins");
 
         Writer w = fo.openWriter();
         writer = new PrintWriter(w);
@@ -113,14 +98,10 @@ public class MisoAnnotationProcessor extends AbstractProcessor {
       }
 
       return true;
-    }
-    catch (IOException e) {
-      processingEnv.getMessager().printMessage(
-          Diagnostic.Kind.ERROR,
-          "Problem creating META-INF/miso/plugins file");
+    } catch (IOException e) {
+      processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "Problem creating META-INF/miso/plugins file");
       return false;
-    }
-    finally {
+    } finally {
       if (writer != null) {
         writer.close();
       }

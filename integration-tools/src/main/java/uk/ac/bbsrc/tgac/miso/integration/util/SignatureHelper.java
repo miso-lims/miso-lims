@@ -23,14 +23,24 @@
 
 package uk.ac.bbsrc.tgac.miso.integration.util;
 
-import java.security.*;
+import java.security.InvalidKeyException;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.Signature;
+import java.security.SignatureException;
 import java.security.spec.EncodedKeySpec;
 import java.security.spec.PKCS8EncodedKeySpec;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
@@ -40,7 +50,7 @@ import org.slf4j.LoggerFactory;
  * uk.ac.bbsrc.tgac.miso.webapp.context
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 09/02/12
  * @since 0.1.6
@@ -57,9 +67,7 @@ public class SignatureHelper {
   public static final String SIGNATURE_HEADER = "x-signature";
   public static final String URL_X_HEADER = "x-url";
 
-  public static final List<String> SIGNATURE_KEYWORDS = Arrays.asList(USER_HEADER,
-                                                                      TIMESTAMP_HEADER,
-                                                                      URL_X_HEADER);
+  public static final List<String> SIGNATURE_KEYWORDS = Arrays.asList(USER_HEADER, TIMESTAMP_HEADER, URL_X_HEADER);
   private static final String DSA_ALGORITHM = "DSA";
   private static final String HMAC_SHA1_ALGORITHM = "HmacSHA1";
 
@@ -115,24 +123,18 @@ public class SignatureHelper {
     }
 
     /*
-    TODO - put parameters back in - sign SI message payload?
-    // load parameters
-    for (Object key : request.getParameterMap().keySet()) {
-      log.debug("FOUND PARAMETER: " + (String)key);
-      String[] o = (String[]) request.getParameterMap().get(key);
-      headersAndParams.put((String) key, o[0]);
-    }
-    */
+     * TODO - put parameters back in - sign SI message payload? // load parameters for (Object key : request.getParameterMap().keySet()) {
+     * log.debug("FOUND PARAMETER: " + (String)key); String[] o = (String[]) request.getParameterMap().get(key);
+     * headersAndParams.put((String) key, o[0]); }
+     */
 
-    return createSortedUrl(
-            request.getContextPath() + request.getServletPath() + request.getPathInfo(),
-            headersAndParams);
+    return createSortedUrl(request.getContextPath() + request.getServletPath() + request.getPathInfo(), headersAndParams);
   }
 
   public static String calculateHMAC(String data, String key) throws java.security.SignatureException {
     String result;
     try {
-      //get an hmac_sha1 key from the raw key bytes
+      // get an hmac_sha1 key from the raw key bytes
       SecretKeySpec signingKey = new SecretKeySpec(key.getBytes(), HMAC_SHA1_ALGORITHM);
 
       // get an hmac_sha1 Mac instance and initialize with the signing key
@@ -144,9 +146,8 @@ public class SignatureHelper {
 
       // base64-encode the hmac
       result = Base64.encodeBase64URLSafeString(rawHmac);
-      //result = Base64.encodeBase64String(rawHmac);
-    }
-    catch (Exception e) {
+      // result = Base64.encodeBase64String(rawHmac);
+    } catch (Exception e) {
       throw new SignatureException("Failed to generate HMAC : " + e.getMessage());
     }
     return result;
@@ -156,7 +157,7 @@ public class SignatureHelper {
   private static PublicKey decodePublicKey(String publicKey) throws Exception {
     KeyFactory keyFactory = KeyFactory.getInstance(DSA_ALGORITHM);
     byte[] publicKeyBytes = Base64.decodeBase64(publicKey);
-    //EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(publicKeyBytes);
+    // EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(publicKeyBytes);
     EncodedKeySpec publicKeySpec = new PKCS8EncodedKeySpec(publicKeyBytes);
     return keyFactory.generatePublic(publicKeySpec);
   }
@@ -173,14 +174,14 @@ public class SignatureHelper {
     signature.update(url.getBytes());
     try {
       return signature.verify(Base64.decodeBase64(signatureString));
-    }
-    catch (SignatureException e) {
+    } catch (SignatureException e) {
       log.error("FAILED TO VERIFY SIGNATURE: " + signature.toString());
       return false;
     }
   }
 
-  public static boolean validateSignature(HttpServletRequest request, String publicKey, String signature) throws InvalidKeyException, Exception {
+  public static boolean validateSignature(HttpServletRequest request, String publicKey, String signature) throws InvalidKeyException,
+      Exception {
     if (request == null || signature == null || publicKey == null) {
       throw new InvalidKeyException("Cannot verify signature when request or signature are null!");
     }

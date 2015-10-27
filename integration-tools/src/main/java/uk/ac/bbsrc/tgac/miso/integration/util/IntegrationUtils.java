@@ -35,7 +35,7 @@ import java.util.zip.GZIPOutputStream;
  * uk.ac.bbsrc.tgac.miso.integration.util
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 04/11/11
  * @since 0.1.3
@@ -43,29 +43,34 @@ import java.util.zip.GZIPOutputStream;
 public class IntegrationUtils {
   /**
    * Sets up the socket connection to a given host
-   *
-   * @param host of type String
-   * @param port of type int
+   * 
+   * @param host
+   *          of type String
+   * @param port
+   *          of type int
    * @return Socket
-   * @throws IntegrationException when the socket couldn't be created
+   * @throws IntegrationException
+   *           when the socket couldn't be created
    */
   public static Socket prepareSocket(String host, int port) throws IntegrationException {
     try {
       return new Socket(host, port);
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
-      throw new IntegrationException("Cannot connect to "+host+":"+port+". Cause: "+e.getMessage());
+      throw new IntegrationException("Cannot connect to " + host + ":" + port + ". Cause: " + e.getMessage());
     }
   }
 
   /**
    * Sends a String message to a given host socket
-   *
-   * @param socket of type Socket
-   * @param query of type String
+   * 
+   * @param socket
+   *          of type Socket
+   * @param query
+   *          of type String
    * @return String
-   * @throws IntegrationException when the socket couldn't be created
+   * @throws IntegrationException
+   *           when the socket couldn't be created
    */
   public static String sendMessage(Socket socket, String query) throws IntegrationException {
     BufferedWriter wr = null;
@@ -74,7 +79,7 @@ public class IntegrationUtils {
       wr = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF8"));
 
       // Send data
-      wr.write(query+"\r\n");
+      wr.write(query + "\r\n");
       wr.flush();
 
       // Get response
@@ -90,31 +95,24 @@ public class IntegrationUtils {
       String dirty = sb.toString();
       StringBuilder response = new StringBuilder();
       int codePoint;
-      int i=0;
-      while(i<dirty.length()) {
-          codePoint = dirty.codePointAt(i);
-          if ((codePoint == 0x9) ||
-              (codePoint == 0xA) ||
-              (codePoint == 0xD) ||
-              ((codePoint >= 0x20) && (codePoint <= 0xD7FF)) ||
-              ((codePoint >= 0xE000) && (codePoint <= 0xFFFD)) ||
-              ((codePoint >= 0x10000) && (codePoint <= 0x10FFFF))) {
-              response.append(Character.toChars(codePoint));
-          }
-          i+= Character.charCount(codePoint);
+      int i = 0;
+      while (i < dirty.length()) {
+        codePoint = dirty.codePointAt(i);
+        if ((codePoint == 0x9) || (codePoint == 0xA) || (codePoint == 0xD) || ((codePoint >= 0x20) && (codePoint <= 0xD7FF))
+            || ((codePoint >= 0xE000) && (codePoint <= 0xFFFD)) || ((codePoint >= 0x10000) && (codePoint <= 0x10FFFF))) {
+          response.append(Character.toChars(codePoint));
+        }
+        i += Character.charCount(codePoint);
       }
 
       return response.toString().replace("\\\n", "").replace("\\\t", "");
-    }
-    catch (UnknownHostException e) {
+    } catch (UnknownHostException e) {
       System.err.println("Cannot resolve host: " + socket.getInetAddress());
       throw new IntegrationException(e.getMessage());
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       System.err.println("Couldn't get I/O for the connection to: " + socket.getInetAddress());
       throw new IntegrationException(e.getMessage());
-    }
-    finally {
+    } finally {
       try {
         if (wr != null) {
           wr.close();
@@ -140,7 +138,7 @@ public class IntegrationUtils {
   public static byte[] decompress(byte[] contentBytes) throws IOException {
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     GZIPInputStream bis = new GZIPInputStream(new Base64InputStream(new ByteArrayInputStream(contentBytes)));
-    byte[] buffer = new byte[1024*4];
+    byte[] buffer = new byte[1024 * 4];
     int n = 0;
     while (-1 != (n = bis.read(buffer))) {
       out.write(buffer, 0, n);

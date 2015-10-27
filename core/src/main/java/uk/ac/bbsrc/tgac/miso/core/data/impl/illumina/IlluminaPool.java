@@ -34,7 +34,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
  * uk.ac.bbsrc.tgac.miso.core.data.impl.illumina
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */

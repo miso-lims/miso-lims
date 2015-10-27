@@ -23,18 +23,18 @@
 
 package uk.ac.bbsrc.tgac.miso.core.service.submission;
 
+import java.io.File;
+import java.util.Set;
+
 import net.sourceforge.fluxion.spi.Spi;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.SubmissionException;
 
-import java.io.File;
-import java.util.Set;
-
 /**
  * An interface that defines a TransferMethod object that can submit data files to a service defined by an endpoint
- *
+ * 
  * @author Antony Colles
  * @since 0.1.6
  */
@@ -42,7 +42,7 @@ import java.util.Set;
 public interface FilePathGenerator {
   /**
    * Generates file Paths for sequence datafiles
-   *
+   * 
    * @param partition
    * @param dilution
    * @return Object response

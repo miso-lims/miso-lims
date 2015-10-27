@@ -10,7 +10,7 @@ import java.util.Set;
  * uk.ac.bbsrc.tgac.miso.core.data
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 22/10/13
  * @since 0.2.1-SNAPSHOT
@@ -68,7 +68,6 @@ public class EntityGroupImpl<T extends Nameable, S extends Nameable> implements 
 
   @Override
   public boolean isDeletable() {
-    return getId() != EntityGroupImpl.UNSAVED_ID &&
-           getEntities().isEmpty();
+    return getId() != EntityGroupImpl.UNSAVED_ID && getEntities().isEmpty();
   }
 }

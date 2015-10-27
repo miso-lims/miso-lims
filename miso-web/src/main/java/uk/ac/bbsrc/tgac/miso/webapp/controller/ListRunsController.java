@@ -49,7 +49,7 @@ import java.util.List;
  * com.eaglegenomics.miso.web
  * <p/>
  * TODO Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -72,12 +72,13 @@ public class ListRunsController {
   }
 
   @RequestMapping(value = "/runs/rest/", method = RequestMethod.GET)
-  public @ResponseBody Collection<Run> jsonRest() throws IOException {
+  public @ResponseBody
+  Collection<Run> jsonRest() throws IOException {
     return requestManager.listAllRuns();
   }
 
   @RequestMapping("/runs")
   public ModelAndView listRuns() throws Exception {
-      return new ModelAndView("/pages/listRuns.jsp");
+    return new ModelAndView("/pages/listRuns.jsp");
   }
 }

@@ -34,7 +34,7 @@ import java.io.Serializable;
  * uk.ac.bbsrc.tgac.miso.core.data.impl
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.3
  */
@@ -48,22 +48,22 @@ public class RunQCImpl extends AbstractRunQC implements Serializable {
 
   /**
    * Construct a new RunQC from a parent Run, checking that the given User can read that Run
-   *
-   * @param run of type Run
-   * @param user of type User
+   * 
+   * @param run
+   *          of type Run
+   * @param user
+   *          of type User
    */
   public RunQCImpl(Run run, User user) {
     if (run.userCanRead(user)) {
       try {
         setRun(run);
-      }
-      catch (MalformedRunException e) {
+      } catch (MalformedRunException e) {
         e.printStackTrace();
       }
-      //setSecurityProfile(experiment.getSecurityProfile());
-    }
-    else {
-      //setSecurityProfile(new SecurityProfile(user));
+      // setSecurityProfile(experiment.getSecurityProfile());
+    } else {
+      // setSecurityProfile(new SecurityProfile(user));
     }
   }
 

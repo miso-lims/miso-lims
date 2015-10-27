@@ -34,7 +34,7 @@ import java.io.Serializable;
  * uk.ac.bbsrc.tgac.miso.core.data.impl
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -51,8 +51,9 @@ public class emPCRDilution extends AbstractDilution implements Serializable {
 
   /**
    * Construct a new emPCRDilution with a SecurityProfile owned by the given User
-   *
-   * @param user of type User
+   * 
+   * @param user
+   *          of type User
    */
   public emPCRDilution(User user) {
     setSecurityProfile(new SecurityProfile(user));
@@ -64,7 +65,7 @@ public class emPCRDilution extends AbstractDilution implements Serializable {
 
   public void setEmPCR(emPCR emPCR) {
     this.emPCR = emPCR;
-  }  
+  }
 
   public Library getLibrary() {
     if (emPCR != null) {

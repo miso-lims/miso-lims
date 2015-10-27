@@ -12,25 +12,21 @@ import java.io.File;
 import java.io.UnsupportedEncodingException;
 
 /**
- * Created with IntelliJ IDEA.
- * User: bianx
- * Date: 09/05/2013
- * Time: 11:48
- * To change this template use File | Settings | File Templates.
+ * Created with IntelliJ IDEA. User: bianx Date: 09/05/2013 Time: 11:48 To change this template use File | Settings | File Templates.
  */
 @ServiceProvider
 public class BradyCustomMinus80TubeBarcodeLabelSchema implements BarcodableSchema<File, JSONObject> {
   private BarcodeLabelFactory<File, JSONObject, BarcodableSchema<File, JSONObject>> barcodeLabelFactory = new FileGeneratingBarcodeLabelFactory<JSONObject>();
 
-  public String getName(){
-    return  "bradyCustomMinus80TubeBarcodeLabelSchema";
+  public String getName() {
+    return "bradyCustomMinus80TubeBarcodeLabelSchema";
   }
 
   private JSONObject jsonObject;
 
   @Override
   public Class<JSONObject> isStateFor() {
-    return JSONObject.class;  //To change body of implemented methods use File | Settings | File Templates.
+    return JSONObject.class; // To change body of implemented methods use File | Settings | File Templates.
   }
 
   @Override
@@ -63,8 +59,7 @@ public class BradyCustomMinus80TubeBarcodeLabelSchema implements BarcodableSchem
         sb.append("B 2,6,0,DATAMATRIX,0.21;").append(barcode).append("\n");
         sb.append("B 13,1,0,DATAMATRIX+RECT,0.25;").append(barcode).append("\n");
         sb.append("T 29,2,0,5,pt4;[DATE]").append("\n");
-      }
-      else {
+      } else {
         sb.append("m m").append("\n");
         sb.append("J").append("\n");
         sb.append("S l1;0,0,12,15,38").append("\n");
@@ -72,7 +67,7 @@ public class BradyCustomMinus80TubeBarcodeLabelSchema implements BarcodableSchem
         sb.append("T 29,2,0,5,pt4;[DATE]").append("\n");
       }
 
-      //shorten alias to fit on label if too long
+      // shorten alias to fit on label if too long
       if (alias.length() >= 20) {
         alias = alias.substring(0, 18) + "...";
       }
@@ -80,8 +75,7 @@ public class BradyCustomMinus80TubeBarcodeLabelSchema implements BarcodableSchem
       sb.append("T 17,8,0,5,pt6;").append(LimsUtils.unicodeify(alias)).append("\n");
       sb.append("T 17,11,0,5,pt6;").append(LimsUtils.unicodeify(name)).append("\n");
       sb.append("A 1").append("\n");
-    }
-    catch (UnsupportedEncodingException e) {
+    } catch (UnsupportedEncodingException e) {
       e.printStackTrace();
     }
     return sb.toString();

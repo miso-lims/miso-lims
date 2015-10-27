@@ -23,18 +23,18 @@
 
 package uk.ac.bbsrc.tgac.miso.core.service.integration.ws.pacbio;
 
+import java.net.URI;
+
 import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-
-import java.net.URI;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.service.integration.ws.solid
  * <p/>
- * Wraps up a PacBioService so that, following construction, any exceptions can be caught when getting the underlying
- * PacBioService via getPacBioService(). Without this class, applications would exit following the non-propagatable
- * exception producing by a malfunctioning Service (e.g. unresolvable REST URL)
- *
+ * Wraps up a PacBioService so that, following construction, any exceptions can be caught when getting the underlying PacBioService via
+ * getPacBioService(). Without this class, applications would exit following the non-propagatable exception producing by a malfunctioning
+ * Service (e.g. unresolvable REST URL)
+ * 
  * @author Rob Davey
  * @date 11/04/12
  * @since 0.1.6
@@ -56,8 +56,7 @@ public class PacBioServiceWrapper {
   public PacBioService getPacBioService() throws InterrogationException {
     if (pacbioService != null) {
       return pacbioService;
-    }
-    else {
+    } else {
       throw new InterrogationException("Couldn't contact PacBio machine " + machineName + " at " + restLocation.toString());
     }
   }

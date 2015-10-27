@@ -38,26 +38,27 @@ import java.util.Date;
 
 /**
  * Interface describing an alert that can be raised, usually as a result of an {@link Event}
- *
+ * 
  * @author Rob Davey
  * @date 22-Sep-2011
  * @since 0.1.2
  */
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
-//@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
+// @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public interface Alert extends Comparable, Deletable {
   /**
    * Returns the alertId of this Alert object.
-   *
+   * 
    * @return Long alertId.
    */
   public Long getAlertId();
 
   /**
    * Sets the alertId of this Alert object.
-   *
-   * @param alertId Long.
+   * 
+   * @param alertId
+   *          Long.
    */
   public void setAlertId(Long alertId);
 

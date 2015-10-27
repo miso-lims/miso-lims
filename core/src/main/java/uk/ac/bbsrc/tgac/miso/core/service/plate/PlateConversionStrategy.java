@@ -29,11 +29,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.Plate;
 import java.util.List;
 
 /**
- * An interface that defines how to convert between Lists of {@link Plate} objects. This is usually employed when
- * moving from one Plate well configuration to another, e.g. between 4 96-well plates to a single 384-well plate.
- * Libraries are often in different wells, or pooled, upon Plate preparation, so a conversion is necessary to
- * track this change in placement.
- *
+ * An interface that defines how to convert between Lists of {@link Plate} objects. This is usually employed when moving from one Plate well
+ * configuration to another, e.g. between 4 96-well plates to a single 384-well plate. Libraries are often in different wells, or pooled,
+ * upon Plate preparation, so a conversion is necessary to track this change in placement.
+ * 
  * @author Rob Davey
  * @date 22/05/12
  * @since 0.1.6
@@ -42,6 +41,7 @@ import java.util.List;
 public interface PlateConversionStrategy<T extends Plate> {
   /**
    * Convert the List of {@link Plate} objects
+   * 
    * @param plates
    * @return the converted list of Plates
    */

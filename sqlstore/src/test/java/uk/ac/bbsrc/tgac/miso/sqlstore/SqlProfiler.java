@@ -12,7 +12,7 @@ import java.util.*;
  * uk.ac.bbsrc.tgac.miso.sqlstore
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 08/10/12
  * @since 0.1.9
@@ -42,7 +42,8 @@ public class SqlProfiler {
       }
     }
     sqlTiming.recordTiming(time);
-    System.out.println(pjp.getArgs()[0].toString() + " :: " + sqlTimings.get(pjp.getArgs()[0].toString()).getCumulativeExecutionTime()+"s");
+    System.out.println(pjp.getArgs()[0].toString() + " :: " + sqlTimings.get(pjp.getArgs()[0].toString()).getCumulativeExecutionTime()
+        + "s");
     return obj;
   }
 
@@ -52,18 +53,18 @@ public class SqlProfiler {
 
       public int compare(SqlTiming o1, SqlTiming o2) {
         switch (sort) {
-          case AVG_EXECUTION_TIME:
-            return Math.round(o1.getAvgExecutionTime() - o2.getAvgExecutionTime());
-          case CUMULATIVE_EXECUTION_TIME:
-            long diff = o1.getCumulativeExecutionTime() - o2.getCumulativeExecutionTime();
-            if (diff > 0l)
-              return 1;
-            else if (diff == 0)
-              return 0;
-            else
-              return -1;
-          case NUMBER_OF_EXECUTIONS:
-            return o1.getExecutionCount() - o2.getExecutionCount();
+        case AVG_EXECUTION_TIME:
+          return Math.round(o1.getAvgExecutionTime() - o2.getAvgExecutionTime());
+        case CUMULATIVE_EXECUTION_TIME:
+          long diff = o1.getCumulativeExecutionTime() - o2.getCumulativeExecutionTime();
+          if (diff > 0l)
+            return 1;
+          else if (diff == 0)
+            return 0;
+          else
+            return -1;
+        case NUMBER_OF_EXECUTIONS:
+          return o1.getExecutionCount() - o2.getExecutionCount();
         }
         return 0;
       }
@@ -72,7 +73,6 @@ public class SqlProfiler {
 
     return timings;
   }
-
 
   private class SqlTiming {
 
@@ -111,6 +111,3 @@ public class SqlProfiler {
     AVG_EXECUTION_TIME, CUMULATIVE_EXECUTION_TIME, NUMBER_OF_EXECUTIONS
   }
 }
-
-
-

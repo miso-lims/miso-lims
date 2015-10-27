@@ -58,7 +58,7 @@ import java.util.*;
  * uk.ac.bbsrc.tgac.miso.spring.ajax
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -117,8 +117,7 @@ public class ProjectControllerHelperService {
       project.getOverviews().add(overview);
       requestManager.saveProjectOverview(overview);
       requestManager.saveProject(project);
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError(e.getMessage());
     }
@@ -147,8 +146,7 @@ public class ProjectControllerHelperService {
       overview.getNotes().add(note);
       requestManager.saveProjectOverviewNote(overview, note);
       requestManager.saveProject(project);
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError(e.getMessage());
     }
@@ -168,12 +166,10 @@ public class ProjectControllerHelperService {
         requestManager.deleteNote(note);
         requestManager.saveProjectOverview(po);
         return JSONUtils.SimpleJSONResponse("OK");
-      }
-      else {
+      } else {
         return JSONUtils.SimpleJSONError("Project Overview does not have note " + noteId + ". Cannot remove");
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Cannot remove note: " + e.getMessage());
     }
@@ -186,8 +182,7 @@ public class ProjectControllerHelperService {
       overview.setLocked(false);
       requestManager.saveProjectOverview(overview);
       requestManager.saveProject(overview.getProject());
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError(e.getMessage());
     }
@@ -201,8 +196,7 @@ public class ProjectControllerHelperService {
       overview.setLocked(true);
       requestManager.saveProjectOverview(overview);
       requestManager.saveProject(overview.getProject());
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError(e.getMessage());
     }
@@ -220,12 +214,10 @@ public class ProjectControllerHelperService {
           issue = issueTrackerManager.getIssue(issueKey.getString("key"));
           if (issue != null) {
             issueList.add(issue);
-          }
-          else {
+          } else {
             errorList.add(issueKey.getString("key"));
           }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
           e.printStackTrace();
           errorList.add(issueKey.getString("key"));
         }
@@ -235,8 +227,7 @@ public class ProjectControllerHelperService {
       j.put("validIssues", JSONArray.fromObject(issueList));
       j.put("invalidIssues", JSONArray.fromObject(errorList));
       return j;
-    }
-    else {
+    } else {
       return JSONUtils.SimpleJSONError("No issue tracker manager available.");
     }
   }
@@ -261,13 +252,11 @@ public class ProjectControllerHelperService {
           }
         }
         return j;
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
         e.printStackTrace();
         return JSONUtils.SimpleJSONError(e.getMessage());
       }
-    }
-    else {
+    } else {
       return JSONUtils.SimpleJSONError("No issue tracker manager available.");
     }
   }
@@ -279,8 +268,7 @@ public class ProjectControllerHelperService {
         j.put(project.getProjectId(), checkOverviews(project.getProjectId()));
       }
       return j;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
@@ -292,8 +280,7 @@ public class ProjectControllerHelperService {
       Long projectId = json.getLong("projectId");
       j.put("response", checkOverviews(projectId));
       return j;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
@@ -315,8 +302,7 @@ public class ProjectControllerHelperService {
         sb.append("</tr>");
       }
       sb.append("</table>");
-    }
-    else {
+    } else {
       sb.append("No Overview");
     }
     return sb.toString();
@@ -327,19 +313,17 @@ public class ProjectControllerHelperService {
       JSONObject j = new JSONObject();
       JSONArray jsonArray = new JSONArray();
       for (Project project : requestManager.listAllProjects()) {
-        jsonArray.add("['" + project.getName() + "','" +
-                      project.getAlias() + "','" +
-                      project.getDescription() + "','" +
-                      project.getProgress().getKey() + "','" +
-//                      checkOverviews(project.getProjectId()) + "','" +
-                      project.getProjectId() + "','" +
-                      "<a href=\"/miso/project/" + project.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
+        jsonArray.add("['" + project.getName() + "','" + project.getAlias() + "','" + project.getDescription() + "','"
+            + project.getProgress().getKey() + "','"
+            +
+            // checkOverviews(project.getProjectId()) + "','" +
+            project.getProjectId() + "','" + "<a href=\"/miso/project/" + project.getId()
+            + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
 
       }
       j.put("projectsArray", jsonArray);
       return j;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
@@ -348,8 +332,7 @@ public class ProjectControllerHelperService {
   private String colorOverviewState(Boolean bool) {
     if (bool) {
       return " partitionOccupied";
-    }
-    else {
+    } else {
       return "";
     }
   }
@@ -367,12 +350,10 @@ public class ProjectControllerHelperService {
       }
       if (pass == samples.size()) {
         return "green";
-      }
-      else {
+      } else {
         return "yellow";
       }
-    }
-    else {
+    } else {
       return "gray";
     }
   }
@@ -388,12 +369,10 @@ public class ProjectControllerHelperService {
       }
       if (pass >= libs.size()) {
         return "green";
-      }
-      else {
+      } else {
         return "yellow";
       }
-    }
-    else {
+    } else {
       return "gray";
     }
   }
@@ -410,16 +389,13 @@ public class ProjectControllerHelperService {
 
       if (pass == runs.size()) {
         return "green";
-      }
-      else {
+      } else {
         return "yellow";
       }
-    }
-    else {
+    } else {
       return "gray";
     }
   }
-
 
   public JSONObject editProjectTrafficLight(HttpSession session, JSONObject json) {
     Long projectId = json.getLong("projectId");
@@ -429,22 +405,15 @@ public class ProjectControllerHelperService {
       String trafLib = checkLibraries(projectId);
       String trafRun = checkRuns(projectId);
 
-      b.append("<div id=\"projectstatustrafficlight\">\n" +
-               "        <table class=\"traf\">\n" +
-               "<thead><tr><th width=\"33%\">Samples</th><th width=\"33%\">Libraries</th><th width=\"33%\">Runs</th></tr></thead>" +
-               "            <tbody>\n" +
-               "            <tr>\n" +
-               "                <td width=\"33%\"><img src=\"/styles/images/status/" + trafSample + ".png\"/></td>\n" +
-               "                <td width=\"33%\"><img src=\"/styles/images/status/" + trafLib + ".png\"/></td>\n" +
-               "                <td width=\"33%\"><img src=\"/styles/images/status/" + trafRun + ".png\"/></td>\n" +
-               "            </tr>\n" +
-               "            </tbody>\n" +
-               "        </table>\n" +
-               "</div>");
+      b.append("<div id=\"projectstatustrafficlight\">\n" + "        <table class=\"traf\">\n"
+          + "<thead><tr><th width=\"33%\">Samples</th><th width=\"33%\">Libraries</th><th width=\"33%\">Runs</th></tr></thead>"
+          + "            <tbody>\n" + "            <tr>\n" + "                <td width=\"33%\"><img src=\"/styles/images/status/"
+          + trafSample + ".png\"/></td>\n" + "                <td width=\"33%\"><img src=\"/styles/images/status/" + trafLib
+          + ".png\"/></td>\n" + "                <td width=\"33%\"><img src=\"/styles/images/status/" + trafRun + ".png\"/></td>\n"
+          + "            </tr>\n" + "            </tbody>\n" + "        </table>\n" + "</div>");
 
       return JSONUtils.JSONObjectResponse("html", b.toString());
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
@@ -465,19 +434,18 @@ public class ProjectControllerHelperService {
         Collection<MisoPrintService> services = printManager.listPrintServicesByBarcodeableClass(Sample.class);
         if (services.size() == 1) {
           mps = services.iterator().next();
+        } else {
+          return JSONUtils
+              .SimpleJSONError("No serviceName specified, but more than one available service able to print this barcode type.");
         }
-        else {
-          return JSONUtils.SimpleJSONError("No serviceName specified, but more than one available service able to print this barcode type.");
-        }
-      }
-      else {
+      } else {
         mps = printManager.getPrintService(serviceName);
       }
 
       Queue<File> thingsToPrint = new LinkedList<File>();
       Collection<Sample> samples = requestManager.listAllSamplesByProjectId(projectId);
       for (Sample sample : samples) {
-        //autosave the barcode if none has been previously generated
+        // autosave the barcode if none has been previously generated
         if (sample.getIdentificationBarcode() == null || "".equals(sample.getIdentificationBarcode())) {
           requestManager.saveSample(sample);
         }
@@ -486,12 +454,10 @@ public class ProjectControllerHelperService {
       }
       PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
       return JSONUtils.SimpleJSONResponse("Job " + pj.getJobId() + " : Barcodes printed.");
-    }
-    catch (MisoPrintException e) {
+    } catch (MisoPrintException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
     }
@@ -512,12 +478,11 @@ public class ProjectControllerHelperService {
         Collection<MisoPrintService> services = printManager.listPrintServicesByBarcodeableClass(Sample.class);
         if (services.size() == 1) {
           mps = services.iterator().next();
+        } else {
+          return JSONUtils
+              .SimpleJSONError("No serviceName specified, but more than one available service able to print this barcode type.");
         }
-        else {
-          return JSONUtils.SimpleJSONError("No serviceName specified, but more than one available service able to print this barcode type.");
-        }
-      }
-      else {
+      } else {
         mps = printManager.getPrintService(serviceName);
       }
 
@@ -533,12 +498,10 @@ public class ProjectControllerHelperService {
       }
       PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
       return JSONUtils.SimpleJSONResponse("Job " + pj.getJobId() + " : Barcodes printed.");
-    }
-    catch (MisoPrintException e) {
+    } catch (MisoPrintException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
     }
@@ -559,19 +522,18 @@ public class ProjectControllerHelperService {
         Collection<MisoPrintService> services = printManager.listPrintServicesByBarcodeableClass(Library.class);
         if (services.size() == 1) {
           mps = services.iterator().next();
+        } else {
+          return JSONUtils
+              .SimpleJSONError("No serviceName specified, but more than one available service able to print this barcode type.");
         }
-        else {
-          return JSONUtils.SimpleJSONError("No serviceName specified, but more than one available service able to print this barcode type.");
-        }
-      }
-      else {
+      } else {
         mps = printManager.getPrintService(serviceName);
       }
 
       Queue<File> thingsToPrint = new LinkedList<File>();
       Collection<Library> libraries = requestManager.listAllLibrariesByProjectId(projectId);
       for (Library library : libraries) {
-        //autosave the barcode if none has been previously generated
+        // autosave the barcode if none has been previously generated
         if (library.getIdentificationBarcode() == null || "".equals(library.getIdentificationBarcode())) {
           requestManager.saveLibrary(library);
         }
@@ -580,12 +542,10 @@ public class ProjectControllerHelperService {
       }
       PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
       return JSONUtils.SimpleJSONResponse("Job " + pj.getJobId() + " : Barcodes printed.");
-    }
-    catch (MisoPrintException e) {
+    } catch (MisoPrintException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
     }
@@ -606,12 +566,11 @@ public class ProjectControllerHelperService {
         Collection<MisoPrintService> services = printManager.listPrintServicesByBarcodeableClass(Library.class);
         if (services.size() == 1) {
           mps = services.iterator().next();
+        } else {
+          return JSONUtils
+              .SimpleJSONError("No serviceName specified, but more than one available service able to print this barcode type.");
         }
-        else {
-          return JSONUtils.SimpleJSONError("No serviceName specified, but more than one available service able to print this barcode type.");
-        }
-      }
-      else {
+      } else {
         mps = printManager.getPrintService(serviceName);
       }
 
@@ -619,7 +578,7 @@ public class ProjectControllerHelperService {
       for (JSONObject p : (Iterable<JSONObject>) ss) {
         Long libraryId = p.getLong("libraryId");
         Library library = requestManager.getLibraryById(libraryId);
-        //autosave the barcode if none has been previously generated
+        // autosave the barcode if none has been previously generated
         if (library.getIdentificationBarcode() == null || "".equals(library.getIdentificationBarcode())) {
           requestManager.saveLibrary(library);
         }
@@ -628,12 +587,10 @@ public class ProjectControllerHelperService {
       }
       PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
       return JSONUtils.SimpleJSONResponse("Job " + pj.getJobId() + " : Barcodes printed.");
-    }
-    catch (MisoPrintException e) {
+    } catch (MisoPrintException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
     }
@@ -654,19 +611,18 @@ public class ProjectControllerHelperService {
         Collection<MisoPrintService> services = printManager.listPrintServicesByBarcodeableClass(Dilution.class);
         if (services.size() == 1) {
           mps = services.iterator().next();
+        } else {
+          return JSONUtils
+              .SimpleJSONError("No serviceName specified, but more than one available service able to print this barcode type.");
         }
-        else {
-          return JSONUtils.SimpleJSONError("No serviceName specified, but more than one available service able to print this barcode type.");
-        }
-      }
-      else {
+      } else {
         mps = printManager.getPrintService(serviceName);
       }
 
       Queue<File> thingsToPrint = new LinkedList<File>();
       Collection<LibraryDilution> libraryDilutions = requestManager.listAllLibraryDilutionsByProjectId(projectId);
       for (LibraryDilution libraryDilution : libraryDilutions) {
-        //autosave the barcode if none has been previously generated
+        // autosave the barcode if none has been previously generated
         if (libraryDilution.getIdentificationBarcode() == null || "".equals(libraryDilution.getIdentificationBarcode())) {
           requestManager.saveLibraryDilution(libraryDilution);
         }
@@ -675,12 +631,10 @@ public class ProjectControllerHelperService {
       }
       PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
       return JSONUtils.SimpleJSONResponse("Job " + pj.getJobId() + " : Barcodes printed.");
-    }
-    catch (MisoPrintException e) {
+    } catch (MisoPrintException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
     }
@@ -701,12 +655,11 @@ public class ProjectControllerHelperService {
         Collection<MisoPrintService> services = printManager.listPrintServicesByBarcodeableClass(Dilution.class);
         if (services.size() == 1) {
           mps = services.iterator().next();
+        } else {
+          return JSONUtils
+              .SimpleJSONError("No serviceName specified, but more than one available service able to print this barcode type.");
         }
-        else {
-          return JSONUtils.SimpleJSONError("No serviceName specified, but more than one available service able to print this barcode type.");
-        }
-      }
-      else {
+      } else {
         mps = printManager.getPrintService(serviceName);
       }
 
@@ -714,7 +667,7 @@ public class ProjectControllerHelperService {
       for (JSONObject p : (Iterable<JSONObject>) ss) {
         Long dilutionId = p.getLong("dilutionId");
         LibraryDilution libraryDilution = requestManager.getLibraryDilutionById(dilutionId);
-        //autosave the barcode if none has been previously generated
+        // autosave the barcode if none has been previously generated
         if (libraryDilution.getIdentificationBarcode() == null || "".equals(libraryDilution.getIdentificationBarcode())) {
           requestManager.saveLibraryDilution(libraryDilution);
         }
@@ -723,12 +676,10 @@ public class ProjectControllerHelperService {
       }
       PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
       return JSONUtils.SimpleJSONResponse("Job " + pj.getJobId() + " : Barcodes printed.");
-    }
-    catch (MisoPrintException e) {
+    } catch (MisoPrintException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
     }
@@ -736,8 +687,8 @@ public class ProjectControllerHelperService {
 
   public JSONObject generateSampleDeliveryForm(HttpSession session, JSONObject json) {
     Boolean plate = false;
-    if ("yes".equals(json.getString("plate"))){
-        plate = true;
+    if ("yes".equals(json.getString("plate"))) {
+      plate = true;
     }
     Long projectId = json.getLong("projectId");
     List<Sample> samples = new ArrayList<Sample>();
@@ -747,20 +698,16 @@ public class ProjectControllerHelperService {
         for (JSONObject j : (Iterable<JSONObject>) a) {
           samples.add(requestManager.getSampleById(j.getLong("sampleId")));
         }
-        File f = misoFileManager.getNewFile(
-                Project.class,
-                projectId.toString(),
-                "SampleInformationForm-" + LimsUtils.getCurrentDateAsString() + ".odt");
+        File f = misoFileManager.getNewFile(Project.class, projectId.toString(),
+            "SampleInformationForm-" + LimsUtils.getCurrentDateAsString() + ".odt");
 
         FormUtils.createSampleDeliveryForm(samples, f, plate);
         return JSONUtils.SimpleJSONResponse("" + f.getName().hashCode());
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
         e.printStackTrace();
         return JSONUtils.SimpleJSONError("Failed to create sample delivery form: " + e.getMessage());
       }
-    }
-    else {
+    } else {
       return JSONUtils.SimpleJSONError("No samples selected to generate delivery form");
     }
   }
@@ -770,19 +717,15 @@ public class ProjectControllerHelperService {
       Long projectId = json.getLong("projectId");
       String documentFormat = json.getString("documentFormat");
       try {
-        File f = misoFileManager.getNewFile(
-                Project.class,
-                projectId.toString(),
-                "BulkInputForm-" + LimsUtils.getCurrentDateAsString() + "." + documentFormat);
+        File f = misoFileManager.getNewFile(Project.class, projectId.toString(), "BulkInputForm-" + LimsUtils.getCurrentDateAsString()
+            + "." + documentFormat);
         FormUtils.createSampleInputSpreadsheet(requestManager.getProjectById(projectId).getSamples(), f);
         return JSONUtils.SimpleJSONResponse("" + f.getName().hashCode());
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
         e.printStackTrace();
         return JSONUtils.SimpleJSONError("Failed to get bulk input form: " + e.getMessage());
       }
-    }
-    else {
+    } else {
       return JSONUtils.SimpleJSONError("Missing project ID or document format supplied.");
     }
   }
@@ -806,7 +749,9 @@ public class ProjectControllerHelperService {
         Sample s = null;
         try {
           s = mapper.readValue(sam.toString(), SampleImpl.class);
-          sb.append("<a class=\"dashboardresult\" href=\"/miso/sample/" + s.getId() + "\"><div onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
+          sb.append("<a class=\"dashboardresult\" href=\"/miso/sample/"
+              + s.getId()
+              + "\"><div onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
           sb.append("Name: <b>" + s.getName() + "</b><br/>");
           sb.append("Alias: <b>" + s.getAlias() + "</b><br/>");
 
@@ -825,31 +770,23 @@ public class ProjectControllerHelperService {
           if (!pools.isEmpty()) {
             sb.append("Pools: <ul>");
             for (Pool p : pools) {
-              sb.append("<li>")
-                .append(p.getName())
-                .append(" (")
-                .append(p.getAlias())
-                .append(") - ")
-                .append(p.getDilutions().size())
-                .append(" dilutions<li>");
+              sb.append("<li>").append(p.getName()).append(" (").append(p.getAlias()).append(") - ").append(p.getDilutions().size())
+                  .append(" dilutions<li>");
             }
             sb.append("</ul><br/>");
           }
 
           sb.append("</div></a>");
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
           e.printStackTrace();
-        }
-        finally {
+        } finally {
           sb.append("</div>");
           session.removeAttribute("bulksamples");
         }
       }
 
       return JSONUtils.SimpleJSONResponse(sb.toString());
-    }
-    else {
+    } else {
       return JSONUtils.SimpleJSONError("Failed to get bulk input sheet from session.");
     }
   }
@@ -859,20 +796,16 @@ public class ProjectControllerHelperService {
       Long projectId = json.getLong("projectId");
       String documentFormat = json.getString("documentFormat");
       try {
-        File f = misoFileManager.getNewFile(
-                Project.class,
-                projectId.toString(),
-                "PlateInputForm-" + LimsUtils.getCurrentDateAsString() + "." + documentFormat);
-        //TODO select a single sample to base sheet on?
+        File f = misoFileManager.getNewFile(Project.class, projectId.toString(), "PlateInputForm-" + LimsUtils.getCurrentDateAsString()
+            + "." + documentFormat);
+        // TODO select a single sample to base sheet on?
         FormUtils.createPlateInputSpreadsheet(f);
         return JSONUtils.SimpleJSONResponse("" + f.getName().hashCode());
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
         e.printStackTrace();
         return JSONUtils.SimpleJSONError("Failed to get plate input form: " + e.getMessage());
       }
-    }
-    else {
+    } else {
       return JSONUtils.SimpleJSONError("Missing project ID or document format supplied.");
     }
   }
@@ -889,8 +822,7 @@ public class ProjectControllerHelperService {
         requestManager.saveProject(overview.getProject());
       }
       return JSONUtils.SimpleJSONResponse("OK");
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
     }
     return JSONUtils.SimpleJSONError("Unable to watch/unwatch overview");
@@ -909,12 +841,10 @@ public class ProjectControllerHelperService {
           requestManager.saveProject(overview.getProject());
         }
         return JSONUtils.SimpleJSONResponse("OK");
-      }
-      else {
+      } else {
         return JSONUtils.SimpleJSONError("Cannot unwatch an entity of which you are the owner.");
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
     }
     return JSONUtils.SimpleJSONError("Unable to watch/unwatch overview");
@@ -936,8 +866,7 @@ public class ProjectControllerHelperService {
       sb.append("</ul>");
       j.put("watchers", sb.toString());
       return j;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
     }
     return JSONUtils.SimpleJSONError("Unable to list watchers");
@@ -950,16 +879,12 @@ public class ProjectControllerHelperService {
       JSONObject j = new JSONObject();
       JSONArray jsonArray = new JSONArray();
       for (Sample sample : requestManager.listAllSamplesByProjectId(projectId)) {
-        jsonArray.add("{'id':'" + sample.getId() + "'," +
-                      "'name':'" + sample.getName() + "'," +
-                      "'alias':'"+sample.getAlias() + "'," +
-                      "'type':'"+sample.getSampleType() + "'," +
-                      "'description':'"+sample.getDescription() + "'}");
+        jsonArray.add("{'id':'" + sample.getId() + "'," + "'name':'" + sample.getName() + "'," + "'alias':'" + sample.getAlias() + "',"
+            + "'type':'" + sample.getSampleType() + "'," + "'description':'" + sample.getDescription() + "'}");
       }
       j.put("array", jsonArray);
       return j;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
@@ -976,8 +901,7 @@ public class ProjectControllerHelperService {
         for (JSONObject j : (Iterable<JSONObject>) a) {
           if (j.has("sampleId")) {
             samples.add(requestManager.getSampleById(j.getLong("sampleId")));
-          }
-          else {
+          } else {
             return JSONUtils.SimpleJSONError("Unable to add Sample Group: invalid sample set JSON has missing sampleId");
           }
         }
@@ -992,8 +916,7 @@ public class ProjectControllerHelperService {
       requestManager.saveProject(overview.getProject());
 
       return JSONUtils.SimpleJSONResponse("OK");
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Unable to add Sample Group: " + e.getMessage());
     }
@@ -1014,12 +937,10 @@ public class ProjectControllerHelperService {
               Sample s = requestManager.getSampleById(j.getLong("sampleId"));
               if (osg.getEntities().contains(s)) {
                 log.error("Sample group already contains " + s.getName());
-              }
-              else {
+              } else {
                 osg.addEntity(s);
               }
-            }
-            else {
+            } else {
               return JSONUtils.SimpleJSONError("Unable to add Sample Group: invalid sample set JSON has missing sampleId");
             }
           }
@@ -1030,8 +951,7 @@ public class ProjectControllerHelperService {
       requestManager.saveProject(overview.getProject());
 
       return JSONUtils.SimpleJSONResponse("OK");
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Unable to add Sample Group: " + e.getMessage());
     }

@@ -28,7 +28,7 @@ package uk.ac.bbsrc.tgac.miso.core.exception;
  * <p/>
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since version
  */
@@ -40,7 +40,7 @@ public class StatusException extends Exception {
   public StatusException(String s, Throwable cause) {
     super(s);
     if (cause != null) {
-        initCause(cause);
+      initCause(cause);
     }
   }
 }

@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
  * uk.ac.bbsrc.tgac.miso.core.service.naming
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 27/09/12
  * @since 0.1.8
@@ -32,10 +32,9 @@ public class AllowAnythingEntityNamingScheme<T extends Nameable> implements Miso
 
   public AllowAnythingEntityNamingScheme() {
     try {
-      type = (Class<T>)Class.forName("uk.ac.bbsrc.tgac.miso.core.data.Nameable");
+      type = (Class<T>) Class.forName("uk.ac.bbsrc.tgac.miso.core.data.Nameable");
       validationMap.put("name", Pattern.compile("(.*)"));
-    }
-    catch (ClassNotFoundException e) {
+    } catch (ClassNotFoundException e) {
       e.printStackTrace();
     }
   }
@@ -49,13 +48,13 @@ public class AllowAnythingEntityNamingScheme<T extends Nameable> implements Miso
   public void setValidationRegex(String fieldName, String regex) throws MisoNamingException {
     if (fieldCheck(fieldName)) {
       if (validationMap.get(fieldName) != null) {
-        log.warn("Setting validation regex from '" +validationMap.get(fieldName).pattern()+ "' to '"+regex+"'. This usually doesn't happen at " +
-                 "runtime unless a custom regex is specified at MISO startup!");
+        log.warn("Setting validation regex from '" + validationMap.get(fieldName).pattern() + "' to '" + regex
+            + "'. This usually doesn't happen at " + "runtime unless a custom regex is specified at MISO startup!");
         validationMap.put(fieldName, Pattern.compile(regex));
       }
-    }
-    else {
-      throw new MisoNamingException("Cannot set validation regex for a field (via 'get"+ LimsUtils.capitalise(fieldName)+"') that doesn't exist in " + namingSchemeFor().getCanonicalName());
+    } else {
+      throw new MisoNamingException("Cannot set validation regex for a field (via 'get" + LimsUtils.capitalise(fieldName)
+          + "') that doesn't exist in " + namingSchemeFor().getCanonicalName());
     }
   }
 
@@ -80,14 +79,13 @@ public class AllowAnythingEntityNamingScheme<T extends Nameable> implements Miso
       String customName = lng.generateName(o);
       if (validateField(fieldName, customName)) {
         return customName;
+      } else {
+        throw new MisoNamingException("Custom naming generator '" + lng.getGeneratorName() + "' supplied for entity field '" + fieldName
+            + "' generated an invalid name according to the validation scheme '" + validationMap.get(fieldName) + "'");
       }
-      else {
-        throw new MisoNamingException("Custom naming generator '"+lng.getGeneratorName()+"' supplied for entity field '"+fieldName+"' generated an invalid name according to the validation scheme '"+validationMap.get(fieldName)+"'");
-      }
-    }
-    else {
-      log.info("Generating name for " + o.getClass().getSimpleName() +" :: " + o.getId());
-      return ""+o.getId();
+    } else {
+      log.info("Generating name for " + o.getClass().getSimpleName() + " :: " + o.getId());
+      return "" + o.getId();
     }
   }
 
@@ -96,8 +94,7 @@ public class AllowAnythingEntityNamingScheme<T extends Nameable> implements Miso
     Pattern p = validationMap.get(fieldName);
     if (p != null) {
       return validationMap.get(fieldName).pattern();
-    }
-    else {
+    } else {
       throw new MisoNamingException("No such field registered for validation");
     }
   }
@@ -119,7 +116,7 @@ public class AllowAnythingEntityNamingScheme<T extends Nameable> implements Miso
 
   @Override
   public boolean allowDuplicateEntityNameFor(String fieldName) {
-    //if the field exists, then duplicates are allowed
+    // if the field exists, then duplicates are allowed
     return fieldCheck(fieldName);
   }
 
@@ -134,9 +131,8 @@ public class AllowAnythingEntityNamingScheme<T extends Nameable> implements Miso
       if (m != null) {
         return true;
       }
-    }
-    catch (NoSuchMethodException e) {
-      log.error("No such field '"+fieldName+"' on class " + namingSchemeFor().getCanonicalName());
+    } catch (NoSuchMethodException e) {
+      log.error("No such field '" + fieldName + "' on class " + namingSchemeFor().getCanonicalName());
       e.printStackTrace();
     }
     return false;

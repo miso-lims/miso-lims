@@ -39,7 +39,7 @@ import java.util.Collection;
  * com.eaglegenomics.miso.hibernatestore
  * <p/>
  * TODO Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -64,14 +64,10 @@ public class HibernateStudyStore extends HibernateDaoSupport implements Store<St
   @Transactional(readOnly = true)
   @SuppressWarnings("unchecked")
   public Collection<Study> listAll() throws IOException {
-/*    return (Collection<Study>) getHibernateTemplate().execute(
-            new HibernateCallback() {
-              public Object doInHibernate(Session session)
-                      throws HibernateException {
-                return session.createQuery("from AbstractStudy").list();
-              }
-            });
-            */
+    /*
+     * return (Collection<Study>) getHibernateTemplate().execute( new HibernateCallback() { public Object doInHibernate(Session session)
+     * throws HibernateException { return session.createQuery("from AbstractStudy").list(); } });
+     */
     return null;
   }
 

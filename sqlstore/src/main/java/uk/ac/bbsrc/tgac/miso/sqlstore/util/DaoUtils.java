@@ -38,12 +38,13 @@ import java.sql.SQLException;
  * Nasty class to manually wire up a MisoRequestManager.
  * <p/>
  * SHOULD ONLY BE USED FOR TESTING PURPOSES!
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public class DaoUtils {
-  public static <T extends LocalSecurityManager> void wireMisoRequestManager(MisoRequestManager requestManager, T lsm, JdbcTemplate jt) throws SQLException {
+  public static <T extends LocalSecurityManager> void wireMisoRequestManager(MisoRequestManager requestManager, T lsm, JdbcTemplate jt)
+      throws SQLException {
     SQLEmPCRDilutionDAO emPCRDilutionDAO;
     SQLLibraryDilutionDAO libraryDilutionDAO;
     SQLEmPCRDAO emPCRDAO;
@@ -184,7 +185,7 @@ public class DaoUtils {
 
     runDAO.setJdbcTemplate(jt);
     runDAO.setSecurityProfileDAO(securityProfileDAO);
-    //runDAO.setFlowcellDAO(flowcellDAO);
+    // runDAO.setFlowcellDAO(flowcellDAO);
     runDAO.setSequencerPartitionContainerDAO(sequencerPartitionContainerDAO);
     runDAO.setSequencerReferenceDAO(sequencerReferenceDAO);
     runDAO.setStatusDAO(statusDAO);
@@ -249,7 +250,7 @@ public class DaoUtils {
     requestManager.setSecurityProfileStore(securityProfileDAO);
     requestManager.setStatusStore(statusDAO);
     requestManager.setStudyStore(studyDAO);
-    //requestManager.setSubmissionStore(submissionDAO);
+    // requestManager.setSubmissionStore(submissionDAO);
   }
 
   public static <T extends LocalSecurityManager> void wireLocalSecurityManager(T securityManager, JdbcTemplate jt) throws SQLException {

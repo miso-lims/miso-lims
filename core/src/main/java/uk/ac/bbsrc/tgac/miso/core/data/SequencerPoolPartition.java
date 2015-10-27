@@ -32,29 +32,30 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.w3c.dom.Document;
 
 /**
- * A SequencerPoolPartition is a {@link Partition} subtype that can be linked to a {@link Pool} instance.
- * This allows Pools to be coupled to a {@link Run} via the Run's {@link SequencerPartitionContainer}(s)
- *
+ * A SequencerPoolPartition is a {@link Partition} subtype that can be linked to a {@link Pool} instance. This allows Pools to be coupled to
+ * a {@link Run} via the Run's {@link SequencerPartitionContainer}(s)
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
-//@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
-@JsonIgnoreProperties({"securityProfile"})
+// @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
+@JsonIgnoreProperties({ "securityProfile" })
 public interface SequencerPoolPartition extends Partition, Deletable, Submittable<Document> {
   /**
    * Returns the pool of this SequencerPoolPartition object.
-   *
+   * 
    * @return Pool pool.
    */
-  @JsonManagedReference(value="pool")
+  @JsonManagedReference(value = "pool")
   public Pool<? extends Poolable> getPool();
 
   /**
    * Sets the pool of this SequencerPoolPartition object.
-   *
-   * @param pool pool.
+   * 
+   * @param pool
+   *          pool.
    */
   public void setPool(Pool<? extends Poolable> pool);
 }

@@ -39,7 +39,7 @@ import java.util.*;
  * uk.ac.bbsrc.tgac.tagbarcode
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 28/06/12
  * @since 0.1.6
@@ -86,15 +86,12 @@ public class RapidLibraryTagBarcodeStrategy implements TagBarcodeStrategy, Reque
         try {
           List<TagBarcode> barcodes = new ArrayList<TagBarcode>(requestManager.listAllTagBarcodesByPlatform(PlatformType.LS454.getKey()));
           for (TagBarcode t : barcodes) {
-            if (getName().equals(t.getStrategyName()) &&
-                t.getName() != null &&
-                t.getName().startsWith("RL")) {
+            if (getName().equals(t.getStrategyName()) && t.getName() != null && t.getName().startsWith("RL")) {
               log.debug("Registering tag barcode: " + t.getName());
               tagBarcodeMap.get(1).add(t);
             }
           }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
           e.printStackTrace();
         }
       }

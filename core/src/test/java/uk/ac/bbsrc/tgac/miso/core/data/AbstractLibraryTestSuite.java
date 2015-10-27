@@ -15,38 +15,38 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 public class AbstractLibraryTestSuite {
 
-   AbstractLibrary al;
+  AbstractLibrary al;
 
-   @Before
-   public void setUp() throws Exception {
-      al = new AbstractLibrary() {
-      };
-   }
+  @Before
+  public void setUp() throws Exception {
+    al = new AbstractLibrary() {
+    };
+  }
 
-   @Test
-   public final void testInheritPermissions() {
-      final SecurableByProfile parent = Mockito.mock(SecurableByProfile.class);
-      final SecurityProfile mockSecurityProfile = Mockito.mock(SecurityProfile.class);
-      final User mockUser = Mockito.mock(User.class);
-      when(parent.getSecurityProfile()).thenReturn(mockSecurityProfile);
-      when(mockSecurityProfile.getOwner()).thenReturn(mockUser);
+  @Test
+  public final void testInheritPermissions() {
+    final SecurableByProfile parent = Mockito.mock(SecurableByProfile.class);
+    final SecurityProfile mockSecurityProfile = Mockito.mock(SecurityProfile.class);
+    final User mockUser = Mockito.mock(User.class);
+    when(parent.getSecurityProfile()).thenReturn(mockSecurityProfile);
+    when(mockSecurityProfile.getOwner()).thenReturn(mockUser);
 
-      assertNull(al.getSecurityProfile());
-      al.inheritPermissions(parent);
-      assertNotNull(al.getSecurityProfile());
-   }
+    assertNull(al.getSecurityProfile());
+    al.inheritPermissions(parent);
+    assertNotNull(al.getSecurityProfile());
+  }
 
-   @Test(expected = SecurityException.class)
-   public void testInheritPermissionsException() {
-      final SecurableByProfile parent = Mockito.mock(SecurableByProfile.class);
-      final SecurityProfile mockSecurityProfile = Mockito.mock(SecurityProfile.class);
-      when(parent.getSecurityProfile()).thenReturn(mockSecurityProfile);
-      al.inheritPermissions(parent);
-   }
+  @Test(expected = SecurityException.class)
+  public void testInheritPermissionsException() {
+    final SecurableByProfile parent = Mockito.mock(SecurableByProfile.class);
+    final SecurityProfile mockSecurityProfile = Mockito.mock(SecurityProfile.class);
+    when(parent.getSecurityProfile()).thenReturn(mockSecurityProfile);
+    al.inheritPermissions(parent);
+  }
 
-//   TODO - cs.  This exception is never thrown!  Remove it or add exception.
-//   @Test(expected = MalformedLibraryException.class)
-//   public final void testaddQc() {
-//
-//   }
+  // TODO - cs. This exception is never thrown! Remove it or add exception.
+  // @Test(expected = MalformedLibraryException.class)
+  // public final void testaddQc() {
+  //
+  // }
 }

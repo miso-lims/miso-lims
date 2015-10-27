@@ -39,7 +39,7 @@ import java.util.List;
  * uk.ac.bbsrc.tgac.miso.core.data.impl
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 14-May-2012
  * @since 0.1.6
@@ -60,8 +60,9 @@ public class SequencerPartitionContainerImpl extends AbstractSequencerPartitionC
 
   /**
    * Construct a new SequencerPartitionContainer with a SecurityProfile owned by the given User
-   *
-   * @param user of type User
+   * 
+   * @param user
+   *          of type User
    */
   public SequencerPartitionContainerImpl(User user) {
     setSecurityProfile(new SecurityProfile(user));
@@ -79,7 +80,7 @@ public class SequencerPartitionContainerImpl extends AbstractSequencerPartitionC
 
   @Override
   public SequencerPoolPartition getPartitionAt(int partitionNumber) throws IndexOutOfBoundsException {
-    return partitions.get(partitionNumber-1);
+    return partitions.get(partitionNumber - 1);
   }
 
   public void setPartitionLimit(int partitionLimit) {
@@ -101,9 +102,8 @@ public class SequencerPartitionContainerImpl extends AbstractSequencerPartitionC
       partition.setPartitionNumber(getPartitions().size() + 1);
       partition.setSecurityProfile(getSecurityProfile());
       getPartitions().add(partition);
-    }
-    else {
-      log.warn("This partition container is limited to "+partitionLimit+" partitions");
+    } else {
+      log.warn("This partition container is limited to " + partitionLimit + " partitions");
     }
   }
 
@@ -111,16 +111,14 @@ public class SequencerPartitionContainerImpl extends AbstractSequencerPartitionC
     if (getPartitions().size() < partitionLimit) {
       if (!getPartitions().contains(partition)) {
         if (partition.getSequencerPartitionContainer() == null) partition.setSequencerPartitionContainer(this);
-        if (partition.getPartitionNumber() == null ) partition.setPartitionNumber(getPartitions().size() + 1);
-        if (partition.getSecurityProfile() == null ) partition.setSecurityProfile(getSecurityProfile());
+        if (partition.getPartitionNumber() == null) partition.setPartitionNumber(getPartitions().size() + 1);
+        if (partition.getSecurityProfile() == null) partition.setSecurityProfile(getSecurityProfile());
         getPartitions().add(partition);
-      }
-      else {
+      } else {
         log.warn("This partition container already contains that partition");
       }
-    }
-    else {
-      log.warn("This partition container is limited to "+partitionLimit+" partitions");
+    } else {
+      log.warn("This partition container is limited to " + partitionLimit + " partitions");
     }
   }
 
@@ -132,8 +130,7 @@ public class SequencerPartitionContainerImpl extends AbstractSequencerPartitionC
       sb.append(" : [");
       sb.append(LimsUtils.join(getPartitions(), ","));
       sb.append("]");
-    }
-    else {
+    } else {
       sb.append(" : ");
       sb.append("!!!!! NULL PARTITIONS !!!!!");
     }

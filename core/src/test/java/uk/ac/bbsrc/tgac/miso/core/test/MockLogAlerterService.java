@@ -33,7 +33,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.AlertingException;
  * uk.ac.bbsrc.tgac.miso.core.test
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 29/09/11
  * @since 0.1.2

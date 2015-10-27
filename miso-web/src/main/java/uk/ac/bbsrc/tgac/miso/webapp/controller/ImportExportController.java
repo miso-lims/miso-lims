@@ -11,11 +11,7 @@ import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.*;
 
 /**
- * Created with IntelliJ IDEA.
- * User: bianx
- * Date: 04/12/2013
- * Time: 13:39
- * To change this template use File | Settings | File Templates.
+ * Created with IntelliJ IDEA. User: bianx Date: 04/12/2013 Time: 13:39 To change this template use File | Settings | File Templates.
  */
 @Controller
 @RequestMapping("/importexport")
@@ -59,6 +55,5 @@ public class ImportExportController {
   public ModelAndView importLibrarySheet(ModelMap model) {
     return new ModelAndView("/pages/importLibraryPoolSheet.jsp", model);
   }
-
 
 }

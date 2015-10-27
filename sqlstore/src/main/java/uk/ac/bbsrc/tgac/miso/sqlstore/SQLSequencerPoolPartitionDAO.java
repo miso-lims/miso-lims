@@ -61,64 +61,55 @@ import java.util.List;
  * uk.ac.bbsrc.tgac.miso.sqlstore
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.1.6
  */
 public class SQLSequencerPoolPartitionDAO implements PartitionStore {
   private static final String TABLE_NAME = "_Partition";
 
-  public static final String PARTITIONS_SELECT =
-          "SELECT partitionId, partitionNumber, pool_poolId, securityProfile_profileId " +
-          "FROM "+TABLE_NAME;
+  public static final String PARTITIONS_SELECT = "SELECT partitionId, partitionNumber, pool_poolId, securityProfile_profileId " + "FROM "
+      + TABLE_NAME;
 
-  public static final String PARTITION_SELECT_BY_ID =
-          PARTITIONS_SELECT + " " + "WHERE partitionId = ?";
+  public static final String PARTITION_SELECT_BY_ID = PARTITIONS_SELECT + " " + "WHERE partitionId = ?";
 
-  public static final String PARTITION_DELETE =
-      "DELETE FROM "+TABLE_NAME+" WHERE partitionId=:partitionId";
+  public static final String PARTITION_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE partitionId=:partitionId";
 
-  public static final String PARTITION_UPDATE =
-          "UPDATE "+TABLE_NAME+" " +
-          "SET partitionNumber=:partitionNumber, pool_poolId=:pool_poolId, securityProfile_profileId=:securityProfile_profileId " +
-          "WHERE partitionId=:partitionId";
+  public static final String PARTITION_UPDATE = "UPDATE " + TABLE_NAME + " "
+      + "SET partitionNumber=:partitionNumber, pool_poolId=:pool_poolId, securityProfile_profileId=:securityProfile_profileId "
+      + "WHERE partitionId=:partitionId";
 
-  public static final String PARTITIONS_BY_RELATED_RUN =
-          "SELECT l.partitionId, l.partitionNumber, l.pool_poolId, l.securityProfile_profileId " +
-          "FROM "+TABLE_NAME+" l, Run_SequencerPartitionContainer rf, Run r " +
-          "WHERE l.container_containerId=rf.containers_containerId " +
-          "AND rf.Run_runId=r.runId " +
-          "AND r.runId=?";
+  public static final String PARTITIONS_BY_RELATED_RUN = "SELECT l.partitionId, l.partitionNumber, l.pool_poolId, l.securityProfile_profileId "
+      + "FROM "
+      + TABLE_NAME
+      + " l, Run_SequencerPartitionContainer rf, Run r "
+      + "WHERE l.container_containerId=rf.containers_containerId " + "AND rf.Run_runId=r.runId " + "AND r.runId=?";
 
-  public static final String PARTITIONS_BY_RELATED_SEQUENCER_PARTITION_CONTAINER =
-          "SELECT l.partitionId, l.partitionNumber, l.pool_poolId, l.securityProfile_profileId " +
-          "FROM "+TABLE_NAME+" l " +
-          "INNER JOIN SequencerPartitionContainer_Partition fl ON l.partitionId = fl.partitions_partitionId " +
-          "AND fl.container_containerId=?";
+  public static final String PARTITIONS_BY_RELATED_SEQUENCER_PARTITION_CONTAINER = "SELECT l.partitionId, l.partitionNumber, l.pool_poolId, l.securityProfile_profileId "
+      + "FROM "
+      + TABLE_NAME
+      + " l "
+      + "INNER JOIN SequencerPartitionContainer_Partition fl ON l.partitionId = fl.partitions_partitionId "
+      + "AND fl.container_containerId=?";
 
-  public static final String PARTITIONS_BY_RELATED_POOL =
-          PARTITIONS_SELECT + " WHERE pool_poolId = ?";
+  public static final String PARTITIONS_BY_RELATED_POOL = PARTITIONS_SELECT + " WHERE pool_poolId = ?";
 
-  public static String PARTITIONS_BY_RELATED_PROJECT =
-          "SELECT l.* " +
-          "FROM Project p, "+TABLE_NAME+" l " +
-          "INNER JOIN Study st ON st.project_projectId = p.projectId " +
-          "LEFT JOIN Experiment ex ON st.studyId = ex.study_studyId " +
-          "INNER JOIN Pool_Experiment pex ON ex.experimentId = pex.experiments_experimentId " +
-          "LEFT JOIN Pool pool ON pool.poolId = pex.pool_poolId " +
-          "LEFT JOIN "+TABLE_NAME+" l ON pool.poolId = l.pool_poolId " +
-          "LEFT JOIN SequencerPartitionContainer_Partition fl ON l.partitionId = fl.partitions_partitionId " +
-          "LEFT JOIN SequencerPartitionContainer fa ON fl.container_containerId = fa.containerId " +
+  public static String PARTITIONS_BY_RELATED_PROJECT = "SELECT l.* " + "FROM Project p, " + TABLE_NAME + " l "
+      + "INNER JOIN Study st ON st.project_projectId = p.projectId " + "LEFT JOIN Experiment ex ON st.studyId = ex.study_studyId "
+      + "INNER JOIN Pool_Experiment pex ON ex.experimentId = pex.experiments_experimentId "
+      + "LEFT JOIN Pool pool ON pool.poolId = pex.pool_poolId " + "LEFT JOIN " + TABLE_NAME + " l ON pool.poolId = l.pool_poolId "
+      + "LEFT JOIN SequencerPartitionContainer_Partition fl ON l.partitionId = fl.partitions_partitionId "
+      + "LEFT JOIN SequencerPartitionContainer fa ON fl.container_containerId = fa.containerId " +
 
-          "INNER JOIN Run_SequencerPartitionContainer rf ON fa.containerId = rf.containers_containerId " +
-          "LEFT JOIN Run ra ON rf.Run_runId = ra.runId " +
-          "WHERE p.projectId=?";
-           //just changed this bit to see if it fixes the missing partition problem...
-  public static final String PARTITIONS_BY_RELATED_SUBMISSION =
-          "SELECT l.partitionId, l.partitionNumber, l.pool_poolId, l.securityProfile_profileId " +
-          "FROM "+TABLE_NAME+" l, Submission_Partition_Dilution sl " +
-          "WHERE l.partitionId=sl.partition_partitionId " +
-          "AND sl.submission_submissionId=?";
+      "INNER JOIN Run_SequencerPartitionContainer rf ON fa.containerId = rf.containers_containerId "
+      + "LEFT JOIN Run ra ON rf.Run_runId = ra.runId " + "WHERE p.projectId=?";
+  // just changed this bit to see if it fixes the missing partition problem...
+  public static final String PARTITIONS_BY_RELATED_SUBMISSION = "SELECT l.partitionId, l.partitionNumber, l.pool_poolId, l.securityProfile_profileId "
+      + "FROM "
+      + TABLE_NAME
+      + " l, Submission_Partition_Dilution sl "
+      + "WHERE l.partitionId=sl.partition_partitionId "
+      + "AND sl.submission_submissionId=?";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLSequencerPoolPartitionDAO.class);
 
@@ -181,15 +172,8 @@ public class SQLSequencerPoolPartitionDAO implements PartitionStore {
 
   @Override
   @Transactional(readOnly = false, rollbackFor = IOException.class)
-  @TriggersRemove(cacheName = {"sequencerPoolPartitionCache", "lazySequencerPoolPartitionCache"},
-                  keyGenerator = @KeyGenerator(
-                          name = "HashCodeCacheKeyGenerator",
-                          properties = {
-                                  @Property(name = "includeMethod", value = "false"),
-                                  @Property(name = "includeParameterTypes", value = "false")
-                          }
-                  )
-  )
+  @TriggersRemove(cacheName = { "sequencerPoolPartitionCache", "lazySequencerPoolPartitionCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
+      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public long save(SequencerPoolPartition partition) throws IOException {
     Long securityProfileId = partition.getSecurityProfile().getProfileId();
     if (securityProfileId == null || this.cascadeType != null) { // && this.cascadeType.equals(CascadeType.PERSIST)) {
@@ -197,8 +181,7 @@ public class SQLSequencerPoolPartitionDAO implements PartitionStore {
     }
 
     MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("partitionNumber", partition.getPartitionNumber())
-          .addValue("securityProfile_profileId", securityProfileId);
+    params.addValue("partitionNumber", partition.getPartitionNumber()).addValue("securityProfile_profileId", securityProfileId);
 
     if (partition.getPool() != null) {
       params.addValue("pool_poolId", partition.getPool().getId());
@@ -208,19 +191,15 @@ public class SQLSequencerPoolPartitionDAO implements PartitionStore {
         partition.getPool().setReadyToRun(false);
       }
       poolDAO.save(partition.getPool());
-    }
-    else {
+    } else {
       params.addValue("pool_poolId", null);
     }
-    
+
     if (partition.getId() == AbstractPartition.UNSAVED_ID) {
-      SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-        .withTableName(TABLE_NAME)
-        .usingGeneratedKeyColumns("partitionId");
+      SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("partitionId");
       Number newId = insert.executeAndReturnKey(params);
       partition.setId(newId.longValue());
-    }
-    else {
+    } else {
       params.addValue("partitionId", partition.getId());
       NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
       namedTemplate.update(PARTITION_UPDATE, params);
@@ -234,61 +213,48 @@ public class SQLSequencerPoolPartitionDAO implements PartitionStore {
   }
 
   @Override
-  @Cacheable(cacheName="partitionListCache",
-      keyGenerator = @KeyGenerator(
-              name = "HashCodeCacheKeyGenerator",
-              properties = {
-                      @Property(name="includeMethod", value="false"),
-                      @Property(name="includeParameterTypes", value="false")
-              }
-      )
-  )
+  @Cacheable(cacheName = "partitionListCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
+      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public List<SequencerPoolPartition> listAll() throws IOException {
     return template.query(PARTITIONS_SELECT, new PartitionMapper(true));
   }
 
   @Override
   public int count() throws IOException {
-    return template.queryForInt("SELECT count(*) FROM "+TABLE_NAME);
+    return template.queryForInt("SELECT count(*) FROM " + TABLE_NAME);
   }
 
-  @Cacheable(cacheName="sequencerPoolPartitionCache",
-                  keyGenerator = @KeyGenerator(
-                          name = "HashCodeCacheKeyGenerator",
-                          properties = {
-                                  @Property(name = "includeMethod", value = "false"),
-                                  @Property(name = "includeParameterTypes", value = "false")
-                          }
-                  )
-  )
+  @Cacheable(cacheName = "sequencerPoolPartitionCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
+      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public SequencerPoolPartition get(long partitionId) throws IOException {
-    List eResults = template.query(PARTITION_SELECT_BY_ID, new Object[]{partitionId}, new PartitionMapper());
+    List eResults = template.query(PARTITION_SELECT_BY_ID, new Object[] { partitionId }, new PartitionMapper());
     return eResults.size() > 0 ? (SequencerPoolPartition) eResults.get(0) : null;
   }
 
   public SequencerPoolPartition lazyGet(long partitionId) throws IOException {
-    List eResults = template.query(PARTITION_SELECT_BY_ID, new Object[]{partitionId}, new PartitionMapper(true));
+    List eResults = template.query(PARTITION_SELECT_BY_ID, new Object[] { partitionId }, new PartitionMapper(true));
     return eResults.size() > 0 ? (SequencerPoolPartition) eResults.get(0) : null;
   }
 
   public Collection<SequencerPoolPartition> listByRunId(long runId) throws IOException {
-    return template.query(PARTITIONS_BY_RELATED_RUN, new Object[]{runId}, new PartitionMapper());
+    return template.query(PARTITIONS_BY_RELATED_RUN, new Object[] { runId }, new PartitionMapper());
   }
 
   public Collection<SequencerPoolPartition> listBySequencerPartitionContainerId(long sequencerPartitionContainerId) throws IOException {
-    return template.query(PARTITIONS_BY_RELATED_SEQUENCER_PARTITION_CONTAINER, new Object[]{sequencerPartitionContainerId}, new PartitionMapper(true));
+    return template.query(PARTITIONS_BY_RELATED_SEQUENCER_PARTITION_CONTAINER, new Object[] { sequencerPartitionContainerId },
+        new PartitionMapper(true));
   }
 
   public List<SequencerPoolPartition> listByPoolId(long poolId) throws IOException {
-    return template.query(PARTITIONS_BY_RELATED_POOL, new Object[]{poolId}, new PartitionMapper(true));
+    return template.query(PARTITIONS_BY_RELATED_POOL, new Object[] { poolId }, new PartitionMapper(true));
   }
 
   public List<SequencerPoolPartition> listBySubmissionId(long submissionId) throws IOException {
-    return template.query(PARTITIONS_BY_RELATED_SUBMISSION, new Object[]{submissionId}, new PartitionMapper());
-  }  
+    return template.query(PARTITIONS_BY_RELATED_SUBMISSION, new Object[] { submissionId }, new PartitionMapper());
+  }
 
   public List<SequencerPoolPartition> listByProjectId(long projectId) throws IOException {
-    return template.query(PARTITIONS_BY_RELATED_PROJECT, new Object[]{projectId}, new PartitionMapper(true));
+    return template.query(PARTITIONS_BY_RELATED_PROJECT, new Object[] { projectId }, new PartitionMapper(true));
   }
 
   public class PartitionMapper extends CacheAwareRowMapper<SequencerPoolPartition> {
@@ -307,7 +273,7 @@ public class SQLSequencerPoolPartitionDAO implements PartitionStore {
         Element element;
         if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
           log.debug("Cache hit on map for SequencerPoolPartition " + id);
-          return (SequencerPoolPartition)element.getObjectValue();
+          return (SequencerPoolPartition) element.getObjectValue();
         }
       }
       SequencerPoolPartition l = dataObjectFactory.getSequencerPoolPartition();
@@ -319,13 +285,12 @@ public class SQLSequencerPoolPartitionDAO implements PartitionStore {
         if (!isLazy()) {
           l.setSequencerPartitionContainer(sequencerPartitionContainerDAO.getSequencerPartitionContainerByPartitionId(id));
         }
-      }
-      catch (IOException e1) {
+      } catch (IOException e1) {
         e1.printStackTrace();
       }
 
       if (isCacheEnabled() && lookupCache(cacheManager) != null) {
-        lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id) ,l));
+        lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id), l));
       }
 
       return l;
@@ -333,20 +298,12 @@ public class SQLSequencerPoolPartitionDAO implements PartitionStore {
   }
 
   @Transactional(readOnly = false, rollbackFor = IOException.class)
-  @TriggersRemove(
-      cacheName = {"sequencerPoolPartitionCache", "lazySequencerPoolPartitionCache"},
-      keyGenerator = @KeyGenerator (
-          name = "HashCodeCacheKeyGenerator",
-          properties = {
-              @Property(name="includeMethod", value="false"),
-              @Property(name="includeParameterTypes", value="false")
-          }
-      )
-  )
+  @TriggersRemove(cacheName = { "sequencerPoolPartitionCache", "lazySequencerPoolPartitionCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
+      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
   public boolean remove(SequencerPoolPartition partition) throws IOException {
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-    if (partition.isDeletable() && (namedTemplate.update(PARTITION_DELETE,
-                                                         new MapSqlParameterSource().addValue("partitionId", partition.getId())) == 1)) {
+    if (partition.isDeletable()
+        && (namedTemplate.update(PARTITION_DELETE, new MapSqlParameterSource().addValue("partitionId", partition.getId())) == 1)) {
       purgeListCache(partition, false);
       return true;
     }

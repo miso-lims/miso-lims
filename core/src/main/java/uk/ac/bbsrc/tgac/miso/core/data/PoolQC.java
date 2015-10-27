@@ -33,16 +33,16 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolException;
 
 /**
  * A QC that is specifically carried out on a given {@link uk.ac.bbsrc.tgac.miso.core.data.Pool}
- *
+ * 
  * @author Rob Davey
  * @since 0.1.9
  */
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC)
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public interface PoolQC extends QC {
   /**
    * Returns the pool of this PoolQC object.
-   *
+   * 
    * @return Pool pool.
    */
   @JsonBackReference(value = "qcpool")
@@ -50,23 +50,26 @@ public interface PoolQC extends QC {
 
   /**
    * Sets the pool of this PoolQC object.
-   *
-   * @param pool Pool.
-   * @throws uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolException when the Pool being set is not valid
+   * 
+   * @param pool
+   *          Pool.
+   * @throws uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolException
+   *           when the Pool being set is not valid
    */
   public void setPool(Pool pool) throws MalformedPoolException;
 
   /**
    * Returns the results of this QC object.
-   *
+   * 
    * @return Double results.
    */
   public Double getResults();
 
   /**
    * Sets the results of this QC object.
-   *
-   * @param results results.
+   * 
+   * @param results
+   *          results.
    */
-  public void setResults(Double results);  
+  public void setResults(Double results);
 }

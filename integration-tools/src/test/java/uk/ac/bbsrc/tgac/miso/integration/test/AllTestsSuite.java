@@ -30,7 +30,7 @@ import org.junit.runners.Suite;
  * uk.ac.bbsrc.tgac.miso.integration.test
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 22-May-2012
  * @since 0.1.6
@@ -38,8 +38,7 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-  //JargonTests.class
+// JargonTests.class
 })
-
 public class AllTestsSuite {
 }

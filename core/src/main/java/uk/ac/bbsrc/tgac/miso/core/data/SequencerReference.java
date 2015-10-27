@@ -31,24 +31,25 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 /**
  * A SequencerReference is a {@link HardwareReference} specifically designated with a {@link Platform}
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
-//@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
+// @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public interface SequencerReference extends HardwareReference, Deletable {
   /**
    * Sets the platform of this SequencerReference object.
-   *
-   * @param platform platform.
+   * 
+   * @param platform
+   *          platform.
    */
   void setPlatform(Platform platform);
-  
+
   /**
    * Returns the platform of this SequencerReference object.
-   *
+   * 
    * @return Platform platform.
    */
   Platform getPlatform();

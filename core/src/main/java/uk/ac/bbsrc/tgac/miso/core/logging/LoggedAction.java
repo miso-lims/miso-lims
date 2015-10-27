@@ -30,11 +30,11 @@ import java.lang.annotation.Target;
 
 /**
  * An annotation to mark a method that represents a reserved action that should be logged
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
-@Target({ElementType.METHOD})
+@Target({ ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface LoggedAction {
 }

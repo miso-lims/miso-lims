@@ -14,7 +14,7 @@ import java.util.Map;
  * uk.ac.bbsrc.tgac.miso.sqlstore
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 08/10/12
  * @since 0.1.9
@@ -32,8 +32,7 @@ public class MockSQLSecurityDAO extends SQLSecurityDAO {
           usermap.put(userId, u);
         }
         return u;
-      }
-      else {
+      } else {
         return usermap.get(userId);
       }
     }
@@ -46,8 +45,7 @@ public class MockSQLSecurityDAO extends SQLSecurityDAO {
         Collection<Group> gs = super.listGroupsByUserId(userId);
         groupmap.put(userId, gs);
         return gs;
-      }
-      else {
+      } else {
         return groupmap.get(userId);
       }
     }

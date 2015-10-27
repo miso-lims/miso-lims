@@ -32,18 +32,14 @@ import java.util.Map;
  * uk.ac.bbsrc.tgac.miso.core.alert.type
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 22-Sep-2011
  * @since 0.1.2
  */
 public enum AlertLevel {
-  INFO("INFO"),
-  LOW("LOW"),
-  MEDIUM("MEDIUM"),
-  HIGH("HIGH"),
-  CRITICAL("CRITICAL");
-  
+  INFO("INFO"), LOW("LOW"), MEDIUM("MEDIUM"), HIGH("HIGH"), CRITICAL("CRITICAL");
+
   /**
    * Field key
    */
@@ -60,8 +56,9 @@ public enum AlertLevel {
 
   /**
    * Constructs a AlertLevel based on a given key
-   *
-   * @param key of type String
+   * 
+   * @param key
+   *          of type String
    */
   AlertLevel(String key) {
     this.key = key;
@@ -69,8 +66,9 @@ public enum AlertLevel {
 
   /**
    * Returns a AlertLevel given an enum key
-   *
-   * @param key of type String
+   * 
+   * @param key
+   *          of type String
    * @return AlertType
    */
   public static AlertLevel get(String key) {
@@ -79,7 +77,7 @@ public enum AlertLevel {
 
   /**
    * Returns the key of this AlertLevel enum.
-   *
+   * 
    * @return String key.
    */
   public String getKey() {
@@ -88,7 +86,7 @@ public enum AlertLevel {
 
   /**
    * Returns the keys of this AlertLevel enum.
-   *
+   * 
    * @return ArrayList<String> keys.
    */
   public static ArrayList<String> getKeys() {

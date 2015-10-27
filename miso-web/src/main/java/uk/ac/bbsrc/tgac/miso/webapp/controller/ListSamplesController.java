@@ -48,7 +48,7 @@ import java.util.List;
  * com.eaglegenomics.miso.web
  * <p/>
  * TODO Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -71,8 +71,7 @@ public class ListSamplesController {
   }
 
   @RequestMapping(value = "/samples/rest/", method = RequestMethod.GET)
-  public
-  @ResponseBody
+  public @ResponseBody
   Collection<Sample> jsonRest() throws IOException {
     return requestManager.listAllSamples();
   }

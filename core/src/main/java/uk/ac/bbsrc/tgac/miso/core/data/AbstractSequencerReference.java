@@ -30,8 +30,8 @@ import java.io.IOException;
 import java.net.InetAddress;
 
 /**
- * Abstract class to provide basic methods to encapsulate a reference to a physical machine attached to a sequencer 
- *
+ * Abstract class to provide basic methods to encapsulate a reference to a physical machine attached to a sequencer
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */

@@ -30,7 +30,7 @@ import org.junit.runners.Suite;
  * uk.ac.bbsrc.tgac.miso.sqlstore
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 12-Jul-2011
  * @since 0.0.3

@@ -32,7 +32,7 @@ import java.util.Date;
 
 /**
  * Skeleton implementation of a QC
- *
+ * 
  * @author Rob Davey
  * @date 25-Jul-2011
  * @since 0.0.3
@@ -100,22 +100,16 @@ public abstract class AbstractQC implements QC {
    */
   @Override
   public boolean equals(Object obj) {
-    if (obj == null)
-      return false;
-    if (obj == this)
-      return true;
-    if (!(obj instanceof QC))
-      return false;
+    if (obj == null) return false;
+    if (obj == this) return true;
+    if (!(obj instanceof QC)) return false;
     QC them = (QC) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
-    if (this.getId() == AbstractQC.UNSAVED_ID
-        || them.getId() == AbstractQC.UNSAVED_ID) {
-      return this.getQcCreator().equals(them.getQcCreator())
-             && this.getQcDate().equals(them.getQcDate())
-             && this.getQcType().equals(them.getQcType());
-    }
-    else {
+    if (this.getId() == AbstractQC.UNSAVED_ID || them.getId() == AbstractQC.UNSAVED_ID) {
+      return this.getQcCreator().equals(them.getQcCreator()) && this.getQcDate().equals(them.getQcDate())
+          && this.getQcType().equals(them.getQcType());
+    } else {
       return this.getId() == them.getId();
     }
   }
@@ -123,9 +117,8 @@ public abstract class AbstractQC implements QC {
   @Override
   public int hashCode() {
     if (getId() != 0L && getId() != AbstractQC.UNSAVED_ID) {
-      return (int)getId();
-    }
-    else {
+      return (int) getId();
+    } else {
       final int PRIME = 37;
       int hashcode = -1;
       if (getQcCreator() != null) hashcode = PRIME * hashcode + getQcCreator().hashCode();
@@ -137,7 +130,7 @@ public abstract class AbstractQC implements QC {
 
   @Override
   public int compareTo(Object o) {
-    QC t = (QC)o;
+    QC t = (QC) o;
     if (getId() < t.getId()) return -1;
     if (getId() > t.getId()) return 1;
     return 0;

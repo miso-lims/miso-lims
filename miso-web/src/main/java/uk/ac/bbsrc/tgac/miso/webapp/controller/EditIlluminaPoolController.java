@@ -56,7 +56,7 @@ import java.util.*;
  * com.eaglegenomics.miso.web
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -92,7 +92,7 @@ public class EditIlluminaPoolController {
     ArrayList<LibraryDilution> libs = new ArrayList<LibraryDilution>();
     for (Dilution l : requestManager.listAllLibraryDilutionsByPlatform(PlatformType.ILLUMINA)) {
       if (!pool.getDilutions().contains(l)) {
-        libs.add((LibraryDilution)l);
+        libs.add((LibraryDilution) l);
       }
     }
     Collections.sort(libs);
@@ -109,15 +109,13 @@ public class EditIlluminaPoolController {
             if (e.getId() != experimentId) {
               es.add(e);
             }
-          }
-          else {
+          } else {
             es.add(e);
           }
         }
       }
       return es;
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to list experiments", ex);
       }
@@ -136,27 +134,25 @@ public class EditIlluminaPoolController {
   }
 
   @RequestMapping(value = "/{poolId}", method = RequestMethod.GET)
-  public ModelAndView setupForm(@PathVariable Long poolId,
-                                ModelMap model) throws IOException {
+  public ModelAndView setupForm(@PathVariable Long poolId, ModelMap model) throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Pool pool = null;
       if (poolId == AbstractPool.UNSAVED_ID) {
         pool = dataObjectFactory.getIlluminaPool(user);
         model.put("title", "New Illumina Pool");
-      }
-      else {
+      } else {
         pool = requestManager.getPoolById(poolId);
-        model.put("title", "Illumina Pool "+poolId);
+        model.put("title", "Illumina Pool " + poolId);
       }
 
       if (pool == null) {
-        throw new SecurityException("No such Illumina Pool");        
+        throw new SecurityException("No such Illumina Pool");
       }
       if (!pool.userCanRead(user)) {
         throw new SecurityException("Permission denied.");
       }
-      
+
       model.put("formObj", pool);
       model.put("pool", pool);
       model.put("availableDilutions", populateAvailableDilutions(pool));
@@ -165,8 +161,7 @@ public class EditIlluminaPoolController {
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, pool, securityManager.listAllUsers()));
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, pool, securityManager.listAllGroups()));
       return new ModelAndView("/pages/editIlluminaPool.jsp", model);
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to show Illumina pool", ex);
       }
@@ -175,9 +170,8 @@ public class EditIlluminaPoolController {
   }
 
   @RequestMapping(value = "/{poolId}/experiment/{experimentId}", method = RequestMethod.GET)
-  public ModelAndView setupFormWithExperiment(@PathVariable Long poolId,
-                                @PathVariable Long experimentId,
-                                ModelMap model) throws IOException {
+  public ModelAndView setupFormWithExperiment(@PathVariable Long poolId, @PathVariable Long experimentId, ModelMap model)
+      throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Pool<? extends Poolable> pool = null;
@@ -185,10 +179,9 @@ public class EditIlluminaPoolController {
         pool = dataObjectFactory.getPool(user);
         pool.setPlatformType(PlatformType.ILLUMINA);
         model.put("title", "New Illumina Pool");
-      }
-      else {
+      } else {
         pool = requestManager.getPoolById(poolId);
-        model.put("title", "Illumina Pool "+poolId);
+        model.put("title", "Illumina Pool " + poolId);
       }
 
       if (pool == null) {
@@ -200,9 +193,8 @@ public class EditIlluminaPoolController {
 
       if (experimentId != null) {
         model.put("accessibleExperiments", populateExperiments(experimentId, pool));
-      }
-      else {
-        model.put("accessibleExperiments", populateExperiments(null, pool)); 
+      } else {
+        model.put("accessibleExperiments", populateExperiments(null, pool));
       }
 
       model.put("formObj", pool);
@@ -213,22 +205,20 @@ public class EditIlluminaPoolController {
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, pool, securityManager.listAllUsers()));
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, pool, securityManager.listAllGroups()));
       return new ModelAndView("/pages/editIlluminaPool.jsp", model);
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to show Illumina pool", ex);
       }
       throw ex;
     }
-//    catch (MalformedExperimentException e) {
-//      e.printStackTrace();
-//      throw new IOException(e);
-//    }
+    // catch (MalformedExperimentException e) {
+    // e.printStackTrace();
+    // throw new IOException(e);
+    // }
   }
 
   @RequestMapping(value = "/new/dilution/{dilutionId}", method = RequestMethod.GET)
-  public ModelAndView setupFormWithDilution(@PathVariable Long dilutionId,
-                                ModelMap model) throws IOException {
+  public ModelAndView setupFormWithDilution(@PathVariable Long dilutionId, ModelMap model) throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       IlluminaPool pool = dataObjectFactory.getIlluminaPool(user);
@@ -237,13 +227,13 @@ public class EditIlluminaPoolController {
       if (pool == null) {
         throw new SecurityException("No such Illumina Pool");
       }
-      
+
       if (!pool.userCanRead(user)) {
         throw new SecurityException("Permission denied.");
       }
 
       if (dilutionId != null) {
-          LibraryDilution ld = requestManager.getLibraryDilutionById(dilutionId);
+        LibraryDilution ld = requestManager.getLibraryDilutionById(dilutionId);
         if (ld != null) {
           pool.addPoolableElement(ld);
         }
@@ -257,32 +247,28 @@ public class EditIlluminaPoolController {
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, pool, securityManager.listAllUsers()));
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, pool, securityManager.listAllGroups()));
       return new ModelAndView("/pages/editIlluminaPool.jsp", model);
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to show Illumina pool", ex);
       }
       throw ex;
-    }
-    catch (MalformedDilutionException e) {
+    } catch (MalformedDilutionException e) {
       e.printStackTrace();
       throw new IOException(e);
     }
   }
 
-
   @RequestMapping(value = "/import", method = RequestMethod.POST)
   public String importLibraryDilutionsToPool(HttpServletRequest request, ModelMap model) throws IOException {
-    IlluminaPool p = (IlluminaPool)model.get("pool");
+    IlluminaPool p = (IlluminaPool) model.get("pool");
     String[] dils = request.getParameterValues("importdilslist");
     for (String s : dils) {
       LibraryDilution ld = requestManager.getLibraryDilutionByBarcode(s);
       if (ld != null) {
         try {
           p.addPoolableElement(ld);
-        }
-        catch (MalformedDilutionException e) {
-          log.debug("Cannot add library dilution "+s+" to pool " + p.getName());
+        } catch (MalformedDilutionException e) {
+          log.debug("Cannot add library dilution " + s + " to pool " + p.getName());
           e.printStackTrace();
         }
       }
@@ -293,9 +279,7 @@ public class EditIlluminaPoolController {
   }
 
   @RequestMapping(method = RequestMethod.POST)
-  public String processSubmit(@ModelAttribute("pool") Pool pool,
-                              ModelMap model,
-                              SessionStatus session) throws IOException {
+  public String processSubmit(@ModelAttribute("pool") Pool pool, ModelMap model, SessionStatus session) throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       if (!pool.userCanWrite(user)) {
@@ -305,8 +289,7 @@ public class EditIlluminaPoolController {
       session.setComplete();
       model.clear();
       return "redirect:/miso/pool/illumina/" + pool.getId();
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to save Illumina pool", ex);
       }

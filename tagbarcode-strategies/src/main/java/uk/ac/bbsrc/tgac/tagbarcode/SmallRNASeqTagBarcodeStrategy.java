@@ -39,7 +39,7 @@ import java.util.*;
  * uk.ac.bbsrc.tgac.tagbarcode
  * <p/>
  * Info
- *
+ * 
  * @author Xingdong Bian
  * @date 03/07/14
  * @since 0.2.1
@@ -86,15 +86,12 @@ public class SmallRNASeqTagBarcodeStrategy implements TagBarcodeStrategy, Reques
         try {
           List<TagBarcode> barcodes = new ArrayList<TagBarcode>(requestManager.listAllTagBarcodesByPlatform(PlatformType.ILLUMINA.getKey()));
           for (TagBarcode t : barcodes) {
-            if (getName().equals(t.getStrategyName()) &&
-                t.getName() != null &&
-                t.getName().startsWith("RPI")) {
+            if (getName().equals(t.getStrategyName()) && t.getName() != null && t.getName().startsWith("RPI")) {
               log.debug("Registering tag barcode: " + t.getName());
               tagBarcodeMap.get(1).add(t);
             }
           }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
           e.printStackTrace();
         }
       }

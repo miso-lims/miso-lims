@@ -36,7 +36,7 @@ import java.util.*;
  * uk.ac.bbsrc.tgac.miso.core.service.tagbarcode
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 28/06/12
  * @since 0.1.6
@@ -63,7 +63,7 @@ public class TagBarcodeStrategyResolverService {
   }
 
   public Collection<TagBarcodeStrategy> getTagBarcodeStrategies() {
-    //lazily load available strategies
+    // lazily load available strategies
     if (strategyMap == null) {
       ServiceLoader<TagBarcodeStrategy> consumerLoader = ServiceLoader.load(TagBarcodeStrategy.class);
       Iterator<TagBarcodeStrategy> consumerIterator = consumerLoader.iterator();
@@ -73,22 +73,20 @@ public class TagBarcodeStrategyResolverService {
         TagBarcodeStrategy p = consumerIterator.next();
 
         if (p instanceof RequestManagerAware) {
-          if (requestManager != null && ((RequestManagerAware)p).getRequestManager() == null) {
-            ((RequestManagerAware)p).setRequestManager(requestManager);
+          if (requestManager != null && ((RequestManagerAware) p).getRequestManager() == null) {
+            ((RequestManagerAware) p).setRequestManager(requestManager);
             p.reload();
-          }
-          else {
+          } else {
             log.error("Ooops. No request manager available to register with RequestManagerAware services!");
           }
         }
 
         if (!strategyMap.containsKey(p.getName())) {
           strategyMap.put(p.getName(), p);
-        }
-        else {
+        } else {
           if (strategyMap.get(p.getName()) != p) {
-            String msg = "Multiple different TagBarcodeStrategies with the same strategy name " +
-                         "('" + p.getName() + "') are present on the classpath. Strategy names must be unique.";
+            String msg = "Multiple different TagBarcodeStrategies with the same strategy name " + "('" + p.getName()
+                + "') are present on the classpath. Strategy names must be unique.";
             log.error(msg);
             throw new ServiceConfigurationError(msg);
           }

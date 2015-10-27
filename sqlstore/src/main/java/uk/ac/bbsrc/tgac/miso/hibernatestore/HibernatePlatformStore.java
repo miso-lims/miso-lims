@@ -38,12 +38,12 @@ import java.util.Collection;
  * com.eaglegenomics.miso.hibernatestore
  * <p/>
  * TODO Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 @Deprecated
-public class HibernatePlatformStore  extends HibernateDaoSupport implements Store<Platform> {
+public class HibernatePlatformStore extends HibernateDaoSupport implements Store<Platform> {
   @Transactional(readOnly = false)
   public long save(Platform platform) throws IOException {
     getHibernateTemplate().saveOrUpdate(platform);
@@ -63,14 +63,10 @@ public class HibernatePlatformStore  extends HibernateDaoSupport implements Stor
   @Transactional(readOnly = true)
   @SuppressWarnings("unchecked")
   public Collection<Platform> listAll() throws IOException {
-/*    return (Collection<Platform>) getHibernateTemplate().execute(
-            new HibernateCallback() {
-              public Object doInHibernate(Session session)
-                      throws HibernateException {
-                return session.createQuery("from AbstractPlatform").list();
-              }
-            });
-            */
+    /*
+     * return (Collection<Platform>) getHibernateTemplate().execute( new HibernateCallback() { public Object doInHibernate(Session session)
+     * throws HibernateException { return session.createQuery("from AbstractPlatform").list(); } });
+     */
     return null;
   }
 

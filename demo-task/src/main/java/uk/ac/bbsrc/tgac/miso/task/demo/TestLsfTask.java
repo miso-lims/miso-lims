@@ -38,7 +38,7 @@ import java.util.Map;
  * uk.ac.bbsrc.tgac.miso.task.test
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 24-Jun-2011
  * @since 0.0.3
@@ -103,4 +103,3 @@ public class TestLsfTask extends AbstractLSFProcess {
     return new File(outputDir, "test.lsfoutput.txt").getAbsolutePath();
   }
 }
-

@@ -38,7 +38,7 @@ import java.util.Map;
  * uk.ac.bbsrc.tgac.miso.task.lsf
  * <p/>
  * Test LSF process task
- *
+ * 
  * @author Rob Davey
  * @date 23-Jun-2011
  * @since 0.0.3
@@ -98,16 +98,15 @@ public class TestLsfProcess implements ConanProcess {
       log.info("Parameters set. Executing...");
       boolean foo = tlsfp.execute(testParams);
       log.info("Result: " + foo);
-    }
-    catch (InterruptedException e) {
+    } catch (InterruptedException e) {
       e.printStackTrace();
-    }
-    catch (ProcessExecutionException e) {
+    } catch (ProcessExecutionException e) {
       e.printStackTrace();
     }
   }
 
-  public boolean execute(Map<ConanParameter, String> parameters) throws IllegalArgumentException, ProcessExecutionException, InterruptedException {
+  public boolean execute(Map<ConanParameter, String> parameters) throws IllegalArgumentException, ProcessExecutionException,
+      InterruptedException {
     return new TestLsfTask().execute(parameters);
   }
 

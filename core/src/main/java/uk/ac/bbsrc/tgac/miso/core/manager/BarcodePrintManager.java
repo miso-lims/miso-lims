@@ -42,7 +42,7 @@ import java.util.Queue;
  * uk.ac.bbsrc.tgac.miso.core.manager
  * <p/>
  * Manages specified MisoPrintServices and allows construction of a print job that will be persisted on print()
- *
+ * 
  * @author Rob Davey
  * @date 30-Jun-2011
  * @since 0.0.3
@@ -68,8 +68,7 @@ public class BarcodePrintManager extends AbstractPrintManager<Queue<File>> {
         try {
           long jobId = storePrintJob(job);
           job.setJobId(jobId);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
           e.printStackTrace();
           log.debug("Could not store print job");
         }
@@ -84,24 +83,20 @@ public class BarcodePrintManager extends AbstractPrintManager<Queue<File>> {
 
           if (jobOK) {
             job.setStatus("OK");
-          }
-          else {
+          } else {
             job.setStatus("FAIL");
           }
 
           storePrintJob(job);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
           e.printStackTrace();
           throw new MisoPrintException("Could not print barcodes to " + printServiceName + ": " + e.getMessage(), e);
         }
         return job;
-      }
-      else {
+      } else {
         throw new MisoPrintException("No such PrintService: " + printServiceName);
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       throw new MisoPrintException("Cannot retrieve PrintService: " + printServiceName);
     }

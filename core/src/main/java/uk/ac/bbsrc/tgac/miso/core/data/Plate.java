@@ -38,22 +38,23 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * A Plate represents a collection of sequenceable material, typed by that material object, usually a List of {@link Library}
- * elements of a given size. Plates can be described further by a {@link PlateMaterialType} and a plate-specific {@link TagBarcode}
- *
+ * A Plate represents a collection of sequenceable material, typed by that material object, usually a List of {@link Library} elements of a
+ * given size. Plates can be described further by a {@link PlateMaterialType} and a plate-specific {@link TagBarcode}
+ * 
  * @author Rob Davey
  * @date 25-Jul-2011
  * @since 0.0.3
  */
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
-//@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
-@JsonIgnoreProperties({"securityProfile"})
+// @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
+@JsonIgnoreProperties({ "securityProfile" })
 @PrintableBarcode
-public interface Plate<T extends List<S>, S> extends SecurableByProfile, Barcodable, Locatable, Comparable, Deletable, Poolable<Plate<LinkedList<S>, S>, S> {
+public interface Plate<T extends List<S>, S> extends SecurableByProfile, Barcodable, Locatable, Comparable, Deletable,
+    Poolable<Plate<LinkedList<S>, S>, S> {
   /**
    * Gets the current plateId
-   *
+   * 
    * @return Long
    */
   @Deprecated
@@ -61,86 +62,93 @@ public interface Plate<T extends List<S>, S> extends SecurableByProfile, Barcoda
 
   /**
    * Sets the plateId of this Plate object
-   *
-   * @param plateId Long.
-   *
+   * 
+   * @param plateId
+   *          Long.
+   * 
    */
   @Deprecated
   public void setPlateId(Long plateId);
 
   /**
    * Sets the ID of this Plate object.
-   *
-   * @param id long.
+   * 
+   * @param id
+   *          long.
    */
   public void setId(long id);
 
   /**
    * Sets the name of this Plate object.
-   *
-   * @param name name.
+   * 
+   * @param name
+   *          name.
    */
   public void setName(String name);
 
   /**
    * Returns the description of this Plate object.
-   *
+   * 
    * @return String description.
    */
   public String getDescription();
 
   /**
    * Sets the description of this Plate object.
-   *
-   * @param description description.
+   * 
+   * @param description
+   *          description.
    */
   public void setDescription(String description);
 
   /**
    * Returns the creationDate of this Plate object.
-   *
+   * 
    * @return Date creationDate.
    */
   public Date getCreationDate();
 
   /**
    * Sets the creationDate of this Plate object.
-   *
-   * @param date creationDate.
+   * 
+   * @param date
+   *          creationDate.
    */
   public void setCreationDate(Date date);
 
   /**
    * Returns the plateMaterialType of this Plate object.
-   *
+   * 
    * @return PlateMaterialType plateMaterialType.
    */
   public PlateMaterialType getPlateMaterialType();
 
   /**
    * Sets the plateMaterialType of this Plate object.
-   *
-   * @param plateMaterialType PlateMaterialType.
+   * 
+   * @param plateMaterialType
+   *          PlateMaterialType.
    */
   public void setPlateMaterialType(PlateMaterialType plateMaterialType);
 
   /**
    * Returns the TagBarcode of this Plate object
-   *
+   * 
    * @return TagBarcode tagBarcode.
    */
   public TagBarcode getTagBarcode();
 
   /**
    * Sets the TagBarcode of this Plate object.
-   *
-   * @param tagBarcode TagBarcode.
+   * 
+   * @param tagBarcode
+   *          TagBarcode.
    */
   public void setTagBarcode(TagBarcode tagBarcode);
 
   /**
    * Returns the Plate size
-   *
+   * 
    * @return int size.
    */
   public int getSize();
@@ -151,18 +159,19 @@ public interface Plate<T extends List<S>, S> extends SecurableByProfile, Barcoda
 
   /**
    * Returns the list of Elements present on this Plate object
-   *
+   * 
    * @return T element.
    */
-  //@JsonManagedReference
+  // @JsonManagedReference
   public T getElements();
 
   public void setElements(T elements);
 
   /**
    * Adds an Element to this Plate object
-   *
-   * @param element S.
+   * 
+   * @param element
+   *          S.
    */
   public void addElement(S element);
 

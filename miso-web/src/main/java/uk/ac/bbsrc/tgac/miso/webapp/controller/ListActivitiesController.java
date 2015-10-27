@@ -43,38 +43,38 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 @Controller
 public class ListActivitiesController {
-	protected static final Logger log = LoggerFactory.getLogger(ListActivitiesController.class);
+  protected static final Logger log = LoggerFactory.getLogger(ListActivitiesController.class);
 
-	@Autowired
-	private SecurityManager securityManager;
+  @Autowired
+  private SecurityManager securityManager;
 
-	public void setSecurityManager(SecurityManager securityManager) {
-		this.securityManager = securityManager;
-	}
+  public void setSecurityManager(SecurityManager securityManager) {
+    this.securityManager = securityManager;
+  }
 
-	@Autowired
-	private ProtocolManager protocolManager;
+  @Autowired
+  private ProtocolManager protocolManager;
 
-	public void setProtocolManager(ProtocolManager protocolManager) {
-		this.protocolManager = protocolManager;
-	}
+  public void setProtocolManager(ProtocolManager protocolManager) {
+    this.protocolManager = protocolManager;
+  }
 
-	@RequestMapping("/activity/activities")
-	public ModelAndView listActivities() throws IOException {
-		try {
-			User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext()	.getAuthentication().getName());
-			Collection<Activity> activities = new HashSet<Activity>();
-			for (Activity activity : protocolManager.listAllActivities()) {
-				if (activity instanceof ManualActivity) {
-					activities.add(activity);
-				}
-			}
-			return new ModelAndView("/pages/listActivities.jsp", "activities", activities);
-		} catch (IOException ex) {
-			if (log.isDebugEnabled()) {
-				log.debug("Failed to list activities", ex);
-			}
-			throw ex;
-		}
-	}
+  @RequestMapping("/activity/activities")
+  public ModelAndView listActivities() throws IOException {
+    try {
+      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+      Collection<Activity> activities = new HashSet<Activity>();
+      for (Activity activity : protocolManager.listAllActivities()) {
+        if (activity instanceof ManualActivity) {
+          activities.add(activity);
+        }
+      }
+      return new ModelAndView("/pages/listActivities.jsp", "activities", activities);
+    } catch (IOException ex) {
+      if (log.isDebugEnabled()) {
+        log.debug("Failed to list activities", ex);
+      }
+      throw ex;
+    }
+  }
 }
