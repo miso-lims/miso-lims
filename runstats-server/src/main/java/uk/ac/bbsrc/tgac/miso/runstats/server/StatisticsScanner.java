@@ -38,7 +38,7 @@ import java.util.regex.Pattern;
  * uk.ac.bbsrc.tgac.miso.notification.core
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 13-Dec-2010
  * @since 0.0.2
@@ -76,8 +76,7 @@ public class StatisticsScanner extends DefaultDirectoryScanner {
               }
             }
           }
-        }
-        else {
+        } else {
           if (rm.find()) {
             files.addAll(Arrays.asList(listEligibleFiles(rootFile)));
           }

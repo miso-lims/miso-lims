@@ -60,7 +60,7 @@ import java.util.*;
  * uk.ac.bbsrc.tgac.miso.spring.ajax
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -97,7 +97,7 @@ public class RunControllerHelperService {
       Long runId = AbstractRun.UNSAVED_ID;
 
       if (json.has("runId") && !json.getString("runId").equals("")) {
-        //edit existing run
+        // edit existing run
         Map<String, Object> responseMap = new HashMap<String, Object>();
         runId = Long.parseLong(json.getString("runId"));
         Run storedRun = requestManager.getRunById(runId);
@@ -109,8 +109,7 @@ public class RunControllerHelperService {
           if (!newRuntype.equals(storedPlatformType)) {
             run = dataObjectFactory.getRunOfType(newPt, user);
             run.setId(storedRun.getId());
-          }
-          else {
+          } else {
             run = storedRun;
           }
 
@@ -124,14 +123,12 @@ public class RunControllerHelperService {
           }
           srb.append("</select>");
           responseMap.put("sequencers", srb.toString());
-        }
-        else {
+        } else {
           return JSONUtils.SimpleJSONError("Unrecognised PlatformType");
         }
         return JSONUtils.JSONObjectResponse(responseMap);
-      }
-      else {
-        //new run
+      } else {
+        // new run
         Map<String, Object> responseMap = new HashMap<String, Object>();
 
         PlatformType newPt = PlatformType.get(newRuntype);
@@ -144,15 +141,13 @@ public class RunControllerHelperService {
           }
           srb.append("</select>");
           responseMap.put("sequencers", srb.toString());
-        }
-        else {
+        } else {
           return JSONUtils.SimpleJSONError("Unrecognised PlatformType");
         }
 
         return JSONUtils.JSONObjectResponse(responseMap);
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Failed to change PlatformType", e);
       return JSONUtils.SimpleJSONError("Failed to change PlatformType");
     }
@@ -174,8 +169,7 @@ public class RunControllerHelperService {
       responseMap.put("partitions", getPlatformRunOptions(run));
 
       return JSONUtils.JSONObjectResponse(responseMap);
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Failed to get Run options");
     }
@@ -188,20 +182,15 @@ public class RunControllerHelperService {
       if (pt != null) {
         if (pt.equals(PlatformType.ILLUMINA)) {
           return changeIlluminaContainer(session, json);
-        }
-        else if (pt.equals(PlatformType.LS454)) {
+        } else if (pt.equals(PlatformType.LS454)) {
           return changeLS454Container(session, json);
-        }
-        else if (pt.equals(PlatformType.SOLID)) {
+        } else if (pt.equals(PlatformType.SOLID)) {
           return changeSolidContainer(session, json);
-        }
-        else if (pt.equals(PlatformType.IONTORRENT)) {
+        } else if (pt.equals(PlatformType.IONTORRENT)) {
           return null;
-        }
-        else if (pt.equals(PlatformType.PACBIO)) {
+        } else if (pt.equals(PlatformType.PACBIO)) {
           return changePacBioContainer(session, json);
-        }
-        else {
+        } else {
           return JSONUtils.SimpleJSONError("Unrecognised platform type: " + platform);
         }
       }
@@ -216,14 +205,11 @@ public class RunControllerHelperService {
       if (pt != null) {
         if (pt.equals(PlatformType.LS454)) {
           return changeLS454Chamber(session, json);
-        }
-        else if (pt.equals(PlatformType.SOLID)) {
+        } else if (pt.equals(PlatformType.SOLID)) {
           return changeSolidChamber(session, json);
-        }
-        else if (pt.equals(PlatformType.PACBIO)) {
+        } else if (pt.equals(PlatformType.PACBIO)) {
           return changePacBioChamber(session, json);
-        }
-        else {
+        } else {
           return JSONUtils.SimpleJSONError("Unrecognised platform type: " + platform);
         }
       }
@@ -239,9 +225,12 @@ public class RunControllerHelperService {
     if ("Illumina MiSeq".equals(instrumentModel) || "Illumina NextSeq 500".equals(instrumentModel)) {
       b.append("<h2>Container 1</h2>");
       b.append("<table class='in'>");
-      b.append("<tr><td>ID:</td><td><button onclick='Run.container.lookupContainer(this, 0);' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'><input type='text' id='sequencerPartitionContainers[0].identificationBarcode' name='sequencerPartitionContainers[0].identificationBarcode'/></div></td></tr>");
-      b.append("<tr><td>Location:</td><td><input type='text' id='sequencerPartitionContainers[0].locationBarcode' name='sequencerPartitionContainers[0].locationBarcode'/></td></tr>");
-      b.append("<tr><td>Paired:</td><td><input type='checkbox' id='sequencerPartitionContainers[0].paired' name='sequencerPartitionContainers[0].paired' value='false'/></td></tr>");
+      b.append(
+          "<tr><td>ID:</td><td><button onclick='Run.container.lookupContainer(this, 0);' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'><input type='text' id='sequencerPartitionContainers[0].identificationBarcode' name='sequencerPartitionContainers[0].identificationBarcode'/></div></td></tr>");
+      b.append(
+          "<tr><td>Location:</td><td><input type='text' id='sequencerPartitionContainers[0].locationBarcode' name='sequencerPartitionContainers[0].locationBarcode'/></td></tr>");
+      b.append(
+          "<tr><td>Paired:</td><td><input type='checkbox' id='sequencerPartitionContainers[0].paired' name='sequencerPartitionContainers[0].paired' value='false'/></td></tr>");
       b.append("</table>");
       b.append("<div id='partitionErrorDiv'> </div>");
       b.append("<div id='partitionDiv'>");
@@ -249,7 +238,8 @@ public class RunControllerHelperService {
       b.append("<th>Lane No.</th>");
       b.append("<th>Pool</th>");
 
-      b.append("<tr><td>1 </td><td width='90%'><div id='p_div_0-0' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[0].partitions[0].pool' partition='0_0'></ul></div></td></tr>");
+      b.append(
+          "<tr><td>1 </td><td width='90%'><div id='p_div_0-0' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[0].partitions[0].pool' partition='0_0'></ul></div></td></tr>");
       b.append("</table>");
       b.append("</div>");
 
@@ -258,13 +248,15 @@ public class RunControllerHelperService {
       f.setPartitionLimit(1);
       f.initEmptyPartitions();
       run.addSequencerPartitionContainer(f);
-    }
-    else if ("Illumina HiSeq 2500".equals(run.getSequencerReference().getPlatform().getInstrumentModel())) {
+    } else if ("Illumina HiSeq 2500".equals(run.getSequencerReference().getPlatform().getInstrumentModel())) {
       b.append("<h2>Container 1</h2>");
       b.append("<table class='in'>");
-      b.append("<tr><td>ID:</td><td><button onclick='Run.container.lookupContainer(this, 0);' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'><input type='text' id='sequencerPartitionContainers[0].identificationBarcode' name='sequencerPartitionContainers[0].identificationBarcode'/></div></td></tr>");
-      b.append("<tr><td>Location:</td><td><input type='text' id='sequencerPartitionContainers[0].locationBarcode' name='sequencerPartitionContainers[0].locationBarcode'/></td></tr>");
-      b.append("<tr><td>Paired:</td><td><input type='checkbox' id='sequencerPartitionContainers[0].paired' name='sequencerPartitionContainers[0].paired' value='false'/></td></tr>");
+      b.append(
+          "<tr><td>ID:</td><td><button onclick='Run.container.lookupContainer(this, 0);' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'><input type='text' id='sequencerPartitionContainers[0].identificationBarcode' name='sequencerPartitionContainers[0].identificationBarcode'/></div></td></tr>");
+      b.append(
+          "<tr><td>Location:</td><td><input type='text' id='sequencerPartitionContainers[0].locationBarcode' name='sequencerPartitionContainers[0].locationBarcode'/></td></tr>");
+      b.append(
+          "<tr><td>Paired:</td><td><input type='checkbox' id='sequencerPartitionContainers[0].paired' name='sequencerPartitionContainers[0].paired' value='false'/></td></tr>");
       b.append("</table>");
       b.append("<div id='partitionErrorDiv'> </div>");
       b.append("<div id='partitionDiv'>");
@@ -275,16 +267,19 @@ public class RunControllerHelperService {
       SequencerPartitionContainer<SequencerPoolPartition> f = dataObjectFactory.getSequencerPartitionContainer();
       f.setPlatform(run.getSequencerReference().getPlatform());
       run.addSequencerPartitionContainer(f);
-    }
-    else {
+    } else {
       int numContainers = json.getInt("numContainers");
       run.getSequencerPartitionContainers().clear();
       for (int i = 0; i < numContainers; i++) {
         b.append("<h2>Container " + (i + 1) + "</h2>");
         b.append("<table class='in'>");
-        b.append("<tr><td>ID:</td><td><button onclick='Run.container.lookupContainer(this, " + i + ");' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'><input type='text' id='sequencerPartitionContainers[" + i + "].identificationBarcode' name='sequencerPartitionContainers[" + i + "].identificationBarcode'/></div></td></tr>");
-        b.append("<tr><td>Location:</td><td><input type='text' id='sequencerPartitionContainers[" + i + "].locationBarcode' name='sequencerPartitionContainers[" + i + "].locationBarcode'/></td></tr>");
-        b.append("<tr><td>Paired:</td><td><input type='checkbox' id='sequencerPartitionContainers[" + i + "].paired' name='sequencerPartitionContainers[" + i + "].paired' value='false'/></td></tr>");
+        b.append("<tr><td>ID:</td><td><button onclick='Run.container.lookupContainer(this, " + i
+            + ");' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'><input type='text' id='sequencerPartitionContainers["
+            + i + "].identificationBarcode' name='sequencerPartitionContainers[" + i + "].identificationBarcode'/></div></td></tr>");
+        b.append("<tr><td>Location:</td><td><input type='text' id='sequencerPartitionContainers[" + i
+            + "].locationBarcode' name='sequencerPartitionContainers[" + i + "].locationBarcode'/></td></tr>");
+        b.append("<tr><td>Paired:</td><td><input type='checkbox' id='sequencerPartitionContainers[" + i
+            + "].paired' name='sequencerPartitionContainers[" + i + "].paired' value='false'/></td></tr>");
         b.append("</table>");
         b.append("<div id='partitionErrorDiv'> </div>");
         b.append("<div id='partitionDiv'>");
@@ -292,14 +287,30 @@ public class RunControllerHelperService {
         b.append("<th>Lane No.</th>");
         b.append("<th>Pool</th>");
 
-        b.append("<tr><td>1 </td><td width='90%'><div id='p_div_" + i + "-0' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + i + "].partitions[0].pool' partition='" + i + "_0'></ul></div></td></tr>");
-        b.append("<tr><td>2 </td><td width='90%'><div id='p_div_" + i + "-1' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + i + "].partitions[1].pool' partition='" + i + "_1'></ul></div></td></tr>");
-        b.append("<tr><td>3 </td><td width='90%'><div id='p_div_" + i + "-2' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + i + "].partitions[2].pool' partition='" + i + "_2'></ul></div></td></tr>");
-        b.append("<tr><td>4 </td><td width='90%'><div id='p_div_" + i + "-3' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + i + "].partitions[3].pool' partition='" + i + "_3'></ul></div></td></tr>");
-        b.append("<tr><td>5 </td><td width='90%'><div id='p_div_" + i + "-4' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + i + "].partitions[4].pool' partition='" + i + "_4'></ul></div></td></tr>");
-        b.append("<tr><td>6 </td><td width='90%'><div id='p_div_" + i + "-5' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + i + "].partitions[5].pool' partition='" + i + "_5'></ul></div></td></tr>");
-        b.append("<tr><td>7 </td><td width='90%'><div id='p_div_" + i + "-6' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + i + "].partitions[6].pool' partition='" + i + "_6'></ul></div></td></tr>");
-        b.append("<tr><td>8 </td><td width='90%'><div id='p_div_" + i + "-7' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + i + "].partitions[7].pool' partition='" + i + "_7'></ul></div></td></tr>");
+        b.append("<tr><td>1 </td><td width='90%'><div id='p_div_" + i
+            + "-0' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + i
+            + "].partitions[0].pool' partition='" + i + "_0'></ul></div></td></tr>");
+        b.append("<tr><td>2 </td><td width='90%'><div id='p_div_" + i
+            + "-1' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + i
+            + "].partitions[1].pool' partition='" + i + "_1'></ul></div></td></tr>");
+        b.append("<tr><td>3 </td><td width='90%'><div id='p_div_" + i
+            + "-2' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + i
+            + "].partitions[2].pool' partition='" + i + "_2'></ul></div></td></tr>");
+        b.append("<tr><td>4 </td><td width='90%'><div id='p_div_" + i
+            + "-3' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + i
+            + "].partitions[3].pool' partition='" + i + "_3'></ul></div></td></tr>");
+        b.append("<tr><td>5 </td><td width='90%'><div id='p_div_" + i
+            + "-4' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + i
+            + "].partitions[4].pool' partition='" + i + "_4'></ul></div></td></tr>");
+        b.append("<tr><td>6 </td><td width='90%'><div id='p_div_" + i
+            + "-5' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + i
+            + "].partitions[5].pool' partition='" + i + "_5'></ul></div></td></tr>");
+        b.append("<tr><td>7 </td><td width='90%'><div id='p_div_" + i
+            + "-6' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + i
+            + "].partitions[6].pool' partition='" + i + "_6'></ul></div></td></tr>");
+        b.append("<tr><td>8 </td><td width='90%'><div id='p_div_" + i
+            + "-7' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + i
+            + "].partitions[7].pool' partition='" + i + "_7'></ul></div></td></tr>");
         b.append("</table>");
         b.append("</div>");
 
@@ -328,7 +339,9 @@ public class RunControllerHelperService {
 
     for (int i = 0; i < numLanes; i++) {
       b.append("<tr><td>" + (i + 1) + "</td>");
-      b.append("<td width='90%'><div id='p_div_" + container + "-" + i + "' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + container + "].partitions[" + i + "].pool' partition='" + container + "_" + i + "'></ul></div></td>");
+      b.append("<td width='90%'><div id='p_div_" + container + "-" + i
+          + "' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + container
+          + "].partitions[" + i + "].pool' partition='" + container + "_" + i + "'></ul></div></td>");
       b.append("</tr>");
     }
     b.append("</table>");
@@ -345,17 +358,26 @@ public class RunControllerHelperService {
     for (int i = 0; i < numContainers; i++) {
       b.append("<h2>Container " + (i + 1) + "</h2>");
       b.append("<table class='in'>");
-      b.append("<tr><td>ID:</td><td><button onclick='Run.container.lookupContainer(this, " + i + ");' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'><input type='text' id='sequencerPartitionContainers[" + i + "].identificationBarcode' name='sequencerPartitionContainers[" + i + "].identificationBarcode'/></div></td></tr>");
-      b.append("<tr><td>Location:</td><td><input type='text' id='sequencerPartitionContainers[" + i + "].locationBarcode' name='sequencerPartitionContainers[" + i + "].locationBarcode'/></td></tr>");
-      b.append("<tr><td>Paired:</td><td><input type='checkbox' id='sequencerPartitionContainers[" + i + "].paired' name='sequencerPartitionContainers[" + i + "].paired'/></td></tr>");
+      b.append("<tr><td>ID:</td><td><button onclick='Run.container.lookupContainer(this, " + i
+          + ");' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'><input type='text' id='sequencerPartitionContainers["
+          + i + "].identificationBarcode' name='sequencerPartitionContainers[" + i + "].identificationBarcode'/></div></td></tr>");
+      b.append("<tr><td>Location:</td><td><input type='text' id='sequencerPartitionContainers[" + i
+          + "].locationBarcode' name='sequencerPartitionContainers[" + i + "].locationBarcode'/></td></tr>");
+      b.append("<tr><td>Paired:</td><td><input type='checkbox' id='sequencerPartitionContainers[" + i
+          + "].paired' name='sequencerPartitionContainers[" + i + "].paired'/></td></tr>");
       b.append("</table>");
       b.append("<div id='partitionErrorDiv'> </div>");
       b.append("<div id='partitionDiv'>");
-      b.append("<input id='chamber1' name='container" + i + "Select' onchange='Run.ui.changeLS454Chamber(this, " + i + ");' type='radio' value='1'/>1 ");
-      b.append("<input id='chamber2' name='container" + i + "Select' onchange='Run.ui.changeLS454Chamber(this, " + i + ");' type='radio' value='2'/>2 ");
-      b.append("<input id='chamber4' name='container" + i + "Select' onchange='Run.ui.changeLS454Chamber(this, " + i + ");' type='radio' value='4'/>4 ");
-      b.append("<input id='chamber8' name='container" + i + "Select' onchange='Run.ui.changeLS454Chamber(this, " + i + ");' type='radio' value='8'/>8 ");
-      b.append("<input id='chamber16' name='container" + i + "Select' onchange='Run.ui.changeLS454Chamber(this, " + i + ");' type='radio' value='16'/>16<br/>");
+      b.append("<input id='chamber1' name='container" + i + "Select' onchange='Run.ui.changeLS454Chamber(this, " + i
+          + ");' type='radio' value='1'/>1 ");
+      b.append("<input id='chamber2' name='container" + i + "Select' onchange='Run.ui.changeLS454Chamber(this, " + i
+          + ");' type='radio' value='2'/>2 ");
+      b.append("<input id='chamber4' name='container" + i + "Select' onchange='Run.ui.changeLS454Chamber(this, " + i
+          + ");' type='radio' value='4'/>4 ");
+      b.append("<input id='chamber8' name='container" + i + "Select' onchange='Run.ui.changeLS454Chamber(this, " + i
+          + ");' type='radio' value='8'/>8 ");
+      b.append("<input id='chamber16' name='container" + i + "Select' onchange='Run.ui.changeLS454Chamber(this, " + i
+          + ");' type='radio' value='16'/>16<br/>");
       b.append("<div id='containerdiv" + i + "'> </div>");
       b.append("</div>");
 
@@ -382,7 +404,9 @@ public class RunControllerHelperService {
 
     for (int i = 0; i < numChambers; i++) {
       b.append("<tr><td>" + (i + 1) + "</td>");
-      b.append("<td width='90%'><div id='p_div_" + container + "-" + i + "' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + container + "].partitions[" + i + "].pool' partition='" + container + "_" + i + "'></ul></div></td>");
+      b.append("<td width='90%'><div id='p_div_" + container + "-" + i
+          + "' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + container
+          + "].partitions[" + i + "].pool' partition='" + container + "_" + i + "'></ul></div></td>");
       b.append("</tr>");
     }
     b.append("</table>");
@@ -399,9 +423,13 @@ public class RunControllerHelperService {
     for (int i = 0; i < numContainers; i++) {
       b.append("<h2>Container " + (i + 1) + "</h2>");
       b.append("<table class='in'>");
-      b.append("<tr><td>ID:</td><td><button onclick='Run.container.lookupContainer(this, " + i + ");' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'><input type='text' id='sequencerPartitionContainers[" + i + "].identificationBarcode' name='sequencerPartitionContainers[" + i + "].identificationBarcode'/></div></td></tr>");
-      b.append("<tr><td>Location:</td><td><input type='text' id='sequencerPartitionContainers[" + i + "].locationBarcode' name='sequencerPartitionContainers[" + i + "].locationBarcode'/></td></tr>");
-      b.append("<tr><td>Paired:</td><td><input type='checkbox' id='sequencerPartitionContainers[" + i + "].paired' name='sequencerPartitionContainers[" + i + "].paired'/></td></tr>");
+      b.append("<tr><td>ID:</td><td><button onclick='Run.container.lookupContainer(this, " + i
+          + ");' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'><input type='text' id='sequencerPartitionContainers["
+          + i + "].identificationBarcode' name='sequencerPartitionContainers[" + i + "].identificationBarcode'/></div></td></tr>");
+      b.append("<tr><td>Location:</td><td><input type='text' id='sequencerPartitionContainers[" + i
+          + "].locationBarcode' name='sequencerPartitionContainers[" + i + "].locationBarcode'/></td></tr>");
+      b.append("<tr><td>Paired:</td><td><input type='checkbox' id='sequencerPartitionContainers[" + i
+          + "].paired' name='sequencerPartitionContainers[" + i + "].paired'/></td></tr>");
       b.append("</table>");
       b.append("<div id='partitionErrorDiv'> </div>");
       b.append("<div id='partitionDiv'>");
@@ -410,19 +438,34 @@ public class RunControllerHelperService {
         b.append("<th>Chamber No.</th>");
         b.append("<th>Pool</th>");
 
-        b.append("<tr><td>1 </td><td width='90%'><div id='p_div_" + i + "-0' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + i + "].partitions[0].pool' partition='" + i + "_0'></ul></div></td></tr>");
-        b.append("<tr><td>2 </td><td width='90%'><div id='p_div_" + i + "-1' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + i + "].partitions[1].pool' partition='" + i + "_1'></ul></div></td></tr>");
-        b.append("<tr><td>3 </td><td width='90%'><div id='p_div_" + i + "-2' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + i + "].partitions[2].pool' partition='" + i + "_2'></ul></div></td></tr>");
-        b.append("<tr><td>4 </td><td width='90%'><div id='p_div_" + i + "-3' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + i + "].partitions[3].pool' partition='" + i + "_3'></ul></div></td></tr>");
-        b.append("<tr><td>5 </td><td width='90%'><div id='p_div_" + i + "-4' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + i + "].partitions[4].pool' partition='" + i + "_4'></ul></div></td></tr>");
-        b.append("<tr><td>6 </td><td width='90%'><div id='p_div_" + i + "-5' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + i + "].partitions[5].pool' partition='" + i + "_5'></ul></div></td></tr>");
+        b.append("<tr><td>1 </td><td width='90%'><div id='p_div_" + i
+            + "-0' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + i
+            + "].partitions[0].pool' partition='" + i + "_0'></ul></div></td></tr>");
+        b.append("<tr><td>2 </td><td width='90%'><div id='p_div_" + i
+            + "-1' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + i
+            + "].partitions[1].pool' partition='" + i + "_1'></ul></div></td></tr>");
+        b.append("<tr><td>3 </td><td width='90%'><div id='p_div_" + i
+            + "-2' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + i
+            + "].partitions[2].pool' partition='" + i + "_2'></ul></div></td></tr>");
+        b.append("<tr><td>4 </td><td width='90%'><div id='p_div_" + i
+            + "-3' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + i
+            + "].partitions[3].pool' partition='" + i + "_3'></ul></div></td></tr>");
+        b.append("<tr><td>5 </td><td width='90%'><div id='p_div_" + i
+            + "-4' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + i
+            + "].partitions[4].pool' partition='" + i + "_4'></ul></div></td></tr>");
+        b.append("<tr><td>6 </td><td width='90%'><div id='p_div_" + i
+            + "-5' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + i
+            + "].partitions[5].pool' partition='" + i + "_5'></ul></div></td></tr>");
         b.append("</table>");
-      }
-      else {
-        b.append("<input id='chamber1' name='container" + i + "Select' onchange='Run.ui.changeSolidChamber(this, " + i + ");' type='radio' value='1'/>1 ");
-        b.append("<input id='chamber4' name='container" + i + "Select' onchange='Run.ui.changeSolidChamber(this, " + i + ");' type='radio' value='4'/>4 ");
-        b.append("<input id='chamber8' name='container" + i + "Select' onchange='Run.ui.changeSolidChamber(this, " + i + ");' type='radio' value='8'/>8 ");
-        b.append("<input id='chamber16' name='container" + i + "Select' onchange='Run.ui.changeSolidChamber(this, " + i + ");' type='radio' value='16'/>16<br/>");
+      } else {
+        b.append("<input id='chamber1' name='container" + i + "Select' onchange='Run.ui.changeSolidChamber(this, " + i
+            + ");' type='radio' value='1'/>1 ");
+        b.append("<input id='chamber4' name='container" + i + "Select' onchange='Run.ui.changeSolidChamber(this, " + i
+            + ");' type='radio' value='4'/>4 ");
+        b.append("<input id='chamber8' name='container" + i + "Select' onchange='Run.ui.changeSolidChamber(this, " + i
+            + ");' type='radio' value='8'/>8 ");
+        b.append("<input id='chamber16' name='container" + i + "Select' onchange='Run.ui.changeSolidChamber(this, " + i
+            + ");' type='radio' value='16'/>16<br/>");
       }
       b.append("<div id='containerdiv" + i + "'> </div>");
       b.append("</div>");
@@ -449,7 +492,9 @@ public class RunControllerHelperService {
     b.append("<th>Pool</th>");
     for (int i = 0; i < numChambers; i++) {
       b.append("<tr><td>" + (i + 1) + "</td>");
-      b.append("<td width='90%'><div id='p_div_" + container + "-" + i + "' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + container + "].partitions[" + i + "].pool'  partition='" + container + "_" + i + "'></ul></div></td>");
+      b.append("<td width='90%'><div id='p_div_" + container + "-" + i
+          + "' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + container
+          + "].partitions[" + i + "].pool'  partition='" + container + "_" + i + "'></ul></div></td>");
       b.append("</tr>");
     }
     b.append("</table>");
@@ -465,21 +510,33 @@ public class RunControllerHelperService {
     for (int i = 0; i < numContainers; i++) {
       b.append("<h2>Container " + (i + 1) + "</h2>");
       b.append("<table class='in'>");
-      b.append("<tr><td>ID:</td><td><button onclick='Run.container.lookupContainer(this, " + i + ");' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'><input type='text' id='sequencerPartitionContainers[" + i + "].identificationBarcode' name='sequencerPartitionContainers[" + i + "].identificationBarcode'/></div></td></tr>");
-      b.append("<tr><td>Location:</td><td><input type='text' id='sequencerPartitionContainers[" + i + "].locationBarcode' name='sequencerPartitionContainers[" + i + "].locationBarcode'/></td></tr>");
-      b.append("<tr><td>Paired:</td><td><input type='checkbox' id='sequencerPartitionContainers[" + i + "].paired' name='sequencerPartitionContainers[" + i + "].paired'/></td></tr>");
+      b.append("<tr><td>ID:</td><td><button onclick='Run.container.lookupContainer(this, " + i
+          + ");' type='button' class='right-button ui-state-default ui-corner-all'>Lookup</button><div style='overflow:hidden'><input type='text' id='sequencerPartitionContainers["
+          + i + "].identificationBarcode' name='sequencerPartitionContainers[" + i + "].identificationBarcode'/></div></td></tr>");
+      b.append("<tr><td>Location:</td><td><input type='text' id='sequencerPartitionContainers[" + i
+          + "].locationBarcode' name='sequencerPartitionContainers[" + i + "].locationBarcode'/></td></tr>");
+      b.append("<tr><td>Paired:</td><td><input type='checkbox' id='sequencerPartitionContainers[" + i
+          + "].paired' name='sequencerPartitionContainers[" + i + "].paired'/></td></tr>");
       b.append("</table>");
       b.append("<div id='partitionErrorDiv'> </div>");
       b.append("<div id='partitionDiv'>");
 
-      b.append("<input id='chamber1' name='container" + i + "Select' onchange='Run.ui.changePacBioChamber(this, " + i + ");' type='radio' value='1'/>1 ");
-      b.append("<input id='chamber2' name='container" + i + "Select' onchange='Run.ui.changePacBioChamber(this, " + i + ");' type='radio' value='2'/>2 ");
-      b.append("<input id='chamber3' name='container" + i + "Select' onchange='Run.ui.changePacBioChamber(this, " + i + ");' type='radio' value='3'/>3 ");
-      b.append("<input id='chamber4' name='container" + i + "Select' onchange='Run.ui.changePacBioChamber(this, " + i + ");' type='radio' value='4'/>4 ");
-      b.append("<input id='chamber5' name='container" + i + "Select' onchange='Run.ui.changePacBioChamber(this, " + i + ");' type='radio' value='5'/>5 ");
-      b.append("<input id='chamber6' name='container" + i + "Select' onchange='Run.ui.changePacBioChamber(this, " + i + ");' type='radio' value='6'/>6 ");
-      b.append("<input id='chamber7' name='container" + i + "Select' onchange='Run.ui.changePacBioChamber(this, " + i + ");' type='radio' value='7'/>7 ");
-      b.append("<input id='chamber8' name='container" + i + "Select' onchange='Run.ui.changePacBioChamber(this, " + i + ");' type='radio' value='8'/>8<br/>");
+      b.append("<input id='chamber1' name='container" + i + "Select' onchange='Run.ui.changePacBioChamber(this, " + i
+          + ");' type='radio' value='1'/>1 ");
+      b.append("<input id='chamber2' name='container" + i + "Select' onchange='Run.ui.changePacBioChamber(this, " + i
+          + ");' type='radio' value='2'/>2 ");
+      b.append("<input id='chamber3' name='container" + i + "Select' onchange='Run.ui.changePacBioChamber(this, " + i
+          + ");' type='radio' value='3'/>3 ");
+      b.append("<input id='chamber4' name='container" + i + "Select' onchange='Run.ui.changePacBioChamber(this, " + i
+          + ");' type='radio' value='4'/>4 ");
+      b.append("<input id='chamber5' name='container" + i + "Select' onchange='Run.ui.changePacBioChamber(this, " + i
+          + ");' type='radio' value='5'/>5 ");
+      b.append("<input id='chamber6' name='container" + i + "Select' onchange='Run.ui.changePacBioChamber(this, " + i
+          + ");' type='radio' value='6'/>6 ");
+      b.append("<input id='chamber7' name='container" + i + "Select' onchange='Run.ui.changePacBioChamber(this, " + i
+          + ");' type='radio' value='7'/>7 ");
+      b.append("<input id='chamber8' name='container" + i + "Select' onchange='Run.ui.changePacBioChamber(this, " + i
+          + ");' type='radio' value='8'/>8<br/>");
 
       b.append("<div id='containerdiv" + i + "'> </div>");
       b.append("</div>");
@@ -506,7 +563,9 @@ public class RunControllerHelperService {
     b.append("<th>Pool</th>");
     for (int i = 0; i < numChambers; i++) {
       b.append("<tr><td>" + (i + 1) + "</td>");
-      b.append("<td width='90%'><div id='p_div_" + container + "-" + i + "' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + container + "].partitions[" + i + "].pool'  partition='" + container + "_" + i + "'></ul></div></td>");
+      b.append("<td width='90%'><div id='p_div_" + container + "-" + i
+          + "' class='elementListDroppableDiv'><ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + container
+          + "].partitions[" + i + "].pool'  partition='" + container + "_" + i + "'></ul></div></td>");
       b.append("</tr>");
     }
     b.append("</table>");
@@ -542,8 +601,7 @@ public class RunControllerHelperService {
       map.put("qcUserOptions", sb.toString());
       map.put("runId", json.getString("runId"));
       return JSONUtils.JSONObjectResponse(map);
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       log.error("Failed to get available users for this Run QC: ", e);
       return JSONUtils.SimpleJSONError("Failed to get available users for this Run QC: " + e.getMessage());
@@ -560,8 +618,7 @@ public class RunControllerHelperService {
       Map<String, Object> map = new HashMap<String, Object>();
       map.put("types", sb.toString());
       return JSONUtils.JSONObjectResponse(map);
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
     }
     return JSONUtils.SimpleJSONError("Cannot list all Run QC Types");
@@ -577,7 +634,9 @@ public class RunControllerHelperService {
         for (SequencerPartitionContainer<SequencerPoolPartition> f : ((RunImpl) r).getSequencerPartitionContainers()) {
           sb.append("<table class='containerSummary'><tr>");
           for (Partition p : f.getPartitions()) {
-            sb.append("<td onclick='Run.qc.toggleProcessPartition(this);' runId='" + r.getId() + "' containerId='" + f.getId() + "' partitionNumber='" + p.getPartitionNumber() + "' id='" + r.getId() + "_" + f.getId() + "_" + p.getPartitionNumber() + "' class='smallbox'>" + p.getPartitionNumber() + "</td>");
+            sb.append("<td onclick='Run.qc.toggleProcessPartition(this);' runId='" + r.getId() + "' containerId='" + f.getId()
+                + "' partitionNumber='" + p.getPartitionNumber() + "' id='" + r.getId() + "_" + f.getId() + "_" + p.getPartitionNumber()
+                + "' class='smallbox'>" + p.getPartitionNumber() + "</td>");
           }
           sb.append("</tr></table>");
         }
@@ -586,8 +645,7 @@ public class RunControllerHelperService {
         map.put("processSelection", sb.toString());
         return JSONUtils.JSONObjectResponse(map);
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
     }
     return JSONUtils.SimpleJSONError("Cannot list all Run QC Process Selection");
@@ -605,10 +663,8 @@ public class RunControllerHelperService {
         Long runId = Long.parseLong(json.getString("runId"));
         Run run = requestManager.getRunById(runId);
         /*
-        if (json.has("qcPassed") && json.getString("qcPassed").equals("true")) {
-          sample.setQcPassed(true);
-        }
-        */
+         * if (json.has("qcPassed") && json.getString("qcPassed").equals("true")) { sample.setQcPassed(true); }
+         */
 
         List<String> processSelections = new ArrayList<String>();
         List<Partition> partitionSelections = new ArrayList<Partition>();
@@ -639,7 +695,8 @@ public class RunControllerHelperService {
         run.addQc(newQc);
 
         StringBuilder sb = new StringBuilder();
-        sb.append("<tr><th>QCed By</th><th>QC Date</th><th>Method</th><th>Process Selection</th><th>Information</th><th>Do Not Process</th></tr>");
+        sb.append(
+            "<tr><th>QCed By</th><th>QC Date</th><th>Method</th><th>Process Selection</th><th>Information</th><th>Do Not Process</th></tr>");
         for (RunQC qc : run.getRunQCs()) {
           sb.append("<tr>");
           sb.append("<td>" + qc.getQcCreator() + "</td>");
@@ -651,10 +708,13 @@ public class RunControllerHelperService {
             sb.append("<table class='containerSummary'><tr>");
             for (Partition p : f.getPartitions()) {
               if (processSelections.contains(run.getId() + "_" + f.getId() + "_" + p.getPartitionNumber())) {
-                sb.append("<td runId='" + run.getId() + "' containerId='" + f.getId() + "' partitionId='" + p.getId() + "' id='" + qc.getId() + "_" + run.getId() + "_" + f.getId() + "_" + p.getPartitionNumber() + "' class='smallbox partitionOccupied'>" + p.getPartitionNumber() + "</td>");
-              }
-              else {
-                sb.append("<td runId='" + run.getId() + "' containerId='" + f.getId() + "' partitionId='" + p.getId() + "' id='" + qc.getId() + "_" + run.getId() + "_" + f.getId() + "_" + p.getPartitionNumber() + "' class='smallbox'>" + p.getPartitionNumber() + "</td>");
+                sb.append("<td runId='" + run.getId() + "' containerId='" + f.getId() + "' partitionId='" + p.getId() + "' id='"
+                    + qc.getId() + "_" + run.getId() + "_" + f.getId() + "_" + p.getPartitionNumber()
+                    + "' class='smallbox partitionOccupied'>" + p.getPartitionNumber() + "</td>");
+              } else {
+                sb.append("<td runId='" + run.getId() + "' containerId='" + f.getId() + "' partitionId='" + p.getId() + "' id='"
+                    + qc.getId() + "_" + run.getId() + "_" + f.getId() + "_" + p.getPartitionNumber() + "' class='smallbox'>"
+                    + p.getPartitionNumber() + "</td>");
               }
             }
             sb.append("</tr></table>");
@@ -669,249 +729,139 @@ public class RunControllerHelperService {
 
         return JSONUtils.SimpleJSONResponse(sb.toString());
       }
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       log.error("Failed to add Run QC to this run: ", e);
       return JSONUtils.SimpleJSONError("Failed to add Run QC to this run: " + e.getMessage());
     }
     return JSONUtils.SimpleJSONError("Cannot add RunQC");
   }
 
-  //TODO - FIX THIS!
+  // TODO - FIX THIS!
   /*
-  public JSONObject previewRunImport(HttpSession session, JSONObject json) {
-    StringBuffer sb = new StringBuffer();
-
-    String runPath = json.getString("runPath");
-    String platformType = json.getString("platformType");
-    String experimentId = json.getString("experimentId");
-
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Experiment experiment = requestManager.getExperimentById(Long.parseLong(experimentId));
-      PlatformType rt = PlatformType.get(platformType);
-
-      if (rt.equals(PlatformType.ILLUMINA)) {
-        //Run run = ((TgacDataObjectFactory) DataObjectFactory.getDataObjectFactory(DataObjectFactory.TGAC)).getRunOfType(rt, experiment, user);
-        Run run = dataObjectFactory.getRunOfType(rt, user);
-        run.setPlatformType(rt);
-        //match something like 100216_N73018_0002_desc
-        String regex = "([\\d]+)_(N[0-9]{5})_([\\d]{4})_(.*)";
-        Pattern p = Pattern.compile(regex);
-        Matcher m = p.matcher(runPath); // get a matcher object
-
-        if (m.matches()) {
-          Map<String, String> s = RunInfoUtils.checkIlluminaStatus(runPath);
-          if (s.get("error") == null) {
-            try {
-              StatusImpl status = new StatusImpl(s.get("ok"));
-              Map<String, String> complete = RunInfoUtils.checkIlluminaCompleted(runPath);
-              if (complete.get("error") == null) {
-                status.setHealth(HealthType.Completed);
-              }
-
-              Document statusDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(status.parseStatusFile())));
-              String runName = statusDoc.getElementsByTagName("RunName").item(0).getTextContent();
-              String per = statusDoc.getElementsByTagName("IsPairedEndRun").item(0).getTextContent();
-              String cyc = statusDoc.getElementsByTagName("NumCycles").item(0).getTextContent();
-
-              run.setName(runName);
-              run.setPairedEnd(Boolean.parseBoolean(per));
-              run.setCycles(Integer.parseInt(cyc));
-
-              run.setPlatformRunId(Integer.parseInt(m.group(3)));
-              run.setDescription(m.group(4));
-              run.setFilePath(runPath);
-
-              run.setStatus(status);
-
-              boolean stored = false;
-              for (Run r : requestManager.listAllRuns()) {
-                if (r.equals(run)) {
-                  stored = true;
-                  run.setRunId(r.getRunId());
-                }
-              }
-
-              session.setAttribute("experiment", experiment);
-              session.setAttribute("run", run);
-
-              StringBuilder b = new StringBuilder();
-              String health = run.getStatus().getHealth().getKey();
-              b.append("<div id='runpreview' class='" + health + "'>");
-
-              b.append("<h1 class='h_" + health + "'>" + run.getStatus().getHealth().getKey() + "</h1><br/>(" + run.getStatus().getPath() + ")<br/>");
-              b.append("Name: <b>" + run.getName() + "</b><br/>");
-              b.append("Description: <b>" + run.getDescription() + "</b><br/>");
-              b.append("Paired End: <b>" + run.getPairedEnd() + "</b><br/>");
-              b.append("Cycles: <b>" + run.getCycles() + "</b><br/><br/>");
-
-              if (stored) {
-                b.append("<br/>This run has already been added to the system: <a href='/miso/run/" + run.getRunId() + "/experiment/" + experimentId + "'>" + run.getName() + "</a>");
-              }
-              else {
-                b.append("<form method='POST'>");
-                b.append("<input type='hidden' name='experiment' id='experiment' value='" + experimentId + "'");
-                b.append("<input type='submit' value='Import'/>");
-                b.append("</form>");
-              }
-
-              b.append("</div>");
-              return JSONUtils.SimpleJSONResponse(b.toString());
-            }
-            catch (ParserConfigurationException e) {
-              //throw new MalformedRunException("Could not set up status parser", e);
-              return JSONUtils.SimpleJSONError("Could not set up status parser: " + e.getMessage());
-            }
-            catch (SAXException e) {
-              //throw new MalformedRunException("Could not parse status document", e);
-              return JSONUtils.SimpleJSONError("Could not parse status document: " + e.getMessage());
-            }
-            catch (StatusException e) {
-              //throw new MalformedRunException("Could not populate Status object", e);
-              return JSONUtils.SimpleJSONError("Could not populate Status object: " + e.getMessage());
-            }
-          }
-          else {
-            //throw new MalformedRunException("Run directory \"" + runPath + "\" could not be found.");
-            return JSONUtils.SimpleJSONError("Run directory \"" + runPath + "\" could not be found.");
-          }
-        }
-        else {
-          //throw new MalformedRunException("Run directory \"" + runPath + "\" does not look right.");
-          return JSONUtils.SimpleJSONError("Run directory \"" + runPath + "\" does not look right.");
-        }
-      }
-      else if (rt.equals(PlatformType.LS454)) {
-        //Run run = ((TgacDataObjectFactory) DataObjectFactory.getDataObjectFactory(DataObjectFactory.TGAC)).getRunOfType(rt, experiment, user);
-        Run run = dataObjectFactory.getRunOfType(rt, user);
-        run.setPlatformType(rt);
-        //match something like R_2009_11_20_08_52_18_FLX02090498_Administrator_JR1JR2JR3JR4
-        String regex = "R_(\\d{4}_\\d{2}_\\d{2}_\\d{2}_\\d{2}_\\d{2})_([A-Z0-9]+)_([A-Za-z]+)_(.*)";
-        Pattern p = Pattern.compile(regex);
-        Matcher m = p.matcher(runPath); // get a matcher object
-
-        if (m.matches()) {
-          Map<String, String> s = RunInfoUtils.check454Status(runPath);
-          if (s.get("error") == null) {
-            try {
-              StatusImpl status = new StatusImpl(s.get("ok"));
-              Map<String, String> complete = RunInfoUtils.check454Completed(runPath);
-              if (complete.get("error") == null) {
-                status.setHealth(HealthType.Completed);
-              }
-
-              Document statusDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(status.parseStatusFile())));
-
-              //String per = statusDoc.getElementsByTagName("IsPairedEndRun").item(0).getTextContent();
-              //run.setPairedEnd(Boolean.parseBoolean(per));
-
-              NodeList nodes = statusDoc.getElementsByTagName("id");
-              for (int i = 0; i < nodes.getLength(); i++) {
-                Node n = nodes.item(i);
-                if (n.getParentNode() != null) {
-                  if (n.getParentNode().getNodeName().equals("run")) {
-                    run.setName(n.getTextContent());
-                  }
-                  else if (n.getParentNode().getNodeName().equals("ptp")) {
-                    run.setPlatformRunId(Integer.parseInt(n.getTextContent()));
-                  }
-                }
-              }
-
-              run.setPairedEnd(false);
-
-              String cyc = statusDoc.getElementsByTagName("numCycles").item(0).getTextContent();
-              run.setCycles(Integer.parseInt(cyc));
-
-              String desc = statusDoc.getElementsByTagName("shortName").item(0).getTextContent();
-              run.setDescription(desc);
-
-              run.setFilePath(runPath);
-
-              run.setStatus(status);
-
-              boolean stored = false;
-              for (Run r : requestManager.listAllRuns()) {
-                if (r.equals(run)) {
-                  stored = true;
-                  run.setRunId(r.getRunId());
-                }
-              }
-
-              session.setAttribute("experiment", experiment);
-              session.setAttribute("run", run);
-
-              StringBuilder b = new StringBuilder();
-              String health = run.getStatus().getHealth().getKey();
-              b.append("<div id='runpreview' class='" + health + "'");
-
-              b.append("<h1 class='h_" + health + "'>" + health + "</h1><br/>(" + run.getStatus().getPath() + ")<br/>");
-              b.append("Name: <b>" + run.getName() + "</b><br/>");
-              b.append("Description: <b>" + run.getDescription() + "</b><br/>");
-              //b.append("Paired End: <b>" + run.getPairedEnd() + "</b><br/>");
-              b.append("Cycles: <b>" + run.getCycles() + "</b><br/><br/>");
-
-              if (stored) {
-                b.append("<br/>This run has already been added to the system: <a href='/miso/run/" + run.getRunId() + "/experiment/" + experimentId + "'>" + run.getName() + "</a>");
-              }
-              else {
-                b.append("<form method='POST'>");
-                b.append("<input type='hidden' name='experiment' id='experiment' value='" + experimentId + "'");
-                b.append("<input type='submit' value='Import'/>");
-                b.append("</form>");
-              }
-
-              b.append("</div>");
-              return JSONUtils.SimpleJSONResponse(b.toString());
-            }
-            catch (ParserConfigurationException e) {
-              //throw new MalformedRunException("Could not set up status parser", e);
-              return JSONUtils.SimpleJSONError("Could not set up status parser: " + e.getMessage());
-            }
-            catch (SAXException e) {
-              //throw new MalformedRunException("Could not parse status document", e);
-              return JSONUtils.SimpleJSONError("Could not parse status document: " + e.getMessage());
-            }
-            catch (StatusException e) {
-              //throw new MalformedRunException("Could not populate Status object", e);
-              return JSONUtils.SimpleJSONError("Could not populate Status object: " + e.getMessage());
-            }
-          }
-          else {
-            //throw new MalformedRunException("Run directory \"" + runPath + "\" could not be found.");
-            return JSONUtils.SimpleJSONError("Run directory \"" + runPath + "\" could not be found.");
-          }
-        }
-        else {
-          //throw new MalformedRunException("Run directory \"" + runPath + "\" does not look right.");
-          return JSONUtils.SimpleJSONError("Run directory \"" + runPath + "\" does not look right.");
-        }
-
-      }
-      else if (rt.equals(PlatformType.SOLID)) {
-        return JSONUtils.SimpleJSONError("Unsupported import type at present.");
-      }
-      else {
-        return JSONUtils.SimpleJSONError("Unrecognised run type.");
-      }
-    }
-    catch (IOException e) {
-      e.printStackTrace();
-      return JSONUtils.SimpleJSONError("Could not retrieve essential objects for run import.");
-    }
-  }
-  */
+   * public JSONObject previewRunImport(HttpSession session, JSONObject json) { StringBuffer sb = new StringBuffer();
+   * 
+   * String runPath = json.getString("runPath"); String platformType = json.getString("platformType"); String experimentId =
+   * json.getString("experimentId");
+   * 
+   * try { User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName()); Experiment
+   * experiment = requestManager.getExperimentById(Long.parseLong(experimentId)); PlatformType rt = PlatformType.get(platformType);
+   * 
+   * if (rt.equals(PlatformType.ILLUMINA)) { //Run run = ((TgacDataObjectFactory)
+   * DataObjectFactory.getDataObjectFactory(DataObjectFactory.TGAC)).getRunOfType(rt, experiment, user); Run run =
+   * dataObjectFactory.getRunOfType(rt, user); run.setPlatformType(rt); //match something like 100216_N73018_0002_desc String regex =
+   * "([\\d]+)_(N[0-9]{5})_([\\d]{4})_(.*)"; Pattern p = Pattern.compile(regex); Matcher m = p.matcher(runPath); // get a matcher object
+   * 
+   * if (m.matches()) { Map<String, String> s = RunInfoUtils.checkIlluminaStatus(runPath); if (s.get("error") == null) { try { StatusImpl
+   * status = new StatusImpl(s.get("ok")); Map<String, String> complete = RunInfoUtils.checkIlluminaCompleted(runPath); if
+   * (complete.get("error") == null) { status.setHealth(HealthType.Completed); }
+   * 
+   * Document statusDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new
+   * StringReader(status.parseStatusFile()))); String runName = statusDoc.getElementsByTagName("RunName").item(0).getTextContent(); String
+   * per = statusDoc.getElementsByTagName("IsPairedEndRun").item(0).getTextContent(); String cyc =
+   * statusDoc.getElementsByTagName("NumCycles").item(0).getTextContent();
+   * 
+   * run.setName(runName); run.setPairedEnd(Boolean.parseBoolean(per)); run.setCycles(Integer.parseInt(cyc));
+   * 
+   * run.setPlatformRunId(Integer.parseInt(m.group(3))); run.setDescription(m.group(4)); run.setFilePath(runPath);
+   * 
+   * run.setStatus(status);
+   * 
+   * boolean stored = false; for (Run r : requestManager.listAllRuns()) { if (r.equals(run)) { stored = true; run.setRunId(r.getRunId()); }
+   * }
+   * 
+   * session.setAttribute("experiment", experiment); session.setAttribute("run", run);
+   * 
+   * StringBuilder b = new StringBuilder(); String health = run.getStatus().getHealth().getKey(); b.append("<div id='runpreview' class='" +
+   * health + "'>");
+   * 
+   * b.append("<h1 class='h_" + health + "'>" + run.getStatus().getHealth().getKey() + "</h1><br/>(" + run.getStatus().getPath() +
+   * ")<br/>"); b.append("Name: <b>" + run.getName() + "</b><br/>"); b.append("Description: <b>" + run.getDescription() + "</b><br/>");
+   * b.append("Paired End: <b>" + run.getPairedEnd() + "</b><br/>"); b.append("Cycles: <b>" + run.getCycles() + "</b><br/><br/>");
+   * 
+   * if (stored) { b.append("<br/>This run has already been added to the system: <a href='/miso/run/" + run.getRunId() + "/experiment/" +
+   * experimentId + "'>" + run.getName() + "</a>"); } else { b.append("<form method='POST'>"); b.append(
+   * "<input type='hidden' name='experiment' id='experiment' value='" + experimentId + "'"); b.append(
+   * "<input type='submit' value='Import'/>"); b.append("</form>"); }
+   * 
+   * b.append("</div>"); return JSONUtils.SimpleJSONResponse(b.toString()); } catch (ParserConfigurationException e) { //throw new
+   * MalformedRunException("Could not set up status parser", e); return JSONUtils.SimpleJSONError("Could not set up status parser: " +
+   * e.getMessage()); } catch (SAXException e) { //throw new MalformedRunException("Could not parse status document", e); return
+   * JSONUtils.SimpleJSONError("Could not parse status document: " + e.getMessage()); } catch (StatusException e) { //throw new
+   * MalformedRunException("Could not populate Status object", e); return JSONUtils.SimpleJSONError("Could not populate Status object: " +
+   * e.getMessage()); } } else { //throw new MalformedRunException("Run directory \"" + runPath + "\" could not be found."); return
+   * JSONUtils.SimpleJSONError("Run directory \"" + runPath + "\" could not be found."); } } else { //throw new MalformedRunException(
+   * "Run directory \"" + runPath + "\" does not look right."); return JSONUtils.SimpleJSONError("Run directory \"" + runPath +
+   * "\" does not look right."); } } else if (rt.equals(PlatformType.LS454)) { //Run run = ((TgacDataObjectFactory)
+   * DataObjectFactory.getDataObjectFactory(DataObjectFactory.TGAC)).getRunOfType(rt, experiment, user); Run run =
+   * dataObjectFactory.getRunOfType(rt, user); run.setPlatformType(rt); //match something like
+   * R_2009_11_20_08_52_18_FLX02090498_Administrator_JR1JR2JR3JR4 String regex =
+   * "R_(\\d{4}_\\d{2}_\\d{2}_\\d{2}_\\d{2}_\\d{2})_([A-Z0-9]+)_([A-Za-z]+)_(.*)"; Pattern p = Pattern.compile(regex); Matcher m =
+   * p.matcher(runPath); // get a matcher object
+   * 
+   * if (m.matches()) { Map<String, String> s = RunInfoUtils.check454Status(runPath); if (s.get("error") == null) { try { StatusImpl status
+   * = new StatusImpl(s.get("ok")); Map<String, String> complete = RunInfoUtils.check454Completed(runPath); if (complete.get("error") ==
+   * null) { status.setHealth(HealthType.Completed); }
+   * 
+   * Document statusDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new
+   * StringReader(status.parseStatusFile())));
+   * 
+   * //String per = statusDoc.getElementsByTagName("IsPairedEndRun").item(0).getTextContent();
+   * //run.setPairedEnd(Boolean.parseBoolean(per));
+   * 
+   * NodeList nodes = statusDoc.getElementsByTagName("id"); for (int i = 0; i < nodes.getLength(); i++) { Node n = nodes.item(i); if
+   * (n.getParentNode() != null) { if (n.getParentNode().getNodeName().equals("run")) { run.setName(n.getTextContent()); } else if
+   * (n.getParentNode().getNodeName().equals("ptp")) { run.setPlatformRunId(Integer.parseInt(n.getTextContent())); } } }
+   * 
+   * run.setPairedEnd(false);
+   * 
+   * String cyc = statusDoc.getElementsByTagName("numCycles").item(0).getTextContent(); run.setCycles(Integer.parseInt(cyc));
+   * 
+   * String desc = statusDoc.getElementsByTagName("shortName").item(0).getTextContent(); run.setDescription(desc);
+   * 
+   * run.setFilePath(runPath);
+   * 
+   * run.setStatus(status);
+   * 
+   * boolean stored = false; for (Run r : requestManager.listAllRuns()) { if (r.equals(run)) { stored = true; run.setRunId(r.getRunId()); }
+   * }
+   * 
+   * session.setAttribute("experiment", experiment); session.setAttribute("run", run);
+   * 
+   * StringBuilder b = new StringBuilder(); String health = run.getStatus().getHealth().getKey(); b.append("<div id='runpreview' class='" +
+   * health + "'");
+   * 
+   * b.append("<h1 class='h_" + health + "'>" + health + "</h1><br/>(" + run.getStatus().getPath() + ")<br/>"); b.append("Name: <b>" +
+   * run.getName() + "</b><br/>"); b.append("Description: <b>" + run.getDescription() + "</b><br/>"); //b.append("Paired End: <b>" +
+   * run.getPairedEnd() + "</b><br/>"); b.append("Cycles: <b>" + run.getCycles() + "</b><br/><br/>");
+   * 
+   * if (stored) { b.append("<br/>This run has already been added to the system: <a href='/miso/run/" + run.getRunId() + "/experiment/" +
+   * experimentId + "'>" + run.getName() + "</a>"); } else { b.append("<form method='POST'>"); b.append(
+   * "<input type='hidden' name='experiment' id='experiment' value='" + experimentId + "'"); b.append(
+   * "<input type='submit' value='Import'/>"); b.append("</form>"); }
+   * 
+   * b.append("</div>"); return JSONUtils.SimpleJSONResponse(b.toString()); } catch (ParserConfigurationException e) { //throw new
+   * MalformedRunException("Could not set up status parser", e); return JSONUtils.SimpleJSONError("Could not set up status parser: " +
+   * e.getMessage()); } catch (SAXException e) { //throw new MalformedRunException("Could not parse status document", e); return
+   * JSONUtils.SimpleJSONError("Could not parse status document: " + e.getMessage()); } catch (StatusException e) { //throw new
+   * MalformedRunException("Could not populate Status object", e); return JSONUtils.SimpleJSONError("Could not populate Status object: " +
+   * e.getMessage()); } } else { //throw new MalformedRunException("Run directory \"" + runPath + "\" could not be found."); return
+   * JSONUtils.SimpleJSONError("Run directory \"" + runPath + "\" could not be found."); } } else { //throw new MalformedRunException(
+   * "Run directory \"" + runPath + "\" does not look right."); return JSONUtils.SimpleJSONError("Run directory \"" + runPath +
+   * "\" does not look right."); }
+   * 
+   * } else if (rt.equals(PlatformType.SOLID)) { return JSONUtils.SimpleJSONError("Unsupported import type at present."); } else { return
+   * JSONUtils.SimpleJSONError("Unrecognised run type."); } } catch (IOException e) { e.printStackTrace(); return JSONUtils.SimpleJSONError(
+   * "Could not retrieve essential objects for run import."); } }
+   */
 
   private String getPlatformRunOptions(Run run) throws IOException {
     StringBuilder b = new StringBuilder();
     b.append("<span id='containerspan'>Containers: ");
     for (int i = 0; i < run.getSequencerReference().getPlatform().getNumContainers(); i++) {
       b.append("<input id='container" + (i + 1) + "' name='containerselect' ");
-      b.append("onchange='Run.container.changeContainer(" +
-               (i + 1) + "," +
-               "\"" + run.getSequencerReference().getPlatform().getPlatformType().getKey() + "\"," +
-               run.getSequencerReference().getId() + ");' type='radio' value='" + (i + 1) + "'/>" + (i + 1));
+      b.append("onchange='Run.container.changeContainer(" + (i + 1) + "," + "\""
+          + run.getSequencerReference().getPlatform().getPlatformType().getKey() + "\"," + run.getSequencerReference().getId()
+          + ");' type='radio' value='" + (i + 1) + "'/>" + (i + 1));
     }
     b.append("</span><br/>");
     b.append("<div id='containerdiv' class='note ui-corner-all'> </div>");
@@ -919,18 +869,19 @@ public class RunControllerHelperService {
   }
 
   public JSONObject lookupContainer(HttpSession session, JSONObject json) {
-    if (json.has("barcode") && !"".equals(json.getString("barcode")) &&
-        json.has("containerNum")) {
+    if (json.has("barcode") && !"".equals(json.getString("barcode")) && json.has("containerNum")) {
       try {
         String barcode = json.getString("barcode");
         long containerNum = json.getLong("containerNum");
-        Collection<SequencerPartitionContainer<SequencerPoolPartition>> fs = requestManager.listSequencerPartitionContainersByBarcode(barcode);
+        Collection<SequencerPartitionContainer<SequencerPoolPartition>> fs = requestManager
+            .listSequencerPartitionContainersByBarcode(barcode);
         if (!fs.isEmpty()) {
           JSONObject confirm = new JSONObject();
           StringBuilder sb = new StringBuilder();
           if (fs.size() == 1) {
-            //replace container div
-            SequencerPartitionContainer<SequencerPoolPartition> f = new ArrayList<SequencerPartitionContainer<SequencerPoolPartition>>(fs).get(0);
+            // replace container div
+            SequencerPartitionContainer<SequencerPoolPartition> f = new ArrayList<SequencerPartitionContainer<SequencerPoolPartition>>(fs)
+                .get(0);
             sb.append("<table class='in'>");
             sb.append("<th>Partition No.</th>");
             sb.append("<th>Pool</th>");
@@ -941,7 +892,8 @@ public class RunControllerHelperService {
               if (p.getPool() != null) {
                 confirm.put(p.getPartitionNumber(), p.getPool().getName());
 
-                sb.append("<ul partition='" + (p.getPartitionNumber() - 1) + "' bind='sequencerPartitionContainers[" + containerNum + "].partitions[" + (p.getPartitionNumber() - 1) + "].pool' class='runPartitionDroppable'>");
+                sb.append("<ul partition='" + (p.getPartitionNumber() - 1) + "' bind='sequencerPartitionContainers[" + containerNum
+                    + "].partitions[" + (p.getPartitionNumber() - 1) + "].pool' class='runPartitionDroppable'>");
                 sb.append("<div class='dashboard'>");
                 sb.append(p.getPool().getName());
                 sb.append("(" + LimsUtils.getDateAsString(p.getPool().getCreationDate()) + ")<br/>");
@@ -949,23 +901,26 @@ public class RunControllerHelperService {
                 if (!p.getPool().getExperiments().isEmpty()) {
                   sb.append("<i>");
                   for (Experiment e : p.getPool().getExperiments()) {
-                    sb.append(e.getStudy().getProject().getAlias() + " (" + e.getName() + ": " + p.getPool().getDilutions().size() + " dilutions)<br/>");
+                    sb.append(e.getStudy().getProject().getAlias() + " (" + e.getName() + ": " + p.getPool().getDilutions().size()
+                        + " dilutions)<br/>");
                   }
                   sb.append("</i>");
-                  sb.append("<input type='hidden' name='sequencerPartitionContainers[" + containerNum + "].partitions[" + (p.getPartitionNumber() - 1) + "].pool' id='pId" + (p.getPartitionNumber() - 1) + "' value='" + p.getPool().getId() + "'/>");
-                }
-                else {
+                  sb.append("<input type='hidden' name='sequencerPartitionContainers[" + containerNum + "].partitions["
+                      + (p.getPartitionNumber() - 1) + "].pool' id='pId" + (p.getPartitionNumber() - 1) + "' value='" + p.getPool().getId()
+                      + "'/>");
+                } else {
                   sb.append("<i>No experiment linked to this pool</i>");
                 }
                 sb.append("</span>");
                 sb.append("</div>");
                 sb.append("</ul>");
-              }
-              else {
+              } else {
                 confirm.put(p.getPartitionNumber(), "empty");
 
                 sb.append("<div id='p_div_" + (p.getPartitionNumber() - 1) + "' class='elementListDroppableDiv'>");
-                sb.append("<ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + containerNum + "].partitions[" + (p.getPartitionNumber() - 1) + "].pool' partition='" + (p.getPartitionNumber() - 1) + "' ondblclick='Run.container.populatePartition(this);'></ul>");
+                sb.append("<ul class='runPartitionDroppable' bind='sequencerPartitionContainers[" + containerNum + "].partitions["
+                    + (p.getPartitionNumber() - 1) + "].pool' partition='" + (p.getPartitionNumber() - 1)
+                    + "' ondblclick='Run.container.populatePartition(this);'></ul>");
                 sb.append("</div>");
               }
               sb.append("</td>");
@@ -977,22 +932,18 @@ public class RunControllerHelperService {
             responseMap.put("barcode", f.getIdentificationBarcode());
             responseMap.put("verify", confirm);
             return JSONUtils.JSONObjectResponse(responseMap);
-          }
-          else {
-            //choose container
+          } else {
+            // choose container
             return JSONUtils.JSONObjectResponse("html", "");
           }
-        }
-        else {
+        } else {
           return JSONUtils.JSONObjectResponse("err", "No containers with this barcode.");
         }
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
         e.printStackTrace();
         return JSONUtils.JSONObjectResponse("err", "Unable to lookup barcode.");
       }
-    }
-    else {
+    } else {
       return JSONUtils.SimpleJSONError("Please supply a barcode to lookup.");
     }
   }
@@ -1009,7 +960,7 @@ public class RunControllerHelperService {
 
       String sheet = RunProcessingUtils.buildIlluminaDemultiplexCSV(r, f, casavaVersion, user.getFullName());
 
-      File out = misoFileManager.getNewFile(Run.class, r.getAlias(), "samplesheet-"+LimsUtils.getSimpleCurrentDate()+".csv");
+      File out = misoFileManager.getNewFile(Run.class, r.getAlias(), "samplesheet-" + LimsUtils.getSimpleCurrentDate() + ".csv");
       LimsUtils.stringToFile(sheet, out);
       log.debug("SampleSheet for " + r.getAlias() + " written to " + out.getAbsolutePath());
 
@@ -1037,8 +988,7 @@ public class RunControllerHelperService {
       run.getNotes().add(note);
       requestManager.saveRunNote(run, note);
       requestManager.saveRun(run);
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError(e.getMessage());
     }
@@ -1058,17 +1008,14 @@ public class RunControllerHelperService {
         requestManager.deleteNote(note);
         requestManager.saveRun(run);
         return JSONUtils.SimpleJSONResponse("OK");
-      }
-      else {
+      } else {
         return JSONUtils.SimpleJSONError("Sample does not have note " + noteId + ". Cannot remove");
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Cannot remove note: " + e.getMessage());
     }
   }
-
 
   public JSONObject watchRun(HttpSession session, JSONObject json) {
     Long runId = json.getLong("runId");
@@ -1076,13 +1023,12 @@ public class RunControllerHelperService {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Run run = requestManager.getRunById(runId);
       if (!run.getWatchers().contains(user)) {
-        //run.addWatcher(user);
+        // run.addWatcher(user);
         watchManager.watch(run, user);
         requestManager.saveRun(run);
       }
       return JSONUtils.SimpleJSONResponse("OK");
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
     }
     return JSONUtils.SimpleJSONError("Unable to watch run");
@@ -1094,13 +1040,12 @@ public class RunControllerHelperService {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Run run = requestManager.getRunById(runId);
       if (run.getWatchers().contains(user)) {
-        //run.removeWatcher(user);
+        // run.removeWatcher(user);
         watchManager.unwatch(run, user);
         requestManager.saveRun(run);
       }
       return JSONUtils.SimpleJSONResponse("OK");
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
     }
     return JSONUtils.SimpleJSONError("Unable to unwatch run");
@@ -1118,7 +1063,7 @@ public class RunControllerHelperService {
 
       if (barcode != null && !"".equals(barcode)) {
         if (LimsUtils.isBase64String(barcode)) {
-          //Base64-encoded string, most likely a barcode image beeped in. decode and search
+          // Base64-encoded string, most likely a barcode image beeped in. decode and search
           barcode = new String(Base64.decodeBase64(barcode));
         }
       }
@@ -1127,33 +1072,28 @@ public class RunControllerHelperService {
         PlatformType pt = PlatformType.get(json.getString("platform"));
         if (pt != null) {
           p = requestManager.getPoolByBarcode(barcode, pt);
-        }
-        else {
+        } else {
           p = requestManager.getPoolByBarcode(barcode);
         }
-      }
-      else {
+      } else {
         if (r.getPlatformType() != null) {
           p = requestManager.getPoolByBarcode(barcode, r.getPlatformType());
-        }
-        else {
+        } else {
           p = requestManager.getPoolByBarcode(barcode);
         }
       }
       List<SequencerPartitionContainer> fs = new ArrayList<SequencerPartitionContainer>(r.getSequencerPartitionContainers());
       if (!fs.isEmpty()) {
         SequencerPartitionContainer f = fs.get(container);
-        //if (f.getPlatformType().equals(p.getPlatformType())) {
+        // if (f.getPlatformType().equals(p.getPlatformType())) {
         if (f.getPlatform().getPlatformType().equals(p.getPlatformType())) {
           return JSONUtils.JSONObjectResponse("html", poolHtml(p, container, partition));
-        }
-        else {
+        } else {
           return JSONUtils.JSONObjectResponse("err", "Error: pool platform does not match container platform");
         }
       }
       return JSONUtils.JSONObjectResponse("err", "Error: cannot get containers from this run");
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.JSONObjectResponse("err", "Error: no such pool");
     }
@@ -1169,30 +1109,27 @@ public class RunControllerHelperService {
       Set<Project> pooledProjects = new HashSet<Project>();
 
       if (p.getExperiments().size() != 0) {
-        //check if each poolable has been in a study for this pool already
+        // check if each poolable has been in a study for this pool already
         Collection<? extends Poolable> ds = p.getPoolableElements();
         for (Poolable d : ds) {
           if (d instanceof Dilution) {
-            Collection<Study> studies = requestManager.listAllStudiesByLibraryId(((Dilution)d).getLibrary().getId());
+            Collection<Study> studies = requestManager.listAllStudiesByLibraryId(((Dilution) d).getLibrary().getId());
             if (studies.isEmpty()) {
-              pooledProjects.add(((Dilution)d).getLibrary().getSample().getProject());
-            }
-            else {
+              pooledProjects.add(((Dilution) d).getLibrary().getSample().getProject());
+            } else {
               for (Study stu : studies) {
                 pooledProjects.add(stu.getProject());
               }
             }
-          }
-          else if (d instanceof Plate) {
-            Plate plate = (Plate)d;
+          } else if (d instanceof Plate) {
+            Plate plate = (Plate) d;
             if (!plate.getElements().isEmpty()) {
               if (plate.getElementType().equals(Library.class)) {
-                Library l = (Library)plate.getElements().get(0);
+                Library l = (Library) plate.getElements().get(0);
                 Collection<Study> studies = requestManager.listAllStudiesByLibraryId(l.getId());
                 if (studies.isEmpty()) {
                   pooledProjects.add(l.getSample().getProject());
-                }
-                else {
+                } else {
                   for (Study stu : studies) {
                     pooledProjects.add(stu.getProject());
                   }
@@ -1208,18 +1145,16 @@ public class RunControllerHelperService {
             pooledProjects.remove(expProject);
           }
         }
-      }
-      else {
+      } else {
         Collection<? extends Poolable> ds = p.getPoolableElements();
         for (Poolable d : ds) {
           if (d instanceof Dilution) {
-            pooledProjects.add(((Dilution)d).getLibrary().getSample().getProject());
-          }
-          else if (d instanceof Plate) {
-            Plate plate = (Plate)d;
+            pooledProjects.add(((Dilution) d).getLibrary().getSample().getProject());
+          } else if (d instanceof Plate) {
+            Plate plate = (Plate) d;
             if (!plate.getElements().isEmpty()) {
               if (plate.getElementType().equals(Library.class)) {
-                Library l = (Library)plate.getElements().get(0);
+                Library l = (Library) plate.getElements().get(0);
                 pooledProjects.add(l.getSample().getProject());
               }
             }
@@ -1229,27 +1164,30 @@ public class RunControllerHelperService {
       sb.append("<div style='float:left; clear:both'>");
       for (Project project : pooledProjects) {
         sb.append("<div id='studySelectDiv" + partition + "_" + project.getProjectId() + "'>");
-        sb.append(project.getAlias() + ": <select name='poolStudies" + partition + "_" + project.getProjectId() + "' id='poolStudies" + partition + "_" + project.getProjectId() + "'>");
+        sb.append(project.getAlias() + ": <select name='poolStudies" + partition + "_" + project.getProjectId() + "' id='poolStudies"
+            + partition + "_" + project.getProjectId() + "'>");
         Collection<Study> studies = requestManager.listAllStudiesByProjectId(project.getProjectId());
         if (studies.isEmpty()) {
-          //throw new Exception("No studies available on project " + project.getName() + ". At least one study must be available for each project associated with this Pool.");
-          return JSONUtils.SimpleJSONError("No studies available on project " + project.getName() + ". At least one study must be available for each project associated with this Pool.");
-        }
-        else {
+          // throw new Exception("No studies available on project " + project.getName() +
+          // ". At least one study must be available for each project associated with this Pool.");
+          return JSONUtils.SimpleJSONError("No studies available on project " + project.getName()
+              + ". At least one study must be available for each project associated with this Pool.");
+        } else {
           for (Study s : studies) {
             sb.append("<option value='" + s.getId() + "'>" + s.getName() + " - " + s.getStudyType() + "</option>");
           }
         }
         sb.append("</select>");
-        sb.append("<input id='studySelectButton-" + partition + "_" + p.getId() + "' type='button' onclick=\"Run.container.selectStudy('" + partition + "', " + p.getId() + "," + project.getProjectId() + ");\" class=\"ui-state-default ui-corner-all\" value='Select Study'/>");
+        sb.append("<input id='studySelectButton-" + partition + "_" + p.getId() + "' type='button' onclick=\"Run.container.selectStudy('"
+            + partition + "', " + p.getId() + "," + project.getProjectId()
+            + ");\" class=\"ui-state-default ui-corner-all\" value='Select Study'/>");
         sb.append("</div><br/>");
       }
       sb.append("</div>");
-    //}
+      // }
 
       return JSONUtils.JSONObjectResponse("html", sb.toString());
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError(e.getMessage());
     }
@@ -1258,7 +1196,8 @@ public class RunControllerHelperService {
   private String poolHtml(Pool<? extends Poolable> p, int container, int partition) {
     StringBuilder b = new StringBuilder();
     try {
-      b.append("<div style='position:relative' onMouseOver='this.className=\"dashboardhighlight\"' onMouseOut='this.className=\"dashboard\"' class='dashboard'>");
+      b.append(
+          "<div style='position:relative' onMouseOver='this.className=\"dashboardhighlight\"' onMouseOut='this.className=\"dashboard\"' class='dashboard'>");
       b.append("<div style=\"float:left\"><b>" + p.getName() + " (" + LimsUtils.getDateAsString(p.getCreationDate()) + ")</b><br/>");
 
       Collection<? extends Dilution> ds = p.getDilutions();
@@ -1269,7 +1208,8 @@ public class RunControllerHelperService {
       b.append("<br/><i>");
       Collection<Experiment> exprs = p.getExperiments();
       for (Experiment e : exprs) {
-        b.append("<span>" + e.getStudy().getProject().getAlias() + "(" + e.getName() + ": " + p.getDilutions().size() + " dilutions)</span><br/>");
+        b.append("<span>" + e.getStudy().getProject().getAlias() + "(" + e.getName() + ": " + p.getDilutions().size()
+            + " dilutions)</span><br/>");
       }
       b.append("</i>");
 
@@ -1282,32 +1222,35 @@ public class RunControllerHelperService {
         b.append("<div style='float:left; clear:both'>");
         for (Project project : pooledProjects) {
           b.append("<div id='studySelectDiv" + partition + "_" + project.getProjectId() + "'>");
-          b.append(project.getAlias() + ": <select name='poolStudies" + partition + "_" + project.getProjectId() + "' id='poolStudies" + partition + "_" + project.getProjectId() + "'>");
+          b.append(project.getAlias() + ": <select name='poolStudies" + partition + "_" + project.getProjectId() + "' id='poolStudies"
+              + partition + "_" + project.getProjectId() + "'>");
           Collection<Study> studies = requestManager.listAllStudiesByProjectId(project.getProjectId());
           if (studies.isEmpty()) {
-            throw new Exception("No studies available on project " + project.getName() + ". At least one study must be available for each project associated with this Pool. Double click to add a different pool");
-          }
-          else {
+            throw new Exception("No studies available on project " + project.getName()
+                + ". At least one study must be available for each project associated with this Pool. Double click to add a different pool");
+          } else {
             for (Study s : studies) {
               b.append("<option value='" + s.getId() + "'>" + s.getAlias() + " (" + s.getName() + " - " + s.getStudyType() + ")</option>");
             }
           }
           b.append("</select>");
-          b.append("<input type='button' onclick=\"Run.container.selectStudy('" + partition + "', " + p.getId() + "," + project.getProjectId() + ");\" class=\"ui-state-default ui-corner-all\" value='Select Study'/>");
+          b.append("<input type='button' onclick=\"Run.container.selectStudy('" + partition + "', " + p.getId() + ","
+              + project.getProjectId() + ");\" class=\"ui-state-default ui-corner-all\" value='Select Study'/>");
           b.append("</div><br/>");
         }
       }
       b.append("</div>");
-      b.append("<input type='hidden' name='sequencerPartitionContainers[" + container + "].partitions[" + partition + "].pool' id='pId" + p.getId() + "' value='" + p.getId() + "'/></div>");
-      b.append("<div style='position: absolute; bottom: 0; right: 0; font-size: 24px; font-weight: bold; color:#BBBBBB'>" + p.getPlatformType().getKey() + "</div>");
-      b.append("<span style='position: absolute; top: 0; right: 0;' onclick='Run.pool.confirmPoolRemove(this);' class='float-right ui-icon ui-icon-circle-close'></span>");
+      b.append("<input type='hidden' name='sequencerPartitionContainers[" + container + "].partitions[" + partition + "].pool' id='pId"
+          + p.getId() + "' value='" + p.getId() + "'/></div>");
+      b.append("<div style='position: absolute; bottom: 0; right: 0; font-size: 24px; font-weight: bold; color:#BBBBBB'>"
+          + p.getPlatformType().getKey() + "</div>");
+      b.append(
+          "<span style='position: absolute; top: 0; right: 0;' onclick='Run.pool.confirmPoolRemove(this);' class='float-right ui-icon ui-icon-circle-close'></span>");
       b.append("</div>");
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return "Cannot get studies for pool: " + e.getMessage();
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       e.printStackTrace();
       return "Cannot get studies for pool: " + e.getMessage();
     }
@@ -1319,8 +1262,7 @@ public class RunControllerHelperService {
     User user;
     try {
       user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
     }
@@ -1331,17 +1273,14 @@ public class RunControllerHelperService {
         try {
           requestManager.deleteRun(requestManager.getRunById(runId));
           return JSONUtils.SimpleJSONResponse("Run deleted");
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
           e.printStackTrace();
           return JSONUtils.SimpleJSONError("Cannot delete run: " + e.getMessage());
         }
-      }
-      else {
+      } else {
         return JSONUtils.SimpleJSONError("No run specified to delete.");
       }
-    }
-    else {
+    } else {
       return JSONUtils.SimpleJSONError("Only admins can delete objects.");
     }
   }
@@ -1351,19 +1290,20 @@ public class RunControllerHelperService {
       JSONObject j = new JSONObject();
       JSONArray jsonArray = new JSONArray();
       for (Run run : requestManager.listAllRuns()) {
-        jsonArray.add("['" + run.getName() + "','" +
-                      run.getAlias() + "','" +
-                      (run.getStatus() != null && run.getStatus().getHealth() != null ? run.getStatus().getHealth().getKey() : "") + "','" +
-                      (run.getStatus() != null && run.getStatus().getStartDate() != null ? LimsUtils.getDateAsString(run.getStatus().getStartDate()) : "") + "','" +
-                      (run.getStatus() != null && run.getStatus().getCompletionDate() != null ? LimsUtils.getDateAsString(run.getStatus().getCompletionDate()) : "") + "','" +
-                      (run.getPlatformType() != null ? run.getPlatformType().getKey() : "") + "','" +
-                      "<a href=\"/miso/run/" + run.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
+        jsonArray.add("['" + run.getName() + "','" + run.getAlias() + "','"
+            + (run.getStatus() != null && run.getStatus().getHealth() != null ? run.getStatus().getHealth().getKey() : "") + "','"
+            + (run.getStatus() != null && run.getStatus().getStartDate() != null ? LimsUtils.getDateAsString(run.getStatus().getStartDate())
+                : "")
+            + "','"
+            + (run.getStatus() != null && run.getStatus().getCompletionDate() != null
+                ? LimsUtils.getDateAsString(run.getStatus().getCompletionDate()) : "")
+            + "','" + (run.getPlatformType() != null ? run.getPlatformType().getKey() : "") + "','" + "<a href=\"/miso/run/" + run.getId()
+            + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
 
       }
       j.put("runsArray", jsonArray);
       return j;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }

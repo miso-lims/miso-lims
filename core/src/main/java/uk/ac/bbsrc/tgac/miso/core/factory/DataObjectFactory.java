@@ -39,26 +39,31 @@ import java.util.LinkedList;
  * uk.ac.bbsrc.tgac.miso.core.factory
  * <p/>
  * TODO Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public abstract class DataObjectFactory {
-  //public static final int TGAC = 1;
+  // public static final int TGAC = 1;
 
   public abstract User getUser();
+
   public abstract Group getGroup();
 
   public abstract Project getProject();
+
   public abstract Project getProject(User user);
 
   public abstract Study getStudy();
+
   public abstract Study getStudy(User user);
 
   public abstract Experiment getExperiment();
+
   public abstract Experiment getExperiment(User user);
 
   public abstract Sample getSample();
+
   public abstract Sample getSample(User user);
 
   public abstract SampleQC getSampleQC();
@@ -66,82 +71,95 @@ public abstract class DataObjectFactory {
   public abstract LibraryQC getLibraryQC();
 
   public abstract Run getRun();
+
   public abstract Run getRun(User user);
 
   public abstract RunQC getRunQC();
 
   public abstract Run getRunOfType(PlatformType platformType);
+
   public abstract Run getRunOfType(PlatformType platformType, User user);
 
   public abstract SequencerPartitionContainer<SequencerPoolPartition> getSequencerPartitionContainer();
+
   public abstract SequencerPartitionContainer<SequencerPoolPartition> getSequencerPartitionContainer(User user);
+
   public abstract SequencerPartitionContainer<SequencerPoolPartition> getSequencerPartitionContainer(Platform platformType);
+
   public abstract SequencerPartitionContainer<SequencerPoolPartition> getSequencerPartitionContainer(Platform platformType, User user);
 
   public abstract SequencerPoolPartition getSequencerPoolPartition();
 
   public abstract Library getLibrary();
+
   public abstract Library getLibrary(User user);
 
   public abstract LibraryDilution getLibraryDilution();
+
   public abstract LibraryDilution getLibraryDilution(User user);
 
   public abstract emPCRDilution getEmPCRDilution();
+
   public abstract emPCRDilution getEmPCRDilution(User user);
 
   public abstract emPCR getEmPCR();
+
   public abstract emPCR getEmPCR(User user);
 
-  //public abstract <T extends List<S>, S extends Plateable> Plate<T, S> getPlateOfSize(int size);
-  //public abstract <T extends List<S>, S extends Plateable> Plate<T, S> getPlateOfSize(int size, User user);
+  // public abstract <T extends List<S>, S extends Plateable> Plate<T, S> getPlateOfSize(int size);
+  // public abstract <T extends List<S>, S extends Plateable> Plate<T, S> getPlateOfSize(int size, User user);
   public abstract Plate<LinkedList<Plateable>, Plateable> getPlateOfSize(int size);
+
   public abstract Plate<LinkedList<Plateable>, Plateable> getPlateOfSize(int size, User user);
 
   public abstract Pool<? extends Poolable> getPool();
+
   public abstract Pool<? extends Poolable> getPool(User user);
+
   public abstract Pool<? extends Poolable> getPoolOfType(PlatformType platformType, User user);
 
   public abstract PoolQC getPoolQC();
 
   @Deprecated
   public abstract IlluminaPool getIlluminaPool();
+
   @Deprecated
   public abstract IlluminaPool getIlluminaPool(User user);
 
   @Deprecated
   public abstract LS454Pool getLS454Pool();
+
   @Deprecated
   public abstract LS454Pool getLS454Pool(User user);
 
   @Deprecated
   public abstract SolidPool getSolidPool();
+
   @Deprecated
   public abstract SolidPool getSolidPool(User user);
 
   @Deprecated
   public abstract PacBioPool getPacBioPool();
+
   @Deprecated
   public abstract PacBioPool getPacBioPool(User user);
 
   @Deprecated
   public abstract emPCRPool getEmPCRPool(PlatformType platformType);
+
   @Deprecated
   public abstract emPCRPool getEmPCRPool(PlatformType platformType, User user);
 
   public abstract Status getStatus();
+
   public abstract SequencerReference getSequencerReference();
 
   public abstract Submission getSubmission();
+
   public abstract Submission getSubmission(User user);
 
   /*
-  public static DataObjectFactory getDataObjectFactory(int whichFactory) {
-    switch (whichFactory) {
-      case TGAC:
-          return new TgacDataObjectFactory();
-      default :
-          return null;
-    }
-  }
-  */
+   * public static DataObjectFactory getDataObjectFactory(int whichFactory) { switch (whichFactory) { case TGAC: return new
+   * TgacDataObjectFactory(); default : return null; } }
+   */
 }

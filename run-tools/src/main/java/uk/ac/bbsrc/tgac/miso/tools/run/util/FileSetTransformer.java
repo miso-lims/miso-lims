@@ -23,11 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.tools.run.util;
 
-import net.sf.json.JSONObject;
-import org.springframework.util.LinkedMultiValueMap;
-
-import java.io.File;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -35,7 +30,7 @@ import java.util.Set;
  * uk.ac.bbsrc.tgac.miso.notification.util
  * <p/>
  * Takes a set of files and transforms them into a textual representation ready for passing to a Message receiving service
- *
+ * 
  * @author Rob Davey
  * @date 16-Feb-2011
  * @since 0.0.3

@@ -43,7 +43,6 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
-
 import com.eaglegenomics.simlims.core.User;
 
 import javax.servlet.http.HttpSession;
@@ -56,7 +55,7 @@ import java.util.List;
  * uk.ac.bbsrc.tgac.miso.spring.ajax
  * <p/>
  * Info
- *
+ * 
  * @author Xingdong Bian
  * @author Rob Davey
  * @since 0.0.2
@@ -83,22 +82,22 @@ public class ReportingControllerHelperService {
     try {
       ArrayList<String> columns = DbUtils.getColumns(interfaceTemplate, table);
 
-      sb.append("<div class='divhighlight' id='").append(table).append("_div'").append("><h2>").append(table).append("</h2><div id='").append(table).append("_columnlist'>");
+      sb.append("<div class='divhighlight' id='").append(table).append("_div'").append("><h2>").append(table).append("</h2><div id='")
+          .append(table).append("_columnlist'>");
       sb.append("<table class='paramtable' table='" + table + "'>");
       for (String s : columns) {
         sb.append("<tr>");
-        sb.append("<td><input type='checkbox' table='" + table + "' column='" + s + "' id='" + table + "-" + s + "' value='" + s + "' onchange='toggleAddColumnToQuerySet(\"" + table + "\", this);'/>").append(s).append("</td>");
+        sb.append("<td><input type='checkbox' table='" + table + "' column='" + s + "' id='" + table + "-" + s + "' value='" + s
+            + "' onchange='toggleAddColumnToQuerySet(\"" + table + "\", this);'/>").append(s).append("</td>");
         sb.append("<td>").append(sqlOptionsDropdown(table, s)).append("</td>");
         sb.append("<td>").append("<input type='text' id='" + s + "_value'/>").append("</td>");
         sb.append("</tr>");
       }
       sb.append("</table></div></div>");
-    }
-    catch (MetaDataAccessException e) {
+    } catch (MetaDataAccessException e) {
       e.printStackTrace();
       return JSONUtils.JSONObjectResponse("html", "Error: " + e.getMessage());
-    }
-    catch (SQLException e) {
+    } catch (SQLException e) {
       e.printStackTrace();
       return JSONUtils.JSONObjectResponse("html", "Error: " + e.getMessage());
     }
@@ -155,71 +154,57 @@ public class ReportingControllerHelperService {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
 
-
       if (json.has("reportType") && !json.get("reportType").equals("")) {
-        b.append("<input type=\"text\" onkeyup=\"Utils.timer.timedFunc(reportSearch(this), 300);\" size=\"20\" id=\"search" + json.get("reportType") + "\" name=\"search" + json.get("reportType") + "\"/>");
+        b.append("<input type=\"text\" onkeyup=\"Utils.timer.timedFunc(reportSearch(this), 300);\" size=\"20\" id=\"search"
+            + json.get("reportType") + "\" name=\"search" + json.get("reportType") + "\"/>");
         b.append("<form id=\"reportform\" name=\"reportform\" method=\"POST\" >");
-        b.append("<button type=\"button\" id=\"generateReportButton\" class=\"fg-button ui-state-default ui-corner-all\"  onclick=\"generateReport('reportform');\">Generate Report</button><br/>");
+        b.append(
+            "<button type=\"button\" id=\"generateReportButton\" class=\"fg-button ui-state-default ui-corner-all\"  onclick=\"generateReport('reportform');\">Generate Report</button><br/>");
         b.append("<input type=\"hidden\" name=\"reportType\" value=\"" + json.get("reportType") + "\"/>");
         if (json.get("reportType").equals("Project")) {
-          b.append("<br/><input type=\"checkbox\" name=\"incChart\" value=\"incChart\" checked=\"checked\"/>Include Project Status Chart &nbsp;&nbsp;&nbsp;");
+          b.append(
+              "<br/><input type=\"checkbox\" name=\"incChart\" value=\"incChart\" checked=\"checked\"/>Include Project Status Chart &nbsp;&nbsp;&nbsp;");
           b.append("<input type=\"checkbox\" name=\"incOverview\" checked=\"checked\"/>Include Project Overview &nbsp;&nbsp;&nbsp;");
           b.append("<input type=\"checkbox\" name=\"incSamples\" checked=\"checked\"/>Include Project Samples");
           b.append("<table class=\"list\" id=\"table\">");
-          b.append("<thead>\n" +
-                   "    <tr>\n" +
-                   "        <th><input class=\"chkbox\" type=\"checkbox\" onclick=\"Utils.ui.checkAll(document.reportform.ids)\"/> All</th>\n" +
-                   "        <th>Project Name</th>\n" +
-                   "        <th>Project Alias</th>\n" +
-                   "        <th>Project Description</th>\n" +
-                   "        <th>Progress</th>\n" +
-                   "    </tr>\n" +
-                   "    </thead>\n" +
-                   "    <tbody id=\"search" + json.get("reportType") + "result\">");
+          b.append("<thead>\n" + "    <tr>\n"
+              + "        <th><input class=\"chkbox\" type=\"checkbox\" onclick=\"Utils.ui.checkAll(document.reportform.ids)\"/> All</th>\n"
+              + "        <th>Project Name</th>\n" + "        <th>Project Alias</th>\n" + "        <th>Project Description</th>\n"
+              + "        <th>Progress</th>\n" + "    </tr>\n" + "    </thead>\n" + "    <tbody id=\"search" + json.get("reportType")
+              + "result\">");
 
           b.append("</tbody>");
-        }
-        else if (json.get("reportType").equals("Sample")) {
-          b.append("<br/><input type=\"checkbox\" name=\"incChart\" value=\"incChart\" checked=\"checked\"/>Include Charts &nbsp;&nbsp;&nbsp;");
+        } else if (json.get("reportType").equals("Sample")) {
+          b.append(
+              "<br/><input type=\"checkbox\" name=\"incChart\" value=\"incChart\" checked=\"checked\"/>Include Charts &nbsp;&nbsp;&nbsp;");
           b.append("<input type=\"checkbox\" name=\"incQC\" checked=\"checked\"/>Include QC Detail &nbsp;&nbsp;&nbsp;");
           b.append("<table class=\"list\" id=\"table\">");
-          b.append("<thead>\n" +
-                   "    <tr>\n" +
-                   "        <th><input class=\"chkbox\" type=\"checkbox\" onClick=\"Utils.ui.checkAll(document.reportform.ids)\"/> All</th>\n" +
-                   "        <th>Sample Name</th>\n" +
-                   "        <th>Sample Alias</th>\n" +
-                   "        <th>Sample Description</th>\n" +
-                   "        <th>Sample Type</th>\n" +
-                   "    </tr>\n" +
-                   "    </thead>\n" +
-                   "    <tbody id=\"search" + json.get("reportType") + "result\">");
+          b.append("<thead>\n" + "    <tr>\n"
+              + "        <th><input class=\"chkbox\" type=\"checkbox\" onClick=\"Utils.ui.checkAll(document.reportform.ids)\"/> All</th>\n"
+              + "        <th>Sample Name</th>\n" + "        <th>Sample Alias</th>\n" + "        <th>Sample Description</th>\n"
+              + "        <th>Sample Type</th>\n" + "    </tr>\n" + "    </thead>\n" + "    <tbody id=\"search" + json.get("reportType")
+              + "result\">");
           b.append("</tbody>");
-        }
-        else if (json.get("reportType").equals("Run")) {
-          b.append("<br/><input type=\"checkbox\" name=\"incChart\" value=\"incChart\" checked=\"checked\"/>Include Charts &nbsp;&nbsp;&nbsp;");
+        } else if (json.get("reportType").equals("Run")) {
+          b.append(
+              "<br/><input type=\"checkbox\" name=\"incChart\" value=\"incChart\" checked=\"checked\"/>Include Charts &nbsp;&nbsp;&nbsp;");
           b.append("<input type=\"checkbox\" name=\"incAlias\" checked=\"checked\"/>Include Run Alias &nbsp;&nbsp;&nbsp;");
-          //b.append("<input type=\"checkbox\" name=\"incDescription\" checked=\"checked\"/>Include Run Description &nbsp;&nbsp;&nbsp;");
+          // b.append("<input type=\"checkbox\" name=\"incDescription\" checked=\"checked\"/>Include Run Description &nbsp;&nbsp;&nbsp;");
           b.append("<table class=\"list\" id=\"table\">");
-          b.append("<thead>\n" +
-                   "    <tr>\n" +
-                   "        <th><input class=\"chkbox\" type=\"checkbox\" onClick=\"Utils.ui.checkAll(document.reportform.ids)\"/> All</th>\n" +
-                   "        <th>Run Name</th>\n" +
-                   "        <th>Run Alias</th>\n" +
-                  // "        <th>Run Description</th>\n" +
-                   "        <th>Status</th>\n" +
-                   "    </tr>\n" +
-                   "    </thead>\n" +
-                   "    <tbody id=\"search" + json.get("reportType") + "result\">");
+          b.append("<thead>\n" + "    <tr>\n"
+              + "        <th><input class=\"chkbox\" type=\"checkbox\" onClick=\"Utils.ui.checkAll(document.reportform.ids)\"/> All</th>\n"
+              + "        <th>Run Name</th>\n" + "        <th>Run Alias</th>\n" +
+              // " <th>Run Description</th>\n" +
+              "        <th>Status</th>\n" + "    </tr>\n" + "    </thead>\n" + "    <tbody id=\"search" + json.get("reportType")
+              + "result\">");
           b.append("</tbody>");
-        }
-        else {
+        } else {
           b.append("Unrecognised ReportType");
         }
         b.append("</form>");
         b.append("</table>");
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Failed to change ReportType", e);
       return JSONUtils.SimpleJSONError("Failed to change ReportType");
     }
@@ -242,10 +227,10 @@ public class ReportingControllerHelperService {
             String projectAlias = project.getAlias() == null ? null : project.getAlias().toLowerCase();
             String projectDesc = project.getDescription() == null ? null : project.getDescription().toLowerCase();
 
-            if (projectName != null && (projectName.equals(str) || projectName.contains(str)
-                                        || projectAlias.equals(str) || projectAlias.contains(str)
-                                        || projectDesc.equals(str) || projectDesc.contains(str))) {
-              b.append("<tr><td><input class=\"chkbox\" id=\"" + project.getProjectId() + "\" type=\"checkbox\" name=\"ids\" value=\"" + project.getProjectId() + "\" id=\"" + project.getProjectId() + "\"/></td>");
+            if (projectName != null && (projectName.equals(str) || projectName.contains(str) || projectAlias.equals(str)
+                || projectAlias.contains(str) || projectDesc.equals(str) || projectDesc.contains(str))) {
+              b.append("<tr><td><input class=\"chkbox\" id=\"" + project.getProjectId() + "\" type=\"checkbox\" name=\"ids\" value=\""
+                  + project.getProjectId() + "\" id=\"" + project.getProjectId() + "\"/></td>");
               b.append("<td>" + project.getName());
               b.append("</td>");
               b.append("<td> " + project.getAlias());
@@ -263,15 +248,14 @@ public class ReportingControllerHelperService {
             b.append("No matches");
           }
           return JSONUtils.JSONObjectResponse("html", b.toString());
-        }
-        else {
+        } else {
           return JSONUtils.JSONObjectResponse("html", "Need a longer search pattern ...");
         }
-      }
-      else {
+      } else {
         StringBuilder b = new StringBuilder();
         for (Project project : requestManager.listAllProjects()) {
-          b.append("<tr><td><input class=\"chkbox\" id=\"" + project.getProjectId() + "\" type=\"checkbox\" name=\"ids\" value=\"" + project.getProjectId() + "\" id=\"" + project.getProjectId() + "\"/></td>");
+          b.append("<tr><td><input class=\"chkbox\" id=\"" + project.getProjectId() + "\" type=\"checkbox\" name=\"ids\" value=\""
+              + project.getProjectId() + "\" id=\"" + project.getProjectId() + "\"/></td>");
           b.append("<td>" + project.getName());
           b.append("</td>");
           b.append("<td> " + project.getAlias());
@@ -284,14 +268,13 @@ public class ReportingControllerHelperService {
         }
         return JSONUtils.JSONObjectResponse("html", b.toString());
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
   }
 
-  //sample
+  // sample
 
   public JSONObject searchSample(HttpSession session, JSONObject json) {
     String searchStr = (String) json.get("str");
@@ -309,10 +292,10 @@ public class ReportingControllerHelperService {
             String sampleAlias = sample.getAlias() == null ? null : sample.getAlias().toLowerCase();
             String sampleDesc = sample.getDescription() == null ? null : sample.getDescription().toLowerCase();
 
-            if (sampleName != null && (sampleName.equals(str) || sampleName.contains(str)
-                                       || sampleAlias.equals(str) || sampleAlias.contains(str)
-                                       || sampleDesc.equals(str) || sampleDesc.contains(str))) {
-              b.append("<tr><td><input type=\"checkbox\" class=\"chkbox\" name=\"ids\" value=\"" + sample.getId() + "\" id=\"" + sample.getId() + "\"/></td>");
+            if (sampleName != null && (sampleName.equals(str) || sampleName.contains(str) || sampleAlias.equals(str)
+                || sampleAlias.contains(str) || sampleDesc.equals(str) || sampleDesc.contains(str))) {
+              b.append("<tr><td><input type=\"checkbox\" class=\"chkbox\" name=\"ids\" value=\"" + sample.getId() + "\" id=\""
+                  + sample.getId() + "\"/></td>");
               b.append("<td>" + sample.getName());
               b.append("</td>");
               b.append("<td> " + sample.getAlias());
@@ -330,15 +313,14 @@ public class ReportingControllerHelperService {
             b.append("No matches");
           }
           return JSONUtils.JSONObjectResponse("html", b.toString());
-        }
-        else {
+        } else {
           return JSONUtils.JSONObjectResponse("html", "Need a longer search pattern ...");
         }
-      }
-      else {
+      } else {
         StringBuilder b = new StringBuilder();
         for (Sample sample : requestManager.listAllSamples()) {
-          b.append("<tr><td><input type=\"checkbox\" class=\"chkbox\" name=\"ids\" value=\"" + sample.getId() + "\" id=\"" + sample.getId() + "\"/></td>");
+          b.append("<tr><td><input type=\"checkbox\" class=\"chkbox\" name=\"ids\" value=\"" + sample.getId() + "\" id=\"" + sample.getId()
+              + "\"/></td>");
           b.append("<td>" + sample.getName());
           b.append("</td>");
           b.append("<td> " + sample.getAlias());
@@ -351,15 +333,13 @@ public class ReportingControllerHelperService {
         }
         return JSONUtils.JSONObjectResponse("html", b.toString());
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
   }
 
-
-  //run
+  // run
 
   public JSONObject searchRun(HttpSession session, JSONObject json) {
     String searchStr = (String) json.get("str");
@@ -377,16 +357,16 @@ public class ReportingControllerHelperService {
             String runAlias = run.getAlias() == null ? null : run.getAlias().toLowerCase();
             String runDesc = run.getDescription() == null ? null : run.getDescription().toLowerCase();
 
-            if (runName != null && (runName.equals(str) || runName.contains(str)
-                                    || runAlias.equals(str) || runAlias.contains(str)
-                                    || runDesc.equals(str) || runDesc.contains(str))) {
-              b.append("<tr><td><input type=\"checkbox\" class=\"chkbox\" name=\"ids\" value=\"" + run.getId() + "\" id=\"" + run.getId() + "\"/></td>");
+            if (runName != null && (runName.equals(str) || runName.contains(str) || runAlias.equals(str) || runAlias.contains(str)
+                || runDesc.equals(str) || runDesc.contains(str))) {
+              b.append("<tr><td><input type=\"checkbox\" class=\"chkbox\" name=\"ids\" value=\"" + run.getId() + "\" id=\"" + run.getId()
+                  + "\"/></td>");
               b.append("<td>" + run.getName());
               b.append("</td>");
               b.append("<td> " + run.getAlias());
               b.append("</td>");
-              //b.append("<td> " + run.getDescription());
-              //b.append("</td>");
+              // b.append("<td> " + run.getDescription());
+              // b.append("</td>");
               b.append("<td> " + run.getStatus().getHealth().getKey());
               b.append("</td>");
               b.append("</tr>");
@@ -398,34 +378,31 @@ public class ReportingControllerHelperService {
             b.append("No matches");
           }
           return JSONUtils.JSONObjectResponse("html", b.toString());
-        }
-        else {
+        } else {
           return JSONUtils.JSONObjectResponse("html", "Need a longer search pattern ...");
         }
-      }
-      else {
+      } else {
         StringBuilder b = new StringBuilder();
         for (Run run : requestManager.listAllRuns()) {
-          b.append("<tr><td><input type=\"checkbox\" class=\"chkbox\" name=\"ids\" value=\"" + run.getId() + "\" id=\"" + run.getId() + "\"/></td>");
+          b.append("<tr><td><input type=\"checkbox\" class=\"chkbox\" name=\"ids\" value=\"" + run.getId() + "\" id=\"" + run.getId()
+              + "\"/></td>");
           b.append("<td>" + run.getName());
           b.append("</td>");
           b.append("<td> " + run.getAlias());
           b.append("</td>");
-         // b.append("<td> " + run.getDescription());
-          //b.append("</td>");
+          // b.append("<td> " + run.getDescription());
+          // b.append("</td>");
           b.append("<td> " + run.getStatus().getHealth().getKey());
           b.append("</td>");
           b.append("</tr>");
         }
         return JSONUtils.JSONObjectResponse("html", b.toString());
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
   }
-
 
   public JSONObject generateReport(HttpSession session, JSONObject json) {
     String type = null;
@@ -449,15 +426,12 @@ public class ReportingControllerHelperService {
             if (p != null) {
               reportables.add(p);
             }
-          }
-          catch (IOException e) {
+          } catch (IOException e) {
             log.debug(" ", e);
           }
-        }
-        else if (j.getString("name").equals("incOverview")) {
+        } else if (j.getString("name").equals("incOverview")) {
           options.add("Overview");
-        }
-        else if (j.getString("name").equals("incSamples")) {
+        } else if (j.getString("name").equals("incSamples")) {
           options.add("Samples");
         }
       }
@@ -466,17 +440,14 @@ public class ReportingControllerHelperService {
       try {
         if (type != null) {
           html = ReportsUtils.buildHTMLReport(reportables, type, options);
-        }
-        else {
+        } else {
           return JSONUtils.SimpleJSONError("Null ReportType");
         }
-      }
-      catch (ReportingException e) {
-        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+      } catch (ReportingException e) {
+        e.printStackTrace(); // To change body of catch statement use File | Settings | File Templates.
         return JSONUtils.SimpleJSONError("Failed to generate");
       }
-    }
-    else if (a.getJSONObject(0).getString("value").equals("Sample")) {
+    } else if (a.getJSONObject(0).getString("value").equals("Sample")) {
       for (JSONObject j : (Iterable<JSONObject>) a) {
         if (j.getString("name").equals("ids")) {
           try {
@@ -484,12 +455,10 @@ public class ReportingControllerHelperService {
             if (s != null) {
               reportables.add(s);
             }
-          }
-          catch (IOException e) {
+          } catch (IOException e) {
             log.debug(" ", e);
           }
-        }
-        else if (j.getString("name").equals("incQC")) {
+        } else if (j.getString("name").equals("incQC")) {
           options.add("QC");
         }
       }
@@ -498,17 +467,14 @@ public class ReportingControllerHelperService {
       try {
         if (type != null) {
           html = ReportsUtils.buildHTMLReport(reportables, type, options);
-        }
-        else {
+        } else {
           return JSONUtils.SimpleJSONError("Null ReportType");
         }
-      }
-      catch (ReportingException e) {
-        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+      } catch (ReportingException e) {
+        e.printStackTrace(); // To change body of catch statement use File | Settings | File Templates.
         return JSONUtils.SimpleJSONError("Failed to generate");
       }
-    }
-    else if (a.getJSONObject(0).getString("value").equals("Run")) {
+    } else if (a.getJSONObject(0).getString("value").equals("Run")) {
       for (JSONObject j : (Iterable<JSONObject>) a) {
         if (j.getString("name").equals("ids")) {
           try {
@@ -516,15 +482,12 @@ public class ReportingControllerHelperService {
             if (r != null) {
               reportables.add(r);
             }
-          }
-          catch (IOException e) {
+          } catch (IOException e) {
             log.debug(" ", e);
           }
-        }
-        else if (j.getString("name").equals("incAlias")) {
+        } else if (j.getString("name").equals("incAlias")) {
           options.add("Alias");
-        }
-        else if (j.getString("name").equals("incDescription")) {
+        } else if (j.getString("name").equals("incDescription")) {
           options.add("Description");
         }
       }
@@ -533,12 +496,10 @@ public class ReportingControllerHelperService {
       try {
         if (type != null) {
           html = ReportsUtils.buildHTMLReport(reportables, type, options);
-        }
-        else {
+        } else {
           return JSONUtils.SimpleJSONError("Null ReportType");
         }
-      }
-      catch (ReportingException e) {
+      } catch (ReportingException e) {
         e.printStackTrace();
         return JSONUtils.SimpleJSONError("Failed to generate");
       }

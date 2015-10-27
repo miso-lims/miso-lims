@@ -29,16 +29,21 @@ import uk.ac.bbsrc.tgac.miso.core.event.model.ProjectOverviewEvent;
  * uk.ac.bbsrc.tgac.miso.core.event.listener
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 16/11/11
  * @since 0.1.3
  */
 public interface ProjectOverviewListener extends MisoListener {
   void allSampleQcPassed(ProjectOverviewEvent poe);
+
   void allLibraryPreparationComplete(ProjectOverviewEvent poe);
+
   void allLibraryQcPassed(ProjectOverviewEvent poe);
+
   void allPoolsConstructed(ProjectOverviewEvent poe);
+
   void allRunsCompleted(ProjectOverviewEvent poe);
+
   void primaryAnalysisCompleted(ProjectOverviewEvent poe);
 }

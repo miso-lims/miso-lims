@@ -31,35 +31,41 @@ import java.util.Collection;
 
 /**
  * Defines a DAO interface for storing SequencerReferences
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public interface SequencerReferenceStore extends Store<SequencerReference>, Remover<SequencerReference> {
   /**
    * Get a SequencerReference that holds information about a Run given a Run ID
-   *
-   * @param runId of type long
+   * 
+   * @param runId
+   *          of type long
    * @return SequencerReference
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   SequencerReference getByRunId(long runId) throws IOException;
 
   /**
    * Get a SequencerReference by a given name
-   *
-   * @param referenceName of type String
+   * 
+   * @param referenceName
+   *          of type String
    * @return SequencerReference
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   SequencerReference getByName(String referenceName) throws IOException;
 
   /**
    * Get all SequencerReferences of a given PlatformType, e.g. PlatformType.ILLUMINA
-   *
-   * @param platformType of type PlatformType
+   * 
+   * @param platformType
+   *          of type PlatformType
    * @return Collection<SequencerReference>
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   Collection<SequencerReference> listByPlatformType(PlatformType platformType) throws IOException;
 }

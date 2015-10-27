@@ -23,33 +23,25 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
-import com.eaglegenomics.simlims.core.User;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
-import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
-import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
-
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * com.eaglegenomics.miso.web
  * <p/>
  * TODO Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -72,10 +64,8 @@ public class ListExperimentsController {
   }
 
   @RequestMapping(value = "/experiments/rest/", method = RequestMethod.GET)
-  public
-  @ResponseBody
-  Collection<Experiment> jsonRest() throws IOException {
-    //User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+  public @ResponseBody Collection<Experiment> jsonRest() throws IOException {
+    // User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     return requestManager.listAllExperiments();
   }
 

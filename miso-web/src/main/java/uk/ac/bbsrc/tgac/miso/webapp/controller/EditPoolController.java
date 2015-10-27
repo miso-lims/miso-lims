@@ -68,7 +68,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
  * uk.ac.bbsrc.tgac.miso.webapp.controller
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.1.9
  */
@@ -103,19 +103,20 @@ public class EditPoolController {
   public Collection<String> populatePlatformTypes() {
     return PlatformType.getKeys();
   }
-  
+
   @ModelAttribute("autoGenerateIdBarcodes")
   public Boolean autoGenerateIdentificationBarcodes() {
-    MisoPropertyExporter exporter = (MisoPropertyExporter)ApplicationContextProvider.getApplicationContext().getBean("propertyConfigurer");
+    MisoPropertyExporter exporter = (MisoPropertyExporter) ApplicationContextProvider.getApplicationContext().getBean("propertyConfigurer");
     Map<String, String> misoProperties = exporter.getResolvedProperties();
-    return misoProperties.containsKey("miso.autoGenerateIdentificationBarcodes") && Boolean.parseBoolean(misoProperties.get("miso.autoGenerateIdentificationBarcodes"));
+    return misoProperties.containsKey("miso.autoGenerateIdentificationBarcodes")
+        && Boolean.parseBoolean(misoProperties.get("miso.autoGenerateIdentificationBarcodes"));
   }
 
   private List<? extends Dilution> populateAvailableDilutions(Pool pool) throws IOException {
     ArrayList<LibraryDilution> libs = new ArrayList<LibraryDilution>();
     for (Dilution l : requestManager.listAllLibraryDilutionsByPlatform(PlatformType.ILLUMINA)) {
       if (!pool.getDilutions().contains(l)) {
-        libs.add((LibraryDilution)l);
+        libs.add((LibraryDilution) l);
       }
     }
     Collections.sort(libs);
@@ -132,15 +133,13 @@ public class EditPoolController {
             if (e.getId() != experimentId) {
               es.add(e);
             }
-          }
-          else {
+          } else {
             es.add(e);
           }
         }
       }
       return es;
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to list experiments", ex);
       }
@@ -159,18 +158,16 @@ public class EditPoolController {
   }
 
   @RequestMapping(value = "/{poolId}", method = RequestMethod.GET)
-  public ModelAndView setupForm(@PathVariable Long poolId,
-                                ModelMap model) throws IOException {
+  public ModelAndView setupForm(@PathVariable Long poolId, ModelMap model) throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Pool pool = null;
       if (poolId == AbstractPool.UNSAVED_ID) {
         pool = dataObjectFactory.getPool(user);
         model.put("title", "New Pool");
-      }
-      else {
+      } else {
         pool = requestManager.getPoolById(poolId);
-        model.put("title", "Pool "+poolId);
+        model.put("title", "Pool " + poolId);
       }
 
       if (pool == null) {
@@ -179,7 +176,7 @@ public class EditPoolController {
       if (!pool.userCanRead(user)) {
         throw new SecurityException("Permission denied.");
       }
-      
+
       model.put("formObj", pool);
       model.put("pool", pool);
       model.put("availableDilutions", populateAvailableDilutions(pool));
@@ -188,8 +185,7 @@ public class EditPoolController {
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, pool, securityManager.listAllUsers()));
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, pool, securityManager.listAllGroups()));
       return new ModelAndView("/pages/editPool.jsp", model);
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to show pool", ex);
       }
@@ -198,19 +194,17 @@ public class EditPoolController {
   }
 
   @RequestMapping(value = "/{poolId}/experiment/{experimentId}", method = RequestMethod.GET)
-  public ModelAndView setupFormWithExperiment(@PathVariable Long poolId,
-                                @PathVariable Long experimentId,
-                                ModelMap model) throws IOException {
+  public ModelAndView setupFormWithExperiment(@PathVariable Long poolId, @PathVariable Long experimentId, ModelMap model)
+      throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Pool pool = null;
       if (poolId == AbstractPool.UNSAVED_ID) {
         pool = dataObjectFactory.getPool(user);
         model.put("title", "New Pool");
-      }
-      else {
+      } else {
         pool = requestManager.getPoolById(poolId);
-        model.put("title", "Pool "+poolId);
+        model.put("title", "Pool " + poolId);
       }
 
       if (pool == null) {
@@ -222,9 +216,8 @@ public class EditPoolController {
 
       if (experimentId != null) {
         model.put("accessibleExperiments", populateExperiments(experimentId, pool));
-      }
-      else {
-        model.put("accessibleExperiments", populateExperiments(null, pool)); 
+      } else {
+        model.put("accessibleExperiments", populateExperiments(null, pool));
       }
 
       model.put("formObj", pool);
@@ -235,23 +228,21 @@ public class EditPoolController {
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, pool, securityManager.listAllUsers()));
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, pool, securityManager.listAllGroups()));
       return new ModelAndView("/pages/editPool.jsp", model);
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to show pool", ex);
       }
       throw ex;
     }
-//    catch (MalformedExperimentException e) {
-//      e.printStackTrace();
-//      throw new IOException(e);
-//    }
+    // catch (MalformedExperimentException e) {
+    // e.printStackTrace();
+    // throw new IOException(e);
+    // }
   }
 
   @Deprecated
   @RequestMapping(value = "/new/dilution/{dilutionId}/platform/{platform}", method = RequestMethod.GET)
-  public ModelAndView setupFormWithDilution(@PathVariable Long dilutionId, String platform,
-                                ModelMap model) throws IOException {
+  public ModelAndView setupFormWithDilution(@PathVariable Long dilutionId, String platform, ModelMap model) throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Pool pool = dataObjectFactory.getPool(user);
@@ -260,13 +251,13 @@ public class EditPoolController {
       if (pool == null) {
         throw new SecurityException("No such Pool");
       }
-      
+
       if (!pool.userCanRead(user)) {
         throw new SecurityException("Permission denied.");
       }
 
       if (dilutionId != null) {
-          Dilution ld = requestManager.getDilutionByIdAndPlatform(dilutionId, PlatformType.get(platform));
+        Dilution ld = requestManager.getDilutionByIdAndPlatform(dilutionId, PlatformType.get(platform));
         if (ld != null) {
           pool.addPoolableElement(ld);
         }
@@ -280,14 +271,12 @@ public class EditPoolController {
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, pool, securityManager.listAllUsers()));
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, pool, securityManager.listAllGroups()));
       return new ModelAndView("/pages/editPool.jsp", model);
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to show pool", ex);
       }
       throw ex;
-    }
-    catch (MalformedDilutionException e) {
+    } catch (MalformedDilutionException e) {
       e.printStackTrace();
       throw new IOException(e);
     }
@@ -295,16 +284,15 @@ public class EditPoolController {
 
   @RequestMapping(value = "/import", method = RequestMethod.POST)
   public String importDilutionsToPool(HttpServletRequest request, ModelMap model) throws IOException {
-    Pool<Dilution> p = (PoolImpl)model.get("pool");
+    Pool<Dilution> p = (PoolImpl) model.get("pool");
     String[] dils = request.getParameterValues("importdilslist");
     for (String s : dils) {
       Dilution ld = requestManager.getDilutionByBarcodeAndPlatform(s, p.getPlatformType());
       if (ld != null) {
         try {
           p.addPoolableElement(ld);
-        }
-        catch (MalformedDilutionException e) {
-          log.debug("Cannot add dilution "+s+" to pool " + p.getName());
+        } catch (MalformedDilutionException e) {
+          log.debug("Cannot add dilution " + s + " to pool " + p.getName());
           e.printStackTrace();
         }
       }
@@ -314,11 +302,10 @@ public class EditPoolController {
     return "redirect:/miso/pool/" + p.getId();
   }
 
-  //@RequestMapping(value = {"/{poolId}", ""}, method = RequestMethod.POST)
-  @RequestMapping(value = {"/new", "/{poolId}"}, method = RequestMethod.POST)
-  public String processSubmit(@ModelAttribute("pool") Pool<? extends Poolable> pool,
-                              ModelMap model,
-                              SessionStatus session) throws IOException {
+  // @RequestMapping(value = {"/{poolId}", ""}, method = RequestMethod.POST)
+  @RequestMapping(value = { "/new", "/{poolId}" }, method = RequestMethod.POST)
+  public String processSubmit(@ModelAttribute("pool") Pool<? extends Poolable> pool, ModelMap model, SessionStatus session)
+      throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       if (!pool.userCanWrite(user)) {
@@ -329,8 +316,7 @@ public class EditPoolController {
       session.setComplete();
       model.clear();
       return "redirect:/miso/pool/" + pool.getId();
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to save pool", ex);
       }

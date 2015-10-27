@@ -25,14 +25,13 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 //import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
 
 import java.util.Collection;
 
 /**
  * Defines a contract whereby an implementing class is able to be listened to by a MisoListener, thereby raising alerts on given events
- *
+ * 
  * @author Rob Davey
  * @date 21-Jan-2013
  * @since 0.1.9

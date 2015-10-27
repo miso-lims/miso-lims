@@ -39,7 +39,7 @@ import java.util.Map;
  * uk.ac.bbsrc.tgac.miso.core.service.integration.strategy.impl
  * <p/>
  * Implementation of a MISO notification system message consumer
- *
+ * 
  * @author Rob Davey
  * @date 03/02/12
  * @since 0.1.5
@@ -48,6 +48,7 @@ import java.util.Map;
 public class LS454NotificationConsumerStrategy implements NotificationConsumerStrategy {
   protected static final Logger log = LoggerFactory.getLogger(LS454NotificationConsumerStrategy.class);
 
+  @Override
   public String getName() {
     return "LS454NotificationConsumer";
   }

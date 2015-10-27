@@ -27,7 +27,7 @@ package uk.ac.bbsrc.tgac.miso.core.exception;
  * MalformedExperimentException
  * <p/>
  * TODO Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -39,7 +39,7 @@ public class MalformedExperimentException extends Exception {
   public MalformedExperimentException(String s, Throwable cause) {
     super(s);
     if (cause != null) {
-        initCause(cause);
+      initCause(cause);
     }
   }
 }

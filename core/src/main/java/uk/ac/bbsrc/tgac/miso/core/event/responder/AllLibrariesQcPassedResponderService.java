@@ -38,7 +38,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.AlertingException;
  * uk.ac.bbsrc.tgac.miso.core.event.responder
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 20/10/11
  * @since 0.1.2
@@ -52,15 +52,16 @@ public class AllLibrariesQcPassedResponderService extends AbstractResponderServi
     this.baseURL = baseURL;
   }
 
-  public AllLibrariesQcPassedResponderService() {}
+  public AllLibrariesQcPassedResponderService() {
+  }
 
   @Override
   public boolean respondsTo(Event event) {
     if (event instanceof ProjectOverviewEvent) {
-      ProjectOverviewEvent poe = (ProjectOverviewEvent)event;
+      ProjectOverviewEvent poe = (ProjectOverviewEvent) event;
       ProjectOverview po = poe.getEventObject();
       if (poe.getEventType().equals(MisoEventType.ALL_LIBRARIES_QC_PASSED) && po.getAllLibrariesQcPassed()) {
-        log.debug("Project "+poe.getEventObject().getProject().getAlias() +": " + poe.getEventMessage());
+        log.debug("Project " + poe.getEventObject().getProject().getAlias() + ": " + poe.getEventMessage());
         return true;
       }
     }
@@ -70,7 +71,7 @@ public class AllLibrariesQcPassedResponderService extends AbstractResponderServi
   @Override
   public void generateResponse(Event event) {
     if (event instanceof ProjectOverviewEvent) {
-      ProjectOverviewEvent re = (ProjectOverviewEvent)event;
+      ProjectOverviewEvent re = (ProjectOverviewEvent) event;
       ProjectOverview po = re.getEventObject();
 
       for (User user : po.getWatchers()) {
@@ -78,17 +79,17 @@ public class AllLibrariesQcPassedResponderService extends AbstractResponderServi
         a.setAlertTitle("All Library QCs passed for project " + po.getProject().getAlias() + "(" + po.getProject().getName() + ")");
 
         StringBuilder at = new StringBuilder();
-        at.append("The following Project's Libraries have been QC'ed successfully: "+po.getProject().getAlias()+" ("+event.getEventMessage()+"). Please view Project " +po.getProject().getId() + " in MISO for more information");
+        at.append("The following Project's Libraries have been QC'ed successfully: " + po.getProject().getAlias() + " ("
+            + event.getEventMessage() + "). Please view Project " + po.getProject().getId() + " in MISO for more information");
         if (event.getEventContext().has("baseURL")) {
-          at.append(":\n\n" + event.getEventContext().getString("baseURL")+"/project/"+po.getProject().getId());
+          at.append(":\n\n" + event.getEventContext().getString("baseURL") + "/project/" + po.getProject().getId());
         }
         a.setAlertText(at.toString());
 
         for (AlerterService as : getAlerterServices()) {
           try {
             as.raiseAlert(a);
-          }
-          catch (AlertingException e) {
+          } catch (AlertingException e) {
             log.error("Cannot raise user-level alert:" + e.getMessage());
             e.printStackTrace();
           }

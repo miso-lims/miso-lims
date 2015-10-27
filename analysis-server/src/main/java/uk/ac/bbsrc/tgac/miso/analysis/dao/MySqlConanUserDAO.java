@@ -34,7 +34,7 @@ import java.util.Map;
  * uk.ac.bbsrc.tgac.miso.analysis
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 07/11/11
  * @since 0.1.3
@@ -46,8 +46,7 @@ public class MySqlConanUserDAO extends DatabaseConanUserDAO {
     Object ai = rs.get("Auto_increment");
     if (ai != null) {
       return new Long(ai.toString());
-    }
-    else {
+    } else {
       throw new IOException("Cannot resolve Auto_increment value from DBMS metadata tables");
     }
   }
@@ -60,35 +59,23 @@ public class MySqlConanUserDAO extends DatabaseConanUserDAO {
       userCheck = getJdbcTemplate().queryForInt(USER_COUNT, user.getId());
     }
 
-    //There is no such user in database
+    // There is no such user in database
     if (userCheck == 0) {
       try {
         int userID = (int) getAutoIncrement("CONAN_USERS");
-        getJdbcTemplate().update(USER_INSERT,
-                                 userID,
-                                 user.getUserName(),
-                                 user.getFirstName(),
-                                 user.getSurname(),
-                                 user.getEmail(),
-                                 user.getRestApiKey(),
-                                 user.getPermissions().toString());
+        getJdbcTemplate().update(USER_INSERT, userID, user.getUserName(), user.getFirstName(), user.getSurname(), user.getEmail(),
+            user.getRestApiKey(), user.getPermissions().toString());
         if (user instanceof ConanUserWithPermissions) {
           ((ConanUserWithPermissions) user).setId(Integer.toString(userID));
+        } else {
+          getLog().warn("User acquired from database was of unexpected type " + user.getClass().getSimpleName() + ", cannot set user ID");
         }
-        else {
-          getLog().warn("User acquired from database was of unexpected type " +
-                        user.getClass().getSimpleName() + ", cannot set user ID");
-        }
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
         e.printStackTrace();
       }
-    }
-    else {
-      getJdbcTemplate().update(USER_UPDATE,
-                               user.getUserName(), user.getFirstName(), user.getSurname(),
-                               user.getEmail(),
-                               user.getRestApiKey(), user.getPermissions().toString(), user.getId());
+    } else {
+      getJdbcTemplate().update(USER_UPDATE, user.getUserName(), user.getFirstName(), user.getSurname(), user.getEmail(),
+          user.getRestApiKey(), user.getPermissions().toString(), user.getId());
     }
 
     return user;

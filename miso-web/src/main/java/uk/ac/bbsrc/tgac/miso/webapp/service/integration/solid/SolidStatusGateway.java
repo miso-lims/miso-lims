@@ -31,12 +31,12 @@ import org.springframework.util.MultiValueMap;
  * uk.ac.bbsrc.tgac.miso.webapp.service
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 04-Aug-2011
  * @since 0.0.3
  */
 public interface SolidStatusGateway {
-    @Gateway(requestChannel = "solidStatusChannel")
-    void consume(Message<MultiValueMap<String, String>> message);  
+  @Gateway(requestChannel = "solidStatusChannel")
+  void consume(Message<MultiValueMap<String, String>> message);
 }

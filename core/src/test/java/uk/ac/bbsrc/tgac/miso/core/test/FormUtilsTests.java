@@ -24,6 +24,8 @@
 package uk.ac.bbsrc.tgac.miso.core.test;
 
 import com.eaglegenomics.simlims.core.User;
+
+import junit.framework.Assert;
 import junit.framework.TestCase;
 import org.junit.Test;
 import org.odftoolkit.odfdom.doc.OdfTextDocument;
@@ -46,7 +48,7 @@ import java.util.List;
  * uk.ac.bbsrc.tgac.miso.core.test
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 06-Sep-2011
  * @since 0.1.1
@@ -63,10 +65,9 @@ public class FormUtilsTests {
       testSampleDeliveryFile = File.createTempFile("test-sampleDeliveryForm", ".odt");
       testSampleBulkInputOdsFile = File.createTempFile("test-sampleBulkInputOds", ".ods");
       testSampleBulkInputXlsFile = File.createTempFile("test-sampleBulkInputXls", ".xlsx");
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
-      TestCase.fail();
+      Assert.fail();
     }
   }
 
@@ -74,22 +75,21 @@ public class FormUtilsTests {
   public void testCreateSampleDeliveryForm() {
     try {
       uk.ac.bbsrc.tgac.miso.core.util.FormUtils.createSampleDeliveryForm(generateSamples(), testSampleDeliveryFile, true);
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       e.printStackTrace();
-      TestCase.fail();
+      Assert.fail();
     }
   }
 
   @Test
   public void testConvertToPdf() {
     try {
-      OdfTextDocument oDoc = uk.ac.bbsrc.tgac.miso.core.util.FormUtils.createSampleDeliveryForm(generateSamples(), testSampleDeliveryFile, false);
+      OdfTextDocument oDoc = uk.ac.bbsrc.tgac.miso.core.util.FormUtils.createSampleDeliveryForm(generateSamples(), testSampleDeliveryFile,
+          false);
       uk.ac.bbsrc.tgac.miso.core.util.FormUtils.convertToPDF(oDoc);
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       e.printStackTrace();
-      TestCase.fail();
+      Assert.fail();
     }
   }
 
@@ -100,17 +100,14 @@ public class FormUtilsTests {
       int numExpected = generateSamples().size();
       if (samples.size() != numExpected) {
         log.error("Expected samples in: " + numExpected + ". Number imported: " + samples.size());
-        TestCase.fail();
-      }
-      else {
+        Assert.fail();
+      } else {
         log.info("Expected samples in: " + numExpected + ". Number imported: " + samples.size());
       }
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       e.printStackTrace();
-      TestCase.fail();
-    }
-    finally {
+      Assert.fail();
+    } finally {
       testSampleDeliveryFile.delete();
     }
   }
@@ -122,14 +119,13 @@ public class FormUtilsTests {
       LimsUtils.writeFile(in, testSampleBulkInputOdsFile);
       User u = new UserImpl();
       u.setLoginName("testBulkImportUser");
-      List<Sample> samples = FormUtils.importSampleInputSpreadsheet(testSampleBulkInputOdsFile, u, new MockFormTestRequestManager(), new DefaultLibraryNamingScheme());
+      List<Sample> samples = FormUtils.importSampleInputSpreadsheet(testSampleBulkInputOdsFile, u, new MockFormTestRequestManager(),
+          new DefaultLibraryNamingScheme());
       log.info("Imported :: " + LimsUtils.join(samples, " | "));
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       e.printStackTrace();
-      TestCase.fail();
-    }
-    finally {
+      Assert.fail();
+    } finally {
       testSampleBulkInputOdsFile.delete();
     }
   }
@@ -141,14 +137,13 @@ public class FormUtilsTests {
       LimsUtils.writeFile(in, testSampleBulkInputXlsFile);
       User u = new UserImpl();
       u.setLoginName("testBulkImportUser");
-      List<Sample> samples = FormUtils.importSampleInputSpreadsheet(testSampleBulkInputXlsFile, u, new MockFormTestRequestManager(), new DefaultLibraryNamingScheme());
+      List<Sample> samples = FormUtils.importSampleInputSpreadsheet(testSampleBulkInputXlsFile, u, new MockFormTestRequestManager(),
+          new DefaultLibraryNamingScheme());
       log.info("Imported :: " + LimsUtils.join(samples, " | "));
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       e.printStackTrace();
-      TestCase.fail();
-    }
-    finally {
+      Assert.fail();
+    } finally {
       testSampleBulkInputXlsFile.delete();
     }
   }
@@ -160,8 +155,8 @@ public class FormUtilsTests {
     for (int i = 1; i < 6; i++) {
       Sample s = dataObjectFactory.getSample();
       s.setId(i);
-      s.setName("SAM"+i);
-      s.setAlias("MI_S"+i+"_TestSample");
+      s.setName("SAM" + i);
+      s.setAlias("MI_S" + i + "_TestSample");
       s.setScientificName("F.bar");
       s.setIdentificationBarcode(s.getName() + "::" + s.getAlias());
       samples.add(s);

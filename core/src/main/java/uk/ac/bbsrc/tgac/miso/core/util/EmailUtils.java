@@ -33,7 +33,7 @@ import java.util.Properties;
 
 /**
  * Utility class to provide email sending functionality
- *
+ * 
  * @author Xingdong Bian
  * @author Rob Davey
  * @since 0.0.2
@@ -42,12 +42,17 @@ public class EmailUtils {
 
   /**
    * Send an email to a recipient
-   *
-   * @param to of type String
-   * @param from of type String
-   * @param subject of type String
-   * @param text of type String
-   * @param mailProps of type Properties
+   * 
+   * @param to
+   *          of type String
+   * @param from
+   *          of type String
+   * @param subject
+   *          of type String
+   * @param text
+   *          of type String
+   * @param mailProps
+   *          of type Properties
    * @throws javax.mail.MessagingException
    */
   public static void send(String to, String from, String subject, String text, Properties mailProps) throws MessagingException {

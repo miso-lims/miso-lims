@@ -9,5 +9,5 @@ import org.springframework.transaction.annotation.Transactional;
 @ContextConfiguration("/db-test-context.xml")
 @Transactional
 public class AbstractDAOTest {
-  
+
 }

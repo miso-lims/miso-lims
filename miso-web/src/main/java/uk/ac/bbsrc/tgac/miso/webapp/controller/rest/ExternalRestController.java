@@ -29,19 +29,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedDilutionException;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryQcException;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleQcException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -49,7 +42,7 @@ import java.util.Collection;
  * uk.ac.bbsrc.tgac.miso.webapp.controller.rest
  * <p/>
  * Info
- *
+ * 
  * @author bianx
  */
 @Controller
@@ -66,9 +59,7 @@ public class ExternalRestController {
   }
 
   @RequestMapping(value = "projects", method = RequestMethod.GET)
-  public
-  @ResponseBody
-  String jsonRest() throws IOException {
+  public @ResponseBody String jsonRest() throws IOException {
     StringBuilder sb = new StringBuilder();
     Collection<Project> lp = requestManager.listAllProjects();
     int pi = 0;
@@ -95,12 +86,8 @@ public class ExternalRestController {
     return "{" + sb.toString() + "}";
   }
 
-
   @RequestMapping(value = "project/{projectId}", method = RequestMethod.GET)
-  public
-  @ResponseBody
-  String jsonRestProject(@PathVariable Long projectId,
-                         ModelMap model) throws IOException {
+  public @ResponseBody String jsonRestProject(@PathVariable Long projectId, ModelMap model) throws IOException {
     StringBuilder sb = new StringBuilder();
 
     Project p = requestManager.getProjectById(projectId);
@@ -159,7 +146,8 @@ public class ExternalRestController {
         sb.append("'qcPassed':'" + (sample.getQcPassed() != null ? sample.getQcPassed().toString() : "") + "'");
         sb.append(",");
 
-        sb.append("'receivedDate':'" + (sample.getReceivedDate() != null ? LimsUtils.getDateAsString(sample.getReceivedDate()) : "not available") + "'");
+        sb.append("'receivedDate':'"
+            + (sample.getReceivedDate() != null ? LimsUtils.getDateAsString(sample.getReceivedDate()) : "not available") + "'");
         sb.append(",");
         sb.append("'sampleType':'" + (sample.getSampleType() != null ? sample.getSampleType() : "") + "'");
         sb.append(",");
@@ -183,7 +171,8 @@ public class ExternalRestController {
         ri++;
         if (!run.getStatus().getHealth().getKey().equals("Failed")) {
           ArrayList<String> runSamples = new ArrayList();
-          Collection<SequencerPartitionContainer<SequencerPoolPartition>> spcs = requestManager.listSequencerPartitionContainersByRunId(run.getId());
+          Collection<SequencerPartitionContainer<SequencerPoolPartition>> spcs = requestManager
+              .listSequencerPartitionContainersByRunId(run.getId());
           if (spcs.size() > 0) {
             for (SequencerPartitionContainer<SequencerPoolPartition> spc : spcs) {
 
@@ -204,15 +193,17 @@ public class ExternalRestController {
             }
           }
 
-
           sb.append("{");
           sb.append("'name':'" + run.getName() + "'");
           sb.append(",");
-          sb.append("'status':'" + (run.getStatus() != null && run.getStatus().getHealth() != null ? run.getStatus().getHealth().getKey() : "") + "'");
+          sb.append("'status':'"
+              + (run.getStatus() != null && run.getStatus().getHealth() != null ? run.getStatus().getHealth().getKey() : "") + "'");
           sb.append(",");
-          sb.append("'startDate':'" + (run.getStatus() != null && run.getStatus().getStartDate() != null ? run.getStatus().getStartDate().toString() : "") + "'");
+          sb.append("'startDate':'"
+              + (run.getStatus() != null && run.getStatus().getStartDate() != null ? run.getStatus().getStartDate().toString() : "") + "'");
           sb.append(",");
-          sb.append("'completionDate':'" + (run.getStatus() != null && run.getStatus().getCompletionDate() != null ? run.getStatus().getCompletionDate().toString() : "") + "'");
+          sb.append("'completionDate':'" + (run.getStatus() != null && run.getStatus().getCompletionDate() != null
+              ? run.getStatus().getCompletionDate().toString() : "") + "'");
           sb.append(",");
           sb.append("'platformType':'" + (run.getPlatformType() != null ? run.getPlatformType().getKey() : "") + "'");
           sb.append(",");

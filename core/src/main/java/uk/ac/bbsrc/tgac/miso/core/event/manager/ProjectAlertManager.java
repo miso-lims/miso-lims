@@ -25,15 +25,11 @@ package uk.ac.bbsrc.tgac.miso.core.event.manager;
 
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
-import com.googlecode.ehcache.annotations.KeyGenerator;
-import com.googlecode.ehcache.annotations.Property;
-import com.googlecode.ehcache.annotations.TriggersRemove;
 import com.rits.cloning.Cloner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
@@ -45,7 +41,7 @@ import java.util.*;
  * uk.ac.bbsrc.tgac.miso.core.event.manager
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 11/11/11
  * @since 0.1.3
@@ -118,8 +114,7 @@ public class ProjectAlertManager {
             if (clone.getProgress() != null) {
               log.debug("Not replacing Project " + clone.getId() + ": " + clone.getProgress().name());
             }
-          }
-          else {
+          } else {
             applyListeners(clone);
 
             for (ProjectOverview po : clone.getOverviews()) {
@@ -133,8 +128,7 @@ public class ProjectAlertManager {
           }
         }
       }
-    }
-    else {
+    } else {
       log.warn("Alerting system disabled.");
     }
   }
@@ -155,8 +149,7 @@ public class ProjectAlertManager {
           log.debug("Dequeued " + project.getId());
         }
       }
-    }
-    else {
+    } else {
       log.warn("Alerting system disabled.");
     }
   }
@@ -167,11 +160,11 @@ public class ProjectAlertManager {
 
   private void update(Project p) throws IOException {
     if (enabled) {
-      //don't just replace the object - set required fields otherwise we have to reset all the object's listeners
+      // don't just replace the object - set required fields otherwise we have to reset all the object's listeners
       Project clone = projects.get(p.getId());
       if (clone == null) {
         log.debug("Update: no clone - pushing");
-        //new project - add all ProjectWatchers!
+        // new project - add all ProjectWatchers!
         for (User u : securityManager.listUsersByGroupName("ProjectWatchers")) {
           p.addWatcher(u);
           for (ProjectOverview po : p.getOverviews()) {
@@ -179,8 +172,7 @@ public class ProjectAlertManager {
           }
         }
         push(p);
-      }
-      else {
+      } else {
         log.debug("Update: got clone of " + clone.getId());
         clone.setProgress(cloner.deepClone(p.getProgress()));
 
@@ -193,8 +185,7 @@ public class ProjectAlertManager {
             cloneOverview.setAllPoolsConstructed(po.getAllPoolsConstructed());
             cloneOverview.setAllRunsCompleted(po.getAllRunsCompleted());
             cloneOverview.setPrimaryAnalysisCompleted(po.getPrimaryAnalysisCompleted());
-          }
-          else {
+          } else {
             log.debug("Original project has an overview, but it seems it hasn't been cloned.");
           }
         }
@@ -250,8 +241,7 @@ public class ProjectAlertManager {
         }
 
         push(project);
-      }
-      else {
+      } else {
         clone.addWatcher(user);
         for (ProjectOverview po : clone.getOverviews()) {
           ProjectOverview cloneOverview = clone.getOverviewById(po.getOverviewId());
@@ -277,8 +267,7 @@ public class ProjectAlertManager {
         }
 
         push(project);
-      }
-      else {
+      } else {
         clone.removeWatcher(user);
         for (ProjectOverview po : clone.getOverviews()) {
           ProjectOverview cloneOverview = clone.getOverviewById(po.getOverviewId());
@@ -295,9 +284,9 @@ public class ProjectAlertManager {
     for (Project p : projects.values()) {
       if (user.getGroups() != null && user.getGroups().contains(securityManager.getGroupByName("ProjectWatchers"))) {
         addWatcher(p, userId);
-      }
-      else {
-        if (p.getSecurityProfile() != null && p.getSecurityProfile().getOwner() != null && !p.getSecurityProfile().getOwner().equals(user)) {
+      } else {
+        if (p.getSecurityProfile() != null && p.getSecurityProfile().getOwner() != null
+            && !p.getSecurityProfile().getOwner().equals(user)) {
           removeWatcher(p, userId);
         }
       }

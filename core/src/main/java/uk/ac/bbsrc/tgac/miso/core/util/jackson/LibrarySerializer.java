@@ -11,7 +11,7 @@ import java.io.IOException;
  * uk.ac.bbsrc.tgac.miso.webapp.util
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 03/01/13
  * @since 0.1.9
@@ -20,9 +20,7 @@ public class LibrarySerializer extends JsonSerializer<Library> {
   @Override
   public void serialize(Library library, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
     jsonGenerator.writeStartObject();
-    //jsonGenerator.writeStringField("username", user.getUsername());
-
-
+    // jsonGenerator.writeStringField("username", user.getUsername());
 
     jsonGenerator.writeEndObject();
   }

@@ -46,7 +46,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.UnicodeReader;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-import java.io.StringReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -54,16 +53,18 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * A concrete implementation of a SequencerInterrogationStrategy that can make queries and parse results, supported by a MisoPerlDaemonInterrogationMechanism, to an Illumina sequencer.
+ * A concrete implementation of a SequencerInterrogationStrategy that can make queries and parse results, supported by a
+ * MisoPerlDaemonInterrogationMechanism, to an Illumina sequencer.
  * <p/>
- * Methods in this class are not usually called explicitly, but via a {@link SequencerInterrogator} that has wrapped up this strategy to a SequencerReference. 
- *
+ * Methods in this class are not usually called explicitly, but via a {@link SequencerInterrogator} that has wrapped up this strategy to a
+ * SequencerReference.
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 @ServiceProvider
 public class IlluminaSequencerInterrogationStrategy implements SequencerInterrogationStrategy {
-  /** Field log  */
+  /** Field log */
   protected static final Logger log = LoggerFactory.getLogger(IlluminaSequencerInterrogationStrategy.class);
 
   private static final MisoPerlDaemonQuery statusQuery = new MisoPerlDaemonQuery("Illumina", "status");
@@ -87,8 +88,7 @@ public class IlluminaSequencerInterrogationStrategy implements SequencerInterrog
             StatusImpl status = new StatusImpl();
             if (j.has("complete") && j.getString("complete").equals("true")) {
               status.setHealth(HealthType.Completed);
-            }
-            else {
+            } else {
               status.setHealth(HealthType.Running);
             }
 
@@ -99,16 +99,13 @@ public class IlluminaSequencerInterrogationStrategy implements SequencerInterrog
             status.setInstrumentName(statusDoc.getElementsByTagName("InstrumentName").item(0).getTextContent());
             status.setRunName(statusDoc.getElementsByTagName("RunName").item(0).getTextContent());
             s.add(status);
-          }
-          catch (ParserConfigurationException e) {
+          } catch (ParserConfigurationException e) {
             e.printStackTrace();
             throw new InterrogationException(e.getMessage());
-          }
-          catch (ParseException e) {
+          } catch (ParseException e) {
             e.printStackTrace();
             throw new InterrogationException(e.getMessage());
-          }
-          catch (TransformerException e) {
+          } catch (TransformerException e) {
             e.printStackTrace();
             throw new InterrogationException(e.getMessage());
           }
@@ -121,20 +118,21 @@ public class IlluminaSequencerInterrogationStrategy implements SequencerInterrog
   @Override
   public List<Status> listAllStatusBySequencerName(SequencerReference sr, String name) throws InterrogationException {
     List<Status> sts = new ArrayList<Status>();
-    String regex = ".*/([\\d]+_"+name+"_[\\d]+_[A-z0-9_]*)/.*";
+    String regex = ".*/([\\d]+_" + name + "_[\\d]+_[A-z0-9_]*)/.*";
     Pattern p = Pattern.compile(regex);
     for (Status s : listAllStatus(sr)) {
-        Matcher m = p.matcher(s.getRunName());
-        if (m.matches()) {
-          sts.add(s);
-        }
+      Matcher m = p.matcher(s.getRunName());
+      if (m.matches()) {
+        sts.add(s);
+      }
     }
     return sts;
   }
 
   @Override
   public List<String> listRunsByHealthType(SequencerReference sr, HealthType healthType) throws InterrogationException {
-    String response = doQuery(sr, new MisoPerlDaemonInterrogationMechanism(), new MisoPerlDaemonQuery("Illumina", healthType.getKey().toLowerCase())).parseResult();
+    String response = doQuery(sr, new MisoPerlDaemonInterrogationMechanism(),
+        new MisoPerlDaemonQuery("Illumina", healthType.getKey().toLowerCase())).parseResult();
     List<String> s = new ArrayList<String>();
     if (response != null) {
       String[] ss = response.split(",");
@@ -203,8 +201,7 @@ public class IlluminaSequencerInterrogationStrategy implements SequencerInterrog
             StatusImpl status = new StatusImpl();
             if (j.has("complete") && j.getString("complete").equals("true")) {
               status.setHealth(HealthType.Completed);
-            }
-            else {
+            } else {
               status.setHealth(HealthType.Running);
             }
 
@@ -218,16 +215,13 @@ public class IlluminaSequencerInterrogationStrategy implements SequencerInterrog
           }
         }
       }
-    }
-    catch (ParserConfigurationException e) {
+    } catch (ParserConfigurationException e) {
       e.printStackTrace();
       throw new InterrogationException(e.getMessage());
-    }
-    catch (ParseException e) {
+    } catch (ParseException e) {
       e.printStackTrace();
       throw new InterrogationException(e.getMessage());
-    }
-    catch (TransformerException e) {
+    } catch (TransformerException e) {
       e.printStackTrace();
       throw new InterrogationException(e.getMessage());
     }
@@ -249,14 +243,14 @@ public class IlluminaSequencerInterrogationStrategy implements SequencerInterrog
           }
         }
       }
-    }
-    catch (InterrogationException e) {
+    } catch (InterrogationException e) {
       e.printStackTrace();
     }
     return json;
   }
 
-  private InterrogationResult<String> doQuery(SequencerReference sr, InterrogationMechanism mechanism, MisoPerlDaemonQuery query) throws InterrogationException {
+  private InterrogationResult<String> doQuery(SequencerReference sr, InterrogationMechanism mechanism, MisoPerlDaemonQuery query)
+      throws InterrogationException {
     log.info("Pushing query: " + query.generateQuery());
     InterrogationResult<String> result = mechanism.doQuery(sr, query);
     log.info("Consuming result: " + result.parseResult());

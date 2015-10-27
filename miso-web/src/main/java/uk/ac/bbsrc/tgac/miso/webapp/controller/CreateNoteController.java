@@ -37,49 +37,33 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 @RequestMapping("/note")
 @SessionAttributes("user")
 public class CreateNoteController {
-	protected static final Logger log = LoggerFactory.getLogger(CreateNoteController.class);
+  protected static final Logger log = LoggerFactory.getLogger(CreateNoteController.class);
 
-	@Autowired
-	private SecurityManager securityManager;
+  @Autowired
+  private SecurityManager securityManager;
 
-	@Autowired
-	private RequestManager requestManager;
+  @Autowired
+  private RequestManager requestManager;
 
-	public void setSecurityManager(SecurityManager securityManager) {
-		this.securityManager = securityManager;
-	}
+  public void setSecurityManager(SecurityManager securityManager) {
+    this.securityManager = securityManager;
+  }
 
-	public void setRequestManager(RequestManager requestManager) {
-		this.requestManager = requestManager;
-	}
-/*
-	@RequestMapping(method = RequestMethod.POST)
-	public String processSubmit(
-			@RequestParam(value = "requestId", required = true) long requestId,
-			@RequestParam(value = "text", required = true) String text,
-			@RequestParam(value = "internalOnly", defaultValue = "false") boolean internalOnly,
-			ModelMap model, SessionStatus session) throws IOException {
-		try {
-			User user = securityManager
-					.getUserByLoginName(SecurityContextHolder.getContext()
-							.getAuthentication().getName());
-			Request request = requestManager.getRequestById(requestId);
-			if (!request.userCanWrite(user)) {
-				throw new SecurityException("Permission denied.");
-			}
-			Note note = request.createNote(user);
-			note.setText(text);
-			note.setInternalOnly(internalOnly);
-			requestManager.saveRequest(request);
-			session.setComplete();
-			model.clear();
-			return "redirect:/miso/request/view/" + requestId;
-		} catch (IOException ex) {
-			if (log.isDebugEnabled()) {
-				log.debug("Failed to create note", ex);
-			}
-			throw ex;
-		}
-	}
-	*/
+  public void setRequestManager(RequestManager requestManager) {
+    this.requestManager = requestManager;
+  }
+  /*
+   * @RequestMapping(method = RequestMethod.POST) public String processSubmit(
+   * 
+   * @RequestParam(value = "requestId", required = true) long requestId,
+   * 
+   * @RequestParam(value = "text", required = true) String text,
+   * 
+   * @RequestParam(value = "internalOnly", defaultValue = "false") boolean internalOnly, ModelMap model, SessionStatus session) throws
+   * IOException { try { User user = securityManager .getUserByLoginName(SecurityContextHolder.getContext() .getAuthentication().getName());
+   * Request request = requestManager.getRequestById(requestId); if (!request.userCanWrite(user)) { throw new SecurityException(
+   * "Permission denied."); } Note note = request.createNote(user); note.setText(text); note.setInternalOnly(internalOnly);
+   * requestManager.saveRequest(request); session.setComplete(); model.clear(); return "redirect:/miso/request/view/" + requestId; } catch
+   * (IOException ex) { if (log.isDebugEnabled()) { log.debug("Failed to create note", ex); } throw ex; } }
+   */
 }

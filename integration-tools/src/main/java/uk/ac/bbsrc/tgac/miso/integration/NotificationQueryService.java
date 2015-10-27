@@ -1,6 +1,5 @@
 package uk.ac.bbsrc.tgac.miso.integration;
 
-import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,7 +8,7 @@ import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationUtils;
 
 /**
  * Service to enable queries to a notification-server instance
- *
+ * 
  * @author Rob Davey
  * @date 10/04/14
  * @since 0.2.1-SNAPSHOT

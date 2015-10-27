@@ -23,15 +23,15 @@
 
 package uk.ac.bbsrc.tgac.miso.tools.run.util;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Set;
 
 /**
  * uk.ac.bbsrc.tgac.miso.notification.util
  * <p/>
- * Takes a set of Strings representing XML fragments and transforms them into a textual representation ready for passing to a Message receiving service
- *
+ * Takes a set of Strings representing XML fragments and transforms them into a textual representation ready for passing to a Message
+ * receiving service
+ * 
  * @author Rob Davey
  * @date 08-Aug-2011
  * @since 0.0.3

@@ -43,16 +43,18 @@ import java.util.Collection;
  * @since 0.0.2
  */
 @Deprecated
-public class HibernatePlatformStore  extends HibernateDaoSupport implements Store<Platform> {
+public class HibernatePlatformStore extends HibernateDaoSupport implements Store<Platform> {
+  @Override
   @Transactional(readOnly = false)
   public long save(Platform platform) throws IOException {
     getHibernateTemplate().saveOrUpdate(platform);
     return platform.getPlatformId();
   }
 
+  @Override
   @Transactional(readOnly = true)
   public Platform get(long platformId) throws IOException {
-    return (Platform) getHibernateTemplate().load(PlatformImpl.class, platformId);
+    return getHibernateTemplate().load(PlatformImpl.class, platformId);
   }
 
   @Override
@@ -60,17 +62,14 @@ public class HibernatePlatformStore  extends HibernateDaoSupport implements Stor
     return get(id);
   }
 
+  @Override
   @Transactional(readOnly = true)
   @SuppressWarnings("unchecked")
   public Collection<Platform> listAll() throws IOException {
-/*    return (Collection<Platform>) getHibernateTemplate().execute(
-            new HibernateCallback() {
-              public Object doInHibernate(Session session)
-                      throws HibernateException {
-                return session.createQuery("from AbstractPlatform").list();
-              }
-            });
-            */
+    /*
+     * return (Collection<Platform>) getHibernateTemplate().execute( new HibernateCallback() { public Object doInHibernate(Session session)
+     * throws HibernateException { return session.createQuery("from AbstractPlatform").list(); } });
+     */
     return null;
   }
 

@@ -37,22 +37,21 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 import javax.persistence.*;
 
 /**
- * Concrete implementation of a Partition to represent a Lane in a sequencing platform that uses lanes, e.g.
- *  Illumina
- *
+ * Concrete implementation of a Partition to represent a Lane in a sequencing platform that uses lanes, e.g. Illumina
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 @Entity
 @Table(name = "`Lane`")
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
-//@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
-@JsonIgnoreProperties({"securityProfile","flowcell"})
+// @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
+@JsonIgnoreProperties({ "securityProfile", "flowcell" })
 @Deprecated
 public class Lane extends PartitionImpl {
   public static final Long UNSAVED_ID = 0L;
-  
+
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   public Long laneId = Lane.UNSAVED_ID;
@@ -66,8 +65,9 @@ public class Lane extends PartitionImpl {
 
   /**
    * Construct a new Lane with a SecurityProfile owned by the given User
-   *
-   * @param user of type User
+   * 
+   * @param user
+   *          of type User
    */
   public Lane(User user) {
     setSecurityProfile(new SecurityProfile(user));

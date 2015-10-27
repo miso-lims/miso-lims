@@ -39,13 +39,12 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.solid.SolidRun;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 import java.util.LinkedList;
-import java.util.List;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.factory
  * <p/>
  * TODO Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -65,9 +64,10 @@ public class TgacDataObjectFactory extends DataObjectFactory {
     return new ProjectImpl();
   }
 
+  @Override
   public Project getProject(User user) {
     return new ProjectImpl(user);
-  }  
+  }
 
   @Override
   public Study getStudy() {
@@ -140,7 +140,7 @@ public class TgacDataObjectFactory extends DataObjectFactory {
   }
 
   @Override
-  //public <T extends List<S>, S extends Plateable> Plate<T, S> getPlateOfSize(int size) {
+  // public <T extends List<S>, S extends Plateable> Plate<T, S> getPlateOfSize(int size) {
   public Plate<LinkedList<Plateable>, Plateable> getPlateOfSize(int size) {
     return new PlateImpl<Plateable>(size);
   }
@@ -155,6 +155,7 @@ public class TgacDataObjectFactory extends DataObjectFactory {
     return new PoolImpl<Poolable>();
   }
 
+  @Override
   public Pool<? extends Poolable> getPool(User user) {
     return new PoolImpl<Poolable>(user);
   }
@@ -165,6 +166,7 @@ public class TgacDataObjectFactory extends DataObjectFactory {
     return new IlluminaPool();
   }
 
+  @Override
   @Deprecated
   public IlluminaPool getIlluminaPool(User user) {
     return new IlluminaPool(user);
@@ -176,6 +178,7 @@ public class TgacDataObjectFactory extends DataObjectFactory {
     return new LS454Pool();
   }
 
+  @Override
   @Deprecated
   public LS454Pool getLS454Pool(User user) {
     return new LS454Pool(user);
@@ -187,6 +190,7 @@ public class TgacDataObjectFactory extends DataObjectFactory {
     return new SolidPool();
   }
 
+  @Override
   @Deprecated
   public SolidPool getSolidPool(User user) {
     return new SolidPool(user);
@@ -198,6 +202,7 @@ public class TgacDataObjectFactory extends DataObjectFactory {
     return new PacBioPool();
   }
 
+  @Override
   @Deprecated
   public PacBioPool getPacBioPool(User user) {
     return new PacBioPool(user);
@@ -209,6 +214,7 @@ public class TgacDataObjectFactory extends DataObjectFactory {
     return new emPCRPool(platformType);
   }
 
+  @Override
   @Deprecated
   public emPCRPool getEmPCRPool(PlatformType platformType, User user) {
     return new emPCRPool(user, platformType);
@@ -247,8 +253,7 @@ public class TgacDataObjectFactory extends DataObjectFactory {
   public Library getLibrary(Sample sample, User user) {
     if (sample.userCanWrite(user)) {
       return new LibraryImpl(sample, user);
-    }
-    else {
+    } else {
       throw new SecurityException();
     }
   }
@@ -256,8 +261,7 @@ public class TgacDataObjectFactory extends DataObjectFactory {
   public Study getStudy(Project project, User user) {
     if (project.userCanWrite(user)) {
       return new StudyImpl(project, user);
-    }
-    else {
+    } else {
       throw new SecurityException();
     }
   }
@@ -265,8 +269,7 @@ public class TgacDataObjectFactory extends DataObjectFactory {
   public Experiment getExperiment(Study study, User user) {
     if (study.userCanWrite(user)) {
       return new ExperimentImpl(study, user);
-    }
-    else {
+    } else {
       throw new SecurityException();
     }
   }
@@ -274,12 +277,12 @@ public class TgacDataObjectFactory extends DataObjectFactory {
   public Sample getSample(Project project, User user) {
     if (project.userCanWrite(user)) {
       return new SampleImpl(project, user);
-    }
-    else {
+    } else {
       throw new SecurityException();
     }
   }
 
+  @Override
   public Sample getSample(User user) {
     return new SampleImpl(user);
   }
@@ -287,8 +290,7 @@ public class TgacDataObjectFactory extends DataObjectFactory {
   public SampleQC getSampleQC(Sample sample, User user) {
     if (sample.userCanWrite(user)) {
       return new SampleQCImpl(sample, user);
-    }
-    else {
+    } else {
       throw new SecurityException();
     }
   }
@@ -296,8 +298,7 @@ public class TgacDataObjectFactory extends DataObjectFactory {
   public LibraryQC getLibraryQC(Library library, User user) {
     if (library.userCanWrite(user)) {
       return new LibraryQCImpl(library, user);
-    }
-    else {
+    } else {
       throw new SecurityException();
     }
   }
@@ -305,12 +306,12 @@ public class TgacDataObjectFactory extends DataObjectFactory {
   public Run getRun(Experiment experiment, User user) {
     if (experiment.userCanWrite(user)) {
       return new RunImpl(experiment, user);
-    }
-    else {
+    } else {
       throw new SecurityException();
     }
   }
 
+  @Override
   public Run getRun(User user) {
     return new RunImpl(user);
   }
@@ -326,8 +327,7 @@ public class TgacDataObjectFactory extends DataObjectFactory {
   public Run getIlluminaRun(Experiment experiment, User user) {
     if (experiment.userCanWrite(user)) {
       return new IlluminaRun(user);
-    }
-    else {
+    } else {
       throw new SecurityException();
     }
   }
@@ -343,8 +343,7 @@ public class TgacDataObjectFactory extends DataObjectFactory {
   public Run getLs454Run(Experiment experiment, User user) {
     if (experiment.userCanWrite(user)) {
       return new LS454Run(user);
-    }
-    else {
+    } else {
       throw new SecurityException();
     }
   }
@@ -361,8 +360,7 @@ public class TgacDataObjectFactory extends DataObjectFactory {
     if (experiment.userCanWrite(user)) {
       return new SolidRun(user);
 
-    }
-    else {
+    } else {
       throw new SecurityException();
     }
   }
@@ -379,77 +377,58 @@ public class TgacDataObjectFactory extends DataObjectFactory {
     if (experiment.userCanWrite(user)) {
       return new PacBioRun(user);
 
-    }
-    else {
+    } else {
       throw new SecurityException();
     }
   }
-  
+
+  @Override
   public Pool<? extends Poolable> getPoolOfType(PlatformType platformtype, User user) throws IllegalArgumentException {
     if (platformtype != null) {
       Pool<? extends Poolable> p = getPool(user);
       p.setPlatformType(platformtype);
       return p;
       /*
-      if (platformtype.equals(PlatformType.ILLUMINA)) {
-        return getIlluminaPool(user);
-      }
-      else if (platformtype.equals(PlatformType.LS454)) {
-        return getLS454Pool(user);
-      }
-      else if (platformtype.equals(PlatformType.SOLID)) {
-        return getSolidPool(user);
-      }
-      else if (platformtype.equals(PlatformType.PACBIO)) {
-        return getPacBioPool(user);
-      }
-      else {
-        throw new IllegalArgumentException("Unrecognised PlatformType");
-      }
-      */
-    }
-    else {
+       * if (platformtype.equals(PlatformType.ILLUMINA)) { return getIlluminaPool(user); } else if (platformtype.equals(PlatformType.LS454))
+       * { return getLS454Pool(user); } else if (platformtype.equals(PlatformType.SOLID)) { return getSolidPool(user); } else if
+       * (platformtype.equals(PlatformType.PACBIO)) { return getPacBioPool(user); } else { throw new IllegalArgumentException(
+       * "Unrecognised PlatformType"); }
+       */
+    } else {
       throw new IllegalArgumentException("Null PlatformType supplied");
     }
   }
 
+  @Override
   public Run getRunOfType(PlatformType platformtype) throws IllegalArgumentException {
     if (platformtype != null) {
       if (platformtype.equals(PlatformType.ILLUMINA)) {
         return getIlluminaRun();
-      }
-      else if (platformtype.equals(PlatformType.LS454)) {
+      } else if (platformtype.equals(PlatformType.LS454)) {
         return getLs454Run();
-      }
-      else if (platformtype.equals(PlatformType.SOLID)) {
+      } else if (platformtype.equals(PlatformType.SOLID)) {
         return getSolidRun();
-      }
-      else if (platformtype.equals(PlatformType.PACBIO)) {
+      } else if (platformtype.equals(PlatformType.PACBIO)) {
         return getPacBioRun();
-      }
-      else {
+      } else {
         throw new IllegalArgumentException("Unrecognised PlatformType");
       }
-    }
-    else {
+    } else {
       throw new IllegalArgumentException("Null PlatformType supplied");
     }
   }
 
+  @Override
   public Run getRunOfType(PlatformType platformtype, User user) throws IllegalArgumentException {
     if (platformtype.equals(PlatformType.ILLUMINA)) {
       return getIlluminaRun(user);
-    }
-    else if (platformtype.equals(PlatformType.LS454)) {
+    } else if (platformtype.equals(PlatformType.LS454)) {
       return getLs454Run(user);
-    }
-    else if (platformtype.equals(PlatformType.SOLID)) {
+    } else if (platformtype.equals(PlatformType.SOLID)) {
       return getSolidRun(user);
-    }
-    else if (platformtype.equals(PlatformType.PACBIO)) {
+    } else if (platformtype.equals(PlatformType.PACBIO)) {
       return getPacBioRun(user);
-    }
-    else {
+    } else {
       throw new IllegalArgumentException("Unrecognised PlatformType");
     }
   }
@@ -486,25 +465,23 @@ public class TgacDataObjectFactory extends DataObjectFactory {
   public Run getRunOfType(PlatformType platformtype, Experiment experiment, User user) throws IllegalArgumentException {
     if (platformtype.equals(PlatformType.ILLUMINA)) {
       return getIlluminaRun(experiment, user);
-    }
-    else if (platformtype.equals(PlatformType.LS454)) {
+    } else if (platformtype.equals(PlatformType.LS454)) {
       return getLs454Run(experiment, user);
-    }
-    else if (platformtype.equals(PlatformType.SOLID)) {
+    } else if (platformtype.equals(PlatformType.SOLID)) {
       return getSolidRun(experiment, user);
-    }
-    else if (platformtype.equals(PlatformType.PACBIO)) {
+    } else if (platformtype.equals(PlatformType.PACBIO)) {
       return getPacBioRun(user);
-    }
-    else {
+    } else {
       throw new IllegalArgumentException("Unrecognised PlatformType");
     }
   }
 
+  @Override
   public SubmissionImpl getSubmission() {
     return new SubmissionImpl();
   }
 
+  @Override
   public SubmissionImpl getSubmission(User user) {
     return new SubmissionImpl(user);
   }

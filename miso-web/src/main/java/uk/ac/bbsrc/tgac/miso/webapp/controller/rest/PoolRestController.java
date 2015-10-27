@@ -49,11 +49,8 @@ import java.util.List;
 
 /**
  * A controller to handle all REST requests for Pools
- *
- * Created by IntelliJ IDEA.
- * User: bianx
- * Date: 17-Aug-2011
- * Time: 11:34:04
+ * 
+ * Created by IntelliJ IDEA. User: bianx Date: 17-Aug-2011 Time: 11:34:04
  */
 @Controller
 @RequestMapping("/rest/pool")
@@ -78,8 +75,7 @@ public class PoolRestController {
         return mapper.writeValueAsString(p);
       }
       return mapper.writeValueAsString(RestUtils.error("No such pool with that ID.", "poolId", poolId.toString()));
-    }
-    catch (IOException ioe) {
+    } catch (IOException ioe) {
       return mapper.writeValueAsString(RestUtils.error("Cannot retrieve pool: " + ioe.getMessage(), "poolId", poolId.toString()));
     }
   }
@@ -117,6 +113,6 @@ public class PoolRestController {
     for (String name : types) {
       names.add("\"" + name + "\"");
     }
-    return "{"+LimsUtils.join(names, ",")+"}";
+    return "{" + LimsUtils.join(names, ",") + "}";
   }
 }

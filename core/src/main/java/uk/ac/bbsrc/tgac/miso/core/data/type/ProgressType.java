@@ -30,19 +30,13 @@ import java.util.Map;
 
 /**
  * This enum represents progress stages that any monitored process can utilise.
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public enum ProgressType {
-  UNKNOWN("Unknown"),
-  ACTIVE("Active"),
-  INACTIVE("Inactive"),
-  CANCELLED("Cancelled"),
-  PROPOSED("Proposed"),
-  PENDING("Pending"),
-  APPROVED("Approved"),
-  COMPLETED("Completed");
+  UNKNOWN("Unknown"), ACTIVE("Active"), INACTIVE("Inactive"), CANCELLED("Cancelled"), PROPOSED("Proposed"), PENDING("Pending"), APPROVED(
+      "Approved"), COMPLETED("Completed");
 
   /**
    * Field key
@@ -60,8 +54,9 @@ public enum ProgressType {
 
   /**
    * Constructs a ProgressType based on a given key
-   *
-   * @param key of type String
+   * 
+   * @param key
+   *          of type String
    */
   ProgressType(String key) {
     this.key = key;
@@ -69,8 +64,9 @@ public enum ProgressType {
 
   /**
    * Returns a ProgressType given an enum key
-   *
-   * @param key of type String
+   * 
+   * @param key
+   *          of type String
    * @return ProgressType
    */
   public static ProgressType get(String key) {
@@ -79,7 +75,7 @@ public enum ProgressType {
 
   /**
    * Returns the key of this ProgressType enum.
-   *
+   * 
    * @return String key.
    */
   public String getKey() {
@@ -88,7 +84,7 @@ public enum ProgressType {
 
   /**
    * Returns the keys of this ProgressType enum.
-   *
+   * 
    * @return ArrayList<String> keys.
    */
   public static ArrayList<String> getKeys() {

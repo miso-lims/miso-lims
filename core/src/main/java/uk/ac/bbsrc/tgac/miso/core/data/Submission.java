@@ -36,49 +36,69 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import java.util.*;
 
 /**
- * Created by IntelliJ IDEA.
- * User: davey
- * Date: 10-Feb-2010
- * Time: 09:43:30
+ * Created by IntelliJ IDEA. User: davey Date: 10-Feb-2010 Time: 09:43:30
  */
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
-//@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
-@JsonIgnoreProperties({"securityProfile"})
+// @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
+@JsonIgnoreProperties({ "securityProfile" })
 public interface Submission<I, O, R> extends Submittable<O>, SecurableByProfile, Nameable, Comparable {
 
   public static final Long UNSAVED_ID = 0L;
 
   @Deprecated
   public Long getSubmissionId();
+
   @Deprecated
   public void setSubmissionId(Long submissionId);
 
   public void setId(long id);
 
   public void setName(String name);
+
   public String getAlias();
+
   public void setAlias(String alias);
+
   public String getAccession();
+
   public void setAccession(String accession);
+
   public String getDescription();
+
   public void setDescription(String description);
+
   public String getTitle();
+
   public void setTitle(String title);
+
   public Date getCreationDate();
+
   public void setCreationDate(Date creationDate);
+
   public Date getSubmissionDate();
+
   public void setSubmissionDate(Date submissionDate);
+
   public boolean isVerified();
+
   public void setVerified(boolean verified);
+
   public boolean isCompleted();
+
   public void setCompleted(boolean completed);
+
   public void addSubmissionElement(I i);
+
   public Set<Submittable<O>> getSubmissionElements();
+
   public SubmissionActionType getSubmissionActionType();
+
   public void setSubmissionActionType(SubmissionActionType submissionActionType);
+
   public R submit(SubmissionManager<I, O, R> manager) throws SubmissionException;
 
   Date getLastUpdated();
+
   void setLastUpdated(Date lastUpdated);
 }

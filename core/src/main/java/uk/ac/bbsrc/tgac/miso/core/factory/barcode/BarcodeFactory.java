@@ -60,7 +60,7 @@ import java.util.Map;
  * uk.ac.bbsrc.tgac.miso.core.factory.barcode
  * <p/>
  * Simple factory that builds barcode RenderedImages given a MISO Barcodable object and a BarcodeGenerator
- *
+ * 
  * @author Rob Davey
  * @date 09-Feb-2011
  * @since 0.0.3
@@ -164,12 +164,11 @@ public class BarcodeFactory {
       BitmapCanvasProvider provider = new BitmapCanvasProvider(bitmapResolution, imageType, antialias, orientation);
       provider.establishDimensions(dimension);
       if (barcodeGenerator instanceof AbstractBarcodeBean) {
-        AbstractBarcodeBean bean = (AbstractBarcodeBean)barcodeGenerator;
+        AbstractBarcodeBean bean = (AbstractBarcodeBean) barcodeGenerator;
         bean.setModuleWidth(UnitConv.in2mm(pointPixels / bitmapResolution));
         bean.doQuietZone(false);
         bean.generateBarcode(provider, enc);
-      }
-      else {
+      } else {
         barcodeGenerator.generateBarcode(provider, enc);
       }
       provider.finish();
@@ -195,7 +194,7 @@ public class BarcodeFactory {
   }
 
   public RenderedImage generateSquareDataMatrix(Barcodable barcodable, int width) throws IOException {
-    DataMatrixBean dmb = (DataMatrixBean)DATAMATRIX;
+    DataMatrixBean dmb = (DataMatrixBean) DATAMATRIX;
     dmb.setShape(SymbolShapeHint.FORCE_SQUARE);
     return getImage(barcodable, dmb, new BarcodeDimension(width, width));
   }
@@ -205,9 +204,9 @@ public class BarcodeFactory {
   }
 
   public RenderedImage generateRectDataMatrix(Barcodable barcodable, int width, int height) throws IOException {
-    DataMatrixBean dmb = (DataMatrixBean)DATAMATRIX;
+    DataMatrixBean dmb = (DataMatrixBean) DATAMATRIX;
     dmb.setShape(SymbolShapeHint.FORCE_RECTANGLE);
-    return getImage(barcodable, dmb, new BarcodeDimension(width, height));  
+    return getImage(barcodable, dmb, new BarcodeDimension(width, height));
   }
 
   public void generateRectDataMatrix(Barcodable barcodable, int width, int height, OutputStream output) throws IOException {

@@ -29,7 +29,7 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 
 /**
  * Defines a contract whereby an implementing class is able to be deleted
- *
+ * 
  * @author Rob Davey
  * @date 10-May-2011
  * @since 0.0.3
@@ -37,7 +37,7 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 public interface Deletable {
   /**
    * Ascertain whether this object is deletable given a set of underlying criteria
-   *
+   * 
    * @return boolean true if able to be deleted successfully
    */
   @JsonIgnore

@@ -24,14 +24,15 @@
 package uk.ac.bbsrc.tgac.miso.core.event;
 
 /**
- * AOP aspect interface that reacts to an update to an object, typically thus firing an {@link Event} and raising an {@link Alert}.
- * Any registered watchers (of type {@link com.eaglegenomics.simlims.core.User}) can also be alerted.
- *
+ * AOP aspect interface that reacts to an update to an object, typically thus firing an {@link Event} and raising an {@link Alert}. Any
+ * registered watchers (of type {@link com.eaglegenomics.simlims.core.User}) can also be alerted.
+ * 
  * @author Rob Davey
  * @date 14/11/11
  * @since 0.1.3
  */
 public interface AlertAspect {
   public void updateWatcher(Long userId);
+
   public void update(Long entityId);
 }

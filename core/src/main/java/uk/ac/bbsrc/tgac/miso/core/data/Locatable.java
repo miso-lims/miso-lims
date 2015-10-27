@@ -24,24 +24,25 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 /**
- * This interface simply describes an object that can be barcoded to denote its location,
- * i.e. have a location String that represents a scannable barcode
- *
+ * This interface simply describes an object that can be barcoded to denote its location, i.e. have a location String that represents a
+ * scannable barcode
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public interface Locatable {
   /**
    * Returns the locationBarcode of this Locatable object.
-   *
+   * 
    * @return String locationBarcode.
    */
   public String getLocationBarcode();
 
   /**
    * Sets the locationBarcode of this Locatable object.
-   *
-   * @param locationBarcode locationBarcode.
+   * 
+   * @param locationBarcode
+   *          locationBarcode.
    */
   public void setLocationBarcode(String locationBarcode);
 }

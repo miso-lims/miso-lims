@@ -28,8 +28,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.bbsrc.tgac.miso.core.event.Alert;
 import uk.ac.bbsrc.tgac.miso.core.event.AlerterService;
-import uk.ac.bbsrc.tgac.miso.core.event.impl.DefaultAlert;
-import uk.ac.bbsrc.tgac.miso.core.event.impl.SystemAlert;
 import uk.ac.bbsrc.tgac.miso.core.exception.AlertingException;
 import uk.ac.bbsrc.tgac.miso.core.store.AlertStore;
 
@@ -39,7 +37,7 @@ import java.io.IOException;
  * uk.ac.bbsrc.tgac.miso.core.event.service
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 29/09/11
  * @since 0.1.2
@@ -59,13 +57,11 @@ public class DaoAlerterService implements AlerterService {
     try {
       if (alertStore != null) {
         alertStore.save(a);
-      }
-      else {
+      } else {
         throw new RuntimeException("Cannot persist raised Alert. Specified Alert store is null");
       }
-    }
-    catch (IOException e) {
-      log.error("Cannot save alert to DAO: "+e.getMessage());
+    } catch (IOException e) {
+      log.error("Cannot save alert to DAO: " + e.getMessage());
       throw new AlertingException("Cannot save alert to DAO", e);
     }
   }

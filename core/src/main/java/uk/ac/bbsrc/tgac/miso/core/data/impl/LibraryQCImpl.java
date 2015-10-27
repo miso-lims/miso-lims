@@ -23,7 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -33,7 +32,7 @@ import java.io.Serializable;
 
 /**
  * Concrete implementation of a LibraryQC
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -45,30 +44,32 @@ public class LibraryQCImpl extends AbstractLibraryQC implements Serializable {
   }
 
   /**
-   * Construct a new LibraryQC from a parent Library, checking that the given User can read that Library 
-   *
-   * @param library of type Library
-   * @param user of type User
+   * Construct a new LibraryQC from a parent Library, checking that the given User can read that Library
+   * 
+   * @param library
+   *          of type Library
+   * @param user
+   *          of type User
    */
   public LibraryQCImpl(Library library, User user) {
     if (library.userCanRead(user)) {
       try {
         setLibrary(library);
-      }
-      catch (MalformedLibraryException e) {
+      } catch (MalformedLibraryException e) {
         e.printStackTrace();
       }
-      //setSecurityProfile(experiment.getSecurityProfile());
-    }
-    else {
-      //setSecurityProfile(new SecurityProfile(user));
+      // setSecurityProfile(experiment.getSecurityProfile());
+    } else {
+      // setSecurityProfile(new SecurityProfile(user));
     }
   }
 
+  @Override
   public boolean userCanRead(User user) {
     return true;
   }
 
+  @Override
   public boolean userCanWrite(User user) {
     return true;
   }

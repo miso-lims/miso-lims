@@ -32,7 +32,7 @@ import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
  * uk.ac.bbsrc.tgac.miso.core.event.model
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 28/09/11
  * @since 0.1.2
@@ -49,6 +49,7 @@ public class RunEvent implements Event<Run> {
     this.eventType = eventType;
   }
 
+  @Override
   public Run getEventObject() {
     return this.run;
   }

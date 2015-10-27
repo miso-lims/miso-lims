@@ -108,8 +108,7 @@ public class EditExperimentController {
   }
 
   @RequestMapping(value = "/new/{studyId}", method = RequestMethod.GET)
-  public ModelAndView newAssignedExperiment(@PathVariable Long studyId,
-                                            ModelMap model) throws IOException {
+  public ModelAndView newAssignedExperiment(@PathVariable Long studyId, ModelMap model) throws IOException {
     return setupForm(AbstractExperiment.UNSAVED_ID, studyId, model);
   }
 
@@ -119,8 +118,7 @@ public class EditExperimentController {
   }
 
   @RequestMapping(value = "/{experimentId}", method = RequestMethod.GET)
-  public ModelAndView setupForm(@PathVariable Long experimentId,
-                                ModelMap model) throws IOException {
+  public ModelAndView setupForm(@PathVariable Long experimentId, ModelMap model) throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Experiment experiment = requestManager.getExperimentById(experimentId);
@@ -145,8 +143,7 @@ public class EditExperimentController {
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, experiment, securityManager.listAllGroups()));
       model.put("title", "Experiment " + experimentId);
       return new ModelAndView("/pages/editExperiment.jsp", model);
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to show experiment", ex);
       }
@@ -155,17 +152,14 @@ public class EditExperimentController {
   }
 
   @RequestMapping(value = "/{experimentId}/study/{studyId}", method = RequestMethod.GET)
-  public ModelAndView setupForm(@PathVariable Long experimentId,
-                                @PathVariable Long studyId,
-                                ModelMap model) throws IOException {
+  public ModelAndView setupForm(@PathVariable Long experimentId, @PathVariable Long studyId, ModelMap model) throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Experiment experiment = null;
       if (experimentId == AbstractExperiment.UNSAVED_ID) {
         experiment = dataObjectFactory.getExperiment();
         model.put("title", "New Experiment");
-      }
-      else {
+      } else {
         experiment = requestManager.getExperimentById(experimentId);
         model.put("title", "Experiment " + experimentId);
       }
@@ -187,8 +181,7 @@ public class EditExperimentController {
           LimsUtils.inheritUsersAndGroups(experiment, study.getSecurityProfile());
           sp.setOwner(user);
           experiment.setSecurityProfile(sp);
-        }
-        else {
+        } else {
           experiment.inheritPermissions(study);
         }
       }
@@ -205,8 +198,7 @@ public class EditExperimentController {
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, experiment, securityManager.listAllUsers()));
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, experiment, securityManager.listAllGroups()));
       return new ModelAndView("/pages/editExperiment.jsp", model);
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to show experiment", ex);
       }
@@ -215,9 +207,8 @@ public class EditExperimentController {
   }
 
   @RequestMapping(method = RequestMethod.POST)
-  public String processSubmit(@ModelAttribute("experiment") Experiment experiment,
-                              ModelMap model,
-                              SessionStatus session) throws IOException, MalformedExperimentException {
+  public String processSubmit(@ModelAttribute("experiment") Experiment experiment, ModelMap model, SessionStatus session)
+      throws IOException, MalformedExperimentException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       if (!experiment.userCanWrite(user)) {
@@ -227,8 +218,7 @@ public class EditExperimentController {
       session.setComplete();
       model.clear();
       return "redirect:/miso/experiment/" + experiment.getId();
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to save Experiment", ex);
       }

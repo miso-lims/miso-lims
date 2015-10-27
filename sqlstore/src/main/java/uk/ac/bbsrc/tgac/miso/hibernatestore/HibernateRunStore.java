@@ -24,16 +24,15 @@
 package uk.ac.bbsrc.tgac.miso.hibernatestore;
 
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
-//import org.hibernate.HibernateException;
-//import org.hibernate.Session;
-import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 
 import java.io.IOException;
-import java.lang.Object;import java.lang.String;import java.lang.SuppressWarnings;import java.util.Collection;
+import java.lang.String;
+import java.lang.SuppressWarnings;
+import java.util.Collection;
 
 /**
  * com.eaglegenomics.miso.hibernatestore
@@ -44,18 +43,20 @@ import java.lang.Object;import java.lang.String;import java.lang.SuppressWarning
  * @since 0.0.2
  */
 @Deprecated
-public class HibernateRunStore  extends HibernateDaoSupport implements Store<Run> {
+public class HibernateRunStore extends HibernateDaoSupport implements Store<Run> {
+  @Override
   @Transactional(readOnly = false)
   public long save(Run run) throws IOException {
-    //getHibernateTemplate().saveOrUpdate(run);
+    // getHibernateTemplate().saveOrUpdate(run);
     getHibernateTemplate().merge(run);
     return run.getRunId();
   }
 
+  @Override
   @Transactional(readOnly = true)
   public Run get(long runId) throws IOException {
-    //may have to check for null before the cast
-    return (Run) getHibernateTemplate().get(AbstractRun.class, runId);
+    // may have to check for null before the cast
+    return getHibernateTemplate().get(AbstractRun.class, runId);
   }
 
   @Override
@@ -65,21 +66,18 @@ public class HibernateRunStore  extends HibernateDaoSupport implements Store<Run
 
   @Transactional(readOnly = true)
   public Run get(String name) throws IOException {
-    //may have to check for null before the cast
-    return (Run) getHibernateTemplate().get(AbstractRun.class, name);
+    // may have to check for null before the cast
+    return getHibernateTemplate().get(AbstractRun.class, name);
   }
 
+  @Override
   @Transactional(readOnly = true)
   @SuppressWarnings("unchecked")
   public Collection<Run> listAll() throws IOException {
-/*    return (Collection<Run>) getHibernateTemplate().execute(
-            new HibernateCallback() {
-              public Object doInHibernate(Session session)
-                      throws HibernateException {
-                return session.createQuery("from AbstractRun").list(); 
-              }
-            });
-            */
+    /*
+     * return (Collection<Run>) getHibernateTemplate().execute( new HibernateCallback() { public Object doInHibernate(Session session)
+     * throws HibernateException { return session.createQuery("from AbstractRun").list(); } });
+     */
     return null;
   }
 

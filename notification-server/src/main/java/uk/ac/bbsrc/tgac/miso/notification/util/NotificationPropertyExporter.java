@@ -33,17 +33,16 @@ import java.util.*;
  * A handy class that exposes property placeholders discovered at init time by a PropertyPlaceholderConfigurer.
  * <p/>
  * As an aside, usually these properties are not available to beans, but this class exposes them via getResolvedProperties()
- *
+ * 
  * @author Rob Davey
  * @date 09-Dec-2011
  * @since 0.1.4
  */
 public class NotificationPropertyExporter extends PropertyPlaceholderConfigurer {
   private Map<String, String> resolvedProperties;
-  
+
   @Override
-  protected void processProperties(ConfigurableListableBeanFactory beanFactoryToProcess,
-                                   Properties properties) throws BeansException {
+  protected void processProperties(ConfigurableListableBeanFactory beanFactoryToProcess, Properties properties) throws BeansException {
     super.processProperties(beanFactoryToProcess, properties);
     resolvedProperties = new HashMap<String, String>();
     for (Object key : properties.keySet()) {

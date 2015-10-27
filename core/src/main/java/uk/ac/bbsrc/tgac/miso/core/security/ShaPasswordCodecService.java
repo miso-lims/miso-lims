@@ -34,31 +34,32 @@ import javax.crypto.spec.SecretKeySpec;
 import java.security.SignatureException;
 
 /**
- * A service class that encodes plaintext passwords into their hashed Base64-encoded counterparts
- * using a specified Spring Security PasswordEncoder 
- *
+ * A service class that encodes plaintext passwords into their hashed Base64-encoded counterparts using a specified Spring Security
+ * PasswordEncoder
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public final class ShaPasswordCodecService implements PasswordCodecService {
-  /** Field log  */
+  /** Field log */
   protected static final Logger log = LoggerFactory.getLogger(ShaPasswordCodecService.class);
 
-  /** Field instance  */
+  /** Field instance */
   private static ShaPasswordCodecService instance;
   private PasswordEncoder encoder;
 
+  @Override
   public PasswordEncoder getEncoder() {
     return encoder;
   }
 
+  @Override
   public void setEncoder(PasswordEncoder encoder) {
     this.encoder = encoder;
   }
 
   /**
-   * Constructor PasswordCodecService creates a new PasswordCodecService instance with a SHA
-   * password encoder as default
+   * Constructor PasswordCodecService creates a new PasswordCodecService instance with a SHA password encoder as default
    */
   private ShaPasswordCodecService() {
     encoder = new ShaPasswordEncoder();
@@ -66,34 +67,40 @@ public final class ShaPasswordCodecService implements PasswordCodecService {
 
   /**
    * Encrypt a plaintext String using a PasswordEncoder strategy, with a null salt.
-   *
-   * @param plaintext of type String
+   * 
+   * @param plaintext
+   *          of type String
    * @return String the encrypted String of the given plaintext String
    */
+  @Override
   public synchronized String encrypt(String plaintext) {
     return encrypt(plaintext, null);
   }
 
   /**
    * Encrypt a plaintext String using a PasswordEncoder strategy, with a given salt.
-   *
-   * @param plaintext of type String
+   * 
+   * @param plaintext
+   *          of type String
    * @return String the encrypted String of the given plaintext String
    */
+  @Override
   public synchronized String encrypt(String plaintext, byte[] salt) {
     return encoder.encodePassword(plaintext, salt);
   }
 
   /**
    * Encrypt a plaintext String using a hmac_sha1 salt
-   *
-   * @param key of type String
-   * @param plaintext of type String
+   * 
+   * @param key
+   *          of type String
+   * @param plaintext
+   *          of type String
    * @return String the encrypted String of the given plaintext String
-   * @throws java.security.SignatureException when the HMAC is unable to be generated
+   * @throws java.security.SignatureException
+   *           when the HMAC is unable to be generated
    */
-  public synchronized String encryptHMACSHA1(String key, String plaintext) throws SignatureException
-  {
+  public synchronized String encryptHMACSHA1(String key, String plaintext) throws SignatureException {
     String result;
     try {
       // get an hmac_sha1 key from the raw key bytes
@@ -107,10 +114,9 @@ public final class ShaPasswordCodecService implements PasswordCodecService {
       byte[] rawHmac = mac.doFinal(plaintext.getBytes());
 
       // base64-encode the hmac
-      //result = new BASE64Encoder().encode(rawHmac);
+      // result = new BASE64Encoder().encode(rawHmac);
       result = new Base64().encodeToString(rawHmac);
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       throw new SignatureException("Failed to generate HMAC : " + e.getMessage());
     }
     return result;
@@ -118,12 +124,12 @@ public final class ShaPasswordCodecService implements PasswordCodecService {
 
   /**
    * Returns a singleton (as far as singletons are actually singletons!) instance of a PasswordCodecService object.
-   *
+   * 
    * @return PasswordCodecService instance.
    */
   public static synchronized ShaPasswordCodecService getInstance() {
-    if(instance == null) {
-       instance = new ShaPasswordCodecService();
+    if (instance == null) {
+      instance = new ShaPasswordCodecService();
     }
     return instance;
   }

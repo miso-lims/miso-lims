@@ -29,32 +29,20 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.Status;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaRun;
-import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.event.AlerterService;
-import uk.ac.bbsrc.tgac.miso.core.event.ResponderService;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.DefaultEntityNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.DefaultLibraryNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.DefaultSampleNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.test
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 26/09/11
  * @since 0.1.2
@@ -74,7 +62,7 @@ public class NamingTests {
 
   @Test
   public void testSampleNaming() throws MisoNamingException {
-    //DefaultEntityNamingScheme<Sample> entityNameValidationScheme = new DefaultEntityNamingScheme(Sample.class);
+    // DefaultEntityNamingScheme<Sample> entityNameValidationScheme = new DefaultEntityNamingScheme(Sample.class);
     Sample s = dataObjectFactory.getSample();
     s.setId(1L);
     String name = sampleNamingScheme.generateNameFor("name", s);
@@ -89,7 +77,7 @@ public class NamingTests {
 
   @Test
   public void testLibraryNaming() throws MisoNamingException {
-    //DefaultEntityNamingScheme<Library> entityNameValidationScheme = new DefaultEntityNamingScheme(Library.class);
+    // DefaultEntityNamingScheme<Library> entityNameValidationScheme = new DefaultEntityNamingScheme(Library.class);
     Library l = dataObjectFactory.getLibrary();
     l.setId(1L);
     String name = libraryNamingScheme.generateNameFor("name", l);

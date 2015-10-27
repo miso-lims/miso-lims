@@ -28,18 +28,14 @@ import org.slf4j.LoggerFactory;
 import uk.ac.bbsrc.tgac.miso.core.event.Event;
 import uk.ac.bbsrc.tgac.miso.core.event.ResponderService;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
-import uk.ac.bbsrc.tgac.miso.core.event.listener.ProjectListener;
-import uk.ac.bbsrc.tgac.miso.core.event.model.ProjectEvent;
-
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Set;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.event.impl
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 15/11/11
  * @since 0.1.3
@@ -54,6 +50,7 @@ public class DefaultProjectListener implements MisoListener {
     return responderServices;
   }
 
+  @Override
   public void setResponderServices(Collection<? extends ResponderService> responderServices) {
     this.responderServices = responderServices;
   }

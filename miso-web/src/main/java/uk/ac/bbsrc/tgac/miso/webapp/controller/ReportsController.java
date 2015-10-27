@@ -114,8 +114,7 @@ public class ReportsController {
             new ITextProjectDecorator(projects, new Document(), baos).buildReport();
 
             response.setHeader("Expires", "0");
-            response.setHeader("Cache-Control",
-                               "must-revalidate, post-check=0, pre-check=0");
+            response.setHeader("Cache-Control", "must-revalidate, post-check=0, pre-check=0");
             response.setHeader("Pragma", "public");
             response.setContentType("application/pdf");
             response.setContentLength(baos.size());
@@ -123,39 +122,35 @@ public class ReportsController {
             baos.writeTo(os);
             os.flush();
             os.close();
-          }
-          else {
+          } else {
             throw new ReportingException("Unsupported report format");
           }
-        }
-        catch (ReportingException e) {
+        } catch (ReportingException e) {
           e.printStackTrace();
         }
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
     }
   }
 
   @RequestMapping(value = "/projects", method = RequestMethod.GET)
   public void fireGetProjectsReport(ModelMap modelMap, HttpServletResponse response) {
-    //User user = null;
+    // User user = null;
     String format = PDF;
     try {
-      //user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+      // user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       try {
         if (format.equals(PDF)) {
           ByteArrayOutputStream baos = new ByteArrayOutputStream();
           List<Project> projects = new ArrayList<Project>(requestManager.listAllProjects());
           Document document = new Document();
-//          for (Project project : projects) {
-//            new ITextProjectDecorator(project, document, baos).buildReport();
-//          }
+          // for (Project project : projects) {
+          // new ITextProjectDecorator(project, document, baos).buildReport();
+          // }
           new ITextProjectDecorator(projects, document, baos).buildReport();
           response.setHeader("Expires", "0");
-          response.setHeader("Cache-Control",
-                             "must-revalidate, post-check=0, pre-check=0");
+          response.setHeader("Cache-Control", "must-revalidate, post-check=0, pre-check=0");
           response.setHeader("Pragma", "public");
           response.setContentType("application/pdf");
           response.setContentLength(baos.size());
@@ -163,20 +158,16 @@ public class ReportsController {
           baos.writeTo(os);
           os.flush();
           os.close();
-        }
-        else {
+        } else {
           throw new ReportingException("Unsupported report format");
         }
-      }
-      catch (ReportingException e) {
+      } catch (ReportingException e) {
         e.printStackTrace();
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
     }
   }
-
 
   @RequestMapping(value = "/sample/{sampleId}")
   public void fireGetSampleReport(@PathVariable("sampleId") Long sampleId, ModelMap modelMap, HttpServletResponse response) {
@@ -194,17 +185,14 @@ public class ReportsController {
         try {
           if (format.equals(PDF)) {
             System.out.println("not implemented");
-          }
-          else {
+          } else {
             throw new ReportingException("Unsupported report format");
           }
-        }
-        catch (ReportingException e) {
+        } catch (ReportingException e) {
           e.printStackTrace();
         }
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
     }
   }
@@ -218,16 +206,13 @@ public class ReportsController {
       try {
         if (format.equals(PDF)) {
           System.out.println("not implemented");
-        }
-        else {
+        } else {
           throw new ReportingException("Unsupported report format");
         }
-      }
-      catch (ReportingException e) {
+      } catch (ReportingException e) {
         e.printStackTrace();
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
     }
   }
@@ -248,17 +233,14 @@ public class ReportsController {
         try {
           if (format.equals(PDF)) {
             System.out.println("not implemented");
-          }
-          else {
+          } else {
             throw new ReportingException("Unsupported report format");
           }
-        }
-        catch (ReportingException e) {
+        } catch (ReportingException e) {
           e.printStackTrace();
         }
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
     }
   }
@@ -269,12 +251,10 @@ public class ReportsController {
     try {
       if (format.equals(PDF)) {
         System.out.println("not implemented");
-      }
-      else {
+      } else {
         throw new ReportingException("Unsupported report format");
       }
-    }
-    catch (ReportingException e) {
+    } catch (ReportingException e) {
       e.printStackTrace();
     }
   }
@@ -283,11 +263,9 @@ public class ReportsController {
   public ModelAndView setupForm(ModelMap modelMap) {
     try {
       modelMap.put("tables", DbUtils.getTables(interfaceTemplate));
-    }
-    catch (MetaDataAccessException e) {
+    } catch (MetaDataAccessException e) {
       e.printStackTrace();
-    }
-    catch (SQLException e) {
+    } catch (SQLException e) {
       e.printStackTrace();
     }
     return new ModelAndView("/pages/reporting.jsp", modelMap);
@@ -300,8 +278,7 @@ public class ReportsController {
       String j = ServletRequestUtils.getRequiredStringParameter(request, "json");
       JSONObject json = JSONObject.fromObject(j);
       log.info(json.toString());
-    }
-    catch (ServletRequestBindingException e) {
+    } catch (ServletRequestBindingException e) {
       e.printStackTrace();
     }
   }

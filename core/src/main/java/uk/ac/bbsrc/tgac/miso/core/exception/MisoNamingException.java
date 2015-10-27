@@ -27,7 +27,7 @@ package uk.ac.bbsrc.tgac.miso.core.exception;
  * uk.ac.bbsrc.tgac.miso.core.exception
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 30-Jun-2011
  * @since 0.0.3
@@ -40,7 +40,7 @@ public class MisoNamingException extends Exception {
   public MisoNamingException(String s, Throwable cause) {
     super(s);
     if (cause != null) {
-        initCause(cause);
+      initCause(cause);
     }
   }
 }

@@ -24,7 +24,6 @@
 package uk.ac.bbsrc.tgac.miso.core.store;
 
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 
 import java.io.IOException;
@@ -32,7 +31,7 @@ import java.util.Collection;
 
 /**
  * Defines a DAO interface for storing RunQCs
- *
+ * 
  * @author Rob Davey
  * @since 0.0.3
  */
@@ -40,26 +39,31 @@ public interface RunQcStore extends Store<RunQC>, Remover<RunQC> {
   /**
    * Retrieve a RunQC from an underlying data store given a RunQC ID
    * <p/>
-   * This method intends to retrieve objects in an 'ignorant' fashion, i.e.  will not populate
-   * parent or child objects that could lead to a circular dependency
-   *
-   * @param qcId of type long
+   * This method intends to retrieve objects in an 'ignorant' fashion, i.e. will not populate parent or child objects that could lead to a
+   * circular dependency
+   * 
+   * @param qcId
+   *          of type long
    * @return RunQC
-   * @throws java.io.IOException when
+   * @throws java.io.IOException
+   *           when
    */
-  //RunQC lazyGet(long qcId) throws IOException;
+  // RunQC lazyGet(long qcId) throws IOException;
 
   /**
    * List all RunQCs performed on a Run given a parent Run ID
-   *
-   * @param runId of type long
+   * 
+   * @param runId
+   *          of type long
    * @return Collection<RunQC>
-   * @throws java.io.IOException when
+   * @throws java.io.IOException
+   *           when
    */
   Collection<RunQC> listByRunId(long runId) throws IOException;
 
   /**
    * Get the QcType descriptor for a given type ID
+   * 
    * @param qcTypeId
    * @return the QcType with the given ID, or null if none exists
    * @throws IOException
@@ -68,6 +72,7 @@ public interface RunQcStore extends Store<RunQC>, Remover<RunQC> {
 
   /**
    * Get the QcType descriptor for a given type name
+   * 
    * @param qcName
    * @return the QcType with the given name, or null if none exists
    * @throws IOException
@@ -76,6 +81,7 @@ public interface RunQcStore extends Store<RunQC>, Remover<RunQC> {
 
   /**
    * Get all QcType descriptors for {@link uk.ac.bbsrc.tgac.miso.core.data.Run} objects
+   * 
    * @return Collection<QcType>
    * @throws IOException
    */

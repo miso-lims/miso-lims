@@ -29,32 +29,33 @@ import javax.persistence.Id;
 import java.io.Serializable;
 
 /**
- * Provides model access to the underlying MISO QcType lookup table. These types should hold manufacturer platform information for QC analysis. 
+ * Provides model access to the underlying MISO QcType lookup table. These types should hold manufacturer platform information for QC
+ * analysis.
  * <p/>
  * See:
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public class QcType implements Comparable, Serializable {
   public static final Long UNSAVED_ID = 0L;
 
-  /** Field libraryTypeId  */
+  /** Field libraryTypeId */
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long qcTypeId = QcType.UNSAVED_ID;
   /** Field name */
   private String name;
-  /** Field description  */
+  /** Field description */
   private String description;
-  /** Field qcTarget  */
+  /** Field qcTarget */
   private String qcTarget;
-  /** Field units  */
+  /** Field units */
   private String units;
 
   /**
    * Returns the qcTypeId of this QcType object.
-   *
+   * 
    * @return Long qcTypeId.
    */
   public Long getQcTypeId() {
@@ -63,8 +64,9 @@ public class QcType implements Comparable, Serializable {
 
   /**
    * Sets the qcTypeId of this QcType object.
-   *
-   * @param qcTypeId qcTypeId.
+   * 
+   * @param qcTypeId
+   *          qcTypeId.
    */
   public void setQcTypeId(Long qcTypeId) {
     this.qcTypeId = qcTypeId;
@@ -72,7 +74,7 @@ public class QcType implements Comparable, Serializable {
 
   /**
    * Returns the name of this QcType object.
-   *
+   * 
    * @return String name.
    */
   public String getName() {
@@ -81,8 +83,9 @@ public class QcType implements Comparable, Serializable {
 
   /**
    * Sets the name of this QcType object.
-   *
-   * @param name name.
+   * 
+   * @param name
+   *          name.
    */
   public void setName(String name) {
     this.name = name;
@@ -90,7 +93,7 @@ public class QcType implements Comparable, Serializable {
 
   /**
    * Returns the description of this LibraryType object.
-   *
+   * 
    * @return String description.
    */
   public String getDescription() {
@@ -99,8 +102,9 @@ public class QcType implements Comparable, Serializable {
 
   /**
    * Sets the description of this LibraryType object.
-   *
-   * @param description description.
+   * 
+   * @param description
+   *          description.
    */
   public void setDescription(String description) {
     this.description = description;
@@ -108,7 +112,7 @@ public class QcType implements Comparable, Serializable {
 
   /**
    * Returns the qcTarget of this QcType object.
-   *
+   * 
    * @return String qcTarget.
    */
   public String getQcTarget() {
@@ -117,8 +121,9 @@ public class QcType implements Comparable, Serializable {
 
   /**
    * Sets the qcTarget of this QcType object.
-   *
-   * @param qcTarget qcTarget.
+   * 
+   * @param qcTarget
+   *          qcTarget.
    */
   public void setQcTarget(String qcTarget) {
     this.qcTarget = qcTarget;
@@ -126,7 +131,7 @@ public class QcType implements Comparable, Serializable {
 
   /**
    * Returns the units of this QcType object.
-   *
+   * 
    * @return String units.
    */
   public String getUnits() {
@@ -135,8 +140,9 @@ public class QcType implements Comparable, Serializable {
 
   /**
    * Sets the units of this QcType object.
-   *
-   * @param units units.
+   * 
+   * @param units
+   *          units.
    */
   public void setUnits(String units) {
     this.units = units;
@@ -144,12 +150,9 @@ public class QcType implements Comparable, Serializable {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null)
-      return false;
-    if (obj == this)
-      return true;
-    if (!(obj instanceof QcType))
-      return false;
+    if (obj == null) return false;
+    if (obj == this) return true;
+    if (!(obj instanceof QcType)) return false;
     QcType them = (QcType) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
@@ -160,8 +163,7 @@ public class QcType implements Comparable, Serializable {
   public int hashCode() {
     if (getQcTypeId() != UNSAVED_ID) {
       return getQcTypeId().intValue();
-    }
-    else {
+    } else {
       int hashcode = -1;
       if (getName() != null) hashcode = 37 * hashcode + getName().hashCode();
       if (getDescription() != null) hashcode = 37 * hashcode + getDescription().hashCode();
@@ -171,7 +173,7 @@ public class QcType implements Comparable, Serializable {
 
   @Override
   public int compareTo(Object o) {
-    QcType t = (QcType)o;
+    QcType t = (QcType) o;
     int name = getName().compareTo(t.getName());
     if (name != 0) return name;
 

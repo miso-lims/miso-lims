@@ -31,13 +31,15 @@ import java.util.Collection;
  * uk.ac.bbsrc.tgac.miso.core.service.integration
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 30/11/12
  * @since 0.1.9
  */
 public interface FilePathGeneratorResolverService {
   FilePathGenerator getFilePathGenerator(PlatformType platformType);
+
   FilePathGenerator getFilePathGenerator(String generatorName);
+
   Collection<FilePathGenerator> getFilePathGenerators();
 }

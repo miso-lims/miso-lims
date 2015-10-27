@@ -32,7 +32,7 @@ import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
  * uk.ac.bbsrc.tgac.miso.core.event.model
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 16/11/11
  * @since 0.1.3

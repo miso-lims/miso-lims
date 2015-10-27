@@ -23,22 +23,20 @@
 
 package uk.ac.bbsrc.tgac.miso.core.service.printing;
 
-import uk.ac.bbsrc.tgac.miso.core.service.integration.strategy.NotificationConsumerStrategy;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.strategy.PrintStrategy;
-
 import java.util.Collection;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.service.integration
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 13/04/12
  * @since 0.1.6
  */
 public interface PrintContextResolverService {
   PrintContext getPrintContext(String contextName);
+
   Collection<PrintContext> getPrintContexts();
 }

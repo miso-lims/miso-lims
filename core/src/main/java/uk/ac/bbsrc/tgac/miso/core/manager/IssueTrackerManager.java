@@ -32,7 +32,7 @@ import java.io.IOException;
  * uk.ac.bbsrc.tgac.miso.core.manager
  * <p/>
  * An interface to define simple access to a specified issue tracker
- *
+ * 
  * @author Rob Davey
  * @date 25-Jan-2011
  * @since 0.0.3
@@ -45,19 +45,20 @@ public interface IssueTrackerManager {
   String getType();
 
   JSONObject getIssue(String issueKey) throws IOException;
+
   String getBaseTrackerUrl();
 
   public enum TrackerType {
-    JIRA("jira"),
-    RT("RT");
+    JIRA("jira"), RT("RT");
 
-    /** Field key  */
+    /** Field key */
     private String key;
 
     /**
      * Constructs a TrackerType based on a given key
-     *
-     * @param key of type String
+     * 
+     * @param key
+     *          of type String
      */
     TrackerType(String key) {
       this.key = key;
@@ -65,7 +66,7 @@ public interface IssueTrackerManager {
 
     /**
      * Returns the key of this TrackerType enum.
-     *
+     * 
      * @return String key.
      */
     public String getKey() {

@@ -23,8 +23,15 @@
 
 package uk.ac.bbsrc.tgac.miso.core.service.integration.ws.pacbio;
 
+import java.io.IOException;
+import java.net.URI;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -34,12 +41,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.net.URI;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class PacBioService {
   protected static final Logger log = LoggerFactory.getLogger(PacBioService.class);
@@ -54,27 +55,25 @@ public class PacBioService {
   public String getPrimaryAnalysisJob(String plateId, String sampleWellId, Date fromDate) {
     try {
       String d = startDateFormat.format(fromDate);
-      HttpGet httpget = new HttpGet(baseRestUri.toString() + "Jobs/PrimaryAnalysis/Query?after="+d);
+      HttpGet httpget = new HttpGet(baseRestUri.toString() + "Jobs/PrimaryAnalysis/Query?after=" + d);
       HttpResponse response = httpclient.execute(httpget);
       String out = parseEntity(response.getEntity());
       JSONArray a = JSONArray.fromObject(out);
-      for (JSONObject j : (Iterable<JSONObject>)a) {
+      for (JSONObject j : (Iterable<JSONObject>) a) {
         if (j.getString("Plate").equals(plateId) && j.getString("Well").equals(sampleWellId)) {
           return j.toString();
         }
       }
-    }
-    catch (ClientProtocolException e) {
+    } catch (ClientProtocolException e) {
       e.printStackTrace();
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
     }
     return null;
   }
 
   public String getPrimaryAnalysisStatus(String plateId, String sampleWellId) {
-    HttpGet httpget = new HttpGet(baseRestUri.toString() + "/Jobs/PrimaryAnalysis/"+plateId+"/"+sampleWellId+"/Status");
+    HttpGet httpget = new HttpGet(baseRestUri.toString() + "/Jobs/PrimaryAnalysis/" + plateId + "/" + sampleWellId + "/Status");
     try {
       HttpResponse response = httpclient.execute(httpget);
       String out = parseEntity(response.getEntity());
@@ -82,18 +81,16 @@ public class PacBioService {
       if (j.has("Status")) {
         return j.getString("Status");
       }
-    }
-    catch (ClientProtocolException e) {
+    } catch (ClientProtocolException e) {
       e.printStackTrace();
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
     }
     return null;
   }
 
   public String getPlateStatus(String plateId) {
-    HttpGet httpget = new HttpGet(baseRestUri.toString() + "/Jobs/Plate/"+plateId+"/Status");
+    HttpGet httpget = new HttpGet(baseRestUri.toString() + "/Jobs/Plate/" + plateId + "/Status");
     try {
       HttpResponse response = httpclient.execute(httpget);
       String out = parseEntity(response.getEntity());
@@ -101,11 +98,9 @@ public class PacBioService {
       if (j.has("Status")) {
         return j.getString("Status");
       }
-    }
-    catch (ClientProtocolException e) {
+    } catch (ClientProtocolException e) {
       e.printStackTrace();
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
     }
     return null;
@@ -114,8 +109,7 @@ public class PacBioService {
   private String parseEntity(HttpEntity entity) throws IOException {
     if (entity != null) {
       return EntityUtils.toString(entity, "UTF-8");
-    }
-    else {
+    } else {
       throw new IOException("Null entity in REST response");
     }
   }

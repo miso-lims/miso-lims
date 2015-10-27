@@ -23,7 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.core.service.printing.strategy;
 
-import net.sourceforge.fluxion.spi.Spi;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
 
 import java.io.IOException;
@@ -32,7 +31,7 @@ import java.io.IOException;
  * uk.ac.bbsrc.tgac.miso.core.service.printing.strategy
  * <p/>
  * Defines printing some content T using a print mechanism
- *
+ * 
  * @author Rob Davey
  * @date 30-Jun-2011
  * @since 0.0.3

@@ -31,7 +31,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * uk.ac.bbsrc.tgac.miso.runstats.server
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 27/10/11
  * @since 0.1.2

@@ -39,7 +39,7 @@ import java.util.Map;
  * uk.ac.bbsrc.tgac.miso.analysis.tgac
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 14/10/11
  * @since 0.1.2
@@ -66,6 +66,7 @@ public class LsfGzipProcess extends AbstractTgacLsfProcess {
     parameters.add(compressionParameter);
   }
 
+  @Override
   protected Logger getLog() {
     return log;
   }

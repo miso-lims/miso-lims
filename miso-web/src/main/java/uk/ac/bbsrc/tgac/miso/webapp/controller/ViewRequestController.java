@@ -35,84 +35,53 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.RequestControllerHelperLoader;
 
 @Controller
 public class ViewRequestController {
-	protected static final Logger log = LoggerFactory.getLogger(ViewRequestController.class);
+  protected static final Logger log = LoggerFactory.getLogger(ViewRequestController.class);
 
-	//@Autowired
-	//private RequestControllerHelperLoader requestControllerHelperLoader;
+  // @Autowired
+  // private RequestControllerHelperLoader requestControllerHelperLoader;
 
-	//@Autowired
-	private SecurityManager securityManager;
+  // @Autowired
+  private SecurityManager securityManager;
 
-	@Autowired
-	private RequestManager requestManager;
+  @Autowired
+  private RequestManager requestManager;
 
-	@Autowired
-	private ProtocolManager protocolManager;
+  @Autowired
+  private ProtocolManager protocolManager;
 
-	public void setProtocolManager(ProtocolManager protocolManager) {
-		this.protocolManager = protocolManager;
-	}
+  public void setProtocolManager(ProtocolManager protocolManager) {
+    this.protocolManager = protocolManager;
+  }
 
-	public void setRequestHelperLoader(
-			RequestControllerHelperLoader requestControllerHelperLoader) {
-		//this.requestControllerHelperLoader = requestControllerHelperLoader;
-	}
+  public void setRequestHelperLoader(RequestControllerHelperLoader requestControllerHelperLoader) {
+    // this.requestControllerHelperLoader = requestControllerHelperLoader;
+  }
 
-	public void setRequestManager(RequestManager requestManager) {
-		this.requestManager = requestManager;
-	}
+  public void setRequestManager(RequestManager requestManager) {
+    this.requestManager = requestManager;
+  }
 
-	public void setSecurityManager(SecurityManager securityManager) {
-		this.securityManager = securityManager;
-	}
-/*
-	@RequestMapping("/request/view/${requestId}")
-	public ModelAndView viewRequest(
-			@RequestParam(value = "requestId", required = true) long requestId)
-			throws IOException {
-		try {
-			User user = securityManager
-					.getUserByLoginName(SecurityContextHolder.getContext()
-							.getAuthentication().getName());
-			Request request = requestManager.getRequestById(requestId);
-			if (!request.userCanRead(user)) {
-				throw new SecurityException("Permission denied.");
-			}
-			return new ModelAndView("/pages/viewRequest.jsp", "request",
-					request);
-		} catch (IOException ex) {
-			if (log.isDebugEnabled()) {
-				log.debug("Failed to show request", ex);
-			}
-			throw ex;
-		}
-	}
-
-	@RequestMapping("/request/view/${requestId}/${executionCount}")
-	public String listRequestResults(
-			@RequestParam(value = "requestId", required = true) long requestId,
-			@RequestParam(value = "executionCount", required = true) int executionCount)
-			throws IOException {
-		try {
-			User user = securityManager
-					.getUserByLoginName(SecurityContextHolder.getContext()
-							.getAuthentication().getName());
-			Request request = requestManager.getRequestById(requestId);
-			if (!request.userCanRead(user)) {
-				throw new SecurityException("Permission denied.");
-			}
-			return "redirect:"
-					+ requestControllerHelperLoader.getHelper(
-							protocolManager.getProtocol(request
-									.getProtocolUniqueIdentifier()))
-							.getResultsControllerUrl() + "/"
-					+ requestId + "/" + executionCount;
-		} catch (IOException ex) {
-			if (log.isDebugEnabled()) {
-				log.debug("Failed to show request results", ex);
-			}
-			throw ex;
-		}
-	}
-	*/
+  public void setSecurityManager(SecurityManager securityManager) {
+    this.securityManager = securityManager;
+  }
+  /*
+   * @RequestMapping("/request/view/${requestId}") public ModelAndView viewRequest(
+   * 
+   * @RequestParam(value = "requestId", required = true) long requestId) throws IOException { try { User user = securityManager
+   * .getUserByLoginName(SecurityContextHolder.getContext() .getAuthentication().getName()); Request request =
+   * requestManager.getRequestById(requestId); if (!request.userCanRead(user)) { throw new SecurityException("Permission denied."); } return
+   * new ModelAndView("/pages/viewRequest.jsp", "request", request); } catch (IOException ex) { if (log.isDebugEnabled()) { log.debug(
+   * "Failed to show request", ex); } throw ex; } }
+   * 
+   * @RequestMapping("/request/view/${requestId}/${executionCount}") public String listRequestResults(
+   * 
+   * @RequestParam(value = "requestId", required = true) long requestId,
+   * 
+   * @RequestParam(value = "executionCount", required = true) int executionCount) throws IOException { try { User user = securityManager
+   * .getUserByLoginName(SecurityContextHolder.getContext() .getAuthentication().getName()); Request request =
+   * requestManager.getRequestById(requestId); if (!request.userCanRead(user)) { throw new SecurityException("Permission denied."); } return
+   * "redirect:" + requestControllerHelperLoader.getHelper( protocolManager.getProtocol(request .getProtocolUniqueIdentifier()))
+   * .getResultsControllerUrl() + "/" + requestId + "/" + executionCount; } catch (IOException ex) { if (log.isDebugEnabled()) { log.debug(
+   * "Failed to show request results", ex); } throw ex; } }
+   */
 }

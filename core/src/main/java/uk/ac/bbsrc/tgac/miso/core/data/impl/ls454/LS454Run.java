@@ -28,19 +28,14 @@ import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.factory.submission.ERASubmissionFactory;
-
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.impl.ls454
  * <p/>
  * TODO Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -59,22 +54,19 @@ public class LS454Run extends RunImpl {
     setSecurityProfile(new SecurityProfile(user));
   }
 
+  @Override
   public void buildSubmission() {
     /*
-    try {
-      DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-      submissionDocument = docBuilder.newDocument();
-    }
-    catch (ParserConfigurationException e) {
-      e.printStackTrace();
-    }
-    ERASubmissionFactory.generateFullRunSubmissionXML(submissionDocument, this);
-    */
+     * try { DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder(); submissionDocument =
+     * docBuilder.newDocument(); } catch (ParserConfigurationException e) { e.printStackTrace(); }
+     * ERASubmissionFactory.generateFullRunSubmissionXML(submissionDocument, this);
+     */
   }
 
   /**
    * Method buildReport ...
    */
+  @Override
   public void buildReport() {
 
   }

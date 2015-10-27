@@ -28,7 +28,7 @@ package uk.ac.bbsrc.tgac.miso.notification.manager;
  * <p/>
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 06-Dec-2010
  * @since version

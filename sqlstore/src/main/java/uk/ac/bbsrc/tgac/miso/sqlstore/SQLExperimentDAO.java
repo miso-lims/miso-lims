@@ -56,80 +56,56 @@ import java.util.*;
 import java.util.regex.Matcher;
 
 /**
- * A data access object designed for retrieving Experiments from the LIMS database.  This DAO should be
- * configured with a spring {@link JdbcTemplate} object which will be used to query the database.
+ * A data access object designed for retrieving Experiments from the LIMS database. This DAO should be configured with a spring
+ * {@link JdbcTemplate} object which will be used to query the database.
  *
  * @author Rob Davey
  * @since 0.0.2
  */
 public class SQLExperimentDAO implements ExperimentStore {
-  private static final String TABLE_NAME="Experiment";
+  private static final String TABLE_NAME = "Experiment";
 
-  public static final String EXPERIMENTS_SELECT =
-          "SELECT experimentId, name, description, alias, accession, title, platform_platformId, securityProfile_profileId, study_studyId " +
-          "FROM "+TABLE_NAME;
+  public static final String EXPERIMENTS_SELECT = "SELECT experimentId, name, description, alias, accession, title, platform_platformId, securityProfile_profileId, study_studyId "
+      + "FROM " + TABLE_NAME;
 
-  public static final String EXPERIMENTS_SELECT_LIMIT =
-          EXPERIMENTS_SELECT + " ORDER BY experimentId DESC LIMIT ?";
+  public static final String EXPERIMENTS_SELECT_LIMIT = EXPERIMENTS_SELECT + " ORDER BY experimentId DESC LIMIT ?";
 
-  public static final String EXPERIMENT_SELECT_BY_ID =
-          EXPERIMENTS_SELECT + " " + "WHERE experimentId = ?";
+  public static final String EXPERIMENT_SELECT_BY_ID = EXPERIMENTS_SELECT + " " + "WHERE experimentId = ?";
 
-  public static final String EXPERIMENTS_SELECT_BY_SEARCH =
-          EXPERIMENTS_SELECT + " WHERE " +
-          "name LIKE ? OR " +
-          "alias LIKE ? OR " +
-          "description LIKE ? ";
+  public static final String EXPERIMENTS_SELECT_BY_SEARCH = EXPERIMENTS_SELECT + " WHERE " + "name LIKE ? OR " + "alias LIKE ? OR "
+      + "description LIKE ? ";
 
-  public static final String EXPERIMENT_UPDATE =
-          "UPDATE " +TABLE_NAME+
-          " SET name=:name, description=:description, alias=:alias, accession=:accession, title=:title, platform_platformId=:platform_platformId, securityProfile_profileId=:securityProfile_profileId " +
-          "WHERE experimentId=:experimentId";  
+  public static final String EXPERIMENT_UPDATE = "UPDATE " + TABLE_NAME
+      + " SET name=:name, description=:description, alias=:alias, accession=:accession, title=:title, platform_platformId=:platform_platformId, securityProfile_profileId=:securityProfile_profileId "
+      + "WHERE experimentId=:experimentId";
 
-  public static final String EXPERIMENT_DELETE =
-          "DELETE FROM "+TABLE_NAME+" WHERE experimentId=:experimentId";
+  public static final String EXPERIMENT_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE experimentId=:experimentId";
 
-  public static final String PROFILE_SELECT_BY_EXPERIMENT_ID =
-          "SELECT sp.profileId, sp.allowAllInternal, sp.owner_userId " +
-          "FROM "+TABLE_NAME+" e, SecurityProfile sp " +
-          "WHERE sp.profileId = e.SecurityProfile_profileId " +
-          "AND e.experimentId=?";
+  public static final String PROFILE_SELECT_BY_EXPERIMENT_ID = "SELECT sp.profileId, sp.allowAllInternal, sp.owner_userId " + "FROM "
+      + TABLE_NAME + " e, SecurityProfile sp " + "WHERE sp.profileId = e.SecurityProfile_profileId " + "AND e.experimentId=?";
 
-  public static final String EXPERIMENTS_BY_RELATED_STUDY =
-          "SELECT e.experimentId, e.name, e.description, e.alias, e.accession, e.title, e.platform_platformId, e.securityProfile_profileId, e.study_studyId " +
-          "FROM "+TABLE_NAME+" e, Study s " +
-          "WHERE e.study_studyId=s.studyId " +
-          "AND s.studyId=?";
+  public static final String EXPERIMENTS_BY_RELATED_STUDY = "SELECT e.experimentId, e.name, e.description, e.alias, e.accession, e.title, e.platform_platformId, e.securityProfile_profileId, e.study_studyId "
+      + "FROM " + TABLE_NAME + " e, Study s " + "WHERE e.study_studyId=s.studyId " + "AND s.studyId=?";
 
-/*  public static final String EXPERIMENTS_BY_RELATED_SAMPLE =
-          "SELECT e.experimentId, e.name, e.description, e.alias, e.accession, e.title, e.platform_platformId, e.securityProfile_profileId, e.study_studyId, es.samples_sampleId " +
-          "FROM Experiment e, Experiment_Sample es " +
-          "WHERE es.Experiment_experimentId=e.experimentId " +
-          "AND es.samples_sampleId=?";
-*/
-  public static final String EXPERIMENTS_BY_RELATED_POOL =
-          "SELECT e.experimentId, e.name, e.description, e.alias, e.accession, e.title, e.platform_platformId, e.securityProfile_profileId, e.study_studyId, pe.experiments_experimentId " +
-          "FROM "+TABLE_NAME+" e, Pool_Experiment pe " +
-          "WHERE pe.experiments_experimentId=e.experimentId " +
-          "AND pe.pool_poolId=?";
+  /*
+   * public static final String EXPERIMENTS_BY_RELATED_SAMPLE =
+   * "SELECT e.experimentId, e.name, e.description, e.alias, e.accession, e.title, e.platform_platformId, e.securityProfile_profileId, e.study_studyId, es.samples_sampleId "
+   * + "FROM Experiment e, Experiment_Sample es " + "WHERE es.Experiment_experimentId=e.experimentId " + "AND es.samples_sampleId=?";
+   */
+  public static final String EXPERIMENTS_BY_RELATED_POOL = "SELECT e.experimentId, e.name, e.description, e.alias, e.accession, e.title, e.platform_platformId, e.securityProfile_profileId, e.study_studyId, pe.experiments_experimentId "
+      + "FROM " + TABLE_NAME + " e, Pool_Experiment pe " + "WHERE pe.experiments_experimentId=e.experimentId " + "AND pe.pool_poolId=?";
 
-  public static final String EXPERIMENT_BY_RELATED_PARTITION =
-          "SELECT e.experimentId, e.name, e.description, e.alias, e.accession, e.title, e.platform_platformId, e.securityProfile_profileId, e.study_studyId, er.runs_runId " +
-          "FROM "+TABLE_NAME+" e, _Partition l " +
-          "WHERE e.experimentId=l.experiment_experimentId " +
-          "AND l.partitionId=?";
+  public static final String EXPERIMENT_BY_RELATED_PARTITION = "SELECT e.experimentId, e.name, e.description, e.alias, e.accession, e.title, e.platform_platformId, e.securityProfile_profileId, e.study_studyId, er.runs_runId "
+      + "FROM " + TABLE_NAME + " e, _Partition l " + "WHERE e.experimentId=l.experiment_experimentId " + "AND l.partitionId=?";
 
-  public static final String EXPERIMENTS_BY_RELATED_SUBMISSION =
-          "SELECT e.experimentId, e.name, e.description, e.alias, e.accession, e.title, e.platform_platformId, e.securityProfile_profileId, e.study_studyId " +
-          "FROM "+TABLE_NAME+" e, Submission_Experiment se " +
-          "WHERE e.experimentId=se.experiments_experimentId " +
-          "AND se.submission_submissionId=?";  
+  public static final String EXPERIMENTS_BY_RELATED_SUBMISSION = "SELECT e.experimentId, e.name, e.description, e.alias, e.accession, e.title, e.platform_platformId, e.securityProfile_profileId, e.study_studyId "
+      + "FROM " + TABLE_NAME + " e, Submission_Experiment se " + "WHERE e.experimentId=se.experiments_experimentId "
+      + "AND se.submission_submissionId=?";
 
-  public static final String POOL_EXPERIMENT_DELETE_BY_EXPERIMENT_ID =
-          "DELETE FROM Pool_Experiment " +
-          "WHERE experiments_experimentId=:experiments_experimentId";
-//          "WHERE experiments_experimentId=:experiments_experimentId " +
-//          "AND pool_poolId=:pool_poolId";
+  public static final String POOL_EXPERIMENT_DELETE_BY_EXPERIMENT_ID = "DELETE FROM Pool_Experiment "
+      + "WHERE experiments_experimentId=:experiments_experimentId";
+  // "WHERE experiments_experimentId=:experiments_experimentId " +
+  // "AND pool_poolId=:pool_poolId";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLExperimentDAO.class);
 
@@ -161,7 +137,7 @@ public class SQLExperimentDAO implements ExperimentStore {
   public void setCacheManager(CacheManager cacheManager) {
     this.cacheManager = cacheManager;
   }
-  
+
   @Autowired
   private DataObjectFactory dataObjectFactory;
 
@@ -213,11 +189,10 @@ public class SQLExperimentDAO implements ExperimentStore {
   }
 
   /**
-   * Get the maximum allowed number of parameters that can be supplied to a parameterised query.  This is effectively
-   * the maximum bound for an "IN" list - i.e. SELECT * FROM foo WHERE foo.bar IN (?,?,?,...,?).  If unset, this
-   * defaults to 500.  Typically, the limit for oracle databases is 1000.  If, for any query that takes a list, the
-   * size of the list is greater than this value, the query will be split into several smaller subqueries and the
-   * results aggregated.  As a user, you should not notice any difference.
+   * Get the maximum allowed number of parameters that can be supplied to a parameterised query. This is effectively the maximum bound for
+   * an "IN" list - i.e. SELECT * FROM foo WHERE foo.bar IN (?,?,?,...,?). If unset, this defaults to 500. Typically, the limit for oracle
+   * databases is 1000. If, for any query that takes a list, the size of the list is greater than this value, the query will be split into
+   * several smaller subqueries and the results aggregated. As a user, you should not notice any difference.
    *
    * @return the maximum bound on the query list size
    */
@@ -226,19 +201,19 @@ public class SQLExperimentDAO implements ExperimentStore {
   }
 
   /**
-   * Set the maximum allowed number of parameters that can be supplied to a parameterised query.  This is effectively
-   * the maximum bound for an "IN" list - i.e. SELECT * FROM foo WHERE foo.bar IN (?,?,?,...,?).  If unset, this
-   * defaults to 500.  Typically, the limit for oracle databases is 1000.  If, for any query that takes a list, the
-   * size of the list is greater than this value, the query will be split into several smaller subqueries and the
-   * results aggregated.
+   * Set the maximum allowed number of parameters that can be supplied to a parameterised query. This is effectively the maximum bound for
+   * an "IN" list - i.e. SELECT * FROM foo WHERE foo.bar IN (?,?,?,...,?). If unset, this defaults to 500. Typically, the limit for oracle
+   * databases is 1000. If, for any query that takes a list, the size of the list is greater than this value, the query will be split into
+   * several smaller subqueries and the results aggregated.
    *
-   * @param maxQueryParams the maximum bound on the query list size - this should never be greater than that allowed
-   *                       by the database, but can be smaller
+   * @param maxQueryParams
+   *          the maximum bound on the query list size - this should never be greater than that allowed by the database, but can be smaller
    */
   public void setMaxQueryParams(int maxQueryParams) {
     this.maxQueryParams = maxQueryParams;
   }
 
+  @Override
   public void setCascadeType(CascadeType cascadeType) {
     this.cascadeType = cascadeType;
   }
@@ -253,21 +228,16 @@ public class SQLExperimentDAO implements ExperimentStore {
   }
 
   /**
-   * Writes the given experiment to the database, using the default transaction strategy configured for the
-   * datasource.
+   * Writes the given experiment to the database, using the default transaction strategy configured for the datasource.
    *
-   * @param experiment the experiment to write
+   * @param experiment
+   *          the experiment to write
    */
+  @Override
   @Transactional(readOnly = false, rollbackFor = IOException.class)
-  @TriggersRemove(cacheName={"experimentCache", "lazyExperimentCache"},
-                  keyGenerator = @KeyGenerator(
-                          name = "HashCodeCacheKeyGenerator",
-                          properties = {
-                                  @Property(name = "includeMethod", value = "false"),
-                                  @Property(name = "includeParameterTypes", value = "false")
-                          }
-                  )
-  )
+  @TriggersRemove(cacheName = { "experimentCache",
+      "lazyExperimentCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
+          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
   public long save(Experiment experiment) throws IOException {
     Long securityProfileId = experiment.getSecurityProfile().getProfileId();
     if (securityProfileId == null || this.cascadeType != null) {// && this.cascadeType.equals(CascadeType.PERSIST)) {
@@ -275,18 +245,13 @@ public class SQLExperimentDAO implements ExperimentStore {
     }
 
     MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("alias", experiment.getAlias())
-            .addValue("accession", experiment.getAccession())
-            .addValue("description", experiment.getDescription())
-            .addValue("title", experiment.getTitle())
-            .addValue("platform_platformId", experiment.getPlatform().getPlatformId())
-            .addValue("securityProfile_profileId", securityProfileId)
-            .addValue("study_studyId", experiment.getStudy().getId());
+    params.addValue("alias", experiment.getAlias()).addValue("accession", experiment.getAccession())
+        .addValue("description", experiment.getDescription()).addValue("title", experiment.getTitle())
+        .addValue("platform_platformId", experiment.getPlatform().getPlatformId()).addValue("securityProfile_profileId", securityProfileId)
+        .addValue("study_studyId", experiment.getStudy().getId());
 
     if (experiment.getId() == AbstractExperiment.UNSAVED_ID) {
-      SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-                            .withTableName(TABLE_NAME)
-                            .usingGeneratedKeyColumns("experimentId");
+      SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("experimentId");
       try {
         experiment.setId(DbUtils.getAutoIncrement(template, TABLE_NAME));
 
@@ -299,46 +264,36 @@ public class SQLExperimentDAO implements ExperimentStore {
           Number newId = insert.executeAndReturnKey(params);
           if (newId.longValue() != experiment.getId()) {
             log.error("Expected Experiment ID doesn't match returned value from database insert: rolling back...");
-            new NamedParameterJdbcTemplate(template).update(EXPERIMENT_DELETE, new MapSqlParameterSource().addValue("experimentId", newId.longValue()));
+            new NamedParameterJdbcTemplate(template).update(EXPERIMENT_DELETE,
+                new MapSqlParameterSource().addValue("experimentId", newId.longValue()));
             throw new IOException("Something bad happened. Expected Experiment ID doesn't match returned value from DB insert");
           }
-        }
-        else {
+        } else {
           throw new IOException("Cannot save Experiment - invalid field:" + experiment.toString());
         }
-      }
-      catch (MisoNamingException e) {
+      } catch (MisoNamingException e) {
         throw new IOException("Cannot save Experiment - issue with naming scheme", e);
       }
       /*
-      String name = Experiment.PREFIX + DbUtils.getAutoIncrement(template, TABLE_NAME);
-      params.addValue("name", name);
-      Number newId = insert.executeAndReturnKey(params);
-      experiment.setExperimentId(newId.longValue());
-      experiment.setName(name);
-      */
-    }
-    else {
+       * String name = Experiment.PREFIX + DbUtils.getAutoIncrement(template, TABLE_NAME); params.addValue("name", name); Number newId =
+       * insert.executeAndReturnKey(params); experiment.setExperimentId(newId.longValue()); experiment.setName(name);
+       */
+    } else {
       try {
         if (namingScheme.validateField("name", experiment.getName())) {
-          params.addValue("experimentId", experiment.getId())
-                .addValue("name", experiment.getName());
+          params.addValue("experimentId", experiment.getId()).addValue("name", experiment.getName());
           NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
           namedTemplate.update(EXPERIMENT_UPDATE, params);
-        }
-        else {
+        } else {
           throw new IOException("Cannot save Experiment - invalid field:" + experiment.toString());
         }
-      }
-      catch (MisoNamingException e) {
+      } catch (MisoNamingException e) {
         throw new IOException("Cannot save Experiment - issue with naming scheme", e);
       }
       /*
-      params.addValue("experimentId", experiment.getExperimentId())
-              .addValue("name", experiment.getName());
-      NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-      namedTemplate.update(EXPERIMENT_UPDATE, params);
-      */
+       * params.addValue("experimentId", experiment.getExperimentId()) .addValue("name", experiment.getName()); NamedParameterJdbcTemplate
+       * namedTemplate = new NamedParameterJdbcTemplate(template); namedTemplate.update(EXPERIMENT_UPDATE, params);
+       */
     }
 
     if (this.cascadeType != null) {
@@ -348,32 +303,28 @@ public class SQLExperimentDAO implements ExperimentStore {
       eNamedTemplate.update(POOL_EXPERIMENT_DELETE_BY_EXPERIMENT_ID, eParams);
 
       if (experiment.getPool() != null) {
-        SimpleJdbcInsert eInsert = new SimpleJdbcInsert(template)
-                .withTableName("Pool_Experiment");
+        SimpleJdbcInsert eInsert = new SimpleJdbcInsert(template).withTableName("Pool_Experiment");
 
         MapSqlParameterSource esParams = new MapSqlParameterSource();
-        esParams.addValue("experiments_experimentId", experiment.getId())
-                .addValue("pool_poolId", experiment.getPool().getId());
+        esParams.addValue("experiments_experimentId", experiment.getId()).addValue("pool_poolId", experiment.getPool().getId());
         eInsert.execute(esParams);
 
         if (this.cascadeType.equals(CascadeType.PERSIST)) {
           DbUtils.flushCache(cacheManager, "poolCache");
-        }
-        else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-          //Cache pc = cacheManager.getCache("poolCache");
-          //pc.remove(DbUtils.hashCodeCacheKeyFor(experiment.getPool().getId()));
+        } else if (this.cascadeType.equals(CascadeType.REMOVE)) {
+          // Cache pc = cacheManager.getCache("poolCache");
+          // pc.remove(DbUtils.hashCodeCacheKeyFor(experiment.getPool().getId()));
           DbUtils.updateCaches(cacheManager, experiment.getPool(), Pool.class);
         }
       }
 
       Study s = experiment.getStudy();
       if (this.cascadeType.equals(CascadeType.PERSIST)) {
-        if (s!=null) studyDAO.save(s);
-      }
-      else if (this.cascadeType.equals(CascadeType.REMOVE)) {
+        if (s != null) studyDAO.save(s);
+      } else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (s != null) {
-          //Cache pc = cacheManager.getCache("studyCache");
-          //pc.remove(DbUtils.hashCodeCacheKeyFor(s.getId()));
+          // Cache pc = cacheManager.getCache("studyCache");
+          // pc.remove(DbUtils.hashCodeCacheKeyFor(s.getId()));
           DbUtils.updateCaches(cacheManager, s, Study.class);
         }
       }
@@ -382,17 +333,14 @@ public class SQLExperimentDAO implements ExperimentStore {
         for (Kit k : experiment.getKits()) {
           kitDAO.save(k);
 
-          SimpleJdbcInsert kInsert = new SimpleJdbcInsert(template)
-                                .withTableName("Experiment_Kit");
+          SimpleJdbcInsert kInsert = new SimpleJdbcInsert(template).withTableName("Experiment_Kit");
 
           MapSqlParameterSource kParams = new MapSqlParameterSource();
-          kParams.addValue("experiments_experimentId", experiment.getId())
-                  .addValue("kits_kidId", k.getId());
+          kParams.addValue("experiments_experimentId", experiment.getId()).addValue("kits_kidId", k.getId());
           try {
             kInsert.execute(kParams);
-          }
-          catch(DuplicateKeyException dke) {
-            //ignore
+          } catch (DuplicateKeyException dke) {
+            // ignore
           }
         }
       }
@@ -403,101 +351,87 @@ public class SQLExperimentDAO implements ExperimentStore {
     return experiment.getId();
   }
 
-  @Cacheable(cacheName="experimentListCache",
-      keyGenerator = @KeyGenerator(
-              name = "HashCodeCacheKeyGenerator",
-              properties = {
-                      @Property(name="includeMethod", value="false"),
-                      @Property(name="includeParameterTypes", value="false")
-              }
-      )
-  )
+  @Override
+  @Cacheable(cacheName = "experimentListCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
+      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
   public List<Experiment> listAll() {
     return template.query(EXPERIMENTS_SELECT, new ExperimentMapper(true));
   }
 
+  @Override
   public List<Experiment> listAllWithLimit(long limit) throws IOException {
-    return template.query(EXPERIMENTS_SELECT_LIMIT, new Object[]{limit}, new ExperimentMapper(true));
+    return template.query(EXPERIMENTS_SELECT_LIMIT, new Object[] { limit }, new ExperimentMapper(true));
   }
 
   @Override
   public int count() throws IOException {
-    return template.queryForInt("SELECT count(*) FROM "+TABLE_NAME);
+    return template.queryForInt("SELECT count(*) FROM " + TABLE_NAME);
   }
 
+  @Override
   public List<Experiment> listBySearch(String query) {
     String mySQLQuery = "%" + query.replaceAll("_", Matcher.quoteReplacement("\\_")) + "%";
-    return template.query(EXPERIMENTS_SELECT_BY_SEARCH, new Object[]{mySQLQuery,mySQLQuery,mySQLQuery}, new ExperimentMapper(true));
+    return template.query(EXPERIMENTS_SELECT_BY_SEARCH, new Object[] { mySQLQuery, mySQLQuery, mySQLQuery }, new ExperimentMapper(true));
   }
 
+  @Override
   public List<Experiment> listByStudyId(long studyId) {
-    List results = template.query(EXPERIMENTS_BY_RELATED_STUDY, new Object[]{studyId}, new ExperimentMapper());
-    List<Experiment> es = (List<Experiment>)results;
+    List results = template.query(EXPERIMENTS_BY_RELATED_STUDY, new Object[] { studyId }, new ExperimentMapper());
+    List<Experiment> es = results;
     return es;
   }
 
+  @Override
   public List<Experiment> listBySubmissionId(long submissionId) throws IOException {
-    return template.query(EXPERIMENTS_BY_RELATED_SUBMISSION, new Object[]{submissionId}, new ExperimentMapper());  
+    return template.query(EXPERIMENTS_BY_RELATED_SUBMISSION, new Object[] { submissionId }, new ExperimentMapper());
   }
 
+  @Override
   public List<Experiment> listByPoolId(long poolId) {
-    return template.query(EXPERIMENTS_BY_RELATED_POOL, new Object[]{poolId}, new ExperimentMapper(true));
+    return template.query(EXPERIMENTS_BY_RELATED_POOL, new Object[] { poolId }, new ExperimentMapper(true));
   }
 
-  @Cacheable(cacheName="experimentCache",
-                  keyGenerator = @KeyGenerator(
-                          name = "HashCodeCacheKeyGenerator",
-                          properties = {
-                                  @Property(name = "includeMethod", value = "false"),
-                                  @Property(name = "includeParameterTypes", value = "false")
-                          }
-                  )
-  )
+  @Override
+  @Cacheable(cacheName = "experimentCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
+      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
   public Experiment get(long experimentId) throws IOException {
-    List eResults = template.query(EXPERIMENT_SELECT_BY_ID, new Object[]{experimentId}, new ExperimentMapper());
+    List eResults = template.query(EXPERIMENT_SELECT_BY_ID, new Object[] { experimentId }, new ExperimentMapper());
     Experiment e = eResults.size() > 0 ? (Experiment) eResults.get(0) : null;
     return e;
   }
 
+  @Override
   public Experiment lazyGet(long experimentId) throws IOException {
-    List eResults = template.query(EXPERIMENT_SELECT_BY_ID, new Object[]{experimentId}, new ExperimentMapper(true));
+    List eResults = template.query(EXPERIMENT_SELECT_BY_ID, new Object[] { experimentId }, new ExperimentMapper(true));
     Experiment e = eResults.size() > 0 ? (Experiment) eResults.get(0) : null;
     return e;
   }
 
+  @Override
   @Transactional(readOnly = false, rollbackFor = IOException.class)
-  @TriggersRemove(
-          cacheName={"experimentCache", "lazyExperimentCache"},
-          keyGenerator = @KeyGenerator (
-              name = "HashCodeCacheKeyGenerator",
-              properties = {
-                      @Property(name="includeMethod", value="false"),
-                      @Property(name="includeParameterTypes", value="false")
-              }
-          )
-  )
+  @TriggersRemove(cacheName = { "experimentCache",
+      "lazyExperimentCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
+          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
   public boolean remove(Experiment experiment) throws IOException {
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-    if (experiment.isDeletable() &&
-           (namedTemplate.update(EXPERIMENT_DELETE,
-                            new MapSqlParameterSource().addValue("experimentId", experiment.getId())) == 1)) {
+    if (experiment.isDeletable()
+        && (namedTemplate.update(EXPERIMENT_DELETE, new MapSqlParameterSource().addValue("experimentId", experiment.getId())) == 1)) {
       Study s = experiment.getStudy();
       if (this.cascadeType.equals(CascadeType.PERSIST)) {
-        if (s!=null) studyDAO.save(s);
+        if (s != null) studyDAO.save(s);
         if (experiment.getPool() != null) {
-          //DbUtils.flushCache(cacheManager, "poolCache");
+          // DbUtils.flushCache(cacheManager, "poolCache");
           DbUtils.updateCaches(cacheManager, experiment.getPool(), Pool.class);
         }
-      }
-      else if (this.cascadeType.equals(CascadeType.REMOVE)) {
+      } else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (s != null) {
-          //Cache sc = cacheManager.getCache("studyCache");
-          //sc.remove(DbUtils.hashCodeCacheKeyFor(s.getId()));
+          // Cache sc = cacheManager.getCache("studyCache");
+          // sc.remove(DbUtils.hashCodeCacheKeyFor(s.getId()));
           DbUtils.updateCaches(cacheManager, s, Study.class);
 
           if (experiment.getPool() != null) {
-            //Cache pc = cacheManager.getCache("poolCache");
-            //pc.remove(DbUtils.hashCodeCacheKeyFor(experiment.getPool().getId()));
+            // Cache pc = cacheManager.getCache("poolCache");
+            // pc.remove(DbUtils.hashCodeCacheKeyFor(experiment.getPool().getId()));
             DbUtils.updateCaches(cacheManager, experiment.getPool(), Pool.class);
           }
         }
@@ -519,6 +453,7 @@ public class SQLExperimentDAO implements ExperimentStore {
       super(Experiment.class, lazy);
     }
 
+    @Override
     public Experiment mapRow(ResultSet rs, int rowNum) throws SQLException {
       long id = rs.getLong("experimentId");
 
@@ -526,7 +461,7 @@ public class SQLExperimentDAO implements ExperimentStore {
         Element element;
         if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
           log.debug("Cache hit on map for experiment " + id);
-          return (Experiment)element.getObjectValue();
+          return (Experiment) element.getObjectValue();
         }
       }
       Experiment e = dataObjectFactory.getExperiment();
@@ -547,8 +482,7 @@ public class SQLExperimentDAO implements ExperimentStore {
           e.setPool(poolDAO.getPoolByExperiment(e));
           e.setKits(kitDAO.listByExperiment(rs.getLong("experimentId")));
         }
-      }
-      catch (IOException e1) {
+      } catch (IOException e1) {
         e1.printStackTrace();
       }
 
@@ -560,4 +494,3 @@ public class SQLExperimentDAO implements ExperimentStore {
     }
   }
 }
-

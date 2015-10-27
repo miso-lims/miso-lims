@@ -35,7 +35,7 @@ import java.util.Map;
  * uk.ac.bbsrc.tgac.miso.core.service.integration.strategy
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 03/02/12
  * @since 0.1.5
@@ -48,8 +48,9 @@ public interface NotificationConsumerStrategy {
 
   /**
    * Return true if this strategy is able to consume information from a given PlatformType
-   *
-   * @param pt of type PlatformType
+   * 
+   * @param pt
+   *          of type PlatformType
    * @return boolean
    */
   boolean isStrategyFor(PlatformType pt);

@@ -24,9 +24,6 @@
 package uk.ac.bbsrc.tgac.miso.hibernatestore;
 
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
-//import org.hibernate.HibernateException;
-//import org.hibernate.Session;
-import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractStudy;
@@ -45,15 +42,17 @@ import java.util.Collection;
  */
 @Deprecated
 public class HibernateStudyStore extends HibernateDaoSupport implements Store<Study> {
+  @Override
   @Transactional(readOnly = false)
   public long save(Study study) throws IOException {
     getHibernateTemplate().saveOrUpdate(study);
     return study.getStudyId();
   }
 
+  @Override
   @Transactional(readOnly = true)
   public Study get(long studyId) throws IOException {
-    return (Study) getHibernateTemplate().get(AbstractStudy.class, studyId);
+    return getHibernateTemplate().get(AbstractStudy.class, studyId);
   }
 
   @Override
@@ -61,17 +60,14 @@ public class HibernateStudyStore extends HibernateDaoSupport implements Store<St
     return get(id);
   }
 
+  @Override
   @Transactional(readOnly = true)
   @SuppressWarnings("unchecked")
   public Collection<Study> listAll() throws IOException {
-/*    return (Collection<Study>) getHibernateTemplate().execute(
-            new HibernateCallback() {
-              public Object doInHibernate(Session session)
-                      throws HibernateException {
-                return session.createQuery("from AbstractStudy").list();
-              }
-            });
-            */
+    /*
+     * return (Collection<Study>) getHibernateTemplate().execute( new HibernateCallback() { public Object doInHibernate(Session session)
+     * throws HibernateException { return session.createQuery("from AbstractStudy").list(); } });
+     */
     return null;
   }
 

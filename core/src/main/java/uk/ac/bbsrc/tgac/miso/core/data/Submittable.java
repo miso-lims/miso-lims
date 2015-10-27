@@ -23,14 +23,11 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import uk.ac.bbsrc.tgac.miso.core.data.visitor.SubmittableVisitor;
-
 /**
  * A Submittable object knows how to generate data based on itself that will be submitted to a repository.
  * <p/>
- * Submittables are typed by the object that they generate, e.g. a {@link org.w3c.dom.Document}
- * if they generate a XML fragment
- *
+ * Submittables are typed by the object that they generate, e.g. a {@link org.w3c.dom.Document} if they generate a XML fragment
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -38,10 +35,10 @@ public interface Submittable<T> {
 
   /**
    * Returns the submissionData of this Submittable object.
-   *
+   * 
    * @return T submissionData.
    */
-  //public T getSubmissionData();
+  // public T getSubmissionData();
 
   /**
    * Generate submission data based on this object
@@ -50,8 +47,9 @@ public interface Submittable<T> {
 
   /**
    * Accept a SubmittableVisitor that visits this object to generate submission data
-   *
-   * @param v of type SubmittableVisitor
+   * 
+   * @param v
+   *          of type SubmittableVisitor
    */
-  //public void accept(SubmittableVisitor v);
+  // public void accept(SubmittableVisitor v);
 }

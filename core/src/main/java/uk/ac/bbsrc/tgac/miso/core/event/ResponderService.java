@@ -24,15 +24,16 @@
 package uk.ac.bbsrc.tgac.miso.core.event;
 
 /**
- * Interface describing a service that responds to {@link Event}s. Typed to a particular {@link Event}, this enables
- * a service manager to find responder services that can process that {@link Event} type, and generate a response accordingly.
- * Typically this would be an {@link Alert}.
- *
+ * Interface describing a service that responds to {@link Event}s. Typed to a particular {@link Event}, this enables a service manager to
+ * find responder services that can process that {@link Event} type, and generate a response accordingly. Typically this would be an
+ * {@link Alert}.
+ * 
  * @author Rob Davey
  * @date 26/09/11
  * @since 0.1.2
  */
 public interface ResponderService<T extends Event> {
   boolean respondsTo(T t);
+
   void generateResponse(T t);
 }

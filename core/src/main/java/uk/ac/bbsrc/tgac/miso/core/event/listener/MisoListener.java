@@ -28,23 +28,22 @@ import uk.ac.bbsrc.tgac.miso.core.event.ResponderService;
 
 import java.util.Collection;
 import java.util.EventListener;
-import java.util.Set;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.alert
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 23-Sep-2011
  * @since 0.1.2
  */
 public interface MisoListener extends EventListener {
   /**
-   * Called whenever a {@link Event} changes it's state, either because it has started
-   * or stopped running for some reason.
-   *
-   * @param event the event that was fired
+   * Called whenever a {@link Event} changes it's state, either because it has started or stopped running for some reason.
+   * 
+   * @param event
+   *          the event that was fired
    */
   public void stateChanged(Event event);
 

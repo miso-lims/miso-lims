@@ -36,36 +36,36 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 @Controller
 public class ListGroupsController {
-	protected static final Logger log = LoggerFactory.getLogger(ListGroupsController.class);
+  protected static final Logger log = LoggerFactory.getLogger(ListGroupsController.class);
 
-	@Autowired
-	private SecurityManager securityManager;
+  @Autowired
+  private SecurityManager securityManager;
 
-	public void setSecurityManager(SecurityManager securityManager) {
-		this.securityManager = securityManager;
-	}
+  public void setSecurityManager(SecurityManager securityManager) {
+    this.securityManager = securityManager;
+  }
 
-	@RequestMapping("/admin/groups")
-	public ModelAndView adminListGroups() throws IOException {
-		try {
-			return new ModelAndView("/pages/listGroups.jsp", "groups", securityManager.listAllGroups());
-		} catch (IOException ex) {
-			if (log.isDebugEnabled()) {
-				log.debug("Failed to list groups", ex);
-			}
-			throw ex;
-		}
-	}
+  @RequestMapping("/admin/groups")
+  public ModelAndView adminListGroups() throws IOException {
+    try {
+      return new ModelAndView("/pages/listGroups.jsp", "groups", securityManager.listAllGroups());
+    } catch (IOException ex) {
+      if (log.isDebugEnabled()) {
+        log.debug("Failed to list groups", ex);
+      }
+      throw ex;
+    }
+  }
 
-	@RequestMapping("/tech/groups")
-	public ModelAndView techListGroups() throws IOException {
-		try {
-			return new ModelAndView("/pages/listGroups.jsp", "groups", securityManager.listAllGroups());
-		} catch (IOException ex) {
-			if (log.isDebugEnabled()) {
-				log.debug("Failed to list groups", ex);
-			}
-			throw ex;
-		}
-	}
+  @RequestMapping("/tech/groups")
+  public ModelAndView techListGroups() throws IOException {
+    try {
+      return new ModelAndView("/pages/listGroups.jsp", "groups", securityManager.listAllGroups());
+    } catch (IOException ex) {
+      if (log.isDebugEnabled()) {
+        log.debug("Failed to list groups", ex);
+      }
+      throw ex;
+    }
+  }
 }

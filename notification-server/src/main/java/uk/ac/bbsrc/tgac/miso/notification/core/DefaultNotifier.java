@@ -23,6 +23,20 @@
 
 package uk.ac.bbsrc.tgac.miso.notification.core;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -44,6 +58,7 @@ import org.springframework.integration.support.channel.BeanFactoryChannelResolve
 import org.springframework.integration.support.channel.ChannelResolver;
 import org.springframework.integration.transformer.HeaderEnricher;
 import org.springframework.integration.transformer.MessageTransformingHandler;
+
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.ws.pacbio.PacBioServiceWrapper;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.ws.solid.SolidServiceWrapper;
@@ -53,19 +68,11 @@ import uk.ac.bbsrc.tgac.miso.notification.util.NotificationUtils;
 import uk.ac.bbsrc.tgac.miso.tools.run.MultiFileQueueMessageSource;
 import uk.ac.bbsrc.tgac.miso.tools.run.RunFolderScanner;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.net.URI;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-
 /**
  * uk.ac.bbsrc.tgac.miso.notification.service.impl
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 06-Dec-2010
  * @since 0.1.4
@@ -140,7 +147,7 @@ public class DefaultNotifier {
           mfqms.setScanner(rfs);
           mfqms.setFilter(statusFilter);
           mfqms.setDirectories(paths);
-          //make sure all the directories are rescanned each poll
+          // make sure all the directories are rescanned each poll
           mfqms.setScanEachPoll(false);
           mfqms.afterPropertiesSet();
 
@@ -152,8 +159,7 @@ public class DefaultNotifier {
           DynamicTrigger trigger;
           if (props.containsKey(platformType + ".scanRate")) {
             trigger = new DynamicTrigger(Integer.parseInt(props.getProperty(platformType + ".scanRate")), TimeUnit.MILLISECONDS);
-          }
-          else {
+          } else {
             trigger = new DynamicTrigger(600000, TimeUnit.MILLISECONDS);
           }
           trigger.setFixedRate(false);
@@ -169,7 +175,7 @@ public class DefaultNotifier {
           outputChannel.setBeanFactory(context.getBeanFactory());
 
           if (props.containsKey("wiretap.enabled") && "true".equals(props.get("wiretap.enabled"))) {
-            //set up wire tap
+            // set up wire tap
             DirectChannel wireTapChannel = (DirectChannel) channelResolver.resolveChannelName("wireTapChannel");
             wireTapChannel.setBeanName("wireTapChannel");
             wireTapChannel.setBeanFactory(context.getBeanFactory());
@@ -188,17 +194,17 @@ public class DefaultNotifier {
             outputChannel.setInterceptors(ints);
           }
 
-          DirectChannel signChannel = (DirectChannel)channelResolver.resolveChannelName(platformType+"MessageSignerChannel");
+          DirectChannel signChannel = (DirectChannel) channelResolver.resolveChannelName(platformType + "MessageSignerChannel");
           signChannel.setBeanFactory(context.getBeanFactory());
 
-          DirectChannel splitterChannel = (DirectChannel)channelResolver.resolveChannelName(platformType+"SplitterChannel");
+          DirectChannel splitterChannel = (DirectChannel) channelResolver.resolveChannelName(platformType + "SplitterChannel");
           splitterChannel.setBeanFactory(context.getBeanFactory());
 
           if (props.containsKey(platformType + ".http.statusEndpointURIs")) {
             log.debug("Resolving " + platformType + ".http.statusEndpointURIs ...");
             String statusEndpointURIs = props.getProperty(platformType + ".http.statusEndpointURIs");
             for (String uri : statusEndpointURIs.split(",")) {
-              //split into multiple messages
+              // split into multiple messages
               MethodInvokingSplitter mis = new MethodInvokingSplitter(notificationUtils, "splitMessage");
               mis.setBeanName(platformType + "Splitter");
               mis.setBeanFactory(context.getBeanFactory());
@@ -206,7 +212,7 @@ public class DefaultNotifier {
               mis.setOutputChannel(signChannel);
               splitterChannel.subscribe(mis);
 
-              //sign messages and inject url into message headers via HeaderEnricher
+              // sign messages and inject url into message headers via HeaderEnricher
               Map<String, SignedHeaderValueMessageProcessor<String>> urlHeaderToSign = new HashMap<String, SignedHeaderValueMessageProcessor<String>>();
               URI su = URI.create(uri);
               urlHeaderToSign.put("x-url", new SignedHeaderValueMessageProcessor<String>(su.getPath()));
@@ -224,7 +230,7 @@ public class DefaultNotifier {
 
               DefaultHttpHeaderMapper hm = new DefaultHttpHeaderMapper();
               hm.setUserDefinedHeaderPrefix("");
-              String[] names = {"Accept", "x-url", "x-signature", "x-user"};
+              String[] names = { "Accept", "x-url", "x-signature", "x-user" };
               hm.setBeanFactory(context.getBeanFactory());
               hm.setOutboundHeaderNames(names);
               hm.setInboundHeaderNames(names);
@@ -265,31 +271,29 @@ public class DefaultNotifier {
             outputChannel.subscribe(tog);
           }
 
-          if ((!props.containsKey(platformType + ".tcp.host") || !props.containsKey(platformType + ".tcp.port")) && !props.containsKey(platformType + ".http.statusEndpointURIs")) {
-            log.error("You have specified a list of paths to scan, but no valid endpoint to notify. Please add a <platform>.http.statusEndpointURIs property and/or <platform>.tcp.host/port properties in notification.properties");
-          }
-          else {
+          if ((!props.containsKey(platformType + ".tcp.host") || !props.containsKey(platformType + ".tcp.port"))
+              && !props.containsKey(platformType + ".http.statusEndpointURIs")) {
+            log.error(
+                "You have specified a list of paths to scan, but no valid endpoint to notify. Please add a <platform>.http.statusEndpointURIs property and/or <platform>.tcp.host/port properties in notification.properties");
+          } else {
             spca.start();
           }
-        }
-        else {
-          log.warn("You have not specified a list of " + platformType + " paths to scan. Please add a " + platformType.toLowerCase() + ".dataPaths property in notification.properties if you wish to track this platform");
+        } else {
+          log.warn("You have not specified a list of " + platformType + " paths to scan. Please add a " + platformType.toLowerCase()
+              + ".dataPaths property in notification.properties if you wish to track this platform");
         }
 
-        NotificationRequestManager nrm = (NotificationRequestManager)context.getBean("notificationRequestManager");
+        NotificationRequestManager nrm = (NotificationRequestManager) context.getBean("notificationRequestManager");
         nrm.setApplicationContext(context);
         nrm.setDataPaths(allDataPaths);
       }
-    }
-    catch (FileNotFoundException e) {
+    } catch (FileNotFoundException e) {
       log.error("Cannot find a notification.properties file in the same directory as the notification jar. Please add one");
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.error("Cannot read notification.properties. Please check permissions/availability");
-      //e.printStackTrace();
-    }
-    catch(Exception e) {
-      log.error("Something else went wrong:"+e.getMessage());
+      // e.printStackTrace();
+    } catch (Exception e) {
+      log.error("Something else went wrong:" + e.getMessage());
     }
   }
 
@@ -302,6 +306,7 @@ public class DefaultNotifier {
       this.value = value;
     }
 
+    @Override
     public T processMessage(Message<?> message) {
       return this.value;
     }
@@ -310,6 +315,7 @@ public class DefaultNotifier {
       this.overwrite = overwrite;
     }
 
+    @Override
     public Boolean isOverwrite() {
       return this.overwrite;
     }

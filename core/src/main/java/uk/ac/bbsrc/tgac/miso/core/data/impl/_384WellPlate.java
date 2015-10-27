@@ -24,23 +24,18 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import com.eaglegenomics.simlims.core.User;
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractPlate;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.Plate;
-import uk.ac.bbsrc.tgac.miso.core.data.Plateable;
 import uk.ac.bbsrc.tgac.miso.core.service.plate.Default384WellPlateConversionStrategy;
 import uk.ac.bbsrc.tgac.miso.core.service.plate.PlateConversionStrategy;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * A concrete Plate implementation representing a 384-well plate, comprising 4 quartile {@link _96WellPlate}s.
- *
+ * 
  * @author Rob Davey
  * @date 05-Sep-2011
  * @since 0.1.1
@@ -74,10 +69,9 @@ public class _384WellPlate extends PlateImpl<_96WellPlate> implements Serializab
   @Override
   public void addElement(_96WellPlate plate) throws IllegalStateException {
     if (elements.size() < MAX_ELEMENTS) {
-      plate.setName("Q"+(elements.size()+1));
+      plate.setName("Q" + (elements.size() + 1));
       elements.add(plate);
-    }
-    else {
+    } else {
       throw new IllegalStateException("This 384 well plate already has 4 96 well plates");
     }
   }
@@ -89,20 +83,21 @@ public class _384WellPlate extends PlateImpl<_96WellPlate> implements Serializab
 
   public void setElement(int quarter, _96WellPlate plate) {
     elements.set(quarter, plate);
-    plate.setName("Q"+quarter);
+    plate.setName("Q" + quarter);
   }
 
   public void setElementsAndDoConversion(List<_96WellPlate> plates) throws IllegalStateException {
     if (plates.size() != MAX_ELEMENTS) {
-      throw new IllegalStateException("Number of plates to add cannot be below or exceed the number of max elements ("+MAX_ELEMENTS+")");
-    }
-    else {
+      throw new IllegalStateException(
+          "Number of plates to add cannot be below or exceed the number of max elements (" + MAX_ELEMENTS + ")");
+    } else {
       for (_96WellPlate plate : this.plateConversionStrategy.convert(plates)) {
         addElement(plate);
       }
     }
   }
 
+  @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("PLATE " + this.getName() + "\n");
@@ -117,8 +112,7 @@ public class _384WellPlate extends PlateImpl<_96WellPlate> implements Serializab
           sb.append(l.getAlias());
           if (splitcount == splits.size()) {
             sb.append("|\n");
-          }
-          else {
+          } else {
             sb.append(",");
           }
           splitcount++;

@@ -31,7 +31,7 @@ import uk.ac.bbsrc.tgac.miso.runstats.client.manager.RunStatsManager;
  * uk.ac.bbsrc.tgac.miso.runstats.client.handler
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 27/10/11
  * @since 0.1.3

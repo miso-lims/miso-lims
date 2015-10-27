@@ -23,7 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
-import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import org.slf4j.Logger;
@@ -36,6 +35,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPoolQC;
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
@@ -64,34 +64,23 @@ import java.util.List;
 public class SQLPoolQCDAO implements PoolQcStore {
   private static final String TABLE_NAME = "PoolQC";
 
-  public static final String POOL_QC =
-          "SELECT qcId, pool_poolId, qcUserName, qcDate, qcMethod, results " +
-          "FROM "+TABLE_NAME;
+  public static final String POOL_QC = "SELECT qcId, pool_poolId, qcUserName, qcDate, qcMethod, results " + "FROM " + TABLE_NAME;
 
-  public static final String POOL_QC_SELECT_BY_ID =
-         POOL_QC + " WHERE qcId=?";
+  public static final String POOL_QC_SELECT_BY_ID = POOL_QC + " WHERE qcId=?";
 
-  public static final String POOL_QC_SELECT_BY_POOL_ID =
-          POOL_QC + " WHERE pool_poolId=? " +
-          "ORDER BY qcDate ASC";
+  public static final String POOL_QC_SELECT_BY_POOL_ID = POOL_QC + " WHERE pool_poolId=? " + "ORDER BY qcDate ASC";
 
-  public static final String POOL_QC_UPDATE =
-          "UPDATE "+TABLE_NAME+
-          " SET pool_poolId=:pool_poolId, qcUserName=:qcUserName, qcDate=:qcDate, qcMethod=:qcMethod, results=:results " +
-          "WHERE qcId=:qcId";
+  public static final String POOL_QC_UPDATE = "UPDATE " + TABLE_NAME
+      + " SET pool_poolId=:pool_poolId, qcUserName=:qcUserName, qcDate=:qcDate, qcMethod=:qcMethod, results=:results " + "WHERE qcId=:qcId";
 
-  public static final String POOL_QC_TYPE_SELECT =
-          "SELECT qcTypeId, name, description, qcTarget, units " +
-          "FROM QCType WHERE qcTarget = 'Pool'";
+  public static final String POOL_QC_TYPE_SELECT = "SELECT qcTypeId, name, description, qcTarget, units "
+      + "FROM QCType WHERE qcTarget = 'Pool'";
 
-  public static final String POOL_QC_TYPE_SELECT_BY_ID =
-          POOL_QC_TYPE_SELECT + " AND qcTypeId = ?";
+  public static final String POOL_QC_TYPE_SELECT_BY_ID = POOL_QC_TYPE_SELECT + " AND qcTypeId = ?";
 
-  public static final String POOL_QC_TYPE_SELECT_BY_NAME =
-          POOL_QC_TYPE_SELECT + " AND name = ?";
+  public static final String POOL_QC_TYPE_SELECT_BY_NAME = POOL_QC_TYPE_SELECT + " AND name = ?";
 
-  public static final String POOL_QC_DELETE =
-         "DELETE FROM "+TABLE_NAME+" WHERE qcId=:qcId";
+  public static final String POOL_QC_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE qcId=:qcId";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLPoolQCDAO.class);
 
@@ -129,23 +118,19 @@ public class SQLPoolQCDAO implements PoolQcStore {
     this.cascadeType = cascadeType;
   }
 
+  @Override
   @Transactional(readOnly = false, rollbackFor = IOException.class)
   public long save(PoolQC poolQC) throws IOException {
     MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("pool_poolId", poolQC.getPool().getId())
-            .addValue("qcUserName", poolQC.getQcCreator())
-            .addValue("qcDate", poolQC.getQcDate())
-            .addValue("qcMethod", poolQC.getQcType().getQcTypeId())
-            .addValue("results", poolQC.getResults());
+    params.addValue("pool_poolId", poolQC.getPool().getId()).addValue("qcUserName", poolQC.getQcCreator())
+        .addValue("qcDate", poolQC.getQcDate()).addValue("qcMethod", poolQC.getQcType().getQcTypeId())
+        .addValue("results", poolQC.getResults());
 
-    if (poolQC.getId() == AbstractPoolQC.UNSAVED_ID) {
-      SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-                              .withTableName(TABLE_NAME)
-                              .usingGeneratedKeyColumns("qcId");
+    if (poolQC.getId() == AbstractQC.UNSAVED_ID) {
+      SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("qcId");
       Number newId = insert.executeAndReturnKey(params);
       poolQC.setId(newId.longValue());
-    }
-    else {
+    } else {
       params.addValue("qcId", poolQC.getId());
       NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
       namedTemplate.update(POOL_QC_UPDATE, params);
@@ -155,19 +140,17 @@ public class SQLPoolQCDAO implements PoolQcStore {
       Pool l = poolQC.getPool();
       if (this.cascadeType.equals(CascadeType.PERSIST)) {
         if (l != null) poolDAO.save(l);
-      }
-      else if (this.cascadeType.equals(CascadeType.REMOVE)) {
+      } else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (l != null) {
-          //Cache pc = cacheManager.getCache("poolCache");
-          //pc.remove(DbUtils.hashCodeCacheKeyFor(l.getId()));
+          // Cache pc = cacheManager.getCache("poolCache");
+          // pc.remove(DbUtils.hashCodeCacheKeyFor(l.getId()));
           DbUtils.updateCaches(cacheManager, l, Pool.class);
         }
-      }
-      else if (this.cascadeType.equals(CascadeType.ALL)) {
+      } else if (this.cascadeType.equals(CascadeType.ALL)) {
         if (l != null) {
           poolDAO.save(l);
-          //Cache pc = cacheManager.getCache("poolCache");
-          //pc.remove(DbUtils.hashCodeCacheKeyFor(l.getId()));
+          // Cache pc = cacheManager.getCache("poolCache");
+          // pc.remove(DbUtils.hashCodeCacheKeyFor(l.getId()));
           DbUtils.updateCaches(cacheManager, l, Pool.class);
         }
       }
@@ -175,42 +158,44 @@ public class SQLPoolQCDAO implements PoolQcStore {
     return poolQC.getId();
   }
 
+  @Override
   public PoolQC get(long qcId) throws IOException {
-    List<PoolQC> eResults = template.query(POOL_QC_SELECT_BY_ID, new Object[]{qcId}, new PoolQcMapper());
+    List<PoolQC> eResults = template.query(POOL_QC_SELECT_BY_ID, new Object[] { qcId }, new PoolQcMapper());
     return eResults.size() > 0 ? eResults.get(0) : null;
   }
 
-  public PoolQC  lazyGet(long qcId) throws IOException {
-    List<PoolQC> eResults = template.query(POOL_QC_SELECT_BY_ID, new Object[]{qcId}, new PoolQcMapper(true));
+  @Override
+  public PoolQC lazyGet(long qcId) throws IOException {
+    List<PoolQC> eResults = template.query(POOL_QC_SELECT_BY_ID, new Object[] { qcId }, new PoolQcMapper(true));
     return eResults.size() > 0 ? eResults.get(0) : null;
   }
 
+  @Override
   public Collection<PoolQC> listByPoolId(long poolId) throws IOException {
-    return template.query(POOL_QC_SELECT_BY_POOL_ID, new Object[]{poolId}, new PoolQcMapper(true));
+    return template.query(POOL_QC_SELECT_BY_POOL_ID, new Object[] { poolId }, new PoolQcMapper(true));
   }
 
+  @Override
   public Collection<PoolQC> listAll() throws IOException {
     return template.query(POOL_QC, new PoolQcMapper(true));
   }
 
   @Override
   public int count() throws IOException {
-    return template.queryForInt("SELECT count(*) FROM "+TABLE_NAME);
+    return template.queryForInt("SELECT count(*) FROM " + TABLE_NAME);
   }
 
+  @Override
   public boolean remove(PoolQC qc) throws IOException {
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-    if (qc.isDeletable() &&
-           (namedTemplate.update(POOL_QC_DELETE,
-                                 new MapSqlParameterSource().addValue("qcId", qc.getId())) == 1)) {
+    if (qc.isDeletable() && (namedTemplate.update(POOL_QC_DELETE, new MapSqlParameterSource().addValue("qcId", qc.getId())) == 1)) {
       Pool l = qc.getPool();
       if (this.cascadeType.equals(CascadeType.PERSIST)) {
         if (l != null) poolDAO.save(l);
-      }
-      else if (this.cascadeType.equals(CascadeType.REMOVE)) {
+      } else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         if (l != null) {
-          //Cache pc = cacheManager.getCache("poolCache");
-          //pc.remove(DbUtils.hashCodeCacheKeyFor(l.getId()));
+          // Cache pc = cacheManager.getCache("poolCache");
+          // pc.remove(DbUtils.hashCodeCacheKeyFor(l.getId()));
           DbUtils.updateCaches(cacheManager, l, Pool.class);
         }
       }
@@ -221,15 +206,16 @@ public class SQLPoolQCDAO implements PoolQcStore {
 
   public class PoolQcMapper extends CacheAwareRowMapper<PoolQC> {
     public PoolQcMapper() {
-      //pool qcs aren't cached at present
+      // pool qcs aren't cached at present
       super(PoolQC.class, false, false);
     }
 
     public PoolQcMapper(boolean lazy) {
-      //pool qcs aren't cached at present
+      // pool qcs aren't cached at present
       super(PoolQC.class, lazy, false);
     }
 
+    @Override
     public PoolQC mapRow(ResultSet rs, int rowNum) throws SQLException {
       long id = rs.getLong("qcId");
 
@@ -237,7 +223,7 @@ public class SQLPoolQCDAO implements PoolQcStore {
         Element element;
         if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
           log.debug("Cache hit on map for PoolQC " + id);
-          return (PoolQC)element.getObjectValue();
+          return (PoolQC) element.getObjectValue();
         }
       }
 
@@ -252,39 +238,41 @@ public class SQLPoolQCDAO implements PoolQcStore {
         if (!isLazy()) {
           s.setPool(poolDAO.get(rs.getLong("pool_poolId")));
         }
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
         e.printStackTrace();
-      }
-      catch (MalformedPoolException e) {
+      } catch (MalformedPoolException e) {
         e.printStackTrace();
       }
 
       if (isCacheEnabled() && lookupCache(cacheManager) != null) {
-        lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id) ,s));
+        lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id), s));
       }
 
       return s;
     }
   }
 
+  @Override
   public Collection<QcType> listAllPoolQcTypes() throws IOException {
     return template.query(POOL_QC_TYPE_SELECT, new PoolQcTypeMapper());
   }
 
+  @Override
   public QcType getPoolQcTypeById(long qcTypeId) throws IOException {
-    List eResults = template.query(POOL_QC_TYPE_SELECT_BY_ID, new Object[]{qcTypeId}, new PoolQcTypeMapper());
+    List eResults = template.query(POOL_QC_TYPE_SELECT_BY_ID, new Object[] { qcTypeId }, new PoolQcTypeMapper());
     QcType e = eResults.size() > 0 ? (QcType) eResults.get(0) : null;
     return e;
   }
 
+  @Override
   public QcType getPoolQcTypeByName(String qcName) throws IOException {
-    List eResults = template.query(POOL_QC_TYPE_SELECT_BY_NAME, new Object[]{qcName}, new PoolQcTypeMapper());
+    List eResults = template.query(POOL_QC_TYPE_SELECT_BY_NAME, new Object[] { qcName }, new PoolQcTypeMapper());
     QcType e = eResults.size() > 0 ? (QcType) eResults.get(0) : null;
     return e;
   }
 
   public class PoolQcTypeMapper implements RowMapper<QcType> {
+    @Override
     public QcType mapRow(ResultSet rs, int rowNum) throws SQLException {
       QcType qt = new QcType();
       qt.setQcTypeId(rs.getLong("qcTypeId"));

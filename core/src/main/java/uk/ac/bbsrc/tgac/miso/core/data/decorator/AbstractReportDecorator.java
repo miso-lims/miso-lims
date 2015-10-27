@@ -25,25 +25,24 @@ package uk.ac.bbsrc.tgac.miso.core.data.decorator;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Reportable;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.decorator
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public abstract class AbstractReportDecorator<O> implements Reportable<O> {
- // protected final Reportable reportable;
+  // protected final Reportable reportable;
   protected final List<? extends Reportable> reportables;
   protected O report;
 
-//  public AbstractReportDecorator(Reportable reportable) {
-//    this.reportable = reportable;
-//  }
+  // public AbstractReportDecorator(Reportable reportable) {
+  // this.reportable = reportable;
+  // }
 
   public AbstractReportDecorator(List<? extends Reportable> reportables) {
     this.reportables = reportables;

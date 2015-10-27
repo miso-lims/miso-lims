@@ -39,7 +39,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.support.lob.DefaultLobHandler;
 import org.springframework.jdbc.support.lob.LobHandler;
-import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.BarcodePrintManager;
@@ -61,8 +60,7 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * Set up an in memory (hypersonic) database, and creating a DBUnit environment for
- * testing DAO methods.
+ * Set up an in memory (hypersonic) database, and creating a DBUnit environment for testing DAO methods.
  * <p/>
  * Info
  *
@@ -77,79 +75,16 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
   private static final String USER = "sa";
   private static final String PASSWORD = "";
 
-  private static final String[] tables =
-  {
-    "Alert",
-    "EntityGroup",
-    "EntityGroup_Elements",
-    "Experiment",
-    "Experiment_Kit",
-    "Kit",
-    "KitDescriptor",
-    "Kit_Note",
-    "Library",
-    "LibraryDilution",
-    "LibraryQC",
-    "LibrarySelectionType",
-    "LibraryStrategyType",
-    "LibraryType",
-    "Library_Note",
-    "Library_TagBarcode",
-    "Note",
-    "_Partition",
-    "Plate",
-    "Plate_Elements",
-    "Platform",
-    "Pool",
-    "PoolQC",
-    "Pool_Elements",
-    "Pool_Experiment",
-    "PrintJob",
-    "PrintService",
-    "Project",
-    "ProjectOverview",
-    "ProjectOverview_Note",
-    "Project_Issues",
-    "Project_Note",
-    "Project_ProjectOverview",
-    "Project_Request",
-    "Project_Study",
-    "QCType",
-    "Request",
-    "Request_Note",
-    "Run",
-    "RunQC",
-    "RunQC_Partition",
-    "Run_Note",
-    "Sample",
-    "SampleQC",
-    "SampleType",
-    "Sample_Note",
-    "SecurityProfile",
-    "SecurityProfile_ReadGroup",
-    "SecurityProfile_ReadUser",
-    "SecurityProfile_WriteGroup",
-    "SecurityProfile_WriteUser",
-    "SequencerPartitionContainer",
-    "SequencerPartitionContainer_Partition",
-    "SequencerReference",
-    "Status",
-    "Study",
-    "StudyType",
-    "Study_Experiment",
-    "Submission",
-    "Submission_Experiment",
-    "Submission_Partition_Dilution",
-    "Submission_Sample",
-    "Submission_Study",
-    "TagBarcodes",
-    "User",
-    "User_Group",
-    "Watcher",
-    "_Group",
-    "emPCR",
-    "emPCRDilution",
-  };
+  private static final String[] tables = { "Alert", "EntityGroup", "EntityGroup_Elements", "Experiment", "Experiment_Kit", "Kit",
+      "KitDescriptor", "Kit_Note", "Library", "LibraryDilution", "LibraryQC", "LibrarySelectionType", "LibraryStrategyType", "LibraryType",
+      "Library_Note", "Library_TagBarcode", "Note", "_Partition", "Plate", "Plate_Elements", "Platform", "Pool", "PoolQC", "Pool_Elements",
+      "Pool_Experiment", "PrintJob", "PrintService", "Project", "ProjectOverview", "ProjectOverview_Note", "Project_Issues", "Project_Note",
+      "Project_ProjectOverview", "Project_Request", "Project_Study", "QCType", "Request", "Request_Note", "Run", "RunQC", "RunQC_Partition",
+      "Run_Note", "Sample", "SampleQC", "SampleType", "Sample_Note", "SecurityProfile", "SecurityProfile_ReadGroup",
+      "SecurityProfile_ReadUser", "SecurityProfile_WriteGroup", "SecurityProfile_WriteUser", "SequencerPartitionContainer",
+      "SequencerPartitionContainer_Partition", "SequencerReference", "Status", "Study", "StudyType", "Study_Experiment", "Submission",
+      "Submission_Experiment", "Submission_Partition_Dilution", "Submission_Sample", "Submission_Study", "TagBarcodes", "User",
+      "User_Group", "Watcher", "_Group", "emPCR", "emPCRDilution", };
 
   private DataSource datasource;
 
@@ -189,8 +124,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
   public DataSource getDataSource() {
     if (datasource != null) {
       return datasource;
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -198,8 +132,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
   public DaoLookup getDaoLookup() {
     if (daoLookup != null) {
       return daoLookup;
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -207,8 +140,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
   public SQLAlertDAO getAlertDAO() {
     if (alertDAO != null) {
       return alertDAO;
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -216,8 +148,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
   public SQLLibraryDilutionDAO getLibraryDilutionDAO() {
     if (libraryDilutionDAO != null) {
       return libraryDilutionDAO;
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -225,18 +156,15 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
   public SQLEntityGroupDAO getEntityGroupDAO() {
     if (entityGroupDAO != null) {
       return entityGroupDAO;
-    }
-    else {
+    } else {
       return null;
     }
   }
 
-
   public SQLEmPCRDAO getEmPCRDAO() {
     if (emPCRDAO != null) {
       return emPCRDAO;
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -244,8 +172,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
   public SQLEmPCRDilutionDAO getEmPCRDilutionDAO() {
     if (emPCRDilutionDAO != null) {
       return emPCRDilutionDAO;
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -253,8 +180,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
   public SQLExperimentDAO getExperimentDAO() {
     if (experimentDAO != null) {
       return experimentDAO;
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -262,8 +188,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
   public SQLKitDAO getKitDAO() {
     if (kitDAO != null) {
       return kitDAO;
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -271,8 +196,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
   public SQLLibraryDAO getLibraryDAO() {
     if (libraryDAO != null) {
       return libraryDAO;
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -280,8 +204,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
   public SQLLibraryQCDAO getLibraryQcDAO() {
     if (libraryQcDAO != null) {
       return libraryQcDAO;
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -289,8 +212,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
   public SQLNoteDAO getNoteDAO() {
     if (noteDAO != null) {
       return noteDAO;
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -298,8 +220,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
   public SQLPlateDAO getPlateDAO() {
     if (plateDAO != null) {
       return plateDAO;
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -307,8 +228,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
   public SQLPlatformDAO getPlatformDAO() {
     if (platformDAO != null) {
       return platformDAO;
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -316,8 +236,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
   public SQLPoolDAO getPoolDAO() {
     if (poolDAO != null) {
       return poolDAO;
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -325,8 +244,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
   public SQLPoolQCDAO getPoolQcDAO() {
     if (poolQcDAO != null) {
       return poolQcDAO;
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -334,8 +252,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
   public SQLProjectDAO getProjectDAO() {
     if (projectDAO != null) {
       return projectDAO;
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -343,8 +260,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
   public SQLPrintJobDAO getPrintJobDAO() {
     if (printJobDAO != null) {
       return printJobDAO;
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -352,8 +268,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
   public SQLPrintServiceDAO getPrintServiceDAO() {
     if (printServiceDAO != null) {
       return printServiceDAO;
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -361,8 +276,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
   public SQLRunDAO getRunDAO() {
     if (runDAO != null) {
       return runDAO;
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -370,8 +284,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
   public SQLRunQCDAO getRunQcDAO() {
     if (runQcDAO != null) {
       return runQcDAO;
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -379,8 +292,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
   public SQLSampleDAO getSampleDAO() {
     if (sampleDAO != null) {
       return sampleDAO;
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -388,8 +300,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
   public SQLSampleQCDAO getSampleQcDAO() {
     if (sampleQcDAO != null) {
       return sampleQcDAO;
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -397,8 +308,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
   public SQLSecurityProfileDAO getSecurityProfileDAO() {
     if (securityProfileDAO != null) {
       return securityProfileDAO;
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -406,8 +316,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
   public SQLSecurityDAO getSecurityDAO() {
     if (securityDAO != null) {
       return securityDAO;
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -415,8 +324,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
   public SQLSequencerReferenceDAO getSequencerReferenceDAO() {
     if (sequencerReferenceDAO != null) {
       return sequencerReferenceDAO;
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -424,8 +332,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
   public SQLStatusDAO getStatusDAO() {
     if (statusDAO != null) {
       return statusDAO;
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -433,8 +340,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
   public SQLStudyDAO getStudyDAO() {
     if (studyDAO != null) {
       return studyDAO;
-    }
-    else {
+    } else {
       return null;
     }
   }
@@ -448,7 +354,6 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
     assert watcherDAO != null;
     return watcherDAO;
   }
-
 
   public SQLSequencerPoolPartitionDAO getPartitionDAO() {
     assert partitionDAO != null;
@@ -469,7 +374,8 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
       props.load(in);
       System.out.print("properties loaded...");
 
-      Connection jdbcConnection = DriverManager.getConnection(props.getProperty("db.url"), props.getProperty("db.username"), props.getProperty("db.password"));
+      Connection jdbcConnection = DriverManager.getConnection(props.getProperty("db.url"), props.getProperty("db.username"),
+          props.getProperty("db.password"));
       IDatabaseConnection connection = new DatabaseConnection(jdbcConnection);
       DatabaseConfig config = connection.getConfig();
       config.setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, new MySqlDataTypeFactory());
@@ -495,14 +401,14 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
   }
 
   /**
-   * This sets up an in-memory database using Hypersonic, and uses DBUnit to dump sample data from miso-db.xml into
-   * this in-memory database.  It then configures a SingleConnectionDataSource from spring to provide access to the
-   * underlying DB connection.  Finally, it initialises a JdbcTemplate using this datasource, and all the relevant DAOs using
-   * this template.  After setup, you should be able to use the DAOs to test method calls against the data configured
-   * in the sample dataset, or add to it and check the resulting data.
+   * This sets up an in-memory database using Hypersonic, and uses DBUnit to dump sample data from miso-db.xml into this in-memory database.
+   * It then configures a SingleConnectionDataSource from spring to provide access to the underlying DB connection. Finally, it initialises
+   * a JdbcTemplate using this datasource, and all the relevant DAOs using this template. After setup, you should be able to use the DAOs to
+   * test method calls against the data configured in the sample dataset, or add to it and check the resulting data.
    *
    * @throws Exception
    */
+  @Override
   @Before
   public void setUp() throws Exception {
     System.out.println(">>>>>>>>>>>>>> SETUP");
@@ -511,13 +417,14 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
     Properties props = new Properties();
     props.load(in);
 
-    datasource = new DriverManagerDataSource(props.getProperty("db.url"), props.getProperty("db.username"), props.getProperty("db.password"));
+    datasource = new DriverManagerDataSource(props.getProperty("db.url"), props.getProperty("db.username"),
+        props.getProperty("db.password"));
 
     DataObjectFactory dataObjectFactory = new TgacDataObjectFactory();
     LobHandler lh = new DefaultLobHandler();
     JdbcTemplate template = new JdbcTemplate(datasource);
 
-    //securityDAO = new SQLSecurityDAO();
+    // securityDAO = new SQLSecurityDAO();
     securityDAO = new MockSQLSecurityDAO();
     securityDAO.setLobHandler(lh);
     securityDAO.setJdbcTemplate(template);
@@ -555,7 +462,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
 
     Map<Class<?>, Store<?>> daos = new HashMap<Class<?>, Store<?>>();
 
-    //just use a basic SQL auth for testing
+    // just use a basic SQL auth for testing
     LocalSecurityManager sm = new LocalSecurityManager();
     sm.setSecurityStore(securityDAO);
     securityProfileDAO.setJdbcTemplate(template);
@@ -766,6 +673,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
     entityGroupDAO.setDaoLookup(daoLookup);
   }
 
+  @Override
   @After
   public void tearDown() throws Exception {
     System.out.println("<<<<<<<<<<<<<<<< TEARDOWN");
@@ -777,675 +685,282 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
     System.out.println("Creating test database tables...");
 
     runStatement(conn,
-                 "CREATE TABLE Alert (" +
-                 "alertId BIGINT NOT NULL," +
-                 "title VARCHAR(100) NOT NULL," +
-                 "text LONGVARCHAR NOT NULL," +
-                 "userId BIGINT NOT NULL," +
-                 "date DATE NOT NULL," +
-                 "isRead BIT NOT NULL," +
-                 "level VARCHAR(8) NOT NULL," +
-                 "PRIMARY KEY (alertId)" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE EntityGroup (" +
-                 "entityGroupId BIGINT NOT NULL, " +
-                 "parentId BIGINT NOT NULL, " +
-                 "parentType VARCHAR(255) NOT NULL," +
-                 "PRIMARY KEY  (entityGroupId, parentId)" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE EntityGroup_Elements (" +
-                 "entityGroup_entityGroupId BIGINT NOT NULL, " +
-                 "entityId BIGINT NOT NULL, " +
-                 "entityType VARCHAR(255) NOT NULL," +
-                 "PRIMARY KEY  (entityGroup_entityGroupId,entityId)" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE Experiment (" +
-                 "experimentId BIGINT NOT NULL, " +
-                 "name VARCHAR(255) NOT NULL, " +
-                 "description VARCHAR(255) NOT NULL," +
-                 "accession VARCHAR(50) default NULL," +
-                 "title VARCHAR(255) NOT NULL," +
-                 "securityProfile_profileId BIGINT default NULL," +
-                 "study_studyId BIGINT default NULL," +
-                 "alias VARCHAR(30) default NULL," +
-                 "platform_platformId BIGINT default NULL," +
-                 "PRIMARY KEY  (experimentId)" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE Experiment_Kit (" +
-                 "experiments_experimentId BIGINT NOT NULL," +
-                 "kits_kitId BIGINT NOT NULL" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE Kit (" +
-                 "kitId BIGINT NOT NULL," +
-                 "identificationBarcode VARCHAR(255) default NULL," +
-                 "locationBarcode VARCHAR(255) default NULL," +
-                 "lotNumber VARCHAR(30) NOT NULL," +
-                 "kitDate DATE NOT NULL," +
-                 "kitDescriptorId BIGINT NOT NULL," +
-                 "PRIMARY KEY  (kitId)" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE KitDescriptor (" +
-                 "kitDescriptorId BIGINT NOT NULL," +
-                 "name VARCHAR(255) default NULL," +
-                 "version INT default NULL," +
-                 "manufacturer VARCHAR(100) NOT NULL," +
-                 "partNumber VARCHAR(50) NOT NULL," +
-                 "stockLevel INT NOT NULL," +
-                 "kitType VARCHAR(30) NOT NULL," +
-                 "platformType VARCHAR(20) NOT NULL," +
-                 "PRIMARY KEY  (kitDescriptorId)" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE Kit_Note (" +
-                 "kit_kitId BIGINT NOT NULL," +
-                 "notes_noteId BIGINT NOT NULL" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE Library (" +
-                 "libraryId BIGINT NOT NULL," +
-                 "name VARCHAR(255) NOT NULL," +
-                 "description VARCHAR(255) NOT NULL," +
-                 "accession VARCHAR(30) default NULL," +
-                 "securityProfile_profileId BIGINT default NULL," +
-                 "sample_sampleId BIGINT NOT NULL," +
-                 "identificationBarcode VARCHAR(255) default NULL," +
-                 "locationBarcode VARCHAR(255) default NULL," +
-                 "libraryType BIGINT default NULL," +
-                 "librarySelectionType BIGINT default NULL," +
-                 "libraryStrategyType BIGINT default NULL," +
-                 "concentration TINYINT default NULL," +
-                 "creationDate TIMESTAMP NOT NULL," +
-                 "platformName VARCHAR(255) default NULL," +
-                 "alias VARCHAR(30) default NULL," +
-                 "paired BIT NOT NULL," +
-                 "qcPassed VARCHAR(5) default NULL," +
-                 "PRIMARY KEY  (libraryId)" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE LibraryDilution (" +
-                 "dilutionId BIGINT NOT NULL," +
-                 "concentration DOUBLE NOT NULL," +
-                 "library_libraryId BIGINT NOT NULL," +
-                 "identificationBarcode VARCHAR(255) default NULL," +
-                 "creationDate DATE NOT NULL," +
-                 "dilutionUserName VARCHAR(255) NOT NULL," +
-                 "name VARCHAR(255) NOT NULL," +
-                 "securityProfile_profileId BIGINT default NULL," +
-                 "PRIMARY KEY  (dilutionId)" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE LibraryQC (" +
-                 "qcId BIGINT NOT NULL," +
-                 "library_libraryId BIGINT NOT NULL," +
-                 "qcUserName VARCHAR(255) NOT NULL," +
-                 "qcDate TIMESTAMP NOT NULL," +
-                 "qcMethod BIGINT NOT NULL," +
-                 "results DOUBLE default NULL," +
-                 "insertSize INT NOT NULL," +
-                 "PRIMARY KEY (qcId)" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE LibraryType (" +
-                 "libraryTypeId BIGINT NOT NULL," +
-                 "description VARCHAR(255) NOT NULL," +
-                 "platformType VARCHAR(50) NOT NULL," +
-                 "PRIMARY KEY  (libraryTypeId)" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE LibrarySelectionType (" +
-                 "librarySelectionTypeId BIGINT NOT NULL," +
-                 "name VARCHAR(50) NOT NULL," +
-                 "description VARCHAR(255) NOT NULL," +
-                 "PRIMARY KEY  (librarySelectionTypeId)" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE LibraryStrategyType (" +
-                 "libraryStrategyTypeId BIGINT NOT NULL," +
-                 "name VARCHAR(50) NOT NULL," +
-                 "description VARCHAR(255) NOT NULL," +
-                 "PRIMARY KEY  (libraryStrategyTypeId)" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE Library_Note (" +
-                 "library_libraryId BIGINT NOT NULL," +
-                 "notes_noteId BIGINT NOT NULL" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE Library_TagBarcode (" +
-                 "library_libraryId BIGINT NOT NULL," +
-                 "barcode_barcodeId BIGINT NOT NULL" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE Note (" +
-                 "noteId BIGINT NOT NULL, " +
-                 "creationDate DATE default NULL, " +
-                 "internalOnly BIT NOT NULL, " +
-                 "text VARCHAR(255) default NULL, " +
-                 "owner_userId BIGINT default NULL, " +
-                 "PRIMARY KEY (noteId)" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE _Partition (" +
-                 "partitionId BIGINT NOT NULL," +
-                 "partitionNumber TINYINT NOT NULL," +
-                 "pool_poolId BIGINT default NULL," +
-                 "securityProfile_profileId BIGINT NOT NULL," +
-                 "PRIMARY KEY  (partitionId)" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE Plate (" +
-                 "plateId BIGINT NOT NULL," +
-                 "name VARCHAR(255) NOT NULL," +
-                 "description VARCHAR(255) NOT NULL," +
-                 "creationDate DATE NOT NULL," +
-                 "plateMaterialType VARCHAR(20) NOT NULL," +
-                 "identificationBarcode VARCHAR(255) DEFAULT NULL," +
-                 "locationBarcode VARCHAR(255) DEFAULT NULL," +
-                 "size INT NOT NULL," +
-                 "tagBarcodeId BIGINT DEFAULT NULL," +
-                 "securityProfile_profileId BIGINT default NULL," +
-                 "PRIMARY KEY (plateId) " +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE Plate_Elements (" +
-                 "plate_plateId BIGINT NOT NULL," +
-                 "elementType VARCHAR(255) NOT NULL" +
-                 "elementPosition INTEGER NOT NULL" +
-                 "elementId BIGINT NOT NULL" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE Pool (" +
-                 "poolId BIGINT NOT NULL," +
-                 "concentration DOUBLE NOT NULL," +
-                 "identificationBarcode VARCHAR(13) default NULL," +
-                 "name VARCHAR(255) NOT NULL," +
-                 "alias VARCHAR(50) default NULL," +
-                 "creationDate DATE NOT NULL," +
-                 "securityProfile_profileId BIGINT default NULL," +
-                 "experiment_experimentId BIGINT default NULL," +
-                 "platformType VARCHAR(20) NOT NULL," +
-                 "ready BOOLEAN NOT NULL," +
-                 "qcPassed VARCHAR(5) default NULL," +
-                 "PRIMARY KEY  (poolId)" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE PoolQC (" +
-                 "qcId BIGINT NOT NULL," +
-                 "pool_poolId BIGINT NOT NULL," +
-                 "qcUserName VARCHAR(255) NOT NULL," +
-                 "qcDate TIMESTAMP NOT NULL," +
-                 "qcMethod BIGINT NOT NULL," +
-                 "results DOUBLE default NULL," +
-                 "PRIMARY KEY (qcId)" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE Pool_Experiment (" +
-                 "pool_poolId BIGINT NOT NULL," +
-                 "experiments_experimentId BIGINT NOT NULL" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE Pool_Elements (" +
-                 "pool_poolId BIGINT NOT NULL," +
-                 "elementType VARCHAR(255) NOT NULL" +
-                 "elementId BIGINT NOT NULL" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE Platform (" +
-                 "platformId BIGINT NOT NULL," +
-                 "name VARCHAR(50) NOT NULL," +
-                 "instrumentModel VARCHAR(100) NOT NULL," +
-                 "description VARCHAR(255) NOT NULL," +
-                 "numContainers TINYINT NOT NULL," +
-                 "PRIMARY KEY  (platformId)" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE PrintJob (" +
-                 "jobId BIGINT NOT NULL," +
-                 "printServiceName VARCHAR(255) NOT NULL," +
-                 "printDate TIMESTAMP NOT NULL," +
-                 "jobCreator_userId BIGINT NOT NULL," +
-                 "printedElements BINARY NOT NULL," +
-                 "status VARCHAR(20) NOT NULL," +
-                 "PRIMARY KEY (jobId));");
-
-    runStatement(conn,
-                 "CREATE TABLE PrintService (" +
-                 "serviceId BIGINT NOT NULL," +
-                 "serviceName VARCHAR(100) NOT NULL," +
-                 "contextName VARCHAR(100) NOT NULL," +
-                 "contextFields VARCHAR(255)," +
-                 "enabled BIT NOT NULL," +
-                 "printServiceFor VARCHAR(255) NOT NULL," +
-                 "PRIMARY KEY (serviceId));");
-
-    runStatement(conn,
-                 "CREATE TABLE Project (" +
-                 "projectId BIGINT NOT NULL," +
-                 "creationDate TIMESTAMP default NULL," +
-                 "description VARCHAR(255) default NULL," +
-                 "name VARCHAR(255) default NULL," +
-                 "alias VARCHAR(50) default NULL," +
-                 "securityProfile_profileId BIGINT default NULL," +
-                 "progress VARCHAR(20) NOT NULL," +
-                 "lastUpdated TIMESTAMP default CURRENT_TIMESTAMP, " +
-                 "PRIMARY KEY  (projectId)" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE Project_Issues (" +
-                 "project_projectId BIGINT NOT NULL," +
-                 "issueKey VARCHAR NOT NULL" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE ProjectOverview (" +
-                 "overviewId BIGINT NOT NULL," +
-                 "principalInvestigator VARCHAR(255) NOT NULL," +
-                 "startDate DATE default NULL," +
-                 "endDate DATE default NULL," +
-                 "numProposedSamples INT default NULL," +
-                 "locked BIT NOT NULL," +
-                 "allSampleQcPassed BIT default NULL," +
-                 "libraryPreparationComplete BIT default NULL," +
-                 "allLibraryQcPassed BIT default NULL," +
-                 "allPoolsConstructed BIT default NULL," +
-                 "allRunsCompleted BIT default NULL," +
-                 "primaryAnalysisCompleted BIT default NULL," +
-                 "lastUpdated TIMESTAMP default CURRENT_TIMESTAMP, " +
-                 "PRIMARY KEY (overviewId)" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE ProjectOverview_Note (" +
-                 "overview_overviewId BIGINT NOT NULL," +
-                 "notes_noteId BIGINT NOT NULL" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE Project_Note (" +
-                 "project_projectId BIGINT NOT NULL," +
-                 "notes_noteId BIGINT NOT NULL" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE Project_ProjectOverview (" +
-                 "project_projectID BIGINT NOT NULL," +
-                 "overviews_overviewId BIGINT NOT NULL" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE Project_Request (" +
-                 "Project_projectId BIGINT NOT NULL," +
-                 "requests_requestId BIGINT NOT NULL" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE Project_Study (" +
-                 "Project_projectId BIGINT NOT NULL," +
-                 "studies_studyId BIGINT NOT NULL" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE QcType (" +
-                 "qcTypeId BIGINT NOT NULL," +
-                 "name VARCHAR(255) NOT NULL," +
-                 "description VARCHAR(255) NOT NULL," +
-                 "qcTarget VARCHAR(50) NOT NULL," +
-                 "units VARCHAR(10) NOT NULL," +
-                 "PRIMARY KEY (qcTypeId)" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE Request (" +
-                 "requestId BIGINT NOT NULL," +
-                 "creationDate TIMESTAMP default NULL," +
-                 "description VARCHAR(255) default NULL," +
-                 "executionCount INT NOT NULL," +
-                 "lastExecutionDate TIMESTAMP default NULL," +
-                 "name VARCHAR(255) default NULL," +
-                 "protocolUniqueIdentifier VARCHAR(255) default NULL," +
-                 "project_projectId BIGINT default NULL," +
-                 "securityProfile_profileId BIGINT default NULL," +
-                 "PRIMARY KEY (requestId)" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE Request_Note (" +
-                 "Request_requestId BIGINT NOT NULL," +
-                 "notes_noteId BIGINT NOT NULL" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE Run (" +
-                 "runId BIGINT NOT NULL," +
-                 "name VARCHAR(255) NOT NULL," +
-                 "alias VARCHAR(50) NOT NULL," +
-                 "description VARCHAR(255) NOT NULL," +
-                 "accession VARCHAR(50) default NULL," +
-                 "platformRunId INT default NULL," +
-                 "pairedEnd BOOLEAN NOT NULL," +
-                 "cycles SMALLINT default NULL," +
-                 "filePath VARCHAR(255) default NULL," +
-                 "securityProfile_profileId BIGINT default NULL," +
-                 "platformType VARCHAR(50) NOT NULL," +
-                 "status_statusId BIGINT default NULL," +
-                 "sequencerReference_sequencerReferenceId BIGINT default NULL," +
-                 "PRIMARY KEY  (runId)" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE RunQC (" +
-                 "qcId BIGINT NOT NULL," +
-                 "run_runId BIGINT NOT NULL," +
-                 "qcUserName VARCHAR(255) NOT NULL," +
-                 "qcDate TIMESTAMP NOT NULL," +
-                 "qcMethod BIGINT NOT NULL," +
-                 "information LONGVARCHAR default NULL," +
-                 "doNotProcess BIT NOT NULL," +
-                 "PRIMARY KEY (qcId)" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE RunQC_Partition (" +
-                 "runQc_runQcId BIGINT NOT NULL," +
-                 "containers_containerId BIGINT NOT NULL," +
-                 "partitionNumber TINYINT NOT NULL" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE Run_SequencerPartitionContainer (" +
-                 "Run_runId BIGINT NOT NULL," +
-                 "containers_containerId BIGINT NOT NULL" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE Run_Note (" +
-                 "run_runId BIGINT NOT NULL," +
-                 "notes_noteId BIGINT NOT NULL" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE Sample (" +
-                 "sampleId BIGINT NOT NULL," +
-                 "accession VARCHAR(50) default NULL," +
-                 "name VARCHAR(255) NOT NULL," +
-                 "description VARCHAR(255) NOT NULL," +
-                 "scientificName VARCHAR(255) NOT NULL," +
-                 "taxonIdentifier VARCHAR(255) default NULL," +
-                 "securityProfile_profileId BIGINT default NULL," +
-                 "identificationBarcode VARCHAR(255) default NULL," +
-                 "locationBarcode VARCHAR(255) default NULL," +
-                 "sampleType VARCHAR(50) NOT NULL," +
-                 "receivedDate TIMESTAMP default NULL," +
-                 "qcPassed VARCHAR(5) default NULL," +
-                 "alias VARCHAR(30) default NULL," +
-                 "project_projectId BIGINT NOT NULL," +
-                 "PRIMARY KEY  (sampleId)" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE SampleQC (" +
-                 "qcId BIGINT NOT NULL," +
-                 "sample_sampleId BIGINT NOT NULL," +
-                 "qcUserName VARCHAR(255) NOT NULL," +
-                 "qcDate TIMESTAMP NOT NULL," +
-                 "qcMethod BIGINT NOT NULL," +
-                 "results DOUBLE default NULL," +
-                 "PRIMARY KEY (qcId)" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE SampleType (" +
-                 "typeId BIGINT NOT NULL," +
-                 "name VARCHAR(255) NOT NULL," +
-                 "PRIMARY KEY (typeId)" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE Sample_Note (" +
-                 "sample_sampleId BIGINT NOT NULL," +
-                 "notes_noteId BIGINT NOT NULL" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE SecurityProfile (" +
-                 "profileId BIGINT NOT NULL," +
-                 "allowAllInternal BIT NOT NULL," +
-                 "owner_userId BIGINT default NULL," +
-                 "PRIMARY KEY  (profileId)" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE SecurityProfile_ReadGroup (" +
-                 "SecurityProfile_profileId BIGINT NOT NULL," +
-                 "readGroup_groupId BIGINT NOT NULL" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE SecurityProfile_ReadUser (" +
-                 "SecurityProfile_profileId BIGINT NOT NULL," +
-                 "readUser_userId BIGINT NOT NULL" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE SecurityProfile_WriteGroup (" +
-                 "SecurityProfile_profileId BIGINT NOT NULL," +
-                 "writeGroup_groupId BIGINT NOT NULL" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE SecurityProfile_WriteUser (" +
-                 "SecurityProfile_profileId BIGINT NOT NULL," +
-                 "writeUser_userId BIGINT NOT NULL" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE SequencerPartitionContainer (" +
-                 "containerId BIGINT NOT NULL," +
-                 "platform BIGINT DEFAULT NULL," +
-                 "securityProfile_profileId BIGINT default NULL," +
-                 "identificationBarcode VARCHAR(255) default NULL," +
-                 "locationBarcode VARCHAR(255) default NULL," +
-                 "validationBarcode VARCHAR(255) default NULL," +
-                 "PRIMARY KEY  (containerId)" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE SequencerPartitionContainer_Partition (" +
-                 "container_containerId BIGINT NOT NULL," +
-                 "partitions_partitionId BIGINT NOT NULL" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE SequencerReference (" +
-                 "referenceId BIGINT NOT NULL," +
-                 "name VARCHAR(30) NOT NULL," +
-                 "ipAddress BINARY NOT NULL," +
-                 "platformId BIGINT NOT NULL," +
-                 "available BIT NOT NULL," +
-                 "PRIMARY KEY  (referenceId)" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE Status (" +
-                 "statusId BIGINT NOT NULL," +
-                 "health VARCHAR(50) NOT NULL," +
-                 "completionDate DATE default NULL," +
-                 "startDate DATE default NULL," +
-                 "xml BINARY default NULL," +
-                 "runName VARCHAR(255) default NULL," +
-                 "instrumentName VARCHAR(255) default NULL," +
-                 "lastUpdated TIMESTAMP default CURRENT_TIMESTAMP, " +
-                 "PRIMARY KEY (statusId)" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE Study (" +
-                 "studyId BIGINT NOT NULL," +
-                 "name VARCHAR(255) NOT NULL," +
-                 "description VARCHAR(255) NOT NULL," +
-                 "accession VARCHAR(30) default NULL," +
-                 "securityProfile_profileId BIGINT default NULL," +
-                 "project_projectId BIGINT NOT NULL," +
-                 "studyType VARCHAR(255) default NULL," +
-                 "alias VARCHAR(30) default NULL," +
-                 "PRIMARY KEY  (studyId)" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE StudyType (" +
-                 "typeId BIGINT NOT NULL," +
-                 "name VARCHAR(255) NOT NULL," +
-                 "PRIMARY KEY (typeId)" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE Study_Experiment (" +
-                 "Study_studyId BIGINT NOT NULL," +
-                 "experiments_experimentId BIGINT NOT NULL" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE Submission (" +
-                 "submissionId BIGINT NOT NULL," +
-                 "creationDate DATE NOT NULL," +
-                 "submittedDate DATE DEFAULT NULL," +
-                 "verified BIT NOT NULL," +
-                 "description VARCHAR(255)," +
-                 "name VARCHAR(255)," +
-                 "title VARCHAR(255)," +
-                 "accession VARCHAR(50) DEFAULT NULL," +
-                 "alias VARCHAR(30) DEFAULT NULL," +
-                 "completed BIT NOT NULL," +
-                 "PRIMARY KEY (submissionId)" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE Submission_Experiment (" +
-                 "submission_submissionId BIGINT NOT NULL," +
-                 "experiments_experimentId BIGINT NOT NULL" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE Submission_Partition_Dilution (" +
-                 "submission_submissionId BIGINT NOT NULL," +
-                 "partition_partitionId BIGINT NOT NULL," +
-                 "dilution_dilutionId BIGINT NOT NULL," +
-                 "PRIMARY KEY (submission_submissionId,partition_partitionId,dilution_dilutionId)" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE Submission_Sample (" +
-                 "submission_submissionId BIGINT NOT NULL," +
-                 "samples_sampleId BIGINT NOT NULL" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE Submission_Study (" +
-                 "submission_submissionId BIGINT NOT NULL," +
-                 "studies_studyId BIGINT NOT NULL" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE TagBarcodes (" +
-                 "tagId BIGINT NOT NULL," +
-                 "name VARCHAR(10) NOT NULL," +
-                 "sequence VARCHAR(20) NOT NULL," +
-                 "platformName VARCHAR(20) NOT NULL," +
-                 "strategyName VARCHAR(100) NOT NULL," +
-                 "PRIMARY KEY  (tagId)" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE User (" +
-                 "userId BIGINT NOT NULL," +
-                 "active BIT NOT NULL," +
-                 "admin BIT NOT NULL," +
-                 "external BIT NOT NULL," +
-                 "fullName VARCHAR(255) default NULL," +
-                 "internal BIT NOT NULL," +
-                 "loginName VARCHAR(255) default NULL," +
-                 "roles BINARY," +
-                 "password VARCHAR(255) default NULL," +
-                 "email VARCHAR(255) default NULL," +
-                 "PRIMARY KEY  (userId)" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE User_Group (" +
-                 "users_userId BIGINT NOT NULL," +
-                 "groups_groupId BIGINT NOT NULL" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE _Group (" +
-                 "groupId BIGINT NOT NULL," +
-                 "description VARCHAR(255) default NULL," +
-                 "name VARCHAR(255) default NULL," +
-                 "PRIMARY KEY  (groupId)" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE emPCR (" +
-                 "pcrId BIGINT NOT NULL," +
-                 "concentration DOUBLE NOT NULL," +
-                 "dilution_dilutionId BIGINT NOT NULL," +
-                 "creationDate DATE NOT NULL," +
-                 "pcrUserName VARCHAR(255) NOT NULL," +
-                 "name VARCHAR(255) NOT NULL," +
-                 "securityProfile_profileId BIGINT default NULL," +
-                 "PRIMARY KEY  (pcrId)" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE emPCRDilution (" +
-                 "dilutionId BIGINT NOT NULL," +
-                 "concentration DOUBLE NOT NULL," +
-                 "emPCR_pcrId BIGINT NOT NULL," +
-                 "identificationBarcode VARCHAR(255) default NULL," +
-                 "creationDate DATE NOT NULL," +
-                 "dilutionUserName VARCHAR(255) NOT NULL," +
-                 "name VARCHAR(255) NOT NULL," +
-                 "securityProfile_profileId BIGINT default NULL," +
-                 "PRIMARY KEY  (dilutionId)" +
-                 ");");
-
-    runStatement(conn,
-                 "CREATE TABLE Watcher (" +
-                 "entityName VARCHAR(4) NOT NULL," +
-                 "userId BIGINT NOT NULL" +
-                 ");");
+        "CREATE TABLE Alert (" + "alertId BIGINT NOT NULL," + "title VARCHAR(100) NOT NULL," + "text LONGVARCHAR NOT NULL,"
+            + "userId BIGINT NOT NULL," + "date DATE NOT NULL," + "isRead BIT NOT NULL," + "level VARCHAR(8) NOT NULL,"
+            + "PRIMARY KEY (alertId)" + ");");
+
+    runStatement(conn, "CREATE TABLE EntityGroup (" + "entityGroupId BIGINT NOT NULL, " + "parentId BIGINT NOT NULL, "
+        + "parentType VARCHAR(255) NOT NULL," + "PRIMARY KEY  (entityGroupId, parentId)" + ");");
+
+    runStatement(conn, "CREATE TABLE EntityGroup_Elements (" + "entityGroup_entityGroupId BIGINT NOT NULL, " + "entityId BIGINT NOT NULL, "
+        + "entityType VARCHAR(255) NOT NULL," + "PRIMARY KEY  (entityGroup_entityGroupId,entityId)" + ");");
+
+    runStatement(conn,
+        "CREATE TABLE Experiment (" + "experimentId BIGINT NOT NULL, " + "name VARCHAR(255) NOT NULL, "
+            + "description VARCHAR(255) NOT NULL," + "accession VARCHAR(50) default NULL," + "title VARCHAR(255) NOT NULL,"
+            + "securityProfile_profileId BIGINT default NULL," + "study_studyId BIGINT default NULL," + "alias VARCHAR(30) default NULL,"
+            + "platform_platformId BIGINT default NULL," + "PRIMARY KEY  (experimentId)" + ");");
+
+    runStatement(conn, "CREATE TABLE Experiment_Kit (" + "experiments_experimentId BIGINT NOT NULL," + "kits_kitId BIGINT NOT NULL" + ");");
+
+    runStatement(conn,
+        "CREATE TABLE Kit (" + "kitId BIGINT NOT NULL," + "identificationBarcode VARCHAR(255) default NULL,"
+            + "locationBarcode VARCHAR(255) default NULL," + "lotNumber VARCHAR(30) NOT NULL," + "kitDate DATE NOT NULL,"
+            + "kitDescriptorId BIGINT NOT NULL," + "PRIMARY KEY  (kitId)" + ");");
+
+    runStatement(conn,
+        "CREATE TABLE KitDescriptor (" + "kitDescriptorId BIGINT NOT NULL," + "name VARCHAR(255) default NULL,"
+            + "version INT default NULL," + "manufacturer VARCHAR(100) NOT NULL," + "partNumber VARCHAR(50) NOT NULL,"
+            + "stockLevel INT NOT NULL," + "kitType VARCHAR(30) NOT NULL," + "platformType VARCHAR(20) NOT NULL,"
+            + "PRIMARY KEY  (kitDescriptorId)" + ");");
+
+    runStatement(conn, "CREATE TABLE Kit_Note (" + "kit_kitId BIGINT NOT NULL," + "notes_noteId BIGINT NOT NULL" + ");");
+
+    runStatement(conn,
+        "CREATE TABLE Library (" + "libraryId BIGINT NOT NULL," + "name VARCHAR(255) NOT NULL," + "description VARCHAR(255) NOT NULL,"
+            + "accession VARCHAR(30) default NULL," + "securityProfile_profileId BIGINT default NULL," + "sample_sampleId BIGINT NOT NULL,"
+            + "identificationBarcode VARCHAR(255) default NULL," + "locationBarcode VARCHAR(255) default NULL,"
+            + "libraryType BIGINT default NULL," + "librarySelectionType BIGINT default NULL," + "libraryStrategyType BIGINT default NULL,"
+            + "concentration TINYINT default NULL," + "creationDate TIMESTAMP NOT NULL," + "platformName VARCHAR(255) default NULL,"
+            + "alias VARCHAR(30) default NULL," + "paired BIT NOT NULL," + "qcPassed VARCHAR(5) default NULL," + "PRIMARY KEY  (libraryId)"
+            + ");");
+
+    runStatement(conn,
+        "CREATE TABLE LibraryDilution (" + "dilutionId BIGINT NOT NULL," + "concentration DOUBLE NOT NULL,"
+            + "library_libraryId BIGINT NOT NULL," + "identificationBarcode VARCHAR(255) default NULL," + "creationDate DATE NOT NULL,"
+            + "dilutionUserName VARCHAR(255) NOT NULL," + "name VARCHAR(255) NOT NULL," + "securityProfile_profileId BIGINT default NULL,"
+            + "PRIMARY KEY  (dilutionId)" + ");");
+
+    runStatement(conn,
+        "CREATE TABLE LibraryQC (" + "qcId BIGINT NOT NULL," + "library_libraryId BIGINT NOT NULL," + "qcUserName VARCHAR(255) NOT NULL,"
+            + "qcDate TIMESTAMP NOT NULL," + "qcMethod BIGINT NOT NULL," + "results DOUBLE default NULL," + "insertSize INT NOT NULL,"
+            + "PRIMARY KEY (qcId)" + ");");
+
+    runStatement(conn, "CREATE TABLE LibraryType (" + "libraryTypeId BIGINT NOT NULL," + "description VARCHAR(255) NOT NULL,"
+        + "platformType VARCHAR(50) NOT NULL," + "PRIMARY KEY  (libraryTypeId)" + ");");
+
+    runStatement(conn, "CREATE TABLE LibrarySelectionType (" + "librarySelectionTypeId BIGINT NOT NULL," + "name VARCHAR(50) NOT NULL,"
+        + "description VARCHAR(255) NOT NULL," + "PRIMARY KEY  (librarySelectionTypeId)" + ");");
+
+    runStatement(conn, "CREATE TABLE LibraryStrategyType (" + "libraryStrategyTypeId BIGINT NOT NULL," + "name VARCHAR(50) NOT NULL,"
+        + "description VARCHAR(255) NOT NULL," + "PRIMARY KEY  (libraryStrategyTypeId)" + ");");
+
+    runStatement(conn, "CREATE TABLE Library_Note (" + "library_libraryId BIGINT NOT NULL," + "notes_noteId BIGINT NOT NULL" + ");");
+
+    runStatement(conn,
+        "CREATE TABLE Library_TagBarcode (" + "library_libraryId BIGINT NOT NULL," + "barcode_barcodeId BIGINT NOT NULL" + ");");
+
+    runStatement(conn,
+        "CREATE TABLE Note (" + "noteId BIGINT NOT NULL, " + "creationDate DATE default NULL, " + "internalOnly BIT NOT NULL, "
+            + "text VARCHAR(255) default NULL, " + "owner_userId BIGINT default NULL, " + "PRIMARY KEY (noteId)" + ");");
+
+    runStatement(conn, "CREATE TABLE _Partition (" + "partitionId BIGINT NOT NULL," + "partitionNumber TINYINT NOT NULL,"
+        + "pool_poolId BIGINT default NULL," + "securityProfile_profileId BIGINT NOT NULL," + "PRIMARY KEY  (partitionId)" + ");");
+
+    runStatement(conn,
+        "CREATE TABLE Plate (" + "plateId BIGINT NOT NULL," + "name VARCHAR(255) NOT NULL," + "description VARCHAR(255) NOT NULL,"
+            + "creationDate DATE NOT NULL," + "plateMaterialType VARCHAR(20) NOT NULL," + "identificationBarcode VARCHAR(255) DEFAULT NULL,"
+            + "locationBarcode VARCHAR(255) DEFAULT NULL," + "size INT NOT NULL," + "tagBarcodeId BIGINT DEFAULT NULL,"
+            + "securityProfile_profileId BIGINT default NULL," + "PRIMARY KEY (plateId) " + ");");
+
+    runStatement(conn, "CREATE TABLE Plate_Elements (" + "plate_plateId BIGINT NOT NULL," + "elementType VARCHAR(255) NOT NULL"
+        + "elementPosition INTEGER NOT NULL" + "elementId BIGINT NOT NULL" + ");");
+
+    runStatement(conn,
+        "CREATE TABLE Pool (" + "poolId BIGINT NOT NULL," + "concentration DOUBLE NOT NULL,"
+            + "identificationBarcode VARCHAR(13) default NULL," + "name VARCHAR(255) NOT NULL," + "alias VARCHAR(50) default NULL,"
+            + "creationDate DATE NOT NULL," + "securityProfile_profileId BIGINT default NULL,"
+            + "experiment_experimentId BIGINT default NULL," + "platformType VARCHAR(20) NOT NULL," + "ready BOOLEAN NOT NULL,"
+            + "qcPassed VARCHAR(5) default NULL," + "PRIMARY KEY  (poolId)" + ");");
+
+    runStatement(conn,
+        "CREATE TABLE PoolQC (" + "qcId BIGINT NOT NULL," + "pool_poolId BIGINT NOT NULL," + "qcUserName VARCHAR(255) NOT NULL,"
+            + "qcDate TIMESTAMP NOT NULL," + "qcMethod BIGINT NOT NULL," + "results DOUBLE default NULL," + "PRIMARY KEY (qcId)" + ");");
+
+    runStatement(conn,
+        "CREATE TABLE Pool_Experiment (" + "pool_poolId BIGINT NOT NULL," + "experiments_experimentId BIGINT NOT NULL" + ");");
+
+    runStatement(conn, "CREATE TABLE Pool_Elements (" + "pool_poolId BIGINT NOT NULL," + "elementType VARCHAR(255) NOT NULL"
+        + "elementId BIGINT NOT NULL" + ");");
+
+    runStatement(conn,
+        "CREATE TABLE Platform (" + "platformId BIGINT NOT NULL," + "name VARCHAR(50) NOT NULL," + "instrumentModel VARCHAR(100) NOT NULL,"
+            + "description VARCHAR(255) NOT NULL," + "numContainers TINYINT NOT NULL," + "PRIMARY KEY  (platformId)" + ");");
+
+    runStatement(conn,
+        "CREATE TABLE PrintJob (" + "jobId BIGINT NOT NULL," + "printServiceName VARCHAR(255) NOT NULL," + "printDate TIMESTAMP NOT NULL,"
+            + "jobCreator_userId BIGINT NOT NULL," + "printedElements BINARY NOT NULL," + "status VARCHAR(20) NOT NULL,"
+            + "PRIMARY KEY (jobId));");
+
+    runStatement(conn,
+        "CREATE TABLE PrintService (" + "serviceId BIGINT NOT NULL," + "serviceName VARCHAR(100) NOT NULL,"
+            + "contextName VARCHAR(100) NOT NULL," + "contextFields VARCHAR(255)," + "enabled BIT NOT NULL,"
+            + "printServiceFor VARCHAR(255) NOT NULL," + "PRIMARY KEY (serviceId));");
+
+    runStatement(conn,
+        "CREATE TABLE Project (" + "projectId BIGINT NOT NULL," + "creationDate TIMESTAMP default NULL,"
+            + "description VARCHAR(255) default NULL," + "name VARCHAR(255) default NULL," + "alias VARCHAR(50) default NULL,"
+            + "securityProfile_profileId BIGINT default NULL," + "progress VARCHAR(20) NOT NULL,"
+            + "lastUpdated TIMESTAMP default CURRENT_TIMESTAMP, " + "PRIMARY KEY  (projectId)" + ");");
+
+    runStatement(conn, "CREATE TABLE Project_Issues (" + "project_projectId BIGINT NOT NULL," + "issueKey VARCHAR NOT NULL" + ");");
+
+    runStatement(conn, "CREATE TABLE ProjectOverview (" + "overviewId BIGINT NOT NULL," + "principalInvestigator VARCHAR(255) NOT NULL,"
+        + "startDate DATE default NULL," + "endDate DATE default NULL," + "numProposedSamples INT default NULL," + "locked BIT NOT NULL,"
+        + "allSampleQcPassed BIT default NULL," + "libraryPreparationComplete BIT default NULL," + "allLibraryQcPassed BIT default NULL,"
+        + "allPoolsConstructed BIT default NULL," + "allRunsCompleted BIT default NULL," + "primaryAnalysisCompleted BIT default NULL,"
+        + "lastUpdated TIMESTAMP default CURRENT_TIMESTAMP, " + "PRIMARY KEY (overviewId)" + ");");
+
+    runStatement(conn,
+        "CREATE TABLE ProjectOverview_Note (" + "overview_overviewId BIGINT NOT NULL," + "notes_noteId BIGINT NOT NULL" + ");");
+
+    runStatement(conn, "CREATE TABLE Project_Note (" + "project_projectId BIGINT NOT NULL," + "notes_noteId BIGINT NOT NULL" + ");");
+
+    runStatement(conn,
+        "CREATE TABLE Project_ProjectOverview (" + "project_projectID BIGINT NOT NULL," + "overviews_overviewId BIGINT NOT NULL" + ");");
+
+    runStatement(conn,
+        "CREATE TABLE Project_Request (" + "Project_projectId BIGINT NOT NULL," + "requests_requestId BIGINT NOT NULL" + ");");
+
+    runStatement(conn, "CREATE TABLE Project_Study (" + "Project_projectId BIGINT NOT NULL," + "studies_studyId BIGINT NOT NULL" + ");");
+
+    runStatement(conn,
+        "CREATE TABLE QcType (" + "qcTypeId BIGINT NOT NULL," + "name VARCHAR(255) NOT NULL," + "description VARCHAR(255) NOT NULL,"
+            + "qcTarget VARCHAR(50) NOT NULL," + "units VARCHAR(10) NOT NULL," + "PRIMARY KEY (qcTypeId)" + ");");
+
+    runStatement(conn, "CREATE TABLE Request (" + "requestId BIGINT NOT NULL," + "creationDate TIMESTAMP default NULL,"
+        + "description VARCHAR(255) default NULL," + "executionCount INT NOT NULL," + "lastExecutionDate TIMESTAMP default NULL,"
+        + "name VARCHAR(255) default NULL," + "protocolUniqueIdentifier VARCHAR(255) default NULL,"
+        + "project_projectId BIGINT default NULL," + "securityProfile_profileId BIGINT default NULL," + "PRIMARY KEY (requestId)" + ");");
+
+    runStatement(conn, "CREATE TABLE Request_Note (" + "Request_requestId BIGINT NOT NULL," + "notes_noteId BIGINT NOT NULL" + ");");
+
+    runStatement(conn, "CREATE TABLE Run (" + "runId BIGINT NOT NULL," + "name VARCHAR(255) NOT NULL," + "alias VARCHAR(50) NOT NULL,"
+        + "description VARCHAR(255) NOT NULL," + "accession VARCHAR(50) default NULL," + "platformRunId INT default NULL,"
+        + "pairedEnd BOOLEAN NOT NULL," + "cycles SMALLINT default NULL," + "filePath VARCHAR(255) default NULL,"
+        + "securityProfile_profileId BIGINT default NULL," + "platformType VARCHAR(50) NOT NULL," + "status_statusId BIGINT default NULL,"
+        + "sequencerReference_sequencerReferenceId BIGINT default NULL," + "PRIMARY KEY  (runId)" + ");");
+
+    runStatement(conn,
+        "CREATE TABLE RunQC (" + "qcId BIGINT NOT NULL," + "run_runId BIGINT NOT NULL," + "qcUserName VARCHAR(255) NOT NULL,"
+            + "qcDate TIMESTAMP NOT NULL," + "qcMethod BIGINT NOT NULL," + "information LONGVARCHAR default NULL,"
+            + "doNotProcess BIT NOT NULL," + "PRIMARY KEY (qcId)" + ");");
+
+    runStatement(conn, "CREATE TABLE RunQC_Partition (" + "runQc_runQcId BIGINT NOT NULL," + "containers_containerId BIGINT NOT NULL,"
+        + "partitionNumber TINYINT NOT NULL" + ");");
+
+    runStatement(conn,
+        "CREATE TABLE Run_SequencerPartitionContainer (" + "Run_runId BIGINT NOT NULL," + "containers_containerId BIGINT NOT NULL" + ");");
+
+    runStatement(conn, "CREATE TABLE Run_Note (" + "run_runId BIGINT NOT NULL," + "notes_noteId BIGINT NOT NULL" + ");");
+
+    runStatement(conn,
+        "CREATE TABLE Sample (" + "sampleId BIGINT NOT NULL," + "accession VARCHAR(50) default NULL," + "name VARCHAR(255) NOT NULL,"
+            + "description VARCHAR(255) NOT NULL," + "scientificName VARCHAR(255) NOT NULL," + "taxonIdentifier VARCHAR(255) default NULL,"
+            + "securityProfile_profileId BIGINT default NULL," + "identificationBarcode VARCHAR(255) default NULL,"
+            + "locationBarcode VARCHAR(255) default NULL," + "sampleType VARCHAR(50) NOT NULL," + "receivedDate TIMESTAMP default NULL,"
+            + "qcPassed VARCHAR(5) default NULL," + "alias VARCHAR(30) default NULL," + "project_projectId BIGINT NOT NULL,"
+            + "PRIMARY KEY  (sampleId)" + ");");
+
+    runStatement(conn,
+        "CREATE TABLE SampleQC (" + "qcId BIGINT NOT NULL," + "sample_sampleId BIGINT NOT NULL," + "qcUserName VARCHAR(255) NOT NULL,"
+            + "qcDate TIMESTAMP NOT NULL," + "qcMethod BIGINT NOT NULL," + "results DOUBLE default NULL," + "PRIMARY KEY (qcId)" + ");");
+
+    runStatement(conn,
+        "CREATE TABLE SampleType (" + "typeId BIGINT NOT NULL," + "name VARCHAR(255) NOT NULL," + "PRIMARY KEY (typeId)" + ");");
+
+    runStatement(conn, "CREATE TABLE Sample_Note (" + "sample_sampleId BIGINT NOT NULL," + "notes_noteId BIGINT NOT NULL" + ");");
+
+    runStatement(conn, "CREATE TABLE SecurityProfile (" + "profileId BIGINT NOT NULL," + "allowAllInternal BIT NOT NULL,"
+        + "owner_userId BIGINT default NULL," + "PRIMARY KEY  (profileId)" + ");");
+
+    runStatement(conn, "CREATE TABLE SecurityProfile_ReadGroup (" + "SecurityProfile_profileId BIGINT NOT NULL,"
+        + "readGroup_groupId BIGINT NOT NULL" + ");");
+
+    runStatement(conn, "CREATE TABLE SecurityProfile_ReadUser (" + "SecurityProfile_profileId BIGINT NOT NULL,"
+        + "readUser_userId BIGINT NOT NULL" + ");");
+
+    runStatement(conn, "CREATE TABLE SecurityProfile_WriteGroup (" + "SecurityProfile_profileId BIGINT NOT NULL,"
+        + "writeGroup_groupId BIGINT NOT NULL" + ");");
+
+    runStatement(conn, "CREATE TABLE SecurityProfile_WriteUser (" + "SecurityProfile_profileId BIGINT NOT NULL,"
+        + "writeUser_userId BIGINT NOT NULL" + ");");
+
+    runStatement(conn,
+        "CREATE TABLE SequencerPartitionContainer (" + "containerId BIGINT NOT NULL," + "platform BIGINT DEFAULT NULL,"
+            + "securityProfile_profileId BIGINT default NULL," + "identificationBarcode VARCHAR(255) default NULL,"
+            + "locationBarcode VARCHAR(255) default NULL," + "validationBarcode VARCHAR(255) default NULL," + "PRIMARY KEY  (containerId)"
+            + ");");
+
+    runStatement(conn, "CREATE TABLE SequencerPartitionContainer_Partition (" + "container_containerId BIGINT NOT NULL,"
+        + "partitions_partitionId BIGINT NOT NULL" + ");");
+
+    runStatement(conn, "CREATE TABLE SequencerReference (" + "referenceId BIGINT NOT NULL," + "name VARCHAR(30) NOT NULL,"
+        + "ipAddress BINARY NOT NULL," + "platformId BIGINT NOT NULL," + "available BIT NOT NULL," + "PRIMARY KEY  (referenceId)" + ");");
+
+    runStatement(conn,
+        "CREATE TABLE Status (" + "statusId BIGINT NOT NULL," + "health VARCHAR(50) NOT NULL," + "completionDate DATE default NULL,"
+            + "startDate DATE default NULL," + "xml BINARY default NULL," + "runName VARCHAR(255) default NULL,"
+            + "instrumentName VARCHAR(255) default NULL," + "lastUpdated TIMESTAMP default CURRENT_TIMESTAMP, " + "PRIMARY KEY (statusId)"
+            + ");");
+
+    runStatement(conn,
+        "CREATE TABLE Study (" + "studyId BIGINT NOT NULL," + "name VARCHAR(255) NOT NULL," + "description VARCHAR(255) NOT NULL,"
+            + "accession VARCHAR(30) default NULL," + "securityProfile_profileId BIGINT default NULL,"
+            + "project_projectId BIGINT NOT NULL," + "studyType VARCHAR(255) default NULL," + "alias VARCHAR(30) default NULL,"
+            + "PRIMARY KEY  (studyId)" + ");");
+
+    runStatement(conn,
+        "CREATE TABLE StudyType (" + "typeId BIGINT NOT NULL," + "name VARCHAR(255) NOT NULL," + "PRIMARY KEY (typeId)" + ");");
+
+    runStatement(conn,
+        "CREATE TABLE Study_Experiment (" + "Study_studyId BIGINT NOT NULL," + "experiments_experimentId BIGINT NOT NULL" + ");");
+
+    runStatement(conn,
+        "CREATE TABLE Submission (" + "submissionId BIGINT NOT NULL," + "creationDate DATE NOT NULL," + "submittedDate DATE DEFAULT NULL,"
+            + "verified BIT NOT NULL," + "description VARCHAR(255)," + "name VARCHAR(255)," + "title VARCHAR(255),"
+            + "accession VARCHAR(50) DEFAULT NULL," + "alias VARCHAR(30) DEFAULT NULL," + "completed BIT NOT NULL,"
+            + "PRIMARY KEY (submissionId)" + ");");
+
+    runStatement(conn, "CREATE TABLE Submission_Experiment (" + "submission_submissionId BIGINT NOT NULL,"
+        + "experiments_experimentId BIGINT NOT NULL" + ");");
+
+    runStatement(conn,
+        "CREATE TABLE Submission_Partition_Dilution (" + "submission_submissionId BIGINT NOT NULL,"
+            + "partition_partitionId BIGINT NOT NULL," + "dilution_dilutionId BIGINT NOT NULL,"
+            + "PRIMARY KEY (submission_submissionId,partition_partitionId,dilution_dilutionId)" + ");");
+
+    runStatement(conn,
+        "CREATE TABLE Submission_Sample (" + "submission_submissionId BIGINT NOT NULL," + "samples_sampleId BIGINT NOT NULL" + ");");
+
+    runStatement(conn,
+        "CREATE TABLE Submission_Study (" + "submission_submissionId BIGINT NOT NULL," + "studies_studyId BIGINT NOT NULL" + ");");
+
+    runStatement(conn,
+        "CREATE TABLE TagBarcodes (" + "tagId BIGINT NOT NULL," + "name VARCHAR(10) NOT NULL," + "sequence VARCHAR(20) NOT NULL,"
+            + "platformName VARCHAR(20) NOT NULL," + "strategyName VARCHAR(100) NOT NULL," + "PRIMARY KEY  (tagId)" + ");");
+
+    runStatement(conn,
+        "CREATE TABLE User (" + "userId BIGINT NOT NULL," + "active BIT NOT NULL," + "admin BIT NOT NULL," + "external BIT NOT NULL,"
+            + "fullName VARCHAR(255) default NULL," + "internal BIT NOT NULL," + "loginName VARCHAR(255) default NULL," + "roles BINARY,"
+            + "password VARCHAR(255) default NULL," + "email VARCHAR(255) default NULL," + "PRIMARY KEY  (userId)" + ");");
+
+    runStatement(conn, "CREATE TABLE User_Group (" + "users_userId BIGINT NOT NULL," + "groups_groupId BIGINT NOT NULL" + ");");
+
+    runStatement(conn, "CREATE TABLE _Group (" + "groupId BIGINT NOT NULL," + "description VARCHAR(255) default NULL,"
+        + "name VARCHAR(255) default NULL," + "PRIMARY KEY  (groupId)" + ");");
+
+    runStatement(conn,
+        "CREATE TABLE emPCR (" + "pcrId BIGINT NOT NULL," + "concentration DOUBLE NOT NULL," + "dilution_dilutionId BIGINT NOT NULL,"
+            + "creationDate DATE NOT NULL," + "pcrUserName VARCHAR(255) NOT NULL," + "name VARCHAR(255) NOT NULL,"
+            + "securityProfile_profileId BIGINT default NULL," + "PRIMARY KEY  (pcrId)" + ");");
+
+    runStatement(conn,
+        "CREATE TABLE emPCRDilution (" + "dilutionId BIGINT NOT NULL," + "concentration DOUBLE NOT NULL," + "emPCR_pcrId BIGINT NOT NULL,"
+            + "identificationBarcode VARCHAR(255) default NULL," + "creationDate DATE NOT NULL," + "dilutionUserName VARCHAR(255) NOT NULL,"
+            + "name VARCHAR(255) NOT NULL," + "securityProfile_profileId BIGINT default NULL," + "PRIMARY KEY  (dilutionId)" + ");");
+
+    runStatement(conn, "CREATE TABLE Watcher (" + "entityName VARCHAR(4) NOT NULL," + "userId BIGINT NOT NULL" + ");");
 
     System.out.println("...done!");
     conn.close();

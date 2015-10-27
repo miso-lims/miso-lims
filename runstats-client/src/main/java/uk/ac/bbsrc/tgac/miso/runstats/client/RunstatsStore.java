@@ -23,17 +23,13 @@
 
 package uk.ac.bbsrc.tgac.miso.runstats.client;
 
-import uk.ac.bbsrc.tgac.miso.core.store.Remover;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
-
-import java.io.IOException;
-import java.util.Collection;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.store
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 22-Sep-2011
  * @since 0.1.2

@@ -43,7 +43,7 @@ import java.util.*;
  * uk.ac.bbsrc.tgac.miso.notification.handler
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 08-Dec-2010
  * @since version
@@ -70,7 +70,8 @@ public class NotificationJobLauncher implements JobLauncher, InitializingBean {
   }
 
   @Override
-  public JobExecution run(final Job job, final JobParameters jobParameters) throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException, JobParametersInvalidException {
+  public JobExecution run(final Job job, final JobParameters jobParameters)
+      throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException, JobParametersInvalidException {
     Assert.notNull(job, "The Job must not be null.");
     Assert.notNull(jobParameters, "The JobParameters must not be null.");
 
@@ -87,10 +88,8 @@ public class NotificationJobLauncher implements JobLauncher, InitializingBean {
     job.getJobParametersValidator().validate(jobParameters);
 
     /*
-     * There is a very small probability that a non-restartable job can be
-     * restarted, but only if another process or thread manages to launch
-     * <i>and</i> fail a job execution for this instance between the last
-     * assertion and the next method returning successfully.
+     * There is a very small probability that a non-restartable job can be restarted, but only if another process or thread manages to
+     * launch <i>and</i> fail a job execution for this instance between the last assertion and the next method returning successfully.
      */
     jobExecution = repository.createJobExecution(job.getName(), jobParameters);
 
@@ -100,8 +99,7 @@ public class NotificationJobLauncher implements JobLauncher, InitializingBean {
         jobParameters.getParameters().put(key, param);
         taskExecutor.execute(new NotificationRunnable(job, jobParameters, jobExecution));
       }
-    }
-    catch (TaskRejectedException e) {
+    } catch (TaskRejectedException e) {
       jobExecution.upgradeStatus(BatchStatus.FAILED);
       if (jobExecution.getExitStatus().equals(ExitStatus.UNKNOWN)) {
         jobExecution.setExitStatus(ExitStatus.FAILED.addExitDescription(e));
@@ -112,6 +110,7 @@ public class NotificationJobLauncher implements JobLauncher, InitializingBean {
     return jobExecution;
   }
 
+  @Override
   public void afterPropertiesSet() throws Exception {
     Assert.state(repository != null, "A JobRepository has not been set.");
     if (taskExecutor == null) {
@@ -131,18 +130,15 @@ public class NotificationJobLauncher implements JobLauncher, InitializingBean {
       this.jobExecution = jobExecution;
     }
 
+    @Override
     public void run() {
       try {
-        log.info("Job: [" + job + "] launched with the following parameters: [" + jobParameters
-                 + "]");
+        log.info("Job: [" + job + "] launched with the following parameters: [" + jobParameters + "]");
         job.execute(jobExecution);
-        log.info("Job: [" + job + "] completed with the following parameters: [" + jobParameters
-                 + "] and the following status: [" + jobExecution.getStatus() + "]");
-      }
-      catch (Throwable t) {
-        log.info("Job: [" + job
-                 + "] failed unexpectedly and fatally with the following parameters: [" + jobParameters
-                 + "]", t);
+        log.info("Job: [" + job + "] completed with the following parameters: [" + jobParameters + "] and the following status: ["
+            + jobExecution.getStatus() + "]");
+      } catch (Throwable t) {
+        log.info("Job: [" + job + "] failed unexpectedly and fatally with the following parameters: [" + jobParameters + "]", t);
         rethrow(t);
       }
     }
@@ -150,8 +146,7 @@ public class NotificationJobLauncher implements JobLauncher, InitializingBean {
     private void rethrow(Throwable t) {
       if (t instanceof RuntimeException) {
         throw (RuntimeException) t;
-      }
-      else if (t instanceof Error) {
+      } else if (t instanceof Error) {
         throw (Error) t;
       }
       throw new IllegalStateException(t);

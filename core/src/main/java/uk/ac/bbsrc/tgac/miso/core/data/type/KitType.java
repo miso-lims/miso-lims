@@ -30,20 +30,16 @@ import java.util.Map;
 
 /**
  * Enum representing all potential Kit types
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public enum KitType {
-  LIBRARY("Library"),
-  SEQUENCING("Sequencing"),
-  EMPCR("EmPCR"),
-  CLUSTERING("Clustering"),
-  MULTIPLEXING("Multiplexing");
+  LIBRARY("Library"), SEQUENCING("Sequencing"), EMPCR("EmPCR"), CLUSTERING("Clustering"), MULTIPLEXING("Multiplexing");
 
-  /** Field key  */
+  /** Field key */
   private String key;
-  /** Field lookup  */
+  /** Field lookup */
   private static final Map<String, KitType> lookup = new HashMap<String, KitType>();
 
   static {
@@ -53,8 +49,9 @@ public enum KitType {
 
   /**
    * Constructs a KitType based on a given key
-   *
-   * @param key of type String
+   * 
+   * @param key
+   *          of type String
    */
   KitType(String key) {
     this.key = key;
@@ -62,8 +59,9 @@ public enum KitType {
 
   /**
    * Returns a KitType given an enum key
-   *
-   * @param key of type String
+   * 
+   * @param key
+   *          of type String
    * @return KitType
    */
   public static KitType get(String key) {
@@ -72,7 +70,7 @@ public enum KitType {
 
   /**
    * Returns the key of this KitType enum.
-   *
+   * 
    * @return String key.
    */
   public String getKey() {
@@ -81,7 +79,7 @@ public enum KitType {
 
   /**
    * Returns the keys of this KitType enum.
-   *
+   * 
    * @return ArrayList<String> keys.
    */
   public static ArrayList<String> getKeys() {

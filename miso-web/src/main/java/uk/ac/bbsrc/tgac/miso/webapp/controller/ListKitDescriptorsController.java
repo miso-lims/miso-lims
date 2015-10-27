@@ -28,13 +28,11 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
@@ -62,13 +60,12 @@ public class ListKitDescriptorsController {
     try {
       model.addAttribute("sequencing", requestManager.listKitDescriptorsByType(KitType.SEQUENCING));
       model.addAttribute("empcr", requestManager.listKitDescriptorsByType(KitType.EMPCR));
-      model.addAttribute("library",requestManager.listKitDescriptorsByType(KitType.LIBRARY));
-      model.addAttribute("clustering",requestManager.listKitDescriptorsByType(KitType.CLUSTERING));
-      model.addAttribute("multiplexing",requestManager.listKitDescriptorsByType(KitType.MULTIPLEXING));
+      model.addAttribute("library", requestManager.listKitDescriptorsByType(KitType.LIBRARY));
+      model.addAttribute("clustering", requestManager.listKitDescriptorsByType(KitType.CLUSTERING));
+      model.addAttribute("multiplexing", requestManager.listKitDescriptorsByType(KitType.MULTIPLEXING));
 
       return new ModelAndView("/pages/listKitDescriptors.jsp", model);
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to list Kit Descriptors", ex);
       }

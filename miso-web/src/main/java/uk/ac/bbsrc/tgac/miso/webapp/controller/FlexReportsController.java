@@ -32,41 +32,26 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller;
  * @since 0.1.2
  */
 
-import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
-import com.lowagie.text.Document;
 import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.MetaDataAccessException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.ServletRequestUtils;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
-import uk.ac.bbsrc.tgac.miso.core.data.*;
-import uk.ac.bbsrc.tgac.miso.core.data.decorator.itext.ITextProjectDecorator;
-import uk.ac.bbsrc.tgac.miso.core.exception.ReportingException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 @RequestMapping("/flexreports")
 @Controller
@@ -98,29 +83,25 @@ public class FlexReportsController {
     this.interfaceTemplate = interfaceTemplate;
   }
 
-
   @RequestMapping(method = RequestMethod.GET)
   public ModelAndView query(ModelMap modelMap) {
     try {
       modelMap.put("tables", DbUtils.getTables(interfaceTemplate));
-    }
-    catch (MetaDataAccessException e) {
+    } catch (MetaDataAccessException e) {
       e.printStackTrace();
-    }
-    catch (SQLException e) {
+    } catch (SQLException e) {
       e.printStackTrace();
     }
     return new ModelAndView("/pages/flexreport.jsp", modelMap);
   }
 
-    @RequestMapping(method = RequestMethod.POST)
+  @RequestMapping(method = RequestMethod.POST)
   public void postReport(ModelMap modelMap, HttpServletRequest request, HttpServletResponse response) {
     try {
       String j = ServletRequestUtils.getRequiredStringParameter(request, "json");
       JSONObject json = JSONObject.fromObject(j);
       log.info(json.toString());
-    }
-    catch (ServletRequestBindingException e) {
+    } catch (ServletRequestBindingException e) {
       e.printStackTrace();
     }
   }

@@ -25,16 +25,18 @@ package uk.ac.bbsrc.tgac.miso.core.service.integration.ws.solid;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
-
 /**
- * <p>Java class for run complex type.
+ * <p>
+ * Java class for run complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="run">
@@ -62,333 +64,287 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "run", propOrder = {
-    "creator",
-    "dateCompleted",
-    "dateCreated",
-    "dateStarted",
-    "flowcellNum",
-    "id",
-    "instrumentName",
-    "name",
-    "numberOfSamples",
-    "qualityMetrics",
-    "sampleInfoList",
-    "xml"
-})
+@XmlType(name = "run", propOrder = { "creator", "dateCompleted", "dateCreated", "dateStarted", "flowcellNum", "id", "instrumentName",
+    "name", "numberOfSamples", "qualityMetrics", "sampleInfoList", "xml" })
 public class Run {
 
-    protected String creator;
-    protected String dateCompleted;
-    protected String dateCreated;
-    protected String dateStarted;
-    protected String flowcellNum;
-    protected String id;
-    protected String instrumentName;
-    protected String name;
-    protected Integer numberOfSamples;
-    @XmlElement(nillable = true)
-    protected List<QualityMetrics> qualityMetrics;
-    @XmlElement(nillable = true)
-    protected List<SampleInfo> sampleInfoList;
-    protected String xml;
+  protected String creator;
+  protected String dateCompleted;
+  protected String dateCreated;
+  protected String dateStarted;
+  protected String flowcellNum;
+  protected String id;
+  protected String instrumentName;
+  protected String name;
+  protected Integer numberOfSamples;
+  @XmlElement(nillable = true)
+  protected List<QualityMetrics> qualityMetrics;
+  @XmlElement(nillable = true)
+  protected List<SampleInfo> sampleInfoList;
+  protected String xml;
 
-    /**
-     * Gets the value of the creator property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getCreator() {
-        return creator;
-    }
+  /**
+   * Gets the value of the creator property.
+   * 
+   * @return possible object is {@link String }
+   * 
+   */
+  public String getCreator() {
+    return creator;
+  }
 
-    /**
-     * Sets the value of the creator property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setCreator(String value) {
-        this.creator = value;
-    }
+  /**
+   * Sets the value of the creator property.
+   * 
+   * @param value
+   *          allowed object is {@link String }
+   * 
+   */
+  public void setCreator(String value) {
+    this.creator = value;
+  }
 
-    /**
-     * Gets the value of the dateCompleted property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getDateCompleted() {
-        return dateCompleted;
-    }
+  /**
+   * Gets the value of the dateCompleted property.
+   * 
+   * @return possible object is {@link String }
+   * 
+   */
+  public String getDateCompleted() {
+    return dateCompleted;
+  }
 
-    /**
-     * Sets the value of the dateCompleted property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setDateCompleted(String value) {
-        this.dateCompleted = value;
-    }
+  /**
+   * Sets the value of the dateCompleted property.
+   * 
+   * @param value
+   *          allowed object is {@link String }
+   * 
+   */
+  public void setDateCompleted(String value) {
+    this.dateCompleted = value;
+  }
 
-    /**
-     * Gets the value of the dateCreated property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getDateCreated() {
-        return dateCreated;
-    }
+  /**
+   * Gets the value of the dateCreated property.
+   * 
+   * @return possible object is {@link String }
+   * 
+   */
+  public String getDateCreated() {
+    return dateCreated;
+  }
 
-    /**
-     * Sets the value of the dateCreated property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setDateCreated(String value) {
-        this.dateCreated = value;
-    }
+  /**
+   * Sets the value of the dateCreated property.
+   * 
+   * @param value
+   *          allowed object is {@link String }
+   * 
+   */
+  public void setDateCreated(String value) {
+    this.dateCreated = value;
+  }
 
-    /**
-     * Gets the value of the dateStarted property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getDateStarted() {
-        return dateStarted;
-    }
+  /**
+   * Gets the value of the dateStarted property.
+   * 
+   * @return possible object is {@link String }
+   * 
+   */
+  public String getDateStarted() {
+    return dateStarted;
+  }
 
-    /**
-     * Sets the value of the dateStarted property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setDateStarted(String value) {
-        this.dateStarted = value;
-    }
+  /**
+   * Sets the value of the dateStarted property.
+   * 
+   * @param value
+   *          allowed object is {@link String }
+   * 
+   */
+  public void setDateStarted(String value) {
+    this.dateStarted = value;
+  }
 
-    /**
-     * Gets the value of the flowcellNum property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getFlowcellNum() {
-        return flowcellNum;
-    }
+  /**
+   * Gets the value of the flowcellNum property.
+   * 
+   * @return possible object is {@link String }
+   * 
+   */
+  public String getFlowcellNum() {
+    return flowcellNum;
+  }
 
-    /**
-     * Sets the value of the flowcellNum property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setFlowcellNum(String value) {
-        this.flowcellNum = value;
-    }
+  /**
+   * Sets the value of the flowcellNum property.
+   * 
+   * @param value
+   *          allowed object is {@link String }
+   * 
+   */
+  public void setFlowcellNum(String value) {
+    this.flowcellNum = value;
+  }
 
-    /**
-     * Gets the value of the id property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getId() {
-        return id;
-    }
+  /**
+   * Gets the value of the id property.
+   * 
+   * @return possible object is {@link String }
+   * 
+   */
+  public String getId() {
+    return id;
+  }
 
-    /**
-     * Sets the value of the id property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setId(String value) {
-        this.id = value;
-    }
+  /**
+   * Sets the value of the id property.
+   * 
+   * @param value
+   *          allowed object is {@link String }
+   * 
+   */
+  public void setId(String value) {
+    this.id = value;
+  }
 
-    /**
-     * Gets the value of the instrumentName property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getInstrumentName() {
-        return instrumentName;
-    }
+  /**
+   * Gets the value of the instrumentName property.
+   * 
+   * @return possible object is {@link String }
+   * 
+   */
+  public String getInstrumentName() {
+    return instrumentName;
+  }
 
-    /**
-     * Sets the value of the instrumentName property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setInstrumentName(String value) {
-        this.instrumentName = value;
-    }
+  /**
+   * Sets the value of the instrumentName property.
+   * 
+   * @param value
+   *          allowed object is {@link String }
+   * 
+   */
+  public void setInstrumentName(String value) {
+    this.instrumentName = value;
+  }
 
-    /**
-     * Gets the value of the name property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getName() {
-        return name;
-    }
+  /**
+   * Gets the value of the name property.
+   * 
+   * @return possible object is {@link String }
+   * 
+   */
+  public String getName() {
+    return name;
+  }
 
-    /**
-     * Sets the value of the name property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setName(String value) {
-        this.name = value;
-    }
+  /**
+   * Sets the value of the name property.
+   * 
+   * @param value
+   *          allowed object is {@link String }
+   * 
+   */
+  public void setName(String value) {
+    this.name = value;
+  }
 
-    /**
-     * Gets the value of the numberOfSamples property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Integer }
-     *     
-     */
-    public Integer getNumberOfSamples() {
-        return numberOfSamples;
-    }
+  /**
+   * Gets the value of the numberOfSamples property.
+   * 
+   * @return possible object is {@link Integer }
+   * 
+   */
+  public Integer getNumberOfSamples() {
+    return numberOfSamples;
+  }
 
-    /**
-     * Sets the value of the numberOfSamples property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Integer }
-     *     
-     */
-    public void setNumberOfSamples(Integer value) {
-        this.numberOfSamples = value;
-    }
+  /**
+   * Sets the value of the numberOfSamples property.
+   * 
+   * @param value
+   *          allowed object is {@link Integer }
+   * 
+   */
+  public void setNumberOfSamples(Integer value) {
+    this.numberOfSamples = value;
+  }
 
-    /**
-     * Gets the value of the qualityMetrics property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the qualityMetrics property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getQualityMetrics().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link QualityMetrics }
-     * 
-     * 
-     */
-    public List<QualityMetrics> getQualityMetrics() {
-        if (qualityMetrics == null) {
-            qualityMetrics = new ArrayList<QualityMetrics>();
-        }
-        return this.qualityMetrics;
+  /**
+   * Gets the value of the qualityMetrics property.
+   * 
+   * <p>
+   * This accessor method returns a reference to the live list, not a snapshot. Therefore any modification you make to the returned list
+   * will be present inside the JAXB object. This is why there is not a <CODE>set</CODE> method for the qualityMetrics property.
+   * 
+   * <p>
+   * For example, to add a new item, do as follows:
+   * 
+   * <pre>
+   * getQualityMetrics().add(newItem);
+   * </pre>
+   * 
+   * 
+   * <p>
+   * Objects of the following type(s) are allowed in the list {@link QualityMetrics }
+   * 
+   * 
+   */
+  public List<QualityMetrics> getQualityMetrics() {
+    if (qualityMetrics == null) {
+      qualityMetrics = new ArrayList<QualityMetrics>();
     }
+    return this.qualityMetrics;
+  }
 
-    /**
-     * Gets the value of the sampleInfoList property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the sampleInfoList property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getSampleInfoList().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link SampleInfo }
-     * 
-     * 
-     */
-    public List<SampleInfo> getSampleInfoList() {
-        if (sampleInfoList == null) {
-            sampleInfoList = new ArrayList<SampleInfo>();
-        }
-        return this.sampleInfoList;
+  /**
+   * Gets the value of the sampleInfoList property.
+   * 
+   * <p>
+   * This accessor method returns a reference to the live list, not a snapshot. Therefore any modification you make to the returned list
+   * will be present inside the JAXB object. This is why there is not a <CODE>set</CODE> method for the sampleInfoList property.
+   * 
+   * <p>
+   * For example, to add a new item, do as follows:
+   * 
+   * <pre>
+   * getSampleInfoList().add(newItem);
+   * </pre>
+   * 
+   * 
+   * <p>
+   * Objects of the following type(s) are allowed in the list {@link SampleInfo }
+   * 
+   * 
+   */
+  public List<SampleInfo> getSampleInfoList() {
+    if (sampleInfoList == null) {
+      sampleInfoList = new ArrayList<SampleInfo>();
     }
+    return this.sampleInfoList;
+  }
 
-    /**
-     * Gets the value of the xml property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getXml() {
-        return xml;
-    }
+  /**
+   * Gets the value of the xml property.
+   * 
+   * @return possible object is {@link String }
+   * 
+   */
+  public String getXml() {
+    return xml;
+  }
 
-    /**
-     * Sets the value of the xml property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setXml(String value) {
-        this.xml = value;
-    }
+  /**
+   * Sets the value of the xml property.
+   * 
+   * @param value
+   *          allowed object is {@link String }
+   * 
+   */
+  public void setXml(String value) {
+    this.xml = value;
+  }
 
 }

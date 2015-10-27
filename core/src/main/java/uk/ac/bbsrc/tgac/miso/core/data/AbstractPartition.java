@@ -31,7 +31,7 @@ import javax.persistence.*;
 
 /**
  * Skeleton implementation of a Partition
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -48,34 +48,42 @@ public abstract class AbstractPartition implements Partition {
   private Integer partitionNumber;
   private SequencerPartitionContainer sequencerPartitionContainer = null;
 
+  @Override
   public SequencerPartitionContainer getSequencerPartitionContainer() {
     return this.sequencerPartitionContainer;
   }
 
+  @Override
   public void setSequencerPartitionContainer(SequencerPartitionContainer sequencerPartitionContainer) {
     this.sequencerPartitionContainer = sequencerPartitionContainer;
   }
 
+  @Override
   public void setId(long id) {
     this.id = id;
   }
 
+  @Override
   public long getId() {
     return id;
   }
 
+  @Override
   public void setPartitionNumber(Integer partitionNumber) {
     this.partitionNumber = partitionNumber;
   }
 
+  @Override
   public Integer getPartitionNumber() {
     return partitionNumber;
   }
 
+  @Override
   public boolean userCanRead(User user) {
     return securityProfile.userCanRead(user);
   }
 
+  @Override
   public boolean userCanWrite(User user) {
     return securityProfile.userCanWrite(user);
   }
@@ -84,46 +92,42 @@ public abstract class AbstractPartition implements Partition {
     return getId() != AbstractPartition.UNSAVED_ID;
   }
 
+  @Override
   public void setSecurityProfile(SecurityProfile securityProfile) {
     this.securityProfile = securityProfile;
   }
 
+  @Override
   public SecurityProfile getSecurityProfile() {
     return securityProfile;
   }
 
+  @Override
   public void inheritPermissions(SecurableByProfile parent) throws SecurityException {
     if (parent.getSecurityProfile().getOwner() != null) {
       setSecurityProfile(parent.getSecurityProfile());
-    }
-    else {
+    } else {
       throw new SecurityException("Cannot inherit permissions when parent object owner is not set!");
     }
-  }  
+  }
 
   public abstract void buildSubmission();
 
   /**
-   * Equivalency is based on getProjectId() if set, otherwise on name,
-   * description and creation date.
+   * Equivalency is based on getProjectId() if set, otherwise on name, description and creation date.
    */
   @Override
   public boolean equals(Object obj) {
-    if (obj == null)
-      return false;
-    if (obj == this)
-      return true;
-    if (!(obj instanceof AbstractPartition))
-      return false;
+    if (obj == null) return false;
+    if (obj == this) return true;
+    if (!(obj instanceof AbstractPartition)) return false;
     AbstractPartition them = (AbstractPartition) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
-    if (getId() == AbstractPartition.UNSAVED_ID
-        || them.getId() == AbstractPartition.UNSAVED_ID) {
+    if (getId() == AbstractPartition.UNSAVED_ID || them.getId() == AbstractPartition.UNSAVED_ID) {
       return getPartitionNumber().equals(them.getPartitionNumber())
-             && getSequencerPartitionContainer().equals(them.getSequencerPartitionContainer());
-    }
-    else {
+          && getSequencerPartitionContainer().equals(them.getSequencerPartitionContainer());
+    } else {
       return this.getId() == them.getId();
     }
   }
@@ -131,9 +135,8 @@ public abstract class AbstractPartition implements Partition {
   @Override
   public int hashCode() {
     if (getId() != AbstractPartition.UNSAVED_ID) {
-      return (int)getId();
-    }
-    else {
+      return (int) getId();
+    } else {
       final int PRIME = 37;
       int hashcode = -1;
       if (getPartitionNumber() != null) hashcode = PRIME * hashcode + getPartitionNumber().hashCode();
@@ -144,12 +147,11 @@ public abstract class AbstractPartition implements Partition {
 
   @Override
   public int compareTo(Object o) {
-    Partition t = (Partition)o;
+    Partition t = (Partition) o;
     if (getId() != 0L && t.getId() != 0L) {
       if (getId() < t.getId()) return -1;
       if (getId() > t.getId()) return 1;
-    }
-    else {
+    } else {
       if (getPartitionNumber() < t.getPartitionNumber()) return -1;
       if (getPartitionNumber() > t.getPartitionNumber()) return 1;
     }

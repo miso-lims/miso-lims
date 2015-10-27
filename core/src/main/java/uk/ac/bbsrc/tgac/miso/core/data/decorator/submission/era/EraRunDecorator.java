@@ -30,10 +30,6 @@ import org.w3c.dom.Element;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.decorator.AbstractSubmittableDecorator;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
-import uk.ac.bbsrc.tgac.miso.core.service.submission.FilePathGenerator;
-import uk.ac.bbsrc.tgac.miso.core.service.submission.TGACIlluminaFilepathGenerator;
-
-import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
@@ -41,7 +37,7 @@ import java.util.Properties;
 
 /**
  * Decorates a SequencerPoolPartition so that an ERA Run submission XML document can be built from it
- *
+ * 
  * @author Rob Davey
  * @date 12-Oct-2010
  * @since 0.0.2
@@ -50,6 +46,7 @@ public class EraRunDecorator extends AbstractSubmittableDecorator<Document> {
 
   private Run r;
   protected static final Logger log = LoggerFactory.getLogger(EraRunDecorator.class);
+
   public EraRunDecorator(Submittable submittable, Properties submissionProperties, Document submission) {
     super(submittable, submissionProperties);
     this.submission = submission;
@@ -61,13 +58,14 @@ public class EraRunDecorator extends AbstractSubmittableDecorator<Document> {
     this.r = r;
   }
 
+  @Override
   public void buildSubmission() {
-    SequencerPoolPartition p = (SequencerPoolPartition)submittable;
+    SequencerPoolPartition p = (SequencerPoolPartition) submittable;
 
     if (p.getPool() != null) {
       Pool<? extends Poolable> pool = p.getPool();
 
-      //TODO - fix this. not great.
+      // TODO - fix this. not great.
       Run r = p.getSequencerPartitionContainer().getRun();
 
       if (r == null) r = this.r;
@@ -77,9 +75,9 @@ public class EraRunDecorator extends AbstractSubmittableDecorator<Document> {
 
         for (Poolable poolable : poolables) {
           Element run = submission.createElementNS(null, "RUN");
-          run.setAttribute("alias", "L00"+p.getPartitionNumber()+":"+poolable.getName()+":"+r.getAlias());
+          run.setAttribute("alias", "L00" + p.getPartitionNumber() + ":" + poolable.getName() + ":" + r.getAlias());
           run.setAttribute("run_center", submissionProperties.getProperty("submission.centreName"));
-          if (r.getStatus()!= null && r.getStatus().getHealth().equals(HealthType.Completed)) {
+          if (r.getStatus() != null && r.getStatus().getHealth().equals(HealthType.Completed)) {
             DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
             run.setAttribute("run_date", df.format(r.getStatus().getCompletionDate()));
           }
@@ -96,23 +94,23 @@ public class EraRunDecorator extends AbstractSubmittableDecorator<Document> {
           Element dataBlock = submission.createElementNS(null, "DATA_BLOCK");
           dataBlock.setAttribute("sector", Integer.toString(p.getPartitionNumber()));
           if (poolables.size() > 1) {
-            //multiplexed
+            // multiplexed
             dataBlock.setAttribute("member_name", poolable.getName());
           }
 
           Element files = submission.createElementNS(null, "FILES");
 
-//          FilePathGenerator fpg = new TGACIlluminaFilepathGenerator();
-//          String basePath = submissionProperties.getProperty("submission.baseReadPath");
-//          if (basePath != null) {
-//            fpg = new TGACIlluminaFilepathGenerator(basePath);
-//          }
+          // FilePathGenerator fpg = new TGACIlluminaFilepathGenerator();
+          // String basePath = submissionProperties.getProperty("submission.baseReadPath");
+          // if (basePath != null) {
+          // fpg = new TGACIlluminaFilepathGenerator(basePath);
+          // }
 
           try {
-            Element file = submission.createElementNS(null,"FILE");
-            file.setAttribute("filename", r.getAlias()+"/"+"00"+p.getPartitionNumber()+"/"+poolable.getName()+"_R1.fastq.gz");
+            Element file = submission.createElementNS(null, "FILE");
+            file.setAttribute("filename", r.getAlias() + "/" + "00" + p.getPartitionNumber() + "/" + poolable.getName() + "_R1.fastq.gz");
             file.setAttribute("filetype", "fastq");
-            file.setAttribute("quality_scoring_system","phred");
+            file.setAttribute("quality_scoring_system", "phred");
             file.setAttribute("quality_encoding", "ascii");
             file.setAttribute("ascii_offset", "!");
             file.setAttribute("checksum_method", "MD5");
@@ -123,10 +121,11 @@ public class EraRunDecorator extends AbstractSubmittableDecorator<Document> {
             files.appendChild(file);
 
             if (r.getPairedEnd()) {
-              Element file2 = submission.createElementNS(null,"FILE");
-              file2.setAttribute("filename", r.getAlias()+"/"+"00"+p.getPartitionNumber()+"/"+poolable.getName()+"_R2.fastq.gz");
+              Element file2 = submission.createElementNS(null, "FILE");
+              file2.setAttribute("filename",
+                  r.getAlias() + "/" + "00" + p.getPartitionNumber() + "/" + poolable.getName() + "_R2.fastq.gz");
               file2.setAttribute("filetype", "fastq");
-              file2.setAttribute("quality_scoring_system","phred");
+              file2.setAttribute("quality_scoring_system", "phred");
               file2.setAttribute("quality_encoding", "ascii");
               file2.setAttribute("ascii_offset", "!");
               file2.setAttribute("checksum_method", "MD5");
@@ -136,8 +135,7 @@ public class EraRunDecorator extends AbstractSubmittableDecorator<Document> {
               file2.appendChild(readLabel2);
               files.appendChild(file2);
             }
-          }
-          catch (Exception e) {
+          } catch (Exception e) {
             e.printStackTrace();
           }
 

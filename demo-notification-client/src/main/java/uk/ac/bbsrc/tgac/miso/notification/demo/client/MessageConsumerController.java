@@ -50,12 +50,12 @@ import java.util.Map;
  * message producers can POST messages to this controller.
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.1.4
  */
 @Controller
-@RequestMapping(value="/consumer")
+@RequestMapping(value = "/consumer")
 public class MessageConsumerController {
   protected static final Logger log = LoggerFactory.getLogger(MessageConsumerController.class);
 
@@ -80,7 +80,7 @@ public class MessageConsumerController {
     this.securityManager = securityManager;
   }
 
-  @RequestMapping(value="/illumina/run/status", method = RequestMethod.POST)
+  @RequestMapping(value = "/illumina/run/status", method = RequestMethod.POST)
   public String consumeGatewayIlluminaStatus(HttpServletRequest request) throws IOException {
     for (NotificationGateway s : notificationGatewayService.getGatewaysFor(PlatformType.ILLUMINA)) {
       log.debug("Using " + s.toString());
@@ -90,7 +90,7 @@ public class MessageConsumerController {
   }
 
   private MultiValueMap<String, String> exposeRequest(HttpServletRequest request) {
-    log.debug("Request size: "+request.getContentLength());
+    log.debug("Request size: " + request.getContentLength());
     Map<String, Object> map = request.getParameterMap();
     log.debug("RAW MAP: " + map.toString());
     MultiValueMap<String, String> message = new LinkedMultiValueMap<String, String>();

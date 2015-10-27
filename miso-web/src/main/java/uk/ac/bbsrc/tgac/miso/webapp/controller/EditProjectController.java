@@ -1,4 +1,4 @@
- /*
+/*
  * Copyright (c) 2012. The Genome Analysis Centre, Norwich, UK
  * MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
  * *********************************************************************
@@ -25,10 +25,21 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
 
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,29 +49,50 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
-import uk.ac.bbsrc.tgac.miso.core.data.*;
-import com.eaglegenomics.simlims.core.User;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.*;
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractProject;
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractSampleQC;
+import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
+import uk.ac.bbsrc.tgac.miso.core.data.Plate;
+import uk.ac.bbsrc.tgac.miso.core.data.Plateable;
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
+import uk.ac.bbsrc.tgac.miso.core.data.Study;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCR;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryQcException;
+import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
+import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
+import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
-import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
-import uk.ac.bbsrc.tgac.miso.webapp.context.ApplicationContextProvider;
 
-import javax.servlet.http.HttpServletRequest;
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
- @Controller
+@Controller
 @RequestMapping("/project")
 @SessionAttributes("project")
 public class EditProjectController {
@@ -111,7 +143,7 @@ public class EditProjectController {
     if (projectId != AbstractProject.UNSAVED_ID) {
       Project p = requestManager.getProjectById(projectId);
       if (p != null) {
-        //User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+        // User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
         Map<Integer, String> fileMap = new HashMap<Integer, String>();
         for (String s : filesManager.getFileNames(Project.class, projectId.toString())) {
           fileMap.put(s.hashCode(), s);
@@ -160,11 +192,10 @@ public class EditProjectController {
       for (Run r : runs) {
         RunImpl ri = (RunImpl) r;
         ri.setSequencerPartitionContainers(new ArrayList<SequencerPartitionContainer<SequencerPoolPartition>>(
-                requestManager.listSequencerPartitionContainersByRunId(r.getId())));
+            requestManager.listSequencerPartitionContainersByRunId(r.getId())));
       }
       return runs;
-    }
-    catch (NoSuchMethodException e) {
+    } catch (NoSuchMethodException e) {
       throw new IOException(e);
     }
   }
@@ -177,14 +208,12 @@ public class EditProjectController {
         for (LibraryQC qc : requestManager.listAllLibraryQCsByLibraryId(l.getId())) {
           try {
             l.addQc(qc);
-          }
-          catch (MalformedLibraryQcException e) {
+          } catch (MalformedLibraryQcException e) {
             throw new IOException(e);
           }
         }
       }
-    }
-    catch (NoSuchMethodException e) {
+    } catch (NoSuchMethodException e) {
       throw new IOException(e);
     }
 
@@ -253,8 +282,10 @@ public class EditProjectController {
     return dilutions;
   }
 
-  public Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> populateProjectPlates(long projectId) throws IOException {
-    List<Plate<? extends List<? extends Plateable>, ? extends Plateable>> plates = new ArrayList<Plate<? extends List<? extends Plateable>, ? extends Plateable>>(requestManager.listAllPlatesByProjectId(projectId));
+  public Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> populateProjectPlates(long projectId)
+      throws IOException {
+    List<Plate<? extends List<? extends Plateable>, ? extends Plateable>> plates = new ArrayList<Plate<? extends List<? extends Plateable>, ? extends Plateable>>(
+        requestManager.listAllPlatesByProjectId(projectId));
     Collections.sort(plates);
     return plates;
   }
@@ -280,9 +311,7 @@ public class EditProjectController {
   }
 
   @RequestMapping(value = "/graph/{projectId}", method = RequestMethod.GET)
-  public
-  @ResponseBody
-  JSONObject graphRest(@PathVariable Long projectId) throws IOException {
+  public @ResponseBody JSONObject graphRest(@PathVariable Long projectId) throws IOException {
     JSONObject j = new JSONObject();
     try {
       Collection<Sample> samples = requestManager.listAllSamplesByProjectId(projectId);
@@ -294,12 +323,9 @@ public class EditProjectController {
       JSONObject samplesJSON = new JSONObject();
 
       for (Run run : runs) {
-        if (run.getStatus() != null
-            && run.getStatus().getHealth() != null
-            && run.getStatus().getHealth().getKey().equals("Completed")) {
+        if (run.getStatus() != null && run.getStatus().getHealth() != null && run.getStatus().getHealth().getKey().equals("Completed")) {
           runsJSON.put(run.getName(), "1");
-        }
-        else {
+        } else {
           runsJSON.put(run.getName(), "0");
         }
       }
@@ -308,8 +334,7 @@ public class EditProjectController {
         Collection<Experiment> experiments = requestManager.listAllExperimentsByStudyId(study.getId());
         if (experiments.size() == 0) {
           studiesJSON.put(study.getName(), "2");
-        }
-        else {
+        } else {
           JSONObject experimentsJSON = new JSONObject();
           for (Experiment e : experiments) {
             experimentsJSON.put(e.getName(), "2");
@@ -323,12 +348,10 @@ public class EditProjectController {
         if (libraries.size() == 0) {
           if (sample.getQcPassed()) {
             samplesJSON.put(sample.getName(), "1");
-          }
-          else {
+          } else {
             samplesJSON.put(sample.getName(), "0");
           }
-        }
-        else {
+        } else {
           JSONObject librariesJSON = new JSONObject();
           for (Library library : libraries) {
             Collection<LibraryDilution> lds = requestManager.listAllLibraryDilutionsByLibraryId(library.getId());
@@ -338,12 +361,10 @@ public class EditProjectController {
                 dilutionsJSON.put(ld.getName(), "2");
               }
               librariesJSON.put(library.getName(), dilutionsJSON);
-            }
-            else {
+            } else {
               if (library.getLibraryQCs().size() > 0) {
                 librariesJSON.put(library.getName(), "1");
-              }
-              else {
+              } else {
                 librariesJSON.put(library.getName(), "0");
               }
             }
@@ -357,8 +378,7 @@ public class EditProjectController {
       j.put("Samples", samplesJSON);
 
       return j;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
@@ -370,18 +390,14 @@ public class EditProjectController {
   }
 
   @RequestMapping(value = "/{projectId}", method = RequestMethod.GET)
-  public ModelAndView setupForm(@PathVariable Long projectId,
-                                ModelMap model) throws IOException {
+  public ModelAndView setupForm(@PathVariable Long projectId, ModelMap model) throws IOException {
     try {
-      User user = securityManager
-              .getUserByLoginName(SecurityContextHolder.getContext()
-                      .getAuthentication().getName());
+      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Project project = null;
       if (projectId == AbstractProject.UNSAVED_ID) {
         project = dataObjectFactory.getProject(user);
         model.put("title", "New Project");
-      }
-      else {
+      } else {
         project = requestManager.getProjectById(projectId);
         model.put("title", "Project " + projectId);
         model.put("projectRuns", populateProjectRuns(projectId));
@@ -414,7 +430,7 @@ public class EditProjectController {
       model.put("formObj", project);
       model.put("project", project);
       model.put("projectFiles", populateProjectFiles(projectId));
-      //model.put("projectRuns", requestManager.listAllRunsByProjectId(projectId));
+      // model.put("projectRuns", requestManager.listAllRunsByProjectId(projectId));
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, project, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, project, securityManager.listAllUsers()));
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, project, securityManager.listAllGroups()));
@@ -422,7 +438,7 @@ public class EditProjectController {
 
       Map<Long, String> overviewMap = new HashMap<Long, String>();
       for (ProjectOverview po : project.getOverviews()) {
-        //log.debug(po.getWatchers().toString());
+        // log.debug(po.getWatchers().toString());
         if (po.getWatchers().contains(user)) {
           overviewMap.put(po.getId(), user.getLoginName());
         }
@@ -430,8 +446,7 @@ public class EditProjectController {
       model.put("overviewMap", overviewMap);
 
       return new ModelAndView("/pages/editProject.jsp", model);
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to show project", ex);
       }
@@ -440,12 +455,10 @@ public class EditProjectController {
   }
 
   @RequestMapping(method = RequestMethod.POST)
-  public String processSubmit(@ModelAttribute("project") Project project,
-                              ModelMap model, SessionStatus session, HttpServletRequest request) throws IOException {
+  public String processSubmit(@ModelAttribute("project") Project project, ModelMap model, SessionStatus session, HttpServletRequest request)
+      throws IOException {
     try {
-      User user = securityManager
-              .getUserByLoginName(SecurityContextHolder.getContext()
-                      .getAuthentication().getName());
+      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       if (!project.userCanWrite(user)) {
         throw new SecurityException("Permission denied.");
       }
@@ -453,12 +466,11 @@ public class EditProjectController {
       session.setComplete();
       model.clear();
       return "redirect:/miso/project/" + project.getProjectId();
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to save project", ex);
       }
       throw ex;
     }
   }
- }
+}

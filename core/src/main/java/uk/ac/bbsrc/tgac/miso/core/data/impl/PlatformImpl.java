@@ -23,16 +23,17 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractPlatform;
-
-import javax.persistence.*;
 import java.io.Serializable;
+
+import javax.persistence.Entity;
+
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractPlatform;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.data
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */

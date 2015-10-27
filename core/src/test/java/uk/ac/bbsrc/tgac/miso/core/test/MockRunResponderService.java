@@ -44,7 +44,7 @@ import java.util.Set;
  * uk.ac.bbsrc.tgac.miso.core.test
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 27/09/11
  * @since 0.1.2
@@ -66,7 +66,7 @@ public class MockRunResponderService implements ResponderService {
   @Override
   public boolean respondsTo(Event event) {
     if (event instanceof RunEvent) {
-      RunEvent re = (RunEvent)event;
+      RunEvent re = (RunEvent) event;
       Run r = re.getEventObject();
       log.info("Checking responder for run " + r.getId());
       if (r.getStatus() != null) {
@@ -87,13 +87,12 @@ public class MockRunResponderService implements ResponderService {
     u.setFullName("Foo bar");
     Alert a = new MockAlert(u);
     a.setAlertTitle("New alert for " + u.getFullName());
-    a.setAlertText(a.getAlertText() + " ("+event.getEventMessage()+")");
+    a.setAlertText(a.getAlertText() + " (" + event.getEventMessage() + ")");
 
     for (AlerterService as : alerterServices) {
       try {
         as.raiseAlert(a);
-      }
-      catch (AlertingException e) {
+      } catch (AlertingException e) {
         log.error("Cannot raise user-level alert:" + e.getMessage());
         e.printStackTrace();
       }

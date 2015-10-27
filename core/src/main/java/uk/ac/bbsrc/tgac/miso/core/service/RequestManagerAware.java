@@ -29,12 +29,13 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
  * uk.ac.bbsrc.tgac.miso.core.service
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 28/06/12
  * @since 0.1.6
  */
 public interface RequestManagerAware {
   RequestManager getRequestManager();
+
   void setRequestManager(RequestManager requestManager);
 }

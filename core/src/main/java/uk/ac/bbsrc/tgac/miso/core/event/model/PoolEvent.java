@@ -32,7 +32,7 @@ import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
  * uk.ac.bbsrc.tgac.miso.core.event.model
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 28/09/11
  * @since 0.1.6
@@ -49,6 +49,7 @@ public class PoolEvent implements Event<Pool> {
     this.eventType = eventType;
   }
 
+  @Override
   public Pool getEventObject() {
     return this.pool;
   }

@@ -32,7 +32,7 @@ import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
  * uk.ac.bbsrc.tgac.miso.core.event
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 26/09/11
  * @since 0.1.2
@@ -47,6 +47,7 @@ public class StatusChangedEvent<T> implements Event {
     this.currentStatus = s;
   }
 
+  @Override
   public T getEventObject() {
     return o;
   }

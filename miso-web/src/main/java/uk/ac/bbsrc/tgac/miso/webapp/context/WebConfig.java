@@ -14,7 +14,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.SessionConversationAttributeStore;
  * uk.ac.bbsrc.tgac.miso.webapp.context
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 07/02/13
  * @since 0.1.9
@@ -36,6 +36,7 @@ public class WebConfig extends WebMvcConfigurationSupport {
     return sessionAttributeStore;
   }
 
+  @Override
   @Bean
   public RequestMappingHandlerAdapter requestMappingHandlerAdapter() {
     RequestMappingHandlerAdapter adapter = super.requestMappingHandlerAdapter();

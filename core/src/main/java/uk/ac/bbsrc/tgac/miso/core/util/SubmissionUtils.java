@@ -41,7 +41,7 @@ import java.util.zip.GZIPInputStream;
 
 /**
  * Utility class to aid the submission of data to repositories
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -49,9 +49,10 @@ public class SubmissionUtils {
 
   /**
    * Creates an empty {@link Document} for use with the other helper methods in this class.
-   *
+   * 
    * @return Document
-   * @throws ParserConfigurationException when
+   * @throws ParserConfigurationException
+   *           when
    */
   public static Document emptyDocument() throws ParserConfigurationException {
     DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -60,12 +61,14 @@ public class SubmissionUtils {
 
   /**
    * Transforms a DOM Document into a file on disk
-   *
-   * @param fromDocument the Document to use as the source
-   * @param toPath       the destination file path represented as a String
+   * 
+   * @param fromDocument
+   *          the Document to use as the source
+   * @param toPath
+   *          the destination file path represented as a String
    * @throws java.io.IOException
    * @throws javax.xml.transform.TransformerException
-   *
+   * 
    */
   public static void transform(Document fromDocument, File toPath) throws TransformerException, IOException {
     Transformer transformer = TransformerFactory.newInstance().newTransformer();
@@ -78,13 +81,16 @@ public class SubmissionUtils {
 
   /**
    * Transforms a DOM Document into a file on disk
-   *
-   * @param fromDocument       the Document to use as the source
-   * @param toPath             the destination file path represented as a String
-   * @param omitXmlDeclaration will not write the XML header if true
+   * 
+   * @param fromDocument
+   *          the Document to use as the source
+   * @param toPath
+   *          the destination file path represented as a String
+   * @param omitXmlDeclaration
+   *          will not write the XML header if true
    * @throws java.io.IOException
    * @throws javax.xml.transform.TransformerException
-   *
+   * 
    */
   public static void transform(Document fromDocument, File toPath, boolean omitXmlDeclaration) throws TransformerException, IOException {
     Transformer transformer = TransformerFactory.newInstance().newTransformer();
@@ -98,12 +104,13 @@ public class SubmissionUtils {
 
   /**
    * Transforms a DOM Document into a String
-   *
-   * @param fromDocument the Document to use as the source
+   * 
+   * @param fromDocument
+   *          the Document to use as the source
    * @return the XML as a String
    * @throws java.io.IOException
    * @throws javax.xml.transform.TransformerException
-   *
+   * 
    */
   public static String transform(Document fromDocument) throws TransformerException, IOException {
     Transformer transformer = TransformerFactory.newInstance().newTransformer();
@@ -118,13 +125,15 @@ public class SubmissionUtils {
 
   /**
    * Transforms a DOM Document into a String
-   *
-   * @param fromDocument       the Document to use as the source
-   * @param omitXmlDeclaration will not write the XML header if true
+   * 
+   * @param fromDocument
+   *          the Document to use as the source
+   * @param omitXmlDeclaration
+   *          will not write the XML header if true
    * @return the XML as a String
    * @throws java.io.IOException
    * @throws javax.xml.transform.TransformerException
-   *
+   * 
    */
   public static String transform(Document fromDocument, boolean omitXmlDeclaration) throws TransformerException, IOException {
     Transformer transformer = TransformerFactory.newInstance().newTransformer();
@@ -144,8 +153,7 @@ public class SubmissionUtils {
     if (isCompressed(Files.readAllBytes(Paths.get(fromPath.toURI())))) {
       GZIPInputStream gzis = new GZIPInputStream(new FileInputStream(fromPath));
       reader = bomCheck(gzis);
-    }
-    else {
+    } else {
       reader = bomCheck(fromPath);
     }
     StringWriter sw = new StringWriter();
@@ -155,13 +163,15 @@ public class SubmissionUtils {
 
   /**
    * Transforms a File representing a DOM Document into a String
-   *
-   * @param fromPath           the File object to use as the source
-   * @param omitXmlDeclaration will not write the XML header if true
+   * 
+   * @param fromPath
+   *          the File object to use as the source
+   * @param omitXmlDeclaration
+   *          will not write the XML header if true
    * @return the XML as a String
    * @throws java.io.IOException
    * @throws javax.xml.transform.TransformerException
-   *
+   * 
    */
   public static String transform(File fromPath, boolean omitXmlDeclaration) throws TransformerException, IOException {
     Transformer transformer = TransformerFactory.newInstance().newTransformer();
@@ -172,8 +182,7 @@ public class SubmissionUtils {
     if (isCompressed(Files.readAllBytes(Paths.get(fromPath.toURI())))) {
       GZIPInputStream gzis = new GZIPInputStream(new FileInputStream(fromPath));
       reader = bomCheck(gzis);
-    }
-    else {
+    } else {
       reader = bomCheck(fromPath);
     }
 
@@ -188,9 +197,11 @@ public class SubmissionUtils {
 
   /**
    * Transforms a file on disk into a DOM Document
-   *
-   * @param fromPath   the File object to use as the source
-   * @param toDocument the destination Document
+   * 
+   * @param fromPath
+   *          the File object to use as the source
+   * @param toDocument
+   *          the destination Document
    * @throws javax.xml.transform.TransformerException
    * @throws java.io.IOException
    */
@@ -199,8 +210,7 @@ public class SubmissionUtils {
     if (isCompressed(Files.readAllBytes(Paths.get(fromPath.toURI())))) {
       GZIPInputStream gzis = new GZIPInputStream(new FileInputStream(fromPath));
       reader = bomCheck(gzis);
-    }
-    else {
+    } else {
       reader = bomCheck(fromPath);
     }
     TransformerFactory.newInstance().newTransformer().transform(new StreamSource(reader), new DOMResult(toDocument));
@@ -208,18 +218,19 @@ public class SubmissionUtils {
 
   /**
    * Transforms a streamed XML representation into a DOM Document
-   *
-   * @param in         the XML fragment as an input stream to use as the source
-   * @param toDocument the destination Document
+   * 
+   * @param in
+   *          the XML fragment as an input stream to use as the source
+   * @param toDocument
+   *          the destination Document
    * @throws javax.xml.transform.TransformerException
-   *
+   * 
    */
   public static void transform(InputStream in, Document toDocument) throws TransformerException {
     try {
       Reader reader = bomCheck(in);
       TransformerFactory.newInstance().newTransformer().transform(new StreamSource(reader), new DOMResult(toDocument));
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       throw new TransformerException("Cannot remove byte-order-mark from XML file");
     }
 
@@ -227,26 +238,29 @@ public class SubmissionUtils {
 
   /**
    * Transforms a streamed XML representation into a DOM Document
-   *
-   * @param reader     the XML fragment as an input stream to use as the source
-   * @param toDocument the destination Document
+   * 
+   * @param reader
+   *          the XML fragment as an input stream to use as the source
+   * @param toDocument
+   *          the destination Document
    * @throws javax.xml.transform.TransformerException
-   *
+   * 
    */
   public static void transform(UnicodeReader reader, Document toDocument) throws TransformerException {
     try {
       TransformerFactory.newInstance().newTransformer().transform(new StreamSource(reader), new DOMResult(toDocument));
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       throw new TransformerException("Cannot remove byte-order-mark from XML file");
     }
   }
 
   /**
    * Transforms a string path representing a file on disk into a DOM Document
-   *
-   * @param fromPath   the file path represented as a String to use as the source
-   * @param toDocument the destination Document
+   * 
+   * @param fromPath
+   *          the file path represented as a String to use as the source
+   * @param toDocument
+   *          the destination Document
    * @throws javax.xml.transform.TransformerException
    * @throws java.io.IOException
    */
@@ -255,8 +269,7 @@ public class SubmissionUtils {
     if (isCompressed(Files.readAllBytes(Paths.get(fromPath)))) {
       GZIPInputStream gzis = new GZIPInputStream(new FileInputStream(fromPath));
       reader = new UnicodeReader(gzis, "UTF-8");
-    }
-    else {
+    } else {
       reader = new UnicodeReader(new FileInputStream(new File(fromPath)), "UTF-8");
     }
 
@@ -265,9 +278,11 @@ public class SubmissionUtils {
 
   /**
    * Parses a string path representing an XML file on disk into a StringWriter
-   *
-   * @param fromPath the file path represented as a String to use as the source
-   * @param toWriter the destination StringWriter
+   * 
+   * @param fromPath
+   *          the file path represented as a String to use as the source
+   * @param toWriter
+   *          the destination StringWriter
    * @throws javax.xml.transform.TransformerException
    * @throws java.io.IOException
    */
@@ -277,9 +292,11 @@ public class SubmissionUtils {
 
   /**
    * Parses an XML file on disk into a Writer
-   *
-   * @param fromPath the file to use as the source
-   * @param toWriter the destination Writer
+   * 
+   * @param fromPath
+   *          the file to use as the source
+   * @param toWriter
+   *          the destination Writer
    * @throws javax.xml.transform.TransformerException
    * @throws java.io.IOException
    */
@@ -288,8 +305,7 @@ public class SubmissionUtils {
     if (isCompressed(Files.readAllBytes(Paths.get(fromPath.toURI())))) {
       GZIPInputStream gzis = new GZIPInputStream(new FileInputStream(fromPath));
       reader = bomCheck(gzis);
-    }
-    else {
+    } else {
       reader = bomCheck(fromPath);
     }
     TransformerFactory.newInstance().newTransformer().transform(new StreamSource(reader), new StreamResult(toWriter));
@@ -297,29 +313,30 @@ public class SubmissionUtils {
 
   /**
    * Parses an XML document into a Writer
-   *
-   * @param fromDocument the Document to use as the source
-   * @param toWriter     the destination Writer
+   * 
+   * @param fromDocument
+   *          the Document to use as the source
+   * @param toWriter
+   *          the destination Writer
    * @throws javax.xml.transform.TransformerException
-   *
+   * 
    */
   public static void transform(Document fromDocument, Writer toWriter) throws TransformerException {
     TransformerFactory.newInstance().newTransformer().transform(new DOMSource(fromDocument), new StreamResult(toWriter));
   }
 
-  private static char[] UTF32BE = {0x00, 0x00, 0xFE, 0xFF};
-  private static char[] UTF32LE = {0xFF, 0xFE, 0x00, 0x00};
-  private static char[] UTF16BE = {0xFE, 0xFF};
-  private static char[] UTF16LE = {0xFF, 0xFE};
-  private static char[] UTF8 = {0xEF, 0xBB, 0xBF};
-  private static char[] OTHER = {'\uFEFF'};
+  private static char[] UTF32BE = { 0x00, 0x00, 0xFE, 0xFF };
+  private static char[] UTF32LE = { 0xFF, 0xFE, 0x00, 0x00 };
+  private static char[] UTF16BE = { 0xFE, 0xFF };
+  private static char[] UTF16LE = { 0xFF, 0xFE };
+  private static char[] UTF8 = { 0xEF, 0xBB, 0xBF };
+  private static char[] OTHER = { '\uFEFF' };
 
   private static Reader bomCheck(InputStream in) throws IOException {
     UnicodeBOMInputStream bomStream = new UnicodeBOMInputStream(in);
     if (bomStream.getBOM() != UnicodeBOMInputStream.BOM.NONE) {
       return new BufferedReader(new InputStreamReader(bomStream.skipBOM()));
-    }
-    else {
+    } else {
       return new BufferedReader(new InputStreamReader(bomStream));
     }
   }
@@ -328,8 +345,7 @@ public class SubmissionUtils {
     UnicodeBOMInputStream bomStream = new UnicodeBOMInputStream(new FileInputStream(fromPath));
     if (bomStream.getBOM() != UnicodeBOMInputStream.BOM.NONE) {
       return new BufferedReader(new InputStreamReader(bomStream.skipBOM()));
-    }
-    else {
+    } else {
       return new BufferedReader(new InputStreamReader(bomStream));
     }
   }
@@ -370,6 +386,7 @@ public class SubmissionUtils {
   }
 
   public static boolean isCompressed(byte[] bytes) throws IOException {
-    return !((bytes == null) || (bytes.length < 2)) && ((bytes[0] == (byte) (GZIPInputStream.GZIP_MAGIC)) && (bytes[1] == (byte) (GZIPInputStream.GZIP_MAGIC >> 8)));
+    return !((bytes == null) || (bytes.length < 2))
+        && ((bytes[0] == (byte) (GZIPInputStream.GZIP_MAGIC)) && (bytes[1] == (byte) (GZIPInputStream.GZIP_MAGIC >> 8)));
   }
 }

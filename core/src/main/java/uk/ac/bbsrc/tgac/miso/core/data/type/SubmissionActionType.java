@@ -29,25 +29,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Enum representing all potential submission action types. These types should match the SRA submission schema for
- * submission actions. 
- *
+ * Enum representing all potential submission action types. These types should match the SRA submission schema for submission actions.
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public enum SubmissionActionType {
-  ADD("ADD"),
-  MODIFY("MODIFY"),
-  SUPPRESS("SUPPRESS"),
-  HOLD("HOLD"),
-  RELEASE("RELEASE"),
-  CLOSE("CLOSE"),
-  PROTECT("PROTECT"),
-  VALIDATE("VALIDATE");
+  ADD("ADD"), MODIFY("MODIFY"), SUPPRESS("SUPPRESS"), HOLD("HOLD"), RELEASE("RELEASE"), CLOSE("CLOSE"), PROTECT("PROTECT"), VALIDATE(
+      "VALIDATE");
 
-    /** Field key  */
+  /** Field key */
   private String key;
-  /** Field lookup  */
+  /** Field lookup */
   private static final Map<String, SubmissionActionType> lookup = new HashMap<String, SubmissionActionType>();
 
   static {
@@ -57,8 +50,9 @@ public enum SubmissionActionType {
 
   /**
    * Constructs a SubmissionActionType based on a given key
-   *
-   * @param key of type String
+   * 
+   * @param key
+   *          of type String
    */
   SubmissionActionType(String key) {
     this.key = key;
@@ -66,8 +60,9 @@ public enum SubmissionActionType {
 
   /**
    * Returns a SubmissionActionType given an enum key
-   *
-   * @param key of type String
+   * 
+   * @param key
+   *          of type String
    * @return SubmissionActionType
    */
   public static SubmissionActionType get(String key) {
@@ -76,7 +71,7 @@ public enum SubmissionActionType {
 
   /**
    * Returns the key of this SubmissionActionType object.
-   *
+   * 
    * @return String key.
    */
   public String getKey() {
@@ -85,7 +80,7 @@ public enum SubmissionActionType {
 
   /**
    * Returns the keys of this SubmissionActionType object.
-   *
+   * 
    * @return ArrayList<String> keys.
    */
   public static ArrayList<String> getKeys() {

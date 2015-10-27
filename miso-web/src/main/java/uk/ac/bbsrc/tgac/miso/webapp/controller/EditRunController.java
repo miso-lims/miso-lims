@@ -135,7 +135,7 @@ public class EditRunController {
 
   public Boolean isMultiplexed(Run run) throws IOException {
     if (run != null && run.getId() != AbstractRun.UNSAVED_ID) {
-      //for (SequencerPartitionContainer<SequencerPoolPartition> f : requestManager.listSequencerPartitionContainersByRunId(run.getId())) {
+      // for (SequencerPartitionContainer<SequencerPoolPartition> f : requestManager.listSequencerPartitionContainersByRunId(run.getId())) {
       for (SequencerPartitionContainer<SequencerPoolPartition> f : run.getSequencerPartitionContainers()) {
         for (SequencerPoolPartition p : f.getPartitions()) {
           if (p.getPool() != null && p.getPool().getDilutions().size() > 1) {
@@ -149,11 +149,11 @@ public class EditRunController {
 
   @ModelAttribute("metrixEnabled")
   public Boolean isMetrixEnabled() {
-    MisoPropertyExporter exporter = (MisoPropertyExporter)applicationContextProvider.getApplicationContext().getBean("propertyConfigurer");
+    MisoPropertyExporter exporter = (MisoPropertyExporter) ApplicationContextProvider.getApplicationContext().getBean("propertyConfigurer");
     Map<String, String> misoProperties = exporter.getResolvedProperties();
-    return misoProperties.containsKey("miso.notification.interop.enabled") && Boolean.parseBoolean(misoProperties.get("miso.notification.interop.enabled"));
+    return misoProperties.containsKey("miso.notification.interop.enabled")
+        && Boolean.parseBoolean(misoProperties.get("miso.notification.interop.enabled"));
   }
-
 
   public Boolean hasOperationsQcPassed(Run run) throws IOException {
     if (run != null && run.getId() != AbstractRun.UNSAVED_ID) {
@@ -204,61 +204,38 @@ public class EditRunController {
 
   @RequestMapping(value = "/new", method = RequestMethod.GET)
   public ModelAndView newUnassignedRun(ModelMap model) throws IOException {
-    //clear any existing run in the model
+    // clear any existing run in the model
     model.addAttribute("run", null);
     return setupForm(AbstractRun.UNSAVED_ID, model);
   }
 
-/*  @RequestMapping(value = "/new/experiment/{experimentId}", method = RequestMethod.GET)
-  public ModelAndView newAssignedRun(@PathVariable Long experimentId,
-                                     ModelMap model) throws IOException {
-    //clear any existing run in the model
-    model.addAttribute("run", null);
-    return setupForm(AbstractRun.UNSAVED_ID, experimentId, model);
-  }*/
+  /*
+   * @RequestMapping(value = "/new/experiment/{experimentId}", method = RequestMethod.GET) public ModelAndView newAssignedRun(@PathVariable
+   * Long experimentId, ModelMap model) throws IOException { //clear any existing run in the model model.addAttribute("run", null); return
+   * setupForm(AbstractRun.UNSAVED_ID, experimentId, model); }
+   */
 
-/*  @RequestMapping(value = "/{runId}", method = RequestMethod.GET)
-  public ModelAndView setupForm(@PathVariable Long runId,
-                                ModelMap model) throws IOException {
-
-    try {
-      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Run run = requestManager.getRunById(runId);
-      if (run != null) {
-        if (!run.userCanRead(user)) {
-          throw new SecurityException("Permission denied.");
-        }
-
-        model.put("formObj", run);
-        model.put("run", run);
-        model.put("owners", LimsSecurityUtils.getPotentialOwners(user, run, securityManager.listAllUsers()));
-        model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, run, securityManager.listAllUsers()));
-        model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, run, securityManager.listAllGroups()));
-      }
-      else {
-        throw new SecurityException("No such Run");
-      }
-      return new ModelAndView("/pages/editRun.jsp", model);
-    }
-    catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to show experiment", ex);
-      }
-      throw ex;
-    }
-  } */
-
+  /*
+   * @RequestMapping(value = "/{runId}", method = RequestMethod.GET) public ModelAndView setupForm(@PathVariable Long runId, ModelMap model)
+   * throws IOException {
+   * 
+   * try { User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName()); Run run =
+   * requestManager.getRunById(runId); if (run != null) { if (!run.userCanRead(user)) { throw new SecurityException("Permission denied."); }
+   * 
+   * model.put("formObj", run); model.put("run", run); model.put("owners", LimsSecurityUtils.getPotentialOwners(user, run,
+   * securityManager.listAllUsers())); model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, run,
+   * securityManager.listAllUsers())); model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, run,
+   * securityManager.listAllGroups())); } else { throw new SecurityException("No such Run"); } return new ModelAndView("/pages/editRun.jsp",
+   * model); } catch (IOException ex) { if (log.isDebugEnabled()) { log.debug("Failed to show experiment", ex); } throw ex; } }
+   */
 
   @RequestMapping(value = "/rest/{runId}", method = RequestMethod.GET)
-  public
-  @ResponseBody
-  Run jsonRest(@PathVariable Long runId) throws IOException {
+  public @ResponseBody Run jsonRest(@PathVariable Long runId) throws IOException {
     return requestManager.getRunById(runId);
   }
 
   @RequestMapping(value = "/{runId}", method = RequestMethod.GET)
-  public ModelAndView setupForm(@PathVariable Long runId,
-                                ModelMap model) throws IOException {
+  public ModelAndView setupForm(@PathVariable Long runId, ModelMap model) throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Run run = null;
@@ -268,15 +245,13 @@ public class EditRunController {
         model.put("title", "New Run");
         model.put("availablePools", populateAvailablePools(user));
         model.put("multiplexed", false);
-      }
-      else {
+      } else {
         run = requestManager.getRunById(runId);
         if (run == null) {
           throw new SecurityException("No such Run.");
-        }
-        else {
+        } else {
           model.put("title", "Run " + runId);
-          //model.put("availablePools", populateAvailablePools(run.getPlatformType(), user));
+          // model.put("availablePools", populateAvailablePools(run.getPlatformType(), user));
           model.put("multiplexed", isMultiplexed(run));
           try {
             if (runStatsManager != null) {
@@ -284,12 +259,11 @@ public class EditRunController {
             }
             model.put("operationsQcPassed", hasOperationsQcPassed(run));
             model.put("informaticsQcPassed", hasInformaticsQcPassed(run));
-          }
-          catch (RunStatsException e) {
+          } catch (RunStatsException e) {
             e.printStackTrace();
           }
 
-          //runAlertManager.push(run);
+          // runAlertManager.push(run);
         }
       }
 
@@ -299,17 +273,17 @@ public class EditRunController {
 
       if (run.getStatus() == null) {
         run.setStatus(new StatusImpl());
-      }
-      else {
+      } else {
         try {
-          InputStream in = StatsController.class.getResourceAsStream("/status/xsl/"+run.getPlatformType().getKey().toLowerCase()+"/statusXml.xsl");
+          InputStream in = StatsController.class
+              .getResourceAsStream("/status/xsl/" + run.getPlatformType().getKey().toLowerCase() + "/statusXml.xsl");
           if (in != null && run.getStatus().getXml() != null) {
             String xsl = LimsUtils.inputStreamToString(in);
             model.put("statusXml", (SubmissionUtils.xslTransform(run.getStatus().getXml(), xsl)));
           }
-        }
-        catch (TransformerException e) {
-          model.put("error", MisoWebUtils.generateErrorDivMessage("Cannot retrieve status XML for the given run: " + run.getAlias(), e.getMessage()));
+        } catch (TransformerException e) {
+          model.put("error",
+              MisoWebUtils.generateErrorDivMessage("Cannot retrieve status XML for the given run: " + run.getAlias(), e.getMessage()));
           e.printStackTrace();
         }
       }
@@ -327,8 +301,7 @@ public class EditRunController {
       model.put("overviewMap", runMap);
 
       return new ModelAndView("/pages/editRun.jsp", model);
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to show run", ex);
       }
@@ -337,8 +310,8 @@ public class EditRunController {
   }
 
   @RequestMapping(method = RequestMethod.POST)
-  public String processSubmit(@ModelAttribute("run") Run run,
-                              ModelMap model, SessionStatus session) throws IOException, MalformedRunException {
+  public String processSubmit(@ModelAttribute("run") Run run, ModelMap model, SessionStatus session)
+      throws IOException, MalformedRunException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       if (!run.userCanWrite(user)) {
@@ -349,8 +322,7 @@ public class EditRunController {
       session.setComplete();
       model.clear();
       return "redirect:/miso/run/" + run.getId();
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to save run", ex);
       }
