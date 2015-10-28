@@ -145,6 +145,17 @@ Project.ui = {
   projectFileUploadSuccess: function () {
     jQuery('#statusdiv').html("Upload complete. Refresh to see the file.");
   },
+  
+  deleteFile: function (projectId, fileKey) {
+	    if (confirm("Are you sure you want to delete this file?")) {
+	      Fluxion.doAjax(
+	        'projectControllerHelperService',
+	        'deleteProjectFile',
+	        {'id': projectId, 'hashcode': fileKey, 'url': ajaxurl},
+	        {'doOnSuccess': Utils.page.pageReload}
+	      );
+	    }
+	  },
 
   deliveryFormUploadSuccess: function () {
     jQuery('#deliveryform_statusdiv').html("Samples imported.");
@@ -407,7 +418,6 @@ Project.ui = {
 
   processBulkSampleQcTable: function (tableName, json) {
     Utils.ui.reenableButton('bulkSampleQcButton', "Save QCs");
-
     var a = json.saved;
     for (var i = 0; i < a.length; i++) {
       jQuery(tableName).find("tr:gt(0)").each(function () {
