@@ -314,6 +314,14 @@ public class SQLPoolDAO implements PoolStore {
     this.securityProfileDAO = securityProfileDAO;
   }
 
+  public SecurityStore getSecurityDAO() {
+    return securityDAO;
+  }
+
+  public void setSecurityDAO(SecurityStore securityDAO) {
+    this.securityDAO = securityDAO;
+  }
+
   public JdbcTemplate getJdbcTemplate() {
     return template;
   }

@@ -81,21 +81,21 @@ import com.googlecode.ehcache.annotations.TriggersRemove;
 public class SQLSequencerPartitionContainerDAO implements SequencerPartitionContainerStore {
   private static final String TABLE_NAME = "SequencerPartitionContainer";
 
-  private static final String SEQUENCER_PARTITION_CONTAINER_SELECT = "SELECT containerId, platform, identificationBarcode, locationBarcode, validationBarcode, securityProfile_profileId FROM "
+  private static final String SEQUENCER_PARTITION_CONTAINER_SELECT = "SELECT containerId, platform, identificationBarcode, locationBarcode, validationBarcode, securityProfile_profileId, lastModifier FROM "
       + TABLE_NAME;
 
   public static final String SEQUENCER_PARTITION_CONTAINER_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE containerId=:containerId";
 
   private static final String SEQUENCER_PARTITION_CONTAINER_SELECT_BY_ID = SEQUENCER_PARTITION_CONTAINER_SELECT + " WHERE containerId=?";
 
-  private static final String SEQUENCER_PARTITION_CONTAINER_SELECT_BY_PARTITION_ID = "SELECT s.containerId, s.platform, s.identificationBarcode, s.locationBarcode, s.validationBarcode, s.securityProfile_profileId "
+  private static final String SEQUENCER_PARTITION_CONTAINER_SELECT_BY_PARTITION_ID = "SELECT s.containerId, s.platform, s.identificationBarcode, s.locationBarcode, s.validationBarcode, s.securityProfile_profileId, s.lastModifier "
       + "FROM "
       + TABLE_NAME
       + " s, SequencerPartitionContainer_Partition sp "
       + "WHERE s.containerId=sp.container_containerId "
       + "AND sp.partitions_partitionId=?";
 
-  private static final String SEQUENCER_PARTITION_CONTAINER_SELECT_BY_RELATED_RUN = "SELECT DISTINCT f.containerId, f.platform, f.identificationBarcode, f.locationBarcode, f.validationBarcode, f.securityProfile_profileId "
+  private static final String SEQUENCER_PARTITION_CONTAINER_SELECT_BY_RELATED_RUN = "SELECT DISTINCT f.containerId, f.platform, f.identificationBarcode, f.locationBarcode, f.validationBarcode, f.securityProfile_profileId, f.lastModifier "
       + "FROM "
       + TABLE_NAME
       + " f, Run_SequencerPartitionContainer rf "
@@ -114,7 +114,7 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
   public static final String SEQUENCER_PARTITION_CONTAINER_UPDATE = "UPDATE "
       + TABLE_NAME
       + " "
-      + "SET platform=:platform, identificationBarcode=:identificationBarcode, locationBarcode=:locationBarcode, validationBarcode=:validationBarcode, securityProfile_profileId:=securityProfile_profileId "
+      + "SET platform=:platform, identificationBarcode=:identificationBarcode, locationBarcode=:locationBarcode, validationBarcode=:validationBarcode, securityProfile_profileId:=securityProfile_profileId, lastModifier=:lastModifier "
       + "WHERE containerId=:containerId";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLSequencerPartitionContainerDAO.class);

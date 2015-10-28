@@ -79,7 +79,7 @@ import com.googlecode.ehcache.annotations.TriggersRemove;
 public class SQLStudyDAO implements StudyStore {
   private static final String TABLE_NAME = "Study";
 
-  public static final String STUDIES_SELECT = "SELECT studyId, name, description, alias, accession, securityProfile_profileId, project_projectId, studyType "
+  public static final String STUDIES_SELECT = "SELECT studyId, name, description, alias, accession, securityProfile_profileId, project_projectId, studyType, lastModifier "
       + "FROM " + TABLE_NAME;
 
   public static final String STUDIES_SELECT_LIMIT = STUDIES_SELECT + " ORDER BY studyId DESC LIMIT ?";
@@ -92,21 +92,21 @@ public class SQLStudyDAO implements StudyStore {
   public static final String STUDY_UPDATE = "UPDATE "
       + TABLE_NAME
       + " "
-      + "SET name=:name, description=:description, alias=:alias, accession=:accession, securityProfile_profileId=:securityProfile_profileId, project_projectId=:project_projectId, studyType=:studyType "
+      + "SET name=:name, description=:description, alias=:alias, accession=:accession, securityProfile_profileId=:securityProfile_profileId, project_projectId=:project_projectId, studyType=:studyType, lastModifier=:lastModifier "
       + "WHERE studyId=:studyId";
 
   public static final String STUDY_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE studyId=:studyId";
 
-  public static final String STUDY_SELECT_BY_EXPERIMENT_ID = "SELECT s.studyId, s.name, s.description, s.alias, s.accession, s.securityProfile_profileId, s.project_projectId, s.studyType "
+  public static final String STUDY_SELECT_BY_EXPERIMENT_ID = "SELECT s.studyId, s.name, s.description, s.alias, s.accession, s.securityProfile_profileId, s.project_projectId, s.studyType, s.lastModifier "
       + "FROM " + TABLE_NAME + " s, Experiment e " + "WHERE s.studyId=e.study_studyId " + "AND e.experimentId=?";
 
-  public static final String STUDY_SELECT_BY_STUDY_TYPE = "SELECT s.studyId, s.name, s.description, s.alias, s.accession, s.securityProfile_profileId, s.project_projectId, s.studyType "
+  public static final String STUDY_SELECT_BY_STUDY_TYPE = "SELECT s.studyId, s.name, s.description, s.alias, s.accession, s.securityProfile_profileId, s.project_projectId, s.studyType, s.lastModifier "
       + "FROM " + TABLE_NAME + " s, StudyType t " + "WHERE s.studyType=t.name " + "AND t.name=?";
 
-  public static final String STUDIES_BY_RELATED_PROJECT = "SELECT s.studyId, s.name, s.description, s.alias, s.accession, s.securityProfile_profileId, s.project_projectId, s.studyType "
+  public static final String STUDIES_BY_RELATED_PROJECT = "SELECT s.studyId, s.name, s.description, s.alias, s.accession, s.securityProfile_profileId, s.project_projectId, s.studyType, s.lastModifier "
       + "FROM " + TABLE_NAME + " s, Project_Study ps " + "WHERE s.studyId=ps.studies_studyId " + "AND ps.Project_projectId=?";
 
-  public static final String STUDIES_BY_RELATED_SUBMISSION = "SELECT s.studyId, s.name, s.description, s.alias, s.accession, s.securityProfile_profileId, s.project_projectId, s.studyType "
+  public static final String STUDIES_BY_RELATED_SUBMISSION = "SELECT s.studyId, s.name, s.description, s.alias, s.accession, s.securityProfile_profileId, s.project_projectId, s.studyType, s.lastModifier "
       + "FROM " + TABLE_NAME + " s, Submission_Study ss " + "WHERE s.studyId=ss.studies_studyId " + "AND ss.submission_submissionId=?";
 
   public static final String STUDIES_BY_RELATED_LIBRARY = "SELECT " + "stu.* FROM Study stu "
