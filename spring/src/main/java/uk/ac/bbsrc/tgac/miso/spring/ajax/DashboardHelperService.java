@@ -372,7 +372,7 @@ public class DashboardHelperService {
       }
     } catch (IOException e) {
       log.error("check alerts", e);
-      JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
+      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
     return response;
   }
@@ -405,7 +405,7 @@ public class DashboardHelperService {
       }
     } catch (IOException e) {
       log.error("get alerts", e);
-      JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
+      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
 
     return JSONUtils.JSONObjectResponse("html", b.toString());
@@ -435,11 +435,11 @@ public class DashboardHelperService {
           b.append("</div>");
         }
       } else {
-        JSONUtils.SimpleJSONError("Failed: You do not have access to view system level alerts");
+        return JSONUtils.SimpleJSONError("Failed: You do not have access to view system level alerts");
       }
     } catch (IOException e) {
       log.error("get system alerts", e);
-      JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
+      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
 
     return JSONUtils.JSONObjectResponse("html", b.toString());
@@ -454,11 +454,11 @@ public class DashboardHelperService {
         a.setAlertRead(true);
         requestManager.saveAlert(a);
       } else {
-        JSONUtils.SimpleJSONError("You do not have the rights to set this alert as read");
+        return JSONUtils.SimpleJSONError("You do not have the rights to set this alert as read");
       }
     } catch (IOException e) {
       log.error("set alert as read", e);
-      JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
+      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
     return JSONUtils.SimpleJSONResponse("ok");
   }
@@ -473,12 +473,12 @@ public class DashboardHelperService {
           a.setAlertRead(true);
           requestManager.saveAlert(a);
         } else {
-          JSONUtils.SimpleJSONError("You do not have the rights to set this alert as read");
+          return JSONUtils.SimpleJSONError("You do not have the rights to set this alert as read");
         }
       }
     } catch (IOException e) {
       log.error("set all alerts as read", e);
-      JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
+      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
     return JSONUtils.SimpleJSONResponse("ok");
   }
