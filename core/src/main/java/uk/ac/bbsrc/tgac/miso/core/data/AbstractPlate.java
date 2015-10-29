@@ -23,19 +23,29 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
-import com.eaglegenomics.simlims.core.User;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlateMaterialType;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
-import javax.persistence.*;
-import java.util.*;
+import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.User;
 
 /**
  * Skeleton implementation of a Plate
- *
+ * 
  * @author Rob Davey
  * @date 05-Sep-2011
  * @since 0.1.1
@@ -61,6 +71,18 @@ public abstract class AbstractPlate<T extends List<S>, S extends Plateable> impl
   private String locationBarcode;
 
   private Date lastUpdated;
+  private final List<ChangeLog> changeLog = new ArrayList<ChangeLog>();
+  private User lastModifier;
+
+  @Override
+  public User getLastModifier() {
+    return lastModifier;
+  }
+
+  @Override
+  public void setLastModifier(User lastModifier) {
+    this.lastModifier = lastModifier;
+  }
 
   @Override
   @Deprecated
@@ -171,7 +193,7 @@ public abstract class AbstractPlate<T extends List<S>, S extends Plateable> impl
   }
 
   public String getLabelText() {
-    return getTagBarcode().getSequence() + "("+getElementType().getSimpleName() + " " + getPlateMaterialType().getKey()+")";
+    return getTagBarcode().getSequence() + "(" + getElementType().getSimpleName() + " " + getPlateMaterialType().getKey() + ")";
   }
 
   public Date getLastUpdated() {
@@ -184,10 +206,9 @@ public abstract class AbstractPlate<T extends List<S>, S extends Plateable> impl
 
   @Override
   public boolean isDeletable() {
-    return getId() != AbstractPlate.UNSAVED_ID &&
-           (getElements() == null || getElements().isEmpty());
+    return getId() != AbstractPlate.UNSAVED_ID && (getElements() == null || getElements().isEmpty());
   }
-  
+
   @Override
   public boolean userCanRead(User user) {
     return securityProfile.userCanRead(user);
@@ -212,29 +233,22 @@ public abstract class AbstractPlate<T extends List<S>, S extends Plateable> impl
   public void inheritPermissions(SecurableByProfile parent) throws SecurityException {
     if (parent.getSecurityProfile().getOwner() != null) {
       setSecurityProfile(parent.getSecurityProfile());
-    }
-    else {
+    } else {
       throw new SecurityException("Cannot inherit permissions when parent object owner is not set!");
     }
   }
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null)
-      return false;
-    if (obj == this)
-      return true;
-    if (!(obj instanceof AbstractPlate))
-      return false;
+    if (obj == null) return false;
+    if (obj == this) return true;
+    if (!(obj instanceof AbstractPlate)) return false;
     AbstractPlate them = (AbstractPlate) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
-    if (getId() == AbstractPlate.UNSAVED_ID
-        || them.getId() == AbstractPlate.UNSAVED_ID) {
-      return getName().equals(them.getName()) &&
-             getPlateMaterialType().equals(them.getPlateMaterialType());
-    }
-    else {
+    if (getId() == AbstractPlate.UNSAVED_ID || them.getId() == AbstractPlate.UNSAVED_ID) {
+      return getName().equals(them.getName()) && getPlateMaterialType().equals(them.getPlateMaterialType());
+    } else {
       return this.getId() == them.getId();
     }
   }
@@ -242,9 +256,8 @@ public abstract class AbstractPlate<T extends List<S>, S extends Plateable> impl
   @Override
   public int hashCode() {
     if (getId() != AbstractPlate.UNSAVED_ID) {
-      return (int)getId();
-    }
-    else {
+      return (int) getId();
+    } else {
       final int PRIME = 37;
       int hashcode = -1;
       if (getName() != null) hashcode = PRIME * hashcode + getName().hashCode();
@@ -255,12 +268,11 @@ public abstract class AbstractPlate<T extends List<S>, S extends Plateable> impl
 
   @Override
   public int compareTo(Object o) {
-    Plate t = (Plate)o;
+    Plate t = (Plate) o;
     if (getId() != 0L && t.getId() != 0L) {
       if (getId() < t.getId()) return -1;
       if (getId() > t.getId()) return 1;
-    }
-    else if (getName() != null && t.getName() != null) {
+    } else if (getName() != null && t.getName() != null) {
       return getName().compareTo(t.getName());
     }
     return 0;
@@ -275,5 +287,10 @@ public abstract class AbstractPlate<T extends List<S>, S extends Plateable> impl
     sb.append(" : ");
     sb.append(getDescription());
     return sb.toString();
-  }  
+  }
+
+  @Override
+  public Collection<ChangeLog> getChangeLog() {
+    return changeLog;
+  }
 }

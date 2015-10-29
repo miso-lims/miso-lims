@@ -23,20 +23,33 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
-import com.eaglegenomics.simlims.core.User;
-import org.w3c.dom.Document;
-import uk.ac.bbsrc.tgac.miso.core.data.visitor.SubmittableVisitor;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
-import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
-
-import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.w3c.dom.Document;
+
+import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
+import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
+
+import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.User;
+
 /**
  * Skeleton implementation of a Study
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -76,6 +89,25 @@ public abstract class AbstractStudy implements Study {
   @Column(name = "alias")
   private String alias;
 
+  private final Collection<ChangeLog> changeLog = new ArrayList<ChangeLog>();
+  private User lastModifier;
+
+  @Override
+  public User getLastModifier() {
+    return lastModifier;
+  }
+
+  @Override
+  public void setLastModifier(User lastModifier) {
+    this.lastModifier = lastModifier;
+  }
+
+  @Override
+  public Collection<ChangeLog> getChangeLog() {
+    return changeLog;
+  }
+
+  @Override
   public Project getProject() {
     return project;
   }
@@ -152,12 +184,12 @@ public abstract class AbstractStudy implements Study {
   }
 
   public void addExperiment(Experiment e) throws MalformedExperimentException {
-    //do experiment validation
+    // do experiment validation
 
-    //propagate security profiles down the hierarchy
+    // propagate security profiles down the hierarchy
     e.setSecurityProfile(this.securityProfile);
 
-    //add
+    // add
     this.experiments.add(e);
   }
 
@@ -170,8 +202,7 @@ public abstract class AbstractStudy implements Study {
   }
 
   public boolean isDeletable() {
-    return getId() != AbstractStudy.UNSAVED_ID &&
-           getExperiments().isEmpty();    
+    return getId() != AbstractStudy.UNSAVED_ID && getExperiments().isEmpty();
   }
 
   public abstract void buildSubmission();
@@ -187,11 +218,10 @@ public abstract class AbstractStudy implements Study {
   public void inheritPermissions(SecurableByProfile parent) throws SecurityException {
     if (parent.getSecurityProfile().getOwner() != null) {
       setSecurityProfile(parent.getSecurityProfile());
-    }
-    else {
+    } else {
       throw new SecurityException("Cannot inherit permissions when parent object owner is not set!");
     }
-  }  
+  }
 
   public boolean userCanRead(User user) {
     return securityProfile.userCanRead(user);
@@ -200,32 +230,25 @@ public abstract class AbstractStudy implements Study {
   public boolean userCanWrite(User user) {
     return securityProfile.userCanWrite(user);
   }
-  
+
   /**
-   * Equivalency is based on getProjectId() if set, otherwise on name,
-   * description and creation date.
+   * Equivalency is based on getProjectId() if set, otherwise on name, description and creation date.
    */
   @Override
   public boolean equals(Object obj) {
-    if (obj == null)
-      return false;
-    if (obj == this)
-      return true;
-    if (!(obj instanceof Study))
-      return false;
+    if (obj == null) return false;
+    if (obj == this) return true;
+    if (!(obj instanceof Study)) return false;
     Study them = (Study) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
-    if (getId() == AbstractStudy.UNSAVED_ID
-        || them.getId() == AbstractStudy.UNSAVED_ID) {
+    if (getId() == AbstractStudy.UNSAVED_ID || them.getId() == AbstractStudy.UNSAVED_ID) {
       if (getName() != null && them.getName() != null) {
         return getName().equals(them.getName());
-      }
-      else {
+      } else {
         return getAlias().equals(them.getAlias());
       }
-    }
-    else {
+    } else {
       return this.getId() == them.getId();
     }
   }
@@ -233,21 +256,20 @@ public abstract class AbstractStudy implements Study {
   @Override
   public int hashCode() {
     if (this.getId() != AbstractStudy.UNSAVED_ID) {
-      return (int)getId();
-    }
-    else {
+      return (int) getId();
+    } else {
       final int PRIME = 37;
       int hashcode = 1;
       if (getName() != null) hashcode = PRIME * hashcode + getName().hashCode();
       if (getAlias() != null) hashcode = PRIME * hashcode + getAlias().hashCode();
-      //if (getDescription() != null) hashcode = 37 * hashcode + getDescription().hashCode();
+      // if (getDescription() != null) hashcode = 37 * hashcode + getDescription().hashCode();
       return hashcode;
     }
   }
 
   @Override
   public int compareTo(Object o) {
-    Study t = (Study)o;
+    Study t = (Study) o;
     if (getId() < t.getId()) return -1;
     if (getId() > t.getId()) return 1;
     return 0;
@@ -267,7 +289,7 @@ public abstract class AbstractStudy implements Study {
 
     if (getProject() != null) {
       sb.append(getProject().getAlias());
-      sb.append("("+getProject().getName()+")");
+      sb.append("(" + getProject().getName() + ")");
     }
     return sb.toString();
   }

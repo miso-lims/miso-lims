@@ -24,7 +24,13 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,16 +39,26 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
-import uk.ac.bbsrc.tgac.miso.core.data.*;
-import com.eaglegenomics.simlims.core.User;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractPlate;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.Plate;
+import uk.ac.bbsrc.tgac.miso.core.data.Plateable;
+import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
+import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 @Controller
 @RequestMapping("/plate")
@@ -65,7 +81,7 @@ public class EditPlateController {
   public void setInterfaceTemplate(JdbcTemplate interfaceTemplate) {
     this.interfaceTemplate = interfaceTemplate;
   }
-  
+
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
   }
@@ -94,7 +110,7 @@ public class EditPlateController {
     Collections.sort(tagBarcodes);
     List<String> names = new ArrayList<String>();
     for (TagBarcode tb : tagBarcodes) {
-      names.add("\"" + tb.getName() + " ("+tb.getSequence()+")\"" + ":" + "\"" + tb.getId() + "\"");
+      names.add("\"" + tb.getName() + " (" + tb.getSequence() + ")\"" + ":" + "\"" + tb.getId() + "\"");
     }
     return LimsUtils.join(names, ",");
   }
@@ -105,25 +121,30 @@ public class EditPlateController {
   }
 
   @RequestMapping(value = "/rest/{plateId}", method = RequestMethod.GET)
-  public @ResponseBody Plate<? extends List<? extends Plateable>, ? extends Plateable> jsonRest(@PathVariable Long plateId) throws IOException {
-    //return requestManager.<LinkedList<Plateable>, Plateable> getPlateById(plateId);
+  public @ResponseBody
+  Plate<? extends List<? extends Plateable>, ? extends Plateable> jsonRest(@PathVariable Long plateId) throws IOException {
+    // return requestManager.<LinkedList<Plateable>, Plateable> getPlateById(plateId);
     return requestManager.getPlateById(plateId);
   }
 
+  @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
+  public @ResponseBody
+  Collection<ChangeLog> jsonRestChanges() throws IOException {
+    return requestManager.listAllChanges("Plate");
+  }
+
   @RequestMapping(value = "/{plateId}", method = RequestMethod.GET)
-  public ModelAndView setupForm(@PathVariable Long plateId,
-                                ModelMap model) throws IOException {
+  public ModelAndView setupForm(@PathVariable Long plateId, ModelMap model) throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Plate<? extends List<? extends Plateable>, ? extends Plateable> plate = null;
       if (plateId == AbstractPlate.UNSAVED_ID) {
         plate = dataObjectFactory.getPlateOfSize(96, user);
         model.put("title", "New Plate");
-      }
-      else {
-        //plate = requestManager.<LinkedList<Plateable>, Plateable> getPlateById(plateId);
+      } else {
+        // plate = requestManager.<LinkedList<Plateable>, Plateable> getPlateById(plateId);
         plate = requestManager.getPlateById(plateId);
-        model.put("title", "Plate "+plateId);
+        model.put("title", "Plate " + plateId);
       }
 
       if (plate != null) {
@@ -132,21 +153,19 @@ public class EditPlateController {
         }
         model.put("formObj", plate);
         model.put("plate", plate);
-      }
-      else {
+      } else {
         throw new SecurityException("No such Plate");
       }
 
       model.put("availableTagBarcodes", populateAvailableTagBarcodes());
 
       /*
-      model.put("owners", LimsSecurityUtils.getPotentialOwners(user, study, securityManager.listAllUsers()));
-      model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, study, securityManager.listAllUsers()));
-      model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, study, securityManager.listAllGroups()));
-      */
+       * model.put("owners", LimsSecurityUtils.getPotentialOwners(user, study, securityManager.listAllUsers()));
+       * model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, study, securityManager.listAllUsers()));
+       * model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, study, securityManager.listAllGroups()));
+       */
       return new ModelAndView("/pages/editPlate.jsp", model);
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to show Plate", ex);
       }
@@ -164,8 +183,7 @@ public class EditPlateController {
       model.put("plate", plate);
       model.put("availableTagBarcodes", populateAvailableTagBarcodes());
       return new ModelAndView("/pages/importPlate.jsp", model);
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to show Plate", ex);
       }
@@ -175,24 +193,23 @@ public class EditPlateController {
 
   @RequestMapping(value = "/export", method = RequestMethod.GET)
   public ModelAndView exportPlate(ModelMap model) throws IOException {
-      return new ModelAndView("/pages/exportPlate.jsp", model);
+    return new ModelAndView("/pages/exportPlate.jsp", model);
   }
 
   @RequestMapping(method = RequestMethod.POST)
-  public String processSubmit(@ModelAttribute("plate") Plate<LinkedList<Plateable>, Plateable> plate,
-                              ModelMap model,
-                              SessionStatus session) throws IOException {
+  public String processSubmit(@ModelAttribute("plate") Plate<LinkedList<Plateable>, Plateable> plate, ModelMap model, SessionStatus session)
+      throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       if (!plate.userCanWrite(user)) {
         throw new SecurityException("Permission denied.");
       }
+      plate.setLastModifier(user);
       requestManager.savePlate(plate);
       session.setComplete();
       model.clear();
-      return "redirect:/miso/plate/"+plate.getId();
-    }
-    catch (IOException ex) {
+      return "redirect:/miso/plate/" + plate.getId();
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to save Plate", ex);
       }

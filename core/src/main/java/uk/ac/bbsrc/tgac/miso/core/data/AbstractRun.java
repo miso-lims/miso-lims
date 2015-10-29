@@ -23,18 +23,34 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import com.eaglegenomics.simlims.core.Note;
-import com.eaglegenomics.simlims.core.SecurityProfile;
-import com.eaglegenomics.simlims.core.User;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
-import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
-import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
-import uk.ac.bbsrc.tgac.miso.core.event.listener.RunListener;
+
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.visitor.SubmittableVisitor;
+import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
 import uk.ac.bbsrc.tgac.miso.core.event.model.RunEvent;
 import uk.ac.bbsrc.tgac.miso.core.event.model.StatusChangedEvent;
 import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
@@ -42,13 +58,13 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunQcException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
-import javax.persistence.*;
-import java.io.Serializable;
-import java.util.*;
+import com.eaglegenomics.simlims.core.Note;
+import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.User;
 
 /**
  * Skeleton implementation of a Run
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -95,6 +111,20 @@ public abstract class AbstractRun implements Run {
   // listeners
   private Set<MisoListener> listeners = new HashSet<MisoListener>();
   private Set<User> watchers = new HashSet<User>();
+
+  private User lastModifier;
+
+  @Override
+  public User getLastModifier() {
+    return lastModifier;
+  }
+
+  @Override
+  public void setLastModifier(User lastModifier) {
+    this.lastModifier = lastModifier;
+  }
+
+  private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
   @Deprecated
   public Long getRunId() {
@@ -215,17 +245,14 @@ public abstract class AbstractRun implements Run {
 
         if (status.getHealth().equals(HealthType.Started)) {
           fireRunStartedEvent();
-        }
-        else if (status.getHealth().equals(HealthType.Completed)) {
+        } else if (status.getHealth().equals(HealthType.Completed)) {
           fireRunCompletedEvent();
-        }
-        else if (status.getHealth().equals(HealthType.Failed)) {
-//          if (status.getCompletionDate() == null) {
-//            status.setCompletionDate(new Date());
-//          }
+        } else if (status.getHealth().equals(HealthType.Failed)) {
+          // if (status.getCompletionDate() == null) {
+          // status.setCompletionDate(new Date());
+          // }
           fireRunFailedEvent();
-        }
-        else {
+        } else {
           fireStatusChangedEvent();
         }
       }
@@ -239,8 +266,7 @@ public abstract class AbstractRun implements Run {
     this.runQCs.add(runQC);
     try {
       runQC.setRun(this);
-    }
-    catch (MalformedRunException e) {
+    } catch (MalformedRunException e) {
       e.printStackTrace();
     }
   }
@@ -279,7 +305,7 @@ public abstract class AbstractRun implements Run {
 
   public void accept(SubmittableVisitor v) {
     v.visit(this);
-  }   
+  }
 
   public boolean userCanRead(User user) {
     return securityProfile.userCanRead(user);
@@ -300,11 +326,10 @@ public abstract class AbstractRun implements Run {
   public void inheritPermissions(SecurableByProfile parent) throws SecurityException {
     if (parent.getSecurityProfile().getOwner() != null) {
       setSecurityProfile(parent.getSecurityProfile());
-    }
-    else {
+    } else {
       throw new SecurityException("Cannot inherit permissions when parent object owner is not set!");
     }
-  }  
+  }
 
   public abstract void buildReport();
 
@@ -402,20 +427,15 @@ public abstract class AbstractRun implements Run {
    */
   @Override
   public boolean equals(Object obj) {
-    if (obj == null)
-      return false;
-    if (obj == this)
-      return true;
-    if (!(obj instanceof AbstractRun))
-      return false;
+    if (obj == null) return false;
+    if (obj == this) return true;
+    if (!(obj instanceof AbstractRun)) return false;
     Run them = (Run) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
-    if (getId() == AbstractRun.UNSAVED_ID
-        || them.getId() == AbstractRun.UNSAVED_ID) {
-      return getAlias().equals(them.getAlias()); //&& this.getDescription().equals(them.getDescription());
-    }
-    else {
+    if (getId() == AbstractRun.UNSAVED_ID || them.getId() == AbstractRun.UNSAVED_ID) {
+      return getAlias().equals(them.getAlias()); // && this.getDescription().equals(them.getDescription());
+    } else {
       return getId() == them.getId();
     }
   }
@@ -423,21 +443,20 @@ public abstract class AbstractRun implements Run {
   @Override
   public int hashCode() {
     if (getId() != AbstractRun.UNSAVED_ID) {
-      return (int)getId();
-    }
-    else {
+      return (int) getId();
+    } else {
       final int PRIME = 37;
       int hashcode = 1;
       if (getAlias() != null) hashcode = PRIME * hashcode + getAlias().hashCode();
-      //if (getDescription() != null) hashcode = PRIME * hashcode + getDescription().hashCode();
-      //if (getExperiment() != null) hashcode = 37 * hashcode + getExperiment().hashCode();
+      // if (getDescription() != null) hashcode = PRIME * hashcode + getDescription().hashCode();
+      // if (getExperiment() != null) hashcode = 37 * hashcode + getExperiment().hashCode();
       return hashcode;
     }
   }
 
   @Override
   public int compareTo(Object o) {
-    Run t = (Run)o;
+    Run t = (Run) o;
     if (getId() < t.getId()) return -1;
     if (getId() > t.getId()) return 1;
     return 0;
@@ -459,8 +478,13 @@ public abstract class AbstractRun implements Run {
 
     if (getStatus() != null) {
       sb.append(getStatus().getHealth());
-      sb.append("("+getStatus().getStatusId()+")");
+      sb.append("(" + getStatus().getStatusId() + ")");
     }
     return sb.toString();
+  }
+
+  @Override
+  public Collection<ChangeLog> getChangeLog() {
+    return changeLog;
   }
 }

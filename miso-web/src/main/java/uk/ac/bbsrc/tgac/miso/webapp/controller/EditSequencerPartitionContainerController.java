@@ -23,8 +23,10 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,19 +34,28 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
-import uk.ac.bbsrc.tgac.miso.core.data.*;
+
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.Platform;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Map;
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 @Controller
 @RequestMapping("/container")
@@ -80,6 +91,12 @@ public class EditSequencerPartitionContainerController {
     this.securityManager = securityManager;
   }
 
+  @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
+  public @ResponseBody
+  Collection<ChangeLog> jsonRestChanges() throws IOException {
+    return requestManager.listAllChanges("SequencerPartitionContainer");
+  }
+
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
     return DbUtils.getColumnSizes(interfaceTemplate, "Flowcell");
@@ -101,16 +118,14 @@ public class EditSequencerPartitionContainerController {
   }
 
   @RequestMapping(value = "/{containerId}", method = RequestMethod.GET)
-  public ModelAndView setupForm(@PathVariable Long containerId,
-                                ModelMap model) throws IOException {
+  public ModelAndView setupForm(@PathVariable Long containerId, ModelMap model) throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       SequencerPartitionContainer<SequencerPoolPartition> container = null;
       if (containerId == AbstractSequencerPartitionContainer.UNSAVED_ID) {
         container = dataObjectFactory.getSequencerPartitionContainer(user);
         model.put("title", "New Container");
-      }
-      else {
+      } else {
         container = requestManager.getSequencerPartitionContainerById(containerId);
         model.put("title", "Container " + containerId);
       }
@@ -118,8 +133,7 @@ public class EditSequencerPartitionContainerController {
       model.put("formObj", container);
       model.put("container", container);
       return new ModelAndView("/pages/editSequencerPartitionContainer.jsp", model);
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to show container", ex);
       }
@@ -128,20 +142,20 @@ public class EditSequencerPartitionContainerController {
   }
 
   @RequestMapping(method = RequestMethod.POST)
-  public String processSubmit(@ModelAttribute("container") SequencerPartitionContainer container,
-                              ModelMap model, SessionStatus session) throws IOException, MalformedRunException {
+  public String processSubmit(@ModelAttribute("container") SequencerPartitionContainer container, ModelMap model, SessionStatus session)
+      throws IOException, MalformedRunException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       if (!container.userCanWrite(user)) {
         throw new SecurityException("Permission denied.");
       }
 
+      container.setLastModifier(user);
       long containerId = requestManager.saveSequencerPartitionContainer(container);
       session.setComplete();
       model.clear();
-      return "redirect:/miso/container/"+containerId;
-    }
-    catch (IOException ex) {
+      return "redirect:/miso/container/" + containerId;
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to save container", ex);
       }

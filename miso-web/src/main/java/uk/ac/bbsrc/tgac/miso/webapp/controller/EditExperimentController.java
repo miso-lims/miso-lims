@@ -24,9 +24,13 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,20 +38,32 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.eaglegenomics.simlims.core.User;
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractExperiment;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Platform;
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
+import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
+
+import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 @Controller
 @RequestMapping("/experiment")
@@ -108,19 +124,24 @@ public class EditExperimentController {
   }
 
   @RequestMapping(value = "/new/{studyId}", method = RequestMethod.GET)
-  public ModelAndView newAssignedExperiment(@PathVariable Long studyId,
-                                            ModelMap model) throws IOException {
+  public ModelAndView newAssignedExperiment(@PathVariable Long studyId, ModelMap model) throws IOException {
     return setupForm(AbstractExperiment.UNSAVED_ID, studyId, model);
   }
 
   @RequestMapping(value = "/rest/{experimentId}", method = RequestMethod.GET)
-  public @ResponseBody Experiment jsonRest(@PathVariable Long experimentId) throws IOException {
+  public @ResponseBody
+  Experiment jsonRest(@PathVariable Long experimentId) throws IOException {
     return requestManager.getExperimentById(experimentId);
   }
 
+  @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
+  public @ResponseBody
+  Collection<ChangeLog> jsonRestChanges() throws IOException {
+    return requestManager.listAllChanges("Experiment");
+  }
+
   @RequestMapping(value = "/{experimentId}", method = RequestMethod.GET)
-  public ModelAndView setupForm(@PathVariable Long experimentId,
-                                ModelMap model) throws IOException {
+  public ModelAndView setupForm(@PathVariable Long experimentId, ModelMap model) throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Experiment experiment = requestManager.getExperimentById(experimentId);
@@ -145,8 +166,7 @@ public class EditExperimentController {
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, experiment, securityManager.listAllGroups()));
       model.put("title", "Experiment " + experimentId);
       return new ModelAndView("/pages/editExperiment.jsp", model);
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to show experiment", ex);
       }
@@ -155,17 +175,14 @@ public class EditExperimentController {
   }
 
   @RequestMapping(value = "/{experimentId}/study/{studyId}", method = RequestMethod.GET)
-  public ModelAndView setupForm(@PathVariable Long experimentId,
-                                @PathVariable Long studyId,
-                                ModelMap model) throws IOException {
+  public ModelAndView setupForm(@PathVariable Long experimentId, @PathVariable Long studyId, ModelMap model) throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Experiment experiment = null;
       if (experimentId == AbstractExperiment.UNSAVED_ID) {
         experiment = dataObjectFactory.getExperiment();
         model.put("title", "New Experiment");
-      }
-      else {
+      } else {
         experiment = requestManager.getExperimentById(experimentId);
         model.put("title", "Experiment " + experimentId);
       }
@@ -187,8 +204,7 @@ public class EditExperimentController {
           LimsUtils.inheritUsersAndGroups(experiment, study.getSecurityProfile());
           sp.setOwner(user);
           experiment.setSecurityProfile(sp);
-        }
-        else {
+        } else {
           experiment.inheritPermissions(study);
         }
       }
@@ -205,8 +221,7 @@ public class EditExperimentController {
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, experiment, securityManager.listAllUsers()));
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, experiment, securityManager.listAllGroups()));
       return new ModelAndView("/pages/editExperiment.jsp", model);
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to show experiment", ex);
       }
@@ -215,20 +230,19 @@ public class EditExperimentController {
   }
 
   @RequestMapping(method = RequestMethod.POST)
-  public String processSubmit(@ModelAttribute("experiment") Experiment experiment,
-                              ModelMap model,
-                              SessionStatus session) throws IOException, MalformedExperimentException {
+  public String processSubmit(@ModelAttribute("experiment") Experiment experiment, ModelMap model, SessionStatus session)
+      throws IOException, MalformedExperimentException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       if (!experiment.userCanWrite(user)) {
         throw new SecurityException("Permission denied.");
       }
+      experiment.setLastModifier(user);
       requestManager.saveExperiment(experiment);
       session.setComplete();
       model.clear();
       return "redirect:/miso/experiment/" + experiment.getId();
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to save Experiment", ex);
       }
