@@ -204,6 +204,7 @@ public class EditPlateController {
       if (!plate.userCanWrite(user)) {
         throw new SecurityException("Permission denied.");
       }
+      plate.setLastModifier(user);
       requestManager.savePlate(plate);
       session.setComplete();
       model.clear();

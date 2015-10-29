@@ -87,7 +87,7 @@ import com.googlecode.ehcache.annotations.TriggersRemove;
 public class SQLPlateDAO implements PlateStore {
   private static final String TABLE_NAME = "Plate";
 
-  public static final String PLATE_SELECT = "SELECT plateId, name, description, creationDate, plateMaterialType, identificationBarcode, locationBarcode, size, tagBarcodeId, securityProfile_profileId "
+  public static final String PLATE_SELECT = "SELECT plateId, name, description, creationDate, plateMaterialType, identificationBarcode, locationBarcode, size, tagBarcodeId, securityProfile_profileId, lastModifier "
       + "FROM " + TABLE_NAME;
 
   public static final String PLATE_SELECT_BY_ID = PLATE_SELECT + " WHERE plateId = ?";
@@ -97,7 +97,7 @@ public class SQLPlateDAO implements PlateStore {
   public static final String PLATE_UPDATE = "UPDATE "
       + TABLE_NAME
       + " "
-      + "SET plateId=:plateId, name=:name, description=:description, creationDate=:creationDate, plateMaterialType=:plateMaterialType, identificationBarcode=:identificationBarcode, locationBarcode=:locationBarcode, size=:size, tagBarcodeId=:tagBarcodeId, securityProfile_profileId=:securityProfile_profileId "
+      + "SET plateId=:plateId, name=:name, description=:description, creationDate=:creationDate, plateMaterialType=:plateMaterialType, identificationBarcode=:identificationBarcode, locationBarcode=:locationBarcode, size=:size, tagBarcodeId=:tagBarcodeId, securityProfile_profileId=:securityProfile_profileId, lastModifier=:lastModifier "
       + "WHERE plateId=:plateId";
 
   public static final String PLATE_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE plateId=:plateId";
@@ -263,6 +263,7 @@ public class SQLPlateDAO implements PlateStore {
         .addValue("plateMaterialType", plate.getPlateMaterialType().getKey()).addValue("locationBarcode", plate.getLocationBarcode())
         .addValue("size", plate.getSize()).addValue("securityProfile_profileId", securityProfileId);
 
+    params.addValue("lastModifier", plate.getLastModifier().getUserId());
     if (plate.getTagBarcode() != null) {
       params.addValue("tagBarcodeId", plate.getTagBarcode().getId());
     }
@@ -418,6 +419,7 @@ public class SQLPlateDAO implements PlateStore {
       // plate.setLastUpdated(rs.getTimestamp("lastUpdated"));
 
       try {
+        plate.setLastModifier(securityDAO.getUserById(rs.getLong("lastModifier")));
         plate.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
         plate.setPlateMaterialType(PlateMaterialType.get(rs.getString("plateMaterialType")));
         plate.setTagBarcode(libraryDAO.getTagBarcodeById(rs.getLong("tagBarcodeId")));

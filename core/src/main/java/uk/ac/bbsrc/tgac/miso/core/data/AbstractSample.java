@@ -101,6 +101,17 @@ public abstract class AbstractSample implements Sample {
   private String locationBarcode;
   private String alias;
   private Date lastUpdated;
+  private User lastModifier;
+
+  @Override
+  public User getLastModifier() {
+    return lastModifier;
+  }
+
+  @Override
+  public void setLastModifier(User lastModifier) {
+    this.lastModifier = lastModifier;
+  }
 
   @Override
   public Project getProject() {

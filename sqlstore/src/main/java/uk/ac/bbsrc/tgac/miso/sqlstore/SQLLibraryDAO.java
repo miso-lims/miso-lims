@@ -94,7 +94,7 @@ public class SQLLibraryDAO implements LibraryStore {
   private static String TABLE_NAME = "Library";
 
   public static final String LIBRARIES_SELECT = "SELECT libraryId, name, description, alias, accession, securityProfile_profileId, sample_sampleId, identificationBarcode, "
-      + "locationBarcode, paired, libraryType, librarySelectionType, libraryStrategyType, platformName, concentration, creationDate, qcPassed "
+      + "locationBarcode, paired, libraryType, librarySelectionType, libraryStrategyType, platformName, concentration, creationDate, qcPassed, lastModifier "
       + "FROM " + TABLE_NAME;
 
   public static final String LIBRARIES_SELECT_LIMIT = LIBRARIES_SELECT + " ORDER BY libraryId DESC LIMIT ?";
@@ -113,13 +113,13 @@ public class SQLLibraryDAO implements LibraryStore {
       + " SET name=:name, description=:description, alias=:alias, accession=:accession, securityProfile_profileId=:securityProfile_profileId, "
       + "sample_sampleId=:sample_sampleId, identificationBarcode=:identificationBarcode,  locationBarcode=:locationBarcode, "
       + "paired=:paired, libraryType=:libraryType, librarySelectionType=:librarySelectionType, libraryStrategyType=:libraryStrategyType, "
-      + "platformName=:platformName, concentration=:concentration, creationDate=:creationDate, qcPassed=:qcPassed "
+      + "platformName=:platformName, concentration=:concentration, creationDate=:creationDate, qcPassed=:qcPassed, lastModifier=:lastModifier "
       + "WHERE libraryId=:libraryId";
 
   public static final String LIBRARY_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE libraryId=:libraryId";
 
   public static final String LIBRARIES_SELECT_BY_SAMPLE_ID = "SELECT l.libraryId, l.name, l.description, l.alias, l.accession, l.securityProfile_profileId, l.sample_sampleId, l.identificationBarcode, l.locationBarcode, "
-      + "l.paired, l.libraryType, l.librarySelectionType, l.libraryStrategyType, l.platformName, l.concentration, l.creationDate, l.qcPassed "
+      + "l.paired, l.libraryType, l.librarySelectionType, l.libraryStrategyType, l.platformName, l.concentration, l.creationDate, l.qcPassed, l.lastModifier "
       + "FROM " + TABLE_NAME + " l, Sample s " + "WHERE l.sample_sampleId=s.sampleId " + "AND s.sampleId=?";
 
   public static String LIBRARIES_SELECT_BY_PROJECT_ID =
@@ -160,7 +160,7 @@ public class SQLLibraryDAO implements LibraryStore {
   public static final String LIBRARY_STRATEGY_TYPE_SELECT_BY_NAME = LIBRARY_STRATEGY_TYPES_SELECT + " WHERE name = ?";
 
   public static final String LIBRARIES_BY_RELATED_DILUTION_ID = "SELECT p.library_libraryId, l.libraryId, l.name, l.description, l.alias, l.accession, l.securityProfile_profileId, l.sample_sampleId, l.identificationBarcode, l.locationBarcode, "
-      + "l.paired, l.libraryType, l.librarySelectionType, l.libraryStrategyType, l.platformName, l.concentration, l.creationDate, l.qcPassed "
+      + "l.paired, l.libraryType, l.librarySelectionType, l.libraryStrategyType, l.platformName, l.concentration, l.creationDate, l.qcPassed, l.lastModifier "
       + "FROM " + TABLE_NAME + " l, LibraryDilution p " + "WHERE l.libraryId=p.library_libraryId " + "AND p.dilutionId=?";
 
   public static final String TAG_BARCODES_SELECT = "SELECT tagId, name, sequence, platformName, strategyName " + "FROM TagBarcodes";
@@ -297,6 +297,7 @@ public class SQLLibraryDAO implements LibraryStore {
         .addValue("platformName", library.getPlatformName()).addValue("concentration", library.getInitialConcentration())
         .addValue("creationDate", library.getCreationDate());
     // .addValue("qcPassed", library.getQcPassed());
+    params.addValue("lastModifier", library.getLastModifier().getUserId());
 
     if (library.getQcPassed() != null) {
       params.addValue("qcPassed", library.getQcPassed().toString());
@@ -690,6 +691,7 @@ public class SQLLibraryDAO implements LibraryStore {
       // library.setLastUpdated(rs.getTimestamp("lastUpdated"));
 
       try {
+        library.setLastModifier(securityDAO.getUserById(rs.getLong("lastModifier")));
         library.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
 
         library.setLibraryType(getLibraryTypeById(rs.getLong("libraryType")));

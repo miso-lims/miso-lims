@@ -36,6 +36,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleQcException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 import com.eaglegenomics.simlims.core.Note;
+import com.eaglegenomics.simlims.core.User;
 
 /**
  * A Sample contains information about the original material upon which a sequencing experiment is to be based.
@@ -303,4 +304,8 @@ public interface Sample extends SecurableByProfile, Submittable<Document>, Barco
   Date getLastUpdated();
 
   void setLastUpdated(Date lastUpdated);
+  
+  public User getLastModifier();
+  
+  public void setLastModifier(User user);
 }

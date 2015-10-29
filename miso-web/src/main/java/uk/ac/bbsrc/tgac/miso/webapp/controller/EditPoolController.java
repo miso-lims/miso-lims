@@ -294,7 +294,8 @@ public class EditPoolController {
         }
       }
     }
-
+    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    p.setLastModifier(user);
     requestManager.savePool(p);
     return "redirect:/miso/pool/" + p.getId();
   }
@@ -309,6 +310,7 @@ public class EditPoolController {
         throw new SecurityException("Permission denied.");
       }
 
+      pool.setLastModifier(user);
       requestManager.savePool(pool);
       session.setComplete();
       model.clear();

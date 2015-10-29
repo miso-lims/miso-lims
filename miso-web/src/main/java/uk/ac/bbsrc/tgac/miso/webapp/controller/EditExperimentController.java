@@ -237,6 +237,7 @@ public class EditExperimentController {
       if (!experiment.userCanWrite(user)) {
         throw new SecurityException("Permission denied.");
       }
+      experiment.setLastModifier(user);
       requestManager.saveExperiment(experiment);
       session.setComplete();
       model.clear();

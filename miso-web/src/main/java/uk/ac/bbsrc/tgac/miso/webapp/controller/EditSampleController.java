@@ -448,6 +448,7 @@ public class EditSampleController {
         throw new SecurityException("Permission denied.");
       }
 
+      sample.setLastModifier(user);
       requestManager.saveSample(sample);
       session.setComplete();
       model.clear();

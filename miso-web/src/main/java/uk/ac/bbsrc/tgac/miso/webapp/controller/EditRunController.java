@@ -346,6 +346,7 @@ public class EditRunController {
         throw new SecurityException("Permission denied.");
       }
 
+      run.setLastModifier(user);
       requestManager.saveRun(run);
       session.setComplete();
       model.clear();

@@ -302,6 +302,7 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
     params.addValue("identificationBarcode", sequencerPartitionContainer.getIdentificationBarcode());
     params.addValue("locationBarcode", sequencerPartitionContainer.getLocationBarcode());
     params.addValue("validationBarcode", sequencerPartitionContainer.getValidationBarcode());
+    params.addValue("lastModifier", sequencerPartitionContainer.getLastModifier().getUserId());
 
     // if (sequencerPartitionContainer.getPlatformType() != null) {
     // params.addValue("platformType", sequencerPartitionContainer.getPlatformType().getKey());

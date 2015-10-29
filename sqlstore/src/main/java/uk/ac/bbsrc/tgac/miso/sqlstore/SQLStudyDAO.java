@@ -208,6 +208,7 @@ public class SQLStudyDAO implements StudyStore {
         .addValue("securityProfile_profileId", securityProfileId).addValue("project_projectId", study.getProject().getProjectId())
         .addValue("studyType", study.getStudyType());
 
+    params.addValue("lastModifier", study.getLastModifier().getUserId());
     if (study.getId() == AbstractStudy.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("studyId");
       try {

@@ -574,6 +574,7 @@ public class EditLibraryController {
       if (!library.userCanWrite(user)) {
         throw new SecurityException("Permission denied.");
       }
+      library.setLastModifier(user);
       requestManager.saveLibrary(library);
       session.setComplete();
       model.clear();

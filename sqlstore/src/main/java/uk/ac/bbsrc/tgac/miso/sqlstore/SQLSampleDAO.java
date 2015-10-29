@@ -74,6 +74,7 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.store.SecurityStore;
 import com.googlecode.ehcache.annotations.Cacheable;
 import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
@@ -91,7 +92,7 @@ public class SQLSampleDAO implements SampleStore {
   private static final String TABLE_NAME = "Sample";
 
   public static final String SAMPLES_SELECT = "SELECT sampleId, name, description, scientificName, taxonIdentifier, alias, accession, securityProfile_profileId, identificationBarcode, locationBarcode, "
-      + "sampleType, receivedDate, qcPassed, project_projectId " + "FROM " + TABLE_NAME;
+      + "sampleType, receivedDate, qcPassed, project_projectId, lastModifier " + "FROM " + TABLE_NAME;
 
   public static final String SAMPLES_SELECT_LIMIT = SAMPLES_SELECT + " ORDER BY sampleId DESC LIMIT ?";
 
@@ -112,7 +113,7 @@ public class SQLSampleDAO implements SampleStore {
       + " "
       + "SET name=:name, description=:description, scientificName=:scientificName, taxonIdentifier=:taxonIdentifier, alias=:alias, accession=:accession, securityProfile_profileId=:securityProfile_profileId, "
       + "identificationBarcode=:identificationBarcode, locationBarcode=:locationBarcode, sampleType=:sampleType, receivedDate=:receivedDate, "
-      + "qcPassed=:qcPassed, project_projectId=:project_projectId " + "WHERE sampleId=:sampleId";
+      + "qcPassed=:qcPassed, project_projectId=:project_projectId, lastModifier=:lastModifier " + "WHERE sampleId=:sampleId";
 
   public static final String SAMPLE_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE sampleId=:sampleId";
 
@@ -133,7 +134,7 @@ public class SQLSampleDAO implements SampleStore {
       + "WHERE es.samples_sampleId=s.sampleId " + "AND es.Experiment_experimentId=?";
 
   public static final String SAMPLE_SELECT_BY_LIBRARY_ID = "SELECT s.sampleId, s.name, s.description, s.scientificName, s.taxonIdentifier, s.alias, s.accession, s.securityProfile_profileId, s.identificationBarcode, s.locationBarcode, "
-      + "s.sampleType, s.receivedDate, s.qcPassed, s.project_projectId "
+      + "s.sampleType, s.receivedDate, s.qcPassed, s.project_projectId, s.lastModifier "
       + "FROM "
       + TABLE_NAME
       + " s, Library l "
@@ -143,7 +144,7 @@ public class SQLSampleDAO implements SampleStore {
       + "WHERE samples_sampleId=:samples_sampleId";
 
   public static final String SAMPLES_BY_RELATED_SUBMISSION = "SELECT s.sampleId, s.name, s.description, s.scientificName, s.taxonIdentifier, s.alias, s.accession, s.securityProfile_profileId, s.identificationBarcode, s.locationBarcode, "
-      + "s.sampleType, s.receivedDate, s.qcPassed, project_projectId "
+      + "s.sampleType, s.receivedDate, s.qcPassed, project_projectId, s.lastModifier "
       + "FROM "
       + TABLE_NAME
       + " s, Submission_Sample ss "
@@ -161,6 +162,7 @@ public class SQLSampleDAO implements SampleStore {
   private NoteStore noteDAO;
   private CascadeType cascadeType;
   private ChangeLogStore changeLogDAO;
+  private SecurityStore securityDAO;
 
   @Autowired
   private MisoNamingScheme<Sample> sampleNamingScheme;
@@ -271,6 +273,7 @@ public class SQLSampleDAO implements SampleStore {
             .addValue("receivedDate", sample.getReceivedDate()).addValue("qcPassed", sample.getQcPassed().toString())
             .addValue("project_projectId", sample.getProject().getProjectId()).addValue("securityProfile_profileId", securityProfileId);
 
+        params.addValue("lastModifier", sample.getLastModifier().getUserId());
         if (sampleNamingScheme.validateField("name", sample.getName()) && sampleNamingScheme.validateField("alias", sample.getAlias())) {
           batch.add(params);
           purgeCache(sample);
@@ -303,6 +306,7 @@ public class SQLSampleDAO implements SampleStore {
         .addValue("receivedDate", sample.getReceivedDate()).addValue("project_projectId", sample.getProject().getProjectId())
         .addValue("securityProfile_profileId", securityProfileId);
 
+    params.addValue("lastModifier", sample.getLastModifier().getUserId());
     if (sample.getQcPassed() != null) {
       params.addValue("qcPassed", sample.getQcPassed().toString());
     } else {
@@ -503,6 +507,14 @@ public class SQLSampleDAO implements SampleStore {
     this.changeLogDAO = changeLogDAO;
   }
 
+  public SecurityStore getSecurityDAO() {
+    return securityDAO;
+  }
+
+  public void setSecurityDAO(SecurityStore securityDAO) {
+    this.securityDAO = securityDAO;
+  }
+
   public class SampleMapper extends CacheAwareRowMapper<Sample> {
     public SampleMapper() {
       super(Sample.class);
@@ -550,6 +562,7 @@ public class SQLSampleDAO implements SampleStore {
       // s.setLastUpdated(rs.getTimestamp("lastUpdated"));
 
       try {
+        s.setLastModifier(securityDAO.getUserById(rs.getLong("lastModifier")));
         s.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
         if (!isLazy()) {
           s.setProject(projectDAO.get(rs.getLong("project_projectId")));
