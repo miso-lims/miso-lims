@@ -36,6 +36,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -49,6 +50,7 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAnalyteImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleQcException;
@@ -106,6 +108,10 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   private Date lastUpdated;
   private User lastModifier;
   private boolean empty;
+
+  @OneToOne(targetEntity = SampleAnalyteImpl.class)
+  @JoinColumn(name = "sampleAnalyteId")
+  private SampleAnalyte sampleAnalyte;
 
   @Override
   public User getLastModifier() {
@@ -440,5 +446,15 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
     sb.append(getSampleType());
 
     return sb.toString();
+  }
+
+  @Override
+  public SampleAnalyte getSampleAnalyte() {
+    return sampleAnalyte;
+  }
+
+  @Override
+  public void setSampleAnalyte(SampleAnalyte sampleAnalyte) {
+    this.sampleAnalyte = sampleAnalyte;
   }
 }
