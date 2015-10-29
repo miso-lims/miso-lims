@@ -171,6 +171,7 @@ public class SubmissionControllerHelperService {
           String s = submissionManager.generateSubmissionMetadata(submission);
           return JSONUtils.JSONObjectResponse("metadata", s);
         } catch (SubmissionException se) {
+          log.error("cannot preview submission metadata", se);
           return JSONUtils.SimpleJSONError("Cannot preview submission metadata: " + se.getMessage());
         }
       }
@@ -202,7 +203,7 @@ public class SubmissionControllerHelperService {
           }
         }
       } catch (ParseException e) {
-        log.error("No timestamped submission metadata documents. Falling back to simple names: " + e.getMessage());
+        log.error("No timestamped submission metadata documents. Falling back to simple names", e);
       }
 
       String dateStr = "";
@@ -245,6 +246,7 @@ public class SubmissionControllerHelperService {
         try {
           String s = submissionManager.generateSubmissionMetadata(submission);
         } catch (SubmissionException se) {
+          log.error("validate submission metadata", se);
           return JSONUtils.SimpleJSONError(se.getMessage());
         }
         Document report = submission.submit(submissionManager);

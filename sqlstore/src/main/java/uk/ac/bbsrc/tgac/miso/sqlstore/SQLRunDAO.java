@@ -387,7 +387,7 @@ public class SQLRunDAO implements RunStore {
           try {
             fInsert.execute(fcParams);
           } catch (DuplicateKeyException dke) {
-            log.warn("This Run/SequencerPartitionContainer combination already exists - not inserting: " + dke.getMessage());
+            log.error("This Run/SequencerPartitionContainer combination already exists - not inserting", dke);
           }
         }
       }

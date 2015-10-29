@@ -739,9 +739,9 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
       try {
         xmls.add(SubmissionUtils.transform(f));
       } catch (TransformerException e) {
-        log.error("Error transforming XML: " + e.getMessage());
+        log.error("Error transforming XML", e);
       } catch (IOException e) {
-        log.error("Error with file IO: " + e.getMessage());
+        log.error("Error with file IO", e);
       }
     }
     return NotificationUtils.buildSimpleMessage(xmls);
@@ -768,9 +768,9 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
       try {
         files.add(SubmissionUtils.transform(f));
       } catch (TransformerException e) {
-        log.error("Error transforming XML: " + e.getMessage());
+        log.error("Error transforming XML", e);
       } catch (IOException e) {
-        log.error("Error with file IO: " + e.getMessage());
+        log.error("Error with file IO", e);
       }
     }
     return files;

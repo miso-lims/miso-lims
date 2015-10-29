@@ -72,6 +72,7 @@ public class RunStatsManager {
     try {
       return reports.listPerBaseSummaryAnalyses();
     } catch (SQLException e) {
+      log.error("list per base summary analyses", e);
       throw new RunStatsException("Cannot retrieve the list of per-base summary analyses: " + e.getMessage());
     }
   }
@@ -80,6 +81,7 @@ public class RunStatsManager {
     try {
       return reports.listGlobalAnalyses();
     } catch (SQLException e) {
+      log.error("list global analyses", e);
       throw new RunStatsException("Cannot retrieve the list of global run-based analyses: " + e.getMessage());
     }
   }
@@ -235,6 +237,7 @@ public class RunStatsManager {
     try {
       return d3p.getPerPositionBaseSequenceQualityForLane(run.getAlias(), run.getPairedEnd(), laneNumber);
     } catch (ConsumerException e) {
+      log.error("cannot generate D3 plot JSON for run " + run.getAlias(), e);
       throw new RunStatsException("Cannot generate D3 plot JSON for run " + run.getAlias() + ": " + e.getMessage());
     }
   }
@@ -244,6 +247,7 @@ public class RunStatsManager {
     try {
       return d3p.getPerPositionBaseContentForLane(run.getAlias(), run.getPairedEnd(), laneNumber);
     } catch (ConsumerException e) {
+      log.error("cannot generate D3 plot JSON for run " + run.getAlias(), e);
       throw new RunStatsException("Cannot generate D3 plot JSON for run " + run.getAlias() + ": " + e.getMessage());
     }
   }

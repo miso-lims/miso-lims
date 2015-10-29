@@ -71,7 +71,7 @@ public class EmailAlerterService implements AlerterService {
       try {
         EmailUtils.send(to, from, subject, text, mailProps);
       } catch (MessagingException e) {
-        log.error("Cannot send email to alert recipients:" + e.getMessage());
+        log.error("Cannot send email to alert recipients", e);
         throw new AlertingException("Cannot send email to alert recipients", e);
       }
     }

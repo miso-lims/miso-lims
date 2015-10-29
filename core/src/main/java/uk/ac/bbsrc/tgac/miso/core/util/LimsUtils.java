@@ -723,6 +723,7 @@ public class LimsUtils {
         result.append("\n");
       }
     } catch (Exception e) {
+      log.error("reflect string", e);
       result.append("\n\nERROR: " + e.getMessage() + "\n\n");
     }
     return result.toString();

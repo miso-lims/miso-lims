@@ -335,7 +335,7 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
         try {
           eInsert.execute(flParams);
         } catch (DuplicateKeyException dke) {
-          log.debug("This Container/Partition combination already exists - not inserting: " + dke.getMessage());
+          log.error("This Container/Partition combination already exists - not inserting", dke);
         }
       }
     }

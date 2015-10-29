@@ -318,7 +318,7 @@ public class SQLProjectDAO implements ProjectStore {
             try {
               fInsert.execute(fcParams);
             } catch (DuplicateKeyException dke) {
-              log.warn("This Project/Issue Key combination already exists - not inserting: " + dke.getMessage());
+              log.error("This Project/Issue Key combination already exists - not inserting", dke);
             }
           }
         }
@@ -374,7 +374,7 @@ public class SQLProjectDAO implements ProjectStore {
       try {
         pInsert.execute(poParams);
       } catch (DuplicateKeyException dke) {
-        log.warn("This Project/Overview combination already exists - not inserting: " + dke.getMessage());
+        log.error("This Project/Overview combination already exists - not inserting", dke);
       }
     } else {
       params.addValue("overviewId", overview.getId());

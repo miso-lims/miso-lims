@@ -80,6 +80,7 @@ public class PoolRestController {
       }
       return mapper.writeValueAsString(RestUtils.error("No such pool with that ID.", "poolId", poolId.toString()));
     } catch (IOException ioe) {
+      log.error("cannot retrieve pool", ioe);
       return mapper.writeValueAsString(RestUtils.error("Cannot retrieve pool: " + ioe.getMessage(), "poolId", poolId.toString()));
     }
   }

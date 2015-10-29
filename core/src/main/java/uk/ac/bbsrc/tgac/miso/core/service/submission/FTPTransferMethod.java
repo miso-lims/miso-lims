@@ -86,7 +86,7 @@ public class FTPTransferMethod implements TransferMethod {
 
       return (report);
     } catch (java.io.FileNotFoundException j) {
-      log.debug("The specified datafiles could not be found.");
+      log.error("The specified datafiles could not be found.", j);
       throw new SubmissionException("DataFiles could not be found:" + j.getMessage());
     } catch (Exception e) {
       log.error("upload sequence data", e);

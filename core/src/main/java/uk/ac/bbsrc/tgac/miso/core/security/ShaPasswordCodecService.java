@@ -117,6 +117,7 @@ public final class ShaPasswordCodecService implements PasswordCodecService {
       // base64-encode the hmac
       result = new Base64().encodeToString(rawHmac);
     } catch (Exception e) {
+      log.error("failed to generate HMAC", e);
       throw new SignatureException("Failed to generate HMAC : " + e.getMessage());
     }
     return result;

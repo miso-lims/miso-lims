@@ -267,10 +267,13 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
         sb.append(SubmissionUtils.transform(submissionDocument, true));
       }
     } catch (ParserConfigurationException e) {
+      log.error("generate submission metadata", e);
       throw new SubmissionException(e.getMessage());
     } catch (TransformerException e) {
+      log.error("generate submission metadata", e);
       throw new SubmissionException(e.getMessage());
     } catch (IOException e) {
+      log.error("generate submission metadata", e);
       throw new SubmissionException(
           "Cannot write to submission storage directory: " + subPath + ". Please check this directory exists and is writable.");
     } finally {
@@ -518,7 +521,7 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
           }
         }
       } catch (ParseException e) {
-        log.error("No timestamped submission metadata documents. Falling back to simple names: " + e.getMessage());
+        log.error("No timestamped submission metadata documents. Falling back to simple names", e);
       }
 
       String dateStr = "";

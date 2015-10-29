@@ -173,9 +173,9 @@ public class PacBioTransformer implements FileSetTransformer<String, String, Fil
               }
             }
           } catch (InterrogationException e) {
-            log.warn(e.getMessage() + ". Attempting fall-back date resolution...");
+            log.error("Attempting fall-back date resolution...", e);
           } catch (UnsupportedEncodingException e) {
-            log.warn(e.getMessage() + ". Cannot encode plateId to be URL friendly.");
+            log.error("Cannot encode plateId to be URL friendly.", e);
           }
         } else {
           log.error(rootFile.getName() + " :: Permission denied");

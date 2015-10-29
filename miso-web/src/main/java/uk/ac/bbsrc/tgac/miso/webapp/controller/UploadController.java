@@ -181,7 +181,7 @@ public class UploadController {
         request.getSession(false).setAttribute("bulksamples", o);
       }
     } catch (Exception e) {
-      log.error("SAMPLE IMPORT FAIL:" + e.getMessage());
+      log.error("SAMPLE IMPORT FAIL", e);
     }
   }
 

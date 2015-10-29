@@ -87,6 +87,7 @@ public class RunRestController {
       }
       return mapper.writeValueAsString(RestUtils.error("No such run with that ID.", "runId", runId.toString()));
     } catch (IOException ioe) {
+      log.error("cannot retrieve run", ioe);
       return mapper.writeValueAsString(RestUtils.error("Cannot retrieve run: " + ioe.getMessage(), "runId", runId.toString()));
     }
   }
@@ -103,6 +104,7 @@ public class RunRestController {
       }
       return mapper.writeValueAsString(RestUtils.error("No such run with that alias.", "runAlias", runAlias.toString()));
     } catch (IOException ioe) {
+      log.error("cannot retrieve run", ioe);
       return mapper.writeValueAsString(RestUtils.error("Cannot retrieve run: " + ioe.getMessage(), "runAlias", runAlias));
     }
   }

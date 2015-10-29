@@ -84,6 +84,7 @@ public class ProjectRestController {
       }
       return RestUtils.error("No such project with that alias.", "projectAlias", projectAlias).toString();
     } catch (IOException ioe) {
+      log.error("cannot retrieve project", ioe);
       return RestUtils.error("Cannot retrieve project: " + ioe.getMessage(), "projectAlias", projectAlias).toString();
     }
   }
@@ -122,6 +123,7 @@ public class ProjectRestController {
       }
       return mapper.writeValueAsString(RestUtils.error("No such project with that ID.", "projectId", projectId.toString()));
     } catch (IOException ioe) {
+      log.error("cannot retrieve project", ioe);
       return mapper.writeValueAsString(RestUtils.error("Cannot retrieve project: " + ioe.getMessage(), "projectId", projectId.toString()));
     }
   }

@@ -258,7 +258,7 @@ public class SQLTgacSubmissionDAO implements Store<Submission>, NamingSchemeAwar
                 poParams.addValue("experiments_experimentId", experiment.getId());
                 pInsert.execute(poParams);
               } catch (DuplicateKeyException dke) {
-                log.warn("This Submission_Experiment combination already exists - not inserting: " + dke.getMessage());
+                log.error("This Submission_Experiment combination already exists - not inserting", dke);
               }
 
               Study study = experiment.getStudy();
@@ -269,7 +269,7 @@ public class SQLTgacSubmissionDAO implements Store<Submission>, NamingSchemeAwar
                 poParams.addValue("studies_studyId", study.getId());
                 sInsert.execute(poParams);
               } catch (DuplicateKeyException dke) {
-                log.warn("This Submission_Study combination already exists - not inserting: " + dke.getMessage());
+                log.error("This Submission_Study combination already exists - not inserting", dke);
               }
             }
 
@@ -283,7 +283,7 @@ public class SQLTgacSubmissionDAO implements Store<Submission>, NamingSchemeAwar
                 poParams.addValue("samples_sampleId", sample.getId());
                 sInsert.execute(poParams);
               } catch (DuplicateKeyException dke) {
-                log.warn("This Submission_Sample combination already exists - not inserting: " + dke.getMessage());
+                log.error("This Submission_Sample combination already exists - not inserting", dke);
               }
 
               // Adds Submission_Partition_Dilution info to DB table.
@@ -297,7 +297,7 @@ public class SQLTgacSubmissionDAO implements Store<Submission>, NamingSchemeAwar
                 sInsert.execute(poParams);
 
               } catch (DuplicateKeyException dke) {
-                log.warn("This Submission_Partition_Dilution combination already exists - not inserting: " + dke.getMessage());
+                log.error("This Submission_Partition_Dilution combination already exists - not inserting", dke);
               }
             }
           }
@@ -312,7 +312,7 @@ public class SQLTgacSubmissionDAO implements Store<Submission>, NamingSchemeAwar
               poParams.addValue(priKey, priValue);
               pInsert.execute(poParams);
             } catch (DuplicateKeyException dke) {
-              log.warn("This " + tableName + " combination already exists - not inserting: " + dke.getMessage());
+              log.error("This " + tableName + " combination already exists - not inserting", dke);
             }
           } else {
             throw new IOException("Null parameter key/value detected. Cannot insert.");
@@ -426,7 +426,7 @@ public class SQLTgacSubmissionDAO implements Store<Submission>, NamingSchemeAwar
           t.addSubmissionElement(newPartition);
         }
       } catch (IOException ie) {
-        log.error("Cannot map submission: " + ie.getMessage(), ie);
+        log.error("Cannot map submission", ie);
       }
 
       return t;

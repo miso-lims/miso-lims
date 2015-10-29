@@ -288,11 +288,11 @@ public class DefaultNotifier {
         nrm.setDataPaths(allDataPaths);
       }
     } catch (FileNotFoundException e) {
-      log.error("Cannot find a notification.properties file in the same directory as the notification jar. Please add one");
+      log.error("Cannot find a notification.properties file in the same directory as the notification jar. Please add one", e);
     } catch (IOException e) {
-      log.error("Cannot read notification.properties. Please check permissions/availability");
+      log.error("Cannot read notification.properties. Please check permissions/availability", e);
     } catch (Exception e) {
-      log.error("Something else went wrong:" + e.getMessage());
+      log.error("Something else went wrong", e);
     }
   }
 

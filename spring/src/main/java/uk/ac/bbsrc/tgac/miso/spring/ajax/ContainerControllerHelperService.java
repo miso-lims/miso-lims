@@ -896,7 +896,7 @@ public class ContainerControllerHelperService {
       j.put("array", jsonArray);
       return j;
     } catch (IOException e) {
-      log.debug("Failed", e);
+      log.error("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
   }

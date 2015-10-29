@@ -87,7 +87,7 @@ public class LogAspect {
     if (SecurityContextHolder.getContext().getAuthentication() != null) {
       name = SecurityContextHolder.getContext().getAuthentication().getName();
     }
-    this.log.warn("FAIL [" + name + "] " + join.toString() + " [" + join.getArgs()[0] + "] -> " + e.getMessage());
+    this.log.warn("FAIL [" + name + "] " + join.toString() + " [" + join.getArgs()[0] + "]", e);
   }
 
   /**
@@ -117,6 +117,6 @@ public class LogAspect {
    */
   public void logFailedAjaxEvent(JoinPoint join, JSONObject json, Exception e) {
     this.log.warn("AJAX FAIL [" + SecurityContextHolder.getContext().getAuthentication().getName() + "] " + join.toString() + " ["
-        + json.toString() + "] -> " + e.getMessage());
+        + json.toString() + "]", e);
   }
 }

@@ -78,9 +78,9 @@ public class StatisticsTransformer implements FileSetTransformer<String, Map<Str
           }
         }
       } catch (FileNotFoundException e) {
-        log.error("Cannot process file: " + e.getMessage());
+        log.error("Cannot process file", e);
       } catch (IOException e) {
-        log.error("Error with file IO: " + e.getMessage());
+        log.error("Error with file IO", e);
       }
     }
 

@@ -111,7 +111,7 @@ public class FlexReportingControllerHelperService {
       jsonObject.put("progress", "<option value=\"all\">all</option>" + a.toString());
       return jsonObject;
     } catch (IOException e) {
-      log.debug("Failed", e);
+      log.error("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
   }
@@ -157,7 +157,7 @@ public class FlexReportingControllerHelperService {
       jsonObject.put("html", jsonArray);
       return jsonObject;
     } catch (Exception e) {
-      log.debug("Failed", e);
+      log.error("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
   }
@@ -204,7 +204,7 @@ public class FlexReportingControllerHelperService {
       response.put("detailTable", buildProjectDetailReport(projects));
       return response;
     } catch (IOException e) {
-      log.debug("Failed", e);
+      log.error("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
   }
@@ -314,7 +314,7 @@ public class FlexReportingControllerHelperService {
       jsonObject.put("html", jsonArray);
       return jsonObject;
     } catch (Exception e) {
-      log.debug("Failed", e);
+      log.error("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
   }
@@ -370,7 +370,7 @@ public class FlexReportingControllerHelperService {
           + "\" />','" + project.getName() + "','" + project.getAlias() + "','" + project.getProgress().name() + "','" + sb.toString()
           + "']";
     } catch (IOException e) {
-      log.debug("Failed", e);
+      log.error("Failed", e);
       return "Failed: " + e.getMessage();
     }
   }
@@ -397,7 +397,7 @@ public class FlexReportingControllerHelperService {
       response.put("reportTable", buildSampleRelationReport(p, runs));
       return response;
     } catch (IOException e) {
-      log.debug("Failed", e);
+      log.error("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
   }
@@ -465,7 +465,7 @@ public class FlexReportingControllerHelperService {
       jsonObject.put("type", "<option value=\"all\">all</option>" + a.toString());
       return jsonObject;
     } catch (IOException e) {
-      log.debug("Failed", e);
+      log.error("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
   }
@@ -523,7 +523,7 @@ public class FlexReportingControllerHelperService {
       jsonObject.put("html", jsonArray);
       return jsonObject;
     } catch (Exception e) {
-      log.debug("Failed", e);
+      log.error("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
   }
@@ -602,7 +602,7 @@ public class FlexReportingControllerHelperService {
       response.put("reportTable", buildSampleReport(samples));
       return response;
     } catch (IOException e) {
-      log.debug("Failed", e);
+      log.error("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
   }
@@ -683,7 +683,7 @@ public class FlexReportingControllerHelperService {
       jsonObject.put("html", jsonArray);
       return jsonObject;
     } catch (Exception e) {
-      log.debug("Failed", e);
+      log.error("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
   }
@@ -770,7 +770,7 @@ public class FlexReportingControllerHelperService {
       response.put("relationQCTable", buildRelationQCTable(libraries));
       return response;
     } catch (IOException e) {
-      log.debug("Failed", e);
+      log.error("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
   }
@@ -890,7 +890,7 @@ public class FlexReportingControllerHelperService {
       jsonObject.put("html", jsonArray);
       return jsonObject;
     } catch (Exception e) {
-      log.debug("Failed", e);
+      log.error("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
   }
@@ -951,7 +951,7 @@ public class FlexReportingControllerHelperService {
       response.put("runsPartitionReport", buildRunPartitionReport(runs));
       return response;
     } catch (IOException e) {
-      log.debug("Failed", e);
+      log.error("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
   }
@@ -1124,7 +1124,7 @@ public class FlexReportingControllerHelperService {
       projectJSON.put("children", projectChildrenArray);
       return projectJSON;
     } catch (IOException e) {
-      log.debug("Failed", e);
+      log.error("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
   }

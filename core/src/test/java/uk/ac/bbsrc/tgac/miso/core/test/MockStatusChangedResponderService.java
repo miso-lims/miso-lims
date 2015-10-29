@@ -89,7 +89,7 @@ public class MockStatusChangedResponderService implements ResponderService {
       try {
         as.raiseAlert(a);
       } catch (AlertingException e) {
-        log.error("Cannot raise user-level alert:" + e.getMessage());
+        log.error("Cannot raise user-level alert", e);
         e.printStackTrace();
       }
     }

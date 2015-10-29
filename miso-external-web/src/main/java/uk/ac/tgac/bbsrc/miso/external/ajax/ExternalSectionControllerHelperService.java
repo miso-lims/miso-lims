@@ -242,6 +242,7 @@ public class ExternalSectionControllerHelperService {
 
       return jsonObject;
     } catch (Exception e) {
+      log.error("failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
   }
@@ -307,6 +308,7 @@ public class ExternalSectionControllerHelperService {
       // base64-encode the hmac
       result = Base64.encodeBase64URLSafeString(rawHmac);
     } catch (Exception e) {
+      log.error("failed to generate HMAC", e);
       throw new SignatureException("Failed to generate HMAC : " + e.getMessage());
     }
     return result;
