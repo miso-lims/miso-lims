@@ -59,7 +59,7 @@ public class PoolAlertAspect {
         poolAlertManager.removeWatcher(pool, user.getUserId());
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("remove watcher", e);
     }
   }
 
@@ -69,7 +69,7 @@ public class PoolAlertAspect {
         poolAlertManager.addWatcher(pool, user.getUserId());
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("add watcher", e);
     }
   }
 
@@ -77,7 +77,7 @@ public class PoolAlertAspect {
     try {
       poolAlertManager.update(pool.getId());
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("update pool alert aspect", e);
     }
   }
 }

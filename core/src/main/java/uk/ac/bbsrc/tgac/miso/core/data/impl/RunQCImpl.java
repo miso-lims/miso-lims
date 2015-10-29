@@ -24,12 +24,13 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
-
 import com.eaglegenomics.simlims.core.User;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractRunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunException;
+
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.impl
@@ -40,6 +41,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunException;
  * @since 0.0.3
  */
 public class RunQCImpl extends AbstractRunQC implements Serializable {
+  protected static final Logger log = LoggerFactory.getLogger(RunQCImpl.class);
   /**
    * Construct a new RunQCImpl
    */
@@ -60,7 +62,7 @@ public class RunQCImpl extends AbstractRunQC implements Serializable {
       try {
         setRun(run);
       } catch (MalformedRunException e) {
-        e.printStackTrace();
+        log.error("constructor", e);
       }
     }
   }

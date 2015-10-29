@@ -276,7 +276,7 @@ public class SQLNoteDAO implements NoteStore {
       try {
         note.setOwner(securityDAO.getUserById(rs.getLong("owner_userId")));
       } catch (IOException e) {
-        e.printStackTrace();
+        log.error("note row mapper", e);
       }
 
       return note;

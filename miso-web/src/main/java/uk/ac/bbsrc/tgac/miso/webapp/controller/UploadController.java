@@ -214,7 +214,7 @@ public class UploadController {
       PrintWriter out = response.getWriter();
       out.println("<input type='hidden' id='uploadresponsebody' value='" + o.toString() + "'/>");
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("upload project plate", e);
     }
   }
 
@@ -245,7 +245,7 @@ public class UploadController {
       PrintWriter out = response.getWriter();
       out.println("<input type='hidden' id='uploadresponsebody' value='" + o.toString() + "'/>");
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("upload plate input", e);
     }
   }
 
@@ -263,7 +263,7 @@ public class UploadController {
       PrintWriter out = response.getWriter();
       out.println("<input type='hidden' id='uploadresponsebody' value='" + jsonArray + "'/>");
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("upload sample sheet", e);
     }
   }
 
@@ -284,7 +284,7 @@ public class UploadController {
     }
 
     catch (Exception e) {
-      e.printStackTrace();
+      log.error("upload library pool sheet", e);
     }
   }
 

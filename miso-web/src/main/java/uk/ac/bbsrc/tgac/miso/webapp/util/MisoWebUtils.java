@@ -23,10 +23,14 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.util;
 
+
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
@@ -40,6 +44,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
  * @since 0.0.2
  */
 public class MisoWebUtils {
+  protected static final Logger log = LoggerFactory.getLogger(MisoWebUtils.class);
   public static String generateErrorDivMessage(String errorMessage) {
     return "<div id='errordiv' class='flasherror'>" + errorMessage + "</div>";
   }
@@ -64,7 +69,7 @@ public class MisoWebUtils {
               "MISO storage directory seems to exist, but some other IO error occurred. Please check that this directory is writable.");
         }
       } catch (IOException e) {
-        e.printStackTrace();
+        log.error("check storage directories", e);
         checks.put("error", "Cannot access one of the MISO storage directories: " + e.getMessage());
       }
     } else {
@@ -83,7 +88,7 @@ public class MisoWebUtils {
         LimsUtils.checkFile(new File(baseStoragePath, "submission.properties"));
         checks.put("ok", "All core properties files OK");
       } catch (IOException e) {
-        e.printStackTrace();
+        log.error("core properties files check", e);
         checks.put("error", "Cannot access one of the MISO core properties files: " + e.getMessage());
       }
     }

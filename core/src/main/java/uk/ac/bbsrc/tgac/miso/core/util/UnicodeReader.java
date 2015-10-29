@@ -37,11 +37,15 @@ import java.io.PushbackInputStream;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Generic unicode textreader, which will use BOM mark to identify the encoding to be used. If BOM is not found then use a given default or
  * system encoding.
  */
 public class UnicodeReader extends Reader {
+  protected static final Logger log = LoggerFactory.getLogger(UnicodeReader.class);
   PushbackInputStream internalIn;
   InputStreamReader internalIn2 = null;
   String defaultEnc;
@@ -65,7 +69,7 @@ public class UnicodeReader extends Reader {
       internalIn = new PushbackInputStream(in, BOM_SIZE);
       this.defaultEnc = defaultEnc;
     } catch (UnsupportedEncodingException e) {
-      e.printStackTrace();
+      log.error("unicode reader", e);
     }
   }
 

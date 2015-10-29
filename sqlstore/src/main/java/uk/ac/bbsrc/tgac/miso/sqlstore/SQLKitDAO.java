@@ -268,7 +268,7 @@ public class SQLKitDAO implements KitStore {
         kit.setKitDescriptor(kd);
         kit.setNotes(noteDAO.listByKit(rs.getLong("kitId")));
       } catch (IOException e) {
-        e.printStackTrace();
+        log.error("kit row mapper", e);
       }
       return kit;
     }

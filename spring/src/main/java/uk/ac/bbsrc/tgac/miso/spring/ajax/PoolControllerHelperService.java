@@ -123,7 +123,7 @@ public class PoolControllerHelperService {
       map.put("types", sb.toString());
       return JSONUtils.JSONObjectResponse(map);
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("get pool qc types", e);
     }
     return JSONUtils.SimpleJSONError("Cannot list all Pool QC Types");
   }
@@ -355,7 +355,7 @@ public class PoolControllerHelperService {
         return JSONUtils.SimpleJSONError("Pool has no parseable barcode");
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("cannot access " + temploc.getAbsolutePath(), e);
       return JSONUtils.SimpleJSONError(e.getMessage() + ": Cannot seem to access " + temploc.getAbsolutePath());
     }
   }
@@ -392,7 +392,7 @@ public class PoolControllerHelperService {
           File f = mps.getLabelFor(pool);
           if (f != null) thingsToPrint.add(f);
         } catch (IOException e) {
-          e.printStackTrace();
+          log.error("error printing pool barcode", e);
           return JSONUtils.SimpleJSONError("Error printing pool barcode: " + e.getMessage());
         }
       }
@@ -400,10 +400,10 @@ public class PoolControllerHelperService {
       PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
       return JSONUtils.SimpleJSONResponse("Job " + pj.getJobId() + " : Barcodes printed.");
     } catch (MisoPrintException e) {
-      e.printStackTrace();
+      log.error("no printer of that name available", e);
       return JSONUtils.SimpleJSONError("No printer of that name available: " + e.getMessage());
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("cannot print barcodes", e);
       return JSONUtils.SimpleJSONError("Cannot print barcodes: " + e.getMessage());
     }
   }
@@ -462,7 +462,7 @@ public class PoolControllerHelperService {
         return JSONUtils.JSONObjectResponse("html", "Need a longer search pattern ...");
       }
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("pool search experiments", e);
       return JSONUtils.SimpleJSONError(e.getMessage());
     }
   }
@@ -493,7 +493,7 @@ public class PoolControllerHelperService {
             p.addExperiment(e);
             requestManager.saveExperiment(e);
           } catch (MalformedExperimentException e1) {
-            e1.printStackTrace();
+            log.error("save experiment", e1);
           }
 
           sb.append("<i>");
@@ -508,7 +508,7 @@ public class PoolControllerHelperService {
         return JSONUtils.SimpleJSONError("Could not resolve Run ID. Please ensure the run is saved before adding Pools");
       }
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("select study for pool", e);
       return JSONUtils.SimpleJSONError(e.getMessage());
     }
   }
@@ -678,7 +678,7 @@ public class PoolControllerHelperService {
     try {
       user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("error getting currently logged in user", e);
       return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
     }
 
@@ -689,7 +689,7 @@ public class PoolControllerHelperService {
           requestManager.deletePool(requestManager.getPoolById(poolId));
           return JSONUtils.SimpleJSONResponse("Pool deleted");
         } catch (IOException e) {
-          e.printStackTrace();
+          log.error("cannot delete pool", e);
           return JSONUtils.SimpleJSONError("Cannot delete pool: " + e.getMessage());
         }
       } else {

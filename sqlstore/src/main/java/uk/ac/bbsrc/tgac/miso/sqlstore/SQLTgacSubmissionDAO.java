@@ -404,7 +404,7 @@ public class SQLTgacSubmissionDAO implements Store<Submission>, NamingSchemeAwar
             try {
               newPool.addPoolableElement(dil);
             } catch (Exception e) {
-              e.printStackTrace();
+              log.error("TGAC submission row mapper", e);
             }
           }
           // adds the new pool to the partition
@@ -426,8 +426,7 @@ public class SQLTgacSubmissionDAO implements Store<Submission>, NamingSchemeAwar
           t.addSubmissionElement(newPartition);
         }
       } catch (IOException ie) {
-        log.warn("Cannot map submission: " + ie.getMessage());
-        ie.printStackTrace();
+        log.error("Cannot map submission: " + ie.getMessage(), ie);
       }
 
       return t;

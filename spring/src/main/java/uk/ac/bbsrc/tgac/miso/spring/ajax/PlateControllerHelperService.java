@@ -132,7 +132,7 @@ public class PlateControllerHelperService {
         return JSONUtils.SimpleJSONError("Plate has no parseable barcode");
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("cannot access " + temploc.getAbsolutePath(), e);
       return JSONUtils.SimpleJSONError(e.getMessage() + ": Cannot seem to access " + temploc.getAbsolutePath());
     }
   }
@@ -172,17 +172,17 @@ public class PlateControllerHelperService {
           File f = mps.getLabelFor(plate);
           if (f != null) thingsToPrint.add(f);
         } catch (IOException e) {
-          e.printStackTrace();
+          log.error("printing barcodes", e);
           return JSONUtils.SimpleJSONError("Error printing barcodes: " + e.getMessage());
         }
       }
       PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
       return JSONUtils.SimpleJSONResponse("Job " + pj.getJobId() + " : Barcodes printed.");
     } catch (MisoPrintException e) {
-      e.printStackTrace();
+      log.error("print barcodes", e);
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("print barcodes", e);
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
     }
   }
@@ -222,7 +222,7 @@ public class PlateControllerHelperService {
         return JSONUtils.SimpleJSONError("New location barcode not recognised");
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("change plate location", e);
       return JSONUtils.SimpleJSONError(e.getMessage());
     }
 
@@ -254,7 +254,7 @@ public class PlateControllerHelperService {
         FormUtils.createPlateInputSpreadsheet(f);
         return JSONUtils.SimpleJSONResponse("" + f.getName().hashCode());
       } catch (Exception e) {
-        e.printStackTrace();
+        log.error("failed to get plate input form", e);
         return JSONUtils.SimpleJSONError("Failed to get plate input form: " + e.getMessage());
       }
     } else {
@@ -322,8 +322,7 @@ public class PlateControllerHelperService {
           try {
             requestManager.deletePool(currentPool);
           } catch (IOException e1) {
-            log.error("Cannot delete pool. Nothing left to do.");
-            e1.printStackTrace();
+            log.error("Cannot delete pool. Nothing left to do.", e1);
           }
         }
 
@@ -334,13 +333,11 @@ public class PlateControllerHelperService {
           try {
             requestManager.deletePlate(currentPlate);
           } catch (IOException e1) {
-            log.error("Cannot delete plate. Nothing left to do.");
-            e1.printStackTrace();
+            log.error("Cannot delete plate. Nothing left to do.", e1);
           }
         }
 
-        log.error("Caused by...");
-        e.printStackTrace();
+        log.error("cannot save imported plate", e);
         return JSONUtils.SimpleJSONError("Cannot save imported plate: " + e.getMessage());
       }
     } else {
@@ -399,7 +396,7 @@ public class PlateControllerHelperService {
     try {
       user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("error getting currently logged in user", e);
       return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
     }
 
@@ -410,7 +407,7 @@ public class PlateControllerHelperService {
           requestManager.deletePlate(requestManager.getPlateById(plateId));
           return JSONUtils.SimpleJSONResponse("Plate deleted");
         } catch (IOException e) {
-          e.printStackTrace();
+          log.error("cannot delete plate", e);
           return JSONUtils.SimpleJSONError("Cannot delete plate: " + e.getMessage());
         }
       } else {
@@ -466,7 +463,7 @@ public class PlateControllerHelperService {
       FormUtils.createPlateExportForm(f, a);
       return JSONUtils.SimpleJSONResponse("" + f.getName().hashCode());
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("failed to get plate input form", e);
       return JSONUtils.SimpleJSONError("Failed to get plate input form: " + e.getMessage());
     }
   }

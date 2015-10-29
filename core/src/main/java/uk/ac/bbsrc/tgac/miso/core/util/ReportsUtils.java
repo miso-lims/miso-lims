@@ -39,6 +39,9 @@ import org.jfree.chart.plot.PiePlot;
 import org.jfree.data.general.DefaultPieDataset;
 import org.jfree.util.Rotation;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Reportable;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
@@ -55,6 +58,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.ReportingException;
  * @since 0.0.2
  */
 public class ReportsUtils {
+  protected static final Logger log = LoggerFactory.getLogger(ReportsUtils.class);
 
   public static String buildHTMLReport(List<? extends Reportable> reportables, String type, List<String> options)
       throws ReportingException {
@@ -234,7 +238,7 @@ public class ReportsUtils {
         try {
           ChartUtilities.saveChartAsPNG(projectchart, chart, 500, 300);
         } catch (IOException e) {
-          e.printStackTrace();
+          log.error("build HTML report", e);
         }
         if (chartbool) {
           sb.append("<br/><img src='/styles/images/projectschart" + r + ".png'/>");
@@ -373,7 +377,7 @@ public class ReportsUtils {
         try {
           ChartUtilities.saveChartAsPNG(samplechart, chart, 500, 300);
         } catch (IOException e) {
-          e.printStackTrace();
+          log.error("save chart as PNG", e);
         }
 
         if (chartbool) {
@@ -402,7 +406,7 @@ public class ReportsUtils {
         try {
           ChartUtilities.saveChartAsPNG(sampleqcchart, qcchart, 500, 300);
         } catch (IOException e) {
-          e.printStackTrace();
+          log.error("save chart as PNG", e);
         }
         if (chartbool) {
           sb.append(" <img src='/styles/images/samplesqcchart" + r + ".png'/>");
@@ -524,7 +528,7 @@ public class ReportsUtils {
         try {
           ChartUtilities.saveChartAsPNG(runchart, chart, 500, 300);
         } catch (IOException e) {
-          e.printStackTrace();
+          log.error("save chart as PNG", e);
         }
 
         if (chartbool) {

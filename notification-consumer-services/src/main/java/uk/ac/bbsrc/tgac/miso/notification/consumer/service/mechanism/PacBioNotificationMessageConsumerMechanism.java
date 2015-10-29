@@ -112,11 +112,9 @@ public class PacBioNotificationMessageConsumerMechanism
               String s = new String(IntegrationUtils.decompress(URLDecoder.decode(cell.getString("cellStatus"), "UTF-8").getBytes()));
               status += s + "\n\n";
             } catch (UnsupportedEncodingException e) {
-              log.error("Cannot decode status xml: " + e.getMessage());
-              e.printStackTrace();
+              log.error("Cannot decode status xml", e);
             } catch (IOException e) {
-              log.error("Cannot decompress and decode incoming status: " + e.getMessage());
-              e.printStackTrace();
+              log.error("Cannot decompress and decode incoming status", e);
             }
           }
         }
@@ -163,8 +161,7 @@ public class PacBioNotificationMessageConsumerMechanism
                     try {
                       r.getStatus().setStartDate(startDateFormat.parse(run.getString("startDate")));
                     } catch (ParseException e) {
-                      log.error(e.getMessage());
-                      e.printStackTrace();
+                      log.error("process run JSON start date", e);
                     }
                   }
 
@@ -172,8 +169,7 @@ public class PacBioNotificationMessageConsumerMechanism
                     try {
                       r.getStatus().setCompletionDate(startDateFormat.parse(run.getString("completionDate")));
                     } catch (ParseException e) {
-                      log.error(e.getMessage());
-                      e.printStackTrace();
+                      log.error("process run JSON completion date", e);
                     }
                   }
 
@@ -210,8 +206,7 @@ public class PacBioNotificationMessageConsumerMechanism
                     try {
                       r.getStatus().setStartDate(startDateFormat.parse(run.getString("startDate")));
                     } catch (ParseException e) {
-                      log.error(e.getMessage());
-                      e.printStackTrace();
+                      log.error("process run JSON start date", e);
                     }
                   }
 
@@ -219,8 +214,7 @@ public class PacBioNotificationMessageConsumerMechanism
                     try {
                       r.getStatus().setCompletionDate(startDateFormat.parse(run.getString("completionDate")));
                     } catch (ParseException e) {
-                      log.error(e.getMessage());
-                      e.printStackTrace();
+                      log.error("process run JSON completion date", e);
                     }
                   }
 
@@ -325,8 +319,7 @@ public class PacBioNotificationMessageConsumerMechanism
             }
           }
         } catch (IOException e) {
-          log.error(e.getMessage());
-          e.printStackTrace();
+          log.error("process run JSON", e);
         }
       } else {
         log.error("No notification status available for " + runName);
@@ -339,8 +332,7 @@ public class PacBioNotificationMessageConsumerMechanism
         log.info("Batch saved " + saved.length + " / " + runs.size() + " runs");
       }
     } catch (IOException e) {
-      log.error("Couldn't save run batch: " + e.getMessage());
-      e.printStackTrace();
+      log.error("Couldn't save run batch", e);
     }
 
     return updatedRuns;

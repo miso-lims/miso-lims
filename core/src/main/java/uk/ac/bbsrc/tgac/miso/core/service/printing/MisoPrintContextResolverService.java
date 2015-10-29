@@ -56,10 +56,8 @@ public class MisoPrintContextResolverService implements PrintContextResolverServ
           return context.getClass().newInstance();
         } catch (InstantiationException e) {
           log.error("Cannot create a new instance of '" + contextName + "'", e);
-          e.printStackTrace();
         } catch (IllegalAccessException e) {
           log.error("Cannot create a new instance of '" + contextName + "'", e);
-          e.printStackTrace();
         }
       }
     }

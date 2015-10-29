@@ -256,7 +256,7 @@ public class EditLS454PoolController {
       }
       throw ex;
     } catch (MalformedDilutionException e) {
-      e.printStackTrace();
+      log.error("setup pool with dilution", e);
       throw new IOException(e);
     }
   }
@@ -271,8 +271,7 @@ public class EditLS454PoolController {
         try {
           p.addPoolableElement(ld);
         } catch (MalformedDilutionException e) {
-          log.debug("Cannot add emPCR dilution " + s + " to pool " + p.getName());
-          e.printStackTrace();
+          log.error("Cannot add emPCR dilution " + s + " to pool " + p.getName(), e);
         }
       }
     }

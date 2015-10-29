@@ -170,7 +170,7 @@ public class RunControllerHelperService {
 
       return JSONUtils.JSONObjectResponse(responseMap);
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("failed to get run options", e);
       return JSONUtils.SimpleJSONError("Failed to get Run options");
     }
   }
@@ -602,7 +602,6 @@ public class RunControllerHelperService {
       map.put("runId", json.getString("runId"));
       return JSONUtils.JSONObjectResponse(map);
     } catch (IOException e) {
-      e.printStackTrace();
       log.error("Failed to get available users for this Run QC: ", e);
       return JSONUtils.SimpleJSONError("Failed to get available users for this Run QC: " + e.getMessage());
     }
@@ -619,7 +618,7 @@ public class RunControllerHelperService {
       map.put("types", sb.toString());
       return JSONUtils.JSONObjectResponse(map);
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("cannot list all run QC types", e);
     }
     return JSONUtils.SimpleJSONError("Cannot list all Run QC Types");
   }
@@ -646,7 +645,7 @@ public class RunControllerHelperService {
         return JSONUtils.JSONObjectResponse(map);
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("get run QC process selection", e);
     }
     return JSONUtils.SimpleJSONError("Cannot list all Run QC Process Selection");
   }
@@ -822,7 +821,7 @@ public class RunControllerHelperService {
           return JSONUtils.JSONObjectResponse("err", "No containers with this barcode.");
         }
       } catch (IOException e) {
-        e.printStackTrace();
+        log.error("unable to lookup barcode", e);
         return JSONUtils.JSONObjectResponse("err", "Unable to lookup barcode.");
       }
     } else {
@@ -871,7 +870,7 @@ public class RunControllerHelperService {
       requestManager.saveRunNote(run, note);
       requestManager.saveRun(run);
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("add run note", e);
       return JSONUtils.SimpleJSONError(e.getMessage());
     }
 
@@ -894,7 +893,7 @@ public class RunControllerHelperService {
         return JSONUtils.SimpleJSONError("Sample does not have note " + noteId + ". Cannot remove");
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("delete run note", e);
       return JSONUtils.SimpleJSONError("Cannot remove note: " + e.getMessage());
     }
   }
@@ -910,7 +909,7 @@ public class RunControllerHelperService {
       }
       return JSONUtils.SimpleJSONResponse("OK");
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("watch run", e);
     }
     return JSONUtils.SimpleJSONError("Unable to watch run");
   }
@@ -926,7 +925,7 @@ public class RunControllerHelperService {
       }
       return JSONUtils.SimpleJSONResponse("OK");
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("unwatch run", e);
     }
     return JSONUtils.SimpleJSONError("Unable to unwatch run");
   }
@@ -973,7 +972,7 @@ public class RunControllerHelperService {
       }
       return JSONUtils.JSONObjectResponse("err", "Error: cannot get containers from this run");
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("no such pool", e);
       return JSONUtils.JSONObjectResponse("err", "Error: no such pool");
     }
   }
@@ -1064,7 +1063,7 @@ public class RunControllerHelperService {
 
       return JSONUtils.JSONObjectResponse("html", sb.toString());
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("check pool experiment", e);
       return JSONUtils.SimpleJSONError(e.getMessage());
     }
   }
@@ -1123,11 +1122,8 @@ public class RunControllerHelperService {
       b.append(
           "<span style='position: absolute; top: 0; right: 0;' onclick='Run.pool.confirmPoolRemove(this);' class='float-right ui-icon ui-icon-circle-close'></span>");
       b.append("</div>");
-    } catch (IOException e) {
-      e.printStackTrace();
-      return "Cannot get studies for pool: " + e.getMessage();
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("pool html", e);
       return "Cannot get studies for pool: " + e.getMessage();
     }
 
@@ -1139,7 +1135,7 @@ public class RunControllerHelperService {
     try {
       user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("delete run", e);
       return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
     }
 
@@ -1150,7 +1146,7 @@ public class RunControllerHelperService {
           requestManager.deleteRun(requestManager.getRunById(runId));
           return JSONUtils.SimpleJSONResponse("Run deleted");
         } catch (IOException e) {
-          e.printStackTrace();
+          log.error("delete run", e);
           return JSONUtils.SimpleJSONError("Cannot delete run: " + e.getMessage());
         }
       } else {

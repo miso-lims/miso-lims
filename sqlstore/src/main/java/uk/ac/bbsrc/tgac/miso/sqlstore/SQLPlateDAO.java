@@ -445,7 +445,7 @@ public class SQLPlateDAO implements PlateStore {
         }
         plate.getChangeLog().addAll(changeLogDAO.listAllById(TABLE_NAME, id));
       } catch (IOException e1) {
-        e1.printStackTrace();
+        log.error("plate row mapper", e1);
       }
 
       if (isCacheEnabled() && lookupCache(cacheManager) != null) {

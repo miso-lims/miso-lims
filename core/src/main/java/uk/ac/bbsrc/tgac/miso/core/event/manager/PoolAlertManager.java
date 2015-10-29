@@ -111,7 +111,7 @@ public class PoolAlertManager {
             }
           }
         } catch (Exception e) {
-          e.printStackTrace();
+          log.error("push", e);
         }
       }
     } else {
@@ -159,8 +159,7 @@ public class PoolAlertManager {
             m.setAccessible(true);
             m.invoke(clone);
           } catch (Exception e) {
-            log.error("Cannot fire pool ready event: " + e.getMessage());
-            e.printStackTrace();
+            log.error("Cannot fire pool ready event", e);
           }
         } else {
           log.debug("Updating Pool " + clone.getId() + " ...");

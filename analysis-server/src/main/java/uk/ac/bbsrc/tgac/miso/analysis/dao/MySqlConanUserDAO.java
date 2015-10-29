@@ -30,6 +30,9 @@ import uk.ac.ebi.fgpt.conan.model.ConanUser;
 import java.io.IOException;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * uk.ac.bbsrc.tgac.miso.analysis
  * <p/>
@@ -40,6 +43,8 @@ import java.util.Map;
  * @since 0.1.3
  */
 public class MySqlConanUserDAO extends DatabaseConanUserDAO {
+  protected static final Logger log = LoggerFactory.getLogger(MySqlConanUserDAO.class);
+
   private long getAutoIncrement(String tableName) throws IOException {
     final String q = "SHOW TABLE STATUS LIKE '" + tableName + "'";
     Map<String, Object> rs = getJdbcTemplate().queryForMap(q);
@@ -71,7 +76,7 @@ public class MySqlConanUserDAO extends DatabaseConanUserDAO {
           getLog().warn("User acquired from database was of unexpected type " + user.getClass().getSimpleName() + ", cannot set user ID");
         }
       } catch (IOException e) {
-        e.printStackTrace();
+        log.error("save user", e);
       }
     } else {
       getJdbcTemplate().update(USER_UPDATE, user.getUserName(), user.getFirstName(), user.getSurname(), user.getEmail(),

@@ -140,9 +140,9 @@ public class RestSignatureFilter extends OncePerRequestFilter {
             SignatureHelper.generatePrivateUserKey((user.getLoginName() + "::" + user.getPassword()).getBytes("UTF-8")), signature);
       }
     } catch (InvalidKeyException e) {
-      e.printStackTrace();
+      logger.error("filter", e);
     } catch (Exception e) {
-      e.printStackTrace();
+      logger.error("filter", e);
     }
 
     try {
@@ -151,8 +151,7 @@ public class RestSignatureFilter extends OncePerRequestFilter {
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "REST signature failed validation.");
       }
     } catch (Exception e) {
-      logger.error("UNABLE TO UNDERTAKE SIGNATURE VALIDATION");
-      e.printStackTrace();
+      logger.error("UNABLE TO UNDERTAKE SIGNATURE VALIDATION", e);
       response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "The REST Security Server experienced an internal error.");
     }
 
@@ -170,7 +169,7 @@ public class RestSignatureFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContextHolderStrategy().setContext(sc);
         logger.debug("Set context - chaining");
       } catch (AuthenticationException a) {
-        a.printStackTrace();
+        logger.error("filter", a);
       }
       filterChain.doFilter(request, response);
     } else {

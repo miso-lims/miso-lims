@@ -161,7 +161,7 @@ public class PoolSearchService {
         return JSONUtils.JSONObjectResponse("html", "Need a longer search pattern ...");
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("cannot complete pool element search", e);
       return JSONUtils.SimpleJSONError("Could not complete pool element search: " + e.getMessage());
     }
   }

@@ -30,6 +30,9 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
 
@@ -41,6 +44,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
  * @since 0.0.2
  */
 public class SequencerInterrogationUtils {
+  protected static final Logger log = LoggerFactory.getLogger(SequencerInterrogationUtils.class);
   /**
    * Sets up the socket connection to a given SequencerReference
    * 
@@ -55,7 +59,7 @@ public class SequencerInterrogationUtils {
     try {
       return new Socket(sr.getIpAddress(), 7899);
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("prepare socket", e);
       throw new InterrogationException(e.getMessage());
     }
   }
@@ -94,7 +98,7 @@ public class SequencerInterrogationUtils {
       socket.close();
       String dirty = sb.toString();
 
-      System.out.println(dirty);
+      log.info(dirty);
 
       StringBuilder response = new StringBuilder(); // Used to hold the output.
       int codePoint; // Used to reference the current character.
@@ -111,14 +115,14 @@ public class SequencerInterrogationUtils {
 
       String clean = response.toString().replace("\\\n", "").replace("\\\t", "");
 
-      System.out.println(clean);
+      log.info(clean);
 
       return clean;
     } catch (UnknownHostException e) {
-      System.err.println("Cannot resolve host: " + socket.getInetAddress());
+      log.error("Cannot resolve host: " + socket.getInetAddress(), e);
       throw new InterrogationException(e.getMessage());
     } catch (IOException e) {
-      System.err.println("Couldn't get I/O for the connection to: " + socket.getInetAddress());
+      log.error("Couldn't get I/O for the connection to: " + socket.getInetAddress(), e);
       throw new InterrogationException(e.getMessage());
     }
   }

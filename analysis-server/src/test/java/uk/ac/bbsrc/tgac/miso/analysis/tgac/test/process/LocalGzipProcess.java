@@ -81,10 +81,10 @@ public class LocalGzipProcess implements ConanProcess {
         getLog().info("Response from command [" + command + "]: " + output.length + " lines, first line was " + output[0]);
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("gzip", e);
       return false;
     } catch (CommandExecutionException e) {
-      e.printStackTrace();
+      log.error("gzip", e);
       return false;
     }
     return true;

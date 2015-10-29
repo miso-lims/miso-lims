@@ -234,9 +234,9 @@ public class SQLPoolQCDAO implements PoolQcStore {
           s.setPool(poolDAO.get(rs.getLong("pool_poolId")));
         }
       } catch (IOException e) {
-        e.printStackTrace();
+        log.error("pool QC row mapper", e);
       } catch (MalformedPoolException e) {
-        e.printStackTrace();
+        log.error("pool QC row mapper", e);
       }
 
       if (isCacheEnabled() && lookupCache(cacheManager) != null) {

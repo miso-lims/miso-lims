@@ -91,7 +91,7 @@ public class RunStatsManager {
       ReportTable rt = reports.getAverageValues(map);
       return rt != null && !rt.isEmpty();
     } catch (SQLException e) {
-      e.printStackTrace();
+      log.error("has stats for run", e);
       return false;
     }
   }
@@ -109,9 +109,9 @@ public class RunStatsManager {
       }
       report.put("runSummary", JSONArray.fromObject(rt.toJSON()));
     } catch (SQLException e) {
-      e.printStackTrace();
+      log.error("get summary stats for run", e);
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("get summary stats for run", e);
     }
 
     if (!((RunImpl) run).getSequencerPartitionContainers().isEmpty()) {
@@ -132,9 +132,9 @@ public class RunStatsManager {
               partition.put("partitionSummary", JSONArray.fromObject(rt.toJSON()));
             }
           } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("get summary stats for run", e);
           } catch (IOException e) {
-            e.printStackTrace();
+            log.error("get summary stats for run", e);
           }
 
           // clear any previous barcode query
@@ -153,9 +153,9 @@ public class RunStatsManager {
                       partition.put(tb.getSequence(), JSONArray.fromObject(rt.toJSON()));
                     }
                   } catch (SQLException e) {
-                    e.printStackTrace();
+                    log.error("get summary stats for run", e);
                   } catch (IOException e) {
-                    e.printStackTrace();
+                    log.error("get summary stats for run", e);
                   }
                 }
               }
@@ -185,9 +185,9 @@ public class RunStatsManager {
         partition.put("partitionSummary", JSONArray.fromObject(rt.toJSON()));
       }
     } catch (SQLException e) {
-      e.printStackTrace();
+      log.error("get summary stats for lane", e);
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("get summary stats for lane", e);
     }
 
     // clear any previous barcode query
@@ -210,9 +210,9 @@ public class RunStatsManager {
                       partition.put(tb.getSequence(), JSONArray.fromObject(rt.toJSON()));
                     }
                   } catch (SQLException e) {
-                    e.printStackTrace();
+                    log.error("get summary stats for lane", e);
                   } catch (IOException e) {
-                    e.printStackTrace();
+                    log.error("get summary stats for lane", e);
                   }
                 }
               }

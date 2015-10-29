@@ -99,7 +99,7 @@ public class NexteraDualIndexTagBarcodeStrategy implements TagBarcodeStrategy, R
             }
           }
         } catch (IOException e) {
-          e.printStackTrace();
+          log.error("get barcodes", e);
         }
       } else {
         log.error("Null requestManager");

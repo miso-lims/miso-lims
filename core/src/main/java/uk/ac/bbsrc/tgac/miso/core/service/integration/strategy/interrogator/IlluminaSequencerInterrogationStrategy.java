@@ -104,13 +104,13 @@ public class IlluminaSequencerInterrogationStrategy implements SequencerInterrog
             status.setRunName(statusDoc.getElementsByTagName("RunName").item(0).getTextContent());
             s.add(status);
           } catch (ParserConfigurationException e) {
-            e.printStackTrace();
+            log.error("list all statuses", e);
             throw new InterrogationException(e.getMessage());
           } catch (ParseException e) {
-            e.printStackTrace();
+            log.error("list all statuses", e);
             throw new InterrogationException(e.getMessage());
           } catch (TransformerException e) {
-            e.printStackTrace();
+            log.error("list all statuses", e);
             throw new InterrogationException(e.getMessage());
           }
         }
@@ -220,13 +220,13 @@ public class IlluminaSequencerInterrogationStrategy implements SequencerInterrog
         }
       }
     } catch (ParserConfigurationException e) {
-      e.printStackTrace();
+      log.error("get run status", e);
       throw new InterrogationException(e.getMessage());
     } catch (ParseException e) {
-      e.printStackTrace();
+      log.error("get run status", e);
       throw new InterrogationException(e.getMessage());
     } catch (TransformerException e) {
-      e.printStackTrace();
+      log.error("get run status", e);
       throw new InterrogationException(e.getMessage());
     }
     return null;
@@ -248,7 +248,7 @@ public class IlluminaSequencerInterrogationStrategy implements SequencerInterrog
         }
       }
     } catch (InterrogationException e) {
-      e.printStackTrace();
+      log.error("get run information", e);
     }
     return json;
   }

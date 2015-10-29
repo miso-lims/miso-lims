@@ -59,7 +59,7 @@ public class ProjectOverviewAlertAspect {
         projectAlertManager.removeWatcher(overview, user.getUserId());
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("remove watcher", e);
     }
   }
 
@@ -69,7 +69,7 @@ public class ProjectOverviewAlertAspect {
         projectAlertManager.addWatcher(overview, user.getUserId());
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("add watcher", e);
     }
   }
 }

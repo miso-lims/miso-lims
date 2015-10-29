@@ -105,8 +105,7 @@ public class AllSamplesQcPassedResponderService extends AbstractResponderService
           try {
             as.raiseAlert(a);
           } catch (AlertingException e) {
-            log.error("Cannot raise user-level alert:" + e.getMessage());
-            e.printStackTrace();
+            log.error("Cannot raise user-level alert", e);
           }
         }
       }

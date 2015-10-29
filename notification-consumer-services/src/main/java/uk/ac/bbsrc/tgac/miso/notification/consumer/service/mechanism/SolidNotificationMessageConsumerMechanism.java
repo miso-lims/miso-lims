@@ -158,8 +158,7 @@ public class SolidNotificationMessageConsumerMechanism
                       r.getStatus().setStartDate(logDateFormat.parse(run.getString("startDate")));
                     }
                   } catch (ParseException e) {
-                    log.error(e.getMessage());
-                    e.printStackTrace();
+                    log.error("process run JSON start date", e);
                   }
                 }
 
@@ -172,8 +171,7 @@ public class SolidNotificationMessageConsumerMechanism
                       r.getStatus().setCompletionDate(null);
                     }
                   } catch (ParseException e) {
-                    log.error(e.getMessage());
-                    e.printStackTrace();
+                    log.error("process run JSON completion date", e);
                   }
                 }
               }
@@ -212,8 +210,7 @@ public class SolidNotificationMessageConsumerMechanism
                       r.getStatus().setStartDate(logDateFormat.parse(run.getString("startDate")));
                     }
                   } catch (ParseException e) {
-                    log.error(e.getMessage());
-                    e.printStackTrace();
+                    log.error("process run JSON start date", e);
                   }
                 }
 
@@ -226,8 +223,7 @@ public class SolidNotificationMessageConsumerMechanism
                       r.getStatus().setCompletionDate(null);
                     }
                   } catch (ParseException e) {
-                    log.error(e.getMessage());
-                    e.printStackTrace();
+                    log.error("process run JSON completion date", e);
                   }
                 }
 
@@ -303,8 +299,7 @@ public class SolidNotificationMessageConsumerMechanism
             }
           }
         } catch (IOException e) {
-          log.error(e.getMessage());
-          e.printStackTrace();
+          log.error("process run JSON", e);
         }
       }
     }
@@ -315,8 +310,7 @@ public class SolidNotificationMessageConsumerMechanism
         log.info("Batch saved " + saved.length + " / " + runs.size() + " runs");
       }
     } catch (IOException e) {
-      log.error("Couldn't save run batch: " + e.getMessage());
-      e.printStackTrace();
+      log.error("Couldn't save run batch", e);
     }
 
     return updatedRuns;

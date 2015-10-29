@@ -398,7 +398,7 @@ public class SQLEmPCRDilutionDAO implements EmPCRDilutionStore {
           pcrDilution.setEmPCR(emPcrDAO.lazyGet(rs.getLong("emPCR_pcrId")));
         }
       } catch (IOException e1) {
-        e1.printStackTrace();
+        log.error("EmPCR dilution row mapper", e1);
       }
 
       if (isCacheEnabled() && lookupCache(cacheManager) != null) {

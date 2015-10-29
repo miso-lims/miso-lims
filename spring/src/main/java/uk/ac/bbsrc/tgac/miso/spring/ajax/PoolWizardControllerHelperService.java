@@ -86,10 +86,10 @@ public class PoolWizardControllerHelperService {
         s.setQcDate(df.parse(q.getString("poolQcDate")));
         s.setQcType(requestManager.getPoolQcTypeById(q.getLong("poolQcType")));
       } catch (IOException e) {
-        e.printStackTrace();
+        log.error("add pool", e);
         return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
       } catch (ParseException e) {
-        e.printStackTrace();
+        log.error("add pool", e);
         return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
       }
       pqcs.add(s);
@@ -154,11 +154,9 @@ public class PoolWizardControllerHelperService {
               qc.setPool(pool);
               pool.addQc(qc);
             } catch (MalformedPoolException e) {
-              e.printStackTrace();
               log.error("Failed", e);
               return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
             } catch (MalformedPoolQcException e) {
-              e.printStackTrace();
               log.error("Failed", e);
               return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
             }

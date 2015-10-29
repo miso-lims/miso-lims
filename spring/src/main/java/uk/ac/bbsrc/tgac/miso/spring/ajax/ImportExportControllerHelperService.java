@@ -131,7 +131,7 @@ public class ImportExportControllerHelperService {
       FormUtils.createSampleExportForm(f, a);
       return JSONUtils.SimpleJSONResponse("" + f.getName().hashCode());
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("failed to get plate input form", e);
       return JSONUtils.SimpleJSONError("Failed to get plate input form: " + e.getMessage());
     }
   }
@@ -144,7 +144,7 @@ public class ImportExportControllerHelperService {
       FormUtils.generateCSVBAC(f, a);
       return JSONUtils.SimpleJSONResponse("" + f.getName().hashCode());
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("failed to get plate input form", e);
       return JSONUtils.SimpleJSONError("Failed to get plate input form: " + e.getMessage());
     }
   }
@@ -158,7 +158,7 @@ public class ImportExportControllerHelperService {
       FormUtils.createLibraryPoolExportFormFromWeb(f, a, barcodekit);
       return JSONUtils.SimpleJSONResponse("" + f.getName().hashCode());
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("failed to get plate input form", e);
       return JSONUtils.SimpleJSONError("Failed to get plate input form: " + e.getMessage());
     }
   }
@@ -595,7 +595,6 @@ public class ImportExportControllerHelperService {
         return JSONUtils.JSONObjectResponse(map);
       }
     } catch (IOException e) {
-      e.printStackTrace();
       log.error("Failed to retrieve library types given platform type: ", e);
       return JSONUtils.SimpleJSONError("Failed to retrieve library types given platform type: " + e.getMessage());
     }

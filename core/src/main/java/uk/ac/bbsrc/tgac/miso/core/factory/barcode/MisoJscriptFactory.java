@@ -80,7 +80,7 @@ public class MisoJscriptFactory {
       sb.append("T 17,11,0,5,pt6;").append(unicodeify(name)).append("\n");
       sb.append("A 1").append("\n");
     } catch (UnsupportedEncodingException e) {
-      e.printStackTrace();
+      log.error("standard tube barcode label", e);
     }
     return sb.toString();
   }
@@ -107,7 +107,7 @@ public class MisoJscriptFactory {
       sb.append("T 13,11,0,5,pt6;").append(unicodeify(name)).append("\n");
       sb.append("A 1").append("\n");
     } catch (UnsupportedEncodingException e) {
-      e.printStackTrace();
+      log.error("-80 tube barcode label", e);
     }
 
     return sb.toString();

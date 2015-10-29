@@ -738,11 +738,11 @@ public class SQLLibraryDAO implements LibraryStore {
         }
         library.getChangeLog().addAll(getChangeLogDAO().listAllById(TABLE_NAME, id));
       } catch (IOException e1) {
-        e1.printStackTrace();
+        log.error("library row mapper", e1);
       } catch (MalformedLibraryQcException e) {
-        e.printStackTrace();
+        log.error("library row mapper", e);
       } catch (MalformedDilutionException e) {
-        e.printStackTrace();
+        log.error("library row mapper", e);
       }
 
       if (isCacheEnabled() && lookupCache(cacheManager) != null) {

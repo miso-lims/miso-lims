@@ -75,7 +75,7 @@ public class StudyControllerHelperService {
     try {
       user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("error getting currently logged in user", e);
       return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
     }
 
@@ -86,7 +86,7 @@ public class StudyControllerHelperService {
           requestManager.deleteStudy(requestManager.getStudyById(studyId));
           return JSONUtils.SimpleJSONResponse("Study deleted");
         } catch (IOException e) {
-          e.printStackTrace();
+          log.error("cannot delete study", e);
           return JSONUtils.SimpleJSONError("Cannot delete study: " + e.getMessage());
         }
       } else {

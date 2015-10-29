@@ -27,6 +27,9 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.Element;
@@ -37,7 +40,6 @@ import com.lowagie.text.Rectangle;
 import com.lowagie.text.pdf.PdfContentByte;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Reportable;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -52,6 +54,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.ReportingException;
  * @since 0.0.2
  */
 public class ITextProjectDecorator extends AbstractReportDecorator<Document> {
+  protected static final Logger log = LoggerFactory.getLogger(ITextProjectDecorator.class);
 
   protected OutputStream stream;
 
@@ -117,7 +120,7 @@ public class ITextProjectDecorator extends AbstractReportDecorator<Document> {
 
         report.close();
       } catch (DocumentException e) {
-        e.printStackTrace();
+        log.error("build report", e);
         throw new ReportingException(e.getMessage());
       }
     } else if (reportables.size() > 1) {

@@ -248,9 +248,9 @@ public class SQLSampleQCDAO implements SampleQcStore {
           s.setSample(sampleDAO.get(rs.getLong("sample_sampleId")));
         }
       } catch (IOException e) {
-        e.printStackTrace();
+        log.error("sample QC row mapper", e);
       } catch (MalformedSampleException e) {
-        e.printStackTrace();
+        log.error("sample QC row mapper", e);
       }
 
       if (isCacheEnabled() && lookupCache(cacheManager) != null) {

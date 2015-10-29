@@ -35,7 +35,7 @@ public class AllowAnythingEntityNamingScheme<T extends Nameable> implements Miso
       type = (Class<T>) Class.forName("uk.ac.bbsrc.tgac.miso.core.data.Nameable");
       validationMap.put("name", Pattern.compile("(.*)"));
     } catch (ClassNotFoundException e) {
-      e.printStackTrace();
+      log.error("constructor", e);
     }
   }
 
@@ -132,8 +132,7 @@ public class AllowAnythingEntityNamingScheme<T extends Nameable> implements Miso
         return true;
       }
     } catch (NoSuchMethodException e) {
-      log.error("No such field '" + fieldName + "' on class " + namingSchemeFor().getCanonicalName());
-      e.printStackTrace();
+      log.error("No such field '" + fieldName + "' on class " + namingSchemeFor().getCanonicalName(), e);
     }
     return false;
   }

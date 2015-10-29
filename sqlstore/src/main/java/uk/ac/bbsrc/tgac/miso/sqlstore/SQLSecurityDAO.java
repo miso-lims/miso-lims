@@ -169,9 +169,9 @@ public class SQLSecurityDAO implements SecurityStore {
           roleBlob = new SerialBlob(rbytes);
         }
       } catch (SerialException e) {
-        e.printStackTrace();
+        log.error("save user", e);
       } catch (SQLException e) {
-        e.printStackTrace();
+        log.error("save user", e);
       }
     }
 
@@ -409,7 +409,7 @@ public class SQLSecurityDAO implements SecurityStore {
           user.setGroups(listGroupsByUserId(id));
         }
       } catch (IOException e) {
-        e.printStackTrace();
+        log.error("user row mapper", e);
       }
 
       if (isCacheEnabled() && lookupCache(cacheManager) != null) {
@@ -431,7 +431,7 @@ public class SQLSecurityDAO implements SecurityStore {
       try {
         g.setUsers(listUsersByGroupName(g.getName()));
       } catch (IOException e) {
-        e.printStackTrace();
+        log.error("group row mapper", e);
       }
 
       return g;

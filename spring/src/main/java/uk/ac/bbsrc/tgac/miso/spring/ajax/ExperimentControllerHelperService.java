@@ -256,7 +256,7 @@ public class ExperimentControllerHelperService {
       }
       return JSONUtils.SimpleJSONResponse("Saved kit!");
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("add library kit", e);
       return JSONUtils.SimpleJSONError("Failed to save library kit");
     }
   }
@@ -317,7 +317,7 @@ public class ExperimentControllerHelperService {
       }
       return JSONUtils.SimpleJSONResponse("Saved kit!");
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("add EmPCR kit", e);
       return JSONUtils.SimpleJSONError("Failed to save EmPCR kit");
     }
   }
@@ -378,7 +378,7 @@ public class ExperimentControllerHelperService {
       }
       return JSONUtils.SimpleJSONResponse("Saved kit!");
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("failed to save clustering kit", e);
       return JSONUtils.SimpleJSONError("Failed to save clustering kit");
     }
   }
@@ -439,7 +439,7 @@ public class ExperimentControllerHelperService {
       }
       return JSONUtils.SimpleJSONResponse("Saved kit!");
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("failed to save sequencing kit", e);
       return JSONUtils.SimpleJSONError("Failed to save sequencing kit");
     }
   }

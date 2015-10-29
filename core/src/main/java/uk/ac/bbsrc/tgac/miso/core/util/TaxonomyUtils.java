@@ -75,17 +75,17 @@ public class TaxonomyUtils {
             return e.getTextContent();
           }
         } catch (ParserConfigurationException e) {
-          e.printStackTrace();
+          log.error("check scientific name at NCBI", e);
         } catch (TransformerException e) {
-          e.printStackTrace();
+          log.error("check scientific name at NCBI", e);
         }
       } catch (ClientProtocolException e) {
-        e.printStackTrace();
+        log.error("check scientific name at NCBI", e);
       } catch (IOException e) {
-        e.printStackTrace();
+        log.error("check scientific name at NCBI", e);
       }
     } catch (UnsupportedEncodingException e) {
-      e.printStackTrace();
+      log.error("check scientific name at NCBI", e);
     }
     return null;
   }

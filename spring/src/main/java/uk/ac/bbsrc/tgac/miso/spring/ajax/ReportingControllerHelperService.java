@@ -95,10 +95,10 @@ public class ReportingControllerHelperService {
       }
       sb.append("</table></div></div>");
     } catch (MetaDataAccessException e) {
-      e.printStackTrace();
+      log.error("get table columns", e);
       return JSONUtils.JSONObjectResponse("html", "Error: " + e.getMessage());
     } catch (SQLException e) {
-      e.printStackTrace();
+      log.error("get table columns", e);
       return JSONUtils.JSONObjectResponse("html", "Error: " + e.getMessage());
     }
     return JSONUtils.JSONObjectResponse("html", sb.toString());
@@ -192,9 +192,8 @@ public class ReportingControllerHelperService {
           b.append("<table class=\"list\" id=\"table\">");
           b.append("<thead>\n" + "    <tr>\n"
               + "        <th><input class=\"chkbox\" type=\"checkbox\" onClick=\"Utils.ui.checkAll(document.reportform.ids)\"/> All</th>\n"
-              + "        <th>Run Name</th>\n" + "        <th>Run Alias</th>\n" +
-              "        <th>Status</th>\n" + "    </tr>\n" + "    </thead>\n" + "    <tbody id=\"search" + json.get("reportType")
-              + "result\">");
+              + "        <th>Run Name</th>\n" + "        <th>Run Alias</th>\n" + "        <th>Status</th>\n" + "    </tr>\n"
+              + "    </thead>\n" + "    <tbody id=\"search" + json.get("reportType") + "result\">");
           b.append("</tbody>");
         } else {
           b.append("Unrecognised ReportType");
@@ -438,7 +437,7 @@ public class ReportingControllerHelperService {
           return JSONUtils.SimpleJSONError("Null ReportType");
         }
       } catch (ReportingException e) {
-        e.printStackTrace(); // To change body of catch statement use File | Settings | File Templates.
+        log.error("generate report", e);
         return JSONUtils.SimpleJSONError("Failed to generate");
       }
     } else if (a.getJSONObject(0).getString("value").equals("Sample")) {
@@ -465,7 +464,7 @@ public class ReportingControllerHelperService {
           return JSONUtils.SimpleJSONError("Null ReportType");
         }
       } catch (ReportingException e) {
-        e.printStackTrace(); // To change body of catch statement use File | Settings | File Templates.
+        log.error("generate report", e);
         return JSONUtils.SimpleJSONError("Failed to generate");
       }
     } else if (a.getJSONObject(0).getString("value").equals("Run")) {
@@ -494,7 +493,7 @@ public class ReportingControllerHelperService {
           return JSONUtils.SimpleJSONError("Null ReportType");
         }
       } catch (ReportingException e) {
-        e.printStackTrace();
+        log.error("generate report", e);
         return JSONUtils.SimpleJSONError("Failed to generate");
       }
     }

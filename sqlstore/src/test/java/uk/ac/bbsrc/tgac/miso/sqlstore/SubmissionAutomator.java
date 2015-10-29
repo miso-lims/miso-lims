@@ -61,7 +61,7 @@ public class SubmissionAutomator extends LimsDAOTestCase {
       super.setUp();
       log.debug("Super setup");
     } catch (Exception e) {
-      e.printStackTrace(); // To change body of catch statement use File | Settings | File Templates.
+      log.error("super setup", e);
     }
     log.debug("Child setup");
 
@@ -173,7 +173,7 @@ public class SubmissionAutomator extends LimsDAOTestCase {
       validateXML(submissionFileName, xsdPath + "SRA.submission.xsd");
       submissionDocument = null;
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("submit project", e);
     }
   }
 
@@ -195,11 +195,11 @@ public class SubmissionAutomator extends LimsDAOTestCase {
       builder.parse(newFile);
       log.info("Validation of " + xmlFile + " complete!");
     } catch (ParserConfigurationException e) {
-      e.printStackTrace();
+      log.error("validate XML", e);
     } catch (SAXException e) {
-      e.printStackTrace();
+      log.error("validate XML", e);
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("validate XML", e);
     }
   }
 }

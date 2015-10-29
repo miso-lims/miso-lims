@@ -68,7 +68,7 @@ public class SequencerReferenceControllerHelperService {
       }
       return JSONUtils.JSONObjectResponse("platforms", sb.toString());
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("list platforms", e);
     }
     return JSONUtils.SimpleJSONError("Cannot list available platforms");
   }
@@ -89,7 +89,7 @@ public class SequencerReferenceControllerHelperService {
       sequencers.put("sequencers", sequencers_list);
       return sequencers;
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("list sequencers", e);
     }
     return JSONUtils.SimpleJSONError("Cannot list available sequencers");
   }
@@ -136,7 +136,7 @@ public class SequencerReferenceControllerHelperService {
     try {
       user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("delete sequencer reference", e);
       return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
     }
 
@@ -147,7 +147,7 @@ public class SequencerReferenceControllerHelperService {
           requestManager.deleteSequencerReference(requestManager.getSequencerReferenceById(refId));
           return JSONUtils.SimpleJSONResponse("Sequencer Reference deleted");
         } catch (IOException e) {
-          e.printStackTrace();
+          log.error("cannot delete sequencer reference", e);
           return JSONUtils.SimpleJSONError("Cannot delete sequencer reference: " + e.getMessage());
         }
       } else {

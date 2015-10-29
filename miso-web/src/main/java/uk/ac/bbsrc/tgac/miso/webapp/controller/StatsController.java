@@ -162,8 +162,7 @@ public class StatsController {
       } catch (InterrogationException e) {
         model.put("error", MisoWebUtils.generateErrorDivMessage(
             "Cannot retrieve status information for the given sequencer reference: " + sr.getName(), e.getMessage()));
-        log.info(e.getMessage());
-        e.printStackTrace();
+        log.error("cannot retrieve status for sequencer", e);
       }
     } else {
       throw new IOException("Cannot retrieve the named Sequencer reference");
@@ -196,8 +195,7 @@ public class StatsController {
       } catch (InterrogationException e) {
         model.put("error", MisoWebUtils.generateErrorDivMessage(
             "Cannot retrieve status information for the given sequencer reference: " + sr.getName(), e.getMessage()));
-        log.info(e.getMessage());
-        e.printStackTrace();
+        log.error("cannot retrieve the status for sequencer", e);
       }
     } else {
       throw new IOException("Cannot retrieve the named Sequencer reference");
@@ -267,7 +265,7 @@ public class StatsController {
       } catch (TransformerException e) {
         model.put("error",
             MisoWebUtils.generateErrorDivMessage("Cannot retrieve status XML for the given run: " + runName, e.getMessage()));
-        e.printStackTrace();
+        log.error("Cannot retrieve XML for run", e);
       }
     } else {
       model.put("error", "Cannot retrieve the given sequencer reference: " + referenceId);
@@ -310,7 +308,7 @@ public class StatsController {
         }
       } catch (TransformerException e) {
         sb.append("Unable to transform Cluster Status XML: " + e.getMessage());
-        e.printStackTrace();
+        log.error("Unable to transform cluster status XML", e);
       }
       model.put("clusterStatus", sb.toString());
     }
@@ -353,7 +351,7 @@ public class StatsController {
       } catch (TransformerException e) {
         model.put("error",
             MisoWebUtils.generateErrorDivMessage("Cannot retrieve status XML for the given run: " + runName, e.getMessage()));
-        e.printStackTrace();
+        log.error("Cannot retrieve status XML for run", e);
       }
     } else {
       model.put("error", "Cannot retrieve the given sequencer reference: " + referenceId);

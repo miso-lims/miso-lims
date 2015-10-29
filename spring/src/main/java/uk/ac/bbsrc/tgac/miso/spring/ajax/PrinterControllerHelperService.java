@@ -103,10 +103,10 @@ public class PrinterControllerHelperService {
       }
       return JSONUtils.JSONObjectResponse("services", sb.toString());
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("list available services", e);
       return JSONUtils.SimpleJSONError("Cannot retrieve available print services");
     } catch (ClassNotFoundException e) {
-      e.printStackTrace();
+      log.error("list available services", e);
       return JSONUtils.SimpleJSONError("Cannot resolve the print service class: " + json.getString("serviceClass"));
     }
   }
@@ -161,7 +161,7 @@ public class PrinterControllerHelperService {
         return JSONUtils.SimpleJSONError("No context or invalid context name supplied");
       }
     } catch (IllegalAccessException e) {
-      e.printStackTrace();
+      log.error("get context fiedls", e);
       return JSONUtils.SimpleJSONError("Cannot get context fields for context: " + json.getString("contextName"));
     }
   }
@@ -206,13 +206,13 @@ public class PrinterControllerHelperService {
       printManager.storePrintService(printService);
       return JSONUtils.JSONObjectResponse("html", "OK");
     } catch (ClassNotFoundException e) {
-      e.printStackTrace();
+      log.error("add print service", e);
       return JSONUtils.SimpleJSONError("Cannot add printer service:" + e.getMessage());
     } catch (IllegalAccessException e) {
-      e.printStackTrace();
+      log.error("add print service", e);
       return JSONUtils.SimpleJSONError("Cannot add printer service." + e.getMessage());
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("add print service", e);
       return JSONUtils.SimpleJSONError("Cannot add printer service." + e.getMessage());
     }
   }
@@ -228,7 +228,7 @@ public class PrinterControllerHelperService {
         }
         return JSONUtils.SimpleJSONResponse("Printer disabled");
       } catch (IOException e) {
-        e.printStackTrace();
+        log.error("disable print service", e);
         return JSONUtils.SimpleJSONError("Cannot resolve printer with name: " + printerName + " : " + e.getMessage());
       }
     } else {
@@ -247,7 +247,7 @@ public class PrinterControllerHelperService {
         }
         return JSONUtils.SimpleJSONResponse("Printer enabled");
       } catch (IOException e) {
-        e.printStackTrace();
+        log.error("enable print service", e);
         return JSONUtils.SimpleJSONError("Cannot resolve printer with name: " + printerName + " : " + e.getMessage());
       }
     } else {
@@ -308,10 +308,10 @@ public class PrinterControllerHelperService {
         printManager.print(pj.getQueuedElements(), pj.getPrintService().getName(), pj.getPrintUser());
         return JSONUtils.SimpleJSONResponse("Print job " + pj + " reprinted successfully");
       } catch (IOException e) {
-        e.printStackTrace();
+        log.error("cannot retrieve print job", e);
         return JSONUtils.SimpleJSONError("Cannot retrieve print job.");
       } catch (MisoPrintException e) {
-        e.printStackTrace();
+        log.error("no such printer", e);
         return JSONUtils.SimpleJSONError("No such printer, or no printer specified.");
       }
     } else {
@@ -347,10 +347,10 @@ public class PrinterControllerHelperService {
       PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
       return JSONUtils.SimpleJSONResponse("Job " + pj.getJobId() + " : Barcodes printed.");
     } catch (MisoPrintException e) {
-      e.printStackTrace();
+      log.error("failed to print barcodes", e);
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("failed to print barcodes", e);
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
     }
   }
@@ -379,10 +379,10 @@ public class PrinterControllerHelperService {
       PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
       return JSONUtils.SimpleJSONResponse("Job " + pj.getJobId() + " : Barcodes printed.");
     } catch (MisoPrintException e) {
-      e.printStackTrace();
+      log.error("failed to print barcodes", e);
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("failed to print barcodes", e);
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
     }
   }
@@ -420,10 +420,10 @@ public class PrinterControllerHelperService {
         return JSONUtils.SimpleJSONResponse("No barcode.");
       }
     } catch (MisoPrintException e) {
-      e.printStackTrace();
+      log.error("failed to print barcodes", e);
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("failed to print barcodes", e);
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
     }
   }

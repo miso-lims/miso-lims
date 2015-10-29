@@ -30,6 +30,9 @@ import java.util.Map;
 
 import javax.servlet.ServletContext;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -44,8 +47,10 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import uk.ac.bbsrc.tgac.miso.integration.util.SignatureHelper;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
+
 @Controller
 public class MenuController implements ServletContextAware {
+  protected static final Logger log = LoggerFactory.getLogger(MenuController.class);
 
   ServletContext servletContext;
   @Autowired
@@ -81,10 +86,10 @@ public class MenuController implements ServletContextAware {
       model.put("userGroups", groups.toString());
       return new ModelAndView("/pages/myAccount.jsp", model);
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("my account menu", e);
       return new ModelAndView("/login.jsp", model);
     } catch (NoSuchAlgorithmException e) {
-      e.printStackTrace();
+      log.error("my account menu", e);
       return new ModelAndView("/login.jsp", model);
     }
   }

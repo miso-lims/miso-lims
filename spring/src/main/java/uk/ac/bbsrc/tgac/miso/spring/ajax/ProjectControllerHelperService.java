@@ -49,6 +49,8 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
@@ -139,7 +141,7 @@ public class ProjectControllerHelperService {
       requestManager.saveProjectOverview(overview);
       requestManager.saveProject(project);
     } catch (final IOException e) {
-      e.printStackTrace();
+      log.error("add project overview", e);
       return JSONUtils.SimpleJSONError(e.getMessage());
     }
 
@@ -168,7 +170,7 @@ public class ProjectControllerHelperService {
       requestManager.saveProjectOverviewNote(overview, note);
       requestManager.saveProject(project);
     } catch (final IOException e) {
-      e.printStackTrace();
+      log.error("add project overview note", e);
       return JSONUtils.SimpleJSONError(e.getMessage());
     }
 
@@ -191,7 +193,7 @@ public class ProjectControllerHelperService {
         return JSONUtils.SimpleJSONError("Project Overview does not have note " + noteId + ". Cannot remove");
       }
     } catch (final IOException e) {
-      e.printStackTrace();
+      log.error("delete project overview", e);
       return JSONUtils.SimpleJSONError("Cannot remove note: " + e.getMessage());
     }
   }
@@ -219,7 +221,7 @@ public class ProjectControllerHelperService {
         return JSONUtils.SimpleJSONError(MessageFormat.format("Cannot delete file id {0}.  Access denied.", id));
       }
     } catch (final IOException e) {
-      e.printStackTrace();
+      log.error("delete project file", e);
       return JSONUtils.SimpleJSONError("Cannot remove file: " + e.getMessage());
     }
   }
@@ -232,7 +234,7 @@ public class ProjectControllerHelperService {
       requestManager.saveProjectOverview(overview);
       requestManager.saveProject(overview.getProject());
     } catch (final IOException e) {
-      e.printStackTrace();
+      log.error("unlock project overview", e);
       return JSONUtils.SimpleJSONError(e.getMessage());
     }
     return JSONUtils.SimpleJSONResponse("ok");
@@ -246,7 +248,7 @@ public class ProjectControllerHelperService {
       requestManager.saveProjectOverview(overview);
       requestManager.saveProject(overview.getProject());
     } catch (final IOException e) {
-      e.printStackTrace();
+      log.error("lock project overview", e);
       return JSONUtils.SimpleJSONError(e.getMessage());
     }
     return JSONUtils.SimpleJSONResponse("ok");
@@ -267,7 +269,7 @@ public class ProjectControllerHelperService {
             errorList.add(issueKey.getString("key"));
           }
         } catch (final IOException e) {
-          e.printStackTrace();
+          log.error("preview issues", e);
           errorList.add(issueKey.getString("key"));
         }
       }
@@ -302,7 +304,7 @@ public class ProjectControllerHelperService {
         }
         return j;
       } catch (final IOException e) {
-        e.printStackTrace();
+        log.error("get issues", e);
         return JSONUtils.SimpleJSONError(e.getMessage());
       }
     } else {
@@ -363,9 +365,7 @@ public class ProjectControllerHelperService {
       final JSONArray jsonArray = new JSONArray();
       for (final Project project : requestManager.listAllProjects()) {
         jsonArray.add("['" + project.getName() + "','" + project.getAlias() + "','" + project.getDescription() + "','"
-            + project.getProgress().getKey() + "','" +
-            // checkOverviews(project.getProjectId()) + "','" +
-            project.getProjectId() + "','" + "<a href=\"/miso/project/" + project.getId()
+            + project.getProgress().getKey() + "','" + project.getProjectId() + "','" + "<a href=\"/miso/project/" + project.getId()
             + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
 
       }
@@ -503,10 +503,10 @@ public class ProjectControllerHelperService {
       final PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
       return JSONUtils.SimpleJSONResponse("Job " + pj.getJobId() + " : Barcodes printed.");
     } catch (final MisoPrintException e) {
-      e.printStackTrace();
+      log.error("print barcodes", e);
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
     } catch (final IOException e) {
-      e.printStackTrace();
+      log.error("print barcodes", e);
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
     }
   }
@@ -547,10 +547,10 @@ public class ProjectControllerHelperService {
       final PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
       return JSONUtils.SimpleJSONResponse("Job " + pj.getJobId() + " : Barcodes printed.");
     } catch (final MisoPrintException e) {
-      e.printStackTrace();
+      log.error("print barcodes", e);
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
     } catch (final IOException e) {
-      e.printStackTrace();
+      log.error("print barcodes", e);
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
     }
   }
@@ -591,10 +591,10 @@ public class ProjectControllerHelperService {
       final PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
       return JSONUtils.SimpleJSONResponse("Job " + pj.getJobId() + " : Barcodes printed.");
     } catch (final MisoPrintException e) {
-      e.printStackTrace();
+      log.error("print barcodes", e);
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
     } catch (final IOException e) {
-      e.printStackTrace();
+      log.error("print barcodes", e);
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
     }
   }
@@ -636,10 +636,10 @@ public class ProjectControllerHelperService {
       final PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
       return JSONUtils.SimpleJSONResponse("Job " + pj.getJobId() + " : Barcodes printed.");
     } catch (final MisoPrintException e) {
-      e.printStackTrace();
+      log.error("print barcodes", e);
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
     } catch (final IOException e) {
-      e.printStackTrace();
+      log.error("print barcodes", e);
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
     }
   }
@@ -680,10 +680,10 @@ public class ProjectControllerHelperService {
       final PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
       return JSONUtils.SimpleJSONResponse("Job " + pj.getJobId() + " : Barcodes printed.");
     } catch (final MisoPrintException e) {
-      e.printStackTrace();
+      log.error("print barcodes", e);
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
     } catch (final IOException e) {
-      e.printStackTrace();
+      log.error("print barcodes", e);
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
     }
   }
@@ -725,10 +725,10 @@ public class ProjectControllerHelperService {
       final PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
       return JSONUtils.SimpleJSONResponse("Job " + pj.getJobId() + " : Barcodes printed.");
     } catch (final MisoPrintException e) {
-      e.printStackTrace();
+      log.error("print barcodes", e);
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
     } catch (final IOException e) {
-      e.printStackTrace();
+      log.error("print barcodes", e);
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
     }
   }
@@ -752,7 +752,7 @@ public class ProjectControllerHelperService {
         FormUtils.createSampleDeliveryForm(samples, f, plate);
         return JSONUtils.SimpleJSONResponse("" + f.getName().hashCode());
       } catch (final Exception e) {
-        e.printStackTrace();
+        log.error("generate sample deliver form", e);
         return JSONUtils.SimpleJSONError("Failed to create sample delivery form: " + e.getMessage());
       }
     } else {
@@ -825,7 +825,7 @@ public class ProjectControllerHelperService {
 
           sb.append("</div></a>");
         } catch (final IOException e) {
-          e.printStackTrace();
+          log.error("visualise bulk sample input form", e);
         } finally {
           sb.append("</div>");
           session.removeAttribute("bulksamples");
@@ -849,7 +849,7 @@ public class ProjectControllerHelperService {
         FormUtils.createPlateInputSpreadsheet(f);
         return JSONUtils.SimpleJSONResponse("" + f.getName().hashCode());
       } catch (final Exception e) {
-        e.printStackTrace();
+        log.error("download plate input", e);
         return JSONUtils.SimpleJSONError("Failed to get plate input form: " + e.getMessage());
       }
     } else {
@@ -870,7 +870,7 @@ public class ProjectControllerHelperService {
       }
       return JSONUtils.SimpleJSONResponse("OK");
     } catch (final IOException e) {
-      e.printStackTrace();
+      log.error("watch overview", e);
     }
     return JSONUtils.SimpleJSONError("Unable to watch/unwatch overview");
   }
@@ -892,7 +892,7 @@ public class ProjectControllerHelperService {
         return JSONUtils.SimpleJSONError("Cannot unwatch an entity of which you are the owner.");
       }
     } catch (final IOException e) {
-      e.printStackTrace();
+      log.error("unwatch overview", e);
     }
     return JSONUtils.SimpleJSONError("Unable to watch/unwatch overview");
   }
@@ -914,7 +914,7 @@ public class ProjectControllerHelperService {
       j.put("watchers", sb.toString());
       return j;
     } catch (final IOException e) {
-      e.printStackTrace();
+      log.error("list watch overview", e);
     }
     return JSONUtils.SimpleJSONError("Unable to list watchers");
   }
@@ -964,7 +964,7 @@ public class ProjectControllerHelperService {
 
       return JSONUtils.SimpleJSONResponse("OK");
     } catch (final IOException e) {
-      e.printStackTrace();
+      log.error("add sample group", e);
       return JSONUtils.SimpleJSONError("Unable to add Sample Group: " + e.getMessage());
     }
   }
@@ -999,7 +999,7 @@ public class ProjectControllerHelperService {
 
       return JSONUtils.SimpleJSONResponse("OK");
     } catch (final IOException e) {
-      e.printStackTrace();
+      log.error("add samples to group", e);
       return JSONUtils.SimpleJSONError("Unable to add Sample Group: " + e.getMessage());
     }
   }

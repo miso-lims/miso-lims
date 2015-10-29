@@ -4,6 +4,8 @@ import java.io.File;
 
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.spi.ServiceProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeLabelFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.factory.FileGeneratingBarcodeLabelFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.schema.BarcodableSchema;
@@ -13,6 +15,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.printing.schema.BarcodableSchema;
  */
 @ServiceProvider
 public class Brady1DBarcodeLabelSchema implements BarcodableSchema<File, JSONObject> {
+  protected static final Logger log = LoggerFactory.getLogger(Brady1DBarcodeLabelSchema.class);
   private BarcodeLabelFactory<File, JSONObject, BarcodableSchema<File, JSONObject>> barcodeLabelFactory = new FileGeneratingBarcodeLabelFactory<JSONObject>();
 
   @Override
@@ -52,7 +55,7 @@ public class Brady1DBarcodeLabelSchema implements BarcodableSchema<File, JSONObj
       sb.append("B 1,0,0,CODE128,5,0.25;").append(field1).append("\n");
       sb.append("A ").append(count).append("\n");
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("get raw state", e);
     }
     return sb.toString();
   }

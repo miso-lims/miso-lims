@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -73,6 +75,7 @@ public class SQLSequencerReferenceDAO implements SequencerReferenceStore {
 
   private static final String SEQUENCER_REFERENCE_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE referenceId=:referenceId";
 
+  protected static final Logger log = LoggerFactory.getLogger(SQLSequencerReferenceDAO.class);
   private JdbcTemplate template;
   private PlatformStore platformDAO;
 
@@ -103,7 +106,7 @@ public class SQLSequencerReferenceDAO implements SequencerReferenceStore {
     try {
       ipBlob = new SerialBlob(sequencerReference.getIpAddress().getAddress());
     } catch (SQLException e) {
-      e.printStackTrace();
+      log.error("sequencer reference save", e);
     }
 
     params.addValue("name", sequencerReference.getName());
@@ -194,7 +197,7 @@ public class SQLSequencerReferenceDAO implements SequencerReferenceStore {
           }
         }
       } catch (IOException e1) {
-        e1.printStackTrace();
+        log.error("sequence reference row mapper", e1);
       }
       return c;
     }

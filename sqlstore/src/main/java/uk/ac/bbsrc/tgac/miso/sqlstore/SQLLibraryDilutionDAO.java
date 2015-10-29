@@ -429,7 +429,7 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
           libraryDilution.setLibrary(libraryDAO.lazyGet(rs.getLong("library_libraryId")));
         }
       } catch (IOException e1) {
-        e1.printStackTrace();
+        log.error("library dilution row mapper", e1);
       }
 
       if (isCacheEnabled() && lookupCache(cacheManager) != null) {

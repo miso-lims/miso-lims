@@ -27,14 +27,15 @@ import java.io.File;
 import java.io.IOException;
 
 import org.springframework.security.core.context.SecurityContextHolder;
-
 import com.eaglegenomics.simlims.core.User;
 import com.opensymphony.util.FileUtils;
-
 import net.sourceforge.fluxion.spi.ServiceProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeLabelFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.schema.BarcodableSchema;
+
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.service.printing.factory
@@ -47,6 +48,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.printing.schema.BarcodableSchema;
  */
 @ServiceProvider
 public class ImageRasterBarcodeLabelFactory<T> implements BarcodeLabelFactory<File, T, BarcodableSchema<File, T>> {
+  protected static final Logger log = LoggerFactory.getLogger(ImageRasterBarcodeLabelFactory.class);
   private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
   private MisoFilesManager misoFileManager;
 
@@ -73,7 +75,7 @@ public class ImageRasterBarcodeLabelFactory<T> implements BarcodeLabelFactory<Fi
 
       return f;
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("get label", e);
     }
     return null;
   }

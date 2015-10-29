@@ -235,16 +235,16 @@ public class SQLAlertDAO implements AlertStore {
           a.setAlertLevel(AlertLevel.get(rs.getString("level")));
           a.setAlertDate(rs.getDate("date"));
         } catch (IOException e1) {
-          e1.printStackTrace();
+          log.error("alert row mapper", e1);
         }
 
         if (isCacheEnabled() && lookupCache(cacheManager) != null) {
           lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id), a));
         }
       } catch (CacheException ce) {
-        ce.printStackTrace();
+        log.error("alert row mapper", ce);
       } catch (UnsupportedOperationException uoe) {
-        uoe.printStackTrace();
+        log.error("alert row mapper", uoe);
       }
       return a;
     }

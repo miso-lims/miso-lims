@@ -394,7 +394,7 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
         s.setLastModifier(securityDAO.getUserById(rs.getLong("lastModifier")));
         s.getChangeLog().addAll(changeLogDAO.listAllById(TABLE_NAME, "container", id));
       } catch (IOException e1) {
-        e1.printStackTrace();
+        log.error("partition container row mapper", e1);
       }
 
       if (isCacheEnabled() && lookupCache(cacheManager) != null) {

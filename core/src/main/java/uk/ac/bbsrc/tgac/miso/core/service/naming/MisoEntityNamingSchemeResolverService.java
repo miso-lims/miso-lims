@@ -32,10 +32,8 @@ public class MisoEntityNamingSchemeResolverService implements EntityNamingScheme
           return scheme.getClass().newInstance();
         } catch (InstantiationException e) {
           log.error("Cannot create a new instance of '" + schemeName + "'", e);
-          e.printStackTrace();
         } catch (IllegalAccessException e) {
           log.error("Cannot create a new instance of '" + schemeName + "'", e);
-          e.printStackTrace();
         }
       }
     }

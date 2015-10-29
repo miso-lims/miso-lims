@@ -100,7 +100,7 @@ public class ProjectRestController {
               try {
                 s.addLibrary(l);
               } catch (MalformedLibraryException e) {
-                e.printStackTrace();
+                log.error("get project by id", e);
               }
             }
           }
@@ -110,7 +110,7 @@ public class ProjectRestController {
               try {
                 s.addQc(qc);
               } catch (MalformedSampleQcException e) {
-                e.printStackTrace();
+                log.error("get project by id", e);
               }
             }
           }
@@ -134,7 +134,7 @@ public class ProjectRestController {
         try {
           l.addDilution(dil);
         } catch (MalformedDilutionException e) {
-          e.printStackTrace();
+          log.error("get project libraries", e);
         }
       }
 
@@ -142,7 +142,7 @@ public class ProjectRestController {
         try {
           l.addQc(qc);
         } catch (MalformedLibraryQcException e) {
-          e.printStackTrace();
+          log.error("get project libraries", e);
         }
       }
     }

@@ -31,14 +31,15 @@ import java.util.regex.Pattern;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.UnicodeReader;
+
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.impl.solid
@@ -49,6 +50,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.UnicodeReader;
  * @since 0.0.3
  */
 public class SolidStatus extends StatusImpl {
+  protected static final Logger log = LoggerFactory.getLogger(SolidStatus.class);
   String statusXml = null;
 
   public SolidStatus() {
@@ -109,11 +111,11 @@ public class SolidStatus extends StatusImpl {
       }
       setXml(statusXml);
     } catch (ParserConfigurationException e) {
-      e.printStackTrace();
+      log.error("parse status XML", e);
     } catch (TransformerException e) {
-      e.printStackTrace();
+      log.error("parse status XML", e);
     } catch (ParseException e) {
-      e.printStackTrace();
+      log.error("parse status XML", e);
     }
   }
 

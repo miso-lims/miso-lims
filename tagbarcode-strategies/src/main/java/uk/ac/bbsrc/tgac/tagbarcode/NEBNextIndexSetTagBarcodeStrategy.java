@@ -93,7 +93,7 @@ public class NEBNextIndexSetTagBarcodeStrategy implements TagBarcodeStrategy, Re
             }
           }
         } catch (IOException e) {
-          e.printStackTrace();
+          log.error("get barcodes", e);
         }
       }
     }

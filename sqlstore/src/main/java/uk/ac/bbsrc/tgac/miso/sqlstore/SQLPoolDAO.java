@@ -723,10 +723,8 @@ public class SQLPoolDAO implements PoolStore {
         p.getChangeLog().addAll(changeLogDAO.listAllById(TABLE_NAME, id));
       } catch (IOException e1) {
         log.error("Cannot map from database to Pool: ", e1);
-        e1.printStackTrace();
       } catch (MalformedPoolQcException e) {
         log.error("Cannot add PoolQC to pool: ", e);
-        e.printStackTrace();
       }
 
       if (poolAlertManager != null) {

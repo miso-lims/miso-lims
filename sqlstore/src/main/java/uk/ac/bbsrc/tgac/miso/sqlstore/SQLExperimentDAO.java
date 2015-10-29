@@ -502,7 +502,7 @@ public class SQLExperimentDAO implements ExperimentStore {
         }
         e.getChangeLog().addAll(getChangeLogDAO().listAllById(TABLE_NAME, id));
       } catch (IOException e1) {
-        e1.printStackTrace();
+        log.error("experiment row mapper", e1);
       }
 
       if (isCacheEnabled() && lookupCache(cacheManager) != null) {

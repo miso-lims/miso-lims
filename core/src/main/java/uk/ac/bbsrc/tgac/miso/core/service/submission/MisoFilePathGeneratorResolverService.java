@@ -56,10 +56,8 @@ public class MisoFilePathGeneratorResolverService implements FilePathGeneratorRe
           return generator.getClass().newInstance();
         } catch (InstantiationException e) {
           log.error("Cannot create a new instance of '" + generator.getName() + "'", e);
-          e.printStackTrace();
         } catch (IllegalAccessException e) {
           log.error("Cannot create a new instance of '" + generator.getName() + "'", e);
-          e.printStackTrace();
         }
       }
     }
@@ -75,10 +73,8 @@ public class MisoFilePathGeneratorResolverService implements FilePathGeneratorRe
           return generator.getClass().newInstance();
         } catch (InstantiationException e) {
           log.error("Cannot create a new instance of '" + generatorName + "'", e);
-          e.printStackTrace();
         } catch (IllegalAccessException e) {
           log.error("Cannot create a new instance of '" + generatorName + "'", e);
-          e.printStackTrace();
         }
       }
     }

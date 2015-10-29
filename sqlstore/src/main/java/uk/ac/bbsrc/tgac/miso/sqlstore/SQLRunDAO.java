@@ -539,8 +539,7 @@ public class SQLRunDAO implements RunStore {
           }
         }
       } catch (IOException e) {
-        log.error("Cannot batch save run: " + run.getName());
-        e.printStackTrace();
+        log.error("Cannot batch save run: " + run.getName(), e);
       }
     }
 
@@ -733,9 +732,9 @@ public class SQLRunDAO implements RunStore {
         r.setLastModifier(securityDAO.getUserById(rs.getLong("lastModifier")));
         r.getChangeLog().addAll(changeLogDAO.listAllById(TABLE_NAME, id));
       } catch (IOException e1) {
-        e1.printStackTrace();
+        log.error("run row mapper", e1);
       } catch (Exception e) {
-        e.printStackTrace();
+        log.error("run row mapper", e);
       }
 
       if (runAlertManager != null) {

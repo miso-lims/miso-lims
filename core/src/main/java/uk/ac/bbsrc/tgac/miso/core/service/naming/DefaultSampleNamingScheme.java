@@ -143,8 +143,7 @@ public class DefaultSampleNamingScheme implements RequestManagerAwareNamingSchem
     try {
       return namingSchemeFor().getMethod("get" + LimsUtils.capitalise(fieldName));
     } catch (NoSuchMethodException e) {
-      log.error("No such field '" + fieldName + "' on class " + namingSchemeFor().getCanonicalName());
-      e.printStackTrace();
+      log.error("No such field '" + fieldName + "' on class " + namingSchemeFor().getCanonicalName(), e);
     }
     return null;
   }

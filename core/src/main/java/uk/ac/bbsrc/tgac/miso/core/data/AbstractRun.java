@@ -289,7 +289,7 @@ public abstract class AbstractRun implements Run {
     try {
       runQC.setRun(this);
     } catch (MalformedRunException e) {
-      e.printStackTrace();
+      log.error("set run", e);
     }
   }
 

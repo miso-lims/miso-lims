@@ -139,12 +139,11 @@ public class PacBioTransformer implements FileSetTransformer<String, String, Fil
 
                 run.getJSONArray("cells").add(cellObj);
               } catch (ParserConfigurationException e) {
-                e.printStackTrace();
+                log.error(runName + ":: Unable to process run", e);
               } catch (TransformerException e) {
-                e.printStackTrace();
+                log.error(runName + ":: Unable to process run", e);
               } catch (IOException e) {
-                log.error(runName + ":: Unable to process run: " + e.getMessage());
-                e.printStackTrace();
+                log.error(runName + ":: Unable to process run", e);
               }
             }
           }

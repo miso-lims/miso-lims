@@ -311,7 +311,7 @@ public class SQLEmPCRDAO implements EmPCRStore {
           pcr.setEmPcrDilutions(emPCRDilutionDAO.listAllByEmPCRId(id));
         }
       } catch (IOException e1) {
-        e1.printStackTrace();
+        log.error("EmPCR row mapper", e1);
       }
 
       if (isCacheEnabled() && lookupCache(cacheManager) != null) {

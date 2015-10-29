@@ -33,15 +33,16 @@ import javax.xml.transform.TransformerException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.UnicodeReader;
+
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.impl.solid
@@ -54,6 +55,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.UnicodeReader;
 @Entity
 @DiscriminatorValue("Solid")
 public class SolidRun extends RunImpl {
+  protected static final Logger log = LoggerFactory.getLogger(SolidRun.class);
 
   public SolidRun() {
     setPlatformType(PlatformType.SOLID);
@@ -120,9 +122,9 @@ public class SolidRun extends RunImpl {
         log.error("No status XML for this run");
       }
     } catch (ParserConfigurationException e) {
-      e.printStackTrace();
+      log.error("parse status XML", e);
     } catch (TransformerException e) {
-      e.printStackTrace();
+      log.error("parse status XML", e);
     }
   }
 

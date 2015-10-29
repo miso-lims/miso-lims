@@ -395,9 +395,9 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
               SubmissionUtils.transform(submissionReport, savedReport);
               return submissionReport;
             } catch (IOException e) {
-              e.printStackTrace();
+              log.error("submission report", e);
             } catch (TransformerException e) {
-              e.printStackTrace();
+              log.error("submission report", e);
             } finally {
               submissionProperties.remove("submissionDate");
             }
@@ -409,14 +409,14 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
           throw new SubmissionException("Could not find a Submission in the supplied set of Submittables");
         }
       } catch (IOException e) {
-        e.printStackTrace();
+        log.error("submission report", e);
       } catch (TransformerException e) {
-        e.printStackTrace();
+        log.error("submission report", e);
       } finally {
         submissionProperties.remove("submissionDate");
       }
     } catch (ParserConfigurationException e) {
-      e.printStackTrace();
+      log.error("submission report", e);
     }
     return null;
   }
@@ -456,7 +456,7 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
         try {
           dataFiles = FPG.generateFilePaths(l);
         } catch (SubmissionException submissionException) {
-          submissionException.printStackTrace();
+          log.error("submit sequence data", submissionException);
         }
       }
     }
@@ -472,7 +472,7 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
 
         return ("Attempting to upload files...");
       } catch (Exception e) {
-        e.printStackTrace();
+        log.error("failed to upload", e);
         return ("There was an error: " + e.getMessage());
       }
     } else
@@ -484,7 +484,7 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
     try {
       return uploadReports.get(submissionId);
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("failed to get upload reports", e);
     }
     return null;
   }
@@ -577,9 +577,9 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
         }
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("prettify submission data", e);
     } catch (TransformerException e) {
-      e.printStackTrace();
+      log.error("prettify submission data", e);
     }
 
     return sb.toString();
@@ -632,8 +632,7 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
       // or, as in this example, create a new one.
       return new DefaultHttpClient(ccm, httpClient.getParams());
     } catch (Throwable t) {
-      log.warn("Something nasty happened with the EvilTrustingTrustManager. Warranty is null and void!");
-      t.printStackTrace();
+      log.error("Something nasty happened with the EvilTrustingTrustManager. Warranty is null and void!", t);
       return null;
     }
   }

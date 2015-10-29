@@ -153,7 +153,7 @@ public class TransmissionUtils {
       }
     } catch (IOException e) {
       error = true;
-      e.printStackTrace();
+      log.error("ftp", e);
     } finally {
       try {
         if (fis != null) {
@@ -166,7 +166,7 @@ public class TransmissionUtils {
           }
         }
       } catch (IOException ioe) {
-        ioe.printStackTrace();
+        log.error("ftp", ioe);
       }
     }
 
@@ -217,7 +217,7 @@ public class TransmissionUtils {
       }
     } catch (IOException e) {
       error = true;
-      e.printStackTrace();
+      log.error("ftp put listen", e);
     } finally {
       try {
         log.info("TransmissionUtils putListen:finally: " + ftp.getReplyString());
@@ -231,7 +231,7 @@ public class TransmissionUtils {
           }
         }
       } catch (IOException ioe) {
-        ioe.printStackTrace();
+        log.error("ftp put listen close", ioe);
       }
     }
 

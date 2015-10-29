@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.analysis.dao;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 import uk.ac.bbsrc.tgac.miso.analysis.parameter.Optionable;
 import uk.ac.bbsrc.tgac.miso.analysis.parameter.Transientable;
@@ -47,6 +49,7 @@ import java.util.Map;
  * @since 0.1.3
  */
 public class MySqlConanTaskDAO extends DatabaseConanTaskDAO {
+  protected static final Logger log = LoggerFactory.getLogger(MySqlConanTaskDAO.class);
 
   private long getAutoIncrement(String tableName) throws IOException {
     final String q = "SHOW TABLE STATUS LIKE '" + tableName + "'";
@@ -121,7 +124,7 @@ public class MySqlConanTaskDAO extends DatabaseConanTaskDAO {
         }
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("save task", e);
     }
     return conanTask;
   }
@@ -146,7 +149,7 @@ public class MySqlConanTaskDAO extends DatabaseConanTaskDAO {
         conanProcessRun.setId(Integer.toString(processRunID));
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("save process run", e);
     }
     return super.saveProcessRun(conanTaskID, conanProcessRun);
   }
