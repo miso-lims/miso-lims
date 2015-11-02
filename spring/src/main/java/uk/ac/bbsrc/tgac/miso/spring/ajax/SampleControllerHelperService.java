@@ -704,7 +704,7 @@ public class SampleControllerHelperService {
       }
     }
     catch (IOException e) {
-      e.printStackTrace();
+      log.debug("Could not change Sample identificationBarcode: " + e.getMessage());
       return JSONUtils.SimpleJSONError(e.getMessage());
     }
     

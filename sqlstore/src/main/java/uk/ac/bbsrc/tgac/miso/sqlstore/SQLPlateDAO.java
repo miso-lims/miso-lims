@@ -216,7 +216,7 @@ public class SQLPlateDAO implements PlateStore {
       barcode = plate.getName() + "::" + plate.getTagBarcode();
     }
     else {
-      //TODO this should be alias (however, Plate does not have an alias field)
+      //TODO this should eventually be changed to alias (however, Plate does not have an alias field)
       barcode = plate.getName() + "::" + plate.getDescription();
     }    
     plate.setIdentificationBarcode(barcode); 

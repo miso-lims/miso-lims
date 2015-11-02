@@ -392,7 +392,7 @@ public class LibraryControllerHelperService {
       }
     }
     catch (IOException e) {
-      e.printStackTrace();
+      log.debug("Could not change Library identificationBarcode: " + e.getMessage());
       return JSONUtils.SimpleJSONError(e.getMessage());
     }
     
