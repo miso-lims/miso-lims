@@ -158,6 +158,7 @@ public class SampleControllerHelperService {
               DateFormat df = new SimpleDateFormat("dd/mm/yyyy");
               String type = j.getString("sampleType");
               String locationBarcode = j.getString("locationBarcode");
+              String identificationBarcode = j.getString("identificationBarcode");
 
               Sample news = new SampleImpl();
               news.setProject(p);
@@ -167,6 +168,7 @@ public class SampleControllerHelperService {
               news.setSecurityProfile(sp);
               news.setSampleType(type);
               news.setLocationBarcode(locationBarcode);
+              news.setIdentificationBarcode(identificationBarcode);
 
               if (j.has("receivedDate") && !"".equals(j.getString("receivedDate"))) {
                 Date date = df.parse(j.getString("receivedDate"));
@@ -686,6 +688,27 @@ public class SampleControllerHelperService {
     }
 
     return JSONUtils.SimpleJSONResponse("Note saved successfully");
+  }
+  
+  public JSONObject changeSampleIdBarcode(HttpSession session, JSONObject json) {
+    Long sampleId = json.getLong("sampleId");
+    String idBarcode = json.getString("identificationBarcode");
+    
+    try {
+      if (!"".equals(idBarcode)) {
+        Sample sample = requestManager.getSampleById(sampleId);
+        sample.setIdentificationBarcode(idBarcode);
+        requestManager.saveSample(sample);
+      } else {
+        return JSONUtils.SimpleJSONError("New identification barcode not recognized");
+      }
+    }
+    catch (IOException e) {
+      log.debug("Could not change Sample identificationBarcode: " + e.getMessage());
+      return JSONUtils.SimpleJSONError(e.getMessage());
+    }
+    
+    return JSONUtils.SimpleJSONResponse("New Identification Barcode successfully assigned.");
   }
 
   public JSONObject lookupNCBIScientificName(HttpSession session, JSONObject json) {

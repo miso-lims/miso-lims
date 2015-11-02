@@ -539,6 +539,67 @@ Pool.search = {
 };
 
 Pool.barcode = {
+  editPoolIdBarcode: function (span, id) {
+    Fluxion.doAjax(
+      'loggedActionService',
+      'logAction',
+      {
+        'objectId': id,
+        'objectType': 'Pool',
+        'action': 'editPoolIdBarcode',
+        'url': ajaxurl
+      },
+      {}
+    );
+
+    var v = span.find('a').text();
+    if (v && v !== "") {
+      span.html("<input type='text' value='" + v + "' name='identificationBarcode' id='identificationBarcode'>");
+    }
+  },
+
+  showPoolIdBarcodeChangeDialog: function (poolId, poolIdBarcode) {
+    var self = this;
+    jQuery('#changePoolIdBarcodeDialog')
+      .html("<form>" +
+            "<fieldset class='dialog'>" +
+            "<strong><label>Current Barcode: </label></strong>" + poolIdBarcode +
+            "<br /><strong><label for='notetext'>New Barcode:</label></strong>" +
+            "<input type='text' name='idBarcodeInput' id='idBarcodeInput' class='text ui-widget-content ui-corner-all' />" +
+            "</fieldset></form>");
+
+    jQuery('#changePoolIdBarcodeDialog').dialog({
+      autoOpen: false,
+      width: 400,
+      modal: true,
+      resizable: false,
+      buttons: {
+        "Save": function () {
+          self.changePoolIdBarcode(poolId, jQuery('#idBarcodeInput').val());
+          jQuery(this).dialog('close');
+        },
+        "Cancel": function () {
+          jQuery(this).dialog('close');
+        }
+      }
+    }).dialog('open');
+  },
+
+  changePoolIdBarcode: function (poolId, idBarcode) {
+    Fluxion.doAjax(
+      'poolControllerHelperService',
+      'changePoolIdBarcode',
+      {
+        'poolId': poolId,
+        'identificationBarcode': idBarcode,
+        'url': ajaxurl
+      },
+      {
+        'doOnSuccess': Utils.page.pageReload
+      }
+    );
+  },
+
   printPoolBarcodes : function() {
     var pools = [];
     for (var i = 0; i < arguments.length; i++) {

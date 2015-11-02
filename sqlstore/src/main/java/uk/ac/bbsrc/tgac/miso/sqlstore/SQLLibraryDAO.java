@@ -222,6 +222,7 @@ public class SQLLibraryDAO implements LibraryStore {
   private LibraryDilutionStore dilutionDAO;
   private NoteStore noteDAO;
   private CascadeType cascadeType;
+  private boolean autoGenerateIdentificationBarcodes;
 
   @Autowired
   private MisoNamingScheme<Library> libraryNamingScheme;
@@ -300,6 +301,23 @@ public class SQLLibraryDAO implements LibraryStore {
   public void setCascadeType(CascadeType cascadeType) {
     this.cascadeType = cascadeType;
   }
+  
+  public void setAutoGenerateIdentificationBarcodes(boolean autoGenerateIdentificationBarcodes) {
+    this.autoGenerateIdentificationBarcodes = autoGenerateIdentificationBarcodes;
+  }
+  
+  public boolean getAutoGenerateIdentificationBarcodes() {
+    return autoGenerateIdentificationBarcodes;
+  }
+  
+  /**
+   * Generates a unique barcode. Note that the barcode will change when the alias is changed.
+   * @param library
+   */
+  public void autoGenerateIdBarcode(Library library) {
+    String barcode = library.getName() + "::" + library.getAlias();
+    library.setIdentificationBarcode(barcode); 
+  }
 
   private void purgeListCache(Library l, boolean replace) {
     Cache cache = cacheManager.getCache("libraryListCache");
@@ -372,10 +390,13 @@ public class SQLLibraryDAO implements LibraryStore {
           String name = libraryNamingScheme.generateNameFor("name", library);
           library.setName(name);
           if (libraryNamingScheme.validateField("name", library.getName()) && libraryNamingScheme.validateField("alias", library.getAlias())) {
-            String barcode = name + "::" + library.getAlias();
-            params.addValue("name", name);
+            
+            if (autoGenerateIdentificationBarcodes) {
+              autoGenerateIdBarcode(library);
+            } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
 
-            params.addValue("identificationBarcode", barcode);
+            params.addValue("name", name);
+            params.addValue("identificationBarcode", library.getIdentificationBarcode());
 
             Number newId = insert.executeAndReturnKey(params);
             if (newId.longValue() != library.getId()) {
@@ -398,7 +419,13 @@ public class SQLLibraryDAO implements LibraryStore {
         if (libraryNamingScheme.validateField("name", library.getName()) && libraryNamingScheme.validateField("alias", library.getAlias())) {
           params.addValue("libraryId", library.getId())
                 .addValue("name", library.getName())
-                .addValue("identificationBarcode", library.getName() + "::" + library.getAlias());
+                .addValue("alias", library.getAlias())
+                .addValue("description", library.getDescription());
+          if (autoGenerateIdentificationBarcodes) {
+            autoGenerateIdBarcode(library);
+          } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
+          params.addValue("identificationBarcode", library.getIdentificationBarcode())
+                .addValue("locationBarcode", library.getLocationBarcode());
           NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
           namedTemplate.update(LIBRARY_UPDATE, params);
         }

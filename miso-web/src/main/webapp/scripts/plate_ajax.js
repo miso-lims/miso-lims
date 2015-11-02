@@ -173,6 +173,67 @@ Plate.tagbarcode = {
 };
 
 Plate.ui = {
+  editPlateIdBarcode: function(span, id) {
+    Fluxion.doAjax(
+      'loggedActionService',
+      'logAction',
+      {
+        'objectId': id,
+        'objectType': 'Plate',
+        'action': 'editPlateIdBarcode',
+        'url': ajaxurl
+      },
+      {}
+    );
+
+    var v = span.find('a').text();
+    if (v && v !== "") {
+      span.html("<input type='text' value='" + v + "' name='identificationBarcode' id='identificationBarcode'>");
+    }
+  },
+
+  showPlateIdBarcodeChangeDialog: function (plateId, plateIdBarcode) {
+    var self = this;
+    jQuery('#changePlateIdBarcodeDialog')
+      .html("<form>" +
+            "<fieldset class='dialog'>" +
+            "<strong><label>Current Barcode: </label></strong>" + plateIdBarcode +
+            "<br /><strong><label for='notetext'>New Barcode:</label></strong>" +
+            "<input type='text' name='idBarcodeInput' id='idBarcodeInput' class='text ui-widget-content ui-corner-all' />" +
+            "</fieldset></form>");
+
+    jQuery('#changePlateIdBarcodeDialog').dialog({
+      autoOpen: false,
+      width: 400,
+      modal: true,
+      resizable: false,
+      buttons: {
+        "Save": function () {
+          self.changePlateIdBarcode(plateId, jQuery('#idBarcodeInput').val());
+          jQuery(this).dialog('close');
+        },
+        "Cancel": function () {
+          jQuery(this).dialog('close');
+        }
+      }
+    }).dialog('open');
+  },
+
+  changePlateIdBarcode: function (plateId, idBarcode) {
+    Fluxion.doAjax(
+      'plateControllerHelperService',
+      'changePlateIdBarcode',
+      {
+        'plateId': plateId,
+        'identificationBarcode': idBarcode,
+        'url': ajaxurl
+      },
+      {
+        'doOnSuccess': Utils.page.pageReload
+      }
+    );
+  },
+
   downloadPlateInputForm: function (documentFormat) {
     Fluxion.doAjax(
             'plateControllerHelperService',

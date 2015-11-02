@@ -67,8 +67,7 @@
             <div id="locationBarcodeMenu"
                  onmouseover="mcancelclosetime()"
                  onmouseout="mclosetime()">
-              <a href="javascript:void(0);" onclick="Plate.barcode.showPlateLocationChangeDialog(${plate.id});">Change
-                location</a>
+              <a href="javascript:void(0);" onclick="Plate.barcode.showPlateLocationChangeDialog(${plate.id});">Change location</a>
             </div>
           </li>
         </ul>
@@ -78,21 +77,27 @@
   </div>
   <div class="barcodeArea ui-corner-all">
     <span style="float: left; font-size: 24px; font-weight: bold; color:#BBBBBB">ID</span>
-    <c:if test="${not empty plate.identificationBarcode}">
-      <ul class="barcode-ddm">
-        <li>
-          <a onmouseover="mopen('idBarcodeMenu')" onmouseout="mclosetime()">
-            <span style="float:right; margin-top:6px;" class="ui-icon ui-icon-triangle-1-s"></span>
-            <span id="idBarcode" style="float:right"></span>
-          </a>
+    <ul class="barcode-ddm">
+      <li>
+        <a onmouseover="mopen('idBarcodeMenu')" onmouseout="mclosetime()">
+          <span style="float:right; margin-top:6px;" class="ui-icon ui-icon-triangle-1-s"></span>
+          <span id="idBarcode" style="float:right"></span>
+        </a>
 
-          <div id="idBarcodeMenu"
-               onmouseover="mcancelclosetime()"
-               onmouseout="mclosetime()">
-            <a href="javascript:void(0);" onclick="Plate.barcode.printPlateBarcodes(${plate.id});">Print</a>
-          </div>
-        </li>
-      </ul>
+        <div id="idBarcodeMenu"
+             onmouseover="mcancelclosetime()"
+             onmouseout="mclosetime()">
+          <a href="javascript:void(0);" 
+             onclick="Plate.barcode.printPlateBarcodes(${plate.id});">Print</a>
+          <c:if test="${not autoGenerateIdBarcodes}">
+            <a href="javascript:void(0);"
+             onclick="Plate.ui.showPlateIdBarcodeChangeDialog(${plate.id}, '${plate.identificationBarcode}');">Assign New Barcode</a>
+          </c:if>
+        </div>
+      </li>
+    </ul>
+    <div id="changePlateIdBarcodeDialog" title="Assign New Barcode"></div>
+    <c:if test="${not empty plate.identificationBarcode}">
       <script type="text/javascript">
         jQuery(document).ready(function () {
           Fluxion.doAjax(
@@ -102,7 +107,7 @@
               'url': ajaxurl
             },
             {'doOnSuccess': function (json) {
-              jQuery('#idBarcode').html("<img style='height:30px; border:0;' src='<c:url value='/temp/'/>" + json.img + "'/>");
+              jQuery('#idBarcode').html("<img style='height:30px; border:0;' alt='${plate.identificationBarcode}' title='${plate.identificationBarcode}' src='<c:url value='/temp/'/>" + json.img + "'/>");
             }
             });
         });

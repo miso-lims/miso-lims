@@ -374,6 +374,67 @@ Library.empcr = {
 };
 
 Library.barcode = {
+  editLibraryBarcode: function(span, id) {
+    Fluxion.doAjax(
+      'loggedActionService',
+      'logAction',
+      {
+        'objectId': id,
+        'objectType': 'Library',
+        'action': 'editLibraryIdBarcode',
+        'url': ajaxurl
+      },
+      {}
+    );
+
+    var v = span.find('a').text();
+    if (v && v !== "") {
+      span.html("<input type='text' value='" + v + "' name='identificationBarcode' id='identificationBarcode'>");
+    }
+  },
+
+  showLibraryIdBarcodeChangeDialog: function (libraryId, libraryIdBarcode) {
+    var self = this;
+    jQuery('#changeLibraryIdBarcodeDialog')
+      .html("<form>" +
+            "<fieldset class='dialog'>" +
+            "<strong><label>Current Barcode: </label></strong>" + libraryIdBarcode +
+            "<br /><strong><label for='notetext'>New Barcode:</label></strong>" +
+            "<input type='text' name='idBarcodeInput' id='idBarcodeInput' class='text ui-widget-content ui-corner-all' />" +
+            "</fieldset></form>");
+
+    jQuery('#changeLibraryIdBarcodeDialog').dialog({
+      autoOpen: false,
+      width: 400,
+      modal: true,
+      resizable: false,
+      buttons: {
+        "Save": function () {
+          self.changeLibraryIdBarcode(libraryId, jQuery('#idBarcodeInput').val());
+          jQuery(this).dialog('close');
+        },
+        "Cancel": function () {
+          jQuery(this).dialog('close');
+        }
+      }
+    }).dialog('open');
+  },
+
+  changeLibraryIdBarcode: function (libraryId, idBarcode) {
+    Fluxion.doAjax(
+      'libraryControllerHelperService',
+      'changeLibraryIdBarcode',
+      {
+        'libraryId': libraryId,
+        'identificationBarcode': idBarcode,
+        'url': ajaxurl
+      },
+      {
+        'doOnSuccess': Utils.page.pageReload
+      }
+    );
+  },
+
   printLibraryBarcodes: function () {
     var libraries = [];
     for (var i = 0; i < arguments.length; i++) {
