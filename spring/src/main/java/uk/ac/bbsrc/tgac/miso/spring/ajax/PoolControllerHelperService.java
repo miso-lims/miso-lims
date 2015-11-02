@@ -405,7 +405,7 @@ public class PoolControllerHelperService {
     
     try {
       if (!"".equals(idBarcode)) {
-        Pool pool = requestManager.getPoolById(poolId);
+        Pool<? extends Poolable> pool = requestManager.getPoolById(poolId);
         pool.setIdentificationBarcode(idBarcode);
         requestManager.savePool(pool);
       } else {
@@ -413,7 +413,7 @@ public class PoolControllerHelperService {
       }
     }
     catch (IOException e) {
-      e.printStackTrace();
+      log.debug("Could not change Pool identificationBarcode: " + e.getMessage());
       return JSONUtils.SimpleJSONError(e.getMessage());
     }
     

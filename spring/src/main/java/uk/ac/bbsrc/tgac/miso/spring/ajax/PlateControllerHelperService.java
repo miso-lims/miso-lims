@@ -187,7 +187,7 @@ public class PlateControllerHelperService {
     
     try {
       if (!"".equals(idBarcode)) {
-        Plate plate = requestManager.getPlateById(plateId);
+        Plate<? extends List<? extends Plateable>, ? extends Plateable> plate = requestManager.getPlateById(plateId);
         plate.setIdentificationBarcode(idBarcode);
         requestManager.savePlate(plate);
       } else {
@@ -195,7 +195,7 @@ public class PlateControllerHelperService {
       }
     }
     catch (IOException e) {
-      e.printStackTrace();
+      log.debug("Could not change Plate identificationBarcode: " + e.getMessage());
       return JSONUtils.SimpleJSONError(e.getMessage());
     }
     

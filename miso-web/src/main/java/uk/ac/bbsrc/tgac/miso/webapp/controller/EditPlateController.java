@@ -93,13 +93,6 @@ public class EditPlateController {
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
   }
-  
-  @Autowired
-  private ApplicationContextProvider applicationContextProvider;
-
-  public void setApplicationContextProvider(ApplicationContextProvider applicationContextProvider) {
-    this.applicationContextProvider = applicationContextProvider;
-  }
 
   @ModelAttribute("materialTypes")
   public Collection<String> populateMaterialTypes() throws IOException {
@@ -108,7 +101,7 @@ public class EditPlateController {
   
   @ModelAttribute("autoGenerateIdBarcodes")
   public Boolean autoGenerateIdentificationBarcodes() {
-    MisoPropertyExporter exporter = (MisoPropertyExporter)applicationContextProvider.getApplicationContext().getBean("propertyConfigurer");
+    MisoPropertyExporter exporter = (MisoPropertyExporter)ApplicationContextProvider.getApplicationContext().getBean("propertyConfigurer");
     Map<String, String> misoProperties = exporter.getResolvedProperties();
     return misoProperties.containsKey("miso.autoGenerateIdentificationBarcodes") && Boolean.parseBoolean(misoProperties.get("miso.autoGenerateIdentificationBarcodes"));
   }
