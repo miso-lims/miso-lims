@@ -206,13 +206,3 @@ VALUES ('IPO1',1),('IPO10',1),('IPO2',1),('IPO3',1),('IPO4',1),('IPO5',1),('IPO6
 DELETE FROM `SecurityProfile`;
 INSERT INTO `SecurityProfile`(`profileId`, `allowAllInternal`, `owner_userId`) 
 VALUES (1,1,1),(2,1,1),(3,1,1),(4,1,1),(5,1,1),(6,1,1),(7,1,1),(8,1,1),(9,1,1),(10,1,1),(11,1,1),(12,1,NULL),(13,1,NULL),(14,1,NULL),(15,1,NULL);
-
-/* Disabled until box stuff is merged in
-DELETE FROM `Box`;
-INSERT INTO `Box`(`boxId`, `boxSizeId`, `boxUseId`, `name`, `alias`, `identificationBarcode`, `locationBarcode`, `securityProfile_profileId`) 
-VALUES (99,1,1,'BOX1','TEH BOX',NULL,NULL,NULL);
-
-DELETE FROM `BoxPosition`;
-INSERT INTO `BoxPosition`(`boxPositionId`, `boxId`, `column`, `row`) 
-VALUES (101,99,0,0),(87,99,2,2);
-*/
