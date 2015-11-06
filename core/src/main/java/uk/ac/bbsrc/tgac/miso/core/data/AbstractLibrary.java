@@ -95,6 +95,7 @@ public abstract class AbstractLibrary implements Library {
   private String alias;
   private Boolean qcPassed;
   private User lastModifier;
+  private boolean lowQuality;
 
   private Collection<Note> notes = new HashSet<Note>();
   private final Collection<ChangeLog> changeLog = new ArrayList<ChangeLog>();
@@ -374,6 +375,16 @@ public abstract class AbstractLibrary implements Library {
   @Override
   public void setLastUpdated(Date lastUpdated) {
     this.lastUpdated = lastUpdated;
+  }
+
+  @Override
+  public void setLowQuality(boolean lowquality) {
+    lowQuality = lowquality;
+  }
+
+  @Override
+  public boolean isLowQuality() {
+    return lowQuality;
   }
 
   @CoverageIgnore

@@ -88,6 +88,13 @@ public class PoolSearchService {
           List<Pool<? extends Poolable>> rPools = new ArrayList<>(pools);
           Collections.reverse(rPools);
           for (Pool<? extends Poolable> pool : rPools) {
+            boolean hasLowQuality = false;
+            for (Dilution d : pool.getDilutions()) {
+              hasLowQuality = hasLowQuality || d.getLibrary().isLowQuality();
+            }
+            if (hasLowQuality) {
+              continue;
+            }
             b.append(poolHtml(pool));
           }
         } else {
