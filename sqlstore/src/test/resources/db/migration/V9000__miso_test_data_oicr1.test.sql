@@ -1,3 +1,7 @@
+DELETE FROM `_Partition`;
+INSERT INTO `_Partition` (`partitionId`, `partitionNumber`, `pool_poolId`, `securityProfile_profileId`)
+VALUES (1,1,1,1);
+
 DELETE FROM `Experiment`;
 INSERT INTO `Experiment`(`experimentId`, `name`, `description`, `accession`, `title`, `securityProfile_profileId`, `study_studyId`, `alias`, `platform_platformId`) 
 VALUES (1,'EXP1','TEST',NULL,'PRO1 Illumina Other experiment (Auto-gen)',1,1,'EXP_AUTOGEN_STU1_Other_1',26),
