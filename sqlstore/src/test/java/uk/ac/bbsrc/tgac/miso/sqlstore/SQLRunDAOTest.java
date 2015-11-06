@@ -114,7 +114,7 @@ public class SQLRunDAOTest extends AbstractDAOTest {
   }
   
   @Test
-  public void testListBySearch1204() { // TODO: why doesn't this throw IOException?
+  public void testListBySearch1204() {
     List<Run> runs = dao.listBySearch("1204");
     assertEquals(2, runs.size());
   }
