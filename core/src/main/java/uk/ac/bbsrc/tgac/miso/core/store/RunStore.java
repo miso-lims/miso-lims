@@ -23,12 +23,12 @@
 
 package uk.ac.bbsrc.tgac.miso.core.store;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
-
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
 
 /**
  * Defines a DAO interface for storing Runs
@@ -68,11 +68,12 @@ public interface RunStore extends Store<Run>, Cascadable, Remover<Run>, NamingSc
   Run getLatestRunIdRunBySequencerPartitionContainerId(long containerId) throws IOException;
 
   /**
-   * List all Runs that match a search criteria
+   * List all Runs with name, alias, or description containing the query string
    *
-   * @param query of type String
+   * @param query String to search for
    * @return Collection<Run>
-   * @throws IOException when
+   * @throws IOException
+   * @throws NullPOinterException if query is null
    */
   Collection<Run> listBySearch(String query) throws IOException;
 
@@ -134,15 +135,16 @@ public interface RunStore extends Store<Run>, Cascadable, Remover<Run>, NamingSc
   /**
    * List all Runs by their health given a HealthType 
    *
-   * @param health of type String
-   * @return List<Run>
-   * @throws IOException when
+   * @param health status to search for
+   * @return all runs with matching status
+   * @throws IOException
    */
   List<Run> listByStatus(String health) throws IOException;
 
   /**
    * List all persisted objects
    *
+   * @param the maximum number of objects to return. If this is negative, no limit will be set
    * @return Collection<Run>
    * @throws IOException when the objects cannot be retrieved
    */
