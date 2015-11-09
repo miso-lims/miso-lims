@@ -122,13 +122,7 @@
         </resources>
       </build>
 
-      <dependencies>
-        <dependency>
-          <groupId>${parent.groupId}</groupId>
-          <artifactId>sqlstore</artifactId>
-          <version>${parent.version}</version>
-        </dependency>
-      </dependencies>
+
 
       <properties>
         <spring-version>3.1.3.RELEASE</spring-version>
@@ -268,11 +262,13 @@
       <url>http://www.hasbanana.com/maven/repo</url>
     </repository>
 
+    <!--
     <repository>
       <id>sonatype-sourceforge-snapshots</id>
       <name>Sonatype SF Repository</name>
       <url>http://oss.sonatype.org/content/repositories/sourceforge-snapshots/</url>
     </repository>
+    -->
 
     <repository>
       <id>Atlassian Maven Repository</id>
@@ -506,6 +502,31 @@
       <classifier>jdk15</classifier>
     </dependency>
 
+    <!--
+      <dependency>
+        <groupId>oauth.signpost</groupId>
+        <artifactId>signpost-core</artifactId>
+        <version>1.2</version>
+        <exclusions>
+            <exclusion>
+                <groupId>commons-codec</groupId>
+                <artifactId>commons-codec</artifactId>
+            </exclusion>
+        </exclusions>
+      </dependency>
+
+    <dependency>
+        <groupId>com.atlassian.jira</groupId>
+        <artifactId>jira-rest-java-client</artifactId>
+        <version>0.1.1</version>
+        <exclusions>
+            <exclusion>
+                <groupId>org.codehaus.jackson</groupId>
+                <artifactId>jackson-core-asl</artifactId>
+            </exclusion>
+        </exclusions>
+    </dependency>
+    -->
 
     <dependency>
       <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
@@ -524,6 +545,13 @@
       <artifactId>jersey-apache-client</artifactId>
       <version>1.19</version>
     </dependency>
+    <!--
+    <dependency>
+      <groupId>org.atmosphere</groupId>
+      <artifactId>atmosphere-jquery</artifactId>
+      <version>0.8.2</version>
+    </dependency>
+    -->
   </dependencies>
   <properties>
     <jdom-version>1.1</jdom-version>
