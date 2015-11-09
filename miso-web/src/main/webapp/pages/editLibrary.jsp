@@ -742,6 +742,7 @@
               <c:choose>
                 <c:when test="${library.platformName ne 'Illumina'}">
                   <td>
+              <c:if test="${library.platformName eq 'LS454' or library.platformName eq 'Solid'}">
                     <a href="javascript:void(0);" onclick="Library.empcr.insertEmPcrRow(${dil.id});">Add emPCR</a>
                   </td>
                 </c:when>

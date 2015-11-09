@@ -602,14 +602,24 @@
 
   <div id="projectfiles">
     <c:forEach items="${projectFiles}" var="file">
-      <div id="file${file.key}">
-        <div onMouseOver="this.className='boxlistboxhighlight'" onMouseOut="this.className='boxlistbox'" class="boxlistbox">
-          <a href="<c:url value='/miso/download/project/${project.id}/${file.key}'/>">${file.value}</a>
-          <c:if test="${(project.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
-                          or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-          <a href='#' onclick="Project.ui.deleteProjectFile('${project.id}', '${file.value}', '${file.key}');">
+      <div id='btnPanel' style='float: left; width: 32px;'>
+        <table>
+          <tr>
+            <sec:authorize access="hasRole('ROLE_ADMIN')">
+              <td class="misoicon" onclick="Project.ui.deleteFile(${project.id}, ${file.key});">
+                <span class="ui-icon ui-icon-trash" />
+              </td>
+            </sec:authorize>
+          </tr>
+        </table>
+    </div>
+    <a class="listbox" href="<c:url value='/miso/download/project/${project.id}/${file.key}'/>">
+
+      <div onMouseOver="this.className='boxlistboxhighlight'" onMouseOut="this.className='boxlistbox'" class="boxlistbox" style='margin-left: 32px;'>
+          ${file.value}
+      </div>
+    </a>
             <i class="fa fa-trash-o fa-lg fa-fw pull-right" style="padding-top:4px"></i>
-          </a>
           </c:if>
         </div>
       </div>
