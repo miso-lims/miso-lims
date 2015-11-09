@@ -134,6 +134,116 @@
       https://www.github.com/TGAC/miso-lims
     </url>
 <<<<<<< HEAD
+ </scm>
+
+ <!-- Maven repository deploy -->
+ <distributionManagement>
+  <downloadUrl>https://repos.tgac.ac.uk/maven/repo</downloadUrl>
+  <repository>
+   <id>miso-releases</id>
+   <name>MISO repository</name>
+   <url>scp://repos.tgac.ac.uk/storage/html/maven/miso/releases</url>
+  </repository>
+  <snapshotRepository>
+   <id>miso-snapshots</id>
+   <name>MISO snapshot repository</name>
+   <url>scp://repos.tgac.ac.uk/storage/html/maven/miso/snapshots</url>
+  </snapshotRepository>
+ </distributionManagement>
+
+ <!-- Maven repository download -->
+ <repositories>
+  <repository>
+   <id>hasbanana-repo</id>
+   <name>hasbanana Maven Repository</name>
+   <url>http://www.hasbanana.com/maven/repo</url>
+  </repository>
+
+  <repository>
+   <id>tgac-repo</id>
+   <name>TGAC Maven Repository</name>
+   <url>https://repos.tgac.ac.uk/maven/repo</url>
+   <releases>
+    <enabled>true</enabled>
+    <updatePolicy>always</updatePolicy>
+   </releases>
+   <snapshots>
+    <enabled>true</enabled>
+    <updatePolicy>always</updatePolicy>
+   </snapshots>
+  </repository>
+
+  <repository>
+   <id>tgac-snapshots-repo</id>
+   <name>TGAC Maven Snapshots Repository</name>
+   <url>https://repos.tgac.ac.uk/maven/miso/snapshots</url>
+   <releases>
+    <enabled>false</enabled>
+    <updatePolicy>always</updatePolicy>
+   </releases>
+   <snapshots>
+    <enabled>true</enabled>
+    <updatePolicy>always</updatePolicy>
+   </snapshots>
+  </repository>
+
+  <repository>
+   <id>tgac-releases-repo</id>
+   <name>TGAC Maven Releases Repository</name>
+   <url>https://repos.tgac.ac.uk/maven/miso/releases</url>
+   <releases>
+    <enabled>true</enabled>
+    <updatePolicy>always</updatePolicy>
+   </releases>
+   <snapshots>
+    <enabled>false</enabled>
+    <updatePolicy>always</updatePolicy>
+   </snapshots>
+  </repository>
+
+  <!-- <repository> <id>apache-snapshots</id> <name>apache snapshots repository</name> 
+   <url>http://repository.apache.org/snapshots</url> <snapshots> <enabled>true</enabled> 
+   <updatePolicy>never</updatePolicy> </snapshots> </repository> -->
+
+  <repository>
+   <id>spring-snapshot</id>
+   <name>Spring Portfolio Milestone Repository</name>
+   <url>http://maven.springframework.org/snapshot</url>
+   <snapshots>
+    <enabled>true</enabled>
+   </snapshots>
+  </repository>
+
+  <repository>
+   <id>Atlassian Maven Repository</id>
+   <url>https://maven.atlassian.com/public</url>
+  </repository>
+
+  <repository>
+   <id>spring-maven-release</id>
+   <name>Springframework Maven Repository</name>
+   <url>http://maven.springframework.org/release</url>
+  </repository>
+  <repository>
+   <id>spring-maven-milestone</id>
+   <name>Springframework Maven Repository</name>
+   <url>http://maven.springframework.org/milestone</url>
+  </repository>
+  <repository>
+   <id>springsource-milestone</id>
+   <url>http://repository.springsource.com/maven/bundles/milestone</url>
+  </repository>
+  <repository>
+   <id>springsource-external</id>
+   <url>http://repository.springsource.com/maven/bundles/external</url>
+  </repository>
+  <repository>
+   <id>springsource-snapshot</id>
+   <url>http://repository.springsource.com/maven/bundles/snapshot</url>
+  </repository>
+
+  <repository>
+=======
   </scm>
 
   <!-- Maven repository deploy -->
@@ -249,270 +359,9 @@
       <id>springsource-snapshot</id>
       <url>http://repository.springsource.com/maven/bundles/snapshot</url>
     </repository>
-  </repositories>
-
-  <pluginRepositories>
-    <pluginRepository>
-      <id>miso-releases</id>
-      <name>MISO repository</name>
-      <url>https://repos.tgac.ac.uk/maven/miso/releases</url>
-      <releases>
-        <enabled>true</enabled>
-        <updatePolicy>always</updatePolicy>
-      </releases>
-    </pluginRepository>
-
-    <pluginRepository>
-      <id>miso-snapshots</id>
-      <name>MISO snapshot repository</name>
-      <url>https://repos.tgac.ac.uk/maven/miso/snapshots</url>
-      <snapshots>
-        <enabled>true</enabled>
-        <updatePolicy>always</updatePolicy>
-      </snapshots>
-    </pluginRepository>
-
-    <pluginRepository>
-      <id>apache-snapshots</id>
-      <name>apache snapshots repository</name>
-      <url>http://repository.apache.org/snapshots</url>
-      <snapshots>
-        <updatePolicy>never</updatePolicy>
-      </snapshots>
-    </pluginRepository>
-
-    <pluginRepository>
-      <id>Atlassian Maven Repository</id>
-      <url>https://maven.atlassian.com/public</url>
-    </pluginRepository>
-
-  </pluginRepositories>
-
-  <!-- Required Build Plugins -->
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
-          <encoding>${project.build.sourceEncoding}</encoding>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.5</version>
-        <configuration>
-          <includes>
-            <include>**/*Suite.java</include>
-          </includes>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>com.atlassian.maven.plugins</groupId>
-        <artifactId>maven-clover2-plugin</artifactId>
-        <version>3.1.2</version>
-        <configuration>
-          <licenseLocation>clover.license</licenseLocation>
-        </configuration>
-      </plugin>
-      
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.9</version>
-        <configuration>
-          <stylesheetfile>${basedir}/src/main/javadoc/stylesheet.css</stylesheetfile>
-        </configuration>
-      </plugin>      
-    </plugins>
-
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-site-plugin</artifactId>
-          <version>2.1.1</version>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-  </build>
-
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.5</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>1.6.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <version>1.6.0</version>
-    </dependency>
-  </dependencies>
-
-  <modules>
-    <module>integration-tools</module>
-
-    <module>core</module>
-    <module>run-tools</module>
-
-    <module>spring</module>
-    <module>miso-web</module>
-
-    <module>tagbarcode-strategies</module>
-  </modules>
-
-  <profiles>
-    <profile>
-      <id>external</id>
-      <modules>
-        <module>sqlstore</module>
-
-        <module>runstats-client</module>
-
-        <module>analysis-server</module>
-        <module>notification-consumer-services</module>
-        <module>notification-server</module>
-
-        <module>demo-notification-client</module>
-        <module>demo-task</module>
-      </modules>
-      <activation>
-        <property>
-          <name>release</name>
-          <value>external</value>
-        </property>
-      </activation>
-    </profile>
-  </profiles>
-
-  <properties>
-    <simlims-version>0.0.5</simlims-version>
-    <spring-version>3.1.3.RELEASE</spring-version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
-=======
- </scm>
-
- <!-- Maven repository deploy -->
- <distributionManagement>
-  <downloadUrl>https://repos.tgac.ac.uk/maven/repo</downloadUrl>
-  <repository>
-   <id>miso-releases</id>
-   <name>MISO repository</name>
-   <url>scp://repos.tgac.ac.uk/storage/html/maven/miso/releases</url>
-  </repository>
-  <snapshotRepository>
-   <id>miso-snapshots</id>
-   <name>MISO snapshot repository</name>
-   <url>scp://repos.tgac.ac.uk/storage/html/maven/miso/snapshots</url>
-  </snapshotRepository>
- </distributionManagement>
-
- <!-- Maven repository download -->
- <repositories>
-  <repository>
-   <id>hasbanana-repo</id>
-   <name>hasbanana Maven Repository</name>
-   <url>http://www.hasbanana.com/maven/repo</url>
-  </repository>
-
-  <repository>
-   <id>tgac-repo</id>
-   <name>TGAC Maven Repository</name>
-   <url>https://repos.tgac.ac.uk/maven/repo</url>
-   <releases>
-    <enabled>true</enabled>
-    <updatePolicy>always</updatePolicy>
-   </releases>
-   <snapshots>
-    <enabled>true</enabled>
-    <updatePolicy>always</updatePolicy>
-   </snapshots>
-  </repository>
-
-  <repository>
-   <id>tgac-snapshots-repo</id>
-   <name>TGAC Maven Snapshots Repository</name>
-   <url>https://repos.tgac.ac.uk/maven/miso/snapshots</url>
-   <releases>
-    <enabled>false</enabled>
-    <updatePolicy>always</updatePolicy>
-   </releases>
-   <snapshots>
-    <enabled>true</enabled>
-    <updatePolicy>always</updatePolicy>
-   </snapshots>
-  </repository>
-
-  <repository>
-   <id>tgac-releases-repo</id>
-   <name>TGAC Maven Releases Repository</name>
-   <url>https://repos.tgac.ac.uk/maven/miso/releases</url>
-   <releases>
-    <enabled>true</enabled>
-    <updatePolicy>always</updatePolicy>
-   </releases>
-   <snapshots>
-    <enabled>false</enabled>
-    <updatePolicy>always</updatePolicy>
-   </snapshots>
-  </repository>
-
-  <!-- <repository> <id>apache-snapshots</id> <name>apache snapshots repository</name> 
-   <url>http://repository.apache.org/snapshots</url> <snapshots> <enabled>true</enabled> 
-   <updatePolicy>never</updatePolicy> </snapshots> </repository> -->
-
-  <repository>
-   <id>spring-snapshot</id>
-   <name>Spring Portfolio Milestone Repository</name>
-   <url>http://maven.springframework.org/snapshot</url>
-   <snapshots>
-    <enabled>true</enabled>
-   </snapshots>
-  </repository>
-
-  <repository>
-   <id>Atlassian Maven Repository</id>
-   <url>https://maven.atlassian.com/public</url>
-  </repository>
-
-  <repository>
-   <id>spring-maven-release</id>
-   <name>Springframework Maven Repository</name>
-   <url>http://maven.springframework.org/release</url>
-  </repository>
-  <repository>
-   <id>spring-maven-milestone</id>
-   <name>Springframework Maven Repository</name>
-   <url>http://maven.springframework.org/milestone</url>
-  </repository>
-  <repository>
-   <id>springsource-milestone</id>
-   <url>http://repository.springsource.com/maven/bundles/milestone</url>
-  </repository>
-  <repository>
-   <id>springsource-external</id>
-   <url>http://repository.springsource.com/maven/bundles/external</url>
-  </repository>
-  <repository>
-   <id>springsource-snapshot</id>
-   <url>http://repository.springsource.com/maven/bundles/snapshot</url>
-  </repository>
-
-  <repository>
+    
+    <repository>
+>>>>>>> fa674e6... Added build depedencies
    <id>fluxion-snapshots-repo</id>
    <name>TGAC Fluxion Snapshots Repository</name>
    <url>https://repos.tgac.ac.uk/maven/fluxion/snapshots</url>
@@ -539,6 +388,7 @@
     <updatePolicy>always</updatePolicy>
    </snapshots>
   </repository>
+<<<<<<< HEAD
  </repositories>
 
  <pluginRepositories>
@@ -576,6 +426,10 @@
    <url>https://maven.atlassian.com/public</url>
   </pluginRepository>
 
+  <pluginRepository>
+      <id>onejar-maven-plugin.googlecode.com</id>
+      <url>http://onejar-maven-plugin.googlecode.com/svn/mavenrepo</url>
+  </pluginRepository>
  </pluginRepositories>
 
  <!-- Required Build Plugins -->
@@ -713,6 +567,166 @@
   <spring-version>3.1.3.RELEASE</spring-version>
   <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
  </properties>
->>>>>>> fc690a66833d44bc0a059ae2d3e2073aa160b91a
+=======
+    
+  </repositories>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>miso-releases</id>
+      <name>MISO repository</name>
+      <url>https://repos.tgac.ac.uk/maven/miso/releases</url>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+      </releases>
+    </pluginRepository>
+
+    <pluginRepository>
+      <id>miso-snapshots</id>
+      <name>MISO snapshot repository</name>
+      <url>https://repos.tgac.ac.uk/maven/miso/snapshots</url>
+      <snapshots>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+      </snapshots>
+    </pluginRepository>
+
+    <pluginRepository>
+      <id>apache-snapshots</id>
+      <name>apache snapshots repository</name>
+      <url>http://repository.apache.org/snapshots</url>
+      <snapshots>
+        <updatePolicy>never</updatePolicy>
+      </snapshots>
+    </pluginRepository>
+
+    <pluginRepository>
+      <id>Atlassian Maven Repository</id>
+      <url>https://maven.atlassian.com/public</url>
+    </pluginRepository>
+
+    <pluginRepository>
+        <id>onejar-maven-plugin.googlecode.com</id>
+        <url>http://onejar-maven-plugin.googlecode.com/svn/mavenrepo</url>
+    </pluginRepository>
+  </pluginRepositories>
+
+  <!-- Required Build Plugins -->
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.7</source>
+          <target>1.7</target>
+          <encoding>${project.build.sourceEncoding}</encoding>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.5</version>
+        <configuration>
+          <includes>
+            <include>**/*Suite.java</include>
+          </includes>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>com.atlassian.maven.plugins</groupId>
+        <artifactId>maven-clover2-plugin</artifactId>
+        <version>3.1.2</version>
+        <configuration>
+          <licenseLocation>clover.license</licenseLocation>
+        </configuration>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.9</version>
+        <configuration>
+          <stylesheetfile>${basedir}/src/main/javadoc/stylesheet.css</stylesheetfile>
+        </configuration>
+      </plugin>      
+    </plugins>
+
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>2.1.1</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.5</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.6.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>1.6.0</version>
+    </dependency>
+  </dependencies>
+
+  <modules>
+    <module>integration-tools</module>
+
+    <module>core</module>
+    <module>run-tools</module>
+
+    <module>spring</module>
+    <module>miso-web</module>
+
+    <module>tagbarcode-strategies</module>
+  </modules>
+
+  <profiles>
+    <profile>
+      <id>external</id>
+      <modules>
+        <module>sqlstore</module>
+
+        <module>runstats-client</module>
+
+        <module>analysis-server</module>
+        <module>notification-consumer-services</module>
+        <module>notification-server</module>
+
+        <module>demo-notification-client</module>
+        <module>demo-task</module>
+      </modules>
+      <activation>
+        <property>
+          <name>release</name>
+          <value>external</value>
+        </property>
+      </activation>
+    </profile>
+  </profiles>
+
+  <properties>
+    <simlims-version>0.0.5</simlims-version>
+    <spring-version>3.1.3.RELEASE</spring-version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+>>>>>>> fa674e6... Added build depedencies
 
 </project>

@@ -750,7 +750,7 @@
               <c:choose>
                 <c:when test="${library.platformName ne 'Illumina'}">
                   <td id="empcr${dil.id}" align="center">
-              <c:if test="${library.platformName eq 'LS454' or library.platformName eq 'Solid'}">
+                    <a href="javascript:void(0);" onclick="Library.empcr.insertEmPcrRow(${dil.id});">
                       <span class="fa fa-flask fa-lg"></span>
                     </a>
                   </td>

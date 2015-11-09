@@ -619,10 +619,6 @@
           ${file.value}
       </div>
     </a>
-            <i class="fa fa-trash-o fa-lg fa-fw pull-right" style="padding-top:4px"></i>
-          </c:if>
-        </div>
-      </div>
     </c:forEach>
   </div>
 </div>
