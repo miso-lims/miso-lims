@@ -56,7 +56,6 @@ public abstract class AbstractPlate<T extends List<S>, S extends Plateable> impl
   @Enumerated(EnumType.STRING)
   private PlateMaterialType plateMaterialType;
 
-  private TagBarcode tagBarcode;
   private String identificationBarcode;
   private String locationBarcode;
 
@@ -124,16 +123,6 @@ public abstract class AbstractPlate<T extends List<S>, S extends Plateable> impl
   }
 
   @Override
-  public TagBarcode getTagBarcode() {
-    return tagBarcode;
-  }
-
-  @Override
-  public void setTagBarcode(TagBarcode tagBarcode) {
-    this.tagBarcode = tagBarcode;
-  }
-
-  @Override
   public abstract int getSize();
 
   @Override
@@ -171,7 +160,7 @@ public abstract class AbstractPlate<T extends List<S>, S extends Plateable> impl
   }
 
   public String getLabelText() {
-    return getTagBarcode().getSequence() + "("+getElementType().getSimpleName() + " " + getPlateMaterialType().getKey()+")";
+    return  "("+getElementType().getSimpleName() + " " + getPlateMaterialType().getKey()+")";
   }
 
   public Date getLastUpdated() {

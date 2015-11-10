@@ -26,7 +26,6 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 import com.eaglegenomics.simlims.core.User;
 import org.codehaus.jackson.annotate.JsonIgnore;
 
-import java.util.Collection;
 import java.util.Set;
 
 /**

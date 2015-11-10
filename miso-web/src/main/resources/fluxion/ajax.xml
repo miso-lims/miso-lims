@@ -147,5 +147,13 @@
           class="uk.ac.bbsrc.tgac.miso.spring.ajax.ImportExportControllerHelperService">
     </bean>
 
+    <bean id="entityGroupControllerHelperService"
+          class="uk.ac.bbsrc.tgac.miso.spring.ajax.EntityGroupControllerHelperService">
+    </bean>
+
+    <bean id="workflowControllerHelperService"
+          class="uk.ac.bbsrc.tgac.miso.spring.ajax.WorkflowControllerHelperService">
+    </bean>
+
 </beans>
 

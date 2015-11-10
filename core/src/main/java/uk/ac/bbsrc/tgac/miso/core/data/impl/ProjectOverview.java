@@ -77,13 +77,13 @@ public class ProjectOverview implements Watchable, Alertable, Nameable, Serializ
   private String principalInvestigator;
 
   @Deprecated
-  private Collection<Sample> samples = new HashSet<Sample>();
+  private Collection<Sample> samples = new HashSet<>();
 
-  private EntityGroup<ProjectOverview, Sample> sampleGroup;
+  private HierarchicalEntityGroup<ProjectOverview, Sample> sampleGroup;
 
-  private Collection<Library> libraries = new HashSet<Library>();
-  private Collection<Run> runs = new HashSet<Run>();
-  private Collection<Note> notes = new HashSet<Note>();
+  private Collection<Library> libraries = new HashSet<>();
+  private Collection<Run> runs = new HashSet<>();
+  private Collection<Note> notes = new HashSet<>();
   private Date startDate;
   private Date endDate;
   private Integer numProposedSamples;
@@ -94,8 +94,8 @@ public class ProjectOverview implements Watchable, Alertable, Nameable, Serializ
   private boolean allPoolsConstructed;
   private boolean allRunsCompleted;
   private boolean primaryAnalysisCompleted;
-  private Set<MisoListener> listeners = new HashSet<MisoListener>();
-  private Set<User> watchers = new HashSet<User>();
+  private Set<MisoListener> listeners = new HashSet<>();
+  private Set<User> watchers = new HashSet<>();
   private Date lastUpdated;
 
   @Override
@@ -170,11 +170,11 @@ public class ProjectOverview implements Watchable, Alertable, Nameable, Serializ
     this.locked = locked;
   }
 
-  public EntityGroup<ProjectOverview, Sample> getSampleGroup() {
+  public HierarchicalEntityGroup<ProjectOverview, Sample> getSampleGroup() {
     return sampleGroup;
   }
 
-  public void setSampleGroup(EntityGroup<ProjectOverview, Sample> sampleGroup) {
+  public void setSampleGroup(HierarchicalEntityGroup<ProjectOverview, Sample> sampleGroup) {
     this.sampleGroup = sampleGroup;
   }
 
@@ -188,9 +188,16 @@ public class ProjectOverview implements Watchable, Alertable, Nameable, Serializ
   }
 
   public Collection<Sample> getQcPassedSamples() {
-    List<Sample> qcSamples = new ArrayList<Sample>();
+    List<Sample> qcSamples = new ArrayList<>();
     if (getSampleGroup() != null) {
       for (Sample s : getSampleGroup().getEntities()) {
+        if (s != null && s.getQcPassed() != null && s.getQcPassed()) {
+          qcSamples.add(s);
+        }
+      }
+    }
+    else {
+      for (Sample s : getProject().getSamples()) {
         if (s != null && s.getQcPassed() != null && s.getQcPassed()) {
           qcSamples.add(s);
         }

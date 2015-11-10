@@ -49,7 +49,7 @@ var ImportExport = ImportExport || {
     var div = "<div onMouseOver='this.className=\"dashboardhighlight\"' onMouseOut='this.className=\"dashboard\"' class='dashboard'>";
     div += "<span class='float-left' id='element" + elementId + "'><input type='hidden' id='poolableElements" + elementId + "' value='" + elementName + "' name='poolableElements'/>";
     div += "<b>Element: " + elementName + "</b></span>";
-    div += "<span onclick='Utils.ui.confirmRemove(jQuery(this).parent());' class='float-right ui-icon ui-icon-circle-close'></span></div>";
+    div += "<span onclick='Utils.ui.confirmRemove(jQuery(this).parent());' class='fa fa-fw fa-2x fa-times-circle-o pull-right'></span></div>";
     jQuery('#dillist').append(div);
     jQuery('#searchElementsResult').css('visibility', 'hidden');
   },
@@ -68,7 +68,7 @@ var ImportExport = ImportExport || {
         wellId = 'NA';
       }
       jQuery(this).append("<input type=\"hidden\" value=\"SAM" + sampleId + ":" + wellId + ":" + sampleAlias + ":" + projectName + ":" + projectAlias + ":" + dnaOrRNA + "\" name=\"sampleinwell\"/> " + sampleName);
-      jQuery(this).append(" <span onclick='ImportExport.confirmSampleRemove(this);' class='ui-icon ui-icon-circle-close'></span>");
+      jQuery(this).append(" <span onclick='ImportExport.confirmSampleRemove(this);' class='fa fa-fw fa-2x fa-times-circle-o pull-right'></span>");
     });
   },
 
@@ -134,27 +134,27 @@ var ImportExport = ImportExport || {
                                             "onclick=\"ImportExport.confirmSamplesUpload();\">Confirm and Get Library & Pool Sheet</button>" +
                                             "<button type=\"button\" id=\"cancelSamplesUploadButton\" class=\"br-button ui-state-default ui-corner-all\" " +
                                             "onclick=\"window.location='/miso/importexport/importsamplesheet';\">Cancel</button>" +
-                                            "<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" class=\"display\" id=\"sampleSheetUploadSuccessTable\"></table>");
+                                            "<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" class=\"table table-striped table-bordered display\" id=\"sampleSheetUploadSuccessTable\"></table>");
       jQuery('#sampleSheetUploadSuccessTable').dataTable({
-                                                           "aaData": response,
-                                                           "aoColumns": [
-                                                             { "sTitle": "Project"},
-                                                             { "sTitle": "Client"},
-                                                             { "sTitle": "Sample Name"},
-                                                             { "sTitle": "Sample Alias"},
-                                                             { "sTitle": "Well"},
-                                                             { "sTitle": "Adaptor"},
-                                                             { "sTitle": "QC value"},
-                                                             { "sTitle": "QC Passed"},
-                                                             { "sTitle": "Notes"}
-                                                           ],
-                                                           "bPaginate": false,
-                                                           "bFilter": false,
-                                                           "bSort": false,
-                                                           "bJQueryUI": true
-                                                         });
+         "aaData": response,
+         "aoColumns": [
+           { "sTitle": "Project"},
+           { "sTitle": "Client"},
+           { "sTitle": "Sample Name"},
+           { "sTitle": "Sample Alias"},
+           { "sTitle": "Well"},
+           { "sTitle": "Adaptor"},
+           { "sTitle": "QC value"},
+           { "sTitle": "QC Passed"},
+           { "sTitle": "Notes"}
+         ],
+         "bPaginate": false,
+         "bFilter": false,
+         "bSort": false,
+         "bJQueryUI": false
+       });
 
-    sampleJSONArray = response;
+      sampleJSONArray = response;
     }
     else {
       setTimeout(function () {
@@ -200,32 +200,30 @@ var ImportExport = ImportExport || {
                                             "onclick=\"ImportExport.confirmLibrariesPoolsUpload();\">Confirm Upload</button>" +
                                             "<button type=\"button\" id=\"cancelLibrariesPoolsUploadButton\" class=\"br-button ui-state-default ui-corner-all\" " +
                                             "onclick=\"window.location='/miso/importexport/importlibrarypoolsheet';\">Cancel</button>" +
-                                            "<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" class=\"display\" id=\"librarypoolSheetUploadSuccessTable\"></table>");
+                                            "<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" class=\"table table-striped table-bordered display\" id=\"librarypoolSheetUploadSuccessTable\"></table>");
       jQuery('#librarypoolSheetUploadSuccessTable').dataTable({
-                                                           "aaData": response['rows'],
-                                                           "aoColumns": [
-                                                             { "sTitle": "Sample Name"},
-                                                             { "sTitle": "Sample Alias"},
-                                                             { "sTitle": "Well"},
-                                                             { "sTitle": "Library Alias"},
-                                                             { "sTitle": "Library Description"},
-                                                             { "sTitle": "Qubit Conc"},
-                                                             { "sTitle": "Insert Size (bp)"},
-                                                             { "sTitle": "Molarity (nm)"},
-                                                             { "sTitle": "QC Passed"},
-                                                             { "sTitle": "Barcode Kit"},
-                                                             { "sTitle": "Barcode Tag"},
-                                                             { "sTitle": "LDI Conc"},
-                                                             { "sTitle": "Pool Name"},
-                                                             { "sTitle": "Pool Molarity (nm)"} ,
-                                                             { "sTitle": "Proceed Key"},
-                                                             { "sTitle": "Note"}
-                                                           ],
-                                                           "bPaginate": false,
-                                                           "bFilter": false,
-                                                           "bSort": false,
-                                                           "bJQueryUI": true
-                                                         });
+         "aaData": response['rows'],
+         "aoColumns": [
+           { "sTitle": "Sample Name"},
+           { "sTitle": "Sample Alias"},
+           { "sTitle": "Well"},
+           { "sTitle": "Library Alias"},
+           { "sTitle": "Library Description"},
+           { "sTitle": "Qubit Conc"},
+           { "sTitle": "Insert Size (bp)"},
+           { "sTitle": "Molarity (nm)"},
+           { "sTitle": "QC Passed"},
+           { "sTitle": "Barcode Kit"},
+           { "sTitle": "Barcode Tag"},
+           { "sTitle": "LDI Conc"},
+           { "sTitle": "Pool Name"},
+           { "sTitle": "Pool Molarity (nm)"}
+         ],
+         "bPaginate": false,
+         "bFilter": false,
+         "bSort": false,
+         "bJQueryUI": false
+       });
 
       librariesPoolsJSON = response;
     }
@@ -276,24 +274,5 @@ var ImportExport = ImportExport || {
             }
             }
     );
-  },
-
-  generateCSVBAC:function(){
-    Utils.ui.disableButton("generateCSVBACButton");
-    console.info(jQuery('#generateCSVBACForm').serializeArray());
-    Fluxion.doAjax(
-            'importExportControllerHelperService',
-            'generateCSVBAC',
-            {
-              'form': jQuery('#generateCSVBACForm').serializeArray(),
-              'url': ajaxurl
-            },
-            {'doOnSuccess': function (json) {
-              Utils.page.pageRedirect('/miso/download/plate/csv/' + json.response);
-            }
-            }
-    );
-    Utils.ui.reenableButton("generateCSVBACButton", "Generate CSV");
-
   }
 };

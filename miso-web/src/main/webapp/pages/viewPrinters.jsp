@@ -29,14 +29,20 @@
   
 --%>
 <%@ include file="../header.jsp" %>
-<script type="text/javascript" src="<c:url value='/scripts/printer_ajax.js?ts=${timestamp.time}'/>"></script>
+
 
 <div id="maincontent">
   <div id="contentcolumn">
     <c:choose>
       <c:when test="${not empty barcodePrinter}">
-        <h1>Printer ${barcodePrinter.name}</h1>
-        <table class="list" id="printerTable">
+        <nav class="navbar navbar-default" role="navigation">
+           <div class="navbar-header">
+              <span class="navbar-brand navbar-center">
+                Printer ${barcodePrinter.name}
+              </span>
+           </div>
+        </nav>
+        <table class="table table-bordered table-striped" id="printerTable">
           <thead>
           <tr>
             <th>Job ID</th>
@@ -78,14 +84,20 @@
         </script>
       </c:when>
       <c:otherwise>
-        <h1>Printers</h1>
+        <nav class="navbar navbar-default" role="navigation">
+           <div class="navbar-header">
+              <span class="navbar-brand navbar-center">
+                <div id="title">Printers</div>
+              </span>
+           </div>
+        </nav>
         <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
           <a href='javascript:void(0);' class="add" onclick="Print.ui.getPrinterFormEntities(); return false;">Add
             Printer Service</a><br/>
         </c:if>
 
         <form id='addPrinterForm'>
-          <table class="list" id="printerTable">
+          <table class="table table-bordered table-striped" id="printerTable">
             <thead>
             <tr>
               <th>Printer Service</th>
@@ -127,7 +139,7 @@
                   <td id='edit-${service.name}' class="misoicon"/>
                   <a href='javascript:void(0);'
                      onclick="Print.ui.changePrinterServiceRow('${service.name}');"><span
-                      class="ui-icon ui-icon-pencil"/></a>
+                      class="fa fa-pencil-square-o fa-lg"/></a>
                   </td>
                 </c:if>
               </tr>
@@ -152,8 +164,14 @@
 
     <c:choose>
       <c:when test="${not empty userPrintJobs}">
-        <h1>Print Jobs</h1>
-        <table class="list" id="printerTable">
+        <nav class="navbar navbar-default" role="navigation">
+           <div class="navbar-header">
+              <span class="navbar-brand navbar-center">
+                Print Jobs
+              </span>
+           </div>
+        </nav>
+        <table class="table table-bordered table-striped" id="printerTable">
           <thead>
           <tr>
             <th>Job ID</th>
@@ -198,7 +216,13 @@
         </script>
       </c:when>
       <c:otherwise>
-        <h1>Print Jobs</h1>
+        <nav class="navbar navbar-default" role="navigation">
+           <div class="navbar-header">
+              <span class="navbar-brand navbar-center">
+                Print Jobs
+              </span>
+           </div>
+        </nav>
         You have no print jobs.
       </c:otherwise>
     </c:choose>

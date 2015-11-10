@@ -134,8 +134,19 @@ public class LimsSecurityUtils {
    }
 
    /**
-    * From a subset of supplied users (usually the list of all users in MISO), returns a collection of Users that can be set as owners of
-    * the supplied SecurableByProfile object
+   * Get a list of all internal users
+   */
+  public static Set<User> getInternalUsers(Collection<User> allUsers) throws IOException {
+    SortedSet<User> owners = new TreeSet<>(new FullNameComparator());
+    for (User u : allUsers) {
+      if (u.isInternal()) {
+        owners.add(u);
+      }
+    }
+    return owners;
+  }
+
+  /**
     *
     * @param user
     *           of type User

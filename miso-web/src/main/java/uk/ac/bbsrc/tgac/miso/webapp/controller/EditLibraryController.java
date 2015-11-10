@@ -30,6 +30,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
 import uk.ac.bbsrc.tgac.miso.core.service.tagbarcode.TagBarcodeStrategy;
 import uk.ac.bbsrc.tgac.miso.core.service.tagbarcode.TagBarcodeStrategyResolverService;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
@@ -82,6 +83,9 @@ public class EditLibraryController {
   private RequestManager requestManager;
 
   @Autowired
+  private FilesManager filesManager;
+
+  @Autowired
   private DataObjectFactory dataObjectFactory;
 
   @Autowired
@@ -100,6 +104,10 @@ public class EditLibraryController {
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
+  }
+
+  public void setFilesManager(FilesManager filesManager) {
+    this.filesManager = filesManager;
   }
 
   public void setSecurityManager(SecurityManager securityManager) {
@@ -182,6 +190,20 @@ public class EditLibraryController {
       runs.addAll(prs);
     }
     return runs;
+  }
+
+  public Map<Integer, String> populateLibraryFiles(Long libraryId) throws IOException {
+    if (libraryId != AbstractLibrary.UNSAVED_ID) {
+      Library s = requestManager.getLibraryById(libraryId);
+      if (s != null) {
+        Map<Integer, String> fileMap = new HashMap<Integer, String>();
+        for (String f : filesManager.getFileNames(Library.class, libraryId.toString())) {
+          fileMap.put(f.hashCode(), f);
+        }
+        return fileMap;
+      }
+    }
+    return Collections.emptyMap();
   }
 
   public Collection<LibraryType> populateLibraryTypesByPlatform(String platform) throws IOException {
@@ -372,7 +394,7 @@ public class EditLibraryController {
   public Collection<emPCRDilution> populateEmPcrDilutions(User user, Collection<emPCR> pcrs) throws IOException {
     Collection<emPCRDilution> dilutions = new HashSet<emPCRDilution>();
     for (emPCR pcr : pcrs) {
-      for (emPCRDilution dilution : requestManager.listAllEmPcrDilutionsByEmPcrId(pcr.getId())) {
+      for (emPCRDilution dilution : requestManager.listAllEmPCRDilutionsByEmPcrId(pcr.getId())) {
         dilution.setEmPCR(pcr);
         dilutions.add(dilution);
       }
@@ -427,6 +449,7 @@ public class EditLibraryController {
       model.put("poolLibraryMap", poolLibraryMap);
       model.put("libraryPools", pools);
       model.put("libraryRuns", getRunsByLibraryPools(pools));
+      model.put("libraryFiles", populateLibraryFiles(libraryId));
 
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, library, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, library, securityManager.listAllUsers()));
@@ -518,6 +541,7 @@ public class EditLibraryController {
       model.put("poolLibraryMap", poolLibraryMap);
       model.put("libraryPools", pools);
       model.put("libraryRuns", getRunsByLibraryPools(pools));
+      model.put("libraryFiles", populateLibraryFiles(libraryId));
 
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, library, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, library, securityManager.listAllUsers()));

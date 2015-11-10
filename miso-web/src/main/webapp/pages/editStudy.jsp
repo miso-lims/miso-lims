@@ -34,16 +34,22 @@
 
 <div id="maincontent">
   <div id="contentcolumn">
-    <form:form action="/miso/study" method="POST" commandName="study" autocomplete="off"
-               onsubmit="return validate_study(this);">
+    <form:form action="/miso/study" method="POST" commandName="study" autocomplete="off">
       <sessionConversation:insertSessionConversationId attributeName="study"/>
-      <h1>
-        <c:choose>
-          <c:when test="${study.id != 0}">Edit</c:when>
-          <c:otherwise>Create</c:otherwise>
-        </c:choose> Study
-        <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
-      </h1>
+      <nav class="navbar navbar-default" role="navigation">
+         <div class="navbar-header">
+            <span class="navbar-brand navbar-center">
+              <c:choose>
+                <c:when test="${study.id != 0}">Edit</c:when>
+                <c:otherwise>Create</c:otherwise>
+              </c:choose> Study
+            </span>
+         </div>
+         <div class="navbar-right container-fluid">
+            <button type="button" class="btn btn-default navbar-btn" onclick="return validate_study(this.form);">Save</button>
+         </div>
+      </nav>
+
       <div class="breadcrumbs">
         <ul>
           <li>
@@ -96,22 +102,25 @@
       </tr>
       <tr>
         <td class="h">Alias:</td>
-        <td><form:input path="alias" class="validateable"/><span id="aliascounter" class="counter"></span></td>
-          <%--<td><a href="void(0);" onclick="popup('help/studyAlias.html');">Help</a></td>--%>
+        <td>
+          <div class="input-group">
+            <form:input path="alias" class="validateable form-control"/><span id="aliascounter" class="input-group-addon"></span>
+          </div>
+        </td>
       </tr>
       <tr>
         <td>Description:</td>
-        <td><form:input path="description" class="validateable"/><span id="descriptioncounter" class="counter"></span>
+        <td>
+          <div class="input-group">
+            <form:input path="description" class="validateable form-control"/><span id="descriptioncounter" class="input-group-addon"></span>
+          </div>
         </td>
-          <%--<td><a href="void(0);" onclick="popup('help/studyDescription.html');">Help</a></td>--%>
       </tr>
       <c:if test="${not empty study.accession}">
         <tr>
           <td class="h">Accession:</td>
-          <td><a href="http://www.ebi.ac.uk/ena/data/view/${study.accession}"
-                 target="_blank">${study.accession}</a>
+          <td><a href="http://www.ebi.ac.uk/ena/data/view/${study.accession}" target="_blank">${study.accession}</a>
           </td>
-            <%--<td><a href="void(0);" onclick="popup('help/studyAccession.html');">Help</a></td>--%>
         </tr>
       </c:if>
       <tr>
@@ -139,26 +148,26 @@
 
       <c:choose>
         <c:when test="${study.id != 0}">
-          <h1>
-            <div id="totalCount">
+          <nav id="navbar-exp" class="navbar navbar-default navbar-static" role="navigation">
+            <div class="navbar-header">
+              <span id="totalCount" class="navbar-brand navbar-center">Experiments</span>
             </div>
-          </h1>
-          <ul class="sddm">
-            <li>
-              <a onmouseover="mopen('expmenu')" onmouseout="mclosetime()">Options
-                <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
-              </a>
+            <div class="collapse navbar-collapse bs-example-js-navbar-collapse">
+              <ul class="nav navbar-nav navbar-right">
+                <li id="exp-menu" class="dropdown">
+                  <a id="expdrop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Options <b class="caret"></b></a>
+                  <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="expdrop1">
+                    <li role="presentation">
+                      <a href='<c:url value="/miso/experiment/new/${study.id}"/>'>Add Experiment</a>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+          </nav>
 
-              <div id="expmenu"
-                   onmouseover="mcancelclosetime()"
-                   onmouseout="mclosetime()">
-                <a href='<c:url value="/miso/experiment/new/${study.id}"/>' class="add">Add new
-                  Experiment</a>
-              </div>
-            </li>
-          </ul>
           <span style="clear:both">
-            <table class="list" id="table">
+            <table class="table table-bordered table-striped" id="table">
               <thead>
               <tr>
                 <th>Experiment Name</th>
@@ -178,7 +187,7 @@
                     - ${experiment.platform.instrumentModel}</td>
                   <td class="misoicon"
                       onclick="window.location.href='<c:url value="/miso/experiment/${experiment.id}"/>'">
-                    <span class="ui-icon ui-icon-pencil"/></td>
+                    <span class="fa fa-pencil-square-o fa-lg"/></td>
                 </tr>
               </c:forEach>
               </tbody>

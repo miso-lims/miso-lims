@@ -23,7 +23,13 @@
   ~ **********************************************************************
   --%>
 
-<h1>Requests</h1>
+<nav class="navbar navbar-default" role="navigation">
+   <div class="navbar-header">
+      <span class="navbar-brand navbar-center">
+        Requests
+      </span>
+   </div>
+</nav>
 <ul>
   <c:forEach items="${requests}" var="request">
     <li>${request}</li>

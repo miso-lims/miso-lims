@@ -26,10 +26,17 @@
   <div id="contentcolumn">
     <form:form action="/miso/stats/sequencer" method="POST" commandName="sequencerReference" autocomplete="off">
       <sessionConversation:insertSessionConversationId attributeName="sequencerReference"/>
-      <h1>
-        Edit Sequencer Reference
-        <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
-      </h1>
+      <nav class="navbar navbar-default" role="navigation">
+         <div class="navbar-header">
+            <span class="navbar-brand navbar-center">
+              Edit Sequencer Reference
+            </span>
+         </div>
+         <div class="navbar-right container-fluid">
+            <button type="submit" class="btn btn-default navbar-btn">Save</button>
+         </div>
+      </nav>
+
       <div class="breadcrumbs">
         <ul>
           <li>
@@ -72,12 +79,16 @@
         </tr>
         <tr>
           <td class="h">Name:</td>
-          <td><form:input path="name"/><span id="namecounter" class="counter"></span></td>
+          <td>
+            <div class="input-group">
+              <form:input path="name" class="form-control"/><span id="namecounter" class="input-group-addon"></span>
+            </div>
+          </td>
         </tr>
         <tr>
           <td>IP Address:</td>
           <td>
-            <input type="text" id="ipAddress" name="ipAddress" value="${trimmedIpAddress}"/>
+            <input type="text" id="ipAddress" name="ipAddress" value="${trimmedIpAddress}" class="form-control"/>
             <input type="hidden" value="on" name="_ipAddress"/>
           </td>
         </tr>

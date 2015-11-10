@@ -88,12 +88,12 @@ Project.ui = {
             { "sTitle": "Overview"},
             { "sTitle": "Edit"}
           ],
-          "bJQueryUI": true,
+          "bJQueryUI": false,
           "iDisplayLength": 25,
           "aaSorting": [
             [0, "desc"]
           ],
-          "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
+          //"sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>',
           "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
             Fluxion.doAjax(
               'projectControllerHelperService',
@@ -109,8 +109,8 @@ Project.ui = {
             );
           }
         });
-        jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
-        jQuery("#toolbar").append("<button style=\"margin-left:5px;\" onclick=\"window.location.href='/miso/project/new';\" class=\"fg-button ui-state-default ui-corner-all\">Add Project</button>");
+        //jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
+        //jQuery("#toolbar").append("<button style=\"margin-left:5px;\" onclick=\"window.location.href='/miso/project/new';\" class=\"fg-button ui-state-default ui-corner-all\">Add Project</button>");
       }
       }
     );
@@ -167,6 +167,22 @@ Project.ui = {
 
   cancelSampleDeliveryFormUpload: function () {
     jQuery('#deliveryformdiv').css("display", "none");
+  },
+
+  deleteProjectFile: function(projectId, fileName, fileKey) {
+    Fluxion.doAjax(
+      'projectControllerHelperService',
+      'deleteProjectFile',
+      {
+        'projectId': projectId,
+        'fileName': fileName,
+        'url': ajaxurl
+      },
+      {'doOnSuccess': function (json) {
+        jQuery('#file'+fileKey).remove();
+      }
+      }
+    );
   },
 
   downloadBulkSampleInputForm: function (projectId, documentFormat) {
@@ -332,12 +348,12 @@ Project.ui = {
             { "sTitle": "Description"},
             { "sTitle": "Edit"}
           ],
-          "bJQueryUI": true,
+          "bJQueryUI": false,
           "iDisplayLength": 25,
           "aaSorting": [
             [0, "desc"]
-          ],
-          "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>'
+          ]
+          //"sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>'
           /*
            ,
 
@@ -358,8 +374,9 @@ Project.ui = {
            }
            */
         });
-        jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
+        //jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
         //jQuery("#toolbar").append("<button style=\"margin-left:5px;\" onclick=\"window.location.href='/miso/project/new';\" class=\"fg-button ui-state-default ui-corner-all\">Add Project</button>");
+        jQuery("#plateElementsTable_wrapper").prepend("<div class='float-right toolbar'></div>");
       }
       }
     );
@@ -623,11 +640,7 @@ Project.ui = {
 
   receiveSamples: function (tableId) {
     if (!jQuery(tableId).hasClass("display")) {
-      //destroy current table and recreate
       jQuery(tableId).dataTable().fnDestroy();
-      //bug fix to reset table width
-      jQuery(tableId).removeAttr("style");
-
       jQuery(tableId).addClass("display");
 
       jQuery(tableId + ' tbody').find("tr").each(function () {
@@ -660,11 +673,10 @@ Project.ui = {
         ],
         "bPaginate": false,
         "bInfo": false,
-        "bJQueryUI": true,
+        "bJQueryUI": false,
         "bAutoWidth": true,
         "bSort": false,
-        "bFilter": false,
-        "sDom": '<<"toolbar">f>r<t>ip>'
+        "bFilter": false
       });
 
       jQuery(tableId).find("tr:first").prepend("<th>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"" + tableId + "\", this);'></span></th>");
@@ -679,6 +691,7 @@ Project.ui = {
         }
       });
 
+      jQuery(tableId+"_wrapper").prepend("<div class='float-right toolbar'></div>");
       jQuery("div.toolbar").html("<input type='button' value='Receive Selected' onclick=\"Project.ui.receiveSelectedSamples('" + tableId + "');\" class=\"fg-button ui-state-default ui-corner-all\"/>");
       jQuery("div.toolbar").append("<input type='button' value='Cancel' onclick=\"Utils.page.pageReload();\" class=\"fg-button ui-state-default ui-corner-all\"/>");
       jQuery("div.toolbar").removeClass("toolbar");
@@ -718,9 +731,9 @@ Project.overview = {
     jQuery('#addProjectOverviewDialog')
         .html("<form>" +
               "<fieldset class='dialog'><label for='principalInvestigator'>Principal Investigator</label>" +
-              "<input type='text' name='principalInvestigator' id='principalInvestigator' class='text ui-widget-content ui-corner-all' />" +
+              "<input type='text' name='principalInvestigator' id='principalInvestigator' class='form-control'/>" +
               "<label for='numProposedSamples'>No. Proposed Samples</label>" +
-              "<input type='text' name='numProposedSamples' id='numProposedSamples' class='text ui-widget-content ui-corner-all' />" +
+              "<input type='text' name='numProposedSamples' id='numProposedSamples' class='form-control'/>" +
               "</fieldset></form>");
 
     jQuery(function () {
@@ -765,10 +778,10 @@ Project.overview = {
       .html("<form>" +
             "<fieldset class='dialog'>" +
             "<label for='internalOnly'>Internal Only?</label>" +
-            "<input type='checkbox' checked='checked' name='internalOnly' id='internalOnly' class='text ui-widget-content ui-corner-all' />" +
+            "<input type='checkbox' checked='checked' name='internalOnly' id='internalOnly'/>" +
             "<br/>" +
             "<label for='notetext'>Text</label>" +
-            "<input type='text' name='notetext' id='notetext' class='text ui-widget-content ui-corner-all' />" +
+            "<input type='text' name='notetext' id='notetext' class='form-control'/>" +
             "</fieldset></form>");
 
     jQuery(function () {
@@ -822,7 +835,7 @@ Project.overview = {
     var tableDiv = "#sampleGroupTableDiv"+overviewId;
     var tableId = "#sampleGroupTable"+overviewId;
 
-    jQuery(tableDiv).html("<table class='list display' id='sampleGroupTable"+overviewId+"'><thead><tr><th>Sample Name</th><th>Alias</th><th>Type</th><th>Description</th></tr></thead><tbody></tbody></table>");
+    jQuery(tableDiv).html("<table class='table table-striped table-bordered display' id='sampleGroupTable"+overviewId+"'><thead><tr><th>Sample Name</th><th>Alias</th><th>Type</th><th>Description</th></tr></thead><tbody></tbody></table>");
 
     Fluxion.doAjax(
       'projectControllerHelperService',
@@ -854,14 +867,10 @@ Project.overview = {
           ],
           "bPaginate": false,
           "bInfo": false,
-          "bJQueryUI": true,
+          "bJQueryUI": false,
           "bAutoWidth": true,
-          "bFilter": false,
-          "sDom": '<<"toolbar">f>r<t>ip>'
+          "bFilter": false
         });
-
-        //bug fix to reset table width
-        jQuery(tableId).removeAttr("style");
 
         jQuery(tableId).find("tr").each(function () {
           jQuery(this).removeAttr("onmouseover").removeAttr("onmouseout");
@@ -879,6 +888,7 @@ Project.overview = {
           }
         });
 
+        jQuery(tableId+"_wrapper").prepend("<div class='float-right toolbar'></div>");
         jQuery("div.toolbar").html("<input type='button' value='Group Selected' onclick=\"Project.overview.addSampleGroup('"+overviewId+"', '" + tableId + "');\" class=\"fg-button ui-state-default ui-corner-all\"/>");
         jQuery("div.toolbar").append("<input type='button' value='Cancel' onclick=\"Utils.page.pageReload();\" class=\"fg-button ui-state-default ui-corner-all\"/>");
         jQuery("div.toolbar").removeClass("toolbar");
@@ -913,7 +923,7 @@ Project.overview = {
     var tableDiv = "#sampleGroupTableDiv"+overviewId;
     var tableId = "#sampleGroupTable"+overviewId;
 
-    jQuery(tableDiv).html("<table class='list display' id='sampleGroupTable"+overviewId+"'><thead><tr><th>Sample Name</th><th>Alias</th><th>Type</th><th>Description</th></tr></thead><tbody></tbody></table>");
+    jQuery(tableDiv).html("<table class='table table-striped table-bordered display' id='sampleGroupTable"+overviewId+"'><thead><tr><th>Sample Name</th><th>Alias</th><th>Type</th><th>Description</th></tr></thead><tbody></tbody></table>");
 
     Fluxion.doAjax(
       'projectControllerHelperService',
@@ -945,14 +955,10 @@ Project.overview = {
           ],
           "bPaginate": false,
           "bInfo": false,
-          "bJQueryUI": true,
+          "bJQueryUI": false,
           "bAutoWidth": true,
-          "bFilter": false,
-          "sDom": '<<"toolbar">f>r<t>ip>'
+          "bFilter": false
         });
-
-        //bug fix to reset table width
-        jQuery(tableId).removeAttr("style");
 
         jQuery(tableId).find("tr").each(function () {
           jQuery(this).removeAttr("onmouseover").removeAttr("onmouseout");
@@ -970,6 +976,7 @@ Project.overview = {
           }
         });
 
+        jQuery(tableId+"_wrapper").prepend("<div class='float-right toolbar'></div>");
         jQuery("div.toolbar").html("<input type='button' value='Add Selected' onclick=\"Project.overview.addSamplesToGroup('"+overviewId+"', '" + tableId + "', '"+groupId+"');\" class=\"fg-button ui-state-default ui-corner-all\">Add Selected</input>");
         jQuery("div.toolbar").append("<input type='button' value='Cancel' onclick=\"Utils.page.pageReload();\" class=\"fg-button ui-state-default ui-corner-all\">Cancel</input>");
         jQuery("div.toolbar").removeClass("toolbar");
@@ -1268,11 +1275,7 @@ Project.barcode = {
 
   selectSampleBarcodesToPrint: function (tableId) {
     if (!jQuery(tableId).hasClass("display")) {
-      //destroy current table and recreate
       jQuery(tableId).dataTable().fnDestroy();
-      //bug fix to reset table width
-      jQuery(tableId).removeAttr("style");
-
       jQuery(tableId).addClass("display");
 
       jQuery(tableId).find('tr:first th:gt(6)').remove();
@@ -1283,14 +1286,6 @@ Project.barcode = {
 
       jQuery(tableId).find("tr:first").prepend("<th width='5%'>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"" + tableId + "\", this);'></span></th>");
       jQuery(tableId).find("tr:gt(0)").prepend("<td width='5%' class='rowSelect'></td>");
-
-      //Sample Name 	Sample Alias 	Sample Description 	Type 	QC Passed
-      var headers = ['rowsel',
-                     'name',
-                     'alias',
-                     'description',
-                     'type',
-                     'qcPassed'];
 
       var oTable = jQuery(tableId).dataTable({
         "aoColumnDefs": [
@@ -1304,7 +1299,7 @@ Project.barcode = {
         ],
         "bPaginate": false,
         "bInfo": false,
-        "bJQueryUI": true,
+        "bJQueryUI": false,
         "bAutoWidth": true,
         "aoColumns": [
           {"bSortable": false},
@@ -1316,8 +1311,7 @@ Project.barcode = {
           null,
           null
       ],
-        "bFilter": false,
-        "sDom": '<<"toolbar">f>r<t>ip>'
+        "bFilter": false
       });
 
       jQuery(tableId).find('.rowSelect').click(function () {
@@ -1329,6 +1323,7 @@ Project.barcode = {
         }
       });
 
+      jQuery(tableId+"_wrapper").prepend("<div class='float-right toolbar'></div>");
       jQuery("div.toolbar").html("<input type='button' value='Print Selected' type='button' onclick=\"Project.barcode.printSelectedSampleBarcodes('" + tableId + "');\" class=\"fg-button ui-state-default ui-corner-all\"/>");
       jQuery("div.toolbar").append("<input type='button' value='Cancel' onclick=\"Utils.page.pageReload();\" class=\"fg-button ui-state-default ui-corner-all\"/>");
       jQuery("div.toolbar").removeClass("toolbar");
@@ -1399,11 +1394,7 @@ Project.barcode = {
 
   selectLibraryBarcodesToPrint: function (tableId) {
     if (!jQuery(tableId).hasClass("display")) {
-      //destroy current table and recreate
       jQuery(tableId).dataTable().fnDestroy();
-      //bug fix to reset table width
-      jQuery(tableId).removeAttr("style");
-
       jQuery(tableId).addClass("display");
 
       jQuery(tableId).find('tr:first th:gt(8)').remove();
@@ -1414,16 +1405,6 @@ Project.barcode = {
 
       jQuery(tableId).find("tr:first").prepend("<th width='5%'>Select <span sel='none' header='select' class='ui-icon ui-icon-arrowstop-1-s' style='float:right' onclick='DatatableUtils.toggleSelectAll(\"" + tableId + "\", this);'></span></th>");
       jQuery(tableId).find("tr:gt(0)").prepend("<td width='5%' class='rowSelect'></td>");
-      //Library Name 	Library Alias 	Library Description 	Library Type 	Library Platform 	Tag Barcode 	Insert Size
-      var headers = ['rowsel',
-                     'name',
-                     'alias',
-                     'date',
-                     'description',
-                     'libraryType',
-                     'platform',
-                     'tagBarcode',
-                     'insertSize'];
 
       var oTable = jQuery(tableId).dataTable({
         "aoColumnDefs": [
@@ -1437,7 +1418,7 @@ Project.barcode = {
         ],
         "bPaginate": false,
         "bInfo": false,
-        "bJQueryUI": true,
+        "bJQueryUI": false,
         "bAutoWidth": true,
 
          "aoColumns": [
@@ -1452,8 +1433,7 @@ Project.barcode = {
            null,
            null
          ],
-        "bFilter": false,
-        "sDom": '<<"toolbar">f>r<t>ip>'
+        "bFilter": false
       });
 
       jQuery(tableId).find('.rowSelect').click(function () {
@@ -1465,6 +1445,7 @@ Project.barcode = {
         }
       });
 
+      jQuery(tableId+"_wrapper").prepend("<div class='float-right toolbar'></div>");
       jQuery("div.toolbar").html("<input type='button' value='Print Selected' onclick=\"Project.barcode.printSelectedLibraryBarcodes('" + tableId + "');\" class=\"fg-button ui-state-default ui-corner-all\"/>");
       jQuery("div.toolbar").append("<input type='button' value='Cancel' onclick=\"Utils.page.pageReload();\" class=\"fg-button ui-state-default ui-corner-all\"/>");
       jQuery("div.toolbar").removeClass("toolbar");
@@ -1536,11 +1517,7 @@ Project.barcode = {
 
   selectLibraryDilutionBarcodesToPrint: function (tableId) {
     if (!jQuery(tableId).hasClass("display")) {
-      //destroy current table and recreate
       jQuery(tableId).dataTable().fnDestroy();
-      //bug fix to reset table width
-      jQuery(tableId).removeAttr("style");
-
       jQuery(tableId).addClass("display");
 
       jQuery(tableId).find('tr:first th:gt(5)').remove();
@@ -1571,7 +1548,7 @@ Project.barcode = {
         ],
         "bPaginate": false,
         "bInfo": false,
-        "bJQueryUI": true,
+        "bJQueryUI": false,
         "bAutoWidth": true,
         "aoColumns": [
           {"bSortable": false},
@@ -1582,8 +1559,7 @@ Project.barcode = {
           null,
           null
         ],
-        "bFilter": false,
-        "sDom": '<<"toolbar">f>r<t>ip>'
+        "bFilter": false
       });
 
       jQuery(tableId).find('.rowSelect').click(function () {
@@ -1595,6 +1571,7 @@ Project.barcode = {
         }
       });
 
+      jQuery(tableId+"_wrapper").prepend("<div class='float-right toolbar'></div>");
       jQuery("div.toolbar").html("<input type='button' value='Print Selected' onclick=\"Project.barcode.printSelectedLibraryDilutionBarcodes('" + tableId + "');\" class=\"fg-button ui-state-default ui-corner-all\"/>");
       jQuery("div.toolbar").append("<input type='button' value='Cancel' onclick=\"Utils.page.pageReload();\" class=\"fg-button ui-state-default ui-corner-all\"/>");
       jQuery("div.toolbar").removeClass("toolbar");

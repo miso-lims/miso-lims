@@ -3,7 +3,7 @@ MISO: An open source LIMS for small-to-large scale sequencing centres
 
 &copy; 2013. [The Genome Analysis Centre] [1], Norwich, UK
 
-> MISO project contacts: Robert Davey (robert.davey@tgac.ac.uk), Mario Caccamo (mario.caccamo@tgac.ac.uk)
+> MISO project contacts: Robert Davey (robert.davey@tgac.ac.uk), Christopher Salt (christopher.salt@tgac.ac.uk)
 >
 > MISO is free software: you can redistribute it and/or modify
 > it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ For Full MISO Documentation please visit our documentation website:
 https://documentation.tgac.ac.uk/display/MISO/MISO+Documentation+Home
 
 
-VERSION 0.2.0 (Neon)
+VERSION 0.2.1 (Sodium)
 
 1) BUILDING
 -----------
@@ -33,9 +33,13 @@ You will need [Maven 2.2.1] [3] to build MISO (*NOTE Not Maven 3!*). Once you ha
 
     mvn clean install -P external
 
-This will *NOT* run unit tests. To enable unit tests of database sanity, use:
+This will run unit tests, but not the database tests. To enable unit tests of database sanity, use:
 
-    mvn -DsqlTests=true install -P external
+    mvn -DsqlTests=true clean install -P external
+
+To skip tests altogether:
+
+    mvn clean install -P external -Dmaven.test.skip=true
 
 In order for the tests to work, you will need a MISO database set up as per the instructions below, and the correct properties specified in `sqlstore/src/test/resources/test.db.properties`.
 

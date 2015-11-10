@@ -89,7 +89,7 @@ public class ReportingControllerHelperService {
         sb.append("<tr>");
         sb.append("<td><input type='checkbox' table='" + table + "' column='" + s + "' id='" + table + "-" + s + "' value='" + s + "' onchange='toggleAddColumnToQuerySet(\"" + table + "\", this);'/>").append(s).append("</td>");
         sb.append("<td>").append(sqlOptionsDropdown(table, s)).append("</td>");
-        sb.append("<td>").append("<input type='text' id='" + s + "_value'/>").append("</td>");
+        sb.append("<td>").append("<input type='text' id='" + s + "_value' class='form-control'/>").append("</td>");
         sb.append("</tr>");
       }
       sb.append("</table></div></div>");

@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import com.google.json.JsonSanitizer;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
@@ -160,7 +161,7 @@ public class FlexReportingControllerHelperService {
               Date endDate = df.parse(to);
               Date creationDate = project.getCreationDate();
 
-              if ((creationDate.after(startDate) && creationDate.before(endDate)) || creationDate.equals(startDate) || creationDate.equals(endDate)) {
+              if (creationDate.after(startDate) && creationDate.before(endDate)) {
                 jsonArray.add(projectRowBuilder(project));
               }
             }
@@ -234,10 +235,10 @@ public class FlexReportingControllerHelperService {
   public JSONArray buildProjectReport(List<Project> projects) {
     JSONArray jsonArray = new JSONArray();
     for (Project project : projects) {
-      jsonArray.add("['" + (project.getName().replace("+", "-")).replace("'", "\\'") + "','" +
-                    (project.getAlias().replace("+", "-")).replace("'", "\\'") + "','" +
-                    (project.getDescription().replace("+", "-")).replace("'", "\\'") + "','" +
-                    project.getProgress().name() + "']");
+      jsonArray.add(JsonSanitizer.sanitize("[\"" + (project.getName().replace("+", "-")) + "\",\"" +
+                    (project.getAlias().replace("+", "-")) + "\",\"" +
+                    (project.getDescription().replace("+", "-")) + "\",\"" +
+                    project.getProgress().name() + "\"]"));
     }
     return jsonArray;
   }
@@ -261,12 +262,12 @@ public class FlexReportingControllerHelperService {
                         if (libraryInRun.getSample().getProject().equals(requestManager.getProjectById(project.getProjectId()))) {
                           if (librariesInRun.add(libraryInRun)) {
 
-                            jsonArray.add("['" + project.getName() + "','" +
-                                          libraryInRun.getSample().getName() + "','" +
-                                          libraryInRun.getName() + "','" +
-                                          spp.getPool().getName() + "','" +
-                                          run.getName() + "','" +
-                                          run.getStatus().getHealth().getKey() + "']");
+                            jsonArray.add(JsonSanitizer.sanitize("[\"" + project.getName() + "\",\"" +
+                                          libraryInRun.getSample().getName() + "\",\"" +
+                                          libraryInRun.getName() + "\",\"" +
+                                          spp.getPool().getName() + "\",\"" +
+                                          run.getName() + "\",\"" +
+                                          run.getStatus().getHealth().getKey() + "\"]"));
                           }
                         }
                       }
@@ -281,9 +282,9 @@ public class FlexReportingControllerHelperService {
         for (Library library : requestManager.listAllLibrariesByProjectId(project.getProjectId())) {
           if (!librariesInRun.contains(library)) {
             Sample sample = library.getSample();
-            jsonArray.add("['" + project.getName() + "','" +
-                          sample.getName() + "','" +
-                          library.getName() + "','NA','NA','NA']");
+            jsonArray.add(JsonSanitizer.sanitize("[\"" + project.getName() + "\",\"" +
+                          sample.getName() + "\",\"" +
+                          library.getName() + "\",\"NA\",\"NA\",\"NA\"]"));
           }
         }
 
@@ -328,7 +329,7 @@ public class FlexReportingControllerHelperService {
               Date endDate = df.parse(to);
               Date runDate = run.getStatus().getCompletionDate();
 
-              if ((runDate.after(startDate) && runDate.before(endDate)) || runDate.equals(startDate) || runDate.equals(endDate)) {
+              if (runDate.after(startDate) && runDate.before(endDate)) {
                 projectBool = true;
               }
             }
@@ -467,15 +468,15 @@ public class FlexReportingControllerHelperService {
                           List list = new ArrayList(libraryInRun.getLibraryQCs());
                           LibraryQC libraryQc = (LibraryQC) list.get(list.size() - 1);
 
-                          jsonArray.add("['" + sample.getAlias() + "','" +
-                                        sample.getDescription() + "','" +
-                                        sample.getSampleType() + "','" +
-                                        libraryInRun.getName() + "','" +
-                                        dilution.getName() + "','" +
-                                        tagBarcode.toString() + "','" +
-                                        libraryQc.getInsertSize().toString() + "','" +
-                                        run.getAlias() + "','" +
-                                        spp.getPartitionNumber().toString() + "']");
+                          jsonArray.add(JsonSanitizer.sanitize("[\"" + sample.getAlias() + "\",\"" +
+                                        sample.getDescription() + "\",\"" +
+                                        sample.getSampleType() + "\",\"" +
+                                        libraryInRun.getName() + "\",\"" +
+                                        dilution.getName() + "\",\"" +
+                                        tagBarcode.toString() + "\",\"" +
+                                        libraryQc.getInsertSize().toString() + "\",\"" +
+                                        run.getAlias() + "\",\"" +
+                                        spp.getPartitionNumber().toString() + "\"]"));
                         }
                       }
                     }
@@ -564,7 +565,7 @@ public class FlexReportingControllerHelperService {
               Date endDate = df.parse(to);
               Date receivedDate = sample.getReceivedDate();
 
-              if ((receivedDate.after(startDate) && receivedDate.before(endDate)) || receivedDate.equals(startDate) || receivedDate.equals(endDate)) {
+              if (receivedDate.after(startDate) && receivedDate.before(endDate)) {
                 jsonArray.add(sampleFormRowBuilder(sample));
               }
             }
@@ -672,11 +673,11 @@ public class FlexReportingControllerHelperService {
       if (sample.getQcPassed() != null) {
         qc = sample.getQcPassed().toString();
       }
-      jsonArray.add("['" + (sample.getName().replace("+", "-")).replace("'", "\\'") + "','" +
-                    (sample.getAlias().replace("+", "-")).replace("'", "\\'") + "','" +
-                    (sample.getDescription().replace("+", "-")).replace("'", "\\'") + "','" +
-                    sample.getSampleType() + "','" +
-                    qc + "']");
+      jsonArray.add(JsonSanitizer.sanitize("[\"" + (sample.getName().replace("+", "-")) + "\",\"" +
+                    (sample.getAlias().replace("+", "-")) + "\",\"" +
+                    (sample.getDescription().replace("+", "-")) + "\",\"" +
+                    sample.getSampleType() + "\",\"" +
+                    qc + "\"]"));
     }
     return jsonArray;
   }
@@ -750,7 +751,7 @@ public class FlexReportingControllerHelperService {
             Date startDate = df.parse(from);
             Date endDate = df.parse(to);
             Date receivedDate = library.getCreationDate();
-            if ((receivedDate.after(startDate) && receivedDate.before(endDate)) || receivedDate.equals(startDate) || receivedDate.equals(endDate)) {
+            if (receivedDate.after(startDate) && receivedDate.before(endDate)) {
               jsonArray.add(libraryFormRowBuilder(library));
             }
           }
@@ -818,17 +819,14 @@ public class FlexReportingControllerHelperService {
           Integer libqcfailed = 0;
           for (Library l : libraries) {
             if (l.getLibraryType().getDescription().equals(libraryType) && l.getPlatformName().equals(platform)) {
-              if (l.getQcPassed() != null) {
-                if (l.getQcPassed()) {
-                  libqcpassed++;
-                }
+              if (l.getQcPassed()) {
+                libqcpassed++;
               }
               else {
                 libqcfailed++;
               }
             }
           }
-
           if (libqcpassed > 0 || libqcfailed > 0) {
             overviewRelationArray.add("['" + libraryType + "','" + platform + "'," + libqcpassed + "," + libqcfailed + "," + (libqcpassed + libqcfailed) + "]");
             qcPassed += libqcpassed;
@@ -863,12 +861,12 @@ public class FlexReportingControllerHelperService {
       if (library.getQcPassed() != null) {
         qc = library.getQcPassed().toString();
       }
-      jsonArray.add("['" + (library.getName().replace("+", "-")).replace("'", "\\'") + "','" +
-                    (library.getAlias().replace("+", "-")).replace("'", "\\'") + "','" +
-                    (library.getDescription().replace("+", "-")).replace("'", "\\'") + "','" +
-                    library.getPlatformName() + "','" +
-                    library.getLibraryType().getDescription() + "','" +
-                    qc + "']");
+      jsonArray.add(JsonSanitizer.sanitize("[\"" + (library.getName().replace("+", "-")).replace("'", "\\'") + "\",\"" +
+                   (library.getAlias().replace("+", "-")).replace("'", "\\'") + "\",\"" +
+                   (library.getDescription().replace("+", "-")).replace("'", "\\'") + "\",\"" +
+                   library.getPlatformName() + "\",\"" +
+                   library.getLibraryType().getDescription() + "\",\"" +
+                   qc + "\"]"));
     }
     return jsonArray;
   }
@@ -885,16 +883,16 @@ public class FlexReportingControllerHelperService {
         sampleQC = library.getSample().getQcPassed().toString();
       }
 
-      jsonArray.add("['" + library.getSample().getProject().getName() + "','" +
-                    library.getName() + "','" +
-                    library.getAlias() + "','" +
-                    library.getDescription() + "','" +
-                    library.getPlatformName() + "','" +
-                    library.getLibraryType().getDescription() + "','" +
-                    qc + "','" +
-                    LimsUtils.getDateAsString(library.getCreationDate()) + "','" +
-                    library.getSample().getName() + "','" +
-                    sampleQC + "']");
+      jsonArray.add(JsonSanitizer.sanitize("[\"" + library.getSample().getProject().getName() + "\",\"" +
+                    library.getName() + "\",\"" +
+                    library.getAlias() + "\",\"" +
+                    library.getDescription() + "\",\"" +
+                    library.getPlatformName() + "\",\"" +
+                    library.getLibraryType().getDescription() + "\",\"" +
+                    qc + "\",\"" +
+                    LimsUtils.getDateAsString(library.getCreationDate()) + "\",\"" +
+                    library.getSample().getName() + "\",\"" +
+                    sampleQC + "\"]"));
     }
     return jsonArray;
   }
@@ -968,7 +966,7 @@ public class FlexReportingControllerHelperService {
               Date endDate = df.parse(to);
               Date receivedDate = run.getStatus().getCompletionDate();
 
-              if ((receivedDate.after(startDate) && receivedDate.before(endDate)) || receivedDate.equals(startDate) || receivedDate.equals(endDate)) {
+              if (receivedDate.after(startDate) && receivedDate.before(endDate)) {
                 jsonArray.add(runFormRowBuilder(run));
               }
             }
@@ -982,7 +980,7 @@ public class FlexReportingControllerHelperService {
               Date endDate = df.parse(runStartedTo);
               Date startedDate = run.getStatus().getStartDate();
 
-              if ((startedDate.after(startDate) && startedDate.before(endDate)) || startedDate.equals(startDate) || startedDate.equals(endDate)){
+              if (startedDate.after(startDate) && startedDate.before(endDate)) {
                 jsonArray.add(runFormRowBuilder(run));
               }
             }
@@ -1064,10 +1062,10 @@ public class FlexReportingControllerHelperService {
   public JSONArray buildRunReport(ArrayList<Run> runs) {
     JSONArray jsonArray = new JSONArray();
     for (Run run : runs) {
-      jsonArray.add("['" + (run.getName().replace("+", "-")).replace("'", "\\'") + "','" +
-                    (run.getAlias().replace("+", "-")).replace("'", "\\'") + "','" +
-                    (run.getStatus() != null && run.getStatus().getHealth() != null ? run.getStatus().getHealth().getKey() : "") + "','" +
-                    run.getPlatformType().getKey() + "']");
+      jsonArray.add(JsonSanitizer.sanitize("[\"" + (run.getName().replace("+", "-")) + "\",\"" +
+                    (run.getAlias().replace("+", "-")) + "\",\"" +
+                    (run.getStatus() != null && run.getStatus().getHealth() != null ? run.getStatus().getHealth().getKey() : "") + "\",\"" +
+                    run.getPlatformType().getKey() + "\"]"));
     }
     return jsonArray;
   }
@@ -1094,14 +1092,14 @@ public class FlexReportingControllerHelperService {
                     Map<String, Integer> projectMapDisplayed = new HashMap<String, Integer>();
                     for (Dilution dilution : spp.getPool().getDilutions()) {
                       if (!projectMapDisplayed.containsKey(dilution.getLibrary().getSample().getProject().getName())) {
-                        jsonArray.add("['" + run.getName() + "','" +
-                                      (run.getAlias().replace("+", "-")).replace("'", "\\'") + "','" +
-                                      (run.getStatus() != null ? LimsUtils.getDateAsString(run.getStatus().getStartDate()) : "") + "','" +
-                                      pool.getName() + "','" +
-                                      spp.getPartitionNumber() + "','" +
-                                      dilution.getLibrary().getSample().getProject().getName() + "','" +
-                                      projectMap.get(dilution.getLibrary().getSample().getProject().getName()) + "','" +
-                                      spp.getPool().getDilutions().size() + "']");
+                        jsonArray.add(JsonSanitizer.sanitize("[\"" + run.getName() + "\",\"" +
+                                      (run.getAlias().replace("+", "-")) + "\",\"" +
+                                      (run.getStatus() != null ? LimsUtils.getDateAsString(run.getStatus().getStartDate()) : "") + "\",\"" +
+                                      pool.getName() + "\",\"" +
+                                      spp.getPartitionNumber() + "\",\"" +
+                                      dilution.getLibrary().getSample().getProject().getName() + "\",\"" +
+                                      projectMap.get(dilution.getLibrary().getSample().getProject().getName()) + "\",\"" +
+                                      spp.getPool().getDilutions().size() + "\"]"));
                         projectMapDisplayed.put(dilution.getLibrary().getSample().getProject().getName(), 1);
                       }
                     }

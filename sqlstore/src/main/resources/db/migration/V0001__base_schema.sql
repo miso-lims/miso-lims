@@ -35,6 +35,36 @@ CREATE TABLE `Alert` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `Assignee`
+--
+
+DROP TABLE IF EXISTS `Assignee`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `Assignee` (
+  `entityName` varchar(45) NOT NULL,
+  `userId` bigint(20) NOT NULL,
+  PRIMARY KEY (`entityName`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `Attached_Elements`
+--
+
+DROP TABLE IF EXISTS `Attached_Elements`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `Attached_Elements` (
+  `attachableId` bigint(20) NOT NULL,
+  `attachableEntityType` varchar(255) NOT NULL,
+  `attachedId` bigint(20) NOT NULL,
+  `attachedEntityType` varchar(255) NOT NULL,
+  PRIMARY KEY (`attachableId`,`attachableEntityType`,`attachedId`,`attachedEntityType`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `Chamber`
 --
 
@@ -51,6 +81,45 @@ CREATE TABLE `Chamber` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `DATABASECHANGELOG`
+--
+
+DROP TABLE IF EXISTS `DATABASECHANGELOG`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `DATABASECHANGELOG` (
+  `ID` varchar(63) NOT NULL,
+  `AUTHOR` varchar(63) NOT NULL,
+  `FILENAME` varchar(200) NOT NULL,
+  `DATEEXECUTED` datetime NOT NULL,
+  `ORDEREXECUTED` int(11) NOT NULL,
+  `EXECTYPE` varchar(10) NOT NULL,
+  `MD5SUM` varchar(35) DEFAULT NULL,
+  `DESCRIPTION` varchar(255) DEFAULT NULL,
+  `COMMENTS` varchar(255) DEFAULT NULL,
+  `TAG` varchar(255) DEFAULT NULL,
+  `LIQUIBASE` varchar(20) DEFAULT NULL,
+  PRIMARY KEY (`ID`,`AUTHOR`,`FILENAME`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `DATABASECHANGELOGLOCK`
+--
+
+DROP TABLE IF EXISTS `DATABASECHANGELOGLOCK`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `DATABASECHANGELOGLOCK` (
+  `ID` int(11) NOT NULL,
+  `LOCKED` tinyint(1) NOT NULL,
+  `LOCKGRANTED` datetime DEFAULT NULL,
+  `LOCKEDBY` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `EntityGroup`
 --
 
@@ -61,6 +130,9 @@ CREATE TABLE `EntityGroup` (
   `entityGroupId` bigint(20) NOT NULL AUTO_INCREMENT,
   `parentId` bigint(20) NOT NULL,
   `parentType` varchar(255) NOT NULL,
+  `creatorId` bigint(20) NOT NULL,
+  `creationDate` date NOT NULL,
+  `assigneeId` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`entityGroupId`,`parentId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -1386,6 +1458,8 @@ CREATE TABLE `Workflow` (
   `start_date` date DEFAULT NULL,
   `completion_date` date DEFAULT NULL,
   `workflowDefinition_definitionId` bigint(20) DEFAULT NULL,
+  `alias` varchar(100) DEFAULT NULL,
+  `status` varchar(50) NOT NULL,
   PRIMARY KEY (`workflowId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -1432,6 +1506,7 @@ DROP TABLE IF EXISTS `WorkflowDefinition_WorkflowProcessDefinition`;
 CREATE TABLE `WorkflowDefinition_WorkflowProcessDefinition` (
   `workflowDefinitionId` bigint(20) NOT NULL,
   `workflowProcessDefinitionId` bigint(20) NOT NULL,
+  `order` tinyint(4) NOT NULL,
   PRIMARY KEY (`workflowDefinitionId`,`workflowProcessDefinitionId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -1627,4 +1702,4 @@ CREATE TABLE `persistent_logins` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-09-28 15:15:27
+-- Dump completed on 2015-09-28 16:14:41

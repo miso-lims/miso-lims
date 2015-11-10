@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractEntityGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 
@@ -15,13 +16,12 @@ import java.util.Set;
  * @date 22/10/13
  * @since 0.2.1-SNAPSHOT
  */
-public class EntityGroupImpl<T extends Nameable, S extends Nameable> implements EntityGroup<T, S> {
+public class EntityGroupImpl<S extends Nameable> extends AbstractEntityGroup<S> {
   public static final Long UNSAVED_ID = 0L;
   private Set<S> entities = new HashSet<>();
 
   private long groupId;
   private String name;
-  private T parent;
 
   @Override
   public String getName() {
@@ -39,16 +39,6 @@ public class EntityGroupImpl<T extends Nameable, S extends Nameable> implements 
 
   public void setId(long groupId) {
     this.groupId = groupId;
-  }
-
-  @Override
-  public T getParent() {
-    return parent;
-  }
-
-  @Override
-  public void setParent(T parent) {
-    this.parent = parent;
   }
 
   @Override

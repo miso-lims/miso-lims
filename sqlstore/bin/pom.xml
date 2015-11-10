@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2010. The Genome Analysis Centre, Norwich, UK
+  ~ MISO project contacts: Robert Davey, Mario Caccamo @ TGAC
+  ~
+  ~ **********************************************************************
+  ~
+  ~ This file is part of MISO.
+  ~
+  ~ MISO is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ MISO is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+  ~
+  ~ **********************************************************************
+  -->  
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <parent>
+    <artifactId>miso</artifactId>
+    <groupId>uk.ac.bbsrc.tgac.miso</groupId>
+    <version>0.2.1-SNAPSHOT</version>
+  </parent>
+
+  <groupId>${parent.groupId}</groupId>
+  <version>${parent.version}</version>
+  <artifactId>sqlstore</artifactId>
+
+  <packaging>jar</packaging>
+  <name>MISO SQL Store</name>
+  <modelVersion>4.0.0</modelVersion>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.0</version>
+        <executions>
+          <execution>
+            <id>copy</id>
+            <phase>process-sources</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.aspectj</groupId>
+                  <artifactId>aspectjweaver</artifactId>
+                  <version>1.6.12</version>
+                  <type>jar</type>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${project.build.directory}/dependency</outputDirectory>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.7</source>
+          <target>1.7</target>
+          <encoding>${project.build.sourceEncoding}</encoding>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.5</version>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.flywaydb</groupId>
+        <artifactId>flyway-maven-plugin</artifactId>
+        <version>3.2.1</version>
+        <configuration>
+          <!--
+            Do not modify these placeholder database credentials and risk committing them to git. Instead create a "flyway.properties"
+            file in the same directory as this "pom.xml" file. The "flyway.properties" file is .gitignored and the values it contains
+            will take precedence over the values in this "pom.xml" file. Here is an example of the properties in the
+            "flyway.properties" file:
+            flyway.user=miso
+            flyway.password=secret
+            flyway.url=jdbc:mysql://localhost:3307/devmisodb
+           -->
+          <user>tgaclims</user>
+          <password>tgaclims</password>
+          <driver>com.mysql.jdbc.Driver</driver>
+          <url>jdbc:mysql://localhost:3306/lims</url>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>unto.net</id>
+      <url>http://repository.unto.net/maven/</url>
+      <releases>
+        <updatePolicy>daily</updatePolicy>
+        <checksumPolicy>warn</checksumPolicy>
+      </releases>
+      <snapshots>
+        <updatePolicy>daily</updatePolicy>
+        <checksumPolicy>warn</checksumPolicy>
+      </snapshots>
+    </pluginRepository>
+  </pluginRepositories>
+
+  <repositories>
+    <repository>
+      <id>maven2-repository.dev.java.net</id>
+      <name>Java.net Repository for Maven</name>
+      <url>http://download.java.net/maven/2/</url>
+      <layout>default</layout>
+    </repository>
+  </repositories>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.aspectj</groupId>
+      <artifactId>aspectjweaver</artifactId>
+      <version>1.6.12</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>${parent.groupId}</groupId>
+      <artifactId>core</artifactId>
+      <version>${parent.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.eaglegenomics.simlims</groupId>
+      <artifactId>simlims-sqlstore</artifactId>
+      <version>${simlims-version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <version>5.1.13</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.dbunit</groupId>
+      <artifactId>dbunit</artifactId>
+      <version>2.4.7</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>slf4j-api</artifactId>
+          <groupId>org.slf4j</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>junit</artifactId>
+          <groupId>junit</groupId>
+        </exclusion>
+      </exclusions>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>hsqldb</groupId>
+      <artifactId>hsqldb</artifactId>
+      <version>1.8.0.7</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-tx</artifactId>
+      <version>${spring-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-jdbc</artifactId>
+      <version>${spring-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-orm</artifactId>
+      <version>${spring-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.sf.ehcache</groupId>
+      <artifactId>ehcache</artifactId>
+      <type>pom</type>
+      <version>2.6.3</version>
+    </dependency>
+    <dependency>
+      <groupId>net.sf.ehcache</groupId>
+      <artifactId>ehcache-core</artifactId>
+      <version>2.6.3</version>
+    </dependency>
+    <dependency>
+      <groupId>com.googlecode.ehcache-spring-annotations</groupId>
+      <artifactId>ehcache-spring-annotations</artifactId>
+      <version>1.2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>bouncycastle</groupId>
+      <artifactId>bcprov-jdk14</artifactId>
+      <version>138</version>
+    </dependency>
+  </dependencies>
+  <properties>
+    <spring-version>3.1.3.RELEASE</spring-version>
+    <junit-version>4.5</junit-version>
+    <commons-logging-version>1.1</commons-logging-version>
+  </properties>
+
+  <profiles>
+    <profile>
+      <id>sqlstore-tests</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+        <property>
+          <name>sqlTests</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>2.5</version>
+            <configuration>
+              <skip>false</skip>
+
+              <includes>
+                <include>**/*Suite.java</include>
+              </includes>
+              <reportFormat>brief</reportFormat>
+              <useFile>false</useFile>
+              <forkMode>once</forkMode>
+              <!-- ENABLE THIS IF TIMING TESTS -->
+              <!-- <argLine>-ea -Xmx768m -javaagent:target/dependency/aspectjweaver-1.6.8.jar</argLine> -->
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>

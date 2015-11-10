@@ -22,20 +22,18 @@
   --%>
 <%@ include file="../header.jsp" %>
 <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.breadcrumbs.popup.js'/>"></script>
-<script type="text/javascript" src="<c:url value='/scripts/plate_ajax.js?ts=${timestamp.time}'/>"></script>
-
-<script src="<c:url value='/scripts/datatables_utils.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
-<script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
-<script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.mini.js'/>" type="text/javascript"></script>
-<script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.datepicker.js'/>" type="text/javascript"></script>
-<script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.checkbox.js'/>" type="text/javascript"></script>
-<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" type="text/css">
 
 <div id="maincontent">
   <div id="contentcolumn">
     <form:form commandName="plate" autocomplete="off">
     <sessionConversation:insertSessionConversationId attributeName="plate"/>
-    <h1>Import Plate</h1>
+    <nav class="navbar navbar-default" role="navigation">
+       <div class="navbar-header">
+          <span class="navbar-brand navbar-center">
+            Import Plate
+          </span>
+       </div>
+    </nav>
 
     <h2>Plate Information</h2>
 
@@ -43,8 +41,8 @@
       <div class="barcodeArea ui-corner-all">
         <c:choose>
           <c:when test="${empty plate.locationBarcode}">
-            <span style="float: left; font-size: 24px; font-weight: bold; color:#BBBBBB">Location</span><form:input
-              path="locationBarcode" size="8"/>
+            <span style="float: left; font-size: 24px; font-weight: bold; color:#BBBBBB">Location</span>
+            <form:input path="locationBarcode" size="8" class="form-control"/>
           </c:when>
           <c:otherwise>
             <span style="float: left; font-size: 24px; font-weight: bold; color:#BBBBBB">Location</span>
@@ -78,12 +76,16 @@
         </tr>
         <tr>
           <td>Description:</td>
-          <td><form:input path="description"/><span id="descriptioncounter" class="counter"></span></td>
+          <td>
+            <div class="input-group">
+              <form:input path="description" class="form-control"/><span id="descriptioncounter" class="input-group-addon"></span>
+            </div>
+          </td>
         </tr>
         <tr>
           <td>Creation Date:</td>
           <td>
-            <form:input path="creationDate" id="creationdatepicker"/>
+            <form:input path="creationDate" id="creationdatepicker" class="form-control"/>
             <script type="text/javascript">
               Utils.ui.addMaxDatePicker("creationdatepicker", 0);
             </script>
@@ -92,7 +94,7 @@
         <tr>
           <td>Size:</td>
           <td>
-            <form:input path="size" id="size"/>
+            <form:input path="size" id="size" class="form-control"/>
           </td>
         </tr>
         <tr>
@@ -120,22 +122,24 @@
 
       <a name="plate_elements"></a>
 
-      <h1>
-        Elements
-      </h1>
-      <ul class="sddm">
-        <li>
-          <a onmouseover="mopen('qcmenu')" onmouseout="mclosetime()">Options
-            <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
-          </a>
+      <nav id="navbar-el" class="navbar navbar-default navbar-static" role="navigation">
+        <div class="navbar-header">
+          <span id="totalCount" class="navbar-brand navbar-center">Elements</span>
+        </div>
+        <div class="collapse navbar-collapse bs-example-js-navbar-collapse">
+          <ul class="nav navbar-nav navbar-right">
+            <li id="el-menu" class="dropdown">
+              <a id="eldrop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Options <b class="caret"></b></a>
+              <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="eldrop1">
+                <li role="presentation">
+                  <a href="/miso/plate/export">Get Plate Input Form</a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </nav>
 
-          <div id="qcmenu"
-               onmouseover="mcancelclosetime()"
-               onmouseout="mclosetime()">
-            <a href="/miso/plate/export">Get Plate Input Form</a>
-          </div>
-        </li>
-      </ul>
         <span style="clear:both">
           <div id="plateformdiv" class="simplebox">
             <table class="in">
@@ -162,7 +166,7 @@
           </div>
 
           <div id="importPlateElements"></div>
-          <table cellpadding="0" cellspacing="0" border="0" class="display" id="plateElementsTable"></table>
+          <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered display" id="plateElementsTable"></table>
         </span>
       <br/>
     </div>

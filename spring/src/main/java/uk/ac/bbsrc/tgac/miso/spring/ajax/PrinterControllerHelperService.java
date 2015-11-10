@@ -272,7 +272,7 @@ public class PrinterControllerHelperService {
 
       MisoPrintService bps = printManager.getPrintService(serviceName);
 
-      response.put("hostname", "<input type='text' id='newhost-" + serviceName + "' value='" + bps.getPrintContext().getHost() + "'/>");
+      response.put("hostname", "<input type='text' id='newhost-" + serviceName + "' value='" + bps.getPrintContext().getHost() + "' class='form-control'/>");
       response.put("edit", "<a href='javascript:void(0);' onclick='Print.ui.editPrinterService(\"" + serviceName + "\");'>Save</a>");
       response.put("barcodableSchemas", "<select id='newschema-" + serviceName + "' name='printSchema'>" + listBarcodableSchemas(session, json).getString("barcodableSchemas") + "</select>");
       return response;

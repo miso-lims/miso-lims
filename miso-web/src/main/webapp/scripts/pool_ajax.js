@@ -52,13 +52,13 @@ Pool.qc = {
       var column2 = $('poolQcTable').rows[1].insertCell(-1);
       column2.innerHTML = "<input id='poolQcUser' name='poolQcUser' type='hidden' value='" + $('currentUser').innerHTML + "'/>" + $('currentUser').innerHTML;
       var column3 = $('poolQcTable').rows[1].insertCell(-1);
-      column3.innerHTML = "<input id='poolQcDate' name='poolQcDate' type='text'/>";
+      column3.innerHTML = "<input id='poolQcDate' name='poolQcDate' type='text' class='form-control'/>";
       var column4 = $('poolQcTable').rows[1].insertCell(-1);
       column4.innerHTML = "<select id='poolQcType' name='poolQcType' onchange='Pool.qc.changePoolQcUnits(this);'/>";
       var column5 = $('poolQcTable').rows[1].insertCell(-1);
-      column5.innerHTML = "<input id='poolQcResults' name='poolQcResults' type='text'/><span id='units'/>";
+      column5.innerHTML = "<div class='input-group'><input id='poolQcResults' name='poolQcResults' type='text' class='form-control'/><span class='input-group-addon' id='units'/></div>";
       var column6 = $('poolQcTable').rows[1].insertCell(-1);
-      column6.innerHTML = "<a href='javascript:void(0);' onclick='Pool.qc.addPoolQC();'/>Add</a>";
+      column6.innerHTML = "<div style='text-align:center;'><a href='javascript:void(0);' onclick='Pool.qc.addPoolQC();'/><span class='fa fa-fw fa-lg fa-plus-square-o'></span></a></div>";
 
       Utils.ui.addMaxDatePicker("poolQcDate", 0);
 
@@ -143,13 +143,13 @@ Pool.wizard = {
 
       $('poolQcTable').insertRow(1);
       var column3 = $('poolQcTable').rows[1].insertCell(-1);
-      column3.innerHTML = "<input id='poolQcDate' name='poolQcDate' type='text'/>";
+      column3.innerHTML = "<input id='poolQcDate' name='poolQcDate' type='text' class='form-control'/>";
       var column4 = $('poolQcTable').rows[1].insertCell(-1);
       column4.innerHTML = "<select id='poolQcType' name='poolQcType' onchange='Pool.qc.changePoolQcUnits(this);'/>";
       var column5 = $('poolQcTable').rows[1].insertCell(-1);
-      column5.innerHTML = "<input id='poolQcResults' name='poolQcResults' type='text'/><span id='units'/>";
+      column5.innerHTML = "<div class='input-group'><input id='poolQcResults' name='poolQcResults' type='text' class='form-control'/><span class='input-group-addon' id='units'/></div>";
       var column6 = $('poolQcTable').rows[1].insertCell(-1);
-      column6.innerHTML = "<a href='javascript:void(0);' onclick='Pool.wizard.addPoolQC(this);'/>Add</a>";
+      column6.innerHTML = "<div style='text-align:center;'><a href='javascript:void(0);' onclick='Pool.wizard.addPoolQC(this);'/><span class='fa fa-fw fa-lg fa-plus-square-o'></span></a></div>";
 
       jQuery("#poolQcDate").val(jQuery.datepicker.formatDate('dd/mm/yy', new Date()));
       Utils.ui.addMaxDatePicker("poolQcDate", 0);
@@ -348,7 +348,7 @@ Pool.ui = {
             { "sTitle": "Concentration"},
             { "sTitle": "Edit"}
           ],
-          "bJQueryUI": true,
+          "bJQueryUI": false,
           "iDisplayLength":  25,
           "aaSorting":[
             [0,"desc"]
@@ -399,12 +399,107 @@ Pool.ui = {
     );
   },
 
+  createListingPoolsTables : function() {
+    Fluxion.doAjax(
+      'poolControllerHelperService',
+      'listPoolsDataTable',
+      {
+        'url':ajaxurl
+      },
+      {'doOnSuccess': function(json) {
+        for(var platform in json) {
+          if(json.hasOwnProperty(platform)) {
+            var pools = json[platform];
+            var table = 'listing'+platform+'PoolsTable';
+
+            //jQuery('#'+table).html("<img src='../styles/images/ajax-loader.gif'/>");
+            jQuery.fn.dataTableExt.oSort['no-po-asc'] = function(x, y) {
+              var a = parseInt(x.replace(/^.*PO/i, ""));
+              var b = parseInt(y.replace(/^.*PO/i, ""));
+              return ((a < b) ? -1 : ((a > b) ? 1 : 0));
+            };
+            jQuery.fn.dataTableExt.oSort['no-po-desc'] = function(x, y) {
+              var a = parseInt(x.replace(/^.*PO/i, ""));
+              var b = parseInt(y.replace(/^.*PO/i, ""));
+              return ((a < b) ? 1 : ((a > b) ? -1 : 0));
+            };
+
+            jQuery('#'+table).html('');
+            jQuery('#'+table).dataTable({
+              "aaData": pools,
+              "aoColumns": [
+                { "sTitle": "Name", "sType":"no-po"},
+                { "sTitle": "Alias"},
+                { "sTitle": "Date Created"},
+                { "sTitle": "Information"},
+                { "sTitle": "Average Insert Size"},
+                { "sTitle": "Concentration"},
+                { "sTitle": "Edit"}
+              ],
+              "bJQueryUI": false,
+              "iDisplayLength":  25,
+              "aaSorting":[
+                [0,"desc"]
+              ] ,
+              "fnRowCallback": function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                Fluxion.doAjax(
+                  'poolControllerHelperService',
+                  'checkInfoByPoolId',
+                  {
+                    'poolId':aData[3],
+                    'url':ajaxurl
+                  },
+                  {'doOnSuccess': function(json) {
+                    jQuery('td:eq(3)', nRow).html(json.response);
+                  }
+                  }
+                );
+
+                Fluxion.doAjax(
+                  'poolControllerHelperService',
+                  'checkAverageInsertSizeByPoolId',
+                  {
+                    'poolId':aData[4],
+                    'url':ajaxurl
+                  },
+                  {'doOnSuccess': function(json) {
+                    jQuery('td:eq(4)', nRow).html(json.response);
+                  }
+                  }
+                );
+
+                Fluxion.doAjax(
+                  'poolControllerHelperService',
+                  'checkConcentrationByPoolId',
+                  {
+                    'poolId':aData[5],
+                    'url':ajaxurl
+                  },
+                  {'doOnSuccess': function(json) {
+                    jQuery('td:eq(5)', nRow).html(json.response);
+                  }
+                  }
+                );
+              }
+            });
+          }
+        }
+      }}
+    );
+  },
+
   getPoolableElementInfo : function(poolId, elementId) {
     Fluxion.doAjax(
       'poolControllerHelperService',
       'getPoolableElementInfo',
       {'poolId':poolId, 'elementId':elementId, 'url':ajaxurl},
       {'doOnSuccess': function(json) {
+        if (json.ok) {
+          jQuery('#element-wrapper-'+elementId).addClass("green-left-border");
+        }
+        else {
+          jQuery('#element-wrapper-'+elementId).addClass("red-left-border");
+        }
         jQuery('#element'+elementId).append(json.info);
       }
       }
@@ -412,36 +507,34 @@ Pool.ui = {
   },
 
   createElementSelectDatatable : function(platform) {
-    jQuery('#elementSelectDatatableDiv').html("<table cellpadding='0' width='100%' cellspacing='0' border='0' class='display' id='elementSelectDatatable'></table>");
+    jQuery('#elementSelectDatatableDiv').html("<table cellpadding='0' width='100%' cellspacing='0' border='0' class='table table-striped table-bordered display' id='elementSelectDatatable'></table>");
     jQuery('#elementSelectDatatable').html("<img src='/styles/images/ajax-loader.gif'/>");
     Fluxion.doAjax(
-            'poolControllerHelperService',
-            'createElementSelectDataTable',
-            {
-              'url':ajaxurl,
-              'platform':platform
-            },
-            {'doOnSuccess': function(json) {
-
-              jQuery('#elementSelectDatatable').html('');
-              jQuery('#elementSelectDatatable').dataTable({
-                                            "aaData": json.poolelements,
-                                            "aoColumns": [
-                                              { "sTitle": "Dilution Name", "sType":"natural"},
-                                              { "sTitle": "Library", "sType":"natural"},
-                                              { "sTitle": "Sample", "sType":"natural"},
-                                              { "sTitle": "Project", "sType":"natural"},
-                                              { "sTitle": "Add"}
-                                            ],
-                                            "bJQueryUI": true,
-                                            "iDisplayLength":  25,
-                                            "aaSorting":[
-                                              [0,"desc"]
-                                            ]
-                                          });
-
-            }
-            }
+      'poolControllerHelperService',
+      'createElementSelectDataTable',
+      {
+        'url':ajaxurl,
+        'platform':platform
+      },
+      {'doOnSuccess': function(json) {
+        jQuery('#elementSelectDatatable').html('');
+        jQuery('#elementSelectDatatable').dataTable({
+          "aaData": json.poolelements,
+          "aoColumns": [
+            { "sTitle": "Dilution Name", "sType":"natural"},
+            { "sTitle": "Library", "sType":"natural"},
+            { "sTitle": "Sample", "sType":"natural"},
+            { "sTitle": "Project", "sType":"natural"},
+            { "sTitle": "Add"}
+          ],
+          "bJQueryUI": false,
+          "iDisplayLength":  25,
+          "aaSorting":[
+            [0,"desc"]
+          ]
+        });
+      }
+      }
     );
   },
 
@@ -475,7 +568,7 @@ Pool.search = {
       var div = "<div onMouseOver='this.className=\"dashboardhighlight\"' onMouseOut='this.className=\"dashboard\"' class='dashboard'>";
       div += "<span class='float-left'><input type='hidden' id='experiment" + experimentId + "' value='" + experimentId + "' name='experiments'/>";
       div += "<b>Experiment: " + experimentName + "</b></span>";
-      div += "<span onclick='Utils.ui.confirmRemove(jQuery(this).parent());' class='float-right ui-icon ui-icon-circle-close'></span></div>";
+      div += "<span onclick='Utils.ui.confirmRemove(jQuery(this).parent());' class='fa fa-fw fa-2x fa-times-circle-o pull-right'></span></div>";
       jQuery('#exptlist').append(div);
     }
     jQuery('#exptresult').css('visibility', 'hidden');
@@ -531,7 +624,7 @@ Pool.search = {
       var div = "<div onMouseOver='this.className=\"dashboardhighlight\"' onMouseOut='this.className=\"dashboard\"' class='dashboard'>";
       div += "<span class='float-left' id='element"+elementId+"'><input type='hidden' id='poolableElements" + elementId + "' value='" + elementName + "' name='poolableElements'/>";
       div += "<b>Element: " + elementName + "</b></span>";
-      div += "<span onclick='Utils.ui.confirmRemove(jQuery(this).parent());' class='float-right ui-icon ui-icon-circle-close'></span></div>";
+      div += "<span onclick='Utils.ui.confirmRemove(jQuery(this).parent());' class='fa fa-fw fa-2x fa-times-circle-o pull-right'></span></div>";
       jQuery('#dillist').append(div);
     }
     jQuery('#searchElementsResult').css('visibility', 'hidden');
@@ -563,8 +656,6 @@ Pool.barcode = {
     if (!jQuery(tableId).hasClass("display")) {
       //destroy current table and recreate
       jQuery(tableId).dataTable().fnDestroy();
-      //bug fix to reset table width
-      jQuery(tableId).removeAttr("style");
       jQuery(tableId).addClass("display");
 
       jQuery(tableId).find('tr:first th:eq(3)').remove();
@@ -587,11 +678,10 @@ Pool.barcode = {
         ],
         "bPaginate": false,
         "bInfo": false,
-        "bJQueryUI": true,
+        "bJQueryUI": false,
         "bAutoWidth": true,
         "bSort": false,
-        "bFilter": false,
-        "sDom": '<<"toolbar">f>r<t>ip>'
+        "bFilter": false
       });
 
       jQuery(tableId).find("tr:first").prepend("<th>Select</th>");
@@ -606,6 +696,7 @@ Pool.barcode = {
         }
       });
 
+      jQuery(tableId+"_wrapper").prepend("<div class='float-right toolbar'></div>");
       jQuery("div.toolbar").html("<button type='button' onclick=\"Pool.barcode.printSelectedPoolBarcodes('" + tableId + "');\" class=\"fg-button ui-state-default ui-corner-all\">Print Selected</button>");
       jQuery("div.toolbar").append("<button onclick=\"Utils.page.pageReload();\" class=\"fg-button ui-state-default ui-corner-all\">Cancel</button>");
       jQuery("div.toolbar").removeClass("toolbar");

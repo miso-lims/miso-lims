@@ -366,7 +366,7 @@
 		if(typeof(rowid) =='undefined' || isEmpty(rowid)) { return ""; }
 		if(op.editbutton){
 			ocl = "onclick=$.fn.fmatter.rowactions('"+rowid+"','"+opts.gid+"','edit',"+op.keys+");";
-			str =str+ "<div style='margin-left:8px;'><div title='"+$.jgrid.nav.edittitle+"' style='float:left;cursor:pointer;' class='ui-pg-div ui-inline-edit' "+ocl+"><span class='ui-icon ui-icon-pencil'></span></div>";
+			str =str+ "<div style='margin-left:8px;'><div title='"+$.jgrid.nav.edittitle+"' style='float:left;cursor:pointer;' class='ui-pg-div ui-inline-edit' "+ocl+"><span class='fa fa-pencil-square-o fa-lg'></span></div>";
 		}
 		if(op.delbutton) {
 			ocl = "onclick=jQuery('#"+opts.gid+"').jqGrid('delGridRow','"+rowid+"');";

@@ -194,7 +194,7 @@ public class PoolControllerHelperService {
       JSONObject response = new JSONObject();
       Long qcId = Long.parseLong(json.getString("qcId"));
       PoolQC poolQc = requestManager.getPoolQCById(qcId);
-      response.put("results", "<input type='text' id='" + qcId + "' value='" + poolQc.getResults() + "'/>");
+      response.put("results", "<input type='text' id='" + qcId + "' value='" + poolQc.getResults() + "' class='form-control'/>");
       response.put("edit", "<a href='javascript:void(0);' onclick='Pool.qc.editPoolQC(\"" + qcId + "\");'>Save</a>");
       return response;
     }
@@ -686,6 +686,43 @@ public class PoolControllerHelperService {
   }
 
   public JSONObject listPoolsDataTable(HttpSession session, JSONObject json) {
+    Map<String, Set<Pool>> poolMap = new HashMap<>();
+    for (PlatformType pt : PlatformType.values()) {
+      poolMap.put(pt.getKey(), new HashSet<Pool>());
+    }
+
+    JSONObject j = new JSONObject();
+
+    try {
+      for (Pool pool : requestManager.listAllPools()) {
+        poolMap.get(pool.getPlatformType().getKey()).add(pool);
+      }
+
+      for (String poolType : poolMap.keySet()) {
+        JSONArray arr = new JSONArray();
+
+        for (Pool pool : poolMap.get(poolType)) {
+          JSONArray pout = new JSONArray();
+          pout.add(pool.getName());
+          pout.add(pool.getAlias() != null ? pool.getAlias() : "");
+          pout.add(pool.getCreationDate() != null ? pool.getCreationDate().toString() : "");
+          pout.add(pool.getId());
+          pout.add(pool.getId());
+          pout.add(pool.getId());
+          pout.add("<a href=\"/miso/pool/" + pool.getId() + "\"><span class=\"fa fa-pencil-square-o fa-lg\"></span></a>");
+          arr.add(pout);
+        }
+
+        j.put(poolType, arr);
+      }
+
+      return j;
+    }
+    catch (IOException e) {
+      log.debug("Failed", e);
+      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
+    }
+/*
     if (json.has("platform") && !"".equals(json.getString("platform"))) {
       try {
         String platform = json.getString("platform");
@@ -699,7 +736,7 @@ public class PoolControllerHelperService {
           pout.add(pool.getId());
           pout.add(pool.getId());
           pout.add(pool.getId());
-          pout.add("<a href=\"/miso/pool/" + pool.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>");
+          pout.add("<a href=\"/miso/pool/" + pool.getId() + "\"><span class=\"fa fa-pencil-square-o fa-lg\"></span></a>");
           arr.add(pout);
         }
         j.put("pools", arr);
@@ -713,10 +750,12 @@ public class PoolControllerHelperService {
     else {
       return JSONUtils.SimpleJSONError("No platform specified");
     }
+    */
   }
 
   public JSONObject getPoolableElementInfo(HttpSession session, JSONObject json) {
     if (json.has("poolId") && json.has("elementId")) {
+      JSONObject response = new JSONObject();
       try {
         Long poolId = json.getLong("poolId");
         Long elementId = json.getLong("elementId");
@@ -759,6 +798,8 @@ public class PoolControllerHelperService {
                       break;
                     }
                   }
+                  response.put("ok", "ok");
+                  //info.append("<span class='counter'><img src='/styles/images/status/green.png' border='0'></span>");
                   info.append(out);
                 }
                 else {
@@ -774,7 +815,9 @@ public class PoolControllerHelperService {
             break;
           }
         }
-        return JSONUtils.JSONObjectResponse("info", info.toString());
+        response.put("info", info.toString());
+        return response;
+        //return JSONUtils.JSONObjectResponse("info", info.toString());
       }
       catch (IOException e) {
         log.debug("Failed", e);
@@ -798,8 +841,8 @@ public class PoolControllerHelperService {
           pout.add(libraryDilution.getLibrary().getName() + "-" + libraryDilution.getLibrary().getAlias());
           pout.add(libraryDilution.getLibrary().getSample().getName() + "-" + libraryDilution.getLibrary().getSample().getAlias());
           pout.add(libraryDilution.getLibrary().getSample().getProject().getName() + "-" + libraryDilution.getLibrary().getSample().getProject().getAlias());
-          pout.add("<div style='cursor:pointer;' onmousedown=\"Pool.search.poolSearchSelectElement('" + libraryDilution.getId() + "', '"
-                   + libraryDilution.getName() + "')\"><span class=\"ui-icon ui-icon-plusthick\"></span></div>");
+          pout.add("<div style='cursor:pointer; text-align:center;' onmousedown=\"Pool.search.poolSearchSelectElement('" + libraryDilution.getId() + "', '"
+                   + libraryDilution.getName() + "')\"><span class=\"fa fa-fw fa-lg fa-plus-square-o\"></span></div>");
           arr.add(pout);
         }
         j.put("poolelements", arr);

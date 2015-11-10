@@ -75,7 +75,7 @@ Experiment.ui = {
             { "sTitle": "Platform"},
             { "sTitle": "Edit"}
           ],
-          "bJQueryUI": true,
+          "bJQueryUI": false,
           "iDisplayLength": 25,
           "aaSorting": [
             [0, "desc"]
@@ -106,7 +106,7 @@ Experiment.pool = {
       var newpool = pool.clone().appendTo(poolSel);
       newpool.append("<input type='hidden' id='pool" + pool.attr("bind") + "' name='pool' value='" + pool.attr("bind") + "'/>");
       newpool.remove('.pType');
-      newpool.append("<span style='position: absolute; top: 0; right: 0;' onclick='Experiment.pool.confirmPoolRemove(this);' class='float-right ui-icon ui-icon-circle-close'></span>");
+      newpool.append("<span style='position: absolute; top: 0; right: 0;' onclick='Experiment.pool.confirmPoolRemove(this);' class='fa fa-fw fa-2x fa-times-circle-o pull-right'></span>");
       newpool.removeAttr("ondblclick");
       newpool.dblclick(function () {
         poolSel.html("");
@@ -229,7 +229,7 @@ Experiment.kit = {
 
     dialogText += "</select><br/>" +
                   "<label for='partNumber'>Part Number / Barcode</label>" +
-                  "<input type='text' name='partNumber' id='partNumber' onkeyup='Experiment.kit.lookupKitDescriptorByPartNumber(this);' class='text ui-widget-content ui-corner-all required' />";
+                  "<input type='text' name='partNumber' id='partNumber' onkeyup='Experiment.kit.lookupKitDescriptorByPartNumber(this);' class='form-control required' />";
 
     if (multiplexed == "true") {
       dialogText += "<label for='multiplexingKitType'>Multiplexing Kit</label>" +
@@ -240,12 +240,12 @@ Experiment.kit = {
       }
       dialogText += "</select><br/>" +
                     "<label for='multiplexingKitBarcode'>Multiplexing Kit Barcode</label>" +
-                    "<input type='text' name='multiplexingKitBarcode' id='multiplexingKitBarcode' class='text ui-widget-content ui-corner-all required' />";
+                    "<input type='text' name='multiplexingKitBarcode' id='multiplexingKitBarcode' class='form-control required' />";
     }
 
     dialogText += "<br/>" +
                   "<label for='lotNumber'>Lot Number / Barcode</label>" +
-                  "<input type='text' name='lotNumber' id='lotNumber' class='text ui-widget-content ui-corner-all required' />";
+                  "<input type='text' name='lotNumber' id='lotNumber' class='form-control equired' />";
 
     dialogText += "</fieldset></form>";
 
@@ -330,11 +330,11 @@ Experiment.kit = {
 
     dialogText += "</select><br/>" +
                   "<label for='partNumber'>Part Number / Barcode</label>" +
-                  "<input type='text' name='partNumber' id='partNumber' onkeyup='Experiment.kit.lookupKitDescriptorByPartNumber(this);' class='text ui-widget-content ui-corner-all required' />";
+                  "<input type='text' name='partNumber' id='partNumber' onkeyup='Experiment.kit.lookupKitDescriptorByPartNumber(this);' class='form-control required' />";
 
     dialogText += "<br/>" +
                   "<label for='lotNumber'>Lot Number / Barcode</label>" +
-                  "<input type='text' name='lotNumber' id='lotNumber' class='text ui-widget-content ui-corner-all required' />";
+                  "<input type='text' name='lotNumber' id='lotNumber' class='form-control required' />";
 
     dialogText += "</fieldset></form>";
 
@@ -408,11 +408,11 @@ Experiment.kit = {
 
     dialogText += "</select><br/>" +
                   "<label for='partNumber'>Part Number / Barcode</label>" +
-                  "<input type='text' name='partNumber' id='partNumber' onkeyup='Experiment.kit.lookupKitDescriptorByPartNumber(this);' class='text ui-widget-content ui-corner-all required' />";
+                  "<input type='text' name='partNumber' id='partNumber' onkeyup='Experiment.kit.lookupKitDescriptorByPartNumber(this);' class='form-control required' />";
 
     dialogText += "<br/>" +
                   "<label for='lotNumber'>Lot Number / Barcode</label>" +
-                  "<input type='text' name='lotNumber' id='lotNumber' class='text ui-widget-content ui-corner-all required' />";
+                  "<input type='text' name='lotNumber' id='lotNumber' class='form-control required' />";
 
     dialogText += "</fieldset></form>";
 
@@ -486,11 +486,11 @@ Experiment.kit = {
 
     dialogText += "</select><br/>" +
                   "<label for='partNumber'>Part Number / Barcode</label>" +
-                  "<input type='text' name='partNumber' id='partNumber' onkeyup='Experiment.kit.lookupKitDescriptorByPartNumber(this);' class='text ui-widget-content ui-corner-all required' />";
+                  "<input type='text' name='partNumber' id='partNumber' onkeyup='Experiment.kit.lookupKitDescriptorByPartNumber(this);' class='form-control required' />";
 
     dialogText += "<br/>" +
                   "<label for='lotNumber'>Lot Number / Barcode</label>" +
-                  "<input type='text' name='lotNumber' id='lotNumber' class='text ui-widget-content ui-corner-all required' />";
+                  "<input type='text' name='lotNumber' id='lotNumber' class='form-control required' />";
 
     dialogText += "</fieldset></form>";
 

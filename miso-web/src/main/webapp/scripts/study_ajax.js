@@ -66,7 +66,7 @@ Study.ui = {
             { "sTitle": "Type"},
             { "sTitle": "Edit"}
           ],
-          "bJQueryUI": true,
+          "bJQueryUI": false,
           "iDisplayLength":  25,
           "aaSorting":[
             [0,"desc"]

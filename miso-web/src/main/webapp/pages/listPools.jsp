@@ -29,14 +29,16 @@
   Time: 14:22
 --%>
 <%@ include file="../header.jsp" %>
-<script src="<c:url value='/scripts/datatables_utils.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
-<script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
-<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" type="text/css">
-<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables_themeroller.css'/>">
 
 <div id="maincontent">
   <div id="contentcolumn">
-    <h1>Pools</h1>
+    <nav class="navbar navbar-default" role="navigation">
+       <div class="navbar-header">
+          <span class="navbar-brand navbar-center">
+            Pools
+          </span>
+       </div>
+    </nav>
 
     <div id="tabs">
       <ul>
@@ -47,37 +49,32 @@
 
       <c:forEach items="${platformTypes}" var="pt" varStatus="c">
         <div id="tab-${c.count}">
-          <h1>
-            <div id="${pt}totalCount">${pt} Pools</div>
-          </h1>
-          <ul class="sddm">
-            <li>
-              <a onmouseover="mopen('ipomenu')" onmouseout="mclosetime()">Options
-                <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
-              </a>
-
-              <div id="ipomenu"
-                   onmouseover="mcancelclosetime()"
-                   onmouseout="mclosetime()">
-                <a href='<c:url value="/miso/pool/new"/>'>Add Pool</a>
-                <a href='javascript:void(0);'
-                   onclick="Pool.barcode.selectPoolBarcodesToPrint('#${fn:toLowerCase(pt)}'); return false;">Print
-                  Barcodes
-                  ...</a>
-              </div>
-            </li>
-          </ul>
-          <table cellpadding="0" cellspacing="0" border="0" class="display" id="listing${pt}PoolsTable"></table>
-          <script type="text/javascript">
-            jQuery(document).ready(function () {
-              Pool.ui.createListingPoolsTable('${pt}');
-            });
+          <nav id="navbar-${pt}" class="navbar navbar-default navbar-static" role="navigation">
+            <div class="navbar-header">
+              <span class="navbar-brand navbar-center" id="${pt}totalCount">${pt} Pools</span>
+            </div>
+            <div class="collapse navbar-collapse bs-example-js-navbar-collapse">
+              <ul class="nav navbar-nav navbar-right">
+                <li id="${pt}-menu" class="dropdown">
+                  <a id="${pt}drop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Options <b class="caret"></b></a>
+                  <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="${pt}drop1">
+                    <li role="presentation"><a href='<c:url value="/miso/pool/new"/>'>Add Pool</a></li>
+                    <li role="presentation"><a href='javascript:void(0);' onclick="Pool.barcode.selectPoolBarcodesToPrint('#${fn:toLowerCase(pt)}');">Print Barcodes</a></li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+          </nav>
+          <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered display" id="listing${pt}PoolsTable"></table>
+          <script>
+            jQuery("#listing${pt}PoolsTable").html("<img src='../styles/images/ajax-loader.gif'/>");
           </script>
         </div>
       </c:forEach>
       <script type="text/javascript">
         jQuery(document).ready(function () {
           jQuery("#tabs").tabs();
+          Pool.ui.createListingPoolsTables();
         });
       </script>
     </div>

@@ -195,7 +195,7 @@ public class ERASubmissionFactory {
     Element runSet = doc.createElementNS(null, "RUN_SET");
     doc.appendChild(runSet);
 
-    for (SequencerPartitionContainer<SequencerPoolPartition> f : ((RunImpl)r).getSequencerPartitionContainers()) {
+    for (SequencerPartitionContainer<SequencerPoolPartition> f : r.getSequencerPartitionContainers()) {
       for (SequencerPoolPartition p : f.getPartitions()) {
         if (p.getPool() != null) {
           generatePartitionRunSubmissionXML(doc, p, r, submissionProperties);

@@ -40,6 +40,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -100,35 +102,6 @@ public class UploadController {
 
   public void setLibraryNamingScheme(MisoNamingScheme<Library> libraryNamingScheme) {
     this.libraryNamingScheme = libraryNamingScheme;
-  }
-
-  private Class lookupCoreClass(String className) throws ClassNotFoundException {
-    return this.getClass().getClassLoader().loadClass("uk.ac.bbsrc.tgac.miso.core." + className);
-  }
-
-  public void uploadFile(Class type, String qualifier, MultipartFile fileItem) throws IOException {
-    File dir = new File(filesManager.getFileStorageDirectory() + File.separator + type.getSimpleName().toLowerCase() + File.separator + qualifier);
-    if (LimsUtils.checkDirectory(dir, true)) {
-      log.info("Attempting to store " + dir.toString() + File.separator + fileItem.getOriginalFilename());
-      fileItem.transferTo(new File(dir + File.separator + fileItem.getOriginalFilename().replaceAll("\\s", "_")));
-    }
-    else {
-      throw new IOException("Cannot upload file - check that the directory specified in miso.properties exists and is writable");
-    }
-  }
-
-  public void uploadFile(Object type, String qualifier, MultipartFile fileItem) throws IOException {
-    uploadFile(type.getClass(), qualifier, fileItem);
-  }
-
-
-  @RequestMapping(value = "/project", method = RequestMethod.POST)
-  public void uploadProjectDocument(MultipartHttpServletRequest request) throws IOException {
-    String projectId = request.getParameter("projectId");
-
-    for (MultipartFile fileItem : getMultipartFiles(request)) {
-      uploadFile(Project.class, projectId, fileItem);
-    }
   }
 
   @RequestMapping(value = "/project/sample-delivery-form", method = RequestMethod.POST)
@@ -296,22 +269,80 @@ public class UploadController {
     }
   }
 
-  @RequestMapping(value = "/libraryqc", method = RequestMethod.POST)
-  public void uploadLibraryQcDocument(MultipartHttpServletRequest request) throws IOException {
-    String libraryId = request.getParameter("libraryId");
+  public JSONObject uploadFile(Class type, String qualifier, MultipartFile fileItem) throws IOException {
+    File dir = new File(filesManager.getFileStorageDirectory() + File.separator + type.getSimpleName().toLowerCase() + File.separator + qualifier);
+    JSONObject response = new JSONObject();
 
-    for (MultipartFile fileItem : getMultipartFiles(request)) {
-      uploadFile(LibraryQC.class, libraryId + File.separator + "qc" + File.separator, fileItem);
+    if (LimsUtils.checkDirectory(dir, true)) {
+      log.debug("Attempting to store " + dir.toString() + File.separator + fileItem.getOriginalFilename());
+      File toFile = new File(dir + File.separator + fileItem.getOriginalFilename().replaceAll("\\s", "_"));
+      fileItem.transferTo(toFile);
+      response.put("name", fileItem.getOriginalFilename());
+      response.put("size", new Long(fileItem.getSize()).intValue());
+      response.put("url", "/miso/download/"+type.getSimpleName().toLowerCase()+"/"+qualifier+"/"+toFile.getName().hashCode());
     }
+    else {
+      response.put("name", fileItem.getOriginalFilename());
+      response.put("size", new Long(fileItem.getSize()).intValue());
+      response.put("error", "Cannot upload file - check that the directory specified in miso.properties exists and is writable");
+    }
+    return response;
   }
 
-  @RequestMapping(value = "/sampleqc", method = RequestMethod.POST)
-  public void uploadSampleQcDocument(MultipartHttpServletRequest request) throws IOException {
+  public void uploadFile(Object type, String qualifier, MultipartFile fileItem) throws IOException {
+    uploadFile(type.getClass(), qualifier, fileItem);
+  }
+
+  @RequestMapping(value = "/project", method = RequestMethod.POST)
+  public @ResponseBody String uploadProjectDocument(MultipartHttpServletRequest request) throws IOException {
+    String projectId = request.getParameter("projectId");
+
+    JSONObject response = new JSONObject();
+    JSONArray files = new JSONArray();
+    for (MultipartFile fileItem : getMultipartFiles(request)) {
+      files.add(uploadFile(Project.class, projectId, fileItem));
+    }
+    response.put("files", files);
+    return response.toString();
+  }
+
+  @RequestMapping(value = "/sample", method = RequestMethod.POST)
+  public @ResponseBody String uploadSampleDocument(MultipartHttpServletRequest request) throws IOException {
     String sampleId = request.getParameter("sampleId");
 
+    JSONObject response = new JSONObject();
+    JSONArray files = new JSONArray();
     for (MultipartFile fileItem : getMultipartFiles(request)) {
-      uploadFile(SampleQC.class, sampleId + File.separator + "qc" + File.separator, fileItem);
+      files.add(uploadFile(Sample.class, sampleId, fileItem));
     }
+    response.put("files", files);
+    return response.toString();
+  }
+
+  @RequestMapping(value = "/library", method = RequestMethod.POST)
+  public @ResponseBody String uploadLibraryDocument(MultipartHttpServletRequest request) throws IOException {
+    String libraryId = request.getParameter("libraryId");
+
+    JSONObject response = new JSONObject();
+    JSONArray files = new JSONArray();
+    for (MultipartFile fileItem : getMultipartFiles(request)) {
+      files.add(uploadFile(Library.class, libraryId, fileItem));
+    }
+    response.put("files", files);
+    return response.toString();
+  }
+
+  @RequestMapping(value = "/run", method = RequestMethod.POST)
+  public @ResponseBody String uploadRunDocument(MultipartHttpServletRequest request) throws IOException {
+    String runId = request.getParameter("runId");
+
+    JSONObject response = new JSONObject();
+    JSONArray files = new JSONArray();
+    for (MultipartFile fileItem : getMultipartFiles(request)) {
+      files.add(uploadFile(Run.class, runId, fileItem));
+    }
+    response.put("files", files);
+    return response.toString();
   }
 
   @RequestMapping(value = "/dilution-to-pool", method = RequestMethod.POST)

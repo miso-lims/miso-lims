@@ -25,25 +25,30 @@
 
 <link rel="stylesheet" href="<c:url value='/styles/progress.css'/>" type="text/css">
 <script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
-<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" type="text/css">
-<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables_themeroller.css'/>">
-<div id="maincontent">
-    <div id="contentcolumn">
-        <h1>Your Project Status</h1>
+<script src="<c:url value='/scripts/jquery/datatables/js/datatables.bootstrap.js'/>" type="text/javascript"></script>
+<link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/datatables.bootstrap.css'/>">
 
-        <div id="externalProjectStatus">
-            <p>Please select a project to view.</p>
-        </div>
-        <div id="externalSampleStatusWrapper">
-            <table cellpadding="0" cellspacing="0" border="0" class="display" id="externalSampleStatus">
-            </table>
-        </div>
-        <div id="externalSampleQcStatus">
-        </div>
-        <div id="externalRunStatusWrapper">
-            <table cellpadding="0" cellspacing="0" border="0" class="display" id="externalRunStatus">
-            </table>
-        </div>
+<div id="maincontent">
+  <div id="contentcolumn">
+    <nav class="navbar navbar-default" role="navigation">
+      <div class="navbar-header">
+        <span class="navbar-brand navbar-center">Your Project Status</span>
+      </div>
+    </nav>
+
+    <div id="externalProjectStatus">
+        <p>Please select a project to view.</p>
+    </div>
+    <div id="externalSampleStatusWrapper">
+      <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered display" id="externalSampleStatus">
+      </table>
+    </div>
+    <div id="externalSampleQcStatus">
+    </div>
+    <div id="externalRunStatusWrapper">
+      <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered display" id="externalRunStatus">
+      </table>
+    </div>
     </div>
 </div>
 
@@ -59,101 +64,100 @@
     });
 
     function externalProjectsListing() {
-        jQuery('#externalProjectsListing').html("<img src='../styles/images/ajax-loader.gif'/>");
-        Fluxion.doAjax(
-                'externalSectionControllerHelperService',
-                'listProjects',
-                {'url': ajaxurl},
-                {
-                    "doOnSuccess": function (json) {
-                        jQuery('#externalProjectsListing').html(json.html);
-                    }
-                });
+      jQuery('#externalProjectsListing').html("<img src='../styles/images/ajax-loader.gif'/>");
+      Fluxion.doAjax(
+        'externalSectionControllerHelperService',
+        'listProjects',
+        {'url': ajaxurl},
+        {
+          "doOnSuccess": function (json) {
+            jQuery('#externalProjectsListing').html(json.html);
+          }
+        });
     }
 
     function showProjectStatus(projectId) {
-        createListingSamplesTable(projectId);
-        createListingRunsTable(projectId);
-        Fluxion.doAjax(
-                'externalSectionControllerHelperService',
-                'projectStatus',
-                {'projectId': projectId, 'url': ajaxurl},
-                {
-                    "doOnSuccess": function (json) {
-                        jQuery('#externalProjectStatus').html(json.projectJson);
-                        jQuery('#externalSampleQcStatus').html(json.sampleQcJson);
-                    }
-                });
+      createListingSamplesTable(projectId);
+      createListingRunsTable(projectId);
+      Fluxion.doAjax(
+        'externalSectionControllerHelperService',
+        'projectStatus',
+        {'projectId': projectId, 'url': ajaxurl},
+        {
+          "doOnSuccess": function (json) {
+            jQuery('#externalProjectStatus').html(json.projectJson);
+            jQuery('#externalSampleQcStatus').html(json.sampleQcJson);
+          }
+        });
     }
 
     function createListingSamplesTable(projectId) {
-        jQuery('#externalSampleStatusWrapper').html("<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" class=\"display\" id=\"externalSampleStatus\"></table>");
-        jQuery('#externalSampleStatus').html("<img src='../styles/images/ajax-loader.gif'/>");
+      jQuery('#externalSampleStatusWrapper').html("<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" class=\"table table-striped table-bordered display\" id=\"externalSampleStatus\"></table>");
+      jQuery('#externalSampleStatus').html("<img src='../styles/images/ajax-loader.gif'/>");
 
-        Fluxion.doAjax(
-                'externalSectionControllerHelperService',
-                'listSamplesDataTable',
-                {
-                    'projectId': projectId, 'url': ajaxurl
-                },
-                {'doOnSuccess': function (json) {
-                    jQuery('#externalSampleStatus').html('');
-                    jQuery('#externalSampleStatus').dataTable({
-                                                                  "aaData": json.array,
-                                                                  "aoColumns": [
-                                                                      { "sTitle": "Sample Alias"},
-                                                                      { "sTitle": "Type"},
-                                                                      { "sTitle": "QC Passed"},
-                                                                      { "sTitle": "Qubit Concentration"},
-                                                                      { "sTitle": "Received"}
-                                                                  ],
-                                                                  "bJQueryUI": true
-                                                              });
-                }
-                }
-        );
+      Fluxion.doAjax(
+        'externalSectionControllerHelperService',
+        'listSamplesDataTable',
+        {
+            'projectId': projectId, 'url': ajaxurl
+        },
+        {'doOnSuccess': function (json) {
+          jQuery('#externalSampleStatus').html('');
+          jQuery('#externalSampleStatus').dataTable({
+            "aaData": json.array,
+            "aoColumns": [
+              { "sTitle": "Sample Alias"},
+              { "sTitle": "Type"},
+              { "sTitle": "QC Passed"},
+              { "sTitle": "Qubit Concentration"},
+              { "sTitle": "Received"}
+            ],
+            "bJQueryUI": false
+          });
+        }
+        }
+      );
     }
 
     function createListingRunsTable(projectId) {
-        jQuery('#externalRunStatusWrapper').html("<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" class=\"display\" id=\"externalRunStatus\"></table>");
-        jQuery('#externalRunStatus').html("<img src='../styles/images/ajax-loader.gif'/>");
+      jQuery('#externalRunStatusWrapper').html("<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" class=\"table table-striped table-bordered display\" id=\"externalRunStatus\"></table>");
+      jQuery('#externalRunStatus').html("<img src='../styles/images/ajax-loader.gif'/>");
 
-        jQuery.fn.dataTableExt.oSort['no-run-asc'] = function (x, y) {
-          var a = parseInt(x.replace(/^RUN/i, ""));
-          var b = parseInt(y.replace(/^RUN/i, ""));
-          return ((a < b) ? -1 : ((a > b) ? 1 : 0));
-        };
-        jQuery.fn.dataTableExt.oSort['no-run-desc'] = function (x, y) {
-          var a = parseInt(x.replace(/^RUN/i, ""));
-          var b = parseInt(y.replace(/^RUN/i, ""));
-          return ((a < b) ? 1 : ((a > b) ? -1 : 0));
-        };
+      jQuery.fn.dataTableExt.oSort['no-run-asc'] = function (x, y) {
+        var a = parseInt(x.replace(/^RUN/i, ""));
+        var b = parseInt(y.replace(/^RUN/i, ""));
+        return ((a < b) ? -1 : ((a > b) ? 1 : 0));
+      };
+      jQuery.fn.dataTableExt.oSort['no-run-desc'] = function (x, y) {
+        var a = parseInt(x.replace(/^RUN/i, ""));
+        var b = parseInt(y.replace(/^RUN/i, ""));
+        return ((a < b) ? 1 : ((a > b) ? -1 : 0));
+      };
 
-        Fluxion.doAjax(
-                'externalSectionControllerHelperService',
-                'listRunsDataTable',
-                {
-                    'projectId': projectId, 'url': ajaxurl
-                },
-                {'doOnSuccess': function (json) {
-                    jQuery('#externalRunStatus').html('');
-                    jQuery('#externalRunStatus').dataTable({
-                                                               "aaData": json.array,
-                                                               "aoColumns": [
-                                                                   { "sTitle": "Run Name", "sType": "no-run"},
-                                                                   { "sTitle": "Status"},
-                                                                   { "sTitle": "Start Date"},
-                                                                   { "sTitle": "End Date"},
-                                                                   { "sTitle": "Type"},
-                                                                   { "sTitle": "Samples"}
-                                                               ],
-                                                               "bJQueryUI": true
-                                                           });
-                }
-                }
-        );
+      Fluxion.doAjax(
+        'externalSectionControllerHelperService',
+        'listRunsDataTable',
+        {
+          'projectId': projectId, 'url': ajaxurl
+        },
+        {'doOnSuccess': function (json) {
+          jQuery('#externalRunStatus').html('');
+          jQuery('#externalRunStatus').dataTable({
+            "aaData": json.array,
+            "aoColumns": [
+              { "sTitle": "Run Name", "sType": "no-run"},
+              { "sTitle": "Status"},
+              { "sTitle": "Start Date"},
+              { "sTitle": "End Date"},
+              { "sTitle": "Type"},
+              { "sTitle": "Samples"}
+            ],
+            "bJQueryUI": false
+          });
+        }
+        }
+      );
     }
-
 </script>
 
 <%@ include file="externalFooter.jsp" %>

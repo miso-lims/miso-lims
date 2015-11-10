@@ -34,18 +34,30 @@
   <div id="contentcolumn">
 
     <c:if test="${not empty clusterStatus}">
-      <h1>${referenceName} Cluster Status</h1>
-      ${clusterStatus}
+      <nav class="navbar navbar-default" role="navigation">
+         <div class="navbar-header">
+            <span class="navbar-brand navbar-center">
+              ${referenceName} Cluster Status<br/>
+              ${clusterStatus}
+            </span>
+         </div>
+      </nav>
     </c:if>
 
     <c:if test="${not empty stats}">
-      <h1>${referenceName} Runs</h1>
+      <nav class="navbar navbar-default" role="navigation">
+         <div class="navbar-header">
+            <span class="navbar-brand navbar-center">
+              ${referenceName} Runs
+            </span>
+         </div>
+      </nav>
 
-      <form id="filter-form">Filter: <input name="filter" id="filter" value="" maxlength="30" size="30" type="text">
+      <form id="filter-form">Filter: <input name="filter" id="filter" value="" maxlength="30" size="30" type="text" class="form-control">
       </form>
       <br/>
 
-      <table class="list" id="runStatusTable">
+      <table class="table table-bordered table-striped" id="runStatusTable">
         <thead>
         <tr>
           <th>Run Name</th>
@@ -66,7 +78,7 @@
             <td><fmt:formatDate value="${stat.lastUpdated}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
             <td class="misoicon"
                 onclick="window.location.href='<c:url value="/miso/stats/${fn:toLowerCase(platformtype)}/${referenceId}/${stat.runName}"/>'">
-              <span class="ui-icon ui-icon-pencil"/></td>
+              <span class="fa fa-pencil-square-o fa-lg"/></td>
           </tr>
         </c:forEach>
         </tbody>
@@ -96,7 +108,14 @@
     </c:if>
 
     <c:if test="${not empty incompleteRuns}">
-      <h1>${referenceName} Incomplete Runs</h1>
+      <nav class="navbar navbar-default" role="navigation">
+         <div class="navbar-header">
+            <span class="navbar-brand navbar-center">
+              ${referenceName} Incomplete Runs
+            </span>
+         </div>
+      </nav>
+
       <c:forEach items="${incompleteRuns}" var="incomp">
         <a href="<c:url value="/miso/stats/${fn:toLowerCase(platformtype)}/${referenceId}/${incomp}"/>">${incomp}</a><br/>
       </c:forEach>
@@ -105,9 +124,15 @@
 
     <c:choose>
       <c:when test="${not empty runStatus}">
-        <h1>${runName}</h1>
+        <nav class="navbar navbar-default" role="navigation">
+           <div class="navbar-header">
+              <span class="navbar-brand navbar-center">
+                ${runName}
+              </span>
+           </div>
+        </nav>
 
-        <table class="list" id="runStatusTable">
+        <table class="table table-bordered table-striped" id="runStatusTable">
           <thead>
           <tr>
             <th>Run Name</th>
@@ -124,7 +149,7 @@
             <td>${runStatus.startDate}</td>
             <td><fmt:formatDate value="${runStatus.lastUpdated}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
             <td class="misoicon" onclick="window.location.href='<c:url value="/miso/run/${runId}"/>'"><span
-                    class="ui-icon ui-icon-pencil"/></td>
+                    class="fa fa-pencil-square-o fa-lg"/></td>
           </tr>
 
           </tbody>
@@ -137,7 +162,14 @@
       </c:when>
       <c:otherwise>
         <c:if test="${empty referenceId}">
-          <h1>${platformtype} Sequencer References</h1>
+          <nav class="navbar navbar-default" role="navigation">
+             <div class="navbar-header">
+                <span class="navbar-brand navbar-center">
+                  ${platformtype} Sequencer References
+                </span>
+             </div>
+          </nav>
+
           <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
             <a href='javascript:void(0);' class="add" onclick="Sequencer.ui.insertSequencerReferenceRow(); return false;">Add
               Sequencer Reference</a><br/>
@@ -145,7 +177,7 @@
 
           <div id="addSequencerReference"></div>
           <form id='addReferenceForm'>
-            <table class="list" id="sequencerReferenceTable">
+            <table class="table table-bordered table-striped" id="sequencerReferenceTable">
               <thead>
               <tr>
                 <th class="fit">ID</th>
@@ -196,9 +228,9 @@
                     <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
                       <td class="misoicon"
                           onclick="window.location.href='<c:url value="/miso/stats/sequencer/${ref.id}"/>'"><span
-                              class="ui-icon ui-icon-pencil"/></td>
+                              class="fa fa-pencil-square-o fa-lg"/></td>
                       <td class="misoicon" onclick="Sequencer.ui.deleteSequencerReference(${ref.id}, pageReload);"><span
-                              class="ui-icon ui-icon-trash"/></td>
+                              class="fa fa-trash-o fa-lg"/></td>
                     </c:if>
                   </tr>
                 </c:forEach>

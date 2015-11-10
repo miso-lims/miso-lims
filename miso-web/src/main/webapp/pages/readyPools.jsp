@@ -37,7 +37,11 @@
     jQuery("#tabs").tabs();
   });
 </script>
-<h1>Pools</h1>
+<nav class="navbar navbar-default" role="navigation">
+  <div class="navbar-header">
+    <span class="navbar-brand navbar-center">Pools</span>
+  </div>
+</nav>
 
 <div id="tabs">
 <ul>
@@ -48,15 +52,19 @@
 
 <c:forEach items="${platformTypes}" var="pt" varStatus="c">
   <div id="tab-${c.count}">
-    <h1>
-      <div id="${pt}totalCount">${pt} Pools</div>
-    </h1>
+    <nav class="navbar navbar-default" role="navigation">
+       <div class="navbar-header">
+          <span class="navbar-brand navbar-center">
+            <div id="${pt}totalCount">${pt} Pools</div>
+          </span>
+       </div>
+    </nav>
 
     <form id="filter-form${c.count}">Filter:
-      <input name="filter${c.count}" id="filter${c.count}" value="" maxlength="30" size="30" type="text">
+      <input name="filter${c.count}" id="filter${c.count}" value="" maxlength="30" size="30" type="text" class="form-control">
     </form>
     <br/>
-    <table class="list" id="${pt}_table">
+    <table class="table table-bordered table-striped" id="${pt}_table">
       <thead>
       <tr>
         <th>Name</th>
@@ -75,7 +83,7 @@
           <td>${ipool.creationDate}</td>
           <td class="misoicon"
               onclick="window.location.href='<c:url value="/miso/pool/${ipool.id}"/>'"><span
-              class="ui-icon ui-icon-pencil"/></td>
+              class="fa fa-pencil-square-o fa-lg"/></td>
         </tr>
       </c:forEach>
       </tbody>
@@ -86,7 +94,7 @@
       <div id="ipu_arrowclick" class="toggleLeft"></div>
     </div>
     <div id="ipudiv" class="simplebox ui-corner-all" style="display:none;">
-      <table class="list" id="${pt}_used_table">
+      <table class="table table-bordered table-striped" id="${pt}_used_table">
         <thead>
         <tr>
           <th>Name</th>
@@ -105,7 +113,7 @@
             <td>${ipool.creationDate}</td>
             <td class="misoicon"
                 onclick="window.location.href='<c:url value="/miso/pool/${ipool.id}"/>'"><span
-                class="ui-icon ui-icon-pencil"/></td>
+                class="fa fa-pencil-square-o fa-lg"/></td>
           </tr>
         </c:forEach>
         </tbody>

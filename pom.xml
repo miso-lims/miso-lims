@@ -268,6 +268,7 @@
     <updatePolicy>always</updatePolicy>
    </snapshots>
   </repository>
+    
  </repositories>
 
  <pluginRepositories>
@@ -305,6 +306,10 @@
    <url>https://maven.atlassian.com/public</url>
   </pluginRepository>
 
+  <pluginRepository>
+      <id>onejar-maven-plugin.googlecode.com</id>
+      <url>http://onejar-maven-plugin.googlecode.com/svn/mavenrepo</url>
+  </pluginRepository>
  </pluginRepositories>
 
  <!-- Required Build Plugins -->

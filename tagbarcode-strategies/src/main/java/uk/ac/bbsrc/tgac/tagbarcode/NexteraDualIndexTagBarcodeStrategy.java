@@ -94,9 +94,6 @@ public class NexteraDualIndexTagBarcodeStrategy implements TagBarcodeStrategy, R
               else if (t.getName().startsWith("N5")) {
                 tagBarcodeMap.get(2).add(t);
               }
-              else if (t.getName().startsWith("S5")) {
-                tagBarcodeMap.get(2).add(t);
-              }
             }
           }
         }

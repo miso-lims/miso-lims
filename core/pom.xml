@@ -55,7 +55,7 @@
   <repository>
    <id>OpenSymphony mirror repository</id>
    <name>OpenSymphony mirror repository</name>
-   <url>https://oswokflow-repository.googlecode.com/svn/deploy/</url>
+        <url>https://oswokflow-repository.googlecode.com/svn/deploy</url>
   </repository>
  </repositories>
 
@@ -242,7 +242,7 @@
   <dependency>
    <groupId>org.reflections</groupId>
    <artifactId>reflections</artifactId>
-   <version>0.9.5</version>
+      <version>0.9.9-RC1</version>
   </dependency>
 
   <dependency>

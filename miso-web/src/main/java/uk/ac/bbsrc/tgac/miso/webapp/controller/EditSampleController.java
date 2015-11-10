@@ -42,6 +42,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
+import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
@@ -66,6 +67,9 @@ public class EditSampleController {
   private RequestManager requestManager;
 
   @Autowired
+  private FilesManager filesManager;
+
+  @Autowired
   private DataObjectFactory dataObjectFactory;
 
   @Autowired
@@ -81,6 +85,10 @@ public class EditSampleController {
 
   public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
+  }
+
+  public void setFilesManager(FilesManager filesManager) {
+    this.filesManager = filesManager;
   }
 
   public void setSecurityManager(SecurityManager securityManager) {
@@ -104,7 +112,7 @@ public class EditSampleController {
   public Map<String, Sample> getAdjacentSamplesInGroup(Sample s, @RequestParam(value = "entityGroupId", required = true) Long entityGroupId) throws IOException {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     Project p = s.getProject();
-    EntityGroup<? extends Nameable, Sample> sgroup = (EntityGroup<? extends Nameable, Sample>) requestManager.getEntityGroupById(entityGroupId);
+    HierarchicalEntityGroup<? extends Nameable, Sample> sgroup = (HierarchicalEntityGroup<? extends Nameable, Sample>) requestManager.getEntityGroupById(entityGroupId);
 
     Sample prevS = null;
     Sample nextS = null;
@@ -160,6 +168,20 @@ public class EditSampleController {
         ret.put("previousSample", prevS);
         ret.put("nextSample", nextS);
         return ret;
+      }
+    }
+    return Collections.emptyMap();
+  }
+
+  public Map<Integer, String> populateSampleFiles(Long sampleId) throws IOException {
+    if (sampleId != AbstractSample.UNSAVED_ID) {
+      Sample s = requestManager.getSampleById(sampleId);
+      if (s != null) {
+        Map<Integer, String> fileMap = new HashMap<Integer, String>();
+        for (String f : filesManager.getFileNames(Sample.class, sampleId.toString())) {
+          fileMap.put(f.hashCode(), f);
+        }
+        return fileMap;
       }
     }
     return Collections.emptyMap();
@@ -318,7 +340,7 @@ public class EditSampleController {
       model.put("poolSampleMap", poolSampleMap);
       model.put("samplePools", pools);
       model.put("sampleRuns", getRunsBySamplePools(pools));
-
+      model.put("sampleFiles", populateSampleFiles(sampleId));
 
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, sample, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, sample, securityManager.listAllUsers()));
@@ -401,6 +423,7 @@ public class EditSampleController {
       model.put("poolSampleMap", poolSampleMap);
       model.put("samplePools", pools);
       model.put("sampleRuns", getRunsBySamplePools(pools));
+      model.put("sampleFiles", populateSampleFiles(sampleId));
 
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, sample, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, sample, securityManager.listAllUsers()));

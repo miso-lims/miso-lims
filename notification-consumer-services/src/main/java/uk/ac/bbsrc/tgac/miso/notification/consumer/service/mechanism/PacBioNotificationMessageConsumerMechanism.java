@@ -278,7 +278,7 @@ public class PacBioNotificationMessageConsumerMechanism implements NotificationM
                           }
                         }
 
-                        ((RunImpl)r).addSequencerPartitionContainer(lf);
+                        r.addSequencerPartitionContainer(lf);
                       }
                       else {
                         //more than one flowcell hit to this barcode
@@ -304,7 +304,7 @@ public class PacBioNotificationMessageConsumerMechanism implements NotificationM
                         log.info("\\_ Created new container with "+f.getPartitions().size()+" partitions");
                         long flowId = requestManager.saveSequencerPartitionContainer(f);
                         f.setId(flowId);
-                        ((RunImpl)r).addSequencerPartitionContainer(f);
+                        r.addSequencerPartitionContainer(f);
                         //TODO match up samples to libraries and pools? Or match up pool numbers
                         /*
                         for (JSONObject obj : (Iterable<JSONObject>)cells) {

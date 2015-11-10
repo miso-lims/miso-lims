@@ -57,6 +57,9 @@ function validate_run(form) {
   if (!ok) {
     alert(error);
   }
+  else {
+    form.submit();
+  }
 
   return ok;
 }
@@ -67,7 +70,7 @@ function checkForCompletionDate() {
     if (statusVal === "Failed" || statusVal === "Stopped") {
       alert("You are manually setting a run to Stopped or Failed. Please remember to enter a Completion Date!");
       if (jQuery("#completionDate input").length == 0) {
-        jQuery("#completionDate").html("<input type='text' name='status.completionDate' id='status.completionDate' value='" + jQuery('#completionDate').html() + "'>");
+        jQuery("#completionDate").html("<input type='text' name='status.completionDate' id='status.completionDate' value='" + jQuery('#completionDate').html() + "' class='form-control'>");
         Utils.ui.addDatePicker("status\\.completionDate");
       }
     }

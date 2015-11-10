@@ -56,7 +56,6 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
-import uk.ac.bbsrc.tgac.miso.webapp.context.ApplicationContextProvider;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -241,14 +240,14 @@ public class EditProjectController {
   public Collection<emPCRDilution> populateProjectEmPcrDilutions(Collection<emPCR> projectEmPCRs) throws IOException {
     List<emPCRDilution> dilutions = new ArrayList<emPCRDilution>();
     for (emPCR e : projectEmPCRs) {
-      dilutions.addAll(requestManager.listAllEmPcrDilutionsByEmPcrId(e.getId()));
+      dilutions.addAll(requestManager.listAllEmPCRDilutionsByEmPcrId(e.getId()));
     }
     Collections.sort(dilutions);
     return dilutions;
   }
 
   public Collection<emPCRDilution> populateProjectEmPcrDilutions(long projectId) throws IOException {
-    List<emPCRDilution> dilutions = new ArrayList<emPCRDilution>(requestManager.listAllEmPcrDilutionsByProjectId(projectId));
+    List<emPCRDilution> dilutions = new ArrayList<emPCRDilution>(requestManager.listAllEmPCRDilutionsByProjectId(projectId));
     Collections.sort(dilutions);
     return dilutions;
   }
@@ -414,7 +413,6 @@ public class EditProjectController {
       model.put("formObj", project);
       model.put("project", project);
       model.put("projectFiles", populateProjectFiles(projectId));
-      //model.put("projectRuns", requestManager.listAllRunsByProjectId(projectId));
       model.put("owners", LimsSecurityUtils.getPotentialOwners(user, project, securityManager.listAllUsers()));
       model.put("accessibleUsers", LimsSecurityUtils.getAccessibleUsers(user, project, securityManager.listAllUsers()));
       model.put("accessibleGroups", LimsSecurityUtils.getAccessibleGroups(user, project, securityManager.listAllGroups()));

@@ -270,7 +270,7 @@ public class MisoAppListener implements ServletContextListener {
         log.info("" + rm.listAllLibraries().size());
         log.info("\\_ dilutions...");
         log.info("" + rm.listAllLibraryDilutions().size());
-        log.info("" + rm.listAllEmPcrDilutions().size());
+        log.info("" + rm.listAllEmPCRDilutions().size());
         log.info("\\_ pools...");
         log.info("" + rm.listAllPools().size());
         log.info("\\_ plates...");
@@ -321,6 +321,9 @@ public class MisoAppListener implements ServletContextListener {
       }
     }
 
+    String analysisServerEnabled = misoProperties.get("miso.analysis.server.enabled");
+    context.getServletContext().setAttribute("analysisServerEnabled", Boolean.parseBoolean(analysisServerEnabled));
+
     if ("true".equals(misoProperties.get("miso.statsdb.enabled"))) {
       try {
         JndiObjectFactoryBean jndiBean = new JndiObjectFactoryBean();
@@ -343,6 +346,8 @@ public class MisoAppListener implements ServletContextListener {
 
         RunStatsManager rsm = new RunStatsManager(template);
         context.getBeanFactory().registerSingleton("runStatsManager", rsm);
+
+        log.info("StatsDB linkup initialised.");
       }
       catch (NamingException e) {
         log.error("Cannot initiate statsdb connection: " + e.getMessage());

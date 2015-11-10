@@ -27,8 +27,9 @@
 #progress {
   list-style:none;
   float:left;
-  margin-bottom:20px;
-  margin-left:-40px;
+  margin-bottom:10px;
+  margin-left:-30px;
+  margin-top:10px;
   counter-reset:step;
   /*
   background:#7b8d77;

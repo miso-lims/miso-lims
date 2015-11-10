@@ -30,14 +30,14 @@
 <%@ include file="../header.jsp" %>
 <script src="<c:url value='/scripts/jquery/js/jquery.breadcrumbs.popup.js'/>" type="text/javascript"></script>
 
-<script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
-<script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.mini.js'/>" type="text/javascript"></script>
-<script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.datepicker.js'/>" type="text/javascript"></script>
-<script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.checkbox.js'/>" type="text/javascript"></script>
-<link href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" rel="stylesheet" type="text/css">
-
-<script src="<c:url value='/scripts/datatables_utils.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
-<script src="<c:url value='/scripts/natural_sort.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
+<!-- fileupload -->
+<script src="<c:url value='/scripts/jquery/fileupload/js/jquery.fileupload.js'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/jquery/fileupload/js/jquery.fileupload-process.js'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/jquery/fileupload/js/jquery.fileupload-jquery-ui.js'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/jquery/fileupload/js/jquery.iframe-transport.js'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/jquery/fileupload/js/vendor/jquery.ui.widget.js'/>" type="text/javascript"></script>
+<link href="<c:url value='/scripts/jquery/fileupload/css/jquery.fileupload.css'/>" rel="stylesheet" type="text/css">
+<link href="<c:url value='/scripts/jquery/fileupload/css/jquery.fileupload-ui.css'/>" rel="stylesheet" type="text/css">
 
 <script src="<c:url value='/scripts/stats_ajax.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
 
@@ -55,15 +55,19 @@
 
 <form:form action="/miso/sample" method="POST" commandName="sample" autocomplete="off" acceptCharset="utf-8">
 <sessionConversation:insertSessionConversationId attributeName="sample"/>
-<h1>
-  <c:choose>
-    <c:when test="${sample.id != 0}">Edit</c:when>
-    <c:otherwise>Create</c:otherwise>
-  </c:choose> Sample
-  <button type="button" class="fg-button ui-state-default ui-corner-all"
-          onclick="return validate_sample(this.form);">Save
-  </button>
-</h1>
+<nav class="navbar navbar-default" role="navigation">
+  <div class="navbar-header">
+    <span class="navbar-brand navbar-center">
+    <c:choose>
+      <c:when test="${sample.id != 0}">Edit</c:when>
+      <c:otherwise>Create</c:otherwise>
+    </c:choose> Sample
+    </span>
+  </div>
+  <div class="navbar-right container-fluid">
+    <button class="btn btn-default navbar-btn" href='javascript:void(0);' onclick="return validate_sample(this.form);">Save</button>
+  </div>
+</nav>
 
 <c:if test="${not empty sample.project}">
   <div class="breadcrumbs">
@@ -72,6 +76,7 @@
         <a href="/">Home</a>
       </li>
       <li>
+        <%--
         <div class="breadcrumbsbubbleInfo">
           <div class="trigger">
             <a href='<c:url value="/miso/project/${sample.project.id}"/>'>${sample.project.name}</a>
@@ -80,19 +85,22 @@
               ${sample.project.alias}
           </div>
         </div>
+        --%>
+        <a data-toggle="tooltip" data-placement="bottom" title="${sample.project.alias}" href='<c:url value="/miso/project/${sample.project.id}"/>'>${sample.project.name}</a>
       </li>
     </ul>
-    <c:if test="${not empty nextSample}">
-      <span style="float:right; padding-top: 5px; padding-left: 6px">
-        <a class='arrowright' href='<c:url value="/miso/sample/${nextSample.id}"/>'>Next Sample <b>${nextSample.name}</b></a>
-      </span>
-    </c:if>
-    <c:if test="${not empty previousSample}">
-      <span style="float:right; padding-top: 5px">
-        <a class='arrowleft' href='<c:url value="/miso/sample/${previousSample.id}"/>'>Previous Sample <b>${previousSample.name}</b></a>
-      </span>
-    </c:if>
+    <div class="btn-group pull-right">
+      <c:if test="${not empty previousSample}">
+        <a class='btn btn-default previous' href='<c:url value="/miso/sample/${previousSample.id}"/>'><i class="fa fa-arrow-circle-o-left"></i> Previous Sample <b>${previousSample.name}</b></a>
+      </c:if>
+      <c:if test="${not empty nextSample}">
+        <a class='btn btn-default next' href='<c:url value="/miso/sample/${nextSample.id}"/>'>Next Sample <b>${nextSample.name}</b> <i class="fa fa-arrow-circle-o-right"></i></a>
+      </c:if>
+    </div>
   </div>
+  <script>
+    jQuery("[data-toggle=tooltip]").tooltip();
+  </script>
 </c:if>
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
   <div id="note_arrowclick" class="toggleLeft"></div>
@@ -104,11 +112,11 @@
 <h2>Sample Information</h2>
 
 <div class="barcodes">
-  <div class="barcodeArea ui-corner-all">
+  <div class="barcodeArea ui-corner-all" style="width:220px">
     <c:choose>
       <c:when test="${empty sample.locationBarcode}">
-        <span style="float: left; font-size: 24px; font-weight: bold; color:#BBBBBB">Location</span><form:input
-          path="locationBarcode" size="8"/>
+        <span style="float: left; font-size: 24px; font-weight: bold; color:#BBBBBB">Location</span>
+        <form:input path="locationBarcode" size="8" class="form-control float-right"/>
       </c:when>
       <c:otherwise>
         <span style="float: left; font-size: 24px; font-weight: bold; color:#BBBBBB">Location</span>
@@ -135,20 +143,15 @@
   <div class="barcodeArea ui-corner-all">
     <span style="float: left; font-size: 24px; font-weight: bold; color:#BBBBBB">ID</span>
     <c:if test="${not empty sample.identificationBarcode}">
-      <ul class="barcode-ddm">
-        <li>
-          <a onmouseover="mopen('idBarcodeMenu')" onmouseout="mclosetime()">
-            <span style="float:right; margin-top:6px;" class="ui-icon ui-icon-triangle-1-s"></span>
-            <span id="idBarcode" style="float:right"></span>
-          </a>
-
-          <div id="idBarcodeMenu"
-               onmouseover="mcancelclosetime()"
-               onmouseout="mclosetime()">
-            <a href="javascript:void(0);"
-               onclick="Sample.barcode.printSampleBarcodes(${sample.id});">Print</a>
-          </div>
-        </li>
+      <ul class="nav navbar-right">
+        <li class="dropdown">
+         <a id="idBarcode" class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0);">
+           <i class="fa fa-caret-down"></i>
+         </a>
+         <ul class="dropdown-menu dropdown-tasks">
+           <li role="presentation"><a href="javascript:void(0);" onclick="Sample.barcode.printSampleBarcodes(${sample.id});">Print</a></li>
+         </ul>
+       </li>
       </ul>
       <script type="text/javascript">
         jQuery(document).ready(function () {
@@ -160,7 +163,7 @@
               'url': ajaxurl
             },
             {'doOnSuccess': function (json) {
-              jQuery('#idBarcode').html("<img style='height:30px; border:0;' src='<c:url value='/temp/'/>" + json.img + "'/>");
+              jQuery('#idBarcode').prepend("<img style='height:30px; border:0; padding-right:4px' src='<c:url value='/temp/'/>" + json.img + "'/>");
             }
           });
         });
@@ -210,20 +213,24 @@
     </tr>
     <tr>
       <td class="h">Alias:</td>
-      <td><form:input path="alias" class="validateable"/><span id="aliascounter" class="counter"></span></td>
-        <%--<td><a href="void(0);" onclick="popup('help/sampleAlias.html');">Help</a></td>--%>
+      <td>
+        <div class="input-group">
+          <form:input path="alias" class="validateable form-control"/><span id="aliascounter" class="input-group-addon"></span>
+        </div>
+      </td>
     </tr>
     <tr>
       <td>Description:</td>
-      <td><form:input path="description" class="validateable"/><span id="descriptioncounter"
-                                                                     class="counter"></span>
+      <td>
+        <div class="input-group">
+          <form:input path="description" class="validateable form-control"/><span id="descriptioncounter" class="input-group-addon"></span>
+        </div>
       </td>
-        <%--<td><a href="void(0);" onclick="popup('help/sampleDescription.html');">Help</a></td>--%>
     </tr>
     <tr>
       <td>Date of receipt:</td>
       <td>
-        <form:input path="receivedDate" id="receiveddatepicker"/>
+        <form:input path="receivedDate" id="receiveddatepicker" class="form-control"/>
         <script type="text/javascript">
           Utils.ui.addDatePicker("receiveddatepicker");
         </script>
@@ -231,11 +238,11 @@
     </tr>
     <tr>
       <td class="h">Scientific Name:</td>
-      <td><form:input path="scientificName"/>
+      <td><form:input path="scientificName" class="form-control"/>
         <c:if test="${sessionScope.taxonLookupEnabled}">
         <script>Utils.timer.typewatchFunc(jQuery('#scientificName'), validate_ncbi_taxon, 1000, 2);</script>
+        </c:if>
       </td>
-      </c:if>
         <%--<td><a href="void(0);" onclick="popup('help/sampleScientificName.html');">Help</a></td>--%>
     </tr>
     <c:if test="${not empty sample.accession}">
@@ -250,99 +257,193 @@
       <td>Sample Type:</td>
       <td><form:select id="sampleTypes" path="sampleType" items="${sampleTypes}"/></td>
     </tr>
-    <tr bgcolor="yellow">
+    <tr>
       <td>QC Passed:</td>
       <td>
-        <form:radiobutton path="qcPassed" value="" label="Unknown"/>
-        <form:radiobutton path="qcPassed" value="true" label="True"/>
-        <form:radiobutton path="qcPassed" value="false" label="False"/>
+        <div id="qc-radio" class="btn-group" data-toggle="buttons">
+          <label class='btn btn-default'><form:radiobutton path="qcPassed" value="" label="Unknown"/></label>
+          <label class='btn btn-default'><form:radiobutton path="qcPassed" value="true" label="True"/></label>
+          <label class='btn btn-default'><form:radiobutton path="qcPassed" value="false" label="False"/></label>
+        </div>
+        <script>
+          jQuery(document).ready(function () {
+            var c = jQuery('#qc-radio :input:checked');
+            c.parent('.btn').addClass('active');
+            var inpv = c.val();
+            if (inpv === "") { c.parent('.btn').removeClass('btn-default').addClass("btn-warning"); }
+            if (inpv === "true") { c.parent('.btn').removeClass('btn-default').addClass("btn-success"); }
+            if (inpv === "false") { c.parent('.btn').removeClass('btn-default').addClass("btn-danger"); }
+          });
+        </script>
       </td>
     </tr>
-    <c:choose>
-    <c:when
-        test="${!empty sample.project and sample.securityProfile.profileId eq sample.project.securityProfile.profileId}">
-    <tr>
-      <td>Permissions</td>
-      <td><i>Inherited from project </i>
-        <a href='<c:url value="/miso/project/${sample.project.id}"/>'>${sample.project.name}</a>
-        <input type="hidden" value="${sample.project.securityProfile.profileId}"
-               name="securityProfile" id="securityProfile"/>
-      </td>
-    </tr>
-  </table>
-  </c:when>
-  <c:otherwise>
+  <c:choose>
+    <c:when test="${!empty sample.project and sample.securityProfile.profileId eq sample.project.securityProfile.profileId}">
+      <tr>
+        <td>Permissions</td>
+        <td><i>Inherited from project </i>
+          <a href='<c:url value="/miso/project/${sample.project.id}"/>'>${sample.project.name}</a>
+          <input type="hidden" value="${sample.project.securityProfile.profileId}"
+                 name="securityProfile" id="securityProfile"/>
+        </td>
+      </tr>
+    </table>
+    </c:when>
+    <c:otherwise>
     </table>
     <%@ include file="permissions.jsp" %>
-  </c:otherwise>
+    </c:otherwise>
   </c:choose>
-  <c:if test="${sample.id != 0}">
-    <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#notes_arrowclick'), 'notes');">Notes
-      <div id="notes_arrowclick" class="toggleLeftDown"></div>
-    </div>
-    <div id="notes">
-      <h1>Notes</h1>
-      <ul class="sddm">
-        <li>
-          <a onmouseover="mopen('notesmenu')" onmouseout="mclosetime()">Options
-            <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
-          </a>
-
-          <div id="notesmenu"
-               onmouseover="mcancelclosetime()"
-               onmouseout="mclosetime()">
-            <a onclick="Sample.ui.showSampleNoteDialog(${sample.id});" href="javascript:void(0);" class="add">Add Note</a>
-          </div>
-        </li>
-      </ul>
-        <%-- <div style="clear:both"></div> --%>
-      <c:if test="${fn:length(sample.notes) > 0}">
-        <div class="note" style="clear:both">
-          <c:forEach items="${sample.notes}" var="note" varStatus="n">
-            <div class="exppreview" id="sample-notes-${n.count}">
-              <b>${note.creationDate}</b>: ${note.text}
-              <span class="float-right" style="font-weight:bold; color:#C0C0C0;">${note.owner.loginName}
-                <c:if test="${(project.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
-                                or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-                <span style="color:#000000"><a href='#' onclick="Sample.ui.deleteSampleNote('${sample.sampleId}', '${note.noteId}');">
-                  <span class="ui-icon ui-icon-trash" style="clear: both; position: relative; float: right; margin-top: -15px;"/></a></span>
-                </c:if>
-              </span>
-            </div>
-          </c:forEach>
-        </div>
-      </c:if>
-      <div id="addSampleNoteDialog" title="Create new Note"></div>
-    </div>
-    <br/>
-  </c:if>
 </div>
 </form:form>
 
 <c:if test="${sample.id != 0}">
-  <a name="sampleqc"></a>
+  <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#upload_arrowclick'), 'uploaddiv');">
+    Sample Files
+    <div id="upload_arrowclick" class="toggleLeft"></div>
+  </div>
+  <div id="uploaddiv" class="panel panel-default padded-panel" style="display:none;">
+    <table class="in">
+      <tr>
+        <td>
+          <span id="upload-area">
+            <div class="fileupload-buttonbar">
+              <div class="fileupload-buttonbar">
+                <div>
+                  <span class="btn btn-success fileinput-button">
+                    <i class="glyphicon glyphicon-plus"></i>
+                    <span>Add files...</span>
+                    <input id="ajax_upload_form" type="file" name="files[]" data-url="<c:url value="/miso/upload/sample"/>" multiple/>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div id="progress" class="progress">
+              <div class="progress-bar progress-bar-success"></div>
+            </div>
 
-  <h1>
-    <div id="qcsTotalCount"></div>
-  </h1>
-  <ul class="sddm">
-    <li>
-      <a onmouseover="mopen('qcmenu')" onmouseout="mclosetime()">Options
-        <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
-      </a>
+            <div id="selectedFiles" class="files"></div>
+          </span>
 
-      <div id="qcmenu"
-           onmouseover="mcancelclosetime()"
-           onmouseout="mclosetime()">
-        <a href='javascript:void(0);' class="add"
-           onclick="Sample.qc.generateSampleQCRow(${sample.id}); return false;">Add Sample QC</a>
+          <script>
+            jQuery('#ajax_upload_form').fileupload({
+              formData: {'sampleId': '${sample.id}'},
+              dataType: 'json',
+              done: function (e, data) {
+                jQuery.each(data.result.files, function (index, file) {
+                  var r = "<a href='"+file.url+"'><a class='listbox' href='"+file.url+"'><div onMouseOver='this.className=\"boxlistboxhighlight\"' onMouseOut='this.className=\"boxlistbox\"' class='boxlistbox'>"+file.name+"</div></a></a>";
+                  jQuery(r).prependTo('#samplefiles');
+                });
+
+                //reset progress
+                jQuery('#progress .progress-bar').css('width', '0%');
+              },
+              progress: function (e, data) {
+                var progress = parseInt(data.loaded / data.total * 100, 10);
+                jQuery('#progress .progress-bar').css('width', progress + '%');
+              }
+            }).prop('disabled', !jQuery.support.fileInput)
+              .parent().addClass(jQuery.support.fileInput ? undefined : 'disabled');
+          </script>
+        </td>
+      </tr>
+    </table>
+
+    <div id="samplefiles">
+      <c:forEach items="${sampleFiles}" var="file">
+        <div id="file${file.key}">
+          <div onMouseOver="this.className='boxlistboxhighlight'" onMouseOut="this.className='boxlistbox'" class="boxlistbox">
+            <a href="<c:url value='/miso/download/sample/${sample.id}/${file.key}'/>">${file.value}</a>
+            <c:if test="${(library.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
+                            or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+            <a href='#' onclick="Sample.ui.deleteSampleFile('${sample.id}', '${file.value}', '${file.key}');">
+              <i class="fa fa-trash-o fa-lg fa-fw pull-right" style="padding-top:4px"></i>
+            </a>
+            </c:if>
+          </div>
+        </div>
+      </c:forEach>
+    </div>
+  </div>
+
+  <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#notes_arrowclick'), 'notes');">Notes
+    <c:choose>
+      <c:when test="${fn:length(sample.notes) > 0}">
+        <div id="notes_arrowclick" class="toggleLeftDown"></div>
       </div>
-    </li>
-  </ul>
+      <div id="notes" class="panel panel-default padded-panel">
+      </c:when>
+      <c:otherwise>
+        <div id="notes_arrowclick" class="toggleLeft"></div>
+      </div>
+      <div id="notes" class="panel panel-default padded-panel" style="display:none">
+      </c:otherwise>
+    </c:choose>
+
+    <nav id="navbar-notes" class="navbar navbar-default navbar-static" role="navigation">
+      <div class="navbar-header">
+        <span class="navbar-brand navbar-center">Notes</span>
+      </div>
+      <div class="collapse navbar-collapse">
+        <ul class="nav navbar-nav navbar-right">
+          <%--<li><a href="#">Link</a></li>--%>
+          <li id="notes-menu" class="dropdown">
+            <a id="notedrop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Options <b class="caret"></b></a>
+            <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="notedrop1">
+              <li role="presentation">
+                <a role="menuitem" onclick="Sample.ui.showSampleNoteDialog(${sample.id});" href="javascript:void(0);">Add Note</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  <c:if test="${fn:length(sample.notes) > 0}">
+    <div class="note" style="clear:both">
+      <c:forEach items="${sample.notes}" var="note" varStatus="n">
+        <div class="exppreview" id="sample-notes-${n.count}">
+          <b>${note.creationDate}</b>: ${note.text}
+          <span class="float-right" style="font-weight:bold; color:#C0C0C0;">${note.owner.loginName}
+            <c:if test="${(project.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
+                            or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+            <span style="color:#000000"><a href='#' onclick="Sample.ui.deleteSampleNote('${sample.sampleId}', '${note.noteId}');">
+              <i class="fa fa-trash-o fa-fw"></i></a></span>
+            </c:if>
+          </span>
+        </div>
+        </c:forEach>
+      </div>
+    </c:if>
+    <div id="addSampleNoteDialog" title="Create new Note"></div>
+  </div>
+</c:if>
+
+<c:if test="${sample.id != 0}">
+  <div id="sampleqc-div" class="panel panel-default padded-panel">
+    <a name="sampleqc"></a>
+
+    <nav id="navbar-sampleqc" class="navbar navbar-default navbar-static" role="navigation">
+      <div class="navbar-header">
+        <span id="qcsTotalCount" class="navbar-brand navbar-center">Sample QCs</span>
+      </div>
+      <div class="collapse navbar-collapse bs-example-js-navbar-collapse">
+        <ul class="nav navbar-nav navbar-right">
+          <li id="sampleqc-menu" class="dropdown">
+            <a id="sampleqcdrop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Options <b class="caret"></b></a>
+            <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="sampleqcdrop1">
+              <li role="presentation">
+                <a onclick="Sample.qc.generateSampleQCRow(${sample.id});" href='javascript:void(0);'>Add Sample QC</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
     <span style="clear:both">
       <div id="addSampleQC"></div>
       <form id='addQcForm'>
-        <table class="list" id="sampleQcTable" class="in">
+        <table class="table table-striped table-bordered" id="sampleQcTable">
           <thead>
           <tr>
               <%--
@@ -377,7 +478,7 @@
                                           or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
                   <td id="edit${qc.id}" align="center"><a href="javascript:void(0);"
                                                           onclick="Sample.qc.changeSampleQCRow('${qc.id}','${sample.id}')">
-                    <span class="ui-icon ui-icon-pencil"></span></a></td>
+                    <span class="fa fa-pencil-square-o fa-lg"></span></a></td>
                 </c:if>
               </tr>
             </c:forEach>
@@ -387,131 +488,120 @@
         <input type='hidden' id='sampleId' name='id' value='${sample.id}'/>
       </form>
     </span>
-  <script type="text/javascript">
-    jQuery(document).ready(function () {
-      jQuery("#sampleQcTable").tablesorter();
-      jQuery('#qcsTotalCount').html(jQuery('#sampleQcTable>tbody>tr:visible').length.toString() + " QCs");
-      jQuery('#librariesTotalCount').html(jQuery('#library_table>tbody>tr:visible').length.toString() + " Libraries");
-    });
-  </script>
-  <br/>
-  <%--
-      <h2 class="hrule">Upload SampleQC File</h2>
-      <table class="in">
-          <tr>
-              <td width="30%">
-                  <form method='post'
-                        id='ajax_upload_form'
-                        action="<c:url value="/miso/upload/sampleqc"/>"
-                        enctype="multipart/form-data"
-                        target="target_upload"
-                        onsubmit="Utils.fileUpload.fileUploadProgress('ajax_upload_form', 'statusdiv', Utils.page.pageReload);">
-                      <input type="hidden" name="sampleId" value="${sample.sampleId}"/><br/>
-                      <input type="file" name="file"/><br/>
-                      <button type="submit" class="br-button ui-state-default ui-corner-all">Upload</button>
-                  </form>
-                  <iframe id='target_upload' name='target_upload' src='' style='display: none'></iframe>
-                  <div id="statusdiv"></div>
-              </td>
-          </tr>
-      </table>
+    <script type="text/javascript">
+      jQuery(document).ready(function () {
+        jQuery('#sampleQcTable').dataTable({
+          "aaSorting": [
+            [2, 'asc']
+          ],
+          "aoColumns": [
+            null,
+            { "sType": 'natural' },
+            null,
+            null
+            <sec:authorize access="hasRole('ROLE_ADMIN')">, null</sec:authorize>
+          ],
+          "iDisplayLength": 50,
+          "bJQueryUI": false,
+          "bRetrieve": true
+        });
 
-      <ul>
-          <c:forEach items="${qcFiles}" var="file">
-              <li><a href="<c:url value='/miso/download/sample/${sample.sampleId}/qc/${file.key}'/>">${file.value}</a>
-              </li>
-          </c:forEach>
-      </ul>
-  --%>
-  <a name="library"></a>
-
-  <h1>
-    <div id="librariesTotalCount">
-    </div>
-  </h1>
-  <ul class="sddm">
-    <li>
-      <a onmouseover="mopen('librarymenu')" onmouseout="mclosetime()">Options
-        <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
-      </a>
-
-      <div id="librarymenu"
-           onmouseover="mcancelclosetime()"
-           onmouseout="mclosetime()">
-        <a href='<c:url value="/miso/library/new/${sample.id}"/>' class="add">Add Library</a><br/>
-
-        <c:if test="${not empty sample.libraries}">
-          <a href='javascript:void(0);' onclick='bulkLibraryQcTable();' class="add">Bulk QC these
-            Libraries</a>
-          <a href='javascript:void(0);' onclick='bulkLibraryDilutionTable();' class="add">Bulk Add Library
-            Dilutions</a>
-        </c:if>
-      </div>
-    </li>
-  </ul>
-    <span style="clear:both">
-      <table class="list" id="library_table">
-        <thead>
-        <tr>
-          <th>Library Name</th>
-          <th>Library Alias</th>
-          <th>Library Type</th>
-          <th>QC Passed</th>
-          <th class="fit">Edit</th>
-        </tr>
-        </thead>
-        <tbody>
-        <c:forEach items="${sample.libraries}" var="library">
-          <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-            <td><b>${library.name}</b></td>
-            <td>${library.alias}</td>
-            <td>${library.libraryType.description}</td>
-            <td>${library.qcPassed}</td>
-            <td class="misoicon"
-                onclick="window.location.href='<c:url value="/miso/library/${library.id}"/>'"><span
-                class="ui-icon ui-icon-pencil"/></td>
-          </tr>
-        </c:forEach>
-        </tbody>
-      </table>
-    </span>
-  <script type="text/javascript">
-    jQuery(document).ready(function () {
-      jQuery('#library_table').dataTable({
-        "aaSorting": [
-          [1, 'asc']
-        ],
-        "aoColumns": [
-          null,
-          { "sType": 'natural' },
-          null,
-          null,
-          null
-        ],
-        "iDisplayLength": 50,
-        "bJQueryUI": true,
-        "bRetrieve": true
+        jQuery('#qcsTotalCount').html(jQuery('#sampleQcTable>tbody>tr:visible').length.toString() + " QCs");
+        jQuery('#librariesTotalCount').html(jQuery('#library_table>tbody>tr:visible').length.toString() + " Libraries");
       });
-    });
-  </script>
+    </script>
+  </div>
+
+  <div id="library-div" class="panel panel-default padded-panel">
+    <a name="library"></a>
+
+    <nav id="navbar-library" class="navbar navbar-default navbar-static" role="navigation">
+      <div class="navbar-header">
+        <span id="librariesTotalCount" class="navbar-brand navbar-center">Libraries</span>
+      </div>
+      <div class="collapse navbar-collapse bs-example-js-navbar-collapse">
+        <ul class="nav navbar-nav navbar-right">
+          <li id="library-menu" class="dropdown">
+            <a id="librarydrop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Options <b class="caret"></b></a>
+            <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="librarydrop1">
+              <li role="presentation"><a href='<c:url value="/miso/library/new/${sample.id}"/>'>Add Library</a></li>
+              <c:if test="${not empty sample.libraries}">
+              <li role="presentation"><a href='javascript:void(0);' onclick='bulkLibraryQcTable();'>Bulk QC these Libraries</a></li>
+              <li role="presentation"><a href='javascript:void(0);' onclick='bulkLibraryDilutionTable();'>Bulk Add Library Dilutions</a></li>
+              </c:if>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </nav>
+      <span style="clear:both">
+        <table class="table table-striped table-bordered" id="library_table">
+          <thead>
+          <tr>
+            <th>Library Name</th>
+            <th>Library Alias</th>
+            <th>Library Type</th>
+            <th>QC Passed</th>
+            <th class="fit">Edit</th>
+          </tr>
+          </thead>
+          <tbody>
+          <c:forEach items="${sample.libraries}" var="library">
+            <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
+              <td><b>${library.name}</b></td>
+              <td>${library.alias}</td>
+              <td>${library.libraryType.description}</td>
+              <td>${library.qcPassed}</td>
+              <td class="misoicon"
+                  onclick="window.location.href='<c:url value="/miso/library/${library.id}"/>'"><span
+                  class="fa fa-pencil-square-o fa-lg"/></td>
+            </tr>
+          </c:forEach>
+          </tbody>
+        </table>
+      </span>
+    <script type="text/javascript">
+      jQuery(document).ready(function () {
+        jQuery('#library_table').dataTable({
+          "aaSorting": [
+            [1, 'asc']
+          ],
+          "aoColumns": [
+            null,
+            { "sType": 'natural' },
+            null,
+            null,
+            null
+          ],
+          "iDisplayLength": 50,
+          "bJQueryUI": false,
+          "bRetrieve": true
+        });
+      });
+    </script>
+  </div>
 
   <c:if test="${not empty samplePools}">
-    <br/>
-    <h1>${fn:length(samplePools)} Pools</h1>
-    <ul class="sddm">
-      <li>
-        <a onmouseover="mopen('poolsmenu')" onmouseout="mclosetime()">Options
-          <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
-        </a>
-
-        <div id="poolsmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
-        <a href="javascript:void(0);" onclick="Pool.barcode.selectPoolBarcodesToPrint('#pools_table');">Print Barcodes ...</a>
-        </div>
-      </li>
-    </ul>
-
+  <div id="pool-div" class="panel panel-default padded-panel">
+    <nav id="navbar-pool" class="navbar navbar-default navbar-static" role="navigation">
+      <div class="navbar-header">
+        <span class="navbar-brand navbar-center">${fn:length(samplePools)} Pools</span>
+      </div>
+      <div class="collapse navbar-collapse bs-example-js-navbar-collapse">
+        <ul class="nav navbar-nav navbar-right">
+          <li id="pool-menu" class="dropdown">
+            <a id="pooldrop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Options <b class="caret"></b></a>
+            <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="pooldrop1">
+              <li role="presentation">
+                <a href="javascript:void(0);" onclick="Pool.barcode.selectPoolBarcodesToPrint('#pools_table');">Print Barcodes</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </nav>
     <span style="clear:both">
-      <table class="list" id="pools_table">
+      <table class="table table-striped table-bordered" id="pools_table">
         <thead>
         <tr>
           <th>Pool Name</th>
@@ -533,13 +623,13 @@
             <td>${pool.platformType.key}</td>
             <td>${pool.creationDate}</td>
             <td>${pool.concentration}</td>
-              <%-- <td class="misoicon" onclick="window.location.href='<c:url value="/miso/pool/${fn:toLowerCase(pool.platformType.key)}/${pool.id}"/>'"><span class="ui-icon ui-icon-pencil"/></td> --%>
+              <%-- <td class="misoicon" onclick="window.location.href='<c:url value="/miso/pool/${fn:toLowerCase(pool.platformType.key)}/${pool.id}"/>'"><span class="fa fa-pencil-square-o fa-lg"/></td> --%>
             <td class="misoicon" onclick="window.location.href='<c:url value="/miso/pool/${pool.id}"/>'">
-              <span class="ui-icon ui-icon-pencil"/>
+              <span class="fa fa-pencil-square-o fa-lg"/>
             </td>
             <sec:authorize access="hasRole('ROLE_ADMIN')">
               <td class="misoicon" onclick="Pool.deletePool(${pool.id}, Utils.page.pageReload);">
-                <span class="ui-icon ui-icon-trash"/>
+                <span class="fa fa-trash-o fa-lg"/>
               </td>
             </sec:authorize>
           </tr>
@@ -563,19 +653,24 @@
               <sec:authorize access="hasRole('ROLE_ADMIN')">, null</sec:authorize>
             ],
             "iDisplayLength": 50,
-            "bJQueryUI": true,
+            "bJQueryUI": false,
             "bRetrieve": true
           });
         });
       </script>
     </span>
+  </div>
   </c:if>
 
   <c:if test="${not empty sampleRuns}">
-    <br/>
-    <h1>${fn:length(sampleRuns)} Runs</h1>
+  <div id="run-div" class="panel panel-default padded-panel">
+    <nav id="navbar-run" class="navbar navbar-default navbar-static" role="navigation">
+      <div class="navbar-header">
+        <span class="navbar-brand navbar-center">${fn:length(sampleRuns)} Runs</span>
+      </div>
+    </nav>
 
-    <table class="list" id="run_table">
+    <table class="table table-striped table-bordered" id="run_table">
       <thead>
       <tr>
         <th>Run Name</th>
@@ -622,11 +717,11 @@
             </c:forEach>
           </td>
           <td class="misoicon" onclick="window.location.href='<c:url value="/miso/run/${run.id}"/>'">
-            <span class="ui-icon ui-icon-pencil"/>
+            <span class="fa fa-pencil-square-o fa-lg"/>
           </td>
           <sec:authorize access="hasRole('ROLE_ADMIN')">
             <td class="misoicon" onclick="Run.deleteRun(${run.id}, Utils.page.pageReload);">
-              <span class="ui-icon ui-icon-trash"/>
+              <span class="fa fa-trash-o fa-lg"/>
             </td>
           </sec:authorize>
         </tr>
@@ -648,11 +743,12 @@
             <sec:authorize access="hasRole('ROLE_ADMIN')">, null</sec:authorize>
           ],
           "iDisplayLength": 50,
-          "bJQueryUI": true,
+          "bJQueryUI": false,
           "bRetrieve": true
         });
       });
     </script>
+  </div>
   </c:if>
 </c:if>
 
@@ -676,13 +772,16 @@
       </li>
     </ul>
   </div>
-  <h1>Create Samples
-    <button id="bulkSampleButton" onClick="submitBulkSamples();" class="fg-button ui-state-default ui-corner-all">
-      Save
-    </button>
-  </h1>
-  <br/>
-  <br/>
+  <nav class="navbar navbar-default" role="navigation">
+     <div class="navbar-header">
+        <span class="navbar-brand navbar-center">
+          Create Samples
+        </span>
+     </div>
+     <div class="navbar-right container-fluid">
+        <button type="button" class="btn btn-default navbar-btn" id="bulkSampleButton" onClick="submitBulkSamples();">Save</button>
+     </div>
+  </nav>
 
   <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#options_arrowclick'), 'optionsdiv');">Table
     Options
@@ -692,7 +791,7 @@
     <input type="checkbox" name="autoIncrementSampleAlias" checked="checked"/>Increment Sample Aliases
     Automatically<br/>
   </div>
-  <table id="cinput" class="display">
+  <table id="cinput" class="table table-striped table-bordered display">
     <thead>
     <tr>
       <th>Sample Alias</th>
@@ -726,13 +825,14 @@ jQuery(document).ready(function () {
     ],
     "bPaginate": false,
     "bInfo": false,
-    "bJQueryUI": true,
+    "bJQueryUI": false,
     "bAutoWidth": true,
-    "bSort": false,
-    "sDom": '<<"toolbar">f>r<t>ip>'
+    "bSort": false
   });
   //jQuery("div.toolbar").html("<a onclick=\"fnClickAddRow();\" href=\"javascript:void(0);\">Add a new row</a>");
-  jQuery("div.toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
+
+  jQuery("#cinput_wrapper").prepend("<div class='float-right toolbar'></div>");
+  //jQuery("div.toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
   jQuery("div.toolbar").html("<button onclick=\"bulkCopySample();\" class=\"fg-button ui-state-default ui-corner-all\"><span class=\"add\">Bulk Copy</span></button> <button onclick=\"fnClickAddRow();\" class=\"fg-button ui-state-default ui-corner-all\"><span class=\"add\">Add Row</span></button>");
   //setEditables(oTable);
 
@@ -788,7 +888,7 @@ function fnClickAddRow(rowdata) {
         "",
         "",
         "<span style='text-align:center;' name='copy-button' class='ui-icon ui-icon-arrowrefresh-1-n' title='Copy row'></span>",
-        "<span style='text-align:center;' name='del-button' class='ui-icon ui-icon-trash' title='Delete row'></span>"
+        "<span style='text-align:center;' name='del-button' class='fa fa-trash-o fa-lg' title='Delete row'></span>"
       ]
     );
   }
@@ -1021,9 +1121,6 @@ function submitBulkSamples() {
 function bulkLibraryQcTable() {
   //destroy current table and recreate
   jQuery('#library_table').dataTable().fnDestroy();
-  //bug fix to reset table width
-  jQuery('#library_table').removeAttr("style");
-
   jQuery('#library_table').addClass("display");
 
   //remove edit header and column
@@ -1069,11 +1166,10 @@ function bulkLibraryQcTable() {
     ],
     "bPaginate": false,
     "bInfo": false,
-    "bJQueryUI": true,
+    "bJQueryUI": false,
     "bAutoWidth": true,
     "bSort": false,
-    "bFilter": false,
-    "sDom": '<<"toolbar">f>r<t>ip>'
+    "bFilter": false
   });
 
   jQuery('#library_table').find("tr:gt(0)").each(function () {
@@ -1089,7 +1185,8 @@ function bulkLibraryQcTable() {
       jQuery(this).parent().addClass('row_selected');
   });
 
-  jQuery("div.toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
+  //jQuery("div.toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
+  jQuery("#library_table_wrapper").prepend("<div class='float-right toolbar'></div>");
   jQuery("div.toolbar").html("<button id=\"bulkLibraryQcButton\" onclick=\"Sample.qc.saveBulkLibraryQc();\" class=\"fg-button ui-state-default ui-corner-all\"><span class=\"add\">Save QCs</span></button>");
 
   jQuery('#library_table .defaultEditable').editable(function (value, settings) {
@@ -1183,9 +1280,6 @@ function bulkLibraryDilutionTable() {
   if (!jQuery('#library_table').hasClass("display")) {
     //destroy current table and recreate
     jQuery('#library_table').dataTable().fnDestroy();
-    //bug fix to reset table width
-    jQuery('#library_table').removeAttr("style");
-
     jQuery('#library_table').addClass("display");
 
     //remove edit header and column
@@ -1225,11 +1319,10 @@ function bulkLibraryDilutionTable() {
       ],
       "bPaginate": false,
       "bInfo": false,
-      "bJQueryUI": true,
+      "bJQueryUI": false,
       "bAutoWidth": true,
       "bSort": false,
-      "bFilter": false,
-      "sDom": '<<"toolbar">f>r<t>ip>'
+      "bFilter": false
     });
 
     jQuery('#library_table').find("tr:gt(0)").each(function () {
@@ -1245,6 +1338,7 @@ function bulkLibraryDilutionTable() {
         jQuery(this).parent().addClass('row_selected');
     });
 
+    jQuery("#library_table_wrapper").prepend("<div class='float-right toolbar'></div>");
     jQuery("div.toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
     jQuery("div.toolbar").html("<button id=\"bulkLibraryDilutionButton\" onclick=\"Sample.library.saveBulkLibraryDilutions();\" class=\"fg-button ui-state-default ui-corner-all\"><span class=\"add\">Save Dilutions</span></button>");
 
@@ -1299,6 +1393,7 @@ function bulkLibraryDilutionTable() {
 
 </div>
 </div>
+
 <%@ include file="adminsub.jsp" %>
 
 <%@ include file="../footer.jsp" %>

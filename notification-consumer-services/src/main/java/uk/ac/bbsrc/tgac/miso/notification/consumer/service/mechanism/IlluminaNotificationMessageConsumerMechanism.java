@@ -226,7 +226,7 @@ public class IlluminaNotificationMessageConsumerMechanism implements Notificatio
               r.setStatus(is);
             }
 
-            log.info(runName + " New status: " + r.getStatus().getHealth().toString() + " -> " + ht.toString());
+            log.debug(runName + " New status: " + r.getStatus().getHealth().toString() + " -> " + ht.toString());
 
             if (run.has("numCycles")) {
               r.setCycles(Integer.parseInt(run.getString("numCycles")));

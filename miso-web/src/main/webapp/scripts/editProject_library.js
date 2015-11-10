@@ -31,9 +31,6 @@ function bulkLibraryQcTable(tableName) {
   if (!lTable.hasClass("display")) {
     //destroy current table and recreate
     lTable.dataTable().fnDestroy();
-    //bug fix to reset table width
-    lTable.removeAttr("style");
-
     lTable.addClass("display");
 
     //remove edit header and column
@@ -82,37 +79,36 @@ function bulkLibraryQcTable(tableName) {
     jQuery(tableName + " tr:gt(0)").append("<td class='defaultEditable'></td>");
 
     var datatable = lTable.dataTable({
-                                       "aoColumnDefs": [
-                                         {
-                                           "bUseRendered": false,
-                                           "aTargets": [ 0 ]
-                                         }
-                                       ],
-                                       "aaSorting": [
-                                         [2, 'asc']
-                                       ],
-                                       "aoColumns": [
-                                         {"bSortable": false},
-                                         { "sType": 'natural' },
-                                         { "sType": 'natural' },
-                                         { "sType": 'natural' },
-                                         { "sType": 'natural' },
-                                         null,
-                                         null,
-                                         null,
-                                         {"bSortable": false},
-                                         {"bSortable": false},
-                                         {"bSortable": false},
-                                         {"bSortable": false}
-                                       ],
-                                       "bPaginate": false,
-                                       "bInfo": false,
-                                       "bJQueryUI": true,
-                                       "bAutoWidth": true,
-                                       "bSort": true,
-                                       "bFilter": true,
-                                       "sDom": '<<"toolbar">f>r<t>ip>'
-                                     });
+       "aoColumnDefs": [
+         {
+           "bUseRendered": false,
+           "aTargets": [ 0 ]
+         }
+       ],
+       "aaSorting": [
+         [2, 'asc']
+       ],
+       "aoColumns": [
+         {"bSortable": false},
+         { "sType": 'natural' },
+         { "sType": 'natural' },
+         { "sType": 'natural' },
+         { "sType": 'natural' },
+         null,
+         null,
+         null,
+         {"bSortable": false},
+         {"bSortable": false},
+         {"bSortable": false},
+         {"bSortable": false}
+       ],
+       "bPaginate": false,
+       "bInfo": false,
+       "bJQueryUI": false,
+       "bAutoWidth": true,
+       "bSort": true,
+       "bFilter": true
+     });
 
     lTable.find("tr:gt(0)").each(function () {
       for (var i = 0; i < this.cells.length; i++) {
@@ -127,96 +123,96 @@ function bulkLibraryQcTable(tableName) {
         jQuery(this).parent().addClass('row_selected');
     });
 
-    //jQuery("div.toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
+    jQuery(tableName + "_wrapper").prepend("<div class='float-right toolbar'></div>");
     jQuery("div.toolbar").html("<input type='button' value='Save QCs' id=\"bulkLibraryQcButton\" onclick=\"Sample.qc.saveBulkLibraryQc('" + tableName + "');\" class=\"fg-button ui-state-default ui-corner-all\"/>");
     jQuery("div.toolbar").append("<input type='button' value='Cancel'  onclick=\"Utils.page.pageReload();\" class=\"fg-button ui-state-default ui-corner-all\"/>");
     jQuery("div.toolbar").removeClass("toolbar");
 
     jQuery(tableName + ' .defaultEditable').editable(function (value, settings) {
-                                                       return value;
-                                                     },
-                                                     {
-                                                       callback: function (sValue, y) {
-                                                         var aPos = datatable.fnGetPosition(this);
-                                                         datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-                                                       },
-                                                       submitdata: function (value, settings) {
-                                                         return {
-                                                           "row_id": this.parentNode.getAttribute('id'),
-                                                           "column": datatable.fnGetPosition(this)[2]
-                                                         };
-                                                       },
-                                                       onblur: 'submit',
-                                                       placeholder: '',
-                                                       height: '14px'
-                                                     });
+       return value;
+     },
+     {
+       callback: function (sValue, y) {
+         var aPos = datatable.fnGetPosition(this);
+         datatable.fnUpdate(sValue, aPos[0], aPos[1]);
+       },
+       submitdata: function (value, settings) {
+         return {
+           "row_id": this.parentNode.getAttribute('id'),
+           "column": datatable.fnGetPosition(this)[2]
+         };
+       },
+       onblur: 'submit',
+       placeholder: '',
+       height: '14px'
+     });
 
     jQuery(tableName + " .typeSelect").editable(function (value, settings) {
-                                                  return value;
-                                                },
-                                                {
-                                                  data: libraryQcTypesString,
-                                                  type: 'select',
-                                                  onblur: 'submit',
-                                                  placeholder: '',
-                                                  style: 'inherit',
-                                                  callback: function (sValue, y) {
-                                                    var aPos = datatable.fnGetPosition(this);
-                                                    datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-                                                  },
-                                                  submitdata: function (value, settings) {
-                                                    return {
-                                                      "row_id": this.parentNode.getAttribute('id'),
-                                                      "column": datatable.fnGetPosition(this)[2]
-                                                    };
-                                                  }
-                                                });
+      return value;
+    },
+    {
+      data: libraryQcTypesString,
+      type: 'select',
+      onblur: 'submit',
+      placeholder: '',
+      style: 'inherit',
+      callback: function (sValue, y) {
+        var aPos = datatable.fnGetPosition(this);
+        datatable.fnUpdate(sValue, aPos[0], aPos[1]);
+      },
+      submitdata: function (value, settings) {
+        return {
+          "row_id": this.parentNode.getAttribute('id'),
+          "column": datatable.fnGetPosition(this)[2]
+        };
+      }
+    });
 
     jQuery(tableName + " .dateSelect").editable(function (value, settings) {
-                                                  return value;
-                                                },
-                                                {
-                                                  type: 'datepicker',
-                                                  width: '100px',
-                                                  onblur: 'submit',
-                                                  placeholder: '',
-                                                  style: 'inherit',
-                                                  datepicker: {
-                                                    dateFormat: 'dd/mm/yy',
-                                                    showButtonPanel: true,
-                                                    maxDate: 0
-                                                  },
-                                                  callback: function (sValue, y) {
-                                                    var aPos = datatable.fnGetPosition(this);
-                                                    datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-                                                  },
-                                                  submitdata: function (value, settings) {
-                                                    return {
-                                                      "row_id": this.parentNode.getAttribute('id'),
-                                                      "column": datatable.fnGetPosition(this)[2]
-                                                    };
-                                                  }
-                                                });
+      return value;
+    },
+    {
+      type: 'datepicker',
+      width: '100px',
+      onblur: 'submit',
+      placeholder: '',
+      style: 'inherit',
+      datepicker: {
+        dateFormat: 'dd/mm/yy',
+        showButtonPanel: true,
+        maxDate: 0
+      },
+      callback: function (sValue, y) {
+        var aPos = datatable.fnGetPosition(this);
+        datatable.fnUpdate(sValue, aPos[0], aPos[1]);
+      },
+      submitdata: function (value, settings) {
+        return {
+          "row_id": this.parentNode.getAttribute('id'),
+          "column": datatable.fnGetPosition(this)[2]
+        };
+      }
+    });
 
     jQuery(tableName + " .passedCheck").editable(function (value, settings) {
-                                                   return value;
-                                                 },
-                                                 {
-                                                   type: 'qcradio',
-                                                   onblur: 'submit',
-                                                   placeholder: '',
-                                                   style: 'inherit',
-                                                   callback: function (sValue, y) {
-                                                     var aPos = datatable.fnGetPosition(this);
-                                                     datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-                                                   },
-                                                   submitdata: function (value, settings) {
-                                                     return {
-                                                       "row_id": this.parentNode.getAttribute('id'),
-                                                       "column": datatable.fnGetPosition(this)[2]
-                                                     };
-                                                   }
-                                                 });
+       return value;
+     },
+     {
+       type: 'qcradio',
+       onblur: 'submit',
+       placeholder: '',
+       style: 'inherit',
+       callback: function (sValue, y) {
+         var aPos = datatable.fnGetPosition(this);
+         datatable.fnUpdate(sValue, aPos[0], aPos[1]);
+       },
+       submitdata: function (value, settings) {
+         return {
+           "row_id": this.parentNode.getAttribute('id'),
+           "column": datatable.fnGetPosition(this)[2]
+         };
+       }
+     });
   }
 }
 
@@ -225,9 +221,6 @@ function bulkLibraryDilutionTable(tableName) {
   if (!lTable.hasClass("display")) {
     //destroy current table and recreate
     lTable.dataTable().fnDestroy();
-    //bug fix to reset table width
-    lTable.removeAttr("style");
-
     lTable.addClass("display");
 
     //remove edit header and column
@@ -268,33 +261,32 @@ function bulkLibraryDilutionTable(tableName) {
     jQuery(tableName + " tr:gt(0)").append("<td class='defaultEditable'></td>");
 
     var datatable = lTable.dataTable({
-                                       "aoColumnDefs": [
-                                         {
-                                           "bUseRendered": false,
-                                           "aTargets": [ 0 ]
-                                         }
-                                       ],
-                                       "aoColumns": [
-                                         {"bSortable": false},
-                                         { "sType": 'natural' },
-                                         { "sType": 'natural' },
-                                         { "sType": 'natural' },
-                                         { "sType": 'natural' },
-                                         null,
-                                         {"bSortable": false},
-                                         {"bSortable": false},
-                                         {"bSortable": false},
-                                         {"bSortable": false},
-                                         {"bSortable": false}
-                                       ],
-                                       "bPaginate": false,
-                                       "bInfo": false,
-                                       "bJQueryUI": true,
-                                       "bAutoWidth": true,
-                                       "bSort": true,
-                                       "bFilter": false,
-                                       "sDom": '<<"toolbar">f>r<t>ip>'
-                                     });
+       "aoColumnDefs": [
+         {
+           "bUseRendered": false,
+           "aTargets": [ 0 ]
+         }
+       ],
+       "aoColumns": [
+         {"bSortable": false},
+         { "sType": 'natural' },
+         { "sType": 'natural' },
+         { "sType": 'natural' },
+         { "sType": 'natural' },
+         null,
+         {"bSortable": false},
+         {"bSortable": false},
+         {"bSortable": false},
+         {"bSortable": false},
+         {"bSortable": false}
+       ],
+       "bPaginate": false,
+       "bInfo": false,
+       "bJQueryUI": false,
+       "bAutoWidth": true,
+       "bSort": true,
+       "bFilter": false
+     });
 
     lTable.find("tr:gt(0)").each(function () {
       for (var i = 0; i < this.cells.length; i++) {
@@ -309,53 +301,54 @@ function bulkLibraryDilutionTable(tableName) {
         jQuery(this).parent().addClass('row_selected');
     });
 
+    jQuery(tableName+"_wrapper").prepend("<div class='float-right toolbar'></div>");
     jQuery("div.toolbar").html("<input type='button' value='Save Dilutions' id=\"bulkLibraryDilutionButton\" onclick=\"Sample.library.saveBulkLibraryDilutions('" + tableName + "');\" class=\"fg-button ui-state-default ui-corner-all\"/>");
     jQuery("div.toolbar").append("<input type='button' value='Cancel' onclick=\"Utils.page.pageReload();\" class=\"fg-button ui-state-default ui-corner-all\"/>");
     jQuery("div.toolbar").removeClass("toolbar");
 
     jQuery(tableName + ' .defaultEditable').editable(function (value, settings) {
-                                                       return value;
-                                                     },
-                                                     {
-                                                       callback: function (sValue, y) {
-                                                         var aPos = datatable.fnGetPosition(this);
-                                                         datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-                                                       },
-                                                       submitdata: function (value, settings) {
-                                                         return {
-                                                           "row_id": this.parentNode.getAttribute('id'),
-                                                           "column": datatable.fnGetPosition(this)[2]
-                                                         };
-                                                       },
-                                                       onblur: 'submit',
-                                                       placeholder: '',
-                                                       height: '14px'
-                                                     });
+       return value;
+     },
+     {
+       callback: function (sValue, y) {
+         var aPos = datatable.fnGetPosition(this);
+         datatable.fnUpdate(sValue, aPos[0], aPos[1]);
+       },
+       submitdata: function (value, settings) {
+         return {
+           "row_id": this.parentNode.getAttribute('id'),
+           "column": datatable.fnGetPosition(this)[2]
+         };
+       },
+       onblur: 'submit',
+       placeholder: '',
+       height: '14px'
+     });
 
     jQuery(tableName + " .dateSelect").editable(function (value, settings) {
-                                                  return value;
-                                                },
-                                                {
-                                                  type: 'datepicker',
-                                                  width: '100px',
-                                                  onblur: 'submit',
-                                                  placeholder: '',
-                                                  style: 'inherit',
-                                                  datepicker: {
-                                                    dateFormat: 'dd/mm/yy',
-                                                    showButtonPanel: true,
-                                                    maxDate: 0
-                                                  },
-                                                  callback: function (sValue, y) {
-                                                    var aPos = datatable.fnGetPosition(this);
-                                                    datatable.fnUpdate(sValue, aPos[0], aPos[1]);
-                                                  },
-                                                  submitdata: function (value, settings) {
-                                                    return {
-                                                      "row_id": this.parentNode.getAttribute('id'),
-                                                      "column": datatable.fnGetPosition(this)[2]
-                                                    };
-                                                  }
-                                                });
+      return value;
+    },
+    {
+      type: 'datepicker',
+      width: '100px',
+      onblur: 'submit',
+      placeholder: '',
+      style: 'inherit',
+      datepicker: {
+        dateFormat: 'dd/mm/yy',
+        showButtonPanel: true,
+        maxDate: 0
+      },
+      callback: function (sValue, y) {
+        var aPos = datatable.fnGetPosition(this);
+        datatable.fnUpdate(sValue, aPos[0], aPos[1]);
+      },
+      submitdata: function (value, settings) {
+        return {
+          "row_id": this.parentNode.getAttribute('id'),
+          "column": datatable.fnGetPosition(this)[2]
+        };
+      }
+    });
   }
 }
