@@ -6,6 +6,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -83,5 +85,25 @@ public class PoolControllerHelperServiceTestSuite {
     verify(requestManager, never()).savePool(pool);
     
     assertEquals("New+identification+barcode+not+recognized", response.get("error"));
+  }
+  
+  @SuppressWarnings("unchecked")
+  @Test
+  public final void testChangePoolIdBarcodeReturnsError() throws Exception {
+    final long id = 1L;
+    final String idBarcode = "idBarcode";
+    final IOException expected = new IOException("thrown by mock");
+    when(requestManager.getPoolById(anyLong())).thenReturn(pool);
+    when(requestManager.savePool(pool)).thenThrow(expected);
+    
+    
+    final JSONObject json = new JSONObject();
+    json.put("poolId", id);
+    json.put("identificationBarcode", idBarcode);
+    
+    final JSONObject error = new JSONObject();
+    error.put("error", "thrown+by+mock");
+    
+    assertEquals(error, poolControllerHelperService.changePoolIdBarcode(null,  json));
   }
 }
