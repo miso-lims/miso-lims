@@ -47,7 +47,6 @@ public class LibraryControllerHelperServiceTestSuite {
      MockitoAnnotations.initMocks(this);
   }
   
-  @SuppressWarnings("unchecked")
   @Test
   public final void testChangeLibraryIdBarcode() throws Exception {
     final long id = 1L;
@@ -66,7 +65,6 @@ public class LibraryControllerHelperServiceTestSuite {
     assertEquals("New+identification+barcode+successfully+assigned.", response.get("response"));
   }
   
-  @SuppressWarnings("unchecked")
   @Test
   public final void testChangeLibraryIdBarcodeBlankBarcode() throws Exception {
     final long id = 1L;
@@ -86,18 +84,21 @@ public class LibraryControllerHelperServiceTestSuite {
   }
   
   @Test
-  public final void testChangeLibraryIdBarcodeException() throws Exception {
+  public final void testChangeLibraryIdBarcodeReturnsError() throws Exception {
+
     final long id = 1L;
     final String idBarcode = "idBarcode";
     final IOException expected = new IOException("thrown by mock");
     when(requestManager.getLibraryById(anyLong())).thenReturn(library);
     when(requestManager.saveLibrary(library)).thenThrow(expected);
-    
+
     final JSONObject json = new JSONObject();
     json.put("libraryId", id);
     json.put("identificationBarcode", idBarcode);
     
-    libraryControllerHelperService.changeLibraryIdBarcode(null,  json);
+    final JSONObject error = new JSONObject();
+    error.put("error", "thrown+by+mock");
     
+    assertEquals(error, libraryControllerHelperService.changeLibraryIdBarcode(null,  json));
   }
 }
