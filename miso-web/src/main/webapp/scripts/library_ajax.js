@@ -403,7 +403,6 @@ Library.barcode = {
             "<input type='text' name='idBarcodeInput' id='idBarcodeInput' class='text ui-widget-content ui-corner-all' />" +
             "</fieldset></form>");
 
-<<<<<<< HEAD
     jQuery('#changeLibraryIdBarcodeDialog').dialog({
       autoOpen: false,
       width: 400,
@@ -419,26 +418,6 @@ Library.barcode = {
         }
       }
     }).dialog('open');
-=======
-    jQuery(function () {
-      jQuery('#changeLibraryIdBarcodeDialog').dialog({
-        autoOpen: false,
-        width: 400,
-        modal: true,
-        resizable: false,
-        buttons: {
-          "Save": function () {
-            self.changeLibraryIdBarcode(libraryId, jQuery('#idBarcodeInput').val());
-            jQuery(this).dialog('close');
-          },
-          "Cancel": function () {
-            jQuery(this).dialog('close');
-          }
-        }
-      });
-    });
-    jQuery('#changeLibraryIdBarcodeDialog').dialog('open');
->>>>>>> Add JS functions for changing ID barcodes.
   },
 
   changeLibraryIdBarcode: function (libraryId, idBarcode) {
