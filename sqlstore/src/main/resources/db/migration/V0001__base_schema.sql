@@ -651,7 +651,7 @@ CREATE TABLE `ProjectOverview` (
   `allRunsCompleted` bit(1) DEFAULT b'0',
   `primaryAnalysisCompleted` bit(1) DEFAULT b'0',
   PRIMARY KEY (`overviewId`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Information about a project proposal';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1100,7 +1100,7 @@ CREATE TABLE `State_Key` (
   `id` bigint(20) NOT NULL,
   `value` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1114,7 +1114,7 @@ CREATE TABLE `State_Value` (
   `id` bigint(20) NOT NULL,
   `value` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1387,7 +1387,7 @@ CREATE TABLE `Workflow` (
   `completion_date` date DEFAULT NULL,
   `workflowDefinition_definitionId` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`workflowId`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1404,7 +1404,7 @@ CREATE TABLE `WorkflowDefinition` (
   `name` varchar(255) DEFAULT NULL,
   `description` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`workflowDefinitionId`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1419,7 +1419,7 @@ CREATE TABLE `WorkflowDefinition_State` (
   `state_key` varchar(45) DEFAULT NULL,
   `required` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`workflowDefinitionId`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1433,7 +1433,7 @@ CREATE TABLE `WorkflowDefinition_WorkflowProcessDefinition` (
   `workflowDefinitionId` bigint(20) NOT NULL,
   `workflowProcessDefinitionId` bigint(20) NOT NULL,
   PRIMARY KEY (`workflowDefinitionId`,`workflowProcessDefinitionId`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1450,7 +1450,7 @@ CREATE TABLE `WorkflowProcess` (
   `completion_date` date DEFAULT NULL,
   `workflowProcessDefinition_definitionId` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`processId`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1470,7 +1470,7 @@ CREATE TABLE `WorkflowProcessDefinition` (
   `inputType` text,
   `outputType` text,
   PRIMARY KEY (`workflowProcessDefinitionId`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1485,7 +1485,7 @@ CREATE TABLE `WorkflowProcessDefinition_State` (
   `state_key` varchar(45) DEFAULT NULL,
   `required` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`workflowProcessDefinitionId`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1500,7 +1500,7 @@ CREATE TABLE `WorkflowProcess_State` (
   `state_key_id` bigint(20) NOT NULL,
   `state_value_id` bigint(20) NOT NULL,
   PRIMARY KEY (`processId`,`state_value_id`,`state_key_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1515,7 +1515,7 @@ CREATE TABLE `Workflow_State` (
   `state_key_id` bigint(20) NOT NULL,
   `state_value_id` bigint(20) NOT NULL,
   PRIMARY KEY (`workflowId`,`state_key_id`,`state_value_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1529,7 +1529,7 @@ CREATE TABLE `Workflow_WorkflowProcess` (
   `workflowId` bigint(20) NOT NULL,
   `processId` bigint(20) NOT NULL,
   PRIMARY KEY (`workflowId`,`processId`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
