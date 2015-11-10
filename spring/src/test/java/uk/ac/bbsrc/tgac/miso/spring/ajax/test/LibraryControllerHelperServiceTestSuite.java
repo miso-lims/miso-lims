@@ -6,6 +6,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -81,5 +83,21 @@ public class LibraryControllerHelperServiceTestSuite {
     verify(requestManager, never()).saveLibrary(library);
     
     assertEquals("New+identification+barcode+not+recognized", response.get("error"));
+  }
+  
+  @Test
+  public final void testChangeLibraryIdBarcodeException() throws Exception {
+    final long id = 1L;
+    final String idBarcode = "idBarcode";
+    final IOException expected = new IOException("thrown by mock");
+    when(requestManager.getLibraryById(anyLong())).thenReturn(library);
+    when(requestManager.saveLibrary(library)).thenThrow(expected);
+    
+    final JSONObject json = new JSONObject();
+    json.put("libraryId", id);
+    json.put("identificationBarcode", idBarcode);
+    
+    libraryControllerHelperService.changeLibraryIdBarcode(null,  json);
+    
   }
 }
