@@ -390,6 +390,16 @@ public abstract class AbstractPool<P extends Poolable> implements Pool<P> {
   }
 
   @Override
+  public boolean getHasLowQualityMembers() {
+    for (Dilution d : getDilutions()) {
+      if (d.getLibrary().isLowQuality()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @Override
   public boolean equals(Object obj) {
     if (obj == null) return false;
     if (obj == this) return true;

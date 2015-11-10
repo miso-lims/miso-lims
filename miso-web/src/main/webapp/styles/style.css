@@ -88,6 +88,19 @@ a {
     display: inline-block;
 }
 
+span.lowquality {
+	color: #a93232;
+	font-weight: bold;
+}
+
+div.lowquality {
+	border-color: #a93232;
+}
+
+div.lowquality div {
+	color: #a93232;
+}
+
 #navtabs {
     float: left;
     width: 100%;

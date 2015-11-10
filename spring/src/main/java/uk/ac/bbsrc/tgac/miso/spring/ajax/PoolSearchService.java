@@ -88,13 +88,6 @@ public class PoolSearchService {
           List<Pool<? extends Poolable>> rPools = new ArrayList<>(pools);
           Collections.reverse(rPools);
           for (Pool<? extends Poolable> pool : rPools) {
-            boolean hasLowQuality = false;
-            for (Dilution d : pool.getDilutions()) {
-              hasLowQuality = hasLowQuality || d.getLibrary().isLowQuality();
-            }
-            if (hasLowQuality) {
-              continue;
-            }
             b.append(poolHtml(pool));
           }
         } else {
@@ -175,8 +168,9 @@ public class PoolSearchService {
 
   private String poolHtml(Pool<? extends Poolable> p) {
     StringBuilder b = new StringBuilder();
-    b.append(
-        "<div style='position:relative' onMouseOver='this.className=\"dashboardhighlight\"' onMouseOut='this.className=\"dashboard\"' class='dashboard'>");
+    String lowquality = p.getHasLowQualityMembers() ? " lowquality" : "";
+    b.append("<div style='position:relative' onMouseOver='this.className=\"dashboardhighlight" + lowquality
+        + "\"' onMouseOut='this.className=\"dashboard" + lowquality + "\"' class='dashboard" + lowquality + "'>");
     if (LimsUtils.isStringEmptyOrNull(p.getAlias())) {
       b.append("<div style=\"float:left\"><b>" + p.getName() + " : " + p.getCreationDate() + "</b><br/>");
     } else {
@@ -186,27 +180,29 @@ public class PoolSearchService {
     Collection<? extends Poolable> ds = p.getPoolableElements();
     for (Poolable d : ds) {
       if (d instanceof Dilution) {
-        b.append("<span>" + d.getName() + " (" + ((Dilution) d).getLibrary().getSample().getProject().getAlias() + ") : "
-            + ((Dilution) d).getConcentration() + " " + ((Dilution) d).getUnits() + "</span><br/>");
+        b.append("<span" + (((Dilution) d).getLibrary().isLowQuality() ? " class='lowquality'" : "") + ">" + d.getName() + " ("
+            + ((Dilution) d).getLibrary().getSample().getProject().getAlias() + ") : " + ((Dilution) d).getConcentration() + " "
+            + ((Dilution) d).getUnits() + "</span><br/>");
       } else if (d instanceof Plate) {
         Plate<LinkedList<Plateable>, Plateable> plate = (Plate<LinkedList<Plateable>, Plateable>) d;
         if (!plate.getElements().isEmpty()) {
           Plateable element = plate.getElements().getFirst();
           if (element instanceof Library) {
             Library l = (Library) element;
-            b.append(
-                "<span>" + d.getName() + " [" + plate.getSize() + "-well] (" + l.getSample().getProject().getAlias() + ")</span><br/>");
+            b.append("<span" + (l.isLowQuality() ? " class='lowquality'" : "") + ">" + d.getName() + " [" + plate.getSize() + "-well] ("
+                + l.getSample().getProject().getAlias() + ")</span><br/>");
           } else if (element instanceof Dilution) {
             Dilution dl = (Dilution) element;
-            b.append("<span>" + dl.getName() + " [" + plate.getSize() + "-well] (" + dl.getLibrary().getSample().getProject().getAlias()
-                + ")</span><br/>");
+            b.append("<span" + (dl.getLibrary().isLowQuality() ? " class='lowquality'" : "") + ">" + dl.getName() + " [" + plate.getSize()
+                + "-well] (" + dl.getLibrary().getSample().getProject().getAlias() + ")</span><br/>");
           } else if (element instanceof Sample) {
             Sample s = (Sample) element;
             b.append("<span>" + s.getName() + " [" + plate.getSize() + "-well] (" + s.getProject().getAlias() + ")</span><br/>");
           }
         }
       } else {
-        b.append("<span>" + d.getName() + "</span><br/>");
+        b.append("<span" + (d instanceof Library && ((Library) d).isLowQuality() ? " class='lowquality'" : "") + ">" + d.getName()
+            + "</span><br/>");
       }
     }
 
