@@ -88,7 +88,7 @@ public class TissueOriginController {
     if (tissueOrigins.isEmpty()) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     } else {
-      Set<TissueOriginDto> tissueOriginDtos = Dtos.asDto(tissueOrigins);
+      Set<TissueOriginDto> tissueOriginDtos = Dtos.asTissueOriginDtos(tissueOrigins);
       for (TissueOriginDto tissueOriginDto : tissueOriginDtos) {
         tissueOriginDto = writeUrls(tissueOriginDto, uriBuilder);
       }

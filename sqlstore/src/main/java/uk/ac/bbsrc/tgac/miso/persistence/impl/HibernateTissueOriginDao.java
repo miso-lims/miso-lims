@@ -47,7 +47,6 @@ public class HibernateTissueOriginDao implements TissueOriginDao {
     Date now = new Date();
     tissueOrigin.setCreationDate(now);
     tissueOrigin.setLastUpdated(now);
-    log.error("tissue orgin from hibernate:" + tissueOrigin);
     return (Long) currentSession().save(tissueOrigin);
   }
 
@@ -61,7 +60,6 @@ public class HibernateTissueOriginDao implements TissueOriginDao {
   public void update(TissueOrigin tissueOrigin) {
     Date now = new Date();
     tissueOrigin.setLastUpdated(now);
-    log.error("tissue orgin from hibernate during update:" + tissueOrigin);
     currentSession().update(tissueOrigin);
   }
 
