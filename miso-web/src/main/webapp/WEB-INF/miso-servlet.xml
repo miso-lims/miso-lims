@@ -25,9 +25,16 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:tx="http://www.springframework.org/schema/tx"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
-                           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd"
+       xmlns:mvc="http://www.springframework.org/schema/mvc" 
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans 
+       http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+       http://www.springframework.org/schema/context 
+       http://www.springframework.org/schema/context/spring-context-3.1.xsd 
+       http://www.springframework.org/schema/mvc 
+       http://www.springframework.org/schema/mvc/spring-mvc.xsd 
+       http://www.springframework.org/schema/tx 
+       http://www.springframework.org/schema/tx/spring-tx.xsd"
        default-autowire="byName">
 
     <!-- <context:load-time-weaver aspectj-weaving="on" weaver-class="org.springframework.instrument.classloading.ReflectiveLoadTimeWeaver"/> -->
@@ -38,6 +45,15 @@
     <context:component-scan annotation-config="true" base-package="com.eaglegenomics.simlims"/>
     <context:component-scan annotation-config="true" base-package="uk.ac.bbsrc.tgac.miso"/>
     <context:component-scan annotation-config="true" base-package="net.sourceforge.fluxion.ajax"/>
+    
+    <context:property-placeholder location="classpath:miso.properties" />
+
+    <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
+      <property name="location">
+          <value>classpath:miso.properties</value>
+      </property>
+      <property name="ignoreUnresolvablePlaceholders" value="true"/>
+    </bean>
 
     <!-- <bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping"/> -->
 

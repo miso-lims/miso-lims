@@ -190,6 +190,7 @@
     <property name="sampleQcDAO" ref="sqlSampleQCDAO"/>
     <property name="securityProfileDAO" ref="sqlSecurityProfileDAO"/>
     <property name="jdbcTemplate" ref="interfaceTemplate"/>
+    <property name="autoGenerateIdentificationBarcodes"><value>${miso.autoGenerateIdentificationBarcodes}</value></property>
   </bean>
 
   <bean id="sqlSampleQCDAO"
@@ -271,6 +272,7 @@
     <property name="libraryQcDAO" ref="sqlLibraryQCDAO"/>
     <property name="securityProfileDAO" ref="sqlSecurityProfileDAO"/>
     <property name="jdbcTemplate" ref="interfaceTemplate"/>
+    <property name="autoGenerateIdentificationBarcodes"><value>${miso.autoGenerateIdentificationBarcodes}</value></property>
   </bean>
 
   <bean id="sqlNoteDAO"
@@ -295,6 +297,7 @@
     <property name="poolQcDAO" ref="sqlPoolQCDAO"/>
     <property name="watcherDAO" ref="sqlWatcherDAO"/>
     <property name="jdbcTemplate" ref="interfaceTemplate"/>
+    <property name="autoGenerateIdentificationBarcodes"><value>${miso.autoGenerateIdentificationBarcodes}</value></property>
   </bean>
 
   <bean id="sqlPoolQCDAO"
@@ -376,6 +379,7 @@
     <property name="dilutionDAO" ref="sqlLibraryDilutionDAO"/>
     <property name="securityProfileDAO" ref="sqlSecurityProfileDAO"/>
     <property name="jdbcTemplate" ref="interfaceTemplate"/>
+    <property name="autoGenerateIdentificationBarcodes"><value>${miso.autoGenerateIdentificationBarcodes}</value></property>
   </bean>
 
   <bean id="sqlAlertDAO"
