@@ -23,6 +23,57 @@
 
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
+import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.regex.Matcher;
+
+import javax.persistence.CascadeType;
+
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Transactional;
+
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
+import uk.ac.bbsrc.tgac.miso.core.data.Status;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.event.manager.RunAlertManager;
+import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
+import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
+import uk.ac.bbsrc.tgac.miso.core.store.RunQcStore;
+import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
+import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
+import uk.ac.bbsrc.tgac.miso.core.store.SequencerReferenceStore;
+import uk.ac.bbsrc.tgac.miso.core.store.StatusStore;
+import uk.ac.bbsrc.tgac.miso.core.store.Store;
+import uk.ac.bbsrc.tgac.miso.core.store.WatcherStore;
+import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
+import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
+
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
@@ -30,41 +81,6 @@ import com.googlecode.ehcache.annotations.Cacheable;
 import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
 import com.googlecode.ehcache.annotations.TriggersRemove;
-import com.googlecode.ehcache.annotations.key.HashCodeCacheKeyGenerator;
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
-import net.sf.ehcache.constructs.blocking.BlockingCache;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.transaction.annotation.Transactional;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.event.manager.RunAlertManager;
-import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.store.*;
-import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
-import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
-import uk.ac.bbsrc.tgac.miso.core.data.*;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
-
-import javax.persistence.CascadeType;
-import java.io.IOException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.*;
-import java.util.regex.Matcher;
 
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore
@@ -120,13 +136,13 @@ public class SQLRunDAO implements RunStore {
           "WHERE l.experiment_experimentId = ?";
 
   public static final String RUNS_SELECT_BY_PLATFORM_ID =
-          "SELECT r.name, r.alias, r.description, r.accession, r.platformRunId, r.pairedEnd, r.cycles, r.filePath, r.securityProfile_profileId, r.platformType, r.status_statusId, r.sequencerReference_sequencerReferenceId " +
-          "FROM "+TABLE_NAME+" r, Platform p " +
-          "WHERE r.platform_platformId=p.platformId " +
-          "AND r.platform_platformId=?";
+          "SELECT r.runId, r.name, r.alias, r.description, r.accession, r.platformRunId, r.pairedEnd, r.cycles, r.filePath, r.securityProfile_profileId, r.platformType, r.status_statusId, r.sequencerReference_sequencerReferenceId " +
+          "FROM "+TABLE_NAME+" r " + 
+          "LEFT JOIN SequencerReference sr ON r.sequencerReference_sequencerReferenceId=sr.referenceId " +
+          "WHERE sr.platformId=?";
 
   public static final String RUNS_SELECT_BY_STATUS_HEALTH =
-          "SELECT r.name, r.alias, r.description, r.accession, r.platformRunId, r.pairedEnd, r.cycles, r.filePath, r.securityProfile_profileId, r.platformType, r.status_statusId, r.sequencerReference_sequencerReferenceId " +
+          "SELECT r.runId, r.name, r.alias, r.description, r.accession, r.platformRunId, r.pairedEnd, r.cycles, r.filePath, r.securityProfile_profileId, r.platformType, r.status_statusId, r.sequencerReference_sequencerReferenceId " +
           "FROM "+TABLE_NAME+" r, Status s " +
           "WHERE r.status_statusId=s.statusId " +
           "AND s.health=?";
@@ -172,7 +188,8 @@ public class SQLRunDAO implements RunStore {
           "INNER JOIN Run_SequencerPartitionContainer rf ON container.containerId = rf.containers_containerId " +
           "LEFT JOIN "+TABLE_NAME+" r ON rf.Run_runId = r.runId " +
           "INNER JOIN Status s ON r.status_statusId=s.statusId " +
-          "WHERE container.containerId=?";
+          "WHERE container.containerId=? " +
+          "GROUP BY r.runId";
 
   public static String LATEST_RUN_ID_SELECT_BY_SEQUENCER_PARTITION_CONTAINER_ID =
           "SELECT runId, name, alias, description, accession, platformRunId, pairedEnd, cycles, filePath, securityProfile_profileId, platformType, status_statusId, sequencerReference_sequencerReferenceId " +
@@ -278,6 +295,7 @@ public class SQLRunDAO implements RunStore {
     this.template = template;
   }
 
+  @Override
   public void setCascadeType(CascadeType cascadeType) {
     this.cascadeType = cascadeType;
   }
@@ -438,6 +456,7 @@ public class SQLRunDAO implements RunStore {
     return run.getId();
   }
 
+  @Override
   public synchronized int[] saveAll(Collection<Run> runs) throws IOException {
     log.debug(">>> Entering saveAll with " + runs.size() + " runs");
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
@@ -592,6 +611,7 @@ public class SQLRunDAO implements RunStore {
     return template.query(RUNS_SELECT, new RunMapper(true));
   }
 
+  @Override
   public List<Run> listAllWithLimit(long limit) throws IOException {
     return template.query(RUNS_SELECT_LIMIT, new Object[]{limit}, new RunMapper(true));
   }
@@ -622,6 +642,7 @@ public class SQLRunDAO implements RunStore {
     return template.query(RUNS_SELECT_BY_STATUS_HEALTH, new Object[]{health}, new RunMapper(true));
   }
 
+  @Override
   @Deprecated
   public List<Run> listByExperimentId(long experimentId) throws IOException {
     //return template.query(RUNS_SELECT_BY_RELATED_EXPERIMENT, new Object[]{experimentId, experimentId}, new RunMapper());
@@ -638,16 +659,18 @@ public class SQLRunDAO implements RunStore {
     return template.query(RUNS_SELECT_BY_SEQUENCER_PARTITION_CONTAINER_ID, new Object[]{containerId}, new RunMapper(true));
   }
 
+  @Override
   public Run getLatestStartDateRunBySequencerPartitionContainerId(long containerId) throws IOException {
-    List eResults = template.query(LATEST_RUN_STARTED_SELECT_BY_SEQUENCER_PARTITION_CONTAINER_ID, new Object[]{containerId}, new RunMapper(true));
-    Run r = eResults.size() > 0 ? (Run)eResults.get(0) : null;
+    List<Run> eResults = template.query(LATEST_RUN_STARTED_SELECT_BY_SEQUENCER_PARTITION_CONTAINER_ID, new Object[]{containerId}, new RunMapper(true));
+    Run r = eResults.size() > 0 ? eResults.get(0) : null;
     if (r == null) { r = getLatestRunIdRunBySequencerPartitionContainerId(containerId); }
     return r;
   }
 
+  @Override
   public Run getLatestRunIdRunBySequencerPartitionContainerId(long containerId) throws IOException {
-    List eResults = template.query(LATEST_RUN_ID_SELECT_BY_SEQUENCER_PARTITION_CONTAINER_ID, new Object[]{containerId}, new RunMapper(true));
-    return eResults.size() > 0 ? (Run)eResults.get(0) : null;
+    List<Run> eResults = template.query(LATEST_RUN_ID_SELECT_BY_SEQUENCER_PARTITION_CONTAINER_ID, new Object[]{containerId}, new RunMapper(true));
+    return eResults.size() > 0 ? eResults.get(0) : null;
   }
 
   @Override
@@ -661,20 +684,20 @@ public class SQLRunDAO implements RunStore {
                   )
   )
   public Run get(long runId) throws IOException {
-    List eResults = template.query(RUN_SELECT_BY_ID, new Object[]{runId}, new RunMapper());
-    return eResults.size() > 0 ? (Run) eResults.get(0) : null;
+    List<Run> eResults = template.query(RUN_SELECT_BY_ID, new Object[]{runId}, new RunMapper());
+    return eResults.size() > 0 ? eResults.get(0) : null;
   }
 
   @Override
   public Run getByAlias(String alias) throws IOException {
-    List eResults = template.query(RUN_SELECT_BY_ALIAS, new Object[]{alias}, new RunMapper());
-    return eResults.size() > 0 ? (Run) eResults.get(0) : null;
+    List<Run> eResults = template.query(RUN_SELECT_BY_ALIAS, new Object[]{alias}, new RunMapper());
+    return eResults.size() > 0 ? eResults.get(0) : null;
   }
 
   @Override
   public Run lazyGet(long runId) throws IOException {
-    List eResults = template.query(RUN_SELECT_BY_ID, new Object[]{runId}, new RunMapper(true));
-    return eResults.size() > 0 ? (Run) eResults.get(0) : null;
+    List<Run> eResults = template.query(RUN_SELECT_BY_ID, new Object[]{runId}, new RunMapper(true));
+    return eResults.size() > 0 ? eResults.get(0) : null;
   }
 
   @Override
@@ -709,6 +732,7 @@ public class SQLRunDAO implements RunStore {
       super(Run.class, lazy);
     }
 
+    @Override
     public Run mapRow(ResultSet rs, int rowNum) throws SQLException {
       long id = rs.getLong("runId");
 

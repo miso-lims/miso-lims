@@ -37,6 +37,8 @@ import org.junit.runners.Suite;
  */
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ LimsDAO.class })
+@Suite.SuiteClasses({
+  SQLRunDAOTest.class
+})
 public class AllTestsSuite {
 }
