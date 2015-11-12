@@ -1,4 +1,4 @@
-package uk.ac.bbsrc.tgac.miso.persistence.impl;
+package uk.ac.bbsrc.tgac.miso.persistence;
 
 import java.util.List;
 
