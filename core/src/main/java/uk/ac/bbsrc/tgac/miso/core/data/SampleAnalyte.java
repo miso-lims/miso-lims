@@ -2,48 +2,60 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.util.Date;
 
-import org.codehaus.jackson.annotate.JsonTypeInfo;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
+import com.eaglegenomics.simlims.core.User;
 
-@JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public interface SampleAnalyte {
-  public static final Long UNSAVED_ID = 0L;
 
-  public Long getSampleAnalyteId();
+  Long getSampleAnalyteId();
 
-  public void setSampleAnalyteId(Long sampleAnalyteId);
+  void setSampleAnalyteId(Long sampleAnalyteId);
 
-  public Sample getSample();
+  Sample getSample();
 
-  public void setSample(Sample sample);
+  void setSample(Sample sample);
 
-  public String getPurpose();
+  SamplePurpose getSamplePurpose();
 
-  public void setPurpose(String purpose);
+  void setSamplePurpose(SamplePurpose samplePurpose);
 
-  public String getRegion();
+  SampleGroupId getSampleGroup();
 
-  public void setRegion(String region);
+  void setSampleGroup(SampleGroupId sampleGroup);
 
-  public String getTubeId();
+  TissueMaterial getTissueMaterial();
 
-  public void setTubeId(String tubeId);
+  void setTissueMaterial(TissueMaterial tissueMaterial);
 
-  public Integer getStockNumber();
+  String getRegion();
 
-  public void setStockNumber(Integer stockNumber);
+  void setRegion(String region);
 
-  public Integer getAliquotNumber();
+  String getTubeId();
 
-  public void setAliquotNumber(Integer aliquotNumber);
+  void setTubeId(String tubeId);
 
-  public Date getCreationDate();
+  Integer getStockNumber();
 
-  public void setCreationDate(Date creationDate);
+  void setStockNumber(Integer stockNumber);
 
-  public Date getLastUpdated();
+  Integer getAliquotNumber();
 
-  public void setLastUpdated(Date lastUpdated);
+  void setAliquotNumber(Integer aliquotNumber);
+
+  User getCreatedBy();
+
+  void setCreatedBy(User createdBy);
+
+  Date getCreationDate();
+
+  void setCreationDate(Date creationDate);
+
+  User getUpdatedBy();
+
+  void setUpdatedBy(User updatedBy);
+
+  Date getLastUpdated();
+
+  void setLastUpdated(Date lastUpdated);
 
 }
