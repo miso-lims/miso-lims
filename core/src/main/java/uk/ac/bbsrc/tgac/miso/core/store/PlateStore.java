@@ -23,12 +23,12 @@
 
 package uk.ac.bbsrc.tgac.miso.core.store;
 
+import java.io.IOException;
+import java.util.List;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Plate;
 import uk.ac.bbsrc.tgac.miso.core.data.Plateable;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
-
-import java.io.IOException;
-import java.util.List;
 
 /**
  * Defines a DAO interface for storing Plates

@@ -23,19 +23,22 @@
 
 package uk.ac.bbsrc.tgac.miso.core.event.manager;
 
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-import com.rits.cloning.Cloner;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import com.rits.cloning.Cloner;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-
-import java.io.IOException;
-import java.util.*;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.event.manager

@@ -23,12 +23,16 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.util.Collection;
+import java.util.List;
+
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
-import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
-import java.util.List;
+import com.eaglegenomics.simlims.core.User;
+
+import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
  * A SequencerPartitionContainer describes a collection of {@link Partition} objects that can be used as part of a sequencer {@link Run}.

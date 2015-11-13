@@ -23,12 +23,12 @@
 
 package uk.ac.bbsrc.tgac.miso.core.service.tagbarcode;
 
+import java.util.Map;
+import java.util.Set;
+
 import net.sourceforge.fluxion.spi.Spi;
 import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-
-import java.util.Map;
-import java.util.Set;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.service.tagbarcode

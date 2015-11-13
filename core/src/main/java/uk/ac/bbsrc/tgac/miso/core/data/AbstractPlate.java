@@ -23,15 +23,25 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
-import com.eaglegenomics.simlims.core.User;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.User;
+
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlateMaterialType;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
-
-import javax.persistence.*;
-import java.util.*;
 
 /**
  * Skeleton implementation of a Plate

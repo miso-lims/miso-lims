@@ -7,6 +7,7 @@ import org.springframework.web.bind.support.SessionAttributeStore;
 import org.springframework.web.bind.support.WebBindingInitializer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
+
 import uk.ac.bbsrc.tgac.miso.spring.LimsBindingInitializer;
 import uk.ac.bbsrc.tgac.miso.webapp.util.SessionConversationAttributeStore;
 

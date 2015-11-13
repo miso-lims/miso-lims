@@ -23,7 +23,34 @@
 
 package uk.ac.bbsrc.tgac.miso.core.manager;
 
-import net.sf.json.JSONArray;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URL;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -40,29 +67,25 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
-import uk.ac.bbsrc.tgac.miso.core.data.*;
-import uk.ac.bbsrc.tgac.miso.core.service.submission.*;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
+
+import net.sf.json.JSONArray;
+import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
+import uk.ac.bbsrc.tgac.miso.core.data.Study;
+import uk.ac.bbsrc.tgac.miso.core.data.Submission;
+import uk.ac.bbsrc.tgac.miso.core.data.Submittable;
 import uk.ac.bbsrc.tgac.miso.core.exception.SubmissionException;
 import uk.ac.bbsrc.tgac.miso.core.factory.submission.ERASubmissionFactory;
-
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-import java.io.*;
-import java.net.URI;
-import java.net.URL;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import uk.ac.bbsrc.tgac.miso.core.service.submission.ERAEndpoint;
+import uk.ac.bbsrc.tgac.miso.core.service.submission.EndPoint;
+import uk.ac.bbsrc.tgac.miso.core.service.submission.FTPTransferMethod;
+import uk.ac.bbsrc.tgac.miso.core.service.submission.FilePathGenerator;
+import uk.ac.bbsrc.tgac.miso.core.service.submission.TGACIlluminaFilepathGenerator;
+import uk.ac.bbsrc.tgac.miso.core.service.submission.TransferMethod;
+import uk.ac.bbsrc.tgac.miso.core.service.submission.UploadReport;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
 
 /**
  * Manager class that holds state for a submission connection to the EBI SRA submission service, and facilitates the submission process

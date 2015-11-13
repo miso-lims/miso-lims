@@ -37,6 +37,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
+import com.eaglegenomics.simlims.core.User;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -52,8 +54,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.jackson.LibraryRecursionAvoidanceMixin;
 import uk.ac.bbsrc.tgac.miso.core.util.jackson.SampleProjectAvoidanceMixin;
 import uk.ac.bbsrc.tgac.miso.core.util.jackson.UserInfoMixin;
 import uk.ac.bbsrc.tgac.miso.webapp.util.RestUtils;
-
-import com.eaglegenomics.simlims.core.User;
 
 /**
  * A controller to handle all REST requests for Projects

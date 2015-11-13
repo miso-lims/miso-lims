@@ -23,14 +23,16 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import com.eaglegenomics.simlims.core.User;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
+import java.util.Date;
+import java.util.Queue;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import java.util.Date;
-import java.util.Queue;
+
+import com.eaglegenomics.simlims.core.User;
+
+import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
 
 /**
  * Skeleton implementation of a PrintJob

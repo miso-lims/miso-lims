@@ -23,21 +23,36 @@
 
 package uk.ac.bbsrc.tgac.miso.core.util;
 
-import com.opensymphony.util.XMLUtils;
-import org.w3c.dom.Document;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.zip.GZIPInputStream;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.*;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.zip.GZIPInputStream;
+
+import org.w3c.dom.Document;
+
+import com.opensymphony.util.XMLUtils;
 
 /**
  * Utility class to aid the submission of data to repositories

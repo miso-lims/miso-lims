@@ -23,9 +23,9 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunException;
-
 import java.util.List;
+
+import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunException;
 
 /**
  * Skeleton implementation of a RunQC

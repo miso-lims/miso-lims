@@ -23,11 +23,11 @@
 
 package uk.ac.bbsrc.tgac.miso.core.event.listener;
 
-import uk.ac.bbsrc.tgac.miso.core.event.Event;
-import uk.ac.bbsrc.tgac.miso.core.event.ResponderService;
-
 import java.util.Collection;
 import java.util.EventListener;
+
+import uk.ac.bbsrc.tgac.miso.core.event.Event;
+import uk.ac.bbsrc.tgac.miso.core.event.ResponderService;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.alert

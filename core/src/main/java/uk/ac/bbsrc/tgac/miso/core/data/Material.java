@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import org.codehaus.jackson.annotate.JsonTypeInfo;
+
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**

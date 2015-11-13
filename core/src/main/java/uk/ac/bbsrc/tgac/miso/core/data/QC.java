@@ -23,10 +23,11 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import com.eaglegenomics.simlims.core.Securable;
-import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
-
 import java.util.Date;
+
+import com.eaglegenomics.simlims.core.Securable;
+
+import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 
 /**
  * A QC represents a validation step carried out on a given model object, e.g. a {@link Library} via a {@link LibraryQC}, a {@link Sample}

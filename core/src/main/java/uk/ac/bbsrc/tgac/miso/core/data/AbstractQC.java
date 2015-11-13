@@ -23,12 +23,13 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
+import java.util.Date;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import java.util.Date;
+
+import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 
 /**
  * Skeleton implementation of a QC

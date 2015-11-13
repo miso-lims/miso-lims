@@ -23,10 +23,11 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import org.codehaus.jackson.annotate.JsonTypeInfo;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
 import java.io.IOException;
 import java.net.InetAddress;
+
+import org.codehaus.jackson.annotate.JsonTypeInfo;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 /**
  * A HardwareReference represents a piece of network-connected physical hardware that performs a given task, e.g. a sequencer

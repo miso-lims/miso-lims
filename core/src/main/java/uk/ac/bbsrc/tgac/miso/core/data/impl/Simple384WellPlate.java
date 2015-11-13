@@ -23,13 +23,15 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
-import com.eaglegenomics.simlims.core.User;
+import java.io.Serializable;
+import java.util.LinkedList;
+
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
+import com.eaglegenomics.simlims.core.User;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.type._384WellPlatePosition;
-
-import java.io.Serializable;
-import java.util.*;
 
 /**
  * A concrete Plate implementation representing a Simple 384-well plate, comprising 384 {@link uk.ac.bbsrc.tgac.miso.core.data.Library}s.

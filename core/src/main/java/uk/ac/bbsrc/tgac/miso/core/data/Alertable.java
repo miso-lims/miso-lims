@@ -23,9 +23,9 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
-
 import java.util.Collection;
+
+import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
 
 /**
  * Defines a contract whereby an implementing class is able to be listened to by a MisoListener, thereby raising alerts on given events

@@ -23,10 +23,10 @@
 
 package uk.ac.bbsrc.tgac.miso.core.service.integration;
 
+import java.util.Set;
+
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.strategy.NotificationGateway;
-
-import java.util.Set;
 
 /**
  * A service interface to describe how to load {@link NotificationGateway} services into MISO

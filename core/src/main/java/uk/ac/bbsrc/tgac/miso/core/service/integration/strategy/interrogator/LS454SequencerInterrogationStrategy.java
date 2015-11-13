@@ -23,33 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.core.service.integration.strategy.interrogator;
 
-import net.sf.json.JSON;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import net.sf.json.xml.XMLSerializer;
-import net.sourceforge.fluxion.spi.ServiceProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
-import uk.ac.bbsrc.tgac.miso.core.data.Status;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.service.integration.mechanism.interrogator.MisoPerlDaemonInterrogationMechanism;
-import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
-import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
-import uk.ac.bbsrc.tgac.miso.core.service.integration.contract.InterrogationResult;
-import uk.ac.bbsrc.tgac.miso.core.service.integration.contract.impl.MisoPerlDaemonQuery;
-import uk.ac.bbsrc.tgac.miso.core.service.integration.mechanism.InterrogationMechanism;
-import uk.ac.bbsrc.tgac.miso.core.service.integration.strategy.SequencerInterrogationStrategy;
-import uk.ac.bbsrc.tgac.miso.core.util.UnicodeReader;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -57,6 +30,35 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
+import net.sf.json.JSON;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import net.sf.json.xml.XMLSerializer;
+import net.sourceforge.fluxion.spi.ServiceProvider;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
+import uk.ac.bbsrc.tgac.miso.core.data.Status;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
+import uk.ac.bbsrc.tgac.miso.core.service.integration.contract.InterrogationResult;
+import uk.ac.bbsrc.tgac.miso.core.service.integration.contract.impl.MisoPerlDaemonQuery;
+import uk.ac.bbsrc.tgac.miso.core.service.integration.mechanism.InterrogationMechanism;
+import uk.ac.bbsrc.tgac.miso.core.service.integration.mechanism.interrogator.MisoPerlDaemonInterrogationMechanism;
+import uk.ac.bbsrc.tgac.miso.core.service.integration.strategy.SequencerInterrogationStrategy;
+import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.UnicodeReader;
 
 /**
  * A concrete implementation of a SequencerInterrogationStrategy that can make queries and parse results, supported by a

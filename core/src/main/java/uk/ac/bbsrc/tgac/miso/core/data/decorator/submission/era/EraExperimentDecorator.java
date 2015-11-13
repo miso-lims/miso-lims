@@ -23,14 +23,21 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.decorator.submission.era;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import uk.ac.bbsrc.tgac.miso.core.data.*;
-import uk.ac.bbsrc.tgac.miso.core.data.decorator.AbstractSubmittableDecorator;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
+import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
+import uk.ac.bbsrc.tgac.miso.core.data.Submittable;
+import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
+import uk.ac.bbsrc.tgac.miso.core.data.decorator.AbstractSubmittableDecorator;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 /**
  * Decorates an Experiment so that an ERA Experiment submission XML document can be built from it

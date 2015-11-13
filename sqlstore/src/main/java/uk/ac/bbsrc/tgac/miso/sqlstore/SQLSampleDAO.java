@@ -23,37 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
-import com.eaglegenomics.simlims.core.Note;
-import com.googlecode.ehcache.annotations.*;
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
-import uk.ac.bbsrc.tgac.miso.core.data.Project;
-import com.eaglegenomics.simlims.core.SecurityProfile;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.transaction.annotation.Transactional;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
-import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
-import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.store.*;
-import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
-import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
-import uk.ac.bbsrc.tgac.miso.core.data.*;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleQcException;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
-
-import javax.persistence.CascadeType;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -62,6 +31,53 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
+
+import javax.persistence.CascadeType;
+
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
+import org.springframework.transaction.annotation.Transactional;
+
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
+import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
+import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
+import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleQcException;
+import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
+import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
+import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
+import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
+import uk.ac.bbsrc.tgac.miso.core.store.SampleQcStore;
+import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
+import uk.ac.bbsrc.tgac.miso.core.store.Store;
+import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
+import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
+
+import com.eaglegenomics.simlims.core.Note;
+import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.store.SecurityStore;
+import com.googlecode.ehcache.annotations.Cacheable;
+import com.googlecode.ehcache.annotations.KeyGenerator;
+import com.googlecode.ehcache.annotations.Property;
+import com.googlecode.ehcache.annotations.TriggersRemove;
 
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore
@@ -567,7 +583,6 @@ public class SQLSampleDAO implements SampleStore {
       if (isCacheEnabled() && lookupCache(cacheManager) != null) {
         lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id), s));
       }
-
       return s;
     }
   }

@@ -23,11 +23,11 @@
 
 package uk.ac.bbsrc.tgac.miso.core.store;
 
-import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
-import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
-
 import java.io.IOException;
 import java.util.Collection;
+
+import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
+import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 
 /**
  * Defines a DAO interface for storing LibraryQCs

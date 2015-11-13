@@ -23,15 +23,16 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
+import java.io.Serializable;
+import java.util.LinkedList;
+import java.util.List;
+
 import com.eaglegenomics.simlims.core.User;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.service.plate.Default384WellPlateConversionStrategy;
 import uk.ac.bbsrc.tgac.miso.core.service.plate.PlateConversionStrategy;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-
-import java.io.Serializable;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * A concrete Plate implementation representing a 384-well plate, comprising 4 quartile {@link _96WellPlate}s.

@@ -23,17 +23,19 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
-import com.eaglegenomics.simlims.core.User;
+import java.io.Serializable;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.AutoPopulatingList;
+
+import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.User;
+
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-
-import java.io.Serializable;
-import java.util.List;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.impl

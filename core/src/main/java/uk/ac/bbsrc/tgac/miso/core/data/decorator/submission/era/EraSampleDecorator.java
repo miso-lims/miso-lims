@@ -23,12 +23,14 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.decorator.submission.era;
 
+import java.util.Properties;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.Submittable;
 import uk.ac.bbsrc.tgac.miso.core.data.decorator.AbstractSubmittableDecorator;
-import java.util.Properties;
 
 /**
  * Decorates a Sample so that an ERA submission XML document can be built from it

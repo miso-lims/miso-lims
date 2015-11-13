@@ -23,11 +23,11 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.net.InetAddress;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Abstract class to provide basic methods to encapsulate a reference to a physical machine attached to a sequencer

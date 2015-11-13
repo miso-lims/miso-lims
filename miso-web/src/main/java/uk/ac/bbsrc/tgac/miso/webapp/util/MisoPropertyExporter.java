@@ -23,6 +23,19 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.util;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -31,9 +44,6 @@ import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.util.CollectionUtils;
-
-import java.io.*;
-import java.util.*;
 
 /**
  * A handy class that exposes property placeholders discovered at webapp init time by a PropertyPlaceholderConfigurer.

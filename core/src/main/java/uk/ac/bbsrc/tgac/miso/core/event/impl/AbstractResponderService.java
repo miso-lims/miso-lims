@@ -23,9 +23,16 @@
 
 package uk.ac.bbsrc.tgac.miso.core.event.impl;
 
-import com.eaglegenomics.simlims.core.User;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.eaglegenomics.simlims.core.User;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Watchable;
 import uk.ac.bbsrc.tgac.miso.core.event.Alert;
 import uk.ac.bbsrc.tgac.miso.core.event.AlerterService;
@@ -33,11 +40,6 @@ import uk.ac.bbsrc.tgac.miso.core.event.Event;
 import uk.ac.bbsrc.tgac.miso.core.event.ResponderService;
 import uk.ac.bbsrc.tgac.miso.core.event.alerter.DaoAlerterService;
 import uk.ac.bbsrc.tgac.miso.core.exception.AlertingException;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.event.impl

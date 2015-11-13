@@ -23,7 +23,19 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.context;
 
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Map;
+
+import javax.naming.NamingException;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+import javax.sql.DataSource;
+
 import org.apache.log4j.PropertyConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +53,9 @@ import org.springframework.security.web.authentication.preauth.PreAuthenticatedA
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.context.support.XmlWebApplicationContext;
+
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
 import uk.ac.bbsrc.tgac.miso.core.event.manager.PoolAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.ProjectAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.RunAlertManager;
@@ -66,16 +81,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.runstats.client.manager.RunStatsManager;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
-
-import javax.naming.NamingException;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-import javax.sql.DataSource;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.*;
 
 /**
  * The custom MISO context listener class. On webapp context init, we can do some startup checks, e.g. checking the existence of required

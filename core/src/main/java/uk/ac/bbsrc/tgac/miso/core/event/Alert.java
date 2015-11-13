@@ -23,13 +23,15 @@
 
 package uk.ac.bbsrc.tgac.miso.core.event;
 
-import com.eaglegenomics.simlims.core.User;
+import java.util.Date;
+
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
-import uk.ac.bbsrc.tgac.miso.core.event.type.AlertLevel;
-import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 
-import java.util.Date;
+import com.eaglegenomics.simlims.core.User;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
+import uk.ac.bbsrc.tgac.miso.core.event.type.AlertLevel;
 
 /**
  * Interface describing an alert that can be raised, usually as a result of an {@link Event}

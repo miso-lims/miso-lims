@@ -23,17 +23,20 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.util.Collection;
+import java.util.Date;
+
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
+
+import com.eaglegenomics.simlims.core.User;
+
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedDilutionException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolQcException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
-
-import java.util.Collection;
-import java.util.Date;
 
 /**
  * A Pool represents a collection of one or more {@link Poolable} objects, which enables multiplexing to be modelled if necessary. Pools

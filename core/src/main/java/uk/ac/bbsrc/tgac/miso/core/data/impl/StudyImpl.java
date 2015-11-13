@@ -27,11 +27,11 @@ import java.io.Serializable;
 
 import javax.persistence.Entity;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractStudy;
-import uk.ac.bbsrc.tgac.miso.core.data.Project;
-
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
+
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractStudy;
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
 
 /**
  * Concrete implementation of a Study

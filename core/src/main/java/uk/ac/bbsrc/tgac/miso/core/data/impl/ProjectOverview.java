@@ -23,25 +23,39 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
-import com.eaglegenomics.simlims.core.Note;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-import com.eaglegenomics.simlims.core.User;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.ac.bbsrc.tgac.miso.core.data.*;
+
+import com.eaglegenomics.simlims.core.Note;
+import com.eaglegenomics.simlims.core.User;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Alertable;
+import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.Watchable;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
 import uk.ac.bbsrc.tgac.miso.core.event.model.ProjectOverviewEvent;
 import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import java.io.Serializable;
-import java.util.*;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.data

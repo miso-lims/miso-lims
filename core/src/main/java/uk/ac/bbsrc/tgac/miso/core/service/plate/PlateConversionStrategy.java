@@ -23,10 +23,10 @@
 
 package uk.ac.bbsrc.tgac.miso.core.service.plate;
 
+import java.util.List;
+
 import net.sourceforge.fluxion.spi.Spi;
 import uk.ac.bbsrc.tgac.miso.core.data.Plate;
-
-import java.util.List;
 
 /**
  * An interface that defines how to convert between Lists of {@link Plate} objects. This is usually employed when moving from one Plate well

@@ -23,10 +23,16 @@
 
 package uk.ac.bbsrc.tgac.miso.core.util;
 
-import uk.ac.bbsrc.tgac.miso.core.data.*;
-
 import java.util.Map;
 import java.util.TreeMap;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
+import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.util
@@ -62,8 +68,8 @@ public class RunProcessingUtils {
       if (p != null) {
         for (Dilution ld : p.getDilutions()) {
           count++;
-          sb.append(f.getIdentificationBarcode()).append(",").append(l.getPartitionNumber()).append(",")
-              .append(f.getId()).append("_").append(ld.getLibrary().getName()).append("_").append(ld.getName()).append(",")
+          sb.append(f.getIdentificationBarcode()).append(",").append(l.getPartitionNumber()).append(",").append(f.getId()).append("_")
+              .append(ld.getLibrary().getName()).append("_").append(ld.getName()).append(",")
               .append(ld.getLibrary().getSample().getAlias().replaceAll("\\s", "")).append(",");
 
           if (ld.getLibrary().getTagBarcodes() != null && !ld.getLibrary().getTagBarcodes().isEmpty() && p.getDilutions().size() > 1) {

@@ -35,9 +35,11 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import uk.ac.bbsrc.tgac.miso.core.data.*;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Plate;
+import uk.ac.bbsrc.tgac.miso.core.data.Plateable;
+import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 
 @Controller
 public class ListPlatesController {

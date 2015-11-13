@@ -23,10 +23,17 @@
 
 package uk.ac.bbsrc.tgac.miso.core.service.submission;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.ServiceConfigurationError;
+import java.util.ServiceLoader;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import java.util.*;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.service.integration

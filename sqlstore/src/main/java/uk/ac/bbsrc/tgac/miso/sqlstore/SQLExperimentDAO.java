@@ -23,37 +23,54 @@
 
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
-import com.googlecode.ehcache.annotations.Cacheable;
-import com.googlecode.ehcache.annotations.KeyGenerator;
-import com.googlecode.ehcache.annotations.Property;
-import com.googlecode.ehcache.annotations.TriggersRemove;
+import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.regex.Matcher;
+
+import javax.persistence.CascadeType;
+
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.jdbc.core.*;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.transaction.annotation.Transactional;
+
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractExperiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Kit;
+import uk.ac.bbsrc.tgac.miso.core.data.Platform;
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
+import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.store.*;
+import uk.ac.bbsrc.tgac.miso.core.store.ExperimentStore;
+import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
+import uk.ac.bbsrc.tgac.miso.core.store.PlatformStore;
+import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
+import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
+import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
+import uk.ac.bbsrc.tgac.miso.core.store.Store;
+import uk.ac.bbsrc.tgac.miso.core.store.StudyStore;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
-import uk.ac.bbsrc.tgac.miso.core.data.*;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 
-import javax.persistence.CascadeType;
-import java.io.IOException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.*;
-import java.util.regex.Matcher;
+import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.store.SecurityStore;
+import com.googlecode.ehcache.annotations.Cacheable;
+import com.googlecode.ehcache.annotations.KeyGenerator;
+import com.googlecode.ehcache.annotations.Property;
+import com.googlecode.ehcache.annotations.TriggersRemove;
 
 /**
  * A data access object designed for retrieving Experiments from the LIMS database. This DAO should be configured with a spring

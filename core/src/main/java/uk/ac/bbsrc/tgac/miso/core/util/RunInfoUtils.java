@@ -23,11 +23,11 @@
 
 package uk.ac.bbsrc.tgac.miso.core.util;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility class to grab run info from a sequencer. Deprecated!

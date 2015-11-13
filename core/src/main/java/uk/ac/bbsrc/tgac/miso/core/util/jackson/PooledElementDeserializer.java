@@ -1,5 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.core.util.jackson;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.JsonProcessingException;
@@ -9,10 +13,8 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 
-import java.io.IOException;
-import java.util.*;
+import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.util.jackson

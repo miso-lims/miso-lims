@@ -23,14 +23,15 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
-import com.eaglegenomics.simlims.core.User;
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.Plate;
-import uk.ac.bbsrc.tgac.miso.core.data.Plateable;
-
 import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.Set;
+
+import com.eaglegenomics.simlims.core.User;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.Plate;
+import uk.ac.bbsrc.tgac.miso.core.data.Plateable;
 
 /**
  * A concrete Plate implementation representing a 96-well plate, comprising 96 {@link Library} elements.

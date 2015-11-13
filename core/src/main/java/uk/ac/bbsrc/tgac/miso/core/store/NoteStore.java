@@ -23,15 +23,16 @@
 
 package uk.ac.bbsrc.tgac.miso.core.store;
 
+import java.io.IOException;
+import java.util.List;
+
 import com.eaglegenomics.simlims.core.Note;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
-
-import java.io.IOException;
-import java.util.List;
 
 /**
  * Defines a DAO interface for storing Notes

@@ -23,20 +23,21 @@
 
 package uk.ac.bbsrc.tgac.miso.core.service.integration;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.endpoint.AbstractEndpoint;
 import org.springframework.integration.gateway.GatewayProxyFactoryBean;
 import org.springframework.integration.handler.ServiceActivatingHandler;
+
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.strategy.NotificationConsumerStrategy;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.strategy.NotificationGateway;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Concrete implementation of a {@link NotificationGatewayService} that discovers, via the SPI framework {@link java.util.ServiceLoader},

@@ -23,13 +23,14 @@
 
 package uk.ac.bbsrc.tgac.miso.core.logging;
 
-import net.sf.json.JSONObject;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
+
+import net.sf.json.JSONObject;
 
 /**
  * Defines an aspect whereby the given JoinPoint advice (an execution event, e.g. a DAO save operation) is logged to a particular logger

@@ -23,15 +23,17 @@
 
 package uk.ac.bbsrc.tgac.miso.core.event.impl;
 
-import com.eaglegenomics.simlims.core.User;
-import uk.ac.bbsrc.tgac.miso.core.event.Alert;
-import uk.ac.bbsrc.tgac.miso.core.event.type.AlertLevel;
+import java.io.Serializable;
+import java.util.Date;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import java.io.Serializable;
-import java.util.Date;
+
+import com.eaglegenomics.simlims.core.User;
+
+import uk.ac.bbsrc.tgac.miso.core.event.Alert;
+import uk.ac.bbsrc.tgac.miso.core.event.type.AlertLevel;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.event.impl

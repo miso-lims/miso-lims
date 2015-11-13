@@ -23,6 +23,14 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.context;
 
+import java.io.IOException;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,16 +38,10 @@ import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.session.SessionManagementFilter;
+
 import uk.ac.bbsrc.tgac.miso.core.event.manager.PoolAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.ProjectAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.RunAlertManager;
-
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 
 /**
  * A Spring filter that checks whether a session has expired when doing an AJAX request. Usually, the request would just fail, but this

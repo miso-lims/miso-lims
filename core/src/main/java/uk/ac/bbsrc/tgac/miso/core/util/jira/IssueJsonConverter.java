@@ -23,11 +23,11 @@
 
 package uk.ac.bbsrc.tgac.miso.core.util.jira;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.util.jira

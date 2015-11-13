@@ -23,13 +23,15 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import org.codehaus.jackson.annotate.JsonTypeInfo;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-import com.eaglegenomics.simlims.core.User;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
-
 import java.util.Date;
 import java.util.Queue;
+
+import org.codehaus.jackson.annotate.JsonTypeInfo;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+
+import com.eaglegenomics.simlims.core.User;
+
+import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
 
 /**
  * An interface to describe a print job carried out on a {@link Queue} of printable objects, sent to a MISO {@link MisoPrintService}

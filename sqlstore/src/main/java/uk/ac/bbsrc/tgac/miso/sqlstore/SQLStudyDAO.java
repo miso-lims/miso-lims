@@ -23,44 +23,49 @@
 
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
-import com.googlecode.ehcache.annotations.KeyGenerator;
-import com.googlecode.ehcache.annotations.Property;
+import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.regex.Matcher;
+
+import javax.persistence.CascadeType;
+
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
-import org.springframework.beans.factory.annotation.Autowired;
-import uk.ac.bbsrc.tgac.miso.core.data.Project;
-import com.eaglegenomics.simlims.core.SecurityProfile;
-import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.store.ExperimentStore;
-import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
-import uk.ac.bbsrc.tgac.miso.core.store.Store;
-import uk.ac.bbsrc.tgac.miso.core.store.StudyStore;
-import com.googlecode.ehcache.annotations.Cacheable;
-import com.googlecode.ehcache.annotations.TriggersRemove;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.transaction.annotation.Transactional;
-import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
-import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
+
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractStudy;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
+import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.store.ExperimentStore;
+import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
+import uk.ac.bbsrc.tgac.miso.core.store.Store;
+import uk.ac.bbsrc.tgac.miso.core.store.StudyStore;
+import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
+import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
-import javax.persistence.CascadeType;
-import java.io.IOException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.regex.Matcher;
+import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.store.SecurityStore;
+import com.googlecode.ehcache.annotations.Cacheable;
+import com.googlecode.ehcache.annotations.KeyGenerator;
+import com.googlecode.ehcache.annotations.Property;
+import com.googlecode.ehcache.annotations.TriggersRemove;
 
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore

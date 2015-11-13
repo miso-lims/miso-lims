@@ -24,11 +24,11 @@
 package uk.ac.bbsrc.tgac.miso.core.service.integration.mechanism.interrogator;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
-import uk.ac.bbsrc.tgac.miso.core.util.SequencerInterrogationUtils;
 import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.contract.impl.MisoPerlDaemonQuery;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.contract.impl.MisoPerlDaemonResult;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.mechanism.InterrogationMechanism;
+import uk.ac.bbsrc.tgac.miso.core.util.SequencerInterrogationUtils;
 
 /**
  * A concrete interrogation mechanism that interrogates a queryable SequencerReference with a MisoPerlDaemonQuery that produces a

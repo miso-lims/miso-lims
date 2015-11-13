@@ -26,6 +26,7 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
+
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 
 /**

@@ -23,9 +23,9 @@
 
 package uk.ac.bbsrc.tgac.miso.core.service.printing.strategy;
 
-import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
-
 import java.io.IOException;
+
+import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.service.printing.strategy

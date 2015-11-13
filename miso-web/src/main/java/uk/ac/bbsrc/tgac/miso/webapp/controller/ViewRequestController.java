@@ -29,8 +29,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import com.eaglegenomics.simlims.core.manager.ProtocolManager;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
+import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.webapp.util.RequestControllerHelperLoader;
 
 @Controller

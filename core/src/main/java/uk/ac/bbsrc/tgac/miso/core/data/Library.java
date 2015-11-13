@@ -31,6 +31,9 @@ import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
+import com.eaglegenomics.simlims.core.Note;
+import com.eaglegenomics.simlims.core.User;
+
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
@@ -38,8 +41,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedDilutionException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryQcException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
-
-import com.eaglegenomics.simlims.core.Note;
 
 /**
  * A Library is the first step in constructing sequenceable material from an initial {@link Sample}. A Library is then diluted down to a

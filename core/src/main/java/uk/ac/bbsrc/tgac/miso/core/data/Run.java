@@ -23,18 +23,21 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-import com.eaglegenomics.simlims.core.Note;
-import org.w3c.dom.Document;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunQcException;
-import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
-
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.codehaus.jackson.annotate.JsonTypeInfo;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+import org.w3c.dom.Document;
+
+import com.eaglegenomics.simlims.core.Note;
+import com.eaglegenomics.simlims.core.User;
+
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunQcException;
+import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
  * A Run represents a sequencing run on a single sequencing instrument, referenced by a {@link SequencerReference}, comprising one or more

@@ -23,18 +23,20 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.impl.illumina;
 
-import org.w3c.dom.Document;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
-import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
-import uk.ac.bbsrc.tgac.miso.core.util.UnicodeReader;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+
+import org.w3c.dom.Document;
+
+import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
+import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
+import uk.ac.bbsrc.tgac.miso.core.util.UnicodeReader;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.impl.illumina

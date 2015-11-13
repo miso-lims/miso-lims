@@ -23,14 +23,14 @@
 
 package uk.ac.bbsrc.tgac.miso.core.service.integration.strategy.interrogator;
 
+import java.util.List;
+
 import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.strategy.SequencerInterrogationStrategy;
-
-import java.util.List;
 
 /**
  * This class represents an entry point that couples a SequencerInterrogationStrategy to a SequencerReference, so that reference can be

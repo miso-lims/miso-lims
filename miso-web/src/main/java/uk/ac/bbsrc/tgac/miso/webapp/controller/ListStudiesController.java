@@ -23,7 +23,9 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import java.io.IOException;
+import java.util.Collection;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,10 +34,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
+
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-import java.io.IOException;
-import java.util.Collection;
 
 /**
  * com.eaglegenomics.miso.web

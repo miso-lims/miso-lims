@@ -23,15 +23,29 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
-import com.eaglegenomics.simlims.core.User;
-import org.w3c.dom.Document;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
-import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
-
-import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.w3c.dom.Document;
+
+import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.User;
+
+import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
+import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
  * Skeleton implementation of a Study

@@ -23,15 +23,16 @@
 
 package uk.ac.bbsrc.tgac.miso.core.security;
 
+import java.security.SignatureException;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.encoding.PasswordEncoder;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import java.security.SignatureException;
 
 /**
  * A service class that encodes plaintext passwords into their hashed Base64-encoded counterparts using a specified Spring Security

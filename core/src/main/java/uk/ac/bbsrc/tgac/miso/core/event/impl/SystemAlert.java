@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.core.event.impl;
 
 import com.eaglegenomics.simlims.core.User;
+
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 

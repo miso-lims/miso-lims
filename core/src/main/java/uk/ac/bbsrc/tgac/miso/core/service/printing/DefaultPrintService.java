@@ -23,19 +23,21 @@
 
 package uk.ac.bbsrc.tgac.miso.core.service.printing;
 
-import net.sourceforge.fluxion.spi.ServiceProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
-import uk.ac.bbsrc.tgac.miso.core.exception.MisoPrintException;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.schema.BarcodableSchema;
+import java.io.File;
+import java.io.IOException;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import java.io.File;
-import java.io.IOException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import net.sourceforge.fluxion.spi.ServiceProvider;
+import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
+import uk.ac.bbsrc.tgac.miso.core.exception.MisoPrintException;
+import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
+import uk.ac.bbsrc.tgac.miso.core.service.printing.schema.BarcodableSchema;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.service.printing

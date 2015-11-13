@@ -23,15 +23,17 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.util.Date;
+import java.util.Set;
+
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
+
 import uk.ac.bbsrc.tgac.miso.core.data.type.SubmissionActionType;
 import uk.ac.bbsrc.tgac.miso.core.exception.SubmissionException;
 import uk.ac.bbsrc.tgac.miso.core.manager.SubmissionManager;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
-
-import java.util.*;
 
 /**
  * Created by IntelliJ IDEA. User: davey Date: 10-Feb-2010 Time: 09:43:30

@@ -1,8 +1,8 @@
 package uk.ac.bbsrc.tgac.miso.core.manager;
 
-import net.sf.json.JSONObject;
-
 import java.io.IOException;
+
+import net.sf.json.JSONObject;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.manager

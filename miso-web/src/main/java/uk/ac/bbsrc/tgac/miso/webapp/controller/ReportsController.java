@@ -23,6 +23,32 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.MetaDataAccessException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.ServletRequestBindingException;
+import org.springframework.web.bind.ServletRequestUtils;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.ModelAndView;
+
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller
  * <p/>
@@ -35,34 +61,18 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import com.lowagie.text.Document;
+
 import net.sf.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.MetaDataAccessException;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.ServletRequestBindingException;
-import org.springframework.web.bind.ServletRequestUtils;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.servlet.ModelAndView;
-import uk.ac.bbsrc.tgac.miso.core.data.*;
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractProject;
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.decorator.itext.ITextProjectDecorator;
 import uk.ac.bbsrc.tgac.miso.core.exception.ReportingException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.sql.SQLException;
-import java.util.*;
 
 @RequestMapping("/reports")
 @Controller

@@ -22,11 +22,14 @@
  */
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
-import javax.persistence.*;
+import java.io.Serializable;
+
+import javax.persistence.Entity;
+
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
+
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractProject;
-import java.io.Serializable;
 
 /**
  * Concrete implementation of a Project, inheriting from the simlims core Project

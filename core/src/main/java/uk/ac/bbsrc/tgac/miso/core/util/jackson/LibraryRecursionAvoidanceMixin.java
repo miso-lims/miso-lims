@@ -1,6 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.util.jackson;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 
 /**

@@ -23,17 +23,20 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import com.eaglegenomics.simlims.core.Note;
+import java.util.Collection;
+import java.util.Date;
+
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.w3c.dom.Document;
+
+import com.eaglegenomics.simlims.core.Note;
+import com.eaglegenomics.simlims.core.User;
+
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleQcException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
-
-import java.util.Collection;
-import java.util.Date;
 
 /**
  * A Sample contains information about the original material upon which a sequencing experiment is to be based.

@@ -23,17 +23,34 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Set;
+import java.util.TreeSet;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.w3c.dom.Document;
+
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
-import org.w3c.dom.Document;
+
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleQcException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
-
-import javax.persistence.*;
-import java.util.*;
 
 /**
  * Skeleton implementation of a Sample

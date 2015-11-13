@@ -23,11 +23,26 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
-import com.eaglegenomics.simlims.core.User;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.TreeSet;
+
+import javax.persistence.CascadeType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToOne;
+
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.User;
+
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
 import uk.ac.bbsrc.tgac.miso.core.event.model.PoolEvent;
 import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
@@ -37,9 +52,6 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolQcException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import uk.ac.bbsrc.tgac.miso.core.util.jackson.PooledElementDeserializer;
-
-import javax.persistence.*;
-import java.util.*;
 
 /**
  * Skeleton implementation of a Pool

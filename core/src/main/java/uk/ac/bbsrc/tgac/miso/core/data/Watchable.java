@@ -23,10 +23,11 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import com.eaglegenomics.simlims.core.User;
+import java.util.Set;
+
 import org.codehaus.jackson.annotate.JsonIgnore;
 
-import java.util.Set;
+import com.eaglegenomics.simlims.core.User;
 
 /**
  * A Watchable object can be assigned watchers that will receive alerts upon the occurence of defined events.

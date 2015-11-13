@@ -23,13 +23,14 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
+import java.io.Serializable;
+
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
+
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
 import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-
-import java.io.Serializable;
 
 /**
  * Info

@@ -1,16 +1,17 @@
 package uk.ac.bbsrc.tgac.miso.core.service.naming;
 
-import net.sourceforge.fluxion.spi.ServiceProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
-import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import net.sourceforge.fluxion.spi.ServiceProvider;
+import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
+import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.service.naming

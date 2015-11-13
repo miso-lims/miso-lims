@@ -23,16 +23,17 @@
 
 package uk.ac.bbsrc.tgac.miso.core.service.submission;
 
-import org.apache.commons.net.ftp.FTPClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import uk.ac.bbsrc.tgac.miso.core.exception.SubmissionException;
-import uk.ac.bbsrc.tgac.miso.core.util.TransmissionUtils;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
+import org.apache.commons.net.ftp.FTPClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import uk.ac.bbsrc.tgac.miso.core.exception.SubmissionException;
+import uk.ac.bbsrc.tgac.miso.core.util.TransmissionUtils;
 
 /**
  * Created by IntelliJ IDEA. User: collesa Date: 26/03/12 Time: 13:10 To change this template use File | Settings | File Templates.

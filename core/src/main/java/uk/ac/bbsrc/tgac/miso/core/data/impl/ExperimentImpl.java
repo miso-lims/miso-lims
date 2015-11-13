@@ -23,11 +23,15 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
+import java.io.Serializable;
+
+import javax.persistence.Entity;
+
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
-import uk.ac.bbsrc.tgac.miso.core.data.*;
-import javax.persistence.*;
-import java.io.Serializable;
+
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractExperiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Study;
 
 /**
  * Concrete implementation of an Experiment

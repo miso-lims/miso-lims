@@ -23,15 +23,19 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlateMaterialType;
-import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
-
+import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.codehaus.jackson.annotate.JsonTypeInfo;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+
+import com.eaglegenomics.simlims.core.User;
+
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlateMaterialType;
+import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 /**
  * A Plate represents a collection of sequenceable material, typed by that material object, usually a List of {@link Library} elements of a

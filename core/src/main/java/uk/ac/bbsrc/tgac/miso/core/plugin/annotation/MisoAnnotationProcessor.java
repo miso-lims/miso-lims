@@ -23,6 +23,13 @@
 
 package uk.ac.bbsrc.tgac.miso.core.plugin.annotation;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Writer;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
@@ -32,12 +39,6 @@ import javax.lang.model.util.SimpleElementVisitor6;
 import javax.tools.Diagnostic;
 import javax.tools.FileObject;
 import javax.tools.StandardLocation;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Writer;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * A processor for MISO annotations. You should use this processor when compiling MISO tools, as it extracts metadata encapsulated in

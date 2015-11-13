@@ -23,10 +23,11 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.type;
 
+import java.io.Serializable;
+
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import java.io.Serializable;
 
 /**
  * Provides model access to the underlying MISO LibrarySelectionType lookup table. These types should match the SRA submission schema for

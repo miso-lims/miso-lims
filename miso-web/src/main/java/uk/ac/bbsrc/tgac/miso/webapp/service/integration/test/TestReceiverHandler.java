@@ -23,12 +23,13 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.service.integration.test;
 
-import net.sf.json.JSONObject;
+import java.util.Date;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.integration.Message;
 
-import java.util.Date;
+import net.sf.json.JSONObject;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.service

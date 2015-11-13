@@ -23,15 +23,15 @@
 
 package uk.ac.bbsrc.tgac.miso.core.util;
 
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
-import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
+import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
 
 /**
  * Utility class that provides helpful method to interrogate sequencers using JSON queries sent to a socket running MISOs Perl Interrogation

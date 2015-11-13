@@ -23,21 +23,84 @@
 
 package uk.ac.bbsrc.tgac.miso.core.manager;
 
-import com.eaglegenomics.simlims.core.Note;
-import com.eaglegenomics.simlims.core.SecurityProfile;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.TreeSet;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import uk.ac.bbsrc.tgac.miso.core.data.Project;
-import uk.ac.bbsrc.tgac.miso.core.data.*;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.*;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
-import uk.ac.bbsrc.tgac.miso.core.data.type.*;
-import uk.ac.bbsrc.tgac.miso.core.event.Alert;
-import uk.ac.bbsrc.tgac.miso.core.store.*;
 
-import java.io.IOException;
-import java.util.*;
+import com.eaglegenomics.simlims.core.Note;
+import com.eaglegenomics.simlims.core.SecurityProfile;
+
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
+import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
+import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
+import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Kit;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
+import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
+import uk.ac.bbsrc.tgac.miso.core.data.Plate;
+import uk.ac.bbsrc.tgac.miso.core.data.Plateable;
+import uk.ac.bbsrc.tgac.miso.core.data.Platform;
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
+import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
+import uk.ac.bbsrc.tgac.miso.core.data.Status;
+import uk.ac.bbsrc.tgac.miso.core.data.Study;
+import uk.ac.bbsrc.tgac.miso.core.data.Submission;
+import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCR;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
+import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
+import uk.ac.bbsrc.tgac.miso.core.event.Alert;
+import uk.ac.bbsrc.tgac.miso.core.store.AlertStore;
+import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
+import uk.ac.bbsrc.tgac.miso.core.store.EmPCRDilutionStore;
+import uk.ac.bbsrc.tgac.miso.core.store.EmPCRStore;
+import uk.ac.bbsrc.tgac.miso.core.store.EntityGroupStore;
+import uk.ac.bbsrc.tgac.miso.core.store.ExperimentStore;
+import uk.ac.bbsrc.tgac.miso.core.store.KitStore;
+import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
+import uk.ac.bbsrc.tgac.miso.core.store.LibraryQcStore;
+import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
+import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
+import uk.ac.bbsrc.tgac.miso.core.store.PartitionStore;
+import uk.ac.bbsrc.tgac.miso.core.store.PlateStore;
+import uk.ac.bbsrc.tgac.miso.core.store.PlatformStore;
+import uk.ac.bbsrc.tgac.miso.core.store.PoolQcStore;
+import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
+import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
+import uk.ac.bbsrc.tgac.miso.core.store.RunQcStore;
+import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
+import uk.ac.bbsrc.tgac.miso.core.store.SampleQcStore;
+import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
+import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
+import uk.ac.bbsrc.tgac.miso.core.store.SequencerReferenceStore;
+import uk.ac.bbsrc.tgac.miso.core.store.StatusStore;
+import uk.ac.bbsrc.tgac.miso.core.store.Store;
+import uk.ac.bbsrc.tgac.miso.core.store.StudyStore;
 
 /**
  * Implementation of a RequestManager to facilitate persistence operations on MISO model objects

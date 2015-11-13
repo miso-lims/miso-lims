@@ -23,19 +23,23 @@
 
 package uk.ac.bbsrc.tgac.miso.core.util;
 
+import static org.apache.commons.net.io.Util.copyStream;
+
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.NoRouteToHostException;
+import java.net.UnknownHostException;
+import java.util.List;
+
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
 import org.apache.commons.net.io.CopyStreamListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.*;
-import java.net.NoRouteToHostException;
-import java.net.UnknownHostException;
-import java.util.List;
-
-import static org.apache.commons.net.io.Util.*;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.util
