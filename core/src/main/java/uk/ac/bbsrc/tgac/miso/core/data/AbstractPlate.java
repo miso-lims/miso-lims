@@ -35,7 +35,7 @@ import java.util.*;
 
 /**
  * Skeleton implementation of a Plate
- *
+ * 
  * @author Rob Davey
  * @date 05-Sep-2011
  * @since 0.1.1
@@ -79,6 +79,7 @@ public abstract class AbstractPlate<T extends List<S>, S extends Plateable> impl
     return plateId;
   }
 
+  @Override
   public void setId(long id) {
     this.plateId = id;
   }
@@ -148,6 +149,7 @@ public abstract class AbstractPlate<T extends List<S>, S extends Plateable> impl
   @Override
   public abstract Class getElementType();
 
+  @Override
   public abstract Collection<S> getInternalPoolableElements();
 
   @Override
@@ -170,24 +172,26 @@ public abstract class AbstractPlate<T extends List<S>, S extends Plateable> impl
     this.locationBarcode = locationBarcode;
   }
 
+  @Override
   public String getLabelText() {
-    return getTagBarcode().getSequence() + "("+getElementType().getSimpleName() + " " + getPlateMaterialType().getKey()+")";
+    return getTagBarcode().getSequence() + "(" + getElementType().getSimpleName() + " " + getPlateMaterialType().getKey() + ")";
   }
 
+  @Override
   public Date getLastUpdated() {
     return lastUpdated;
   }
 
+  @Override
   public void setLastUpdated(Date lastUpdated) {
     this.lastUpdated = lastUpdated;
   }
 
   @Override
   public boolean isDeletable() {
-    return getId() != AbstractPlate.UNSAVED_ID &&
-           (getElements() == null || getElements().isEmpty());
+    return getId() != AbstractPlate.UNSAVED_ID && (getElements() == null || getElements().isEmpty());
   }
-  
+
   @Override
   public boolean userCanRead(User user) {
     return securityProfile.userCanRead(user);
@@ -212,29 +216,22 @@ public abstract class AbstractPlate<T extends List<S>, S extends Plateable> impl
   public void inheritPermissions(SecurableByProfile parent) throws SecurityException {
     if (parent.getSecurityProfile().getOwner() != null) {
       setSecurityProfile(parent.getSecurityProfile());
-    }
-    else {
+    } else {
       throw new SecurityException("Cannot inherit permissions when parent object owner is not set!");
     }
   }
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null)
-      return false;
-    if (obj == this)
-      return true;
-    if (!(obj instanceof AbstractPlate))
-      return false;
+    if (obj == null) return false;
+    if (obj == this) return true;
+    if (!(obj instanceof AbstractPlate)) return false;
     AbstractPlate them = (AbstractPlate) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
-    if (getId() == AbstractPlate.UNSAVED_ID
-        || them.getId() == AbstractPlate.UNSAVED_ID) {
-      return getName().equals(them.getName()) &&
-             getPlateMaterialType().equals(them.getPlateMaterialType());
-    }
-    else {
+    if (getId() == AbstractPlate.UNSAVED_ID || them.getId() == AbstractPlate.UNSAVED_ID) {
+      return getName().equals(them.getName()) && getPlateMaterialType().equals(them.getPlateMaterialType());
+    } else {
       return this.getId() == them.getId();
     }
   }
@@ -242,9 +239,8 @@ public abstract class AbstractPlate<T extends List<S>, S extends Plateable> impl
   @Override
   public int hashCode() {
     if (getId() != AbstractPlate.UNSAVED_ID) {
-      return (int)getId();
-    }
-    else {
+      return (int) getId();
+    } else {
       final int PRIME = 37;
       int hashcode = -1;
       if (getName() != null) hashcode = PRIME * hashcode + getName().hashCode();
@@ -255,12 +251,11 @@ public abstract class AbstractPlate<T extends List<S>, S extends Plateable> impl
 
   @Override
   public int compareTo(Object o) {
-    Plate t = (Plate)o;
+    Plate t = (Plate) o;
     if (getId() != 0L && t.getId() != 0L) {
       if (getId() < t.getId()) return -1;
       if (getId() > t.getId()) return 1;
-    }
-    else if (getName() != null && t.getName() != null) {
+    } else if (getName() != null && t.getName() != null) {
       return getName().compareTo(t.getName());
     }
     return 0;
@@ -275,5 +270,5 @@ public abstract class AbstractPlate<T extends List<S>, S extends Plateable> impl
     sb.append(" : ");
     sb.append(getDescription());
     return sb.toString();
-  }  
+  }
 }

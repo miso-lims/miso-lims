@@ -23,7 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.core.store;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 
 import java.io.IOException;
@@ -31,56 +30,52 @@ import java.util.Collection;
 
 /**
  * Defines a DAO interface for storing Partitions
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public interface PartitionStore extends Store<SequencerPoolPartition>, Cascadable, Remover<SequencerPoolPartition> {
   /**
-   * Retrieve a Partition from an underlying data store given a Partition ID
-   * <p/>
-   * This method intends to retrieve objects in an 'ignorant' fashion, i.e.  will not populate
-   * parent or child objects that could lead to a circular dependency
-   *
-   * @param partitionId of type long
-   * @return Partition
-   * @throws java.io.IOException when
-   */
-  //SequencerPoolPartition lazyGet(long partitionId) throws IOException;
-
-  /**
    * List all Partitions that are part of a Run given a Run ID
-   *
-   * @param runId of type long
+   * 
+   * @param runId
+   *          of type long
    * @return Collection<Partition>
-   * @throws java.io.IOException when
+   * @throws java.io.IOException
+   *           when
    */
   Collection<SequencerPoolPartition> listByRunId(long runId) throws IOException;
 
   /**
    * List all Partitions on a parent SequencerPartitionContainer given a SequencerPartitionContainer ID
-   *
-   * @param sequencerPartitionContainerId of type long
+   * 
+   * @param sequencerPartitionContainerId
+   *          of type long
    * @return Collection<Partition>
-   * @throws java.io.IOException when
+   * @throws java.io.IOException
+   *           when
    */
   Collection<SequencerPoolPartition> listBySequencerPartitionContainerId(long sequencerPartitionContainerId) throws IOException;
 
   /**
    * List all Partitions that hold an Pool given a Pool ID
-   *
-   * @param poolId of type long
+   * 
+   * @param poolId
+   *          of type long
    * @return Collection<Partition>
-   * @throws java.io.IOException when
+   * @throws java.io.IOException
+   *           when
    */
   Collection<SequencerPoolPartition> listByPoolId(long poolId) throws IOException;
 
   /**
    * List all Partitions that are part of a Submission given a Submission ID
-   *
-   * @param submissionId of type long
+   * 
+   * @param submissionId
+   *          of type long
    * @return Collection<Partition>
-   * @throws java.io.IOException when
+   * @throws java.io.IOException
+   *           when
    */
   Collection<SequencerPoolPartition> listBySubmissionId(long submissionId) throws IOException;
 }

@@ -10,7 +10,7 @@ import java.util.*;
  * <p/>
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 29/08/12
  * @since 0.1.7
@@ -25,12 +25,10 @@ public class MisoNameGeneratorResolverService implements NameGeneratorResolverSe
       if (generator.getGeneratorName().equals(generatorName)) {
         try {
           return generator.getClass().newInstance();
-        }
-        catch (InstantiationException e) {
+        } catch (InstantiationException e) {
           log.error("Cannot create a new instance of '" + generatorName + "'", e);
           e.printStackTrace();
-        }
-        catch (IllegalAccessException e) {
+        } catch (IllegalAccessException e) {
           log.error("Cannot create a new instance of '" + generatorName + "'", e);
           e.printStackTrace();
         }
@@ -42,7 +40,7 @@ public class MisoNameGeneratorResolverService implements NameGeneratorResolverSe
 
   @Override
   public Collection<NameGenerator<?>> getNameGenerators() {
-    //lazily load available generators
+    // lazily load available generators
     if (contextMap == null) {
       ServiceLoader<? extends NameGenerator> consumerLoader = ServiceLoader.load(NameGenerator.class);
       Iterator<? extends NameGenerator> consumerIterator = consumerLoader.iterator();
@@ -53,11 +51,10 @@ public class MisoNameGeneratorResolverService implements NameGeneratorResolverSe
 
         if (!contextMap.containsKey(p.getGeneratorName())) {
           contextMap.put(p.getGeneratorName(), p);
-        }
-        else {
+        } else {
           if (contextMap.get(p.getGeneratorName()) != p) {
-            String msg = "Multiple different Name Generators with the same scheme name " +
-                         "('" + p.getGeneratorName() + "') are present on the classpath. Generator names must be unique.";
+            String msg = "Multiple different Name Generators with the same scheme name " + "('" + p.getGeneratorName()
+                + "') are present on the classpath. Generator names must be unique.";
             log.error(msg);
             throw new ServiceConfigurationError(msg);
           }

@@ -27,7 +27,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.integration.contract.InterrogationQuer
 
 /**
  * A class that can build queries that can be consumed by the MISO Interrogation Daemon
- *
+ * 
  * @author Rob Davey
  * @date 07-Oct-2010
  * @since 0.0.2
@@ -39,9 +39,11 @@ public class MisoPerlDaemonQuery implements InterrogationQuery<String> {
 
   /**
    * Creates a new MisoPerlDaemonQuery instance with no run specified. This will produce lists of all runs that meet the query parameters.
-   *
-   * @param platform of type String
-   * @param type of type String
+   * 
+   * @param platform
+   *          of type String
+   * @param type
+   *          of type String
    */
   public MisoPerlDaemonQuery(String platform, String type) {
     this.platform = platform;
@@ -49,11 +51,15 @@ public class MisoPerlDaemonQuery implements InterrogationQuery<String> {
   }
 
   /**
-   * Creates a new MisoPerlDaemonQuery instance with a run specified. This will produce information about the given run that meets the query parameters.
-   *
-   * @param platform of type String
-   * @param runId of type String
-   * @param type of type String
+   * Creates a new MisoPerlDaemonQuery instance with a run specified. This will produce information about the given run that meets the query
+   * parameters.
+   * 
+   * @param platform
+   *          of type String
+   * @param runId
+   *          of type String
+   * @param type
+   *          of type String
    */
   public MisoPerlDaemonQuery(String platform, String runId, String type) {
     this.platform = platform;
@@ -63,26 +69,16 @@ public class MisoPerlDaemonQuery implements InterrogationQuery<String> {
 
   /**
    * Returns the query String that this query object represents
+   * 
    * @return String
    */
+  @Override
   public String generateQuery() {
     if (runId != null) {
-      return "{'query':" +
-            "{'run':" +
-            "[" +
-            "{'platform':'"+platform+"','type':'"+type+"','runId':'"+runId+"'}" +
-            "]" +
-            "}" +
-            "}\n";
-    }
-    else {
-      return "{'query':" +
-            "{'run':" +
-            "[" +
-            "{'platform':'"+platform+"','type':'"+type+"'}" +
-            "]" +
-            "}" +
-            "}\n";
+      return "{'query':" + "{'run':" + "[" + "{'platform':'" + platform + "','type':'" + type + "','runId':'" + runId + "'}" + "]" + "}"
+          + "}\n";
+    } else {
+      return "{'query':" + "{'run':" + "[" + "{'platform':'" + platform + "','type':'" + type + "'}" + "]" + "}" + "}\n";
     }
   }
 }

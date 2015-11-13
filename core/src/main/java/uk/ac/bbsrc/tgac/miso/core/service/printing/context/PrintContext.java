@@ -23,15 +23,15 @@
 
 package uk.ac.bbsrc.tgac.miso.core.service.printing.context;
 
-import net.sourceforge.fluxion.spi.Spi;
-
 import java.io.IOException;
+
+import net.sourceforge.fluxion.spi.Spi;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.service.printing.context
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 30-Jun-2011
  * @since 0.0.3
@@ -39,7 +39,10 @@ import java.io.IOException;
 @Spi
 public interface PrintContext<T> {
   boolean print(T content) throws IOException;
+
   public String getName();
+
   public String getDescription();
+
   public String getHost();
 }

@@ -27,82 +27,75 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Created by IntelliJ IDEA.
- * User: collesa
- * Date: 26/04/12
- * Time: 17:18
- * To change this template use File | Settings | File Templates.
+ * Created by IntelliJ IDEA. User: collesa Date: 26/04/12 Time: 17:18 To change this template use File | Settings | File Templates.
  */
 public class FTPUploadReport implements UploadReport {
-    private List<UploadJob> uploadJobs=new ArrayList<UploadJob>() {
-    };
+  private List<UploadJob> uploadJobs = new ArrayList<UploadJob>() {
+  };
 
-    private String status;
-    private String message;
-    protected static final Logger log = LoggerFactory.getLogger(FTPUploadReport.class);
-    public FTPUploadReport(List<FTPUploadJob> FTPUploadJobs) {
-           log.debug("FTPUploadReport has been created for submission:" );
+  private String status;
+  private String message;
+  protected static final Logger log = LoggerFactory.getLogger(FTPUploadReport.class);
 
-           //this.uploadJobs = FTPUploadJobs;
+  public FTPUploadReport(List<FTPUploadJob> FTPUploadJobs) {
+    log.debug("FTPUploadReport has been created for submission:");
 
-           for(FTPUploadJob up: FTPUploadJobs){
-               log.debug("UploadJob: " + up.getFile() +" "+ up.getPercentageTransferred()+"% complete");
+    for (FTPUploadJob up : FTPUploadJobs) {
+      log.debug("UploadJob: " + up.getFile() + " " + up.getPercentageTransferred() + "% complete");
 
-               uploadJobs.add(up);
-           }
-       }
+      uploadJobs.add(up);
+    }
+  }
 
-    @Override
-    public void setStatus(String status) {
-        this.status=status;
+  @Override
+  public void setStatus(String status) {
+    this.status = status;
+  }
+
+  @Override
+  public void setMessage(String message) {
+    this.message = message;
+  }
+
+  @Override
+  public String getStatus() {
+    return status; // To change body of implemented methods use File | Settings | File Templates.
+  }
+
+  @Override
+  public String getMessage() {
+    return message; // To change body of implemented methods use File | Settings | File Templates.
+  }
+
+  @Override
+  public Map<String, Object> getUploadReport() {
+    Map report = new HashMap<String, Object>();
+    for (UploadJob up : uploadJobs) {
+      report.put(up.getFile().getName(), up.getPercentageTransferred());
+      log.debug(up.getFile().getName());
     }
 
-    @Override
-    public void setMessage(String message) {
-        this.message=message;
-    }
+    return report;
+  }
 
-    @Override
-    public String getStatus() {
-        return status;  //To change body of implemented methods use File | Settings | File Templates.
-    }
+  @Override
+  public List<UploadJob> getUploadJobs() {
+    return uploadJobs;
+  }
 
-    @Override
-    public String getMessage() {
-        return message;  //To change body of implemented methods use File | Settings | File Templates.
-    }
+  @Override
+  public UploadJob getUploadJobByFile() {
+    return uploadJobs.iterator().next(); // To change body of implemented methods use File | Settings | File Templates.
+  }
 
-
-
-    public Map<String, Object> getUploadReport(){
-        Map report= new HashMap<String, Object>();
-        for (UploadJob up: uploadJobs){
-            report.put(up.getFile().getName(),up.getPercentageTransferred());
-            log.debug(up.getFile().getName());
-        }
-
-        return report;
-    }
-
-
-    @Override
-    public List<UploadJob> getUploadJobs() {
-        return uploadJobs;
-    }
-
-    @Override
-    public UploadJob getUploadJobByFile() {
-        return uploadJobs.iterator().next();  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public UploadJob getUploadJobByIndex() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
+  @Override
+  public UploadJob getUploadJobByIndex() {
+    return null; // To change body of implemented methods use File | Settings | File Templates.
+  }
 
 }

@@ -32,21 +32,18 @@ import java.util.Map;
  * uk.ac.bbsrc.tgac.miso.core.data.type
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 01-Aug-2011
  * @since 0.0.3
  */
 public enum PlateMaterialType {
-  BACTERIA("Bacteria"),
-  DNA("DNA"),
-  RAD("RAD"),
-  NEXTERA("Nextera");
+  BACTERIA("Bacteria"), DNA("DNA"), RAD("RAD"), NEXTERA("Nextera");
 
-  /** Field key  */
+  /** Field key */
   private String key;
 
-  /** Field lookup  */
+  /** Field lookup */
   private static final Map<String, PlateMaterialType> lookup = new HashMap<String, PlateMaterialType>();
 
   static {
@@ -56,8 +53,9 @@ public enum PlateMaterialType {
 
   /**
    * Constructs a PlateMaterialType based on a given key
-   *
-   * @param key of type String
+   * 
+   * @param key
+   *          of type String
    */
   PlateMaterialType(String key) {
     this.key = key;
@@ -65,8 +63,9 @@ public enum PlateMaterialType {
 
   /**
    * Returns a SubmissionActionType given an enum key
-   *
-   * @param key of type String
+   * 
+   * @param key
+   *          of type String
    * @return SubmissionActionType
    */
   public static PlateMaterialType get(String key) {
@@ -75,7 +74,7 @@ public enum PlateMaterialType {
 
   /**
    * Returns the key of this PlateMaterialType enum.
-   *
+   * 
    * @return String key.
    */
   public String getKey() {
@@ -84,7 +83,7 @@ public enum PlateMaterialType {
 
   /**
    * Returns the keys of this PlateMaterialType enum.
-   *
+   * 
    * @return ArrayList<String> keys.
    */
   public static ArrayList<String> getKeys() {
@@ -95,4 +94,3 @@ public enum PlateMaterialType {
     return keys;
   }
 }
-

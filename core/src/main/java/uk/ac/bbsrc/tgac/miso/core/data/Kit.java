@@ -23,9 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-//import com.fasterxml.jackson.annotation.*;
-//import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import com.eaglegenomics.simlims.core.Note;
@@ -34,19 +31,18 @@ import java.util.Collection;
 import java.util.Date;
 
 /**
- * A Kit represents a consumable that can be used as part of a lab procedure, whereby its type is described by a
- * {@link KitDescriptor} and its actual existence by a lot number. {@link Note} objects can be added to Kits.
- *
+ * A Kit represents a consumable that can be used as part of a lab procedure, whereby its type is described by a {@link KitDescriptor} and
+ * its actual existence by a lot number. {@link Note} objects can be added to Kits.
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
-//@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public interface Kit extends Comparable, Barcodable, Locatable {
   /**
    * Returns the kitId of this Kit object.
-   *
+   * 
    * @return Long kitId.
    */
   @Deprecated
@@ -54,9 +50,10 @@ public interface Kit extends Comparable, Barcodable, Locatable {
 
   /**
    * Sets the kitId of this Kit object.
-   *
-   * @param kitId the id of this Kit object.
-   *
+   * 
+   * @param kitId
+   *          the id of this Kit object.
+   * 
    */
   @Deprecated
   void setKitId(Long kitId);
@@ -65,68 +62,73 @@ public interface Kit extends Comparable, Barcodable, Locatable {
 
   /**
    * Returns the lotNumber of this Kit object.
-   *
+   * 
    * @return String lotNumber.
    */
   String getLotNumber();
 
   /**
    * Sets the lotNumber of this Kit object.
-   *
-   * @param lotNumber the Kit lot number.
-   *
+   * 
+   * @param lotNumber
+   *          the Kit lot number.
+   * 
    */
   void setLotNumber(String lotNumber);
 
   /**
    * Returns the kitDate of this Kit object.
-   *
+   * 
    * @return Date kitDate.
    */
   Date getKitDate();
 
   /**
    * Sets the kitDate of this Kit object.
-   *
-   * @param kitDate kitDate.
-   *
+   * 
+   * @param kitDate
+   *          kitDate.
+   * 
    */
   void setKitDate(Date kitDate);
 
   /**
    * Returns the notes of this Kit object.
-   *
+   * 
    * @return Collection<Note> notes.
    */
   Collection<Note> getNotes();
 
   /**
    * Returns the kitDescriptor of this Kit object.
-   *
+   * 
    * @return {@link KitDescriptor} kitDescriptor.
    */
   KitDescriptor getKitDescriptor();
 
   /**
    * Sets the kitDescriptor of this Kit object.
-   *
-   * @param kd kitDescriptor.
-   *
+   * 
+   * @param kd
+   *          kitDescriptor.
+   * 
    */
   void setKitDescriptor(KitDescriptor kd);
 
   /**
    * Sets the notes of this Kit object.
-   *
-   * @param notes notes.
-   *
+   * 
+   * @param notes
+   *          notes.
+   * 
    */
   void setNotes(Collection<Note> notes);
 
   /**
    * Add a note to this Kit
-   *
-   * @param note of type {@link Note}
+   * 
+   * @param note
+   *          of type {@link Note}
    */
   void addNote(Note note);
 }

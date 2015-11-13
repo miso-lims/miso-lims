@@ -46,7 +46,7 @@ import java.util.Collection;
 
 /**
  * A controller to handle all REST requests for Runs
- *
+ * 
  * @author Rob Davey
  * @date 01-Sep-2011
  * @since 0.1.0
@@ -80,8 +80,7 @@ public class RunRestController {
         return mapper.writeValueAsString(r);
       }
       return mapper.writeValueAsString(RestUtils.error("No such run with that ID.", "runId", runId.toString()));
-    }
-    catch (IOException ioe) {
+    } catch (IOException ioe) {
       return mapper.writeValueAsString(RestUtils.error("Cannot retrieve run: " + ioe.getMessage(), "runId", runId.toString()));
     }
   }
@@ -97,8 +96,7 @@ public class RunRestController {
         return mapper.writeValueAsString(r);
       }
       return mapper.writeValueAsString(RestUtils.error("No such run with that alias.", "runAlias", runAlias.toString()));
-    }
-    catch (IOException ioe) {
+    } catch (IOException ioe) {
       return mapper.writeValueAsString(RestUtils.error("Cannot retrieve run: " + ioe.getMessage(), "runAlias", runAlias));
     }
   }
@@ -115,7 +113,7 @@ public class RunRestController {
     }
     return RestUtils.error("No such run with that alias.", "runAlias", runAlias.toString()).toString();
   }
-  
+
   @RequestMapping(method = RequestMethod.GET)
   public @ResponseBody String listAllRuns() throws IOException {
     Collection<Run> lr = requestManager.listAllRuns();

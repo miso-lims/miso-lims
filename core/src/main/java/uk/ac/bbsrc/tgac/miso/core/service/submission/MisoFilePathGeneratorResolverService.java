@@ -26,16 +26,13 @@ package uk.ac.bbsrc.tgac.miso.core.service.submission;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.PrintContextResolverService;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
-
 import java.util.*;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.service.integration
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 03/02/12
  * @since 0.1.5
@@ -50,12 +47,10 @@ public class MisoFilePathGeneratorResolverService implements FilePathGeneratorRe
       if (generator.generatesFilePathsFor() != null && generator.generatesFilePathsFor().equals(platformType)) {
         try {
           return generator.getClass().newInstance();
-        }
-        catch (InstantiationException e) {
+        } catch (InstantiationException e) {
           log.error("Cannot create a new instance of '" + generator.getName() + "'", e);
           e.printStackTrace();
-        }
-        catch (IllegalAccessException e) {
+        } catch (IllegalAccessException e) {
           log.error("Cannot create a new instance of '" + generator.getName() + "'", e);
           e.printStackTrace();
         }
@@ -71,12 +66,10 @@ public class MisoFilePathGeneratorResolverService implements FilePathGeneratorRe
       if (generator.getName().equals(generatorName)) {
         try {
           return generator.getClass().newInstance();
-        }
-        catch (InstantiationException e) {
+        } catch (InstantiationException e) {
           log.error("Cannot create a new instance of '" + generatorName + "'", e);
           e.printStackTrace();
-        }
-        catch (IllegalAccessException e) {
+        } catch (IllegalAccessException e) {
           log.error("Cannot create a new instance of '" + generatorName + "'", e);
           e.printStackTrace();
         }
@@ -88,7 +81,7 @@ public class MisoFilePathGeneratorResolverService implements FilePathGeneratorRe
 
   @Override
   public Collection<FilePathGenerator> getFilePathGenerators() {
-    //lazily load available contexts
+    // lazily load available contexts
     if (contextMap == null) {
       ServiceLoader<FilePathGenerator> consumerLoader = ServiceLoader.load(FilePathGenerator.class);
       Iterator<FilePathGenerator> consumerIterator = consumerLoader.iterator();
@@ -99,11 +92,10 @@ public class MisoFilePathGeneratorResolverService implements FilePathGeneratorRe
 
         if (!contextMap.containsKey(p.getName())) {
           contextMap.put(p.getName(), p);
-        }
-        else {
+        } else {
           if (contextMap.get(p.getName()) != p) {
-            String msg = "Multiple different FilePathGenerators with the same context name " +
-                         "('" + p.getName() + "') are present on the classpath. Generator names must be unique.";
+            String msg = "Multiple different FilePathGenerators with the same context name " + "('" + p.getName()
+                + "') are present on the classpath. Generator names must be unique.";
             log.error(msg);
             throw new ServiceConfigurationError(msg);
           }

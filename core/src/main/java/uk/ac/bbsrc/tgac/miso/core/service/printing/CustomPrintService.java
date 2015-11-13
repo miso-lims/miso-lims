@@ -23,25 +23,28 @@
 
 package uk.ac.bbsrc.tgac.miso.core.service.printing;
 
-import net.sf.json.JSONObject;
-import net.sourceforge.fluxion.spi.ServiceProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import uk.ac.bbsrc.tgac.miso.core.exception.MisoPrintException;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.schema.BarcodableSchema;
+import java.io.File;
+import java.io.IOException;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import java.io.File;
-import java.io.IOException;
+
+import net.sf.json.JSONObject;
+import net.sourceforge.fluxion.spi.ServiceProvider;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import uk.ac.bbsrc.tgac.miso.core.exception.MisoPrintException;
+import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
+import uk.ac.bbsrc.tgac.miso.core.service.printing.schema.BarcodableSchema;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.service.printing
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 30-Jun-2011
  * @since 0.0.3
@@ -58,7 +61,6 @@ public class CustomPrintService implements MisoPrintService<File, JSONObject, Pr
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long serviceId = -1L;
-
 
   @Override
   public long getServiceId() {
@@ -100,11 +102,13 @@ public class CustomPrintService implements MisoPrintService<File, JSONObject, Pr
     this.pc = pc;
   }
 
-  public BarcodableSchema<File, JSONObject> getBarcodableSchema(){
+  @Override
+  public BarcodableSchema<File, JSONObject> getBarcodableSchema() {
     return barcodableSchema;
   }
 
-  public void setBarcodableSchema(BarcodableSchema<File, JSONObject> barcodableSchema){
+  @Override
+  public void setBarcodableSchema(BarcodableSchema<File, JSONObject> barcodableSchema) {
     this.barcodableSchema = barcodableSchema;
   }
 
@@ -113,12 +117,10 @@ public class CustomPrintService implements MisoPrintService<File, JSONObject, Pr
     if (pc != null) {
       if (isEnabled()) {
         return pc.print(content);
-      }
-      else {
+      } else {
         throw new IOException("Printer " + getName() + " is not enabled.");
       }
-    }
-    else {
+    } else {
       throw new IOException("No PrintContext specified");
     }
   }
@@ -138,10 +140,9 @@ public class CustomPrintService implements MisoPrintService<File, JSONObject, Pr
     BarcodableSchema<File, JSONObject> bs = getBarcodableSchema();
     if (bs != null) {
       return bs.getPrintableLabel(b);
-    }
-    else {
-      throw new MisoPrintException("No barcodable schema set for '"+getName()+"' service. Make sure a schema is set in the " +
-                                   "printer administration page");
+    } else {
+      throw new MisoPrintException(
+          "No barcodable schema set for '" + getName() + "' service. Make sure a schema is set in the " + "printer administration page");
     }
   }
 

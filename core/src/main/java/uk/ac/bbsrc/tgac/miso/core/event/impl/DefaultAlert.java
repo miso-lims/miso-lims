@@ -37,7 +37,7 @@ import java.util.Date;
  * uk.ac.bbsrc.tgac.miso.core.event.impl
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 07/10/11
  * @since 0.1.2
@@ -136,7 +136,7 @@ public class DefaultAlert implements Alert, Serializable {
 
   @Override
   public int compareTo(Object o) {
-    Alert a = (Alert)o;
+    Alert a = (Alert) o;
     if (getAlertId() != null && a.getAlertId() != null) {
       if (getAlertId() < a.getAlertId()) return -1;
       if (getAlertId() > a.getAlertId()) return 1;

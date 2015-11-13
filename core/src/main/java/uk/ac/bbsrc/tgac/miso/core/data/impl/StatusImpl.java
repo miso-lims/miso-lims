@@ -35,7 +35,7 @@ import java.util.Date;
  * uk.ac.bbsrc.tgac.miso.core.data.impl
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -51,7 +51,7 @@ public class StatusImpl implements Status, Serializable {
   @Enumerated(EnumType.STRING)
   private HealthType health;
   private Date startDate;
-  private Date completionDate; 
+  private Date completionDate;
   private String instrumentName;
   private String xml;
   private String runName;
@@ -67,8 +67,9 @@ public class StatusImpl implements Status, Serializable {
 
   /**
    * Construct a new Status with HealthType.Unknown and a given run name
-   *
-   * @param runName of type String
+   * 
+   * @param runName
+   *          of type String
    */
   public StatusImpl(String runName) {
     setRunName(runName);
@@ -76,101 +77,109 @@ public class StatusImpl implements Status, Serializable {
     setStartDate(new Date());
   }
 
+  @Override
   public Long getStatusId() {
     return statusId;
   }
 
+  @Override
   public void setStatusId(Long statusId) {
     this.statusId = statusId;
   }
 
+  @Override
   public String getXml() {
     return xml;
   }
 
+  @Override
   public void setXml(String xml) {
     this.xml = xml;
   }
 
+  @Override
   public HealthType getHealth() {
     return health;
   }
 
+  @Override
   public Date getStartDate() {
     return startDate;
   }
 
+  @Override
   public void setStartDate(Date startDate) {
     this.startDate = startDate;
   }
 
+  @Override
   public Date getCompletionDate() {
     return completionDate;
   }
 
+  @Override
   public void setCompletionDate(Date completionDate) {
     this.completionDate = completionDate;
   }
 
+  @Override
   public void setHealth(HealthType health) {
-//    if (this.health != null && !this.health.equals(health) && health.equals(HealthType.Completed)) {
-//      setCompletionDate(new Date());
-//    }
     this.health = health;
   }
 
+  @Override
   public String getInstrumentName() {
     return instrumentName;
   }
 
+  @Override
   public void setInstrumentName(String instrumentName) {
     this.instrumentName = instrumentName;
   }
 
+  @Override
   public String getRunName() {
     return runName;
   }
 
+  @Override
   public void setRunName(String runName) {
     this.runName = runName;
   }
 
+  @Override
   public Date getLastUpdated() {
     return lastUpdated;
   }
 
+  @Override
   public void setLastUpdated(Date lastUpdated) {
     this.lastUpdated = lastUpdated;
   }
 
+  @Override
   public boolean userCanRead(User user) {
     return true;
   }
 
+  @Override
   public boolean userCanWrite(User user) {
     return false;
   }
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null)
-      return false;
-    if (obj == this)
-      return true;
-    if (!(obj instanceof Status))
-      return false;
+    if (obj == null) return false;
+    if (obj == this) return true;
+    if (!(obj instanceof Status)) return false;
     Status them = (Status) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
-    if (getStatusId().equals(StatusImpl.UNSAVED_ID)
-        || them.getStatusId().equals(StatusImpl.UNSAVED_ID)) {
+    if (getStatusId().equals(StatusImpl.UNSAVED_ID) || them.getStatusId().equals(StatusImpl.UNSAVED_ID)) {
       return getRunName().equals(them.getRunName());
-    }
-    else {
-      return getStatusId().equals(them.getStatusId()) &&
-             getHealth().equals(them.getHealth()) &&
-             getStartDate().equals(them.getStartDate()) &&
-             getCompletionDate().equals(them.getCompletionDate());
+    } else {
+      return getStatusId().equals(them.getStatusId()) && getHealth().equals(them.getHealth()) && getStartDate().equals(them.getStartDate())
+          && getCompletionDate().equals(them.getCompletionDate());
     }
   }
 
@@ -178,11 +187,10 @@ public class StatusImpl implements Status, Serializable {
   public int hashCode() {
     if (getStatusId() != null && !getStatusId().equals(StatusImpl.UNSAVED_ID)) {
       return getStatusId().hashCode();
-    }
-    else {
+    } else {
       final int PRIME = 31;
       int result = 1;
-      result = (result*PRIME) + (getRunName() == null ? 0 : getRunName().hashCode());
+      result = (result * PRIME) + (getRunName() == null ? 0 : getRunName().hashCode());
       return result;
     }
   }

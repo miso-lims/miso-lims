@@ -1,7 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
 import com.eaglegenomics.simlims.core.Group;
-import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import java.io.IOException;
@@ -32,8 +31,7 @@ public class MockSQLSecurityDAO extends SQLSecurityDAO {
           usermap.put(userId, u);
         }
         return u;
-      }
-      else {
+      } else {
         return usermap.get(userId);
       }
     }
@@ -46,8 +44,7 @@ public class MockSQLSecurityDAO extends SQLSecurityDAO {
         Collection<Group> gs = super.listGroupsByUserId(userId);
         groupmap.put(userId, gs);
         return gs;
-      }
-      else {
+      } else {
         return groupmap.get(userId);
       }
     }

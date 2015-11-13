@@ -42,7 +42,7 @@ import java.util.*;
  * uk.ac.bbsrc.tgac.miso.core.event.responder
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 20/10/11
  * @since 0.1.2
@@ -52,10 +52,12 @@ public class RunQcAddedResponderService extends AbstractResponderService {
 
   private Set<AlerterService> alerterServices = new HashSet<AlerterService>();
 
+  @Override
   public Set<AlerterService> getAlerterServices() {
     return alerterServices;
   }
 
+  @Override
   public void setAlerterServices(Set<AlerterService> alerterServices) {
     this.alerterServices = alerterServices;
   }
@@ -63,10 +65,10 @@ public class RunQcAddedResponderService extends AbstractResponderService {
   @Override
   public boolean respondsTo(Event event) {
     if (event instanceof RunEvent) {
-      RunEvent re = (RunEvent)event;
+      RunEvent re = (RunEvent) event;
       Run r = re.getEventObject();
       if (re.getEventType().equals(MisoEventType.RUN_QC_ADDED) && r.getRunQCs() != null && !r.getRunQCs().isEmpty()) {
-        log.info("Run "+ r.getAlias() +": " + re.getEventMessage());
+        log.info("Run " + r.getAlias() + ": " + re.getEventMessage());
         return true;
       }
     }
@@ -76,7 +78,7 @@ public class RunQcAddedResponderService extends AbstractResponderService {
   @Override
   public void generateResponse(Event event) {
     if (event instanceof RunEvent) {
-      RunEvent re = (RunEvent)event;
+      RunEvent re = (RunEvent) event;
       Run r = re.getEventObject();
       RunQC lastAdded = null;
 
@@ -84,9 +86,8 @@ public class RunQcAddedResponderService extends AbstractResponderService {
       if (!lqc.isEmpty()) {
         try {
           Collections.sort(lqc, new DateComparator(RunQC.class, "getQcDate"));
-          lastAdded = lqc.get(lqc.size()-1);
-        }
-        catch (NoSuchMethodException e) {
+          lastAdded = lqc.get(lqc.size() - 1);
+        } catch (NoSuchMethodException e) {
           log.error("Cannot sort list of run QCs", e);
           e.printStackTrace();
         }
@@ -99,24 +100,24 @@ public class RunQcAddedResponderService extends AbstractResponderService {
         String qcType = "";
 
         if (lastAdded != null) {
-          qcType = lastAdded.getQcType().getName()+" ";
-          qcInfo = "QC'ed by "+lastAdded.getQcCreator()+ " on " + lastAdded.getQcDate() + " ("+lastAdded.getInformation()+"). ";
+          qcType = lastAdded.getQcType().getName() + " ";
+          qcInfo = "QC'ed by " + lastAdded.getQcCreator() + " on " + lastAdded.getQcDate() + " (" + lastAdded.getInformation() + "). ";
         }
 
         a.setAlertTitle(qcType + "Run QC Added : " + r.getAlias());
 
         StringBuilder at = new StringBuilder();
-        at.append("The following Run has been QCed: "+r.getAlias()+" ("+event.getEventMessage()+"). "+qcInfo+"Please view Run " +r.getId()+ " in MISO for more information.");
+        at.append("The following Run has been QCed: " + r.getAlias() + " (" + event.getEventMessage() + "). " + qcInfo + "Please view Run "
+            + r.getId() + " in MISO for more information.");
         if (event.getEventContext().has("baseURL")) {
-          at.append(":\n\n" + event.getEventContext().getString("baseURL")+"/run/"+r.getId());
+          at.append(":\n\n" + event.getEventContext().getString("baseURL") + "/run/" + r.getId());
         }
         a.setAlertText(at.toString());
 
         for (AlerterService as : alerterServices) {
           try {
             as.raiseAlert(a);
-          }
-          catch (AlertingException e) {
+          } catch (AlertingException e) {
             log.error("Cannot raise user-level alert:" + e.getMessage());
             e.printStackTrace();
           }

@@ -30,19 +30,14 @@ import java.util.Map;
 
 /**
  * This enum represents the health of a particular object, given some kind of underlying process
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public enum HealthType {
-  Unknown("Unknown"),
-  Completed("Completed"),
-  Failed("Failed"),
-  Started("Started"),
-  Stopped("Stopped"),
-  Running("Running");
+  Unknown("Unknown"), Completed("Completed"), Failed("Failed"), Started("Started"), Stopped("Stopped"), Running("Running");
 
-  /** Field key  */
+  /** Field key */
   private String key;
   /**
    * Field lookup
@@ -56,8 +51,9 @@ public enum HealthType {
 
   /**
    * Constructs a HealthType based on a given key
-   *
-   * @param key of type String
+   * 
+   * @param key
+   *          of type String
    */
   HealthType(String key) {
     this.key = key;
@@ -65,8 +61,9 @@ public enum HealthType {
 
   /**
    * Returns a HealthType given an enum key
-   *
-   * @param key of type String
+   * 
+   * @param key
+   *          of type String
    * @return HealthType
    */
   public static HealthType get(String key) {
@@ -75,7 +72,7 @@ public enum HealthType {
 
   /**
    * Returns the key of this HealthType enum.
-   *
+   * 
    * @return String key.
    */
   public String getKey() {
@@ -84,7 +81,7 @@ public enum HealthType {
 
   /**
    * Returns the keys of this HealthType enum.
-   *
+   * 
    * @return ArrayList<String> keys.
    */
   public static ArrayList<String> getKeys() {

@@ -128,7 +128,6 @@ ZeroClipboard_TableTools.Client.prototype = {
 			this.sized = true;
 		}
 		
-		// style.backgroundColor = '#f00'; // debug
 		if ( this.domElement ) {
 			this.domElement.appendChild(this.div);
 			this.div.innerHTML = this.getHTML( box.width, box.height );
@@ -140,8 +139,6 @@ ZeroClipboard_TableTools.Client.prototype = {
 		var style = this.div.style;
 		
 		style.position = 'absolute';
-		//style.left = (this.domElement.offsetLeft)+'px';
-		//style.top = this.domElement.offsetTop+'px';
 		style.width = box.width + 'px';
 		style.height = box.height + 'px';
 		
@@ -314,7 +311,6 @@ ZeroClipboard_TableTools.Client.prototype = {
 			
 			case 'mouseover':
 				if (this.domElement && this.cssEffects) {
-					//this.domElement.addClass('hover');
 					if (this.recoverActive) this.domElement.addClass('active');
 				}
 				break;
@@ -326,7 +322,6 @@ ZeroClipboard_TableTools.Client.prototype = {
 						this.domElement.removeClass('active');
 						this.recoverActive = true;
 					}
-					//this.domElement.removeClass('hover');
 				}
 				break;
 			

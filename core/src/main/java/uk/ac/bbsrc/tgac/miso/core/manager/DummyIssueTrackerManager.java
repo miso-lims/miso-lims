@@ -8,7 +8,7 @@ import java.io.IOException;
  * uk.ac.bbsrc.tgac.miso.core.manager
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 21/06/12
  * @since 0.1.6

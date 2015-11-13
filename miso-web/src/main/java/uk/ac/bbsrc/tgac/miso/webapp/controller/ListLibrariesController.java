@@ -39,7 +39,7 @@ import java.util.Collection;
 
 /**
  * Controller for listing libraries
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */

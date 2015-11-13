@@ -34,7 +34,7 @@ import java.io.IOException;
  * uk.ac.bbsrc.tgac.miso.core.service.printing
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 30-Jun-2011
  * @since 0.0.3
@@ -42,17 +42,30 @@ import java.io.IOException;
 @Spi
 public interface MisoPrintService<T, S, C extends PrintContext<T>> {
   long getServiceId();
+
   void setServiceId(long serviceId);
+
   String getName();
+
   void setName(String name);
+
   boolean isEnabled();
+
   void setEnabled(boolean enabled);
+
   C getPrintContext();
+
   void setPrintContext(C pc);
+
   boolean print(T content) throws IOException;
+
   void setPrintServiceFor(Class<? extends S> c);
+
   Class<? extends S> getPrintServiceFor();
+
   public T getLabelFor(S b) throws MisoPrintException;
+
   void setBarcodableSchema(BarcodableSchema<T, S> barcodableSchema);
+
   BarcodableSchema getBarcodableSchema();
 }

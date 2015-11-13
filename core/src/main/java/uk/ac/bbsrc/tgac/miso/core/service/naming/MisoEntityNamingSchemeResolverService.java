@@ -10,7 +10,7 @@ import java.util.*;
  * <p/>
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 29/08/12
  * @since 0.1.7
@@ -25,12 +25,10 @@ public class MisoEntityNamingSchemeResolverService implements EntityNamingScheme
       if (scheme.getSchemeName().equals(schemeName)) {
         try {
           return scheme.getClass().newInstance();
-        }
-        catch (InstantiationException e) {
+        } catch (InstantiationException e) {
           log.error("Cannot create a new instance of '" + schemeName + "'", e);
           e.printStackTrace();
-        }
-        catch (IllegalAccessException e) {
+        } catch (IllegalAccessException e) {
           log.error("Cannot create a new instance of '" + schemeName + "'", e);
           e.printStackTrace();
         }
@@ -42,7 +40,7 @@ public class MisoEntityNamingSchemeResolverService implements EntityNamingScheme
 
   @Override
   public Collection<MisoNamingScheme<?>> getNamingSchemes() {
-    //lazily load available schemes
+    // lazily load available schemes
     if (contextMap == null) {
       ServiceLoader<? extends MisoNamingScheme> consumerLoader = ServiceLoader.load(MisoNamingScheme.class);
       Iterator<? extends MisoNamingScheme> consumerIterator = consumerLoader.iterator();
@@ -53,11 +51,10 @@ public class MisoEntityNamingSchemeResolverService implements EntityNamingScheme
 
         if (!contextMap.containsKey(p.getSchemeName())) {
           contextMap.put(p.getSchemeName(), p);
-        }
-        else {
+        } else {
           if (contextMap.get(p.getSchemeName()) != p) {
-            String msg = "Multiple different NamingSchemes with the same scheme name " +
-                         "('" + p.getSchemeName() + "') are present on the classpath. Scheme names must be unique.";
+            String msg = "Multiple different NamingSchemes with the same scheme name " + "('" + p.getSchemeName()
+                + "') are present on the classpath. Scheme names must be unique.";
             log.error(msg);
             throw new ServiceConfigurationError(msg);
           }
@@ -72,11 +69,10 @@ public class MisoEntityNamingSchemeResolverService implements EntityNamingScheme
 
         if (!contextMap.containsKey(p.getSchemeName())) {
           contextMap.put(p.getSchemeName(), p);
-        }
-        else {
+        } else {
           if (contextMap.get(p.getSchemeName()) != p) {
-            String msg = "Multiple different NamingSchemes with the same scheme name " +
-                         "('" + p.getSchemeName() + "') are present on the classpath. Scheme names must be unique.";
+            String msg = "Multiple different NamingSchemes with the same scheme name " + "('" + p.getSchemeName()
+                + "') are present on the classpath. Scheme names must be unique.";
             log.error(msg);
             throw new ServiceConfigurationError(msg);
           }

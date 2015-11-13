@@ -31,11 +31,8 @@ import uk.ac.bbsrc.tgac.miso.core.util.UnicodeReader;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-import java.io.StringReader;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -43,7 +40,7 @@ import java.util.regex.Pattern;
  * uk.ac.bbsrc.tgac.miso.core.data.impl.illumina
  * <p/>
  * TODO Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -74,8 +71,7 @@ public class IlluminaStatus extends StatusImpl {
         }
         setRunName(runName);
         setHealth(HealthType.Unknown);
-      }
-      else {
+      } else {
         String runStarted = statusDoc.getElementsByTagName("RunStarted").item(0).getTextContent();
         setStartDate(new SimpleDateFormat("EEEE, MMMMM dd, yyyy h:mm aaa").parse(runStarted));
         setInstrumentName(statusDoc.getElementsByTagName("InstrumentName").item(0).getTextContent());
@@ -83,14 +79,11 @@ public class IlluminaStatus extends StatusImpl {
         setHealth(HealthType.Unknown);
       }
       setXml(statusXml);
-    }
-    catch (ParserConfigurationException e) {
+    } catch (ParserConfigurationException e) {
       e.printStackTrace();
-    }
-    catch (TransformerException e) {
+    } catch (TransformerException e) {
       e.printStackTrace();
-    }
-    catch (ParseException e) {
+    } catch (ParseException e) {
       e.printStackTrace();
     }
   }

@@ -33,7 +33,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.integration.strategy.interrogator.LS45
 
 /**
  * A factory to build SequencerInterrogators
- *
+ * 
  * @author Rob Davey
  * @date 06-Sep-2010
  * @since 0.0.2
@@ -42,30 +42,25 @@ public class SequencerInterrogatorFactory {
 
   /**
    * Builds a SequencerInterrogator object from a given SequencerReference
-   *
-   * @param sr of type SequencerReference
+   * 
+   * @param sr
+   *          of type SequencerReference
    * @return SequencerInterrogator
-   * @throws InterrogationException when an unsupported PlatformType is specified 
+   * @throws InterrogationException
+   *           when an unsupported PlatformType is specified
    */
   public static SequencerInterrogator getSequencerInterrogator(SequencerReference sr) throws InterrogationException {
     if (sr.getPlatform().getPlatformType().equals(PlatformType.ILLUMINA)) {
       return new SequencerInterrogator(new IlluminaSequencerInterrogationStrategy(), sr);
-    }
-    else if (sr.getPlatform().getPlatformType().equals(PlatformType.LS454)) {
+    } else if (sr.getPlatform().getPlatformType().equals(PlatformType.LS454)) {
       return new SequencerInterrogator(new LS454SequencerInterrogationStrategy(), sr);
-    }
-    else if (sr.getPlatform().getPlatformType().equals(PlatformType.SOLID)) {
+    } else if (sr.getPlatform().getPlatformType().equals(PlatformType.SOLID)) {
       return new SequencerInterrogator(new SolidSequencerInterrogationStrategy(), sr);
-    }
-    else if (sr.getPlatform().getPlatformType().equals(PlatformType.IONTORRENT)) {
-      //return new SequencerInterrogator(new SolidSequencerInterrogationStrategy(), sr);
+    } else if (sr.getPlatform().getPlatformType().equals(PlatformType.IONTORRENT)) {
       throw new InterrogationException("Unsupported PlatformType");
-    }
-    else if (sr.getPlatform().getPlatformType().equals(PlatformType.PACBIO)) {
-      //return new SequencerInterrogator(new SolidSequencerInterrogationStrategy(), sr);
+    } else if (sr.getPlatform().getPlatformType().equals(PlatformType.PACBIO)) {
       throw new InterrogationException("Unsupported PlatformType");
-    }
-    else {
+    } else {
       throw new InterrogationException("Unrecognised PlatformType");
     }
   }

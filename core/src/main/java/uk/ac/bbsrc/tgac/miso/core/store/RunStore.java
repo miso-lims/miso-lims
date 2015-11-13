@@ -38,21 +38,10 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
  */
 public interface RunStore extends Store<Run>, Cascadable, Remover<Run>, NamingSchemeAware<Run> {
   /**
-   * Retrieve a Run from an underlying data store given a Run ID
-   * <p/>
-   * This method intends to retrieve objects in an 'ignorant' fashion, i.e.  will not populate
-   * parent or child objects that could lead to a circular dependency
-   *
-   * @param runId of type long
-   * @return Run
-   * @throws IOException when
-   */
-  //Run lazyGet(long runId) throws IOException;
-
-  /**
    * Gets the latest Run, by start date, that is associated with the given container
    *
-   * @param containerId long
+   * @param containerId
+   *          long
    * @return Run
    * @throws IOException
    */
@@ -61,7 +50,8 @@ public interface RunStore extends Store<Run>, Cascadable, Remover<Run>, NamingSc
   /**
    * Gets the latest Run, by run ID, that is associated with the given container
    *
-   * @param containerId long
+   * @param containerId
+   *          long
    * @return Run
    * @throws IOException
    */
@@ -70,28 +60,34 @@ public interface RunStore extends Store<Run>, Cascadable, Remover<Run>, NamingSc
   /**
    * List all Runs with name, alias, or description containing the query string
    *
-   * @param query String to search for
+   * @param query
+   *          String to search for
    * @return Collection<Run>
    * @throws IOException
-   * @throws NullPOinterException if query is null
+   * @throws NullPointerException
+   *           if query is null
    */
   Collection<Run> listBySearch(String query) throws IOException;
 
   /**
    * Retrieve a Run from an underlying data store given a Run alias
    *
-   * @param alias of type String
+   * @param alias
+   *          of type String
    * @return Run
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   Run getByAlias(String alias) throws IOException;
 
   /**
    * List all Runs related to an Experiment given an Experiment ID
    *
-   * @param experimentId of type long
+   * @param experimentId
+   *          of type long
    * @return List<Run>
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   @Deprecated
   List<Run> listByExperimentId(long experimentId) throws IOException;
@@ -99,43 +95,52 @@ public interface RunStore extends Store<Run>, Cascadable, Remover<Run>, NamingSc
   /**
    * List all Runs using a Pool given a Pool ID
    *
-   * @param poolId of type long
+   * @param poolId
+   *          of type long
    * @return List<Run>
-   * @throws IOException when
-   */  
+   * @throws IOException
+   *           when
+   */
   List<Run> listByPoolId(long poolId) throws IOException;
 
   /**
    * List all Runs using a Container given a Container ID
    *
-   * @param containerId of type long
+   * @param containerId
+   *          of type long
    * @return List<Run>
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   List<Run> listBySequencerPartitionContainerId(long containerId) throws IOException;
 
   /**
    * List all Runs related to a Project given a Project ID
    *
-   * @param projectId of type long
+   * @param projectId
+   *          of type long
    * @return List<Run>
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   List<Run> listByProjectId(long projectId) throws IOException;
 
   /**
-   * List all Runs carried out on a Platform given a Platform ID 
+   * List all Runs carried out on a Platform given a Platform ID
    *
-   * @param platformId of type long
+   * @param platformId
+   *          of type long
    * @return List<Run>
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   List<Run> listByPlatformId(long platformId) throws IOException;
-  
+
   /**
-   * List all Runs by their health given a HealthType 
+   * List all Runs by their health given a HealthType
    *
-   * @param health status to search for
+   * @param health
+   *          status to search for
    * @return all runs with matching status
    * @throws IOException
    */
@@ -144,9 +149,11 @@ public interface RunStore extends Store<Run>, Cascadable, Remover<Run>, NamingSc
   /**
    * List all persisted objects
    *
-   * @param the maximum number of objects to return. If this is negative, no limit will be set
+   * @param the
+   *          maximum number of objects to return. If this is negative, no limit will be set
    * @return Collection<Run>
-   * @throws IOException when the objects cannot be retrieved
+   * @throws IOException
+   *           when the objects cannot be retrieved
    */
   Collection<Run> listAllWithLimit(long limit) throws IOException;
 

@@ -23,18 +23,12 @@
 
 package uk.ac.bbsrc.tgac.miso.core.factory.reports.itext;
 
-import com.lowagie.text.Document;
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.pdf.PdfWriter;
-
-import java.io.ByteArrayOutputStream;
-
 /**
  * uk.ac.bbsrc.tgac.miso.core.factory.reports.itext
  * <p/>
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 12-Oct-2010
  * @since version

@@ -23,17 +23,17 @@
 
 package uk.ac.bbsrc.tgac.miso.core.factory.barcode;
 
+import java.io.UnsupportedEncodingException;
+
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.UnsupportedEncodingException;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.factory.barcode
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 04-May-2011
  * @since 0.0.3
@@ -49,8 +49,7 @@ public class MisoJscriptFactory {
       if (Character.UnicodeBlock.of(c) != Character.UnicodeBlock.BASIC_LATIN) {
         int codePoint = Character.codePointAt(barcode, count);
         b.append("[U:$").append(String.format("%04x", codePoint).toUpperCase()).append("]");
-      }
-      else {
+      } else {
         b.append(c);
       }
       count++;
@@ -72,7 +71,7 @@ public class MisoJscriptFactory {
       sb.append("B 17,1,0,DATAMATRIX+RECT,0.25;").append(barcode).append("\n");
       sb.append("T 29,2,0,5,pt4;[DATE]").append("\n");
 
-      //shorten alias to fit on label if too long
+      // shorten alias to fit on label if too long
       if (alias.length() >= 17) {
         alias = alias.substring(0, 15) + "...";
       }
@@ -80,8 +79,7 @@ public class MisoJscriptFactory {
       sb.append("T 17,8,0,5,pt6;").append(unicodeify(alias)).append("\n");
       sb.append("T 17,11,0,5,pt6;").append(unicodeify(name)).append("\n");
       sb.append("A 1").append("\n");
-    }
-    catch (UnsupportedEncodingException e) {
+    } catch (UnsupportedEncodingException e) {
       e.printStackTrace();
     }
     return sb.toString();
@@ -100,7 +98,7 @@ public class MisoJscriptFactory {
       sb.append("B 13,1,0,DATAMATRIX+RECT,0.25;").append(barcode).append("\n");
       sb.append("T 29,2,0,5,pt4;[DATE]").append("\n");
 
-      //shorten alias to fit on label if too long
+      // shorten alias to fit on label if too long
       if (alias.length() >= 20) {
         alias = alias.substring(0, 18) + "...";
       }
@@ -108,8 +106,7 @@ public class MisoJscriptFactory {
       sb.append("T 13,8,0,5,pt6;").append(unicodeify(alias)).append("\n");
       sb.append("T 13,11,0,5,pt6;").append(unicodeify(name)).append("\n");
       sb.append("A 1").append("\n");
-    }
-    catch (UnsupportedEncodingException e) {
+    } catch (UnsupportedEncodingException e) {
       e.printStackTrace();
     }
 
@@ -118,23 +115,6 @@ public class MisoJscriptFactory {
 
   public static String plateBarcodeLabel(String name, String tagBarcode, String barcode) {
     StringBuilder sb = new StringBuilder();
-    /*
-    sb.append("m m").append("\n");
-    sb.append("J").append("\n");
-    sb.append("S l1;0,0,12,15,38").append("\n");
-    sb.append("B 3,2,0,DATAMATRIX,0.2;").append(barcode).append("\n");
-    sb.append("B 17,1,0,DATAMATRIX+RECT,0.25;").append(barcode).append("\n");
-    sb.append("T 29,2,0,5,pt4;[DATE]").append("\n");
-
-    //shorten alias to fit on label if too long
-    if (tagBarcode.length() >= 17) {
-      tagBarcode = tagBarcode.substring(0, 15) + "...";
-    }
-
-    sb.append("T 17,8,0,5,pt6;").append(tagBarcode).append("\n");
-    sb.append("T 17,11,0,5,pt6;").append(name).append("\n");
-    sb.append("A 1").append("\n");
-    */
     return sb.toString();
   }
 }

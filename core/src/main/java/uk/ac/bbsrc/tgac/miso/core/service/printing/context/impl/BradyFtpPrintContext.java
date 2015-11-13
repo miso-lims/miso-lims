@@ -36,7 +36,7 @@ import java.io.IOException;
  * uk.ac.bbsrc.tgac.miso.core.service.printing.context.impl
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 30-Jun-2011
  * @since 0.0.3
@@ -49,6 +49,7 @@ public class BradyFtpPrintContext implements PrintContext<File> {
   public String username;
   public String password;
 
+  @Override
   public String getHost() {
     return host;
   }
@@ -89,6 +90,6 @@ public class BradyFtpPrintContext implements PrintContext<File> {
 
   @Override
   public boolean print(File content) throws IOException {
-    return ps.print(content, this);    
+    return ps.print(content, this);
   }
 }

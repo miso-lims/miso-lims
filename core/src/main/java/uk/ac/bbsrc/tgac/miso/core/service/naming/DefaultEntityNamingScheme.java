@@ -3,7 +3,6 @@ package uk.ac.bbsrc.tgac.miso.core.service.naming;
 import net.sourceforge.fluxion.spi.ServiceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
@@ -18,7 +17,7 @@ import java.util.regex.Pattern;
  * uk.ac.bbsrc.tgac.miso.core.service.naming
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 29/08/12
  * @since 0.1.7
@@ -33,10 +32,9 @@ public class DefaultEntityNamingScheme<T extends Nameable> implements MisoNaming
 
   public DefaultEntityNamingScheme() {
     try {
-      type = (Class<T>)Class.forName("uk.ac.bbsrc.tgac.miso.core.data.Nameable");
+      type = (Class<T>) Class.forName("uk.ac.bbsrc.tgac.miso.core.data.Nameable");
       validationMap.put("name", Pattern.compile("([A-Z]{3})([0-9]+)"));
-    }
-    catch (ClassNotFoundException e) {
+    } catch (ClassNotFoundException e) {
       e.printStackTrace();
     }
   }
@@ -50,13 +48,13 @@ public class DefaultEntityNamingScheme<T extends Nameable> implements MisoNaming
   public void setValidationRegex(String fieldName, String regex) throws MisoNamingException {
     if (fieldCheck(fieldName)) {
       if (validationMap.get(fieldName) != null) {
-        log.warn("Setting validation regex from '" +validationMap.get(fieldName).pattern()+ "' to '"+regex+"'. This usually doesn't happen at " +
-                 "runtime unless a custom regex is specified at MISO startup!");
+        log.warn("Setting validation regex from '" + validationMap.get(fieldName).pattern() + "' to '" + regex
+            + "'. This usually doesn't happen at " + "runtime unless a custom regex is specified at MISO startup!");
         validationMap.put(fieldName, Pattern.compile(regex));
       }
-    }
-    else {
-      throw new MisoNamingException("Cannot set validation regex for a field (via 'get"+ LimsUtils.capitalise(fieldName)+"') that doesn't exist in " + namingSchemeFor().getCanonicalName());
+    } else {
+      throw new MisoNamingException("Cannot set validation regex for a field (via 'get" + LimsUtils.capitalise(fieldName)
+          + "') that doesn't exist in " + namingSchemeFor().getCanonicalName());
     }
   }
 
@@ -81,12 +79,11 @@ public class DefaultEntityNamingScheme<T extends Nameable> implements MisoNaming
       String customName = lng.generateName(o);
       if (validateField(fieldName, customName)) {
         return customName;
+      } else {
+        throw new MisoNamingException("Custom naming generator '" + lng.getGeneratorName() + "' supplied for entity field '" + fieldName
+            + "' generated an invalid name according to the validation scheme '" + validationMap.get(fieldName) + "'");
       }
-      else {
-        throw new MisoNamingException("Custom naming generator '"+lng.getGeneratorName()+"' supplied for entity field '"+fieldName+"' generated an invalid name according to the validation scheme '"+validationMap.get(fieldName)+"'");
-      }
-    }
-    else {
+    } else {
       if (DefaultMisoEntityPrefix.get(o.getClass().getSimpleName()) == null) {
         for (Class<?> i : LimsUtils.getAllInterfaces(o.getClass())) {
           if (DefaultMisoEntityPrefix.get(i.getSimpleName()) != null) {
@@ -106,8 +103,7 @@ public class DefaultEntityNamingScheme<T extends Nameable> implements MisoNaming
     Pattern p = validationMap.get(fieldName);
     if (p != null) {
       return validationMap.get(fieldName).pattern();
-    }
-    else {
+    } else {
       throw new MisoNamingException("No such field registered for validation");
     }
   }
@@ -137,7 +133,7 @@ public class DefaultEntityNamingScheme<T extends Nameable> implements MisoNaming
 
   @Override
   public boolean allowDuplicateEntityNameFor(String fieldName) {
-    //never allow duplicate names
+    // never allow duplicate names
     return false;
   }
 
@@ -152,9 +148,8 @@ public class DefaultEntityNamingScheme<T extends Nameable> implements MisoNaming
       if (m != null) {
         return true;
       }
-    }
-    catch (NoSuchMethodException e) {
-      log.error("No such field '"+fieldName+"' on class " + namingSchemeFor().getCanonicalName());
+    } catch (NoSuchMethodException e) {
+      log.error("No such field '" + fieldName + "' on class " + namingSchemeFor().getCanonicalName());
       e.printStackTrace();
     }
     return false;

@@ -30,8 +30,8 @@ import java.io.IOException;
 import java.net.InetAddress;
 
 /**
- * Abstract class to provide basic methods to encapsulate a reference to a physical machine attached to a sequencer 
- *
+ * Abstract class to provide basic methods to encapsulate a reference to a physical machine attached to a sequencer
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -66,38 +66,47 @@ public abstract class AbstractSequencerReference implements SequencerReference {
     return this.name;
   }
 
+  @Override
   public void setPlatform(Platform platform) {
     this.platform = platform;
   }
 
+  @Override
   public Platform getPlatform() {
     return this.platform;
   }
 
+  @Override
   public void setAvailable(Boolean available) {
     this.available = available;
   }
 
+  @Override
   public Boolean getAvailable() {
     return this.available;
   }
 
+  @Override
   public void checkAvailability(int timeout) throws IOException {
     this.available = getIpAddress().isReachable(timeout);
   }
 
+  @Override
   public void setIpAddress(InetAddress ip) {
     this.ip = ip;
   }
 
+  @Override
   public InetAddress getIpAddress() {
     return this.ip;
   }
 
+  @Override
   public String getFQDN() {
     return getIpAddress().getCanonicalHostName();
   }
 
+  @Override
   public boolean isDeletable() {
     return getId() != AbstractSequencerReference.UNSAVED_ID;
   }

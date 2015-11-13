@@ -92,8 +92,7 @@ public class PoolWizardController {
   }
 
   @RequestMapping(value = "/new/{projectId}", method = RequestMethod.GET)
-  public ModelAndView newAssignedProject(@PathVariable Long projectId,
-                                         ModelMap model) throws IOException {
+  public ModelAndView newAssignedProject(@PathVariable Long projectId, ModelMap model) throws IOException {
     try {
       Project p = requestManager.getProjectById(projectId);
       StringBuilder a = new StringBuilder();
@@ -108,11 +107,9 @@ public class PoolWizardController {
 
       model.put("project", p);
       model.put("platforms", a.toString());
-      //model.put("existingStudies", requestManager.listAllStudiesByProjectId(projectId));
       model.put("studyTypes", b.toString());
       return new ModelAndView("/pages/poolWizard.jsp", model);
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to show pool wizard", ex);
       }

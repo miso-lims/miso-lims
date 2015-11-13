@@ -27,17 +27,17 @@ import uk.ac.bbsrc.tgac.miso.core.data.Reportable;
 
 /**
  * Visitor class to generate report data for a given Reportable
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public class ReportableVisitor {
   /**
    * Visit a Reportable to generate a report
-   *
-   * @param r of type Reportable
+   * 
+   * @param r
+   *          of type Reportable
    */
   public void visit(Reportable r) {
-    //r.buildReport();
   }
 }

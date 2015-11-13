@@ -25,41 +25,36 @@ package uk.ac.bbsrc.tgac.miso.core.security;
 
 import com.eaglegenomics.simlims.core.Securable;
 import com.eaglegenomics.simlims.core.SecurityProfile;
-//import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-//import com.fasterxml.jackson.annotation.JsonIgnore;
-//import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-//import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 /**
  * Allows an object to be read/write secured by a supplied {@link SecurityProfile}
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public interface SecurableByProfile extends Securable {
   /**
    * Returns the securityProfile of this SecurableByProfile object.
-   *
+   * 
    * @return SecurityProfile securityProfile.
    */
   public SecurityProfile getSecurityProfile();
 
   /**
    * Sets the securityProfile of this SecurableByProfile object.
-   *
-   * @param profile securityProfile.
+   * 
+   * @param profile
+   *          securityProfile.
    */
   public void setSecurityProfile(SecurityProfile profile);
 
   /**
    * Inherit the SecurityProfile of the given parent SecurableByProfile
-   *
-   * @param parent of type SecurableByProfile
-   * @throws SecurityException when the parent SecurityProfile could not be inherited 
+   * 
+   * @param parent
+   *          of type SecurableByProfile
+   * @throws SecurityException
+   *           when the parent SecurityProfile could not be inherited
    */
   void inheritPermissions(SecurableByProfile parent) throws SecurityException;
 }

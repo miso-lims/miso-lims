@@ -31,34 +31,25 @@ import java.util.Collection;
 
 /**
  * Defines a DAO interface for storing LibraryQCs
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public interface PoolQcStore extends Store<PoolQC>, Remover<PoolQC> {
   /**
-   * Retrieve a PoolQC from an underlying data store given a PoolQC ID
-   * <p/>
-   * This method intends to retrieve objects in an 'ignorant' fashion, i.e.  will not populate
-   * parent or child objects that could lead to a circular dependency
-   *
-   * @param qcId of type long
-   * @return PoolQC
-   * @throws java.io.IOException when
-   */
-  //PoolQC lazyGet(long qcId) throws IOException;
-
-  /**
    * List all PoolQCs performed on a Pool given a parent Pool ID
-   *
-   * @param poolId of type long
+   * 
+   * @param poolId
+   *          of type long
    * @return Collection<PoolQC>
-   * @throws java.io.IOException when
+   * @throws java.io.IOException
+   *           when
    */
   Collection<PoolQC> listByPoolId(long poolId) throws IOException;
 
   /**
    * Get the QcType descriptor for a given type ID
+   * 
    * @param qcTypeId
    * @return the QcType with the given ID, or null if none exists
    * @throws java.io.IOException
@@ -67,6 +58,7 @@ public interface PoolQcStore extends Store<PoolQC>, Remover<PoolQC> {
 
   /**
    * Get the QcType descriptor for a given type name
+   * 
    * @param qcName
    * @return the QcType with the given name, or null if none exists
    * @throws java.io.IOException
@@ -75,6 +67,7 @@ public interface PoolQcStore extends Store<PoolQC>, Remover<PoolQC> {
 
   /**
    * Get all QcType descriptors for {@link uk.ac.bbsrc.tgac.miso.core.data.Pool} objects
+   * 
    * @return Collection<QcType>
    * @throws java.io.IOException
    */

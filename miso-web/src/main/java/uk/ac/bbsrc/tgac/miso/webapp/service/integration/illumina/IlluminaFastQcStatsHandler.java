@@ -35,7 +35,7 @@ import java.util.Map;
  * uk.ac.bbsrc.tgac.miso.webapp.service.integration.illumina
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 07-Mar-2011
  * @since version

@@ -77,17 +77,14 @@ public class MenuController implements ServletContextAware {
       model.put("apiKey", SignatureHelper.generatePrivateUserKey((user.getLoginName() + "::" + user.getPassword()).getBytes("UTF-8")));
       model.put("userGroups", groups.toString());
       return new ModelAndView("/pages/myAccount.jsp", model);
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return new ModelAndView("/login.jsp", model);
-    }
-    catch (NoSuchAlgorithmException e) {
+    } catch (NoSuchAlgorithmException e) {
       e.printStackTrace();
       return new ModelAndView("/login.jsp", model);
     }
   }
-
 
   public void setSecurityManager(com.eaglegenomics.simlims.core.manager.SecurityManager securityManager) {
     this.securityManager = securityManager;
@@ -103,12 +100,10 @@ public class MenuController implements ServletContextAware {
       }
       if (Arrays.asList(user.getRoles()).contains("ROLE_EXTERNAL") && !Arrays.asList(user.getRoles()).contains("ROLE_INTERNAL")) {
         return new ModelAndView("/pages/external/externalMain.jsp", model);
-      }
-      else {
+      } else {
         return new ModelAndView("/pages/mainMenu.jsp", model);
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       return new ModelAndView("/login.jsp", model);
     }
   }

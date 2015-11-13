@@ -30,11 +30,12 @@ import java.util.Collection;
  * uk.ac.bbsrc.tgac.miso.core.factory.reports
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public interface ReportsFactory {
   Object buildReport(Reportable r);
+
   Object buildReport(Collection<? extends Reportable> r);
 }

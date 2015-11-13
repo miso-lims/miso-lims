@@ -27,11 +27,12 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
 
-
 /**
- * <p>Java class for queueStatistics complex type.
+ * <p>
+ * Java class for queueStatistics complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="queueStatistics">
@@ -53,133 +54,120 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "queueStatistics", propOrder = {
-    "activeJobs",
-    "activeNodeString",
-    "blockedJobs",
-    "idleJobs",
-    "totalJobs",
-    "xml"
-})
+@XmlType(name = "queueStatistics", propOrder = { "activeJobs", "activeNodeString", "blockedJobs", "idleJobs", "totalJobs", "xml" })
 public class QueueStatistics {
 
-    protected int activeJobs;
-    protected String activeNodeString;
-    protected int blockedJobs;
-    protected int idleJobs;
-    protected int totalJobs;
-    protected String xml;
+  protected int activeJobs;
+  protected String activeNodeString;
+  protected int blockedJobs;
+  protected int idleJobs;
+  protected int totalJobs;
+  protected String xml;
 
-    /**
-     * Gets the value of the activeJobs property.
-     * 
-     */
-    public int getActiveJobs() {
-        return activeJobs;
-    }
+  /**
+   * Gets the value of the activeJobs property.
+   * 
+   */
+  public int getActiveJobs() {
+    return activeJobs;
+  }
 
-    /**
-     * Sets the value of the activeJobs property.
-     * 
-     */
-    public void setActiveJobs(int value) {
-        this.activeJobs = value;
-    }
+  /**
+   * Sets the value of the activeJobs property.
+   * 
+   */
+  public void setActiveJobs(int value) {
+    this.activeJobs = value;
+  }
 
-    /**
-     * Gets the value of the activeNodeString property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getActiveNodeString() {
-        return activeNodeString;
-    }
+  /**
+   * Gets the value of the activeNodeString property.
+   * 
+   * @return possible object is {@link String }
+   * 
+   */
+  public String getActiveNodeString() {
+    return activeNodeString;
+  }
 
-    /**
-     * Sets the value of the activeNodeString property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setActiveNodeString(String value) {
-        this.activeNodeString = value;
-    }
+  /**
+   * Sets the value of the activeNodeString property.
+   * 
+   * @param value
+   *          allowed object is {@link String }
+   * 
+   */
+  public void setActiveNodeString(String value) {
+    this.activeNodeString = value;
+  }
 
-    /**
-     * Gets the value of the blockedJobs property.
-     * 
-     */
-    public int getBlockedJobs() {
-        return blockedJobs;
-    }
+  /**
+   * Gets the value of the blockedJobs property.
+   * 
+   */
+  public int getBlockedJobs() {
+    return blockedJobs;
+  }
 
-    /**
-     * Sets the value of the blockedJobs property.
-     * 
-     */
-    public void setBlockedJobs(int value) {
-        this.blockedJobs = value;
-    }
+  /**
+   * Sets the value of the blockedJobs property.
+   * 
+   */
+  public void setBlockedJobs(int value) {
+    this.blockedJobs = value;
+  }
 
-    /**
-     * Gets the value of the idleJobs property.
-     * 
-     */
-    public int getIdleJobs() {
-        return idleJobs;
-    }
+  /**
+   * Gets the value of the idleJobs property.
+   * 
+   */
+  public int getIdleJobs() {
+    return idleJobs;
+  }
 
-    /**
-     * Sets the value of the idleJobs property.
-     * 
-     */
-    public void setIdleJobs(int value) {
-        this.idleJobs = value;
-    }
+  /**
+   * Sets the value of the idleJobs property.
+   * 
+   */
+  public void setIdleJobs(int value) {
+    this.idleJobs = value;
+  }
 
-    /**
-     * Gets the value of the totalJobs property.
-     * 
-     */
-    public int getTotalJobs() {
-        return totalJobs;
-    }
+  /**
+   * Gets the value of the totalJobs property.
+   * 
+   */
+  public int getTotalJobs() {
+    return totalJobs;
+  }
 
-    /**
-     * Sets the value of the totalJobs property.
-     * 
-     */
-    public void setTotalJobs(int value) {
-        this.totalJobs = value;
-    }
+  /**
+   * Sets the value of the totalJobs property.
+   * 
+   */
+  public void setTotalJobs(int value) {
+    this.totalJobs = value;
+  }
 
-    /**
-     * Gets the value of the xml property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getXml() {
-        return xml;
-    }
+  /**
+   * Gets the value of the xml property.
+   * 
+   * @return possible object is {@link String }
+   * 
+   */
+  public String getXml() {
+    return xml;
+  }
 
-    /**
-     * Sets the value of the xml property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setXml(String value) {
-        this.xml = value;
-    }
+  /**
+   * Sets the value of the xml property.
+   * 
+   * @param value
+   *          allowed object is {@link String }
+   * 
+   */
+  public void setXml(String value) {
+    this.xml = value;
+  }
 
 }

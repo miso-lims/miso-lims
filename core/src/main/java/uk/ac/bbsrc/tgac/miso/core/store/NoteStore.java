@@ -35,112 +35,139 @@ import java.util.List;
 
 /**
  * Defines a DAO interface for storing Notes
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public interface NoteStore extends Store<Note> {
   /**
    * List all Notes related to a ProjectOverview given a ProjectOverview ID
-   *
-   * @param overviewId of type Long
+   * 
+   * @param overviewId
+   *          of type Long
    * @return List<Note>
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   List<Note> listByProjectOverview(Long overviewId) throws IOException;
 
   /**
    * List all Notes related to a Kit given a Kit ID
-   *
-   * @param kitId of type Long
+   * 
+   * @param kitId
+   *          of type Long
    * @return List<Note>
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   List<Note> listByKit(Long kitId) throws IOException;
 
   /**
    * List all Notes related to a Sample given a Sample ID
-   *
-   * @param sampleId of type Long
+   * 
+   * @param sampleId
+   *          of type Long
    * @return List<Note>
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   List<Note> listBySample(Long sampleId) throws IOException;
 
   /**
    * List all Notes related to a Library given a Library ID
-   *
-   * @param libraryId of type Long
+   * 
+   * @param libraryId
+   *          of type Long
    * @return List<Note>
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   List<Note> listByLibrary(Long libraryId) throws IOException;
 
   /**
    * List all Notes related to a Run given a Run ID
-   *
-   * @param runId of type Long
+   * 
+   * @param runId
+   *          of type Long
    * @return List<Note>
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   List<Note> listByRun(Long runId) throws IOException;
 
   /**
    * Save a ProjectOverview Note
-   *
-   * @param overview of type ProjectOverview
-   * @param note of type Note
+   * 
+   * @param overview
+   *          of type ProjectOverview
+   * @param note
+   *          of type Note
    * @return long
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   long saveProjectOverviewNote(ProjectOverview overview, Note note) throws IOException;
 
   /**
    * Save a Kit Note
-   *
-   * @param kit of type Kit
-   * @param note of type Note
+   * 
+   * @param kit
+   *          of type Kit
+   * @param note
+   *          of type Note
    * @return long
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   long saveKitNote(Kit kit, Note note) throws IOException;
 
   /**
    * Save a Sample Note
-   *
-   * @param sample of type Sample
-   * @param note of type Note
+   * 
+   * @param sample
+   *          of type Sample
+   * @param note
+   *          of type Note
    * @return long
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   long saveSampleNote(Sample sample, Note note) throws IOException;
 
   /**
    * Save a Library Note
-   *
-   * @param library of type Library
-   * @param note of type Note
+   * 
+   * @param library
+   *          of type Library
+   * @param note
+   *          of type Note
    * @return long
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   long saveLibraryNote(Library library, Note note) throws IOException;
 
   /**
    * Save a Run Note
-   *
-   * @param run of type Run
-   * @param note of type Note
+   * 
+   * @param run
+   *          of type Run
+   * @param note
+   *          of type Note
    * @return long
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   long saveRunNote(Run run, Note note) throws IOException;
 
   /**
    * Remove note
-   *
-   * @param note Note
+   * 
+   * @param note
+   *          Note
    * @return boolean true if removed successfully
-   * @throws java.io.IOException when the object cannot be removed
+   * @throws java.io.IOException
+   *           when the object cannot be removed
    */
   public boolean remove(Note note) throws IOException;
 }

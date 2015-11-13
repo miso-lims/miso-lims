@@ -507,7 +507,6 @@ function changetodendo() {
         .data(nodes);
     // Enter any new nodes at the parent's previous position.
     node.enter().append("svg:circle")
-//                .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
         .attr("cx", function (d) {
                 return source.y0;
               })
@@ -541,14 +540,12 @@ function changetodendo() {
         .attr("cy", function (d) {
                 return d.x;
               })
-//                .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; })
         .attr("r", "4");
 
 
     // Transition nodes to their new position.
     node.transition()
         .duration(duration)
-//                 .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; })
         .attr("cx", function (d) {
                 return d.y;
               })
@@ -572,7 +569,6 @@ function changetodendo() {
     node.exit().transition()
         .duration(duration)
         .attr("r", "4")
-//                  .attr("transform", function(d) { return "translate(" + source.y + "," + source.x + ")"; })
         .attr("cx", function (d) {
                 return source.y;
               })
@@ -588,7 +584,6 @@ function changetodendo() {
 
     text.enter().append("svg:text")
         .attr("class", "node1")
-//               .attr("transform", function(d) { return "translate(" + source.y0-30 + "," + source.x0 + ")"; })
         .attr("dx", function (d) {
                 return source.y0 + 5;
               })
@@ -602,7 +597,6 @@ function changetodendo() {
 
         .transition()
         .duration(duration)
-//        .attr("transform", function(d) { return "translate(" + d.y-30 + "," + d.x + ")"; });
         .attr("dx", function (d) {
                 return d.y + 5;
               })

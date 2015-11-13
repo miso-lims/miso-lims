@@ -29,7 +29,7 @@ import java.util.List;
  * uk.ac.bbsrc.tgac.miso.analysis.submission
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 08/11/11
  * @since 0.1.3
@@ -57,7 +57,7 @@ public class PipelineRequest {
 
   /**
    * Gets the name of the new pipeline being requested
-   *
+   * 
    * @return the pipeline name
    */
   public String getName() {
@@ -66,7 +66,7 @@ public class PipelineRequest {
 
   /**
    * Gets the rest api key of the user that is requesting the creation of the new pipeline
-   *
+   * 
    * @return the rest api key of the creator of this pipeline request
    */
   public String getRestApiKey() {
@@ -74,10 +74,9 @@ public class PipelineRequest {
   }
 
   /**
-   * Gets a list of string arrays representing process name/type pairs.  Each element in the list should be a string
-   * array with a length of 2, where the element at index 0 is the process name and the element at index 1 is the
-   * string representing the process type.
-   *
+   * Gets a list of string arrays representing process name/type pairs. Each element in the list should be a string array with a length of
+   * 2, where the element at index 0 is the process name and the element at index 1 is the string representing the process type.
+   * 
    * @return a simple representation of the processes to recover when creating this pipeline
    */
   public List<String> getProcesses() {
@@ -86,7 +85,7 @@ public class PipelineRequest {
 
   /**
    * Gets whether or not this pipeline should be made public on creation.
-   *
+   * 
    * @return whether this pipeline is public
    */
   public boolean isPrivate() {
@@ -95,9 +94,6 @@ public class PipelineRequest {
 
   @Override
   public String toString() {
-    return "PipelineRequest: " +
-           "name='" + name + "', " +
-           "processes={" + processDescriptions + "}, " +
-           "isPrivate=" + isPrivate + "}";
+    return "PipelineRequest: " + "name='" + name + "', " + "processes={" + processDescriptions + "}, " + "isPrivate=" + isPrivate + "}";
   }
 }

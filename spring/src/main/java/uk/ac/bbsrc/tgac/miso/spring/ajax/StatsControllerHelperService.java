@@ -45,7 +45,7 @@ import java.io.IOException;
  * uk.ac.bbsrc.tgac.miso.spring.ajax
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.1.6
  */
@@ -84,17 +84,14 @@ public class StatsControllerHelperService {
       try {
         Run run = requestManager.getRunById(runId);
         return runStatsManager.getSummaryStatsForRun(run);
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
         e.printStackTrace();
         return JSONUtils.SimpleJSONError("Cannot retrieve run: " + e.getMessage());
-      }
-      catch (RunStatsException e) {
+      } catch (RunStatsException e) {
         e.printStackTrace();
         return JSONUtils.SimpleJSONError("Cannot get stats for run: " + e.getMessage());
       }
-    }
-    else {
+    } else {
       return JSONUtils.SimpleJSONError("Run stats manager is not set. No stats available.");
     }
   }
@@ -106,17 +103,14 @@ public class StatsControllerHelperService {
       try {
         Run run = requestManager.getRunById(runId);
         return runStatsManager.getSummaryStatsForLane(run, partitionNumber);
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
         e.printStackTrace();
         return JSONUtils.SimpleJSONError("Cannot retrieve run: " + e.getMessage());
-      }
-      catch (RunStatsException e) {
+      } catch (RunStatsException e) {
         e.printStackTrace();
         return JSONUtils.SimpleJSONError("Cannot get stats for lane: " + e.getMessage());
       }
-    }
-    else {
+    } else {
       return JSONUtils.SimpleJSONError("Run stats manager is not set. No stats available.");
     }
   }
@@ -128,12 +122,10 @@ public class StatsControllerHelperService {
       Run run = requestManager.getRunById(runId);
       JSONObject resultJson = runStatsManager.getPerPositionBaseSequenceQualityForLane(run, lane);
       return resultJson;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed");
-    }
-    catch (RunStatsException e) {
+    } catch (RunStatsException e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed");
     }
@@ -144,8 +136,7 @@ public class StatsControllerHelperService {
     String platformType = json.getString("platformType").toLowerCase();
     try {
       return notificationQueryService.getInterOpMetrics(runAlias, platformType);
-    }
-    catch (IntegrationException e) {
+    } catch (IntegrationException e) {
       e.printStackTrace();
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed to retrieve InterOp metrics: " + e.getMessage());
@@ -158,8 +149,7 @@ public class StatsControllerHelperService {
     int laneNum = json.getInt("lane");
     try {
       return notificationQueryService.getInterOpMetricsForLane(runAlias, platformType, laneNum);
-    }
-    catch (IntegrationException e) {
+    } catch (IntegrationException e) {
       e.printStackTrace();
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed to retrieve InterOp metrics: " + e.getMessage());
@@ -185,13 +175,11 @@ public class StatsControllerHelperService {
         return JSONUtils.SimpleJSONResponse("No run progress available for run " + runAlias);
       }
       return JSONUtils.SimpleJSONResponse("Run already set to non-Unknown: " + runAlias);
-    }
-    catch (IntegrationException e) {
+    } catch (IntegrationException e) {
       e.printStackTrace();
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed to retrieve run progress: " + e.getMessage());
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed to retrieve run progress: " + e.getMessage());

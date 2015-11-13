@@ -40,7 +40,7 @@ import java.util.List;
  * uk.ac.bbsrc.tgac.miso.core.data.impl
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.1.0
  */
@@ -48,7 +48,8 @@ public class RunImpl extends AbstractRun implements Serializable {
   protected static final Logger log = LoggerFactory.getLogger(RunImpl.class);
 
   @OneToMany(cascade = CascadeType.ALL)
-  private List<SequencerPartitionContainer<SequencerPoolPartition>> containers = new AutoPopulatingList<SequencerPartitionContainer<SequencerPoolPartition>>(SequencerPartitionContainerImpl.class);
+  private List<SequencerPartitionContainer<SequencerPoolPartition>> containers = new AutoPopulatingList<SequencerPartitionContainer<SequencerPoolPartition>>(
+      SequencerPartitionContainerImpl.class);
 
   /**
    * Construct a new Run with a default empty SecurityProfile
@@ -59,8 +60,9 @@ public class RunImpl extends AbstractRun implements Serializable {
 
   /**
    * Construct a new Run with a SecurityProfile owned by the given User
-   *
-   * @param user of type User
+   * 
+   * @param user
+   *          of type User
    */
   public RunImpl(User user) {
     setSecurityProfile(new SecurityProfile(user));
@@ -69,8 +71,7 @@ public class RunImpl extends AbstractRun implements Serializable {
   public RunImpl(Experiment experiment, User user) {
     if (experiment.userCanRead(user)) {
       setSecurityProfile(experiment.getSecurityProfile());
-    }
-    else {
+    } else {
       setSecurityProfile(new SecurityProfile(user));
     }
   }
@@ -90,24 +91,23 @@ public class RunImpl extends AbstractRun implements Serializable {
   public void addSequencerPartitionContainer(SequencerPartitionContainer<SequencerPoolPartition> f) {
     f.setSecurityProfile(getSecurityProfile());
     if (f.getId() == 0L && f.getIdentificationBarcode() == null) {
-      //can't validate it so add it anyway. this will only usually be the case for new run population.
+      // can't validate it so add it anyway. this will only usually be the case for new run population.
       this.containers.add(f);
-    }
-    else {
+    } else {
       if (!this.containers.contains(f)) {
         this.containers.add(f);
       }
     }
   }
 
+  @Override
   public void buildSubmission() {
   }
 
   /**
    * Method buildReport ...
    */
+  @Override
   public void buildReport() {
   }
 }
-
-

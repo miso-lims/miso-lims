@@ -7,12 +7,13 @@ import java.util.Collection;
  * <p/>
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 29/08/12
  * @since version
  */
 public interface EntityNamingSchemeResolverService {
   MisoNamingScheme<?> getNamingScheme(String schemeName);
+
   Collection<MisoNamingScheme<?>> getNamingSchemes();
 }

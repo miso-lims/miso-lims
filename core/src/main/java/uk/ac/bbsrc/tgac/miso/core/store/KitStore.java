@@ -23,30 +23,39 @@
 
 package uk.ac.bbsrc.tgac.miso.core.store;
 
+import java.io.IOException;
+import java.util.List;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 
-import java.io.IOException;
-import java.util.List;
-
 /**
  * Defines a DAO interface for storing Kits
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public interface KitStore extends Store<Kit> {
   Kit getKitByIdentificationBarcode(String barcode) throws IOException;
+
   Kit getKitByLotNumber(String lotNumber) throws IOException;
+
   List<Kit> listByLibrary(long libraryId) throws IOException;
+
   List<Kit> listByExperiment(long experimentId) throws IOException;
+
   List<Kit> listByManufacturer(String manufacturerName) throws IOException;
+
   List<Kit> listKitsByType(KitType kitType) throws IOException;
 
   KitDescriptor getKitDescriptorById(long kitDescriptorId) throws IOException;
+
   KitDescriptor getKitDescriptorByPartNumber(String partNumber) throws IOException;
+
   List<KitDescriptor> listAllKitDescriptors() throws IOException;
+
   List<KitDescriptor> listKitDescriptorsByType(KitType kitType) throws IOException;
+
   long saveKitDescriptor(KitDescriptor kitDescriptor) throws IOException;
 }

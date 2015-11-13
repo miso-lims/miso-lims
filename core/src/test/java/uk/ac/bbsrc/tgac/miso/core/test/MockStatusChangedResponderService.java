@@ -26,7 +26,6 @@ package uk.ac.bbsrc.tgac.miso.core.test;
 import com.eaglegenomics.simlims.core.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
@@ -34,7 +33,6 @@ import uk.ac.bbsrc.tgac.miso.core.event.Alert;
 import uk.ac.bbsrc.tgac.miso.core.event.AlerterService;
 import uk.ac.bbsrc.tgac.miso.core.event.Event;
 import uk.ac.bbsrc.tgac.miso.core.event.ResponderService;
-import uk.ac.bbsrc.tgac.miso.core.event.model.RunEvent;
 import uk.ac.bbsrc.tgac.miso.core.event.model.StatusChangedEvent;
 import uk.ac.bbsrc.tgac.miso.core.exception.AlertingException;
 
@@ -45,7 +43,7 @@ import java.util.Set;
  * uk.ac.bbsrc.tgac.miso.core.test
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 27/09/11
  * @since 0.1.2
@@ -67,7 +65,7 @@ public class MockStatusChangedResponderService implements ResponderService {
   @Override
   public boolean respondsTo(Event event) {
     if (event instanceof StatusChangedEvent) {
-      StatusChangedEvent se = (StatusChangedEvent)event;
+      StatusChangedEvent se = (StatusChangedEvent) event;
       Status s = se.getStatus();
       log.info("Checking responder for status change event for " + se.getEventObject().getClass().getSimpleName());
       if (s != null) {
@@ -85,13 +83,12 @@ public class MockStatusChangedResponderService implements ResponderService {
     User u = new UserImpl();
     u.setFullName("Bar baz");
     Alert a = new MockAlert(u);
-    a.setAlertText(a.getAlertText() + " ("+event.getEventMessage()+")");
+    a.setAlertText(a.getAlertText() + " (" + event.getEventMessage() + ")");
 
     for (AlerterService as : alerterServices) {
       try {
         as.raiseAlert(a);
-      }
-      catch (AlertingException e) {
+      } catch (AlertingException e) {
         log.error("Cannot raise user-level alert:" + e.getMessage());
         e.printStackTrace();
       }

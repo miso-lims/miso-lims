@@ -33,7 +33,7 @@ import java.util.Properties;
 
 /**
  * Decorates a Study so that an ERA Study submission XML document can be built from it
- *
+ * 
  * @author Rob Davey
  * @date 12-Oct-2010
  * @since 0.0.2
@@ -45,11 +45,11 @@ public class EraStudyDecorator extends AbstractSubmittableDecorator<Document> {
     this.submission = submission;
   }
 
+  @Override
   public void buildSubmission() {
-    Study s = (Study)submittable;
+    Study s = (Study) submittable;
     if (submission != null) {
       Element study = submission.createElement("STUDY");
-      //study.setAttribute("accession", s.getAccession());
       study.setAttribute("alias", s.getAlias());
 
       Element studyDescriptor = submission.createElementNS(null, "DESCRIPTOR");
@@ -61,17 +61,12 @@ public class EraStudyDecorator extends AbstractSubmittableDecorator<Document> {
       studyType.setAttribute("existing_study_type", s.getStudyType());
       studyDescriptor.appendChild(studyType);
 
-      // DEPRECATED SRA 1.2
-      //Element centerName = doc.createElementNS(null, "CENTER_NAME");
-      //centerName.setTextContent(TgacSubmissionConstants.CENTRE_NAME.getKey());
-      //studyDescriptor.appendChild(centerName);
-
       Element centerProjectName = submission.createElementNS(null, "CENTER_PROJECT_NAME");
       centerProjectName.setTextContent(s.getProject().getAlias());
       studyDescriptor.appendChild(centerProjectName);
 
       Element studyAbstract = submission.createElementNS(null, "STUDY_ABSTRACT");
-      //TODO - add Study.getAbstract()
+      // TODO - add Study.getAbstract()
       studyAbstract.setTextContent(s.getAbstract());
       studyDescriptor.appendChild(studyAbstract);
 

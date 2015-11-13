@@ -44,7 +44,7 @@ import java.util.Collection;
 
 /**
  * A controller to handle all REST requests for Libraries
- *
+ * 
  * @author Rob Davey
  * @date 16-Aug-2011
  * @since 0.1.0
@@ -74,8 +74,7 @@ public class LibraryRestController {
         return mapper.writeValueAsString(l);
       }
       return mapper.writeValueAsString(RestUtils.error("No such library with that ID.", "libraryId", libraryId.toString()));
-    }
-    catch (IOException ioe) {
+    } catch (IOException ioe) {
       return mapper.writeValueAsString(RestUtils.error("Cannot retrieve library: " + ioe.getMessage(), "libraryId", libraryId.toString()));
     }
   }

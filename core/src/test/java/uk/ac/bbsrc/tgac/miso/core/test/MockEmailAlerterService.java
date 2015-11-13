@@ -37,7 +37,7 @@ import java.util.Properties;
  * uk.ac.bbsrc.tgac.miso.core.test
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 29/09/11
  * @since 0.1.2
@@ -52,8 +52,7 @@ public class MockEmailAlerterService implements AlerterService {
     String to = "someone@somewhere";
     String from = "runstats@miso";
     String subject = "Test runstats delivery";
-    String text = "Hello,\n\nMISO would like to tell you about something:\n\n"+a.toString();
-
+    String text = "Hello,\n\nMISO would like to tell you about something:\n\n" + a.toString();
 
     try {
       EmailUtils.send(to, from, subject, text, new Properties());

@@ -25,15 +25,11 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.session.SessionInformation;
-import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -76,8 +72,7 @@ public class ListUsersController {
       model.addAttribute("total", nonExpiredUsers.size());
 
       return new ModelAndView("/pages/listUsers.jsp", "users", securityManager.listAllUsers());
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to list users", ex);
       }
@@ -89,8 +84,7 @@ public class ListUsersController {
   public ModelAndView techListUsers() throws IOException {
     try {
       return new ModelAndView("/pages/listUsers.jsp", "users", securityManager.listAllUsers());
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to list users", ex);
       }

@@ -28,7 +28,6 @@ import com.eaglegenomics.simlims.core.User;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
 import uk.ac.bbsrc.tgac.miso.core.event.model.PoolEvent;
 import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
@@ -44,7 +43,7 @@ import java.util.*;
 
 /**
  * Skeleton implementation of a Pool
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -58,7 +57,7 @@ public abstract class AbstractPool<P extends Poolable> implements Pool<P> {
   private long poolId = AbstractPool.UNSAVED_ID;
 
   @OneToOne(cascade = CascadeType.ALL)
-  private SecurityProfile securityProfile;  
+  private SecurityProfile securityProfile;
 
   private String name;
   private String alias;
@@ -79,11 +78,13 @@ public abstract class AbstractPool<P extends Poolable> implements Pool<P> {
   private Set<MisoListener> listeners = new HashSet<MisoListener>();
   private Set<User> watchers = new HashSet<User>();
 
+  @Override
   @Deprecated
   public Long getPoolId() {
     return this.poolId;
   }
 
+  @Override
   @Deprecated
   public void setPoolId(Long poolId) {
     this.poolId = poolId;
@@ -94,6 +95,7 @@ public abstract class AbstractPool<P extends Poolable> implements Pool<P> {
     return poolId;
   }
 
+  @Override
   public void setId(long id) {
     this.poolId = id;
   }
@@ -131,13 +133,11 @@ public abstract class AbstractPool<P extends Poolable> implements Pool<P> {
       for (T poolable : poolables) {
         if (poolable != null) {
           if (poolable instanceof Poolable) {
-            this.pooledElements.add((P)poolable);
-          }
-          else {
+            this.pooledElements.add((P) poolable);
+          } else {
             log.error(poolable.getClass().getName());
           }
-        }
-        else {
+        } else {
           log.error("Null poolable");
         }
       }
@@ -150,9 +150,9 @@ public abstract class AbstractPool<P extends Poolable> implements Pool<P> {
   }
 
   /**
-   * Convenience method to return Dilutions from this Pool given that the Pooled Elements may well either be a set of
-   * single dilutions, or a single plate comprising a number of dilutions within that plate, or something else entirely
-   *
+   * Convenience method to return Dilutions from this Pool given that the Pooled Elements may well either be a set of single dilutions, or a
+   * single plate comprising a number of dilutions within that plate, or something else entirely
+   * 
    * @return Collection<Dilution> dilutions.
    */
   @Override
@@ -160,7 +160,7 @@ public abstract class AbstractPool<P extends Poolable> implements Pool<P> {
     Set<Dilution> allDilutions = new HashSet<Dilution>();
     for (Poolable poolable : getPoolableElements()) {
       if (poolable instanceof Dilution) {
-        allDilutions.add((Dilution)poolable);
+        allDilutions.add((Dilution) poolable);
       }
     }
     return allDilutions;
@@ -191,102 +191,119 @@ public abstract class AbstractPool<P extends Poolable> implements Pool<P> {
     return experiments;
   }
 
+  @Override
   public Date getCreationDate() {
     return this.creationDate;
   }
 
+  @Override
   public void setCreationDate(Date creationDate) {
     this.creationDate = creationDate;
   }
 
+  @Override
   public Double getConcentration() {
     return this.concentration;
   }
 
+  @Override
   public void setConcentration(Double concentration) {
     this.concentration = concentration;
   }
 
+  @Override
   public String getIdentificationBarcode() {
     return identificationBarcode;
   }
 
+  @Override
   public void setIdentificationBarcode(String identificationBarcode) {
     this.identificationBarcode = identificationBarcode;
   }
 
+  @Override
   public String getLabelText() {
     return getAlias();
   }
 
+  @Override
   public boolean getReadyToRun() {
     return readyToRun;
   }
 
+  @Override
   public void setReadyToRun(boolean readyToRun) {
     if (!getReadyToRun() && readyToRun) {
       this.readyToRun = readyToRun;
       firePoolReadyEvent();
-    }
-    else {
+    } else {
       this.readyToRun = readyToRun;
     }
   }
 
+  @Override
   public void addQc(PoolQC poolQc) throws MalformedPoolQcException {
     this.poolQCs.add(poolQc);
     try {
       poolQc.setPool(this);
-    }
-    catch (MalformedPoolException e) {
+    } catch (MalformedPoolException e) {
       e.printStackTrace();
     }
   }
 
+  @Override
   public Collection<PoolQC> getPoolQCs() {
     return poolQCs;
   }
 
+  @Override
   public Boolean getQcPassed() {
     return qcPassed;
   }
 
+  @Override
   public void setQcPassed(Boolean qcPassed) {
     this.qcPassed = qcPassed;
   }
 
+  @Override
   public Date getLastUpdated() {
     return lastUpdated;
   }
 
+  @Override
   public void setLastUpdated(Date lastUpdated) {
     this.lastUpdated = lastUpdated;
   }
 
+  @Override
   public boolean userCanRead(User user) {
     return securityProfile.userCanRead(user);
   }
 
+  @Override
   public boolean userCanWrite(User user) {
     return securityProfile.userCanWrite(user);
   }
 
+  @Override
   public void setSecurityProfile(SecurityProfile securityProfile) {
     this.securityProfile = securityProfile;
   }
 
+  @Override
   public SecurityProfile getSecurityProfile() {
     return securityProfile;
   }
 
+  @Override
   public void inheritPermissions(SecurableByProfile parent) throws SecurityException {
     if (parent.getSecurityProfile().getOwner() != null) {
       setSecurityProfile(parent.getSecurityProfile());
-    }
-    else {
+    } else {
       throw new SecurityException("Cannot inherit permissions when parent object owner is not set!");
     }
-  }  
+  }
 
   @Override
   public Set<MisoListener> getListeners() {
@@ -305,8 +322,7 @@ public abstract class AbstractPool<P extends Poolable> implements Pool<P> {
 
   protected void firePoolReadyEvent() {
     if (this.getId() != 0L) {
-      //PoolEvent pe = new PoolEvent(this, MisoEventType.POOL_READY, "Pool "+getName()+" ("+getAlias()+") ready to run");
-      PoolEvent pe = new PoolEvent(this, MisoEventType.POOL_READY, "Pool "+getName()+" ready to run");
+      PoolEvent pe = new PoolEvent(this, MisoEventType.POOL_READY, "Pool " + getName() + " ready to run");
       for (MisoListener listener : getListeners()) {
         listener.stateChanged(pe);
       }
@@ -338,50 +354,22 @@ public abstract class AbstractPool<P extends Poolable> implements Pool<P> {
     return getName();
   }
 
-  /*
-  public static String lookupPrefix(PlatformType type) {
-    if (type.equals(PlatformType.ILLUMINA)) {
-      return "IPO";
-    }
-    else if (type.equals(PlatformType.SOLID)) {
-      return "SPO";
-    }
-    else if (type.equals(PlatformType.LS454)) {
-      return "LPO";
-    }
-    else if (type.equals(PlatformType.PACBIO)) {
-      return "PPO";
-    }
-    else if (type.equals(PlatformType.IONTORRENT)) {
-      return "TPO";
-    }
-    //must be a universal Pool
-    return "UPO";
-  }
-*/
-
+  @Override
   public boolean isDeletable() {
-    return getId() != AbstractPool.UNSAVED_ID &&
-           getPoolableElements().isEmpty();
+    return getId() != AbstractPool.UNSAVED_ID && getPoolableElements().isEmpty();
   }
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null)
-      return false;
-    if (obj == this)
-      return true;
-    if (!(obj instanceof Platform))
-      return false;
+    if (obj == null) return false;
+    if (obj == this) return true;
+    if (!(obj instanceof Platform)) return false;
     Pool them = (Pool) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
-    if (getId() == AbstractPool.UNSAVED_ID
-        || them.getId() == AbstractPool.UNSAVED_ID) {
-      return getPlatformType().equals(them.getPlatformType())
-             && getCreationDate().equals(them.getCreationDate());
-    }
-    else {
+    if (getId() == AbstractPool.UNSAVED_ID || them.getId() == AbstractPool.UNSAVED_ID) {
+      return getPlatformType().equals(them.getPlatformType()) && getCreationDate().equals(them.getCreationDate());
+    } else {
       return getId() == them.getId();
     }
   }
@@ -389,22 +377,19 @@ public abstract class AbstractPool<P extends Poolable> implements Pool<P> {
   @Override
   public int hashCode() {
     if (getId() != AbstractPool.UNSAVED_ID) {
-      return (int)getId();
-    }
-    else {
+      return (int) getId();
+    } else {
       final int PRIME = 37;
       int hashcode = -1;
       if (getPlatformType() != null) hashcode = PRIME * hashcode + getPlatformType().hashCode();
       if (getCreationDate() != null) hashcode = PRIME * hashcode + getCreationDate().hashCode();
-//      if (getIdentificationBarcode() != null) hashcode = PRIME * hashcode + getIdentificationBarcode().hashCode();
-//      if (getDilutions() != null && !getDilutions().isEmpty()) hashcode = PRIME * hashcode + getDilutions().hashCode();
       return hashcode;
     }
   }
 
   @Override
   public int compareTo(Object o) {
-    Pool t = (Pool)o;
+    Pool t = (Pool) o;
     if (getId() < t.getId()) return -1;
     if (getId() > t.getId()) return 1;
     return 0;

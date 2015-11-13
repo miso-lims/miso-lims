@@ -23,16 +23,12 @@
 
 package uk.ac.bbsrc.tgac.miso.core.service.submission;
 
-import java.io.File;
-import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * An interface that defines datafile upload progress report
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -40,13 +36,20 @@ public interface UploadReport {
   /**
    *
    */
-    public void setStatus(String status);
-    public void setMessage(String message);
-    public String getStatus();
-    public String getMessage();
-    public Map<String,Object> getUploadReport();
-    public List<UploadJob> getUploadJobs();
-    public UploadJob getUploadJobByFile();
-    public UploadJob getUploadJobByIndex();
+  public void setStatus(String status);
+
+  public void setMessage(String message);
+
+  public String getStatus();
+
+  public String getMessage();
+
+  public Map<String, Object> getUploadReport();
+
+  public List<UploadJob> getUploadJobs();
+
+  public UploadJob getUploadJobByFile();
+
+  public UploadJob getUploadJobByIndex();
 
 }

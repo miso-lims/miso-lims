@@ -71,14 +71,14 @@ import uk.ac.bbsrc.tgac.miso.tools.run.util.FileSetTransformer;
  * uk.ac.bbsrc.tgac.miso.notification.util
  * <p/>
  * Transforms relevant Illumina metadata files into a Map to form the payload of a Message
- *
+ * 
  * @author Rob Davey
  * @date 10-Dec-2010
  * @since 0.1.6
  */
 public class IlluminaTransformer implements FileSetTransformer<String, String, File> {
   protected static final Logger log = LoggerFactory.getLogger(IlluminaTransformer.class);
-  
+
   public static final String JSON_RUN_NAME = "runName";
   public static final String JSON_FULL_PATH = "fullPath";
   public static final String JSON_RUN_INFO = "runinfo";
@@ -90,12 +90,12 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
   public static final String JSON_NUM_CYCLES = "numCycles";
   public static final String JSON_START_DATE = "startDate";
   public static final String JSON_COMPLETE_DATE = "completionDate";
-  
+
   public static final String STATUS_COMPLETE = "Completed";
   public static final String STATUS_RUNNING = "Running";
   public static final String STATUS_UNKNOWN = "Unknown";
   public static final String STATUS_FAILED = "Failed";
-  
+
   private final String oldStatusPath = "/Data/Status.xml";
   private final String newStatusPath = "/Data/reports/Status.xml";
   private final String runInfoPath = "/RunInfo.xml";
@@ -104,26 +104,24 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
   private final Map<String, String> finishedCache = new HashMap<>();
 
   private final Pattern runCompleteLogPattern = Pattern.compile(
-      "(\\d{1,2}\\/\\d{1,2}\\/\\d{4},\\d{2}:\\d{2}:\\d{2})\\.\\d{3},\\d+,\\d+,\\d+,Proce[s||e]sing\\s+completed\\.\\s+Run\\s+has\\s+finished\\."
-  );
+      "(\\d{1,2}\\/\\d{1,2}\\/\\d{4},\\d{2}:\\d{2}:\\d{2})\\.\\d{3},\\d+,\\d+,\\d+,Proce[s||e]sing\\s+completed\\.\\s+Run\\s+has\\s+finished\\.");
 
-  private final Pattern lastDateEntryLogPattern = Pattern.compile(
-      "(\\d{1,2}\\/\\d{1,2}\\/\\d{4},\\d{2}:\\d{2}:\\d{2})\\.\\d{3},\\d+,\\d+,\\d+,.*"
-  );
+  private final Pattern lastDateEntryLogPattern = Pattern
+      .compile("(\\d{1,2}\\/\\d{1,2}\\/\\d{4},\\d{2}:\\d{2}:\\d{2})\\.\\d{3},\\d+,\\d+,\\d+,.*");
 
   private final DateFormat logDateFormat = new SimpleDateFormat("MM'/'dd'/'yyyy','HH:mm:ss");
 
   public Map<String, String> transform(Message<Set<File>> message) {
     return transform(message.getPayload());
   }
-  
+
   @Override
   public Map<String, String> transform(Set<File> files) {
     log.info("Processing " + files.size() + " Illumina run directories...");
 
     int count = 0;
 
-    //TODO modify this to use a JSONObject instead of a Map
+    // TODO modify this to use a JSONObject instead of a Map
     Map<String, JSONArray> map = new HashMap<>();
 
     map.put(STATUS_RUNNING, new JSONArray());
@@ -144,27 +142,28 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
 
             if (!finishedCache.keySet().contains(runName)) {
               int numReads = 0;
-              
+
               run.put(JSON_RUN_NAME, runName);
-              run.put(JSON_FULL_PATH, rootFile.getCanonicalPath()); //follow symlinks!
-              
+              run.put(JSON_FULL_PATH, rootFile.getCanonicalPath()); // follow symlinks!
+
               // Get xml files
               Document statusDoc = null;
               if (PossiblyGzippedFileUtils.checkExists(rootFile, oldStatusPath)) {
                 statusDoc = PossiblyGzippedFileUtils.getXmlDocument(rootFile, oldStatusPath);
                 if (statusDoc == null) {
-                  run.put(JSON_STATUS, "<error><RunName>" + runName + "</RunName><ErrorMessage>Cannot read status file</ErrorMessage></error>");
+                  run.put(JSON_STATUS,
+                      "<error><RunName>" + runName + "</RunName><ErrorMessage>Cannot read status file</ErrorMessage></error>");
                 }
-              }
-              else if (PossiblyGzippedFileUtils.checkExists(rootFile, newStatusPath)) {
+              } else if (PossiblyGzippedFileUtils.checkExists(rootFile, newStatusPath)) {
                 statusDoc = PossiblyGzippedFileUtils.getXmlDocument(rootFile, newStatusPath);
                 if (statusDoc == null) {
-                  run.put(JSON_STATUS, "<error><RunName>" + runName + "</RunName><ErrorMessage>Cannot read status file</ErrorMessage></error>");
+                  run.put(JSON_STATUS,
+                      "<error><RunName>" + runName + "</RunName><ErrorMessage>Cannot read status file</ErrorMessage></error>");
                 }
               }
               Document runInfoDoc = PossiblyGzippedFileUtils.getXmlDocument(rootFile, runInfoPath);
               Document runParamDoc = PossiblyGzippedFileUtils.getXmlDocument(rootFile, runParametersPath);
-              
+
               // Get main stuff from Status.xml
               if (statusDoc != null) {
                 run.put(JSON_STATUS, SubmissionUtils.transform(statusDoc));
@@ -172,12 +171,12 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                   runName = statusDoc.getElementsByTagName("RunName").item(0).getTextContent();
                   run.put(JSON_RUN_NAME, runName);
                 }
-                
+
                 if (statusDoc.getElementsByTagName("NumberOfReads").getLength() != 0) {
                   numReads = new Integer(statusDoc.getElementsByTagName("NumberOfReads").item(0).getTextContent());
                 }
               }
-              
+
               // Get main stuff from RunInfo.xml
               if (runInfoDoc != null) {
                 run.put(JSON_RUN_INFO, SubmissionUtils.transform(runInfoDoc));
@@ -186,22 +185,21 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                   numReads = runInfoDoc.getElementsByTagName("Read").getLength();
                 }
               }
-              
+
               // Get main stuff from runParams.xml
               if (runParamDoc != null) {
                 run.put(JSON_RUN_PARAMS, SubmissionUtils.transform(runParamDoc));
                 checkRunParams(runParamDoc, run);
               }
-              
+
               boolean lastCycleComplete = checkCycles(rootFile, run, statusDoc, runInfoDoc);
               checkDates(rootFile, run);
               String status = checkRunStatus(run, rootFile, numReads, lastCycleComplete);
               map.get(status).add(run);
-            }
-            else {
+            } else {
               log.info("Run already scanned. Getting cached version " + runName);
 
-              //if a completed run has been moved (e.g. archived), update the new path
+              // if a completed run has been moved (e.g. archived), update the new path
               JSONObject json = JSONObject.fromObject(finishedCache.get(runName));
               if (json.has("fullPath") && !rootFile.getCanonicalPath().equals(json.getString("fullPath"))) {
                 log.info("Cached path changed. Updating " + runName);
@@ -210,21 +208,17 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
               }
               map.get(STATUS_COMPLETE).add(finishedCache.get(runName));
             }
-          }
-          catch (ParserConfigurationException e) {
+          } catch (ParserConfigurationException e) {
             log.error("Error configuring parser: " + e.getMessage());
             e.printStackTrace();
-          }
-          catch (TransformerException e) {
+          } catch (TransformerException e) {
             log.error("Error transforming XML: " + e.getMessage());
             e.printStackTrace();
-          }
-          catch (IOException e) {
+          } catch (IOException e) {
             log.error("Error with file IO: " + e.getMessage());
             e.printStackTrace();
           }
-        }
-        else {
+        } else {
           log.error(rootFile.getName() + " :: Permission denied");
         }
       }
@@ -235,7 +229,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
       smap.put(key, map.get(key).toString());
 
       if (STATUS_COMPLETE.equals(key)) {
-        for (JSONObject run : (Iterable<JSONObject>)map.get(key)) {
+        for (JSONObject run : (Iterable<JSONObject>) map.get(key)) {
           if (!finishedCache.keySet().contains(run.getString("runName"))) {
             log.info("Caching completed run " + run.getString("runName"));
             finishedCache.put(run.getString("runName"), run.toString());
@@ -246,13 +240,15 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
 
     return smap;
   }
-  
+
   /**
-   * Reads a RunInfo document, looks for sequencer name, container ID, and lane count, and adds to the run any of these that are 
-   * not already included
+   * Reads a RunInfo document, looks for sequencer name, container ID, and lane count, and adds to the run any of these that are not already
+   * included
    * 
-   * @param runInfoDoc the RunInfo.xml Document
-   * @param run JSON representation of the sequencer run
+   * @param runInfoDoc
+   *          the RunInfo.xml Document
+   * @param run
+   *          JSON representation of the sequencer run
    * @throws TransformerException
    * @throws IOException
    * @throws ParserConfigurationException
@@ -264,8 +260,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
 
     if (runInfoDoc.getElementsByTagName("FlowcellId").getLength() != 0) {
       run.put(JSON_CONTAINER_ID, runInfoDoc.getElementsByTagName("FlowcellId").item(0).getTextContent());
-    }
-    else if (runInfoDoc.getElementsByTagName("Flowcell").getLength() != 0) {
+    } else if (runInfoDoc.getElementsByTagName("Flowcell").getLength() != 0) {
       run.put(JSON_CONTAINER_ID, runInfoDoc.getElementsByTagName("Flowcell").item(0).getTextContent());
     }
 
@@ -279,13 +274,15 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
       }
     }
   }
-  
+
   /**
-   * Reads the runParameters.xml document, looks for the sequencer name and container ID, and adds to the run any of these that are not 
+   * Reads the runParameters.xml document, looks for the sequencer name and container ID, and adds to the run any of these that are not
    * already included
    * 
-   * @param runParamDoc the runParameters.xml Document
-   * @param run JSON representation of the sequencer run
+   * @param runParamDoc
+   *          the runParameters.xml Document
+   * @param run
+   *          JSON representation of the sequencer run
    * @return true if runParameters.xml is missing, but runParameters.xml* is found, which indicates run failure; false otherwise
    * @throws TransformerException
    * @throws IOException
@@ -299,14 +296,15 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
     if (!run.has(JSON_CONTAINER_ID) && runParamDoc.getElementsByTagName("Barcode").getLength() != 0) {
       run.put(JSON_CONTAINER_ID, runParamDoc.getElementsByTagName("Barcode").item(0).getTextContent());
     }
-    
+
     run.put("kits", checkKits(runParamDoc));
   }
-  
+
   /**
    * Looks for a file in the run directory that begins with "runParameters.xml" which may indicate a failure
    * 
-   * @param rootFile run directory
+   * @param rootFile
+   *          run directory
    * @return true if any such files are found; false otherwise
    */
   private boolean checkRunParametersXFile(File rootFile) {
@@ -317,34 +315,37 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
     }
     return false;
   }
-  
+
   /**
-   * Checks Status.xml and RunInfo.xml for the total number of cycles, and looks for evidence of the final cycle completing. Status.xml 
-   * and several log files are examined. The number of cycles, if found, is added to the run data
+   * Checks Status.xml and RunInfo.xml for the total number of cycles, and looks for evidence of the final cycle completing. Status.xml and
+   * several log files are examined. The number of cycles, if found, is added to the run data
    * 
-   * @param rootFile run directory
-   * @param run JSON representation of the sequencer run
-   * @param statusDoc Status.xml Document (may be null)
-   * @param runInfoDoc RunInfo.xml Document (may be null)
+   * @param rootFile
+   *          run directory
+   * @param run
+   *          JSON representation of the sequencer run
+   * @param statusDoc
+   *          Status.xml Document (may be null)
+   * @param runInfoDoc
+   *          RunInfo.xml Document (may be null)
    * @return true if the method finds evidence of the final cycle completing; false otherwise
    * @throws FileNotFoundException
    * @throws IOException
    */
-  private boolean checkCycles(File rootFile, JSONObject run, Document statusDoc, Document runInfoDoc) throws FileNotFoundException, IOException {
+  private boolean checkCycles(File rootFile, JSONObject run, Document statusDoc, Document runInfoDoc)
+      throws FileNotFoundException, IOException {
     String runName = run.getString(JSON_RUN_NAME);
     int numCycles = 0;
-    
+
     if (statusDoc != null) {
       if (statusDoc.getElementsByTagName("NumCycles").getLength() != 0) {
         numCycles = new Integer(statusDoc.getElementsByTagName("NumCycles").item(0).getTextContent());
-      }
-      else if (statusDoc.getElementsByTagName("NumberCycles").getLength() != 0) {
+      } else if (statusDoc.getElementsByTagName("NumberCycles").getLength() != 0) {
         numCycles = new Integer(statusDoc.getElementsByTagName("NumberCycles").item(0).getTextContent());
       }
       if (numCycles > 0) {
         run.put(JSON_NUM_CYCLES, numCycles);
-        if (statusDoc.getElementsByTagName("ImgCycle").getLength() != 0
-            && statusDoc.getElementsByTagName("ScoreCycle").getLength() != 0
+        if (statusDoc.getElementsByTagName("ImgCycle").getLength() != 0 && statusDoc.getElementsByTagName("ScoreCycle").getLength() != 0
             && statusDoc.getElementsByTagName("CallCycle").getLength() != 0) {
           int imgCycle = new Integer(statusDoc.getElementsByTagName("ImgCycle").item(0).getTextContent());
           int scoreCycle = new Integer(statusDoc.getElementsByTagName("ScoreCycle").item(0).getTextContent());
@@ -353,7 +354,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
         }
       }
     }
-    
+
     if (numCycles == 0 && runInfoDoc != null) {
       NodeList nl = runInfoDoc.getElementsByTagName("Read");
       if (nl.getLength() > 0) {
@@ -366,7 +367,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
         run.put(JSON_NUM_CYCLES, numCycles);
       }
     }
-    
+
     // Check for Post Run Step log
     File dir = new File(rootFile, "/Logs/");
     FileFilter fileFilter = new WildcardFileFilter("*Post Run Step.log*");
@@ -374,20 +375,19 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
     if (filterFiles != null && filterFiles.length > 0) {
       return true;
     }
-    
+
     if (numCycles > 0) {
       // Check for last cycle log file
       if (PossiblyGzippedFileUtils.checkExists(rootFile, "/Logs/" + runName + "_Cycle" + numCycles + "_Log.00.log")) {
         return true;
       }
-      
+
       // Check CycleTimes.txt for last cycle complete log message
       String cycleTimeLogPath = "/Logs/CycleTimes.txt";
       if (PossiblyGzippedFileUtils.checkExistsReadable(rootFile, cycleTimeLogPath)) {
         Pattern p = Pattern.compile(
-          "(\\d{1,2}\\/\\d{1,2}\\/\\d{4})\\s+(\\d{2}:\\d{2}:\\d{2})\\.\\d{3}\\s+[A-z0-9]+\\s+" + numCycles + "\\s+End\\s{1}Imaging"
-        );
-        
+            "(\\d{1,2}\\/\\d{1,2}\\/\\d{4})\\s+(\\d{2}:\\d{2}:\\d{2})\\.\\d{3}\\s+[A-z0-9]+\\s+" + numCycles + "\\s+End\\s{1}Imaging");
+
         Matcher m = PossiblyGzippedFileUtils.tailGrep(rootFile, cycleTimeLogPath, p, 10);
         if (m != null && m.groupCount() > 0) {
           return true;
@@ -396,12 +396,14 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
     }
     return false;
   }
-  
+
   /**
    * Checks for existance the expected Basecalling_Netcopy_complete_X files for a completed run
    * 
-   * @param rootFile run directory
-   * @param numReads number of reads
+   * @param rootFile
+   *          run directory
+   * @param numReads
+   *          number of reads
    * @return true if the expected files exist; false otherwise
    */
   private boolean checkReadCompleteFiles(File rootFile, int numReads) {
@@ -409,8 +411,9 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
       if (numReads < 1) return false;
       for (int i = 1; i <= numReads; i++) {
         if (!PossiblyGzippedFileUtils.checkExists(rootFile, "/Basecalling_Netcopy_complete_Read" + (i) + ".txt")
-        && !PossiblyGzippedFileUtils.checkExists(rootFile, "/Basecalling_Netcopy_complete_READ" + (i) + ".txt")) {
-          log.debug(rootFile.getName() + " :: No Basecalling_Netcopy_complete_Read" + (i) + ".txt / Basecalling_Netcopy_complete_READ" + (i) + ".txt!");
+            && !PossiblyGzippedFileUtils.checkExists(rootFile, "/Basecalling_Netcopy_complete_READ" + (i) + ".txt")) {
+          log.debug(rootFile.getName() + " :: No Basecalling_Netcopy_complete_Read" + (i) + ".txt / Basecalling_Netcopy_complete_READ" + (i)
+              + ".txt!");
           return false;
         }
       }
@@ -421,8 +424,10 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
   /**
    * Attempts to find the sequencer run's start and end date, and add them to the run data
    * 
-   * @param rootFile run directory
-   * @param run JSON representation of the sequencer run
+   * @param rootFile
+   *          run directory
+   * @param run
+   *          JSON representation of the sequencer run
    * @throws IOException
    */
   private void checkDates(File rootFile, JSONObject run) throws IOException {
@@ -434,13 +439,13 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
       log.debug(runName + " :: Got start date -> " + startMatcher.group(1));
       run.put(JSON_START_DATE, startMatcher.group(1));
     }
-    
+
     final String cycleTimeLogPath = "/Logs/CycleTimes.txt";
     final String rtaLogPath = "/Data/RTALogs/Log.txt";
     final String rtaLog2Path = "/Data/Log.txt";
     final String eventsLogPath = "/Events.log";
     final String rtaCompletePath = "/RTAComplete.txt";
-    
+
     String completed = null;
 
     // check RTA logs
@@ -450,25 +455,23 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
         completed = m.group(1);
         log.debug(runName + " :: Got RTALogs Log.txt completion date -> " + completed);
       }
-    }
-    else if (PossiblyGzippedFileUtils.checkExistsReadable(rootFile, rtaLog2Path)) {
+    } else if (PossiblyGzippedFileUtils.checkExistsReadable(rootFile, rtaLog2Path)) {
       Matcher m = PossiblyGzippedFileUtils.tailGrep(rootFile, rtaLog2Path, runCompleteLogPattern, 10);
       if (m != null && m.groupCount() > 0) {
         completed = m.group(1);
         log.debug(runName + " :: Got Log.txt completion date -> " + completed);
       }
     }
-    
+
     if (completed == null) {
-    //attempt to get latest log file entry date
+      // attempt to get latest log file entry date
       if (PossiblyGzippedFileUtils.checkExistsReadable(rootFile, rtaLogPath)) {
         Matcher m = PossiblyGzippedFileUtils.tailGrep(rootFile, rtaLogPath, lastDateEntryLogPattern, 1);
         if (m != null && m.groupCount() > 0) {
           completed = m.group(1);
           log.debug(runName + " :: Got RTALogs Log.txt last entry date -> " + completed);
         }
-      }
-      else if (PossiblyGzippedFileUtils.checkExistsReadable(rootFile, rtaLog2Path)) {
+      } else if (PossiblyGzippedFileUtils.checkExistsReadable(rootFile, rtaLog2Path)) {
         Matcher m = PossiblyGzippedFileUtils.tailGrep(rootFile, rtaLog2Path, lastDateEntryLogPattern, 1);
         if (m != null && m.groupCount() > 0) {
           completed = m.group(1);
@@ -476,13 +479,12 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
         }
       }
     }
-    
+
     // Try CycleTimes.txt
     if (run.has(JSON_NUM_CYCLES) && PossiblyGzippedFileUtils.checkExistsReadable(rootFile, cycleTimeLogPath)) {
       int numCycles = run.getInt(JSON_NUM_CYCLES);
       Pattern p = Pattern.compile(
-          "(\\d{1,2}\\/\\d{1,2}\\/\\d{4})\\s+(\\d{2}:\\d{2}:\\d{2})\\.\\d{3}\\s+[A-z0-9]+\\s+" + numCycles + "\\s+End\\s{1}Imaging"
-      );
+          "(\\d{1,2}\\/\\d{1,2}\\/\\d{4})\\s+(\\d{2}:\\d{2}:\\d{2})\\.\\d{3}\\s+[A-z0-9]+\\s+" + numCycles + "\\s+End\\s{1}Imaging");
 
       Matcher m = PossiblyGzippedFileUtils.tailGrep(rootFile, cycleTimeLogPath, p, 10);
       if (m != null && m.groupCount() > 0) {
@@ -490,8 +492,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
         if (completed == null) {
           completed = cycleDateStr;
           log.debug(runName + " :: Got CycleTimes.txt last cycle date -> " + completed);
-        }
-        else { // check if this time is newer
+        } else { // check if this time is newer
           log.debug(runName + " :: Checking " + cycleDateStr + " vs. " + completed);
           try {
             Date cycleDate = logDateFormat.parse(cycleDateStr);
@@ -501,22 +502,19 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
               completed = cycleDateStr;
               log.debug(runName + " :: Cycletimes completion date is newer -> " + completed);
             }
-          }
-          catch (ParseException e) {
+          } catch (ParseException e) {
             log.debug(runName + " :: Oops. Can't parse dates. Falling back!");
           }
         }
       }
     }
 
-    //still nothing? attempt with Events.log
+    // still nothing? attempt with Events.log
     if (completed == null) {
-      //attempt to get latest log file entry date
+      // attempt to get latest log file entry date
       if (PossiblyGzippedFileUtils.checkExistsReadable(rootFile, eventsLogPath)) {
         log.debug(runName + " :: Checking events log...");
-        Pattern p = Pattern.compile(
-            "\\.*\\s+(\\d{1,2}\\/\\d{2}\\/\\d{4})\\s+(\\d{1,2}:\\d{2}:\\d{2}).\\d+.*"
-        );
+        Pattern p = Pattern.compile("\\.*\\s+(\\d{1,2}\\/\\d{2}\\/\\d{4})\\s+(\\d{1,2}:\\d{2}:\\d{2}).\\d+.*");
 
         Matcher m = PossiblyGzippedFileUtils.tailGrep(rootFile, eventsLogPath, p, 50);
         if (m != null && m.groupCount() > 0) {
@@ -530,9 +528,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
     if (completed == null) {
       if (PossiblyGzippedFileUtils.checkExistsReadable(rootFile, rtaCompletePath)) {
         log.debug(runName + " :: Last ditch attempt. Checking RTAComplete log...");
-        Pattern p = Pattern.compile(
-            "\\.*(\\d{1,2}\\/\\d{1,2}\\/\\d{4}),(\\d{1,2}:\\d{1,2}:\\d{1,2}).\\d+.*"
-        );
+        Pattern p = Pattern.compile("\\.*(\\d{1,2}\\/\\d{1,2}\\/\\d{4}),(\\d{1,2}:\\d{1,2}:\\d{1,2}).\\d+.*");
 
         Matcher m = PossiblyGzippedFileUtils.tailGrep(rootFile, rtaCompletePath, p, 2);
         if (m != null && m.groupCount() > 0) {
@@ -541,7 +537,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
         }
       }
     }
-    
+
     if (completed == null) completed = "null";
     run.put(JSON_COMPLETE_DATE, completed);
   }
@@ -549,9 +545,10 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
   /**
    * Checks files in the run directory's /Data/RTALogs/ subdirectory for a log message indicating run failure
    * 
-   * @param rootFile run directory
-   * @return true if a message is found that indicates run failure; false otherwise. A return value of false is not conclusive evidence 
-   * that a run has completed or that it was successful
+   * @param rootFile
+   *          run directory
+   * @return true if a message is found that indicates run failure; false otherwise. A return value of false is not conclusive evidence that
+   *         a run has completed or that it was successful
    * @throws IOException
    */
   private boolean checkLoggedFailures(File rootFile) throws IOException {
@@ -574,61 +571,57 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
     }
     return failed;
   }
-  
+
   private String checkRunStatus(JSONObject run, File rootFile, int numReads, boolean lastCycleComplete) throws IOException {
     final String runName = run.getString(JSON_RUN_NAME);
-    
+
     boolean baseCompleteFileFound = PossiblyGzippedFileUtils.checkExists(rootFile, "/Basecalling_Netcopy_complete.txt");
     boolean baseCompleteReadFilesFound = checkReadCompleteFiles(rootFile, numReads);
-    
+
     String returnStatus;
-    
+
     if (baseCompleteReadFilesFound) {
       if (lastCycleComplete) {
         // ReadX files exist, BaseComplete undetermined, lastCycle evidence exists
         log.debug(runName + " :: All Basecalling_Netcopy_complete*.txt exist and last cycle evidence exists.");
         returnStatus = STATUS_COMPLETE;
-      }
-      else {
+      } else {
         if (baseCompleteFileFound) {
           // ReadX files exist, BaseComplete file exists, No lastCycle evidence
-          log.debug(runName + " :: All Basecalling_Netcopy_complete_ReadX.txt exist and Basecalling_Netcopy_complete.txt exists but no evidence of last cycle completion.");
+          log.debug(runName
+              + " :: All Basecalling_Netcopy_complete_ReadX.txt exist and Basecalling_Netcopy_complete.txt exists but no evidence of last cycle completion.");
           returnStatus = STATUS_UNKNOWN;
-        }
-        else {
+        } else {
           // ReadX files exist, No BaseComplete file, No lastCycle evidence
-          log.debug(runName + " :: All Basecalling_Netcopy_complete_ReadX.txt exist but Basecalling_Netcopy_complete.txt doesn't exist and no evidence of last cycle completion.");
+          log.debug(runName
+              + " :: All Basecalling_Netcopy_complete_ReadX.txt exist but Basecalling_Netcopy_complete.txt doesn't exist and no evidence of last cycle completion.");
           returnStatus = STATUS_UNKNOWN;
         }
       }
-    }
-    else { // Missing ReadX files
+    } else { // Missing ReadX files
       if (PossiblyGzippedFileUtils.checkExists(rootFile, "/Run.completed")) {
         // Missing ReadX files, Run.completed exists
         log.debug(runName + " :: Basecalling_Netcopy_complete*.txt don't exist, but Run.completed exists.");
         returnStatus = STATUS_COMPLETE;
-      }
-      else {
+      } else {
         // Missing ReadX files, no Run.completed
         if (!baseCompleteFileFound && !lastCycleComplete) {
           // Missing ReadX files, no Run.completed, no BaseComplete file, no lastCycle evidence
           log.debug(runName + " :: Basecalling_Netcopy_complete*.txt don't exist and no evidence of last cycle completion.");
           returnStatus = STATUS_RUNNING;
-        }
-        else {
+        } else {
           // Missing ReadX files, no Run.completed, BaseComplete undetermined, lastCycle undetermined
           log.debug(runName + " :: Basecalling_Netcopy_complete*.txt don't exist.");
           returnStatus = STATUS_UNKNOWN;
         }
       }
     }
-    
+
     boolean failed = checkLoggedFailures(rootFile) || (!run.has(JSON_RUN_PARAMS) && checkRunParametersXFile(rootFile));
     if (failed) {
       return STATUS_FAILED;
-    }
-    else {
-      log.debug("Run is "+returnStatus);
+    } else {
+      log.debug("Run is " + returnStatus);
       return returnStatus;
     }
   }
@@ -637,7 +630,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
     Set<String> rlist = new HashSet<>();
     NodeList reagents = runParamDoc.getElementsByTagName("ReagentKits");
     if (reagents.getLength() > 0) {
-      Element rkit = (Element)reagents.item(0);
+      Element rkit = (Element) reagents.item(0);
       NodeList kits = rkit.getElementsByTagName("ID");
       for (int i = 0; i < kits.getLength(); i++) {
         Element e = (Element) kits.item(i);
@@ -652,26 +645,25 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
 
   private JSONObject parseInterOp(File rootFile) throws IOException {
     Document runInfo = null;
-    
+
     try {
       runInfo = PossiblyGzippedFileUtils.getXmlDocument(rootFile, "/RunInfo.xml");
     } catch (ParserConfigurationException | TransformerException e) {
       log.error("Error parsing file: " + e.getMessage());
       e.printStackTrace();
     }
-    
+
     if (runInfo == null) {
       return null;
-    }
-    else {
+    } else {
       Summary sum = new Summary();
       sum.setRunDirectory(rootFile.getCanonicalPath());
-      
+
       // Metrix fails to set current cycle, and parsing ErrorMetricsOut.bin depends on this, so set it here
       final String extractionMetricsPath = rootFile.getCanonicalPath() + "/InterOp/" + nki.constants.Constants.EXTRACTION_METRICS;
       ExtractionMetrics eim = new ExtractionMetrics(extractionMetricsPath, 0);
       sum.setCurrentCycle(eim.getLastCycle());
-      
+
       RunInfoHandler.parseAll(runInfo, sum);
       MetrixContainer mc = new MetrixContainer(sum, false); // Note: this is very slow, but the data is cached at least
       return JSONObject.fromObject(new MetrixContainerDecorator(mc, true).toJSON().toJSONString());
@@ -694,18 +686,16 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
           try {
             String runName = rootFile.getName();
             if (!finishedCache.keySet().contains(runName)) {
-              //parse interop if completed cache doesn't hold this run
+              // parse interop if completed cache doesn't hold this run
               JSONObject metrix = parseInterOp(rootFile);
               if (metrix != null) {
                 run.put("metrix", metrix);
-              }
-              else {
+              } else {
                 run.put("error", "Cannot provide metrics - parsing failed.");
               }
               run.put("runName", runName);
               map.add(run);
-            }
-            else {
+            } else {
               JSONObject cachedRun = JSONObject.fromObject(finishedCache.get(runName));
               if (!cachedRun.has("metrix")) {
                 JSONObject metrix = parseInterOp(rootFile);
@@ -713,24 +703,20 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
                   run.put("metrix", metrix);
                   cachedRun.put("metrix", metrix);
                   finishedCache.put(runName, cachedRun.toString());
-                }
-                else {
+                } else {
                   run.put("error", "Cannot provide metrics - parsing failed.");
                 }
-              }
-              else {
+              } else {
                 run.put("metrix", cachedRun.get("metrix"));
               }
               run.put("runName", runName);
               map.add(run);
             }
-          }
-          catch (IOException e) {
+          } catch (IOException e) {
             log.error("Error with file IO: " + e.getMessage());
             e.printStackTrace();
           }
-        }
-        else {
+        } else {
           log.error(rootFile.getName() + " :: Permission denied");
           run.put("runName", rootFile.getName());
           run.put("error", "Cannot read into run directory. Permission denied.");
@@ -757,13 +743,9 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
     for (File f : files) {
       try {
         xmls.add(SubmissionUtils.transform(f));
-      }
-      catch (TransformerException e) {
-        //e.printStackTrace();
+      } catch (TransformerException e) {
         log.error("Error transforming XML: " + e.getMessage());
-      }
-      catch (IOException e) {
-        //e.printStackTrace();
+      } catch (IOException e) {
         log.error("Error with file IO: " + e.getMessage());
       }
     }
@@ -790,13 +772,9 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
       File f = new File(params.getValue().toString());
       try {
         files.add(SubmissionUtils.transform(f));
-      }
-      catch (TransformerException e) {
-        //e.printStackTrace();
+      } catch (TransformerException e) {
         log.error("Error transforming XML: " + e.getMessage());
-      }
-      catch (IOException e) {
-        //e.printStackTrace();
+      } catch (IOException e) {
         log.error("Error with file IO: " + e.getMessage());
       }
     }

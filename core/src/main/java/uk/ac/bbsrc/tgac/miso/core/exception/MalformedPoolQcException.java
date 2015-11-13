@@ -27,7 +27,7 @@ package uk.ac.bbsrc.tgac.miso.core.exception;
  * uk.ac.bbsrc.tgac.miso.core.exception
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.1.9
  */
@@ -43,4 +43,3 @@ public class MalformedPoolQcException extends Exception {
     }
   }
 }
-

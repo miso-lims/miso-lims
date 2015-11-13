@@ -28,20 +28,21 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.encoding.PasswordEncoder;
 
 /**
- * A service class that passes plaintext passwords through the system so that they can then be encoded by a downstream
- * service, such as OpenLDAP
- *
+ * A service class that passes plaintext passwords through the system so that they can then be encoded by a downstream service, such as
+ * OpenLDAP
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public final class PassthroughPasswordCodecService implements PasswordCodecService {
-  /** Field log  */
+  /** Field log */
   protected static final Logger log = LoggerFactory.getLogger(PassthroughPasswordCodecService.class);
 
-  /** Field instance  */
+  /** Field instance */
   private static PassthroughPasswordCodecService instance;
   private PasswordEncoder encoder;
 
+  @Override
   public PasswordEncoder getEncoder() {
     return encoder;
   }
@@ -49,26 +50,31 @@ public final class PassthroughPasswordCodecService implements PasswordCodecServi
   /**
    * Set the encoder. This will NOT actually encrypt, but is used for validation of existing passwords
    */
+  @Override
   public void setEncoder(PasswordEncoder encoder) {
     this.encoder = encoder;
   }
 
   /**
    * This method does nothing, i.e. simply passes the password through and does no encryption
-   *
-   * @param plaintext of type String
+   * 
+   * @param plaintext
+   *          of type String
    * @return String the plaintext String
    */
+  @Override
   public synchronized String encrypt(String plaintext) {
     return plaintext;
   }
 
   /**
    * This method does nothing, i.e. simply passes the password through and does no encryption
-   *
-   * @param plaintext of type String
+   * 
+   * @param plaintext
+   *          of type String
    * @return String the plaintext String
    */
+  @Override
   public synchronized String encrypt(String plaintext, byte[] salt) {
     return plaintext;
   }

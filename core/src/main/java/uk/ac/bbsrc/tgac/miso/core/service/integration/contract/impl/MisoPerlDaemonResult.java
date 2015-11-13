@@ -27,7 +27,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.integration.contract.InterrogationResu
 
 /**
  * A class that can parse responses made by the MISO Interrogation Daemon
- *
+ * 
  * @author Rob Davey
  * @date 07-Oct-2010
  * @since 0.0.2
@@ -37,8 +37,9 @@ public class MisoPerlDaemonResult implements InterrogationResult<String> {
 
   /**
    * Creates a new MisoPerlDaemonResult instance.
-   *
-   * @param resultString of type String
+   * 
+   * @param resultString
+   *          of type String
    */
   public MisoPerlDaemonResult(String resultString) {
     this.resultString = resultString;
@@ -46,9 +47,10 @@ public class MisoPerlDaemonResult implements InterrogationResult<String> {
 
   /**
    * Parses the response given on construction and returns a result in the form of a simple String
-   *
+   * 
    * @return String the parsed response
    */
+  @Override
   public String parseResult() {
     return resultString;
   }

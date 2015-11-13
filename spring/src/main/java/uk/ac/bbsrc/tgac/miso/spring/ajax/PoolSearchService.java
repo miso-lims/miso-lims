@@ -44,7 +44,7 @@ import java.util.*;
  * uk.ac.bbsrc.tgac.miso.miso.spring.ajax
  * <p/>
  * Info
- *
+ * 
  * @author Xingdong Bian
  * @author Rob Davey
  * @since 0.0.2
@@ -68,22 +68,19 @@ public class PoolSearchService {
         Collection<Pool<? extends Poolable>> pools = null;
         if (searchStr != null && !searchStr.equals("")) {
           if (LimsUtils.isBase64String(searchStr)) {
-            //Base64-encoded string, most likely a barcode image beeped in. decode and search
+            // Base64-encoded string, most likely a barcode image beeped in. decode and search
             searchStr = new String(Base64.decodeBase64(searchStr));
           }
 
           if (readyOnly) {
             pools = requestManager.listReadyPoolsByPlatformAndSearch(PlatformType.valueOf(platformType), searchStr);
-          }
-          else {
+          } else {
             pools = requestManager.listAllPoolsByPlatformAndSearch(PlatformType.valueOf(platformType), searchStr);
           }
-        }
-        else {
+        } else {
           if (readyOnly) {
             pools = requestManager.listReadyPoolsByPlatform(PlatformType.valueOf(platformType));
-          }
-          else {
+          } else {
             pools = requestManager.listAllPoolsByPlatform(PlatformType.valueOf(platformType));
           }
         }
@@ -93,13 +90,11 @@ public class PoolSearchService {
           for (Pool<? extends Poolable> pool : rPools) {
             b.append(poolHtml(pool));
           }
-        }
-        else {
+        } else {
           b.append("No matches");
         }
         return JSONUtils.JSONObjectResponse("html", b.toString());
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
         log.debug("Failed", e);
         return JSONUtils.SimpleJSONError("Failed");
       }
@@ -113,45 +108,43 @@ public class PoolSearchService {
     try {
       if (searchStr.length() > 1) {
         if (LimsUtils.isBase64String(searchStr)) {
-          //Base64-encoded string, most likely a barcode image beeped in. decode and search
+          // Base64-encoded string, most likely a barcode image beeped in. decode and search
           searchStr = new String(Base64.decodeBase64(searchStr));
         }
 
-        //String str = searchStr.toLowerCase();
         StringBuilder b = new StringBuilder();
-        List<? extends Dilution> dilutions = new ArrayList<Dilution>(requestManager.listDilutionsBySearch(searchStr, PlatformType.valueOf(platformType)));
+        List<? extends Dilution> dilutions = new ArrayList<Dilution>(
+            requestManager.listDilutionsBySearch(searchStr, PlatformType.valueOf(platformType)));
         int numMatches = 0;
         for (Dilution d : dilutions) {
-          //have to use onmousedown because of blur firing before onclick and hiding the div before it can be added
-          b.append("<div onmouseover=\"this.className='autocompleteboxhighlight'\" onmouseout=\"this.className='autocompletebox'\" class=\"autocompletebox\"" +
-                   " onmousedown=\"Pool.search.poolSearchSelectElement('" + d.getId() + "', '" + d.getName() + "')\">" +
-                   "<b>Dilution: " + d.getName() + "</b><br/>" +
-                   "<b>Library: " + d.getLibrary().getAlias() + "</b><br/>" +
-                   "<b>Sample: " + d.getLibrary().getSample().getAlias() + "</b><br/>" +
-                   "</div>");
+          // have to use onmousedown because of blur firing before onclick and hiding the div before it can be added
+          b.append(
+              "<div onmouseover=\"this.className='autocompleteboxhighlight'\" onmouseout=\"this.className='autocompletebox'\" class=\"autocompletebox\""
+                  + " onmousedown=\"Pool.search.poolSearchSelectElement('" + d.getId() + "', '" + d.getName() + "')\">" + "<b>Dilution: "
+                  + d.getName() + "</b><br/>" + "<b>Library: " + d.getLibrary().getAlias() + "</b><br/>" + "<b>Sample: "
+                  + d.getLibrary().getSample().getAlias() + "</b><br/>" + "</div>");
           numMatches++;
         }
 
-        List<Plate<? extends List<? extends Plateable>, ? extends Plateable>> poolables = new ArrayList<Plate<? extends List<? extends Plateable>, ? extends Plateable>>(requestManager.listAllPlatesBySearch(searchStr));
+        List<Plate<? extends List<? extends Plateable>, ? extends Plateable>> poolables = new ArrayList<Plate<? extends List<? extends Plateable>, ? extends Plateable>>(
+            requestManager.listAllPlatesBySearch(searchStr));
         for (Plate<? extends List<? extends Plateable>, ? extends Plateable> d : poolables) {
-          //have to use onmousedown because of blur firing before onclick and hiding the div before it can be added
-          b.append("<div onmouseover=\"this.className='autocompleteboxhighlight'\" onmouseout=\"this.className='autocompletebox'\" class=\"autocompletebox\"" +
-                   " onmousedown=\"Pool.search.poolSearchSelectElement('" + d.getId() + "', '" + d.getName() + "')\">" +
-                   "<b>Plate: " + d.getName() + "</b><br/>" +
-                   "<b>Size: " + d.getSize() + "</b><br/>");
+          // have to use onmousedown because of blur firing before onclick and hiding the div before it can be added
+          b.append(
+              "<div onmouseover=\"this.className='autocompleteboxhighlight'\" onmouseout=\"this.className='autocompletebox'\" class=\"autocompletebox\""
+                  + " onmousedown=\"Pool.search.poolSearchSelectElement('" + d.getId() + "', '" + d.getName() + "')\">" + "<b>Plate: "
+                  + d.getName() + "</b><br/>" + "<b>Size: " + d.getSize() + "</b><br/>");
 
           if (!d.getElements().isEmpty()) {
             Plateable element = d.getElements().get(0);
             if (element instanceof Library) {
-              Library l = (Library)element;
+              Library l = (Library) element;
               b.append("<b>Project: " + l.getSample().getProject().getAlias() + "</b><br/>");
-            }
-            else if (element instanceof Dilution) {
-              Dilution l = (Dilution)element;
+            } else if (element instanceof Dilution) {
+              Dilution l = (Dilution) element;
               b.append("<b>Project: " + l.getLibrary().getSample().getProject().getAlias() + "</b><br/>");
-            }
-            else if (element instanceof Sample) {
-              Sample l = (Sample)element;
+            } else if (element instanceof Sample) {
+              Sample l = (Sample) element;
               b.append("<b>Project: " + l.getProject().getAlias() + "</b><br/>");
             }
           }
@@ -161,16 +154,13 @@ public class PoolSearchService {
 
         if (numMatches == 0) {
           return JSONUtils.JSONObjectResponse("html", "No matches");
-        }
-        else {
+        } else {
           return JSONUtils.JSONObjectResponse("html", "<div class=\"autocomplete\"><ul>" + b.toString() + "</ul></div>");
         }
-      }
-      else {
+      } else {
         return JSONUtils.JSONObjectResponse("html", "Need a longer search pattern ...");
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Could not complete pool element search: " + e.getMessage());
     }
@@ -178,38 +168,37 @@ public class PoolSearchService {
 
   private String poolHtml(Pool<? extends Poolable> p) {
     StringBuilder b = new StringBuilder();
-    b.append("<div style='position:relative' onMouseOver='this.className=\"dashboardhighlight\"' onMouseOut='this.className=\"dashboard\"' class='dashboard'>");
+    b.append(
+        "<div style='position:relative' onMouseOver='this.className=\"dashboardhighlight\"' onMouseOut='this.className=\"dashboard\"' class='dashboard'>");
     if (LimsUtils.isStringEmptyOrNull(p.getAlias())) {
-      b.append("<div style=\"float:left\"><b>" + p.getName() + " : "+p.getCreationDate()+"</b><br/>");
-    }
-    else {
-      b.append("<div style=\"float:left\"><b>" + p.getName() + " (" + p.getAlias() + ") : "+p.getCreationDate()+"</b><br/>");
+      b.append("<div style=\"float:left\"><b>" + p.getName() + " : " + p.getCreationDate() + "</b><br/>");
+    } else {
+      b.append("<div style=\"float:left\"><b>" + p.getName() + " (" + p.getAlias() + ") : " + p.getCreationDate() + "</b><br/>");
     }
 
     Collection<? extends Poolable> ds = p.getPoolableElements();
     for (Poolable d : ds) {
       if (d instanceof Dilution) {
-        b.append("<span>" + d.getName() + " (" + ((Dilution)d).getLibrary().getSample().getProject().getAlias() + ") : "+((Dilution) d).getConcentration()+" "+((Dilution) d).getUnits()+"</span><br/>");
-      }
-      else if (d instanceof Plate) {
-        Plate<LinkedList<Plateable>, Plateable> plate = (Plate<LinkedList<Plateable>, Plateable>)d;
+        b.append("<span>" + d.getName() + " (" + ((Dilution) d).getLibrary().getSample().getProject().getAlias() + ") : "
+            + ((Dilution) d).getConcentration() + " " + ((Dilution) d).getUnits() + "</span><br/>");
+      } else if (d instanceof Plate) {
+        Plate<LinkedList<Plateable>, Plateable> plate = (Plate<LinkedList<Plateable>, Plateable>) d;
         if (!plate.getElements().isEmpty()) {
           Plateable element = plate.getElements().getFirst();
           if (element instanceof Library) {
-            Library l = (Library)element;
-            b.append("<span>" + d.getName() + " ["+plate.getSize()+"-well] (" + l.getSample().getProject().getAlias() + ")</span><br/>");
-          }
-          else if (element instanceof Dilution) {
-            Dilution dl = (Dilution)element;
-            b.append("<span>" + dl.getName() + " ["+plate.getSize()+"-well] (" + dl.getLibrary().getSample().getProject().getAlias() + ")</span><br/>");
-          }
-          else if (element instanceof Sample) {
-            Sample s = (Sample)element;
-            b.append("<span>" + s.getName() + " ["+plate.getSize()+"-well] (" + s.getProject().getAlias() + ")</span><br/>");
+            Library l = (Library) element;
+            b.append(
+                "<span>" + d.getName() + " [" + plate.getSize() + "-well] (" + l.getSample().getProject().getAlias() + ")</span><br/>");
+          } else if (element instanceof Dilution) {
+            Dilution dl = (Dilution) element;
+            b.append("<span>" + dl.getName() + " [" + plate.getSize() + "-well] (" + dl.getLibrary().getSample().getProject().getAlias()
+                + ")</span><br/>");
+          } else if (element instanceof Sample) {
+            Sample s = (Sample) element;
+            b.append("<span>" + s.getName() + " [" + plate.getSize() + "-well] (" + s.getProject().getAlias() + ")</span><br/>");
           }
         }
-      }
-      else {
+      } else {
         b.append("<span>" + d.getName() + "</span><br/>");
       }
     }
@@ -217,12 +206,14 @@ public class PoolSearchService {
     b.append("<br/><i>");
     Collection<Experiment> exprs = p.getExperiments();
     for (Experiment e : exprs) {
-      b.append("<span>" + e.getStudy().getProject().getAlias() + "(" + e.getName() + ": " + p.getDilutions().size() + " dilutions)</span><br/>");
+      b.append(
+          "<span>" + e.getStudy().getProject().getAlias() + "(" + e.getName() + ": " + p.getDilutions().size() + " dilutions)</span><br/>");
     }
     b.append("</i>");
 
     b.append("<input type='hidden' id='pId" + p.getId() + "' value='" + p.getId() + "'/></div>");
-    b.append("<div style='position: absolute; bottom: 0; right: 0; font-size: 24px; font-weight: bold; color:#BBBBBB'>" + p.getPlatformType().getKey() + "</div>");
+    b.append("<div style='position: absolute; bottom: 0; right: 0; font-size: 24px; font-weight: bold; color:#BBBBBB'>"
+        + p.getPlatformType().getKey() + "</div>");
     b.append("</div>");
     return b.toString();
   }

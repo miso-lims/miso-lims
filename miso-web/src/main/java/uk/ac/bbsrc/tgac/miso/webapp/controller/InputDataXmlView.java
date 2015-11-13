@@ -42,83 +42,71 @@ import com.eaglegenomics.simlims.core.ActivityData;
 import com.eaglegenomics.simlims.core.DataReference;
 
 public class InputDataXmlView implements View {
-	protected static final Logger log = LoggerFactory.getLogger(InputDataXmlView.class);
+  protected static final Logger log = LoggerFactory.getLogger(InputDataXmlView.class);
 
-	public String getContentType() {
-		return "text/xml";
-	}
+  @Override
+  public String getContentType() {
+    return "text/xml";
+  }
 
-	@SuppressWarnings("unchecked")
-	public void render(Map<String, ?> model, HttpServletRequest request,
-			HttpServletResponse response) throws Exception {
-		Map<String, ActivityData> inputData = (Map<String, ActivityData>) model
-				.get("inputData");
-		if (inputData == null) {
-			throw new IllegalArgumentException(
-					"Can only render Map<String,ActivityData> mapped to key 'inputData'.");
-		}
+  @Override
+  @SuppressWarnings("unchecked")
+  public void render(Map<String, ?> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    Map<String, ActivityData> inputData = (Map<String, ActivityData>) model.get("inputData");
+    if (inputData == null) {
+      throw new IllegalArgumentException("Can only render Map<String,ActivityData> mapped to key 'inputData'.");
+    }
 
-		// Start document with "root" tag
-		Document doc = new Document(new Element("inputData"));
-		// Get the root tag
-		Element rootEl = doc.getRootElement();
+    // Start document with "root" tag
+    Document doc = new Document(new Element("inputData"));
+    // Get the root tag
+    Element rootEl = doc.getRootElement();
 
-		// Add other tags
-		for (Map.Entry<String, ActivityData> mapEntry : inputData.entrySet()) {
-			String displayName = mapEntry.getKey();
-			ActivityData data = mapEntry.getValue();
-			// Add new xml element
-			Element activityDataEl = new Element("activityData");
-			activityDataEl.setAttribute(new Attribute("activityAlias", data
-					.getActivityAlias()));
-			activityDataEl.setAttribute(new Attribute("creationDate", data
-					.getCreationDate().toString()));
-			activityDataEl.setAttribute(new Attribute("priority", data
-					.getPriority().toString()));
-			activityDataEl.setAttribute(new Attribute("uniqueId", ""
-					+ data.getUniqueId()));
-			activityDataEl.setAttribute(new Attribute("displayName",
-					displayName));
-			DataReference dataRef = data.getDataReference();
-			Element dataRefEl = new Element("dataReference");
-			dataRefEl.setAttribute(new Attribute("referenceClass", dataRef
-					.getReferenceClass().getName()));
-			dataRefEl.setAttribute(new Attribute("referenceId", ""
-					+ dataRef.getReferenceId()));
-			activityDataEl.addContent(dataRefEl);
-			for (Map.Entry<String, ActivityData.Entry> indexedEntry : data
-					.getIndexedEntries().entrySet()) {
-				String index = indexedEntry.getKey();
-				ActivityData.Entry entry = indexedEntry.getValue();
-				Element entryEl = new Element("entry");
-				entryEl.setAttribute(new Attribute("index", index));
-				entryEl.setAttribute(new Attribute("protocol", entry
-						.getProtocol().getUniqueIdentifier()));
-				entryEl.setAttribute(new Attribute("request", entry
-						.getRequest().getName()));
-				entryEl.setAttribute(new Attribute("executionCount", ""
-						+ entry.getExecutionCount()));
-				activityDataEl.addContent(entryEl);
-			}
-			rootEl.addContent(activityDataEl);
-		}
+    // Add other tags
+    for (Map.Entry<String, ActivityData> mapEntry : inputData.entrySet()) {
+      String displayName = mapEntry.getKey();
+      ActivityData data = mapEntry.getValue();
+      // Add new xml element
+      Element activityDataEl = new Element("activityData");
+      activityDataEl.setAttribute(new Attribute("activityAlias", data.getActivityAlias()));
+      activityDataEl.setAttribute(new Attribute("creationDate", data.getCreationDate().toString()));
+      activityDataEl.setAttribute(new Attribute("priority", data.getPriority().toString()));
+      activityDataEl.setAttribute(new Attribute("uniqueId", "" + data.getUniqueId()));
+      activityDataEl.setAttribute(new Attribute("displayName", displayName));
+      DataReference dataRef = data.getDataReference();
+      Element dataRefEl = new Element("dataReference");
+      dataRefEl.setAttribute(new Attribute("referenceClass", dataRef.getReferenceClass().getName()));
+      dataRefEl.setAttribute(new Attribute("referenceId", "" + dataRef.getReferenceId()));
+      activityDataEl.addContent(dataRefEl);
+      for (Map.Entry<String, ActivityData.Entry> indexedEntry : data.getIndexedEntries().entrySet()) {
+        String index = indexedEntry.getKey();
+        ActivityData.Entry entry = indexedEntry.getValue();
+        Element entryEl = new Element("entry");
+        entryEl.setAttribute(new Attribute("index", index));
+        entryEl.setAttribute(new Attribute("protocol", entry.getProtocol().getUniqueIdentifier()));
+        entryEl.setAttribute(new Attribute("request", entry.getRequest().getName()));
+        entryEl.setAttribute(new Attribute("executionCount", "" + entry.getExecutionCount()));
+        activityDataEl.addContent(entryEl);
+      }
+      rootEl.addContent(activityDataEl);
+    }
 
-		// Set response type and write XML
-		XMLOutputter outp = new XMLOutputter();
-		outp.setFormat(Format.getPrettyFormat());
-		String xmlAsString = outp.outputString(doc);
+    // Set response type and write XML
+    XMLOutputter outp = new XMLOutputter();
+    outp.setFormat(Format.getPrettyFormat());
+    String xmlAsString = outp.outputString(doc);
 
-		if (log.isDebugEnabled()) {
-			log.debug("Generating XML response: " + xmlAsString);
-		}
+    if (log.isDebugEnabled()) {
+      log.debug("Generating XML response: " + xmlAsString);
+    }
 
-		response.setContentType(getContentType());
-		response.setContentLength(xmlAsString.length());
+    response.setContentType(getContentType());
+    response.setContentLength(xmlAsString.length());
 
-		PrintWriter out = new PrintWriter(response.getOutputStream());
-		out.print(xmlAsString);
-		out.flush();
-		out.close();
-	}
+    PrintWriter out = new PrintWriter(response.getOutputStream());
+    out.print(xmlAsString);
+    out.flush();
+    out.close();
+  }
 
 }

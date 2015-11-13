@@ -33,26 +33,26 @@ import java.io.Serializable;
  * Library strategy types.
  * <p/>
  * See:
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public class LibraryStrategyType implements Comparable, Serializable {
-  /** Field UNSAVED_ID  */
+  /** Field UNSAVED_ID */
   public static final Long UNSAVED_ID = 0L;
 
-  /** Field libraryStrategyTypeId  */
+  /** Field libraryStrategyTypeId */
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long libraryStrategyTypeId = LibraryStrategyType.UNSAVED_ID;
-  /** Field name  */
+  /** Field name */
   private String name;
-  /** Field description  */
+  /** Field description */
   private String description;
 
   /**
    * Returns the libraryStrategyTypeId of this LibraryStrategyType object.
-   *
+   * 
    * @return Long libraryStrategyTypeId.
    */
   public Long getLibraryStrategyTypeId() {
@@ -61,8 +61,9 @@ public class LibraryStrategyType implements Comparable, Serializable {
 
   /**
    * Sets the libraryStrategyTypeId of this LibraryStrategyType object.
-   *
-   * @param libraryStrategyTypeId libraryStrategyTypeId.
+   * 
+   * @param libraryStrategyTypeId
+   *          libraryStrategyTypeId.
    */
   public void setLibraryStrategyTypeId(Long libraryStrategyTypeId) {
     this.libraryStrategyTypeId = libraryStrategyTypeId;
@@ -70,7 +71,7 @@ public class LibraryStrategyType implements Comparable, Serializable {
 
   /**
    * Returns the name of this LibraryStrategyType object.
-   *
+   * 
    * @return String name.
    */
   public String getName() {
@@ -79,8 +80,9 @@ public class LibraryStrategyType implements Comparable, Serializable {
 
   /**
    * Sets the name of this LibraryStrategyType object.
-   *
-   * @param name name.
+   * 
+   * @param name
+   *          name.
    */
   public void setName(String name) {
     this.name = name;
@@ -88,7 +90,7 @@ public class LibraryStrategyType implements Comparable, Serializable {
 
   /**
    * Returns the description of this LibraryStrategyType object.
-   *
+   * 
    * @return String description.
    */
   public String getDescription() {
@@ -97,8 +99,9 @@ public class LibraryStrategyType implements Comparable, Serializable {
 
   /**
    * Sets the description of this LibraryStrategyType object.
-   *
-   * @param description description.
+   * 
+   * @param description
+   *          description.
    */
   public void setDescription(String description) {
     this.description = description;
@@ -106,12 +109,9 @@ public class LibraryStrategyType implements Comparable, Serializable {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null)
-      return false;
-    if (obj == this)
-      return true;
-    if (!(obj instanceof LibraryStrategyType))
-      return false;
+    if (obj == null) return false;
+    if (obj == this) return true;
+    if (!(obj instanceof LibraryStrategyType)) return false;
     LibraryStrategyType them = (LibraryStrategyType) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
@@ -122,8 +122,7 @@ public class LibraryStrategyType implements Comparable, Serializable {
   public int hashCode() {
     if (getLibraryStrategyTypeId() != UNSAVED_ID) {
       return getLibraryStrategyTypeId().intValue();
-    }
-    else {
+    } else {
       int hashcode = -1;
       if (getName() != null) hashcode = 37 * hashcode + getName().hashCode();
       if (getDescription() != null) hashcode = 37 * hashcode + getDescription().hashCode();
@@ -133,7 +132,7 @@ public class LibraryStrategyType implements Comparable, Serializable {
 
   @Override
   public int compareTo(Object o) {
-    LibraryStrategyType t = (LibraryStrategyType)o;
+    LibraryStrategyType t = (LibraryStrategyType) o;
 
     int name = getName().compareTo(t.getName());
     if (name != 0) return name;

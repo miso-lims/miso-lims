@@ -34,7 +34,7 @@ import java.util.Date;
  * uk.ac.bbsrc.tgac.miso.webapp.service
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 02-Dec-2010
  * @since version
@@ -43,15 +43,12 @@ public class TestReceiverHandler {
   private static Logger logger = LoggerFactory.getLogger(TestReceiverHandler.class);
 
   public void handleMessage(Message<String> message) {
-    logger.debug("At {} I received a message with payload {}", new String[]{
-            new Date(message.getHeaders().getTimestamp()).toString(),
-    });
+    logger.debug("At {} I received a message with payload {}", new String[] { new Date(message.getHeaders().getTimestamp()).toString(), });
   }
 
   public void handleJson(Message<String> message) {
     JSONObject json = JSONObject.fromObject(message.getPayload());
-    logger.debug("At {} I received a message with payload {}", new String[]{
-            new Date(message.getHeaders().getTimestamp()).toString(), json.getString("foo")
-    });
+    logger.debug("At {} I received a message with payload {}",
+        new String[] { new Date(message.getHeaders().getTimestamp()).toString(), json.getString("foo") });
   }
 }

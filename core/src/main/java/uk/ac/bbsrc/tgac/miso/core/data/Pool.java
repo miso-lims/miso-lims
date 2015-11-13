@@ -23,11 +23,7 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-//import com.fasterxml.jackson.annotation.*;
-//import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonManagedReference;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -40,28 +36,25 @@ import java.util.Collection;
 import java.util.Date;
 
 /**
- * A Pool represents a collection of one or more {@link Poolable} objects, which enables multiplexing to be modelled
- * if necessary. Pools provide the link between the {@link Sample} tree and the {@link Run} tree of the MISO data model,
- * which means that multiple samples from multiple {@link Project}s can be pooled together.
+ * A Pool represents a collection of one or more {@link Poolable} objects, which enables multiplexing to be modelled if necessary. Pools
+ * provide the link between the {@link Sample} tree and the {@link Run} tree of the MISO data model, which means that multiple samples from
+ * multiple {@link Project}s can be pooled together.
  * <p/>
- * Pools are typed by the {@link Poolable} interface type they can accept, and as such, Pools can accept {@link Dilution}
- * and {@link Plate} objects at present. At creation time, a Pool is said to be "ready to run", which makes it easy to
- * categorise and list Pools according to whether they have been placed on a {@link SequencerPoolPartition} (at which
- * point ready to run becomes false) or not.
- *
+ * Pools are typed by the {@link Poolable} interface type they can accept, and as such, Pools can accept {@link Dilution} and {@link Plate}
+ * objects at present. At creation time, a Pool is said to be "ready to run", which makes it easy to categorise and list Pools according to
+ * whether they have been placed on a {@link SequencerPoolPartition} (at which point ready to run becomes false) or not.
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
-//@JsonInclude(JsonInclude.Include.NON_NULL)
-//@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
-@JsonIgnoreProperties({"securityProfile","dilutions"})
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
+@JsonIgnoreProperties({ "securityProfile", "dilutions" })
 @PrintableBarcode
 public interface Pool<P extends Poolable> extends SecurableByProfile, Comparable, Barcodable, Watchable, Deletable, Alertable {
   /**
    * Returns the poolId of this Pool object.
-   *
+   * 
    * @return Long poolId.
    */
   @Deprecated
@@ -69,180 +62,198 @@ public interface Pool<P extends Poolable> extends SecurableByProfile, Comparable
 
   /**
    * Sets the poolId of this Pool object.
-   *
-   * @param poolId poolId.
-   *
+   * 
+   * @param poolId
+   *          poolId.
+   * 
    */
   @Deprecated
   public void setPoolId(Long poolId);
 
   /**
    * Sets the ID of this Pool object.
-   *
-   * @param id long.
+   * 
+   * @param id
+   *          long.
    */
   public void setId(long id);
 
   /**
    * Sets the name of this Pool object.
-   *
-   * @param name name.
-   *
+   * 
+   * @param name
+   *          name.
+   * 
    */
   public void setName(String name);
 
   /**
    * Returns the alias of this Pool object.
-   *
+   * 
    * @return String alias.
    */
   public String getAlias();
 
   /**
    * Sets the alias of this Pool object.
-   *
-   * @param alias alias.
-   *
+   * 
+   * @param alias
+   *          alias.
+   * 
    */
   public void setAlias(String alias);
 
   /**
    * Adds a Poolable element to this Pool
-   *
-   * @param poolable element of type P
-   * @throws MalformedDilutionException when the Dilution added is not valid
+   * 
+   * @param poolable
+   *          element of type P
+   * @throws MalformedDilutionException
+   *           when the Dilution added is not valid
    */
   public void addPoolableElement(P poolable) throws MalformedDilutionException;
 
   /**
    * Sets the Poolable elements of this Pool object.
-   *
-   * @param poolables poolables.
+   * 
+   * @param poolables
+   *          poolables.
    */
   public <T extends Poolable> void setPoolableElements(Collection<T> poolables);
 
   /**
    * Returns the Poolable elements of this Pool object.
-   *
+   * 
    * @return Collection<D> poolables.
    */
-  //@JsonManagedReference
+  // @JsonManagedReference
   public Collection<P> getPoolableElements();
 
   /**
    * Convenience method to return Dilutions from this Pool given that the Pooled Elements may well
-   *
+   * 
    * @return Collection<D> poolables.
    */
-  //@JsonManagedReference
+  // @JsonManagedReference
   public Collection<? extends Dilution> getDilutions();
 
   /**
    * Registers an Experiment to this Pool
-   *
-   * @param experiment of type Experiment
-   * @throws MalformedExperimentException when
+   * 
+   * @param experiment
+   *          of type Experiment
+   * @throws MalformedExperimentException
+   *           when
    */
   public void addExperiment(Experiment experiment) throws MalformedExperimentException;
 
   /**
    * Sets the experiments related to this Pool object.
-   *
-   * @param experiments experiments.
+   * 
+   * @param experiments
+   *          experiments.
    */
   public void setExperiments(Collection<Experiment> experiments);
 
   /**
    * Returns the experiments related to this Pool object.
-   *
+   * 
    * @return Experiment experiment.
    */
-  //@JsonManagedReference
+  // @JsonManagedReference
   public Collection<Experiment> getExperiments();
 
   /**
    * Returns the creationDate of this Pool object.
-   *
+   * 
    * @return Date creationDate.
    */
   public Date getCreationDate();
 
   /**
    * Sets the creationDate of this Pool object.
-   *
-   * @param creationDate creationDate.
+   * 
+   * @param creationDate
+   *          creationDate.
    */
   public void setCreationDate(Date creationDate);
 
   /**
    * Returns the concentration of this Pool object.
-   *
+   * 
    * @return Double concentration.
    */
   public Double getConcentration();
 
   /**
    * Sets the concentration of this Pool object.
-   *
-   * @param concentration concentration.
+   * 
+   * @param concentration
+   *          concentration.
    */
   public void setConcentration(Double concentration);
 
   /**
    * Returns the platformType of this Platform object.
-   *
+   * 
    * @return PlatformType platformType.
    */
   public PlatformType getPlatformType();
 
   /**
    * Sets the platformType of this Platform object.
-   *
-   * @param name platformType.
+   * 
+   * @param name
+   *          platformType.
    */
   public void setPlatformType(PlatformType name);
 
   /**
    * Checks if this Pool is ready to be run
-   *
+   * 
    * @return boolean ready.
    */
   public boolean getReadyToRun();
 
   /**
    * Sets the ready to run status of this Pool
-   *
-   * @param ready Boolean.
+   * 
+   * @param ready
+   *          Boolean.
    */
   public void setReadyToRun(boolean ready);
 
   /**
    * Registers that a LibraryQC has been carried out on this Library
-   *
-   * @param poolQC of type PoolQC
-   * @throws MalformedPoolQcException when the PoolQC being added is not valid
+   * 
+   * @param poolQC
+   *          of type PoolQC
+   * @throws MalformedPoolQcException
+   *           when the PoolQC being added is not valid
    */
   public void addQc(PoolQC poolQC) throws MalformedPoolQcException;
 
   /**
    * Returns the poolQCs of this Pool object.
-   *
+   * 
    * @return Collection<PoolQC> poolQCs.
    */
-  //@JsonManagedReference(value = "poolqcs")
+  // @JsonManagedReference(value = "poolqcs")
   public Collection<PoolQC> getPoolQCs();
 
   /**
    * Returns the qcPassed of this Pool object.
-   *
+   * 
    * @return Boolean qcPassed.
    */
   public Boolean getQcPassed();
 
   /**
-   * Sets the qcPassed attribute of this Pool object. This should be true when a suitable QC has been carried out that passes a given result.
-   *
-   * @param qcPassed qcPassed.
+   * Sets the qcPassed attribute of this Pool object. This should be true when a suitable QC has been carried out that passes a given
+   * result.
+   * 
+   * @param qcPassed
+   *          qcPassed.
    */
   public void setQcPassed(Boolean qcPassed);
 

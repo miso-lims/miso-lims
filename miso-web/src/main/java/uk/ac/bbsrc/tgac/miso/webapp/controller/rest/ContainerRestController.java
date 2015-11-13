@@ -39,7 +39,7 @@ import java.util.Collection;
  * uk.ac.bbsrc.tgac.miso.webapp.controller.rest
  * <p/>
  * Info
- *
+ * 
  * @author Xingdong Bian
  */
 @Controller
@@ -56,11 +56,10 @@ public class ContainerRestController {
   }
 
   @RequestMapping(value = "{containerBarcode}", method = RequestMethod.GET)
-  public
-  @ResponseBody
-  String jsonRest(@PathVariable String containerBarcode) throws IOException {
+  public @ResponseBody String jsonRest(@PathVariable String containerBarcode) throws IOException {
     StringBuilder sb = new StringBuilder();
-    Collection<SequencerPartitionContainer<SequencerPoolPartition>> sequencerPartitionContainerCollection = requestManager.listSequencerPartitionContainersByBarcode(containerBarcode);
+    Collection<SequencerPartitionContainer<SequencerPoolPartition>> sequencerPartitionContainerCollection = requestManager
+        .listSequencerPartitionContainersByBarcode(containerBarcode);
     int i = 0;
     for (SequencerPartitionContainer<SequencerPoolPartition> sequencerPartitionContainer : sequencerPartitionContainerCollection) {
       i++;
@@ -79,7 +78,7 @@ public class ContainerRestController {
           sb.append("{");
           sb.append("\"poolName\":\"" + partition.getPool().getName() + "\",");
           sb.append("\"poolDate\":\"" + partition.getPool().getCreationDate() + "\",");
-          //experiments
+          // experiments
           sb.append("\"experiments\":[");
           int ie = 0;
           for (Experiment experiment : partition.getPool().getExperiments()) {
@@ -92,7 +91,7 @@ public class ContainerRestController {
           }
           sb.append("],");
 
-          //dilutions
+          // dilutions
           sb.append("\"poolableElements\":[");
           int id = 0;
           for (Poolable poolable : partition.getPool().getPoolableElements()) {
@@ -106,8 +105,7 @@ public class ContainerRestController {
           }
           sb.append("]");
           sb.append("}");
-        }
-        else {
+        } else {
           sb.append("\"\"");
         }
         sb.append("}");

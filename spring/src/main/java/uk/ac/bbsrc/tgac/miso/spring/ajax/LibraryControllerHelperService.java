@@ -128,19 +128,17 @@ public class LibraryControllerHelperService {
         if (libraryNamingScheme.validateField("alias", alias)) {
           log.debug("Library alias OK!");
           return JSONUtils.SimpleJSONResponse("OK");
-        }
-        else {
+        } else {
           log.error("Library alias not valid: " + alias);
-          return JSONUtils.SimpleJSONError("The following Library alias doesn't conform to the chosen naming scheme ("+libraryNamingScheme.getValidationRegex("alias")+") or already exists: " + json.getString("alias"));
+          return JSONUtils.SimpleJSONError("The following Library alias doesn't conform to the chosen naming scheme ("
+              + libraryNamingScheme.getValidationRegex("alias") + ") or already exists: " + json.getString("alias"));
         }
-      }
-      catch (MisoNamingException e) {
+      } catch (MisoNamingException e) {
         log.error("Cannot validate Library alias " + json.getString("alias") + ": " + e.getMessage());
         e.printStackTrace();
         return JSONUtils.SimpleJSONError("Cannot validate Library alias " + json.getString("alias") + ": " + e.getMessage());
       }
-    }
-    else {
+    } else {
       return JSONUtils.SimpleJSONError("No alias specified");
     }
   }
@@ -162,8 +160,7 @@ public class LibraryControllerHelperService {
       library.getNotes().add(note);
       requestManager.saveLibraryNote(library, note);
       requestManager.saveLibrary(library);
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError(e.getMessage());
     }
@@ -183,12 +180,10 @@ public class LibraryControllerHelperService {
         requestManager.deleteNote(note);
         requestManager.saveLibrary(library);
         return JSONUtils.SimpleJSONResponse("OK");
-      }
-      else {
+      } else {
         return JSONUtils.SimpleJSONError("Library does not have note " + noteId + ". Cannot remove");
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Cannot remove note: " + e.getMessage());
     }
@@ -196,7 +191,7 @@ public class LibraryControllerHelperService {
 
   public JSONObject getLibraryBarcode(HttpSession session, JSONObject json) {
     Long libraryId = json.getLong("libraryId");
-    File temploc = new File(session.getServletContext().getRealPath("/")+"temp/");
+    File temploc = new File(session.getServletContext().getRealPath("/") + "temp/");
     try {
       Library library = requestManager.getLibraryById(libraryId);
       barcodeFactory.setPointPixels(1.5f);
@@ -211,12 +206,10 @@ public class LibraryControllerHelperService {
         BarcodeGenerator bg = BarcodeFactory.lookupGenerator(json.getString("barcodeGenerator"));
         if (bg != null) {
           bi = barcodeFactory.generateBarcode(library, bg, dim);
+        } else {
+          return JSONUtils.SimpleJSONError("'" + json.getString("barcodeGenerator") + "' is not a valid barcode generator type");
         }
-        else {
-          return JSONUtils.SimpleJSONError("'"+json.getString("barcodeGenerator") + "' is not a valid barcode generator type");
-        }
-      }
-      else {
+      } else {
         bi = barcodeFactory.generateSquareDataMatrix(library, 400);
       }
 
@@ -226,12 +219,10 @@ public class LibraryControllerHelperService {
           return JSONUtils.JSONObjectResponse("img", tempimage.getName());
         }
         return JSONUtils.SimpleJSONError("Writing temp image file failed.");
-      }
-      else {
+      } else {
         return JSONUtils.SimpleJSONError("Library has no parseable barcode");
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError(e.getMessage() + ": Cannot seem to generate temp file for barcode");
     }
@@ -242,50 +233,48 @@ public class LibraryControllerHelperService {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
 
       String serviceName = null;
-      if (json.has("serviceName")) { serviceName = json.getString("serviceName"); }
+      if (json.has("serviceName")) {
+        serviceName = json.getString("serviceName");
+      }
 
       MisoPrintService<File, Barcodable, PrintContext<File>> mps = null;
       if (serviceName == null) {
         Collection<MisoPrintService> services = printManager.listPrintServicesByBarcodeableClass(Library.class);
         if (services.size() == 1) {
           mps = services.iterator().next();
+        } else {
+          return JSONUtils
+              .SimpleJSONError("No serviceName specified, but more than one available service able to print this barcode type.");
         }
-        else {
-          return JSONUtils.SimpleJSONError("No serviceName specified, but more than one available service able to print this barcode type.");
-        }
-      }
-      else {
+      } else {
         mps = printManager.getPrintService(serviceName);
       }
 
       Queue<File> thingsToPrint = new LinkedList<File>();
 
       JSONArray ls = JSONArray.fromObject(json.getString("libraries"));
-      for (JSONObject l : (Iterable<JSONObject>)ls) {
+      for (JSONObject l : (Iterable<JSONObject>) ls) {
         try {
           Long libraryId = l.getLong("libraryId");
           Library library = requestManager.getLibraryById(libraryId);
-          //autosave the barcode if none has been previously generated
+          // autosave the barcode if none has been previously generated
           if (library.getIdentificationBarcode() == null || "".equals(library.getIdentificationBarcode())) {
             requestManager.saveLibrary(library);
           }
 
           File f = mps.getLabelFor(library);
-          if (f!=null) thingsToPrint.add(f);
-        }
-        catch (IOException e) {
+          if (f != null) thingsToPrint.add(f);
+        } catch (IOException e) {
           e.printStackTrace();
           return JSONUtils.SimpleJSONError("Error printing barcodes: " + e.getMessage());
         }
       }
       PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
-      return JSONUtils.SimpleJSONResponse("Job "+pj.getJobId()+" : Barcodes printed.");
-    }
-    catch (MisoPrintException e) {
+      return JSONUtils.SimpleJSONResponse("Job " + pj.getJobId() + " : Barcodes printed.");
+    } catch (MisoPrintException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
     }
@@ -296,51 +285,48 @@ public class LibraryControllerHelperService {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
 
       String serviceName = null;
-      if (json.has("serviceName")) { serviceName = json.getString("serviceName"); }
+      if (json.has("serviceName")) {
+        serviceName = json.getString("serviceName");
+      }
 
       MisoPrintService<File, Barcodable, PrintContext<File>> mps = null;
       if (serviceName == null) {
         Collection<MisoPrintService> services = printManager.listPrintServicesByBarcodeableClass(LibraryDilution.class);
         if (services.size() == 1) {
           mps = services.iterator().next();
+        } else {
+          return JSONUtils
+              .SimpleJSONError("No serviceName specified, but more than one available service able to print this barcode type.");
         }
-        else {
-          return JSONUtils.SimpleJSONError("No serviceName specified, but more than one available service able to print this barcode type.");
-        }
-      }
-      else {
+      } else {
         mps = printManager.getPrintService(serviceName);
       }
 
       Queue<File> thingsToPrint = new LinkedList<File>();
 
       JSONArray ls = JSONArray.fromObject(json.getString("dilutions"));
-      for (JSONObject l : (Iterable<JSONObject>)ls) {
+      for (JSONObject l : (Iterable<JSONObject>) ls) {
         try {
           Long dilutionId = l.getLong("dilutionId");
-//          String platform = l.getString("platform");
           LibraryDilution dilution = requestManager.getLibraryDilutionById(dilutionId);
-          //autosave the barcode if none has been previously generated
+          // autosave the barcode if none has been previously generated
           if (dilution.getIdentificationBarcode() == null || "".equals(dilution.getIdentificationBarcode())) {
             requestManager.saveLibraryDilution(dilution);
           }
           File f = mps.getLabelFor(dilution);
-          if (f!=null) thingsToPrint.add(f);
+          if (f != null) thingsToPrint.add(f);
           thingsToPrint.add(f);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
           e.printStackTrace();
           return JSONUtils.SimpleJSONError("Error printing barcodes: " + e.getMessage());
         }
       }
       PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
-      return JSONUtils.SimpleJSONResponse("Job "+pj.getJobId()+" : Barcodes printed.");
-    }
-    catch (MisoPrintException e) {
+      return JSONUtils.SimpleJSONResponse("Job " + pj.getJobId() + " : Barcodes printed.");
+    } catch (MisoPrintException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
     }
@@ -366,23 +352,21 @@ public class LibraryControllerHelperService {
         library.getNotes().add(note);
         requestManager.saveLibraryNote(library, note);
         requestManager.saveLibrary(library);
-      }
-      else {
+      } else {
         return JSONUtils.SimpleJSONError("New location barcode not recognised");
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError(e.getMessage());
     }
 
     return JSONUtils.SimpleJSONResponse("Note saved successfully");
   }
-  
+
   public JSONObject changeLibraryIdBarcode(HttpSession session, JSONObject json) {
     Long libraryId = json.getLong("libraryId");
     String idBarcode = json.getString("identificationBarcode");
-    
+
     try {
       if (!isStringEmptyOrNull(idBarcode)) {
         Library library = requestManager.getLibraryById(libraryId);
@@ -391,18 +375,17 @@ public class LibraryControllerHelperService {
       } else {
         return JSONUtils.SimpleJSONError("New identification barcode not recognized");
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Could not change Library identificationBarcode: " + e.getMessage());
       return JSONUtils.SimpleJSONError(e.getMessage());
     }
-    
+
     return JSONUtils.SimpleJSONResponse("New identification barcode successfully assigned.");
   }
 
   public JSONObject getLibraryDilutionBarcode(HttpSession session, JSONObject json) {
     Long dilutionId = json.getLong("dilutionId");
-    File temploc = new File(session.getServletContext().getRealPath("/")+"temp/");
+    File temploc = new File(session.getServletContext().getRealPath("/") + "temp/");
     try {
       LibraryDilution dil = requestManager.getLibraryDilutionById(dilutionId);
       barcodeFactory.setPointPixels(1.5f);
@@ -414,12 +397,10 @@ public class LibraryControllerHelperService {
           return JSONUtils.JSONObjectResponse("img", tempimage.getName());
         }
         return JSONUtils.SimpleJSONError("Writing temp image file failed.");
-      }
-      else {
+      } else {
         return JSONUtils.SimpleJSONError("Dilution has no parseable barcode");
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError(e.getMessage() + ": Cannot seem to generate temp file for barcode");
     }
@@ -434,8 +415,7 @@ public class LibraryControllerHelperService {
         return j;
       }
       return JSONUtils.SimpleJSONError("No strategy found with the name: \"" + json.getString("strategy") + "\"");
-    }
-    else {
+    } else {
       return JSONUtils.SimpleJSONError("No valid strategy given");
     }
   }
@@ -451,7 +431,6 @@ public class LibraryControllerHelperService {
           try {
             SecurityProfile sp = null;
             Sample sample = null;
-            //String libAlias = null;
             String sampleAlias = j.getString("parentSample");
 
             for (Sample s : p.getSamples()) {
@@ -459,21 +438,10 @@ public class LibraryControllerHelperService {
                 sp = s.getSecurityProfile();
                 sample = s;
                 break;
-                /*
-                if (sampleNamingScheme.validateField("alias", s.getAlias())) {
-                  Pattern pat = Pattern.compile(sampleNamingScheme.getValidationRegex("alias"));
-                  Matcher mat = pat.matcher(s.getAlias());
-                  //convert the sample alias automatically to a library alias
-                  int numLibs = requestManager.listAllLibrariesBySampleId(s.getId()).size();
-                  String la = mat.group(1) + "_" + "L" + mat.group(2) + "-"+(numLibs+1)+"_" + mat.group(3);
-                  if (libraryNamingScheme.validateField("alias", la)) {
-                    libAlias = la;
-                  }
-                }*/
               }
             }
 
-            if (sample != null) { // && libAlias != null) {
+            if (sample != null) {
               String descr = j.getString("description");
               String platform = j.getString("platform");
               String type = j.getString("libraryType");
@@ -513,55 +481,45 @@ public class LibraryControllerHelperService {
                   try {
                     long cl = Long.parseLong(code);
                     barcodes.put(count, requestManager.getTagBarcodeById(cl));
-                  }
-                  catch (NumberFormatException e) {
+                  } catch (NumberFormatException e) {
                     e.printStackTrace();
-                    return JSONUtils.SimpleJSONError("Cannot save Library. It looks like there are tag barcodes for the library of "+sample.getAlias()+", but they cannot be processed");
-                  }
-                  finally {
-                     count++;
+                    return JSONUtils.SimpleJSONError("Cannot save Library. It looks like there are tag barcodes for the library of "
+                        + sample.getAlias() + ", but they cannot be processed");
+                  } finally {
+                    count++;
                   }
                 }
                 library.setTagBarcodes(barcodes);
               }
 
               saveSet.add(library);
+            } else {
+              throw new IOException(
+                  "Could not process a selected Sample to generate Libraries. Please check that all selected samples' aliases conform to the chosen naming convention ("
+                      + sampleNamingScheme.getValidationRegex("alias") + ")");
             }
-            else {
-              throw new IOException("Could not process a selected Sample to generate Libraries. Please check that all selected samples' aliases conform to the chosen naming convention ("+sampleNamingScheme.getValidationRegex("alias")+")");
-            }
-          }
-          catch (IOException e) {
+          } catch (IOException e) {
             e.printStackTrace();
             return JSONUtils.SimpleJSONError("Cannot save Library generated from " + j.getString("parentSample") + ": " + e.getMessage());
-          }
-          catch (JSONException e) {
+          } catch (JSONException e) {
             e.printStackTrace();
-            return JSONUtils.SimpleJSONError("Cannot save Library. Something cannot be retrieved from the bulk input table: " + e.getMessage());
+            return JSONUtils
+                .SimpleJSONError("Cannot save Library. Something cannot be retrieved from the bulk input table: " + e.getMessage());
           }
         }
 
-        /*
-        Set<Library> complement = LimsUtils.relativeComplementByProperty(
-                Library.class,
-                "getAlias",
-                saveSet,
-                new HashSet(requestManager.listAllLibrariesByProjectId(json.getLong("projectId"))));
-                        */
         List<Library> sortedList = new ArrayList<Library>(saveSet);
         Collections.sort(sortedList, new AliasComparator(Library.class));
         for (Library library : sortedList) {
           requestManager.saveLibrary(library);
         }
-        
+
         return JSONUtils.SimpleJSONResponse("All libraries saved successfully");
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
         e.printStackTrace();
         return JSONUtils.SimpleJSONError("Cannot retrieve parent project with ID " + json.getLong("projectId"));
       }
-    }
-    else {
+    } else {
       return JSONUtils.SimpleJSONError("No libraries specified");
     }
   }
@@ -576,26 +534,26 @@ public class LibraryControllerHelperService {
         List<LibraryType> types = new ArrayList<LibraryType>(requestManager.listLibraryTypesByPlatform(platform));
         Collections.sort(types);
         for (LibraryType s : types) {
-          libsb.append("<option value='" + s.getLibraryTypeId() + "'>"+s.getDescription()+"</option>");
+          libsb.append("<option value='" + s.getLibraryTypeId() + "'>" + s.getDescription() + "</option>");
         }
 
         StringBuilder tagsb = new StringBuilder();
-        List<TagBarcodeStrategy> strategies = new ArrayList<TagBarcodeStrategy>(tagBarcodeStrategyResolverService.getTagBarcodeStrategiesByPlatform(PlatformType.get(platform)));
+        List<TagBarcodeStrategy> strategies = new ArrayList<TagBarcodeStrategy>(
+            tagBarcodeStrategyResolverService.getTagBarcodeStrategiesByPlatform(PlatformType.get(platform)));
         tagsb.append("<option value=''>No Barcode Strategy</option>");
         for (TagBarcodeStrategy tb : strategies) {
-          tagsb.append("<option value='" + tb.getName() + "'>"+tb.getName()+"</option>");
+          tagsb.append("<option value='" + tb.getName() + "'>" + tb.getName() + "</option>");
         }
 
         map.put("libraryTypes", libsb.toString());
         map.put("tagBarcodeStrategies", tagsb.toString());
-        
+
         return JSONUtils.JSONObjectResponse(map);
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       log.error("Failed to retrieve library types given platform type: ", e);
-      return JSONUtils.SimpleJSONError("Failed to retrieve library types given platform type: " + e.getMessage());      
+      return JSONUtils.SimpleJSONError("Failed to retrieve library types given platform type: " + e.getMessage());
     }
     return JSONUtils.SimpleJSONError("Cannot resolve LibraryType from selected Platform");
   }
@@ -608,26 +566,24 @@ public class LibraryControllerHelperService {
         Map<Integer, Set<TagBarcode>> barcodes = tbs.getApplicableBarcodes();
         StringBuilder tagsb = new StringBuilder();
         for (Integer i : barcodes.keySet()) {
-          //select
-          tagsb.append("Barcode "+i+": " + "<select id='tagBarcodes[\""+i+"\"]' name='tagBarcodes[\""+i+"\"]'>");
+          // select
+          tagsb.append("Barcode " + i + ": " + "<select id='tagBarcodes[\"" + i + "\"]' name='tagBarcodes[\"" + i + "\"]'>");
           tagsb.append("<option value=''>No Barcode</option>");
           List<TagBarcode> bs = new ArrayList<TagBarcode>(barcodes.get(i));
           Collections.sort(bs);
           for (TagBarcode tb : bs) {
-            //option
-            tagsb.append("<option value='" + tb.getId() + "'>"+tb.getName()+"</option>");
+            // option
+            tagsb.append("<option value='" + tb.getId() + "'>" + tb.getName() + "</option>");
           }
           tagsb.append("</select><br/>");
-          tagsb.append("<input type='hidden' value='on' name='_tagBarcodes[\""+i+"\"]'/>");
+          tagsb.append("<input type='hidden' value='on' name='_tagBarcodes[\"" + i + "\"]'/>");
         }
         map.put("tagBarcodes", tagsb.toString());
         return JSONUtils.JSONObjectResponse(map);
-      }
-      else {
+      } else {
         return JSONUtils.SimpleJSONError("No such TagBarcodeStrategy: " + json.getString("strategy"));
       }
-    }
-    else {
+    } else {
       return JSONUtils.SimpleJSONError("No valid TagBarcodeStrategy selected");
     }
   }
@@ -637,13 +593,12 @@ public class LibraryControllerHelperService {
       StringBuilder sb = new StringBuilder();
       Collection<QcType> types = requestManager.listAllLibraryQcTypes();
       for (QcType s : types) {
-        sb.append("<option units='"+s.getUnits()+"' value='" + s.getQcTypeId() + "'>"+s.getName()+"</option>");
+        sb.append("<option units='" + s.getUnits() + "' value='" + s.getQcTypeId() + "'>" + s.getName() + "</option>");
       }
       Map<String, Object> map = new HashMap<String, Object>();
       map.put("types", sb.toString());
       return JSONUtils.JSONObjectResponse(map);
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
     }
     return JSONUtils.SimpleJSONError("Cannot list all Library QC Types");
@@ -653,8 +608,8 @@ public class LibraryControllerHelperService {
     try {
       for (Object key : json.keySet()) {
         if (json.get(key) == null || json.get(key).equals("")) {
-          String k = (String)key;
-          return JSONUtils.SimpleJSONError("Please enter a value for '" +k+ "'");
+          String k = (String) key;
+          return JSONUtils.SimpleJSONError("Please enter a value for '" + k + "'");
         }
       }
       if (json.has("libraryId") && !json.get("libraryId").equals("")) {
@@ -673,22 +628,19 @@ public class LibraryControllerHelperService {
         requestManager.saveLibraryQC(newQc);
 
         StringBuilder sb = new StringBuilder();
-        //sb.append("<tr><th>ID</th><th>QCed By</th><th>QC Date</th><th>Method</th><th>Results</th><th>Insert Size</th></tr>");
         sb.append("<tr><th>QCed By</th><th>QC Date</th><th>Method</th><th>Results</th><th>Insert Size</th></tr>");
         for (LibraryQC qc : library.getLibraryQCs()) {
           sb.append("<tr>");
-          //sb.append("<td>"+qc.getQcId()+"</td>");
-          sb.append("<td>"+qc.getQcCreator()+"</td>");
-          sb.append("<td>"+qc.getQcDate()+"</td>");
-          sb.append("<td>"+qc.getQcType().getName()+"</td>");
-          sb.append("<td>"+qc.getResults()+" "+ qc.getQcType().getUnits() +"</td>");
-          sb.append("<td>"+qc.getInsertSize()+" bp</td>");
+          sb.append("<td>" + qc.getQcCreator() + "</td>");
+          sb.append("<td>" + qc.getQcDate() + "</td>");
+          sb.append("<td>" + qc.getQcType().getName() + "</td>");
+          sb.append("<td>" + qc.getResults() + " " + qc.getQcType().getUnits() + "</td>");
+          sb.append("<td>" + qc.getInsertSize() + " bp</td>");
           sb.append("</tr>");
         }
         return JSONUtils.SimpleJSONResponse(sb.toString());
       }
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       log.error("Failed to add Library QC to this Library: ", e);
       return JSONUtils.SimpleJSONError("Failed to add Library QC to this Library: " + e.getMessage());
     }
@@ -698,9 +650,9 @@ public class LibraryControllerHelperService {
   public JSONObject bulkAddLibraryQCs(HttpSession session, JSONObject json) {
     try {
       JSONArray qcs = JSONArray.fromObject(json.getString("qcs"));
-      //validate
+      // validate
       boolean ok = true;
-      for (JSONObject qc : (Iterable<JSONObject>)qcs) {
+      for (JSONObject qc : (Iterable<JSONObject>) qcs) {
         String qcPassed = qc.getString("qcPassed");
         String qcType = qc.getString("qcType");
         String results = qc.getString("results");
@@ -708,28 +660,23 @@ public class LibraryControllerHelperService {
         String qcDate = qc.getString("qcDate");
         String insertSize = qc.getString("insertSize");
 
-        //if (qcPassed == null || qcPassed.equals("") ||
-        if (qcType == null || qcType.equals("") ||
-            results == null || results.equals("") ||
-            qcCreator == null || qcCreator.equals("") ||
-            qcDate == null || qcDate.equals("") ||
-            insertSize == null || insertSize.equals("")) {
+        if (qcType == null || qcType.equals("") || results == null || results.equals("") || qcCreator == null || qcCreator.equals("")
+            || qcDate == null || qcDate.equals("") || insertSize == null || insertSize.equals("")) {
           ok = false;
         }
       }
 
-      //persist
+      // persist
       if (ok) {
         Map<String, Object> map = new HashMap<String, Object>();
         JSONArray a = new JSONArray();
         JSONArray errors = new JSONArray();
-        for (JSONObject qc : (Iterable<JSONObject>)qcs) {
+        for (JSONObject qc : (Iterable<JSONObject>) qcs) {
           JSONObject j = addLibraryQC(session, qc);
           j.put("libraryId", qc.getString("libraryId"));
           if (j.has("error")) {
             errors.add(j);
-          }
-          else {
+          } else {
             a.add(j);
           }
         }
@@ -738,13 +685,12 @@ public class LibraryControllerHelperService {
           map.put("errors", errors);
         }
         return JSONUtils.JSONObjectResponse(map);
-      }
-      else {
+      } else {
         log.error("Failed to add Library QC to this Library: one of the required fields of the selected QCs is missing or invalid");
-        return JSONUtils.SimpleJSONError("Failed to add Library QC to this Library: one of the required fields of the selected QCs is missing or invalid");
+        return JSONUtils.SimpleJSONError(
+            "Failed to add Library QC to this Library: one of the required fields of the selected QCs is missing or invalid");
       }
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       log.error("Failed to add Library QC to this Library: ", e);
       return JSONUtils.SimpleJSONError("Failed to add Library QC to this Library: " + e.getMessage());
     }
@@ -754,8 +700,8 @@ public class LibraryControllerHelperService {
     try {
       for (Object key : json.keySet()) {
         if (json.get(key) == null || json.get(key).equals("")) {
-          String k = (String)key;
-          return JSONUtils.SimpleJSONError("Please enter a value for '" +k+ "'");
+          String k = (String) key;
+          return JSONUtils.SimpleJSONError("Please enter a value for '" + k + "'");
         }
       }
       if (json.has("libraryId") && !json.get("libraryId").equals("")) {
@@ -765,27 +711,25 @@ public class LibraryControllerHelperService {
         newDilution.setSecurityProfile(library.getSecurityProfile());
         newDilution.setDilutionCreator(json.getString("dilutionCreator"));
         newDilution.setCreationDate(new SimpleDateFormat("dd/MM/yyyy").parse(json.getString("dilutionDate")));
-        //newDilution.setLocationBarcode(json.getString("locationBarcode"));
         newDilution.setConcentration(Double.parseDouble(json.getString("results")));
         library.addDilution(newDilution);
         requestManager.saveLibraryDilution(newDilution);
 
         StringBuilder sb = new StringBuilder();
         sb.append("<tr>");
-        //sb.append("<th>ID</th><th>Done By</th><th>Date</th><th>Barcode</th><th>Results</th>");
         sb.append("<th>LD Name</th><th>Done By</th><th>Date</th><th>Results</th><th>ID barcode</th>");
         if (!library.getPlatformName().equals("Illumina")) {
           sb.append("<th>Add emPCR</th>");
         }
         sb.append("</tr>");
 
-        File temploc = new File(session.getServletContext().getRealPath("/")+"temp/");
+        File temploc = new File(session.getServletContext().getRealPath("/") + "temp/");
         for (LibraryDilution dil : library.getLibraryDilutions()) {
           sb.append("<tr>");
-          sb.append("<td>"+dil.getName()+"</td>");
-          sb.append("<td>"+dil.getDilutionCreator()+"</td>");
-          sb.append("<td>"+dil.getCreationDate()+"</td>");
-          sb.append("<td>"+dil.getConcentration()+" "+ dil.getUnits()+"</td>");
+          sb.append("<td>" + dil.getName() + "</td>");
+          sb.append("<td>" + dil.getDilutionCreator() + "</td>");
+          sb.append("<td>" + dil.getCreationDate() + "</td>");
+          sb.append("<td>" + dil.getConcentration() + " " + dil.getUnits() + "</td>");
           sb.append("<td>");
 
           try {
@@ -795,29 +739,26 @@ public class LibraryControllerHelperService {
             if (bi != null) {
               File tempimage = misoFileManager.generateTemporaryFile("barcode-", ".png", temploc);
               if (ImageIO.write(bi, "png", tempimage)) {
-                sb.append("<img style='border:0;' src='/temp/"+tempimage.getName()+"'/>");
+                sb.append("<img style='border:0;' src='/temp/" + tempimage.getName() + "'/>");
               }
             }
-          }
-          catch (IOException e) {
+          } catch (IOException e) {
             e.printStackTrace();
           }
           sb.append("</td>");
 
           if (!library.getPlatformName().equals("Illumina")) {
-            sb.append("<td><a href='javascript:void(0);' onclick='Library.empcr.insertEmPcrRow("+dil.getId()+");'>Add emPCR</a></td>");
-          }
-          else {
-            //sb.append("<td><a href='/miso/poolwizard/new/"+library.getPlatformName().toLowerCase()+"/new/'>Construct New Pool</a></td>");
-            sb.append("<td><a href='/miso/poolwizard/new/"+library.getSample().getProject().getProjectId()+"'>Construct New Pool</a></td>");
+            sb.append("<td><a href='javascript:void(0);' onclick='Library.empcr.insertEmPcrRow(" + dil.getId() + ");'>Add emPCR</a></td>");
+          } else {
+            sb.append(
+                "<td><a href='/miso/poolwizard/new/" + library.getSample().getProject().getProjectId() + "'>Construct New Pool</a></td>");
           }
 
           sb.append("</tr>");
         }
         return JSONUtils.SimpleJSONResponse(sb.toString());
       }
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       log.error("Failed to add Library Dilution to this Library: ", e);
       return JSONUtils.SimpleJSONError("Failed to add Library Dilution to this Library: " + e.getMessage());
     }
@@ -827,32 +768,30 @@ public class LibraryControllerHelperService {
   public JSONObject bulkAddLibraryDilutions(HttpSession session, JSONObject json) {
     try {
       JSONArray dilutions = JSONArray.fromObject(json.getString("dilutions"));
-      //validate
+      // validate
       boolean ok = true;
-      for (JSONObject dil : (Iterable<JSONObject>)dilutions) {
+      for (JSONObject dil : (Iterable<JSONObject>) dilutions) {
         String results = dil.getString("results");
         String dilutionCreator = dil.getString("dilutionCreator");
         String dilutionDate = dil.getString("dilutionDate");
 
-        if (results == null || results.equals("") ||
-            dilutionCreator == null || dilutionCreator.equals("") ||
-            dilutionDate == null || dilutionDate.equals("")) {
+        if (results == null || results.equals("") || dilutionCreator == null || dilutionCreator.equals("") || dilutionDate == null
+            || dilutionDate.equals("")) {
           ok = false;
         }
       }
 
-      //persist
+      // persist
       if (ok) {
         Map<String, Object> map = new HashMap<String, Object>();
         JSONArray a = new JSONArray();
         JSONArray errors = new JSONArray();
-        for (JSONObject dil : (Iterable<JSONObject>)dilutions) {
+        for (JSONObject dil : (Iterable<JSONObject>) dilutions) {
           JSONObject j = addLibraryDilution(session, dil);
           j.put("libraryId", dil.getString("libraryId"));
           if (j.has("error")) {
             errors.add(j);
-          }
-          else {
+          } else {
             a.add(j);
           }
         }
@@ -861,13 +800,13 @@ public class LibraryControllerHelperService {
           map.put("errors", errors);
         }
         return JSONUtils.JSONObjectResponse(map);
+      } else {
+        log.error(
+            "Failed to add Library Dilutions to this Library: one of the required fields of the selected Library Dilutions is missing or invalid");
+        return JSONUtils.SimpleJSONError(
+            "Failed to add Library Dilutions to this Library: one of the required fields of the selected Library Dilutions is missing or invalid");
       }
-      else {
-        log.error("Failed to add Library Dilutions to this Library: one of the required fields of the selected Library Dilutions is missing or invalid");
-        return JSONUtils.SimpleJSONError("Failed to add Library Dilutions to this Library: one of the required fields of the selected Library Dilutions is missing or invalid");
-      }
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       log.error("Failed to add Library Dilutions to this Library: ", e);
       return JSONUtils.SimpleJSONError("Failed to add Library Dilutions to this Library: " + e.getMessage());
     }
@@ -879,10 +818,10 @@ public class LibraryControllerHelperService {
       Long dilutionId = Long.parseLong(json.getString("dilutionId"));
       LibraryDilution dilution = requestManager.getLibraryDilutionById(dilutionId);
       response.put("results", "<input type='text' id='" + dilutionId + "' value='" + dilution.getConcentration() + "'/>");
-      response.put("edit", "<a href='javascript:void(0);' onclick='Library.dilution.editLibraryDilution(\"" + dilutionId + "\");'>Save</a>");
+      response.put("edit",
+          "<a href='javascript:void(0);' onclick='Library.dilution.editLibraryDilution(\"" + dilutionId + "\");'>Save</a>");
       return response;
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       log.error("Failed to display Library Dilution of this Library: ", e);
       return JSONUtils.SimpleJSONError("Failed to display Library Dilution of this sample: " + e.getMessage());
     }
@@ -897,8 +836,7 @@ public class LibraryControllerHelperService {
         requestManager.saveLibraryDilution(dilution);
         return JSONUtils.SimpleJSONResponse("OK");
       }
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       log.error("Failed to edit Library Dilution of this Library: ", e);
       return JSONUtils.SimpleJSONError("Failed to edit Library Dilution of this Library: " + e.getMessage());
     }
@@ -909,8 +847,8 @@ public class LibraryControllerHelperService {
     try {
       for (Object key : json.keySet()) {
         if (json.get(key) == null || json.get(key).equals("")) {
-          String k = (String)key;
-          return JSONUtils.SimpleJSONError("Please enter a value for '" +k+ "'");
+          String k = (String) key;
+          return JSONUtils.SimpleJSONError("Please enter a value for '" + k + "'");
         }
       }
       if (json.has("dilutionId") && !json.get("dilutionId").equals("")) {
@@ -931,21 +869,20 @@ public class LibraryControllerHelperService {
         sb.append("</tr>");
         for (emPCR p : requestManager.listAllEmPCRsByDilutionId(dilutionId)) {
           sb.append("<tr>");
-          sb.append("<td>"+p.getId()+"</td>");
-          sb.append("<td>"+p.getPcrCreator()+"</td>");
-          sb.append("<td>"+p.getCreationDate()+"</td>");
-          sb.append("<td>"+p.getConcentration()+" "+ p.getUnits()+"</td>");
-          sb.append("<td><a href='javascript:void(0);' onclick='Library.empcr.insertEmPcrDilutionRow("+p.getId()+");'>Add emPCR Dilution</a></td>");
+          sb.append("<td>" + p.getId() + "</td>");
+          sb.append("<td>" + p.getPcrCreator() + "</td>");
+          sb.append("<td>" + p.getCreationDate() + "</td>");
+          sb.append("<td>" + p.getConcentration() + " " + p.getUnits() + "</td>");
+          sb.append("<td><a href='javascript:void(0);' onclick='Library.empcr.insertEmPcrDilutionRow(" + p.getId()
+              + ");'>Add emPCR Dilution</a></td>");
           sb.append("</tr>");
         }
         return JSONUtils.SimpleJSONResponse(sb.toString());
-      }
-      else {
+      } else {
         log.error("Failed to add emPCR to this LibraryDilution: No parent Dilution ID found");
-        return JSONUtils.SimpleJSONError("Failed to add emPCR to this LibraryDilution: No parent Dilution ID found");        
+        return JSONUtils.SimpleJSONError("Failed to add emPCR to this LibraryDilution: No parent Dilution ID found");
       }
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       log.error("Failed to add emPCR to this LibraryDilution: ", e);
       return JSONUtils.SimpleJSONError("Failed to add emPCR to this LibraryDilution: " + e.getMessage());
     }
@@ -955,8 +892,8 @@ public class LibraryControllerHelperService {
     try {
       for (Object key : json.keySet()) {
         if (json.get(key) == null || json.get(key).equals("")) {
-          String k = (String)key;
-          return JSONUtils.SimpleJSONError("Please enter a value for '" +k+ "'");
+          String k = (String) key;
+          return JSONUtils.SimpleJSONError("Please enter a value for '" + k + "'");
         }
       }
       if (json.has("pcrId") && !json.get("pcrId").equals("")) {
@@ -972,17 +909,16 @@ public class LibraryControllerHelperService {
 
         StringBuilder sb = new StringBuilder();
         sb.append("<tr>");
-        //sb.append("<th>ID</th><th>Done By</th><th>Date</th><th>Barcode</th><th>Results</th>");
         sb.append("<th>ID</th><th>Done By</th><th>Date</th><th>Results</th><th>ID Barcode</th>");
         sb.append("</tr>");
-        
-        File temploc = new File(session.getServletContext().getRealPath("/")+"temp/");
+
+        File temploc = new File(session.getServletContext().getRealPath("/") + "temp/");
         for (emPCRDilution dil : requestManager.listAllEmPcrDilutionsByEmPcrId(pcrId)) {
           sb.append("<tr>");
-          sb.append("<td>"+dil.getId()+"</td>");
-          sb.append("<td>"+dil.getDilutionCreator()+"</td>");
-          sb.append("<td>"+dil.getCreationDate()+"</td>");
-          sb.append("<td>"+dil.getConcentration()+" "+ dil.getUnits()+"</td>");
+          sb.append("<td>" + dil.getId() + "</td>");
+          sb.append("<td>" + dil.getDilutionCreator() + "</td>");
+          sb.append("<td>" + dil.getCreationDate() + "</td>");
+          sb.append("<td>" + dil.getConcentration() + " " + dil.getUnits() + "</td>");
 
           sb.append("<td>");
           try {
@@ -992,23 +928,21 @@ public class LibraryControllerHelperService {
             if (bi != null) {
               File tempimage = misoFileManager.generateTemporaryFile("barcode-", ".png", temploc);
               if (ImageIO.write(bi, "png", tempimage)) {
-                sb.append("<img style='border:0;' src='/temp/"+tempimage.getName()+"'/>");
+                sb.append("<img style='border:0;' src='/temp/" + tempimage.getName() + "'/>");
               }
             }
-          }
-          catch (IOException e) {
+          } catch (IOException e) {
             e.printStackTrace();
           }
           sb.append("</td>");
 
-          //sb.append("<td><a href='/miso/pool/"+pcr.getLibraryDilution().getLibrary().getPlatformName().toLowerCase()+"/new/'>Construct New Pool</a></td>");
-          sb.append("<td><a href='/miso/poolwizard/new/"+pcr.getLibraryDilution().getLibrary().getSample().getProject().getProjectId()+"'>Construct New Pool</a></td>");
+          sb.append("<td><a href='/miso/poolwizard/new/" + pcr.getLibraryDilution().getLibrary().getSample().getProject().getProjectId()
+              + "'>Construct New Pool</a></td>");
           sb.append("</tr>");
         }
         return JSONUtils.SimpleJSONResponse(sb.toString());
       }
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       log.error("Failed to add EmPCRDilution to this EmPCR: ", e);
       return JSONUtils.SimpleJSONError("Failed to add EmPCRDilution to this EmPCR: " + e.getMessage());
     }
@@ -1018,32 +952,30 @@ public class LibraryControllerHelperService {
   public JSONObject bulkAddEmPcrs(HttpSession session, JSONObject json) {
     try {
       JSONArray pcrs = JSONArray.fromObject(json.getString("pcrs"));
-      //validate
+      // validate
       boolean ok = true;
-      for (JSONObject pcr : (Iterable<JSONObject>)pcrs) {
+      for (JSONObject pcr : (Iterable<JSONObject>) pcrs) {
         String pcrCreator = pcr.getString("pcrCreator");
         String pcrDate = pcr.getString("pcrDate");
         String concentration = pcr.getString("results");
 
-        if (concentration == null || concentration.equals("") ||
-            pcrCreator == null || pcrCreator.equals("") ||
-            pcrDate == null || pcrDate.equals("")) {
+        if (concentration == null || concentration.equals("") || pcrCreator == null || pcrCreator.equals("") || pcrDate == null
+            || pcrDate.equals("")) {
           ok = false;
         }
       }
 
-      //persist
+      // persist
       if (ok) {
         Map<String, Object> map = new HashMap<String, Object>();
         JSONArray a = new JSONArray();
         JSONArray errors = new JSONArray();
-        for (JSONObject pcr : (Iterable<JSONObject>)pcrs) {
+        for (JSONObject pcr : (Iterable<JSONObject>) pcrs) {
           JSONObject j = addEmPcr(session, pcr);
           j.put("dilutionId", pcr.getString("dilutionId"));
           if (j.has("error")) {
             errors.add(j);
-          }
-          else {
+          } else {
             a.add(j);
           }
         }
@@ -1052,13 +984,12 @@ public class LibraryControllerHelperService {
           map.put("errors", errors);
         }
         return JSONUtils.JSONObjectResponse(map);
-      }
-      else {
+      } else {
         log.error("Failed to add EmPCRs to this Library Dilution: one of the required fields of the selected EmPCR is missing or invalid");
-        return JSONUtils.SimpleJSONError("Failed to add EmPCRs to this Library Dilution: one of the required fields of the EmPCR is missing or invalid");
+        return JSONUtils.SimpleJSONError(
+            "Failed to add EmPCRs to this Library Dilution: one of the required fields of the EmPCR is missing or invalid");
       }
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       log.error("Failed to add EmPCRs to this Library Dilution: ", e);
       return JSONUtils.SimpleJSONError("Failed to add EmPCRs to this Library Dilution: " + e.getMessage());
     }
@@ -1067,32 +998,30 @@ public class LibraryControllerHelperService {
   public JSONObject bulkAddEmPcrDilutions(HttpSession session, JSONObject json) {
     try {
       JSONArray dilutions = JSONArray.fromObject(json.getString("dilutions"));
-      //validate
+      // validate
       boolean ok = true;
-      for (JSONObject dil : (Iterable<JSONObject>)dilutions) {
+      for (JSONObject dil : (Iterable<JSONObject>) dilutions) {
         String dilutionCreator = dil.getString("pcrDilutionCreator");
         String dilutionDate = dil.getString("pcrDilutionDate");
         String concentration = dil.getString("results");
 
-        if (concentration == null || concentration.equals("") ||
-            dilutionCreator == null || dilutionCreator.equals("") ||
-            dilutionDate == null || dilutionDate.equals("")) {
+        if (concentration == null || concentration.equals("") || dilutionCreator == null || dilutionCreator.equals("")
+            || dilutionDate == null || dilutionDate.equals("")) {
           ok = false;
         }
       }
 
-      //persist
+      // persist
       if (ok) {
         Map<String, Object> map = new HashMap<String, Object>();
         JSONArray a = new JSONArray();
         JSONArray errors = new JSONArray();
-        for (JSONObject dil : (Iterable<JSONObject>)dilutions) {
+        for (JSONObject dil : (Iterable<JSONObject>) dilutions) {
           JSONObject j = addEmPcrDilution(session, dil);
           j.put("pcrId", dil.getString("pcrId"));
           if (j.has("error")) {
             errors.add(j);
-          }
-          else {
+          } else {
             a.add(j);
           }
         }
@@ -1101,13 +1030,13 @@ public class LibraryControllerHelperService {
           map.put("errors", errors);
         }
         return JSONUtils.JSONObjectResponse(map);
+      } else {
+        log.error(
+            "Failed to add EmPCR Dilutions to this EmPCR: one of the required fields of the selected EmPCR Dilutions is missing or invalid");
+        return JSONUtils.SimpleJSONError(
+            "Failed to add EmPCR Dilutions to this EmPCR: one of the required fields of the selected EmPCR Dilutions is missing or invalid");
       }
-      else {
-        log.error("Failed to add EmPCR Dilutions to this EmPCR: one of the required fields of the selected EmPCR Dilutions is missing or invalid");
-        return JSONUtils.SimpleJSONError("Failed to add EmPCR Dilutions to this EmPCR: one of the required fields of the selected EmPCR Dilutions is missing or invalid");
-      }
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       log.error("Failed to add EmPCR Dilutions to this EmPCR: ", e);
       return JSONUtils.SimpleJSONError("Failed to add EmPCR Dilutions to this EmPCR: " + e.getMessage());
     }
@@ -1122,10 +1051,10 @@ public class LibraryControllerHelperService {
 
       response.put("results", "<input type='text' id='results" + qcId + "' value='" + libraryQc.getResults() + "'/>");
       response.put("insertSize", "<input type='text' id='insertSize" + qcId + "' value='" + libraryQc.getInsertSize() + "'/>");
-      response.put("edit", "<a href='javascript:void(0);' onclick='Library.qc.editLibraryQC(\"" + qcId + "\",\"" + libraryId + "\");'>Save</a>");
+      response.put("edit",
+          "<a href='javascript:void(0);' onclick='Library.qc.editLibraryQC(\"" + qcId + "\",\"" + libraryId + "\");'>Save</a>");
       return response;
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       log.error("Failed to display library QC of this library: ", e);
       return JSONUtils.SimpleJSONError("Failed to display library QC of this library: " + e.getMessage());
     }
@@ -1141,10 +1070,9 @@ public class LibraryControllerHelperService {
         libraryQc.setInsertSize(Integer.parseInt(json.getString("insertSize")));
         requestManager.saveLibraryQC(libraryQc);
 
-        }
-        return JSONUtils.SimpleJSONResponse("done");
       }
-    catch (Exception e) {
+      return JSONUtils.SimpleJSONResponse("done");
+    } catch (Exception e) {
       log.error("Failed to add library QC to this library: ", e);
       return JSONUtils.SimpleJSONError("Failed to add library QC to this library: " + e.getMessage());
     }
@@ -1154,8 +1082,7 @@ public class LibraryControllerHelperService {
     User user;
     try {
       user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
     }
@@ -1166,17 +1093,14 @@ public class LibraryControllerHelperService {
         try {
           requestManager.deleteLibrary(requestManager.getLibraryById(libraryId));
           return JSONUtils.SimpleJSONResponse("Library deleted");
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
           e.printStackTrace();
           return JSONUtils.SimpleJSONError("Cannot delete library: " + e.getMessage());
         }
-      }
-      else {
+      } else {
         return JSONUtils.SimpleJSONError("No library specified to delete.");
       }
-    }
-    else {
+    } else {
       return JSONUtils.SimpleJSONError("Only logged-in admins can delete objects.");
     }
   }
@@ -1185,8 +1109,7 @@ public class LibraryControllerHelperService {
     User user;
     try {
       user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
     }
@@ -1197,17 +1120,14 @@ public class LibraryControllerHelperService {
         try {
           requestManager.deleteLibraryDilution(requestManager.getLibraryDilutionById(libraryDilutionId));
           return JSONUtils.SimpleJSONResponse("LibraryDilution deleted");
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
           e.printStackTrace();
           return JSONUtils.SimpleJSONError("Cannot delete library dilution: " + e.getMessage());
         }
-      }
-      else {
+      } else {
         return JSONUtils.SimpleJSONError("No library dilution specified to delete.");
       }
-    }
-    else {
+    } else {
       return JSONUtils.SimpleJSONError("Only logged-in admins can delete objects.");
     }
   }
@@ -1216,8 +1136,7 @@ public class LibraryControllerHelperService {
     User user;
     try {
       user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
     }
@@ -1228,17 +1147,14 @@ public class LibraryControllerHelperService {
         try {
           requestManager.deleteEmPCR(requestManager.getEmPcrById(empcrId));
           return JSONUtils.SimpleJSONResponse("EmPCR deleted");
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
           e.printStackTrace();
           return JSONUtils.SimpleJSONError("Cannot delete EmPCR: " + e.getMessage());
         }
-      }
-      else {
+      } else {
         return JSONUtils.SimpleJSONError("No EmPCR specified to delete.");
       }
-    }
-    else {
+    } else {
       return JSONUtils.SimpleJSONError("Only logged-in admins can delete objects.");
     }
   }
@@ -1247,8 +1163,7 @@ public class LibraryControllerHelperService {
     User user;
     try {
       user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
     }
@@ -1259,17 +1174,14 @@ public class LibraryControllerHelperService {
         try {
           requestManager.deleteEmPcrDilution(requestManager.getEmPcrDilutionById(deleteEmPCRDilution));
           return JSONUtils.SimpleJSONResponse("EmPCRDilution deleted");
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
           e.printStackTrace();
           return JSONUtils.SimpleJSONError("Cannot delete EmPCR dilution: " + e.getMessage());
         }
-      }
-      else {
+      } else {
         return JSONUtils.SimpleJSONError("No EmPCR dilution specified to delete.");
       }
-    }
-    else {
+    } else {
       return JSONUtils.SimpleJSONError("Only logged-in admins can delete objects.");
     }
   }
@@ -1283,19 +1195,14 @@ public class LibraryControllerHelperService {
         if (library.getQcPassed() != null) {
           qcpassed = library.getQcPassed().toString();
         }
-        jsonArray.add("['" + library.getName() + "','" +
-                      library.getAlias() + "','" +
-                      library.getLibraryType().getDescription() + "','" +
-                      library.getSample().getName()+ "','" +
-                      qcpassed + "','" +
-                      "<a href=\"/miso/library/" + library.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "','" +
-                      (library.getIdentificationBarcode() != null ? library.getIdentificationBarcode() : "") +
-                      "']");
+        jsonArray.add("['" + library.getName() + "','" + library.getAlias() + "','" + library.getLibraryType().getDescription() + "','"
+            + library.getSample().getName() + "','" + qcpassed + "','" + "<a href=\"/miso/library/" + library.getId()
+            + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "','"
+            + (library.getIdentificationBarcode() != null ? library.getIdentificationBarcode() : "") + "']");
       }
       j.put("array", jsonArray);
       return j;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
@@ -1320,7 +1227,7 @@ public class LibraryControllerHelperService {
   public void setMisoFileManager(MisoFilesManager misoFileManager) {
     this.misoFileManager = misoFileManager;
   }
-  
+
   public void setPrintManager(PrintManager<MisoPrintService, Queue<?>> printManager) {
     this.printManager = printManager;
   }

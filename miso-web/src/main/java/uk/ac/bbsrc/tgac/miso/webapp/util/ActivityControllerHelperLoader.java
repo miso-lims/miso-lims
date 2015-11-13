@@ -23,47 +23,23 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.util;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-import com.eaglegenomics.simlims.core.Activity;
-//import com.eaglegenomics.simlims.spring.ActivityControllerHelper;
+public class ActivityControllerHelperLoader implements InitializingBean, ApplicationContextAware {
 
-public class ActivityControllerHelperLoader implements InitializingBean,
-		ApplicationContextAware {
-//	protected static final Logger log = LoggerFactory.getLogger(ActivityControllerHelperLoader.class);
+  @Autowired
+  private ApplicationContext context;
 
-	//private transient Map<Activity, ActivityControllerHelper> activityHelpers = new HashMap<Activity, ActivityControllerHelper>();
+  @Override
+  public void setApplicationContext(ApplicationContext context) throws BeansException {
+    this.context = context;
+  }
 
-	@Autowired
-	private ApplicationContext context;
-
-	public void setApplicationContext(ApplicationContext context)
-			throws BeansException {
-		this.context = context;
-	}
-
-/*	public ActivityControllerHelper getHelper(Activity key) {
-		return activityHelpers.get(key);
-	}
-*/
-	public void afterPropertiesSet() throws Exception {
-/*		for (ActivityControllerHelper entry : context.getBeansOfType(
-				ActivityControllerHelper.class).values()) {
-			if (log.isInfoEnabled()) {
-				log.info("Loaded activity helper for "
-						+ entry.getActivity().getUniqueIdentifier());
-			}
-			activityHelpers.put(entry.getActivity(), entry);
-		}
-		*/
-	}
+  @Override
+  public void afterPropertiesSet() throws Exception {
+  }
 }

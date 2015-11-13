@@ -23,7 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller.d3graph;
 
-
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.poi.openxml4j.exceptions.InvalidOperationException;
@@ -39,13 +38,8 @@ import uk.ac.bbsrc.tgac.miso.webapp.controller.EditProjectController;
 import java.io.IOException;
 import java.util.Collection;
 
-
 /**
- * Created by IntelliJ IDEA.
- * User: thankia
- * Date: 06/12/11
- * Time: 11:36
- * To change this template use File | Settings | File Templates.
+ * Created by IntelliJ IDEA. User: thankia Date: 06/12/11 Time: 11:36 To change this template use File | Settings | File Templates.
  */
 @Controller
 @RequestMapping("/d3graph/run")
@@ -62,18 +56,15 @@ public class RunD3CalendarController {
       Collection<Run> runs = requestManager.listAllRuns();
       JSONArray runsArray = new JSONArray();
       for (Run r : runs) {
-        runsArray.add(JSONObject.fromObject("{'ID':'" + r.getId()
-                                            + "','Name':'" + r.getName()
-                                            + "','Start':'" + (r.getStatus() != null ? r.getStatus().getStartDate() : "")
-                                            + "','Stop':'" + (r.getStatus() != null ? r.getStatus().getCompletionDate() : "")
-                                            + "','Instrument':'" + r.getSequencerReference().getId()
-                                            + "','InstrumentName':'" +  r.getSequencerReference().getPlatform().getInstrumentModel()
-                                            + "','Health':'" + (r.getStatus() != null && r.getStatus().getHealth() != null ? r.getStatus().getHealth().getKey() : "")
-                                            + "','Description':'" + r.getDescription()+  "'}"));
+        runsArray.add(JSONObject.fromObject(
+            "{'ID':'" + r.getId() + "','Name':'" + r.getName() + "','Start':'" + (r.getStatus() != null ? r.getStatus().getStartDate() : "")
+                + "','Stop':'" + (r.getStatus() != null ? r.getStatus().getCompletionDate() : "") + "','Instrument':'"
+                + r.getSequencerReference().getId() + "','InstrumentName':'" + r.getSequencerReference().getPlatform().getInstrumentModel()
+                + "','Health':'" + (r.getStatus() != null && r.getStatus().getHealth() != null ? r.getStatus().getHealth().getKey() : "")
+                + "','Description':'" + r.getDescription() + "'}"));
       }
       return runsArray;
-    }
-    catch (InvalidOperationException e) {
+    } catch (InvalidOperationException e) {
       log.debug("Failed", e);
       JSONArray runsArray = new JSONArray();
       runsArray.add(JSONObject.fromObject("{'Error':" + e + "}"));

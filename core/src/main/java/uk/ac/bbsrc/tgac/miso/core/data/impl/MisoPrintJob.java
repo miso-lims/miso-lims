@@ -29,11 +29,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.AbstractPrintJob;
  * uk.ac.bbsrc.tgac.miso.core.data.impl
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 01-Jul-2011
  * @since 0.0.3
  */
 public class MisoPrintJob extends AbstractPrintJob {
-  
+
 }

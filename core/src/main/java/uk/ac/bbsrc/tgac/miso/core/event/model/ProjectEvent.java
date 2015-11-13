@@ -32,7 +32,7 @@ import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
  * uk.ac.bbsrc.tgac.miso.core.event.model
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 14/11/11
  * @since 0.1.3
@@ -49,6 +49,7 @@ public class ProjectEvent implements Event<Project> {
     this.eventType = eventType;
   }
 
+  @Override
   public Project getEventObject() {
     return this.project;
   }

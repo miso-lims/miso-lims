@@ -23,36 +23,35 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
-//import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-//import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-//import com.fasterxml.jackson.annotation.JsonTypeInfo;
-//import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-//import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import java.io.Serializable;
+
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
-import uk.ac.bbsrc.tgac.miso.core.data.*;
 
-import java.io.Serializable;
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractPartition;
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.impl
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 03-Aug-2011
  * @since 0.0.3
  */
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
-//@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
-@JsonIgnoreProperties({"securityProfile","container"})
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
+@JsonIgnoreProperties({ "securityProfile", "container" })
 public class PartitionImpl extends AbstractPartition implements SequencerPoolPartition, Serializable {
   Pool<? extends Poolable> pool = null;
 
-  public PartitionImpl() { }
-  
+  public PartitionImpl() {
+  }
+
   @Override
   public void buildSubmission() {
   }
@@ -79,6 +78,5 @@ public class PartitionImpl extends AbstractPartition implements SequencerPoolPar
     }
     return sb.toString();
   }
-
 
 }

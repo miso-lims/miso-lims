@@ -23,9 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-//import com.fasterxml.jackson.annotation.*;
-//import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import java.io.IOException;
@@ -34,75 +31,80 @@ import java.net.InetAddress;
 /**
  * A HardwareReference represents a piece of network-connected physical hardware that performs a given task, e.g. a sequencer
  * <p/>
- * Usually, the hardware itself is abstracted by a protocol of some kind, managed by a computer node, e.g. the head node that sits on top of a
- * sequencing machine. This computer will have an IP address on which a service will run to accept a
+ * Usually, the hardware itself is abstracted by a protocol of some kind, managed by a computer node, e.g. the head node that sits on top of
+ * a sequencing machine. This computer will have an IP address on which a service will run to accept a
  * {@link uk.ac.bbsrc.tgac.miso.core.service.integration.contract.InterrogationQuery} and give back a
  * {@link uk.ac.bbsrc.tgac.miso.core.service.integration.contract.InterrogationResult}.
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
-//@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
-@JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public interface HardwareReference extends Nameable {
   /**
    * Sets the id of this HardwareReference object.
-   *
-   * @param id id.
-   *
+   * 
+   * @param id
+   *          id.
+   * 
    */
   void setId(Long id);
 
   /**
    * Sets the name of this HardwareReference object.
-   *
-   * @param name name.
-   *
+   * 
+   * @param name
+   *          name.
+   * 
    */
   void setName(String name);
 
   /**
    * Sets the availability of this HardwareReference object.
-   *
-   * @param available available.
-   *
+   * 
+   * @param available
+   *          available.
+   * 
    */
   void setAvailable(Boolean available);
 
   /**
    * Returns the availability of this HardwareReference object.
-   *
+   * 
    * @return Boolean available.
    */
   Boolean getAvailable();
 
   /**
-   * Check the availability of this HardwareReference within a given timeout period 
-   *
-   * @param timeout of type int
-   * @throws IOException when the machine cannot be contacted
+   * Check the availability of this HardwareReference within a given timeout period
+   * 
+   * @param timeout
+   *          of type int
+   * @throws IOException
+   *           when the machine cannot be contacted
    */
   void checkAvailability(int timeout) throws IOException;
 
   /**
    * Sets the ipAddress of this HardwareReference object.
-   *
-   * @param ip ipAddress.
-   *
+   * 
+   * @param ip
+   *          ipAddress.
+   * 
    */
   void setIpAddress(InetAddress ip);
 
   /**
    * Returns the ipAddress of this HardwareReference object.
-   *
+   * 
    * @return InetAddress ipAddress.
    */
   InetAddress getIpAddress();
 
   /**
    * Returns the fully qualified domain name (FQDN) of this HardwareReference object.
-   *
+   * 
    * @return String FQDN.
    */
   String getFQDN();

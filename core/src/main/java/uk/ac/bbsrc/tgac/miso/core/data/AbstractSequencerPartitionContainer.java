@@ -23,16 +23,22 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
-import com.eaglegenomics.simlims.core.User;
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToOne;
+
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
-import javax.persistence.*;
-import java.util.List;
+import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.User;
 
 /**
  * Skeleton implementation of a SequencerPartitionContainer
- *
+ * 
  * @author Rob Davey
  * @since 0.1.6
  */
@@ -54,11 +60,13 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
   private Platform platform;
   private String validationBarcode;
 
+  @Override
   @Deprecated
   public Long getContainerId() {
     return containerId;
   }
 
+  @Override
   @Deprecated
   public void setContainerId(Long containerId) {
     this.containerId = containerId;
@@ -69,46 +77,57 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
     return containerId;
   }
 
+  @Override
   public void setId(long id) {
     this.containerId = id;
   }
 
+  @Override
   public String getIdentificationBarcode() {
     return identificationBarcode;
   }
 
+  @Override
   public void setIdentificationBarcode(String identificationBarcode) {
     this.identificationBarcode = identificationBarcode;
   }
 
+  @Override
   public String getLocationBarcode() {
     return locationBarcode;
   }
 
+  @Override
   public void setLocationBarcode(String locationBarcode) {
     this.locationBarcode = locationBarcode;
   }
 
+  @Override
   public String getName() {
     return name;
   }
 
+  @Override
   public void setName(String name) {
     this.name = name;
   }
 
+  @Override
   public String getLabelText() {
-    return getPlatform().getPlatformType().name()+" " + getValidationBarcode();
+    return getPlatform().getPlatformType().name() + " " + getValidationBarcode();
   }
 
+  @Override
   public boolean isDeletable() {
     return getId() != AbstractSequencerPartitionContainer.UNSAVED_ID;
   }
 
+  @Override
   public String getValidationBarcode() {
     return validationBarcode;
   }
 
+  @Override
   public void setValidationBarcode(String validationBarcode) {
     this.validationBarcode = validationBarcode;
   }
@@ -121,16 +140,21 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
     this.paired = paired;
   }
 
+  @Override
   public abstract List<T> getPartitions();
 
+  @Override
   public abstract void setPartitions(List<T> partitions);
 
+  @Override
   public abstract T getPartitionAt(int partitionNumber);
 
+  @Override
   public Run getRun() {
     return run;
   }
 
+  @Override
   public void setRun(Run run) {
     this.run = run;
   }
@@ -145,46 +169,45 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
     this.platform = platform;
   }
 
+  @Override
   public boolean userCanRead(User user) {
     return securityProfile.userCanRead(user);
   }
 
+  @Override
   public boolean userCanWrite(User user) {
     return securityProfile.userCanWrite(user);
   }
 
+  @Override
   public void setSecurityProfile(SecurityProfile securityProfile) {
     this.securityProfile = securityProfile;
   }
 
+  @Override
   public SecurityProfile getSecurityProfile() {
     return securityProfile;
   }
 
+  @Override
   public void inheritPermissions(SecurableByProfile parent) throws SecurityException {
     if (parent.getSecurityProfile().getOwner() != null) {
       setSecurityProfile(parent.getSecurityProfile());
-    }
-    else {
+    } else {
       throw new SecurityException("Cannot inherit permissions when parent object owner is not set!");
     }
-  }  
+  }
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null)
-      return false;
-    if (obj == this)
-      return true;
-    if (!(obj instanceof SequencerPartitionContainer))
-      return false;
+    if (obj == null) return false;
+    if (obj == this) return true;
+    if (!(obj instanceof SequencerPartitionContainer)) return false;
     SequencerPartitionContainer them = (SequencerPartitionContainer) obj;
     // If not saved, then compare resolved actual objects. Otherwise just compare IDs.
-    if (getId() == AbstractSequencerPartitionContainer.UNSAVED_ID
-        || them.getId() == AbstractSequencerPartitionContainer.UNSAVED_ID) {
+    if (getId() == AbstractSequencerPartitionContainer.UNSAVED_ID || them.getId() == AbstractSequencerPartitionContainer.UNSAVED_ID) {
       return getIdentificationBarcode().equals(them.getIdentificationBarcode());
-    }
-    else {
+    } else {
       return getId() == them.getId();
     }
   }
@@ -192,12 +215,11 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
   @Override
   public int hashCode() {
     if (getId() != AbstractSequencerPartitionContainer.UNSAVED_ID) {
-      return (int)getId();
-    }
-    else {
+      return (int) getId();
+    } else {
       int hashcode = -1;
       if (getIdentificationBarcode() != null) hashcode = 37 * hashcode + getIdentificationBarcode().hashCode();
-      return hashcode;      
+      return hashcode;
     }
   }
 
@@ -214,7 +236,7 @@ public abstract class AbstractSequencerPartitionContainer<T extends Partition> i
 
   @Override
   public int compareTo(Object o) {
-    SequencerPartitionContainer t = (SequencerPartitionContainer)o;
+    SequencerPartitionContainer t = (SequencerPartitionContainer) o;
     if (getId() < t.getId()) return -1;
     if (getId() > t.getId()) return 1;
     return 0;

@@ -34,7 +34,7 @@ import java.io.IOException;
  * uk.ac.bbsrc.tgac.miso.core.event
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 11/01/12
  * @since 0.1.4
@@ -62,8 +62,7 @@ public class UserUpdateAspect {
       runAlertManager.updateGroupWatcher(userId);
       projectAlertManager.updateGroupWatcher(userId);
       poolAlertManager.updateGroupWatcher(userId);
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
     }
   }

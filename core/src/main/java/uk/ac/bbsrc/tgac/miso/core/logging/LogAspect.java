@@ -33,20 +33,21 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * Defines an aspect whereby the given JoinPoint advice (an execution event, e.g. a DAO save operation) is logged to a particular logger
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 @Aspect
 public class LogAspect {
 
-  /** Field log  */
+  /** Field log */
   protected Logger log;
 
   /**
    * Constructor LogAspect creates a new LogAspect instance with a given Logger name
-   *
-   * @param logName of type String
+   * 
+   * @param logName
+   *          of type String
    */
   public LogAspect(String logName) {
     this.log = LoggerFactory.getLogger(logName);
@@ -54,8 +55,9 @@ public class LogAspect {
 
   /**
    * For a successful event, given a supplied JoinPoint, log advice to the logger defined in the aspect object
-   *
-   * @param join of type JoinPoint
+   * 
+   * @param join
+   *          of type JoinPoint
    */
   public void logEvent(JoinPoint join) {
     String name = "SERVICE";
@@ -73,38 +75,47 @@ public class LogAspect {
 
   /**
    * For a failed event, given a supplied JoinPoint and exception, log advice to the logger defined in the aspect object
-   *
-   * @param join of type JoinPoint
-   * @param e of type Exception
+   * 
+   * @param join
+   *          of type JoinPoint
+   * @param e
+   *          of type Exception
    */
   public void logFailedEvent(JoinPoint join, Exception e) {
-    String name = "SERVICE:"+e.getClass().getSimpleName();
+    String name = "SERVICE:" + e.getClass().getSimpleName();
     if (SecurityContextHolder.getContext().getAuthentication() != null) {
       name = SecurityContextHolder.getContext().getAuthentication().getName();
     }
-    this.log.warn("FAIL ["+ name +"] "+join.toString()+" [" + join.getArgs()[0] +"] -> "+e.getMessage());
+    this.log.warn("FAIL [" + name + "] " + join.toString() + " [" + join.getArgs()[0] + "] -> " + e.getMessage());
   }
 
   /**
    * For a successful AJAX event, given a supplied JoinPoint and JSON query, log advice to the logger defined in the aspect object
-   *
-   * @param join of type JoinPoint
-   * @param json of type JSONObject
+   * 
+   * @param join
+   *          of type JoinPoint
+   * @param json
+   *          of type JSONObject
    */
-  @AfterReturning(pointcut="@annotation(LoggedAction)", returning="json")
+  @AfterReturning(pointcut = "@annotation(LoggedAction)", returning = "json")
   public void logAjaxEvent(JoinPoint join, JSONObject json) {
     System.out.println("logAjaxEvent: " + join.toString());
-    this.log.info("AJAX OK ["+ SecurityContextHolder.getContext().getAuthentication().getName()+"] "+join.toString()+" [" + json.toString() +"]");
+    this.log.info("AJAX OK [" + SecurityContextHolder.getContext().getAuthentication().getName() + "] " + join.toString() + " ["
+        + json.toString() + "]");
   }
 
   /**
    * For a failed AJAX event, given a supplied JoinPoint, JSON query and exception, log advice to the logger defined in the aspect object
-   *
-   * @param join of type JoinPoint
-   * @param json of type JSONObject
-   * @param e of type Exception
+   * 
+   * @param join
+   *          of type JoinPoint
+   * @param json
+   *          of type JSONObject
+   * @param e
+   *          of type Exception
    */
   public void logFailedAjaxEvent(JoinPoint join, JSONObject json, Exception e) {
-    this.log.warn("AJAX FAIL ["+ SecurityContextHolder.getContext().getAuthentication().getName()+"] "+join.toString()+" [" + json.toString() +"] -> "+e.getMessage());
+    this.log.warn("AJAX FAIL [" + SecurityContextHolder.getContext().getAuthentication().getName() + "] " + join.toString() + " ["
+        + json.toString() + "] -> " + e.getMessage());
   }
 }

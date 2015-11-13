@@ -38,7 +38,7 @@ import java.util.Map;
  * uk.ac.bbsrc.tgac.miso.task.test
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 24-Jun-2011
  * @since 0.0.3
@@ -74,27 +74,33 @@ public class TestLsfTask extends AbstractLSFProcess {
     });
   }
 
+  @Override
   protected Logger getLog() {
     return log;
   }
 
+  @Override
   public String getName() {
     return "Test";
   }
 
+  @Override
   public Collection<ConanParameter> getParameters() {
     return parameters;
   }
 
+  @Override
   protected String getComponentName() {
     return "TestComponent";
   }
 
+  @Override
   protected String getCommand(Map<ConanParameter, String> parameters) {
     getLog().debug("Executing " + getName() + " with the following parameters: " + parameters.toString());
     return "grep -c \"#\" /etc/profile";
   }
 
+  @Override
   protected String getLSFOutputFilePath(Map<ConanParameter, String> parameters) {
     // files to write output to
     final File outputDir = new File("/tmp", ".miso");
@@ -103,4 +109,3 @@ public class TestLsfTask extends AbstractLSFProcess {
     return new File(outputDir, "test.lsfoutput.txt").getAbsolutePath();
   }
 }
-

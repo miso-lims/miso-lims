@@ -24,16 +24,14 @@
 package uk.ac.bbsrc.tgac.miso.hibernatestore;
 
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
-//import org.hibernate.HibernateException;
-//import org.hibernate.Session;
-import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.transaction.annotation.Transactional;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractExperiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 
 import java.io.IOException;
-import java.lang.Object;import java.lang.SuppressWarnings;import java.util.Collection;
+import java.lang.SuppressWarnings;
+import java.util.Collection;
 
 /**
  * com.eaglegenomics.miso.hibernatestore
@@ -45,15 +43,17 @@ import java.lang.Object;import java.lang.SuppressWarnings;import java.util.Colle
  */
 @Deprecated
 public class HibernateExperimentStore extends HibernateDaoSupport implements Store<Experiment> {
+  @Override
   @Transactional(readOnly = false)
   public long save(Experiment experiment) throws IOException {
     getHibernateTemplate().merge(experiment);
     return experiment.getExperimentId();
   }
 
+  @Override
   @Transactional(readOnly = true)
   public Experiment get(long experimentId) throws IOException {
-    return (Experiment) getHibernateTemplate().get(AbstractExperiment.class, experimentId);
+    return getHibernateTemplate().get(AbstractExperiment.class, experimentId);
   }
 
   @Override
@@ -61,17 +61,10 @@ public class HibernateExperimentStore extends HibernateDaoSupport implements Sto
     return get(id);
   }
 
+  @Override
   @Transactional(readOnly = true)
   @SuppressWarnings("unchecked")
   public Collection<Experiment> listAll() throws IOException {
-/*    return (Collection<Experiment>) getHibernateTemplate().execute(
-            new HibernateCallback() {
-              public Object doInHibernate(Session session)
-                      throws HibernateException {
-                return session.createQuery("from AbstractExperiment").list();
-              }
-            });
-            */
     return null;
   }
 

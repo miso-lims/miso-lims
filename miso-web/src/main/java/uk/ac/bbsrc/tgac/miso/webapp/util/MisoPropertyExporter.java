@@ -38,13 +38,12 @@ import java.util.*;
 /**
  * A handy class that exposes property placeholders discovered at webapp init time by a PropertyPlaceholderConfigurer.
  * <p/>
- * This class accepts a list of available property files referenced in the Spring configs via a property list, or alternatively
- * you can supply a single MISO miso.properties file that contains the base MISO storage directory (where other property
- * files are housed). These additional properties files will be discovered at runtime, imported into the base properties,
- * and used by Spring to do its magic.
+ * This class accepts a list of available property files referenced in the Spring configs via a property list, or alternatively you can
+ * supply a single MISO miso.properties file that contains the base MISO storage directory (where other property files are housed). These
+ * additional properties files will be discovered at runtime, imported into the base properties, and used by Spring to do its magic.
  * <p/>
  * As an aside, usually these properties are not available to beans, but this class exposes them via getResolvedProperties()
- *
+ * 
  * @author Rob Davey
  * @date 01-Sep-2010
  * @since 0.0.2
@@ -53,16 +52,15 @@ public class MisoPropertyExporter extends PropertyPlaceholderConfigurer {
   protected static final Logger log = LoggerFactory.getLogger(MisoPropertyExporter.class);
 
   private Map<String, String> resolvedProperties;
-  
+
   @Override
-  protected void processProperties(ConfigurableListableBeanFactory beanFactoryToProcess,
-                                   Properties misoProps) throws BeansException {
+  protected void processProperties(ConfigurableListableBeanFactory beanFactoryToProcess, Properties misoProps) throws BeansException {
 
     String baseStoragePath = misoProps.getProperty("miso.baseDirectory");
     if (baseStoragePath != null) {
-      //append a trailing slash if one is missing
+      // append a trailing slash if one is missing
       if (!baseStoragePath.endsWith("/")) {
-        baseStoragePath+="/";
+        baseStoragePath += "/";
       }
 
       // set a system property to the base directory so that other systems can be configured based on this path
@@ -76,7 +74,7 @@ public class MisoPropertyExporter extends PropertyPlaceholderConfigurer {
 
       List<String> propertiesList = Arrays.asList(new File(baseStoragePath).list(new PropertiesFilenameFilter()));
       for (String propPath : propertiesList) {
-        log.debug("Attempting to load " + baseStoragePath+propPath);
+        log.debug("Attempting to load " + baseStoragePath + propPath);
         Properties tempProps;
 
         try {
@@ -86,17 +84,17 @@ public class MisoPropertyExporter extends PropertyPlaceholderConfigurer {
             tempProps.load(in);
             log.debug("Loaded " + tempProps.keySet() + " from " + propPath);
             CollectionUtils.mergePropertiesIntoMap(tempProps, misoProps);
+          } catch (IOException e) {
+            throw new InvalidPropertyException(MisoPropertyExporter.class, "All",
+                "Cannot load " + baseStoragePath + propPath + " properties. Cannot read file!");
           }
-          catch (IOException e) {
-            throw new InvalidPropertyException(MisoPropertyExporter.class, "All", "Cannot load " + baseStoragePath+propPath + " properties. Cannot read file!");
-          }
-        }
-        catch (FileNotFoundException e) {
-          throw new InvalidPropertyException(MisoPropertyExporter.class, "All", "Cannot load " + baseStoragePath+propPath + " properties. File does not exist!");
+        } catch (FileNotFoundException e) {
+          throw new InvalidPropertyException(MisoPropertyExporter.class, "All",
+              "Cannot load " + baseStoragePath + propPath + " properties. File does not exist!");
         }
       }
 
-      //override any config file security.method property with that from the system env
+      // override any config file security.method property with that from the system env
       if (System.getenv("security.method") != null) {
         misoProps.put("security.method", System.getenv("security.method"));
         log.debug("Set security.method to " + misoProps.get("security.method"));
@@ -107,16 +105,13 @@ public class MisoPropertyExporter extends PropertyPlaceholderConfigurer {
       for (Object key : misoProps.keySet()) {
         String keyStr = key.toString();
 
-        //doesn't seem to resolve properties properly - just end up null
-        //resolvedProperties.put(keyStr, resolvePlaceholder(props.getProperty(keyStr), props, SYSTEM_PROPERTIES_MODE_OVERRIDE));
+        // doesn't seem to resolve properties properly - just end up null
         resolvedProperties.put(keyStr, misoProps.getProperty(keyStr));
       }
-    }
-    else {
-      throw new InvalidPropertyException(MisoPropertyExporter.class,
-        "miso.baseDirectory",
-        "Cannot resolve miso.baseDirectory. This should be specified in the " +
-        "miso.properties file which should be made available on the classpath.");
+    } else {
+      throw new InvalidPropertyException(MisoPropertyExporter.class, "miso.baseDirectory",
+          "Cannot resolve miso.baseDirectory. This should be specified in the "
+              + "miso.properties file which should be made available on the classpath.");
     }
   }
 
@@ -133,7 +128,7 @@ public class MisoPropertyExporter extends PropertyPlaceholderConfigurer {
   protected class PropertiesFilenameFilter implements FilenameFilter {
     @Override
     public boolean accept(File dir, String name) {
-      return name.endsWith(".properties"); 
+      return name.endsWith(".properties");
     }
   }
 }

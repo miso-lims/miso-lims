@@ -30,13 +30,11 @@ import org.slf4j.LoggerFactory;
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationException;
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationUtils;
 
-import java.util.Iterator;
-
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.service.task
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 09/11/11
  * @since 0.1.3
@@ -113,10 +111,9 @@ public class AnalysisQueryService {
           String error = r.getJSONObject(0).getString("error");
           log.error(error);
           throw new IntegrationException("Analysis query returned an error: " + error);
-        }
-        else {
+        } else {
           JSONArray n = new JSONArray();
-          for (JSONObject task : (Iterable<JSONObject>)r) {
+          for (JSONObject task : (Iterable<JSONObject>) r) {
             if (!task.getString("statusMessage").contains("Failed")) {
               n.add(task);
             }
@@ -141,10 +138,9 @@ public class AnalysisQueryService {
           String error = r.getJSONObject(0).getString("error");
           log.error(error);
           throw new IntegrationException("Analysis query returned an error: " + error);
-        }
-        else {
+        } else {
           JSONArray n = new JSONArray();
-          for (JSONObject task : (Iterable<JSONObject>)r) {
+          for (JSONObject task : (Iterable<JSONObject>) r) {
             if (task.getString("statusMessage").contains("Failed")) {
               n.add(task);
             }
@@ -250,8 +246,7 @@ public class AnalysisQueryService {
 
     if (json.has("priority")) {
       j.put("priority", json.get("priority"));
-    }
-    else {
+    } else {
       j.put("priority", "MEDIUM");
     }
 

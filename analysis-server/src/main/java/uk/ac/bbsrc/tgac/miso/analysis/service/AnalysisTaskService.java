@@ -23,22 +23,19 @@
 
 package uk.ac.bbsrc.tgac.miso.analysis.service;
 
-import uk.ac.bbsrc.tgac.miso.analysis.parameter.DefaultProcessParameter;
 import uk.ac.bbsrc.tgac.miso.analysis.parameter.Optionable;
 import uk.ac.ebi.fgpt.conan.model.ConanParameter;
 import uk.ac.ebi.fgpt.conan.model.ConanProcess;
 import uk.ac.ebi.fgpt.conan.service.DefaultTaskService;
 import uk.ac.ebi.fgpt.conan.service.exception.MissingRequiredParameterException;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 /**
  * uk.ac.bbsrc.tgac.miso.analysis.service
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 28/03/12
  * @since 0.1.6
@@ -46,37 +43,25 @@ import java.util.Map;
 public class AnalysisTaskService extends DefaultTaskService {
 
   @Override
-  public void extractConanParameters(Map<ConanParameter, String> parameters,
-                                     Map<String, String> inputValues,
-                                     ConanProcess process) {
+  public void extractConanParameters(Map<ConanParameter, String> parameters, Map<String, String> inputValues, ConanProcess process) {
     for (ConanParameter param : process.getParameters()) {
-      if ((param instanceof Optionable && ((Optionable)param).isOptional()) ||
-          inputValues.get(param.getName()) != null) {
+      if ((param instanceof Optionable && ((Optionable) param).isOptional()) || inputValues.get(param.getName()) != null) {
         if (!parameters.containsKey(param)) {
           parameters.put(param, inputValues.get(param.getName()));
         }
-      }
-      else {
+      } else {
         throw new MissingRequiredParameterException(
-                "Required parameter '" + param.getName() + "' not supplied, " +
-                "required for process '" + process.getName() + "'");
+            "Required parameter '" + param.getName() + "' not supplied, " + "required for process '" + process.getName() + "'");
       }
     }
 
     /*
-    //finally, map in any parameters that need to be used, but not saved
-    List<String> paramnames = new ArrayList<String>();
-    for (ConanParameter cp : parameters.keySet()) {
-      paramnames.add(cp.getName());
-    }
-
-    for (String transientParam : inputValues.keySet()) {
-      DefaultProcessParameter dpp = new DefaultProcessParameter(transientParam);
-      if (!paramnames.contains(transientParam)) {
-        getLog().info("Adding "+transientParam);
-        parameters.put(dpp, inputValues.get(transientParam));
-      }
-    }
-    */
+     * //finally, map in any parameters that need to be used, but not saved List<String> paramnames = new ArrayList<String>(); for
+     * (ConanParameter cp : parameters.keySet()) { paramnames.add(cp.getName()); }
+     * 
+     * for (String transientParam : inputValues.keySet()) { DefaultProcessParameter dpp = new DefaultProcessParameter(transientParam); if
+     * (!paramnames.contains(transientParam)) { getLog().info("Adding "+transientParam); parameters.put(dpp,
+     * inputValues.get(transientParam)); } }
+     */
   }
 }

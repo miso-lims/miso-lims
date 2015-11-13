@@ -164,16 +164,12 @@ Library.dilution = {
 
       $('libraryDilutionTable').insertRow(1);
       //dilutionId    Done By   Dilution Date Barcode Results
-      //var column1=$('libraryDilutionTable').rows[1].insertCell(-1);
-      //column1.innerHTML="<input type='hidden' id='libraryId' name='libraryId' value='"+libraryId+"'/>";
       var column1 = $('libraryDilutionTable').rows[1].insertCell(-1);
       column1.innerHTML = "<input id='name' name='name' type='hidden' value='Unsaved '/>Unsaved";
       var column2 = $('libraryDilutionTable').rows[1].insertCell(-1);
       column2.innerHTML = "<input id='libraryDilutionCreator' name='libraryDilutionCreator' type='hidden' value='" + $('currentUser').innerHTML + "'/>" + $('currentUser').innerHTML;
       var column3 = $('libraryDilutionTable').rows[1].insertCell(-1);
       column3.innerHTML = "<input id='libraryDilutionDate' name='libraryDilutionDate' type='text'/>";
-      //var column5=$('libraryDilutionTable').rows[1].insertCell(-1);
-      //column5.innerHTML="<input id='libraryDilutionBarcode' name='libraryDilutionBarcode' type='text'/>";
       var column6 = $('libraryDilutionTable').rows[1].insertCell(-1);
       column6.innerHTML = "<input id='libraryDilutionResults' name='libraryDilutionResults' type='text'/>";
       var column7 = $('libraryDilutionTable').rows[1].insertCell(-1);
@@ -259,8 +255,6 @@ Library.empcr = {
 
       $('emPcrTable').insertRow(1);
 
-      //var column1=$('emPcrTable').rows[1].insertCell(-1);
-      //column1.innerHTML="<input type='hidden' id='dilutionId' name='dilutionId' value='"+dilutionId+"'/>";
       var column2 = $('emPcrTable').rows[1].insertCell(-1);
       column2.innerHTML = "" + dilutionId + " <input type='hidden' id='dilutionId' name='dilutionId' value='" + dilutionId + "'/>";
       var column3 = $('emPcrTable').rows[1].insertCell(-1);
@@ -304,16 +298,12 @@ Library.empcr = {
 
       $('emPcrDilutionTable').insertRow(1);
 
-      //var column1=$('emPcrDilutionTable').rows[1].insertCell(-1);
-      //column1.innerHTML="<input type='hidden' id='emPcrId' name='emPcrId' value='"+emPcrId+"'/>";
       var column2 = $('emPcrDilutionTable').rows[1].insertCell(-1);
       column2.innerHTML = "" + emPcrId + " <input type='hidden' id='emPcrId' name='emPcrId' value='" + emPcrId + "'/>";
       var column3 = $('emPcrDilutionTable').rows[1].insertCell(-1);
       column3.innerHTML = "<input id='emPcrDilutionCreator' name='emPcrDilutionCreator' type='hidden' value='" + $('currentUser').innerHTML + "'/>" + $('currentUser').innerHTML;
       var column4 = $('emPcrDilutionTable').rows[1].insertCell(-1);
       column4.innerHTML = "<input id='emPcrDilutionDate' name='emPcrDilutionDate' type='text'/>";
-      //var column5=$('emPcrDilutionTable').rows[1].insertCell(-1);
-      //column5.innerHTML="<input id='emPcrDilutionBarcode' name='emPcrDilutionBarcode' type='text'/>";
       var column6 = $('emPcrDilutionTable').rows[1].insertCell(-1);
       column6.innerHTML = "<input id='emPcrDilutionResults' name='emPcrDilutionResults' type='text'/>";
       var column7 = $('emPcrDilutionTable').rows[1].insertCell(-1);
@@ -678,7 +668,6 @@ Library.ui = {
             jQuery(c).html("");
             for (var i = 0; i < json.numApplicableBarcodes; i++) {
               jQuery(c).append("<span class='tagBarcodeSelectDiv' position='" + (i + 1) + "' id='tagbarcodes" + (i + 1) + "'>- <i>Select...</i></span>");
-              //jQuery(c).append("<td class='smallbox'><span class='tagBarcodeSelectDiv' position='"+(i+1)+"' id='tagbarcodes"+(i+1)+"'>X</span></td>");
               if (json.numApplicableBarcodes > 1 && i == 0) {
                 jQuery(c).append("|");
               }

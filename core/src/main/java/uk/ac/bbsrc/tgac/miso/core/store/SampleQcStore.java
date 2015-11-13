@@ -31,34 +31,25 @@ import java.util.Collection;
 
 /**
  * Defines a DAO interface for storing SampleQCs
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public interface SampleQcStore extends Store<SampleQC>, Remover<SampleQC> {
   /**
-   * Retrieve a SampleQC from an underlying data store given a SampleQC ID
-   * <p/>
-   * This method intends to retrieve objects in an 'ignorant' fashion, i.e. will not populate
-   * parent or child objects that could lead to a circular dependency
-   *
-   * @param qcId of type long
-   * @return SampleQC
-   * @throws IOException when
-   */
-  //SampleQC lazyGet(long qcId) throws IOException;
-
-  /**
    * List all SampleQCs performed on a Sample given a parent Sample ID
-   *
-   * @param sampleId of type long
+   * 
+   * @param sampleId
+   *          of type long
    * @return Collection<SampleQC>
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   Collection<SampleQC> listBySampleId(long sampleId) throws IOException;
 
   /**
    * Get the QcType descriptor for a given type ID
+   * 
    * @param qcTypeId
    * @return the QcType with the given ID, or null if none exists
    * @throws IOException
@@ -67,6 +58,7 @@ public interface SampleQcStore extends Store<SampleQC>, Remover<SampleQC> {
 
   /**
    * Get the QcType descriptor for a given type name
+   * 
    * @param qcName
    * @return the QcType with the given name, or null if none exists
    * @throws IOException
@@ -75,6 +67,7 @@ public interface SampleQcStore extends Store<SampleQC>, Remover<SampleQC> {
 
   /**
    * Get all QcType descriptors for {@link uk.ac.bbsrc.tgac.miso.core.data.Sample} objects
+   * 
    * @return Collection<QcType>
    * @throws IOException
    */

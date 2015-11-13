@@ -6,7 +6,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Sample;
  * uk.ac.bbsrc.tgac.miso.core.data.impl
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 22/10/13
  * @since 0.2.1-SNAPSHOT
@@ -31,6 +31,7 @@ public class OverviewSampleGroup extends EntityGroupImpl<ProjectOverview, Sample
     return name;
   }
 
+  @Override
   public void setName(String name) {
     this.name = name;
   }
@@ -40,8 +41,8 @@ public class OverviewSampleGroup extends EntityGroupImpl<ProjectOverview, Sample
     return groupId;
   }
 
+  @Override
   public void setId(long groupId) {
     this.groupId = groupId;
   }
 }
-

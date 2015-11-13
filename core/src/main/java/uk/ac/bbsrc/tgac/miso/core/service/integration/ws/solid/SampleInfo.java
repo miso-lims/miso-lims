@@ -30,11 +30,12 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
-
 /**
- * <p>Java class for sampleInfo complex type.
+ * <p>
+ * Java class for sampleInfo complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="sampleInfo">
@@ -55,145 +56,125 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "sampleInfo", propOrder = {
-    "libraryInfoList",
-    "name",
-    "primaryAnalysisStatus",
-    "secondaryAnalysisStatus",
-    "xml"
-})
+@XmlType(name = "sampleInfo", propOrder = { "libraryInfoList", "name", "primaryAnalysisStatus", "secondaryAnalysisStatus", "xml" })
 public class SampleInfo {
 
-    @XmlElement(nillable = true)
-    protected List<LibraryInfo> libraryInfoList;
-    protected String name;
-    protected String primaryAnalysisStatus;
-    protected String secondaryAnalysisStatus;
-    protected String xml;
+  @XmlElement(nillable = true)
+  protected List<LibraryInfo> libraryInfoList;
+  protected String name;
+  protected String primaryAnalysisStatus;
+  protected String secondaryAnalysisStatus;
+  protected String xml;
 
-    /**
-     * Gets the value of the libraryInfoList property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the libraryInfoList property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getLibraryInfoList().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link LibraryInfo }
-     * 
-     * 
-     */
-    public List<LibraryInfo> getLibraryInfoList() {
-        if (libraryInfoList == null) {
-            libraryInfoList = new ArrayList<LibraryInfo>();
-        }
-        return this.libraryInfoList;
+  /**
+   * Gets the value of the libraryInfoList property.
+   * 
+   * <p>
+   * This accessor method returns a reference to the live list, not a snapshot. Therefore any modification you make to the returned list
+   * will be present inside the JAXB object. This is why there is not a <CODE>set</CODE> method for the libraryInfoList property.
+   * 
+   * <p>
+   * For example, to add a new item, do as follows:
+   * 
+   * <pre>
+   * getLibraryInfoList().add(newItem);
+   * </pre>
+   * 
+   * 
+   * <p>
+   * Objects of the following type(s) are allowed in the list {@link LibraryInfo }
+   * 
+   * 
+   */
+  public List<LibraryInfo> getLibraryInfoList() {
+    if (libraryInfoList == null) {
+      libraryInfoList = new ArrayList<LibraryInfo>();
     }
+    return this.libraryInfoList;
+  }
 
-    /**
-     * Gets the value of the name property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getName() {
-        return name;
-    }
+  /**
+   * Gets the value of the name property.
+   * 
+   * @return possible object is {@link String }
+   * 
+   */
+  public String getName() {
+    return name;
+  }
 
-    /**
-     * Sets the value of the name property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setName(String value) {
-        this.name = value;
-    }
+  /**
+   * Sets the value of the name property.
+   * 
+   * @param value
+   *          allowed object is {@link String }
+   * 
+   */
+  public void setName(String value) {
+    this.name = value;
+  }
 
-    /**
-     * Gets the value of the primaryAnalysisStatus property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getPrimaryAnalysisStatus() {
-        return primaryAnalysisStatus;
-    }
+  /**
+   * Gets the value of the primaryAnalysisStatus property.
+   * 
+   * @return possible object is {@link String }
+   * 
+   */
+  public String getPrimaryAnalysisStatus() {
+    return primaryAnalysisStatus;
+  }
 
-    /**
-     * Sets the value of the primaryAnalysisStatus property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setPrimaryAnalysisStatus(String value) {
-        this.primaryAnalysisStatus = value;
-    }
+  /**
+   * Sets the value of the primaryAnalysisStatus property.
+   * 
+   * @param value
+   *          allowed object is {@link String }
+   * 
+   */
+  public void setPrimaryAnalysisStatus(String value) {
+    this.primaryAnalysisStatus = value;
+  }
 
-    /**
-     * Gets the value of the secondaryAnalysisStatus property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getSecondaryAnalysisStatus() {
-        return secondaryAnalysisStatus;
-    }
+  /**
+   * Gets the value of the secondaryAnalysisStatus property.
+   * 
+   * @return possible object is {@link String }
+   * 
+   */
+  public String getSecondaryAnalysisStatus() {
+    return secondaryAnalysisStatus;
+  }
 
-    /**
-     * Sets the value of the secondaryAnalysisStatus property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setSecondaryAnalysisStatus(String value) {
-        this.secondaryAnalysisStatus = value;
-    }
+  /**
+   * Sets the value of the secondaryAnalysisStatus property.
+   * 
+   * @param value
+   *          allowed object is {@link String }
+   * 
+   */
+  public void setSecondaryAnalysisStatus(String value) {
+    this.secondaryAnalysisStatus = value;
+  }
 
-    /**
-     * Gets the value of the xml property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getXml() {
-        return xml;
-    }
+  /**
+   * Gets the value of the xml property.
+   * 
+   * @return possible object is {@link String }
+   * 
+   */
+  public String getXml() {
+    return xml;
+  }
 
-    /**
-     * Sets the value of the xml property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setXml(String value) {
-        this.xml = value;
-    }
+  /**
+   * Sets the value of the xml property.
+   * 
+   * @param value
+   *          allowed object is {@link String }
+   * 
+   */
+  public void setXml(String value) {
+    this.xml = value;
+  }
 
 }

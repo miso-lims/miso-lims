@@ -23,128 +23,152 @@
 
 package uk.ac.bbsrc.tgac.miso.core.store;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Defines a DAO interface for storing Dilutions
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public interface LibraryDilutionStore extends Store<LibraryDilution>, Remover<LibraryDilution>, NamingSchemeAware<LibraryDilution> {
   /**
    * List all LibraryDilutions by a given parent library ID
-   *
-   * @param libraryId of type long
+   * 
+   * @param libraryId
+   *          of type long
    * @return Collection<LibraryDilution>
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   Collection<LibraryDilution> listByLibraryId(long libraryId) throws IOException;
 
   /**
    * List all Dilutions prepared for a given PlatformType
-   *
-   * @param platformtype of type PlatformType
+   * 
+   * @param platformtype
+   *          of type PlatformType
    * @return List<? extends Dilution>
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   Collection<LibraryDilution> listAllLibraryDilutionsByPlatform(PlatformType platformtype) throws IOException;
 
   /**
    * List all Dilutions prepared for a given PlatformType and search query
-   *
-   * @param query of type String
-   * @param platformtype of type PlatformType
+   * 
+   * @param query
+   *          of type String
+   * @param platformtype
+   *          of type PlatformType
    * @return Collection<? extends Dilution>
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   Collection<LibraryDilution> listAllLibraryDilutionsByPlatformAndSearch(String query, PlatformType platformtype) throws IOException;
 
   /**
-   * List all Dilutions prepared for a given PlatformType  that are part of a given Pool
-   *
-   * @param platformType of type PlatformType
-   * @param poolId of type long
+   * List all Dilutions prepared for a given PlatformType that are part of a given Pool
+   * 
+   * @param platformType
+   *          of type PlatformType
+   * @param poolId
+   *          of type long
    * @return Collection<? extends Dilution>
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   Collection<LibraryDilution> listAllLibraryDilutionsByPoolAndPlatform(long poolId, PlatformType platformType) throws IOException;
 
   /**
    * List all LibraryDilutions that are related to a given Project
-   *
-   * @param projectId of type long
+   * 
+   * @param projectId
+   *          of type long
    * @return Collection<LibraryDilution>
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   Collection<LibraryDilution> listAllLibraryDilutionsByProjectId(long projectId) throws IOException;
 
   /**
    * List all LibraryDilutions that match a given search string
-   *
-   * @param query of type String
-   * @param platformType of type PlatformType
+   * 
+   * @param query
+   *          of type String
+   * @param platformType
+   *          of type PlatformType
    * @return Collection<LibraryDilution>
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   Collection<LibraryDilution> listAllLibraryDilutionsBySearch(String query, PlatformType platformType) throws IOException;
-
 
   Collection<LibraryDilution> listAllLibraryDilutionsBySearchOnly(String query) throws IOException;
 
   /**
    * List all emPCRDilutions prepared for a given PlatformType within a given Project
-   *
-   * @param projectId of type long
-   * @param platformType of type PlatformType
+   * 
+   * @param projectId
+   *          of type long
+   * @param platformType
+   *          of type PlatformType
    * @return Collection<Dilution>
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   Collection<LibraryDilution> listAllLibraryDilutionsByProjectAndPlatform(long projectId, PlatformType platformType) throws IOException;
 
   /**
    * List all LibraryDilutions in a given EmPCRool
-   *
-   * @param poolId of type long
+   * 
+   * @param poolId
+   *          of type long
    * @return Collection<LibraryDilution>
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   Collection<LibraryDilution> listByEmPCRPoolId(long poolId) throws IOException;
 
   /**
    * Get a Dilution by ID barcode, given a PlatformType
-   *
-   * @param barcode of type String
-   * @param platformType of type PlatformType
+   * 
+   * @param barcode
+   *          of type String
+   * @param platformType
+   *          of type PlatformType
    * @return Dilution
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   LibraryDilution getLibraryDilutionByBarcodeAndPlatform(String barcode, PlatformType platformType) throws IOException;
 
   /**
    * Get a Dilution by ID, given a PlatformType
-   *
-   * @param dilutionId of type long
-   * @param platformType of type PlatformType 
+   * 
+   * @param dilutionId
+   *          of type long
+   * @param platformType
+   *          of type PlatformType
    * @return Dilution
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   LibraryDilution getLibraryDilutionByIdAndPlatform(long dilutionId, PlatformType platformType) throws IOException;
 
   /**
    * Get a LibraryDilution by ID barcode
-   *
-   * @param barcode of type String
+   * 
+   * @param barcode
+   *          of type String
    * @return LibraryDilution
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   LibraryDilution getLibraryDilutionByBarcode(String barcode) throws IOException;
 

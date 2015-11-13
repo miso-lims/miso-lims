@@ -33,20 +33,23 @@ import java.util.Map;
  * Utility class to grab run info from a sequencer. Deprecated!
  * <p/>
  * Use SequencerInterrogationUtils instead.
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  * @deprecated
  */
+@Deprecated
 public class RunInfoUtils {
   protected static final Logger log = LoggerFactory.getLogger(RunInfoUtils.class);
 
   /**
    * Check the status of an Illumina run
-   *
-   * @param runName of type String
+   * 
+   * @param runName
+   *          of type String
    * @return Map<String, String>
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   public static Map<String, String> checkIlluminaStatus(String runName) throws IOException {
     ProcessBuilder pb = new ProcessBuilder();
@@ -57,10 +60,12 @@ public class RunInfoUtils {
 
   /**
    * Check if an Illumina run is completed
-   *
-   * @param runName of type String
+   * 
+   * @param runName
+   *          of type String
    * @return Map<String, String>
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   public static Map<String, String> checkIlluminaCompleted(String runName) throws IOException {
     ProcessBuilder pb = new ProcessBuilder();
@@ -71,10 +76,12 @@ public class RunInfoUtils {
 
   /**
    * Check the status of a 454 run
-   *
-   * @param runName of type String
+   * 
+   * @param runName
+   *          of type String
    * @return Map<String, String>
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   public static Map<String, String> check454Status(String runName) throws IOException {
     ProcessBuilder pb = new ProcessBuilder();
@@ -85,10 +92,12 @@ public class RunInfoUtils {
 
   /**
    * Check if a 454 run is completed
-   *
-   * @param runName of type String
+   * 
+   * @param runName
+   *          of type String
    * @return Map<String, String>
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   public static Map<String, String> check454Completed(String runName) throws IOException {
     ProcessBuilder pb = new ProcessBuilder();
@@ -96,6 +105,5 @@ public class RunInfoUtils {
     Process process = pb.start();
     return LimsUtils.checkPipes(process);
   }
-
 
 }

@@ -39,8 +39,7 @@ public class ReceiveSampleController {
   public ModelAndView setupForm(ModelMap model) throws Exception {
     try {
       return new ModelAndView("/pages/sampleReceipt.jsp", model);
-    }
-    catch (Exception ex) {
+    } catch (Exception ex) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to show sample", ex);
       }

@@ -338,28 +338,8 @@ Project.ui = {
             [0, "desc"]
           ],
           "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>'
-          /*
-           ,
-
-           "fnRowCallback": function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-
-           Fluxion.doAjax(
-           'projectControllerHelperService',
-           'checkOverviewByProjectId',
-           {
-           'projectId':aData[4],
-           'url':ajaxurl
-           },
-           {'doOnSuccess': function(json) {
-           jQuery('td:eq(4)', nRow).html(json.response);
-           }
-           }
-           );
-           }
-           */
         });
         jQuery("#toolbar").parent().addClass("fg-toolbar ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix");
-        //jQuery("#toolbar").append("<button style=\"margin-left:5px;\" onclick=\"window.location.href='/miso/project/new';\" class=\"fg-button ui-state-default ui-corner-all\">Add Project</button>");
       }
       }
     );
@@ -1133,13 +1113,6 @@ Project.issues = {
         jQuery('#previewbox' + i).append("<b>Updated:</b> " + issue.updated + "<br/>");
         jQuery('#previewbox' + i).append("<input type='hidden' name='issueKeys' id='issueKeys" + i + "' value='" + key + "'><hr/>");
         jQuery('#issues').append("</div>");
-      }
-    }
-
-    if (json.invalidIssues !== "undefined" && json.invalidIssues.length > 0) {
-      for (var i = 0; i < json.invalidIssues.length; i++) {
-        //var key = json.invalidIssues[i];
-
       }
     }
 

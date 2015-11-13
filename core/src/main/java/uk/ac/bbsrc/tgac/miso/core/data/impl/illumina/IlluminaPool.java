@@ -25,7 +25,6 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl.illumina;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -34,7 +33,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
  * uk.ac.bbsrc.tgac.miso.core.data.impl.illumina
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */

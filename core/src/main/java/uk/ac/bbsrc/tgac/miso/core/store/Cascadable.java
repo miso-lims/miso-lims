@@ -27,15 +27,16 @@ import javax.persistence.CascadeType;
 
 /**
  * A simple interface to define DAO objects that recognise that they are part of a persistence cascade.
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public interface Cascadable {
   /**
    * Sets the cascadeType of this Cascadable object.
-   *
-   * @param cascadeType cascadeType.
+   * 
+   * @param cascadeType
+   *          cascadeType.
    */
   public void setCascadeType(CascadeType cascadeType);
 }

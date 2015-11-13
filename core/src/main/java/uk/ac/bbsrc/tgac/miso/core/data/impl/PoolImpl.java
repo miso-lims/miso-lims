@@ -26,17 +26,14 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
-import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
-import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 import java.io.Serializable;
-import java.util.Collection;
 
 /**
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */

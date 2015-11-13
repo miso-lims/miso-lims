@@ -40,17 +40,14 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
 
 import javax.servlet.http.HttpSession;
-import java.io.File;
 import java.io.IOException;
 import java.util.*;
-
-//import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -94,11 +91,9 @@ public class ProjectTreeControllerHelperService {
     this.watchManager = watchManager;
   }
 
-  /*starts with project listing
-  * list all the projects and
-  * subs define the number of Runs, Samples and Studies
-  * return as a JSONarray
-  * */
+  /*
+   * starts with project listing list all the projects and subs define the number of Runs, Samples and Studies return as a JSONarray
+   */
 
   public JSONObject listProjectTree(HttpSession session, JSONObject json) {
     try {
@@ -107,7 +102,6 @@ public class ProjectTreeControllerHelperService {
       JSONObject miso = new JSONObject();
       JSONArray projectsArray = new JSONArray();
       for (Project p : projects) {
-//        Project pro = requestManager.getProjectById(p.getProjectId());
         JSONObject projectJSON = new JSONObject();
         projectJSON.put("name", p.getName());
         projectJSON.put("show", "PROJECT");
@@ -126,17 +120,15 @@ public class ProjectTreeControllerHelperService {
 
       miso.put("children", projectsArray);
       return miso;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
   }
 
-  /* This method looks for sub parts of the Project
-  * and returns Names of the sub parts
-  * i.e. Runs, Samples, Studies etc
-  * */
+  /*
+   * This method looks for sub parts of the Project and returns Names of the sub parts i.e. Runs, Samples, Studies etc
+   */
 
   public JSONObject PROJECTsubs(HttpSession session, JSONObject json) {
     try {
@@ -164,7 +156,6 @@ public class ProjectTreeControllerHelperService {
         childArray.add(child);
       }
 
-
       Collection<Study> studies = requestManager.listAllStudiesByProjectId(projectId);
 
       if (studies.size() > 0) {
@@ -180,16 +171,14 @@ public class ProjectTreeControllerHelperService {
       miso.put("id", projectId);
       miso.put("children", childArray);
 
-
       return miso;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
   }
 
-  /*This method returns list of Runs related to Project Id */
+  /* This method returns list of Runs related to Project Id */
 
   public JSONObject RUNs(HttpSession session, JSONObject json) {
     try {
@@ -200,32 +189,28 @@ public class ProjectTreeControllerHelperService {
 
       Collection<Run> runs = requestManager.listAllRunsByProjectId(projectId);
 
-
       JSONObject miso = new JSONObject();
       for (Run run : runs) {
-        if (run.getStatus() != null
-            && run.getStatus().getHealth() != null
-            && run.getStatus().getHealth().getKey().equals("Completed")) {
-          runsArray.add(JSONObject.fromObject("{'name': '" + run.getName() + "','description':'" + run.getAlias() + "','show':'\"RUN \"','color': '1'}"));
-        }
-        else {
-          runsArray.add(JSONObject.fromObject("{'name': '" + run.getName() + "','description':'" + run.getAlias() + "','show':'\"RUN \"','color': '0'}"));
+        if (run.getStatus() != null && run.getStatus().getHealth() != null && run.getStatus().getHealth().getKey().equals("Completed")) {
+          runsArray.add(JSONObject
+              .fromObject("{'name': '" + run.getName() + "','description':'" + run.getAlias() + "','show':'\"RUN \"','color': '1'}"));
+        } else {
+          runsArray.add(JSONObject
+              .fromObject("{'name': '" + run.getName() + "','description':'" + run.getAlias() + "','show':'\"RUN \"','color': '0'}"));
         }
 
       }
       miso.put("id", projectId);
       miso.put("children", runsArray);
 
-
       return miso;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
   }
 
-  /*This method returns list of Samples related to Project Id */
+  /* This method returns list of Samples related to Project Id */
 
   public JSONObject SAMPLEs(HttpSession session, JSONObject json) {
     try {
@@ -247,9 +232,9 @@ public class ProjectTreeControllerHelperService {
               sampleQC = "1";
             }
           }
-          samplesArray.add(JSONObject.fromObject("{'name': '" + sample.getName() + "','description':'" + sample.getAlias() + "','subs':'\"0\"','color': '" + sampleQC + "'}"));
-        }
-        else {
+          samplesArray.add(JSONObject.fromObject(
+              "{'name': '" + sample.getName() + "','description':'" + sample.getAlias() + "','subs':'\"0\"','color': '" + sampleQC + "'}"));
+        } else {
           JSONObject subsampleJSON = new JSONObject();
           subsampleJSON.put("name", sample.getName());
           subsampleJSON.put("id", sample.getId());
@@ -261,20 +246,16 @@ public class ProjectTreeControllerHelperService {
         }
       }
 
-
       miso.put("children", samplesArray);
 
-
       return miso;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
   }
 
-  /*This method returns list of Libraries related to Sample */
-
+  /* This method returns list of Libraries related to Sample */
 
   public JSONObject SAMPLEsubs(HttpSession session, JSONObject json) {
     try {
@@ -283,29 +264,28 @@ public class ProjectTreeControllerHelperService {
 
       JSONObject miso = new JSONObject();
 
-
       Collection<Library> libraries = requestManager.listAllLibrariesBySampleId(sampleId);
       JSONArray librariesArray = new JSONArray();
 
       for (Library library : libraries) {
         if (library.getLibraryQCs().size() > 0) {
-          librariesArray.add(JSONObject.fromObject("{'name': '" + library.getName() + "','description':'" + library.getAlias() + "','color': '1'}"));
-        }
-        else {
-          librariesArray.add(JSONObject.fromObject("{'name': '" + library.getName() + "','description':'" + library.getAlias() + "','color': '0'}"));
+          librariesArray
+              .add(JSONObject.fromObject("{'name': '" + library.getName() + "','description':'" + library.getAlias() + "','color': '1'}"));
+        } else {
+          librariesArray
+              .add(JSONObject.fromObject("{'name': '" + library.getName() + "','description':'" + library.getAlias() + "','color': '0'}"));
         }
       }
       miso.put("id", sampleId);
       miso.put("children", librariesArray);
       return miso;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
   }
 
-  /*This method returns list of Studies related to Project Id */
+  /* This method returns list of Studies related to Project Id */
 
   public JSONObject STUDYs(HttpSession session, JSONObject json) {
     try {
@@ -313,7 +293,6 @@ public class ProjectTreeControllerHelperService {
       long projectId = json.getLong("id");
 
       JSONArray childArray = new JSONArray();
-
 
       Collection<Study> studies = requestManager.listAllStudiesByProjectId(projectId);
       JSONObject studyJSON = new JSONObject();
@@ -336,22 +315,19 @@ public class ProjectTreeControllerHelperService {
 
       miso.put("children", childArray);
 
-
       return miso;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
   }
 
- /*This method returns list of Experiments related to Study */
+  /* This method returns list of Experiments related to Study */
 
   public JSONObject STUDYsubs(HttpSession session, JSONObject json) {
     try {
 
       long studyId = json.getLong("id");
-
 
       Collection<Experiment> experiments = requestManager.listAllExperimentsByStudyId(studyId);
       JSONArray experimentsArray = new JSONArray();
@@ -364,8 +340,7 @@ public class ProjectTreeControllerHelperService {
       miso.put("children", experimentsArray);
 
       return miso;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }

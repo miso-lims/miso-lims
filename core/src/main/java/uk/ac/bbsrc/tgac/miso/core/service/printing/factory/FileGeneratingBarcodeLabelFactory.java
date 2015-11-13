@@ -23,22 +23,25 @@
 
 package uk.ac.bbsrc.tgac.miso.core.service.printing.factory;
 
-import com.eaglegenomics.simlims.core.User;
-import com.opensymphony.util.FileUtils;
-import net.sourceforge.fluxion.spi.ServiceProvider;
-import org.springframework.security.core.context.SecurityContextHolder;
-import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeLabelFactory;
-import uk.ac.bbsrc.tgac.miso.core.manager.*;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.schema.BarcodableSchema;
-
 import java.io.File;
 import java.io.IOException;
+
+import net.sourceforge.fluxion.spi.ServiceProvider;
+
+import org.springframework.security.core.context.SecurityContextHolder;
+
+import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeLabelFactory;
+import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
+import uk.ac.bbsrc.tgac.miso.core.service.printing.schema.BarcodableSchema;
+
+import com.eaglegenomics.simlims.core.User;
+import com.opensymphony.util.FileUtils;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.service.printing.factory
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 17/04/12
  * @since 0.1.6
@@ -59,18 +62,18 @@ public class FileGeneratingBarcodeLabelFactory<T> implements BarcodeLabelFactory
   }
 
   @Override
-  public File getLabel(BarcodableSchema<File, T> s,T b) {
+  public File getLabel(BarcodableSchema<File, T> s, T b) {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
 
       String labelScript = s.getRawState(b);
 
-      File f = misoFileManager.generateTemporaryFile(user.getLoginName() + "_"+b.getClass().getSimpleName().toLowerCase()+"-", ".printjob");
+      File f = misoFileManager.generateTemporaryFile(user.getLoginName() + "_" + b.getClass().getSimpleName().toLowerCase() + "-",
+          ".printjob");
       FileUtils.write(f, labelScript);
 
       return f;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
     }
     return null;

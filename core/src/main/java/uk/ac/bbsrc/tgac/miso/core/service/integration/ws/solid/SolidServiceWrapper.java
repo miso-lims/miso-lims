@@ -32,10 +32,10 @@ import java.net.URL;
 /**
  * uk.ac.bbsrc.tgac.miso.core.service.integration.ws.solid
  * <p/>
- * Wraps up a SolidService so that, following construction, any exceptions can be caught when getting the underlying
- * SolidService via getSolidService(). Without this class, applications would exit following the non-propagatable
- * exception producing by a malfunctioning Service (e.g. unresolvable WSDL URL)
- *
+ * Wraps up a SolidService so that, following construction, any exceptions can be caught when getting the underlying SolidService via
+ * getSolidService(). Without this class, applications would exit following the non-propagatable exception producing by a malfunctioning
+ * Service (e.g. unresolvable WSDL URL)
+ * 
  * @author Rob Davey
  * @date 09/11/11
  * @since 0.1.3
@@ -58,8 +58,7 @@ public class SolidServiceWrapper {
   public SolidService getSolidService() throws InterrogationException {
     if (solidService != null) {
       return solidService;
-    }
-    else {
+    } else {
       throw new InterrogationException("Couldn't contact SOLiD machine " + machineName + " at " + wsdlLocation.toString());
     }
   }

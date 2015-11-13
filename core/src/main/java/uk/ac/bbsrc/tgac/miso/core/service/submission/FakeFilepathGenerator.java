@@ -36,17 +36,13 @@ import org.slf4j.LoggerFactory;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 /**
- * Created by IntelliJ IDEA.
- * User: collesa
- * Date: 04/04/12
- * Time: 15:15
- * To change this template use File | Settings | File Templates.
+ * Created by IntelliJ IDEA. User: collesa Date: 04/04/12 Time: 15:15 To change this template use File | Settings | File Templates.
  */
 @ServiceProvider
-public class FakeFilepathGenerator implements FilePathGenerator{
+public class FakeFilepathGenerator implements FilePathGenerator {
   protected static final Logger log = LoggerFactory.getLogger(FakeFilepathGenerator.class);
 
-  //returns a HashSet containing 3 files on the local drive.
+  // returns a HashSet containing 3 files on the local drive.
   @Override
   public Set<File> generateFilePath(SequencerPoolPartition partition, Dilution libraryDilution) {
     Set<File> files = new HashSet<File>();
@@ -57,8 +53,8 @@ public class FakeFilepathGenerator implements FilePathGenerator{
   @Override
   public Set<File> generateFilePaths(SequencerPoolPartition partition) {
     Set<File> dataFiles = new HashSet<File>();
-    for(int i=1;i<=3;i++){
-      File datafile = new File("/storage/miso/datafiles/datafile"+i+".dat");
+    for (int i = 1; i <= 3; i++) {
+      File datafile = new File("/storage/miso/datafiles/datafile" + i + ".dat");
       dataFiles.add(datafile);
     }
     return dataFiles;

@@ -27,7 +27,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.ReportingException;
 
 /**
  * An interface to define classes that can be reported on
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */

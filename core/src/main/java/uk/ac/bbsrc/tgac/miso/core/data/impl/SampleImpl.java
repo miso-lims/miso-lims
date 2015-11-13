@@ -25,26 +25,15 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
-import net.sourceforge.fluxion.spi.ServiceProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import uk.ac.bbsrc.tgac.miso.core.data.*;
-import uk.ac.bbsrc.tgac.miso.core.factory.submission.ERASubmissionFactory;
-
 import javax.persistence.*;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.Set;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.impl
  * <p/>
  * TODO Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -58,47 +47,46 @@ public class SampleImpl extends AbstractSample implements Serializable {
   }
 
   /**
-  * Construct a new Sample with a SecurityProfile owned by the given User
-   *
-   * @param user of type User
+   * Construct a new Sample with a SecurityProfile owned by the given User
+   * 
+   * @param user
+   *          of type User
    */
   public SampleImpl(User user) {
     setSecurityProfile(new SecurityProfile(user));
   }
 
   /**
-   * If the given User can read the parent Project, construct a new Sample with a SecurityProfile inherited from the parent Project.
-   * If not, construct a new Sample with a SecurityProfile owned by the given User
-   *
-   * @param project of type Project
-   * @param user of type User
+   * If the given User can read the parent Project, construct a new Sample with a SecurityProfile inherited from the parent Project. If not,
+   * construct a new Sample with a SecurityProfile owned by the given User
+   * 
+   * @param project
+   *          of type Project
+   * @param user
+   *          of type User
    */
   public SampleImpl(Project project, User user) {
     if (project.userCanRead(user)) {
       setProject(project);
       setSecurityProfile(project.getSecurityProfile());
-    }
-    else {
+    } else {
       setSecurityProfile(new SecurityProfile(user));
     }
   }
 
+  @Override
   public void buildSubmission() {
     /*
-    try {
-      DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-      submissionDocument = docBuilder.newDocument();
-    }
-    catch (ParserConfigurationException e) {
-      e.printStackTrace();
-    }
-    ERASubmissionFactory.generateSampleSubmissionXML(submissionDocument, this);
-    */
+     * try { DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder(); submissionDocument =
+     * docBuilder.newDocument(); } catch (ParserConfigurationException e) { e.printStackTrace(); }
+     * ERASubmissionFactory.generateSampleSubmissionXML(submissionDocument, this);
+     */
   }
-  
+
   /**
    * Method buildReport ...
    */
+  @Override
   public void buildReport() {
 
   }

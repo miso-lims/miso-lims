@@ -32,7 +32,7 @@ import java.util.Date;
  * uk.ac.bbsrc.tgac.miso.core.util
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 01/12/11
  * @since 0.1.3
@@ -42,7 +42,7 @@ public class DateComparator implements Comparator {
   private boolean isAscending = true;
   private boolean isNullsLast = true;
   private boolean fallBackToId = false;
-  private static final Object[] EMPTY_OBJECT_ARRAY = new Object[]{};
+  private static final Object[] EMPTY_OBJECT_ARRAY = new Object[] {};
 
   public DateComparator(Class c, String methodName) throws NoSuchMethodException, IllegalArgumentException {
     this(c, methodName, false);
@@ -55,8 +55,7 @@ public class DateComparator implements Comparator {
     if (returnClass.getName().equals("void")) {
       String message = method.getName() + " has a void return type";
       throw new IllegalArgumentException(message);
-    }
-    else if (!returnClass.equals(Date.class)) {
+    } else if (!returnClass.equals(Date.class)) {
       String message = method.getName() + " does not return a java.util.Date";
       throw new IllegalArgumentException(message);
     }
@@ -65,13 +64,12 @@ public class DateComparator implements Comparator {
   @Override
   public int compare(Object object1, Object object2) {
     Date date1 = null;
-    Date date2  = null;
+    Date date2 = null;
 
     try {
-      date1 = (Date)method.invoke(object1, EMPTY_OBJECT_ARRAY);
-      date2 = (Date)method.invoke(object2, EMPTY_OBJECT_ARRAY);
-    }
-    catch (Exception e) {
+      date1 = (Date) method.invoke(object1, EMPTY_OBJECT_ARRAY);
+      date2 = (Date) method.invoke(object2, EMPTY_OBJECT_ARRAY);
+    } catch (Exception e) {
       throw new RuntimeException(e);
     }
 
@@ -80,23 +78,22 @@ public class DateComparator implements Comparator {
     if (date1 == null) return isNullsLast ? 1 : -1;
     if (date2 == null) return isNullsLast ? -1 : 1;
 
-    //  Compare objects
+    // Compare objects
     Date c1;
     Date c2;
 
     if (isAscending) {
       c1 = date1;
       c2 = date2;
-    }
-    else {
+    } else {
       c1 = date2;
       c2 = date1;
     }
 
     if (c1.before(c2)) {
-        return -1;
+      return -1;
     } else if (c1.after(c2)) {
-        return 1;
+      return 1;
     } else {
       if (fallBackToId) {
         Method mid1 = null;
@@ -105,21 +102,18 @@ public class DateComparator implements Comparator {
         try {
           mid1 = object1.getClass().getMethod("getId");
           mid2 = object2.getClass().getMethod("getId");
-        }
-        catch (NoSuchMethodException e) {
-          //fail silently and return equality
+        } catch (NoSuchMethodException e) {
+          // fail silently and return equality
         }
         if (mid1 != null && mid2 != null) {
           try {
-            Long id1 = (Long)mid1.invoke(object1);
-            Long id2 = (Long)mid2.invoke(object2);
+            Long id1 = (Long) mid1.invoke(object1);
+            Long id2 = (Long) mid2.invoke(object2);
             return id1.compareTo(id2);
-          }
-          catch (InvocationTargetException e) {
-            //fail silently and return equality
-          }
-          catch (IllegalAccessException e) {
-            //fail silently and return equality
+          } catch (InvocationTargetException e) {
+            // fail silently and return equality
+          } catch (IllegalAccessException e) {
+            // fail silently and return equality
           }
         }
       }

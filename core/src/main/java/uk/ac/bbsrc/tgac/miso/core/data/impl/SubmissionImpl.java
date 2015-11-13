@@ -42,7 +42,7 @@ import java.util.*;
 
 /**
  * Concrete implementation of a Submission that
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -79,18 +79,21 @@ public class SubmissionImpl implements Submission<Submittable, Document, Documen
 
   /**
    * Construct a new Submission with a SecurityProfile owned by the given User
-   *
-   * @param user of type User
+   * 
+   * @param user
+   *          of type User
    */
   public SubmissionImpl(User user) {
     setSecurityProfile(new SecurityProfile(user));
   }
 
+  @Override
   @Deprecated
   public Long getSubmissionId() {
     return submissionId;
   }
 
+  @Override
   @Deprecated
   public void setSubmissionId(Long submissionId) {
     this.submissionId = submissionId;
@@ -101,91 +104,111 @@ public class SubmissionImpl implements Submission<Submittable, Document, Documen
     return submissionId;
   }
 
+  @Override
   public void setId(long id) {
     this.submissionId = id;
   }
 
+  @Override
   public String getName() {
     return name;
   }
 
+  @Override
   public void setName(String name) {
     this.name = name;
   }
 
+  @Override
   public String getAlias() {
     return alias;
   }
 
+  @Override
   public void setAlias(String alias) {
     this.alias = alias;
   }
 
+  @Override
   public Date getCreationDate() {
     return creationDate;
   }
 
+  @Override
   public void setCreationDate(Date creationDate) {
     this.creationDate = creationDate;
   }
 
+  @Override
   public Date getSubmissionDate() {
     return submissionDate;
   }
 
+  @Override
   public void setSubmissionDate(Date submissionDate) {
     this.submissionDate = submissionDate;
   }
 
+  @Override
   public String getDescription() {
     return description;
   }
 
+  @Override
   public void setDescription(String description) {
     this.description = description;
   }
 
+  @Override
   public String getTitle() {
     return title;
   }
 
+  @Override
   public void setTitle(String title) {
     this.title = title;
   }
 
+  @Override
   public boolean isVerified() {
     return verified;
   }
 
+  @Override
   public void setVerified(boolean verified) {
     this.verified = verified;
   }
 
+  @Override
   public boolean isCompleted() {
     return completed;
   }
 
+  @Override
   public void setCompleted(boolean completed) {
     this.completed = completed;
   }
 
+  @Override
   public String getAccession() {
     return accession;
   }
 
+  @Override
   public void setAccession(String accession) {
     this.accession = accession;
   }
 
+  @Override
   public void addSubmissionElement(Submittable s) {
     if (!submittables.contains(s)) {
-        submittables.add(s);
-    }
-    else {
+      submittables.add(s);
+    } else {
       log.debug(s.getClass().getSimpleName() + " already exists in the Submission payload. Not adding.");
     }
   }
 
+  @Override
   public Set<Submittable<Document>> getSubmissionElements() {
     return submittables;
   }
@@ -194,18 +217,22 @@ public class SubmissionImpl implements Submission<Submittable, Document, Documen
     this.submittables = submittables;
   }
 
+  @Override
   public SubmissionActionType getSubmissionActionType() {
     return submissionActionType;
   }
 
+  @Override
   public void setSubmissionActionType(SubmissionActionType submissionActionType) {
     this.submissionActionType = submissionActionType;
   }
 
+  @Override
   public Date getLastUpdated() {
     return lastUpdated;
   }
 
+  @Override
   public void setLastUpdated(Date lastUpdated) {
     this.lastUpdated = lastUpdated;
   }
@@ -224,8 +251,7 @@ public class SubmissionImpl implements Submission<Submittable, Document, Documen
   public void inheritPermissions(SecurableByProfile parent) throws SecurityException {
     if (parent.getSecurityProfile().getOwner() != null) {
       setSecurityProfile(parent.getSecurityProfile());
-    }
-    else {
+    } else {
       throw new SecurityException("Cannot inherit permissions when parent object owner is not set!");
     }
   }
@@ -238,8 +264,6 @@ public class SubmissionImpl implements Submission<Submittable, Document, Documen
   @Override
   public boolean userCanWrite(User user) {
     return securityProfile.userCanWrite(user);
-      //return this.userCanWrite(user);
-
   }
 
   @Override
@@ -249,12 +273,12 @@ public class SubmissionImpl implements Submission<Submittable, Document, Documen
   @Override
   public Document submit(SubmissionManager manager) throws SubmissionException {
     submittables.add(this);
-    return (Document)manager.submit(submittables);
+    return (Document) manager.submit(submittables);
   }
 
   @Override
   public int compareTo(Object o) {
-    Submission t = (Submission)o;
+    Submission t = (Submission) o;
     if (getId() < t.getId()) return -1;
     if (getId() > t.getId()) return 1;
     return 0;

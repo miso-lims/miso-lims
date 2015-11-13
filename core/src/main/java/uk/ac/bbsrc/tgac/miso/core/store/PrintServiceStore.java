@@ -30,7 +30,7 @@ import java.util.List;
 
 /**
  * Defines a DAO for storing {@link MisoPrintService} objects
- *
+ * 
  * @author Rob Davey
  * @date 01-Jul-2011
  * @since 0.0.3
@@ -38,8 +38,9 @@ import java.util.List;
 public interface PrintServiceStore extends Store<MisoPrintService> {
   /**
    * Get the MisoPrintService with the specified name
-   *
-   * @param serviceName of type String
+   * 
+   * @param serviceName
+   *          of type String
    * @return the MisoPrintService with the given name, or null if none exists
    * @throws IOException
    */
@@ -48,10 +49,12 @@ public interface PrintServiceStore extends Store<MisoPrintService> {
   /**
    * List all {@link MisoPrintService} objects that are able to handle a given
    * {@link uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext}
-   *
-   * @param contextName of type String
+   * 
+   * @param contextName
+   *          of type String
    * @return List<MisoPrintService>
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   List<MisoPrintService> listByContext(String contextName) throws IOException;
 }

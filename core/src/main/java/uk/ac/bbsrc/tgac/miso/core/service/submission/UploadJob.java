@@ -24,21 +24,19 @@
 package uk.ac.bbsrc.tgac.miso.core.service.submission;
 
 import java.io.File;
-import java.net.URI;
 
 /**
  * An interface that defines an EndPoint object that can recieve datafiles
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public interface UploadJob {
   /**
    * Accepts sequence Datafiles
-   *
-   *
+   * 
+   * 
    */
-
 
   public void setFile(File file);
 
@@ -49,7 +47,5 @@ public interface UploadJob {
   public int getPercentageTransferred();
 
   public boolean isComplete();
-
-
 
 }

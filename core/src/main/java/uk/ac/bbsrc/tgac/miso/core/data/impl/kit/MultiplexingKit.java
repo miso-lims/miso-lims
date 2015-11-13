@@ -31,7 +31,7 @@ import java.io.Serializable;
  * uk.ac.bbsrc.tgac.miso.core.data.impl.kit
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */

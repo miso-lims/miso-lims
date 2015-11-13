@@ -45,7 +45,7 @@ import java.util.*;
  * uk.ac.bbsrc.tgac.miso.webapp.controller
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.3
  */
@@ -75,7 +75,7 @@ public class PrinterController {
     this.printManager = printManager;
   }
 
-  @RequestMapping(value= "/admin/configuration/printers", method = RequestMethod.GET)
+  @RequestMapping(value = "/admin/configuration/printers", method = RequestMethod.GET)
   public ModelAndView view(ModelMap model) throws IOException {
     model.put("barcodePrinters", printManager.listAllPrintServices());
     return new ModelAndView("/pages/viewPrinters.jsp", model);
@@ -89,8 +89,7 @@ public class PrinterController {
 
       Collection<? extends PrintJob> jobs = printManager.listPrintJobsByPrintService(ps);
       model.put("printJobs", jobs);
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
     }
     return new ModelAndView("/pages/viewPrinters.jsp", model);
@@ -102,29 +101,9 @@ public class PrinterController {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Collection<? extends PrintJob> jobs = printManager.listPrintJobsByUser(user);
       model.put("userPrintJobs", jobs);
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       e.printStackTrace();
     }
     return new ModelAndView("/pages/viewPrinters.jsp", model);
   }
-
-  /*
-  @RequestMapping(value = "/barcode/{printerId}", method = RequestMethod.POST)
-  public String processSubmit(@ModelAttribute("printer") PrinterReference pr,
-                              ModelMap model, SessionStatus session) throws IOException {
-    try {
-      requestManager.savePrinterReference(pr);
-      session.setComplete();
-      model.clear();
-      return "redirect:/miso/admin/configuration/printers";
-    }
-    catch (IOException ex) {
-      if (log.isDebugEnabled()) {
-        log.debug("Failed to save Barcode Printer", ex);
-      }
-      throw ex;
-    }
-  }
-  */
 }

@@ -75,143 +75,83 @@ import java.util.regex.Matcher;
 public class SQLLibraryDAO implements LibraryStore {
   private static String TABLE_NAME = "Library";
 
-  public static final String LIBRARIES_SELECT =
-          "SELECT libraryId, name, description, alias, accession, securityProfile_profileId, sample_sampleId, identificationBarcode, " +
-          "locationBarcode, paired, libraryType, librarySelectionType, libraryStrategyType, platformName, concentration, creationDate, qcPassed " +
-          "FROM "+TABLE_NAME;
+  public static final String LIBRARIES_SELECT = "SELECT libraryId, name, description, alias, accession, securityProfile_profileId, sample_sampleId, identificationBarcode, "
+      + "locationBarcode, paired, libraryType, librarySelectionType, libraryStrategyType, platformName, concentration, creationDate, qcPassed "
+      + "FROM " + TABLE_NAME;
 
-  public static final String LIBRARIES_SELECT_LIMIT =
-          LIBRARIES_SELECT + " ORDER BY libraryId DESC LIMIT ?";
+  public static final String LIBRARIES_SELECT_LIMIT = LIBRARIES_SELECT + " ORDER BY libraryId DESC LIMIT ?";
 
-  public static final String LIBRARY_SELECT_BY_ID =
-          LIBRARIES_SELECT + " " + "WHERE libraryId = ?";
+  public static final String LIBRARY_SELECT_BY_ID = LIBRARIES_SELECT + " " + "WHERE libraryId = ?";
 
-  public static final String LIBRARY_SELECT_BY_ALIAS =
-          LIBRARIES_SELECT + " WHERE alias = ?";
+  public static final String LIBRARY_SELECT_BY_ALIAS = LIBRARIES_SELECT + " WHERE alias = ?";
 
-  public static final String LIBRARIES_SELECT_BY_SEARCH =
-          LIBRARIES_SELECT + " WHERE " +
-          "identificationBarcode LIKE ? OR " +
-          "name LIKE ? OR " +
-          "alias LIKE ? OR " +
-          "description LIKE ? ";
+  public static final String LIBRARIES_SELECT_BY_SEARCH = LIBRARIES_SELECT + " WHERE " + "identificationBarcode LIKE ? OR "
+      + "name LIKE ? OR " + "alias LIKE ? OR " + "description LIKE ? ";
 
-  public static final String LIBRARY_SELECT_BY_IDENTIFICATION_BARCODE =
-          LIBRARIES_SELECT + " " + "WHERE identificationBarcode = ?";
+  public static final String LIBRARY_SELECT_BY_IDENTIFICATION_BARCODE = LIBRARIES_SELECT + " " + "WHERE identificationBarcode = ?";
 
-  public static final String LIBRARY_UPDATE =
-          "UPDATE " + TABLE_NAME +
-          " SET name=:name, description=:description, alias=:alias, accession=:accession, securityProfile_profileId=:securityProfile_profileId, " +
-          "sample_sampleId=:sample_sampleId, identificationBarcode=:identificationBarcode,  locationBarcode=:locationBarcode, " +
-          "paired=:paired, libraryType=:libraryType, librarySelectionType=:librarySelectionType, libraryStrategyType=:libraryStrategyType, "+
-          "platformName=:platformName, concentration=:concentration, creationDate=:creationDate, qcPassed=:qcPassed " +
-          "WHERE libraryId=:libraryId";
+  public static final String LIBRARY_UPDATE = "UPDATE " + TABLE_NAME
+      + " SET name=:name, description=:description, alias=:alias, accession=:accession, securityProfile_profileId=:securityProfile_profileId, "
+      + "sample_sampleId=:sample_sampleId, identificationBarcode=:identificationBarcode,  locationBarcode=:locationBarcode, "
+      + "paired=:paired, libraryType=:libraryType, librarySelectionType=:librarySelectionType, libraryStrategyType=:libraryStrategyType, "
+      + "platformName=:platformName, concentration=:concentration, creationDate=:creationDate, qcPassed=:qcPassed "
+      + "WHERE libraryId=:libraryId";
 
-  public static final String LIBRARY_DELETE =
-          "DELETE FROM "+TABLE_NAME+" WHERE libraryId=:libraryId";
+  public static final String LIBRARY_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE libraryId=:libraryId";
 
-  public static final String LIBRARIES_SELECT_BY_SAMPLE_ID =
-          "SELECT l.libraryId, l.name, l.description, l.alias, l.accession, l.securityProfile_profileId, l.sample_sampleId, l.identificationBarcode, l.locationBarcode, " +
-          "l.paired, l.libraryType, l.librarySelectionType, l.libraryStrategyType, l.platformName, l.concentration, l.creationDate, l.qcPassed " +
-          "FROM "+TABLE_NAME+" l, Sample s " +
-          "WHERE l.sample_sampleId=s.sampleId " +
-          "AND s.sampleId=?";
+  public static final String LIBRARIES_SELECT_BY_SAMPLE_ID = "SELECT l.libraryId, l.name, l.description, l.alias, l.accession, l.securityProfile_profileId, l.sample_sampleId, l.identificationBarcode, l.locationBarcode, "
+      + "l.paired, l.libraryType, l.librarySelectionType, l.libraryStrategyType, l.platformName, l.concentration, l.creationDate, l.qcPassed "
+      + "FROM " + TABLE_NAME + " l, Sample s " + "WHERE l.sample_sampleId=s.sampleId " + "AND s.sampleId=?";
 
-  public static String LIBRARIES_SELECT_BY_PROJECT_ID =
-/*          "SELECT li.* " +
-          "FROM Project p " +
-          "LEFT JOIN Study st ON st.project_projectId = p.projectId " +
-          "LEFT JOIN Experiment ex ON st.studyId = ex.study_studyId " +
-          "INNER JOIN Experiment_Sample exsa ON ex.experimentId = exsa.experiment_experimentId " +
-          "LEFT JOIN Sample sa ON exsa.samples_sampleId = sa.sampleId " +
-          "INNER JOIN Library li ON li.sample_sampleId = sa.sampleId " +
-          "WHERE p.projectId=?";*/
-          "SELECT li.* FROM Project p " +
-          "INNER JOIN Sample sa ON sa.project_projectId = p.projectId " +
-          "INNER JOIN "+TABLE_NAME+" li ON li.sample_sampleId = sa.sampleId " +
-          "WHERE p.projectId=?";
+  public static String LIBRARIES_SELECT_BY_PROJECT_ID = "SELECT li.* FROM Project p "
+      + "INNER JOIN Sample sa ON sa.project_projectId = p.projectId " + "INNER JOIN " + TABLE_NAME
+      + " li ON li.sample_sampleId = sa.sampleId " + "WHERE p.projectId=?";
 
-  public static final String LIBRARY_TYPES_SELECT =
-          "SELECT libraryTypeId, description, platformType " +
-          "FROM LibraryType";
+  public static final String LIBRARY_TYPES_SELECT = "SELECT libraryTypeId, description, platformType " + "FROM LibraryType";
 
-  public static final String LIBRARY_TYPE_SELECT_BY_ID =
-          LIBRARY_TYPES_SELECT +
-          " WHERE libraryTypeId = ?";
+  public static final String LIBRARY_TYPE_SELECT_BY_ID = LIBRARY_TYPES_SELECT + " WHERE libraryTypeId = ?";
 
-  public static final String LIBRARY_TYPE_SELECT_BY_DESCRIPTION =
-          LIBRARY_TYPES_SELECT +
-          " WHERE description = ?";
+  public static final String LIBRARY_TYPE_SELECT_BY_DESCRIPTION = LIBRARY_TYPES_SELECT + " WHERE description = ?";
 
-  public static final String LIBRARY_TYPE_SELECT_BY_DESCRIPTION_AND_PLATFORM =
-          LIBRARY_TYPES_SELECT +
-          " WHERE description = ? AND platformType = ?";
+  public static final String LIBRARY_TYPE_SELECT_BY_DESCRIPTION_AND_PLATFORM = LIBRARY_TYPES_SELECT
+      + " WHERE description = ? AND platformType = ?";
 
-  public static final String LIBRARY_TYPES_SELECT_BY_PLATFORM =
-          "SELECT libraryTypeId, description, platformType " +
-          "FROM LibraryType " +
-          "WHERE platformType=?";
+  public static final String LIBRARY_TYPES_SELECT_BY_PLATFORM = "SELECT libraryTypeId, description, platformType " + "FROM LibraryType "
+      + "WHERE platformType=?";
 
-  public static final String LIBRARY_SELECTION_TYPES_SELECT =
-          "SELECT librarySelectionTypeId, name, description " +
-          "FROM LibrarySelectionType";
+  public static final String LIBRARY_SELECTION_TYPES_SELECT = "SELECT librarySelectionTypeId, name, description "
+      + "FROM LibrarySelectionType";
 
-  public static final String LIBRARY_SELECTION_TYPE_SELECT_BY_ID =
-          LIBRARY_SELECTION_TYPES_SELECT +
-          " WHERE librarySelectionTypeId = ?";
+  public static final String LIBRARY_SELECTION_TYPE_SELECT_BY_ID = LIBRARY_SELECTION_TYPES_SELECT + " WHERE librarySelectionTypeId = ?";
 
-  public static final String LIBRARY_SELECTION_TYPE_SELECT_BY_NAME =
-          LIBRARY_SELECTION_TYPES_SELECT +
-          " WHERE name = ?";
+  public static final String LIBRARY_SELECTION_TYPE_SELECT_BY_NAME = LIBRARY_SELECTION_TYPES_SELECT + " WHERE name = ?";
 
-  public static final String LIBRARY_STRATEGY_TYPES_SELECT =
-          "SELECT libraryStrategyTypeId, name, description " +
-          "FROM LibraryStrategyType";
+  public static final String LIBRARY_STRATEGY_TYPES_SELECT = "SELECT libraryStrategyTypeId, name, description "
+      + "FROM LibraryStrategyType";
 
-  public static final String LIBRARY_STRATEGY_TYPE_SELECT_BY_ID =
-          LIBRARY_STRATEGY_TYPES_SELECT +
-          " WHERE libraryStrategyTypeId = ?";
+  public static final String LIBRARY_STRATEGY_TYPE_SELECT_BY_ID = LIBRARY_STRATEGY_TYPES_SELECT + " WHERE libraryStrategyTypeId = ?";
 
-  public static final String LIBRARY_STRATEGY_TYPE_SELECT_BY_NAME =
-          LIBRARY_STRATEGY_TYPES_SELECT +
-          " WHERE name = ?";  
+  public static final String LIBRARY_STRATEGY_TYPE_SELECT_BY_NAME = LIBRARY_STRATEGY_TYPES_SELECT + " WHERE name = ?";
 
-  public static final String LIBRARIES_BY_RELATED_DILUTION_ID =
-          "SELECT p.library_libraryId, l.libraryId, l.name, l.description, l.alias, l.accession, l.securityProfile_profileId, l.sample_sampleId, l.identificationBarcode, l.locationBarcode, " +
-          "l.paired, l.libraryType, l.librarySelectionType, l.libraryStrategyType, l.platformName, l.concentration, l.creationDate, l.qcPassed " +
-          "FROM "+TABLE_NAME+" l, LibraryDilution p " +
-          "WHERE l.libraryId=p.library_libraryId " +
-          "AND p.dilutionId=?";
+  public static final String LIBRARIES_BY_RELATED_DILUTION_ID = "SELECT p.library_libraryId, l.libraryId, l.name, l.description, l.alias, l.accession, l.securityProfile_profileId, l.sample_sampleId, l.identificationBarcode, l.locationBarcode, "
+      + "l.paired, l.libraryType, l.librarySelectionType, l.libraryStrategyType, l.platformName, l.concentration, l.creationDate, l.qcPassed "
+      + "FROM " + TABLE_NAME + " l, LibraryDilution p " + "WHERE l.libraryId=p.library_libraryId " + "AND p.dilutionId=?";
 
-  public static final String TAG_BARCODES_SELECT =
-          "SELECT tagId, name, sequence, platformName, strategyName " +
-          "FROM TagBarcodes";
+  public static final String TAG_BARCODES_SELECT = "SELECT tagId, name, sequence, platformName, strategyName " + "FROM TagBarcodes";
 
-  public static final String TAG_BARCODE_SELECT_BY_NAME =
-          TAG_BARCODES_SELECT +
-          " WHERE name = ? ORDER by tagId";
+  public static final String TAG_BARCODE_SELECT_BY_NAME = TAG_BARCODES_SELECT + " WHERE name = ? ORDER by tagId";
 
-  public static final String TAG_BARCODE_SELECT_BY_LIBRARY_ID =
-          "SELECT tb.tagId, tb.name, tb.sequence, tb.platformName, tb.strategyName " +
-          "FROM TagBarcodes tb, Library_TagBarcode lt " +
-          "WHERE tb.tagId = lt.barcode_barcodeId " +
-          "AND lt.library_libraryId = ? ";
+  public static final String TAG_BARCODE_SELECT_BY_LIBRARY_ID = "SELECT tb.tagId, tb.name, tb.sequence, tb.platformName, tb.strategyName "
+      + "FROM TagBarcodes tb, Library_TagBarcode lt " + "WHERE tb.tagId = lt.barcode_barcodeId " + "AND lt.library_libraryId = ? ";
 
-  public static final String TAG_BARCODES_SELECT_BY_PLATFORM =
-          TAG_BARCODES_SELECT +
-          " WHERE platformName = ? ORDER by tagId";
+  public static final String TAG_BARCODES_SELECT_BY_PLATFORM = TAG_BARCODES_SELECT + " WHERE platformName = ? ORDER by tagId";
 
-  public static final String TAG_BARCODES_SELECT_BY_STRATEGY_NAME =
-          TAG_BARCODES_SELECT +
-          " WHERE strategyName = ? ORDER by tagId";
+  public static final String TAG_BARCODES_SELECT_BY_STRATEGY_NAME = TAG_BARCODES_SELECT + " WHERE strategyName = ? ORDER by tagId";
 
-  public static final String TAG_BARCODE_SELECT_BY_ID =
-          TAG_BARCODES_SELECT +
-          " WHERE tagId = ?";
+  public static final String TAG_BARCODE_SELECT_BY_ID = TAG_BARCODES_SELECT + " WHERE tagId = ?";
 
-  public static final String LIBRARY_TAGBARCODE_DELETE_BY_LIBRARY_ID =
-          "DELETE FROM Library_TagBarcode " +
-          "WHERE library_libraryId=:library_libraryId";
+  public static final String LIBRARY_TAGBARCODE_DELETE_BY_LIBRARY_ID = "DELETE FROM Library_TagBarcode "
+      + "WHERE library_libraryId=:library_libraryId";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLLibraryDAO.class);
   private JdbcTemplate template;
@@ -280,7 +220,7 @@ public class SQLLibraryDAO implements LibraryStore {
 
   public void setNoteDAO(NoteStore noteDAO) {
     this.noteDAO = noteDAO;
-  }  
+  }
 
   public Store<SecurityProfile> getSecurityProfileDAO() {
     return securityProfileDAO;
@@ -301,22 +241,23 @@ public class SQLLibraryDAO implements LibraryStore {
   public void setCascadeType(CascadeType cascadeType) {
     this.cascadeType = cascadeType;
   }
-  
+
   public void setAutoGenerateIdentificationBarcodes(boolean autoGenerateIdentificationBarcodes) {
     this.autoGenerateIdentificationBarcodes = autoGenerateIdentificationBarcodes;
   }
-  
+
   public boolean getAutoGenerateIdentificationBarcodes() {
     return autoGenerateIdentificationBarcodes;
   }
-  
+
   /**
    * Generates a unique barcode. Note that the barcode will change when the alias is changed.
+   * 
    * @param library
    */
   public void autoGenerateIdBarcode(Library library) {
     String barcode = library.getName() + "::" + library.getAlias();
-    library.setIdentificationBarcode(barcode); 
+    library.setIdentificationBarcode(barcode);
   }
 
   private void purgeListCache(Library l, boolean replace) {
@@ -328,69 +269,51 @@ public class SQLLibraryDAO implements LibraryStore {
     purgeListCache(l, true);
   }
 
+  @Override
   @Transactional(readOnly = false, rollbackFor = Exception.class)
-  @TriggersRemove(cacheName = {"libraryCache", "lazyLibraryCache"},
-                  keyGenerator = @KeyGenerator(
-                          name = "HashCodeCacheKeyGenerator",
-                          properties = {
-                                  @Property(name = "includeMethod", value = "false"),
-                                  @Property(name = "includeParameterTypes", value = "false")
-                          }
-                  )
-  )
+  @TriggersRemove(cacheName = { "libraryCache",
+      "lazyLibraryCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
+          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
   public long save(Library library) throws IOException {
     Long securityProfileId = library.getSecurityProfile().getProfileId();
-    if (this.cascadeType != null) { // && this.cascadeType.equals(CascadeType.PERSIST)) {
+    if (this.cascadeType != null) {
       securityProfileId = securityProfileDAO.save(library.getSecurityProfile());
     }
 
     MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("alias", library.getAlias())
-            .addValue("accession", library.getAccession())
-            .addValue("description", library.getDescription())
-            .addValue("locationBarcode", library.getLocationBarcode())
-            .addValue("paired", library.getPaired())
-            .addValue("sample_sampleId", library.getSample().getId())
-            .addValue("securityProfile_profileId", securityProfileId)
-            .addValue("libraryType", library.getLibraryType().getLibraryTypeId())
-            .addValue("librarySelectionType", library.getLibrarySelectionType().getLibrarySelectionTypeId())
-            .addValue("libraryStrategyType", library.getLibraryStrategyType().getLibraryStrategyTypeId())
-            .addValue("platformName", library.getPlatformName())
-            .addValue("concentration", library.getInitialConcentration())
-            .addValue("creationDate", library.getCreationDate());
-            //.addValue("qcPassed", library.getQcPassed());
+    params.addValue("alias", library.getAlias());
+    params.addValue("accession", library.getAccession());
+    params.addValue("description", library.getDescription());
+    params.addValue("locationBarcode", library.getLocationBarcode());
+    params.addValue("paired", library.getPaired());
+    params.addValue("sample_sampleId", library.getSample().getId());
+    params.addValue("securityProfile_profileId", securityProfileId);
+    params.addValue("libraryType", library.getLibraryType().getLibraryTypeId());
+    params.addValue("librarySelectionType", library.getLibrarySelectionType().getLibrarySelectionTypeId());
+    params.addValue("libraryStrategyType", library.getLibraryStrategyType().getLibraryStrategyTypeId());
+    params.addValue("platformName", library.getPlatformName());
+    params.addValue("concentration", library.getInitialConcentration());
+    params.addValue("creationDate", library.getCreationDate());
 
     if (library.getQcPassed() != null) {
       params.addValue("qcPassed", library.getQcPassed().toString());
-    }
-    else {
+    } else {
       params.addValue("qcPassed", library.getQcPassed());
     }
 
     if (library.getId() == AbstractLibrary.UNSAVED_ID) {
       if (!libraryNamingScheme.allowDuplicateEntityNameFor("alias") && getByAlias(library.getAlias()) != null) {
         throw new IOException("NEW: A library with this alias already exists in the database");
-      }
-      else {
-        SimpleJdbcInsert insert = new SimpleJdbcInsert(template)
-                .withTableName(TABLE_NAME)
-                .usingGeneratedKeyColumns("libraryId");
-        /*
-        String name = Library.PREFIX + DbUtils.getAutoIncrement(template, TABLE_NAME);
-        params.addValue("name", name);
-        params.addValue("identificationBarcode", name + "::" + library.getAlias());
-        Number newId = insert.executeAndReturnKey(params);
-        library.setLibraryId(newId.longValue());
-        library.setName(name);
-        */
-
+      } else {
+        SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("libraryId");
         try {
           library.setId(DbUtils.getAutoIncrement(template, TABLE_NAME));
 
           String name = libraryNamingScheme.generateNameFor("name", library);
           library.setName(name);
-          if (libraryNamingScheme.validateField("name", library.getName()) && libraryNamingScheme.validateField("alias", library.getAlias())) {
-            
+          if (libraryNamingScheme.validateField("name", library.getName())
+              && libraryNamingScheme.validateField("alias", library.getAlias())) {
+
             if (autoGenerateIdentificationBarcodes) {
               autoGenerateIdBarcode(library);
             } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
@@ -401,39 +324,36 @@ public class SQLLibraryDAO implements LibraryStore {
             Number newId = insert.executeAndReturnKey(params);
             if (newId.longValue() != library.getId()) {
               log.error("Expected library ID doesn't match returned value from database insert: rolling back...");
-              new NamedParameterJdbcTemplate(template).update(LIBRARY_DELETE, new MapSqlParameterSource().addValue("libraryId", newId.longValue()));
+              new NamedParameterJdbcTemplate(template).update(LIBRARY_DELETE,
+                  new MapSqlParameterSource().addValue("libraryId", newId.longValue()));
               throw new IOException("Something bad happened. Expected library ID doesn't match returned value from DB insert");
             }
-          }
-          else {
+          } else {
             throw new IOException("Cannot save library - invalid field:" + library.toString());
           }
-        }
-        catch (MisoNamingException e) {
+        } catch (MisoNamingException e) {
           throw new IOException("Cannot save library - issue with naming scheme", e);
         }
       }
-    }
-    else {
+    } else {
       try {
-        if (libraryNamingScheme.validateField("name", library.getName()) && libraryNamingScheme.validateField("alias", library.getAlias())) {
-          params.addValue("libraryId", library.getId())
-                .addValue("name", library.getName())
-                .addValue("alias", library.getAlias())
-                .addValue("description", library.getDescription());
+        if (libraryNamingScheme.validateField("name", library.getName())
+            && libraryNamingScheme.validateField("alias", library.getAlias())) {
+          params.addValue("libraryId", library.getId());
+          params.addValue("name", library.getName());
+          params.addValue("alias", library.getAlias());
+          params.addValue("description", library.getDescription());
           if (autoGenerateIdentificationBarcodes) {
             autoGenerateIdBarcode(library);
           } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
-          params.addValue("identificationBarcode", library.getIdentificationBarcode())
-                .addValue("locationBarcode", library.getLocationBarcode());
+          params.addValue("identificationBarcode", library.getIdentificationBarcode()).addValue("locationBarcode",
+              library.getLocationBarcode());
           NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
           namedTemplate.update(LIBRARY_UPDATE, params);
-        }
-        else {
+        } else {
           throw new IOException("Cannot save library - invalid field:" + library.toString());
         }
-      }
-      catch (MisoNamingException e) {
+      } catch (MisoNamingException e) {
         throw new IOException("Cannot save library - issue with naming scheme", e);
       }
     }
@@ -443,54 +363,31 @@ public class SQLLibraryDAO implements LibraryStore {
     NamedParameterJdbcTemplate libNamedTemplate = new NamedParameterJdbcTemplate(template);
     libNamedTemplate.update(LIBRARY_TAGBARCODE_DELETE_BY_LIBRARY_ID, libparams);
 
-    /*
-    if (library.getTagBarcode() != null) {
-      SimpleJdbcInsert eInsert = new SimpleJdbcInsert(template)
-              .withTableName("Library_TagBarcode");
-
-      MapSqlParameterSource ltParams = new MapSqlParameterSource();
-      ltParams.addValue("library_libraryId", library.getLibraryId())
-              .addValue("barcode_barcodeId", library.getTagBarcode().getTagBarcodeId());
-
-      eInsert.execute(ltParams);
-    }
-    */
-
     if (library.getTagBarcodes() != null && !library.getTagBarcodes().isEmpty()) {
-      SimpleJdbcInsert eInsert = new SimpleJdbcInsert(template)
-              .withTableName("Library_TagBarcode");
+      SimpleJdbcInsert eInsert = new SimpleJdbcInsert(template).withTableName("Library_TagBarcode");
 
       for (TagBarcode t : library.getTagBarcodes().values()) {
         MapSqlParameterSource ltParams = new MapSqlParameterSource();
-        ltParams.addValue("library_libraryId", library.getId())
-              .addValue("barcode_barcodeId", t.getId());
+        ltParams.addValue("library_libraryId", library.getId());
+        ltParams.addValue("barcode_barcodeId", t.getId());
         eInsert.execute(ltParams);
       }
     }
 
     if (this.cascadeType != null) {
       if (this.cascadeType.equals(CascadeType.PERSIST)) {
-        //total fudge to clear out the pool cache if this library is used in any pool by way of a dilution
-//        if (!poolDAO.listByLibraryId(library.getId()).isEmpty()) {
-//          DbUtils.flushCache(cacheManager, "poolCache");
-//        }
+        // total fudge to clear out the pool cache if this library is used in any pool by way of a dilution
         for (Pool p : poolDAO.listByLibraryId(library.getId())) {
-          //poolCache.remove(DbUtils.hashCodeCacheKeyFor(p.getId()));
           DbUtils.updateCaches(cacheManager, p, Pool.class);
         }
 
         sampleDAO.save(library.getSample());
-      }
-      else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-        //Cache poolCache = cacheManager.getCache("poolCache");
+      } else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         for (Pool p : poolDAO.listByLibraryId(library.getId())) {
-          //poolCache.remove(DbUtils.hashCodeCacheKeyFor(p.getId()));
           DbUtils.updateCaches(cacheManager, p, Pool.class);
         }
 
-        //Cache sampleCache = cacheManager.getCache("sampleCache");
         if (library.getSample() != null) {
-          //sampleCache.remove(DbUtils.hashCodeCacheKeyFor(library.getSample().getId()));
           DbUtils.updateCaches(cacheManager, library.getSample(), Sample.class);
         }
       }
@@ -507,125 +404,106 @@ public class SQLLibraryDAO implements LibraryStore {
     return library.getId();
   }
 
-  @Cacheable(cacheName = "libraryCache",
-                  keyGenerator = @KeyGenerator(
-                          name = "HashCodeCacheKeyGenerator",
-                          properties = {
-                                  @Property(name = "includeMethod", value = "false"),
-                                  @Property(name = "includeParameterTypes", value = "false")
-                          }
-                  )
-  )
+  @Override
+  @Cacheable(cacheName = "libraryCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
+      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
   public Library get(long libraryId) throws IOException {
-    List eResults = template.query(LIBRARY_SELECT_BY_ID, new Object[]{libraryId}, new LibraryMapper());
+    List eResults = template.query(LIBRARY_SELECT_BY_ID, new Object[] { libraryId }, new LibraryMapper());
     Library e = eResults.size() > 0 ? (Library) eResults.get(0) : null;
     return e;
   }
 
+  @Override
   public Library getByBarcode(String barcode) throws IOException {
-    List eResults = template.query(LIBRARY_SELECT_BY_IDENTIFICATION_BARCODE, new Object[]{barcode}, new LibraryMapper());
+    List eResults = template.query(LIBRARY_SELECT_BY_IDENTIFICATION_BARCODE, new Object[] { barcode }, new LibraryMapper());
     Library e = eResults.size() > 0 ? (Library) eResults.get(0) : null;
     return e;
   }
 
+  @Override
   public Library getByAlias(String alias) throws IOException {
-    List eResults = template.query(LIBRARY_SELECT_BY_ALIAS, new Object[]{alias}, new LibraryMapper());
+    List eResults = template.query(LIBRARY_SELECT_BY_ALIAS, new Object[] { alias }, new LibraryMapper());
     Library e = eResults.size() > 0 ? (Library) eResults.get(0) : null;
     return e;
   }
 
+  @Override
   public Library lazyGet(long libraryId) throws IOException {
-    List eResults = template.query(LIBRARY_SELECT_BY_ID, new Object[]{libraryId}, new LibraryMapper(true));
+    List eResults = template.query(LIBRARY_SELECT_BY_ID, new Object[] { libraryId }, new LibraryMapper(true));
     Library e = eResults.size() > 0 ? (Library) eResults.get(0) : null;
     return e;
   }
 
   public Library getByIdentificationBarcode(String barcode) throws IOException {
-    List eResults = template.query(LIBRARY_SELECT_BY_IDENTIFICATION_BARCODE, new Object[]{barcode}, new LibraryMapper());
+    List eResults = template.query(LIBRARY_SELECT_BY_IDENTIFICATION_BARCODE, new Object[] { barcode }, new LibraryMapper());
     Library e = eResults.size() > 0 ? (Library) eResults.get(0) : null;
     return e;
   }
 
+  @Override
   public List<Library> listByLibraryDilutionId(long dilutionId) throws IOException {
-    return template.query(LIBRARIES_BY_RELATED_DILUTION_ID, new Object[]{dilutionId}, new LibraryMapper(true));
+    return template.query(LIBRARIES_BY_RELATED_DILUTION_ID, new Object[] { dilutionId }, new LibraryMapper(true));
   }
 
+  @Override
   public List<Library> listBySampleId(long sampleId) throws IOException {
-    return template.query(LIBRARIES_SELECT_BY_SAMPLE_ID, new Object[]{sampleId}, new LibraryMapper(true));
+    return template.query(LIBRARIES_SELECT_BY_SAMPLE_ID, new Object[] { sampleId }, new LibraryMapper(true));
   }
 
+  @Override
   public List<Library> listByProjectId(long projectId) throws IOException {
-    return template.query(LIBRARIES_SELECT_BY_PROJECT_ID, new Object[]{projectId}, new LibraryMapper(true));
+    return template.query(LIBRARIES_SELECT_BY_PROJECT_ID, new Object[] { projectId }, new LibraryMapper(true));
   }
 
-  @Cacheable(cacheName="libraryListCache",
-      keyGenerator = @KeyGenerator(
-              name = "HashCodeCacheKeyGenerator",
-              properties = {
-                      @Property(name="includeMethod", value="false"),
-                      @Property(name="includeParameterTypes", value="false")
-              }
-      )
-  )
+  @Override
+  @Cacheable(cacheName = "libraryListCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
+      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
   public List<Library> listAll() throws IOException {
     return template.query(LIBRARIES_SELECT, new LibraryMapper(true));
   }
 
+  @Override
   public List<Library> listAllWithLimit(long limit) throws IOException {
-    return template.query(LIBRARIES_SELECT_LIMIT, new Object[]{limit}, new LibraryMapper(true));
+    return template.query(LIBRARIES_SELECT_LIMIT, new Object[] { limit }, new LibraryMapper(true));
   }
 
   @Override
   public int count() throws IOException {
-    return template.queryForInt("SELECT count(*) FROM "+TABLE_NAME);
+    return template.queryForInt("SELECT count(*) FROM " + TABLE_NAME);
   }
 
+  @Override
   public List<Library> listBySearch(String query) {
     String mySQLQuery = "%" + query.replaceAll("_", Matcher.quoteReplacement("\\_")) + "%";
-    return template.query(LIBRARIES_SELECT_BY_SEARCH, new Object[]{mySQLQuery,mySQLQuery,mySQLQuery,mySQLQuery}, new LibraryMapper(true));
+    return template.query(LIBRARIES_SELECT_BY_SEARCH, new Object[] { mySQLQuery, mySQLQuery, mySQLQuery, mySQLQuery },
+        new LibraryMapper(true));
   }
 
+  @Override
   @Transactional(readOnly = false, rollbackFor = IOException.class)
-  @TriggersRemove(
-          cacheName = {"libraryCache", "lazyLibraryCache"},
-          keyGenerator = @KeyGenerator (
-              name = "HashCodeCacheKeyGenerator",
-              properties = {
-                      @Property(name="includeMethod", value="false"),
-                      @Property(name="includeParameterTypes", value="false")
-              }
-          )
-  )
+  @TriggersRemove(cacheName = { "libraryCache",
+      "lazyLibraryCache" }, keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
+          @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
   public boolean remove(Library library) throws IOException {
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-    if (library.isDeletable() &&
-           (namedTemplate.update(LIBRARY_DELETE,
-                            new MapSqlParameterSource().addValue("libraryId", library.getId())) == 1)) {
+    if (library.isDeletable()
+        && (namedTemplate.update(LIBRARY_DELETE, new MapSqlParameterSource().addValue("libraryId", library.getId())) == 1)) {
       if (this.cascadeType.equals(CascadeType.PERSIST)) {
-//        if (!poolDAO.listByLibraryId(library.getId()).isEmpty()) {
-          //DbUtils.flushCache(cacheManager, "poolCache");
-//        }
         for (Pool p : poolDAO.listByLibraryId(library.getId())) {
-          //poolCache.remove(DbUtils.hashCodeCacheKeyFor(p.getId()));
           DbUtils.updateCaches(cacheManager, p, Pool.class);
         }
         sampleDAO.save(library.getSample());
-      }
-      else if (this.cascadeType.equals(CascadeType.REMOVE)) {
-        //Cache poolCache = cacheManager.getCache("poolCache");
+      } else if (this.cascadeType.equals(CascadeType.REMOVE)) {
         for (Pool p : poolDAO.listByLibraryId(library.getId())) {
-          //poolCache.remove(DbUtils.hashCodeCacheKeyFor(p.getId()));
           DbUtils.updateCaches(cacheManager, p, Pool.class);
         }
 
-        //Cache sampleCache = cacheManager.getCache("sampleCache");
         if (library.getSample() != null) {
-          //sampleCache.remove(DbUtils.hashCodeCacheKeyFor(library.getSample().getId()));
           DbUtils.updateCaches(cacheManager, library.getSample(), Sample.class);
         }
       }
 
-      //remove any child library QCs
+      // remove any child library QCs
       for (LibraryQC lqc : library.getLibraryQCs()) {
         libraryQcDAO.remove(lqc);
       }
@@ -637,84 +515,99 @@ public class SQLLibraryDAO implements LibraryStore {
     return false;
   }
 
+  @Override
   public LibraryType getLibraryTypeById(long libraryTypeId) throws IOException {
-    List eResults = template.query(LIBRARY_TYPE_SELECT_BY_ID, new Object[]{libraryTypeId}, new LibraryTypeMapper());
+    List eResults = template.query(LIBRARY_TYPE_SELECT_BY_ID, new Object[] { libraryTypeId }, new LibraryTypeMapper());
     LibraryType e = eResults.size() > 0 ? (LibraryType) eResults.get(0) : null;
     return e;
   }
 
+  @Override
   public LibraryType getLibraryTypeByDescription(String description) throws IOException {
-    List eResults = template.query(LIBRARY_TYPE_SELECT_BY_DESCRIPTION, new Object[]{description}, new LibraryTypeMapper());
+    List eResults = template.query(LIBRARY_TYPE_SELECT_BY_DESCRIPTION, new Object[] { description }, new LibraryTypeMapper());
     LibraryType e = eResults.size() > 0 ? (LibraryType) eResults.get(0) : null;
     return e;
   }
 
+  @Override
   public LibraryType getLibraryTypeByDescriptionAndPlatform(String description, PlatformType platformType) throws IOException {
-    List eResults = template.query(LIBRARY_TYPE_SELECT_BY_DESCRIPTION_AND_PLATFORM, new Object[]{description, platformType.getKey()}, new LibraryTypeMapper());
+    List eResults = template.query(LIBRARY_TYPE_SELECT_BY_DESCRIPTION_AND_PLATFORM, new Object[] { description, platformType.getKey() },
+        new LibraryTypeMapper());
     LibraryType e = eResults.size() > 0 ? (LibraryType) eResults.get(0) : null;
     return e;
   }
 
+  @Override
   public LibrarySelectionType getLibrarySelectionTypeById(long librarySelectionTypeId) throws IOException {
-    List eResults = template.query(LIBRARY_SELECTION_TYPE_SELECT_BY_ID, new Object[]{librarySelectionTypeId}, new LibrarySelectionTypeMapper());
+    List eResults = template.query(LIBRARY_SELECTION_TYPE_SELECT_BY_ID, new Object[] { librarySelectionTypeId },
+        new LibrarySelectionTypeMapper());
     LibrarySelectionType e = eResults.size() > 0 ? (LibrarySelectionType) eResults.get(0) : null;
     return e;
   }
 
+  @Override
   public LibrarySelectionType getLibrarySelectionTypeByName(String name) throws IOException {
-    List eResults = template.query(LIBRARY_SELECTION_TYPE_SELECT_BY_NAME, new Object[]{name}, new LibrarySelectionTypeMapper());
+    List eResults = template.query(LIBRARY_SELECTION_TYPE_SELECT_BY_NAME, new Object[] { name }, new LibrarySelectionTypeMapper());
     LibrarySelectionType e = eResults.size() > 0 ? (LibrarySelectionType) eResults.get(0) : null;
     return e;
   }
 
+  @Override
   public LibraryStrategyType getLibraryStrategyTypeById(long libraryStrategyTypeId) throws IOException {
-    List eResults = template.query(LIBRARY_STRATEGY_TYPE_SELECT_BY_ID, new Object[]{libraryStrategyTypeId}, new LibraryStrategyTypeMapper());
+    List eResults = template.query(LIBRARY_STRATEGY_TYPE_SELECT_BY_ID, new Object[] { libraryStrategyTypeId },
+        new LibraryStrategyTypeMapper());
     LibraryStrategyType e = eResults.size() > 0 ? (LibraryStrategyType) eResults.get(0) : null;
     return e;
   }
 
+  @Override
   public LibraryStrategyType getLibraryStrategyTypeByName(String name) throws IOException {
-    List eResults = template.query(LIBRARY_STRATEGY_TYPE_SELECT_BY_NAME, new Object[]{name}, new LibraryStrategyTypeMapper());
+    List eResults = template.query(LIBRARY_STRATEGY_TYPE_SELECT_BY_NAME, new Object[] { name }, new LibraryStrategyTypeMapper());
     LibraryStrategyType e = eResults.size() > 0 ? (LibraryStrategyType) eResults.get(0) : null;
     return e;
   }
 
+  @Override
   public List<LibraryType> listLibraryTypesByPlatform(String platformType) throws IOException {
-    return template.query(LIBRARY_TYPES_SELECT_BY_PLATFORM, new Object[]{platformType}, new LibraryTypeMapper());
+    return template.query(LIBRARY_TYPES_SELECT_BY_PLATFORM, new Object[] { platformType }, new LibraryTypeMapper());
   }
 
+  @Override
   public List<LibraryType> listAllLibraryTypes() throws IOException {
     return template.query(LIBRARY_TYPES_SELECT, new LibraryTypeMapper());
   }
 
+  @Override
   public List<LibrarySelectionType> listAllLibrarySelectionTypes() throws IOException {
     return template.query(LIBRARY_SELECTION_TYPES_SELECT, new LibrarySelectionTypeMapper());
   }
 
+  @Override
   public List<LibraryStrategyType> listAllLibraryStrategyTypes() throws IOException {
     return template.query(LIBRARY_STRATEGY_TYPES_SELECT, new LibraryStrategyTypeMapper());
   }
 
+  @Override
   public TagBarcode getTagBarcodeById(long tagBarcodeId) throws IOException {
-    List eResults = template.query(TAG_BARCODE_SELECT_BY_ID, new Object[]{tagBarcodeId}, new TagBarcodeMapper());
+    List eResults = template.query(TAG_BARCODE_SELECT_BY_ID, new Object[] { tagBarcodeId }, new TagBarcodeMapper());
     TagBarcode e = eResults.size() > 0 ? (TagBarcode) eResults.get(0) : null;
     return e;
   }
 
   public TagBarcode getTagBarcodeByName(String name) throws IOException {
-    List eResults = template.query(TAG_BARCODE_SELECT_BY_NAME, new Object[]{name}, new TagBarcodeMapper());
+    List eResults = template.query(TAG_BARCODE_SELECT_BY_NAME, new Object[] { name }, new TagBarcodeMapper());
     TagBarcode e = eResults.size() > 0 ? (TagBarcode) eResults.get(0) : null;
     return e;
   }
 
   public TagBarcode getTagBarcodeByLibraryId(long libraryId) throws IOException {
-    List eResults = template.query(TAG_BARCODE_SELECT_BY_LIBRARY_ID, new Object[]{libraryId}, new TagBarcodeMapper());
+    List eResults = template.query(TAG_BARCODE_SELECT_BY_LIBRARY_ID, new Object[] { libraryId }, new TagBarcodeMapper());
     TagBarcode e = eResults.size() > 0 ? (TagBarcode) eResults.get(0) : null;
     return e;
   }
 
   public HashMap<Integer, TagBarcode> getTagBarcodesByLibraryId(long libraryId) throws IOException {
-    List<TagBarcode> eResults = template.query(TAG_BARCODE_SELECT_BY_LIBRARY_ID, new Object[]{libraryId}, new TagBarcodeMapper());
+    List<TagBarcode> eResults = template.query(TAG_BARCODE_SELECT_BY_LIBRARY_ID, new Object[] { libraryId }, new TagBarcodeMapper());
     if (!eResults.isEmpty()) {
       HashMap<Integer, TagBarcode> map = new HashMap<Integer, TagBarcode>();
       int count = 1;
@@ -727,14 +620,17 @@ public class SQLLibraryDAO implements LibraryStore {
     return new HashMap<Integer, TagBarcode>();
   }
 
+  @Override
   public List<TagBarcode> listTagBarcodesByPlatform(String platformType) throws IOException {
-    return template.query(TAG_BARCODES_SELECT_BY_PLATFORM, new Object[]{platformType}, new TagBarcodeMapper());
+    return template.query(TAG_BARCODES_SELECT_BY_PLATFORM, new Object[] { platformType }, new TagBarcodeMapper());
   }
 
+  @Override
   public List<TagBarcode> listTagBarcodesByStrategyName(String strategyName) throws IOException {
-    return template.query(TAG_BARCODES_SELECT_BY_STRATEGY_NAME, new Object[]{strategyName}, new TagBarcodeMapper());
+    return template.query(TAG_BARCODES_SELECT_BY_STRATEGY_NAME, new Object[] { strategyName }, new TagBarcodeMapper());
   }
 
+  @Override
   public List<TagBarcode> listAllTagBarcodes() throws IOException {
     return template.query(TAG_BARCODES_SELECT, new TagBarcodeMapper());
   }
@@ -756,7 +652,7 @@ public class SQLLibraryDAO implements LibraryStore {
         Element element;
         if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
           log.debug("Cache hit on map for library " + id);
-          return (Library)element.getObjectValue();
+          return (Library) element.getObjectValue();
         }
       }
 
@@ -772,19 +668,14 @@ public class SQLLibraryDAO implements LibraryStore {
       library.setPaired(rs.getBoolean("paired"));
       library.setInitialConcentration(rs.getDouble("concentration"));
       library.setPlatformName(rs.getString("platformName"));
-      //library.setQcPassed(rs.getBoolean("qcPassed"));
       if (rs.getString("qcPassed") != null) {
         library.setQcPassed(Boolean.parseBoolean(rs.getString("qcPassed")));
-      }
-      else {
+      } else {
         library.setQcPassed(null);
       }
 
-      //library.setLastUpdated(rs.getTimestamp("lastUpdated"));
-
       try {
         library.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
-
 
         library.setLibraryType(getLibraryTypeById(rs.getLong("libraryType")));
         library.setLibrarySelectionType(getLibrarySelectionTypeById(rs.getLong("librarySelectionType")));
@@ -804,23 +695,19 @@ public class SQLLibraryDAO implements LibraryStore {
           }
 
           library.setNotes(noteDAO.listByLibrary(id));
-        }
-        else {
+        } else {
           library.setSample(sampleDAO.lazyGet(rs.getLong("sample_sampleId")));
         }
-      }
-      catch (IOException e1) {
+      } catch (IOException e1) {
         e1.printStackTrace();
-      }
-      catch (MalformedLibraryQcException e) {
+      } catch (MalformedLibraryQcException e) {
         e.printStackTrace();
-      }
-      catch (MalformedDilutionException e) {
+      } catch (MalformedDilutionException e) {
         e.printStackTrace();
       }
 
       if (isCacheEnabled() && lookupCache(cacheManager) != null) {
-        lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id) ,library));
+        lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id), library));
       }
 
       return library;
@@ -828,6 +715,7 @@ public class SQLLibraryDAO implements LibraryStore {
   }
 
   public class LibraryTypeMapper implements RowMapper<LibraryType> {
+    @Override
     public LibraryType mapRow(ResultSet rs, int rowNum) throws SQLException {
       LibraryType lt = new LibraryType();
       lt.setLibraryTypeId(rs.getLong("libraryTypeId"));
@@ -838,6 +726,7 @@ public class SQLLibraryDAO implements LibraryStore {
   }
 
   public class LibrarySelectionTypeMapper implements RowMapper<LibrarySelectionType> {
+    @Override
     public LibrarySelectionType mapRow(ResultSet rs, int rowNum) throws SQLException {
       LibrarySelectionType lst = new LibrarySelectionType();
       lst.setLibrarySelectionTypeId(rs.getLong("librarySelectionTypeId"));
@@ -848,6 +737,7 @@ public class SQLLibraryDAO implements LibraryStore {
   }
 
   public class LibraryStrategyTypeMapper implements RowMapper<LibraryStrategyType> {
+    @Override
     public LibraryStrategyType mapRow(ResultSet rs, int rowNum) throws SQLException {
       LibraryStrategyType lst = new LibraryStrategyType();
       lst.setLibraryStrategyTypeId(rs.getLong("libraryStrategyTypeId"));
@@ -858,6 +748,7 @@ public class SQLLibraryDAO implements LibraryStore {
   }
 
   public class TagBarcodeMapper implements RowMapper<TagBarcode> {
+    @Override
     public TagBarcode mapRow(ResultSet rs, int rowNum) throws SQLException {
       TagBarcode tb = new TagBarcodeImpl();
       tb.setId(rs.getLong("tagId"));

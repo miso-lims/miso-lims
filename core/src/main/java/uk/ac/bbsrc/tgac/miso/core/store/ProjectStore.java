@@ -32,71 +32,83 @@ import java.util.Collection;
 
 /**
  * Defines a DAO interface for storing Projects
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public interface ProjectStore extends Store<Project>, Cascadable, Remover<Project>, NamingSchemeAware<Project> {
   /**
    * Get a Project given an alias
-   *
-   * @param alias of type String
+   * 
+   * @param alias
+   *          of type String
    * @return Project
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   Project getByAlias(String alias) throws IOException;
 
   /**
    * Get a parent Project related to a Study given a Study ID
-   *
-   * @param studyId of type long
+   * 
+   * @param studyId
+   *          of type long
    * @return Project
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   Project getByStudyId(long studyId) throws IOException;
 
   /**
    * List all Projects that match a search criteria
-   *
-   * @param query of type String
+   * 
+   * @param query
+   *          of type String
    * @return Collection<Project>
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   Collection<Project> listBySearch(String query) throws IOException;
 
   /**
    * Get a ProjectOverview given a ProjectOverview ID
-   *
-   * @param overviewId of type long
+   * 
+   * @param overviewId
+   *          of type long
    * @return ProjectOverview
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   ProjectOverview getProjectOverviewById(long overviewId) throws IOException;
 
-   /**
-   * Get  ProjectOverviews given a Project ID
-   *
-   * @param projectId of type long
+  /**
+   * Get ProjectOverviews given a Project ID
+   * 
+   * @param projectId
+   *          of type long
    * @return Collection<ProjectOverview>
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   Collection<ProjectOverview> listOverviewsByProjectId(long projectId) throws IOException;
 
-
   /**
    * List all persisted objects
-   *
+   * 
    * @return Collection<Project>
-   * @throws IOException when the objects cannot be retrieved
+   * @throws IOException
+   *           when the objects cannot be retrieved
    */
   Collection<Project> listAllWithLimit(long limit) throws IOException;
 
   /**
    * Save a ProjectOverview
-   *
-   * @param overview of type ProjectOverview
+   * 
+   * @param overview
+   *          of type ProjectOverview
    * @return long
-   * @throws IOException when
+   * @throws IOException
+   *           when
    */
   long saveOverview(ProjectOverview overview) throws IOException;
 }

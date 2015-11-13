@@ -33,7 +33,7 @@ import java.io.IOException;
  * uk.ac.bbsrc.tgac.miso.analysis.parameter
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 14/10/11
  * @since 0.1.2
@@ -65,16 +65,14 @@ public class PathCreatingPathParameter extends AbstractConanParameter implements
         if (!f.exists()) {
           if (f.isDirectory()) {
             return (f.mkdirs());
-          }
-          else {
+          } else {
             if (!f.getParentFile().exists()) f.getParentFile().mkdirs();
             return f.createNewFile() && f.delete();
           }
         }
         return true;
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
     }
     return false;

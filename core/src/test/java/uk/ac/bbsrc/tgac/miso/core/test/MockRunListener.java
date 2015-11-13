@@ -25,22 +25,18 @@ package uk.ac.bbsrc.tgac.miso.core.test;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.event.Event;
 import uk.ac.bbsrc.tgac.miso.core.event.ResponderService;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.RunListener;
 import uk.ac.bbsrc.tgac.miso.core.event.model.RunEvent;
-import uk.ac.bbsrc.tgac.miso.core.event.model.StatusChangedEvent;
-
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Set;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.event
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 26/09/11
  * @since 0.1.2
@@ -51,10 +47,12 @@ public class MockRunListener implements RunListener {
 
   private String baseURL = "";
 
+  @Override
   public Collection<? extends ResponderService> getResponderServices() {
     return responderServices;
   }
 
+  @Override
   public void setResponderServices(Collection<? extends ResponderService> responderServices) {
     log.info("Setting " + responderServices.size() + " responder(s)");
     this.responderServices = responderServices;
@@ -67,7 +65,7 @@ public class MockRunListener implements RunListener {
 
   @Override
   public void runStarted(RunEvent r) {
-    log.info("Run "+r.getEventObject().getId()+" started");
+    log.info("Run " + r.getEventObject().getId() + " started");
     for (ResponderService responder : getResponderServices()) {
       if (responder.respondsTo(r)) {
         responder.generateResponse(r);
@@ -77,7 +75,7 @@ public class MockRunListener implements RunListener {
 
   @Override
   public void runCompleted(RunEvent r) {
-    log.info("Run "+r.getEventObject().getId()+" completed");
+    log.info("Run " + r.getEventObject().getId() + " completed");
     for (ResponderService responder : getResponderServices()) {
       if (responder.respondsTo(r)) {
         responder.generateResponse(r);
@@ -87,7 +85,7 @@ public class MockRunListener implements RunListener {
 
   @Override
   public void runFailed(RunEvent r) {
-    log.info("Run "+r.getEventObject().getId()+" failed");
+    log.info("Run " + r.getEventObject().getId() + " failed");
     for (ResponderService responder : getResponderServices()) {
       if (responder.respondsTo(r)) {
         responder.generateResponse(r);
@@ -97,7 +95,7 @@ public class MockRunListener implements RunListener {
 
   @Override
   public void runQcAdded(RunEvent r) {
-    log.info("Run "+r.getEventObject().getId()+" qc added");
+    log.info("Run " + r.getEventObject().getId() + " qc added");
     for (ResponderService responder : getResponderServices()) {
       if (responder.respondsTo(r)) {
         responder.generateResponse(r);

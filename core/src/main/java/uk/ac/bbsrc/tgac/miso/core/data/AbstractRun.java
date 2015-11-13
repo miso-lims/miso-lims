@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
-import uk.ac.bbsrc.tgac.miso.core.event.listener.RunListener;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.visitor.SubmittableVisitor;
@@ -43,12 +42,11 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunQcException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.util.*;
 
 /**
  * Skeleton implementation of a Run
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -96,11 +94,13 @@ public abstract class AbstractRun implements Run {
   private Set<MisoListener> listeners = new HashSet<MisoListener>();
   private Set<User> watchers = new HashSet<User>();
 
+  @Override
   @Deprecated
   public Long getRunId() {
     return runId;
   }
 
+  @Override
   @Deprecated
   public void setRunId(Long runId) {
     this.runId = runId;
@@ -111,14 +111,17 @@ public abstract class AbstractRun implements Run {
     return runId;
   }
 
+  @Override
   public void setId(long id) {
     this.runId = id;
   }
 
+  @Override
   public SequencerReference getSequencerReference() {
     return sequencerReference;
   }
 
+  @Override
   public void setSequencerReference(SequencerReference sequencerReference) {
     this.sequencerReference = sequencerReference;
   }
@@ -132,82 +135,102 @@ public abstract class AbstractRun implements Run {
   @Override
   public abstract void addSequencerPartitionContainer(SequencerPartitionContainer<SequencerPoolPartition> sequencerPartitionContainer);
 
+  @Override
   public PlatformType getPlatformType() {
     return platformType;
   }
 
+  @Override
   public void setPlatformType(PlatformType platformType) {
     this.platformType = platformType;
   }
 
+  @Override
   public String getAccession() {
     return accession;
   }
 
+  @Override
   public void setAccession(String accession) {
     this.accession = accession;
   }
 
+  @Override
   public String getName() {
     return name;
   }
 
+  @Override
   public void setName(String name) {
     this.name = name;
   }
 
+  @Override
   public String getAlias() {
     return alias;
   }
 
+  @Override
   public void setAlias(String alias) {
     this.alias = alias;
   }
 
+  @Override
   public String getDescription() {
     return description;
   }
 
+  @Override
   public void setDescription(String description) {
     this.description = description;
   }
 
+  @Override
   public Integer getPlatformRunId() {
     return platformRunId;
   }
 
+  @Override
   public void setPlatformRunId(Integer platformRunId) {
     this.platformRunId = platformRunId;
   }
 
+  @Override
   public Integer getCycles() {
     return cycles;
   }
 
+  @Override
   public void setCycles(Integer cycles) {
     this.cycles = cycles;
   }
 
+  @Override
   public Boolean getPairedEnd() {
     return pairedEnd;
   }
 
+  @Override
   public void setPairedEnd(Boolean pairedEnd) {
     this.pairedEnd = pairedEnd;
   }
 
+  @Override
   public String getFilePath() {
     return filePath;
   }
 
+  @Override
   public void setFilePath(String filePath) {
     this.filePath = filePath;
   }
 
+  @Override
   public Status getStatus() {
     return status;
   }
 
+  @Override
   public void setStatus(Status status) {
     if (this.status != null && status != null) {
       if (!status.getHealth().equals(this.status.getHealth())) {
@@ -215,17 +238,11 @@ public abstract class AbstractRun implements Run {
 
         if (status.getHealth().equals(HealthType.Started)) {
           fireRunStartedEvent();
-        }
-        else if (status.getHealth().equals(HealthType.Completed)) {
+        } else if (status.getHealth().equals(HealthType.Completed)) {
           fireRunCompletedEvent();
-        }
-        else if (status.getHealth().equals(HealthType.Failed)) {
-//          if (status.getCompletionDate() == null) {
-//            status.setCompletionDate(new Date());
-//          }
+        } else if (status.getHealth().equals(HealthType.Failed)) {
           fireRunFailedEvent();
-        }
-        else {
+        } else {
           fireStatusChangedEvent();
         }
       }
@@ -233,18 +250,19 @@ public abstract class AbstractRun implements Run {
     this.status = status;
   }
 
+  @Override
   public void addQc(RunQC runQC) throws MalformedRunQcException {
     fireRunQcAddedEvent();
 
     this.runQCs.add(runQC);
     try {
       runQC.setRun(this);
-    }
-    catch (MalformedRunException e) {
+    } catch (MalformedRunException e) {
       e.printStackTrace();
     }
   }
 
+  @Override
   public Collection<RunQC> getRunQCs() {
     return runQCs;
   }
@@ -253,22 +271,27 @@ public abstract class AbstractRun implements Run {
     this.runQCs = qcs;
   }
 
+  @Override
   public Collection<Note> getNotes() {
     return notes;
   }
 
+  @Override
   public void addNote(Note note) {
     this.notes.add(note);
   }
 
+  @Override
   public void setNotes(Collection<Note> notes) {
     this.notes = notes;
   }
 
+  @Override
   public Date getLastUpdated() {
     return lastUpdated;
   }
 
+  @Override
   public void setLastUpdated(Date lastUpdated) {
     this.lastUpdated = lastUpdated;
   }
@@ -279,33 +302,38 @@ public abstract class AbstractRun implements Run {
 
   public void accept(SubmittableVisitor v) {
     v.visit(this);
-  }   
+  }
 
+  @Override
   public boolean userCanRead(User user) {
     return securityProfile.userCanRead(user);
   }
 
+  @Override
   public boolean userCanWrite(User user) {
     return securityProfile.userCanWrite(user);
   }
 
+  @Override
   public void setSecurityProfile(SecurityProfile securityProfile) {
     this.securityProfile = securityProfile;
   }
 
+  @Override
   public SecurityProfile getSecurityProfile() {
     return securityProfile;
   }
 
+  @Override
   public void inheritPermissions(SecurableByProfile parent) throws SecurityException {
     if (parent.getSecurityProfile().getOwner() != null) {
       setSecurityProfile(parent.getSecurityProfile());
-    }
-    else {
+    } else {
       throw new SecurityException("Cannot inherit permissions when parent object owner is not set!");
     }
-  }  
+  }
 
+  @Override
   public abstract void buildReport();
 
   @Override
@@ -393,6 +421,7 @@ public abstract class AbstractRun implements Run {
     return getName();
   }
 
+  @Override
   public boolean isDeletable() {
     return getId() != AbstractQC.UNSAVED_ID;
   }
@@ -402,20 +431,15 @@ public abstract class AbstractRun implements Run {
    */
   @Override
   public boolean equals(Object obj) {
-    if (obj == null)
-      return false;
-    if (obj == this)
-      return true;
-    if (!(obj instanceof AbstractRun))
-      return false;
+    if (obj == null) return false;
+    if (obj == this) return true;
+    if (!(obj instanceof AbstractRun)) return false;
     Run them = (Run) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
-    if (getId() == AbstractRun.UNSAVED_ID
-        || them.getId() == AbstractRun.UNSAVED_ID) {
-      return getAlias().equals(them.getAlias()); //&& this.getDescription().equals(them.getDescription());
-    }
-    else {
+    if (getId() == AbstractRun.UNSAVED_ID || them.getId() == AbstractRun.UNSAVED_ID) {
+      return getAlias().equals(them.getAlias());
+    } else {
       return getId() == them.getId();
     }
   }
@@ -423,21 +447,18 @@ public abstract class AbstractRun implements Run {
   @Override
   public int hashCode() {
     if (getId() != AbstractRun.UNSAVED_ID) {
-      return (int)getId();
-    }
-    else {
+      return (int) getId();
+    } else {
       final int PRIME = 37;
       int hashcode = 1;
       if (getAlias() != null) hashcode = PRIME * hashcode + getAlias().hashCode();
-      //if (getDescription() != null) hashcode = PRIME * hashcode + getDescription().hashCode();
-      //if (getExperiment() != null) hashcode = 37 * hashcode + getExperiment().hashCode();
       return hashcode;
     }
   }
 
   @Override
   public int compareTo(Object o) {
-    Run t = (Run)o;
+    Run t = (Run) o;
     if (getId() < t.getId()) return -1;
     if (getId() > t.getId()) return 1;
     return 0;
@@ -459,7 +480,7 @@ public abstract class AbstractRun implements Run {
 
     if (getStatus() != null) {
       sb.append(getStatus().getHealth());
-      sb.append("("+getStatus().getStatusId()+")");
+      sb.append("(" + getStatus().getStatusId() + ")");
     }
     return sb.toString();
   }

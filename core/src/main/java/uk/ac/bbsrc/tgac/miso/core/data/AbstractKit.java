@@ -41,147 +41,147 @@ import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 
 /**
  * Skeleton implementation of a Kit
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
 public abstract class AbstractKit implements Kit {
-   public static final Long UNSAVED_ID = 0L;
-   @Id
-   @GeneratedValue(strategy = GenerationType.AUTO)
-   private long kitId = AbstractKit.UNSAVED_ID;
-   private String identificationBarcode;
-   private String locationBarcode;
+  public static final Long UNSAVED_ID = 0L;
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  private long kitId = AbstractKit.UNSAVED_ID;
+  private String identificationBarcode;
+  private String locationBarcode;
 
-   @Transient
-   @Enumerated(EnumType.STRING)
-   private Collection<Note> notes = new HashSet<Note>();
-   private String lotNumber;
-   private Date kitDate;
-   private KitDescriptor kitDescriptor;
+  @Transient
+  @Enumerated(EnumType.STRING)
+  private Collection<Note> notes = new HashSet<Note>();
+  private String lotNumber;
+  private Date kitDate;
+  private KitDescriptor kitDescriptor;
 
-   @Override
-   @CoverageIgnore
-   @Deprecated
-   public Long getKitId() {
-      return kitId;
-   }
+  @Override
+  @CoverageIgnore
+  @Deprecated
+  public Long getKitId() {
+    return kitId;
+  }
 
-   @Override
-   @CoverageIgnore
-   @Deprecated
-   public void setKitId(Long kitId) {
-      this.kitId = kitId;
-   }
+  @Override
+  @CoverageIgnore
+  @Deprecated
+  public void setKitId(Long kitId) {
+    this.kitId = kitId;
+  }
 
-   @Override
-   public long getId() {
-      return kitId;
-   }
+  @Override
+  public long getId() {
+    return kitId;
+  }
 
-   @Override
-   public void setId(long id) {
-      this.kitId = id;
-   }
+  @Override
+  public void setId(long id) {
+    this.kitId = id;
+  }
 
-   @Override
-   public String getLotNumber() {
-      return lotNumber;
-   }
+  @Override
+  public String getLotNumber() {
+    return lotNumber;
+  }
 
-   @Override
-   public void setLotNumber(String lotNumber) {
-      this.lotNumber = lotNumber;
-   }
+  @Override
+  public void setLotNumber(String lotNumber) {
+    this.lotNumber = lotNumber;
+  }
 
-   @Override
-   public Date getKitDate() {
-      return kitDate;
-   }
+  @Override
+  public Date getKitDate() {
+    return kitDate;
+  }
 
-   @Override
-   public void setKitDate(Date kitDate) {
-      this.kitDate = kitDate;
-   }
+  @Override
+  public void setKitDate(Date kitDate) {
+    this.kitDate = kitDate;
+  }
 
-   @Override
-   public Collection<Note> getNotes() {
-      return notes;
-   }
+  @Override
+  public Collection<Note> getNotes() {
+    return notes;
+  }
 
-   @Override
-   public KitDescriptor getKitDescriptor() {
-      return kitDescriptor;
-   }
+  @Override
+  public KitDescriptor getKitDescriptor() {
+    return kitDescriptor;
+  }
 
-   @Override
-   public void setKitDescriptor(KitDescriptor kitDescriptor) {
-      this.kitDescriptor = kitDescriptor;
-   }
+  @Override
+  public void setKitDescriptor(KitDescriptor kitDescriptor) {
+    this.kitDescriptor = kitDescriptor;
+  }
 
-   @Override
-   public void setNotes(Collection<Note> notes) {
-      this.notes = notes;
-   }
+  @Override
+  public void setNotes(Collection<Note> notes) {
+    this.notes = notes;
+  }
 
-   @CoverageIgnore
-   @Override
-   public void addNote(Note note) {
-      this.notes.add(note);
-   }
+  @CoverageIgnore
+  @Override
+  public void addNote(Note note) {
+    this.notes.add(note);
+  }
 
-   @Override
-   public String getIdentificationBarcode() {
-      return identificationBarcode;
-   }
+  @Override
+  public String getIdentificationBarcode() {
+    return identificationBarcode;
+  }
 
-   @Override
-   public void setIdentificationBarcode(String identificationBarcode) {
-      this.identificationBarcode = identificationBarcode;
-   }
+  @Override
+  public void setIdentificationBarcode(String identificationBarcode) {
+    this.identificationBarcode = identificationBarcode;
+  }
 
-   @Override
-   public String getLocationBarcode() {
-      return locationBarcode;
-   }
+  @Override
+  public String getLocationBarcode() {
+    return locationBarcode;
+  }
 
-   @Override
-   public void setLocationBarcode(String locationBarcode) {
-      this.locationBarcode = locationBarcode;
-   }
+  @Override
+  public void setLocationBarcode(String locationBarcode) {
+    this.locationBarcode = locationBarcode;
+  }
 
-   @CoverageIgnore
-   @Override
-   public String getName() {
-      return getKitDescriptor().getName();
-   }
+  @CoverageIgnore
+  @Override
+  public String getName() {
+    return getKitDescriptor().getName();
+  }
 
-   @Override
-   @CoverageIgnore
-   public String getLabelText() {
-      return getLotNumber();
-   }
+  @Override
+  @CoverageIgnore
+  public String getLabelText() {
+    return getLotNumber();
+  }
 
-   @CoverageIgnore
-   @Override
-   public int compareTo(Object o) {
-      final Kit t = (Kit) o;
-      if (getId() < t.getId()) return -1;
-      if (getId() > t.getId()) return 1;
-      return 0;
-   }
+  @CoverageIgnore
+  @Override
+  public int compareTo(Object o) {
+    final Kit t = (Kit) o;
+    if (getId() < t.getId()) return -1;
+    if (getId() > t.getId()) return 1;
+    return 0;
+  }
 
-   @CoverageIgnore
-   @Override
-   public String toString() {
-      final StringBuilder sb = new StringBuilder();
-      sb.append(getId());
-      sb.append(" : ");
-      sb.append(getLotNumber());
-      sb.append(" : ");
-      sb.append(getIdentificationBarcode());
-      sb.append(" : ");
-      sb.append(getKitDate());
-      return sb.toString();
-   }
+  @CoverageIgnore
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder();
+    sb.append(getId());
+    sb.append(" : ");
+    sb.append(getLotNumber());
+    sb.append(" : ");
+    sb.append(getIdentificationBarcode());
+    sb.append(" : ");
+    sb.append(getKitDate());
+    return sb.toString();
+  }
 }

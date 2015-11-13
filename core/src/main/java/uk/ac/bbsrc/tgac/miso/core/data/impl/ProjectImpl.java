@@ -23,16 +23,9 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import javax.persistence.*;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractProject;
-import uk.ac.bbsrc.tgac.miso.core.factory.submission.ERASubmissionFactory;
-
 import java.io.Serializable;
 
 /**
@@ -52,29 +45,27 @@ public class ProjectImpl extends AbstractProject implements Serializable {
 
   /**
    * Construct a new Project with a SecurityProfile owned by the given User
-   *
-   * @param user of type User
+   * 
+   * @param user
+   *          of type User
    */
   public ProjectImpl(User user) {
     setSecurityProfile(new SecurityProfile(user));
   }
 
+  @Override
   public void buildSubmission() {
     /*
-    try {
-      DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-      submissionDocument = docBuilder.newDocument();
-    }
-    catch (ParserConfigurationException e) {
-      e.printStackTrace();
-    }
-    ERASubmissionFactory.generateProjectSubmissionXML(submissionDocument, this);
-    */
+     * try { DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder(); submissionDocument =
+     * docBuilder.newDocument(); } catch (ParserConfigurationException e) { e.printStackTrace(); }
+     * ERASubmissionFactory.generateProjectSubmissionXML(submissionDocument, this);
+     */
   }
 
   /**
    * Method buildReport ...
    */
+  @Override
   public void buildReport() {
 
   }

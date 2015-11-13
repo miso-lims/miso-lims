@@ -32,7 +32,7 @@ import java.util.Properties;
  * uk.ac.bbsrc.tgac.miso.notification.handler
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 08-Dec-2010
  * @since 0.0.2
@@ -69,4 +69,3 @@ public class JobLaunchRequest {
     return jobParameters == null ? Collections.EMPTY_MAP : Collections.unmodifiableMap(jobParameters);
   }
 }
-

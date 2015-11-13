@@ -39,7 +39,7 @@ import java.util.*;
  * uk.ac.bbsrc.tgac.tagbarcode
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @date 28/06/12
  * @since 0.1.6
@@ -84,30 +84,26 @@ public class Dual16SV4DualIndexTagBarcodeStrategy implements TagBarcodeStrategy,
         tagBarcodeMap.put(2, new TreeSet<TagBarcode>());
 
         try {
-          List<TagBarcode> barcodes = new ArrayList<TagBarcode>(requestManager.listAllTagBarcodesByPlatform(PlatformType.ILLUMINA.getKey()));
+          List<TagBarcode> barcodes = new ArrayList<TagBarcode>(
+              requestManager.listAllTagBarcodesByPlatform(PlatformType.ILLUMINA.getKey()));
           for (TagBarcode t : barcodes) {
             if (getName().equals(t.getStrategyName()) && t.getName() != null) {
               log.debug("Registering tag barcode: " + t.getName());
               if (t.getName().startsWith("SA7")) {
                 tagBarcodeMap.get(1).add(t);
-              }
-              else if (t.getName().startsWith("SB7")) {
+              } else if (t.getName().startsWith("SB7")) {
                 tagBarcodeMap.get(1).add(t);
-              }
-              else if (t.getName().startsWith("SA5")) {
+              } else if (t.getName().startsWith("SA5")) {
                 tagBarcodeMap.get(2).add(t);
-              }
-              else if (t.getName().startsWith("SB5")) {
+              } else if (t.getName().startsWith("SB5")) {
                 tagBarcodeMap.get(2).add(t);
               }
             }
           }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
           e.printStackTrace();
         }
-      }
-      else {
+      } else {
         log.error("Null requestManager");
       }
     }

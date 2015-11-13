@@ -52,7 +52,7 @@ import java.util.*;
  * uk.ac.bbsrc.tgac.miso.spring.ajax
  * <p/>
  * Info
- *
+ * 
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -107,12 +107,12 @@ public class CacheHelperService {
       Cache cache = cacheManager.getCache(cacheName);
       if (cache != null) {
         cache.removeAll();
-        log.info("Cache '"+cacheName+"' flushed!");
-      }
-      else {
+        log.info("Cache '" + cacheName + "' flushed!");
+      } else {
         return JSONUtils.SimpleJSONError("No such cache: " + cacheName);
       }
-      return JSONUtils.JSONObjectResponse("html", jQueryDialogFactory.okDialog("Cache Administration", "Cache '"+cacheName+"' flushed successfully!"));
+      return JSONUtils.JSONObjectResponse("html",
+          jQueryDialogFactory.okDialog("Cache Administration", "Cache '" + cacheName + "' flushed successfully!"));
     }
     return JSONUtils.SimpleJSONError("No cache specified to flush");
   }
@@ -136,10 +136,11 @@ public class CacheHelperService {
     for (String s : cacheNames) {
       Cache c = cacheManager.getCache(s);
       JSONObject j = new JSONObject();
-      j.put("name",s);
-      j.put("size",c.getSize());
+      j.put("name", s);
+      j.put("size", c.getSize());
       j.put("hits", c.getLiveCacheStatistics().getCacheHitCount());
-      j.put("searchtimes", c.getLiveCacheStatistics().getAverageGetTimeMillis() + " ("+c.getLiveCacheStatistics().getMaxGetTimeMillis()+")");
+      j.put("searchtimes",
+          c.getLiveCacheStatistics().getAverageGetTimeMillis() + " (" + c.getLiveCacheStatistics().getMaxGetTimeMillis() + ")");
       caches.add(j);
     }
     response.put("caches", caches);
@@ -177,10 +178,10 @@ public class CacheHelperService {
           requestManager.savePool(p);
         }
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
-      return JSONUtils.JSONObjectResponse("html", jQueryDialogFactory.errorDialog("Cache Administration", "Barcode regeneration failed!:\n\n" + e.getMessage()));
+      return JSONUtils.JSONObjectResponse("html",
+          jQueryDialogFactory.errorDialog("Cache Administration", "Barcode regeneration failed!:\n\n" + e.getMessage()));
     }
 
     DbUtils.flushAllCaches(cacheManager);
@@ -190,20 +191,7 @@ public class CacheHelperService {
 
   @Deprecated
   public JSONObject reindexAlertManagers(HttpSession session, JSONObject json) {
-    /*
-    try {
-      log.info("Alert managers reindexing...");
-      if (projectAlertManager != null) projectAlertManager.indexify();
-      if (runAlertManager != null) runAlertManager.indexify();
-      if (poolAlertManager != null) poolAlertManager.indexify();
-    }
-    catch (IOException e) {
-      e.printStackTrace();
-      return JSONUtils.JSONObjectResponse("html", jQueryDialogFactory.okDialog("Cache Administration", "Unable to reindex alert managers: " + e.getMessage()));
-    }
-
-    return JSONUtils.JSONObjectResponse("html", jQueryDialogFactory.okDialog("Cache Administration", "Alert Managers reindexing!"));
-    */
-    return JSONUtils.JSONObjectResponse("html", jQueryDialogFactory.okDialog("Cache Administration", "Deprecated function. Not reindexing."));
+    return JSONUtils.JSONObjectResponse("html",
+        jQueryDialogFactory.okDialog("Cache Administration", "Deprecated function. Not reindexing."));
   }
 }

@@ -30,19 +30,12 @@ import uk.ac.bbsrc.tgac.miso.core.exception.SubmissionException;
 import uk.ac.bbsrc.tgac.miso.core.util.TransmissionUtils;
 
 import java.io.File;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
 /**
- * Created by IntelliJ IDEA.
- * User: collesa
- * Date: 26/03/12
- * Time: 13:10
- * To change this template use File | Settings | File Templates.
+ * Created by IntelliJ IDEA. User: collesa Date: 26/03/12 Time: 13:10 To change this template use File | Settings | File Templates.
  */
 public class FTPTransferMethod implements TransferMethod {
   protected static final Logger log = LoggerFactory.getLogger(TransmissionUtils.class);
@@ -50,7 +43,8 @@ public class FTPTransferMethod implements TransferMethod {
   private String username;
   private String password;
 
-  public FTPTransferMethod() {}
+  public FTPTransferMethod() {
+  }
 
   public FTPTransferMethod(String username, String password) {
     this.username = username;
@@ -65,6 +59,7 @@ public class FTPTransferMethod implements TransferMethod {
     this.password = password;
   }
 
+  @Override
   public FTPUploadReport uploadSequenceData(Set<File> dataFiles, EndPoint endpoint) throws SubmissionException {
     List<FTPUploadJob> FTPUploadList = new ArrayList<FTPUploadJob>();
     try {
@@ -72,40 +67,27 @@ public class FTPTransferMethod implements TransferMethod {
         FTPClient ftpClient = TransmissionUtils.ftpConnect(endpoint.getDestination().getHost(), username, password);
 
         FTPUploadJob FTPUploadJob = new FTPUploadJob(f);
-        //Have left this code commented in case I need to use it to help sort out the upload progress indicator problem
-        //Antony 8/05/2012
-        //DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-        //get current date time with Date()
-        //Date date = new Date();
-        //System.out.println(dateFormat.format(date));
 
-        boolean success = TransmissionUtils.ftpPutListen(ftpClient, "anon/", FTPUploadJob.getFile(), false, false, FTPUploadJob.getListener());
+        boolean success = TransmissionUtils.ftpPutListen(ftpClient, "anon/", FTPUploadJob.getFile(), false, false,
+            FTPUploadJob.getListener());
         if (success) {
           log.info("FTPTransferMethod: upload of " + f.getName() + " successful.");
-          //date = new Date();
-          // System.out.println(dateFormat.format(date));
-        }
-        else {
+        } else {
           log.info("FTPTransferMethod: upload of " + f.getName() + " failed.");
         }
 
         FTPUploadList.add(FTPUploadJob);
-        //System.out.println("Upload Job created for:" + FTPUploadJob.getFile() + " " + FTPUploadJob.getBytesTransferred() +
-        //" bytes, or " + FTPUploadJob.getPercentageTransferred()+"% transferred...");
       }
-      //boolean uploadSuccessful=TransmissionUtils.ftpPut(ftpClient, "anon/", fileList, true, false);
 
       FTPUploadReport report = new FTPUploadReport(FTPUploadList);
       report.setStatus("uploading");
       report.setMessage("uploading " + FTPUploadList.size() + " files.");
 
       return (report);
-    }
-    catch (java.io.FileNotFoundException j) {
+    } catch (java.io.FileNotFoundException j) {
       log.debug("The specified datafiles could not be found.");
       throw new SubmissionException("DataFiles could not be found:" + j.getMessage());
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       e.printStackTrace();
       throw new SubmissionException(e.getMessage());
     }

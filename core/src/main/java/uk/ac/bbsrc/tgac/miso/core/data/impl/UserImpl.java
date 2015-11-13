@@ -40,9 +40,9 @@ import java.util.List;
 
 /**
  * Concrete implementation of a User object, inheriting from the simlims core User
- *
+ * 
  * @author Rob Davey
- * @since 0.0.2  
+ * @since 0.0.2
  */
 @Entity
 public class UserImpl implements User, Serializable, Comparable {
@@ -51,8 +51,7 @@ public class UserImpl implements User, Serializable, Comparable {
   private static final long serialVersionUID = 1L;
 
   /**
-   * Use this ID to indicate that a user has not yet been saved, and therefore
-   * does not yet have a unique ID.
+   * Use this ID to indicate that a user has not yet been saved, and therefore does not yet have a unique ID.
    */
   public static final Long UNSAVED_ID = 0L;
 
@@ -71,18 +70,22 @@ public class UserImpl implements User, Serializable, Comparable {
   private Collection<Group> groups = new HashSet<Group>();
   private String[] roles = new String[0];
 
+  @Override
   public boolean isActive() {
     return active;
   }
 
+  @Override
   public void setActive(boolean active) {
     this.active = active;
   }
 
+  @Override
   public Long getUserId() {
     return userId;
   }
 
+  @Override
   public void setUserId(Long userId) {
     this.userId = userId;
   }
@@ -95,34 +98,42 @@ public class UserImpl implements User, Serializable, Comparable {
     this.userId = userId;
   }
 
+  @Override
   public String getEmail() {
     return email;
   }
 
+  @Override
   public void setEmail(String email) {
     this.email = email;
   }
 
+  @Override
   public String getFullName() {
     return fullName;
   }
 
+  @Override
   public String getPassword() {
     return password;
   }
 
+  @Override
   public Collection<Group> getGroups() {
     return groups;
   }
 
+  @Override
   public String getLoginName() {
     return loginName;
   }
 
+  @Override
   public String[] getRoles() {
     return roles;
   }
 
+  @Override
   public Collection<GrantedAuthority> getRolesAsAuthorities() {
     List<GrantedAuthority> auths = new ArrayList<GrantedAuthority>();
     for (String s : roles) {
@@ -131,6 +142,7 @@ public class UserImpl implements User, Serializable, Comparable {
     return auths;
   }
 
+  @Override
   public Collection<GrantedAuthority> getPermissionsAsAuthorities() {
     List<GrantedAuthority> auths = new ArrayList<GrantedAuthority>();
     if (isAdmin()) {
@@ -148,46 +160,57 @@ public class UserImpl implements User, Serializable, Comparable {
     return auths;
   }
 
+  @Override
   public boolean isAdmin() {
     return admin;
   }
 
+  @Override
   public boolean isExternal() {
     return external;
   }
 
+  @Override
   public boolean isInternal() {
     return internal;
   }
 
+  @Override
   public void setAdmin(boolean admin) {
     this.admin = admin;
   }
 
+  @Override
   public void setExternal(boolean external) {
     this.external = external;
   }
 
+  @Override
   public void setFullName(String fullName) {
     this.fullName = fullName;
   }
 
+  @Override
   public void setPassword(String password) {
     this.password = password;
   }
 
+  @Override
   public void setGroups(Collection<Group> groups) {
     this.groups = groups;
   }
 
+  @Override
   public void setInternal(boolean internal) {
     this.internal = internal;
   }
 
+  @Override
   public void setLoginName(String loginName) {
     this.loginName = loginName;
   }
 
+  @Override
   public void setRoles(String[] roles) {
     this.roles = roles;
   }
@@ -197,17 +220,13 @@ public class UserImpl implements User, Serializable, Comparable {
    */
   @Override
   public boolean equals(Object obj) {
-    if (obj == null)
-      return false;
-    if (obj == this)
-      return true;
-    if (!(obj instanceof UserImpl))
-      return false;
+    if (obj == null) return false;
+    if (obj == this) return true;
+    if (!(obj instanceof UserImpl)) return false;
     UserImpl them = (UserImpl) obj;
     if (getId() == UserImpl.UNSAVED_ID || them.getId() == UserImpl.UNSAVED_ID) {
       return this.getLoginName().equals(them.getLoginName());
-    }
-    else {
+    } else {
       return this.getId() == them.getId();
     }
   }
@@ -215,11 +234,10 @@ public class UserImpl implements User, Serializable, Comparable {
   @Override
   public int hashCode() {
     if (getId() != UserImpl.UNSAVED_ID) {
-      return (int)getId();
-    }
-    else {
+      return (int) getId();
+    } else {
       int hashcode = 1;
-      if (getLoginName() != null) hashcode = 37* hashcode + getLoginName().hashCode();
+      if (getLoginName() != null) hashcode = 37 * hashcode + getLoginName().hashCode();
       if (getEmail() != null) hashcode = 37 * hashcode + getEmail().hashCode();
       return hashcode;
     }
@@ -242,8 +260,9 @@ public class UserImpl implements User, Serializable, Comparable {
     return sb.toString();
   }
 
+  @Override
   public int compareTo(Object o) {
-    User t = (User)o;
+    User t = (User) o;
     if (getId() < t.getUserId()) return -1;
     if (getId() > t.getUserId()) return 1;
     return 0;
