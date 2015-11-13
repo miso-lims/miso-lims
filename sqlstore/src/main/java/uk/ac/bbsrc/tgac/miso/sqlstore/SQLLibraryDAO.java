@@ -63,6 +63,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryQcException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
@@ -93,7 +94,7 @@ public class SQLLibraryDAO implements LibraryStore {
   private static String TABLE_NAME = "Library";
 
   public static final String LIBRARIES_SELECT = "SELECT libraryId, name, description, alias, accession, securityProfile_profileId, sample_sampleId, identificationBarcode, "
-      + "locationBarcode, paired, libraryType, librarySelectionType, libraryStrategyType, platformName, concentration, creationDate, qcPassed "
+      + "locationBarcode, paired, libraryType, librarySelectionType, libraryStrategyType, platformName, concentration, creationDate, qcPassed, lastModifier "
       + "FROM " + TABLE_NAME;
 
   public static final String LIBRARIES_SELECT_LIMIT = LIBRARIES_SELECT + " ORDER BY libraryId DESC LIMIT ?";
@@ -111,13 +112,13 @@ public class SQLLibraryDAO implements LibraryStore {
       + " SET name=:name, description=:description, alias=:alias, accession=:accession, securityProfile_profileId=:securityProfile_profileId, "
       + "sample_sampleId=:sample_sampleId, identificationBarcode=:identificationBarcode,  locationBarcode=:locationBarcode, "
       + "paired=:paired, libraryType=:libraryType, librarySelectionType=:librarySelectionType, libraryStrategyType=:libraryStrategyType, "
-      + "platformName=:platformName, concentration=:concentration, creationDate=:creationDate, qcPassed=:qcPassed "
+      + "platformName=:platformName, concentration=:concentration, creationDate=:creationDate, qcPassed=:qcPassed, lastModifier=:lastModifier "
       + "WHERE libraryId=:libraryId";
 
   public static final String LIBRARY_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE libraryId=:libraryId";
 
   public static final String LIBRARIES_SELECT_BY_SAMPLE_ID = "SELECT l.libraryId, l.name, l.description, l.alias, l.accession, l.securityProfile_profileId, l.sample_sampleId, l.identificationBarcode, l.locationBarcode, "
-      + "l.paired, l.libraryType, l.librarySelectionType, l.libraryStrategyType, l.platformName, l.concentration, l.creationDate, l.qcPassed "
+      + "l.paired, l.libraryType, l.librarySelectionType, l.libraryStrategyType, l.platformName, l.concentration, l.creationDate, l.qcPassed, l.lastModifier "
       + "FROM " + TABLE_NAME + " l, Sample s " + "WHERE l.sample_sampleId=s.sampleId " + "AND s.sampleId=?";
 
   public static String LIBRARIES_SELECT_BY_PROJECT_ID = "SELECT li.* FROM Project p "
@@ -151,7 +152,7 @@ public class SQLLibraryDAO implements LibraryStore {
   public static final String LIBRARY_STRATEGY_TYPE_SELECT_BY_NAME = LIBRARY_STRATEGY_TYPES_SELECT + " WHERE name = ?";
 
   public static final String LIBRARIES_BY_RELATED_DILUTION_ID = "SELECT p.library_libraryId, l.libraryId, l.name, l.description, l.alias, l.accession, l.securityProfile_profileId, l.sample_sampleId, l.identificationBarcode, l.locationBarcode, "
-      + "l.paired, l.libraryType, l.librarySelectionType, l.libraryStrategyType, l.platformName, l.concentration, l.creationDate, l.qcPassed "
+      + "l.paired, l.libraryType, l.librarySelectionType, l.libraryStrategyType, l.platformName, l.concentration, l.creationDate, l.qcPassed, l.lastModifier "
       + "FROM " + TABLE_NAME + " l, LibraryDilution p " + "WHERE l.libraryId=p.library_libraryId " + "AND p.dilutionId=?";
 
   public static final String TAG_BARCODES_SELECT = "SELECT tagId, name, sequence, platformName, strategyName " + "FROM TagBarcodes";
@@ -180,6 +181,8 @@ public class SQLLibraryDAO implements LibraryStore {
   private NoteStore noteDAO;
   private CascadeType cascadeType;
   private boolean autoGenerateIdentificationBarcodes;
+  private ChangeLogStore changeLogDAO;
+  private SecurityStore securityDAO;
 
   @Autowired
   private MisoNamingScheme<Library> libraryNamingScheme;
@@ -311,6 +314,7 @@ public class SQLLibraryDAO implements LibraryStore {
     params.addValue("platformName", library.getPlatformName());
     params.addValue("concentration", library.getInitialConcentration());
     params.addValue("creationDate", library.getCreationDate());
+    params.addValue("lastModifier", library.getLastModifier().getUserId());
 
     if (library.getQcPassed() != null) {
       params.addValue("qcPassed", library.getQcPassed().toString());
@@ -652,6 +656,22 @@ public class SQLLibraryDAO implements LibraryStore {
     return template.query(TAG_BARCODES_SELECT, new TagBarcodeMapper());
   }
 
+  public ChangeLogStore getChangeLogDAO() {
+    return changeLogDAO;
+  }
+
+  public void setChangeLogDAO(ChangeLogStore changeLogDAO) {
+    this.changeLogDAO = changeLogDAO;
+  }
+
+  public SecurityStore getSecurityDAO() {
+    return securityDAO;
+  }
+
+  public void setSecurityDAO(SecurityStore securityDAO) {
+    this.securityDAO = securityDAO;
+  }
+
   public class LibraryMapper extends CacheAwareRowMapper<Library> {
     public LibraryMapper() {
       super(Library.class);
@@ -692,6 +712,7 @@ public class SQLLibraryDAO implements LibraryStore {
       }
 
       try {
+        library.setLastModifier(securityDAO.getUserById(rs.getLong("lastModifier")));
         library.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
 
         library.setLibraryType(getLibraryTypeById(rs.getLong("libraryType")));
@@ -715,6 +736,7 @@ public class SQLLibraryDAO implements LibraryStore {
         } else {
           library.setSample(sampleDAO.lazyGet(rs.getLong("sample_sampleId")));
         }
+        library.getChangeLog().addAll(getChangeLogDAO().listAllById(TABLE_NAME, id));
       } catch (IOException e1) {
         e1.printStackTrace();
       } catch (MalformedLibraryQcException e) {

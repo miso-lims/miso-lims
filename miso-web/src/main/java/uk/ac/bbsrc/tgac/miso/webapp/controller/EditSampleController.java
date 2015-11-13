@@ -57,6 +57,7 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSampleQC;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -427,6 +428,11 @@ public class EditSampleController {
     }
   }
 
+  @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
+  public @ResponseBody Collection<ChangeLog> jsonRestChanges() throws IOException {
+    return requestManager.listAllChanges("Sample");
+  }
+
   @RequestMapping(value = "/bulk/dummy", method = RequestMethod.POST)
   public String processSubmit() {
     return null;
@@ -441,6 +447,7 @@ public class EditSampleController {
         throw new SecurityException("Permission denied.");
       }
 
+      sample.setLastModifier(user);
       requestManager.saveSample(sample);
       session.setComplete();
       model.clear();

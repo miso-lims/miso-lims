@@ -105,7 +105,7 @@
           <user>tgaclims</user>
           <password>tgaclims</password>
           <driver>com.mysql.jdbc.Driver</driver>
-          <url>jdbc:mysql://localhost:3306/lims</url>
+          <url>jdbc:mysql://localhost:3306/lims?characterEncoding=UTF-8</url>
         </configuration>
       </plugin>
       <plugin>

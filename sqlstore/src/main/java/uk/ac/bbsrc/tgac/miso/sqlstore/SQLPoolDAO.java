@@ -61,6 +61,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolQcException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ExperimentStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
@@ -221,6 +222,16 @@ public class SQLPoolDAO implements PoolStore {
   private WatcherStore watcherDAO;
   private CascadeType cascadeType;
   private boolean autoGenerateIdentificationBarcodes;
+  private ChangeLogStore changeLogDAO;
+  private SecurityStore securityDAO;
+
+  public ChangeLogStore getChangeLogDAO() {
+    return changeLogDAO;
+  }
+
+  public void setChangeLogDAO(ChangeLogStore changeLogDAO) {
+    this.changeLogDAO = changeLogDAO;
+  }
 
   @Autowired
   private PoolAlertManager poolAlertManager;
@@ -276,6 +287,14 @@ public class SQLPoolDAO implements PoolStore {
 
   public void setSecurityProfileDAO(Store<SecurityProfile> securityProfileDAO) {
     this.securityProfileDAO = securityProfileDAO;
+  }
+
+  public SecurityStore getSecurityDAO() {
+    return securityDAO;
+  }
+
+  public void setSecurityDAO(SecurityStore securityDAO) {
+    this.securityDAO = securityDAO;
   }
 
   public JdbcTemplate getJdbcTemplate() {
@@ -369,6 +388,7 @@ public class SQLPoolDAO implements PoolStore {
     params.addValue("securityProfile_profileId", securityProfileId);
     params.addValue("platformType", pool.getPlatformType().getKey());
     params.addValue("ready", pool.getReadyToRun());
+    params.addValue("lastModifier", pool.getLastModifier().getUserId());
 
     if (pool.getQcPassed() != null) {
       params.addValue("qcPassed", pool.getQcPassed().toString());
@@ -700,6 +720,7 @@ public class SQLPoolDAO implements PoolStore {
             p.addQc(qc);
           }
         }
+        p.getChangeLog().addAll(changeLogDAO.listAllById(TABLE_NAME, id));
       } catch (IOException e1) {
         log.error("Cannot map from database to Pool: ", e1);
         e1.printStackTrace();

@@ -159,4 +159,11 @@ public interface SequencerPartitionContainer<T extends Partition> extends Secura
    * 
    */
   public void addNewPartition();
+
+  public User getLastModifier();
+
+  public void setLastModifier(User lastModifier);
+
+  public Collection<ChangeLog> getChangeLog();
+
 }

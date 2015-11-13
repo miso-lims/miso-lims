@@ -47,6 +47,7 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
@@ -88,6 +89,11 @@ public class EditSequencerPartitionContainerController {
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
+  }
+
+  @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
+  public @ResponseBody Collection<ChangeLog> jsonRestChanges() throws IOException {
+    return requestManager.listAllChanges("SequencerPartitionContainer");
   }
 
   @ModelAttribute("maxLengths")
@@ -143,6 +149,7 @@ public class EditSequencerPartitionContainerController {
         throw new SecurityException("Permission denied.");
       }
 
+      container.setLastModifier(user);
       long containerId = requestManager.saveSequencerPartitionContainer(container);
       session.setComplete();
       model.clear();

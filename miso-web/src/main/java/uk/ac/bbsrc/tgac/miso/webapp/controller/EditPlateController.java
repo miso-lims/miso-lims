@@ -51,6 +51,7 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPlate;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Plate;
 import uk.ac.bbsrc.tgac.miso.core.data.Plateable;
 import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
@@ -134,6 +135,11 @@ public class EditPlateController {
     return requestManager.getPlateById(plateId);
   }
 
+  @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
+  public @ResponseBody Collection<ChangeLog> jsonRestChanges() throws IOException {
+    return requestManager.listAllChanges("Plate");
+  }
+
   @RequestMapping(value = "/{plateId}", method = RequestMethod.GET)
   public ModelAndView setupForm(@PathVariable Long plateId, ModelMap model) throws IOException {
     try {
@@ -204,6 +210,7 @@ public class EditPlateController {
       if (!plate.userCanWrite(user)) {
         throw new SecurityException("Permission denied.");
       }
+      plate.setLastModifier(user);
       requestManager.savePlate(plate);
       session.setComplete();
       model.clear();

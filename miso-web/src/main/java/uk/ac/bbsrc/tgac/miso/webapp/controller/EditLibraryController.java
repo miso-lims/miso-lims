@@ -60,6 +60,7 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibraryQC;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
@@ -382,6 +383,11 @@ public class EditLibraryController {
     }
   }
 
+  @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
+  public @ResponseBody Collection<ChangeLog> jsonRestChanges() throws IOException {
+    return requestManager.listAllChanges("Library");
+  }
+
   public Collection<emPCR> populateEmPcrs(User user, Library library) throws IOException {
     Collection<emPCR> pcrs = new HashSet<emPCR>();
     for (emPCR pcr : requestManager.listAllEmPCRs()) {
@@ -563,6 +569,7 @@ public class EditLibraryController {
       if (!library.userCanWrite(user)) {
         throw new SecurityException("Permission denied.");
       }
+      library.setLastModifier(user);
       requestManager.saveLibrary(library);
       session.setComplete();
       model.clear();

@@ -90,8 +90,10 @@ public abstract class AbstractLibrary implements Library {
   private Integer libraryQuant;
   private String alias;
   private Boolean qcPassed;
+  private User lastModifier;
 
   private Collection<Note> notes = new HashSet<Note>();
+  private final Collection<ChangeLog> changeLog = new ArrayList<ChangeLog>();
 
   private Date lastUpdated;
 
@@ -469,5 +471,18 @@ public abstract class AbstractLibrary implements Library {
     sb.append(getDescription());
     sb.append(" : ");
     return sb.toString();
+  }
+
+  public User getLastModifier() {
+    return lastModifier;
+  }
+
+  public void setLastModifier(User lastModifier) {
+    this.lastModifier = lastModifier;
+  }
+
+  @Override
+  public Collection<ChangeLog> getChangeLog() {
+    return changeLog;
   }
 }

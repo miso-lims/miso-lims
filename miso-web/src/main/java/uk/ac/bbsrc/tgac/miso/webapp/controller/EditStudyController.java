@@ -49,6 +49,7 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractStudy;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
@@ -100,6 +101,11 @@ public class EditStudyController {
       }
       throw ex;
     }
+  }
+
+  @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
+  public @ResponseBody Collection<ChangeLog> jsonRestChanges() throws IOException {
+    return requestManager.listAllChanges("Study");
   }
 
   @ModelAttribute("maxLengths")
@@ -201,6 +207,7 @@ public class EditStudyController {
       if (!study.userCanWrite(user)) {
         throw new SecurityException("Permission denied.");
       }
+      study.setLastModifier(user);
       requestManager.saveStudy(study);
       session.setComplete();
       model.clear();

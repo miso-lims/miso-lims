@@ -54,6 +54,7 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
@@ -233,6 +234,11 @@ public class EditRunController {
     return requestManager.getRunById(runId);
   }
 
+  @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
+  public @ResponseBody Collection<ChangeLog> jsonRestChanges() throws IOException {
+    return requestManager.listAllChanges("Run");
+  }
+
   @RequestMapping(value = "/{runId}", method = RequestMethod.GET)
   public ModelAndView setupForm(@PathVariable Long runId, ModelMap model) throws IOException {
     try {
@@ -314,6 +320,7 @@ public class EditRunController {
         throw new SecurityException("Permission denied.");
       }
 
+      run.setLastModifier(user);
       requestManager.saveRun(run);
       session.setComplete();
       model.clear();

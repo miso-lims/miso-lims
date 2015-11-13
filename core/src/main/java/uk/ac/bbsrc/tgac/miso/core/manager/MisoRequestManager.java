@@ -163,6 +163,8 @@ public class MisoRequestManager implements RequestManager {
   private StudyStore studyStore;
   @Autowired
   private Store<Submission> submissionStore;
+  @Autowired
+  private ChangeLogStore changeLogStore;
 
   public void setAlertStore(AlertStore alertStore) {
     this.alertStore = alertStore;
@@ -2394,5 +2396,18 @@ public class MisoRequestManager implements RequestManager {
     } else {
       throw new IOException("No entityGroupStore available. Check that it has been declared in the Spring config.");
     }
+  }
+
+  @Override
+  public Collection<ChangeLog> listAllChanges(String type) throws IOException {
+    return changeLogStore.listAll(type);
+  }
+
+  public ChangeLogStore getChangeLogStore() {
+    return changeLogStore;
+  }
+
+  public void setChangeLogStore(ChangeLogStore changeLogStore) {
+    this.changeLogStore = changeLogStore;
   }
 }

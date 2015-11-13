@@ -52,6 +52,7 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractExperiment;
+import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
@@ -130,6 +131,11 @@ public class EditExperimentController {
   @RequestMapping(value = "/rest/{experimentId}", method = RequestMethod.GET)
   public @ResponseBody Experiment jsonRest(@PathVariable Long experimentId) throws IOException {
     return requestManager.getExperimentById(experimentId);
+  }
+
+  @RequestMapping(value = "/rest/changes", method = RequestMethod.GET)
+  public @ResponseBody Collection<ChangeLog> jsonRestChanges() throws IOException {
+    return requestManager.listAllChanges("Experiment");
   }
 
   @RequestMapping(value = "/{experimentId}", method = RequestMethod.GET)
@@ -229,6 +235,7 @@ public class EditExperimentController {
       if (!experiment.userCanWrite(user)) {
         throw new SecurityException("Permission denied.");
       }
+      experiment.setLastModifier(user);
       requestManager.saveExperiment(experiment);
       session.setComplete();
       model.clear();

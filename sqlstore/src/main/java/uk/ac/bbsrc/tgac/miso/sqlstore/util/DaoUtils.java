@@ -33,6 +33,7 @@ import org.springframework.jdbc.support.lob.DefaultLobHandler;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoRequestManager;
+import uk.ac.bbsrc.tgac.miso.sqlstore.SQLChangeLogDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLEmPCRDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLEmPCRDilutionDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLExperimentDAO;
@@ -91,6 +92,7 @@ public class DaoUtils {
     SQLStudyDAO studyDAO;
     SQLTgacSubmissionDAO submissionDAO;
     SQLKitDAO kitDAO;
+    SQLChangeLogDAO changeLogDAO;
 
     DataObjectFactory dataObjectFactory = new TgacDataObjectFactory();
 
@@ -119,6 +121,9 @@ public class DaoUtils {
     statusDAO = new SQLStatusDAO();
     studyDAO = new SQLStudyDAO();
     submissionDAO = new SQLTgacSubmissionDAO();
+    changeLogDAO = new SQLChangeLogDAO();
+
+    changeLogDAO.setJdbcTemplate(jt);
 
     lsm.setSecurityStore(securityDAO);
 
@@ -216,6 +221,7 @@ public class DaoUtils {
     runDAO.setDataObjectFactory(dataObjectFactory);
 
     sampleDAO.setJdbcTemplate(jt);
+    sampleDAO.setChangeLogDAO(changeLogDAO);
     sampleDAO.setSecurityProfileDAO(securityProfileDAO);
     sampleDAO.setNoteDAO(noteDAO);
     sampleDAO.setLibraryDAO(libraryDAO);
@@ -273,6 +279,7 @@ public class DaoUtils {
     requestManager.setSecurityProfileStore(securityProfileDAO);
     requestManager.setStatusStore(statusDAO);
     requestManager.setStudyStore(studyDAO);
+    requestManager.setChangeLogStore(changeLogDAO);
   }
 
   public static <T extends LocalSecurityManager> void wireLocalSecurityManager(T securityManager, JdbcTemplate jt) throws SQLException {
