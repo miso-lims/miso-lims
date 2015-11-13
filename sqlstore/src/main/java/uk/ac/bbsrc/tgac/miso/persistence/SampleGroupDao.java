@@ -6,13 +6,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleGroupId;
 
 public interface SampleGroupDao {
 
-  List<SampleGroupId> getSampleGroupId();
+  List<SampleGroupId> getSampleGroups();
 
-  SampleGroupId getSampleGroupId(Long id);
+  SampleGroupId getSampleGroup(Long id);
 
-  Long addSampleGroupId(SampleGroupId sampleGroup);
+  Long addSampleGroup(SampleGroupId sampleGroup);
 
-  void deleteSampleGroupId(SampleGroupId sampleGroup);
+  void deleteSampleGroup(SampleGroupId sampleGroup);
 
   void update(SampleGroupId sampleGroup);
 

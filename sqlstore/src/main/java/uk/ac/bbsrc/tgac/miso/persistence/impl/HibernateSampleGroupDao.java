@@ -30,7 +30,7 @@ public class HibernateSampleGroupDao implements SampleGroupDao {
   }
 
   @Override
-  public List<SampleGroupId> getSampleGroupId() {
+  public List<SampleGroupId> getSampleGroups() {
     Query query = currentSession().createQuery("from SampleGroupIdImpl");
     @SuppressWarnings("unchecked")
     List<SampleGroupId> records = query.list();
@@ -38,12 +38,12 @@ public class HibernateSampleGroupDao implements SampleGroupDao {
   }
 
   @Override
-  public SampleGroupId getSampleGroupId(Long id) {
+  public SampleGroupId getSampleGroup(Long id) {
     return (SampleGroupId) currentSession().get(SampleGroupImpl.class, id);
   }
 
   @Override
-  public Long addSampleGroupId(SampleGroupId sampleGroup) {
+  public Long addSampleGroup(SampleGroupId sampleGroup) {
     Date now = new Date();
     sampleGroup.setCreationDate(now);
     sampleGroup.setLastUpdated(now);
@@ -51,7 +51,7 @@ public class HibernateSampleGroupDao implements SampleGroupDao {
   }
 
   @Override
-  public void deleteSampleGroupId(SampleGroupId sampleGroup) {
+  public void deleteSampleGroup(SampleGroupId sampleGroup) {
     currentSession().delete(sampleGroup);
 
   }

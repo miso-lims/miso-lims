@@ -9,14 +9,22 @@ import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.QcPassedDetail;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleAnalyte;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleGroupId;
+import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
+import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.QcPassedDetailImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAdditionalInfoImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAnalyteImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleGroupImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 
@@ -188,6 +196,112 @@ public class Dtos {
     SampleAdditionalInfo to = new SampleAdditionalInfoImpl();
     to.setPassageNumber(from.getPassageNumber());
     to.setTimesReceived(from.getTimesReceived());
+    return to;
+  }
+
+  public static TissueMaterialDto asDto(TissueMaterial from) {
+    TissueMaterialDto dto = new TissueMaterialDto();
+    dto.setId(from.getTissueMaterialId());
+    dto.setAlias(from.getAlias());
+    dto.setDescription(from.getDescription());
+    dto.setCreatedById(from.getCreatedBy().getUserId());
+    dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
+    dto.setUpdatedById(from.getUpdatedBy().getUserId());
+    dto.setLastUpdated(dateTimeFormatter.print(from.getLastUpdated().getTime()));
+    return dto;
+  }
+
+  public static Set<TissueMaterialDto> asTissueMaterialDtos(Set<TissueMaterial> from) {
+    Set<TissueMaterialDto> dtoSet = Sets.newHashSet();
+    for (TissueMaterial tissueMaterial : from) {
+      dtoSet.add(asDto(tissueMaterial));
+    }
+    return dtoSet;
+  }
+
+  public static TissueMaterial to(TissueMaterialDto from) {
+    TissueMaterial to = new TissueMaterialImpl();
+    to.setAlias(from.getAlias());
+    to.setDescription(from.getDescription());
+    return to;
+  }
+
+  public static SamplePurposeDto asDto(SamplePurpose from) {
+    SamplePurposeDto dto = new SamplePurposeDto();
+    dto.setId(from.getSamplePurposeId());
+    dto.setAlias(from.getAlias());
+    dto.setDescription(from.getDescription());
+    dto.setCreatedById(from.getCreatedBy().getUserId());
+    dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
+    dto.setUpdatedById(from.getUpdatedBy().getUserId());
+    dto.setLastUpdated(dateTimeFormatter.print(from.getLastUpdated().getTime()));
+    return dto;
+  }
+
+  public static Set<SamplePurposeDto> asSamplePurposeDtos(Set<SamplePurpose> from) {
+    Set<SamplePurposeDto> dtoSet = Sets.newHashSet();
+    for (SamplePurpose samplePurpose : from) {
+      dtoSet.add(asDto(samplePurpose));
+    }
+    return dtoSet;
+  }
+
+  public static SamplePurpose to(SamplePurposeDto from) {
+    SamplePurpose to = new SamplePurposeImpl();
+    to.setAlias(from.getAlias());
+    to.setDescription(from.getDescription());
+    return to;
+  }
+
+  public static SampleGroupDto asDto(SampleGroupId from) {
+    SampleGroupDto dto = new SampleGroupDto();
+    dto.setId(from.getSampleGroupId());
+    dto.setGroupId(from.getGroupId());
+    dto.setDescription(from.getDescription());
+    dto.setCreatedById(from.getCreatedBy().getUserId());
+    dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
+    dto.setUpdatedById(from.getUpdatedBy().getUserId());
+    dto.setLastUpdated(dateTimeFormatter.print(from.getLastUpdated().getTime()));
+    return dto;
+  }
+
+  public static Set<SampleGroupDto> asSampleGroupDtos(Set<SampleGroupId> from) {
+    Set<SampleGroupDto> dtoSet = Sets.newHashSet();
+    for (SampleGroupId samplePurpose : from) {
+      dtoSet.add(asDto(samplePurpose));
+    }
+    return dtoSet;
+  }
+
+  public static SampleGroupId to(SampleGroupDto from) {
+    SampleGroupId to = new SampleGroupImpl();
+    to.setGroupId(from.getGroupId());
+    to.setDescription(from.getDescription());
+    return to;
+  }
+
+  public static SampleAnalyteDto asDto(SampleAnalyte from) {
+    SampleAnalyteDto dto = new SampleAnalyteDto();
+    dto.setId(from.getSampleAnalyteId());
+    dto.setRegion(from.getRegion());
+    dto.setCreatedById(from.getCreatedBy().getUserId());
+    dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
+    dto.setUpdatedById(from.getUpdatedBy().getUserId());
+    dto.setLastUpdated(dateTimeFormatter.print(from.getLastUpdated().getTime()));
+    return dto;
+  }
+
+  public static Set<SampleAnalyteDto> asSampleAnalyteDtos(Set<SampleAnalyte> from) {
+    Set<SampleAnalyteDto> dtoSet = Sets.newHashSet();
+    for (SampleAnalyte sampleAnalyte : from) {
+      dtoSet.add(asDto(sampleAnalyte));
+    }
+    return dtoSet;
+  }
+
+  public static SampleAnalyte to(SampleAnalyteDto from) {
+    SampleAnalyte to = new SampleAnalyteImpl();
+    to.setRegion(from.getRegion());
     return to;
   }
 

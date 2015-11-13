@@ -106,7 +106,6 @@
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.Run" value-ref="runStore" />
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.RunQC" value-ref="runQcStore" />
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.Sample" value-ref="sampleStore" />
-        <entry key="uk.ac.bbsrc.tgac.miso.core.data.SampleAnalyte" value-ref="sampleAnalyteStore"/>
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.SampleQC" value-ref="sampleQcStore" />
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer" value-ref="sequencerPartitionContainerStore" />
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.SequencerReference" value-ref="sequencerReferenceStore" />
@@ -302,11 +301,6 @@
   <bean id="sqlNoteDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLNoteDAO">
     <property name="securityDAO" ref="sqlSecurityDAO" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
-  </bean>
-
-  <bean id="sqlSampleAnalyteDAO"
-        class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLSampleAnalyteDAO">
-    <property name="jdbcTemplate" ref="interfaceTemplate"/>
   </bean>
 
   <bean id="sqlPlatformDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLPlatformDAO">
@@ -595,18 +589,6 @@
     </property>
   </bean>
   
-  <bean name="sampleAnalyteStore" class="org.springframework.aop.framework.ProxyFactoryBean">
-    <property name="proxyInterfaces">
-      <value>uk.ac.bbsrc.tgac.miso.core.store.SampleAnalyteStore</value>
-    </property>
-    <property name="interceptorNames">
-      <list>
-        <value>sqlSampleAnalyteDAO</value>
-      </list>
-    </property>
-  </bean>
-  
-
   <bean name="poolStore" class="org.springframework.aop.framework.ProxyFactoryBean">
     <property name="proxyInterfaces">
       <value>uk.ac.bbsrc.tgac.miso.core.store.PoolStore</value>
