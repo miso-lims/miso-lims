@@ -23,7 +23,12 @@
 
 package uk.ac.bbsrc.tgac.miso.notification.demo.client;
 
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,16 +39,14 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.NotificationGatewayService;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.strategy.NotificationGateway;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Map;
 
 /**
  * A message consumer that will listen for messages and pass them on to respective handlers. This is a REST-aware controller, which means

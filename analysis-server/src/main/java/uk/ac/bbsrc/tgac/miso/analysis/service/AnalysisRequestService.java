@@ -23,12 +23,11 @@
 
 package uk.ac.bbsrc.tgac.miso.analysis.service;
 
-import net.sf.json.JSONObject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.analysis.manager.AnalysisRequestManager;
 import uk.ac.bbsrc.tgac.miso.analysis.submission.PipelineRequest;
 import uk.ac.bbsrc.tgac.miso.analysis.submission.TaskSubmissionRequest;

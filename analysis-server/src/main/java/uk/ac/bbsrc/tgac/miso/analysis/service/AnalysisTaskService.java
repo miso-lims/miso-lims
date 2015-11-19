@@ -23,13 +23,13 @@
 
 package uk.ac.bbsrc.tgac.miso.analysis.service;
 
+import java.util.Map;
+
 import uk.ac.bbsrc.tgac.miso.analysis.parameter.Optionable;
 import uk.ac.ebi.fgpt.conan.model.ConanParameter;
 import uk.ac.ebi.fgpt.conan.model.ConanProcess;
 import uk.ac.ebi.fgpt.conan.service.DefaultTaskService;
 import uk.ac.ebi.fgpt.conan.service.exception.MissingRequiredParameterException;
-
-import java.util.Map;
 
 /**
  * uk.ac.bbsrc.tgac.miso.analysis.service

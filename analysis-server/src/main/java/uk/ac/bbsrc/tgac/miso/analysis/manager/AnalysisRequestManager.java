@@ -23,13 +23,20 @@
 
 package uk.ac.bbsrc.tgac.miso.analysis.manager;
 
-import net.sf.json.JSONObject;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.analysis.submission.PipelineRequest;
 import uk.ac.bbsrc.tgac.miso.analysis.submission.TaskSubmissionRequest;
 import uk.ac.ebi.fgpt.conan.dao.ConanPipelineDAO;
@@ -37,16 +44,14 @@ import uk.ac.ebi.fgpt.conan.dao.XMLLoadingPipelineDAO;
 import uk.ac.ebi.fgpt.conan.model.ConanPipeline;
 import uk.ac.ebi.fgpt.conan.model.ConanProcess;
 import uk.ac.ebi.fgpt.conan.model.ConanTask;
-
 import uk.ac.ebi.fgpt.conan.model.ConanUser;
-import uk.ac.ebi.fgpt.conan.service.*;
+import uk.ac.ebi.fgpt.conan.service.ConanPipelineService;
+import uk.ac.ebi.fgpt.conan.service.ConanProcessService;
+import uk.ac.ebi.fgpt.conan.service.ConanSubmissionService;
+import uk.ac.ebi.fgpt.conan.service.ConanTaskService;
+import uk.ac.ebi.fgpt.conan.service.ConanUserService;
+import uk.ac.ebi.fgpt.conan.service.DefaultPipelineService;
 import uk.ac.ebi.fgpt.conan.service.exception.SubmissionException;
-
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * uk.ac.bbsrc.tgac.miso.analysis.manager

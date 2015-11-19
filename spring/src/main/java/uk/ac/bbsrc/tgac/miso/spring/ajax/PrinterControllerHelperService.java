@@ -37,15 +37,17 @@ import java.util.Set;
 
 import javax.servlet.http.HttpSession;
 
-import net.sf.json.JSONObject;
-import net.sourceforge.fluxion.ajax.Ajaxified;
-import net.sourceforge.fluxion.ajax.util.JSONUtils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
+import net.sf.json.JSONObject;
+import net.sourceforge.fluxion.ajax.Ajaxified;
+import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.PrintJob;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoPrintException;
@@ -57,9 +59,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.schema.BarcodableSchema;
 import uk.ac.bbsrc.tgac.miso.core.util.PrintServiceUtils;
-
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax

@@ -23,9 +23,15 @@
 
 package uk.ac.bbsrc.tgac.miso.analysis.dao;
 
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.Date;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
+
 import uk.ac.bbsrc.tgac.miso.analysis.parameter.Optionable;
 import uk.ac.bbsrc.tgac.miso.analysis.parameter.Transientable;
 import uk.ac.ebi.fgpt.conan.dao.DatabaseConanTaskDAO;
@@ -34,10 +40,6 @@ import uk.ac.ebi.fgpt.conan.model.ConanPipeline;
 import uk.ac.ebi.fgpt.conan.model.ConanProcessRun;
 import uk.ac.ebi.fgpt.conan.model.ConanTask;
 
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.Date;
-import java.util.Map;
 
 /**
  * uk.ac.bbsrc.tgac.miso.analysis

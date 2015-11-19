@@ -25,30 +25,57 @@ package uk.ac.bbsrc.tgac.miso.sqlstore.util;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
-import org.apache.poi.ss.usermodel.Row;
-import uk.ac.bbsrc.tgac.miso.core.data.Project;
-import com.eaglegenomics.simlims.core.SecurityProfile;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaRun;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.manager.MisoRequestManager;
-import com.eaglegenomics.simlims.core.manager.LocalSecurityManager;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.xssf.usermodel.*;
-import uk.ac.bbsrc.tgac.miso.core.data.*;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.*;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ls454.LS454Run;
-import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.manager.LocalSecurityManager;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
+import uk.ac.bbsrc.tgac.miso.core.data.Platform;
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
+import uk.ac.bbsrc.tgac.miso.core.data.Study;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryQCImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PoolImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleQCImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.StudyImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCR;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaRun;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ls454.LS454Run;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
+import uk.ac.bbsrc.tgac.miso.core.manager.MisoRequestManager;
 
 /**
  * Created by IntelliJ IDEA. User: bian Date: 10-Jun-2010 Time: 10:14:21 read excel 2007+ file

@@ -25,34 +25,64 @@ package uk.ac.bbsrc.tgac.miso.spring;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.Group;
-import com.eaglegenomics.simlims.core.Activity;
-import com.eaglegenomics.simlims.core.Protocol;
-import com.eaglegenomics.simlims.core.SecurityProfile;
-import com.eaglegenomics.simlims.core.manager.ProtocolManager;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.propertyeditors.*;
-import org.springframework.util.NumberUtils;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.support.WebBindingInitializer;
-import org.springframework.web.context.request.WebRequest;
-import uk.ac.bbsrc.tgac.miso.core.data.*;
-import uk.ac.bbsrc.tgac.miso.core.data.Project;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.*;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
-import uk.ac.bbsrc.tgac.miso.core.data.type.*;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-
 import java.beans.PropertyEditorSupport;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.propertyeditors.CustomBooleanEditor;
+import org.springframework.beans.propertyeditors.CustomCollectionEditor;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.beans.propertyeditors.CustomMapEditor;
+import org.springframework.beans.propertyeditors.CustomNumberEditor;
+import org.springframework.util.NumberUtils;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.support.WebBindingInitializer;
+import org.springframework.web.context.request.WebRequest;
+
+import com.eaglegenomics.simlims.core.Activity;
+import com.eaglegenomics.simlims.core.Group;
+import com.eaglegenomics.simlims.core.Protocol;
+import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.ProtocolManager;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
+import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Kit;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.Platform;
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
+import uk.ac.bbsrc.tgac.miso.core.data.Status;
+import uk.ac.bbsrc.tgac.miso.core.data.Study;
+import uk.ac.bbsrc.tgac.miso.core.data.Submittable;
+import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
+import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryStrategyType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+
 
 /**
  * Class that binds all the MISO model datatypes to the Spring form path types

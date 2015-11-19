@@ -23,11 +23,14 @@
 
 package uk.ac.bbsrc.tgac.miso.notification.util;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
-
-import java.util.*;
 
 /**
  * A handy class that exposes property placeholders discovered at init time by a PropertyPlaceholderConfigurer.

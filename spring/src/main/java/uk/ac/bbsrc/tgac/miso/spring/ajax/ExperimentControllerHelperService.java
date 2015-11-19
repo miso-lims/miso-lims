@@ -25,21 +25,6 @@ package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import net.sourceforge.fluxion.ajax.Ajaxified;
-import net.sourceforge.fluxion.ajax.util.JSONUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
-import uk.ac.bbsrc.tgac.miso.core.data.Kit;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.*;
-import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
@@ -47,6 +32,28 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.servlet.http.HttpSession;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import net.sourceforge.fluxion.ajax.Ajaxified;
+import net.sourceforge.fluxion.ajax.util.JSONUtils;
+import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Kit;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.ClusterKit;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.EmPcrKit;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.LibraryKit;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.SequencingKit;
+import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
+import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax

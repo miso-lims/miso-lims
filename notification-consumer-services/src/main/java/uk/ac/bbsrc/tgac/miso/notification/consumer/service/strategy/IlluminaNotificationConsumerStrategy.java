@@ -23,17 +23,18 @@
 
 package uk.ac.bbsrc.tgac.miso.notification.consumer.service.strategy;
 
-import net.sourceforge.fluxion.spi.ServiceProvider;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.integration.Message;
+
+import net.sourceforge.fluxion.spi.ServiceProvider;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
-import uk.ac.bbsrc.tgac.miso.notification.consumer.service.mechanism.IlluminaNotificationMessageConsumerMechanism;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.strategy.NotificationConsumerStrategy;
-
-import java.util.List;
-import java.util.Map;
+import uk.ac.bbsrc.tgac.miso.notification.consumer.service.mechanism.IlluminaNotificationMessageConsumerMechanism;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.service.integration.strategy.impl

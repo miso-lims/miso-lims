@@ -23,14 +23,15 @@
 
 package uk.ac.bbsrc.tgac.miso.analysis.util;
 
-import net.sf.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import uk.ac.bbsrc.tgac.miso.analysis.exception.InvalidRequestParameterException;
-import uk.ac.bbsrc.tgac.miso.analysis.submission.TaskSubmissionRequest;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import net.sf.json.JSONObject;
+import uk.ac.bbsrc.tgac.miso.analysis.exception.InvalidRequestParameterException;
+import uk.ac.bbsrc.tgac.miso.analysis.submission.TaskSubmissionRequest;
 
 /**
  * uk.ac.bbsrc.tgac.miso.analysis.util

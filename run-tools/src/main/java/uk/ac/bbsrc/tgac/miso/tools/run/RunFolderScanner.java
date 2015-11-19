@@ -23,16 +23,16 @@
 
 package uk.ac.bbsrc.tgac.miso.tools.run;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.springframework.integration.file.DefaultDirectoryScanner;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.integration.file.DefaultDirectoryScanner;
 
 /**
  * uk.ac.bbsrc.tgac.miso.tools.run

@@ -221,7 +221,6 @@ public class AnalysisController {
    */
   @RequestMapping(value = "/analysis/tasks", method = RequestMethod.GET, params = "pending")
   public @ResponseBody List<ConanTask<? extends ConanPipeline>> getPendingTasks() {
-
     return null;
   }
 

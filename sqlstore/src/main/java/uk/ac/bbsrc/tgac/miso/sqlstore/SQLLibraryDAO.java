@@ -695,7 +695,7 @@ public class SQLLibraryDAO implements LibraryStore {
                if (library.getId() == 0) {
                   DbUtils.updateCaches(lookupCache(cacheManager), id);
                } else {
-          return (Library) element.getObjectValue();
+                  return (Library) element.getObjectValue();
                }
         }
       }

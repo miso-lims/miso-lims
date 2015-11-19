@@ -1,13 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
-import com.eaglegenomics.simlims.core.Group;
-import com.eaglegenomics.simlims.core.User;
-
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.eaglegenomics.simlims.core.Group;
+import com.eaglegenomics.simlims.core.User;
 
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore

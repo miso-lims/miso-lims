@@ -1,6 +1,9 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.util.Date;
 import java.util.Set;
+
+import com.eaglegenomics.simlims.core.User;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.data

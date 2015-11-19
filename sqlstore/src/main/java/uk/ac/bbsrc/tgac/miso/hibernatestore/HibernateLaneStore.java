@@ -23,13 +23,14 @@
 
 package uk.ac.bbsrc.tgac.miso.hibernatestore;
 
-import uk.ac.bbsrc.tgac.miso.core.store.Store;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
-import org.springframework.transaction.annotation.Transactional;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.Lane;
-
 import java.io.IOException;
 import java.util.Collection;
+
+import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.transaction.annotation.Transactional;
+
+import uk.ac.bbsrc.tgac.miso.core.data.impl.Lane;
+import uk.ac.bbsrc.tgac.miso.core.store.Store;
 
 /**
  * com.eaglegenomics.miso.hibernatestore

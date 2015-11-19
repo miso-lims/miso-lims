@@ -44,14 +44,6 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import nki.core.MetrixContainer;
-import nki.decorators.MetrixContainerDecorator;
-import nki.objects.Summary;
-import nki.parsers.illumina.ExtractionMetrics;
-import nki.parsers.xml.RunInfoHandler;
-
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,6 +56,13 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import nki.core.MetrixContainer;
+import nki.decorators.MetrixContainerDecorator;
+import nki.objects.Summary;
+import nki.parsers.illumina.ExtractionMetrics;
+import nki.parsers.xml.RunInfoHandler;
 import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
 import uk.ac.bbsrc.tgac.miso.notification.util.NotificationUtils;
 import uk.ac.bbsrc.tgac.miso.notification.util.PossiblyGzippedFileUtils;

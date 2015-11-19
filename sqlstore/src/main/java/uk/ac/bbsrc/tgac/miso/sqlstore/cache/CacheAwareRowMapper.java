@@ -1,9 +1,10 @@
 package uk.ac.bbsrc.tgac.miso.sqlstore.cache;
 
+import org.springframework.jdbc.core.RowMapper;
+
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheException;
 import net.sf.ehcache.CacheManager;
-import org.springframework.jdbc.core.RowMapper;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**

@@ -23,16 +23,17 @@
 
 package uk.ac.bbsrc.tgac.miso.task.demo;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import uk.ac.ebi.fgpt.conan.model.ConanParameter;
-import uk.ac.ebi.fgpt.conan.model.ConanProcess;
-import uk.ac.ebi.fgpt.conan.service.exception.ProcessExecutionException;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import uk.ac.ebi.fgpt.conan.model.ConanParameter;
+import uk.ac.ebi.fgpt.conan.model.ConanProcess;
+import uk.ac.ebi.fgpt.conan.service.exception.ProcessExecutionException;
 
 /**
  * uk.ac.bbsrc.tgac.miso.task.lsf

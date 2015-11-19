@@ -23,22 +23,28 @@
 
 package uk.ac.bbsrc.tgac.miso.notification.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.batch.core.configuration.DuplicateJobException;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
-import org.springframework.integration.Message;
-import uk.ac.bbsrc.tgac.miso.notification.core.batch.JobLaunchRequest;
-import uk.ac.bbsrc.tgac.miso.notification.util.NotificationUtils;
-
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import org.springframework.batch.core.configuration.DuplicateJobException;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.integration.Message;
+
+import uk.ac.bbsrc.tgac.miso.notification.core.batch.JobLaunchRequest;
+import uk.ac.bbsrc.tgac.miso.notification.util.NotificationUtils;
 
 /**
  * uk.ac.bbsrc.tgac.miso.notification.handler

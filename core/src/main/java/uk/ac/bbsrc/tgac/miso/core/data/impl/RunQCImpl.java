@@ -31,7 +31,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.AbstractRunQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunException;
 
-
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.impl
  * <p/>

@@ -23,7 +23,18 @@
 
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
-import com.eaglegenomics.simlims.core.manager.LocalSecurityManager;
+import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+
+import javax.persistence.CascadeType;
+import javax.sql.DataSource;
+
 import org.dbunit.DatabaseTestCase;
 import org.dbunit.JdbcDatabaseTester;
 import org.dbunit.database.DatabaseConfig;
@@ -41,6 +52,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.support.lob.DefaultLobHandler;
 import org.springframework.jdbc.support.lob.LobHandler;
+
+import com.eaglegenomics.simlims.core.manager.LocalSecurityManager;
+
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.BarcodePrintManager;
@@ -49,17 +63,6 @@ import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintContextResolverServi
 import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DaoLookup;
-
-import javax.persistence.CascadeType;
-import javax.sql.DataSource;
-import java.io.InputStream;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
 
 /**
  * Set up an in memory (hypersonic) database, and creating a DBUnit environment for testing DAO methods.

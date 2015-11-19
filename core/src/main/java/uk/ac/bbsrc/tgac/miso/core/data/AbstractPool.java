@@ -35,14 +35,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
-
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
-
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
 import uk.ac.bbsrc.tgac.miso.core.event.model.PoolEvent;
 import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
@@ -52,6 +49,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolQcException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import uk.ac.bbsrc.tgac.miso.core.util.jackson.PooledElementDeserializer;
+
 
 /**
  * Skeleton implementation of a Pool
@@ -89,7 +87,6 @@ public abstract class AbstractPool<P extends Poolable> implements Pool<P> {
   // listeners
   private Set<MisoListener> listeners = new HashSet<MisoListener>();
   private Set<User> watchers = new HashSet<User>();
-
   private final Collection<ChangeLog> changeLog = new ArrayList<ChangeLog>();
   private User lastModifier;
 

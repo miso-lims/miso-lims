@@ -1,9 +1,17 @@
 package uk.ac.bbsrc.tgac.miso.core.service.naming;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.springframework.util.NumberUtils;
+
+import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
+import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**
  * This enum represents the set of prefixes for MISO objects, used in naming schemes

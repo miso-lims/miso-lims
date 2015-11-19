@@ -23,14 +23,15 @@
 
 package uk.ac.bbsrc.tgac.miso.spring.ajax.logging;
 
-import net.sf.json.JSONObject;
-import net.sourceforge.fluxion.ajax.Ajaxified;
+import javax.servlet.http.HttpSession;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
-import uk.ac.bbsrc.tgac.miso.core.logging.LoggedAction;
 
-import javax.servlet.http.HttpSession;
+import net.sf.json.JSONObject;
+import net.sourceforge.fluxion.ajax.Ajaxified;
+import uk.ac.bbsrc.tgac.miso.core.logging.LoggedAction;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax.logging

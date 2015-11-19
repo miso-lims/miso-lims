@@ -23,22 +23,23 @@
 
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
+import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.store.PlatformStore;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 
-import java.io.IOException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
+import uk.ac.bbsrc.tgac.miso.core.data.Platform;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.PlatformImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
+import uk.ac.bbsrc.tgac.miso.core.store.PlatformStore;
 
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore

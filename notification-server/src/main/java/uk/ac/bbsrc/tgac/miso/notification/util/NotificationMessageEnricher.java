@@ -23,15 +23,15 @@
 
 package uk.ac.bbsrc.tgac.miso.notification.util;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.integration.Message;
 import org.springframework.integration.MessagingException;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.integration.transformer.HeaderEnricher;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * uk.ac.bbsrc.tgac.miso.notification.util

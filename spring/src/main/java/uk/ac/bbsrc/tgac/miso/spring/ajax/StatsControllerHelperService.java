@@ -23,13 +23,19 @@
 
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-import net.sf.json.JSONObject;
-import net.sourceforge.fluxion.ajax.Ajaxified;
-import net.sourceforge.fluxion.ajax.util.JSONUtils;
+import java.io.IOException;
+
+import javax.servlet.http.HttpSession;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
+import net.sf.json.JSONObject;
+import net.sourceforge.fluxion.ajax.Ajaxified;
+import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
@@ -37,9 +43,6 @@ import uk.ac.bbsrc.tgac.miso.integration.NotificationQueryService;
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationException;
 import uk.ac.bbsrc.tgac.miso.runstats.client.RunStatsException;
 import uk.ac.bbsrc.tgac.miso.runstats.client.manager.RunStatsManager;
-
-import javax.servlet.http.HttpSession;
-import java.io.IOException;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax

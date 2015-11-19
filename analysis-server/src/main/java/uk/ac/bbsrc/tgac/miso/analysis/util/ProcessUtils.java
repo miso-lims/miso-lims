@@ -25,12 +25,12 @@ package uk.ac.bbsrc.tgac.miso.analysis.util;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
+import java.util.Map;
+
 import net.sf.json.JSONObject;
 import uk.ac.ebi.fgpt.conan.model.ConanParameter;
 import uk.ac.ebi.fgpt.conan.model.ConanProcess;
 import uk.ac.ebi.fgpt.conan.service.exception.MissingRequiredParameterException;
-
-import java.util.Map;
 
 /**
  * uk.ac.bbsrc.tgac.miso.analysis.util

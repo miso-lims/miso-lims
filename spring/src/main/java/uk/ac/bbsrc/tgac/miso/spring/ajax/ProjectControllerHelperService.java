@@ -51,8 +51,6 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;

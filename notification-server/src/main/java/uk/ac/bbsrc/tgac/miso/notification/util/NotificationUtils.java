@@ -23,16 +23,22 @@
 
 package uk.ac.bbsrc.tgac.miso.notification.util;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.integration.Message;
 import org.springframework.integration.MessageHeaders;
 import org.springframework.integration.support.MessageBuilder;
-import uk.ac.bbsrc.tgac.miso.integration.util.SignatureHelper;
 
-import java.util.*;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import uk.ac.bbsrc.tgac.miso.integration.util.SignatureHelper;
 
 /**
  * uk.ac.bbsrc.tgac.miso.notification.util

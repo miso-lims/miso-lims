@@ -25,12 +25,25 @@ package uk.ac.bbsrc.tgac.miso.notification.service;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.integration.Message;
 import org.w3c.dom.Document;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.ws.solid.RunArray;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.ws.solid.SolidService;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.ws.solid.SolidServiceWrapper;
@@ -38,16 +51,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.UnicodeReader;
 import uk.ac.bbsrc.tgac.miso.integration.context.ApplicationContextProvider;
 import uk.ac.bbsrc.tgac.miso.tools.run.util.FileSetTransformer;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * uk.ac.bbsrc.tgac.miso.notification.util
