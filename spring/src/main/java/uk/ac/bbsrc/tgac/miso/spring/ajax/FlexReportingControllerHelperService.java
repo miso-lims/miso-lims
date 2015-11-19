@@ -45,6 +45,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import com.google.json.JsonSanitizer;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -235,9 +236,8 @@ public class FlexReportingControllerHelperService {
   public JSONArray buildProjectReport(List<Project> projects) {
     JSONArray jsonArray = new JSONArray();
     for (Project project : projects) {
-      jsonArray.add("['" + (project.getName().replace("+", "-")).replace("'", "\\'") + "','"
-          + (project.getAlias().replace("+", "-")).replace("'", "\\'") + "','"
-          + (project.getDescription().replace("+", "-")).replace("'", "\\'") + "','" + project.getProgress().name() + "']");
+      jsonArray.add(JsonSanitizer.sanitize("[\"" + (project.getName().replace("+", "-")) + "\",\"" + (project.getAlias().replace("+", "-"))
+          + "\",\"" + (project.getDescription().replace("+", "-")) + "\",\"" + project.getProgress().name() + "\"]"));
     }
     return jsonArray;
   }
@@ -262,9 +262,9 @@ public class FlexReportingControllerHelperService {
                         if (libraryInRun.getSample().getProject().equals(requestManager.getProjectById(project.getProjectId()))) {
                           if (librariesInRun.add(libraryInRun)) {
 
-                            jsonArray.add("['" + project.getName() + "','" + libraryInRun.getSample().getName() + "','"
-                                + libraryInRun.getName() + "','" + spp.getPool().getName() + "','" + run.getName() + "','"
-                                + run.getStatus().getHealth().getKey() + "']");
+                            jsonArray.add(JsonSanitizer.sanitize("[\"" + project.getName() + "\",\"" + libraryInRun.getSample().getName()
+                                + "\",\"" + libraryInRun.getName() + "\",\"" + spp.getPool().getName() + "\",\"" + run.getName() + "\",\""
+                                + run.getStatus().getHealth().getKey() + "\"]"));
                           }
                         }
                       }
@@ -453,10 +453,10 @@ public class FlexReportingControllerHelperService {
                           List list = new ArrayList(libraryInRun.getLibraryQCs());
                           LibraryQC libraryQc = (LibraryQC) list.get(list.size() - 1);
 
-                          jsonArray.add("['" + sample.getAlias() + "','" + sample.getDescription() + "','" + sample.getSampleType() + "','"
-                              + libraryInRun.getName() + "','" + dilution.getName() + "','" + tagBarcode.toString() + "','"
-                              + libraryQc.getInsertSize().toString() + "','" + run.getAlias() + "','" + spp.getPartitionNumber().toString()
-                              + "']");
+                          jsonArray.add(JsonSanitizer.sanitize("[\"" + sample.getAlias() + "\",\"" + sample.getDescription() + "\",\""
+                              + sample.getSampleType() + "\",\"" + libraryInRun.getName() + "\",\"" + dilution.getName() + "\",\""
+                              + tagBarcode.toString() + "\",\"" + libraryQc.getInsertSize().toString() + "\",\"" + run.getAlias() + "\",\""
+                              + spp.getPartitionNumber().toString() + "\"]"));
                         }
                       }
                     }
@@ -802,10 +802,10 @@ public class FlexReportingControllerHelperService {
       if (library.getQcPassed() != null) {
         qc = library.getQcPassed().toString();
       }
-      jsonArray.add("['" + (library.getName().replace("+", "-")).replace("'", "\\'") + "','"
-          + (library.getAlias().replace("+", "-")).replace("'", "\\'") + "','"
-          + (library.getDescription().replace("+", "-")).replace("'", "\\'") + "','" + library.getPlatformName() + "','"
-          + library.getLibraryType().getDescription() + "','" + qc + "']");
+      jsonArray.add(JsonSanitizer.sanitize("[\"" + (library.getName().replace("+", "-")).replace("'", "\\'") + "\",\""
+          + (library.getAlias().replace("+", "-")).replace("'", "\\'") + "\",\""
+          + (library.getDescription().replace("+", "-")).replace("'", "\\'") + "\",\"" + library.getPlatformName() + "\",\""
+          + library.getLibraryType().getDescription() + "\",\"" + qc + "\"]"));
     }
     return jsonArray;
   }
@@ -822,9 +822,10 @@ public class FlexReportingControllerHelperService {
         sampleQC = library.getSample().getQcPassed().toString();
       }
 
-      jsonArray.add("['" + library.getSample().getProject().getName() + "','" + library.getName() + "','" + library.getAlias() + "','"
-          + library.getDescription() + "','" + library.getPlatformName() + "','" + library.getLibraryType().getDescription() + "','" + qc
-          + "','" + LimsUtils.getDateAsString(library.getCreationDate()) + "','" + library.getSample().getName() + "','" + sampleQC + "']");
+      jsonArray.add(JsonSanitizer.sanitize("[\"" + library.getSample().getProject().getName() + "\",\"" + library.getName() + "\",\""
+          + library.getAlias() + "\",\"" + library.getDescription() + "\",\"" + library.getPlatformName() + "\",\""
+          + library.getLibraryType().getDescription() + "\",\"" + qc + "\",\"" + LimsUtils.getDateAsString(library.getCreationDate())
+          + "\",\"" + library.getSample().getName() + "\",\"" + sampleQC + "\"]"));
     }
     return jsonArray;
   }
@@ -979,10 +980,9 @@ public class FlexReportingControllerHelperService {
   public JSONArray buildRunReport(ArrayList<Run> runs) {
     JSONArray jsonArray = new JSONArray();
     for (Run run : runs) {
-      jsonArray
-          .add("['" + (run.getName().replace("+", "-")).replace("'", "\\'") + "','" + (run.getAlias().replace("+", "-")).replace("'", "\\'")
-              + "','" + (run.getStatus() != null && run.getStatus().getHealth() != null ? run.getStatus().getHealth().getKey() : "") + "','"
-              + run.getPlatformType().getKey() + "']");
+      jsonArray.add(JsonSanitizer.sanitize("[\"" + (run.getName().replace("+", "-")) + "\",\"" + (run.getAlias().replace("+", "-"))
+          + "\",\"" + (run.getStatus() != null && run.getStatus().getHealth() != null ? run.getStatus().getHealth().getKey() : "") + "\",\""
+          + run.getPlatformType().getKey() + "\"]"));
     }
     return jsonArray;
   }
@@ -1011,12 +1011,12 @@ public class FlexReportingControllerHelperService {
                     Map<String, Integer> projectMapDisplayed = new HashMap<String, Integer>();
                     for (Dilution dilution : spp.getPool().getDilutions()) {
                       if (!projectMapDisplayed.containsKey(dilution.getLibrary().getSample().getProject().getName())) {
-                        jsonArray.add("['" + run.getName() + "','" + (run.getAlias().replace("+", "-")).replace("'", "\\'") + "','"
-                            + (run.getStatus() != null ? LimsUtils.getDateAsString(run.getStatus().getStartDate()) : "") + "','"
-                            + pool.getName() + "','" + spp.getPartitionNumber() + "','"
-                            + dilution.getLibrary().getSample().getProject().getName() + "','"
-                            + projectMap.get(dilution.getLibrary().getSample().getProject().getName()) + "','"
-                            + spp.getPool().getDilutions().size() + "']");
+                        jsonArray.add(JsonSanitizer.sanitize("[\"" + run.getName() + "\",\"" + (run.getAlias().replace("+", "-")) + "\",\""
+                            + (run.getStatus() != null ? LimsUtils.getDateAsString(run.getStatus().getStartDate()) : "") + "\",\""
+                            + pool.getName() + "\",\"" + spp.getPartitionNumber() + "\",\""
+                            + dilution.getLibrary().getSample().getProject().getName() + "\",\""
+                            + projectMap.get(dilution.getLibrary().getSample().getProject().getName()) + "\",\""
+                            + spp.getPool().getDilutions().size() + "\"]"));
                         projectMapDisplayed.put(dilution.getLibrary().getSample().getProject().getName(), 1);
                       }
                     }

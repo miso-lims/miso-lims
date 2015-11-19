@@ -51,6 +51,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import com.google.json.JsonSanitizer;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -375,8 +376,9 @@ public class PlateControllerHelperService {
                 log.info("No tag barcodes!");
               }
 
-              jsonArray.add("['" + l.getName() + "','" + l.getAlias() + "','" + strategyName + "','" + seqbuilder.toString() + "','"
-                  + "<a href=\"/miso/library/" + l.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']");
+              jsonArray.add(JsonSanitizer.sanitize(
+                  "[\"" + l.getName() + "\",\"" + l.getAlias() + "\",\"" + strategyName + "\",\"" + seqbuilder.toString() + "\",\""
+                      + "<a href=\"/miso/library/" + l.getId() + "\"><span class=\"fa fa-pencil-square-o fa-lg\"></span></a>" + "\"]"));
             }
           }
         }
