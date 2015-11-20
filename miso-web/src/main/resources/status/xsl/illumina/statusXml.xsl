@@ -12,47 +12,50 @@
   ~
   ~ MISO is distributed in the hope that it will be useful,
   ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
   ~ GNU General Public License for more details.
   ~
   ~ You should have received a copy of the GNU General Public License
-  ~ along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+  ~ along with MISO. If not, see <http://www.gnu.org/licenses/>.
   ~
   ~ **********************************************************************
-  -->
+-->
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-    <xsl:output method="html"/>
+  <xsl:output method="html" />
 
-    <xsl:template match="/">
-        <div class="note">
-            <h3>Status</h3>
-            <xsl:value-of select="Status/Software"/><br/>
-            <xsl:value-of select="Status/InstrumentName"/><br/>
-            <xsl:value-of select="Status/RunStarted"/><br/>
+  <xsl:template match="/">
+    <div class="note">
+      <h3>Status</h3>
+      <xsl:value-of select="Status/Software" />
+      <br />
+      <xsl:value-of select="Status/InstrumentName" />
+      <br />
+      <xsl:value-of select="Status/RunStarted" />
+      <br />
 
-            <table class="list">
-                <tr bgcolor="#CCDDFF">
-                    <th>Cycles</th>
-                    <th>Image Cycle</th>
-                    <th>Score Cycle</th>
-                    <th>Call Cycle</th>
-                </tr>
-                <tr>
-                    <td>
-                        <xsl:value-of select="Status/NumCycles"/>
-                    </td>
-                    <td>
-                        <xsl:value-of select="Status/ImgCycle"/>
-                    </td>
-                    <td>
-                        <xsl:value-of select="Status/ScoreCycle"/>
-                    </td>
-                    <td>
-                        <xsl:value-of select="Status/CallCycle"/>
-                    </td>
-                </tr>
-            </table>
-        </div>
-    </xsl:template>
+      <table class="list">
+        <tr bgcolor="#CCDDFF">
+          <th>Cycles</th>
+          <th>Image Cycle</th>
+          <th>Score Cycle</th>
+          <th>Call Cycle</th>
+        </tr>
+        <tr>
+          <td>
+            <xsl:value-of select="Status/NumCycles" />
+          </td>
+          <td>
+            <xsl:value-of select="Status/ImgCycle" />
+          </td>
+          <td>
+            <xsl:value-of select="Status/ScoreCycle" />
+          </td>
+          <td>
+            <xsl:value-of select="Status/CallCycle" />
+          </td>
+        </tr>
+      </table>
+    </div>
+  </xsl:template>
 </xsl:stylesheet>
