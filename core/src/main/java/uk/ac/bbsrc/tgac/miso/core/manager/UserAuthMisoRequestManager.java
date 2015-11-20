@@ -472,8 +472,8 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
-  public emPCR getEmPcrById(long pcrId) throws IOException {
-    emPCR o = super.getEmPcrById(pcrId);
+  public emPCR getEmPCRById(long pcrId) throws IOException {
+    emPCR o = super.getEmPCRById(pcrId);
     if (readCheck(o))
       return o;
     else
@@ -481,8 +481,8 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
-  public emPCRDilution getEmPcrDilutionById(long dilutionId) throws IOException {
-    emPCRDilution o = super.getEmPcrDilutionById(dilutionId);
+  public emPCRDilution getEmPCRDilutionById(long dilutionId) throws IOException {
+    emPCRDilution o = super.getEmPCRDilutionById(dilutionId);
     if (readCheck(o))
       return o;
     else
@@ -490,8 +490,8 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
-  public emPCRDilution getEmPcrDilutionByBarcode(String barcode) throws IOException {
-    emPCRDilution o = super.getEmPcrDilutionByBarcode(barcode);
+  public emPCRDilution getEmPCRDilutionByBarcode(String barcode) throws IOException {
+    emPCRDilution o = super.getEmPCRDilutionByBarcode(barcode);
     if (readCheck(o))
       return o;
     else
@@ -499,8 +499,8 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
-  public emPCRDilution getEmPcrDilutionByBarcodeAndPlatform(String barcode, PlatformType platformType) throws IOException {
-    emPCRDilution o = super.getEmPcrDilutionByBarcodeAndPlatform(barcode, platformType);
+  public emPCRDilution getEmPCRDilutionByBarcodeAndPlatform(String barcode, PlatformType platformType) throws IOException {
+    emPCRDilution o = super.getEmPCRDilutionByBarcodeAndPlatform(barcode, platformType);
     if (readCheck(o))
       return o;
     else
@@ -1165,10 +1165,10 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
-  public Collection<emPCRDilution> listAllEmPcrDilutions() throws IOException {
+  public Collection<emPCRDilution> listAllEmPCRDilutions() throws IOException {
     User user = getCurrentUser();
     Collection<emPCRDilution> accessibles = new HashSet<>();
-    for (emPCRDilution dilution : super.listAllEmPcrDilutions()) {
+    for (emPCRDilution dilution : super.listAllEmPCRDilutions()) {
       if (dilution.userCanRead(user)) {
         accessibles.add(dilution);
       }
@@ -1177,10 +1177,10 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
-  public Collection<emPCRDilution> listAllEmPcrDilutionsByEmPcrId(long pcrId) throws IOException {
+  public Collection<emPCRDilution> listAllEmPCRDilutionsByEmPcrId(long pcrId) throws IOException {
     User user = getCurrentUser();
     Collection<emPCRDilution> accessibles = new HashSet<>();
-    for (emPCRDilution dilution : super.listAllEmPcrDilutionsByEmPcrId(pcrId)) {
+    for (emPCRDilution dilution : super.listAllEmPCRDilutionsByEmPcrId(pcrId)) {
       if (dilution.userCanRead(user)) {
         accessibles.add(dilution);
       }
@@ -1189,10 +1189,10 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
-  public Collection<emPCRDilution> listAllEmPcrDilutionsByPlatform(PlatformType platformType) throws IOException {
+  public Collection<emPCRDilution> listAllEmPCRDilutionsByPlatform(PlatformType platformType) throws IOException {
     User user = getCurrentUser();
     Collection<emPCRDilution> accessibles = new HashSet<>();
-    for (emPCRDilution dilution : super.listAllEmPcrDilutionsByPlatform(platformType)) {
+    for (emPCRDilution dilution : super.listAllEmPCRDilutionsByPlatform(platformType)) {
       if (dilution.userCanRead(user)) {
         accessibles.add(dilution);
       }
@@ -1201,10 +1201,10 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
-  public Collection<emPCRDilution> listAllEmPcrDilutionsByProjectId(long projectId) throws IOException {
+  public Collection<emPCRDilution> listAllEmPCRDilutionsByProjectId(long projectId) throws IOException {
     User user = getCurrentUser();
     Collection<emPCRDilution> accessibles = new HashSet<>();
-    for (emPCRDilution dilution : super.listAllEmPcrDilutionsByProjectId(projectId)) {
+    for (emPCRDilution dilution : super.listAllEmPCRDilutionsByProjectId(projectId)) {
       if (dilution.userCanRead(user)) {
         accessibles.add(dilution);
       }
@@ -1213,10 +1213,10 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
-  public Collection<emPCRDilution> listAllEmPcrDilutionsBySearch(String query, PlatformType platformType) throws IOException {
+  public Collection<emPCRDilution> listAllEmPCRDilutionsBySearch(String query, PlatformType platformType) throws IOException {
     User user = getCurrentUser();
     Collection<emPCRDilution> accessibles = new HashSet<>();
-    for (emPCRDilution dilution : super.listAllEmPcrDilutionsBySearch(query, platformType)) {
+    for (emPCRDilution dilution : super.listAllEmPCRDilutionsBySearch(query, platformType)) {
       if (dilution.userCanRead(user)) {
         accessibles.add(dilution);
       }
@@ -1225,10 +1225,10 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
-  public Collection<emPCRDilution> listAllEmPcrDilutionsByProjectAndPlatform(long projectId, PlatformType platformType) throws IOException {
+  public Collection<emPCRDilution> listAllEmPCRDilutionsByProjectAndPlatform(long projectId, PlatformType platformType) throws IOException {
     User user = getCurrentUser();
     Collection<emPCRDilution> accessibles = new HashSet<>();
-    for (emPCRDilution dilution : super.listAllEmPcrDilutionsByProjectAndPlatform(projectId, platformType)) {
+    for (emPCRDilution dilution : super.listAllEmPCRDilutionsByProjectAndPlatform(projectId, platformType)) {
       if (dilution.userCanRead(user)) {
         accessibles.add(dilution);
       }
@@ -1237,10 +1237,10 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
-  public Collection<emPCRDilution> listAllEmPcrDilutionsByPoolAndPlatform(long poolId, PlatformType platformType) throws IOException {
+  public Collection<emPCRDilution> listAllEmPCRDilutionsByPoolAndPlatform(long poolId, PlatformType platformType) throws IOException {
     User user = getCurrentUser();
     Collection<emPCRDilution> accessibles = new HashSet<>();
-    for (emPCRDilution dilution : super.listAllEmPcrDilutionsByPoolAndPlatform(poolId, platformType)) {
+    for (emPCRDilution dilution : super.listAllEmPCRDilutionsByPoolAndPlatform(poolId, platformType)) {
       if (dilution.userCanRead(user)) {
         accessibles.add(dilution);
       }
@@ -1662,9 +1662,9 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
-  public void deleteEmPcrDilution(emPCRDilution dilution) throws IOException {
+  public void deleteEmPCRDilution(emPCRDilution dilution) throws IOException {
     if (getCurrentUser().isAdmin()) {
-      super.deleteEmPcrDilution(dilution);
+      super.deleteEmPCRDilution(dilution);
     }
   }
 

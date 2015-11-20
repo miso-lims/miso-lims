@@ -70,7 +70,7 @@ public class ListDilutionsController {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       model.addAttribute("libDilutions", requestManager.listAllLibraryDilutions());
-      model.addAttribute("pcrDilutions", requestManager.listAllEmPcrDilutions());
+      model.addAttribute("pcrDilutions", requestManager.listAllEmPCRDilutions());
       return new ModelAndView("/pages/listDilutions.jsp", model);
     } catch (IOException ex) {
       if (log.isDebugEnabled()) {

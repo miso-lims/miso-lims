@@ -796,7 +796,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<emPCRDilution> listAllEmPcrDilutions() throws IOException {
+  public Collection<emPCRDilution> listAllEmPCRDilutions() throws IOException {
     if (emPCRDilutionStore != null) {
       return emPCRDilutionStore.listAll();
     } else {
@@ -805,7 +805,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<emPCRDilution> listAllEmPcrDilutionsByPlatform(PlatformType platformType) throws IOException {
+  public Collection<emPCRDilution> listAllEmPCRDilutionsByPlatform(PlatformType platformType) throws IOException {
     if (emPCRDilutionStore != null) {
       return emPCRDilutionStore.listAllEmPcrDilutionsByPlatform(platformType);
     } else {
@@ -814,7 +814,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<emPCRDilution> listAllEmPcrDilutionsByPoolAndPlatform(long poolId, PlatformType platformType) throws IOException {
+  public Collection<emPCRDilution> listAllEmPCRDilutionsByPoolAndPlatform(long poolId, PlatformType platformType) throws IOException {
     if (emPCRDilutionStore != null) {
       return emPCRDilutionStore.listAllEmPcrDilutionsByPoolAndPlatform(poolId, platformType);
     } else {
@@ -850,7 +850,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<emPCRDilution> listAllEmPcrDilutionsByEmPcrId(long pcrId) throws IOException {
+  public Collection<emPCRDilution> listAllEmPCRDilutionsByEmPcrId(long pcrId) throws IOException {
     if (emPCRDilutionStore != null) {
       return emPCRDilutionStore.listAllByEmPCRId(pcrId);
     } else {
@@ -859,7 +859,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<emPCRDilution> listAllEmPcrDilutionsByProjectId(long projectId) throws IOException {
+  public Collection<emPCRDilution> listAllEmPCRDilutionsByProjectId(long projectId) throws IOException {
     if (emPCRDilutionStore != null) {
       return emPCRDilutionStore.listAllEmPcrDilutionsByProjectId(projectId);
     } else {
@@ -868,7 +868,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<emPCRDilution> listAllEmPcrDilutionsBySearch(String query, PlatformType platformType) throws IOException {
+  public Collection<emPCRDilution> listAllEmPCRDilutionsBySearch(String query, PlatformType platformType) throws IOException {
     if (emPCRDilutionStore != null) {
       return emPCRDilutionStore.listAllEmPcrDilutionsBySearch(query, platformType);
     } else {
@@ -877,7 +877,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<emPCRDilution> listAllEmPcrDilutionsByProjectAndPlatform(long projectId, PlatformType platformType) throws IOException {
+  public Collection<emPCRDilution> listAllEmPCRDilutionsByProjectAndPlatform(long projectId, PlatformType platformType) throws IOException {
     if (emPCRDilutionStore != null) {
       return emPCRDilutionStore.listAllEmPcrDilutionsByProjectAndPlatform(projectId, platformType);
     } else {
@@ -1389,7 +1389,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public void deleteEmPcrDilution(emPCRDilution dilution) throws IOException {
+  public void deleteEmPCRDilution(emPCRDilution dilution) throws IOException {
     if (emPCRDilutionStore != null) {
       if (!emPCRDilutionStore.remove(dilution)) {
         throw new IOException("Unable to delete emPCRDilution.");
@@ -1954,7 +1954,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public emPCRDilution getEmPcrDilutionByBarcodeAndPlatform(String barcode, PlatformType platformType) throws IOException {
+  public emPCRDilution getEmPCRDilutionByBarcodeAndPlatform(String barcode, PlatformType platformType) throws IOException {
     if (emPCRDilutionStore != null) {
       return emPCRDilutionStore.getEmPcrDilutionByBarcodeAndPlatform(barcode, platformType);
     } else {
@@ -2062,7 +2062,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public emPCR getEmPcrById(long pcrId) throws IOException {
+  public emPCR getEmPCRById(long pcrId) throws IOException {
     if (emPCRStore != null) {
       return emPCRStore.get(pcrId);
     } else {
@@ -2071,7 +2071,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public emPCRDilution getEmPcrDilutionById(long dilutionId) throws IOException {
+  public emPCRDilution getEmPCRDilutionById(long dilutionId) throws IOException {
     if (emPCRDilutionStore != null) {
       return emPCRDilutionStore.get(dilutionId);
     } else {
@@ -2080,7 +2080,7 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public emPCRDilution getEmPcrDilutionByBarcode(String barcode) throws IOException {
+  public emPCRDilution getEmPCRDilutionByBarcode(String barcode) throws IOException {
     if (emPCRDilutionStore != null) {
       return emPCRDilutionStore.getEmPcrDilutionByBarcode(barcode);
     } else {
@@ -2120,7 +2120,7 @@ public class MisoRequestManager implements RequestManager {
     String[] s = barcode.split("::");
     if (s.length > 1) {
       String platformKey = s[1];
-      if (!isStringEmptyOrNull(platformKey)) {
+      if (platformKey != null && !"".equals(platformKey)) {
         PlatformType pt = PlatformType.get(platformKey);
         if (pt != null) {
           return getPoolByBarcode(barcode, pt);

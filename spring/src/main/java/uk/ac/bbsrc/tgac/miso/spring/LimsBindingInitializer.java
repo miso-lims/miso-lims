@@ -960,7 +960,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
         if ("LDI".equals(prefix)) {
           return id != null ? requestManager.getLibraryDilutionById(id) : null;
         } else if ("EDI".equals(prefix)) {
-          return id != null ? requestManager.getEmPcrDilutionById(id) : null;
+          return id != null ? requestManager.getEmPCRDilutionById(id) : null;
         } else {
           log.debug("Failed to resolve dilution with identifier: " + prefix + ident);
         }
@@ -1009,7 +1009,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
     Long id = null;
     if (element instanceof String) id = NumberUtils.parseNumber((String) element, Long.class).longValue();
     try {
-      return id != null ? requestManager.getEmPcrDilutionById(id) : null;
+      return id != null ? requestManager.getEmPCRDilutionById(id) : null;
     } catch (IOException e) {
       if (log.isDebugEnabled()) {
         log.debug("Failed to resolve dilution " + element, e);
@@ -1280,7 +1280,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
           return id != null ? requestManager.getLibraryDilutionById(id) : null;
         } else if ("EDI".equals(prefix)) {
           log.info(prefix + ":" + ident + " -> EmPCRDilution");
-          return id != null ? requestManager.getEmPcrDilutionById(id) : null;
+          return id != null ? requestManager.getEmPCRDilutionById(id) : null;
         } else if ("PLA".equals(prefix)) {
           log.info(prefix + ":" + ident + " -> Plate");
           return id != null ? requestManager.getPlateById(id) : null;

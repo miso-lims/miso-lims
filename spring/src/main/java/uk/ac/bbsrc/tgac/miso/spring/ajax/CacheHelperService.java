@@ -110,7 +110,7 @@ public class CacheHelperService {
   }
 
   public JSONObject flushCache(HttpSession session, JSONObject json) {
-    if (json.has("cache") && !isStringEmptyOrNull(json.getString("cache"))) {
+    if (json.has("cache") && !"".equals(json.getString("cache"))) {
       String cacheName = json.getString("cache");
       Cache cache = cacheManager.getCache(cacheName);
       if (cache != null) {
@@ -169,7 +169,7 @@ public class CacheHelperService {
         }
       }
 
-      for (emPCRDilution ed : requestManager.listAllEmPcrDilutions()) {
+      for (emPCRDilution ed : requestManager.listAllEmPCRDilutions()) {
         if (isStringEmptyOrNull(ed.getIdentificationBarcode())) {
           requestManager.saveEmPCRDilution(ed);
         }

@@ -268,14 +268,14 @@ public class EditProjectController {
   public Collection<emPCRDilution> populateProjectEmPcrDilutions(Collection<emPCR> projectEmPCRs) throws IOException {
     List<emPCRDilution> dilutions = new ArrayList<emPCRDilution>();
     for (emPCR e : projectEmPCRs) {
-      dilutions.addAll(requestManager.listAllEmPcrDilutionsByEmPcrId(e.getId()));
+      dilutions.addAll(requestManager.listAllEmPCRDilutionsByEmPcrId(e.getId()));
     }
     Collections.sort(dilutions);
     return dilutions;
   }
 
   public Collection<emPCRDilution> populateProjectEmPcrDilutions(long projectId) throws IOException {
-    List<emPCRDilution> dilutions = new ArrayList<emPCRDilution>(requestManager.listAllEmPcrDilutionsByProjectId(projectId));
+    List<emPCRDilution> dilutions = new ArrayList<emPCRDilution>(requestManager.listAllEmPCRDilutionsByProjectId(projectId));
     Collections.sort(dilutions);
     return dilutions;
   }

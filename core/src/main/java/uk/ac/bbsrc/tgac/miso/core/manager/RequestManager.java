@@ -189,13 +189,13 @@ public interface RequestManager {
 
   public TagBarcode getTagBarcodeById(long tagBarcodeId) throws IOException;
 
-  public emPCR getEmPcrById(long pcrId) throws IOException;
+  public emPCR getEmPCRById(long pcrId) throws IOException;
 
-  public emPCRDilution getEmPcrDilutionByBarcodeAndPlatform(String barcode, PlatformType platformType) throws IOException;
+  public emPCRDilution getEmPCRDilutionByBarcodeAndPlatform(String barcode, PlatformType platformType) throws IOException;
 
-  public emPCRDilution getEmPcrDilutionById(long dilutionId) throws IOException;
+  public emPCRDilution getEmPCRDilutionById(long dilutionId) throws IOException;
 
-  public emPCRDilution getEmPcrDilutionByBarcode(String barcode) throws IOException;
+  public emPCRDilution getEmPCRDilutionByBarcode(String barcode) throws IOException;
 
   public Note getNoteById(long noteId) throws IOException;
 
@@ -392,19 +392,19 @@ public interface RequestManager {
   public Collection<LibraryDilution> listAllLibraryDilutionsByProjectAndPlatform(long projectId, PlatformType platformType)
       throws IOException;
 
-  public Collection<emPCRDilution> listAllEmPcrDilutions() throws IOException;
+  public Collection<emPCRDilution> listAllEmPCRDilutions() throws IOException;
 
-  public Collection<emPCRDilution> listAllEmPcrDilutionsByEmPcrId(long pcrId) throws IOException;
+  public Collection<emPCRDilution> listAllEmPCRDilutionsByEmPcrId(long pcrId) throws IOException;
 
-  public Collection<emPCRDilution> listAllEmPcrDilutionsByPlatform(PlatformType platformType) throws IOException;
+  public Collection<emPCRDilution> listAllEmPCRDilutionsByPlatform(PlatformType platformType) throws IOException;
 
-  public Collection<emPCRDilution> listAllEmPcrDilutionsByProjectId(long projectId) throws IOException;
+  public Collection<emPCRDilution> listAllEmPCRDilutionsByProjectId(long projectId) throws IOException;
 
-  public Collection<emPCRDilution> listAllEmPcrDilutionsBySearch(String query, PlatformType platformType) throws IOException;
+  public Collection<emPCRDilution> listAllEmPCRDilutionsBySearch(String query, PlatformType platformType) throws IOException;
 
-  public Collection<emPCRDilution> listAllEmPcrDilutionsByProjectAndPlatform(long projectId, PlatformType platformType) throws IOException;
+  public Collection<emPCRDilution> listAllEmPCRDilutionsByProjectAndPlatform(long projectId, PlatformType platformType) throws IOException;
 
-  public Collection<emPCRDilution> listAllEmPcrDilutionsByPoolAndPlatform(long poolId, PlatformType platformType) throws IOException;
+  public Collection<emPCRDilution> listAllEmPCRDilutionsByPoolAndPlatform(long poolId, PlatformType platformType) throws IOException;
 
   public Collection<emPCR> listAllEmPCRs() throws IOException;
 
@@ -524,7 +524,7 @@ public interface RequestManager {
 
   public void deleteLibraryDilution(LibraryDilution dilution) throws IOException;
 
-  public void deleteEmPcrDilution(emPCRDilution dilution) throws IOException;
+  public void deleteEmPCRDilution(emPCRDilution dilution) throws IOException;
 
   public void deleteSequencerReference(SequencerReference sequencerReference) throws IOException;
 
