@@ -14,11 +14,11 @@
   ~
   ~ MISO is distributed in the hope that it will be useful,
   ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
   ~ GNU General Public License for more details.
   ~
   ~ You should have received a copy of the GNU General Public License
-  ~ along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+  ~ along with MISO. If not, see <http://www.gnu.org/licenses/>.
   ~
   ~ **********************************************************************
   -->
@@ -95,7 +95,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-war-plugin</artifactId>
-	          <version>2.3</version>
+            <version>2.3</version>
             <configuration>
               <webResources>
                 <resource>
@@ -268,13 +268,11 @@
       <url>http://www.hasbanana.com/maven/repo</url>
     </repository>
 
-    <!--
     <repository>
       <id>sonatype-sourceforge-snapshots</id>
       <name>Sonatype SF Repository</name>
       <url>http://oss.sonatype.org/content/repositories/sourceforge-snapshots/</url>
     </repository>
-    -->
 
     <repository>
       <id>Atlassian Maven Repository</id>
@@ -508,31 +506,6 @@
       <classifier>jdk15</classifier>
     </dependency>
 
-    <!--
-      <dependency>
-        <groupId>oauth.signpost</groupId>
-        <artifactId>signpost-core</artifactId>
-        <version>1.2</version>
-        <exclusions>
-            <exclusion>
-                <groupId>commons-codec</groupId>
-                <artifactId>commons-codec</artifactId>
-            </exclusion>
-        </exclusions>
-      </dependency>
-
-    <dependency>
-        <groupId>com.atlassian.jira</groupId>
-        <artifactId>jira-rest-java-client</artifactId>
-        <version>0.1.1</version>
-        <exclusions>
-            <exclusion>
-                <groupId>org.codehaus.jackson</groupId>
-                <artifactId>jackson-core-asl</artifactId>
-            </exclusion>
-        </exclusions>
-    </dependency>
-    -->
 
     <dependency>
       <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
@@ -551,13 +524,6 @@
       <artifactId>jersey-apache-client</artifactId>
       <version>1.19</version>
     </dependency>
-    <!--
-    <dependency>
-      <groupId>org.atmosphere</groupId>
-      <artifactId>atmosphere-jquery</artifactId>
-      <version>0.8.2</version>
-    </dependency>
-    -->
   </dependencies>
   <properties>
     <jdom-version>1.1</jdom-version>
