@@ -148,9 +148,9 @@ public class DashboardHelperService {
       List<Project> projects;
       StringBuilder b = new StringBuilder();
       if (!isStringEmptyOrNull(searchStr)) {
-        projects = new ArrayList<Project>(requestManager.listAllProjectsBySearch(searchStr));
+        projects = new ArrayList<>(requestManager.listAllProjectsBySearch(searchStr));
       } else {
-        projects = new ArrayList<Project>(requestManager.listAllProjectsWithLimit(50));
+        projects = new ArrayList<>(requestManager.listAllProjectsWithLimit(50));
       }
 
       if (projects.size() > 0) {
@@ -347,9 +347,9 @@ public class DashboardHelperService {
           // Base64-encoded string, most likely a barcode image beeped in. decode and search
           searchStr = new String(Base64.decodeBase64(searchStr));
         }
-        samples = new ArrayList<Sample>(requestManager.listAllSamplesBySearch(searchStr));
+        samples = new ArrayList<>(requestManager.listAllSamplesBySearch(searchStr));
       } else {
-        samples = new ArrayList<Sample>(requestManager.listAllSamplesWithLimit(50));
+        samples = new ArrayList<>(requestManager.listAllSamplesWithLimit(50));
       }
 
       if (samples.size() > 0) {
@@ -393,9 +393,9 @@ public class DashboardHelperService {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       List<Alert> alerts;
       if (json.has("showReadAlerts") && json.getBoolean("showReadAlerts")) {
-        alerts = new ArrayList<Alert>(requestManager.listAlertsByUserId(user.getUserId()));
+        alerts = new ArrayList<>(requestManager.listAlertsByUserId(user.getUserId()));
       } else {
-        alerts = new ArrayList<Alert>(requestManager.listUnreadAlertsByUserId(user.getUserId()));
+        alerts = new ArrayList<>(requestManager.listUnreadAlertsByUserId(user.getUserId()));
       }
       Collections.sort(alerts);
       for (Alert a : alerts) {

@@ -313,7 +313,7 @@ public class SQLEntityGroupDAO implements EntityGroupStore {
 
   private Set<Nameable> resolveEntityGroupElements(long groupId) throws IOException, SQLException {
     try {
-      Set<Nameable> elements = new HashSet<Nameable>();
+      Set<Nameable> elements = new HashSet<>();
       List<Map<String, Object>> rows = template.queryForList(ENTITYGROUP_ELEMENT_SELECT, groupId);
       for (Map<String, Object> map : rows) {
         Class<? extends Nameable> clz = Class.forName((String) map.get("entityType")).asSubclass(Nameable.class);

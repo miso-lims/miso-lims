@@ -657,7 +657,7 @@ public class SQLProjectDAO implements ProjectStore {
         overview.setRuns(runDAO.listByProjectId(rs.getLong("project_projectId")));
         overview.setNotes(noteDAO.listByProjectOverview(id));
 
-        overview.setWatchers(new HashSet<User>(watcherDAO.getWatchersByEntityName(overview.getWatchableIdentifier())));
+        overview.setWatchers(new HashSet<>(watcherDAO.getWatchersByEntityName(overview.getWatchableIdentifier())));
         if (overview.getProject().getSecurityProfile() != null && overview.getProject().getSecurityProfile().getOwner() != null)
           overview.addWatcher(overview.getProject().getSecurityProfile().getOwner());
         for (User u : watcherDAO.getWatchersByWatcherGroup("ProjectWatchers")) {
