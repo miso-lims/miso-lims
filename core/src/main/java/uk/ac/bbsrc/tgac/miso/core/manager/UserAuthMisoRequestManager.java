@@ -520,7 +520,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   public Note getNoteById(long noteId) throws IOException {
     Note o = super.getNoteById(noteId);
     User user = getCurrentUser();
-    if (o.getOwner().equals(user) || (o.isInternalOnly() && user.isInternal()))
+    if (o.getOwner().equals(user) || user.isAdmin() || (o.isInternalOnly() && user.isInternal()))
       return o;
     else
       throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Note " + o.getNoteId());
