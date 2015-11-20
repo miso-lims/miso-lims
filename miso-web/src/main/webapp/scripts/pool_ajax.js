@@ -697,36 +697,32 @@ Pool.barcode = {
               json.services +
               "</select></fieldset></form>");
 
-          jQuery(function() {
-            jQuery('#printServiceSelectDialog').dialog({
-              autoOpen: false,
-              width: 400,
-              modal: true,
-              resizable: false,
-              buttons: {
-              "Print": function() {
-                Fluxion.doAjax(
-                  'poolControllerHelperService',
-                  'printPoolBarcodes',
-                  {
-                    'serviceName':jQuery('#serviceSelect').val(),
-                    'pools':pools,
-                    'url':ajaxurl
-                  },
-                  {'doOnSuccess':function (json) {
-                      alert(json.response);
-                    }
+          jQuery('#printServiceSelectDialog').dialog({
+            width: 400,
+            modal: true,
+            resizable: false,
+            buttons: {
+            "Print": function() {
+              Fluxion.doAjax(
+                'poolControllerHelperService',
+                'printPoolBarcodes',
+                {
+                  'serviceName':jQuery('#serviceSelect').val(),
+                  'pools':pools,
+                  'url':ajaxurl
+                },
+                {'doOnSuccess':function (json) {
+                    alert(json.response);
                   }
-                );
-                jQuery(this).dialog('close');
-              },
-              "Cancel": function() {
-                jQuery(this).dialog('close');
-              }
-              }
-            });
+                }
+              );
+              jQuery(this).dialog('close');
+            },
+            "Cancel": function() {
+              jQuery(this).dialog('close');
+            }
+            }
           });
-          jQuery('#printServiceSelectDialog').dialog('open');
         },
         'doOnError':function (json) {
           alert(json.error);

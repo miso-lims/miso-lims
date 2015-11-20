@@ -250,44 +250,40 @@ Print.service = {
                         json.services +
                         "</select></fieldset></form>");
 
-          jQuery(function () {
-            var barcodeitornot = 'no';
-            if (jQuery('#barcodeit').is(':checked')) {
-              barcodeitornot = 'yes';
-            }
-            jQuery('#printServiceSelectDialog').dialog({
-              autoOpen: false,
-              width: 400,
-              modal: true,
-              resizable: false,
-              buttons: {
-                "Print": function () {
-                  Fluxion.doAjax(
-                    'printerControllerHelperService',
-                    'printCustomBarcode',
-                    {
-                      'serviceName': jQuery('#serviceSelect').val(),
-                      'line1': jQuery('#customPrintLine1').val(),
-                      'line2': jQuery('#customPrintLine2').val(),
-                      'line3': jQuery('#customPrintLine3').val(),
-                      'barcodeit': barcodeitornot,
-                      'url': ajaxurl
-                    },
-                    {
-                      'doOnSuccess': function (json) {
-                        alert(json.response);
-                      }
+          var barcodeitornot = 'no';
+          if (jQuery('#barcodeit').is(':checked')) {
+            barcodeitornot = 'yes';
+          }
+          jQuery('#printServiceSelectDialog').dialog({
+            width: 400,
+            modal: true,
+            resizable: false,
+            buttons: {
+              "Print": function () {
+                Fluxion.doAjax(
+                  'printerControllerHelperService',
+                  'printCustomBarcode',
+                  {
+                    'serviceName': jQuery('#serviceSelect').val(),
+                    'line1': jQuery('#customPrintLine1').val(),
+                    'line2': jQuery('#customPrintLine2').val(),
+                    'line3': jQuery('#customPrintLine3').val(),
+                    'barcodeit': barcodeitornot,
+                    'url': ajaxurl
+                  },
+                  {
+                    'doOnSuccess': function (json) {
+                      alert(json.response);
                     }
-                  );
-                  jQuery(this).dialog('close');
-                },
-                "Cancel": function () {
-                  jQuery(this).dialog('close');
-                }
+                  }
+                );
+                jQuery(this).dialog('close');
+              },
+              "Cancel": function () {
+                jQuery(this).dialog('close');
               }
-            });
+            }
           });
-          jQuery('#printServiceSelectDialog').dialog('open');
         },
         'doOnError': function (json) {
           alert(json.error);
@@ -318,38 +314,34 @@ Print.service = {
                   json.services +
                   "</select></fieldset></form>");
 
-          jQuery(function () {
-            jQuery('#printServiceSelectDialog').dialog({
-              autoOpen: false,
-              width: 400,
-              modal: true,
-              resizable: false,
-              buttons: {
-                "Print": function () {
-                  Fluxion.doAjax(
-                    'printerControllerHelperService',
-                    'printCustom1DBarcode',
-                    {
-                      'serviceName': jQuery('#serviceSelect').val(),
-                      'line1': jQuery('#custom1DPrintLine1').val(),
-                      'line2': jQuery('#custom1DPrintLine2').val(),
-                      'url': ajaxurl
-                    },
-                    {
-                      'doOnSuccess': function (json) {
-                        alert(json.response);
-                      }
+          jQuery('#printServiceSelectDialog').dialog({
+            width: 400,
+            modal: true,
+            resizable: false,
+            buttons: {
+              "Print": function () {
+                Fluxion.doAjax(
+                  'printerControllerHelperService',
+                  'printCustom1DBarcode',
+                  {
+                    'serviceName': jQuery('#serviceSelect').val(),
+                    'line1': jQuery('#custom1DPrintLine1').val(),
+                    'line2': jQuery('#custom1DPrintLine2').val(),
+                    'url': ajaxurl
+                  },
+                  {
+                    'doOnSuccess': function (json) {
+                      alert(json.response);
                     }
-                  );
-                  jQuery(this).dialog('close');
-                },
-                "Cancel": function () {
-                  jQuery(this).dialog('close');
-                }
+                  }
+                );
+                jQuery(this).dialog('close');
+              },
+              "Cancel": function () {
+                jQuery(this).dialog('close');
               }
-            });
+            }
           });
-          jQuery('#printServiceSelectDialog').dialog('open');
         },
         'doOnError': function (json) {
           alert(json.error);
@@ -369,57 +361,53 @@ Print.service = {
     }
 
     Fluxion.doAjax(
-            'printerControllerHelperService',
-            'listAvailableServices',
-            {
-              'serviceClass': 'net.sf.json.JSONObject',
-              'url': ajaxurl
-            },
-            {
-              'doOnSuccess': function (json) {
-                jQuery('#printServiceSelectDialog')
-                        .html("<form>" +
-                              "<fieldset class='dialog'>" +
-                              "<select name='serviceSelect' id='serviceSelect' class='ui-widget-content ui-corner-all'>" +
-                              json.services +
-                              "</select></fieldset></form>");
+      'printerControllerHelperService',
+      'listAvailableServices',
+      {
+        'serviceClass': 'net.sf.json.JSONObject',
+        'url': ajaxurl
+      },
+      {
+        'doOnSuccess': function (json) {
+          jQuery('#printServiceSelectDialog')
+                  .html("<form>" +
+                        "<fieldset class='dialog'>" +
+                        "<select name='serviceSelect' id='serviceSelect' class='ui-widget-content ui-corner-all'>" +
+                        json.services +
+                        "</select></fieldset></form>");
 
-                jQuery(function () {
-                  jQuery('#printServiceSelectDialog').dialog({
-                                                               autoOpen: false,
-                                                               width: 400,
-                                                               modal: true,
-                                                               resizable: false,
-                                                               buttons: {
-                                                                 "Print": function () {
-                                                                   Fluxion.doAjax(
-                                                                           'printerControllerHelperService',
-                                                                           'printCustom1DBarcodeBulk',
-                                                                           {
-                                                                             'serviceName': jQuery('#serviceSelect').val(),
-                                                                             'barcodes': codes,
-                                                                             'url': ajaxurl
-                                                                           },
-                                                                           {
-                                                                             'doOnSuccess': function (json) {
-                                                                               alert(json.response);
-                                                                             }
-                                                                           }
-                                                                   );
-                                                                   jQuery(this).dialog('close');
-                                                                 },
-                                                                 "Cancel": function () {
-                                                                   jQuery(this).dialog('close');
-                                                                 }
-                                                               }
-                                                             });
-                });
-                jQuery('#printServiceSelectDialog').dialog('open');
+          jQuery('#printServiceSelectDialog').dialog({
+            width: 400,
+            modal: true,
+            resizable: false,
+            buttons: {
+              "Print": function () {
+                Fluxion.doAjax(
+                  'printerControllerHelperService',
+                  'printCustom1DBarcodeBulk',
+                  {
+                    'serviceName': jQuery('#serviceSelect').val(),
+                    'barcodes': codes,
+                    'url': ajaxurl
+                  },
+                  {
+                    'doOnSuccess': function (json) {
+                      alert(json.response);
+                    }
+                  }
+                );
+                jQuery(this).dialog('close');
               },
-              'doOnError': function (json) {
-                alert(json.error);
+              "Cancel": function () {
+                jQuery(this).dialog('close');
               }
             }
+          });
+        },
+        'doOnError': function (json) {
+          alert(json.error);
+        }
+      }
     );
   }
 };

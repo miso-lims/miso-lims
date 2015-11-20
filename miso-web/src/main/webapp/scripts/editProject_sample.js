@@ -297,24 +297,20 @@ function getBulkSampleInputForm(projectId) {
                 "<input type='radio' name='formType' id='formTypeXls' class='text ui-widget-content ui-corner-all' value='xlsx'/>" +
                 "</fieldset></form>");
 
-  jQuery(function () {
-    jQuery('#getBulkSampleInputFormDialog').dialog({
-      autoOpen: false,
-      width: 400,
-      modal: true,
-      resizable: false,
-      buttons: {
-        "Get Form": function () {
-          Project.ui.downloadBulkSampleInputForm(projectId, jQuery('input[name=formType]:checked').val());
-          jQuery(this).dialog('close');
-        },
-        "Cancel": function () {
-          jQuery(this).dialog('close');
-        }
+  jQuery('#getBulkSampleInputFormDialog').dialog({
+    width: 400,
+    modal: true,
+    resizable: false,
+    buttons: {
+      "Get Form": function () {
+        Project.ui.downloadBulkSampleInputForm(projectId, jQuery('input[name=formType]:checked').val());
+        jQuery(this).dialog('close');
+      },
+      "Cancel": function () {
+        jQuery(this).dialog('close');
       }
-    });
+    }
   });
-  jQuery('#getBulkSampleInputFormDialog').dialog('open');
 }
 
 function getPlateInputForm(projectId) {
@@ -328,23 +324,19 @@ function getPlateInputForm(projectId) {
                 "<input type='radio' name='formType' id='formTypeXls' class='text ui-widget-content ui-corner-all' value='xlsx'/>" +
                 "</fieldset></form>");
 
-  jQuery(function () {
-    jQuery('#getPlateInputFormDialog').dialog({
-      autoOpen: false,
-      width: 400,
-      modal: true,
-      resizable: false,
-      buttons: {
-        "Get Form": function () {
-          Project.ui.downloadPlateInputForm(projectId, jQuery('input[name=formType]:checked').val());
-          jQuery(this).dialog('close');
-        },
-        "Cancel": function () {
-          jQuery(this).dialog('close');
-        }
+  jQuery('#getPlateInputFormDialog').dialog({
+    width: 400,
+    modal: true,
+    resizable: false,
+    buttons: {
+      "Get Form": function () {
+        Project.ui.downloadPlateInputForm(projectId, jQuery('input[name=formType]:checked').val());
+        jQuery(this).dialog('close');
+      },
+      "Cancel": function () {
+        jQuery(this).dialog('close');
       }
-    });
+    }
   });
-  jQuery('#getPlateInputFormDialog').dialog('open');
 }
 

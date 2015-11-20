@@ -60,42 +60,38 @@ Plate.barcode = {
                   json.services +
                   "</select></fieldset></form>");
 
-                jQuery(function () {
-                  jQuery('#printServiceSelectDialog').dialog({
-                                                               autoOpen: false,
-                                                               width: 400,
-                                                               modal: true,
-                                                               resizable: false,
-                                                               buttons: {
-                                                                 "Print": function () {
-                                                                   Fluxion.doAjax(
-                                                                           'plateControllerHelperService',
-                                                                           'printPlateBarcodes',
-                                                                           {
-                                                                             'serviceName': jQuery('#serviceSelect').val(),
-                                                                             'plates': plates,
-                                                                             'url': ajaxurl
-                                                                           },
-                                                                           {
-                                                                             'doOnSuccess': function (json) {
-                                                                               alert(json.response);
-                                                                             }
-                                                                           }
-                                                                   );
-                                                                   jQuery(this).dialog('close');
-                                                                 },
-                                                                 "Cancel": function () {
-                                                                   jQuery(this).dialog('close');
-                                                                 }
-                                                               }
-                                                             });
-                });
-                jQuery('#printServiceSelectDialog').dialog('open');
-              },
-              'doOnError': function (json) {
-                alert(json.error);
-              }
-            }
+          jQuery('#printServiceSelectDialog').dialog({
+            width: 400,
+            modal: true,
+            resizable: false,
+            buttons: {
+              "Print": function () {
+                Fluxion.doAjax(
+                 'plateControllerHelperService',
+                 'printPlateBarcodes',
+                 {
+                   'serviceName': jQuery('#serviceSelect').val(),
+                   'plates': plates,
+                   'url': ajaxurl
+                 },
+                 {
+                   'doOnSuccess': function (json) {
+                     alert(json.response);
+                   }
+                 }
+               );
+               jQuery(this).dialog('close');
+             },
+             "Cancel": function () {
+               jQuery(this).dialog('close');
+             }
+           }
+         });
+        },
+        'doOnError': function (json) {
+          alert(json.error);
+        }
+      }
     );
 
     /*
@@ -122,24 +118,20 @@ Plate.barcode = {
             "<input type='text' name='locationBarcode' id='locationBarcode' class='text ui-widget-content ui-corner-all'/>" +
             "</fieldset></form>");
 
-    jQuery(function() {
-      jQuery('#changePlateLocationDialog').dialog({
-        autoOpen: false,
-        width: 400,
-        modal: true,
-        resizable: false,
-        buttons: {
-          "Save": function() {
-            self.changePlateLocation(plateId, jQuery('#locationBarcode').val());
-            jQuery(this).dialog('close');
-          },
-          "Cancel": function() {
-            jQuery(this).dialog('close');
-          }
+    jQuery('#changePlateLocationDialog').dialog({
+      width: 400,
+      modal: true,
+      resizable: false,
+      buttons: {
+        "Save": function() {
+          self.changePlateLocation(plateId, jQuery('#locationBarcode').val());
+          jQuery(this).dialog('close');
+        },
+        "Cancel": function() {
+          jQuery(this).dialog('close');
         }
-      });
+      }
     });
-    jQuery('#changePlateLocationDialog').dialog('open');
   },
 
   changePlateLocation: function (plateId, barcode) {
