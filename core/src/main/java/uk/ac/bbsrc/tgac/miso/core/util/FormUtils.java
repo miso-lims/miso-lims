@@ -4290,38 +4290,39 @@ public class FormUtils {
                 throw new InputFormException("No tag barcodes associated with the kit definition '" + getCellValueAsString(barcodeKitCell)
                     + "' for sample: '" + s.getAlias() + "'.");
               }
-            }
 
-            if (getCellValueAsString(poolConvertedMolarityCell) != null) {
-              String poolNum = getCellValueAsString(poolNumberCell);
-              Pool<Plate<LinkedList<Library>, Library>> p = pools.get(poolNum);
-              if (p != null) {
-                log.debug("Retrieved pool " + poolNum);
-                try {
-                  p.setConcentration(Double.valueOf(getCellValueAsString(poolConvertedMolarityCell)));
-                } catch (NumberFormatException nfe) {
-                  throw new InputFormException("Supplied pool concentration for pool '" + poolNum + "' is invalid", nfe);
+              if (getCellValueAsString(poolConvertedMolarityCell) != null) {
+                String poolNum = getCellValueAsString(poolNumberCell);
+                Pool<Plate<LinkedList<Library>, Library>> p = pools.get(poolNum);
+                if (p != null) {
+                  log.debug("Retrieved pool " + poolNum);
+                  try {
+                    p.setConcentration(Double.valueOf(getCellValueAsString(poolConvertedMolarityCell)));
+                  } catch (NumberFormatException nfe) {
+                    throw new InputFormException("Supplied pool concentration for pool '" + poolNum + "' is invalid", nfe);
+                  }
                 }
               }
+
+              log.info("Added library: " + library.toString());
+              manager.saveLibrary(library);
+
+              if (getCellValueAsString(platePosCell) != null && libraryPlate != null) {
+                // libraryPlate.setElement(getCellValueAsString(platePosCell), library);
+                libraryPlate.addElement(library);
+                log.info("Added library " + library.getAlias() + " to " + getCellValueAsString(platePosCell));
+              }
+
+              samples.add(s);
+
+              Pool<Plate<LinkedList<Library>, Library>> p = pools.get(getCellValueAsString(poolNumberCell));
+              if (p != null && !p.getPoolableElements().contains(libraryPlate)) {
+                p.addPoolableElement(libraryPlate);
+                log.info("Added plate to pool: " + p.toString());
+              }
+            } else {
+              log.error("Cannot generate library alias from specified parent sample alias. Does it match the required schema?");
             }
-
-            log.info("Added library: " + library.toString());
-            manager.saveLibrary(library);
-
-            if (getCellValueAsString(platePosCell) != null && libraryPlate != null) {
-              libraryPlate.addElement(library);
-              log.info("Added library " + library.getAlias() + " to " + getCellValueAsString(platePosCell));
-            }
-
-            samples.add(s);
-
-            Pool<Plate<LinkedList<Library>, Library>> p = pools.get(getCellValueAsString(poolNumberCell));
-            if (p != null && !p.getPoolableElements().contains(libraryPlate)) {
-              p.addPoolableElement(libraryPlate);
-              log.info("Added plate to pool: " + p.toString());
-            }
-          } else {
-            log.error("Cannot generate library alias from specified parent sample alias. Does it match the required schema?");
           }
         }
       }
@@ -4833,17 +4834,17 @@ public class FormUtils {
   private static String getCellValueAsString(XSSFCell cell) {
     if (cell != null) {
       switch (cell.getCellType()) {
-      case Cell.CELL_TYPE_BLANK:
+      case XSSFCell.CELL_TYPE_BLANK:
         return null;
-      case Cell.CELL_TYPE_BOOLEAN:
+      case XSSFCell.CELL_TYPE_BOOLEAN:
         return String.valueOf(cell.getBooleanCellValue());
-      case Cell.CELL_TYPE_ERROR:
+      case XSSFCell.CELL_TYPE_ERROR:
         return cell.getErrorCellString();
-      case Cell.CELL_TYPE_FORMULA:
+      case XSSFCell.CELL_TYPE_FORMULA:
         return cell.getRawValue();
-      case Cell.CELL_TYPE_NUMERIC:
+      case XSSFCell.CELL_TYPE_NUMERIC:
         return String.valueOf(cell.getNumericCellValue());
-      case Cell.CELL_TYPE_STRING:
+      case XSSFCell.CELL_TYPE_STRING:
         return cell.getStringCellValue();
       default:
         return null;
