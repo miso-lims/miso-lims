@@ -13,7 +13,6 @@ import javax.persistence.Table;
 
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractProject;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 
@@ -25,7 +24,7 @@ public class SubprojectImpl implements Subproject {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long subprojectId;
 
-  @OneToOne(targetEntity = AbstractProject.class)
+  @OneToOne(targetEntity = ProjectImpl.class)
   @JoinColumn(name = "projectId", nullable = false)
   private Project parentProject;
 

@@ -25,11 +25,15 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 import java.io.Serializable;
 
 import javax.persistence.Entity;
+import javax.persistence.Table;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractProject;
+import uk.ac.bbsrc.tgac.miso.core.factory.submission.ERASubmissionFactory;
+
+import java.io.Serializable;
 
 /**
  * Concrete implementation of a Project, inheriting from the simlims core Project
@@ -38,7 +42,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.AbstractProject;
  * @since 0.0.2
  */
 @Entity
+@Table(name = "Project")
 public class ProjectImpl extends AbstractProject implements Serializable {
+
+  private static final long serialVersionUID = 1L;
+
   /**
    * Construct a new Project with a default empty SecurityProfile
    */

@@ -2,6 +2,7 @@
 -- Switch tables to InnoDB to permit foreign key constraints.
 ALTER TABLE Sample ENGINE = InnoDB ROW_FORMAT = DEFAULT;
 ALTER TABLE Project ENGINE = InnoDB ROW_FORMAT = DEFAULT;
+ALTER TABLE KitDescriptor ENGINE = InnoDB ROW_FORMAT = DEFAULT;
 
 
 ALTER TABLE User ENGINE = InnoDB ROW_FORMAT = DEFAULT;
@@ -150,6 +151,10 @@ CREATE TABLE `SampleAdditionalInfo` (
   CONSTRAINT `FKp8bvx3e7jsmnyw51toi7mq7cq` FOREIGN KEY (`updatedBy`) REFERENCES `User` (`userId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+ALTER TABLE SampleAdditionalInfo ADD COLUMN `kitDescriptorId` BIGINT (20) DEFAULT NULL after subprojectId;
+ALTER TABLE SampleAdditionalInfo ADD FOREIGN KEY (kitDescriptorId) REFERENCES KitDescriptor (kitDescriptorId);
+
+
 CREATE TABLE `TissueMaterial` (
   `tissueMaterialId` bigint(20) NOT NULL AUTO_INCREMENT,
   `alias` varchar(255) NOT NULL,
@@ -232,3 +237,6 @@ CREATE TABLE `SampleAnalyte` (
 
 ALTER TABLE Sample ADD COLUMN `sampleAnalyteId` BIGINT (20) DEFAULT NULL after identityId;
 ALTER TABLE Sample ADD FOREIGN KEY (sampleAnalyteId) REFERENCES SampleAnalyte (sampleAnalyteId);
+
+ALTER TABLE Sample ADD COLUMN `sampleAdditionalInfoId` BIGINT (20) DEFAULT NULL after sampleAnalyteId;
+ALTER TABLE Sample ADD FOREIGN KEY (sampleAdditionalInfoId) REFERENCES SampleAdditionalInfo (sampleAdditionalInfoId);

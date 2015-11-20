@@ -14,7 +14,6 @@ import javax.persistence.UniqueConstraint;
 
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractProject;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleGroupId;
 
@@ -26,7 +25,7 @@ public class SampleGroupImpl implements SampleGroupId {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long sampleGroupId;
 
-  @OneToOne(targetEntity = AbstractProject.class)
+  @OneToOne(targetEntity = ProjectImpl.class)
   @JoinColumn(name = "projectId", nullable = false)
   private Project project;
 
@@ -50,66 +49,82 @@ public class SampleGroupImpl implements SampleGroupId {
   @Column(nullable = false)
   private Date lastUpdated;
 
+  @Override
   public Long getSampleGroupId() {
     return sampleGroupId;
   }
 
+  @Override
   public void setSampleGroupId(Long sampleGroupId) {
     this.sampleGroupId = sampleGroupId;
   }
 
+  @Override
   public Project getProject() {
     return project;
   }
 
+  @Override
   public void setProject(Project project) {
     this.project = project;
   }
 
+  @Override
   public Integer getGroupId() {
     return groupId;
   }
 
+  @Override
   public void setGroupId(Integer groupId) {
     this.groupId = groupId;
   }
 
+  @Override
   public String getDescription() {
     return description;
   }
 
+  @Override
   public void setDescription(String description) {
     this.description = description;
   }
 
+  @Override
   public User getCreatedBy() {
     return createdBy;
   }
 
+  @Override
   public void setCreatedBy(User createdBy) {
     this.createdBy = createdBy;
   }
 
+  @Override
   public Date getCreationDate() {
     return creationDate;
   }
 
+  @Override
   public void setCreationDate(Date creationDate) {
     this.creationDate = creationDate;
   }
 
+  @Override
   public User getUpdatedBy() {
     return updatedBy;
   }
 
+  @Override
   public void setUpdatedBy(User updatedBy) {
     this.updatedBy = updatedBy;
   }
 
+  @Override
   public Date getLastUpdated() {
     return lastUpdated;
   }
 
+  @Override
   public void setLastUpdated(Date lastUpdated) {
     this.lastUpdated = lastUpdated;
   }

@@ -96,6 +96,7 @@ public class SampleAnalyteImpl implements SampleAnalyte {
     return sampleGroup;
   }
 
+  @Override
   public void setSampleGroup(SampleGroupId sampleGroup) {
     this.sampleGroup = sampleGroup;
   }

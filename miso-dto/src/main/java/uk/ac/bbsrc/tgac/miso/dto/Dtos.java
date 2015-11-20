@@ -8,6 +8,7 @@ import org.joda.time.format.ISODateTimeFormat;
 import com.google.common.collect.Sets;
 
 import uk.ac.bbsrc.tgac.miso.core.data.QcPassedDetail;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAnalyte;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
@@ -305,4 +306,27 @@ public class Dtos {
     return to;
   }
 
+  public static SampleDto asDto(Sample from) {
+    SampleDto dto = new SampleDto();
+    dto.setId(from.getSampleId());
+    dto.setAlias(from.getAlias());
+    dto.setDescription(from.getDescription());
+    dto.setReceivedDate(dateTimeFormatter.print(from.getReceivedDate().getTime()));
+    return dto;
+  }
+
+  // public static Set<TissueOriginDto> asTissueOriginDtos(Set<TissueOrigin> from) {
+  // Set<TissueOriginDto> dtoSet = Sets.newHashSet();
+  // for (TissueOrigin tissueOrigin : from) {
+  // dtoSet.add(asDto(tissueOrigin));
+  // }
+  // return dtoSet;
+  // }
+  //
+  // public static TissueOrigin to(TissueOriginDto from) {
+  // TissueOrigin to = new TissueOriginImpl();
+  // to.setAlias(from.getAlias());
+  // to.setDescription(from.getDescription());
+  // return to;
+  // }
 }

@@ -37,8 +37,8 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.Transient;
 
 import org.apache.commons.lang.BooleanUtils;
 import org.slf4j.Logger;
@@ -60,7 +60,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
  * @author Rob Davey
  * @since 0.0.2
  */
-@Entity
+@MappedSuperclass
 public abstract class AbstractProject implements Project {
   protected static final Logger log = LoggerFactory.getLogger(AbstractProject.class);
   private static final long serialVersionUID = 1L;
@@ -79,22 +79,29 @@ public abstract class AbstractProject implements Project {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long projectId = AbstractProject.UNSAVED_ID;
 
-  @OneToMany(cascade = CascadeType.ALL)
+  @Transient
   private Collection<Request> requests = new HashSet<Request>();
 
+  @Transient
   private Collection<Sample> samples = new HashSet<Sample>();
+  @Transient
   private Collection<Run> runs = new HashSet<Run>();
+  @Transient
   private Collection<Study> studies = new HashSet<Study>();
+  @Transient
   private Collection<ProjectOverview> overviews = new HashSet<ProjectOverview>();
+  @Transient
   private Collection<String> issueKeys = new HashSet<String>();
 
   @Enumerated(EnumType.STRING)
   private ProgressType progress;
 
-  @OneToOne(cascade = CascadeType.ALL)
+  @Transient
   private SecurityProfile securityProfile = null;
+  @Transient
   private final Set<MisoListener> listeners = new HashSet<MisoListener>();
   private Date lastUpdated;
+  @Transient
   private Set<User> watchers = new HashSet<User>();
 
   @Override

@@ -24,6 +24,9 @@
 package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.util.ArrayList;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -37,7 +40,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -50,11 +54,19 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAnalyteImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAnalyteNode;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleIdentityNode;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleQcException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+
 
 /**
  * Skeleton implementation of a Sample
@@ -62,8 +74,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  * @author Rob Davey
  * @since 0.0.2
  */
-@Entity
-@Table(name = "`Sample`")
+@MappedSuperclass
 public abstract class AbstractSample extends AbstractBoxable implements Sample {
   protected static final Logger log = LoggerFactory.getLogger(AbstractSample.class);
   public static final Long UNSAVED_ID = 0L;
@@ -73,25 +84,30 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long sampleId = AbstractSample.UNSAVED_ID;
 
+  @ManyToOne(targetEntity = ProjectImpl.class)
   private Project project;
 
-  @ManyToMany(targetEntity = AbstractExperiment.class, mappedBy = "samples")
+  @Transient
   private final Collection<Experiment> experiments = new HashSet<Experiment>();
 
+  @Transient
   private final Collection<Library> libraries = new HashSet<Library>();
 
+  @Transient
   private Collection<SampleQC> sampleQCs = new TreeSet<SampleQC>();
 
+  @Transient
   private Collection<Note> notes = new HashSet<Note>();
 
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
+  @Transient
   private Set<Plate<? extends LinkedList<Sample>, Sample>> plates = new HashSet<Plate<? extends LinkedList<Sample>, Sample>>();
 
   @Transient
   public Document submissionDocument;
 
-  @OneToOne(cascade = CascadeType.ALL)
+  @Transient
   private SecurityProfile securityProfile = null;
 
   private String accession;
@@ -105,6 +121,7 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   private String identificationBarcode;
   private String locationBarcode;
   private String alias;
+  @Transient
   private Date lastUpdated;
   private User lastModifier;
   private boolean empty;
@@ -207,6 +224,16 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @Override
   public void setTaxonIdentifier(String taxonIdentifier) {
     this.taxonIdentifier = taxonIdentifier;
+  }
+
+  @Override
+  public String getAlias() {
+    return alias;
+  }
+
+  @Override
+  public void setAlias(String alias) {
+    this.alias = alias;
   }
 
   @Override
@@ -383,6 +410,14 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @Override
   public abstract void buildReport();
 
+  public SampleAdditionalInfo getSampleAdditionalInfo() {
+    return sampleAdditionalInfo;
+  }
+
+  public void setSampleAdditionalInfo(SampleAdditionalInfo sampleAdditionalInfo) {
+    this.sampleAdditionalInfo = sampleAdditionalInfo;
+  }
+
   /**
    * Equivalency is based on getSampleId() if set, otherwise on name, otherwise on alias
    */
@@ -470,6 +505,146 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @Override
   public void setIdentity(Identity identity) {
     this.identity = identity;
+  }
+
+  public static class SampleFactoryBuilder {
+    private String description;
+    private String sampleType;
+    private Project project;
+    private String scientificName;
+
+    /** User is needed to create a SecurityProfile. */
+    private User user;
+
+    private SampleAdditionalInfo sampleAdditionalInfo;
+    private Identity identity;
+    private SampleAnalyte sampleAnalyte;
+    private String accession;
+    private String name;
+    private String identificationBarcode;
+    private String locationBarcode;
+    private Date receivedDate;
+    private Boolean qcPassed;
+    private String alias;
+    private String taxonIdentifier;
+
+    public Identity getIdentity() {
+      return identity;
+    }
+
+    public String getDescription() {
+      return description;
+    }
+
+    public String getSampleType() {
+      return sampleType;
+    }
+
+    public Project getProject() {
+      return project;
+    }
+
+    public String getScientificName() {
+      return scientificName;
+    }
+
+    public User getUser() {
+      return user;
+    }
+
+    public SampleAdditionalInfo getSampleAdditionalInfo() {
+      return sampleAdditionalInfo;
+    }
+
+    public SampleFactoryBuilder description(String description) {
+      this.description = description;
+      return this;
+    }
+
+    public SampleFactoryBuilder sampleType(String sampleType) {
+      this.sampleType = sampleType;
+      return this;
+    }
+
+    public SampleFactoryBuilder project(Project project) {
+      this.project = project;
+      return this;
+    }
+
+    public SampleFactoryBuilder scientificName(String scientificName) {
+      this.scientificName = scientificName;
+      return this;
+    }
+
+    public SampleFactoryBuilder user(User user) {
+      this.user = user;
+      return this;
+    }
+
+    public SampleFactoryBuilder sampleAdditionalInfo(SampleAdditionalInfo sampleAdditionalInfo) {
+      this.sampleAdditionalInfo = sampleAdditionalInfo;
+      return this;
+    }
+
+    public SampleAnalyte getSampleAnalyte() {
+      return sampleAnalyte;
+    }
+
+    public String getAccession() {
+      return accession;
+    }
+
+    public String getName() {
+      return name;
+    }
+
+    public String getIdentificationBarcode() {
+      return identificationBarcode;
+    }
+
+    public String getLocationBarcode() {
+      return locationBarcode;
+    }
+
+    public Date getReceivedDate() {
+      return receivedDate;
+    }
+
+    public Boolean getQcPassed() {
+      return qcPassed;
+    }
+
+    public String getAlias() {
+      return alias;
+    }
+
+    public String getTaxonIdentifier() {
+      return taxonIdentifier;
+    }
+
+    public Sample build() {
+      checkNotNull(user, "A User must be provided to create a Sample.");
+      checkNotNull(project, "A Project must be provided to create a Sample.");
+      checkArgument(!LimsUtils.isStringEmptyOrNull(description), "Must provide a description to create a Sample");
+      checkArgument(!LimsUtils.isStringEmptyOrNull(sampleType), "Must provide a sampleType to create a Sample");
+      checkArgument(!LimsUtils.isStringEmptyOrNull(scientificName), "Must provide a scientificName to create a Sample");
+
+      if (sampleAdditionalInfo == null) {
+        // Classic MISO Sample.
+        return new SampleImpl(this);
+      } else {
+        checkNotNull(sampleAdditionalInfo, "SampleAdditionalInfo must be provided to create a Sample.");
+        checkNotNull(sampleAdditionalInfo.getSampleClass(), "SampleAdditionalInfo.sampleClass must be provided to create a Sample.");
+        checkNotNull(sampleAdditionalInfo.getTissueOrigin(), "SampleAdditionalInfo.tissueOrigin must be provided to create a Sample.");
+        checkNotNull(sampleAdditionalInfo.getTissueType(), "SampleAdditionalInfo.tissueType must be provided to create a Sample.");
+        if (identity != null) {
+          return new SampleIdentityNode(this);
+        } else if (sampleAnalyte != null) {
+          return new SampleAnalyteNode(this);
+        }
+      }
+      throw new IllegalArgumentException("No sample can be built with the specified parameters.");
+    }
   }
 
 }
