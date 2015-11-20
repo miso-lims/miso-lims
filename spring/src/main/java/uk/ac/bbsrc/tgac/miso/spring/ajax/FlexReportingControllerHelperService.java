@@ -386,9 +386,6 @@ public class FlexReportingControllerHelperService {
         sb.append("</ul>");
       }
 
-      // return "['<input class=\"chkboxprojectrunlane\" id=\"" + project.getProjectId() +
-      // "\" type=\"checkbox\" name=\"projectIds\" value=\"" + project.getProjectId() + "\" id=\"" + project.getProjectId() + "\"/>','"
-      // + project.getName() + "','"
       return "['<input id=\"" + project.getProjectId() + "\" type=\"radio\" name=\"projectId\" value=\"" + project.getProjectId()
           + "\" />','" + project.getName() + "','" + project.getAlias() + "','" + project.getProgress().name() + "','" + sb.toString()
           + "']";

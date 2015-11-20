@@ -203,7 +203,6 @@ public class ExternalSectionControllerHelperService {
             passStr = passed.toString();
           }
         }
-        // sb.append("</tbody></table>");
         sampleQcSb.append("Sample QC Passed: " + sampleQCPassed + " out of " + samples.size() + ".<br/><br/>");
       }
 

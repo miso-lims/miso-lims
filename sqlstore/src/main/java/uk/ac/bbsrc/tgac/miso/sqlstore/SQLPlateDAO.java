@@ -310,7 +310,6 @@ public class SQLPlateDAO implements PlateStore {
           if (autoGenerateIdentificationBarcodes) {
             autoGenerateIdBarcode(plate);
           } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
-
           params.addValue("name", name);
 
           params.addValue("identificationBarcode", plate.getIdentificationBarcode());
@@ -333,7 +332,6 @@ public class SQLPlateDAO implements PlateStore {
         if (autoGenerateIdentificationBarcodes) {
           autoGenerateIdBarcode(plate);
         } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
-
         if (namingScheme.validateField("name", plate.getName())) {
           params.addValue("plateId", plate.getId());
           params.addValue("name", plate.getName());

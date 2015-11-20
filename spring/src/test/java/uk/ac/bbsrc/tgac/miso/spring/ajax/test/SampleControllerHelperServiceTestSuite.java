@@ -28,7 +28,7 @@ public class SampleControllerHelperServiceTestSuite {
 
   @InjectMocks
   private SampleControllerHelperService sampleControllerHelperService;
-  
+
   @Mock
   private SecurityManager securityManager;
   @Mock
@@ -44,47 +44,47 @@ public class SampleControllerHelperServiceTestSuite {
 
   @Before
   public void setUp() throws Exception {
-     MockitoAnnotations.initMocks(this);
+    MockitoAnnotations.initMocks(this);
   }
-  
+
   @SuppressWarnings("unchecked")
   @Test
   public final void testChangeSampleIdBarcode() throws Exception {
     final long id = 1L;
     final String idBarcode = "idBarcode";
     when(requestManager.getSampleById(anyLong())).thenReturn(sample);
-    
+
     final JSONObject json = new JSONObject();
     json.put("sampleId", id);
     json.put("identificationBarcode", idBarcode);
-    
-    final JSONObject response = sampleControllerHelperService.changeSampleIdBarcode(null,  json);
-    
+
+    final JSONObject response = sampleControllerHelperService.changeSampleIdBarcode(null, json);
+
     verify(sample).setIdentificationBarcode(idBarcode);
     verify(requestManager).saveSample(sample);
-    
+
     assertEquals("New+Identification+Barcode+successfully+assigned.", response.get("response"));
   }
-  
+
   @SuppressWarnings("unchecked")
   @Test
   public final void testChangeSampleIdBarcodeBlankBarcode() throws Exception {
     final long id = 1L;
     final String idBarcode = "";
     when(requestManager.getSampleById(anyLong())).thenReturn(sample);
-    
+
     final JSONObject json = new JSONObject();
     json.put("sampleId", id);
     json.put("identificationBarcode", idBarcode);
-    
-    final JSONObject response = sampleControllerHelperService.changeSampleIdBarcode(null,  json);
-    
+
+    final JSONObject response = sampleControllerHelperService.changeSampleIdBarcode(null, json);
+
     verify(sample, never()).setIdentificationBarcode(idBarcode);
     verify(requestManager, never()).saveSample(sample);
-    
+
     assertEquals("New+identification+barcode+not+recognized", response.get("error"));
   }
-  
+
   @Test
   public final void testChangeLibraryIdBarcodeReturnsError() throws Exception {
     final long id = 1L;
@@ -92,15 +92,14 @@ public class SampleControllerHelperServiceTestSuite {
     final IOException expected = new IOException("thrown by mock");
     when(requestManager.getSampleById(anyLong())).thenReturn(sample);
     when(requestManager.saveSample(sample)).thenThrow(expected);
-    
-    
+
     final JSONObject json = new JSONObject();
     json.put("sampleId", id);
     json.put("identificationBarcode", idBarcode);
-    
+
     final JSONObject error = new JSONObject();
     error.put("error", "thrown+by+mock");
-    
-    assertEquals(error, sampleControllerHelperService.changeSampleIdBarcode(null,  json));
+
+    assertEquals(error, sampleControllerHelperService.changeSampleIdBarcode(null, json));
   }
 }

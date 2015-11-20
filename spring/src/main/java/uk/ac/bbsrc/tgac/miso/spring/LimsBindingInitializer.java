@@ -164,11 +164,6 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
       }
     });
 
-    /*
-     * binder.registerCustomEditor(Request.class, new PropertyEditorSupport() {
-     * 
-     * @Override public void setAsText(String element) throws IllegalArgumentException { setValue(resolveRequest(element)); } });
-     */
     binder.registerCustomEditor(Protocol.class, new PropertyEditorSupport() {
       @Override
       public void setAsText(String element) throws IllegalArgumentException {
@@ -219,17 +214,6 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
       }
     });
 
-    /*
-     * binder.registerCustomEditor(ProjectOverview.class, new PropertyEditorSupport() {
-     * 
-     * @Override public void setAsText(String element) throws IllegalArgumentException { log.info("Overviews set found... resolving...");
-     * setValue(resolveProjectOverview(element)); } });
-     * 
-     * binder.registerCustomEditor(Set.class, "overviews", new CustomCollectionEditor(Set.class) {
-     * 
-     * @Override public void setAsText(String element) throws IllegalArgumentException { setValue(resolveProjectOverview(element)); } });
-     */
-
     binder.registerCustomEditor(Set.class, "studies", new CustomCollectionEditor(Set.class) {
       @Override
       protected Object convertElement(Object element) {
@@ -264,12 +248,6 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
         setValue(resolvePool(element));
       }
     });
-
-    /*
-     * binder.registerCustomEditor(Pool.class, "flowcells.lanes.pool", new PropertyEditorSupport() {
-     * 
-     * @Override public void setAsText(String element) throws IllegalArgumentException { setValue(resolvePool(element)); } });
-     */
 
     binder.registerCustomEditor(Set.class, "samples", new CustomCollectionEditor(Set.class) {
       @Override
@@ -624,12 +602,6 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
     }
   }
 
-  /*
-   * private Request resolveRequest(Object element) throws IllegalArgumentException { Long id = null; if (element instanceof String) id =
-   * NumberUtils.parseNumber((String) element, Long.class).longValue(); try { return id != null ? requestManager.getRequestById(id) : null;
-   * } catch (IOException e) { if (log.isDebugEnabled()) { log.debug("Failed to resolve request " + element, e); } throw new
-   * IllegalArgumentException(e); } }
-   */
   /**
    * Resolve a Project object from an ID or {@link uk.ac.bbsrc.tgac.miso.core.data.Project.PREFIX} String
    * 

@@ -762,7 +762,6 @@ public class ContainerControllerHelperService {
       if (platform == null) {
         throw new Exception("Could not retrieve Platform:" + platformId);
       }
-      ;
 
       StringBuilder sb = new StringBuilder();
 

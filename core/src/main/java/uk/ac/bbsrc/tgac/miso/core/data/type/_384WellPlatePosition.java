@@ -8,7 +8,7 @@ import java.util.Map;
  * uk.ac.bbsrc.tgac.miso.core.data.type
  * <p/>
  * Info
- * 
+ *
  * @author Rob Davey
  * @date 06/12/12
  * @since 0.1.9

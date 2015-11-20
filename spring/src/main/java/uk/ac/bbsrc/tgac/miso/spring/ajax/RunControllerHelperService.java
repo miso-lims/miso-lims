@@ -688,9 +688,6 @@ public class RunControllerHelperService {
       if (json.has("runId") && !isStringEmptyOrNull(json.getString("runId"))) {
         Long runId = Long.parseLong(json.getString("runId"));
         Run run = requestManager.getRunById(runId);
-        /*
-         * if (json.has("qcPassed") && json.getString("qcPassed").equals("true")) { sample.setQcPassed(true); }
-         */
 
         List<String> processSelections = new ArrayList<String>();
         List<Partition> partitionSelections = new ArrayList<Partition>();

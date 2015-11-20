@@ -86,7 +86,7 @@ public class ERASubmissionFactory {
     new EraSubmissionDecorator(submission, submissionProperties, doc).buildSubmission();
   }
 
-  /**
+ /**
    * Generate a Study XML fragment from a Study object and pipe the results into the supplied DOM XML Document
    * 
    * @param doc
@@ -115,7 +115,7 @@ public class ERASubmissionFactory {
     }
   }
 
-  /**
+ /**
    * Generate an Experiment XML fragment from an Experiment object and pipe the results into the supplied DOM XML Document
    * 
    * @param doc
@@ -144,7 +144,7 @@ public class ERASubmissionFactory {
     }
   }
 
-  /**
+ /**
    * Generate a Sample XML fragment from a Sample object and pipe the results into the supplied DOM XML Document
    * 
    * @param doc
@@ -173,7 +173,7 @@ public class ERASubmissionFactory {
     }
   }
 
-  /**
+ /**
    * Generate a Run XML fragment from a SequencerExperimentPartition object (that is present on the given Run object) and pipe the results
    * into the supplied DOM XML Document
    * 
@@ -186,7 +186,7 @@ public class ERASubmissionFactory {
     new EraRunDecorator(p, submissionProperties, doc).buildSubmission();
   }
 
-  /**
+ /**
    * Generate a Run XML fragment from a SequencerExperimentPartition object (that is present on the given Run object) and pipe the results
    * into the supplied DOM XML Document
    * 

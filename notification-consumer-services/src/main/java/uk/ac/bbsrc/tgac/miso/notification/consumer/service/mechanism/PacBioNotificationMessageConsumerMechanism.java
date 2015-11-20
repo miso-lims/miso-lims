@@ -296,10 +296,10 @@ public class PacBioNotificationMessageConsumerMechanism
                         long flowId = requestManager.saveSequencerPartitionContainer(f);
                         f.setId(flowId);
                         ((RunImpl) r).addSequencerPartitionContainer(f);
-                        // TODO match up samples to libraries and pools? Or match up pool numbers
+
+                          }
+                        }
                       }
-                    }
-                  }
                 } else {
                   SequencerPartitionContainer f = fs.iterator().next();
                   f.setSecurityProfile(r.getSecurityProfile());
