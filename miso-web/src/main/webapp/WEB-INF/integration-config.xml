@@ -13,39 +13,37 @@
   ~
   ~ MISO is distributed in the hope that it will be useful,
   ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
   ~ GNU General Public License for more details.
   ~
   ~ You should have received a copy of the GNU General Public License
-  ~ along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+  ~ along with MISO. If not, see <http://www.gnu.org/licenses/>.
   ~
   ~ **********************************************************************
-  -->
+-->
 
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:integration="http://www.springframework.org/schema/integration"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:integration="http://www.springframework.org/schema/integration"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
                            http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd"
-       default-autowire="byName">
+  default-autowire="byName">
 
-  <integration:annotation-config/>
+  <integration:annotation-config />
 
   <!-- analysis server -->
   <bean name="analysisQueryService" class="uk.ac.bbsrc.tgac.miso.integration.AnalysisQueryService">
-    <property name="analysisServerHost" value="${miso.analysis.server.host}"/>
-    <property name="analysisServerPort" value="${miso.analysis.server.port}"/>
+    <property name="analysisServerHost" value="${miso.analysis.server.host}" />
+    <property name="analysisServerPort" value="${miso.analysis.server.port}" />
   </bean>
 
   <bean name="notificationQueryService" class="uk.ac.bbsrc.tgac.miso.integration.NotificationQueryService">
-    <property name="notificationServerHost" value="${miso.notification.server.host}"/>
-    <property name="notificationServerPort" value="${miso.notification.server.port}"/>
+    <property name="notificationServerHost" value="${miso.notification.server.host}" />
+    <property name="notificationServerPort" value="${miso.notification.server.port}" />
   </bean>
 
-  <bean name="notificationConsumerService" class="uk.ac.bbsrc.tgac.miso.core.service.integration.MisoNotificationConsumerService"/>
+  <bean name="notificationConsumerService" class="uk.ac.bbsrc.tgac.miso.core.service.integration.MisoNotificationConsumerService" />
   <bean name="notificationGatewayService" class="uk.ac.bbsrc.tgac.miso.core.service.integration.MisoNotificationGatewayService">
-    <constructor-arg index="0" ref="notificationConsumerService"/>
+    <constructor-arg index="0" ref="notificationConsumerService" />
   </bean>
 
-  <integration:channel id="outboundChannel"/>
+  <integration:channel id="outboundChannel" />
 </beans>

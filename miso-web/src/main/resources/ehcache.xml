@@ -13,344 +13,277 @@
   ~
   ~ MISO is distributed in the hope that it will be useful,
   ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
   ~ GNU General Public License for more details.
   ~
   ~ You should have received a copy of the GNU General Public License
-  ~ along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+  ~ along with MISO. If not, see <http://www.gnu.org/licenses/>.
   ~
   ~ **********************************************************************
-  -->
+-->
 
-<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="ehcache.xsd"
-         updateCheck="true"
-         monitoring="autodetect"
-         dynamicConfig="true">
-    <diskStore path="${miso.baseDirectory}cache"/>
-    <defaultCache
-            maxElementsInMemory="10000"
-            eternal="false"
-            timeToIdleSeconds="120"
-            timeToLiveSeconds="120"
-            overflowToDisk="true"
-            diskPersistent="false"
-            diskExpiryThreadIntervalSeconds="120"
-            memoryStoreEvictionPolicy="LRU">
-    </defaultCache>
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ehcache.xsd" updateCheck="true"
+  monitoring="autodetect" dynamicConfig="true">
+  <diskStore path="${miso.baseDirectory}cache" />
+  <defaultCache maxElementsInMemory="10000" eternal="false" timeToIdleSeconds="120" timeToLiveSeconds="120" overflowToDisk="true"
+    diskPersistent="false" diskExpiryThreadIntervalSeconds="120" memoryStoreEvictionPolicy="LRU">
+  </defaultCache>
 
-    <cache name="limsCache" maxElementsInMemory="100000" eternal="false" overflowToDisk="false">
-        <cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
-                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
-                     retryAttempts="0" retryAttemptDelaySeconds="0"/>
-    </cache>
-
-    <!-- <cache name="alertCache" maxElementsInMemory="1000000" eternal="true" overflowToDisk="false" statistics="true"> -->
-    <cache name="alertCache" eternal="true" overflowToDisk="true" statistics="true"
-           maxBytesLocalHeap="5M" maxBytesLocalDisk="100M">
-                <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
-                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
-                     retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
-    </cache>
-
-    <!-- <cache name="containerCache" maxElementsInMemory="10000" eternal="true" overflowToDisk="false" statistics="true"> -->
-    <cache name="sequencerPartitionContainerCache" eternal="true" overflowToDisk="true" statistics="true"
-           maxBytesLocalHeap="5M" maxBytesLocalDisk="100M">
-                <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
-                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
-                     retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
-    </cache>
-
-    <cache name="lazySequencerPartitionContainerCache" eternal="true" overflowToDisk="true" statistics="true"
-           maxBytesLocalHeap="5M" maxBytesLocalDisk="100M">
-                <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
-                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
-                     retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
-    </cache>
-
-    <!-- <cache name="libraryDilutionCache" maxElementsInMemory="10000" eternal="true" overflowToDisk="false" statistics="true"> -->
-    <cache name="libraryDilutionCache" eternal="true" overflowToDisk="true" statistics="true"
-           maxBytesLocalHeap="30M" maxBytesLocalDisk="100M">
-                <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
-                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
-                     retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
-    </cache>
-
-    <cache name="lazyLibraryDilutionCache" eternal="true" overflowToDisk="true" statistics="true"
-           maxBytesLocalHeap="5M" maxBytesLocalDisk="75M">
-                <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
-                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
-                     retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
-    </cache>
-
-    <!-- <cache name="emPCRDilutionCache" maxElementsInMemory="10000" eternal="true" overflowToDisk="false" statistics="true"> -->
-    <cache name="emPCRDilutionCache" eternal="true" overflowToDisk="true" statistics="true"
-           maxBytesLocalHeap="30M" maxBytesLocalDisk="100M">
-                <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
-                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
-                     retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
-    </cache>
-
-    <cache name="lazyEmPCRDilutionCache" eternal="true" overflowToDisk="true" statistics="true"
-           maxBytesLocalHeap="5M" maxBytesLocalDisk="75M">
-                <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
-                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
-                     retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
-    </cache>
-
-    <!-- <cache name="empcrCache" maxElementsInMemory="100000" eternal="true" overflowToDisk="false" statistics="true"> -->
-    <cache name="emPCRCache" eternal="true" overflowToDisk="true" statistics="true"
-           maxBytesLocalHeap="10M" maxBytesLocalDisk="100M">
-                <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
-                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
-                     retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
-    </cache>
-
-    <cache name="lazyEmPCRCache" eternal="true" overflowToDisk="true" statistics="true"
-           maxBytesLocalHeap="5M" maxBytesLocalDisk="75M">
-                <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
-                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
-                     retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
-    </cache>
-
-    <!-- <cache name="experimentCache" maxElementsInMemory="1000" eternal="true" overflowToDisk="false" statistics="true"> -->
-    <cache name="experimentCache" eternal="true" overflowToDisk="true" statistics="true"
-           maxBytesLocalHeap="25M" maxBytesLocalDisk="500M">
-                <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
-                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
-                     retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
-    </cache>
-
-    <cache name="lazyExperimentCache" eternal="true" overflowToDisk="true" statistics="true"
-           maxBytesLocalHeap="5M" maxBytesLocalDisk="75M">
-                <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
-                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
-                     retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
-    </cache>
-
-    <!-- <cache name="partitionCache" maxElementsInMemory="10000" eternal="true" overflowToDisk="false" statistics="true"> -->
-    <cache name="kitCache" eternal="true" overflowToDisk="true" statistics="true"
-           maxBytesLocalHeap="5M" maxBytesLocalDisk="50M">
-                <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
-                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
-                     retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
-    </cache>
-
-    <cache name="lazyKitCache" eternal="true" overflowToDisk="true" statistics="true"
-           maxBytesLocalHeap="3M" maxBytesLocalDisk="20M">
-                <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
-                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
-                     retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
-    </cache>
-
-    <!-- <cache name="libraryCache" maxElementsInMemory="1000" eternal="true" overflowToDisk="true" statistics="true"> -->
-    <cache name="libraryCache" eternal="true" overflowToDisk="true" statistics="true"
-           maxBytesLocalHeap="50M" maxBytesLocalDisk="500M">
-                <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
-                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
-                     retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
-    </cache>
-
-    <cache name="lazyLibraryCache" eternal="true" overflowToDisk="true" statistics="true"
-           maxBytesLocalHeap="5M" maxBytesLocalDisk="75M">
-                <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
-                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
-                     retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
-    </cache>
-
-    <!-- <cache name="partitionCache" maxElementsInMemory="10000" eternal="true" overflowToDisk="false" statistics="true"> -->
-    <cache name="sequencerPoolPartitionCache" eternal="true" overflowToDisk="true" statistics="true"
-           maxBytesLocalHeap="10M" maxBytesLocalDisk="500M">
-                <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
-                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
-                     retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
-    </cache>
-
-    <cache name="lazySequencerPoolPartitionCache" eternal="true" overflowToDisk="true" statistics="true"
-           maxBytesLocalHeap="5M" maxBytesLocalDisk="75M">
-                <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
-                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
-                     retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
-    </cache>
-
-    <!-- <cache name="plateCache" maxElementsInMemory="10000" eternal="true" overflowToDisk="false" statistics="true"> -->
-    <cache name="plateCache" eternal="true" overflowToDisk="true" statistics="true"
-           maxBytesLocalHeap="10M" maxBytesLocalDisk="500M">
-                <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
-                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
-                     retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
-    </cache>
-
-    <cache name="lazyPlateCache" eternal="true" overflowToDisk="true" statistics="true"
-           maxBytesLocalHeap="5M" maxBytesLocalDisk="75M">
-                <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
-                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
-                     retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
-    </cache>
-
-    <!-- <cache name="poolCache" maxElementsInMemory="100" eternal="true" overflowToDisk="true" statistics="true"> -->
-    <cache name="poolCache" eternal="true" overflowToDisk="true" statistics="true"
-           maxBytesLocalHeap="50M" maxBytesLocalDisk="500M">
-                <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
-                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
-                     retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
-    </cache>
-
-    <cache name="lazyPoolCache" eternal="true" overflowToDisk="true" statistics="true"
-           maxBytesLocalHeap="10M" maxBytesLocalDisk="100M">
-                <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
-                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
-                     retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
-    </cache>
-
-    <!-- <cache name="projectCache" maxElementsInMemory="1000" eternal="true" overflowToDisk="true" statistics="true"> -->
-    <cache name="projectCache" eternal="true" overflowToDisk="true" statistics="true"
-           maxBytesLocalHeap="10M" maxBytesLocalDisk="500M">
-                <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
-                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
-                     retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
-    </cache>
-
-  <cache name="lazyProjectCache" eternal="true" overflowToDisk="true" statistics="true"
-         maxBytesLocalHeap="5M" maxBytesLocalDisk="75M">
-              <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
-                   writeCoalescing="false" writeBatching="false" writeBatchSize="1"
-                   retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+  <cache name="limsCache" maxElementsInMemory="100000" eternal="false" overflowToDisk="false">
+    <cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5" writeCoalescing="false" writeBatching="false"
+      writeBatchSize="1" retryAttempts="0" retryAttemptDelaySeconds="0" />
   </cache>
 
-    <!-- <cache name="projectOverviewCache" maxElementsInMemory="1000" eternal="true" overflowToDisk="false" statistics="true"> -->
-    <cache name="projectOverviewCache" eternal="true" overflowToDisk="true" statistics="true"
-           maxBytesLocalHeap="20M" maxBytesLocalDisk="500M">
-                <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
-                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
-                     retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
-    </cache>
+  <!-- <cache name="alertCache" maxElementsInMemory="1000000" eternal="true" overflowToDisk="false" statistics="true"> -->
+  <cache name="alertCache" eternal="true" overflowToDisk="true" statistics="true" maxBytesLocalHeap="5M" maxBytesLocalDisk="100M">
+    <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+      writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+      retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+  </cache>
 
-    <cache name="lazyProjectOverviewCache" eternal="true" overflowToDisk="true" statistics="true"
-           maxBytesLocalHeap="5M" maxBytesLocalDisk="75M">
-                <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
-                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
-                     retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
-    </cache>
+  <!-- <cache name="containerCache" maxElementsInMemory="10000" eternal="true" overflowToDisk="false" statistics="true"> -->
+  <cache name="sequencerPartitionContainerCache" eternal="true" overflowToDisk="true" statistics="true" maxBytesLocalHeap="5M"
+    maxBytesLocalDisk="100M">
+    <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+      writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+      retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+  </cache>
 
-    <!-- <cache name="runCache" maxElementsInMemory="100" eternal="true" overflowToDisk="true" statistics="true"> -->
-    <cache name="runCache" eternal="true" overflowToDisk="true" statistics="true"
-           maxBytesLocalHeap="50M" maxBytesLocalDisk="500M">
-                <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
-                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
-                     retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
-    </cache>
+  <cache name="lazySequencerPartitionContainerCache" eternal="true" overflowToDisk="true" statistics="true" maxBytesLocalHeap="5M"
+    maxBytesLocalDisk="100M">
+    <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+      writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+      retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+  </cache>
 
-    <cache name="lazyRunCache" eternal="true" overflowToDisk="true" statistics="true"
-           maxBytesLocalHeap="5M" maxBytesLocalDisk="75M">
-                <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
-                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
-                     retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
-    </cache>
+  <!-- <cache name="libraryDilutionCache" maxElementsInMemory="10000" eternal="true" overflowToDisk="false" statistics="true"> -->
+  <cache name="libraryDilutionCache" eternal="true" overflowToDisk="true" statistics="true" maxBytesLocalHeap="30M" maxBytesLocalDisk="100M">
+    <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+      writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+      retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+  </cache>
 
-    <!-- <cache name="sampleCache" maxElementsInMemory="1000" eternal="true" overflowToDisk="false" statistics="true"> -->
-    <cache name="sampleCache" eternal="true" overflowToDisk="true" statistics="true"
-           maxBytesLocalHeap="50M" maxBytesLocalDisk="500M">
-                <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
-                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
-                     retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
-    </cache>
+  <cache name="lazyLibraryDilutionCache" eternal="true" overflowToDisk="true" statistics="true" maxBytesLocalHeap="5M"
+    maxBytesLocalDisk="75M">
+    <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+      writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+      retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+  </cache>
 
-    <cache name="lazySampleCache" eternal="true" overflowToDisk="true" statistics="true"
-           maxBytesLocalHeap="5M" maxBytesLocalDisk="75M">
-                <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
-                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
-                     retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
-    </cache>
+  <!-- <cache name="emPCRDilutionCache" maxElementsInMemory="10000" eternal="true" overflowToDisk="false" statistics="true"> -->
+  <cache name="emPCRDilutionCache" eternal="true" overflowToDisk="true" statistics="true" maxBytesLocalHeap="30M" maxBytesLocalDisk="100M">
+    <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+      writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+      retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+  </cache>
+
+  <cache name="lazyEmPCRDilutionCache" eternal="true" overflowToDisk="true" statistics="true" maxBytesLocalHeap="5M"
+    maxBytesLocalDisk="75M">
+    <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+      writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+      retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+  </cache>
+
+  <!-- <cache name="empcrCache" maxElementsInMemory="100000" eternal="true" overflowToDisk="false" statistics="true"> -->
+  <cache name="emPCRCache" eternal="true" overflowToDisk="true" statistics="true" maxBytesLocalHeap="10M" maxBytesLocalDisk="100M">
+    <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+      writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+      retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+  </cache>
+
+  <cache name="lazyEmPCRCache" eternal="true" overflowToDisk="true" statistics="true" maxBytesLocalHeap="5M" maxBytesLocalDisk="75M">
+    <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+      writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+      retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+  </cache>
+
+  <!-- <cache name="experimentCache" maxElementsInMemory="1000" eternal="true" overflowToDisk="false" statistics="true"> -->
+  <cache name="experimentCache" eternal="true" overflowToDisk="true" statistics="true" maxBytesLocalHeap="25M" maxBytesLocalDisk="500M">
+    <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+      writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+      retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+  </cache>
+
+  <cache name="lazyExperimentCache" eternal="true" overflowToDisk="true" statistics="true" maxBytesLocalHeap="5M" maxBytesLocalDisk="75M">
+    <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+      writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+      retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+  </cache>
+
+  <!-- <cache name="partitionCache" maxElementsInMemory="10000" eternal="true" overflowToDisk="false" statistics="true"> -->
+  <cache name="kitCache" eternal="true" overflowToDisk="true" statistics="true" maxBytesLocalHeap="5M" maxBytesLocalDisk="50M">
+    <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+      writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+      retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+  </cache>
+
+  <cache name="lazyKitCache" eternal="true" overflowToDisk="true" statistics="true" maxBytesLocalHeap="3M" maxBytesLocalDisk="20M">
+    <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+      writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+      retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+  </cache>
+
+  <!-- <cache name="libraryCache" maxElementsInMemory="1000" eternal="true" overflowToDisk="true" statistics="true"> -->
+  <cache name="libraryCache" eternal="true" overflowToDisk="true" statistics="true" maxBytesLocalHeap="50M" maxBytesLocalDisk="500M">
+    <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+      writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+      retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+  </cache>
+
+  <cache name="lazyLibraryCache" eternal="true" overflowToDisk="true" statistics="true" maxBytesLocalHeap="5M" maxBytesLocalDisk="75M">
+    <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+      writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+      retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+  </cache>
+
+  <!-- <cache name="partitionCache" maxElementsInMemory="10000" eternal="true" overflowToDisk="false" statistics="true"> -->
+  <cache name="sequencerPoolPartitionCache" eternal="true" overflowToDisk="true" statistics="true" maxBytesLocalHeap="10M"
+    maxBytesLocalDisk="500M">
+    <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+      writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+      retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+  </cache>
+
+  <cache name="lazySequencerPoolPartitionCache" eternal="true" overflowToDisk="true" statistics="true" maxBytesLocalHeap="5M"
+    maxBytesLocalDisk="75M">
+    <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+      writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+      retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+  </cache>
+
+  <!-- <cache name="plateCache" maxElementsInMemory="10000" eternal="true" overflowToDisk="false" statistics="true"> -->
+  <cache name="plateCache" eternal="true" overflowToDisk="true" statistics="true" maxBytesLocalHeap="10M" maxBytesLocalDisk="500M">
+    <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+      writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+      retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+  </cache>
+
+  <cache name="lazyPlateCache" eternal="true" overflowToDisk="true" statistics="true" maxBytesLocalHeap="5M" maxBytesLocalDisk="75M">
+    <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+      writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+      retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+  </cache>
+
+  <!-- <cache name="poolCache" maxElementsInMemory="100" eternal="true" overflowToDisk="true" statistics="true"> -->
+  <cache name="poolCache" eternal="true" overflowToDisk="true" statistics="true" maxBytesLocalHeap="50M" maxBytesLocalDisk="500M">
+    <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+      writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+      retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+  </cache>
+
+  <cache name="lazyPoolCache" eternal="true" overflowToDisk="true" statistics="true" maxBytesLocalHeap="10M" maxBytesLocalDisk="100M">
+    <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+      writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+      retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+  </cache>
+
+  <!-- <cache name="projectCache" maxElementsInMemory="1000" eternal="true" overflowToDisk="true" statistics="true"> -->
+  <cache name="projectCache" eternal="true" overflowToDisk="true" statistics="true" maxBytesLocalHeap="10M" maxBytesLocalDisk="500M">
+    <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+      writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+      retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+  </cache>
+
+  <cache name="lazyProjectCache" eternal="true" overflowToDisk="true" statistics="true" maxBytesLocalHeap="5M" maxBytesLocalDisk="75M">
+    <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+      writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+      retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+  </cache>
+
+  <!-- <cache name="projectOverviewCache" maxElementsInMemory="1000" eternal="true" overflowToDisk="false" statistics="true"> -->
+  <cache name="projectOverviewCache" eternal="true" overflowToDisk="true" statistics="true" maxBytesLocalHeap="20M" maxBytesLocalDisk="500M">
+    <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+      writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+      retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+  </cache>
+
+  <cache name="lazyProjectOverviewCache" eternal="true" overflowToDisk="true" statistics="true" maxBytesLocalHeap="5M"
+    maxBytesLocalDisk="75M">
+    <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+      writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+      retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+  </cache>
+
+  <!-- <cache name="runCache" maxElementsInMemory="100" eternal="true" overflowToDisk="true" statistics="true"> -->
+  <cache name="runCache" eternal="true" overflowToDisk="true" statistics="true" maxBytesLocalHeap="50M" maxBytesLocalDisk="500M">
+    <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+      writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+      retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+  </cache>
+
+  <cache name="lazyRunCache" eternal="true" overflowToDisk="true" statistics="true" maxBytesLocalHeap="5M" maxBytesLocalDisk="75M">
+    <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+      writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+      retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+  </cache>
 
   <!-- <cache name="sampleCache" maxElementsInMemory="1000" eternal="true" overflowToDisk="false" statistics="true"> -->
-  <cache name="sampleQCCache" eternal="true" overflowToDisk="true" statistics="true"
-         maxBytesLocalHeap="10M" maxBytesLocalDisk="150M">
-              <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
-                   writeCoalescing="false" writeBatching="false" writeBatchSize="1"
-                   retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+  <cache name="sampleCache" eternal="true" overflowToDisk="true" statistics="true" maxBytesLocalHeap="50M" maxBytesLocalDisk="500M">
+    <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+      writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+      retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
   </cache>
 
-  <cache name="lazySampleQCCache" eternal="true" overflowToDisk="true" statistics="true"
-         maxBytesLocalHeap="5M" maxBytesLocalDisk="75M">
-              <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
-                   writeCoalescing="false" writeBatching="false" writeBatchSize="1"
-                   retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+  <cache name="lazySampleCache" eternal="true" overflowToDisk="true" statistics="true" maxBytesLocalHeap="5M" maxBytesLocalDisk="75M">
+    <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+      writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+      retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
   </cache>
 
-    <cache name="securityProfileCache" maxElementsInMemory="100000" eternal="true" overflowToDisk="true" statistics="true"/>
-    <!-- <cache name="securityProfileCache" eternal="true" overflowToDisk="true" statistics="true"
-           maxBytesLocalHeap="500M" -->
+  <!-- <cache name="sampleCache" maxElementsInMemory="1000" eternal="true" overflowToDisk="false" statistics="true"> -->
+  <cache name="sampleQCCache" eternal="true" overflowToDisk="true" statistics="true" maxBytesLocalHeap="10M" maxBytesLocalDisk="150M">
+    <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+      writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+      retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+  </cache>
 
-    <!-- <cache name="studyCache" maxElementsInMemory="1000" eternal="true" overflowToDisk="false" statistics="true"> -->
-    <cache name="studyCache" eternal="true" overflowToDisk="true" statistics="true"
-           maxBytesLocalHeap="5M" maxBytesLocalDisk="100M">
-                <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
-                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
-                     retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+  <cache name="lazySampleQCCache" eternal="true" overflowToDisk="true" statistics="true" maxBytesLocalHeap="5M" maxBytesLocalDisk="75M">
+    <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+      writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+      retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+  </cache>
 
-    </cache>
+  <cache name="securityProfileCache" maxElementsInMemory="100000" eternal="true" overflowToDisk="true" statistics="true" />
+  <!-- <cache name="securityProfileCache" eternal="true" overflowToDisk="true" statistics="true"
+    maxBytesLocalHeap="500M" -->
 
-    <cache name="lazyStudyCache" eternal="true" overflowToDisk="true" statistics="true"
-           maxBytesLocalHeap="3M" maxBytesLocalDisk="30M">
-                <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
-                     writeCoalescing="false" writeBatching="false" writeBatchSize="1"
-                     retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
+  <!-- <cache name="studyCache" maxElementsInMemory="1000" eternal="true" overflowToDisk="false" statistics="true"> -->
+  <cache name="studyCache" eternal="true" overflowToDisk="true" statistics="true" maxBytesLocalHeap="5M" maxBytesLocalDisk="100M">
+    <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+      writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+      retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
 
-    </cache>
+  </cache>
 
-    <!-- <cache name="userCache" maxElementsInMemory="100000" eternal="true" overflowToDisk="false" statistics="true"/> -->
-    <cache name="userCache" eternal="true" overflowToDisk="true" statistics="true"
-           maxBytesLocalHeap="5M" maxBytesLocalDisk="100M"/>
+  <cache name="lazyStudyCache" eternal="true" overflowToDisk="true" statistics="true" maxBytesLocalHeap="3M" maxBytesLocalDisk="30M">
+    <!--<cacheWriter writeMode="write-through" maxWriteDelay="0" rateLimitPerSecond="5"
+      writeCoalescing="false" writeBatching="false" writeBatchSize="1"
+      retryAttempts="0" retryAttemptDelaySeconds="0"/> -->
 
-    <cache name="lazyUserCache" eternal="true" overflowToDisk="false" statistics="true"
-           maxBytesLocalHeap="3M" maxBytesLocalDisk="30M"/>
+  </cache>
 
-<!-- LIST CACHES -->
-    <cache name="containerListCache"
-           maxElementsInMemory="1"
-           eternal="true"
-           overflowToDisk="false" statistics="true"/>
+  <!-- <cache name="userCache" maxElementsInMemory="100000" eternal="true" overflowToDisk="false" statistics="true"/> -->
+  <cache name="userCache" eternal="true" overflowToDisk="true" statistics="true" maxBytesLocalHeap="5M" maxBytesLocalDisk="100M" />
 
-    <cache name="experimentListCache"
-           maxElementsInMemory="1"
-           eternal="true"
-           overflowToDisk="false"
-           diskPersistent="false" statistics="true"/>
+  <cache name="lazyUserCache" eternal="true" overflowToDisk="false" statistics="true" maxBytesLocalHeap="3M" maxBytesLocalDisk="30M" />
 
-    <cache name="libraryListCache"
-           maxElementsInMemory="1"
-           eternal="true"
-           overflowToDisk="false" statistics="true"/>
+  <!-- LIST CACHES -->
+  <cache name="containerListCache" maxElementsInMemory="1" eternal="true" overflowToDisk="false" statistics="true" />
 
-    <cache name="partitionListCache"
-           maxElementsInMemory="1"
-           eternal="true"
-           overflowToDisk="false" statistics="true"/>
+  <cache name="experimentListCache" maxElementsInMemory="1" eternal="true" overflowToDisk="false" diskPersistent="false" statistics="true" />
 
-    <cache name="poolListCache"
-           maxElementsInMemory="1"
-           eternal="true"
-           overflowToDisk="false" statistics="true"/>
+  <cache name="libraryListCache" maxElementsInMemory="1" eternal="true" overflowToDisk="false" statistics="true" />
 
-    <cache name="projectListCache"
-           maxElementsInMemory="1"
-           eternal="true"
-           overflowToDisk="false" statistics="true"/>
+  <cache name="partitionListCache" maxElementsInMemory="1" eternal="true" overflowToDisk="false" statistics="true" />
 
-    <cache name="runListCache"
-           maxElementsInMemory="1"
-           eternal="true"
-           overflowToDisk="false" statistics="true"/>
+  <cache name="poolListCache" maxElementsInMemory="1" eternal="true" overflowToDisk="false" statistics="true" />
 
-    <cache name="sampleListCache"
-           maxElementsInMemory="1"
-           eternal="true"
-           overflowToDisk="false" statistics="true"/>
+  <cache name="projectListCache" maxElementsInMemory="1" eternal="true" overflowToDisk="false" statistics="true" />
 
-    <cache name="studyListCache"
-           maxElementsInMemory="1"
-           eternal="true"
-           overflowToDisk="false" statistics="true"/>
+  <cache name="runListCache" maxElementsInMemory="1" eternal="true" overflowToDisk="false" statistics="true" />
+
+  <cache name="sampleListCache" maxElementsInMemory="1" eternal="true" overflowToDisk="false" statistics="true" />
+
+  <cache name="studyListCache" maxElementsInMemory="1" eternal="true" overflowToDisk="false" statistics="true" />
 
 </ehcache>

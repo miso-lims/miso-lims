@@ -14,42 +14,41 @@
   ~
   ~ MISO is distributed in the hope that it will be useful,
   ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
   ~ GNU General Public License for more details.
   ~
   ~ You should have received a copy of the GNU General Public License
-  ~ along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+  ~ along with MISO. If not, see <http://www.gnu.org/licenses/>.
   ~
   ~ **********************************************************************
-  -->
+-->
 
-<conan-pipelines xmlns="http://www.ebi.ac.uk/arrayexpress/conan/pipelines"
-                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                 xsi:schemaLocation="http://www.ebi.ac.uk/arrayexpress/conan/pipelines
+<conan-pipelines xmlns="http://www.ebi.ac.uk/arrayexpress/conan/pipelines" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.ebi.ac.uk/arrayexpress/conan/pipelines
                                      http://www.ebi.ac.uk/arrayexpress/conan/pipelines.xsd">
 
   <!--
-  Add xml elements to name your pipeline and chain processes together here
-  Note that the interface will display these pipelines in declaration order, with the first pipeline as the default
+    Add xml elements to name your pipeline and chain processes together here
+    Note that the interface will display these pipelines in declaration order, with the first pipeline as the default
   -->
 
   <!-- Demo processes -->
   <pipeline name="demo 1" creator="davey">
     <processes>
-      <process name="demo process 1"/>
+      <process name="demo process 1" />
     </processes>
   </pipeline>
 
   <pipeline name="demo 2" creator="davey">
     <processes>
-      <process name="demo process 2"/>
-      <process name="demo process 2 (5 parameters)"/>
+      <process name="demo process 2" />
+      <process name="demo process 2 (5 parameters)" />
     </processes>
   </pipeline>
 
   <pipeline name="daemon demo" creator="davey" daemonized="true">
     <processes>
-      <process name="daemon demo process"/>
+      <process name="daemon demo process" />
     </processes>
   </pipeline>
 

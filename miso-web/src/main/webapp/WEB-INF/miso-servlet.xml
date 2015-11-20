@@ -13,21 +13,18 @@
   ~
   ~ MISO is distributed in the hope that it will be useful,
   ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
   ~ GNU General Public License for more details.
   ~
   ~ You should have received a copy of the GNU General Public License
-  ~ along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+  ~ along with MISO. If not, see <http://www.gnu.org/licenses/>.
   ~
   ~ **********************************************************************
-  -->
+-->
 
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:mvc="http://www.springframework.org/schema/mvc" 
-       xmlns:tx="http://www.springframework.org/schema/tx"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans 
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+  xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:tx="http://www.springframework.org/schema/tx"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans 
        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
        http://www.springframework.org/schema/context 
        http://www.springframework.org/schema/context/spring-context-3.1.xsd 
@@ -35,70 +32,24 @@
        http://www.springframework.org/schema/mvc/spring-mvc.xsd 
        http://www.springframework.org/schema/tx 
        http://www.springframework.org/schema/tx/spring-tx.xsd"
-       default-autowire="byName">
+  default-autowire="byName">
 
-    <!-- <context:load-time-weaver aspectj-weaving="on" weaver-class="org.springframework.instrument.classloading.ReflectiveLoadTimeWeaver"/> -->
-    <!--<mvc:annotation-driven />-->
+  <tx:annotation-driven proxy-target-class="true" />
 
-    <tx:annotation-driven proxy-target-class="true" />
+  <context:component-scan annotation-config="true" base-package="com.eaglegenomics.simlims" />
+  <context:component-scan annotation-config="true" base-package="uk.ac.bbsrc.tgac.miso" />
+  <context:component-scan annotation-config="true" base-package="net.sourceforge.fluxion.ajax" />
 
-    <context:component-scan annotation-config="true" base-package="com.eaglegenomics.simlims"/>
-    <context:component-scan annotation-config="true" base-package="uk.ac.bbsrc.tgac.miso"/>
-    <context:component-scan annotation-config="true" base-package="net.sourceforge.fluxion.ajax"/>
-    
-    <context:property-placeholder location="classpath:miso.properties" />
+  <context:property-placeholder location="classpath:miso.properties" />
 
-    <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
-      <property name="location">
-          <value>classpath:miso.properties</value>
-      </property>
-      <property name="ignoreUnresolvablePlaceholders" value="true"/>
-    </bean>
+  <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
+    <property name="location">
+      <value>classpath:miso.properties</value>
+    </property>
+    <property name="ignoreUnresolvablePlaceholders" value="true" />
+  </bean>
 
-    <!-- <bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping"/> -->
+  <bean name="webBindingInitializer" class="uk.ac.bbsrc.tgac.miso.spring.LimsBindingInitializer" />
 
-    <!-- <bean name="misoWebBinder" class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
-        <property name="cacheSeconds" value="0"/>
-        <property name="webBindingInitializer">
-            <bean class="uk.ac.bbsrc.tgac.miso.spring.LimsBindingInitializer"/>
-        </property>
-        <property name="messageConverters">
-            <list>
-               <bean class="org.springframework.http.converter.ByteArrayHttpMessageConverter" />
-               <bean class="org.springframework.http.converter.StringHttpMessageConverter" />
-               <bean class="org.springframework.http.converter.FormHttpMessageConverter" />
-               <bean class="org.springframework.http.converter.xml.SourceHttpMessageConverter" />
-               <bean class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter"/>
-            </list>
-        </property>
-        <property name="sessionAttributeStore" ref="sessionConversationAttributeStore"/>
-    </bean>
-    -->
-  <!--
-    <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
-      <property name="cacheSeconds" value="0"/>
-      <property name="webBindingInitializer">
-          <bean class="uk.ac.bbsrc.tgac.miso.spring.LimsBindingInitializer"/>
-      </property>
-      <property name="messageConverters">
-          <list>
-             <bean class="org.springframework.http.converter.ByteArrayHttpMessageConverter" />
-             <bean class="org.springframework.http.converter.StringHttpMessageConverter" />
-             <bean class="org.springframework.http.converter.FormHttpMessageConverter" />
-             <bean class="org.springframework.http.converter.xml.SourceHttpMessageConverter" />
-             <bean class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter"/>
-          </list>
-      </property>
-      <property name="sessionAttributeStore" ref="sessionConversationAttributeStore"/>
-    </bean>
-    -->
-
-    <bean name="webBindingInitializer" class="uk.ac.bbsrc.tgac.miso.spring.LimsBindingInitializer"/>
-
-    <bean name="inputDataXmlView" class="uk.ac.bbsrc.tgac.miso.webapp.controller.InputDataXmlView"/>
-
-    <!-- <bean id="sessionConversationAttributeStore" class="uk.ac.bbsrc.tgac.miso.webapp.util.SessionConversationAttributeStore">
-      <property name="numConversationsToKeep" value="1000"/>
-    </bean> -->
-
+  <bean name="inputDataXmlView" class="uk.ac.bbsrc.tgac.miso.webapp.controller.InputDataXmlView" />
 </beans>

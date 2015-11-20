@@ -13,56 +13,55 @@
   ~
   ~ MISO is distributed in the hope that it will be useful,
   ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
   ~ GNU General Public License for more details.
   ~
   ~ You should have received a copy of the GNU General Public License
-  ~ along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+  ~ along with MISO. If not, see <http://www.gnu.org/licenses/>.
   ~
   ~ **********************************************************************
-  -->
+-->
 
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:aop="http://www.springframework.org/schema/aop" xmlns:util="http://www.springframework.org/schema/util"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+  xmlns:util="http://www.springframework.org/schema/util"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
-       default-autowire="byName">
+  default-autowire="byName">
 
-  <bean name="watchManager" class="uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager"/>
+  <bean name="watchManager" class="uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager" />
 
   <bean id="userUpdateAspectBean" class="uk.ac.bbsrc.tgac.miso.core.event.impl.UserUpdateAspect">
-    <property name="runAlertManager" ref="runAlertManager"/>
-    <property name="projectAlertManager" ref="projectAlertManager"/>
-    <property name="poolAlertManager" ref="poolAlertManager"/>
+    <property name="runAlertManager" ref="runAlertManager" />
+    <property name="projectAlertManager" ref="projectAlertManager" />
+    <property name="poolAlertManager" ref="poolAlertManager" />
   </bean>
 
-<!-- ALERTERS -->
+  <!-- ALERTERS -->
   <bean name="daoAlerterService" class="uk.ac.bbsrc.tgac.miso.core.event.alerter.DaoAlerterService">
-    <property name="alertStore" ref="sqlAlertDAO"/>
+    <property name="alertStore" ref="sqlAlertDAO" />
   </bean>
 
   <bean name="emailAlerterService" class="uk.ac.bbsrc.tgac.miso.core.event.alerter.EmailAlerterService">
     <property name="mailProps">
-      <bean factory-bean="propertyConfigurer" factory-method="getPropertiesAsProperties"/>
+      <bean factory-bean="propertyConfigurer" factory-method="getPropertiesAsProperties" />
     </property>
   </bean>
 
-<!-- RUNS -->
+  <!-- RUNS -->
   <bean id="runAlertAspectBean" class="uk.ac.bbsrc.tgac.miso.core.event.impl.RunAlertAspect">
-    <constructor-arg index="0" ref="runAlertManager"/>
+    <constructor-arg index="0" ref="runAlertManager" />
   </bean>
 
   <bean name="runAlertManager" class="uk.ac.bbsrc.tgac.miso.core.event.manager.RunAlertManager">
-    <property name="enabled" value="${miso.alerting.enabled}"/>
-    <property name="securityManager" ref="securityManager"/>
+    <property name="enabled" value="${miso.alerting.enabled}" />
+    <property name="securityManager" ref="securityManager" />
   </bean>
 
   <bean name="runListener" class="uk.ac.bbsrc.tgac.miso.core.event.impl.DefaultListener">
     <property name="responderServices">
       <set value-type="uk.ac.bbsrc.tgac.miso.core.event.ResponderService">
-        <ref bean="runFailedResponderService"/>
-        <ref bean="runQcAddedResponderService"/>
+        <ref bean="runFailedResponderService" />
+        <ref bean="runQcAddedResponderService" />
       </set>
     </property>
   </bean>
@@ -70,8 +69,8 @@
   <bean name="runFailedResponderService" class="uk.ac.bbsrc.tgac.miso.core.event.responder.RunFailedResponderService">
     <property name="alerterServices">
       <set value-type="uk.ac.bbsrc.tgac.miso.core.event.AlerterService">
-        <ref bean="daoAlerterService"/>
-        <ref bean="emailAlerterService"/>
+        <ref bean="daoAlerterService" />
+        <ref bean="emailAlerterService" />
       </set>
     </property>
   </bean>
@@ -79,24 +78,24 @@
   <bean name="runQcAddedResponderService" class="uk.ac.bbsrc.tgac.miso.core.event.responder.RunQcAddedResponderService">
     <property name="alerterServices">
       <set value-type="uk.ac.bbsrc.tgac.miso.core.event.AlerterService">
-        <ref bean="daoAlerterService"/>
-        <ref bean="emailAlerterService"/>
+        <ref bean="daoAlerterService" />
+        <ref bean="emailAlerterService" />
       </set>
     </property>
   </bean>
 
-<!-- PROJECTS -->
+  <!-- PROJECTS -->
   <bean id="projectAlertAspectBean" class="uk.ac.bbsrc.tgac.miso.core.event.impl.ProjectAlertAspect">
-    <constructor-arg index="0" ref="projectAlertManager"/>
+    <constructor-arg index="0" ref="projectAlertManager" />
   </bean>
 
   <bean id="projectOverviewAlertAspectBean" class="uk.ac.bbsrc.tgac.miso.core.event.impl.ProjectOverviewAlertAspect">
-    <constructor-arg index="0" ref="projectAlertManager"/>
+    <constructor-arg index="0" ref="projectAlertManager" />
   </bean>
 
   <bean name="projectAlertManager" class="uk.ac.bbsrc.tgac.miso.core.event.manager.ProjectAlertManager">
-    <property name="enabled" value="${miso.alerting.enabled}"/>
-    <property name="securityManager" ref="securityManager"/>
+    <property name="enabled" value="${miso.alerting.enabled}" />
+    <property name="securityManager" ref="securityManager" />
   </bean>
 
   <bean name="projectListener" class="uk.ac.bbsrc.tgac.miso.core.event.impl.DefaultListener">
@@ -105,13 +104,13 @@
   <bean name="projectOverviewListener" class="uk.ac.bbsrc.tgac.miso.core.event.impl.DefaultListener">
     <property name="responderServices">
       <set value-type="uk.ac.bbsrc.tgac.miso.core.event.ResponderService">
-        <ref bean="allSamplesQcPassedResponderService"/>
-        <ref bean="libraryPreparationCompleteResponderService"/>
-        <ref bean="allLibrariesQcPassedResponderService"/>
-        <ref bean="poolConstructionCompleteResponderService"/>
-        <ref bean="poolConstructionCompleteResponderService"/>
-        <ref bean="allRunsCompleteResponderService"/>
-        <ref bean="primaryAnalysisCompleteResponderService"/>
+        <ref bean="allSamplesQcPassedResponderService" />
+        <ref bean="libraryPreparationCompleteResponderService" />
+        <ref bean="allLibrariesQcPassedResponderService" />
+        <ref bean="poolConstructionCompleteResponderService" />
+        <ref bean="poolConstructionCompleteResponderService" />
+        <ref bean="allRunsCompleteResponderService" />
+        <ref bean="primaryAnalysisCompleteResponderService" />
       </set>
     </property>
   </bean>
@@ -119,8 +118,8 @@
   <bean name="allSamplesQcPassedResponderService" class="uk.ac.bbsrc.tgac.miso.core.event.responder.AllSamplesQcPassedResponderService">
     <property name="alerterServices">
       <set value-type="uk.ac.bbsrc.tgac.miso.core.event.AlerterService">
-        <ref bean="daoAlerterService"/>
-        <ref bean="emailAlerterService"/>
+        <ref bean="daoAlerterService" />
+        <ref bean="emailAlerterService" />
       </set>
     </property>
   </bean>
@@ -128,8 +127,8 @@
   <bean name="libraryPreparationCompleteResponderService" class="uk.ac.bbsrc.tgac.miso.core.event.responder.LibraryPreparationCompleteResponderService">
     <property name="alerterServices">
       <set value-type="uk.ac.bbsrc.tgac.miso.core.event.AlerterService">
-        <ref bean="daoAlerterService"/>
-        <ref bean="emailAlerterService"/>
+        <ref bean="daoAlerterService" />
+        <ref bean="emailAlerterService" />
       </set>
     </property>
   </bean>
@@ -137,8 +136,8 @@
   <bean name="allLibrariesQcPassedResponderService" class="uk.ac.bbsrc.tgac.miso.core.event.responder.AllLibrariesQcPassedResponderService">
     <property name="alerterServices">
       <set value-type="uk.ac.bbsrc.tgac.miso.core.event.AlerterService">
-        <ref bean="daoAlerterService"/>
-        <ref bean="emailAlerterService"/>
+        <ref bean="daoAlerterService" />
+        <ref bean="emailAlerterService" />
       </set>
     </property>
   </bean>
@@ -146,8 +145,8 @@
   <bean name="poolConstructionCompleteResponderService" class="uk.ac.bbsrc.tgac.miso.core.event.responder.PoolConstructionCompleteResponderService">
     <property name="alerterServices">
       <set value-type="uk.ac.bbsrc.tgac.miso.core.event.AlerterService">
-        <ref bean="daoAlerterService"/>
-        <ref bean="emailAlerterService"/>
+        <ref bean="daoAlerterService" />
+        <ref bean="emailAlerterService" />
       </set>
     </property>
   </bean>
@@ -155,8 +154,8 @@
   <bean name="allRunsCompleteResponderService" class="uk.ac.bbsrc.tgac.miso.core.event.responder.AllRunsCompletedResponderService">
     <property name="alerterServices">
       <set value-type="uk.ac.bbsrc.tgac.miso.core.event.AlerterService">
-        <ref bean="daoAlerterService"/>
-        <ref bean="emailAlerterService"/>
+        <ref bean="daoAlerterService" />
+        <ref bean="emailAlerterService" />
       </set>
     </property>
   </bean>
@@ -164,26 +163,26 @@
   <bean name="primaryAnalysisCompleteResponderService" class="uk.ac.bbsrc.tgac.miso.core.event.responder.PrimaryAnalysisCompletedResponderService">
     <property name="alerterServices">
       <set value-type="uk.ac.bbsrc.tgac.miso.core.event.AlerterService">
-        <ref bean="daoAlerterService"/>
-        <ref bean="emailAlerterService"/>
+        <ref bean="daoAlerterService" />
+        <ref bean="emailAlerterService" />
       </set>
     </property>
   </bean>
 
-<!-- POOLS -->
+  <!-- POOLS -->
   <bean id="poolAlertAspectBean" class="uk.ac.bbsrc.tgac.miso.core.event.impl.PoolAlertAspect">
-    <constructor-arg index="0" ref="poolAlertManager"/>
+    <constructor-arg index="0" ref="poolAlertManager" />
   </bean>
 
   <bean name="poolAlertManager" class="uk.ac.bbsrc.tgac.miso.core.event.manager.PoolAlertManager">
-    <property name="enabled" value="${miso.alerting.enabled}"/>
-    <property name="securityManager" ref="securityManager"/>
+    <property name="enabled" value="${miso.alerting.enabled}" />
+    <property name="securityManager" ref="securityManager" />
   </bean>
 
   <bean name="poolListener" class="uk.ac.bbsrc.tgac.miso.core.event.impl.DefaultListener">
     <property name="responderServices">
       <set value-type="uk.ac.bbsrc.tgac.miso.core.event.ResponderService">
-        <ref bean="poolReadyResponderService"/>
+        <ref bean="poolReadyResponderService" />
       </set>
     </property>
   </bean>
@@ -191,94 +190,94 @@
   <bean name="poolReadyResponderService" class="uk.ac.bbsrc.tgac.miso.core.event.responder.PoolReadyResponderService">
     <property name="alerterServices">
       <set value-type="uk.ac.bbsrc.tgac.miso.core.event.AlerterService">
-        <ref bean="daoAlerterService"/>
-        <ref bean="emailAlerterService"/>
+        <ref bean="daoAlerterService" />
+        <ref bean="emailAlerterService" />
       </set>
     </property>
   </bean>
 
-<!-- ASPECT CONFIG -->
+  <!-- ASPECT CONFIG -->
   <aop:config>
     <aop:aspect id="overviewWatcherUpdateAspect" ref="projectOverviewAlertAspectBean">
       <aop:pointcut id="overviewWatcherAddPointcut"
-                    expression="execution(* uk.ac.bbsrc.tgac.miso.core.store.WatcherStore.saveWatchedEntityUser(uk.ac.bbsrc.tgac.miso.core.data.Watchable,com.eaglegenomics.simlims.core.User)) and args(overview,user)"/>
-      <aop:after-returning pointcut-ref="overviewWatcherAddPointcut" method="addWatcher" arg-names="overview,user"/>
+        expression="execution(* uk.ac.bbsrc.tgac.miso.core.store.WatcherStore.saveWatchedEntityUser(uk.ac.bbsrc.tgac.miso.core.data.Watchable,com.eaglegenomics.simlims.core.User)) and args(overview,user)" />
+      <aop:after-returning pointcut-ref="overviewWatcherAddPointcut" method="addWatcher" arg-names="overview,user" />
 
       <aop:pointcut id="overviewWatcherRemovePointcut"
-                    expression="execution(* uk.ac.bbsrc.tgac.miso.core.store.WatcherStore.removeWatchedEntityByUser(uk.ac.bbsrc.tgac.miso.core.data.Watchable,com.eaglegenomics.simlims.core.User)) and args(overview,user)"/>
-      <aop:after-returning pointcut-ref="overviewWatcherRemovePointcut" method="removeWatcher" arg-names="overview,user"/>
+        expression="execution(* uk.ac.bbsrc.tgac.miso.core.store.WatcherStore.removeWatchedEntityByUser(uk.ac.bbsrc.tgac.miso.core.data.Watchable,com.eaglegenomics.simlims.core.User)) and args(overview,user)" />
+      <aop:after-returning pointcut-ref="overviewWatcherRemovePointcut" method="removeWatcher" arg-names="overview,user" />
 
       <aop:pointcut id="overviewWatchPointcut"
-        expression="execution(* uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager.watch(uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview,com.eaglegenomics.simlims.core.User)) and args(overview,user)"/>
-      <aop:after-returning pointcut-ref="overviewWatchPointcut" method="addWatcher" arg-names="overview,user"/>
+        expression="execution(* uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager.watch(uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview,com.eaglegenomics.simlims.core.User)) and args(overview,user)" />
+      <aop:after-returning pointcut-ref="overviewWatchPointcut" method="addWatcher" arg-names="overview,user" />
 
       <aop:pointcut id="overviewUnwatchPointcut"
-        expression="execution(* uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager.unwatch(uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview,com.eaglegenomics.simlims.core.User)) and args(overview,user)"/>
-      <aop:after-returning pointcut-ref="overviewUnwatchPointcut" method="removeWatcher" arg-names="overview,user"/>
+        expression="execution(* uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager.unwatch(uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview,com.eaglegenomics.simlims.core.User)) and args(overview,user)" />
+      <aop:after-returning pointcut-ref="overviewUnwatchPointcut" method="removeWatcher" arg-names="overview,user" />
     </aop:aspect>
 
     <aop:aspect id="projectAlertAspect" ref="projectAlertAspectBean">
       <aop:pointcut id="projectAlertPointcut"
-        expression="execution(* uk.ac.bbsrc.tgac.miso.core.manager.RequestManager.saveProject(uk.ac.bbsrc.tgac.miso.core.data.Project))"/>
-      <aop:after-returning pointcut-ref="projectAlertPointcut" method="update" returning="projectId"/>
+        expression="execution(* uk.ac.bbsrc.tgac.miso.core.manager.RequestManager.saveProject(uk.ac.bbsrc.tgac.miso.core.data.Project))" />
+      <aop:after-returning pointcut-ref="projectAlertPointcut" method="update" returning="projectId" />
 
       <aop:pointcut id="projectWatcherRemovePointcut"
-                    expression="execution(* uk.ac.bbsrc.tgac.miso.core.store.WatcherStore.removeWatchedEntityByUser(uk.ac.bbsrc.tgac.miso.core.data.Watchable,com.eaglegenomics.simlims.core.User)) and args(project,user)"/>
-      <aop:after-returning pointcut-ref="projectWatcherRemovePointcut" method="removeWatcher" arg-names="project,user"/>
+        expression="execution(* uk.ac.bbsrc.tgac.miso.core.store.WatcherStore.removeWatchedEntityByUser(uk.ac.bbsrc.tgac.miso.core.data.Watchable,com.eaglegenomics.simlims.core.User)) and args(project,user)" />
+      <aop:after-returning pointcut-ref="projectWatcherRemovePointcut" method="removeWatcher" arg-names="project,user" />
 
       <aop:pointcut id="projectWatcherAddPointcut"
-                    expression="execution(* uk.ac.bbsrc.tgac.miso.core.store.WatcherStore.saveWatchedEntityUser(uk.ac.bbsrc.tgac.miso.core.data.Watchable,com.eaglegenomics.simlims.core.User)) and args(project,user)"/>
-      <aop:after-returning pointcut-ref="projectWatcherAddPointcut" method="addWatcher" arg-names="project,user"/>
+        expression="execution(* uk.ac.bbsrc.tgac.miso.core.store.WatcherStore.saveWatchedEntityUser(uk.ac.bbsrc.tgac.miso.core.data.Watchable,com.eaglegenomics.simlims.core.User)) and args(project,user)" />
+      <aop:after-returning pointcut-ref="projectWatcherAddPointcut" method="addWatcher" arg-names="project,user" />
 
       <aop:pointcut id="projectWatchPointcut"
-        expression="execution(* uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager.watch(uk.ac.bbsrc.tgac.miso.core.data.Project,com.eaglegenomics.simlims.core.User)) and args(project,user)"/>
-      <aop:after-returning pointcut-ref="projectWatchPointcut" method="addWatcher" arg-names="project,user"/>
+        expression="execution(* uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager.watch(uk.ac.bbsrc.tgac.miso.core.data.Project,com.eaglegenomics.simlims.core.User)) and args(project,user)" />
+      <aop:after-returning pointcut-ref="projectWatchPointcut" method="addWatcher" arg-names="project,user" />
 
       <aop:pointcut id="projectUnwatchPointcut"
-        expression="execution(* uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager.unwatch(uk.ac.bbsrc.tgac.miso.core.data.Project,com.eaglegenomics.simlims.core.User)) and args(project,user)"/>
-      <aop:after-returning pointcut-ref="projectUnwatchPointcut" method="removeWatcher" arg-names="project,user"/>
+        expression="execution(* uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager.unwatch(uk.ac.bbsrc.tgac.miso.core.data.Project,com.eaglegenomics.simlims.core.User)) and args(project,user)" />
+      <aop:after-returning pointcut-ref="projectUnwatchPointcut" method="removeWatcher" arg-names="project,user" />
     </aop:aspect>
 
     <aop:aspect id="runAlertAspect" ref="runAlertAspectBean">
       <aop:pointcut id="runAlertPointcut"
-        expression="execution(* uk.ac.bbsrc.tgac.miso.core.manager.RequestManager.saveRun(uk.ac.bbsrc.tgac.miso.core.data.Run))"/>
-      <aop:after-returning pointcut-ref="runAlertPointcut" method="update" returning="runId"/>
+        expression="execution(* uk.ac.bbsrc.tgac.miso.core.manager.RequestManager.saveRun(uk.ac.bbsrc.tgac.miso.core.data.Run))" />
+      <aop:after-returning pointcut-ref="runAlertPointcut" method="update" returning="runId" />
 
       <aop:pointcut id="runWatchPointcut"
-        expression="execution(* uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager.watch(uk.ac.bbsrc.tgac.miso.core.data.Run,com.eaglegenomics.simlims.core.User)) and args(run,user)"/>
-      <aop:after-returning pointcut-ref="runWatchPointcut" method="addWatcher" arg-names="run,user"/>
+        expression="execution(* uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager.watch(uk.ac.bbsrc.tgac.miso.core.data.Run,com.eaglegenomics.simlims.core.User)) and args(run,user)" />
+      <aop:after-returning pointcut-ref="runWatchPointcut" method="addWatcher" arg-names="run,user" />
 
       <aop:pointcut id="runUnwatchPointcut"
-        expression="execution(* uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager.unwatch(uk.ac.bbsrc.tgac.miso.core.data.Run,com.eaglegenomics.simlims.core.User)) and args(run,user)"/>
-      <aop:after-returning pointcut-ref="runUnwatchPointcut" method="removeWatcher" arg-names="run,user"/>
+        expression="execution(* uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager.unwatch(uk.ac.bbsrc.tgac.miso.core.data.Run,com.eaglegenomics.simlims.core.User)) and args(run,user)" />
+      <aop:after-returning pointcut-ref="runUnwatchPointcut" method="removeWatcher" arg-names="run,user" />
     </aop:aspect>
 
     <aop:aspect id="poolAlertAspect" ref="poolAlertAspectBean">
       <aop:pointcut id="poolAlertPointcut"
-        expression="execution(* uk.ac.bbsrc.tgac.miso.core.manager.RequestManager.savePool(uk.ac.bbsrc.tgac.miso.core.data.Pool)) and args(pool)"/>
-      <aop:after-returning pointcut-ref="poolAlertPointcut" method="update" arg-names="pool"/>
+        expression="execution(* uk.ac.bbsrc.tgac.miso.core.manager.RequestManager.savePool(uk.ac.bbsrc.tgac.miso.core.data.Pool)) and args(pool)" />
+      <aop:after-returning pointcut-ref="poolAlertPointcut" method="update" arg-names="pool" />
 
       <aop:pointcut id="poolWatcherAddPointcut"
-                    expression="execution(* uk.ac.bbsrc.tgac.miso.core.store.WatcherStore.saveWatchedEntityUser(uk.ac.bbsrc.tgac.miso.core.data.Watchable,com.eaglegenomics.simlims.core.User)) and args(pool,user)"/>
-      <aop:after-returning pointcut-ref="poolWatcherAddPointcut" method="addWatcher" arg-names="pool,user"/>
+        expression="execution(* uk.ac.bbsrc.tgac.miso.core.store.WatcherStore.saveWatchedEntityUser(uk.ac.bbsrc.tgac.miso.core.data.Watchable,com.eaglegenomics.simlims.core.User)) and args(pool,user)" />
+      <aop:after-returning pointcut-ref="poolWatcherAddPointcut" method="addWatcher" arg-names="pool,user" />
 
       <aop:pointcut id="poolWatcherRemovePointcut"
-                    expression="execution(* uk.ac.bbsrc.tgac.miso.core.store.WatcherStore.removeWatchedEntityByUser(uk.ac.bbsrc.tgac.miso.core.data.Watchable,com.eaglegenomics.simlims.core.User)) and args(pool,user)"/>
-      <aop:after-returning pointcut-ref="poolWatcherRemovePointcut" method="removeWatcher" arg-names="pool,user"/>
+        expression="execution(* uk.ac.bbsrc.tgac.miso.core.store.WatcherStore.removeWatchedEntityByUser(uk.ac.bbsrc.tgac.miso.core.data.Watchable,com.eaglegenomics.simlims.core.User)) and args(pool,user)" />
+      <aop:after-returning pointcut-ref="poolWatcherRemovePointcut" method="removeWatcher" arg-names="pool,user" />
 
       <aop:pointcut id="poolWatchPointcut"
-        expression="execution(* uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager.watch(uk.ac.bbsrc.tgac.miso.core.data.Pool,com.eaglegenomics.simlims.core.User)) and args(pool,user)"/>
-      <aop:after-returning pointcut-ref="poolWatchPointcut" method="addWatcher" arg-names="pool,user"/>
+        expression="execution(* uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager.watch(uk.ac.bbsrc.tgac.miso.core.data.Pool,com.eaglegenomics.simlims.core.User)) and args(pool,user)" />
+      <aop:after-returning pointcut-ref="poolWatchPointcut" method="addWatcher" arg-names="pool,user" />
 
       <aop:pointcut id="poolUnwatchPointcut"
-        expression="execution(* uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager.unwatch(uk.ac.bbsrc.tgac.miso.core.data.Pool,com.eaglegenomics.simlims.core.User)) and args(pool,user)"/>
-      <aop:after-returning pointcut-ref="poolUnwatchPointcut" method="removeWatcher" arg-names="pool,user"/>
+        expression="execution(* uk.ac.bbsrc.tgac.miso.core.event.manager.WatchManager.unwatch(uk.ac.bbsrc.tgac.miso.core.data.Pool,com.eaglegenomics.simlims.core.User)) and args(pool,user)" />
+      <aop:after-returning pointcut-ref="poolUnwatchPointcut" method="removeWatcher" arg-names="pool,user" />
     </aop:aspect>
 
     <aop:aspect id="userUpdateAspect" ref="userUpdateAspectBean">
       <aop:pointcut id="userUpdatePointcut"
-        expression="execution(* com.eaglegenomics.simlims.core.manager.SecurityManager.saveUser(com.eaglegenomics.simlims.core.User))"/>
-      <aop:after-returning pointcut-ref="userUpdatePointcut" method="update" returning="userId"/>
+        expression="execution(* com.eaglegenomics.simlims.core.manager.SecurityManager.saveUser(com.eaglegenomics.simlims.core.User))" />
+      <aop:after-returning pointcut-ref="userUpdatePointcut" method="update" returning="userId" />
     </aop:aspect>
 
   </aop:config>
