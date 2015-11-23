@@ -72,6 +72,11 @@
 
  <dependencies>
   <dependency>
+   <groupId>${parent.groupId}</groupId>
+   <artifactId>integration-tools</artifactId>
+   <version>${parent.version}</version>
+  </dependency>
+  <dependency>
    <groupId>org.codehaus.jackson</groupId>
    <artifactId>jackson-mapper-asl</artifactId>
   </dependency>

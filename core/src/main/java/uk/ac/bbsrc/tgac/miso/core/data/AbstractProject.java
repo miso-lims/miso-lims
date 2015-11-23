@@ -30,10 +30,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
+import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -41,6 +38,9 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.Transient;
 
 import org.apache.commons.lang.BooleanUtils;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.TypeDefs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +50,10 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
+import uk.ac.bbsrc.tgac.miso.core.data.visitor.SubmittableVisitor;
+import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressTypeUserType;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
+import uk.ac.bbsrc.tgac.miso.core.event.listener.ProjectListener;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 
@@ -61,6 +64,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
  * @since 0.0.2
  */
 @MappedSuperclass
+@TypeDefs({ @TypeDef(name = "progressTypeUserType", typeClass = ProgressTypeUserType.class) })
 public abstract class AbstractProject implements Project {
   protected static final Logger log = LoggerFactory.getLogger(AbstractProject.class);
   private static final long serialVersionUID = 1L;
@@ -93,7 +97,8 @@ public abstract class AbstractProject implements Project {
   @Transient
   private Collection<String> issueKeys = new HashSet<String>();
 
-  @Enumerated(EnumType.STRING)
+  @Column
+  @Type(type = "progressTypeUserType")
   private ProgressType progress;
 
   @Transient
