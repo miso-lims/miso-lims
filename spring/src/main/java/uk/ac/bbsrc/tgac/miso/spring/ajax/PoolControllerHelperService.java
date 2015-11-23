@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -701,12 +702,22 @@ public class PoolControllerHelperService {
   }
 
   public JSONObject listPoolsDataTable(HttpSession session, JSONObject json) {
-    if (json.has("platform") && !isStringEmptyOrNull(json.getString("platform"))) {
+    Map<String, Set<Pool>> poolMap = new HashMap<>();
+    for (PlatformType pt : PlatformType.values()) {
+      poolMap.put(pt.getKey(), new HashSet<Pool>());
+    }
+
+    JSONObject j = new JSONObject();
+
       try {
-        String platform = json.getString("platform");
-        JSONObject j = new JSONObject();
+      for (Pool pool : requestManager.listAllPools()) {
+        poolMap.get(pool.getPlatformType().getKey()).add(pool);
+      }
+
+      for (String poolType : poolMap.keySet()) {
         JSONArray arr = new JSONArray();
-        for (Pool pool : requestManager.listAllPoolsByPlatform(PlatformType.get(platform))) {
+
+        for (Pool pool : poolMap.get(poolType)) {
           JSONArray pout = new JSONArray();
           pout.add(pool.getName());
           pout.add(pool.getAlias() != null ? pool.getAlias() : "");
@@ -717,14 +728,14 @@ public class PoolControllerHelperService {
           pout.add("<a href=\"/miso/pool/" + pool.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>");
           arr.add(pout);
         }
-        j.put("pools", arr);
+
+        j.put(poolType, arr);
+      }
+
         return j;
       } catch (IOException e) {
         log.debug("Failed", e);
         return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
-      }
-    } else {
-      return JSONUtils.SimpleJSONError("No platform specified");
     }
   }
 
@@ -758,26 +769,28 @@ public class PoolControllerHelperService {
                   + dilution.getLibrary().getAlias() + "(" + dilution.getLibrary().getName() + ")</a><br/>");
               info.append("<b>Sample:</b> <a href='/miso/sample/" + dilution.getLibrary().getSample().getId() + "'>"
                   + dilution.getLibrary().getSample().getAlias() + "(" + dilution.getLibrary().getSample().getName() + ")</a><br/>");
-              Map<Integer, TagBarcode> barcodes = dilution.getLibrary().getTagBarcodes();
-              if (!barcodes.isEmpty()) {
-                String out = "<b>Barcodes:</b></br>";
-                for (Integer key : barcodes.keySet()) {
-                  TagBarcode tb = barcodes.get(key);
-                  if (tb != null) {
-                    out += key + ":" + tb.getName() + " (" + tb.getSequence() + ")<br/>";
-                    out += "<span class='counter'><img src='/styles/images/status/green.png' border='0'></span>";
-                  } else {
-                    out += "Error retrieving barcode [" + key + "] for library " + dilution.getLibrary().getName()
-                        + ". Please check libraries for this pool.";
-                    out += "<span class='counter'><img src='/styles/images/status/red.png' border='0'></span>";
-                    break;
+              if (pool.getPoolableElements().size() > 1) {
+                Map<Integer, TagBarcode> barcodes = dilution.getLibrary().getTagBarcodes();
+                if (!barcodes.isEmpty()) {
+                  String out = "<b>Barcodes:</b></br>";
+                  for (Integer key : barcodes.keySet()) {
+                    TagBarcode tb = barcodes.get(key);
+                    if (tb != null) {
+                      out += key + ":" + tb.getName() + " (" + tb.getSequence() + ")<br/>";
+                      out += "<span class='counter'><img src='/styles/images/status/green.png' border='0'></span>";
+                    } else {
+                      out += "Error retrieving barcode [" + key + "] for library " + dilution.getLibrary().getName()
+                          + ". Please check libraries for this pool.";
+                      out += "<span class='counter'><img src='/styles/images/status/red.png' border='0'></span>";
+                      break;
+                    }
                   }
+                  info.append(out);
+                } else {
+                  info.append("<b>Barcode:</b>");
+                  info.append("<b>Library:</b> <a href='/miso/library/" + dilution.getLibrary().getId() + "'>Choose tag barcode</a>");
+                  info.append("<span class='counter'><img src='/styles/images/status/red.png' border='0'></span>");
                 }
-                info.append(out);
-              } else {
-                info.append("<b>Barcode:</b>");
-                info.append("<b>Library:</b> <a href='/miso/library/" + dilution.getLibrary().getId() + "'>Choose tag barcode</a>");
-                info.append("<span class='counter'><img src='/styles/images/status/red.png' border='0'></span>");
               }
             } else {
               info.append("Unrecognised poolable element: " + p.getClass().getSimpleName());
