@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.impl.solid;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -75,7 +77,7 @@ public class SolidRun extends RunImpl {
 
   public SolidRun(String statusXml, User user) {
     try {
-      if (statusXml != null && !"".equals(statusXml)) {
+      if (!isStringEmptyOrNull(statusXml)) {
         String runDirRegex = "([A-z0-9\\-]+)_([0-9]{8})_(.*)";
         Pattern runRegex = Pattern.compile(runDirRegex);
         Document statusDoc = SubmissionUtils.emptyDocument();

@@ -166,7 +166,7 @@ public class PlateControllerHelperService {
           Long plateId = s.getLong("plateId");
           Plate<? extends List<? extends Plateable>, ? extends Plateable> plate = requestManager.getPlateById(plateId);
           // autosave the barcode if none has been previously generated
-          if (plate.getIdentificationBarcode() == null || "".equals(plate.getIdentificationBarcode())) {
+          if (isStringEmptyOrNull(plate.getIdentificationBarcode())) {
             requestManager.savePlate(plate);
           }
           File f = mps.getLabelFor(plate);
@@ -231,7 +231,7 @@ public class PlateControllerHelperService {
 
   public JSONObject getTagBarcodesForMaterialType(HttpSession session, JSONObject json) {
     Map<String, Object> responseMap = new HashMap<String, Object>();
-    if (json.has("materialType") && !"".equals(json.getString("materialType"))) {
+    if (json.has("materialType") && !isStringEmptyOrNull(json.getString("materialType"))) {
       String materialType = json.getString("materialType");
       StringBuilder srb = new StringBuilder();
       srb.append("<select name='tagBarcode' id='tagBarcodes'>");
@@ -271,7 +271,7 @@ public class PlateControllerHelperService {
         String description = json.getString("description");
         String creationDate = json.getString("creationDate");
         String plateMaterialType = null;
-        if (json.has("plateMaterialType") && !json.getString("plateMaterialType").equals("")) {
+        if (json.has("plateMaterialType") && !isStringEmptyOrNull(json.getString("plateMaterialType"))) {
           plateMaterialType = json.getString("plateMaterialType");
         }
 
@@ -423,7 +423,7 @@ public class PlateControllerHelperService {
     try {
       List<Sample> samples;
       StringBuilder b = new StringBuilder();
-      if (!"".equals(searchStr)) {
+      if (!isStringEmptyOrNull(searchStr)) {
         samples = new ArrayList<Sample>(requestManager.listAllSamplesBySearch(searchStr));
       } else {
         samples = new ArrayList<Sample>(requestManager.listAllSamplesWithLimit(250));

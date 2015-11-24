@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.core.event.alerter;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import java.util.Properties;
 
 import javax.mail.MessagingException;
@@ -60,7 +62,7 @@ public class EmailAlerterService implements AlerterService {
       throw new AlertingException("No SMTP host specified in the mail.properties configuration file. Cannot send email.");
     } else {
       String from = mailProps.getProperty("mail.from");
-      if (from == null || "".equals(from)) {
+      if (!isStringEmptyOrNull(from)) {
         from = "miso@your.miso.server";
       }
 

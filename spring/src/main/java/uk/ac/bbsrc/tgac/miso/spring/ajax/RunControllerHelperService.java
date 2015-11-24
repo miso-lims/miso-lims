@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
@@ -96,7 +98,7 @@ public class RunControllerHelperService {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Long runId = AbstractRun.UNSAVED_ID;
 
-      if (json.has("runId") && !json.getString("runId").equals("")) {
+      if (json.has("runId") && !isStringEmptyOrNull(json.getString("runId"))) {
         // edit existing run
         Map<String, Object> responseMap = new HashMap<String, Object>();
         runId = Long.parseLong(json.getString("runId"));
@@ -626,7 +628,7 @@ public class RunControllerHelperService {
   public JSONObject getRunQCProcessSelection(HttpSession session, JSONObject json) {
     try {
       StringBuilder sb = new StringBuilder();
-      if (json.has("runId") && !json.get("runId").equals("")) {
+      if (json.has("runId") && !isStringEmptyOrNull(json.getString("runId"))) {
         Long runId = Long.parseLong(json.getString("runId"));
         Run r = requestManager.getRunById(runId);
 
@@ -652,13 +654,13 @@ public class RunControllerHelperService {
 
   public JSONObject addRunQC(HttpSession session, JSONObject json) {
     try {
-      for (Object key : json.keySet()) {
-        if (json.get(key) == null || json.get(key).equals("")) {
-          String k = (String) key;
-          return JSONUtils.SimpleJSONError("Please enter a value for '" + k + "'");
+      for (Object k : json.keySet()) {
+        String key = (String) k;
+        if (json.get(key) == null || isStringEmptyOrNull(json.getString(key))) {
+          return JSONUtils.SimpleJSONError("Please enter a value for '" + key + "'");
         }
       }
-      if (json.has("runId") && !json.get("runId").equals("")) {
+      if (json.has("runId") && !isStringEmptyOrNull(json.getString("runId"))) {
         Long runId = Long.parseLong(json.getString("runId"));
         Run run = requestManager.getRunById(runId);
         /*
@@ -750,7 +752,7 @@ public class RunControllerHelperService {
   }
 
   public JSONObject lookupContainer(HttpSession session, JSONObject json) {
-    if (json.has("barcode") && !"".equals(json.getString("barcode")) && json.has("containerNum")) {
+    if (json.has("barcode") && !isStringEmptyOrNull(json.getString("barcode")) && json.has("containerNum")) {
       try {
         String barcode = json.getString("barcode");
         long containerNum = json.getLong("containerNum");
@@ -835,7 +837,7 @@ public class RunControllerHelperService {
     SequencerPartitionContainer<SequencerPoolPartition> f = requestManager.getSequencerPartitionContainerById(json.getLong("containerId"));
     if (r != null && f != null) {
       String casavaVersion = "1.8.2";
-      if (json.has("casavaVersion") && !"".equals(json.getString("casavaVersion"))) {
+      if (json.has("casavaVersion") && !isStringEmptyOrNull(json.getString("casavaVersion"))) {
         casavaVersion = json.getString("casavaVersion");
       }
 
@@ -940,14 +942,14 @@ public class RunControllerHelperService {
     try {
       Pool<? extends Poolable> p = null;
 
-      if (barcode != null && !"".equals(barcode)) {
+      if (barcode != null && !isStringEmptyOrNull(barcode)) {
         if (LimsUtils.isBase64String(barcode)) {
           // Base64-encoded string, most likely a barcode image beeped in. decode and search
           barcode = new String(Base64.decodeBase64(barcode));
         }
       }
 
-      if (json.has("platform") && !"".equals(json.getString("platform"))) {
+      if (json.has("platform") && !isStringEmptyOrNull(json.getString("platform"))) {
         PlatformType pt = PlatformType.get(json.getString("platform"));
         if (pt != null) {
           p = requestManager.getPoolByBarcode(barcode, pt);

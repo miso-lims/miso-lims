@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.core.manager;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -323,13 +325,13 @@ public class ERASubmissionManager implements SubmissionManager<Set<Submittable<D
       String proxyUser = submissionProperties.getProperty("submission.proxyUser");
       String proxyPass = submissionProperties.getProperty("submission.proxyPass");
 
-      if (proxyHost != null && !proxyHost.equals("")) {
+      if (!isStringEmptyOrNull(proxyHost)) {
         sb.append("-x ").append(proxyHost);
 
-        if (proxyUser != null && !proxyUser.equals("")) {
+        if (!isStringEmptyOrNull(proxyUser)) {
           sb.append("-U ").append(proxyUser);
 
-          if (proxyPass != null && !proxyPass.equals("")) {
+          if (!isStringEmptyOrNull(proxyPass)) {
             sb.append(":").append(proxyPass);
           }
         }

@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.core.service.naming;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -101,7 +103,7 @@ public class AllowAnythingEntityNamingScheme<T extends Nameable> implements Miso
 
   @Override
   public boolean validateField(String fieldName, String entityName) throws MisoNamingException {
-    return !"".equals(entityName) && fieldCheck(fieldName);
+    return !isStringEmptyOrNull(entityName) && fieldCheck(fieldName);
   }
 
   @Override

@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -184,10 +186,10 @@ public class EditUserController {
     try {
       if (user.getUserId() == UserImpl.UNSAVED_ID) {
         // new user. don't require a password to be set initially
-        if (!LimsUtils.isStringEmptyOrNull(request.getParameter("newpassword"))
-            && !LimsUtils.isStringEmptyOrNull(request.getParameter("confirmpassword"))) {
+        if (!isStringEmptyOrNull(request.getParameter("newpassword"))
+            && !isStringEmptyOrNull(request.getParameter("confirmpassword"))) {
           if (request.getParameter("newpassword").equals(request.getParameter("confirmpassword"))) {
-            if (!"".equals(request.getParameter("newpassword")) && !"".equals(request.getParameter("confirmpassword"))) {
+            if (!isStringEmptyOrNull(request.getParameter("newpassword")) && !isStringEmptyOrNull(request.getParameter("confirmpassword"))) {
               if (SecurityContextHolder.getContext().getAuthentication().getAuthorities()
                   .contains(new GrantedAuthorityImpl("ROLE_ADMIN"))) {
                 // auth'ed user is the account holder or an admin
@@ -205,11 +207,11 @@ public class EditUserController {
           }
         }
       } else {
-        if (!LimsUtils.isStringEmptyOrNull(request.getParameter("password"))
-            && !LimsUtils.isStringEmptyOrNull(request.getParameter("newpassword"))) {
-          if (!LimsUtils.isStringEmptyOrNull(request.getParameter("confirmpassword"))) {
+        if (!isStringEmptyOrNull(request.getParameter("password"))
+            && !isStringEmptyOrNull(request.getParameter("newpassword"))) {
+          if (!isStringEmptyOrNull(request.getParameter("confirmpassword"))) {
             if (request.getParameter("newpassword").equals(request.getParameter("confirmpassword"))) {
-              if (!"".equals(request.getParameter("newpassword")) && !"".equals(request.getParameter("confirmpassword"))) {
+              if (!isStringEmptyOrNull(request.getParameter("newpassword")) && !isStringEmptyOrNull(request.getParameter("confirmpassword"))) {
                 if (SecurityContextHolder.getContext().getAuthentication().getName().equals(user.getLoginName())) {
                   if (passwordCodecService.getEncoder().isPasswordValid(user.getPassword(), request.getParameter("password"), null)) {
                     log.debug("User '" + user.getLoginName() + "' attempting own password change");
@@ -252,11 +254,11 @@ public class EditUserController {
   public String processSubmit(@ModelAttribute("user") User user, ModelMap model, SessionStatus session, HttpServletRequest request)
       throws IOException {
     try {
-      if (!LimsUtils.isStringEmptyOrNull(request.getParameter("password"))
-          && !LimsUtils.isStringEmptyOrNull(request.getParameter("newpassword"))) {
-        if (!LimsUtils.isStringEmptyOrNull(request.getParameter("confirmpassword"))) {
+      if (!isStringEmptyOrNull(request.getParameter("password"))
+          && !isStringEmptyOrNull(request.getParameter("newpassword"))) {
+        if (!isStringEmptyOrNull(request.getParameter("confirmpassword"))) {
           if (request.getParameter("newpassword").equals(request.getParameter("confirmpassword"))) {
-            if (!"".equals(request.getParameter("newpassword")) && !"".equals(request.getParameter("confirmpassword"))) {
+            if (!isStringEmptyOrNull(request.getParameter("newpassword")) && !isStringEmptyOrNull(request.getParameter("confirmpassword"))) {
               if (SecurityContextHolder.getContext().getAuthentication().getName().equals(user.getLoginName())) {
                 if (passwordCodecService.getEncoder().isPasswordValid(user.getPassword(), request.getParameter("password"), null)) {
                   log.debug("User '" + user.getLoginName() + "' attempting own password change");

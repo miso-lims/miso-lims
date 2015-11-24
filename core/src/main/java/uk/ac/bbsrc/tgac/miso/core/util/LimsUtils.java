@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.core.util;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -496,7 +498,7 @@ public class LimsUtils {
   public static Map<String, String> checkPipes(Process process) throws IOException {
     HashMap<String, String> r = new HashMap<String, String>();
     String error = LimsUtils.processStdErr(process);
-    if (error.equals("")) {
+    if (isStringEmptyOrNull(error)) {
       String out = LimsUtils.processStdOut(process);
       log.debug(out);
       r.put("ok", out);

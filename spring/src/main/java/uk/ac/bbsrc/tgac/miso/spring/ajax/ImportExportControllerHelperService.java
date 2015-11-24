@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
@@ -83,7 +85,7 @@ public class ImportExportControllerHelperService {
     try {
       List<Sample> samples;
       StringBuilder b = new StringBuilder();
-      if (!"".equals(searchStr)) {
+      if (!isStringEmptyOrNull(searchStr)) {
         samples = new ArrayList<Sample>(requestManager.listAllSamplesBySearch(searchStr));
       } else {
         samples = new ArrayList<Sample>(requestManager.listAllSamplesWithLimit(250));
@@ -169,7 +171,7 @@ public class ImportExportControllerHelperService {
     for (JSONArray jsonArrayElement : (Iterable<JSONArray>) jsonArray) {
 
       Sample s = null;
-      if (jsonArrayElement.get(3) != null && !"".equals(jsonArrayElement.getString(3))) {
+      if (jsonArrayElement.get(3) != null && !isStringEmptyOrNull(jsonArrayElement.getString(3))) {
         String salias = jsonArrayElement.getString(3);
         Collection<Sample> ss = requestManager.listSamplesByAlias(salias);
         if (!ss.isEmpty()) {
@@ -211,11 +213,11 @@ public class ImportExportControllerHelperService {
               requestManager.saveSample(s);
               log.info("Added sample QC: " + sqc.toString());
             }
-            if (jsonArrayElement.get(7) != null && !"".equals(jsonArrayElement.getString(7))) {
+            if (jsonArrayElement.get(7) != null && !isStringEmptyOrNull(jsonArrayElement.getString(7))) {
               s.setQcPassed(Boolean.parseBoolean(jsonArrayElement.getString(7)));
               requestManager.saveSample(s);
             }
-            if (jsonArrayElement.get(8) != null && !"".equals(jsonArrayElement.getString(8))) {
+            if (jsonArrayElement.get(8) != null && !isStringEmptyOrNull(jsonArrayElement.getString(8))) {
               List<String> notesList = Arrays.asList((jsonArrayElement.getString(8)).split(";"));
               for (String notetext : notesList) {
                 Note note = new Note();
@@ -273,7 +275,7 @@ public class ImportExportControllerHelperService {
           .fromObject(jsonObject.get("rows").toString().replace("\\\"", "'"))) {
 
         Sample s = null;
-        if (jsonArrayElement.get(1) != null && !"".equals(jsonArrayElement.getString(1))) {
+        if (jsonArrayElement.get(1) != null && !isStringEmptyOrNull(jsonArrayElement.getString(1))) {
           String salias = jsonArrayElement.getString(1);
           Collection<Sample> ss = requestManager.listSamplesByAlias(salias);
           if (!ss.isEmpty()) {
@@ -336,7 +338,7 @@ public class ImportExportControllerHelperService {
 
               log.info("Added library: " + library.toString());
               requestManager.saveLibrary(library);
-              if (jsonArrayElement.getString(5) != null && !"".equals(jsonArrayElement.getString(5))) {
+              if (jsonArrayElement.get(5) != null && !isStringEmptyOrNull(jsonArrayElement.getString(5))) {
                 try {
                   LibraryQC lqc = new LibraryQCImpl();
                   lqc.setLibrary(library);
@@ -355,7 +357,7 @@ public class ImportExportControllerHelperService {
                   if (insertSize == 0 && lqc.getResults() == 0) {
                     library.setQcPassed(false);
                   } else {
-                    if (jsonArrayElement.getString(8) != null && !"".equals(jsonArrayElement.getString(8))) {
+                    if (jsonArrayElement.get(8) != null && !isStringEmptyOrNull(jsonArrayElement.getString(8))) {
                       library.setQcPassed(Boolean.parseBoolean(jsonArrayElement.getString(8)));
                     }
                   }
@@ -365,7 +367,7 @@ public class ImportExportControllerHelperService {
                 }
               }
 
-              if (jsonArrayElement.getString(7) != null && !"".equals(jsonArrayElement.getString(7))) {
+              if (jsonArrayElement.get(7) != null && !isStringEmptyOrNull(jsonArrayElement.getString(7))) {
                 try {
                   LibraryQC lqc = new LibraryQCImpl();
                   lqc.setLibrary(library);
@@ -383,7 +385,7 @@ public class ImportExportControllerHelperService {
                   if (insertSize == 0 && lqc.getResults() == 0) {
                     library.setQcPassed(false);
                   } else {
-                    if (jsonArrayElement.getString(8) != null && !"".equals(jsonArrayElement.getString(8))) {
+                    if (jsonArrayElement.get(8) != null && !isStringEmptyOrNull(jsonArrayElement.getString(8))) {
                       library.setQcPassed(Boolean.parseBoolean(jsonArrayElement.getString(8)));
                     }
                   }
@@ -393,12 +395,12 @@ public class ImportExportControllerHelperService {
                 }
               }
 
-              if (jsonArrayElement.getString(9) != null && !"".equals(jsonArrayElement.getString(9))
+              if (jsonArrayElement.get(9) != null && !isStringEmptyOrNull(jsonArrayElement.getString(9))
                   && (library.getQcPassed() || library.getQcPassed() == null)) {
                 Collection<TagBarcode> bcs = requestManager.listAllTagBarcodesByStrategyName(jsonArrayElement.getString(9));
                 if (!bcs.isEmpty()) {
                   String tags = jsonArrayElement.getString(10);
-                  if (!"".equals(tags)) {
+                  if (!isStringEmptyOrNull(tags)) {
                     HashMap<Integer, TagBarcode> tbs = new HashMap<Integer, TagBarcode>();
                     if (tags.contains("-")) {
                       String[] splits = tags.split("-");
@@ -442,7 +444,7 @@ public class ImportExportControllerHelperService {
 
               LibraryDilution ldi = new LibraryDilution();
 
-              if (jsonArrayElement.getString(11) != null && !"".equals(jsonArrayElement.getString(11))) {
+              if (jsonArrayElement.get(11) != null && !isStringEmptyOrNull(jsonArrayElement.getString(11))) {
                 try {
                   ldi.setLibrary(library);
                   ldi.setSecurityProfile(library.getSecurityProfile());
@@ -464,14 +466,14 @@ public class ImportExportControllerHelperService {
               requestManager.saveLibrary(library);
 
               Pattern poolPattern = Pattern.compile("^[IiUu][Pp][Oo]([0-9]*)");
-              if (jsonArrayElement.getString(12) != null && !"".equals(jsonArrayElement.getString(12))) {
+              if (jsonArrayElement.get(12) != null && !isStringEmptyOrNull(jsonArrayElement.getString(12))) {
                 String poolName = jsonArrayElement.getString(12);
 
                 Matcher m = poolPattern.matcher(poolName);
                 if (m.matches()) {
                   Pool existedPool = requestManager.getPoolById(Integer.valueOf(m.group(1)));
                   pools.put(poolName, existedPool);
-                  if (jsonArrayElement.getString(13) != null && !"".equals(jsonArrayElement.getString(13))) {
+                  if (jsonArrayElement.get(13) != null && !isStringEmptyOrNull(jsonArrayElement.getString(13))) {
                     existedPool.setConcentration(Double.valueOf(jsonArrayElement.getString(13)));
                   }
                   if (ldi != null) {
@@ -485,7 +487,7 @@ public class ImportExportControllerHelperService {
                     pool.setPlatformType(pt);
                     pool.setReadyToRun(true);
                     pool.setCreationDate(new Date());
-                    if (jsonArrayElement.getString(13) != null && !"".equals(jsonArrayElement.getString(13))) {
+                    if (jsonArrayElement.get(13) != null && !isStringEmptyOrNull(jsonArrayElement.getString(13))) {
                       pool.setConcentration(Double.valueOf(jsonArrayElement.getString(13)));
                     } else {
                       pool.setConcentration(0.0);
@@ -570,7 +572,7 @@ public class ImportExportControllerHelperService {
 
   public JSONObject changePlatformName(HttpSession session, JSONObject json) {
     try {
-      if (json.has("platform") && !json.get("platform").equals("")) {
+      if (json.has("platform") && !isStringEmptyOrNull((String) json.get("platform"))) {
         String platform = json.getString("platform");
         Map<String, Object> map = new HashMap<String, Object>();
 

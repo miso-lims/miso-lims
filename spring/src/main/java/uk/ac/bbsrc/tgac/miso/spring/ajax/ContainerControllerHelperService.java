@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import net.sf.json.JSONArray;
@@ -516,7 +518,7 @@ public class ContainerControllerHelperService {
     int partition = json.getInt("partition");
 
     try {
-      if (barcode != null && !"".equals(barcode)) {
+      if (isStringEmptyOrNull(barcode)) {
         if (LimsUtils.isBase64String(barcode)) {
           // Base64-encoded string, most likely a barcode image beeped in. decode and search
           barcode = new String(Base64.decodeBase64(barcode));
@@ -633,7 +635,7 @@ public class ContainerControllerHelperService {
     try {
       b.append(
           "<div style='position:relative' onMouseOver='this.className=\"dashboardhighlight\"' onMouseOut='this.className=\"dashboard\"' class='dashboard'>");
-      if (LimsUtils.isStringEmptyOrNull(p.getAlias())) {
+      if (isStringEmptyOrNull(p.getAlias())) {
         b.append("<div style=\"float:left\"><b>" + p.getName() + " : " + p.getCreationDate() + "</b><br/>");
       } else {
         b.append("<div style=\"float:left\"><b>" + p.getName() + " (" + p.getAlias() + ") : " + p.getCreationDate() + "</b><br/>");
@@ -768,7 +770,7 @@ public class ContainerControllerHelperService {
   }
 
   public JSONObject lookupContainer(HttpSession session, JSONObject json) {
-    if (json.has("barcode") && !"".equals(json.getString("barcode"))) {
+    if (json.has("barcode") && !isStringEmptyOrNull(json.getString("barcode"))) {
       try {
         String barcode = json.getString("barcode");
         Collection<SequencerPartitionContainer<SequencerPoolPartition>> fs = requestManager

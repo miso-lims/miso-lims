@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.core.util;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -2905,7 +2907,7 @@ public class FormUtils {
 
     OdfTableCell platformCell = oTable.getCellByPosition("B2");
     PlatformType pt = null;
-    if (!"".equals(platformCell.getStringValue())) {
+    if (!isStringEmptyOrNull(platformCell.getStringValue())) {
       pt = PlatformType.get(platformCell.getStringValue());
     }
     if (pt == null) {
@@ -2916,7 +2918,7 @@ public class FormUtils {
 
     OdfTableCell typeCell = oTable.getCellByPosition("C2");
     LibraryType lt = null;
-    if (!"".equals(typeCell.getStringValue())) {
+    if (!isStringEmptyOrNull(typeCell.getStringValue())) {
       String[] split = typeCell.getStringValue().split("-");
       String plat = split[0];
       String type = split[1];
@@ -2935,7 +2937,7 @@ public class FormUtils {
 
     OdfTableCell selectionCell = oTable.getCellByPosition("D2");
     LibrarySelectionType ls = null;
-    if (!"".equals(selectionCell.getStringValue())) {
+    if (!isStringEmptyOrNull(selectionCell.getStringValue())) {
       ls = manager.getLibrarySelectionTypeByName(selectionCell.getStringValue());
     }
     if (ls == null) {
@@ -2946,7 +2948,7 @@ public class FormUtils {
 
     OdfTableCell strategyCell = oTable.getCellByPosition("E2");
     LibraryStrategyType lst = null;
-    if (!"".equals(strategyCell.getStringValue())) {
+    if (!isStringEmptyOrNull(strategyCell.getStringValue())) {
       lst = manager.getLibraryStrategyTypeByName(strategyCell.getStringValue());
     }
     if (lst == null) {
@@ -2957,7 +2959,7 @@ public class FormUtils {
 
     OdfTableCell plateBarcodeCell = oTable.getCellByPosition("F2");
     String plateBarcode = null;
-    if (!"".equals(plateBarcodeCell.getStringValue())) {
+    if (!isStringEmptyOrNull(plateBarcodeCell.getStringValue())) {
       plateBarcode = plateBarcodeCell.getStringValue();
     }
     if (plateBarcode == null) {
@@ -2975,7 +2977,7 @@ public class FormUtils {
       if (ri > 3) {
         // Ax - plate position
         OdfTableCell platePosCell = oTable.getCellByPosition(0, ri);
-        if (!"".equals(platePosCell.getStringValue()) && libraryPlate == null) {
+        if (!isStringEmptyOrNull(platePosCell.getStringValue()) && libraryPlate == null) {
           // plated libraries - process as plate
           libraryPlate = new Simple384WellPlate();
           libraryPlate.setIdentificationBarcode(plateBarcode);
@@ -2986,7 +2988,7 @@ public class FormUtils {
         OdfTableCell sampleAliasCell = oTable.getCellByPosition(1, ri);
 
         Sample s = null;
-        if (!"".equals(sampleAliasCell.getStringValue())) {
+        if (!isStringEmptyOrNull(sampleAliasCell.getStringValue())) {
           Collection<Sample> ss = manager.listSamplesByAlias(sampleAliasCell.getStringValue());
           if (!ss.isEmpty()) {
             if (ss.size() == 1) {
@@ -3029,7 +3031,7 @@ public class FormUtils {
           OdfTableCell poolConvertedMolarityCell = oTable.getCellByPosition(21, ri);
 
           // add pool, if any
-          if (!"".equals(poolNumberCell.getStringValue())) {
+          if (!isStringEmptyOrNull(poolNumberCell.getStringValue())) {
             if (!pools.containsKey(poolNumberCell.getStringValue())) {
               PlatePool pool = new PlatePool();
               pool.setAlias(poolNumberCell.getStringValue());
@@ -3042,7 +3044,7 @@ public class FormUtils {
           }
 
           // process sample QC
-          if (!"".equals(sampleQcCell.getStringValue())) {
+          if (!isStringEmptyOrNull(sampleQcCell.getStringValue())) {
             try {
               SampleQC sqc = new SampleQCImpl();
               sqc.setSample(s);
@@ -3083,7 +3085,7 @@ public class FormUtils {
               library.setLibraryStrategyType(lst);
               library.setPaired(paired);
 
-              if (!"".equals(libraryQcMolarityCell.getStringValue())) {
+              if (!isStringEmptyOrNull(libraryQcMolarityCell.getStringValue())) {
                 int insertSize = 0;
                 try {
                   String bp = libraryQcInsertSizeCell.getStringValue();
@@ -3124,11 +3126,11 @@ public class FormUtils {
                 }
               }
 
-              if (!"".equals(barcodeKitCell.getStringValue())) {
+              if (!isStringEmptyOrNull(barcodeKitCell.getStringValue())) {
                 Collection<TagBarcode> bcs = manager.listAllTagBarcodesByStrategyName(barcodeKitCell.getStringValue());
                 if (!bcs.isEmpty()) {
                   String tags = barcodeTagsCell.getStringValue();
-                  if (!"".equals(tags)) {
+                  if (!isStringEmptyOrNull(tags)) {
                     HashMap<Integer, TagBarcode> tbs = new HashMap<Integer, TagBarcode>();
                     if (tags.contains("-")) {
                       String[] splits = tags.split("-");
@@ -3162,7 +3164,7 @@ public class FormUtils {
                 }
               }
 
-              if (!"".equals(poolConvertedMolarityCell.getStringValue())) {
+              if (!isStringEmptyOrNull(poolConvertedMolarityCell.getStringValue())) {
                 Pool<Plate<LinkedList<Library>, Library>> p = pools.get(poolNumberCell.getStringValue());
                 if (p != null) {
                   log.debug("Retrieved pool " + poolNumberCell.getStringValue());
@@ -3178,7 +3180,7 @@ public class FormUtils {
 
               log.info("Added library: " + library.toString());
 
-              if (!"".equals(platePosCell.getStringValue()) && libraryPlate != null) {
+              if (!isStringEmptyOrNull(platePosCell.getStringValue()) && libraryPlate != null) {
                 libraryPlate.addElement(library);
                 log.info("Added library " + library.getAlias() + " to " + platePosCell.getStringValue());
               }
@@ -3292,14 +3294,13 @@ public class FormUtils {
             }
 
             StringBuilder noteSB = new StringBuilder();
-            if (getCellValueAsString(rinCell) != null && !"".equals(getCellValueAsString(rinCell))
-                && !"NA".equals(getCellValueAsString(rinCell))) {
+            if (!isStringEmptyOrNull(getCellValueAsString(rinCell)) && !"NA".equals(getCellValueAsString(rinCell))) {
               noteSB.append("RIN:" + getCellValueAsString(rinCell) + ";");
             }
-            if (getCellValueAsString(sample260280Cell) != null && !"".equals(getCellValueAsString(sample260280Cell))) {
+            if (!isStringEmptyOrNull(getCellValueAsString(sample260280Cell))) {
               noteSB.append("260/280:" + getCellValueAsString(sample260280Cell) + ";");
             }
-            if (getCellValueAsString(sample260230Cell) != null && !"".equals(getCellValueAsString(sample260230Cell))) {
+            if (!isStringEmptyOrNull(getCellValueAsString(sample260230Cell))) {
               noteSB.append("260/230:" + getCellValueAsString(sample260230Cell) + ";");
             }
             sampleArray.add(noteSB.toString());
@@ -3413,7 +3414,7 @@ public class FormUtils {
 
               }
             }
-            if (getCellValueAsString(wellCell) != null && !"".equals(getCellValueAsString(wellCell))
+            if (!isStringEmptyOrNull(getCellValueAsString(wellCell))
                 && !"NA".equals(getCellValueAsString(wellCell))) {
               Note note = new Note();
               note.setCreationDate(date);
@@ -3426,7 +3427,7 @@ public class FormUtils {
                 log.info("Added sample Note for Well: " + note.toString());
               }
             }
-            if (getCellValueAsString(rinCell) != null && !"".equals(getCellValueAsString(rinCell))
+            if (!isStringEmptyOrNull(getCellValueAsString(rinCell))
                 && !"NA".equals(getCellValueAsString(rinCell))) {
               Note note = new Note();
               note.setCreationDate(date);
@@ -3439,7 +3440,7 @@ public class FormUtils {
                 log.info("Added sample Note for RIN: " + note.toString());
               }
             }
-            if (getCellValueAsString(sample260280Cell) != null && !"".equals(getCellValueAsString(sample260280Cell))) {
+            if (!isStringEmptyOrNull(getCellValueAsString(sample260280Cell))) {
               Note note = new Note();
               note.setCreationDate(date);
               note.setOwner(u);
@@ -3451,7 +3452,7 @@ public class FormUtils {
                 log.info("Added sample Note for 260/280: " + note.toString());
               }
             }
-            if (getCellValueAsString(sample260230Cell) != null && !"".equals(getCellValueAsString(sample260230Cell))) {
+            if (!isStringEmptyOrNull(getCellValueAsString(sample260230Cell))) {
               Note note = new Note();
               note.setCreationDate(date);
               note.setOwner(u);
@@ -3594,7 +3595,7 @@ public class FormUtils {
 
           if ("A".equals(proceedKey) || "L".equals(proceedKey) || "U".equals(proceedKey)) {
             String libDesc = s.getDescription();
-            if (getCellValueAsString(libraryDescriptionCell) != null && !"".equals(getCellValueAsString(libraryDescriptionCell))) {
+            if (!isStringEmptyOrNull(getCellValueAsString(libraryDescriptionCell))) {
               libDesc = getCellValueAsString(libraryDescriptionCell);
             }
             rowsJSONArray.add(libDesc);
@@ -3804,7 +3805,7 @@ public class FormUtils {
 
               library.setAlias(libAlias);
               library.setSecurityProfile(s.getSecurityProfile());
-              if (getCellValueAsString(libraryDescriptionCell) != null && "".equals(getCellValueAsString(libraryDescriptionCell))) {
+              if (!isStringEmptyOrNull(getCellValueAsString(libraryDescriptionCell))) {
                 library.setDescription(getCellValueAsString(libraryDescriptionCell));
               } else {
                 library.setDescription(s.getDescription());
@@ -3918,7 +3919,7 @@ public class FormUtils {
                 Collection<TagBarcode> bcs = manager.listAllTagBarcodesByStrategyName(getCellValueAsString(barcodeKitCell));
                 if (!bcs.isEmpty()) {
                   String tags = getCellValueAsString(barcodeTagsCell);
-                  if (!"".equals(tags)) {
+                  if (!isStringEmptyOrNull(tags)) {
                     HashMap<Integer, TagBarcode> tbs = new HashMap<Integer, TagBarcode>();
                     if (tags.contains("-")) {
                       String[] splits = tags.split("-");
@@ -4256,7 +4257,7 @@ public class FormUtils {
               Collection<TagBarcode> bcs = manager.listAllTagBarcodesByStrategyName(getCellValueAsString(barcodeKitCell));
               if (!bcs.isEmpty()) {
                 String tags = getCellValueAsString(barcodeTagsCell);
-                if (!"".equals(tags)) {
+                if (!isStringEmptyOrNull(tags)) {
                   HashMap<Integer, TagBarcode> tbs = new HashMap<Integer, TagBarcode>();
                   if (tags.contains("-")) {
                     String[] splits = tags.split("-");
@@ -4361,7 +4362,7 @@ public class FormUtils {
 
     OdfTableCell platformCell = oTable.getCellByPosition("B2");
     PlatformType pt = null;
-    if (!"".equals(platformCell.getStringValue())) {
+    if (!isStringEmptyOrNull(platformCell.getStringValue())) {
       pt = PlatformType.get(platformCell.getStringValue());
     }
     if (pt == null) {
@@ -4372,7 +4373,7 @@ public class FormUtils {
 
     OdfTableCell typeCell = oTable.getCellByPosition("C2");
     LibraryType lt = null;
-    if (!"".equals(typeCell.getStringValue())) {
+    if (!isStringEmptyOrNull(typeCell.getStringValue())) {
       String[] split = typeCell.getStringValue().split("-");
       String plat = split[0];
       String type = split[1];
@@ -4391,7 +4392,7 @@ public class FormUtils {
 
     OdfTableCell selectionCell = oTable.getCellByPosition("D2");
     LibrarySelectionType ls = null;
-    if (!"".equals(selectionCell.getStringValue())) {
+    if (!isStringEmptyOrNull(selectionCell.getStringValue())) {
       ls = manager.getLibrarySelectionTypeByName(selectionCell.getStringValue());
     }
     if (ls == null) {
@@ -4402,7 +4403,7 @@ public class FormUtils {
 
     OdfTableCell strategyCell = oTable.getCellByPosition("E2");
     LibraryStrategyType lst = null;
-    if (!"".equals(strategyCell.getStringValue())) {
+    if (!isStringEmptyOrNull(strategyCell.getStringValue())) {
       lst = manager.getLibraryStrategyTypeByName(strategyCell.getStringValue());
     }
     if (lst == null) {
@@ -4419,7 +4420,7 @@ public class FormUtils {
       if (ri > 3) {
         // Ax - plate position
         OdfTableCell platePosCell = oTable.getCellByPosition(0, ri);
-        if (!"".equals(platePosCell.getStringValue())) {
+        if (!isStringEmptyOrNull(platePosCell.getStringValue())) {
           // plated samples - process as plate
           samplePlate = new PlateImpl<Sample>();
         }
@@ -4428,7 +4429,7 @@ public class FormUtils {
         OdfTableCell sampleAliasCell = oTable.getCellByPosition(2, ri);
 
         Sample s = null;
-        if (!"".equals(sampleAliasCell.getStringValue())) {
+        if (!isStringEmptyOrNull(sampleAliasCell.getStringValue())) {
           Collection<Sample> ss = manager.listSamplesByAlias(sampleAliasCell.getStringValue());
           if (!ss.isEmpty()) {
             if (ss.size() == 1) {
@@ -4629,7 +4630,7 @@ public class FormUtils {
   }
 
   private static void processPool(String poolAlias, String poolConvertedMolarity, Map<String, Pool<Dilution>> pools) throws Exception {
-    if (!"".equals(poolAlias)) {
+    if (!isStringEmptyOrNull(poolAlias)) {
       if (!pools.containsKey(poolAlias)) {
         Pool<Dilution> pool = new PoolImpl<Dilution>();
         pool.setAlias(poolAlias);
@@ -4637,7 +4638,7 @@ public class FormUtils {
         log.info("Added pool: " + poolAlias);
       }
 
-      if (!"".equals(poolConvertedMolarity)) {
+      if (!isStringEmptyOrNull(poolConvertedMolarity)) {
         Pool<Dilution> p = pools.get(poolAlias);
         if (p != null) {
           log.info("Retrieved pool " + poolAlias);
@@ -4655,7 +4656,7 @@ public class FormUtils {
 
   private static void processSampleQC(String sampleQc, Sample s, User u, RequestManager manager) throws Exception {
     // process sample QC
-    if (!"".equals(sampleQc)) {
+    if (!isStringEmptyOrNull(sampleQc)) {
       try {
         SampleQC sqc = new SampleQCImpl();
         sqc.setSample(s);
@@ -4676,12 +4677,12 @@ public class FormUtils {
   private static Library processLibrary(String libraryQc, String libraryDescription, String libraryQcPassFail, Sample s, PlatformType pt,
       LibraryType lt, LibrarySelectionType ls, LibraryStrategyType lst, boolean paired, MisoNamingScheme<Library> libraryNamingScheme)
           throws Exception {
-    if (!"".equals(libraryQc)) {
+    if (!isStringEmptyOrNull(libraryQc)) {
       // create library
       Library library = new LibraryImpl();
       library.setSample(s);
       library.setSecurityProfile(s.getSecurityProfile());
-      if (!"".equals(libraryDescription)) {
+      if (!isStringEmptyOrNull(libraryDescription)) {
         library.setDescription(libraryDescription);
       } else {
         library.setDescription(s.getDescription());
@@ -4693,7 +4694,7 @@ public class FormUtils {
       library.setLibraryStrategyType(lst);
       library.setPaired(paired);
 
-      if (!"".equals(libraryQcPassFail)) {
+      if (!isStringEmptyOrNull(libraryQcPassFail)) {
         library.setQcPassed(Boolean.parseBoolean(libraryQcPassFail));
       }
 
@@ -4708,7 +4709,7 @@ public class FormUtils {
 
   private static void processLibraryQC(String libraryQc, String libraryQcMolarity, String libraryQcInsertSize, Library library, User u,
       RequestManager manager) throws Exception {
-    if (!"".equals(libraryQcMolarity)) {
+    if (!isStringEmptyOrNull(libraryQcMolarity)) {
       int insertSize = 0;
       try {
         Matcher m = digitPattern.matcher(libraryQcInsertSize);
@@ -4756,10 +4757,10 @@ public class FormUtils {
   }
 
   private static void processBarcodes(String barcodeKit, String barcodeTags, Library library, RequestManager manager) throws Exception {
-    if (!"".equals(barcodeKit)) {
+    if (!isStringEmptyOrNull(barcodeKit)) {
       Collection<TagBarcode> bcs = manager.listAllTagBarcodesByStrategyName(barcodeKit);
       if (!bcs.isEmpty()) {
-        if (!"".equals(barcodeTags)) {
+        if (!isStringEmptyOrNull(barcodeTags)) {
           HashMap<Integer, TagBarcode> tbs = new HashMap<Integer, TagBarcode>();
           if (barcodeTags.contains("-")) {
             String[] splits = barcodeTags.split("-");
@@ -4793,7 +4794,7 @@ public class FormUtils {
   }
 
   private static void processDilutions(String dilutionMolarity, Library library, Pool<Dilution> p, User u) throws Exception {
-    if (!"".equals(dilutionMolarity)) {
+    if (!isStringEmptyOrNull(dilutionMolarity)) {
       try {
         LibraryDilution ldi = new LibraryDilution();
         ldi.setLibrary(library);
@@ -4968,7 +4969,7 @@ public class FormUtils {
           // well
           Node n2 = ttre.getChildNodes().item(1);
           if (n2.getFirstChild() != null) {
-            if (!"".equals(n2.getFirstChild().getTextContent())) {
+            if (!isStringEmptyOrNull(n2.getFirstChild().getTextContent())) {
               Note noteWell = new Note();
               noteWell.setText("well:" + n2.getFirstChild().getTextContent());
               s.addNote(noteWell);
@@ -4992,7 +4993,7 @@ public class FormUtils {
 
           Node n9 = ttre.getChildNodes().item(9);
           if (n9.getFirstChild() != null) {
-            if (!"".equals(n9.getFirstChild().getTextContent())) {
+            if (!isStringEmptyOrNull(n9.getFirstChild().getTextContent())) {
               Note note1 = new Note();
               note1.setText("260/280:" + n9.getFirstChild().getTextContent());
               s.addNote(note1);
@@ -5001,7 +5002,7 @@ public class FormUtils {
 
           Node n10 = ttre.getChildNodes().item(10);
           if (n10.getFirstChild() != null) {
-            if (!"".equals("260/230:" + n10.getFirstChild().getTextContent())) {
+            if (!isStringEmptyOrNull("260/230:" + n10.getFirstChild().getTextContent())) {
               Note note2 = new Note();
               note2.setText(n9.getFirstChild().getTextContent());
               s.addNote(note2);

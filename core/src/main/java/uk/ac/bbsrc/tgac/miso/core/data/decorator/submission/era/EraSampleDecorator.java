@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.decorator.submission.era;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import java.util.Properties;
 
 import org.w3c.dom.Document;
@@ -66,7 +68,7 @@ public class EraSampleDecorator extends AbstractSubmittableDecorator<Document> {
 
     // 2/11/2011 Antony Colles moved IF !=null statement, to help produce valid submission XML.
     Element sampleTaxonIdentifier = submission.createElementNS(null, "TAXON_ID");
-    if (sample.getTaxonIdentifier() != null && !sample.getTaxonIdentifier().equals("")) {
+    if (!isStringEmptyOrNull(sample.getTaxonIdentifier())) {
       sampleTaxonIdentifier.setTextContent(sample.getTaxonIdentifier());
     } else {
       sampleTaxonIdentifier.setTextContent("000001");

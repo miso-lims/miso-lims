@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.context;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -287,7 +289,7 @@ public class MisoAppListener implements ServletContextListener {
 
     if ("true".equals(misoProperties.get("miso.issuetracker.enabled"))) {
       String trackerType = misoProperties.get("miso.issuetracker.tracker");
-      if (trackerType != null && !"".equals(trackerType)) {
+      if (!isStringEmptyOrNull(trackerType)) {
         try {
           IssueTrackerManager manager = IssueTrackerFactory.newInstance().getTrackerManager(trackerType);
           if (manager != null) {

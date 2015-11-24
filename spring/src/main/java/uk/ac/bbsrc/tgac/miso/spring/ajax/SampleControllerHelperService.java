@@ -168,18 +168,18 @@ public class SampleControllerHelperService {
               news.setLocationBarcode(locationBarcode);
               news.setIdentificationBarcode(identificationBarcode);
 
-              if (j.has("receivedDate") && !"".equals(j.getString("receivedDate"))) {
+              if (j.has("receivedDate") && !isStringEmptyOrNull(j.getString("receivedDate"))) {
                 Date date = df.parse(j.getString("receivedDate"));
                 news.setReceivedDate(date);
               }
 
-              if (!j.getString("note").equals("")) {
+              if (!isStringEmptyOrNull(j.getString("note"))) {
                 Note note = new Note();
                 note.setOwner(sp.getOwner());
                 note.setText(j.getString("note"));
                 note.setInternalOnly(true);
 
-                if (j.has("receivedDate") && !"".equals(j.getString("receivedDate"))) {
+                if (j.has("receivedDate") && !isStringEmptyOrNull(j.getString("receivedDate"))) {
                   Date date = df.parse(j.getString("receivedDate"));
                   note.setCreationDate(date);
                 } else {
@@ -259,7 +259,7 @@ public class SampleControllerHelperService {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       users.add(user.getFullName());
 
-      if (json.has("sampleId") && !json.get("sampleId").equals("")) {
+      if (json.has("sampleId") && !isStringEmptyOrNull(json.getString("sampleId"))) {
         Long sampleId = Long.parseLong(json.getString("sampleId"));
         Sample sample = requestManager.getSampleById(sampleId);
 
@@ -306,13 +306,13 @@ public class SampleControllerHelperService {
 
   public JSONObject addSampleQC(HttpSession session, JSONObject json) {
     try {
-      for (Object key : json.keySet()) {
-        if (json.get(key) == null || json.get(key).equals("")) {
-          String k = (String) key;
-          return JSONUtils.SimpleJSONError("Please enter a value for '" + k + "'");
+      for (Object k : json.keySet()) {
+        String key = (String) k;
+        if (json.get(key) == null || isStringEmptyOrNull(json.getString(key))) {
+          return JSONUtils.SimpleJSONError("Please enter a value for '" + key + "'");
         }
       }
-      if (json.has("sampleId") && !json.get("sampleId").equals("")) {
+      if (json.has("sampleId") && !isStringEmptyOrNull(json.getString("sampleId"))) {
         Long sampleId = Long.parseLong(json.getString("sampleId"));
         Sample sample = requestManager.getSampleById(sampleId);
         if (json.get("qcPassed") != null) {
@@ -366,7 +366,7 @@ public class SampleControllerHelperService {
 
   public JSONObject editSampleQC(HttpSession session, JSONObject json) {
     try {
-      if (json.has("qcId") && !json.get("qcId").equals("")) {
+      if (json.has("qcId") && !isStringEmptyOrNull(json.getString("qcId"))) {
         Long qcId = Long.parseLong(json.getString("qcId"));
         SampleQC sampleQc = requestManager.getSampleQCById(qcId);
         sampleQc.setResults(Double.parseDouble(json.getString("result")));
@@ -391,8 +391,8 @@ public class SampleControllerHelperService {
         String qcCreator = qc.getString("qcCreator");
         String qcDate = qc.getString("qcDate");
 
-        if (qcType == null || qcType.equals("") || results == null || results.equals("") || qcCreator == null || qcCreator.equals("")
-            || qcDate == null || qcDate.equals("")) {
+        if (isStringEmptyOrNull(qcType) || isStringEmptyOrNull(results) || isStringEmptyOrNull(qcCreator)
+            || isStringEmptyOrNull(qcDate)) {
           ok = false;
         }
       }
@@ -596,7 +596,7 @@ public class SampleControllerHelperService {
           Long sampleId = s.getLong("sampleId");
           Sample sample = requestManager.getSampleById(sampleId);
           // autosave the barcode if none has been previously generated
-          if (sample.getIdentificationBarcode() == null || "".equals(sample.getIdentificationBarcode())) {
+          if (isStringEmptyOrNull(sample.getIdentificationBarcode())) {
             requestManager.saveSample(sample);
           }
           File f = mps.getLabelFor(sample);

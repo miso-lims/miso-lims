@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.decorator.submission.era;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -69,7 +71,7 @@ public class EraExperimentDecorator extends AbstractSubmittableDecorator<Documen
       Element studyRef = submission.createElementNS(null, "STUDY_REF");
       studyRef.setAttribute("refname", e.getStudy().getAlias());
       studyRef.setAttribute("refcenter", submissionProperties.getProperty("submission.centreName"));
-      if (e.getStudy().getAccession() != null && !"".equals(e.getStudy().getAccession())) {
+      if (e.getStudy().getAccession() != null && !isStringEmptyOrNull(e.getStudy().getAccession())) {
         studyRef.setAttribute("accession", e.getStudy().getAccession());
       }
       experiment.appendChild(studyRef);
@@ -98,7 +100,7 @@ public class EraExperimentDecorator extends AbstractSubmittableDecorator<Documen
             member.setAttribute("member_name", dil.getName());
             member.setAttribute("refcenter", submissionProperties.getProperty("submission.centreName"));
             member.setAttribute("refname", relevantLibrary.getSample().getAlias());
-            if (relevantLibrary.getSample().getAccession() != null && !"".equals(relevantLibrary.getSample().getAccession())) {
+            if (!isStringEmptyOrNull(relevantLibrary.getSample().getAccession())) {
               sampleDescriptor.setAttribute("accession", relevantLibrary.getSample().getAccession());
             }
             pool.appendChild(member);
@@ -121,7 +123,7 @@ public class EraExperimentDecorator extends AbstractSubmittableDecorator<Documen
             relevantLibrary = dil.getLibrary();
             sampleDescriptor.setAttribute("refname", relevantLibrary.getSample().getAlias());
             sampleDescriptor.setAttribute("refcenter", submissionProperties.getProperty("submission.centreName"));
-            if (relevantLibrary.getSample().getAccession() != null && !"".equals(relevantLibrary.getSample().getAccession())) {
+            if (!isStringEmptyOrNull(relevantLibrary.getSample().getAccession())) {
               sampleDescriptor.setAttribute("accession", relevantLibrary.getSample().getAccession());
             }
           }
@@ -133,7 +135,7 @@ public class EraExperimentDecorator extends AbstractSubmittableDecorator<Documen
       Element libraryDescriptor = submission.createElementNS(null, "LIBRARY_DESCRIPTOR");
       Element libraryName = submission.createElementNS(null, "LIBRARY_NAME");
       if (relevantLibrary != null) {
-        if (e.getPool().getAlias() != null && !"".equals(e.getPool().getAlias())) {
+        if (!isStringEmptyOrNull(e.getPool().getAlias())) {
           libraryName.setTextContent(e.getPool().getAlias());
         } else {
           libraryName.setTextContent(e.getPool().getName());

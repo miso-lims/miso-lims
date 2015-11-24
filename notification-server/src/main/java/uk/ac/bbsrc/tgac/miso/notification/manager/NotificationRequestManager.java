@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.notification.manager;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -80,7 +82,7 @@ public class NotificationRequestManager {
       }
 
       for (String s : status.keySet()) {
-        if (!"".equals(status.get(s))) {
+        if (!isStringEmptyOrNull(status.get(s))) {
           JSONArray runs = JSONArray.fromObject(status.get(s));
           if (!runs.isEmpty()) {
             return "{'progress':'" + s + "'}";
@@ -100,7 +102,7 @@ public class NotificationRequestManager {
       String platformType = request.getString("platform").toLowerCase();
       Map<String, String> status = parseRunFolder(platformType, folder);
       for (String s : status.keySet()) {
-        if (!"".equals(status.get(s))) {
+        if (!isStringEmptyOrNull(status.get(s))) {
           log.debug("queryRunStatus: " + status.get(s));
           JSONArray runs = JSONArray.fromObject(status.get(s));
           if (!runs.isEmpty()) {
@@ -122,7 +124,7 @@ public class NotificationRequestManager {
       String platformType = request.getString("platform").toLowerCase();
       Map<String, String> status = parseRunFolder(platformType, folder);
       for (String s : status.keySet()) {
-        if (!"".equals(status.get(s))) {
+        if (!isStringEmptyOrNull(status.get(s))) {
           log.debug("queryRunInfo: " + status.get(s));
           JSONArray runs = JSONArray.fromObject(status.get(s));
           if (!runs.isEmpty()) {
@@ -144,7 +146,7 @@ public class NotificationRequestManager {
       String platformType = request.getString("platform").toLowerCase();
       Map<String, String> status = parseRunFolder(platformType, folder);
       for (String s : status.keySet()) {
-        if (!"".equals(status.get(s))) {
+        if (!isStringEmptyOrNull(status.get(s))) {
           log.debug("queryRunParameters: " + status.get(s));
           JSONArray runs = JSONArray.fromObject(status.get(s));
           if (!runs.isEmpty()) {
@@ -183,9 +185,9 @@ public class NotificationRequestManager {
   private File lookupRunAliasPath(JSONObject request) {
     if (context != null && dataPaths != null) {
       String platformType = request.getString("platform").toLowerCase();
-      if (!"".equals(platformType) && platformType != null) {
+      if (!isStringEmptyOrNull(platformType)) {
         String runAlias = request.getString("run");
-        if (!"".equals(runAlias) && runAlias != null) {
+        if (!isStringEmptyOrNull(runAlias)) {
           RunFolderScanner rfs = (RunFolderScanner) context.getBean(platformType + "StatusRecursiveScanner");
           if (rfs != null) {
             for (File dataPath : dataPaths.get(platformType)) {
@@ -206,7 +208,7 @@ public class NotificationRequestManager {
 
   private Map<String, String> parseRunFolder(String platformType, File path) throws IllegalStateException, IllegalArgumentException {
     if (context != null && dataPaths != null) {
-      if (!"".equals(platformType) && platformType != null) {
+      if (!isStringEmptyOrNull(platformType)) {
         FileSetTransformer<String, String, File> fst = (FileSetTransformer<String, String, File>) context
             .getBean(platformType + "Transformer");
         Set<File> fs = new HashSet<>();

@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -84,7 +86,7 @@ public class PrinterControllerHelperService {
   public JSONObject listAvailableServices(HttpSession session, JSONObject json) {
     try {
       StringBuilder sb = new StringBuilder();
-      if (json.has("serviceClass") && !"".equals(json.getString("serviceClass"))) {
+      if (json.has("serviceClass") && !isStringEmptyOrNull(json.getString("serviceClass"))) {
         Collection<MisoPrintService> ps = printManager.listPrintServicesByBarcodeableClass(Class.forName(json.getString("serviceClass")));
         if (ps.size() > 1) {
           sb.append("<option value=''>Select print service...</option>");
@@ -152,7 +154,7 @@ public class PrinterControllerHelperService {
 
   public JSONObject getContextFields(HttpSession session, JSONObject json) {
     try {
-      if (json.has("contextName") && !json.get("contextName").equals("")) {
+      if (json.has("contextName") && !isStringEmptyOrNull(json.getString("contextName"))) {
         PrintContext p = printManager.getPrintContext(json.getString("contextName"));
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("contextFields", PrintServiceUtils.mapContextFieldsToJSON(p));
@@ -169,7 +171,7 @@ public class PrinterControllerHelperService {
   public JSONObject checkPrinterAvailability(HttpSession session, JSONObject json) {
     try {
 
-      if (json.has("host") && !json.get("host").equals("")) {
+      if (json.has("host") && !isStringEmptyOrNull(json.getString("host"))) {
         InetAddress i = InetAddress.getByName(json.getString("host"));
         if (i.isReachable(2000)) {
           return JSONUtils.JSONObjectResponse("html", "OK");
@@ -218,7 +220,7 @@ public class PrinterControllerHelperService {
   }
 
   public JSONObject disablePrintService(HttpSession session, JSONObject json) {
-    if (json.has("printerName") && json.getString("printerName") != null && !"".equals(json.getString("printerName"))) {
+    if (json.has("printerName") && !isStringEmptyOrNull(json.getString("printerName"))) {
       String printerName = json.getString("printerName");
       try {
         MisoPrintService bps = printManager.getPrintService(printerName);
@@ -237,7 +239,7 @@ public class PrinterControllerHelperService {
   }
 
   public JSONObject enablePrintService(HttpSession session, JSONObject json) {
-    if (json.has("printerName") && json.getString("printerName") != null && !"".equals(json.getString("printerName"))) {
+    if (json.has("printerName") && !isStringEmptyOrNull(json.getString("printerName"))) {
       String printerName = json.getString("printerName");
       try {
         MisoPrintService bps = printManager.getPrintService(printerName);
@@ -275,7 +277,7 @@ public class PrinterControllerHelperService {
 
   public JSONObject editPrinterService(HttpSession session, JSONObject json) {
     try {
-      if (json.has("serviceName") && !json.get("serviceName").equals("")) {
+      if (json.has("serviceName") && !isStringEmptyOrNull(json.getString("serviceName"))) {
         MisoPrintService bps = printManager.getPrintService(json.getString("serviceName"));
         if (bps != null) {
           PrintContext pc = bps.getPrintContext();
@@ -283,7 +285,7 @@ public class PrinterControllerHelperService {
           contextFields.put("host", json.getString("host"));
           PrintServiceUtils.mapJSONToContextFields(contextFields, pc);
           bps.setPrintContext(pc);
-          if (json.has("schema") && !json.get("schema").equals("")) {
+          if (json.has("schema") && !isStringEmptyOrNull(json.getString("schema"))) {
             BarcodableSchema barcodableSchema = printManager.getBarcodableSchema(json.getString("schema"));
             bps.setBarcodableSchema(barcodableSchema);
           }

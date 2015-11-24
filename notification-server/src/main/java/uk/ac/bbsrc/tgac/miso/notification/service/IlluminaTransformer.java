@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.notification.service;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
@@ -357,7 +359,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
       if (nl.getLength() > 0) {
         for (int i = 0; i < nl.getLength(); i++) {
           Element e = (Element) nl.item(i);
-          if (!"".equals(e.getAttributeNS(null, "NumCycles"))) {
+          if (!isStringEmptyOrNull(e.getAttributeNS(null, "NumCycles"))) {
             numCycles += Integer.parseInt(e.getAttributeNS(null, "NumCycles"));
           }
         }
@@ -633,7 +635,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
         Element e = (Element) kits.item(i);
         String rs = e.getTextContent();
         for (String r : rs.split("[,;]")) {
-          if (r != null && !"".equals(r)) rlist.add(r.trim());
+          if (!isStringEmptyOrNull(r)) rlist.add(r.trim());
         }
       }
     }

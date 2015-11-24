@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
@@ -66,7 +68,7 @@ public class PoolSearchService {
       boolean readyOnly = json.getBoolean("readyOnly");
       try {
         Collection<Pool<? extends Poolable>> pools = null;
-        if (searchStr != null && !searchStr.equals("")) {
+        if (!isStringEmptyOrNull(searchStr)) {
           if (LimsUtils.isBase64String(searchStr)) {
             // Base64-encoded string, most likely a barcode image beeped in. decode and search
             searchStr = new String(Base64.decodeBase64(searchStr));

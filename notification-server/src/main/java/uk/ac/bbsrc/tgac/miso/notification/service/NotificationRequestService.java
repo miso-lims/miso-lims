@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.notification.service;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -132,6 +134,6 @@ public class NotificationRequestService {
   }
 
   public boolean validateQueryJSON(JSONObject json) {
-    return (json.has("query") && (json.getString("query") != null && !"".equals(json.getString("query"))));
+    return (json.has("query") && (!isStringEmptyOrNull(json.getString("query"))));
   }
 }

@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.notification.service;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.slf4j.Logger;
@@ -116,10 +118,10 @@ public class SolidTransformer implements FileSetTransformer<String, String, File
                 log.debug(runName + " :: Started -> " + dateStarted);
                 run.put("startDate", dateStarted);
 
-                if (!"".equals(dateStarted) && "".equals(dateCompleted)) {
+                if (!isStringEmptyOrNull(dateStarted) && isStringEmptyOrNull(dateCompleted)) {
                   log.debug(runName + " :: Running");
                   map.get("Running").add(run);
-                } else if (!"".equals(dateStarted) && !"".equals(dateCompleted)) {
+                } else if (!isStringEmptyOrNull(dateStarted) && !isStringEmptyOrNull(dateCompleted)) {
                   log.debug(runName + " :: Completed -> " + dateCompleted);
                   run.put("completionDate", dateCompleted);
                   map.get("Completed").add(run);
@@ -161,10 +163,10 @@ public class SolidTransformer implements FileSetTransformer<String, String, File
 
                   run.put("status", SubmissionUtils.transform(statusFile));
 
-                  if (!"".equals(dateStarted) && "".equals(dateCompleted)) {
+                  if (!isStringEmptyOrNull(dateStarted) && isStringEmptyOrNull(dateCompleted)) {
                     log.debug(runName + " :: Running");
                     map.get("Running").add(run);
-                  } else if (!"".equals(dateStarted) && !"".equals(dateCompleted)) {
+                  } else if (!isStringEmptyOrNull(dateStarted) && !isStringEmptyOrNull(dateCompleted)) {
                     log.debug(runName + " :: Completed -> " + dateCompleted);
                     run.put("completionDate", dateCompleted);
                     map.get("Completed").add(run);

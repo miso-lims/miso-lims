@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -339,7 +341,7 @@ public class EditLibraryController {
 
   @RequestMapping(value = "librarytypes", method = RequestMethod.GET)
   public @ResponseBody String jsonRestLibraryTypes(@RequestParam("platform") String platform) throws IOException {
-    if (platform != null && !"".equals(platform)) {
+    if (!isStringEmptyOrNull(platform)) {
       List<String> types = new ArrayList<String>();
       for (LibraryType t : populateLibraryTypesByPlatform(platform)) {
         types.add("\"" + t.getDescription() + "\"" + ":" + "\"" + t.getDescription() + "\"");
@@ -352,7 +354,7 @@ public class EditLibraryController {
 
   @RequestMapping(value = "barcodeStrategies", method = RequestMethod.GET)
   public @ResponseBody String jsonRestBarcodeStrategies(@RequestParam("platform") String platform) throws IOException {
-    if (platform != null && !"".equals(platform)) {
+    if (!isStringEmptyOrNull(platform)) {
       List<String> types = new ArrayList<String>();
       for (TagBarcodeStrategy t : tagBarcodeStrategyResolverService.getTagBarcodeStrategiesByPlatform(PlatformType.get(platform))) {
         types.add("\"" + t.getName() + "\"" + ":" + "\"" + t.getName() + "\"");
@@ -366,7 +368,7 @@ public class EditLibraryController {
   @RequestMapping(value = "barcodesForPosition", method = RequestMethod.GET)
   public @ResponseBody String jsonRestTagBarcodes(@RequestParam("barcodeStrategy") String barcodeStrategy,
       @RequestParam("position") String position) throws IOException {
-    if (barcodeStrategy != null && !"".equals(barcodeStrategy)) {
+    if (!isStringEmptyOrNull(barcodeStrategy)) {
       TagBarcodeStrategy tbs = tagBarcodeStrategyResolverService.getTagBarcodeStrategy(barcodeStrategy);
       if (tbs != null) {
         List<TagBarcode> tagBarcodes = new ArrayList<TagBarcode>(tbs.getApplicableBarcodesForPosition(Integer.parseInt(position)));

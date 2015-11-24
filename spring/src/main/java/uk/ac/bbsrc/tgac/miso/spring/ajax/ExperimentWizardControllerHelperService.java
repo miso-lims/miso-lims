@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -193,7 +195,7 @@ public class ExperimentWizardControllerHelperService {
   public JSONObject loadPoolsByPlatform(HttpSession session, JSONObject json) {
     StringBuilder a = new StringBuilder();
     try {
-      if (json.has("platformId") && !"".equals(json.getString("platformId"))) {
+      if (json.has("platformId") && !isStringEmptyOrNull(json.getString("platformId"))) {
         Long platformId = json.getLong("platformId");
         Platform platform = requestManager.getPlatformById(platformId);
         if (platform != null) {
@@ -203,7 +205,7 @@ public class ExperimentWizardControllerHelperService {
           for (Pool p : pools) {
             a.append("<div bind='" + p.getId()
                 + "' onMouseOver='this.className=\"dashboardhighlight\"' onMouseOut='this.className=\"dashboard\"' class='dashboard' style='position:relative' ");
-            if (json.has("newid") && !"".equals(json.getString("newid"))) {
+            if (json.has("newid") && !isStringEmptyOrNull(json.getString("newid"))) {
               a.append("ondblclick='Experiment.pool.experimentSelectPool(this," + json.getString("newid") + ");'");
             } else {
               a.append("ondblclick='Experiment.pool.experimentSelectPool(this);'");

@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.core.service.submission;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.Collection;
@@ -72,7 +74,7 @@ public class TGACIlluminaFilepathGenerator implements FilePathGenerator {
         Collection<Experiment> experiments = pool.getExperiments();
         Experiment experiment = experiments.iterator().next();
         StringBuilder filePath = new StringBuilder();
-        if (!"".equals(basePath)) {
+        if (!isStringEmptyOrNull(basePath)) {
           filePath.append(partition.getSequencerPartitionContainer().getRun().getFilePath() + "/Data/Intensities/BaseCalls/PAP/Project_"
               + experiment.getStudy().getProject().getAlias() + "/Sample_" + l.getLibrary().getName() + "/" + l.getLibrary().getName());
         } else {

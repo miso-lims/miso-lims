@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.impl.illumina;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -70,7 +72,7 @@ public class IlluminaRun extends RunImpl {
   public IlluminaRun(String statusXml, User user) {
     try {
       Document statusDoc = SubmissionUtils.emptyDocument();
-      if (statusXml != null && !"".equals(statusXml)) {
+      if (!isStringEmptyOrNull(statusXml)) {
         SubmissionUtils.transform(new UnicodeReader(statusXml), statusDoc);
 
         String runName = (statusDoc.getElementsByTagName("RunName").item(0).getTextContent());

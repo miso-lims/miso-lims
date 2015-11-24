@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.core.factory.barcode;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.IOException;
@@ -159,7 +161,7 @@ public class BarcodeFactory {
   private RenderedImage getImage(Barcodable barcodable, BarcodeGenerator barcodeGenerator, BarcodeDimension dimension) throws IOException {
     String input = barcodable.getIdentificationBarcode();
 
-    if (input != null && !"".equals(input)) {
+    if (!isStringEmptyOrNull(input)) {
       String enc = new String(Base64.encodeBase64(input.getBytes("UTF-8")));
 
       BitmapCanvasProvider provider = new BitmapCanvasProvider(bitmapResolution, imageType, antialias, orientation);

@@ -259,7 +259,7 @@ public class LibraryControllerHelperService {
           Long libraryId = l.getLong("libraryId");
           Library library = requestManager.getLibraryById(libraryId);
           // autosave the barcode if none has been previously generated
-          if (library.getIdentificationBarcode() == null || "".equals(library.getIdentificationBarcode())) {
+          if (isStringEmptyOrNull(library.getIdentificationBarcode())) {
             requestManager.saveLibrary(library);
           }
 
@@ -311,7 +311,7 @@ public class LibraryControllerHelperService {
           Long dilutionId = l.getLong("dilutionId");
           LibraryDilution dilution = requestManager.getLibraryDilutionById(dilutionId);
           // autosave the barcode if none has been previously generated
-          if (dilution.getIdentificationBarcode() == null || "".equals(dilution.getIdentificationBarcode())) {
+          if (isStringEmptyOrNull(dilution.getIdentificationBarcode())) {
             requestManager.saveLibraryDilution(dilution);
           }
           File f = mps.getLabelFor(dilution);
@@ -469,12 +469,12 @@ public class LibraryControllerHelperService {
               library.setIdentificationBarcode(identificationBarcode);
 
               boolean paired = false;
-              if (!"".equals(j.getString("paired"))) {
+              if (!isStringEmptyOrNull(j.getString("paired"))) {
                 paired = j.getBoolean("paired");
               }
               library.setPaired(paired);
 
-              if (j.has("tagBarcodes") && !"".equals(j.getString("tagBarcodes")) && !j.getString("tagBarcodes").contains("Select")) {
+              if (j.has("tagBarcodes") && !isStringEmptyOrNull(j.getString("tagBarcodes")) && !j.getString("tagBarcodes").contains("Select")) {
                 String[] codes = j.getString("tagBarcodes").split(Pattern.quote("|"));
                 HashMap<Integer, TagBarcode> barcodes = new HashMap<Integer, TagBarcode>();
                 int count = 1;
@@ -527,7 +527,7 @@ public class LibraryControllerHelperService {
 
   public JSONObject changePlatformName(HttpSession session, JSONObject json) {
     try {
-      if (json.has("platform") && !json.get("platform").equals("")) {
+      if (json.has("platform") && !isStringEmptyOrNull(json.getString("platform"))) {
         String platform = json.getString("platform");
         Map<String, Object> map = new HashMap<String, Object>();
 
@@ -606,13 +606,13 @@ public class LibraryControllerHelperService {
 
   public JSONObject addLibraryQC(HttpSession session, JSONObject json) {
     try {
-      for (Object key : json.keySet()) {
-        if (json.get(key) == null || json.get(key).equals("")) {
-          String k = (String) key;
-          return JSONUtils.SimpleJSONError("Please enter a value for '" + k + "'");
+      for (Object k : json.keySet()) {
+        String key = (String) k;
+        if (isStringEmptyOrNull(json.getString(key))) {
+          return JSONUtils.SimpleJSONError("Please enter a value for '" + key + "'");
         }
       }
-      if (json.has("libraryId") && !json.get("libraryId").equals("")) {
+      if (json.has("libraryId") && !isStringEmptyOrNull(json.getString("libraryId"))) {
         Long libraryId = Long.parseLong(json.getString("libraryId"));
         Library library = requestManager.getLibraryById(libraryId);
         LibraryQC newQc = dataObjectFactory.getLibraryQC();
@@ -660,8 +660,8 @@ public class LibraryControllerHelperService {
         String qcDate = qc.getString("qcDate");
         String insertSize = qc.getString("insertSize");
 
-        if (qcType == null || qcType.equals("") || results == null || results.equals("") || qcCreator == null || qcCreator.equals("")
-            || qcDate == null || qcDate.equals("") || insertSize == null || insertSize.equals("")) {
+        if (isStringEmptyOrNull(qcType) || isStringEmptyOrNull(results) || isStringEmptyOrNull(qcCreator)
+            || isStringEmptyOrNull(qcDate) || isStringEmptyOrNull(insertSize)) {
           ok = false;
         }
       }
@@ -698,13 +698,13 @@ public class LibraryControllerHelperService {
 
   public JSONObject addLibraryDilution(HttpSession session, JSONObject json) {
     try {
-      for (Object key : json.keySet()) {
-        if (json.get(key) == null || json.get(key).equals("")) {
-          String k = (String) key;
-          return JSONUtils.SimpleJSONError("Please enter a value for '" + k + "'");
+      for (Object k : json.keySet()) {
+        String key = (String) k;
+        if (isStringEmptyOrNull(json.getString(key))) {
+          return JSONUtils.SimpleJSONError("Please enter a value for '" + key + "'");
         }
       }
-      if (json.has("libraryId") && !json.get("libraryId").equals("")) {
+      if (json.has("libraryId") && !isStringEmptyOrNull(json.getString("libraryId"))) {
         Long libraryId = Long.parseLong(json.getString("libraryId"));
         Library library = requestManager.getLibraryById(libraryId);
         LibraryDilution newDilution = dataObjectFactory.getLibraryDilution();
@@ -775,8 +775,7 @@ public class LibraryControllerHelperService {
         String dilutionCreator = dil.getString("dilutionCreator");
         String dilutionDate = dil.getString("dilutionDate");
 
-        if (results == null || results.equals("") || dilutionCreator == null || dilutionCreator.equals("") || dilutionDate == null
-            || dilutionDate.equals("")) {
+        if (isStringEmptyOrNull(results) || isStringEmptyOrNull(dilutionCreator) || isStringEmptyOrNull(dilutionDate)) {
           ok = false;
         }
       }
@@ -829,7 +828,7 @@ public class LibraryControllerHelperService {
 
   public JSONObject editLibraryDilution(HttpSession session, JSONObject json) {
     try {
-      if (json.has("dilutionId") && !json.get("dilutionId").equals("")) {
+      if (json.has("dilutionId") && !isStringEmptyOrNull(json.getString("dilutionId"))) {
         Long dilutionId = Long.parseLong(json.getString("dilutionId"));
         LibraryDilution dilution = requestManager.getLibraryDilutionById(dilutionId);
         dilution.setConcentration(Double.parseDouble(json.getString("result")));
@@ -845,13 +844,13 @@ public class LibraryControllerHelperService {
 
   public JSONObject addEmPcr(HttpSession session, JSONObject json) {
     try {
-      for (Object key : json.keySet()) {
-        if (json.get(key) == null || json.get(key).equals("")) {
-          String k = (String) key;
-          return JSONUtils.SimpleJSONError("Please enter a value for '" + k + "'");
+      for (Object k : json.keySet()) {
+        String key = (String) k;
+        if (isStringEmptyOrNull(json.getString(key))) {
+          return JSONUtils.SimpleJSONError("Please enter a value for '" + key + "'");
         }
       }
-      if (json.has("dilutionId") && !json.get("dilutionId").equals("")) {
+      if (json.has("dilutionId") && !isStringEmptyOrNull(json.getString("dilutionId"))) {
         Long dilutionId = Long.parseLong(json.getString("dilutionId"));
         LibraryDilution dilution = requestManager.getLibraryDilutionById(dilutionId);
         emPCR pcr = dataObjectFactory.getEmPCR();
@@ -890,13 +889,13 @@ public class LibraryControllerHelperService {
 
   public JSONObject addEmPcrDilution(HttpSession session, JSONObject json) {
     try {
-      for (Object key : json.keySet()) {
-        if (json.get(key) == null || json.get(key).equals("")) {
-          String k = (String) key;
-          return JSONUtils.SimpleJSONError("Please enter a value for '" + k + "'");
+      for (Object k : json.keySet()) {
+        String key = (String) k;
+        if (isStringEmptyOrNull(json.getString(key))) {
+          return JSONUtils.SimpleJSONError("Please enter a value for '" + key + "'");
         }
       }
-      if (json.has("pcrId") && !json.get("pcrId").equals("")) {
+      if (json.has("pcrId") && !isStringEmptyOrNull(json.getString("pcrId"))) {
         Long pcrId = Long.parseLong(json.getString("pcrId"));
         emPCR pcr = requestManager.getEmPcrById(pcrId);
         emPCRDilution newDilution = dataObjectFactory.getEmPCRDilution();
@@ -959,8 +958,7 @@ public class LibraryControllerHelperService {
         String pcrDate = pcr.getString("pcrDate");
         String concentration = pcr.getString("results");
 
-        if (concentration == null || concentration.equals("") || pcrCreator == null || pcrCreator.equals("") || pcrDate == null
-            || pcrDate.equals("")) {
+        if (isStringEmptyOrNull(concentration) || isStringEmptyOrNull(pcrCreator) || isStringEmptyOrNull(pcrDate)) {
           ok = false;
         }
       }
@@ -1005,8 +1003,8 @@ public class LibraryControllerHelperService {
         String dilutionDate = dil.getString("pcrDilutionDate");
         String concentration = dil.getString("results");
 
-        if (concentration == null || concentration.equals("") || dilutionCreator == null || dilutionCreator.equals("")
-            || dilutionDate == null || dilutionDate.equals("")) {
+        if (isStringEmptyOrNull(concentration) || isStringEmptyOrNull(dilutionCreator)
+            || isStringEmptyOrNull(dilutionDate)) {
           ok = false;
         }
       }
@@ -1062,7 +1060,7 @@ public class LibraryControllerHelperService {
 
   public JSONObject editLibraryQC(HttpSession session, JSONObject json) {
     try {
-      if (json.has("qcId") && !json.get("qcId").equals("")) {
+      if (json.has("qcId") && !isStringEmptyOrNull(json.getString("qcId"))) {
         Long qcId = Long.parseLong(json.getString("qcId"));
         LibraryQC libraryQc = requestManager.getLibraryQCById(qcId);
 
