@@ -23,13 +23,14 @@
 
 package uk.ac.bbsrc.tgac.miso.core.service.integration.strategy;
 
-import net.sourceforge.fluxion.spi.Spi;
-import org.springframework.integration.Message;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
-
 import java.util.List;
 import java.util.Map;
+
+import org.springframework.integration.Message;
+
+import net.sourceforge.fluxion.spi.Spi;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.service.integration.strategy

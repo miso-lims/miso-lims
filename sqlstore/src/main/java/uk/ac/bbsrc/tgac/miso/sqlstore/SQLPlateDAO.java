@@ -23,13 +23,21 @@
 
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
-import com.googlecode.ehcache.annotations.Cacheable;
-import com.googlecode.ehcache.annotations.KeyGenerator;
-import com.googlecode.ehcache.annotations.Property;
-import com.googlecode.ehcache.annotations.TriggersRemove;
+import java.io.IOException;
+import java.lang.reflect.ParameterizedType;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import javax.persistence.CascadeType;
+
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
+
 import org.codehaus.jackson.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,22 +47,33 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.transaction.annotation.Transactional;
-import uk.ac.bbsrc.tgac.miso.core.data.*;
+
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractPlate;
+import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.Plate;
+import uk.ac.bbsrc.tgac.miso.core.data.Plateable;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlateMaterialType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.store.*;
+import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
+import uk.ac.bbsrc.tgac.miso.core.store.LibraryDilutionStore;
+import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
+import uk.ac.bbsrc.tgac.miso.core.store.PlateStore;
+import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
+import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DaoLookup;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
-import javax.persistence.CascadeType;
-import java.io.IOException;
-import java.lang.reflect.ParameterizedType;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.*;
+import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.store.SecurityStore;
+import com.googlecode.ehcache.annotations.Cacheable;
+import com.googlecode.ehcache.annotations.KeyGenerator;
+import com.googlecode.ehcache.annotations.Property;
+import com.googlecode.ehcache.annotations.TriggersRemove;
 
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore
@@ -75,8 +94,10 @@ public class SQLPlateDAO implements PlateStore {
 
   public static final String PLATE_SELECT_BY_ID_BARCODE = PLATE_SELECT + " WHERE identificationBarcode = ?";
 
-  public static final String PLATE_UPDATE = "UPDATE " + TABLE_NAME + " "
-      + "SET plateId=:plateId, name=:name, description=:description, creationDate=:creationDate, plateMaterialType=:plateMaterialType, identificationBarcode=:identificationBarcode, locationBarcode=:locationBarcode, size=:size, tagBarcodeId=:tagBarcodeId, securityProfile_profileId=:securityProfile_profileId "
+  public static final String PLATE_UPDATE = "UPDATE "
+      + TABLE_NAME
+      + " "
+      + "SET plateId=:plateId, name=:name, description=:description, creationDate=:creationDate, plateMaterialType=:plateMaterialType, identificationBarcode=:identificationBarcode, locationBarcode=:locationBarcode, size=:size, tagBarcodeId=:tagBarcodeId, securityProfile_profileId=:securityProfile_profileId, lastModifier=:lastModifier "
       + "WHERE plateId=:plateId";
 
   public static final String PLATE_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE plateId=:plateId";
@@ -112,6 +133,8 @@ public class SQLPlateDAO implements PlateStore {
   private LibraryDilutionStore dilutionDAO;
   private Store<SecurityProfile> securityProfileDAO;
   private boolean autoGenerateIdentificationBarcodes;
+  private ChangeLogStore changeLogDAO;
+  private SecurityStore securityDAO;
 
   @Autowired
   private DaoLookup daoLookup;
@@ -270,6 +293,7 @@ public class SQLPlateDAO implements PlateStore {
     params.addValue("locationBarcode", plate.getLocationBarcode());
     params.addValue("size", plate.getSize());
     params.addValue("securityProfile_profileId", securityProfileId);
+    params.addValue("lastModifier", plate.getLastModifier().getUserId());
 
     if (plate.getTagBarcode() != null) {
       params.addValue("tagBarcodeId", plate.getTagBarcode().getId());
@@ -411,6 +435,7 @@ public class SQLPlateDAO implements PlateStore {
       plate.setLocationBarcode(rs.getString("locationBarcode"));
 
       try {
+        plate.setLastModifier(securityDAO.getUserById(rs.getLong("lastModifier")));
         plate.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
         plate.setPlateMaterialType(PlateMaterialType.get(rs.getString("plateMaterialType")));
         plate.setTagBarcode(libraryDAO.getTagBarcodeById(rs.getLong("tagBarcodeId")));
@@ -418,6 +443,7 @@ public class SQLPlateDAO implements PlateStore {
         if (!isLazy()) {
           plate.setElements(resolvePlateElements(plate.getId()));
         }
+        plate.getChangeLog().addAll(changeLogDAO.listAllById(TABLE_NAME, id));
       } catch (IOException e1) {
         e1.printStackTrace();
       }
@@ -463,5 +489,21 @@ public class SQLPlateDAO implements PlateStore {
     } else {
       throw new IllegalArgumentException("Element type " + elementType.getName() + " is not a valid Plateable type");
     }
+  }
+
+  public ChangeLogStore getChangeLogDAO() {
+    return changeLogDAO;
+  }
+
+  public void setChangeLogDAO(ChangeLogStore changeLogStore) {
+    this.changeLogDAO = changeLogStore;
+  }
+
+  public SecurityStore getSecurityDAO() {
+    return securityDAO;
+  }
+
+  public void setSecurityDAO(SecurityStore securityDAO) {
+    this.securityDAO = securityDAO;
   }
 }

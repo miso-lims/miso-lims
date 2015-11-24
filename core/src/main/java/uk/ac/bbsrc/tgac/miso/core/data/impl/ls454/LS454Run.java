@@ -23,13 +23,15 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.impl.ls454;
 
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
+
 import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.impl.ls454

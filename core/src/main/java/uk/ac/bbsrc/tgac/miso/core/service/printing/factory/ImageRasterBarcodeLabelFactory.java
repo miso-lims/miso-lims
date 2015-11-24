@@ -23,16 +23,18 @@
 
 package uk.ac.bbsrc.tgac.miso.core.service.printing.factory;
 
+import java.io.File;
+import java.io.IOException;
+
+import org.springframework.security.core.context.SecurityContextHolder;
+
 import com.eaglegenomics.simlims.core.User;
 import com.opensymphony.util.FileUtils;
+
 import net.sourceforge.fluxion.spi.ServiceProvider;
-import org.springframework.security.core.context.SecurityContextHolder;
 import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeLabelFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.schema.BarcodableSchema;
-
-import java.io.File;
-import java.io.IOException;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.service.printing.factory

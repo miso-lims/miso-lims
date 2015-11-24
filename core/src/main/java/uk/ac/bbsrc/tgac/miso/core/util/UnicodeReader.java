@@ -29,8 +29,13 @@ package uk.ac.bbsrc.tgac.miso.core.util;
  Win2k Notepad:
  Unicode format = UTF-16LE
  ***/
-
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PushbackInputStream;
+import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 
 /**
  * Generic unicode textreader, which will use BOM mark to identify the encoding to be used. If BOM is not found then use a given default or

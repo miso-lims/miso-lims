@@ -23,15 +23,17 @@
 
 package uk.ac.bbsrc.tgac.miso.core.event.alerter;
 
+import java.util.Properties;
+
+import javax.mail.MessagingException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import uk.ac.bbsrc.tgac.miso.core.event.Alert;
 import uk.ac.bbsrc.tgac.miso.core.event.AlerterService;
 import uk.ac.bbsrc.tgac.miso.core.exception.AlertingException;
 import uk.ac.bbsrc.tgac.miso.core.util.EmailUtils;
-
-import javax.mail.MessagingException;
-import java.util.Properties;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.event.service

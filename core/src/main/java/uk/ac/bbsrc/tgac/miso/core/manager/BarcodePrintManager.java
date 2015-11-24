@@ -23,18 +23,21 @@
 
 package uk.ac.bbsrc.tgac.miso.core.manager;
 
-import com.eaglegenomics.simlims.core.User;
+import java.io.File;
+import java.io.IOException;
+import java.util.Date;
+import java.util.Queue;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.eaglegenomics.simlims.core.User;
+
 import uk.ac.bbsrc.tgac.miso.core.data.PrintJob;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.MisoPrintJob;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoPrintException;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.PrintContextResolverService;
-import java.io.File;
-import java.io.IOException;
-import java.util.Date;
-import java.util.Queue;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.manager

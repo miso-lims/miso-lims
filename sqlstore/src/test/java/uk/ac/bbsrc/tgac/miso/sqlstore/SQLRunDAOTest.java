@@ -49,6 +49,8 @@ import uk.ac.bbsrc.tgac.miso.core.store.WatcherStore;
 
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.store.SecurityStore;
 
 public class SQLRunDAOTest extends AbstractDAOTest {
 
@@ -61,6 +63,8 @@ public class SQLRunDAOTest extends AbstractDAOTest {
 
   @Mock
   private MisoNamingScheme<Run> namingScheme;
+  @Mock
+  private SecurityStore securityDAO;
   @Mock
   private Store<SecurityProfile> securityProfileDAO;
   @Mock
@@ -308,9 +312,12 @@ public class SQLRunDAOTest extends AbstractDAOTest {
     run.setSecurityProfile(profile);
     SequencerReference sequencer = Mockito.mock(SequencerReference.class);
     Mockito.when(sequencer.getId()).thenReturn(1L);
+    User user = Mockito.mock(User.class);
+    Mockito.when(user.getUserId()).thenReturn(1L);
     run.setSequencerReference(sequencer);
     run.setFilePath("/far/far/away");
     run.setName("AwesomeRun");
+    run.setLastModifier(user);
 
     Mockito.when(namingScheme.validateField(Matchers.anyString(), Matchers.anyString())).thenReturn(true);
 
@@ -393,6 +400,8 @@ public class SQLRunDAOTest extends AbstractDAOTest {
     SecurityProfile profile = Mockito.mock(SecurityProfile.class);
     SequencerReference sequencer = Mockito.mock(SequencerReference.class);
     Mockito.when(sequencer.getId()).thenReturn(1L);
+    User user = Mockito.mock(User.class);
+    Mockito.when(user.getUserId()).thenReturn(1L);
     Run run = new RunImpl();
     run.setSecurityProfile(profile);
     run.setAlias(alias);
@@ -403,6 +412,7 @@ public class SQLRunDAOTest extends AbstractDAOTest {
     run.setFilePath("/somewhere/someplace/");
     run.setPlatformType(PlatformType.ILLUMINA);
     run.setSequencerReference(sequencer);
+    run.setLastModifier(user);
     return run;
   }
 
@@ -414,6 +424,9 @@ public class SQLRunDAOTest extends AbstractDAOTest {
 
   @SuppressWarnings("unchecked") // Safe (for mocks in a unit test)
   private void mockNonLazyThings() throws IOException {
+    User mockUser = Mockito.mock(User.class);
+    Mockito.when(securityDAO.getUserById(Matchers.anyLong())).thenReturn(mockUser);
+
     List<SequencerPartitionContainer<SequencerPoolPartition>> mockContainers = new ArrayList<>();
     mockContainers.add(Mockito.mock(SequencerPartitionContainer.class));
     Mockito.when(sequencerPartitionContainerDAO.listAllSequencerPartitionContainersByRunId(Matchers.anyLong())).thenReturn(mockContainers);

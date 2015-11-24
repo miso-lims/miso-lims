@@ -23,11 +23,12 @@
 
 package uk.ac.bbsrc.tgac.miso.core.store;
 
-import com.eaglegenomics.simlims.core.User;
-import uk.ac.bbsrc.tgac.miso.core.data.Watchable;
-
 import java.io.IOException;
 import java.util.Collection;
+
+import com.eaglegenomics.simlims.core.User;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Watchable;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.store

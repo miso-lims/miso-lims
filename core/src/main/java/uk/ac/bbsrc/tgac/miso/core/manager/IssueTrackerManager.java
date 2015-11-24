@@ -23,10 +23,10 @@
 
 package uk.ac.bbsrc.tgac.miso.core.manager;
 
+import java.io.IOException;
+
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.spi.Spi;
-
-import java.io.IOException;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.manager

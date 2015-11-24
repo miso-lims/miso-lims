@@ -23,11 +23,12 @@
 
 package uk.ac.bbsrc.tgac.miso.core.service.integration.ws.solid;
 
-import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import java.net.URL;
 
 import javax.xml.namespace.QName;
-import java.net.URL;
+
+import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.service.integration.ws.solid

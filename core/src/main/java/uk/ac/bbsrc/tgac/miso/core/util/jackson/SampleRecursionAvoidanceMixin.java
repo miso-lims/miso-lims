@@ -1,9 +1,10 @@
 package uk.ac.bbsrc.tgac.miso.core.util.jackson;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
-
 import java.util.Collection;
+
+import org.codehaus.jackson.annotate.JsonIgnore;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
 
 /**
  * Jackson Mixin class to avoid recursion when grabbing samples and any child libraries.

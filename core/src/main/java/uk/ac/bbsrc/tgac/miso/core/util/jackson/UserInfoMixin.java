@@ -1,9 +1,11 @@
 package uk.ac.bbsrc.tgac.miso.core.util.jackson;
 
-import com.eaglegenomics.simlims.core.Group;
+import java.util.Collection;
+
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
-import java.util.Collection;
+
+import com.eaglegenomics.simlims.core.Group;
 
 /**
  * Jackson Mixin class to filter sensitive user info

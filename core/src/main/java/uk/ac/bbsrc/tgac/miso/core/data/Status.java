@@ -23,11 +23,14 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.util.Date;
+
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
+
 import com.eaglegenomics.simlims.core.Securable;
+
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
-import java.util.Date;
 
 /**
  * Definition of a Status object, used to hold metadata about the current status of a particular activity

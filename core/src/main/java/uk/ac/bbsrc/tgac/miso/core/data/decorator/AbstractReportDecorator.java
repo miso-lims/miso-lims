@@ -23,9 +23,9 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.decorator;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Reportable;
-
 import java.util.List;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Reportable;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.decorator

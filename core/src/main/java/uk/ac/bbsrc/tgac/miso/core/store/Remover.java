@@ -23,9 +23,9 @@
 
 package uk.ac.bbsrc.tgac.miso.core.store;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
-
 import java.io.IOException;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Deletable;
 
 /**
  * Defines a contract whereby an implementing class is able to remove a given object T from a store

@@ -23,11 +23,9 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.context;
 
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-
 import java.io.IOException;
 import java.security.InvalidKeyException;
-import java.util.*;
+import java.util.Enumeration;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -48,6 +46,9 @@ import org.springframework.security.web.context.HttpRequestResponseHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
 import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.integration.util.SignatureHelper;
 

@@ -23,8 +23,9 @@
 
 package uk.ac.bbsrc.tgac.miso.core.factory.reports;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Reportable;
 import java.util.Collection;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Reportable;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.factory.reports

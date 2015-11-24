@@ -23,9 +23,9 @@
 
 package uk.ac.bbsrc.tgac.miso.core.service.printing;
 
-import uk.ac.bbsrc.tgac.miso.core.service.printing.schema.BarcodableSchema;
-
 import java.util.Collection;
+
+import uk.ac.bbsrc.tgac.miso.core.service.printing.schema.BarcodableSchema;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.service.integration

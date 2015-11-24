@@ -23,17 +23,24 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.decorator.submission.era;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import uk.ac.bbsrc.tgac.miso.core.data.*;
-import uk.ac.bbsrc.tgac.miso.core.data.decorator.AbstractSubmittableDecorator;
-import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Properties;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
+import uk.ac.bbsrc.tgac.miso.core.data.Submittable;
+import uk.ac.bbsrc.tgac.miso.core.data.decorator.AbstractSubmittableDecorator;
+import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 
 /**
  * Decorates a SequencerPoolPartition so that an ERA Run submission XML document can be built from it

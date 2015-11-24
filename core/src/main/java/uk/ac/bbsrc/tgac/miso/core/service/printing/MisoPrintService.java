@@ -23,12 +23,12 @@
 
 package uk.ac.bbsrc.tgac.miso.core.service.printing;
 
+import java.io.IOException;
+
 import net.sourceforge.fluxion.spi.Spi;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoPrintException;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.schema.BarcodableSchema;
-
-import java.io.IOException;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.service.printing

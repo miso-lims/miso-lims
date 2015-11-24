@@ -23,12 +23,12 @@
 
 package uk.ac.bbsrc.tgac.miso.core.store;
 
+import java.io.IOException;
+import java.util.Collection;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
-
-import java.io.IOException;
-import java.util.Collection;
 
 /**
  * Defines a DAO interface for storing Projects

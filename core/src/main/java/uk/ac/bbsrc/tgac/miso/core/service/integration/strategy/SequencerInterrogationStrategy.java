@@ -23,14 +23,14 @@
 
 package uk.ac.bbsrc.tgac.miso.core.service.integration.strategy;
 
+import java.util.List;
+
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.spi.Spi;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
-
-import java.util.List;
 
 /**
  * This interface defines the contract that an interrogation mechanism can implement to query an underlying interrogatable object

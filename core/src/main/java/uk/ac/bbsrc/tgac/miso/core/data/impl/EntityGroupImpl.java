@@ -1,10 +1,10 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
-import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
-import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
-
 import java.util.HashSet;
 import java.util.Set;
+
+import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
+import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.data

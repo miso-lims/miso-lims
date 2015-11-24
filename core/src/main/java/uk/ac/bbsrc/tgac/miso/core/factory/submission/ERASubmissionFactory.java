@@ -23,12 +23,25 @@
 
 package uk.ac.bbsrc.tgac.miso.core.factory.submission;
 
+import java.util.Collection;
+import java.util.Properties;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import uk.ac.bbsrc.tgac.miso.core.data.*;
-import uk.ac.bbsrc.tgac.miso.core.data.decorator.submission.era.*;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.*;
-import java.util.*;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
+import uk.ac.bbsrc.tgac.miso.core.data.Study;
+import uk.ac.bbsrc.tgac.miso.core.data.Submission;
+import uk.ac.bbsrc.tgac.miso.core.data.decorator.submission.era.EraExperimentDecorator;
+import uk.ac.bbsrc.tgac.miso.core.data.decorator.submission.era.EraRunDecorator;
+import uk.ac.bbsrc.tgac.miso.core.data.decorator.submission.era.EraSampleDecorator;
+import uk.ac.bbsrc.tgac.miso.core.data.decorator.submission.era.EraStudyDecorator;
+import uk.ac.bbsrc.tgac.miso.core.data.decorator.submission.era.EraSubmissionDecorator;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 
 /**
  * Generates XML fragments for Submission, Study, Sample, Experiment and Run schema datatypes based on the SRA submission schema, backed by

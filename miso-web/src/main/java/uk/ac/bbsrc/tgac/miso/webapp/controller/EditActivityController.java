@@ -26,11 +26,12 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.SessionAttributes;
 
 import com.eaglegenomics.simlims.core.ActivitySessionFactory;
 import com.eaglegenomics.simlims.core.manager.ProtocolManager;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
 import uk.ac.bbsrc.tgac.miso.webapp.util.ActivityControllerHelperLoader;
 
 @Controller

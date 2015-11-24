@@ -30,6 +30,7 @@ for (File file : productionSchemaDir.listFiles()) {
         .replaceAll('DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP', 'AS CURRENT_TIMESTAMP') // syntax difference, same result
         .replaceAll('\\\\\'', '\'\'') // escape single quotes as '' instead of '/
         .replaceAll('(\'ROLE_[^\']*\')', 'RAWTOHEX($1)') // RAWTOHEX function to write BLOB fields
+        .replaceAll('(?s)CREATE TRIGGER.*;', '') // Delete triggers
         
     Files.write(dstPath, translated.getBytes(), StandardOpenOption.CREATE)
     println("Wrote translated schema file: " + dstPath.toAbsolutePath().toString())

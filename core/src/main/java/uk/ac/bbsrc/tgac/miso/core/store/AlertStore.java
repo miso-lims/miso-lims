@@ -23,11 +23,11 @@
 
 package uk.ac.bbsrc.tgac.miso.core.store;
 
-import uk.ac.bbsrc.tgac.miso.core.event.Alert;
-import uk.ac.bbsrc.tgac.miso.core.event.type.AlertLevel;
-
 import java.io.IOException;
 import java.util.Collection;
+
+import uk.ac.bbsrc.tgac.miso.core.event.Alert;
+import uk.ac.bbsrc.tgac.miso.core.event.type.AlertLevel;
 
 /**
  * A Store interface that describes how to retrieve and persist {@link Alert} objects

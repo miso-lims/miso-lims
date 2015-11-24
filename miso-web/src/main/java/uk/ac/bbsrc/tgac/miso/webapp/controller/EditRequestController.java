@@ -39,9 +39,10 @@ import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.Protocol;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.ProtocolManager;
-import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import com.eaglegenomics.simlims.core.store.DataReferenceStore;
+
+import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.webapp.util.RequestControllerHelperLoader;
 
 @Controller

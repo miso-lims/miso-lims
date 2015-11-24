@@ -23,13 +23,14 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
-import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
+import java.io.Serializable;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import java.io.Serializable;
+
+import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.impl

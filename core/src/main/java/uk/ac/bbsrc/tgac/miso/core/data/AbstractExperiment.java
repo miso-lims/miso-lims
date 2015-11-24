@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.GeneratedValue;
@@ -84,6 +85,22 @@ public abstract class AbstractExperiment implements Experiment {
   private Platform platform;
 
   private Collection<Kit> kits = new HashSet<Kit>();
+  private final List<ChangeLog> changeLog = new ArrayList<ChangeLog>();
+  private User lastModifier;
+
+  @Override
+  public User getLastModifier() {
+    return lastModifier;
+  }
+
+  @Override
+  public void setLastModifier(User lastModifier) {
+    this.lastModifier = lastModifier;
+  }
+
+  public List<ChangeLog> getChangeLog() {
+    return changeLog;
+  }
 
   @Override
   public Study getStudy() {

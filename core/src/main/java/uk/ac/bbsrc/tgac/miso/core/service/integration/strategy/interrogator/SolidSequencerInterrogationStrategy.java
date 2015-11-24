@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.core.service.integration.strategy.interrogator;
 
+import java.util.List;
+
 import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
@@ -30,8 +32,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.strategy.SequencerInterrogationStrategy;
-
-import java.util.List;
 
 /**
  * A concrete implementation of a SequencerInterrogationStrategy that can make queries and parse results, supported by a

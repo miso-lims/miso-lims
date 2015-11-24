@@ -23,14 +23,20 @@
 
 package uk.ac.bbsrc.tgac.miso.core.service.printing.strategy.impl;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.context.impl.BradySpoolPrintContext;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.strategy.PrintStrategy;
-
-import javax.print.*;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+
+import javax.print.Doc;
+import javax.print.DocFlavor;
+import javax.print.DocPrintJob;
+import javax.print.PrintException;
+import javax.print.SimpleDoc;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import uk.ac.bbsrc.tgac.miso.core.service.printing.context.impl.BradySpoolPrintContext;
+import uk.ac.bbsrc.tgac.miso.core.service.printing.strategy.PrintStrategy;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.service.printing.strategy.impl

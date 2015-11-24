@@ -23,8 +23,9 @@
 
 package uk.ac.bbsrc.tgac.miso.core.service.printing;
 
-import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
 import java.util.Collection;
+
+import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.service.integration

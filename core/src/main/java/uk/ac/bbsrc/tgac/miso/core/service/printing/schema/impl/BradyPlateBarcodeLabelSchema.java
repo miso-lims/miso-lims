@@ -1,14 +1,15 @@
 package uk.ac.bbsrc.tgac.miso.core.service.printing.schema.impl;
 
-import net.sourceforge.fluxion.spi.ServiceProvider;
+import java.io.File;
+import java.io.UnsupportedEncodingException;
+
 import org.apache.commons.codec.binary.Base64;
+
+import net.sourceforge.fluxion.spi.ServiceProvider;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeLabelFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.factory.FileGeneratingBarcodeLabelFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.schema.BarcodableSchema;
-
-import java.io.File;
-import java.io.UnsupportedEncodingException;
 
 /**
  * Created with IntelliJ IDEA. User: bianx Date: 09/05/2013 Time: 11:48 To change this template use File | Settings | File Templates.

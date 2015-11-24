@@ -23,15 +23,20 @@
 
 package uk.ac.bbsrc.tgac.miso.core.service.plate;
 
-import com.eaglegenomics.simlims.core.User;
-import net.sourceforge.fluxion.spi.ServiceProvider;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.eaglegenomics.simlims.core.User;
+
+import net.sourceforge.fluxion.spi.ServiceProvider;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.impl._96WellPlate;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-
-import java.util.*;
 
 /**
  * A concrete implementation of a {@link PlateConversionStrategy} that takes a set of 4 96-well plates, and converts them into a specific

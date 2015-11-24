@@ -23,17 +23,18 @@
 
 package uk.ac.bbsrc.tgac.miso.core.service.printing.strategy.impl;
 
-import org.apache.commons.net.ftp.FTPClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.context.impl.BradyFtpPrintContext;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.strategy.PrintStrategy;
-import uk.ac.bbsrc.tgac.miso.core.util.TransmissionUtils;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.net.ftp.FTPClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import uk.ac.bbsrc.tgac.miso.core.service.printing.context.impl.BradyFtpPrintContext;
+import uk.ac.bbsrc.tgac.miso.core.service.printing.strategy.PrintStrategy;
+import uk.ac.bbsrc.tgac.miso.core.util.TransmissionUtils;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.service.printing.strategy.impl

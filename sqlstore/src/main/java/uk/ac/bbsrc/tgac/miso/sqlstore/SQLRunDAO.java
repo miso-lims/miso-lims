@@ -63,6 +63,7 @@ import uk.ac.bbsrc.tgac.miso.core.event.manager.RunAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.RunQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
@@ -73,12 +74,11 @@ import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.store.WatcherStore;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
-import uk.ac.bbsrc.tgac.miso.core.data.*;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.store.SecurityStore;
 import com.googlecode.ehcache.annotations.Cacheable;
 import com.googlecode.ehcache.annotations.KeyGenerator;
 import com.googlecode.ehcache.annotations.Property;
@@ -95,7 +95,7 @@ import com.googlecode.ehcache.annotations.TriggersRemove;
 public class SQLRunDAO implements RunStore {
   private static final String TABLE_NAME = "Run";
 
-  public static final String RUNS_SELECT = "SELECT runId, name, alias, description, accession, platformRunId, pairedEnd, cycles, filePath, securityProfile_profileId, platformType, status_statusId, sequencerReference_sequencerReferenceId "
+  public static final String RUNS_SELECT = "SELECT runId, name, alias, description, accession, platformRunId, pairedEnd, cycles, filePath, securityProfile_profileId, platformType, status_statusId, sequencerReference_sequencerReferenceId, lastModifier "
       + "FROM " + TABLE_NAME;
 
   public static final String RUNS_SELECT_LIMIT = RUNS_SELECT + " ORDER BY runId DESC LIMIT ?";
@@ -117,8 +117,8 @@ public class SQLRunDAO implements RunStore {
 
   @Deprecated
   public static final String RUNS_SELECT_BY_RELATED_EXPERIMENT = "SELECT r.runId, r.name, r.alias, r.description, r.accession, r.platformRunId, r.pairedEnd, r.cycles, r.filePath, "
-      + "r.securityProfile_profileId, r.platformType, r.status_statusId, r.sequencerReference_sequencerReferenceId " + "FROM " + TABLE_NAME
-      + " r " +
+      + "r.securityProfile_profileId, r.platformType, r.status_statusId, r.sequencerReference_sequencerReferenceId, r.lastModifier "
+      + "FROM " + TABLE_NAME + " r " +
 
   "INNER JOIN Run_SequencerPartitionContainer rf ON r.runId = rf.Run_runId"
       + "LEFT JOIN SequencerPartitionContainer f ON f.containerId = rf.containers_containerId "
@@ -127,11 +127,11 @@ public class SQLRunDAO implements RunStore {
 
   "WHERE l.experiment_experimentId = ?";
 
-  public static final String RUNS_SELECT_BY_PLATFORM_ID = "SELECT r.runId, r.name, r.alias, r.description, r.accession, r.platformRunId, r.pairedEnd, r.cycles, r.filePath, r.securityProfile_profileId, r.platformType, r.status_statusId, r.sequencerReference_sequencerReferenceId "
-      + "FROM " + TABLE_NAME + " r " + "LEFT JOIN SequencerReference sr ON r.sequencerReference_sequencerReferenceId=sr.referenceId "
-      + "WHERE sr.platformId=?";
+  public static final String RUNS_SELECT_BY_PLATFORM_ID = "SELECT r.runId, r.name, r.alias, r.description, r.accession, r.platformRunId, r.pairedEnd, r.cycles, r.filePath, r.securityProfile_profileId, r.platformType, r.status_statusId, r.sequencerReference_sequencerReferenceId, r.lastModifier "
+      + "FROM " + TABLE_NAME
+      + " r LEFT JOIN SequencerReference sr ON r.sequencerReference_sequencerReferenceId=sr.referenceId WHERE sr.platformId=?";
 
-  public static final String RUNS_SELECT_BY_STATUS_HEALTH = "SELECT r.runId, r.name, r.alias, r.description, r.accession, r.platformRunId, r.pairedEnd, r.cycles, r.filePath, r.securityProfile_profileId, r.platformType, r.status_statusId, r.sequencerReference_sequencerReferenceId "
+  public static final String RUNS_SELECT_BY_STATUS_HEALTH = "SELECT r.runId, r.name, r.alias, r.description, r.accession, r.platformRunId, r.pairedEnd, r.cycles, r.filePath, r.securityProfile_profileId, r.platformType, r.status_statusId, r.sequencerReference_sequencerReferenceId, r.lastModifier "
       + "FROM " + TABLE_NAME + " r, Status s " + "WHERE r.status_statusId=s.statusId " + "AND s.health=?";
 
   public static String RUNS_SELECT_BY_PROJECT_ID = "SELECT DISTINCT ra.* " + "FROM Project p "
@@ -140,10 +140,9 @@ public class SQLRunDAO implements RunStore {
       + "LEFT JOIN Pool pool ON pool.poolId = pex.pool_poolId " + "LEFT JOIN _Partition c ON pool.poolId = c.pool_poolId "
       + "LEFT JOIN SequencerPartitionContainer_Partition fc ON c.partitionId = fc.partitions_partitionId "
       + "LEFT JOIN _Partition l ON pool.poolId = l.pool_poolId "
-      + "LEFT JOIN SequencerPartitionContainer fa ON fc.container_containerId = fa.containerId " +
-
-  "INNER JOIN Run_SequencerPartitionContainer rf ON fa.containerId = rf.containers_containerId " + "LEFT JOIN " + TABLE_NAME
-      + " ra ON rf.Run_runId = ra.runId " + "WHERE p.projectId=?";
+      + "LEFT JOIN SequencerPartitionContainer fa ON fc.container_containerId = fa.containerId "
+      + "INNER JOIN Run_SequencerPartitionContainer rf ON fa.containerId = rf.containers_containerId " + "LEFT JOIN " + TABLE_NAME
+      + " ra ON rf.Run_runId = ra.runId " + "WHERE p.projectId=? GROUP BY ra.runId";
 
   public static String RUNS_SELECT_BY_POOL_ID = "SELECT DISTINCT ra.* " + "FROM Pool pool "
       + "LEFT JOIN _Partition c ON pool.poolId = c.pool_poolId "
@@ -154,17 +153,17 @@ public class SQLRunDAO implements RunStore {
   "INNER JOIN Run_SequencerPartitionContainer rf ON fa.containerId = rf.containers_containerId " + "LEFT JOIN " + TABLE_NAME
       + " ra ON rf.Run_runId = ra.runId " + "WHERE pool.poolId=?";
 
-  public static String RUNS_SELECT_BY_SEQUENCER_PARTITION_CONTAINER_ID = "SELECT ra.* " + "FROM SequencerPartitionContainer container "
+  public static String RUNS_SELECT_BY_SEQUENCER_PARTITION_CONTAINER_ID = "SELECT ra.* FROM SequencerPartitionContainer container "
       + "INNER JOIN Run_SequencerPartitionContainer rf ON container.containerId = rf.containers_containerId " + "LEFT JOIN " + TABLE_NAME
-      + " ra ON rf.Run_runId = ra.runId " + "WHERE container.containerId=?";
+      + " ra ON rf.Run_runId = ra.runId " + "WHERE container.containerId=? GROUP BY ra.runId";
 
   public static String LATEST_RUN_STARTED_SELECT_BY_SEQUENCER_PARTITION_CONTAINER_ID = "SELECT max(s.startDate), r.runId, r.name, r.alias, r.description, r.accession, r.platformRunId, r.pairedEnd, r.cycles, r.filePath, r.securityProfile_profileId, r.platformType, r.status_statusId, r.sequencerReference_sequencerReferenceId "
       + "FROM SequencerPartitionContainer container "
       + "INNER JOIN Run_SequencerPartitionContainer rf ON container.containerId = rf.containers_containerId " + "LEFT JOIN " + TABLE_NAME
-      + " r ON rf.Run_runId = r.runId " + "INNER JOIN Status s ON r.status_statusId=s.statusId " + "WHERE container.containerId=? "
-      + "GROUP BY r.runId";
+      + " r ON rf.Run_runId = r.runId " + "INNER JOIN Status s ON r.status_statusId=s.statusId "
+      + "WHERE container.containerId=? GROUP BY r.runId";
 
-  public static String LATEST_RUN_ID_SELECT_BY_SEQUENCER_PARTITION_CONTAINER_ID = "SELECT runId, name, alias, description, accession, platformRunId, pairedEnd, cycles, filePath, securityProfile_profileId, platformType, status_statusId, sequencerReference_sequencerReferenceId "
+  public static String LATEST_RUN_ID_SELECT_BY_SEQUENCER_PARTITION_CONTAINER_ID = "SELECT runId, name, alias, description, accession, platformRunId, pairedEnd, cycles, filePath, securityProfile_profileId, platformType, status_statusId, sequencerReference_sequencerReferenceId, lastModifier "
       + "FROM " + TABLE_NAME + " " + "INNER JOIN ( " + "    SELECT MAX(r.runId) as maxrun "
       + "    FROM SequencerPartitionContainer container "
       + "    INNER JOIN Run_SequencerPartitionContainer rf ON container.containerId = rf.containers_containerId " + "    LEFT JOIN "
@@ -182,6 +181,8 @@ public class SQLRunDAO implements RunStore {
   private NoteStore noteDAO;
   private WatcherStore watcherDAO;
   private CascadeType cascadeType;
+  private ChangeLogStore changeLogDAO;
+  private SecurityStore securityDAO;
 
   @Autowired
   private RunAlertManager runAlertManager;
@@ -329,6 +330,7 @@ public class SQLRunDAO implements RunStore {
     params.addValue("securityProfile_profileId", securityProfileId);
     params.addValue("status_statusId", statusId);
     params.addValue("sequencerReference_sequencerReferenceId", run.getSequencerReference().getId());
+    params.addValue("lastModifier", run.getLastModifier().getUserId());
 
     if (run.getId() == AbstractRun.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("runId");
@@ -457,6 +459,7 @@ public class SQLRunDAO implements RunStore {
         params.addValue("securityProfile_profileId", securityProfileId);
         params.addValue("status_statusId", statusId);
         params.addValue("sequencerReference_sequencerReferenceId", run.getSequencerReference().getId());
+        params.addValue("lastModifier", run.getLastModifier().getUserId());
 
         if (run.getId() == AbstractRun.UNSAVED_ID) {
           SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("runId");
@@ -655,6 +658,22 @@ public class SQLRunDAO implements RunStore {
     return false;
   }
 
+  public ChangeLogStore getChangeLogDAO() {
+    return changeLogDAO;
+  }
+
+  public void setChangeLogDAO(ChangeLogStore changeLogDAO) {
+    this.changeLogDAO = changeLogDAO;
+  }
+
+  public SecurityStore getSecurityDAO() {
+    return securityDAO;
+  }
+
+  public void setSecurityDAO(SecurityStore securityDAO) {
+    this.securityDAO = securityDAO;
+  }
+
   public class RunMapper extends CacheAwareRowMapper<Run> {
     public RunMapper() {
       super(Run.class);
@@ -690,6 +709,7 @@ public class SQLRunDAO implements RunStore {
       r.setPlatformType(PlatformType.get(rs.getString("platformType")));
 
       try {
+        r.setLastModifier(securityDAO.getUserById(rs.getLong("lastModifier")));
         r.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
         r.setStatus(statusDAO.get(rs.getLong("status_statusId")));
         r.setSequencerReference(sequencerReferenceDAO.get(rs.getLong("sequencerReference_sequencerReferenceId")));
@@ -710,6 +730,8 @@ public class SQLRunDAO implements RunStore {
 
           r.setNotes(noteDAO.listByRun(id));
         }
+        r.setLastModifier(securityDAO.getUserById(rs.getLong("lastModifier")));
+        r.getChangeLog().addAll(changeLogDAO.listAllById(TABLE_NAME, id));
       } catch (IOException e1) {
         e1.printStackTrace();
       } catch (Exception e) {

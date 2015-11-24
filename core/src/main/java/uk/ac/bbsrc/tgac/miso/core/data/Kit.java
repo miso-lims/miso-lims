@@ -23,12 +23,15 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import org.codehaus.jackson.annotate.JsonTypeInfo;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-import com.eaglegenomics.simlims.core.Note;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 import java.util.Collection;
 import java.util.Date;
+
+import org.codehaus.jackson.annotate.JsonTypeInfo;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+
+import com.eaglegenomics.simlims.core.Note;
+
+import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
 
 /**
  * A Kit represents a consumable that can be used as part of a lab procedure, whereby its type is described by a {@link KitDescriptor} and

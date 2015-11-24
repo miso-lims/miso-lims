@@ -23,12 +23,12 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.util;
 
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.util

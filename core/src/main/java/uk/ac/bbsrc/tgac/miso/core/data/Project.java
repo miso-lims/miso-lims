@@ -23,16 +23,17 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.util.Collection;
+import java.util.Date;
+
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.w3c.dom.Document;
+
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
-
-import java.util.Collection;
-import java.util.Date;
 
 /**
  * A Project represents the top level object in the MISO data model. A Project couples together {@link Study} and {@link Sample} objects to

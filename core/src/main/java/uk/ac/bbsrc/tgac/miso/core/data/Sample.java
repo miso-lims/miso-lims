@@ -23,17 +23,20 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
-import com.eaglegenomics.simlims.core.Note;
+import java.util.Collection;
+import java.util.Date;
+
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.w3c.dom.Document;
+
+import com.eaglegenomics.simlims.core.Note;
+import com.eaglegenomics.simlims.core.User;
+
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleQcException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
-
-import java.util.Collection;
-import java.util.Date;
 
 /**
  * A Sample contains information about the original material upon which a sequencing experiment is to be based.
@@ -201,6 +204,13 @@ public interface Sample
   public Collection<Note> getNotes();
 
   /**
+   * Returns the notes of this Sample object.
+   * 
+   * @return Collection<Note> notes.
+   */
+  public Collection<ChangeLog> getChangeLog();
+
+  /**
    * Adds a Library that has been prepared from this Sample
    * 
    * @param library
@@ -293,4 +303,8 @@ public interface Sample
   Date getLastUpdated();
 
   void setLastUpdated(Date lastUpdated);
+
+  public User getLastModifier();
+
+  public void setLastModifier(User user);
 }

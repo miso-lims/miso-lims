@@ -23,17 +23,34 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Set;
+import java.util.TreeSet;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.w3c.dom.Document;
+
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
-import org.w3c.dom.Document;
+
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleQcException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
-
-import javax.persistence.*;
-import java.util.*;
 
 /**
  * Skeleton implementation of a Sample
@@ -62,6 +79,8 @@ public abstract class AbstractSample implements Sample {
 
   private Collection<Note> notes = new HashSet<Note>();
 
+  private final Collection<ChangeLog> changeLog = new ArrayList<>();
+
   private Set<Plate<? extends LinkedList<Sample>, Sample>> plates = new HashSet<Plate<? extends LinkedList<Sample>, Sample>>();
 
   @Transient
@@ -82,6 +101,17 @@ public abstract class AbstractSample implements Sample {
   private String locationBarcode;
   private String alias;
   private Date lastUpdated;
+  private User lastModifier;
+
+  @Override
+  public User getLastModifier() {
+    return lastModifier;
+  }
+
+  @Override
+  public void setLastModifier(User lastModifier) {
+    this.lastModifier = lastModifier;
+  }
 
   @Override
   public Project getProject() {
@@ -279,6 +309,11 @@ public abstract class AbstractSample implements Sample {
   @Override
   public void setNotes(Collection<Note> notes) {
     this.notes = notes;
+  }
+
+  @Override
+  public Collection<ChangeLog> getChangeLog() {
+    return changeLog;
   }
 
   @Override

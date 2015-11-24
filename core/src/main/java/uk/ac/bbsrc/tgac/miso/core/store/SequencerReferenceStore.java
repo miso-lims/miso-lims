@@ -23,11 +23,11 @@
 
 package uk.ac.bbsrc.tgac.miso.core.store;
 
-import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
-import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
-
 import java.io.IOException;
 import java.util.Collection;
+
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 /**
  * Defines a DAO interface for storing SequencerReferences

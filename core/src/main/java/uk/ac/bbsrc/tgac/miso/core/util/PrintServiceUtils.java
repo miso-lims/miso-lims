@@ -23,12 +23,13 @@
 
 package uk.ac.bbsrc.tgac.miso.core.util;
 
-import net.sf.json.JSONObject;
+import java.lang.reflect.Field;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
 
-import java.lang.reflect.Field;
+import net.sf.json.JSONObject;
+import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.util

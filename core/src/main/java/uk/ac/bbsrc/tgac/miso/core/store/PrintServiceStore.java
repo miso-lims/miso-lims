@@ -23,10 +23,10 @@
 
 package uk.ac.bbsrc.tgac.miso.core.store;
 
-import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
-
 import java.io.IOException;
 import java.util.List;
+
+import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
 
 /**
  * Defines a DAO for storing {@link MisoPrintService} objects

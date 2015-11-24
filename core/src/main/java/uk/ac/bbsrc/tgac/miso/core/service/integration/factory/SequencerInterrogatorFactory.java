@@ -24,12 +24,12 @@
 package uk.ac.bbsrc.tgac.miso.core.service.integration.factory;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
-import uk.ac.bbsrc.tgac.miso.core.service.integration.strategy.interrogator.SequencerInterrogator;
-import uk.ac.bbsrc.tgac.miso.core.service.integration.strategy.interrogator.SolidSequencerInterrogationStrategy;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.strategy.interrogator.IlluminaSequencerInterrogationStrategy;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.strategy.interrogator.LS454SequencerInterrogationStrategy;
+import uk.ac.bbsrc.tgac.miso.core.service.integration.strategy.interrogator.SequencerInterrogator;
+import uk.ac.bbsrc.tgac.miso.core.service.integration.strategy.interrogator.SolidSequencerInterrogationStrategy;
 
 /**
  * A factory to build SequencerInterrogators

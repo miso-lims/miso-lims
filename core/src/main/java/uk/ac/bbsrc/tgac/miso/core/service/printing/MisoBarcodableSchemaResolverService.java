@@ -23,11 +23,17 @@
 
 package uk.ac.bbsrc.tgac.miso.core.service.printing;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.ServiceConfigurationError;
+import java.util.ServiceLoader;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.schema.BarcodableSchema;
 
-import java.util.*;
+import uk.ac.bbsrc.tgac.miso.core.service.printing.schema.BarcodableSchema;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.service.printing

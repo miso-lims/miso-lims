@@ -23,10 +23,10 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.service.integration.illumina;
 
+import java.util.Set;
+
 import org.springframework.integration.Message;
 import org.springframework.integration.annotation.Gateway;
-
-import java.util.Set;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.service

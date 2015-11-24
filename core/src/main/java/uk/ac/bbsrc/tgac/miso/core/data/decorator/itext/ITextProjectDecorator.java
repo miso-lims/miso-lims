@@ -27,12 +27,6 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Project;
-import uk.ac.bbsrc.tgac.miso.core.data.Reportable;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.decorator.AbstractReportDecorator;
-import uk.ac.bbsrc.tgac.miso.core.exception.ReportingException;
-
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.Element;
@@ -43,6 +37,12 @@ import com.lowagie.text.Rectangle;
 import com.lowagie.text.pdf.PdfContentByte;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.Reportable;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.decorator.AbstractReportDecorator;
+import uk.ac.bbsrc.tgac.miso.core.exception.ReportingException;
 
 /**
  * Decorates a Project so that an iText report can be built from it

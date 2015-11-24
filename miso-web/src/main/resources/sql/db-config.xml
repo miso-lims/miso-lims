@@ -117,6 +117,8 @@
     <property name="cascadeType">
       <value type="javax.persistence.CascadeType">REMOVE</value>
     </property>
+    <property name="securityDAO" ref="sqlSecurityDAO"/>
+    <property name="changeLogDAO" ref="sqlChangeLogDAO"/>
     <property name="projectDAO" ref="sqlProjectDAO"/>
     <property name="experimentDAO" ref="sqlExperimentDAO"/>
     <property name="securityProfileDAO" ref="sqlSecurityProfileDAO"/>
@@ -169,6 +171,8 @@
     <property name="cascadeType">
       <value type="javax.persistence.CascadeType">REMOVE</value>
     </property>
+    <property name="securityDAO" ref="sqlSecurityDAO"/>
+    <property name="changeLogDAO" ref="sqlChangeLogDAO"/>
     <property name="studyDAO" ref="sqlStudyDAO"/>
     <property name="sampleDAO" ref="sqlSampleDAO"/>
     <property name="runDAO" ref="sqlRunDAO"/>
@@ -184,10 +188,12 @@
     <property name="cascadeType">
       <value type="javax.persistence.CascadeType">REMOVE</value>
     </property>
+    <property name="changeLogDAO" ref="sqlChangeLogDAO"/>
     <property name="noteDAO" ref="sqlNoteDAO"/>
     <property name="libraryDAO" ref="sqlLibraryDAO"/>
     <property name="projectDAO" ref="sqlProjectDAO"/>
     <property name="sampleQcDAO" ref="sqlSampleQCDAO"/>
+    <property name="securityDAO" ref="sqlSecurityDAO"/>
     <property name="securityProfileDAO" ref="sqlSecurityProfileDAO"/>
     <property name="jdbcTemplate" ref="interfaceTemplate"/>
     <property name="autoGenerateIdentificationBarcodes"><value>${miso.autoGenerateIdentificationBarcodes}</value></property>
@@ -216,6 +222,8 @@
     <property name="cascadeType">
       <value type="javax.persistence.CascadeType">PERSIST</value>
     </property>
+    <property name="securityDAO" ref="sqlSecurityDAO"/>
+    <property name="changeLogDAO" ref="sqlChangeLogDAO"/>
     <property name="securityManager" ref="securityManager"/>
     <property name="sequencerPartitionContainerDAO" ref="sqlSequencerPartitionContainerDAO"/>
     <property name="securityProfileDAO" ref="sqlSecurityProfileDAO"/>
@@ -242,6 +250,8 @@
     <property name="cascadeType">
       <value type="javax.persistence.CascadeType">PERSIST</value>
     </property>
+    <property name="securityDAO" ref="sqlSecurityDAO"/>
+    <property name="changeLogDAO" ref="sqlChangeLogDAO"/>
     <property name="partitionDAO" ref="sqlPartitionDAO"/>
     <property name="runDAO" ref="sqlRunDAO"/>
     <property name="platformDAO" ref="sqlPlatformDAO"/>
@@ -265,6 +275,8 @@
     <property name="cascadeType">
       <value type="javax.persistence.CascadeType">REMOVE</value>
     </property>
+    <property name="securityDAO" ref="sqlSecurityDAO"/>
+    <property name="changeLogDAO" ref="sqlChangeLogDAO"/>
     <property name="noteDAO" ref="sqlNoteDAO"/>
     <property name="poolDAO" ref="sqlPoolDAO"/>
     <property name="sampleDAO" ref="sqlSampleDAO"/>
@@ -291,6 +303,8 @@
     <property name="cascadeType">
       <value type="javax.persistence.CascadeType">REMOVE</value>
     </property>
+    <property name="securityDAO" ref="sqlSecurityDAO"/>
+    <property name="changeLogDAO" ref="sqlChangeLogDAO"/>
     <property name="securityManager" ref="securityManager"/>
     <property name="securityProfileDAO" ref="sqlSecurityProfileDAO"/>
     <property name="experimentDAO" ref="sqlExperimentDAO"/>
@@ -374,6 +388,8 @@
     <property name="cascadeType">
       <value type="javax.persistence.CascadeType">PERSIST</value>
     </property>
+    <property name="securityDAO" ref="sqlSecurityDAO"/>
+    <property name="changeLogDAO" ref="sqlChangeLogDAO"/>
     <property name="libraryDAO" ref="sqlLibraryDAO"/>
     <property name="sampleDAO" ref="sqlSampleDAO"/>
     <property name="dilutionDAO" ref="sqlLibraryDilutionDAO"/>
@@ -391,6 +407,11 @@
   <bean id="sqlWatcherDAO"
         class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLWatcherDAO">
     <property name="securityManager" ref="securityManager"/>
+    <property name="jdbcTemplate" ref="interfaceTemplate"/>
+  </bean>
+
+  <bean id="sqlChangeLogDAO"
+        class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLChangeLogDAO">
     <property name="jdbcTemplate" ref="interfaceTemplate"/>
   </bean>
 
@@ -720,6 +741,17 @@
     <property name="interceptorNames">
       <list>
         <value>sqlWatcherDAO</value>
+      </list>
+    </property>
+  </bean>
+
+  <bean name="changeLogStore" class="org.springframework.aop.framework.ProxyFactoryBean">
+    <property name="proxyInterfaces">
+      <value>uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore</value>
+    </property>
+    <property name="interceptorNames">
+      <list>
+        <value>sqlChangeLogDAO</value>
       </list>
     </property>
   </bean>

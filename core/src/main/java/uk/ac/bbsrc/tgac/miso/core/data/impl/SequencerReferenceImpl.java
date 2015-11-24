@@ -23,11 +23,11 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerReference;
-import uk.ac.bbsrc.tgac.miso.core.data.Platform;
-
 import java.io.Serializable;
 import java.net.InetAddress;
+
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerReference;
+import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 
 /**
  * Concrete implementation to encapsulate a reference to a physical machine attached to a sequencer

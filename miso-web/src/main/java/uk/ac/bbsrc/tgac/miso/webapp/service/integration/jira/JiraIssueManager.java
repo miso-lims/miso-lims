@@ -23,7 +23,14 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.service.integration.jira;
 
-import com.sun.jersey.api.client.*;
+import java.io.IOException;
+import java.net.URI;
+
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
+
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.client.apache.ApacheHttpClient;
 import com.sun.jersey.client.apache.ApacheHttpClientHandler;
 import com.sun.jersey.client.apache.config.ApacheHttpClientConfig;
@@ -31,15 +38,11 @@ import com.sun.jersey.client.apache.config.DefaultApacheHttpClientConfig;
 import com.sun.jersey.oauth.client.OAuthClientFilter;
 import com.sun.jersey.oauth.signature.OAuthParameters;
 import com.sun.jersey.oauth.signature.OAuthSecrets;
+
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.spi.ServiceProvider;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.IssueTrackerManager;
 import uk.ac.bbsrc.tgac.miso.core.util.jira.IssueJsonConverter;
-
-import java.io.IOException;
-import java.net.*;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.service.integration.jira

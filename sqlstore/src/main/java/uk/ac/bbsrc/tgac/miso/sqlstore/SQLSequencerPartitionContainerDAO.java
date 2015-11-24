@@ -23,14 +23,20 @@
 
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
-import com.googlecode.ehcache.annotations.Cacheable;
-import com.googlecode.ehcache.annotations.KeyGenerator;
-import com.googlecode.ehcache.annotations.Property;
-import com.googlecode.ehcache.annotations.TriggersRemove;
+import java.io.IOException;
+import java.lang.reflect.ParameterizedType;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import javax.persistence.CascadeType;
+
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
+
 import org.codehaus.jackson.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,21 +47,28 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.transaction.annotation.Transactional;
-import uk.ac.bbsrc.tgac.miso.core.data.*;
+
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.store.*;
+import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
+import uk.ac.bbsrc.tgac.miso.core.store.PartitionStore;
+import uk.ac.bbsrc.tgac.miso.core.store.PlatformStore;
+import uk.ac.bbsrc.tgac.miso.core.store.RunStore;
+import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
+import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
-import javax.persistence.CascadeType;
-import java.io.IOException;
-import java.lang.reflect.ParameterizedType;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.store.SecurityStore;
+import com.googlecode.ehcache.annotations.Cacheable;
+import com.googlecode.ehcache.annotations.KeyGenerator;
+import com.googlecode.ehcache.annotations.Property;
+import com.googlecode.ehcache.annotations.TriggersRemove;
 
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore
@@ -68,19 +81,25 @@ import java.util.List;
 public class SQLSequencerPartitionContainerDAO implements SequencerPartitionContainerStore {
   private static final String TABLE_NAME = "SequencerPartitionContainer";
 
-  private static final String SEQUENCER_PARTITION_CONTAINER_SELECT = "SELECT containerId, platform, identificationBarcode, locationBarcode, validationBarcode, securityProfile_profileId FROM "
+  private static final String SEQUENCER_PARTITION_CONTAINER_SELECT = "SELECT containerId, platform, identificationBarcode, locationBarcode, validationBarcode, securityProfile_profileId, lastModifier FROM "
       + TABLE_NAME;
 
   public static final String SEQUENCER_PARTITION_CONTAINER_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE containerId=:containerId";
 
   private static final String SEQUENCER_PARTITION_CONTAINER_SELECT_BY_ID = SEQUENCER_PARTITION_CONTAINER_SELECT + " WHERE containerId=?";
 
-  private static final String SEQUENCER_PARTITION_CONTAINER_SELECT_BY_PARTITION_ID = "SELECT s.containerId, s.platform, s.identificationBarcode, s.locationBarcode, s.validationBarcode, s.securityProfile_profileId "
-      + "FROM " + TABLE_NAME + " s, SequencerPartitionContainer_Partition sp " + "WHERE s.containerId=sp.container_containerId "
+  private static final String SEQUENCER_PARTITION_CONTAINER_SELECT_BY_PARTITION_ID = "SELECT s.containerId, s.platform, s.identificationBarcode, s.locationBarcode, s.validationBarcode, s.securityProfile_profileId, s.lastModifier "
+      + "FROM "
+      + TABLE_NAME
+      + " s, SequencerPartitionContainer_Partition sp "
+      + "WHERE s.containerId=sp.container_containerId "
       + "AND sp.partitions_partitionId=?";
 
-  private static final String SEQUENCER_PARTITION_CONTAINER_SELECT_BY_RELATED_RUN = "SELECT DISTINCT f.containerId, f.platform, f.identificationBarcode, f.locationBarcode, f.validationBarcode, f.securityProfile_profileId "
-      + "FROM " + TABLE_NAME + " f, Run_SequencerPartitionContainer rf " + "WHERE f.containerId=rf.containers_containerId "
+  private static final String SEQUENCER_PARTITION_CONTAINER_SELECT_BY_RELATED_RUN = "SELECT DISTINCT f.containerId, f.platform, f.identificationBarcode, f.locationBarcode, f.validationBarcode, f.securityProfile_profileId, f.lastModifier "
+      + "FROM "
+      + TABLE_NAME
+      + " f, Run_SequencerPartitionContainer rf "
+      + "WHERE f.containerId=rf.containers_containerId "
       + "AND rf.run_runId=?";
 
   private static final String SEQUENCER_PARTITION_CONTAINER_SELECT_BY_IDENTIFICATION_BARCODE = SEQUENCER_PARTITION_CONTAINER_SELECT
@@ -92,8 +111,10 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
   public static final String RUN_SEQUENCER_PARTITION_CONTAINER_DELETE_BY_SEQUENCER_PARTITION_CONTAINER_ID = "DELETE FROM Run_SequencerPartitionContainer "
       + "WHERE containers_containerId=:containers_containerId";
 
-  public static final String SEQUENCER_PARTITION_CONTAINER_UPDATE = "UPDATE " + TABLE_NAME + " "
-      + "SET platform=:platform, identificationBarcode=:identificationBarcode, locationBarcode=:locationBarcode, validationBarcode=:validationBarcode, securityProfile_profileId:=securityProfile_profileId "
+  public static final String SEQUENCER_PARTITION_CONTAINER_UPDATE = "UPDATE "
+      + TABLE_NAME
+      + " "
+      + "SET platform=:platform, identificationBarcode=:identificationBarcode, locationBarcode=:locationBarcode, validationBarcode=:validationBarcode, securityProfile_profileId:=securityProfile_profileId, lastModifier=:lastModifier "
       + "WHERE containerId=:containerId";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLSequencerPartitionContainerDAO.class);
@@ -105,6 +126,8 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
   private CascadeType cascadeType;
 
   private PlatformStore platformDAO;
+  private ChangeLogStore changeLogDAO;
+  private SecurityStore securityDAO;
 
   @Autowired
   private MisoNamingScheme<SequencerPartitionContainer<SequencerPoolPartition>> namingScheme;
@@ -281,6 +304,7 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
     params.addValue("identificationBarcode", sequencerPartitionContainer.getIdentificationBarcode());
     params.addValue("locationBarcode", sequencerPartitionContainer.getLocationBarcode());
     params.addValue("validationBarcode", sequencerPartitionContainer.getValidationBarcode());
+    params.addValue("lastModifier", sequencerPartitionContainer.getLastModifier().getUserId());
 
     if (sequencerPartitionContainer.getPlatform() != null) {
       params.addValue("platform", sequencerPartitionContainer.getPlatform().getPlatformId());
@@ -367,6 +391,8 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
         s.setLocationBarcode(rs.getString("locationBarcode"));
         s.setValidationBarcode(rs.getString("validationBarcode"));
         s.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
+        s.setLastModifier(securityDAO.getUserById(rs.getLong("lastModifier")));
+        s.getChangeLog().addAll(changeLogDAO.listAllById(TABLE_NAME, "container", id));
       } catch (IOException e1) {
         e1.printStackTrace();
       }
@@ -420,5 +446,21 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
       return true;
     }
     return false;
+  }
+
+  public ChangeLogStore getChangeLogDAO() {
+    return changeLogDAO;
+  }
+
+  public void setChangeLogDAO(ChangeLogStore changeLogDAO) {
+    this.changeLogDAO = changeLogDAO;
+  }
+
+  public SecurityStore getSecurityDAO() {
+    return securityDAO;
+  }
+
+  public void setSecurityDAO(SecurityStore securityDAO) {
+    this.securityDAO = securityDAO;
   }
 }

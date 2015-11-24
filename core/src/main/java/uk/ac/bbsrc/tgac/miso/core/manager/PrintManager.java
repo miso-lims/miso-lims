@@ -23,17 +23,18 @@
 
 package uk.ac.bbsrc.tgac.miso.core.manager;
 
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Set;
+
 import com.eaglegenomics.simlims.core.User;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.data.PrintJob;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoPrintException;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.schema.BarcodableSchema;
-
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Set;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.manager

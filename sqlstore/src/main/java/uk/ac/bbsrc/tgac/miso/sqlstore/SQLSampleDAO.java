@@ -23,37 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
-import com.eaglegenomics.simlims.core.Note;
-import com.googlecode.ehcache.annotations.*;
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
-import uk.ac.bbsrc.tgac.miso.core.data.Project;
-import com.eaglegenomics.simlims.core.SecurityProfile;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.transaction.annotation.Transactional;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
-import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
-import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
-import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
-import uk.ac.bbsrc.tgac.miso.core.store.*;
-import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
-import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
-import uk.ac.bbsrc.tgac.miso.core.data.*;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleQcException;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
-
-import javax.persistence.CascadeType;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -62,6 +31,54 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
+
+import javax.persistence.CascadeType;
+
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
+import org.springframework.transaction.annotation.Transactional;
+
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
+import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
+import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
+import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleQcException;
+import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
+import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
+import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
+import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
+import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
+import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
+import uk.ac.bbsrc.tgac.miso.core.store.SampleQcStore;
+import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
+import uk.ac.bbsrc.tgac.miso.core.store.Store;
+import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
+import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
+
+import com.eaglegenomics.simlims.core.Note;
+import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.store.SecurityStore;
+import com.googlecode.ehcache.annotations.Cacheable;
+import com.googlecode.ehcache.annotations.KeyGenerator;
+import com.googlecode.ehcache.annotations.Property;
+import com.googlecode.ehcache.annotations.TriggersRemove;
 
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore
@@ -75,7 +92,7 @@ public class SQLSampleDAO implements SampleStore {
   private static final String TABLE_NAME = "Sample";
 
   public static final String SAMPLES_SELECT = "SELECT sampleId, name, description, scientificName, taxonIdentifier, alias, accession, securityProfile_profileId, identificationBarcode, locationBarcode, "
-      + "sampleType, receivedDate, qcPassed, project_projectId " + "FROM " + TABLE_NAME;
+      + "sampleType, receivedDate, qcPassed, project_projectId, lastModifier " + "FROM " + TABLE_NAME;
 
   public static final String SAMPLES_SELECT_LIMIT = SAMPLES_SELECT + " ORDER BY sampleId DESC LIMIT ?";
 
@@ -94,28 +111,37 @@ public class SQLSampleDAO implements SampleStore {
   public static final String SAMPLE_UPDATE = "UPDATE " + TABLE_NAME + " "
       + "SET name=:name, description=:description, scientificName=:scientificName, taxonIdentifier=:taxonIdentifier, alias=:alias, accession=:accession, securityProfile_profileId=:securityProfile_profileId, "
       + "identificationBarcode=:identificationBarcode, locationBarcode=:locationBarcode, sampleType=:sampleType, receivedDate=:receivedDate, "
-      + "qcPassed=:qcPassed, project_projectId=:project_projectId " + "WHERE sampleId=:sampleId";
+      + "qcPassed=:qcPassed, project_projectId=:project_projectId, lastModifier=:lastModifier " + "WHERE sampleId=:sampleId";
 
   public static final String SAMPLE_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE sampleId=:sampleId";
 
   public static String SAMPLES_SELECT_BY_PROJECT_ID = SAMPLES_SELECT + " WHERE project_projectId = ?";
 
   public static final String SAMPLES_SELECT_BY_EXPERIMENT_ID = "SELECT s.sampleId, s.name, s.description, s.scientificName, s.taxonIdentifier, s.alias, s.accession, s.securityProfile_profileId, s.identificationBarcode, s.locationBarcode, "
-      + "s.sampleType, s.receivedDate, s.qcPassed, s.project_projectId " + "FROM " + TABLE_NAME + " s, Experiment_Sample es "
+      + "s.sampleType, s.receivedDate, s.qcPassed, s.project_projectId "
+      + "FROM "
+      + TABLE_NAME
+      + " s, Experiment_Sample es "
       + "WHERE es.samples_sampleId=s.sampleId " + "AND es.Experiment_experimentId=?";
 
   public static final String SAMPLE_SELECT_BY_LIBRARY_ID = "SELECT s.sampleId, s.name, s.description, s.scientificName, s.taxonIdentifier, s.alias, s.accession, s.securityProfile_profileId, s.identificationBarcode, s.locationBarcode, "
-      + "s.sampleType, s.receivedDate, s.qcPassed, s.project_projectId " + "FROM " + TABLE_NAME + " s, Library l "
+      + "s.sampleType, s.receivedDate, s.qcPassed, s.project_projectId, s.lastModifier "
+      + "FROM "
+      + TABLE_NAME
+      + " s, Library l "
       + "WHERE s.sampleId=l.sample_sampleId " + "AND l.libraryId=?";
 
   public static final String EXPERIMENT_SAMPLE_DELETE_BY_SAMPLE_ID = "DELETE FROM Experiment_Sample "
       + "WHERE samples_sampleId=:samples_sampleId";
 
   public static final String SAMPLES_BY_RELATED_SUBMISSION = "SELECT s.sampleId, s.name, s.description, s.scientificName, s.taxonIdentifier, s.alias, s.accession, s.securityProfile_profileId, s.identificationBarcode, s.locationBarcode, "
-      + "s.sampleType, s.receivedDate, s.qcPassed, project_projectId " + "FROM " + TABLE_NAME + " s, Submission_Sample ss "
+      + "s.sampleType, s.receivedDate, s.qcPassed, project_projectId, s.lastModifier "
+      + "FROM "
+      + TABLE_NAME
+      + " s, Submission_Sample ss "
       + "WHERE s.sampleId=ss.samples_sampleId " + "AND ss.submission_submissionId=?";
 
-  public static final String SAMPLE_TYPES_SELECT = "SELECT name " + "FROM SampleType";
+  public static final String SAMPLE_TYPES_SELECT = "SELECT name FROM SampleType";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLSampleDAO.class);
 
@@ -127,6 +153,8 @@ public class SQLSampleDAO implements SampleStore {
   private NoteStore noteDAO;
   private CascadeType cascadeType;
   private boolean autoGenerateIdentificationBarcodes;
+  private ChangeLogStore changeLogDAO;
+  private SecurityStore securityDAO;
 
   @Autowired
   private MisoNamingScheme<Sample> sampleNamingScheme;
@@ -256,6 +284,7 @@ public class SQLSampleDAO implements SampleStore {
         params.addValue("qcPassed", sample.getQcPassed().toString());
         params.addValue("project_projectId", sample.getProject().getProjectId());
         params.addValue("securityProfile_profileId", securityProfileId);
+        params.addValue("lastModifier", sample.getLastModifier().getUserId());
 
         if (sampleNamingScheme.validateField("name", sample.getName()) && sampleNamingScheme.validateField("alias", sample.getAlias())) {
           batch.add(params);
@@ -292,6 +321,7 @@ public class SQLSampleDAO implements SampleStore {
     params.addValue("receivedDate", sample.getReceivedDate());
     params.addValue("project_projectId", sample.getProject().getProjectId());
     params.addValue("securityProfile_profileId", securityProfileId);
+    params.addValue("lastModifier", sample.getLastModifier().getUserId());
 
     if (sample.getQcPassed() != null) {
       params.addValue("qcPassed", sample.getQcPassed().toString());
@@ -494,6 +524,22 @@ public class SQLSampleDAO implements SampleStore {
     return template.query(SAMPLES_BY_RELATED_SUBMISSION, new Object[] { submissionId }, new SampleMapper());
   }
 
+  public ChangeLogStore getChangeLogDAO() {
+    return changeLogDAO;
+  }
+
+  public void setChangeLogDAO(ChangeLogStore changeLogDAO) {
+    this.changeLogDAO = changeLogDAO;
+  }
+
+  public SecurityStore getSecurityDAO() {
+    return securityDAO;
+  }
+
+  public void setSecurityDAO(SecurityStore securityDAO) {
+    this.securityDAO = securityDAO;
+  }
+
   public class SampleMapper extends CacheAwareRowMapper<Sample> {
     public SampleMapper() {
       super(Sample.class);
@@ -506,13 +552,13 @@ public class SQLSampleDAO implements SampleStore {
     @Override
     public Sample mapRow(ResultSet rs, int rowNum) throws SQLException {
       long id = rs.getLong("sampleId");
-
       if (isCacheEnabled() && lookupCache(cacheManager) != null) {
         Element element;
         if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
           log.info("Cache hit on map for sample " + id);
           log.info("Cache hit on map for sample with element " + element);
           Sample sample = (Sample) element.getObjectValue();
+          if (sample == null) throw new NullPointerException("The cache is full of lies!!!");
           if (sample.getId() == 0) {
             DbUtils.updateCaches(lookupCache(cacheManager), id);
           } else {
@@ -540,6 +586,7 @@ public class SQLSampleDAO implements SampleStore {
       }
 
       try {
+        s.setLastModifier(securityDAO.getUserById(rs.getLong("lastModifier")));
         s.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
         if (!isLazy()) {
           s.setProject(projectDAO.get(rs.getLong("project_projectId")));
@@ -556,6 +603,7 @@ public class SQLSampleDAO implements SampleStore {
         } else {
           s.setProject(projectDAO.lazyGet(rs.getLong("project_projectId")));
         }
+        s.getChangeLog().addAll(changeLogDAO.listAllById(TABLE_NAME, id));
       } catch (IOException e1) {
         e1.printStackTrace();
       } catch (MalformedLibraryException e) {
@@ -567,7 +615,6 @@ public class SQLSampleDAO implements SampleStore {
       if (isCacheEnabled() && lookupCache(cacheManager) != null) {
         lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id), s));
       }
-
       return s;
     }
   }

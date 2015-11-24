@@ -23,12 +23,13 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.util.List;
+
 import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
-import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunException;
 
-import java.util.List;
+import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunException;
 
 /**
  * A QC that is specifically carried out on a given {@link uk.ac.bbsrc.tgac.miso.core.data.Run}

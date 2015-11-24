@@ -23,14 +23,15 @@
 
 package uk.ac.bbsrc.tgac.miso.core.service.printing.context.impl;
 
-import net.sourceforge.fluxion.spi.ServiceProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
-import uk.ac.bbsrc.tgac.miso.core.service.printing.strategy.impl.BradyFtpPrintStrategy;
-
 import java.io.File;
 import java.io.IOException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import net.sourceforge.fluxion.spi.ServiceProvider;
+import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
+import uk.ac.bbsrc.tgac.miso.core.service.printing.strategy.impl.BradyFtpPrintStrategy;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.service.printing.context.impl
