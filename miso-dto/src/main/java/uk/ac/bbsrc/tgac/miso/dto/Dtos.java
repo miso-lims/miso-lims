@@ -7,6 +7,7 @@ import org.joda.time.format.ISODateTimeFormat;
 
 import com.google.common.collect.Sets;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.QcPassedDetail;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
@@ -18,16 +19,19 @@ import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.QcPassedDetailImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAnalyteImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleGroupImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
+import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 public class Dtos {
 
@@ -309,24 +313,116 @@ public class Dtos {
   public static SampleDto asDto(Sample from) {
     SampleDto dto = new SampleDto();
     dto.setId(from.getSampleId());
-    dto.setAlias(from.getAlias());
+    if (!LimsUtils.isStringEmptyOrNull(from.getAccession())) {
+      dto.setAccession(from.getAccession());
+    }
+    dto.setName(from.getName());
     dto.setDescription(from.getDescription());
-    dto.setReceivedDate(dateTimeFormatter.print(from.getReceivedDate().getTime()));
+    if (!LimsUtils.isStringEmptyOrNull(from.getIdentificationBarcode())) {
+      dto.setIdentificationBarcode(from.getIdentificationBarcode());
+    }
+    if (!LimsUtils.isStringEmptyOrNull(from.getLocationBarcode())) {
+      dto.setLocationBarcode(from.getLocationBarcode());
+    }
+    dto.setSampleType(from.getSampleType());
+    if (from.getReceivedDate() != null) {
+      dto.setReceivedDate(dateTimeFormatter.print(from.getReceivedDate().getTime()));
+    }
+    if (from.getQcPassed() != null) {
+      dto.setQcPassed(from.getQcPassed());
+    }
+    if (!LimsUtils.isStringEmptyOrNull(from.getAlias())) {
+      dto.setAlias(from.getAlias());
+    }
+    dto.setProjectId(from.getProject().getProjectId());
+    dto.setScientificName(from.getScientificName());
+    if (!LimsUtils.isStringEmptyOrNull(from.getTaxonIdentifier())) {
+      dto.setTaxonIdentifier(from.getTaxonIdentifier());
+    }
+    if (from.getIdentity() != null) {
+      dto.setSampleIdentityDto(asDto(from.getIdentity()));
+    }
+    if (from.getSampleAnalyte() != null) {
+      dto.setSampleAnalyte(asDto(from.getSampleAnalyte()));
+    }
+    if (from.getSampleAdditionalInfo() != null) {
+      dto.setSampleAdditionalInfo(asDto(from.getSampleAdditionalInfo()));
+    }
+
     return dto;
   }
 
-  // public static Set<TissueOriginDto> asTissueOriginDtos(Set<TissueOrigin> from) {
-  // Set<TissueOriginDto> dtoSet = Sets.newHashSet();
-  // for (TissueOrigin tissueOrigin : from) {
-  // dtoSet.add(asDto(tissueOrigin));
-  // }
-  // return dtoSet;
-  // }
-  //
-  // public static TissueOrigin to(TissueOriginDto from) {
-  // TissueOrigin to = new TissueOriginImpl();
-  // to.setAlias(from.getAlias());
-  // to.setDescription(from.getDescription());
-  // return to;
-  // }
+  public static Set<SampleDto> asSampleDtos(Set<Sample> from) {
+    Set<SampleDto> dtoSet = Sets.newHashSet();
+    for (Sample sample : from) {
+      dtoSet.add(asDto(sample));
+    }
+    return dtoSet;
+  }
+
+  public static Sample to(SampleDto from) {
+    Sample to = new SampleImpl();
+    to.setId(from.getId());
+
+    if (!LimsUtils.isStringEmptyOrNull(from.getAccession())) {
+      to.setAccession(from.getAccession());
+    }
+    to.setName(from.getName());
+    to.setDescription(from.getDescription());
+    if (!LimsUtils.isStringEmptyOrNull(from.getIdentificationBarcode())) {
+      to.setIdentificationBarcode(from.getIdentificationBarcode());
+    }
+    if (!LimsUtils.isStringEmptyOrNull(from.getLocationBarcode())) {
+      to.setLocationBarcode(from.getLocationBarcode());
+    }
+    to.setSampleType(from.getSampleType());
+    if (from.getReceivedDate() != null) {
+      to.setReceivedDate(dateTimeFormatter.parseDateTime(from.getReceivedDate()).toDate());
+    }
+    if (from.getQcPassed() != null) {
+      to.setQcPassed(from.getQcPassed());
+    }
+    if (!LimsUtils.isStringEmptyOrNull(from.getAlias())) {
+      to.setAlias(from.getAlias());
+    }
+    // Project
+    to.setScientificName(from.getScientificName());
+    if (!LimsUtils.isStringEmptyOrNull(from.getTaxonIdentifier())) {
+      to.setTaxonIdentifier(from.getTaxonIdentifier());
+    }
+
+    to.setAlias(from.getAlias());
+    to.setDescription(from.getDescription());
+
+    return to;
+  }
+
+  public static SampleIdentityDto asDto(Identity from) {
+    SampleIdentityDto dto = new SampleIdentityDto();
+    dto.setId(from.getIdentityId());
+    dto.setSampleId(from.getSample().getSampleId());
+    dto.setInternalName(from.getInternalName());
+    dto.setExternalName(from.getExternalName());
+    dto.setCreatedById(from.getCreatedBy().getUserId());
+    dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
+    dto.setUpdatedById(from.getUpdatedBy().getUserId());
+    dto.setLastUpdated(dateTimeFormatter.print(from.getLastUpdated().getTime()));
+    return dto;
+  }
+
+  public static Set<SampleIdentityDto> asSampleIdentityDtos(Set<Identity> from) {
+    Set<SampleIdentityDto> dtoSet = Sets.newHashSet();
+    for (Identity tissueOrigin : from) {
+      dtoSet.add(asDto(tissueOrigin));
+    }
+    return dtoSet;
+  }
+
+  public static Identity to(SampleIdentityDto from) {
+    Identity to = new IdentityImpl();
+    to.setInternalName(from.getInternalName());
+    to.setExternalName(from.getExternalName());
+    return to;
+  }
+
 }

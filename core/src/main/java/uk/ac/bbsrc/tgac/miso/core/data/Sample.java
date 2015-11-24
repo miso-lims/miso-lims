@@ -298,4 +298,8 @@ public interface Sample extends SecurableByProfile, Submittable<Document>, Locat
   public Identity getIdentity();
 
   public void setIdentity(Identity identity);
+
+  public SampleAdditionalInfo getSampleAdditionalInfo();
+
+  public void setSampleAdditionalInfo(SampleAdditionalInfo sampleAdditionalInfo);
 }

@@ -21,10 +21,10 @@ public class SampleDto {
   private Long projectId;
   private String scientificName;
   private String taxonIdentifier;
+  private SampleIdentityDto sampleIdentityDto;
+  private SampleAnalyteDto sampleAnalyte;
+  private SampleAdditionalInfoDto sampleAdditionalInfo;
 
-  // private IdentityDto identityDto;
-  // private SampleAnalyteDto sampleAnalyte;
-  // private SampleAdditionalInfoDto sampleAdditionalInfo;
   public Long getId() {
     return id;
   }
@@ -135,6 +135,30 @@ public class SampleDto {
 
   public void setTaxonIdentifier(String taxonIdentifier) {
     this.taxonIdentifier = taxonIdentifier;
+  }
+
+  public SampleIdentityDto getSampleIdentityDto() {
+    return sampleIdentityDto;
+  }
+
+  public void setSampleIdentityDto(SampleIdentityDto sampleIdentityDto) {
+    this.sampleIdentityDto = sampleIdentityDto;
+  }
+
+  public SampleAnalyteDto getSampleAnalyte() {
+    return sampleAnalyte;
+  }
+
+  public void setSampleAnalyte(SampleAnalyteDto sampleAnalyte) {
+    this.sampleAnalyte = sampleAnalyte;
+  }
+
+  public SampleAdditionalInfoDto getSampleAdditionalInfo() {
+    return sampleAdditionalInfo;
+  }
+
+  public void setSampleAdditionalInfo(SampleAdditionalInfoDto sampleAdditionalInfo) {
+    this.sampleAdditionalInfo = sampleAdditionalInfo;
   }
 
 }
