@@ -447,37 +447,33 @@ Library.barcode = {
                   json.services +
                   "</select></fieldset></form>");
 
-          jQuery(function () {
-            jQuery('#printServiceSelectDialog').dialog({
-              autoOpen: false,
-              width: 400,
-              modal: true,
-              resizable: false,
-              buttons: {
-                "Print": function () {
-                  Fluxion.doAjax(
-                    'libraryControllerHelperService',
-                    'printLibraryBarcodes',
-                    {
-                      'serviceName': jQuery('#serviceSelect').val(),
-                      'libraries': libraries,
-                      'url': ajaxurl
-                    },
-                    {
-                      'doOnSuccess': function (json) {
-                        alert(json.response);
-                      }
+          jQuery('#printServiceSelectDialog').dialog({
+            width: 400,
+            modal: true,
+            resizable: false,
+            buttons: {
+              "Print": function () {
+                Fluxion.doAjax(
+                  'libraryControllerHelperService',
+                  'printLibraryBarcodes',
+                  {
+                    'serviceName': jQuery('#serviceSelect').val(),
+                    'libraries': libraries,
+                    'url': ajaxurl
+                  },
+                  {
+                    'doOnSuccess': function (json) {
+                      alert(json.response);
                     }
-                  );
-                  jQuery(this).dialog('close');
-                },
-                "Cancel": function () {
-                  jQuery(this).dialog('close');
-                }
+                  }
+                );
+                jQuery(this).dialog('close');
+              },
+              "Cancel": function () {
+                jQuery(this).dialog('close');
               }
-            });
+            }
           });
-          jQuery('#printServiceSelectDialog').dialog('open');
         },
         'doOnError': function (json) {
           alert(json.error);
@@ -506,38 +502,34 @@ Library.barcode = {
                   json.services +
                   "</select></fieldset></form>");
 
-          jQuery(function () {
-            jQuery('#printServiceSelectDialog').dialog({
-              autoOpen: false,
-              width: 400,
-              modal: true,
-              resizable: false,
-              buttons: {
-                "Print": function () {
-                  Fluxion.doAjax(
-                    'libraryControllerHelperService',
-                    'printLibraryDilutionBarcodes',
-                    {
-                      'serviceName': jQuery('#serviceSelect').val(),
-                      'dilutions': dilutions,
-                      'platform': platform,
-                      'url': ajaxurl
-                    },
-                    {
-                      'doOnSuccess': function (json) {
-                        alert(json.response);
-                      }
+          jQuery('#printServiceSelectDialog').dialog({
+            width: 400,
+            modal: true,
+            resizable: false,
+            buttons: {
+              "Print": function () {
+                Fluxion.doAjax(
+                  'libraryControllerHelperService',
+                  'printLibraryDilutionBarcodes',
+                  {
+                    'serviceName': jQuery('#serviceSelect').val(),
+                    'dilutions': dilutions,
+                    'platform': platform,
+                    'url': ajaxurl
+                  },
+                  {
+                    'doOnSuccess': function (json) {
+                      alert(json.response);
                     }
-                  );
-                  jQuery(this).dialog('close');
-                },
-                "Cancel": function () {
-                  jQuery(this).dialog('close');
-                }
+                  }
+                );
+                jQuery(this).dialog('close');
+              },
+              "Cancel": function () {
+                jQuery(this).dialog('close');
               }
-            });
+            }
           });
-          jQuery('#printServiceSelectDialog').dialog('open');
         },
         'doOnError': function (json) {
           alert(json.error);
@@ -555,24 +547,20 @@ Library.barcode = {
             "<input type='text' name='locationBarcodeInput' id='locationBarcodeInput' class='text ui-widget-content ui-corner-all'/>" +
             "</fieldset></form>");
 
-    jQuery(function () {
-      jQuery('#changeLibraryLocationDialog').dialog({
-        autoOpen: false,
-        width: 400,
-        modal: true,
-        resizable: false,
-        buttons: {
-          "Save": function () {
-            self.changeLibraryLocation(libraryId, jQuery('#locationBarcodeInput').val());
-            jQuery(this).dialog('close');
-          },
-          "Cancel": function () {
-            jQuery(this).dialog('close');
-          }
+    jQuery('#changeLibraryLocationDialog').dialog({
+      width: 400,
+      modal: true,
+      resizable: false,
+      buttons: {
+        "Save": function () {
+          self.changeLibraryLocation(libraryId, jQuery('#locationBarcodeInput').val());
+          jQuery(this).dialog('close');
+        },
+        "Cancel": function () {
+          jQuery(this).dialog('close');
         }
-      });
+      }
     });
-    jQuery('#changeLibraryLocationDialog').dialog('open');
   },
 
   changeLibraryLocation: function (libraryId, barcode) {
@@ -819,24 +807,20 @@ Library.ui = {
             "<input type='text' name='notetext' id='notetext' class='text ui-widget-content ui-corner-all' />" +
             "</fieldset></form>");
 
-    jQuery(function () {
-      jQuery('#addLibraryNoteDialog').dialog({
-        autoOpen: false,
-        width: 400,
-        modal: true,
-        resizable: false,
-        buttons: {
-          "Add Note": function () {
-            self.addLibraryNote(libraryId, jQuery('#internalOnly').val(), jQuery('#notetext').val());
-            jQuery(this).dialog('close');
-          },
-          "Cancel": function () {
-            jQuery(this).dialog('close');
-          }
+    jQuery('#addLibraryNoteDialog').dialog({
+      width: 400,
+      modal: true,
+      resizable: false,
+      buttons: {
+        "Add Note": function () {
+          self.addLibraryNote(libraryId, jQuery('#internalOnly').val(), jQuery('#notetext').val());
+          jQuery(this).dialog('close');
+        },
+        "Cancel": function () {
+          jQuery(this).dialog('close');
         }
-      });
+      }
     });
-    jQuery('#addLibraryNoteDialog').dialog('open');
   },
 
   addLibraryNote: function (libraryId, internalOnly, text) {

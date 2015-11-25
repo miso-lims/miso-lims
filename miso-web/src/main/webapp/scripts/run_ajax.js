@@ -274,24 +274,20 @@ Run.ui = {
             "<input type='text' name='notetext' id='notetext' class='text ui-widget-content ui-corner-all' />" +
             "</fieldset></form>");
 
-    jQuery(function () {
-      jQuery('#addRunNoteDialog').dialog({
-         autoOpen: false,
-         width: 400,
-         modal: true,
-         resizable: false,
-         buttons: {
-           "Add Note": function () {
-             self.addRunNote(runId, jQuery('#internalOnly').val(), jQuery('#notetext').val());
-             jQuery(this).dialog('close');
-           },
-           "Cancel": function () {
-             jQuery(this).dialog('close');
-           }
-         }
-       });
+    jQuery('#addRunNoteDialog').dialog({
+      width: 400,
+      modal: true,
+      resizable: false,
+      buttons: {
+        "Add Note": function () {
+          self.addRunNote(runId, jQuery('#internalOnly').val(), jQuery('#notetext').val());
+          jQuery(this).dialog('close');
+        },
+        "Cancel": function () {
+          jQuery(this).dialog('close');
+        }
+      }
     });
-    jQuery('#addRunNoteDialog').dialog('open');
   },
 
   addRunNote: function (runId, internalOnly, text) {

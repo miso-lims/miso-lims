@@ -357,37 +357,33 @@ Sample.barcode = {
                   json.services +
                   "</select></fieldset></form>");
 
-          jQuery(function () {
-            jQuery('#printServiceSelectDialog').dialog({
-              autoOpen: false,
-              width: 400,
-              modal: true,
-              resizable: false,
-              buttons: {
-                "Print": function () {
-                  Fluxion.doAjax(
-                    'sampleControllerHelperService',
-                    'printSampleBarcodes',
-                    {
-                      'serviceName': jQuery('#serviceSelect').val(),
-                      'samples': samples,
-                      'url': ajaxurl
-                    },
-                    {
-                      'doOnSuccess': function (json) {
-                        alert(json.response);
-                      }
+          jQuery('#printServiceSelectDialog').dialog({
+            width: 400,
+            modal: true,
+            resizable: false,
+            buttons: {
+              "Print": function () {
+                Fluxion.doAjax(
+                  'sampleControllerHelperService',
+                  'printSampleBarcodes',
+                  {
+                    'serviceName': jQuery('#serviceSelect').val(),
+                    'samples': samples,
+                    'url': ajaxurl
+                  },
+                  {
+                    'doOnSuccess': function (json) {
+                      alert(json.response);
                     }
-                  );
-                  jQuery(this).dialog('close');
-                },
-                "Cancel": function () {
-                  jQuery(this).dialog('close');
-                }
+                  }
+                );
+                jQuery(this).dialog('close');
+              },
+              "Cancel": function () {
+                jQuery(this).dialog('close');
               }
-            });
+            }
           });
-          jQuery('#printServiceSelectDialog').dialog('open');
         },
         'doOnError': function (json) {
           alert(json.error);
@@ -476,24 +472,20 @@ Sample.ui = {
             "<input type='text' name='locationBarcodeInput' id='locationBarcodeInput' class='text ui-widget-content ui-corner-all'/>" +
             "</fieldset></form>");
 
-    jQuery(function () {
-      jQuery('#changeSampleLocationDialog').dialog({
-        autoOpen: false,
-        width: 400,
-        modal: true,
-        resizable: false,
-        buttons: {
-          "Save": function () {
-            self.changeSampleLocation(sampleId, jQuery('#locationBarcodeInput').val());
-            jQuery(this).dialog('close');
-          },
-          "Cancel": function () {
-            jQuery(this).dialog('close');
-          }
+    jQuery('#changeSampleLocationDialog').dialog({
+      width: 400,
+      modal: true,
+      resizable: false,
+      buttons: {
+        "Save": function () {
+          self.changeSampleLocation(sampleId, jQuery('#locationBarcodeInput').val());
+          jQuery(this).dialog('close');
+        },
+        "Cancel": function () {
+          jQuery(this).dialog('close');
         }
-      });
+      }
     });
-    jQuery('#changeSampleLocationDialog').dialog('open');
   },
 
   changeSampleLocation: function (sampleId, barcode) {
@@ -523,24 +515,20 @@ Sample.ui = {
             "<input type='text' name='notetext' id='notetext' class='text ui-widget-content ui-corner-all' />" +
             "</fieldset></form>");
 
-    jQuery(function () {
-      jQuery('#addSampleNoteDialog').dialog({
-        autoOpen: false,
-        width: 400,
-        modal: true,
-        resizable: false,
-        buttons: {
-          "Add Note": function () {
-            self.addSampleNote(sampleId, jQuery('#internalOnly').val(), jQuery('#notetext').val());
-            jQuery(this).dialog('close');
-          },
-          "Cancel": function () {
-            jQuery(this).dialog('close');
-          }
+    jQuery('#addSampleNoteDialog').dialog({
+      width: 400,
+      modal: true,
+      resizable: false,
+      buttons: {
+        "Add Note": function () {
+          self.addSampleNote(sampleId, jQuery('#internalOnly').val(), jQuery('#notetext').val());
+          jQuery(this).dialog('close');
+        },
+        "Cancel": function () {
+          jQuery(this).dialog('close');
         }
-      });
+      }
     });
-    jQuery('#addSampleNoteDialog').dialog('open');
   },
 
   addSampleNote: function (sampleId, internalOnly, text) {

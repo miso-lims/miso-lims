@@ -251,32 +251,28 @@ Experiment.kit = {
 
     jQuery('#addKitDialog').html(dialogText);
 
-    jQuery(function () {
-      jQuery('#addKitDialog').dialog({
-        autoOpen: false,
-        width: 400,
-        modal: true,
-        resizable: false,
-        buttons: {
-          "Add Library Kit": function () {
-            var b = this;
-            if (jQuery("#addKitForm").validate().form()) {
-              if (multiplexed == "true") {
-                self.addLibraryKit(experimentId, jQuery('#kitDescriptor').val(), jQuery('#partNumber').val(), jQuery('#multiplexingKitType').val(), jQuery('#multiplexingKitBarcode').val(), jQuery('#lotNumber').val());
-              }
-              else {
-                self.addLibraryKit(experimentId, jQuery('#kitDescriptor').val(), jQuery('#partNumber').val(), undefined, undefined, jQuery('#lotNumber').val());
-              }
-              jQuery(b).dialog('close');
+    jQuery('#addKitDialog').dialog({
+      width: 400,
+      modal: true,
+      resizable: false,
+      buttons: {
+        "Add Library Kit": function () {
+          var b = this;
+          if (jQuery("#addKitForm").validate().form()) {
+            if (multiplexed == "true") {
+              self.addLibraryKit(experimentId, jQuery('#kitDescriptor').val(), jQuery('#partNumber').val(), jQuery('#multiplexingKitType').val(), jQuery('#multiplexingKitBarcode').val(), jQuery('#lotNumber').val());
             }
-          },
-          "Cancel": function () {
-            jQuery(this).dialog('close');
+            else {
+              self.addLibraryKit(experimentId, jQuery('#kitDescriptor').val(), jQuery('#partNumber').val(), undefined, undefined, jQuery('#lotNumber').val());
+            }
+            jQuery(b).dialog('close');
           }
+        },
+        "Cancel": function () {
+          jQuery(this).dialog('close');
         }
-      });
+      }
     });
-    jQuery('#addKitDialog').dialog('open');
     jQuery('#addKitDialog').parent().css("width", "auto");
   },
 
@@ -340,27 +336,23 @@ Experiment.kit = {
 
     jQuery('#addKitDialog').html(dialogText);
 
-    jQuery(function () {
-      jQuery('#addKitDialog').dialog({
-        autoOpen: false,
-        width: 400,
-        modal: true,
-        resizable: false,
-        buttons: {
-          "Add EmPCR Kit": function () {
-            var b = this;
-            if (jQuery("#addKitForm").validate().form()) {
-              self.addEmPcrKit(experimentId, jQuery('#kitDescriptor').val(), jQuery('#partNumber').val(), jQuery('#lotNumber').val());
-              jQuery(b).dialog('close');
-            }
-          },
-          "Cancel": function () {
-            jQuery(this).dialog('close');
+    jQuery('#addKitDialog').dialog({
+      width: 400,
+      modal: true,
+      resizable: false,
+      buttons: {
+        "Add EmPCR Kit": function () {
+          var b = this;
+          if (jQuery("#addKitForm").validate().form()) {
+            self.addEmPcrKit(experimentId, jQuery('#kitDescriptor').val(), jQuery('#partNumber').val(), jQuery('#lotNumber').val());
+            jQuery(b).dialog('close');
           }
+        },
+        "Cancel": function () {
+          jQuery(this).dialog('close');
         }
-      });
+      }
     });
-    jQuery('#addKitDialog').dialog('open');
   },
 
   addEmPcrKit: function (experimentId, kitDescriptorId, partNumber, lotNumber) {
@@ -418,27 +410,23 @@ Experiment.kit = {
 
     jQuery('#addKitDialog').html(dialogText);
 
-    jQuery(function () {
-      jQuery('#addKitDialog').dialog({
-        autoOpen: false,
-        width: 400,
-        modal: true,
-        resizable: false,
-        buttons: {
-          "Add Clustering Kit": function () {
-            var b = this;
-            if (jQuery("#addKitForm").validate().form()) {
-              self.addClusteringKit(experimentId, jQuery('#kitDescriptor').val(), jQuery('#partNumber').val(), jQuery('#lotNumber').val());
-              jQuery(b).dialog('close');
-            }
-          },
-          "Cancel": function () {
-            jQuery(this).dialog('close');
+    jQuery('#addKitDialog').dialog({
+      width: 400,
+      modal: true,
+      resizable: false,
+      buttons: {
+        "Add Clustering Kit": function () {
+          var b = this;
+          if (jQuery("#addKitForm").validate().form()) {
+            self.addClusteringKit(experimentId, jQuery('#kitDescriptor').val(), jQuery('#partNumber').val(), jQuery('#lotNumber').val());
+            jQuery(b).dialog('close');
           }
+        },
+        "Cancel": function () {
+          jQuery(this).dialog('close');
         }
-      });
+      }
     });
-    jQuery('#addKitDialog').dialog('open');
   },
 
   addClusteringKit: function (experimentId, kitDescriptorId, partNumber, lotNumber) {
@@ -496,28 +484,24 @@ Experiment.kit = {
 
     jQuery('#addKitDialog').html(dialogText);
 
-    jQuery(function () {
-      jQuery('#addKitDialog').dialog({
-        autoOpen: false,
-        width: 400,
-        modal: true,
-        resizable: false,
-        buttons: {
-          "Add Sequencing Kit": function () {
-            var b = this;
+    jQuery('#addKitDialog').dialog({
+      width: 400,
+      modal: true,
+      resizable: false,
+      buttons: {
+        "Add Sequencing Kit": function () {
+          var b = this;
 
-            if (jQuery("#addKitForm").validate().form()) {
-              self.addSequencingKit(experimentId, jQuery('#kitDescriptor').val(), jQuery('#partNumber').val(), jQuery('#lotNumber').val());
-              jQuery(b).dialog('close');
-            }
-          },
-          "Cancel": function () {
-            jQuery(this).dialog('close');
+          if (jQuery("#addKitForm").validate().form()) {
+            self.addSequencingKit(experimentId, jQuery('#kitDescriptor').val(), jQuery('#partNumber').val(), jQuery('#lotNumber').val());
+            jQuery(b).dialog('close');
           }
+        },
+        "Cancel": function () {
+          jQuery(this).dialog('close');
         }
-      });
+      }
     });
-    jQuery('#addKitDialog').dialog('open');
   },
 
   addSequencingKit: function (experimentId, kitDescriptorId, partNumber, lotNumber) {
