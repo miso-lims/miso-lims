@@ -62,7 +62,7 @@ public class DaoAlerterService implements AlerterService {
         throw new RuntimeException("Cannot persist raised Alert. Specified Alert store is null");
       }
     } catch (IOException e) {
-      log.error("Cannot save alert to DAO: " + e.getMessage());
+      log.error("Cannot save alert to DAO", e);
       throw new AlertingException("Cannot save alert to DAO", e);
     }
   }

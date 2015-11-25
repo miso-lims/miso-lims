@@ -74,7 +74,7 @@ public class AnalysisRequestService {
       analysisRequestManager.generateAndSubmitTask(request);
       return "{'response':'Task submitted: " + request.getPipelineName() + "'}";
     } catch (SubmissionException e) {
-      e.printStackTrace();
+      log.error("submit analysis task", e);
       return "{'error':'Task not submitted: " + e.getMessage() + "'}";
     }
   }

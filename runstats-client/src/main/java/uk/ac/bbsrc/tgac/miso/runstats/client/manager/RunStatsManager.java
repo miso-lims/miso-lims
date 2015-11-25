@@ -72,6 +72,7 @@ public class RunStatsManager {
     try {
       return reports.listPerBaseSummaryAnalyses();
     } catch (SQLException e) {
+      log.error("list per base summary analyses", e);
       throw new RunStatsException("Cannot retrieve the list of per-base summary analyses: " + e.getMessage());
     }
   }
@@ -80,6 +81,7 @@ public class RunStatsManager {
     try {
       return reports.listGlobalAnalyses();
     } catch (SQLException e) {
+      log.error("list global analyses", e);
       throw new RunStatsException("Cannot retrieve the list of global run-based analyses: " + e.getMessage());
     }
   }
@@ -91,7 +93,7 @@ public class RunStatsManager {
       ReportTable rt = reports.getAverageValues(map);
       return rt != null && !rt.isEmpty();
     } catch (SQLException e) {
-      e.printStackTrace();
+      log.error("has stats for run", e);
       return false;
     }
   }
@@ -109,9 +111,9 @@ public class RunStatsManager {
       }
       report.put("runSummary", JSONArray.fromObject(rt.toJSON()));
     } catch (SQLException e) {
-      e.printStackTrace();
+      log.error("get summary stats for run", e);
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("get summary stats for run", e);
     }
 
     if (!((RunImpl) run).getSequencerPartitionContainers().isEmpty()) {
@@ -132,9 +134,9 @@ public class RunStatsManager {
               partition.put("partitionSummary", JSONArray.fromObject(rt.toJSON()));
             }
           } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("get summary stats for run", e);
           } catch (IOException e) {
-            e.printStackTrace();
+            log.error("get summary stats for run", e);
           }
 
           // clear any previous barcode query
@@ -153,9 +155,9 @@ public class RunStatsManager {
                       partition.put(tb.getSequence(), JSONArray.fromObject(rt.toJSON()));
                     }
                   } catch (SQLException e) {
-                    e.printStackTrace();
+                    log.error("get summary stats for run", e);
                   } catch (IOException e) {
-                    e.printStackTrace();
+                    log.error("get summary stats for run", e);
                   }
                 }
               }
@@ -185,9 +187,9 @@ public class RunStatsManager {
         partition.put("partitionSummary", JSONArray.fromObject(rt.toJSON()));
       }
     } catch (SQLException e) {
-      e.printStackTrace();
+      log.error("get summary stats for lane", e);
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("get summary stats for lane", e);
     }
 
     // clear any previous barcode query
@@ -210,9 +212,9 @@ public class RunStatsManager {
                       partition.put(tb.getSequence(), JSONArray.fromObject(rt.toJSON()));
                     }
                   } catch (SQLException e) {
-                    e.printStackTrace();
+                    log.error("get summary stats for lane", e);
                   } catch (IOException e) {
-                    e.printStackTrace();
+                    log.error("get summary stats for lane", e);
                   }
                 }
               }
@@ -235,6 +237,7 @@ public class RunStatsManager {
     try {
       return d3p.getPerPositionBaseSequenceQualityForLane(run.getAlias(), run.getPairedEnd(), laneNumber);
     } catch (ConsumerException e) {
+      log.error("cannot generate D3 plot JSON for run " + run.getAlias(), e);
       throw new RunStatsException("Cannot generate D3 plot JSON for run " + run.getAlias() + ": " + e.getMessage());
     }
   }
@@ -244,6 +247,7 @@ public class RunStatsManager {
     try {
       return d3p.getPerPositionBaseContentForLane(run.getAlias(), run.getPairedEnd(), laneNumber);
     } catch (ConsumerException e) {
+      log.error("cannot generate D3 plot JSON for run " + run.getAlias(), e);
       throw new RunStatsException("Cannot generate D3 plot JSON for run " + run.getAlias() + ": " + e.getMessage());
     }
   }

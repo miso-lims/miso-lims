@@ -277,7 +277,7 @@ public abstract class AbstractPool<P extends Poolable> implements Pool<P> {
     try {
       poolQc.setPool(this);
     } catch (MalformedPoolException e) {
-      e.printStackTrace();
+      log.error("add QC", e);
     }
   }
 

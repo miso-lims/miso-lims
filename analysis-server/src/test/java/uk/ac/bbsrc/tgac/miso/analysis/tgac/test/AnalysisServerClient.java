@@ -113,13 +113,6 @@ public class AnalysisServerClient {
 
       String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket("norwich", 7898), task.toString());
       if (!"".equals(response)) {
-        /*
-         * JSONArray r = JSONArray.fromObject(response); if (!r.isEmpty()) { if (r.size() == 1 && r.getJSONObject(0).has("error")) { String
-         * error = r.getJSONObject(0).getString("error"); log.error(error); throw new InterrogationException(
-         * "Analysis query returned an error: " + error); }
-         * 
-         * log.info("RESPONSE: " + response); }
-         */
         log.info("RESPONSE: " + response);
       }
     } catch (IntegrationException e) {

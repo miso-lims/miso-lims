@@ -435,9 +435,9 @@ public class SQLStudyDAO implements StudyStore {
         s.setLastModifier(securityDAO.getUserById(rs.getLong("lastModifier")));
         s.getChangeLog().addAll(changeLogDAO.listAllById(TABLE_NAME, id));
       } catch (IOException e1) {
-        e1.printStackTrace();
+        log.error("study row mapper", e1);
       } catch (MalformedExperimentException e) {
-        e.printStackTrace();
+        log.error("study row mapper", e);
       }
 
       if (isCacheEnabled() && lookupCache(cacheManager) != null) {

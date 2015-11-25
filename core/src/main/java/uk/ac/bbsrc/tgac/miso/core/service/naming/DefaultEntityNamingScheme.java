@@ -36,7 +36,7 @@ public class DefaultEntityNamingScheme<T extends Nameable> implements MisoNaming
       type = (Class<T>) Class.forName("uk.ac.bbsrc.tgac.miso.core.data.Nameable");
       validationMap.put("name", Pattern.compile("([A-Z]{3})([0-9]+)"));
     } catch (ClassNotFoundException e) {
-      e.printStackTrace();
+      log.error("constructor", e);
     }
   }
 
@@ -150,8 +150,7 @@ public class DefaultEntityNamingScheme<T extends Nameable> implements MisoNaming
         return true;
       }
     } catch (NoSuchMethodException e) {
-      log.error("No such field '" + fieldName + "' on class " + namingSchemeFor().getCanonicalName());
-      e.printStackTrace();
+      log.error("No such field '" + fieldName + "' on class " + namingSchemeFor().getCanonicalName(), e);
     }
     return false;
   }

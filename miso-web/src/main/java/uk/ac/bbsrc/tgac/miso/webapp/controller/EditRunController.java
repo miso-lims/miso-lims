@@ -264,7 +264,7 @@ public class EditRunController {
             model.put("operationsQcPassed", hasOperationsQcPassed(run));
             model.put("informaticsQcPassed", hasInformaticsQcPassed(run));
           } catch (RunStatsException e) {
-            e.printStackTrace();
+            log.error("setup run form", e);
           }
         }
       }
@@ -286,7 +286,7 @@ public class EditRunController {
         } catch (TransformerException e) {
           model.put("error",
               MisoWebUtils.generateErrorDivMessage("Cannot retrieve status XML for the given run: " + run.getAlias(), e.getMessage()));
-          e.printStackTrace();
+          log.error("transform XML status", e);
         }
       }
 

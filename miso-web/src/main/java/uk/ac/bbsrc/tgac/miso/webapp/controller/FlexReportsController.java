@@ -82,9 +82,9 @@ public class FlexReportsController {
     try {
       modelMap.put("tables", DbUtils.getTables(interfaceTemplate));
     } catch (MetaDataAccessException e) {
-      e.printStackTrace();
+      log.error("query flex reports", e);
     } catch (SQLException e) {
-      e.printStackTrace();
+      log.error("query flex reports", e);
     }
     return new ModelAndView("/pages/flexreport.jsp", modelMap);
   }
@@ -96,7 +96,7 @@ public class FlexReportsController {
       JSONObject json = JSONObject.fromObject(j);
       log.info(json.toString());
     } catch (ServletRequestBindingException e) {
-      e.printStackTrace();
+      log.error("post flex reports", e);
     }
   }
 

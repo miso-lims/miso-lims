@@ -93,7 +93,7 @@ public class NEBNextTagBarcodeStrategy implements TagBarcodeStrategy, RequestMan
             }
           }
         } catch (IOException e) {
-          e.printStackTrace();
+          log.error("get barcodes", e);
         }
       }
     }

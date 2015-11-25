@@ -130,8 +130,7 @@ public class SampleControllerHelperService {
               + sampleNamingScheme.getValidationRegex("alias") + ") or already exists: " + json.getString("alias"));
         }
       } catch (MisoNamingException e) {
-        log.error("Cannot validate sample alias " + json.getString("alias") + ": " + e.getMessage());
-        e.printStackTrace();
+        log.error("Cannot validate sample alias " + json.getString("alias"), e);
         return JSONUtils.SimpleJSONError("Cannot validate sample alias " + json.getString("alias") + ": " + e.getMessage());
       }
     } else {
@@ -196,10 +195,10 @@ public class SampleControllerHelperService {
                   + sampleNamingScheme.getValidationRegex("alias") + ") or already exists: " + j.getString("alias"));
             }
           } catch (ParseException e) {
-            e.printStackTrace();
+            log.error("Cannot parse date for sample", e);
             return JSONUtils.SimpleJSONError("Cannot parse date for sample " + j.getString("alias"));
           } catch (MisoNamingException e) {
-            e.printStackTrace();
+            log.error("Cannot validate sample alias ", e);
             return JSONUtils.SimpleJSONError("Cannot validate sample alias " + j.getString("alias") + ": " + e.getMessage());
           }
         }
@@ -229,8 +228,7 @@ public class SampleControllerHelperService {
               savedSamples.add(sample.getAlias());
               log.info("Saved: " + sample.getAlias());
             } catch (IOException e) {
-              log.error("Couldn't save: " + sample.getAlias());
-              e.printStackTrace();
+              log.error("Couldn't save: " + sample.getAlias(), e);
             }
           }
 
@@ -244,10 +242,10 @@ public class SampleControllerHelperService {
               .SimpleJSONError("Error in saving samples - perhaps samples specified already exist in the database with a given alias?");
         }
       } catch (NoSuchMethodException e) {
-        e.printStackTrace();
+        log.error("Cannot save samples for project", e);
         return JSONUtils.SimpleJSONError("Cannot save samples for project " + json.getLong("projectId") + ": " + e.getMessage());
       } catch (IOException e) {
-        e.printStackTrace();
+        log.error("Cannot save samples for project", e);
         return JSONUtils.SimpleJSONError("Cannot save samples for project " + json.getLong("projectId") + ": " + e.getMessage());
       }
     } else {
@@ -286,7 +284,6 @@ public class SampleControllerHelperService {
       return JSONUtils.JSONObjectResponse(map);
     } catch (IOException e) {
       log.error("Failed to get available users for this Sample QC: ", e);
-      e.printStackTrace();
       return JSONUtils.SimpleJSONError("Failed to get available users for this Sample QC: " + e.getMessage());
     }
   }
@@ -302,7 +299,7 @@ public class SampleControllerHelperService {
       map.put("types", sb.toString());
       return JSONUtils.JSONObjectResponse(map);
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("get sample qc type", e);
     }
     return JSONUtils.SimpleJSONError("Cannot list all Sample QC Types");
   }
@@ -450,7 +447,7 @@ public class SampleControllerHelperService {
       requestManager.saveSampleNote(sample, note);
       requestManager.saveSample(sample);
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("add sample note", e);
       return JSONUtils.SimpleJSONError(e.getMessage());
     }
 
@@ -473,7 +470,7 @@ public class SampleControllerHelperService {
         return JSONUtils.SimpleJSONError("Sample does not have note " + noteId + ". Cannot remove");
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("cannot remove note", e);
       return JSONUtils.SimpleJSONError("Cannot remove note: " + e.getMessage());
     }
   }
@@ -500,7 +497,7 @@ public class SampleControllerHelperService {
         return JSONUtils.SimpleJSONError("Sample " + sample.getName() + " has already been received");
       }
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("sample not in database", e);
       return JSONUtils.SimpleJSONError(e.getMessage() + ": This sample doesn't seem to be in the database.");
     }
   }
@@ -519,7 +516,7 @@ public class SampleControllerHelperService {
       response.put("result", "Samples received date saved");
       return response;
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("cannot set receipt date for sample", e);
       return JSONUtils.SimpleJSONError(e.getMessage() + ": Cannot set receipt date for sample");
     }
   }
@@ -558,7 +555,7 @@ public class SampleControllerHelperService {
         return JSONUtils.SimpleJSONError("Sample has no parseable barcode");
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("cannot access: " + temploc.getAbsolutePath(), e);
       return JSONUtils.SimpleJSONError(e.getMessage() + ": Cannot seem to access " + temploc.getAbsolutePath());
     }
   }
@@ -605,7 +602,7 @@ public class SampleControllerHelperService {
           File f = mps.getLabelFor(sample);
           if (f != null) thingsToPrint.add(f);
         } catch (IOException e) {
-          e.printStackTrace();
+          log.error("printing barcodes", e);
           return JSONUtils.SimpleJSONError("Error printing barcodes: " + e.getMessage());
         }
       }
@@ -613,10 +610,10 @@ public class SampleControllerHelperService {
       PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
       return JSONUtils.SimpleJSONResponse("Job " + pj.getJobId() + " : Barcodes printed.");
     } catch (MisoPrintException e) {
-      e.printStackTrace();
+      log.error("printing barcodes", e);
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("printing barcodes", e);
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
     }
   }
@@ -645,7 +642,7 @@ public class SampleControllerHelperService {
         return JSONUtils.SimpleJSONError("New location barcode not recognised");
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("change sample location", e);
       return JSONUtils.SimpleJSONError(e.getMessage());
     }
 
@@ -687,7 +684,7 @@ public class SampleControllerHelperService {
     try {
       user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("delete sample", e);
       return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
     }
 
@@ -698,7 +695,7 @@ public class SampleControllerHelperService {
           requestManager.deleteSample(requestManager.getSampleById(sampleId));
           return JSONUtils.SimpleJSONResponse("Sample deleted");
         } catch (IOException e) {
-          e.printStackTrace();
+          log.error("delete sample", e);
           return JSONUtils.SimpleJSONError("Cannot delete sample: " + e.getMessage());
         }
       } else {
@@ -714,7 +711,7 @@ public class SampleControllerHelperService {
     try {
       user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("remove sample from group", e);
       return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
     }
 
@@ -738,7 +735,7 @@ public class SampleControllerHelperService {
             return JSONUtils.SimpleJSONResponse("Sample not in this sample group!");
           }
         } catch (IOException e) {
-          e.printStackTrace();
+          log.error("remove sample from group", e);
           return JSONUtils.SimpleJSONError("Cannot remove sample from group: " + e.getMessage());
         }
       } else {

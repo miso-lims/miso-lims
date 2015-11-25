@@ -111,9 +111,9 @@ public class SQLStatusDAO implements StatusStore {
         params.addValue("xml", null);
       }
     } catch (SerialException e) {
-      e.printStackTrace();
+      log.error("status save", e);
     } catch (SQLException e) {
-      e.printStackTrace();
+      log.error("status save", e);
     }
 
     if (status.getStatusId() == 0L) {

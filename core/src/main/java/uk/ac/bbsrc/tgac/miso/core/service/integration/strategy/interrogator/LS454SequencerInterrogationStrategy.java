@@ -113,13 +113,13 @@ public class LS454SequencerInterrogationStrategy implements SequencerInterrogati
             }
             s.add(status);
           } catch (ParserConfigurationException e) {
-            e.printStackTrace();
+            log.error("list all statuses", e);
             throw new InterrogationException(e.getMessage());
           } catch (ParseException e) {
-            e.printStackTrace();
+            log.error("list all statuses", e);
             throw new InterrogationException(e.getMessage());
           } catch (TransformerException e) {
-            e.printStackTrace();
+            log.error("list all statuses", e);
             throw new InterrogationException(e.getMessage());
           }
         }
@@ -225,13 +225,13 @@ public class LS454SequencerInterrogationStrategy implements SequencerInterrogati
         }
       }
     } catch (ParserConfigurationException e) {
-      e.printStackTrace();
+      log.error("get run status", e);
       throw new InterrogationException(e.getMessage());
     } catch (ParseException e) {
-      e.printStackTrace();
+      log.error("get run status", e);
       throw new InterrogationException(e.getMessage());
     } catch (TransformerException e) {
-      e.printStackTrace();
+      log.error("get run status", e);
       throw new InterrogationException(e.getMessage());
     }
     return null;
@@ -262,7 +262,7 @@ public class LS454SequencerInterrogationStrategy implements SequencerInterrogati
         }
       }
     } catch (InterrogationException ie) {
-      ie.printStackTrace();
+      log.error("get run information", ie);
     }
     return json;
   }

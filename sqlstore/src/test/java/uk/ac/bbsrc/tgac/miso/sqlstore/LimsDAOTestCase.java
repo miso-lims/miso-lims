@@ -35,6 +35,8 @@ import org.dbunit.ext.hsqldb.HsqldbDataTypeFactory;
 import org.dbunit.ext.mysql.MySqlDataTypeFactory;
 import org.junit.After;
 import org.junit.Before;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.support.lob.DefaultLobHandler;
@@ -68,6 +70,7 @@ import java.util.Properties;
  * @since 0.0.2
  */
 public abstract class LimsDAOTestCase extends DatabaseTestCase {
+  protected static final Logger log = LoggerFactory.getLogger(LimsDAOTestCase.class);
   private QueryDataSet dataSet;
 
   private static final String DRIVER = "org.hsqldb.jdbcDriver";
@@ -368,24 +371,24 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
   @Override
   protected IDataSet getDataSet() throws Exception {
     if (dataSet == null) {
-      System.out.print("Getting dataset...");
+      log.info("Getting dataset...");
       InputStream in = LimsDAOTestCase.class.getClassLoader().getResourceAsStream("test.db.properties");
       Properties props = new Properties();
       props.load(in);
-      System.out.print("properties loaded...");
+      log.info("properties loaded...");
 
       Connection jdbcConnection = DriverManager.getConnection(props.getProperty("db.url"), props.getProperty("db.username"),
           props.getProperty("db.password"));
       IDatabaseConnection connection = new DatabaseConnection(jdbcConnection);
       DatabaseConfig config = connection.getConfig();
       config.setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, new MySqlDataTypeFactory());
-      System.out.print("mysql connection set...");
+      log.info("mysql connection set...");
 
       dataSet = new QueryDataSet(connection);
       for (String table : tables) {
         dataSet.addTable(table);
       }
-      System.out.print("dataset ready.\n");
+      log.info("dataset ready.\n");
     }
     return dataSet;
   }
@@ -411,7 +414,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
   @Override
   @Before
   public void setUp() throws Exception {
-    System.out.println(">>>>>>>>>>>>>> SETUP");
+    log.info(">>>>>>>>>>>>>> SETUP");
 
     InputStream in = LimsDAOTestCase.class.getClassLoader().getResourceAsStream("test.db.properties");
     Properties props = new Properties();
@@ -675,13 +678,13 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
   @Override
   @After
   public void tearDown() throws Exception {
-    System.out.println("<<<<<<<<<<<<<<<< TEARDOWN");
+    log.info("<<<<<<<<<<<<<<<< TEARDOWN");
     datasource = null;
   }
 
   private static void createDatabase(Connection conn) throws Exception {
     // get a database connection that will create the DB in memory
-    System.out.println("Creating test database tables...");
+    log.info("Creating test database tables...");
 
     runStatement(conn,
         "CREATE TABLE Alert (" + "alertId BIGINT NOT NULL," + "title VARCHAR(100) NOT NULL," + "text LONGVARCHAR NOT NULL,"
@@ -961,7 +964,7 @@ public abstract class LimsDAOTestCase extends DatabaseTestCase {
 
     runStatement(conn, "CREATE TABLE Watcher (" + "entityName VARCHAR(4) NOT NULL," + "userId BIGINT NOT NULL" + ");");
 
-    System.out.println("...done!");
+    log.info("...done!");
     conn.close();
   }
 

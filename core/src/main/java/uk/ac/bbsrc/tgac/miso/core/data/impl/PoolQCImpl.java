@@ -24,12 +24,13 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
-
 import com.eaglegenomics.simlims.core.User;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPoolQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolException;
+
 
 /**
  * Concrete implementation of a PoolQC
@@ -38,6 +39,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedPoolException;
  * @since 0.1.9
  */
 public class PoolQCImpl extends AbstractPoolQC implements Serializable {
+  protected static final Logger log = LoggerFactory.getLogger(PoolQCImpl.class);
   /**
    * Construct a new PoolQC
    */
@@ -57,7 +59,7 @@ public class PoolQCImpl extends AbstractPoolQC implements Serializable {
       try {
         setPool(pool);
       } catch (MalformedPoolException e) {
-        e.printStackTrace();
+        log.error("constructor", e);
       }
     }
   }

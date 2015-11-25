@@ -605,11 +605,11 @@ public class SQLSampleDAO implements SampleStore {
         }
         s.getChangeLog().addAll(changeLogDAO.listAllById(TABLE_NAME, id));
       } catch (IOException e1) {
-        e1.printStackTrace();
+        log.error("sample row mapper", e1);
       } catch (MalformedLibraryException e) {
-        e.printStackTrace();
+        log.error("sample row mapper", e);
       } catch (MalformedSampleQcException e) {
-        e.printStackTrace();
+        log.error("sample row mapper", e);
       }
 
       if (isCacheEnabled() && lookupCache(cacheManager) != null) {

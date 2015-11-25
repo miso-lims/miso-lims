@@ -157,8 +157,7 @@ public class SQLDilutionDAO implements DilutionStore {
   public static final String EMPCR_DILUTION_DELETE = "DELETE FROM emPCRDilution WHERE dilutionId=:dilutionId";
 
   public static final String EMPCR_DILUTION_SELECT_BY_SEARCH = "SELECT ed.dilutionId, ed.name, ed.concentration, ed.emPCR_pcrId, ed.identificationBarcode, ed.creationDate, ed.dilutionUserName, ed.securityProfile_profileId, e.dilution_dilutionId "
-      + "FROM emPCRDilution ed, emPCR e, LibraryDilution ld WHERE ed.emPCR_pcrId = e.pcrId "
-      + "AND ld.dilutionId = e.dilution_dilutionId "
+      + "FROM emPCRDilution ed, emPCR e, LibraryDilution ld WHERE ed.emPCR_pcrId = e.pcrId " + "AND ld.dilutionId = e.dilution_dilutionId "
       + "AND (ed.name LIKE :search OR ld.name LIKE :search OR ed.identificationBarcode LIKE :search)";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLDilutionDAO.class);
@@ -478,7 +477,7 @@ public class SQLDilutionDAO implements DilutionStore {
   @Override
   @Transactional(readOnly = false, rollbackFor = IOException.class)
   @TriggersRemove(cacheName = "emPCRDilutionCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
-      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }))
+      @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
   public long saveEmPCRDilution(emPCRDilution dilution) throws IOException {
     Long securityProfileId = dilution.getSecurityProfile().getProfileId();
     if (securityProfileId == null || (this.cascadeType != null)) { // && this.cascadeType.equals(CascadeType.PERSIST))) {
@@ -655,7 +654,6 @@ public class SQLDilutionDAO implements DilutionStore {
         libraryDilution.setLibrary(libraryDAO.lazyGet(rs.getLong("library_libraryId")));
       } catch (IOException e) {
         log.error("Cannot map from database to LibraryDilution: ", e);
-        e.printStackTrace();
       }
 
       return libraryDilution;
@@ -678,7 +676,7 @@ public class SQLDilutionDAO implements DilutionStore {
         Library library = libraryDAO.get(rs.getLong("library_libraryId"));
         libraryDilution.setLibrary(library);
       } catch (IOException e1) {
-        e1.printStackTrace();
+        log.error("library dilution row mapper", e1);
       }
       return libraryDilution;
     }
@@ -700,7 +698,6 @@ public class SQLDilutionDAO implements DilutionStore {
         pcrDilution.setEmPCR(emPcrDAO.lazyGet(rs.getLong("emPCR_pcrId")));
       } catch (IOException e) {
         log.error("Cannot map from database to emPCRDilution: ", e);
-        e.printStackTrace();
       }
       return pcrDilution;
     }
@@ -721,7 +718,7 @@ public class SQLDilutionDAO implements DilutionStore {
         pcrDilution.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
         pcrDilution.setEmPCR(emPcrDAO.get(rs.getLong("emPCR_pcrId")));
       } catch (IOException e1) {
-        e1.printStackTrace();
+        log.error("EmPCR dilution row mapper", e1);
       }
       return pcrDilution;
     }

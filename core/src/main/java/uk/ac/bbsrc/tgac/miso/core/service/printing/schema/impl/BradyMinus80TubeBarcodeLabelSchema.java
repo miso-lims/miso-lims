@@ -4,8 +4,9 @@ import java.io.File;
 import java.io.UnsupportedEncodingException;
 
 import org.apache.commons.codec.binary.Base64;
-
 import net.sourceforge.fluxion.spi.ServiceProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
 import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeLabelFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.factory.FileGeneratingBarcodeLabelFactory;
@@ -17,6 +18,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
  */
 @ServiceProvider
 public class BradyMinus80TubeBarcodeLabelSchema implements BarcodableSchema<File, Barcodable> {
+  protected static final Logger log = LoggerFactory.getLogger(BradyMinus80TubeBarcodeLabelSchema.class);
   private BarcodeLabelFactory<File, Barcodable, BarcodableSchema<File, Barcodable>> barcodeLabelFactory = new FileGeneratingBarcodeLabelFactory<Barcodable>();
 
   @Override
@@ -67,7 +69,7 @@ public class BradyMinus80TubeBarcodeLabelSchema implements BarcodableSchema<File
       sb.append("T 17,11,0,5,pt6;").append(LimsUtils.unicodeify(name)).append("\n");
       sb.append("A 1").append("\n");
     } catch (UnsupportedEncodingException e) {
-      e.printStackTrace();
+      log.error("get raw state", e);
     }
 
     return sb.toString();

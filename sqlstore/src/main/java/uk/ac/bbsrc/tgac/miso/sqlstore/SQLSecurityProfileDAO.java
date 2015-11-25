@@ -263,7 +263,7 @@ public class SQLSecurityProfileDAO implements Store<SecurityProfile> {
       try {
         sp.setOwner(securityManager.getUserById(rs.getLong("owner_userId")));
       } catch (IOException e) {
-        e.printStackTrace();
+        log.error("security profile mapper", e);
       }
 
       return sp;

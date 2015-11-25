@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.analysis.parameter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 import uk.ac.ebi.fgpt.conan.model.AbstractConanParameter;
 
@@ -39,6 +41,7 @@ import java.io.IOException;
  * @since 0.1.2
  */
 public class PathCreatingPathParameter extends AbstractConanParameter implements Optionable {
+  protected static final Logger log = LoggerFactory.getLogger(PathCreatingPathParameter.class);
   private boolean optional = false;
 
   public PathCreatingPathParameter(String name) {
@@ -73,7 +76,7 @@ public class PathCreatingPathParameter extends AbstractConanParameter implements
         return true;
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("validate parameter value", e);
     }
     return false;
   }

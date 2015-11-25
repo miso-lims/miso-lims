@@ -240,9 +240,9 @@ public class SQLLibraryQCDAO implements LibraryQcStore {
           s.setLibrary(libraryDAO.get(rs.getLong("library_libraryId")));
         }
       } catch (IOException e) {
-        e.printStackTrace();
+        log.error("library QC row mapper", e);
       } catch (MalformedLibraryException e) {
-        e.printStackTrace();
+        log.error("library QC row mapper", e);
       }
 
       if (isCacheEnabled() && lookupCache(cacheManager) != null) {

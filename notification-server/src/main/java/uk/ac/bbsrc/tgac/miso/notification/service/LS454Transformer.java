@@ -156,7 +156,7 @@ public class LS454Transformer implements FileSetTransformer<String, String, File
               log.error("No imageProcessingOnly folder detected. Cannot process run " + runName + ".");
             }
           } catch (IOException e) {
-            log.error(recentProcessingDir.getAbsolutePath() + " :: Unable to process runLog: " + e.getMessage());
+            log.error(recentProcessingDir.getAbsolutePath() + " :: Unable to process runLog", e);
           }
         } else {
           log.error("Cannot read into run directory: " + rootFile.getAbsolutePath());

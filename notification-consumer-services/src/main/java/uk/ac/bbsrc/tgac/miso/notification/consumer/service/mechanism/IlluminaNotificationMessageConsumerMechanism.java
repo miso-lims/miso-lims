@@ -173,8 +173,7 @@ public class IlluminaNotificationMessageConsumerMechanism
                     r.getStatus().setStartDate(illuminaRunFolderDateFormat.parse(run.getString("startDate")));
                   }
                 } catch (ParseException e) {
-                  log.error(e.getMessage());
-                  e.printStackTrace();
+                  log.error("run JSON", e);
                 }
               }
 
@@ -186,8 +185,7 @@ public class IlluminaNotificationMessageConsumerMechanism
                     r.getStatus().setCompletionDate(logDateFormat.parse(run.getString("completionDate")));
                   }
                 } catch (ParseException e) {
-                  log.error(e.getMessage());
-                  e.printStackTrace();
+                  log.error("run JSON", e);
                 }
               }
             }
@@ -252,8 +250,7 @@ public class IlluminaNotificationMessageConsumerMechanism
                   r.getStatus().setStartDate(illuminaRunFolderDateFormat.parse(run.getString("startDate")));
                 }
               } catch (ParseException e) {
-                log.error(runName + ": " + e.getMessage());
-                e.printStackTrace();
+                log.error(runName, e);
               }
             }
 
@@ -264,12 +261,11 @@ public class IlluminaNotificationMessageConsumerMechanism
                 try {
                   r.getStatus().setCompletionDate(logDateFormat.parse(run.getString("completionDate")));
                 } catch (ParseException e) {
-                  log.error(runName + ": " + e.getMessage());
+                  log.error(runName, e);
                   try {
                     r.getStatus().setCompletionDate(anotherLogDateFormat.parse(run.getString("completionDate")));
                   } catch (ParseException e1) {
-                    log.error(runName + ": " + e1.getMessage());
-                    e1.printStackTrace();
+                    log.error(runName, e1);
                   }
                 }
               } else {
@@ -417,8 +413,7 @@ public class IlluminaNotificationMessageConsumerMechanism
           requestManager.saveStatus(is);
         }
       } catch (IOException ioe) {
-        log.error("Couldn't process run:" + ioe.getMessage());
-        ioe.printStackTrace();
+        log.error("Couldn't process run", ioe);
       }
     }
     try {
@@ -427,8 +422,7 @@ public class IlluminaNotificationMessageConsumerMechanism
         log.info("Batch saved " + saved.length + " / " + runs.size() + " runs");
       }
     } catch (IOException e) {
-      log.error("Couldn't save run batch: " + e.getMessage());
-      e.printStackTrace();
+      log.error("Couldn't save run batch", e);
     }
 
     return updatedRuns;

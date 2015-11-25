@@ -85,10 +85,10 @@ public class StatsControllerHelperService {
         Run run = requestManager.getRunById(runId);
         return runStatsManager.getSummaryStatsForRun(run);
       } catch (IOException e) {
-        e.printStackTrace();
+        log.error("cannot retrieve run", e);
         return JSONUtils.SimpleJSONError("Cannot retrieve run: " + e.getMessage());
       } catch (RunStatsException e) {
-        e.printStackTrace();
+        log.error("cannot retrieve run", e);
         return JSONUtils.SimpleJSONError("Cannot get stats for run: " + e.getMessage());
       }
     } else {
@@ -104,10 +104,10 @@ public class StatsControllerHelperService {
         Run run = requestManager.getRunById(runId);
         return runStatsManager.getSummaryStatsForLane(run, partitionNumber);
       } catch (IOException e) {
-        e.printStackTrace();
+        log.error("cannot retrieve run", e);
         return JSONUtils.SimpleJSONError("Cannot retrieve run: " + e.getMessage());
       } catch (RunStatsException e) {
-        e.printStackTrace();
+        log.error("cannot retrieve run", e);
         return JSONUtils.SimpleJSONError("Cannot get stats for lane: " + e.getMessage());
       }
     } else {
@@ -123,10 +123,10 @@ public class StatsControllerHelperService {
       JSONObject resultJson = runStatsManager.getPerPositionBaseSequenceQualityForLane(run, lane);
       return resultJson;
     } catch (IOException e) {
-      log.debug("Failed", e);
+      log.error("Failed", e);
       return JSONUtils.SimpleJSONError("Failed");
     } catch (RunStatsException e) {
-      log.debug("Failed", e);
+      log.error("Failed", e);
       return JSONUtils.SimpleJSONError("Failed");
     }
   }
@@ -137,8 +137,7 @@ public class StatsControllerHelperService {
     try {
       return notificationQueryService.getInterOpMetrics(runAlias, platformType);
     } catch (IntegrationException e) {
-      e.printStackTrace();
-      log.debug("Failed", e);
+      log.error("Failed to retrieve InterOp metrics", e);
       return JSONUtils.SimpleJSONError("Failed to retrieve InterOp metrics: " + e.getMessage());
     }
   }
@@ -150,8 +149,7 @@ public class StatsControllerHelperService {
     try {
       return notificationQueryService.getInterOpMetricsForLane(runAlias, platformType, laneNum);
     } catch (IntegrationException e) {
-      e.printStackTrace();
-      log.debug("Failed", e);
+      log.error("Failed", e);
       return JSONUtils.SimpleJSONError("Failed to retrieve InterOp metrics: " + e.getMessage());
     }
   }
@@ -176,12 +174,10 @@ public class StatsControllerHelperService {
       }
       return JSONUtils.SimpleJSONResponse("Run already set to non-Unknown: " + runAlias);
     } catch (IntegrationException e) {
-      e.printStackTrace();
-      log.debug("Failed", e);
+      log.error("Failed", e);
       return JSONUtils.SimpleJSONError("Failed to retrieve run progress: " + e.getMessage());
     } catch (IOException e) {
-      e.printStackTrace();
-      log.debug("Failed", e);
+      log.error("Failed", e);
       return JSONUtils.SimpleJSONError("Failed to retrieve run progress: " + e.getMessage());
     }
   }

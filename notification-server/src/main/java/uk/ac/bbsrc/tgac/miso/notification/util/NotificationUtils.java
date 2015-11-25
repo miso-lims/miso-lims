@@ -125,7 +125,7 @@ public class NotificationUtils {
 
       newheaders.put(SignatureHelper.SIGNATURE_HEADER, SignatureHelper.createSignature(stringHeaders, url, SignatureHelper.PUBLIC_KEY));
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("sign message headers", e);
     }
     return newheaders;
   }

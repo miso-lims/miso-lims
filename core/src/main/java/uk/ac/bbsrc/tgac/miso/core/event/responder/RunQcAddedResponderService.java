@@ -97,7 +97,6 @@ public class RunQcAddedResponderService extends AbstractResponderService {
           lastAdded = lqc.get(lqc.size() - 1);
         } catch (NoSuchMethodException e) {
           log.error("Cannot sort list of run QCs", e);
-          e.printStackTrace();
         }
       }
 
@@ -126,8 +125,7 @@ public class RunQcAddedResponderService extends AbstractResponderService {
           try {
             as.raiseAlert(a);
           } catch (AlertingException e) {
-            log.error("Cannot raise user-level alert:" + e.getMessage());
-            e.printStackTrace();
+            log.error("Cannot raise user-level alert", e);
           }
         }
       }

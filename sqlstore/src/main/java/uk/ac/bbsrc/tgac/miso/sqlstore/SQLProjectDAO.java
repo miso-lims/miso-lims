@@ -318,7 +318,7 @@ public class SQLProjectDAO implements ProjectStore {
             try {
               fInsert.execute(fcParams);
             } catch (DuplicateKeyException dke) {
-              log.warn("This Project/Issue Key combination already exists - not inserting: " + dke.getMessage());
+              log.error("This Project/Issue Key combination already exists - not inserting", dke);
             }
           }
         }
@@ -374,7 +374,7 @@ public class SQLProjectDAO implements ProjectStore {
       try {
         pInsert.execute(poParams);
       } catch (DuplicateKeyException dke) {
-        log.warn("This Project/Overview combination already exists - not inserting: " + dke.getMessage());
+        log.error("This Project/Overview combination already exists - not inserting", dke);
       }
     } else {
       params.addValue("overviewId", overview.getId());
@@ -565,7 +565,7 @@ public class SQLProjectDAO implements ProjectStore {
             project.setStudies(studyDAO.listByProjectId(id));
           }
         } catch (IOException e1) {
-          e1.printStackTrace();
+          log.error("project row mapper", e1);
         }
 
         if (projectAlertManager != null) {
@@ -577,9 +577,9 @@ public class SQLProjectDAO implements ProjectStore {
           log.debug("Cache put for Project " + id);
         }
       } catch (net.sf.ehcache.CacheException ce) {
-        ce.printStackTrace();
+        log.error("project row mapper", ce);
       } catch (UnsupportedOperationException uoe) {
-        uoe.printStackTrace();
+        log.error("project row mapper", uoe);
       }
       return project;
     }
@@ -642,7 +642,7 @@ public class SQLProjectDAO implements ProjectStore {
           overview.addWatcher(u);
         }
       } catch (IOException e) {
-        e.printStackTrace();
+        log.error("project overview row mapper", e);
       }
 
       if (isCacheEnabled() && lookupCache(cacheManager) != null) {

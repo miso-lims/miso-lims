@@ -25,12 +25,14 @@ package uk.ac.bbsrc.tgac.miso.core.event.impl;
 
 import java.io.IOException;
 
-import org.aspectj.lang.annotation.Aspect;
-
 import com.eaglegenomics.simlims.core.User;
-
+import org.aspectj.lang.annotation.Aspect;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.ProjectAlertManager;
+
+import java.io.IOException;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.event
@@ -43,6 +45,7 @@ import uk.ac.bbsrc.tgac.miso.core.event.manager.ProjectAlertManager;
  */
 @Aspect
 public class ProjectAlertAspect {
+  protected static final Logger log = LoggerFactory.getLogger(ProjectAlertAspect.class);
   private ProjectAlertManager projectAlertManager;
 
   public ProjectAlertAspect(ProjectAlertManager projectAlertManager) {
@@ -55,7 +58,7 @@ public class ProjectAlertAspect {
         projectAlertManager.removeWatcher(project, user.getUserId());
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("remove watcher", e);
     }
   }
 
@@ -65,7 +68,7 @@ public class ProjectAlertAspect {
         projectAlertManager.addWatcher(project, user.getUserId());
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("add watcher", e);
     }
   }
 
@@ -73,7 +76,7 @@ public class ProjectAlertAspect {
     try {
       projectAlertManager.update(projectId);
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("update alert aspect", e);
     }
   }
 }

@@ -32,10 +32,8 @@ public class MisoNameGeneratorResolverService implements NameGeneratorResolverSe
           return generator.getClass().newInstance();
         } catch (InstantiationException e) {
           log.error("Cannot create a new instance of '" + generatorName + "'", e);
-          e.printStackTrace();
         } catch (IllegalAccessException e) {
           log.error("Cannot create a new instance of '" + generatorName + "'", e);
-          e.printStackTrace();
         }
       }
     }

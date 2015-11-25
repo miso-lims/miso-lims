@@ -92,7 +92,7 @@ public class RapidLibraryTagBarcodeStrategy implements TagBarcodeStrategy, Reque
             }
           }
         } catch (IOException e) {
-          e.printStackTrace();
+          log.error("get barcodes", e);
         }
       }
     }

@@ -123,7 +123,7 @@ public class SQLPrintServiceDAO implements PrintServiceStore {
       String contextFieldJSON = contextFields.toString();
       params.addValue("contextFields", contextFieldJSON);
     } catch (IllegalAccessException e) {
-      e.printStackTrace();
+      log.error("save print service", e);
     }
 
     if (printService.getServiceId() == -1) {
@@ -213,13 +213,13 @@ public class SQLPrintServiceDAO implements PrintServiceStore {
 
         return printService;
       } catch (ClassNotFoundException e) {
-        e.printStackTrace();
+        log.error("print service row mapper", e);
       } catch (IllegalAccessException e) {
-        e.printStackTrace();
+        log.error("print service row mapper", e);
       } catch (JSONException e) {
-        e.printStackTrace();
+        log.error("print service row mapper", e);
       } catch (IOException e) {
-        e.printStackTrace();
+        log.error("print service row mapper", e);
       }
       return null;
     }

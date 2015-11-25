@@ -335,7 +335,7 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
         try {
           eInsert.execute(flParams);
         } catch (DuplicateKeyException dke) {
-          log.debug("This Container/Partition combination already exists - not inserting: " + dke.getMessage());
+          log.error("This Container/Partition combination already exists - not inserting", dke);
         }
       }
     }
@@ -394,7 +394,7 @@ public class SQLSequencerPartitionContainerDAO implements SequencerPartitionCont
         s.setLastModifier(securityDAO.getUserById(rs.getLong("lastModifier")));
         s.getChangeLog().addAll(changeLogDAO.listAllById(TABLE_NAME, "container", id));
       } catch (IOException e1) {
-        e1.printStackTrace();
+        log.error("partition container row mapper", e1);
       }
 
       if (isCacheEnabled() && lookupCache(cacheManager) != null) {

@@ -199,9 +199,6 @@ public class AnalysisController {
    */
   @RequestMapping(value = "/analysis/task/{taskID}", method = RequestMethod.GET)
   public @ResponseBody ConanTask<? extends ConanPipeline> getTask(@PathVariable String taskID) {
-    /*
-     * try { return getQueryService().getTask(taskID); } catch (InterrogationException e) { e.printStackTrace(); return null; }
-     */
     return null;
   }
 
@@ -213,9 +210,6 @@ public class AnalysisController {
    */
   @RequestMapping(value = "/analysis/tasks", method = RequestMethod.GET)
   public @ResponseBody List<ConanTask<? extends ConanPipeline>> getTasks() {
-    /*
-     * try { return getQueryService().getTasks(); } catch (InterrogationException e) { e.printStackTrace(); return null; }
-     */
     return null;
   }
 
@@ -227,9 +221,7 @@ public class AnalysisController {
    */
   @RequestMapping(value = "/analysis/tasks", method = RequestMethod.GET, params = "pending")
   public @ResponseBody List<ConanTask<? extends ConanPipeline>> getPendingTasks() {
-    /*
-     * try { return getQueryService().getPendingTasks(); } catch (InterrogationException e) { e.printStackTrace(); return null; }
-     */
+
     return null;
   }
 
@@ -240,9 +232,6 @@ public class AnalysisController {
    */
   @RequestMapping(value = "/analysis/tasks", method = RequestMethod.GET, params = "running")
   public @ResponseBody List<ConanTask<? extends ConanPipeline>> getRunningTasks() {
-    /*
-     * try { return getQueryService().getRunningTasks(); } catch (InterrogationException e) { e.printStackTrace(); return null; }
-     */
     return null;
   }
 
@@ -254,9 +243,6 @@ public class AnalysisController {
    */
   @RequestMapping(value = "/analysis/tasks", method = RequestMethod.GET, params = "complete")
   public @ResponseBody List<ConanTask<? extends ConanPipeline>> getCompletedTasks() {
-    /*
-     * try { return getQueryService().getCompletedTasks(); } catch (InterrogationException e) { e.printStackTrace(); return null; }
-     */
     return null;
   }
 
@@ -268,9 +254,6 @@ public class AnalysisController {
    */
   @RequestMapping(value = "/analysis/pipeline/{pipelineName}", method = RequestMethod.GET)
   public @ResponseBody ConanPipeline getPipeline(@PathVariable String pipelineName) {
-    /*
-     * try { return getQueryService().getPipeline(pipelineName); } catch (InterrogationException e) { e.printStackTrace(); return null; }
-     */
     return null;
   }
 
@@ -282,16 +265,6 @@ public class AnalysisController {
    */
   @RequestMapping(value = "/analysis/pipelines", method = RequestMethod.GET)
   public @ResponseBody List<ConanPipeline> getPipelines() {
-    /*
-     * try { return getQueryService().getPipelines(); } catch (InterrogationException e) { e.printStackTrace(); return null; }
-     */
     return null;
   }
-
-  /*
-   * @RequestMapping(value = "/task/{taskId}", method = RequestMethod.POST) public String processSubmit(@ModelAttribute("task") ConanTask<?
-   * extends ConanPipeline> t, ModelMap model, SessionStatus session) throws IOException { try { session.setComplete(); model.clear();
-   * return "redirect:/miso/analysis"; } catch (IOException ex) { if (log.isDebugEnabled()) { log.debug("Failed to do stuff", ex); } throw
-   * ex; } }
-   */
 }

@@ -36,6 +36,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.*;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ls454.LS454Run;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,6 +52,7 @@ import java.util.regex.Pattern;
  * Created by IntelliJ IDEA. User: bian Date: 10-Jun-2010 Time: 10:14:21 read excel 2007+ file
  */
 public class ImportExcel {
+  protected static final Logger log = LoggerFactory.getLogger(ImportExcel.class);
 
   static MisoRequestManager misoManager = new MisoRequestManager();
   static LocalSecurityManager securityManager = new LocalSecurityManager();
@@ -95,7 +98,7 @@ public class ImportExcel {
         processIlluminaData(misoManager.getPlatformById(15), hiSeqData);
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("Excel", e);
     } finally {
       if (fis2 != null) {
         fis2.close();
@@ -314,7 +317,7 @@ public class ImportExcel {
 
           if (runDescription.equals(runD)) {
             run = r;
-            System.out.println("Run [using existing run]: " + run);
+            log.info("Run [using existing run]: " + run);
           }
         }
       } else {
@@ -323,7 +326,7 @@ public class ImportExcel {
         run.setPlatformType(PlatformType.LS454);
         run.setSecurityProfile(sp);
         misoManager.saveRun(run);
-        System.out.println("Run [new run created]: " + run);
+        log.info("Run [new run created]: " + run);
       }
     }
 
@@ -384,7 +387,7 @@ public class ImportExcel {
               run.getStatus().setInstrumentName(machine);
               long runId = misoManager.saveRun(run);
               run.setRunId(runId);
-              System.out.println("Run [new illumina run created]: " + run);
+              log.info("Run [new illumina run created]: " + run);
             }
           }
         }

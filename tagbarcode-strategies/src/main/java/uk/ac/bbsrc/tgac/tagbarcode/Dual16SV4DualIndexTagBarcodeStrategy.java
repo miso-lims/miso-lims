@@ -101,7 +101,7 @@ public class Dual16SV4DualIndexTagBarcodeStrategy implements TagBarcodeStrategy,
             }
           }
         } catch (IOException e) {
-          e.printStackTrace();
+          log.error("get barcodes", e);
         }
       } else {
         log.error("Null requestManager");

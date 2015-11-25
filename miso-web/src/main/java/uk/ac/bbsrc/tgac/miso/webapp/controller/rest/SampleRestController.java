@@ -80,6 +80,7 @@ public class SampleRestController {
       }
       return mapper.writeValueAsString(RestUtils.error("No such sample with that ID.", "sampleId", sampleId.toString()));
     } catch (IOException ioe) {
+      log.error("cannot retrieve sample", ioe);
       return mapper.writeValueAsString(RestUtils.error("Cannot retrieve sample: " + ioe.getMessage(), "sampleId", sampleId.toString()));
     }
   }

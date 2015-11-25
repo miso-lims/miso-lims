@@ -42,8 +42,7 @@ public class SqlProfiler {
       }
     }
     sqlTiming.recordTiming(time);
-    System.out
-        .println(pjp.getArgs()[0].toString() + " :: " + sqlTimings.get(pjp.getArgs()[0].toString()).getCumulativeExecutionTime() + "s");
+    log.info(pjp.getArgs()[0].toString() + " :: " + sqlTimings.get(pjp.getArgs()[0].toString()).getCumulativeExecutionTime() + "s");
     return obj;
   }
 

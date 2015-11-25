@@ -117,9 +117,9 @@ public class SQLPrintJobDAO implements PrintJobStore {
         params.addValue("printedElements", null);
       }
     } catch (SerialException e) {
-      e.printStackTrace();
+      log.error("print job save", e);
     } catch (SQLException e) {
-      e.printStackTrace();
+      log.error("print job save", e);
     }
 
     if (printJob.getJobId() == AbstractPrintJob.UNSAVED_ID) {
@@ -185,9 +185,9 @@ public class SQLPrintJobDAO implements PrintJobStore {
         printJob.setStatus(rs.getString("status"));
         return printJob;
       } catch (IOException e) {
-        e.printStackTrace();
+        log.error("print job row mapper", e);
       } catch (ClassNotFoundException e) {
-        e.printStackTrace();
+        log.error("print job row mapper", e);
       }
       return null;
     }

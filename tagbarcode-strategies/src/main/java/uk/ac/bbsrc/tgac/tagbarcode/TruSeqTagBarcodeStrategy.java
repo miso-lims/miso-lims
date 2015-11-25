@@ -93,7 +93,7 @@ public class TruSeqTagBarcodeStrategy implements TagBarcodeStrategy, RequestMana
             }
           }
         } catch (IOException e) {
-          e.printStackTrace();
+          log.error("get barcodes", e);
         }
       }
     }

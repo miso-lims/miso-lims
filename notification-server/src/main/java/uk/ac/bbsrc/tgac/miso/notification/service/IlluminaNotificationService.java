@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.notification.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -49,6 +51,7 @@ import java.util.regex.Pattern;
  */
 @Deprecated
 public class IlluminaNotificationService {
+  protected static final Logger log = LoggerFactory.getLogger(IlluminaNotificationService.class);
   public JobLaunchRequest filesToJobRequest(Set<File> files) {
     Map<String, String> params = new HashMap<String, String>();
     String regex = ".*/([\\d]+_[A-z0-9]+_[\\d]+_[A-z0-9_]*)/.*";
@@ -65,7 +68,7 @@ public class IlluminaNotificationService {
   public Set<Resource> filesToResources(Set<File> files) throws DuplicateJobException {
     Set<Resource> resources = new HashSet<Resource>();
     for (File f : files) {
-      System.out.println("Converting file " + f.getName() + " to resource...");
+      log.info("Converting file " + f.getName() + " to resource...");
       resources.add(new FileSystemResource(f));
     }
 
@@ -84,9 +87,9 @@ public class IlluminaNotificationService {
       br.close();
       hm.put("statusXml", sb.toString());
     } catch (FileNotFoundException e) {
-      e.printStackTrace();
+      log.warn("handle status XML", e);
     } catch (IOException e) {
-      e.printStackTrace();
+      log.warn("handle status XML", e);
     }
     return NotificationUtils.buildSimplePostMessage(hm);
   }

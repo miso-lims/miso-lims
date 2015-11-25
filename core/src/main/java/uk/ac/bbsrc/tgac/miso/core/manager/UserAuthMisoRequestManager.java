@@ -109,8 +109,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
       try {
         return s.userCanRead(getCurrentUser());
       } catch (IOException e) {
-        e.printStackTrace();
-        log.error("Cannot resolve a currently logged in user: " + e.getMessage());
+        log.error("Cannot resolve a currently logged in user", e);
       }
     } else {
       throw new IOException("Cannot check read permissions for null object. Does this object really exist?");
@@ -123,8 +122,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
       try {
         return s.userCanWrite(getCurrentUser());
       } catch (IOException e) {
-        e.printStackTrace();
-        log.error("Cannot resolve a currently logged in user: " + e.getMessage());
+        log.error("cannot resolve a currently logged in user", e);
       }
     } else {
       throw new IOException("Cannot check write permissions for null object. Does this object really exist?");

@@ -100,7 +100,7 @@ public class SureSelectXT2TagBarcodeStrategy implements TagBarcodeStrategy, Requ
             }
           }
         } catch (IOException e) {
-          e.printStackTrace();
+          log.error("get barcodes", e);
         }
       }
     }

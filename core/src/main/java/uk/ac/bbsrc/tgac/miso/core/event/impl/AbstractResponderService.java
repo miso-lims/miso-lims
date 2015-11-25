@@ -93,8 +93,7 @@ public abstract class AbstractResponderService implements ResponderService {
         try {
           as.raiseAlert(a);
         } catch (AlertingException e) {
-          log.error("Cannot raise system alert:" + e.getMessage());
-          e.printStackTrace();
+          log.error("Cannot raise system alert", e);
         }
       }
     }
@@ -113,8 +112,7 @@ public abstract class AbstractResponderService implements ResponderService {
         try {
           as.raiseAlert(a);
         } catch (AlertingException e) {
-          log.error("Cannot raise user-level alert:" + e.getMessage());
-          e.printStackTrace();
+          log.error("Cannot raise user-level alert", e);
         }
       }
     }

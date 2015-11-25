@@ -139,6 +139,7 @@ public class SignatureHelper {
       // base64-encode the hmac
       result = Base64.encodeBase64URLSafeString(rawHmac);
     } catch (Exception e) {
+      log.error("failed to generate HMAC", e);
       throw new SignatureException("Failed to generate HMAC : " + e.getMessage());
     }
     return result;
@@ -165,7 +166,7 @@ public class SignatureHelper {
     try {
       return signature.verify(Base64.decodeBase64(signatureString));
     } catch (SignatureException e) {
-      log.error("FAILED TO VERIFY SIGNATURE: " + signature.toString());
+      log.error("FAILED TO VERIFY SIGNATURE: " + signature.toString(), e);
       return false;
     }
   }

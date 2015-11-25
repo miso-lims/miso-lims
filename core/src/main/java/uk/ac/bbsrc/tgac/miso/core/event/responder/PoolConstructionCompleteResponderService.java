@@ -100,8 +100,7 @@ public class PoolConstructionCompleteResponderService implements ResponderServic
           try {
             as.raiseAlert(a);
           } catch (AlertingException e) {
-            log.error("Cannot raise user-level alert:" + e.getMessage());
-            e.printStackTrace();
+            log.error("Cannot raise user-level alert", e);
           }
         }
       }

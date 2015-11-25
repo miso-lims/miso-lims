@@ -63,12 +63,12 @@ public class MisoJdbcUserDetailsManager extends JdbcUserDetailsManager {
                 String s1 = new String(rbytes);
                 String[] roles = s1.split(",");
                 for (String role : roles) {
-                  System.out.println("Found role " + role + " for " + rs.getString("username"));
+                  log.info("Found role " + role + " for " + rs.getString("username"));
                   GrantedAuthorityImpl authority = new GrantedAuthorityImpl(role);
                   roleList.add(authority);
                 }
               } else {
-                System.out.println("Cannot process user login - cannot extract roles from database");
+                log.error("Cannot process user login - cannot extract roles from database");
               }
             }
 
@@ -77,8 +77,7 @@ public class MisoJdbcUserDetailsManager extends JdbcUserDetailsManager {
               if (rs.getBoolean("external")) roleList.add(new GrantedAuthorityImpl("ROLE_EXTERNAL"));
               if (rs.getBoolean("internal")) roleList.add(new GrantedAuthorityImpl("ROLE_INTERNAL"));
             } catch (SQLException e) {
-              e.printStackTrace();
-              log.warn("Couldn't retrieve a user property to convert to a role: " + e.getMessage());
+              log.error("Couldn't retrieve a user property to convert to a role", e);
             }
 
             if (roleList.isEmpty()) {

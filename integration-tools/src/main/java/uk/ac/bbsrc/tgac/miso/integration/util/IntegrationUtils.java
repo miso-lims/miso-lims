@@ -25,6 +25,8 @@ package uk.ac.bbsrc.tgac.miso.integration.util;
 
 import org.apache.commons.codec.binary.Base64InputStream;
 import org.apache.commons.codec.binary.Base64OutputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.*;
@@ -41,6 +43,7 @@ import java.util.zip.GZIPOutputStream;
  * @since 0.1.3
  */
 public class IntegrationUtils {
+  protected static final Logger log = LoggerFactory.getLogger(IntegrationUtils.class);
   /**
    * Sets up the socket connection to a given host
    * 
@@ -56,7 +59,7 @@ public class IntegrationUtils {
     try {
       return new Socket(host, port);
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("prepare socket", e);
       throw new IntegrationException("Cannot connect to " + host + ":" + port + ". Cause: " + e.getMessage());
     }
   }
@@ -107,10 +110,10 @@ public class IntegrationUtils {
 
       return response.toString().replace("\\\n", "").replace("\\\t", "");
     } catch (UnknownHostException e) {
-      System.err.println("Cannot resolve host: " + socket.getInetAddress());
+      log.error("Cannot resolve host: " + socket.getInetAddress(), e);
       throw new IntegrationException(e.getMessage());
     } catch (IOException e) {
-      System.err.println("Couldn't get I/O for the connection to: " + socket.getInetAddress());
+      log.error("Couldn't get I/O for the connection to: " + socket.getInetAddress(), e);
       throw new IntegrationException(e.getMessage());
     } finally {
       try {
@@ -121,7 +124,7 @@ public class IntegrationUtils {
           rd.close();
         }
       } catch (Throwable t) {
-        t.printStackTrace();
+        log.error("close socket", t);
       }
     }
   }

@@ -86,8 +86,7 @@ public class IlluminaCortexStatsHandler {
               out.write(buf, 0, len);
             }
           } catch (IOException e) {
-            log.error("Could not write temporary file: " + outFile.getAbsolutePath());
-            e.printStackTrace();
+            log.error("Could not write temporary file: " + outFile.getAbsolutePath(), e);
           } finally {
             try {
               bis.close();

@@ -174,7 +174,8 @@ public class SQLEntityGroupDAO implements EntityGroupStore {
   public long save(EntityGroup<? extends Nameable, ? extends Nameable> entityGroup) throws IOException {
     // save group
     MapSqlParameterSource params = new MapSqlParameterSource();
-    params.addValue("parentId", entityGroup.getParent().getId());params.addValue("parentType", entityGroup.getParent().getClass().getName());
+    params.addValue("parentId", entityGroup.getParent().getId());
+    params.addValue("parentType", entityGroup.getParent().getClass().getName());
 
     if (entityGroup.getId() == EntityGroupImpl.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("entityGroupId");

@@ -56,10 +56,8 @@ public class MisoBarcodableSchemaResolverService implements BarcodableSchemaReso
           return barcodableSchema.getClass().newInstance();
         } catch (InstantiationException e) {
           log.error("Cannot create a new instance of '" + name + "'", e);
-          e.printStackTrace();
         } catch (IllegalAccessException e) {
           log.error("Cannot create a new instance of '" + name + "'", e);
-          e.printStackTrace();
         }
       }
     }

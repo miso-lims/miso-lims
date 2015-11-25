@@ -24,12 +24,13 @@
 package uk.ac.bbsrc.tgac.miso.core.data.impl;
 
 import java.io.Serializable;
-
 import com.eaglegenomics.simlims.core.User;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
+
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.impl
@@ -40,6 +41,7 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
  * @since 0.0.2
  */
 public class SampleQCImpl extends AbstractSampleQC implements Serializable {
+  protected static final Logger log = LoggerFactory.getLogger(SampleQCImpl.class);
   /**
    * Construct a new SampleQCImpl
    */
@@ -60,7 +62,7 @@ public class SampleQCImpl extends AbstractSampleQC implements Serializable {
       try {
         setSample(sample);
       } catch (MalformedSampleException e) {
-        e.printStackTrace();
+        log.error("constructor", e);
       }
     } else {
     }

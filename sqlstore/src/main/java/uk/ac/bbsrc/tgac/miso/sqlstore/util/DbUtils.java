@@ -87,18 +87,15 @@ public class DbUtils {
       Object o = JdbcUtils.extractDatabaseMetaData(template.getDataSource(), new GetColumnSizes(connection.getCatalog(), table));
       return (HashMap<String, Integer>) o;
     } catch (MetaDataAccessException e) {
-      e.printStackTrace();
-      log.warn("Could not retrieve table " + table + " field lengths: " + e.getMessage());
+      log.error("Could not retrieve table " + table + " field lengths", e);
     } catch (SQLException e) {
-      e.printStackTrace();
-      log.warn("Could not retrieve table " + table + " field lengths: " + e.getMessage());
+      log.error("Could not retrieve table " + table + " field lengths", e);
     } finally {
       if (connection != null) {
         try {
           connection.close();
         } catch (SQLException e) {
-          e.printStackTrace();
-          log.error("Badness! Could not close connection!");
+          log.error("Badness! Could not close connection!", e);
         }
       }
     }
@@ -112,18 +109,15 @@ public class DbUtils {
       Object o = JdbcUtils.extractDatabaseMetaData(template.getDataSource(), new GetColumnSizes(connection.getCatalog(), table));
       return ((HashMap<String, Integer>) o).get(column);
     } catch (MetaDataAccessException e) {
-      e.printStackTrace();
-      log.warn("Could not retrieve field " + column + " max length: " + e.getMessage());
+      log.error("Could not retrieve field " + column + " max length", e);
     } catch (SQLException e) {
-      e.printStackTrace();
-      log.warn("Could not retrieve field " + column + " max length: " + e.getMessage());
+      log.error("Could not retrieve field " + column + " max length", e);
     } finally {
       if (connection != null) {
         try {
           connection.close();
         } catch (SQLException e) {
-          e.printStackTrace();
-          log.error("Badness! Could not close connection!");
+          log.error("Badness! Could not close connection!", e);
         }
       }
     }

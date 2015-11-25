@@ -137,7 +137,7 @@ public class EraRunDecorator extends AbstractSubmittableDecorator<Document> {
               files.appendChild(file2);
             }
           } catch (Exception e) {
-            e.printStackTrace();
+            log.error("build submission", e);
           }
 
           dataBlock.appendChild(files);

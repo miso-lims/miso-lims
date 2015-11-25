@@ -88,8 +88,7 @@ public class IRODSFilepathGenerator implements FilePathGenerator {
       this.irodsAccessObjectFactory = irodsFileSystem.getIRODSAccessObjectFactory();
       this.queryExecutorAO = irodsAccessObjectFactory.getIRODSGenQueryExecutor(account);
     } catch (JargonException e) {
-      log.error("Cannot create IRODSFilepathGenerator instance: " + e.getMessage());
-      e.printStackTrace();
+      log.error("Cannot create IRODSFilepathGenerator instance", e);
     }
   }
 
@@ -124,7 +123,7 @@ public class IRODSFilepathGenerator implements FilePathGenerator {
             throw new JargonException("error executing query", jqe);
           }
         } catch (JargonException e) {
-          e.printStackTrace();
+          log.error("error executing query", e);
         }
 
         for (String fp : filePaths) {

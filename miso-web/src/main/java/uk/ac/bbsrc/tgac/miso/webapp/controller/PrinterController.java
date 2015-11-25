@@ -96,7 +96,7 @@ public class PrinterController {
       Collection<? extends PrintJob> jobs = printManager.listPrintJobsByPrintService(ps);
       model.put("printJobs", jobs);
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("view barcode printer", e);
     }
     return new ModelAndView("/pages/viewPrinters.jsp", model);
   }
@@ -108,7 +108,7 @@ public class PrinterController {
       Collection<? extends PrintJob> jobs = printManager.listPrintJobsByUser(user);
       model.put("userPrintJobs", jobs);
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("my print jobs", e);
     }
     return new ModelAndView("/pages/viewPrinters.jsp", model);
   }

@@ -128,22 +128,22 @@ public class AnalysisRequestManager {
         }
       }
     } catch (NoSuchMethodException e) {
-      e.printStackTrace();
+      log.error("query tasks", e);
       return "ERROR: " + e.getMessage();
     } catch (InvocationTargetException e) {
-      e.printStackTrace();
+      log.error("query tasks", e);
       return "ERROR: " + e.getMessage();
     } catch (IllegalAccessException e) {
-      e.printStackTrace();
+      log.error("query tasks", e);
       return "ERROR: " + e.getMessage();
     } catch (JsonMappingException e) {
-      e.printStackTrace();
+      log.error("query tasks", e);
       return "ERROR: " + e.getMessage();
     } catch (JsonGenerationException e) {
-      e.printStackTrace();
+      log.error("query tasks", e);
       return "ERROR: " + e.getMessage();
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("query tasks", e);
       return "ERROR: " + e.getMessage();
     }
   }
@@ -198,22 +198,22 @@ public class AnalysisRequestManager {
         }
       }
     } catch (NoSuchMethodException e) {
-      e.printStackTrace();
+      log.error("query pipeliens", e);
       return "ERROR: " + e.getMessage();
     } catch (InvocationTargetException e) {
-      e.printStackTrace();
+      log.error("query pipeliens", e);
       return "ERROR: " + e.getMessage();
     } catch (IllegalAccessException e) {
-      e.printStackTrace();
+      log.error("query pipeliens", e);
       return "ERROR: " + e.getMessage();
     } catch (JsonMappingException e) {
-      e.printStackTrace();
+      log.error("query pipeliens", e);
       return "ERROR: " + e.getMessage();
     } catch (JsonGenerationException e) {
-      e.printStackTrace();
+      log.error("query pipeliens", e);
       return "ERROR: " + e.getMessage();
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("query pipeliens", e);
       return "ERROR: " + e.getMessage();
     }
   }

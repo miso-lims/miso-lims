@@ -41,11 +41,12 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 import org.apache.commons.lang.BooleanUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.eaglegenomics.simlims.core.Request;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
-
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
@@ -60,6 +61,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
  */
 @Entity
 public abstract class AbstractProject implements Project {
+  protected static final Logger log = LoggerFactory.getLogger(AbstractProject.class);
   private static final long serialVersionUID = 1L;
 
   /**
@@ -90,7 +92,7 @@ public abstract class AbstractProject implements Project {
 
   @OneToOne(cascade = CascadeType.ALL)
   private SecurityProfile securityProfile = null;
-  private Set<MisoListener> listeners = new HashSet<MisoListener>();
+  private final Set<MisoListener> listeners = new HashSet<MisoListener>();
   private Date lastUpdated;
   private Set<User> watchers = new HashSet<User>();
 
@@ -202,7 +204,7 @@ public abstract class AbstractProject implements Project {
     try {
       Collections.sort(Arrays.asList(this.samples), new AliasComparator(Sample.class));
     } catch (NoSuchMethodException e) {
-      e.printStackTrace();
+      log.error("set samples", e);
     }
   }
 
@@ -212,7 +214,7 @@ public abstract class AbstractProject implements Project {
     try {
       Collections.sort(Arrays.asList(this.runs), new AliasComparator(Run.class));
     } catch (NoSuchMethodException e) {
-      e.printStackTrace();
+      log.error("set runs", e);
     }
   }
 
@@ -222,7 +224,7 @@ public abstract class AbstractProject implements Project {
     try {
       Collections.sort(Arrays.asList(this.samples), new AliasComparator(Sample.class));
     } catch (NoSuchMethodException e) {
-      e.printStackTrace();
+      log.error("set sample", e);
     }
   }
 
@@ -232,7 +234,7 @@ public abstract class AbstractProject implements Project {
     try {
       Collections.sort(Arrays.asList(this.studies), new AliasComparator(Study.class));
     } catch (NoSuchMethodException e) {
-      e.printStackTrace();
+      log.error("set studies", e);
     }
   }
 

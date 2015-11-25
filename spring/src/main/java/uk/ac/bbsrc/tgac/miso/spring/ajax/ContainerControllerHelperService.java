@@ -124,7 +124,7 @@ public class ContainerControllerHelperService {
         return JSONUtils.JSONObjectResponse(responseMap);
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("failed to get container options", e);
       return JSONUtils.SimpleJSONError("Failed to get Container options");
     }
   }
@@ -247,7 +247,7 @@ public class ContainerControllerHelperService {
       b.append("</div>");
       return JSONUtils.SimpleJSONResponse(b.toString());
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("no sequencer reference defined", e);
       return JSONUtils.SimpleJSONError("No sequencer reference defined");
     }
   }
@@ -338,7 +338,7 @@ public class ContainerControllerHelperService {
       b.append("</div>");
       return JSONUtils.SimpleJSONResponse(b.toString());
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("no sequencer reference defined", e);
       return JSONUtils.SimpleJSONError("No sequencer reference defined");
     }
   }
@@ -532,7 +532,7 @@ public class ContainerControllerHelperService {
         return JSONUtils.JSONObjectResponse("err", "Error: pool platform does not match container platform");
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("no such pool", e);
       return JSONUtils.JSONObjectResponse("err", "Error: no such pool");
     }
   }
@@ -623,7 +623,7 @@ public class ContainerControllerHelperService {
 
       return JSONUtils.JSONObjectResponse("html", sb.toString());
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("check pool experiment", e);
       return JSONUtils.SimpleJSONError(e.getMessage());
     }
   }
@@ -709,11 +709,8 @@ public class ContainerControllerHelperService {
       b.append(
           "<span style='position: absolute; top: 0; right: 0;' onclick='Container.pool.confirmPoolRemove(this);' class='float-right ui-icon ui-icon-circle-close'></span>");
       b.append("</div>");
-    } catch (IOException e) {
-      e.printStackTrace();
-      return "Cannot get studies for pool: " + e.getMessage();
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("cannot get studies for pool", e);
       return "Cannot get studies for pool: " + e.getMessage();
     }
 
@@ -755,7 +752,7 @@ public class ContainerControllerHelperService {
         p.addExperiment(e);
         requestManager.saveExperiment(e);
       } catch (MalformedExperimentException e1) {
-        e1.printStackTrace();
+        log.error("failed to save experiment", e1);
         return JSONUtils.SimpleJSONError("Failed to save experiment: " + e1.getMessage());
       }
 
@@ -765,7 +762,7 @@ public class ContainerControllerHelperService {
 
       return JSONUtils.JSONObjectResponse("html", sb.toString());
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("select study for pool", e);
       return JSONUtils.SimpleJSONError("Failed " + e.getMessage());
     }
   }
@@ -860,7 +857,7 @@ public class ContainerControllerHelperService {
           return JSONUtils.JSONObjectResponse("error", "No containers with this barcode.");
         }
       } catch (IOException e) {
-        e.printStackTrace();
+        log.error("unable to lookup barcode", e);
         return JSONUtils.JSONObjectResponse("error", "Unable to lookup barcode.");
       }
     } else {
@@ -899,7 +896,7 @@ public class ContainerControllerHelperService {
       j.put("array", jsonArray);
       return j;
     } catch (IOException e) {
-      log.debug("Failed", e);
+      log.error("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
   }
@@ -936,7 +933,7 @@ public class ContainerControllerHelperService {
         return JSONUtils.SimpleJSONError("No Sequencer Partition Container specified");
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("error getting currently logged in user", e);
       return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
     }
   }
@@ -946,7 +943,7 @@ public class ContainerControllerHelperService {
     try {
       user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("error getting currently logged in user", e);
       return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
     }
 
@@ -958,7 +955,7 @@ public class ContainerControllerHelperService {
           requestManager.deleteContainer(container);
           return JSONUtils.SimpleJSONResponse("Sequencer Partition Container deleted");
         } catch (IOException e) {
-          e.printStackTrace();
+          log.error("cannot delete sequencer parition container", e);
           return JSONUtils.SimpleJSONError("Cannot delete Sequencer Partition Container: " + e.getMessage());
         }
       } else {

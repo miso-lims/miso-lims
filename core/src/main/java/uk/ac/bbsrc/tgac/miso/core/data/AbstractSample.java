@@ -42,15 +42,17 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.w3c.dom.Document;
-
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleQcException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
+
 
 /**
  * Skeleton implementation of a Sample
@@ -61,6 +63,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @Entity
 @Table(name = "`Sample`")
 public abstract class AbstractSample implements Sample {
+  protected static final Logger log = LoggerFactory.getLogger(AbstractSample.class);
   public static final Long UNSAVED_ID = 0L;
   private static final long serialVersionUID = 1L;
 
@@ -78,7 +81,6 @@ public abstract class AbstractSample implements Sample {
   private Collection<SampleQC> sampleQCs = new TreeSet<SampleQC>();
 
   private Collection<Note> notes = new HashSet<Note>();
-
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
   private Set<Plate<? extends LinkedList<Sample>, Sample>> plates = new HashSet<Plate<? extends LinkedList<Sample>, Sample>>();
@@ -246,7 +248,7 @@ public abstract class AbstractSample implements Sample {
     try {
       sampleQc.setSample(this);
     } catch (MalformedSampleException e) {
-      e.printStackTrace();
+      log.error("add QC", e);
     }
   }
 

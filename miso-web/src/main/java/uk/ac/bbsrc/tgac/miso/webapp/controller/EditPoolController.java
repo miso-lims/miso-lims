@@ -280,7 +280,7 @@ public class EditPoolController {
       }
       throw ex;
     } catch (MalformedDilutionException e) {
-      e.printStackTrace();
+      log.error("setup form with dilution", e);
       throw new IOException(e);
     }
   }
@@ -295,8 +295,7 @@ public class EditPoolController {
         try {
           p.addPoolableElement(ld);
         } catch (MalformedDilutionException e) {
-          log.debug("Cannot add dilution " + s + " to pool " + p.getName());
-          e.printStackTrace();
+          log.error("Cannot add dilution " + s + " to pool " + p.getName(), e);
         }
       }
     }

@@ -81,6 +81,7 @@ public class LibraryRestController {
       }
       return mapper.writeValueAsString(RestUtils.error("No such library with that ID.", "libraryId", libraryId.toString()));
     } catch (IOException ioe) {
+      log.error("cannot retrieve library", ioe);
       return mapper.writeValueAsString(RestUtils.error("Cannot retrieve library: " + ioe.getMessage(), "libraryId", libraryId.toString()));
     }
   }

@@ -287,7 +287,7 @@ public class SQLSequencerPoolPartitionDAO implements PartitionStore {
           l.setSequencerPartitionContainer(sequencerPartitionContainerDAO.getSequencerPartitionContainerByPartitionId(id));
         }
       } catch (IOException e1) {
-        e1.printStackTrace();
+        log.error("sequencer pool partition row mapper", e1);
       }
 
       if (isCacheEnabled() && lookupCache(cacheManager) != null) {

@@ -85,6 +85,7 @@ public class NotificationRequestService {
     try {
       return notificationRequestManager.queryRunProgress(request);
     } catch (Exception ise) {
+      log.error("cannot retrieve run progress", ise);
       return "{\"error\":\"Cannot retrieve run status: " + ise.getMessage() + "\"}";
     }
   }
@@ -93,6 +94,7 @@ public class NotificationRequestService {
     try {
       return notificationRequestManager.queryRunStatus(request);
     } catch (Exception ise) {
+      log.error("cannot retrieve run status", ise);
       return "{\"error\":\"Cannot retrieve run status: " + ise.getMessage() + "\"}";
     }
   }
@@ -101,6 +103,7 @@ public class NotificationRequestService {
     try {
       return notificationRequestManager.queryRunInfo(request);
     } catch (Exception ise) {
+      log.error("cannot retrieve run info", ise);
       return "{\"error\":\"Cannot retrieve run information: " + ise.getMessage() + "\"}";
     }
   }
@@ -109,6 +112,7 @@ public class NotificationRequestService {
     try {
       return notificationRequestManager.queryRunParameters(request);
     } catch (Exception ise) {
+      log.error("cannot retrieve run parameters", ise);
       return "{\"error\":\"Cannot retrieve run parameters: " + ise.getMessage() + "\"}";
     }
   }
@@ -117,6 +121,7 @@ public class NotificationRequestService {
     try {
       return notificationRequestManager.queryInterOpMetrics(request);
     } catch (Exception ise) {
+      log.error("cannot retrieve run interop metrics", ise);
       return "{\"error\":\"Cannot retrieve InterOp metrics: " + ise.getMessage() + "\"}";
     }
   }

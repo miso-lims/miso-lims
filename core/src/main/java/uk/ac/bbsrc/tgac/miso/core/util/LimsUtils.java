@@ -122,7 +122,7 @@ public class LimsUtils {
       int responseCode = connection.getResponseCode();
       return (responseCode == 200);
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("is URL valid", e);
     }
     return false;
   }
@@ -132,7 +132,7 @@ public class LimsUtils {
       URL url = uri.toURL();
       return isUrlValid(url);
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("is URL valid", e);
     }
     return false;
   }
@@ -291,17 +291,13 @@ public class LimsUtils {
       }
       return diff;
     } catch (ConcurrentModificationException e) {
-      e.printStackTrace();
-      log.error("Backing set modification outside iterator.");
+      log.error("Backing set modification outside iterator.", e);
     } catch (NoSuchMethodException e) {
-      e.printStackTrace();
-      log.error("Class " + c.getName() + " doesn't declare a " + methodName + " method.");
+      log.error("Class " + c.getName() + " doesn't declare a " + methodName + " method.", e);
     } catch (InvocationTargetException e) {
-      e.printStackTrace();
-      log.error("Cannot invoke " + methodName + " on class " + c.getName());
+      log.error("Cannot invoke " + methodName + " on class " + c.getName(), e);
     } catch (IllegalAccessException e) {
-      e.printStackTrace();
-      log.error("Cannot invoke " + methodName + " on class " + c.getName());
+      log.error("Cannot invoke " + methodName + " on class " + c.getName(), e);
     }
     return null;
   }
@@ -353,10 +349,10 @@ public class LimsUtils {
         }
 
         if (entry.isDirectory()) {
-          System.out.println("Extracting directory: " + entry.getName());
+          log.info("Extracting directory: " + entry.getName());
           LimsUtils.checkDirectory(outputFile, true);
         } else {
-          System.out.println("Extracting file: " + entry.getName());
+          log.info("Extracting file: " + entry.getName());
           int count;
           byte data[] = new byte[BUFFER];
           FileOutputStream fos = new FileOutputStream(outputFile);
@@ -370,7 +366,7 @@ public class LimsUtils {
       }
       zis.close();
     } catch (Exception e) {
-      e.printStackTrace();
+      log.error("location lookup", e);
       return false;
     }
     return true;
@@ -415,8 +411,7 @@ public class LimsUtils {
           out.write(buf, 0, len);
         }
       } catch (IOException e) {
-        log.error("Could not write file: " + path.getAbsolutePath());
-        e.printStackTrace();
+        log.error("Could not write file: " + path.getAbsolutePath(), e);
       } finally {
         try {
           in.close();
@@ -728,6 +723,7 @@ public class LimsUtils {
         result.append("\n");
       }
     } catch (Exception e) {
+      log.error("reflect string", e);
       result.append("\n\nERROR: " + e.getMessage() + "\n\n");
     }
     return result.toString();
@@ -738,9 +734,7 @@ public class LimsUtils {
     try {
       c.close();
     } catch (Throwable t) {
-      // Resource close failed! There's only one thing we can do:
-      // Log the exception using your favorite logging framework
-      t.printStackTrace();
+      log.error("safe close", t);
     }
   }
 

@@ -31,8 +31,8 @@ import javax.persistence.Entity;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import org.w3c.dom.Document;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;import org.w3c.dom.Document;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
@@ -42,6 +42,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.UnicodeReader;
+
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.impl.illumina
@@ -54,6 +55,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.UnicodeReader;
 @Entity
 @DiscriminatorValue("Illumina")
 public class IlluminaRun extends RunImpl {
+  protected static final Logger log = LoggerFactory.getLogger(IlluminaRun.class);
 
   public IlluminaRun() {
     setPlatformType(PlatformType.ILLUMINA);
@@ -101,10 +103,9 @@ public class IlluminaRun extends RunImpl {
         log.error("No status XML for this run");
       }
     } catch (ParserConfigurationException e) {
-      e.printStackTrace();
+      log.error("Cannot parse status", e);
     } catch (TransformerException e) {
-      log.error("Cannot parse status: " + statusXml);
-      e.printStackTrace();
+      log.error("Cannot parse status: " + statusXml, e);
     }
   }
 

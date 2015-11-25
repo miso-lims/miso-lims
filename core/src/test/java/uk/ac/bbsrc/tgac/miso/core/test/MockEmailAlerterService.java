@@ -57,7 +57,7 @@ public class MockEmailAlerterService implements AlerterService {
     try {
       EmailUtils.send(to, from, subject, text, new Properties());
     } catch (MessagingException e) {
-      log.error("Cannot send email to alert recipients:" + e.getMessage());
+      log.error("Cannot send email to alert recipients", e);
       throw new AlertingException("Cannot send email to alert recipients", e);
     }
   }

@@ -174,8 +174,7 @@ public class MisoAppListener implements ServletContextListener {
           try {
             mns.setValidationRegex(prop, misoProperties.get("miso.naming.validation." + classname + "." + prop));
           } catch (MisoNamingException e) {
-            log.error("Cannot set new validation regex for field '" + prop + "'. Reverting to default: " + e);
-            e.printStackTrace();
+            log.error("Cannot set new validation regex for field '" + prop + "'. Reverting to default.", e);
           }
         }
 
@@ -201,7 +200,6 @@ public class MisoAppListener implements ServletContextListener {
       }
     } catch (Exception e) {
       log.error("Could not list print services. This does not bode well for printing.", e);
-      e.printStackTrace();
     }
 
     // set up Tag Barcode strategies
@@ -258,7 +256,7 @@ public class MisoAppListener implements ServletContextListener {
           sc.setAuthentication(newAuthentication);
           SecurityContextHolder.getContextHolderStrategy().setContext(sc);
         } catch (AuthenticationException a) {
-          a.printStackTrace();
+          log.error("security context init", a);
         }
 
         log.info("\\_ projects...");
@@ -283,7 +281,7 @@ public class MisoAppListener implements ServletContextListener {
         log.info("\\_ runs...");
         log.info("" + rm.listAllRuns().size());
       } catch (IOException e) {
-        e.printStackTrace();
+        log.info("precache", e);
       }
     }
 
@@ -307,14 +305,11 @@ public class MisoAppListener implements ServletContextListener {
             log.error("No such issue tracker available with given type: " + trackerType);
           }
         } catch (NoSuchMethodException e) {
-          log.error("Unable to start the defined issuetracker " + trackerType + ": " + e.getMessage());
-          e.printStackTrace();
+          log.error("Unable to start the defined issuetracker " + trackerType, e);
         } catch (InvocationTargetException e) {
-          log.error("Unable to start the defined issuetracker " + trackerType + ": " + e.getMessage());
-          e.printStackTrace();
+          log.error("Unable to start the defined issuetracker " + trackerType, e);
         } catch (IllegalAccessException e) {
-          log.error("Unable to start the defined issuetracker " + trackerType + ": " + e.getMessage());
-          e.printStackTrace();
+          log.error("Unable to start the defined issuetracker " + trackerType, e);
         }
       }
     }
@@ -342,8 +337,7 @@ public class MisoAppListener implements ServletContextListener {
         RunStatsManager rsm = new RunStatsManager(template);
         context.getBeanFactory().registerSingleton("runStatsManager", rsm);
       } catch (NamingException e) {
-        log.error("Cannot initiate statsdb connection: " + e.getMessage());
-        e.printStackTrace();
+        log.error("Cannot initiate statsdb connection", e);
       }
     }
   }

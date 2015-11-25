@@ -209,14 +209,11 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
               map.get(STATUS_COMPLETE).add(finishedCache.get(runName));
             }
           } catch (ParserConfigurationException e) {
-            log.error("Error configuring parser: " + e.getMessage());
-            e.printStackTrace();
+            log.error("Error configuring parser", e);
           } catch (TransformerException e) {
-            log.error("Error transforming XML: " + e.getMessage());
-            e.printStackTrace();
+            log.error("Error transforming XML", e);
           } catch (IOException e) {
-            log.error("Error with file IO: " + e.getMessage());
-            e.printStackTrace();
+            log.error("Error with file IO", e);
           }
         } else {
           log.error(rootFile.getName() + " :: Permission denied");
@@ -649,8 +646,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
     try {
       runInfo = PossiblyGzippedFileUtils.getXmlDocument(rootFile, "/RunInfo.xml");
     } catch (ParserConfigurationException | TransformerException e) {
-      log.error("Error parsing file: " + e.getMessage());
-      e.printStackTrace();
+      log.error("Error parsing file", e);
     }
 
     if (runInfo == null) {
@@ -713,8 +709,7 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
               map.add(run);
             }
           } catch (IOException e) {
-            log.error("Error with file IO: " + e.getMessage());
-            e.printStackTrace();
+            log.error("Error with file IO", e);
           }
         } else {
           log.error(rootFile.getName() + " :: Permission denied");
@@ -744,9 +739,9 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
       try {
         xmls.add(SubmissionUtils.transform(f));
       } catch (TransformerException e) {
-        log.error("Error transforming XML: " + e.getMessage());
+        log.error("Error transforming XML", e);
       } catch (IOException e) {
-        log.error("Error with file IO: " + e.getMessage());
+        log.error("Error with file IO", e);
       }
     }
     return NotificationUtils.buildSimpleMessage(xmls);
@@ -773,9 +768,9 @@ public class IlluminaTransformer implements FileSetTransformer<String, String, F
       try {
         files.add(SubmissionUtils.transform(f));
       } catch (TransformerException e) {
-        log.error("Error transforming XML: " + e.getMessage());
+        log.error("Error transforming XML", e);
       } catch (IOException e) {
-        log.error("Error with file IO: " + e.getMessage());
+        log.error("Error with file IO", e);
       }
     }
     return files;

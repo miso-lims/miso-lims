@@ -243,7 +243,7 @@ public class SQLRunQCDAO implements RunQcStore {
           }
         }
       } catch (IOException e) {
-        e.printStackTrace();
+        log.error("parition row mapper", e);
       }
       return null;
     }
@@ -286,9 +286,9 @@ public class SQLRunQCDAO implements RunQcStore {
           s.setRun(runDAO.get(rs.getLong("run_runId")));
         }
       } catch (IOException e) {
-        e.printStackTrace();
+        log.error("run QC row mapper", e);
       } catch (MalformedRunException e) {
-        e.printStackTrace();
+        log.error("run QC row mapper", e);
       }
 
       if (isCacheEnabled() && lookupCache(cacheManager) != null) {

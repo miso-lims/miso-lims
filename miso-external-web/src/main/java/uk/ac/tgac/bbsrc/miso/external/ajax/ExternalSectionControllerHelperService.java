@@ -33,6 +33,8 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -48,6 +50,7 @@ import java.security.SignatureException;
  */
 @Ajaxified
 public class ExternalSectionControllerHelperService {
+  protected static final Logger log = LoggerFactory.getLogger(ExternalSectionControllerHelperService.class);
 
   public JSONObject loginDisplayProjects(HttpSession session, JSONObject json) {
     JSONObject response = new JSONObject();
@@ -93,9 +96,8 @@ public class ExternalSectionControllerHelperService {
       response.put("html", b.toString());
       return response;
     } catch (Exception e) {
-      System.out.println(e.getMessage());
+      log.error("login display projects", e);
       return JSONUtils.SimpleJSONError("Failed: Problem with Login.");
-
     }
   }
 
@@ -240,6 +242,7 @@ public class ExternalSectionControllerHelperService {
 
       return jsonObject;
     } catch (Exception e) {
+      log.error("failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
   }
@@ -305,6 +308,7 @@ public class ExternalSectionControllerHelperService {
       // base64-encode the hmac
       result = Base64.encodeBase64URLSafeString(rawHmac);
     } catch (Exception e) {
+      log.error("failed to generate HMAC", e);
       throw new SignatureException("Failed to generate HMAC : " + e.getMessage());
     }
     return result;

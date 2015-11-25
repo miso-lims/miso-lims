@@ -84,6 +84,7 @@ public class ProjectRestController {
       }
       return RestUtils.error("No such project with that alias.", "projectAlias", projectAlias).toString();
     } catch (IOException ioe) {
+      log.error("cannot retrieve project", ioe);
       return RestUtils.error("Cannot retrieve project: " + ioe.getMessage(), "projectAlias", projectAlias).toString();
     }
   }
@@ -100,7 +101,7 @@ public class ProjectRestController {
               try {
                 s.addLibrary(l);
               } catch (MalformedLibraryException e) {
-                e.printStackTrace();
+                log.error("get project by id", e);
               }
             }
           }
@@ -110,7 +111,7 @@ public class ProjectRestController {
               try {
                 s.addQc(qc);
               } catch (MalformedSampleQcException e) {
-                e.printStackTrace();
+                log.error("get project by id", e);
               }
             }
           }
@@ -122,6 +123,7 @@ public class ProjectRestController {
       }
       return mapper.writeValueAsString(RestUtils.error("No such project with that ID.", "projectId", projectId.toString()));
     } catch (IOException ioe) {
+      log.error("cannot retrieve project", ioe);
       return mapper.writeValueAsString(RestUtils.error("Cannot retrieve project: " + ioe.getMessage(), "projectId", projectId.toString()));
     }
   }
@@ -134,7 +136,7 @@ public class ProjectRestController {
         try {
           l.addDilution(dil);
         } catch (MalformedDilutionException e) {
-          e.printStackTrace();
+          log.error("get project libraries", e);
         }
       }
 
@@ -142,7 +144,7 @@ public class ProjectRestController {
         try {
           l.addQc(qc);
         } catch (MalformedLibraryQcException e) {
-          e.printStackTrace();
+          log.error("get project libraries", e);
         }
       }
     }

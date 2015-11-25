@@ -93,7 +93,7 @@ public class BiooNEXTflexV2TagBarcodeStrategy implements TagBarcodeStrategy, Req
             }
           }
         } catch (IOException e) {
-          e.printStackTrace();
+          log.error("get barcodes", e);
         }
       }
     }

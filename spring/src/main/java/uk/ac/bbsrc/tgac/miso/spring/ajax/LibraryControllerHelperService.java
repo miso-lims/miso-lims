@@ -60,6 +60,8 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
@@ -134,8 +136,7 @@ public class LibraryControllerHelperService {
               + libraryNamingScheme.getValidationRegex("alias") + ") or already exists: " + json.getString("alias"));
         }
       } catch (MisoNamingException e) {
-        log.error("Cannot validate Library alias " + json.getString("alias") + ": " + e.getMessage());
-        e.printStackTrace();
+        log.error("Cannot validate Library alias " + json.getString("alias"), e);
         return JSONUtils.SimpleJSONError("Cannot validate Library alias " + json.getString("alias") + ": " + e.getMessage());
       }
     } else {
@@ -161,7 +162,7 @@ public class LibraryControllerHelperService {
       requestManager.saveLibraryNote(library, note);
       requestManager.saveLibrary(library);
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("add library note", e);
       return JSONUtils.SimpleJSONError(e.getMessage());
     }
 
@@ -184,7 +185,7 @@ public class LibraryControllerHelperService {
         return JSONUtils.SimpleJSONError("Library does not have note " + noteId + ". Cannot remove");
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("delete library note", e);
       return JSONUtils.SimpleJSONError("Cannot remove note: " + e.getMessage());
     }
   }
@@ -223,7 +224,7 @@ public class LibraryControllerHelperService {
         return JSONUtils.SimpleJSONError("Library has no parseable barcode");
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("get library barcode", e);
       return JSONUtils.SimpleJSONError(e.getMessage() + ": Cannot seem to generate temp file for barcode");
     }
   }
@@ -265,17 +266,17 @@ public class LibraryControllerHelperService {
           File f = mps.getLabelFor(library);
           if (f != null) thingsToPrint.add(f);
         } catch (IOException e) {
-          e.printStackTrace();
+          log.error("printing barcodes", e);
           return JSONUtils.SimpleJSONError("Error printing barcodes: " + e.getMessage());
         }
       }
       PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
       return JSONUtils.SimpleJSONResponse("Job " + pj.getJobId() + " : Barcodes printed.");
     } catch (MisoPrintException e) {
-      e.printStackTrace();
+      log.error("print barcodes", e);
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("print barcodes", e);
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
     }
   }
@@ -317,17 +318,17 @@ public class LibraryControllerHelperService {
           if (f != null) thingsToPrint.add(f);
           thingsToPrint.add(f);
         } catch (IOException e) {
-          e.printStackTrace();
+          log.error("print barcodes", e);
           return JSONUtils.SimpleJSONError("Error printing barcodes: " + e.getMessage());
         }
       }
       PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
       return JSONUtils.SimpleJSONResponse("Job " + pj.getJobId() + " : Barcodes printed.");
     } catch (MisoPrintException e) {
-      e.printStackTrace();
+      log.error("print barcodes", e);
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("print barcodes", e);
       return JSONUtils.SimpleJSONError("Failed to print barcodes: " + e.getMessage());
     }
   }
@@ -356,7 +357,7 @@ public class LibraryControllerHelperService {
         return JSONUtils.SimpleJSONError("New location barcode not recognised");
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("change library location", e);
       return JSONUtils.SimpleJSONError(e.getMessage());
     }
 
@@ -401,7 +402,7 @@ public class LibraryControllerHelperService {
         return JSONUtils.SimpleJSONError("Dilution has no parseable barcode");
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("library dilution barcode", e);
       return JSONUtils.SimpleJSONError(e.getMessage() + ": Cannot seem to generate temp file for barcode");
     }
   }
@@ -482,7 +483,7 @@ public class LibraryControllerHelperService {
                     long cl = Long.parseLong(code);
                     barcodes.put(count, requestManager.getTagBarcodeById(cl));
                   } catch (NumberFormatException e) {
-                    e.printStackTrace();
+                    log.error("cannot save library", e);
                     return JSONUtils.SimpleJSONError("Cannot save Library. It looks like there are tag barcodes for the library of "
                         + sample.getAlias() + ", but they cannot be processed");
                   } finally {
@@ -499,10 +500,10 @@ public class LibraryControllerHelperService {
                       + sampleNamingScheme.getValidationRegex("alias") + ")");
             }
           } catch (IOException e) {
-            e.printStackTrace();
+            log.error("cannot save library", e);
             return JSONUtils.SimpleJSONError("Cannot save Library generated from " + j.getString("parentSample") + ": " + e.getMessage());
           } catch (JSONException e) {
-            e.printStackTrace();
+            log.error("cannot save library", e);
             return JSONUtils
                 .SimpleJSONError("Cannot save Library. Something cannot be retrieved from the bulk input table: " + e.getMessage());
           }
@@ -516,7 +517,7 @@ public class LibraryControllerHelperService {
 
         return JSONUtils.SimpleJSONResponse("All libraries saved successfully");
       } catch (Exception e) {
-        e.printStackTrace();
+        log.error("cannot retrieve parent project", e);
         return JSONUtils.SimpleJSONError("Cannot retrieve parent project with ID " + json.getLong("projectId"));
       }
     } else {
@@ -551,7 +552,6 @@ public class LibraryControllerHelperService {
         return JSONUtils.JSONObjectResponse(map);
       }
     } catch (IOException e) {
-      e.printStackTrace();
       log.error("Failed to retrieve library types given platform type: ", e);
       return JSONUtils.SimpleJSONError("Failed to retrieve library types given platform type: " + e.getMessage());
     }
@@ -599,7 +599,7 @@ public class LibraryControllerHelperService {
       map.put("types", sb.toString());
       return JSONUtils.JSONObjectResponse(map);
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("cannot list all library QC types", e);
     }
     return JSONUtils.SimpleJSONError("Cannot list all Library QC Types");
   }
@@ -743,7 +743,7 @@ public class LibraryControllerHelperService {
               }
             }
           } catch (IOException e) {
-            e.printStackTrace();
+            log.error("failed to add library dilution to this library", e);
           }
           sb.append("</td>");
 
@@ -932,7 +932,7 @@ public class LibraryControllerHelperService {
               }
             }
           } catch (IOException e) {
-            e.printStackTrace();
+            log.error("failed to add EmPCR dilution", e);
           }
           sb.append("</td>");
 
@@ -1083,7 +1083,7 @@ public class LibraryControllerHelperService {
     try {
       user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("error getting current logged in user", e);
       return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
     }
 
@@ -1094,7 +1094,7 @@ public class LibraryControllerHelperService {
           requestManager.deleteLibrary(requestManager.getLibraryById(libraryId));
           return JSONUtils.SimpleJSONResponse("Library deleted");
         } catch (IOException e) {
-          e.printStackTrace();
+          log.error("cannot delete library", e);
           return JSONUtils.SimpleJSONError("Cannot delete library: " + e.getMessage());
         }
       } else {
@@ -1110,7 +1110,7 @@ public class LibraryControllerHelperService {
     try {
       user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("error getting currently logged in user", e);
       return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
     }
 
@@ -1121,7 +1121,7 @@ public class LibraryControllerHelperService {
           requestManager.deleteLibraryDilution(requestManager.getLibraryDilutionById(libraryDilutionId));
           return JSONUtils.SimpleJSONResponse("LibraryDilution deleted");
         } catch (IOException e) {
-          e.printStackTrace();
+          log.error("delete library dilution", e);
           return JSONUtils.SimpleJSONError("Cannot delete library dilution: " + e.getMessage());
         }
       } else {
@@ -1137,7 +1137,7 @@ public class LibraryControllerHelperService {
     try {
       user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("cannot get currently logged in user", e);
       return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
     }
 
@@ -1148,7 +1148,7 @@ public class LibraryControllerHelperService {
           requestManager.deleteEmPCR(requestManager.getEmPcrById(empcrId));
           return JSONUtils.SimpleJSONResponse("EmPCR deleted");
         } catch (IOException e) {
-          e.printStackTrace();
+          log.error("cannot delete EmPCR", e);
           return JSONUtils.SimpleJSONError("Cannot delete EmPCR: " + e.getMessage());
         }
       } else {
@@ -1164,7 +1164,7 @@ public class LibraryControllerHelperService {
     try {
       user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("error getting currently logged in user", e);
       return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
     }
 
@@ -1175,7 +1175,7 @@ public class LibraryControllerHelperService {
           requestManager.deleteEmPcrDilution(requestManager.getEmPcrDilutionById(deleteEmPCRDilution));
           return JSONUtils.SimpleJSONResponse("EmPCRDilution deleted");
         } catch (IOException e) {
-          e.printStackTrace();
+          log.error("cannot delete EmPCR dilution", e);
           return JSONUtils.SimpleJSONError("Cannot delete EmPCR dilution: " + e.getMessage());
         }
       } else {
@@ -1203,7 +1203,7 @@ public class LibraryControllerHelperService {
       j.put("array", jsonArray);
       return j;
     } catch (IOException e) {
-      log.debug("Failed", e);
+      log.error("Failed", e);
       return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
     }
   }

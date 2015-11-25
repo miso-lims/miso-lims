@@ -179,7 +179,7 @@ public class CacheHelperService {
         }
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("barcode regeneration failed", e);
       return JSONUtils.JSONObjectResponse("html",
           jQueryDialogFactory.errorDialog("Cache Administration", "Barcode regeneration failed!:\n\n" + e.getMessage()));
     }

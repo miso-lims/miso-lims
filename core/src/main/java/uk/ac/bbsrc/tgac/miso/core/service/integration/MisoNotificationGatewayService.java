@@ -114,7 +114,7 @@ public class MisoNotificationGatewayService extends AbstractEndpoint implements 
             NotificationGateway s = (NotificationGateway) gateway.getObject();
             gateways.add(s);
           } catch (Exception e) {
-            e.printStackTrace();
+            log.error("get gateways for", e);
           }
         }
       }

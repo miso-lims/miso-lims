@@ -65,9 +65,9 @@ public class PacBioService {
         }
       }
     } catch (ClientProtocolException e) {
-      e.printStackTrace();
+      log.error("get primary analyis job", e);
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("get primary analyis job", e);
     }
     return null;
   }
@@ -82,9 +82,9 @@ public class PacBioService {
         return j.getString("Status");
       }
     } catch (ClientProtocolException e) {
-      e.printStackTrace();
+      log.error("get primary analyis status", e);
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("get primary analyis status", e);
     }
     return null;
   }
@@ -99,9 +99,9 @@ public class PacBioService {
         return j.getString("Status");
       }
     } catch (ClientProtocolException e) {
-      e.printStackTrace();
+      log.error("get plate status", e);
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("get plate status", e);
     }
     return null;
   }

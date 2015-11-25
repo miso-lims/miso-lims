@@ -128,13 +128,13 @@ public class SolidTransformer implements FileSetTransformer<String, String, File
                   map.get("Unknown").add(run);
                 }
               } catch (ParserConfigurationException e) {
-                log.error("Error configuring parser: " + e.getMessage());
+                log.error("Error configuring parser", e);
               } catch (TransformerException e) {
-                log.error("Error transforming XML: " + e.getMessage());
+                log.error("Error transforming XML", e);
               }
             }
           } catch (Exception e) {
-            log.error("Error contacting SOLiD machine. Attempting to parse " + statusFile.getAbsolutePath() + ": " + e.getMessage());
+            log.error("Error contacting SOLiD machine. Attempting to parse " + statusFile.getAbsolutePath(), e);
             run.put("runName", runName);
 
             if (statusFile.exists()) {
@@ -174,11 +174,11 @@ public class SolidTransformer implements FileSetTransformer<String, String, File
                     map.get("Unknown").add(run);
                   }
                 } catch (ParserConfigurationException ee) {
-                  log.error("Error configuring parser: " + ee.getMessage());
+                  log.error("Error configuring parser", ee);
                 } catch (TransformerException ee) {
-                  log.error("Error transforming XML: " + ee.getMessage());
+                  log.error("Error transforming XML", ee);
                 } catch (IOException ee) {
-                  log.error("Error with file IO: " + ee.getMessage());
+                  log.error("Error with file IO", ee);
                 }
               } else {
                 log.debug(runName + " :: Cannot read status file. Minimal run information only.");

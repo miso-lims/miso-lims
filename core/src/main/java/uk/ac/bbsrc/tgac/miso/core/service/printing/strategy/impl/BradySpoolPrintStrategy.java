@@ -62,9 +62,9 @@ public class BradySpoolPrintStrategy implements PrintStrategy<String, BradySpool
         return true;
       }
     } catch (UnsupportedEncodingException e) {
-      e.printStackTrace();
+      log.error("print", e);
     } catch (PrintException e) {
-      e.printStackTrace();
+      log.error("print", e);
     }
     return false;
   }

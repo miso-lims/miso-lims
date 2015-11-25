@@ -136,11 +136,11 @@ public class ReportsController {
             throw new ReportingException("Unsupported report format");
           }
         } catch (ReportingException e) {
-          e.printStackTrace();
+          log.error("project report", e);
         }
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("project report", e);
     }
   }
 
@@ -167,10 +167,10 @@ public class ReportsController {
           throw new ReportingException("Unsupported report format");
         }
       } catch (ReportingException e) {
-        e.printStackTrace();
+        log.error("project report", e);
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("project report", e);
     }
   }
 
@@ -189,16 +189,16 @@ public class ReportsController {
 
         try {
           if (format.equals(PDF)) {
-            System.out.println("not implemented");
+            log.warn("not implemented");
           } else {
             throw new ReportingException("Unsupported report format");
           }
         } catch (ReportingException e) {
-          e.printStackTrace();
+          log.error("get sample report error", e);
         }
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("get sample report error", e);
     }
   }
 
@@ -210,15 +210,15 @@ public class ReportsController {
       user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       try {
         if (format.equals(PDF)) {
-          System.out.println("not implemented");
+          log.warn("not implemented");
         } else {
           throw new ReportingException("Unsupported report format");
         }
       } catch (ReportingException e) {
-        e.printStackTrace();
+        log.error("get samples report error", e);
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("get samples report error", e);
     }
   }
 
@@ -237,16 +237,16 @@ public class ReportsController {
 
         try {
           if (format.equals(PDF)) {
-            System.out.println("not implemented");
+            log.warn("not implemented");
           } else {
             throw new ReportingException("Unsupported report format");
           }
         } catch (ReportingException e) {
-          e.printStackTrace();
+          log.error("get run report error", e);
         }
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("get run report error", e);
     }
   }
 
@@ -255,12 +255,12 @@ public class ReportsController {
     String format = PDF;
     try {
       if (format.equals(PDF)) {
-        System.out.println("not implemented");
+        log.warn("not implemented");
       } else {
         throw new ReportingException("Unsupported report format");
       }
     } catch (ReportingException e) {
-      e.printStackTrace();
+      log.error("get runs report error", e);
     }
   }
 
@@ -269,9 +269,9 @@ public class ReportsController {
     try {
       modelMap.put("tables", DbUtils.getTables(interfaceTemplate));
     } catch (MetaDataAccessException e) {
-      e.printStackTrace();
+      log.error("reports controller form", e);
     } catch (SQLException e) {
-      e.printStackTrace();
+      log.error("reports controller form", e);
     }
     return new ModelAndView("/pages/reporting.jsp", modelMap);
   }
@@ -284,7 +284,7 @@ public class ReportsController {
       JSONObject json = JSONObject.fromObject(j);
       log.info(json.toString());
     } catch (ServletRequestBindingException e) {
-      e.printStackTrace();
+      log.error("project report post", e);
     }
   }
 }

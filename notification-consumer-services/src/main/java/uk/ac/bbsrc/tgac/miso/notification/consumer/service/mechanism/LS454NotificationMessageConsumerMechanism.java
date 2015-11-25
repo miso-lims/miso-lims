@@ -117,11 +117,9 @@ public class LS454NotificationMessageConsumerMechanism
           try {
             runLog = new String(IntegrationUtils.decompress(URLDecoder.decode(run.getString("status"), "UTF-8").getBytes()));
           } catch (UnsupportedEncodingException e) {
-            log.error("Cannot decode status runLog: " + e.getMessage());
-            e.printStackTrace();
+            log.error("Cannot decode status runLog", e);
           } catch (IOException e) {
-            log.error("Cannot decompress and decode incoming status: " + e.getMessage());
-            e.printStackTrace();
+            log.error("Cannot decompress and decode incoming status", e);
           }
         }
 
@@ -174,8 +172,7 @@ public class LS454NotificationMessageConsumerMechanism
                   try {
                     is.setCompletionDate(gsLogDateFormat.parse(run.getString("completionDate")));
                   } catch (ParseException e) {
-                    log.error("Cannot parse " + runName + " completion date: " + e.getMessage());
-                    e.printStackTrace();
+                    log.error("Cannot parse " + runName + " completion date", e);
                   }
                 }
 
@@ -228,8 +225,7 @@ public class LS454NotificationMessageConsumerMechanism
                   try {
                     r.getStatus().setCompletionDate(gsLogDateFormat.parse(run.getString("completionDate")));
                   } catch (ParseException e) {
-                    log.error(e.getMessage());
-                    e.printStackTrace();
+                    log.error("run JSON", e);
                   }
                 }
 
@@ -302,14 +298,11 @@ public class LS454NotificationMessageConsumerMechanism
                       }
                     }
                   } catch (ParserConfigurationException e) {
-                    log.error(e.getMessage());
-                    e.printStackTrace();
+                    log.error("run JSON", e);
                   } catch (TransformerException e) {
-                    log.error(e.getMessage());
-                    e.printStackTrace();
+                    log.error("run JSON", e);
                   } catch (ParseException e) {
-                    log.error(e.getMessage());
-                    e.printStackTrace();
+                    log.error("run JSON", e);
                   }
                 } else {
                   try {
@@ -321,8 +314,7 @@ public class LS454NotificationMessageConsumerMechanism
                       requestManager.saveStatus(r.getStatus());
                     }
                   } catch (ParseException e) {
-                    log.error(e.getMessage());
-                    e.printStackTrace();
+                    log.error("run JSON", e);
                   }
                 }
 
@@ -331,8 +323,7 @@ public class LS454NotificationMessageConsumerMechanism
               }
             }
           } catch (IOException e) {
-            log.error(e.getMessage());
-            e.printStackTrace();
+            log.error("run JSON", e);
           }
         } else {
           log.error("Error consuming run " + runName + ". Please check the gsRunProcessor.log file for this run.");
@@ -346,8 +337,7 @@ public class LS454NotificationMessageConsumerMechanism
         log.info("Batch saved " + saved.length + " / " + runs.size() + " runs");
       }
     } catch (IOException e) {
-      log.error("Couldn't save run batch: " + e.getMessage());
-      e.printStackTrace();
+      log.error("Couldn't save run batch", e);
     }
 
     return updatedRuns;

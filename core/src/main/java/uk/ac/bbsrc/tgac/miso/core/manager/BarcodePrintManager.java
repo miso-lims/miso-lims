@@ -70,8 +70,7 @@ public class BarcodePrintManager extends AbstractPrintManager<Queue<File>> {
           long jobId = storePrintJob(job);
           job.setJobId(jobId);
         } catch (IOException e) {
-          e.printStackTrace();
-          log.debug("Could not store print job");
+          log.error("Could not store print job", e);
         }
 
         try {
@@ -90,7 +89,7 @@ public class BarcodePrintManager extends AbstractPrintManager<Queue<File>> {
 
           storePrintJob(job);
         } catch (IOException e) {
-          e.printStackTrace();
+          log.error("Could not store print barcodes", e);
           throw new MisoPrintException("Could not print barcodes to " + printServiceName + ": " + e.getMessage(), e);
         }
         return job;
@@ -98,7 +97,7 @@ public class BarcodePrintManager extends AbstractPrintManager<Queue<File>> {
         throw new MisoPrintException("No such PrintService: " + printServiceName);
       }
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("Could not store print barcodes", e);
       throw new MisoPrintException("Cannot retrieve PrintService: " + printServiceName);
     }
   }

@@ -139,12 +139,11 @@ public class PacBioTransformer implements FileSetTransformer<String, String, Fil
 
                 run.getJSONArray("cells").add(cellObj);
               } catch (ParserConfigurationException e) {
-                e.printStackTrace();
+                log.error(runName + ":: Unable to process run", e);
               } catch (TransformerException e) {
-                e.printStackTrace();
+                log.error(runName + ":: Unable to process run", e);
               } catch (IOException e) {
-                log.error(runName + ":: Unable to process run: " + e.getMessage());
-                e.printStackTrace();
+                log.error(runName + ":: Unable to process run", e);
               }
             }
           }
@@ -174,9 +173,9 @@ public class PacBioTransformer implements FileSetTransformer<String, String, Fil
               }
             }
           } catch (InterrogationException e) {
-            log.warn(e.getMessage() + ". Attempting fall-back date resolution...");
+            log.error("Attempting fall-back date resolution...", e);
           } catch (UnsupportedEncodingException e) {
-            log.warn(e.getMessage() + ". Cannot encode plateId to be URL friendly.");
+            log.error("Cannot encode plateId to be URL friendly.", e);
           }
         } else {
           log.error(rootFile.getName() + " :: Permission denied");
