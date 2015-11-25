@@ -64,7 +64,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleAnalyte;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
@@ -77,7 +76,6 @@ import uk.ac.bbsrc.tgac.miso.core.store.ChangeLogStore;
 import uk.ac.bbsrc.tgac.miso.core.store.LibraryStore;
 import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
-import uk.ac.bbsrc.tgac.miso.core.store.SampleAnalyteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
@@ -154,7 +152,6 @@ public class SQLSampleDAO implements SampleStore {
   private ProjectStore projectDAO;
   private LibraryStore libraryDAO;
   private SampleQcStore sampleQcDAO;
-  private SampleAnalyteStore sampleAnalyteDAO;
   private NoteStore noteDAO;
   private CascadeType cascadeType;
   private boolean autoGenerateIdentificationBarcodes;
@@ -205,10 +202,6 @@ public class SQLSampleDAO implements SampleStore {
 
   public void setNoteDAO(NoteStore noteDAO) {
     this.noteDAO = noteDAO;
-  }
-
-  public void setSampleAnalyteDAO(SampleAnalyteStore sampleAnalyteDAO) {
-    this.sampleAnalyteDAO = sampleAnalyteDAO;
   }
 
   public void setLibraryDAO(LibraryStore libraryDAO) {
@@ -426,9 +419,6 @@ public class SQLSampleDAO implements SampleStore {
           noteDAO.saveSampleNote(sample, n);
         }
       }
-      if (!(sample.getSampleAnalyte() == null)) {
-        sampleAnalyteDAO.save(sample.getSampleAnalyte());
-      }
 
       purgeListCache(sample);
     }
@@ -640,17 +630,9 @@ public class SQLSampleDAO implements SampleStore {
 
           s.setNotes(noteDAO.listBySample(id));
 
-          SampleAnalyte sampleAnalyte = sampleAnalyteDAO.get(rs.getLong("sampleAnalyteId"));
-          if (sampleAnalyte != null) {
-            s.setSampleAnalyte(sampleAnalyte);
-          }
         } else {
           s.setProject(projectDAO.lazyGet(rs.getLong("project_projectId")));
 
-          SampleAnalyte sampleAnalyte = sampleAnalyteDAO.lazyGet(rs.getLong("sampleAnalyteId"));
-          if (sampleAnalyte != null) {
-            s.setSampleAnalyte(sampleAnalyte);
-          }
         }
         s.getChangeLog().addAll(changeLogDAO.listAllById(TABLE_NAME, id));
       } catch (IOException e1) {

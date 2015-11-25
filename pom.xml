@@ -1,398 +1,398 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- ~ Copyright (c) 2010. The Genome Analysis Centre, Norwich, UK ~ MISO 
- project contacts: Robert Davey, Mario Caccamo @ TGAC ~ ~ ********************************************************************** 
- ~ ~ This file is part of MISO. ~ ~ MISO is free software: you can redistribute 
- it and/or modify ~ it under the terms of the GNU General Public License as 
- published by ~ the Free Software Foundation, either version 3 of the License, 
- or ~ (at your option) any later version. ~ ~ MISO is distributed in the hope 
- that it will be useful, ~ but WITHOUT ANY WARRANTY; without even the implied 
- warranty of ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
- ~ GNU General Public License for more details. ~ ~ You should have received 
- a copy of the GNU General Public License ~ along with MISO. If not, see <http://www.gnu.org/licenses/>. 
- ~ ~ ********************************************************************** -->
+<!-- ~ Copyright (c) 2010. The Genome Analysis Centre, Norwich, UK ~ MISO
+  project contacts: Robert Davey, Mario Caccamo @ TGAC ~ ~ **********************************************************************
+  ~ ~ This file is part of MISO. ~ ~ MISO is free software: you can redistribute
+  it and/or modify ~ it under the terms of the GNU General Public License as
+  published by ~ the Free Software Foundation, either version 3 of the License,
+  or ~ (at your option) any later version. ~ ~ MISO is distributed in the hope
+  that it will be useful, ~ but WITHOUT ANY WARRANTY; without even the implied
+  warranty of ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  ~ GNU General Public License for more details. ~ ~ You should have received
+  a copy of the GNU General Public License ~ along with MISO. If not, see <http://www.gnu.org/licenses/>.
+  ~ ~ ********************************************************************** -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
- xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
- <modelVersion>4.0.0</modelVersion>
- <groupId>uk.ac.bbsrc.tgac.miso</groupId>
- <artifactId>miso</artifactId>
- <packaging>pom</packaging>
- <version>0.2.1-SNAPSHOT</version>
- <name>MISO Framework</name>
- <url>http://www.tgac.ac.uk/miso</url>
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>uk.ac.bbsrc.tgac.miso</groupId>
+  <artifactId>miso</artifactId>
+  <packaging>pom</packaging>
+  <version>0.2.1-SNAPSHOT</version>
+  <name>MISO Framework</name>
+  <url>http://www.tgac.ac.uk/miso</url>
 
- <!-- Reporting/Documentation output -->
- <reporting>
-  <plugins>
-   <plugin>
-    <groupId>org.apache.maven.plugins</groupId>
-    <artifactId>maven-javadoc-plugin</artifactId>
-    <version>2.9</version>
-    <configuration>
-     <stylesheetfile>${basedir}/src/main/javadoc/stylesheet.css</stylesheetfile>
-    </configuration>
-   </plugin>
-   <plugin>
-    <groupId>org.apache.maven.plugins</groupId>
-    <artifactId>maven-project-info-reports-plugin</artifactId>
-    <version>2.2</version>
-    <reportSets>
-     <reportSet>
-      <reports>
-       <!-- <report>dependencies</report> -->
-       <report>project-team</report>
-       <report>mailing-list</report>
-       <report>cim</report>
-       <report>issue-tracking</report>
-       <report>license</report>
-       <report>scm</report>
-       <report>index</report>
-      </reports>
-     </reportSet>
-    </reportSets>
-   </plugin>
-   <plugin>
-    <groupId>org.apache.maven.plugins</groupId>
-    <artifactId>maven-release-plugin</artifactId>
-    <version>2.1</version>
-    <configuration>
-     <preparationGoals>clean verify install</preparationGoals>
-    </configuration>
-   </plugin>
-  </plugins>
- </reporting>
+  <!-- Reporting/Documentation output -->
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.9</version>
+        <configuration>
+          <stylesheetfile>${basedir}/src/main/javadoc/stylesheet.css</stylesheetfile>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>2.2</version>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <!-- <report>dependencies</report> -->
+              <report>project-team</report>
+              <report>mailing-list</report>
+              <report>cim</report>
+              <report>issue-tracking</report>
+              <report>license</report>
+              <report>scm</report>
+              <report>index</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>2.1</version>
+        <configuration>
+          <preparationGoals>clean verify install</preparationGoals>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
 
- <!-- Licensing -->
- <licenses>
-  <license>
-   <name>GNU Lesser General Public License</name>
-   <url>http://www.gnu.org/copyleft/lesser.html</url>
-   <distribution>repo</distribution>
-  </license>
- </licenses>
+  <!-- Licensing -->
+  <licenses>
+    <license>
+      <name>GNU Lesser General Public License</name>
+      <url>http://www.gnu.org/copyleft/lesser.html</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
 
- <!-- Bug Tracker -->
- <issueManagement>
-  <system>jira</system>
-  <url>http://jira.tgac.bbsrc.ac.uk/browse/MISO</url>
- </issueManagement>
+  <!-- Bug Tracker -->
+  <issueManagement>
+    <system>jira</system>
+    <url>http://jira.tgac.bbsrc.ac.uk/browse/MISO</url>
+  </issueManagement>
 
- <!-- Developer Listing -->
- <developers>
-  <developer>
-   <id>davey</id>
-   <name>Rob Davey</name>
-   <email>robert.davey@tgac.ac.uk</email>
-   <organization>TGAC</organization>
-   <organizationUrl>http://www.tgac.ac.uk/bioinformatics/sequencing-informatics/</organizationUrl>
-   <roles>
-    <role>administrator</role>
-    <role>Developer</role>
-   </roles>
-   <timezone>0</timezone>
-   <properties />
-  </developer>
+  <!-- Developer Listing -->
+  <developers>
+    <developer>
+      <id>davey</id>
+      <name>Rob Davey</name>
+      <email>robert.davey@tgac.ac.uk</email>
+      <organization>TGAC</organization>
+      <organizationUrl>http://www.tgac.ac.uk/bioinformatics/sequencing-informatics/</organizationUrl>
+      <roles>
+        <role>administrator</role>
+        <role>Developer</role>
+      </roles>
+      <timezone>0</timezone>
+      <properties />
+    </developer>
 
-  <developer>
-   <id>bianx</id>
-   <name>Xingdong Bian</name>
-   <email>xingdong.bian@tgac.ac.uk</email>
-   <organization>TGAC</organization>
-   <organizationUrl>http://www.tgac.ac.uk/bioinformatics/sequence-informatics/core-bioinformatics/</organizationUrl>
-   <roles>
-    <role>administrator</role>
-    <role>Developer</role>
-   </roles>
-   <timezone>0</timezone>
-   <properties />
-  </developer>
+    <developer>
+      <id>bianx</id>
+      <name>Xingdong Bian</name>
+      <email>xingdong.bian@tgac.ac.uk</email>
+      <organization>TGAC</organization>
+      <organizationUrl>http://www.tgac.ac.uk/bioinformatics/sequence-informatics/core-bioinformatics/</organizationUrl>
+      <roles>
+        <role>administrator</role>
+        <role>Developer</role>
+      </roles>
+      <timezone>0</timezone>
+      <properties />
+    </developer>
 
-  <developer>
-   <id>thankia</id>
-   <name>Anil Thanki</name>
-   <email>anil.thanki@tgac.ac.uk</email>
-   <organization>TGAC</organization>
-   <organizationUrl>http://www.tgac.ac.uk/bioinformatics/sequence-informatics/core-bioinformatics/</organizationUrl>
-   <roles>
-    <role>administrator</role>
-    <role>Developer</role>
-   </roles>
-   <timezone>0</timezone>
-   <properties />
-  </developer>
- </developers>
+    <developer>
+      <id>thankia</id>
+      <name>Anil Thanki</name>
+      <email>anil.thanki@tgac.ac.uk</email>
+      <organization>TGAC</organization>
+      <organizationUrl>http://www.tgac.ac.uk/bioinformatics/sequence-informatics/core-bioinformatics/</organizationUrl>
+      <roles>
+        <role>administrator</role>
+        <role>Developer</role>
+      </roles>
+      <timezone>0</timezone>
+      <properties />
+    </developer>
+  </developers>
 
- <!-- SVN connection -->
- <scm>
-  <connection>
+  <!-- SVN connection -->
+  <scm>
+    <connection>
       scm:git:https://www.github.com/TGAC/miso-lims
     </connection>
-  <developerConnection>
+    <developerConnection>
       scm:git:ssh://www.github.com/TGAC/miso-lims
     </developerConnection>
-  <url>
+    <url>
       https://www.github.com/TGAC/miso-lims
     </url>
- </scm>
+  </scm>
 
- <!-- Maven repository deploy -->
- <distributionManagement>
-  <downloadUrl>https://repos.tgac.ac.uk/maven/repo</downloadUrl>
-  <repository>
-   <id>miso-releases</id>
-   <name>MISO repository</name>
-   <url>scp://repos.tgac.ac.uk/storage/html/maven/miso/releases</url>
-  </repository>
-  <snapshotRepository>
-   <id>miso-snapshots</id>
-   <name>MISO snapshot repository</name>
-   <url>scp://repos.tgac.ac.uk/storage/html/maven/miso/snapshots</url>
-  </snapshotRepository>
- </distributionManagement>
+  <!-- Maven repository deploy -->
+  <distributionManagement>
+    <downloadUrl>https://repos.tgac.ac.uk/maven/repo</downloadUrl>
+    <repository>
+      <id>miso-releases</id>
+      <name>MISO repository</name>
+      <url>scp://repos.tgac.ac.uk/storage/html/maven/miso/releases</url>
+    </repository>
+    <snapshotRepository>
+      <id>miso-snapshots</id>
+      <name>MISO snapshot repository</name>
+      <url>scp://repos.tgac.ac.uk/storage/html/maven/miso/snapshots</url>
+    </snapshotRepository>
+  </distributionManagement>
 
- <!-- Maven repository download -->
- <repositories>
-  <repository>
-   <id>hasbanana-repo</id>
-   <name>hasbanana Maven Repository</name>
-   <url>http://www.hasbanana.com/maven/repo</url>
-  </repository>
+  <!-- Maven repository download -->
+  <repositories>
+    <repository>
+      <id>hasbanana-repo</id>
+      <name>hasbanana Maven Repository</name>
+      <url>http://www.hasbanana.com/maven/repo</url>
+    </repository>
 
-  <repository>
-   <id>tgac-repo</id>
-   <name>TGAC Maven Repository</name>
-   <url>https://repos.tgac.ac.uk/maven/repo</url>
-   <releases>
-    <enabled>true</enabled>
-    <updatePolicy>always</updatePolicy>
-   </releases>
-   <snapshots>
-    <enabled>true</enabled>
-    <updatePolicy>always</updatePolicy>
-   </snapshots>
-  </repository>
+    <repository>
+      <id>tgac-repo</id>
+      <name>TGAC Maven Repository</name>
+      <url>https://repos.tgac.ac.uk/maven/repo</url>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+      </snapshots>
+    </repository>
 
-  <repository>
-   <id>tgac-snapshots-repo</id>
-   <name>TGAC Maven Snapshots Repository</name>
-   <url>https://repos.tgac.ac.uk/maven/miso/snapshots</url>
-   <releases>
-    <enabled>false</enabled>
-    <updatePolicy>always</updatePolicy>
-   </releases>
-   <snapshots>
-    <enabled>true</enabled>
-    <updatePolicy>always</updatePolicy>
-   </snapshots>
-  </repository>
+    <repository>
+      <id>tgac-snapshots-repo</id>
+      <name>TGAC Maven Snapshots Repository</name>
+      <url>https://repos.tgac.ac.uk/maven/miso/snapshots</url>
+      <releases>
+        <enabled>false</enabled>
+        <updatePolicy>always</updatePolicy>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+      </snapshots>
+    </repository>
 
-  <repository>
-   <id>tgac-releases-repo</id>
-   <name>TGAC Maven Releases Repository</name>
-   <url>https://repos.tgac.ac.uk/maven/miso/releases</url>
-   <releases>
-    <enabled>true</enabled>
-    <updatePolicy>always</updatePolicy>
-   </releases>
-   <snapshots>
-    <enabled>false</enabled>
-    <updatePolicy>always</updatePolicy>
-   </snapshots>
-  </repository>
+    <repository>
+      <id>tgac-releases-repo</id>
+      <name>TGAC Maven Releases Repository</name>
+      <url>https://repos.tgac.ac.uk/maven/miso/releases</url>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+        <updatePolicy>always</updatePolicy>
+      </snapshots>
+    </repository>
 
-  <!-- <repository> <id>apache-snapshots</id> <name>apache snapshots repository</name> 
-   <url>http://repository.apache.org/snapshots</url> <snapshots> <enabled>true</enabled> 
-   <updatePolicy>never</updatePolicy> </snapshots> </repository> -->
+    <!-- <repository> <id>apache-snapshots</id> <name>apache snapshots repository</name>
+      <url>http://repository.apache.org/snapshots</url> <snapshots> <enabled>true</enabled>
+      <updatePolicy>never</updatePolicy> </snapshots> </repository> -->
 
-  <repository>
-   <id>spring-snapshot</id>
-   <name>Spring Portfolio Milestone Repository</name>
-   <url>http://maven.springframework.org/snapshot</url>
-   <snapshots>
-    <enabled>true</enabled>
-   </snapshots>
-  </repository>
+    <repository>
+      <id>spring-snapshot</id>
+      <name>Spring Portfolio Milestone Repository</name>
+      <url>http://maven.springframework.org/snapshot</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
 
-  <repository>
-   <id>Atlassian Maven Repository</id>
-   <url>https://maven.atlassian.com/public</url>
-  </repository>
+    <repository>
+      <id>Atlassian Maven Repository</id>
+      <url>https://maven.atlassian.com/public</url>
+    </repository>
 
-  <repository>
-   <id>spring-maven-release</id>
-   <name>Springframework Maven Repository</name>
-   <url>http://maven.springframework.org/release</url>
-  </repository>
-  <repository>
-   <id>spring-maven-milestone</id>
-   <name>Springframework Maven Repository</name>
-   <url>http://maven.springframework.org/milestone</url>
-  </repository>
-  <repository>
-   <id>springsource-milestone</id>
-   <url>http://repository.springsource.com/maven/bundles/milestone</url>
-  </repository>
-  <repository>
-   <id>springsource-external</id>
-   <url>http://repository.springsource.com/maven/bundles/external</url>
-  </repository>
-  <repository>
-   <id>springsource-snapshot</id>
-   <url>http://repository.springsource.com/maven/bundles/snapshot</url>
-  </repository>
+    <repository>
+      <id>spring-maven-release</id>
+      <name>Springframework Maven Repository</name>
+      <url>http://maven.springframework.org/release</url>
+    </repository>
+    <repository>
+      <id>spring-maven-milestone</id>
+      <name>Springframework Maven Repository</name>
+      <url>http://maven.springframework.org/milestone</url>
+    </repository>
+    <repository>
+      <id>springsource-milestone</id>
+      <url>http://repository.springsource.com/maven/bundles/milestone</url>
+    </repository>
+    <repository>
+      <id>springsource-external</id>
+      <url>http://repository.springsource.com/maven/bundles/external</url>
+    </repository>
+    <repository>
+      <id>springsource-snapshot</id>
+      <url>http://repository.springsource.com/maven/bundles/snapshot</url>
+    </repository>
 
-  <repository>
-   <id>fluxion-snapshots-repo</id>
-   <name>TGAC Fluxion Snapshots Repository</name>
-   <url>https://repos.tgac.ac.uk/maven/fluxion/snapshots</url>
-   <releases>
-    <enabled>false</enabled>
-    <updatePolicy>always</updatePolicy>
-   </releases>
-   <snapshots>
-    <enabled>true</enabled>
-    <updatePolicy>always</updatePolicy>
-   </snapshots>
-  </repository>
+    <repository>
+      <id>fluxion-snapshots-repo</id>
+      <name>TGAC Fluxion Snapshots Repository</name>
+      <url>https://repos.tgac.ac.uk/maven/fluxion/snapshots</url>
+      <releases>
+        <enabled>false</enabled>
+        <updatePolicy>always</updatePolicy>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+      </snapshots>
+    </repository>
 
-  <repository>
-   <id>fluxion-releases-repo</id>
-   <name>TGAC Fluxion Releases Repository</name>
-   <url>https://repos.tgac.ac.uk/maven/fluxion/releases</url>
-   <releases>
-    <enabled>true</enabled>
-    <updatePolicy>always</updatePolicy>
-   </releases>
-   <snapshots>
-    <enabled>false</enabled>
-    <updatePolicy>always</updatePolicy>
-   </snapshots>
-  </repository>
- </repositories>
+    <repository>
+      <id>fluxion-releases-repo</id>
+      <name>TGAC Fluxion Releases Repository</name>
+      <url>https://repos.tgac.ac.uk/maven/fluxion/releases</url>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+        <updatePolicy>always</updatePolicy>
+      </snapshots>
+    </repository>
+  </repositories>
 
- <pluginRepositories>
-  <pluginRepository>
-   <id>miso-releases</id>
-   <name>MISO repository</name>
-   <url>https://repos.tgac.ac.uk/maven/miso/releases</url>
-   <releases>
-    <enabled>true</enabled>
-    <updatePolicy>always</updatePolicy>
-   </releases>
-  </pluginRepository>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>miso-releases</id>
+      <name>MISO repository</name>
+      <url>https://repos.tgac.ac.uk/maven/miso/releases</url>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+      </releases>
+    </pluginRepository>
 
-  <pluginRepository>
-   <id>miso-snapshots</id>
-   <name>MISO snapshot repository</name>
-   <url>https://repos.tgac.ac.uk/maven/miso/snapshots</url>
-   <snapshots>
-    <enabled>true</enabled>
-    <updatePolicy>always</updatePolicy>
-   </snapshots>
-  </pluginRepository>
+    <pluginRepository>
+      <id>miso-snapshots</id>
+      <name>MISO snapshot repository</name>
+      <url>https://repos.tgac.ac.uk/maven/miso/snapshots</url>
+      <snapshots>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+      </snapshots>
+    </pluginRepository>
 
-  <pluginRepository>
-   <id>apache-snapshots</id>
-   <name>apache snapshots repository</name>
-   <url>http://repository.apache.org/snapshots</url>
-   <snapshots>
-    <updatePolicy>never</updatePolicy>
-   </snapshots>
-  </pluginRepository>
+    <pluginRepository>
+      <id>apache-snapshots</id>
+      <name>apache snapshots repository</name>
+      <url>http://repository.apache.org/snapshots</url>
+      <snapshots>
+        <updatePolicy>never</updatePolicy>
+      </snapshots>
+    </pluginRepository>
 
-  <pluginRepository>
-   <id>Atlassian Maven Repository</id>
-   <url>https://maven.atlassian.com/public</url>
-  </pluginRepository>
+    <pluginRepository>
+      <id>Atlassian Maven Repository</id>
+      <url>https://maven.atlassian.com/public</url>
+    </pluginRepository>
 
- </pluginRepositories>
+  </pluginRepositories>
 
- <!-- Required Build Plugins -->
- <build>
-  <plugins>
-   <plugin>
-    <groupId>org.apache.maven.plugins</groupId>
-    <artifactId>maven-compiler-plugin</artifactId>
-    <configuration>
-     <source>1.7</source>
-     <target>1.7</target>
-     <showWarnings>true</showWarnings>
-    </configuration>
-   </plugin>
+  <!-- Required Build Plugins -->
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.7</source>
+          <target>1.7</target>
+          <showWarnings>true</showWarnings>
+        </configuration>
+      </plugin>
 
-   <plugin>
-    <artifactId>maven-surefire-plugin</artifactId>
-    <version>2.5</version>
-    <configuration>
-     <includes>
-      <include>**/*Suite.java</include>
-     </includes>
-    </configuration>
-   </plugin>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.5</version>
+        <configuration>
+          <includes>
+            <include>**/*Suite.java</include>
+          </includes>
+        </configuration>
+      </plugin>
 
-   <!-- <plugin> <groupId>com.atlassian.maven.plugins</groupId> <artifactId>maven-clover2-plugin</artifactId> 
-    <version>3.1.2</version> <configuration> <licenseLocation>clover.license</licenseLocation> 
-    </configuration> </plugin> -->
-   <plugin>
-    <groupId>org.apache.maven.plugins</groupId>
-    <artifactId>maven-javadoc-plugin</artifactId>
-    <version>2.9</version>
-    <configuration>
-     <stylesheetfile>${basedir}/src/main/javadoc/stylesheet.css</stylesheetfile>
-    </configuration>
-   </plugin>
+      <!-- <plugin> <groupId>com.atlassian.maven.plugins</groupId> <artifactId>maven-clover2-plugin</artifactId>
+        <version>3.1.2</version> <configuration> <licenseLocation>clover.license</licenseLocation>
+        </configuration> </plugin> -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.9</version>
+        <configuration>
+          <stylesheetfile>${basedir}/src/main/javadoc/stylesheet.css</stylesheetfile>
+        </configuration>
+      </plugin>
 
-   <plugin>
-    <groupId>org.codehaus.mojo</groupId>
-    <artifactId>cobertura-maven-plugin</artifactId>
-    <version>2.7</version>
-    <configuration>
-     <formats>
-      <format>xml</format>
-     </formats>
-     <instrumentation>
-      <!-- <excludes> <exclude>**/Abstract*.*</exclude> </excludes> -->
-      <ignoreTrivial>true</ignoreTrivial>
-      <ignoreMethodAnnotations>
-       <ignoreMethodAnnotation>uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore</ignoreMethodAnnotation>
-      </ignoreMethodAnnotations>
-     </instrumentation>
-    </configuration>
-   </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>cobertura-maven-plugin</artifactId>
+        <version>2.7</version>
+        <configuration>
+          <formats>
+            <format>xml</format>
+          </formats>
+          <instrumentation>
+            <!-- <excludes> <exclude>**/Abstract*.*</exclude> </excludes> -->
+            <ignoreTrivial>true</ignoreTrivial>
+            <ignoreMethodAnnotations>
+              <ignoreMethodAnnotation>uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore</ignoreMethodAnnotation>
+            </ignoreMethodAnnotations>
+          </instrumentation>
+        </configuration>
+      </plugin>
 
-  </plugins>
+    </plugins>
 
-  <pluginManagement>
-   <plugins>
-    <plugin>
-     <groupId>org.apache.maven.plugins</groupId>
-     <artifactId>maven-site-plugin</artifactId>
-     <version>2.1.1</version>
-    </plugin>
-   </plugins>
-  </pluginManagement>
- </build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>2.1.1</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 
- <dependencies>
-  <dependency>
-   <groupId>junit</groupId>
-   <artifactId>junit</artifactId>
-   <version>4.9</version>
-   <scope>test</scope>
-  </dependency>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.9</version>
+      <scope>test</scope>
+    </dependency>
 
-  <dependency>
-   <groupId>org.mockito</groupId>
-   <artifactId>mockito-core</artifactId>
-   <version>1.10.19</version>
-   <scope>test</scope>
-  </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>1.10.19</version>
+      <scope>test</scope>
+    </dependency>
 
-  <dependency>
-   <groupId>org.slf4j</groupId>
-   <artifactId>slf4j-api</artifactId>
-   <version>1.6.1</version>
-  </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.6.1</version>
+    </dependency>
 
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -406,53 +406,82 @@
     </dependency>
   </dependencies>
 
- <modules>
-  <module>integration-tools</module>
+  <modules>
+    <module>integration-tools</module>
 
-  <module>core</module>
-  <module>run-tools</module>
+    <module>core</module>
+    <module>run-tools</module>
 
-  <module>spring</module>
-  <module>miso-web</module>
-  <module>runstats-client</module>
+    <module>spring</module>
+    <module>miso-web</module>
 
-  <module>tagbarcode-strategies</module>
-  <module>miso-service</module>
-  <module>sqlstore</module>
-  <module>miso-dto</module>
- </modules>
-
- <profiles>
-  <profile>
-   <id>external</id>
-   <modules>
+    <module>tagbarcode-strategies</module>
+    <module>miso-service</module>
     <module>sqlstore</module>
+    <module>miso-dto</module>
+  </modules>
+  
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>uk.ac.bbsrc.tgac.miso</groupId>
+        <artifactId>sqlstore</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>uk.ac.bbsrc.tgac.miso</groupId>
+        <artifactId>miso-service</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>uk.ac.bbsrc.tgac.miso</groupId>
+        <artifactId>miso-dto</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>joda-time</groupId>
+        <artifactId>joda-time</artifactId>
+        <version>${joda-time.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.jackson</groupId>
+        <artifactId>jackson-mapper-asl</artifactId>
+        <version>${jackson.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
-    <module>runstats-client</module>
+  <profiles>
+    <profile>
+      <id>external</id>
+      <modules>
+        <module>sqlstore</module>
 
-    <module>analysis-server</module>
-    <module>notification-consumer-services</module>
-    <module>notification-server</module>
+        <module>runstats-client</module>
 
-    <module>demo-notification-client</module>
-    <module>demo-task</module>
-   </modules>
-   <activation>
-    <property>
-     <name>release</name>
-     <value>external</value>
-    </property>
-   </activation>
-  </profile>
- </profiles>
+        <module>analysis-server</module>
+        <module>notification-consumer-services</module>
+        <module>notification-server</module>
 
- <properties>
-  <simlims-version>0.0.5-SNAPSHOT</simlims-version>
-  <spring-version>3.1.3.RELEASE</spring-version>
-  <hibernate.version>4.2.21.Final</hibernate.version>
-  <joda-time.version>2.9</joda-time.version>
-  <jackson.version>1.9.2</jackson.version>
-  <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
- </properties>
+        <module>demo-notification-client</module>
+        <module>demo-task</module>
+      </modules>
+      <activation>
+        <property>
+          <name>release</name>
+          <value>external</value>
+        </property>
+      </activation>
+    </profile>
+  </profiles>
+
+  <properties>
+    <simlims-version>0.0.5-SNAPSHOT</simlims-version>
+    <spring-version>3.1.3.RELEASE</spring-version>
+    <hibernate.version>4.2.21.Final</hibernate.version>
+    <joda-time.version>2.9</joda-time.version>
+    <jackson.version>1.9.13</jackson.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
 
 </project>
