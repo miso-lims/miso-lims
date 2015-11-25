@@ -58,7 +58,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ls454.LS454Run;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ls454.LS454Status;
@@ -296,7 +295,7 @@ public class LS454NotificationMessageConsumerMechanism
                         f.setIdentificationBarcode(ptpId);
 
                         log.debug("\\_ Created new SequencerPartitionContainer with " + f.getPartitions().size() + " partitions");
-                        ((RunImpl) r).addSequencerPartitionContainer(f);
+                        r.addSequencerPartitionContainer(f);
                       }
                     } else {
                       SequencerPartitionContainer f = fs.iterator().next();

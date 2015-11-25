@@ -41,7 +41,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.decorator.submission.era.EraRunDecorator;
 import uk.ac.bbsrc.tgac.miso.core.data.decorator.submission.era.EraSampleDecorator;
 import uk.ac.bbsrc.tgac.miso.core.data.decorator.submission.era.EraStudyDecorator;
 import uk.ac.bbsrc.tgac.miso.core.data.decorator.submission.era.EraSubmissionDecorator;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 
 /**
  * Generates XML fragments for Submission, Study, Sample, Experiment and Run schema datatypes based on the SRA submission schema, backed by
@@ -232,7 +231,7 @@ public class ERASubmissionFactory {
     Element runSet = doc.createElementNS(null, "RUN_SET");
     doc.appendChild(runSet);
 
-    for (SequencerPartitionContainer<SequencerPoolPartition> f : ((RunImpl) r).getSequencerPartitionContainers()) {
+    for (SequencerPartitionContainer<SequencerPoolPartition> f : r.getSequencerPartitionContainers()) {
       for (SequencerPoolPartition p : f.getPartitions()) {
         if (p.getPool() != null) {
           generatePartitionRunSubmissionXML(doc, p, r, submissionProperties);

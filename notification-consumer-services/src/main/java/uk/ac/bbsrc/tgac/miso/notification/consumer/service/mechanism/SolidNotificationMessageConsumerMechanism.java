@@ -51,7 +51,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.solid.SolidRun;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.solid.SolidStatus;
@@ -273,7 +272,7 @@ public class SolidNotificationMessageConsumerMechanism
                       if (lf.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
                         lf.setPlatform(r.getSequencerReference().getPlatform());
                       }
-                      ((RunImpl) r).addSequencerPartitionContainer(lf);
+                      r.addSequencerPartitionContainer(lf);
                     }
                   } else {
                     log.debug("No containers linked to run " + r.getId() + ": creating...");
@@ -284,7 +283,7 @@ public class SolidNotificationMessageConsumerMechanism
                     if (f.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
                       f.setPlatform(r.getSequencerReference().getPlatform());
                     }
-                    ((RunImpl) r).addSequencerPartitionContainer(f);
+                    r.addSequencerPartitionContainer(f);
                   }
                 }
               } else {

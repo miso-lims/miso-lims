@@ -45,7 +45,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 import uk.ac.bbsrc.tgac.miso.runstats.client.RunStatsException;
 import uk.ac.tgac.statsdb.exception.ConsumerException;
 import uk.ac.tgac.statsdb.run.ReportTable;
@@ -127,9 +126,9 @@ public class RunStatsManager {
       log.error("get summary stats for run", e);
     }
 
-    if (!((RunImpl) run).getSequencerPartitionContainers().isEmpty()) {
+    if (!run.getSequencerPartitionContainers().isEmpty()) {
       JSONObject containers = new JSONObject();
-      for (SequencerPartitionContainer<SequencerPoolPartition> container : ((RunImpl) run).getSequencerPartitionContainers()) {
+      for (SequencerPartitionContainer<SequencerPoolPartition> container : run.getSequencerPartitionContainers()) {
         JSONObject f = new JSONObject();
         f.put("idBarcode", container.getIdentificationBarcode());
 
@@ -205,8 +204,8 @@ public class RunStatsManager {
 
     // clear any previous barcode query
     map.remove(RunProperty.barcode);
-    if (!((RunImpl) run).getSequencerPartitionContainers().isEmpty()) {
-      for (SequencerPartitionContainer<SequencerPoolPartition> container : ((RunImpl) run).getSequencerPartitionContainers()) {
+    if (!run.getSequencerPartitionContainers().isEmpty()) {
+      for (SequencerPartitionContainer<SequencerPoolPartition> container : run.getSequencerPartitionContainers()) {
         SequencerPoolPartition part = container.getPartitionAt(laneNumber);
         if (part.getPartitionNumber() == laneNumber) {
           if (part.getPool() != null) {
