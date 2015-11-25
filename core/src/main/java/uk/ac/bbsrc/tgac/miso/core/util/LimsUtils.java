@@ -143,6 +143,10 @@ public class LimsUtils {
     return "".equals(s) || s == null;
   }
 
+  public static boolean isStringBlankOrNull(String s) {
+    return s == null || "".equals(s.trim());
+  }
+
   /**
    * Join a collection, akin to Perl's join(), using a given delimiter to produce a single String
    * 

@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.util;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringBlankOrNull;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -87,7 +89,7 @@ public class SessionConversationAttributeStore implements SessionAttributeStore,
     String cId = getConversationIdFromRequest(request, attributeName);
 
     // create a new conversation id if it does not exist.
-    if (cId == null || cId.trim().length() == 0) {
+    if (isStringBlankOrNull(cId)) {
       cId = String.valueOf(System.currentTimeMillis());
 
       // set a request attribute so that the view can use it to pass along the
@@ -160,7 +162,7 @@ public class SessionConversationAttributeStore implements SessionAttributeStore,
     // look for a conversation id.
     String cId = getConversationIdFromRequest(request, attributeName);
 
-    if (cId != null && cId.trim().length() > 0) {
+    if (!isStringBlankOrNull(cId)) {
       attributeName = calculateSessionLookupKey(attributeName, cId);
     }
 
@@ -295,7 +297,7 @@ public class SessionConversationAttributeStore implements SessionAttributeStore,
 
       // create queue if necessary.
       if (queue != null) {
-        if (conversationId != null && conversationId.trim().length() > 0) {
+        if (!isStringBlankOrNull(conversationId)) {
           queue.remove(conversationId);
         }
       }
