@@ -1165,18 +1165,6 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
-  public Collection<LibraryDilution> listAllLibraryDilutionsByPoolAndPlatform(long poolId, PlatformType platformType) throws IOException {
-    User user = getCurrentUser();
-    Collection<LibraryDilution> accessibles = new HashSet<LibraryDilution>();
-    for (LibraryDilution dilution : super.listAllLibraryDilutionsByPoolAndPlatform(poolId, platformType)) {
-      if (dilution.userCanRead(user)) {
-        accessibles.add(dilution);
-      }
-    }
-    return accessibles;
-  }
-
-  @Override
   public Collection<emPCRDilution> listAllEmPcrDilutions() throws IOException {
     User user = getCurrentUser();
     Collection<emPCRDilution> accessibles = new HashSet<emPCRDilution>();

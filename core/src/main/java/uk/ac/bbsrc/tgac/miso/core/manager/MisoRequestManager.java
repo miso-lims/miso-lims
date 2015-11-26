@@ -794,15 +794,6 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<LibraryDilution> listAllLibraryDilutionsByPoolAndPlatform(long poolId, PlatformType platformType) throws IOException {
-    if (libraryDilutionStore != null) {
-      return libraryDilutionStore.listAllLibraryDilutionsByPoolAndPlatform(poolId, platformType);
-    } else {
-      throw new IOException("No libraryDilutionStore available. Check that it has been declared in the Spring config.");
-    }
-  }
-
-  @Override
   public Collection<emPCRDilution> listAllEmPcrDilutions() throws IOException {
     if (emPCRDilutionStore != null) {
       return emPCRDilutionStore.listAll();

@@ -95,12 +95,6 @@ public class SQLEmPCRDilutionDAO implements EmPCRDilutionStore {
 
   public static final String EMPCR_DILUTION_SELECT_BY_IDENTIFICATION_BARCODE = EMPCR_DILUTION_SELECT + " WHERE identificationBarcode=?";
 
-  public static final String EMPCR_DILUTION_SELECT_BY_LS454 = "SELECT p.dilutions_dilutionId, l.dilutionId, l.name, l.concentration, l.emPCR_pcrId, l.identificationBarcode, l.creationDate, l.dilutionUserName, l.securityProfile_profileId "
-      + "FROM emPCRDilution l, Pool_emPCRDilution p " + "WHERE l.dilutionId=p.dilutions_dilutionId";
-
-  public static final String EMPCR_DILUTION_SELECT_BY_SOLID = "SELECT p.dilutions_dilutionId, l.dilutionId, l.name, l.concentration, l.emPCR_pcrId, l.identificationBarcode, l.creationDate, l.dilutionUserName, l.securityProfile_profileId "
-      + "FROM emPCRDilution l, Pool_emPCRDilution p " + "WHERE l.dilutionId=p.dilutions_dilutionId";
-
   public static final String EMPCR_DILUTIONS_BY_RELATED_POOL_ID = EMPCR_DILUTION_SELECT + " AND p.pool_poolId=?";
 
   public static final String EMPCR_DILUTION_UPDATE = "UPDATE emPCRDilution "
