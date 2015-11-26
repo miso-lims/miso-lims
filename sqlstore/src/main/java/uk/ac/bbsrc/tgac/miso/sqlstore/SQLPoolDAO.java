@@ -90,7 +90,7 @@ import com.googlecode.ehcache.annotations.TriggersRemove;
 public class SQLPoolDAO implements PoolStore {
   private static final String TABLE_NAME = "Pool";
 
-  private static final String POOL_SELECT = "SELECT poolId, concentration, identificationBarcode, name, alias, creationDate, securityProfile_profileId, platformType, ready, qcPassed "
+  private static final String POOL_SELECT = "SELECT poolId, concentration, identificationBarcode, name, alias, creationDate, securityProfile_profileId, platformType, ready, qcPassed, lastModifier "
       + "FROM " + TABLE_NAME;
 
   public static final String POOL_SELECT_BY_POOL_ID = POOL_SELECT + " WHERE poolId=?";
@@ -105,7 +105,7 @@ public class SQLPoolDAO implements PoolStore {
   public static final String POOL_SELECT_BY_PLATFORM_AND_READY_AND_SEARCH = POOL_SELECT_BY_PLATFORM_AND_SEARCH + " AND ready=1";
 
   public static final String POOL_UPDATE = "UPDATE " + TABLE_NAME + " "
-      + "SET alias=:alias, concentration=:concentration, identificationBarcode=:identificationBarcode, creationDate=:creationDate, securityProfile_profileId=:securityProfile_profileId, platformType=:platformType, ready=:ready, qcPassed=:qcPassed "
+      + "SET alias=:alias, concentration=:concentration, identificationBarcode=:identificationBarcode, creationDate=:creationDate, securityProfile_profileId=:securityProfile_profileId, platformType=:platformType, ready=:ready, qcPassed=:qcPassed, lastModifier=:lastModifier "
       + "WHERE poolId=:poolId";
 
   public static final String POOL_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE poolId=:poolId";
@@ -172,7 +172,7 @@ public class SQLPoolDAO implements PoolStore {
 
   public static final String ILLUMINA_POOL_SELECT_BY_ID_BARCODE = ILLUMINA_POOL_SELECT + " AND identificationBarcode=?";
 
-  public static final String ILLUMINA_POOL_SELECT_BY_EXPERIMENT_ID = "SELECT ip.poolId, ip.concentration, ip.identificationBarcode, ip.name, ip.alias, ip.creationDate, ip.securityProfile_profileId, ip.platformType, ip.ready, ip.qcPassed "
+  public static final String ILLUMINA_POOL_SELECT_BY_EXPERIMENT_ID = "SELECT ip.poolId, ip.concentration, ip.identificationBarcode, ip.name, ip.alias, ip.creationDate, ip.securityProfile_profileId, ip.platformType, ip.ready, ip.qcPassed, ip.lastModifier "
       + "FROM " + TABLE_NAME + " ip, Pool_Experiment pe " + "WHERE ip.poolId=pe.pool_poolId " + "AND ip.platformType='Illumina' "
       + "AND pe.experiments_experimentId=?";
 
@@ -185,7 +185,7 @@ public class SQLPoolDAO implements PoolStore {
 
   public static final String LS454_POOL_SELECT_BY_ID_BARCODE = LS454_POOL_SELECT + " AND identificationBarcode=?";
 
-  public static final String LS454_POOL_SELECT_BY_EXPERIMENT_ID = "SELECT ip.poolId, ip.concentration, ip.identificationBarcode, ip.name, ip.alias, ip.creationDate, ip.securityProfile_profileId, ip.platformType, ip.ready, ip.qcPassed "
+  public static final String LS454_POOL_SELECT_BY_EXPERIMENT_ID = "SELECT ip.poolId, ip.concentration, ip.identificationBarcode, ip.name, ip.alias, ip.creationDate, ip.securityProfile_profileId, ip.platformType, ip.ready, ip.qcPassed, ip.lastModifier "
       + "FROM " + TABLE_NAME + " ip, Pool_Experiment pe " + "WHERE ip.poolId=pe.pool_poolId " + "AND ip.platformType='LS454' "
       + "AND pe.experiments_experimentId=?";
 
@@ -201,7 +201,7 @@ public class SQLPoolDAO implements PoolStore {
 
   public static final String SOLID_POOL_SELECT_BY_ID_BARCODE = SOLID_POOL_SELECT + " AND identificationBarcode=?";
 
-  public static final String SOLID_POOL_SELECT_BY_EXPERIMENT_ID = "SELECT ip.poolId, ip.concentration, ip.identificationBarcode, ip.name, ip.alias, ip.creationDate, ip.securityProfile_profileId, ip.platformType, ip.ready, ip.qcPassed "
+  public static final String SOLID_POOL_SELECT_BY_EXPERIMENT_ID = "SELECT ip.poolId, ip.concentration, ip.identificationBarcode, ip.name, ip.alias, ip.creationDate, ip.securityProfile_profileId, ip.platformType, ip.ready, ip.qcPassed, ip.lastModifier "
       + "FROM " + TABLE_NAME + " ip, Pool_Experiment pe " + "WHERE ip.poolId=pe.pool_poolId " + "AND ip.platformType='Solid' "
       + "AND pe.experiments_experimentId=?";
 
@@ -698,6 +698,7 @@ public class SQLPoolDAO implements PoolStore {
         p.setConcentration(rs.getDouble("concentration"));
         p.setIdentificationBarcode(rs.getString("identificationBarcode"));
         p.setReadyToRun(rs.getBoolean("ready"));
+        p.setLastModifier(securityDAO.getUserById(rs.getLong("lastModifier")));
         if (rs.getString("qcPassed") != null) {
           p.setQcPassed(Boolean.parseBoolean(rs.getString("qcPassed")));
         } else {
