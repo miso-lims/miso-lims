@@ -222,7 +222,6 @@
     <property name="projectDAO" ref="sqlProjectDAO" />
     <property name="sampleQcDAO" ref="sqlSampleQCDAO" />
     <property name="securityDAO" ref="sqlSecurityDAO" />
-    <property name="sampleAnalyteDAO" ref="sqlSampleAnalyteDAO"/>
     <property name="securityProfileDAO" ref="sqlSecurityProfileDAO" />
     <property name="jdbcTemplate" ref="interfaceTemplate" />
     <property name="autoGenerateIdentificationBarcodes">
