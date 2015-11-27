@@ -1,11 +1,11 @@
 
 -- Switch tables to InnoDB to permit foreign key constraints.
+--StartNoTest
 ALTER TABLE Sample ENGINE = InnoDB ROW_FORMAT = DEFAULT;
 ALTER TABLE Project ENGINE = InnoDB ROW_FORMAT = DEFAULT;
 ALTER TABLE KitDescriptor ENGINE = InnoDB ROW_FORMAT = DEFAULT;
-
-
 ALTER TABLE User ENGINE = InnoDB ROW_FORMAT = DEFAULT;
+--EndNoTest
 
 CREATE TABLE `TissueOrigin` (
   `tissueOriginId` bigint(20) NOT NULL AUTO_INCREMENT,
