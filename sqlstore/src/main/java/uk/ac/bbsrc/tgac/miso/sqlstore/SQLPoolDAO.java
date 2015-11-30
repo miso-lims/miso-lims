@@ -30,18 +30,18 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
-
+import org.apache.commons.lang.NotImplementedException;
 import org.codehaus.jackson.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -49,6 +49,17 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.store.SecurityStore;
+import com.googlecode.ehcache.annotations.Cacheable;
+import com.googlecode.ehcache.annotations.KeyGenerator;
+import com.googlecode.ehcache.annotations.Property;
+import com.googlecode.ehcache.annotations.TriggersRemove;
+
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Plate;
@@ -71,14 +82,6 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DaoLookup;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
-import com.eaglegenomics.simlims.core.SecurityProfile;
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.store.SecurityStore;
-import com.googlecode.ehcache.annotations.Cacheable;
-import com.googlecode.ehcache.annotations.KeyGenerator;
-import com.googlecode.ehcache.annotations.Property;
-import com.googlecode.ehcache.annotations.TriggersRemove;
-
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore
  * <p/>
@@ -89,6 +92,8 @@ import com.googlecode.ehcache.annotations.TriggersRemove;
  */
 public class SQLPoolDAO implements PoolStore {
   private static final String TABLE_NAME = "Pool";
+
+  private static final String POOL_CHANGE_LOG_INSERT = "INSERT INTO PoolChangeLog (poolId, columnsChanged, userId, message) VALUES (?, '', ?, ?)";
 
   private static final String POOL_SELECT = "SELECT poolId, concentration, identificationBarcode, name, alias, creationDate, securityProfile_profileId, platformType, ready, qcPassed, lastModifier "
       + "FROM " + TABLE_NAME;
@@ -443,6 +448,15 @@ public class SQLPoolDAO implements PoolStore {
       }
     }
 
+    Set<String> oldIds = new HashSet<String>(
+        template.query(POOL_ELEMENT_SELECT_BY_POOL_ID, new Object[] { pool.getId() }, new RowMapper<String>() {
+          @Override
+          public String mapRow(ResultSet rs, int pos) throws SQLException {
+            String[] parts = rs.getString("elementType").split("\\.");
+            return parts[parts.length - 1] + ":" + rs.getLong("elementId");
+          }
+        }));
+    Set<String> newIds = new HashSet<String>();
     MapSqlParameterSource delparams = new MapSqlParameterSource();
     delparams.addValue("pool_poolId", pool.getId());
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
@@ -458,6 +472,7 @@ public class SQLPoolDAO implements PoolStore {
       Cache ldc = cacheManager.getCache("lazy" + type + "Cache");
 
       for (Poolable d : pool.getPoolableElements()) {
+        newIds.add(d.getClass().getSimpleName() + ":" + d.getId());
         MapSqlParameterSource esParams = new MapSqlParameterSource();
         esParams.addValue("elementId", d.getId());
         esParams.addValue("pool_poolId", pool.getId());
@@ -481,6 +496,16 @@ public class SQLPoolDAO implements PoolStore {
           }
         }
       }
+    }
+
+    Set<String> commonIds = new HashSet<>(oldIds);
+    commonIds.retainAll(newIds);
+    newIds.removeAll(commonIds);
+    oldIds.removeAll(commonIds);
+    if (!newIds.isEmpty() || !oldIds.isEmpty()) {
+      String message = user.getLoginName() + (oldIds.isEmpty() ? "" : (" Removed: " + buildElementString(oldIds)))
+          + (newIds.isEmpty() ? "" : (" Added: " + buildElementString(newIds)));
+      template.update(POOL_CHANGE_LOG_INSERT, pool.getId(), pool.getLastModifier().getUserId(), message);
     }
 
     MapSqlParameterSource poolparams = new MapSqlParameterSource();
@@ -517,6 +542,33 @@ public class SQLPoolDAO implements PoolStore {
     purgeListCache(pool);
 
     return pool.getId();
+  }
+
+  private String buildElementString(Set<String> ids) {
+    StringBuilder names = new StringBuilder();
+    for (String id : ids) {
+      if (names.length() > 0) {
+        names.append(", ");
+      }
+      String[] parts = id.split(":");
+      String idColumn;
+      if (parts[0].equals("LibraryDilution")) {
+        idColumn = "dilutionId";
+      } else if (parts[0].equals("Plate")) {
+        idColumn = "plateId";
+      } else {
+        throw new NotImplementedException("Don't know how to pool: " + parts[0]);
+      }
+      names.append(template.query("SELECT name FROM " + parts[0] + " WHERE " + idColumn + " = ?",
+          new Object[] { Integer.parseInt(parts[1]) }, new ResultSetExtractor<String>() {
+            @Override
+            public String extractData(ResultSet rs) throws SQLException, DataAccessException {
+              return rs.next() ? rs.getString("name") : null;
+            }
+
+          }));
+    }
+    return names.toString();
   }
 
   @Override
