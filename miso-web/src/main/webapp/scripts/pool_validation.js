@@ -21,33 +21,75 @@
  * *********************************************************************
  */
 
+jQuery(document).ready(function () {
+  jQuery('#pool-form').parsley();
+  jQuery.listen('parsley:field:validate', function () {
+    updateWarning();
+  });
+});
+
+function clean_pool_fields() {
+  jQuery('#pool-form').find('input:text').each(function() {
+    Utils.validation.clean_input_field(jQuery(this));
+  });
+};
+
+// update warning message
+function updateWarning() {
+  if (true === jQuery('#pool-form').parsley().isValid()) {
+    jQuery('.bs-callout-info').removeClass('hidden');
+    jQuery('.bs-callout-warning').addClass('hidden');
+  } else {
+    jQuery('.bs-callout-info').addClass('hidden');
+    jQuery('.bs-callout-warning').removeClass('hidden');
+  }
+};
+
 function validate_pool(form) {
-  var ok = true;
-  var error = "Please correct the following errors:\n";
-  if (form.concentration.value.length == 0) {
-    error += "You have not filled the Concentration of the Pool.\n";
-    ok = false;
-  }
+  clean_pool_fields();
 
-  var numberExp = /[.*0-9]/;
-  if (!numberExp.test(form.concentration.value)) {
-    error += "The Concentration of the Pool can only be numbers.\n";
-    ok = false;
-  }
+  jQuery('#pool-form').parsley().destroy();
 
-  if (form.creationDate.value.length == 0) {
-    error += "You have not filled the Creation Date of the Pool.\n";
-    ok = false;
-  }
+  // Alias input field validation
+  jQuery('#alias').attr('class', 'form-control');
+  jQuery('#alias').attr('data-parsley-required', 'true');
+  jQuery('#alias').attr('data-parsley-maxlength', '100');
+  jQuery('#alias').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
 
-  if (!jQuery('#dillist').html().trim()) {
-    error += "You have selected no dilutions for this Pool.\n";
-    ok = false;
-  }
+  // Description input field validation
+  jQuery('#description').attr('class', 'form-control');
+  jQuery('#description').attr('data-parsley-required', 'true');
+  jQuery('#description').attr('data-parsley-maxlength', '100');
+  jQuery('#description').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
 
-  if (!ok) {
-    alert(error);
-  }
+  // Concentration input field validation
+  jQuery('#concentration').attr('class', 'form-control');
+  jQuery('#concentration').attr('data-parsley-required', 'true');
+  jQuery('#concentration').attr('data-parsley-maxlength', '100');
+  jQuery('#concentration').attr('data-parsley-type', 'number');
 
-  return ok;
-}
+  // Creation Date input field validation
+  jQuery('creationDate').attr('data-parsley-required', 'true');
+  jQuery('creationDate').attr('data-parsley-pattern', Utils.validation.dateRegex);
+  jQuery('creationDate').attr('data-date-format', 'DD/MM/YYYY');
+  jQuery('creationDate').attr('data-parsley-error-message', 'Date must be of form DD/MM/YYYY');
+
+  jQuery('#pool-form').parsley();
+  jQuery('#pool-form').parsley().validate();
+
+  validate_backend();
+ }
+
+var validate_backend = function() {
+  if (jQuery('#pool-form').parsley().isValid() === true) {
+    jQuery('.bs-callout-info').removeClass('hidden');
+    jQuery('.bs-callout-warning').addClass('hidden');
+
+    jQuery('#pool-form').submit();
+    return true;
+  } else {
+    jQuery('.bs-callout-info').addClass('hidden');
+    jQuery('.bs-callout-warning').removeClass('hidden');
+    return false;
+  }
+};

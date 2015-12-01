@@ -36,6 +36,10 @@
 
 <script src="<c:url value='/scripts/stats_ajax.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
 
+<script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
+<script type="text/javascript" src="<c:url value='/scripts/library_validation.js?ts=${timestamp.time}'/>"></script>
+
+
 <div id="maincontent">
 <div id="contentcolumn">
 <c:if test="${library.id == 0}">
@@ -53,7 +57,7 @@
 <div id="tab-1">
 </c:if>
 
-<form:form action="/miso/library" method="POST" commandName="library" autocomplete="off" acceptCharset="utf-8">
+<form:form id="library-form" data-parsley-validate="" action="/miso/library" method="POST" commandName="library" autocomplete="off" acceptCharset="utf-8">
 <sessionConversation:insertSessionConversationId attributeName="library"/>
 <h1>
   <c:choose>
@@ -61,7 +65,7 @@
     <c:otherwise>Create</c:otherwise>
   </c:choose> Library
   <button type="button" class="fg-button ui-state-default ui-corner-all"
-          onclick="return validate_library(this.form);">Save
+          onclick="return validate_library();">Save
   </button>
 </h1>
 <div class="breadcrumbs">
@@ -107,6 +111,12 @@
 <div id="notediv" class="note" style="display:none;">A Library is the first step in constructing sequenceable
   material from an initial Sample. A Library is then diluted down to a Dilution, and put in a Pool.
 </div>
+
+<div class="bs-callout bs-callout-warning hidden">
+  <h2>Oh snap!</h2>
+  <p>This form seems to be invalid</p>
+</div>
+
 <h2>Library Information</h2>
 
 <div class="barcodes">

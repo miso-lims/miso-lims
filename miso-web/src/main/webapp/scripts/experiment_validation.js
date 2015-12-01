@@ -21,6 +21,69 @@
  * *********************************************************************
  */
 
+jQuery(document).ready(function () {
+  jQuery('#experiment-form').parsley();
+  jQuery.listen('parsley:field:validate', function () {
+    updateWarning();
+  });
+});
+
+// Trim whitespace from input fields
+function clean_experiment_fields() {
+  jQuery('#experiment-form').find('input:text').each(function() {
+    Utils.validation.clean_input_field(jQuery(this));
+  });
+};
+
+// update warning message
+function updateWarning() {
+  if (true === jQuery('#experiment-form').parsley().isValid()) {
+    jQuery('.bs-callout-info').removeClass('hidden');
+    jQuery('.bs-callout-warning').addClass('hidden');
+  } else {
+    jQuery('.bs-callout-info').addClass('hidden');
+    jQuery('.bs-callout-warning').removeClass('hidden');
+  }
+};
+
+function validate_experiment() {
+  clean_experiment_fields();
+
+  jQuery('#experiment-form').parsley().destroy();
+
+  // Title input field validation
+  jQuery('#title').attr('class', 'form-control');
+  jQuery('#title').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+  jQuery('#title').attr('data-parsley-required', 'true');
+  jQuery('#title').attr('data-parsley-maxlength', '255');
+
+  // Alias input field validation
+  jQuery('#alias').attr('class', 'form-control');
+  jQuery('#alias').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+  jQuery('#alias').attr('data-parsley-required', 'true');
+  jQuery('#alias').attr('data-parsley-maxlength', '100');
+
+  // Description input field validation
+  jQuery('#description').attr('class', 'form-control');
+  jQuery('#description').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+  jQuery('#description').attr('data-parsley-required', 'true');
+  jQuery('#description').attr('data-parsley-maxlength', '255');
+
+  jQuery('#experiment-form').parsley();
+  jQuery('#experiment-form').parsley().validate();
+  validate_backend();
+};
+
+function validate_backend() {
+  updateWarning();
+
+  // if valid, then submit form
+  if (true === jQuery('#experiment-form').parsley().isValid()) {
+    jQuery('#experiment-form').submit();
+  }
+};
+
+/*
 function validate_experiment(form) {
   var ok = true;
   var error = "Please correct the following error(s):\n\n";
@@ -35,7 +98,7 @@ function validate_experiment(form) {
       var result = Utils.validation.validate_input_field(this, 'Experiment', ok);
       ok = result.okstatus;
       error += result.errormsg;
-    })
+    });
   }
 
   if (!ok) {
@@ -44,3 +107,4 @@ function validate_experiment(form) {
 
   return ok;
 }
+*/

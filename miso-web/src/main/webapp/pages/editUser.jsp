@@ -22,18 +22,26 @@
   ~
   ~ **********************************************************************
   --%>
+<script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
+<script type="text/javascript" src="<c:url value='/scripts/user_validation.js?ts=${timestamp.time}'/>"></script>
 
 <div id="maincontent">
   <div id="contentcolumn">
     <c:choose>
       <c:when test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-        <form:form action="/miso/admin/user" method="POST" commandName="user" autocomplete="off">
+        <form:form id="user-form" data-parsley-validation="" action="/miso/admin/user" method="POST" commandName="user" autocomplete="off">
           <sessionConversation:insertSessionConversationId attributeName="user"/>
           <h1><c:choose><c:when
               test="${not empty user.userId}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose>
             User
-            <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
+            <button onclick="return validate_user();" class="fg-button ui-state-default ui-corner-all">Save</button>
           </h1>
+
+          <div class="bs-callout bs-callout-warning hidden">
+            <h2>Oh snap!</h2>
+            <p>This form seems to be invalid!</p>
+          </div>
+
           <table class="in">
             <tr>
               <td class="h">User ID:</td>

@@ -22,21 +22,21 @@
  */
 
 jQuery(document).ready(function () {
+  jQuery('#group-form').parsley();
   jQuery.listen('parsley:field:validate', function () {
     updateWarning();
   });
 });
 
-// Trim whitespace from input fields
-function clean_study_fields() {
-  jQuery('#study-form').find('input:text').each(function() {
+function clean_group_fields() {
+  jQuery('#group-form').find('input:text').each(function() {
     Utils.validation.clean_input_field(jQuery(this));
   });
 };
 
 // update warning message
 function updateWarning() {
-  if (true === jQuery('#study-form').parsley().isValid()) {
+  if (true === jQuery('#group-form').parsley().isValid()) {
     jQuery('.bs-callout-info').removeClass('hidden');
     jQuery('.bs-callout-warning').addClass('hidden');
   } else {
@@ -45,31 +45,35 @@ function updateWarning() {
   }
 };
 
-function validate_study() {
-  clean_study_fields();
-  // Have to manually add attributes to all form elements because form elements are dynamically generated :/
-  jQuery('#study-form').parsley().destroy();
+function validate_group() {
+  clean_group_fields();
 
-  // Alias input field validation
-  jQuery('#alias').attr('class', 'form-control');
-  jQuery('#alias').attr('data-parsley-required', 'true');
-  jQuery('#alias').attr('data-parsley-maxlength', '100');
+  jQuery('#group-form').parsley().destroy();
 
-  // Description input field validation
+  // Full name input field validation
+  jQuery('#name').attr('class', 'form-control');
+  jQuery('#name').attr('data-parsley-required', 'true');
+  jQuery('#name').attr('data-parsley-maxlength', '100');
+  jQuery('#name').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+
+  // Login name input field validation
   jQuery('#description').attr('class', 'form-control');
-  jQuery('#description').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
   jQuery('#description').attr('data-parsley-required', 'true');
-  jQuery('#description').attr('data-parsley-maxlength', '65535');
-  jQuery('#study-form').parsley();
-  jQuery('#study-form').parsley().validate();
-  validate_backend();
+  jQuery('#description').attr('data-parsley-maxlength', '100');
+  jQuery('#description').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+
+  jQuery('#group-form').parsley();
+  jQuery('#group-form').parsley().validate();
+
+  return validate_backend();
 };
 
-function validate_backend() {
+var validate_backend = function() {
   updateWarning();
-  // if valid, then submit form
-  if (true === jQuery('#study-form').parsley().isValid()) {
-    jQuery('#study-form').submit();
+  if (jQuery('#group-form').parsley().isValid() === true) {
+    jQuery('#group-form').submit();
+    return true;
+  } else {
+    return false;
   }
 };
-

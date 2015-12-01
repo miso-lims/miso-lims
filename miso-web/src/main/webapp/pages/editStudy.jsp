@@ -32,17 +32,19 @@
 <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.breadcrumbs.popup.js'/>"></script>
 <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.popup.js'/>"></script>
 
+<script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
+<script type="text/javascript" src="<c:url value='/scripts/study_validation.js?ts=${timestamp.time}'/>"></script>
+
 <div id="maincontent">
   <div id="contentcolumn">
-    <form:form action="/miso/study" method="POST" commandName="study" autocomplete="off"
-               onsubmit="return validate_study(this);">
+    <form:form id="study-form" data-parsley-validate="" action="/miso/study" method="POST" commandName="study" autocomplete="off">
       <sessionConversation:insertSessionConversationId attributeName="study"/>
       <h1>
         <c:choose>
           <c:when test="${study.id != 0}">Edit</c:when>
           <c:otherwise>Create</c:otherwise>
         </c:choose> Study
-        <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
+        <button type="submit" class="fg-button ui-state-default ui-corner-all" onclick="return validate_study();">Save</button>
       </h1>
       <div class="breadcrumbs">
         <ul>
@@ -67,6 +69,12 @@
       <div id="notediv" class="note" style="display:none;">A Study contains more fine-grained information about
         the sequencing Project. Studies can contain any number of sequencing Experiments and Analysis.
       </div>
+
+      <div class="bs-callout bs-callout-warning hidden">
+        <h2>Oh snap!</h2>
+        <p>This form seems to be invalid</p>
+      </div>
+
       <h2>Study Information</h2>
       <table class="in">
       <tr>

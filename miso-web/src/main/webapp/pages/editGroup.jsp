@@ -23,18 +23,26 @@
   ~
   ~ **********************************************************************
   --%>
+<script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
+<script type="text/javascript" src="<c:url value='/scripts/group_validation.js?ts=${timestamp.time}'/>"></script>
 
 <div id="maincontent">
   <div id="contentcolumn">
-    <form:form method="POST" commandName="group" autocomplete="off">
+    <form:form id="group-form" method="POST" commandName="group" autocomplete="off">
 
       <sessionConversation:insertSessionConversationId attributeName="group"/>
 
       <h1><c:choose><c:when
           test="${not empty group.groupId}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose>
         Group
-        <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
+        <button onclick="return validate_group();" class="fg-button ui-state-default ui-corner-all">Save</button>
       </h1>
+
+      <div class="bs-callout bs-callout-warning hidden">
+            <h2>Oh snap!</h2>
+            <p>This form seems to be invalid!</p>
+      </div>
+
       <table class="in">
         <tr>
           <td class="h">Group ID:</td>

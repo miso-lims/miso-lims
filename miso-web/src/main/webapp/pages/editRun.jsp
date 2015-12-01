@@ -34,16 +34,18 @@
 <script src="<c:url value='/scripts/statsdbperbasecontent.js'/>" type="text/javascript"></script>
 
 <script type="text/javascript" src="<c:url value='/scripts/run_ajax.js?ts=${timestamp.time}'/>"></script>
-<script type="text/javascript" src="<c:url value='/scripts/run_validation.js?ts=${timestamp.time}'/>"></script>
 <script type="text/javascript" src="<c:url value='/scripts/stats_ajax.js?ts=${timestamp.time}'/>"></script>
+
+
+<script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
+<script type="text/javascript" src="<c:url value='/scripts/run_validation.js?ts=${timestamp.time}'/>"></script>
 
 <c:choose>
   <c:when test="${not empty run.status}"><div id="maincontent" class="${run.status.health.key}"></c:when>
   <c:otherwise><div id="maincontent"></c:otherwise>
 </c:choose>
 <div id="contentcolumn">
-<form:form action="/miso/run" method="POST" modelAttribute="run" autocomplete="off"
-           onsubmit="return validate_run(this);">
+<form:form id="run-form" data-parsley-validate="" action="/miso/run" method="POST" modelAttribute="run" autocomplete="off">
 
 <sessionConversation:insertSessionConversationId attributeName="run"/>
 
@@ -52,7 +54,7 @@
     <c:when test="${run.id != 0}">Edit</c:when>
     <c:otherwise>Create</c:otherwise>
   </c:choose> Run
-  <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
+  <button onclick="return validate_run();" class="fg-button ui-state-default ui-corner-all">Save</button>
 </h1>
 
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
@@ -62,6 +64,12 @@
   Each run partition (lane/chamber) holds a Pool which is linked to a number of Experiments to facilitate multiplexing
   if required.
 </div>
+
+<div class="bs-callout bs-callout-warning hidden">
+  <h2>Oh snap!</h2>
+  <p>This form seems to be invalid!</p>
+</div>
+
 <h2>Run Information</h2>
 <ul class="sddm" style="margin: 0px 8px 0 0;">
   <li>
@@ -108,6 +116,7 @@
       <c:when test="${run.id == 0}">
         <td>Platform:</td>
         <td>
+          <div id="platformButtons">
           <c:choose>
             <c:when test="${not empty run.status and run.status.health.key ne 'Unknown'}"><form:radiobuttons
                 id="platformTypes" path="platformType" items="${platformTypes}"
@@ -116,6 +125,7 @@
             <c:otherwise><form:radiobuttons id="platformTypes" path="platformType" items="${platformTypes}"
                                             onchange="Run.ui.changePlatformType(this);"/></c:otherwise>
           </c:choose>
+        </div>
         </td>
       </c:when>
       <c:otherwise>
@@ -124,7 +134,14 @@
       </c:otherwise>
     </c:choose>
   </tr>
-
+  <tr>
+    <td></td>
+    <td>
+      <div class="parsley-errors-list filled" id="platformError">
+        <div class="parsley-required"></div>
+      </div>
+    </td>
+  </tr>
   <tr>
     <c:choose>
       <c:when test="${run.id == 0}">

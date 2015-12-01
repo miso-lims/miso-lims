@@ -21,34 +21,74 @@
  * *********************************************************************
  */
 
-function validate_project(form) {
-  var ok = true;
-  var error = "Please correct the following error(s):\n\n";
-  
-  if (jQuery("input[name=progress]").length > 0) {
-    if (!jQuery('input[name=progress]').is(':checked')) {
-      ok = false;
-      error += "You have not chosen the Progress of the Project.\n";
-    }
-  }
+jQuery(document).ready(function () {
+  jQuery('#project-form').parsley();
+  jQuery.listen('parsley:field:validate', function () {
+    updateWarning();
+  });
+});
 
-  if (jQuery(':text.validateable').length > 0) {
-    jQuery(':text.validateable').each(function() {
-      var result = Utils.validation.validate_input_field(this,'Project', ok);
-      ok = result.okstatus;
-      error += result.errormsg;
-    })
-  }
+function clean_project_fields() {
+  jQuery('#project-form').find('input:text').each(function() {
+    Utils.validation.clean_input_field(jQuery(this));
+  });
+};
 
-  if (!ok) {
-    alert(error);
+// update warning message
+function updateWarning() {
+  if (true === jQuery('#project-form').parsley().isValid()) {
+    jQuery('.bs-callout-info').removeClass('hidden');
+    jQuery('.bs-callout-warning').addClass('hidden');
+  } else {
+    jQuery('.bs-callout-info').addClass('hidden');
+    jQuery('.bs-callout-warning').removeClass('hidden');
   }
-  else {
-    form.submit();
-  }
+};
 
-  return ok;
-}
+function validate_project() {
+  clean_project_fields();
+
+  jQuery('#project-form').parsley().destroy();
+
+  // Alias input field validation
+  jQuery('#alias').attr('class', 'form-control');
+  jQuery('#alias').attr('data-parsley-required', 'true');
+  jQuery('#alias').attr('data-parsley-maxlength', '100');
+  jQuery('#alias').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+
+  // Description input field validation
+  jQuery('#description').attr('class', 'form-control');
+  jQuery('#description').attr('data-parsley-required', 'true');
+  jQuery('#description').attr('data-parsley-maxlength', '100');
+  jQuery('#description').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+
+  // Radio button validation: ensure a button is selected (assumes there is one progress button, no other way to check because of dynamic
+  // generation)
+  jQuery('#progress1').attr('required', 'true');
+  jQuery('#progress1').attr('data-parsley-error-message', 'You must select a progress.');
+  jQuery('#progress1').attr('data-parsley-errors-container', '#progressSelectError');
+  jQuery('#progress1').attr('data-parsley-class-handler', '#progressButtons');
+
+
+  jQuery('#project-form').parsley();
+  jQuery('#project-form').parsley().validate();
+
+  validateFront();
+ }
+
+var validateFront = function() {
+  if (jQuery('#project-form').parsley().isValid() === true) {
+    jQuery('.bs-callout-info').removeClass('hidden');
+    jQuery('.bs-callout-warning').addClass('hidden');
+
+    jQuery('#project-form').submit();
+    return true;
+  } else {
+    jQuery('.bs-callout-info').addClass('hidden');
+    jQuery('.bs-callout-warning').removeClass('hidden');
+    return false;
+  }
+};
 
 function validate_sample_qcs(json) {
   var ok = true;
@@ -73,4 +113,3 @@ function validate_empcr_dilutions(json) {
   }
   return ok;
 }
-

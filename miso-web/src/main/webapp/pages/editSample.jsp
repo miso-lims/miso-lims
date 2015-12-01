@@ -41,6 +41,9 @@
 
 <script src="<c:url value='/scripts/stats_ajax.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
 
+<script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
+<script type="text/javascript" src="<c:url value='/scripts/sample_validation.js?ts=${timestamp.time}'/>"></script>
+
 <div id="maincontent">
 <div id="contentcolumn">
 <c:if test="${sample.id == 0 and not empty sample.project}">
@@ -53,7 +56,8 @@
 <div id="tab-1">
 </c:if>
 
-<form:form action="/miso/sample" method="POST" commandName="sample" autocomplete="off" acceptCharset="utf-8">
+
+<form:form id="sample-form" data-parsley-validate="" action="/miso/sample" method="POST" commandName="sample" autocomplete="off" acceptCharset="utf-8">
 <sessionConversation:insertSessionConversationId attributeName="sample"/>
 <h1>
   <c:choose>
@@ -61,7 +65,7 @@
     <c:otherwise>Create</c:otherwise>
   </c:choose> Sample
   <button type="button" class="fg-button ui-state-default ui-corner-all"
-          onclick="return validate_sample(this.form);">Save
+          onclick="return validate_sample();">Save
   </button>
 </h1>
 
@@ -101,6 +105,12 @@
   sequencing experiments are to be based. Samples can be used in any number of sequencing Experiments in the form
   of a Library that is often processed further into pooled Dilutions.
 </div>
+
+<div class="bs-callout bs-callout-warning hidden">
+  <h2>Oh snap!</h2>
+  <p>This form seems to be invalid!</p>
+</div>
+
 <h2>Sample Information</h2>
 
 <div class="barcodes">
@@ -195,6 +205,9 @@
               <form:checkboxes items="${accessibleProjects}" path="project" itemValue="id"
                                itemLabel="name" onclick="Utils.ui.uncheckOthers('project', this);"/>
             </div>
+            <div class="parsley-errors-list filled" id="projectError">
+              <div class="parsley-required"></div>
+            </div>
           </td>
         </c:when>
         <c:otherwise>
@@ -215,13 +228,13 @@
       </td>
     </tr>
     <tr>
-      <td class="h">Alias:</td>
-      <td><form:input path="alias" class="validateable"/><span id="aliascounter" class="counter"></span></td>
+      <td class="h">Alias:*</td>
+      <td><form:input id="alias" path="alias" name="alias"/><span id="aliascounter" class="counter"></span></td>
         <%--<td><a href="void(0);" onclick="popup('help/sampleAlias.html');">Help</a></td>--%>
     </tr>
     <tr>
-      <td>Description:</td>
-      <td><form:input path="description" class="validateable"/><span id="descriptioncounter"
+      <td>Description:*</td>
+      <td><form:input id="description" path="description"/><span id="descriptioncounter"
                                                                      class="counter"></span>
       </td>
         <%--<td><a href="void(0);" onclick="popup('help/sampleDescription.html');">Help</a></td>--%>
@@ -229,14 +242,14 @@
     <tr>
       <td>Date of receipt:</td>
       <td>
-        <form:input path="receivedDate" id="receiveddatepicker"/>
+        <form:input path="receivedDate" id="receiveddatepicker" placeholder="DD/MM/YYYY"/>
         <script type="text/javascript">
           Utils.ui.addDatePicker("receiveddatepicker");
         </script>
       </td>
     </tr>
     <tr>
-      <td class="h">Scientific Name:</td>
+      <td class="h">Scientific Name:*</td>
       <td><form:input path="scientificName"/>
         <c:if test="${sessionScope.taxonLookupEnabled}">
         <script>Utils.timer.typewatchFunc(jQuery('#scientificName'), validate_ncbi_taxon, 1000, 2);</script>
@@ -253,7 +266,7 @@
       </tr>
     </c:if>
     <tr>
-      <td>Sample Type:</td>
+      <td>Sample Type:*</td>
       <td><form:select id="sampleTypes" path="sampleType" items="${sampleTypes}"/></td>
     </tr>
     <tr bgcolor="yellow">

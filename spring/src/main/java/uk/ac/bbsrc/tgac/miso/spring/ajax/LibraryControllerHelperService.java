@@ -123,6 +123,21 @@ public class LibraryControllerHelperService {
   @Autowired
   private MisoNamingScheme<Library> libraryNamingScheme;
 
+
+  /**
+   * Returns a JSONObject containing the alias regex used by the current library naming scheme
+   */
+  public JSONObject getLibraryAliasRegex(HttpSession session, JSONObject json) {
+    try {
+      JSONObject response = new JSONObject();
+      response.put("aliasRegex", libraryNamingScheme.getValidationRegex("alias"));
+      return response;
+    } catch (MisoNamingException e) {
+      log.error("Could not retrieve library alias regex from server!");
+      return JSONUtils.SimpleJSONError("Could not retrieve library alias regex from server!");
+    }
+  }
+
   public JSONObject validateLibraryAlias(HttpSession session, JSONObject json) {
     if (json.has("alias")) {
       String alias = json.getString("alias");

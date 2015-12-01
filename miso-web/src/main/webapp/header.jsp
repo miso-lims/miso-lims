@@ -77,6 +77,9 @@
   <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.tablesorter.min.js'/>"></script>
   <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.metadata.js'/>"></script>
 
+  <!-- Parsley -->
+  <script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
+
   <!-- D3.js for Graphics -->
   <script type="text/javascript" src="<c:url value='/scripts/d3v2/d3.v2.min.js'/>"></script>
 
@@ -98,15 +101,6 @@
   <script type="text/javascript"
           src="<c:url value='/scripts/sequencer_reference_ajax.js?ts=${timestamp.time}'/>"></script>
   <script type="text/javascript" src="<c:url value='/scripts/study_ajax.js?ts=${timestamp.time}'/>"></script>
-
-  <!-- form validations -->
-  <script type="text/javascript"
-          src="<c:url value='/scripts/experiment_validation.js?ts=${timestamp.time}'/>"></script>
-  <script type="text/javascript" src="<c:url value='/scripts/library_validation.js?ts=${timestamp.time}'/>"></script>
-  <script type="text/javascript" src="<c:url value='/scripts/pool_validation.js?ts=${timestamp.time}'/>"></script>
-  <script type="text/javascript" src="<c:url value='/scripts/project_validation.js?ts=${timestamp.time}'/>"></script>
-  <script type="text/javascript" src="<c:url value='/scripts/sample_validation.js?ts=${timestamp.time}'/>"></script>
-  <script type="text/javascript" src="<c:url value='/scripts/study_validation.js?ts=${timestamp.time}'/>"></script>
 
   <!-- give $ back to prototype -->
   <script type="text/javascript">jQuery.noConflict();</script>
