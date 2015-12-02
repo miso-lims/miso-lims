@@ -761,9 +761,9 @@ public class FlexReportingControllerHelperService {
               if (l.getQcPassed() != null) {
                 if (l.getQcPassed()) {
                   libqcpassed++;
+                } else {
+                  libqcfailed++;
                 }
-              } else {
-                libqcfailed++;
               }
             }
           }
