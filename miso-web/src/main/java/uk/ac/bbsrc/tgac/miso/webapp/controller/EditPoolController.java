@@ -110,13 +110,17 @@ public class EditPoolController {
   public Collection<String> populatePlatformTypes() {
     return PlatformType.getKeys();
   }
+  
+  public Boolean misoPropertyBoolean(String property) {
+    MisoPropertyExporter exporter = (MisoPropertyExporter) ApplicationContextProvider.getApplicationContext().getBean("propertyConfigurer");
+    Map<String, String> misoProperties = exporter.getResolvedProperties();
+    return misoProperties.containsKey(property)
+        && Boolean.parseBoolean(misoProperties.get(property));
+  }
 
   @ModelAttribute("autoGenerateIdBarcodes")
   public Boolean autoGenerateIdentificationBarcodes() {
-    MisoPropertyExporter exporter = (MisoPropertyExporter) ApplicationContextProvider.getApplicationContext().getBean("propertyConfigurer");
-    Map<String, String> misoProperties = exporter.getResolvedProperties();
-    return misoProperties.containsKey("miso.autoGenerateIdentificationBarcodes")
-        && Boolean.parseBoolean(misoProperties.get("miso.autoGenerateIdentificationBarcodes"));
+    return misoPropertyBoolean("miso.autoGenerateIdentificationBarcodes");
   }
 
   private List<? extends Dilution> populateAvailableDilutions(Pool pool) throws IOException {
