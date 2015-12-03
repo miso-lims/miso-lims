@@ -34,12 +34,15 @@ import java.util.LinkedList;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
@@ -139,6 +142,14 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @OneToOne(targetEntity = SampleAdditionalInfoImpl.class)
   @JoinColumn(name = "sampleAdditionalInfoId")
   private SampleAdditionalInfo sampleAdditionalInfo;
+
+  @ManyToOne(targetEntity = SampleImpl.class)
+  @JoinColumn(name = "parentId")
+  private Sample parent;
+
+  @OneToMany(targetEntity = SampleImpl.class, fetch = FetchType.LAZY)
+  @JoinTable(name = "SampleHierarchy", joinColumns = @JoinColumn(name = "parentId") , inverseJoinColumns = @JoinColumn(name = "childId") )
+  private Set<Sample> children = new HashSet<Sample>();
 
   @Override
   public User getLastModifier() {
@@ -513,6 +524,26 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @Override
   public void setIdentity(Identity identity) {
     this.identity = identity;
+  }
+
+  @Override
+  public Sample getParent() {
+    return parent;
+  }
+
+  @Override
+  public void setParent(Sample parent) {
+    this.parent = parent;
+  }
+
+  @Override
+  public Set<Sample> getChildren() {
+    return children;
+  }
+
+  @Override
+  public void setChildren(Set<Sample> children) {
+    this.children = children;
   }
 
   public static class SampleFactoryBuilder {

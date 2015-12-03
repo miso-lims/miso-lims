@@ -240,3 +240,15 @@ ALTER TABLE Sample ADD FOREIGN KEY (sampleAnalyteId) REFERENCES SampleAnalyte (s
 
 ALTER TABLE Sample ADD COLUMN `sampleAdditionalInfoId` BIGINT (20) DEFAULT NULL after sampleAnalyteId;
 ALTER TABLE Sample ADD FOREIGN KEY (sampleAdditionalInfoId) REFERENCES SampleAdditionalInfo (sampleAdditionalInfoId);
+
+CREATE TABLE `SampleHierarchy` (
+  `parentId` bigint(20) NOT NULL,
+  `childId` bigint(20) NOT NULL,
+  PRIMARY KEY (`parentId`,`childId`),
+  UNIQUE KEY `UK_a5jwa184bxpj7fm7bf7yqpmhh` (`childId`),
+  CONSTRAINT `FKdw2ithwf37a42xbbr98fqx91h` FOREIGN KEY (`childId`) REFERENCES `Sample` (`sampleId`),
+  CONSTRAINT `FKrw8dmp9ac7ikylmqup276vmf8` FOREIGN KEY (`parentId`) REFERENCES `Sample` (`sampleId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+ALTER TABLE Sample ADD COLUMN `parentId` BIGINT (20) DEFAULT NULL after sampleAdditionalInfoId;
+ALTER TABLE Sample ADD FOREIGN KEY (parentId) REFERENCES Sample (sampleId);
