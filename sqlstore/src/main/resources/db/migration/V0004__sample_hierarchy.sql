@@ -216,8 +216,8 @@ CREATE TABLE `SampleAnalyte` (
   `stockNumber` int(11) DEFAULT NULL,
   `aliquotNumber` int(11) DEFAULT NULL,
   `createdBy` bigint(20) NOT NULL,
-  `updatedBy` bigint(20) NOT NULL,
   `creationDate` datetime NOT NULL,
+  `updatedBy` bigint(20) NOT NULL,
   `lastUpdated` datetime NOT NULL,
   PRIMARY KEY (`sampleAnalyteId`),
   KEY `FKpras819b6p7vh12xbeovne8o0` (`createdBy`),
@@ -252,3 +252,40 @@ CREATE TABLE `SampleHierarchy` (
 
 ALTER TABLE Sample ADD COLUMN `parentId` BIGINT (20) DEFAULT NULL after sampleAdditionalInfoId;
 ALTER TABLE Sample ADD FOREIGN KEY (parentId) REFERENCES Sample (sampleId);
+
+CREATE TABLE `SampleNumberPerProject` (
+  `sampleNumberPerProjectId` bigint(20) NOT NULL AUTO_INCREMENT,
+  `projectId` bigint(20) NOT NULL,
+  `highestSampleNumber` int(11) NOT NULL,
+  `padding` int(11) NOT NULL,
+  `createdBy` bigint(20) NOT NULL,
+  `creationDate` datetime NOT NULL,
+  `updatedBy` bigint(20) NOT NULL,
+  `lastUpdated` datetime NOT NULL,
+  PRIMARY KEY (`sampleNumberPerProjectId`),
+  UNIQUE KEY `UK_dw1vcaxddbxopw3imu0rxm1ww` (`projectId`),
+  KEY `FKjxikp47dpisx3tr3vkxuknfeh` (`createdBy`),
+  KEY `FKlgd3qd6d25aawdl1ldqvc1vxf` (`updatedBy`),
+  CONSTRAINT `FKjxikp47dpisx3tr3vkxuknfeh` FOREIGN KEY (`createdBy`) REFERENCES `User` (`userId`),
+  CONSTRAINT `FKlgd3qd6d25aawdl1ldqvc1vxf` FOREIGN KEY (`updatedBy`) REFERENCES `User` (`userId`),
+  CONSTRAINT `FKpbhtha4po9so0lup7x3sxge5p` FOREIGN KEY (`projectId`) REFERENCES `Project` (`projectId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `SampleValidRelationship` (
+  `sampleValidRelationshipId` bigint(20) NOT NULL AUTO_INCREMENT,
+  `parentId` bigint(20) NOT NULL,
+  `childId` bigint(20) NOT NULL,
+  `createdBy` bigint(20) NOT NULL,
+  `creationDate` datetime NOT NULL,
+  `updatedBy` bigint(20) NOT NULL,
+  `lastUpdated` datetime NOT NULL,
+  PRIMARY KEY (`sampleValidRelationshipId`),
+  UNIQUE KEY `UK6h6c3shh0sluresucsxf5ixb7` (`parentId`,`childId`),
+  KEY `FKk7dtvey4xjbrt9qdwkjl00wlb` (`childId`),
+  KEY `FKfk3wsykea5rk3svf1n702eti0` (`createdBy`),
+  KEY `FKb9uqsxsfb2fxnl8jjo8p5ifer` (`updatedBy`),
+  CONSTRAINT `FK9tn7y9gmki3ygroc0fd3288vm` FOREIGN KEY (`parentId`) REFERENCES `SampleClass` (`sampleClassId`),
+  CONSTRAINT `FKb9uqsxsfb2fxnl8jjo8p5ifer` FOREIGN KEY (`updatedBy`) REFERENCES `User` (`userId`),
+  CONSTRAINT `FKfk3wsykea5rk3svf1n702eti0` FOREIGN KEY (`createdBy`) REFERENCES `User` (`userId`),
+  CONSTRAINT `FKk7dtvey4xjbrt9qdwkjl00wlb` FOREIGN KEY (`childId`) REFERENCES `SampleClass` (`sampleClassId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
