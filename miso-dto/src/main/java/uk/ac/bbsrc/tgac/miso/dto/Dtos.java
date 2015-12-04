@@ -14,7 +14,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAnalyte;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleGroupId;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleNumberPerProject;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
@@ -26,7 +28,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAnalyteImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleClassImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleGroupImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleNumberPerProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleValidRelationshipImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
@@ -422,6 +426,59 @@ public class Dtos {
     Identity to = new IdentityImpl();
     to.setInternalName(from.getInternalName());
     to.setExternalName(from.getExternalName());
+    return to;
+  }
+
+  public static SampleNumberPerProjectDto asDto(SampleNumberPerProject from) {
+    SampleNumberPerProjectDto dto = new SampleNumberPerProjectDto();
+    dto.setId(from.getSampleNumberPerProjectId());
+    dto.setProjectId(from.getProject().getProjectId());
+    dto.setHighestSampleNumber(from.getHighestSampleNumber());
+    dto.setPadding(from.getPadding());
+    dto.setCreatedById(from.getCreatedBy().getUserId());
+    dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
+    dto.setUpdatedById(from.getUpdatedBy().getUserId());
+    dto.setLastUpdated(dateTimeFormatter.print(from.getLastUpdated().getTime()));
+    return dto;
+  }
+
+  public static Set<SampleNumberPerProjectDto> asSampleNumberPerProjectDtos(Set<SampleNumberPerProject> from) {
+    Set<SampleNumberPerProjectDto> dtoSet = Sets.newHashSet();
+    for (SampleNumberPerProject sampleNumberPerProject : from) {
+      dtoSet.add(asDto(sampleNumberPerProject));
+    }
+    return dtoSet;
+  }
+
+  public static SampleNumberPerProject to(SampleNumberPerProjectDto from) {
+    SampleNumberPerProject to = new SampleNumberPerProjectImpl();
+    to.setHighestSampleNumber(from.getHighestSampleNumber());
+    to.setPadding(from.getPadding());
+    return to;
+  }
+
+  public static SampleValidRelationshipDto asDto(SampleValidRelationship from) {
+    SampleValidRelationshipDto dto = new SampleValidRelationshipDto();
+    dto.setId(from.getSampleValidRelationshipId());
+    dto.setParentId(from.getParent().getSampleClassId());
+    dto.setChildId(from.getChild().getSampleClassId());
+    dto.setCreatedById(from.getCreatedBy().getUserId());
+    dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
+    dto.setUpdatedById(from.getUpdatedBy().getUserId());
+    dto.setLastUpdated(dateTimeFormatter.print(from.getLastUpdated().getTime()));
+    return dto;
+  }
+
+  public static Set<SampleValidRelationshipDto> asSampleValidRelationshipDtos(Set<SampleValidRelationship> from) {
+    Set<SampleValidRelationshipDto> dtoSet = Sets.newHashSet();
+    for (SampleValidRelationship sampleValidRelationship : from) {
+      dtoSet.add(asDto(sampleValidRelationship));
+    }
+    return dtoSet;
+  }
+
+  public static SampleValidRelationship to(SampleValidRelationshipDto from) {
+    SampleValidRelationship to = new SampleValidRelationshipImpl();
     return to;
   }
 
