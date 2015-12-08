@@ -29,7 +29,7 @@ VERSION 0.2.0 (Neon)
 1) BUILDING
 -----------
 
-You will need [Maven 2.2.1] [3] to build MISO (*NOTE Not Maven 3!*). Once you have grabbed the code and installed Maven, in the root of the project (you should see a pom.xml file and module directories like `analysis-server` and `core` etc) call:
+You will need [Maven 3.0.5] [3] to build MISO (*NOTE Not Maven 2!*). Once you have grabbed the code and installed Maven, in the root of the project (you should see a pom.xml file and module directories like `analysis-server` and `core` etc) call:
 
     mvn clean install -P external
 
