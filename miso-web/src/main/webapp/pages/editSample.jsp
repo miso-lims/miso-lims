@@ -144,26 +144,28 @@
   </div>
   <div class="barcodeArea ui-corner-all">
     <span style="float: left; font-size: 24px; font-weight: bold; color:#BBBBBB">ID</span>
-    <ul class="barcode-ddm">
-      <li>
-        <a onmouseover="mopen('idBarcodeMenu')" onmouseout="mclosetime()">
-          <span style="float:right; margin-top:6px;" class="ui-icon ui-icon-triangle-1-s"></span>
-          <span id="idBarcode" style="float:right;"></span>
-        </a>
+    <c:if test="${sample.id != 0}">
+      <ul class="barcode-ddm">
+        <li>
+          <a onmouseover="mopen('idBarcodeMenu')" onmouseout="mclosetime()">
+            <span style="float:right; margin-top:6px;" class="ui-icon ui-icon-triangle-1-s"></span>
+            <span id="idBarcode" style="float:right;"></span>
+          </a>
 
-        <div id="idBarcodeMenu"
-            onmouseover="mcancelclosetime()"
-            onmouseout="mclosetime()">
+          <div id="idBarcodeMenu"
+              onmouseover="mcancelclosetime()"
+              onmouseout="mclosetime()">
 
-          <a href="javascript:void(0);"
-             onclick="Sample.barcode.printSampleBarcodes(${sample.id});">Print</a>
-          <c:if test="${not autoGenerateIdBarcodes}">
             <a href="javascript:void(0);"
-             onclick="Sample.ui.showSampleIdBarcodeChangeDialog(${sample.id}, '${sample.identificationBarcode}');">Assign New Barcode</a>
-          </c:if>
-        </div>
-      </li>
-    </ul> 
+               onclick="Sample.barcode.printSampleBarcodes(${sample.id});">Print</a>
+            <c:if test="${not autoGenerateIdBarcodes}">
+              <a href="javascript:void(0);"
+               onclick="Sample.ui.showSampleIdBarcodeChangeDialog(${sample.id}, '${sample.identificationBarcode}');">Assign New Barcode</a>
+            </c:if>
+          </div>
+        </li>
+      </ul>
+    </c:if>
     <div id="changeSampleIdBarcodeDialog" title="Assign New Barcode"></div>
     <c:if test="${not empty sample.identificationBarcode}">
       <script type="text/javascript">

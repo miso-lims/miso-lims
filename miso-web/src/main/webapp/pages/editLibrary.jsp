@@ -150,23 +150,25 @@
   </div>
   <div class="barcodeArea ui-corner-all">
     <span style="float: left; font-size: 24px; font-weight: bold; color:#BBBBBB">ID</span>
-    <ul class="barcode-ddm">
-      <li>
-        <a onmouseover="mopen('idBarcodeMenu')" onmouseout="mclosetime()">
-          <span style="float:right; margin-top:6px;" class="ui-icon ui-icon-triangle-1-s"></span>
-          <span id="idBarcode" style="float:right"></span>
-        </a>
+    <c:if test="${library.id != 0}">
+      <ul class="barcode-ddm">
+        <li>
+          <a onmouseover="mopen('idBarcodeMenu')" onmouseout="mclosetime()">
+            <span style="float:right; margin-top:6px;" class="ui-icon ui-icon-triangle-1-s"></span>
+            <span id="idBarcode" style="float:right"></span>
+          </a>
 
-        <div id="idBarcodeMenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
-          <a href="javascript:void(0);" 
-             onclick="Library.barcode.printLibraryBarcodes(${library.id});">Print</a>
-          <c:if test="${not autoGenerateIdBarcodes}">
+          <div id="idBarcodeMenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
             <a href="javascript:void(0);"
-             onclick="Library.barcode.showLibraryIdBarcodeChangeDialog(${library.id}, '${library.identificationBarcode}');">Assign New Barcode</a>
-          </c:if>
-        </div>
-      </li>
-    </ul>
+               onclick="Library.barcode.printLibraryBarcodes(${library.id});">Print</a>
+            <c:if test="${not autoGenerateIdBarcodes}">
+              <a href="javascript:void(0);"
+               onclick="Library.barcode.showLibraryIdBarcodeChangeDialog(${library.id}, '${library.identificationBarcode}');">Assign New Barcode</a>
+            </c:if>
+          </div>
+        </li>
+      </ul>
+    </c:if>
     <div id="changeLibraryIdBarcodeDialog" title="Assign New Barcode"></div>
     <c:if test="${not empty library.identificationBarcode}">
       <script type="text/javascript">
