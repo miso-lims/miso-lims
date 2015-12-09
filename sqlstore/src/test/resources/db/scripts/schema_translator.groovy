@@ -15,7 +15,7 @@ final String basedir = "${project.basedir}"
 final File productionSchemaDir = new File(basedir + '/src/main/resources/db/migration/')
 println('Translating schema files from ' + productionSchemaDir.getAbsolutePath() + '...')
 final String productionScriptPattern = '^V\\d{4}_.*\\.sql$'
-final String testSchemaDir = basedir + '/target/test-classes/db/migration/'
+final String testSchemaDir = basedir + '/target/test-classes/db/test_migration/'
 
 Files.createDirectories(Paths.get(testSchemaDir))
 for (File file : productionSchemaDir.listFiles()) {
