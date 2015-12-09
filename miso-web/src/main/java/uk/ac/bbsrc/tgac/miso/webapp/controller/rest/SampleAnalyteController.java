@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -71,11 +72,13 @@ public class SampleAnalyteController {
   }
 
   private static SampleAnalyteDto writeUrls(SampleAnalyteDto sampleAnalyteDto, UriComponentsBuilder uriBuilder) {
-    sampleAnalyteDto.setUrl(uriBuilder.replacePath("/rest/sampleanalyte/{id}").buildAndExpand(sampleAnalyteDto.getId()).toUriString());
-    sampleAnalyteDto
-        .setCreatedByUrl(uriBuilder.replacePath("/rest/user/{id}").buildAndExpand(sampleAnalyteDto.getCreatedById()).toUriString());
-    sampleAnalyteDto
-        .setUpdatedByUrl(uriBuilder.replacePath("/rest/user/{id}").buildAndExpand(sampleAnalyteDto.getUpdatedById()).toUriString());
+    URI baseUri = uriBuilder.build().toUri();
+    sampleAnalyteDto.setUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/sampleanalyte/{id}")
+        .buildAndExpand(sampleAnalyteDto.getId()).toUriString());
+    sampleAnalyteDto.setCreatedByUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/user/{id}")
+        .buildAndExpand(sampleAnalyteDto.getCreatedById()).toUriString());
+    sampleAnalyteDto.setUpdatedByUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/user/{id}")
+        .buildAndExpand(sampleAnalyteDto.getUpdatedById()).toUriString());
     return sampleAnalyteDto;
   }
 

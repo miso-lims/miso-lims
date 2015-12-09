@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -60,8 +61,6 @@ public class TissueOriginController {
   @RequestMapping(value = "/tissueorigin/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
   public ResponseEntity<TissueOriginDto> getTissueOrigin(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder) {
-    log.error("************* id=" + id);
-
     TissueOrigin tissueOrigin = tissueOriginService.get(id);
     if (tissueOrigin == null) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -73,11 +72,13 @@ public class TissueOriginController {
   }
 
   private static TissueOriginDto writeUrls(TissueOriginDto tissueOriginDto, UriComponentsBuilder uriBuilder) {
-    tissueOriginDto.setUrl(uriBuilder.replacePath("/rest/tissueorigin/{id}").buildAndExpand(tissueOriginDto.getId()).toUriString());
-    tissueOriginDto
-        .setCreatedByUrl(uriBuilder.replacePath("/rest/user/{id}").buildAndExpand(tissueOriginDto.getCreatedById()).toUriString());
-    tissueOriginDto
-        .setUpdatedByUrl(uriBuilder.replacePath("/rest/user/{id}").buildAndExpand(tissueOriginDto.getUpdatedById()).toUriString());
+    URI baseUri = uriBuilder.build().toUri();
+    tissueOriginDto.setUrl(
+        UriComponentsBuilder.fromUri(baseUri).path("/rest/tissueorigin/{id}").buildAndExpand(tissueOriginDto.getId()).toUriString());
+    tissueOriginDto.setCreatedByUrl(
+        UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}").buildAndExpand(tissueOriginDto.getCreatedById()).toUriString());
+    tissueOriginDto.setUpdatedByUrl(
+        UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}").buildAndExpand(tissueOriginDto.getUpdatedById()).toUriString());
     return tissueOriginDto;
   }
 
@@ -99,15 +100,9 @@ public class TissueOriginController {
   @RequestMapping(value = "/tissueorigin", method = RequestMethod.POST, headers = { "Content-type=application/json" })
   @ResponseBody
   public ResponseEntity<?> createTissueOrigin(@RequestBody TissueOriginDto tissueOriginDto, UriComponentsBuilder b) throws IOException {
-    log.error("Tissue Origin Dto after deserializationg: " + tissueOriginDto);
     TissueOrigin tissueOrigin = Dtos.to(tissueOriginDto);
-
-    log.error("tissue origin from controller: " + tissueOrigin);
     Long id = tissueOriginService.create(tissueOrigin);
-    log.error("2");
-
     UriComponents uriComponents = b.path("/tissueorigin/{id}").buildAndExpand(id);
-    log.error("3");
     HttpHeaders headers = new HttpHeaders();
     headers.setLocation(uriComponents.toUri());
     return new ResponseEntity<>(headers, HttpStatus.CREATED);

@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -71,11 +72,13 @@ public class SamplePurposeController {
   }
 
   private static SamplePurposeDto writeUrls(SamplePurposeDto samplePurposeDto, UriComponentsBuilder uriBuilder) {
-    samplePurposeDto.setUrl(uriBuilder.replacePath("/rest/samplepurpose/{id}").buildAndExpand(samplePurposeDto.getId()).toUriString());
-    samplePurposeDto
-        .setCreatedByUrl(uriBuilder.replacePath("/rest/user/{id}").buildAndExpand(samplePurposeDto.getCreatedById()).toUriString());
-    samplePurposeDto
-        .setUpdatedByUrl(uriBuilder.replacePath("/rest/user/{id}").buildAndExpand(samplePurposeDto.getUpdatedById()).toUriString());
+    URI baseUri = uriBuilder.build().toUri();
+    samplePurposeDto.setUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/samplepurpose/{id}")
+        .buildAndExpand(samplePurposeDto.getId()).toUriString());
+    samplePurposeDto.setCreatedByUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/user/{id}")
+        .buildAndExpand(samplePurposeDto.getCreatedById()).toUriString());
+    samplePurposeDto.setUpdatedByUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/user/{id}")
+        .buildAndExpand(samplePurposeDto.getUpdatedById()).toUriString());
     return samplePurposeDto;
   }
 

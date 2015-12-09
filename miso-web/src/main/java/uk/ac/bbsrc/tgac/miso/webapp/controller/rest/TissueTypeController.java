@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -71,9 +72,13 @@ public class TissueTypeController {
   }
 
   private static TissueTypeDto writeUrls(TissueTypeDto tissueTypeDto, UriComponentsBuilder uriBuilder) {
-    tissueTypeDto.setUrl(uriBuilder.replacePath("/rest/tissuetype/{id}").buildAndExpand(tissueTypeDto.getId()).toUriString());
-    tissueTypeDto.setCreatedByUrl(uriBuilder.replacePath("/rest/user/{id}").buildAndExpand(tissueTypeDto.getCreatedById()).toUriString());
-    tissueTypeDto.setUpdatedByUrl(uriBuilder.replacePath("/rest/user/{id}").buildAndExpand(tissueTypeDto.getUpdatedById()).toUriString());
+    URI baseUri = uriBuilder.build().toUri();
+    tissueTypeDto.setUrl(
+        UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/tissuetype/{id}").buildAndExpand(tissueTypeDto.getId()).toUriString());
+    tissueTypeDto.setCreatedByUrl(
+        UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/user/{id}").buildAndExpand(tissueTypeDto.getCreatedById()).toUriString());
+    tissueTypeDto.setUpdatedByUrl(
+        UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/user/{id}").buildAndExpand(tissueTypeDto.getUpdatedById()).toUriString());
     return tissueTypeDto;
   }
 

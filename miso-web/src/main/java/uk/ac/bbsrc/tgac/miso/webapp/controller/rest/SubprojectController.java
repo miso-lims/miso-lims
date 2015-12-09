@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -71,9 +72,13 @@ public class SubprojectController {
   }
 
   private static SubprojectDto writeUrls(SubprojectDto subprojectDto, UriComponentsBuilder uriBuilder) {
-    subprojectDto.setUrl(uriBuilder.replacePath("/rest/subproject/{id}").buildAndExpand(subprojectDto.getId()).toUriString());
-    subprojectDto.setCreatedByUrl(uriBuilder.replacePath("/rest/user/{id}").buildAndExpand(subprojectDto.getCreatedById()).toUriString());
-    subprojectDto.setUpdatedByUrl(uriBuilder.replacePath("/rest/user/{id}").buildAndExpand(subprojectDto.getUpdatedById()).toUriString());
+    URI baseUri = uriBuilder.build().toUri();
+    subprojectDto.setUrl(
+        UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/subproject/{id}").buildAndExpand(subprojectDto.getId()).toUriString());
+    subprojectDto.setCreatedByUrl(
+        UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/user/{id}").buildAndExpand(subprojectDto.getCreatedById()).toUriString());
+    subprojectDto.setUpdatedByUrl(
+        UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/user/{id}").buildAndExpand(subprojectDto.getUpdatedById()).toUriString());
     return subprojectDto;
   }
 

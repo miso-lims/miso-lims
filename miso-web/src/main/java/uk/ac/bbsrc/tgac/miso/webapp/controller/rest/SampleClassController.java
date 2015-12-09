@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -71,9 +72,13 @@ public class SampleClassController {
   }
 
   private static SampleClassDto writeUrls(SampleClassDto sampleClassDto, UriComponentsBuilder uriBuilder) {
-    sampleClassDto.setUrl(uriBuilder.replacePath("/rest/sampleclass/{id}").buildAndExpand(sampleClassDto.getId()).toUriString());
-    sampleClassDto.setCreatedByUrl(uriBuilder.replacePath("/rest/user/{id}").buildAndExpand(sampleClassDto.getCreatedById()).toUriString());
-    sampleClassDto.setUpdatedByUrl(uriBuilder.replacePath("/rest/user/{id}").buildAndExpand(sampleClassDto.getUpdatedById()).toUriString());
+    URI baseUri = uriBuilder.build().toUri();
+    sampleClassDto.setUrl(
+        UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/sampleclass/{id}").buildAndExpand(sampleClassDto.getId()).toUriString());
+    sampleClassDto.setCreatedByUrl(
+        UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/user/{id}").buildAndExpand(sampleClassDto.getCreatedById()).toUriString());
+    sampleClassDto.setUpdatedByUrl(
+        UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/user/{id}").buildAndExpand(sampleClassDto.getUpdatedById()).toUriString());
     return sampleClassDto;
   }
 

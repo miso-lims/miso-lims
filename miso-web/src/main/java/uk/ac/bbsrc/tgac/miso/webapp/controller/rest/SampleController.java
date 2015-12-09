@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
+import java.net.URI;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +68,9 @@ public class SampleController {
   }
 
   private static SampleDto writeUrls(SampleDto sampleDto, UriComponentsBuilder uriBuilder) {
-    sampleDto.setUrl(uriBuilder.replacePath("/rest/sample/{id}").buildAndExpand(sampleDto.getId()).toUriString());
+    URI baseUri = uriBuilder.build().toUri();
+    sampleDto
+        .setUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/sample/{id}").buildAndExpand(sampleDto.getId()).toUriString());
     // sampleDto.setCreatedByUrl(uriBuilder.replacePath("/rest/user/{id}").buildAndExpand(sampleDto.getCreatedById()).toUriString());
     // sampleDto.setUpdatedByUrl(uriBuilder.replacePath("/rest/user/{id}").buildAndExpand(sampleDto.getUpdatedById()).toUriString());
     return sampleDto;

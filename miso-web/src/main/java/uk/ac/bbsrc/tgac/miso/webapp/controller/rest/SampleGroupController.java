@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -71,9 +72,13 @@ public class SampleGroupController {
   }
 
   private static SampleGroupDto writeUrls(SampleGroupDto sampleGroupDto, UriComponentsBuilder uriBuilder) {
-    sampleGroupDto.setUrl(uriBuilder.replacePath("/rest/samplegroup/{id}").buildAndExpand(sampleGroupDto.getId()).toUriString());
-    sampleGroupDto.setCreatedByUrl(uriBuilder.replacePath("/rest/user/{id}").buildAndExpand(sampleGroupDto.getCreatedById()).toUriString());
-    sampleGroupDto.setUpdatedByUrl(uriBuilder.replacePath("/rest/user/{id}").buildAndExpand(sampleGroupDto.getUpdatedById()).toUriString());
+    URI baseUri = uriBuilder.build().toUri();
+    sampleGroupDto.setUrl(
+        UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/samplegroup/{id}").buildAndExpand(sampleGroupDto.getId()).toUriString());
+    sampleGroupDto.setCreatedByUrl(
+        UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/user/{id}").buildAndExpand(sampleGroupDto.getCreatedById()).toUriString());
+    sampleGroupDto.setUpdatedByUrl(
+        UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/user/{id}").buildAndExpand(sampleGroupDto.getUpdatedById()).toUriString());
     return sampleGroupDto;
   }
 

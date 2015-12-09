@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -71,11 +72,13 @@ public class QcPassedDetailController {
   }
 
   private static QcPassedDetailDto writeUrls(QcPassedDetailDto qcPassedDetailDto, UriComponentsBuilder uriBuilder) {
-    qcPassedDetailDto.setUrl(uriBuilder.replacePath("/rest/qcpasseddetail/{id}").buildAndExpand(qcPassedDetailDto.getId()).toUriString());
-    qcPassedDetailDto
-        .setCreatedByUrl(uriBuilder.replacePath("/rest/user/{id}").buildAndExpand(qcPassedDetailDto.getCreatedById()).toUriString());
-    qcPassedDetailDto
-        .setUpdatedByUrl(uriBuilder.replacePath("/rest/user/{id}").buildAndExpand(qcPassedDetailDto.getUpdatedById()).toUriString());
+    URI baseUri = uriBuilder.build().toUri();
+    qcPassedDetailDto.setUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/qcpasseddetail/{id}")
+        .buildAndExpand(qcPassedDetailDto.getId()).toUriString());
+    qcPassedDetailDto.setCreatedByUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/user/{id}")
+        .buildAndExpand(qcPassedDetailDto.getCreatedById()).toUriString());
+    qcPassedDetailDto.setUpdatedByUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/user/{id}")
+        .buildAndExpand(qcPassedDetailDto.getUpdatedById()).toUriString());
     return qcPassedDetailDto;
   }
 

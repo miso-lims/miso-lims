@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -71,12 +72,13 @@ public class SampleNumberPerProjectController {
   }
 
   private static SampleNumberPerProjectDto writeUrls(SampleNumberPerProjectDto sampleNumberPerProjectDto, UriComponentsBuilder uriBuilder) {
-    sampleNumberPerProjectDto.setUrl(
-        uriBuilder.replacePath("/rest/samplenumberperproject/{id}").buildAndExpand(sampleNumberPerProjectDto.getId()).toUriString());
-    sampleNumberPerProjectDto.setCreatedByUrl(
-        uriBuilder.replacePath("/rest/user/{id}").buildAndExpand(sampleNumberPerProjectDto.getCreatedById()).toUriString());
-    sampleNumberPerProjectDto.setUpdatedByUrl(
-        uriBuilder.replacePath("/rest/user/{id}").buildAndExpand(sampleNumberPerProjectDto.getUpdatedById()).toUriString());
+    URI baseUri = uriBuilder.build().toUri();
+    sampleNumberPerProjectDto.setUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/samplenumberperproject/{id}")
+        .buildAndExpand(sampleNumberPerProjectDto.getId()).toUriString());
+    sampleNumberPerProjectDto.setCreatedByUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/user/{id}")
+        .buildAndExpand(sampleNumberPerProjectDto.getCreatedById()).toUriString());
+    sampleNumberPerProjectDto.setUpdatedByUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/user/{id}")
+        .buildAndExpand(sampleNumberPerProjectDto.getUpdatedById()).toUriString());
     return sampleNumberPerProjectDto;
   }
 

@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -71,12 +72,13 @@ public class SampleAdditionalInfoController {
   }
 
   private static SampleAdditionalInfoDto writeUrls(SampleAdditionalInfoDto sampleAdditionalInfoDto, UriComponentsBuilder uriBuilder) {
-    sampleAdditionalInfoDto
-        .setUrl(uriBuilder.replacePath("/rest/sampleadditionalinfo/{id}").buildAndExpand(sampleAdditionalInfoDto.getId()).toUriString());
-    sampleAdditionalInfoDto
-        .setCreatedByUrl(uriBuilder.replacePath("/rest/user/{id}").buildAndExpand(sampleAdditionalInfoDto.getCreatedById()).toUriString());
-    sampleAdditionalInfoDto
-        .setUpdatedByUrl(uriBuilder.replacePath("/rest/user/{id}").buildAndExpand(sampleAdditionalInfoDto.getUpdatedById()).toUriString());
+    URI baseUri = uriBuilder.build().toUri();
+    sampleAdditionalInfoDto.setUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/sampleadditionalinfo/{id}")
+        .buildAndExpand(sampleAdditionalInfoDto.getId()).toUriString());
+    sampleAdditionalInfoDto.setCreatedByUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/user/{id}")
+        .buildAndExpand(sampleAdditionalInfoDto.getCreatedById()).toUriString());
+    sampleAdditionalInfoDto.setUpdatedByUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/user/{id}")
+        .buildAndExpand(sampleAdditionalInfoDto.getUpdatedById()).toUriString());
     return sampleAdditionalInfoDto;
   }
 

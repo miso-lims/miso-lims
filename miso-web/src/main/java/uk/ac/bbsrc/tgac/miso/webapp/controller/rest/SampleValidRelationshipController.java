@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -73,12 +74,13 @@ public class SampleValidRelationshipController {
 
   private static SampleValidRelationshipDto writeUrls(SampleValidRelationshipDto sampleValidRelationshipDto,
       UriComponentsBuilder uriBuilder) {
-    sampleValidRelationshipDto.setUrl(
-        uriBuilder.replacePath("/rest/samplevalidrelationship/{id}").buildAndExpand(sampleValidRelationshipDto.getId()).toUriString());
-    sampleValidRelationshipDto.setCreatedByUrl(
-        uriBuilder.replacePath("/rest/user/{id}").buildAndExpand(sampleValidRelationshipDto.getCreatedById()).toUriString());
-    sampleValidRelationshipDto.setUpdatedByUrl(
-        uriBuilder.replacePath("/rest/user/{id}").buildAndExpand(sampleValidRelationshipDto.getUpdatedById()).toUriString());
+    URI baseUri = uriBuilder.build().toUri();
+    sampleValidRelationshipDto.setUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/samplevalidrelationship/{id}")
+        .buildAndExpand(sampleValidRelationshipDto.getId()).toUriString());
+    sampleValidRelationshipDto.setCreatedByUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/user/{id}")
+        .buildAndExpand(sampleValidRelationshipDto.getCreatedById()).toUriString());
+    sampleValidRelationshipDto.setUpdatedByUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/user/{id}")
+        .buildAndExpand(sampleValidRelationshipDto.getUpdatedById()).toUriString());
     return sampleValidRelationshipDto;
   }
 
