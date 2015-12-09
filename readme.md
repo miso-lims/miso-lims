@@ -46,8 +46,9 @@ All being well after a few minutes (it can take a while to download all the requ
 
 If you are upgrading from a previous version of MISO, you will need to follow these steps:
 
-* Backup your existing database and apply any database patches in https://repos.tgac.ac.uk/miso/latest/sql/patches
+* Backup your existing database
 * Stop Tomcat
+* Update the database using `cd sqlstore && mvn -P external compile flyway:migrate`
 * Delete (or move) the old `<tomcat>/webapps/ROOT.war`
 * Delete the `<tomcat>webapps/ROOT` directory
 * Copy the newly built `miso-web/target/ROOT.war` to `<tomcat>/webapps`
@@ -60,14 +61,7 @@ Done!
 
 3.1 ) Setting up the MISO database
 
-You will need to install MySQL v5 or greater. You will then need the two latest MISO database dumps. These are available
-from our repository here:
-
-https://repos.tgac.ac.uk/miso/latest/sql/lims-schema.sql
-
-https://repos.tgac.ac.uk/miso/latest/sql/miso_type_data.sql
-
-Log in to your local MySQL install, and create a database called 'lims':
+You will need to install MySQL v5 or greater. Log in to your local MySQL install, and create a database called 'lims':
 
     CREATE DATABASE lims;
     USE lims;
@@ -85,8 +79,10 @@ database from your remote machine:
 
 Then populate the database with the two dumps by running the following commands at a shell prompt:
 
-    mysql -u tgaclims -p -D lims < lims-schema.sql
-    mysql -u tgaclims -p -D lims < miso_type_data.sql
+    cd sqlstore && mvn -P external compile flyway:migrate
+
+The database schema many need to be upgraded in future version. This commany
+will apply the necessary changes to update an existing database.
 
 3.2 ) Setting up the MISO web application
 
