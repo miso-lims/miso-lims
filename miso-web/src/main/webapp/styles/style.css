@@ -28,7 +28,7 @@ h1 {
 h2 {
     font-size: 1.2em;
     padding: 0;
-    margin: 0;
+    margin: 0%;
     color: #666666;
 }
 
@@ -1890,3 +1890,17 @@ button.disabled {
    font-family: Verdana, Arial, sans-serif;
    font-size: 1em;
  }
+ 
+.first-half-width {
+   width: 50%;
+   padding-left: 8%;
+ }
+ 
+.second-half-width {
+	width: 50%;
+	float:right;
+}
+
+h2.tissue {
+	margin: 0% 2%;
+}

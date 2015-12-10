@@ -22,6 +22,7 @@
   --%>
   
 <%@ include file="../header.jsp" %>
+
 <script src="<c:url value='/scripts/jquery/js/jquery.breadcrumbs.popup.js'/>" type="text/javascript"></script>
 
 <script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
@@ -37,27 +38,57 @@
 <div id="maincontent">
 <div id="contentcolumn">
 
-  <h1>Tissue Origins</h1>
+  <h1>Tissue Options</h1>
   
   <div class="sectionDivider"></div>
-  <table id="allOriginsTable">
-	  <thead>
-		  <tr>
-		    <th>Alias&nbsp;&nbsp;&nbsp;&nbsp;Description</th>
-      </tr>
-    </thead>
-    <tbody id="allOrigins"></tbody>
-    </table>
-    
-    <script type="text/javascript">
-      jQuery(document).ready(function() {
-        Tissue.getTissueOrigins();
-      });
-    </script>
+  <h2 class="tissue" id="origins">Tissue Origins</h2>
+  <div>
+	  <table id="allOriginsTable" class="tissueOptionsTable">
+		  <thead>
+			  <tr>
+			    <th><span class="first-half-width">Alias</span><span class="second-half-width">Description</span></th>
+	      </tr>
+	    </thead>
+	    <tbody id="allOrigins"></tbody>
+	  </table>
   </div>
+  
+  <div class="sectionDivider"></div>
+  <h2 class="tissue" id="conditions">Tissue Conditions</h2>
+  <div>
+	  <table id="allConditionsTable" class="tissueOptionsTable">
+	    <thead>
+	      <tr>
+	        <th><span class="first-half-width">Alias</span><span class="second-half-width">Description</span></th>
+	      </tr>
+	    </thead>
+	    <tbody id="allConditions"></tbody>
+	  </table>
+	</div>
+	
+	<div class="sectionDivider"></div>
+  <h2 class="tissue" id="materials">Tissue Materials</h2>
+  <div>
+    <table id="allMaterialsTable" class="tissueOptionsTable">
+      <thead>
+        <tr>
+          <th><span class="first-half-width">Alias</span><span class="second-half-width">Description</span></th>
+        </tr>
+      </thead>
+      <tbody id="allMaterials"></tbody>
+    </table>
   </div>
 
 </div>
 </div>
+  
+<script type="text/javascript">
+  jQuery(document).ready(function() {
+    Tissue.getTissueOrigins();
+    Tissue.getTissueConditions();
+    Tissue.getTissueMaterials();
+  });
+</script>
+  
 <%@ include file="adminsub.jsp" %>
 <%@ include file="../footer.jsp" %>
