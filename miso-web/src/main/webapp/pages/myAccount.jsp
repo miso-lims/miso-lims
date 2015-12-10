@@ -104,9 +104,9 @@
         <div class="portlet">
           <div class="portlet-header">Tissue Details</div>
           <div class="portlet-content">
-            <a href="<c:url value='/miso/tissueOrigins'/>">Tissue Origins</a><br/>
-            <a href="<c:url value='/miso/tissueType'/>">Tissue Types</a><br/>
-            <a href="<c:url value='/miso/tissueMaterial'/>">Tissue Material</a>
+            <a href="<c:url value='/miso/tissueOptions#origins'/>">Tissue Origins</a><br/>
+            <a href="<c:url value='/miso/tissueOptions#conditions'/>">Tissue Types</a><br/>
+            <a href="<c:url value='/miso/tissueOptions#materials'/>">Tissue Materials</a>
           </div>
         </div>
       </sec:authorize>
