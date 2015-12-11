@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +62,11 @@ public class SubprojectController {
 
   @RequestMapping(value = "/subproject/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public ResponseEntity<SubprojectDto> getSubproject(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder) {
+  public ResponseEntity<SubprojectDto> getSubproject(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
+      HttpServletResponse response) {
+    if (response.containsHeader("x-authentication-failed")) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
     Subproject subproject = subprojectService.get(id);
     if (subproject == null) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -84,7 +90,10 @@ public class SubprojectController {
 
   @RequestMapping(value = "/subprojects", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public ResponseEntity<Set<SubprojectDto>> getSubprojects(UriComponentsBuilder uriBuilder) {
+  public ResponseEntity<Set<SubprojectDto>> getSubprojects(UriComponentsBuilder uriBuilder, HttpServletResponse response) {
+    if (response.containsHeader("x-authentication-failed")) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
     Set<Subproject> subprojects = subprojectService.getAll();
     if (subprojects.isEmpty()) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -99,7 +108,11 @@ public class SubprojectController {
 
   @RequestMapping(value = "/subproject", method = RequestMethod.POST, headers = { "Content-type=application/json" })
   @ResponseBody
-  public ResponseEntity<?> createSubproject(@RequestBody SubprojectDto subprojectDto, UriComponentsBuilder b) throws IOException {
+  public ResponseEntity<?> createSubproject(@RequestBody SubprojectDto subprojectDto, UriComponentsBuilder b, HttpServletResponse response)
+      throws IOException {
+    if (response.containsHeader("x-authentication-failed")) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
     Subproject subproject = Dtos.to(subprojectDto);
     Long id = subprojectService.create(subproject);
     UriComponents uriComponents = b.path("/subproject/{id}").buildAndExpand(id);
@@ -110,7 +123,11 @@ public class SubprojectController {
 
   @RequestMapping(value = "/subproject/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
   @ResponseBody
-  public ResponseEntity<?> updateSubproject(@PathVariable("id") Long id, @RequestBody SubprojectDto subprojectDto) throws IOException {
+  public ResponseEntity<?> updateSubproject(@PathVariable("id") Long id, @RequestBody SubprojectDto subprojectDto,
+      HttpServletResponse response) throws IOException {
+    if (response.containsHeader("x-authentication-failed")) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
     Subproject subproject = Dtos.to(subprojectDto);
     subproject.setSubprojectId(id);
     subprojectService.update(subproject);
@@ -119,7 +136,10 @@ public class SubprojectController {
 
   @RequestMapping(value = "/subproject/{id}", method = RequestMethod.DELETE)
   @ResponseBody
-  public ResponseEntity<?> deleteSubproject(@PathVariable("id") Long id) throws IOException {
+  public ResponseEntity<?> deleteSubproject(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
+    if (response.containsHeader("x-authentication-failed")) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
     subprojectService.delete(id);
     return new ResponseEntity<>(HttpStatus.OK);
   }

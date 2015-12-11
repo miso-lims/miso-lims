@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +62,11 @@ public class SamplePurposeController {
 
   @RequestMapping(value = "/samplepurpose/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public ResponseEntity<SamplePurposeDto> getSamplePurpose(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder) {
+  public ResponseEntity<SamplePurposeDto> getSamplePurpose(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
+      HttpServletResponse response) {
+    if (response.containsHeader("x-authentication-failed")) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
     SamplePurpose samplePurpose = samplePurposeService.get(id);
     if (samplePurpose == null) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -84,7 +90,10 @@ public class SamplePurposeController {
 
   @RequestMapping(value = "/samplepurposes", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public ResponseEntity<Set<SamplePurposeDto>> getSamplePurposes(UriComponentsBuilder uriBuilder) {
+  public ResponseEntity<Set<SamplePurposeDto>> getSamplePurposes(UriComponentsBuilder uriBuilder, HttpServletResponse response) {
+    if (response.containsHeader("x-authentication-failed")) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
     Set<SamplePurpose> samplePurposes = samplePurposeService.getAll();
     if (samplePurposes.isEmpty()) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -99,7 +108,11 @@ public class SamplePurposeController {
 
   @RequestMapping(value = "/samplepurpose", method = RequestMethod.POST, headers = { "Content-type=application/json" })
   @ResponseBody
-  public ResponseEntity<?> createSamplePurpose(@RequestBody SamplePurposeDto samplePurposeDto, UriComponentsBuilder b) throws IOException {
+  public ResponseEntity<?> createSamplePurpose(@RequestBody SamplePurposeDto samplePurposeDto, UriComponentsBuilder b,
+      HttpServletResponse response) throws IOException {
+    if (response.containsHeader("x-authentication-failed")) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
     SamplePurpose samplePurpose = Dtos.to(samplePurposeDto);
     Long id = samplePurposeService.create(samplePurpose);
     UriComponents uriComponents = b.path("/samplepurpose/{id}").buildAndExpand(id);
@@ -110,8 +123,11 @@ public class SamplePurposeController {
 
   @RequestMapping(value = "/samplepurpose/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
   @ResponseBody
-  public ResponseEntity<?> updateSamplePurpose(@PathVariable("id") Long id, @RequestBody SamplePurposeDto samplePurposeDto)
-      throws IOException {
+  public ResponseEntity<?> updateSamplePurpose(@PathVariable("id") Long id, @RequestBody SamplePurposeDto samplePurposeDto,
+      HttpServletResponse response) throws IOException {
+    if (response.containsHeader("x-authentication-failed")) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
     SamplePurpose samplePurpose = Dtos.to(samplePurposeDto);
     samplePurpose.setSamplePurposeId(id);
     samplePurposeService.update(samplePurpose);
@@ -120,7 +136,10 @@ public class SamplePurposeController {
 
   @RequestMapping(value = "/samplepurpose/{id}", method = RequestMethod.DELETE)
   @ResponseBody
-  public ResponseEntity<?> deleteSamplePurpose(@PathVariable("id") Long id) throws IOException {
+  public ResponseEntity<?> deleteSamplePurpose(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
+    if (response.containsHeader("x-authentication-failed")) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
     samplePurposeService.delete(id);
     return new ResponseEntity<>(HttpStatus.OK);
   }

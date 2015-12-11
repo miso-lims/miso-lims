@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +62,11 @@ public class SampleGroupController {
 
   @RequestMapping(value = "/samplegroup/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public ResponseEntity<SampleGroupDto> getSampleGroup(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder) {
+  public ResponseEntity<SampleGroupDto> getSampleGroup(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
+      HttpServletResponse response) {
+    if (response.containsHeader("x-authentication-failed")) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
     SampleGroupId sampleGroup = sampleGroupService.get(id);
     if (sampleGroup == null) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -84,9 +90,12 @@ public class SampleGroupController {
 
   @RequestMapping(value = "/samplegroups", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public ResponseEntity<Set<SampleGroupDto>> getSampleGroups(UriComponentsBuilder uriBuilder) {
+  public ResponseEntity<Set<SampleGroupDto>> getSampleGroups(UriComponentsBuilder uriBuilder, HttpServletResponse response) {
     Set<SampleGroupId> sampleGroups = sampleGroupService.getAll();
     if (sampleGroups.isEmpty()) {
+      if (response.containsHeader("x-authentication-failed")) {
+        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+      }
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     } else {
       Set<SampleGroupDto> sampleGroupDtos = Dtos.asSampleGroupDtos(sampleGroups);
@@ -99,7 +108,11 @@ public class SampleGroupController {
 
   @RequestMapping(value = "/samplegroup", method = RequestMethod.POST, headers = { "Content-type=application/json" })
   @ResponseBody
-  public ResponseEntity<?> createSampleGroup(@RequestBody SampleGroupDto sampleGroupDto, UriComponentsBuilder b) throws IOException {
+  public ResponseEntity<?> createSampleGroup(@RequestBody SampleGroupDto sampleGroupDto, UriComponentsBuilder b,
+      HttpServletResponse response) throws IOException {
+    if (response.containsHeader("x-authentication-failed")) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
     SampleGroupId sampleGroup = Dtos.to(sampleGroupDto);
     Long id = sampleGroupService.create(sampleGroup);
     UriComponents uriComponents = b.path("/samplegroup/{id}").buildAndExpand(id);
@@ -110,7 +123,11 @@ public class SampleGroupController {
 
   @RequestMapping(value = "/samplegroup/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
   @ResponseBody
-  public ResponseEntity<?> updateSampleGroup(@PathVariable("id") Long id, @RequestBody SampleGroupDto sampleGroupDto) throws IOException {
+  public ResponseEntity<?> updateSampleGroup(@PathVariable("id") Long id, @RequestBody SampleGroupDto sampleGroupDto,
+      HttpServletResponse response) throws IOException {
+    if (response.containsHeader("x-authentication-failed")) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
     SampleGroupId sampleGroup = Dtos.to(sampleGroupDto);
     sampleGroup.setSampleGroupId(id);
     sampleGroupService.update(sampleGroup);
@@ -119,7 +136,10 @@ public class SampleGroupController {
 
   @RequestMapping(value = "/samplegroup/{id}", method = RequestMethod.DELETE)
   @ResponseBody
-  public ResponseEntity<?> deleteSampleGroup(@PathVariable("id") Long id) throws IOException {
+  public ResponseEntity<?> deleteSampleGroup(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
+    if (response.containsHeader("x-authentication-failed")) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
     sampleGroupService.delete(id);
     return new ResponseEntity<>(HttpStatus.OK);
   }

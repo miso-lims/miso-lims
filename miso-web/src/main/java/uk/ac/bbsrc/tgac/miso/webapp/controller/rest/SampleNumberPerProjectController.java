@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +62,11 @@ public class SampleNumberPerProjectController {
 
   @RequestMapping(value = "/samplenumberperproject/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public ResponseEntity<SampleNumberPerProjectDto> getSampleNumberPerProject(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder) {
+  public ResponseEntity<SampleNumberPerProjectDto> getSampleNumberPerProject(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
+      HttpServletResponse response) {
+    if (response.containsHeader("x-authentication-failed")) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
     SampleNumberPerProject sampleNumberPerProject = sampleNumberPerProjectService.get(id);
     if (sampleNumberPerProject == null) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -72,6 +78,7 @@ public class SampleNumberPerProjectController {
   }
 
   private static SampleNumberPerProjectDto writeUrls(SampleNumberPerProjectDto sampleNumberPerProjectDto, UriComponentsBuilder uriBuilder) {
+
     URI baseUri = uriBuilder.build().toUri();
     sampleNumberPerProjectDto.setUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/samplenumberperproject/{id}")
         .buildAndExpand(sampleNumberPerProjectDto.getId()).toUriString());
@@ -84,7 +91,11 @@ public class SampleNumberPerProjectController {
 
   @RequestMapping(value = "/samplenumberperprojects", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public ResponseEntity<Set<SampleNumberPerProjectDto>> getSampleNumberPerProjects(UriComponentsBuilder uriBuilder) {
+  public ResponseEntity<Set<SampleNumberPerProjectDto>> getSampleNumberPerProjects(UriComponentsBuilder uriBuilder,
+      HttpServletResponse response) {
+    if (response.containsHeader("x-authentication-failed")) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
     Set<SampleNumberPerProject> sampleNumberPerProjects = sampleNumberPerProjectService.getAll();
     if (sampleNumberPerProjects.isEmpty()) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -100,7 +111,10 @@ public class SampleNumberPerProjectController {
   @RequestMapping(value = "/samplenumberperproject", method = RequestMethod.POST, headers = { "Content-type=application/json" })
   @ResponseBody
   public ResponseEntity<?> createSampleNumberPerProject(@RequestBody SampleNumberPerProjectDto sampleNumberPerProjectDto,
-      UriComponentsBuilder b) throws IOException {
+      UriComponentsBuilder b, HttpServletResponse response) throws IOException {
+    if (response.containsHeader("x-authentication-failed")) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
     SampleNumberPerProject sampleNumberPerProject = Dtos.to(sampleNumberPerProjectDto);
     Long id = sampleNumberPerProjectService.create(sampleNumberPerProject);
     UriComponents uriComponents = b.path("/samplenumberperproject/{id}").buildAndExpand(id);
@@ -112,7 +126,10 @@ public class SampleNumberPerProjectController {
   @RequestMapping(value = "/samplenumberperproject/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
   @ResponseBody
   public ResponseEntity<?> updateSampleNumberPerProject(@PathVariable("id") Long id,
-      @RequestBody SampleNumberPerProjectDto sampleNumberPerProjectDto) throws IOException {
+      @RequestBody SampleNumberPerProjectDto sampleNumberPerProjectDto, HttpServletResponse response) throws IOException {
+    if (response.containsHeader("x-authentication-failed")) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
     SampleNumberPerProject sampleNumberPerProject = Dtos.to(sampleNumberPerProjectDto);
     sampleNumberPerProject.setSampleNumberPerProjectId(id);
     sampleNumberPerProjectService.update(sampleNumberPerProject);
@@ -121,7 +138,10 @@ public class SampleNumberPerProjectController {
 
   @RequestMapping(value = "/samplenumberperproject/{id}", method = RequestMethod.DELETE)
   @ResponseBody
-  public ResponseEntity<?> deleteSampleNumberPerProject(@PathVariable("id") Long id) throws IOException {
+  public ResponseEntity<?> deleteSampleNumberPerProject(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
+    if (response.containsHeader("x-authentication-failed")) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
     sampleNumberPerProjectService.delete(id);
     return new ResponseEntity<>(HttpStatus.OK);
   }

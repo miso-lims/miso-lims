@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +62,11 @@ public class QcPassedDetailController {
 
   @RequestMapping(value = "/qcpasseddetail/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public ResponseEntity<QcPassedDetailDto> getQcPassedDetail(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder) {
+  public ResponseEntity<QcPassedDetailDto> getQcPassedDetail(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
+      HttpServletResponse response) {
+    if (response.containsHeader("x-authentication-failed")) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
     QcPassedDetail qcPassedDetail = qcPassedDetailService.get(id);
     if (qcPassedDetail == null) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -84,9 +90,13 @@ public class QcPassedDetailController {
 
   @RequestMapping(value = "/qcpasseddetails", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public ResponseEntity<Set<QcPassedDetailDto>> getQcPassedDetail(UriComponentsBuilder uriBuilder) {
+  public ResponseEntity<Set<QcPassedDetailDto>> getQcPassedDetail(UriComponentsBuilder uriBuilder, HttpServletResponse response) {
+    if (response.containsHeader("x-authentication-failed")) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
     Set<QcPassedDetail> qcPassedDetails = qcPassedDetailService.getAll();
     if (qcPassedDetails.isEmpty()) {
+
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     } else {
       Set<QcPassedDetailDto> qcPassedDetailDtos = Dtos.asQcPassedDetailDtos(qcPassedDetails);
@@ -99,8 +109,11 @@ public class QcPassedDetailController {
 
   @RequestMapping(value = "/qcpasseddetail", method = RequestMethod.POST, headers = { "Content-type=application/json" })
   @ResponseBody
-  public ResponseEntity<?> createQcPassedDetail(@RequestBody QcPassedDetailDto qcPassedDetailDto, UriComponentsBuilder b)
-      throws IOException {
+  public ResponseEntity<?> createQcPassedDetail(@RequestBody QcPassedDetailDto qcPassedDetailDto, UriComponentsBuilder b,
+      HttpServletResponse response) throws IOException {
+    if (response.containsHeader("x-authentication-failed")) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
     QcPassedDetail qcPassedDetail = Dtos.to(qcPassedDetailDto);
     Long id = qcPassedDetailService.create(qcPassedDetail);
     UriComponents uriComponents = b.path("/qcpasseddetails/{id}").buildAndExpand(id);
@@ -111,8 +124,11 @@ public class QcPassedDetailController {
 
   @RequestMapping(value = "/qcpasseddetail/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
   @ResponseBody
-  public ResponseEntity<?> updateQcPassedDetail(@PathVariable("id") Long id, @RequestBody QcPassedDetailDto qcPassedDetailDto)
-      throws IOException {
+  public ResponseEntity<?> updateQcPassedDetail(@PathVariable("id") Long id, @RequestBody QcPassedDetailDto qcPassedDetailDto,
+      HttpServletResponse response) throws IOException {
+    if (response.containsHeader("x-authentication-failed")) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
     QcPassedDetail qcPassedDetail = Dtos.to(qcPassedDetailDto);
     qcPassedDetail.setQcPassedDetailId(id);
     qcPassedDetailService.update(qcPassedDetail);
@@ -121,7 +137,10 @@ public class QcPassedDetailController {
 
   @RequestMapping(value = "/qcpasseddetail/{id}", method = RequestMethod.DELETE)
   @ResponseBody
-  public ResponseEntity<?> deleteQcPassedDetail(@PathVariable("id") Long id) throws IOException {
+  public ResponseEntity<?> deleteQcPassedDetail(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
+    if (response.containsHeader("x-authentication-failed")) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
     qcPassedDetailService.delete(id);
     return new ResponseEntity<>(HttpStatus.OK);
   }

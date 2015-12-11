@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,8 +62,11 @@ public class SampleValidRelationshipController {
 
   @RequestMapping(value = "/samplevalidrelationship/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public ResponseEntity<SampleValidRelationshipDto> getSampleValidRelationship(@PathVariable("id") Long id,
-      UriComponentsBuilder uriBuilder) {
+  public ResponseEntity<SampleValidRelationshipDto> getSampleValidRelationship(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
+      HttpServletResponse response) {
+    if (response.containsHeader("x-authentication-failed")) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
     SampleValidRelationship sampleValidRelationship = sampleValidRelationshipService.get(id);
     if (sampleValidRelationship == null) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -86,7 +91,11 @@ public class SampleValidRelationshipController {
 
   @RequestMapping(value = "/samplevalidrelationships", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public ResponseEntity<Set<SampleValidRelationshipDto>> getSampleValidRelationships(UriComponentsBuilder uriBuilder) {
+  public ResponseEntity<Set<SampleValidRelationshipDto>> getSampleValidRelationships(UriComponentsBuilder uriBuilder,
+      HttpServletResponse response) {
+    if (response.containsHeader("x-authentication-failed")) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
     Set<SampleValidRelationship> sampleValidRelationships = sampleValidRelationshipService.getAll();
     if (sampleValidRelationships.isEmpty()) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -102,7 +111,10 @@ public class SampleValidRelationshipController {
   @RequestMapping(value = "/samplevalidrelationship", method = RequestMethod.POST, headers = { "Content-type=application/json" })
   @ResponseBody
   public ResponseEntity<?> createSampleValidRelationship(@RequestBody SampleValidRelationshipDto sampleValidRelationshipDto,
-      UriComponentsBuilder b) throws IOException {
+      UriComponentsBuilder b, HttpServletResponse response) throws IOException {
+    if (response.containsHeader("x-authentication-failed")) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
     SampleValidRelationship sampleValidRelationship = Dtos.to(sampleValidRelationshipDto);
     Long id = sampleValidRelationshipService.create(sampleValidRelationship);
     UriComponents uriComponents = b.path("/samplevalidrelationship/{id}").buildAndExpand(id);
@@ -114,7 +126,10 @@ public class SampleValidRelationshipController {
   @RequestMapping(value = "/samplevalidrelationship/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
   @ResponseBody
   public ResponseEntity<?> updateSampleValidRelationship(@PathVariable("id") Long id,
-      @RequestBody SampleValidRelationshipDto sampleValidRelationshipDto) throws IOException {
+      @RequestBody SampleValidRelationshipDto sampleValidRelationshipDto, HttpServletResponse response) throws IOException {
+    if (response.containsHeader("x-authentication-failed")) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
     SampleValidRelationship sampleValidRelationship = Dtos.to(sampleValidRelationshipDto);
     sampleValidRelationship.setSampleValidRelationshipId(id);
     sampleValidRelationshipService.update(sampleValidRelationship);
@@ -123,7 +138,10 @@ public class SampleValidRelationshipController {
 
   @RequestMapping(value = "/samplevalidrelationship/{id}", method = RequestMethod.DELETE)
   @ResponseBody
-  public ResponseEntity<?> deleteSampleValidRelationship(@PathVariable("id") Long id) throws IOException {
+  public ResponseEntity<?> deleteSampleValidRelationship(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
+    if (response.containsHeader("x-authentication-failed")) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
     sampleValidRelationshipService.delete(id);
     return new ResponseEntity<>(HttpStatus.OK);
   }

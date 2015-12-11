@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +62,11 @@ public class SampleAdditionalInfoController {
 
   @RequestMapping(value = "/sampleadditionalinfo/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public ResponseEntity<SampleAdditionalInfoDto> getSampleAdditionalInfo(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder) {
+  public ResponseEntity<SampleAdditionalInfoDto> getSampleAdditionalInfo(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
+      HttpServletResponse response) {
+    if (response.containsHeader("x-authentication-failed")) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
     SampleAdditionalInfo sampleAdditionalInfo = sampleAdditionalInfoService.get(id);
     if (sampleAdditionalInfo == null) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -72,6 +78,7 @@ public class SampleAdditionalInfoController {
   }
 
   private static SampleAdditionalInfoDto writeUrls(SampleAdditionalInfoDto sampleAdditionalInfoDto, UriComponentsBuilder uriBuilder) {
+
     URI baseUri = uriBuilder.build().toUri();
     sampleAdditionalInfoDto.setUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/sampleadditionalinfo/{id}")
         .buildAndExpand(sampleAdditionalInfoDto.getId()).toUriString());
@@ -84,7 +91,11 @@ public class SampleAdditionalInfoController {
 
   @RequestMapping(value = "/sampleadditionalinfos", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public ResponseEntity<Set<SampleAdditionalInfoDto>> getSampleAdditionalInfos(UriComponentsBuilder uriBuilder) {
+  public ResponseEntity<Set<SampleAdditionalInfoDto>> getSampleAdditionalInfos(UriComponentsBuilder uriBuilder,
+      HttpServletResponse response) {
+    if (response.containsHeader("x-authentication-failed")) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
     Set<SampleAdditionalInfo> sampleAdditionalInfos = sampleAdditionalInfoService.getAll();
     if (sampleAdditionalInfos.isEmpty()) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -99,8 +110,11 @@ public class SampleAdditionalInfoController {
 
   @RequestMapping(value = "/sampleadditionalinfo", method = RequestMethod.POST, headers = { "Content-type=application/json" })
   @ResponseBody
-  public ResponseEntity<?> createSampleAdditionalInfo(@RequestBody SampleAdditionalInfoDto sampleAdditionalInfoDto, UriComponentsBuilder b)
-      throws IOException {
+  public ResponseEntity<?> createSampleAdditionalInfo(@RequestBody SampleAdditionalInfoDto sampleAdditionalInfoDto, UriComponentsBuilder b,
+      HttpServletResponse response) throws IOException {
+    if (response.containsHeader("x-authentication-failed")) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
     SampleAdditionalInfo sampleAdditionalInfo = Dtos.to(sampleAdditionalInfoDto);
     Long id = sampleAdditionalInfoService.create(sampleAdditionalInfo);
     UriComponents uriComponents = b.path("/sampleadditionalinfo/{id}").buildAndExpand(id);
@@ -112,7 +126,10 @@ public class SampleAdditionalInfoController {
   @RequestMapping(value = "/sampleadditionalinfo/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
   @ResponseBody
   public ResponseEntity<?> updateSampleAdditionalInfo(@PathVariable("id") Long id,
-      @RequestBody SampleAdditionalInfoDto sampleAdditionalInfoDto) throws IOException {
+      @RequestBody SampleAdditionalInfoDto sampleAdditionalInfoDto, HttpServletResponse response) throws IOException {
+    if (response.containsHeader("x-authentication-failed")) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
     SampleAdditionalInfo sampleAdditionalInfo = Dtos.to(sampleAdditionalInfoDto);
     sampleAdditionalInfo.setSampleAdditionalInfoId(id);
     sampleAdditionalInfoService.update(sampleAdditionalInfo);
@@ -121,7 +138,10 @@ public class SampleAdditionalInfoController {
 
   @RequestMapping(value = "/sampleadditionalinfo/{id}", method = RequestMethod.DELETE)
   @ResponseBody
-  public ResponseEntity<?> deleteSampleAdditionalInfo(@PathVariable("id") Long id) throws IOException {
+  public ResponseEntity<?> deleteSampleAdditionalInfo(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
+    if (response.containsHeader("x-authentication-failed")) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
     sampleAdditionalInfoService.delete(id);
     return new ResponseEntity<>(HttpStatus.OK);
   }

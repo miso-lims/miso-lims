@@ -26,6 +26,8 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 import java.io.IOException;
 import java.net.URI;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +58,10 @@ public class SampleController {
 
   @RequestMapping(value = "/sample/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public ResponseEntity<SampleDto> getSample(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder) {
+  public ResponseEntity<SampleDto> getSample(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder, HttpServletResponse response) {
+    if (response.containsHeader("x-authentication-failed")) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
     Sample sample = sampleService.get(id);
     if (sample == null) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -113,7 +118,10 @@ public class SampleController {
 
   @RequestMapping(value = "/sample/{id}", method = RequestMethod.DELETE)
   @ResponseBody
-  public ResponseEntity<?> deleteSample(@PathVariable("id") Long id) throws IOException {
+  public ResponseEntity<?> deleteSample(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
+    if (response.containsHeader("x-authentication-failed")) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
     sampleService.delete(id);
     return new ResponseEntity<>(HttpStatus.OK);
   }

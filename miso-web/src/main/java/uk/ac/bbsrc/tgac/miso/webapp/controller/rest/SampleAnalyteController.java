@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +62,11 @@ public class SampleAnalyteController {
 
   @RequestMapping(value = "/sampleanalyte/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public ResponseEntity<SampleAnalyteDto> getSampleAnalyte(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder) {
+  public ResponseEntity<SampleAnalyteDto> getSampleAnalyte(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
+      HttpServletResponse response) {
+    if (response.containsHeader("x-authentication-failed")) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
     SampleAnalyte sampleAnalyte = sampleAnalyteService.get(id);
     if (sampleAnalyte == null) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -84,7 +90,10 @@ public class SampleAnalyteController {
 
   @RequestMapping(value = "/sampleanalytes", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public ResponseEntity<Set<SampleAnalyteDto>> getSampleAnalytes(UriComponentsBuilder uriBuilder) {
+  public ResponseEntity<Set<SampleAnalyteDto>> getSampleAnalytes(UriComponentsBuilder uriBuilder, HttpServletResponse response) {
+    if (response.containsHeader("x-authentication-failed")) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
     Set<SampleAnalyte> sampleAnalytes = sampleAnalyteService.getAll();
     if (sampleAnalytes.isEmpty()) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -99,7 +108,11 @@ public class SampleAnalyteController {
 
   @RequestMapping(value = "/sampleanalyte", method = RequestMethod.POST, headers = { "Content-type=application/json" })
   @ResponseBody
-  public ResponseEntity<?> createSampleAnalyte(@RequestBody SampleAnalyteDto sampleAnalyteDto, UriComponentsBuilder b) throws IOException {
+  public ResponseEntity<?> createSampleAnalyte(@RequestBody SampleAnalyteDto sampleAnalyteDto, UriComponentsBuilder b,
+      HttpServletResponse response) throws IOException {
+    if (response.containsHeader("x-authentication-failed")) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
     SampleAnalyte sampleAnalyte = Dtos.to(sampleAnalyteDto);
     Long id = sampleAnalyteService.create(sampleAnalyte);
     UriComponents uriComponents = b.path("/sampleanalyte/{id}").buildAndExpand(id);
@@ -110,8 +123,11 @@ public class SampleAnalyteController {
 
   @RequestMapping(value = "/sampleanalyte/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
   @ResponseBody
-  public ResponseEntity<?> updateSampleAnalyte(@PathVariable("id") Long id, @RequestBody SampleAnalyteDto sampleAnalyteDto)
-      throws IOException {
+  public ResponseEntity<?> updateSampleAnalyte(@PathVariable("id") Long id, @RequestBody SampleAnalyteDto sampleAnalyteDto,
+      HttpServletResponse response) throws IOException {
+    if (response.containsHeader("x-authentication-failed")) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
     SampleAnalyte sampleAnalyte = Dtos.to(sampleAnalyteDto);
     sampleAnalyte.setSampleAnalyteId(id);
     sampleAnalyteService.update(sampleAnalyte);
@@ -120,7 +136,10 @@ public class SampleAnalyteController {
 
   @RequestMapping(value = "/sampleanalyte/{id}", method = RequestMethod.DELETE)
   @ResponseBody
-  public ResponseEntity<?> deleteSampleAnalyte(@PathVariable("id") Long id) throws IOException {
+  public ResponseEntity<?> deleteSampleAnalyte(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
+    if (response.containsHeader("x-authentication-failed")) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
     sampleAnalyteService.delete(id);
     return new ResponseEntity<>(HttpStatus.OK);
   }

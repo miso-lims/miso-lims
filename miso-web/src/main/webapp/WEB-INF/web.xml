@@ -164,6 +164,11 @@
     <url-pattern>/miso/rest/run/*</url-pattern>
   </filter-mapping>  
 
+  <filter-mapping>
+    <filter-name>restSignatureFilter</filter-name>
+    <url-pattern>/miso/rest/sample/*</url-pattern>
+  </filter-mapping>  
+
   <filter>
     <filter-name>ajaxFilterChain</filter-name>
     <filter-class>uk.ac.bbsrc.tgac.miso.webapp.context.AjaxSessionFilter</filter-class>
