@@ -187,7 +187,7 @@ public class RestSignatureHeaderFilter extends OncePerRequestFilter {
     StringBuilder sb = new StringBuilder();
     sb.append("**************************************************************************************\n");
     sb.append("**  DANGER!! REST requests in MISO are currently unauthenticated. This is suitable  **\n");
-    sb.append("**  during development only. Adjust this setting in the RestSignatureFilter class.  **\n");
+    sb.append("**  during development only. Adjust setting in RestSignatureHeaderFilter class.     **\n");
     sb.append("**************************************************************************************\n");
     logger.error(sb.toString());
 
