@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +62,11 @@ public class TissueOriginController {
 
   @RequestMapping(value = "/tissueorigin/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public ResponseEntity<TissueOriginDto> getTissueOrigin(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder) {
+  public ResponseEntity<TissueOriginDto> getTissueOrigin(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
+      HttpServletResponse response) {
+    if (response.containsHeader("x-authentication-failed")) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
     TissueOrigin tissueOrigin = tissueOriginService.get(id);
     if (tissueOrigin == null) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -84,7 +90,10 @@ public class TissueOriginController {
 
   @RequestMapping(value = "/tissueorigins", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public ResponseEntity<Set<TissueOriginDto>> getTissueOrigins(UriComponentsBuilder uriBuilder) {
+  public ResponseEntity<Set<TissueOriginDto>> getTissueOrigins(UriComponentsBuilder uriBuilder, HttpServletResponse response) {
+    if (response.containsHeader("x-authentication-failed")) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
     Set<TissueOrigin> tissueOrigins = tissueOriginService.getAll();
     if (tissueOrigins.isEmpty()) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -99,7 +108,11 @@ public class TissueOriginController {
 
   @RequestMapping(value = "/tissueorigin", method = RequestMethod.POST, headers = { "Content-type=application/json" })
   @ResponseBody
-  public ResponseEntity<?> createTissueOrigin(@RequestBody TissueOriginDto tissueOriginDto, UriComponentsBuilder b) throws IOException {
+  public ResponseEntity<?> createTissueOrigin(@RequestBody TissueOriginDto tissueOriginDto, UriComponentsBuilder b,
+      HttpServletResponse response) throws IOException {
+    if (response.containsHeader("x-authentication-failed")) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
     TissueOrigin tissueOrigin = Dtos.to(tissueOriginDto);
     Long id = tissueOriginService.create(tissueOrigin);
     UriComponents uriComponents = b.path("/tissueorigin/{id}").buildAndExpand(id);
@@ -110,8 +123,11 @@ public class TissueOriginController {
 
   @RequestMapping(value = "/tissueorigin/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
   @ResponseBody
-  public ResponseEntity<?> updateTissueOrigin(@PathVariable("id") Long id, @RequestBody TissueOriginDto tissueOriginDto)
-      throws IOException {
+  public ResponseEntity<?> updateTissueOrigin(@PathVariable("id") Long id, @RequestBody TissueOriginDto tissueOriginDto,
+      HttpServletResponse response) throws IOException {
+    if (response.containsHeader("x-authentication-failed")) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
     TissueOrigin tissueOrigin = Dtos.to(tissueOriginDto);
     tissueOrigin.setTissueOriginId(id);
     tissueOriginService.update(tissueOrigin);
@@ -120,7 +136,10 @@ public class TissueOriginController {
 
   @RequestMapping(value = "/tissueorigin/{id}", method = RequestMethod.DELETE)
   @ResponseBody
-  public ResponseEntity<?> deleteTissueOrigin(@PathVariable("id") Long id) throws IOException {
+  public ResponseEntity<?> deleteTissueOrigin(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
+    if (response.containsHeader("x-authentication-failed")) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
     tissueOriginService.delete(id);
     return new ResponseEntity<>(HttpStatus.OK);
   }

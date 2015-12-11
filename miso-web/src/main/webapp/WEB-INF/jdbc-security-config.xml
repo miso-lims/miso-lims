@@ -123,6 +123,11 @@
     <property name="securityManager" ref="securityManager" />
   </bean>
 
+  <bean id="restSignatureHeaderFilter" class="uk.ac.bbsrc.tgac.miso.webapp.context.RestSignatureHeaderFilter">
+    <constructor-arg ref="httpSessionSecurityContextRepository"/>
+    <property name="securityManager" ref="securityManager"/>
+  </bean>
+
   <bean id="exposeRequestUrlFilter" class="uk.ac.bbsrc.tgac.miso.webapp.context.ExposeRequestUrlFilter">
     <constructor-arg ref="httpSessionSecurityContextRepository" />
     <property name="applicationContextProvider" ref="applicationContextProvider" />

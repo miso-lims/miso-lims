@@ -108,6 +108,16 @@
   </filter-mapping>
 
   <filter>
+    <filter-name>restSignatureHeaderFilter</filter-name>
+    <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+  </filter>
+  
+  <filter-mapping>
+    <filter-name>restSignatureHeaderFilter</filter-name>
+    <url-pattern>/miso/rest/*</url-pattern>
+  </filter-mapping>
+
+  <filter>
     <filter-name>restSignatureFilter</filter-name>
     <!-- <filter-class>uk.ac.bbsrc.tgac.miso.webapp.context.RestSignatureFilter</filter-class> -->
     <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
@@ -117,11 +127,42 @@
     <filter-name>restSignatureFilter</filter-name>
     <url-pattern>/miso/consumer/*</url-pattern>
   </filter-mapping>
+  
+  <filter-mapping>
+    <filter-name>restSignatureFilter</filter-name>
+    <url-pattern>/miso/rest/pool/*</url-pattern>
+  </filter-mapping>
+
+  
+  <filter-mapping>
+    <filter-name>restSignatureFilter</filter-name>
+    <url-pattern>/miso/rest/container/*</url-pattern>
+  </filter-mapping>
+  
+  <filter-mapping>
+    <filter-name>restSignatureFilter</filter-name>
+    <url-pattern>/miso/rest/external/*</url-pattern>
+  </filter-mapping>
 
   <filter-mapping>
     <filter-name>restSignatureFilter</filter-name>
-    <url-pattern>/miso/rest/*</url-pattern>
+    <url-pattern>/miso/rest/library/*</url-pattern>
   </filter-mapping>
+  
+  <filter-mapping>
+    <filter-name>restSignatureFilter</filter-name>
+    <url-pattern>/miso/rest/pool/*</url-pattern>
+  </filter-mapping>
+  
+  <filter-mapping>
+    <filter-name>restSignatureFilter</filter-name>
+    <url-pattern>/miso/rest/project/*</url-pattern>
+  </filter-mapping>
+  
+  <filter-mapping>
+    <filter-name>restSignatureFilter</filter-name>
+    <url-pattern>/miso/rest/run/*</url-pattern>
+  </filter-mapping>  
 
   <filter>
     <filter-name>ajaxFilterChain</filter-name>
