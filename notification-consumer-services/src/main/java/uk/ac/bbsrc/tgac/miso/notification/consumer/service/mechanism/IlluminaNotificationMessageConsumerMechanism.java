@@ -169,7 +169,7 @@ public class IlluminaNotificationMessageConsumerMechanism
 
               if (run.has("startDate")) {
                 try {
-                  if (!"null".equals(run.getString("startDate")) && !isStringEmptyOrNull(run.getString("startDate"))) {
+                  if (!isStringEmptyOrNull(run.getString("startDate")) && !"null".equals(run.getString("startDate"))) {
                     log.debug("Updating start date:" + run.getString("startDate"));
                     r.getStatus().setStartDate(illuminaRunFolderDateFormat.parse(run.getString("startDate")));
                   }
