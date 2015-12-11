@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.dto.SampleOptionsDto;
+import uk.ac.bbsrc.tgac.miso.service.QcPassedDetailService;
 import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
 import uk.ac.bbsrc.tgac.miso.service.SampleGroupService;
 import uk.ac.bbsrc.tgac.miso.service.SamplePurposeService;
@@ -40,6 +41,8 @@ public class SampleOptionsController {
   private SampleGroupService sampleGroupService;
   @Autowired
   private TissueMaterialService tissueMaterialService;
+  @Autowired
+  private QcPassedDetailService qcPassedDetailService;
   
   @RequestMapping(value = "/sampleoptions", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
@@ -52,6 +55,7 @@ public class SampleOptionsController {
     sampleOptionsDto.setSamplePurposes(samplePurposeService.getAll());
     sampleOptionsDto.setSampleGroups(sampleGroupService.getAll());
     sampleOptionsDto.setTissueMaterials(tissueMaterialService.getAll());
+    sampleOptionsDto.setQcPassedDetails(qcPassedDetailService.getAll());
    
     return new ResponseEntity<>(sampleOptionsDto, HttpStatus.OK);
   }
