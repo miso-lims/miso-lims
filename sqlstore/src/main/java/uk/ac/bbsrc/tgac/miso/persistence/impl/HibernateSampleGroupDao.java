@@ -31,7 +31,7 @@ public class HibernateSampleGroupDao implements SampleGroupDao {
 
   @Override
   public List<SampleGroupId> getSampleGroups() {
-    Query query = currentSession().createQuery("from SampleGroupIdImpl");
+    Query query = currentSession().createQuery("from SampleGroupImpl");
     @SuppressWarnings("unchecked")
     List<SampleGroupId> records = query.list();
     return records;

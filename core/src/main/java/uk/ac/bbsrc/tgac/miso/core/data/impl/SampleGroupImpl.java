@@ -128,5 +128,12 @@ public class SampleGroupImpl implements SampleGroupId {
   public void setLastUpdated(Date lastUpdated) {
     this.lastUpdated = lastUpdated;
   }
+  
+  @Override
+  public String toString() {
+    return "SampleGroupImpl [sampleGroupId=" + sampleGroupId + ", projectId=" + project + ", groupId=" + groupId + ", description=" 
+        + description + ", createdBy=" + createdBy + ", creationDate=" + creationDate + ", updatedBy=" + updatedBy + ", lastUpdated=" 
+        + lastUpdated + "]";
+  }
 
 }

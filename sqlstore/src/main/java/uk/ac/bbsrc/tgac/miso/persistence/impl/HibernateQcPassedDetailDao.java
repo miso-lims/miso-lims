@@ -31,7 +31,7 @@ public class HibernateQcPassedDetailDao implements QcPassedDetailDao {
 
   @Override
   public List<QcPassedDetail> getQcPassedDetails() {
-    Query query = currentSession().createQuery("from QcPassedDetailsImpl");
+    Query query = currentSession().createQuery("from QcPassedDetailImpl");
     @SuppressWarnings("unchecked")
     List<QcPassedDetail> records = query.list();
     return records;

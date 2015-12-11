@@ -47,10 +47,12 @@ public class QcPassedDetailImpl implements QcPassedDetail {
   @Column(nullable = false)
   private Date lastUpdated;
 
+  @Override
   public Long getQcPassedDetailId() {
     return qcPassedDetailId;
   }
 
+  @Override
   public void setQcPassedDetailId(Long qcPassedDetailId) {
     this.qcPassedDetailId = qcPassedDetailId;
   }
@@ -125,4 +127,10 @@ public class QcPassedDetailImpl implements QcPassedDetail {
     this.noteRequired = noteRequired;
   }
 
+  @Override
+  public String toString() {
+    return "QcPassedDetailImpl [qcPassedDetailId=" + qcPassedDetailId + ", status=" + status + ", description=" + description 
+        + ", noteRequired=" + noteRequired + ", createdBy=" + createdBy + ", creationDate=" + creationDate + ", updatedBy=" + updatedBy 
+        + ", lastUpdated=" + lastUpdated + "]"; 
+  }
 }

@@ -114,4 +114,10 @@ public class SampleGroupDto {
     this.groupId = groupId;
   }
 
+  @Override
+  public String toString() {
+    return "SampleGroupDto [id=" + id + ", url=" + url  +", projectId=" + projectId + ", projectUrl=" + projectUrl + ", groupId=" + groupId
+        + ", description=" + description + ", createdById=" + createdById + ", createdByUrl=" + createdByUrl + ", creationDate=" 
+        + creationDate + ", updatedById=" + updatedById + ", updatedByUrl=" + updatedByUrl + ", lastUpdated=" + lastUpdated + "]";
+  }
 }
