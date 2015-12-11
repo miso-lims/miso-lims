@@ -366,8 +366,8 @@ public class ProjectControllerHelperService {
       final JSONArray jsonArray = new JSONArray();
       for (Project project : requestManager.listAllProjects()) {
         jsonArray.add(JsonSanitizer.sanitize("[\"" + project.getName() + "\",\"" + project.getAlias() + "\",\"" + project.getDescription()
-            + "\",\"" + project.getProgress().getKey() + "\",\"" + project.getProjectId() + "\",\"" + "<a href=\"/miso/project/"
-            + project.getId() + "\"><span class=\"fa fa-pencil-square-o fa-lg\"></span></a>" + "\"]"));
+            + "\",\"" + project.getProgress().getKey() + "\",\"" + project.getProjectId() + "\",'" + "<a href=\"/miso/project/"
+            + project.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']"));
 
       }
       j.put("projectsArray", jsonArray);

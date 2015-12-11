@@ -107,8 +107,8 @@ public class StudyControllerHelperService {
       JSONArray jsonArray = new JSONArray();
       for (Study study : requestManager.listAllStudies()) {
         jsonArray.add(JsonSanitizer.sanitize("[\"" + study.getName() + "\",\"" + study.getAlias() + "\",\"" + study.getDescription()
-            + "\",\"" + study.getStudyType() + "\",\"" + "<a href=\"/miso/study/" + study.getId()
-            + "\"><span class=\"fa fa-pencil-square-o fa-lg\"></span></a>" + "\"]"));
+            + "\",\"" + study.getStudyType() + "\",'" + "<a href=\"/miso/study/" + study.getId()
+            + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']"));
 
       }
       j.put("array", jsonArray);
