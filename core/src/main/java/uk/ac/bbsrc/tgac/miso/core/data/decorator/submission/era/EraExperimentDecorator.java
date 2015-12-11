@@ -71,7 +71,7 @@ public class EraExperimentDecorator extends AbstractSubmittableDecorator<Documen
       Element studyRef = submission.createElementNS(null, "STUDY_REF");
       studyRef.setAttribute("refname", e.getStudy().getAlias());
       studyRef.setAttribute("refcenter", submissionProperties.getProperty("submission.centreName"));
-      if (e.getStudy().getAccession() != null && !isStringEmptyOrNull(e.getStudy().getAccession())) {
+      if (!isStringEmptyOrNull(e.getStudy().getAccession())) {
         studyRef.setAttribute("accession", e.getStudy().getAccession());
       }
       experiment.appendChild(studyRef);
