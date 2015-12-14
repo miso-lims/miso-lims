@@ -76,7 +76,7 @@ public class RunProcessingUtils {
                   .append(f.getId()).append("_").append(ld.getLibrary().getName()).append("_").append(ld.getName()).append(",")
                   .append(ld.getLibrary().getSample().getAlias().replaceAll("\\s", "")).append(",");
 
-          if (ld.getLibrary().getTagBarcodes() != null && !ld.getLibrary().getTagBarcodes().isEmpty() && p.getDilutions().size() > 1) {
+          if (ld.getLibrary().getTagBarcodes() != null && !ld.getLibrary().getTagBarcodes().isEmpty()) {
             Map<Integer, TagBarcode> barcodes = new TreeMap<Integer, TagBarcode>(ld.getLibrary().getTagBarcodes());
             int bcount = 1;
             for (Integer key : barcodes.keySet()) {

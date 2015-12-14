@@ -23,12 +23,26 @@
 
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import net.sourceforge.fluxion.ajax.Ajaxified;
-import net.sourceforge.fluxion.ajax.util.JSONUtils;
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
+import java.awt.image.RenderedImage;
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
+import java.util.TreeSet;
+
+import javax.imageio.ImageIO;
+import javax.servlet.http.HttpSession;
+
 import org.apache.commons.codec.binary.Base64;
 import org.krysalis.barcode4j.BarcodeDimension;
 import org.krysalis.barcode4j.BarcodeGenerator;
@@ -36,7 +50,29 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
-import uk.ac.bbsrc.tgac.miso.core.data.*;
+
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import net.sourceforge.fluxion.ajax.Ajaxified;
+import net.sourceforge.fluxion.ajax.util.JSONUtils;
+import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
+import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
+import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
+import uk.ac.bbsrc.tgac.miso.core.data.Plate;
+import uk.ac.bbsrc.tgac.miso.core.data.Plateable;
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
+import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
+import uk.ac.bbsrc.tgac.miso.core.data.PrintJob;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.Study;
+import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -51,14 +87,6 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintService;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.context.PrintContext;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-
-import javax.imageio.ImageIO;
-import javax.servlet.http.HttpSession;
-import java.awt.image.RenderedImage;
-import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.*;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
@@ -89,14 +117,13 @@ public class PoolControllerHelperService {
       StringBuilder sb = new StringBuilder();
       Collection<QcType> types = requestManager.listAllPoolQcTypes();
       for (QcType s : types) {
-        sb.append("<option units='"+s.getUnits()+"' value='" + s.getQcTypeId() + "'>"+s.getName()+"</option>");
+        sb.append("<option units='" + s.getUnits() + "' value='" + s.getQcTypeId() + "'>" + s.getName() + "</option>");
       }
       Map<String, Object> map = new HashMap<String, Object>();
       map.put("types", sb.toString());
       return JSONUtils.JSONObjectResponse(map);
-    }
-    catch (IOException e) {
-      e.printStackTrace();
+    } catch (IOException e) {
+      log.error("get pool qc types", e);
     }
     return JSONUtils.SimpleJSONError("Cannot list all Pool QC Types");
   }
@@ -105,8 +132,8 @@ public class PoolControllerHelperService {
     try {
       for (Object key : json.keySet()) {
         if (json.get(key) == null || json.get(key).equals("")) {
-          String k = (String)key;
-          return JSONUtils.SimpleJSONError("Please enter a value for '" +k+ "'");
+          String k = (String) key;
+          return JSONUtils.SimpleJSONError("Please enter a value for '" + k + "'");
         }
       }
       if (json.has("poolId") && !json.get("poolId").equals("")) {
@@ -127,19 +154,17 @@ public class PoolControllerHelperService {
         sb.append("<tr><th>QCed By</th><th>QC Date</th><th>Method</th><th>Results</th></tr>");
         for (PoolQC qc : pool.getPoolQCs()) {
           sb.append("<tr>");
-          sb.append("<td>"+qc.getQcCreator()+"</td>");
-          sb.append("<td>"+qc.getQcDate()+"</td>");
-          sb.append("<td>"+qc.getQcType().getName()+"</td>");
-          sb.append("<td>"+qc.getResults()+" "+ qc.getQcType().getUnits() +"</td>");
+          sb.append("<td>" + qc.getQcCreator() + "</td>");
+          sb.append("<td>" + qc.getQcDate() + "</td>");
+          sb.append("<td>" + qc.getQcType().getName() + "</td>");
+          sb.append("<td>" + qc.getResults() + " " + qc.getQcType().getUnits() + "</td>");
           sb.append("</tr>");
         }
         return JSONUtils.SimpleJSONResponse(sb.toString());
-      }
-      else {
+      } else {
         return JSONUtils.SimpleJSONError("Cannot detect parent pool ID. Cannot add PoolQC");
       }
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       log.error("Failed to add Pool QC to this Pool: ", e);
       return JSONUtils.SimpleJSONError("Failed to add Pool QC to this Pool: " + e.getMessage());
     }
@@ -148,42 +173,38 @@ public class PoolControllerHelperService {
   public JSONObject bulkAddPoolQCs(HttpSession session, JSONObject json) {
     try {
       JSONArray qcs = JSONArray.fromObject(json.getString("qcs"));
-      //validate
+      // validate
       boolean ok = true;
-      for (JSONObject qc : (Iterable<JSONObject>)qcs) {
+      for (JSONObject qc : (Iterable<JSONObject>) qcs) {
         String qcPassed = qc.getString("qcPassed");
         String qcType = qc.getString("qcType");
         String results = qc.getString("results");
         String qcCreator = qc.getString("qcCreator");
         String qcDate = qc.getString("qcDate");
 
-        if (qcPassed == null || qcPassed.equals("") ||
-            qcType == null || qcType.equals("") ||
-            results == null || results.equals("") ||
-            qcCreator == null || qcCreator.equals("") ||
-            qcDate == null || qcDate.equals("")) {
+        if (qcPassed == null || qcPassed.equals("") || qcType == null || qcType.equals("") || results == null || results.equals("")
+            || qcCreator == null || qcCreator.equals("") || qcDate == null || qcDate.equals("")) {
           ok = false;
         }
       }
 
-      //persist
+      // persist
       if (ok) {
         Map<String, Object> map = new HashMap<String, Object>();
         JSONArray a = new JSONArray();
-        for (JSONObject qc : (Iterable<JSONObject>)qcs) {
+        for (JSONObject qc : (Iterable<JSONObject>) qcs) {
           JSONObject j = addPoolQC(session, qc);
           j.put("poolId", qc.getString("poolId"));
           a.add(j);
         }
         map.put("saved", a);
         return JSONUtils.JSONObjectResponse(map);
-      }
-      else {
+      } else {
         log.error("Failed to add Pool QC to this Pool: one of the required fields of the selected QCs is missing or invalid");
-        return JSONUtils.SimpleJSONError("Failed to add Pool QC to this Pool: one of the required fields of the selected QCs is missing or invalid");
+        return JSONUtils
+            .SimpleJSONError("Failed to add Pool QC to this Pool: one of the required fields of the selected QCs is missing or invalid");
       }
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       log.error("Failed to add Pool QC to this Pool: ", e);
       return JSONUtils.SimpleJSONError("Failed to add Pool QC to this Pool: " + e.getMessage());
     }
@@ -197,8 +218,7 @@ public class PoolControllerHelperService {
       response.put("results", "<input type='text' id='" + qcId + "' value='" + poolQc.getResults() + "'/>");
       response.put("edit", "<a href='javascript:void(0);' onclick='Pool.qc.editPoolQC(\"" + qcId + "\");'>Save</a>");
       return response;
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       log.error("Failed to display Pool QC of this sample: ", e);
       return JSONUtils.SimpleJSONError("Failed to display Pool QC of this sample: " + e.getMessage());
     }
@@ -213,8 +233,7 @@ public class PoolControllerHelperService {
         requestManager.savePoolQC(poolQc);
         return JSONUtils.SimpleJSONResponse("OK");
       }
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       log.error("Failed to add Pool QC to this sample: ", e);
       return JSONUtils.SimpleJSONError("Failed to add Pool QC to this sample: " + e.getMessage());
     }
@@ -226,7 +245,7 @@ public class PoolControllerHelperService {
     sb.append("<div id='dilslist' class='checklist' style='width: 100%;'>");
     for (String s : codes) {
       if (LimsUtils.isBase64String(s)) {
-        //Base64-encoded string, most likely a barcode image beeped in. decode and search
+        // Base64-encoded string, most likely a barcode image beeped in. decode and search
         s = new String(Base64.decodeBase64(s));
       }
       Dilution ed = requestManager.getDilutionByBarcode(s);
@@ -238,8 +257,8 @@ public class PoolControllerHelperService {
       }
     }
     sb.append("</div>");
-    sb.append("<a onclick='Utils.ui.checkAll(\"importdilslist\"); return false;' href='javascript:void(0);'>All</a> " +
-              "/ <a onclick='Utils.ui.uncheckAll(\"importdilslist\"); return false;' href='javascript:void(0);'>None</a>");
+    sb.append("<a onclick='Utils.ui.checkAll(\"importdilslist\"); return false;' href='javascript:void(0);'>All</a> "
+        + "/ <a onclick='Utils.ui.uncheckAll(\"importdilslist\"); return false;' href='javascript:void(0);'>None</a>");
     sb.append("<br/><button type='submit' class='br-button ui-state-default ui-corner-all'>Use</button>");
     return sb.toString();
   }
@@ -266,8 +285,7 @@ public class PoolControllerHelperService {
 
         return JSONUtils.SimpleJSONResponse(sb.toString());
       }
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       log.debug("Failed to generate barcode selection: ", e);
       return JSONUtils.SimpleJSONError("Failed to generate barcode selection");
     }
@@ -281,7 +299,7 @@ public class PoolControllerHelperService {
         String[] codes = barcodes.split("\n");
 
         // make sure there are no duplicates and order the strings
-        // by putitng the codes in a treeset        
+        // by putitng the codes in a treeset
         TreeSet<String> hcodes = new TreeSet<String>();
         hcodes.addAll(Arrays.asList(codes));
 
@@ -295,8 +313,7 @@ public class PoolControllerHelperService {
 
         return JSONUtils.SimpleJSONResponse(sb.toString());
       }
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       log.debug("Failed to generate barcode selection: ", e);
       return JSONUtils.SimpleJSONError("Failed to generate barcode selection");
     }
@@ -321,12 +338,10 @@ public class PoolControllerHelperService {
         BarcodeGenerator bg = BarcodeFactory.lookupGenerator(json.getString("barcodeGenerator"));
         if (bg != null) {
           bi = barcodeFactory.generateBarcode(pool, bg, dim);
-        }
-        else {
+        } else {
           return JSONUtils.SimpleJSONError("'" + json.getString("barcodeGenerator") + "' is not a valid barcode generator type");
         }
-      }
-      else {
+      } else {
         bi = barcodeFactory.generateSquareDataMatrix(pool, 400);
       }
 
@@ -336,13 +351,11 @@ public class PoolControllerHelperService {
           return JSONUtils.JSONObjectResponse("img", tempimage.getName());
         }
         return JSONUtils.SimpleJSONError("Writing temp image file failed.");
-      }
-      else {
+      } else {
         return JSONUtils.SimpleJSONError("Pool has no parseable barcode");
       }
-    }
-    catch (IOException e) {
-      e.printStackTrace();
+    } catch (IOException e) {
+      log.error("cannot access " + temploc.getAbsolutePath(), e);
       return JSONUtils.SimpleJSONError(e.getMessage() + ": Cannot seem to access " + temploc.getAbsolutePath());
     }
   }
@@ -362,12 +375,11 @@ public class PoolControllerHelperService {
         Collection<MisoPrintService> services = printManager.listPrintServicesByBarcodeableClass(Pool.class);
         if (services.size() == 1) {
           mps = services.iterator().next();
+        } else {
+          return JSONUtils
+              .SimpleJSONError("No serviceName specified, but more than one available service able to print this barcode type.");
         }
-        else {
-          return JSONUtils.SimpleJSONError("No serviceName specified, but more than one available service able to print this barcode type.");
-        }
-      }
-      else {
+      } else {
         mps = printManager.getPrintService(serviceName);
       }
 
@@ -379,24 +391,41 @@ public class PoolControllerHelperService {
 
           File f = mps.getLabelFor(pool);
           if (f != null) thingsToPrint.add(f);
-        }
-        catch (IOException e) {
-          e.printStackTrace();
+        } catch (IOException e) {
+          log.error("error printing pool barcode", e);
           return JSONUtils.SimpleJSONError("Error printing pool barcode: " + e.getMessage());
         }
       }
 
       PrintJob pj = printManager.print(thingsToPrint, mps.getName(), user);
       return JSONUtils.SimpleJSONResponse("Job " + pj.getJobId() + " : Barcodes printed.");
-    }
-    catch (MisoPrintException e) {
-      e.printStackTrace();
+    } catch (MisoPrintException e) {
+      log.error("no printer of that name available", e);
       return JSONUtils.SimpleJSONError("No printer of that name available: " + e.getMessage());
-    }
-    catch (IOException e) {
-      e.printStackTrace();
+    } catch (IOException e) {
+      log.error("cannot print barcodes", e);
       return JSONUtils.SimpleJSONError("Cannot print barcodes: " + e.getMessage());
     }
+  }
+
+  public JSONObject changePoolIdBarcode(HttpSession session, JSONObject json) {
+    Long poolId = json.getLong("poolId");
+    String idBarcode = json.getString("identificationBarcode");
+
+    try {
+      if (!isStringEmptyOrNull(idBarcode)) {
+        Pool<? extends Poolable> pool = requestManager.getPoolById(poolId);
+        pool.setIdentificationBarcode(idBarcode);
+        requestManager.savePool(pool);
+      } else {
+        return JSONUtils.SimpleJSONError("New identification barcode not recognized");
+      }
+    } catch (IOException e) {
+      log.debug("Could not change Pool identificationBarcode: " + e.getMessage());
+      return JSONUtils.SimpleJSONError(e.getMessage());
+    }
+
+    return JSONUtils.SimpleJSONResponse("New identification barcode successfully assigned.");
   }
 
   public JSONObject poolSearchExperiments(HttpSession session, JSONObject json) {
@@ -411,33 +440,29 @@ public class PoolControllerHelperService {
         for (Experiment e : experiments) {
           if (e.getPlatform().getPlatformType().equals(PlatformType.valueOf(platformType))) {
             String expName = e.getName() == null ? null : e.getName();
-            if (expName != null &&
-                (expName.toLowerCase().equals(str) || expName.toLowerCase().contains(str)) ||
-                (e.getStudy().getAlias().toLowerCase().contains(str) || e.getStudy().getName().toLowerCase().contains(str)) ||
-                (e.getStudy().getProject().getAlias().toLowerCase().contains(str) || e.getStudy().getProject().getName().toLowerCase().contains(str))) {
-              b.append("<div onmouseover=\"this.className='autocompleteboxhighlight'\" onmouseout=\"this.className='autocompletebox'\" class=\"autocompletebox\"" +
-                       " onclick=\"Pool.search.poolSearchSelectExperiment('" + e.getId() + "', '" + e.getName() + "')\">" +
-                       "<b>Experiment:</b> " + expName + "<br/>" +
-                       "<b>Description:</b> " + e.getDescription() + "<br/>" +
-                       "<b>Project:</b> " + e.getStudy().getProject().getAlias() + "<br/>" +
-                       "</div>");
+            if (expName != null && (expName.toLowerCase().equals(str) || expName.toLowerCase().contains(str))
+                || (e.getStudy().getAlias().toLowerCase().contains(str) || e.getStudy().getName().toLowerCase().contains(str))
+                || (e.getStudy().getProject().getAlias().toLowerCase().contains(str)
+                    || e.getStudy().getProject().getName().toLowerCase().contains(str))) {
+              b.append(
+                  "<div onmouseover=\"this.className='autocompleteboxhighlight'\" onmouseout=\"this.className='autocompletebox'\" class=\"autocompletebox\""
+                      + " onclick=\"Pool.search.poolSearchSelectExperiment('" + e.getId() + "', '" + e.getName() + "')\">"
+                      + "<b>Experiment:</b> " + expName + "<br/>" + "<b>Description:</b> " + e.getDescription() + "<br/>"
+                      + "<b>Project:</b> " + e.getStudy().getProject().getAlias() + "<br/>" + "</div>");
               numMatches++;
             }
           }
         }
         if (numMatches == 0) {
           return JSONUtils.JSONObjectResponse("html", "No matches");
-        }
-        else {
+        } else {
           return JSONUtils.JSONObjectResponse("html", "<div class=\"autocomplete\"><ul>" + b.toString() + "</ul></div>");
         }
-      }
-      else {
+      } else {
         return JSONUtils.JSONObjectResponse("html", "Need a longer search pattern ...");
       }
-    }
-    catch (Exception e) {
-      e.printStackTrace();
+    } catch (Exception e) {
+      log.error("pool search experiments", e);
       return JSONUtils.SimpleJSONError(e.getMessage());
     }
   }
@@ -467,9 +492,8 @@ public class PoolControllerHelperService {
           try {
             p.addExperiment(e);
             requestManager.saveExperiment(e);
-          }
-          catch (MalformedExperimentException e1) {
-            e1.printStackTrace();
+          } catch (MalformedExperimentException e1) {
+            log.error("save experiment", e1);
           }
 
           sb.append("<i>");
@@ -477,17 +501,14 @@ public class PoolControllerHelperService {
           sb.append("</i>");
 
           return JSONUtils.JSONObjectResponse("html", sb.toString());
-        }
-        else {
+        } else {
           return JSONUtils.SimpleJSONError("Could not find run with ID " + runId);
         }
-      }
-      else {
+      } else {
         return JSONUtils.SimpleJSONError("Could not resolve Run ID. Please ensure the run is saved before adding Pools");
       }
-    }
-    catch (Exception e) {
-      e.printStackTrace();
+    } catch (Exception e) {
+      log.error("select study for pool", e);
       return JSONUtils.SimpleJSONError(e.getMessage());
     }
   }
@@ -504,8 +525,6 @@ public class PoolControllerHelperService {
           for (Dilution ld : dls) {
             List<LibraryQC> libraryQCs = new ArrayList<LibraryQC>(requestManager.listAllLibraryQCsByLibraryId(ld.getLibrary().getId()));
             if (libraryQCs.size() > 0) {
-              //List<LibraryQC> libraryQCsList = new ArrayList<LibraryQC>(libraryQCs);
-              //Collections.sort(libraryQCsList);
               LibraryQC libraryQC = libraryQCs.get(libraryQCs.size() - 1);
               sum += libraryQC.getInsertSize();
               count++;
@@ -514,15 +533,13 @@ public class PoolControllerHelperService {
           if (count > 0) {
             b.append(Math.round(sum / count) + " bp");
           }
-        }
-        else {
+        } else {
           b.append("No QC");
         }
         j.put(pool.getId(), b.toString());
       }
       return j;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError(e.getMessage());
     }
@@ -549,14 +566,12 @@ public class PoolControllerHelperService {
         if (count > 0) {
           b.append(Math.round(sum / count) + " bp");
         }
-      }
-      else {
+      } else {
         b.append("No QC");
       }
       j.put("response", b.toString());
       return j;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError(e.getMessage());
     }
@@ -570,8 +585,7 @@ public class PoolControllerHelperService {
       double concentration = pool.getConcentration();
       j.put("response", concentration);
       return j;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError(e.getMessage());
     }
@@ -588,67 +602,72 @@ public class PoolControllerHelperService {
         Collection<? extends Dilution> dls = pool.getDilutions();
         for (Dilution dilution : dls) {
           info.append("<li><b>" + dilution.getName() + "</b>");
-          info.append("<br/><small><u><a href='/miso/project/"+dilution.getLibrary().getSample().getProject().getId()+"'>" + dilution.getLibrary().getSample().getProject().getAlias() + "</a></u>");
-          info.append("<br/><a href='/miso/library/"+dilution.getLibrary().getId()+"'>" + dilution.getLibrary().getAlias() + " (" + dilution.getLibrary().getName() + ")</a>");
-          info.append("<br/><a href='/miso/sample/"+dilution.getLibrary().getSample().getId()+"'>" + dilution.getLibrary().getSample().getDescription() + " (" + dilution.getLibrary().getSample().getName() + ")</a></small>");
+          info.append("<br/><small><u><a href='/miso/project/" + dilution.getLibrary().getSample().getProject().getId() + "'>"
+              + dilution.getLibrary().getSample().getProject().getAlias() + "</a></u>");
+          info.append("<br/><a href='/miso/library/" + dilution.getLibrary().getId() + "'>" + dilution.getLibrary().getAlias() + " ("
+              + dilution.getLibrary().getName() + ")</a>");
+          info.append("<br/><a href='/miso/sample/" + dilution.getLibrary().getSample().getId() + "'>"
+              + dilution.getLibrary().getSample().getDescription() + " (" + dilution.getLibrary().getSample().getName() + ")</a></small>");
           info.append("</li>");
         }
         info.append("</ul>");
-      }
-      else if (pool.getPoolableElements().size() > 0) {
+      } else if (pool.getPoolableElements().size() > 0) {
         info.append("<ul class=\"shorterbullets\">");
         Collection<? extends Poolable> ds = pool.getPoolableElements();
         for (Poolable p : ds) {
           if (p instanceof Dilution) {
-            Dilution dilution = (Dilution)p;
+            Dilution dilution = (Dilution) p;
             info.append("<li><b>" + dilution.getName() + "</b>");
-            info.append("<br/><small><u><a href='/miso/project/"+dilution.getLibrary().getSample().getProject().getId()+"'>" + dilution.getLibrary().getSample().getProject().getAlias() + "</a></u>");
-            info.append("<br/><a href='/miso/library/"+dilution.getLibrary().getId()+"'>" + dilution.getLibrary().getAlias() + " (" + dilution.getLibrary().getName() + ")</a>");
-            info.append("<br/><a href='/miso/sample/"+dilution.getLibrary().getSample().getId()+"'>" + dilution.getLibrary().getSample().getDescription() + " (" + dilution.getLibrary().getSample().getName() + ")</a></small>");
+            info.append("<br/><small><u><a href='/miso/project/" + dilution.getLibrary().getSample().getProject().getId() + "'>"
+                + dilution.getLibrary().getSample().getProject().getAlias() + "</a></u>");
+            info.append("<br/><a href='/miso/library/" + dilution.getLibrary().getId() + "'>" + dilution.getLibrary().getAlias() + " ("
+                + dilution.getLibrary().getName() + ")</a>");
+            info.append("<br/><a href='/miso/sample/" + dilution.getLibrary().getSample().getId() + "'>"
+                + dilution.getLibrary().getSample().getDescription() + " (" + dilution.getLibrary().getSample().getName()
+                + ")</a></small>");
             info.append("</li>");
-          }
-          else if (p instanceof Plate) {
-            Plate<LinkedList<Plateable>, Plateable> plate = (Plate<LinkedList<Plateable>, Plateable>)p;
-            info.append("<li><b><a href='/miso/plate/"+plate.getId()+"'>" + plate.getName() + "</b> ["+plate.getSize()+"-well]</a>");
+          } else if (p instanceof Plate) {
+            Plate<LinkedList<Plateable>, Plateable> plate = (Plate<LinkedList<Plateable>, Plateable>) p;
+            info.append(
+                "<li><b><a href='/miso/plate/" + plate.getId() + "'>" + plate.getName() + "</b> [" + plate.getSize() + "-well]</a>");
             if (!plate.getElements().isEmpty()) {
-              info.append("<br/><small><u>"+plate.getSize()+"-well "+plate.getElementType().getSimpleName()+" plate</u>");
+              info.append("<br/><small><u>" + plate.getSize() + "-well " + plate.getElementType().getSimpleName() + " plate</u>");
               Plateable element = plate.getElements().getFirst();
               if (element instanceof Library) {
-                Library l = (Library)element;
-                info.append("<br/><small><u><a href='/miso/project/"+l.getSample().getProject().getId()+"'>" + l.getSample().getProject().getAlias() + " ("+l.getSample().getProject().getName()+")</a></u>");
+                Library l = (Library) element;
+                info.append("<br/><small><u><a href='/miso/project/" + l.getSample().getProject().getId() + "'>"
+                    + l.getSample().getProject().getAlias() + " (" + l.getSample().getProject().getName() + ")</a></u>");
                 info.append("<br/>Platform: " + l.getPlatformName());
                 info.append("<br/>Type: " + l.getLibraryType().getDescription());
                 info.append("<br/>Selection: " + l.getLibrarySelectionType().getName());
                 info.append("<br/>Strategy: " + l.getLibraryStrategyType().getName());
-              }
-              else if (element instanceof Dilution) {
-                Dilution l = (Dilution)element;
-                info.append("<br/><small><u><a href='/miso/project/"+l.getLibrary().getSample().getProject().getId()+"'>" + l.getLibrary().getSample().getProject().getAlias() + " ("+l.getLibrary().getSample().getProject().getName()+")</a></u>");
+              } else if (element instanceof Dilution) {
+                Dilution l = (Dilution) element;
+                info.append("<br/><small><u><a href='/miso/project/" + l.getLibrary().getSample().getProject().getId() + "'>"
+                    + l.getLibrary().getSample().getProject().getAlias() + " (" + l.getLibrary().getSample().getProject().getName()
+                    + ")</a></u>");
                 info.append("<br/>Platform: " + l.getLibrary().getPlatformName());
                 info.append("<br/>Type: " + l.getLibrary().getLibraryType().getDescription());
                 info.append("<br/>Selection: " + l.getLibrary().getLibrarySelectionType().getName());
                 info.append("<br/>Strategy: " + l.getLibrary().getLibraryStrategyType().getName());
-              }
-              else if (element instanceof Sample) {
-                Sample l = (Sample)element;
-                info.append("<br/><small><u><a href='/miso/project/"+l.getProject().getId()+"'>" + l.getProject().getAlias() + " ("+l.getProject().getName()+")</a></u>");
+              } else if (element instanceof Sample) {
+                Sample l = (Sample) element;
+                info.append("<br/><small><u><a href='/miso/project/" + l.getProject().getId() + "'>" + l.getProject().getAlias() + " ("
+                    + l.getProject().getName() + ")</a></u>");
               }
             }
             info.append("</li>");
-          }
-          else {
+          } else {
             info.append("<li><b>" + p.getName() + "</b>");
           }
         }
         info.append("</ul>");
-      }
-      else {
+      } else {
         info.append("No pooled elements");
       }
       j.put("response", info.toString());
       return j;
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.debug("Failed", e);
       return JSONUtils.SimpleJSONError(e.getMessage());
     }
@@ -658,9 +677,8 @@ public class PoolControllerHelperService {
     User user;
     try {
       user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-    }
-    catch (IOException e) {
-      e.printStackTrace();
+    } catch (IOException e) {
+      log.error("error getting currently logged in user", e);
       return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
     }
 
@@ -670,17 +688,14 @@ public class PoolControllerHelperService {
         try {
           requestManager.deletePool(requestManager.getPoolById(poolId));
           return JSONUtils.SimpleJSONResponse("Pool deleted");
-        }
-        catch (IOException e) {
-          e.printStackTrace();
+        } catch (IOException e) {
+          log.error("cannot delete pool", e);
           return JSONUtils.SimpleJSONError("Cannot delete pool: " + e.getMessage());
         }
-      }
-      else {
+      } else {
         return JSONUtils.SimpleJSONError("No pool specified to delete.");
       }
-    }
-    else {
+    } else {
       return JSONUtils.SimpleJSONError("Only logged-in admins can delete objects.");
     }
   }
@@ -704,13 +719,11 @@ public class PoolControllerHelperService {
         }
         j.put("pools", arr);
         return j;
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
         log.debug("Failed", e);
         return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
       }
-    }
-    else {
+    } else {
       return JSONUtils.SimpleJSONError("No platform specified");
     }
   }
@@ -725,63 +738,59 @@ public class PoolControllerHelperService {
         for (Poolable p : pool.getPoolableElements()) {
           if (p.getId() == elementId) {
             if (p instanceof Plate) {
-              Plate<LinkedList<Plateable>, Plateable> plate = (Plate)p;
+              Plate<LinkedList<Plateable>, Plateable> plate = (Plate) p;
               for (Plateable plateable : plate.getElements()) {
                 if (plateable instanceof Plate) {
-                  info.append("<b>Internal Plate:</b> <a href='/miso/plate/"+plate.getId()+"'>"+plate.getName()+"</a><br/>");
-                }
-                else if (p instanceof Library) {
-                  Library library = (Library)plateable;
-                  info.append("<b>Library:</b> <a href='/miso/library/"+library.getId()+"'>"+library.getAlias()+"("+library.getName()+")</a><br/>");
+                  info.append("<b>Internal Plate:</b> <a href='/miso/plate/" + plate.getId() + "'>" + plate.getName() + "</a><br/>");
+                } else if (p instanceof Library) {
+                  Library library = (Library) plateable;
+                  info.append("<b>Library:</b> <a href='/miso/library/" + library.getId() + "'>" + library.getAlias() + "("
+                      + library.getName() + ")</a><br/>");
                 }
               }
-            }
-            else if (p instanceof Dilution) {
-              Dilution dilution = (Dilution)p;
+            } else if (p instanceof Dilution) {
+              Dilution dilution = (Dilution) p;
               if (dilution instanceof emPCRDilution) {
-                info.append("<b>emPCR:</b> <a href='/miso/empcr/"+((emPCRDilution)dilution).getEmPCR().getId()+"'>"+((emPCRDilution)dilution).getEmPCR().getName()+"<br/>");
+                info.append("<b>emPCR:</b> <a href='/miso/empcr/" + ((emPCRDilution) dilution).getEmPCR().getId() + "'>"
+                    + ((emPCRDilution) dilution).getEmPCR().getName() + "<br/>");
               }
-              info.append("<b>Library:</b> <a href='/miso/library/"+dilution.getLibrary().getId()+"'>"+dilution.getLibrary().getAlias()+"("+dilution.getLibrary().getName()+")</a><br/>");
-              info.append("<b>Sample:</b> <a href='/miso/sample/"+dilution.getLibrary().getSample().getId()+"'>"+dilution.getLibrary().getSample().getAlias()+"("+dilution.getLibrary().getSample().getName()+")</a><br/>");
-              if (pool.getPoolableElements().size() > 1) {
-                Map<Integer, TagBarcode> barcodes = dilution.getLibrary().getTagBarcodes();
-                if (!barcodes.isEmpty()) {
-                  String out = "<b>Barcodes:</b></br>";
-                  for (Integer key : barcodes.keySet()) {
-                    TagBarcode tb = barcodes.get(key);
-                    if (tb != null) {
-                      out += key + ":" + tb.getName() + " (" + tb.getSequence() + ")<br/>";
-                      out += "<span class='counter'><img src='/styles/images/status/green.png' border='0'></span>";
-                    }
-                    else {
-                      out += "Error retrieving barcode ["+key+"] for library "+dilution.getLibrary().getName()+". Please check libraries for this pool.";
-                      out += "<span class='counter'><img src='/styles/images/status/red.png' border='0'></span>";
-                      break;
-                    }
+              info.append("<b>Library:</b> <a href='/miso/library/" + dilution.getLibrary().getId() + "'>"
+                  + dilution.getLibrary().getAlias() + "(" + dilution.getLibrary().getName() + ")</a><br/>");
+              info.append("<b>Sample:</b> <a href='/miso/sample/" + dilution.getLibrary().getSample().getId() + "'>"
+                  + dilution.getLibrary().getSample().getAlias() + "(" + dilution.getLibrary().getSample().getName() + ")</a><br/>");
+              Map<Integer, TagBarcode> barcodes = dilution.getLibrary().getTagBarcodes();
+              if (!barcodes.isEmpty()) {
+                String out = "<b>Barcodes:</b></br>";
+                for (Integer key : barcodes.keySet()) {
+                  TagBarcode tb = barcodes.get(key);
+                  if (tb != null) {
+                    out += key + ":" + tb.getName() + " (" + tb.getSequence() + ")<br/>";
+                    out += "<span class='counter'><img src='/styles/images/status/green.png' border='0'></span>";
+                  } else {
+                    out += "Error retrieving barcode [" + key + "] for library " + dilution.getLibrary().getName()
+                        + ". Please check libraries for this pool.";
+                    out += "<span class='counter'><img src='/styles/images/status/red.png' border='0'></span>";
+                    break;
                   }
-                  info.append(out);
                 }
-                else {
-                  info.append("<b>Barcode:</b>");
-                  info.append("<b>Library:</b> <a href='/miso/library/"+dilution.getLibrary().getId()+"'>Choose tag barcode</a>");
-                  info.append("<span class='counter'><img src='/styles/images/status/red.png' border='0'></span>");
-                }
+                info.append(out);
+              } else {
+                info.append("<b>Barcode:</b>");
+                info.append("<b>Library:</b> <a href='/miso/library/" + dilution.getLibrary().getId() + "'>Choose tag barcode</a>");
+                info.append("<span class='counter'><img src='/styles/images/status/red.png' border='0'></span>");
               }
-            }
-            else {
+            } else {
               info.append("Unrecognised poolable element: " + p.getClass().getSimpleName());
             }
             break;
           }
         }
         return JSONUtils.JSONObjectResponse("info", info.toString());
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
         log.debug("Failed", e);
         return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
       }
-    }
-    else {
+    } else {
       return JSONUtils.SimpleJSONError("No pool or element ID specified");
     }
   }
@@ -797,20 +806,19 @@ public class PoolControllerHelperService {
           pout.add(libraryDilution.getName());
           pout.add(libraryDilution.getLibrary().getName() + "-" + libraryDilution.getLibrary().getAlias());
           pout.add(libraryDilution.getLibrary().getSample().getName() + "-" + libraryDilution.getLibrary().getSample().getAlias());
-          pout.add(libraryDilution.getLibrary().getSample().getProject().getName() + "-" + libraryDilution.getLibrary().getSample().getProject().getAlias());
+          pout.add(libraryDilution.getLibrary().getSample().getProject().getName() + "-"
+              + libraryDilution.getLibrary().getSample().getProject().getAlias());
           pout.add("<div style='cursor:pointer;' onmousedown=\"Pool.search.poolSearchSelectElement('" + libraryDilution.getId() + "', '"
-                   + libraryDilution.getName() + "')\"><span class=\"ui-icon ui-icon-plusthick\"></span></div>");
+              + libraryDilution.getName() + "')\"><span class=\"ui-icon ui-icon-plusthick\"></span></div>");
           arr.add(pout);
         }
         j.put("poolelements", arr);
         return j;
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
         log.debug("Failed", e);
         return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
       }
-    }
-    else {
+    } else {
       return JSONUtils.SimpleJSONError("No platform specified");
     }
   }
