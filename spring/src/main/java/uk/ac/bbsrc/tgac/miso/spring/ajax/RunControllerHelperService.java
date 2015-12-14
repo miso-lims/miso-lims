@@ -942,7 +942,7 @@ public class RunControllerHelperService {
     try {
       Pool<? extends Poolable> p = null;
 
-      if (barcode != null && !isStringEmptyOrNull(barcode)) {
+      if (!isStringEmptyOrNull(barcode)) {
         if (LimsUtils.isBase64String(barcode)) {
           // Base64-encoded string, most likely a barcode image beeped in. decode and search
           barcode = new String(Base64.decodeBase64(barcode));

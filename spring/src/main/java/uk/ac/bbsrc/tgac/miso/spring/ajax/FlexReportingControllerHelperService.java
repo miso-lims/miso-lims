@@ -128,7 +128,7 @@ public class FlexReportingControllerHelperService {
     try {
 
       Collection<Project> projects = null;
-      if (searchStr != null && !isStringEmptyOrNull(searchStr)) {
+      if (!isStringEmptyOrNull(searchStr)) {
         projects = requestManager.listAllProjectsBySearch(searchStr);
       } else {
         projects = requestManager.listAllProjects();
