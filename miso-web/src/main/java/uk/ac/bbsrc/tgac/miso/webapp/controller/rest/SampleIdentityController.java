@@ -3,6 +3,8 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -15,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleCategory;
 import uk.ac.bbsrc.tgac.miso.dto.SampleCategoryDto;
@@ -28,7 +29,10 @@ public class SampleIdentityController {
 
   @RequestMapping(value = "/samplecategories", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public ResponseEntity<Set<SampleCategoryDto>> getSampleCategories(UriComponentsBuilder uriBuilder) {
+  public ResponseEntity<Set<SampleCategoryDto>> getSampleCategories(HttpServletResponse response) {
+    if (response.containsHeader("x-authentication-failed")) {
+      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
     ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(true);
     scanner.addIncludeFilter(new AnnotationTypeFilter(SampleCategory.class));
     Set<SampleCategoryDto> results = new HashSet<SampleCategoryDto>();
