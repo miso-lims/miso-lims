@@ -106,7 +106,10 @@
           <div class="portlet-content">
             <a href="<c:url value='/miso/tissueOptions#origins'/>">Tissue Origins</a><br/>
             <a href="<c:url value='/miso/tissueOptions#conditions'/>">Tissue Types</a><br/>
-            <a href="<c:url value='/miso/tissueOptions#materials'/>">Tissue Materials</a>
+            <a href="<c:url value='/miso/tissueOptions#materials'/>">Tissue Materials</a><br/>
+            <a href="<c:url value='/miso/tissueOptions#purposes'/>">Sample Purposes</a><br/>
+            <a href="<c:url value='/miso/tissueOptions#qcDetails'/>">QC Details</a><br/>
+            <a href="<c:url value='/miso/tissueOptions#subprojects'/>">Subprojects</a><br/>
           </div>
         </div>
       </sec:authorize>

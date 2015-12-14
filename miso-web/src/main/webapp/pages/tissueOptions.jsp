@@ -40,8 +40,7 @@
 
   <h1>Tissue Options</h1>
   
-  <div class="sectionDivider"></div>
-  <h2 class="tissue" id="origins">Tissue Origins</h2>
+  <h2 id="origins">Tissue Origins</h2>
   <div>
 	  <table id="allOriginsTable" class="tissueOptionsTable">
 		  <thead>
@@ -53,8 +52,9 @@
 	  </table>
   </div>
   
+  
   <div class="sectionDivider"></div>
-  <h2 class="tissue" id="conditions">Tissue Conditions</h2>
+  <h2 id="conditions">Tissue Conditions</h2>
   <div>
 	  <table id="allConditionsTable" class="tissueOptionsTable">
 	    <thead>
@@ -67,7 +67,7 @@
 	</div>
 	
 	<div class="sectionDivider"></div>
-  <h2 class="tissue" id="materials">Tissue Materials</h2>
+  <h2 id="materials">Tissue Materials</h2>
   <div>
     <table id="allMaterialsTable" class="tissueOptionsTable">
       <thead>
@@ -76,6 +76,45 @@
         </tr>
       </thead>
       <tbody id="allMaterials"></tbody>
+    </table>
+  </div>
+  
+  <div class="sectionDivider"></div>
+  <h2 id="purposes">Sample Purposes</h2>
+  <div>
+    <table id="allPurposesTable" class="tissueOptionsTable">
+      <thead>
+        <tr>
+          <th><span class="first-half-width">Alias</span><span class="second-half-width">Description</span></th>
+        </tr>
+      </thead>
+      <tbody id="allPurposes"></tbody>
+    </table>
+  </div>
+  
+  <div class="sectionDivider"></div>
+  <h2 id="qcDetails">QC Details</h2>
+  <div>
+    <table id="allQcDetailsTable" class="tissueOptionsTable">
+      <thead>
+        <tr>
+          <th>Status Description Note Required?</th>
+        </tr>
+      </thead>
+      <tbody id="allQcDetails"></tbody>
+    </table>
+  </div>
+  
+  <div class="sectionDivider"></div>
+  <h2 id="subprojects">Subprojects</h2>
+  <div>
+    <table id="allSubprojectsTable" class="tissueOptionsTable">
+      <thead>
+        <tr>
+          <th>Alias Project Description Priority</th>
+        </tr>
+      </thead>
+      <tbody id="allSubprojects"></tbody>
     </table>
   </div>
 
@@ -87,6 +126,9 @@
     Tissue.getTissueOrigins();
     Tissue.getTissueConditions();
     Tissue.getTissueMaterials();
+    Tissue.getSamplePurposes();
+    QC.getQcDetails();
+    Subproject.getSubprojects();
   });
 </script>
   
