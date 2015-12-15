@@ -392,8 +392,6 @@ public interface RequestManager {
   public Collection<LibraryDilution> listAllLibraryDilutionsByProjectAndPlatform(long projectId, PlatformType platformType)
       throws IOException;
 
-  public Collection<LibraryDilution> listAllLibraryDilutionsByPoolAndPlatform(long poolId, PlatformType platformType) throws IOException;
-
   public Collection<emPCRDilution> listAllEmPcrDilutions() throws IOException;
 
   public Collection<emPCRDilution> listAllEmPcrDilutionsByEmPcrId(long pcrId) throws IOException;

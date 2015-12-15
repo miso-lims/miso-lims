@@ -73,19 +73,6 @@ public interface LibraryDilutionStore extends Store<LibraryDilution>, Remover<Li
   Collection<LibraryDilution> listAllLibraryDilutionsByPlatformAndSearch(String query, PlatformType platformtype) throws IOException;
 
   /**
-   * List all Dilutions prepared for a given PlatformType that are part of a given Pool
-   * 
-   * @param platformType
-   *          of type PlatformType
-   * @param poolId
-   *          of type long
-   * @return Collection<? extends Dilution>
-   * @throws IOException
-   *           when
-   */
-  Collection<LibraryDilution> listAllLibraryDilutionsByPoolAndPlatform(long poolId, PlatformType platformType) throws IOException;
-
-  /**
    * List all LibraryDilutions that are related to a given Project
    * 
    * @param projectId
@@ -123,17 +110,6 @@ public interface LibraryDilutionStore extends Store<LibraryDilution>, Remover<Li
    *           when
    */
   Collection<LibraryDilution> listAllLibraryDilutionsByProjectAndPlatform(long projectId, PlatformType platformType) throws IOException;
-
-  /**
-   * List all LibraryDilutions in a given EmPCRool
-   * 
-   * @param poolId
-   *          of type long
-   * @return Collection<LibraryDilution>
-   * @throws IOException
-   *           when
-   */
-  Collection<LibraryDilution> listByEmPCRPoolId(long poolId) throws IOException;
 
   /**
    * Get a Dilution by ID barcode, given a PlatformType

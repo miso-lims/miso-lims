@@ -95,13 +95,6 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
 
   public static final String LIBRARY_DILUTION_SELECT_BY_IDENTIFICATION_BARCODE = LIBRARY_DILUTION_SELECT + " WHERE identificationBarcode=?";
 
-  public static final String LIBRARY_DILUTIONS_BY_RELATED_ILLUMINA_POOL_ID = "SELECT p.dilutions_dilutionId, l.dilutionId, l.name, l.concentration, l.library_libraryId, l.identificationBarcode, l.creationDate, l.dilutionUserName, l.securityProfile_profileId "
-      + "FROM LibraryDilution l, Pool_LibraryDilution p " + "WHERE l.dilutionId=p.dilutions_dilutionId " + "AND p.pool_poolId=?";
-
-  public static final String LIBRARY_DILUTIONS_BY_RELATED_EMPCR_POOL_ID = "SELECT p.dilutions_dilutionId, l.dilutionId, l.name, l.concentration, l.library_libraryId, l.identificationBarcode, l.creationDate, l.dilutionUserName, l.securityProfile_profileId "
-      + "FROM LibraryDilution l, Pool_LibraryDilution p " + "WHERE l.dilutionId=p.dilutions_dilutionId " + "AND p.name LIKE 'EFO%' "
-      + "AND p.pool_poolId=?";
-
   public static final String LIBRARY_DILUTION_UPDATE = "UPDATE LibraryDilution "
       + "SET name=:name, concentration=:concentration, library_libraryId=:library_libraryId, identificationBarcode=:identificationBarcode, creationDate=:creationDate, securityProfile_profileId=:securityProfile_profileId "
       + "WHERE dilutionId=:dilutionId";
@@ -236,16 +229,6 @@ public class SQLLibraryDilutionDAO implements LibraryDilutionStore {
       throws IOException {
     return template.query(LIBRARY_DILUTION_SELECT_BY_PROJECT_AND_LIBRARY_PLATFORM, new Object[] { platformType.getKey(), projectId },
         new LibraryDilutionMapper(true));
-  }
-
-  @Override
-  public Collection<LibraryDilution> listAllLibraryDilutionsByPoolAndPlatform(long poolId, PlatformType platformType) throws IOException {
-    return template.query(LIBRARY_DILUTIONS_BY_RELATED_ILLUMINA_POOL_ID, new Object[] { poolId }, new LibraryDilutionMapper(true));
-  }
-
-  @Override
-  public Collection<LibraryDilution> listByEmPCRPoolId(long poolId) throws IOException {
-    return template.query(LIBRARY_DILUTIONS_BY_RELATED_EMPCR_POOL_ID, new Object[] { poolId }, new LibraryDilutionMapper(true));
   }
 
   @Override
