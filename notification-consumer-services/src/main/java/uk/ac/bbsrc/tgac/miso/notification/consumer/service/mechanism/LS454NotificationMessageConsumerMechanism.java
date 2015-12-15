@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.notification.consumer.service.mechanism;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.slf4j.Logger;
@@ -113,7 +115,7 @@ public class LS454NotificationMessageConsumerMechanism
 
       if (run.has("status")) {
         String runLog = "";
-        if (!"".equals(run.getString("status"))) {
+        if (!isStringEmptyOrNull(run.getString("status"))) {
           try {
             runLog = new String(IntegrationUtils.decompress(URLDecoder.decode(run.getString("status"), "UTF-8").getBytes()));
           } catch (UnsupportedEncodingException e) {
@@ -230,8 +232,7 @@ public class LS454NotificationMessageConsumerMechanism
                 }
 
                 // update path if changed
-                if (run.has("fullPath") && !"".equals(run.getString("fullPath")) && r.getFilePath() != null
-                    && !"".equals(r.getFilePath())) {
+                if (run.has("fullPath") && !isStringEmptyOrNull(run.getString("fullPath")) && !isStringEmptyOrNull(r.getFilePath())) {
                   if (!run.getString("fullPath").equals(r.getFilePath())) {
                     log.debug("Updating run file path:" + r.getFilePath() + " -> " + run.getString("fullPath"));
                     r.setFilePath(run.getString("fullPath"));
@@ -291,7 +292,7 @@ public class LS454NotificationMessageConsumerMechanism
                       if (f.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
                         f.setPlatform(r.getSequencerReference().getPlatform());
                       }
-                      if (f.getIdentificationBarcode() == null || "".equals(f.getIdentificationBarcode())) {
+                      if (isStringEmptyOrNull(f.getIdentificationBarcode())) {
                         f.setIdentificationBarcode(ptpId);
                         long flowId = requestManager.saveSequencerPartitionContainer(f);
                         f.setId(flowId);

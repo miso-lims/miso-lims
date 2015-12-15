@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -494,7 +496,7 @@ public class ProjectControllerHelperService {
       final Collection<Sample> samples = requestManager.listAllSamplesByProjectId(projectId);
       for (final Sample sample : samples) {
         // autosave the barcode if none has been previously generated
-        if (sample.getIdentificationBarcode() == null || "".equals(sample.getIdentificationBarcode())) {
+        if (isStringEmptyOrNull(sample.getIdentificationBarcode())) {
           requestManager.saveSample(sample);
         }
         final File f = mps.getLabelFor(sample);
@@ -538,7 +540,7 @@ public class ProjectControllerHelperService {
       for (final JSONObject p : (Iterable<JSONObject>) ss) {
         final Long sampleId = p.getLong("sampleId");
         final Sample sample = requestManager.getSampleById(sampleId);
-        if (sample.getIdentificationBarcode() == null || "".equals(sample.getIdentificationBarcode())) {
+        if (isStringEmptyOrNull(sample.getIdentificationBarcode())) {
           requestManager.saveSample(sample);
         }
         final File f = mps.getLabelFor(sample);
@@ -582,7 +584,7 @@ public class ProjectControllerHelperService {
       final Collection<Library> libraries = requestManager.listAllLibrariesByProjectId(projectId);
       for (final Library library : libraries) {
         // autosave the barcode if none has been previously generated
-        if (library.getIdentificationBarcode() == null || "".equals(library.getIdentificationBarcode())) {
+        if (isStringEmptyOrNull(library.getIdentificationBarcode())) {
           requestManager.saveLibrary(library);
         }
         final File f = mps.getLabelFor(library);
@@ -627,7 +629,7 @@ public class ProjectControllerHelperService {
         final Long libraryId = p.getLong("libraryId");
         final Library library = requestManager.getLibraryById(libraryId);
         // autosave the barcode if none has been previously generated
-        if (library.getIdentificationBarcode() == null || "".equals(library.getIdentificationBarcode())) {
+        if (isStringEmptyOrNull(library.getIdentificationBarcode())) {
           requestManager.saveLibrary(library);
         }
         final File f = mps.getLabelFor(library);
@@ -671,7 +673,7 @@ public class ProjectControllerHelperService {
       final Collection<LibraryDilution> libraryDilutions = requestManager.listAllLibraryDilutionsByProjectId(projectId);
       for (final LibraryDilution libraryDilution : libraryDilutions) {
         // autosave the barcode if none has been previously generated
-        if (libraryDilution.getIdentificationBarcode() == null || "".equals(libraryDilution.getIdentificationBarcode())) {
+        if (isStringEmptyOrNull(libraryDilution.getIdentificationBarcode())) {
           requestManager.saveLibraryDilution(libraryDilution);
         }
         final File f = mps.getLabelFor(libraryDilution);
@@ -716,7 +718,7 @@ public class ProjectControllerHelperService {
         final Long dilutionId = p.getLong("dilutionId");
         final LibraryDilution libraryDilution = requestManager.getLibraryDilutionById(dilutionId);
         // autosave the barcode if none has been previously generated
-        if (libraryDilution.getIdentificationBarcode() == null || "".equals(libraryDilution.getIdentificationBarcode())) {
+        if (isStringEmptyOrNull(libraryDilution.getIdentificationBarcode())) {
           requestManager.saveLibraryDilution(libraryDilution);
         }
         final File f = mps.getLabelFor(libraryDilution);

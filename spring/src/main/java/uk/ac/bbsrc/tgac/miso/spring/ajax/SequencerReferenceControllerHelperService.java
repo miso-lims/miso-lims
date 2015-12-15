@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import net.sf.json.JSONArray;
@@ -97,7 +99,7 @@ public class SequencerReferenceControllerHelperService {
   public JSONObject checkServerAvailability(HttpSession session, JSONObject json) {
     try {
 
-      if (json.has("server") && !json.get("server").equals("")) {
+      if (json.has("server") && !isStringEmptyOrNull(json.getString("server"))) {
         InetAddress i = InetAddress.getByName(json.getString("server"));
         if (i.isReachable(2000)) {
           return JSONUtils.JSONObjectResponse("html", "OK");
@@ -114,7 +116,7 @@ public class SequencerReferenceControllerHelperService {
 
   public JSONObject addSequencerReference(HttpSession session, JSONObject json) {
     try {
-      if (json.has("server") && !json.get("server").equals("")) {
+      if (json.has("server") && !isStringEmptyOrNull(json.getString("server"))) {
         InetAddress i = InetAddress.getByName(json.getString("server"));
         String name = json.getString("name");
         Platform p = requestManager.getPlatformById(json.getInt("platform"));

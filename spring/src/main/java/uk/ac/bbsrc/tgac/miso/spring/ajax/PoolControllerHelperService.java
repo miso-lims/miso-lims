@@ -130,13 +130,13 @@ public class PoolControllerHelperService {
 
   public JSONObject addPoolQC(HttpSession session, JSONObject json) {
     try {
-      for (Object key : json.keySet()) {
-        if (json.get(key) == null || json.get(key).equals("")) {
-          String k = (String) key;
-          return JSONUtils.SimpleJSONError("Please enter a value for '" + k + "'");
+      for (Object k : json.keySet()) {
+        String key = (String) k;
+        if (isStringEmptyOrNull(json.getString(key))) {
+          return JSONUtils.SimpleJSONError("Please enter a value for '" + key + "'");
         }
       }
-      if (json.has("poolId") && !json.get("poolId").equals("")) {
+      if (json.has("poolId") && !isStringEmptyOrNull(json.getString("poolId"))) {
         Long poolId = Long.parseLong(json.getString("poolId"));
         Pool<? extends Poolable> pool = requestManager.getPoolById(poolId);
         PoolQC newQc = dataObjectFactory.getPoolQC();
@@ -182,8 +182,8 @@ public class PoolControllerHelperService {
         String qcCreator = qc.getString("qcCreator");
         String qcDate = qc.getString("qcDate");
 
-        if (qcPassed == null || qcPassed.equals("") || qcType == null || qcType.equals("") || results == null || results.equals("")
-            || qcCreator == null || qcCreator.equals("") || qcDate == null || qcDate.equals("")) {
+        if (isStringEmptyOrNull(qcPassed) || isStringEmptyOrNull(qcType) || isStringEmptyOrNull(results)
+            || isStringEmptyOrNull(qcCreator) || isStringEmptyOrNull(qcDate)) {
           ok = false;
         }
       }
@@ -226,7 +226,7 @@ public class PoolControllerHelperService {
 
   public JSONObject editPoolQC(HttpSession session, JSONObject json) {
     try {
-      if (json.has("qcId") && !json.get("qcId").equals("")) {
+      if (json.has("qcId") && !isStringEmptyOrNull(json.getString("qcId"))) {
         Long qcId = Long.parseLong(json.getString("qcId"));
         PoolQC poolQc = requestManager.getPoolQCById(qcId);
         poolQc.setResults(Double.parseDouble(json.getString("result")));
@@ -701,7 +701,7 @@ public class PoolControllerHelperService {
   }
 
   public JSONObject listPoolsDataTable(HttpSession session, JSONObject json) {
-    if (json.has("platform") && !"".equals(json.getString("platform"))) {
+    if (json.has("platform") && !isStringEmptyOrNull(json.getString("platform"))) {
       try {
         String platform = json.getString("platform");
         JSONObject j = new JSONObject();
@@ -798,7 +798,7 @@ public class PoolControllerHelperService {
   }
 
   public JSONObject createElementSelectDataTable(HttpSession session, JSONObject json) {
-    if (json.has("platform") && !"".equals(json.getString("platform"))) {
+    if (json.has("platform") && !isStringEmptyOrNull(json.getString("platform"))) {
       try {
         String platform = json.getString("platform");
         JSONObject j = new JSONObject();

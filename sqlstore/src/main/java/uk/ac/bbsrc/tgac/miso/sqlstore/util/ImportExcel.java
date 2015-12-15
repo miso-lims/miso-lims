@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.sqlstore.util;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import org.apache.poi.ss.usermodel.Row;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import com.eaglegenomics.simlims.core.SecurityProfile;
@@ -352,7 +354,7 @@ public class ImportExcel {
         List<Cell> list9 = sheetData.get(l + 9);
         Cell cell9b = list9.get(1);
         String runFilePath = getCellContents(cell9b);
-        if (!runFilePath.equals("")) {
+        if (!isStringEmptyOrNull(runFilePath)) {
           String runDirRegex = ".*[\\\\/]*([\\d]{6}_[A-z0-9]+_[\\d]{4,5}[A-z0-9_\\+]*)[\\\\/]*.*";
           Pattern runDirPattern = Pattern.compile(runDirRegex);
           Matcher rm = runDirPattern.matcher(runFilePath);
@@ -482,7 +484,7 @@ public class ImportExcel {
       libConc = libConc.replace("pmol", "");
     }
 
-    if (libConc == null || libConc.equals("")) {
+    if (isStringEmptyOrNull(libConc)) {
       libConc = "0";
     }
 
@@ -526,7 +528,7 @@ public class ImportExcel {
     if (readLength.contains("bp")) {
       readLength = readLength.replace("bp", "");
     }
-    if (readLength == null || readLength.equals("")) {
+    if (isStringEmptyOrNull(readLength)) {
       readLength = "0";
     }
 

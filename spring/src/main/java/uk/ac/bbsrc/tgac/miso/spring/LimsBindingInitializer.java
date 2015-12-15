@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.spring;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.Activity;
@@ -559,7 +561,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
    */
   private User resolveUser(Object element) throws IllegalArgumentException {
     Long id = null;
-    if (element instanceof String && !"".equals(element)) id = NumberUtils.parseNumber((String) element, Long.class).longValue();
+    if (element instanceof String && !isStringEmptyOrNull((String) element)) id = NumberUtils.parseNumber((String) element, Long.class).longValue();
     try {
       return id != null ? securityManager.getUserById(id) : null;
     } catch (IOException e) {
@@ -845,7 +847,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
     Long id = null;
     if (element instanceof String) {
       String s = (String) element;
-      if (!"".equals(s)) {
+      if (!isStringEmptyOrNull(s)) {
         id = NumberUtils.parseNumber((String) element, Long.class).longValue();
       }
     }
@@ -872,7 +874,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
     Long id = null;
     if (element instanceof String) {
       String s = (String) element;
-      if (!"".equals(s)) {
+      if (!isStringEmptyOrNull(s)) {
         id = NumberUtils.parseNumber((String) element, Long.class).longValue();
       }
     }
@@ -1105,7 +1107,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
    */
   private Kit resolveKit(Object element) throws IllegalArgumentException {
     Long id = null;
-    if (element instanceof String && !"".equals(element)) id = NumberUtils.parseNumber((String) element, Long.class).longValue();
+    if (element instanceof String && !isStringEmptyOrNull((String) element)) id = NumberUtils.parseNumber((String) element, Long.class).longValue();
     try {
       return id != null ? requestManager.getKitById(id) : null;
     } catch (IOException e) {
@@ -1215,7 +1217,7 @@ public class LimsBindingInitializer extends org.springframework.web.bind.support
    */
   private TagBarcode resolveTagBarcode(Object element) throws IllegalArgumentException {
     Long id = null;
-    if (element instanceof String && !"".equals(element)) id = NumberUtils.parseNumber((String) element, Long.class).longValue();
+    if (element instanceof String && !isStringEmptyOrNull((String) element)) id = NumberUtils.parseNumber((String) element, Long.class).longValue();
     try {
       return id != null ? requestManager.getTagBarcodeById(id) : null;
     } catch (IOException e) {

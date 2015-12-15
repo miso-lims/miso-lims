@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.notification.consumer.service.mechanism;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.slf4j.Logger;
@@ -167,8 +169,7 @@ public class IlluminaNotificationMessageConsumerMechanism
 
               if (run.has("startDate")) {
                 try {
-                  if (run.get("startDate") != null && !run.getString("startDate").equals("null")
-                      && !"".equals(run.getString("startDate"))) {
+                  if (!isStringEmptyOrNull(run.getString("startDate")) && !"null".equals(run.getString("startDate"))) {
                     log.debug("Updating start date:" + run.getString("startDate"));
                     r.getStatus().setStartDate(illuminaRunFolderDateFormat.parse(run.getString("startDate")));
                   }
@@ -179,8 +180,8 @@ public class IlluminaNotificationMessageConsumerMechanism
 
               if (run.has("completionDate")) {
                 try {
-                  if (run.get("completionDate") != null && !run.getString("completionDate").equals("null")
-                      && !"".equals(run.getString("completionDate"))) {
+                  if (!"null".equals(run.getString("completionDate"))
+                      && !isStringEmptyOrNull(run.getString("completionDate"))) {
                     log.debug("Updating completion date:" + run.getString("completionDate"));
                     r.getStatus().setCompletionDate(logDateFormat.parse(run.getString("completionDate")));
                   }
@@ -197,7 +198,7 @@ public class IlluminaNotificationMessageConsumerMechanism
             r.setPlatformType(PlatformType.ILLUMINA);
 
             // update description if empty
-            if (LimsUtils.isStringEmptyOrNull(r.getDescription())) {
+            if (isStringEmptyOrNull(r.getDescription())) {
               r.setDescription(m.group(3));
             }
 
@@ -245,7 +246,7 @@ public class IlluminaNotificationMessageConsumerMechanism
 
             if (run.has("startDate")) {
               try {
-                if (run.get("startDate") != null && !run.getString("startDate").equals("null") && !"".equals(run.getString("startDate"))) {
+                if (!"null".equals(run.getString("startDate")) && !isStringEmptyOrNull(run.getString("startDate"))) {
                   log.debug("Updating start date:" + run.getString("startDate"));
                   r.getStatus().setStartDate(illuminaRunFolderDateFormat.parse(run.getString("startDate")));
                 }
@@ -255,8 +256,7 @@ public class IlluminaNotificationMessageConsumerMechanism
             }
 
             if (run.has("completionDate")) {
-              if (run.get("completionDate") != null && !run.getString("completionDate").equals("null")
-                  && !"".equals(run.getString("completionDate"))) {
+              if (!"null".equals(run.getString("completionDate")) && !isStringEmptyOrNull(run.getString("completionDate"))) {
                 log.debug("Updating completion date:" + run.getString("completionDate"));
                 try {
                   r.getStatus().setCompletionDate(logDateFormat.parse(run.getString("completionDate")));
@@ -277,7 +277,7 @@ public class IlluminaNotificationMessageConsumerMechanism
             }
 
             // update path if changed
-            if (run.has("fullPath") && !"".equals(run.getString("fullPath")) && r.getFilePath() != null && !"".equals(r.getFilePath())) {
+            if (run.has("fullPath") && !isStringEmptyOrNull(run.getString("fullPath")) && !isStringEmptyOrNull(r.getFilePath())) {
               if (!run.getString("fullPath").equals(r.getFilePath())) {
                 log.debug("Updating run file path:" + r.getFilePath() + " -> " + run.getString("fullPath"));
                 r.setFilePath(run.getString("fullPath"));
@@ -288,7 +288,7 @@ public class IlluminaNotificationMessageConsumerMechanism
           if (r.getSequencerReference() != null) {
             Collection<SequencerPartitionContainer<SequencerPoolPartition>> fs = r.getSequencerPartitionContainers();
             if (fs.isEmpty()) {
-              if (run.has("containerId") && !"".equals(run.getString("containerId"))) {
+              if (run.has("containerId") && !isStringEmptyOrNull(run.getString("containerId"))) {
                 Collection<SequencerPartitionContainer<SequencerPoolPartition>> pfs = requestManager
                     .listSequencerPartitionContainersByBarcode(run.getString("containerId"));
                 if (!pfs.isEmpty()) {
@@ -398,8 +398,8 @@ public class IlluminaNotificationMessageConsumerMechanism
                 }
               }
 
-              if (f.getIdentificationBarcode() == null || "".equals(f.getIdentificationBarcode())) {
-                if (run.has("containerId") && !"".equals(run.getString("containerId"))) {
+              if (isStringEmptyOrNull(f.getIdentificationBarcode())) {
+                if (run.has("containerId") && !isStringEmptyOrNull(run.getString("containerId"))) {
                   f.setIdentificationBarcode(run.getString("containerId"));
                 }
               }

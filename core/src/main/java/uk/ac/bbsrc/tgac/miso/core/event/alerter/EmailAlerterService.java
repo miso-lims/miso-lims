@@ -59,11 +59,7 @@ public class EmailAlerterService implements AlerterService {
       log.error("No SMTP host specified in the mail.properties configuration file. Cannot send email.");
       throw new AlertingException("No SMTP host specified in the mail.properties configuration file. Cannot send email.");
     } else {
-      String from = mailProps.getProperty("mail.from");
-      if (from == null || "".equals(from)) {
-        from = "miso@your.miso.server";
-      }
-
+      String from = mailProps.getProperty("mail.from", "miso@your.miso.server");
       String to = a.getAlertUser().getEmail();
       String subject = "MISO ALERT: " + a.getAlertTitle();
       String text = "Hello " + a.getAlertUser().getFullName() + ",\n\nMISO would like to tell you about something:\n\n" + a.getAlertTitle()

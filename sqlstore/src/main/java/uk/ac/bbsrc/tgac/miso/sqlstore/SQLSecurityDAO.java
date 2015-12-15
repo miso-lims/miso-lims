@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
@@ -190,8 +192,8 @@ public class SQLSecurityDAO implements SecurityStore {
       if (existingUser != null) {
         // if the user already exists, but no password has been set, grab the existing one
         // this is probably due to an admin change of user properties, but not a password change
-        if (user.getPassword() == null || "".equals(user.getPassword())) {
-          if (existingUser.getPassword() != null || !"".equals(existingUser.getPassword())) {
+        if (!isStringEmptyOrNull(user.getPassword())) {
+          if (!isStringEmptyOrNull(existingUser.getPassword())) {
             user.setPassword(existingUser.getPassword());
             params.addValue("password", user.getPassword());
           }

@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.core.util;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import java.lang.reflect.Method;
 
 /**
@@ -62,11 +64,11 @@ public class AliasComparator extends AlphanumericComparator {
     }
 
     // Treat empty strings like nulls
-    if (alias1.length() == 0) {
+    if (isStringEmptyOrNull(alias1)) {
       alias1 = null;
     }
 
-    if (alias2.length() == 0) {
+    if (isStringEmptyOrNull(alias2)) {
       alias2 = null;
     }
 

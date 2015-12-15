@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.analysis.util;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import net.sf.json.JSONObject;
 import uk.ac.ebi.fgpt.conan.model.ConanParameter;
 import uk.ac.ebi.fgpt.conan.model.ConanProcess;
@@ -64,6 +66,6 @@ public class ProcessUtils {
   }
 
   public static boolean validateQueryJSON(JSONObject json) {
-    return (json.has("query") && (json.getString("query") != null && !"".equals(json.getString("query"))));
+    return (json.has("query") && isStringEmptyOrNull(json.getString("query")));
   }
 }

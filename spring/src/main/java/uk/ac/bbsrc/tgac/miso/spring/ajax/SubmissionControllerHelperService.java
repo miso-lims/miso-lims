@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -81,7 +83,7 @@ public class SubmissionControllerHelperService {
   // editSubmission.jsp
   public JSONObject saveSubmission(HttpSession session, JSONObject json) {
     try {
-      if (json.has("form") && !json.get("form").equals("")) {
+      if (json.has("form") && !isStringEmptyOrNull(json.getString("form"))) {
         // creates a new submission object using the form info
         Submission newSubmission = new SubmissionImpl();
         // if editing an existing submission
@@ -157,7 +159,7 @@ public class SubmissionControllerHelperService {
 
   public JSONObject previewSubmissionMetadata(HttpSession session, JSONObject json) {
     try {
-      if (json.has("submissionId") && !json.get("submissionId").equals("")) {
+      if (json.has("submissionId") && !isStringEmptyOrNull(json.getString("submissionId"))) {
         Long submissionId = ((Integer) json.get("submissionId")).longValue();
         Submission<Submittable, Document, Document> submission = requestManager.getSubmissionById(submissionId);
 
@@ -213,7 +215,7 @@ public class SubmissionControllerHelperService {
 
       Set<File> filesToZip = new HashSet<File>();
       for (File f : files) {
-        if (!"".equals(dateStr) && f.getName().contains(dateStr) && f.getName().endsWith(".xml")) {
+        if (!isStringEmptyOrNull(dateStr) && f.getName().contains(dateStr) && f.getName().endsWith(".xml")) {
           filesToZip.add(f);
         }
       }
@@ -235,7 +237,7 @@ public class SubmissionControllerHelperService {
    */
   public JSONObject validateSubmissionMetadata(HttpSession session, JSONObject json) {
     try {
-      if (json.has("submissionId") && !json.get("submissionId").equals("")) {
+      if (json.has("submissionId") && !isStringEmptyOrNull(json.getString("submissionId"))) {
         Long submissionId = ((Integer) json.get("submissionId")).longValue();
         Submission<Submittable, Document, Document> submission = requestManager.getSubmissionById(submissionId);
         SubmissionActionType action = SubmissionActionType.VALIDATE;
@@ -266,7 +268,7 @@ public class SubmissionControllerHelperService {
 
   public JSONObject submitSubmissionMetadata(HttpSession session, JSONObject json) {
     try {
-      if (json.has("submissionId") && !json.get("submissionId").equals("")) {
+      if (json.has("submissionId") && !isStringEmptyOrNull(json.getString("submissionId"))) {
         Long submissionId = ((Integer) json.get("submissionId")).longValue();
         Submission submission = requestManager.getSubmissionById(submissionId);
 
@@ -295,7 +297,7 @@ public class SubmissionControllerHelperService {
 
   public JSONObject submitSequenceData(HttpSession session, JSONObject json) {
     try {
-      if (json.has("submissionId") && !json.get("submissionId").equals("")) {
+      if (json.has("submissionId") && !isStringEmptyOrNull(json.getString("submissionId"))) {
         Long submissionId = ((Integer) json.get("submissionId")).longValue();
         Submission<Submittable, Document, Document> submission = requestManager.getSubmissionById(submissionId);
         String response = submissionManager.submitSequenceData(submission);
@@ -311,7 +313,7 @@ public class SubmissionControllerHelperService {
 
   public JSONObject checkUploadProgress(HttpSession session, JSONObject json) {
     try {
-      if (json.has("submissionId") && !json.get("submissionId").equals("")/* && !json.get("submissionId").equals(null) */) {
+      if (json.has("submissionId") && !isStringEmptyOrNull(json.getString("submissionId"))) {
         Long submissionId = json.getLong("submissionId");
         Map<String, Object> responseMap;
         JSONObject report = new JSONObject();
@@ -347,7 +349,7 @@ public class SubmissionControllerHelperService {
 
   public JSONObject openSubmissionProjectNodes(HttpSession session, JSONObject json) {
     try {
-      if (json.has("submissionId") && !json.get("submissionId").equals("") && !json.get("submissionId").equals(null)) {
+      if (json.has("submissionId") && !isStringEmptyOrNull(json.getString("submissionId"))) {
         Long submissionId = json.getLong("submissionId");
         Map<String, Object> responseMap = new HashMap<String, Object>();
 
@@ -388,11 +390,11 @@ public class SubmissionControllerHelperService {
     try {
       // gets the submission from the database
       Submission sub = null;
-      if (json.has("submissionId") && !json.get("submissionId").equals("")) {
+      if (json.has("submissionId") && !isStringEmptyOrNull(json.getString("submissionId"))) {
         sub = requestManager.getSubmissionById(json.getLong("submissionId"));
       }
       // gets studies and experiments for the project that has been selected
-      if (json.has("projectId") && !json.get("projectId").equals("")) {
+      if (json.has("projectId") && !isStringEmptyOrNull(json.getString("projectId"))) {
         StringBuilder sb = new StringBuilder();
         Long projectId = json.getLong("projectId");
 

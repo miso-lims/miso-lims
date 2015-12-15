@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.notification.consumer.service.mechanism;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.slf4j.Logger;
@@ -120,7 +122,7 @@ public class PacBioNotificationMessageConsumerMechanism
         }
       }
 
-      if (!"".equals(status)) {
+      if (!isStringEmptyOrNull(status)) {
         try {
           if (!status.startsWith("ERROR")) {
             Status is = new PacBioStatus(status);
@@ -157,7 +159,7 @@ public class PacBioNotificationMessageConsumerMechanism
                 }
 
                 if (sr != null) {
-                  if (run.has("startDate") && !"".equals(run.getString("startDate"))) {
+                  if (run.has("startDate") && !isStringEmptyOrNull(run.getString("startDate"))) {
                     try {
                       r.getStatus().setStartDate(startDateFormat.parse(run.getString("startDate")));
                     } catch (ParseException e) {
@@ -165,7 +167,7 @@ public class PacBioNotificationMessageConsumerMechanism
                     }
                   }
 
-                  if (run.has("completionDate") && !"".equals(run.getString("completionDate"))) {
+                  if (run.has("completionDate") && !isStringEmptyOrNull(run.getString("completionDate"))) {
                     try {
                       r.getStatus().setCompletionDate(startDateFormat.parse(run.getString("completionDate")));
                     } catch (ParseException e) {
@@ -202,7 +204,7 @@ public class PacBioNotificationMessageConsumerMechanism
                 }
 
                 if (r.getSequencerReference() != null) {
-                  if (run.has("startDate") && !"".equals(run.getString("startDate"))) {
+                  if (run.has("startDate") && !isStringEmptyOrNull(run.getString("startDate"))) {
                     try {
                       r.getStatus().setStartDate(startDateFormat.parse(run.getString("startDate")));
                     } catch (ParseException e) {
@@ -210,7 +212,7 @@ public class PacBioNotificationMessageConsumerMechanism
                     }
                   }
 
-                  if (run.has("completionDate") && !"".equals(run.getString("completionDate"))) {
+                  if (run.has("completionDate") && !isStringEmptyOrNull(run.getString("completionDate"))) {
                     try {
                       r.getStatus().setCompletionDate(startDateFormat.parse(run.getString("completionDate")));
                     } catch (ParseException e) {
@@ -219,8 +221,7 @@ public class PacBioNotificationMessageConsumerMechanism
                   }
 
                   // update path if changed
-                  if (run.has("fullPath") && !"".equals(run.getString("fullPath")) && r.getFilePath() != null
-                      && !"".equals(r.getFilePath())) {
+                  if (run.has("fullPath") && !isStringEmptyOrNull(run.getString("fullPath")) && !isStringEmptyOrNull(r.getFilePath())) {
                     if (!run.getString("fullPath").equals(r.getFilePath())) {
                       log.info("Updating run file path:" + r.getFilePath() + " -> " + run.getString("fullPath"));
                       r.setFilePath(run.getString("fullPath"));
@@ -239,7 +240,7 @@ public class PacBioNotificationMessageConsumerMechanism
               if (r.getSequencerReference() != null) {
                 List<SequencerPartitionContainer<SequencerPoolPartition>> fs = ((PacBioRun) r).getSequencerPartitionContainers();
                 if (fs.isEmpty()) {
-                  if (run.has("plateId") && !"".equals(run.getString("plateId"))) {
+                  if (run.has("plateId") && !isStringEmptyOrNull(run.getString("plateId"))) {
                     Collection<SequencerPartitionContainer<SequencerPoolPartition>> pfs = requestManager
                         .listSequencerPartitionContainersByBarcode(run.getString("plateId"));
                     if (!pfs.isEmpty()) {
@@ -273,7 +274,7 @@ public class PacBioNotificationMessageConsumerMechanism
                         SequencerPartitionContainer f = new SequencerPartitionContainerImpl();
                         f.setPartitionLimit(cells.size());
                         f.initEmptyPartitions();
-                        if (run.has("plateId") && !"".equals(run.getString("plateId"))) {
+                        if (run.has("plateId") && !isStringEmptyOrNull(run.getString("plateId"))) {
                           f.setIdentificationBarcode(run.getString("plateId"));
                         }
                         if (f.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
@@ -294,8 +295,8 @@ public class PacBioNotificationMessageConsumerMechanism
                   if (f.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
                     f.setPlatform(r.getSequencerReference().getPlatform());
                   }
-                  if (f.getIdentificationBarcode() == null || "".equals(f.getIdentificationBarcode())) {
-                    if (run.has("plateId") && !"".equals(run.getString("plateId"))) {
+                  if (isStringEmptyOrNull(f.getIdentificationBarcode())) {
+                    if (run.has("plateId") && !isStringEmptyOrNull(run.getString("plateId"))) {
                       f.setIdentificationBarcode(run.getString("plateId"));
                       requestManager.saveSequencerPartitionContainer(f);
                     }

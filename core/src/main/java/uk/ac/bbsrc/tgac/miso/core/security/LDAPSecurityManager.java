@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.core.security;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import java.io.IOException;
 
 import org.slf4j.Logger;
@@ -108,7 +110,7 @@ public class LDAPSecurityManager extends LocalSecurityManager implements MisoSec
   public long saveUser(User user) throws IOException {
     User jdbcUser = super.getUserByLoginName(user.getLoginName());
     if (jdbcUser != null) {
-      if (!LimsUtils.isStringEmptyOrNull(user.getPassword())) {
+      if (!isStringEmptyOrNull(user.getPassword())) {
         if (SecurityContextHolder.getContext().getAuthentication() != null
             && SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) {
 
@@ -153,19 +155,19 @@ public class LDAPSecurityManager extends LocalSecurityManager implements MisoSec
             user.setUserId(jdbcUser.getUserId());
           }
 
-          if ("".equals(user.getFullName()) || user.getFullName() == null) {
+          if (isStringEmptyOrNull(user.getFullName())) {
             throw new IOException("Cannot save user with no full name / display name.");
           }
 
-          if ("".equals(user.getEmail()) || user.getEmail() == null) {
+          if (isStringEmptyOrNull(user.getEmail())) {
             throw new IOException("Cannot save user with no email.");
           }
 
-          if ("".equals(user.getLoginName()) || user.getLoginName() == null) {
+          if (isStringEmptyOrNull(user.getLoginName())) {
             throw new IOException("Cannot save user with no login name.");
           }
 
-          if ("".equals(user.getPassword()) || user.getPassword() == null) {
+          if (isStringEmptyOrNull(user.getPassword())) {
             // infer that the password is going to be the same, not set to null
             user.setPassword(jdbcUser.getPassword());
           }
@@ -178,7 +180,7 @@ public class LDAPSecurityManager extends LocalSecurityManager implements MisoSec
       }
       return jdbcUser.getUserId();
     } else {
-      if (!LimsUtils.isStringEmptyOrNull(user.getPassword())) {
+      if (!isStringEmptyOrNull(user.getPassword())) {
         log.info("Creating " + user.getLoginName() + " in LIMS");
         return super.saveUser(user);
       }

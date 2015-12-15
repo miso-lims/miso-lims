@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.analysis.tgac.test;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,7 +114,7 @@ public class AnalysisServerClient {
       task.put("submit", j);
 
       String response = IntegrationUtils.sendMessage(IntegrationUtils.prepareSocket("norwich", 7898), task.toString());
-      if (!"".equals(response)) {
+      if (!isStringEmptyOrNull(response)) {
         log.info("RESPONSE: " + response);
       }
     } catch (IntegrationException e) {

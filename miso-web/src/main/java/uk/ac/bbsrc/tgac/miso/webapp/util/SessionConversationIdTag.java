@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.util;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringBlankOrNull;
+
 import javax.servlet.jsp.JspException;
 
 import org.springframework.web.servlet.tags.form.AbstractHtmlElementTag;
@@ -66,12 +68,12 @@ public class SessionConversationIdTag extends AbstractHtmlElementTag {
     String conversationId = (String) pageContext.getRequest().getAttribute(attributeName + "_cId");
 
     // if no value was found then try to pull value as request parameter.
-    if (conversationId == null || conversationId.trim().length() == 0) {
+    if (isStringBlankOrNull(conversationId)) {
       conversationId = pageContext.getRequest().getParameter(attributeName + "_cId");
     }
 
     // if a conversation Id was found then process it.
-    if (conversationId != null && conversationId.trim().length() > 0) {
+    if (!isStringBlankOrNull(conversationId)) {
 
       // set the request attribute.
       pageContext.getRequest().setAttribute("curr_" + attributeName + "_cId", conversationId);

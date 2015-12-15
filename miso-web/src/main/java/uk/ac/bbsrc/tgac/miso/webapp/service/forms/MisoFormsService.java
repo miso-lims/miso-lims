@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.webapp.service.forms;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -65,11 +67,11 @@ public class MisoFormsService {
         Sample ms = requestManager.getSampleByBarcode(s.getIdentificationBarcode());
         if (ms != null) {
           // only process if there's a description
-          if (s.getDescription() != null && !"".equals(s.getDescription())) {
+          if (!isStringEmptyOrNull(s.getDescription())) {
             ms.setDescription(s.getDescription());
             log.info(ms.getName() + " : Set description -> " + ms.getDescription());
 
-            if (s.getScientificName() != null && !"".equals(s.getScientificName())) {
+            if (!isStringEmptyOrNull(s.getScientificName())) {
               ms.setScientificName(s.getScientificName());
               log.info(ms.getName() + " : Set scientific name -> " + ms.getScientificName());
               if (checkTaxon) {
@@ -106,14 +108,11 @@ public class MisoFormsService {
   }
 
   public boolean importSampleDeliveryFormSamplesValidation(List<Sample> samples) {
-    Boolean b = true;
+    boolean b = true;
     for (Sample s : samples) {
-      if (s.getDescription() != null && !"".equals(s.getDescription()) && s.getScientificName() != null
-          && !"".equals(s.getScientificName())) {
-        b = b & true;
-      } else {
+      if (isStringEmptyOrNull(s.getDescription()) || isStringEmptyOrNull(s.getScientificName())) {
         log.warn(s.getIdentificationBarcode() + ": Sample not valid!");
-        b = b & false;
+        b = false;
       }
     }
     return b;

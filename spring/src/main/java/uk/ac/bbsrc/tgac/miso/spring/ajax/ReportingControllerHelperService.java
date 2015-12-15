@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
@@ -154,7 +156,7 @@ public class ReportingControllerHelperService {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
 
-      if (json.has("reportType") && !json.get("reportType").equals("")) {
+      if (json.has("reportType") && !isStringEmptyOrNull((String) json.get("reportType"))) {
         b.append("<input type=\"text\" onkeyup=\"Utils.timer.timedFunc(reportSearch(this), 300);\" size=\"20\" id=\"search"
             + json.get("reportType") + "\" name=\"search" + json.get("reportType") + "\"/>");
         b.append("<form id=\"reportform\" name=\"reportform\" method=\"POST\" >");
@@ -212,7 +214,7 @@ public class ReportingControllerHelperService {
     String searchStr = (String) json.get("str");
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      if (searchStr != null && !searchStr.equals("")) {
+      if (!isStringEmptyOrNull(searchStr)) {
         if (searchStr.length() > 1) {
           String str = searchStr.toLowerCase();
 
@@ -277,7 +279,7 @@ public class ReportingControllerHelperService {
     String searchStr = (String) json.get("str");
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      if (searchStr != null && !searchStr.equals("")) {
+      if (!isStringEmptyOrNull(searchStr)) {
         if (searchStr.length() > 1) {
           String str = searchStr.toLowerCase();
 
@@ -342,7 +344,7 @@ public class ReportingControllerHelperService {
     String searchStr = (String) json.get("str");
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      if (searchStr != null && !searchStr.equals("")) {
+      if (!isStringEmptyOrNull(searchStr)) {
         if (searchStr.length() > 1) {
           String str = searchStr.toLowerCase();
 

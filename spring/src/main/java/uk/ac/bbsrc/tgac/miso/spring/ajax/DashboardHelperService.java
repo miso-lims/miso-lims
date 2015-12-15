@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import org.apache.commons.codec.binary.Base64;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import com.eaglegenomics.simlims.core.User;
@@ -71,7 +73,7 @@ public class DashboardHelperService {
 
   public JSONObject checkUser(HttpSession session, JSONObject json) {
     String username = json.getString("username");
-    if (username != null && !username.equals("")) {
+    if (isStringEmptyOrNull(username)) {
       if (SecurityContextHolder.getContext().getAuthentication().getName().equals(username)) {
         try {
           User user = securityManager.getUserByLoginName(username);
@@ -138,7 +140,7 @@ public class DashboardHelperService {
     try {
       List<Project> projects;
       StringBuilder b = new StringBuilder();
-      if (!"".equals(searchStr)) {
+      if (!isStringEmptyOrNull(searchStr)) {
         projects = new ArrayList<Project>(requestManager.listAllProjectsBySearch(searchStr));
       } else {
         projects = new ArrayList<Project>(requestManager.listAllProjectsWithLimit(50));
@@ -170,7 +172,7 @@ public class DashboardHelperService {
     try {
       List<Study> studies;
       StringBuilder b = new StringBuilder();
-      if (!"".equals(searchStr)) {
+      if (!isStringEmptyOrNull(searchStr)) {
         studies = new ArrayList<Study>(requestManager.listAllStudiesBySearch(searchStr));
       } else {
         studies = new ArrayList<Study>(requestManager.listAllStudiesWithLimit(50));
@@ -201,7 +203,7 @@ public class DashboardHelperService {
     try {
       List<Experiment> experiments;
       StringBuilder b = new StringBuilder();
-      if (!"".equals(searchStr)) {
+      if (!isStringEmptyOrNull(searchStr)) {
         experiments = new ArrayList<Experiment>(requestManager.listAllExperimentsBySearch(searchStr));
       } else {
         experiments = new ArrayList<Experiment>(requestManager.listAllExperimentsWithLimit(50));
@@ -232,7 +234,7 @@ public class DashboardHelperService {
     try {
       List<Run> runs;
       StringBuilder b = new StringBuilder();
-      if (!"".equals(searchStr)) {
+      if (!isStringEmptyOrNull(searchStr)) {
         runs = new ArrayList<Run>(requestManager.listAllRunsBySearch(searchStr));
       } else {
         runs = new ArrayList<Run>(requestManager.listAllRunsWithLimit(50));
@@ -263,7 +265,7 @@ public class DashboardHelperService {
     try {
       List<LibraryDilution> libraryDilutions;
       StringBuilder b = new StringBuilder();
-      if (!"".equals(searchStr)) {
+      if (!isStringEmptyOrNull(searchStr)) {
         libraryDilutions = new ArrayList<LibraryDilution>(requestManager.listAllLibraryDilutionsBySearchOnly(searchStr));
       } else {
         libraryDilutions = new ArrayList<LibraryDilution>(requestManager.listAllLibraryDilutionsWithLimit(50));
@@ -298,7 +300,7 @@ public class DashboardHelperService {
     try {
       List<Library> libraries;
       StringBuilder b = new StringBuilder();
-      if (!"".equals(searchStr)) {
+      if (!isStringEmptyOrNull(searchStr)) {
         if (LimsUtils.isBase64String(searchStr)) {
           // Base64-encoded string, most likely a barcode image beeped in. decode and search
           searchStr = new String(Base64.decodeBase64(searchStr));
@@ -333,7 +335,7 @@ public class DashboardHelperService {
     try {
       List<Sample> samples;
       StringBuilder b = new StringBuilder();
-      if (!"".equals(searchStr)) {
+      if (!isStringEmptyOrNull(searchStr)) {
         if (LimsUtils.isBase64String(searchStr)) {
           // Base64-encoded string, most likely a barcode image beeped in. decode and search
           searchStr = new String(Base64.decodeBase64(searchStr));

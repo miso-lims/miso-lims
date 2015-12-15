@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.core.manager;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -2127,7 +2129,7 @@ public class MisoRequestManager implements RequestManager {
     String[] s = barcode.split("::");
     if (s.length > 1) {
       String platformKey = s[1];
-      if (platformKey != null && !"".equals(platformKey)) {
+      if (!isStringEmptyOrNull(platformKey)) {
         PlatformType pt = PlatformType.get(platformKey);
         if (pt != null) {
           return getPoolByBarcode(barcode, pt);

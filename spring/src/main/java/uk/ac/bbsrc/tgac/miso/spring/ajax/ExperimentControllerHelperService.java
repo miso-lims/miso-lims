@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -243,7 +245,7 @@ public class ExperimentControllerHelperService {
         KitDescriptor kd = requestManager.getKitDescriptorById(new Long(kitDescriptor));
         lk.setKitDescriptor(kd);
         lk.setLotNumber(lotNumber);
-        if (!json.has("kitDate") || json.getString("kitDate").equals("")) {
+        if (!json.has("kitDate") || isStringEmptyOrNull(json.getString("kitDate"))) {
           lk.setKitDate(new Date());
         }
 
@@ -304,7 +306,7 @@ public class ExperimentControllerHelperService {
         KitDescriptor kd = requestManager.getKitDescriptorById(new Long(kitDescriptor));
         lk.setKitDescriptor(kd);
         lk.setLotNumber(lotNumber);
-        if (!json.has("kitDate") || json.getString("kitDate").equals("")) {
+        if (!json.has("kitDate") || isStringEmptyOrNull(json.getString("kitDate"))) {
           lk.setKitDate(new Date());
         }
 
@@ -365,7 +367,7 @@ public class ExperimentControllerHelperService {
         KitDescriptor kd = requestManager.getKitDescriptorById(new Long(kitDescriptor));
         lk.setKitDescriptor(kd);
         lk.setLotNumber(lotNumber);
-        if (!json.has("kitDate") || json.getString("kitDate").equals("")) {
+        if (!json.has("kitDate") || isStringEmptyOrNull(json.getString("kitDate"))) {
           lk.setKitDate(new Date());
         }
 
@@ -426,7 +428,7 @@ public class ExperimentControllerHelperService {
         KitDescriptor kd = requestManager.getKitDescriptorById(new Long(kitDescriptor));
         lk.setKitDescriptor(kd);
         lk.setLotNumber(lotNumber);
-        if (!json.has("kitDate") || json.getString("kitDate").equals("")) {
+        if (!json.has("kitDate") || isStringEmptyOrNull(json.getString("kitDate"))) {
           lk.setKitDate(new Date());
         }
 

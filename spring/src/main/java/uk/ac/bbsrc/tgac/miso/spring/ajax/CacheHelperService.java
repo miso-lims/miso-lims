@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.json.JSONArray;
@@ -102,7 +104,7 @@ public class CacheHelperService {
   }
 
   public JSONObject flushCache(HttpSession session, JSONObject json) {
-    if (json.has("cache") && !"".equals(json.getString("cache"))) {
+    if (json.has("cache") && !isStringEmptyOrNull(json.getString("cache"))) {
       String cacheName = json.getString("cache");
       Cache cache = cacheManager.getCache(cacheName);
       if (cache != null) {
@@ -150,31 +152,31 @@ public class CacheHelperService {
   public JSONObject regenerateAllBarcodes(HttpSession session, JSONObject json) {
     try {
       for (Sample s : requestManager.listAllSamples()) {
-        if (s.getIdentificationBarcode() == null || "".equals(s.getIdentificationBarcode())) {
+        if (isStringEmptyOrNull(s.getIdentificationBarcode())) {
           requestManager.saveSample(s);
         }
       }
 
       for (LibraryDilution ld : requestManager.listAllLibraryDilutions()) {
-        if (ld.getIdentificationBarcode() == null || "".equals(ld.getIdentificationBarcode())) {
+        if (isStringEmptyOrNull(ld.getIdentificationBarcode())) {
           requestManager.saveLibraryDilution(ld);
         }
       }
 
       for (emPCRDilution ed : requestManager.listAllEmPcrDilutions()) {
-        if (ed.getIdentificationBarcode() == null || "".equals(ed.getIdentificationBarcode())) {
+        if (isStringEmptyOrNull(ed.getIdentificationBarcode())) {
           requestManager.saveEmPCRDilution(ed);
         }
       }
 
       for (Library l : requestManager.listAllLibraries()) {
-        if (l.getIdentificationBarcode() == null || "".equals(l.getIdentificationBarcode())) {
+        if (isStringEmptyOrNull(l.getIdentificationBarcode())) {
           requestManager.saveLibrary(l);
         }
       }
 
       for (Pool p : requestManager.listAllPools()) {
-        if (p.getIdentificationBarcode() == null || "".equals(p.getIdentificationBarcode())) {
+        if (isStringEmptyOrNull(p.getIdentificationBarcode())) {
           requestManager.savePool(p);
         }
       }

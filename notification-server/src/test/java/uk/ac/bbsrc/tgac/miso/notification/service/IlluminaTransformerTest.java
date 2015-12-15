@@ -1,5 +1,7 @@
 package uk.ac.bbsrc.tgac.miso.notification.service;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import java.io.File;
 import java.util.HashSet;
 import java.util.Map;
@@ -228,7 +230,7 @@ public class IlluminaTransformerTest {
 
     assertTrue(run.has(IlluminaTransformer.JSON_COMPLETE_DATE));
     String date = run.getString(IlluminaTransformer.JSON_COMPLETE_DATE);
-    assertTrue(date != null && !date.equals(""));
+    assertTrue(!isStringEmptyOrNull(date));
     assertTrue(!date.equals("null"));
   }
 
@@ -239,7 +241,7 @@ public class IlluminaTransformerTest {
 
     assertTrue(run.has(IlluminaTransformer.JSON_COMPLETE_DATE));
     String date = run.getString(IlluminaTransformer.JSON_COMPLETE_DATE);
-    assertTrue(date != null && !date.equals(""));
+    assertTrue(!isStringEmptyOrNull(date));
     assertTrue(!date.equals("null"));
   }
 
@@ -250,7 +252,7 @@ public class IlluminaTransformerTest {
 
     assertTrue(run.has(IlluminaTransformer.JSON_COMPLETE_DATE));
     String date = run.getString(IlluminaTransformer.JSON_COMPLETE_DATE);
-    assertTrue(date != null && !date.equals(""));
+    assertTrue(!isStringEmptyOrNull(date));
     assertTrue(!date.equals("null"));
   }
 
@@ -261,7 +263,7 @@ public class IlluminaTransformerTest {
 
     assertTrue(run.has(IlluminaTransformer.JSON_COMPLETE_DATE));
     String date = run.getString(IlluminaTransformer.JSON_COMPLETE_DATE);
-    assertTrue(date != null && !date.equals(""));
+    assertTrue(!isStringEmptyOrNull(date));
     assertTrue(date.equals("null"));
   }
 

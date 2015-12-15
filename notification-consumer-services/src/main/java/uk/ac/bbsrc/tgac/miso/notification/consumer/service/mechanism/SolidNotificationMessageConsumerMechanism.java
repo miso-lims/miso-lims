@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.notification.consumer.service.mechanism;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.slf4j.Logger;
@@ -228,8 +230,7 @@ public class SolidNotificationMessageConsumerMechanism
                 }
 
                 // update path if changed
-                if (run.has("fullPath") && !"".equals(run.getString("fullPath")) && r.getFilePath() != null
-                    && !"".equals(r.getFilePath())) {
+                if (run.has("fullPath") && !isStringEmptyOrNull(run.getString("fullPath")) && !isStringEmptyOrNull(r.getFilePath())) {
                   if (!run.getString("fullPath").equals(r.getFilePath())) {
                     log.debug("Updating run file path:" + r.getFilePath() + " -> " + run.getString("fullPath"));
                     r.setFilePath(run.getString("fullPath"));
@@ -248,7 +249,7 @@ public class SolidNotificationMessageConsumerMechanism
             if (r.getSequencerReference() != null) {
               List<SequencerPartitionContainer<SequencerPoolPartition>> fs = ((SolidRun) r).getSequencerPartitionContainers();
               if (fs.isEmpty()) {
-                if (run.has("containerId") && !"".equals(run.getString("containerId"))) {
+                if (run.has("containerId") && !isStringEmptyOrNull(run.getString("containerId"))) {
                   Collection<SequencerPartitionContainer<SequencerPoolPartition>> pfs = requestManager
                       .listSequencerPartitionContainersByBarcode(run.getString("containerId"));
                   if (!pfs.isEmpty()) {
@@ -286,7 +287,7 @@ public class SolidNotificationMessageConsumerMechanism
                   f.setPlatform(r.getSequencerReference().getPlatform());
                 }
 
-                if (run.has("containerId") && !"".equals(run.getString("containerId"))) {
+                if (run.has("containerId") && !isStringEmptyOrNull(run.getString("containerId"))) {
                   f.setIdentificationBarcode(run.getString("containerId"));
                 }
 

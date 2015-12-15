@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
+import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
+
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -126,7 +128,7 @@ public class FlexReportingControllerHelperService {
     try {
 
       Collection<Project> projects = null;
-      if (searchStr != null && !searchStr.equals("")) {
+      if (!isStringEmptyOrNull(searchStr)) {
         projects = requestManager.listAllProjectsBySearch(searchStr);
       } else {
         projects = requestManager.listAllProjects();
@@ -135,7 +137,7 @@ public class FlexReportingControllerHelperService {
       for (Project project : projects) {
         if (progress.equals("all") || progress.equals(project.getProgress().getKey())) {
 
-          if (from != null && !from.equals("") && to != null && !to.equals("")) {
+          if (!isStringEmptyOrNull(from) && !isStringEmptyOrNull(to)) {
             if (project.getCreationDate() != null) {
 
               DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
@@ -278,7 +280,7 @@ public class FlexReportingControllerHelperService {
     try {
 
       Collection<Project> projects = null;
-      if (searchStr != null && !searchStr.equals("")) {
+      if (!isStringEmptyOrNull(searchStr)) {
         projects = requestManager.listAllProjectsBySearch(searchStr);
       } else {
         projects = requestManager.listAllProjects();
@@ -289,7 +291,7 @@ public class FlexReportingControllerHelperService {
         Collection<Run> runs = requestManager.listAllRunsByProjectId(project.getProjectId());
         for (Run run : runs) {
 
-          if (from != null && !from.equals("") && to != null && !to.equals("")) {
+          if (!isStringEmptyOrNull(from) && !isStringEmptyOrNull(to)) {
             if (run.getStatus() != null && run.getStatus().getCompletionDate() != null) {
 
               DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
@@ -490,7 +492,7 @@ public class FlexReportingControllerHelperService {
     JSONObject jsonObject = new JSONObject();
     try {
       Collection<Sample> samples = null;
-      if (searchStr != null && !searchStr.equals("")) {
+      if (!isStringEmptyOrNull(searchStr)) {
         samples = requestManager.listAllSamplesBySearch(searchStr);
       } else {
         samples = requestManager.listAllSamples();
@@ -502,7 +504,7 @@ public class FlexReportingControllerHelperService {
         }
         if ((type.equals("all") || type.equals(sample.getSampleType())) && (qc.equals("all") || qc.equals(sampleQC))) {
 
-          if (from != null && !from.equals("") && to != null && !to.equals("")) {
+          if (!isStringEmptyOrNull(from) && !isStringEmptyOrNull(to)) {
             if (sample.getReceivedDate() != null) {
 
               DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
@@ -655,7 +657,7 @@ public class FlexReportingControllerHelperService {
     JSONArray jsonArray = new JSONArray();
     try {
       Collection<Library> libraries = null;
-      if (searchStr != null && !searchStr.equals("")) {
+      if (!isStringEmptyOrNull(searchStr)) {
         libraries = requestManager.listAllLibrariesBySearch(searchStr);
       } else {
         libraries = requestManager.listAllLibraries();
@@ -665,7 +667,7 @@ public class FlexReportingControllerHelperService {
         if ((platform.equals("all") || platform.equals(library.getPlatformName()))
             && (qc.equals("all") || qc.equals(library.getQcPassed().toString()))) {
 
-          if (from != null && !from.equals("") && to != null && !to.equals("") && library.getCreationDate() != null) {
+          if (!isStringEmptyOrNull(from) && !isStringEmptyOrNull(to) && library.getCreationDate() != null) {
 
             DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
             Date startDate = df.parse(from);
@@ -845,7 +847,7 @@ public class FlexReportingControllerHelperService {
     String status = json.getString("status");
     try {
       Collection<Run> runs = null;
-      if (searchStr != null && !searchStr.equals("")) {
+      if (!isStringEmptyOrNull(searchStr)) {
         runs = requestManager.listAllRunsBySearch(searchStr);
       } else {
         runs = requestManager.listAllRuns();
@@ -856,7 +858,7 @@ public class FlexReportingControllerHelperService {
             && (status.equals("all") || (run.getStatus() != null && run.getStatus().getHealth() != null
                 ? status.equals(run.getStatus().getHealth().getKey()) : true))) {
 
-          if (from != null && !from.equals("") && to != null && !to.equals("")) {
+          if (!isStringEmptyOrNull(from) && !isStringEmptyOrNull(to)) {
             if (run.getStatus() != null && run.getStatus().getCompletionDate() != null) {
 
               DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
@@ -869,7 +871,7 @@ public class FlexReportingControllerHelperService {
                 jsonArray.add(runFormRowBuilder(run));
               }
             }
-          } else if (runStartedFrom != null && !runStartedFrom.equals("") && runStartedTo != null && !runStartedTo.equals("")) {
+          } else if (!isStringEmptyOrNull(runStartedFrom) && !isStringEmptyOrNull(runStartedTo)) {
             if (run.getStatus() != null && run.getStatus().getStartDate() != null) {
 
               DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
