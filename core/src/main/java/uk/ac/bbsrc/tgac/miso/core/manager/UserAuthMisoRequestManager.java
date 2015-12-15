@@ -112,7 +112,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
         log.error("Cannot resolve a currently logged in user", e);
       }
     } else {
-      return true;
+      throw new IOException("Cannot check read permissions for null object. Does this object really exist?");
     }
     return false;
   }
