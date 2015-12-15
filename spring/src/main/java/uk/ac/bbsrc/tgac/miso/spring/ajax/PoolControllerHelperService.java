@@ -257,8 +257,8 @@ public class PoolControllerHelperService {
       }
     }
     sb.append("</div>");
-    sb.append("<a onclick='Utils.ui.checkAll(\"importdilslist\"); return false;' href='javascript:void(0);'>All</a> "
-        + "/ <a onclick='Utils.ui.uncheckAll(\"importdilslist\"); return false;' href='javascript:void(0);'>None</a>");
+    sb.append("<a onclick='Utils.ui.checkAll(\"importdilslist\"); return false;' href='javascript:void(0);'>All</a> " +
+              "/ <a onclick='Utils.ui.uncheckAll(\"importdilslist\"); return false;' href='javascript:void(0);'>None</a>");
     sb.append("<br/><button type='submit' class='br-button ui-state-default ui-corner-all'>Use</button>");
     return sb.toString();
   }
@@ -804,6 +804,9 @@ public class PoolControllerHelperService {
         JSONObject j = new JSONObject();
         JSONArray arr = new JSONArray();
         for (LibraryDilution libraryDilution : requestManager.listAllLibraryDilutionsByPlatform((PlatformType.get(platform)))) {
+          if (libraryDilution.getLibrary().isLowQuality()) {
+            continue;
+          }
           JSONArray pout = new JSONArray();
           pout.add(libraryDilution.getName());
           pout.add(libraryDilution.getLibrary().getName() + "-" + libraryDilution.getLibrary().getAlias());

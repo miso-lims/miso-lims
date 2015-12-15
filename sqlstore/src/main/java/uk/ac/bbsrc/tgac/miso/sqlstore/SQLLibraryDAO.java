@@ -93,7 +93,7 @@ public class SQLLibraryDAO implements LibraryStore {
   private static String TABLE_NAME = "Library";
 
   public static final String LIBRARIES_SELECT = "SELECT libraryId, name, description, alias, accession, securityProfile_profileId, sample_sampleId, identificationBarcode, "
-      + "locationBarcode, paired, libraryType, librarySelectionType, libraryStrategyType, platformName, concentration, creationDate, qcPassed, lastModifier "
+      + "locationBarcode, paired, libraryType, librarySelectionType, libraryStrategyType, platformName, concentration, creationDate, qcPassed, lastModifier, lowQuality "
       + "FROM " + TABLE_NAME;
 
   public static final String LIBRARIES_SELECT_LIMIT = LIBRARIES_SELECT + " ORDER BY libraryId DESC LIMIT ?";
@@ -111,13 +111,13 @@ public class SQLLibraryDAO implements LibraryStore {
       + " SET name=:name, description=:description, alias=:alias, accession=:accession, securityProfile_profileId=:securityProfile_profileId, "
       + "sample_sampleId=:sample_sampleId, identificationBarcode=:identificationBarcode,  locationBarcode=:locationBarcode, "
       + "paired=:paired, libraryType=:libraryType, librarySelectionType=:librarySelectionType, libraryStrategyType=:libraryStrategyType, "
-      + "platformName=:platformName, concentration=:concentration, creationDate=:creationDate, qcPassed=:qcPassed, lastModifier=:lastModifier "
+      + "platformName=:platformName, concentration=:concentration, creationDate=:creationDate, qcPassed=:qcPassed, lastModifier=:lastModifier, lowQuality=:lowQuality "
       + "WHERE libraryId=:libraryId";
 
   public static final String LIBRARY_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE libraryId=:libraryId";
 
   public static final String LIBRARIES_SELECT_BY_SAMPLE_ID = "SELECT l.libraryId, l.name, l.description, l.alias, l.accession, l.securityProfile_profileId, l.sample_sampleId, l.identificationBarcode, l.locationBarcode, "
-      + "l.paired, l.libraryType, l.librarySelectionType, l.libraryStrategyType, l.platformName, l.concentration, l.creationDate, l.qcPassed, l.lastModifier "
+      + "l.paired, l.libraryType, l.librarySelectionType, l.libraryStrategyType, l.platformName, l.concentration, l.creationDate, l.qcPassed, l.lastModifier, l.lowQuality "
       + "FROM " + TABLE_NAME + " l, Sample s " + "WHERE l.sample_sampleId=s.sampleId " + "AND s.sampleId=?";
 
   public static String LIBRARIES_SELECT_BY_PROJECT_ID = "SELECT li.* FROM Project p "
@@ -151,7 +151,7 @@ public class SQLLibraryDAO implements LibraryStore {
   public static final String LIBRARY_STRATEGY_TYPE_SELECT_BY_NAME = LIBRARY_STRATEGY_TYPES_SELECT + " WHERE name = ?";
 
   public static final String LIBRARIES_BY_RELATED_DILUTION_ID = "SELECT p.library_libraryId, l.libraryId, l.name, l.description, l.alias, l.accession, l.securityProfile_profileId, l.sample_sampleId, l.identificationBarcode, l.locationBarcode, "
-      + "l.paired, l.libraryType, l.librarySelectionType, l.libraryStrategyType, l.platformName, l.concentration, l.creationDate, l.qcPassed, l.lastModifier "
+      + "l.paired, l.libraryType, l.librarySelectionType, l.libraryStrategyType, l.platformName, l.concentration, l.creationDate, l.qcPassed "
       + "FROM " + TABLE_NAME + " l, LibraryDilution p " + "WHERE l.libraryId=p.library_libraryId " + "AND p.dilutionId=?";
 
   public static final String TAG_BARCODES_SELECT = "SELECT tagId, name, sequence, platformName, strategyName " + "FROM TagBarcodes";
@@ -314,6 +314,7 @@ public class SQLLibraryDAO implements LibraryStore {
     params.addValue("concentration", library.getInitialConcentration());
     params.addValue("creationDate", library.getCreationDate());
     params.addValue("lastModifier", library.getLastModifier().getUserId());
+    params.addValue("lowQuality", library.isLowQuality());
 
     if (library.getQcPassed() != null) {
       params.addValue("qcPassed", library.getQcPassed().toString());
@@ -694,7 +695,7 @@ public class SQLLibraryDAO implements LibraryStore {
                if (library.getId() == 0) {
                   DbUtils.updateCaches(lookupCache(cacheManager), id);
                } else {
-                  return (Library) element.getObjectValue();
+          return (Library) element.getObjectValue();
                }
         }
       }
@@ -711,6 +712,7 @@ public class SQLLibraryDAO implements LibraryStore {
       library.setPaired(rs.getBoolean("paired"));
       library.setInitialConcentration(rs.getDouble("concentration"));
       library.setPlatformName(rs.getString("platformName"));
+      library.setLowQuality(rs.getBoolean("lowQuality"));
       if (rs.getString("qcPassed") != null) {
         library.setQcPassed(Boolean.parseBoolean(rs.getString("qcPassed")));
       } else {

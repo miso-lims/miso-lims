@@ -129,7 +129,6 @@ public interface Pool<P extends Poolable> extends SecurableByProfile, Comparable
    * 
    * @return Collection<D> poolables.
    */
-  // @JsonManagedReference
   public Collection<P> getPoolableElements();
 
   /**
@@ -137,7 +136,6 @@ public interface Pool<P extends Poolable> extends SecurableByProfile, Comparable
    * 
    * @return Collection<D> poolables.
    */
-  // @JsonManagedReference
   public Collection<? extends Dilution> getDilutions();
 
   /**
@@ -163,7 +161,6 @@ public interface Pool<P extends Poolable> extends SecurableByProfile, Comparable
    * 
    * @return Experiment experiment.
    */
-  // @JsonManagedReference
   public Collection<Experiment> getExperiments();
 
   /**
@@ -241,7 +238,6 @@ public interface Pool<P extends Poolable> extends SecurableByProfile, Comparable
    * 
    * @return Collection<PoolQC> poolQCs.
    */
-  // @JsonManagedReference(value = "poolqcs")
   public Collection<PoolQC> getPoolQCs();
 
   /**
@@ -275,4 +271,7 @@ public interface Pool<P extends Poolable> extends SecurableByProfile, Comparable
    * Sets the user who last modified this item. It should always be set to the current user on save.
    */
   public void setLastModifier(User user);
+
+  public boolean getHasLowQualityMembers();
+
 }

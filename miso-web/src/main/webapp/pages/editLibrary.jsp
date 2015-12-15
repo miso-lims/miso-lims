@@ -266,6 +266,12 @@
   </td>
 </tr>
 <tr>
+  <td>Low Quality:</td>
+  <td>
+    <form:checkbox path="lowQuality"/>
+  </td>
+</tr>
+<tr>
   <c:choose>
     <c:when test="${library.id ==0 or empty library.libraryType}">
       <td>Platform - Library Type:</td>

@@ -42,6 +42,8 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedDilutionException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryQcException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
+import com.eaglegenomics.simlims.core.Note;
+
 /**
  * A Library is the first step in constructing sequenceable material from an initial {@link Sample}. A Library is then diluted down to a
  * {@link Dilution}, and put in a {@link Pool}, which is then sequenced.
@@ -383,4 +385,11 @@ public interface Library extends SecurableByProfile, Comparable, Barcodable, Loc
    * Sets the user who last modified this item. It should always be set to the current user on save.
    */
   public void setLastModifier(User user);
+
+  /**
+   * Set the flag that this library is sufficiently bad that it is not worth sequencing.
+   */
+  public void setLowQuality(boolean lowquality);
+
+  public boolean isLowQuality();
 }

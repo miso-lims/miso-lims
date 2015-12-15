@@ -63,6 +63,7 @@
         <th>Alias</th>
         <th>Barcode</th>
         <th>Date Created</th>
+        <th>Low Quality</th>
         <th class="fit">Edit</th>
       </tr>
       </thead>
@@ -73,6 +74,7 @@
           <td>${ipool.alias}</td>
           <td>${ipool.identificationBarcode}</td>
           <td>${ipool.creationDate}</td>
+          <td>${ipool.hasLowQualityMembers}</td>
           <td class="misoicon"
               onclick="window.location.href='<c:url value="/miso/pool/${ipool.id}"/>'"><span
               class="ui-icon ui-icon-pencil"/></td>
