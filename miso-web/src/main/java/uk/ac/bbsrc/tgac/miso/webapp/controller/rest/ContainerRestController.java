@@ -26,11 +26,15 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 import java.io.IOException;
 import java.util.Collection;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -42,6 +46,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestExceptionHandler.RestError;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller.rest
@@ -63,7 +68,7 @@ public class ContainerRestController {
     this.requestManager = requestManager;
   }
 
-  @RequestMapping(value = "{containerBarcode}", method = RequestMethod.GET)
+  @RequestMapping(value = "{containerBarcode}", method = RequestMethod.GET, produces="application/json")
   public @ResponseBody String jsonRest(@PathVariable String containerBarcode) throws IOException {
     StringBuilder sb = new StringBuilder();
     Collection<SequencerPartitionContainer<SequencerPoolPartition>> sequencerPartitionContainerCollection = requestManager
@@ -74,7 +79,9 @@ public class ContainerRestController {
       sb.append("{");
       sb.append("\"containerId\":\"" + sequencerPartitionContainer.getId() + "\",");
       sb.append("\"identificationBarcode\":\"" + sequencerPartitionContainer.getIdentificationBarcode() + "\",");
-      sb.append("\"platform\":\"" + sequencerPartitionContainer.getPlatform().getNameAndModel() + "\",");
+      if (sequencerPartitionContainer.getPlatform() != null) {
+        sb.append("\"platform\":\"" + sequencerPartitionContainer.getPlatform().getNameAndModel() + "\",");
+      }
       sb.append("\"partitions\":[");
       int ip = 0;
       for (SequencerPoolPartition partition : sequencerPartitionContainer.getPartitions()) {
@@ -123,10 +130,16 @@ public class ContainerRestController {
       }
       sb.append("]");
       sb.append("}");
-    }
-    if (i < sequencerPartitionContainerCollection.size()) {
-      sb.append(",");
+      if (i < sequencerPartitionContainerCollection.size()) {
+        sb.append(",");
+      }
     }
     return "[" + sb.toString() + "]";
   }
+  
+  @ExceptionHandler(Exception.class)
+  public @ResponseBody RestError handleError(HttpServletRequest request, HttpServletResponse response, Exception exception) {
+    return RestExceptionHandler.handleException(request, response, exception);
+  }
+  
 }

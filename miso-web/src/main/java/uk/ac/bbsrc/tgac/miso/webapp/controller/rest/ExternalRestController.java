@@ -27,11 +27,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.Response.Status;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -48,6 +53,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestExceptionHandler.RestError;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller.rest
@@ -69,7 +75,7 @@ public class ExternalRestController {
     this.requestManager = requestManager;
   }
 
-  @RequestMapping(value = "projects", method = RequestMethod.GET)
+  @RequestMapping(value = "projects", method = RequestMethod.GET, produces="application/json")
   public @ResponseBody String jsonRest() throws IOException {
     StringBuilder sb = new StringBuilder();
     Collection<Project> lp = requestManager.listAllProjects();
@@ -97,11 +103,14 @@ public class ExternalRestController {
     return "{" + sb.toString() + "}";
   }
 
-  @RequestMapping(value = "project/{projectId}", method = RequestMethod.GET)
+  @RequestMapping(value = "project/{projectId}", method = RequestMethod.GET, produces="application/json")
   public @ResponseBody String jsonRestProject(@PathVariable Long projectId, ModelMap model) throws IOException {
     StringBuilder sb = new StringBuilder();
 
     Project p = requestManager.getProjectById(projectId);
+    if (p == null) {
+      throw new RestException("No project found with ID: " + projectId, Status.NOT_FOUND);
+    }
     sb.append("'id':'" + projectId + "'");
     sb.append(",");
     sb.append("'name':'" + p.getName() + "'");
@@ -242,4 +251,10 @@ public class ExternalRestController {
 
     return "{" + sb.toString() + "}";
   }
+  
+  @ExceptionHandler(Exception.class)
+  public @ResponseBody RestError handleError(HttpServletRequest request, HttpServletResponse response, Exception exception) {
+    return RestExceptionHandler.handleException(request, response, exception);
+  }
+  
 }

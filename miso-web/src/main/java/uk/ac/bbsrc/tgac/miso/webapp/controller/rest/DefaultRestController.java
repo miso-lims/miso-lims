@@ -7,6 +7,7 @@ import javax.ws.rs.core.Response.Status;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestExceptionHandler.RestError;
@@ -15,8 +16,11 @@ import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestExceptionHandler.RestErr
 @RequestMapping("/rest")
 public class DefaultRestController {
   
-  @RequestMapping("/**")
-  public void unmappedRequest(HttpServletRequest request) {
+  @RequestMapping(value="/**", method=RequestMethod.GET, produces="application/json")
+  public void unmappedRequest(HttpServletRequest request, HttpServletResponse response) {
+    if (response.containsHeader("x-authentication-failed")) {
+      throw new RestException(Status.UNAUTHORIZED);
+    }
     throw new RestException("Invalid URL", Status.NOT_FOUND);
   }
   
