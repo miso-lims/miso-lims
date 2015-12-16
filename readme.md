@@ -81,7 +81,7 @@ Then populate the database with the two dumps by running the following commands 
 
     cd sqlstore && mvn -P external compile flyway:migrate
 
-The database schema many need to be upgraded in future version. This commany
+The database schema many need to be upgraded in future version. This command
 will apply the necessary changes to update an existing database.
 
 3.2 ) Setting up the MISO web application
