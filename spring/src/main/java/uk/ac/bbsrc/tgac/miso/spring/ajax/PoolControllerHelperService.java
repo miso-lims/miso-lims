@@ -729,7 +729,6 @@ public class PoolControllerHelperService {
           pout.add(pool.getCreationDate() != null ? pool.getCreationDate().toString() : "");
           pout.add(pool.getId());
           pout.add(pool.getId());
-          pout.add(pool.getId());
           pout.add("<a href=\"/miso/pool/" + pool.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>");
           arr.add(pout);
         }

@@ -343,7 +343,6 @@ Pool.ui = {
             { "sTitle": "Name", "sType":"no-po"},
             { "sTitle": "Alias"},
             { "sTitle": "Date Created"},
-            { "sTitle": "Information"},
             { "sTitle": "Average Insert Size"},
             { "sTitle": "Concentration"},
             { "sTitle": "Edit"}
@@ -356,7 +355,7 @@ Pool.ui = {
           "fnRowCallback": function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
             Fluxion.doAjax(
               'poolControllerHelperService',
-              'checkInfoByPoolId',
+              'checkAverageInsertSizeByPoolId',
               {
                 'poolId':aData[3],
                 'url':ajaxurl
@@ -369,26 +368,13 @@ Pool.ui = {
 
             Fluxion.doAjax(
               'poolControllerHelperService',
-              'checkAverageInsertSizeByPoolId',
+              'checkConcentrationByPoolId',
               {
                 'poolId':aData[4],
                 'url':ajaxurl
               },
               {'doOnSuccess': function(json) {
                 jQuery('td:eq(4)', nRow).html(json.response);
-              }
-              }
-            );
-
-            Fluxion.doAjax(
-              'poolControllerHelperService',
-              'checkConcentrationByPoolId',
-              {
-                'poolId':aData[5],
-                'url':ajaxurl
-              },
-              {'doOnSuccess': function(json) {
-                jQuery('td:eq(5)', nRow).html(json.response);
               }
               }
             );
