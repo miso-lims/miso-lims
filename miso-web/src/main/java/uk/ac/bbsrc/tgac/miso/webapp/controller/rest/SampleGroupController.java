@@ -28,6 +28,7 @@ import java.net.URI;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.Response.Status;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +54,7 @@ import uk.ac.bbsrc.tgac.miso.service.SampleGroupService;
 @Controller
 @RequestMapping("/rest")
 @SessionAttributes("samplegroup")
-public class SampleGroupController {
+public class SampleGroupController extends RestController {
 
   protected static final Logger log = LoggerFactory.getLogger(SampleGroupController.class);
 
@@ -62,18 +63,18 @@ public class SampleGroupController {
 
   @RequestMapping(value = "/samplegroup/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public ResponseEntity<SampleGroupDto> getSampleGroup(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
+  public SampleGroupDto getSampleGroup(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
       HttpServletResponse response) {
     if (response.containsHeader("x-authentication-failed")) {
-      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+      throw new RestException(Status.UNAUTHORIZED);
     }
     SampleGroupId sampleGroup = sampleGroupService.get(id);
     if (sampleGroup == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      throw new RestException("No sample group found with ID: " + id, Status.NOT_FOUND);
     } else {
       SampleGroupDto dto = Dtos.asDto(sampleGroup);
       dto = writeUrls(dto, uriBuilder);
-      return new ResponseEntity<>(dto, HttpStatus.OK);
+      return dto;
     }
   }
 
@@ -90,19 +91,19 @@ public class SampleGroupController {
 
   @RequestMapping(value = "/samplegroups", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public ResponseEntity<Set<SampleGroupDto>> getSampleGroups(UriComponentsBuilder uriBuilder, HttpServletResponse response) {
+  public Set<SampleGroupDto> getSampleGroups(UriComponentsBuilder uriBuilder, HttpServletResponse response) {
+    if (response.containsHeader("x-authentication-failed")) {
+      throw new RestException(Status.UNAUTHORIZED);
+    }
     Set<SampleGroupId> sampleGroups = sampleGroupService.getAll();
     if (sampleGroups.isEmpty()) {
-      if (response.containsHeader("x-authentication-failed")) {
-        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-      }
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      throw new RestException("No sample groups found", Status.NOT_FOUND);
     } else {
       Set<SampleGroupDto> sampleGroupDtos = Dtos.asSampleGroupDtos(sampleGroups);
       for (SampleGroupDto sampleGroupDto : sampleGroupDtos) {
         sampleGroupDto = writeUrls(sampleGroupDto, uriBuilder);
       }
-      return new ResponseEntity<>(sampleGroupDtos, HttpStatus.OK);
+      return sampleGroupDtos;
     }
   }
 
@@ -111,7 +112,7 @@ public class SampleGroupController {
   public ResponseEntity<?> createSampleGroup(@RequestBody SampleGroupDto sampleGroupDto, UriComponentsBuilder b,
       HttpServletResponse response) throws IOException {
     if (response.containsHeader("x-authentication-failed")) {
-      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+      throw new RestException(Status.UNAUTHORIZED);
     }
     SampleGroupId sampleGroup = Dtos.to(sampleGroupDto);
     Long id = sampleGroupService.create(sampleGroup);
@@ -126,7 +127,7 @@ public class SampleGroupController {
   public ResponseEntity<?> updateSampleGroup(@PathVariable("id") Long id, @RequestBody SampleGroupDto sampleGroupDto,
       HttpServletResponse response) throws IOException {
     if (response.containsHeader("x-authentication-failed")) {
-      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+      throw new RestException(Status.UNAUTHORIZED);
     }
     SampleGroupId sampleGroup = Dtos.to(sampleGroupDto);
     sampleGroup.setSampleGroupId(id);
@@ -138,7 +139,7 @@ public class SampleGroupController {
   @ResponseBody
   public ResponseEntity<?> deleteSampleGroup(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
     if (response.containsHeader("x-authentication-failed")) {
-      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+      throw new RestException(Status.UNAUTHORIZED);
     }
     sampleGroupService.delete(id);
     return new ResponseEntity<>(HttpStatus.OK);

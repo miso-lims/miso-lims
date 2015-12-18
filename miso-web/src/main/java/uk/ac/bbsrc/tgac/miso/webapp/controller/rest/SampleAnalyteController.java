@@ -28,6 +28,7 @@ import java.net.URI;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.Response.Status;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +54,7 @@ import uk.ac.bbsrc.tgac.miso.service.SampleAnalyteService;
 @Controller
 @RequestMapping("/rest")
 @SessionAttributes("sampleanalyte")
-public class SampleAnalyteController {
+public class SampleAnalyteController extends RestController {
 
   protected static final Logger log = LoggerFactory.getLogger(SampleAnalyteController.class);
 
@@ -62,18 +63,18 @@ public class SampleAnalyteController {
 
   @RequestMapping(value = "/sampleanalyte/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public ResponseEntity<SampleAnalyteDto> getSampleAnalyte(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
+  public SampleAnalyteDto getSampleAnalyte(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
       HttpServletResponse response) {
     if (response.containsHeader("x-authentication-failed")) {
-      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+      throw new RestException(Status.UNAUTHORIZED);
     }
     SampleAnalyte sampleAnalyte = sampleAnalyteService.get(id);
     if (sampleAnalyte == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      throw new RestException("No sample analyte found with ID: " + id, Status.NOT_FOUND);
     } else {
       SampleAnalyteDto dto = Dtos.asDto(sampleAnalyte);
       dto = writeUrls(dto, uriBuilder);
-      return new ResponseEntity<>(dto, HttpStatus.OK);
+      return dto;
     }
   }
 
@@ -90,19 +91,19 @@ public class SampleAnalyteController {
 
   @RequestMapping(value = "/sampleanalytes", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public ResponseEntity<Set<SampleAnalyteDto>> getSampleAnalytes(UriComponentsBuilder uriBuilder, HttpServletResponse response) {
+  public Set<SampleAnalyteDto> getSampleAnalytes(UriComponentsBuilder uriBuilder, HttpServletResponse response) {
     if (response.containsHeader("x-authentication-failed")) {
-      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+      throw new RestException(Status.UNAUTHORIZED);
     }
     Set<SampleAnalyte> sampleAnalytes = sampleAnalyteService.getAll();
     if (sampleAnalytes.isEmpty()) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      throw new RestException("No sample analytes found", Status.NOT_FOUND);
     } else {
       Set<SampleAnalyteDto> sampleAnalyteDtos = Dtos.asSampleAnalyteDtos(sampleAnalytes);
       for (SampleAnalyteDto sampleAnalyteDto : sampleAnalyteDtos) {
         sampleAnalyteDto = writeUrls(sampleAnalyteDto, uriBuilder);
       }
-      return new ResponseEntity<>(sampleAnalyteDtos, HttpStatus.OK);
+      return sampleAnalyteDtos;
     }
   }
 
@@ -111,7 +112,7 @@ public class SampleAnalyteController {
   public ResponseEntity<?> createSampleAnalyte(@RequestBody SampleAnalyteDto sampleAnalyteDto, UriComponentsBuilder b,
       HttpServletResponse response) throws IOException {
     if (response.containsHeader("x-authentication-failed")) {
-      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+      throw new RestException(Status.UNAUTHORIZED);
     }
     SampleAnalyte sampleAnalyte = Dtos.to(sampleAnalyteDto);
     Long id = sampleAnalyteService.create(sampleAnalyte);
@@ -126,7 +127,7 @@ public class SampleAnalyteController {
   public ResponseEntity<?> updateSampleAnalyte(@PathVariable("id") Long id, @RequestBody SampleAnalyteDto sampleAnalyteDto,
       HttpServletResponse response) throws IOException {
     if (response.containsHeader("x-authentication-failed")) {
-      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+      throw new RestException(Status.UNAUTHORIZED);
     }
     SampleAnalyte sampleAnalyte = Dtos.to(sampleAnalyteDto);
     sampleAnalyte.setSampleAnalyteId(id);
@@ -138,7 +139,7 @@ public class SampleAnalyteController {
   @ResponseBody
   public ResponseEntity<?> deleteSampleAnalyte(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
     if (response.containsHeader("x-authentication-failed")) {
-      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+      throw new RestException(Status.UNAUTHORIZED);
     }
     sampleAnalyteService.delete(id);
     return new ResponseEntity<>(HttpStatus.OK);

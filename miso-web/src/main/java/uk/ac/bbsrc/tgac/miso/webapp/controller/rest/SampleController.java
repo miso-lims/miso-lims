@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.net.URI;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.Response.Status;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +50,7 @@ import uk.ac.bbsrc.tgac.miso.service.SampleService;
 @Controller
 @RequestMapping("/rest/fred")
 @SessionAttributes("sample")
-public class SampleController {
+public class SampleController extends RestController {
 
   protected static final Logger log = LoggerFactory.getLogger(SampleController.class);
 
@@ -58,17 +59,17 @@ public class SampleController {
 
   @RequestMapping(value = "/sample/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public ResponseEntity<SampleDto> getSample(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder, HttpServletResponse response) {
+  public SampleDto getSample(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder, HttpServletResponse response) {
     if (response.containsHeader("x-authentication-failed")) {
-      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+      throw new RestException(Status.UNAUTHORIZED);
     }
     Sample sample = sampleService.get(id);
     if (sample == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      throw new RestException("No sample found with ID: " + id, Status.NOT_FOUND);
     } else {
       SampleDto dto = Dtos.asDto(sample);
       dto = writeUrls(dto, uriBuilder);
-      return new ResponseEntity<>(dto, HttpStatus.OK);
+      return dto;
     }
   }
 
@@ -120,7 +121,7 @@ public class SampleController {
   @ResponseBody
   public ResponseEntity<?> deleteSample(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
     if (response.containsHeader("x-authentication-failed")) {
-      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+      throw new RestException(Status.UNAUTHORIZED);
     }
     sampleService.delete(id);
     return new ResponseEntity<>(HttpStatus.OK);

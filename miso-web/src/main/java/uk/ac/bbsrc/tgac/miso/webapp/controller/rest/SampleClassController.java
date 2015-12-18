@@ -28,6 +28,7 @@ import java.net.URI;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.Response.Status;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +54,7 @@ import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
 @Controller
 @RequestMapping("/rest")
 @SessionAttributes("sampleclass")
-public class SampleClassController {
+public class SampleClassController extends RestController {
 
   protected static final Logger log = LoggerFactory.getLogger(SampleClassController.class);
 
@@ -62,18 +63,18 @@ public class SampleClassController {
 
   @RequestMapping(value = "/sampleclass/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public ResponseEntity<SampleClassDto> getSampleClass(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
+  public SampleClassDto getSampleClass(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
       HttpServletResponse response) {
     if (response.containsHeader("x-authentication-failed")) {
-      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+      throw new RestException(Status.UNAUTHORIZED);
     }
     SampleClass sampleClass = sampleClassService.get(id);
     if (sampleClass == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      throw new RestException("No sample class found with ID: " + id, Status.UNAUTHORIZED);
     } else {
       SampleClassDto dto = Dtos.asDto(sampleClass);
       dto = writeUrls(dto, uriBuilder);
-      return new ResponseEntity<>(dto, HttpStatus.OK);
+      return dto;
     }
   }
 
@@ -90,19 +91,19 @@ public class SampleClassController {
 
   @RequestMapping(value = "/sampleclasss", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public ResponseEntity<Set<SampleClassDto>> getSampleClasss(UriComponentsBuilder uriBuilder, HttpServletResponse response) {
+  public Set<SampleClassDto> getSampleClasss(UriComponentsBuilder uriBuilder, HttpServletResponse response) {
     if (response.containsHeader("x-authentication-failed")) {
-      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+      throw new RestException(Status.UNAUTHORIZED);
     }
     Set<SampleClass> sampleClasss = sampleClassService.getAll();
     if (sampleClasss.isEmpty()) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      throw new RestException("No sample classs found", Status.NOT_FOUND);
     } else {
       Set<SampleClassDto> sampleClassDtos = Dtos.asSampleClassDtos(sampleClasss);
       for (SampleClassDto sampleClassDto : sampleClassDtos) {
         sampleClassDto = writeUrls(sampleClassDto, uriBuilder);
       }
-      return new ResponseEntity<>(sampleClassDtos, HttpStatus.OK);
+      return sampleClassDtos;
     }
   }
 
@@ -111,7 +112,7 @@ public class SampleClassController {
   public ResponseEntity<?> createSampleClass(@RequestBody SampleClassDto sampleClassDto, UriComponentsBuilder b,
       HttpServletResponse response) throws IOException {
     if (response.containsHeader("x-authentication-failed")) {
-      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+      throw new RestException(Status.UNAUTHORIZED);
     }
     SampleClass sampleClass = Dtos.to(sampleClassDto);
     Long id = sampleClassService.create(sampleClass);
@@ -126,7 +127,7 @@ public class SampleClassController {
   public ResponseEntity<?> updateSampleClass(@PathVariable("id") Long id, @RequestBody SampleClassDto sampleClassDto,
       HttpServletResponse response) throws IOException {
     if (response.containsHeader("x-authentication-failed")) {
-      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+      throw new RestException(Status.UNAUTHORIZED);
     }
     SampleClass sampleClass = Dtos.to(sampleClassDto);
     sampleClass.setSampleClassId(id);
@@ -138,7 +139,7 @@ public class SampleClassController {
   @ResponseBody
   public ResponseEntity<?> deleteSampleClass(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
     if (response.containsHeader("x-authentication-failed")) {
-      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+      throw new RestException(Status.UNAUTHORIZED);
     }
     sampleClassService.delete(id);
     return new ResponseEntity<>(HttpStatus.OK);

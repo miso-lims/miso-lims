@@ -28,6 +28,7 @@ import java.net.URI;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.Response.Status;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +54,7 @@ import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
 @Controller
 @RequestMapping("/rest")
 @SessionAttributes("samplevalidrelationship")
-public class SampleValidRelationshipController {
+public class SampleValidRelationshipController extends RestController {
 
   protected static final Logger log = LoggerFactory.getLogger(SampleValidRelationshipController.class);
 
@@ -62,18 +63,18 @@ public class SampleValidRelationshipController {
 
   @RequestMapping(value = "/samplevalidrelationship/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public ResponseEntity<SampleValidRelationshipDto> getSampleValidRelationship(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
+  public SampleValidRelationshipDto getSampleValidRelationship(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
       HttpServletResponse response) {
     if (response.containsHeader("x-authentication-failed")) {
-      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+      throw new RestException(Status.UNAUTHORIZED);
     }
     SampleValidRelationship sampleValidRelationship = sampleValidRelationshipService.get(id);
     if (sampleValidRelationship == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      throw new RestException("No sample valid relationship found with ID: " + id, Status.NOT_FOUND);
     } else {
       SampleValidRelationshipDto dto = Dtos.asDto(sampleValidRelationship);
       dto = writeUrls(dto, uriBuilder);
-      return new ResponseEntity<>(dto, HttpStatus.OK);
+      return dto;
     }
   }
 
@@ -91,20 +92,20 @@ public class SampleValidRelationshipController {
 
   @RequestMapping(value = "/samplevalidrelationships", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public ResponseEntity<Set<SampleValidRelationshipDto>> getSampleValidRelationships(UriComponentsBuilder uriBuilder,
+  public Set<SampleValidRelationshipDto> getSampleValidRelationships(UriComponentsBuilder uriBuilder,
       HttpServletResponse response) {
     if (response.containsHeader("x-authentication-failed")) {
-      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+      throw new RestException(Status.UNAUTHORIZED);
     }
     Set<SampleValidRelationship> sampleValidRelationships = sampleValidRelationshipService.getAll();
     if (sampleValidRelationships.isEmpty()) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      throw new RestException("No sample valid relationships found", Status.NOT_FOUND);
     } else {
       Set<SampleValidRelationshipDto> sampleValidRelationshipDtos = Dtos.asSampleValidRelationshipDtos(sampleValidRelationships);
       for (SampleValidRelationshipDto sampleValidRelationshipDto : sampleValidRelationshipDtos) {
         sampleValidRelationshipDto = writeUrls(sampleValidRelationshipDto, uriBuilder);
       }
-      return new ResponseEntity<>(sampleValidRelationshipDtos, HttpStatus.OK);
+      return sampleValidRelationshipDtos;
     }
   }
 
@@ -113,7 +114,7 @@ public class SampleValidRelationshipController {
   public ResponseEntity<?> createSampleValidRelationship(@RequestBody SampleValidRelationshipDto sampleValidRelationshipDto,
       UriComponentsBuilder b, HttpServletResponse response) throws IOException {
     if (response.containsHeader("x-authentication-failed")) {
-      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+      throw new RestException(Status.UNAUTHORIZED);
     }
     SampleValidRelationship sampleValidRelationship = Dtos.to(sampleValidRelationshipDto);
     Long id = sampleValidRelationshipService.create(sampleValidRelationship);
@@ -128,7 +129,7 @@ public class SampleValidRelationshipController {
   public ResponseEntity<?> updateSampleValidRelationship(@PathVariable("id") Long id,
       @RequestBody SampleValidRelationshipDto sampleValidRelationshipDto, HttpServletResponse response) throws IOException {
     if (response.containsHeader("x-authentication-failed")) {
-      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+      throw new RestException(Status.UNAUTHORIZED);
     }
     SampleValidRelationship sampleValidRelationship = Dtos.to(sampleValidRelationshipDto);
     sampleValidRelationship.setSampleValidRelationshipId(id);
@@ -140,7 +141,7 @@ public class SampleValidRelationshipController {
   @ResponseBody
   public ResponseEntity<?> deleteSampleValidRelationship(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
     if (response.containsHeader("x-authentication-failed")) {
-      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+      throw new RestException(Status.UNAUTHORIZED);
     }
     sampleValidRelationshipService.delete(id);
     return new ResponseEntity<>(HttpStatus.OK);

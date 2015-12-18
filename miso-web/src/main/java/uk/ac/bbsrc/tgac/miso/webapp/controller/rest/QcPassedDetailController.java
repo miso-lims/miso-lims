@@ -28,6 +28,7 @@ import java.net.URI;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.Response.Status;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +54,7 @@ import uk.ac.bbsrc.tgac.miso.service.QcPassedDetailService;
 @Controller
 @RequestMapping("/rest")
 @SessionAttributes("qcpasseddetail")
-public class QcPassedDetailController {
+public class QcPassedDetailController extends RestController {
 
   protected static final Logger log = LoggerFactory.getLogger(QcPassedDetailController.class);
 
@@ -62,18 +63,18 @@ public class QcPassedDetailController {
 
   @RequestMapping(value = "/qcpasseddetail/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public ResponseEntity<QcPassedDetailDto> getQcPassedDetail(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
+  public QcPassedDetailDto getQcPassedDetail(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
       HttpServletResponse response) {
     if (response.containsHeader("x-authentication-failed")) {
-      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+      throw new RestException(Status.UNAUTHORIZED);
     }
     QcPassedDetail qcPassedDetail = qcPassedDetailService.get(id);
     if (qcPassedDetail == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      throw new RestException("No QC passed detail found with ID: " + id, Status.NOT_FOUND);
     } else {
       QcPassedDetailDto dto = Dtos.asDto(qcPassedDetail);
       dto = writeUrls(dto, uriBuilder);
-      return new ResponseEntity<>(dto, HttpStatus.OK);
+      return dto;
     }
   }
 
@@ -90,20 +91,19 @@ public class QcPassedDetailController {
 
   @RequestMapping(value = "/qcpasseddetails", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public ResponseEntity<Set<QcPassedDetailDto>> getQcPassedDetail(UriComponentsBuilder uriBuilder, HttpServletResponse response) {
+  public Set<QcPassedDetailDto> getQcPassedDetail(UriComponentsBuilder uriBuilder, HttpServletResponse response) {
     if (response.containsHeader("x-authentication-failed")) {
-      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+      throw new RestException(Status.UNAUTHORIZED);
     }
     Set<QcPassedDetail> qcPassedDetails = qcPassedDetailService.getAll();
     if (qcPassedDetails.isEmpty()) {
-
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      throw new RestException("No QC passed details found", Status.NOT_FOUND);
     } else {
       Set<QcPassedDetailDto> qcPassedDetailDtos = Dtos.asQcPassedDetailDtos(qcPassedDetails);
       for (QcPassedDetailDto qcPassedDetailDto : qcPassedDetailDtos) {
         qcPassedDetailDto = writeUrls(qcPassedDetailDto, uriBuilder);
       }
-      return new ResponseEntity<>(qcPassedDetailDtos, HttpStatus.OK);
+      return qcPassedDetailDtos;
     }
   }
 
@@ -112,7 +112,7 @@ public class QcPassedDetailController {
   public ResponseEntity<?> createQcPassedDetail(@RequestBody QcPassedDetailDto qcPassedDetailDto, UriComponentsBuilder b,
       HttpServletResponse response) throws IOException {
     if (response.containsHeader("x-authentication-failed")) {
-      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+      throw new RestException(Status.UNAUTHORIZED);
     }
     QcPassedDetail qcPassedDetail = Dtos.to(qcPassedDetailDto);
     Long id = qcPassedDetailService.create(qcPassedDetail);
@@ -127,7 +127,7 @@ public class QcPassedDetailController {
   public ResponseEntity<?> updateQcPassedDetail(@PathVariable("id") Long id, @RequestBody QcPassedDetailDto qcPassedDetailDto,
       HttpServletResponse response) throws IOException {
     if (response.containsHeader("x-authentication-failed")) {
-      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+      throw new RestException(Status.UNAUTHORIZED);
     }
     QcPassedDetail qcPassedDetail = Dtos.to(qcPassedDetailDto);
     qcPassedDetail.setQcPassedDetailId(id);
@@ -139,10 +139,10 @@ public class QcPassedDetailController {
   @ResponseBody
   public ResponseEntity<?> deleteQcPassedDetail(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
     if (response.containsHeader("x-authentication-failed")) {
-      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+      throw new RestException(Status.UNAUTHORIZED);
     }
     qcPassedDetailService.delete(id);
     return new ResponseEntity<>(HttpStatus.OK);
   }
-
+  
 }

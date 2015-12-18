@@ -28,6 +28,7 @@ import java.net.URI;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.Response.Status;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +54,7 @@ import uk.ac.bbsrc.tgac.miso.service.TissueTypeService;
 @Controller
 @RequestMapping("/rest")
 @SessionAttributes("tissuetype")
-public class TissueTypeController {
+public class TissueTypeController extends RestController {
 
   protected static final Logger log = LoggerFactory.getLogger(TissueTypeController.class);
 
@@ -62,18 +63,18 @@ public class TissueTypeController {
 
   @RequestMapping(value = "/tissuetype/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public ResponseEntity<TissueTypeDto> getTissueType(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
+  public TissueTypeDto getTissueType(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
       HttpServletResponse response) {
     if (response.containsHeader("x-authentication-failed")) {
-      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+      throw new RestException(Status.UNAUTHORIZED);
     }
     TissueType tissueType = tissueTypeService.get(id);
     if (tissueType == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      throw new RestException("No tissue type found with ID: " + id, Status.NOT_FOUND);
     } else {
       TissueTypeDto dto = Dtos.asDto(tissueType);
       dto = writeUrls(dto, uriBuilder);
-      return new ResponseEntity<>(dto, HttpStatus.OK);
+      return dto;
     }
   }
 
@@ -90,19 +91,19 @@ public class TissueTypeController {
 
   @RequestMapping(value = "/tissuetypes", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public ResponseEntity<Set<TissueTypeDto>> getTissueTypes(UriComponentsBuilder uriBuilder, HttpServletResponse response) {
+  public Set<TissueTypeDto> getTissueTypes(UriComponentsBuilder uriBuilder, HttpServletResponse response) {
     if (response.containsHeader("x-authentication-failed")) {
-      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+      throw new RestException(Status.UNAUTHORIZED);
     }
     Set<TissueType> tissueTypes = tissueTypeService.getAll();
     if (tissueTypes.isEmpty()) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      throw new RestException("No tissue types found", Status.NOT_FOUND);
     } else {
       Set<TissueTypeDto> tissueTypeDtos = Dtos.asTissueTypeDtos(tissueTypes);
       for (TissueTypeDto tissueTypeDto : tissueTypeDtos) {
         tissueTypeDto = writeUrls(tissueTypeDto, uriBuilder);
       }
-      return new ResponseEntity<>(tissueTypeDtos, HttpStatus.OK);
+      return tissueTypeDtos;
     }
   }
 
@@ -111,7 +112,7 @@ public class TissueTypeController {
   public ResponseEntity<?> createTissueType(@RequestBody TissueTypeDto tissueTypeDto, UriComponentsBuilder b, HttpServletResponse response)
       throws IOException {
     if (response.containsHeader("x-authentication-failed")) {
-      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+      throw new RestException(Status.UNAUTHORIZED);
     }
     TissueType tissueType = Dtos.to(tissueTypeDto);
     Long id = tissueTypeService.create(tissueType);
@@ -126,7 +127,7 @@ public class TissueTypeController {
   public ResponseEntity<?> updateTissueType(@PathVariable("id") Long id, @RequestBody TissueTypeDto tissueTypeDto,
       HttpServletResponse response) throws IOException {
     if (response.containsHeader("x-authentication-failed")) {
-      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+      throw new RestException(Status.UNAUTHORIZED);
     }
     TissueType tissueType = Dtos.to(tissueTypeDto);
     tissueType.setTissueTypeId(id);
@@ -138,7 +139,7 @@ public class TissueTypeController {
   @ResponseBody
   public ResponseEntity<?> deleteTissueType(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
     if (response.containsHeader("x-authentication-failed")) {
-      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+      throw new RestException(Status.UNAUTHORIZED);
     }
     tissueTypeService.delete(id);
     return new ResponseEntity<>(HttpStatus.OK);

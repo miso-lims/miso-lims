@@ -28,6 +28,7 @@ import java.net.URI;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.Response.Status;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +54,7 @@ import uk.ac.bbsrc.tgac.miso.service.SampleAdditionalInfoService;
 @Controller
 @RequestMapping("/rest")
 @SessionAttributes("sampleadditionalinfo")
-public class SampleAdditionalInfoController {
+public class SampleAdditionalInfoController extends RestController {
 
   protected static final Logger log = LoggerFactory.getLogger(SampleAdditionalInfoController.class);
 
@@ -62,18 +63,18 @@ public class SampleAdditionalInfoController {
 
   @RequestMapping(value = "/sampleadditionalinfo/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public ResponseEntity<SampleAdditionalInfoDto> getSampleAdditionalInfo(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
+  public SampleAdditionalInfoDto getSampleAdditionalInfo(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
       HttpServletResponse response) {
     if (response.containsHeader("x-authentication-failed")) {
-      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+      throw new RestException(Status.UNAUTHORIZED);
     }
     SampleAdditionalInfo sampleAdditionalInfo = sampleAdditionalInfoService.get(id);
     if (sampleAdditionalInfo == null) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      throw new RestException("No sample additional info found with ID: " + id, Status.NOT_FOUND);
     } else {
       SampleAdditionalInfoDto dto = Dtos.asDto(sampleAdditionalInfo);
       dto = writeUrls(dto, uriBuilder);
-      return new ResponseEntity<>(dto, HttpStatus.OK);
+      return dto;
     }
   }
 
@@ -91,20 +92,20 @@ public class SampleAdditionalInfoController {
 
   @RequestMapping(value = "/sampleadditionalinfos", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public ResponseEntity<Set<SampleAdditionalInfoDto>> getSampleAdditionalInfos(UriComponentsBuilder uriBuilder,
+  public Set<SampleAdditionalInfoDto> getSampleAdditionalInfos(UriComponentsBuilder uriBuilder,
       HttpServletResponse response) {
     if (response.containsHeader("x-authentication-failed")) {
-      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+      throw new RestException(Status.UNAUTHORIZED);
     }
     Set<SampleAdditionalInfo> sampleAdditionalInfos = sampleAdditionalInfoService.getAll();
     if (sampleAdditionalInfos.isEmpty()) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      throw new RestException("No sample additional infos found", Status.NOT_FOUND);
     } else {
       Set<SampleAdditionalInfoDto> sampleAdditionalInfoDtos = Dtos.asSampleAdditionalInfoDtos(sampleAdditionalInfos);
       for (SampleAdditionalInfoDto sampleAdditionalInfoDto : sampleAdditionalInfoDtos) {
         sampleAdditionalInfoDto = writeUrls(sampleAdditionalInfoDto, uriBuilder);
       }
-      return new ResponseEntity<>(sampleAdditionalInfoDtos, HttpStatus.OK);
+      return sampleAdditionalInfoDtos;
     }
   }
 
@@ -113,7 +114,7 @@ public class SampleAdditionalInfoController {
   public ResponseEntity<?> createSampleAdditionalInfo(@RequestBody SampleAdditionalInfoDto sampleAdditionalInfoDto, UriComponentsBuilder b,
       HttpServletResponse response) throws IOException {
     if (response.containsHeader("x-authentication-failed")) {
-      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+      throw new RestException(Status.UNAUTHORIZED);
     }
     SampleAdditionalInfo sampleAdditionalInfo = Dtos.to(sampleAdditionalInfoDto);
     Long id = sampleAdditionalInfoService.create(sampleAdditionalInfo);
@@ -128,7 +129,7 @@ public class SampleAdditionalInfoController {
   public ResponseEntity<?> updateSampleAdditionalInfo(@PathVariable("id") Long id,
       @RequestBody SampleAdditionalInfoDto sampleAdditionalInfoDto, HttpServletResponse response) throws IOException {
     if (response.containsHeader("x-authentication-failed")) {
-      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+      throw new RestException(Status.UNAUTHORIZED);
     }
     SampleAdditionalInfo sampleAdditionalInfo = Dtos.to(sampleAdditionalInfoDto);
     sampleAdditionalInfo.setSampleAdditionalInfoId(id);
@@ -140,7 +141,7 @@ public class SampleAdditionalInfoController {
   @ResponseBody
   public ResponseEntity<?> deleteSampleAdditionalInfo(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
     if (response.containsHeader("x-authentication-failed")) {
-      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+      throw new RestException(Status.UNAUTHORIZED);
     }
     sampleAdditionalInfoService.delete(id);
     return new ResponseEntity<>(HttpStatus.OK);
