@@ -24,372 +24,365 @@ var projectArray;
 
 var Tissue = Tissue || {
   getTissueOrigins: function() {
-    jQuery.ajax({
-      url: '/miso/rest/tissueorigins',
-      success: function (data) {
-        data.sort(function (a,b) {
-          return (a.alias > b.alias) ? 1 : ((b.alias > a.alias) ? -1 : 0);
-        });
-        
-        var html = '';
-        for (var i=0; i<data.length; i++) {
-          var id = data[i]["id"];
-          var alias = data[i]["alias"];
-          var description = data[i]["description"];
-          var endpoint = "/miso/rest/tissueorigin/" + id;
-          
-          html += '<tr class="TO"><td>';
-          html += '<input id="TO_alias_'+ id +'" value="'+ alias +'"/>&nbsp;';
-          html += '<input id="TO_description_'+ id +'" value="'+ description +'"/>&nbsp';
-          html += '<button class="inline" onclick="Tissue.update(\''+endpoint+'\', '+id+', \'TO\')">Update</button>&nbsp';
-          html += '</form></td>';
-          html += '<td><button class="delete-button inline" onclick="Tissue.confirmDelete(\''+endpoint+'\')">Delete</button></td>';
-        }
-        html += '</tr><tr><td><button id="newOrigin" onclick="Tissue.createNewRow(\'TO\')">Create New Origin</button></tr></tr>';
-        jQuery('#allOrigins').append(html);
-      }
-    });
+    Options.makeXhrRequest('GET', '/miso/rest/tissueorigins', Tissue.createTissueOriginsTable);
+  },
+  
+  createTissueOriginsTable: function (xhr) {
+    var TOtable = [];
+    var id, alias, description, endpoint;
+    Tissue.createTable(xhr, 'TO', 'allOrigins', 'tissueorigin', 'Origin', TOtable);
   },
   
   getTissueConditions: function() {
-    jQuery.ajax({
-      url: '/miso/rest/tissuetypes',
-      success: function (data) {
-        data.sort(function (a,b) {
-          return (a.alias > b.alias) ? 1 : ((b.alias > a.alias) ? -1 : 0);
-        });
-        
-        var html = '';
-        for (var i=0; i<data.length; i++) {
-          var id = data[i]["id"];
-          var alias = data[i]["alias"];
-          var description = data[i]["description"];
-          var endpoint = "/miso/rest/tissuetype/" + id;
-          
-          html += '<tr class="TC"><td>';
-          html += '<input id="TC_alias_'+ id +'" value="'+ alias +'"/>&nbsp;';
-          html += '<input id="TC_description_'+ id +'" value="'+ description +'"/>&nbsp';
-          html += '<button class="inline" onclick="Tissue.update(\''+endpoint+'\', '+id+', \'TC\')">Update</button>&nbsp';
-          html += '</form></td>';
-          html += '<td><button class="delete-button inline" onclick="Tissue.confirmDelete(\''+endpoint+'\')">Delete</button></td>';
-        }
-        html += '</tr><tr><td><button id="newCondition" onclick="Tissue.createNewRow(\'TC\')">Create New Condition</button></tr></tr>';
-        jQuery('#allConditions').append(html);
-      }
-    });
+    Options.makeXhrRequest('GET', '/miso/rest/tissuetypes', Tissue.createTissueConditionsTable);
+  },
+  
+  createTissueConditionsTable: function (xhr) {
+    var TCtable = [];
+    var id, alias, description, endpoint;
+    Tissue.createTable(xhr, 'TC', 'allConditions', 'tissuetype', 'Condition', TCtable);
   },
   
   getTissueMaterials: function() {
-    jQuery.ajax({
-      url: '/miso/rest/tissuematerials',
-      success: function (data) {
-        data.sort(function (a,b) {
-          return (a.alias > b.alias) ? 1 : ((b.alias > a.alias) ? -1 : 0);
-        });
-        
-        var html = '';
-        for (var i=0; i<data.length; i++) {
-          var id = data[i]["id"];
-          var alias = data[i]["alias"];
-          var description = data[i]["description"];
-          var endpoint = "/miso/rest/tissuematerial/" + id;
-          
-          html += '<tr class="TM"><td>';
-          html += '<input id="TM_alias_'+ id +'" value="'+ alias +'"/>&nbsp;';
-          html += '<input id="TM_description_'+ id +'" value="'+ description +'"/>&nbsp';
-          html += '<button class="inline" onclick="Tissue.update(\''+endpoint+'\', '+id+', \'TM\')">Update</button>&nbsp';
-          html += '</form></td>';
-          html += '<td><button class="delete-button inline" onclick="Tissue.confirmDelete(\''+endpoint+'\')">Delete</button></td>';
-        }
-        html += '</tr><tr><td><button id="newMaterial" onclick="Tissue.createNewRow(\'TM\')">Create New Material</button></tr></tr>';
-        jQuery('#allMaterials').append(html);
-      }
-    });
+    Options.makeXhrRequest('GET', '/miso/rest/tissuematerials', Tissue.createTissueMaterialsTable);
+  },
+  
+  createTissueMaterialsTable: function (xhr) {
+    var TMtable = [];
+    var id, alias, description, endpoint;
+    Tissue.createTable(xhr, 'TM', 'allMaterials', 'tissuematerial', 'Material', TMtable);
   },
   
   getSamplePurposes: function() {
-    jQuery.ajax({
-      url: '/miso/rest/samplepurposes',
-      success: function (data) {
-        data.sort(function (a,b) {
-          return (a.alias > b.alias) ? 1 : ((b.alias > a.alias) ? -1 : 0);
-        });
-        
-        var html = '';
-        for (var i=0; i<data.length; i++) {
-          var id = data[i]["id"];
-          var alias = data[i]["alias"];
-          var description = data[i]["description"];
-          var endpoint = "/miso/rest/samplepurpose/" + id;
-          
-          html += '<tr class="SP"><td>';
-          html += '<input id="SP_alias_'+ id +'" value="'+ alias +'"/>&nbsp;';
-          html += '<input id="SP_description_'+ id +'" value="'+ description +'"/>&nbsp;';
-          html += '<button class="inline" onclick="Tissue.update(\''+endpoint+'\', '+id+', \'SP\')">Update</button>&nbsp;';
-          html += '</form></td>';
-          html += '<td><button class="delete-button inline" onclick="Tissue.confirmDelete(\''+endpoint+'\')">Delete</button></td>';
-        }
-        html += '</tr><tr><td><button id="newPurpose" onclick="Tissue.createNewRow(\'SP\')">Create New Purpose</button></tr></tr>';
-        jQuery('#allPurposes').append(html);
-      }
-    });
+    Options.makeXhrRequest('GET', '/miso/rest/samplepurposes', Tissue.createSamplePurposesTable);
   },
   
-  update: function (endpoint, option, id) {
-    var alias = jQuery('#'+option+'_alias_'+ id).val();
-    var description = jQuery('#'+option+'_description_'+id).val();
+  createSamplePurposesTable: function (xhr) {
+    var SPtable = [];
+    var id, alias, description, endpoint;
+    Tissue.createTable(xhr, 'SP', 'allPurposes', 'samplepurpose', 'Purpose', SPtable);
+  },
+
+  createTable: function (xhr, option, tableId, endpointWord, word, table) {
+    var data = JSON.parse(xhr.responseText);
+    data.sort(function (a,b) {
+      return (a.alias > b.alias) ? 1 : ((b.alias > a.alias) ? -1 : 0);
+    });
+
+    document.getElementById(tableId).innerHTML = null;
+    for (var i=0; i<data.length; i++) {
+      id = data[i]["id"];
+      alias = data[i]["alias"];
+      description = data[i]["description"];
+      endpoint = "/miso/rest/"+ endpointWord +"/" + id;
+      
+      table.push('<tr class="'+option+'"><td>');
+      table.push(Options.createTextInput(option+'_alias_'+id, alias));
+      table.push(Options.createTextInput(option+'_description_'+id, description));
+      table.push(Options.createButton('Update', "Tissue.update('"+endpoint+"', "+id+", '"+option+"')"));
+      table.push('</td><td>');
+      table.push(Options.createButton('Delete', "Options.confirmDelete('"+endpoint+"')"));
+      table.push('</td></tr>');
+    }
+    table.push('<tr id="new'+option+'RowButton"><td>');
+    table.push(Options.createButton('Create New '+word, "Tissue.createNewRow('"+option+"')", 'newOrigin'));
+    table.push('</td></tr>');
+    document.getElementById(tableId).innerHTML = table.join('');
+  },
+  
+  update: function (endpoint, id, option) {
+    var alias = document.getElementById(option+'_alias_'+ id).value;
+    var description = document.getElementById(option+'_description_'+id).value;
     if (!alias || !description) {
       alert("Neither alias nor description can be blank.");
       return null;
     }
-    jQuery.ajax({
-      url: endpoint,
-      type: 'PUT',
-      /*beforeSend: function (request) { 
-        request.setRequestHeader("x-user", "admin");
-        //request.setRequestHeader("x-signature", "K8r1yrb9KA4l3QX2AKN4B6t5tGY"); // this is hard-coded for testing purposes
-        //request.setRequestHeader("x-url", "/miso/rest/tissueorigin/"+id);
-      },*/
-      data: JSON.stringify({ 'alias': alias, 'description': description }),
-      contentType: 'application/json',
-      success: function (data) {
-        Utils.page.pageReload;
-      },
-      error: function (response) {
-        console.log(response.getResponseHeader());
-      }
-    });
-  },
-  
-  confirmDelete: function (endpoint) {
-    if (confirm('Are you sure you wish to delete? This operation cannot be undone!')) {
-      jQuery.ajax({
-        url: endpoint,
-        type: 'DELETE',
-        success: function() {
-          Utils.page.pageReload;
-        },
-        error: function(data) { console.log(data); }
-      });
+    var callback;
+    switch (option) {
+      case 'TO': callback = Tissue.getTissueOrigins;
+      case 'TC': callback = Tissue.getTissueConditions;
+      case 'TM': callback = Tissue.getTissueMaterials;
+      case 'SP': callback = Tissue.getSamplePurposes;
     }
+    Options.makeXhrRequest('PUT', endpoint, callback, JSON.stringify({ 'alias': alias, 'description': description }));
   },
   
   createNewRow: function (option) {
-    var html = '<tr><td><input id="'+option+'_alias_new" value=""/>&nbsp;<input id="'+option+'_description_new" value=""/>&nbsp;';
-    html += '<button id="addNew'+option+'" onclick="Tissue.addNew(\''+option+'\');">Add</button></td></tr>';
-    jQuery('tr.'+option+':nth-last-child(2)').after(html);
-    jQuery('#'+option+'_alias_new').focus();
+    var row = [];
+
+    row.push('<tr><td>');
+    row.push(Options.createTextInput(option+'_alias_new'));
+    row.push(Options.createTextInput(option+'_description_new'));
+    row.push(Options.createButton('Add', "Tissue.addNew('"+option+"')"));
+    row.push('</td></tr>');
+
+    document.getElementById('new'+option+'RowButton').insertAdjacentHTML('beforebegin', row.join(''));
+    document.getElementById(option+'_alias_new').focus();
   },
   
   addNew: function (option) {
-    var alias = jQuery('#'+option+'_alias_new').val();
-    var description = jQuery('#'+option+'_description_new').val();
+    var alias = document.getElementById(option+'_alias_new').value;
+    var description = document.getElementById(option+'_description_new').value;
     if (alias == '' || description == '') {
       alert("Neither alias nor description can be blank.");
       return null;
     }
-    var collection;
+    var collection, callback;
     switch (option) {
-      case 'TO': collection = 'tissueorigin'; break;
-      case 'TC': collection = 'tissuetype'; break;
-      case 'TM': collection = 'tissuematerial'; break;
-      case 'SP': collection = 'samplepurpose'; break;
+      case 'TO': 
+        collection = 'tissueorigin'; 
+        callback = Tissue.getTissueOrigins;
+        break;
+      case 'TC': 
+        collection = 'tissuetype'; 
+        callback = Tissue.getTissueConditions;
+        break;
+      case 'TM': 
+        collection = 'tissuematerial'; 
+        callback = Tissue.getTissueMaterials;
+        break;
+      case 'SP': 
+        collection = 'samplepurpose'; 
+        callback = Tissue.getSamplePurposes;
+        break;
     }
-    jQuery.ajax({
-      url: '/miso/rest/'+ collection,
-      type: 'POST',
-      contentType: 'application/json',
-      data: JSON.stringify({ 'alias': alias, 'description': description }),
-      success: function() {
-        Utils.page.pageReload;
-      }
-    });
+    Options.makeXhrRequest('POST', '/miso/rest/'+collection, callback, JSON.stringify({ 'alias': alias, 'description': description }));
   }
 };
 
 var QC = QC || {
   getQcDetails: function () {
-    jQuery.ajax({
-      url: '/miso/rest/qcpasseddetails',
-      success: function (data) {
-        data.sort(function (a, b){
-          return (a.status > b.status) ? 1 : ((b.status > a.status) ? -1 : 0);
-        });
-        
-        var html = '';
-        for (var i=0; i<data.length; i++) {
-          var id = data[i]["id"];
-          var status = data[i]["status"];
-          var description = data[i]["description"];
-          var note = data[i]["noteRequired"];
-          var endpoint = "/miso/rest/qcpasseddetail/" + id;
-          
-          html += '<tr class="QC"><td>';
-          html += '<select id="QC_status+'+ id +'"><option value="1"'+ (status == 'true' ? ' selected' : '') +'>True</option>';
-          html += '<option value="0"'+ (status == 'false' ? ' selected' : '') +'>False</option>';
-          html += '<option value=""'+ (status == '' ? ' selected' : '') +'>Unknown</option></select>&nbsp;';
-          html += '<input id="QC_description_'+ id +'" value="'+ description +'"/>&nbsp;';
-          html += '<select id="QC_note_'+ id +'">';
-          html += '<option value="1"'+ (note == 'true' ? ' selected' : '') +'>True</option>';
-          html += '<option value="0"'+ (note == 'false' ? ' selected' : '') +'>False</option></select>'; 
-          html += '<button class="inline" onclick="QC.update(\''+endpoint+'\, '+id+')">Update</button>&nbsp;';
-          html += '</form></td>';
-          html += '<td><button class="delete-button inline" onclick="Tissue.confirmDelete(\''+endpoint+'\')">Delete</button></td>';
-        }
-        html += '</tr><tr><td><button id="newDetails" onclick="QC.createNewRow()">Create New QC Details</button></td></tr>';
-        jQuery('#allQcDetails').append(html);
-      }
+    Options.makeXhrRequest('GET','/miso/rest/qcpasseddetails', QC.createQcDetailsTable);
+  },
+  
+  createQcDetailsTable: function (xhr) {
+    var data = JSON.parse(xhr.responseText);
+    data.sort(function (a, b){
+      return (a.status > b.status) ? 1 : ((b.status > a.status) ? -1 : 0);
     });
+   
+    document.getElementById('allQcDetails').innerHTML = null;
+
+    var table = [];
+    var id, status, description, note, endpoint;
+
+    for (var i=0; i<data.length; i++) {
+      id = data[i]["id"];
+      status = data[i]["status"];
+      description = data[i]["description"];
+      note = data[i]["noteRequired"];
+      endpoint = "/miso/rest/qcpasseddetail/" + id;
+
+      table.push('<tr class="QC"><td>');
+      table.push(QC.createStatusInput('QC_status_'+id, status));
+      table.push(Options.createTextInput('QC_description_'+id, description));
+      table.push(QC.createNoteReqdInput('QC_note_'+id, note));
+      table.push(Options.createButton('Update', "QC.update('"+endpoint+"', "+id+")"));
+      table.push('</td><td>');
+      table.push(Options.createButton('Delete', "Options.confirmDelete('"+endpoint+"')"));
+      table.push('</td></tr>');
+    }
+    table.push('<tr id="newQCRowButton"><td>');
+    table.push(Options.createButton('Create New QC Details', 'QC.createNewRow()', 'newDetails'));
+    table.push('</td></tr>');
+    document.getElementById('allQcDetails').innerHTML = table.join('');
+  },
+
+  createStatusInput: function (idValue, status) {
+    var select = [];
+    select.push('<select id="'+ idValue +'">');
+    select.push('<option value="true"'+ (status === 'true' ? select.push(Options.selectedOpt) : '') +'>True</option>');
+    select.push('<option value="false"'+ (status === 'false' ? select.push(Options.selectedOpt) : '') +'>False</option>');
+    select.push('<option value=""'+ (status === '' ? select.push(Options.selectedOpt) : '') +'>Unknown</option>');
+    select.push('</select>');
+    return select.join('');
+  },
+
+  createNoteReqdInput: function (idValue, note) {
+    var select = [];
+    select.push('<select id="'+ idValue +'">');
+    select.push('<option value="1"'+ (note ? select.push(Options.selectedOpt) : '') +'>Yes</option>');
+    select.push('<option value="0"'+ (note ? '' : select.push(Options.selectedOpt)) +'>No</option>');
+    select.push('</select>');
+    return select.join('');
   },
   
   update: function (endpoint, id) {
-    var status = jQuery('#QC_status_'+id).val();
-    var description = jQuery('#QC_description_'+id).val();
-    var note = jQuery('#QC_note_'+id).val();
+    var status = document.getElementById('QC_status_'+id).value;
+    var description = document.getElementById('QC_description_'+id).value;
+    var note = document.getElementById('QC_note_'+id).value;
     if (!status || !description || !note) {
       alert("Neither status, description nor note required can be blank.");
       return null;
     }
-    jQuery.ajax({
-      url: endpoint,
-      type: 'PUT',
-      data: JSON.stringify({ 'status': status, 'description': description, 'noteRequired': note }),
-      contentType: 'application/json',
-      success: function (data) {
-        Utils.page.pageReload;
-      },
-      error: function (response) {
-        console.log(response.getResponseHeader());
-      }
-    });
+    Options.makeXhrRequest('PUT', endpoint, QC.getQcDetails, JSON.stringify({ 'status': status, 'description': description, 'noteRequired': note }));
   },
   
   createNewRow: function () {
-    var html = '<tr><td>';
-    html += '<select id="QC_status_new">';
-    html += '<option value="1" selected>True</option><option value="0">False</option><option value="">Unknown</option></select>&nbsp;';
-    html += '<input id="QC_description_new" value=""/>&nbsp;<select id="QC_note_new"><option value="1">True</option><option value="0">False</option></select>&nbsp;';
-    html += '<button id="addNewQC" onclick="QC.addNew();">Add</button></td></tr>';
-    jQuery('tr.QC:nth-last-child(2)').after(html);
-    jQuery('#QC_status_new').focus();
+    var row = [];
+
+    row.push('<tr><td>');
+    row.push(QC.createStatusInput('QC_status_new'));
+    row.push(Options.createTextInput('QC_description_new'));
+    row.push(QC.createNoteReqdInput('QC_note_new'));
+    row.push(Options.createButton('Add', "QC.addNew()"));
+    row.push('</td></tr>');
+
+    document.getElementById('newQCRowButton').insertAdjacentHTML('beforebegin', row.join(''));
+    document.getElementById('QC_status_new').focus();
   },
   
   addNew: function() {
-    var status = jQuery('#QC_status_new').val();
-    var description = jQuery('#QC_description_new').val();
-    var note = jQuery('#QC_note_new').val();
+    var status = document.getElementById('QC_status_new').value;
+    var description = document.getElementById('QC_description_new').value;
+    var note = document.getElementById('QC_note_new').value;
     if (!status || !description || !note) {
       alert("Neither status, description nor note required can be blank.");
       return null;
     }
-    jQuery.ajax({
-      url: '/miso/rest/qcpasseddetail',
-      type: 'POST',
-      contentType: 'application/json',
-      data: JSON.stringify({ 'status': status, 'description': description, 'noteRequired': note }),
-      success: function() {
-        Utils.page.pageReload;
-      }
-    });
+    Options.makeXhrRequest('POST', '/miso/rest/qcpasseddetail', QC.getQcDetails, JSON.stringify({ 'status': status, 'description': description, 'noteRequired': note }));
   }
 };
 
 var Subproject = Subproject || {
-  getSubprojects: function () {
-    jQuery.get('/miso/rest/project', function (response) {
-      projectArray = JSON.parse(response).sort(function (a, b) {
-        return (a.alias > b.alias) ? 1 : ((b.alias > a.alias) ? -1 : 0);
-      });
-    }).done(function() {
-        jQuery.ajax({
-          url: '/miso/rest/subprojects',
-          success: function (data) {
-            data.sort(function (a, b) {
-              return (a.alias > b.alias) ? 1 : ((b.alias > a.alias) ? -1 : 0);
-            });
-            
-            var html = '';
-            for (var i=0; i<data.length; i++) {
-              var id = data[i]["id"];
-              var alias = data[i]["alias"];
-              var description = data[i]["description"];
-              var project = data[i]["projectId"];
-              var priority = data[i]["priority"];
-              var endpoint = "/miso/rest/subproject/" + id;
-              
-              html += '<tr class="subP"><td><input id="subP_alias_'+ id +'" value="'+ alias +'"/>&nbsp;';
-              html += '<input id="subP_description_'+ id +'" value="'+ description +'"/>&nbsp;';
-              html += '<select id="subP_parentProject_'+ id +'">';
-              for (var j=0; j<projectArray.length; j++) {
-                html += '<option value="'+ projectArray[j]["projectId"] +'"'+ (projectArray[j]["projectId"] == project ? ' selected' : '') + '>' + projectArray[j]["alias"] + '</option>';
-              }
-              html += '</select>&nbsp;';
-              html += '<select id="subP_priority_'+ id +'">';
-              html += '<option value="1"'+ (priority ? ' selected' : '') +'>High</option>';
-              html += '<option value="0"'+ (priority ? '' : ' selected')  +'>Standard</option></select>&nbsp;';
-              html += '<button class="inline" onclick="Subproject.update(\''+endpoint+'\', '+id+')">Update</button>&nbsp;';
-              html += '</form></td>';
-              html += '<td><button class="delete-button inline" onclick="Tissue.confirmDelete(\''+endpoint+'\')">Delete</button></td>';
-            }
-            html += '</tr><tr><td><button id="newSubproject" onclick="Subproject.createNewRow()">Create New Subproject</button></td></tr>';
-            jQuery('#allSubprojects').append(html);
-          }
-        });
-      });
+  getSubprojects: function (xhr) {
+    Options.makeXhrRequest('GET', '/miso/rest/project', Subproject.listProjects, xhr);
+  },
+  
+  listProjects: function (pxhr) {
+    projectArray = JSON.parse(pxhr.response).sort(function (a, b) {
+      return (a.alias > b.alias) ? 1 : ((b.alias > a.alias) ? -1 : 0);
+    });
+    Options.makeXhrRequest('GET', '/miso/rest/subprojects', Subproject.createSubprojectTable);
+  },
+  
+  createSubprojectTable: function (xhr) {
+    var data = JSON.parse(xhr.response).sort(function (a, b) {
+      return (a.alias > b.alias) ? 1 : ((b.alias > a.alias) ? -1 : 0);
+    });
+    
+    document.getElementById('allSubprojects').innerHTML = null;
+
+    var table = [];
+    var id, alias, description, project, priority, endpoint, tr, td, aliasInput, descriptionInput, parentProjectInput, priorityInput, updateButton, td2, deleteButton, newRowButton;
+    
+    for (var i=0; i<data.length; i++) {
+      id = data[i]["id"];
+      alias = data[i]["alias"];
+      description = data[i]["description"];
+      project = data[i]["projectId"];
+      priority = data[i]["priority"];
+      endpoint = "/miso/rest/subproject/" + id;
+
+      table.push('<tr class="subP"><td>');
+      table.push(Options.createTextInput('subP_alias_'+ id, alias));
+      table.push(Options.createTextInput('subP_description_'+id, description));
+      table.push(Subproject.createProjectsSelect('subP_parentProject_'+ id, project));
+      table.push(Subproject.createPrioritySelect('subP_priority_'+ id, priority));
+      table.push(Options.createButton('Update', "Subproject.update('"+endpoint+"', "+id+")"));
+      table.push('</td><td>');
+      table.push(Options.createButton('Delete', "Options.confirmDelete('"+endpoint+"')"));
+      table.push('</td></tr>');
+    }
+    table.push('<tr id="newSubpRowButton"><td>');
+    table.push(Options.createButton('Create New Subproject', 'Subproject.createNewRow()', 'newDetails'));
+    table.push('</td></tr>');
+    document.getElementById('allSubprojects').innerHTML = table.join('');
+  },
+  
+  createProjectsSelect: function(idValue, project) {
+    var select = [];
+    select.push('<select id="'+ idValue +'">');
+    for (var j=0;j<projectArray.length;j++) {
+      select.push('<option value="'+ projectArray[j]["projectId"] +'"');
+      if (project) {
+        projectArray[j]["projectId"] == project ? select.push(' selected="selected"') : null ;
+      }
+      select.push('>'+ projectArray[j]["alias"] +'</option>');
+    }
+    select.push('</select>');
+    return select.join('');
+  },
+  
+  createPrioritySelect: function(idValue, priority) {
+    var select = [];
+    select.push('<select id="'+ idValue +'">');
+    select.push('<option value="1"'+ (priority ? 'selected="selected"' : '') +'>High</option>');
+    select.push('<option value="0"'+ (priority ? '' : 'selected="selected"') +'>Standard</option>');
+    select.push('</select>')
+    return select.join('');
   },
   
   update: function (endpoint, id) {
-    var alias = jQuery('#subP_alias_'+id).val();
-    var description = jQuery('#subP_description_'+id).val();
-    var parentProject = jQuery('#subP_parentProject_'+id).val();
-    var priority = jQuery('#subP_priority_'+id).val();
+    var alias = document.getElementById('subP_alias_'+id).value;
+    var description = document.getElementById('subP_description_'+id).value;
+    var parentProject = document.getElementById('subP_parentProject_'+id).value;
+    var priority = document.getElementById('subP_priority_'+id).value;
     if (!alias || !description || !parentProject || !priority) {
       alert("Neither alias, description, project nor priority can be blank.");
       return null;
     }
-    jQuery.ajax({
-      url: endpoint,
-      type: 'PUT',
-      data: JSON.stringify({ 'alias': alias, 'description': description, 'parentProjectId': parentProject, 'priority': priority }),
-      contentType: 'application/json',
-      success: function (data) {
-        Utils.page.pageReload;
-      },
-      error: function (response) {
-        console.log(response.getResponseHeader());
-      }
-    });
+    Options.makeXhrRequest('PUT', endpoint, Subproject.getSubprojects, JSON.stringify({ 'alias': alias, 'description': description, 'parentProjectId': parentProject, 'priority': priority }));
   },
   
   createNewRow: function () {
-    var html = '<tr><td>';
-    html += '<input id="subP_alias_new">&nbsp;<input id="subP_description_new" value=""/>&nbsp;<select id="subP_parentProject_new">';
-    for (var i=0; i<projectArray.length; i++) {
-      html += '<option value="'+ projectArray[i]["projectId"] +'">' + projectArray[i]["alias"] + '</option>';
-    }
-    html += '</select>&nbsp;<select id="subP_priority_new"><option value="1">High</option><option value="0">Standard</option></select>&nbsp;';
-    html += '<button id="addNewSubproject" onclick="Subproject.addNew();">Add</button></td></tr>';
-    jQuery('tr.subP:nth-last-child(2)').after(html);
-    jQuery('#subP_alias_new').focus();
+    var row = [];
+
+    row.push('<tr><td>');
+    row.push(Options.createTextInput('subP_alias_new'));
+    row.push(Options.createTextInput('subP_description_new'));
+    row.push(Subproject.createProjectsSelect('subP_parentProject_new'));
+    row.push(Subproject.createPrioritySelect('subP_priority_new'));
+    row.push(Options.createButton('Add', "Subproject.addNew()"));
+    row.push('</td></tr>');
+
+    document.getElementById('newSubpRowButton').insertAdjacentHTML('beforebegin', row.join(''));
+    document.getElementById('subP_alias_new').focus();
   },
   
   addNew: function() {
-    var alias = jQuery('#subP_alias_new').val();
-    var description = jQuery('#subP_description_new').val();
-    var parentProject = jQuery('#subP_parentProject_new').val();
-    var priority = jQuery('#subP_priority_new').val();
+    var alias = document.getElementById('subP_alias_new').value;
+    var description = document.getElementById('subP_description_new').value;
+    var parentProject = document.getElementById('subP_parentProject_new').value;
+    var priority = document.getElementById('subP_priority_new').value;
     if (!alias || !description || !parentProject || !priority) {
       alert("Neither alias, description, project nor priority can be blank.");
       return null;
     }
-    jQuery.ajax({
-      url: '/miso/rest/subproject',
-      type: 'POST',
-      contentType: 'application/json',
-      data: JSON.stringify({ 'alias': alias, 'description': description, 'parentProjectId': parentProject, 'priority': priority}),
-      success: function() {
-        Utils.page.pageReload;
+    Options.makeXhrRequest('POST', '/miso/rest/subproject', Subproject.getSubprojects, JSON.stringify({ 'alias': alias, 'description': description, 'parentProjectId': parentProject, 'priority': priority}));
+  }
+};
+
+var Options = Options || {
+  makeXhrRequest: function (method, endpoint, callback, data) {
+    var expectedStatus = (method == 'POST' ? 201 : 200);
+    if (!callback) callback = document.location.reload;
+    var xhr = new XMLHttpRequest();
+    xhr.open(method, endpoint);
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState === XMLHttpRequest.DONE) {
+        if (xhr.status === expectedStatus) {
+          data ? callback() : callback(xhr) ;
+        } else {
+          console.log(xhr.response);
+        }
       }
-    });
+    }
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    data ? xhr.send(data) : xhr.send();
+  },
+
+  confirmDelete: function (endpoint) {
+    if (confirm('Are you sure you wish to delete? This operation cannot be undone!')) {
+      Options.makeXhrRequest('DELETE', endpoint);
+    }
+  },
+
+  createTextInput: function(idValue, valueText) {
+    return '<input type="text" id="'+ idValue +'" value="'+ (valueText ? valueText : '') +'"></input>';
+  },
+
+  createButton: function(valueText, onclickFunction, idText) {
+    return '<button class="inline"'+(idText ? ' id="'+ idText +'"' : '')+' onclick="'+ onclickFunction +'">'+ valueText +'</button>';
   }
 };
