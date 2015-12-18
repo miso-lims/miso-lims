@@ -97,7 +97,7 @@ public class PoolSearchService {
           if (readyOnly) {
             pools = requestManager.listReadyPoolsByPlatform(PlatformType.valueOf(platformType));
           } else {
-            pools = requestManager.listAllPoolsByPlatform(PlatformType.valueOf(platformType));
+            pools = requestManager.listAllPoolsByPlatform(PlatformType.valueOf(platformType), false);
           }
         }
         if (pools.size() > 0) {

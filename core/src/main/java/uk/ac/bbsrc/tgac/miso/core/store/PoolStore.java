@@ -42,6 +42,8 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
  */
 public interface PoolStore
     extends Store<Pool<? extends Poolable>>, Remover<Pool<? extends Poolable>>, NamingSchemeAware<Pool<? extends Poolable>> {
+  Collection<Pool<? extends Poolable>> listAll(boolean lazy) throws IOException;
+
   /**
    * Get a Pool given a barcode and its platform
    * 
@@ -95,11 +97,13 @@ public interface PoolStore
    * 
    * @param platformType
    *          of type PlatformType
+   * @param lazy
+   *          read the pool's contents
    * @return List<Pool<? extends Poolable>
    * @throws IOException
    *           when
    */
-  List<Pool<? extends Poolable>> listAllByPlatform(PlatformType platformType) throws IOException;
+  List<Pool<? extends Poolable>> listAllByPlatform(PlatformType platformType, boolean lazy) throws IOException;
 
   /**
    * List all Pools that are for a given {@link PlatformType} that match a search query String

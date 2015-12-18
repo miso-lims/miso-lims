@@ -112,7 +112,7 @@ public class EditExperimentController {
   public Collection<? extends Pool> populateAvailablePools(User user, Experiment experiment) throws IOException {
     if (experiment.getPlatform() != null) {
       List<Pool> pools = new ArrayList<Pool>();
-      for (Pool p : requestManager.listAllPoolsByPlatform(experiment.getPlatform().getPlatformType())) {
+      for (Pool p : requestManager.listAllPoolsByPlatform(experiment.getPlatform().getPlatformType(), false)) {
         if (experiment.getPool() == null || !experiment.getPool().equals(p)) {
           pools.add(p);
         }

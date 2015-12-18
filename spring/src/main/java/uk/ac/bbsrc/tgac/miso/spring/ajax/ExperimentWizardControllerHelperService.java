@@ -211,7 +211,7 @@ public class ExperimentWizardControllerHelperService {
         Platform platform = requestManager.getPlatformById(platformId);
         if (platform != null) {
           PlatformType pt = platform.getPlatformType();
-          List<Pool<? extends Poolable>> pools = new ArrayList<Pool<? extends Poolable>>(requestManager.listAllPoolsByPlatform(pt));
+          List<Pool<? extends Poolable>> pools = new ArrayList<Pool<? extends Poolable>>(requestManager.listAllPoolsByPlatform(pt, true));
           Collections.sort(pools);
           for (Pool p : pools) {
             a.append("<div bind='" + p.getId()

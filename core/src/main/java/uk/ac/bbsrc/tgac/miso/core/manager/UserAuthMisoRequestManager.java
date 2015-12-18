@@ -1282,10 +1282,10 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
-  public Collection<Pool<? extends Poolable>> listAllPools() throws IOException {
+  public Collection<Pool<? extends Poolable>> listAllPools(boolean lazy) throws IOException {
     User user = getCurrentUser();
     ArrayList<Pool<? extends Poolable>> accessibles = new ArrayList<>();
-    for (Pool<? extends Poolable> pool : super.listAllPools()) {
+    for (Pool<? extends Poolable> pool : super.listAllPools(lazy)) {
       if (pool.userCanRead(user)) {
         accessibles.add(pool);
       }
@@ -1295,10 +1295,10 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   }
 
   @Override
-  public Collection<Pool<? extends Poolable>> listAllPoolsByPlatform(PlatformType platformType) throws IOException {
+  public Collection<Pool<? extends Poolable>> listAllPoolsByPlatform(PlatformType platformType, boolean lazy) throws IOException {
     User user = getCurrentUser();
     ArrayList<Pool<? extends Poolable>> accessibles = new ArrayList<>();
-    for (Pool<? extends Poolable> pool : super.listAllPoolsByPlatform(platformType)) {
+    for (Pool<? extends Poolable> pool : super.listAllPoolsByPlatform(platformType, lazy)) {
       if (pool.userCanRead(user)) {
         accessibles.add(pool);
       }
@@ -1583,7 +1583,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> listAllPlatesBySearch(String str) throws IOException {
     User user = getCurrentUser();
-    Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> accessibles = new HashSet<>();
+    Collection<Plate<? extends List<? extends Plateable>, ? extends Plateable>> accessibles = new HashSet<Plate<? extends List<? extends Plateable>, ? extends Plateable>>();
     for (Plate<? extends List<? extends Plateable>, ? extends Plateable> plate : super.listAllPlatesBySearch(str)) {
       if (plate.userCanRead(user)) {
         accessibles.add(plate);

@@ -107,7 +107,7 @@ public class ExperimentWizardController {
     if (experiment.getPlatform() != null) {
       PlatformType platformType = experiment.getPlatform().getPlatformType();
       ArrayList<Pool> pools = new ArrayList<Pool>();
-      for (Pool p : requestManager.listAllPoolsByPlatform(platformType)) {
+      for (Pool p : requestManager.listAllPoolsByPlatform(platformType, false)) {
         if (experiment.getPool() == null || !experiment.getPool().equals(p)) {
           pools.add(p);
         }
@@ -115,7 +115,7 @@ public class ExperimentWizardController {
       }
       return pools;
     }
-    return requestManager.listAllPools();
+    return requestManager.listAllPools(true);
   }
 
   @RequestMapping(value = "/new/{projectId}", method = RequestMethod.GET)

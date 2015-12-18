@@ -642,7 +642,12 @@ public class SQLPoolDAO implements PoolStore {
   @Cacheable(cacheName = "poolListCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
       @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
   public Collection<Pool<? extends Poolable>> listAll() throws IOException {
-    return template.query(POOL_SELECT, new PoolMapper());
+    return listAll(false);
+  }
+
+  @Override
+  public Collection<Pool<? extends Poolable>> listAll(boolean lazy) throws IOException {
+    return template.query(POOL_SELECT, new PoolMapper(lazy));
   }
 
   @Override
@@ -651,8 +656,8 @@ public class SQLPoolDAO implements PoolStore {
   }
 
   @Override
-  public List<Pool<? extends Poolable>> listAllByPlatform(PlatformType platformType) throws IOException {
-    return template.query(POOL_SELECT_BY_PLATFORM, new Object[] { platformType.getKey() }, new PoolMapper());
+  public List<Pool<? extends Poolable>> listAllByPlatform(PlatformType platformType, boolean lazy) throws IOException {
+    return template.query(POOL_SELECT_BY_PLATFORM, new Object[] { platformType.getKey() }, new PoolMapper(lazy));
   }
 
   @Override
@@ -762,7 +767,7 @@ public class SQLPoolDAO implements PoolStore {
         PlatformType pt = PlatformType.get(rs.getString("platformType"));
         p.setPlatformType(pt);
 
-        if (pt != null) {
+        if (pt != null && !isLazy()) {
           Collection<? extends Poolable> poolables = listPoolableElementsByPoolId(id);
           p.setPoolableElements(poolables);
         }

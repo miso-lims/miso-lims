@@ -199,11 +199,11 @@ public class EditRunController {
   }
 
   public Collection<Pool<? extends Poolable>> populateAvailablePools(User user) throws IOException {
-    return requestManager.listAllPools();
+    return requestManager.listAllPools(true);
   }
 
   public Collection<Pool> populateAvailablePools(PlatformType platformType, User user) throws IOException {
-    List<Pool> pools = new ArrayList<Pool>(requestManager.listAllPoolsByPlatform(platformType));
+    List<Pool> pools = new ArrayList<Pool>(requestManager.listAllPoolsByPlatform(platformType, false));
     Collections.sort(pools);
     return pools;
   }

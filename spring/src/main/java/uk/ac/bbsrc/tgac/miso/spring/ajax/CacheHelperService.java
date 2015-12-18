@@ -181,7 +181,7 @@ public class CacheHelperService {
         }
       }
 
-      for (Pool p : requestManager.listAllPools()) {
+      for (Pool p : requestManager.listAllPools(true)) {
         if (isStringEmptyOrNull(p.getIdentificationBarcode())) {
           requestManager.savePool(p);
         }

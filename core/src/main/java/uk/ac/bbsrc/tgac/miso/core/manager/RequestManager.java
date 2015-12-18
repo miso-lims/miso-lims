@@ -434,9 +434,9 @@ public interface RequestManager {
 
   public Collection<emPCR> listAllEmPCRsByProjectId(long projectId) throws IOException;
 
-  public Collection<Pool<? extends Poolable>> listAllPools() throws IOException;
+  public Collection<Pool<? extends Poolable>> listAllPools(boolean lazy) throws IOException;
 
-  public Collection<Pool<? extends Poolable>> listAllPoolsByPlatform(PlatformType platformType) throws IOException;
+  public Collection<Pool<? extends Poolable>> listAllPoolsByPlatform(PlatformType platformType, boolean lazy) throws IOException;
 
   public Collection<Pool<? extends Poolable>> listAllPoolsByPlatformAndSearch(PlatformType platformType, String query) throws IOException;
 

@@ -577,18 +577,18 @@ public class MisoRequestManager implements RequestManager {
   }
 
   @Override
-  public Collection<Pool<? extends Poolable>> listAllPools() throws IOException {
+  public Collection<Pool<? extends Poolable>> listAllPools(boolean lazy) throws IOException {
     if (poolStore != null) {
-      return poolStore.listAll();
+      return poolStore.listAll(lazy);
     } else {
       throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
     }
   }
 
   @Override
-  public Collection<Pool<? extends Poolable>> listAllPoolsByPlatform(PlatformType platformType) throws IOException {
+  public Collection<Pool<? extends Poolable>> listAllPoolsByPlatform(PlatformType platformType, boolean lazy) throws IOException {
     if (poolStore != null) {
-      return poolStore.listAllByPlatform(platformType);
+      return poolStore.listAllByPlatform(platformType, lazy);
     } else {
       throw new IOException("No poolStore available. Check that it has been declared in the Spring config.");
     }
