@@ -35,12 +35,16 @@
 <link rel="stylesheet" href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" type="text/css">
 <link rel="stylesheet" href="<c:url value='/styles/progress.css'/>" type="text/css">
 
-<form:form action="/miso/project" method="POST" commandName="project" autocomplete="off">
+<script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
+<script type="text/javascript" src="<c:url value='/scripts/project_validation.js?ts=${timestamp.time}'/>"></script>
+
+
+<form:form id="project-form" data-parsley-validate="" action="/miso/project" method="POST" commandName="project" autocomplete="off">
 <sessionConversation:insertSessionConversationId attributeName="project"/>
 <h1><c:choose><c:when
     test="${project.id != 0}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose>
   Project
-  <button type="button" class="fg-button ui-state-default ui-corner-all" onclick="return validate_project(this.form);">
+  <button type="button" class="fg-button ui-state-default ui-corner-all" onclick="return validate_project();">
     Save
   </button>
 </h1>
@@ -74,6 +78,11 @@
 
 </c:if>
 
+<div class="bs-callout bs-callout-warning hidden">
+  <h2>Oh snap!</h2>
+  <p>This form seems to be invalid!</p>
+</div>
+
 <h2>Project Information</h2>
 <table class="in">
   <tr>
@@ -100,27 +109,37 @@
   </tr>
   <tr>
     <td class="h">Alias:</td>
-    <td><form:input path="alias" maxlength="${maxLengths['alias']}" class="validateable"/>
+    <td><form:input id="alias" path="alias" maxlength="${maxLengths['alias']}" class="validateable"/>
       <span id="aliascounter" class="counter"></span>
     </td>
   </tr>
   <tr>
-    <td class="h">Description:</td>
-    <td><form:input path="description" maxlength="${maxLengths['description']}" class="validateable"/>
+    <td class="h">Description:*</td>
+    <td><form:input id="description" path="description" maxlength="${maxLengths['description']}" class="validateable"/>
       <span id="descriptioncounter" class="counter"></span></td>
   </tr>
   <tr>
-    <td>Progress:</td>
+    <td>Progress:*</td>
     <td>
       <c:choose>
         <c:when test="${(project.securityProfile.owner.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                         or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-          <form:radiobuttons id="progress" path="progress"/>
+          <div id="progressButtons">
+            <form:radiobuttons id="progress" path="progress"/>
+          </div>
         </c:when>
         <c:otherwise>
           ${project.progress}
         </c:otherwise>
       </c:choose>
+    </td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>
+      <div class="parsley-errors-list filled" id="progressSelectError">
+        <div class="parsley-required"></div>
+      </div>
     </td>
   </tr>
 </table>
@@ -400,7 +419,7 @@
       <thead>
       <tr>
         <th>Sample Name</th>
-        <th>Sample Alias</th>
+        <th>Sample Alias*</th>
         <th class="fit">Edit</th>
         <th class="fit">REMOVE</th>
       </tr>

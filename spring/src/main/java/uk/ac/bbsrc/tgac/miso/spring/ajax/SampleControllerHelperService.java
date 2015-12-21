@@ -117,6 +117,21 @@ public class SampleControllerHelperService {
   @Autowired
   private CacheHelperService cacheHelperService;
 
+
+  /**
+   * Returns a JSONObject containing the alias regex used by the current sample naming scheme
+   */
+  public JSONObject getSampleAliasRegex(HttpSession session, JSONObject json) {
+    try {
+      JSONObject response = new JSONObject();
+      response.put("aliasRegex", sampleNamingScheme.getValidationRegex("alias"));
+      return response;
+    } catch (MisoNamingException e) {
+      log.error("Cannot get the sample alias regex from the server");
+      return JSONUtils.SimpleJSONError("Cannot get the sample alias regex from the server");
+    }
+  }
+
   public JSONObject validateSampleAlias(HttpSession session, JSONObject json) {
     if (json.has("alias")) {
       String alias = json.getString("alias");

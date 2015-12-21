@@ -36,13 +36,16 @@
 <script src="<c:url value='/scripts/datatables_utils.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/natural_sort.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
 
+<script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
+<script type="text/javascript" src="<c:url value='/scripts/pool_validation.js?ts=${timestamp.time}'/>"></script>
+
 <div id="maincontent">
 <div id="contentcolumn">
-<form:form method="POST" commandName="pool" autocomplete="off" onsubmit="return validate_pool(this);">
+<form:form id="pool-form" data-parsley-validate="" method="POST" commandName="pool" autocomplete="off">
 <sessionConversation:insertSessionConversationId attributeName="pool"/>
 <h1><c:choose><c:when
     test="${pool.id != 0}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose> Pool
-  <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
+  <button type="submit" onclick="return validate_pool();" class="fg-button ui-state-default ui-corner-all">Save</button>
 </h1>
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
   <div id="note_arrowclick" class="toggleLeft"></div>
@@ -51,6 +54,12 @@
   to be placed, as part of an Experiment, in a sequencer instrument Run partition (lane/chamber/cell). Pools
   with more than one Dilution or a Plate with multiple libraries are said to be multiplexed.
 </div>
+
+<div class="bs-callout bs-callout-warning hidden">
+  <h2>Oh snap!</h2>
+  <p>This form seems to be invalid!</p>
+</div>
+
 <h2>Pool Information</h2>
 
 <div class="barcodes">
@@ -106,7 +115,7 @@
     </td>
   </tr>
   <tr>
-    <td class="h">Pool Name:</td>
+    <td class="h">Name:</td>
     <td>
       <c:choose>
         <c:when test="${pool.id != 0}">${pool.name}</c:when>
@@ -115,8 +124,8 @@
     </td>
   </tr>
   <tr>
-    <td class="h">Pool Alias:</td>
-    <td><form:input path="alias"/></td>
+    <td class="h">Alias:*</td>
+    <td><form:input id="alias" path="alias"/></td>
   </tr>
   <tr>
     <td>Platform Type:</td>
@@ -132,11 +141,11 @@
     </td>
   </tr>
   <tr>
-    <td class="h">Desired Concentration</td>
-    <td><form:input path="concentration"/></td>
+    <td class="h">Desired Concentration:*</td>
+    <td><form:input id="concentration" path="concentration"/></td>
   </tr>
   <tr>
-    <td class="h">Creation Date:</td>
+    <td class="h">Creation Date:*</td>
     <td><c:choose>
       <c:when test="${pool.id != 0}">
         <fmt:formatDate pattern="dd/MM/yy" type="both" value="${pool.creationDate}"/>
