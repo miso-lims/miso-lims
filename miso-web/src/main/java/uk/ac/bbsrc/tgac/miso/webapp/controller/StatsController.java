@@ -118,7 +118,7 @@ public class StatsController {
     SequencerReference sr = requestManager.getSequencerReferenceById(referenceId);
     if (sr != null) {
       model.put("sequencerReference", sr);
-      String ip = sr.getIpAddress().toString();
+      String ip = sr.getIpAddress() == null ? "" : sr.getIpAddress().toString();
       if (ip.startsWith("/")) {
         model.put("trimmedIpAddress", ip.substring(1));
       } else {
