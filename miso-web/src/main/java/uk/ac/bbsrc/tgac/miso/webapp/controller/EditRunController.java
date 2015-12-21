@@ -50,9 +50,6 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
@@ -80,6 +77,9 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.context.ApplicationContextProvider;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
+
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 @Controller
 @RequestMapping("/run")
@@ -242,34 +242,51 @@ public class EditRunController {
 
   @RequestMapping(value = "/{runId}", method = RequestMethod.GET)
   public ModelAndView setupForm(@PathVariable Long runId, ModelMap model) throws IOException {
+    User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    Run run = null;
+
+    if (runId == AbstractRun.UNSAVED_ID) {
+      run = dataObjectFactory.getRun(user);
+    } else {
+      run = requestManager.getRunById(runId);
+    }
+    
+    return setupForm(run, model);
+  }
+  
+  @RequestMapping(value = "/alias/{runAlias}", method = RequestMethod.GET)
+  public ModelAndView setupForm(@PathVariable String runAlias, ModelMap model) throws IOException {
+    Run run = requestManager.getRunByAlias(runAlias);
+    return setupForm(run, model);
+  }
+  
+  public ModelAndView setupForm(Run run, ModelMap model) throws IOException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-      Run run = null;
 
-      if (runId == AbstractRun.UNSAVED_ID) {
+      if (run == null) {
+        throw new SecurityException("No such Run.");
+      }
+      else if (run.getId() == AbstractRun.UNSAVED_ID) {
         run = dataObjectFactory.getRun(user);
         model.put("title", "New Run");
         model.put("availablePools", populateAvailablePools(user));
         model.put("multiplexed", false);
-      } else {
-        run = requestManager.getRunById(runId);
-        if (run == null) {
-          throw new SecurityException("No such Run.");
-        } else {
-          model.put("title", "Run " + runId);
-          model.put("multiplexed", isMultiplexed(run));
-          try {
-            if (runStatsManager != null) {
-              model.put("statsAvailable", runStatsManager.hasStatsForRun(run));
-            }
-            model.put("operationsQcPassed", hasOperationsQcPassed(run));
-            model.put("informaticsQcPassed", hasInformaticsQcPassed(run));
-          } catch (RunStatsException e) {
-            log.error("setup run form", e);
+      }
+      else {
+        model.put("title", "Run " + run.getId());
+        model.put("multiplexed", isMultiplexed(run));
+        try {
+          if (runStatsManager != null) {
+            model.put("statsAvailable", runStatsManager.hasStatsForRun(run));
           }
+          model.put("operationsQcPassed", hasOperationsQcPassed(run));
+          model.put("informaticsQcPassed", hasInformaticsQcPassed(run));
+        } catch (RunStatsException e) {
+          log.error("setup run form", e);
         }
       }
-
+      
       if (!run.userCanRead(user)) {
         throw new SecurityException("Permission denied.");
       }
