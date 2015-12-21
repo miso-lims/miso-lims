@@ -861,6 +861,7 @@
         <th>Run Name</th>
         <th>Run Alias</th>
         <th>Partitions</th>
+        <th>Status</th>
         <th class="fit">Edit</th>
         <sec:authorize access="hasRole('ROLE_ADMIN')">
           <th class="fit">DELETE</th>
@@ -901,6 +902,7 @@
               </c:if>
             </c:forEach>
           </td>
+          <td>${run.status.health}</td>
           <td class="misoicon" onclick="window.location.href='<c:url value="/miso/run/${run.id}"/>'">
             <span class="ui-icon ui-icon-pencil"/>
           </td>

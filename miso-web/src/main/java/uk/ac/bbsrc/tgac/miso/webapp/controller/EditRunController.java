@@ -56,6 +56,7 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Partition;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
@@ -321,6 +322,9 @@ public class EditRunController {
       }
 
       run.setLastModifier(user);
+      for (SequencerPartitionContainer<? extends Partition> container : run.getSequencerPartitionContainers()) {
+        container.setLastModifier(user);
+      }
       requestManager.saveRun(run);
       session.setComplete();
       model.clear();

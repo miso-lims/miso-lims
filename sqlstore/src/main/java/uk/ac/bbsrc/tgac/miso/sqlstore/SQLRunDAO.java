@@ -104,8 +104,7 @@ public class SQLRunDAO implements RunStore {
 
   public static final String RUN_SELECT_BY_ALIAS = RUNS_SELECT + " WHERE alias = ?";
 
-  public static final String RUNS_SELECT_BY_SEARCH = RUNS_SELECT + " WHERE " + "name LIKE ? OR " + "alias LIKE ? OR "
-      + "description LIKE ? ";
+  public static final String RUNS_SELECT_BY_SEARCH = RUNS_SELECT + " WHERE name LIKE ? OR alias LIKE ? OR description LIKE ? ";
 
   public static final String RUN_UPDATE = "UPDATE " + TABLE_NAME + " "
       + "SET name=:name, alias=:alias, description=:description, accession=:accession, platformRunId=:platformRunId, "
@@ -116,59 +115,44 @@ public class SQLRunDAO implements RunStore {
   public static final String RUN_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE runId=:runId";
 
   @Deprecated
-  public static final String RUNS_SELECT_BY_RELATED_EXPERIMENT = "SELECT r.runId, r.name, r.alias, r.description, r.accession, r.platformRunId, r.pairedEnd, r.cycles, r.filePath, "
-      + "r.securityProfile_profileId, r.platformType, r.status_statusId, r.sequencerReference_sequencerReferenceId, r.lastModifier "
-      + "FROM " + TABLE_NAME + " r " +
-
-  "INNER JOIN Run_SequencerPartitionContainer rf ON r.runId = rf.Run_runId"
+  public static final String RUNS_SELECT_BY_RELATED_EXPERIMENT = RUNS_SELECT
+      + " WHERE runId IN (SELECT rf.Run_runId FROM Run_SequencerPartitionContainer rf "
       + "LEFT JOIN SequencerPartitionContainer f ON f.containerId = rf.containers_containerId "
       + "LEFT JOIN SequencerPartitionContainer_Partition fl ON f.containerId = fl.container_containerId "
-      + "LEFT JOIN _Partition l ON fl.partitions_partitionId = l.partitionId " +
+      + "LEFT JOIN _Partition l ON fl.partitions_partitionId = l.partitionId WHERE l.experiment_experimentId = ?)";
 
-  "WHERE l.experiment_experimentId = ?";
+  public static final String RUNS_SELECT_BY_PLATFORM_ID = RUNS_SELECT
+      + " WHERE sequencerReference_sequencerReferenceId IN (SELECT referenceId FROM SequencerReference WHERE platformId=?)";
 
-  public static final String RUNS_SELECT_BY_PLATFORM_ID = "SELECT r.runId, r.name, r.alias, r.description, r.accession, r.platformRunId, r.pairedEnd, r.cycles, r.filePath, r.securityProfile_profileId, r.platformType, r.status_statusId, r.sequencerReference_sequencerReferenceId, r.lastModifier "
-      + "FROM " + TABLE_NAME
-      + " r LEFT JOIN SequencerReference sr ON r.sequencerReference_sequencerReferenceId=sr.referenceId WHERE sr.platformId=?";
+  public static final String RUNS_SELECT_BY_STATUS_HEALTH = RUNS_SELECT
+      + " WHERE status_statusId IN (SELECT statusId FROM Status WHERE health=?)";
 
-  public static final String RUNS_SELECT_BY_STATUS_HEALTH = "SELECT r.runId, r.name, r.alias, r.description, r.accession, r.platformRunId, r.pairedEnd, r.cycles, r.filePath, r.securityProfile_profileId, r.platformType, r.status_statusId, r.sequencerReference_sequencerReferenceId, r.lastModifier "
-      + "FROM " + TABLE_NAME + " r, Status s " + "WHERE r.status_statusId=s.statusId " + "AND s.health=?";
-
-  public static String RUNS_SELECT_BY_PROJECT_ID = "SELECT DISTINCT ra.* " + "FROM Project p "
-      + "INNER JOIN Study st ON st.project_projectId = p.projectId " + "LEFT JOIN Experiment ex ON st.studyId = ex.study_studyId "
+  public static String RUNS_SELECT_BY_PROJECT_ID = RUNS_SELECT + " WHERE runId IN (SELECT rf.Run_runId FROM Project p "
+      + "INNER JOIN Study st ON st.project_projectId = p.projectId LEFT JOIN Experiment ex ON st.studyId = ex.study_studyId "
       + "INNER JOIN Pool_Experiment pex ON ex.experimentId = pex.experiments_experimentId "
       + "LEFT JOIN Pool pool ON pool.poolId = pex.pool_poolId " + "LEFT JOIN _Partition c ON pool.poolId = c.pool_poolId "
       + "LEFT JOIN SequencerPartitionContainer_Partition fc ON c.partitionId = fc.partitions_partitionId "
       + "LEFT JOIN _Partition l ON pool.poolId = l.pool_poolId "
       + "LEFT JOIN SequencerPartitionContainer fa ON fc.container_containerId = fa.containerId "
-      + "INNER JOIN Run_SequencerPartitionContainer rf ON fa.containerId = rf.containers_containerId " + "LEFT JOIN " + TABLE_NAME
-      + " ra ON rf.Run_runId = ra.runId " + "WHERE p.projectId=? GROUP BY ra.runId";
+      + "INNER JOIN Run_SequencerPartitionContainer rf ON fa.containerId = rf.containers_containerId WHERE p.projectId=?)";
 
-  public static String RUNS_SELECT_BY_POOL_ID = "SELECT DISTINCT ra.* " + "FROM Pool pool "
+  public static String RUNS_SELECT_BY_POOL_ID = RUNS_SELECT + " WHERE runId IN (SELECT rf.Run_runId FROM Pool pool "
       + "LEFT JOIN _Partition c ON pool.poolId = c.pool_poolId "
-      + "LEFT JOIN SequencerPartitionContainer_Partition fc ON c.partitionId = fc.partitions_partitionId " +
+      + "LEFT JOIN SequencerPartitionContainer_Partition fc ON c.partitionId = fc.partitions_partitionId "
+      + "LEFT JOIN SequencerPartitionContainer fa ON fc.container_containerId = fa.containerId "
+      + "INNER JOIN Run_SequencerPartitionContainer rf ON fa.containerId = rf.containers_containerId WHERE pool.poolId=?)";
 
-  "LEFT JOIN SequencerPartitionContainer fa ON fc.container_containerId = fa.containerId " +
+  public static String RUNS_SELECT_BY_SEQUENCER_PARTITION_CONTAINER_ID = RUNS_SELECT
+      + " WHERE runId IN (SELECT rf.Run_runId FROM Run_SequencerPartitionContainer rf WHERE rf.containers_containerId=?)";
 
-  "INNER JOIN Run_SequencerPartitionContainer rf ON fa.containerId = rf.containers_containerId " + "LEFT JOIN " + TABLE_NAME
-      + " ra ON rf.Run_runId = ra.runId " + "WHERE pool.poolId=?";
+  public static String LATEST_RUN_STARTED_SELECT_BY_SEQUENCER_PARTITION_CONTAINER_ID = RUNS_SELECT
+      + " INNER JOIN Status s ON status_statusId=s.statusId"
+      + " WHERE runId IN (SELECT Run_runId FROM Run_SequencerPartitionContainer WHERE containers_containerId=?)"
+      + " ORDER BY s.startDate DESC LIMIT 1";
 
-  public static String RUNS_SELECT_BY_SEQUENCER_PARTITION_CONTAINER_ID = "SELECT ra.* FROM SequencerPartitionContainer container "
-      + "INNER JOIN Run_SequencerPartitionContainer rf ON container.containerId = rf.containers_containerId " + "LEFT JOIN " + TABLE_NAME
-      + " ra ON rf.Run_runId = ra.runId " + "WHERE container.containerId=? GROUP BY ra.runId";
-
-  public static String LATEST_RUN_STARTED_SELECT_BY_SEQUENCER_PARTITION_CONTAINER_ID = "SELECT max(s.startDate), r.runId, r.name, r.alias, r.description, r.accession, r.platformRunId, r.pairedEnd, r.cycles, r.filePath, r.securityProfile_profileId, r.platformType, r.status_statusId, r.sequencerReference_sequencerReferenceId "
-      + "FROM SequencerPartitionContainer container "
-      + "INNER JOIN Run_SequencerPartitionContainer rf ON container.containerId = rf.containers_containerId " + "LEFT JOIN " + TABLE_NAME
-      + " r ON rf.Run_runId = r.runId " + "INNER JOIN Status s ON r.status_statusId=s.statusId "
-      + "WHERE container.containerId=? GROUP BY r.runId";
-
-  public static String LATEST_RUN_ID_SELECT_BY_SEQUENCER_PARTITION_CONTAINER_ID = "SELECT runId, name, alias, description, accession, platformRunId, pairedEnd, cycles, filePath, securityProfile_profileId, platformType, status_statusId, sequencerReference_sequencerReferenceId, lastModifier "
-      + "FROM " + TABLE_NAME + " " + "INNER JOIN ( " + "    SELECT MAX(r.runId) as maxrun "
-      + "    FROM SequencerPartitionContainer container "
-      + "    INNER JOIN Run_SequencerPartitionContainer rf ON container.containerId = rf.containers_containerId " + "    LEFT JOIN "
-      + TABLE_NAME + " r ON rf.Run_runId = r.runId " + "    WHERE container.containerId=? GROUP BY r.alias "
-      + ") grouprun ON runId = maxrun";
+  public static String LATEST_RUN_ID_SELECT_BY_SEQUENCER_PARTITION_CONTAINER_ID = RUNS_SELECT
+      + " WHERE runId IN (SELECT Run_runId FROM Run_SequencerPartitionContainer WHERE containers_containerId=?)"
+      + " ORDER BY runId DESC LIMIT 1";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLRunDAO.class);
 
