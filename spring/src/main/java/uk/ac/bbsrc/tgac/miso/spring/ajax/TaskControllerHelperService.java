@@ -23,17 +23,18 @@
 
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
+import javax.servlet.http.HttpSession;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.bbsrc.tgac.miso.integration.AnalysisQueryService;
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationException;
-
-import javax.servlet.http.HttpSession;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax

@@ -23,24 +23,31 @@
 
 package uk.ac.bbsrc.tgac.miso.notification.service;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+import java.io.File;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.xml.transform.TransformerException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.integration.Message;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
 import uk.ac.bbsrc.tgac.miso.integration.util.IntegrationUtils;
 import uk.ac.bbsrc.tgac.miso.tools.run.RunFolderConstants;
 import uk.ac.bbsrc.tgac.miso.tools.run.util.FileSetTransformer;
-
-import javax.xml.transform.TransformerException;
-import java.io.File;
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * uk.ac.bbsrc.tgac.miso.notification.util

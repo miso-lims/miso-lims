@@ -28,14 +28,14 @@ public class PlateControllerHelperServiceTestSuite {
 
   @InjectMocks
   private PlateControllerHelperService plateControllerHelperService;
-  
+
   @Mock
   private SecurityManager securityManager;
   @Mock
   private RequestManager requestManager;
   @Mock
   private User user;
-  
+
   @SuppressWarnings("rawtypes")
   @Mock
   private Plate plate;
@@ -46,47 +46,47 @@ public class PlateControllerHelperServiceTestSuite {
 
   @Before
   public void setUp() throws Exception {
-     MockitoAnnotations.initMocks(this);
+    MockitoAnnotations.initMocks(this);
   }
-  
+
   @SuppressWarnings("unchecked")
   @Test
   public final void testChangePlateIdBarcode() throws Exception {
     final long id = 1L;
     final String idBarcode = "idBarcode";
     when(requestManager.getPlateById(anyLong())).thenReturn(plate);
-    
+
     final JSONObject json = new JSONObject();
     json.put("plateId", id);
     json.put("identificationBarcode", idBarcode);
-    
-    final JSONObject response = plateControllerHelperService.changePlateIdBarcode(null,  json);
-    
+
+    final JSONObject response = plateControllerHelperService.changePlateIdBarcode(null, json);
+
     verify(plate).setIdentificationBarcode(idBarcode);
     verify(requestManager).savePlate(plate);
-    
+
     assertEquals("New+identification+barcode+successfully+assigned.", response.get("response"));
   }
-  
+
   @SuppressWarnings("unchecked")
   @Test
   public final void testChangePlateIdBarcodeBlankBarcode() throws Exception {
     final long id = 1L;
     final String idBarcode = "";
     when(requestManager.getPlateById(anyLong())).thenReturn(plate);
-    
+
     final JSONObject json = new JSONObject();
     json.put("plateId", id);
     json.put("identificationBarcode", idBarcode);
-    
-    final JSONObject response = plateControllerHelperService.changePlateIdBarcode(null,  json);
-    
+
+    final JSONObject response = plateControllerHelperService.changePlateIdBarcode(null, json);
+
     verify(plate, never()).setIdentificationBarcode(idBarcode);
     verify(requestManager, never()).savePlate(plate);
-    
+
     assertEquals("New+identification+barcode+not+recognized", response.get("error"));
   }
-  
+
   @SuppressWarnings("unchecked")
   @Test
   public final void testChangePlateIdBarcodeReturnsError() throws Exception {
@@ -95,15 +95,14 @@ public class PlateControllerHelperServiceTestSuite {
     final IOException expected = new IOException("thrown by mock");
     when(requestManager.getPlateById(anyLong())).thenReturn(plate);
     when(requestManager.savePlate(plate)).thenThrow(expected);
-    
-    
+
     final JSONObject json = new JSONObject();
     json.put("plateId", id);
     json.put("identificationBarcode", idBarcode);
-    
+
     final JSONObject error = new JSONObject();
     error.put("error", "thrown+by+mock");
-    
-    assertEquals(error, plateControllerHelperService.changePlateIdBarcode(null,  json));
+
+    assertEquals(error, plateControllerHelperService.changePlateIdBarcode(null, json));
   }
 }

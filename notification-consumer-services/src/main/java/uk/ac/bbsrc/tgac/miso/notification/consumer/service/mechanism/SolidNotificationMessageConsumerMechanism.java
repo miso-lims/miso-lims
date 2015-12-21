@@ -25,14 +25,32 @@ package uk.ac.bbsrc.tgac.miso.notification.consumer.service.mechanism;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.integration.Message;
 import org.springframework.util.Assert;
-import uk.ac.bbsrc.tgac.miso.core.data.*;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
+import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerPartitionContainerImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.solid.SolidRun;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.solid.SolidStatus;
@@ -42,14 +60,6 @@ import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.mechanism.NotificationMessageConsumerMechanism;
 import uk.ac.bbsrc.tgac.miso.tools.run.RunFolderConstants;
-
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.service.integration.mechanism.impl
@@ -230,7 +240,8 @@ public class SolidNotificationMessageConsumerMechanism
                 }
 
                 // update path if changed
-                if (run.has("fullPath") && !isStringEmptyOrNull(run.getString("fullPath")) && !isStringEmptyOrNull(r.getFilePath())) {
+                if (run.has("fullPath") && !"".equals(run.getString("fullPath")) && r.getFilePath() != null
+                    && !"".equals(r.getFilePath())) {
                   if (!run.getString("fullPath").equals(r.getFilePath())) {
                     log.debug("Updating run file path:" + r.getFilePath() + " -> " + run.getString("fullPath"));
                     r.setFilePath(run.getString("fullPath"));
@@ -261,7 +272,7 @@ public class SolidNotificationMessageConsumerMechanism
                       if (lf.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
                         lf.setPlatform(r.getSequencerReference().getPlatform());
                       }
-                      ((RunImpl) r).addSequencerPartitionContainer(lf);
+                      r.addSequencerPartitionContainer(lf);
                     }
                   } else {
                     log.debug("No containers linked to run " + r.getId() + ": creating...");
@@ -272,7 +283,7 @@ public class SolidNotificationMessageConsumerMechanism
                     if (f.getPlatform() == null && r.getSequencerReference().getPlatform() != null) {
                       f.setPlatform(r.getSequencerReference().getPlatform());
                     }
-                    ((RunImpl) r).addSequencerPartitionContainer(f);
+                    r.addSequencerPartitionContainer(f);
                   }
                 }
               } else {

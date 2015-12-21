@@ -28,7 +28,7 @@ public class LibraryControllerHelperServiceTestSuite {
 
   @InjectMocks
   private LibraryControllerHelperService libraryControllerHelperService;
-  
+
   @Mock
   private SecurityManager securityManager;
   @Mock
@@ -44,45 +44,45 @@ public class LibraryControllerHelperServiceTestSuite {
 
   @Before
   public void setUp() throws Exception {
-     MockitoAnnotations.initMocks(this);
+    MockitoAnnotations.initMocks(this);
   }
-  
+
   @Test
   public final void testChangeLibraryIdBarcode() throws Exception {
     final long id = 1L;
     final String idBarcode = "idBarcode";
     when(requestManager.getLibraryById(anyLong())).thenReturn(library);
-    
+
     final JSONObject json = new JSONObject();
     json.put("libraryId", id);
     json.put("identificationBarcode", idBarcode);
-    
-    final JSONObject response = libraryControllerHelperService.changeLibraryIdBarcode(null,  json);
-    
+
+    final JSONObject response = libraryControllerHelperService.changeLibraryIdBarcode(null, json);
+
     verify(library).setIdentificationBarcode(idBarcode);
     verify(requestManager).saveLibrary(library);
-    
+
     assertEquals("New+identification+barcode+successfully+assigned.", response.get("response"));
   }
-  
+
   @Test
   public final void testChangeLibraryIdBarcodeBlankBarcode() throws Exception {
     final long id = 1L;
     final String idBarcode = "";
     when(requestManager.getLibraryById(anyLong())).thenReturn(library);
-    
+
     final JSONObject json = new JSONObject();
     json.put("libraryId", id);
     json.put("identificationBarcode", idBarcode);
-    
-    final JSONObject response = libraryControllerHelperService.changeLibraryIdBarcode(null,  json);
-    
+
+    final JSONObject response = libraryControllerHelperService.changeLibraryIdBarcode(null, json);
+
     verify(library, never()).setIdentificationBarcode(idBarcode);
     verify(requestManager, never()).saveLibrary(library);
-    
+
     assertEquals("New+identification+barcode+not+recognized", response.get("error"));
   }
-  
+
   @Test
   public final void testChangeLibraryIdBarcodeReturnsError() throws Exception {
     final long id = 1L;
@@ -90,15 +90,14 @@ public class LibraryControllerHelperServiceTestSuite {
     final IOException expected = new IOException("thrown by mock");
     when(requestManager.getLibraryById(anyLong())).thenReturn(library);
     when(requestManager.saveLibrary(library)).thenThrow(expected);
-    
-    
+
     final JSONObject json = new JSONObject();
     json.put("libraryId", id);
     json.put("identificationBarcode", idBarcode);
-    
+
     final JSONObject error = new JSONObject();
     error.put("error", "thrown+by+mock");
-    
-    assertEquals(error, libraryControllerHelperService.changeLibraryIdBarcode(null,  json));
+
+    assertEquals(error, libraryControllerHelperService.changeLibraryIdBarcode(null, json));
   }
 }

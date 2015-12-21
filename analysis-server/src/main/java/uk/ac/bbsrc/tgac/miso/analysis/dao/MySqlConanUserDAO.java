@@ -23,16 +23,15 @@
 
 package uk.ac.bbsrc.tgac.miso.analysis.dao;
 
-import uk.ac.ebi.fgpt.conan.core.user.ConanUserWithPermissions;
-import uk.ac.ebi.fgpt.conan.dao.DatabaseConanUserDAO;
-import uk.ac.ebi.fgpt.conan.model.ConanUser;
-
 import java.io.IOException;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.ac.ebi.fgpt.conan.core.user.ConanUserWithPermissions;
+import uk.ac.ebi.fgpt.conan.dao.DatabaseConanUserDAO;
+import uk.ac.ebi.fgpt.conan.model.ConanUser;
 /**
  * uk.ac.bbsrc.tgac.miso.analysis
  * <p/>
@@ -44,7 +43,6 @@ import org.slf4j.LoggerFactory;
  */
 public class MySqlConanUserDAO extends DatabaseConanUserDAO {
   protected static final Logger log = LoggerFactory.getLogger(MySqlConanUserDAO.class);
-
   private long getAutoIncrement(String tableName) throws IOException {
     final String q = "SHOW TABLE STATUS LIKE '" + tableName + "'";
     Map<String, Object> rs = getJdbcTemplate().queryForMap(q);

@@ -129,16 +129,6 @@ public class DownloadController {
     }
   }
 
-  /*
-   * @RequestMapping(value = "/{type}/{id}/{hashcode}", method = RequestMethod.GET) protected void downloadFile(@PathVariable String type,
-   * 
-   * @PathVariable String id,
-   * 
-   * @PathVariable Integer hashcode, HttpServletResponse response) throws Exception { //User user =
-   * securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
-   * lookupAndRetrieveFile(Class.forName(LimsUtils.capitalise(type)), id, hashcode, response); }
-   */
-
   @RequestMapping(value = "/libraryqc/{id}/{hashcode}", method = RequestMethod.GET)
   protected void downloadLibraryQcFile(@PathVariable Long id, @PathVariable Integer hashcode, HttpServletResponse response)
       throws Exception {

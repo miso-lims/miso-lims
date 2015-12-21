@@ -23,17 +23,18 @@
 
 package uk.ac.bbsrc.tgac.miso.analysis.process;
 
-import net.sourceforge.fluxion.spi.ServiceProvider;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import net.sourceforge.fluxion.spi.ServiceProvider;
 import uk.ac.bbsrc.tgac.miso.analysis.parameter.FlagParameter;
 import uk.ac.bbsrc.tgac.miso.analysis.parameter.PathCreatingPathParameter;
 import uk.ac.ebi.fgpt.conan.lsf.LSFProcess;
 import uk.ac.ebi.fgpt.conan.model.ConanParameter;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
 
 /**
  * uk.ac.bbsrc.tgac.miso.analysis.tgac

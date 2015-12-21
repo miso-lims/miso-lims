@@ -13,136 +13,118 @@
   ~
   ~ MISO is distributed in the hope that it will be useful,
   ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
   ~ GNU General Public License for more details.
   ~
   ~ You should have received a copy of the GNU General Public License
-  ~ along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+  ~ along with MISO. If not, see <http://www.gnu.org/licenses/>.
   ~
   ~ **********************************************************************
-  -->
+-->
 
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:security="http://www.springframework.org/schema/security"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:security="http://www.springframework.org/schema/security" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
                         http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd"
-       default-autowire="byName">
+  default-autowire="byName">
 
-  <bean id="securityManager" name="securityManager"
-        class="com.eaglegenomics.simlims.core.manager.LocalSecurityManager"/>
+  <bean id="securityManager" name="securityManager" class="com.eaglegenomics.simlims.core.manager.LocalSecurityManager" />
 
-  <security:global-method-security secured-annotations="enabled"/>
+  <security:global-method-security secured-annotations="enabled" />
 
- <!-- don't want to have a SS filter here as the userless REST auth should have taken care of that -->
-  <security:http pattern="/miso/consumer/**" security="none"/>
-  <security:http pattern="/miso/rest/**" security="none"/>
+  <!-- don't want to have a SS filter here as the userless REST auth should have taken care of that -->
+  <security:http pattern="/miso/consumer/**" security="none" />
+  <security:http pattern="/miso/rest/**" security="none" />
 
-  <security:http pattern="/styles/**" security="none"/><!-- filters="none"/> -->
-  <security:http pattern="/scripts/**" security="none"/><!-- filters="none"/> -->
-  <security:http pattern="/images/**" security="none"/><!-- filters="none"/> -->
-  <security:http pattern="/registerUser" security="none"/><!-- filters="none"/> -->
+  <security:http pattern="/styles/**" security="none" /><!-- filters="none"/> -->
+  <security:http pattern="/scripts/**" security="none" /><!-- filters="none"/> -->
+  <security:http pattern="/images/**" security="none" /><!-- filters="none"/> -->
+  <security:http pattern="/registerUser" security="none" /><!-- filters="none"/> -->
 
-  <security:http access-denied-page="/accessDenied.jsp" use-expressions="true" auto-config="false"
-                 entry-point-ref="loginUrlAuthenticationEntryPoint">
+  <security:http access-denied-page="/accessDenied.jsp" use-expressions="true" auto-config="false" entry-point-ref="loginUrlAuthenticationEntryPoint">
 
     <security:custom-filter position="CONCURRENT_SESSION_FILTER" ref="concurrencyFilter" />
-    <security:custom-filter position="FORM_LOGIN_FILTER" ref="jdbcAuthFilter"/>
-    <security:remember-me data-source-ref="dataSource" user-service-ref="jdbcUserAuthService"/>
+    <security:custom-filter position="FORM_LOGIN_FILTER" ref="jdbcAuthFilter" />
+    <security:remember-me data-source-ref="dataSource" user-service-ref="jdbcUserAuthService" />
 
-    <security:logout logout-success-url="/loggedOut.jsp"/>
+    <security:logout logout-success-url="/loggedOut.jsp" />
 
-    <security:intercept-url pattern="/login.jsp" access="permitAll"/>
+    <security:intercept-url pattern="/login.jsp" access="permitAll" />
 
-    <security:intercept-url pattern="/miso/fluxion.ajax"
-                            access="hasRole('ROLE_INTERNAL') or hasRole('ROLE_EXTERNAL')"/>
-    <security:intercept-url pattern="/miso/admin/**"
-                            access="hasRole('ROLE_ADMIN')"/>
-    <security:intercept-url pattern="/miso/tech/**"
-                            access="hasRole('ROLE_TECH')"/>
-    <security:intercept-url pattern="/miso/reports/**"
-                            access="hasRole('ROLE_ADMIN') or hasRole('ROLE_TECH')"/>
-    <security:intercept-url pattern="/miso/stats/**"
-                            access="hasRole('ROLE_ADMIN') or hasRole('ROLE_TECH')"/>
-    <security:intercept-url pattern="/miso/activity/**"
-                            access="hasRole('ROLE_INTERNAL')"/>
-    <security:intercept-url pattern="/miso/protocols/**/results"
-                            access="hasRole('ROLE_INTERNAL') or hasRole('ROLE_EXTERNAL')"/>
-    <security:intercept-url pattern="/miso/external/**"
-                            access="hasRole('ROLE_INTERNAL') or hasRole('ROLE_EXTERNAL')"/>
-    <security:intercept-url pattern="/miso/mainMenu"
-                            access="hasRole('ROLE_INTERNAL') or hasRole('ROLE_EXTERNAL')"/>
+    <security:intercept-url pattern="/miso/fluxion.ajax" access="hasRole('ROLE_INTERNAL') or hasRole('ROLE_EXTERNAL')" />
+    <security:intercept-url pattern="/miso/admin/**" access="hasRole('ROLE_ADMIN')" />
+    <security:intercept-url pattern="/miso/tech/**" access="hasRole('ROLE_TECH')" />
+    <security:intercept-url pattern="/miso/reports/**" access="hasRole('ROLE_ADMIN') or hasRole('ROLE_TECH')" />
+    <security:intercept-url pattern="/miso/stats/**" access="hasRole('ROLE_ADMIN') or hasRole('ROLE_TECH')" />
+    <security:intercept-url pattern="/miso/activity/**" access="hasRole('ROLE_INTERNAL')" />
+    <security:intercept-url pattern="/miso/protocols/**/results" access="hasRole('ROLE_INTERNAL') or hasRole('ROLE_EXTERNAL')" />
+    <security:intercept-url pattern="/miso/external/**" access="hasRole('ROLE_INTERNAL') or hasRole('ROLE_EXTERNAL')" />
+    <security:intercept-url pattern="/miso/mainMenu" access="hasRole('ROLE_INTERNAL') or hasRole('ROLE_EXTERNAL')" />
 
-    <security:intercept-url pattern="/miso/**"
-                            access="hasRole('ROLE_INTERNAL') or hasRole('ROLE_EXTERNAL')"/>
+    <security:intercept-url pattern="/miso/**" access="hasRole('ROLE_INTERNAL') or hasRole('ROLE_EXTERNAL')" />
 
-    <security:session-management invalid-session-url="/login.jsp" session-fixation-protection="none"/>
+    <security:session-management invalid-session-url="/login.jsp" session-fixation-protection="none" />
   </security:http>
 
   <bean id="concurrencyFilter" class="org.springframework.security.web.session.ConcurrentSessionFilter">
-    <property name="sessionRegistry" ref="sessionRegistry"/>
-    <property name="expiredUrl" value="/login.jsp?login_error=2"/>
+    <property name="sessionRegistry" ref="sessionRegistry" />
+    <property name="expiredUrl" value="/login.jsp?login_error=2" />
   </bean>
 
-  <bean id="sessionRegistry" class="org.springframework.security.core.session.SessionRegistryImpl"/>
+  <bean id="sessionRegistry" class="org.springframework.security.core.session.SessionRegistryImpl" />
 
   <bean id="sas" class="org.springframework.security.web.authentication.session.ConcurrentSessionControlStrategy">
-    <property name="maximumSessions" value="-1"/>
-    <!--<property name="exceptionIfMaximumExceeded" value="false"/>-->
-    <constructor-arg name="sessionRegistry" ref="sessionRegistry"/>
+    <property name="maximumSessions" value="-1" />
+    <!--<property name="exceptionIfMaximumExceeded" value="false"/> -->
+    <constructor-arg name="sessionRegistry" ref="sessionRegistry" />
   </bean>
 
-  <bean id="httpSessionSecurityContextRepository"
-        class="org.springframework.security.web.context.HttpSessionSecurityContextRepository"/>
+  <bean id="httpSessionSecurityContextRepository" class="org.springframework.security.web.context.HttpSessionSecurityContextRepository" />
 
   <security:authentication-manager alias="authenticationManager">
     <security:authentication-provider user-service-ref="jdbcUserAuthService">
-      <security:password-encoder ref="passwordEncoder"/>
+      <security:password-encoder ref="passwordEncoder" />
     </security:authentication-provider>
   </security:authentication-manager>
 
-  <bean id="passwordEncoder" class="org.springframework.security.authentication.encoding.ShaPasswordEncoder"/>
+  <bean id="passwordEncoder" class="org.springframework.security.authentication.encoding.ShaPasswordEncoder" />
 
   <bean id="passwordCodecService" class="uk.ac.bbsrc.tgac.miso.core.security.ShaPasswordCodecService">
-    <property name="encoder" ref="passwordEncoder"/>
+    <property name="encoder" ref="passwordEncoder" />
   </bean>
 
-  <bean id="loginUrlAuthenticationEntryPoint"
-        class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
-    <property name="loginFormUrl" value="/login.jsp"/>
+  <bean id="loginUrlAuthenticationEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
+    <property name="loginFormUrl" value="/login.jsp" />
   </bean>
 
   <bean id="jdbcAuthFilter" class="org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter">
-    <property name="allowSessionCreation" value="true"/>
-    <property name="sessionAuthenticationStrategy" ref="sas"/>
-    <property name="authenticationManager" ref="authenticationManager"/>
-    <property name="authenticationFailureHandler" ref="failureHandler"/>
-    <property name="authenticationSuccessHandler" ref="successHandler"/>
+    <property name="allowSessionCreation" value="true" />
+    <property name="sessionAuthenticationStrategy" ref="sas" />
+    <property name="authenticationManager" ref="authenticationManager" />
+    <property name="authenticationFailureHandler" ref="failureHandler" />
+    <property name="authenticationSuccessHandler" ref="successHandler" />
   </bean>
-  <bean id="successHandler"
-        class="org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler">
-    <property name="defaultTargetUrl" value="/miso/mainMenu"/>
+  <bean id="successHandler" class="org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler">
+    <property name="defaultTargetUrl" value="/miso/mainMenu" />
   </bean>
-  <bean id="failureHandler"
-        class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
-    <property name="defaultFailureUrl" value="/login.jsp?login_error=1"/>
+  <bean id="failureHandler" class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
+    <property name="defaultFailureUrl" value="/login.jsp?login_error=1" />
   </bean>
 
   <bean id="jdbcUserAuthService" class="uk.ac.bbsrc.tgac.miso.sqlstore.manager.MisoJdbcUserDetailsManager">
-    <property name="usersByUsernameQuery" value="${security.jdbc.usersByUsernameQuery}"/>
-    <property name="authoritiesByUsernameQuery" value="${security.jdbc.authoritiesByUsernameQuery}"/>
-    <property name="rolePrefix" value="${security.jdbc.rolePrefix}"/>
-    <property name="enableAuthorities" value="${security.jdbc.enableAuthorities}"/>
-    <property name="jdbcTemplate" ref="interfaceTemplate"/>
+    <property name="usersByUsernameQuery" value="${security.jdbc.usersByUsernameQuery}" />
+    <property name="authoritiesByUsernameQuery" value="${security.jdbc.authoritiesByUsernameQuery}" />
+    <property name="rolePrefix" value="${security.jdbc.rolePrefix}" />
+    <property name="enableAuthorities" value="${security.jdbc.enableAuthorities}" />
+    <property name="jdbcTemplate" ref="interfaceTemplate" />
   </bean>
 
   <bean id="restSignatureFilter" class="uk.ac.bbsrc.tgac.miso.webapp.context.RestSignatureFilter">
-    <constructor-arg ref="httpSessionSecurityContextRepository"/>
-    <property name="securityManager" ref="securityManager"/>
+    <constructor-arg ref="httpSessionSecurityContextRepository" />
+    <property name="securityManager" ref="securityManager" />
   </bean>
 
   <bean id="exposeRequestUrlFilter" class="uk.ac.bbsrc.tgac.miso.webapp.context.ExposeRequestUrlFilter">
-    <constructor-arg ref="httpSessionSecurityContextRepository"/>
-    <property name="applicationContextProvider" ref="applicationContextProvider"/>
+    <constructor-arg ref="httpSessionSecurityContextRepository" />
+    <property name="applicationContextProvider" ref="applicationContextProvider" />
   </bean>
 </beans>

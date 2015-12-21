@@ -34,7 +34,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;import org.w3c.dom.Document;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
@@ -44,7 +46,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.UnicodeReader;
-
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.impl.illumina

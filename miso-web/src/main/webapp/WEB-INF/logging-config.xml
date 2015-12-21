@@ -13,51 +13,49 @@
   ~
   ~ MISO is distributed in the hope that it will be useful,
   ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
   ~ GNU General Public License for more details.
   ~
   ~ You should have received a copy of the GNU General Public License
-  ~ along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+  ~ along with MISO. If not, see <http://www.gnu.org/licenses/>.
   ~
   ~ **********************************************************************
-  -->
+-->
 
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:aop="http://www.springframework.org/schema/aop"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd"
-       default-autowire="byName">
+  default-autowire="byName">
 
   <aop:config>
     <aop:aspect id="requestLogAspect" ref="requestManagerFileLoggerAspectBean">
-      <aop:pointcut id="savePointcut"
-                    expression="execution(* uk.ac.bbsrc.tgac.miso.core.manager.Miso*.save*(..))"/>
-      <aop:after-returning pointcut-ref="savePointcut" method="logEvent" arg-names="join"/>
-      <aop:after-throwing pointcut-ref="savePointcut" method="logFailedEvent" throwing="e" arg-names="join, e"/>
+      <aop:pointcut id="savePointcut" expression="execution(* uk.ac.bbsrc.tgac.miso.core.manager.Miso*.save*(..))" />
+      <aop:after-returning pointcut-ref="savePointcut" method="logEvent" arg-names="join" />
+      <aop:after-throwing pointcut-ref="savePointcut" method="logFailedEvent" throwing="e" arg-names="join, e" />
     </aop:aspect>
     <!-- <aop:aspect id="limsAjaxLogAspect" ref="editFileLoggerAspectBean"> -->
-    <!-- <aop:pointcut id="reservedAjaxPointcut" type="aspectj" expression="execution(@uk.ac.bbsrc.tgac.miso.logging.LoggedAction * *(..)) and @within(net.sourceforge.fluxion.ajax.Ajaxified)"/> -->
+    <!-- <aop:pointcut id="reservedAjaxPointcut" type="aspectj" expression="execution(@uk.ac.bbsrc.tgac.miso.logging.LoggedAction * *(..)) and 
+      @within(net.sourceforge.fluxion.ajax.Ajaxified)"/> -->
     <!-- <aop:pointcut id="reservedAjaxPointcut" type="aspectj" expression="execution(* uk.ac.bbsrc.tgac.miso.ajax.logging.*Service.*(..))"/>
-<aop:after-returning pointcut-ref="reservedAjaxPointcut" method="logEvent" arg-names="join"/> -->
+      <aop:after-returning pointcut-ref="reservedAjaxPointcut" method="logEvent" arg-names="join"/> -->
     <!-- </aop:aspect> -->
     <aop:aspect id="notificationLogAspect" ref="notificationFileLoggerAspectBean">
       <aop:pointcut id="notificationPointcut"
-                    expression="within(uk.ac.bbsrc.tgac.miso.notification.consumer.service.mechanism.*.consume*) and @annotation(uk.ac.bbsrc.tgac.miso.core.logging.LoggedAction))"/>
-      <aop:after-returning pointcut-ref="notificationPointcut" method="logEvent" arg-names="join"/>
-      <aop:after-throwing pointcut-ref="notificationPointcut" method="logFailedEvent" throwing="e" arg-names="join, e"/>
+        expression="within(uk.ac.bbsrc.tgac.miso.notification.consumer.service.mechanism.*.consume*) and @annotation(uk.ac.bbsrc.tgac.miso.core.logging.LoggedAction))" />
+      <aop:after-returning pointcut-ref="notificationPointcut" method="logEvent" arg-names="join" />
+      <aop:after-throwing pointcut-ref="notificationPointcut" method="logFailedEvent" throwing="e" arg-names="join, e" />
     </aop:aspect>
   </aop:config>
 
   <bean id="requestManagerFileLoggerAspectBean" class="uk.ac.bbsrc.tgac.miso.core.logging.LogAspect">
-    <constructor-arg index="0" value="requestFileLogger"/>
+    <constructor-arg index="0" value="requestFileLogger" />
   </bean>
 
   <bean id="notificationFileLoggerAspectBean" class="uk.ac.bbsrc.tgac.miso.core.logging.LogAspect">
-    <constructor-arg index="0" value="notificationFileLogger"/>
+    <constructor-arg index="0" value="notificationFileLogger" />
   </bean>
 
   <bean id="editFileLoggerAspectBean" class="uk.ac.bbsrc.tgac.miso.core.logging.LogAspect">
-    <constructor-arg index="0" value="limsFileLogger"/>
+    <constructor-arg index="0" value="limsFileLogger" />
   </bean>
 </beans>

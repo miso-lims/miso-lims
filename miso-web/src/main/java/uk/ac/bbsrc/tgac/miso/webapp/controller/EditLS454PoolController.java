@@ -100,7 +100,7 @@ public class EditLS454PoolController {
 
   private List<? extends Dilution> populateAvailableDilutions(User user, Pool pool) throws IOException {
     ArrayList<emPCRDilution> libs = new ArrayList<emPCRDilution>();
-    for (Dilution l : requestManager.listAllEmPcrDilutionsByPlatform(PlatformType.LS454)) {
+    for (Dilution l : requestManager.listAllEmPCRDilutionsByPlatform(PlatformType.LS454)) {
       if (!pool.getDilutions().contains(l)) {
         if (l.userCanRead(user)) {
           libs.add((emPCRDilution) l);
@@ -236,7 +236,7 @@ public class EditLS454PoolController {
       }
 
       if (dilutionId != null) {
-        emPCRDilution ed = requestManager.getEmPcrDilutionById(dilutionId);
+        emPCRDilution ed = requestManager.getEmPCRDilutionById(dilutionId);
         if (ed != null) {
           pool.addPoolableElement(ed);
         }
@@ -266,7 +266,7 @@ public class EditLS454PoolController {
     LS454Pool p = (LS454Pool) model.get("pool");
     String[] dils = request.getParameterValues("importdilslist");
     for (String s : dils) {
-      emPCRDilution ld = requestManager.getEmPcrDilutionByBarcode(s);
+      emPCRDilution ld = requestManager.getEmPCRDilutionByBarcode(s);
       if (ld != null) {
         try {
           p.addPoolableElement(ld);

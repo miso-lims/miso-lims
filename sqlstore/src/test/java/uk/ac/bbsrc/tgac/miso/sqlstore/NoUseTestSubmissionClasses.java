@@ -23,19 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
-import org.junit.Before;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
-import uk.ac.bbsrc.tgac.miso.core.data.*;
-import uk.ac.bbsrc.tgac.miso.core.data.decorator.submission.era.*;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.*;
-import uk.ac.bbsrc.tgac.miso.core.data.type.SubmissionActionType;
-import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
-
-import javax.xml.parsers.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -46,9 +33,32 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.*;
+import javax.xml.validation.SchemaFactory;
+
+import org.junit.Before;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
+
+import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.Study;
+import uk.ac.bbsrc.tgac.miso.core.data.Submission;
+import uk.ac.bbsrc.tgac.miso.core.data.decorator.submission.era.EraExperimentDecorator;
+import uk.ac.bbsrc.tgac.miso.core.data.decorator.submission.era.EraSampleDecorator;
+import uk.ac.bbsrc.tgac.miso.core.data.decorator.submission.era.EraStudyDecorator;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SubmissionImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.type.SubmissionActionType;
+import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
 
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore Tests the MISO Submission classes using data from the dev DB. Creates submission, study, experiment and

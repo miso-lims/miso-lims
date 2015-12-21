@@ -31,7 +31,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.AbstractSampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
 
-
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.impl
  * <p/>

@@ -13,32 +13,28 @@
   ~
   ~ MISO is distributed in the hope that it will be useful,
   ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
   ~ GNU General Public License for more details.
   ~
   ~ You should have received a copy of the GNU General Public License
-  ~ along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+  ~ along with MISO. If not, see <http://www.gnu.org/licenses/>.
   ~
   ~ **********************************************************************
-  -->
+-->
 
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd"
-       default-autowire="byName">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd"
+  default-autowire="byName">
 
-    <bean id="barcodeFactory" class="uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeFactory"/>
-    <bean id="jscriptFactory" class="uk.ac.bbsrc.tgac.miso.core.factory.barcode.MisoJscriptFactory"/>
+  <bean id="barcodeFactory" class="uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeFactory" />
+  <bean id="jscriptFactory" class="uk.ac.bbsrc.tgac.miso.core.factory.barcode.MisoJscriptFactory" />
 
-    <bean id="printContextResolverService" name="printStrategyResolverService"
-          class="uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintContextResolverService"/>
-    <bean id="barcodeSchemaContextResolverService" name="barcodableSchemaResolverService"
-          class="uk.ac.bbsrc.tgac.miso.core.service.printing.MisoBarcodableSchemaResolverService"/>
+  <bean id="printContextResolverService" name="printStrategyResolverService" class="uk.ac.bbsrc.tgac.miso.core.service.printing.MisoPrintContextResolverService" />
+  <bean id="barcodeSchemaContextResolverService" name="barcodableSchemaResolverService" class="uk.ac.bbsrc.tgac.miso.core.service.printing.MisoBarcodableSchemaResolverService" />
 
-    <bean id="bradyFtpPrintStrategy"
-          class="uk.ac.bbsrc.tgac.miso.core.service.printing.strategy.impl.BradyFtpPrintStrategy"/>
+  <bean id="bradyFtpPrintStrategy" class="uk.ac.bbsrc.tgac.miso.core.service.printing.strategy.impl.BradyFtpPrintStrategy" />
 
-    <bean id="printManager" class="uk.ac.bbsrc.tgac.miso.core.manager.BarcodePrintManager">
-        <constructor-arg index="0" ref="printContextResolverService"/>
-    </bean>
+  <bean id="printManager" class="uk.ac.bbsrc.tgac.miso.core.manager.BarcodePrintManager">
+    <constructor-arg index="0" ref="printContextResolverService" />
+  </bean>
 </beans>

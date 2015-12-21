@@ -60,8 +60,6 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import net.sourceforge.fluxion.ajax.Ajaxified;
 import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.Barcodable;
@@ -912,7 +910,7 @@ public class LibraryControllerHelperService {
       }
       if (json.has("pcrId") && !isStringEmptyOrNull(json.getString("pcrId"))) {
         Long pcrId = Long.parseLong(json.getString("pcrId"));
-        emPCR pcr = requestManager.getEmPcrById(pcrId);
+        emPCR pcr = requestManager.getEmPCRById(pcrId);
         emPCRDilution newDilution = dataObjectFactory.getEmPCRDilution();
         newDilution.setSecurityProfile(pcr.getSecurityProfile());
         newDilution.setDilutionCreator(json.getString("pcrDilutionCreator"));
@@ -927,7 +925,7 @@ public class LibraryControllerHelperService {
         sb.append("</tr>");
 
         File temploc = new File(session.getServletContext().getRealPath("/") + "temp/");
-        for (emPCRDilution dil : requestManager.listAllEmPcrDilutionsByEmPcrId(pcrId)) {
+        for (emPCRDilution dil : requestManager.listAllEmPCRDilutionsByEmPcrId(pcrId)) {
           sb.append("<tr>");
           sb.append("<td>" + dil.getId() + "</td>");
           sb.append("<td>" + dil.getDilutionCreator() + "</td>");
@@ -1158,7 +1156,7 @@ public class LibraryControllerHelperService {
       if (json.has("empcrId")) {
         Long empcrId = json.getLong("empcrId");
         try {
-          requestManager.deleteEmPCR(requestManager.getEmPcrById(empcrId));
+          requestManager.deleteEmPCR(requestManager.getEmPCRById(empcrId));
           return JSONUtils.SimpleJSONResponse("EmPCR deleted");
         } catch (IOException e) {
           log.error("cannot delete EmPCR", e);
@@ -1185,7 +1183,7 @@ public class LibraryControllerHelperService {
       if (json.has("deleteEmPCRDilution")) {
         Long deleteEmPCRDilution = json.getLong("deleteEmPCRDilution");
         try {
-          requestManager.deleteEmPcrDilution(requestManager.getEmPcrDilutionById(deleteEmPCRDilution));
+          requestManager.deleteEmPCRDilution(requestManager.getEmPCRDilutionById(deleteEmPCRDilution));
           return JSONUtils.SimpleJSONResponse("EmPCRDilution deleted");
         } catch (IOException e) {
           log.error("cannot delete EmPCR dilution", e);

@@ -12,56 +12,56 @@
   ~
   ~ MISO is distributed in the hope that it will be useful,
   ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
   ~ GNU General Public License for more details.
   ~
   ~ You should have received a copy of the GNU General Public License
-  ~ along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+  ~ along with MISO. If not, see <http://www.gnu.org/licenses/>.
   ~
   ~ **********************************************************************
-  -->
+-->
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-    <xsl:output method="html"/>
+  <xsl:output method="html" />
 
-    <xsl:template match="/">
-        <div class="note">
-        <h3>Samples</h3>
-        <table class="list">
-            <tr bgcolor="#CCDDFF">
-                <th>Alias</th>
-                <th>Title</th>
-                <th>Scientific Name</th>
-                <th>Description</th>
-            </tr>
-            <xsl:choose>
-                <xsl:when test="SAMPLE_SET">
-                    <xsl:for-each select="SAMPLE_SET">
-                        <xsl:apply-templates select="SAMPLE"/>
-                    </xsl:for-each>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:apply-templates select="SAMPLE"/>
-                </xsl:otherwise>
-            </xsl:choose>
-        </table>
-        </div>
-    </xsl:template>
-
-    <xsl:template match="SAMPLE">
-        <tr>
-            <td>
-                <xsl:value-of select="@alias"/>
-            </td>
-            <td>
-                <xsl:value-of select="TITLE"/>
-            </td>
-            <td>
-                <xsl:value-of select="SCIENTIFIC_NAME"/>
-            </td>
-            <td>
-                <xsl:value-of select="DESCRIPTION"/>
-            </td>
+  <xsl:template match="/">
+    <div class="note">
+      <h3>Samples</h3>
+      <table class="list">
+        <tr bgcolor="#CCDDFF">
+          <th>Alias</th>
+          <th>Title</th>
+          <th>Scientific Name</th>
+          <th>Description</th>
         </tr>
-    </xsl:template>
+        <xsl:choose>
+          <xsl:when test="SAMPLE_SET">
+            <xsl:for-each select="SAMPLE_SET">
+              <xsl:apply-templates select="SAMPLE" />
+            </xsl:for-each>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:apply-templates select="SAMPLE" />
+          </xsl:otherwise>
+        </xsl:choose>
+      </table>
+    </div>
+  </xsl:template>
+
+  <xsl:template match="SAMPLE">
+    <tr>
+      <td>
+        <xsl:value-of select="@alias" />
+      </td>
+      <td>
+        <xsl:value-of select="TITLE" />
+      </td>
+      <td>
+        <xsl:value-of select="SCIENTIFIC_NAME" />
+      </td>
+      <td>
+        <xsl:value-of select="DESCRIPTION" />
+      </td>
+    </tr>
+  </xsl:template>
 </xsl:stylesheet>

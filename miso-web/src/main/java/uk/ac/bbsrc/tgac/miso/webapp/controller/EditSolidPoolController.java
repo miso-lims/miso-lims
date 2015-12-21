@@ -100,7 +100,7 @@ public class EditSolidPoolController {
 
   private List<? extends Dilution> populateAvailableDilutions(User user, Pool pool) throws IOException {
     ArrayList<emPCRDilution> libs = new ArrayList<emPCRDilution>();
-    for (emPCRDilution l : requestManager.listAllEmPcrDilutions()) {
+    for (emPCRDilution l : requestManager.listAllEmPCRDilutions()) {
       if (l.getEmPCR().getLibraryDilution().getLibrary().getPlatformName().equals(PlatformType.SOLID.getKey())) {
         if (!pool.getDilutions().contains(l)) {
           if (l.userCanRead(user)) {
@@ -238,7 +238,7 @@ public class EditSolidPoolController {
       }
 
       if (dilutionId != null) {
-        emPCRDilution ed = requestManager.getEmPcrDilutionById(dilutionId);
+        emPCRDilution ed = requestManager.getEmPCRDilutionById(dilutionId);
         if (ed != null) {
           pool.addPoolableElement(ed);
         }
@@ -268,7 +268,7 @@ public class EditSolidPoolController {
     SolidPool p = (SolidPool) model.get("pool");
     String[] dils = request.getParameterValues("importdilslist");
     for (String s : dils) {
-      emPCRDilution ld = requestManager.getEmPcrDilutionByBarcode(s);
+      emPCRDilution ld = requestManager.getEmPCRDilutionByBarcode(s);
       if (ld != null) {
         try {
           p.addPoolableElement(ld);

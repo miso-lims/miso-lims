@@ -45,11 +45,9 @@ import javax.persistence.Transient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
-
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
-
 import uk.ac.bbsrc.tgac.miso.core.data.impl.StatusImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -61,6 +59,7 @@ import uk.ac.bbsrc.tgac.miso.core.event.type.MisoEventType;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedRunQcException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
+
 
 /**
  * Skeleton implementation of a Run
@@ -111,7 +110,6 @@ public abstract class AbstractRun implements Run {
   // listeners
   private Set<MisoListener> listeners = new HashSet<MisoListener>();
   private Set<User> watchers = new HashSet<User>();
-
   private User lastModifier;
 
   @Override
@@ -125,7 +123,6 @@ public abstract class AbstractRun implements Run {
   }
 
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
-
   @Deprecated
   public Long getRunId() {
     return runId;

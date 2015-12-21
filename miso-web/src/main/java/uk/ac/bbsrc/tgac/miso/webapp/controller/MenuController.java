@@ -47,7 +47,6 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import uk.ac.bbsrc.tgac.miso.integration.util.SignatureHelper;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
-
 @Controller
 public class MenuController implements ServletContextAware {
   protected static final Logger log = LoggerFactory.getLogger(MenuController.class);

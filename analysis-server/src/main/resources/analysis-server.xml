@@ -13,136 +13,131 @@
   ~
   ~ MISO is distributed in the hope that it will be useful,
   ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
   ~ GNU General Public License for more details.
   ~
   ~ You should have received a copy of the GNU General Public License
-  ~ along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+  ~ along with MISO. If not, see <http://www.gnu.org/licenses/>.
   ~
   ~ **********************************************************************
-  -->
+-->
 
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd"
-       default-autowire="byName">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd"
+  default-autowire="byName">
 
-  <import resource="analysis-service.xml"/>
+  <import resource="analysis-service.xml" />
 
   <bean name="analysisManager" class="uk.ac.bbsrc.tgac.miso.analysis.manager.AnalysisRequestManager">
-    <property name="conanTaskService" ref="taskService"/>
-    <property name="conanUserService" ref="userService"/>
-    <property name="conanSubmissionService" ref="submissionService"/>
-    <property name="conanPipelineService" ref="pipelineService"/>
-    <property name="conanProcessService" ref="processService"/>
+    <property name="conanTaskService" ref="taskService" />
+    <property name="conanUserService" ref="userService" />
+    <property name="conanSubmissionService" ref="submissionService" />
+    <property name="conanPipelineService" ref="pipelineService" />
+    <property name="conanProcessService" ref="processService" />
   </bean>
 
   <bean name="conanTaskDAO" class="uk.ac.bbsrc.tgac.miso.analysis.dao.MySqlConanTaskDAO">
-    <property name="pipelineDAO" ref="conanPipelineDAO"/>
-    <property name="userDAO" ref="conanUserDAO"/>
-    <property name="jdbcTemplate" ref="conanJdbcTemplate"/>
+    <property name="pipelineDAO" ref="conanPipelineDAO" />
+    <property name="userDAO" ref="conanUserDAO" />
+    <property name="jdbcTemplate" ref="conanJdbcTemplate" />
     <property name="conanTaskListeners">
       <util:set value-type="uk.ac.ebi.fgpt.conan.core.task.ConanTaskListener">
-        <ref bean="taskListener"/>
+        <ref bean="taskListener" />
       </util:set>
     </property>
   </bean>
 
   <bean name="conanJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
-    <property name="dataSource" ref="conanDataSource"/>
+    <property name="dataSource" ref="conanDataSource" />
   </bean>
 
   <bean id="conanDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-    <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
-    <property name="url" value="${analysis.db.url}"/>
-    <property name="username" value="${analysis.db.username}"/>
-    <property name="password" value="${analysis.db.password}"/>
+    <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+    <property name="url" value="${analysis.db.url}" />
+    <property name="username" value="${analysis.db.username}" />
+    <property name="password" value="${analysis.db.password}" />
   </bean>
 
   <!-- Conan Pipeline DAO, used in several places to fetch loaded pipelines -->
   <bean name="conanPipelineDAO" class="uk.ac.ebi.fgpt.conan.dao.XMLLoadingPipelineDAO">
-    <property name="processDAO" ref="conanProcessDAO"/>
-    <property name="userDAO" ref="conanUserDAO"/>
+    <property name="processDAO" ref="conanProcessDAO" />
+    <property name="userDAO" ref="conanUserDAO" />
   </bean>
 
   <!-- Conan User DAOs - database and LDAP versions -->
   <bean name="conanUserDAO" class="uk.ac.bbsrc.tgac.miso.analysis.dao.MySqlConanUserDAO">
-    <property name="dataSource" ref="conanDataSource"/>
-    <property name="jdbcTemplate" ref="conanJdbcTemplate"/>
+    <property name="dataSource" ref="conanDataSource" />
+    <property name="jdbcTemplate" ref="conanJdbcTemplate" />
   </bean>
 
   <!-- Conan Process DAO, used by Pipeline DAO to fetch available processes -->
   <bean name="conanProcessDAO" class="uk.ac.ebi.fgpt.conan.dao.SpiDiscoveringProcessDAO">
-    <property name="conanProperties" ref="conanProperties"/>
+    <property name="conanProperties" ref="conanProperties" />
   </bean>
 
-  <bean name="conanProperties" class="uk.ac.ebi.fgpt.conan.properties.ConanProperties"
-        factory-method="getConanProperties">
-    <property name="propertiesFile" ref="conanPropertiesFile"/>
+  <bean name="conanProperties" class="uk.ac.ebi.fgpt.conan.properties.ConanProperties" factory-method="getConanProperties">
+    <property name="propertiesFile" ref="conanPropertiesFile" />
   </bean>
 
   <bean name="conanPropertiesFile" class="java.io.File">
-    <constructor-arg index="0" type="java.lang.String" value="conan.properties"/>
+    <constructor-arg index="0" type="java.lang.String" value="conan.properties" />
   </bean>
 
   <!-- SERVICES -->
 
   <!-- Pipeline service -->
-  <bean name="pipelineService" class="uk.ac.ebi.fgpt.conan.service.DefaultPipelineService"
-        init-method="loadPipelines">
-    <property name="pipelineDAO" ref="conanPipelineDAO"/>
+  <bean name="pipelineService" class="uk.ac.ebi.fgpt.conan.service.DefaultPipelineService" init-method="loadPipelines">
+    <property name="pipelineDAO" ref="conanPipelineDAO" />
     <!-- <property name="daemonService" ref="daemonService"/> -->
   </bean>
 
   <!-- Process service -->
   <bean name="processService" class="uk.ac.ebi.fgpt.conan.service.DefaultProcessService">
-    <property name="processDAO" ref="conanProcessDAO"/>
+    <property name="processDAO" ref="conanProcessDAO" />
   </bean>
 
   <!-- User service -->
   <bean name="userService" class="uk.ac.ebi.fgpt.conan.service.DefaultUserService">
-    <property name="trustedDAO" ref="conanUserDAO"/>
+    <property name="trustedDAO" ref="conanUserDAO" />
   </bean>
 
   <!-- Submission service -->
-  <bean name="submissionService" class="uk.ac.ebi.fgpt.conan.service.DefaultSubmissionService"
-        init-method="init"
-        destroy-method="destroy">
+  <bean name="submissionService" class="uk.ac.ebi.fgpt.conan.service.DefaultSubmissionService" init-method="init" destroy-method="destroy">
     <!-- number of allowed parallel processes -->
-    <constructor-arg name="numberOfParallelJobs" value="${analysis.submission.parallelJobLimit}"/>
+    <constructor-arg name="numberOfParallelJobs" value="${analysis.submission.parallelJobLimit}" />
     <!-- time in seconds to hold jobs before running -->
-    <constructor-arg name="coolingOffPeriod" value="${analysis.submission.coolingOffPeriod}"/>
-    <property name="taskService" ref="taskService"/>
+    <constructor-arg name="coolingOffPeriod" value="${analysis.submission.coolingOffPeriod}" />
+    <property name="taskService" ref="taskService" />
   </bean>
 
   <!-- Task service -->
   <!-- <bean name="taskService" class="uk.ac.ebi.fgpt.conan.service.DefaultTaskService"> -->
   <bean name="taskService" class="uk.ac.bbsrc.tgac.miso.analysis.service.AnalysisTaskService">
-    <property name="conanPipelineDAO" ref="conanPipelineDAO"/>
-    <property name="conanTaskFactory" ref="taskFactory"/>
-    <property name="conanTaskDAO" ref="conanTaskDAO"/>
+    <property name="conanPipelineDAO" ref="conanPipelineDAO" />
+    <property name="conanTaskFactory" ref="taskFactory" />
+    <property name="conanTaskDAO" ref="conanTaskDAO" />
   </bean>
 
   <!-- task factory for generating new tasks -->
   <bean name="taskFactory" class="uk.ac.ebi.fgpt.conan.factory.DefaultTaskFactory">
     <property name="conanTaskListeners">
       <util:set value-type="uk.ac.ebi.fgpt.conan.core.task.ConanTaskListener">
-        <ref bean="taskListener"/>
+        <ref bean="taskListener" />
       </util:set>
     </property>
   </bean>
 
   <!-- task listener that updates database in response to changes in task state etc -->
   <bean name="taskListener" class="uk.ac.ebi.fgpt.conan.factory.DAOWritingConanTaskListener">
-    <property name="conanTaskDAO" ref="conanTaskDAO"/>
+    <property name="conanTaskDAO" ref="conanTaskDAO" />
   </bean>
 
   <!-- Daemon service -->
   <!--
-  <bean name="daemonService" class="uk.ac.ebi.fgpt.conan.service.DefaultDaemonService" destroy-method="shutdown">
+    <bean name="daemonService" class="uk.ac.ebi.fgpt.conan.service.DefaultDaemonService" destroy-method="shutdown">
     <property name="taskService" ref="taskService"/>
     <property name="submissionService" ref="submissionService"/>
     <property name="userService" ref="userService"/>
-  </bean>
+    </bean>
   -->
 </beans>

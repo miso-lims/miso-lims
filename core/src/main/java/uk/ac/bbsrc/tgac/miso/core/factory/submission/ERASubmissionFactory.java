@@ -41,7 +41,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.decorator.submission.era.EraRunDecorator;
 import uk.ac.bbsrc.tgac.miso.core.data.decorator.submission.era.EraSampleDecorator;
 import uk.ac.bbsrc.tgac.miso.core.data.decorator.submission.era.EraStudyDecorator;
 import uk.ac.bbsrc.tgac.miso.core.data.decorator.submission.era.EraSubmissionDecorator;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
 
 /**
  * Generates XML fragments for Submission, Study, Sample, Experiment and Run schema datatypes based on the SRA submission schema, backed by
@@ -87,7 +86,7 @@ public class ERASubmissionFactory {
     new EraSubmissionDecorator(submission, submissionProperties, doc).buildSubmission();
   }
 
-  /**
+ /**
    * Generate a Study XML fragment from a Study object and pipe the results into the supplied DOM XML Document
    * 
    * @param doc
@@ -116,7 +115,7 @@ public class ERASubmissionFactory {
     }
   }
 
-  /**
+ /**
    * Generate an Experiment XML fragment from an Experiment object and pipe the results into the supplied DOM XML Document
    * 
    * @param doc
@@ -145,7 +144,7 @@ public class ERASubmissionFactory {
     }
   }
 
-  /**
+ /**
    * Generate a Sample XML fragment from a Sample object and pipe the results into the supplied DOM XML Document
    * 
    * @param doc
@@ -174,7 +173,7 @@ public class ERASubmissionFactory {
     }
   }
 
-  /**
+ /**
    * Generate a Run XML fragment from a SequencerExperimentPartition object (that is present on the given Run object) and pipe the results
    * into the supplied DOM XML Document
    * 
@@ -187,7 +186,7 @@ public class ERASubmissionFactory {
     new EraRunDecorator(p, submissionProperties, doc).buildSubmission();
   }
 
-  /**
+ /**
    * Generate a Run XML fragment from a SequencerExperimentPartition object (that is present on the given Run object) and pipe the results
    * into the supplied DOM XML Document
    * 
@@ -232,7 +231,7 @@ public class ERASubmissionFactory {
     Element runSet = doc.createElementNS(null, "RUN_SET");
     doc.appendChild(runSet);
 
-    for (SequencerPartitionContainer<SequencerPoolPartition> f : ((RunImpl) r).getSequencerPartitionContainers()) {
+    for (SequencerPartitionContainer<SequencerPoolPartition> f : r.getSequencerPartitionContainers()) {
       for (SequencerPoolPartition p : f.getPartitions()) {
         if (p.getPool() != null) {
           generatePartitionRunSubmissionXML(doc, p, r, submissionProperties);

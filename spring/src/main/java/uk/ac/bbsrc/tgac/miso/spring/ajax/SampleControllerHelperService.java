@@ -60,6 +60,7 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import com.google.json.JsonSanitizer;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -767,10 +768,10 @@ public class SampleControllerHelperService {
       JSONArray jsonArray = new JSONArray();
       for (Sample sample : requestManager.listAllSamples()) {
 
-        jsonArray.add("['" + sample.getName() + "','" + sample.getAlias() + "','" + sample.getSampleType() + "','"
-            + (sample.getQcPassed() != null ? sample.getQcPassed().toString() : "") + "','" + getSampleLastQC(sample.getId()) + "','"
-            + "<a href=\"/miso/sample/" + sample.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "','"
-            + (sample.getIdentificationBarcode() != null ? sample.getIdentificationBarcode() : "") + "','" + "']");
+        jsonArray.add(JsonSanitizer.sanitize("[\"" + sample.getName() + "\",\"" + sample.getAlias() + "\",\"" + sample.getSampleType()
+            + "\",\"" + (sample.getQcPassed() != null ? sample.getQcPassed().toString() : "") + "\",\"" + getSampleLastQC(sample.getId())
+            + "\",'" + "<a href=\"/miso/sample/" + sample.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']"));
+
       }
       j.put("array", jsonArray);
       return j;

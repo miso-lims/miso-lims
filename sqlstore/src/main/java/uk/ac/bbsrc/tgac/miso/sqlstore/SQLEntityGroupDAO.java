@@ -1,7 +1,17 @@
 package uk.ac.bbsrc.tgac.miso.sqlstore;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
+import java.io.IOException;
+import java.lang.reflect.ParameterizedType;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
+
 import org.codehaus.jackson.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +20,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import uk.ac.bbsrc.tgac.miso.core.data.*;
+
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
+import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.EntityGroupImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.store.EntityGroupStore;
@@ -19,13 +33,6 @@ import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DaoLookup;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
-
-import javax.persistence.CascadeType;
-import java.io.IOException;
-import java.lang.reflect.ParameterizedType;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.*;
 
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore
@@ -306,7 +313,7 @@ public class SQLEntityGroupDAO implements EntityGroupStore {
 
   private Set<Nameable> resolveEntityGroupElements(long groupId) throws IOException, SQLException {
     try {
-      Set<Nameable> elements = new HashSet<Nameable>();
+      Set<Nameable> elements = new HashSet<>();
       List<Map<String, Object>> rows = template.queryForList(ENTITYGROUP_ELEMENT_SELECT, groupId);
       for (Map<String, Object> map : rows) {
         Class<? extends Nameable> clz = Class.forName((String) map.get("entityType")).asSubclass(Nameable.class);

@@ -23,10 +23,11 @@
 
 package uk.ac.bbsrc.tgac.miso.sqlstore.cache;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import com.googlecode.ehcache.annotations.key.AbstractCacheKeyGenerator;
-import uk.ac.bbsrc.tgac.miso.core.data.Partition;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Partition;
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 
 /**

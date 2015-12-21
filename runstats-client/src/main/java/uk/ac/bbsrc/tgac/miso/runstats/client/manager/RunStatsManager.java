@@ -23,13 +23,28 @@
 
 package uk.ac.bbsrc.tgac.miso.runstats.client.manager;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.sql.DataSource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
-import uk.ac.bbsrc.tgac.miso.core.data.*;
-import uk.ac.bbsrc.tgac.miso.core.data.impl.RunImpl;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
+import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 import uk.ac.bbsrc.tgac.miso.runstats.client.RunStatsException;
 import uk.ac.tgac.statsdb.exception.ConsumerException;
 import uk.ac.tgac.statsdb.run.ReportTable;
@@ -37,11 +52,6 @@ import uk.ac.tgac.statsdb.run.Reports;
 import uk.ac.tgac.statsdb.run.ReportsDecorator;
 import uk.ac.tgac.statsdb.run.RunProperty;
 import uk.ac.tgac.statsdb.run.consumer.D3PlotConsumer;
-
-import javax.sql.DataSource;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.*;
 
 /**
  * uk.ac.bbsrc.tgac.miso.runstats.client.manager
@@ -116,9 +126,9 @@ public class RunStatsManager {
       log.error("get summary stats for run", e);
     }
 
-    if (!((RunImpl) run).getSequencerPartitionContainers().isEmpty()) {
+    if (!run.getSequencerPartitionContainers().isEmpty()) {
       JSONObject containers = new JSONObject();
-      for (SequencerPartitionContainer<SequencerPoolPartition> container : ((RunImpl) run).getSequencerPartitionContainers()) {
+      for (SequencerPartitionContainer<SequencerPoolPartition> container : run.getSequencerPartitionContainers()) {
         JSONObject f = new JSONObject();
         f.put("idBarcode", container.getIdentificationBarcode());
 
@@ -194,8 +204,8 @@ public class RunStatsManager {
 
     // clear any previous barcode query
     map.remove(RunProperty.barcode);
-    if (!((RunImpl) run).getSequencerPartitionContainers().isEmpty()) {
-      for (SequencerPartitionContainer<SequencerPoolPartition> container : ((RunImpl) run).getSequencerPartitionContainers()) {
+    if (!run.getSequencerPartitionContainers().isEmpty()) {
+      for (SequencerPartitionContainer<SequencerPoolPartition> container : run.getSequencerPartitionContainers()) {
         SequencerPoolPartition part = container.getPartitionAt(laneNumber);
         if (part.getPartitionNumber() == laneNumber) {
           if (part.getPool() != null) {

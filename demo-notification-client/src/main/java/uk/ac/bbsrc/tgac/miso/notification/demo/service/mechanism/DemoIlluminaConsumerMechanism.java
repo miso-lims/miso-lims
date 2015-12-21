@@ -23,11 +23,18 @@
 
 package uk.ac.bbsrc.tgac.miso.notification.demo.service.mechanism;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.integration.Message;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaRun;
@@ -35,8 +42,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.illumina.IlluminaStatus;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.exception.InterrogationException;
 import uk.ac.bbsrc.tgac.miso.core.service.integration.mechanism.NotificationMessageConsumerMechanism;
-
-import java.util.*;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.service.integration.mechanism.impl

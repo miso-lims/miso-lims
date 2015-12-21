@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.analysis.parameter;
 
 import org.springframework.util.StringUtils;
+
 import uk.ac.ebi.fgpt.conan.model.AbstractConanParameter;
 
 /**

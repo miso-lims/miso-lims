@@ -35,9 +35,6 @@ import java.util.Map;
 
 import javax.persistence.CascadeType;
 
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
-
 import org.codehaus.jackson.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +45,15 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.store.SecurityStore;
+import com.googlecode.ehcache.annotations.Cacheable;
+import com.googlecode.ehcache.annotations.KeyGenerator;
+import com.googlecode.ehcache.annotations.Property;
+import com.googlecode.ehcache.annotations.TriggersRemove;
+
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPlate;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
@@ -67,13 +73,6 @@ import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DaoLookup;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
-
-import com.eaglegenomics.simlims.core.SecurityProfile;
-import com.eaglegenomics.simlims.core.store.SecurityStore;
-import com.googlecode.ehcache.annotations.Cacheable;
-import com.googlecode.ehcache.annotations.KeyGenerator;
-import com.googlecode.ehcache.annotations.Property;
-import com.googlecode.ehcache.annotations.TriggersRemove;
 
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore
@@ -311,7 +310,6 @@ public class SQLPlateDAO implements PlateStore {
           if (autoGenerateIdentificationBarcodes) {
             autoGenerateIdBarcode(plate);
           } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
-
           params.addValue("name", name);
 
           params.addValue("identificationBarcode", plate.getIdentificationBarcode());
@@ -334,7 +332,6 @@ public class SQLPlateDAO implements PlateStore {
         if (autoGenerateIdentificationBarcodes) {
           autoGenerateIdBarcode(plate);
         } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
-
         if (namingScheme.validateField("name", plate.getName())) {
           params.addValue("plateId", plate.getId());
           params.addValue("name", plate.getName());

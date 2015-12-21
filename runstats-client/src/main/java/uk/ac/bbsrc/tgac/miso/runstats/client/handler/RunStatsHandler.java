@@ -24,6 +24,7 @@
 package uk.ac.bbsrc.tgac.miso.runstats.client.handler;
 
 import org.springframework.beans.factory.annotation.Autowired;
+
 import uk.ac.bbsrc.tgac.miso.runstats.client.RunstatsStore;
 import uk.ac.bbsrc.tgac.miso.runstats.client.manager.RunStatsManager;
 

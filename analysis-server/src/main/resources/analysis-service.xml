@@ -13,23 +13,21 @@
   ~
   ~ MISO is distributed in the hope that it will be useful,
   ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
   ~ GNU General Public License for more details.
   ~
   ~ You should have received a copy of the GNU General Public License
-  ~ along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+  ~ along with MISO. If not, see <http://www.gnu.org/licenses/>.
   ~
   ~ **********************************************************************
-  -->
+-->
 
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:integration="http://www.springframework.org/schema/integration"
-       xmlns:ip="http://www.springframework.org/schema/integration/ip"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:integration="http://www.springframework.org/schema/integration"
+  xmlns:ip="http://www.springframework.org/schema/integration/ip"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
        http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
        http://www.springframework.org/schema/integration/ip http://www.springframework.org/schema/integration/ip/spring-integration-ip-2.0.xsd"
-       default-autowire="byName">
+  default-autowire="byName">
 
   <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
     <property name="locations">
@@ -37,66 +35,44 @@
         <value>classpath:analysis.properties</value>
       </list>
     </property>
-    <property name="ignoreResourceNotFound" value="true"/>
+    <property name="ignoreResourceNotFound" value="true" />
   </bean>
 
   <bean name="analysisRequestService" class="uk.ac.bbsrc.tgac.miso.analysis.service.AnalysisRequestService">
-    <property name="analysisRequestManager" ref="analysisManager"/>
+    <property name="analysisRequestManager" ref="analysisManager" />
   </bean>
 
-  <bean name="payloadTransformer" class="uk.ac.bbsrc.tgac.miso.analysis.util.PayloadTransformer"/>
+  <bean name="payloadTransformer" class="uk.ac.bbsrc.tgac.miso.analysis.util.PayloadTransformer" />
 
-  <integration:annotation-config/>
-  <integration:channel id="responseChannel"/>
-  <integration:channel id="serviceChannel"/>
+  <integration:annotation-config />
+  <integration:channel id="responseChannel" />
+  <integration:channel id="serviceChannel" />
 
   <bean id="tcpSerializer" class="org.springframework.integration.ip.tcp.serializer.ByteArrayCrLfSerializer">
-    <property name="maxMessageSize" value="${analysis.client.maxMessageSize}"/>
+    <property name="maxMessageSize" value="${analysis.client.maxMessageSize}" />
   </bean>
 
   <bean id="tcpDeserializer" class="org.springframework.integration.ip.tcp.serializer.ByteArrayCrLfSerializer">
-    <property name="maxMessageSize" value="${analysis.server.maxMessageSize}"/>
+    <property name="maxMessageSize" value="${analysis.server.maxMessageSize}" />
   </bean>
 
-  <ip:tcp-connection-factory id="analysisRequestServer"
-                             type="server"
-                             port="${analysis.server.port}"
-                             using-nio="false"
-                             single-use="true"
-                             deserializer="tcpDeserializer"/>
+  <ip:tcp-connection-factory id="analysisRequestServer" type="server" port="${analysis.server.port}" using-nio="false"
+    single-use="true" deserializer="tcpDeserializer" />
 
-  <ip:tcp-inbound-gateway id="requestGateway"
-                          connection-factory="analysisRequestServer"
-                          request-channel="serverBytes2StringChannel"
-                          reply-channel="responseChannel"
-                          error-channel="errorChannel"/>
+  <ip:tcp-inbound-gateway id="requestGateway" connection-factory="analysisRequestServer" request-channel="serverBytes2StringChannel"
+    reply-channel="responseChannel" error-channel="errorChannel" />
 
-  <integration:transformer id="serverBytes2String"
-                           input-channel="serverBytes2StringChannel"
-                           output-channel="serviceChannel"
-                           ref="payloadTransformer"
-                           method="transform"/>
+  <integration:transformer id="serverBytes2String" input-channel="serverBytes2StringChannel" output-channel="serviceChannel"
+    ref="payloadTransformer" method="transform" />
 
-  <integration:service-activator id="analysisServiceActivator"
-                                 input-channel="serviceChannel"
-                                 ref="analysisRequestService"
-                                 method="processRequest"/>
+  <integration:service-activator id="analysisServiceActivator" input-channel="serviceChannel" ref="analysisRequestService"
+    method="processRequest" />
 
-  <ip:tcp-connection-factory id="client"
-                type="client"
-                host="${analysis.client.host}"
-                port="${analysis.client.port}"
-                so-timeout="10000"/>
-<!--single-use="true" -->
+  <ip:tcp-connection-factory id="client" type="client" host="${analysis.client.host}" port="${analysis.client.port}"
+    so-timeout="10000" />
+  <!--single-use="true" -->
 
-        <ip:tcp-outbound-gateway id="outGateway"
-                request-channel="responseChannel"
-                reply-channel="clientBytes2StringChannel"
-                connection-factory="client"
-                request-timeout="10000"
-                reply-timeout="10000"
-                />
-        <integration:transformer id="clientBytes2String"
-                input-channel="clientBytes2StringChannel"
-                expression="new String(payload)"/>
+  <ip:tcp-outbound-gateway id="outGateway" request-channel="responseChannel" reply-channel="clientBytes2StringChannel"
+    connection-factory="client" request-timeout="10000" reply-timeout="10000" />
+  <integration:transformer id="clientBytes2String" input-channel="clientBytes2StringChannel" expression="new String(payload)" />
 </beans>

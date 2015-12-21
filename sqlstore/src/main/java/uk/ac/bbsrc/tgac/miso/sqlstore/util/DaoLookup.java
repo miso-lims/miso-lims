@@ -1,10 +1,13 @@
 package uk.ac.bbsrc.tgac.miso.sqlstore.util;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.ac.bbsrc.tgac.miso.core.store.Store;
 
-import java.util.*;
+import uk.ac.bbsrc.tgac.miso.core.store.Store;
 
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore.util

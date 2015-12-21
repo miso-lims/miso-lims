@@ -23,13 +23,14 @@
 
 package uk.ac.bbsrc.tgac.miso.analysis.parameter;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
-import uk.ac.ebi.fgpt.conan.model.AbstractConanParameter;
 
-import java.io.File;
-import java.io.IOException;
+import uk.ac.ebi.fgpt.conan.model.AbstractConanParameter;
 
 /**
  * uk.ac.bbsrc.tgac.miso.analysis.parameter

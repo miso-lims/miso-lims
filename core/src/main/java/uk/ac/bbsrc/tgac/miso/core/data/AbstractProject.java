@@ -241,6 +241,9 @@ public abstract class AbstractProject implements Project {
   @Override
   public void setOverviews(Collection<ProjectOverview> overviews) {
     this.overviews = overviews;
+    for (ProjectOverview po : overviews) {
+      po.setProject(this);
+    }
   }
 
   @Override

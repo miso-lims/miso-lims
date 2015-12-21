@@ -30,6 +30,8 @@ import javax.persistence.CascadeType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.lob.DefaultLobHandler;
 
+import com.eaglegenomics.simlims.core.manager.LocalSecurityManager;
+
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoRequestManager;
@@ -56,8 +58,6 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.SQLSequencerReferenceDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLStatusDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLStudyDAO;
 import uk.ac.bbsrc.tgac.miso.sqlstore.SQLTgacSubmissionDAO;
-
-import com.eaglegenomics.simlims.core.manager.LocalSecurityManager;
 
 /**
  * Nasty class to manually wire up a MisoRequestManager.

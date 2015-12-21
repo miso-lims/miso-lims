@@ -25,10 +25,11 @@ package uk.ac.bbsrc.tgac.miso.notification.service;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
-import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import net.sf.json.JSONObject;
 import uk.ac.bbsrc.tgac.miso.notification.exception.InvalidRequestParameterException;
 import uk.ac.bbsrc.tgac.miso.notification.manager.NotificationRequestManager;
 

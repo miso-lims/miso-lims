@@ -12,24 +12,24 @@
   ~
   ~ MISO is distributed in the hope that it will be useful,
   ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
   ~ GNU General Public License for more details.
   ~
   ~ You should have received a copy of the GNU General Public License
-  ~ along with MISO.  If not, see <http://www.gnu.org/licenses/>.
+  ~ along with MISO. If not, see <http://www.gnu.org/licenses/>.
   ~
   ~ **********************************************************************
-  -->
+-->
 
 <!DOCTYPE aspectj PUBLIC
         "-//AspectJ//DTD//EN" "http://www.eclipse.org/aspectj/dtd/aspectj.dtd">
 <aspectj>
-    <weaver options="-showWeaveInfo -verbose -debug -XmessageHandlerClass:org.springframework.aop.aspectj.AspectJWeaverMessageHandler">
-        <include within="uk.ac.bbsrc.tgac.miso.spring.ajax.logging.*"/>
-        <include within="uk.ac.bbsrc.tgac.miso.core.logging.*"/>
-    </weaver>
+  <weaver options="-showWeaveInfo -verbose -debug -XmessageHandlerClass:org.springframework.aop.aspectj.AspectJWeaverMessageHandler">
+    <include within="uk.ac.bbsrc.tgac.miso.spring.ajax.logging.*" />
+    <include within="uk.ac.bbsrc.tgac.miso.core.logging.*" />
+  </weaver>
 
-    <aspects>
-        <aspect name="uk.ac.bbsrc.tgac.miso.core.logging.LogAspect"/>
-    </aspects>
+  <aspects>
+    <aspect name="uk.ac.bbsrc.tgac.miso.core.logging.LogAspect" />
+  </aspects>
 </aspectj>

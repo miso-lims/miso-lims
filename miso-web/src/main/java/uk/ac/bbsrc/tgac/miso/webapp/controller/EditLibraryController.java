@@ -405,7 +405,7 @@ public class EditLibraryController {
   public Collection<emPCRDilution> populateEmPcrDilutions(User user, Collection<emPCR> pcrs) throws IOException {
     Collection<emPCRDilution> dilutions = new HashSet<emPCRDilution>();
     for (emPCR pcr : pcrs) {
-      for (emPCRDilution dilution : requestManager.listAllEmPcrDilutionsByEmPcrId(pcr.getId())) {
+      for (emPCRDilution dilution : requestManager.listAllEmPCRDilutionsByEmPcrId(pcr.getId())) {
         dilution.setEmPCR(pcr);
         dilutions.add(dilution);
       }

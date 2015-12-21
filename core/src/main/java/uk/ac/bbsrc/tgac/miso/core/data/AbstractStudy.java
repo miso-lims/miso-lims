@@ -40,12 +40,11 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.w3c.dom.Document;
-
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
-
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedExperimentException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
+
 
 /**
  * Skeleton implementation of a Study
@@ -88,7 +87,6 @@ public abstract class AbstractStudy implements Study {
   private String studyType;
   @Column(name = "alias")
   private String alias;
-
   private final Collection<ChangeLog> changeLog = new ArrayList<ChangeLog>();
   private User lastModifier;
 

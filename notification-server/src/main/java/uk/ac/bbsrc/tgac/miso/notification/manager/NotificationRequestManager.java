@@ -25,20 +25,21 @@ package uk.ac.bbsrc.tgac.miso.notification.manager;
 
 import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import uk.ac.bbsrc.tgac.miso.notification.service.IlluminaTransformer;
-import uk.ac.bbsrc.tgac.miso.tools.run.RunFolderScanner;
-import uk.ac.bbsrc.tgac.miso.tools.run.util.FileSetTransformer;
-
 import java.io.File;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import org.codehaus.jackson.map.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import uk.ac.bbsrc.tgac.miso.notification.service.IlluminaTransformer;
+import uk.ac.bbsrc.tgac.miso.tools.run.RunFolderScanner;
+import uk.ac.bbsrc.tgac.miso.tools.run.util.FileSetTransformer;
 
 /**
  * uk.ac.bbsrc.tgac.miso.notification.manager

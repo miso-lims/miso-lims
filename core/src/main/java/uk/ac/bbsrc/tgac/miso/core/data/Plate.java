@@ -161,7 +161,6 @@ public interface Plate<T extends List<S>, S>
    * 
    * @return T element.
    */
-  // @JsonManagedReference
   public T getElements();
 
   public void setElements(T elements);

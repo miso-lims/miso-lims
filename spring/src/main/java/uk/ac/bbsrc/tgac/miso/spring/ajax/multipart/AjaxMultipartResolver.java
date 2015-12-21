@@ -23,7 +23,12 @@
 
 package uk.ac.bbsrc.tgac.miso.spring.ajax.multipart;
 
-import net.sourceforge.fluxion.ajax.beans.util.FileUploadListener;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.fileupload.FileUpload;
 import org.apache.commons.fileupload.FileUploadBase;
 import org.apache.commons.fileupload.FileUploadException;
@@ -35,10 +40,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import net.sourceforge.fluxion.ajax.beans.util.FileUploadListener;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax.multipart
