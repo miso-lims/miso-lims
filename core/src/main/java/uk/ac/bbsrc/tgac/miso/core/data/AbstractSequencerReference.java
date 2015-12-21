@@ -88,7 +88,7 @@ public abstract class AbstractSequencerReference implements SequencerReference {
 
   @Override
   public void checkAvailability(int timeout) throws IOException {
-    this.available = getIpAddress().isReachable(timeout);
+    this.available = getIpAddress() == null ? false : getIpAddress().isReachable(timeout);
   }
 
   @Override

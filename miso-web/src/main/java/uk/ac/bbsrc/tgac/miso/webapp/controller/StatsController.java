@@ -223,7 +223,7 @@ public class StatsController {
     model.put("platformtype", PlatformType.ILLUMINA);
     Collection<SequencerReference> s = new ArrayList<SequencerReference>();
     for (SequencerReference sr : populateSequencerReferences()) {
-      if (sr.getPlatform().getPlatformType().equals(PlatformType.ILLUMINA)) {
+      if (sr.getPlatform() != null && PlatformType.ILLUMINA.equals(sr.getPlatform().getPlatformType())) {
         s.add(sr);
       }
     }
