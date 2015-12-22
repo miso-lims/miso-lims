@@ -157,6 +157,7 @@ public class SampleControllerHelperService {
   public JSONObject bulkSaveSamples(HttpSession session, JSONObject json) {
     if (json.has("samples")) {
       try {
+        User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
         Project p = requestManager.getProjectById(json.getLong("projectId"));
         SecurityProfile sp = p.getSecurityProfile();
         JSONArray a = JSONArray.fromObject(json.get("samples"));
@@ -240,6 +241,7 @@ public class SampleControllerHelperService {
             }
 
             try {
+              sample.setLastModifier(user);
               requestManager.saveSample(sample);
               savedSamples.add(sample.getAlias());
               log.info("Saved: " + sample.getAlias());
@@ -461,6 +463,7 @@ public class SampleControllerHelperService {
       note.setCreationDate(new Date());
       sample.getNotes().add(note);
       requestManager.saveSampleNote(sample, note);
+      sample.setLastModifier(user);
       requestManager.saveSample(sample);
     } catch (IOException e) {
       log.error("add sample note", e);
@@ -523,10 +526,12 @@ public class SampleControllerHelperService {
     JSONArray ss = JSONArray.fromObject(json.getString("samples"));
 
     try {
+      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       for (JSONObject s : (Iterable<JSONObject>) ss) {
         Long sampleId = s.getLong("sampleId");
         Sample sample = requestManager.getSampleById(sampleId);
         sample.setReceivedDate(new Date());
+        sample.setLastModifier(user);
         requestManager.saveSample(sample);
       }
       response.put("result", "Samples received date saved");
@@ -613,6 +618,7 @@ public class SampleControllerHelperService {
           Sample sample = requestManager.getSampleById(sampleId);
           // autosave the barcode if none has been previously generated
           if (isStringEmptyOrNull(sample.getIdentificationBarcode())) {
+            sample.setLastModifier(user);
             requestManager.saveSample(sample);
           }
           File f = mps.getLabelFor(sample);
@@ -653,6 +659,7 @@ public class SampleControllerHelperService {
         note.setCreationDate(new Date());
         sample.getNotes().add(note);
         requestManager.saveSampleNote(sample, note);
+        sample.setLastModifier(user);
         requestManager.saveSample(sample);
       } else {
         return JSONUtils.SimpleJSONError("New location barcode not recognised");
@@ -671,8 +678,10 @@ public class SampleControllerHelperService {
 
     try {
       if (!isStringEmptyOrNull(idBarcode)) {
+        User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
         Sample sample = requestManager.getSampleById(sampleId);
         sample.setIdentificationBarcode(idBarcode);
+        sample.setLastModifier(user);
         requestManager.saveSample(sample);
       } else {
         return JSONUtils.SimpleJSONError("New identification barcode not recognized");

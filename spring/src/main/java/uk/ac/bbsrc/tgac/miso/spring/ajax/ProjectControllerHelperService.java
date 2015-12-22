@@ -496,6 +496,7 @@ public class ProjectControllerHelperService {
       for (final Sample sample : samples) {
         // autosave the barcode if none has been previously generated
         if (isStringEmptyOrNull(sample.getIdentificationBarcode())) {
+          sample.setLastModifier(user);
           requestManager.saveSample(sample);
         }
         final File f = mps.getLabelFor(sample);
@@ -540,6 +541,7 @@ public class ProjectControllerHelperService {
         final Long sampleId = p.getLong("sampleId");
         final Sample sample = requestManager.getSampleById(sampleId);
         if (isStringEmptyOrNull(sample.getIdentificationBarcode())) {
+          sample.setLastModifier(user);
           requestManager.saveSample(sample);
         }
         final File f = mps.getLabelFor(sample);
@@ -584,6 +586,7 @@ public class ProjectControllerHelperService {
       for (final Library library : libraries) {
         // autosave the barcode if none has been previously generated
         if (isStringEmptyOrNull(library.getIdentificationBarcode())) {
+          library.setLastModifier(user);
           requestManager.saveLibrary(library);
         }
         final File f = mps.getLabelFor(library);
@@ -629,6 +632,7 @@ public class ProjectControllerHelperService {
         final Library library = requestManager.getLibraryById(libraryId);
         // autosave the barcode if none has been previously generated
         if (isStringEmptyOrNull(library.getIdentificationBarcode())) {
+          library.setLastModifier(user);
           requestManager.saveLibrary(library);
         }
         final File f = mps.getLabelFor(library);

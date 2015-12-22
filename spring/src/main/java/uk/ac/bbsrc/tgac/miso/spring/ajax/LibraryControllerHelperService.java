@@ -173,6 +173,7 @@ public class LibraryControllerHelperService {
       note.setCreationDate(new Date());
       library.getNotes().add(note);
       requestManager.saveLibraryNote(library, note);
+      library.setLastModifier(user);
       requestManager.saveLibrary(library);
     } catch (IOException e) {
       log.error("add library note", e);
@@ -187,11 +188,13 @@ public class LibraryControllerHelperService {
     Long noteId = json.getLong("noteId");
 
     try {
+      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Library library = requestManager.getLibraryById(libraryId);
       Note note = requestManager.getNoteById(noteId);
       if (library.getNotes().contains(note)) {
         library.getNotes().remove(note);
         requestManager.deleteNote(note);
+        library.setLastModifier(user);
         requestManager.saveLibrary(library);
         return JSONUtils.SimpleJSONResponse("OK");
       } else {
@@ -273,6 +276,7 @@ public class LibraryControllerHelperService {
           Library library = requestManager.getLibraryById(libraryId);
           // autosave the barcode if none has been previously generated
           if (isStringEmptyOrNull(library.getIdentificationBarcode())) {
+            library.setLastModifier(user);
             requestManager.saveLibrary(library);
           }
 
@@ -365,6 +369,7 @@ public class LibraryControllerHelperService {
         note.setCreationDate(new Date());
         library.getNotes().add(note);
         requestManager.saveLibraryNote(library, note);
+        library.setLastModifier(user);
         requestManager.saveLibrary(library);
       } else {
         return JSONUtils.SimpleJSONError("New location barcode not recognised");
@@ -382,9 +387,11 @@ public class LibraryControllerHelperService {
     String idBarcode = json.getString("identificationBarcode");
 
     try {
+      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       if (!isStringEmptyOrNull(idBarcode)) {
         Library library = requestManager.getLibraryById(libraryId);
         library.setIdentificationBarcode(idBarcode);
+        library.setLastModifier(user);
         requestManager.saveLibrary(library);
       } else {
         return JSONUtils.SimpleJSONError("New identification barcode not recognized");
@@ -437,6 +444,7 @@ public class LibraryControllerHelperService {
   public JSONObject bulkSaveLibraries(HttpSession session, JSONObject json) {
     if (json.has("libraries")) {
       try {
+        User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
         Project p = requestManager.getProjectById(json.getLong("projectId"));
         JSONArray a = JSONArray.fromObject(json.get("libraries"));
         Set<Library> saveSet = new HashSet<Library>();
