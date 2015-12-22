@@ -761,12 +761,13 @@ public class FlexReportingControllerHelperService {
               if (l.getQcPassed() != null) {
                 if (l.getQcPassed()) {
                   libqcpassed++;
-                } else {
-                  libqcfailed++;
                 }
+              } else {
+                libqcfailed++;
               }
             }
           }
+          
 
           if (libqcpassed > 0 || libqcfailed > 0) {
             overviewRelationArray.add(
@@ -822,10 +823,9 @@ public class FlexReportingControllerHelperService {
         sampleQC = library.getSample().getQcPassed().toString();
       }
 
-      jsonArray.add(JsonSanitizer.sanitize("[\"" + library.getSample().getProject().getName() + "\",\"" + library.getName() + "\",\""
-          + library.getAlias() + "\",\"" + library.getDescription() + "\",\"" + library.getPlatformName() + "\",\""
-          + library.getLibraryType().getDescription() + "\",\"" + qc + "\",\"" + LimsUtils.getDateAsString(library.getCreationDate())
-          + "\",\"" + library.getSample().getName() + "\",\"" + sampleQC + "\"]"));
+      jsonArray.add("['" + library.getSample().getProject().getName() + "','" + library.getName() + "','" + library.getAlias() + "','"
+          + library.getDescription() + "','" + library.getPlatformName() + "','" + library.getLibraryType().getDescription() + "','" + qc
+          + "','" + LimsUtils.getDateAsString(library.getCreationDate()) + "','" + library.getSample().getName() + "','" + sampleQC + "']");
     }
     return jsonArray;
   }

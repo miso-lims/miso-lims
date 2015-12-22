@@ -487,7 +487,8 @@ public class LibraryControllerHelperService {
               }
               library.setPaired(paired);
 
-              if (j.has("tagBarcodes") && !isStringEmptyOrNull(j.getString("tagBarcodes")) && !j.getString("tagBarcodes").contains("Select")) {
+              if (j.has("tagBarcodes") && !isStringEmptyOrNull(j.getString("tagBarcodes"))
+                  && !j.getString("tagBarcodes").contains("Select")) {
                 String[] codes = j.getString("tagBarcodes").split(Pattern.quote("|"));
                 HashMap<Integer, TagBarcode> barcodes = new HashMap<Integer, TagBarcode>();
                 int count = 1;
@@ -673,8 +674,8 @@ public class LibraryControllerHelperService {
         String qcDate = qc.getString("qcDate");
         String insertSize = qc.getString("insertSize");
 
-        if (isStringEmptyOrNull(qcType) || isStringEmptyOrNull(results) || isStringEmptyOrNull(qcCreator)
-            || isStringEmptyOrNull(qcDate) || isStringEmptyOrNull(insertSize)) {
+        if (isStringEmptyOrNull(qcType) || isStringEmptyOrNull(results) || isStringEmptyOrNull(qcCreator) || isStringEmptyOrNull(qcDate)
+            || isStringEmptyOrNull(insertSize)) {
           ok = false;
         }
       }
@@ -1016,8 +1017,7 @@ public class LibraryControllerHelperService {
         String dilutionDate = dil.getString("pcrDilutionDate");
         String concentration = dil.getString("results");
 
-        if (isStringEmptyOrNull(concentration) || isStringEmptyOrNull(dilutionCreator)
-            || isStringEmptyOrNull(dilutionDate)) {
+        if (isStringEmptyOrNull(concentration) || isStringEmptyOrNull(dilutionCreator) || isStringEmptyOrNull(dilutionDate)) {
           ok = false;
         }
       }
