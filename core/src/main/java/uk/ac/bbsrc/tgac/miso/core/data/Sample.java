@@ -54,8 +54,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @JsonTypeName("sample")
 @JsonIgnoreProperties({"securityProfile","submissionDocument"})
 @PrintableBarcode
-public interface Sample
-    extends SecurableByProfile, Submittable<Document>, Barcodable, Locatable, Reportable, Comparable, Deletable, Plateable {
+public interface Sample extends SecurableByProfile, Submittable<Document>, Locatable, Reportable, Comparable, Deletable, Plateable, Boxable {
 
   /** Field UNSAVED_ID */
   public static final Long UNSAVED_ID = 0L;
@@ -148,21 +147,6 @@ public interface Sample
    *          taxonIdentifier.
    */
   public void setTaxonIdentifier(String taxonIdentifier);
-
-  /**
-   * Returns the alias of this Sample object.
-   * 
-   * @return String alias.
-   */
-  public String getAlias();
-
-  /**
-   * Sets the alias of this Sample object.
-   * 
-   * @param alias
-   *          alias.
-   */
-  public void setAlias(String alias);
 
   /**
    * Returns the project of this Sample object.

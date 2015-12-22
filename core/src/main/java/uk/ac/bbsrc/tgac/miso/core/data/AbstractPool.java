@@ -57,7 +57,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.jackson.PooledElementDeserializer;
  * @author Rob Davey
  * @since 0.0.2
  */
-public abstract class AbstractPool<P extends Poolable> implements Pool<P> {
+public abstract class AbstractPool<P extends Poolable> extends AbstractBoxable implements Pool<P> {
   protected static final Logger log = LoggerFactory.getLogger(AbstractPool.class);
 
   public static final Long UNSAVED_ID = 0L;
@@ -70,7 +70,6 @@ public abstract class AbstractPool<P extends Poolable> implements Pool<P> {
   private SecurityProfile securityProfile;
 
   private String name;
-  private String alias;
 
   private final Collection<P> pooledElements = new HashSet<P>();
   private Collection<Experiment> experiments = new HashSet<Experiment>();
@@ -135,16 +134,6 @@ public abstract class AbstractPool<P extends Poolable> implements Pool<P> {
   @Override
   public void setName(String name) {
     this.name = name;
-  }
-
-  @Override
-  public String getAlias() {
-    return alias;
-  }
-
-  @Override
-  public void setAlias(String alias) {
-    this.alias = alias;
   }
 
   @Override
