@@ -23,6 +23,8 @@
 
 package uk.ac.bbsrc.tgac.miso.core.data;
 
+import java.util.Date;
+
 import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
@@ -49,4 +51,57 @@ public interface SequencerReference extends HardwareReference, Deletable {
    * @return Platform platform.
    */
   Platform getPlatform();
+  
+  public void setSerialNumber(String serialNumber);
+  
+  public String getSerialNumber();
+  
+  /**
+   * Sets the date when use of this sequencer began
+   * 
+   * @param date
+   */
+  public void setDateCommissioned(Date date);
+  
+  /**
+   * @return the date when use of this sequencer began
+   */
+  public Date getDateCommissioned();
+  
+  /**
+   * Sets the date when use of this sequencer ended
+   * 
+   * @param date
+   */
+  public void setDateDecommissioned(Date date);
+  
+  /**
+   * @return the date when use of this sequencer ended
+   */
+  public Date getDateDecommissioned();
+  
+  /**
+   * Sets the upgraded sequencer reference, which is a new version of this same sequencer, likely renamed during an upgrade
+   * 
+   * @param sequencer
+   */
+  public void setUpgradedSequencerReference(SequencerReference sequencer);
+  
+  /**
+   * @return the upgraded sequencer reference, which is a new version of this same sequencer, likely renamed during an upgrade
+   */
+  public SequencerReference getUpgradedSequencerReference();
+  
+  /**
+   * Sets the pre-upgrade sequencer reference, which is a previous version of this same sequencer, likely before an upgrade caused a rename
+   * 
+   * @param sequencer
+   */
+  public void setPreUpgradeSequencerReference(SequencerReference sequencer);
+  
+  /**
+   * @return the pre-upgrade sequencer reference, which is a previous version of this same sequencer, likely before an upgrade caused a rename
+   */
+  public SequencerReference getPreUpgradeSequencerReference();
+  
 }

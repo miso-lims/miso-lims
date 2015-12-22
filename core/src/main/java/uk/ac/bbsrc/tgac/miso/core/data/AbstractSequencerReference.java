@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +46,11 @@ public abstract class AbstractSequencerReference implements SequencerReference {
   private Platform platform;
   private Boolean available;
   private InetAddress ip;
+  private String serialNumber;
+  private Date dateCommissioned;
+  private Date dateDecommissioned;
+  private SequencerReference upgradedSequencerReference;
+  private SequencerReference preUpgradeSequencerReference;
 
   @Override
   public void setId(Long id) {
@@ -102,6 +108,56 @@ public abstract class AbstractSequencerReference implements SequencerReference {
   }
 
   @Override
+  public void setSerialNumber(String serialNumber) {
+    this.serialNumber = serialNumber;
+  }
+
+  @Override
+  public String getSerialNumber() {
+    return serialNumber;
+  }
+
+  @Override
+  public void setDateCommissioned(Date date) {
+    this.dateCommissioned = date;
+  }
+
+  @Override
+  public Date getDateCommissioned() {
+    return dateCommissioned;
+  }
+
+  @Override
+  public void setDateDecommissioned(Date date) {
+    this.dateDecommissioned = date;
+  }
+
+  @Override
+  public Date getDateDecommissioned() {
+    return dateDecommissioned;
+  }
+
+  @Override
+  public void setUpgradedSequencerReference(SequencerReference sequencer) {
+    this.upgradedSequencerReference = sequencer;
+  }
+
+  @Override
+  public SequencerReference getUpgradedSequencerReference() {
+    return upgradedSequencerReference;
+  }
+
+  @Override
+  public void setPreUpgradeSequencerReference(SequencerReference sequencer) {
+    this.preUpgradeSequencerReference = sequencer;
+  }
+
+  @Override
+  public SequencerReference getPreUpgradeSequencerReference() {
+    return preUpgradeSequencerReference;
+  }
+
+  @Override
   public String getFQDN() {
     return getIpAddress() == null ? null : getIpAddress().getCanonicalHostName();
   }
@@ -113,14 +169,13 @@ public abstract class AbstractSequencerReference implements SequencerReference {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append(getId());
-    sb.append(" : ");
-    sb.append(getName());
-    sb.append(" : ");
-    sb.append(getFQDN());
-    sb.append(" : ");
-    sb.append(getAvailable());
-    return sb.toString();
+    return "AbstractSequencerReference [id=" + id + ", name=" + name
+        + ", platform=" + (platform == null ? null : platform.getPlatformId()) + ", available=" + available
+        + ", ip=" + (ip == null ? null : ip.toString())
+        + ", serialNumber=" + serialNumber
+        + ", dateCommissioned=" + (dateCommissioned == null ? null : dateCommissioned.toString())
+        + ", dateDecommissioned=" + (dateDecommissioned == null ? null : dateDecommissioned.toString())
+        + ", upgradedSequencerReference=" + (upgradedSequencerReference == null ? null : upgradedSequencerReference.getId()) + "]";
   }
+  
 }
