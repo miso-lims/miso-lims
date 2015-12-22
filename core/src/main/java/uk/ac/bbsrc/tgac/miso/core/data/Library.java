@@ -57,7 +57,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @JsonTypeName("library")
 @JsonIgnoreProperties({"securityProfile"})
 @PrintableBarcode
-public interface Library extends SecurableByProfile, Comparable, Barcodable, Locatable, Deletable, Plateable {
+public interface Library extends SecurableByProfile, Comparable, Barcodable, Locatable, Deletable, Plateable, Boxable {
 
   /** Field PREFIX */
   public static final String PREFIX = "LIB";
@@ -103,21 +103,6 @@ public interface Library extends SecurableByProfile, Comparable, Barcodable, Loc
    *          description.
    */
   public void setDescription(String description);
-
-  /**
-   * Returns the alias of this Library object.
-   * 
-   * @return String alias.
-   */
-  public String getAlias();
-
-  /**
-   * Sets the alias of this Library object.
-   * 
-   * @param alias
-   *          alias.
-   */
-  public void setAlias(String alias);
 
   /**
    * Returns the accession of this Library object.

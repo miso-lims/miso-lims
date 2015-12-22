@@ -62,7 +62,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  */
 @Entity
 @Table(name = "`Sample`")
-public abstract class AbstractSample implements Sample {
+public abstract class AbstractSample extends AbstractBoxable implements Sample {
   protected static final Logger log = LoggerFactory.getLogger(AbstractSample.class);
   public static final Long UNSAVED_ID = 0L;
   private static final long serialVersionUID = 1L;
@@ -105,6 +105,7 @@ public abstract class AbstractSample implements Sample {
   private String alias;
   private Date lastUpdated;
   private User lastModifier;
+  private boolean empty;
 
   @Override
   public User getLastModifier() {
@@ -196,16 +197,6 @@ public abstract class AbstractSample implements Sample {
   @Override
   public void setTaxonIdentifier(String taxonIdentifier) {
     this.taxonIdentifier = taxonIdentifier;
-  }
-
-  @Override
-  public String getAlias() {
-    return alias;
-  }
-
-  @Override
-  public void setAlias(String alias) {
-    this.alias = alias;
   }
 
   @Override

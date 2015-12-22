@@ -59,7 +59,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
  * @author Rob Davey
  * @since 0.0.2
  */
-public abstract class AbstractLibrary implements Library {
+public abstract class AbstractLibrary extends AbstractBoxable implements Library {
   protected static final Logger log = LoggerFactory.getLogger(AbstractLibrary.class);
   public static final Long UNSAVED_ID = 0L;
   public static final String UNITS = "nM";
@@ -156,17 +156,6 @@ public abstract class AbstractLibrary implements Library {
     this.accession = accession;
   }
 
-  @Override
-  public String getAlias() {
-    return alias;
-  }
-
-  @Override
-  public void setAlias(String alias) {
-    this.alias = alias;
-  }
-
-  @Override
   public Date getCreationDate() {
     return creationDate;
   }

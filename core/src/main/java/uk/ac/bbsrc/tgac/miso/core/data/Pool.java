@@ -54,7 +54,7 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @JsonIgnoreProperties({ "securityProfile", "dilutions" })
 @PrintableBarcode
-public interface Pool<P extends Poolable> extends SecurableByProfile, Comparable, Barcodable, Watchable, Deletable, Alertable {
+public interface Pool<P extends Poolable> extends SecurableByProfile, Comparable, Barcodable, Watchable, Deletable, Alertable, Boxable {
   /**
    * Returns the poolId of this Pool object.
    * 
@@ -95,6 +95,7 @@ public interface Pool<P extends Poolable> extends SecurableByProfile, Comparable
    * 
    * @return String alias.
    */
+  @Override
   public String getAlias();
 
   /**
@@ -104,6 +105,7 @@ public interface Pool<P extends Poolable> extends SecurableByProfile, Comparable
    *          alias.
    * 
    */
+  @Override
   public void setAlias(String alias);
 
   /**
