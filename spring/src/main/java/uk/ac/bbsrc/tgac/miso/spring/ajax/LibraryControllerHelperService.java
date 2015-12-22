@@ -747,10 +747,11 @@ public class LibraryControllerHelperService {
 
         File temploc = new File(session.getServletContext().getRealPath("/") + "temp/");
         for (LibraryDilution dil : library.getLibraryDilutions()) {
+          SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
           sb.append("<tr>");
           sb.append("<td>" + dil.getName() + "</td>");
           sb.append("<td>" + dil.getDilutionCreator() + "</td>");
-          sb.append("<td>" + dil.getCreationDate() + "</td>");
+          sb.append("<td>" + date.format(dil.getCreationDate()) + "</td>");
           sb.append("<td>" + dil.getConcentration() + " " + dil.getUnits() + "</td>");
           sb.append("<td>");
 
@@ -765,7 +766,7 @@ public class LibraryControllerHelperService {
               }
             }
           } catch (IOException e) {
-            log.error("failed to add library dilution to this library", e);
+            log.error("Error generating library dilution barcode", e);
           }
           sb.append("</td>");
 
