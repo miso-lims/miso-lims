@@ -183,8 +183,8 @@ public class PoolControllerHelperService {
         String qcCreator = qc.getString("qcCreator");
         String qcDate = qc.getString("qcDate");
 
-        if (isStringEmptyOrNull(qcPassed) || isStringEmptyOrNull(qcType) || isStringEmptyOrNull(results)
-            || isStringEmptyOrNull(qcCreator) || isStringEmptyOrNull(qcDate)) {
+        if (isStringEmptyOrNull(qcPassed) || isStringEmptyOrNull(qcType) || isStringEmptyOrNull(results) || isStringEmptyOrNull(qcCreator)
+            || isStringEmptyOrNull(qcDate)) {
           ok = false;
         }
       }
@@ -258,8 +258,8 @@ public class PoolControllerHelperService {
       }
     }
     sb.append("</div>");
-    sb.append("<a onclick='Utils.ui.checkAll(\"importdilslist\"); return false;' href='javascript:void(0);'>All</a> " +
-              "/ <a onclick='Utils.ui.uncheckAll(\"importdilslist\"); return false;' href='javascript:void(0);'>None</a>");
+    sb.append("<a onclick='Utils.ui.checkAll(\"importdilslist\"); return false;' href='javascript:void(0);'>All</a> "
+        + "/ <a onclick='Utils.ui.uncheckAll(\"importdilslist\"); return false;' href='javascript:void(0);'>None</a>");
     sb.append("<br/><button type='submit' class='br-button ui-state-default ui-corner-all'>Use</button>");
     return sb.toString();
   }
