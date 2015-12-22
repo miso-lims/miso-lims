@@ -416,7 +416,10 @@ public class PoolControllerHelperService {
     try {
       if (!isStringEmptyOrNull(idBarcode)) {
         Pool<? extends Poolable> pool = requestManager.getPoolById(poolId);
+        User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+
         pool.setIdentificationBarcode(idBarcode);
+        pool.setLastModifier(user);
         requestManager.savePool(pool);
       } else {
         return JSONUtils.SimpleJSONError("New identification barcode not recognized");
@@ -470,6 +473,7 @@ public class PoolControllerHelperService {
 
   public JSONObject selectStudyForPool(HttpSession session, JSONObject json) {
     try {
+      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Long poolId = json.getLong("poolId");
       Pool p = requestManager.getPoolById(poolId);
 
@@ -492,6 +496,7 @@ public class PoolControllerHelperService {
 
           try {
             p.addExperiment(e);
+            e.setLastModifier(user);
             requestManager.saveExperiment(e);
           } catch (MalformedExperimentException e1) {
             log.error("save experiment", e1);

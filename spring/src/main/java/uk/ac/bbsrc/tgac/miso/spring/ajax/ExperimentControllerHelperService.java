@@ -259,6 +259,7 @@ public class ExperimentControllerHelperService {
 
         Experiment e = requestManager.getExperimentById(new Long(experimentId));
         e.addKit(lk);
+        e.setLastModifier(securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName()));
         requestManager.saveExperiment(e);
         Integer newStock = kd.getStockLevel() - 1;
         kd.setStockLevel(newStock);
@@ -320,6 +321,7 @@ public class ExperimentControllerHelperService {
 
         Experiment e = requestManager.getExperimentById(new Long(experimentId));
         e.addKit(lk);
+        e.setLastModifier(securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName()));
         requestManager.saveExperiment(e);
         Integer newStock = kd.getStockLevel() - 1;
         kd.setStockLevel(newStock);
@@ -381,6 +383,7 @@ public class ExperimentControllerHelperService {
 
         Experiment e = requestManager.getExperimentById(new Long(experimentId));
         e.addKit(lk);
+        e.setLastModifier(securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName()));
         requestManager.saveExperiment(e);
         Integer newStock = kd.getStockLevel() - 1;
         kd.setStockLevel(newStock);
@@ -442,6 +445,7 @@ public class ExperimentControllerHelperService {
 
         Experiment e = requestManager.getExperimentById(new Long(experimentId));
         e.addKit(lk);
+        e.setLastModifier(securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName()));
         requestManager.saveExperiment(e);
         Integer newStock = kd.getStockLevel() - 1;
         kd.setStockLevel(newStock);

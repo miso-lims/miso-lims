@@ -892,6 +892,7 @@ public class RunControllerHelperService {
       note.setCreationDate(new Date());
       run.getNotes().add(note);
       requestManager.saveRunNote(run, note);
+      run.setLastModifier(user);
       requestManager.saveRun(run);
     } catch (IOException e) {
       log.error("add run note", e);
@@ -911,6 +912,7 @@ public class RunControllerHelperService {
       if (run.getNotes().contains(note)) {
         run.getNotes().remove(note);
         requestManager.deleteNote(note);
+        run.setLastModifier(securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName()));
         requestManager.saveRun(run);
         return JSONUtils.SimpleJSONResponse("OK");
       } else {
@@ -929,6 +931,7 @@ public class RunControllerHelperService {
       Run run = requestManager.getRunById(runId);
       if (!run.getWatchers().contains(user)) {
         watchManager.watch(run, user);
+        run.setLastModifier(user);
         requestManager.saveRun(run);
       }
       return JSONUtils.SimpleJSONResponse("OK");
@@ -945,6 +948,7 @@ public class RunControllerHelperService {
       Run run = requestManager.getRunById(runId);
       if (run.getWatchers().contains(user)) {
         watchManager.unwatch(run, user);
+        run.setLastModifier(user);
         requestManager.saveRun(run);
       }
       return JSONUtils.SimpleJSONResponse("OK");
