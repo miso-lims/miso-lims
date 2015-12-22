@@ -119,52 +119,43 @@ public class SQLPoolDAO implements PoolStore {
 
   public static final String POOL_EXPERIMENT_DELETE_BY_POOL_ID = "DELETE FROM Pool_Experiment " + "WHERE pool_poolId=:pool_poolId";
 
-  public static final String EMPCR_POOL_SELECT_BY_RELATED_PROJECT = "SELECT DISTINCT pool.* " + "FROM Project p "
+  public static final String EMPCR_POOL_SELECT_BY_RELATED_PROJECT = POOL_SELECT
+      + " WHERE poolId IN (SELECT DISTINCT pool_poolId FROM Project p " + "INNER JOIN Sample sa ON sa.project_projectId = p.projectId "
+      + "INNER JOIN Library li ON li.sample_sampleId = sa.sampleId "
+      + "INNER JOIN LibraryDilution ld ON ld.library_libraryId = li.libraryId "
+      + "LEFT JOIN emPCR e ON e.dilution_dilutionId = ld.dilutionId " + "LEFT JOIN emPCRDilution ed ON ed.emPCR_pcrId = e.pcrId "
+      + "LEFT JOIN Pool_Elements ple ON ple.elementId = ed.dilutionId "
+      + "WHERE p.projectId = ? AND ple.elementType = 'uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution')";
+
+  public static final String DILUTION_POOL_SELECT_BY_RELATED_PROJECT = POOL_SELECT
+      + " WHERE poolId IN (SELECT DISTINCT pool_poolId FROM Project p "
+
       + "INNER JOIN Sample sa ON sa.project_projectId = p.projectId " + "INNER JOIN Library li ON li.sample_sampleId = sa.sampleId "
-      + "INNER JOIN LibraryDilution ld ON ld.library_libraryId = li.libraryId " +
+      + "INNER JOIN LibraryDilution ld ON ld.library_libraryId = li.libraryId "
+      + "LEFT JOIN Pool_Elements pld ON pld.elementId = ld.dilutionId "
+      + "WHERE p.projectId = ? AND pld.elementType = 'uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution')";
 
-  "LEFT JOIN emPCR e ON e.dilution_dilutionId = ld.dilutionId " + "LEFT JOIN emPCRDilution ed ON ed.emPCR_pcrId = e.pcrId " +
+  public static final String PLATE_POOL_SELECT_BY_RELATED_PROJECT = POOL_SELECT
+      + " WHERE poolId IN (SELECT DISTINCT pool_poolId FROM Project p "
 
-  "LEFT JOIN Pool_Elements ple ON ple.elementId = ed.dilutionId " +
-
-  "INNER JOIN " + TABLE_NAME + " pool ON pool.poolId = ple.pool_poolId "
-      + "WHERE p.projectId = ? AND ple.elementType = 'uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution'";
-
-  public static final String DILUTION_POOL_SELECT_BY_RELATED_PROJECT = "SELECT DISTINCT pool.* " + "FROM Project p "
       + "INNER JOIN Sample sa ON sa.project_projectId = p.projectId " + "INNER JOIN Library li ON li.sample_sampleId = sa.sampleId "
-      + "INNER JOIN LibraryDilution ld ON ld.library_libraryId = li.libraryId " +
+      + "INNER JOIN Plate_Elements pe ON li.libraryId = pe.elementId " + "INNER JOIN Plate pl ON pl.plateId = pe.plate_plateId "
+      + "LEFT JOIN Pool_Elements pld ON pld.elementId = pl.plateId " + "WHERE p.projectId= ? AND pld.elementType LIKE '%Plate')";
 
-  "LEFT JOIN Pool_Elements pld ON pld.elementId = ld.dilutionId " +
+  public static final String POOL_SELECT_BY_RELATED_LIBRARY = POOL_SELECT
+      + " WHERE poolId IN (SELECT COALESCE(pld.pool_poolId, ple.pool_poolId) FROM Library li "
+      + "INNER JOIN LibraryDilution ld ON ld.library_libraryId = li.libraryId "
+      + "LEFT JOIN emPCR e ON e.dilution_dilutionId = ld.dilutionId " + "LEFT JOIN emPCRDilution ed ON ed.emPCR_pcrId = e.pcrId "
+      + "LEFT JOIN Pool_Elements pld ON pld.elementId = ld.dilutionId " + "LEFT JOIN Pool_Elements ple ON ple.elementId = ed.dilutionId "
+      + "WHERE li.libraryId=?)";
 
-  "INNER JOIN " + TABLE_NAME + " pool ON pool.poolId = pld.pool_poolId "
-      + "WHERE p.projectId = ? AND pld.elementType = 'uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution'";
-
-  public static final String PLATE_POOL_SELECT_BY_RELATED_PROJECT = "SELECT DISTINCT pool.* " + "FROM Project p "
-      + "INNER JOIN Sample sa ON sa.project_projectId = p.projectId " + "INNER JOIN Library li ON li.sample_sampleId = sa.sampleId "
-      + "INNER JOIN Plate_Elements pe ON li.libraryId = pe.elementId " + "INNER JOIN Plate pl ON pl.plateId = pe.plate_plateId " +
-
-  "LEFT JOIN Pool_Elements pld ON pld.elementId = pl.plateId " +
-
-  "INNER JOIN " + TABLE_NAME + " pool ON pool.poolId = pld.pool_poolId " + "WHERE p.projectId= ? AND pld.elementType LIKE '%Plate'";
-
-  public static final String POOL_SELECT_BY_RELATED_LIBRARY = "SELECT DISTINCT pool.* " + "FROM Library li "
-      + "INNER JOIN LibraryDilution ld ON ld.library_libraryId = li.libraryId " +
-
-  "LEFT JOIN emPCR e ON e.dilution_dilutionId = ld.dilutionId " + "LEFT JOIN emPCRDilution ed ON ed.emPCR_pcrId = e.pcrId " +
-
-  "LEFT JOIN Pool_Elements pld ON pld.elementId = ld.dilutionId " + "LEFT JOIN Pool_Elements ple ON ple.elementId = ed.dilutionId " +
-
-  "INNER JOIN " + TABLE_NAME + " pool ON pool.poolId = pld.pool_poolId " + "OR pool.poolId = ple.pool_poolId " + "WHERE li.libraryId=?";
-
-  public static final String POOL_SELECT_BY_RELATED_SAMPLE = "SELECT DISTINCT pool.* " + "FROM Sample s "
+  public static final String POOL_SELECT_BY_RELATED_SAMPLE = POOL_SELECT
+      + " WHERE poolId IN (SELECT COALESCE(ple.pool_poolId, pld.pool_poolId) FROM Sample s "
       + "INNER JOIN Library li ON li.sample_sampleId = s.sampleId "
-      + "INNER JOIN LibraryDilution ld ON ld.library_libraryId = li.libraryId " +
-
-  "LEFT JOIN emPCR e ON e.dilution_dilutionId = ld.dilutionId " + "LEFT JOIN emPCRDilution ed ON ed.emPCR_pcrId = e.pcrId " +
-
-  "LEFT JOIN Pool_Elements pld ON pld.elementId = ld.dilutionId " + "LEFT JOIN Pool_Elements ple ON ple.elementId = ed.dilutionId " +
-
-  "INNER JOIN " + TABLE_NAME + " pool ON pool.poolId = pld.pool_poolId " + "OR pool.poolId = ple.pool_poolId " + "WHERE s.sampleId=?";
+      + "INNER JOIN LibraryDilution ld ON ld.library_libraryId = li.libraryId "
+      + "LEFT JOIN emPCR e ON e.dilution_dilutionId = ld.dilutionId " + "LEFT JOIN emPCRDilution ed ON ed.emPCR_pcrId = e.pcrId "
+      + "LEFT JOIN Pool_Elements pld ON pld.elementId = ld.dilutionId " + "LEFT JOIN Pool_Elements ple ON ple.elementId = ed.dilutionId "
+      + "WHERE s.sampleId=?)";
 
   public static final String POOL_ELEMENT_DELETE_BY_POOL_ID = "DELETE FROM Pool_Elements " + "WHERE pool_poolId=:pool_poolId";
 
@@ -177,9 +168,8 @@ public class SQLPoolDAO implements PoolStore {
 
   public static final String ILLUMINA_POOL_SELECT_BY_ID_BARCODE = ILLUMINA_POOL_SELECT + " AND identificationBarcode=?";
 
-  public static final String ILLUMINA_POOL_SELECT_BY_EXPERIMENT_ID = "SELECT ip.poolId, ip.concentration, ip.identificationBarcode, ip.name, ip.alias, ip.creationDate, ip.securityProfile_profileId, ip.platformType, ip.ready, ip.qcPassed, ip.lastModifier "
-      + "FROM " + TABLE_NAME + " ip, Pool_Experiment pe " + "WHERE ip.poolId=pe.pool_poolId " + "AND ip.platformType='Illumina' "
-      + "AND pe.experiments_experimentId=?";
+  public static final String ILLUMINA_POOL_SELECT_BY_EXPERIMENT_ID = ILLUMINA_POOL_SELECT
+      + "AND poolId IN (SELECT pool_poolId FROM Pool_Experiment WHERE experiments_experimentId=?) ";
 
   // 454
   public static final String LS454_POOL_SELECT = POOL_SELECT + " WHERE platformType='LS454'";
@@ -190,9 +180,8 @@ public class SQLPoolDAO implements PoolStore {
 
   public static final String LS454_POOL_SELECT_BY_ID_BARCODE = LS454_POOL_SELECT + " AND identificationBarcode=?";
 
-  public static final String LS454_POOL_SELECT_BY_EXPERIMENT_ID = "SELECT ip.poolId, ip.concentration, ip.identificationBarcode, ip.name, ip.alias, ip.creationDate, ip.securityProfile_profileId, ip.platformType, ip.ready, ip.qcPassed, ip.lastModifier "
-      + "FROM " + TABLE_NAME + " ip, Pool_Experiment pe " + "WHERE ip.poolId=pe.pool_poolId " + "AND ip.platformType='LS454' "
-      + "AND pe.experiments_experimentId=?";
+  public static final String LS454_POOL_SELECT_BY_EXPERIMENT_ID = LS454_POOL_SELECT
+      + "AND poolId IN (SELECT pool_poolId FROM Pool_Experiment WHERE experiments_experimentId=?)";
 
   public static final String EMPCR_DILUTIONS_BY_RELATED_LS454_POOL_ID = "SELECT p.dilutions_dilutionId, l.concentration, l.emPCR_pcrId, l.identificationBarcode, l.name, l.alias, l.creationDate, l.securityProfile_profileId "
       + "FROM emPCRDilution l, Pool_emPCRDilution p " + "WHERE l.dilutionId=p.dilutions_dilutionId " + "AND p.pool_poolId=?";
@@ -206,9 +195,8 @@ public class SQLPoolDAO implements PoolStore {
 
   public static final String SOLID_POOL_SELECT_BY_ID_BARCODE = SOLID_POOL_SELECT + " AND identificationBarcode=?";
 
-  public static final String SOLID_POOL_SELECT_BY_EXPERIMENT_ID = "SELECT ip.poolId, ip.concentration, ip.identificationBarcode, ip.name, ip.alias, ip.creationDate, ip.securityProfile_profileId, ip.platformType, ip.ready, ip.qcPassed, ip.lastModifier "
-      + "FROM " + TABLE_NAME + " ip, Pool_Experiment pe " + "WHERE ip.poolId=pe.pool_poolId " + "AND ip.platformType='Solid' "
-      + "AND pe.experiments_experimentId=?";
+  public static final String SOLID_POOL_SELECT_BY_EXPERIMENT_ID = SOLID_POOL_SELECT
+      + " AND poolId IN (SELECT pool_poolId FROM Pool_Experiment WHERE pe.experiments_experimentId=?)";
 
   public static final String EMPCR_DILUTIONS_BY_RELATED_SOLID_POOL_ID = "SELECT p.dilutions_dilutionId, l.concentration, l.emPCR_pcrId, l.identificationBarcode, l.name, l.alias, l.creationDate, l.securityProfile_profileId "
       + "FROM emPCRDilution l, Pool_emPCRDilution p " + "WHERE l.dilutionId=p.dilutions_dilutionId " + "AND p.pool_poolId=?";
