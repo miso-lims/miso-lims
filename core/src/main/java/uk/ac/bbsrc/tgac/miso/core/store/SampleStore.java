@@ -36,6 +36,7 @@ import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
  * @since 0.0.2
  */
 public interface SampleStore extends Store<Sample>, Cascadable, Remover<Sample>, NamingSchemeAware<Sample> {
+
   /**
    * List all Samples that match a search criteria
    * 

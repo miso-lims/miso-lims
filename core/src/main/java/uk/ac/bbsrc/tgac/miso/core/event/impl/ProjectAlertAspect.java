@@ -25,14 +25,14 @@ package uk.ac.bbsrc.tgac.miso.core.event.impl;
 
 import java.io.IOException;
 
-import com.eaglegenomics.simlims.core.User;
 import org.aspectj.lang.annotation.Aspect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.eaglegenomics.simlims.core.User;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.ProjectAlertManager;
-
-import java.io.IOException;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.event

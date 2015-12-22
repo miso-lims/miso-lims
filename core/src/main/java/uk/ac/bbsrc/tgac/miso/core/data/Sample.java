@@ -27,7 +27,7 @@ import java.util.Collection;
 import java.util.Date;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
+import org.codehaus.jackson.annotate.JsonTypeName;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.w3c.dom.Document;
 
@@ -51,8 +51,8 @@ import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
  * @since 0.0.2
  */
 @JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-@JsonIgnoreProperties({ "securityProfile", "submissionDocument" })
+@JsonTypeName("sample")
+@JsonIgnoreProperties({"securityProfile","submissionDocument"})
 @PrintableBarcode
 public interface Sample
     extends SecurableByProfile, Submittable<Document>, Barcodable, Locatable, Reportable, Comparable, Deletable, Plateable {
@@ -202,11 +202,10 @@ public interface Sample
    * @return Collection<Note> notes.
    */
   public Collection<Note> getNotes();
-
   /**
-   * Returns the notes of this Sample object.
+   * Returns the change logs of this Sample object.
    * 
-   * @return Collection<Note> notes.
+   * @return Collection<ChangeLog> change logs.
    */
   public Collection<ChangeLog> getChangeLog();
 

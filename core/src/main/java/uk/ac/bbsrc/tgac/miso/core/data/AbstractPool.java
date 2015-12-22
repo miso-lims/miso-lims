@@ -72,20 +72,20 @@ public abstract class AbstractPool<P extends Poolable> implements Pool<P> {
   private String name;
   private String alias;
 
-  private Collection<P> pooledElements = new HashSet<P>();
+  private final Collection<P> pooledElements = new HashSet<P>();
   private Collection<Experiment> experiments = new HashSet<Experiment>();
   private Date creationDate;
   private Double concentration;
   private String identificationBarcode;
   private boolean readyToRun = false;
 
-  private Collection<PoolQC> poolQCs = new TreeSet<PoolQC>();
+  private final Collection<PoolQC> poolQCs = new TreeSet<PoolQC>();
   private Boolean qcPassed;
 
   private Date lastUpdated;
 
   // listeners
-  private Set<MisoListener> listeners = new HashSet<MisoListener>();
+  private final Set<MisoListener> listeners = new HashSet<MisoListener>();
   private Set<User> watchers = new HashSet<User>();
   private final Collection<ChangeLog> changeLog = new ArrayList<ChangeLog>();
   private User lastModifier;

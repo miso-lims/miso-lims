@@ -28,7 +28,7 @@ import java.util.Date;
 import java.util.HashMap;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
+import org.codehaus.jackson.annotate.JsonTypeName;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import com.eaglegenomics.simlims.core.Note;
@@ -42,8 +42,6 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedDilutionException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryQcException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 
-import com.eaglegenomics.simlims.core.Note;
-
 /**
  * A Library is the first step in constructing sequenceable material from an initial {@link Sample}. A Library is then diluted down to a
  * {@link Dilution}, and put in a {@link Pool}, which is then sequenced.
@@ -55,9 +53,9 @@ import com.eaglegenomics.simlims.core.Note;
  * @author Rob Davey
  * @since 0.0.2
  */
-@JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-@JsonIgnoreProperties({ "securityProfile" })
+@JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)//, using = LibrarySerializer.class)
+@JsonTypeName("library")
+@JsonIgnoreProperties({"securityProfile"})
 @PrintableBarcode
 public interface Library extends SecurableByProfile, Comparable, Barcodable, Locatable, Deletable, Plateable {
 

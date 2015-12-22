@@ -41,17 +41,18 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
+
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedLibraryException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleException;
 import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleQcException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
-
 
 /**
  * Skeleton implementation of a Sample
@@ -73,13 +74,14 @@ public abstract class AbstractSample implements Sample {
   private Project project;
 
   @ManyToMany(targetEntity = AbstractExperiment.class, mappedBy = "samples")
-  private Collection<Experiment> experiments = new HashSet<Experiment>();
+  private final Collection<Experiment> experiments = new HashSet<Experiment>();
 
-  private Collection<Library> libraries = new HashSet<Library>();
+  private final Collection<Library> libraries = new HashSet<Library>();
 
   private Collection<SampleQC> sampleQCs = new TreeSet<SampleQC>();
 
   private Collection<Note> notes = new HashSet<Note>();
+
   private final Collection<ChangeLog> changeLog = new ArrayList<>();
 
   private Set<Plate<? extends LinkedList<Sample>, Sample>> plates = new HashSet<Plate<? extends LinkedList<Sample>, Sample>>();
