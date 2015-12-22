@@ -114,31 +114,19 @@ public class SQLSampleDAO implements SampleStore {
 
   public static final String SAMPLE_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE sampleId=:sampleId";
 
-  public static String SAMPLES_SELECT_BY_PROJECT_ID = SAMPLES_SELECT + " WHERE project_projectId = ?";
+  public static String SAMPLES_SELECT_BY_PROJECT_ID = SAMPLES_SELECT + " " + "WHERE project_projectId = ?";
 
-  public static final String SAMPLES_SELECT_BY_EXPERIMENT_ID = "SELECT s.sampleId, s.name, s.description, s.scientificName, s.taxonIdentifier, s.alias, s.accession, s.securityProfile_profileId, s.identificationBarcode, s.locationBarcode, "
-      + "s.sampleType, s.receivedDate, s.qcPassed, s.project_projectId "
-      + "FROM "
-      + TABLE_NAME
-      + " s, Experiment_Sample es "
-      + "WHERE es.samples_sampleId=s.sampleId " + "AND es.Experiment_experimentId=?";
+  public static final String SAMPLES_SELECT_BY_EXPERIMENT_ID = SAMPLES_SELECT
+      + " WHERE sampleId IN (SELECT samples_sampleId FROM Experiment_Sample WHERE Experiment_experimentId=?)";
 
-  public static final String SAMPLE_SELECT_BY_LIBRARY_ID = "SELECT s.sampleId, s.name, s.description, s.scientificName, s.taxonIdentifier, s.alias, s.accession, s.securityProfile_profileId, s.identificationBarcode, s.locationBarcode, "
-      + "s.sampleType, s.receivedDate, s.qcPassed, s.project_projectId, s.lastModifier "
-      + "FROM "
-      + TABLE_NAME
-      + " s, Library l "
-      + "WHERE s.sampleId=l.sample_sampleId " + "AND l.libraryId=?";
+  public static final String SAMPLE_SELECT_BY_LIBRARY_ID = SAMPLES_SELECT
+      + " WHERE sampleId IN (SELECT sample_sampleId FROM Library WHERE libraryId=?)";
 
   public static final String EXPERIMENT_SAMPLE_DELETE_BY_SAMPLE_ID = "DELETE FROM Experiment_Sample "
       + "WHERE samples_sampleId=:samples_sampleId";
 
-  public static final String SAMPLES_BY_RELATED_SUBMISSION = "SELECT s.sampleId, s.name, s.description, s.scientificName, s.taxonIdentifier, s.alias, s.accession, s.securityProfile_profileId, s.identificationBarcode, s.locationBarcode, "
-      + "s.sampleType, s.receivedDate, s.qcPassed, project_projectId, s.lastModifier "
-      + "FROM "
-      + TABLE_NAME
-      + " s, Submission_Sample ss "
-      + "WHERE s.sampleId=ss.samples_sampleId " + "AND ss.submission_submissionId=?";
+  public static final String SAMPLES_BY_RELATED_SUBMISSION = SAMPLES_SELECT
+      + " WHERE sampleId IN (SELECT samples_sampleId FROM Submission_Sample WHERE submission_submissionId=?)";
 
   public static final String SAMPLE_TYPES_SELECT = "SELECT name FROM SampleType";
 

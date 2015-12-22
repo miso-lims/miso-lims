@@ -98,14 +98,14 @@ public class SQLLibraryDAO implements LibraryStore {
 
   public static final String LIBRARIES_SELECT_LIMIT = LIBRARIES_SELECT + " ORDER BY libraryId DESC LIMIT ?";
 
-  public static final String LIBRARY_SELECT_BY_ID = LIBRARIES_SELECT + " " + "WHERE libraryId = ?";
+  public static final String LIBRARY_SELECT_BY_ID = LIBRARIES_SELECT + " WHERE libraryId = ?";
 
   public static final String LIBRARY_SELECT_BY_ALIAS = LIBRARIES_SELECT + " WHERE alias = ?";
 
   public static final String LIBRARIES_SELECT_BY_SEARCH = LIBRARIES_SELECT + " WHERE " + "identificationBarcode LIKE ? OR "
       + "name LIKE ? OR " + "alias LIKE ? OR " + "description LIKE ? ";
 
-  public static final String LIBRARY_SELECT_BY_IDENTIFICATION_BARCODE = LIBRARIES_SELECT + " " + "WHERE identificationBarcode = ?";
+  public static final String LIBRARY_SELECT_BY_IDENTIFICATION_BARCODE = LIBRARIES_SELECT + " WHERE identificationBarcode = ?";
 
   public static final String LIBRARY_UPDATE = "UPDATE " + TABLE_NAME
       + " SET name=:name, description=:description, alias=:alias, accession=:accession, securityProfile_profileId=:securityProfile_profileId, "
@@ -116,13 +116,10 @@ public class SQLLibraryDAO implements LibraryStore {
 
   public static final String LIBRARY_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE libraryId=:libraryId";
 
-  public static final String LIBRARIES_SELECT_BY_SAMPLE_ID = "SELECT l.libraryId, l.name, l.description, l.alias, l.accession, l.securityProfile_profileId, l.sample_sampleId, l.identificationBarcode, l.locationBarcode, "
-      + "l.paired, l.libraryType, l.librarySelectionType, l.libraryStrategyType, l.platformName, l.concentration, l.creationDate, l.qcPassed, l.lastModifier, l.lowQuality "
-      + "FROM " + TABLE_NAME + " l, Sample s " + "WHERE l.sample_sampleId=s.sampleId " + "AND s.sampleId=?";
+  public static final String LIBRARIES_SELECT_BY_SAMPLE_ID = LIBRARIES_SELECT + " WHERE sample_sampleId=?";
 
-  public static String LIBRARIES_SELECT_BY_PROJECT_ID = "SELECT li.* FROM Project p "
-      + "INNER JOIN Sample sa ON sa.project_projectId = p.projectId " + "INNER JOIN " + TABLE_NAME
-      + " li ON li.sample_sampleId = sa.sampleId " + "WHERE p.projectId=?";
+  public static String LIBRARIES_SELECT_BY_PROJECT_ID = LIBRARIES_SELECT
+      + " WHERE sample_sampleId IN (SELECT sampleId FROM Sample WHERE project_projectId = ?)";
 
   public static final String LIBRARY_TYPES_SELECT = "SELECT libraryTypeId, description, platformType " + "FROM LibraryType";
 
@@ -150,9 +147,8 @@ public class SQLLibraryDAO implements LibraryStore {
 
   public static final String LIBRARY_STRATEGY_TYPE_SELECT_BY_NAME = LIBRARY_STRATEGY_TYPES_SELECT + " WHERE name = ?";
 
-  public static final String LIBRARIES_BY_RELATED_DILUTION_ID = "SELECT p.library_libraryId, l.libraryId, l.name, l.description, l.alias, l.accession, l.securityProfile_profileId, l.sample_sampleId, l.identificationBarcode, l.locationBarcode, "
-      + "l.paired, l.libraryType, l.librarySelectionType, l.libraryStrategyType, l.platformName, l.concentration, l.creationDate, l.qcPassed "
-      + "FROM " + TABLE_NAME + " l, LibraryDilution p " + "WHERE l.libraryId=p.library_libraryId " + "AND p.dilutionId=?";
+  public static final String LIBRARIES_BY_RELATED_DILUTION_ID = LIBRARIES_SELECT
+      + " WHERE libraryId IN (SELECT library_libraryId FROM LibraryDilution WHERE dilutionId=?)";
 
   public static final String TAG_BARCODES_SELECT = "SELECT tagId, name, sequence, platformName, strategyName " + "FROM TagBarcodes";
 
@@ -334,12 +330,11 @@ public class SQLLibraryDAO implements LibraryStore {
           library.setName(name);
           if (libraryNamingScheme.validateField("name", library.getName())
               && libraryNamingScheme.validateField("alias", library.getAlias())) {
-
             if (autoGenerateIdentificationBarcodes) {
               autoGenerateIdBarcode(library);
             } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
-
             params.addValue("name", name);
+
             params.addValue("identificationBarcode", library.getIdentificationBarcode());
 
             Number newId = insert.executeAndReturnKey(params);
@@ -450,13 +445,13 @@ public class SQLLibraryDAO implements LibraryStore {
 
   @Override
   public Library lazyGet(long libraryId) throws IOException {
-    List eResults = template.query(LIBRARY_SELECT_BY_ID, new Object[] { libraryId }, new LibraryMapper(true));
+    List<Library> eResults = template.query(LIBRARY_SELECT_BY_ID, new Object[] { libraryId }, new LibraryMapper(true));
     Library e = eResults.size() > 0 ? (Library) eResults.get(0) : null;
     return e;
   }
 
   public Library getByIdentificationBarcode(String barcode) throws IOException {
-    List eResults = template.query(LIBRARY_SELECT_BY_IDENTIFICATION_BARCODE, new Object[] { barcode }, new LibraryMapper());
+    List<Library> eResults = template.query(LIBRARY_SELECT_BY_IDENTIFICATION_BARCODE, new Object[] { barcode }, new LibraryMapper());
     Library e = eResults.size() > 0 ? (Library) eResults.get(0) : null;
     return e;
   }
