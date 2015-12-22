@@ -31,6 +31,7 @@ for (File file : productionSchemaDir.listFiles()) {
         .replaceAll('\\\\\'', '\'\'') // escape single quotes as '' instead of '/
         .replaceAll('(\'ROLE_[^\']*\')', 'RAWTOHEX($1)') // RAWTOHEX function to write BLOB fields
         .replaceAll('(?s)CREATE TRIGGER.*;', '') // Delete triggers
+        .replaceAll('(?s)--StartNoTest(.*?)--EndNoTest', '--') // Delete blocks containing non-standard delimiters
         
     Files.write(dstPath, translated.getBytes(), StandardOpenOption.CREATE)
     println("Wrote translated schema file: " + dstPath.toAbsolutePath().toString())
