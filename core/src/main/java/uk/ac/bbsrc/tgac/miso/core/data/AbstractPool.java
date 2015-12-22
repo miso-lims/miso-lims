@@ -400,7 +400,7 @@ public abstract class AbstractPool<P extends Poolable> implements Pool<P> {
   public boolean equals(Object obj) {
     if (obj == null) return false;
     if (obj == this) return true;
-    if (!(obj instanceof Platform)) return false;
+    if (!(obj instanceof Pool)) return false;
     Pool them = (Pool) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.
