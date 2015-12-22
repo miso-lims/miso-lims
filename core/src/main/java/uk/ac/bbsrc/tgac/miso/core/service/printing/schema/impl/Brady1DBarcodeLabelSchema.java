@@ -2,10 +2,11 @@ package uk.ac.bbsrc.tgac.miso.core.service.printing.schema.impl;
 
 import java.io.File;
 
-import net.sf.json.JSONObject;
-import net.sourceforge.fluxion.spi.ServiceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import net.sf.json.JSONObject;
+import net.sourceforge.fluxion.spi.ServiceProvider;
 import uk.ac.bbsrc.tgac.miso.core.factory.barcode.BarcodeLabelFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.factory.FileGeneratingBarcodeLabelFactory;
 import uk.ac.bbsrc.tgac.miso.core.service.printing.schema.BarcodableSchema;

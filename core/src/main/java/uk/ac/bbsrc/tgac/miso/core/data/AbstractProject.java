@@ -47,6 +47,7 @@ import org.slf4j.LoggerFactory;
 import com.eaglegenomics.simlims.core.Request;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
+
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;

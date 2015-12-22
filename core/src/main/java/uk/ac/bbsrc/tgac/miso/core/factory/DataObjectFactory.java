@@ -61,8 +61,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 /**
  * uk.ac.bbsrc.tgac.miso.core.factory
  * <p/>
- * TODO Info
- * 
+ * Provides the basis of an Object Factory needed by MISO
+ *
  * @author Rob Davey
  * @since 0.0.2
  */
