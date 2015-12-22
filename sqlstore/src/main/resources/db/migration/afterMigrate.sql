@@ -15,7 +15,10 @@ FOR EACH ROW
       CASE WHEN (NEW.receivedDate IS NULL) <> (OLD.receivedDate IS NULL) OR NEW.receivedDate <> OLD.receivedDate THEN 'receivedDate' END,
       CASE WHEN NEW.sampleType <> OLD.sampleType THEN 'sampleType' END,
       CASE WHEN NEW.scientificName <> OLD.scientificName THEN 'scientificName' END,
-      CASE WHEN (NEW.taxonIdentifier IS NULL) <> (OLD.taxonIdentifier IS NULL) OR NEW.taxonIdentifier <> OLD.taxonIdentifier THEN 'taxonIdentifier' END), ''),
+      CASE WHEN (NEW.taxonIdentifier IS NULL) <> (OLD.taxonIdentifier IS NULL) OR NEW.taxonIdentifier <> OLD.taxonIdentifier THEN 'taxonIdentifier' END,
+      CASE WHEN NEW.emptied <> OLD.emptied THEN 'emptied' END,
+      CASE WHEN (NEW.volume IS NULL) <> (OLD.volume IS NULL) OR NEW.volume <> OLD.volume THEN 'volume' END
+), ''),
     NEW.lastModifier,
     CONCAT(
       (SELECT fullname FROM User WHERE userId = NEW.lastModifier),
@@ -32,7 +35,14 @@ FOR EACH ROW
         CASE WHEN (NEW.receivedDate IS NULL) <> (OLD.receivedDate IS NULL) OR NEW.receivedDate <> OLD.receivedDate THEN CONCAT('received: ', COALESCE(OLD.receivedDate, 'n/a'), ' → ', COALESCE(NEW.receivedDate, 'n/a')) END,
         CASE WHEN NEW.sampleType <> OLD.sampleType THEN CONCAT('type: ', OLD.sampleType, ' → ', NEW.sampleType) END,
         CASE WHEN NEW.scientificName <> OLD.scientificName THEN CONCAT('scientific name: ', OLD.scientificName, ' → ', NEW.scientificName) END,
-        CASE WHEN (NEW.taxonIdentifier IS NULL) <> (OLD.taxonIdentifier IS NULL) OR NEW.taxonIdentifier <> OLD.taxonIdentifier THEN CONCAT('taxon: ', COALESCE(OLD.taxonIdentifier, 'n/a'), ' → ', COALESCE(NEW.taxonIdentifier, 'n/a')) END)));
+        CASE WHEN (NEW.taxonIdentifier IS NULL) <> (OLD.taxonIdentifier IS NULL) OR NEW.taxonIdentifier <> OLD.taxonIdentifier THEN CONCAT('taxon: ', COALESCE(OLD.taxonIdentifier, 'n/a'), ' → ', COALESCE(NEW.taxonIdentifier, 'n/a')) END,
+        CASE WHEN NEW.emptied <> OLD.emptied THEN CONCAT('emptied: ', OLD.emptied, ' → ', NEW.emptied) END,
+        CASE WHEN (NEW.volume IS NULL) <> (OLD.volume IS NULL) OR NEW.volume <> OLD.volume THEN CONCAT('volume: ', COALESCE(OLD.volume, 'n/a'), ' → ', COALESCE(NEW.volume, 'n/a')) END)));
+
+DROP TRIGGER IF EXISTS BeforeInsertSample;
+CREATE TRIGGER BeforeInsertSample BEFORE INSERT ON Sample
+  FOR EACH ROW
+  SET NEW.boxPositionId = nextval('box_position_seq');
 
 DROP TRIGGER IF EXISTS SampleInsert;
 CREATE TRIGGER SampleInsert AFTER INSERT ON Sample
@@ -217,7 +227,10 @@ FOR EACH ROW
       CASE WHEN NEW.paired <> OLD.paired THEN 'paired' END,
       CASE WHEN (NEW.platformName IS NULL) <> (OLD.platformName IS NULL) OR NEW.platformName <> OLD.platformName THEN 'platformName' END,
       CASE WHEN (NEW.qcPassed IS NULL) <> (OLD.qcPassed IS NULL) OR NEW.qcPassed <> OLD.qcPassed THEN 'qcPassed' END,
-      CASE WHEN NEW.sample_sampleId <> OLD.sample_sampleId THEN 'sample_sampleId' END), ''),
+      CASE WHEN NEW.sample_sampleId <> OLD.sample_sampleId THEN 'sample_sampleId' END,
+      CASE WHEN NEW.emptied <> OLD.emptied THEN 'emptied' END,
+      CASE WHEN (NEW.volume IS NULL) <> (OLD.volume IS NULL) OR NEW.volume <> OLD.volume THEN 'volume' END
+), ''),
     NEW.lastModifier,
     CONCAT(
       (SELECT fullname FROM User WHERE userId = NEW.lastModifier),
@@ -235,7 +248,15 @@ FOR EACH ROW
         CASE WHEN NEW.name <> OLD.name THEN CONCAT('name: ', OLD.name, ' → ', NEW.name) END,
         CASE WHEN NEW.paired <> OLD.paired THEN CONCAT('end: ', CASE WHEN OLD.paired THEN 'paired' ELSE 'singled' END, ' → ', CASE WHEN NEW.paired THEN 'paired' ELSE 'single' END) END,
         CASE WHEN (NEW.platformName IS NULL) <> (OLD.platformName IS NULL) OR NEW.platformName <> OLD.platformName THEN CONCAT('platform: ', COALESCE(OLD.platformName, 'n/a'), ' → ', COALESCE(NEW.platformName, 'n/a')) END,
-        CASE WHEN (NEW.qcPassed IS NULL) <> (OLD.qcPassed IS NULL) OR NEW.qcPassed <> OLD.qcPassed THEN CONCAT('QC passed: ', COALESCE(OLD.qcPassed, 'n/a'), ' → ', COALESCE(NEW.qcPassed, 'n/a')) END)));
+        CASE WHEN (NEW.qcPassed IS NULL) <> (OLD.qcPassed IS NULL) OR NEW.qcPassed <> OLD.qcPassed THEN CONCAT('QC passed: ', COALESCE(OLD.qcPassed, 'n/a'), ' → ', COALESCE(NEW.qcPassed, 'n/a')) END,
+        CASE WHEN NEW.emptied <> OLD.emptied THEN CONCAT('emptied: ', OLD.emptied, ' → ', NEW.emptied) END,
+        CASE WHEN (NEW.volume IS NULL) <> (OLD.volume IS NULL) OR NEW.volume <> OLD.volume THEN CONCAT('volume: ', COALESCE(OLD.volume, 'n/a'), ' → ', COALESCE(NEW.volume, 'n/a')) END)));
+
+DROP TRIGGER IF EXISTS BeforeInsertLibrary;
+CREATE TRIGGER BeforeInsertLibrary BEFORE INSERT ON Library
+  FOR EACH ROW
+  SET NEW.boxPositionId = nextval('box_position_seq');
+
 
 DROP TRIGGER IF EXISTS LibraryInsert;
 CREATE TRIGGER LibraryInsert AFTER INSERT ON Library
@@ -315,3 +336,45 @@ FOR EACH ROW
       (SELECT fullname FROM User WHERE userId = NEW.lastModifier),
       ' created container.'));
 
+DROP TRIGGER IF EXISTS BoxChange;
+DELIMITER //
+CREATE TRIGGER BoxChange BEFORE UPDATE ON Box
+FOR EACH ROW
+  BEGIN
+  DECLARE log_message varchar(500);
+  SET log_message = CONCAT_WS(', ',
+    CASE WHEN NEW.alias <> OLD.alias THEN CONCAT('alias: ', OLD.alias, ' → ', NEW.alias) END,
+    CASE WHEN (NEW.identificationBarcode IS NULL) <> (OLD.identificationBarcode IS NULL) OR NEW.identificationBarcode <> OLD.identificationBarcode THEN CONCAT('barcode: ', COALESCE(OLD.identificationBarcode, 'n/a'), ' → ', COALESCE(NEW.identificationBarcode, 'n/a')) END,
+    CASE WHEN (NEW.locationBarcode IS NULL) <> (OLD.locationBarcode IS NULL) OR NEW.locationBarcode <> OLD.locationBarcode THEN CONCAT('location: ', COALESCE(OLD.locationBarcode, 'n/a'), ' → ', COALESCE(NEW.locationBarcode, 'n/a')) END,
+    CASE WHEN (NEW.description IS NULL) <> (OLD.description IS NULL) OR NEW.description <> OLD.description THEN CONCAT('description: ', COALESCE(OLD.description, 'n/a'), ' → ', COALESCE(NEW.description, 'n/a')) END
+  );
+  IF log_message = '' THEN
+    INSERT INTO BoxChangeLog(boxId, columnsChanged, userId, message) VALUES (
+      New.boxId,
+      COALESCE(CONCAT_WS(',',
+        CASE WHEN NEW.alias <> OLD.alias THEN 'alias' END,
+        CASE WHEN (NEW.identificationBarcode IS NULL) <> (OLD.identificationBarcode IS NULL) OR NEW.identificationBarcode <> OLD.identificationBarcode THEN 'identificationBarcode' END,
+        CASE WHEN (NEW.locationBarcode IS NULL) <> (OLD.locationBarcode IS NULL) OR NEW.locationBarcode <> OLD.locationBarcode THEN 'locationBarcode' END,
+        CASE WHEN (NEW.description IS NULL) <> (OLD.description IS NULL) OR NEW.description <> OLD.description THEN 'description' END), ''),
+      NEW.lastModifier,
+      CONCAT(
+        (SELECT fullname FROM User WHERE userId = NEW.lastModifier),
+        ' has changed: ',
+        log_message
+      )
+    );
+  END IF;
+  END//
+DELIMITER ;
+
+DROP TRIGGER IF EXISTS BoxInsert;
+CREATE TRIGGER BoxInsert AFTER INSERT ON Box
+FOR EACH ROW
+  INSERT INTO BoxChangeLog(boxId, columnsChanged, userId, message) VALUES (
+    NEW.boxId,
+    '',
+    NEW.lastModifier,
+    CONCAT(
+      (SELECT fullname FROM User WHERE userId = NEW.lastModifier),
+      ' created box.')
+  );

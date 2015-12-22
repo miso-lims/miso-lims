@@ -25,7 +25,9 @@ package uk.ac.bbsrc.tgac.miso.core.store;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
@@ -271,4 +273,23 @@ public interface LibraryStore extends Store<Library>, Remover<Library>, NamingSc
    *           when the objects cannot be retrieved
    */
   Collection<Library> listAllWithLimit(long limit) throws IOException;
+
+  /**
+   * Return the Library associated with a given positionId
+   * 
+   * @param positionId
+   *          of type long
+   * @return Boxable
+   */
+  Boxable getByPositionId(long positionId);
+
+  /**
+   * List all libraries associated with an identificationBarcode from given list of
+   * identificationBarcodes (from scan)
+   * @param barcodeList
+   * @return Collection<Library>
+   * @throws IOException
+   *           when the objects cannot be retrieved
+   */
+  Collection<Library> getByBarcodeList(List<String> barcodeList) throws IOException;
 }

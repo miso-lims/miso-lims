@@ -25,7 +25,9 @@ package uk.ac.bbsrc.tgac.miso.core.store;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
 
@@ -131,4 +133,24 @@ public interface SampleStore extends Store<Sample>, Cascadable, Remover<Sample>,
    *           when the objects cannot be retrieved
    */
   Collection<Sample> listAllByReceivedDate(long limit) throws IOException;
+
+  /**
+   * List the Sample associated with the given positionId
+   * @param positionId
+   *          of type long
+   * @return Boxable
+   * @throws IOException
+   *           when
+   */
+  Boxable getByPositionId(long positionId);
+
+  /**
+   * List all Samples associated with identificationBarcodes from the given 
+   * identificationBarcode list
+   * 
+   * @return Collection<Sample
+   * @throws IOException
+   *           when the objects cannot be retrieved
+   */
+  Collection<Sample> getByBarcodeList(List<String> barcodeList) throws IOException;
 }
