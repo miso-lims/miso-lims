@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
 import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
@@ -147,4 +148,34 @@ public interface PoolStore
    *           when
    */
   Pool<? extends Poolable> getPoolByExperiment(Experiment e) throws IOException;
+  
+  /**
+   * List the Pool associated with the given positionId
+   * @param positionId
+   *          of type long
+   * @return Boxable
+   * @throws IOException
+   *           when
+   */
+  Boxable getByPositionId(long positionId);
+
+  /**
+   * List all Samples associated with identificationBarcodes from the given 
+   * identificationBarcode list
+   * 
+   * @return Collection<Sample
+   * @throws IOException
+   *           when the objects cannot be retrieved
+   */
+  Collection<Pool<? extends Poolable>> getByBarcodeList(List<String> barcodeList) throws IOException;
+
+  /**
+   * List the Pool associated with a given identificationBarcode
+   * @param barcode 
+   *          of type String
+   * @return Pool
+   * @throws IOException
+   *           when
+   */
+  Pool<? extends Poolable> getByBarcode(String barcode);
 }

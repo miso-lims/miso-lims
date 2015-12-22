@@ -61,6 +61,7 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractPool;
+import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Plate;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
@@ -78,6 +79,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.PoolQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.store.WatcherStore;
+import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DaoLookup;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
@@ -95,8 +97,13 @@ public class SQLPoolDAO implements PoolStore {
 
   private static final String POOL_CHANGE_LOG_INSERT = "INSERT INTO PoolChangeLog (poolId, columnsChanged, userId, message) VALUES (?, '', ?, ?)";
 
-  private static final String POOL_SELECT = "SELECT poolId, concentration, identificationBarcode, name, alias, creationDate, securityProfile_profileId, platformType, ready, qcPassed, lastModifier "
-      + "FROM " + TABLE_NAME;
+  private static final String POOL_SELECT = "SELECT poolId, concentration, identificationBarcode, name, alias, creationDate, securityProfile_profileId, "
+      + "platformType, ready, qcPassed, lastModifier, boxPositionId, volume, emptied, "
+      + "(SELECT boxId FROM BoxPosition WHERE BoxPosition.boxPositionId = " + TABLE_NAME
+      + ".boxPositionId) AS boxId, (SELECT alias FROM Box, BoxPosition WHERE Box.boxId = BoxPosition.boxId AND BoxPosition.boxPositionId = "
+      + TABLE_NAME + ".boxPositionId) AS boxAlias, (SELECT row FROM BoxPosition WHERE BoxPosition.boxPositionId = " + TABLE_NAME
+      + ".boxPositionId) AS boxRow, (SELECT `column` FROM BoxPosition WHERE BoxPosition.boxPositionId = " + TABLE_NAME
+      + ".boxPositionId) AS boxColumn " + "FROM " + TABLE_NAME;
 
   public static final String POOL_SELECT_BY_POOL_ID = POOL_SELECT + " WHERE poolId=?";
 
@@ -109,8 +116,15 @@ public class SQLPoolDAO implements PoolStore {
 
   public static final String POOL_SELECT_BY_PLATFORM_AND_READY_AND_SEARCH = POOL_SELECT_BY_PLATFORM_AND_SEARCH + " AND ready=1";
 
+  public static final String POOL_SELECT_BY_IDENTIFICATION_BARCODE = POOL_SELECT + " WHERE identificationBarcode = ?";
+
+  public static final String POOL_SELECT_FROM_BARCODE_LIST = POOL_SELECT + " WHERE identificationBarcode IN (";
+
+  public static final String POOL_SELECT_BY_BOX_POSITION_ID = POOL_SELECT + " WHERE boxPositionId = ?";
+
   public static final String POOL_UPDATE = "UPDATE " + TABLE_NAME + " "
-      + "SET alias=:alias, concentration=:concentration, identificationBarcode=:identificationBarcode, creationDate=:creationDate, securityProfile_profileId=:securityProfile_profileId, platformType=:platformType, ready=:ready, qcPassed=:qcPassed, lastModifier=:lastModifier "
+      + "SET alias=:alias, concentration=:concentration, identificationBarcode=:identificationBarcode, creationDate=:creationDate, securityProfile_profileId=:securityProfile_profileId, "
+      + "platformType=:platformType, ready=:ready, qcPassed=:qcPassed, lastModifier=:lastModifier, emptied=:emptied, volume=:volume "
       + "WHERE poolId=:poolId";
 
   public static final String POOL_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE poolId=:poolId";
@@ -381,6 +395,8 @@ public class SQLPoolDAO implements PoolStore {
     params.addValue("securityProfile_profileId", securityProfileId);
     params.addValue("platformType", pool.getPlatformType().getKey());
     params.addValue("ready", pool.getReadyToRun());
+    params.addValue("emptied", pool.isEmpty());
+    params.addValue("volume", pool.getVolume());
     params.addValue("lastModifier", pool.getLastModifier().getUserId());
 
     if (pool.getQcPassed() != null) {
@@ -566,6 +582,26 @@ public class SQLPoolDAO implements PoolStore {
   }
 
   @Override
+  public Pool<? extends Poolable> getByBarcode(String barcode) {
+    List<Pool<? extends Poolable>> eResults = template.query(POOL_SELECT_BY_IDENTIFICATION_BARCODE, new Object[] { barcode },
+        new PoolMapper(true));
+    Pool<? extends Poolable> e = eResults.size() > 0 ? (Pool<? extends Poolable>) eResults.get(0) : null;
+    return e;
+  }
+
+  @Override
+  public List<Pool<? extends Poolable>> getByBarcodeList(List<String> barcodeList) {
+    return DbUtils.getByBarcodeList(template, barcodeList, POOL_SELECT_FROM_BARCODE_LIST, new PoolMapper(true));
+  }
+
+  @Override
+  public Boxable getByPositionId(long positionId) {
+    List<Pool<? extends Poolable>> eResults = template.query(POOL_SELECT_BY_BOX_POSITION_ID, new Object[] { positionId }, new PoolMapper());
+    Pool<? extends Poolable> e = eResults.size() > 0 ? eResults.get(0) : null;
+    return e;
+  }
+
+  @Override
   public Collection<Pool<? extends Poolable>> listBySampleId(long sampleId) throws IOException {
     return template.query(POOL_SELECT_BY_RELATED_SAMPLE, new Object[] { sampleId }, new PoolMapper());
   }
@@ -738,7 +774,15 @@ public class SQLPoolDAO implements PoolStore {
         p.setConcentration(rs.getDouble("concentration"));
         p.setIdentificationBarcode(rs.getString("identificationBarcode"));
         p.setReadyToRun(rs.getBoolean("ready"));
+        p.setVolume(rs.getInt("volume"));
+        p.setEmpty(rs.getBoolean("emptied"));
+        p.setBoxPositionId(rs.getLong("boxPositionId"));
+        p.setBoxAlias(rs.getString("boxAlias"));
+        p.setBoxId(rs.getLong("boxId"));
         p.setLastModifier(securityDAO.getUserById(rs.getLong("lastModifier")));
+        int row = rs.getInt("boxRow");
+        if (!rs.wasNull()) p.setBoxPosition(BoxUtils.getPositionString(row, rs.getInt("boxColumn")));
+
         if (rs.getString("qcPassed") != null) {
           p.setQcPassed(Boolean.parseBoolean(rs.getString("qcPassed")));
         } else {
