@@ -112,7 +112,7 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
         log.error("Cannot resolve a currently logged in user", e);
       }
     } else {
-      throw new IOException("Cannot check read permissions for null object. Does this object really exist?");
+      return true;
     }
     return false;
   }
@@ -355,6 +355,15 @@ public class UserAuthMisoRequestManager extends MisoRequestManager {
   @Override
   public Pool<? extends Poolable> getPoolByBarcode(String barcode, PlatformType platformType) throws IOException {
     Pool<? extends Poolable> o = super.getPoolByBarcode(barcode, platformType);
+    if (readCheck(o))
+      return o;
+    else
+      throw new IOException("User " + getCurrentUser().getFullName() + " cannot read Pool " + o.getId());
+  }
+
+  @Override
+  public Pool<? extends Poolable> getPoolByIdBarcode(String barcode) throws IOException {
+    Pool<? extends Poolable> o = super.getPoolByIdBarcode(barcode);
     if (readCheck(o))
       return o;
     else
