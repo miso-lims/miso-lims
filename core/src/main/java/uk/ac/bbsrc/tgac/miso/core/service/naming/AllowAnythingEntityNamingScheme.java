@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
+import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.service.naming
@@ -36,19 +37,18 @@ public class AllowAnythingEntityNamingScheme<T extends Nameable> implements Miso
   }
 
   @Override
+  @CoverageIgnore
   public void setValidationRegex(String fieldName, String regex) throws MisoNamingException {
   }
 
   @Override
+  @CoverageIgnore
   public Class<T> namingSchemeFor() {
     return type;
   }
 
-  public void setNamingSchemeFor(Class<T> type) {
-    this.type = type;
-  }
-
   @Override
+  @CoverageIgnore
   public String getSchemeName() {
     return "AllowAnythingEntityNamingScheme";
   }
@@ -59,33 +59,35 @@ public class AllowAnythingEntityNamingScheme<T extends Nameable> implements Miso
   }
 
   @Override
+  @CoverageIgnore
   public String getValidationRegex(String fieldName) throws MisoNamingException {
     return ".*";
   }
 
   @Override
+  @CoverageIgnore
   public boolean validateField(String fieldName, String entityName) throws MisoNamingException {
-    return !isStringEmptyOrNull(entityName) && fieldCheck(fieldName);
+    return !isStringEmptyOrNull(entityName);
   }
 
   @Override
+  @CoverageIgnore
   public void registerCustomNameGenerator(String fieldName, NameGenerator<T> nameGenerator) {
   }
 
   @Override
+  @CoverageIgnore
   public void unregisterCustomNameGenerator(String fieldName) {
   }
 
   @Override
+  @CoverageIgnore
   public boolean allowDuplicateEntityNameFor(String fieldName) {
     return true;
   }
 
   @Override
+  @CoverageIgnore
   public void setAllowDuplicateEntityName(String fieldName, boolean allow) {
-  }
-
-  private boolean fieldCheck(String fieldName) {
-        return true;
   }
 }
