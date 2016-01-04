@@ -67,8 +67,12 @@
           </td>
         </tr>
         <tr>
-          <td>Platform:</td>
+          <td class="h">Platform:</td>
           <td>${sequencerReference.platform.nameAndModel}</td>
+        </tr>
+        <tr>
+          <td class="h">Serial Number:</td>
+          <td><input type="text" id="serialNumber" name="serialNumber" value="${sequencerReference.serialNumber}"/></td>
         </tr>
         <tr>
           <td class="h">Name:</td>
@@ -81,6 +85,32 @@
             <input type="hidden" value="on" name="_ipAddress"/>
           </td>
         </tr>
+        <tr>
+          <td class="h">Commissioned</td>
+          <td><fmt:formatDate pattern="dd/MM/yyyy" value="${sequencerReference.dateCommissioned}"/></td>
+        </tr>
+        <tr>
+          <td>Status</td>
+          <td>
+            <c:choose>
+              <c:when test="${sequencerReference.upgradedSequencerReference != null}">Upgraded</c:when>
+              <c:when test="${sequencerReference.dateDecommissioned != null}">Retired</c:when>
+              <c:otherwise>Production</c:otherwise>
+            </c:choose>
+          </td>
+        </tr>
+        <c:if test="${sequencerReference.dateDecommissioned != null}">
+          <tr>
+            <td class="h">Decommissioned</td>
+            <td><fmt:formatDate pattern="dd/MM/yyyy" value="${sequencerReference.dateDecommissioned}"/></td>
+          </tr>
+        </c:if>
+        <c:if test="${sequencerReference.upgradedSequencerReference != null}">
+          <tr>
+            <td class="h">Upgraded To</td>
+            <td><a href="<c:url value='/miso/stats/sequencer/${sequencerReference.upgradedSequencerReference.id}'/>">${sequencerReference.upgradedSequencerReference.name}</a></td>
+          </tr>
+        </c:if>
       </table>
       <br/>
     </form:form>

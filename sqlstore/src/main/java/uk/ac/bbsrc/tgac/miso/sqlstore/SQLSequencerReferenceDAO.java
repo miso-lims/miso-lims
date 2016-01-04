@@ -60,20 +60,23 @@ import uk.ac.bbsrc.tgac.miso.core.store.SequencerReferenceStore;
 public class SQLSequencerReferenceDAO implements SequencerReferenceStore {
   private static final String TABLE_NAME = "SequencerReference";
 
-  private static final String SEQUENCER_REFERENCE_SELECT = "SELECT referenceId, name, ipAddress, platformId, available " + "FROM "
+  private static final String SEQUENCER_REFERENCE_SELECT = "SELECT referenceId, name, ipAddress, platformId, available, serialNumber, dateCommissioned, dateDecommissioned, upgradedSequencerReferenceId " + "FROM "
       + TABLE_NAME;
 
   private static final String SEQUENCER_REFERENCE_SELECT_BY_ID = SEQUENCER_REFERENCE_SELECT + " WHERE referenceId = ?";
 
   private static final String SEQUENCER_REFERENCE_SELECT_BY_NAME = SEQUENCER_REFERENCE_SELECT + " WHERE name = ?";
 
-  private static final String SEQUENCER_REFERENCE_SELECT_BY_PLATFORM = "SELECT sr.referenceId, sr.name, sr.ipAddress, sr.platformId, sr.available, p.platformId, p.name "
+  private static final String SEQUENCER_REFERENCE_SELECT_BY_PLATFORM = "SELECT sr.referenceId, sr.name, sr.ipAddress, sr.platformId, sr.available, sr.serialNumber, sr.dateCommissioned, sr.dateDecommissioned, sr.upgradedSequencerReferenceId, p.platformId, p.name "
       + "FROM " + TABLE_NAME + " sr, Platform p " + "WHERE sr.platformId=p.platformId " + "AND p.name=?";
 
   private static final String SEQUENCER_REFERENCE_SELECT_BY_RELATED_RUN = "";
 
   private static final String SEQUENCER_REFERENCE_UPDATE = "UPDATE " + TABLE_NAME + " "
-      + "SET name=:name, ipAddress=:ipAddress, platformId=:platformId, available=:available " + "WHERE referenceId=:referenceId";
+      + "SET name=:name, ipAddress=:ipAddress, platformId=:platformId, available=:available, serialNumber=:serialNumber, "
+      + "dateCommissioned=:dateCommissioned, dateDecommissioned=:dateDecommissioned,"
+      + "upgradedSequencerReferenceId=:upgradedSequencerReferenceId "
+      + "WHERE referenceId=:referenceId";
 
   private static final String SEQUENCER_REFERENCE_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE referenceId=:referenceId";
 
@@ -115,7 +118,13 @@ public class SQLSequencerReferenceDAO implements SequencerReferenceStore {
     params.addValue("ipAddress", ipBlob);
     params.addValue("platformId", sequencerReference.getPlatform().getPlatformId());
     params.addValue("available", sequencerReference.getAvailable());
-
+    params.addValue("serialNumber", sequencerReference.getSerialNumber());
+    params.addValue("dateCommissioned", sequencerReference.getDateCommissioned());
+    params.addValue("dateDecommissioned", sequencerReference.getDateDecommissioned());
+    if (sequencerReference.getUpgradedSequencerReference() != null) {
+      params.addValue("upgradedSequencerReferenceId", sequencerReference.getUpgradedSequencerReference().getId());
+    }
+    
     if (sequencerReference.getId() == AbstractSequencerReference.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("referenceId");
 
@@ -189,7 +198,15 @@ public class SQLSequencerReferenceDAO implements SequencerReferenceStore {
           c.setName(rs.getString("name"));
           c.setPlatform(platformDAO.get(rs.getLong("platformId")));
           c.setAvailable(rs.getBoolean("available"));
-
+          c.setSerialNumber(rs.getString("serialNumber"));
+          c.setDateCommissioned(rs.getTimestamp("dateCommissioned"));
+          c.setDateDecommissioned(rs.getTimestamp("dateDecommissioned"));
+          int upgradedId = rs.getInt("upgradedSequencerReferenceId");
+          if (upgradedId != AbstractSequencerReference.UNSAVED_ID) {
+            c.setUpgradedSequencerReference(get(upgradedId));
+          }
+          // TODO: optional pre-upgrade reference
+          
           Blob ipBlob = rs.getBlob("ipAddress");
           if (ipBlob != null) {
             if (ipBlob.length() > 0) {
