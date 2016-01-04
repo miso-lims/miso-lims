@@ -1904,3 +1904,7 @@ button.disabled {
 h2.tissue {
 	margin: 0% 2%;
 }
+
+.clear {
+	clear: both;
+}

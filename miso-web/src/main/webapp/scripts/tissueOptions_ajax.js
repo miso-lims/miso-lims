@@ -21,9 +21,10 @@
  * *********************************************************************
  */
 var projectArray;
+var tableLoadCounter = 0;
 
 var Tissue = Tissue || {
-  getTissueOrigins: function() {
+  getTissueOrigins: function () {
     Options.makeXhrRequest('GET', '/miso/rest/tissueorigins', Tissue.createTissueOriginsTable);
   },
   
@@ -33,7 +34,7 @@ var Tissue = Tissue || {
     Tissue.createTable(xhr, 'TO', 'allOrigins', 'tissueorigin', 'Origin', TOtable);
   },
   
-  getTissueConditions: function() {
+  getTissueConditions: function () {
     Options.makeXhrRequest('GET', '/miso/rest/tissuetypes', Tissue.createTissueConditionsTable);
   },
   
@@ -43,7 +44,7 @@ var Tissue = Tissue || {
     Tissue.createTable(xhr, 'TC', 'allConditions', 'tissuetype', 'Condition', TCtable);
   },
   
-  getTissueMaterials: function() {
+  getTissueMaterials: function () {
     Options.makeXhrRequest('GET', '/miso/rest/tissuematerials', Tissue.createTissueMaterialsTable);
   },
   
@@ -53,7 +54,7 @@ var Tissue = Tissue || {
     Tissue.createTable(xhr, 'TM', 'allMaterials', 'tissuematerial', 'Material', TMtable);
   },
   
-  getSamplePurposes: function() {
+  getSamplePurposes: function () {
     Options.makeXhrRequest('GET', '/miso/rest/samplepurposes', Tissue.createSamplePurposesTable);
   },
   
@@ -69,7 +70,8 @@ var Tissue = Tissue || {
       return (a.alias > b.alias) ? 1 : ((b.alias > a.alias) ? -1 : 0);
     });
 
-    document.getElementById(tableId).innerHTML = null;
+    tableBody = document.getElementById(tableId);
+    tableBody.innerHTML = null;
     for (var i=0; i<data.length; i++) {
       id = data[i]["id"];
       alias = data[i]["alias"];
@@ -78,7 +80,9 @@ var Tissue = Tissue || {
       
       table.push('<tr class="'+option+'"><td>');
       table.push(Options.createTextInput(option+'_alias_'+id, alias));
+      table.push('</td><td>');
       table.push(Options.createTextInput(option+'_description_'+id, description));
+      table.push('</td><td>');
       table.push(Options.createButton('Update', "Tissue.update('"+endpoint+"', "+id+", '"+option+"')"));
       table.push('</td><td>');
       table.push(Options.createButton('Delete', "Options.confirmDelete('"+endpoint+"')"));
@@ -87,7 +91,12 @@ var Tissue = Tissue || {
     table.push('<tr id="new'+option+'RowButton"><td>');
     table.push(Options.createButton('Create New '+word, "Tissue.createNewRow('"+option+"')", 'newOrigin'));
     table.push('</td></tr>');
-    document.getElementById(tableId).innerHTML = table.join('');
+    tableBody.innerHTML = table.join('');
+    tableLoadCounter += 1;
+    
+    if (tableLoadCounter > 5) { // if tables have all already been loaded once
+      Options.displayCheckmark(tableBody.parentElement.id);
+    }
   },
   
   update: function (endpoint, id, option) {
@@ -97,14 +106,7 @@ var Tissue = Tissue || {
       alert("Neither alias nor description can be blank.");
       return null;
     }
-    var callback;
-    switch (option) {
-      case 'TO': callback = Tissue.getTissueOrigins;
-      case 'TC': callback = Tissue.getTissueConditions;
-      case 'TM': callback = Tissue.getTissueMaterials;
-      case 'SP': callback = Tissue.getSamplePurposes;
-    }
-    Options.makeXhrRequest('PUT', endpoint, callback, JSON.stringify({ 'alias': alias, 'description': description }));
+    Options.makeXhrRequest('PUT', endpoint, Options.reloadTable, JSON.stringify({ 'alias': alias, 'description': description }), option);
   },
   
   createNewRow: function (option) {
@@ -112,7 +114,9 @@ var Tissue = Tissue || {
 
     row.push('<tr><td>');
     row.push(Options.createTextInput(option+'_alias_new'));
+    row.push('</td><td>');
     row.push(Options.createTextInput(option+'_description_new'));
+    row.push('</td><td>');
     row.push(Options.createButton('Add', "Tissue.addNew('"+option+"')"));
     row.push('</td></tr>');
 
@@ -127,26 +131,17 @@ var Tissue = Tissue || {
       alert("Neither alias nor description can be blank.");
       return null;
     }
-    var collection, callback;
-    switch (option) {
-      case 'TO': 
-        collection = 'tissueorigin'; 
-        callback = Tissue.getTissueOrigins;
-        break;
-      case 'TC': 
-        collection = 'tissuetype'; 
-        callback = Tissue.getTissueConditions;
-        break;
-      case 'TM': 
-        collection = 'tissuematerial'; 
-        callback = Tissue.getTissueMaterials;
-        break;
-      case 'SP': 
-        collection = 'samplepurpose'; 
-        callback = Tissue.getSamplePurposes;
-        break;
+    var collection;
+    if (option == 'TO') {
+      collection = 'tissueorigin';
+    } else if (option == 'TC') {
+      collection = 'tissuetype'; 
+    } else if (option == 'TM') {
+      collection = 'tissuematerial'; 
+    } else if (option == 'SP') {
+      collection = 'samplepurpose';
     }
-    Options.makeXhrRequest('POST', '/miso/rest/'+collection, callback, JSON.stringify({ 'alias': alias, 'description': description }));
+    Options.makeXhrRequest('POST', '/miso/rest/'+collection, Options.reloadTable, JSON.stringify({ 'alias': alias, 'description': description }), option);
   }
 };
 
@@ -161,7 +156,8 @@ var QC = QC || {
       return (a.status > b.status) ? 1 : ((b.status > a.status) ? -1 : 0);
     });
    
-    document.getElementById('allQcDetails').innerHTML = null;
+    var tableBody = document.getElementById('allQcDetails');
+    tableBody.innerHTML = null;
 
     var table = [];
     var id, status, description, note, endpoint;
@@ -185,7 +181,12 @@ var QC = QC || {
     table.push('<tr id="newQCRowButton"><td>');
     table.push(Options.createButton('Create New QC Details', 'QC.createNewRow()', 'newDetails'));
     table.push('</td></tr>');
-    document.getElementById('allQcDetails').innerHTML = table.join('');
+    tableBody.innerHTML = table.join('');
+    tableLoadCounter += 1;
+    
+    if (tableLoadCounter > 5) { // if tables have all already been loaded once
+      Options.displayCheckmark(tableBody.parentElement.id);
+    }
   },
 
   createStatusInput: function (idValue, status) {
@@ -215,7 +216,7 @@ var QC = QC || {
       alert("Neither status, description nor note required can be blank.");
       return null;
     }
-    Options.makeXhrRequest('PUT', endpoint, QC.getQcDetails, JSON.stringify({ 'status': status, 'description': description, 'noteRequired': note }));
+    Options.makeXhrRequest('PUT', endpoint, Options.reloadTable, JSON.stringify({ 'status': status, 'description': description, 'noteRequired': note }), 'QC');
   },
   
   createNewRow: function () {
@@ -240,7 +241,7 @@ var QC = QC || {
       alert("Neither status, description nor note required can be blank.");
       return null;
     }
-    Options.makeXhrRequest('POST', '/miso/rest/qcpasseddetail', QC.getQcDetails, JSON.stringify({ 'status': status, 'description': description, 'noteRequired': note }));
+    Options.makeXhrRequest('POST', '/miso/rest/qcpasseddetail', Options.reloadTable, JSON.stringify({ 'status': status, 'description': description, 'noteRequired': note }), 'QC');
   }
 };
 
@@ -261,7 +262,8 @@ var Subproject = Subproject || {
       return (a.alias > b.alias) ? 1 : ((b.alias > a.alias) ? -1 : 0);
     });
     
-    document.getElementById('allSubprojects').innerHTML = null;
+    var tableBody = document.getElementById('allSubprojects')
+    tableBody.innerHTML = null;
 
     var table = [];
     var id, alias, description, project, priority, endpoint, tr, td, aliasInput, descriptionInput, parentProjectInput, priorityInput, updateButton, td2, deleteButton, newRowButton;
@@ -287,7 +289,12 @@ var Subproject = Subproject || {
     table.push('<tr id="newSubpRowButton"><td>');
     table.push(Options.createButton('Create New Subproject', 'Subproject.createNewRow()', 'newDetails'));
     table.push('</td></tr>');
-    document.getElementById('allSubprojects').innerHTML = table.join('');
+    tableBody.innerHTML = table.join('');
+    tableLoadCounter += 1;
+    
+    if (tableLoadCounter > 5) { // if tables have all already been loaded once
+      Options.displayCheckmark(tableBody.parentElement.id);
+    }
   },
   
   createProjectsSelect: function(idValue, project) {
@@ -322,7 +329,7 @@ var Subproject = Subproject || {
       alert("Neither alias, description, project nor priority can be blank.");
       return null;
     }
-    Options.makeXhrRequest('PUT', endpoint, Subproject.getSubprojects, JSON.stringify({ 'alias': alias, 'description': description, 'parentProjectId': parentProject, 'priority': priority }));
+    Options.makeXhrRequest('PUT', endpoint, Options.reloadTable, JSON.stringify({ 'alias': alias, 'description': description, 'parentProjectId': parentProject, 'priority': priority }), 'SubP');
   },
   
   createNewRow: function () {
@@ -349,20 +356,23 @@ var Subproject = Subproject || {
       alert("Neither alias, description, project nor priority can be blank.");
       return null;
     }
-    Options.makeXhrRequest('POST', '/miso/rest/subproject', Subproject.getSubprojects, JSON.stringify({ 'alias': alias, 'description': description, 'parentProjectId': parentProject, 'priority': priority}));
+    Options.makeXhrRequest('POST', '/miso/rest/subproject', Options.reloadTable, JSON.stringify({ 'alias': alias, 'description': description, 'parentProjectId': parentProject, 'priority': priority}), 'SubP');
   }
 };
 
 var Options = Options || {
-  makeXhrRequest: function (method, endpoint, callback, data) {
+  makeXhrRequest: function (method, endpoint, callback, data, callbackarg) {
     var expectedStatus = (method == 'POST' ? 201 : 200);
-    if (!callback) callback = document.location.reload;
     var xhr = new XMLHttpRequest();
     xhr.open(method, endpoint);
     xhr.onreadystatechange = function() {
       if (xhr.readyState === XMLHttpRequest.DONE) {
         if (xhr.status === expectedStatus) {
-          data ? callback() : callback(xhr) ;
+          if (!callback) {
+            document.location.reload(); 
+          } else {
+            data ? (callbackarg ? callback(callbackarg) : callback()) : callback(xhr) ;
+          }
         } else {
           console.log(xhr.response);
         }
@@ -384,5 +394,41 @@ var Options = Options || {
 
   createButton: function(valueText, onclickFunction, idText) {
     return '<button class="inline"'+(idText ? ' id="'+ idText +'"' : '')+' onclick="'+ onclickFunction +'">'+ valueText +'</button>';
+  },
+  
+  reloadTable: function (option) {
+    var reloadTableFunc, table;
+    if (option == 'TO') {
+      reloadTableFunc = Tissue.getTissueOrigins;
+      table = document.getElementById('allOriginsTable');
+    } else if (option == 'TC') {
+      reloadTableFunc = Tissue.getTissueConditions;
+      table = document.getElementById('allConditionsTable');
+    } else if (option == 'TM') {
+      reloadTableFunc = Tissue.getTissueMaterials;
+      table = document.getElementById('allMaterialsTable');
+    } else if (option == 'SP') {
+      reloadTableFunc = Tissue.getSamplePurposes;
+      table = document.getElementById('allPurposesTable');
+    } else if (option == 'QC') {
+      reloadTableFunc = QC.getQcDetails;
+      table = document.getElementById('allQcDetailsTable');
+    } else if (option == 'SubP') {
+      reloadTableFunc = Subproject.getSubprojects;
+      table = document.getElementById('allSubprojectsTable');
+    }
+    reloadTableFunc();
+  },
+  
+  displayCheckmark: function (tableId) {
+    var table = document.getElementById(tableId);
+    table.setAttribute('style', 'float:left');
+    var checkmark = '<div><img id="checkmark"  src="/styles/images/ok.png"/></div><div class="clear"></div>';
+    table.insertAdjacentHTML('afterend', checkmark);
+    var check = jQuery('#checkmark');
+    check.fadeOut("slow", function() {
+      jQuery(this).remove();
+      table.setAttribute('style', 'clear:both');
+    });
   }
 };

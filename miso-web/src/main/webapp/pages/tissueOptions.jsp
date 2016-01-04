@@ -42,10 +42,10 @@
   
   <h2 id="origins">Tissue Origins</h2>
   <div>
-	  <table id="allOriginsTable" class="tissueOptionsTable">
+	  <table id="allOriginsTable" class="tissueOptionsTable clear">
 		  <thead>
 			  <tr>
-			    <th><span class="first-half-width">Alias</span><span class="second-half-width">Description</span></th>
+			    <th>Alias</th><th>Description</th>
 	      </tr>
 	    </thead>
 	    <tbody id="allOrigins"></tbody>
@@ -56,10 +56,10 @@
   <div class="sectionDivider"></div>
   <h2 id="conditions">Tissue Conditions</h2>
   <div>
-	  <table id="allConditionsTable" class="tissueOptionsTable">
+	  <table id="allConditionsTable" class="tissueOptionsTable clear">
 	    <thead>
 	      <tr>
-	        <th><span class="first-half-width">Alias</span><span class="second-half-width">Description</span></th>
+	        <th>Alias</th><th>Description</th>
 	      </tr>
 	    </thead>
 	    <tbody id="allConditions"></tbody>
@@ -69,10 +69,10 @@
 	<div class="sectionDivider"></div>
   <h2 id="materials">Tissue Materials</h2>
   <div>
-    <table id="allMaterialsTable" class="tissueOptionsTable">
+    <table id="allMaterialsTable" class="tissueOptionsTable clear">
       <thead>
         <tr>
-          <th><span class="first-half-width">Alias</span><span class="second-half-width">Description</span></th>
+          <th>Alias</th><th>Description</th>
         </tr>
       </thead>
       <tbody id="allMaterials"></tbody>
@@ -82,10 +82,10 @@
   <div class="sectionDivider"></div>
   <h2 id="purposes">Sample Purposes</h2>
   <div>
-    <table id="allPurposesTable" class="tissueOptionsTable">
+    <table id="allPurposesTable" class="tissueOptionsTable clear">
       <thead>
         <tr>
-          <th><span class="first-half-width">Alias</span><span class="second-half-width">Description</span></th>
+          <th>Alias</th><th>Description</th>
         </tr>
       </thead>
       <tbody id="allPurposes"></tbody>
@@ -95,10 +95,10 @@
   <div class="sectionDivider"></div>
   <h2 id="qcDetails">QC Details</h2>
   <div>
-    <table id="allQcDetailsTable" class="tissueOptionsTable">
+    <table id="allQcDetailsTable" class="tissueOptionsTable clear">
       <thead>
         <tr>
-          <th>Status Description Note Required?</th>
+          <th>QC</th><th>Passed</th><th>Description</th><th>Note Required?</th>
         </tr>
       </thead>
       <tbody id="allQcDetails"></tbody>
@@ -108,7 +108,7 @@
   <div class="sectionDivider"></div>
   <h2 id="subprojects">Subprojects</h2>
   <div>
-    <table id="allSubprojectsTable" class="tissueOptionsTable">
+    <table id="allSubprojectsTable" class="tissueOptionsTable clear">
       <thead>
         <tr>
           <th>Alias Project Description Priority</th>
@@ -127,7 +127,7 @@
     Tissue.getTissueConditions();
     Tissue.getTissueMaterials();
     Tissue.getSamplePurposes();
-    QC.getQcDetails();
+    //QC.getQcDetails();
     Subproject.getSubprojects();
   });
 </script>
