@@ -98,7 +98,7 @@
     <table id="allQcDetailsTable" class="tissueOptionsTable clear">
       <thead>
         <tr>
-          <th>QC</th><th>Passed</th><th>Description</th><th>Note Required?</th>
+          <th>Description</th><th>QC Passed</th><th>Note Required?</th>
         </tr>
       </thead>
       <tbody id="allQcDetails"></tbody>
@@ -111,7 +111,7 @@
     <table id="allSubprojectsTable" class="tissueOptionsTable clear">
       <thead>
         <tr>
-          <th>Alias Project Description Priority</th>
+          <th>Project</th><th>Alias</th><th>Description</th><th>Priority</th>
         </tr>
       </thead>
       <tbody id="allSubprojects"></tbody>
@@ -127,7 +127,7 @@
     Tissue.getTissueConditions();
     Tissue.getTissueMaterials();
     Tissue.getSamplePurposes();
-    //QC.getQcDetails();
+    QC.getQcDetails();
     Subproject.getSubprojects();
   });
 </script>

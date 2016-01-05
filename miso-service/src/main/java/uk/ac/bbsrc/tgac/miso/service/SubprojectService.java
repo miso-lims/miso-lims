@@ -9,7 +9,7 @@ public interface SubprojectService {
 
   Subproject get(Long subprojectId);
 
-  Long create(Subproject subproject) throws IOException;
+  Long create(Subproject subproject, Long parentProjectId) throws IOException;
 
   void update(Subproject subproject) throws IOException;
 

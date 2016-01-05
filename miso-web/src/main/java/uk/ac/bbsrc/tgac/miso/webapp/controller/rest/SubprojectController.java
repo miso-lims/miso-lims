@@ -115,7 +115,7 @@ public class SubprojectController extends RestController {
       throw new RestException(Status.UNAUTHORIZED);
     }
     Subproject subproject = Dtos.to(subprojectDto);
-    Long id = subprojectService.create(subproject);
+    Long id = subprojectService.create(subproject, subprojectDto.getParentProjectId());
     UriComponents uriComponents = b.path("/subproject/{id}").buildAndExpand(id);
     HttpHeaders headers = new HttpHeaders();
     headers.setLocation(uriComponents.toUri());

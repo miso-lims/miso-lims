@@ -65,36 +65,41 @@ var Tissue = Tissue || {
   },
 
   createTable: function (xhr, option, tableId, endpointWord, word, table) {
-    var data = JSON.parse(xhr.responseText);
-    data.sort(function (a,b) {
-      return (a.alias > b.alias) ? 1 : ((b.alias > a.alias) ? -1 : 0);
-    });
-
     tableBody = document.getElementById(tableId);
     tableBody.innerHTML = null;
-    for (var i=0; i<data.length; i++) {
-      id = data[i]["id"];
-      alias = data[i]["alias"];
-      description = data[i]["description"];
-      endpoint = "/miso/rest/"+ endpointWord +"/" + id;
-      
-      table.push('<tr class="'+option+'"><td>');
-      table.push(Options.createTextInput(option+'_alias_'+id, alias));
-      table.push('</td><td>');
-      table.push(Options.createTextInput(option+'_description_'+id, description));
-      table.push('</td><td>');
-      table.push(Options.createButton('Update', "Tissue.update('"+endpoint+"', "+id+", '"+option+"')"));
-      table.push('</td><td>');
-      table.push(Options.createButton('Delete', "Options.confirmDelete('"+endpoint+"')"));
-      table.push('</td></tr>');
+    
+    var data;
+    if (xhr.responseText) {
+      data = JSON.parse(xhr.responseText);
+      data.sort(function (a,b) {
+        return (a.alias > b.alias) ? 1 : ((b.alias > a.alias) ? -1 : 0);
+      });
+    } // else collection is empty, so add only the "Add New" button
+    if (data) {
+      for (var i=0; i<data.length; i++) {
+        id = data[i]["id"];
+        alias = data[i]["alias"];
+        description = data[i]["description"];
+        endpoint = "/miso/rest/"+ endpointWord +"/" + id;
+        
+        table.push('<tr class="'+option+'"><td>');
+        table.push(Options.createTextInput(option+'_alias_'+id, alias));
+        table.push('</td><td>');
+        table.push(Options.createTextInput(option+'_description_'+id, description));
+        table.push('</td><td>');
+        table.push(Options.createButton('Update', "Tissue.update('"+endpoint+"', "+id+", '"+option+"')"));
+        table.push('</td><td>');
+        table.push(Options.createButton('Delete', "Options.confirmDelete('"+endpoint+"')"));
+        table.push('</td></tr>');
+      }
     }
-    table.push('<tr id="new'+option+'RowButton"><td>');
-    table.push(Options.createButton('Create New '+word, "Tissue.createNewRow('"+option+"')", 'newOrigin'));
+    table.push('<tr id="new'+option+'RowButton" class="'+option+'"><td>');
+    table.push(Options.createButton('New '+word, "Tissue.createNewRow('"+option+"')", 'newOrigin'));
     table.push('</td></tr>');
     tableBody.innerHTML = table.join('');
     tableLoadCounter += 1;
     
-    if (tableLoadCounter > 5) { // if tables have all already been loaded once
+    if (tableLoadCounter > 6) { // if tables have all already been loaded once
       Options.displayCheckmark(tableBody.parentElement.id);
     }
   },
@@ -151,40 +156,48 @@ var QC = QC || {
   },
   
   createQcDetailsTable: function (xhr) {
-    var data = JSON.parse(xhr.responseText);
-    data.sort(function (a, b){
-      return (a.status > b.status) ? 1 : ((b.status > a.status) ? -1 : 0);
-    });
-   
     var tableBody = document.getElementById('allQcDetails');
     tableBody.innerHTML = null;
-
+    
+    var data;
+    if (xhr.responseText) {
+      data = JSON.parse(xhr.responseText);
+      data.sort(function (a, b){
+        return (a.description > b.description) ? 1 : ((b.description > a.description) ? -1 : 0);
+      });
+    } // else collection is empty, so render only the "Add New" button
+   
     var table = [];
     var id, status, description, note, endpoint;
 
-    for (var i=0; i<data.length; i++) {
-      id = data[i]["id"];
-      status = data[i]["status"];
-      description = data[i]["description"];
-      note = data[i]["noteRequired"];
-      endpoint = "/miso/rest/qcpasseddetail/" + id;
-
-      table.push('<tr class="QC"><td>');
-      table.push(QC.createStatusInput('QC_status_'+id, status));
-      table.push(Options.createTextInput('QC_description_'+id, description));
-      table.push(QC.createNoteReqdInput('QC_note_'+id, note));
-      table.push(Options.createButton('Update', "QC.update('"+endpoint+"', "+id+")"));
-      table.push('</td><td>');
-      table.push(Options.createButton('Delete', "Options.confirmDelete('"+endpoint+"')"));
-      table.push('</td></tr>');
+    if (data) {
+      for (var i=0; i<data.length; i++) {
+        id = data[i]["id"];
+        status = data[i]["status"];
+        description = data[i]["description"];
+        note = data[i]["noteRequired"];
+        endpoint = "/miso/rest/qcpasseddetail/" + id;
+  
+        table.push('<tr class="QC"><td>');
+        table.push(Options.createTextInput('QC_description_'+id, description));
+        table.push('</td><td>');
+        table.push(QC.createStatusInput('QC_status_'+id, status));
+        table.push('</td><td>');
+        table.push(QC.createNoteReqdInput('QC_note_'+id, note));
+        table.push('</td><td>');
+        table.push(Options.createButton('Update', "QC.update('"+endpoint+"', "+id+")"));
+        table.push('</td><td>');
+        table.push(Options.createButton('Delete', "Options.confirmDelete('"+endpoint+"')"));
+        table.push('</td></tr>');
+      }
     }
-    table.push('<tr id="newQCRowButton"><td>');
-    table.push(Options.createButton('Create New QC Details', 'QC.createNewRow()', 'newDetails'));
+    table.push('<tr id="newQCRowButton" class="QC"><td>');
+    table.push(Options.createButton('New QC Details', 'QC.createNewRow()', 'newDetails'));
     table.push('</td></tr>');
     tableBody.innerHTML = table.join('');
     tableLoadCounter += 1;
     
-    if (tableLoadCounter > 5) { // if tables have all already been loaded once
+    if (tableLoadCounter > 6) { // if tables have all already been loaded once
       Options.displayCheckmark(tableBody.parentElement.id);
     }
   },
@@ -192,9 +205,9 @@ var QC = QC || {
   createStatusInput: function (idValue, status) {
     var select = [];
     select.push('<select id="'+ idValue +'">');
-    select.push('<option value="true"'+ (status === 'true' ? select.push(Options.selectedOpt) : '') +'>True</option>');
-    select.push('<option value="false"'+ (status === 'false' ? select.push(Options.selectedOpt) : '') +'>False</option>');
-    select.push('<option value=""'+ (status === '' ? select.push(Options.selectedOpt) : '') +'>Unknown</option>');
+    select.push('<option value="true"'+ (status === 'true' ? ' selected' : '') +'>True</option>');
+    select.push('<option value="false"'+ (status === 'false' ? ' selected' : '') +'>False</option>');
+    select.push('<option value=""'+ (status === '' ? ' selected' : '') +'>Unknown</option>');
     select.push('</select>');
     return select.join('');
   },
@@ -202,15 +215,15 @@ var QC = QC || {
   createNoteReqdInput: function (idValue, note) {
     var select = [];
     select.push('<select id="'+ idValue +'">');
-    select.push('<option value="1"'+ (note ? select.push(Options.selectedOpt) : '') +'>Yes</option>');
-    select.push('<option value="0"'+ (note ? '' : select.push(Options.selectedOpt)) +'>No</option>');
+    select.push('<option value="true"'+ (note ? ' selected' : '') +'>Yes</option>');
+    select.push('<option value="false"'+ (note ? '' : ' selected') +'>No</option>');
     select.push('</select>');
     return select.join('');
   },
   
   update: function (endpoint, id) {
-    var status = document.getElementById('QC_status_'+id).value;
     var description = document.getElementById('QC_description_'+id).value;
+    var status = document.getElementById('QC_status_'+id).value;
     var note = document.getElementById('QC_note_'+id).value;
     if (!status || !description || !note) {
       alert("Neither status, description nor note required can be blank.");
@@ -223,9 +236,12 @@ var QC = QC || {
     var row = [];
 
     row.push('<tr><td>');
-    row.push(QC.createStatusInput('QC_status_new'));
     row.push(Options.createTextInput('QC_description_new'));
+    row.push('</td><td>');
+    row.push(QC.createStatusInput('QC_status_new'));
+    row.push('</td><td>');
     row.push(QC.createNoteReqdInput('QC_note_new'));
+    row.push('</td><td>');
     row.push(Options.createButton('Add', "QC.addNew()"));
     row.push('</td></tr>');
 
@@ -234,11 +250,11 @@ var QC = QC || {
   },
   
   addNew: function() {
-    var status = document.getElementById('QC_status_new').value;
     var description = document.getElementById('QC_description_new').value;
+    var status = document.getElementById('QC_status_new').value;
     var note = document.getElementById('QC_note_new').value;
-    if (!status || !description || !note) {
-      alert("Neither status, description nor note required can be blank.");
+    if (!description || !note) { //status can be blank, for QC Passed=Unknown
+      alert("Neither description nor note required can be blank.");
       return null;
     }
     Options.makeXhrRequest('POST', '/miso/rest/qcpasseddetail', Options.reloadTable, JSON.stringify({ 'status': status, 'description': description, 'noteRequired': note }), 'QC');
@@ -258,53 +274,62 @@ var Subproject = Subproject || {
   },
   
   createSubprojectTable: function (xhr) {
-    var data = JSON.parse(xhr.response).sort(function (a, b) {
-      return (a.alias > b.alias) ? 1 : ((b.alias > a.alias) ? -1 : 0);
-    });
-    
     var tableBody = document.getElementById('allSubprojects')
     tableBody.innerHTML = null;
+
+    var data;
+    if (xhr.responseText) {
+      data = JSON.parse(xhr.response).sort(function (a, b) {
+        return (a.alias > b.alias) ? 1 : ((b.alias > a.alias) ? -1 : 0);
+      });
+    }    
 
     var table = [];
     var id, alias, description, project, priority, endpoint, tr, td, aliasInput, descriptionInput, parentProjectInput, priorityInput, updateButton, td2, deleteButton, newRowButton;
     
-    for (var i=0; i<data.length; i++) {
-      id = data[i]["id"];
-      alias = data[i]["alias"];
-      description = data[i]["description"];
-      project = data[i]["projectId"];
-      priority = data[i]["priority"];
-      endpoint = "/miso/rest/subproject/" + id;
-
-      table.push('<tr class="subP"><td>');
-      table.push(Options.createTextInput('subP_alias_'+ id, alias));
-      table.push(Options.createTextInput('subP_description_'+id, description));
-      table.push(Subproject.createProjectsSelect('subP_parentProject_'+ id, project));
-      table.push(Subproject.createPrioritySelect('subP_priority_'+ id, priority));
-      table.push(Options.createButton('Update', "Subproject.update('"+endpoint+"', "+id+")"));
-      table.push('</td><td>');
-      table.push(Options.createButton('Delete', "Options.confirmDelete('"+endpoint+"')"));
-      table.push('</td></tr>');
+    if (data) {
+      for (var i=0; i<data.length; i++) {
+        id = data[i]["id"];
+        alias = data[i]["alias"];
+        description = data[i]["description"];
+        projectId = data[i]["parentProjectId"];
+        projectName = projectArray.filter(function(p) { return p.projectId == projectId; })[0].alias;
+        priority = data[i]["priority"];
+        endpoint = "/miso/rest/subproject/" + id;
+  
+        table.push('<tr class="subP"><td>');
+        table.push('<b><span id="subP_parentProject_'+id+'">'+ projectName +'</span></b>'); // not editable after creation
+        table.push('</td><td>');
+        table.push(Options.createTextInput('subP_alias_'+ id, alias));
+        table.push('</td><td>');
+        table.push(Options.createTextInput('subP_description_'+id, description));
+        table.push('</td><td>');
+        table.push(Subproject.createPrioritySelect('subP_priority_'+ id, priority));
+        table.push('</td><td>');
+        table.push(Options.createButton('Update', "Subproject.update('"+endpoint+"', "+id+")"));
+        table.push('</td><td>');
+        table.push(Options.createButton('Delete', "Options.confirmDelete('"+endpoint+"')"));
+        table.push('</td></tr>');
+      }
     }
-    table.push('<tr id="newSubpRowButton"><td>');
-    table.push(Options.createButton('Create New Subproject', 'Subproject.createNewRow()', 'newDetails'));
+    table.push('<tr id="newSubpRowButton" class="subP"><td>');
+    table.push(Options.createButton('New Subproject', 'Subproject.createNewRow()', 'newDetails'));
     table.push('</td></tr>');
     tableBody.innerHTML = table.join('');
     tableLoadCounter += 1;
     
-    if (tableLoadCounter > 5) { // if tables have all already been loaded once
+    if (tableLoadCounter > 6) { // if tables have all already been loaded once
       Options.displayCheckmark(tableBody.parentElement.id);
     }
   },
   
-  createProjectsSelect: function(idValue, project) {
+  createProjectsSelect: function(idValue, projectId) {
+    var selectedProjectId = projectId || '';
     var select = [];
     select.push('<select id="'+ idValue +'">');
     for (var j=0;j<projectArray.length;j++) {
       select.push('<option value="'+ projectArray[j]["projectId"] +'"');
-      if (project) {
-        projectArray[j]["projectId"] == project ? select.push(' selected="selected"') : null ;
-      }
+      if (projectArray[j]["projectId"] == selectedProjectId) select.push(' selected=""');
       select.push('>'+ projectArray[j]["alias"] +'</option>');
     }
     select.push('</select>');
@@ -314,8 +339,8 @@ var Subproject = Subproject || {
   createPrioritySelect: function(idValue, priority) {
     var select = [];
     select.push('<select id="'+ idValue +'">');
-    select.push('<option value="1"'+ (priority ? 'selected="selected"' : '') +'>High</option>');
-    select.push('<option value="0"'+ (priority ? '' : 'selected="selected"') +'>Standard</option>');
+    select.push('<option value="true"'+ (priority ? ' selected' : '') +'>High</option>');
+    select.push('<option value="false"'+ (priority ? '' : ' selected') +'>Standard</option>');
     select.push('</select>')
     return select.join('');
   },
@@ -323,23 +348,26 @@ var Subproject = Subproject || {
   update: function (endpoint, id) {
     var alias = document.getElementById('subP_alias_'+id).value;
     var description = document.getElementById('subP_description_'+id).value;
-    var parentProject = document.getElementById('subP_parentProject_'+id).value;
     var priority = document.getElementById('subP_priority_'+id).value;
-    if (!alias || !description || !parentProject || !priority) {
-      alert("Neither alias, description, project nor priority can be blank.");
+    if (!alias || !description || !priority) {
+      alert("Neither alias, description, nor priority can be blank.");
       return null;
     }
-    Options.makeXhrRequest('PUT', endpoint, Options.reloadTable, JSON.stringify({ 'alias': alias, 'description': description, 'parentProjectId': parentProject, 'priority': priority }), 'SubP');
+    Options.makeXhrRequest('PUT', endpoint, Options.reloadTable, JSON.stringify({ 'alias': alias, 'description': description, 'priority': priority }), 'SubP');
   },
   
   createNewRow: function () {
     var row = [];
 
     row.push('<tr><td>');
-    row.push(Options.createTextInput('subP_alias_new'));
-    row.push(Options.createTextInput('subP_description_new'));
     row.push(Subproject.createProjectsSelect('subP_parentProject_new'));
+    row.push('</td><td>');
+    row.push(Options.createTextInput('subP_alias_new'));
+    row.push('</td><td>');
+    row.push(Options.createTextInput('subP_description_new'));
+    row.push('</td><td>');
     row.push(Subproject.createPrioritySelect('subP_priority_new'));
+    row.push('</td><td>');
     row.push(Options.createButton('Add', "Subproject.addNew()"));
     row.push('</td></tr>');
 
@@ -350,31 +378,39 @@ var Subproject = Subproject || {
   addNew: function() {
     var alias = document.getElementById('subP_alias_new').value;
     var description = document.getElementById('subP_description_new').value;
-    var parentProject = document.getElementById('subP_parentProject_new').value;
+    var parentProjectId = document.getElementById('subP_parentProject_new').value;
     var priority = document.getElementById('subP_priority_new').value;
-    if (!alias || !description || !parentProject || !priority) {
+    if (!alias || !description || !parentProjectId || !priority) {
       alert("Neither alias, description, project nor priority can be blank.");
       return null;
     }
-    Options.makeXhrRequest('POST', '/miso/rest/subproject', Options.reloadTable, JSON.stringify({ 'alias': alias, 'description': description, 'parentProjectId': parentProject, 'priority': priority}), 'SubP');
+    Options.makeXhrRequest('POST', '/miso/rest/subproject', Options.reloadTable, JSON.stringify({ 'alias': alias, 'description': description, 'parentProjectId': parentProjectId, 'priority': priority}), 'SubP');
   }
 };
 
 var Options = Options || {
   makeXhrRequest: function (method, endpoint, callback, data, callbackarg) {
-    var expectedStatus = (method == 'POST' ? 201 : 200);
+    var expectedStatus;
+    var unauthorizedStatus = 401;
+    if (method == 'POST') {
+      expectedStatus = [201];
+    } else {
+      expectedStatus = [200, 404];
+    }
     var xhr = new XMLHttpRequest();
     xhr.open(method, endpoint);
     xhr.onreadystatechange = function() {
       if (xhr.readyState === XMLHttpRequest.DONE) {
-        if (xhr.status === expectedStatus) {
+        if (expectedStatus.indexOf(xhr.status) != -1) {
           if (!callback) {
             document.location.reload(); 
           } else {
-            data ? (callbackarg ? callback(callbackarg) : callback()) : callback(xhr) ;
+            data ? ( callbackarg ? callback(callbackarg) : callback() ) : callback(xhr) ;
           }
+        } else if (xhr.status === unauthorizedStatus) {
+          alert("You are not authorized to view this page.");
         } else {
-          console.log(xhr.response);
+          alert("Sorry, something went wrong. Please try again. If the issue persists, contact your administrator.");
         }
       }
     }

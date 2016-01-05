@@ -13,9 +13,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Sets;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.persistence.SubprojectDao;
 import uk.ac.bbsrc.tgac.miso.service.SubprojectService;
+import uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO;
 
 @Transactional
 @Service
@@ -23,6 +25,8 @@ public class DefaultSubprojectService implements SubprojectService {
 
   protected static final Logger log = LoggerFactory.getLogger(DefaultSubprojectService.class);
 
+  @Autowired
+  private SQLProjectDAO sqlProjectDAO;
   @Autowired
   private SubprojectDao subprojectDao;
 
@@ -33,12 +37,15 @@ public class DefaultSubprojectService implements SubprojectService {
   public Subproject get(Long subprojectId) {
     return subprojectDao.getSubproject(subprojectId);
   }
+  
 
   @Override
-  public Long create(Subproject subproject) throws IOException {
+  public Long create(Subproject subproject, Long parentProjectId) throws IOException {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    Project parentProject = sqlProjectDAO.get(parentProjectId);
     subproject.setCreatedBy(user);
     subproject.setUpdatedBy(user);
+    subproject.setParentProject(parentProject);
     return subprojectDao.addSubproject(subproject);
   }
 
@@ -47,6 +54,7 @@ public class DefaultSubprojectService implements SubprojectService {
     Subproject updatedSubproject = get(subproject.getSubprojectId());
     updatedSubproject.setAlias(subproject.getAlias());
     updatedSubproject.setDescription(subproject.getDescription());
+    updatedSubproject.setPriority(subproject.getPriority());
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     updatedSubproject.setUpdatedBy(user);
     subprojectDao.update(updatedSubproject);

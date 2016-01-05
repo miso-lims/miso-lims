@@ -4,88 +4,79 @@ import java.util.Set;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
-import uk.ac.bbsrc.tgac.miso.core.data.QcPassedDetail;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleGroupId;
-import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
-import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
-import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
-import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
-import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
-
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 public class SampleOptionsDto {
   
-  private Set<Subproject> subprojects;
-  private Set<TissueOrigin> tissueOrigins;
-  private Set<TissueType> tissueTypes;
-  private Set<SampleClass> sampleClasses;
-  private Set<SamplePurpose> samplePurposes;
-  private Set<SampleGroupId> sampleGroups;
-  private Set<TissueMaterial> tissueMaterials;
-  private Set<QcPassedDetail> qcPassedDetails;
+  private Set<SubprojectDto> subprojects;
+  private Set<TissueOriginDto> tissueOrigins;
+  private Set<TissueTypeDto> tissueTypes;
+  private Set<SampleClassDto> sampleClasses;
+  private Set<SamplePurposeDto> samplePurposes;
+  private Set<SampleGroupDto> sampleGroups;
+  private Set<TissueMaterialDto> tissueMaterials;
+  private Set<QcPassedDetailDto> qcPassedDetails;
   
-  public Set<Subproject> getSubprojects() {
+  public Set<SubprojectDto> getSubprojectsDtos() {
     return subprojects;
   }
   
-  public void setSubprojects(Set<Subproject> subprojects) {
+  public void setSubprojectsDtos(Set<SubprojectDto> subprojects) {
     this.subprojects = subprojects;
   }
   
-  public Set<TissueOrigin> getTissueOrigins() {
+  public Set<TissueOriginDto> getTissueOriginsDtos() {
     return tissueOrigins;
   }
   
-  public void setTissueOrigins(Set<TissueOrigin> tissueOrigins) {
+  public void setTissueOriginsDtos(Set<TissueOriginDto> tissueOrigins) {
     this.tissueOrigins = tissueOrigins;
   }
   
-  public Set<TissueType> getTissueTypes() {
+  public Set<TissueTypeDto> getTissueTypesDtos() {
     return tissueTypes;
   }
   
-  public void setTissueTypes(Set<TissueType> tissueTypes) {
+  public void setTissueTypesDtos(Set<TissueTypeDto> tissueTypes) {
     this.tissueTypes = tissueTypes;
   }
   
-  public Set<SampleClass> getSampleClasses() {
+  public Set<SampleClassDto> getSampleClassesDtos() {
     return sampleClasses;
   }
   
-  public void setSampleClasses(Set<SampleClass> sampleClasses) {
+  public void setSampleClassesDtos(Set<SampleClassDto> sampleClasses) {
     this.sampleClasses = sampleClasses;
   }
   
-  public Set<SamplePurpose> getSamplePurposes() {
+  public Set<SamplePurposeDto> getSamplePurposesDtos() {
     return samplePurposes;
   }
   
-  public void setSamplePurposes(Set<SamplePurpose> samplePurposes) {
+  public void setSamplePurposesDtos(Set<SamplePurposeDto> samplePurposes) {
     this.samplePurposes = samplePurposes;
   }
   
-  public Set<SampleGroupId> getSampleGroups() {
+  public Set<SampleGroupDto> getSampleGroupsDtos() {
     return sampleGroups;
   }
   
-  public void setSampleGroups(Set<SampleGroupId> sampleGroups) {
+  public void setSampleGroupsDtos(Set<SampleGroupDto> sampleGroups) {
     this.sampleGroups = sampleGroups;
   }
   
-  public Set<TissueMaterial> getTissueMaterials() {
+  public Set<TissueMaterialDto> getTissueMaterialsDtos() {
     return tissueMaterials;
   }
   
-  public void setTissueMaterials(Set<TissueMaterial> tissueMaterials) {
+  public void setTissueMaterialsDtos(Set<TissueMaterialDto> tissueMaterials) {
     this.tissueMaterials = tissueMaterials;
   }
   
-  public Set<QcPassedDetail> getQcPassedDetails() {
+  public Set<QcPassedDetailDto> getQcPassedDetailsDtos() {
     return qcPassedDetails;
   }
   
-  public void setQcPassedDetails(Set<QcPassedDetail> qcPassedDetails) {
+  public void setQcPassedDetailsDtos(Set<QcPassedDetailDto> qcPassedDetails) {
     this.qcPassedDetails = qcPassedDetails;
   }
 }

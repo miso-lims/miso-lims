@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SampleOptionsDto;
 import uk.ac.bbsrc.tgac.miso.service.QcPassedDetailService;
 import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
@@ -48,14 +49,14 @@ public class SampleOptionsController {
   @ResponseBody
   public ResponseEntity<SampleOptionsDto> getSampleOptions(UriComponentsBuilder uriBuilder) {
     SampleOptionsDto sampleOptionsDto = new SampleOptionsDto();
-    sampleOptionsDto.setSubprojects(subprojectService.getAll());
-    sampleOptionsDto.setTissueOrigins(tissueOriginService.getAll());
-    sampleOptionsDto.setTissueTypes(tissueTypeService.getAll());
-    sampleOptionsDto.setSampleClasses(sampleClassService.getAll());
-    sampleOptionsDto.setSamplePurposes(samplePurposeService.getAll());
-    sampleOptionsDto.setSampleGroups(sampleGroupService.getAll());
-    sampleOptionsDto.setTissueMaterials(tissueMaterialService.getAll());
-    sampleOptionsDto.setQcPassedDetails(qcPassedDetailService.getAll());
+    sampleOptionsDto.setSubprojectsDtos(Dtos.asSubprojectDtos(subprojectService.getAll()));
+    sampleOptionsDto.setTissueOriginsDtos(Dtos.asTissueOriginDtos(tissueOriginService.getAll()));
+    sampleOptionsDto.setTissueTypesDtos(Dtos.asTissueTypeDtos(tissueTypeService.getAll()));
+    sampleOptionsDto.setSampleClassesDtos(Dtos.asSampleClassDtos(sampleClassService.getAll()));
+    sampleOptionsDto.setSamplePurposesDtos(Dtos.asSamplePurposeDtos(samplePurposeService.getAll()));
+    sampleOptionsDto.setSampleGroupsDtos(Dtos.asSampleGroupDtos(sampleGroupService.getAll()));
+    sampleOptionsDto.setTissueMaterialsDtos(Dtos.asTissueMaterialDtos(tissueMaterialService.getAll()));
+    sampleOptionsDto.setQcPassedDetailsDtos(Dtos.asQcPassedDetailDtos(qcPassedDetailService.getAll()));
    
     return new ResponseEntity<>(sampleOptionsDto, HttpStatus.OK);
   }
