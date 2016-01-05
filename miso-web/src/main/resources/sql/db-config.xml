@@ -396,7 +396,7 @@
   </bean>
 
   <bean id="sqlSequencerServiceRecordDAO"
-        class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLSequencerReferenceDAO">
+        class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLSequencerServiceRecordDAO">
     <property name="sequencerReferenceDAO" ref="sqlSequencerReferenceDAO"/>
     <property name="jdbcTemplate" ref="interfaceTemplate"/>
   </bean>
