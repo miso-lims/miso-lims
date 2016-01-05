@@ -8,7 +8,7 @@ ALTER TABLE SequencerReference ADD COLUMN upgradedSequencerReferenceId bigint(20
 ALTER TABLE SequencerReference ADD CONSTRAINT sequencerReference_upgradedReference_fkey FOREIGN KEY (upgradedSequencerReferenceId) REFERENCES SequencerReference(referenceId);
 
 CREATE TABLE SequencerServiceRecord (
-  recordId bigint(20) PRIMARY KEY,
+  recordId bigint(20) PRIMARY KEY AUTO_INCREMENT,
   sequencerReferenceId bigint(20) NOT NULL,
   title varchar(50) NOT NULL,
   details varchar(2000),
@@ -21,7 +21,7 @@ CREATE TABLE SequencerServiceRecord (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE SequencerServiceAttachment (
-  attachmentId bigint(20) PRIMARY KEY,
+  attachmentId bigint(20) PRIMARY KEY AUTO_INCREMENT,
   serviceRecordId bigint(20) NOT NULL,
   attachment MEDIUMBLOB NOT NULL,
   comment varchar(255),
