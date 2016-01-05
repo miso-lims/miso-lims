@@ -62,6 +62,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
@@ -2348,5 +2349,30 @@ public class UserAuthMisoRequestManager implements RequestManager {
     } else {
       throw new IOException("User " + getCurrentUser().getFullName() + " cannot change Box " + box.getAlias());
     }
+  }
+
+  @Override
+  public long saveSequencerServiceRecord(SequencerServiceRecord record) throws IOException {
+    if (getCurrentUser().isAdmin()) {
+      return backingManager.saveSequencerServiceRecord(record);
+    }
+    else {
+      throw new IOException("User " + getCurrentUser().getFullName() + " cannot write to this Service Record");
+    }
+  }
+
+  @Override
+  public SequencerServiceRecord getSequencerServiceRecordById(long id) throws IOException {
+    return backingManager.getSequencerServiceRecordById(id);
+  }
+
+  @Override
+  public Collection<SequencerServiceRecord> listAllSequencerServiceRecords() throws IOException {
+    return backingManager.listAllSequencerServiceRecords();
+  }
+
+  @Override
+  public Collection<SequencerServiceRecord> listSequencerServiceRecordsBySequencerId(long referenceId) throws IOException {
+    return backingManager.listSequencerServiceRecordsBySequencerId(referenceId);
   }
 }

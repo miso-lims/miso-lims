@@ -395,6 +395,12 @@
     <property name="jdbcTemplate" ref="interfaceTemplate" />
   </bean>
 
+  <bean id="sqlSequencerServiceRecordDAO"
+        class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLSequencerReferenceDAO">
+    <property name="sequencerReferenceDAO" ref="sqlSequencerReferenceDAO"/>
+    <property name="jdbcTemplate" ref="interfaceTemplate"/>
+  </bean>
+
   <bean id="sqlKitDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLKitDAO">
     <property name="cascadeType">
       <value type="javax.persistence.CascadeType">PERSIST</value>

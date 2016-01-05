@@ -62,6 +62,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
@@ -102,6 +103,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.SampleQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerPartitionContainerStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerReferenceStore;
+import uk.ac.bbsrc.tgac.miso.core.store.SequencerServiceRecordStore;
 import uk.ac.bbsrc.tgac.miso.core.store.StatusStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.store.StudyStore;
@@ -164,6 +166,8 @@ public class MisoRequestManager implements RequestManager {
   private SequencerPartitionContainerStore sequencerPartitionContainerStore;
   @Autowired
   private SequencerReferenceStore sequencerReferenceStore;
+  @Autowired
+  private SequencerServiceRecordStore sequencerServiceRecordStore;
   @Autowired
   private StatusStore statusStore;
   @Autowired
@@ -269,6 +273,10 @@ public class MisoRequestManager implements RequestManager {
 
   public void setSequencerReferenceStore(SequencerReferenceStore sequencerReferenceStore) {
     this.sequencerReferenceStore = sequencerReferenceStore;
+  }
+
+  public void setSequencerServiceRecordStore(SequencerServiceRecordStore sequencerServiceRecordStore) {
+    this.sequencerServiceRecordStore = sequencerServiceRecordStore;
   }
 
   public void setStatusStore(StatusStore statusStore) {
@@ -2573,5 +2581,25 @@ public class MisoRequestManager implements RequestManager {
     } else {
       throw new IOException("No boxStore available. Check that it has been declared in the Spring config.");
     }
+  }
+
+  @Override
+  public long saveSequencerServiceRecord(SequencerServiceRecord record) throws IOException {
+    return sequencerServiceRecordStore.save(record);
+  }
+
+  @Override
+  public SequencerServiceRecord getSequencerServiceRecordById(long id) throws IOException {
+    return sequencerServiceRecordStore.get(id);
+  }
+
+  @Override
+  public Collection<SequencerServiceRecord> listAllSequencerServiceRecords() throws IOException {
+    return sequencerServiceRecordStore.listAll();
+  }
+
+  @Override
+  public Collection<SequencerServiceRecord> listSequencerServiceRecordsBySequencerId(long referenceId) throws IOException {
+    return sequencerServiceRecordStore.listBySequencerId(referenceId);
   }
 }

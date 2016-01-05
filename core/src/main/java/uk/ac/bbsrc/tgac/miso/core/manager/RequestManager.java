@@ -53,6 +53,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
 import uk.ac.bbsrc.tgac.miso.core.data.Submission;
@@ -131,6 +132,8 @@ public interface RequestManager {
   public long saveSubmission(Submission submission) throws IOException;
 
   public long saveSequencerReference(SequencerReference sequencerReference) throws IOException;
+  
+  public long saveSequencerServiceRecord(SequencerServiceRecord record) throws IOException;
 
   public long saveKit(Kit kit) throws IOException;
 
@@ -240,6 +243,8 @@ public interface RequestManager {
   public SequencerReference getSequencerReferenceByName(String referenceName) throws IOException;
 
   public SequencerReference getSequencerReferenceByRunId(long runId) throws IOException;
+  
+  public SequencerServiceRecord getSequencerServiceRecordById(long id) throws IOException;
 
   public Kit getKitById(long kitId) throws IOException;
 
@@ -499,6 +504,10 @@ public interface RequestManager {
   public Collection<SequencerReference> listAllSequencerReferences() throws IOException;
 
   public Collection<SequencerReference> listSequencerReferencesByPlatformType(PlatformType platformType) throws IOException;
+  
+  public Collection<SequencerServiceRecord> listAllSequencerServiceRecords() throws IOException;
+  
+  public Collection<SequencerServiceRecord> listSequencerServiceRecordsBySequencerId(long referenceId) throws IOException;
 
   public Collection<Kit> listAllKits() throws IOException;
 
