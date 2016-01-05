@@ -36,9 +36,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.eaglegenomics.simlims.core.Note;
-import com.eaglegenomics.simlims.core.SecurityProfile;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
@@ -108,6 +105,9 @@ import uk.ac.bbsrc.tgac.miso.core.store.SequencerReferenceStore;
 import uk.ac.bbsrc.tgac.miso.core.store.StatusStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.store.StudyStore;
+
+import com.eaglegenomics.simlims.core.Note;
+import com.eaglegenomics.simlims.core.SecurityProfile;
 
 /**
  * Implementation of a RequestManager to facilitate persistence operations on MISO model objects
@@ -1094,6 +1094,15 @@ public class MisoRequestManager implements RequestManager {
   public Collection<Run> listRunsByExperimentId(Long experimentId) throws IOException {
     if (runStore != null) {
       return runStore.listByExperimentId(experimentId);
+    } else {
+      throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+  
+  @Override
+  public Collection<Run> listRunsBySequencerId(Long sequencerReferenceId) throws IOException {
+    if (runStore != null) {
+      return runStore.listBySequencerId(sequencerReferenceId);
     } else {
       throw new IOException("No runStore available. Check that it has been declared in the Spring config.");
     }

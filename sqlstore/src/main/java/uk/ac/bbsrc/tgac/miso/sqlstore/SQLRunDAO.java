@@ -35,6 +35,10 @@ import java.util.regex.Matcher;
 
 import javax.persistence.CascadeType;
 
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,18 +51,6 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.eaglegenomics.simlims.core.Note;
-import com.eaglegenomics.simlims.core.SecurityProfile;
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.store.SecurityStore;
-import com.googlecode.ehcache.annotations.Cacheable;
-import com.googlecode.ehcache.annotations.KeyGenerator;
-import com.googlecode.ehcache.annotations.Property;
-import com.googlecode.ehcache.annotations.TriggersRemove;
-
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractRun;
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
@@ -83,6 +75,15 @@ import uk.ac.bbsrc.tgac.miso.core.store.WatcherStore;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
+import com.eaglegenomics.simlims.core.Note;
+import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.store.SecurityStore;
+import com.googlecode.ehcache.annotations.Cacheable;
+import com.googlecode.ehcache.annotations.KeyGenerator;
+import com.googlecode.ehcache.annotations.Property;
+import com.googlecode.ehcache.annotations.TriggersRemove;
+
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore
  * <p/>
@@ -102,6 +103,8 @@ public class SQLRunDAO implements RunStore {
   public static final String RUN_SELECT_BY_ID = RUNS_SELECT + " WHERE runId = ?";
 
   public static final String RUN_SELECT_BY_ALIAS = RUNS_SELECT + " WHERE alias = ?";
+  
+  public static final String RUN_SELECT_BY_SEQUENCER_ID = RUNS_SELECT + " WHERE sequencerReference_sequencerReferenceId = ?";
 
   public static final String RUNS_SELECT_BY_SEARCH = RUNS_SELECT + " WHERE name LIKE ? OR alias LIKE ? OR description LIKE ? ";
 
@@ -571,6 +574,11 @@ public class SQLRunDAO implements RunStore {
   public List<Run> listByStatus(String health) throws IOException {
     return template.query(RUNS_SELECT_BY_STATUS_HEALTH, new Object[] { health }, new RunMapper(true));
   }
+  
+  @Override
+  public List<Run> listBySequencerId(long sequencerReferenceId) throws IOException {
+    return template.query(RUN_SELECT_BY_SEQUENCER_ID, new Object[] { sequencerReferenceId }, new RunMapper(true));
+  }
 
   @Override
   @Deprecated
@@ -694,7 +702,6 @@ public class SQLRunDAO implements RunStore {
         r.setLastModifier(securityDAO.getUserById(rs.getLong("lastModifier")));
         r.setSecurityProfile(securityProfileDAO.get(rs.getLong("securityProfile_profileId")));
         r.setStatus(statusDAO.get(rs.getLong("status_statusId")));
-        r.setSequencerReference(sequencerReferenceDAO.get(rs.getLong("sequencerReference_sequencerReferenceId")));
         r.setWatchers(new HashSet<User>(watcherDAO.getWatchersByEntityName(r.getWatchableIdentifier())));
         if (r.getSecurityProfile() != null && r.getSecurityProfile().getOwner() != null) r.addWatcher(r.getSecurityProfile().getOwner());
         for (User u : watcherDAO.getWatchersByWatcherGroup("RunWatchers")) {
@@ -702,6 +709,8 @@ public class SQLRunDAO implements RunStore {
         }
 
         if (!isLazy()) {
+          r.setSequencerReference(sequencerReferenceDAO.get(rs.getLong("sequencerReference_sequencerReferenceId")));
+          
           List<SequencerPartitionContainer<SequencerPoolPartition>> ss = sequencerPartitionContainerDAO
               .listAllSequencerPartitionContainersByRunId(id);
           r.setSequencerPartitionContainers(ss);

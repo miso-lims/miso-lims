@@ -47,6 +47,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -116,8 +117,10 @@ public class StatsController {
   @RequestMapping(value = "/sequencer/{referenceId}", method = RequestMethod.GET)
   public ModelAndView viewSequencer(@PathVariable(value = "referenceId") Long referenceId, ModelMap model) throws IOException {
     SequencerReference sr = requestManager.getSequencerReferenceById(referenceId);
+    Collection<Run> runs = requestManager.listRunsBySequencerId(referenceId);
     if (sr != null) {
       model.put("sequencerReference", sr);
+      model.put("sequencerRuns", runs);
       String ip = sr.getIpAddress() == null ? "" : sr.getIpAddress().toString();
       if (ip.startsWith("/")) {
         model.put("trimmedIpAddress", ip.substring(1));

@@ -27,9 +27,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
-import com.eaglegenomics.simlims.core.Note;
-import com.eaglegenomics.simlims.core.SecurityProfile;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
@@ -72,6 +69,9 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.event.Alert;
+
+import com.eaglegenomics.simlims.core.Note;
+import com.eaglegenomics.simlims.core.SecurityProfile;
 
 public interface RequestManager {
 
@@ -488,6 +488,8 @@ public interface RequestManager {
   public Collection<Submission> listAllSubmissions() throws IOException;
 
   public Collection<Run> listRunsByExperimentId(Long experimentId) throws IOException;
+  
+  public Collection<Run> listRunsBySequencerId(Long sequencerReferenceId) throws IOException;
 
   /**
    * Obtain a list of Boxables by supplied identificationBarcode list

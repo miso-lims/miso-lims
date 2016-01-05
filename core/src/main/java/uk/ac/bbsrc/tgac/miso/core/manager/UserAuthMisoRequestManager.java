@@ -36,11 +36,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolderStrategy;
 
-import com.eaglegenomics.simlims.core.Note;
-import com.eaglegenomics.simlims.core.SecurityProfile;
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
@@ -86,6 +81,11 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.QcType;
 import uk.ac.bbsrc.tgac.miso.core.event.Alert;
 import uk.ac.bbsrc.tgac.miso.core.exception.AuthorizationIOException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
+
+import com.eaglegenomics.simlims.core.Note;
+import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.manager
@@ -1596,6 +1596,18 @@ public class UserAuthMisoRequestManager implements RequestManager {
     User user = getCurrentUser();
     Collection<Run> accessibles = new HashSet<>();
     for (Run run : backingManager.listRunsByExperimentId(experimentId)) {
+      if (run.userCanRead(user)) {
+        accessibles.add(run);
+      }
+    }
+    return accessibles;
+  }
+  
+  @Override
+  public Collection<Run> listRunsBySequencerId(Long sequencerReferenceId) throws IOException {
+    User user = getCurrentUser();
+    Collection<Run> accessibles = new HashSet<>();
+    for (Run run : backingManager.listRunsBySequencerId(sequencerReferenceId)) {
       if (run.userCanRead(user)) {
         accessibles.add(run);
       }

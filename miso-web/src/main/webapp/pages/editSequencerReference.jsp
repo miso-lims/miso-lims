@@ -22,6 +22,22 @@
   --%>
 
 <%@ include file="../header.jsp" %>
+<script src="<c:url value='/scripts/jquery/js/jquery.breadcrumbs.popup.js'/>" type="text/javascript"></script>
+
+<script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.mini.js'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.datepicker.js'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.checkbox.js'/>" type="text/javascript"></script>
+<link href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" rel="stylesheet" type="text/css" />
+
+<script src="<c:url value='/scripts/datatables_utils.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/natural_sort.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
+
+<script src="<c:url value='/scripts/stats_ajax.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
+
+<script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
+<script type="text/javascript" src="<c:url value='/scripts/sample_validation.js?ts=${timestamp.time}'/>"></script>
+
 <div id="maincontent">
   <div id="contentcolumn">
     <form:form action="/miso/stats/sequencer" method="POST" commandName="sequencerReference" autocomplete="off">
@@ -91,7 +107,7 @@
         </tr>
         <tr>
           <td>Status</td>
-          <td>
+          <td style="font-weight:bold">
             <c:choose>
               <c:when test="${sequencerReference.upgradedSequencerReference != null}">Upgraded</c:when>
               <c:when test="${sequencerReference.dateDecommissioned != null}">Retired</c:when>
@@ -114,6 +130,65 @@
       </table>
       <br/>
     </form:form>
+    
+    
+    <script type="text/javascript">
+	  jQuery(document).ready(function () {
+	    jQuery('#runCountTotal').html(jQuery('#run_table>tbody>tr:visible').length.toString() + (jQuery('#run_table>tbody>tr:visible').length == 1 ? " Run" : " Runs"));
+      });
+    </script>
+    <br/>
+    <a id="runs"></a>
+    <h1>
+      <span id="runCountTotal"></span>
+    </h1>
+    
+    <div style="clear:both">
+      <table class="list" id="run_table">
+        <thead>
+          <tr>
+            <th>Run Alias</th>
+            <th>Status</th>
+            <th>Started At</th>
+            <th>Completed At</th>
+            <th class="fit">Edit</th>
+          </tr>
+        </thead>
+        <tbody>
+          <c:forEach items="${sequencerRuns}" var="run">
+            <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
+              <td>${run.alias}</td>
+              <td>${run.status.health.key}</td>
+              <td>${run.status.startDate}</td>
+              <td>${run.status.completionDate}</td>
+              <td class="misoicon"
+                  onclick="window.location.href='<c:url value="/miso/run/${run.id}"/>'"><span
+                  class="ui-icon ui-icon-pencil"></span></td>
+            </tr>
+          </c:forEach>
+        </tbody>
+      </table>
+    </div>
+    <script type="text/javascript">
+      jQuery(document).ready(function () {
+        jQuery('#run_table').dataTable({
+          "aaSorting": [
+            [2, 'desc']
+          ],
+          "aoColumns": [
+            { "sType": 'string' },
+            { "sType": 'string' },
+            { "sType": 'date' },
+            { "sType": 'date' },
+            { "bSortable": false }
+          ],
+          "iDisplayLength": 50,
+          "bJQueryUI": true,
+          "bRetrieve": true
+        });
+      });
+    </script>
+    
   </div>
 </div>
 

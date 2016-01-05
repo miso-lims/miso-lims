@@ -2,8 +2,8 @@
 ALTER TABLE SequencerReference ENGINE=InnoDB;
 --EndNoTest
 ALTER TABLE SequencerReference ADD COLUMN serialNumber varchar(30);
-ALTER TABLE SequencerReference ADD COLUMN dateCommissioned timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP;
-ALTER TABLE SequencerReference ADD COLUMN dateDecommissioned timestamp;
+ALTER TABLE SequencerReference ADD COLUMN dateCommissioned date NOT NULL DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE SequencerReference ADD COLUMN dateDecommissioned date DEFAULT NULL;
 ALTER TABLE SequencerReference ADD COLUMN upgradedSequencerReferenceId bigint(20);
 ALTER TABLE SequencerReference ADD CONSTRAINT sequencerReference_upgradedReference_fkey FOREIGN KEY (upgradedSequencerReferenceId) REFERENCES SequencerReference(referenceId);
 
