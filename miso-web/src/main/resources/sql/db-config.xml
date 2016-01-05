@@ -129,6 +129,7 @@
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.SampleQC" value-ref="sampleQcStore" />
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer" value-ref="sequencerPartitionContainerStore" />
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.SequencerReference" value-ref="sequencerReferenceStore" />
+        <entry key="uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord" value-ref="sequencerServiceRecordStore"/>
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.Status" value-ref="statusStore" />
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.Study" value-ref="studyStore" />
         <entry key="uk.ac.bbsrc.tgac.miso.core.data.Submission" value-ref="submissionStore" />
@@ -746,6 +747,17 @@
     <property name="interceptorNames">
       <list>
         <value>sqlSequencerReferenceDAO</value>
+      </list>
+    </property>
+  </bean>
+
+  <bean name="sequencerServiceRecordStore" class="org.springframework.aop.framework.ProxyFactoryBean">
+    <property name="proxyInterfaces">
+      <value>uk.ac.bbsrc.tgac.miso.core.store.SequencerServiceRecordStore</value>
+    </property>
+    <property name="interceptorNames">
+      <list>
+        <value>sqlSequencerServiceRecordDAO</value>
       </list>
     </property>
   </bean>

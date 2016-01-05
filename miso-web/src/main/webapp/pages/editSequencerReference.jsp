@@ -132,17 +132,72 @@
     </form:form>
     
     
-    <script type="text/javascript">
-	  jQuery(document).ready(function () {
-	    jQuery('#runCountTotal').html(jQuery('#run_table>tbody>tr:visible').length.toString() + (jQuery('#run_table>tbody>tr:visible').length == 1 ? " Run" : " Runs"));
+    <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#records_arrowclick'), 'recordsdiv');">
+	  <c:choose>
+	    <c:when test="${fn:length(sequencerServiceRecords) == 1}">1 Service Record</c:when>
+	    <c:otherwise>${fn:length(sequencerServiceRecords)} Service Records</c:otherwise>
+	  </c:choose>
+	  <div id="records_arrowclick" class="toggleLeft"></div>
+	</div>
+	<div id="recordsdiv" style="display:none;">
+	  <h1>Service Records</h1>
+	  <div style="clear:both">
+	    <table class="list" id="records_table">
+	      <thead>
+	        <tr>
+	          <th>Service Date</th>
+	          <th>Title</th>
+	          <th>Serviced By</th>
+	          <th>Phone</th>
+	          <th class="fit">Edit</th>
+	        </tr>
+	      </thead>
+	      <tbody>
+	        <c:forEach items="${sequencerServiceRecords}" var="record">
+	          <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
+	            <td>${record.serviceDate}</td>
+	            <td>${record.title}</td>
+	            <td>${record.servicedByName}</td>
+	            <td>${record.phone}</td>
+	            <td class="misoicon"
+                  onclick="window.location.href='<c:url value="/miso/stats/sequencer/servicerecord/${record.id}"/>'"><span
+                  class="ui-icon ui-icon-pencil"></span></td>
+	          </tr>
+	        </c:forEach>
+	      </tbody>
+	    </table>
+	  </div>
+	</div>
+	<script type="text/javascript">
+      jQuery(document).ready(function () {
+        jQuery('#records_table').dataTable({
+          "aaSorting": [
+            [0, 'desc']
+          ],
+          "aoColumns": [
+            { "sType": 'date' },
+            { "sType": 'string' },
+            { "sType": 'string' },
+            { "sType": 'string' },
+            { "bSortable": false }
+          ],
+          "iDisplayLength": 50,
+          "bJQueryUI": true,
+          "bRetrieve": true
+        });
       });
     </script>
+    
+    
     <br/>
     <a id="runs"></a>
-    <h1>
-      <span id="runCountTotal"></span>
-    </h1>
-    
+    <div class="sectionDivider">
+      <c:choose>
+        <c:when test="${fn:length(sequencerRuns) == 1}">1 Run</c:when>
+        <c:otherwise>${fn:length(sequencerRuns)} Runs</c:otherwise>
+      </c:choose>
+    </div>
+    <h1>Runs</h1>
     <div style="clear:both">
       <table class="list" id="run_table">
         <thead>

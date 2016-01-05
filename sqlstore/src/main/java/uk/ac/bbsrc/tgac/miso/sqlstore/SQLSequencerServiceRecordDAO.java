@@ -26,7 +26,7 @@ public class SQLSequencerServiceRecordDAO implements SequencerServiceRecordStore
   private static final String TABLE_NAME = "SequencerServiceRecord";
   
   private static final String SERVICE_RECORD_SELECT = "SELECT recordId, sequencerReferenceId, title, details, servicedBy, phone,"
-      + " serviceDate, shutdownTime, restartTime"
+      + " serviceDate, shutdownTime, restoredTime"
       + " FROM " + TABLE_NAME;
   
   private static final String SERVICE_RECORD_SELECT_BY_ID = SERVICE_RECORD_SELECT + " WHERE recordId = ?";
@@ -35,7 +35,7 @@ public class SQLSequencerServiceRecordDAO implements SequencerServiceRecordStore
   
   private static final String SERVICE_RECORD_UPDATE = "UPDATE " + TABLE_NAME
       + " SET sequencerReferenceId=:sequencerReferenceId, title=:title, details=:details, servicedBy=:servicedBy, phone=:phone,"
-      + " serviceDate=:serviceDate, shutdownTime=:shutdownTime, restartTime=:restartTime"
+      + " serviceDate=:serviceDate, shutdownTime=:shutdownTime, restoredTime=:restoredTime"
       + " WHERE recordId=:recordId";
   
   private static final String SERVICE_RECORD_DELETE = "DELETE FROM " + TABLE_NAME
@@ -76,7 +76,7 @@ public class SQLSequencerServiceRecordDAO implements SequencerServiceRecordStore
     params.addValue("phone", serviceRecord.getPhone());
     params.addValue("serviceDate", serviceRecord.getServiceDate());
     params.addValue("shutdownTime", serviceRecord.getShutdownTime());
-    params.addValue("restartTime", serviceRecord.getRestoredTime());
+    params.addValue("restoredTime", serviceRecord.getRestoredTime());
     
     if (serviceRecord.getId() == AbstractSequencerServiceRecord.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("recordId");

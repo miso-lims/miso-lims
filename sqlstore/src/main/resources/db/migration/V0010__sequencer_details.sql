@@ -15,8 +15,8 @@ CREATE TABLE SequencerServiceRecord (
   servicedBy varchar(30) NOT NULL,
   phone varchar(12),
   serviceDate date NOT NULL,
-  shutdownTime timestamp,
-  restartTime timestamp,
+  shutdownTime datetime DEFAULT NULL,
+  restoredTime datetime DEFAULT NULL,
   CONSTRAINT sequencerServiceRecord_sequencer_fkey FOREIGN KEY (sequencerReferenceId) REFERENCES SequencerReference(referenceId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
