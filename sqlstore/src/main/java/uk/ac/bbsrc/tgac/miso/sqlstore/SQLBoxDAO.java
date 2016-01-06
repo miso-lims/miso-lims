@@ -3,6 +3,7 @@ package uk.ac.bbsrc.tgac.miso.sqlstore;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -408,7 +409,10 @@ public class SQLBoxDAO implements BoxStore {
 
   @Override
   public void emptyAllTubes(Box box) throws IOException {
-    Map<String, Boxable> boxableItems = box.getBoxables();
+    List<String> boxableBarcodes = new ArrayList<String>();
+    for (Boxable boxable : box.getBoxables().values()) {
+      boxableBarcodes.add(boxable.getIdentificationBarcode());
+    }
     try {
       box.removeAllBoxables();
       save(box);
@@ -417,10 +421,7 @@ public class SQLBoxDAO implements BoxStore {
       throw new IOException("Error emptying box: " + e.getMessage());
     }
 
-    for (Map.Entry<String, Boxable> item : boxableItems.entrySet()) {
-      String position = item.getKey();
-      String barcode = box.getBoxable(position).getIdentificationBarcode();
-
+    for (String barcode : boxableBarcodes) {
       Sample sample = sampleDAO.getByBarcode(barcode);
       if (sample != null) {
         sample.setEmpty(true);
