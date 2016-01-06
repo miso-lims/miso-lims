@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -551,18 +550,10 @@ public class SQLBoxDAO implements BoxStore {
       template.update("INSERT INTO BoxChangeLog (boxId, columnsChanged, userId, message) VALUES (?, '', ?, ?)", box.getId(),
           box.getLastModifier().getUserId(), message);
     }
-    for (Boxable b : box.getBoxables().values()) {
-      Class<?> clazz;
-      if (b instanceof Library) {
-        clazz = Library.class;
-      } else if (b instanceof Pool) {
-        clazz = Pool.class;
-      } else if (b instanceof Sample) {
-        clazz = Sample.class;
-      } else {
-        throw new NotImplementedException("Unhandled boxable: " + b.getClass().getName());
-      }
-      DbUtils.lookupCache(getCacheManager(), clazz, false).remove(DbUtils.hashCodeCacheKeyFor(b.getId()));
+    for (Class<?> clazz : new Class<?>[]{Library.class, Pool.class, Sample.class}) {
+      // remove all caching for Libraries, Pools and Samples to ensure correct position is displayed
+      DbUtils.lookupCache(getCacheManager(), clazz, false).removeAll();
+      DbUtils.lookupCache(getCacheManager(), clazz, true).removeAll();
     }
 
     return box.getId();
