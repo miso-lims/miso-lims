@@ -24,6 +24,10 @@ public class SampleDto {
   private SampleIdentityDto sampleIdentityDto;
   private SampleAnalyteDto sampleAnalyte;
   private SampleAdditionalInfoDto sampleAdditionalInfo;
+  private Long parentId;
+  private String parentUrl;
+  private Long rootSampleClassId;
+  private String rootSampleClassUrl;
 
   public Long getId() {
     return id;
@@ -159,6 +163,38 @@ public class SampleDto {
 
   public void setSampleAdditionalInfo(SampleAdditionalInfoDto sampleAdditionalInfo) {
     this.sampleAdditionalInfo = sampleAdditionalInfo;
+  }
+
+  public Long getParentId() {
+    return parentId;
+  }
+
+  public void setParentId(Long parentId) {
+    this.parentId = parentId;
+  }
+
+  public Long getRootSampleClassId() {
+    return rootSampleClassId;
+  }
+
+  public void setRootSampleClassId(Long rootSampleClassId) {
+    this.rootSampleClassId = rootSampleClassId;
+  }
+
+  public String getParentUrl() {
+    return parentUrl;
+  }
+
+  public void setParentUrl(String parentUrl) {
+    this.parentUrl = parentUrl;
+  }
+
+  public String getRootSampleClassUrl() {
+    return rootSampleClassUrl;
+  }
+
+  public void setRootSampleClassUrl(String rootSampleClassUrl) {
+    this.rootSampleClassUrl = rootSampleClassUrl;
   }
 
 }

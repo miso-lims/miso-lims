@@ -30,11 +30,6 @@ import javax.persistence.Table;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
-import net.sourceforge.fluxion.spi.ServiceProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import uk.ac.bbsrc.tgac.miso.core.data.*;
-import uk.ac.bbsrc.tgac.miso.core.factory.submission.ERASubmissionFactory;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
@@ -90,11 +85,11 @@ public class SampleImpl extends AbstractSample implements Serializable {
   }
 
   public SampleImpl(SampleFactoryBuilder builder) {
-    this(builder.getUser());
-    setProject(builder.getProject());
+    this(builder.getProject(), builder.getUser());
     setDescription(builder.getDescription());
     setSampleType(builder.getSampleType());
     setScientificName(builder.getScientificName());
+    setLastModifier(builder.getUser());
 
     if (!LimsUtils.isStringEmptyOrNull(builder.getAccession())) {
       setAccession(builder.getAccession());

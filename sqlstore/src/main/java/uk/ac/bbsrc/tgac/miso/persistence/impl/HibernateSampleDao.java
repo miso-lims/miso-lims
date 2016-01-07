@@ -1,5 +1,6 @@
 package uk.ac.bbsrc.tgac.miso.persistence.impl;
 
+import java.util.Date;
 import java.util.List;
 
 import org.hibernate.Query;
@@ -30,7 +31,7 @@ public class HibernateSampleDao implements SampleDao {
 
   @Override
   public List<Sample> getSample() {
-    Query query = currentSession().createQuery("from AbstractSample");
+    Query query = currentSession().createQuery("from SampleImpl");
     @SuppressWarnings("unchecked")
     List<Sample> records = query.list();
     return records;
@@ -43,6 +44,8 @@ public class HibernateSampleDao implements SampleDao {
 
   @Override
   public Long addSample(Sample sample) {
+    Date now = new Date();
+    sample.setLastUpdated(now);
     return (Long) currentSession().save(sample);
   }
 
@@ -54,6 +57,8 @@ public class HibernateSampleDao implements SampleDao {
 
   @Override
   public void update(Sample sample) {
+    Date now = new Date();
+    sample.setLastUpdated(now);
     currentSession().update(sample);
   }
 

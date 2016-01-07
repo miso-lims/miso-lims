@@ -9,7 +9,7 @@ public interface SampleService {
 
   Sample get(Long sampleId);
 
-  Long create(Sample sample) throws IOException;
+  Long create(Sample sample, Long projectId, Long parentId, Long rootSampleClassId) throws IOException;
 
   void update(Sample sample) throws IOException;
 

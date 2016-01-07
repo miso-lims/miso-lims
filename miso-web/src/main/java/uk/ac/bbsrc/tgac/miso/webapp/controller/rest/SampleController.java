@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
@@ -32,14 +33,17 @@ import javax.ws.rs.core.Response.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -75,47 +79,54 @@ public class SampleController extends RestController {
 
   private static SampleDto writeUrls(SampleDto sampleDto, UriComponentsBuilder uriBuilder) {
     URI baseUri = uriBuilder.build().toUri();
-    sampleDto
-        .setUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/sample/{id}").buildAndExpand(sampleDto.getId()).toUriString());
+    sampleDto.setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/fred/sample/{id}").buildAndExpand(sampleDto.getId()).toUriString());
     // sampleDto.setCreatedByUrl(uriBuilder.replacePath("/rest/user/{id}").buildAndExpand(sampleDto.getCreatedById()).toUriString());
     // sampleDto.setUpdatedByUrl(uriBuilder.replacePath("/rest/user/{id}").buildAndExpand(sampleDto.getUpdatedById()).toUriString());
+    if (sampleDto.getParentId() != null) {
+      sampleDto.setParentUrl(
+          UriComponentsBuilder.fromUri(baseUri).path("/rest/fred/sample/{id}").buildAndExpand(sampleDto.getParentId()).toUriString());
+    }
+    if (sampleDto.getRootSampleClassId() != null) {
+      sampleDto.setRootSampleClassUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/sampleclass/{id}")
+          .buildAndExpand(sampleDto.getRootSampleClassId()).toUriString());
+    }
     return sampleDto;
   }
 
-  // @RequestMapping(value = "/samples", method = RequestMethod.GET, produces = { "application/json" })
-  // @ResponseBody
-  // public ResponseEntity<Set<SampleDto>> getSamples(UriComponentsBuilder uriBuilder) {
-  // Set<Sample> samples = sampleService.getAll();
-  // if (samples.isEmpty()) {
-  // return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-  // } else {
-  // Set<SampleDto> sampleDtos = Dtos.asSampleDtos(samples);
-  // for (SampleDto sampleDto : sampleDtos) {
-  // sampleDto = writeUrls(sampleDto, uriBuilder);
-  // }
-  // return new ResponseEntity<>(sampleDtos, HttpStatus.OK);
-  // }
-  // }
+  @RequestMapping(value = "/samples", method = RequestMethod.GET, produces = { "application/json" })
+  @ResponseBody
+  public ResponseEntity<Set<SampleDto>> getSamples(UriComponentsBuilder uriBuilder) {
+    Set<Sample> samples = sampleService.getAll();
+    if (samples.isEmpty()) {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    } else {
+      Set<SampleDto> sampleDtos = Dtos.asSampleDtos(samples);
+      for (SampleDto sampleDto : sampleDtos) {
+        sampleDto = writeUrls(sampleDto, uriBuilder);
+      }
+      return new ResponseEntity<>(sampleDtos, HttpStatus.OK);
+    }
+  }
 
-  // @RequestMapping(value = "/sample", method = RequestMethod.POST, headers = { "Content-type=application/json" })
-  // @ResponseBody
-  // public ResponseEntity<?> createSample(@RequestBody SampleDto sampleDto, UriComponentsBuilder b) throws IOException {
-  // Sample sample = Dtos.to(sampleDto);
-  // Long id = sampleService.create(sample);
-  // UriComponents uriComponents = b.path("/sample/{id}").buildAndExpand(id);
-  // HttpHeaders headers = new HttpHeaders();
-  // headers.setLocation(uriComponents.toUri());
-  // return new ResponseEntity<>(headers, HttpStatus.CREATED);
-  // }
+  @RequestMapping(value = "/sample", method = RequestMethod.POST, headers = { "Content-type=application/json" })
+  @ResponseBody
+  public ResponseEntity<?> createSample(@RequestBody SampleDto sampleDto, UriComponentsBuilder b) throws IOException {
+    Sample sample = Dtos.to(sampleDto);
+    Long id = sampleService.create(sample, sampleDto.getProjectId(), sampleDto.getParentId(), sampleDto.getRootSampleClassId());
+    UriComponents uriComponents = b.path("/sample/{id}").buildAndExpand(id);
+    HttpHeaders headers = new HttpHeaders();
+    headers.setLocation(uriComponents.toUri());
+    return new ResponseEntity<>(headers, HttpStatus.CREATED);
+  }
 
-  // @RequestMapping(value = "/sample/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
-  // @ResponseBody
-  // public ResponseEntity<?> updateSample(@PathVariable("id") Long id, @RequestBody SampleDto sampleDto) throws IOException {
-  // Sample sample = Dtos.to(sampleDto);
-  // sample.setSampleId(id);
-  // sampleService.update(sample);
-  // return new ResponseEntity<>(HttpStatus.OK);
-  // }
+  @RequestMapping(value = "/sample/{id}", method = RequestMethod.PUT, headers = { "Content-type=application/json" })
+  @ResponseBody
+  public ResponseEntity<?> updateSample(@PathVariable("id") Long id, @RequestBody SampleDto sampleDto) throws IOException {
+    Sample sample = Dtos.to(sampleDto);
+    sample.setSampleId(id);
+    sampleService.update(sample);
+    return new ResponseEntity<>(HttpStatus.OK);
+  }
 
   @RequestMapping(value = "/sample/{id}", method = RequestMethod.DELETE)
   @ResponseBody

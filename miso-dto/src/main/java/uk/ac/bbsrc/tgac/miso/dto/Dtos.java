@@ -352,6 +352,9 @@ public class Dtos {
     if (from.getSampleAdditionalInfo() != null) {
       dto.setSampleAdditionalInfo(asDto(from.getSampleAdditionalInfo()));
     }
+    if (from.getParent() != null) {
+      dto.setParentId(from.getParent().getSampleId());
+    }
 
     return dto;
   }
@@ -366,8 +369,6 @@ public class Dtos {
 
   public static Sample to(SampleDto from) {
     Sample to = new SampleImpl();
-    to.setId(from.getId());
-
     if (!LimsUtils.isStringEmptyOrNull(from.getAccession())) {
       to.setAccession(from.getAccession());
     }

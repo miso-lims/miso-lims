@@ -566,6 +566,68 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
     private Boolean qcPassed;
     private String alias;
     private String taxonIdentifier;
+    private SampleClass rootSampleClass;
+    private Sample parent;
+
+    public SampleFactoryBuilder parent(Sample parent) {
+      this.parent = parent;
+      return this;
+    }
+
+    public SampleFactoryBuilder rootSampleClass(SampleClass rootSampleClass) {
+      this.rootSampleClass = rootSampleClass;
+      return this;
+    }
+
+    public SampleFactoryBuilder identity(Identity identity) {
+      this.identity = identity;
+      return this;
+    }
+
+    public SampleFactoryBuilder sampleAnalyte(SampleAnalyte sampleAnalyte) {
+      this.sampleAnalyte = sampleAnalyte;
+      return this;
+    }
+
+    public SampleFactoryBuilder accession(String accession) {
+      this.accession = accession;
+      return this;
+    }
+
+    public SampleFactoryBuilder name(String name) {
+      this.name = name;
+      return this;
+    }
+
+    public SampleFactoryBuilder identificationBarcode(String identificationBarcode) {
+      this.identificationBarcode = identificationBarcode;
+      return this;
+    }
+
+    public SampleFactoryBuilder locationBarcode(String locationBarcode) {
+      this.locationBarcode = locationBarcode;
+      return this;
+    }
+
+    public SampleFactoryBuilder receivedDate(Date receivedDate) {
+      this.receivedDate = receivedDate;
+      return this;
+    }
+
+    public SampleFactoryBuilder qcPassed(Boolean qcPassed) {
+      this.qcPassed = qcPassed;
+      return this;
+    }
+
+    public SampleFactoryBuilder alias(String alias) {
+      this.alias = alias;
+      return this;
+    }
+
+    public SampleFactoryBuilder taxonIdentifier(String taxonIdentifier) {
+      this.taxonIdentifier = taxonIdentifier;
+      return this;
+    }
 
     public Identity getIdentity() {
       return identity;
@@ -672,13 +734,16 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
         // Classic MISO Sample.
         return new SampleImpl(this);
       } else {
+        checkNotNull(parent, "parent must be provided to create a Sample.");
         checkNotNull(sampleAdditionalInfo, "SampleAdditionalInfo must be provided to create a Sample.");
         checkNotNull(sampleAdditionalInfo.getSampleClass(), "SampleAdditionalInfo.sampleClass must be provided to create a Sample.");
-        checkNotNull(sampleAdditionalInfo.getTissueOrigin(), "SampleAdditionalInfo.tissueOrigin must be provided to create a Sample.");
-        checkNotNull(sampleAdditionalInfo.getTissueType(), "SampleAdditionalInfo.tissueType must be provided to create a Sample.");
         if (identity != null) {
+          // Or we could mark a SampleClass as the root.
+          checkNotNull(rootSampleClass, "A root SampleClass must be provided to create an Identity Sample.");
           return new SampleIdentityNode(this);
         } else if (sampleAnalyte != null) {
+          checkNotNull(sampleAdditionalInfo.getTissueOrigin(), "SampleAdditionalInfo.tissueOrigin must be provided to create a Sample.");
+          checkNotNull(sampleAdditionalInfo.getTissueType(), "SampleAdditionalInfo.tissueType must be provided to create a Sample.");
           return new SampleAnalyteNode(this);
         }
       }
