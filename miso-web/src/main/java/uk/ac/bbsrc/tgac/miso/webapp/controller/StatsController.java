@@ -443,4 +443,31 @@ public class StatsController {
   public ModelAndView configure(ModelMap model) throws IOException {
     return new ModelAndView("/pages/configureStats.jsp", model);
   }
+
+  @RequestMapping(value = "/sequencer/servicerecord/{recordId}", method = RequestMethod.GET)
+  public ModelAndView viewServiceRecord(@PathVariable(value = "recordId") Long recordId, ModelMap model) throws IOException {
+    SequencerServiceRecord sr = requestManager.getSequencerServiceRecordById(recordId);
+    if (sr != null) {
+      model.put("serviceRecord", sr);
+    } else {
+      throw new IOException("Cannot retrieve the named Service record");
+    }
+    return new ModelAndView("/pages/editServiceRecord.jsp", model);
+  }
+  
+  @RequestMapping(value = "/sequencer/servicerecord", method = RequestMethod.POST)
+  public String processSubmit(@ModelAttribute("serviceRecord") SequencerServiceRecord sr, ModelMap model, SessionStatus session)
+      throws IOException {
+    try {
+      requestManager.saveSequencerServiceRecord(sr);
+      session.setComplete();
+      model.clear();
+      return "redirect:/miso/stats/sequencer/" + sr.getSequencerReference().getId();
+    } catch (IOException ex) {
+      if (log.isDebugEnabled()) {
+        log.debug("Failed to save Sequencer Service Record", ex);
+      }
+      throw ex;
+    }
+  }
 }

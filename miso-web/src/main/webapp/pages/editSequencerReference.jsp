@@ -141,6 +141,17 @@
 	</div>
 	<div id="recordsdiv" style="display:none;">
 	  <h1>Service Records</h1>
+	  <ul class="sddm">
+        <li>
+          <a onmouseover="mopen('recordmenu')" onmouseout="mclosetime()">
+            Options
+            <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
+          </a>
+          <div id="recordmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
+            <a href='<c:url value="/miso/stats/sequencer/${sequencerReference.id}/servicerecord/new"/> '>Add new Service Record</a>
+          </div>
+        </li>
+  	  </ul>
 	  <div style="clear:both">
 	    <table class="list" id="records_table">
 	      <thead>
