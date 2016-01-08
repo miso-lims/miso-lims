@@ -491,7 +491,9 @@
     <spring-version>3.1.3.RELEASE</spring-version>
     <hibernate.version>4.2.21.Final</hibernate.version>
     <joda-time.version>2.9</joda-time.version>
-    <jackson.version>1.9.13</jackson.version>
+    <!-- Note: Jackson 1 versions beyond 1.9.4 are not compatible with 
+      recursive type parameters, such as in the Poolable interface -->
+    <jackson.version>1.9.4</jackson.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
