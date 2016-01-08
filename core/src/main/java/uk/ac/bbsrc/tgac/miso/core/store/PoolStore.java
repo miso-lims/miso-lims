@@ -98,7 +98,7 @@ public interface PoolStore
    * @param platformType
    *          of type PlatformType
    * @param lazy
-   *          read the pool's contents
+   *          do not read the pool's contents from the database
    * @return List<Pool<? extends Poolable>
    * @throws IOException
    *           when
