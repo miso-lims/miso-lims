@@ -30,10 +30,12 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.exception.MisoNamingException;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.factory.TgacDataObjectFactory;
+import uk.ac.bbsrc.tgac.miso.core.service.naming.AllowAnythingEntityNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.DefaultLibraryNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.DefaultSampleNamingScheme;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.MisoNamingScheme;
@@ -52,12 +54,27 @@ public class NamingTests {
   private DataObjectFactory dataObjectFactory;
   private MisoNamingScheme<Sample> sampleNamingScheme;
   private MisoNamingScheme<Library> libraryNamingScheme;
+  private MisoNamingScheme<Nameable> anythingNamingScheme;
 
   @Before
   public void setUp() {
     dataObjectFactory = new TgacDataObjectFactory();
     sampleNamingScheme = new DefaultSampleNamingScheme();
     libraryNamingScheme = new DefaultLibraryNamingScheme();
+    anythingNamingScheme = new AllowAnythingEntityNamingScheme<>();
+  }
+
+  @Test
+  public void testAllowAnything() throws MisoNamingException {
+    Sample s = dataObjectFactory.getSample();
+    s.setId(1L);
+    s.setName(anythingNamingScheme.generateNameFor("name", s));
+    Assert.assertTrue(anythingNamingScheme.validateField("name", s.getName()));
+
+    Library l = dataObjectFactory.getLibrary();
+    l.setId(2L);
+    l.setName(anythingNamingScheme.generateNameFor("name", l));
+    Assert.assertTrue(anythingNamingScheme.validateField("name", l.getName()));
   }
 
   @Test
