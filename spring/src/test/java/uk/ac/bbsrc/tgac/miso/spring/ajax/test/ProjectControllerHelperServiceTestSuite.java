@@ -114,9 +114,9 @@ public class ProjectControllerHelperServiceTestSuite {
     final SecurityContextImpl context = new SecurityContextImpl();
     context.setAuthentication(authentication);
     SecurityContextHolder.setContext(context);
-     final JSONObject json = new JSONObject();
-     json.put("no one expects", "foo");
-     json.put("inquisition", 12L);
+    final JSONObject json = new JSONObject();
+    json.put("no one expects", "foo");
+    json.put("inquisition", 12L);
 
     projectControllerHelperService.deleteProjectFile(null, json);
   }
