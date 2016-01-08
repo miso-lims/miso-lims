@@ -103,7 +103,12 @@
         </tr>
         <tr>
           <td class="h">Commissioned</td>
-          <td><fmt:formatDate pattern="dd/MM/yyyy" value="${sequencerReference.dateCommissioned}"/></td>
+          <td>
+            <form:input path="dateCommissioned" id="datecommissionedpicker" placeholder="DD/MM/YYYY"/>
+            <script type="text/javascript">
+              Utils.ui.addDatePicker("datecommissionedpicker");
+            </script>
+          </td>
         </tr>
         <tr>
           <td>Status</td>
@@ -148,7 +153,7 @@
             <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
           </a>
           <div id="recordmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
-            <a href='<c:url value="/miso/stats/sequencer/${sequencerReference.id}/servicerecord/new"/> '>Add new Service Record</a>
+            <a href='<c:url value="/miso/stats/sequencer/servicerecord/new/${sequencerReference.id}"/> '>Add new Service Record</a>
           </div>
         </li>
   	  </ul>

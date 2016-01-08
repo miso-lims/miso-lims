@@ -124,6 +124,9 @@ public class SQLSequencerReferenceDAO implements SequencerReferenceStore {
     if (sequencerReference.getUpgradedSequencerReference() != null) {
       params.addValue("upgradedSequencerReferenceId", sequencerReference.getUpgradedSequencerReference().getId());
     }
+    else {
+      params.addValue("upgradedSequencerReferenceId", null);
+    }
     
     if (sequencerReference.getId() == AbstractSequencerReference.UNSAVED_ID) {
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("referenceId");
