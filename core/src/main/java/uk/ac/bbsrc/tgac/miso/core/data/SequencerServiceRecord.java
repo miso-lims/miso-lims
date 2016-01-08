@@ -2,6 +2,11 @@ package uk.ac.bbsrc.tgac.miso.core.data;
 
 import java.util.Date;
 
+import org.codehaus.jackson.annotate.JsonTypeInfo;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+
+@JsonSerialize(typing = JsonSerialize.Typing.STATIC, include = JsonSerialize.Inclusion.NON_NULL)
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public interface SequencerServiceRecord extends Deletable {
   
   public void setId(long id);

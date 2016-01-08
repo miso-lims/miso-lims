@@ -43,9 +43,11 @@
     <form:form action="/miso/stats/sequencer/servicerecord" method="POST" commandName="serviceRecord" autocomplete="off">
       <sessionConversation:insertSessionConversationId attributeName="serviceRecord"/>
       <h1>
-        <c:choose><c:when
-              test="${not empty serviceRecord.id}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose>
-            Service Record
+        <c:choose>
+          <c:when test="${serviceRecord.id != 0}">Edit</c:when>
+          <c:otherwise>Create</c:otherwise>
+        </c:choose>
+        Service Record
         <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
       </h1>
       <div class="breadcrumbs">
