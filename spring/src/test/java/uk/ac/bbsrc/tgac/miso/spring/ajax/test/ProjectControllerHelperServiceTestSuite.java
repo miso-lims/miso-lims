@@ -109,9 +109,14 @@ public class ProjectControllerHelperServiceTestSuite {
   @Test(expected = JSONException.class)
   @SuppressWarnings("unchecked")
   public final void testDeleteProjectFileBadJson() throws Exception {
-    final JSONObject json = new JSONObject();
-    json.put("no one expects", "foo");
-    json.put("inquisition", 12L);
+    when(securityManager.getUserByLoginName(anyString())).thenReturn(user);
+    when(authentication.getName()).thenReturn("Dr Admin");
+    final SecurityContextImpl context = new SecurityContextImpl();
+    context.setAuthentication(authentication);
+    SecurityContextHolder.setContext(context);
+     final JSONObject json = new JSONObject();
+     json.put("no one expects", "foo");
+     json.put("inquisition", 12L);
 
     projectControllerHelperService.deleteProjectFile(null, json);
   }

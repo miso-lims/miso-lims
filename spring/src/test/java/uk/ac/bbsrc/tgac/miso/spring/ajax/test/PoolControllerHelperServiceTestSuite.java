@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.spring.ajax.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -14,6 +15,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextImpl;
 
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
@@ -55,7 +58,12 @@ public class PoolControllerHelperServiceTestSuite {
     final long id = 1L;
     final String idBarcode = "idBarcode";
     when(requestManager.getPoolById(anyLong())).thenReturn(pool);
-
+    when(securityManager.getUserByLoginName(anyString())).thenReturn(user);
+    when(authentication.getName()).thenReturn("Dr Admin");
+    final SecurityContextImpl context = new SecurityContextImpl();
+    context.setAuthentication(authentication);
+    SecurityContextHolder.setContext(context);
+    
     final JSONObject json = new JSONObject();
     json.put("poolId", id);
     json.put("identificationBarcode", idBarcode);
@@ -74,7 +82,12 @@ public class PoolControllerHelperServiceTestSuite {
     final long id = 1L;
     final String idBarcode = "";
     when(requestManager.getPoolById(anyLong())).thenReturn(pool);
-
+    when(securityManager.getUserByLoginName(anyString())).thenReturn(user);
+    when(authentication.getName()).thenReturn("Dr Admin");
+    final SecurityContextImpl context = new SecurityContextImpl();
+    context.setAuthentication(authentication);
+    SecurityContextHolder.setContext(context);
+    
     final JSONObject json = new JSONObject();
     json.put("poolId", id);
     json.put("identificationBarcode", idBarcode);
@@ -95,7 +108,12 @@ public class PoolControllerHelperServiceTestSuite {
     final IOException expected = new IOException("thrown by mock");
     when(requestManager.getPoolById(anyLong())).thenReturn(pool);
     when(requestManager.savePool(pool)).thenThrow(expected);
-
+    when(securityManager.getUserByLoginName(anyString())).thenReturn(user);
+    when(authentication.getName()).thenReturn("Dr Admin");
+    final SecurityContextImpl context = new SecurityContextImpl();
+    context.setAuthentication(authentication);
+    SecurityContextHolder.setContext(context);
+    
     final JSONObject json = new JSONObject();
     json.put("poolId", id);
     json.put("identificationBarcode", idBarcode);
