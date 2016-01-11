@@ -112,41 +112,99 @@
         </tr>
         <tr>
           <td>Status</td>
-          <td style="font-weight:bold">
-            <c:choose>
-              <c:when test="${sequencerReference.upgradedSequencerReference != null}">Upgraded</c:when>
-              <c:when test="${sequencerReference.dateDecommissioned != null}">Retired</c:when>
-              <c:otherwise>Production</c:otherwise>
-            </c:choose>
+          <td>
+            <input type="radio" name="status" value="production" onchange="showStatusRows();" <c:if test="${sequencerReference.dateDecommissioned == null}">checked</c:if>/> Production
+            <input type="radio" name="status" value="retired" onchange="showStatusRows();" <c:if test="${sequencerReference.dateDecommissioned != null && sequencerReference.upgradedSequencerReference == null}">checked</c:if>/> Retired
+            <input type="radio" name="status" value="upgraded" onchange="showStatusRows();" <c:if test="${sequencerReference.dateDecommissioned != null && sequencerReference.upgradedSequencerReference != null}">checked</c:if>/> Upgraded
           </td>
         </tr>
-        <c:if test="${sequencerReference.dateDecommissioned != null}">
-          <tr>
-            <td class="h">Decommissioned</td>
-            <td><fmt:formatDate pattern="dd/MM/yyyy" value="${sequencerReference.dateDecommissioned}"/></td>
-          </tr>
-        </c:if>
-        <c:if test="${sequencerReference.upgradedSequencerReference != null}">
-          <tr>
-            <td class="h">Upgraded To</td>
-            <td><a href="<c:url value='/miso/stats/sequencer/${sequencerReference.upgradedSequencerReference.id}'/>">${sequencerReference.upgradedSequencerReference.name}</a></td>
-          </tr>
-        </c:if>
+        <tr id="decommissionedRow">
+          <td class="h">Decommissioned</td>
+          <td>
+            <form:input path="dateDecommissioned" id="datedecommissionedpicker" placeholder="DD/MM/YYYY"/>
+            <script type="text/javascript">
+              Utils.ui.addDatePicker("datedecommissionedpicker");
+            </script>
+          </td>
+        </tr>
+        <tr id="upgradedReferenceRow">
+          <td class="h">Upgraded To</td>
+          <td>
+            <form:select id="upgradedSequencerReference" path="upgradedSequencerReference" onchange="updateUpgradedSequencerReferenceLink();">
+              <form:option value="${null}">(choose)</form:option>
+              <form:options items="${otherSequencerReferences}" itemLabel="name" itemValue="id"/>
+            </form:select>
+            <span id="upgradedSequencerReferenceLink"></span>
+          </td>
+        </tr>
       </table>
+      
+      <script type="text/javascript">
+        function showStatusRows() {
+          switch(jQuery('input[name="status"]:checked').val()) {
+            case "production":
+              hideDecommissioned();
+              hideUpgradedSequencerReference();
+              break;
+            case "retired":
+              showDecommissioned();
+              hideUpgradedSequencerReference();
+              break;
+            case "upgraded":
+              showDecommissioned();
+              showUpgradedSequencerReference();
+              break;
+          }
+        }
+        
+        function hideDecommissioned() {
+          jQuery("#decommissionedRow").hide();
+          jQuery("#datedecommissionedpicker").val("");
+        }
+        
+        function showDecommissioned() {
+          if (jQuery("#datedecommissionedpicker").val() == "") {
+            jQuery("#datedecommissionedpicker").val(jQuery.datepicker.formatDate('dd/mm/yy', new Date()));
+          }
+          jQuery("#decommissionedRow").show();
+        }
+        
+        function hideUpgradedSequencerReference() {
+          jQuery("#upgradedReferenceRow").hide();
+          jQuery("#upgradedSequencerReference").val("");
+        }
+        
+        function showUpgradedSequencerReference() {
+          jQuery("#upgradedReferenceRow").show();
+          updateUpgradedSequencerReferenceLink();
+        }
+        
+        function updateUpgradedSequencerReferenceLink() {
+          jQuery("#upgradedSequencerReferenceLink").empty();
+          if (jQuery("#upgradedSequencerReference").val() != "") {
+            jQuery("#upgradedSequencerReferenceLink").append("<a href='/miso/stats/sequencer/" + jQuery("#upgradedSequencerReference").val() + "'>View</a>");
+          }
+        }
+        
+        jQuery(document).ready(function() {
+          showStatusRows();
+        });
+      </script>
+      
       <br/>
     </form:form>
     
     
     <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#records_arrowclick'), 'recordsdiv');">
-	  <c:choose>
-	    <c:when test="${fn:length(sequencerServiceRecords) == 1}">1 Service Record</c:when>
-	    <c:otherwise>${fn:length(sequencerServiceRecords)} Service Records</c:otherwise>
-	  </c:choose>
-	  <div id="records_arrowclick" class="toggleLeft"></div>
-	</div>
-	<div id="recordsdiv" style="display:none;">
-	  <h1>Service Records</h1>
-	  <ul class="sddm">
+      <c:choose>
+        <c:when test="${fn:length(sequencerServiceRecords) == 1}">1 Service Record</c:when>
+        <c:otherwise>${fn:length(sequencerServiceRecords)} Service Records</c:otherwise>
+      </c:choose>
+      <div id="records_arrowclick" class="toggleLeft"></div>
+    </div>
+    <div id="recordsdiv" style="display:none;">
+      <h1>Service Records</h1>
+      <ul class="sddm">
         <li>
           <a onmouseover="mopen('recordmenu')" onmouseout="mclosetime()">
             Options
@@ -156,35 +214,35 @@
             <a href='<c:url value="/miso/stats/sequencer/servicerecord/new/${sequencerReference.id}"/> '>Add new Service Record</a>
           </div>
         </li>
-  	  </ul>
-	  <div style="clear:both">
-	    <table class="list" id="records_table">
-	      <thead>
-	        <tr>
-	          <th>Service Date</th>
-	          <th>Title</th>
-	          <th>Serviced By</th>
-	          <th>Phone</th>
-	          <th class="fit">Edit</th>
-	        </tr>
-	      </thead>
-	      <tbody>
-	        <c:forEach items="${sequencerServiceRecords}" var="record">
-	          <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
-	            <td>${record.serviceDate}</td>
-	            <td>${record.title}</td>
-	            <td>${record.servicedByName}</td>
-	            <td>${record.phone}</td>
-	            <td class="misoicon"
+      </ul>
+      <div style="clear:both">
+        <table class="list" id="records_table">
+          <thead>
+            <tr>
+              <th>Service Date</th>
+              <th>Title</th>
+              <th>Serviced By</th>
+              <th>Phone</th>
+              <th class="fit">Edit</th>
+            </tr>
+          </thead>
+          <tbody>
+            <c:forEach items="${sequencerServiceRecords}" var="record">
+              <tr onMouseOver="this.className='highlightrow'" onMouseOut="this.className='normalrow'">
+                <td>${record.serviceDate}</td>
+                <td>${record.title}</td>
+                <td>${record.servicedByName}</td>
+                <td>${record.phone}</td>
+                <td class="misoicon"
                   onclick="window.location.href='<c:url value="/miso/stats/sequencer/servicerecord/${record.id}"/>'"><span
                   class="ui-icon ui-icon-pencil"></span></td>
-	          </tr>
-	        </c:forEach>
-	      </tbody>
-	    </table>
-	  </div>
-	</div>
-	<script type="text/javascript">
+              </tr>
+            </c:forEach>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <script type="text/javascript">
       jQuery(document).ready(function () {
         jQuery('#records_table').dataTable({
           "aaSorting": [
