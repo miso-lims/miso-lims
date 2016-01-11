@@ -79,6 +79,10 @@ public class SQLSequencerServiceRecordDAO implements SequencerServiceRecordStore
     params.addValue("restoredTime", serviceRecord.getRestoredTime());
     
     if (serviceRecord.getId() == AbstractSequencerServiceRecord.UNSAVED_ID) {
+      if (serviceRecord.getSequencerReference().getDateDecommissioned() != null) {
+        throw new IOException("Cannot add service records to a retired sequencer");
+      }
+      
       SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("recordId");
 
       Number newId = insert.executeAndReturnKey(params);

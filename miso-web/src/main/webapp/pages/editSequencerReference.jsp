@@ -211,7 +211,14 @@
             <span style="float:right" class="ui-icon ui-icon-triangle-1-s"></span>
           </a>
           <div id="recordmenu" onmouseover="mcancelclosetime()" onmouseout="mclosetime()">
-            <a href='<c:url value="/miso/stats/sequencer/servicerecord/new/${sequencerReference.id}"/> '>Add new Service Record</a>
+            <c:choose>
+              <c:when test="${sequencerReference.dateDecommissioned == null}">
+                <a href='<c:url value="/miso/stats/sequencer/servicerecord/new/${sequencerReference.id}"/> '>Add new Service Record</a>
+              </c:when>
+              <c:otherwise>
+                <a onclick="alert('Error: Cannot add service records to a retired sequencer')">Add new Service Record</a>
+              </c:otherwise>
+            </c:choose>
           </div>
         </li>
       </ul>
