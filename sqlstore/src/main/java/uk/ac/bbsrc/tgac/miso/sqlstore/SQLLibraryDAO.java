@@ -54,6 +54,7 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractLibrary;
+import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Pool;
@@ -78,6 +79,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.NoteStore;
 import uk.ac.bbsrc.tgac.miso.core.store.PoolStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
+import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
@@ -93,36 +95,41 @@ public class SQLLibraryDAO implements LibraryStore {
   private static String TABLE_NAME = "Library";
 
   public static final String LIBRARIES_SELECT = "SELECT libraryId, name, description, alias, accession, securityProfile_profileId, sample_sampleId, identificationBarcode, "
-      + "locationBarcode, paired, libraryType, librarySelectionType, libraryStrategyType, platformName, concentration, creationDate, qcPassed, lastModifier, lowQuality "
-      + "FROM " + TABLE_NAME;
+      + "locationBarcode, paired, libraryType, librarySelectionType, libraryStrategyType, platformName, concentration, creationDate, qcPassed, lastModifier, lowQuality, boxPositionId, volume, emptied, "
+      + "(SELECT boxId FROM BoxPosition WHERE BoxPosition.boxPositionId = " + TABLE_NAME
+      + ".boxPositionId) AS boxId, (SELECT alias FROM Box, BoxPosition WHERE Box.boxId = BoxPosition.boxId AND BoxPosition.boxPositionId = "
+      + TABLE_NAME + ".boxPositionId) AS boxAlias, (SELECT row FROM BoxPosition WHERE BoxPosition.boxPositionId = " + TABLE_NAME
+      + ".boxPositionId) AS boxRow, (SELECT `column` FROM BoxPosition WHERE BoxPosition.boxPositionId = " + TABLE_NAME
+      + ".boxPositionId) AS boxColumn " + "FROM " + TABLE_NAME;
 
   public static final String LIBRARIES_SELECT_LIMIT = LIBRARIES_SELECT + " ORDER BY libraryId DESC LIMIT ?";
 
-  public static final String LIBRARY_SELECT_BY_ID = LIBRARIES_SELECT + " " + "WHERE libraryId = ?";
+  public static final String LIBRARY_SELECT_BY_ID = LIBRARIES_SELECT + " WHERE libraryId = ?";
 
   public static final String LIBRARY_SELECT_BY_ALIAS = LIBRARIES_SELECT + " WHERE alias = ?";
 
   public static final String LIBRARIES_SELECT_BY_SEARCH = LIBRARIES_SELECT + " WHERE " + "identificationBarcode LIKE ? OR "
       + "name LIKE ? OR " + "alias LIKE ? OR " + "description LIKE ? ";
 
-  public static final String LIBRARY_SELECT_BY_IDENTIFICATION_BARCODE = LIBRARIES_SELECT + " " + "WHERE identificationBarcode = ?";
+  public static final String LIBRARY_SELECT_BY_IDENTIFICATION_BARCODE = LIBRARIES_SELECT + " WHERE identificationBarcode = ?";
+
+  public static final String LIBRARIES_SELECT_FROM_BARCODE_LIST = LIBRARIES_SELECT + " WHERE identificationBarcode IN (";
+
+  public static final String LIBRARY_SELECT_BY_BOX_POSITION_ID = LIBRARIES_SELECT + " WHERE boxPositionId = ?";
 
   public static final String LIBRARY_UPDATE = "UPDATE " + TABLE_NAME
       + " SET name=:name, description=:description, alias=:alias, accession=:accession, securityProfile_profileId=:securityProfile_profileId, "
       + "sample_sampleId=:sample_sampleId, identificationBarcode=:identificationBarcode,  locationBarcode=:locationBarcode, "
       + "paired=:paired, libraryType=:libraryType, librarySelectionType=:librarySelectionType, libraryStrategyType=:libraryStrategyType, "
-      + "platformName=:platformName, concentration=:concentration, creationDate=:creationDate, qcPassed=:qcPassed, lastModifier=:lastModifier, lowQuality=:lowQuality "
+      + "platformName=:platformName, concentration=:concentration, creationDate=:creationDate, qcPassed=:qcPassed, lastModifier=:lastModifier, lowQuality=:lowQuality, emptied=:emptied, volume=:volume "
       + "WHERE libraryId=:libraryId";
 
   public static final String LIBRARY_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE libraryId=:libraryId";
 
-  public static final String LIBRARIES_SELECT_BY_SAMPLE_ID = "SELECT l.libraryId, l.name, l.description, l.alias, l.accession, l.securityProfile_profileId, l.sample_sampleId, l.identificationBarcode, l.locationBarcode, "
-      + "l.paired, l.libraryType, l.librarySelectionType, l.libraryStrategyType, l.platformName, l.concentration, l.creationDate, l.qcPassed, l.lastModifier, l.lowQuality "
-      + "FROM " + TABLE_NAME + " l, Sample s " + "WHERE l.sample_sampleId=s.sampleId " + "AND s.sampleId=?";
+  public static final String LIBRARIES_SELECT_BY_SAMPLE_ID = LIBRARIES_SELECT + " WHERE sample_sampleId=?";
 
-  public static String LIBRARIES_SELECT_BY_PROJECT_ID = "SELECT li.* FROM Project p "
-      + "INNER JOIN Sample sa ON sa.project_projectId = p.projectId " + "INNER JOIN " + TABLE_NAME
-      + " li ON li.sample_sampleId = sa.sampleId " + "WHERE p.projectId=?";
+  public static String LIBRARIES_SELECT_BY_PROJECT_ID = LIBRARIES_SELECT
+      + " WHERE sample_sampleId IN (SELECT sampleId FROM Sample WHERE project_projectId = ?)";
 
   public static final String LIBRARY_TYPES_SELECT = "SELECT libraryTypeId, description, platformType " + "FROM LibraryType";
 
@@ -150,9 +157,8 @@ public class SQLLibraryDAO implements LibraryStore {
 
   public static final String LIBRARY_STRATEGY_TYPE_SELECT_BY_NAME = LIBRARY_STRATEGY_TYPES_SELECT + " WHERE name = ?";
 
-  public static final String LIBRARIES_BY_RELATED_DILUTION_ID = "SELECT p.library_libraryId, l.libraryId, l.name, l.description, l.alias, l.accession, l.securityProfile_profileId, l.sample_sampleId, l.identificationBarcode, l.locationBarcode, "
-      + "l.paired, l.libraryType, l.librarySelectionType, l.libraryStrategyType, l.platformName, l.concentration, l.creationDate, l.qcPassed "
-      + "FROM " + TABLE_NAME + " l, LibraryDilution p " + "WHERE l.libraryId=p.library_libraryId " + "AND p.dilutionId=?";
+  public static final String LIBRARIES_BY_RELATED_DILUTION_ID = LIBRARIES_SELECT
+      + " WHERE libraryId IN (SELECT library_libraryId FROM LibraryDilution WHERE dilutionId=?)";
 
   public static final String TAG_BARCODES_SELECT = "SELECT tagId, name, sequence, platformName, strategyName " + "FROM TagBarcodes";
 
@@ -315,6 +321,8 @@ public class SQLLibraryDAO implements LibraryStore {
     params.addValue("creationDate", library.getCreationDate());
     params.addValue("lastModifier", library.getLastModifier().getUserId());
     params.addValue("lowQuality", library.isLowQuality());
+    params.addValue("volume", library.getVolume());
+    params.addValue("emptied", library.isEmpty());
 
     if (library.getQcPassed() != null) {
       params.addValue("qcPassed", library.getQcPassed().toString());
@@ -334,12 +342,11 @@ public class SQLLibraryDAO implements LibraryStore {
           library.setName(name);
           if (libraryNamingScheme.validateField("name", library.getName())
               && libraryNamingScheme.validateField("alias", library.getAlias())) {
-
             if (autoGenerateIdentificationBarcodes) {
               autoGenerateIdBarcode(library);
             } // if !autoGenerateIdentificationBarcodes then the identificationBarcode is set by the user
-
             params.addValue("name", name);
+
             params.addValue("identificationBarcode", library.getIdentificationBarcode());
 
             Number newId = insert.executeAndReturnKey(params);
@@ -442,6 +449,11 @@ public class SQLLibraryDAO implements LibraryStore {
   }
 
   @Override
+  public List<Library> getByBarcodeList(List<String> barcodeList) {
+    return DbUtils.getByBarcodeList(template, barcodeList, LIBRARIES_SELECT_FROM_BARCODE_LIST, new LibraryMapper(true));
+  }
+
+  @Override
   public Library getByAlias(String alias) throws IOException {
     List eResults = template.query(LIBRARY_SELECT_BY_ALIAS, new Object[] { alias }, new LibraryMapper());
     Library e = eResults.size() > 0 ? (Library) eResults.get(0) : null;
@@ -449,14 +461,21 @@ public class SQLLibraryDAO implements LibraryStore {
   }
 
   @Override
+  public Boxable getByPositionId(long positionId) {
+    List<Library> eResults = template.query(LIBRARY_SELECT_BY_BOX_POSITION_ID, new Object[] { positionId }, new LibraryMapper());
+    Library e = eResults.size() > 0 ? eResults.get(0) : null;
+    return e;
+  }
+
+  @Override
   public Library lazyGet(long libraryId) throws IOException {
-    List eResults = template.query(LIBRARY_SELECT_BY_ID, new Object[] { libraryId }, new LibraryMapper(true));
+    List<Library> eResults = template.query(LIBRARY_SELECT_BY_ID, new Object[] { libraryId }, new LibraryMapper(true));
     Library e = eResults.size() > 0 ? (Library) eResults.get(0) : null;
     return e;
   }
 
   public Library getByIdentificationBarcode(String barcode) throws IOException {
-    List eResults = template.query(LIBRARY_SELECT_BY_IDENTIFICATION_BARCODE, new Object[] { barcode }, new LibraryMapper());
+    List<Library> eResults = template.query(LIBRARY_SELECT_BY_IDENTIFICATION_BARCODE, new Object[] { barcode }, new LibraryMapper());
     Library e = eResults.size() > 0 ? (Library) eResults.get(0) : null;
     return e;
   }
@@ -713,6 +732,13 @@ public class SQLLibraryDAO implements LibraryStore {
       library.setInitialConcentration(rs.getDouble("concentration"));
       library.setPlatformName(rs.getString("platformName"));
       library.setLowQuality(rs.getBoolean("lowQuality"));
+      library.setVolume(rs.getInt("volume"));
+      library.setEmpty(rs.getBoolean("emptied"));
+      library.setBoxPositionId(rs.getLong("boxPositionId"));
+      library.setBoxAlias(rs.getString("boxAlias"));
+      library.setBoxId(rs.getLong("boxId"));
+      int row = rs.getInt("boxRow");
+      if (!rs.wasNull()) library.setBoxPosition(BoxUtils.getPositionString(row, rs.getInt("boxColumn")));
       if (rs.getString("qcPassed") != null) {
         library.setQcPassed(Boolean.parseBoolean(rs.getString("qcPassed")));
       } else {

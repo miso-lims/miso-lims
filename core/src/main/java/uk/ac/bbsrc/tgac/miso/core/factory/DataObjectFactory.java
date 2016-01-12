@@ -28,6 +28,7 @@ import java.util.LinkedList;
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
@@ -61,8 +62,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 /**
  * uk.ac.bbsrc.tgac.miso.core.factory
  * <p/>
- * TODO Info
- * 
+ * Provides the basis of an Object Factory needed by MISO
+ *
  * @author Rob Davey
  * @since 0.0.2
  */
@@ -177,8 +178,7 @@ public abstract class DataObjectFactory {
 
   public abstract Submission getSubmission(User user);
 
-  /*
-   * public static DataObjectFactory getDataObjectFactory(int whichFactory) { switch (whichFactory) { case TGAC: return new
-   * TgacDataObjectFactory(); default : return null; } }
-   */
+  public abstract Box getBox();
+
+  public abstract Box getBox(User user);
 }

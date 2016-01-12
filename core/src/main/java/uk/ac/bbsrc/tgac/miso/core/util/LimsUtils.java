@@ -23,8 +23,6 @@
 
 package uk.ac.bbsrc.tgac.miso.core.util;
 
-import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;

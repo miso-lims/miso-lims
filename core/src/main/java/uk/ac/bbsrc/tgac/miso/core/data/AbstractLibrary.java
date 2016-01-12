@@ -36,12 +36,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.type.LibrarySelectionType;
@@ -59,7 +59,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.CoverageIgnore;
  * @author Rob Davey
  * @since 0.0.2
  */
-public abstract class AbstractLibrary implements Library {
+public abstract class AbstractLibrary extends AbstractBoxable implements Library {
   protected static final Logger log = LoggerFactory.getLogger(AbstractLibrary.class);
   public static final Long UNSAVED_ID = 0L;
   public static final String UNITS = "nM";
@@ -156,17 +156,6 @@ public abstract class AbstractLibrary implements Library {
     this.accession = accession;
   }
 
-  @Override
-  public String getAlias() {
-    return alias;
-  }
-
-  @Override
-  public void setAlias(String alias) {
-    this.alias = alias;
-  }
-
-  @Override
   public Date getCreationDate() {
     return creationDate;
   }

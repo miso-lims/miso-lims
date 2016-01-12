@@ -22,64 +22,76 @@
   --%>
 
 <div id="subcontent">
-    <h2>Navigation</h2>
-    <br/>
-    <%--<h2>Search</h2>--%>
-    <%--<span class="inline">--%>
-    <%--<form action="/miso/search">--%>
-    <%--<input type="text" id="search" value="Search for..." onfocus="clearInputField(this);"/><input value="Search"--%>
-    <%--type="submit"/>--%>
-    <%--</form>--%>
-    <%--</span><br/>--%>
+	<h2>Navigation</h2>
+	<br />
+	<%--<h2>Search</h2>--%>
+	<%--<span class="inline">--%>
+	<%--<form action="/miso/search">--%>
+	<%--<input type="text" id="search" value="Search for..." onfocus="clearInputField(this);"/><input value="Search"--%>
+	<%--type="submit"/>--%>
+	<%--</form>--%>
+	<%--</span><br/>--%>
 
-    <h2>Sample Processing</h2>
-    <ul class="bullets">
-        <li><a href="<c:url value="/miso/sample/receipt"/>">Receive Samples</a></li>
-        <li><a href="<c:url value="/miso/importexport"/>">Import & Export</a></li>
-        <%--<li><a href="<c:url value="/miso/plate/import"/>">Import Plate Sheet</a></li>--%>
-        <%--<li><a href="<c:url value="/miso/plate/export"/>">Export Plate Sheet</a></li>--%>
-    </ul>
+	<h2>Sample Processing</h2>
+	<ul class="bullets">
+		<li><a href="<c:url value="/miso/sample/receipt"/>">Receive
+				Samples</a></li>
+		<li><a href="<c:url value="/miso/importexport"/>">Import &
+				Export</a></li>
+		<%--<li><a href="<c:url value="/miso/plate/import"/>">Import Plate Sheet</a></li>--%>
+		<%--<li><a href="<c:url value="/miso/plate/export"/>">Export Plate Sheet</a></li>--%>
+	</ul>
 
-    <h2>Sequencing</h2>
-    <ul class="bullets">
-        <li><a href="<c:url value="/miso/pools/ready"/>">Ready to Run</a></li>
-        <li><a href="<c:url value="/miso/container/new"/>">Create New Partition Container</a></li>
-        <li><a href="<c:url value="/miso/run/new"/>">Create New Run</a></li>
-    </ul>
+	<h2>Sequencing</h2>
+	<ul class="bullets">
+		<li><a href="<c:url value="/miso/pools/ready"/>">Ready to Run</a></li>
+		<li><a href="<c:url value="/miso/container/new"/>">Create New
+				Partition Container</a></li>
+		<li><a href="<c:url value="/miso/run/new"/>">Create New Run</a></li>
+	</ul>
 
-    <h2>Tracking</h2>
-    <ul class="bullets">
-        <li><a href="<c:url value="/miso/runs"/>">List Runs</a></li>
-        <li><a href="<c:url value="/miso/containers"/>">List Partition Containers</a></li>
-        <li><a href="<c:url value="/miso/experiments"/>">List Experiments</a></li>
-        <li><a href="<c:url value="/miso/pools"/>">List Pools</a></li>
-        <li><a href="<c:url value="/miso/libraries"/>">List Libraries</a></li>
-        <li><a href="<c:url value="/miso/samples"/>">List Samples</a></li>
-        <li><a href="<c:url value="/miso/studies"/>">List Studies</a></li>
-        <li><a href="<c:url value="/miso/kitdescriptors"/>">List Consumables</a></li>
-        <li><a href="<c:url value="/miso/plates"/>">List Plates</a></li>
-    </ul>
+	<h2>Tracking</h2>
+	<ul class="bullets">
+		<li><a href="<c:url value="/miso/runs"/>">List Runs</a></li>
+		<li><a href="<c:url value="/miso/containers"/>">List
+				Partition Containers</a></li>
+		<li><a href="<c:url value="/miso/experiments"/>">List
+				Experiments</a></li>
+		<li><a href="<c:url value="/miso/pools"/>">List Pools</a></li>
+		<li><a href="<c:url value="/miso/libraries"/>">List Libraries</a></li>
+		<li><a href="<c:url value="/miso/samples"/>">List Samples</a></li>
+		<li><a href="<c:url value="/miso/studies"/>">List Studies</a></li>
+		<li><a href="<c:url value="/miso/kitdescriptors"/>">List
+				Consumables</a></li>
+		<li><a href="<c:url value="/miso/plates"/>">List Plates</a></li>
+		<li><a href="<c:url value="/miso/boxes"/>">List Boxes</a></li>
+	</ul>
 
-    <h2>Print Jobs</h2>
-    <ul class="bullets">
-        <li><a href="<c:url value="/miso/printjobs"/>">My Print Jobs</a></li>
-        <li><a href="<c:url value="/miso/custombarcode"/>">Custom Barcode Printing</a></li>
-        <sec:authorize access="hasRole('ROLE_ADMIN')">
-            <li><a href="<c:url value="/miso/admin/configuration/printers"/>">Printers</a></li>
-        </sec:authorize>
-    </ul>
+	<h2>Print Jobs</h2>
+	<ul class="bullets">
+		<li><a href="<c:url value="/miso/printjobs"/>">My Print Jobs</a></li>
+		<li><a href="<c:url value="/miso/custombarcode"/>">Custom
+				Barcode Printing</a></li>
+		<sec:authorize access="hasRole('ROLE_ADMIN')">
+			<li><a
+				href="<c:url value="/miso/admin/configuration/printers"/>">Printers</a></li>
+		</sec:authorize>
+	</ul>
 
-    <sec:authorize access="hasRole('ROLE_ADMIN')">
-        <h2>User Administration</h2>
-        <ul class="bullets">
-            <li><a href="<c:url value="/miso/admin/users"/>">List Users</a></li>
-            <li><a href="<c:url value="/miso/admin/user/new"/>">Create User</a></li>
-        </ul>
+	<sec:authorize access="hasRole('ROLE_ADMIN')">
+		<h2>User Administration</h2>
+		<ul class="bullets">
+			<li><a href="<c:url value="/miso/admin/users"/>">List Users</a></li>
+			<li><a href="<c:url value="/miso/admin/user/new"/>">Create
+					User</a></li>
+		</ul>
 
-        <h2>Group Administration</h2>
-        <ul class="bullets">
-            <li><a href="<c:url value="/miso/admin/groups"/>">List Groups</a></li>
-            <li><a href="<c:url value="/miso/admin/group/new"/>">Create Group</a></li>
-        </ul>
-    </sec:authorize>
+		<h2>Group Administration</h2>
+		<ul class="bullets">
+			<li><a href="<c:url value="/miso/admin/groups"/>">List
+					Groups</a></li>
+			<li><a href="<c:url value="/miso/admin/group/new"/>">Create
+					Group</a></li>
+		</ul>
+	</sec:authorize>
 </div>

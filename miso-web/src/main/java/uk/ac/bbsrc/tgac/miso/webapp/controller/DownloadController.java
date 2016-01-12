@@ -42,6 +42,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Plate;
@@ -151,6 +152,11 @@ public class DownloadController {
     } else {
       throw new SecurityException("Access denied");
     }
+  }
+
+  @RequestMapping(value = "/box/forms/{hashcode}", method = RequestMethod.GET)
+  protected void downloadBoxContentsFile(@PathVariable Integer hashcode, HttpServletResponse response) throws Exception {
+    lookupAndRetrieveFile(Box.class, "forms", hashcode, response);
   }
 
   private void lookupAndRetrieveFile(Class cl, String id, Integer hashcode, HttpServletResponse response) throws IOException {

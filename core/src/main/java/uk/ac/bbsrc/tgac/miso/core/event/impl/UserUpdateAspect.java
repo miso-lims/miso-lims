@@ -24,14 +24,14 @@
 package uk.ac.bbsrc.tgac.miso.core.event.impl;
 
 import java.io.IOException;
+
 import org.aspectj.lang.annotation.Aspect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import uk.ac.bbsrc.tgac.miso.core.event.manager.PoolAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.ProjectAlertManager;
 import uk.ac.bbsrc.tgac.miso.core.event.manager.RunAlertManager;
-
-import java.io.IOException;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.event

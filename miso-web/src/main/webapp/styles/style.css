@@ -310,7 +310,6 @@ table.in td {
 }
 
 table.in input[type="text"] {
-    /*background-color: #EEEEFF;*/
     border-left: 1px solid #666699;
     border-top: 1px solid #666666;
     width: 94%;
@@ -618,11 +617,11 @@ div.checklist {
     margin: 0;
     padding: 0;
     display: block;
-    /*background-color: #EEEEFF;*/
+    background-color: #EEEEFF;
 }
 
 .checklist label {
-    /*background-color: #EEEEFF;*/
+    background-color: #EEEEFF;
     margin: 0;
     padding: 0;
     width: 100%;
@@ -1826,4 +1825,18 @@ textarea.parsley-error {
 }
 .bs-callout-info h4 {
   color: #5bc0de;
+}
+
+img.center {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.warning {
+	color: #b23115;
+}
+
+button.disabled {
+  opacity: .4;
 }

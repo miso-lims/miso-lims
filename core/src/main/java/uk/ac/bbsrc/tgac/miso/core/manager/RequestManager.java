@@ -30,6 +30,10 @@ import java.util.List;
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Box;
+import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
+import uk.ac.bbsrc.tgac.miso.core.data.BoxUse;
+import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
 import uk.ac.bbsrc.tgac.miso.core.data.EntityGroup;
@@ -138,6 +142,8 @@ public interface RequestManager {
 
   public long saveEntityGroup(EntityGroup<? extends Nameable, ? extends Nameable> entityGroup) throws IOException;
 
+  public long saveBox(Box box) throws IOException;
+
   // GETS
   public SequencerPoolPartition getSequencerPoolPartitionById(long partitionId) throws IOException;
 
@@ -150,6 +156,8 @@ public interface RequestManager {
   public Pool<? extends Poolable> getPoolByBarcode(String barcode) throws IOException;
 
   public Pool<? extends Poolable> getPoolByBarcode(String barcode, PlatformType platformType) throws IOException;
+
+  public Pool<? extends Poolable> getPoolByIdBarcode(String barcode) throws IOException;
 
   public PoolQC getPoolQCById(long poolQcId) throws IOException;
 
@@ -267,6 +275,12 @@ public interface RequestManager {
 
   public EntityGroup<? extends Nameable, ? extends Nameable> getEntityGroupById(long entityGroupId) throws IOException;
 
+  public Box getBoxById(long boxId) throws IOException;
+
+  public Box getBoxByBarcode(String barcode) throws IOException;
+
+  public Box getBoxByAlias(String alias) throws IOException;
+
   // LISTS
   /**
    * Obtain a list of all the projects the user has access to. Access is defined as either read or write access.
@@ -292,6 +306,14 @@ public interface RequestManager {
   public Collection<Experiment> listAllExperimentsWithLimit(long limit) throws IOException;
 
   public Collection<Experiment> listAllExperimentsBySearch(String query) throws IOException;
+
+  public Collection<Box> listAllBoxes() throws IOException;
+
+  public Collection<Box> listAllBoxesWithLimit(long limit) throws IOException;
+
+  public Collection<Box> listAllBoxesBySearch(String query) throws IOException;
+
+  public Collection<Box> listAllBoxesByAlias(String alias) throws IOException;
 
   public Collection<Run> listAllRuns() throws IOException;
 
@@ -450,6 +472,15 @@ public interface RequestManager {
   public Collection<String> listDistinctPlatformNames() throws IOException;
 
   /**
+   * Obtain a list of all of the Box attributes (uses, sizes)
+   */
+  public Collection<BoxUse> listAllBoxUses() throws IOException;
+
+  public Collection<String> listAllBoxUsesStrings() throws IOException;
+
+  public Collection<BoxSize> listAllBoxSizes() throws IOException;
+
+  /**
    * Obtain a list of all the StudyTypes
    */
   public Collection<String> listAllStudyTypes() throws IOException;
@@ -457,6 +488,11 @@ public interface RequestManager {
   public Collection<Submission> listAllSubmissions() throws IOException;
 
   public Collection<Run> listRunsByExperimentId(Long experimentId) throws IOException;
+
+  /**
+   * Obtain a list of Boxables by supplied identificationBarcode list
+   */
+  public Collection<Boxable> getBoxablesFromBarcodeList(List<String> barcodeList) throws IOException;
 
   public Collection<SequencerReference> listAllSequencerReferences() throws IOException;
 
@@ -499,6 +535,10 @@ public interface RequestManager {
 
   public Collection<Alert> listAlertsByUserId(long userId, long limit) throws IOException;
 
+  public void emptySingleTube(Box box, String position) throws IOException;
+
+  public void emptyAllTubes(Box box) throws IOException;
+
   // DELETES
   public void deleteProject(Project project) throws IOException;
 
@@ -539,4 +579,7 @@ public interface RequestManager {
   public void deleteContainer(SequencerPartitionContainer container) throws IOException;
 
   public void deleteNote(Note note) throws IOException;
+
+  public void deleteBox(Box box) throws IOException;
+
 }

@@ -83,7 +83,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.LibraryType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 
-
 /**
  * Class that binds all the MISO model datatypes to the Spring form path types
  */

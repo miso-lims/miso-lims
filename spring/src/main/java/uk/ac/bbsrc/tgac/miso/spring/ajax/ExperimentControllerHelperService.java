@@ -38,6 +38,7 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
@@ -258,6 +259,7 @@ public class ExperimentControllerHelperService {
 
         Experiment e = requestManager.getExperimentById(new Long(experimentId));
         e.addKit(lk);
+        e.setLastModifier(securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName()));
         requestManager.saveExperiment(e);
         Integer newStock = kd.getStockLevel() - 1;
         kd.setStockLevel(newStock);
@@ -319,6 +321,7 @@ public class ExperimentControllerHelperService {
 
         Experiment e = requestManager.getExperimentById(new Long(experimentId));
         e.addKit(lk);
+        e.setLastModifier(securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName()));
         requestManager.saveExperiment(e);
         Integer newStock = kd.getStockLevel() - 1;
         kd.setStockLevel(newStock);
@@ -380,6 +383,7 @@ public class ExperimentControllerHelperService {
 
         Experiment e = requestManager.getExperimentById(new Long(experimentId));
         e.addKit(lk);
+        e.setLastModifier(securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName()));
         requestManager.saveExperiment(e);
         Integer newStock = kd.getStockLevel() - 1;
         kd.setStockLevel(newStock);
@@ -441,6 +445,7 @@ public class ExperimentControllerHelperService {
 
         Experiment e = requestManager.getExperimentById(new Long(experimentId));
         e.addKit(lk);
+        e.setLastModifier(securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName()));
         requestManager.saveExperiment(e);
         Integer newStock = kd.getStockLevel() - 1;
         kd.setStockLevel(newStock);

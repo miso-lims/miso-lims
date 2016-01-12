@@ -58,6 +58,7 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
+import uk.ac.bbsrc.tgac.miso.core.data.Boxable;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -76,6 +77,7 @@ import uk.ac.bbsrc.tgac.miso.core.store.ProjectStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleQcStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SampleStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
+import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
@@ -91,7 +93,12 @@ public class SQLSampleDAO implements SampleStore {
   private static final String TABLE_NAME = "Sample";
 
   public static final String SAMPLES_SELECT = "SELECT sampleId, name, description, scientificName, taxonIdentifier, alias, accession, securityProfile_profileId, identificationBarcode, locationBarcode, "
-      + "sampleType, receivedDate, qcPassed, project_projectId, lastModifier " + "FROM " + TABLE_NAME;
+      + "sampleType, receivedDate, qcPassed, project_projectId, lastModifier, volume, emptied, boxPositionId, (SELECT boxId FROM BoxPosition WHERE BoxPosition.boxPositionId = "
+      + TABLE_NAME
+      + ".boxPositionId) AS boxId, (SELECT alias FROM Box, BoxPosition WHERE Box.boxId = BoxPosition.boxId AND BoxPosition.boxPositionId = "
+      + TABLE_NAME + ".boxPositionId) AS boxAlias , (SELECT row FROM BoxPosition WHERE BoxPosition.boxPositionId = " + TABLE_NAME
+      + ".boxPositionId) AS boxRow, (SELECT `column` FROM BoxPosition WHERE BoxPosition.boxPositionId = " + TABLE_NAME
+      + ".boxPositionId) AS boxColumn " + "FROM " + TABLE_NAME;
 
   public static final String SAMPLES_SELECT_LIMIT = SAMPLES_SELECT + " ORDER BY sampleId DESC LIMIT ?";
 
@@ -104,41 +111,34 @@ public class SQLSampleDAO implements SampleStore {
 
   public static final String SAMPLE_SELECT_BY_IDENTIFICATION_BARCODE = SAMPLES_SELECT + " " + "WHERE identificationBarcode = ?";
 
+  public static final String SAMPLES_SELECT_FROM_BARCODE_LIST = SAMPLES_SELECT + " " + "WHERE identificationBarcode IN (";
+
+  public static final String SAMPLE_SELECT_BY_BOX_POSITION_ID = SAMPLES_SELECT + " WHERE boxPositionId = ?";
+
   public static final String SAMPLES_SELECT_BY_SEARCH = SAMPLES_SELECT + " WHERE " + "identificationBarcode LIKE ? OR " + "name LIKE ? OR "
       + "alias LIKE ? OR " + "description LIKE ? OR " + "scientificName LIKE ? ";
 
   public static final String SAMPLE_UPDATE = "UPDATE " + TABLE_NAME + " "
       + "SET name=:name, description=:description, scientificName=:scientificName, taxonIdentifier=:taxonIdentifier, alias=:alias, accession=:accession, securityProfile_profileId=:securityProfile_profileId, "
       + "identificationBarcode=:identificationBarcode, locationBarcode=:locationBarcode, sampleType=:sampleType, receivedDate=:receivedDate, "
-      + "qcPassed=:qcPassed, project_projectId=:project_projectId, lastModifier=:lastModifier " + "WHERE sampleId=:sampleId";
+      + "qcPassed=:qcPassed, project_projectId=:project_projectId, lastModifier=:lastModifier, volume=:volume, emptied=:emptied "
+      + "WHERE sampleId=:sampleId";
 
   public static final String SAMPLE_DELETE = "DELETE FROM " + TABLE_NAME + " WHERE sampleId=:sampleId";
 
-  public static String SAMPLES_SELECT_BY_PROJECT_ID = SAMPLES_SELECT + " WHERE project_projectId = ?";
+  public static String SAMPLES_SELECT_BY_PROJECT_ID = SAMPLES_SELECT + " " + "WHERE project_projectId = ?";
 
-  public static final String SAMPLES_SELECT_BY_EXPERIMENT_ID = "SELECT s.sampleId, s.name, s.description, s.scientificName, s.taxonIdentifier, s.alias, s.accession, s.securityProfile_profileId, s.identificationBarcode, s.locationBarcode, "
-      + "s.sampleType, s.receivedDate, s.qcPassed, s.project_projectId "
-      + "FROM "
-      + TABLE_NAME
-      + " s, Experiment_Sample es "
-      + "WHERE es.samples_sampleId=s.sampleId " + "AND es.Experiment_experimentId=?";
+  public static final String SAMPLES_SELECT_BY_EXPERIMENT_ID = SAMPLES_SELECT
+      + " WHERE sampleId IN (SELECT samples_sampleId FROM Experiment_Sample WHERE Experiment_experimentId=?)";
 
-  public static final String SAMPLE_SELECT_BY_LIBRARY_ID = "SELECT s.sampleId, s.name, s.description, s.scientificName, s.taxonIdentifier, s.alias, s.accession, s.securityProfile_profileId, s.identificationBarcode, s.locationBarcode, "
-      + "s.sampleType, s.receivedDate, s.qcPassed, s.project_projectId, s.lastModifier "
-      + "FROM "
-      + TABLE_NAME
-      + " s, Library l "
-      + "WHERE s.sampleId=l.sample_sampleId " + "AND l.libraryId=?";
+  public static final String SAMPLE_SELECT_BY_LIBRARY_ID = SAMPLES_SELECT
+      + " WHERE sampleId IN (SELECT sample_sampleId FROM Library WHERE libraryId=?)";
 
   public static final String EXPERIMENT_SAMPLE_DELETE_BY_SAMPLE_ID = "DELETE FROM Experiment_Sample "
       + "WHERE samples_sampleId=:samples_sampleId";
 
-  public static final String SAMPLES_BY_RELATED_SUBMISSION = "SELECT s.sampleId, s.name, s.description, s.scientificName, s.taxonIdentifier, s.alias, s.accession, s.securityProfile_profileId, s.identificationBarcode, s.locationBarcode, "
-      + "s.sampleType, s.receivedDate, s.qcPassed, project_projectId, s.lastModifier "
-      + "FROM "
-      + TABLE_NAME
-      + " s, Submission_Sample ss "
-      + "WHERE s.sampleId=ss.samples_sampleId " + "AND ss.submission_submissionId=?";
+  public static final String SAMPLES_BY_RELATED_SUBMISSION = SAMPLES_SELECT
+      + " WHERE sampleId IN (SELECT samples_sampleId FROM Submission_Sample WHERE submission_submissionId=?)";
 
   public static final String SAMPLE_TYPES_SELECT = "SELECT name FROM SampleType";
 
@@ -284,6 +284,8 @@ public class SQLSampleDAO implements SampleStore {
         params.addValue("project_projectId", sample.getProject().getProjectId());
         params.addValue("securityProfile_profileId", securityProfileId);
         params.addValue("lastModifier", sample.getLastModifier().getUserId());
+        params.addValue("emptied", sample.isEmpty());
+        params.addValue("volume", sample.getVolume());
 
         if (sampleNamingScheme.validateField("name", sample.getName()) && sampleNamingScheme.validateField("alias", sample.getAlias())) {
           batch.add(params);
@@ -321,6 +323,8 @@ public class SQLSampleDAO implements SampleStore {
     params.addValue("project_projectId", sample.getProject().getProjectId());
     params.addValue("securityProfile_profileId", securityProfileId);
     params.addValue("lastModifier", sample.getLastModifier().getUserId());
+    params.addValue("volume", sample.getVolume());
+    params.addValue("emptied", sample.isEmpty());
 
     if (sample.getQcPassed() != null) {
       params.addValue("qcPassed", sample.getQcPassed().toString());
@@ -497,6 +501,18 @@ public class SQLSampleDAO implements SampleStore {
   }
 
   @Override
+  public List<Sample> getByBarcodeList(List<String> barcodeList) {
+    return DbUtils.getByBarcodeList(template, barcodeList, SAMPLES_SELECT_FROM_BARCODE_LIST, new SampleMapper(true));
+  }
+
+  @Override
+  public Boxable getByPositionId(long positionId) {
+    List<Sample> eResults = template.query(SAMPLE_SELECT_BY_BOX_POSITION_ID, new Object[] { positionId }, new SampleMapper(true));
+    Sample e = eResults.size() > 0 ? eResults.get(0) : null;
+    return e;
+  }
+
+  @Override
   public List<Sample> listByProjectId(long projectId) throws IOException {
     List<Sample> samples = template.query(SAMPLES_SELECT_BY_PROJECT_ID, new Object[] { projectId }, new SampleMapper(true));
     Collections.sort(samples);
@@ -578,6 +594,13 @@ public class SQLSampleDAO implements SampleStore {
       s.setLocationBarcode(rs.getString("locationBarcode"));
       s.setSampleType(rs.getString("sampleType"));
       s.setReceivedDate(rs.getDate("receivedDate"));
+      s.setVolume(rs.getLong("volume"));
+      s.setEmpty(rs.getBoolean("emptied"));
+      s.setBoxPositionId(rs.getLong("boxPositionId"));
+      s.setBoxAlias(rs.getString("boxAlias"));
+      s.setBoxId(rs.getLong("boxId"));
+      int row = rs.getInt("boxRow");
+      if (!rs.wasNull()) s.setBoxPosition(BoxUtils.getPositionString(row, rs.getInt("boxColumn")));
       if (rs.getString("qcPassed") != null) {
         s.setQcPassed(Boolean.parseBoolean(rs.getString("qcPassed")));
       } else {

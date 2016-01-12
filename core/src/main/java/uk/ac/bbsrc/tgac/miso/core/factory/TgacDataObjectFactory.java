@@ -28,6 +28,7 @@ import java.util.LinkedList;
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.User;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
@@ -47,6 +48,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
 import uk.ac.bbsrc.tgac.miso.core.data.Study;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.BoxImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ExperimentImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryImpl;
@@ -516,5 +518,15 @@ public class TgacDataObjectFactory extends DataObjectFactory {
   @Override
   public SubmissionImpl getSubmission(User user) {
     return new SubmissionImpl(user);
+  }
+
+  @Override
+  public Box getBox() {
+    return new BoxImpl();
+  }
+
+  @Override
+  public Box getBox(User user) {
+    return new BoxImpl(user);
   }
 }
