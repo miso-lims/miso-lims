@@ -1,12 +1,17 @@
 package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -76,6 +81,15 @@ public class EditServiceRecordController {
       log.debug("Failed to save Sequencer Service Record", ex);
       throw ex;
     }
+  }
+  
+  @InitBinder
+  public void initBinder(WebDataBinder binder) {
+    // set format for datetime data bindings
+    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+    CustomDateEditor dateEditor = new CustomDateEditor(dateFormat, true);
+    binder.registerCustomEditor(Date.class, "shutdownTime", dateEditor);
+    binder.registerCustomEditor(Date.class, "restoredTime", dateEditor);
   }
 
 }

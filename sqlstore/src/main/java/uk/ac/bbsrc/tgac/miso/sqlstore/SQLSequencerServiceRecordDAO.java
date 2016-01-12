@@ -136,8 +136,8 @@ public class SQLSequencerServiceRecordDAO implements SequencerServiceRecordStore
           r.setServicedByName(rs.getString("servicedBy"));
           r.setPhone(rs.getString("phone"));
           r.setServiceDate(rs.getDate("serviceDate"));
-          r.setShutdownTime(rs.getDate("shutdownTime"));
-          r.setRestoredTime(rs.getDate("restoredTime"));
+          r.setShutdownTime(rs.getTimestamp("shutdownTime"));
+          r.setRestoredTime(rs.getTimestamp("restoredTime"));
           r.setSequencerReference(sequencerReferenceDAO.get(rs.getLong("sequencerReferenceId")));
         }
       } catch (IOException e) {

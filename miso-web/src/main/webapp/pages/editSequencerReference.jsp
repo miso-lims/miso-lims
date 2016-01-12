@@ -102,7 +102,7 @@
           </td>
         </tr>
         <tr>
-          <td class="h">Commissioned</td>
+          <td class="h">Commissioned:</td>
           <td>
             <form:input path="dateCommissioned" id="datecommissionedpicker" placeholder="DD/MM/YYYY"/>
             <script type="text/javascript">
@@ -111,7 +111,7 @@
           </td>
         </tr>
         <tr>
-          <td>Status</td>
+          <td>Status:</td>
           <td>
             <input type="radio" name="status" value="production" onchange="showStatusRows();" <c:if test="${sequencerReference.dateDecommissioned == null}">checked</c:if>/> Production
             <input type="radio" name="status" value="retired" onchange="showStatusRows();" <c:if test="${sequencerReference.dateDecommissioned != null && sequencerReference.upgradedSequencerReference == null}">checked</c:if>/> Retired
@@ -119,7 +119,7 @@
           </td>
         </tr>
         <tr id="decommissionedRow">
-          <td class="h">Decommissioned</td>
+          <td class="h">Decommissioned:</td>
           <td>
             <form:input path="dateDecommissioned" id="datedecommissionedpicker" placeholder="DD/MM/YYYY"/>
             <script type="text/javascript">
@@ -128,7 +128,7 @@
           </td>
         </tr>
         <tr id="upgradedReferenceRow">
-          <td class="h">Upgraded To</td>
+          <td class="h">Upgraded To:</td>
           <td>
             <form:select id="upgradedSequencerReference" path="upgradedSequencerReference" onchange="updateUpgradedSequencerReferenceLink();">
               <form:option value="${null}">(choose)</form:option>

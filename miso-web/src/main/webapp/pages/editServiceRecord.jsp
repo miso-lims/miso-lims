@@ -38,6 +38,10 @@
 <script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
 <script type="text/javascript" src="<c:url value='/scripts/sample_validation.js?ts=${timestamp.time}'/>"></script>
 
+<script type="text/javascript" src="<c:url value='/scripts/jquery/timepicker/js/jquery-ui-timepicker-addon.min.js'/>"></script>
+<link rel="stylesheet" href="<c:url value='/scripts/jquery/timepicker/css/jquery-ui-timepicker-addon.min.css'/>"
+        type="text/css">
+
 <div id="maincontent">
   <div id="contentcolumn">
     <form:form action="/miso/stats/sequencer/servicerecord" method="POST" commandName="serviceRecord" autocomplete="off">
@@ -112,12 +116,32 @@
           </td>
         </tr>
         <tr>
-          <td class="h">Sequencer Shutdown Time</td>
-          <td></td>
+          <td class="h">Sequencer Shutdown Time:</td>
+          <td>
+            <form:input path="shutdownTime" id="shutdownTime" placeholder="DD/MM/YYYY HH:mm"/>
+            <script type="text/javascript">
+              jQuery("#shutdownTime").datetimepicker({
+                controlType: 'select',
+                oneLine: true,
+                dateFormat: 'dd/mm/yy',
+                timeFormat: 'HH:mm'
+              });
+            </script>
+          </td>
         </tr>
         <tr>
-          <td class="h">Sequencer Restored Time</td>
-          <td></td>
+          <td class="h">Sequencer Restored Time:</td>
+          <td>
+            <form:input path="restoredTime" id="restoredTime" placeholder="DD/MM/YYYY HH:mm"/>
+            <script type="text/javascript">
+              jQuery("#restoredTime").datetimepicker({
+                controlType: 'select',
+                oneLine: true,
+                dateFormat: 'dd/mm/yy',
+                timeFormat: 'HH:mm'
+              });
+            </script>
+          </td>
         </tr>
       </table>
       <br/>
