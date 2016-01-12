@@ -23,27 +23,48 @@
 
 package uk.ac.bbsrc.tgac.miso.spring.ajax;
 
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import net.sourceforge.fluxion.ajax.Ajaxified;
-import net.sourceforge.fluxion.ajax.util.JSONUtils;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.servlet.http.HttpSession;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import uk.ac.bbsrc.tgac.miso.core.data.*;
+
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import net.sourceforge.fluxion.ajax.Ajaxified;
+import net.sourceforge.fluxion.ajax.util.JSONUtils;
+import uk.ac.bbsrc.tgac.miso.core.data.Dilution;
+import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
+import uk.ac.bbsrc.tgac.miso.core.data.Library;
+import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
+import uk.ac.bbsrc.tgac.miso.core.data.Run;
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
+import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
+import uk.ac.bbsrc.tgac.miso.core.data.Study;
+import uk.ac.bbsrc.tgac.miso.core.data.TagBarcode;
 import uk.ac.bbsrc.tgac.miso.core.data.type.HealthType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-
-import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
@@ -878,23 +899,21 @@ public class FlexReportingControllerHelperService {
     for (Library library : libraries) {
       String qc = "unknown";
       String sampleQC = "unknown";
+      String scientificName = "unknown";
       if (library.getQcPassed() != null) {
         qc = library.getQcPassed().toString();
       }
       if (library.getSample().getQcPassed() != null) {
         sampleQC = library.getSample().getQcPassed().toString();
       }
+      if (library.getSample().getScientificName() != null) {
+        scientificName = library.getSample().getScientificName();
+      }
 
-      jsonArray.add("['" + library.getSample().getProject().getName() + "','" +
-                    library.getName() + "','" +
-                    library.getAlias() + "','" +
-                    library.getDescription() + "','" +
-                    library.getPlatformName() + "','" +
-                    library.getLibraryType().getDescription() + "','" +
-                    qc + "','" +
-                    LimsUtils.getDateAsString(library.getCreationDate()) + "','" +
-                    library.getSample().getName() + "','" +
-                    sampleQC + "']");
+      jsonArray.add("['" + library.getSample().getProject().getName() + "','" + library.getName() + "','" + library.getAlias() + "','"
+          + library.getDescription() + "','" + library.getPlatformName() + "','" + library.getLibraryType().getDescription() + "','" + qc
+          + "','" + LimsUtils.getDateAsString(library.getCreationDate()) + "','" + library.getSample().getName() + "','" + sampleQC + "','"
+          + scientificName + "']");
     }
     return jsonArray;
   }

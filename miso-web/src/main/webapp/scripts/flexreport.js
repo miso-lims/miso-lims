@@ -592,6 +592,8 @@ Reports.ui = {
   },
 
   createLibraryRelationQCTable: function (array) {
+/*      console.log('array');
+      console.log(array);*/
     jQuery('#librariesRelationQC').css("visibility", "visible");
     jQuery('#librariesRelationQC').html('<table cellpadding="0" cellspacing="0" border="0" class="display" id="librariesRelationQCTable"></table>');
     jQuery('#librariesRelationQCTable').dataTable({
@@ -606,7 +608,8 @@ Reports.ui = {
         { "sTitle": "QC Passed"},
         { "sTitle": "Creation Date"},
         { "sTitle": "Sample Name", "sType": "natural"},
-        { "sTitle": "QC Passed"}
+        { "sTitle": "QC Passed"},
+        { "sTitle": "Scientific Name", "sType": "natural"}
       ],
       "aaSorting": [
         [0, "desc"]
