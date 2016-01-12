@@ -72,7 +72,7 @@ public class RestSignatureFilter extends OncePerRequestFilter {
   SecurityManager securityManager;
   
   /** Used during development only. Set this to true to use REST resources without authentication. Good for manual testing/exploration. */
-  private static boolean UNAUTHENTICATED_MODE = true;
+  private static boolean UNAUTHENTICATED_MODE = false;
   /** Resources created (POST) and modified (PUT) will be associated with this user in UNAUTHENTICATED_MODE. This user must exist. */
   private static String UNAUTHENTICATED_MODE_USER = "admin";
 
