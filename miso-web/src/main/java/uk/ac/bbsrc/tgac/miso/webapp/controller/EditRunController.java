@@ -338,6 +338,11 @@ public class EditRunController {
         throw new SecurityException("Permission denied.");
       }
 
+      for (SequencerPartitionContainer container : run.getSequencerPartitionContainers()) {
+        if (container != null) {
+          container.setLastModifier(user);
+        }
+      }
       run.setLastModifier(user);
       for (SequencerPartitionContainer<? extends Partition> container : run.getSequencerPartitionContainers()) {
         container.setLastModifier(user);
