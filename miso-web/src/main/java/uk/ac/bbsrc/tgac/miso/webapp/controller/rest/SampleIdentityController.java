@@ -30,9 +30,6 @@ public class SampleIdentityController {
   @RequestMapping(value = "/samplecategories", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
   public ResponseEntity<Set<SampleCategoryDto>> getSampleCategories(HttpServletResponse response) {
-    if (response.containsHeader("x-authentication-failed")) {
-      return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-    }
     ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(true);
     scanner.addIncludeFilter(new AnnotationTypeFilter(SampleCategory.class));
     Set<SampleCategoryDto> results = new HashSet<SampleCategoryDto>();

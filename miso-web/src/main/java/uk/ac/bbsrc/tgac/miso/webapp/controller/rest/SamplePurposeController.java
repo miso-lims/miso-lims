@@ -65,9 +65,6 @@ public class SamplePurposeController extends RestController {
   @ResponseBody
   public SamplePurposeDto getSamplePurpose(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
       HttpServletResponse response) {
-    if (response.containsHeader("x-authentication-failed")) {
-      throw new RestException(Status.UNAUTHORIZED);
-    }
     SamplePurpose samplePurpose = samplePurposeService.get(id);
     if (samplePurpose == null) {
       throw new RestException("No sample purpose found with ID: " + id,Status.NOT_FOUND);
@@ -92,9 +89,6 @@ public class SamplePurposeController extends RestController {
   @RequestMapping(value = "/samplepurposes", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
   public Set<SamplePurposeDto> getSamplePurposes(UriComponentsBuilder uriBuilder, HttpServletResponse response) {
-    if (response.containsHeader("x-authentication-failed")) {
-      throw new RestException(Status.UNAUTHORIZED);
-    }
     Set<SamplePurpose> samplePurposes = samplePurposeService.getAll();
     if (samplePurposes.isEmpty()) {
       throw new RestException("No sample purposes found", Status.NOT_FOUND);
@@ -111,9 +105,6 @@ public class SamplePurposeController extends RestController {
   @ResponseBody
   public ResponseEntity<?> createSamplePurpose(@RequestBody SamplePurposeDto samplePurposeDto, UriComponentsBuilder b,
       HttpServletResponse response) throws IOException {
-    if (response.containsHeader("x-authentication-failed")) {
-      throw new RestException(Status.UNAUTHORIZED);
-    }
     SamplePurpose samplePurpose = Dtos.to(samplePurposeDto);
     Long id = samplePurposeService.create(samplePurpose);
     UriComponents uriComponents = b.path("/samplepurpose/{id}").buildAndExpand(id);
@@ -126,9 +117,6 @@ public class SamplePurposeController extends RestController {
   @ResponseBody
   public ResponseEntity<?> updateSamplePurpose(@PathVariable("id") Long id, @RequestBody SamplePurposeDto samplePurposeDto,
       HttpServletResponse response) throws IOException {
-    if (response.containsHeader("x-authentication-failed")) {
-      throw new RestException(Status.UNAUTHORIZED);
-    }
     SamplePurpose samplePurpose = Dtos.to(samplePurposeDto);
     samplePurpose.setSamplePurposeId(id);
     samplePurposeService.update(samplePurpose);
@@ -138,9 +126,6 @@ public class SamplePurposeController extends RestController {
   @RequestMapping(value = "/samplepurpose/{id}", method = RequestMethod.DELETE)
   @ResponseBody
   public ResponseEntity<?> deleteSamplePurpose(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
-    if (response.containsHeader("x-authentication-failed")) {
-      throw new RestException(Status.UNAUTHORIZED);
-    }
     samplePurposeService.delete(id);
     return new ResponseEntity<>(HttpStatus.OK);
   }

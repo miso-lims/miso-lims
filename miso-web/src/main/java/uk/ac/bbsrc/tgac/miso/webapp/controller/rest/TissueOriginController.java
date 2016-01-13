@@ -65,9 +65,6 @@ public class TissueOriginController extends RestController {
   @ResponseBody
   public TissueOriginDto getTissueOrigin(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
       HttpServletResponse response) {
-    if (response.containsHeader("x-authentication-failed")) {
-      throw new RestException(Status.UNAUTHORIZED);
-    }
     TissueOrigin tissueOrigin = tissueOriginService.get(id);
     if (tissueOrigin == null) {
       throw new RestException("No tissue origin found with ID: " + id, Status.NOT_FOUND);
@@ -92,9 +89,6 @@ public class TissueOriginController extends RestController {
   @RequestMapping(value = "/tissueorigins", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
   public Set<TissueOriginDto> getTissueOrigins(UriComponentsBuilder uriBuilder, HttpServletResponse response) {
-    if (response.containsHeader("x-authentication-failed")) {
-      throw new RestException(Status.UNAUTHORIZED);
-    }
     Set<TissueOrigin> tissueOrigins = tissueOriginService.getAll();
     if (tissueOrigins.isEmpty()) {
       throw new RestException("No tissue origins found", Status.NOT_FOUND);
@@ -111,9 +105,6 @@ public class TissueOriginController extends RestController {
   @ResponseBody
   public ResponseEntity<?> createTissueOrigin(@RequestBody TissueOriginDto tissueOriginDto, UriComponentsBuilder b,
       HttpServletResponse response) throws IOException {
-    if (response.containsHeader("x-authentication-failed")) {
-      throw new RestException(Status.UNAUTHORIZED);
-    }
     TissueOrigin tissueOrigin = Dtos.to(tissueOriginDto);
     Long id = tissueOriginService.create(tissueOrigin);
     UriComponents uriComponents = b.path("/tissueorigin/{id}").buildAndExpand(id);
@@ -126,9 +117,6 @@ public class TissueOriginController extends RestController {
   @ResponseBody
   public ResponseEntity<?> updateTissueOrigin(@PathVariable("id") Long id, @RequestBody TissueOriginDto tissueOriginDto,
       HttpServletResponse response) throws IOException {
-    if (response.containsHeader("x-authentication-failed")) {
-      throw new RestException(Status.UNAUTHORIZED);
-    }
     TissueOrigin tissueOrigin = Dtos.to(tissueOriginDto);
     tissueOrigin.setTissueOriginId(id);
     tissueOriginService.update(tissueOrigin);
@@ -138,9 +126,6 @@ public class TissueOriginController extends RestController {
   @RequestMapping(value = "/tissueorigin/{id}", method = RequestMethod.DELETE)
   @ResponseBody
   public ResponseEntity<?> deleteTissueOrigin(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
-    if (response.containsHeader("x-authentication-failed")) {
-      throw new RestException(Status.UNAUTHORIZED);
-    }
     tissueOriginService.delete(id);
     return new ResponseEntity<>(HttpStatus.OK);
   }

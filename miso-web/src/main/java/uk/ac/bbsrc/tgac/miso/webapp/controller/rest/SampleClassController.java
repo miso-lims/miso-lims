@@ -65,9 +65,6 @@ public class SampleClassController extends RestController {
   @ResponseBody
   public SampleClassDto getSampleClass(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
       HttpServletResponse response) {
-    if (response.containsHeader("x-authentication-failed")) {
-      throw new RestException(Status.UNAUTHORIZED);
-    }
     SampleClass sampleClass = sampleClassService.get(id);
     if (sampleClass == null) {
       throw new RestException("No sample class found with ID: " + id, Status.UNAUTHORIZED);
@@ -92,9 +89,6 @@ public class SampleClassController extends RestController {
   @RequestMapping(value = "/sampleclasss", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
   public Set<SampleClassDto> getSampleClasss(UriComponentsBuilder uriBuilder, HttpServletResponse response) {
-    if (response.containsHeader("x-authentication-failed")) {
-      throw new RestException(Status.UNAUTHORIZED);
-    }
     Set<SampleClass> sampleClasss = sampleClassService.getAll();
     if (sampleClasss.isEmpty()) {
       throw new RestException("No sample classs found", Status.NOT_FOUND);
@@ -111,9 +105,6 @@ public class SampleClassController extends RestController {
   @ResponseBody
   public ResponseEntity<?> createSampleClass(@RequestBody SampleClassDto sampleClassDto, UriComponentsBuilder b,
       HttpServletResponse response) throws IOException {
-    if (response.containsHeader("x-authentication-failed")) {
-      throw new RestException(Status.UNAUTHORIZED);
-    }
     SampleClass sampleClass = Dtos.to(sampleClassDto);
     Long id = sampleClassService.create(sampleClass);
     UriComponents uriComponents = b.path("/sampleclass/{id}").buildAndExpand(id);
@@ -126,9 +117,6 @@ public class SampleClassController extends RestController {
   @ResponseBody
   public ResponseEntity<?> updateSampleClass(@PathVariable("id") Long id, @RequestBody SampleClassDto sampleClassDto,
       HttpServletResponse response) throws IOException {
-    if (response.containsHeader("x-authentication-failed")) {
-      throw new RestException(Status.UNAUTHORIZED);
-    }
     SampleClass sampleClass = Dtos.to(sampleClassDto);
     sampleClass.setSampleClassId(id);
     sampleClassService.update(sampleClass);
@@ -138,9 +126,6 @@ public class SampleClassController extends RestController {
   @RequestMapping(value = "/sampleclass/{id}", method = RequestMethod.DELETE)
   @ResponseBody
   public ResponseEntity<?> deleteSampleClass(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
-    if (response.containsHeader("x-authentication-failed")) {
-      throw new RestException(Status.UNAUTHORIZED);
-    }
     sampleClassService.delete(id);
     return new ResponseEntity<>(HttpStatus.OK);
   }

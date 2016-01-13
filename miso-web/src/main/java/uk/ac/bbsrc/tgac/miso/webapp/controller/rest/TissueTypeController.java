@@ -65,9 +65,6 @@ public class TissueTypeController extends RestController {
   @ResponseBody
   public TissueTypeDto getTissueType(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
       HttpServletResponse response) {
-    if (response.containsHeader("x-authentication-failed")) {
-      throw new RestException(Status.UNAUTHORIZED);
-    }
     TissueType tissueType = tissueTypeService.get(id);
     if (tissueType == null) {
       throw new RestException("No tissue type found with ID: " + id, Status.NOT_FOUND);
@@ -92,9 +89,6 @@ public class TissueTypeController extends RestController {
   @RequestMapping(value = "/tissuetypes", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
   public Set<TissueTypeDto> getTissueTypes(UriComponentsBuilder uriBuilder, HttpServletResponse response) {
-    if (response.containsHeader("x-authentication-failed")) {
-      throw new RestException(Status.UNAUTHORIZED);
-    }
     Set<TissueType> tissueTypes = tissueTypeService.getAll();
     if (tissueTypes.isEmpty()) {
       throw new RestException("No tissue types found", Status.NOT_FOUND);
@@ -111,9 +105,6 @@ public class TissueTypeController extends RestController {
   @ResponseBody
   public ResponseEntity<?> createTissueType(@RequestBody TissueTypeDto tissueTypeDto, UriComponentsBuilder b, HttpServletResponse response)
       throws IOException {
-    if (response.containsHeader("x-authentication-failed")) {
-      throw new RestException(Status.UNAUTHORIZED);
-    }
     TissueType tissueType = Dtos.to(tissueTypeDto);
     Long id = tissueTypeService.create(tissueType);
     UriComponents uriComponents = b.path("/tissuetype/{id}").buildAndExpand(id);
@@ -126,9 +117,6 @@ public class TissueTypeController extends RestController {
   @ResponseBody
   public ResponseEntity<?> updateTissueType(@PathVariable("id") Long id, @RequestBody TissueTypeDto tissueTypeDto,
       HttpServletResponse response) throws IOException {
-    if (response.containsHeader("x-authentication-failed")) {
-      throw new RestException(Status.UNAUTHORIZED);
-    }
     TissueType tissueType = Dtos.to(tissueTypeDto);
     tissueType.setTissueTypeId(id);
     tissueTypeService.update(tissueType);
@@ -138,9 +126,6 @@ public class TissueTypeController extends RestController {
   @RequestMapping(value = "/tissuetype/{id}", method = RequestMethod.DELETE)
   @ResponseBody
   public ResponseEntity<?> deleteTissueType(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
-    if (response.containsHeader("x-authentication-failed")) {
-      throw new RestException(Status.UNAUTHORIZED);
-    }
     tissueTypeService.delete(id);
     return new ResponseEntity<>(HttpStatus.OK);
   }

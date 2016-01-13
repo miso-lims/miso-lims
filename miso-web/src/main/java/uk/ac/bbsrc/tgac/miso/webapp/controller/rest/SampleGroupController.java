@@ -65,9 +65,6 @@ public class SampleGroupController extends RestController {
   @ResponseBody
   public SampleGroupDto getSampleGroup(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
       HttpServletResponse response) {
-    if (response.containsHeader("x-authentication-failed")) {
-      throw new RestException(Status.UNAUTHORIZED);
-    }
     SampleGroupId sampleGroup = sampleGroupService.get(id);
     if (sampleGroup == null) {
       throw new RestException("No sample group found with ID: " + id, Status.NOT_FOUND);
@@ -92,9 +89,6 @@ public class SampleGroupController extends RestController {
   @RequestMapping(value = "/samplegroups", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
   public Set<SampleGroupDto> getSampleGroups(UriComponentsBuilder uriBuilder, HttpServletResponse response) {
-    if (response.containsHeader("x-authentication-failed")) {
-      throw new RestException(Status.UNAUTHORIZED);
-    }
     Set<SampleGroupId> sampleGroups = sampleGroupService.getAll();
     if (sampleGroups.isEmpty()) {
       throw new RestException("No sample groups found", Status.NOT_FOUND);
@@ -111,9 +105,6 @@ public class SampleGroupController extends RestController {
   @ResponseBody
   public ResponseEntity<?> createSampleGroup(@RequestBody SampleGroupDto sampleGroupDto, UriComponentsBuilder b,
       HttpServletResponse response) throws IOException {
-    if (response.containsHeader("x-authentication-failed")) {
-      throw new RestException(Status.UNAUTHORIZED);
-    }
     SampleGroupId sampleGroup = Dtos.to(sampleGroupDto);
     Long id = sampleGroupService.create(sampleGroup);
     UriComponents uriComponents = b.path("/samplegroup/{id}").buildAndExpand(id);
@@ -126,9 +117,6 @@ public class SampleGroupController extends RestController {
   @ResponseBody
   public ResponseEntity<?> updateSampleGroup(@PathVariable("id") Long id, @RequestBody SampleGroupDto sampleGroupDto,
       HttpServletResponse response) throws IOException {
-    if (response.containsHeader("x-authentication-failed")) {
-      throw new RestException(Status.UNAUTHORIZED);
-    }
     SampleGroupId sampleGroup = Dtos.to(sampleGroupDto);
     sampleGroup.setSampleGroupId(id);
     sampleGroupService.update(sampleGroup);
@@ -138,9 +126,6 @@ public class SampleGroupController extends RestController {
   @RequestMapping(value = "/samplegroup/{id}", method = RequestMethod.DELETE)
   @ResponseBody
   public ResponseEntity<?> deleteSampleGroup(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
-    if (response.containsHeader("x-authentication-failed")) {
-      throw new RestException(Status.UNAUTHORIZED);
-    }
     sampleGroupService.delete(id);
     return new ResponseEntity<>(HttpStatus.OK);
   }

@@ -65,9 +65,6 @@ public class SubprojectController extends RestController {
   @ResponseBody
   public SubprojectDto getSubproject(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
       HttpServletResponse response) {
-    if (response.containsHeader("x-authentication-failed")) {
-      throw new RestException(Status.UNAUTHORIZED);
-    }
     Subproject subproject = subprojectService.get(id);
     if (subproject == null) {
       throw new RestException("No subproject found with ID: " + id, Status.NOT_FOUND);
@@ -92,9 +89,6 @@ public class SubprojectController extends RestController {
   @RequestMapping(value = "/subprojects", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
   public Set<SubprojectDto> getSubprojects(UriComponentsBuilder uriBuilder, HttpServletResponse response) {
-    if (response.containsHeader("x-authentication-failed")) {
-      throw new RestException(Status.UNAUTHORIZED);
-    }
     Set<Subproject> subprojects = subprojectService.getAll();
     if (subprojects.isEmpty()) {
       throw new RestException("No subprojects found", Status.NOT_FOUND);
@@ -111,9 +105,6 @@ public class SubprojectController extends RestController {
   @ResponseBody
   public ResponseEntity<?> createSubproject(@RequestBody SubprojectDto subprojectDto, UriComponentsBuilder b, HttpServletResponse response)
       throws IOException {
-    if (response.containsHeader("x-authentication-failed")) {
-      throw new RestException(Status.UNAUTHORIZED);
-    }
     Subproject subproject = Dtos.to(subprojectDto);
     Long id = subprojectService.create(subproject, subprojectDto.getParentProjectId());
     UriComponents uriComponents = b.path("/subproject/{id}").buildAndExpand(id);
@@ -126,9 +117,6 @@ public class SubprojectController extends RestController {
   @ResponseBody
   public ResponseEntity<?> updateSubproject(@PathVariable("id") Long id, @RequestBody SubprojectDto subprojectDto,
       HttpServletResponse response) throws IOException {
-    if (response.containsHeader("x-authentication-failed")) {
-      throw new RestException(Status.UNAUTHORIZED);
-    }
     Subproject subproject = Dtos.to(subprojectDto);
     subproject.setSubprojectId(id);
     subprojectService.update(subproject);
@@ -138,9 +126,6 @@ public class SubprojectController extends RestController {
   @RequestMapping(value = "/subproject/{id}", method = RequestMethod.DELETE)
   @ResponseBody
   public ResponseEntity<?> deleteSubproject(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
-    if (response.containsHeader("x-authentication-failed")) {
-      throw new RestException(Status.UNAUTHORIZED);
-    }
     subprojectService.delete(id);
     return new ResponseEntity<>(HttpStatus.OK);
   }

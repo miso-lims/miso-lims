@@ -14,9 +14,6 @@ public class DefaultRestController extends RestController {
   
   @RequestMapping(value="/**", method=RequestMethod.GET, produces="application/json")
   public void unmappedRequest(HttpServletRequest request, HttpServletResponse response) {
-    if (response.containsHeader("x-authentication-failed")) {
-      throw new RestException(Status.UNAUTHORIZED);
-    }
     throw new RestException("Invalid URL", Status.NOT_FOUND);
   }
   

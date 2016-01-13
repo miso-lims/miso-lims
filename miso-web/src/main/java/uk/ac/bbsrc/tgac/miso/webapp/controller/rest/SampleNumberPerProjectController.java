@@ -65,9 +65,6 @@ public class SampleNumberPerProjectController extends RestController {
   @ResponseBody
   public SampleNumberPerProjectDto getSampleNumberPerProject(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
       HttpServletResponse response) {
-    if (response.containsHeader("x-authentication-failed")) {
-      throw new RestException(Status.UNAUTHORIZED);
-    }
     SampleNumberPerProject sampleNumberPerProject = sampleNumberPerProjectService.get(id);
     if (sampleNumberPerProject == null) {
       throw new RestException("No sample number per project found with ID: " + id, Status.NOT_FOUND);
@@ -94,9 +91,6 @@ public class SampleNumberPerProjectController extends RestController {
   @ResponseBody
   public Set<SampleNumberPerProjectDto> getSampleNumberPerProjects(UriComponentsBuilder uriBuilder,
       HttpServletResponse response) {
-    if (response.containsHeader("x-authentication-failed")) {
-      throw new RestException(Status.UNAUTHORIZED);
-    }
     Set<SampleNumberPerProject> sampleNumberPerProjects = sampleNumberPerProjectService.getAll();
     if (sampleNumberPerProjects.isEmpty()) {
       throw new RestException("No sample numbers per project found", Status.NOT_FOUND);
@@ -113,9 +107,6 @@ public class SampleNumberPerProjectController extends RestController {
   @ResponseBody
   public ResponseEntity<?> createSampleNumberPerProject(@RequestBody SampleNumberPerProjectDto sampleNumberPerProjectDto,
       UriComponentsBuilder b, HttpServletResponse response) throws IOException {
-    if (response.containsHeader("x-authentication-failed")) {
-      throw new RestException(Status.UNAUTHORIZED);
-    }
     SampleNumberPerProject sampleNumberPerProject = Dtos.to(sampleNumberPerProjectDto);
     Long id = sampleNumberPerProjectService.create(sampleNumberPerProject);
     UriComponents uriComponents = b.path("/samplenumberperproject/{id}").buildAndExpand(id);
@@ -128,9 +119,6 @@ public class SampleNumberPerProjectController extends RestController {
   @ResponseBody
   public ResponseEntity<?> updateSampleNumberPerProject(@PathVariable("id") Long id,
       @RequestBody SampleNumberPerProjectDto sampleNumberPerProjectDto, HttpServletResponse response) throws IOException {
-    if (response.containsHeader("x-authentication-failed")) {
-      throw new RestException(Status.UNAUTHORIZED);
-    }
     SampleNumberPerProject sampleNumberPerProject = Dtos.to(sampleNumberPerProjectDto);
     sampleNumberPerProject.setSampleNumberPerProjectId(id);
     sampleNumberPerProjectService.update(sampleNumberPerProject);
@@ -140,9 +128,6 @@ public class SampleNumberPerProjectController extends RestController {
   @RequestMapping(value = "/samplenumberperproject/{id}", method = RequestMethod.DELETE)
   @ResponseBody
   public ResponseEntity<?> deleteSampleNumberPerProject(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
-    if (response.containsHeader("x-authentication-failed")) {
-      throw new RestException(Status.UNAUTHORIZED);
-    }
     sampleNumberPerProjectService.delete(id);
     return new ResponseEntity<>(HttpStatus.OK);
   }

@@ -65,9 +65,6 @@ public class SampleValidRelationshipController extends RestController {
   @ResponseBody
   public SampleValidRelationshipDto getSampleValidRelationship(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
       HttpServletResponse response) {
-    if (response.containsHeader("x-authentication-failed")) {
-      throw new RestException(Status.UNAUTHORIZED);
-    }
     SampleValidRelationship sampleValidRelationship = sampleValidRelationshipService.get(id);
     if (sampleValidRelationship == null) {
       throw new RestException("No sample valid relationship found with ID: " + id, Status.NOT_FOUND);
@@ -94,9 +91,6 @@ public class SampleValidRelationshipController extends RestController {
   @ResponseBody
   public Set<SampleValidRelationshipDto> getSampleValidRelationships(UriComponentsBuilder uriBuilder,
       HttpServletResponse response) {
-    if (response.containsHeader("x-authentication-failed")) {
-      throw new RestException(Status.UNAUTHORIZED);
-    }
     Set<SampleValidRelationship> sampleValidRelationships = sampleValidRelationshipService.getAll();
     if (sampleValidRelationships.isEmpty()) {
       throw new RestException("No sample valid relationships found", Status.NOT_FOUND);
@@ -113,9 +107,6 @@ public class SampleValidRelationshipController extends RestController {
   @ResponseBody
   public ResponseEntity<?> createSampleValidRelationship(@RequestBody SampleValidRelationshipDto sampleValidRelationshipDto,
       UriComponentsBuilder b, HttpServletResponse response) throws IOException {
-    if (response.containsHeader("x-authentication-failed")) {
-      throw new RestException(Status.UNAUTHORIZED);
-    }
     SampleValidRelationship sampleValidRelationship = Dtos.to(sampleValidRelationshipDto);
     Long id = sampleValidRelationshipService.create(sampleValidRelationship);
     UriComponents uriComponents = b.path("/samplevalidrelationship/{id}").buildAndExpand(id);
@@ -128,9 +119,6 @@ public class SampleValidRelationshipController extends RestController {
   @ResponseBody
   public ResponseEntity<?> updateSampleValidRelationship(@PathVariable("id") Long id,
       @RequestBody SampleValidRelationshipDto sampleValidRelationshipDto, HttpServletResponse response) throws IOException {
-    if (response.containsHeader("x-authentication-failed")) {
-      throw new RestException(Status.UNAUTHORIZED);
-    }
     SampleValidRelationship sampleValidRelationship = Dtos.to(sampleValidRelationshipDto);
     sampleValidRelationship.setSampleValidRelationshipId(id);
     sampleValidRelationshipService.update(sampleValidRelationship);
@@ -140,9 +128,6 @@ public class SampleValidRelationshipController extends RestController {
   @RequestMapping(value = "/samplevalidrelationship/{id}", method = RequestMethod.DELETE)
   @ResponseBody
   public ResponseEntity<?> deleteSampleValidRelationship(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
-    if (response.containsHeader("x-authentication-failed")) {
-      throw new RestException(Status.UNAUTHORIZED);
-    }
     sampleValidRelationshipService.delete(id);
     return new ResponseEntity<>(HttpStatus.OK);
   }

@@ -64,9 +64,6 @@ public class SampleController extends RestController {
   @RequestMapping(value = "/sample/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
   public SampleDto getSample(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder, HttpServletResponse response) {
-    if (response.containsHeader("x-authentication-failed")) {
-      throw new RestException(Status.UNAUTHORIZED);
-    }
     Sample sample = sampleService.get(id);
     if (sample == null) {
       throw new RestException("No sample found with ID: " + id, Status.NOT_FOUND);
@@ -131,9 +128,6 @@ public class SampleController extends RestController {
   @RequestMapping(value = "/sample/{id}", method = RequestMethod.DELETE)
   @ResponseBody
   public ResponseEntity<?> deleteSample(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
-    if (response.containsHeader("x-authentication-failed")) {
-      throw new RestException(Status.UNAUTHORIZED);
-    }
     sampleService.delete(id);
     return new ResponseEntity<>(HttpStatus.OK);
   }
