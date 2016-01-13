@@ -56,15 +56,11 @@ import uk.ac.bbsrc.tgac.miso.webapp.controller.rest.RestExceptionHandler.RestErr
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 /**
- * uk.ac.bbsrc.tgac.miso.webapp.context
- * <p/>
- * Info
- * 
- * @author Rob Davey
- * @date 09/02/12
- * @since 0.1.6
+ * Authentication filter for REST requests. If authentication headers are found in the request, signature authentication will be 
+ * attempted. Otherwise, forms authentication will be checked. Lastly, if unauthenticated mode is enabled and neither previous 
+ * authentication option has been attempted, the request will be authenticated using the unauthenticated mode user. If authentication 
+ * fails or any other exception occurs, the error data is returned in JSON (see {@link RestError}) and the request is blocked.
  */
-
 public class RestSignatureFilter extends OncePerRequestFilter {
   @Autowired
   AuthenticationManager authenticationManager;
@@ -106,15 +102,18 @@ public class RestSignatureFilter extends OncePerRequestFilter {
     try {
       if (request.getHeader(SignatureHelper.USER_HEADER) == null) {
         if (checkFormLogin(request, response, filterChain)) {
+          // Already logged in via form
           return;
         }
         if (UNAUTHENTICATED_MODE) {
+          // No header/form authentication has been attempted
           filterUnauthenticated(request, response, filterChain);
           return;
         }
         throw new RestException("Cannot enact RESTful request without a user specified!", Status.UNAUTHORIZED);
       }
       
+      // Attempt authentication via username and signature headers
       checkSignature(request, response, filterChain);
     } catch (Exception e) {
       // Return JSON representation of any errors
@@ -127,6 +126,17 @@ public class RestSignatureFilter extends OncePerRequestFilter {
     }
   }
   
+  /**
+   * Checks if the user is already authenticated via form and passes the request/response pair through the filter if so
+   * 
+   * @param request the request being handled
+   * @param response the response being served
+   * @param filterChain the filter chain containing this filter, which is being executed
+   * @return true if the user is authenticated; false otherwise. If true, the filter has already been passed, and no further 
+   * action should be taken.
+   * @throws IOException
+   * @throws ServletException
+   */
   private boolean checkFormLogin(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) 
       throws IOException, ServletException {
     SecurityContext sc = securityContextRepository.loadContext(new HttpRequestResponseHolder(request, response));
@@ -139,6 +149,16 @@ public class RestSignatureFilter extends OncePerRequestFilter {
     return false;
   }
   
+  /**
+   * Forces authentication as the unauthenticated mode user and passes the request/response pair through the filter. 
+   * No further action should be taken after this method has been called, as the filter has already been passed.
+   * 
+   * @param request the request being handled
+   * @param response the response being served
+   * @param filterChain the filter chain containing this filter, which is being executed
+   * @throws IOException
+   * @throws ServletException
+   */
   private void filterUnauthenticated(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
     StringBuilder sb = new StringBuilder();
@@ -158,6 +178,18 @@ public class RestSignatureFilter extends OncePerRequestFilter {
     filterUser(request, response, filterChain, userdetails);
   }
 
+  /**
+   * Attempts authentication via username and signature headers in the request. If successful, passes the request/response pair 
+   * through the filter. No further action should be taken after this method has been called, as the filter has already been passed. 
+   * An Exception of some sort is thrown otherwise
+   * 
+   * @param request the request being handled
+   * @param response the response being served
+   * @param filterChain the filter chain containing this filter, which is being executed
+   * @throws RestException if the username or signature header is missing, if the user cannot be found, or if the signature is invalid
+   * @throws IOException
+   * @throws ServletException
+   */
   private void checkSignature(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
     logger.debug("HEADERS: ");
@@ -211,6 +243,17 @@ public class RestSignatureFilter extends OncePerRequestFilter {
     filterUser(request, response, filterChain, userdetails);
   }
   
+  /**
+   * Sets the security context's authentication and user details and passes the request/response pair through the filter. No further 
+   * action should be taken after this method has been called, as the filter has already been passed.
+   * 
+   * @param request the request being handled
+   * @param response the response being served
+   * @param filterChain the filter chain containing this filter, which is being executed
+   * @throws RestException if the user cannot be found
+   * @throws IOException
+   * @throws ServletException
+   */
   private void filterUser(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain, User userdetails) 
       throws IOException, ServletException {
     if (userdetails != null) {
