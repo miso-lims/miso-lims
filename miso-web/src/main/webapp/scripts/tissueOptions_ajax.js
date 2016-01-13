@@ -158,9 +158,15 @@ var QC = QC || {
   createQcDetailsTable: function (xhr) {
     var tableBody = document.getElementById('allQcDetails');
     tableBody.innerHTML = null;
+    console.log("in create QCD"); /////////////////
     
     var data;
-    if (xhr.responseText) {
+
+    console.log("data: " + typeof data);
+    console.log(data);
+    console.log("xhr: ");
+    console.log(xhr);
+    if (xhr.status == 200) {
       data = JSON.parse(xhr.responseText);
       data.sort(function (a, b){
         return (a.description > b.description) ? 1 : ((b.description > a.description) ? -1 : 0);
@@ -168,6 +174,7 @@ var QC = QC || {
     } // else collection is empty, so render only the "Add New" button
    
     var table = [];
+    console.log("i can has tabl"); //////////////
     var id, status, description, note, endpoint;
 
     if (data) {
@@ -191,10 +198,12 @@ var QC = QC || {
         table.push('</td></tr>');
       }
     }
+    console.log("about to add new QCD row"); ///////////
     table.push('<tr id="newQCRowButton" class="QC"><td>');
     table.push(Options.createButton('New QC Details', 'QC.createNewRow()', 'newDetails'));
     table.push('</td></tr>');
     tableBody.innerHTML = table.join('');
+    console.log("added new QCD row"); ///////////
     tableLoadCounter += 1;
     
     if (tableLoadCounter > 6) { // if tables have all already been loaded once
