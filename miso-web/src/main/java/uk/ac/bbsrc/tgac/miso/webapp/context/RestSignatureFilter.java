@@ -105,11 +105,14 @@ public class RestSignatureFilter extends OncePerRequestFilter {
       throws ServletException, IOException {
     try {
       if (request.getHeader(SignatureHelper.USER_HEADER) == null) {
-        checkFormLogin(request, response, filterChain);
-        if (UNAUTHENTICATED_MODE) {
-          filterUnauthenticated(request, response, filterChain);
+        if (!checkFormLogin(request, response, filterChain)) {
+          if (UNAUTHENTICATED_MODE) {
+            filterUnauthenticated(request, response, filterChain);
+          }
+          else {
+            throw new RestException("Cannot enact RESTful request without a user specified!", Status.UNAUTHORIZED);
+          }
         }
-        throw new RestException("Cannot enact RESTful request without a user specified!", Status.UNAUTHORIZED);
       }
       checkSignature(request, response, filterChain);
     } catch (Exception e) {
@@ -123,14 +126,16 @@ public class RestSignatureFilter extends OncePerRequestFilter {
     }
   }
   
-  private void checkFormLogin(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) 
+  private boolean checkFormLogin(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) 
       throws IOException, ServletException {
     SecurityContext sc = securityContextRepository.loadContext(new HttpRequestResponseHolder(request, response));
     if (sc != null && sc.getAuthentication() != null) {
       logger.debug("User already logged in - chaining");
       SecurityContextHolder.getContextHolderStrategy().setContext(sc);
       filterChain.doFilter(request, response);
+      return true;
     }
+    return false;
   }
   
   private void filterUnauthenticated(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
