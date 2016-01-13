@@ -105,15 +105,16 @@ public class RestSignatureFilter extends OncePerRequestFilter {
       throws ServletException, IOException {
     try {
       if (request.getHeader(SignatureHelper.USER_HEADER) == null) {
-        if (!checkFormLogin(request, response, filterChain)) {
-          if (UNAUTHENTICATED_MODE) {
-            filterUnauthenticated(request, response, filterChain);
-          }
-          else {
-            throw new RestException("Cannot enact RESTful request without a user specified!", Status.UNAUTHORIZED);
-          }
+        if (checkFormLogin(request, response, filterChain)) {
+          return;
         }
+        if (UNAUTHENTICATED_MODE) {
+          filterUnauthenticated(request, response, filterChain);
+          return;
+        }
+        throw new RestException("Cannot enact RESTful request without a user specified!", Status.UNAUTHORIZED);
       }
+      
       checkSignature(request, response, filterChain);
     } catch (Exception e) {
       // Return JSON representation of any errors
