@@ -120,12 +120,7 @@
           <td>
             <form:input path="shutdownTime" id="shutdownTime" placeholder="DD/MM/YYYY HH:mm"/>
             <script type="text/javascript">
-              jQuery("#shutdownTime").datetimepicker({
-                controlType: 'select',
-                oneLine: true,
-                dateFormat: 'dd/mm/yy',
-                timeFormat: 'HH:mm'
-              });
+              Utils.ui.addDateTimePicker("shutdownTime");
             </script>
           </td>
         </tr>
@@ -134,12 +129,7 @@
           <td>
             <form:input path="restoredTime" id="restoredTime" placeholder="DD/MM/YYYY HH:mm"/>
             <script type="text/javascript">
-              jQuery("#restoredTime").datetimepicker({
-                controlType: 'select',
-                oneLine: true,
-                dateFormat: 'dd/mm/yy',
-                timeFormat: 'HH:mm'
-              });
+              Utils.ui.addDateTimePicker("restoredTime");
             </script>
           </td>
         </tr>

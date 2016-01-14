@@ -113,9 +113,9 @@
         <tr>
           <td>Status:</td>
           <td>
-            <input type="radio" name="status" value="production" onchange="showStatusRows();" <c:if test="${sequencerReference.dateDecommissioned == null}">checked</c:if>/> Production
-            <input type="radio" name="status" value="retired" onchange="showStatusRows();" <c:if test="${sequencerReference.dateDecommissioned != null && sequencerReference.upgradedSequencerReference == null}">checked</c:if>/> Retired
-            <input type="radio" name="status" value="upgraded" onchange="showStatusRows();" <c:if test="${sequencerReference.dateDecommissioned != null && sequencerReference.upgradedSequencerReference != null}">checked</c:if>/> Upgraded
+            <input type="radio" name="status" value="production" onchange="Sequencer.ui.showStatusRows();" <c:if test="${sequencerReference.dateDecommissioned == null}">checked</c:if>/> Production
+            <input type="radio" name="status" value="retired" onchange="Sequencer.ui.showStatusRows();" <c:if test="${sequencerReference.dateDecommissioned != null && sequencerReference.upgradedSequencerReference == null}">checked</c:if>/> Retired
+            <input type="radio" name="status" value="upgraded" onchange="Sequencer.ui.showStatusRows();" <c:if test="${sequencerReference.dateDecommissioned != null && sequencerReference.upgradedSequencerReference != null}">checked</c:if>/> Upgraded
           </td>
         </tr>
         <tr id="decommissionedRow">
@@ -131,66 +131,18 @@
           <td class="h">Upgraded To:</td>
           <td>
             <form:select id="upgradedSequencerReference" path="upgradedSequencerReference" onchange="updateUpgradedSequencerReferenceLink();">
-              <form:option value="${null}">(choose)</form:option>
+              <form:option value="0">(choose)</form:option>
               <form:options items="${otherSequencerReferences}" itemLabel="name" itemValue="id"/>
             </form:select>
             <span id="upgradedSequencerReferenceLink"></span>
           </td>
         </tr>
       </table>
-      
       <script type="text/javascript">
-        function showStatusRows() {
-          switch(jQuery('input[name="status"]:checked').val()) {
-            case "production":
-              hideDecommissioned();
-              hideUpgradedSequencerReference();
-              break;
-            case "retired":
-              showDecommissioned();
-              hideUpgradedSequencerReference();
-              break;
-            case "upgraded":
-              showDecommissioned();
-              showUpgradedSequencerReference();
-              break;
-          }
-        }
-        
-        function hideDecommissioned() {
-          jQuery("#decommissionedRow").hide();
-          jQuery("#datedecommissionedpicker").val("");
-        }
-        
-        function showDecommissioned() {
-          if (jQuery("#datedecommissionedpicker").val() == "") {
-            jQuery("#datedecommissionedpicker").val(jQuery.datepicker.formatDate('dd/mm/yy', new Date()));
-          }
-          jQuery("#decommissionedRow").show();
-        }
-        
-        function hideUpgradedSequencerReference() {
-          jQuery("#upgradedReferenceRow").hide();
-          jQuery("#upgradedSequencerReference").val("");
-        }
-        
-        function showUpgradedSequencerReference() {
-          jQuery("#upgradedReferenceRow").show();
-          updateUpgradedSequencerReferenceLink();
-        }
-        
-        function updateUpgradedSequencerReferenceLink() {
-          jQuery("#upgradedSequencerReferenceLink").empty();
-          if (jQuery("#upgradedSequencerReference").val() != "") {
-            jQuery("#upgradedSequencerReferenceLink").append("<a href='/miso/stats/sequencer/" + jQuery("#upgradedSequencerReference").val() + "'>View</a>");
-          }
-        }
-        
         jQuery(document).ready(function() {
-          showStatusRows();
-        });
+	      Sequencer.ui.showStatusRows();
+	    });
       </script>
-      
       <br/>
     </form:form>
     

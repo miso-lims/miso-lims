@@ -166,6 +166,15 @@ Utils.ui = {
   addMaxDatePicker: function (id, maxDateOffset) {
     jQuery("#" + id).datepicker({dateFormat: 'dd/mm/yy', showButtonPanel: true, maxDate: maxDateOffset});
   },
+  
+  addDateTimePicker: function (id) {
+    jQuery("#" + id).datetimepicker({
+      controlType: 'select',
+      oneLine: true,
+      dateFormat: 'dd/mm/yy',
+      timeFormat: 'HH:mm'
+    });
+  },
 
   disableButton: function (buttonDiv) {
     jQuery('#' + buttonDiv).attr('disabled', 'disabled');

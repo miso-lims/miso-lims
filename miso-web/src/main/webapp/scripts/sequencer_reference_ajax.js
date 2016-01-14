@@ -105,5 +105,52 @@ Sequencer.ui = {
         }
       );
     }
+  },
+  
+  showStatusRows : function() {
+    switch(jQuery('input[name="status"]:checked').val()) {
+      case "production":
+        Sequencer.ui.hideDecommissioned();
+        Sequencer.ui.hideUpgradedSequencerReference();
+        break;
+      case "retired":
+        Sequencer.ui.showDecommissioned();
+        Sequencer.ui.hideUpgradedSequencerReference();
+        break;
+      case "upgraded":
+        Sequencer.ui.showDecommissioned();
+        Sequencer.ui.showUpgradedSequencerReference();
+        break;
+    }
+  },
+  
+  hideDecommissioned : function() {
+    jQuery("#decommissionedRow").hide();
+    jQuery("#datedecommissionedpicker").val("");
+  },
+  
+  showDecommissioned : function() {
+    if (jQuery("#datedecommissionedpicker").val() == "") {
+      jQuery("#datedecommissionedpicker").val(jQuery.datepicker.formatDate('dd/mm/yy', new Date()));
+    }
+    jQuery("#decommissionedRow").show();
+  },
+  
+  hideUpgradedSequencerReference : function() {
+    jQuery("#upgradedReferenceRow").hide();
+    jQuery("#upgradedSequencerReference").val("");
+  },
+  
+  showUpgradedSequencerReference : function() {
+    jQuery("#upgradedReferenceRow").show();
+    Sequencer.ui.updateUpgradedSequencerReferenceLink();
+  },
+  
+  updateUpgradedSequencerReferenceLink : function() {
+    jQuery("#upgradedSequencerReferenceLink").empty();
+    if (jQuery("#upgradedSequencerReference").val() != "") {
+      jQuery("#upgradedSequencerReferenceLink").append("<a href='/miso/stats/sequencer/" + jQuery("#upgradedSequencerReference").val() + "'>View</a>");
+    }
   }
+  
 };
