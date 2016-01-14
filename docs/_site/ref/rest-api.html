@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width">
+
+        <title>MISO : REST API</title>
+        <meta name="description" content="An open-source LIMS for NGS sequencing centres">
+
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="/miso-lims/css/syntax.css">
+        <link rel="stylesheet" href="/miso-lims/css/main.css">
+    </head>
+    <body>
+<a href="https://github.com/TGAC/miso-lims"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
+        <div class="container">
+            <div class="row">
+                <div id="header" class="col-sm-12">
+                    <h2><a class="brand" href="/miso-lims/"><img src="/miso-lims/images/MISO.png"/>MISO</a>
+    <small>An open-source LIMS for NGS sequencing centres</small>
+</h2>
+
+                </div>
+            </div>
+
+            <div class="row">
+                
+                
+                    <div id="navigation" class="col-sm-2">
+                        <ul class="nav nav-list">
+    <!--<li><a href="/miso-lims/">Home</a></li>-->
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Getting Started</li>
+            
+            <li data-order="1"><a href="/miso-lims/start/installation.html">Installation</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">User Guides</li>
+            
+            <li data-order="1"><a href="/miso-lims/usr/user-manual.html">User Manual</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Admin Guides</li>
+            
+            <li data-order=""><a href="/miso-lims/adm/external-webapp.html">Configuring the external webapp</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Developer Guides</li>
+            
+            <li data-order=""><a href="/miso-lims/dev/rest-testing.html">REST Testing</a></li>
+        
+            
+            <li data-order=""><a href="/miso-lims/dev/maven-artifacts.html">Maven artifacts</a></li>
+        
+            
+            <li data-order=""><a href="/miso-lims/dev/kit-tracking.html">Kit Tracking</a></li>
+        
+            
+            <li data-order=""><a href="/miso-lims/dev/eclipse-code-formatting.html">Eclipse Code Formatting</a></li>
+        
+            
+            <li data-order=""><a href="/miso-lims/dev/code-style.html">Code Style</a></li>
+        
+            
+            <li data-order=""><a href="/miso-lims/dev/developers-manual.html">Developer's Manual</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Reference</li>
+            
+            <li data-order=""><a href="/miso-lims/ref/rest-api.html">REST API</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Posts</li>
+            
+            <li data-order=""><a href="/miso-lims/post/changelogs-0.2.0.html">Version 0.2.0</a></li>
+        
+            
+            <li data-order=""><a href="/miso-lims/post/changelogs-0.1.9.html">Version 0.1.9</a></li>
+        
+    
+<!-- List additional links. It is recommended to add a divider
+    e.g. <li class="divider"></li> first to break up the content. -->
+</ul>
+
+                    </div>
+
+                    <div id="content" class="col-sm-10">
+                        <div class="page-header">
+    <h2>REST API
+        
+    </h2>
+</div>
+
+<p>MISO REST API queries to the above addresses retrieve JSON objects. The REST API only supports GET requests. Authentication ensures that the user can only view elements (projects, samples, libraries, runs) which they have permission to view.</p>
+
+<p>The External Webapp makes calls to the REST API Projects and Runs endpoints.</p>
+
+<h1 id="projects">Projects</h1>
+
+<h3 id="restproject">/rest/project/</h3>
+
+<p>Retrieves all projects.</p>
+
+<h3 id="restprojectprojectid">/rest/project/{projectId}</h3>
+
+<p>Retrieves a single project by its ID.</p>
+
+<h3 id="restprojectaliasprojectalias">/rest/project/alias/{projectAlias}</h3>
+
+<p>Retrieves a single project by its alias (NB. this needs more testing for potential URL encoding issues).</p>
+
+<h1 id="samples">Samples</h1>
+
+<h3 id="ssamplesrestsampleids"><s>/samples/rest/{sampleId}</s></h3>
+
+<s>Retrieves a single sample.</s>
+<p><em>Deprecated</em></p>
+
+<h3 id="restsamplesampleid">/rest/sample/{sampleId}</h3>
+
+<p>Retrieves a single sample by its ID.</p>
+
+<h1 id="libraries">Libraries</h1>
+
+<h3 id="slibrariesrests"><s>/libraries/rest</s></h3>
+
+<s>Retrieves all libraries.</s>
+<p><em>Deprecated</em></p>
+
+<h3 id="restlibrary">/rest/library</h3>
+
+<p>Retrieves all libraries.</p>
+
+<h3 id="restlibrarylibraryid">/rest/library/{libraryId}</h3>
+
+<p>Retrieves a single library by its ID.</p>
+
+<h3 id="librarybarcodestrategiesplatformplatform">/library/barcodeStrategies?platform={platform}</h3>
+
+<p>Retrieves all barcode strategies associated with a given platform.</p>
+
+<h3 id="librarylibrarytypesplatformplatform">/library/libraryTypes?platform={platform}</h3>
+
+<p>Retrieves all library types associated with a given platform.</p>
+
+<h3 id="librarybarcodesforpositionbarcodestrategybarcodestrategypositionposition">/library/barcodesForPosition?barcodeStrategy={barcodeStrategy}&amp;position={position#}</h3>
+
+<p>Should retrieve all barcodes associated with a given position.</p>
+
+<h1 id="runs">Runs</h1>
+
+<h3 id="srunsrests"><s>/runs/rest</s></h3>
+
+<s>Retrieves all runs (slightly different information than _/rest/run_ below; includes XML of status).</s>
+<p><em>Deprecated</em></p>
+
+<h3 id="restrun">/rest/run</h3>
+
+<p>Retrieves all runs (slightly different information than <em>/runs/rest</em> above).</p>
+
+<h3 id="restrunrunid">/rest/run/{runId}</h3>
+
+<p>Retrieves a single run by its ID.</p>
+
+<h3 id="restrunrunalias">/rest/run/{runAlias}</h3>
+
+<p>Retrieves a single run by its alias.</p>
+
+<h3 id="restrunrunaliassamplesheet">/rest/run/{runAlias}/samplesheet</h3>
+
+<p>Retrieves a samplesheet uploaded for run, if one is given.</p>
+
+<p>Headers: <code>FCID,Lane,SampleID,SampleRef,Index,Description,Control,Recipe,Operator,Project</code></p>
+
+<h1 id="pools">Pools</h1>
+
+<h3 id="restpoolpoolid">/rest/pool/{poolId}</h3>
+
+<p>Retrieves a pool by its ID.</p>
+
+<h3 id="restpoolwizardlibrarydilutions">/rest/pool/wizard/librarydilutions</h3>
+
+<p>Returns all library dilutions by name.</p>
+
+<h3 id="restpoolwizardplatformtypes">/rest/pool/wizard/platformtypes</h3>
+
+<p>Returns all platform types.</p>
+
+<h1 id="miscellaneous">Miscellaneous</h1>
+
+<h3 id="experimentsrest">/experiments/rest</h3>
+
+<p>Retrieves all experiments. (note: plural “experiments” in URL).</p>
+
+<h3 id="experimentrestexperimentid">/experiment/rest/{experimentId}</h3>
+
+<p>Retrieves a single experiment (note: singular “experiment” in URL).</p>
+
+<h3 id="studiesrest">/studies/rest</h3>
+
+<p>Retrieves all studies (note: plural “studies” in URL).</p>
+
+<h3 id="studyreststudyid">/study/rest/{studyId}</h3>
+
+<p>Retrieves a single study (note: singular “study” in URL).</p>
+
+<h3 id="d3graphproject">/d3graph/project</h3>
+
+<p>Retrieves all projects and names of their associated samples, libraries and runs.</p>
+
+<h3 id="d3graphprojectprojectid">/d3graph/project/{projectId}</h3>
+
+<p>Retrieves a single project and the names of its associated samples, libraries and runs.</p>
+
+<h3 id="platerestplateid">/plate/rest/{plateId}</h3>
+
+<p>Retrieves a single plate.</p>
+
+
+
+                    </div>
+                
+            </div>
+
+            
+
+            <div class="row">
+                <div id="footer" class="col-sm-12">
+                    Documentation for <a href="https://github.com/TGAC/miso-lims">MISO</a>
+
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function orderNav() {
+                var list,
+                    section,
+                    header,
+                    sections = [],
+                    lists = {},
+                    headers = {};
+
+                var navUl = document.querySelectorAll('#navigation ul')[0],
+                    navLis = document.querySelectorAll('#navigation ul li');
+
+                if (!navUl) return;
+
+                for (var i = 0; i < navLis.length; i++) {
+                    var order, li = navLis[i];
+
+                    if (li.classList.contains('nav-header')) {
+                        section = li.textContent || li.innerText;
+                        sections.push(section);
+                        headers[section] = li;
+                        continue;
+                    }
+
+                    if (!lists[section]) {
+                        lists[section] = [];
+                    }
+
+                    order = parseFloat(li.getAttribute('data-order'))
+                    lists[section].push([order, li]);
+                }
+
+                for (var i = 0; i < sections.length; i++) {
+                    section = sections[i];
+                    list = lists[section].sort(function(a, b) {
+                        return a[0] - b[0];
+                    });
+
+                    if (header = headers[section]) {
+                        navUl.appendChild(header);
+                    }
+                    for (var j = 0; j < list.length; j++) {
+                        navUl.appendChild(list[j][1]);
+                    }
+                }
+            }
+
+            if (document.querySelectorAll) orderNav();
+        </script>
+        
+    </body>
+</html>
