@@ -113,6 +113,7 @@
     <script type="text/javascript" src="<c:url value='/scripts/sample_ajax.js?ts=${timestamp.time}'/>"></script>
     <script type="text/javascript" src="<c:url value='/scripts/sequencer_reference_ajax.js?ts=${timestamp.time}'/>"></script>
     <script type="text/javascript" src="<c:url value='/scripts/study_ajax.js?ts=${timestamp.time}'/>"></script>
+    <script type="text/javascript" src="<c:url value='/scripts/sequencer_service_record_ajax.js?ts=${timestamp.time}'/>"></script>
 
     <!-- form validations -->
     <script type="text/javascript" src="<c:url value='/scripts/experiment_validation.js?ts=${timestamp.time}'/>"></script>

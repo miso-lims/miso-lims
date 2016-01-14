@@ -109,16 +109,19 @@
   </bean>
 
   <bean id="poolWizardControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.PoolWizardControllerHelperService">
-    </bean>
+  </bean>
 
   <bean id="taskControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.TaskControllerHelperService">
-    </bean>
+  </bean>
 
   <bean id="externalSectionControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.ExternalSectionControllerHelperService">
-    </bean>
+  </bean>
 
   <bean id="importExportControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.ImportExportControllerHelperService">
-    </bean>
+  </bean>
+  
+  <bean id="serviceRecordControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.ServiceRecordControllerHelperService">
+  </bean>
 
 </beans>
 

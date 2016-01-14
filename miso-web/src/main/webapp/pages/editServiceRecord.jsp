@@ -88,7 +88,7 @@
         </tr>
         <tr>
           <td class="h">Sequencer Reference:</td>
-          <td>${serviceRecord.sequencerReference.name}</td>
+          <td><a href='<c:url value="/miso/stats/sequencer/${serviceRecord.sequencerReference.id}"/>'>${serviceRecord.sequencerReference.name}</a></td>
         </tr>
         <tr>
           <td class="h">Title:*</td>
@@ -146,6 +146,62 @@
       </table>
       <br/>
     </form:form>
+    
+    <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#upload_arrowclick'), 'uploaddiv');">
+      Attachments
+      <div id="upload_arrowclick" class="toggleLeft"></div>
+    </div>
+    <div id="uploaddiv" class="simplebox" style="display:none;">
+      <c:choose>
+        <c:when test="${serviceRecord.id != 0}">
+          <table class="in">
+            <tr>
+              <td>
+                <form method='post'
+                    id='ajax_upload_form'
+                    action="<c:url value="/miso/upload/servicerecord"/>"
+                    enctype="multipart/form-data"
+                    target="target_upload"
+                    onsubmit="Utils.fileUpload.fileUploadProgress('ajax_upload_form', 'statusdiv', ServiceRecord.ui.serviceRecordFileUploadSuccess);">
+                  <input type="hidden" name="serviceRecordId" value="${serviceRecord.id}"/>
+                  <input type="file" name="file"/>
+                  <button type="submit" class="br-button ui-state-default ui-corner-all">Upload</button>
+                </form>
+                <iframe id='target_upload' name='target_upload' src='' style='display: none'></iframe>
+                <div id="statusdiv"></div>
+              </td>
+            </tr>
+          </table>
+        </c:when>
+        <c:otherwise>
+          You may upload files after the service record has been saved.
+        </c:otherwise>
+      </c:choose>
+    </div>
+    
+    <c:if test="${serviceRecord.id != 0}">
+      <div id="servicerecordfiles">
+        <c:forEach items="${serviceRecordFiles}" var="file">
+          <div id='btnPanel' style='float: left; width: 32px;'>
+            <sec:authorize access="hasRole('ROLE_ADMIN')">
+              <table>
+                <tr>
+                  <td class="misoicon" onclick="ServiceRecord.ui.deleteFile(${serviceRecord.id}, ${file.key});">
+                    <span class="ui-icon ui-icon-trash"></span>
+                  </td>
+                </tr>
+              </table>
+            </sec:authorize>
+          </div>
+          <a class="listbox" href="<c:url value='/miso/download/servicerecord/${serviceRecord.id}/${file.key}'/>">
+            <div onMouseOver="this.className='boxlistboxhighlight'" onMouseOut="this.className='boxlistbox'" class="boxlistbox" style='margin-left: 32px;'>
+              ${file.value}
+            </div>
+          </a>
+        </c:forEach>
+      </div>
+    </c:if>
+    
   </div>
 </div>
 

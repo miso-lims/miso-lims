@@ -19,11 +19,3 @@ CREATE TABLE SequencerServiceRecord (
   restoredTime datetime DEFAULT NULL,
   CONSTRAINT sequencerServiceRecord_sequencer_fkey FOREIGN KEY (sequencerReferenceId) REFERENCES SequencerReference(referenceId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE TABLE SequencerServiceAttachment (
-  attachmentId bigint(20) PRIMARY KEY AUTO_INCREMENT,
-  serviceRecordId bigint(20) NOT NULL,
-  attachment MEDIUMBLOB NOT NULL,
-  comment varchar(255),
-  CONSTRAINT sequencerServiceAttachment_serviceRecord_fkey FOREIGN KEY (serviceRecordId) REFERENCES SequencerServiceRecord(recordId)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;

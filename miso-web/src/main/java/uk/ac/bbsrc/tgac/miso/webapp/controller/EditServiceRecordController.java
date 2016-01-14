@@ -2,7 +2,10 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,9 +23,11 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
+import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
+import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 
 @Controller
@@ -36,14 +41,32 @@ public class EditServiceRecordController {
   private RequestManager requestManager;
 
   @Autowired
+  private FilesManager filesManager;
+
+  @Autowired
   private DataObjectFactory dataObjectFactory;
 
   public void setRequestManager(uk.ac.bbsrc.tgac.miso.core.manager.RequestManager requestManager) {
     this.requestManager = requestManager;
   }
 
+  public void setFilesManager(FilesManager filesManager) {
+    this.filesManager = filesManager;
+  }
+
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
+  }
+  
+  public Map<Integer, String> populateServiceRecordFiles(SequencerServiceRecord record) throws IOException {
+    if (record.getId() != AbstractSequencerServiceRecord.UNSAVED_ID) {
+      Map<Integer, String> fileMap = new HashMap<Integer, String>();
+      for (String s : filesManager.getFileNames(SequencerServiceRecord.class, String.valueOf(record.getId()))) {
+        fileMap.put(s.hashCode(), s);
+      }
+      return fileMap;
+    }
+    return Collections.emptyMap();
   }
 
   @RequestMapping(value = "/{recordId}", method = RequestMethod.GET)
@@ -51,8 +74,9 @@ public class EditServiceRecordController {
     SequencerServiceRecord sr = requestManager.getSequencerServiceRecordById(recordId);
     if (sr != null) {
       model.put("serviceRecord", sr);
+      model.put("serviceRecordFiles", populateServiceRecordFiles(sr));
     } else {
-      throw new IOException("Cannot retrieve the named Service record");
+      throw new IOException("Cannot retrieve the requested Service Record");
     }
     return new ModelAndView("/pages/editServiceRecord.jsp", model);
   }
@@ -76,7 +100,7 @@ public class EditServiceRecordController {
       requestManager.saveSequencerServiceRecord(record);
       session.setComplete();
       model.clear();
-      return "redirect:/miso/stats/sequencer/" + record.getSequencerReference().getId();
+      return "redirect:/miso/stats/sequencer/servicerecord/" + record.getId();
     } catch (IOException ex) {
       log.debug("Failed to save Sequencer Service Record", ex);
       throw ex;

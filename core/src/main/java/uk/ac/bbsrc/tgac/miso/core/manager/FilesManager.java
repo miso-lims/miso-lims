@@ -27,8 +27,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Nameable;
-
 /**
  * uk.ac.bbsrc.tgac.miso.core.manager
  * <p/>
@@ -50,5 +48,5 @@ public interface FilesManager {
 
   File storeFile(Class type, String qualifier, File file) throws IOException;
 
-  void deleteFile(Class<? extends Nameable> type, String qualifier, String fileName) throws IOException;
+  void deleteFile(Class<?> type, String qualifier, String fileName) throws IOException;
 }
