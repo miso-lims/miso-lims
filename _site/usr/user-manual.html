@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width">
+
+        <title>MISO : User Manual</title>
+        <meta name="description" content="An open-source LIMS for NGS sequencing centres">
+
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="/miso-lims/css/syntax.css">
+        <link rel="stylesheet" href="/miso-lims/css/main.css">
+    </head>
+    <body>
+<a href="https://github.com/TGAC/miso-lims"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
+        <div class="container">
+            <div class="row">
+                <div id="header" class="col-sm-12">
+                    <h2><a class="brand" href="/miso-lims/"><img src="/miso-lims/images/MISO.png"/>MISO</a>
+    <small>An open-source LIMS for NGS sequencing centres</small>
+</h2>
+
+                </div>
+            </div>
+
+            <div class="row">
+                
+                
+                    <div id="navigation" class="col-sm-2">
+                        <ul class="nav nav-list">
+    <!--<li><a href="/miso-lims/">Home</a></li>-->
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Getting Started</li>
+            
+            <li data-order="1"><a href="/miso-lims/start/installation.html">Installation</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">User Guides</li>
+            
+            <li data-order="1"><a href="/miso-lims/usr/user-manual.html">User Manual</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Admin Guides</li>
+            
+            <li data-order=""><a href="/miso-lims/adm/external-webapp.html">Configuring the external webapp</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Developer Guides</li>
+            
+            <li data-order=""><a href="/miso-lims/dev/rest-testing.html">REST Testing</a></li>
+        
+            
+            <li data-order=""><a href="/miso-lims/dev/maven-artifacts.html">Maven artifacts</a></li>
+        
+            
+            <li data-order=""><a href="/miso-lims/dev/kit-tracking.html">Kit Tracking</a></li>
+        
+            
+            <li data-order=""><a href="/miso-lims/dev/eclipse-code-formatting.html">Eclipse Code Formatting</a></li>
+        
+            
+            <li data-order=""><a href="/miso-lims/dev/code-style.html">Code Style</a></li>
+        
+            
+            <li data-order=""><a href="/miso-lims/dev/developers-manual.html">Developer's Manual</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Reference</li>
+            
+            <li data-order=""><a href="/miso-lims/ref/rest-api.html">REST API</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Posts</li>
+            
+            <li data-order=""><a href="/miso-lims/post/changelogs-0.2.0.html">Version 0.2.0</a></li>
+        
+            
+            <li data-order=""><a href="/miso-lims/post/changelogs-0.1.9.html">Version 0.1.9</a></li>
+        
+    
+<!-- List additional links. It is recommended to add a divider
+    e.g. <li class="divider"></li> first to break up the content. -->
+</ul>
+
+                    </div>
+
+                    <div id="content" class="col-sm-10">
+                        <div class="page-header">
+    <h2>User Manual
+        
+    </h2>
+</div>
+
+<h2 id="introduction">Introduction</h2>
+
+<p><a href="http://www.tgac.ac.uk/bioinformatics/sequence-informatics/core-bioinformatics/miso/">MISO</a> (<u>M</u>anaging <u>I</u>nformation for <u>S</u>equencing <u>O</u>perations) is the Lab Information Management System developed at <a href="http://www.tgac.ac.uk/">TGAC</a>. Work started on MISO in 2010 and was released to the community as an open-source LIMS on the 31st May 2012. Version 0.2.0 (Neon) was released on 30th August 2013. MISO is heavily modelled upon the submission schemas specified by the <a href="http://www.ebi.ac.uk/ena/">SRA</a> and is therefore able to automatically generate and deploy the required XML and data files.</p>
+
+<h2 id="overview-of-features">Overview of Features</h2>
+
+<p>Features included in this release:</p>
+
+<ul>
+  <li><strong>BETA Plate support</strong> - 96 and 384-well plates are supported, and can be imported via the new bulk_input spreadsheet.</li>
+  <li><strong>Performance</strong> - MISO has received a lot of work into improving ehcache integration and reducing heap size. It’s <em><strong>much</strong></em> faster!</li>
+  <li><strong>PoolQC support</strong> - Pool objects can now be QCed.</li>
+  <li><strong>Bug fixes</strong> - many bugs have been squashed</li>
+</ul>
+
+<p>General features:</p>
+
+<ul>
+  <li>
+    <p><strong>Authentication</strong> – user-centric access control to designated areas Laboratory tracking – project description, sample receipt, library preparation, run construction, and barcoding</p>
+  </li>
+  <li>
+    <p><strong>Printing</strong> – can directly connect to barcode printers and print barcodes for the relevant objects inside MISO</p>
+  </li>
+  <li>
+    <p><strong>Bioinformatics pipelines</strong> – monitoring and reporting of analytical processes, interacting directly with the computing cluster</p>
+  </li>
+  <li>
+    <p><strong>Reporting</strong> – personalised and filtered accurate statistics from library preparation and sequencing processes and including graphical visualisations</p>
+  </li>
+  <li>
+    <p><strong>Data Visualisation</strong> – through “traffic light” indicators, tree-structured status diagrams and statistics graphs and plots, MISO can easily show the status of each project and its elements by interactive tree and <span class="spell">dendrogram, as well as calendar-based sequencer resource diagrams and run statistics, all using the JavaScript graphing library d3.js.</span></p>
+  </li>
+  <li>
+    <p><strong>Submission</strong> – automated packaging of sequencing data and metadata, deployment of these data to remote public repositories (i.e. EBI)</p>
+  </li>
+  <li>
+    <p><strong>Notification</strong> – automated import of run metadata and notification of change of run status</p>
+  </li>
+</ul>
+
+<h2 id="implementation">Implementation</h2>
+
+<p>Full model and implementation documentation can be found in the <a href="http://confluence.tgac.bbsrc.ac.uk/">Developer Manual</a>. Some brief MISO facts:</p>
+
+<ul>
+  <li>Currently MySQL underpins MISO. Object relational mapping (ORM) via data access objects (DAOs) is achieved through Spring’s JDBC Templates, which enable fine-grained control over queries over the underlying database.</li>
+  <li>Simple Java beans, or Plain Old Java Objects (POJOs) are used to represent the model objects in the database, and we construct concrete relationships between them in business logic space.</li>
+  <li>We have developed a RESTful web application from the Spring 3 MVC framework and, as such, MISO can support a number of view technologies. It comes with a user-friendly interface built on Java Server Pages (JSP) which is designed specifically for lab technicians, but can be queried programmatically using the REST URLs. This means helpful web services, such as remote custom reporting and integration with other tools and instrumentation, are available.</li>
+  <li><a href="http://mbostock.github.com/d3/">D3.js</a> is used for much of the graphical data visualisation in MISO.</li>
+</ul>
+
+<h2 id="releases">Releases</h2>
+
+<ul>
+  <li>MISO has been developed by the <a href="http://www.tgac.ac.uk/bioinformatics/sequence-informatics/core-bioinformatics/">Core Bioinformatics Team</a> at TGAC since February 2010 under leadership of Dr. Robert Davey.</li>
+  <li>The first version of MISO (version 0.1.1, Hydrogen) was released internally to TGAC staff on 19th Sept 2011. Each month brings a new version with novel features and bug fixes. The latest internal release was on 30-06-2012 Version: 0.1.6 (Carbon), and this release represents what will be the first beta community release of MISO.</li>
+</ul>
+
+<h2 id="licensing">Licensing</h2>
+
+<ul>
+  <li>MISO is open-source beta software at present, and is freely available for usage and modification according to the GNU Public Licence V3 (GPL3).</li>
+  <li>We use freely available open-source tools to develop MISO and, in turn, MISO is fully open-source.</li>
+  <li>The Spring framework enables us to supply configurations via XML files, so functionality changes are possible without any code changes. For example, replacing a MySQL database model with Postgres or replacing the authentication mechanism is possible with minimal configuration.</li>
+  <li>Coupled with the open-source ethos of community development, MISO can make for a cost-effective, highly modifiable and robust system that can benefit both the public knowledge repositories and sequencing centres of all sizes.</li>
+  <li>We are actively working on MISO to provide more features, and to support more sequencing platforms.</li>
+</ul>
+
+<h1 id="getting-started">Getting Started</h1>
+
+<h2 id="installation-and-running-miso">Installation and running MISO</h2>
+
+<p>The easiest way to install MISO is to install the free <a href="https://www.virtualbox.org/">VirtualBox</a> software run a virtual machine pre-installed with MISO.</p>
+
+<ul>
+  <li>Download our MISO VM: <a href="https://repos.tgac.ac.uk/miso/latest/MISO_Image.ova">https://repos.tgac.ac.uk/miso/latest/MISO_Image.ova</a></li>
+  <li>Import this OVA file into VirtualBox via the <em>File, Import Appliance</em> option.</li>
+  <li>Starting the appliance will result in an Ubuntu virtual machine complete with all MISO’s prerequisites pre-installed. The login for the virtual image is <strong>miso</strong> / <strong>misoadmin</strong></li>
+  <li>Start MISO server by using ./misoStart.sh and then open the browser and go <a href="http://localhost:8090/">http://localhost:8090/</a></li>
+  <li>Log in to MISO using <strong>admin / admin</strong>. Only some simple configuration for certain elements is required, such as Sequencer References, Printers and any additional users and groups.</li>
+</ul>
+
+<p>As MISO is open-source, the complete source code is available from github: <a href="https://www.github.com/TGAC/miso-lims">https://www.github.com/TGAC/miso-lims</a>. The build, install and running instructions can be found in <a href="/miso-lims/start/installation.html">Installation</a>.</p>
+
+<h2 id="logging-into-miso">Logging into MISO</h2>
+
+<p>MISO ships with a default admin account after installation, using the username password combination of <strong>admin</strong>/<strong>admin</strong>. To add more users and groups please see the section below. For information regarding running MISO using the database or LDAP authentication, please see the Developer Manual.</p>
+
+<h4 id="external-users">External users</h4>
+
+<ul>
+  <li>External users have limited access to MISO, via a restricted read-only interface, which shows the list of projects with which they are involved</li>
+  <li>This interface comprises detailed information about which stage the project is currently at, and QC information about Samples, Libraries and Runs.</li>
+</ul>
+
+<h4 id="internal-users">Internal users</h4>
+
+<ul>
+  <li>Internal users can access most of the features of MISO, depending on the roles allocated to them via the internal user and group management system, or another user directory such as LDAP.</li>
+</ul>
+
+<h2 id="dashboard">Dashboard</h2>
+
+<h4 id="home">Home</h4>
+
+<ul>
+  <li>The Home area represents the MISO dashboard, and includes widget lists of Projects, Runs, Samples, Library, etc, that the logged-in user is able to read.</li>
+  <li>The input fields on the top of each widget can be used to search the relevant object list based on name, alias, description and barcode.</li>
+</ul>
+
+<h4 id="my-account">My Account</h4>
+
+<ul>
+  <li>The My Account tab lets the user access areas of MISO via the sidebar navigation menu, or via the widgets in the main section of the screen.</li>
+  <li>This tab also includes the user’s account settings and configuration. Administrators can see the full <a href="#MISO0.2.0UserManual-configuration">administration and configuration</a> settings of MISO.</li>
+</ul>
+
+<h4 id="my-projects">My Projects</h4>
+
+<ul>
+  <li>This tab lists all the projects available in MISO that are viewable by the logged-in user, with filtering functionality and provides two diagrams showing all projects and objects they contain in a round tree or dendogram style.</li>
+</ul>
+
+<h4 id="reports">Reports</h4>
+
+<ul>
+  <li>Reporting is an important functionality of MISO, with different type of reports being able to be generated based on Projects, Runs, Samples, Libraries, and the resource calendar of sequencing machines.</li>
+</ul>
+
+<h4 id="analysis">Analysis</h4>
+
+<ul>
+  <li>The analysis area provides access to the MISO analysis pipeline system, which allows custom pipelines to be started on a computing cluster via a web interface.</li>
+</ul>
+
+<h4 id="help">Help</h4>
+
+<ul>
+  <li>Link to the user manual.</li>
+</ul>
+
+<h1 id="configuring-miso">Configuring MISO</h1>
+
+<h2 id="users-and-groups">Users and Groups</h2>
+
+<h4 id="listing-users">Listing Users</h4>
+
+<ul>
+  <li>Click the <em>List Users</em> link in the Navigation Panel. You will see a list of currently registered Users.</li>
+  <li>Click the <em>Edit</em> link to start modifying a User.</li>
+  <li>Click the <em>Add User</em> link to add a new User.</li>
+</ul>
+
+<h4 id="creating-users">Creating Users</h4>
+
+<ul>
+  <li>Add the required fields in the form for the user.</li>
+  <li>A user can either be <strong>Internal</strong> or <strong>External</strong>
+    <ul>
+      <li>An Internal user will have access to the full MISO application, depending on their permissions.</li>
+      <li>An External user will have access to a special user interface of MISO that only lets that user view and complete specific elements, depending on their permissions.</li>
+    </ul>
+  </li>
+  <li>Users can easily be added to Groups by simply checking the boxes next to their names in the Groups checklist.</li>
+  <li>Click <em>Save</em> to save the User.</li>
+</ul>
+
+<h4 id="listing-groups">Listing Groups</h4>
+
+<ul>
+  <li>Click the <em>List Groups</em> link in the Navigation Panel. You will see a list of currently available Groups.</li>
+  <li>Click the <em>Edit</em> link to start modifying a Group.</li>
+  <li>Click the <em>Add Group</em> link to add a new Group</li>
+  <li>Three groups should exist in MISO already, and they are <strong>ProjectWatchers</strong>, <strong>RunWatchers</strong>, and <strong>PoolWatchers</strong>. These groups represent the ability to watch all elements of a given type for alerting updates, and as such shouldn’t be removed.</li>
+</ul>
+
+<h4 id="creating-groups">Creating Groups</h4>
+
+<ul>
+  <li>Add a Name and Description for the new Group.</li>
+  <li>Users can easily be added to Groups by simply checking the boxes next to their names in the Users checklist.</li>
+  <li>Click <em>Save</em> to save the Group.</li>
+</ul>
+
+<h2 id="miso-configuration">MISO Configuration</h2>
+
+<p>Some elements of MISO can be modified through the MISO Configuration widget in the My Account page of administrators.</p>
+
+<h4 id="general">General</h4>
+
+<p>Unused at present. This area will be populated with runtime modifiable options.</p>
+
+<h4 id="databases">Databases</h4>
+
+<p>Unused at present. This area will be populated with runtime modifiable options. Databases can be configured through the JNDI which is detailed in the Installation Manual.</p>
+
+<h4 id="security">Security</h4>
+
+<p>Unused at present. This area will be populated with runtime modifiable options. Security is based on user and user group, with defined permissions for each object in the MISO.</p>
+
+<h4 id="barcode-printers">Barcode Printers</h4>
+
+<ul>
+  <li>Barcode printers can be added and managed from this page.</li>
+  <li>Clicking the <em>Add Printer Service</em> link will add a row to the table with relevant information for the printer to add.</li>
+  <li>Type in a unique <strong>Printer Service Name</strong>, select a printer context <strong>type</strong> and options will appear for that type, then choose the element that this printer will print.</li>
+  <li>To print multiple element types from the same printer, simply add separate services for each of the element types, pointing to the same host.</li>
+</ul>
+
+<h2 id="alerts">Alerts</h2>
+
+<h3 id="my-alerts">My Alerts</h3>
+
+<p>MISO has an alerting system whereby users can watch singular elements or whole groups of elements and receive alerts about them. Depending on the way MISO is configured, you will either receive internal MISO alerts, accessed through the My Account tab, via email, or both.</p>
+
+<h4 id="project-alerts">Project Alerts</h4>
+
+<ul>
+  <li>To receive Project level alerts, you will need to be one of the following:
+    <ul>
+      <li>watching a singluar Project by selecting <em>Watch</em> in the Option menu of a Project</li>
+      <li>the owner of a Project</li>
+      <li>in the ProjectWatchers group</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="run-alerts">Run Alerts</h4>
+
+<ul>
+  <li>To receive Run level alerts, you will need to be one of the following:
+    <ul>
+      <li>watching a singluar Run by selecting <em>Watch</em> in the Option menu of a Project</li>
+      <li>the owner of a Run</li>
+      <li>in the RunWatchers group</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="pool-alerts">Pool Alerts</h4>
+
+<ul>
+  <li>To receive Pool level alerts, you will need to be one of the following:
+    <ul>
+      <li>be the owner of a Pool</li>
+      <li>in the PoolWatchers group</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="recent-activity-alerts">Recent Activity Alerts</h3>
+
+<p>If you are and Administrator, you will be able to see the list of recently generated system level alerts. This represents a traceable timeline of events for given elements, and future versions of MISO will be able to utilise these events to build up graphical representations of project flow.</p>
+
+<h2 id="cache-administration">Cache Administration</h2>
+
+<h4 id="flush-all-caches">Flush All Caches</h4>
+
+<ul>
+  <li>Flushing all caches can be use to clear all the locally stored POJO objects in memory. This is useful if an administrator has changed a reference value (i.e. a Sample alias) manually in the underlying database where the original value would still be held in the in-memory cache.</li>
+</ul>
+
+<h4 id="view-cache-stats">View Cache Stats</h4>
+
+<ul>
+  <li>The statistics of each of the caches can be viewed by clicking this link.</li>
+</ul>
+
+<h4 id="regenerate-barcodes">Regenerate Barcodes</h4>
+
+<ul>
+  <li>Generates all the barcodes again in the storage area on disk from the barcode strings of each relevant barcodable object.</li>
+</ul>
+
+<h4 id="reindex-alert-managers">Reindex Alert Managers</h4>
+
+<ul>
+  <li>The MISO alerting system keeps a copy of objects watched by the alerting system. This also helps MISO in being able to form an index of these objects for fast searching. This link will reindex all objects held by this system.</li>
+</ul>
+
+<h2 id="configuring-sequencer-references">Configuring Sequencer References</h2>
+
+<p>Sequencer References represent the link between a physical sequencer and MISO, and are essential for the input of Runs into the system.</p>
+
+<h3 id="viewing-a-sequencer-reference">Viewing a Sequencer Reference</h3>
+
+<ul>
+  <li>The All Sequencer References page shows the currently available sequencers linked to MISO.</li>
+  <li>By clicking on the <em>View</em> link of a sequencer reference, all the runs performed on that machine can be seen with corresponding name, health, date and status.</li>
+</ul>
+
+<h3 id="adding-a-sequencer-reference">Adding a Sequencer Reference</h3>
+
+<ul>
+  <li>When a new sequencer reference is to be added, click on the <em>Add Sequencer Reference</em> link in the top-right of the All Sequencer References page.</li>
+  <li>A new row will be added to the table, where an ID for the instrument will be generated automatically.</li>
+  <li>A unique name <strong>must</strong> be supplied for the sequencer reference, and it <strong>must be</strong> the manufacturer specified name of this instrument, e.g. for an Illumina run folder 120313_SN319_0209_AD0HPAACXX, the sequencer reference name would be SN319. If the name is incorrect here, the notification system will not be able to automatically add runs to MISO.</li>
+  <li>Select a platform for the instrument</li>
+  <li>Set the hostname of the machine. This will either be the head node PC of a given sequencer, or more likely the hostname of a cluster or compute area where the run folders for this instrument are stored on local disk.</li>
+  <li>If the hostname is available on the network, then it will show as OK in the Available column.</li>
+  <li>Add the instrument to MISO by clicking on the <em>Add</em> link.</li>
+</ul>
+
+<h3 id="editing-a-sequencer-reference">Editing a Sequencer Reference</h3>
+
+<ul>
+  <li>Editing a sequencer reference allows the administrator to change the instrument information such as the name and hostname.</li>
+</ul>
+
+<h1 id="working-with-miso">Working with MISO</h1>
+
+<p>In MISO, Project elements are the heart of the system, and comprise many components. All elements are interconnected, based on models designed from the submission schemas specified by the SRA.</p>
+
+<h2 id="project">Project</h2>
+
+<p>A MISO project is a collection of studies, samples, and libraries. Each project has a <em>prefix</em> and an <em>ID</em>. The project ID becomes the suffix of the project’s name_,_ e.g. <strong>PRO1, PRO2</strong>. The project name is programatically constructed to be unique and as such is unchangeable by any user, including administrators. The URL address for viewing any project is **<a href="http://your.miso.host/miso/project/">http://your.miso.host/miso/project/</a><project_id>**.</project_id></p>
+
+<h4 id="creating-a-project">Creating a project</h4>
+
+<ul>
+  <li>Click on the <em>Add Project</em> link at the top-right of the My Projects tab</li>
+  <li>A ID and name will be auto-generated for the project upon saving.</li>
+  <li>Alias - Important information about Project or Specific Project name,</li>
+  <li>Description</li>
+  <li>Set a progress value</li>
+  <li>Add an Issue Tracker key, project can be created by relevant JIRA issue information.</li>
+  <li>Set permissions to other user for access of the project, special group called “Internal” can be used here with a tick to allow all internal staff to access the project.</li>
+  <li>Click <em>Save</em> to save the new project. The following elements can now be edited for the project.
+    <ul>
+      <li>Documentation files related to the project can be uploaded in the section</li>
+      <li>A Project Overview can now be added to the project, as well as Samples and Studies.</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="adding-a-project-overview">Adding a Project Overview</h4>
+
+<ul>
+  <li>A Project Overview represents the portion of work to be done on a particular number of samples for a particular collaborator.</li>
+  <li>Once an overview has been added, this portion of the project work can now be tracked via the alerting system, and will be reflected in the progress indicator.</li>
+</ul>
+
+<h4 id="samples">Samples</h4>
+
+<ul>
+  <li>Click on the <em>Samples</em> expanding link on the right hand side of the page</li>
+  <li>Hover over the <em>Options</em> menu</li>
+  <li>Select <em>Add Sample</em> to start adding samples following the documentation below</li>
+</ul>
+
+<h4 id="libraries">Libraries</h4>
+
+<ul>
+  <li>Click on the <em>Samples</em> expanding link on the right hand side of the page</li>
+  <li>Hover over the <em>Options</em> menu</li>
+  <li>Select <em>Bulk</em> <em>Add Libraries</em> to start adding Libraries following the documentation below</li>
+</ul>
+
+<h4 id="library-dilutions">Library Dilutions</h4>
+
+<ul>
+  <li>Click on the <em>Libraries</em> expanding link on the right hand side of the page</li>
+  <li>Hover over the <em>Options</em> menu</li>
+  <li>Select <em>Bulk Add Library Dilutions</em> to start adding dilutions following the documentation below</li>
+</ul>
+
+<h4 id="empcrs">EmPCRs</h4>
+
+<ul>
+  <li>Click on the <em>Library Dilutions</em> expanding link on the right hand side of the page</li>
+  <li>Hover over the <em>Options</em> menu</li>
+  <li>Select <em>Add EmPCR</em> to start adding EmPCRs following the documentation below</li>
+</ul>
+
+<h4 id="empcr-dilutions">EmPCR Dilutions</h4>
+
+<ul>
+  <li>Click on the <em>EmPCRs</em> expanding link on the right hand side of the page</li>
+  <li>Hover over the <em>Options</em> menu</li>
+  <li>Select <em>Add EmPCR Dilution</em> to start adding EmPCR Dilutions following the documentation below</li>
+</ul>
+
+<h4 id="pools">Pools</h4>
+
+<ul>
+  <li>Click on the <em>Library Dilutions</em> or <em>EmPCR Dilutions</em> expanding links on the right hand side of the page</li>
+  <li>Hover over the <em>Options</em> menu</li>
+  <li>Select <em>Create Pools</em> to start adding creating Pools following the documentation below</li>
+</ul>
+
+<h4 id="studies">Studies</h4>
+
+<ul>
+  <li>Click on the <em>Studies</em> expanding link on the right hand side of the page</li>
+  <li>Hover over the <em>Options</em> menu</li>
+  <li>Select <em>Add Study</em> to start adding studies following the documentation below</li>
+</ul>
+
+<h4 id="runs">Runs</h4>
+
+<ul>
+  <li>Any runs associated with the current project, i.e. runs which have pools containing samples from this project, will be shown in this area.</li>
+</ul>
+
+<h2 id="sample">Sample</h2>
+
+<p>A MISO sample represents the physical material received upon which QCs and library preparations are carried out to prepare that sample for eventual sequencing. Each sample has a <em>prefix</em> and an <em>ID</em>. The sample ID becomes the suffix of the sample’s name_,_ e.g. <strong>SAM1, SAM2</strong>. The sample name is programatically constructed to be unique and as such is unchangeable by any user, including administrators. The URL address for viewing any sample is **<a href="http://your.miso.host/miso/project/">http://your.miso.host/miso/sample/</a><sample_id>**.</sample_id></p>
+
+<h4 id="creating-a-single-sample">Creating a single sample</h4>
+
+<ul>
+  <li>A sample is related to a specific Project and is tracked by a unique <strong>alias</strong> and <strong>identification</strong> <strong>barcode</strong>.</li>
+  <li>Add in a sample description, outlining perhaps the origin and eventual preparation of this sample.</li>
+  <li>Add a sample alias. Sample aliases must conform to the following specification:
+    <ul>
+      <li>
+        <collaborator_identifier>_S<sample_number_relative_to_parent_project>_<material_identifier>
+</material_identifier></sample_number_relative_to_parent_project></collaborator_identifier>
+      </li>
+      <li>where <strong>collaborator_identifier</strong> might be a PI’s initials</li>
+      <li>where <strong>sample_number_relative_to_parent_project</strong> is a sample number supplied for the given set of samples within a project, e.g. 1 for the first sample, 2 for the second etc</li>
+      <li>where <strong>material_identifier</strong> is usually the short species name, or some other sensible description</li>
+      <li>i.e. ABC_S1_H.sapiens</li>
+      <li>A sample alias cannot contains reserved characters or spaces.</li>
+    </ul>
+  </li>
+  <li>Specify a receipt date if this sample has already been received. Leave blank if this sample is to be received at a later date, i.e. when the sample delivery form has been returned to your centre.</li>
+  <li>Specify a NCBI-valid species name for this sample. If enabled, MISO will check this species with the NCBI and ascribe the returned taxon ID to this sample.</li>
+  <li>Specify the type of this sample.</li>
+  <li>Lastly, specify whether this sample has passed QC. Please see the Sample QC section on how to add Sample QCs</li>
+</ul>
+
+<h4 id="bulk-sample-creation">Bulk sample creation</h4>
+
+<ul>
+  <li>Bulk sample addition is identical to single creation, but in tabular form for ease of adding multiple samples.</li>
+  <li>To start the process, click on <em>Add Row</em> at the top of the table. An empty row will be added.</li>
+  <li>Add in the required fields as you would a normal single sample input.</li>
+  <li>To copy this row, click the arrow icon in the <em>Copy</em> field of the table. You will see that by default, the <strong>sample_number_relative_to_parent_project</strong> in the sample alias is incremented automatically. To turn this feature off, expand the <em>Table Options</em> section above the table, and deselect the <em>Increment Sample Aliases Automatically</em> option.</li>
+  <li>Alternatively, you can specify a defined number of rows to add immediately by clicking the <em>Bulk Copy</em> button. A dialog will appear asking you how many rows to add. Choose a value, e.g. “96”, and click <em>OK</em>. This will copy the last row in the table <em>x</em> times, incrementing the <strong>sample_number_relative_to_parent_project</strong>.</li>
+  <li>To quickly fill down a value in a field to other Samples, fill in the value for the chosen field in an upper row, select that row, and then click the <em>Fill Down</em> arrow button in a column header. All Samples below the chosen row will have the same value applied to that field.</li>
+  <li>Click the <em>Save</em> button. You will informed of any rows that did not save.</li>
+</ul>
+
+<h4 id="sample-operations">Sample operations</h4>
+
+<p>Once a Sample has been saved, the following operations are available when visiting the Edit Sample page, via clicking on a sample’s <em>Edit</em> link in any relevant listing table, e.g. from the List Samples page, or the Samples table in a relevant Project.</p>
+
+<h5 id="printing-sample-barcodes">Printing Sample Barcodes</h5>
+
+<ul>
+  <li>Once a Sample has been saved, a barcode will be generated for it. This will be present in the top right of the screen when editing a Sample.</li>
+  <li>Hovering over the barcode will show a menu with the <em>Print</em> option.</li>
+  <li>Clicking on this will show a dialog allowing the user to select which printer with which to print the barcode.</li>
+</ul>
+
+<h5 id="adding-notes">Adding Notes</h5>
+
+<ul>
+  <li>Click on <em>Add Notes</em> under the Notes header.</li>
+  <li>Add any free-text notes related to the Sample.</li>
+</ul>
+
+<h5 id="adding-sample-qcs">Adding Sample QCs</h5>
+
+<ul>
+  <li>In the Edit Sample Page, Click on <em>Add Sample QC</em> under the Option menu.</li>
+  <li>Add details
+    <ul>
+      <li>QCed By, QC Date, QC Method and Result</li>
+    </ul>
+  </li>
+</ul>
+
+<h5 id="adding-libraries">Adding Libraries</h5>
+
+<ul>
+  <li>In the Edit Sample Page, Click on <em>Add Library</em> under Option of Libraries Pane.</li>
+  <li>Select <em>Add Library</em> to start adding Libraries to start adding samples following the documentation below</li>
+</ul>
+
+<h4 id="receiving-samples">Receiving samples</h4>
+
+<ul>
+  <li>Visit the <em>Receive Samples</em> link in the Navigation Bar to access the form to receive samples.</li>
+  <li>Either type, or beep in using a barcode reader, a sample barcode.</li>
+  <li>If this sample has no previously set receipt date, it will be added to the list below the input box.</li>
+  <li>You can repeat this process for as many samples as you need to receive.</li>
+  <li>Once finished inputting, click <em>Save.</em></li>
+</ul>
+
+<h2 id="library">Library</h2>
+
+<p>A MISO sample represents <span style="color: rgb(34,34,34);">the first step in constructing sequenceable material from an initial Sample. A Library is then diluted down to a Dilution, and put in a Pool.. Each library has a <em>prefix</em> and an <em>ID</em>. The library ID becomes the suffix of the library’s name_,_ e.g. <strong>LIB1, LIB2</strong>. The library name is programatically constructed to be unique and as such is unchangeable by any user, including administrators. The URL address for viewing any library is **<a href="http://your.miso.host/miso/project/">http://your.miso.host/miso/library/</a><library_id>**.</library_id></span></p>
+
+<h4 id="adding-libraries-1">Adding Libraries</h4>
+
+<ul>
+  <li>A Library is related to a specific Sample and is tracked by a unique <strong>alias</strong> and <strong>identification</strong> <strong>barcode</strong>.</li>
+  <li>Add in a library description, outlining perhaps the origin and eventual preparation of this library.</li>
+  <li>The Library alias inherits from the parent Sample, but with some important changes:
+    <ul>
+      <li>A Library alias conforms to <collaborator_identifier>_L<parent_sample_number>-<library_number_relative_to_parent_sample>_<material_identifier></material_identifier></library_number_relative_to_parent_sample></parent_sample_number></collaborator_identifier></li>
+      <li>Thus the first Library added to ABC_S1_H.sapiens would have an alias of ABC_L1-1_H.sapiens</li>
+      <li>The second would be ABC_L1-2_H.sapiens, and so on</li>
+    </ul>
+  </li>
+  <li>The creation date is automatically set to the current date.</li>
+  <li>Check the Paired checkbox if the library is paired.</li>
+  <li>Set the Platform that this Library is being prepared for, the Library type, Library section type, Library strategy type.</li>
+  <li>If this Library is to be multiplexed with an adaptor barcode, pick the barcode from the dropdown list available for the selected platform.</li>
+  <li>Check the QC Passed checkbox if the library has passed and QC stages.</li>
+  <li>Permissions will be inherited from the parent Sample.</li>
+</ul>
+
+<h4 id="bulk-library-creation">Bulk Library creation</h4>
+
+<ul>
+  <li>Bulk Library addition is identical to single creation, but in tabular form for ease of adding multiple Libraries.</li>
+  <li>You will see the list of Samples associated with the parent Project. These form the basis for Library creation.</li>
+  <li>Add in the required fields as you would a normal single Library input.</li>
+  <li>Select the samples you wish to use for Library creation by clicking in the <em>Select</em> column so that the row turns blue.</li>
+  <li><strong>One</strong> Library will be created for each Sample selected as such in the table.</li>
+  <li>To quickly fill down a value in a field to other Libraries, fill in the value for the chosen field in an upper row, select that row, and then click the <em>Fill Down</em> arrow button in a column header. All Libraries below the chosen row will have the same value applied to that field.</li>
+  <li>Click the <em>Save</em> button. You will informed of any rows that did not save.</li>
+</ul>
+
+<h4 id="library-operations">Library Operations</h4>
+
+<p>Once a Library has been saved, the following operations are available when visiting the Edit Library page, via clicking on a Library’s <em>Edit</em> link in any relevant listing table, e.g. from the List Libraries page, or the Libraries table in a relevant Project.</p>
+
+<h5 id="adding-notes-1">Adding Notes</h5>
+
+<ul>
+  <li>Click on <em>Add Notes</em> under the Notes header.</li>
+  <li>Add any free-text notes related to the Library.</li>
+</ul>
+
+<h5 id="adding-library-qcs">Adding Library QCs</h5>
+
+<ul>
+  <li>Click on <em>Add Library QC</em> under Option menu.</li>
+  <li>Add details
+    <ul>
+      <li>QC Date, QC Method and Result.</li>
+      <li>Insert Size in base pairs.</li>
+      <li>Click on <em>Add</em> to save.</li>
+    </ul>
+  </li>
+</ul>
+
+<h5 id="add-library-dilutions">Add Library Dilutions</h5>
+
+<ul>
+  <li>Click on <em>Add Library Dilution</em> under Option of Library Dilutions Pane.</li>
+  <li>Add details
+    <ul>
+      <li>Creation Date and Result</li>
+      <li>The ID barcode for the dilution will be generated on save</li>
+      <li>Click on <em>Add</em> to save.</li>
+    </ul>
+  </li>
+</ul>
+
+<h5 id="constructing-pools">Constructing Pools</h5>
+
+<ul>
+  <li>Once a Library Dilution has been saved, you can use it to make up a pool</li>
+  <li>Click on the <em>Construct new Pool using this dilution…</em> link to go to the Pool Wizard.</li>
+  <li>Please see the Pool Wizard documentation below.</li>
+</ul>
+
+<h2 id="pool">Pool</h2>
+
+<p>A MISO Pool contains one or more Dilutions that are to be placed, as part of an Experiment, in a sequencer instrument Run partition (lane/chamber). Pools with more than one Dilution are said to be multiplexed. Each pool has a <em>prefix</em> based on the Platform Type and an <em>ID</em>. For Illumina pools, the prefix will be <strong>IPO</strong>, for 454 <strong>LPO</strong>, for SOLiD <strong>SPO</strong>. The pool ID becomes the suffix of the pool name_,_ e.g. <strong>IPO1, LPO270</strong>. The pool name is programatically constructed to be unique and as such is unchangeable by any user, including administrators. The URL address for viewing any pool is <strong><a href="http://your.miso.host/miso/project/">http://your.miso.host/miso/pool/</a>&lt;platform_type_in_lower_case&gt;/&lt;pool_ID&gt;</strong>.</p>
+
+<h4 id="creating-pools">Creating Pools</h4>
+
+<ul>
+  <li>A Pool is related to a specific Experiment and is tracked by a unique <strong>alias</strong> and <strong>identification</strong> <strong>barcode</strong>.</li>
+  <li>On creation, the Pool ID and name will be auto-generated.</li>
+  <li>Add in a Pool alias, concentration and creation date.</li>
+  <li>Check the Ready to Run checkbox if this Pool is ready to be run on a sequencer, i.e. no more dilutions need to be added.</li>
+  <li>If an Experiment has already been created for this Pool, use the _Search Experiments_field to find valid Experiments based on the name, description or related project.
+    <ul>
+      <li>Once found, click on the Experiment to link it to the Pool.</li>
+      <li>A pool can be linked to multiple experiments to denote a multiplexed pool comprising dilutions from different projects.</li>
+    </ul>
+  </li>
+  <li>
+    <p>If an Experiment has <strong>NOT</strong> been created for this Pool, you can automatically create one simply by adding the pool to a Run partition, and selecting the related study/ies. An Experiment will then be auto-generated for you for each Study.</p>
+
+    <ul>
+      <li><strong>NB</strong> This process requires that at least one Study is present for each of the projects related to this Pool via the prepared Samples.</li>
+    </ul>
+  </li>
+  <li>Add Dilutions to the Pool by:
+    <ul>
+      <li>Using the <em>Search Dilution</em> field to find valid Dilutions based on the name, description or related project</li>
+      <li>Using the <em>Select Dilutions by Barcodes</em> to beep in multiple ID barcodes of dilutions to be added. Barcodes should be on separate lines. Once all dilutions have bene beeped in, click <em>Select</em> to add them.</li>
+      <li>
+        <p>Using the <em>Select Dilutions by Barcode File</em> chooser to upload a file with dilution barcodes in. Barcodes should be on separate lines within the file.</p>
+      </li>
+      <li><strong>NB</strong> Dilutions can only be added to the same Pool if the parent Library objects have different Tag Barcodes.</li>
+    </ul>
+  </li>
+  <li>Both Experiments and Dilutions can be removed from the Pool at any time by clicking on the cross icon on the right of the Experiment or Dilution, and confirming the resulting dialog box.</li>
+</ul>
+
+<h4 id="pool-operations">Pool Operations</h4>
+
+<p>Once a Pool has been saved, the following operations are available when visiting the Edit Pool page, via clicking on a Pool’s <em>Edit</em> link in any relevant listing table, e.g. from the List Pools page, or the Pools table in a relevant Project.</p>
+
+<h2 id="study">Study</h2>
+
+<p>A MISO study represents more fine-grained information about the sequencing Project. Each study has a <em>prefix</em> and an <em>ID</em>. The study ID becomes the suffix of the study name_,_ e.g. <strong>STU1, STU2</strong>. The study name is programatically constructed to be unique and as such is unchangeable by any user, including administrators. The URL address for viewing any study is <strong><a href="http://your.miso.host/miso/project/">http://your.miso.host/miso/study/</a>&lt;study_ID&gt;</strong>.</p>
+
+<h4 id="creating-a-study">Creating a study</h4>
+
+<ul>
+  <li>A study is related to a specific Project and is tracked by a unique <strong>alias</strong>.</li>
+  <li>Add in a Study description, outlining perhaps the origin and purpose of this Study.</li>
+  <li>Add a Study alias.
+    <ul>
+      <li>A Study alias cannot contains reserved characters or spaces.</li>
+    </ul>
+  </li>
+  <li>Specify the type of this Study.</li>
+</ul>
+
+<h4 id="edit-study">Edit Study</h4>
+
+<p>Once a Study has been saved, the following operations are available when visiting the Edit Study page, via clicking on a Study’s <em>Edit</em> link in any relevant listing table, e.g. from the List Studies page, or the Studies table in a relevant Project.</p>
+
+<h5 id="adding-experiments">Adding Experiments</h5>
+
+<ul>
+  <li>Studies can contain any number of sequencing Experiments.</li>
+  <li>Select <em>Add Experiment</em> to start adding Experiments following the documentation below.</li>
+</ul>
+
+<h2 id="experiment">Experiment</h2>
+
+<p>A MISO Experiment represents design information about the sequencing experiment. Each Experiment has a <em>prefix</em> and an <em>ID</em>. The Experiment ID becomes the suffix of the Experiment’s name_,_ e.g. <strong>EXP1, EXP2</strong>. The Experiment name is programatically constructed to be unique and as such is unchangeable by any user, including administrators. The URL address for viewing any Experiment is <strong><a href="http://your.miso.host/miso/project/">http://your.miso.host/miso/experiment/</a>&lt;experiment_ID&gt;</strong>.</p>
+
+<p>Experiments are associated with Pools that are placed on Run partitions, which contain the actual sequencing results.</p>
+
+<h4 id="automatic-experiment-creation">Automatic Experiment Creation</h4>
+
+<ul>
+  <li>Whilst MISO supports creating Experiments manually (see below), it is often easier to allow MISO to generate and link an Experiment to a Pool for you.</li>
+  <li>From the <em>Edit Run</em> page, you are able to select Pools to be placed on Run partitions (lanes/chambers).</li>
+  <li>When assigning a Pool to a partition, the following rules apply for Experiment creation:
+    <ul>
+      <li>If the Pool has no Experiment already linked</li>
+      <li>If there is at least one Study available on each of the Projects represented by the Pool’s dilutions</li>
+    </ul>
+  </li>
+  <li>If these rules are valid, drop boxes will appear for each represented Project, letting you choose the Study on which to base the automatic Experiment creation.</li>
+  <li>Upon clicking <em>Select</em> for each Study, one Experiment will be automatically created and linked to the Pool.</li>
+</ul>
+
+<h4 id="add-experiment-manually">Add Experiment Manually</h4>
+
+<ul>
+  <li>An Experiment is related to a specific Study and is tracked by a unique <strong>alias</strong>.
+    <ul>
+      <li>An Experiment alias cannot contains reserved characters or spaces.</li>
+    </ul>
+  </li>
+  <li>Add in an Experiment title, alias, and description.</li>
+  <li>Specify the platform to which this Experiment is related.</li>
+  <li>Selecting the Platform will populate a list of available Pools to link to this Experiment.</li>
+  <li>Double click to add a chosen Pool to this Experiment.</li>
+  <li>Double clicking again on the chosen Pool area will remove it.</li>
+  <li>Permissions for each Experiment are inherited from the parent Study</li>
+</ul>
+
+<h2 id="partition-containers">Partition Containers</h2>
+
+<p>Partition Containers represent a collection of Partitions (abstractions of lanes, chambers, etc) that are described by a parent Run object. Containers can be populated prior to a Run being entered manually or being imported by the Notification System. This means Containers can be barcoded and entered into MISO with their Pools populated ahead-of-time so that when Runs are added manually or automatically, the Containers can either be linked via a quick lookup or automatically, respectively.</p>
+
+<h4 id="adding-partition-containers-outside-a-run">Adding Partition Containers (outside a Run)</h4>
+
+<ul>
+  <li>Independent Container creation is accessed from the <em>Create New Partition Container</em> link in the navigation area</li>
+  <li>Select a Platform for the Container from the <em>Platform</em> radio buttons</li>
+  <li>Select an available Sequencer Reference from the <em>Sequencer</em> dropdown</li>
+  <li>Select the number of Containers you want to add for the Platform (454 is the only multiple flowcell vendor. HiSeq’s are effectively “single flowcell in twos”, i.e. two run folders are created independently even though two flowcells can be run concurrently on the machine itself).</li>
+  <li>Enter in an ID for this Container. You can validate that this barcode hasn’t been used before by using the <em>Lookup</em> button.</li>
+  <li>A location and validation barcode can also be entered, but are not compulsory.</li>
+  <li>Double click on an empty partition and either beep in or type the barcode of the pool you wish to add to this Container</li>
+  <li>Click on the <em>Save</em> button to save.</li>
+</ul>
+
+<h4 id="adding-partition-containers-within-a-run">Adding Partition Containers (within a Run)</h4>
+
+<ul>
+  <li>Containers can also be created and edited from within a Run itself and the process is very similar to the above.</li>
+  <li>Select the number of Containers you want to add for the Platform (454 is the only multiple flowcell vendor. HiSeq’s are effectively “single flowcell in twos”, i.e. two run folders are created independently even though two flowcells can be run concurrently on the machine itself).</li>
+  <li>Enter in an ID for this Container. You can validate that this barcode hasn’t been used before by using the <em>Lookup</em> button.</li>
+  <li>A location and validation barcode can also be entered, but are not compulsory.</li>
+  <li>Pools are added to Container partitions from the Pool list on the right hand side of the page by double clicking on a Pool</li>
+  <li><strong>NB</strong> the chosen Pools will be added <strong>sequentially</strong> to the Container, as by this point, MISO will assess that as the run is already started, it should be fully populated.</li>
+  <li>If you wish to retrospectively semi-populate a Container, use the method in the previous section (“outside a Run”).</li>
+</ul>
+
+<h2 id="run">Run</h2>
+
+<p>A MISO Run contains the sequencing results from sequencing experiments. Each Run comprises one or more Partition Containers, that in turn comprise Partitions (abstractions of lanes, chambers, etc) which hold a Pool. The Run ID becomes the suffix of the Run name_,_ e.g. <strong>RUN1, RUN2</strong>. The Run name is programatically constructed to be unique and as such is unchangeable by any user, including administrators. The URL address for viewing any Run is <strong><a href="http://your.miso.host/miso/project/">http://your.miso.host/miso/run/</a>&lt;run_ID&gt;</strong>.</p>
+
+<h4 id="automatic-run-notification">Automatic Run Notification</h4>
+
+<p>MISO is bundled with a separate Java application that can be run on a machine with access to sequencer run folders. This Notification module allows MISO to be informed about new Runs without any involvement from a user, making it far simpler to manage Runs within MISO. More information on this system can be found in the relevant Notification System section.</p>
+
+<h4 id="adding-a-run-manually">Adding a Run Manually</h4>
+
+<ul>
+  <li>A Run is related to Projects via the pooled Samples placed on its partitions and is tracked by a unique <strong>alias</strong>.</li>
+  <li>An ID and name will be auto-generated for the Run upon saving.</li>
+  <li>Select a Platform Type.</li>
+  <li>Select a Sequencer Reference
+    <ul>
+      <li>Once a Sequencer Reference has been selected, you will be able to select and populate the Container(s). Please follow the information in the Partition Containers section above.</li>
+    </ul>
+  </li>
+  <li>A Run alias, which should be the run name specified by the sequencer system, and usually relates to a run folder of the same name on the underlying filesystem of use.</li>
+  <li>A Run description, giving a brief overview of what the Run represents.</li>
+  <li>The Run path, which should be the run folder exposed by the sequencer itself or an intermediary storage filesystem or cluster.</li>
+  <li>Check the Paired End checkbox if the Run is paired end.</li>
+  <li>Select the current Run status.</li>
+  <li>Click on <em>Save</em> to save the Run.</li>
+</ul>
+
+<h4 id="run-operations">Run Operations</h4>
+
+<p>Once a Run has been saved, either manually or via the Notification System, the following operations are available when visiting the Edit Run page, via clicking on a Run’s <em>Edit</em> link in any relevant listing table, e.g. from the List Runs page, or the Runs table in a relevant Project.</p>
+
+<ul>
+  <li>Edit alias and description</li>
+  <li>Choose if the Run is paired end</li>
+  <li>Setting the Status of the Run manually
+    <ul>
+      <li>This is also helpful if the notification system fails to accurately record the status of a Run (some platforms don’t expose this information in a coherent fashion).</li>
+    </ul>
+  </li>
+</ul>
+
+<h5 id="editing-partition-containers">Editing Partition Containers</h5>
+
+<ul>
+  <li>See the Partition Containers section above.</li>
+</ul>
+
+<h5 id="adding-notes-2">Adding Notes</h5>
+
+<ul>
+  <li>Click on <em>Add Notes</em> under the Notes header.</li>
+  <li>Add any free-text notes related to the Run.</li>
+</ul>
+
+<h5 id="adding-run-qcs">Adding Run QCs</h5>
+
+<ul>
+  <li>Click on <em>Add Run QC</em> under the Option menu.</li>
+  <li>Add details
+    <ul>
+      <li>The QC User that carried out the QC.</li>
+      <li>The QC date.</li>
+      <li>The QC Method relates to a conceptual or practical QC steps undertaken by one of two “actioners”, i.e. SeqOps (<em>sequencing operations</em>) or SeqInfo (<em>sequence informatics</em>). The former is carried out after the physical run has completed and assessed for quality. The latter is carried out following a primary analysis stage to assess quality.</li>
+      <li>The Process Selection allows the QC to be related to a given subset of partitions, e.g. if lanes 1-4 were OK and should be processed, but lanes 5-8 were not, boxes 1-4 would be clicked to reflect this.</li>
+      <li>Any other free-text information should be added in the Info field.</li>
+      <li>Click on <em>Add</em> to save.</li>
+    </ul>
+  </li>
+</ul>
+
+<h1 id="reporting">Reporting</h1>
+
+<p>Reporting in MISO is a very flexible feature, with reports that can be generated based on Projects, Samples, Libraries and Runs. All reports can be filtered by keywords, date range and relevant types.</p>
+
+<h3 id="generating-reports">Generating Reports</h3>
+
+<ol>
+  <li>Reports based on different elements can be generated from separate tabs for each, i.e. Project report, Sample Report, Libraries Report and Runs Report</li>
+  <li>Each type of report got different filtering options
+    <ol>
+      <li>All type of reports can be filtered by using keyword for name, alias and description, and dates</li>
+      <li>Project reports got extra filter option for Project Progress, i.e. Active, Inactive, Pending, Cancelled, Proposed, completed, Approved, Unknown.</li>
+      <li>Samples reports can be filtered based on Samples Type and Sample QC</li>
+      <li>Libraries reports filters are Sequencer Platform type and Library QC</li>
+      <li>Runs can be filtered based on Run Status, and Sequencers Platform type</li>
+    </ol>
+  </li>
+  <li>Press the <em>Search</em> button, will give you a list of objects based on filters,</li>
+  <li><em>Reset</em> button clears all the filters and reset the list,</li>
+  <li>Select the relevant objects or select <em>All</em> check box and press <em>Generate Report</em>, the report will then be produced.</li>
+</ol>
+
+<h3 id="report-output">Report output</h3>
+
+<p>Includes</p>
+
+<ul>
+  <li>Statistics table based on the state of Projects, Sample, Library, Runs
+    <ul>
+      <li>with doughnut chart(s)</li>
+    </ul>
+  </li>
+  <li>Tabular representation of all elements display information for each element separately.
+    <ul>
+      <li>This can be search based on keywords</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="sequencer-resource-calendar">Sequencer Resource Calendar</h2>
+
+<ul>
+  <li>The Resource Calendar shows Run information for each sequencer available in MISO.</li>
+  <li>Results can be filtered:
+    <ul>
+      <li>
+        <p>Based on Instrument</p>
+
+        <ul>
+          <li>Single Instrument or all</li>
+          <li>For single instrument view in multi-flowcell instruments, e.g. HiSeq2000, both cells are shown on separate rows.</li>
+        </ul>
+      </li>
+      <li>
+        <p>Based on time</p>
+        <ul>
+          <li>Set time periods, i.e. Current Year, Last Year, Last Week, Last Month, Last Three Months, Last Six Months</li>
+          <li>In Custom, start and end dates can be selected independently</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h1 id="submissions">Submissions</h1>
+
+<p>MISO has an automated submission feature, enabling you to quickly and easily submit your sequence meta data to public repositories such as the EBI. MISO will automatically generate the required XML documents based on the information already stored in the system, and submit these to the repository. MISO can also be configured to initiate upload of your actual sequence data.</p>
+
+<h3 id="preparing-new-submissions">Preparing new Submissions</h3>
+
+<ul>
+  <li>To prepare a new Submission, go to the <em>My Account</em> tab, and choose <em>Prepare new Submission</em>.</li>
+  <li>Enter a title, alias and description for your submission in the appropriate boxes.</li>
+  <li>Choose the action for the submission from the options: Add, Modify, suppress, Hold, Release, Close, Protect or Validate.</li>
+  <li>You can now choose which elements you want to submit:
+    <ul>
+      <li>From the list of Projects, clicking on any of these will reveal a drop-down list of submittable elements.</li>
+      <li>Check the boxes next to the elements you wish to submit, and click <em>Save</em>.</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="previewing-validating-and-submitting-metadata">Previewing, Validating and Submitting Metadata</h3>
+
+<ul>
+  <li>Once you have saved your Submission, you will see links to either Preview, Validate or Submit your submission metadata.
+    <ul>
+      <li><strong>Preview</strong> will show you a condensed version of the metadata in a new browser window.</li>
+      <li><strong>Validate</strong> will generate the submission XMLs and send them to the EBI validation service. Any problems with the XMLs will be displayed in the browser window - errors in Red and information in Yellow. The actual metadata will be displayed below these warnings.</li>
+      <li><strong>Submit Metadata</strong> will start the metadata submission process. This will also be validated, and will fail, displaying error messages if the XML is invalid.</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="submitting-sequence-data">Submitting Sequence Data</h3>
+
+<ul>
+  <li>Once you have saved your Submission, you will see a link to submit your sequence data.</li>
+  <li>MISO has a number of mechanisms to find data files based on the platform and submittable elements selected.</li>
+  <li>These mechanisms should be suitable for most platforms outputting data to standard locations. If not, please see the Developer Manual section on writing custom FilePathGenerators.</li>
+  <li>MISO also has mechanisms for uploading data to submission endpoints, e.g. the EBI SRA. MISO ships with a built-in FTP upload feature that will connect to an FTP server and upload datafiles. We are currently working on implementing other, faster upload methods such as ASPERA.</li>
+</ul>
+
+<h3 id="list-submissions">List Submissions</h3>
+
+<ul>
+  <li>Choose <em>List Submissions</em> from the admin area to see a list of all submissions that have been created so far, along with their status. You can edit any of these by clicking the <em>Edit</em> link.</li>
+</ul>
+
+<h1 id="notification-server">Notification Server</h1>
+
+<p>The Notification Server module for MISO collects up sequencer run information from a given set of datapaths (directories on a filesystem) and sends that information to MISO in a simple JSON format, which consumes it and automatically creates and updates Run objects as necessary.</p>
+
+<h3 id="installing">Installing</h3>
+
+<ul>
+  <li>Grab the notification-server jar from the MISO repos site: <a href="https://repos.tgac.ac.uk/miso/release/notification-server-0.1.9.one-jar.jar">https://repos.tgac.ac.uk/miso/release/notification-server-0.2.0.one-jar.jar</a></li>
+  <li>Grab <strong>example-notification.properties</strong> and <strong>run_notification_server.sh</strong> from <a href="https://repos.tgac.ac.uk/miso/common/">https://repos.tgac.ac.uk/miso/common/</a></li>
+  <li>Copy everything to a machine that has access to your sequencer’s run folders.
+    <ul>
+      <li>For example, at TGAC we run it on a specialised virtual machine that has the output folders mounted as a network share. You could just as easily run this module on a cluster head node, or indeed an actual sequencer control PC.</li>
+    </ul>
+  </li>
+  <li>Copy the <strong>example-notification.properties</strong> to a new file called <strong>notification.properties</strong>.</li>
+  <li>Edit the information in the properties file to match your desired configuration. See <em>Configuring</em> below.</li>
+</ul>
+
+<h3 id="configuring">Configuring</h3>
+
+<ul>
+  <li>
+    <p>The supported platforms are: <strong>illumina, solid, ls454, pacbio</strong>. Each subsequent property is demarcated by this platform identifier.</p>
+
+    <ul>
+      <li><strong>wiretap.enabled</strong>:false
+        <ul>
+          <li>Enabling this global option will give you very verbose output about what is getting packaged up and sent to the MISO server. Only turn this on if you like lots of eye-burning developer output.</li>
+        </ul>
+      </li>
+      <li><strong>illumina.dataPaths</strong>:/path/to/your/illumina/run/folders
+        <ul>
+          <li>Set this property to one or more (comma separated) paths on the filesystem where your Illumina run folders are stored.</li>
+        </ul>
+      </li>
+      <li><strong>illumina.http.statusEndpointURIs</strong>:<a href="http://your.miso.server/miso/consumer/illumina/run/status">http://your.miso.server/miso/consumer/illumina/run/status</a>
+        <ul>
+          <li>Set this property to one or more (comma separated) URLs that represent endpoints to send the run information to. This is usually a MISO install, but could be any JSON endpoint you choose. Please see the Developer Documentation for the JSON schema if you want to develop your own endpoints.</li>
+        </ul>
+      </li>
+      <li><strong>illumina.scanRate</strong>:600000
+        <ul>
+          <li>Sets the period in milliseconds to poll the dataPaths above for new folders</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <ul>
+      <li><strong>solid.dataPaths</strong>:/path/to/your/solid/run/folders
+        <ul>
+          <li>As above.</li>
+        </ul>
+      </li>
+      <li><strong>solid.http.statusEndpointURIs</strong>:<a href="http://your.miso.server/miso/consumer/solid/run/status">http://your.miso.server/miso/consumer/solid/run/status</a>
+        <ul>
+          <li>As above.</li>
+        </ul>
+      </li>
+      <li><strong>solid.wsdl.url.s0000</strong>:<a href="http://149.155.210.200:8080/sets/webservice/solid?wsdl">http://your.solid.machine1:8080/sets/webservice/solid?wsdl</a>
+        <ul>
+          <li>Some SOLiD platforms expose web services that can be queried for information. Enter the wsdl path here. The part of property key after the ‘url’, i.e. solid.wsdl.url.<strong>s0000</strong> needs to EXACTLY MATCH the sequencer reference name held in MISO for this machine. There can be more than one of these properties, each with a unique sequencer reference identifier.</li>
+        </ul>
+      </li>
+      <li><strong>solid.scanRate</strong>:600000
+        <ul>
+          <li>As above.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <ul>
+      <li><strong>ls454.dataPaths</strong>:/path/to/your/454/run/folders
+        <ul>
+          <li>As above.</li>
+        </ul>
+      </li>
+      <li><strong>ls454.http.statusEndpointURIs</strong>:<a href="http://your.miso.server/miso/consumer/ls454/run/status">http://your.miso.server/miso/consumer/ls454/run/status</a>
+        <ul>
+          <li>As above.</li>
+        </ul>
+      </li>
+      <li><strong>ls454.scanRate</strong>:600000
+        <ul>
+          <li>As above.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <ul>
+      <li><strong>pacbio.dataPaths</strong>:/path/to/your/pacbio/run/folders
+        <ul>
+          <li>As above.</li>
+        </ul>
+      </li>
+      <li><strong>pacbio.http.statusEndpointURIs</strong>:<a href="http://your.miso.server/miso/consumer/pacbio/run/status">http://your.miso.server/miso/consumer/pacbio/run/status</a>
+        <ul>
+          <li>As above.</li>
+        </ul>
+      </li>
+      <li><strong>pacbio.ws.url.12345</strong>:<a href="http://n56105.nbi.ac.uk/">http://your.pacbio.machine1/</a>
+        <ul>
+          <li>As with the SOLiD web services url, this property represents the PacBio RS REST API endpoint. The part of property key after the ‘url’, i.e. pacbio.ws.url.<strong>12345</strong> needs to EXACTLY MATCH the sequencer reference name held in MISO for this machine. There can be more than one of these properties, each with a unique sequencer reference identifier.</li>
+        </ul>
+      </li>
+      <li><strong>pacbio.scanRate</strong>:600000
+        <ul>
+          <li>As above.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="running">Running</h3>
+
+<p>Simply run the <strong>run_notification_server.sh</strong> shell script. We usually do this in a <strong>screen</strong> (*nix) so you can detach the process and come back to it later on. If you are on Windows, knock up a quick batch script that does the same thing!</p>
+
+<h1 id="analysis-server">Analysis Server</h1>
+
+<p>The Analysis Server module enables MISO to perform workflows as simple pipeline tasks, comprising one or more processes, and fire these off to an LSF machine. This code is heavily based on the ArrayExpress Conan architecture, developed at the EBI by Tony Burdett.</p>
+
+<h3 id="installing-1">Installing</h3>
+
+<ul>
+  <li>Grab the analysis-server jar from the MISO repos site: <a href="https://repos.tgac.ac.uk/miso/release/analysis-server-0.1.9.one-jar.jar">https://repos.tgac.ac.uk/miso/release/analysis-server-0.2.0.one-jar.jar</a></li>
+  <li>Grab <strong>example-analysis.properties</strong> and <strong>run_analysis_server.sh</strong> from <a href="https://repos.tgac.ac.uk/miso/common/">https://repos.tgac.ac.uk/miso/common/</a></li>
+  <li>Copy it to a machine that has the ability to run jobs via LSF (bsub).
+    <ul>
+      <li>For example, at TGAC we run this on a machine that can call our LSF master.</li>
+    </ul>
+  </li>
+  <li>Copy the <strong>example-analysis.properties</strong> to a new file called <strong>analysis.properties</strong>.</li>
+  <li>Set up a new MySQL instance on a server (or use an existing one) and install the Conan database
+    <ul>
+      <li>Grab the Conan MySQL dump from <a href="https://repos.tgac.ac.uk/miso/common/">https://repos.tgac.ac.uk/miso/common/</a></li>
+    </ul>
+  </li>
+  <li>Edit the information in the properties file to match your desired configuration. See <em>Configuring</em> below.</li>
+</ul>
+
+<h3 id="configuring-1">Configuring</h3>
+
+<ul>
+  <li><strong>analysis.server.port</strong>:7898
+    <ul>
+      <li>The port that the server will listen for queries.</li>
+    </ul>
+  </li>
+  <li><strong>analysis.client.host</strong>:localhost
+    <ul>
+      <li>The client socket hostname that will send out responses (usually ‘localhost’)</li>
+    </ul>
+  </li>
+  <li><strong>analysis.client.port</strong>:7898
+    <ul>
+      <li>The socket port of the client that sends out responses (usually the same as the server port)</li>
+    </ul>
+  </li>
+  <li><strong>analysis.db.url</strong>:<a>jdbc:mysql://your.conan.db.server:3306/conan</a>
+    <ul>
+      <li>Conan writes task and process tracking information to a SQL database. Supply the connection string to that database here</li>
+    </ul>
+  </li>
+  <li><strong>analysis.db.username</strong>:conan
+    <ul>
+      <li>The Conan db username</li>
+    </ul>
+  </li>
+  <li><strong>analysis.db.password</strong>:conan
+    <ul>
+      <li>The Conan db password</li>
+    </ul>
+  </li>
+  <li><strong>analysis.server.maxMessageSize</strong>:20480
+    <ul>
+      <li>The maximum message size that can be received by the server</li>
+    </ul>
+  </li>
+  <li><strong>analysis.client.maxMessageSize</strong>:20480
+    <ul>
+      <li>The maximum message size that can be sent out by the client</li>
+    </ul>
+  </li>
+  <li><strong>analysis.submission.parallelJobLimit</strong>:30
+    <ul>
+      <li>The maximum number of parallel jobs that can be processed.</li>
+    </ul>
+  </li>
+  <li><strong>analysis.submission.coolingOffPeriod</strong>:120
+    <ul>
+      <li>The length of time in seconds between submitting a job submission task request and the job being sent to LSF.</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="running-1">Running</h3>
+
+<p>Simply run the <strong>run_analysis_server.sh</strong> shell script. We usually do this in a <strong>screen</strong> (*nix) so you can detach the process and come back to it later on. If you are on Windows, knock up a quick batch script that does the same thing!</p>
+
+<h1 id="troubleshooting">Troubleshooting</h1>
+
+<ul>
+  <li>The current MISO is a beta version so as such doesn’t guarantee bug free usage.</li>
+  <li>If a bug has been found it can be reported to the developers via the <a href="https://tracker.tgac.ac.uk/">MISO JIRA issue system</a>.</li>
+  <li>If you are a developer and have found a bug and have fixed it, please submit a patch via the <a href="https://tracker.tgac.ac.uk/">MISO JIRA system</a>.</li>
+</ul>
+
+
+
+                    </div>
+                
+            </div>
+
+            
+
+            <div class="row">
+                <div id="footer" class="col-sm-12">
+                    Documentation for <a href="https://github.com/TGAC/miso-lims">MISO</a>
+
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function orderNav() {
+                var list,
+                    section,
+                    header,
+                    sections = [],
+                    lists = {},
+                    headers = {};
+
+                var navUl = document.querySelectorAll('#navigation ul')[0],
+                    navLis = document.querySelectorAll('#navigation ul li');
+
+                if (!navUl) return;
+
+                for (var i = 0; i < navLis.length; i++) {
+                    var order, li = navLis[i];
+
+                    if (li.classList.contains('nav-header')) {
+                        section = li.textContent || li.innerText;
+                        sections.push(section);
+                        headers[section] = li;
+                        continue;
+                    }
+
+                    if (!lists[section]) {
+                        lists[section] = [];
+                    }
+
+                    order = parseFloat(li.getAttribute('data-order'))
+                    lists[section].push([order, li]);
+                }
+
+                for (var i = 0; i < sections.length; i++) {
+                    section = sections[i];
+                    list = lists[section].sort(function(a, b) {
+                        return a[0] - b[0];
+                    });
+
+                    if (header = headers[section]) {
+                        navUl.appendChild(header);
+                    }
+                    for (var j = 0; j < list.length; j++) {
+                        navUl.appendChild(list[j][1]);
+                    }
+                }
+            }
+
+            if (document.querySelectorAll) orderNav();
+        </script>
+        
+    </body>
+</html>

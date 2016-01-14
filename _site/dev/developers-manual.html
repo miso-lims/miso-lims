@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width">
+
+        <title>MISO : Developer's Manual</title>
+        <meta name="description" content="An open-source LIMS for NGS sequencing centres">
+
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="/miso-lims/css/syntax.css">
+        <link rel="stylesheet" href="/miso-lims/css/main.css">
+    </head>
+    <body>
+<a href="https://github.com/TGAC/miso-lims"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a>
+        <div class="container">
+            <div class="row">
+                <div id="header" class="col-sm-12">
+                    <h2><a class="brand" href="/miso-lims/"><img src="/miso-lims/images/MISO.png"/>MISO</a>
+    <small>An open-source LIMS for NGS sequencing centres</small>
+</h2>
+
+                </div>
+            </div>
+
+            <div class="row">
+                
+                
+                    <div id="navigation" class="col-sm-2">
+                        <ul class="nav nav-list">
+    <!--<li><a href="/miso-lims/">Home</a></li>-->
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Getting Started</li>
+            
+            <li data-order="1"><a href="/miso-lims/start/installation.html">Installation</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">User Guides</li>
+            
+            <li data-order="1"><a href="/miso-lims/usr/user-manual.html">User Manual</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Admin Guides</li>
+            
+            <li data-order=""><a href="/miso-lims/adm/external-webapp.html">Configuring the external webapp</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Developer Guides</li>
+            
+            <li data-order=""><a href="/miso-lims/dev/rest-testing.html">REST Testing</a></li>
+        
+            
+            <li data-order=""><a href="/miso-lims/dev/maven-artifacts.html">Maven artifacts</a></li>
+        
+            
+            <li data-order=""><a href="/miso-lims/dev/kit-tracking.html">Kit Tracking</a></li>
+        
+            
+            <li data-order=""><a href="/miso-lims/dev/eclipse-code-formatting.html">Eclipse Code Formatting</a></li>
+        
+            
+            <li data-order=""><a href="/miso-lims/dev/code-style.html">Code Style</a></li>
+        
+            
+            <li data-order=""><a href="/miso-lims/dev/developers-manual.html">Developer's Manual</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Reference</li>
+            
+            <li data-order=""><a href="/miso-lims/ref/rest-api.html">REST API</a></li>
+        
+    
+        
+        
+
+        
+            
+                <li class="nav-header">Posts</li>
+            
+            <li data-order=""><a href="/miso-lims/post/changelogs-0.2.0.html">Version 0.2.0</a></li>
+        
+            
+            <li data-order=""><a href="/miso-lims/post/changelogs-0.1.9.html">Version 0.1.9</a></li>
+        
+    
+<!-- List additional links. It is recommended to add a divider
+    e.g. <li class="divider"></li> first to break up the content. -->
+</ul>
+
+                    </div>
+
+                    <div id="content" class="col-sm-10">
+                        <div class="page-header">
+    <h2>Developer's Manual
+        
+    </h2>
+</div>
+
+<p><img src="/plugins/servlet/confluence/placeholder/macro?definition=e3RvYzpvdXRsaW5lPXRydWV9&amp;locale=en_GB&amp;version=2" alt="" /></p>
+
+<h1 id="introduction">Introduction</h1>
+
+<p>This is the “Really Big Index” of all MISO’s major development areas. Some things may be missing here - if so, please <a href="http://tracker.tgac.ac.uk">contact us</a>.</p>
+
+<p>In-depth complete class information is held in the nightly <a href="https://repos.tgac.bbsrc.ac.uk/miso/nightly/javadoc/site/">Javadoc</a>, built from the <a href="https://github.com/TGAC/miso-lims/tree/develop">github develop branch</a><a href="https://repos.tgac.bbsrc.ac.uk/miso/nightly/javadoc/">.</a></p>
+
+<h1 id="core">Core</h1>
+
+<p>The core module represents the heart of MISO which models the domain of NGS metadata tracking that underpins the other modules.</p>
+
+<h2 id="domain-model">Domain Model</h2>
+
+<p>The MISO domain model incorporates those objects which are central to describing the generic core workflow of NGS experiments.</p>
+
+<p><img src="/miso-lims/images/core_model.png" alt="MISO model interfaces" /></p>
+
+<h3 id="core-behavioral-interfaces">Core Behavioral Interfaces</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Interface</th>
+      <th>Description</th>
+      <th>Extending interfaces / Implementing classes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Alertable.java">Alertable</a></td>
+      <td>Defines whether an implementing object is able to have <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/event/listener/MisoListener.java">MisoListener</a> objects registered to it. These listeners are automatically picked up by the Alerting system and used in event propagation to produce alerts that can be tracked by the system (see <a href="#DeveloperManual-SystemLevelAlerts">System Level Alerts</a>) or raised to a particular Group or User (see <a href="#DeveloperManual-UserLevelAlerts">User Level Alerts</a>).</td>
+      <td><a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Pool.java">Pool</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Project.java">Project</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Run.java">Run</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/impl/ProjectOverview.java">ProjectOverview</a></td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Barcodable.java">Barcodable</a></td>
+      <td>Defines whether an implementing object is able to be identified by a barcode string. This interface also defines a label text property which can be used to provide abstraction of a number of member properties into a printable string.</td>
+      <td><a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Dilution.java">Dilution</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Kit.java">Kit</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Library.java">Library</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Plate.java">Plate</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Pool.java">Pool</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Sample.java">Sample</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/SequencerPartitionContainer.java">SequencerPartitionContainer</a></td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Deletable.java">Deletable</a></td>
+      <td>Defines whether an implementing object is deletable by the system. The isDeletable() method defines a contract for ascertaining whether the object has any dependencies that prevent it from being removed, e.g. child members.</td>
+      <td><a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Dilution.java">Dilution</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Experiment.java">Experiment</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Library.java">Library</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Plate.java">Plate</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Pool.java">Pool</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Project.java">Project</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/QC.java">QC</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Run.java">Run</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Sample.java">Sample</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/SequencerReference.java">SequencerReference</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Study.java">Study</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/event/Alert.java">Alert</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/impl/emPCR.java">emPCR</a></td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Locatable.java">Locatable</a></td>
+      <td>Defines whether an implementing object is able to be located by a barcode string, e.g. a freezer shelf barcode.</td>
+      <td><a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Kit.java">Kit</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Library.java">Library</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Plate.java">Plate</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Sample.java">Sample</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/SequencerPartitionContainer.java">SequencerPartitionContainer</a></td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Nameable.java">Nameable</a></td>
+      <td>Defines whether an implementing object is able to be identified by a unique long and named by a string. This name may or may not be unique depending on the given <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/naming/MisoNamingScheme.java">MisoNamingScheme</a> applied (see <a href="#DeveloperManual-NamingSchemes">Naming Schemes</a>). This interface is heavily used in MISO for all persistable objects.</td>
+      <td><a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Barcodable.java">Barcodable</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Experiment.java">Experiment</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/HardwareReference.java">HardwareReference</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Plateable.java">Plateable</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Poolable.java">Poolable</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Project.java">Project</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Run.java">Run</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Study.java">Study</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Submission.java">Submission</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/TagBarcode.java">TagBarcode</a></td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Plateable.java">Plateable</a></td>
+      <td>Defines whether an implementing object can be placed in a <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Plate.java">Plate</a>.</td>
+      <td><a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Dilution.java">Dilution</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Library.java">Library</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Sample.java">Sample</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/impl/_96WellPlate.java">_96WellPlate</a></td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Poolable.java">Poolable</a></td>
+      <td>Defines whether an implementing object can be placed in a <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Pool.java">Pool</a><a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Pool.java">.</a></td>
+      <td><a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Dilution.java">Dilution</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Plate.java">Plate</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Pool.java">Pool</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Poolable.java">Poolable</a> (itself)</td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Reportable.java">Reportable</a></td>
+      <td>Defines whether an implementing object can be used as input for a given report.</td>
+      <td><a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Project.java">Project</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Run.java">Run</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Sample.java">Sample</a></td>
+    </tr>
+    <tr>
+      <td>Securable</td>
+      <td>Defines whether an object can be read from or written to, given a User.</td>
+      <td><a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/security/SecurableByProfile.java">SecurableByProfile</a></td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Submittable.java">Submittable</a></td>
+      <td>Defines whether an implementing object can be aggregated into a <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Submission.java">Submission</a> object.</td>
+      <td><a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Experiment.java">Experiment</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Project.java">Project</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Run.java">Run</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Sample.java">Sample</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/SequencerPoolPartition.java">SequencerPoolPartition</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Study.java">Study</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Submission.java">Submission</a></td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Watchable.java">Watchable</a></td>
+      <td>Defines whether an implementing object can be assigned watchers that will receive alerts upon the occurrence of defined events.</td>
+      <td><a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Pool.java">Pool</a>, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Project.java">Project</a><span>,</span> <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Run.java">Run</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="core-model-interfaces">Core Model Interfaces</h3>
+
+<p>These interfaces represent the objects that store state inherent to the MISO model, and are a superset of the <a href="http://www.ebi.ac.uk/ena/about/sra_format">EBI SRA domain model schema</a>. This means that as object fields are inputted by technicians/auxiliary tools using MISO, the submission schema for the SRA is being populated behind-the-scenes. Decorators are then used to wrap up the synonymous objects so that SRA XMLs can be generated (see <a href="#DeveloperManual-ENADecorators">ENA Decorators</a>).</p>
+
+<p><img src="/download/attachments/950284/image2013-5-29%2017%3A12%3A25.png?version=1&amp;modificationDate=1369843955000&amp;api=v2&amp;effects=border-simple,blur-border" alt="MISO SRA schema model subset" title="MISO Documentation &gt; Developer Manual &gt; image2013-5-29 17:12:25.png (MISO SRA schema model subset)" /></p>
+
+<h3 id="core-security-interfaces">Core Security Interfaces</h3>
+
+<p>MISO objects are secured based on a SecurityProfile associated with that object:</p>
+
+<div class="highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre><span class="line-numbers"> <a href="#n1" name="n1">1</a></span><span style="color:#088;font-weight:bold">public</span> <span style="color:#339;font-weight:bold">class</span> <span style="color:#B06;font-weight:bold">SecurityProfile</span> <span style="color:#088;font-weight:bold">implements</span> <span style="color:#0a8;font-weight:bold">Serializable</span> {
+<span class="line-numbers"> <a href="#n2" name="n2">2</a></span>  ...
+<span class="line-numbers"> <a href="#n3" name="n3">3</a></span>
+<span class="line-numbers"> <a href="#n4" name="n4">4</a></span>  private User owner = <span style="color:#069">null</span>;
+<span class="line-numbers"> <a href="#n5" name="n5">5</a></span>  <span style="color:#088;font-weight:bold">private</span> <span style="color:#0a8;font-weight:bold">Collection</span>&lt;User&gt; readUsers = <span style="color:#080;font-weight:bold">new</span> <span style="color:#0a8;font-weight:bold">HashSet</span>&lt;User&gt;();
+<span class="line-numbers"> <a href="#n6" name="n6">6</a></span>  <span style="color:#088;font-weight:bold">private</span> <span style="color:#0a8;font-weight:bold">Collection</span>&lt;User&gt; writeUsers = <span style="color:#080;font-weight:bold">new</span> <span style="color:#0a8;font-weight:bold">HashSet</span>&lt;User&gt;();
+<span class="line-numbers"> <a href="#n7" name="n7">7</a></span>  <span style="color:#088;font-weight:bold">private</span> <span style="color:#0a8;font-weight:bold">Collection</span>&lt;<span style="color:#0a8;font-weight:bold">Group</span>&gt; readGroups = <span style="color:#080;font-weight:bold">new</span> <span style="color:#0a8;font-weight:bold">HashSet</span>&lt;<span style="color:#0a8;font-weight:bold">Group</span>&gt;();
+<span class="line-numbers"> <a href="#n8" name="n8">8</a></span>  <span style="color:#088;font-weight:bold">private</span> <span style="color:#0a8;font-weight:bold">Collection</span>&lt;<span style="color:#0a8;font-weight:bold">Group</span>&gt; writeGroups = <span style="color:#080;font-weight:bold">new</span> <span style="color:#0a8;font-weight:bold">HashSet</span>&lt;<span style="color:#0a8;font-weight:bold">Group</span>&gt;();
+<span class="line-numbers"> <a href="#n9" name="n9">9</a></span>  <span style="color:#088;font-weight:bold">private</span> <span style="color:#339;font-weight:bold">boolean</span> allowAllInternal = <span style="color:#069">true</span>;
+<span class="line-numbers"><strong><a href="#n10" name="n10">10</a></strong></span>
+<span class="line-numbers"><a href="#n11" name="n11">11</a></span>  ...
+<span class="line-numbers"><a href="#n12" name="n12">12</a></span>}
+</pre></div>
+</div>
+</div>
+
+<p>SecurityProfiles control access based on a single overarching owner, which always has full access (read/write/delete). Users can then be registered with that object’s SecurityProfile that enable them to read or write information. Similarly, read and write access can be specified at the Group level. The <em>allowAllInternal</em> flag states that any User with the ROLE_INTERNAL role (see LINK User Roles) is able to read and write to this object, regardless of the Group that the User is a part of.</p>
+
+<h2 id="enumerated-types">Enumerated Types</h2>
+
+<p>MISO has two categories of enumerated types: those that are actual Java enums, and those that are database-defined.</p>
+
+<h3 id="enums">Enums</h3>
+
+<p>These concrete enums are intended to provide collections of relatively static instances of descriptive definitions.</p>
+
+<p>_384WellPlatePosition</p>
+
+<p>HealthType</p>
+
+<p>KitType</p>
+
+<p>PlateMaterialType</p>
+
+<p>PlatformType</p>
+
+<p>ProgressType</p>
+
+<p>SubmissionActionType</p>
+
+<h3 id="database-definition-types">Database definition types</h3>
+
+<p>Unlike their enum conterparts, these type definitions are instances of database entities, and as such are user-editable from within the MISO interface. The reason for this is because these types follow the enumerations specified in the <a href="ftp://ftp.sra.ebi.ac.uk/meta/xsd/sra_1_5/SRA.experiment.xsd">Experiment SRA common schema</a>, and are more liable to change.</p>
+
+<p>LibrarySelectionType</p>
+
+<p>LibraryStrategyType</p>
+
+<p>LibraryType</p>
+
+<p>QcType</p>
+
+<h2 id="object-factories">Object Factories</h2>
+
+<h2 id="naming-schemes">Naming Schemes</h2>
+
+<p>All <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Nameable.java">Nameable</a> entities in MISO should conform to a Naming Scheme. This ensures consistency of human-readable names across entity space, and allows centralised validation with no requirement of extra code (backend or frontend) on an external developer’s part.</p>
+
+<p>Naming schemes are resolved by the widely-used SPI/ServiceProvider strategy (see also <a href="#DeveloperManual-NamingSchemeServices">Naming Scheme Services</a>), and default implementations of these schemes are named and set in the MISO webapp configuration (see <a href="#DeveloperManual-Configuration">Web Application Configuration</a>). The global default naming scheme is mapped to “namingScheme”, the global sample scheme to “sampleNamingScheme”, and the global library scheme to “libraryNamingScheme”. Any custom services wanting to replace these beans will need to be mapped to these bean IDs at runtime.</p>
+
+<h3 id="misonamingschemes">MisoNamingSchemes</h3>
+
+<p>A <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/naming/MisoNamingScheme.java">MisoNamingScheme</a> is typed by a class T that will be represented and returned by the <strong>namingSchemeFor()</strong> method. They also need to be uniquely named so that they can be resolved at runtime (see also <a href="#DeveloperManual-NamingSchemeServices">Naming Scheme Services</a>). Fields in the typed class are mapped to validation regular expressions, and exposed via the <strong>validateField(String field, String entityName)</strong> method. Finally, names can be generated by mapping <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/naming/NameGenerator.java">NameGenerator</a> instances (see below) to the fields from which names need to be generated, in the same fashion as the validation mapping process. A default concrete implementation, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/naming/DefaultEntityNamingScheme.java">DefaultEntityNamingScheme</a>, is supplied that will generate and validate entity names of the regex below for any instances of the <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Nameable.java">Nameable</a> class type:</p>
+
+<div class="highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre><span class="line-numbers"><a href="#n1" name="n1">1</a></span>...
+<span class="line-numbers"><a href="#n2" name="n2">2</a></span>type = (<span style="color:#0a8;font-weight:bold">Class</span>&lt;T&gt;)<span style="color:#0a8;font-weight:bold">Class</span>.forName(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">uk.ac.bbsrc.tgac.miso.core.data.Nameable</span><span style="color:#710">&quot;</span></span>);
+<span class="line-numbers"><a href="#n3" name="n3">3</a></span>validationMap.put(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">name</span><span style="color:#710">&quot;</span></span>, <span style="color:#0a8;font-weight:bold">Pattern</span>.compile(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">([A-Z]{3})([0-9]+)</span><span style="color:#710">&quot;</span></span>));
+<span class="line-numbers"><a href="#n4" name="n4">4</a></span>...
+</pre></div>
+</div>
+</div>
+
+<p>In this example, the <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/naming/DefaultEntityNamingScheme.java">DefaultEntityNamingScheme</a> will use reflection to retrieve the contents of the <em>name</em> field via the <strong>getName()</strong> method, as mapped by the “name” key (the “get” prefix is added by the implementation). As such, “FOO123” is a valid name, whereas “BA1” and “BAZ1FOO” are not. If you aren’t worried about name collisions for certain fields (which isn’t really helpful and certainly isn’t recommended), then MISO supplies the <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/naming/AllowAnythingEntityNamingScheme.java">AllowAnythingEntityNamingScheme</a> implementation which validates against the (.*) regex and generates names based on the object’s simple class name and ID.</p>
+
+<p>If access to the persistence store is required when validating/generating names, a dedicated interface is available that require implementations to supply a RequestManager instance, i.e. <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/naming/RequestManagerAwareNamingScheme.java">RequestManagerAwareNamingScheme</a>. This interface extends both the <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/naming/MisoNamingScheme.java">MisoNamingScheme</a> and <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/RequestManagerAware.java">RequestManagerAware</a> interfaces. The two default concrete Sample and Library naming schemes supplied my MISO (<a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/naming/DefaultSampleNamingScheme.java">DefaultSampleNamingScheme</a> and <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/naming/DefaultLibraryNamingScheme.java">DefaultLibraryNamingScheme</a>, respectively) use the <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/naming/RequestManagerAwareNamingScheme.java">RequestManagerAwareNamingScheme</a> interface as they need to check the database for any existing samples/libraries that may have the same alias field value.</p>
+
+<h3 id="namegenerators">NameGenerators</h3>
+
+<p>A <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/naming/NameGenerator.java">NameGenerator</a> interface describes classes that can generate Strings from object fields, and are registered in <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/naming/MisoNamingScheme.java">MisoNamingScheme</a>s via the <span style="color: rgb(51,51,51);"><strong>registerCustomNameGenerator()</strong> method</span>. MISO doesn’t supply any concrete implementations of a <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/naming/NameGenerator.java">NameGenerator</a>, and will only use a custom mapped generator if registered, but, if not, instead uses a basic set of prefixes of the domain model objects to construct names, e.g. Sample -&gt; “SAM&lt;id&gt;”, Library -&gt; “LIB&lt;id&gt;”, etc. The full list of default prefixes is held in the <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/naming/DefaultMisoEntityPrefix.java">DefaultMisoEntityPrefix</a> enum.</p>
+
+<h2 id="managers">Managers</h2>
+
+<h3 id="files">Files</h3>
+
+<p>API access to the underlying filesystem is made available through implementors of the <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/manager/FilesManager.java">FilesManager</a> interface. This interface defines a contract to, based on a properties-supplied base directory (see <a href="#DeveloperManual-Configuration">Web Application Configuration</a> and <a href="https://documentation.tgac.ac.uk/pages/viewpage.action?pageId=950282#Installation&amp;AdministrationManual-Settingupmiso.propertiesfile">Installation Readme</a>), generate temporary files, store files and retrieve files from disk, and list files within a given storage directory. The default file storage path is:</p>
+
+<pre><code>/storage/miso/files
+</code></pre>
+
+<p>It is very important that all the underlying directories exist and are writable by the user that runs the MISO instance, but at any rate MISO will attempt to check and create these paths if not.</p>
+
+<p>This manager provides a mechanism to standardise file output into specific directories based on Java object types (simple class names, lowercased) and qualifiers. These qualifiers are a simple string which can be kept constant by the implementor for a given field, e.g object entity ID. So, for example, sample delivery forms can be generated and stored under a Project type and qualifier (see LINK Sample Delivery Forms). The code to do this looks something like:</p>
+
+<div class="highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre><span class="line-numbers"><a href="#n1" name="n1">1</a></span><span style="color:#0a8;font-weight:bold">File</span> f = misoFileManager.getNewFile(
+<span class="line-numbers"><a href="#n2" name="n2">2</a></span>           Project.class,
+<span class="line-numbers"><a href="#n3" name="n3">3</a></span>           projectId.toString(),
+<span class="line-numbers"><a href="#n4" name="n4">4</a></span>           <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">SampleDeliveryForm-</span><span style="color:#710">&quot;</span></span> + LimsUtils.getCurrentDateAsString() + <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">.odt</span><span style="color:#710">&quot;</span></span>);
+</pre></div>
+</div>
+</div>
+
+<pre><code>
+A project with ID 1 and stored in the default file storage directory on the 31st May 2013 will result in the following path structure:
+
+</code></pre>
+<p>/storage/miso/files/project/1/SampleDeliveryForm-20130531.odt<br />
+```</p>
+
+<p>MISO also obfuscates the actual filename and path within the web application user interfaces by using the file object’s hashcode.</p>
+
+<h3 id="issuetrackers">IssueTrackers</h3>
+
+<p>API access to any registered Issue trackers, e.g. JIRA, RT, Redmine, Mantis, is made available through implementors of the <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/manager/IssueTrackerManager.java">IssueTrackerManager</a> interface. Like a lot of other MISO services, the IssueTrackerManager interface has the @Spi annotation, allowing any custom managers to be automatically resolved at runtime by using the @ServiceProvider annotation on any concrete classes (see <a href="#DeveloperManual-MisoServiceProviders">Miso Service Providers</a>). The interface itself is very simple, with only three methods to override: <strong>getType()</strong> which represents the underlying issue tracker enum, e.g. “JIRA”, <strong>getBaseTrackerUrl()</strong> which represents the REST API base URL of the tracker service, and <strong>getIssue(String issueKey)</strong> which actually does the work of grabbing the issue and representing it as a JSONObject.</p>
+
+<p>Issue tracker managers allow integration with external issue trackers, removing the need to context switch between MISO and said tracker by a user. An example of this feature is in the Project page, where one or more issue IDs can be supplied which will import the issue details from the tracker’s API. Currently the only default supported implementation is JIRA, as provided by the <a href="https://github.com/TGAC/miso-lims/blob/develop/miso-web/src/main/java/uk/ac/bbsrc/tgac/miso/webapp/service/integration/jira/JiraIssueManager.java">JiraIssueManager</a> class.</p>
+
+<h3 id="printers">Printers</h3>
+
+<p>API access to any printing devices, notably barcode printers, is made available through implementors of the <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/manager/PrintManager.java">PrintManager</a> interface. This interface defines the contract whereby <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/printing/MisoPrintService.java">MisoPrintService</a>s and <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/PrintJob.java">PrintJob</a>s can be stored and retrieved, as well as an abstraction of printing content to a print service. Like a lot of other MISO services, the <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/printing/MisoPrintService.java">MisoPrintService</a> interface has the @Spi annotation, allowing any custom printing services to be automatically resolved at runtime by using the @ServiceProvider annotation on any concrete classes (see <a href="#DeveloperManual-MisoServiceProviders">Miso Service Providers</a>).</p>
+
+<p>Because of the varied nature of what needs to be printed and to what device that content will be printed, the MISO printing structure is quite complex.</p>
+
+<p>The <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/printing/MisoPrintService.java">MisoPrintService</a> interface acts as the “glue” that wires every other required printing object together and as such is typed accordingly:</p>
+
+<div class="highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre><span class="line-numbers"><a href="#n1" name="n1">1</a></span><span style="color:#088;font-weight:bold">public</span> <span style="color:#339;font-weight:bold">interface</span> <span style="color:#B06;font-weight:bold">MisoPrintService</span>&lt;T, S, C <span style="color:#088;font-weight:bold">extends</span> PrintContext&lt;T&gt;&gt; {
+<span class="line-numbers"><a href="#n2" name="n2">2</a></span>  ...
+<span class="line-numbers"><a href="#n3" name="n3">3</a></span>}
+</pre></div>
+</div>
+</div>
+
+<p>Various selected methods act on these specified types:</p>
+
+<div class="highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre><span class="line-numbers"> <a href="#n1" name="n1">1</a></span>  C getPrintContext();
+<span class="line-numbers"> <a href="#n2" name="n2">2</a></span>  <span style="color:#339;font-weight:bold">void</span> setPrintContext(C pc);
+<span class="line-numbers"> <a href="#n3" name="n3">3</a></span>
+<span class="line-numbers"> <a href="#n4" name="n4">4</a></span>  <span style="color:#339;font-weight:bold">boolean</span> print(T content) <span style="color:#088;font-weight:bold">throws</span> <span style="color:#C00;font-weight:bold">IOException</span>;
+<span class="line-numbers"> <a href="#n5" name="n5">5</a></span>
+<span class="line-numbers"> <a href="#n6" name="n6">6</a></span>  <span style="color:#339;font-weight:bold">void</span> setPrintServiceFor(<span style="color:#0a8;font-weight:bold">Class</span>&lt;? <span style="color:#088;font-weight:bold">extends</span> S&gt; c);
+<span class="line-numbers"> <a href="#n7" name="n7">7</a></span>  <span style="color:#0a8;font-weight:bold">Class</span>&lt;? <span style="color:#088;font-weight:bold">extends</span> S&gt; getPrintServiceFor();
+<span class="line-numbers"> <a href="#n8" name="n8">8</a></span>
+<span class="line-numbers"> <a href="#n9" name="n9">9</a></span>  <span style="color:#088;font-weight:bold">public</span> T getLabelFor(S b);
+<span class="line-numbers"><strong><a href="#n10" name="n10">10</a></strong></span>  <span style="color:#339;font-weight:bold">void</span> setBarcodableSchema(BarcodableSchema&lt;T, S&gt; barcodableSchema);
+<span class="line-numbers"><a href="#n11" name="n11">11</a></span>  BarcodableSchema getBarcodableSchema();
+</pre></div>
+</div>
+</div>
+
+<p><strong>T</strong> here represents the type that represents the actual label object. This could be a <em>File</em>, <em>String</em>, or other custom object that the <strong>print(T content)</strong> method takes.</p>
+
+<p><strong>S</strong> here represents the domain model class type that will be used to generate the label object <strong>T</strong>, using the specified <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/printing/schema/BarcodableSchema.java">BarcodableSchema</a>, e.g. <em>Sample.class</em></p>
+
+<p>A <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/printing/schema/BarcodableSchema.java">BarcodableSchema</a> represents the way that an object of the domain model class type <strong>S</strong>is converted into the label object <strong>T</strong>:</p>
+
+<div class="highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre><span class="line-numbers"><a href="#n1" name="n1">1</a></span><span style="color:#007">@Spi</span>
+<span class="line-numbers"><a href="#n2" name="n2">2</a></span><span style="color:#088;font-weight:bold">public</span> <span style="color:#339;font-weight:bold">interface</span> <span style="color:#B06;font-weight:bold">BarcodableSchema</span>&lt;S, T&gt; {
+<span class="line-numbers"><a href="#n3" name="n3">3</a></span>  <span style="color:#0a8;font-weight:bold">Class</span>&lt;T&gt; isStateFor();
+<span class="line-numbers"><a href="#n4" name="n4">4</a></span>  <span style="color:#088;font-weight:bold">public</span> <span style="color:#0a8;font-weight:bold">String</span> getRawState(T t);
+<span class="line-numbers"><a href="#n5" name="n5">5</a></span>  <span style="color:#088;font-weight:bold">public</span> S getPrintableLabel(T t);
+<span class="line-numbers"><a href="#n6" name="n6">6</a></span>  <span style="color:#0a8;font-weight:bold">String</span> getName();
+<span class="line-numbers"><a href="#n7" name="n7">7</a></span>  <span style="color:#088;font-weight:bold">public</span> BarcodeLabelFactory&lt;S, T, BarcodableSchema&lt;S, T&gt;&gt; getBarcodeLabelFactory();
+<span class="line-numbers"><a href="#n8" name="n8">8</a></span>}
+</pre></div>
+</div>
+</div>
+
+<p>A <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/printing/context/PrintContext.java">PrintContext</a> defines the actual printer host (IP address, FQDN, LPR/IPP string, etc) and any access credentials required whereby content is printed to a host via the <strong>print(T content)</strong> method:</p>
+
+<div class="highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre><span class="line-numbers"><a href="#n1" name="n1">1</a></span><span style="color:#007">@Spi</span>
+<span class="line-numbers"><a href="#n2" name="n2">2</a></span><span style="color:#088;font-weight:bold">public</span> <span style="color:#339;font-weight:bold">interface</span> <span style="color:#B06;font-weight:bold">PrintContext</span>&lt;T&gt; {
+<span class="line-numbers"><a href="#n3" name="n3">3</a></span>  <span style="color:#339;font-weight:bold">boolean</span> print(T content) <span style="color:#088;font-weight:bold">throws</span> <span style="color:#C00;font-weight:bold">IOException</span>;
+<span class="line-numbers"><a href="#n4" name="n4">4</a></span>  <span style="color:#088;font-weight:bold">public</span> <span style="color:#0a8;font-weight:bold">String</span> getName();
+<span class="line-numbers"><a href="#n5" name="n5">5</a></span>  <span style="color:#088;font-weight:bold">public</span> <span style="color:#0a8;font-weight:bold">String</span> getDescription();
+<span class="line-numbers"><a href="#n6" name="n6">6</a></span>  <span style="color:#088;font-weight:bold">public</span> <span style="color:#0a8;font-weight:bold">String</span> getHost();
+<span class="line-numbers"><a href="#n7" name="n7">7</a></span>}
+</pre></div>
+</div>
+</div>
+<p>The <strong>print(T content)</strong> method usually delegates to a <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/printing/strategy/PrintStrategy.java">PrintStrategy</a>, thus allowing different printing mechanisms to be used to the same <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/printing/context/PrintContext.java">PrintContext</a>, e.g. the same printer might accept both FTP and spooler jobs. Like a lot of other MISO services, the <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/printing/context/PrintContext.java">PrintContext</a> interface has the @Spi annotation, allowing any custom printing contexts to be automatically resolved at runtime by using the @ServiceProvider annotation on any concrete classes (see <a href="#DeveloperManual-MisoServiceProviders">Miso Service Providers</a>).</p>
+
+<p>The <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/printing/strategy/PrintStrategy.java">PrintStrategy</a> interface defines a single method, <strong>print(T content, C pc)</strong>, which actually initiates whatever mechanism is required to print the label content <strong>T</strong> to the relevant <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/printing/context/PrintContext.java">PrintContext</a> <strong>C</strong>:</p>
+
+<div class="highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre><span class="line-numbers"><a href="#n1" name="n1">1</a></span><span style="color:#088;font-weight:bold">public</span> <span style="color:#339;font-weight:bold">interface</span> <span style="color:#B06;font-weight:bold">PrintStrategy</span>&lt;T, C <span style="color:#088;font-weight:bold">extends</span> PrintContext&gt; {
+<span class="line-numbers"><a href="#n2" name="n2">2</a></span>  <span style="color:#088;font-weight:bold">public</span> <span style="color:#339;font-weight:bold">boolean</span> print(T content, C pc) <span style="color:#088;font-weight:bold">throws</span> <span style="color:#C00;font-weight:bold">IOException</span>;
+<span class="line-numbers"><a href="#n3" name="n3">3</a></span>}
+</pre></div>
+</div>
+</div>
+
+<p>Phew! So by means of an example, let’s take a MisoPrintService that takes a JSONObject object as content, produces a File that represents barcode label information, and a strategy that knows how to print this file by FTPing it to a printer (this is what actually happens for the Brady IP300/CAB Mach4 printers we have at TGAC, via the <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/printing/CustomPrintService.java">CustomPrintService</a> implementation):</p>
+
+<div class="highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre><span class="line-numbers"><a href="#n1" name="n1">1</a></span><span style="color:#007">@ServiceProvider</span>
+<span class="line-numbers"><a href="#n2" name="n2">2</a></span><span style="color:#088;font-weight:bold">public</span> <span style="color:#339;font-weight:bold">class</span> <span style="color:#B06;font-weight:bold">CustomPrintService</span> <span style="color:#088;font-weight:bold">implements</span> MisoPrintService&lt;<span style="color:#0a8;font-weight:bold">File</span>, JSONObject, PrintContext&lt;<span style="color:#0a8;font-weight:bold">File</span>&gt;&gt; {
+<span class="line-numbers"><a href="#n3" name="n3">3</a></span>  <span style="color:#088;font-weight:bold">private</span> BarcodableSchema&lt;<span style="color:#0a8;font-weight:bold">File</span>, JSONObject&gt; barcodableSchema;
+<span class="line-numbers"><a href="#n4" name="n4">4</a></span>  ...
+<span class="line-numbers"><a href="#n5" name="n5">5</a></span>}
+</pre></div>
+</div>
+</div>
+
+<p>To generate a label File from the JSONObject content, the class calls on the member <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/printing/schema/BarcodableSchema.java">BarcodableSchema</a>:</p>
+
+<div class="highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre><span class="line-numbers"><a href="#n1" name="n1">1</a></span><span style="color:#088;font-weight:bold">public</span> <span style="color:#0a8;font-weight:bold">File</span> getLabelFor(JSONObject b) {
+<span class="line-numbers"><a href="#n2" name="n2">2</a></span>  <span style="color:#080;font-weight:bold">return</span> getBarcodableSchema().getPrintableLabel(b);
+<span class="line-numbers"><a href="#n3" name="n3">3</a></span>}
+</pre></div>
+</div>
+</div>
+
+<p>The schema in this case is the <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/printing/schema/impl/BradyCustomStandardTubeBarcodeLabelSchema.java">BradyCustomStandardTubeBarcodeLabelSchema</a> implementation, which is the concrete class that can generate the <a href="https://www.google.co.uk/url?sa=t&amp;rct=j&amp;q=&amp;esrc=s&amp;source=web&amp;cd=3&amp;cad=rja&amp;ved=0CD4QFjAC&amp;url=http%3A%2F%2Fdomino.bradycms.com%2Fbrady%2Folrsv1r0.nsf%2F67493912eb200af0862568cb005367ff%2Ff5cdfc510e26b3f7c12571fc004626e2%2F%24FILE%2FProgman61_Brady.pdf&amp;ei=sLCtUaOGHMm0PLnOgcAK&amp;usg=AFQjCNFUNw75_6OiUFVvpqumm4acpZ0CBg&amp;sig2=ZfdstELqsNIcW4Cr3OaSog">Brady printer’s JScript format</a> from a JSON input string:</p>
+
+<div class="highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre><span class="line-numbers"> <a href="#n1" name="n1">1</a></span><span style="color:#007">@ServiceProvider</span>
+<span class="line-numbers"> <a href="#n2" name="n2">2</a></span><span style="color:#088;font-weight:bold">public</span> <span style="color:#339;font-weight:bold">class</span> <span style="color:#B06;font-weight:bold">BradyCustomStandardTubeBarcodeLabelSchema</span> <span style="color:#088;font-weight:bold">implements</span> BarcodableSchema&lt;<span style="color:#0a8;font-weight:bold">File</span>, JSONObject&gt; {
+<span class="line-numbers"> <a href="#n3" name="n3">3</a></span>  <span style="color:#088;font-weight:bold">private</span> BarcodeLabelFactory&lt;<span style="color:#0a8;font-weight:bold">File</span>, JSONObject, BarcodableSchema&lt;<span style="color:#0a8;font-weight:bold">File</span>, JSONObject&gt;&gt; barcodeLabelFactory = <span style="color:#080;font-weight:bold">new</span> FileGeneratingBarcodeLabelFactory&lt;JSONObject&gt;();
+<span class="line-numbers"> <a href="#n4" name="n4">4</a></span>  ...
+<span class="line-numbers"> <a href="#n5" name="n5">5</a></span>
+<span class="line-numbers"> <a href="#n6" name="n6">6</a></span>  <span style="color:#007">@Override</span>
+<span class="line-numbers"> <a href="#n7" name="n7">7</a></span>  <span style="color:#088;font-weight:bold">public</span> <span style="color:#0a8;font-weight:bold">String</span> getRawState(JSONObject jsonObject) {
+<span class="line-numbers"> <a href="#n8" name="n8">8</a></span>    <span style="color:#0a8;font-weight:bold">StringBuilder</span> sb = <span style="color:#080;font-weight:bold">new</span> <span style="color:#0a8;font-weight:bold">StringBuilder</span>();
+<span class="line-numbers"> <a href="#n9" name="n9">9</a></span>    <span style="color:#080;font-weight:bold">try</span> {
+<span class="line-numbers"><strong><a href="#n10" name="n10">10</a></strong></span>      <span style="color:#0a8;font-weight:bold">String</span> barcodeit = jsonObject.getString(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">barcode</span><span style="color:#710">&quot;</span></span>);
+<span class="line-numbers"><a href="#n11" name="n11">11</a></span>      <span style="color:#0a8;font-weight:bold">String</span> field1 = jsonObject.getString(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">field1</span><span style="color:#710">&quot;</span></span>);
+<span class="line-numbers"><a href="#n12" name="n12">12</a></span>      <span style="color:#0a8;font-weight:bold">String</span> alias = jsonObject.getString(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">field2</span><span style="color:#710">&quot;</span></span>);
+<span class="line-numbers"><a href="#n13" name="n13">13</a></span>      <span style="color:#0a8;font-weight:bold">String</span> name = jsonObject.getString(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">field3</span><span style="color:#710">&quot;</span></span>);
+<span class="line-numbers"><a href="#n14" name="n14">14</a></span>      <span style="color:#080;font-weight:bold">if</span> (<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">yes</span><span style="color:#710">&quot;</span></span>.equals(barcodeit)) {
+<span class="line-numbers"><a href="#n15" name="n15">15</a></span>        <span style="color:#0a8;font-weight:bold">String</span> barcode = <span style="color:#080;font-weight:bold">new</span> <span style="color:#0a8;font-weight:bold">String</span>(Base64.encodeBase64(field1.getBytes(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">UTF-8</span><span style="color:#710">&quot;</span></span>)));
+<span class="line-numbers"><a href="#n16" name="n16">16</a></span>        sb.append(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">m m</span><span style="color:#710">&quot;</span></span>).append(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#b0b">\n</span><span style="color:#710">&quot;</span></span>);
+<span class="line-numbers"><a href="#n17" name="n17">17</a></span>        sb.append(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">J</span><span style="color:#710">&quot;</span></span>).append(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#b0b">\n</span><span style="color:#710">&quot;</span></span>);
+<span class="line-numbers"><a href="#n18" name="n18">18</a></span>        sb.append(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">S l1;0,0,12,15,38</span><span style="color:#710">&quot;</span></span>).append(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#b0b">\n</span><span style="color:#710">&quot;</span></span>);
+<span class="line-numbers"><a href="#n19" name="n19">19</a></span>        sb.append(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">B 3,2,0,DATAMATRIX,0.21;</span><span style="color:#710">&quot;</span></span>).append(barcode).append(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#b0b">\n</span><span style="color:#710">&quot;</span></span>);
+<span class="line-numbers"><strong><a href="#n20" name="n20">20</a></strong></span>        sb.append(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">B 17,1,0,DATAMATRIX+RECT,0.25;</span><span style="color:#710">&quot;</span></span>).append(barcode).append(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#b0b">\n</span><span style="color:#710">&quot;</span></span>);
+<span class="line-numbers"><a href="#n21" name="n21">21</a></span>        sb.append(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">T 29,2,0,5,pt4;[DATE]</span><span style="color:#710">&quot;</span></span>).append(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#b0b">\n</span><span style="color:#710">&quot;</span></span>);
+<span class="line-numbers"><a href="#n22" name="n22">22</a></span>      }
+<span class="line-numbers"><a href="#n23" name="n23">23</a></span>      <span style="color:#080;font-weight:bold">else</span> {
+<span class="line-numbers"><a href="#n24" name="n24">24</a></span>        sb.append(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">m m</span><span style="color:#710">&quot;</span></span>).append(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#b0b">\n</span><span style="color:#710">&quot;</span></span>);
+<span class="line-numbers"><a href="#n25" name="n25">25</a></span>        sb.append(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">J</span><span style="color:#710">&quot;</span></span>).append(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#b0b">\n</span><span style="color:#710">&quot;</span></span>);
+<span class="line-numbers"><a href="#n26" name="n26">26</a></span>        sb.append(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">S l1;0,0,12,15,38</span><span style="color:#710">&quot;</span></span>).append(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#b0b">\n</span><span style="color:#710">&quot;</span></span>);
+<span class="line-numbers"><a href="#n27" name="n27">27</a></span>        sb.append(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">T 17,5,0,5,pt6;</span><span style="color:#710">&quot;</span></span>).append(LimsUtils.unicodeify(field1)).append(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#b0b">\n</span><span style="color:#710">&quot;</span></span>);
+<span class="line-numbers"><a href="#n28" name="n28">28</a></span>        sb.append(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">T 29,2,0,5,pt4;[DATE]</span><span style="color:#710">&quot;</span></span>).append(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#b0b">\n</span><span style="color:#710">&quot;</span></span>);
+<span class="line-numbers"><a href="#n29" name="n29">29</a></span>      }
+<span class="line-numbers"><strong><a href="#n30" name="n30">30</a></strong></span>      <span style="color:#777">//shorten alias to fit on label if too long</span>
+<span class="line-numbers"><a href="#n31" name="n31">31</a></span>      <span style="color:#080;font-weight:bold">if</span> (alias.length() &gt;= <span style="color:#00D">17</span>) {
+<span class="line-numbers"><a href="#n32" name="n32">32</a></span>        alias = alias.substring(<span style="color:#00D">0</span>, <span style="color:#00D">15</span>) + <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">...</span><span style="color:#710">&quot;</span></span>;
+<span class="line-numbers"><a href="#n33" name="n33">33</a></span>      }
+<span class="line-numbers"><a href="#n34" name="n34">34</a></span>      sb.append(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">T 17,8,0,5,pt6;</span><span style="color:#710">&quot;</span></span>).append(LimsUtils.unicodeify(alias)).append(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#b0b">\n</span><span style="color:#710">&quot;</span></span>);
+<span class="line-numbers"><a href="#n35" name="n35">35</a></span>      sb.append(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">T 17,11,0,5,pt6;</span><span style="color:#710">&quot;</span></span>).append(LimsUtils.unicodeify(name)).append(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#b0b">\n</span><span style="color:#710">&quot;</span></span>);
+<span class="line-numbers"><a href="#n36" name="n36">36</a></span>      sb.append(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">A 1</span><span style="color:#710">&quot;</span></span>).append(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#b0b">\n</span><span style="color:#710">&quot;</span></span>);
+<span class="line-numbers"><a href="#n37" name="n37">37</a></span>    }
+<span class="line-numbers"><a href="#n38" name="n38">38</a></span>    <span style="color:#080;font-weight:bold">catch</span> (<span style="color:#C00;font-weight:bold">UnsupportedEncodingException</span> e) {
+<span class="line-numbers"><a href="#n39" name="n39">39</a></span>      e.printStackTrace();
+<span class="line-numbers"><strong><a href="#n40" name="n40">40</a></strong></span>    }
+<span class="line-numbers"><a href="#n41" name="n41">41</a></span>    <span style="color:#080;font-weight:bold">return</span> sb.toString();
+<span class="line-numbers"><a href="#n42" name="n42">42</a></span>  }
+<span class="line-numbers"><a href="#n43" name="n43">43</a></span>
+<span class="line-numbers"><a href="#n44" name="n44">44</a></span>  ...
+<span class="line-numbers"><a href="#n45" name="n45">45</a></span>}
+</pre></div>
+</div>
+</div>
+
+<p>The JSON input content needs to be in the following structure:</p>
+
+<div class="highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre><span class="line-numbers"><a href="#n1" name="n1">1</a></span>{
+<span class="line-numbers"><a href="#n2" name="n2">2</a></span>  <span style="color:#606"><span style="color:#404">&quot;</span><span>field1</span><span style="color:#404">&quot;</span></span>:<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">Foo</span><span style="color:#710">&quot;</span></span>,
+<span class="line-numbers"><a href="#n3" name="n3">3</a></span>  <span style="color:#606"><span style="color:#404">&quot;</span><span>field2</span><span style="color:#404">&quot;</span></span>:<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">Bar</span><span style="color:#710">&quot;</span></span>,
+<span class="line-numbers"><a href="#n4" name="n4">4</a></span>  <span style="color:#606"><span style="color:#404">&quot;</span><span>field3</span><span style="color:#404">&quot;</span></span>:<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">Baz</span><span style="color:#710">&quot;</span></span>,
+<span class="line-numbers"><a href="#n5" name="n5">5</a></span>  <span style="color:#606"><span style="color:#404">&quot;</span><span>barcodeit</span><span style="color:#404">&quot;</span></span>:<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">yes</span><span style="color:#710">&quot;</span></span> <span style="color:#F00;background-color:#FAA">/</span><span style="color:#F00;background-color:#FAA">/</span> <span style="color:#F00;background-color:#FAA">y</span><span style="color:#F00;background-color:#FAA">e</span><span style="color:#F00;background-color:#FAA">s</span><span style="color:#F00;background-color:#FAA">/</span><span style="color:#F00;background-color:#FAA">n</span><span style="color:#F00;background-color:#FAA">o</span> <span style="color:#F00;background-color:#FAA">b</span><span style="color:#F00;background-color:#FAA">o</span><span style="color:#F00;background-color:#FAA">o</span><span style="color:#F00;background-color:#FAA">l</span><span style="color:#F00;background-color:#FAA">e</span><span style="color:#F00;background-color:#FAA">a</span><span style="color:#F00;background-color:#FAA">n</span> <span style="color:#F00;background-color:#FAA">r</span><span style="color:#F00;background-color:#FAA">e</span><span style="color:#F00;background-color:#FAA">p</span><span style="color:#F00;background-color:#FAA">r</span><span style="color:#F00;background-color:#FAA">e</span><span style="color:#F00;background-color:#FAA">s</span><span style="color:#F00;background-color:#FAA">e</span><span style="color:#F00;background-color:#FAA">n</span><span style="color:#F00;background-color:#FAA">t</span><span style="color:#F00;background-color:#FAA">i</span><span style="color:#F00;background-color:#FAA">n</span><span style="color:#F00;background-color:#FAA">g</span> <span style="color:#F00;background-color:#FAA">w</span><span style="color:#F00;background-color:#FAA">h</span><span style="color:#F00;background-color:#FAA">e</span><span style="color:#F00;background-color:#FAA">t</span><span style="color:#F00;background-color:#FAA">h</span><span style="color:#F00;background-color:#FAA">e</span><span style="color:#F00;background-color:#FAA">r</span> <span style="color:#F00;background-color:#FAA">t</span><span style="color:#F00;background-color:#FAA">o</span> <span style="color:#F00;background-color:#FAA">c</span><span style="color:#F00;background-color:#FAA">o</span><span style="color:#F00;background-color:#FAA">n</span><span style="color:#F00;background-color:#FAA">v</span><span style="color:#F00;background-color:#FAA">e</span><span style="color:#F00;background-color:#FAA">r</span><span style="color:#F00;background-color:#FAA">t</span> <span style="color:#F00;background-color:#FAA">t</span><span style="color:#F00;background-color:#FAA">h</span><span style="color:#F00;background-color:#FAA">e</span> <span style="color:#F00;background-color:#FAA">f</span><span style="color:#F00;background-color:#FAA">i</span><span style="color:#F00;background-color:#FAA">e</span><span style="color:#F00;background-color:#FAA">l</span><span style="color:#F00;background-color:#FAA">d</span><span style="color:#00D">1</span> <span style="color:#F00;background-color:#FAA">i</span><span style="color:#F00;background-color:#FAA">n</span><span style="color:#F00;background-color:#FAA">t</span><span style="color:#F00;background-color:#FAA">o</span> <span style="color:#F00;background-color:#FAA">a</span> <span style="color:#F00;background-color:#FAA">B</span><span style="color:#F00;background-color:#FAA">a</span><span style="color:#F00;background-color:#FAA">s</span><span style="color:#F00;background-color:#FAA">e</span><span style="color:#00D">64</span> <span style="color:#F00;background-color:#FAA">u</span><span style="color:#F00;background-color:#FAA">n</span><span style="color:#F00;background-color:#FAA">i</span><span style="color:#F00;background-color:#FAA">c</span><span style="color:#F00;background-color:#FAA">o</span><span style="color:#F00;background-color:#FAA">d</span><span style="color:#F00;background-color:#FAA">e</span> <span style="color:#F00;background-color:#FAA">s</span><span style="color:#F00;background-color:#FAA">t</span><span style="color:#F00;background-color:#FAA">r</span><span style="color:#F00;background-color:#FAA">i</span><span style="color:#F00;background-color:#FAA">n</span><span style="color:#F00;background-color:#FAA">g</span> <span style="color:#F00;background-color:#FAA">t</span><span style="color:#F00;background-color:#FAA">h</span><span style="color:#F00;background-color:#FAA">a</span><span style="color:#F00;background-color:#FAA">t</span> <span style="color:#F00;background-color:#FAA">w</span><span style="color:#F00;background-color:#FAA">i</span><span style="color:#F00;background-color:#FAA">l</span><span style="color:#F00;background-color:#FAA">l</span> <span style="color:#F00;background-color:#FAA">b</span><span style="color:#F00;background-color:#FAA">e</span> <span style="color:#F00;background-color:#FAA">u</span><span style="color:#F00;background-color:#FAA">s</span><span style="color:#F00;background-color:#FAA">e</span><span style="color:#F00;background-color:#FAA">d</span> <span style="color:#F00;background-color:#FAA">t</span><span style="color:#F00;background-color:#FAA">o</span> <span style="color:#F00;background-color:#FAA">g</span><span style="color:#F00;background-color:#FAA">e</span><span style="color:#F00;background-color:#FAA">n</span><span style="color:#F00;background-color:#FAA">e</span><span style="color:#F00;background-color:#FAA">r</span><span style="color:#F00;background-color:#FAA">a</span><span style="color:#F00;background-color:#FAA">t</span><span style="color:#F00;background-color:#FAA">e</span> <span style="color:#F00;background-color:#FAA">a</span> <span style="color:#F00;background-color:#FAA">D</span><span style="color:#F00;background-color:#FAA">a</span><span style="color:#F00;background-color:#FAA">t</span><span style="color:#F00;background-color:#FAA">a</span><span style="color:#F00;background-color:#FAA">M</span><span style="color:#F00;background-color:#FAA">a</span><span style="color:#F00;background-color:#FAA">t</span><span style="color:#F00;background-color:#FAA">r</span><span style="color:#F00;background-color:#FAA">i</span><span style="color:#F00;background-color:#FAA">x</span> <span style="color:#F00;background-color:#FAA">b</span><span style="color:#F00;background-color:#FAA">a</span><span style="color:#F00;background-color:#FAA">r</span><span style="color:#F00;background-color:#FAA">c</span><span style="color:#F00;background-color:#FAA">o</span><span style="color:#F00;background-color:#FAA">d</span><span style="color:#F00;background-color:#FAA">e</span> <span style="color:#F00;background-color:#FAA">i</span><span style="color:#F00;background-color:#FAA">m</span><span style="color:#F00;background-color:#FAA">a</span><span style="color:#F00;background-color:#FAA">g</span><span style="color:#F00;background-color:#FAA">e</span>
+<span class="line-numbers"><a href="#n6" name="n6">6</a></span>}
+</pre></div>
+</div>
+</div>
+<p>The <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/printing/schema/impl/BradyCustomStandardTubeBarcodeLabelSchema.java">BradyCustomStandardTubeBarcodeLabelSchema</a> class uses a handy reusable <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/printing/factory/BarcodeLabelFactory.java">BarcodeLabelFactory</a> class, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/printing/factory/FileGeneratingBarcodeLabelFactory.java">FileGeneratingBarcodeLabelFactory</a>, that knows how to convert the passed in <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/printing/schema/BarcodableSchema.java">BarcodableSchema</a> into the <em>File</em> label:</p>
+
+<div class="highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre><span class="line-numbers"> <a href="#n1" name="n1">1</a></span><span style="color:#007">@ServiceProvider</span>
+<span class="line-numbers"> <a href="#n2" name="n2">2</a></span><span style="color:#088;font-weight:bold">public</span> <span style="color:#339;font-weight:bold">class</span> <span style="color:#B06;font-weight:bold">FileGeneratingBarcodeLabelFactory</span>&lt;T&gt; <span style="color:#088;font-weight:bold">implements</span> BarcodeLabelFactory&lt;<span style="color:#0a8;font-weight:bold">File</span>, T, BarcodableSchema&lt;<span style="color:#0a8;font-weight:bold">File</span>, T&gt;&gt; {
+<span class="line-numbers"> <a href="#n3" name="n3">3</a></span>  ...
+<span class="line-numbers"> <a href="#n4" name="n4">4</a></span>  <span style="color:#007">@Override</span>
+<span class="line-numbers"> <a href="#n5" name="n5">5</a></span>  <span style="color:#088;font-weight:bold">public</span> <span style="color:#0a8;font-weight:bold">File</span> getLabel(BarcodableSchema&lt;<span style="color:#0a8;font-weight:bold">File</span>, T&gt; s,T b) {
+<span class="line-numbers"> <a href="#n6" name="n6">6</a></span>    <span style="color:#080;font-weight:bold">try</span> {
+<span class="line-numbers"> <a href="#n7" name="n7">7</a></span>      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+<span class="line-numbers"> <a href="#n8" name="n8">8</a></span>
+<span class="line-numbers"> <a href="#n9" name="n9">9</a></span>      <span style="color:#0a8;font-weight:bold">String</span> labelScript = s.getRawState(b);
+<span class="line-numbers"><strong><a href="#n10" name="n10">10</a></strong></span>
+<span class="line-numbers"><a href="#n11" name="n11">11</a></span>      <span style="color:#0a8;font-weight:bold">File</span> f = misoFileManager.generateTemporaryFile(user.getLoginName() + <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">_</span><span style="color:#710">&quot;</span></span>+b.getClass().getSimpleName().toLowerCase()+<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">-</span><span style="color:#710">&quot;</span></span>, <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">.printjob</span><span style="color:#710">&quot;</span></span>);
+<span class="line-numbers"><a href="#n12" name="n12">12</a></span>      FileUtils.write(f, labelScript);
+<span class="line-numbers"><a href="#n13" name="n13">13</a></span>      <span style="color:#080;font-weight:bold">return</span> f;
+<span class="line-numbers"><a href="#n14" name="n14">14</a></span>    }
+<span class="line-numbers"><a href="#n15" name="n15">15</a></span>    <span style="color:#080;font-weight:bold">catch</span> (<span style="color:#C00;font-weight:bold">IOException</span> e) {
+<span class="line-numbers"><a href="#n16" name="n16">16</a></span>      e.printStackTrace();
+<span class="line-numbers"><a href="#n17" name="n17">17</a></span>    }
+<span class="line-numbers"><a href="#n18" name="n18">18</a></span>    <span style="color:#080;font-weight:bold">return</span> <span style="color:#069">null</span>;
+<span class="line-numbers"><a href="#n19" name="n19">19</a></span>  }
+<span class="line-numbers"><strong><a href="#n20" name="n20">20</a></strong></span>  ...
+<span class="line-numbers"><a href="#n21" name="n21">21</a></span>}
+</pre></div>
+</div>
+</div>
+
+<p>As you can see, the factory uses the <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/printing/schema/BarcodableSchema.java">BarcodableSchema</a>’s <strong>getRawState(JSONObject json)</strong> method (see above). The reason for this seemingly back-to-front redundant architecture is that these factories and schemas can be reused without all the encompassing printing structure, decoupling all the implementations from each other, thus giving the flexibility required to support many different printing platforms and label formats.</p>
+
+<p>The above example powers the custom label printing page in the MISO user interface.</p>
+
+<h3 id="request-layer">Request Layer</h3>
+
+<p>API access to the core persistence layer is made available through implementors of the <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/manager/RequestManager.java">RequestManager</a> interface. This interface defines a great deal of behaviour that needs to be implemented so to perform all the necessary CRUD operations. As such, concrete classes of this type can be method heavy. We are hoping to rework this in future MISO versions.</p>
+
+<p>MISO comes with a default implementation, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/manager/MisoRequestManager.java">MisoRequestManager</a>. This is a simple class that calls the underlying <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/store/Store.java">Store</a> implementations (see <a href="#DeveloperManual-PersistenceInterfaces">Persistence Interfaces</a>) to enact the CRUD operations. This makes <strong>unsecured</strong> requests to the stores, i.e. anyone can access anything through this implementation. As a result, we also supply a <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/manager/UserAuthMisoRequestManager.java">UserAuthMisoRequestManager</a> which carries out read/write access checks against a user’s credentials at each method call, thus allowing permissions-enabled abstraction over a data store.</p>
+
+<h3 id="submissions">Submissions</h3>
+
+<p>API access to the submission workflow is made available through implementors of the <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/manager/SubmissionManager.java">SubmissionManager</a> interface, which is typed according to the input type of the submission, <strong>I</strong>, the submission endpoint, <strong>O</strong>, and the response object type from the submission endpoint, <strong>R</strong>.</p>
+
+<div class="highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre><span class="line-numbers"> <a href="#n1" name="n1">1</a></span><span style="color:#088;font-weight:bold">public</span> <span style="color:#339;font-weight:bold">interface</span>  <span style="color:#B06;font-weight:bold">SubmissionManager</span>&lt;I, O, R&gt; {
+<span class="line-numbers"> <a href="#n2" name="n2">2</a></span>  ...
+<span class="line-numbers"> <a href="#n3" name="n3">3</a></span>  public <span style="color:#339;font-weight:bold">void</span> setSubmissionEndPoint(O o);
+<span class="line-numbers"> <a href="#n4" name="n4">4</a></span>  <span style="color:#088;font-weight:bold">public</span> O getSubmissionEndPoint();
+<span class="line-numbers"> <a href="#n5" name="n5">5</a></span>  <span style="color:#088;font-weight:bold">public</span> R submit(I i) <span style="color:#088;font-weight:bold">throws</span> SubmissionException;
+<span class="line-numbers"> <a href="#n6" name="n6">6</a></span>  <span style="color:#088;font-weight:bold">public</span> <span style="color:#0a8;font-weight:bold">Object</span> parseResponse(R response);
+<span class="line-numbers"> <a href="#n7" name="n7">7</a></span>
+<span class="line-numbers"> <a href="#n8" name="n8">8</a></span>  <span style="color:#088;font-weight:bold">public</span> <span style="color:#339;font-weight:bold">void</span> setTransferMethod(TransferMethod transferMethod);
+<span class="line-numbers"> <a href="#n9" name="n9">9</a></span>  ...
+<span class="line-numbers"><strong><a href="#n10" name="n10">10</a></strong></span>}
+</pre></div>
+</div>
+</div>
+<p>The <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/submission/TransferMethod.java">TransferMethod</a> interface defines just that - the way the <strong>submit(I i)</strong> method actually carries out any data file transfers to an <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/submission/EndPoint.java">EndPoint</a>, which simply wraps up a local or remote destination by means of a typed URI:</p>
+
+<div class="highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre><span class="line-numbers"><a href="#n1" name="n1">1</a></span><span style="color:#088;font-weight:bold">public</span> <span style="color:#339;font-weight:bold">interface</span> <span style="color:#B06;font-weight:bold">TransferMethod</span> {
+<span class="line-numbers"><a href="#n2" name="n2">2</a></span>  <span style="color:#088;font-weight:bold">public</span> UploadReport uploadSequenceData(<span style="color:#0a8;font-weight:bold">Set</span>&lt;<span style="color:#0a8;font-weight:bold">File</span>&gt; dataFiles, EndPoint endpoint) <span style="color:#088;font-weight:bold">throws</span> SubmissionException;
+<span class="line-numbers"><a href="#n3" name="n3">3</a></span>}
+</pre></div>
+</div>
+</div>
+
+<div class="highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre><span class="line-numbers"><a href="#n1" name="n1">1</a></span><span style="color:#088;font-weight:bold">public</span> <span style="color:#339;font-weight:bold">interface</span> <span style="color:#B06;font-weight:bold">EndPoint</span>&lt;T <span style="color:#088;font-weight:bold">extends</span> <span style="color:#0a8;font-weight:bold">URI</span>&gt; {
+<span class="line-numbers"><a href="#n2" name="n2">2</a></span>  <span style="color:#088;font-weight:bold">public</span> <span style="color:#339;font-weight:bold">void</span> setDestination(T destination);
+<span class="line-numbers"><a href="#n3" name="n3">3</a></span>  <span style="color:#088;font-weight:bold">public</span> T getDestination();
+<span class="line-numbers"><a href="#n4" name="n4">4</a></span>}
+</pre></div>
+</div>
+</div>
+
+<h2 id="persistence-interfaces">Persistence Interfaces</h2>
+
+<h3 id="stores">Stores</h3>
+
+<p>CRUD functionality in MISO is defined by classes adhering, at their simplest level, to the <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/store/Store.java">Store</a> interface:</p>
+
+<div class="highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre><span class="line-numbers"><a href="#n1" name="n1">1</a></span><span style="color:#088;font-weight:bold">public</span> <span style="color:#339;font-weight:bold">interface</span> <span style="color:#B06;font-weight:bold">Store</span>&lt;T&gt; {
+<span class="line-numbers"><a href="#n2" name="n2">2</a></span>  <span style="color:#088;font-weight:bold">public</span> <span style="color:#339;font-weight:bold">long</span> save(T t) <span style="color:#088;font-weight:bold">throws</span> <span style="color:#C00;font-weight:bold">IOException</span>;
+<span class="line-numbers"><a href="#n3" name="n3">3</a></span>  <span style="color:#088;font-weight:bold">public</span> T get(<span style="color:#339;font-weight:bold">long</span> id) <span style="color:#088;font-weight:bold">throws</span> <span style="color:#C00;font-weight:bold">IOException</span>;
+<span class="line-numbers"><a href="#n4" name="n4">4</a></span>  <span style="color:#088;font-weight:bold">public</span> <span style="color:#0a8;font-weight:bold">Collection</span>&lt;T&gt; listAll() <span style="color:#088;font-weight:bold">throws</span> <span style="color:#C00;font-weight:bold">IOException</span>;
+<span class="line-numbers"><a href="#n5" name="n5">5</a></span>  <span style="color:#088;font-weight:bold">public</span> <span style="color:#339;font-weight:bold">int</span> count() <span style="color:#088;font-weight:bold">throws</span> <span style="color:#C00;font-weight:bold">IOException</span>;
+<span class="line-numbers"><a href="#n6" name="n6">6</a></span>}
+</pre></div>
+</div>
+</div>
+
+<p>You’ll notice that the top-level interface doesn’t support deletion out-of-the-box. This is defined by another interface, <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/store/Remover.java">Remover</a>. The separation is useful so that a developer could provide a read-only Store implementation easily, and the interface is typed to subinterfaces of Deletable, making sure that only certain objects are eligible for deletion.</p>
+
+<div class="highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre><span class="line-numbers"><a href="#n1" name="n1">1</a></span><span style="color:#088;font-weight:bold">public</span> <span style="color:#339;font-weight:bold">interface</span> <span style="color:#B06;font-weight:bold">Remover</span>&lt;T <span style="color:#088;font-weight:bold">extends</span> Deletable&gt; {
+<span class="line-numbers"><a href="#n2" name="n2">2</a></span>  <span style="color:#088;font-weight:bold">public</span> <span style="color:#339;font-weight:bold">boolean</span> remove(T t) <span style="color:#088;font-weight:bold">throws</span> <span style="color:#C00;font-weight:bold">IOException</span>;
+<span class="line-numbers"><a href="#n3" name="n3">3</a></span>}
+</pre></div>
+</div>
+</div>
+
+<p>More interfaces are supplied which wrap up these interfaces, plus more method definitions to add more functionality depending on the object type persisted. The full list of persistence subinterfaces is <a href="https://github.com/TGAC/miso-lims/tree/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/store">on GitHub</a>, and implementations of these can be found in the <a href="#DeveloperManual-DataAccessObjects(DAOs)">Data Access Objects</a> section.</p>
+
+<p>These interfaces provide a robust API to whatever underlying persistence architecture or engine you choose to implement. MISO comes with a default MySQL schema and implementation, which will also be suitable for other open-source MySQL-like databases, such as <a href="http://www.percona.com/software/percona-server">Percona</a> or <a href="https://mariadb.org/">MariaDB</a>. We are currently working on implementations for NoSQL databases, such as <a href="http://www.mongodb.org/">MongoDB</a> and <a href="http://www.orientdb.org/">OrientDB</a>.</p>
+
+<h3 id="object-relational-mapping-orm">Object-Relational Mapping (ORM)</h3>
+
+<p>MISO, like other database-enabled web applications, requires some kind of <a href="http://en.wikipedia.org/wiki/Object-relational_mapping">mapping</a> between the database schema fields and datatypes to Java objects. There are solutions that aim to help with this potentially tricky problem, such as <a href="http://www.hibernate.org/">Hibernate</a>, but we chose not to use this platform, mainly because of the complexity of the relationships that MISO has to manage, but also the troubleshooting guru level required for Hibernate is, in our opinion, restrictive for most developers when picking up a pre-existing project.</p>
+
+<p>Therefore, we have wired up the ORM layer for MISO manually. This is quite a painful procedure given the size of the domain model, but the bonuses are that it is immediately obvious how the relationships are formed by looking through the domain model hierarchy and applying it to the store implementations.</p>
+
+<p>Another bonus is that we can achieve really fine-grained caching support at the time of row mapping code instructions, rather than post-mapping, where the cost of object retrieval has already been spent thus slowing down the process. See the following <a href="#DeveloperManual-Caching">Caching</a> section for details.</p>
+
+<h2 id="alerting-system">Alerting System</h2>
+
+<p>The MISO alerting system propagates information about events to users, based on watched entity types, and to the system, used for reporting purposes.</p>
+
+<h3 id="interfaces">Interfaces</h3>
+
+<p>MISO raises <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/event/Alert.java">Alert</a>s, based on <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/event/Event.java">Event</a>s, via a <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/event/ResponderService.java">ResponderService</a>.</p>
+
+<h3 id="aspects">Aspects</h3>
+
+<p>MISO uses aspect-oriented programming (<a href="http://static.springsource.org/spring/docs/current/spring-framework-reference/htmlsingle/#aop">AOP</a>) to allow runtime weaving of triggered code around defined expressions. This means that there doesn’t have to be concrete code-level boilerplate to wrap up other code that will be fired, given a specific event. An example of this would be logging a bit of text to a file whenever a given method is run. This <strong>can</strong> be achieved through attaching a concrete member to that method to log some text, but this creates a direct coupling between potentially two disparate code levels, e.g. a domain model and a logging system. Aspects removes this coupling.</p>
+
+<h3 id="system-level-alerts">System Level Alerts</h3>
+
+<p>System level alerts have a user ID of 0, and are visible only by administrators.</p>
+
+<h3 id="user-level-alerts">User Level Alerts</h3>
+
+<p>User level alerts are linked to a user ID, and are visible only by that user and administrators.</p>
+
+<h2 id="tag-barcodes">Tag Barcodes</h2>
+
+<h2 id="data-submission">Data Submission</h2>
+
+<h3 id="ena-decorators">ENA Decorators</h3>
+
+<h2 id="utilities">Utilities</h2>
+
+<h2 id="resources">Resources</h2>
+
+<h1 id="persistence-layers">Persistence Layers</h1>
+
+<h2 id="data-access-objects-daos">Data Access Objects (DAOs)</h2>
+
+<p>Data Access Objects (DAOs) are at the heart of a persistence layer implementation. They effectively are concrete classes of <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/store/Store.java">Store</a> (sub-)interfaces.</p>
+
+<h2 id="orm-pitfalls">ORM Pitfalls</h2>
+
+<p>With MISO’s manually mapped object-relational system, there are a few pitfalls to recognise as a developer.</p>
+
+<h2 id="cascading">Cascading</h2>
+
+<p>ORM cascading, where an object has parent, child, or related objects that need to be persisted also, is supported in MISO by the <a href="http://www.oracle.com/technetwork/java/javaee/tech/persistence-jsp-140049.html">Persistence</a> API <a href="http://docs.oracle.com/javaee/7/api/javax/persistence/CascadeType.html">CascadeType</a> enum, which has the following types: ALL, PERSIST, MERGE, REMOVE, REFRESH</p>
+
+<p>DAOs have their CascadeType configured via the <a href="#DeveloperManual-Databaseconfiguration">db-config.xml configuration file</a>. These configurations can get pretty tangled so it’s best to leave the settings as is for the default MISO configuration otherwise unwanted behaviour may result.</p>
+
+<h3 id="child-mapping-cascading">Child mapping cascading</h3>
+
+<p>When saving a parent object, sometimes it’s necessary to persist any child objects too. For example, in the <a href="https://github.com/TGAC/miso-lims/blob/develop/sqlstore/src/main/java/uk/ac/bbsrc/tgac/miso/sqlstore/SQLSampleDAO.java">SQLSampleDAO</a> (and most other relevant <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/security/SecurableByProfile.java">SecurableByProfile</a> implementors), we’d like to persist the SecurityProfile at the time of <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Sample.java">Sample</a> persistence:</p>
+
+<div class="highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre><span class="line-numbers"> <a href="#n1" name="n1">1</a></span>...
+<span class="line-numbers"> <a href="#n2" name="n2">2</a></span>
+<span class="line-numbers"> <a href="#n3" name="n3">3</a></span>public <span style="color:#339;font-weight:bold">long</span> save(Sample sample) <span style="color:#088;font-weight:bold">throws</span> <span style="color:#C00;font-weight:bold">IOException</span> {
+<span class="line-numbers"> <a href="#n4" name="n4">4</a></span>  <span style="color:#0a8;font-weight:bold">Long</span> securityProfileId = sample.getSecurityProfile().getProfileId();
+<span class="line-numbers"> <a href="#n5" name="n5">5</a></span>  <span style="color:#080;font-weight:bold">if</span> (<span style="color:#950">this</span>.cascadeType != <span style="color:#069">null</span>) {
+<span class="line-numbers"> <a href="#n6" name="n6">6</a></span>    securityProfileId = securityProfileDAO.save(sample.getSecurityProfile());
+<span class="line-numbers"> <a href="#n7" name="n7">7</a></span>  }
+<span class="line-numbers"> <a href="#n8" name="n8">8</a></span>
+<span class="line-numbers"> <a href="#n9" name="n9">9</a></span>  ...
+<span class="line-numbers"><strong><a href="#n10" name="n10">10</a></strong></span>}
+<span class="line-numbers"><a href="#n11" name="n11">11</a></span>
+<span class="line-numbers"><a href="#n12" name="n12">12</a></span>...
+</pre></div>
+</div>
+</div>
+
+<p>So, in any case where the CascadeType is set, the SecurityProfile associated with this Sample will also be saved.</p>
+
+<h3 id="parental-mapping-cascading">Parental mapping cascading</h3>
+
+<p>Likewise, when saving a child object, sometimes it’s necessary to persist the parent object too. Using the same <a href="https://github.com/TGAC/miso-lims/blob/develop/sqlstore/src/main/java/uk/ac/bbsrc/tgac/miso/sqlstore/SQLSampleDAO.java">SQLSampleDAO</a> example as above, we want to ensure the parent <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Project.java">Project</a> is managed correctly:</p>
+
+<div class="highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre><span class="line-numbers"> <a href="#n1" name="n1">1</a></span>...
+<span class="line-numbers"> <a href="#n2" name="n2">2</a></span>
+<span class="line-numbers"> <a href="#n3" name="n3">3</a></span>public <span style="color:#339;font-weight:bold">long</span> save(Sample sample) <span style="color:#088;font-weight:bold">throws</span> <span style="color:#C00;font-weight:bold">IOException</span> {
+<span class="line-numbers"> <a href="#n4" name="n4">4</a></span>  ...
+<span class="line-numbers"> <a href="#n5" name="n5">5</a></span>
+<span class="line-numbers"> <a href="#n6" name="n6">6</a></span>  if (<span style="color:#950">this</span>.cascadeType != <span style="color:#069">null</span>) {
+<span class="line-numbers"> <a href="#n7" name="n7">7</a></span>    Project p = sample.getProject();
+<span class="line-numbers"> <a href="#n8" name="n8">8</a></span>    <span style="color:#080;font-weight:bold">if</span> (<span style="color:#950">this</span>.cascadeType.equals(CascadeType.PERSIST)) {
+<span class="line-numbers"> <a href="#n9" name="n9">9</a></span>      <span style="color:#080;font-weight:bold">if</span> (p!=<span style="color:#069">null</span>) {
+<span class="line-numbers"><strong><a href="#n10" name="n10">10</a></strong></span>        projectDAO.save(p);
+<span class="line-numbers"><a href="#n11" name="n11">11</a></span>      }
+<span class="line-numbers"><a href="#n12" name="n12">12</a></span>    }
+<span class="line-numbers"><a href="#n13" name="n13">13</a></span>    <span style="color:#080;font-weight:bold">else</span> <span style="color:#080;font-weight:bold">if</span> (<span style="color:#950">this</span>.cascadeType.equals(CascadeType.REMOVE)) {
+<span class="line-numbers"><a href="#n14" name="n14">14</a></span>      <span style="color:#080;font-weight:bold">if</span> (p != <span style="color:#069">null</span>) {
+<span class="line-numbers"><a href="#n15" name="n15">15</a></span>        DbUtils.updateCaches(cacheManager, p, Project.class);
+<span class="line-numbers"><a href="#n16" name="n16">16</a></span>      }
+<span class="line-numbers"><a href="#n17" name="n17">17</a></span>    }
+<span class="line-numbers"><a href="#n18" name="n18">18</a></span>
+<span class="line-numbers"><a href="#n19" name="n19">19</a></span>    <span style="color:#080;font-weight:bold">if</span> (!sample.getNotes().isEmpty()) {
+<span class="line-numbers"><strong><a href="#n20" name="n20">20</a></strong></span>      <span style="color:#080;font-weight:bold">for</span> (Note n : sample.getNotes()) {
+<span class="line-numbers"><a href="#n21" name="n21">21</a></span>        noteDAO.saveSampleNote(sample, n);
+<span class="line-numbers"><a href="#n22" name="n22">22</a></span>      }
+<span class="line-numbers"><a href="#n23" name="n23">23</a></span>    }
+<span class="line-numbers"><a href="#n24" name="n24">24</a></span>    purgeListCache(sample);
+<span class="line-numbers"><a href="#n25" name="n25">25</a></span>  }
+<span class="line-numbers"><a href="#n26" name="n26">26</a></span>
+<span class="line-numbers"><a href="#n27" name="n27">27</a></span>  ...
+<span class="line-numbers"><a href="#n28" name="n28">28</a></span>}
+</pre></div>
+</div>
+</div>
+
+<p>If the CascadeType is set to PERSIST, we want to call the parent <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Project.java">Project</a> DAO’s <strong>save(Project project)</strong> method, passing in the current Sample’s parent Project. If the CascadeType is set to REMOVE, we want to evict the parent Project from it’s cache, so that stale information isn’t presented to any users.</p>
+
+<p>In any CascadeType scenario, we want to make sure any <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Note.java">Note</a>s attached to this Sample are persisted. Finally, we want to evict this Sample from the cache that holds the list of all Samples, again to make sure stale information isn’t presented to any users.</p>
+
+<h3 id="cache-eviction">Cache eviction</h3>
+
+<p>As is apparent in the previous parent/child mapping cascading examples, any relevant caches should be managed so that up-to-date information is available. When saving any objects, state may change, so stale objects need to be evicted from their caches. See the <a href="#DeveloperManual-Caching">Caching</a> section below.</p>
+
+<h2 id="caching">Caching</h2>
+
+<p>Considering the default SQL layer supplied with MISO, SQL queries can be very slow, especially across multiple tables. As a result, we have implemented an <a href="http://ehcache.org/">EhCache</a> layer that greatly improves read times from the underlying database by storing frequently used objects in memory, and less frequently used on disk, as per a standard <a href="http://en.wikipedia.org/wiki/Cache_algorithms#Least_Recently_Used">LRU policy</a>. A number of caches exist for the various domain model objects and are configured according to available memory and disk space (see <a href="#DeveloperManual-EhCacheConfiguration">EhCache Configuration</a>). Furthermore, the <a href="http://ehcache.org/documentation/2.4/user-guide/spring#spring-25---31-ehcache-annotations-for-spring">EhCache Annotations library</a> is used to simplify the configuration of the persistence and removal policy of objects themselves (see Persisting Objects and below).</p>
+
+<h3 id="persisting-objects">Persisting objects</h3>
+
+<p>When saving objects back to the database, any cache entries need to be removed to ensure that old data is flushed.</p>
+
+<div class="highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre><span class="line-numbers"> <a href="#n1" name="n1">1</a></span><span style="color:#007">@TriggersRemove</span>(
+<span class="line-numbers"> <a href="#n2" name="n2">2</a></span>        cacheName = {<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">projectCache</span><span style="color:#710">&quot;</span></span>, <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">lazyProjectCache</span><span style="color:#710">&quot;</span></span>},
+<span class="line-numbers"> <a href="#n3" name="n3">3</a></span>        keyGenerator = <span style="color:#007">@KeyGenerator</span>(
+<span class="line-numbers"> <a href="#n4" name="n4">4</a></span>                name = <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">HashCodeCacheKeyGenerator</span><span style="color:#710">&quot;</span></span>,
+<span class="line-numbers"> <a href="#n5" name="n5">5</a></span>                properties = {
+<span class="line-numbers"> <a href="#n6" name="n6">6</a></span>                        <span style="color:#007">@Property</span>(name = <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">includeMethod</span><span style="color:#710">&quot;</span></span>, value = <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">false</span><span style="color:#710">&quot;</span></span>),
+<span class="line-numbers"> <a href="#n7" name="n7">7</a></span>                        <span style="color:#007">@Property</span>(name = <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">includeParameterTypes</span><span style="color:#710">&quot;</span></span>, value = <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">false</span><span style="color:#710">&quot;</span></span>)
+<span class="line-numbers"> <a href="#n8" name="n8">8</a></span>                }
+<span class="line-numbers"> <a href="#n9" name="n9">9</a></span>        )
+<span class="line-numbers"><strong><a href="#n10" name="n10">10</a></strong></span>)
+<span class="line-numbers"><a href="#n11" name="n11">11</a></span><span style="color:#088;font-weight:bold">public</span> <span style="color:#339;font-weight:bold">long</span> save(Project project) <span style="color:#088;font-weight:bold">throws</span> <span style="color:#C00;font-weight:bold">IOException</span> {
+<span class="line-numbers"><a href="#n12" name="n12">12</a></span>  ...
+<span class="line-numbers"><a href="#n13" name="n13">13</a></span>}
+</pre></div>
+</div>
+</div>
+
+<h3 id="retrieving-objects">Retrieving objects</h3>
+
+<p>When retrieving objects from the data store, the ehcache-annotated <strong>get()</strong> and <strong>listAll()</strong> methods check the specified caches for collision on the supplied object. If the objects exists in the cache, the cached version is returned. If not, the method body executes:</p>
+
+<div class="highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre><span class="line-numbers"> <a href="#n1" name="n1">1</a></span><span style="color:#007">@Cacheable</span>(cacheName = <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">projectCache</span><span style="color:#710">&quot;</span></span>,
+<span class="line-numbers"> <a href="#n2" name="n2">2</a></span>           keyGenerator = <span style="color:#007">@KeyGenerator</span>(
+<span class="line-numbers"> <a href="#n3" name="n3">3</a></span>                   name = <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">HashCodeCacheKeyGenerator</span><span style="color:#710">&quot;</span></span>,
+<span class="line-numbers"> <a href="#n4" name="n4">4</a></span>                   properties = {
+<span class="line-numbers"> <a href="#n5" name="n5">5</a></span>                           <span style="color:#007">@Property</span>(name = <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">includeMethod</span><span style="color:#710">&quot;</span></span>, value = <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">false</span><span style="color:#710">&quot;</span></span>),
+<span class="line-numbers"> <a href="#n6" name="n6">6</a></span>                           <span style="color:#007">@Property</span>(name = <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">includeParameterTypes</span><span style="color:#710">&quot;</span></span>, value = <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">false</span><span style="color:#710">&quot;</span></span>)
+<span class="line-numbers"> <a href="#n7" name="n7">7</a></span>                   }
+<span class="line-numbers"> <a href="#n8" name="n8">8</a></span>           )
+<span class="line-numbers"> <a href="#n9" name="n9">9</a></span>)
+<span class="line-numbers"><strong><a href="#n10" name="n10">10</a></strong></span><span style="color:#088;font-weight:bold">public</span> Project get(<span style="color:#339;font-weight:bold">long</span> projectId) <span style="color:#088;font-weight:bold">throws</span> <span style="color:#C00;font-weight:bold">IOException</span> {
+<span class="line-numbers"><a href="#n11" name="n11">11</a></span>  ...
+<span class="line-numbers"><a href="#n12" name="n12">12</a></span>}
+<span class="line-numbers"><a href="#n13" name="n13">13</a></span>
+<span class="line-numbers"><a href="#n14" name="n14">14</a></span><span style="color:#007">@Cacheable</span>(cacheName=<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">projectListCache</span><span style="color:#710">&quot;</span></span>,
+<span class="line-numbers"><a href="#n15" name="n15">15</a></span>    keyGenerator = <span style="color:#007">@KeyGenerator</span>(
+<span class="line-numbers"><a href="#n16" name="n16">16</a></span>            name = <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">HashCodeCacheKeyGenerator</span><span style="color:#710">&quot;</span></span>,
+<span class="line-numbers"><a href="#n17" name="n17">17</a></span>            properties = {
+<span class="line-numbers"><a href="#n18" name="n18">18</a></span>                    <span style="color:#007">@Property</span>(name=<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">includeMethod</span><span style="color:#710">&quot;</span></span>, value=<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">false</span><span style="color:#710">&quot;</span></span>),
+<span class="line-numbers"><a href="#n19" name="n19">19</a></span>                    <span style="color:#007">@Property</span>(name=<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">includeParameterTypes</span><span style="color:#710">&quot;</span></span>, value=<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">false</span><span style="color:#710">&quot;</span></span>)
+<span class="line-numbers"><strong><a href="#n20" name="n20">20</a></strong></span>            }
+<span class="line-numbers"><a href="#n21" name="n21">21</a></span>    )
+<span class="line-numbers"><a href="#n22" name="n22">22</a></span>)
+<span class="line-numbers"><a href="#n23" name="n23">23</a></span><span style="color:#088;font-weight:bold">public</span> <span style="color:#0a8;font-weight:bold">List</span>&lt;Project&gt; listAll() {
+<span class="line-numbers"><a href="#n24" name="n24">24</a></span>  ...
+<span class="line-numbers"><a href="#n25" name="n25">25</a></span>}
+</pre></div>
+</div>
+</div>
+
+<h3 id="row-mapping">Row mapping</h3>
+
+<p>In a typical JDBC ORM scenario, Java would make calls to some form of mapper to convert from the ResultSet fields to a Java domain model object. In MISO, <a href="http://static.springsource.org/spring/docs/current/javadoc-api/org/springframework/jdbc/core/RowMapper.html">RowMapper&lt;T&gt;</a> implementations are used to facilitate this, specifically a custom abstract class called <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/sqlstore/cache/CacheAwareRowMapper.java">CacheAwareRowMapper&lt;T&gt;</a>:</p>
+
+<div class="highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre><span class="line-numbers"> <a href="#n1" name="n1">1</a></span><span style="color:#088;font-weight:bold">public</span> <span style="color:#088;font-weight:bold">abstract</span> <span style="color:#339;font-weight:bold">class</span> <span style="color:#B06;font-weight:bold">CacheAwareRowMapper</span>&lt;T&gt; <span style="color:#088;font-weight:bold">implements</span> <span style="color:#0a8;font-weight:bold">RowMapper</span>&lt;T&gt; {
+<span class="line-numbers"> <a href="#n2" name="n2">2</a></span>  <span style="color:#088;font-weight:bold">private</span> <span style="color:#339;font-weight:bold">boolean</span> lazy;
+<span class="line-numbers"> <a href="#n3" name="n3">3</a></span>
+<span class="line-numbers"> <a href="#n4" name="n4">4</a></span>  ...
+<span class="line-numbers"> <a href="#n5" name="n5">5</a></span>
+<span class="line-numbers"> <a href="#n6" name="n6">6</a></span>  public CacheAwareRowMapper(<span style="color:#0a8;font-weight:bold">Class</span>&lt;T&gt; clz, <span style="color:#339;font-weight:bold">boolean</span> lazy) {
+<span class="line-numbers"> <a href="#n7" name="n7">7</a></span>    <span style="color:#950">this</span>.lazy = lazy;
+<span class="line-numbers"> <a href="#n8" name="n8">8</a></span>    <span style="color:#080;font-weight:bold">if</span> (lazy) {
+<span class="line-numbers"> <a href="#n9" name="n9">9</a></span>      <span style="color:#950">this</span>.cacheName = <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">lazy</span><span style="color:#710">&quot;</span></span>+LimsUtils.capitalise(clz.getSimpleName())+<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">Cache</span><span style="color:#710">&quot;</span></span>;
+<span class="line-numbers"><strong><a href="#n10" name="n10">10</a></strong></span>    }
+<span class="line-numbers"><a href="#n11" name="n11">11</a></span>    <span style="color:#080;font-weight:bold">else</span> {
+<span class="line-numbers"><a href="#n12" name="n12">12</a></span>      <span style="color:#950">this</span>.cacheName = LimsUtils.noddyCamelCaseify(clz.getSimpleName())+<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">Cache</span><span style="color:#710">&quot;</span></span>;
+<span class="line-numbers"><a href="#n13" name="n13">13</a></span>    }
+<span class="line-numbers"><a href="#n14" name="n14">14</a></span>  }
+<span class="line-numbers"><a href="#n15" name="n15">15</a></span>
+<span class="line-numbers"><a href="#n16" name="n16">16</a></span>  ...
+<span class="line-numbers"><a href="#n17" name="n17">17</a></span>
+<span class="line-numbers"><a href="#n18" name="n18">18</a></span>  public Cache lookupCache(CacheManager cacheManager) <span style="color:#088;font-weight:bold">throws</span> CacheException, <span style="color:#C00;font-weight:bold">UnsupportedOperationException</span> {
+<span class="line-numbers"><a href="#n19" name="n19">19</a></span>
+<span class="line-numbers"><strong><a href="#n20" name="n20">20</a></strong></span>  }
+<span class="line-numbers"><a href="#n21" name="n21">21</a></span>}
+</pre></div>
+</div>
+</div>
+
+<p>Class construction, can happen in a number of ways, but the most typical is depicted above, i.e. with a Class and boolean signature. Another important method of note is <strong>lookupCache(CacheManager cacheManager)</strong>. This method ensures the cache specified in the constructor is available in a given CacheManager, avoiding NullPointerExceptions.</p>
+
+<p>Three default types of cache exist in MISO, <strong>standard</strong>, <strong>lazy</strong>, and <strong>list</strong>, hence the constructor logic seen above:</p>
+
+<ul>
+  <li>Standard caches hold the results of full object DAO get() operations, and are named as “&lt;objectClassSimpleName&gt;Cache”, e.g. <em>projectCache</em></li>
+  <li>Lazy caches hold the results of partial object DAO lazyGet() operations, and are named as “lazy&lt;objectClassSimpleName&gt;Cache”, e.g. <em>lazyProjectCache</em></li>
+  <li>List caches hold the results of full or partial DAO listAll() operations, and are named as “&lt;objectClassSimpleName&gt;ListCache”, e.g. <em>projectListCache</em></li>
+</ul>
+
+<p>Let’s look at a typical implementation of a <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/sqlstore/cache/CacheAwareRowMapper.java">CacheAwareRowMapper&lt;T&gt;</a>, in this instance for <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Project.java">Project</a> objects, in the <a href="https://github.com/TGAC/miso-lims/blob/develop/sqlstore/src/main/java/uk/ac/bbsrc/tgac/miso/sqlstore/SQLProjectDAO.java">SQLProjectDAO</a> class:</p>
+
+<div class="highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre><span class="line-numbers"> <a href="#n1" name="n1">1</a></span><span style="color:#088;font-weight:bold">public</span> <span style="color:#339;font-weight:bold">class</span> <span style="color:#B06;font-weight:bold">ProjectMapper</span> <span style="color:#088;font-weight:bold">extends</span> CacheAwareRowMapper&lt;Project&gt; {
+<span class="line-numbers"> <a href="#n2" name="n2">2</a></span>  <span style="color:#088;font-weight:bold">public</span> ProjectMapper() {
+<span class="line-numbers"> <a href="#n3" name="n3">3</a></span>    <span style="color:#950">super</span>(Project.class);
+<span class="line-numbers"> <a href="#n4" name="n4">4</a></span>  }
+<span class="line-numbers"> <a href="#n5" name="n5">5</a></span>
+<span class="line-numbers"> <a href="#n6" name="n6">6</a></span>  <span style="color:#088;font-weight:bold">public</span> ProjectMapper(<span style="color:#339;font-weight:bold">boolean</span> lazy) {
+<span class="line-numbers"> <a href="#n7" name="n7">7</a></span>    <span style="color:#950">super</span>(Project.class, lazy);
+<span class="line-numbers"> <a href="#n8" name="n8">8</a></span>  }
+<span class="line-numbers"> <a href="#n9" name="n9">9</a></span>
+<span class="line-numbers"><strong><a href="#n10" name="n10">10</a></strong></span>  <span style="color:#007">@Override</span>
+<span class="line-numbers"><a href="#n11" name="n11">11</a></span>  <span style="color:#088;font-weight:bold">public</span> Project mapRow(<span style="color:#0a8;font-weight:bold">ResultSet</span> rs, <span style="color:#339;font-weight:bold">int</span> rowNum) <span style="color:#088;font-weight:bold">throws</span> <span style="color:#C00;font-weight:bold">SQLException</span> {
+<span class="line-numbers"><a href="#n12" name="n12">12</a></span>    <span style="color:#339;font-weight:bold">long</span> id = rs.getLong(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">projectId</span><span style="color:#710">&quot;</span></span>);
+<span class="line-numbers"><a href="#n13" name="n13">13</a></span>    Project project = <span style="color:#069">null</span>;
+<span class="line-numbers"><a href="#n14" name="n14">14</a></span>    <span style="color:#080;font-weight:bold">try</span> {
+<span class="line-numbers"><a href="#n15" name="n15">15</a></span>      <span style="color:#080;font-weight:bold">if</span> (isCacheEnabled() &amp;&amp; lookupCache(cacheManager) != <span style="color:#069">null</span>) {
+<span class="line-numbers"><a href="#n16" name="n16">16</a></span>        <span style="color:#0a8;font-weight:bold">Element</span> element;
+<span class="line-numbers"><a href="#n17" name="n17">17</a></span>        <span style="color:#080;font-weight:bold">if</span> ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != <span style="color:#069">null</span>) {
+<span class="line-numbers"><a href="#n18" name="n18">18</a></span>          log.debug(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">Cache hit on map for Project </span><span style="color:#710">&quot;</span></span> + id);
+<span class="line-numbers"><a href="#n19" name="n19">19</a></span>          <span style="color:#080;font-weight:bold">return</span> (Project)element.getObjectValue();
+<span class="line-numbers"><strong><a href="#n20" name="n20">20</a></strong></span>        }
+<span class="line-numbers"><a href="#n21" name="n21">21</a></span>      }
+<span class="line-numbers"><a href="#n22" name="n22">22</a></span>
+<span class="line-numbers"><a href="#n23" name="n23">23</a></span>      <span style="color:#777">// do ORM mapping from ResultSet fields to Project object fields</span>
+<span class="line-numbers"><a href="#n24" name="n24">24</a></span>      ...
+<span class="line-numbers"><a href="#n25" name="n25">25</a></span>
+<span class="line-numbers"><a href="#n26" name="n26">26</a></span>      if (isCacheEnabled() &amp;&amp; lookupCache(cacheManager) != <span style="color:#069">null</span>) {
+<span class="line-numbers"><a href="#n27" name="n27">27</a></span>        lookupCache(cacheManager).put(<span style="color:#080;font-weight:bold">new</span> <span style="color:#0a8;font-weight:bold">Element</span>(DbUtils.hashCodeCacheKeyFor(id) ,project));
+<span class="line-numbers"><a href="#n28" name="n28">28</a></span>        log.debug(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">Cache put for Project </span><span style="color:#710">&quot;</span></span> + id);
+<span class="line-numbers"><a href="#n29" name="n29">29</a></span>      }
+<span class="line-numbers"><strong><a href="#n30" name="n30">30</a></strong></span>    }
+<span class="line-numbers"><a href="#n31" name="n31">31</a></span>    <span style="color:#080;font-weight:bold">catch</span>(net.sf.ehcache.CacheException ce) {
+<span class="line-numbers"><a href="#n32" name="n32">32</a></span>      ce.printStackTrace();
+<span class="line-numbers"><a href="#n33" name="n33">33</a></span>    }
+<span class="line-numbers"><a href="#n34" name="n34">34</a></span>    <span style="color:#080;font-weight:bold">catch</span>(<span style="color:#C00;font-weight:bold">UnsupportedOperationException</span> uoe) {
+<span class="line-numbers"><a href="#n35" name="n35">35</a></span>      uoe.printStackTrace();
+<span class="line-numbers"><a href="#n36" name="n36">36</a></span>    }
+<span class="line-numbers"><a href="#n37" name="n37">37</a></span>    <span style="color:#080;font-weight:bold">return</span> project;
+<span class="line-numbers"><a href="#n38" name="n38">38</a></span>  }
+<span class="line-numbers"><a href="#n39" name="n39">39</a></span>}
+</pre></div>
+</div>
+</div>
+
+<p>As you can see, if a Project instance (lazy or otherwise) with a matching hashcode key (see the <a href="https://github.com/TGAC/miso-lims/blob/develop/sqlstore/src/main/java/uk/ac/bbsrc/tgac/miso/sqlstore/util/DbUtils.java">DBUtils helper class</a>) is already in a given cache, then that object is immediately returned and no object creation and mapping takes place. If not, the mapping takes place, and the resulting object is placed into the cache layer.</p>
+
+<p>Each DAO would usually, and does by default, have such a CacheAwareRowMapper for SQL databases. Other engines may well require (or not, as the case may be), different caching strategies.</p>
+
+<h1 id="web-application">Web Application</h1>
+
+<p>The main MISO web application is powered by the <a href="http://www.springsource.org/">Spring framework</a>, notably <a href="http://static.springsource.org/spring/docs/3.2.x/spring-framework-reference/html/mvc.html">Spring MVC</a>. This allows powerful webapp configuration and tailoring via Spring XML and annotations, making functionality like the REST API a breeze. Here, we will go through the MISO elements that comprise the web application layer.</p>
+
+<h2 id="configuration">Configuration</h2>
+
+<p>A great deal of MISO can be configured at the Spring XML level, making it easy for developers to swap out existing MISO implementations for their own, via <a href="http://static.springsource.org/spring/docs/3.2.x/spring-framework-reference/html/overview.html#overview-dependency-injection">Dependency Injection</a>. MISO uses the usual web.xml to define properties relevant to the webapp container, and a number of Spring configuration XML files for the core application itself:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Configuration file</th>
+      <th>Description</th>
+      <th>Documentation</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="https://github.com/TGAC/miso-lims/blob/develop/miso-web/src/main/webapp/WEB-INF/web.xml">web.xml</a></td>
+      <td>Configures the web application with respect to the web container, e.g. Tomcat.</td>
+      <td><a href="#DeveloperManual-Corewebappconfiguration">Core webapp configuration</a></td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/TGAC/miso-lims/blob/develop/miso-web/src/main/webapp/WEB-INF/applicationContext.xml">apicationContext.xml</a></td>
+      <td>Configures the central application miso.properties location and pulls in the configuration files below</td>
+      <td><a href="#DeveloperManual-Applicationcontextconfiguration">Application context configuration</a></td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/TGAC/miso-lims/blob/develop/miso-web/src/main/webapp/WEB-INF/miso-servlet.xml">miso-servlet.xml</a></td>
+      <td>Defines low-level MISO webapp-centric elements.</td>
+      <td><a href="#DeveloperManual-MISOservletconfiguration">MISO servlet configuration</a></td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/TGAC/miso-lims/blob/develop/miso-web/src/main/webapp/WEB-INF/miso-config.xml">miso-config.xml</a></td>
+      <td>High-level user-space MISO bean configuration</td>
+      <td><a href="#DeveloperManual-MISOconfiguration">MISO configuration</a></td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/TGAC/miso-lims/blob/develop/miso-web/src/main/resources/sql/db-config.xml">db-config.xml</a></td>
+      <td>Configures access to the underlying datasource</td>
+      <td><a href="#DeveloperManual-Databaseconfiguration">Database configuration</a></td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/TGAC/miso-lims/blob/develop/miso-web/src/main/webapp/WEB-INF/jdbc-security-config.xml">jdbc-security-config.xml</a> / <a href="https://github.com/TGAC/miso-lims/blob/develop/miso-web/src/main/webapp/WEB-INF/ldap-security-config.xml">ldap-security-config.xml</a></td>
+      <td>Database and LDAP specific configuration, respectively</td>
+      <td><a href="#DeveloperManual-Securityconfiguration">Security configuration</a></td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/TGAC/miso-lims/blob/develop/miso-web/src/main/webapp/WEB-INF/event-config.xml">event-config.xml</a></td>
+      <td>Configures the event subsystem, e.g. aspects for watcher alerting</td>
+      <td><a href="#DeveloperManual-Eventconfiguration">Event configuration</a></td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/TGAC/miso-lims/blob/develop/miso-web/src/main/webapp/WEB-INF/integration-config.xml">integration-config.xml</a></td>
+      <td>Configures elements in the integration layer, e.g. analysis server</td>
+      <td><a href="#DeveloperManual-Integrationconfiguration">Integration configuration</a></td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/TGAC/miso-lims/blob/develop/miso-web/src/main/webapp/WEB-INF/print-config.xml">print-config.xml</a></td>
+      <td>Configures the printing subsystem, e.g. print context resolvers</td>
+      <td><a href="#DeveloperManual-Printerconfiguration">Printer configuration</a></td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/TGAC/miso-lims/blob/develop/miso-web/src/main/webapp/WEB-INF/logging-config.xml">logging-config.xml</a></td>
+      <td>Configures the logging subsystem, e.g. request layer logging</td>
+      <td><a href="#DeveloperManual-Loggingconfiguration">Logging configuration</a></td>
+    </tr>
+    <tr>
+      <td><a href="https://github.com/TGAC/miso-lims/blob/develop/miso-web/src/main/resources/ehcache.xml">ehcache.xml</a></td>
+      <td>Configures the caching layer</td>
+      <td><a href="#DeveloperManual-EhCacheconfiguration">EhCache configuration</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="core-webapp-configuration">Core webapp configuration</h3>
+
+<p>The web.xml is the lowest-level configuration element of many web application containers. In the case of Spring, it allows mapping of URLs to DispatcherServlets, and the inclusion of any relevant filters or logging framework configuration property files.</p>
+
+<h3 id="spanapplication-context-configurationspan"><span>Application context configuration</span></h3>
+
+<p>The applicationContext.xml is always parsed first in a Spring web application, and could in theory hold all webapp config elements, but we have chosen to separate out the specific configuration component areas into individual XML files for ease of use. As such, this XML file pulls in the other downstream config files (see table above).</p>
+
+<h3 id="spanspanmiso-servlet-configurationspanspan"><span><span>MISO servlet configuration</span></span></h3>
+
+<p>This configuration holds low-level MISO configuration elements, e.g.</p>
+
+<h3 id="spanspanspanmiso-configurationspanspanspan"><span><span><span>MISO configuration</span></span></span></h3>
+
+<p><span><span><span>The miso-config.xml file holds higher-level config elements, e.g.</span></span></span></p>
+
+<h3 id="spanspanspandatabase-configurationspanspanspan"><span><span><span>Database configuration</span></span></span></h3>
+
+<p><span><span><span>This configuration file covers the DAO obejct wiring and CascadeType policy definitions.</span></span></span></p>
+
+<h3 id="spanspanspanspansecurity-configurationspanspanspanspan"><span><span><span><span>Security configuration</span></span></span></span></h3>
+
+<p><span><span><span><span>There are two supplied security configuration templates supplied with MISO, one for LDAP and one fo JDBC. The JDBC configuration is the initial default, and is the simplest mechanism to get started. If you would like more fine-grained access to a directory-style authentication and role assignmet mechanism, then LDAP support is also available (subject to obvious configuration). The LDAP mechanism is a nice addition, because the same login access can be used for multiple tools.</span></span></span></span></p>
+
+<h3 id="spanevent-configurationspan"><span>Event configuration</span></h3>
+
+<p><span>Aspect configuration surrounding the event model is configured here.</span></p>
+
+<h3 id="spanspanintegration-configurationspanspan"><span><span>Integration configuration</span></span></h3>
+
+<p><span><span>This file provides access to the minimal configuration around the analysis and notification server connectivity.</span></span></p>
+
+<h3 id="spanspanspanprinter-configurationspanspanspan"><span><span><span>Printer configuration</span></span></span></h3>
+
+<p>The print-config.xml controls available PrintManager beans and relevant print services and strategies.</p>
+
+<h3 id="spanspanspanspanlogging-configurationspanspanspanspan"><span><span><span><span>Logging configuration</span></span></span></span></h3>
+
+<p><span><span><span><span>Overarching logging mechanisms and respective aspect triggers are configured here.</span></span></span></span></p>
+
+<h3 id="ehcache-configuration">EhCache configuration</h3>
+
+<p>Caches, eviction policies and cache sizes are configured here. There shouldn’t be any reason to amend the configuration here in terms of available caches, other than increasing/decreasing cache sizes in memory and disk according to your available JVM memory.</p>
+
+<h2 id="contexts">Contexts</h2>
+
+<h2 id="controllers">Controllers</h2>
+
+<h2 id="rest-api">REST API</h2>
+
+<h3 id="request-signing">Request Signing</h3>
+
+<p>Signing requests requires 3 elements:</p>
+
+<ul>
+  <li>REST API URL of the service you wish to request (see <a href="/miso-lims/ref/rest-api.html">REST API</a> )</li>
+  <li>Your MISO username</li>
+  <li>Your MISO API key - this can be found by logging in to MISO as normal, clicking “My Account” and the key is in the top box</li>
+</ul>
+
+<p>Producing HMAC keys from these elements for your request is easy:</p>
+
+<pre><code>echo -n "&lt;REST-url&gt;?x-url=&lt;REST-url&gt;@x-user=&lt;miso_user_name&gt;" | openssl sha1 -binary -hmac "&lt;your_key_from_miso&gt;" | openssl base64 | tr -d = | tr +/ -_
+</code></pre>
+
+<p>You can then use curl to initiate the request, using the REST API URL, your username, and the signed fragment produced above:</p>
+
+<pre><code>curl --request GET 'http://&lt;miso_url&gt;/&lt;REST-url&gt;'--header 'x-user:&lt;miso_user_name&gt;'--header 'x-signature:&lt;hmac_string_from_above&gt;'--header 'x-url:&lt;REST-url&gt;'
+</code></pre>
+
+<p>Putting the two together, here’s an example shell script that can grab a list of libraries associated with a project:</p>
+
+<pre><code>#!/bin/bash
+
+PROJECTID=$1
+USER=$2
+KEY=$3
+
+SIGNATURE=`echo -n "/miso/rest/project/$PROJECTID/libraries?x-url=/miso/rest/project/$PROJECTID/libraries@x-user=$USER" | openssl sha1 -binary -hmac "$KEY" | openssl base64 | tr -d = | tr +/ -_`
+
+curl --request GET "http://your.miso.url/miso/rest/project/$PROJECTID/libraries" --header "x-user:$USER" --header "x-signature:$SIGNATURE" --header "x-url:/miso/rest/project/$PROJECTID/libraries"
+</code></pre>
+
+<h2 id="ajax-beans">AJAX Beans</h2>
+
+<h2 id="services">Services</h2>
+
+<h2 id="utilities-1">Utilities</h2>
+
+<h2 id="resources-1">Resources</h2>
+
+<h1 id="sequencer-notification-system">Sequencer Notification System</h1>
+
+<h2 id="core-1">Core</h2>
+
+<h2 id="transformers">Transformers</h2>
+
+<h2 id="utilities-2">Utilities</h2>
+
+<h2 id="configuration-1">Configuration</h2>
+
+<h2 id="consumer-services">Consumer Services</h2>
+
+<h1 id="stats-db">Stats DB</h1>
+
+<h2 id="api">API</h2>
+
+<h1 id="miso-service-providers">MISO Service Providers</h1>
+
+<p>MISO exposes many of its services via interface APIs that implement the Service Provider Interface framework. Specifically, the Fluxion SPI library is used to make annotating and discovering services easy via the @ServiceProvider and @Spi annotations. These marked-up services are then discovered at runtime by the core Java ServiceLoader class, and in most cases wired up by Spring to relevant classes that require these services. In this way, developers are able to supply their own services that hook into the MISO APIs and are automatically discovered.</p>
+
+<h2 id="service-interfaces-and-providers">Service Interfaces and Providers</h2>
+
+<p>Service interfaces are annotated with the @Spi annotation, which marks them up for automatic discovery (see Service Discovery section below). Services should always have some kind of identifier, exposed via a simple getter, e.g. getName(). This name should be unique, otherwise services will become confused with others when discovered.</p>
+
+<div class="highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre><span class="line-numbers"><a href="#n1" name="n1">1</a></span><span style="color:#007">@Spi</span>
+<span class="line-numbers"><a href="#n2" name="n2">2</a></span><span style="color:#088;font-weight:bold">public</span> <span style="color:#339;font-weight:bold">interface</span> <span style="color:#B06;font-weight:bold">FooService</span> {
+<span class="line-numbers"><a href="#n3" name="n3">3</a></span>  <span style="color:#0a8;font-weight:bold">String</span> getName();
+<span class="line-numbers"><a href="#n4" name="n4">4</a></span>  <span style="color:#339;font-weight:bold">void</span> doSomething();
+<span class="line-numbers"><a href="#n5" name="n5">5</a></span>}
+</pre></div>
+</div>
+</div>
+
+<p>Service implementations are annotated with the @ServiceProvider annotation, which the ServiceLoader class uses to expose the concrete instances of @Spi interfaces.</p>
+
+<div class="highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre><span class="line-numbers"> <a href="#n1" name="n1">1</a></span><span style="color:#007">@ServiceProvider</span>
+<span class="line-numbers"> <a href="#n2" name="n2">2</a></span><span style="color:#088;font-weight:bold">public</span> <span style="color:#339;font-weight:bold">class</span> <span style="color:#B06;font-weight:bold">FooServiceImpl</span> {
+<span class="line-numbers"> <a href="#n3" name="n3">3</a></span>  <span style="color:#0a8;font-weight:bold">String</span> getName() {
+<span class="line-numbers"> <a href="#n4" name="n4">4</a></span>    <span style="color:#080;font-weight:bold">return</span> <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">FooServiceImpl</span><span style="color:#710">&quot;</span></span>;
+<span class="line-numbers"> <a href="#n5" name="n5">5</a></span>  }
+<span class="line-numbers"> <a href="#n6" name="n6">6</a></span>
+<span class="line-numbers"> <a href="#n7" name="n7">7</a></span>  <span style="color:#339;font-weight:bold">void</span> doSomething() {
+<span class="line-numbers"> <a href="#n8" name="n8">8</a></span>    <span style="color:#0a8;font-weight:bold">System</span>.out.println(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">Something has been done</span><span style="color:#710">&quot;</span></span>);
+<span class="line-numbers"> <a href="#n9" name="n9">9</a></span>  }
+<span class="line-numbers"><strong><a href="#n10" name="n10">10</a></strong></span>}
+</pre></div>
+</div>
+</div>
+
+<h2 id="service-discovery">Service Discovery</h2>
+
+<p>Services are discovered via the ServiceLoader class. An example of a class that resolves a given service is below:</p>
+
+<div class="highlighter-coderay"><div class="CodeRay">
+  <div class="code"><pre><span class="line-numbers"> <a href="#n1" name="n1">1</a></span><span style="color:#088;font-weight:bold">public</span> <span style="color:#339;font-weight:bold">class</span> <span style="color:#B06;font-weight:bold">FooServiceResolver</span> {
+<span class="line-numbers"> <a href="#n2" name="n2">2</a></span>  <span style="color:#088;font-weight:bold">private</span> <span style="color:#0a8;font-weight:bold">Map</span>&lt;<span style="color:#0a8;font-weight:bold">String</span>, FooService&gt; serviceMap;
+<span class="line-numbers"> <a href="#n3" name="n3">3</a></span>
+<span class="line-numbers"> <a href="#n4" name="n4">4</a></span>  <span style="color:#088;font-weight:bold">public</span> <span style="color:#0a8;font-weight:bold">Collection</span>&lt;FooService&gt; discoverServices() {
+<span class="line-numbers"> <a href="#n5" name="n5">5</a></span>    <span style="color:#080;font-weight:bold">if</span> (serviceMap == <span style="color:#069">null</span>) {
+<span class="line-numbers"> <a href="#n6" name="n6">6</a></span>      <span style="color:#777">//on first call of this method, populate a map of service names to services discovered on the classpath</span>
+<span class="line-numbers"> <a href="#n7" name="n7">7</a></span>      ServiceLoader&lt;FooService&gt; loader = ServiceLoader.load(FooService.class);
+<span class="line-numbers"> <a href="#n8" name="n8">8</a></span>      <span style="color:#0a8;font-weight:bold">Iterator</span>&lt;FooService&gt; it = loader.iterator();
+<span class="line-numbers"> <a href="#n9" name="n9">9</a></span>
+<span class="line-numbers"><strong><a href="#n10" name="n10">10</a></strong></span>      serviceMap = <span style="color:#080;font-weight:bold">new</span> <span style="color:#0a8;font-weight:bold">HashMap</span>&lt;<span style="color:#0a8;font-weight:bold">String</span>, FooService&gt;();
+<span class="line-numbers"><a href="#n11" name="n11">11</a></span>
+<span class="line-numbers"><a href="#n12" name="n12">12</a></span>      <span style="color:#080;font-weight:bold">while</span> (it.hasNext()) {
+<span class="line-numbers"><a href="#n13" name="n13">13</a></span>        FooService s = it.next();
+<span class="line-numbers"><a href="#n14" name="n14">14</a></span>        <span style="color:#080;font-weight:bold">if</span> (!serviceMap.containsKey(s.getName())) {
+<span class="line-numbers"><a href="#n15" name="n15">15</a></span>          serviceMap.put(s.getName(), s);
+<span class="line-numbers"><a href="#n16" name="n16">16</a></span>        }
+<span class="line-numbers"><a href="#n17" name="n17">17</a></span>        <span style="color:#080;font-weight:bold">else</span> {
+<span class="line-numbers"><a href="#n18" name="n18">18</a></span>          <span style="color:#080;font-weight:bold">if</span> (serviceMap.get(s.getName()) != s) {
+<span class="line-numbers"><a href="#n19" name="n19">19</a></span>            <span style="color:#0a8;font-weight:bold">String</span> msg = <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">Multiple different FooServices with the same service name </span><span style="color:#710">&quot;</span></span> +
+<span class="line-numbers"><strong><a href="#n20" name="n20">20</a></strong></span>            <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">('</span><span style="color:#710">&quot;</span></span> + s.getName() + <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">') are present on the classpath. Service names must be unique.</span><span style="color:#710">&quot;</span></span>;            
+<span class="line-numbers"><a href="#n21" name="n21">21</a></span>            <span style="color:#080;font-weight:bold">throw</span> <span style="color:#080;font-weight:bold">new</span> ServiceConfigurationError(msg);
+<span class="line-numbers"><a href="#n22" name="n22">22</a></span>          }
+<span class="line-numbers"><a href="#n23" name="n23">23</a></span>        }
+<span class="line-numbers"><a href="#n24" name="n24">24</a></span>      }
+<span class="line-numbers"><a href="#n25" name="n25">25</a></span>    }
+<span class="line-numbers"><a href="#n26" name="n26">26</a></span>    <span style="color:#080;font-weight:bold">return</span> serviceMap.values();
+<span class="line-numbers"><a href="#n27" name="n27">27</a></span>  }
+<span class="line-numbers"><a href="#n28" name="n28">28</a></span>
+<span class="line-numbers"><a href="#n29" name="n29">29</a></span>  <span style="color:#088;font-weight:bold">public</span> FooService getFooService(<span style="color:#0a8;font-weight:bold">String</span> serviceName) {
+<span class="line-numbers"><strong><a href="#n30" name="n30">30</a></strong></span>    <span style="color:#080;font-weight:bold">for</span> (FooService s : discoverServices()) {
+<span class="line-numbers"><a href="#n31" name="n31">31</a></span>      <span style="color:#080;font-weight:bold">if</span> (s.getName().equals(serviceName)) {
+<span class="line-numbers"><a href="#n32" name="n32">32</a></span>        <span style="color:#080;font-weight:bold">return</span> s;
+<span class="line-numbers"><a href="#n33" name="n33">33</a></span>      }
+<span class="line-numbers"><a href="#n34" name="n34">34</a></span>    }
+<span class="line-numbers"><a href="#n35" name="n35">35</a></span>    log.warn(<span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">No service called '</span><span style="color:#710">&quot;</span></span> + serviceName + <span style="background-color:hsla(0,100%,50%,0.05)"><span style="color:#710">&quot;</span><span style="color:#D20">' was available on the classpath</span><span style="color:#710">&quot;</span></span>);
+<span class="line-numbers"><a href="#n36" name="n36">36</a></span>    <span style="color:#080;font-weight:bold">return</span> <span style="color:#069">null</span>;
+<span class="line-numbers"><a href="#n37" name="n37">37</a></span>  }
+<span class="line-numbers"><a href="#n38" name="n38">38</a></span>}
+</pre></div>
+</div>
+</div>
+
+<p>You would realistically have one such class for each service type interface, and wire these into relevant beans via Spring configuration.</p>
+
+<h2 id="implementations">Implementations</h2>
+
+<h2 id="naming-scheme-services">Naming Scheme Services</h2>
+
+<p>MISO has a default built-in service interface called <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/service/naming/MisoNamingScheme.java">MisoNamingScheme</a> that defines contracts for supplying values to <a href="https://github.com/TGAC/miso-lims/blob/develop/core/src/main/java/uk/ac/bbsrc/tgac/miso/core/data/Nameable.java">Nameable</a> object fields, e.g. name and alias. There are a number of concrete default implementations of this interface.</p>
+
+<h2 id="tag-barcode-services">Tag Barcode Services</h2>
+
+<h2 id="notification-consumer-services">Notification Consumer Services</h2>
+
+<h2 id="barcode-printing-services">Barcode Printing Services</h2>
+
+<h2 id="plate-conversion-services">Plate Conversion Services</h2>
+
+<h1 id="analysis-modules">Analysis Modules</h1>
+
+
+                    </div>
+                
+            </div>
+
+            
+
+            <div class="row">
+                <div id="footer" class="col-sm-12">
+                    Documentation for <a href="https://github.com/TGAC/miso-lims">MISO</a>
+
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function orderNav() {
+                var list,
+                    section,
+                    header,
+                    sections = [],
+                    lists = {},
+                    headers = {};
+
+                var navUl = document.querySelectorAll('#navigation ul')[0],
+                    navLis = document.querySelectorAll('#navigation ul li');
+
+                if (!navUl) return;
+
+                for (var i = 0; i < navLis.length; i++) {
+                    var order, li = navLis[i];
+
+                    if (li.classList.contains('nav-header')) {
+                        section = li.textContent || li.innerText;
+                        sections.push(section);
+                        headers[section] = li;
+                        continue;
+                    }
+
+                    if (!lists[section]) {
+                        lists[section] = [];
+                    }
+
+                    order = parseFloat(li.getAttribute('data-order'))
+                    lists[section].push([order, li]);
+                }
+
+                for (var i = 0; i < sections.length; i++) {
+                    section = sections[i];
+                    list = lists[section].sort(function(a, b) {
+                        return a[0] - b[0];
+                    });
+
+                    if (header = headers[section]) {
+                        navUl.appendChild(header);
+                    }
+                    for (var j = 0; j < list.length; j++) {
+                        navUl.appendChild(list[j][1]);
+                    }
+                }
+            }
+
+            if (document.querySelectorAll) orderNav();
+        </script>
+        
+    </body>
+</html>
