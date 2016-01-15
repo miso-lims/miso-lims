@@ -73,7 +73,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
  * uk.ac.bbsrc.tgac.miso.spring.ajax
  * <p/>
  * Info
- * 
+ *
  * @author Xingdong Bian
  * @since 0.1.2
  */
@@ -816,16 +816,21 @@ public class FlexReportingControllerHelperService {
     for (Library library : libraries) {
       String qc = "unknown";
       String sampleQC = "unknown";
+      String scientificName = "unknown";
       if (library.getQcPassed() != null) {
         qc = library.getQcPassed().toString();
       }
       if (library.getSample().getQcPassed() != null) {
         sampleQC = library.getSample().getQcPassed().toString();
       }
+      if (library.getSample().getScientificName() != null) {
+        scientificName = library.getSample().getScientificName();
+      }
 
       jsonArray.add("['" + library.getSample().getProject().getName() + "','" + library.getName() + "','" + library.getAlias() + "','"
           + library.getDescription() + "','" + library.getPlatformName() + "','" + library.getLibraryType().getDescription() + "','" + qc
-          + "','" + LimsUtils.getDateAsString(library.getCreationDate()) + "','" + library.getSample().getName() + "','" + sampleQC + "']");
+          + "','" + LimsUtils.getDateAsString(library.getCreationDate()) + "','" + library.getSample().getName() + "','" + sampleQC + "','"
+          + scientificName + "']");
     }
     return jsonArray;
   }
