@@ -82,7 +82,12 @@ public class PlateControllerHelperServiceTestSuite {
     final long id = 1L;
     final String idBarcode = "";
     when(requestManager.getPlateById(anyLong())).thenReturn(plate);
-
+    when(securityManager.getUserByLoginName(anyString())).thenReturn(user);
+    when(authentication.getName()).thenReturn("Dr Admin");
+    final SecurityContextImpl context = new SecurityContextImpl();
+    context.setAuthentication(authentication);
+    SecurityContextHolder.setContext(context);
+    
     final JSONObject json = new JSONObject();
     json.put("plateId", id);
     json.put("identificationBarcode", idBarcode);
@@ -103,7 +108,12 @@ public class PlateControllerHelperServiceTestSuite {
     final IOException expected = new IOException("thrown by mock");
     when(requestManager.getPlateById(anyLong())).thenReturn(plate);
     when(requestManager.savePlate(plate)).thenThrow(expected);
-
+    when(securityManager.getUserByLoginName(anyString())).thenReturn(user);
+    when(authentication.getName()).thenReturn("Dr Admin");
+    final SecurityContextImpl context = new SecurityContextImpl();
+    context.setAuthentication(authentication);
+    SecurityContextHolder.setContext(context);
+    
     final JSONObject json = new JSONObject();
     json.put("plateId", id);
     json.put("identificationBarcode", idBarcode);

@@ -79,6 +79,11 @@ public class SampleControllerHelperServiceTestSuite {
   public final void testChangeSampleIdBarcodeBlankBarcode() throws Exception {
     final long id = 1L;
     final String idBarcode = "";
+    when(securityManager.getUserByLoginName(anyString())).thenReturn(user);
+    when(authentication.getName()).thenReturn("Dr Admin");
+    final SecurityContextImpl context = new SecurityContextImpl();
+    context.setAuthentication(authentication);
+    SecurityContextHolder.setContext(context);
     when(requestManager.getSampleById(anyLong())).thenReturn(sample);
 
     final JSONObject json = new JSONObject();

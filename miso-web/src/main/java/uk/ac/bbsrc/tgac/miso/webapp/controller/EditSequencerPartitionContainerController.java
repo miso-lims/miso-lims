@@ -49,6 +49,8 @@ import com.eaglegenomics.simlims.core.manager.SecurityManager;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.ChangeLog;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
+import uk.ac.bbsrc.tgac.miso.core.data.Pool;
+import uk.ac.bbsrc.tgac.miso.core.data.Poolable;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -141,7 +143,7 @@ public class EditSequencerPartitionContainerController {
   }
 
   @RequestMapping(method = RequestMethod.POST)
-  public String processSubmit(@ModelAttribute("container") SequencerPartitionContainer container, ModelMap model, SessionStatus session)
+  public String processSubmit(@ModelAttribute("container") SequencerPartitionContainer<SequencerPoolPartition> container, ModelMap model, SessionStatus session)
       throws IOException, MalformedRunException {
     try {
       User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
@@ -149,6 +151,12 @@ public class EditSequencerPartitionContainerController {
         throw new SecurityException("Permission denied.");
       }
 
+      for (SequencerPoolPartition partition : container.getPartitions()) {
+        if (partition.getPool() != null) {
+          Pool<? extends Poolable> pool = partition.getPool();
+          pool.setLastModifier(user);
+        }
+      }
       container.setLastModifier(user);
       long containerId = requestManager.saveSequencerPartitionContainer(container);
       session.setComplete();

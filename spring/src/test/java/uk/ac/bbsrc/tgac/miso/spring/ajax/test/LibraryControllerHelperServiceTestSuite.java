@@ -31,7 +31,7 @@ public class LibraryControllerHelperServiceTestSuite {
 
   @InjectMocks
   private LibraryControllerHelperService libraryControllerHelperService;
-
+  
   @Mock
   private SecurityManager securityManager;
   @Mock
@@ -78,7 +78,12 @@ public class LibraryControllerHelperServiceTestSuite {
     final long id = 1L;
     final String idBarcode = "";
     when(requestManager.getLibraryById(anyLong())).thenReturn(library);
-
+    when(securityManager.getUserByLoginName(anyString())).thenReturn(user);
+    when(authentication.getName()).thenReturn("Dr Admin");
+    final SecurityContextImpl context = new SecurityContextImpl();
+    context.setAuthentication(authentication);
+    SecurityContextHolder.setContext(context);
+    
     final JSONObject json = new JSONObject();
     json.put("libraryId", id);
     json.put("identificationBarcode", idBarcode);
@@ -98,7 +103,12 @@ public class LibraryControllerHelperServiceTestSuite {
     final IOException expected = new IOException("thrown by mock");
     when(requestManager.getLibraryById(anyLong())).thenReturn(library);
     when(requestManager.saveLibrary(library)).thenThrow(expected);
-
+    when(securityManager.getUserByLoginName(anyString())).thenReturn(user);
+    when(authentication.getName()).thenReturn("Dr Admin");
+    final SecurityContextImpl context = new SecurityContextImpl();
+    context.setAuthentication(authentication);
+    SecurityContextHolder.setContext(context);
+    
     final JSONObject json = new JSONObject();
     json.put("libraryId", id);
     json.put("identificationBarcode", idBarcode);
