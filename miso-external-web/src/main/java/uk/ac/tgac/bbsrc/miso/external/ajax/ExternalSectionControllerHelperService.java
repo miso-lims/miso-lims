@@ -66,7 +66,7 @@ public class ExternalSectionControllerHelperService {
       apiKey = generatePrivateUserKey((username + "::" + shapassword).getBytes("UTF-8"));
       String signature = calculateHMAC("/miso/rest/external/projects?x-url=/miso/rest/external/projects@x-user=" + username, apiKey);
       HttpClient client = new DefaultHttpClient();
-      String getURL = "http://hostname-here/miso/rest/external/projects";
+      String getURL = System.getProperty("miso.rooturl") + "/miso/rest/external/projects";
       HttpGet get = new HttpGet(getURL);
       get.setHeader("x-user", username);
       get.setHeader("x-signature", signature);
@@ -121,7 +121,7 @@ public class ExternalSectionControllerHelperService {
       String signature = calculateHMAC("/miso/rest/external/project/" + projectId + "?x-url=/miso/rest/external/project/" + projectId
           + "@x-user=" + username, apiKey);
       HttpClient client = new DefaultHttpClient();
-      String getURL = "http://hostname-here/miso/rest/external/project/" + projectId;
+      String getURL = System.getProperty("miso.rooturl") + "/miso/rest/external/project/" + projectId;
       HttpGet get = new HttpGet(getURL);
       get.setHeader("x-user", username);
       get.setHeader("x-signature", signature);
