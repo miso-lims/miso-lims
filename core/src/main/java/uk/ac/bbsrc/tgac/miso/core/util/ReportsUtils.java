@@ -38,7 +38,6 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PiePlot;
 import org.jfree.data.general.DefaultPieDataset;
 import org.jfree.util.Rotation;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

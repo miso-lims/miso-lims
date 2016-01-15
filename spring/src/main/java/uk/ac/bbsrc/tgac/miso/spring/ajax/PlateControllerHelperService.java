@@ -168,6 +168,7 @@ public class PlateControllerHelperService {
           Plate<? extends List<? extends Plateable>, ? extends Plateable> plate = requestManager.getPlateById(plateId);
           // autosave the barcode if none has been previously generated
           if (isStringEmptyOrNull(plate.getIdentificationBarcode())) {
+            plate.setLastModifier(securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName()));
             requestManager.savePlate(plate);
           }
           File f = mps.getLabelFor(plate);
@@ -196,6 +197,7 @@ public class PlateControllerHelperService {
       if (!isStringEmptyOrNull(idBarcode)) {
         Plate<? extends List<? extends Plateable>, ? extends Plateable> plate = requestManager.getPlateById(plateId);
         plate.setIdentificationBarcode(idBarcode);
+        plate.setLastModifier(securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName()));
         requestManager.savePlate(plate);
       } else {
         return JSONUtils.SimpleJSONError("New identification barcode not recognized");
@@ -301,6 +303,7 @@ public class PlateControllerHelperService {
               }
               log.info("Saving plate: " + plate.toString());
               currentPlate = plate;
+              plate.setLastModifier(securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName()));
               long plateId = requestManager.savePlate(plate);
               j.put("plateId", plateId);
               savedPlates.add(j);
@@ -308,6 +311,7 @@ public class PlateControllerHelperService {
             }
 
             log.info("Saving pool: " + pool.toString());
+            platePool.setLastModifier(securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName()));
             requestManager.savePool(platePool);
             currentPool = null;
           }

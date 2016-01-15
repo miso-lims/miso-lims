@@ -21,13 +21,9 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
  * @since 0.1.7
  */
 public enum DefaultMisoEntityPrefix {
-  EMP("emPCR"), EDI("emPCRDilution"), EPO("Pool"), EXP("Experiment"), LIB("Library"), LDI("LibraryDilution"), PLA("Plate"), PRO(
-      "Project"), UPO("Pool"), RUN("Run"), SAM("Sample"), SPC("SequencerPartitionContainer"), STU("Study"), IPO("Pool"),
-      // SPO("SolidPool"),
-      // LPO("LS454Pool"),
-  PPO("PacBioPool"),
-  // TPO("TorrentPool"),
-  SUB("Submission");
+  BOX("Box"), EMP("emPCR"), EDI("emPCRDilution"), EPO("Pool"), EXP("Experiment"), LIB("Library"), LDI("LibraryDilution"), PLA("Plate"), PRO(
+      "Project"), UPO("Pool"), RUN("Run"), SAM("Sample"), SPC("SequencerPartitionContainer"), STU("Study"), IPO("Pool"), PPO(
+          "PacBioPool"), SUB("Submission");
 
   /**
    * Field key

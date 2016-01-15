@@ -57,7 +57,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.jackson.PooledElementDeserializer;
  * @author Rob Davey
  * @since 0.0.2
  */
-public abstract class AbstractPool<P extends Poolable> implements Pool<P> {
+public abstract class AbstractPool<P extends Poolable> extends AbstractBoxable implements Pool<P> {
   protected static final Logger log = LoggerFactory.getLogger(AbstractPool.class);
 
   public static final Long UNSAVED_ID = 0L;
@@ -70,22 +70,21 @@ public abstract class AbstractPool<P extends Poolable> implements Pool<P> {
   private SecurityProfile securityProfile;
 
   private String name;
-  private String alias;
 
-  private Collection<P> pooledElements = new HashSet<P>();
+  private final Collection<P> pooledElements = new HashSet<P>();
   private Collection<Experiment> experiments = new HashSet<Experiment>();
   private Date creationDate;
   private Double concentration;
   private String identificationBarcode;
   private boolean readyToRun = false;
 
-  private Collection<PoolQC> poolQCs = new TreeSet<PoolQC>();
+  private final Collection<PoolQC> poolQCs = new TreeSet<PoolQC>();
   private Boolean qcPassed;
 
   private Date lastUpdated;
 
   // listeners
-  private Set<MisoListener> listeners = new HashSet<MisoListener>();
+  private final Set<MisoListener> listeners = new HashSet<MisoListener>();
   private Set<User> watchers = new HashSet<User>();
   private final Collection<ChangeLog> changeLog = new ArrayList<ChangeLog>();
   private User lastModifier;
@@ -135,16 +134,6 @@ public abstract class AbstractPool<P extends Poolable> implements Pool<P> {
   @Override
   public void setName(String name) {
     this.name = name;
-  }
-
-  @Override
-  public String getAlias() {
-    return alias;
-  }
-
-  @Override
-  public void setAlias(String alias) {
-    this.alias = alias;
   }
 
   @Override
@@ -400,7 +389,7 @@ public abstract class AbstractPool<P extends Poolable> implements Pool<P> {
   public boolean equals(Object obj) {
     if (obj == null) return false;
     if (obj == this) return true;
-    if (!(obj instanceof Platform)) return false;
+    if (!(obj instanceof Pool)) return false;
     Pool them = (Pool) obj;
     // If not saved, then compare resolved actual objects. Otherwise
     // just compare IDs.

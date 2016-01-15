@@ -20,12 +20,12 @@
   ~ along with MISO. If not, see <http://www.gnu.org/licenses/>.
   ~
   ~ **********************************************************************
--->
+  -->
 
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:integration="http://www.springframework.org/schema/integration"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
                            http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd"
-  default-autowire="byName">
+       default-autowire="byName">
 
   <integration:annotation-config />
 
@@ -43,6 +43,12 @@
   <bean name="notificationConsumerService" class="uk.ac.bbsrc.tgac.miso.core.service.integration.MisoNotificationConsumerService" />
   <bean name="notificationGatewayService" class="uk.ac.bbsrc.tgac.miso.core.service.integration.MisoNotificationGatewayService">
     <constructor-arg index="0" ref="notificationConsumerService" />
+  </bean>
+
+  <!-- box scanner -->
+  <bean name="boxScanner" class="uk.ac.bbsrc.tgac.miso.integration.visionmate.VisionMateScanner">
+    <constructor-arg index="0" value="${miso.visionmate.server.host}" />
+    <constructor-arg index="1" value="${miso.visionmate.server.port}" />
   </bean>
 
   <integration:channel id="outboundChannel" />

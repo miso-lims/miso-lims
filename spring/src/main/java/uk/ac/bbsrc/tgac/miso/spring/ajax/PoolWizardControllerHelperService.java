@@ -174,6 +174,7 @@ public class PoolWizardControllerHelperService {
             }
           }
 
+          pool.setLastModifier(user);
           requestManager.savePool(pool);
 
           sb.append("<a class='dashboardresult' href='/miso/pool/" + pool.getId()
@@ -229,6 +230,8 @@ public class PoolWizardControllerHelperService {
       }
     }
     try {
+      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+
       Project p = requestManager.getProjectById(projectId);
       Study s = new StudyImpl();
       s.setProject(p);
@@ -237,6 +240,7 @@ public class PoolWizardControllerHelperService {
       s.setSecurityProfile(p.getSecurityProfile());
       s.setStudyType(studyType);
 
+      s.setLastModifier(user);
       requestManager.saveStudy(s);
 
       sb.append("<a  class=\"dashboardresult\" href='/miso/study/" + s.getId()

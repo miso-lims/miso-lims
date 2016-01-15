@@ -26,6 +26,8 @@ package uk.ac.bbsrc.tgac.miso.integration.test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
+import uk.ac.bbsrc.tgac.miso.integration.test.visionmate.VisionMateScanTests;
+import uk.ac.bbsrc.tgac.miso.integration.test.visionmate.VisionMateScannerTests;
 /**
  * uk.ac.bbsrc.tgac.miso.integration.test
  * <p/>
@@ -38,7 +40,9 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    // JargonTests.class
+  VisionMateScanTests.class,
+  VisionMateScannerTests.class
 })
+
 public class AllTestsSuite {
 }

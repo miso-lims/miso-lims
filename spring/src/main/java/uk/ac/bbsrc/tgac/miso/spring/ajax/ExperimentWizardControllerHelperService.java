@@ -35,6 +35,7 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
@@ -119,6 +120,7 @@ public class ExperimentWizardControllerHelperService {
       s.setDescription(p.getDescription());
       s.setSecurityProfile(p.getSecurityProfile());
       s.setStudyType(studyType);
+      s.setLastModifier(securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName()));
       requestManager.saveStudy(s);
 
       studyId = String.valueOf(s.getId());
@@ -154,6 +156,7 @@ public class ExperimentWizardControllerHelperService {
         if (poolBarcode != null) {
           e.setPool(requestManager.getPoolByBarcode(poolBarcode));
         }
+        e.setLastModifier(securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName()));
         requestManager.saveExperiment(e);
 
       }

@@ -761,12 +761,13 @@ public class FlexReportingControllerHelperService {
               if (l.getQcPassed() != null) {
                 if (l.getQcPassed()) {
                   libqcpassed++;
-                } else {
-                  libqcfailed++;
                 }
+              } else {
+                libqcfailed++;
               }
             }
           }
+          
 
           if (libqcpassed > 0 || libqcfailed > 0) {
             overviewRelationArray.add(

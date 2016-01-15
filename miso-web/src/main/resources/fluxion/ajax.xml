@@ -20,26 +20,29 @@
   ~ along with MISO. If not, see <http://www.gnu.org/licenses/>.
   ~
   ~ **********************************************************************
--->
+  -->
 
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
-  xmlns:aop="http://www.springframework.org/schema/aop"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd"
-  default-autowire="byName">
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd"
+       default-autowire="byName">
 
-  <!-- <context:load-time-weaver aspectj-weaving="on" weaver-class="org.springframework.instrument.classloading.ReflectiveLoadTimeWeaver"/> -->
-  <bean class="net.sourceforge.fluxion.ajax.controller.AjaxController">
+    <!-- <context:load-time-weaver aspectj-weaving="on" weaver-class="org.springframework.instrument.classloading.ReflectiveLoadTimeWeaver"/> -->
+    <bean class="net.sourceforge.fluxion.ajax.controller.AjaxController">
     <property name="invalidSessionUrl" value="/login.jsp" />
+    </bean>
+
+  <bean id="boxControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.BoxControllerHelperService">
   </bean>
 
   <bean id="plateControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.PlateControllerHelperService">
-  </bean>
+    </bean>
 
   <bean id="poolControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.PoolControllerHelperService">
-  </bean>
+    </bean>
 
   <bean id="printerControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.PrinterControllerHelperService">
-  </bean>
+    </bean>
 
   <bean id="projectControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.ProjectControllerHelperService">
     <property name="issueTrackerManager" ref="issueTrackerManager" />
@@ -76,10 +79,10 @@
   </bean>
 
   <bean id="poolSearchService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.PoolSearchService">
-  </bean>
+    </bean>
 
   <bean id="experimentSearchService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.ExperimentSearchService">
-  </bean>
+    </bean>
 
   <bean id="cacheHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.CacheHelperService">
   </bean>
@@ -106,16 +109,16 @@
   </bean>
 
   <bean id="poolWizardControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.PoolWizardControllerHelperService">
-  </bean>
+    </bean>
 
   <bean id="taskControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.TaskControllerHelperService">
-  </bean>
+    </bean>
 
   <bean id="externalSectionControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.ExternalSectionControllerHelperService">
-  </bean>
+    </bean>
 
   <bean id="importExportControllerHelperService" class="uk.ac.bbsrc.tgac.miso.spring.ajax.ImportExportControllerHelperService">
-  </bean>
+    </bean>
 
 </beans>
 

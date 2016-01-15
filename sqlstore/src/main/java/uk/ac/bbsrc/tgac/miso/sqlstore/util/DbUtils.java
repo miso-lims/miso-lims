@@ -28,6 +28,7 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +37,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.DatabaseMetaDataCallback;
 import org.springframework.jdbc.support.JdbcUtils;
 import org.springframework.jdbc.support.MetaDataAccessException;
@@ -200,6 +202,19 @@ public class DbUtils {
       }
       c.put(new Element(cachekey, e));
     }
+  }
+
+  public static <T> List<T> getByBarcodeList(JdbcTemplate template, List<String> barcodeList, String query, RowMapper<T> mapper) {
+    StringBuilder queryBuilder = new StringBuilder();
+    queryBuilder.append(query);
+    for (int i = 0; i < barcodeList.size(); i++) {
+      if (i != 0) {
+        queryBuilder.append(", ");
+      }
+      queryBuilder.append("?");
+    }
+    queryBuilder.append(")");
+    return template.query(queryBuilder.toString(), new Object[] { barcodeList }, new int[] { Types.VARCHAR }, mapper);
   }
 
   public static Long hashCodeCacheKeyFor(Object... datas) {

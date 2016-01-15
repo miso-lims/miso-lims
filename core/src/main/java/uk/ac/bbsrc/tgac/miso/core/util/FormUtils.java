@@ -5023,4 +5023,44 @@ public class FormUtils {
     OutputStream out = new FileOutputStream(new File("/tmp/test-sample-form.pdf"));
     ODF2PDFViaITextConverter.getInstance().convert(oDoc, out, null);
   }
+
+  public static void createBoxContentsSpreadsheet(File outpath, ArrayList<String> array) throws IOException {
+    InputStream in = null;
+    in = FormUtils.class.getResourceAsStream("/forms/ods/box_input.xlsx");
+    if (in != null) {
+      XSSFWorkbook oDoc = new XSSFWorkbook(in);
+
+      XSSFSheet sheet = oDoc.getSheet("Input");
+      FileOutputStream fileOut = new FileOutputStream(outpath);
+
+      String boxInfo = array.remove(0);
+      String boxName = boxInfo.split(":")[0];
+      String boxAlias = boxInfo.split(":")[1];
+      XSSFRow row1 = sheet.createRow(1);
+      XSSFCell cellA = row1.createCell(0);
+      cellA.setCellValue(boxName);
+      XSSFCell cellB = row1.createCell(1);
+      cellB.setCellValue(boxAlias);
+
+      int i = 4; // start on row 4 of the sheet
+      for (String item : (Iterable<String>) array) {
+        String position = item.split(":")[0];
+        String name = item.split(":")[1];
+        String alias = item.split(":")[2];
+
+        XSSFRow row = sheet.createRow(i);
+        cellA = row.createCell(0);
+        cellA.setCellValue(position);
+        cellB = row.createCell(1);
+        cellB.setCellValue(name);
+        XSSFCell cellC = row.createCell(2);
+        cellC.setCellValue(alias);
+        i++;
+      }
+      oDoc.write(fileOut);
+      fileOut.close();
+    } else {
+      throw new IOException("Could not read from resource.");
+    }
+  }
 }

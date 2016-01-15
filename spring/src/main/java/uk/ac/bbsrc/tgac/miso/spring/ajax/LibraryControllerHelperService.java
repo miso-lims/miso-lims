@@ -173,6 +173,7 @@ public class LibraryControllerHelperService {
       note.setCreationDate(new Date());
       library.getNotes().add(note);
       requestManager.saveLibraryNote(library, note);
+      library.setLastModifier(user);
       requestManager.saveLibrary(library);
     } catch (IOException e) {
       log.error("add library note", e);
@@ -187,11 +188,13 @@ public class LibraryControllerHelperService {
     Long noteId = json.getLong("noteId");
 
     try {
+      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       Library library = requestManager.getLibraryById(libraryId);
       Note note = requestManager.getNoteById(noteId);
       if (library.getNotes().contains(note)) {
         library.getNotes().remove(note);
         requestManager.deleteNote(note);
+        library.setLastModifier(user);
         requestManager.saveLibrary(library);
         return JSONUtils.SimpleJSONResponse("OK");
       } else {
@@ -273,6 +276,7 @@ public class LibraryControllerHelperService {
           Library library = requestManager.getLibraryById(libraryId);
           // autosave the barcode if none has been previously generated
           if (isStringEmptyOrNull(library.getIdentificationBarcode())) {
+            library.setLastModifier(user);
             requestManager.saveLibrary(library);
           }
 
@@ -365,6 +369,7 @@ public class LibraryControllerHelperService {
         note.setCreationDate(new Date());
         library.getNotes().add(note);
         requestManager.saveLibraryNote(library, note);
+        library.setLastModifier(user);
         requestManager.saveLibrary(library);
       } else {
         return JSONUtils.SimpleJSONError("New location barcode not recognised");
@@ -382,9 +387,11 @@ public class LibraryControllerHelperService {
     String idBarcode = json.getString("identificationBarcode");
 
     try {
+      User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
       if (!isStringEmptyOrNull(idBarcode)) {
         Library library = requestManager.getLibraryById(libraryId);
         library.setIdentificationBarcode(idBarcode);
+        library.setLastModifier(user);
         requestManager.saveLibrary(library);
       } else {
         return JSONUtils.SimpleJSONError("New identification barcode not recognized");
@@ -437,6 +444,7 @@ public class LibraryControllerHelperService {
   public JSONObject bulkSaveLibraries(HttpSession session, JSONObject json) {
     if (json.has("libraries")) {
       try {
+        User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
         Project p = requestManager.getProjectById(json.getLong("projectId"));
         JSONArray a = JSONArray.fromObject(json.get("libraries"));
         Set<Library> saveSet = new HashSet<Library>();
@@ -487,7 +495,8 @@ public class LibraryControllerHelperService {
               }
               library.setPaired(paired);
 
-              if (j.has("tagBarcodes") && !isStringEmptyOrNull(j.getString("tagBarcodes")) && !j.getString("tagBarcodes").contains("Select")) {
+              if (j.has("tagBarcodes") && !isStringEmptyOrNull(j.getString("tagBarcodes"))
+                  && !j.getString("tagBarcodes").contains("Select")) {
                 String[] codes = j.getString("tagBarcodes").split(Pattern.quote("|"));
                 HashMap<Integer, TagBarcode> barcodes = new HashMap<Integer, TagBarcode>();
                 int count = 1;
@@ -673,8 +682,8 @@ public class LibraryControllerHelperService {
         String qcDate = qc.getString("qcDate");
         String insertSize = qc.getString("insertSize");
 
-        if (isStringEmptyOrNull(qcType) || isStringEmptyOrNull(results) || isStringEmptyOrNull(qcCreator)
-            || isStringEmptyOrNull(qcDate) || isStringEmptyOrNull(insertSize)) {
+        if (isStringEmptyOrNull(qcType) || isStringEmptyOrNull(results) || isStringEmptyOrNull(qcCreator) || isStringEmptyOrNull(qcDate)
+            || isStringEmptyOrNull(insertSize)) {
           ok = false;
         }
       }
@@ -738,10 +747,11 @@ public class LibraryControllerHelperService {
 
         File temploc = new File(session.getServletContext().getRealPath("/") + "temp/");
         for (LibraryDilution dil : library.getLibraryDilutions()) {
+          SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
           sb.append("<tr>");
           sb.append("<td>" + dil.getName() + "</td>");
           sb.append("<td>" + dil.getDilutionCreator() + "</td>");
-          sb.append("<td>" + dil.getCreationDate() + "</td>");
+          sb.append("<td>" + date.format(dil.getCreationDate()) + "</td>");
           sb.append("<td>" + dil.getConcentration() + " " + dil.getUnits() + "</td>");
           sb.append("<td>");
 
@@ -756,7 +766,7 @@ public class LibraryControllerHelperService {
               }
             }
           } catch (IOException e) {
-            log.error("failed to add library dilution to this library", e);
+            log.error("Error generating library dilution barcode", e);
           }
           sb.append("</td>");
 
@@ -1016,8 +1026,7 @@ public class LibraryControllerHelperService {
         String dilutionDate = dil.getString("pcrDilutionDate");
         String concentration = dil.getString("results");
 
-        if (isStringEmptyOrNull(concentration) || isStringEmptyOrNull(dilutionCreator)
-            || isStringEmptyOrNull(dilutionDate)) {
+        if (isStringEmptyOrNull(concentration) || isStringEmptyOrNull(dilutionCreator) || isStringEmptyOrNull(dilutionDate)) {
           ok = false;
         }
       }
