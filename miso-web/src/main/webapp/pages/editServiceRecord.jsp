@@ -36,7 +36,7 @@
 <script src="<c:url value='/scripts/stats_ajax.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
 
 <script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
-<script type="text/javascript" src="<c:url value='/scripts/sample_validation.js?ts=${timestamp.time}'/>"></script>
+<script type="text/javascript" src="<c:url value='/scripts/sequencer_service_record_validation.js?ts=${timestamp.time}'/>"></script>
 
 <script type="text/javascript" src="<c:url value='/scripts/jquery/timepicker/js/jquery-ui-timepicker-addon.min.js'/>"></script>
 <link rel="stylesheet" href="<c:url value='/scripts/jquery/timepicker/css/jquery-ui-timepicker-addon.min.css'/>"
@@ -44,7 +44,7 @@
 
 <div id="maincontent">
   <div id="contentcolumn">
-    <form:form action="/miso/stats/sequencer/servicerecord" method="POST" commandName="serviceRecord" autocomplete="off">
+    <form:form id="service_record_form" data-parsley-validate="" action="/miso/stats/sequencer/servicerecord" method="POST" commandName="serviceRecord" autocomplete="off">
       <sessionConversation:insertSessionConversationId attributeName="serviceRecord"/>
       <h1>
         <c:choose>
@@ -52,7 +52,7 @@
           <c:otherwise>Create</c:otherwise>
         </c:choose>
         Service Record
-        <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
+        <button onclick="validate_service_record();" class="fg-button ui-state-default ui-corner-all">Save</button>
       </h1>
       <div class="breadcrumbs">
         <ul>
@@ -73,6 +73,12 @@
       <div id="notediv" class="note" style="display:none;">A Service Record is a record of maintenance performed 
       on a sequencer
       </div>
+      
+      <div class="bs-callout bs-callout-warning hidden">
+        <h2>Oh snap!</h2>
+        <p>This form seems to be invalid!</p>
+      </div>
+      
       <h2>Service Record Information</h2>
       
       <br/>
