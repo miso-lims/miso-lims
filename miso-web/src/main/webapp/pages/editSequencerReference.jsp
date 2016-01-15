@@ -36,15 +36,15 @@
 <script src="<c:url value='/scripts/stats_ajax.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
 
 <script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
-<script type="text/javascript" src="<c:url value='/scripts/sample_validation.js?ts=${timestamp.time}'/>"></script>
+<script type="text/javascript" src="<c:url value='/scripts/sequencer_reference_validation.js?ts=${timestamp.time}'/>"></script>
 
 <div id="maincontent">
   <div id="contentcolumn">
-    <form:form action="/miso/stats/sequencer" method="POST" commandName="sequencerReference" autocomplete="off">
+    <form:form id="sequencer_reference_form" data-parsley-validate="" action="/miso/stats/sequencer" method="POST" commandName="sequencerReference" autocomplete="off">
       <sessionConversation:insertSessionConversationId attributeName="sequencerReference"/>
       <h1>
         Edit Sequencer Reference
-        <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
+        <button onclick="validate_sequencer_reference();" class="fg-button ui-state-default ui-corner-all">Save</button>
       </h1>
       <div class="breadcrumbs">
         <ul>
@@ -70,6 +70,12 @@
         a machine physically attached to a sequencer itself, or more commonly, a cluster or storage machine that
         holds the run directories.
       </div>
+      
+      <div class="bs-callout bs-callout-warning hidden">
+        <h2>Oh snap!</h2>
+        <p>This form seems to be invalid!</p>
+      </div>
+      
       <h2>Sequencer Information</h2>
 
       <table class="in">
@@ -88,14 +94,14 @@
         </tr>
         <tr>
           <td class="h">Serial Number:</td>
-          <td><input type="text" id="serialNumber" name="serialNumber" value="${sequencerReference.serialNumber}"/></td>
+          <td><form:input path="serialNumber" id="serialNumber" name="serialNumber"/><span id="serialnumbercounter" class="counter"></span></td>
         </tr>
         <tr>
-          <td class="h">Name:</td>
-          <td><form:input id="name" path="name"/><span id="nameCounter" class="counter"></span></td>
+          <td class="h">Name:*</td>
+          <td><form:input path="name" id="name" name="name"/><span id="nameCounter" class="counter"></span></td>
         </tr>
         <tr>
-          <td>IP Address:</td>
+          <td>IP Address:*</td>
           <td>
             <input type="text" id="ipAddress" name="ipAddress" value="${trimmedIpAddress}"/>
             <input type="hidden" value="on" name="_ipAddress"/>
@@ -119,7 +125,7 @@
           </td>
         </tr>
         <tr id="decommissionedRow">
-          <td class="h">Decommissioned:</td>
+          <td class="h">Decommissioned:*</td>
           <td>
             <form:input path="dateDecommissioned" id="datedecommissionedpicker" placeholder="DD/MM/YYYY"/>
             <script type="text/javascript">
@@ -128,7 +134,7 @@
           </td>
         </tr>
         <tr id="upgradedReferenceRow">
-          <td class="h">Upgraded To:</td>
+          <td class="h">Upgraded To:*</td>
           <td>
             <form:select id="upgradedSequencerReference" path="upgradedSequencerReference" onchange="updateUpgradedSequencerReferenceLink();">
               <form:option value="0">(choose)</form:option>
