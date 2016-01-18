@@ -102,7 +102,7 @@
         </tr>
         <tr>
           <td class="h">Details:</td>
-          <td><form:input id="details" path="details" name="details"/><span id="detailscounter" class="counter"></span></td>
+          <td><form:textarea id="details" path="details" name="details"/><span id="detailscounter" class="counter"></span></td>
         </tr>
         <tr>
           <td class="h">Serviced By:*</td>

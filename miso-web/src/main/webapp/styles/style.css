@@ -315,6 +315,14 @@ table.in input[type="text"] {
     width: 94%;
 }
 
+table.in textarea {
+    border-left: 1px solid #666699;
+    border-top: 1px solid #666666;
+    width: 94%;
+    height: 120px;
+    font-family: inherit;
+}
+
 table.in select[multiple="multiple"] {
     background-color: #EEEEFF;
     border-left: 1px solid #666699;
