@@ -400,6 +400,7 @@
         class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLSequencerServiceRecordDAO">
     <property name="sequencerReferenceDAO" ref="sqlSequencerReferenceDAO"/>
     <property name="jdbcTemplate" ref="interfaceTemplate"/>
+    <property name="misoFilesManager" ref="misoFileManager"/>
   </bean>
 
   <bean id="sqlKitDAO" class="uk.ac.bbsrc.tgac.miso.sqlstore.SQLKitDAO">

@@ -18,6 +18,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
+import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerReferenceStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerServiceRecordStore;
 
@@ -48,9 +49,16 @@ public class SQLSequencerServiceRecordDAO implements SequencerServiceRecordStore
   
   @Autowired
   private DataObjectFactory dataObjectFactory;
+  
+  @Autowired
+  private MisoFilesManager misoFilesManager;
 
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
+  }
+  
+  public void setMisoFilesManager(MisoFilesManager misoFilesManager) {
+    this.misoFilesManager = misoFilesManager;
   }
   
   public JdbcTemplate getJdbcTemplate() {
@@ -125,8 +133,27 @@ public class SQLSequencerServiceRecordDAO implements SequencerServiceRecordStore
   @Override
   public boolean remove(SequencerServiceRecord t) throws IOException {
     NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
-    return t.isDeletable() && 
-        (namedTemplate.update(SERVICE_RECORD_DELETE, new MapSqlParameterSource().addValue("recordId", t.getId())) == 1);
+    long id = t.getId();
+    if (t.isDeletable() && 
+        namedTemplate.update(SERVICE_RECORD_DELETE, new MapSqlParameterSource().addValue("recordId", t.getId())) == 1) {
+      removeAttachments(id);
+      return true;
+    }
+    return false;
+  }
+  
+  private void removeAttachments(long recordId) {
+    try {
+      for (String filename : misoFilesManager.getFileNames(SequencerServiceRecord.class, String.valueOf(recordId))) {
+        try {
+          misoFilesManager.deleteFile(SequencerServiceRecord.class, String.valueOf(recordId), filename);
+        } catch (IOException e) {
+          log.error("Deleted service record " + recordId + ", but failed to delete attachment: " + filename, e);
+        }
+      }
+    } catch (IOException e) {
+      log.error("Deleted service record " + recordId + ", but failed to delete attachments", e);
+    }
   }
 
   public class SequencerServiceRecordMapper implements RowMapper<SequencerServiceRecord> {
