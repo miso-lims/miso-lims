@@ -188,7 +188,15 @@
               <th>Title</th>
               <th>Serviced By</th>
               <th>Reference Number</th>
-              <th class="fit">Edit</th>
+              <c:choose>
+                <c:when test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+                  <th class="fit">Edit</th>
+                  <th class="fit">Delete</th>
+                </c:when>
+                <c:otherwise>
+                  <th class="fit">View</th>
+                </c:otherwise>
+              </c:choose>
             </tr>
           </thead>
           <tbody>
@@ -198,9 +206,14 @@
                 <td>${record.title}</td>
                 <td>${record.servicedByName}</td>
                 <td>${record.referenceNumber}</td>
-                <td class="misoicon"
-                  onclick="window.location.href='<c:url value="/miso/stats/sequencer/servicerecord/${record.id}"/>'"><span
-                  class="ui-icon ui-icon-pencil"></span></td>
+                <td class="misoicon" onclick="window.location.href='<c:url value="/miso/stats/sequencer/servicerecord/${record.id}"/>'">
+                  <span class="ui-icon ui-icon-pencil"></span>
+                </td>
+                <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+                  <td class="misoicon" onclick="ServiceRecord.ui.deleteServiceRecord(${record.id}, Utils.page.pageReload);">
+                    <span class="ui-icon ui-icon-trash"></span>
+                  </td>
+                </c:if>
               </tr>
             </c:forEach>
           </tbody>
@@ -218,6 +231,9 @@
             { "sType": 'string' },
             { "sType": 'string' },
             { "sType": 'string' },
+            <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+              { "bSortable": false },
+            </c:if>
             { "bSortable": false }
           ],
           "iDisplayLength": 50,

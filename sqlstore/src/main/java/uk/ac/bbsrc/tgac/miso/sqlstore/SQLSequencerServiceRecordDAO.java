@@ -122,6 +122,13 @@ public class SQLSequencerServiceRecordDAO implements SequencerServiceRecordStore
     return template.query(SERVICE_RECORD_SELECT_BY_SEQUENCER_ID, new Object[] {referenceId}, new SequencerServiceRecordMapper());
   }
   
+  @Override
+  public boolean remove(SequencerServiceRecord t) throws IOException {
+    NamedParameterJdbcTemplate namedTemplate = new NamedParameterJdbcTemplate(template);
+    return t.isDeletable() && 
+        (namedTemplate.update(SERVICE_RECORD_DELETE, new MapSqlParameterSource().addValue("recordId", t.getId())) == 1);
+  }
+
   public class SequencerServiceRecordMapper implements RowMapper<SequencerServiceRecord> {
 
     @Override

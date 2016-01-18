@@ -44,6 +44,33 @@ public class ServiceRecordControllerHelperService {
     this.misoFileManager = misoFileManager;
   }
   
+  public JSONObject deleteServiceRecord(HttpSession session, JSONObject json) {
+    User user;
+    try {
+      user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    } catch (IOException e) {
+      log.error("delete service record", e);
+      return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
+    }
+
+    if (user != null && user.isAdmin()) {
+      if (json.has("recordId")) {
+        Long recordId = json.getLong("recordId");
+        try {
+          requestManager.deleteSequencerServiceRecord(requestManager.getSequencerServiceRecordById(recordId));
+          return JSONUtils.SimpleJSONResponse("Service Record deleted");
+        } catch (IOException e) {
+          log.error("cannot delete service record", e);
+          return JSONUtils.SimpleJSONError("Cannot delete service record: " + e.getMessage());
+        }
+      } else {
+        return JSONUtils.SimpleJSONError("No Service Record specified to delete.");
+      }
+    } else {
+      return JSONUtils.SimpleJSONError("Only admins can delete objects.");
+    }
+  }
+  
   public JSONObject deleteServiceRecordAttachment(HttpSession session, JSONObject json) {
     final Long id = json.getLong("id");
     final Integer hashcode = json.getInt("hashcode");

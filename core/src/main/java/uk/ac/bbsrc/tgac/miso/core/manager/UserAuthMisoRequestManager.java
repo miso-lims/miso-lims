@@ -1744,6 +1744,13 @@ public class UserAuthMisoRequestManager implements RequestManager {
       backingManager.deleteSequencerReference(sequencerReference);
     }
   }
+  
+  @Override
+  public void deleteSequencerServiceRecord(uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord serviceRecord) throws IOException {
+    if (getCurrentUser().isAdmin()) {
+      super.deleteSequencerServiceRecord(serviceRecord);
+    }
+  }
 
   @Override
   public void deletePool(Pool pool) throws IOException {

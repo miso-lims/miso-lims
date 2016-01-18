@@ -579,6 +579,8 @@ public interface RequestManager {
 
   public void deleteSequencerReference(SequencerReference sequencerReference) throws IOException;
 
+  public void deleteSequencerServiceRecord(SequencerServiceRecord serviceRecord) throws IOException;
+
   public void deletePool(Pool pool) throws IOException;
 
   public void deletePlate(Plate plate) throws IOException;

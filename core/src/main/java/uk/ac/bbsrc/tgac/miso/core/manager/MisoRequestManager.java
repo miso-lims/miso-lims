@@ -1451,6 +1451,17 @@ public class MisoRequestManager implements RequestManager {
       throw new IOException("No sequencerReferenceStore available. Check that it has been declared in the Spring config.");
     }
   }
+  
+  @Override
+  public void deleteSequencerServiceRecord(SequencerServiceRecord serviceRecord) throws IOException {
+    if (sequencerServiceRecordStore != null) {
+      if (!sequencerServiceRecordStore.remove(serviceRecord)) {
+        throw new IOException("Unable to delete Service Record.");
+      }
+    } else {
+      throw new IOException("No sequencerServiceRecordStore available. Check that it has been declared in the Spring config.");
+    }
+  }
 
   @Override
   public void deletePool(Pool pool) throws IOException {
