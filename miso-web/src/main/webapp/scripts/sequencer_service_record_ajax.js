@@ -30,7 +30,8 @@ ServiceRecord.ui = {
   },
 
   serviceRecordFileUploadSuccess: function () {
-    jQuery('#statusdiv').html("Upload complete. Refresh to see the file.");
+    jQuery('#statusdiv').html("Upload complete.");
+    Utils.page.pageReload();
   }
     
 };
