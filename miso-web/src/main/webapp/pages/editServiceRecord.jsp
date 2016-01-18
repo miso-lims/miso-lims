@@ -98,19 +98,19 @@
         </tr>
         <tr>
           <td class="h">Title:*</td>
-          <td><form:input id="title" path="title" name="title"/><span id="titlecounter" class="counter"></span></td>
+          <td><form:input id="title" path="title" name="title"/><span id="titleCounter" class="counter"></span></td>
         </tr>
         <tr>
           <td class="h">Details:</td>
-          <td><form:textarea id="details" path="details" name="details"/><span id="detailscounter" class="counter"></span></td>
+          <td><form:textarea id="details" path="details" name="details"/><span id="detailsCounter" class="counter"></span></td>
         </tr>
         <tr>
           <td class="h">Serviced By:*</td>
-          <td><form:input id="servicedByName" path="servicedByName" name="servicedByName"/><span id="servicedbynamecounter" class="counter"></span></td>
+          <td><form:input id="servicedByName" path="servicedByName" name="servicedByName"/><span id="servicedByNameCounter" class="counter"></span></td>
         </tr>
         <tr>
           <td class="h">Reference Number:</td>
-          <td><form:input id="referenceNumber" path="referenceNumber" name="referenceNumber"/><span id="referencenumbercounter" class="counter"></span></td>
+          <td><form:input id="referenceNumber" path="referenceNumber" name="referenceNumber"/><span id="referenceNumberCounter" class="counter"></span></td>
         </tr>
         <tr>
           <td class="h">Service Date:*</td>
@@ -200,6 +200,38 @@
     
   </div>
 </div>
+
+<script type="text/javascript">
+  jQuery(document).ready(function () {
+    jQuery('#title').simplyCountable({
+      counter: '#titleCounter',
+      countType: 'characters',
+      maxCount: ${maxLengths['title']},
+      countDirection: 'down'
+    });
+
+    jQuery('#details').simplyCountable({
+      counter: '#detailsCounter',
+      countType: 'characters',
+      maxCount: ${maxLengths['details']},
+      countDirection: 'down'
+    });
+
+    jQuery('#servicedByName').simplyCountable({
+      counter: '#servicedByNameCounter',
+      countType: 'characters',
+      maxCount: ${maxLengths['servicedBy']},
+      countDirection: 'down'
+    });
+
+    jQuery('#referenceNumber').simplyCountable({
+      counter: '#referenceNumberCounter',
+      countType: 'characters',
+      maxCount: ${maxLengths['referenceNumber']},
+      countDirection: 'down'
+    });
+  });
+</script>
 
 <%@ include file="adminsub.jsp" %>
 

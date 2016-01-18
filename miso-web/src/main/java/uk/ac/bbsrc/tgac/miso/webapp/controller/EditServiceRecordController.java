@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.WebDataBinder;
@@ -29,6 +30,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SequencerServiceRecord;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.FilesManager;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 @Controller
 @RequestMapping("/stats/sequencer/servicerecord")
@@ -45,6 +47,13 @@ public class EditServiceRecordController {
 
   @Autowired
   private DataObjectFactory dataObjectFactory;
+  
+  @Autowired
+  private JdbcTemplate jdbcTemplate;
+
+  public void setInterfaceTemplate(JdbcTemplate interfaceTemplate) {
+    this.jdbcTemplate = interfaceTemplate;
+  }
 
   public void setRequestManager(uk.ac.bbsrc.tgac.miso.core.manager.RequestManager requestManager) {
     this.requestManager = requestManager;
@@ -67,6 +76,11 @@ public class EditServiceRecordController {
       return fileMap;
     }
     return Collections.emptyMap();
+  }
+  
+  @ModelAttribute("maxLengths")
+  public Map<String, Integer> maxLengths() throws IOException {
+    return DbUtils.getColumnSizes(jdbcTemplate, "SequencerServiceRecord");
   }
 
   @RequestMapping(value = "/{recordId}", method = RequestMethod.GET)
