@@ -53,12 +53,12 @@ function validate_service_record() {
   jQuery('#title').attr('required', 'true');
   jQuery('#title').attr('data-parsley-maxlength', '50');
   
-  jQuery('#details').attr('data-parsley-maxlength', '2000');
+  jQuery('#details').attr('data-parsley-maxlength', '65535');
   
   jQuery('#servicedByName').attr('required', 'true');
   jQuery('#servicedByName').attr('data-parsley-maxlength', '30');
   
-  jQuery('#phone').attr('data-parsley-maxlength', '12');
+  jQuery('#referenceNumber').attr('data-parsley-maxlength', '30');
   
   jQuery('#servicedatepicker').attr('required', 'true');
   jQuery('#servicedatepicker').attr('data-date-format', 'DD/MM/YYYY');

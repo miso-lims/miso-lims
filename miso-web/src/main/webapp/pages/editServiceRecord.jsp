@@ -109,8 +109,8 @@
           <td><form:input id="servicedByName" path="servicedByName" name="servicedByName"/><span id="servicedbynamecounter" class="counter"></span></td>
         </tr>
         <tr>
-          <td class="h">Phone:</td>
-          <td><form:input id="phone" path="phone" name="phone"/><span id="phonecounter" class="counter"></span></td>
+          <td class="h">Reference Number:</td>
+          <td><form:input id="referenceNumber" path="referenceNumber" name="referenceNumber"/><span id="referencenumbercounter" class="counter"></span></td>
         </tr>
         <tr>
           <td class="h">Service Date:*</td>

@@ -25,7 +25,7 @@ public class SQLSequencerServiceRecordDAO implements SequencerServiceRecordStore
   
   private static final String TABLE_NAME = "SequencerServiceRecord";
   
-  private static final String SERVICE_RECORD_SELECT = "SELECT recordId, sequencerReferenceId, title, details, servicedBy, phone,"
+  private static final String SERVICE_RECORD_SELECT = "SELECT recordId, sequencerReferenceId, title, details, servicedBy, referenceNumber,"
       + " serviceDate, shutdownTime, restoredTime"
       + " FROM " + TABLE_NAME;
   
@@ -34,8 +34,8 @@ public class SQLSequencerServiceRecordDAO implements SequencerServiceRecordStore
   private static final String SERVICE_RECORD_SELECT_BY_SEQUENCER_ID = SERVICE_RECORD_SELECT + " WHERE sequencerReferenceId = ?";
   
   private static final String SERVICE_RECORD_UPDATE = "UPDATE " + TABLE_NAME
-      + " SET sequencerReferenceId=:sequencerReferenceId, title=:title, details=:details, servicedBy=:servicedBy, phone=:phone,"
-      + " serviceDate=:serviceDate, shutdownTime=:shutdownTime, restoredTime=:restoredTime"
+      + " SET sequencerReferenceId=:sequencerReferenceId, title=:title, details=:details, servicedBy=:servicedBy,"
+      + " referenceNumber=:referenceNumber, serviceDate=:serviceDate, shutdownTime=:shutdownTime, restoredTime=:restoredTime"
       + " WHERE recordId=:recordId";
   
   private static final String SERVICE_RECORD_DELETE = "DELETE FROM " + TABLE_NAME
@@ -73,7 +73,7 @@ public class SQLSequencerServiceRecordDAO implements SequencerServiceRecordStore
     params.addValue("title", serviceRecord.getTitle());
     params.addValue("details", serviceRecord.getDetails());
     params.addValue("servicedBy", serviceRecord.getServicedByName());
-    params.addValue("phone", serviceRecord.getPhone());
+    params.addValue("referenceNumber", serviceRecord.getReferenceNumber());
     params.addValue("serviceDate", serviceRecord.getServiceDate());
     params.addValue("shutdownTime", serviceRecord.getShutdownTime());
     params.addValue("restoredTime", serviceRecord.getRestoredTime());
@@ -134,7 +134,7 @@ public class SQLSequencerServiceRecordDAO implements SequencerServiceRecordStore
           r.setTitle(rs.getString("title"));
           r.setDetails(rs.getString("details"));
           r.setServicedByName(rs.getString("servicedBy"));
-          r.setPhone(rs.getString("phone"));
+          r.setReferenceNumber(rs.getString("referenceNumber"));
           r.setServiceDate(rs.getDate("serviceDate"));
           r.setShutdownTime(rs.getTimestamp("shutdownTime"));
           r.setRestoredTime(rs.getTimestamp("restoredTime"));

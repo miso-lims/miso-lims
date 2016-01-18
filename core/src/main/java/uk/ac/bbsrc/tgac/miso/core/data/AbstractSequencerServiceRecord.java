@@ -11,7 +11,7 @@ public abstract class AbstractSequencerServiceRecord implements SequencerService
   private String title;
   private String details;
   private String servicedByName;
-  private String phone;
+  private String referenceNumber;
   private Date serviceDate;
   private Date shutdownTime;
   private Date restoredTime;
@@ -67,13 +67,13 @@ public abstract class AbstractSequencerServiceRecord implements SequencerService
   }
 
   @Override
-  public void setPhone(String phone) {
-    this.phone = phone;
+  public void setReferenceNumber(String referenceNumber) {
+    this.referenceNumber = referenceNumber;
   }
 
   @Override
-  public String getPhone() {
-    return phone;
+  public String getReferenceNumber() {
+    return referenceNumber;
   }
 
   @Override
