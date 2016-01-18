@@ -187,7 +187,7 @@
               <th>Service Date</th>
               <th>Title</th>
               <th>Serviced By</th>
-              <th>Phone</th>
+              <th>Reference Number</th>
               <th class="fit">Edit</th>
             </tr>
           </thead>
@@ -197,7 +197,7 @@
                 <td>${record.serviceDate}</td>
                 <td>${record.title}</td>
                 <td>${record.servicedByName}</td>
-                <td>${record.phone}</td>
+                <td>${record.referenceNumber}</td>
                 <td class="misoicon"
                   onclick="window.location.href='<c:url value="/miso/stats/sequencer/servicerecord/${record.id}"/>'"><span
                   class="ui-icon ui-icon-pencil"></span></td>
