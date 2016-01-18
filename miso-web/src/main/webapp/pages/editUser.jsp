@@ -34,7 +34,7 @@
           <h1><c:choose><c:when
               test="${not empty user.userId}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose>
             User
-            <button onclick="return validate_user();" class="fg-button ui-state-default ui-corner-all">Save</button>
+            <button onclick="return validateUser();" class="fg-button ui-state-default ui-corner-all">Save</button>
           </h1>
 
           <div class="bs-callout bs-callout-warning hidden">

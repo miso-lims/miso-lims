@@ -34,7 +34,7 @@
 <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.breadcrumbs.popup.js'/>"></script>
 
 
-<script type="text/javascript" src="<c:url value='/scripts/experiment_validation.js?ts=${timestamp.time}'/>"></script>
+<script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
 
 <div id="maincontent">
 <div id="contentcolumn">
@@ -46,7 +46,7 @@
     <c:when test="${experiment.id != 0}">Edit</c:when>
     <c:otherwise>Create</c:otherwise>
   </c:choose> Experiment
-  <button onclick="return validate_experiment();" class="fg-button ui-state-default ui-corner-all">Save</button>
+  <button onclick="return Experiment.validateExperiment();" class="fg-button ui-state-default ui-corner-all">Save</button>
 </h1>
 <div class="breadcrumbs">
   <ul>
@@ -170,6 +170,13 @@
     <%@ include file="permissions.jsp" %>
   </c:otherwise>
 </c:choose>
+
+<script type="text/javascript">
+  jQuery(document).ready(function() {
+    // Attaches a Parsley form validator. 
+    Validate.attachParsley('#experiment-form');
+  });
+</script>
 
 <div id="tabs">
 <ul>

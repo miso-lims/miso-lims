@@ -22,32 +22,11 @@
  */
 
 jQuery(document).ready(function () {
-  jQuery('#group-form').parsley();
-  jQuery.listen('parsley:field:validate', function () {
-    updateWarning();
-  });
+  Validate.attachParsley('#group-form');
 });
 
-function clean_group_fields() {
-  jQuery('#group-form').find('input:text').each(function() {
-    Utils.validation.clean_input_field(jQuery(this));
-  });
-};
-
-// update warning message
-function updateWarning() {
-  if (true === jQuery('#group-form').parsley().isValid()) {
-    jQuery('.bs-callout-info').removeClass('hidden');
-    jQuery('.bs-callout-warning').addClass('hidden');
-  } else {
-    jQuery('.bs-callout-info').addClass('hidden');
-    jQuery('.bs-callout-warning').removeClass('hidden');
-  }
-};
-
-function validate_group() {
-  clean_group_fields();
-
+function validateGroup() {
+  Validate.cleanFields('#group-form');
   jQuery('#group-form').parsley().destroy();
 
   // Full name input field validation
@@ -65,15 +44,5 @@ function validate_group() {
   jQuery('#group-form').parsley();
   jQuery('#group-form').parsley().validate();
 
-  return validate_backend();
-};
-
-var validate_backend = function() {
-  updateWarning();
-  if (jQuery('#group-form').parsley().isValid() === true) {
-    jQuery('#group-form').submit();
-    return true;
-  } else {
-    return false;
-  }
+  Validate.updateWarningOrSubmit('#group-form');
 };

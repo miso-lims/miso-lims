@@ -120,6 +120,37 @@ var Box = Box || {
         }
       );
     }
+  },
+  
+  // Validate methods are in parsley_form_validations.js
+  validateBox: function () {
+    Validate.cleanFields('#box-form');
+    jQuery('#box-form').parsley().destroy();
+    
+    // Alias input field validation
+    jQuery('#alias').attr('class', 'form-control');
+    jQuery('#alias').attr('data-parsley-required', 'true');
+    jQuery('#alias').attr('data-parsley-maxlength', '100');
+    jQuery('#alias').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+    
+    // Description input field validation
+    jQuery('#description').attr('class', 'form-control');
+    jQuery('#description').attr('data-parsley-required', 'true');
+    jQuery('#description').attr('data-parsley-max-length', '250');
+    jQuery('#description').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+    
+    // BoxUse input field validation
+    jQuery('#boxUse').attr('class', 'form-control');
+    jQuery('#boxUse').attr('data-parsley-required', 'true');
+    
+    // BoxSize input field validation
+    jQuery('#boxSize').attr('class', 'form-control');
+    jQuery('#boxSize').attr('data-parsley-required', 'true');
+    
+    jQuery('#box-form').parsley();
+    jQuery('#box-form').parsley().validate();
+    
+    Validate.updateWarningOrSubmit('#box-form');
   }
 };
 

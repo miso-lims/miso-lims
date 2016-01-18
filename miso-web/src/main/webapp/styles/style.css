@@ -1748,6 +1748,13 @@ a.DTTT_button {
     margin: 20px 20px 10px 0;
 }
 
+.column {
+   width: 50%;
+   float: left;
+   padding-bottom: 100px;
+   margin-top: 4px;
+ }
+
 div.parsley-success,
 input.parsley-success,
 select.parsley-success,
@@ -1839,4 +1846,8 @@ img.center {
 
 button.disabled {
   opacity: .4;
+}
+
+.parsley-required parsley-custom-error-message {
+	color: #ff0000;
 }

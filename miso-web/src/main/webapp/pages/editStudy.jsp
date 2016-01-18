@@ -33,7 +33,6 @@
 <script type="text/javascript" src="<c:url value='/scripts/jquery/js/jquery.popup.js'/>"></script>
 
 <script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
-<script type="text/javascript" src="<c:url value='/scripts/study_validation.js?ts=${timestamp.time}'/>"></script>
 
 <div id="maincontent">
   <div id="contentcolumn">
@@ -44,7 +43,7 @@
           <c:when test="${study.id != 0}">Edit</c:when>
           <c:otherwise>Create</c:otherwise>
         </c:choose> Study
-        <button type="submit" class="fg-button ui-state-default ui-corner-all" onclick="return validate_study();">Save</button>
+        <button type="submit" class="fg-button ui-state-default ui-corner-all" onclick="return Study.validateStudy();">Save</button>
       </h1>
       <div class="breadcrumbs">
         <ul>
@@ -144,6 +143,13 @@
         </c:otherwise>
       </c:choose>
       <br/>
+      
+      <script type="text/javascript">
+        jQuery(document).ready(function () {
+          // Attaches a Parsley form validator. 
+          Validate.attachParsley('#study-form');
+        });
+      </script>
 
       <c:choose>
         <c:when test="${study.id != 0}">

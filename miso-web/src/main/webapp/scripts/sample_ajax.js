@@ -46,6 +46,108 @@ var Sample = Sample || {
         }
       });
     }
+  },
+  
+  validateSample: function () {
+    Validate.cleanFields('#sample-form');
+    jQuery('#sample-form').parsley().destroy();
+
+    // Alias input field validation
+    jQuery('#alias').attr('class', 'form-control');
+    jQuery('#alias').attr('data-parsley-required', 'true');
+    jQuery('#alias').attr('data-parsley-maxlength', '100');
+    jQuery('#description').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+
+    // Description input field validation
+    jQuery('#description').attr('class', 'form-control');
+    jQuery('#description').attr('data-parsley-required', 'true');
+    jQuery('#description').attr('data-parsley-maxlength', '100');
+    jQuery('#description').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+
+    // Checkbox validation: ensure a checkbox is selected (assumes there is a project 1, no other way to check because of dynamic
+    // generation)
+    jQuery('#project1').attr('data-parsley-maxcheck', '1');
+    jQuery('#project1').attr('required', 'true');
+    jQuery('#projectlist').attr('data-parsley-error-message', 'You must select a project.');
+    jQuery('#projectlist').attr('data-parsley-errors-container', '#projectError');
+    jQuery('#projectlist').attr('data-parsley-class-handler', '#projectlist');
+
+    // Date of Receipt validation: ensure date is of correct form
+    jQuery('#receiveddatepicker').attr('class', 'form-control');
+    jQuery('#receiveddatepicker').attr('data-date-format', 'DD/MM/YYYY');
+    jQuery('#receiveddatepicker').attr('data-parsley-pattern', Utils.validation.dateRegex);
+    jQuery('#receiveddatepicker').attr('data-parsley-error-message', 'Date must be of form DD/MM/YYYY');
+
+    // Sample Type validation
+    jQuery('#sampleTypes').attr('class', 'form-control');
+    jQuery('#sampleTypes').attr('required', 'true');
+    jQuery('#sampleTypes').attr('data-parsley-error-message', 'You must select a Sample Type');
+    jQuery('#sampleTypes').attr('data-parsley-errors-container', '#sampleTypesError');
+    
+    // Scientific Name validation
+    jQuery('#scientificName').attr('class', 'form-control');
+    jQuery('#scientificName').attr('data-parsley-required', 'true');
+    jQuery('#scientificName').attr('data-parsley-maxlength', '100');
+    jQuery('#scientificName').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+
+    Fluxion.doAjax(
+      'sampleControllerHelperService',
+      'getSampleAliasRegex',
+      { 'url': ajaxurl },
+      {
+        'doOnSuccess': function(json) {
+          var regex = json.aliasRegex.split(' ').join('+');
+          jQuery('#alias').attr('data-parsley-pattern', regex);
+          // TODO: better error message than a regex..?
+          //       perhaps save a description and examples with the regex
+          jQuery('#alias').attr('data-parsley-error-message', 'Must match '+regex);
+          jQuery('#sample-form').parsley();
+          jQuery('#sample-form').parsley().validate();
+          Validate.updateWarningOrSubmit('#sample-form', Sample.validateSampleAlias);
+        },
+        'doOnError': function(json) {
+          alert(json.error);
+        }
+      }
+    );
+  },
+  
+  validateSampleAlias: function () {
+    Fluxion.doAjax(
+      'sampleControllerHelperService',
+      'validateSampleAlias',
+      {
+        'alias': jQuery('#alias').val(),
+        'url': ajaxurl
+      },
+      {
+        'doOnSuccess': function(json) {
+          if (json.response === "OK") {
+            jQuery('#sample-form').submit();
+          }
+        },
+        'doOnError': function(json) {
+          alert(json.error);
+        }
+      }
+    );
+  },
+  
+  validateNCBITaxon: function () {
+    Fluxion.doAjax(
+      'sampleControllerHelperService',
+      'lookupNCBIScientificName',
+      {
+        'scientificName':jQuery('#scientificName').val(), 
+        'url':ajaxurl
+      },
+      {
+        'doOnSuccess': jQuery('#scientificName').removeClass().addClass("ok"),
+        'doOnError': function(json) { 
+          jQuery('#scientificName').removeClass().addClass("error"); alert(json.error); 
+        }
+      }
+    );
   }
 };
 
@@ -181,7 +283,7 @@ Sample.qc = {
     }
 
     if (aReturn.length > 0) {
-      if (validate_library_qcs(aReturn)) {
+      if (Sample.library.validateLibraryQcs(aReturn)) {
         Fluxion.doAjax(
           'libraryControllerHelperService',
           'bulkAddLibraryQCs',
@@ -269,7 +371,7 @@ Sample.library = {
     }
 
     if (aReturn.length > 0) {
-      if (validate_library_dilutions(aReturn)) {
+      if (Sample.library.validateLibraryDilutions(aReturn)) {
         Fluxion.doAjax(
           'libraryControllerHelperService',
           'bulkAddLibraryDilutions',
@@ -331,6 +433,25 @@ Sample.library = {
     else {
       location.reload(true);
     }
+  },
+  
+  validateLibraryQcs: function () {
+    var ok = true;
+    for (var i = 0; i < json.length; i++) {
+      if (!json[i].results.match(/[0-9\.]+/) ||
+          !json[i].insertSize.match(/[0-9]+/) ||
+          Utils.validation.isNullCheck(json[i].qcDate)) ok = false;
+    }
+    return ok;
+  },
+  
+  validateLibraryDilutions: function (json) {
+    var ok = true;
+    for (var i = 0; i < json.length; i++) {
+      if (!json[i].results.match(/[0-9\.]+/) ||
+          Utils.validation.isNullCheck(json[i].dilutionDate)) ok = false;
+    }
+    return ok;
   }
 };
 

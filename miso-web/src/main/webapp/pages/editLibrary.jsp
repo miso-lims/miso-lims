@@ -37,8 +37,6 @@
 <script src="<c:url value='/scripts/stats_ajax.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
 
 <script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
-<script type="text/javascript" src="<c:url value='/scripts/library_validation.js?ts=${timestamp.time}'/>"></script>
-
 
 <div id="maincontent">
 <div id="contentcolumn">
@@ -65,7 +63,7 @@
     <c:otherwise>Create</c:otherwise>
   </c:choose> Library
   <button type="button" class="fg-button ui-state-default ui-corner-all"
-          onclick="return validate_library();">Save
+          onclick="return Library.validateLibrary();">Save
   </button>
 </h1>
 <div class="breadcrumbs">
@@ -455,6 +453,13 @@
     <%@ include file="permissions.jsp" %>
   </c:otherwise>
 </c:choose>
+
+<script type="text/javascript">
+  jQuery(document).ready(function () {
+    // Attach Parsley form validator
+    Validate.attachParsley('#library-form');
+  });
+</script>
 
 <c:if test="${library.id != 0}">
   <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#notes_arrowclick'), 'notes');">Notes
