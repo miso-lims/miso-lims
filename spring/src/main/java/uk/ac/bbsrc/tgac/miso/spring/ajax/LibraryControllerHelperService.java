@@ -470,7 +470,6 @@ public class LibraryControllerHelperService {
               String selectionType = j.getString("selectionType");
               String strategyType = j.getString("strategyType");
               String locationBarcode = j.getString("locationBarcode");
-              String identificationBarcode = j.getString("identificationBarcode");
 
               Library library = new LibraryImpl();
               library.setSample(sample);
@@ -487,7 +486,6 @@ public class LibraryControllerHelperService {
               library.setLibraryType(requestManager.getLibraryTypeByDescription(type));
               library.setLibrarySelectionType(requestManager.getLibrarySelectionTypeByName(selectionType));
               library.setLibraryStrategyType(requestManager.getLibraryStrategyTypeByName(strategyType));
-              library.setIdentificationBarcode(identificationBarcode);
 
               boolean paired = false;
               if (!isStringEmptyOrNull(j.getString("paired"))) {
