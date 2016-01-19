@@ -173,7 +173,6 @@ public class SampleControllerHelperService {
               DateFormat df = new SimpleDateFormat("dd/mm/yyyy");
               String type = j.getString("sampleType");
               String locationBarcode = j.getString("locationBarcode");
-              String identificationBarcode = j.getString("identificationBarcode");
 
               Sample news = new SampleImpl();
               news.setProject(p);
@@ -183,7 +182,7 @@ public class SampleControllerHelperService {
               news.setSecurityProfile(sp);
               news.setSampleType(type);
               news.setLocationBarcode(locationBarcode);
-              news.setIdentificationBarcode(identificationBarcode);
+              news.setLastModifier(user);
 
               if (j.has("receivedDate") && !isStringEmptyOrNull(j.getString("receivedDate"))) {
                 Date date = df.parse(j.getString("receivedDate"));
@@ -775,10 +774,12 @@ public class SampleControllerHelperService {
       JSONObject j = new JSONObject();
       JSONArray jsonArray = new JSONArray();
       for (Sample sample : requestManager.listAllSamples()) {
+        String identificationBarcode = sample.getIdentificationBarcode();
 
         jsonArray.add(JsonSanitizer.sanitize("[\"" + sample.getName() + "\",\"" + sample.getAlias() + "\",\"" + sample.getSampleType()
             + "\",\"" + (sample.getQcPassed() != null ? sample.getQcPassed().toString() : "") + "\",\"" + getSampleLastQC(sample.getId())
-            + "\",'" + "<a href=\"/miso/sample/" + sample.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "']"));
+            + "\",'" + "<a href=\"/miso/sample/" + sample.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "','" 
+            + (isStringEmptyOrNull(identificationBarcode) ? "" : identificationBarcode) + "]"));
 
       }
       j.put("array", jsonArray);

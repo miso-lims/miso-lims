@@ -56,6 +56,7 @@ import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import com.google.json.JsonSanitizer;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONException;
@@ -470,8 +471,7 @@ public class LibraryControllerHelperService {
               String selectionType = j.getString("selectionType");
               String strategyType = j.getString("strategyType");
               String locationBarcode = j.getString("locationBarcode");
-              String identificationBarcode = j.getString("identificationBarcode");
-
+              
               Library library = new LibraryImpl();
               library.setSample(sample);
 
@@ -487,7 +487,7 @@ public class LibraryControllerHelperService {
               library.setLibraryType(requestManager.getLibraryTypeByDescription(type));
               library.setLibrarySelectionType(requestManager.getLibrarySelectionTypeByName(selectionType));
               library.setLibraryStrategyType(requestManager.getLibraryStrategyTypeByName(strategyType));
-              library.setIdentificationBarcode(identificationBarcode);
+              library.setLastModifier(user);
 
               boolean paired = false;
               if (!isStringEmptyOrNull(j.getString("paired"))) {
@@ -531,10 +531,15 @@ public class LibraryControllerHelperService {
           }
         }
 
-        List<Library> sortedList = new ArrayList<Library>(saveSet);
-        Collections.sort(sortedList, new AliasComparator(Library.class));
-        for (Library library : sortedList) {
-          requestManager.saveLibrary(library);
+        try {
+          List<Library> sortedList = new ArrayList<Library>(saveSet);
+          Collections.sort(sortedList, new AliasComparator(Library.class));
+          for (Library library : sortedList) {
+            requestManager.saveLibrary(library);
+          }
+        } catch (Exception e) {
+          log.error("Error saving bulk libraries", e);
+          return JSONUtils.SimpleJSONError("Error saving libraries, please contact your administrator.");
         }
 
         return JSONUtils.SimpleJSONResponse("All libraries saved successfully");
@@ -1215,10 +1220,12 @@ public class LibraryControllerHelperService {
         if (library.getQcPassed() != null) {
           qcpassed = library.getQcPassed().toString();
         }
-        jsonArray.add("['" + library.getName() + "','" + library.getAlias() + "','" + library.getLibraryType().getDescription() + "','"
-            + library.getSample().getName() + "','" + qcpassed + "','" + "<a href=\"/miso/library/" + library.getId()
-            + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "','"
-            + (library.getIdentificationBarcode() != null ? library.getIdentificationBarcode() : "") + "']");
+        String identificationBarcode = library.getIdentificationBarcode();
+        
+        jsonArray.add(JsonSanitizer.sanitize("[\"" + library.getName() + "\",\"" + library.getAlias() + "\",\"" + library.getLibraryType().getDescription() + "\",\""
+            + library.getSample().getName() + "\",\"" + qcpassed + "\",\"" + "<a href=\"/miso/library/" + library.getId()
+            + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>" + "\",\""
+            + (isStringEmptyOrNull(identificationBarcode) ? "" : identificationBarcode) + "\"]"));
       }
       j.put("array", jsonArray);
       return j;
