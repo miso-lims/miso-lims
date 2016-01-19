@@ -28,15 +28,15 @@ jQuery(document).ready(function () {
 });
 
 // Trim whitespace from input fields
-function clean_service_record_fields() {
-  jQuery('#service_record_form').find('input:text').each(function() {
+function cleanServiceRecordFields() {
+  jQuery('#serviceRecordForm').find('input:text').each(function() {
     Utils.validation.clean_input_field(jQuery(this));
   });
 };
 
 // update warning message
 function updateWarning() {
-  if (true === jQuery('#service_record_form').parsley().isValid()) {
+  if (true === jQuery('#serviceRecordForm').parsley().isValid()) {
     jQuery('.bs-callout-info').removeClass('hidden');
     jQuery('.bs-callout-warning').addClass('hidden');
   } else {
@@ -45,10 +45,10 @@ function updateWarning() {
   }
 };
 
-function validate_service_record() {
-  clean_service_record_fields();
+function validateServiceRecord() {
+  cleanServiceRecordFields();
   
-  jQuery('#service_record_form').parsley().destroy();
+  jQuery('#serviceRecordForm').parsley().destroy();
   
   jQuery('#title').attr('required', 'true');
   jQuery('#title').attr('data-parsley-maxlength', '50');
@@ -60,10 +60,10 @@ function validate_service_record() {
   
   jQuery('#referenceNumber').attr('data-parsley-maxlength', '30');
   
-  jQuery('#servicedatepicker').attr('required', 'true');
-  jQuery('#servicedatepicker').attr('data-date-format', 'DD/MM/YYYY');
-  jQuery('#servicedatepicker').attr('data-parsley-pattern', Utils.validation.dateRegex);
-  jQuery('#servicedatepicker').attr('data-parsley-error-message', 'Date must be of form DD/MM/YYYY');
+  jQuery('#serviceDatePicker').attr('required', 'true');
+  jQuery('#serviceDatePicker').attr('data-date-format', 'DD/MM/YYYY');
+  jQuery('#serviceDatePicker').attr('data-parsley-pattern', Utils.validation.dateRegex);
+  jQuery('#serviceDatePicker').attr('data-parsley-error-message', 'Date must be of form DD/MM/YYYY');
   
   jQuery('#shutdownTime').attr('data-date-format', 'DD/MM/YYYY hh:mm');
   jQuery('#shutdownTime').attr('data-parsley-pattern', Utils.validation.dateTimeRegex);
@@ -74,7 +74,7 @@ function validate_service_record() {
   jQuery('#restoredTime').attr('data-parsley-error-message', 'Time must be of form DD/MM/YYYY hh:mm');
   
   updateWarning();
-  if (jQuery('#service_record_form').parsley().isValid() === true) {
-    jQuery('#service_record_form').submit();
+  if (jQuery('#serviceRecordForm').parsley().isValid() === true) {
+    jQuery('#serviceRecordForm').submit();
   }
 }

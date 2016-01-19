@@ -33,8 +33,7 @@
 <script src="<c:url value='/scripts/datatables_utils.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/natural_sort.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
 
-<script src="<c:url value='/scripts/stats_ajax.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
-
+<script type="text/javascript" src="<c:url value='/scripts/sequencer_service_record_ajax.js?ts=${timestamp.time}'/>"></script>
 <script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
 <script type="text/javascript" src="<c:url value='/scripts/sequencer_service_record_validation.js?ts=${timestamp.time}'/>"></script>
 
@@ -44,7 +43,7 @@
 
 <div id="maincontent">
   <div id="contentcolumn">
-    <form:form id="service_record_form" data-parsley-validate="" action="/miso/stats/sequencer/servicerecord" method="POST" commandName="serviceRecord" autocomplete="off">
+    <form:form id="serviceRecordForm" data-parsley-validate="" action="/miso/stats/sequencer/servicerecord" method="POST" commandName="serviceRecord" autocomplete="off">
       <sessionConversation:insertSessionConversationId attributeName="serviceRecord"/>
       <h1>
         <c:choose>
@@ -52,7 +51,7 @@
           <c:otherwise>Create</c:otherwise>
         </c:choose>
         Service Record
-        <button onclick="validate_service_record();" class="fg-button ui-state-default ui-corner-all">Save</button>
+        <button onclick="validateServiceRecord();" class="fg-button ui-state-default ui-corner-all">Save</button>
       </h1>
       <div class="breadcrumbs">
         <ul>
@@ -67,10 +66,10 @@
           </li>
         </ul>
       </div>
-      <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
-        <div id="note_arrowclick" class="toggleLeft"></div>
+      <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#noteArrowClick'), 'noteDiv');">Quick Help
+        <div id="noteArrowClick" class="toggleLeft"></div>
       </div>
-      <div id="notediv" class="note" style="display:none;">A Service Record is a record of maintenance performed 
+      <div id="noteDiv" class="note" style="display:none;">A Service Record is a record of maintenance performed 
       on a sequencer
       </div>
       
@@ -115,9 +114,9 @@
         <tr>
           <td class="h">Service Date:*</td>
           <td>
-            <form:input path="serviceDate" id="servicedatepicker" placeholder="DD/MM/YYYY"/>
+            <form:input path="serviceDate" id="serviceDatePicker" placeholder="DD/MM/YYYY"/>
             <script type="text/javascript">
-              Utils.ui.addDatePicker("servicedatepicker");
+              Utils.ui.addDatePicker("serviceDatePicker");
             </script>
           </td>
         </tr>
@@ -143,28 +142,28 @@
       <br/>
     </form:form>
     
-    <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#upload_arrowclick'), 'uploaddiv');">
+    <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#uploadArrowClick'), 'uploadDiv');">
       Attachments
-      <div id="upload_arrowclick" class="toggleLeft"></div>
+      <div id="uploadArrowClick" class="toggleLeft"></div>
     </div>
-    <div id="uploaddiv" class="simplebox" style="display:none;">
+    <div id="uploadDiv" class="simplebox" style="display:none;">
       <c:choose>
         <c:when test="${serviceRecord.id != 0}">
           <table class="in">
             <tr>
               <td>
                 <form method='post'
-                    id='ajax_upload_form'
+                    id='ajaxUploadForm'
                     action="<c:url value="/miso/upload/servicerecord"/>"
                     enctype="multipart/form-data"
-                    target="target_upload"
-                    onsubmit="Utils.fileUpload.fileUploadProgress('ajax_upload_form', 'statusdiv', ServiceRecord.ui.serviceRecordFileUploadSuccess);">
+                    target="targetUpload"
+                    onsubmit="Utils.fileUpload.fileUploadProgress('ajaxUploadForm', 'statusDiv', ServiceRecord.ui.serviceRecordFileUploadSuccess);">
                   <input type="hidden" name="serviceRecordId" value="${serviceRecord.id}"/>
                   <input type="file" name="file"/>
                   <button type="submit" class="br-button ui-state-default ui-corner-all">Upload</button>
                 </form>
-                <iframe id='target_upload' name='target_upload' src='' style='display: none'></iframe>
-                <div id="statusdiv"></div>
+                <iframe id='targetUpload' name='targetUpload' src='' style='display: none'></iframe>
+                <div id="statusDiv"></div>
               </td>
             </tr>
           </table>
@@ -176,7 +175,7 @@
     </div>
     
     <c:if test="${serviceRecord.id != 0}">
-      <div id="servicerecordfiles">
+      <div id="serviceRecordFiles">
         <c:forEach items="${serviceRecordFiles}" var="file">
           <div id='btnPanel' style='float: left; width: 32px;'>
             <sec:authorize access="hasRole('ROLE_ADMIN')">
