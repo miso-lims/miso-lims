@@ -9,7 +9,7 @@ public interface SampleValidRelationshipService {
 
   SampleValidRelationship get(Long sampleValidRelationshipId);
 
-  Long create(SampleValidRelationship sampleValidRelationship) throws IOException;
+  Long create(SampleValidRelationship sampleValidRelationship, Long parentSampleClassId, Long childSampleClassId) throws IOException;
 
   void update(SampleValidRelationship sampleValidRelationship) throws IOException;
 

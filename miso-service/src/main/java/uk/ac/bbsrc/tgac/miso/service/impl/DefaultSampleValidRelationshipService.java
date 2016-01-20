@@ -13,7 +13,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Sets;
 
+import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
+import uk.ac.bbsrc.tgac.miso.persistence.SampleClassDao;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleValidRelationshipDao;
 import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
 
@@ -27,6 +29,9 @@ public class DefaultSampleValidRelationshipService implements SampleValidRelatio
   private SampleValidRelationshipDao sampleValidRelationshipDao;
 
   @Autowired
+  private SampleClassDao sampleClassDao;
+
+  @Autowired
   private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
 
   @Override
@@ -35,10 +40,15 @@ public class DefaultSampleValidRelationshipService implements SampleValidRelatio
   }
 
   @Override
-  public Long create(SampleValidRelationship sampleValidRelationship) throws IOException {
+  public Long create(SampleValidRelationship sampleValidRelationship, Long parentSampleClassId, Long childSampleClassId)
+      throws IOException {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    SampleClass parent = sampleClassDao.getSampleClass(parentSampleClassId);
+    SampleClass child = sampleClassDao.getSampleClass(childSampleClassId);
     sampleValidRelationship.setCreatedBy(user);
     sampleValidRelationship.setUpdatedBy(user);
+    sampleValidRelationship.setParent(parent);
+    sampleValidRelationship.setChild(child);
     return sampleValidRelationshipDao.addSampleValidRelationship(sampleValidRelationship);
   }
 

@@ -13,7 +13,6 @@ import javax.persistence.Table;
 
 import com.eaglegenomics.simlims.core.User;
 
-import uk.ac.bbsrc.tgac.miso.core.data.AbstractProject;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleNumberPerProject;
 
@@ -25,7 +24,7 @@ public class SampleNumberPerProjectImpl implements SampleNumberPerProject {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long sampleNumberPerProjectId;
 
-  @OneToOne(targetEntity = AbstractProject.class)
+  @OneToOne(targetEntity = ProjectImpl.class)
   @JoinColumn(name = "projectId", nullable = false, unique = true)
   private Project project;
 
@@ -127,6 +126,13 @@ public class SampleNumberPerProjectImpl implements SampleNumberPerProject {
   @Override
   public void setPadding(Integer padding) {
     this.padding = padding;
+  }
+
+  @Override
+  public String toString() {
+    return "SampleNumberPerProjectImpl [sampleNumberPerProjectId=" + sampleNumberPerProjectId + ", project=" + project
+        + ", highestSampleNumber=" + highestSampleNumber + ", padding=" + padding + ", createdBy=" + createdBy + ", creationDate="
+        + creationDate + ", updatedBy=" + updatedBy + ", lastUpdated=" + lastUpdated + "]";
   }
 
 }

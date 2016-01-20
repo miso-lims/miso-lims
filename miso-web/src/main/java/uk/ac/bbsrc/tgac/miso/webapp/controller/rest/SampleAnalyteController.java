@@ -63,8 +63,7 @@ public class SampleAnalyteController extends RestController {
 
   @RequestMapping(value = "/sampleanalyte/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public SampleAnalyteDto getSampleAnalyte(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder,
-      HttpServletResponse response) {
+  public SampleAnalyteDto getSampleAnalyte(@PathVariable("id") Long id, UriComponentsBuilder uriBuilder, HttpServletResponse response) {
     SampleAnalyte sampleAnalyte = sampleAnalyteService.get(id);
     if (sampleAnalyte == null) {
       throw new RestException("No sample analyte found with ID: " + id, Status.NOT_FOUND);
@@ -106,7 +105,8 @@ public class SampleAnalyteController extends RestController {
   public ResponseEntity<?> createSampleAnalyte(@RequestBody SampleAnalyteDto sampleAnalyteDto, UriComponentsBuilder b,
       HttpServletResponse response) throws IOException {
     SampleAnalyte sampleAnalyte = Dtos.to(sampleAnalyteDto);
-    Long id = sampleAnalyteService.create(sampleAnalyte);
+    Long id = sampleAnalyteService.create(sampleAnalyte, sampleAnalyteDto.getSampleId(), sampleAnalyteDto.getSamplePurposeId(),
+        sampleAnalyteDto.getSampleGroupId(), sampleAnalyteDto.getTissueMaterialId());
     UriComponents uriComponents = b.path("/sampleanalyte/{id}").buildAndExpand(id);
     HttpHeaders headers = new HttpHeaders();
     headers.setLocation(uriComponents.toUri());

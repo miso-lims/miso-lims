@@ -9,7 +9,8 @@ public interface SampleAnalyteService {
 
   SampleAnalyte get(Long sampleAnalyteId);
 
-  Long create(SampleAnalyte sampleAnalyte) throws IOException;
+  Long create(SampleAnalyte sampleAnalyte, Long sampleId, Long samplePurposeId, Long sampleGroupId, Long tissueMaterialId)
+      throws IOException;
 
   void update(SampleAnalyte sampleAnalyte) throws IOException;
 

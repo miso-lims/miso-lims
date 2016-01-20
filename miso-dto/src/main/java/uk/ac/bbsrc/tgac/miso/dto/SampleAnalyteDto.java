@@ -13,7 +13,7 @@ public class SampleAnalyteDto {
   private String samplePurposeUrl;
   private Long sampleGroupId;
   private String sampleGroupUrl;
-  private Long tissueMateriald;
+  private Long tissueMaterialId;
   private String tissueMaterialUrl;
 
   private String region;
@@ -140,14 +140,6 @@ public class SampleAnalyteDto {
     this.sampleGroupUrl = sampleGroupUrl;
   }
 
-  public Long getTissueMateriald() {
-    return tissueMateriald;
-  }
-
-  public void setTissueMateriald(Long tissueMateriald) {
-    this.tissueMateriald = tissueMateriald;
-  }
-
   public String getTissueMaterialUrl() {
     return tissueMaterialUrl;
   }
@@ -186,6 +178,14 @@ public class SampleAnalyteDto {
 
   public void setAliquotNumber(Integer aliquotNumber) {
     this.aliquotNumber = aliquotNumber;
+  }
+
+  public Long getTissueMaterialId() {
+    return tissueMaterialId;
+  }
+
+  public void setTissueMaterialId(Long tissueMaterialId) {
+    this.tissueMaterialId = tissueMaterialId;
   }
 
 }

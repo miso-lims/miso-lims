@@ -310,7 +310,18 @@ public class Dtos {
 
   public static SampleAnalyte to(SampleAnalyteDto from) {
     SampleAnalyte to = new SampleAnalyteImpl();
-    to.setRegion(from.getRegion());
+    if (from.getRegion() != null) {
+      to.setRegion(from.getRegion());
+    }
+    if (from.getTubeId() != null) {
+      to.setTubeId(from.getTubeId());
+    }
+    if (from.getStockNumber() != null) {
+      to.setStockNumber(from.getStockNumber());
+    }
+    if (from.getAliquotNumber() != null) {
+      to.setAliquotNumber(from.getAliquotNumber());
+    }
     return to;
   }
 

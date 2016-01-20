@@ -9,7 +9,7 @@ public interface SampleGroupService {
 
   SampleGroupId get(Long sampleGroupId);
 
-  Long create(SampleGroupId sampleGroup) throws IOException;
+  Long create(SampleGroupId sampleGroup, Long projectId) throws IOException;
 
   void update(SampleGroupId sampleGroup) throws IOException;
 

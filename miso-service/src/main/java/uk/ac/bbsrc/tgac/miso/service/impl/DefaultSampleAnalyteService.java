@@ -13,8 +13,16 @@ import org.springframework.transaction.annotation.Transactional;
 import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Sets;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAnalyte;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleGroupId;
+import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
+import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleAnalyteDao;
+import uk.ac.bbsrc.tgac.miso.persistence.SampleDao;
+import uk.ac.bbsrc.tgac.miso.persistence.SampleGroupDao;
+import uk.ac.bbsrc.tgac.miso.persistence.SamplePurposeDao;
+import uk.ac.bbsrc.tgac.miso.persistence.TissueMaterialDao;
 import uk.ac.bbsrc.tgac.miso.service.SampleAnalyteService;
 
 @Transactional
@@ -27,6 +35,18 @@ public class DefaultSampleAnalyteService implements SampleAnalyteService {
   private SampleAnalyteDao sampleAnalyteDao;
 
   @Autowired
+  private SampleDao sampleDao;
+
+  @Autowired
+  private SamplePurposeDao samplePurposeDao;
+
+  @Autowired
+  private SampleGroupDao sampleGroupDao;
+
+  @Autowired
+  private TissueMaterialDao tissueMaterialDao;
+
+  @Autowired
   private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
 
   @Override
@@ -35,10 +55,27 @@ public class DefaultSampleAnalyteService implements SampleAnalyteService {
   }
 
   @Override
-  public Long create(SampleAnalyte sampleAnalyte) throws IOException {
+  public Long create(SampleAnalyte sampleAnalyte, Long sampleId, Long samplePurposeId, Long sampleGroupId, Long tissueMaterialId)
+      throws IOException {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    Sample sample = sampleDao.getSample(sampleId);
+
     sampleAnalyte.setCreatedBy(user);
     sampleAnalyte.setUpdatedBy(user);
+    sampleAnalyte.setSample(sample);
+
+    if (samplePurposeId != null) {
+      SamplePurpose samplePurpose = samplePurposeDao.getSamplePurpose(samplePurposeId);
+      sampleAnalyte.setSamplePurpose(samplePurpose);
+    }
+    if (sampleGroupId != null) {
+      SampleGroupId sampleGroup = sampleGroupDao.getSampleGroup(sampleGroupId);
+      sampleAnalyte.setSampleGroup(sampleGroup);
+    }
+    if (tissueMaterialId != null) {
+      TissueMaterial tissueMaterial = tissueMaterialDao.getTissueMaterial(tissueMaterialId);
+      sampleAnalyte.setTissueMaterial(tissueMaterial);
+    }
     return sampleAnalyteDao.addSampleAnalyte(sampleAnalyte);
   }
 

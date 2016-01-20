@@ -54,6 +54,8 @@
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAdditionalInfoImpl</value>
         <value>uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleValidRelationshipImpl</value>
+        <value>uk.ac.bbsrc.tgac.miso.core.data.impl.SampleNumberPerProjectImpl</value>
       </list>
     </property>
     <property name="hibernateProperties">

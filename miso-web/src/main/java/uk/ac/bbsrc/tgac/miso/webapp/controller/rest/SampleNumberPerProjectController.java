@@ -89,8 +89,7 @@ public class SampleNumberPerProjectController extends RestController {
 
   @RequestMapping(value = "/samplenumberperprojects", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public Set<SampleNumberPerProjectDto> getSampleNumberPerProjects(UriComponentsBuilder uriBuilder,
-      HttpServletResponse response) {
+  public Set<SampleNumberPerProjectDto> getSampleNumberPerProjects(UriComponentsBuilder uriBuilder, HttpServletResponse response) {
     Set<SampleNumberPerProject> sampleNumberPerProjects = sampleNumberPerProjectService.getAll();
     if (sampleNumberPerProjects.isEmpty()) {
       throw new RestException("No sample numbers per project found", Status.NOT_FOUND);
@@ -108,7 +107,7 @@ public class SampleNumberPerProjectController extends RestController {
   public ResponseEntity<?> createSampleNumberPerProject(@RequestBody SampleNumberPerProjectDto sampleNumberPerProjectDto,
       UriComponentsBuilder b, HttpServletResponse response) throws IOException {
     SampleNumberPerProject sampleNumberPerProject = Dtos.to(sampleNumberPerProjectDto);
-    Long id = sampleNumberPerProjectService.create(sampleNumberPerProject);
+    Long id = sampleNumberPerProjectService.create(sampleNumberPerProject, sampleNumberPerProjectDto.getProjectId());
     UriComponents uriComponents = b.path("/samplenumberperproject/{id}").buildAndExpand(id);
     HttpHeaders headers = new HttpHeaders();
     headers.setLocation(uriComponents.toUri());

@@ -13,9 +13,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Sets;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleGroupId;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleGroupDao;
 import uk.ac.bbsrc.tgac.miso.service.SampleGroupService;
+import uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO;
 
 @Transactional
 @Service
@@ -27,6 +29,9 @@ public class DefaultSampleGroupService implements SampleGroupService {
   private SampleGroupDao sampleGroupDao;
 
   @Autowired
+  private SQLProjectDAO sqlProjectDAO;
+
+  @Autowired
   private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
 
   @Override
@@ -35,10 +40,12 @@ public class DefaultSampleGroupService implements SampleGroupService {
   }
 
   @Override
-  public Long create(SampleGroupId sampleGroup) throws IOException {
+  public Long create(SampleGroupId sampleGroup, Long projectId) throws IOException {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    Project project = sqlProjectDAO.get(projectId);
     sampleGroup.setCreatedBy(user);
     sampleGroup.setUpdatedBy(user);
+    sampleGroup.setProject(project);
     return sampleGroupDao.addSampleGroup(sampleGroup);
   }
 

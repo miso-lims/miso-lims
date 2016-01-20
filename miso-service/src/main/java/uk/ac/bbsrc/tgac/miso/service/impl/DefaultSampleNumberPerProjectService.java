@@ -13,9 +13,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.eaglegenomics.simlims.core.User;
 import com.google.common.collect.Sets;
 
+import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleNumberPerProject;
 import uk.ac.bbsrc.tgac.miso.persistence.SampleNumberPerProjectDao;
 import uk.ac.bbsrc.tgac.miso.service.SampleNumberPerProjectService;
+import uk.ac.bbsrc.tgac.miso.sqlstore.SQLProjectDAO;
 
 @Transactional
 @Service
@@ -27,6 +29,9 @@ public class DefaultSampleNumberPerProjectService implements SampleNumberPerProj
   private SampleNumberPerProjectDao sampleNumberPerProjectDao;
 
   @Autowired
+  private SQLProjectDAO sqlProjectDAO;
+
+  @Autowired
   private com.eaglegenomics.simlims.core.manager.SecurityManager securityManager;
 
   @Override
@@ -35,11 +40,12 @@ public class DefaultSampleNumberPerProjectService implements SampleNumberPerProj
   }
 
   @Override
-  public Long create(SampleNumberPerProject sampleNumberPerProject) throws IOException {
+  public Long create(SampleNumberPerProject sampleNumberPerProject, Long projectId) throws IOException {
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    Project project = sqlProjectDAO.get(projectId);
     sampleNumberPerProject.setCreatedBy(user);
     sampleNumberPerProject.setUpdatedBy(user);
-
+    sampleNumberPerProject.setProject(project);
     return sampleNumberPerProjectDao.addSampleNumberPerProject(sampleNumberPerProject);
   }
 
