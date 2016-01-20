@@ -21,26 +21,31 @@
  * *********************************************************************
  */
 
-var ServiceRecord = ServiceRecord || {
-  
-};
+package uk.ac.bbsrc.tgac.miso.webapp.controller;
 
-ServiceRecord.ui = {
-  
-  deleteFile: function (serviceRecordId, fileKey) {
-    if (confirm("Are you sure you want to delete this file?")) {
-      Fluxion.doAjax(
-        'serviceRecordControllerHelperService',
-        'deleteServiceRecordAttachment',
-        {'id': serviceRecordId, 'hashcode': fileKey, 'url': ajaxurl},
-        {'doOnSuccess': Utils.page.pageReload}
-      );
-    }
-  },
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.ModelAndView;
 
-  serviceRecordFileUploadSuccess: function () {
-    jQuery('#statusDiv').html("Upload complete.");
-    Utils.page.pageReload();
+import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+
+@Controller
+@RequestMapping("/sequencers")
+public class ListSequencerReferencesController {
+
+  @Autowired
+  private RequestManager requestManager;
+  
+  public void setRequestManager(RequestManager requestManager) {
+    this.requestManager = requestManager;
   }
-    
-};
+  
+  @RequestMapping(method = RequestMethod.GET)
+  public ModelAndView listSequencers(ModelMap model) {
+    return new ModelAndView("/pages/listSequencerReferences.jsp", model);
+  }
+
+}

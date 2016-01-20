@@ -43,8 +43,13 @@
     <form:form id="sequencer_reference_form" data-parsley-validate="" action="/miso/stats/sequencer" method="POST" commandName="sequencerReference" autocomplete="off">
       <sessionConversation:insertSessionConversationId attributeName="sequencerReference"/>
       <h1>
-        Edit Sequencer Reference
-        <button onclick="validate_sequencer_reference();" class="fg-button ui-state-default ui-corner-all">Save</button>
+        <sec:authorize access="hasRole('ROLE_ADMIN')">
+          Edit
+        </sec:authorize>
+        Sequencer Reference
+        <sec:authorize access="hasRole('ROLE_ADMIN')">
+          <button onclick="validate_sequencer_reference();" class="fg-button ui-state-default ui-corner-all">Save</button>
+        </sec:authorize>
       </h1>
       <div class="breadcrumbs">
         <ul>
@@ -52,14 +57,7 @@
             <a href="<c:url value='/miso/'/>">Home</a>
           </li>
           <li>
-            <div class="breadcrumbsbubbleInfo">
-              <div class="trigger">
-                <a href='<c:url value="/miso/stats"/>'>Sequencer References</a>
-              </div>
-              <div class="breadcrumbspopup">
-                All Sequencer References
-              </div>
-            </div>
+            <a href='<c:url value="/miso/stats"/>'>Sequencer References</a>
           </li>
         </ul>
       </div>
@@ -94,61 +92,123 @@
         </tr>
         <tr>
           <td class="h">Serial Number:</td>
-          <td><form:input path="serialNumber" id="serialNumber" name="serialNumber"/><span id="serialnumbercounter" class="counter"></span></td>
+          <td>
+            <c:choose>
+              <c:when test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+                <form:input path="serialNumber" id="serialNumber" name="serialNumber"/><span id="serialnumbercounter" class="counter"></span>
+              </c:when>
+              <c:otherwise>${sequencerReference.serialNumber}</c:otherwise>
+            </c:choose>
+          </td>
         </tr>
         <tr>
           <td class="h">Name:*</td>
-          <td><form:input path="name" id="name" name="name"/><span id="nameCounter" class="counter"></span></td>
+          <td>
+            <c:choose>
+              <c:when test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+                <form:input path="name" id="name" name="name"/><span id="nameCounter" class="counter"></span>
+              </c:when>
+              <c:otherwise>${sequencerReference.name}</c:otherwise>
+            </c:choose>
+          </td>
         </tr>
         <tr>
           <td>IP Address:*</td>
           <td>
-            <input type="text" id="ipAddress" name="ipAddress" value="${trimmedIpAddress}"/>
-            <input type="hidden" value="on" name="_ipAddress"/>
+            <c:choose>
+              <c:when test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+                <input type="text" id="ipAddress" name="ipAddress" value="${trimmedIpAddress}"/>
+                <input type="hidden" value="on" name="_ipAddress"/>
+              </c:when>
+              <c:otherwise>${trimmedIpAddress}</c:otherwise>
+            </c:choose>
           </td>
         </tr>
         <tr>
           <td class="h">Commissioned:</td>
           <td>
-            <form:input path="dateCommissioned" id="datecommissionedpicker" placeholder="DD/MM/YYYY"/>
-            <script type="text/javascript">
-              Utils.ui.addDatePicker("datecommissionedpicker");
-            </script>
+            <c:choose>
+              <c:when test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+                <form:input path="dateCommissioned" id="datecommissionedpicker" placeholder="DD/MM/YYYY"/>
+                <script type="text/javascript">
+                  Utils.ui.addDatePicker("datecommissionedpicker");
+                </script>
+              </c:when>
+              <c:otherwise>
+                <fmt:formatDate value="${sequencerReference.dateCommissioned}" pattern="dd/MM/yyyy"/>
+              </c:otherwise>
+            </c:choose>
           </td>
         </tr>
         <tr>
           <td>Status:</td>
           <td>
-            <input type="radio" name="status" value="production" onchange="Sequencer.ui.showStatusRows();" <c:if test="${sequencerReference.dateDecommissioned == null}">checked</c:if>/> Production
-            <input type="radio" name="status" value="retired" onchange="Sequencer.ui.showStatusRows();" <c:if test="${sequencerReference.dateDecommissioned != null && sequencerReference.upgradedSequencerReference == null}">checked</c:if>/> Retired
-            <input type="radio" name="status" value="upgraded" onchange="Sequencer.ui.showStatusRows();" <c:if test="${sequencerReference.dateDecommissioned != null && sequencerReference.upgradedSequencerReference != null}">checked</c:if>/> Upgraded
+            <c:choose>
+              <c:when test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+                <input type="radio" name="status" value="production" onchange="Sequencer.ui.showStatusRows();" <c:if test="${sequencerReference.dateDecommissioned == null}">checked</c:if>/> Production
+                <input type="radio" name="status" value="retired" onchange="Sequencer.ui.showStatusRows();" <c:if test="${sequencerReference.dateDecommissioned != null && sequencerReference.upgradedSequencerReference == null}">checked</c:if>/> Retired
+                <input type="radio" name="status" value="upgraded" onchange="Sequencer.ui.showStatusRows();" <c:if test="${sequencerReference.dateDecommissioned != null && sequencerReference.upgradedSequencerReference != null}">checked</c:if>/> Upgraded
+              </c:when>
+              <c:otherwise>
+                <c:choose>
+                  <c:when test="${sequencerReference.dateDecommissioned == null}">Production</c:when>
+                  <c:when test="${sequencerReference.dateDecommissioned != null && sequencerReference.upgradedSequencerReference == null}">Retired</c:when>
+                  <c:otherwise>Upgraded</c:otherwise>
+                </c:choose>
+              </c:otherwise>
+            </c:choose>
           </td>
         </tr>
         <tr id="decommissionedRow">
           <td class="h">Decommissioned:*</td>
           <td>
-            <form:input path="dateDecommissioned" id="datedecommissionedpicker" placeholder="DD/MM/YYYY"/>
-            <script type="text/javascript">
-              Utils.ui.addDatePicker("datedecommissionedpicker");
-            </script>
+            <c:choose>
+              <c:when test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+                <form:input path="dateDecommissioned" id="datedecommissionedpicker" placeholder="DD/MM/YYYY"/>
+                <script type="text/javascript">
+                  Utils.ui.addDatePicker("datedecommissionedpicker");
+                </script>
+              </c:when>
+              <c:otherwise>
+                <fmt:formatDate value="${sequencerReference.dateDecommissioned}" pattern="dd/MM/yyyy"/>
+              </c:otherwise>
+            </c:choose>
           </td>
         </tr>
         <tr id="upgradedReferenceRow">
           <td class="h">Upgraded To:*</td>
           <td>
-            <form:select id="upgradedSequencerReference" path="upgradedSequencerReference" onchange="updateUpgradedSequencerReferenceLink();">
-              <form:option value="0">(choose)</form:option>
-              <form:options items="${otherSequencerReferences}" itemLabel="name" itemValue="id"/>
-            </form:select>
+            <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+              <form:select id="upgradedSequencerReference" path="upgradedSequencerReference" onchange="Sequencer.ui.updateUpgradedSequencerReferenceLink();">
+                <form:option value="0">(choose)</form:option>
+                <form:options items="${otherSequencerReferences}" itemLabel="name" itemValue="id"/>
+              </form:select>
+            </c:if>
             <span id="upgradedSequencerReferenceLink"></span>
           </td>
         </tr>
       </table>
-      <script type="text/javascript">
-        jQuery(document).ready(function() {
-	      Sequencer.ui.showStatusRows();
-	    });
-      </script>
+      <c:choose>
+        <c:when test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
+          <script type="text/javascript">
+            jQuery(document).ready(function() {
+	          Sequencer.ui.showStatusRows();
+	        });
+          </script>
+        </c:when>
+        <c:otherwise>
+          <script type="text/javascript">
+            jQuery(document).ready(function() {
+              Sequencer.ui.hideStatusRowsReadOnly(
+                  ${sequencerReference.dateDecommissioned != null}, 
+                  ${sequencerReference.upgradedSequencerReference != null}, 
+                  ${sequencerReference.upgradedSequencerReference != null ? sequencerReference.upgradedSequencerReference.id : 0}, 
+                  "<c:if test="${sequencerReference.upgradedSequencerReference != null}">${sequencerReference.upgradedSequencerReference.name}</c:if>"
+              );
+            });
+          </script>
+        </c:otherwise>
+      </c:choose>
       <br/>
     </form:form>
     
@@ -206,11 +266,11 @@
                 <td>${record.title}</td>
                 <td>${record.servicedByName}</td>
                 <td>${record.referenceNumber}</td>
-                <td class="misoicon" onclick="window.location.href='<c:url value="/miso/stats/sequencer/servicerecord/${record.id}"/>'">
+                <td class="misoicon" onclick="window.location.href='<c:url value="/miso/sequencer/servicerecord/${record.id}"/>'">
                   <span class="ui-icon ui-icon-pencil"></span>
                 </td>
                 <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-                  <td class="misoicon" onclick="ServiceRecord.ui.deleteServiceRecord(${record.id}, Utils.page.pageReload);">
+                  <td class="misoicon" onclick="Sequencer.ui.deleteServiceRecord(${record.id}, Utils.page.pageReload);">
                     <span class="ui-icon ui-icon-trash"></span>
                   </td>
                 </c:if>

@@ -178,4 +178,9 @@ public abstract class AbstractSequencerReference implements SequencerReference {
         + ", upgradedSequencerReference=" + (upgradedSequencerReference == null ? null : upgradedSequencerReference.getId()) + "]";
   }
   
+  @Override
+  public boolean isActive() {
+    return dateDecommissioned == null;
+  }
+  
 }

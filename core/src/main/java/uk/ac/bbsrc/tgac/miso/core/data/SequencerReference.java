@@ -104,4 +104,9 @@ public interface SequencerReference extends HardwareReference, Deletable {
    */
   public SequencerReference getPreUpgradeSequencerReference();
   
+  /**
+   * @return true if the sequencer is currently being used in production; false if it is retired
+   */
+  public boolean isActive();
+  
 }

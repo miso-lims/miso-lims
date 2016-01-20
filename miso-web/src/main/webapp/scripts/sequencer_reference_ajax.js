@@ -107,6 +107,19 @@ Sequencer.ui = {
     }
   },
   
+  hideStatusRowsReadOnly : function(decommissioned, upgraded, upgradedId, upgradedName) {
+    if (!decommissioned) {
+      jQuery("#decommissionedRow").hide();
+    }
+    if (!upgraded) {
+      jQuery("#upgradedReferenceRow").hide();
+    }
+    else {
+      jQuery("#upgradedSequencerReferenceLink").empty();
+      jQuery("#upgradedSequencerReferenceLink").append("<a href='/miso/sequencer/" + upgradedId + "'>" + upgradedName + "</a>");
+    }
+  },
+  
   showStatusRows : function() {
     switch(jQuery('input[name="status"]:checked').val()) {
       case "production":
@@ -148,9 +161,60 @@ Sequencer.ui = {
   
   updateUpgradedSequencerReferenceLink : function() {
     jQuery("#upgradedSequencerReferenceLink").empty();
-    if (jQuery("#upgradedSequencerReference").val() != "") {
-      jQuery("#upgradedSequencerReferenceLink").append("<a href='/miso/stats/sequencer/" + jQuery("#upgradedSequencerReference").val() + "'>View</a>");
+    if (jQuery("#upgradedSequencerReference").val() != "" && jQuery("#upgradedSequencerReference").val() != 0) {
+      jQuery("#upgradedSequencerReferenceLink").append("<a href='/miso/sequencer/" + jQuery("#upgradedSequencerReference").val() + "'>View</a>");
     }
+  },
+  
+  deleteServiceRecord : function(recordId, successfunc) {
+    if (confirm("Are you sure you really want to delete service record "+recordId+"? This operation is permanent!")) {
+      Fluxion.doAjax(
+        'serviceRecordControllerHelperService',
+        'deleteServiceRecord',
+        {'recordId':recordId, 'url':ajaxurl},
+        {'doOnSuccess':function(json) {
+            successfunc();
+          }
+        }
+      );
+    }
+  },
+  
+  createListingSequencersTable : function() {
+    jQuery('#listingSequencersTable').html("<img src='../styles/images/ajax-loader.gif'/>");
+    
+    Fluxion.doAjax(
+      'sequencerReferenceControllerHelperService',
+      'listSequencersDataTable',
+      {'url': ajaxurl},
+      {
+        'doOnSuccess': function (json) {
+          jQuery('#listingSequencersTable').html('');
+          jQuery('#listingSequencersTable').dataTable({
+            "aaData": json.array,
+            "aoColumns": [
+              { "sTitle": "Sequencer Name"},
+              { "sTitle": "Platform"},
+              { "sTitle": "Model"},
+              { "sTitle": "Status"},
+              { "sTitle": "Edit"},
+              { "sTitle": "Active", "bVisible": false}
+            ],
+            "bJQueryUI": true,
+            "bAutoWidth": false,
+            "iDisplayLength": 25,
+            "aaSorting": [
+              [0, "asc"]
+            ]
+          });
+          Sequencer.ui.changeSequencerListingActive("true");
+        }
+      }
+    )
+  },
+  
+  changeSequencerListingActive : function(active) {
+    jQuery('#listingSequencersTable').dataTable().fnFilter(active, 5);
   }
   
 };

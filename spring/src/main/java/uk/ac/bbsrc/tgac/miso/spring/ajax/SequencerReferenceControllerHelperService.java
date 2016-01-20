@@ -31,22 +31,23 @@ import java.util.Collection;
 
 import javax.servlet.http.HttpSession;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import net.sourceforge.fluxion.ajax.Ajaxified;
+import net.sourceforge.fluxion.ajax.util.JSONUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import net.sourceforge.fluxion.ajax.Ajaxified;
-import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.Platform;
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SequencerReferenceImpl;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
+
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 /**
  * uk.ac.bbsrc.tgac.miso.spring.ajax
@@ -81,7 +82,6 @@ public class SequencerReferenceControllerHelperService {
   public JSONObject listSequencers(HttpSession session, JSONObject json) {
     try {
       Collection<SequencerReference> sr = requestManager.listAllSequencerReferences();
-      StringBuilder sb = new StringBuilder();
       JSONObject sequencers = new JSONObject();
       JSONArray sequencers_list = new JSONArray();
       for (SequencerReference s : sr) {
@@ -169,5 +169,37 @@ public class SequencerReferenceControllerHelperService {
 
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
+  }
+  
+  public JSONObject listSequencersDataTable(HttpSession session, JSONObject json) {
+    try {
+      JSONObject j = new JSONObject();
+      JSONArray jsonArray = new JSONArray();
+      for (SequencerReference sequencer : requestManager.listAllSequencerReferences()) {
+        JSONArray inner = new JSONArray();
+        inner.add(sequencer.getName());
+        inner.add(sequencer.getPlatform().getPlatformType().getKey());
+        inner.add(sequencer.getPlatform().getInstrumentModel());
+        
+        if (sequencer.isActive()) {
+          inner.add("Production");
+        } else {
+          if (sequencer.getUpgradedSequencerReference() == null) {
+            inner.add("Retired");
+          } else {
+            inner.add("Upgraded");
+          }
+        }
+        
+        inner.add("<a href=\"/miso/sequencer/" + sequencer.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>");
+        inner.add(String.valueOf(sequencer.isActive()));
+        jsonArray.add(inner);
+      }
+      j.put("array", jsonArray);
+      return j;
+    } catch (IOException e) {
+      log.debug("Failed", e);
+      return JSONUtils.SimpleJSONError("Failed: " + e.getMessage());
+    }
   }
 }
