@@ -56,6 +56,7 @@ var Study = Study || {
     jQuery('#study-form').parsley().validate();
     
     Validate.updateWarningOrSubmit('#study-form');
+    return false;
   }
 };
 

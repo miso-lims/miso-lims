@@ -87,6 +87,62 @@ var Container = Container || {
       }
       }
     );
+  },
+  
+  validateContainer: function () {
+    Validate.cleanFields('#container-form');
+    jQuery('#container-form').parsley().destroy();
+    
+    // Radio button validation: ensure a Platform is selected
+    jQuery('#platformTypes').attr('class', 'form-control');
+    jQuery('#platformTypesIllumina').attr('required', 'true');
+    jQuery('#platformTypes').attr('data-parsley-error-message', 'You must select a Platform.');
+    jQuery('#platformTypesIllumina').attr('data-parsley-errors-container', '#platformError');
+    jQuery('#platformTypes').attr('data-parsley-class-handler', '#platformTypesDiv');
+    
+    // Sequencer select field validation
+    jQuery('#sequencerReference').attr('class', 'form-control');
+    jQuery('#sequencerReference').attr('required', 'true');
+    jQuery('#sequencerReference').attr('data-parsley-error-message', 'You must select a Sequencer.');
+    jQuery('#sequencerReference').attr('data-parsley-errors-container', '#sequencerReferenceError');
+  
+    // Radio button validation: ensure a Container number is selected
+    jQuery('#containerselect').attr('class', 'form-control');
+    jQuery('#container1').attr('required', 'true');
+    jQuery('#containerselect').attr('data-parsley-error-message', 'You must select a Container.');
+    jQuery('#container1').attr('data-parsley-errors-container', '#containerError');
+    jQuery('#containerselect').attr('data-parsley-class-handler', '#containerspan');
+    
+    // ID Barcode validation
+    jQuery('#identificationBarcode').attr('class', 'form-control');
+    jQuery('#identificationBarcode').attr('data-parsley-required', 'true');
+    jQuery('#identificationBarcode').attr('data-parsley-maxlength', '100');
+    jQuery('#identificationBarcode').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+    
+    jQuery('#container-form').parsley();
+    jQuery('#container-form').parsley().validate();
+    
+    console.log(jQuery('div[id^="studySelectDiv"]'));
+    
+    Validate.updateWarningOrSubmit('#container-form', Container.validateStudyAdded);
+    return false;
+  },
+  
+  validateStudyAdded: function (form) {
+    var ok = true;
+    if (jQuery('div[id^="studySelectDiv"]').length > 0) {
+      console.log(jQuery('div[id^="studySelectDiv"]'));
+      console.log("whoops");
+      if (!confirm("You haven't selected a study for one or more pools. Are you sure you still want to save?")) {
+        alert("Please select a Study for each Pool added.\n");
+        ok = false;
+      }
+    }
+    if (ok) { 
+      jQuery('#container-form').submit();
+    } else {
+      return ok;
+    }
   }
 };
 

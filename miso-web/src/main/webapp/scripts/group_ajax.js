@@ -21,33 +21,29 @@
  * *********************************************************************
  */
 
-function validate_container(form) {
-  var ok = true;
-  var error = "Please correct the following error(s):\n\n";
+jQuery(document).ready(function () {
+  Validate.attachParsley('#group-form');
+});
 
-  if (Utils.validation.isNullCheck(jQuery('#identificationBarcode').val())) {
-    ok = false;
-    error += "You have not entered an ID barcode for the Container.\n";
-  }
+function validateGroup() {
+  Validate.cleanFields('#group-form');
+  jQuery('#group-form').parsley().destroy();
 
-  if (jQuery(':text.validateable').length > 0) {
-    jQuery(':text.validateable').each(function() {
-      var result = Utils.validation.validate_input_field(this, 'Container', ok);
-      ok = result.okstatus;
-      error += result.errormsg;
-    })
-  }
+  // Full name input field validation
+  jQuery('#name').attr('class', 'form-control');
+  jQuery('#name').attr('data-parsley-required', 'true');
+  jQuery('#name').attr('data-parsley-maxlength', '100');
+  jQuery('#name').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
 
-  if (jQuery('div[id^="studySelectDiv"]').length > 0) {
-    if (!confirm("You haven't selected a study for one or more pools. Are you sure you still want to save?")) {
-      ok = false;
-      error += "Please select studies for all the pools added.\n"
-    }
-  }
+  // Login name input field validation
+  jQuery('#description').attr('class', 'form-control');
+  jQuery('#description').attr('data-parsley-required', 'true');
+  jQuery('#description').attr('data-parsley-maxlength', '100');
+  jQuery('#description').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
 
-  if (!ok) {
-    alert(error);
-  }
+  jQuery('#group-form').parsley();
+  jQuery('#group-form').parsley().validate();
 
-  return ok;
-}
+  Validate.updateWarningOrSubmit('#group-form');
+  return false;
+};

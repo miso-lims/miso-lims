@@ -48,6 +48,7 @@ var Experiment = Experiment || {
     jQuery('#experiment-form').parsley().validate();
     
     Validate.updateWarningOrSubmit('#experiment-form');
+    return false;
   }
 };
 

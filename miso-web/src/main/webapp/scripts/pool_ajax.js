@@ -74,6 +74,7 @@ var Pool = Pool || {
     jQuery('#pool-form').parsley().validate();
 
     Validate.updateWarningOrSubmit('#pool-form');
+    return false;
   }
 };
 

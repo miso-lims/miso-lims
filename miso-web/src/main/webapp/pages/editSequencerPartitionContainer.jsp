@@ -28,28 +28,31 @@
   Time: 12:07
  --%>
 <%@ include file="../header.jsp" %>
-<script src="<c:url value='/scripts/sequencer_partition_container_ajax.js?ts=${timestamp.time}'/>"
-        type="text/javascript"></script>
-<script src="<c:url value='/scripts/sequencer_partition_container_validation.js?ts=${timestamp.time}'/>"
-        type="text/javascript"></script>
+<script src="<c:url value='/scripts/parsley/parsley.min.js'/>" type="text/javascript"></script>
+<!--  sequencer_partition_container_ajax.js is already included in header -->
 
 <div id="maincontent">
 <div id="contentcolumn">
-<form:form action="/miso/container" method="POST" commandName="container" autocomplete="off"
-           onsubmit="return validate_container(this);">
+<form:form id="container-form" data-parsley-validate="" action="/miso/container" method="POST" commandName="container" autocomplete="off">
 <sessionConversation:insertSessionConversationId attributeName="container"/>
 <h1>
   <c:choose>
     <c:when test="${container.id != 0}">Edit</c:when>
     <c:otherwise>Create</c:otherwise>
   </c:choose> Sequencer Partition Container
-  <button type="submit" class="fg-button ui-state-default ui-corner-all">Save</button>
+  <button class="fg-button ui-state-default ui-corner-all"
+          onclick="return Container.validateContainer();">Save</button>
   <sec:authorize access="hasRole('ROLE_ADMIN')">
       <c:if test="${container.id != 0}">
           <button type="button" onclick="Container.deleteContainer(${container.id})" class="fg-button ui-state-default ui-corner-all">Delete</button>
       </c:if>
   </sec:authorize>
 </h1>
+
+<div class="bs-callout bs-callout-warning hidden">
+  <h2>Oh snap!</h2>
+  <p>This form seems to be invalid!</p>
+</div>
 
 <table class="in">
   <tr>
@@ -63,7 +66,7 @@
   </tr>
 
   <tr>
-    <td>Platform:</td>
+    <td>Platform*:</td>
     <td>
       <c:choose>
         <c:when test="${container.id != 0 and not empty container.platform}">
@@ -75,16 +78,24 @@
       </c:choose>
     </td>
   </tr>
+  <tr>
+    <td></td>
+    <td>
+      <div class="parsley-errors-list filled" id="platformError">
+        <div class="parsley-required"></div>
+      </div>
+    </td>
+  </tr>
   <c:choose>
     <c:when test="${container.id != 0 and not empty container.platform}">
       <tr>
-        <td>Sequencer:</td>
+        <td>Sequencer*:</td>
         <td id="sequencerReferenceSelect" platformId="${container.platform.platformId}">${container.platform.instrumentModel}</td>
       </tr>
     </c:when>
     <c:when test="${container.id != 0}">
       <tr>
-        <td>Sequencer:</td>
+        <td>Sequencer*:</td>
         <td id="sequencerReferenceSelect"><i>Not yet processed on a run - unknown</i></td>
       </tr>
     </c:when>
@@ -104,6 +115,9 @@
       <h2>Container Parameters</h2>
 
       <div id="containerPartitions">
+        <div class="parsley-errors-list filled" id="containerError">
+          <div class="parsley-required"></div>
+        </div>
         <c:if test="${container.id != 0}">
           <div class="note ui-corner-all">
             <c:if test="${multiplexed and not empty container.identificationBarcode}">
@@ -300,6 +314,14 @@
   </tbody>
 </table>
 </form:form>
+
+<script type="text/javascript">
+  jQuery(document).ready(function () {
+    // Attach Parsley form validator
+    Validate.attachParsley('#container-form');
+  })
+</script>
+
 <c:if test="${not empty container.changeLog}">
   <br/>
   <h1>Changes</h1>

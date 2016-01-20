@@ -67,6 +67,7 @@ var Library = Library || {
           jQuery('#library-form').parsley();
           jQuery('#library-form').parsley().validate();
           Validate.updateWarningOrSubmit('#library-form', Library.validateLibraryAlias);
+          return false;
         },
         'doOnError': function(json) {
           alert(json.error);

@@ -53,12 +53,19 @@ var Run = Run || {
     jQuery('#description').attr('data-parsley-maxlength', '255');
     jQuery('#description').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
 
-    //Radio button validation: ensure a sequencer is selected
+    // Radio button validation: ensure a platform is selected
     jQuery('#platformType').attr('class', 'form-control');
     jQuery('#platformTypes1').attr('required', 'true');
     jQuery('#platformType').attr('data-parsley-error-message', 'You must select a Platform.');
     jQuery('#platformTypes1').attr('data-parsley-errors-container', '#platformError');
     jQuery('#platformType').attr('data-parsley-class-handler', '#platformButtons');
+    
+    // Sequencer select field validation
+    jQuery('#sequencerReference').attr('class', 'form-control');
+    jQuery('#sequencerReference').attr('required', 'true');
+    jQuery('#sequencerReference').attr('data-parsley-min', '1');
+    jQuery('#sequencerReference').attr('data-parsley-error-message', 'You must select a Sequencer.');
+    jQuery('#sequencerReference').attr('data-parsley-errors-container', '#sequencerReferenceError');
 
     // Run path input field validation
     jQuery('#filePath').attr('class', 'form-control');
@@ -70,6 +77,7 @@ var Run = Run || {
     jQuery('#run-form').parsley().validate();
 
     Validate.updateWarningOrSubmit('#run-form', Run.checkStudiesSelected);
+    return false;
   },
   
   checkStudiesSelected: function () {

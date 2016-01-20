@@ -151,6 +151,7 @@ var Box = Box || {
     jQuery('#box-form').parsley().validate();
     
     Validate.updateWarningOrSubmit('#box-form');
+    return false;
   }
 };
 

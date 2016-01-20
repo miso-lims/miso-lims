@@ -46,11 +46,11 @@ var Project = Project || {
     jQuery('#progress1').attr('data-parsley-errors-container', '#progressSelectError');
     jQuery('#progress').attr('data-parsley-class-handler', '#progressButtons');
 
-
     jQuery('#project-form').parsley();
     jQuery('#project-form').parsley().validate();
 
     Validate.updateWarningOrSubmit('#project-form');
+    return false;
   },
   
   validate_sample_qcs: function (json) {

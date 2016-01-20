@@ -27,7 +27,7 @@ var Validate = Validate || {
     if (jQuery(formSelector).length > 0) jQuery(formSelector).parsley();
     window.Parsley.on('parsley:field:validate', function () {
       Validate.updateWarningorSubmit(formSelector);
-    })
+    });
   },
   
   // Trim whitespace from input fields

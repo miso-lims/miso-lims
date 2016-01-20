@@ -155,6 +155,14 @@
       </c:otherwise>
     </c:choose>
   </tr>
+  <tr>
+    <td></td>
+    <td>
+      <div class="parsley-errors-list filled" id="sequencerReferenceError">
+        <div class="parsley-required"></div>
+      </div>
+    </td>
+  </tr>
 
   <tr>
     <td>Name:</td>

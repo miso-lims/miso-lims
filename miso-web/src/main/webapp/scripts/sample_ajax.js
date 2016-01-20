@@ -104,6 +104,7 @@ var Sample = Sample || {
           jQuery('#sample-form').parsley();
           jQuery('#sample-form').parsley().validate();
           Validate.updateWarningOrSubmit('#sample-form', Sample.validateSampleAlias);
+          return false;
         },
         'doOnError': function(json) {
           alert(json.error);
