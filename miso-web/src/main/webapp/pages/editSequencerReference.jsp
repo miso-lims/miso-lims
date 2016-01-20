@@ -57,7 +57,7 @@
             <a href="<c:url value='/miso/'/>">Home</a>
           </li>
           <li>
-            <a href='<c:url value="/miso/stats"/>'>Sequencer References</a>
+            <a href='<c:url value="/miso/sequencers"/>'>Sequencer References</a>
           </li>
         </ul>
       </div>

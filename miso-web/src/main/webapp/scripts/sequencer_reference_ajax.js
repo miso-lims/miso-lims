@@ -197,6 +197,7 @@ Sequencer.ui = {
               { "sTitle": "Platform"},
               { "sTitle": "Model"},
               { "sTitle": "Status"},
+              { "sTitle": "Last Serviced"},
               { "sTitle": "Edit"},
               { "sTitle": "Active", "bVisible": false}
             ],
@@ -214,7 +215,7 @@ Sequencer.ui = {
   },
   
   changeSequencerListingActive : function(active) {
-    jQuery('#listingSequencersTable').dataTable().fnFilter(active, 5);
+    jQuery('#listingSequencersTable').dataTable().fnFilter(active, 6);
   }
   
 };

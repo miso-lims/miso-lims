@@ -51,6 +51,7 @@ public abstract class AbstractSequencerReference implements SequencerReference {
   private Date dateDecommissioned;
   private SequencerReference upgradedSequencerReference;
   private SequencerReference preUpgradeSequencerReference;
+  private Date lastServicedDate;
 
   @Override
   public void setId(Long id) {
@@ -181,6 +182,16 @@ public abstract class AbstractSequencerReference implements SequencerReference {
   @Override
   public boolean isActive() {
     return dateDecommissioned == null;
+  }
+  
+  @Override
+  public void setLastServicedDate(Date date) {
+    this.lastServicedDate = date;
+  }
+  
+  @Override
+  public Date getLastServicedDate() {
+    return lastServicedDate;
   }
   
 }

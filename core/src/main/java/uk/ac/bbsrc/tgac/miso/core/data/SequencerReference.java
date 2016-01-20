@@ -109,4 +109,14 @@ public interface SequencerReference extends HardwareReference, Deletable {
    */
   public boolean isActive();
   
+  /**
+   * @param date the date when this sequencer was most recently serviced
+   */
+  public void setLastServicedDate(Date date);
+  
+  /**
+   * @return the service date of the most recent service record for this sequencer, or null if there are no such service records
+   */
+  public Date getLastServicedDate();
+  
 }

@@ -27,6 +27,7 @@ import static uk.ac.bbsrc.tgac.miso.core.util.LimsUtils.isStringEmptyOrNull;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
 
 import javax.servlet.http.HttpSession;
@@ -175,6 +176,7 @@ public class SequencerReferenceControllerHelperService {
     try {
       JSONObject j = new JSONObject();
       JSONArray jsonArray = new JSONArray();
+      SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
       for (SequencerReference sequencer : requestManager.listAllSequencerReferences()) {
         JSONArray inner = new JSONArray();
         inner.add(sequencer.getName());
@@ -191,6 +193,7 @@ public class SequencerReferenceControllerHelperService {
           }
         }
         
+        inner.add(sequencer.getLastServicedDate() == null ? "" : df.format(sequencer.getLastServicedDate()));
         inner.add("<a href=\"/miso/sequencer/" + sequencer.getId() + "\"><span class=\"ui-icon ui-icon-pencil\"></span></a>");
         inner.add(String.valueOf(sequencer.isActive()));
         jsonArray.add(inner);

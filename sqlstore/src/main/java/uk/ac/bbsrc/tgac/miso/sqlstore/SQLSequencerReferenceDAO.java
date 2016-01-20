@@ -60,15 +60,19 @@ import uk.ac.bbsrc.tgac.miso.core.store.SequencerReferenceStore;
 public class SQLSequencerReferenceDAO implements SequencerReferenceStore {
   private static final String TABLE_NAME = "SequencerReference";
 
-  private static final String SEQUENCER_REFERENCE_SELECT = "SELECT referenceId, name, ipAddress, platformId, available, serialNumber, dateCommissioned, dateDecommissioned, upgradedSequencerReferenceId " + "FROM "
-      + TABLE_NAME;
+  private static final String SEQUENCER_REFERENCE_SELECT = "SELECT sr.referenceId, sr.name, sr.ipAddress, sr.platformId, sr.available, sr.serialNumber,"
+      + " sr.dateCommissioned, sr.dateDecommissioned, sr.upgradedSequencerReferenceId, sv.lastServiced"
+      + " FROM " + TABLE_NAME + " sr"
+      + " LEFT JOIN (SELECT sequencerReferenceId, MAX(serviceDate) AS 'lastServiced' FROM SequencerServiceRecord GROUP BY sequencerReferenceId) sv"
+      + " ON sv.sequencerReferenceId = sr.referenceId";
 
-  private static final String SEQUENCER_REFERENCE_SELECT_BY_ID = SEQUENCER_REFERENCE_SELECT + " WHERE referenceId = ?";
+  private static final String SEQUENCER_REFERENCE_SELECT_BY_ID = SEQUENCER_REFERENCE_SELECT + " WHERE sr.referenceId = ?";
 
-  private static final String SEQUENCER_REFERENCE_SELECT_BY_NAME = SEQUENCER_REFERENCE_SELECT + " WHERE name = ?";
-
-  private static final String SEQUENCER_REFERENCE_SELECT_BY_PLATFORM = "SELECT sr.referenceId, sr.name, sr.ipAddress, sr.platformId, sr.available, sr.serialNumber, sr.dateCommissioned, sr.dateDecommissioned, sr.upgradedSequencerReferenceId, p.platformId, p.name "
-      + "FROM " + TABLE_NAME + " sr, Platform p " + "WHERE sr.platformId=p.platformId " + "AND p.name=?";
+  private static final String SEQUENCER_REFERENCE_SELECT_BY_NAME = SEQUENCER_REFERENCE_SELECT + " WHERE sr.name = ?";
+  
+  private static final String SEQUENCER_REFERENCE_SELECT_BY_PLATFORM = SEQUENCER_REFERENCE_SELECT
+      + " LEFT JOIN Platform p ON sr.platformId=p.platformId"
+      + " WHERE p.name=?";
 
   private static final String SEQUENCER_REFERENCE_SELECT_BY_RELATED_RUN = "";
 
@@ -217,6 +221,7 @@ public class SQLSequencerReferenceDAO implements SequencerReferenceStore {
               c.setIpAddress(InetAddress.getByAddress(rbytes));
             }
           }
+          c.setLastServicedDate(rs.getTimestamp("lastServiced"));
         }
       } catch (IOException e1) {
         log.error("sequence reference row mapper", e1);
