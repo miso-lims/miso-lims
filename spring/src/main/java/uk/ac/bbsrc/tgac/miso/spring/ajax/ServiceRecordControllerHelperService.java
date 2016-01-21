@@ -74,8 +74,14 @@ public class ServiceRecordControllerHelperService {
   public JSONObject deleteServiceRecordAttachment(HttpSession session, JSONObject json) {
     final Long id = json.getLong("id");
     final Integer hashcode = json.getInt("hashcode");
+    User user = null;
     try {
-      final User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+      user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
+    } catch (final IOException e) {
+      log.error("delete service record file", e);
+      return JSONUtils.SimpleJSONError("Error getting currently logged in user.");
+    }
+    try {
       if (user.isAdmin()) {
         String filename = null;
         for (final String s : misoFileManager.getFileNames(SequencerServiceRecord.class, id.toString())) {
@@ -83,6 +89,9 @@ public class ServiceRecordControllerHelperService {
             filename = s;
             break;
           }
+        }
+        if (filename == null) {
+          return JSONUtils.SimpleJSONError("File not found");
         }
         log.info(MessageFormat.format("Attempting to delete file {0}", filename));
         misoFileManager.deleteFile(SequencerServiceRecord.class, id.toString(), filename);

@@ -3,7 +3,6 @@ package uk.ac.bbsrc.tgac.miso.sqlstore;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -60,10 +59,6 @@ public class SQLSequencerServiceRecordDAO implements SequencerServiceRecordStore
   public void setMisoFilesManager(MisoFilesManager misoFilesManager) {
     this.misoFilesManager = misoFilesManager;
   }
-  
-  public JdbcTemplate getJdbcTemplate() {
-    return template;
-  }
 
   public void setJdbcTemplate(JdbcTemplate template) {
     this.template = template;
@@ -116,7 +111,7 @@ public class SQLSequencerServiceRecordDAO implements SequencerServiceRecordStore
   }
 
   @Override
-  public Collection<SequencerServiceRecord> listAll() throws IOException {
+  public List<SequencerServiceRecord> listAll() throws IOException {
     return template.query(SERVICE_RECORD_SELECT, new SequencerServiceRecordMapper());
   }
 
@@ -126,7 +121,7 @@ public class SQLSequencerServiceRecordDAO implements SequencerServiceRecordStore
   }
 
   @Override
-  public Collection<SequencerServiceRecord> listBySequencerId(long referenceId) {
+  public List<SequencerServiceRecord> listBySequencerId(long referenceId) {
     return template.query(SERVICE_RECORD_SELECT_BY_SEQUENCER_ID, new Object[] {referenceId}, new SequencerServiceRecordMapper());
   }
   
@@ -142,6 +137,12 @@ public class SQLSequencerServiceRecordDAO implements SequencerServiceRecordStore
     return false;
   }
   
+  /**
+   * Attempts to delete all attachments associated with a service record. This method does not throw an exception upon failure to 
+   * delete a file, but will log any failures
+   * 
+   * @param recordId ID of service record to delete attachments from
+   */
   private void removeAttachments(long recordId) {
     try {
       for (String filename : misoFilesManager.getFileNames(SequencerServiceRecord.class, String.valueOf(recordId))) {
@@ -163,17 +164,15 @@ public class SQLSequencerServiceRecordDAO implements SequencerServiceRecordStore
       SequencerServiceRecord r = dataObjectFactory.getSequencerServiceRecord();
       
       try {
-        if (r != null) {
-          r.setId(rs.getLong("recordId"));
-          r.setTitle(rs.getString("title"));
-          r.setDetails(rs.getString("details"));
-          r.setServicedByName(rs.getString("servicedBy"));
-          r.setReferenceNumber(rs.getString("referenceNumber"));
-          r.setServiceDate(rs.getDate("serviceDate"));
-          r.setShutdownTime(rs.getTimestamp("shutdownTime"));
-          r.setRestoredTime(rs.getTimestamp("restoredTime"));
-          r.setSequencerReference(sequencerReferenceDAO.get(rs.getLong("sequencerReferenceId")));
-        }
+        r.setId(rs.getLong("recordId"));
+        r.setTitle(rs.getString("title"));
+        r.setDetails(rs.getString("details"));
+        r.setServicedByName(rs.getString("servicedBy"));
+        r.setReferenceNumber(rs.getString("referenceNumber"));
+        r.setServiceDate(rs.getDate("serviceDate"));
+        r.setShutdownTime(rs.getTimestamp("shutdownTime"));
+        r.setRestoredTime(rs.getTimestamp("restoredTime"));
+        r.setSequencerReference(sequencerReferenceDAO.get(rs.getLong("sequencerReferenceId")));
       } catch (IOException e) {
         log.error("sequence reference row mapper", e);
       }
