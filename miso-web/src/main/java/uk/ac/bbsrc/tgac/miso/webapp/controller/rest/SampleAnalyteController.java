@@ -82,6 +82,14 @@ public class SampleAnalyteController extends RestController {
         .buildAndExpand(sampleAnalyteDto.getCreatedById()).toUriString());
     sampleAnalyteDto.setUpdatedByUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/user/{id}")
         .buildAndExpand(sampleAnalyteDto.getUpdatedById()).toUriString());
+    sampleAnalyteDto.setSampleUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/sample/{id}")
+        .buildAndExpand(sampleAnalyteDto.getSampleId()).toUriString());
+    sampleAnalyteDto.setSamplePurposeUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/samplepurpose/{id}")
+        .buildAndExpand(sampleAnalyteDto.getSamplePurposeId()).toUriString());
+    sampleAnalyteDto.setSampleGroupUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/samplegroup/{id}")
+        .buildAndExpand(sampleAnalyteDto.getSampleGroupId()).toUriString());
+    sampleAnalyteDto.setTissueMaterialUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/tissuematerial/{id}")
+        .buildAndExpand(sampleAnalyteDto.getTissueMaterialId()).toUriString());
     return sampleAnalyteDto;
   }
 
@@ -119,7 +127,8 @@ public class SampleAnalyteController extends RestController {
       HttpServletResponse response) throws IOException {
     SampleAnalyte sampleAnalyte = Dtos.to(sampleAnalyteDto);
     sampleAnalyte.setSampleAnalyteId(id);
-    sampleAnalyteService.update(sampleAnalyte);
+    sampleAnalyteService.update(sampleAnalyte, sampleAnalyteDto.getSamplePurposeId(), sampleAnalyteDto.getSampleGroupId(),
+        sampleAnalyteDto.getTissueMaterialId());
     return new ResponseEntity<>(HttpStatus.OK);
   }
 

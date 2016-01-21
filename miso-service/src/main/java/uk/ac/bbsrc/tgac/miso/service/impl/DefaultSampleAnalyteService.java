@@ -80,9 +80,29 @@ public class DefaultSampleAnalyteService implements SampleAnalyteService {
   }
 
   @Override
-  public void update(SampleAnalyte sampleAnalyte) throws IOException {
+  public void update(SampleAnalyte sampleAnalyte, Long samplePurposeId, Long sampleGroupId, Long tissueMaterialId) throws IOException {
     SampleAnalyte updatedSampleAnalyte = get(sampleAnalyte.getSampleAnalyteId());
+    updatedSampleAnalyte.setRegion(sampleAnalyte.getRegion());
+    updatedSampleAnalyte.setTubeId(sampleAnalyte.getTubeId());
     updatedSampleAnalyte.setStockNumber(sampleAnalyte.getStockNumber());
+    updatedSampleAnalyte.setAliquotNumber(sampleAnalyte.getAliquotNumber());
+
+    SamplePurpose samplePurpose = null;
+    SampleGroupId sampleGroup = null;
+    TissueMaterial tissueMaterial = null;
+    if (samplePurposeId != null) {
+      samplePurpose = samplePurposeDao.getSamplePurpose(samplePurposeId);
+    }
+    if (sampleGroupId != null) {
+      sampleGroup = sampleGroupDao.getSampleGroup(sampleGroupId);
+    }
+    if (tissueMaterialId != null) {
+      tissueMaterial = tissueMaterialDao.getTissueMaterial(tissueMaterialId);
+    }
+    sampleAnalyte.setSamplePurpose(samplePurpose);
+    sampleAnalyte.setSampleGroup(sampleGroup);
+    sampleAnalyte.setTissueMaterial(tissueMaterial);
+
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     updatedSampleAnalyte.setUpdatedBy(user);
     sampleAnalyteDao.update(updatedSampleAnalyte);

@@ -68,7 +68,6 @@ import uk.ac.bbsrc.tgac.miso.core.exception.MalformedSampleQcException;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
-
 /**
  * Skeleton implementation of a Sample
  * 
@@ -129,7 +128,6 @@ public abstract class AbstractSample extends AbstractBoxable implements Sample {
   @OneToOne(targetEntity = UserImpl.class)
   @JoinColumn(name = "lastModifier", nullable = false)
   private User lastModifier;
-  private boolean empty;
 
   @OneToOne(targetEntity = SampleAnalyteImpl.class)
   @JoinColumn(name = "sampleAnalyteId")

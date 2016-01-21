@@ -53,9 +53,13 @@ public class DefaultSampleValidRelationshipService implements SampleValidRelatio
   }
 
   @Override
-  public void update(SampleValidRelationship sampleValidRelationship) throws IOException {
+  public void update(SampleValidRelationship sampleValidRelationship, Long parentSampleClassId, Long childSampleClassId)
+      throws IOException {
     SampleValidRelationship updatedSampleValidRelationship = get(sampleValidRelationship.getSampleValidRelationshipId());
-
+    SampleClass parent = sampleClassDao.getSampleClass(parentSampleClassId);
+    SampleClass child = sampleClassDao.getSampleClass(childSampleClassId);
+    updatedSampleValidRelationship.setParent(parent);
+    updatedSampleValidRelationship.setChild(child);
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     updatedSampleValidRelationship.setUpdatedBy(user);
     sampleValidRelationshipDao.update(updatedSampleValidRelationship);

@@ -12,7 +12,7 @@ public interface SampleAnalyteService {
   Long create(SampleAnalyte sampleAnalyte, Long sampleId, Long samplePurposeId, Long sampleGroupId, Long tissueMaterialId)
       throws IOException;
 
-  void update(SampleAnalyte sampleAnalyte) throws IOException;
+  void update(SampleAnalyte sampleAnalyte, Long samplePurposeId, Long sampleGroupId, Long tissueMaterialId) throws IOException;
 
   Set<SampleAnalyte> getAll();
 

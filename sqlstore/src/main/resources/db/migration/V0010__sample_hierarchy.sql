@@ -206,7 +206,7 @@ CREATE TABLE `SampleGroup` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `SampleAnalyte` (
-  `sampleAnalyteId` bigint(20) NOT NULL,
+  `sampleAnalyteId` bigint(20) NOT NULL AUTO_INCREMENT,
   `sampleId` bigint(20) NOT NULL,
   `samplePurposeId` bigint(20) DEFAULT NULL,
   `sampleGroupId` bigint(20) DEFAULT NULL,

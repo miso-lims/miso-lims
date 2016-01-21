@@ -84,6 +84,10 @@ public class SampleValidRelationshipController extends RestController {
         .buildAndExpand(sampleValidRelationshipDto.getCreatedById()).toUriString());
     sampleValidRelationshipDto.setUpdatedByUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/user/{id}")
         .buildAndExpand(sampleValidRelationshipDto.getUpdatedById()).toUriString());
+    sampleValidRelationshipDto.setParentUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/sample/{id}")
+        .buildAndExpand(sampleValidRelationshipDto.getParentId()).toUriString());
+    sampleValidRelationshipDto.setChildUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/sample/{id}")
+        .buildAndExpand(sampleValidRelationshipDto.getChildId()).toUriString());
     return sampleValidRelationshipDto;
   }
 
@@ -121,7 +125,8 @@ public class SampleValidRelationshipController extends RestController {
       @RequestBody SampleValidRelationshipDto sampleValidRelationshipDto, HttpServletResponse response) throws IOException {
     SampleValidRelationship sampleValidRelationship = Dtos.to(sampleValidRelationshipDto);
     sampleValidRelationship.setSampleValidRelationshipId(id);
-    sampleValidRelationshipService.update(sampleValidRelationship);
+    sampleValidRelationshipService.update(sampleValidRelationship, sampleValidRelationshipDto.getParentId(),
+        sampleValidRelationshipDto.getChildId());
     return new ResponseEntity<>(HttpStatus.OK);
   }
 

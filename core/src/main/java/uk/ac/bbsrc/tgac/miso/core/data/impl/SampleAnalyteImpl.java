@@ -5,6 +5,7 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
@@ -23,7 +24,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 public class SampleAnalyteImpl implements SampleAnalyte {
 
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long sampleAnalyteId;
 
   @OneToOne(targetEntity = SampleImpl.class)
@@ -189,6 +190,14 @@ public class SampleAnalyteImpl implements SampleAnalyte {
   @Override
   public void setLastUpdated(Date lastUpdated) {
     this.lastUpdated = lastUpdated;
+  }
+
+  @Override
+  public String toString() {
+    return "SampleAnalyteImpl [sampleAnalyteId=" + sampleAnalyteId + ", sample=" + sample + ", samplePurpose=" + samplePurpose
+        + ", sampleGroup=" + sampleGroup + ", tissueMaterial=" + tissueMaterial + ", region=" + region + ", tubeId=" + tubeId
+        + ", stockNumber=" + stockNumber + ", aliquotNumber=" + aliquotNumber + ", createdBy=" + createdBy + ", creationDate="
+        + creationDate + ", updatedBy=" + updatedBy + ", lastUpdated=" + lastUpdated + "]";
   }
 
 }

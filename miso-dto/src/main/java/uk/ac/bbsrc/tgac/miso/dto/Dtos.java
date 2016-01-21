@@ -292,7 +292,28 @@ public class Dtos {
   public static SampleAnalyteDto asDto(SampleAnalyte from) {
     SampleAnalyteDto dto = new SampleAnalyteDto();
     dto.setId(from.getSampleAnalyteId());
-    dto.setRegion(from.getRegion());
+    dto.setSampleId(from.getSample().getSampleId());
+    if (from.getSamplePurpose() != null) {
+      dto.setSamplePurposeId(from.getSamplePurpose().getSamplePurposeId());
+    }
+    if (from.getSampleGroup() != null) {
+      dto.setSampleGroupId(from.getSampleGroup().getSampleGroupId());
+    }
+    if (from.getTissueMaterial() != null) {
+      dto.setTissueMaterialId(from.getTissueMaterial().getTissueMaterialId());
+    }
+    if (!LimsUtils.isStringEmptyOrNull(from.getRegion())) {
+      dto.setRegion(from.getRegion());
+    }
+    if (!LimsUtils.isStringEmptyOrNull(from.getTubeId())) {
+      dto.setTubeId(from.getTubeId());
+    }
+    if (from.getStockNumber() != null) {
+      dto.setStockNumber(from.getStockNumber());
+    }
+    if (from.getAliquotNumber() != null) {
+      dto.setAliquotNumber(from.getAliquotNumber());
+    }
     dto.setCreatedById(from.getCreatedBy().getUserId());
     dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
     dto.setUpdatedById(from.getUpdatedBy().getUserId());

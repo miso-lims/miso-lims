@@ -11,7 +11,7 @@ public interface SampleValidRelationshipService {
 
   Long create(SampleValidRelationship sampleValidRelationship, Long parentSampleClassId, Long childSampleClassId) throws IOException;
 
-  void update(SampleValidRelationship sampleValidRelationship) throws IOException;
+  void update(SampleValidRelationship sampleValidRelationship, Long parentSampleClassId, Long childSampleClassId) throws IOException;
 
   Set<SampleValidRelationship> getAll();
 

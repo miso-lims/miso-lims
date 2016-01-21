@@ -47,6 +47,7 @@ public class HibernateSampleAnalyteDao implements SampleAnalyteDao {
     Date now = new Date();
     sampleAnalyte.setCreationDate(now);
     sampleAnalyte.setLastUpdated(now);
+    System.out.println("********* " + sampleAnalyte);
     return (Long) currentSession().save(sampleAnalyte);
   }
 
