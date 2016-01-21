@@ -26,6 +26,8 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 import java.io.IOException;
 import java.util.Collection;
 
+import javax.ws.rs.core.Response.Status;
+
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,8 +39,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
-import com.eaglegenomics.simlims.core.User;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -46,7 +46,8 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.jackson.ProjectSampleRecursionAvoidanceMixin;
 import uk.ac.bbsrc.tgac.miso.core.util.jackson.SampleRecursionAvoidanceMixin;
 import uk.ac.bbsrc.tgac.miso.core.util.jackson.UserInfoMixin;
-import uk.ac.bbsrc.tgac.miso.webapp.util.RestUtils;
+
+import com.eaglegenomics.simlims.core.User;
 
 /**
  * A controller to handle all REST requests for Libraries
@@ -58,7 +59,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.RestUtils;
 @Controller
 @RequestMapping("/rest/library")
 @SessionAttributes("library")
-public class LibraryRestController {
+public class LibraryRestController extends RestController {
   protected static final Logger log = LoggerFactory.getLogger(LibraryRestController.class);
 
   @Autowired
@@ -68,25 +69,20 @@ public class LibraryRestController {
     this.requestManager = requestManager;
   }
 
-  @RequestMapping(value = "{libraryId}", method = RequestMethod.GET)
+  @RequestMapping(value = "{libraryId}", method = RequestMethod.GET, produces="application/json")
   public @ResponseBody String getLibraryById(@PathVariable Long libraryId) throws IOException {
     ObjectMapper mapper = new ObjectMapper();
-    try {
-      Library l = requestManager.getLibraryById(libraryId);
-      if (l != null) {
-        mapper.getSerializationConfig().addMixInAnnotations(Project.class, ProjectSampleRecursionAvoidanceMixin.class);
-        mapper.getSerializationConfig().addMixInAnnotations(Sample.class, SampleRecursionAvoidanceMixin.class);
-        mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
-        return mapper.writeValueAsString(l);
-      }
-      return mapper.writeValueAsString(RestUtils.error("No such library with that ID.", "libraryId", libraryId.toString()));
-    } catch (IOException ioe) {
-      log.error("cannot retrieve library", ioe);
-      return mapper.writeValueAsString(RestUtils.error("Cannot retrieve library: " + ioe.getMessage(), "libraryId", libraryId.toString()));
+    Library l = requestManager.getLibraryById(libraryId);
+    if (l == null) {
+      throw new RestException("No library found with ID: " + libraryId, Status.NOT_FOUND);
     }
+    mapper.getSerializationConfig().addMixInAnnotations(Project.class, ProjectSampleRecursionAvoidanceMixin.class);
+    mapper.getSerializationConfig().addMixInAnnotations(Sample.class, SampleRecursionAvoidanceMixin.class);
+    mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
+    return mapper.writeValueAsString(l);
   }
 
-  @RequestMapping(method = RequestMethod.GET)
+  @RequestMapping(method = RequestMethod.GET, produces="application/json")
   public @ResponseBody String listAllLibraries() throws IOException {
     Collection<Library> libraries = requestManager.listAllLibraries();
     ObjectMapper mapper = new ObjectMapper();
@@ -95,4 +91,5 @@ public class LibraryRestController {
     mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
     return mapper.writeValueAsString(libraries);
   }
+  
 }

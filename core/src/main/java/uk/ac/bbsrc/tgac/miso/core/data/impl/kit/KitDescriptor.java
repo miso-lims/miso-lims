@@ -31,6 +31,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
@@ -43,7 +44,10 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
  * @since 0.0.2
  */
 @Entity
+@Table(name = "KitDescriptor")
 public class KitDescriptor implements Serializable {
+
+  private static final long serialVersionUID = 1L;
 
   /** Field UNSAVED_ID */
   public static final Long UNSAVED_ID = 0L;
@@ -103,7 +107,7 @@ public class KitDescriptor implements Serializable {
 
   /**
    * Returns the version of this KitDescriptor object.
-   * 
+   *
    * @return Double version.
    */
   public Double getVersion() {

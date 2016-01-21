@@ -103,7 +103,7 @@ public abstract class AbstractSequencerReference implements SequencerReference {
 
   @Override
   public String getFQDN() {
-    return getIpAddress().getCanonicalHostName();
+    return getIpAddress() == null ? null : getIpAddress().getCanonicalHostName();
   }
 
   @Override

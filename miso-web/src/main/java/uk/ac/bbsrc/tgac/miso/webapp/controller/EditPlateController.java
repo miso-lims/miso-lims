@@ -99,13 +99,17 @@ public class EditPlateController {
   public Collection<String> populateMaterialTypes() throws IOException {
     return requestManager.listAllStudyTypes();
   }
+  
+  public Boolean misoPropertyBoolean(String property) {
+    MisoPropertyExporter exporter = (MisoPropertyExporter) ApplicationContextProvider.getApplicationContext().getBean("propertyConfigurer");
+    Map<String, String> misoProperties = exporter.getResolvedProperties();
+    return misoProperties.containsKey(property)
+        && Boolean.parseBoolean(misoProperties.get(property));
+  }
 
   @ModelAttribute("autoGenerateIdBarcodes")
   public Boolean autoGenerateIdentificationBarcodes() {
-    MisoPropertyExporter exporter = (MisoPropertyExporter) ApplicationContextProvider.getApplicationContext().getBean("propertyConfigurer");
-    Map<String, String> misoProperties = exporter.getResolvedProperties();
-    return misoProperties.containsKey("miso.autoGenerateIdentificationBarcodes")
-        && Boolean.parseBoolean(misoProperties.get("miso.autoGenerateIdentificationBarcodes"));
+    return misoPropertyBoolean("miso.autoGenerateIdentificationBarcodes");
   }
 
   public Collection<TagBarcode> populateAvailableTagBarcodes() throws IOException {

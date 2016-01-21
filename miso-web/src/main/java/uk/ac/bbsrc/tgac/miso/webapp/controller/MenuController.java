@@ -32,11 +32,11 @@ import javax.servlet.ServletContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.ServletContextAware;
 import org.springframework.web.servlet.ModelAndView;
@@ -45,6 +45,8 @@ import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.integration.util.SignatureHelper;
+import uk.ac.bbsrc.tgac.miso.webapp.context.ApplicationContextProvider;
+import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
 
 @Controller
@@ -54,6 +56,18 @@ public class MenuController implements ServletContextAware {
   ServletContext servletContext;
   @Autowired
   private SecurityManager securityManager;
+  
+  public Boolean getMisoPropertyBoolean(String property) {
+    MisoPropertyExporter exporter = (MisoPropertyExporter) ApplicationContextProvider.getApplicationContext().getBean("propertyConfigurer");
+    Map<String, String> misoProperties = exporter.getResolvedProperties();
+    return misoProperties.containsKey(property)
+        && Boolean.parseBoolean(misoProperties.get(property));
+  }
+  
+  @ModelAttribute("detailedSample")
+  public Boolean isDetailedSampleEnabled() { 
+    return getMisoPropertyBoolean("miso.detailed.sample.enabled");
+  }
 
   @RequestMapping("/tech/menu")
   public String techMenu() {
@@ -123,6 +137,11 @@ public class MenuController implements ServletContextAware {
   @RequestMapping("/activity/menu")
   public String activityMenu() {
     return "/pages/activityMenu.jsp";
+  }
+  
+  @RequestMapping("/tissueOptions")
+  public String tissueOptions() {
+    return "/pages/tissueOptions.jsp";
   }
 
   @Override

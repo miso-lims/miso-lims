@@ -99,7 +99,6 @@
 
   <filter>
     <filter-name>exposeRequestUrlFilter</filter-name>
-    <!-- <filter-class>uk.ac.bbsrc.tgac.miso.webapp.context.ExposeRequestUrlFilter</filter-class> -->
     <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
   </filter>
   <filter-mapping>
@@ -109,18 +108,18 @@
 
   <filter>
     <filter-name>restSignatureFilter</filter-name>
-    <!-- <filter-class>uk.ac.bbsrc.tgac.miso.webapp.context.RestSignatureFilter</filter-class> -->
     <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
   </filter>
-
-  <filter-mapping>
-    <filter-name>restSignatureFilter</filter-name>
-    <url-pattern>/miso/consumer/*</url-pattern>
-  </filter-mapping>
-
+  
   <filter-mapping>
     <filter-name>restSignatureFilter</filter-name>
     <url-pattern>/miso/rest/*</url-pattern>
+  </filter-mapping>
+
+  <filter-mapping>
+    <!-- notification message consumer endpoints -->
+    <filter-name>restSignatureFilter</filter-name>
+    <url-pattern>/miso/consumer/*</url-pattern>
   </filter-mapping>
 
   <filter>

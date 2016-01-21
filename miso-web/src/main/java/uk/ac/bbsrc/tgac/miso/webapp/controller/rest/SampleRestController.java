@@ -25,6 +25,8 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 
 import java.io.IOException;
 
+import javax.ws.rs.core.Response.Status;
+
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,8 +38,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
-import com.eaglegenomics.simlims.core.User;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
@@ -45,7 +45,8 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.jackson.LibraryRecursionAvoidanceMixin;
 import uk.ac.bbsrc.tgac.miso.core.util.jackson.ProjectSampleRecursionAvoidanceMixin;
 import uk.ac.bbsrc.tgac.miso.core.util.jackson.UserInfoMixin;
-import uk.ac.bbsrc.tgac.miso.webapp.util.RestUtils;
+
+import com.eaglegenomics.simlims.core.User;
 
 /**
  * A controller to handle all REST requests for Samples
@@ -57,7 +58,7 @@ import uk.ac.bbsrc.tgac.miso.webapp.util.RestUtils;
 @Controller
 @RequestMapping("/rest/sample")
 @SessionAttributes("sample")
-public class SampleRestController {
+public class SampleRestController extends RestController {
   protected static final Logger log = LoggerFactory.getLogger(SampleRestController.class);
 
   @Autowired
@@ -67,21 +68,17 @@ public class SampleRestController {
     this.requestManager = requestManager;
   }
 
-  @RequestMapping(value = "{sampleId}", method = RequestMethod.GET)
+  @RequestMapping(value = "{sampleId}", method = RequestMethod.GET, produces="application/json")
   public @ResponseBody String getSampleById(@PathVariable Long sampleId) throws IOException {
     ObjectMapper mapper = new ObjectMapper();
     mapper.getSerializationConfig().addMixInAnnotations(Project.class, ProjectSampleRecursionAvoidanceMixin.class);
     mapper.getSerializationConfig().addMixInAnnotations(Library.class, LibraryRecursionAvoidanceMixin.class);
     mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
-    try {
-      Sample s = requestManager.getSampleById(sampleId);
-      if (s != null) {
-        return mapper.writeValueAsString(s);
-      }
-      return mapper.writeValueAsString(RestUtils.error("No such sample with that ID.", "sampleId", sampleId.toString()));
-    } catch (IOException ioe) {
-      log.error("cannot retrieve sample", ioe);
-      return mapper.writeValueAsString(RestUtils.error("Cannot retrieve sample: " + ioe.getMessage(), "sampleId", sampleId.toString()));
+    Sample s = requestManager.getSampleById(sampleId);
+    if (s == null) {
+      throw new RestException("No sample found with ID: " + sampleId, Status.NOT_FOUND);
     }
+    return mapper.writeValueAsString(s);
   }
+  
 }
