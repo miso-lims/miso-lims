@@ -50,11 +50,11 @@
         </tr>
         <tr>
           <td class="h">Name:</td>
-          <td><form:input path="name"/></td>
+          <td><form:input id="name" path="name"/><span id="nameCounter" class="counter"></span></td>
         </tr>
         <tr>
           <td class="h">Description:</td>
-          <td><form:input path="description"/></td>
+          <td><form:input id="description" path="description"/><span id="descriptionCounter" class="counter"></span></td>
         </tr>
         <tr>
           <td class="h">Users:</td>
@@ -71,6 +71,24 @@
     </form:form>
   </div>
 </div>
+
+<script type="text/javascript">
+  jQuery(document).ready(function () {
+    jQuery('#name').simplyCountable({
+      counter: '#nameCounter',
+      countType: 'characters',
+      maxCount: ${maxLengths['name']},
+      countDirection: 'down'
+    });
+
+    jQuery('#description').simplyCountable({
+      counter: '#descriptionCounter',
+      countType: 'characters',
+      maxCount: ${maxLengths['description']},
+      countDirection: 'down'
+    });
+  });
+</script>
 
 <%@ include file="adminsub.jsp" %>
 
