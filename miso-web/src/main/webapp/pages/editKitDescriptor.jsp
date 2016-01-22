@@ -50,7 +50,7 @@
         </tr>
         <tr>
           <td class="h">Name:</td>
-          <td><form:input path="name"/></td>
+          <td><form:input id="name" path="name"/><span id="nameCounter" class="counter"></span></td>
         </tr>
         <tr>
           <td class="h">Version:</td>
@@ -58,11 +58,11 @@
         </tr>
         <tr>
           <td class="h">Manufacturer:</td>
-          <td><form:input path="manufacturer"/></td>
+          <td><form:input id="manufacturer" path="manufacturer"/><span id="manufacturerCounter" class="counter"></span></td>
         </tr>
         <tr>
           <td class="h">Part Number:</td>
-          <td><form:input path="partNumber"/></td>
+          <td><form:input id="partNumber" path="partNumber"/><span id="partNumberCounter" class="counter"></span></td>
         </tr>
         <tr>
           <td class="h">Stock Level:</td>
@@ -100,6 +100,31 @@
     </form:form>
   </div>
 </div>
+
+<script type="text/javascript">
+  jQuery(document).ready(function () {
+    jQuery('#name').simplyCountable({
+      counter: '#nameCounter',
+      countType: 'characters',
+      maxCount: ${maxLengths['name']},
+      countDirection: 'down'
+    });
+
+    jQuery('#manufacturer').simplyCountable({
+      counter: '#manufacturerCounter',
+      countType: 'characters',
+      maxCount: ${maxLengths['manufacturer']},
+      countDirection: 'down'
+    });
+    
+    jQuery('#partNumber').simplyCountable({
+      counter: '#partNumberCounter',
+      countType: 'characters',
+      maxCount: ${maxLengths['partNumber']},
+      countDirection: 'down'
+    });
+  });
+</script>
 
 <%@ include file="adminsub.jsp" %>
 

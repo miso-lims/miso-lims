@@ -104,7 +104,7 @@
                 </tr>
                 <tr>
                     <td class="h">Pool Alias:</td>
-                    <td><form:input path="alias"/></td>
+                    <td><form:input id="alias" path="alias"/><span id="aliasCounter" class="counter"></span></td>
                 </tr>
                 <tr>
                     <td class="h">Desired Concentration</td>
@@ -316,6 +316,17 @@
 <script type="text/javascript">
   Utils.ui.addMaxDatePicker("creationDate", 0);
   Utils.timer.typewatchFunc(jQuery('#searchDilution'), function(){Pool.search.poolSearchEmPcrDilution(jQuery('#searchDilution'), 'LS454')}, 300, 2);
+</script>
+
+<script type="text/javascript">
+  jQuery(document).ready(function () {
+    jQuery('#alias').simplyCountable({
+      counter: '#aliasCounter',
+      countType: 'characters',
+      maxCount: ${maxLengths['alias']},
+      countDirection: 'down'
+    });
+  });
 </script>
 
 <%@ include file="adminsub.jsp" %>

@@ -51,7 +51,7 @@
               <td>Full name:</td>
               <td>
                 <sec:authorize access="hasRole('ROLE_ADMIN')">
-                  <form:input path="fullName"/>
+                  <form:input id="fullName" path="fullName"/><span id="fullNameCounter" class="counter"></span>
                 </sec:authorize>
 
                 <sec:authorize access="hasRole('ROLE_TECH')">
@@ -63,7 +63,7 @@
               <td>Login name:</td>
               <td>
                 <sec:authorize access="hasRole('ROLE_ADMIN')">
-                  <form:input path="loginName"/>
+                  <form:input id="loginName" path="loginName"/><span id="loginNameCounter" class="counter"></span>
                 </sec:authorize>
 
                 <sec:authorize access="hasRole('ROLE_TECH')">
@@ -77,7 +77,7 @@
                 <c:choose>
                   <c:when test="${(user.loginName eq SPRING_SECURITY_CONTEXT.authentication.principal.username)
                                         or fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-                    <form:input path="email"/>
+                    <form:input id="email" path="email"/><span id="emailCounter" class="counter"></span>
                   </c:when>
                   <c:otherwise>
                     <sec:authorize access="hasRole('ROLE_TECH')">
@@ -214,6 +214,31 @@
     </c:choose>
   </div>
 </div>
+
+<script type="text/javascript">
+  jQuery(document).ready(function () {
+    jQuery('#fullName').simplyCountable({
+      counter: '#fullNameCounter',
+      countType: 'characters',
+      maxCount: ${maxLengths['fullName']},
+      countDirection: 'down'
+    });
+
+    jQuery('#loginName').simplyCountable({
+      counter: '#loginNameCounter',
+      countType: 'characters',
+      maxCount: ${maxLengths['loginName']},
+      countDirection: 'down'
+    });
+    
+    jQuery('#email').simplyCountable({
+      counter: '#emailCounter',
+      countType: 'characters',
+      maxCount: ${maxLengths['email']},
+      countDirection: 'down'
+    });
+  });
+</script>
 
 <%@ include file="adminsub.jsp" %>
 
