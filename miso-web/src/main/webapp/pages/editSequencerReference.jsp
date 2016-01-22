@@ -72,7 +72,7 @@
         </tr>
         <tr>
           <td class="h">Name:</td>
-          <td><form:input path="name"/><span id="namecounter" class="counter"></span></td>
+          <td><form:input id="name" path="name"/><span id="nameCounter" class="counter"></span></td>
         </tr>
         <tr>
           <td>IP Address:</td>
@@ -86,6 +86,17 @@
     </form:form>
   </div>
 </div>
+
+<script type="text/javascript">
+  jQuery(document).ready(function () {
+    jQuery('#name').simplyCountable({
+      counter: '#nameCounter',
+      countType: 'characters',
+      maxCount: ${maxLengths['name']},
+      countDirection: 'down'
+    });
+  });
+</script>
 
 <%@ include file="adminsub.jsp" %>
 
