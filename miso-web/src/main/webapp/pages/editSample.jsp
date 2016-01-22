@@ -229,13 +229,12 @@
     </tr>
     <tr>
       <td class="h">Alias:*</td>
-      <td><form:input id="alias" path="alias" name="alias"/><span id="aliascounter" class="counter"></span></td>
+      <td><form:input id="alias" path="alias" name="alias"/><span id="aliasCounter" class="counter"></span></td>
         <%--<td><a href="void(0);" onclick="popup('help/sampleAlias.html');">Help</a></td>--%>
     </tr>
     <tr>
       <td>Description:*</td>
-      <td><form:input id="description" path="description"/><span id="descriptioncounter"
-                                                                     class="counter"></span>
+      <td><form:input id="description" path="description"/><span id="descriptionCounter" class="counter"></span>
       </td>
         <%--<td><a href="void(0);" onclick="popup('help/sampleDescription.html');">Help</a></td>--%>
     </tr>
@@ -250,7 +249,7 @@
     </tr>
     <tr>
       <td class="h">Scientific Name:*</td>
-      <td><form:input path="scientificName"/>
+      <td><form:input id="scientificName" path="scientificName"/><span id="scientificNameCounter" class="counter"></span>
         <c:if test="${sessionScope.taxonLookupEnabled}">
         <script>Utils.timer.typewatchFunc(jQuery('#scientificName'), validate_ncbi_taxon, 1000, 2);</script>
         </c:if>
@@ -1337,6 +1336,32 @@ function bulkLibraryDilutionTable() {
 
 </div>
 </div>
+
+<script type="text/javascript">
+  jQuery(document).ready(function () {
+    jQuery('#alias').simplyCountable({
+      counter: '#aliasCounter',
+      countType: 'characters',
+      maxCount: ${maxLengths['alias']},
+      countDirection: 'down'
+    });
+
+    jQuery('#description').simplyCountable({
+      counter: '#descriptionCounter',
+      countType: 'characters',
+      maxCount: ${maxLengths['description']},
+      countDirection: 'down'
+    });
+    
+    jQuery('#scientificName').simplyCountable({
+      counter: '#scientificNameCounter',
+      countType: 'characters',
+      maxCount: ${maxLengths['scientificName']},
+      countDirection: 'down'
+    });
+  });
+</script>
+
 <%@ include file="adminsub.jsp" %>
 
 <%@ include file="../footer.jsp" %>

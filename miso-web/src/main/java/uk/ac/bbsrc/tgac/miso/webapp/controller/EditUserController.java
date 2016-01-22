@@ -30,12 +30,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.authority.GrantedAuthorityImpl;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -48,17 +50,17 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
+import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
+import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
+import uk.ac.bbsrc.tgac.miso.core.security.PasswordCodecService;
+import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
+
 import com.eaglegenomics.simlims.core.Activity;
 import com.eaglegenomics.simlims.core.Group;
 import com.eaglegenomics.simlims.core.Protocol;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.ProtocolManager;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
-
-import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
-import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
-import uk.ac.bbsrc.tgac.miso.core.security.PasswordCodecService;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 @Controller
 @SessionAttributes("user")
@@ -76,6 +78,13 @@ public class EditUserController {
 
   @Autowired
   private DataObjectFactory dataObjectFactory;
+  
+  @Autowired
+  private JdbcTemplate interfaceTemplate;
+
+  public void setInterfaceTemplate(JdbcTemplate interfaceTemplate) {
+    this.interfaceTemplate = interfaceTemplate;
+  }
 
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
     this.dataObjectFactory = dataObjectFactory;
@@ -91,6 +100,11 @@ public class EditUserController {
 
   public void setPasswordCodecService(PasswordCodecService passwordCodecService) {
     this.passwordCodecService = passwordCodecService;
+  }
+
+  @ModelAttribute("maxLengths")
+  public Map<String, Integer> maxLengths() throws IOException {
+    return DbUtils.getColumnSizes(interfaceTemplate, "User");
   }
 
   @ModelAttribute("groups")

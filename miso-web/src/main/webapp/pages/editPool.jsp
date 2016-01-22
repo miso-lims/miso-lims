@@ -125,7 +125,7 @@
   </tr>
   <tr>
     <td class="h">Alias:*</td>
-    <td><form:input id="alias" path="alias"/></td>
+    <td><form:input id="alias" path="alias"/><span id="aliasCounter" class="counter"></span></td>
   </tr>
   <tr>
     <td>Platform Type:</td>
@@ -444,6 +444,17 @@
   <%--}, 300, 2);--%>
   <%--</c:otherwise>--%>
   <%--</c:choose>--%>
+</script>
+
+<script type="text/javascript">
+  jQuery(document).ready(function () {
+    jQuery('#alias').simplyCountable({
+      counter: '#aliasCounter',
+      countType: 'characters',
+      maxCount: ${maxLengths['alias']},
+      countDirection: 'down'
+    });
+  });
 </script>
 
 <%@ include file="adminsub.jsp" %>
