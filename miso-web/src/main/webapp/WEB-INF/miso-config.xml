@@ -39,7 +39,10 @@
       <bean class="org.springframework.security.core.context.SecurityContextHolder" factory-method="getContextHolderStrategy" />
     </constructor-arg>
     <constructor-arg index="1" ref="securityManager" />
+    <property name="backingManager" ref="backingRequestManager" />
   </bean>
+
+  <bean id="backingRequestManager" class="uk.ac.bbsrc.tgac.miso.core.manager.MisoRequestManager" />
 
   <bean id="misoFormsService" name="misoFormsService" class="uk.ac.bbsrc.tgac.miso.webapp.service.forms.MisoFormsService" />
 
