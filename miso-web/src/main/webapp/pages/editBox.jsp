@@ -43,19 +43,21 @@
 
 <script src="<c:url value='/scripts/box_visualization.js'/>" type="text/javascript"></script>
 
+<script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
+
 <div id="maincontent">
 <div id="contentcolumn">
 
 <div id="tab-1">
 
-<form:form action="/miso/box" method="POST" commandName="box" autocomplete="off" acceptCharset="utf-8">
+<form:form id="box-form" data-parsley-validate="" action="/miso/box" method="POST" commandName="box" autocomplete="off" acceptCharset="utf-8">
 <sessionConversation:insertSessionConversationId attributeName="box" />
 <h1>
   <c:choose>
     <c:when test="${box.id !=0}">Edit</c:when>
     <c:otherwise>Create</c:otherwise>
   </c:choose> Box
-  <button type="button" class="fg-button ui-state-default ui-corner-all" onclick="return validate_box(this.form);">Save</button>
+  <button type="button" class="fg-button ui-state-default ui-corner-all" onclick="return Box.validateBox();">Save</button>
 </h1>
 
 <div class="sectionDivider"  onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
@@ -63,6 +65,12 @@
 </div>
 <div id="notediv" class="note" style="display:none;">A Box is subdivided into rows and columns whoch hold Samples, Libraries, Dilutions, or Pools.
 </div>
+
+<div class="bs-callout bs-callout-warning hidden">
+  <h2>Oh snap!</h2>
+  <p>This form seems to be invalid</p>
+</div>
+
 <h2>Box Information</h2>
 
 <div class="barcodes">
@@ -160,11 +168,11 @@
     </tr>
     <tr>
       <td class="h">Alias:</td>
-      <td><form:input path="alias" class="validateable"/><span id="aliascounter" class="counter"></span></td>
+      <td><form:input id="alias" path="alias" class="validateable"/><span id="aliascounter" class="counter"></span></td>
     </tr>
     <tr>
       <td class="h">Description:</td>
-      <td><form:input path="description" class="validateable"/></td>
+      <td><form:input id="description" path="description" class="validateable"/></td>
     </tr>
     <tr>
       <td class="h">Box Use:</td>
@@ -184,6 +192,13 @@
 </div>
 </form:form>
 </div>
+
+<script type="text/javascript">
+  jQuery(document).ready(function () {
+    // Attaches form validation listener
+    Validate.attachParsley('#box-form');
+  });
+</script>
 
 <c:if test="${box.id != 0}">
 <div id="boxOptions">

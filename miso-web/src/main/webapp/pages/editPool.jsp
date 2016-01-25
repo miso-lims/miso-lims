@@ -37,7 +37,6 @@
 <script src="<c:url value='/scripts/natural_sort.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
 
 <script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
-<script type="text/javascript" src="<c:url value='/scripts/pool_validation.js?ts=${timestamp.time}'/>"></script>
 
 <div id="maincontent">
 <div id="contentcolumn">
@@ -45,7 +44,7 @@
 <sessionConversation:insertSessionConversationId attributeName="pool"/>
 <h1><c:choose><c:when
     test="${pool.id != 0}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose> Pool
-  <button type="submit" onclick="return validate_pool();" class="fg-button ui-state-default ui-corner-all">Save</button>
+  <button type="submit" onclick="return Pool.validatePool();" class="fg-button ui-state-default ui-corner-all">Save</button>
 </h1>
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
   <div id="note_arrowclick" class="toggleLeft"></div>
@@ -170,6 +169,13 @@
 </table>
 <%@ include file="permissions.jsp" %>
 <br/>
+
+<script type="text/javascript">
+  jQuery(document).ready(function () {
+    // Attach Parsley form validator
+    Validate.attachParsley('#pool-form');
+  });
+</script>
 
 <c:if test="${pool.id != 0}">
   <h1>

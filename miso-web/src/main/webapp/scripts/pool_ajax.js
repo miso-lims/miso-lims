@@ -34,6 +34,47 @@ var Pool = Pool || {
         }
       );
     }
+  },
+  
+  validatePool: function () {
+    Validate.cleanFields('#pool-form');
+    jQuery('#pool-form').parsley().destroy();
+
+    // Alias input field validation
+    jQuery('#alias').attr('class', 'form-control');
+    jQuery('#alias').attr('data-parsley-required', 'true');
+    jQuery('#alias').attr('data-parsley-maxlength', '100');
+    jQuery('#alias').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+
+    // Description input field validation
+    jQuery('#description').attr('class', 'form-control');
+    jQuery('#description').attr('data-parsley-required', 'true');
+    jQuery('#description').attr('data-parsley-maxlength', '100');
+    jQuery('#description').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+    
+    // Platform Type input select validation
+    jQuery('#platformType').attr('class', 'form-control');
+    jQuery('#platformType').attr('required', 'true');
+    jQuery('#sampleTypes').attr('data-parsley-error-message', 'You must select a Platform');
+
+    // Concentration input field validation
+    jQuery('#concentration').attr('class', 'form-control');
+    jQuery('#concentration').attr('data-parsley-required', 'true');
+    jQuery('#concentration').attr('data-parsley-maxlength', '10');
+    jQuery('#concentration').attr('data-parsley-type', 'number');
+
+    // Creation Date input field validation
+    jQuery('creationDate').attr('class', 'form-control');
+    jQuery('creationDate').attr('required', 'true');
+    jQuery('creationDate').attr('data-parsley-pattern', Utils.validation.dateRegex);
+    jQuery('creationDate').attr('data-date-format', 'DD/MM/YYYY');
+    jQuery('creationDate').attr('data-parsley-error-message', 'Date must be of form DD/MM/YYYY');
+
+    jQuery('#pool-form').parsley();
+    jQuery('#pool-form').parsley().validate();
+
+    Validate.updateWarningOrSubmit('#pool-form');
+    return false;
   }
 };
 

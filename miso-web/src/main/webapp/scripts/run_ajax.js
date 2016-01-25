@@ -34,6 +34,88 @@ var Run = Run || {
         }
       );
     }
+  },
+  
+  // Validate methods can be found in parsley_form_validations.js
+  validateRun: function () {
+    Validate.cleanFields('#run-form');  
+    jQuery('#run-form').parsley().destroy();
+
+    // Alias input field validation
+    jQuery('#alias').attr('class', 'form-control');
+    jQuery('#alias').attr('data-parsley-required', 'true');
+    jQuery('#alias').attr('data-parsley-maxlength', '255');
+    jQuery('#alias').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+
+    // Description input field validation
+    jQuery('#description').attr('class', 'form-control');
+    jQuery('#description').attr('data-parsley-required', 'true');
+    jQuery('#description').attr('data-parsley-maxlength', '255');
+    jQuery('#description').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+
+    // Radio button validation: ensure a platform is selected
+    jQuery('#platformType').attr('class', 'form-control');
+    jQuery('#platformTypes1').attr('required', 'true');
+    jQuery('#platformType').attr('data-parsley-error-message', 'You must select a Platform.');
+    jQuery('#platformTypes1').attr('data-parsley-errors-container', '#platformError');
+    jQuery('#platformType').attr('data-parsley-class-handler', '#platformButtons');
+    
+    // Sequencer select field validation
+    jQuery('#sequencerReference').attr('class', 'form-control');
+    jQuery('#sequencerReference').attr('required', 'true');
+    jQuery('#sequencerReference').attr('data-parsley-min', '1');
+    jQuery('#sequencerReference').attr('data-parsley-error-message', 'You must select a Sequencer.');
+    jQuery('#sequencerReference').attr('data-parsley-errors-container', '#sequencerReferenceError');
+
+    // Run path input field validation
+    jQuery('#filePath').attr('class', 'form-control');
+    jQuery('#filePath').attr('data-parsley-required', 'true');
+    jQuery('#filePath').attr('data-parsley-maxlength', '100');
+
+
+    jQuery('#run-form').parsley();
+    jQuery('#run-form').parsley().validate();
+
+    Validate.updateWarningOrSubmit('#run-form', Run.checkStudiesSelected);
+    return false;
+  },
+  
+  checkStudiesSelected: function () {
+    var ok = true;
+    var error = "Please correct the following error(s):\n\n";
+
+    if (jQuery('div[id^="studySelectDiv"]').length > 0) {
+      if (!confirm("You haven't selected a study for one or more pools. Are you sure you still want to save?")) {
+        ok = false;
+        error += "Please select studies for all the pools added.\n";
+      }
+    }
+
+    if (!ok) {
+      alert(error);
+      return ok;
+    }
+
+    jQuery('#run-form').submit();
+    return ok;
+  },
+  
+  checkForCompletionDate: function () {
+    var statusVal = jQuery('input[name=status\\.health]:checked').val();
+    if (!Utils.validation.isNullCheck(statusVal)) {
+      if (statusVal === "Failed" || statusVal === "Stopped") {
+        alert("You are manually setting a run to Stopped or Failed. Please remember to enter a Completion Date!");
+        if (jQuery("#completionDate input").length == 0) {
+          jQuery("#completionDate").html("<input type='text' name='status.completionDate' id='status.completionDate' value='" + jQuery('#completionDate').html() + "'>");
+          Utils.ui.addDatePicker("status\\.completionDate");
+        }
+      }
+      else {
+        if (jQuery("#status\\.completionDate").length > 0) {
+          jQuery("#completionDate").html(jQuery("#status\\.completionDate").val());
+        }
+      }
+    }
   }
 };
 

@@ -36,15 +36,13 @@
 <link rel="stylesheet" href="<c:url value='/styles/progress.css'/>" type="text/css">
 
 <script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
-<script type="text/javascript" src="<c:url value='/scripts/project_validation.js?ts=${timestamp.time}'/>"></script>
-
 
 <form:form id="project-form" data-parsley-validate="" action="/miso/project" method="POST" commandName="project" autocomplete="off">
 <sessionConversation:insertSessionConversationId attributeName="project"/>
 <h1><c:choose><c:when
     test="${project.id != 0}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose>
   Project
-  <button type="button" class="fg-button ui-state-default ui-corner-all" onclick="return validate_project();">
+  <button type="button" class="fg-button ui-state-default ui-corner-all" onclick="return Project.validateProject();">
     Save
   </button>
 </h1>
@@ -143,6 +141,14 @@
     </td>
   </tr>
 </table>
+
+<script type="text/javascript">
+  jQuery(document).ready(function () {
+    // Attaches a Parsley form validator
+    Validate.attachParsley('#project-form');
+  });
+</script>
+
 <div id="printServiceSelectDialog" title="Select a Printer"></div>
 
 <div id="projectoverviews">

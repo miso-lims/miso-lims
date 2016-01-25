@@ -35,7 +35,7 @@
       <h1><c:choose><c:when
           test="${not empty group.groupId}">Edit</c:when><c:otherwise>Create</c:otherwise></c:choose>
         Group
-        <button onclick="return validate_group();" class="fg-button ui-state-default ui-corner-all">Save</button>
+        <button onclick="return validateGroup();" class="fg-button ui-state-default ui-corner-all">Save</button>
       </h1>
 
       <div class="bs-callout bs-callout-warning hidden">

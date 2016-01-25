@@ -33,6 +33,68 @@ var Library = Library || {
         }
         });
     }
+  },
+  
+  validateLibrary: function () {
+    Validate.cleanFields('#library-form');
+    jQuery('#library-form').parsley().destroy();
+
+    // Alias input field validation
+    jQuery('#alias').attr('class', 'form-control');
+    jQuery('#alias').attr('data-parsley-required', 'true');
+    jQuery('#alias').attr('data-parsley-maxlength', '100');
+    jQuery('#alias').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+
+    // Description input field validation
+    jQuery('#description').attr('class', 'form-control');
+    jQuery('#description').attr('data-parsley-required', 'true');
+    jQuery('#description').attr('data-parsley-maxlength', '100');
+    jQuery('#description').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+
+    Fluxion.doAjax(
+      'libraryControllerHelperService',
+      'getLibraryAliasRegex',
+      {
+        'url': ajaxurl
+      },
+      {
+        'doOnSuccess': function(json) {
+          var regex = json.aliasRegex.split(' ').join('+');
+          jQuery('#alias').attr('data-parsley-pattern', regex);
+          // TODO: better error message than a regex..?
+          //       perhaps save a description and examples with the regex
+          jQuery('#alias').attr('data-parsley-error-message', 'Must match '+regex);
+          jQuery('#library-form').parsley();
+          jQuery('#library-form').parsley().validate();
+          Validate.updateWarningOrSubmit('#library-form', Library.validateLibraryAlias);
+          return false;
+        },
+        'doOnError': function(json) {
+          alert(json.error);
+        }
+      }
+    );
+  },
+  
+  validateLibraryAlias: function () {
+    Fluxion.doAjax(
+      'libraryControllerHelperService',
+      'validateLibraryAlias',
+      {
+        'alias': jQuery('#alias').val(),
+        'url': ajaxurl
+      },
+      {
+        'doOnSuccess': function(json) {
+          if (json.response === "OK") {
+            jQuery('#library-form').submit();
+          }
+        },
+        'doOnError': function(json) {
+          alert(json.error);
+        }
+      }
+    );
   }
 };
 

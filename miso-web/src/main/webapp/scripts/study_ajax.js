@@ -33,6 +33,30 @@ var Study = Study || {
         }
       });
     }
+  },
+  
+  // Validate methods can be found in parsley_form_validations.js
+  validateStudy: function () {
+    Validate.cleanFields('#study-form');
+    
+    jQuery('#study-form').parsley().destroy();
+
+    // Alias input field validation
+    jQuery('#alias').attr('class', 'form-control');
+    jQuery('#alias').attr('data-parsley-required', 'true');
+    jQuery('#alias').attr('data-parsley-maxlength', '100');
+
+    // Description input field validation
+    jQuery('#description').attr('class', 'form-control');
+    jQuery('#description').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+    jQuery('#description').attr('data-parsley-required', 'true');
+    jQuery('#description').attr('data-parsley-maxlength', '65535');
+    
+    jQuery('#study-form').parsley();
+    jQuery('#study-form').parsley().validate();
+    
+    Validate.updateWarningOrSubmit('#study-form');
+    return false;
   }
 };
 

@@ -21,7 +21,36 @@
  * *********************************************************************
  */
 
-var Experiment = Experiment || {};
+var Experiment = Experiment || {
+  validateExperiment: function () {
+    Validate.cleanFields('#experiment-form');
+    jQuery('#experiment-form').parsley().destroy();
+
+    // Title input field validation
+    jQuery('#title').attr('class', 'form-control');
+    jQuery('#title').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+    jQuery('#title').attr('data-parsley-required', 'true');
+    jQuery('#title').attr('data-parsley-maxlength', '255');
+
+    // Alias input field validation
+    jQuery('#alias').attr('class', 'form-control');
+    jQuery('#alias').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+    jQuery('#alias').attr('data-parsley-required', 'true');
+    jQuery('#alias').attr('data-parsley-maxlength', '100');
+
+    // Description input field validation
+    jQuery('#description').attr('class', 'form-control');
+    jQuery('#description').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+    jQuery('#description').attr('data-parsley-required', 'true');
+    jQuery('#description').attr('data-parsley-maxlength', '255');
+
+    jQuery('#experiment-form').parsley();
+    jQuery('#experiment-form').parsley().validate();
+    
+    Validate.updateWarningOrSubmit('#experiment-form');
+    return false;
+  }
+};
 
 Experiment.ui = {
   wizardAddExperiment: function (form) {

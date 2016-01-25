@@ -22,32 +22,11 @@
  */
 
 jQuery(document).ready(function () {
-  jQuery('#user-form').parsley();
-  jQuery.listen('parsley:field:validate', function () {
-    updateWarning();
-  });
+  Validate.attachParsley('#user-form');
 });
 
-function clean_user_fields() {
-  jQuery('#user-form').find('input:text').each(function() {
-    Utils.validation.clean_input_field(jQuery(this));
-  });
-};
-
-// update warning message
-function updateWarning() {
-  if (true === jQuery('#user-form').parsley().isValid()) {
-    jQuery('.bs-callout-info').removeClass('hidden');
-    jQuery('.bs-callout-warning').addClass('hidden');
-  } else {
-    jQuery('.bs-callout-info').addClass('hidden');
-    jQuery('.bs-callout-warning').removeClass('hidden');
-  }
-};
-
-function validate_user() {
-  clean_user_fields();
-
+function validateUser () {
+  Validate.cleanFields('#user-form');
   jQuery('#user-form').parsley().destroy();
 
   // Full name input field validation
@@ -61,7 +40,6 @@ function validate_user() {
   jQuery('#loginName').attr('data-parsley-required', 'true');
   jQuery('#loginName').attr('data-parsley-maxlength', '100');
   jQuery('#loginName').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
-
 
   // Login name input field validation
   jQuery('#email').attr('class', 'form-control');
@@ -94,18 +72,5 @@ function validate_user() {
   jQuery('#user-form').parsley();
   jQuery('#user-form').parsley().validate();
 
-  return validate_backend();
+  Validate.updateWarningOrSubmit('#user-form');
 };
-
-var validate_backend = function() {
-  updateWarning();
-  if (jQuery('#user-form').parsley().isValid() === true) {
-    jQuery('#user-form').submit();
-    return true;
-  } else {
-    return false;
-  }
-};
-
-
-

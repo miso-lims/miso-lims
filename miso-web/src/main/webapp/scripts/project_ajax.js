@@ -22,7 +22,60 @@
  */
 
 var Project = Project || {
+  validateProject: function () {
+    Validate.cleanFields('#project-form');
+    jQuery('#project-form').parsley().destroy();
 
+    // Alias input field validation
+    jQuery('#alias').attr('class', 'form-control');
+    jQuery('#alias').attr('data-parsley-required', 'true');
+    jQuery('#alias').attr('data-parsley-maxlength', '100');
+    jQuery('#alias').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+
+    // Description input field validation
+    jQuery('#description').attr('class', 'form-control');
+    jQuery('#description').attr('data-parsley-required', 'true');
+    jQuery('#description').attr('data-parsley-maxlength', '100');
+    jQuery('#description').attr('data-parsley-pattern', Utils.validation.sanitizeRegex);
+
+    // Radio button validation: ensure a button is selected (assumes there is one progress button, no other way to check because of dynamic
+    // generation)
+    jQuery('#progress').attr('class', 'form-control');
+    jQuery('#progress1').attr('required', 'true');
+    jQuery('#progress').attr('data-parsley-error-message', 'You must select a progress status.');
+    jQuery('#progress1').attr('data-parsley-errors-container', '#progressSelectError');
+    jQuery('#progress').attr('data-parsley-class-handler', '#progressButtons');
+
+    jQuery('#project-form').parsley();
+    jQuery('#project-form').parsley().validate();
+
+    Validate.updateWarningOrSubmit('#project-form');
+    return false;
+  },
+  
+  validate_sample_qcs: function (json) {
+    var ok = true;
+    for (var i = 0; i < json.length; i++) {
+      if(!json[i].results.match(/[0-9\.]+/)) ok = false;
+    }
+    return ok;
+  },
+  
+  validate_empcrs: function (json) {
+    var ok = true;
+    for (var i = 0; i < json.length; i++) {
+      if(!json[i].results.match(/[0-9\.]+/)) ok = false;
+    }
+    return ok;
+  },
+  
+  validate_empcr_dilutions: function (json) {
+    var ok = true;
+    for (var i = 0; i < json.length; i++) {
+      if(!json[i].results.match(/[0-9\.]+/)) ok = false;
+    }
+    return ok;
+  }
 };
 
 Project.ui = {
@@ -370,7 +423,7 @@ Project.ui = {
     }
 
     if (aReturn.length > 0) {
-      if (validate_sample_qcs(aReturn)) {
+      if (Project.validate_sample_qcs(aReturn)) {
         Fluxion.doAjax(
           'sampleControllerHelperService',
           'bulkAddSampleQCs',
@@ -454,7 +507,7 @@ Project.ui = {
       aReturn.push(obj);
     }
     if (aReturn.length > 0) {
-      if (validate_empcrs(aReturn)) {
+      if (Project.validate_empcrs(aReturn)) {
         Fluxion.doAjax(
           'libraryControllerHelperService',
           'bulkAddEmPcrs',
@@ -538,7 +591,7 @@ Project.ui = {
     }
 
     if (aReturn.length > 0) {
-      if (validate_empcr_dilutions(aReturn)) {
+      if (Project.validate_empcr_dilutions(aReturn)) {
         Fluxion.doAjax(
           'libraryControllerHelperService',
           'bulkAddEmPcrDilutions',

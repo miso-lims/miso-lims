@@ -42,7 +42,6 @@
 <script src="<c:url value='/scripts/stats_ajax.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
 
 <script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
-<script type="text/javascript" src="<c:url value='/scripts/sample_validation.js?ts=${timestamp.time}'/>"></script>
 
 <div id="maincontent">
 <div id="contentcolumn">
@@ -65,7 +64,7 @@
     <c:otherwise>Create</c:otherwise>
   </c:choose> Sample
   <button type="button" class="fg-button ui-state-default ui-corner-all"
-          onclick="return validate_sample();">Save
+          onclick="return Sample.validateSample();">Save
   </button>
 </h1>
 
@@ -252,7 +251,7 @@
       <td class="h">Scientific Name:*</td>
       <td><form:input path="scientificName"/>
         <c:if test="${sessionScope.taxonLookupEnabled}">
-        <script>Utils.timer.typewatchFunc(jQuery('#scientificName'), validate_ncbi_taxon, 1000, 2);</script>
+        <script>Utils.timer.typewatchFunc(jQuery('#scientificName'), Sample.validateNCBITaxon, 1000, 2);</script>
         </c:if>
       </td>
         <%--<td><a href="void(0);" onclick="popup('help/sampleScientificName.html');">Help</a></td>--%>
@@ -295,6 +294,14 @@
     <%@ include file="permissions.jsp" %>
   </c:otherwise>
   </c:choose>
+  
+  <script type="text/javascript">
+    jQuery(document).ready(function () {
+      // Attach Parsley form validator
+      Validate.attachParsley('#sample-form');
+    });
+  </script>
+  
   <c:if test="${sample.id != 0}">
     <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#notes_arrowclick'), 'notes');">Notes
       <div id="notes_arrowclick" class="toggleLeftDown"></div>

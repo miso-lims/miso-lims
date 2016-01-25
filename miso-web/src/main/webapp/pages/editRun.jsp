@@ -38,7 +38,6 @@
 
 
 <script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
-<script type="text/javascript" src="<c:url value='/scripts/run_validation.js?ts=${timestamp.time}'/>"></script>
 
 <c:choose>
   <c:when test="${not empty run.status}"><div id="maincontent" class="${run.status.health.key}"></c:when>
@@ -54,7 +53,7 @@
     <c:when test="${run.id != 0}">Edit</c:when>
     <c:otherwise>Create</c:otherwise>
   </c:choose> Run
-  <button onclick="return validate_run();" class="fg-button ui-state-default ui-corner-all">Save</button>
+  <button onclick="return Run.validateRun();" class="fg-button ui-state-default ui-corner-all">Save</button>
 </h1>
 
 <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#note_arrowclick'), 'notediv');">Quick Help
@@ -156,6 +155,14 @@
       </c:otherwise>
     </c:choose>
   </tr>
+  <tr>
+    <td></td>
+    <td>
+      <div class="parsley-errors-list filled" id="sequencerReferenceError">
+        <div class="parsley-required"></div>
+      </div>
+    </td>
+  </tr>
 
   <tr>
     <td>Name:</td>
@@ -209,7 +216,7 @@
     <td valign="top">Status:</td>
     <td>
       <form:radiobuttons id="status.health" path="status.health" items="${healthTypes}"
-                         onchange="checkForCompletionDate();"/><br/>
+                         onchange="Run.checkForCompletionDate();"/><br/>
       <table class="list" id="runStatusTable">
         <thead>
         <tr>
@@ -250,6 +257,14 @@
   </tr>
 
 </table>
+
+<script type="text/javascript">
+	jQuery(document).ready(function () {
+	  // Attaches a Parsley form validator.
+	  Validate.attachParsley('#run-form');
+	});
+</script>
+
 <%@ include file="permissions.jsp" %>
 <c:if test="${run.id != 0}">
   <c:if test="${statsAvailable}">

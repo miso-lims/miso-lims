@@ -774,6 +774,7 @@ public class ContainerControllerHelperService {
       e.setSecurityProfile(s.getSecurityProfile());
 
       try {
+        e.setLastModifier(securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName()));
         p.addExperiment(e);
         requestManager.saveExperiment(e);
       } catch (MalformedExperimentException e1) {
