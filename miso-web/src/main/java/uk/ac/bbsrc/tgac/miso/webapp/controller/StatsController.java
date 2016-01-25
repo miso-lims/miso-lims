@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
 import javax.xml.namespace.QName;
 import javax.xml.transform.TransformerException;
@@ -35,6 +36,7 @@ import javax.xml.transform.TransformerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -44,8 +46,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
-
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SequencerReference;
 import uk.ac.bbsrc.tgac.miso.core.data.Status;
@@ -57,7 +57,10 @@ import uk.ac.bbsrc.tgac.miso.core.service.integration.strategy.interrogator.Sequ
 import uk.ac.bbsrc.tgac.miso.core.service.integration.ws.solid.SolidService;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
+import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
+
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 /**
  * uk.ac.bbsrc.tgac.miso.webapp.controller
@@ -85,6 +88,18 @@ public class StatsController {
 
   public void setRequestManager(uk.ac.bbsrc.tgac.miso.core.manager.RequestManager requestManager) {
     this.requestManager = requestManager;
+  }
+  
+  @Autowired
+  private JdbcTemplate interfaceTemplate;
+
+  public void setInterfaceTemplate(JdbcTemplate interfaceTemplate) {
+    this.interfaceTemplate = interfaceTemplate;
+  }
+  
+  @ModelAttribute("maxLengths")
+  public Map<String, Integer> maxLengths() throws IOException {
+    return DbUtils.getColumnSizes(interfaceTemplate, "SequencerReference");
   }
 
   public Collection<SequencerReference> populateSequencerReferences() throws IOException {
