@@ -9,6 +9,8 @@ public class SampleAdditionalInfoDto {
   private String url;
   private Long sampleId;
   private String sampleUrl;
+  private Long sampleClassId;
+  private String sampleClassUrl;
   private Long tissueOriginId;
   private String tissueOriginUrl;
   private Long tissueTypeId;
@@ -229,6 +231,22 @@ public class SampleAdditionalInfoDto {
 
   public void setUpdatedById(Long updatedById) {
     this.updatedById = updatedById;
+  }
+
+  public Long getSampleClassId() {
+    return sampleClassId;
+  }
+
+  public void setSampleClassId(Long sampleClassId) {
+    this.sampleClassId = sampleClassId;
+  }
+
+  public String getSampleClassUrl() {
+    return sampleClassUrl;
+  }
+
+  public void setSampleClassUrl(String sampleClassUrl) {
+    this.sampleClassUrl = sampleClassUrl;
   }
 
 }

@@ -99,9 +99,9 @@ public class DefaultSampleAnalyteService implements SampleAnalyteService {
     if (tissueMaterialId != null) {
       tissueMaterial = tissueMaterialDao.getTissueMaterial(tissueMaterialId);
     }
-    sampleAnalyte.setSamplePurpose(samplePurpose);
-    sampleAnalyte.setSampleGroup(sampleGroup);
-    sampleAnalyte.setTissueMaterial(tissueMaterial);
+    updatedSampleAnalyte.setSamplePurpose(samplePurpose);
+    updatedSampleAnalyte.setSampleGroup(sampleGroup);
+    updatedSampleAnalyte.setTissueMaterial(tissueMaterial);
 
     User user = securityManager.getUserByLoginName(SecurityContextHolder.getContext().getAuthentication().getName());
     updatedSampleAnalyte.setUpdatedBy(user);

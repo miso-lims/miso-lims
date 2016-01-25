@@ -184,8 +184,27 @@ public class Dtos {
   public static SampleAdditionalInfoDto asDto(SampleAdditionalInfo from) {
     SampleAdditionalInfoDto dto = new SampleAdditionalInfoDto();
     dto.setId(from.getSampleAdditionalInfoId());
+    dto.setSampleId(from.getSample().getId());
+    dto.setSampleClassId(from.getSampleClass().getSampleClassId());
+    if (from.getTissueOrigin() != null) {
+      dto.setTissueOriginId(from.getTissueOrigin().getTissueOriginId());
+    }
+    if (from.getTissueType() != null) {
+      dto.setTissueTypeId(from.getTissueType().getTissueTypeId());
+    }
+    if (from.getQcPassedDetail() != null) {
+      dto.setQcPassedDetailId(from.getQcPassedDetail().getQcPassedDetailId());
+    }
+    if (from.getSubproject() != null) {
+      dto.setSubprojectId(from.getSubproject().getSubprojectId());
+    }
+    if (from.getPrepKit() != null) {
+      dto.setPrepKitId(from.getPrepKit().getKitDescriptorId());
+    }
     dto.setPassageNumber(from.getPassageNumber());
     dto.setTimesReceived(from.getTimesReceived());
+    dto.setVolume(from.getVolume());
+    dto.setConcentration(from.getConcentration());
     dto.setCreatedById(from.getCreatedBy().getUserId());
     dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
     dto.setUpdatedById(from.getUpdatedBy().getUserId());
@@ -205,6 +224,9 @@ public class Dtos {
     SampleAdditionalInfo to = new SampleAdditionalInfoImpl();
     to.setPassageNumber(from.getPassageNumber());
     to.setTimesReceived(from.getTimesReceived());
+    to.setTubeNumber(from.getTubeNumber());
+    to.setVolume(from.getVolume());
+    to.setConcentration(from.getConcentration());
     return to;
   }
 

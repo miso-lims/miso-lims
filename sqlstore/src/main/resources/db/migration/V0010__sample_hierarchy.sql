@@ -115,7 +115,7 @@ CREATE TABLE `QcPassedDetail` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `SampleAdditionalInfo` (
-  `sampleAdditionalInfoId` bigint(20) NOT NULL,
+  `sampleAdditionalInfoId` bigint(20) NOT NULL AUTO_INCREMENT,
   `sampleId` bigint(20) NOT NULL,
   `sampleClassId` bigint(20) NOT NULL,
   `tissueOriginId` bigint(20) DEFAULT NULL,

@@ -9,9 +9,11 @@ public interface SampleAdditionalInfoService {
 
   SampleAdditionalInfo get(Long sampleAdditionalInfoId);
 
-  Long create(SampleAdditionalInfo sampleAdditionalInfo) throws IOException;
+  Long create(SampleAdditionalInfo sampleAdditionalInfo, Long sampleId, Long tissueOriginId, Long tissueTypeId, Long qcPassedDetailId,
+      Long subprojectId, Long prepKitId, Long sampleClassId) throws IOException;
 
-  void update(SampleAdditionalInfo sampleAdditionalInfo) throws IOException;
+  void update(SampleAdditionalInfo sampleAdditionalInfo, Long tissueOriginId, Long tissueTypeId, Long qcPassedDetailId, Long prepKitId,
+      Long sampleClassId) throws IOException;
 
   Set<SampleAdditionalInfo> getAll();
 

@@ -84,13 +84,34 @@ public class SampleAdditionalInfoController extends RestController {
         .buildAndExpand(sampleAdditionalInfoDto.getCreatedById()).toUriString());
     sampleAdditionalInfoDto.setUpdatedByUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}")
         .buildAndExpand(sampleAdditionalInfoDto.getUpdatedById()).toUriString());
+    sampleAdditionalInfoDto.setSampleUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/sample/{id}")
+        .buildAndExpand(sampleAdditionalInfoDto.getSampleId()).toUriString());
+    if (sampleAdditionalInfoDto.getSampleClassId() != null) {
+      sampleAdditionalInfoDto.setSampleClassUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/sampleclass/{id}")
+          .buildAndExpand(sampleAdditionalInfoDto.getSampleClassId()).toUriString());
+    }
+    if (sampleAdditionalInfoDto.getTissueOriginId() != null) {
+      sampleAdditionalInfoDto.setTissueOriginUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/tissueorigin/{id}")
+          .buildAndExpand(sampleAdditionalInfoDto.getTissueOriginId()).toUriString());
+    }
+    if (sampleAdditionalInfoDto.getTissueTypeId() != null) {
+      sampleAdditionalInfoDto.setTissueTypeUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/tissuetype/{id}")
+          .buildAndExpand(sampleAdditionalInfoDto.getTissueTypeId()).toUriString());
+    }
+    if (sampleAdditionalInfoDto.getQcPassedDetailId() != null) {
+      sampleAdditionalInfoDto.setQcPassedDetailUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/qcpasseddetail/{id}")
+          .buildAndExpand(sampleAdditionalInfoDto.getQcPassedDetailId()).toUriString());
+    }
+    if (sampleAdditionalInfoDto.getSubprojectId() != null) {
+      sampleAdditionalInfoDto.setSubprojectUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/subproject/{id}")
+          .buildAndExpand(sampleAdditionalInfoDto.getSubprojectId()).toUriString());
+    }
     return sampleAdditionalInfoDto;
   }
 
   @RequestMapping(value = "/sampleadditionalinfos", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
-  public Set<SampleAdditionalInfoDto> getSampleAdditionalInfos(UriComponentsBuilder uriBuilder,
-      HttpServletResponse response) {
+  public Set<SampleAdditionalInfoDto> getSampleAdditionalInfos(UriComponentsBuilder uriBuilder, HttpServletResponse response) {
     Set<SampleAdditionalInfo> sampleAdditionalInfos = sampleAdditionalInfoService.getAll();
     if (sampleAdditionalInfos.isEmpty()) {
       throw new RestException("No sample additional infos found", Status.NOT_FOUND);
@@ -108,7 +129,10 @@ public class SampleAdditionalInfoController extends RestController {
   public ResponseEntity<?> createSampleAdditionalInfo(@RequestBody SampleAdditionalInfoDto sampleAdditionalInfoDto, UriComponentsBuilder b,
       HttpServletResponse response) throws IOException {
     SampleAdditionalInfo sampleAdditionalInfo = Dtos.to(sampleAdditionalInfoDto);
-    Long id = sampleAdditionalInfoService.create(sampleAdditionalInfo);
+    Long id = sampleAdditionalInfoService.create(sampleAdditionalInfo, sampleAdditionalInfoDto.getSampleId(),
+        sampleAdditionalInfoDto.getTissueOriginId(), sampleAdditionalInfoDto.getTissueTypeId(),
+        sampleAdditionalInfoDto.getQcPassedDetailId(), sampleAdditionalInfoDto.getSubprojectId(), sampleAdditionalInfoDto.getPrepKitId(),
+        sampleAdditionalInfoDto.getSampleClassId());
     UriComponents uriComponents = b.path("/sampleadditionalinfo/{id}").buildAndExpand(id);
     HttpHeaders headers = new HttpHeaders();
     headers.setLocation(uriComponents.toUri());
@@ -121,7 +145,9 @@ public class SampleAdditionalInfoController extends RestController {
       @RequestBody SampleAdditionalInfoDto sampleAdditionalInfoDto, HttpServletResponse response) throws IOException {
     SampleAdditionalInfo sampleAdditionalInfo = Dtos.to(sampleAdditionalInfoDto);
     sampleAdditionalInfo.setSampleAdditionalInfoId(id);
-    sampleAdditionalInfoService.update(sampleAdditionalInfo);
+    sampleAdditionalInfoService.update(sampleAdditionalInfo, sampleAdditionalInfoDto.getTissueOriginId(),
+        sampleAdditionalInfoDto.getTissueTypeId(), sampleAdditionalInfoDto.getQcPassedDetailId(), sampleAdditionalInfoDto.getPrepKitId(),
+        sampleAdditionalInfoDto.getSampleClassId());
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
