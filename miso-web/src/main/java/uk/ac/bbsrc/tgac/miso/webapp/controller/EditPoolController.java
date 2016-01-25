@@ -132,11 +132,6 @@ public class EditPoolController {
   public Map<String, Integer> maxLengths() throws IOException {
     return DbUtils.getColumnSizes(interfaceTemplate, "Pool");
   }
-  
-  @ModelAttribute("maxLengths")
-  public Map<String, Integer> maxLengths() throws IOException {
-    return DbUtils.getColumnSizes(interfaceTemplate, "Pool");
-  }
 
   private List<? extends Dilution> populateAvailableDilutions(Pool pool) throws IOException {
     ArrayList<LibraryDilution> libs = new ArrayList<LibraryDilution>();
