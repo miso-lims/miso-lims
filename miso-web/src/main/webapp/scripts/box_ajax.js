@@ -232,6 +232,7 @@ Box.ui = {
               { "sTitle" : "ID", "bVisible": false }
             ],
             "bJQueryUI": true,
+            "bAutoWidth": false,
             "bRetrieve": true,
             "iDisplayLength": 25,
             "sDom": '<l<"#toolbar">f>r<t<"fg-toolbar ui-widget-header ui-corner-bl ui-corner-br ui-helper-clearfix"ip>'

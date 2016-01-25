@@ -885,6 +885,7 @@ Library.ui = {
             { "sTitle": "ID", "bVisible": false}
           ],
           "bJQueryUI": true,
+          "bAutoWidth": false,
           "iDisplayLength": 25,
           "aaSorting": [
             [0, "desc"]
