@@ -34,12 +34,10 @@ import java.util.regex.Matcher;
 
 import javax.persistence.CascadeType;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -82,7 +80,6 @@ import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
-
 
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore
@@ -484,7 +481,6 @@ public class SQLSampleDAO implements SampleStore {
   @Cacheable(cacheName = "sampleCache", keyGenerator = @KeyGenerator(name = "HashCodeCacheKeyGenerator", properties = {
       @Property(name = "includeMethod", value = "false"), @Property(name = "includeParameterTypes", value = "false") }) )
   public Sample get(long sampleId) throws IOException {
-    @SuppressWarnings("rawtypes")
     List eResults = template.query(SAMPLE_SELECT_BY_ID, new Object[] { sampleId }, new SampleMapper());
     Sample e = eResults.size() > 0 ? (Sample) eResults.get(0) : null;
     return e;
@@ -492,7 +488,6 @@ public class SQLSampleDAO implements SampleStore {
 
   @Override
   public Sample lazyGet(long sampleId) throws IOException {
-    @SuppressWarnings("rawtypes")
     List eResults = template.query(SAMPLE_SELECT_BY_ID, new Object[] { sampleId }, new SampleMapper(true));
     Sample e = eResults.size() > 0 ? (Sample) eResults.get(0) : null;
     return e;
@@ -500,7 +495,6 @@ public class SQLSampleDAO implements SampleStore {
 
   @Override
   public Sample getByBarcode(String barcode) throws IOException {
-    @SuppressWarnings("rawtypes")
     List eResults = template.query(SAMPLE_SELECT_BY_IDENTIFICATION_BARCODE, new Object[] { barcode }, new SampleMapper(true));
     Sample e = eResults.size() > 0 ? (Sample) eResults.get(0) : null;
     return e;
@@ -573,7 +567,6 @@ public class SQLSampleDAO implements SampleStore {
     @Override
     public Sample mapRow(ResultSet rs, int rowNum) throws SQLException {
       long id = rs.getLong("sampleId");
-
       if (isCacheEnabled() && lookupCache(cacheManager) != null) {
         Element element;
         if ((element = lookupCache(cacheManager).get(DbUtils.hashCodeCacheKeyFor(id))) != null) {
@@ -629,10 +622,8 @@ public class SQLSampleDAO implements SampleStore {
           }
 
           s.setNotes(noteDAO.listBySample(id));
-
         } else {
           s.setProject(projectDAO.lazyGet(rs.getLong("project_projectId")));
-
         }
         s.getChangeLog().addAll(changeLogDAO.listAllById(TABLE_NAME, id));
       } catch (IOException e1) {
@@ -646,7 +637,6 @@ public class SQLSampleDAO implements SampleStore {
       if (isCacheEnabled() && lookupCache(cacheManager) != null) {
         lookupCache(cacheManager).put(new Element(DbUtils.hashCodeCacheKeyFor(id), s));
       }
-
       return s;
     }
   }

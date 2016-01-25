@@ -11,6 +11,3 @@ target/
 
 # Flyway database migration credentials file.
 sqlstore/flyway.properties
-
-# Test file
-core/test_file.txt

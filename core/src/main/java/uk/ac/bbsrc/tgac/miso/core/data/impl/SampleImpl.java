@@ -26,14 +26,12 @@ package uk.ac.bbsrc.tgac.miso.core.data.impl;
 import java.io.Serializable;
 
 import javax.persistence.Entity;
-import javax.persistence.Table;
 
 import com.eaglegenomics.simlims.core.SecurityProfile;
 import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSample;
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
-import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 
 /**
  * uk.ac.bbsrc.tgac.miso.core.data.impl
@@ -44,11 +42,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
  * @since 0.0.2
  */
 @Entity
-@Table(name = "Sample")
 public class SampleImpl extends AbstractSample implements Serializable {
-
-  private static final long serialVersionUID = 1L;
-
   /**
    * Construct a new Sample with a default empty SecurityProfile
    */
@@ -81,39 +75,6 @@ public class SampleImpl extends AbstractSample implements Serializable {
       setSecurityProfile(project.getSecurityProfile());
     } else {
       setSecurityProfile(new SecurityProfile(user));
-    }
-  }
-
-  public SampleImpl(SampleFactoryBuilder builder) {
-    this(builder.getProject(), builder.getUser());
-    setDescription(builder.getDescription());
-    setSampleType(builder.getSampleType());
-    setScientificName(builder.getScientificName());
-    setLastModifier(builder.getUser());
-
-    if (!LimsUtils.isStringEmptyOrNull(builder.getAccession())) {
-      setAccession(builder.getAccession());
-    }
-    if (!LimsUtils.isStringEmptyOrNull(builder.getName())) {
-      setName(builder.getName()); // Required, but will be set later.
-    }
-    if (!LimsUtils.isStringEmptyOrNull(builder.getIdentificationBarcode())) {
-      setIdentificationBarcode(builder.getIdentificationBarcode());
-    }
-    if (!LimsUtils.isStringEmptyOrNull(builder.getLocationBarcode())) {
-      setLocationBarcode(builder.getLocationBarcode());
-    }
-    if (builder.getReceivedDate() != null) {
-      setReceivedDate(builder.getReceivedDate());
-    }
-    if (builder.getQcPassed() != null) {
-      setQcPassed(builder.getQcPassed());
-    }
-    if (!LimsUtils.isStringEmptyOrNull(builder.getAlias())) {
-      setAlias(builder.getAlias());
-    }
-    if (!LimsUtils.isStringEmptyOrNull(builder.getTaxonIdentifier())) {
-      setTaxonIdentifier(builder.getTaxonIdentifier());
     }
   }
 

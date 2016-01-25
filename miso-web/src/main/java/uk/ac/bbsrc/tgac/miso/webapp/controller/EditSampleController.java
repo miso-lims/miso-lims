@@ -110,28 +110,21 @@ public class EditSampleController {
   public void setSecurityManager(SecurityManager securityManager) {
     this.securityManager = securityManager;
   }
-  
-  
-  public Boolean misoPropertyBoolean(String property) {
-    MisoPropertyExporter exporter = (MisoPropertyExporter) ApplicationContextProvider.getApplicationContext().getBean("propertyConfigurer");
-    Map<String, String> misoProperties = exporter.getResolvedProperties();
-    return misoProperties.containsKey(property)
-        && Boolean.parseBoolean(misoProperties.get(property));
-  }
 
   @ModelAttribute("metrixEnabled")
   public Boolean isMetrixEnabled() {
-    return misoPropertyBoolean("miso.notification.interop.enabled");
+    MisoPropertyExporter exporter = (MisoPropertyExporter) ApplicationContextProvider.getApplicationContext().getBean("propertyConfigurer");
+    Map<String, String> misoProperties = exporter.getResolvedProperties();
+    return misoProperties.containsKey("miso.notification.interop.enabled")
+        && Boolean.parseBoolean(misoProperties.get("miso.notification.interop.enabled"));
   }
 
   @ModelAttribute("autoGenerateIdBarcodes")
   public Boolean autoGenerateIdentificationBarcodes() {
-    return misoPropertyBoolean("miso.autoGenerateIdentificationBarcodes");
-  }
-  
-  @ModelAttribute("detailedSample")
-  public Boolean isDetailedSampleEnabled() { 
-    return misoPropertyBoolean("miso.detailed.sample.enabled");
+    MisoPropertyExporter exporter = (MisoPropertyExporter) ApplicationContextProvider.getApplicationContext().getBean("propertyConfigurer");
+    Map<String, String> misoProperties = exporter.getResolvedProperties();
+    return misoProperties.containsKey("miso.autoGenerateIdentificationBarcodes")
+        && Boolean.parseBoolean(misoProperties.get("miso.autoGenerateIdentificationBarcodes"));
   }
 
   public Map<String, Sample> getAdjacentSamplesInGroup(Sample s, @RequestParam(value = "entityGroupId", required = true) Long entityGroupId)

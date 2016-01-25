@@ -26,8 +26,6 @@ package uk.ac.bbsrc.tgac.miso.webapp.controller.rest;
 import java.io.IOException;
 import java.util.Collection;
 
-import javax.ws.rs.core.Response.Status;
-
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +36,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
+
+import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Library;
 import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
@@ -53,8 +53,7 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 import uk.ac.bbsrc.tgac.miso.core.util.jackson.LibraryRecursionAvoidanceMixin;
 import uk.ac.bbsrc.tgac.miso.core.util.jackson.SampleProjectAvoidanceMixin;
 import uk.ac.bbsrc.tgac.miso.core.util.jackson.UserInfoMixin;
-
-import com.eaglegenomics.simlims.core.User;
+import uk.ac.bbsrc.tgac.miso.webapp.util.RestUtils;
 
 /**
  * A controller to handle all REST requests for Projects
@@ -66,7 +65,7 @@ import com.eaglegenomics.simlims.core.User;
 @Controller
 @RequestMapping("/rest/project")
 @SessionAttributes("project")
-public class ProjectRestController extends RestController {
+public class ProjectRestController {
   protected static final Logger log = LoggerFactory.getLogger(ProjectRestController.class);
 
   @Autowired
@@ -76,50 +75,60 @@ public class ProjectRestController extends RestController {
     this.requestManager = requestManager;
   }
 
-  @RequestMapping(value = "/alias/{projectAlias}", method = RequestMethod.GET, produces="application/json")
+  @RequestMapping(value = "/alias/{projectAlias}", method = RequestMethod.GET)
   public @ResponseBody String getProjectByAlias(@PathVariable String projectAlias) throws IOException {
-    Project project = requestManager.getProjectByAlias(projectAlias);
-    if (project == null) {
-      throw new RestException("No project found with alias: " + projectAlias, Status.NOT_FOUND);
+    try {
+      Project project = requestManager.getProjectByAlias(projectAlias);
+      if (project != null) {
+        return getProjectById(project.getId());
+      }
+      return RestUtils.error("No such project with that alias.", "projectAlias", projectAlias).toString();
+    } catch (IOException ioe) {
+      log.error("cannot retrieve project", ioe);
+      return RestUtils.error("Cannot retrieve project: " + ioe.getMessage(), "projectAlias", projectAlias).toString();
     }
-    return getProjectById(project.getId());
   }
 
-  @RequestMapping(value = "{projectId}", method = RequestMethod.GET, produces="application/json")
+  @RequestMapping(value = "{projectId}", method = RequestMethod.GET)
   public @ResponseBody String getProjectById(@PathVariable Long projectId) throws IOException {
     ObjectMapper mapper = new ObjectMapper();
-    Project project = requestManager.getProjectById(projectId);
-    if (project == null) {
-      throw new RestException("No project found with ID: " + projectId, Status.NOT_FOUND);
-    }
-    for (Sample s : project.getSamples()) {
-      if (s.getLibraries().isEmpty()) {
-        for (Library l : requestManager.listAllLibrariesBySampleId(s.getId())) {
-          try {
-            s.addLibrary(l);
-          } catch (MalformedLibraryException e) {
-            log.error("get project by id", e);
+    try {
+      Project project = requestManager.getProjectById(projectId);
+      if (project != null) {
+        for (Sample s : project.getSamples()) {
+          if (s.getLibraries().isEmpty()) {
+            for (Library l : requestManager.listAllLibrariesBySampleId(s.getId())) {
+              try {
+                s.addLibrary(l);
+              } catch (MalformedLibraryException e) {
+                log.error("get project by id", e);
+              }
+            }
           }
-        }
-      }
 
-      if (s.getSampleQCs().isEmpty()) {
-        for (SampleQC qc : requestManager.listAllSampleQCsBySampleId(s.getId())) {
-          try {
-            s.addQc(qc);
-          } catch (MalformedSampleQcException e) {
-            log.error("get project by id", e);
+          if (s.getSampleQCs().isEmpty()) {
+            for (SampleQC qc : requestManager.listAllSampleQCsBySampleId(s.getId())) {
+              try {
+                s.addQc(qc);
+              } catch (MalformedSampleQcException e) {
+                log.error("get project by id", e);
+              }
+            }
           }
         }
+        mapper.getSerializationConfig().addMixInAnnotations(Sample.class, SampleProjectAvoidanceMixin.class);
+        mapper.getSerializationConfig().addMixInAnnotations(Library.class, LibraryRecursionAvoidanceMixin.class);
+        mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
+        return mapper.writeValueAsString(project);
       }
+      return mapper.writeValueAsString(RestUtils.error("No such project with that ID.", "projectId", projectId.toString()));
+    } catch (IOException ioe) {
+      log.error("cannot retrieve project", ioe);
+      return mapper.writeValueAsString(RestUtils.error("Cannot retrieve project: " + ioe.getMessage(), "projectId", projectId.toString()));
     }
-    mapper.getSerializationConfig().addMixInAnnotations(Sample.class, SampleProjectAvoidanceMixin.class);
-    mapper.getSerializationConfig().addMixInAnnotations(Library.class, LibraryRecursionAvoidanceMixin.class);
-    mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
-    return mapper.writeValueAsString(project);
   }
 
-  @RequestMapping(value = "{projectId}/libraries", method = RequestMethod.GET, produces="application/json")
+  @RequestMapping(value = "{projectId}/libraries", method = RequestMethod.GET)
   public @ResponseBody String getProjectLibraries(@PathVariable Long projectId) throws IOException {
     Collection<Library> lp = requestManager.listAllLibrariesByProjectId(projectId);
     for (Library l : lp) {
@@ -147,7 +156,7 @@ public class ProjectRestController extends RestController {
     return mapper.writeValueAsString(lp);
   }
 
-  @RequestMapping(method = RequestMethod.GET, produces="application/json")
+  @RequestMapping(method = RequestMethod.GET)
   public @ResponseBody String listAllProjects() throws IOException {
     Collection<Project> lp = requestManager.listAllProjects();
     for (Project p : lp) {
@@ -161,5 +170,4 @@ public class ProjectRestController extends RestController {
     mapper.getSerializationConfig().addMixInAnnotations(User.class, UserInfoMixin.class);
     return mapper.writeValueAsString(lp);
   }
-  
 }

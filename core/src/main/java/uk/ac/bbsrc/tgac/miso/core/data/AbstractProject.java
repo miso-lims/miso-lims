@@ -30,17 +30,17 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.Column;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.Transient;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
 import org.apache.commons.lang.BooleanUtils;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
-import org.hibernate.annotations.TypeDefs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,10 +50,7 @@ import com.eaglegenomics.simlims.core.User;
 
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
 import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressType;
-import uk.ac.bbsrc.tgac.miso.core.data.visitor.SubmittableVisitor;
-import uk.ac.bbsrc.tgac.miso.core.data.type.ProgressTypeUserType;
 import uk.ac.bbsrc.tgac.miso.core.event.listener.MisoListener;
-import uk.ac.bbsrc.tgac.miso.core.event.listener.ProjectListener;
 import uk.ac.bbsrc.tgac.miso.core.security.SecurableByProfile;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 
@@ -63,8 +60,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
  * @author Rob Davey
  * @since 0.0.2
  */
-@MappedSuperclass
-@TypeDefs({ @TypeDef(name = "progressTypeUserType", typeClass = ProgressTypeUserType.class) })
+@Entity
 public abstract class AbstractProject implements Project {
   protected static final Logger log = LoggerFactory.getLogger(AbstractProject.class);
   private static final long serialVersionUID = 1L;
@@ -83,30 +79,22 @@ public abstract class AbstractProject implements Project {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long projectId = AbstractProject.UNSAVED_ID;
 
-  @Transient
+  @OneToMany(cascade = CascadeType.ALL)
   private Collection<Request> requests = new HashSet<Request>();
 
-  @Transient
   private Collection<Sample> samples = new HashSet<Sample>();
-  @Transient
   private Collection<Run> runs = new HashSet<Run>();
-  @Transient
   private Collection<Study> studies = new HashSet<Study>();
-  @Transient
   private Collection<ProjectOverview> overviews = new HashSet<ProjectOverview>();
-  @Transient
   private Collection<String> issueKeys = new HashSet<String>();
 
-  @Column
-  @Type(type = "progressTypeUserType")
+  @Enumerated(EnumType.STRING)
   private ProgressType progress;
 
-  @Transient
+  @OneToOne(cascade = CascadeType.ALL)
   private SecurityProfile securityProfile = null;
-  @Transient
   private final Set<MisoListener> listeners = new HashSet<MisoListener>();
   private Date lastUpdated;
-  @Transient
   private Set<User> watchers = new HashSet<User>();
 
   @Override

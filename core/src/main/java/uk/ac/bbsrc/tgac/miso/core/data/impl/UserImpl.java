@@ -33,8 +33,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.ManyToMany;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +52,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
  * @since 0.0.2
  */
 @Entity
-@Table(name = "User")
 public class UserImpl implements User, Serializable, Comparable {
   protected static final Logger log = LoggerFactory.getLogger(UserImpl.class);
 
@@ -75,10 +73,8 @@ public class UserImpl implements User, Serializable, Comparable {
   private boolean external = false;
   private boolean admin = false;
   private boolean active = true;
-
-  @Transient
+  @ManyToMany
   private Collection<Group> groups = new HashSet<Group>();
-  @Transient
   private String[] roles = new String[0];
 
   @Override
