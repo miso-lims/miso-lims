@@ -53,7 +53,7 @@ import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
 @Controller
 @RequestMapping("/rest/container")
 @SessionAttributes("container")
-public class ContainerRestController extends RestController {
+public class ContainerRestController {
   protected static final Logger log = LoggerFactory.getLogger(ContainerRestController.class);
 
   @Autowired
@@ -63,7 +63,7 @@ public class ContainerRestController extends RestController {
     this.requestManager = requestManager;
   }
 
-  @RequestMapping(value = "{containerBarcode}", method = RequestMethod.GET, produces="application/json")
+  @RequestMapping(value = "{containerBarcode}", method = RequestMethod.GET)
   public @ResponseBody String jsonRest(@PathVariable String containerBarcode) throws IOException {
     StringBuilder sb = new StringBuilder();
     Collection<SequencerPartitionContainer<SequencerPoolPartition>> sequencerPartitionContainerCollection = requestManager
@@ -74,9 +74,7 @@ public class ContainerRestController extends RestController {
       sb.append("{");
       sb.append("\"containerId\":\"" + sequencerPartitionContainer.getId() + "\",");
       sb.append("\"identificationBarcode\":\"" + sequencerPartitionContainer.getIdentificationBarcode() + "\",");
-      if (sequencerPartitionContainer.getPlatform() != null) {
-        sb.append("\"platform\":\"" + sequencerPartitionContainer.getPlatform().getNameAndModel() + "\",");
-      }
+      sb.append("\"platform\":\"" + sequencerPartitionContainer.getPlatform().getNameAndModel() + "\",");
       sb.append("\"partitions\":[");
       int ip = 0;
       for (SequencerPoolPartition partition : sequencerPartitionContainer.getPartitions()) {
@@ -125,11 +123,10 @@ public class ContainerRestController extends RestController {
       }
       sb.append("]");
       sb.append("}");
-      if (i < sequencerPartitionContainerCollection.size()) {
-        sb.append(",");
-      }
+    }
+    if (i < sequencerPartitionContainerCollection.size()) {
+      sb.append(",");
     }
     return "[" + sb.toString() + "]";
   }
-  
 }

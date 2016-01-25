@@ -27,8 +27,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import javax.ws.rs.core.Response.Status;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +59,7 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 @Controller
 @RequestMapping("/rest/external")
 @SessionAttributes("external")
-public class ExternalRestController extends RestController {
+public class ExternalRestController {
   protected static final Logger log = LoggerFactory.getLogger(ExternalRestController.class);
 
   @Autowired
@@ -71,7 +69,7 @@ public class ExternalRestController extends RestController {
     this.requestManager = requestManager;
   }
 
-  @RequestMapping(value = "projects", method = RequestMethod.GET, produces="application/json")
+  @RequestMapping(value = "projects", method = RequestMethod.GET)
   public @ResponseBody String jsonRest() throws IOException {
     StringBuilder sb = new StringBuilder();
     Collection<Project> lp = requestManager.listAllProjects();
@@ -99,14 +97,11 @@ public class ExternalRestController extends RestController {
     return "{" + sb.toString() + "}";
   }
 
-  @RequestMapping(value = "project/{projectId}", method = RequestMethod.GET, produces="application/json")
+  @RequestMapping(value = "project/{projectId}", method = RequestMethod.GET)
   public @ResponseBody String jsonRestProject(@PathVariable Long projectId, ModelMap model) throws IOException {
     StringBuilder sb = new StringBuilder();
 
     Project p = requestManager.getProjectById(projectId);
-    if (p == null) {
-      throw new RestException("No project found with ID: " + projectId, Status.NOT_FOUND);
-    }
     sb.append("'id':'" + projectId + "'");
     sb.append(",");
     sb.append("'name':'" + p.getName() + "'");
@@ -247,5 +242,4 @@ public class ExternalRestController extends RestController {
 
     return "{" + sb.toString() + "}";
   }
-  
 }
