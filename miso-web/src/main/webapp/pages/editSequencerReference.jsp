@@ -94,7 +94,7 @@
           <td>
             <c:choose>
               <c:when test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-                <form:input path="serialNumber" id="serialNumber" name="serialNumber" class="validateable"/><span id="serialnumbercounter" class="counter"></span>
+                <form:input path="serialNumber" id="serialNumber" name="serialNumber" class="validateable"/><span id="serialNumberCounter" class="counter"></span>
               </c:when>
               <c:otherwise>${sequencerReference.serialNumber}</c:otherwise>
             </c:choose>
@@ -381,6 +381,13 @@
       counter: '#nameCounter',
       countType: 'characters',
       maxCount: ${maxLengths['name']},
+      countDirection: 'down'
+    });
+    
+    jQuery('#serialNumber').simplyCountable({
+      counter: '#serialNumberCounter',
+      countType: 'characters',
+      maxCount: ${maxLengths['serialNumber']},
       countDirection: 'down'
     });
   });
