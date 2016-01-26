@@ -104,14 +104,16 @@
       <c:if test="${detailedSample}">
       <sec:authorize access="hasRole('ROLE_ADMIN')">
         <div class="portlet">
-          <div class="portlet-header">Tissue Details</div>
+          <div class="portlet-header">Institute Defaults</div>
           <div class="portlet-content">
-            <a href="<c:url value='/miso/tissueOptions#origins'/>">Tissue Origins</a><br/>
-            <a href="<c:url value='/miso/tissueOptions#conditions'/>">Tissue Types</a><br/>
-            <a href="<c:url value='/miso/tissueOptions#materials'/>">Tissue Materials</a><br/>
-            <a href="<c:url value='/miso/tissueOptions#purposes'/>">Sample Purposes</a><br/>
-            <a href="<c:url value='/miso/tissueOptions#qcDetails'/>">QC Details</a><br/>
-            <a href="<c:url value='/miso/tissueOptions#subprojects'/>">Subprojects</a><br/>
+            <a href="<c:url value='/miso/instituteDefaults#origins'/>">Tissue Origins</a><br/>
+            <a href="<c:url value='/miso/instituteDefaults#conditions'/>">Tissue Types</a><br/>
+            <a href="<c:url value='/miso/instituteDefaults#materials'/>">Tissue Materials</a><br/>
+            <a href="<c:url value='/miso/instituteDefaults#purposes'/>">Sample Purposes</a><br/>
+            <a href="<c:url value='/miso/instituteDefaults#qcDetails'/>">QC Details</a><br/>
+            <a href="<c:url value='/miso/instituteDefaults#subprojects'/>">Subprojects</a><br/>
+            <a href="<c:url value='/miso/instituteDefaults#classes'/>">Sample Classes</a><br/>
+            <a href="<c:url value='/miso/instituteDefaults#relationships'/>">Relationships between Sample Classes</a>
           </div>
         </div>
       </sec:authorize>

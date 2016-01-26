@@ -25,24 +25,31 @@
 
 <script src="<c:url value='/scripts/jquery/js/jquery.breadcrumbs.popup.js'/>" type="text/javascript"></script>
 
-<script src="<c:url value='/scripts/jquery/datatables/js/jquery.dataTables.min.js'/>" type="text/javascript"></script>
 <script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.mini.js'/>" type="text/javascript"></script>
-<script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.datepicker.js'/>" type="text/javascript"></script>
-<script src="<c:url value='/scripts/jquery/editable/jquery.jeditable.checkbox.js'/>" type="text/javascript"></script>
-<link href="<c:url value='/scripts/jquery/datatables/css/jquery.dataTables.css'/>" rel="stylesheet" type="text/css" />
 
-<script src="<c:url value='/scripts/datatables_utils.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
-<script src="<c:url value='/scripts/natural_sort.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
-<script src="<c:url value='/scripts/tissueOptions_ajax.js'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/sortable.js'/>" type="text/javascript"></script>
+<script src="<c:url value='/scripts/instituteDefaults_ajax.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
 
 <div id="maincontent">
 <div id="contentcolumn">
 
-  <h1>Tissue Options</h1>
+  <h1>Institute Defaults</h1>
   
-  <h2 id="origins">Tissue Origins</h2>
-  <div>
-	  <table id="allOriginsTable" class="tissueOptionsTable clear">
+  <div class="corner-padding">
+    <a href="#origins">Tissue Origins</a><br/>
+    <a href="#conditions">Tissue Conditions</a><br/>
+    <a href="#materials">Tissue Materials</a><br/>
+    <a href="#purposes">Sample Purposes</a><br/>
+    <a href="#qcDetails">QC Details</a><br/>
+    <a href="#subprojects">Subprojects</a><br/>
+    <a href="#classes">Sample Classes</a><br/>
+    <a href="#relationships">Relationships between Sample Classes</a><br/>
+  </div>
+  
+  <div class="sectionDivider"></div>
+  <div class="corner-padding">
+    <h2 id="origins">Tissue Origins</h2>
+	  <table id="allOriginsTable" class="clear default-table" data-sortable>
 		  <thead>
 			  <tr>
 			    <th>Alias</th><th>Description</th>
@@ -54,9 +61,9 @@
   
   
   <div class="sectionDivider"></div>
-  <h2 id="conditions">Tissue Conditions</h2>
-  <div>
-	  <table id="allConditionsTable" class="tissueOptionsTable clear">
+  <div class="corner-padding">
+    <h2 id="conditions">Tissue Conditions</h2>
+	  <table id="allConditionsTable" class="clear default-table" data-sortable>
 	    <thead>
 	      <tr>
 	        <th>Alias</th><th>Description</th>
@@ -67,9 +74,9 @@
 	</div>
 	
 	<div class="sectionDivider"></div>
-  <h2 id="materials">Tissue Materials</h2>
-  <div>
-    <table id="allMaterialsTable" class="tissueOptionsTable clear">
+	<div class="corner-padding">
+    <h2 id="materials">Tissue Materials</h2>
+    <table id="allMaterialsTable" class="clear default-table" data-sortable>
       <thead>
         <tr>
           <th>Alias</th><th>Description</th>
@@ -80,9 +87,9 @@
   </div>
   
   <div class="sectionDivider"></div>
-  <h2 id="purposes">Sample Purposes</h2>
-  <div>
-    <table id="allPurposesTable" class="tissueOptionsTable clear">
+  <div class="corner-padding">
+    <h2 id="purposes">Sample Purposes</h2>
+    <table id="allPurposesTable" class="clear default-table" data-sortable>
       <thead>
         <tr>
           <th>Alias</th><th>Description</th>
@@ -93,9 +100,9 @@
   </div>
   
   <div class="sectionDivider"></div>
-  <h2 id="qcDetails">QC Details</h2>
-  <div>
-    <table id="allQcDetailsTable" class="tissueOptionsTable clear">
+  <div class="corner-padding">
+    <h2 id="qcDetails">QC Details</h2>
+    <table id="allQcDetailsTable" class="clear default-table" data-sortable>
       <thead>
         <tr>
           <th>Description</th><th>QC Passed</th><th>Note Required?</th>
@@ -106,9 +113,9 @@
   </div>
   
   <div class="sectionDivider"></div>
-  <h2 id="subprojects">Subprojects</h2>
-  <div>
-    <table id="allSubprojectsTable" class="tissueOptionsTable clear">
+  <div class="corner-padding">
+    <h2 id="subprojects">Subprojects</h2>
+    <table id="allSubprojectsTable" class="clear default-table" data-sortable>
       <thead>
         <tr>
           <th>Project</th><th>Alias</th><th>Description</th><th>Priority</th>
@@ -116,6 +123,36 @@
       </thead>
       <tbody id="allSubprojects"></tbody>
     </table>
+  </div>
+  
+  <div class="sectionDivider"></div>
+  <div class="corner-padding">
+    <h2 id="classes">Sample Classes</h2>
+    <table id="allClassesTable" class="clear default-table" data-sortable>
+      <thead>
+        <tr>
+          <th>Class</th><th>Category</th>
+        </tr>
+      </thead>
+      <tbody id="allClasses"></tbody>
+    </table>
+  </div>
+  
+  <div class="sectionDivider"></div>
+  <div class="corner-padding">
+    <h2 id="relationships">Relationships between Sample Classes</h2>
+    <!-- <table id="allRelationshipsTable" class="clear default-table" data-sortable>
+      <thead>
+        <tr class="relationship">
+          <th colspan="2">Parent</th>
+          <th colspan="2">Child</th>
+        </tr>
+        <tr class="relationship">
+          <th>Category</th><th>Class</th><th>Category</th><th>Class</th>
+        </tr>
+      </thead>
+      <tbody id="allRelationships"></tbody>
+    </table>  -->
   </div>
 
 </div>
@@ -128,7 +165,8 @@
     Tissue.getTissueMaterials();
     Tissue.getSamplePurposes();
     QC.getQcDetails();
-    Subproject.getSubprojects();
+    Subproject.getProjects();
+    Hierarchy.getSampleCategories(); // callback within this creates Relationships table as well
   });
 </script>
   
