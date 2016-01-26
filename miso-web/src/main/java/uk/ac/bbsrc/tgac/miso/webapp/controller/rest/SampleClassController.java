@@ -78,15 +78,15 @@ public class SampleClassController extends RestController {
   private static SampleClassDto writeUrls(SampleClassDto sampleClassDto, UriComponentsBuilder uriBuilder) {
     URI baseUri = uriBuilder.build().toUri();
     sampleClassDto.setUrl(
-        UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/sampleclass/{id}").buildAndExpand(sampleClassDto.getId()).toUriString());
+        UriComponentsBuilder.fromUri(baseUri).path("/rest/sampleclass/{id}").buildAndExpand(sampleClassDto.getId()).toUriString());
     sampleClassDto.setCreatedByUrl(
-        UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/user/{id}").buildAndExpand(sampleClassDto.getCreatedById()).toUriString());
+        UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}").buildAndExpand(sampleClassDto.getCreatedById()).toUriString());
     sampleClassDto.setUpdatedByUrl(
-        UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/user/{id}").buildAndExpand(sampleClassDto.getUpdatedById()).toUriString());
+        UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}").buildAndExpand(sampleClassDto.getUpdatedById()).toUriString());
     return sampleClassDto;
   }
 
-  @RequestMapping(value = "/sampleclasss", method = RequestMethod.GET, produces = { "application/json" })
+  @RequestMapping(value = "/sampleclasses", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
   public Set<SampleClassDto> getSampleClasss(UriComponentsBuilder uriBuilder, HttpServletResponse response) {
     Set<SampleClass> sampleClasss = sampleClassService.getAll();

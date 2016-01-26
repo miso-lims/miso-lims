@@ -77,11 +77,11 @@ public class QcPassedDetailController extends RestController {
 
   private static QcPassedDetailDto writeUrls(QcPassedDetailDto qcPassedDetailDto, UriComponentsBuilder uriBuilder) {
     URI baseUri = uriBuilder.build().toUri();
-    qcPassedDetailDto.setUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/qcpasseddetail/{id}")
+    qcPassedDetailDto.setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/qcpasseddetail/{id}")
         .buildAndExpand(qcPassedDetailDto.getId()).toUriString());
-    qcPassedDetailDto.setCreatedByUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/user/{id}")
+    qcPassedDetailDto.setCreatedByUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}")
         .buildAndExpand(qcPassedDetailDto.getCreatedById()).toUriString());
-    qcPassedDetailDto.setUpdatedByUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/user/{id}")
+    qcPassedDetailDto.setUpdatedByUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}")
         .buildAndExpand(qcPassedDetailDto.getUpdatedById()).toUriString());
     return qcPassedDetailDto;
   }

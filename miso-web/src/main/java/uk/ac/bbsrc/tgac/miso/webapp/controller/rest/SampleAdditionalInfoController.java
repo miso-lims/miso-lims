@@ -78,11 +78,11 @@ public class SampleAdditionalInfoController extends RestController {
   private static SampleAdditionalInfoDto writeUrls(SampleAdditionalInfoDto sampleAdditionalInfoDto, UriComponentsBuilder uriBuilder) {
 
     URI baseUri = uriBuilder.build().toUri();
-    sampleAdditionalInfoDto.setUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/sampleadditionalinfo/{id}")
+    sampleAdditionalInfoDto.setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/sampleadditionalinfo/{id}")
         .buildAndExpand(sampleAdditionalInfoDto.getId()).toUriString());
-    sampleAdditionalInfoDto.setCreatedByUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/user/{id}")
+    sampleAdditionalInfoDto.setCreatedByUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}")
         .buildAndExpand(sampleAdditionalInfoDto.getCreatedById()).toUriString());
-    sampleAdditionalInfoDto.setUpdatedByUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/user/{id}")
+    sampleAdditionalInfoDto.setUpdatedByUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}")
         .buildAndExpand(sampleAdditionalInfoDto.getUpdatedById()).toUriString());
     return sampleAdditionalInfoDto;
   }

@@ -77,11 +77,11 @@ public class SamplePurposeController extends RestController {
 
   private static SamplePurposeDto writeUrls(SamplePurposeDto samplePurposeDto, UriComponentsBuilder uriBuilder) {
     URI baseUri = uriBuilder.build().toUri();
-    samplePurposeDto.setUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/samplepurpose/{id}")
+    samplePurposeDto.setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/samplepurpose/{id}")
         .buildAndExpand(samplePurposeDto.getId()).toUriString());
-    samplePurposeDto.setCreatedByUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/user/{id}")
+    samplePurposeDto.setCreatedByUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}")
         .buildAndExpand(samplePurposeDto.getCreatedById()).toUriString());
-    samplePurposeDto.setUpdatedByUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/user/{id}")
+    samplePurposeDto.setUpdatedByUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}")
         .buildAndExpand(samplePurposeDto.getUpdatedById()).toUriString());
     return samplePurposeDto;
   }

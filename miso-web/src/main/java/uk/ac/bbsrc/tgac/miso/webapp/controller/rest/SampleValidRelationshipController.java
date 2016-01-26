@@ -78,11 +78,11 @@ public class SampleValidRelationshipController extends RestController {
   private static SampleValidRelationshipDto writeUrls(SampleValidRelationshipDto sampleValidRelationshipDto,
       UriComponentsBuilder uriBuilder) {
     URI baseUri = uriBuilder.build().toUri();
-    sampleValidRelationshipDto.setUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/samplevalidrelationship/{id}")
+    sampleValidRelationshipDto.setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/samplevalidrelationship/{id}")
         .buildAndExpand(sampleValidRelationshipDto.getId()).toUriString());
-    sampleValidRelationshipDto.setCreatedByUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/user/{id}")
+    sampleValidRelationshipDto.setCreatedByUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}")
         .buildAndExpand(sampleValidRelationshipDto.getCreatedById()).toUriString());
-    sampleValidRelationshipDto.setUpdatedByUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/user/{id}")
+    sampleValidRelationshipDto.setUpdatedByUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}")
         .buildAndExpand(sampleValidRelationshipDto.getUpdatedById()).toUriString());
     sampleValidRelationshipDto.setParentUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/sample/{id}")
         .buildAndExpand(sampleValidRelationshipDto.getParentId()).toUriString());

@@ -78,11 +78,11 @@ public class SampleNumberPerProjectController extends RestController {
   private static SampleNumberPerProjectDto writeUrls(SampleNumberPerProjectDto sampleNumberPerProjectDto, UriComponentsBuilder uriBuilder) {
 
     URI baseUri = uriBuilder.build().toUri();
-    sampleNumberPerProjectDto.setUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/samplenumberperproject/{id}")
+    sampleNumberPerProjectDto.setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/samplenumberperproject/{id}")
         .buildAndExpand(sampleNumberPerProjectDto.getId()).toUriString());
-    sampleNumberPerProjectDto.setCreatedByUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/user/{id}")
+    sampleNumberPerProjectDto.setCreatedByUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}")
         .buildAndExpand(sampleNumberPerProjectDto.getCreatedById()).toUriString());
-    sampleNumberPerProjectDto.setUpdatedByUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/user/{id}")
+    sampleNumberPerProjectDto.setUpdatedByUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}")
         .buildAndExpand(sampleNumberPerProjectDto.getUpdatedById()).toUriString());
     return sampleNumberPerProjectDto;
   }

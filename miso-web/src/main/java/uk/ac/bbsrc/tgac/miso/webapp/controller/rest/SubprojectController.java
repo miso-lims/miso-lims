@@ -78,11 +78,11 @@ public class SubprojectController extends RestController {
   private static SubprojectDto writeUrls(SubprojectDto subprojectDto, UriComponentsBuilder uriBuilder) {
     URI baseUri = uriBuilder.build().toUri();
     subprojectDto.setUrl(
-        UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/subproject/{id}").buildAndExpand(subprojectDto.getId()).toUriString());
+        UriComponentsBuilder.fromUri(baseUri).path("/rest/subproject/{id}").buildAndExpand(subprojectDto.getId()).toUriString());
     subprojectDto.setCreatedByUrl(
-        UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/user/{id}").buildAndExpand(subprojectDto.getCreatedById()).toUriString());
+        UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}").buildAndExpand(subprojectDto.getCreatedById()).toUriString());
     subprojectDto.setUpdatedByUrl(
-        UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/user/{id}").buildAndExpand(subprojectDto.getUpdatedById()).toUriString());
+        UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}").buildAndExpand(subprojectDto.getUpdatedById()).toUriString());
     return subprojectDto;
   }
 

@@ -76,11 +76,11 @@ public class SampleAnalyteController extends RestController {
 
   private static SampleAnalyteDto writeUrls(SampleAnalyteDto sampleAnalyteDto, UriComponentsBuilder uriBuilder) {
     URI baseUri = uriBuilder.build().toUri();
-    sampleAnalyteDto.setUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/sampleanalyte/{id}")
+    sampleAnalyteDto.setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/sampleanalyte/{id}")
         .buildAndExpand(sampleAnalyteDto.getId()).toUriString());
-    sampleAnalyteDto.setCreatedByUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/user/{id}")
+    sampleAnalyteDto.setCreatedByUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}")
         .buildAndExpand(sampleAnalyteDto.getCreatedById()).toUriString());
-    sampleAnalyteDto.setUpdatedByUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/user/{id}")
+    sampleAnalyteDto.setUpdatedByUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}")
         .buildAndExpand(sampleAnalyteDto.getUpdatedById()).toUriString());
     sampleAnalyteDto.setSampleUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/sample/{id}")
         .buildAndExpand(sampleAnalyteDto.getSampleId()).toUriString());

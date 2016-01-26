@@ -77,11 +77,11 @@ public class TissueMaterialController extends RestController {
 
   private static TissueMaterialDto writeUrls(TissueMaterialDto tissueMaterialDto, UriComponentsBuilder uriBuilder) {
     URI baseUri = uriBuilder.build().toUri();
-    tissueMaterialDto.setUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/tissuematerial/{id}")
+    tissueMaterialDto.setUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/tissuematerial/{id}")
         .buildAndExpand(tissueMaterialDto.getId()).toUriString());
-    tissueMaterialDto.setCreatedByUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/user/{id}")
+    tissueMaterialDto.setCreatedByUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}")
         .buildAndExpand(tissueMaterialDto.getCreatedById()).toUriString());
-    tissueMaterialDto.setUpdatedByUrl(UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/user/{id}")
+    tissueMaterialDto.setUpdatedByUrl(UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}")
         .buildAndExpand(tissueMaterialDto.getUpdatedById()).toUriString());
     return tissueMaterialDto;
   }

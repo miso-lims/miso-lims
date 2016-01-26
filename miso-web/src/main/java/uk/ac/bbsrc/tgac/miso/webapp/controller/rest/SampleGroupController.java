@@ -77,11 +77,11 @@ public class SampleGroupController extends RestController {
   private static SampleGroupDto writeUrls(SampleGroupDto sampleGroupDto, UriComponentsBuilder uriBuilder) {
     URI baseUri = uriBuilder.build().toUri();
     sampleGroupDto.setUrl(
-        UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/samplegroup/{id}").buildAndExpand(sampleGroupDto.getId()).toUriString());
+        UriComponentsBuilder.fromUri(baseUri).path("/rest/samplegroup/{id}").buildAndExpand(sampleGroupDto.getId()).toUriString());
     sampleGroupDto.setCreatedByUrl(
-        UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/user/{id}").buildAndExpand(sampleGroupDto.getCreatedById()).toUriString());
+        UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}").buildAndExpand(sampleGroupDto.getCreatedById()).toUriString());
     sampleGroupDto.setUpdatedByUrl(
-        UriComponentsBuilder.fromUri(baseUri).replacePath("/rest/user/{id}").buildAndExpand(sampleGroupDto.getUpdatedById()).toUriString());
+        UriComponentsBuilder.fromUri(baseUri).path("/rest/user/{id}").buildAndExpand(sampleGroupDto.getUpdatedById()).toUriString());
     return sampleGroupDto;
   }
 
