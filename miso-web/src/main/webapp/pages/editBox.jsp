@@ -168,11 +168,11 @@
     </tr>
     <tr>
       <td class="h">Alias:</td>
-      <td><form:input id="alias" path="alias" class="validateable"/><span id="aliascounter" class="counter"></span></td>
+      <td><form:input id="alias" path="alias" class="validateable"/><span id="aliasCounter" class="counter"></span></td>
     </tr>
     <tr>
       <td class="h">Description:</td>
-      <td><form:input id="description" path="description" class="validateable"/></td>
+      <td><form:input id="description" path="description" class="validateable"/><span id="descriptionCounter" class="counter"></span></td>
     </tr>
     <tr>
       <td class="h">Box Use:</td>
@@ -304,6 +304,25 @@
 </div>
 </div>
 </div>
+
+<script type="text/javascript">
+  jQuery(document).ready(function () {
+    jQuery('#alias').simplyCountable({
+      counter: '#aliasCounter',
+      countType: 'characters',
+      maxCount: ${maxLengths['alias']},
+      countDirection: 'down'
+    });
+
+    jQuery('#description').simplyCountable({
+      counter: '#descriptionCounter',
+      countType: 'characters',
+      maxCount: ${maxLengths['description']},
+      countDirection: 'down'
+    });
+  });
+</script>
+
 <%@ include file="adminsub.jsp" %>
 <%@ include file="../footer.jsp" %>
 

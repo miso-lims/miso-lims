@@ -138,7 +138,7 @@
     </tr>
     <tr>
       <td>Description:</td>
-      <td><form:input path="description"/><span id="descriptioncounter" class="counter"></span></td>
+      <td><form:input id="description" path="description"/><span id="descriptionCounter" class="counter"></span></td>
     </tr>
     <tr>
       <td>Creation Date:</td>
@@ -323,5 +323,17 @@
 </div>
 </div>
 </div>
+
+<script type="text/javascript">
+  jQuery(document).ready(function () {
+    jQuery('#description').simplyCountable({
+      counter: '#descriptionCounter',
+      countType: 'characters',
+      maxCount: ${maxLengths['description']},
+      countDirection: 'down'
+    });
+  });
+</script>
+
 <%@ include file="adminsub.jsp" %>
 <%@ include file="../footer.jsp" %>
