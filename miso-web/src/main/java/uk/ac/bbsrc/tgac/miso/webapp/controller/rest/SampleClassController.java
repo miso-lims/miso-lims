@@ -47,9 +47,11 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.dto.Dtos;
 import uk.ac.bbsrc.tgac.miso.dto.SampleClassDto;
 import uk.ac.bbsrc.tgac.miso.service.SampleClassService;
+import uk.ac.bbsrc.tgac.miso.service.SampleValidRelationshipService;
 
 @Controller
 @RequestMapping("/rest")
@@ -60,6 +62,8 @@ public class SampleClassController extends RestController {
 
   @Autowired
   private SampleClassService sampleClassService;
+  @Autowired
+  private SampleValidRelationshipService sampleValidRelationshipService;
 
   @RequestMapping(value = "/sampleclass/{id}", method = RequestMethod.GET, produces = { "application/json" })
   @ResponseBody
@@ -126,6 +130,13 @@ public class SampleClassController extends RestController {
   @RequestMapping(value = "/sampleclass/{id}", method = RequestMethod.DELETE)
   @ResponseBody
   public ResponseEntity<?> deleteSampleClass(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
+    // first delete all SampleValidRelationships which reference this Class (as parent or child)
+    for (SampleValidRelationship relationship : sampleValidRelationshipService.getAll()) {
+      if (relationship.getChild().getSampleClassId().equals(id) || relationship.getParent().getSampleClassId().equals(id)) {
+        sampleValidRelationshipService.delete(relationship.getSampleValidRelationshipId());
+      }
+    }
+    // then delete the Class itself
     sampleClassService.delete(id);
     return new ResponseEntity<>(HttpStatus.OK);
   }

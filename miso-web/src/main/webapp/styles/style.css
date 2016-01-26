@@ -1909,6 +1909,24 @@ h2.tissue {
 	clear: both;
 }
 
+.corner-padding {
+	padding: 1%;
+}
+
+table.default-table {
+	font-size: 110%;
+}
+
+tr.relationship th,
+tr.relationship td {
+	padding: 2% 0%;
+	white-space: nowrap;
+}
+
+tr.relationship th {
+	text-align: center;
+}
+
 .parsley-required parsley-custom-error-message {
 	color: #ff0000;
 }
