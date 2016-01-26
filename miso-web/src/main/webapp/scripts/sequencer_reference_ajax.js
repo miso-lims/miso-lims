@@ -21,7 +21,55 @@
  * *********************************************************************
  */
 
-var Sequencer = Sequencer || {};
+var Sequencer = Sequencer || {
+  
+  validateSequencerReference: function() {
+    Validate.cleanFields('#sequencer_reference_form');
+    
+    jQuery('#sequencer_reference_form').parsley().destroy();
+    
+    jQuery('#serialNumber').attr('data-parsley-maxlength', '30');
+    
+    jQuery('#name').attr('required', 'true');
+    jQuery('#name').attr('data-parsley-maxlength', '30');
+    
+    jQuery('#ipAddress').attr('required', 'true');
+    
+    jQuery('#datecommissionedpicker').attr('data-date-format', 'DD/MM/YYYY');
+    jQuery('#datecommissionedpicker').attr('data-parsley-pattern', Utils.validation.dateRegex);
+    jQuery('#datecommissionedpicker').attr('data-parsley-error-message', 'Date must be of form DD/MM/YYYY');
+    
+    jQuery('#datedecommissionedpicker').attr('data-date-format', 'DD/MM/YYYY');
+    jQuery('#datedecommissionedpicker').attr('data-parsley-pattern', Utils.validation.dateRegex);
+    jQuery('#datedecommissionedpicker').attr('data-parsley-error-message', 'Date must be of form DD/MM/YYYY');
+    
+    jQuery('#upgradedSequencerReference').attr('type', 'number');
+    jQuery('#upgradedSequencerReference').attr('data-parsley-error-message', 'Upgrade must refer to an existing sequencer.');
+    
+    if (jQuery('input[name="status"]:checked').val() != "production") {
+      jQuery('#datedecommissionedpicker').attr('required', 'true');
+    }
+    else {
+      jQuery('#datedecommissionedpicker').removeAttr('required');
+    }
+    
+    if (jQuery('input[name="status"]:checked').val() === "upgraded") {
+      jQuery('#upgradedSequencerReference').attr('required', 'true');
+      jQuery('#upgradedSequencerReference').attr('min', '1');
+    }
+    else {
+      jQuery('#upgradedSequencerReference').removeAttr('required');
+      jQuery('#upgradedSequencerReference').removeAttr('min');
+    }
+    
+    jQuery('#sequencer_reference_form').parsley();
+    jQuery('#sequencer_reference_form').parsley().validate();
+    
+    Validate.updateWarningOrSubmit('#sequencer_reference_form');
+    return false;
+  }
+  
+};
 
 Sequencer.ui = {
   insertSequencerReferenceRow : function() {

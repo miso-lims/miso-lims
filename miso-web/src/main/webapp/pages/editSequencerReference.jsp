@@ -36,7 +36,6 @@
 <script src="<c:url value='/scripts/stats_ajax.js?ts=${timestamp.time}'/>" type="text/javascript"></script>
 
 <script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
-<script type="text/javascript" src="<c:url value='/scripts/sequencer_reference_validation.js?ts=${timestamp.time}'/>"></script>
 
 <div id="maincontent">
   <div id="contentcolumn">
@@ -48,7 +47,7 @@
         </sec:authorize>
         Sequencer Reference
         <sec:authorize access="hasRole('ROLE_ADMIN')">
-          <button onclick="validate_sequencer_reference();" class="fg-button ui-state-default ui-corner-all">Save</button>
+          <button onclick="return Sequencer.validateSequencerReference();" class="fg-button ui-state-default ui-corner-all">Save</button>
         </sec:authorize>
       </h1>
       <div class="breadcrumbs">
@@ -95,7 +94,7 @@
           <td>
             <c:choose>
               <c:when test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-                <form:input path="serialNumber" id="serialNumber" name="serialNumber"/><span id="serialnumbercounter" class="counter"></span>
+                <form:input path="serialNumber" id="serialNumber" name="serialNumber" class="validateable"/><span id="serialnumbercounter" class="counter"></span>
               </c:when>
               <c:otherwise>${sequencerReference.serialNumber}</c:otherwise>
             </c:choose>
@@ -106,7 +105,7 @@
           <td>
             <c:choose>
               <c:when test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-                <form:input path="name" id="name" name="name"/><span id="nameCounter" class="counter"></span>
+                <form:input path="name" id="name" name="name" class="validateable"/><span id="nameCounter" class="counter"></span>
               </c:when>
               <c:otherwise>${sequencerReference.name}</c:otherwise>
             </c:choose>
@@ -117,7 +116,7 @@
           <td>
             <c:choose>
               <c:when test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-                <input type="text" id="ipAddress" name="ipAddress" value="${trimmedIpAddress}"/>
+                <input type="text" id="ipAddress" name="ipAddress" value="${trimmedIpAddress}" class="validateable"/>
                 <input type="hidden" value="on" name="_ipAddress"/>
               </c:when>
               <c:otherwise>${trimmedIpAddress}</c:otherwise>
@@ -137,7 +136,7 @@
           <td>
             <c:choose>
               <c:when test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-                <form:input path="dateCommissioned" id="datecommissionedpicker" placeholder="DD/MM/YYYY"/>
+                <form:input path="dateCommissioned" id="datecommissionedpicker" placeholder="DD/MM/YYYY" class="validateable"/>
                 <script type="text/javascript">
                   Utils.ui.addDatePicker("datecommissionedpicker");
                 </script>
@@ -172,7 +171,7 @@
           <td>
             <c:choose>
               <c:when test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-                <form:input path="dateDecommissioned" id="datedecommissionedpicker" placeholder="DD/MM/YYYY"/>
+                <form:input path="dateDecommissioned" id="datedecommissionedpicker" placeholder="DD/MM/YYYY" class="validateable"/>
                 <script type="text/javascript">
                   Utils.ui.addDatePicker("datedecommissionedpicker");
                 </script>
@@ -187,7 +186,7 @@
           <td class="h">Upgraded To:*</td>
           <td>
             <c:if test="${fn:contains(SPRING_SECURITY_CONTEXT.authentication.principal.authorities,'ROLE_ADMIN')}">
-              <form:select id="upgradedSequencerReference" path="upgradedSequencerReference" onchange="Sequencer.ui.updateUpgradedSequencerReferenceLink();">
+              <form:select id="upgradedSequencerReference" path="upgradedSequencerReference"  class="validateable" onchange="Sequencer.ui.updateUpgradedSequencerReferenceLink();">
                 <form:option value="0">(choose)</form:option>
                 <form:options items="${otherSequencerReferences}" itemLabel="name" itemValue="id"/>
               </form:select>
@@ -220,6 +219,12 @@
       <br/>
     </form:form>
     
+    <script type="text/javascript">
+      jQuery(document).ready(function () {
+        // Attaches a Parsley form validator.
+        Validate.attachParsley('#sequencer_reference_form');
+      });
+    </script>
     
     <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#records_arrowclick'), 'recordsdiv');">
       <c:choose>

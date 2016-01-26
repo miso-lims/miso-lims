@@ -35,7 +35,6 @@
 
 <script type="text/javascript" src="<c:url value='/scripts/sequencer_service_record_ajax.js?ts=${timestamp.time}'/>"></script>
 <script type="text/javascript" src="<c:url value='/scripts/parsley/parsley.min.js'/>"></script>
-<script type="text/javascript" src="<c:url value='/scripts/sequencer_service_record_validation.js?ts=${timestamp.time}'/>"></script>
 
 <script type="text/javascript" src="<c:url value='/scripts/jquery/timepicker/js/jquery-ui-timepicker-addon.min.js'/>"></script>
 <link rel="stylesheet" href="<c:url value='/scripts/jquery/timepicker/css/jquery-ui-timepicker-addon.min.css'/>"
@@ -56,7 +55,7 @@
         </c:choose>
         Service Record
         <sec:authorize access="hasRole('ROLE_ADMIN')">
-          <button onclick="validateServiceRecord();" class="fg-button ui-state-default ui-corner-all">Save</button>
+          <button onclick="return ServiceRecord.validateServiceRecord();" class="fg-button ui-state-default ui-corner-all">Save</button>
         </sec:authorize>
       </h1>
       <div class="breadcrumbs">
@@ -198,6 +197,13 @@
       </table>
       <br/>
     </form:form>
+    
+    <script type="text/javascript">
+	  jQuery(document).ready(function () {
+	    // Attaches a Parsley form validator.
+        Validate.attachParsley('#serviceRecordForm');
+      });
+	</script>
     
     <div class="sectionDivider" onclick="Utils.ui.toggleLeftInfo(jQuery('#uploadArrowClick'), 'uploadDiv');">
       Attachments
