@@ -29,6 +29,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -2381,5 +2382,10 @@ public class UserAuthMisoRequestManager implements RequestManager {
   @Override
   public Collection<SequencerServiceRecord> listSequencerServiceRecordsBySequencerId(long referenceId) throws IOException {
     return backingManager.listSequencerServiceRecordsBySequencerId(referenceId);
+  }
+  
+  @Override
+  public Map<String, Integer> getServiceRecordColumnSizes() throws IOException {
+    return backingManager.getServiceRecordColumnSizes();
   }
 }

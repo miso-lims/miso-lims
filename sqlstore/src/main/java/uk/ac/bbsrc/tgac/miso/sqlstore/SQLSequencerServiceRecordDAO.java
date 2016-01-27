@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,7 @@ import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.MisoFilesManager;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerReferenceStore;
 import uk.ac.bbsrc.tgac.miso.core.store.SequencerServiceRecordStore;
+import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 public class SQLSequencerServiceRecordDAO implements SequencerServiceRecordStore {
   
@@ -180,6 +182,11 @@ public class SQLSequencerServiceRecordDAO implements SequencerServiceRecordStore
       return r;
     }
     
+  }
+  
+  @Override
+  public Map<String, Integer> getServiceRecordColumnSizes() throws IOException {
+    return DbUtils.getColumnSizes(template, TABLE_NAME);
   }
   
 }

@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeSet;
 
 import org.slf4j.Logger;
@@ -2625,6 +2626,15 @@ public class MisoRequestManager implements RequestManager {
   public Collection<SequencerServiceRecord> listSequencerServiceRecordsBySequencerId(long referenceId) throws IOException {
     if (sequencerServiceRecordStore != null) {
       return sequencerServiceRecordStore.listBySequencerId(referenceId);
+    } else {
+      throw new IOException("No sequencerServiceRecordStore available. Check that it has been declared in the Spring config.");
+    }
+  }
+  
+  @Override
+  public Map<String, Integer> getServiceRecordColumnSizes() throws IOException {
+    if (sequencerServiceRecordStore != null) {
+      return sequencerServiceRecordStore.getServiceRecordColumnSizes();
     } else {
       throw new IOException("No sequencerServiceRecordStore available. Check that it has been declared in the Spring config.");
     }

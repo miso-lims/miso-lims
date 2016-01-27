@@ -26,6 +26,7 @@ package uk.ac.bbsrc.tgac.miso.core.manager;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
@@ -594,5 +595,7 @@ public interface RequestManager {
   public void deleteNote(Note note) throws IOException;
 
   public void deleteBox(Box box) throws IOException;
+  
+  public Map<String, Integer> getServiceRecordColumnSizes() throws IOException;
 
 }
