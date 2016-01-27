@@ -55,7 +55,7 @@
 			    <th>Alias</th><th>Description</th>
 	      </tr>
 	    </thead>
-	    <tbody id="allOrigins"></tbody>
+	    <tbody id="allOrigins" class="TO"></tbody>
 	  </table>
   </div>
   
@@ -69,7 +69,7 @@
 	        <th>Alias</th><th>Description</th>
 	      </tr>
 	    </thead>
-	    <tbody id="allConditions"></tbody>
+	    <tbody id="allConditions" class="TC"></tbody>
 	  </table>
 	</div>
 	
@@ -82,7 +82,7 @@
           <th>Alias</th><th>Description</th>
         </tr>
       </thead>
-      <tbody id="allMaterials"></tbody>
+      <tbody id="allMaterials" class="TM"></tbody>
     </table>
   </div>
   
@@ -95,7 +95,7 @@
           <th>Alias</th><th>Description</th>
         </tr>
       </thead>
-      <tbody id="allPurposes"></tbody>
+      <tbody id="allPurposes" class="SP"></tbody>
     </table>
   </div>
   
@@ -108,7 +108,7 @@
           <th>Description</th><th>QC Passed</th><th>Note Required?</th>
         </tr>
       </thead>
-      <tbody id="allQcDetails"></tbody>
+      <tbody id="allQcDetails" class="QC"></tbody>
     </table>
   </div>
   
@@ -121,7 +121,7 @@
           <th>Project</th><th>Alias</th><th>Description</th><th>Priority</th>
         </tr>
       </thead>
-      <tbody id="allSubprojects"></tbody>
+      <tbody id="allSubprojects" class="SubP"></tbody>
     </table>
   </div>
   
@@ -134,25 +134,13 @@
           <th>Class</th><th>Category</th>
         </tr>
       </thead>
-      <tbody id="allClasses"></tbody>
+      <tbody id="allClasses" class="Cl"></tbody>
     </table>
   </div>
   
   <div class="sectionDivider"></div>
   <div class="corner-padding">
     <h2 id="relationships">Relationships between Sample Classes</h2>
-    <!-- <table id="allRelationshipsTable" class="clear default-table" data-sortable>
-      <thead>
-        <tr class="relationship">
-          <th colspan="2">Parent</th>
-          <th colspan="2">Child</th>
-        </tr>
-        <tr class="relationship">
-          <th>Category</th><th>Class</th><th>Category</th><th>Class</th>
-        </tr>
-      </thead>
-      <tbody id="allRelationships"></tbody>
-    </table>  -->
   </div>
 
 </div>

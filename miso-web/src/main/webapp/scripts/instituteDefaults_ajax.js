@@ -29,7 +29,7 @@ var Tissue = Tissue || {
   createTissueOriginsTable: function (xhr) {
     var TOtable = [];
     var id, alias, description, endpoint;
-    Tissue.createTable(xhr, 'TO', 'allOrigins', 'tissueorigin', 'Origin', TOtable);
+    Tissue.createTable(xhr, 'TO', 'allOrigins', 'Origin', TOtable);
   },
 
   getTissueConditions: function () {
@@ -39,7 +39,7 @@ var Tissue = Tissue || {
   createTissueConditionsTable: function (xhr) {
     var TCtable = [];
     var id, alias, description, endpoint;
-    Tissue.createTable(xhr, 'TC', 'allConditions', 'tissuetype', 'Condition', TCtable);
+    Tissue.createTable(xhr, 'TC', 'allConditions', 'Condition', TCtable);
   },
 
   getTissueMaterials: function () {
@@ -49,7 +49,7 @@ var Tissue = Tissue || {
   createTissueMaterialsTable: function (xhr) {
     var TMtable = [];
     var id, alias, description, endpoint;
-    Tissue.createTable(xhr, 'TM', 'allMaterials', 'tissuematerial', 'Material', TMtable);
+    Tissue.createTable(xhr, 'TM', 'allMaterials', 'Material', TMtable);
   },
 
   getSamplePurposes: function () {
@@ -59,11 +59,11 @@ var Tissue = Tissue || {
   createSamplePurposesTable: function (xhr) {
     var SPtable = [];
     var id, alias, description, endpoint;
-    Tissue.createTable(xhr, 'SP', 'allPurposes', 'samplepurpose', 'Purpose', SPtable);
+    Tissue.createTable(xhr, 'SP', 'allPurposes', 'Purpose', SPtable);
   },
 
-  createTable: function (xhr, option, tableId, endpointWord, word, table) {
-    tableBody = document.getElementById(tableId);
+  createTable: function (xhr, option, tableBodyId, word, table) {
+    var tableBody = document.getElementById(tableBodyId);
     tableBody.innerHTML = null;
 
     var data;
@@ -80,7 +80,7 @@ var Tissue = Tissue || {
         description = data[i].description;
         endpoint = data[i].url;
 
-        table.push('<tr class="'+option+'"><td>');
+        table.push('<tr><td>');
         table.push(Options.createTextInput(option+'_alias_'+id, alias));
         table.push('</td><td>');
         table.push(Options.createTextInput(option+'_description_'+id, description));
@@ -96,9 +96,9 @@ var Tissue = Tissue || {
 
     if (!document.getElementById('new'+option+'RowButton')) { // add button if it's not already present
       var button = ['<div id="new'+option+'RowButton">'];
-      button.push(Options.createButton('New '+word, "Tissue.createNewRow('"+option+"')", 'newOrigin'));
+      button.push(Options.createButton('New '+word, "Tissue.createNewRow('"+option+"')", 'new'+word));
       button.push('</div>');
-      document.getElementById(tableId).insertAdjacentHTML('afterend', button.join(''));
+      document.getElementById(tableBodyId).parentElement.insertAdjacentHTML('afterend', button.join(''));
     }
 
     if (Options.tableLoadCounter > Options.tablesOnPage) { // if tables have all already been loaded once
@@ -132,19 +132,24 @@ var Tissue = Tissue || {
   },
 
   createNewRow: function (option) {
-    var row = [];
+    if (document.getElementById(option+'_alias_new')) {
+      document.getElementById(option+'_alias_new').focus();
+      return false;
+    } else {
+      var row = [];
 
-    row.push('<tr><td>');
-    row.push(Options.createTextInput(option+'_alias_new'));
-    row.push('</td><td>');
-    row.push(Options.createTextInput(option+'_description_new'));
-    row.push('</td><td>');
-    row.push(Options.createButton('Add', "Tissue.addNew('"+option+"')"));
-    row.push('</td></tr>');
+      row.push('<tr><td>');
+      row.push(Options.createTextInput(option+'_alias_new'));
+      row.push('</td><td>');
+      row.push(Options.createTextInput(option+'_description_new'));
+      row.push('</td><td>');
+      row.push(Options.createButton('Add', "Tissue.addNew('"+option+"')"));
+      row.push('</td></tr>');
 
-    var tableId = document.querySelectorAll('.'+ option)[0].parentElement.id;
-    document.getElementById(tableId).insertAdjacentHTML('beforeend', row.join(''));
-    document.getElementById(option+'_alias_new').focus();
+      var tableBodyId = document.querySelectorAll('.'+ option)[0].id;
+      document.getElementById(tableBodyId).insertAdjacentHTML('beforeend', row.join(''));
+      document.getElementById(option+'_alias_new').focus();
+    }
   }
 };
 
@@ -240,20 +245,25 @@ var QC = QC || {
   },
 
   createNewRow: function () {
-    var row = [];
+    if (document.getElementById('QC_description_new')) {
+      document.getElementById('QC_description_new').focus();
+      return false;
+    } else {
+      var row = [];
 
-    row.push('<tr><td>');
-    row.push(Options.createTextInput('QC_description_new'));
-    row.push('</td><td>');
-    row.push(QC.createStatusInput('QC_status_new'));
-    row.push('</td><td>');
-    row.push(QC.createNoteReqdInput('QC_note_new'));
-    row.push('</td><td>');
-    row.push(Options.createButton('Add', "QC.addNew()"));
-    row.push('</td></tr>');
+      row.push('<tr><td>');
+      row.push(Options.createTextInput('QC_description_new'));
+      row.push('</td><td>');
+      row.push(QC.createStatusInput('QC_status_new'));
+      row.push('</td><td>');
+      row.push(QC.createNoteReqdInput('QC_note_new'));
+      row.push('</td><td>');
+      row.push(Options.createButton('Add', "QC.addNew()"));
+      row.push('</td></tr>');
 
-    document.getElementById('allQcDetails').insertAdjacentHTML('beforeend', row.join(''));
-    document.getElementById('QC_status_new').focus();
+      document.getElementById('allQcDetails').insertAdjacentHTML('beforeend', row.join(''));
+      document.getElementById('QC_status_new').focus();
+    }
   }
 };
 
@@ -272,7 +282,7 @@ var Subproject = Subproject || {
   },
 
   createSubprojectTable: function (xhr) {
-    var tableBody = document.getElementById('allSubprojects')
+    var tableBody = document.getElementById('allSubprojects');
     tableBody.innerHTML = null;
 
     var data;
@@ -343,7 +353,7 @@ var Subproject = Subproject || {
     select.push('<select id="'+ idValue +'">');
     select.push('<option value="true"'+ (priority ? ' selected' : '') +'>High</option>');
     select.push('<option value="false"'+ (priority ? '' : ' selected') +'>Standard</option>');
-    select.push('</select>')
+    select.push('</select>');
     return select.join('');
   },
 
@@ -366,22 +376,27 @@ var Subproject = Subproject || {
   },
 
   createNewRow: function () {
-    var row = [];
+    if (document.getElementById('subP_parentProject_new')) {
+      document.getElementById('subP_parentProject_new').focus();
+      return false;
+    } else {
+      var row = [];
 
-    row.push('<tr><td>');
-    row.push(Subproject.createProjectsSelect('subP_parentProject_new'));
-    row.push('</td><td>');
-    row.push(Options.createTextInput('subP_alias_new'));
-    row.push('</td><td>');
-    row.push(Options.createTextInput('subP_description_new'));
-    row.push('</td><td>');
-    row.push(Subproject.createPrioritySelect('subP_priority_new'));
-    row.push('</td><td>');
-    row.push(Options.createButton('Add', "Subproject.addNew()"));
-    row.push('</td></tr>');
+      row.push('<tr><td>');
+      row.push(Subproject.createProjectsSelect('subP_parentProject_new'));
+      row.push('</td><td>');
+      row.push(Options.createTextInput('subP_alias_new'));
+      row.push('</td><td>');
+      row.push(Options.createTextInput('subP_description_new'));
+      row.push('</td><td>');
+      row.push(Subproject.createPrioritySelect('subP_priority_new'));
+      row.push('</td><td>');
+      row.push(Options.createButton('Add', "Subproject.addNew()"));
+      row.push('</td></tr>');
 
-    document.getElementById('allSubprojects').insertAdjacentHTML('beforeend', row.join(''));
-    document.getElementById('subP_alias_new').focus();
+      document.getElementById('allSubprojects').insertAdjacentHTML('beforeend', row.join(''));
+      document.getElementById('subP_alias_new').focus();
+    }
   }
 };
 
@@ -484,18 +499,23 @@ var Hierarchy = Hierarchy || {
   },
 
   createNewClassRow: function () {
-    var row = [];
+    if (document.getElementById('class_alias_new')) {
+      document.getElementById('class_alias_new').focus();
+      return false;
+    } else {
+      var row = [];
 
-    row.push('<tr><td>');
-    row.push(Options.createTextInput('class_alias_new'));
-    row.push('</td><td>');
-    row.push(Hierarchy.createCategorySelect('class_category_new')); // don't pass in category value because none is selected
-    row.push('</td><td>');
-    row.push(Options.createButton('Add', 'Hierarchy.addNewClass()'));
-    row.push('</td></tr>');
+      row.push('<tr><td>');
+      row.push(Options.createTextInput('class_alias_new'));
+      row.push('</td><td>');
+      row.push(Hierarchy.createCategorySelect('class_category_new')); // don't pass in category value because none is selected
+      row.push('</td><td>');
+      row.push(Options.createButton('Add', 'Hierarchy.addNewClass()'));
+      row.push('</td></tr>');
 
-    document.getElementById('allClasses').insertAdjacentHTML('beforeend', row.join(''));
-    document.getElementById('class_alias_new').focus();
+      document.getElementById('allClasses').insertAdjacentHTML('beforeend', row.join(''));
+      document.getElementById('class_alias_new').focus();
+    }
   },
 
   getRelationships: function () {
@@ -518,7 +538,7 @@ var Hierarchy = Hierarchy || {
     table.push('<table id="allRelationshipsTable" class="clear default-table" data-sortable>');
     table.push('<thead><tr class="relationship">');
     table.push('<th colspan="2">Parent</th><th colspan="2">Child</th>');
-    table.push('</tr><tr class="relationship">');
+    table.push('</tr><tr>');
     table.push('<th>Category</th><th>Class</th><th>Category</th><th>Class</th>');
     table.push('</tr></thead>');
     table.push('<tbody id="allRelationships">');
@@ -537,11 +557,11 @@ var Hierarchy = Hierarchy || {
       table.push(parentClass.sampleCategory);
       table.push('</td><td>');
       table.push(parentClass.alias);
-      table.push('</td><td>')
+      table.push('</td><td>');
       table.push(childClass.sampleCategory);
       table.push('</td><td>');
       table.push(childClass.alias);
-      table.push('</td><td>')
+      table.push('</td><td>');
       table.push(Options.createButton('Delete', 'Options.confirmDelete("'+ endpoint +'")'));
       // no Edit button
       table.push('</td></tr>');
@@ -564,22 +584,27 @@ var Hierarchy = Hierarchy || {
   },
 
   createNewRelationshipRow: function () {
-    var row = [];
-    row.push ('<tr id="newRelationshipRow"><td id="parentCategoryNew">');
-    row.push(Hierarchy.createCategorySelect('relationship_parent_category_new'));
-    row.push('</td><td id="parentClassNew"></td><td id="childCategoryNew">'); // create placeholder dropdown, which will get filled in once user chooses a category
-    row.push(Hierarchy.createCategorySelect('relationship_child_category_new'));
-    row.push('</td><td id="childClassNew"></td><td>');
-    row.push(Options.createButton('Add', 'Hierarchy.addNewRelationship()'));
-    row.push('</td></tr>');
+    if (document.getElementById('relationship_parent_category_new')) {
+      document.getElementById('relationship_parent_category_new').focus();
+      return false;
+    } else {
+      var row = [];
+      row.push ('<tr id="newRelationshipRow"><td id="parentCategoryNew">');
+      row.push(Hierarchy.createCategorySelect('relationship_parent_category_new'));
+      row.push('</td><td id="parentClassNew"></td><td id="childCategoryNew">'); // create placeholder dropdown, which will get filled in once user chooses a category
+      row.push(Hierarchy.createCategorySelect('relationship_child_category_new'));
+      row.push('</td><td id="childClassNew"></td><td>');
+      row.push(Options.createButton('Add', 'Hierarchy.addNewRelationship()'));
+      row.push('</td></tr>');
 
-    document.getElementById('allRelationships').insertAdjacentHTML('beforeend', row.join(''));
-    var parentCategorySelect = document.getElementById('relationship_parent_category_new');
-    var childCategorySelect = document.getElementById('relationship_child_category_new');
-    parentCategorySelect.addEventListener('change', Hierarchy.createClassForCategorySelect);
-    parentCategorySelect.setAttribute('data-role', 'parent');
-    childCategorySelect.addEventListener('change', Hierarchy.createClassForCategorySelect);
-    childCategorySelect.setAttribute('data-role', 'child');
+      document.getElementById('allRelationships').insertAdjacentHTML('beforeend', row.join(''));
+      var parentCategorySelect = document.getElementById('relationship_parent_category_new');
+      var childCategorySelect = document.getElementById('relationship_child_category_new');
+      parentCategorySelect.addEventListener('change', Hierarchy.createClassForCategorySelect);
+      parentCategorySelect.setAttribute('data-role', 'parent');
+      childCategorySelect.addEventListener('change', Hierarchy.createClassForCategorySelect);
+      childCategorySelect.setAttribute('data-role', 'child');
+    }
   },
 
   createClassForCategorySelect: function (event) {
@@ -645,7 +670,7 @@ var Options = Options || {
           alert("Sorry, something went wrong. Please try again. If the issue persists, contact your administrator.");
         }
       }
-    }
+    };
     xhr.setRequestHeader('Content-Type', 'application/json');
     data ? xhr.send(data) : xhr.send();
   },
@@ -682,7 +707,7 @@ var Options = Options || {
   },
 
   reloadTable: function (option) {
-    var reloadTableFunc, table;
+    var reloadTableFunc;
     if (option == 'TO') { reloadTableFunc = Tissue.getTissueOrigins; }
     else if (option == 'TC') { reloadTableFunc = Tissue.getTissueConditions; }
     else if (option == 'TM') { reloadTableFunc = Tissue.getTissueMaterials; }
