@@ -37,7 +37,6 @@ import javax.xml.transform.TransformerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -73,7 +72,6 @@ import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.SubmissionUtils;
 import uk.ac.bbsrc.tgac.miso.runstats.client.RunStatsException;
 import uk.ac.bbsrc.tgac.miso.runstats.client.manager.RunStatsManager;
-import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 import uk.ac.bbsrc.tgac.miso.webapp.context.ApplicationContextProvider;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoPropertyExporter;
 import uk.ac.bbsrc.tgac.miso.webapp.util.MisoWebUtils;
@@ -97,9 +95,6 @@ public class EditRunController {
   private DataObjectFactory dataObjectFactory;
 
   @Autowired
-  private JdbcTemplate interfaceTemplate;
-
-  @Autowired
   private RunAlertManager runAlertManager;
 
   private RunStatsManager runStatsManager;
@@ -109,10 +104,6 @@ public class EditRunController {
 
   public void setApplicationContextProvider(ApplicationContextProvider applicationContextProvider) {
     this.applicationContextProvider = applicationContextProvider;
-  }
-
-  public void setInterfaceTemplate(JdbcTemplate interfaceTemplate) {
-    this.interfaceTemplate = interfaceTemplate;
   }
 
   public void setDataObjectFactory(DataObjectFactory dataObjectFactory) {
@@ -137,7 +128,7 @@ public class EditRunController {
 
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
-    return DbUtils.getColumnSizes(interfaceTemplate, "Run");
+    return requestManager.getRunColumnSizes();
   }
 
   @ModelAttribute("platformTypes")

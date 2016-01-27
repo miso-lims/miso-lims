@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 
 import javax.persistence.CascadeType;
@@ -82,7 +83,6 @@ import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.util.BoxUtils;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
-
 
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore
@@ -664,5 +664,10 @@ public class SQLSampleDAO implements SampleStore {
 
       return s;
     }
+  }
+  
+  @Override
+  public Map<String, Integer> getSampleColumnSizes() throws IOException {
+    return DbUtils.getColumnSizes(template, TABLE_NAME);
   }
 }

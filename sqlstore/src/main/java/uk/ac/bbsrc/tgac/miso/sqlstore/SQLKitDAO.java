@@ -28,8 +28,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.CascadeType;
+
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,8 +46,6 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 
 import com.eaglegenomics.simlims.core.Note;
 
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractKit;
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.ClusterKit;
@@ -69,10 +71,11 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
  * @since 0.0.2
  */
 public class SQLKitDAO implements KitStore {
-  private static final String TABLE_NAME = "Kit";
+  private static final String KIT_TABLE_NAME = "Kit";
+  private static final String DESCRIPTOR_TABLE_NAME = "KitDescriptor";
 
   public static final String KITS_SELECT = "SELECT kitId, identificationBarcode, locationBarcode, lotNumber, kitDate, kitDescriptorId "
-      + "FROM " + TABLE_NAME;
+      + "FROM " + KIT_TABLE_NAME;
 
   public static final String KIT_SELECT_BY_ID = KITS_SELECT + " WHERE kitId = ?";
 
@@ -81,23 +84,23 @@ public class SQLKitDAO implements KitStore {
   public static final String KIT_SELECT_BY_LOT_NUMBER = KITS_SELECT + " WHERE lotNumber = ?";
 
   public static final String KITS_SELECT_BY_TYPE = "SELECT k.kitId, k.identificationBarcode, k.locationBarcode, k.lotNumber, k.kitDate, k.kitDescriptorId, ek.experiments_experimentId "
-      + "FROM " + TABLE_NAME + " k, Experiment_Kit ek " + "WHERE ek.kits_kitId=k.kitId " + "AND ek.experiments_experimentId=?";
+      + "FROM " + KIT_TABLE_NAME + " k, Experiment_Kit ek " + "WHERE ek.kits_kitId=k.kitId " + "AND ek.experiments_experimentId=?";
 
   public static final String KITS_SELECT_BY_MANUFACTURER = "SELECT k.kitId, k.identificationBarcode, k.locationBarcode, k.lotNumber, k.kitDate, k.kitDescriptorId, ek.experiments_experimentId "
-      + "FROM " + TABLE_NAME + " k, Experiment_Kit ek " + "WHERE ek.kits_kitId=k.kitId " + "AND ek.experiments_experimentId=?";
+      + "FROM " + KIT_TABLE_NAME + " k, Experiment_Kit ek " + "WHERE ek.kits_kitId=k.kitId " + "AND ek.experiments_experimentId=?";
 
   public static final String KITS_SELECT_BY_RELATED_EXPERIMENT = "SELECT k.kitId, k.identificationBarcode, k.locationBarcode, k.lotNumber, k.kitDate, k.kitDescriptorId, ek.experiments_experimentId "
-      + "FROM " + TABLE_NAME + " k, Experiment_Kit ek " + "WHERE ek.kits_kitId=k.kitId " + "AND ek.experiments_experimentId=?";
+      + "FROM " + KIT_TABLE_NAME + " k, Experiment_Kit ek " + "WHERE ek.kits_kitId=k.kitId " + "AND ek.experiments_experimentId=?";
 
   public static final String KITS_SELECT_BY_RELATED_LIBRARY = "SELECT k.kitId, k.identificationBarcode, k.locationBarcode, k.lotNumber, k.kitDate, k.kitDescriptorId, ek.experiments_experimentId "
-      + "FROM " + TABLE_NAME + " k, Library_Kit lk " + "WHERE lk.kits_kitId=k.kitId " + "AND lk.libraries_libraryId=?";
+      + "FROM " + KIT_TABLE_NAME + " k, Library_Kit lk " + "WHERE lk.kits_kitId=k.kitId " + "AND lk.libraries_libraryId=?";
 
-  public static final String KIT_UPDATE = "UPDATE " + TABLE_NAME + " "
+  public static final String KIT_UPDATE = "UPDATE " + KIT_TABLE_NAME + " "
       + "SET identificationBarcode=:identificationBarcode, locationBarcode=:locationBarcode, lotNumber=:lotNumber, kitDate=:kitDate, kitDescriptorId=:kitDescriptorId "
       + "WHERE kitId=:kitId";
 
   public static final String KIT_DESCRIPTORS_SELECT = "SELECT kitDescriptorId, name, version, manufacturer, partNumber, stockLevel, kitType, platformType, description "
-      + "FROM KitDescriptor";
+      + "FROM " + DESCRIPTOR_TABLE_NAME;
 
   public static final String KIT_DESCRIPTOR_SELECT_BY_ID = KIT_DESCRIPTORS_SELECT + " WHERE kitDescriptorId=?";
 
@@ -107,9 +110,9 @@ public class SQLKitDAO implements KitStore {
 
   public static final String KIT_DESCRIPTORS_SELECT_BY_PLATFORM = KIT_DESCRIPTORS_SELECT + " WHERE platformType = ?";
 
-  public static final String KIT_DESCRIPTOR_UPDATE = "UPDATE KitDescriptor "
-      + "SET name=:name, version=:version, manufacturer=:manufacturer, partNumber=:partNumber, stockLevel=:stockLevel, kitType=:kitType, platformType=:platformType, description=:description "
-      + "WHERE kitDescriptorId=:kitDescriptorId";
+  public static final String KIT_DESCRIPTOR_UPDATE = "UPDATE " + DESCRIPTOR_TABLE_NAME
+      + " SET name=:name, version=:version, manufacturer=:manufacturer, partNumber=:partNumber, stockLevel=:stockLevel, kitType=:kitType, platformType=:platformType, description=:description"
+      + " WHERE kitDescriptorId=:kitDescriptorId";
 
   protected static final Logger log = LoggerFactory.getLogger(SQLKitDAO.class);
   private JdbcTemplate template;
@@ -176,7 +179,7 @@ public class SQLKitDAO implements KitStore {
 
   @Override
   public int count() throws IOException {
-    return template.queryForInt("SELECT count(*) FROM " + TABLE_NAME);
+    return template.queryForInt("SELECT count(*) FROM " + KIT_TABLE_NAME);
   }
 
   @Override
@@ -209,7 +212,7 @@ public class SQLKitDAO implements KitStore {
     params.addValue("kitDescriptorId", kit.getKitDescriptor().getKitDescriptorId());
 
     if (kit.getId() == AbstractKit.UNSAVED_ID) {
-      SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(TABLE_NAME).usingGeneratedKeyColumns("kitId");
+      SimpleJdbcInsert insert = new SimpleJdbcInsert(template).withTableName(KIT_TABLE_NAME).usingGeneratedKeyColumns("kitId");
       Number newId = insert.executeAndReturnKey(params);
       kit.setId(newId.longValue());
     } else {
@@ -350,5 +353,10 @@ public class SQLKitDAO implements KitStore {
 
       return kd;
     }
+  }
+  
+  @Override
+  public Map<String, Integer> getKitDescriptorColumnSizes() throws IOException {
+    return DbUtils.getColumnSizes(template, DESCRIPTOR_TABLE_NAME);
   }
 }

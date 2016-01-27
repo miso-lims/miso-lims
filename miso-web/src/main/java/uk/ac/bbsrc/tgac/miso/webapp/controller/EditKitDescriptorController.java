@@ -31,7 +31,6 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -47,7 +46,6 @@ import uk.ac.bbsrc.tgac.miso.core.data.type.KitType;
 import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 import uk.ac.bbsrc.tgac.miso.core.factory.DataObjectFactory;
 import uk.ac.bbsrc.tgac.miso.core.manager.RequestManager;
-import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 
 @Controller
 @RequestMapping("/kitdescriptor")
@@ -61,16 +59,9 @@ public class EditKitDescriptorController {
   @Autowired
   private DataObjectFactory dataObjectFactory;
   
-  @Autowired
-  private JdbcTemplate interfaceTemplate;
-
-  public void setInterfaceTemplate(JdbcTemplate interfaceTemplate) {
-    this.interfaceTemplate = interfaceTemplate;
-  }
-  
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
-    return DbUtils.getColumnSizes(interfaceTemplate, "KitDescriptor");
+    return requestManager.getKitDescriptorColumnSizes();
   }
 
   @ModelAttribute("kitTypes")

@@ -597,5 +597,33 @@ public interface RequestManager {
   public void deleteBox(Box box) throws IOException;
   
   public Map<String, Integer> getServiceRecordColumnSizes() throws IOException;
+  
+  public Map<String, Integer> getBoxColumnSizes() throws IOException;
+  
+  public Map<String, Integer> getExperimentColumnSizes() throws IOException;
+  
+  public Map<String, Integer> getPoolColumnSizes() throws IOException;
+  
+  public Map<String, Integer> getKitDescriptorColumnSizes() throws IOException;
+  
+  public Map<String, Integer> getLibraryColumnSizes() throws IOException;
+  
+  public Map<String, Integer> getPlateColumnSizes() throws IOException;
+  
+  public Map<String, Integer> getProjectColumnSizes() throws IOException;
+  
+  public Map<String, Integer> getRunColumnSizes() throws IOException;
+  
+  public Map<String, Integer> getSampleColumnSizes() throws IOException;
+  
+  public Map<String, Integer> getStudyColumnSizes() throws IOException;
+  
+  public Map<String, Integer> getSequencerReferenceColumnSizes() throws IOException;
+  
+  public Map<String, Integer> getSubmissionColumnSizes() throws IOException;
+  
+  public Map<String, Integer> getUserColumnSizes() throws IOException;
+  
+  public Map<String, Integer> getGroupColumnSizes() throws IOException;
 
 }

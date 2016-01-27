@@ -2,6 +2,7 @@ package uk.ac.bbsrc.tgac.miso.core.store;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Box;
 import uk.ac.bbsrc.tgac.miso.core.data.BoxSize;
@@ -87,4 +88,11 @@ public interface BoxStore extends Store<Box>, Remover<Box>, NamingSchemeAware<Bo
   void emptyAllTubes(Box box) throws IOException;
   
   void removeBoxableFromBox(Boxable boxable) throws IOException;
+
+  /**
+   * @return a map containing all column names and max lengths from the Box table
+   * @throws IOException
+   */
+  public Map<String, Integer> getBoxColumnSizes() throws IOException;
+
 }

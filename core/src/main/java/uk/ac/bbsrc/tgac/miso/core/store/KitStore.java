@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.core.store;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Kit;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.kit.KitDescriptor;
@@ -58,4 +59,10 @@ public interface KitStore extends Store<Kit> {
   List<KitDescriptor> listKitDescriptorsByType(KitType kitType) throws IOException;
 
   long saveKitDescriptor(KitDescriptor kitDescriptor) throws IOException;
+  
+  /**
+   * @return a map containing all column names and max lengths from the Kit Descriptor table
+   * @throws IOException
+   */
+  public Map<String, Integer> getKitDescriptorColumnSizes() throws IOException;
 }

@@ -26,6 +26,7 @@ package uk.ac.bbsrc.tgac.miso.core.store;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Run;
 import uk.ac.bbsrc.tgac.miso.core.service.naming.NamingSchemeAware;
@@ -166,4 +167,10 @@ public interface RunStore extends Store<Run>, Cascadable, Remover<Run>, NamingSc
   Collection<Run> listAllWithLimit(long limit) throws IOException;
 
   int[] saveAll(Collection<Run> runs) throws IOException;
+  
+  /**
+   * @return a map containing all column names and max lengths from the Run table
+   * @throws IOException
+   */
+  public Map<String, Integer> getRunColumnSizes() throws IOException;
 }

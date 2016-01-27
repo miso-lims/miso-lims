@@ -35,10 +35,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.sql.rowset.serial.SerialBlob;
 import javax.sql.rowset.serial.SerialException;
+
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,24 +55,22 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.support.lob.LobHandler;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.eaglegenomics.simlims.core.Group;
-import com.eaglegenomics.simlims.core.SecurityProfile;
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-import com.eaglegenomics.simlims.core.store.SecurityStore;
-import com.googlecode.ehcache.annotations.Cacheable;
-import com.googlecode.ehcache.annotations.KeyGenerator;
-import com.googlecode.ehcache.annotations.Property;
-import com.googlecode.ehcache.annotations.TriggersRemove;
-
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.UserImpl;
 import uk.ac.bbsrc.tgac.miso.core.security.PasswordCodecService;
+import uk.ac.bbsrc.tgac.miso.core.store.SecurityStore;
 import uk.ac.bbsrc.tgac.miso.core.store.Store;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.sqlstore.cache.CacheAwareRowMapper;
 import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
+
+import com.eaglegenomics.simlims.core.Group;
+import com.eaglegenomics.simlims.core.SecurityProfile;
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
+import com.googlecode.ehcache.annotations.Cacheable;
+import com.googlecode.ehcache.annotations.KeyGenerator;
+import com.googlecode.ehcache.annotations.Property;
+import com.googlecode.ehcache.annotations.TriggersRemove;
 
 /**
  * uk.ac.bbsrc.tgac.miso.sqlstore
@@ -79,8 +81,11 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
  * @since 0.0.2
  */
 public class SQLSecurityDAO implements SecurityStore {
+  private static final String USER_TABLE_NAME = "User";
+  private static final String GROUP_TABLE_NAME = "_Group";
+  
   public static final String USERS_SELECT = "SELECT userId, active, admin, external, fullName, internal, loginName, roles, password, email "
-      + "FROM User";
+      + "FROM " + USER_TABLE_NAME;
 
   public static final String USER_SELECT_BY_ID = USERS_SELECT + " WHERE userId = ?";
 
@@ -97,10 +102,10 @@ public class SQLSecurityDAO implements SecurityStore {
       + "LEFT JOIN User_Group ug ON ug.users_userId = u.userId " + "LEFT JOIN _Group g ON ug.groups_groupId = g.groupId "
       + "WHERE g.name = ?";
 
-  public static final String USER_UPDATE = "UPDATE User " + "SET active=:active, admin=:admin, external=:external, fullName=:fullName, "
+  public static final String USER_UPDATE = "UPDATE " + USER_TABLE_NAME + " SET active=:active, admin=:admin, external=:external, fullName=:fullName, "
       + "internal=:internal, loginName=:loginName, roles=:roles, password=:password, email=:email " + "WHERE userId=:userId";
 
-  public static final String GROUPS_SELECT = "SELECT groupId, description, name " + "FROM _Group";
+  public static final String GROUPS_SELECT = "SELECT groupId, description, name " + "FROM " + GROUP_TABLE_NAME;
 
   public static final String GROUP_SELECT_BY_ID = GROUPS_SELECT + " WHERE groupId = ?";
 
@@ -111,7 +116,7 @@ public class SQLSecurityDAO implements SecurityStore {
   public static final String GROUPS_SELECT_BY_USER_ID = "SELECT g.groupId, g.name, g.description " + "FROM _Group g, User_Group ug "
       + "WHERE g.groupId=ug.groups_groupId " + "AND ug.users_userId=?";
 
-  public static final String GROUP_UPDATE = "UPDATE _Group " + "SET name=:name, description=:description " + "WHERE groupId=:groupId";
+  public static final String GROUP_UPDATE = "UPDATE " + GROUP_TABLE_NAME + " SET name=:name, description=:description " + "WHERE groupId=:groupId";
 
   public static final String USER_GROUP_DELETE_BY_USER_ID = "DELETE FROM User_Group " + "WHERE users_userId=:userId";
 
@@ -447,5 +452,15 @@ public class SQLSecurityDAO implements SecurityStore {
 
       return g;
     }
+  }
+
+  @Override
+  public Map<String, Integer> getUserColumnSizes() throws IOException {
+    return DbUtils.getColumnSizes(template, USER_TABLE_NAME);
+  }
+
+  @Override
+  public Map<String, Integer> getGroupColumnSizes() throws IOException {
+    return DbUtils.getColumnSizes(template, GROUP_TABLE_NAME);
   }
 }

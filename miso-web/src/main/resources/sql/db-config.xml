@@ -707,7 +707,7 @@
 
   <bean name="securityStore" class="org.springframework.aop.framework.ProxyFactoryBean">
     <property name="proxyInterfaces">
-      <value>com.eaglegenomics.simlims.core.store.SecurityStore</value>
+      <value>uk.ac.bbsrc.tgac.miso.core.store.SecurityStore</value>
     </property>
     <property name="interceptorNames">
       <list>
@@ -740,7 +740,7 @@
 
   <bean name="submissionStore" class="org.springframework.aop.framework.ProxyFactoryBean">
     <property name="proxyInterfaces">
-      <value>uk.ac.bbsrc.tgac.miso.core.store.Store</value>
+      <value>uk.ac.bbsrc.tgac.miso.core.store.SubmissionStore</value>
     </property>
     <property name="interceptorNames">
       <list>

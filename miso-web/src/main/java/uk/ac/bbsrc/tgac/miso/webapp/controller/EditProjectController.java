@@ -37,11 +37,13 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import net.sf.json.JSONObject;
+import net.sourceforge.fluxion.ajax.util.JSONUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -56,11 +58,6 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.eaglegenomics.simlims.core.User;
-import com.eaglegenomics.simlims.core.manager.SecurityManager;
-
-import net.sf.json.JSONObject;
-import net.sourceforge.fluxion.ajax.util.JSONUtils;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractProject;
 import uk.ac.bbsrc.tgac.miso.core.data.AbstractSampleQC;
 import uk.ac.bbsrc.tgac.miso.core.data.Experiment;
@@ -90,7 +87,8 @@ import uk.ac.bbsrc.tgac.miso.core.security.util.LimsSecurityUtils;
 import uk.ac.bbsrc.tgac.miso.core.util.AliasComparator;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
 import uk.ac.bbsrc.tgac.miso.service.ReferenceGenomeService;
-import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
+import com.eaglegenomics.simlims.core.User;
+import com.eaglegenomics.simlims.core.manager.SecurityManager;
 
 @Controller
 @RequestMapping("/project")
@@ -129,13 +127,6 @@ public class EditProjectController {
     this.filesManager = filesManager;
   }
 
-  @Autowired
-  private JdbcTemplate interfaceTemplate;
-
-  public void setInterfaceTemplate(JdbcTemplate interfaceTemplate) {
-    this.interfaceTemplate = interfaceTemplate;
-  }
-
   @InitBinder
   public void initBinder(WebDataBinder binder) {
     CustomDateEditor cde = new CustomDateEditor(new SimpleDateFormat("dd/MM/yyyy"), true);
@@ -158,7 +149,7 @@ public class EditProjectController {
 
   @ModelAttribute("maxLengths")
   public Map<String, Integer> maxLengths() throws IOException {
-    return DbUtils.getColumnSizes(interfaceTemplate, "Project");
+    return requestManager.getProjectColumnSizes();
   }
 
   @ModelAttribute("sampleQcTypesString")

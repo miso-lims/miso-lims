@@ -25,6 +25,7 @@ package uk.ac.bbsrc.tgac.miso.core.store;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
 
 import uk.ac.bbsrc.tgac.miso.core.data.Project;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
@@ -111,4 +112,10 @@ public interface ProjectStore extends Store<Project>, Cascadable, Remover<Projec
    *           when
    */
   long saveOverview(ProjectOverview overview) throws IOException;
+  
+  /**
+   * @return a map containing all column names and max lengths from the Project table
+   * @throws IOException
+   */
+  public Map<String, Integer> getProjectColumnSizes() throws IOException;
 }
