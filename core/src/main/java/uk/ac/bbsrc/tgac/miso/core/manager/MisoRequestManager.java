@@ -2596,21 +2596,37 @@ public class MisoRequestManager implements RequestManager {
 
   @Override
   public long saveSequencerServiceRecord(SequencerServiceRecord record) throws IOException {
-    return sequencerServiceRecordStore.save(record);
+    if (sequencerServiceRecordStore != null) {
+      return sequencerServiceRecordStore.save(record);
+    } else {
+      throw new IOException("No sequencerServiceRecordStore available. Check that it has been declared in the Spring config.");
+    }
   }
 
   @Override
   public SequencerServiceRecord getSequencerServiceRecordById(long id) throws IOException {
-    return sequencerServiceRecordStore.get(id);
+    if (sequencerServiceRecordStore != null) {
+      return sequencerServiceRecordStore.get(id);
+    } else {
+      throw new IOException("No sequencerServiceRecordStore available. Check that it has been declared in the Spring config.");
+    }
   }
 
   @Override
   public Collection<SequencerServiceRecord> listAllSequencerServiceRecords() throws IOException {
-    return sequencerServiceRecordStore.listAll();
+    if (sequencerServiceRecordStore != null) {
+      return sequencerServiceRecordStore.listAll();
+    } else {
+      throw new IOException("No sequencerServiceRecordStore available. Check that it has been declared in the Spring config.");
+    }
   }
 
   @Override
   public Collection<SequencerServiceRecord> listSequencerServiceRecordsBySequencerId(long referenceId) throws IOException {
-    return sequencerServiceRecordStore.listBySequencerId(referenceId);
+    if (sequencerServiceRecordStore != null) {
+      return sequencerServiceRecordStore.listBySequencerId(referenceId);
+    } else {
+      throw new IOException("No sequencerServiceRecordStore available. Check that it has been declared in the Spring config.");
+    }
   }
 }

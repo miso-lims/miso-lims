@@ -1231,6 +1231,10 @@ div.experimentwizard li {
     cursor: pointer;
 }
 
+.sddm li a.disabled {
+	color: darkgray;
+}
+
 .sddm div.run {
     position: absolute;
     visibility: hidden;

@@ -247,7 +247,7 @@
                 <a href='<c:url value="/miso/stats/sequencer/servicerecord/new/${sequencerReference.id}"/> '>Add new Service Record</a>
               </c:when>
               <c:otherwise>
-                <a onclick="alert('Error: Cannot add service records to a retired sequencer')">Add new Service Record</a>
+                <a class="disabled" onclick="alert('Cannot add Service Records to a retired Sequencer')">Add new Service Record</a>
               </c:otherwise>
             </c:choose>
           </div>

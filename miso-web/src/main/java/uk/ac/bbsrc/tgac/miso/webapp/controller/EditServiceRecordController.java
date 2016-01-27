@@ -78,7 +78,7 @@ public class EditServiceRecordController {
     this.jdbcTemplate = interfaceTemplate;
   }
 
-  public void setRequestManager(uk.ac.bbsrc.tgac.miso.core.manager.RequestManager requestManager) {
+  public void setRequestManager(RequestManager requestManager) {
     this.requestManager = requestManager;
   }
 
