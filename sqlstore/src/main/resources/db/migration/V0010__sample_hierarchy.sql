@@ -302,3 +302,19 @@ CREATE TABLE `Institute` (
   CONSTRAINT `institute_createUser_fkey` FOREIGN KEY (`createdBy`) REFERENCES `User` (`userId`),
   CONSTRAINT `institute_updateUser_fkey` FOREIGN KEY (`updatedBy`) REFERENCES `User` (`userId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `SampleTissue` (
+  `sampleTissueId` bigint(20) PRIMARY KEY AUTO_INCREMENT,
+  `sampleId` bigint(20) NOT NULL,
+  `instituteId` bigint(20) NOT NULL,
+  `instituteTissueName` varchar(255),
+  `cellularity` int,
+  `createdBy` bigint(20) NOT NULL,
+  `creationDate` datetime NOT NULL,
+  `updatedBy` bigint(20) NOT NULL,
+  `lastUpdated` datetime NOT NULL,
+  CONSTRAINT `sampleTissue_sample_fkey` FOREIGN KEY (`sampleId`) REFERENCES `Sample` (`sampleId`),
+  CONSTRAINT `sampleTissue_institute_fkey` FOREIGN KEY (`instituteId`) REFERENCES `Institute` (`instituteId`),
+  CONSTRAINT `sampleTissue_createUser_fkey` FOREIGN KEY (`createdBy`) REFERENCES `User` (`userId`),
+  CONSTRAINT `sampleTissue_updateUser_fkey` FOREIGN KEY (`updatedBy`) REFERENCES `User` (`userId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

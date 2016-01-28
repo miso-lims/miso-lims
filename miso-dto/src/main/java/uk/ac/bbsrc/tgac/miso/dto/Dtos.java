@@ -5,6 +5,8 @@ import java.util.Set;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
+import com.google.common.collect.Sets;
+
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
 import uk.ac.bbsrc.tgac.miso.core.data.Institute;
 import uk.ac.bbsrc.tgac.miso.core.data.QcPassedDetail;
@@ -15,6 +17,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.SampleClass;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleGroupId;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleNumberPerProject;
 import uk.ac.bbsrc.tgac.miso.core.data.SamplePurpose;
+import uk.ac.bbsrc.tgac.miso.core.data.SampleTissue;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleValidRelationship;
 import uk.ac.bbsrc.tgac.miso.core.data.Subproject;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
@@ -30,14 +33,13 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleGroupImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleNumberPerProjectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SamplePurposeImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleTissueImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleValidRelationshipImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SubprojectImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
-
-import com.google.common.collect.Sets;
 
 public class Dtos {
 
@@ -538,7 +540,7 @@ public class Dtos {
     SampleValidRelationship to = new SampleValidRelationshipImpl();
     return to;
   }
-  
+
   public static InstituteDto asDto(Institute from) {
     InstituteDto dto = new InstituteDto();
     dto.setId(from.getId());
@@ -550,7 +552,7 @@ public class Dtos {
     dto.setLastUpdated(dateTimeFormatter.print(from.getLastUpdated().getTime()));
     return dto;
   }
-  
+
   public static Set<InstituteDto> asInstituteDtos(Set<Institute> from) {
     Set<InstituteDto> dtoSet = Sets.newHashSet();
     for (Institute institute : from) {
@@ -558,11 +560,41 @@ public class Dtos {
     }
     return dtoSet;
   }
-  
+
   public static Institute to(InstituteDto from) {
     Institute to = new InstituteImpl();
     to.setAlias(from.getAlias());
     to.setLab(from.getLab());
+    return to;
+  }
+
+  public static SampleTissueDto asDto(SampleTissue from) {
+    SampleTissueDto dto = new SampleTissueDto();
+    dto.setId(from.getId());
+    dto.setCellularity(from.getCellularity());
+    dto.setInstitute(asDto(from.getInstitute()));
+    dto.setInstituteTissueName(from.getInstituteTissueName());
+    dto.setCreatedById(from.getCreatedBy().getUserId());
+    dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
+    dto.setUpdatedById(from.getUpdatedBy().getUserId());
+    dto.setLastUpdated(dateTimeFormatter.print(from.getLastUpdated().getTime()));
+    return dto;
+  }
+
+  public static Set<SampleTissueDto> asSampleTissueDtos(Set<SampleTissue> from) {
+    Set<SampleTissueDto> dtoSet = Sets.newHashSet();
+    for (SampleTissue institute : from) {
+      dtoSet.add(asDto(institute));
+    }
+    return dtoSet;
+  }
+
+  public static SampleTissue to(SampleTissueDto from) {
+    SampleTissue to = new SampleTissueImpl();
+    to.setId(from.getId());
+    to.setCellularity(from.getCellularity());
+    to.setInstitute(to(from.getInstitute()));
+    to.setInstituteTissueName(from.getInstituteTissueName());
     return to;
   }
 
