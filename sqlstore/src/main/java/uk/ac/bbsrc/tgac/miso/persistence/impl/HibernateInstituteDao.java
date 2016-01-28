@@ -31,7 +31,7 @@ public class HibernateInstituteDao implements InstituteDao {
 
   @Override
   public List<Institute> getInstitute() {
-    Query query = currentSession().createQuery("from SamplePurposeImpl");
+    Query query = currentSession().createQuery("from InstituteImpl");
     @SuppressWarnings("unchecked")
     List<Institute> institutes = query.list();
     return institutes;

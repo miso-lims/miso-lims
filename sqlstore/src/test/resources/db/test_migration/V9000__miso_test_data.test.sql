@@ -206,3 +206,7 @@ VALUES ('IPO1',1),('IPO10',1),('IPO2',1),('IPO3',1),('IPO4',1),('IPO5',1),('IPO6
 DELETE FROM `SecurityProfile`;
 INSERT INTO `SecurityProfile`(`profileId`, `allowAllInternal`, `owner_userId`) 
 VALUES (1,1,1),(2,1,1),(3,1,1),(4,1,1),(5,1,1),(6,1,1),(7,1,1),(8,1,1),(9,1,1),(10,1,1),(11,1,1),(12,1,NULL),(13,1,NULL),(14,1,NULL),(15,1,NULL);
+
+DELETE FROM `Institute`;
+INSERT INTO `Institute`(`instituteId`, `alias`, `createdBy`, `creationDate`, `updatedBy`, `lastUpdated`)
+VALUES (1,'Institute A',1,'2016-01-28 14:32:00',1,'2016-01-28 14:32:00'),(2,'Institute B',1,'2016-01-29 09:32:00',1,'2016-01-29 09:32:00');
