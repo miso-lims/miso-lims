@@ -5,9 +5,8 @@ import java.util.Set;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
-import com.google.common.collect.Sets;
-
 import uk.ac.bbsrc.tgac.miso.core.data.Identity;
+import uk.ac.bbsrc.tgac.miso.core.data.Institute;
 import uk.ac.bbsrc.tgac.miso.core.data.QcPassedDetail;
 import uk.ac.bbsrc.tgac.miso.core.data.Sample;
 import uk.ac.bbsrc.tgac.miso.core.data.SampleAdditionalInfo;
@@ -22,6 +21,7 @@ import uk.ac.bbsrc.tgac.miso.core.data.TissueMaterial;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueOrigin;
 import uk.ac.bbsrc.tgac.miso.core.data.TissueType;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.IdentityImpl;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.InstituteImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.QcPassedDetailImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAdditionalInfoImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.SampleAnalyteImpl;
@@ -36,6 +36,8 @@ import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueMaterialImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueOriginImpl;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.TissueTypeImpl;
 import uk.ac.bbsrc.tgac.miso.core.util.LimsUtils;
+
+import com.google.common.collect.Sets;
 
 public class Dtos {
 
@@ -534,6 +536,31 @@ public class Dtos {
 
   public static SampleValidRelationship to(SampleValidRelationshipDto from) {
     SampleValidRelationship to = new SampleValidRelationshipImpl();
+    return to;
+  }
+  
+  public static InstituteDto asDto(Institute from) {
+    InstituteDto dto = new InstituteDto();
+    dto.setId(from.getId());
+    dto.setAlias(from.getAlias());
+    dto.setCreatedById(from.getCreatedBy().getUserId());
+    dto.setCreationDate(dateTimeFormatter.print(from.getCreationDate().getTime()));
+    dto.setUpdatedById(from.getUpdatedBy().getUserId());
+    dto.setLastUpdated(dateTimeFormatter.print(from.getLastUpdated().getTime()));
+    return dto;
+  }
+  
+  public static Set<InstituteDto> asInstituteDtos(Set<Institute> from) {
+    Set<InstituteDto> dtoSet = Sets.newHashSet();
+    for (Institute institute : from) {
+      dtoSet.add(asDto(institute));
+    }
+    return dtoSet;
+  }
+  
+  public static Institute to(InstituteDto from) {
+    Institute to = new InstituteImpl();
+    to.setAlias(from.getAlias());
     return to;
   }
 
