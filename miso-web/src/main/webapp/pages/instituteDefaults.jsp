@@ -42,6 +42,7 @@
     <a href="#purposes">Sample Purposes</a><br/>
     <a href="#qcDetails">QC Details</a><br/>
     <a href="#subprojects">Subprojects</a><br/>
+    <a href="#institutes">Institutes</a><br/>
     <a href="#classes">Sample Classes</a><br/>
     <a href="#relationships">Relationships between Sample Classes</a><br/>
   </div>
@@ -122,6 +123,19 @@
         </tr>
       </thead>
       <tbody id="allSubprojects" class="SubP"></tbody>
+    </table>
+  </div>
+  
+  <div class="sectionDivider"></div>
+  <div class="corner-padding">
+    <h2 id="institutes">Institutes</h2>
+    <table id="allInstitutesTable" class="clear default-table" data-sortable>
+      <thead>
+        <tr>
+          <th>Name</th>
+        </tr>
+      </thead>
+      <tbody id="allInstitutes" class="In"></tbody>
     </table>
   </div>
   

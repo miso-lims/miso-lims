@@ -400,6 +400,89 @@ var Subproject = Subproject || {
   }
 };
 
+var Institute = Institute || {
+  getInstitutes: function () {
+    Options.makeXhrRequest('GET', '/miso/rest/institutes', Institute.createInstitutesTable);
+  },
+
+  createInstitutesTable: function (xhr) {
+    var tableBody = document.getElementById('allInstitutes');
+    tableBody.innerHTML = null;
+
+    var data;
+    if (xhr.status == 200) {
+      data = JSON.parse(xhr.responseText);
+      data.sort(function (a, b) { //////////////// TODO: confirm alias??
+        return (a.alias > b.alias) ? 1 : ((b.alias > a.alias) ? -1 : 0);
+      });
+    } // else collection is empty, so render only teh "Add New" button
+
+    var table = [];
+    var id, alias, endpoint;
+
+    if (data) {
+      for (var i=0; i<data.length; i++) {
+        id = data[i].id;
+        alias = data[i].alias;
+        endpoint = data[i].url;
+
+        table.push('<tr class="In"><td>');
+        table.push(Options.createTextInput('In_alias_'+id, alias));
+        table.push('</td><td>');
+        table.push(Options.createButton('Update', "Institute.update('"+endpoint+"', "+id+")"));
+        table.push('</td><td>');
+        table.push(Options.createButton('Delete', "Options.confirmDelete('"+endpoint+"')"));
+        table.push('</td></tr>');
+      }
+    }
+    tableBody.innerHTML = table.join('');
+    Options.tableLoadCounter += 1;
+
+    if (!document.getElementById('newInstituteRowButton')) { // add button if it's not already present
+      var button = ['<div id="newInstituteRowButton">'];
+      button.push(Options.createButton('New Institute', 'Institute.createNewRow()', 'newInstitute'));
+      button.push('</div>');
+      document.getElementById('allInstitutesTable').insertAdjacentHTML('afterend', button.join(''));
+    }
+
+    if (Options.tableLoadCounter > Options.tablesOnPage) { // if all tables have already been loaded once
+      Options.displayCheckmark('allInstitutesTable');
+    }
+  },
+
+  update: function (endpoint, suffix, givenMethod) {
+    var alias = document.getElementById('In_alias_'+suffix).value;
+    if (!alias) {
+      alert("Alias can not be blank.");
+      return null;
+    }
+    var method = givenMethod || 'PUT';
+    Options.makeXhrRequest(method, endpoint, Options.reloadTable, JSON.stringify({ 'alias': alias }), 'In');
+  },
+
+  addNew: function () {
+    Institute.update('/miso/rest/institute', 'new', 'POST'); // TODO: CHECK THIS
+  },
+
+  createNewRow: function () {
+    if (document.getElementById('In_alias_new')) {
+      document.getElementById('In_alias_new').focus();
+      return false;
+    } else {
+      var row = [];
+
+      row.push('<tr><td>');
+      row.push(Options.createTextInput('In_alias_new'));
+      row.push('</td><td>');
+      row.push(Options.createButton('Add', "Institute.addNew()"));
+      row.push('</td></tr>');
+
+      document.getElementById('allInstitutes').insertAdjacentHTML('beforeend', row.join(''));
+      document.getElementById('In_alias_new').focus();
+    }
+  }
+};
+
 var Hierarchy = Hierarchy || {
   categoriesArray: [],
   data: {},
@@ -644,7 +727,7 @@ var Hierarchy = Hierarchy || {
 
 var Options = Options || {
   tableLoadCounter: 0,
-  tablesOnPage: 8,
+  tablesOnPage: 9,
 
   makeXhrRequest: function (method, endpoint, callback, data, callbackarg) {
     var expectedStatus;
@@ -714,6 +797,7 @@ var Options = Options || {
     else if (option == 'SP') { reloadTableFunc = Tissue.getSamplePurposes; }
     else if (option == 'QC') { reloadTableFunc = QC.getQcDetails; }
     else if (option == 'SubP') { reloadTableFunc = Subproject.getProjects; }
+    else if (option == 'In') { reloadTableFunc = Institute.getInstitutes; }
     reloadTableFunc();
   },
 
