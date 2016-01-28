@@ -29,7 +29,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpSession;
 
@@ -496,16 +498,20 @@ public class DashboardHelperService {
     try {
       StringBuilder b = new StringBuilder();
       Collection<Sample> samples = requestManager.listAllSamplesByReceivedDate(100);
+      
+      Set<Long> uniqueProjects = new HashSet<>();   
 
       if (samples.size() > 0) {
         for (Sample s : samples) {
-          if (s.getReceivedDate() != null) {
+          if (s.getReceivedDate() != null && !uniqueProjects.contains(s.getProject().getId())) {
             b.append("<a class=\"dashboardresult\" href=\"/miso/project/" + s.getProject().getId()
                 + "\"><div  onMouseOver=\"this.className=&#39dashboardhighlight&#39\" onMouseOut=\"this.className=&#39dashboard&#39\" class=\"dashboard\">");
             b.append("Name: <b>" + s.getProject().getName() + "</b><br/>");
             b.append("Alias: <b>" + s.getProject().getAlias() + "</b><br/>");
             b.append("Last Received: <b>" + LimsUtils.getDateAsString(s.getReceivedDate()) + "</b><br/>");
             b.append("</div>");
+            
+            uniqueProjects.add(s.getProject().getId());
           }
         }
       } else {
