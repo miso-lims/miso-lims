@@ -1,12 +1,12 @@
 package uk.ac.bbsrc.tgac.miso.core.manager;
 
 import java.io.IOException;
+import java.util.*;
 
 import javax.annotation.Resource;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -18,30 +18,25 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolderStrategy;
 import org.springframework.security.core.context.SecurityContextImpl;
+
+import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
 import static org.junit.Assert.*;
 
 import com.eaglegenomics.simlims.core.Note;
 import com.eaglegenomics.simlims.core.User;
 import com.eaglegenomics.simlims.core.manager.SecurityManager;
-import static org.mockito.MockitoAnnotations.*;
+
 import static org.mockito.Mockito.*;
 
-import uk.ac.bbsrc.tgac.miso.core.data.Library;
-import uk.ac.bbsrc.tgac.miso.core.data.LibraryQC;
-import uk.ac.bbsrc.tgac.miso.core.data.Pool;
-import uk.ac.bbsrc.tgac.miso.core.data.PoolQC;
-import uk.ac.bbsrc.tgac.miso.core.data.Project;
-import uk.ac.bbsrc.tgac.miso.core.data.Run;
-import uk.ac.bbsrc.tgac.miso.core.data.RunQC;
-import uk.ac.bbsrc.tgac.miso.core.data.Sample;
-import uk.ac.bbsrc.tgac.miso.core.data.SampleQC;
+import uk.ac.bbsrc.tgac.miso.core.data.*;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.LibraryDilution;
 import uk.ac.bbsrc.tgac.miso.core.data.impl.ProjectOverview;
+import uk.ac.bbsrc.tgac.miso.core.data.impl.emPCR;
+import uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType;
 
 /**
  * @author Chris Salt
@@ -91,6 +86,36 @@ public class UserAuthMisoRequestManagerTestSuite {
 	private Pool pool;
 	@Mock
 	private PoolQC poolQC;
+	@Mock
+	private emPCR emPCR;
+	@Mock
+	private uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution emPCRDilution;
+	@Mock
+	private Experiment experiment;
+	@Mock
+	private Study study;
+	@Mock
+	private SequencerPoolPartition sequencerPoolParition;
+	@Mock
+	private SequencerPartitionContainer sequencerPartitionContainer;
+	@Mock
+	private Submission submission;
+	@Mock
+	private EntityGroup entityGroup;
+	@Mock
+	private Dilution dilution;
+	@Mock
+	private ProjectOverview projectOverview;
+	@Mock
+	private Status status;
+	@Mock
+	private Plate plate;
+	@Mock
+	private Project project1;
+	@Mock
+	private Project project2;
+	@Mock
+	private Project project3;
 
 	@Resource
 	@InjectMocks
@@ -647,10 +672,31 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveEmPCR(uk.ac.bbsrc.tgac.miso.core.data.impl.emPCR)}
 	 * .
 	 */
-
 	@Test
-	public void testSaveEmPCR() {
-		// TODO: Implement.
+	public void testSaveEmPCR() throws IOException {
+		final long expectedReturn = 1L;
+		when(emPCR.userCanWrite(any(User.class))).thenReturn(true);
+		when(backingManager.saveEmPCR(emPCR)).thenReturn(expectedReturn);
+
+		assertEquals(expectedReturn, userAuthMisoRequestManager.saveEmPCR(emPCR) );
+		verify(backingManager).saveEmPCR(emPCR);
+	}
+
+	/**
+	 * Test method for
+	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveEmPCR(uk.ac.bbsrc.tgac.miso.core.data.impl.emPCR)}
+	 * .
+	 * @throws IOException
+	 */
+	@Test
+	public void testSaveEmPCRThrows() throws IOException {
+		when(emPCR.userCanWrite(any(User.class))).thenReturn(false);
+
+		thrown.expect(IOException.class);
+		thrown.expectMessage("User null cannot write to this EmPCR");
+		userAuthMisoRequestManager.saveEmPCR(emPCR);
+
+		verify(backingManager, never()).saveEmPCR(emPCR);
 	}
 
 	/**
@@ -658,10 +704,30 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveEmPCRDilution(uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution)}
 	 * .
 	 */
-
 	@Test
-	public void testSaveEmPCRDilution() {
-		// TODO: Implement.
+	public void testSaveEmPCRDilution() throws IOException {
+		final long expectedReturn = 1L;
+		when(emPCRDilution.userCanWrite(any(User.class))).thenReturn(true);
+		when(backingManager.saveEmPCRDilution(emPCRDilution)).thenReturn(expectedReturn);
+
+		assertEquals(expectedReturn, userAuthMisoRequestManager.saveEmPCRDilution(emPCRDilution) );
+		verify(backingManager).saveEmPCRDilution(emPCRDilution);
+	}
+
+	/**
+	 * Test method for
+	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveEmPCRDilution(uk.ac.bbsrc.tgac.miso.core.data.impl.emPCRDilution)}
+	 * .
+	 */
+	@Test
+	public void testSaveEmPCRDilutionThrows() throws IOException {
+		when(emPCRDilution.userCanWrite(any(User.class))).thenReturn(false);
+
+		thrown.expect(IOException.class);
+		thrown.expectMessage("User null cannot write to this EmPCRDilution");
+		userAuthMisoRequestManager.saveEmPCRDilution(emPCRDilution);
+
+		verify(backingManager, never()).saveEmPCRDilution(emPCRDilution);
 	}
 
 	/**
@@ -669,10 +735,30 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveExperiment(uk.ac.bbsrc.tgac.miso.core.data.Experiment)}
 	 * .
 	 */
-
 	@Test
-	public void testSaveExperiment() {
-		// TODO: Implement.
+	public void testSaveExperiment() throws IOException {
+		final long expectedReturn = 1L;
+		when(experiment.userCanWrite(any(User.class))).thenReturn(true);
+		when(backingManager.saveExperiment(experiment)).thenReturn(expectedReturn);
+
+		assertEquals(expectedReturn, userAuthMisoRequestManager.saveExperiment(experiment) );
+		verify(backingManager).saveExperiment(experiment);
+	}
+
+	/**
+	 * Test method for
+	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveExperiment(uk.ac.bbsrc.tgac.miso.core.data.Experiment)}
+	 * .
+	 */
+	@Test
+	public void testSaveExperimentThrows() throws IOException {
+		when(experiment.userCanWrite(any(User.class))).thenReturn(false);
+
+		thrown.expect(IOException.class);
+		thrown.expectMessage("User null cannot write to this Experiment");
+		userAuthMisoRequestManager.saveExperiment(experiment);
+
+		verify(backingManager, never()).saveExperiment(experiment);
 	}
 
 	/**
@@ -680,10 +766,30 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveStudy(uk.ac.bbsrc.tgac.miso.core.data.Study)}
 	 * .
 	 */
-
 	@Test
-	public void testSaveStudy() {
-		// TODO: Implement.
+	public void testSaveStudy() throws IOException {
+		final long expectedReturn = 1L;
+		when(study.userCanWrite(any(User.class))).thenReturn(true);
+		when(backingManager.saveStudy(study)).thenReturn(expectedReturn);
+
+		assertEquals(expectedReturn, userAuthMisoRequestManager.saveStudy(study) );
+		verify(backingManager).saveStudy(study);
+	}
+
+	/**
+	 * Test method for
+	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveStudy(uk.ac.bbsrc.tgac.miso.core.data.Study)}
+	 * .
+	 */
+	@Test
+	public void testSaveStudyThrows() throws IOException {
+		when(study.userCanWrite(any(User.class))).thenReturn(false);
+
+		thrown.expect(IOException.class);
+		thrown.expectMessage("User null cannot write to this Study");
+		userAuthMisoRequestManager.saveStudy(study);
+
+		verify(backingManager, never()).saveStudy(study);
 	}
 
 	/**
@@ -691,10 +797,30 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveSequencerPoolPartition(uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition)}
 	 * .
 	 */
-
 	@Test
-	public void testSaveSequencerPoolPartition() {
-		// TODO: Implement.
+	public void testSaveSequencerPoolPartition() throws IOException {
+		final long expectedReturn = 1L;
+		when(sequencerPoolParition.userCanWrite(any(User.class))).thenReturn(true);
+		when(backingManager.saveSequencerPoolPartition(sequencerPoolParition)).thenReturn(expectedReturn);
+
+		assertEquals(expectedReturn, userAuthMisoRequestManager.saveSequencerPoolPartition(sequencerPoolParition) );
+		verify(backingManager).saveSequencerPoolPartition(sequencerPoolParition);
+	}
+
+	/**
+	 * Test method for
+	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveSequencerPoolPartition(uk.ac.bbsrc.tgac.miso.core.data.SequencerPoolPartition)}
+	 * .
+	 */
+	@Test
+	public void testSaveSequencerPoolPartitionThrows() throws IOException {
+		when(sequencerPoolParition.userCanWrite(any(User.class))).thenReturn(false);
+
+		thrown.expect(IOException.class);
+		thrown.expectMessage("User null cannot write to this Partition");
+		userAuthMisoRequestManager.saveSequencerPoolPartition(sequencerPoolParition);
+
+		verify(backingManager, never()).saveSequencerPoolPartition(sequencerPoolParition);
 	}
 
 	/**
@@ -702,10 +828,31 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveSequencerPartitionContainer(uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer)}
 	 * .
 	 */
-
 	@Test
-	public void testSaveSequencerPartitionContainer() {
-		// TODO: Implement.
+	public void testSaveSequencerPartitionContainer() throws IOException {
+		final long expectedReturn = 1L;
+
+		when(sequencerPartitionContainer.userCanWrite(any(User.class))).thenReturn(true);
+		when(backingManager.saveSequencerPartitionContainer(sequencerPartitionContainer)).thenReturn(expectedReturn);
+
+		assertEquals(expectedReturn, userAuthMisoRequestManager.saveSequencerPartitionContainer(sequencerPartitionContainer) );
+		verify(backingManager).saveSequencerPartitionContainer(sequencerPartitionContainer);
+	}
+
+	/**
+	 * Test method for
+	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveSequencerPartitionContainer(uk.ac.bbsrc.tgac.miso.core.data.SequencerPartitionContainer)}
+	 * .
+	 */
+	@Test
+	public void testSaveSequencerPartitionContainerThrows() throws IOException {
+		when(sequencerPartitionContainer.userCanWrite(any(User.class))).thenReturn(false);
+
+		thrown.expect(IOException.class);
+		thrown.expectMessage("User null cannot write to this SequencerPartitionContainer");
+		userAuthMisoRequestManager.saveSequencerPartitionContainer(sequencerPartitionContainer);
+
+		verify(backingManager, never()).saveSequencerPartitionContainer(sequencerPartitionContainer);
 	}
 
 	/**
@@ -713,10 +860,31 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveSubmission(uk.ac.bbsrc.tgac.miso.core.data.Submission)}
 	 * .
 	 */
-
 	@Test
-	public void testSaveSubmission() {
-		// TODO: Implement.
+	public void testSaveSubmission() throws IOException {
+		final long expectedReturn = 1L;
+
+		when(submission.userCanWrite(any(User.class))).thenReturn(true);
+		when(backingManager.saveSubmission(submission)).thenReturn(expectedReturn);
+
+		assertEquals(expectedReturn, userAuthMisoRequestManager.saveSubmission(submission) );
+		verify(backingManager).saveSubmission(submission);
+	}
+
+	/**
+	 * Test method for
+	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveSubmission(uk.ac.bbsrc.tgac.miso.core.data.Submission)}
+	 * .
+	 */
+	@Test
+	public void testSaveSubmissionThrows() throws IOException {
+		when(submission.userCanWrite(any(User.class))).thenReturn(false);
+
+		thrown.expect(IOException.class);
+		thrown.expectMessage("User null cannot write to this Submission");
+		userAuthMisoRequestManager.saveSubmission(submission);
+
+		verify(backingManager, never()).saveSubmission(submission);
 	}
 
 	/**
@@ -724,10 +892,14 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#saveEntityGroup(uk.ac.bbsrc.tgac.miso.core.data.EntityGroup)}
 	 * .
 	 */
-
 	@Test
-	public void testSaveEntityGroup() {
-		// TODO: Implement.
+	public void testSaveEntityGroup() throws IOException {
+		final long expectedReturn = 1L;
+
+		when(backingManager.saveEntityGroup(entityGroup)).thenReturn(expectedReturn);
+
+		assertEquals(expectedReturn, userAuthMisoRequestManager.saveEntityGroup(entityGroup) );
+		verify(backingManager).saveEntityGroup(entityGroup);
 	}
 
 	/**
@@ -735,10 +907,34 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getSequencerPoolPartitionById(long)}
 	 * .
 	 */
-
 	@Test
-	public void testGetSequencerPoolPartitionById() {
-		// TODO: Implement.
+	public void testGetSequencerPoolPartitionById() throws IOException {
+		long inputId = 1L;
+		when(backingManager.getSequencerPoolPartitionById(inputId)).thenReturn(sequencerPoolParition);
+		when(sequencerPoolParition.userCanRead(any(User.class))).thenReturn(true);
+
+		assertEquals(sequencerPoolParition, userAuthMisoRequestManager.getSequencerPoolPartitionById(inputId));
+
+		verify(backingManager).getSequencerPoolPartitionById(inputId);
+	}
+
+	/**
+	 * Test method for
+	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getSequencerPoolPartitionById(long)}
+	 * .
+	 */
+	@Test
+	public void testGetSequencerPoolPartitionByIdThrows() throws IOException {
+		long inputId = 1L;
+		when(backingManager.getSequencerPoolPartitionById(inputId)).thenReturn(sequencerPoolParition);
+		when(sequencerPoolParition.userCanRead(any(User.class))).thenReturn(false);
+
+		thrown.expect(IOException.class);
+		thrown.expectMessage("User null cannot read Partition " + inputId);
+
+    userAuthMisoRequestManager.getSequencerPoolPartitionById(inputId);
+
+		verify(backingManager).getSequencerPoolPartitionById(inputId);
 	}
 
 	/**
@@ -746,10 +942,34 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getExperimentById(long)}
 	 * .
 	 */
-
 	@Test
-	public void testGetExperimentById() {
-		// TODO: Implement.
+	public void testGetExperimentById() throws IOException {
+		long inputId = 1L;
+		when(backingManager.getExperimentById(inputId)).thenReturn(experiment);
+		when(experiment.userCanRead(any(User.class))).thenReturn(true);
+
+		assertEquals(experiment, userAuthMisoRequestManager.getExperimentById(inputId));
+
+		verify(backingManager).getExperimentById(inputId);
+	}
+
+	/**
+	 * Test method for
+	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getExperimentById(long)}
+	 * .
+	 */
+	@Test
+	public void testGetExperimentByIdThrows() throws IOException {
+		long inputId = 1L;
+		when(backingManager.getExperimentById(inputId)).thenReturn(experiment);
+		when(experiment.userCanRead(any(User.class))).thenReturn(false);
+
+		thrown.expect(IOException.class);
+		thrown.expectMessage("User null cannot read Experiment " + inputId);
+
+		userAuthMisoRequestManager.getExperimentById(inputId);
+
+		verify(backingManager).getExperimentById(inputId);
 	}
 
 	/**
@@ -759,8 +979,34 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testGetPoolById() {
-		// TODO: Implement.
+	public void testGetPoolById() throws IOException {
+		long inputId = 1L;
+		when(backingManager.getPoolById(inputId)).thenReturn(pool);
+		when(pool.userCanRead(any(User.class))).thenReturn(true);
+
+		assertEquals(pool, userAuthMisoRequestManager.getPoolById(inputId));
+
+		verify(backingManager).getPoolById(inputId);
+	}
+
+	/**
+	 * Test method for
+	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getPoolById(long)}
+	 * .
+	 */
+
+	@Test
+	public void testGetPoolByIdThrows() throws IOException {
+		long inputId = 1L;
+		when(backingManager.getPoolById(inputId)).thenReturn(pool);
+		when(pool.userCanRead(any(User.class))).thenReturn(false);
+
+		thrown.expect(IOException.class);
+		thrown.expectMessage("User null cannot read Pool " + inputId);
+
+		userAuthMisoRequestManager.getPoolById(inputId);
+
+		verify(backingManager).getPoolById(inputId);
 	}
 
 	/**
@@ -768,10 +1014,38 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getPoolByBarcode(java.lang.String, uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType)}
 	 * .
 	 */
-
 	@Test
-	public void testGetPoolByBarcodeStringPlatformType() {
-		// TODO: Implement.
+	public void testGetPoolByBarcodeStringPlatformType() throws IOException {
+		String barcode = "";
+		PlatformType platformType = PlatformType.ILLUMINA;
+		when(backingManager.getPoolByBarcode(barcode, platformType)).thenReturn(pool);
+		when(pool.userCanRead(any(User.class))).thenReturn(true);
+
+		assertEquals(pool, userAuthMisoRequestManager.getPoolByBarcode(barcode, platformType));
+
+		verify(backingManager).getPoolByBarcode(barcode, platformType);
+	}
+
+	/**
+	 * Test method for
+	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getPoolByBarcode(java.lang.String, uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType)}
+	 * .
+	 */
+	@Test
+	public void testGetPoolByBarcodeStringPlatformTypeThrows() throws IOException {
+		String barcode = "barcode";
+		PlatformType platformType = PlatformType.ILLUMINA;
+		when(backingManager.getPoolByBarcode(barcode, platformType)).thenReturn(pool);
+		when(pool.userCanRead(any(User.class))).thenReturn(false);
+		Long poolId = 1L;
+		when(pool.getId()).thenReturn(poolId);
+
+		thrown.expect(IOException.class);
+		thrown.expectMessage("User null cannot read Pool " + poolId);
+
+		userAuthMisoRequestManager.getPoolByBarcode(barcode, platformType);
+
+		verify(backingManager).getPoolByBarcode(barcode, platformType);
 	}
 
 	/**
@@ -779,10 +1053,36 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getPoolByIdBarcode(java.lang.String)}
 	 * .
 	 */
-
 	@Test
-	public void testGetPoolByIdBarcode() {
-		// TODO: Implement.
+	public void testGetPoolByIdBarcode() throws IOException {
+		String barcode = "barcode";
+		when(backingManager.getPoolByIdBarcode(barcode)).thenReturn(pool);
+		when(pool.userCanRead(any(User.class))).thenReturn(true);
+
+		assertEquals(pool, userAuthMisoRequestManager.getPoolByIdBarcode(barcode));
+
+		verify(backingManager).getPoolByIdBarcode(barcode);
+	}
+
+	/**
+	 * Test method for
+	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getPoolByIdBarcode(java.lang.String)}
+	 * .
+	 */
+	@Test
+	public void testGetPoolByIdBarcodeThrows() throws IOException {
+		String barcode = "barcode";
+		when(backingManager.getPoolByIdBarcode(barcode)).thenReturn(pool);
+		when(pool.userCanRead(any(User.class))).thenReturn(false);
+		Long poolId = 1L;
+		when(pool.getId()).thenReturn(poolId);
+
+		thrown.expect(IOException.class);
+		thrown.expectMessage("User null cannot read Pool " + poolId);
+
+		userAuthMisoRequestManager.getPoolByIdBarcode(barcode);
+
+		verify(backingManager).getPoolByIdBarcode(barcode);
 	}
 
 	/**
@@ -790,10 +1090,36 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getPoolByBarcode(java.lang.String)}
 	 * .
 	 */
-
 	@Test
-	public void testGetPoolByBarcodeString() {
-		// TODO: Implement.
+	public void testGetPoolByBarcodeString() throws IOException {
+		String barcode = "barcode";
+		when(backingManager.getPoolByBarcode(barcode)).thenReturn(pool);
+		when(pool.userCanRead(any(User.class))).thenReturn(true);
+
+		assertEquals(pool, userAuthMisoRequestManager.getPoolByBarcode(barcode));
+
+		verify(backingManager).getPoolByBarcode(barcode);
+	}
+
+	/**
+	 * Test method for
+	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getPoolByBarcode(java.lang.String)}
+	 * .
+	 */
+	@Test
+	public void testGetPoolByBarcodeStringThrows() throws IOException {
+		String barcode = "barcode";
+		when(backingManager.getPoolByBarcode(barcode)).thenReturn(pool);
+		when(pool.userCanRead(any(User.class))).thenReturn(false);
+		Long poolId = 1L;
+		when(pool.getId()).thenReturn(poolId);
+
+		thrown.expect(IOException.class);
+		thrown.expectMessage("User null cannot read Pool " + poolId);
+
+		userAuthMisoRequestManager.getPoolByBarcode(barcode);
+
+		verify(backingManager).getPoolByBarcode(barcode);
 	}
 
 	/**
@@ -801,10 +1127,38 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getPoolQCById(long)}
 	 * .
 	 */
-
 	@Test
-	public void testGetPoolQCById() {
-		// TODO: Implement.
+	public void testGetPoolQCById() throws IOException {
+		long inputId = 1L;
+		when(backingManager.getPoolQCById(inputId)).thenReturn(poolQC);
+		when(poolQC.userCanRead(any(User.class))).thenReturn(true);
+
+		assertEquals(poolQC, userAuthMisoRequestManager.getPoolQCById(inputId));
+
+		verify(backingManager).getPoolQCById(inputId);
+	}
+
+	/**
+	 * Test method for
+	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getPoolQCById(long)}
+	 * .
+	 */
+	@Test
+	public void testGetPoolQCByIdThrows() throws IOException {
+		long qcId = 1L;
+		long poolId = 2L;
+		when(backingManager.getPoolQCById(qcId)).thenReturn(poolQC);
+		when(poolQC.getPool()).thenReturn(pool);
+		when(poolQC.getId()).thenReturn(qcId);
+		when(pool.userCanRead(any(User.class))).thenReturn(false);
+		when(pool.getId()).thenReturn(poolId);
+
+		thrown.expect(IOException.class);
+		thrown.expectMessage("User null cannot read parent Pool " + poolId + " for PoolQC " + qcId);
+
+		userAuthMisoRequestManager.getPoolQCById(qcId);
+
+		verify(backingManager).getPoolQCById(qcId);
 	}
 
 	/**
@@ -812,10 +1166,34 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getLibraryById(long)}
 	 * .
 	 */
-
 	@Test
-	public void testGetLibraryById() {
-		// TODO: Implement.
+	public void testGetLibraryById() throws IOException {
+		long inputId = 1L;
+		when(backingManager.getLibraryById(inputId)).thenReturn(library);
+		when(library.userCanRead(any(User.class))).thenReturn(true);
+
+		assertEquals(library, userAuthMisoRequestManager.getLibraryById(inputId));
+
+		verify(backingManager).getLibraryById(inputId);
+	}
+
+	/**
+	 * Test method for
+	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getLibraryById(long)}
+	 * .
+	 */
+	@Test
+	public void testGetLibraryByIdThrows() throws IOException {
+		long inputId = 1L;
+		when(backingManager.getLibraryById(inputId)).thenReturn(library);
+		when(pool.userCanRead(any(User.class))).thenReturn(false);
+
+		thrown.expect(IOException.class);
+		thrown.expectMessage("User null cannot read Library " + inputId);
+
+		userAuthMisoRequestManager.getLibraryById(inputId);
+
+		verify(backingManager).getLibraryById(inputId);
 	}
 
 	/**
@@ -823,10 +1201,35 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getLibraryByBarcode(java.lang.String)}
 	 * .
 	 */
-
 	@Test
-	public void testGetLibraryByBarcode() {
-		// TODO: Implement.
+	public void testGetLibraryByBarcode() throws IOException {
+		String barcode = "barcode";
+		when(backingManager.getLibraryByBarcode(barcode)).thenReturn(library);
+		when(library.userCanRead(any(User.class))).thenReturn(true);
+
+		assertEquals(library, userAuthMisoRequestManager.getLibraryByBarcode(barcode));
+
+		verify(backingManager).getLibraryByBarcode(barcode);
+	}
+
+	/**
+	 * Test method for
+	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getLibraryByBarcode(java.lang.String)}
+	 * .
+	 */
+	@Test
+	public void testGetLibraryByBarcodeThrows() throws IOException {
+		String barcode = "barcode";
+		when(backingManager.getLibraryByBarcode(barcode)).thenReturn(library);
+		when(library.userCanRead(any(User.class))).thenReturn(false);
+		long libraryId = 1L;
+		when(library.getId()).thenReturn(libraryId);
+		thrown.expect(IOException.class);
+		thrown.expectMessage("User null cannot read Library " + libraryId);
+
+		userAuthMisoRequestManager.getLibraryByBarcode(barcode);
+
+		verify(backingManager).getLibraryByBarcode(barcode);
 	}
 
 	/**
@@ -834,10 +1237,35 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getLibraryByAlias(java.lang.String)}
 	 * .
 	 */
-
 	@Test
-	public void testGetLibraryByAlias() {
-		// TODO: Implement.
+	public void testGetLibraryByAlias() throws IOException {
+		String alias = "alias";
+		when(backingManager.getLibraryByAlias(alias)).thenReturn(library);
+		when(library.userCanRead(any(User.class))).thenReturn(true);
+
+		assertEquals(library, userAuthMisoRequestManager.getLibraryByAlias(alias));
+
+		verify(backingManager).getLibraryByAlias(alias);
+	}
+
+	/**
+	 * Test method for
+	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getLibraryByAlias(java.lang.String)}
+	 * .
+	 */
+	@Test
+	public void testGetLibraryByAliasThrows() throws IOException {
+		String alias = "alias";
+		when(backingManager.getLibraryByAlias(alias)).thenReturn(library);
+		when(library.userCanRead(any(User.class))).thenReturn(false);
+		long libraryId = 1L;
+		when(library.getId()).thenReturn(libraryId);
+		thrown.expect(IOException.class);
+		thrown.expectMessage("User null cannot read Library " + libraryId);
+
+		userAuthMisoRequestManager.getLibraryByAlias(alias);
+
+		verify(backingManager).getLibraryByAlias(alias);
 	}
 
 	/**
@@ -845,10 +1273,35 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getDilutionByBarcode(java.lang.String)}
 	 * .
 	 */
-
 	@Test
-	public void testGetDilutionByBarcode() {
-		// TODO: Implement.
+	public void testGetDilutionByBarcode() throws IOException {
+		String barcode = "barcode";
+		when(backingManager.getDilutionByBarcode(barcode)).thenReturn(dilution);
+		when(dilution.userCanRead(any(User.class))).thenReturn(true);
+
+		assertEquals(dilution, userAuthMisoRequestManager.getDilutionByBarcode(barcode));
+
+		verify(backingManager).getDilutionByBarcode(barcode);
+	}
+
+	/**
+	 * Test method for
+	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getDilutionByBarcode(java.lang.String)}
+	 * .
+	 */
+	@Test
+	public void testGetDilutionByBarcodeThrows() throws IOException {
+		String barcode = "barcode";
+		when(backingManager.getDilutionByBarcode(barcode)).thenReturn(dilution);
+		when(dilution.userCanRead(any(User.class))).thenReturn(false);
+		long dilutionId = 1L;
+		when(dilution.getId()).thenReturn(dilutionId);
+		thrown.expect(IOException.class);
+		thrown.expectMessage("User null cannot read Dilution " + dilutionId);
+
+		userAuthMisoRequestManager.getDilutionByBarcode(barcode);
+
+		verify(backingManager).getDilutionByBarcode(barcode);
 	}
 
 	/**
@@ -858,8 +1311,37 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testGetDilutionByIdAndPlatform() {
-		// TODO: Implement.
+	public void testGetDilutionByIdAndPlatform() throws IOException {
+		long id = 1L;
+		PlatformType platformType = PlatformType.ILLUMINA;
+		when(backingManager.getDilutionByIdAndPlatform(id, platformType)).thenReturn(dilution);
+		when(dilution.userCanRead(any(User.class))).thenReturn(true);
+
+		assertEquals(dilution, userAuthMisoRequestManager.getDilutionByIdAndPlatform(id, platformType));
+
+		verify(backingManager).getDilutionByIdAndPlatform(id, platformType);
+	}
+
+	/**
+	 * Test method for
+	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getDilutionByIdAndPlatform(long, uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType)}
+	 * .
+	 */
+
+	@Test
+	public void testGetDilutionByIdAndPlatformThrows() throws IOException {
+		long dilutionId = 1L;
+		PlatformType platformType = PlatformType.ILLUMINA;
+		when(backingManager.getDilutionByIdAndPlatform(dilutionId, platformType)).thenReturn(dilution);
+		when(dilution.userCanRead(any(User.class))).thenReturn(false);
+		when(dilution.getId()).thenReturn(dilutionId);
+
+		thrown.expect(IOException.class);
+		thrown.expectMessage("User null cannot read Dilution " + dilutionId);
+
+		userAuthMisoRequestManager.getDilutionByIdAndPlatform(dilutionId, platformType);
+
+		verify(backingManager).getDilutionByIdAndPlatform(dilutionId, platformType);
 	}
 
 	/**
@@ -867,10 +1349,38 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getDilutionByBarcodeAndPlatform(java.lang.String, uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType)}
 	 * .
 	 */
-
 	@Test
-	public void testGetDilutionByBarcodeAndPlatform() {
-		// TODO: Implement.
+	public void testGetDilutionByBarcodeAndPlatform() throws IOException {
+		String barcode = "barcode";
+		PlatformType platformType = PlatformType.ILLUMINA;
+		when(backingManager.getDilutionByBarcodeAndPlatform(barcode, platformType)).thenReturn(dilution);
+		when(dilution.userCanRead(any(User.class))).thenReturn(true);
+
+		assertEquals(dilution, userAuthMisoRequestManager.getDilutionByBarcodeAndPlatform(barcode, platformType));
+
+		verify(backingManager).getDilutionByBarcodeAndPlatform(barcode, platformType);
+	}
+
+	/**
+	 * Test method for
+	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getDilutionByBarcodeAndPlatform(java.lang.String, uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType)}
+	 * .
+	 */
+	@Test
+	public void testGetDilutionByBarcodeAndPlatformThrows() throws IOException {
+		String barcode = "barcode";
+		long id = 1L;
+		PlatformType platformType = PlatformType.ILLUMINA;
+		when(backingManager.getDilutionByBarcodeAndPlatform(barcode, platformType)).thenReturn(dilution);
+		when(dilution.userCanRead(any(User.class))).thenReturn(false);
+		when(dilution.getId()).thenReturn(id);
+
+		thrown.expect(IOException.class);
+		thrown.expectMessage("User null cannot read Dilution " + id);
+
+		userAuthMisoRequestManager.getDilutionByBarcodeAndPlatform(barcode, platformType);
+
+		verify(backingManager).getDilutionByBarcodeAndPlatform(barcode, platformType);
 	}
 
 	/**
@@ -878,10 +1388,35 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getLibraryDilutionById(long)}
 	 * .
 	 */
-
 	@Test
-	public void testGetLibraryDilutionById() {
-		// TODO: Implement.
+	public void testGetLibraryDilutionById() throws IOException {
+		long dilutionId = 1L;
+		when(backingManager.getLibraryDilutionById(dilutionId)).thenReturn(libraryDilution);
+		when(libraryDilution.userCanRead(any(User.class))).thenReturn(true);
+
+		assertEquals(libraryDilution, userAuthMisoRequestManager.getLibraryDilutionById(dilutionId));
+
+		verify(backingManager).getLibraryDilutionById(dilutionId);
+	}
+
+	/**
+	 * Test method for
+	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getLibraryDilutionById(long)}
+	 * .
+	 */
+	@Test
+	public void testGetLibraryDilutionByIdThrows() throws IOException {
+		long dilutionId = 1L;
+		PlatformType platformType = PlatformType.ILLUMINA;
+		when(backingManager.getLibraryDilutionById(dilutionId)).thenReturn(libraryDilution);
+		when(libraryDilution.userCanRead(any(User.class))).thenReturn(false);
+
+		thrown.expect(IOException.class);
+		thrown.expectMessage("User null cannot read LibraryDilution " + dilutionId);
+
+		userAuthMisoRequestManager.getLibraryDilutionById(dilutionId);
+
+		verify(backingManager).getLibraryDilutionById(dilutionId);
 	}
 
 	/**
@@ -889,10 +1424,36 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getLibraryDilutionByBarcode(java.lang.String)}
 	 * .
 	 */
-
 	@Test
-	public void testGetLibraryDilutionByBarcode() {
-		// TODO: Implement.
+	public void testGetLibraryDilutionByBarcode() throws IOException {
+		String barcode = "barcode";
+		when(backingManager.getLibraryDilutionByBarcode(barcode)).thenReturn(libraryDilution);
+		when(libraryDilution.userCanRead(any(User.class))).thenReturn(true);
+
+		assertEquals(libraryDilution, userAuthMisoRequestManager.getLibraryDilutionByBarcode(barcode));
+
+		verify(backingManager).getLibraryDilutionByBarcode(barcode);
+	}
+
+	/**
+	 * Test method for
+	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getLibraryDilutionByBarcode(java.lang.String)}
+	 * .
+	 */
+	@Test
+	public void testGetLibraryDilutionByBarcodeThrows() throws IOException {
+		String barcode = "barcode";
+		when(backingManager.getLibraryDilutionByBarcode(barcode)).thenReturn(libraryDilution);
+		when(libraryDilution.userCanRead(any(User.class))).thenReturn(false);
+		long id = 1L;
+		when(libraryDilution.getId()).thenReturn(id);
+
+		thrown.expect(IOException.class);
+		thrown.expectMessage("User null cannot read LibraryDilution " + id );
+
+		userAuthMisoRequestManager.getLibraryDilutionByBarcode(barcode);
+
+		verify(backingManager).getLibraryDilutionByBarcode(barcode);
 	}
 
 	/**
@@ -900,10 +1461,38 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getLibraryDilutionByBarcodeAndPlatform(java.lang.String, uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType)}
 	 * .
 	 */
-
 	@Test
-	public void testGetLibraryDilutionByBarcodeAndPlatform() {
-		// TODO: Implement.
+	public void testGetLibraryDilutionByBarcodeAndPlatform() throws IOException {
+		String barcode = "barcode";
+		PlatformType platformType = PlatformType.ILLUMINA;
+		when(backingManager.getLibraryDilutionByBarcodeAndPlatform(barcode, platformType)).thenReturn(libraryDilution);
+		when(libraryDilution.userCanRead(any(User.class))).thenReturn(true);
+
+		assertEquals(libraryDilution, userAuthMisoRequestManager.getLibraryDilutionByBarcodeAndPlatform(barcode, platformType));
+
+		verify(backingManager).getLibraryDilutionByBarcodeAndPlatform(barcode, platformType);
+	}
+
+	/**
+	 * Test method for
+	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getLibraryDilutionByBarcodeAndPlatform(java.lang.String, uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType)}
+	 * .
+	 */
+	@Test
+	public void testGetLibraryDilutionByBarcodeAndPlatformThrows() throws IOException {
+		String barcode = "barcode";
+		long id = 1L;
+		PlatformType platformType = PlatformType.ILLUMINA;
+		when(backingManager.getLibraryDilutionByBarcodeAndPlatform(barcode, platformType)).thenReturn(libraryDilution);
+		when(libraryDilution.userCanRead(any(User.class))).thenReturn(false);
+		when(libraryDilution.getId()).thenReturn(id);
+
+		thrown.expect(IOException.class);
+		thrown.expectMessage("User null cannot read LibraryDilution " + id);
+
+		userAuthMisoRequestManager.getLibraryDilutionByBarcodeAndPlatform(barcode, platformType);
+
+		verify(backingManager).getLibraryDilutionByBarcodeAndPlatform(barcode, platformType);
 	}
 
 	/**
@@ -911,10 +1500,37 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getLibraryQCById(long)}
 	 * .
 	 */
-
 	@Test
-	public void testGetLibraryQCById() {
-		// TODO: Implement.
+	public void testGetLibraryQCById() throws IOException {
+		long id = 1L;
+		when(backingManager.getLibraryQCById(id)).thenReturn(libraryQC);
+		when(libraryQC.userCanRead(any(User.class))).thenReturn(true);
+
+		assertEquals(libraryQC, userAuthMisoRequestManager.getLibraryQCById(id));
+
+		verify(backingManager).getLibraryQCById(id);
+	}
+
+	/**
+	 * Test method for
+	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getLibraryQCById(long)}
+	 * .
+	 */
+	@Test
+	public void testGetLibraryQCByIdThrows() throws IOException {
+		long qcId = 1L;
+		long libraryId = 2;
+		PlatformType platformType = PlatformType.ILLUMINA;
+		when(backingManager.getLibraryQCById(qcId)).thenReturn(libraryQC);
+		when(libraryQC.userCanRead(any(User.class))).thenReturn(false);
+		when(libraryQC.getLibrary()).thenReturn(library);
+		when(library.getId()).thenReturn(libraryId);
+		thrown.expect(IOException.class);
+		thrown.expectMessage("User null cannot read parent Library " + libraryId + " for LibraryQC " + qcId);
+
+		userAuthMisoRequestManager.getLibraryQCById(qcId);
+
+		verify(backingManager).getLibraryQCById(qcId);
 	}
 
 	/**
@@ -922,10 +1538,34 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getEmPCRById(long)}
 	 * .
 	 */
-
 	@Test
-	public void testGetEmPCRById() {
-		// TODO: Implement.
+	public void testGetEmPCRById() throws IOException {
+		long id = 1L;
+		when(backingManager.getEmPCRById(id)).thenReturn(emPCR);
+		when(emPCR.userCanRead(any(User.class))).thenReturn(true);
+
+		assertEquals(emPCR, userAuthMisoRequestManager.getEmPCRById(id));
+
+		verify(backingManager).getEmPCRById(id);
+	}
+
+	/**
+	 * Test method for
+	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getEmPCRById(long)}
+	 * .
+	 */
+	@Test
+	public void testGetEmPCRByIdThrows() throws IOException {
+		long qcId = 1L;
+		when(backingManager.getEmPCRById(qcId)).thenReturn(emPCR);
+		when(emPCR.userCanRead(any(User.class))).thenReturn(false);
+
+		thrown.expect(IOException.class);
+		thrown.expectMessage("User null cannot read emPCR " + qcId);
+
+		userAuthMisoRequestManager.getEmPCRById(qcId);
+
+		verify(backingManager).getEmPCRById(qcId);
 	}
 
 	/**
@@ -933,10 +1573,34 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getEmPCRDilutionById(long)}
 	 * .
 	 */
-
 	@Test
-	public void testGetEmPCRDilutionById() {
-		// TODO: Implement.
+	public void testGetEmPCRDilutionById() throws IOException {
+		long id = 1L;
+		when(backingManager.getEmPCRDilutionById(id)).thenReturn(emPCRDilution);
+		when(emPCRDilution.userCanRead(any(User.class))).thenReturn(true);
+
+		assertEquals(emPCRDilution, userAuthMisoRequestManager.getEmPCRDilutionById(id));
+
+		verify(backingManager).getEmPCRDilutionById(id);
+	}
+
+	/**
+	 * Test method for
+	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getEmPCRDilutionById(long)}
+	 * .
+	 */
+	@Test
+	public void testGetEmPCRDilutionByIdThrows() throws IOException {
+		long qcId = 1L;
+		when(backingManager.getEmPCRDilutionById(qcId)).thenReturn(emPCRDilution);
+		when(emPCRDilution.userCanRead(any(User.class))).thenReturn(false);
+
+		thrown.expect(IOException.class);
+		thrown.expectMessage("User null cannot read emPCRDilution " + qcId);
+
+		userAuthMisoRequestManager.getEmPCRDilutionById(qcId);
+
+		verify(backingManager).getEmPCRDilutionById(qcId);
 	}
 
 	/**
@@ -944,10 +1608,36 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getEmPCRDilutionByBarcode(java.lang.String)}
 	 * .
 	 */
-
 	@Test
-	public void testGetEmPCRDilutionByBarcode() {
-		// TODO: Implement.
+	public void testGetEmPCRDilutionByBarcode() throws IOException {
+		String barcode = "barcode";
+		when(backingManager.getEmPCRDilutionByBarcode(barcode)).thenReturn(emPCRDilution);
+		when(emPCRDilution.userCanRead(any(User.class))).thenReturn(true);
+
+		assertEquals(emPCRDilution, userAuthMisoRequestManager.getEmPCRDilutionByBarcode(barcode));
+
+		verify(backingManager).getEmPCRDilutionByBarcode(barcode);
+	}
+
+	/**
+	 * Test method for
+	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getEmPCRDilutionByBarcode(java.lang.String)}
+	 * .
+	 */
+	@Test
+	public void testGetEmPCRDilutionByBarcodeThrows() throws IOException {
+		String barcode = "barcode";
+		when(backingManager.getEmPCRDilutionByBarcode(barcode)).thenReturn(emPCRDilution);
+		when(emPCRDilution.userCanRead(any(User.class))).thenReturn(false);
+		long id = 1L;
+		when(emPCRDilution.getId()).thenReturn(id);
+
+		thrown.expect(IOException.class);
+		thrown.expectMessage("User null cannot read emPCRDilution " + id);
+
+		userAuthMisoRequestManager.getEmPCRDilutionByBarcode(barcode);
+
+		verify(backingManager).getEmPCRDilutionByBarcode(barcode);
 	}
 
 	/**
@@ -955,10 +1645,38 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getEmPCRDilutionByBarcodeAndPlatform(java.lang.String, uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType)}
 	 * .
 	 */
-
 	@Test
-	public void testGetEmPCRDilutionByBarcodeAndPlatform() {
-		// TODO: Implement.
+	public void testGetEmPCRDilutionByBarcodeAndPlatform() throws IOException {
+		String barcode = "barcode";
+		PlatformType platformType = PlatformType.ILLUMINA;
+		when(backingManager.getEmPCRDilutionByBarcodeAndPlatform(barcode, platformType)).thenReturn(emPCRDilution);
+		when(emPCRDilution.userCanRead(any(User.class))).thenReturn(true);
+
+		assertEquals(emPCRDilution, userAuthMisoRequestManager.getEmPCRDilutionByBarcodeAndPlatform(barcode, platformType));
+
+		verify(backingManager).getEmPCRDilutionByBarcodeAndPlatform(barcode, platformType);
+	}
+
+	/**
+	 * Test method for
+	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getEmPCRDilutionByBarcodeAndPlatform(java.lang.String, uk.ac.bbsrc.tgac.miso.core.data.type.PlatformType)}
+	 * .
+	 */
+	@Test
+	public void testGetEmPCRDilutionByBarcodeAndPlatformThrows() throws IOException {
+		String barcode = "barcode";
+		long id = 1L;
+		PlatformType platformType = PlatformType.ILLUMINA;
+		when(backingManager.getEmPCRDilutionByBarcodeAndPlatform(barcode, platformType)).thenReturn(emPCRDilution);
+		when(emPCRDilution.userCanRead(any(User.class))).thenReturn(false);
+		when(emPCRDilution.getId()).thenReturn(id);
+
+		thrown.expect(IOException.class);
+		thrown.expectMessage("User null cannot read emPCRDilution " + id);
+
+		userAuthMisoRequestManager.getEmPCRDilutionByBarcodeAndPlatform(barcode, platformType);
+
+		verify(backingManager).getEmPCRDilutionByBarcodeAndPlatform(barcode, platformType);
 	}
 
 	/**
@@ -966,10 +1684,34 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getSequencerPartitionContainerById(long)}
 	 * .
 	 */
-
 	@Test
-	public void testGetSequencerPartitionContainerById() {
-		// TODO: Implement.
+	public void testGetSequencerPartitionContainerById() throws IOException {
+		long id = 1L;
+		when(backingManager.getSequencerPartitionContainerById(id)).thenReturn(sequencerPartitionContainer);
+		when(sequencerPartitionContainer.userCanRead(any(User.class))).thenReturn(true);
+
+		assertEquals(sequencerPartitionContainer, userAuthMisoRequestManager.getSequencerPartitionContainerById(id));
+
+		verify(backingManager).getSequencerPartitionContainerById(id);
+	}
+
+	/**
+	 * Test method for
+	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getSequencerPartitionContainerById(long)}
+	 * .
+	 */
+	@Test
+	public void testGetSequencerPartitionContainerByIdThrows() throws IOException {
+		long id = 1L;
+		when(backingManager.getSequencerPartitionContainerById(id)).thenReturn(sequencerPartitionContainer);
+		when(sequencerPartitionContainer.userCanRead(any(User.class))).thenReturn(false);
+
+		thrown.expect(IOException.class);
+		thrown.expectMessage("User null cannot read SequencerPartitionContainer " + id);
+
+		userAuthMisoRequestManager.getSequencerPartitionContainerById(id);
+
+		verify(backingManager).getSequencerPartitionContainerById(id);
 	}
 
 	/**
@@ -977,10 +1719,75 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getNoteById(long)}
 	 * .
 	 */
-
 	@Test
-	public void testGetNoteById() {
-		// TODO: Implement.
+	public void testGetNoteById() throws IOException {
+		long id = 1L;
+		when(backingManager.getNoteById(id)).thenReturn(note);
+		when(note.getOwner()).thenReturn(user);
+
+		assertEquals(note, userAuthMisoRequestManager.getNoteById(id));
+
+		verify(backingManager).getNoteById(id);
+	}
+
+	/**
+	 * Test method for
+	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getNoteById(long)}
+	 * .
+	 */
+	@Test
+	public void testGetNoteById_AdminUser() throws IOException {
+		long id = 1L;
+		User anotherUser = mock(User.class);
+		when(note.getOwner()).thenReturn(anotherUser);
+		when(user.isAdmin()).thenReturn(true);
+		when(backingManager.getNoteById(id)).thenReturn(note);
+
+		assertEquals(note, userAuthMisoRequestManager.getNoteById(id));
+
+		verify(backingManager).getNoteById(id);
+	}
+
+	/**
+	 * Test method for
+	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getNoteById(long)}
+	 * .
+	 */
+	@Test
+	public void testGetNoteById_InternalUser() throws IOException {
+		long id = 1L;
+		User anotherUser = mock(User.class);
+		when(note.getOwner()).thenReturn(anotherUser);
+		when(note.isInternalOnly()).thenReturn(true);
+		when(user.isInternal()).thenReturn(true);
+		when(backingManager.getNoteById(id)).thenReturn(note);
+
+		assertEquals(note, userAuthMisoRequestManager.getNoteById(id));
+
+		verify(backingManager).getNoteById(id);
+	}
+
+	/**
+	 * Test method for
+	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getNoteById(long)}
+	 * .
+	 */
+	@Test
+	public void testGetNoteById_DifferentUser() throws IOException {
+		long id = 1L;
+		User anotherUser = mock(User.class);
+		when(note.getOwner()).thenReturn(anotherUser);
+		when(note.isInternalOnly()).thenReturn(false);
+		when(note.getNoteId()).thenReturn(id);
+		when(user.isInternal()).thenReturn(true);
+		when(backingManager.getNoteById(id)).thenReturn(note);
+
+		thrown.expect(IOException.class);
+		thrown.expectMessage("User null cannot read Note " + id);
+
+		userAuthMisoRequestManager.getNoteById(id);
+
+		verify(backingManager).getNoteById(id);
 	}
 
 	/**
@@ -988,10 +1795,51 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getProjectById(long)}
 	 * .
 	 */
-
 	@Test
-	public void testGetProjectById() {
-		// TODO: Implement.
+	public void testGetProjectById() throws IOException {
+		long id = 1L;
+		when(backingManager.getProjectById(id)).thenReturn(project);
+		when(project.userCanRead(any(User.class))).thenReturn(true);
+
+		assertEquals(project, userAuthMisoRequestManager.getProjectById(id));
+
+		verify(backingManager).getProjectById(id);
+	}
+
+	/**
+	 * Test method for
+	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getProjectById(long)}
+	 * .
+	 */
+	@Test
+	public void testGetProjectByIdThrows() throws IOException {
+		long id = 1L;
+		when(backingManager.getProjectById(id)).thenReturn(project);
+		when(project.userCanRead(any(User.class))).thenReturn(false);
+
+		thrown.expect(IOException.class);
+		thrown.expectMessage("User null cannot read Project " + id);
+
+		userAuthMisoRequestManager.getProjectById(id);
+
+		verify(backingManager).getProjectById(id);
+	}
+
+
+	/**
+	 * Test method for
+	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getProjectByAlias(java.lang.String)}
+	 * .
+	 */
+	@Test
+	public void testGetProjectByAlias() throws IOException {
+		String alias = "alias";
+		when(backingManager.getProjectByAlias(alias)).thenReturn(project);
+		when(project.userCanRead(any(User.class))).thenReturn(true);
+
+		assertEquals(project, userAuthMisoRequestManager.getProjectByAlias(alias));
+
+		verify(backingManager).getProjectByAlias(alias);
 	}
 
 	/**
@@ -999,10 +1847,18 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getProjectByAlias(java.lang.String)}
 	 * .
 	 */
-
 	@Test
-	public void testGetProjectByAlias() {
-		// TODO: Implement.
+	public void testGetProjectByAliasThrows() throws IOException {
+		String alias = "alias";
+		when(backingManager.getProjectByAlias(alias)).thenReturn(project);
+		when(project.userCanRead(any(User.class))).thenReturn(false);
+
+		thrown.expect(IOException.class);
+		thrown.expectMessage("User null cannot read Project " + alias);
+
+		userAuthMisoRequestManager.getProjectByAlias(alias);
+
+		verify(backingManager).getProjectByAlias(alias);
 	}
 
 	/**
@@ -1010,10 +1866,38 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getProjectOverviewById(long)}
 	 * .
 	 */
-
 	@Test
-	public void testGetProjectOverviewById() {
-		// TODO: Implement.
+	public void testGetProjectOverviewById() throws IOException {
+		long id = 1L;
+		when(backingManager.getProjectOverviewById(id)).thenReturn(projectOverview);
+		when(projectOverview.getProject()).thenReturn(project);
+		when(project.userCanRead(any(User.class))).thenReturn(true);
+
+		assertEquals(projectOverview, userAuthMisoRequestManager.getProjectOverviewById(id));
+
+		verify(backingManager).getProjectOverviewById(id);
+	}
+
+	/**
+	 * Test method for
+	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getProjectOverviewById(long)}
+	 * .
+	 */
+	@Test
+	public void testGetProjectOverviewByIdThrows() throws IOException {
+		long projectOverviewId = 1L;
+		long projectId = 2L;
+		when(backingManager.getProjectOverviewById(projectOverviewId)).thenReturn(projectOverview);
+		when(projectOverview.getProject()).thenReturn(project);
+		when(project.userCanRead(any(User.class))).thenReturn(false);
+		when(project.getProjectId()).thenReturn(projectId);
+
+		thrown.expect(IOException.class);
+		thrown.expectMessage("User null cannot read parent Project " + projectId + " for ProjectOverview " + projectOverviewId);
+
+		userAuthMisoRequestManager.getProjectOverviewById(projectOverviewId);
+
+		verify(backingManager).getProjectOverviewById(projectOverviewId);
 	}
 
 	/**
@@ -1021,10 +1905,34 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getRunById(long)}
 	 * .
 	 */
-
 	@Test
-	public void testGetRunById() {
-		// TODO: Implement.
+	public void testGetRunById() throws IOException {
+		long id = 1L;
+		when(backingManager.getRunById(id)).thenReturn(run);
+		when(run.userCanRead(any(User.class))).thenReturn(true);
+
+		assertEquals(run, userAuthMisoRequestManager.getRunById(id));
+
+		verify(backingManager).getRunById(id);
+	}
+
+	/**
+	 * Test method for
+	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getRunById(long)}
+	 * .
+	 */
+	@Test
+	public void testGetRunByIdThrows() throws IOException {
+		long id = 1L;
+		when(backingManager.getRunById(id)).thenReturn(run);
+		when(run.userCanRead(any(User.class))).thenReturn(false);
+
+		thrown.expect(IOException.class);
+		thrown.expectMessage("User null cannot read Run " + id);
+
+		userAuthMisoRequestManager.getRunById(id);
+
+		verify(backingManager).getRunById(id);
 	}
 
 	/**
@@ -1032,10 +1940,34 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getRunByAlias(java.lang.String)}
 	 * .
 	 */
-
 	@Test
-	public void testGetRunByAlias() {
-		// TODO: Implement.
+	public void testGetRunByAlias() throws IOException {
+		String alias = "alias";
+		when(backingManager.getRunByAlias(alias)).thenReturn(run);
+		when(run.userCanRead(any(User.class))).thenReturn(true);
+
+		assertEquals(run, userAuthMisoRequestManager.getRunByAlias(alias));
+
+		verify(backingManager).getRunByAlias(alias);
+	}
+
+	/**
+	 * Test method for
+	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getRunByAlias(java.lang.String)}
+	 * .
+	 */
+	@Test
+	public void testGetRunByAliasThrows() throws IOException {
+		String alias = "alias";
+		when(backingManager.getRunByAlias(alias)).thenReturn(run);
+		when(run.userCanRead(any(User.class))).thenReturn(false);
+
+		thrown.expect(IOException.class);
+		thrown.expectMessage("User null cannot read Run ");
+
+		userAuthMisoRequestManager.getRunByAlias(alias);
+
+		verify(backingManager).getProjectByAlias(alias);
 	}
 
 	/**
@@ -1043,10 +1975,37 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getRunQCById(long)}
 	 * .
 	 */
-
 	@Test
-	public void testGetRunQCById() {
-		// TODO: Implement.
+	public void testGetRunQCById() throws IOException {
+		long id = 1L;
+		when(backingManager.getRunQCById(id)).thenReturn(runQC);
+		when(runQC.userCanRead(any(User.class))).thenReturn(true);
+
+		assertEquals(runQC, userAuthMisoRequestManager.getRunQCById(id));
+
+		verify(backingManager).getRunQCById(id);
+	}
+
+	/**
+	 * Test method for
+	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getRunQCById(long)}
+	 * .
+	 */
+	@Test
+	public void testGetRunQCByIdThrows() throws IOException {
+		long id = 1L;
+		long runId = 2L;
+		when(backingManager.getRunQCById(id)).thenReturn(runQC);
+		when(runQC.getRun()).thenReturn(run);
+		when(run.userCanRead(any(User.class))).thenReturn(false);
+		when(run.getId()).thenReturn(runId);
+
+		thrown.expect(IOException.class);
+		thrown.expectMessage("User null cannot read parent Run " + runId +  " for RunQC " + id);
+
+		userAuthMisoRequestManager.getRunQCById(id);
+
+		verify(backingManager).getRunQCById(id);
 	}
 
 	/**
@@ -1054,10 +2013,34 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getSampleById(long)}
 	 * .
 	 */
-
 	@Test
-	public void testGetSampleById() {
-		// TODO: Implement.
+	public void testGetSampleById() throws IOException {
+		long id = 1L;
+		when(backingManager.getSampleById(id)).thenReturn(sample);
+		when(sample.userCanRead(any(User.class))).thenReturn(true);
+
+		assertEquals(sample, userAuthMisoRequestManager.getSampleById(id));
+
+		verify(backingManager).getSampleById(id);
+	}
+
+	/**
+	 * Test method for
+	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getSampleById(long)}
+	 * .
+	 */
+	@Test
+	public void testGetSampleByIdThrows() throws IOException {
+		long id = 1L;
+		when(backingManager.getSampleById(id)).thenReturn(sample);
+		when(sample.userCanRead(any(User.class))).thenReturn(false);
+
+		thrown.expect(IOException.class);
+		thrown.expectMessage("User null cannot read Sample " + id);
+
+		userAuthMisoRequestManager.getSampleById(id);
+
+		verify(backingManager).getSampleById(id);
 	}
 
 	/**
@@ -1065,10 +2048,34 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getSampleByBarcode(java.lang.String)}
 	 * .
 	 */
-
 	@Test
-	public void testGetSampleByBarcode() {
-		// TODO: Implement.
+	public void testGetSampleByBarcode() throws IOException {
+		String barcode = "barcode";
+		when(backingManager.getSampleByBarcode(barcode)).thenReturn(sample);
+		when(sample.userCanRead(any(User.class))).thenReturn(true);
+
+		assertEquals(sample, userAuthMisoRequestManager.getSampleByBarcode(barcode));
+
+		verify(backingManager).getSampleByBarcode(barcode);
+	}
+
+	/**
+	 * Test method for
+	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getSampleByBarcode(java.lang.String)}
+	 * .
+	 */
+	@Test
+	public void testGetSampleByBarcodeThrows() throws IOException {
+		String barcode = "barcode";
+		when(backingManager.getSampleByBarcode(barcode)).thenReturn(sample);
+		when(sample.userCanRead(any(User.class))).thenReturn(false);
+
+		thrown.expect(IOException.class);
+		thrown.expectMessage("User null cannot read Sample ");
+
+		userAuthMisoRequestManager.getSampleByBarcode(barcode);
+
+		verify(backingManager).getSampleByBarcode(barcode);
 	}
 
 	/**
@@ -1076,10 +2083,38 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getSampleQCById(long)}
 	 * .
 	 */
-
 	@Test
-	public void testGetSampleQCById() {
-		// TODO: Implement.
+	public void testGetSampleQCById() throws IOException {
+		long id = 1L;
+		when(backingManager.getSampleQCById(id)).thenReturn(sampleQC);
+		when(sampleQC.getSample()).thenReturn(sample);
+		when(sample.userCanRead(any(User.class))).thenReturn(true);
+
+		assertEquals(sampleQC, userAuthMisoRequestManager.getSampleQCById(id));
+
+		verify(backingManager).getSampleQCById(id);
+	}
+
+	/**
+	 * Test method for
+	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getSampleQCById(long)}
+	 * .
+	 */
+	@Test
+	public void testGetSampleQCByIdThrows() throws IOException {
+		long id = 1L, sampleId = 2L;
+
+		when(backingManager.getSampleQCById(id)).thenReturn(sampleQC);
+		when(sampleQC.getSample()).thenReturn(sample);
+		when(sample.userCanRead(any(User.class))).thenReturn(false);
+		when(sample.getId()).thenReturn(sampleId);
+
+		thrown.expect(IOException.class);
+		thrown.expectMessage("User null cannot read parent Sample " + sampleId + " for SampleQC " + id);
+
+		userAuthMisoRequestManager.getSampleQCById(id);
+
+		verify(backingManager).getSampleQCById(id);
 	}
 
 	/**
@@ -1087,10 +2122,36 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getStatusByRunName(java.lang.String)}
 	 * .
 	 */
-
 	@Test
-	public void testGetStatusByRunName() {
-		// TODO: Implement.
+	public void testGetStatusByRunName() throws IOException {
+		String runName = "runName";
+		when(backingManager.getRunByAlias(runName)).thenReturn(run);
+		when(run.userCanRead(any(User.class))).thenReturn(true);
+		when(backingManager.getStatusByRunName(runName)).thenReturn(status);
+
+		assertEquals(status, userAuthMisoRequestManager.getStatusByRunName(runName));
+
+		verify(backingManager).getStatusByRunName(runName);
+	}
+
+	/**
+	 * Test method for
+	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getStatusByRunName(java.lang.String)}
+	 * .
+	 */
+	@Test
+	public void testGetStatusByRunNameThrows() throws IOException {
+		String runName = "runName";
+		when(backingManager.getRunByAlias(runName)).thenReturn(run);
+		when(run.userCanRead(any(User.class))).thenReturn(false);
+		when(backingManager.getStatusByRunName(runName)).thenReturn(status);
+
+		thrown.expect(IOException.class);
+		thrown.expectMessage("User null cannot read parent Run 0 for Status");
+
+		userAuthMisoRequestManager.getStatusByRunName(runName);
+
+		verify(backingManager).getStatusByRunName(runName);
 	}
 
 	/**
@@ -1098,10 +2159,34 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getStudyById(long)}
 	 * .
 	 */
-
 	@Test
-	public void testGetStudyById() {
-		// TODO: Implement.
+	public void testGetStudyById() throws IOException {
+		long id = 1L;
+		when(backingManager.getStudyById(id)).thenReturn(study);
+		when(study.userCanRead(any(User.class))).thenReturn(true);
+
+		assertEquals(study, userAuthMisoRequestManager.getStudyById(id));
+
+		verify(backingManager).getStudyById(id);
+	}
+
+	/**
+	 * Test method for
+	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getStudyById(long)}
+	 * .
+	 */
+	@Test
+	public void testGetStudyByIdThrows() throws IOException {
+		long id = 1L;
+		when(backingManager.getStudyById(id)).thenReturn(study);
+		when(study.userCanRead(any(User.class))).thenReturn(false);
+
+		thrown.expect(IOException.class);
+		thrown.expectMessage("User null cannot read Study " + id);
+
+		userAuthMisoRequestManager.getStudyById(id);
+
+		verify(backingManager).getStudyById(id);
 	}
 
 	/**
@@ -1109,10 +2194,35 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getSubmissionById(long)}
 	 * .
 	 */
-
 	@Test
-	public void testGetSubmissionById() {
-		// TODO: Implement.
+	public void testGetSubmissionById() throws IOException {
+		long id = 1L;
+		when(backingManager.getSubmissionById(id)).thenReturn(submission);
+		when(submission.userCanRead(any(User.class))).thenReturn(true);
+
+		assertEquals(submission, userAuthMisoRequestManager.getSubmissionById(id));
+
+		verify(backingManager).getSubmissionById(id);
+	}
+
+	/**
+	 * Test method for
+	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getSubmissionById(long)}
+	 * .
+	 */
+	@Test
+	public void testGetSubmissionByIdThrows() throws IOException {
+		long id = 1L;
+
+		when(backingManager.getSubmissionById(id)).thenReturn(submission);
+		when(sample.userCanRead(any(User.class))).thenReturn(false);
+
+		thrown.expect(IOException.class);
+		thrown.expectMessage("User null cannot read Submission " + id);
+
+		userAuthMisoRequestManager.getSubmissionById(id);
+
+		verify(backingManager).getSubmissionById(id);
 	}
 
 	/**
@@ -1120,10 +2230,36 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getPlateById(long)}
 	 * .
 	 */
-
 	@Test
-	public void testGetPlateById() {
-		// TODO: Implement.
+	public void testGetPlateById() throws IOException {
+		long id = 1L;
+
+		when(backingManager.getPlateById(id)).thenReturn(plate);
+		when(plate.userCanRead(any(User.class))).thenReturn(true);
+
+		assertEquals(plate, userAuthMisoRequestManager.getPlateById(id));
+
+		verify(backingManager).getPlateById(id);
+	}
+
+	/**
+	 * Test method for
+	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getPlateById(long)}
+	 * .
+	 */
+	@Test
+	public void testGetPlateByIdThrows() throws IOException {
+		long id = 1L;
+
+		when(backingManager.getPlateById(id)).thenReturn(plate);
+		when(plate.userCanRead(any(User.class))).thenReturn(false);
+
+		thrown.expect(IOException.class);
+		thrown.expectMessage("User null cannot read Plate " + id);
+
+		userAuthMisoRequestManager.getPlateById(id);
+
+		verify(backingManager).getPlateById(id);
 	}
 
 	/**
@@ -1131,10 +2267,34 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getPlateByBarcode(java.lang.String)}
 	 * .
 	 */
-
 	@Test
-	public void testGetPlateByBarcode() {
-		// TODO: Implement.
+	public void testGetPlateByBarcode() throws IOException {
+		String barcode = "barcode";
+		when(backingManager.getPlateByBarcode(barcode)).thenReturn(plate);
+		when(plate.userCanRead(any(User.class))).thenReturn(true);
+
+		assertEquals(plate, userAuthMisoRequestManager.getPlateByBarcode(barcode));
+
+		verify(backingManager).getPlateByBarcode(barcode);
+	}
+
+	/**
+	 * Test method for
+	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getPlateByBarcode(java.lang.String)}
+	 * .
+	 */
+	@Test
+	public void testGetPlateByBarcodeThrows() throws IOException {
+		String barcode = "barcode";
+		when(backingManager.getPlateByBarcode(barcode)).thenReturn(plate);
+		when(plate.userCanRead(any(User.class))).thenReturn(false);
+
+		thrown.expect(IOException.class);
+		thrown.expectMessage("User null cannot read Plate ");
+
+		userAuthMisoRequestManager.getPlateByBarcode(barcode);
+
+		verify(backingManager).getPlateByBarcode(barcode);
 	}
 
 	/**
@@ -1142,10 +2302,15 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#getEntityGroupById(long)}
 	 * .
 	 */
-
 	@Test
-	public void testGetEntityGroupById() {
-		// TODO: Implement.
+	public void testGetEntityGroupById() throws IOException {
+		long id = 1L;
+
+		when(backingManager.getEntityGroupById(id)).thenReturn(entityGroup);
+
+		assertEquals(entityGroup, userAuthMisoRequestManager.getEntityGroupById(id));
+
+		verify(backingManager).getEntityGroupById(id);
 	}
 
 	/**
@@ -1153,10 +2318,43 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#listAllProjects()}
 	 * .
 	 */
-
 	@Test
-	public void testListAllProjects() {
-		// TODO: Implement.
+	public void testListAllProjects() throws IOException {
+		Set projects = new HashSet();
+		projects.add(project1);
+		projects.add(project2);
+		projects.add(project3);
+		when(backingManager.listAllProjects()).thenReturn(projects);
+		when(project1.userCanRead(any(User.class))).thenReturn(true);
+		when(project2.userCanRead(any(User.class))).thenReturn(true);
+		when(project3.userCanRead(any(User.class))).thenReturn(true);
+
+		assertEquals(projects, userAuthMisoRequestManager.listAllProjects());
+		verify(backingManager).listAllProjects();
+	}
+
+	/**
+	 * Test method for
+	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#listAllProjects()}
+	 * .
+	 */
+	@Test
+	public void testListAllProjectsOneUnreadable() throws IOException {
+		Set projects = new HashSet();
+		projects.add(project1);
+		projects.add(project2);
+		projects.add(project3);
+		when(backingManager.listAllProjects()).thenReturn(projects);
+		when(project1.userCanRead(any(User.class))).thenReturn(true);
+		when(project2.userCanRead(any(User.class))).thenReturn(false);
+		when(project3.userCanRead(any(User.class))).thenReturn(true);
+
+		Set filtered = new HashSet();
+		filtered.add(project1);
+		filtered.add(project3);
+
+		assertEquals(filtered, userAuthMisoRequestManager.listAllProjects());
+		verify(backingManager).listAllProjects();
 	}
 
 	/**
@@ -1164,9 +2362,8 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#listAllProjectsWithLimit(long)}
 	 * .
 	 */
-
 	@Test
-	public void testListAllProjectsWithLimit() {
+	public void testListAllProjectsWithLimit() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1175,9 +2372,8 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 * {@link uk.ac.bbsrc.tgac.miso.core.manager.UserAuthMisoRequestManager#listAllProjectsBySearch(java.lang.String)}
 	 * .
 	 */
-
 	@Test
-	public void testListAllProjectsBySearch() {
+	public void testListAllProjectsBySearch() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1188,7 +2384,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllOverviewsByProjectId() {
+	public void testListAllOverviewsByProjectId() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1199,7 +2395,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllRuns() {
+	public void testListAllRuns() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1210,7 +2406,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllRunsWithLimit() {
+	public void testListAllRunsWithLimit() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1221,7 +2417,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllRunsBySearch() {
+	public void testListAllRunsBySearch() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1232,7 +2428,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllRunsByProjectId() {
+	public void testListAllRunsByProjectId() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1243,7 +2439,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListRunsByPoolId() {
+	public void testListRunsByPoolId() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1254,7 +2450,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListRunsBySequencerPartitionContainerId() {
+	public void testListRunsBySequencerPartitionContainerId() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1265,7 +2461,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllLS454Runs() {
+	public void testListAllLS454Runs() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1276,7 +2472,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllIlluminaRuns() {
+	public void testListAllIlluminaRuns() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1287,7 +2483,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllSolidRuns() {
+	public void testListAllSolidRuns() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1298,7 +2494,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllRunQCsByRunId() {
+	public void testListAllRunQCsByRunId() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1309,7 +2505,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListSequencerPartitionContainersByRunId() {
+	public void testListSequencerPartitionContainersByRunId() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1320,7 +2516,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListSequencerPartitionContainersByBarcode() {
+	public void testListSequencerPartitionContainersByBarcode() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1331,7 +2527,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllSamples() {
+	public void testListAllSamples() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1342,7 +2538,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllSamplesWithLimit() {
+	public void testListAllSamplesWithLimit() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1353,7 +2549,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllSamplesByReceivedDate() {
+	public void testListAllSamplesByReceivedDate() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1364,7 +2560,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllSamplesBySearch() {
+	public void testListAllSamplesBySearch() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1375,7 +2571,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllSamplesByProjectId() {
+	public void testListAllSamplesByProjectId() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1386,7 +2582,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllSamplesByExperimentId() {
+	public void testListAllSamplesByExperimentId() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1397,7 +2593,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListSamplesByAlias() {
+	public void testListSamplesByAlias() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1408,7 +2604,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllSampleQCsBySampleId() {
+	public void testListAllSampleQCsBySampleId() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1419,7 +2615,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllLibraries() {
+	public void testListAllLibraries() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1430,7 +2626,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllLibrariesWithLimit() {
+	public void testListAllLibrariesWithLimit() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1441,7 +2637,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllLibrariesBySearch() {
+	public void testListAllLibrariesBySearch() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1452,7 +2648,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllLibrariesByProjectId() {
+	public void testListAllLibrariesByProjectId() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1463,7 +2659,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllLibrariesBySampleId() {
+	public void testListAllLibrariesBySampleId() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1474,7 +2670,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllLibraryQCsByLibraryId() {
+	public void testListAllLibraryQCsByLibraryId() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1485,7 +2681,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListDilutionsBySearch() {
+	public void testListDilutionsBySearch() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1496,7 +2692,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllDilutionsByProjectAndPlatform() {
+	public void testListAllDilutionsByProjectAndPlatform() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1507,7 +2703,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllLibraryDilutions() {
+	public void testListAllLibraryDilutions() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1518,7 +2714,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllLibraryDilutionsWithLimit() {
+	public void testListAllLibraryDilutionsWithLimit() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1529,7 +2725,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllLibraryDilutionsByLibraryId() {
+	public void testListAllLibraryDilutionsByLibraryId() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1540,7 +2736,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllLibraryDilutionsByPlatform() {
+	public void testListAllLibraryDilutionsByPlatform() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1551,7 +2747,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllLibraryDilutionsByProjectId() {
+	public void testListAllLibraryDilutionsByProjectId() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1562,7 +2758,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllLibraryDilutionsBySearch() {
+	public void testListAllLibraryDilutionsBySearch() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1573,7 +2769,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllLibraryDilutionsBySearchOnly() {
+	public void testListAllLibraryDilutionsBySearchOnly() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1584,7 +2780,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllLibraryDilutionsByProjectAndPlatform() {
+	public void testListAllLibraryDilutionsByProjectAndPlatform() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1595,7 +2791,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllEmPCRDilutions() {
+	public void testListAllEmPCRDilutions() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1606,7 +2802,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllEmPCRDilutionsByEmPcrId() {
+	public void testListAllEmPCRDilutionsByEmPcrId() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1617,7 +2813,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllEmPCRDilutionsByPlatform() {
+	public void testListAllEmPCRDilutionsByPlatform() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1628,7 +2824,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllEmPCRDilutionsByProjectId() {
+	public void testListAllEmPCRDilutionsByProjectId() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1639,7 +2835,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllEmPCRDilutionsBySearch() {
+	public void testListAllEmPCRDilutionsBySearch() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1650,7 +2846,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllEmPCRDilutionsByProjectAndPlatform() {
+	public void testListAllEmPCRDilutionsByProjectAndPlatform() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1661,7 +2857,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllEmPCRDilutionsByPoolAndPlatform() {
+	public void testListAllEmPCRDilutionsByPoolAndPlatform() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1672,7 +2868,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllEmPCRs() {
+	public void testListAllEmPCRs() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1683,7 +2879,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllEmPCRsByDilutionId() {
+	public void testListAllEmPCRsByDilutionId() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1694,7 +2890,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllPools() {
+	public void testListAllPools() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1705,7 +2901,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllPoolsByPlatform() {
+	public void testListAllPoolsByPlatform() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1716,7 +2912,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllPoolsByPlatformAndSearch() {
+	public void testListAllPoolsByPlatformAndSearch() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1727,7 +2923,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListReadyPoolsByPlatform() {
+	public void testListReadyPoolsByPlatform() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1738,7 +2934,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListReadyPoolsByPlatformAndSearch() {
+	public void testListReadyPoolsByPlatformAndSearch() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1749,7 +2945,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListPoolsByLibraryId() {
+	public void testListPoolsByLibraryId() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1760,7 +2956,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListPoolsBySampleId() {
+	public void testListPoolsBySampleId() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1771,7 +2967,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllPoolQCsByPoolId() {
+	public void testListAllPoolQCsByPoolId() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1782,7 +2978,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllExperiments() {
+	public void testListAllExperiments() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1793,7 +2989,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllExperimentsWithLimit() {
+	public void testListAllExperimentsWithLimit() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1804,7 +3000,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllExperimentsBySearch() {
+	public void testListAllExperimentsBySearch() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1815,7 +3011,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllExperimentsByStudyId() {
+	public void testListAllExperimentsByStudyId() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1826,7 +3022,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllStudies() {
+	public void testListAllStudies() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1837,7 +3033,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllStudiesWithLimit() {
+	public void testListAllStudiesWithLimit() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1848,7 +3044,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllStudiesBySearch() {
+	public void testListAllStudiesBySearch() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1859,7 +3055,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllStudiesByProjectId() {
+	public void testListAllStudiesByProjectId() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1870,7 +3066,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllStudiesByLibraryId() {
+	public void testListAllStudiesByLibraryId() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1881,7 +3077,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllSequencerPoolPartitions() {
+	public void testListAllSequencerPoolPartitions() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1892,7 +3088,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListPartitionsBySequencerPartitionContainerId() {
+	public void testListPartitionsBySequencerPartitionContainerId() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1903,7 +3099,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllSequencerPartitionContainers() {
+	public void testListAllSequencerPartitionContainers() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1914,7 +3110,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllSubmissions() {
+	public void testListAllSubmissions() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1925,7 +3121,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListRunsByExperimentId() {
+	public void testListRunsByExperimentId() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1936,7 +3132,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllPlates() {
+	public void testListAllPlates() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1947,7 +3143,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllPlatesByProjectId() {
+	public void testListAllPlatesByProjectId() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1958,7 +3154,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllPlatesBySearch() {
+	public void testListAllPlatesBySearch() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1969,7 +3165,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testDeleteProject() {
+	public void testDeleteProject() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1980,7 +3176,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testDeleteStudy() {
+	public void testDeleteStudy() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -1991,7 +3187,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testDeleteExperiment() {
+	public void testDeleteExperiment() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2002,7 +3198,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testDeleteSample() {
+	public void testDeleteSample() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2013,7 +3209,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testDeleteLibrary() {
+	public void testDeleteLibrary() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2024,7 +3220,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testDeleteEmPCR() {
+	public void testDeleteEmPCR() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2035,7 +3231,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testDeleteRun() {
+	public void testDeleteRun() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2046,7 +3242,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testDeleteRunQC() {
+	public void testDeleteRunQC() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2057,7 +3253,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testDeleteSampleQC() {
+	public void testDeleteSampleQC() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2068,7 +3264,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testDeleteLibraryQC() {
+	public void testDeleteLibraryQC() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2079,7 +3275,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testDeleteLibraryDilution() {
+	public void testDeleteLibraryDilution() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2090,7 +3286,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testDeleteEmPCRDilution() {
+	public void testDeleteEmPCRDilution() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2101,7 +3297,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testDeleteSequencerReference() {
+	public void testDeleteSequencerReference() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2112,7 +3308,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testDeletePool() {
+	public void testDeletePool() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2123,7 +3319,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testDeletePoolQC() {
+	public void testDeletePoolQC() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2134,7 +3330,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testDeletePlate() {
+	public void testDeletePlate() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2145,7 +3341,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testDeleteEntityGroup() {
+	public void testDeleteEntityGroup() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2156,7 +3352,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testDeleteContainer() {
+	public void testDeleteContainer() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2167,7 +3363,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testDeletePartition() {
+	public void testDeletePartition() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2178,7 +3374,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testDeleteNote() {
+	public void testDeleteNote() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2189,7 +3385,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testSaveRuns() {
+	public void testSaveRuns() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2200,7 +3396,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testSaveRunNote() {
+	public void testSaveRunNote() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2211,7 +3407,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testSaveEmPcrDilution() {
+	public void testSaveEmPcrDilution() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2222,7 +3418,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testSavePlatform() {
+	public void testSavePlatform() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2233,7 +3429,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testSaveStatus() {
+	public void testSaveStatus() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2244,7 +3440,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testSaveSecurityProfile() {
+	public void testSaveSecurityProfile() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2255,7 +3451,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testSaveSequencerReference() {
+	public void testSaveSequencerReference() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2266,7 +3462,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testSaveKit() {
+	public void testSaveKit() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2277,7 +3473,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testSaveKitDescriptor() {
+	public void testSaveKitDescriptor() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2288,7 +3484,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testSavePlate() {
+	public void testSavePlate() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2299,7 +3495,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testSaveAlert() {
+	public void testSaveAlert() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2310,7 +3506,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testSaveBox() {
+	public void testSaveBox() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2321,7 +3517,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testGetLibraryTypeById() {
+	public void testGetLibraryTypeById() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2332,7 +3528,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testGetLibraryTypeByDescription() {
+	public void testGetLibraryTypeByDescription() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2343,7 +3539,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testGetLibraryTypeByDescriptionAndPlatform() {
+	public void testGetLibraryTypeByDescriptionAndPlatform() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2354,7 +3550,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testGetLibrarySelectionTypeById() {
+	public void testGetLibrarySelectionTypeById() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2365,7 +3561,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testGetLibrarySelectionTypeByName() {
+	public void testGetLibrarySelectionTypeByName() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2376,7 +3572,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testGetLibraryStrategyTypeById() {
+	public void testGetLibraryStrategyTypeById() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2387,7 +3583,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testGetLibraryStrategyTypeByName() {
+	public void testGetLibraryStrategyTypeByName() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2398,7 +3594,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testGetTagBarcodeById() {
+	public void testGetTagBarcodeById() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2409,7 +3605,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testGetPlatformById() {
+	public void testGetPlatformById() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2420,7 +3616,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testGetStatusById() {
+	public void testGetStatusById() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2431,7 +3627,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testGetSequencerReferenceById() {
+	public void testGetSequencerReferenceById() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2442,7 +3638,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testGetSequencerReferenceByName() {
+	public void testGetSequencerReferenceByName() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2453,7 +3649,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testGetSequencerReferenceByRunId() {
+	public void testGetSequencerReferenceByRunId() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2464,7 +3660,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testGetKitById() {
+	public void testGetKitById() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2475,7 +3671,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testGetKitByIdentificationBarcode() {
+	public void testGetKitByIdentificationBarcode() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2486,7 +3682,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testGetKitByLotNumber() {
+	public void testGetKitByLotNumber() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2497,7 +3693,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testGetKitDescriptorById() {
+	public void testGetKitDescriptorById() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2508,7 +3704,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testGetKitDescriptorByPartNumber() {
+	public void testGetKitDescriptorByPartNumber() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2519,7 +3715,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testGetSampleQcTypeById() {
+	public void testGetSampleQcTypeById() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2530,7 +3726,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testGetSampleQcTypeByName() {
+	public void testGetSampleQcTypeByName() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2541,7 +3737,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testGetLibraryQcTypeById() {
+	public void testGetLibraryQcTypeById() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2552,7 +3748,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testGetLibraryQcTypeByName() {
+	public void testGetLibraryQcTypeByName() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2563,7 +3759,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testGetRunQcTypeById() {
+	public void testGetRunQcTypeById() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2574,7 +3770,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testGetRunQcTypeByName() {
+	public void testGetRunQcTypeByName() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2585,7 +3781,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testGetPoolQcTypeById() {
+	public void testGetPoolQcTypeById() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2596,7 +3792,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testGetPoolQcTypeByName() {
+	public void testGetPoolQcTypeByName() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2607,7 +3803,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testGetAlertById() {
+	public void testGetAlertById() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2618,7 +3814,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testGetBoxById() {
+	public void testGetBoxById() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2629,7 +3825,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testGetBoxByBarcode() {
+	public void testGetBoxByBarcode() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2640,7 +3836,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testGetBoxByAlias() {
+	public void testGetBoxByAlias() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2651,7 +3847,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllBoxes() {
+	public void testListAllBoxes() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2662,7 +3858,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllBoxesWithLimit() {
+	public void testListAllBoxesWithLimit() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2673,7 +3869,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllBoxesBySearch() {
+	public void testListAllBoxesBySearch() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2684,7 +3880,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllBoxesByAlias() {
+	public void testListAllBoxesByAlias() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2695,7 +3891,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllChanges() {
+	public void testListAllChanges() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2706,7 +3902,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllSampleTypes() {
+	public void testListAllSampleTypes() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2717,7 +3913,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllLibraryTypes() {
+	public void testListAllLibraryTypes() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2728,7 +3924,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListLibraryTypesByPlatform() {
+	public void testListLibraryTypesByPlatform() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2739,7 +3935,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllLibrarySelectionTypes() {
+	public void testListAllLibrarySelectionTypes() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2750,7 +3946,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllLibraryStrategyTypes() {
+	public void testListAllLibraryStrategyTypes() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2761,7 +3957,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllTagBarcodes() {
+	public void testListAllTagBarcodes() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2772,7 +3968,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllTagBarcodesByPlatform() {
+	public void testListAllTagBarcodesByPlatform() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2783,7 +3979,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllTagBarcodesByStrategyName() {
+	public void testListAllTagBarcodesByStrategyName() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2794,7 +3990,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllEmPCRsByProjectId() {
+	public void testListAllEmPCRsByProjectId() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2805,7 +4001,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListPoolsByProjectId() {
+	public void testListPoolsByProjectId() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2816,7 +4012,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllPlatforms() {
+	public void testListAllPlatforms() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2827,7 +4023,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListPlatformsOfType() {
+	public void testListPlatformsOfType() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2838,7 +4034,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListDistinctPlatformNames() {
+	public void testListDistinctPlatformNames() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2849,7 +4045,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllBoxUses() {
+	public void testListAllBoxUses() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2860,7 +4056,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllBoxUsesStrings() {
+	public void testListAllBoxUsesStrings() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2871,7 +4067,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllBoxSizes() {
+	public void testListAllBoxSizes() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2882,7 +4078,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllStudyTypes() {
+	public void testListAllStudyTypes() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2893,7 +4089,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testGetBoxablesFromBarcodeList() {
+	public void testGetBoxablesFromBarcodeList() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2904,7 +4100,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllSequencerReferences() {
+	public void testListAllSequencerReferences() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2915,7 +4111,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListSequencerReferencesByPlatformType() {
+	public void testListSequencerReferencesByPlatformType() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2926,7 +4122,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllKits() {
+	public void testListAllKits() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2937,7 +4133,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListKitsByExperimentId() {
+	public void testListKitsByExperimentId() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2948,7 +4144,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListKitsByManufacturer() {
+	public void testListKitsByManufacturer() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2959,7 +4155,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListKitsByType() {
+	public void testListKitsByType() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2970,7 +4166,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListKitDescriptorsByType() {
+	public void testListKitDescriptorsByType() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2981,7 +4177,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllKitDescriptors() {
+	public void testListAllKitDescriptors() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -2992,7 +4188,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllSampleQcTypes() {
+	public void testListAllSampleQcTypes() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -3003,7 +4199,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllLibraryQcTypes() {
+	public void testListAllLibraryQcTypes() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -3014,7 +4210,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllPoolQcTypes() {
+	public void testListAllPoolQcTypes() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -3025,7 +4221,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllRunQcTypes() {
+	public void testListAllRunQcTypes() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -3036,7 +4232,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllStatus() {
+	public void testListAllStatus() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -3047,7 +4243,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAllStatusBySequencerName() {
+	public void testListAllStatusBySequencerName() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -3058,7 +4254,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListUnreadAlertsByUserId() {
+	public void testListUnreadAlertsByUserId() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -3069,7 +4265,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAlertsByUserIdLong() {
+	public void testListAlertsByUserIdLong() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -3080,7 +4276,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testListAlertsByUserIdLongLong() {
+	public void testListAlertsByUserIdLongLong() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -3091,7 +4287,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testEmptySingleTube() {
+	public void testEmptySingleTube() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -3102,7 +4298,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testEmptyAllTubes() {
+	public void testEmptyAllTubes() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -3113,7 +4309,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testDeleteBox() {
+	public void testDeleteBox() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -3122,7 +4318,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testObject() {
+	public void testObject() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -3131,7 +4327,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testGetClass() {
+	public void testGetClass() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -3140,7 +4336,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testHashCode() {
+	public void testHashCode() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -3149,7 +4345,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testEquals() {
+	public void testEquals() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -3158,7 +4354,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testClone() {
+	public void testClone() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -3167,7 +4363,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testToString() {
+	public void testToString() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -3176,7 +4372,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testNotify() {
+	public void testNotify() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -3185,7 +4381,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testNotifyAll() {
+	public void testNotifyAll() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -3194,7 +4390,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testWaitLong() {
+	public void testWaitLong() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -3203,7 +4399,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testWaitLongInt() {
+	public void testWaitLongInt() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -3212,7 +4408,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testWait() {
+	public void testWait() throws IOException {
 		// TODO: Implement.
 	}
 
@@ -3221,7 +4417,7 @@ public class UserAuthMisoRequestManagerTestSuite {
 	 */
 
 	@Test
-	public void testFinalize() {
+	public void testFinalize() throws IOException {
 		// TODO: Implement.
 	}
 

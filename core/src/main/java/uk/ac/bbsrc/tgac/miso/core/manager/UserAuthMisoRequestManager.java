@@ -643,7 +643,7 @@ public class UserAuthMisoRequestManager implements RequestManager {
       return o;
     else
       throw new IOException(
-          "User " + getCurrentUser().getFullName() + " cannot read parent Run " + o.getSample().getId() + " for SampleQC " + sampleQcId);
+          "User " + getCurrentUser().getFullName() + " cannot read parent Sample " + o.getSample().getId() + " for SampleQC " + sampleQcId);
   }
 
   @Override
