@@ -75,7 +75,7 @@ FOR EACH ROW
 
 CREATE TRIGGER PlateInsert AFTER INSERT ON Plate
 FOR EACH ROW
-  INSERT INTO PlateChangeLog(sampleId, columnsChanged, userId, message) VALUES (
+  INSERT INTO PlateChangeLog(plateId, columnsChanged, userId, message) VALUES (
     NEW.plateId,
     '',
     NEW.lastModifier,
