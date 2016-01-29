@@ -86,7 +86,7 @@ import uk.ac.bbsrc.tgac.miso.sqlstore.util.DbUtils;
 public class SQLPlateDAO implements PlateStore {
   private static final String TABLE_NAME = "Plate";
 
-  public static final String PLATE_SELECT = "SELECT plateId, name, description, creationDate, plateMaterialType, identificationBarcode, locationBarcode, size, tagBarcodeId, securityProfile_profileId "
+  public static final String PLATE_SELECT = "SELECT plateId, name, description, creationDate, plateMaterialType, identificationBarcode, locationBarcode, size, tagBarcodeId, securityProfile_profileId, lastModifier "
       + "FROM " + TABLE_NAME;
 
   public static final String PLATE_SELECT_BY_ID = PLATE_SELECT + " WHERE plateId = ?";
