@@ -195,7 +195,6 @@ Plate.ui = {
             "</fieldset></form>");
 
     jQuery('#changePlateIdBarcodeDialog').dialog({
-      autoOpen: false,
       width: 400,
       modal: true,
       resizable: false,
@@ -208,7 +207,7 @@ Plate.ui = {
           jQuery(this).dialog('close');
         }
       }
-    }).dialog('open');
+    });
   },
 
   changePlateIdBarcode: function (plateId, idBarcode) {
